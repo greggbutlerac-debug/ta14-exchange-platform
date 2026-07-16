@@ -1,0 +1,13 @@
+TA-14 Exchange Platform - Verified Source Package
+
+Copy EVERYTHING inside this folder into:
+C:\Users\gregg\Documents\GitHub\ta14-exchange-platform
+
+Do not copy the outer folder itself.
+Do not delete the existing .git folder in the destination.
+
+Verified before packaging:
+- npm ci: passed
+- TypeScript: passed
+- 18 tests: passed
+- Next.js production build: passed

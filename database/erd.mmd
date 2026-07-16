@@ -1,0 +1,14 @@
+erDiagram
+  ORGANIZATIONS ||--o{ ORGANIZATION_MEMBERS : has
+  ORGANIZATIONS ||--o{ SYSTEMS : owns
+  SYSTEMS ||--o{ ROUTES : defines
+  ROUTES ||--o{ ROUTE_VERSIONS : versions
+  ROUTE_VERSIONS ||--o{ AUTHORITY_RECORDS : binds
+  ROUTE_VERSIONS ||--o{ TEST_RUNS : tested_by
+  TEST_RUNS ||--o{ TEST_RECEIPTS : produces
+  ROUTE_VERSIONS ||--o{ AER_RECORDS : exports
+  TEST_RUNS ||--o{ AER_RECORDS : supports
+  ORGANIZATIONS ||--o{ EVIDENCE_OBJECTS : controls
+  ORGANIZATIONS ||--o{ PAYMENTS : makes
+  PAYMENTS ||--o| ENTITLEMENTS : activates
+  ROUTES ||--o{ REGISTRY_EVENTS : projects
