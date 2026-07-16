@@ -1,0 +1,26 @@
+TA-14 EXCHANGE — COMPLETE CLEAN SOURCE
+
+This ZIP contains the complete project source needed for the GitHub repository.
+It intentionally excludes node_modules, .next build output, local data, and secrets.
+
+GITHUB UPLOAD
+1. Extract this ZIP.
+2. Open the extracted ta14-exchange-platform folder.
+3. On GitHub, open greggbutlerac-debug/ta14-exchange-platform.
+4. Choose Add file > Upload files.
+5. Drag everything INSIDE the ta14-exchange-platform folder onto the upload page.
+6. Commit directly to the main branch.
+
+LOCAL RUN
+1. Install Node.js 20.9 or newer.
+2. Open a terminal in the ta14-exchange-platform folder.
+3. Run: npm install
+4. Run: npm run dev
+5. Open: http://localhost:3000
+
+FULL VERIFICATION
+Run: npm run verify
+
+CURRENT BOUNDARY
+This is the complete local single-route demonstration source. Live sales still require
+production authentication, PostgreSQL, Stripe, managed signing keys, email, and hosting.

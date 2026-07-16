@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/aer.schema.json",
+  "type": "object",
+  "required": [
+    "rid",
+    "routeVersion",
+    "boundary",
+    "decision",
+    "manifestHash",
+    "history"
+  ],
+  "properties": {
+    "rid": {
+      "type": "string"
+    },
+    "routeVersion": {
+      "type": "integer"
+    },
+    "boundary": {
+      "enum": [
+        "self_declared",
+        "mapped",
+        "reviewable",
+        "verified",
+        "continuously_verified"
+      ]
+    },
+    "decision": {
+      "enum": [
+        "ALLOW",
+        "HOLD",
+        "DENY",
+        "ESCALATE"
+      ]
+    },
+    "manifestHash": {
+      "type": "string"
+    },
+    "history": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": true
+}

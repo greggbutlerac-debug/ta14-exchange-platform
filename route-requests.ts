@@ -1,0 +1,3 @@
+import {sha256Canonical} from "../crypto/receipts";
+export interface PaymentCommit{currency:"USD";amountMinor:number;supplierId:string;invoiceId:string;beneficiaryId:string;policyVersion:string;}
+export function createPaymentCommit(input:{amountUsd:number;supplierId:string;invoiceId:string;beneficiaryId:string;policyVersion:string}){const amountMinor=Math.round(input.amountUsd*100);if(Math.abs(amountMinor/100-input.amountUsd)>1e-9)throw new Error("amountUsd supports no more than two decimal places.");const commit:PaymentCommit={currency:"USD",amountMinor,supplierId:input.supplierId.trim(),invoiceId:input.invoiceId.trim(),beneficiaryId:input.beneficiaryId.trim(),policyVersion:input.policyVersion};return{commit,hash:sha256Canonical(commit)};}
