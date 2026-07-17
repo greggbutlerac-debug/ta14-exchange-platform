@@ -1,8 +1,4 @@
-import {
-  BlobPreconditionFailedError,
-  get,
-  put,
-} from "@vercel/blob";
+import { get, put } from "@vercel/blob";
 import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
@@ -55,13 +51,7 @@ type Db = {
   key?: SigningKeyPair;
 };
 
-type LoadedBlobDb = {
-  db: Db;
-  etag: string | null;
-};
-
 const BLOB_PATHNAME = "ta14-exchange/runtime/local-store.json";
-const MAX_BLOB_WRITE_ATTEMPTS = 6;
 
 const dataDir = () =>
   process.env.TA14_DATA_DIR ?? path.join(process.cwd(), "data");
@@ -122,75 +112,28 @@ async function saveLocal(db: Db): Promise<void> {
   await rename(temporaryFile, file);
 }
 
-async function loadBlob(): Promise<LoadedBlobDb> {
+async function loadBlob(): Promise<Db> {
   const result = await get(BLOB_PATHNAME, {
     access: "private",
     useCache: false,
   });
 
   if (!result || result.statusCode !== 200 || !result.stream) {
-    return {
-      db: emptyDb(),
-      etag: null,
-    };
+    return emptyDb();
   }
 
   const contents = await new Response(result.stream).text();
   const parsed = JSON.parse(contents) as Partial<Db>;
 
-  return {
-    db: normalizeDb(parsed),
-    etag: result.blob.etag,
-  };
+  return normalizeDb(parsed);
 }
 
-async function saveBlob(db: Db, etag: string | null): Promise<void> {
-  const body = JSON.stringify(db, null, 2);
-
-  if (etag) {
-    await put(BLOB_PATHNAME, body, {
-      access: "private",
-      contentType: "application/json",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-      ifMatch: etag,
-    });
-
-    return;
-  }
-
-  await put(BLOB_PATHNAME, body, {
+async function saveBlob(db: Db): Promise<void> {
+  await put(BLOB_PATHNAME, JSON.stringify(db, null, 2), {
     access: "private",
     contentType: "application/json",
     addRandomSuffix: false,
-  });
-}
-
-function isConcurrentBlobWrite(error: unknown): boolean {
-  if (error instanceof BlobPreconditionFailedError) {
-    return true;
-  }
-
-  if (!(error instanceof Error)) {
-    return false;
-  }
-
-  const message = error.message.toLowerCase();
-
-  return (
-    message.includes("already exists") ||
-    message.includes("precondition") ||
-    message.includes("etag") ||
-    message.includes("conflict")
-  );
-}
-
-async function waitBeforeRetry(attempt: number): Promise<void> {
-  const delayMilliseconds =
-    50 * 2 ** attempt + Math.floor(Math.random() * 75);
-
-  await new Promise<void>((resolve) => {
-    setTimeout(resolve, delayMilliseconds);
+    allowOverwrite: true,
   });
 }
 
@@ -208,30 +151,12 @@ async function mutateLocal<T>(
 async function mutateBlob<T>(
   operation: (db: Db) => Promise<T> | T,
 ): Promise<T> {
-  for (
-    let attempt = 0;
-    attempt < MAX_BLOB_WRITE_ATTEMPTS;
-    attempt += 1
-  ) {
-    const loaded = await loadBlob();
-    const result = await operation(loaded.db);
+  const db = await loadBlob();
+  const result = await operation(db);
 
-    try {
-      await saveBlob(loaded.db, loaded.etag);
-      return result;
-    } catch (error) {
-      const finalAttempt =
-        attempt === MAX_BLOB_WRITE_ATTEMPTS - 1;
+  await saveBlob(db);
 
-      if (!isConcurrentBlobWrite(error) || finalAttempt) {
-        throw error;
-      }
-
-      await waitBeforeRetry(attempt);
-    }
-  }
-
-  throw new Error("Unable to persist the route store.");
+  return result;
 }
 
 async function mutate<T>(
@@ -260,8 +185,7 @@ async function mutate<T>(
 
 async function load(): Promise<Db> {
   if (useBlobStorage()) {
-    const loaded = await loadBlob();
-    return loaded.db;
+    return loadBlob();
   }
 
   return loadLocal();
