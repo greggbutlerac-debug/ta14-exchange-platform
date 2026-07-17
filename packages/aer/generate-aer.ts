@@ -33,7 +33,7 @@ export interface AerRecord {
     source: string;
     claim: string;
 
-    provenance: {
+    evidenceProvenance: {
       capturedBy: string;
       capturedAt: string;
 
