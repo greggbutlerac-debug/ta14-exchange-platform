@@ -2,34 +2,37 @@
   "name": "ta14-exchange-platform",
   "version": "0.3.2",
   "private": true,
+  "description": "TA-14 Global Admissible Execution Exchange website and admissible execution integrity engine.",
   "type": "module",
+  "packageManager": "npm@10.8.1",
+  "engines": {
+    "node": ">=22 <25",
+    "npm": "10.8.1"
+  },
   "scripts": {
     "dev": "next dev apps/web",
     "build": "next build apps/web",
     "start": "next start apps/web",
+    "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit",
-    "verify": "npm run typecheck && npm test && npm run build"
+    "verify": "npm run typecheck && npm run test && npm run build",
+    "clean": "node -e \"const fs=require('fs'); for (const path of ['apps/web/.next','coverage']) fs.rmSync(path,{recursive:true,force:true});\""
   },
   "dependencies": {
-    "ajv": "^8.17.1",
-    "next": "^15.5.7",
-    "react": "^19.2.0",
-    "react-dom": "^19.2.0"
+    "ajv": "8.17.1",
+    "next": "15.5.7",
+    "react": "19.2.0",
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
-    "@types/node": "^22.10.2",
-    "@types/react": "^19.2.2",
-    "@types/react-dom": "^19.2.2",
-    "typescript": "^5.6.3",
-    "vitest": "^4.1.10"
-  },
-  "description": "TA-14 Global Admissible Execution Exchange single-route website and integrity engine.",
-  "engines": {
-    "node": ">=20.9.0"
+    "@types/node": "22.10.2",
+    "@types/react": "19.2.2",
+    "@types/react-dom": "19.2.2",
+    "typescript": "5.6.3",
+    "vitest": "4.1.10"
   },
   "overrides": {
-    "postcss": "^8.5.10"
+    "postcss": "8.5.10"
   }
 }
