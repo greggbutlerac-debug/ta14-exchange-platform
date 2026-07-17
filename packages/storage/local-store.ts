@@ -88,15 +88,6 @@ function normalizeDb(raw: Partial<Db> | undefined): Db {
 }
 
 function useBlobStorage(): boolean {
-  /*
-   * Current Vercel Blob connections use short-lived OIDC authentication
-   * automatically inside Vercel Functions and may not expose the legacy
-   * BLOB_READ_WRITE_TOKEN variable.
-   *
-   * BLOB_STORE_ID confirms the connected store. VERCEL confirms that the
-   * code is executing in a Vercel deployment. The legacy token remains
-   * supported for local environments and older project connections.
-   */
   return (
     process.env.VERCEL === "1" ||
     Boolean(process.env.BLOB_STORE_ID) ||
@@ -134,6 +125,7 @@ async function saveLocal(db: Db): Promise<void> {
 async function loadBlob(): Promise<LoadedBlobDb> {
   const result = await get(BLOB_PATHNAME, {
     access: "private",
+    useCache: false,
   });
 
   if (!result || result.statusCode !== 200 || !result.stream) {
