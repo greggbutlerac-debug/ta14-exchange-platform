@@ -1161,12 +1161,13 @@ export default function HomePage() {
 
             <nav className="nav-links">
               <a href="#architecture">Architecture</a>
-              <a href="#demo">Route Demo</a>
+              <a href="#platform">Platform</a>
+              <a href="#demo">Runtime</a>
               <a href="#pricing">Pricing</a>
-              <a href="#use-cases">Use Cases</a>
+              <a href="#use-cases">Ecosystem</a>
               <a href="#contact">Contact</a>
               <a className="button button-primary" href="#demo">
-                Start a Route
+                Open Workspace
               </a>
             </nav>
 
@@ -1185,33 +1186,30 @@ export default function HomePage() {
           <section className="container hero">
             <div>
               <div className="eyebrow">
-                Global Admissible Execution Exchange
+                Governance Infrastructure for Builders
               </div>
 
               <h1>
-                Every consequence
+                Build the governance system
                 <br />
-                has a route.
+                that stands between
                 <br />
                 <span className="gradient-text">
-                  TA-14 proves whether it should exist.
+                  intelligence and consequence.
                 </span>
               </h1>
 
               <p className="hero-copy">
-                Build, test, correct, preserve, and verify consequential
-                execution routes before consequence occurs. TA-14 transforms
-                governance claims into bounded records, explainable decisions,
-                correction paths, and durable proof.
+                TA-14 is the exchange platform where AI governance entities, enterprises, reviewers, researchers, and system builders design, test, connect, and verify governance systems before those systems authorize consequential execution.
               </p>
 
               <div className="hero-actions">
                 <a className="button button-primary" href="#demo">
-                  Start Your First Route
+                  Enter the Governance Workspace
                 </a>
 
                 <a className="button button-secondary" href="#architecture">
-                  Explore the Architecture
+                  Explore the TA-14 Architecture
                 </a>
               </div>
 
@@ -1249,7 +1247,7 @@ export default function HomePage() {
               </div>
 
               <div className="core-caption">
-                Admissible execution infrastructure
+                Governance system construction layer
               </div>
             </div>
           </section>
@@ -1259,13 +1257,11 @@ export default function HomePage() {
               <div className="eyebrow">The governing chain</div>
 
               <h2>
-                The route is the governance problem.
+                A place to build governance—not merely describe it.
               </h2>
 
               <p>
-                TA-14 does not stop at policy, monitoring, or approval. It
-                governs the continuity of the exact route from reality through
-                outcome.
+                Bring your own architecture, policy model, agent system, evidence framework, or review layer. TA-14 gives builders a common execution route for testing whether authority, evidence, continuity, binding, commit, execution, and outcome remain admissible together.
               </p>
             </div>
 
@@ -1280,30 +1276,104 @@ export default function HomePage() {
             <div className="product-grid">
               <article className="card">
                 <div className="card-icon">◇</div>
-                <h3>Build</h3>
+                <h3>Design</h3>
                 <p>
-                  Define one bounded consequential action, accountable actor,
-                  authority basis, evidence, policy, destination, and expected
-                  outcome.
+                  Model your governance system, define its boundaries, identify its authority sources, and map every dependency required before execution.
                 </p>
               </article>
 
               <article className="card">
                 <div className="card-icon">⚡</div>
-                <h3>Test</h3>
+                <h3>Challenge</h3>
                 <p>
-                  Run deterministic and challenge tests across completeness,
-                  freshness, identity, policy, commit, bypass, replay, and
-                  outcome correspondence.
+                  Run route-level challenge tests across identity, evidence integrity, freshness, policy, authority, commit, bypass resistance, replay, and outcome correspondence.
                 </p>
               </article>
 
               <article className="card">
                 <div className="card-icon">✓</div>
-                <h3>Preserve</h3>
+                <h3>Connect</h3>
                 <p>
-                  Generate an admissible execution record, essential history,
-                  manifest, route identity, and stable verification reference.
+                  Connect governance entities, review partners, APIs, registries, evidence systems, and execution environments through one preserved route identity.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section id="platform" className="container section">
+            <div className="section-heading">
+              <div className="eyebrow">The governance construction environment</div>
+
+              <h2>
+                Bring your architecture. Build the system around it.
+              </h2>
+
+              <p>
+                The TA-14 Exchange Platform is designed for governance entities and
+                system builders who need more than a public framework. It provides
+                the workspace where governance models become testable routes,
+                interoperable controls, preserved records, and independently
+                reviewable execution infrastructure.
+              </p>
+            </div>
+
+            <div className="product-grid">
+              <article className="card">
+                <div className="card-icon">⌘</div>
+                <h3>Architecture Workspace</h3>
+                <p>
+                  Map your governance model to the TA-14 chain without surrendering
+                  your identity, intellectual property, or independent boundaries.
+                </p>
+              </article>
+
+              <article className="card">
+                <div className="card-icon">↯</div>
+                <h3>Runtime Sandbox</h3>
+                <p>
+                  Submit consequential routes, inject failures, test corrections,
+                  inspect decision receipts, and prove how your system behaves before
+                  production consequence.
+                </p>
+              </article>
+
+              <article className="card">
+                <div className="card-icon">◎</div>
+                <h3>Governance Exchange</h3>
+                <p>
+                  Connect review entities, evidence layers, policy engines, agent
+                  controls, registries, APIs, and execution systems through bounded,
+                  attributable interfaces.
+                </p>
+              </article>
+
+              <article className="card">
+                <div className="card-icon">◇</div>
+                <h3>Partner Review Network</h3>
+                <p>
+                  Preserve architectural independence while receiving scoped review,
+                  second-layer challenge, referral continuity, and clearly documented
+                  boundaries.
+                </p>
+              </article>
+
+              <article className="card">
+                <div className="card-icon">#</div>
+                <h3>Public Registry</h3>
+                <p>
+                  Issue stable route identities, preserve manifests and decision
+                  histories, and create a verification surface that does not depend on
+                  trusting a private dashboard.
+                </p>
+              </article>
+
+              <article className="card">
+                <div className="card-icon">API</div>
+                <h3>Integration Layer</h3>
+                <p>
+                  Bind external governance systems to route creation, evidence intake,
+                  decision states, commits, execution receipts, outcomes, and replay
+                  verification.
                 </p>
               </article>
             </div>
@@ -1314,14 +1384,11 @@ export default function HomePage() {
               <div className="eyebrow">Live route demonstration</div>
 
               <h2>
-                Watch a consequential route receive a real decision.
+                Experience the shared runtime beneath every governance system.
               </h2>
 
               <p>
-                This demonstration models a vendor payment above USD 25,000.
-                The first run receives HOLD. Correct the missing authority and
-                beneficiary binding, then rerun to produce ALLOW and a
-                self-declared AER preview.
+                This demonstration shows how an external governance system can submit a consequential route into TA-14, receive an exact HOLD, correct the missing authority and beneficiary binding, and generate a preserved execution record after the route becomes admissible.
               </p>
             </div>
 
@@ -1655,16 +1722,14 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
 
           <section id="use-cases" className="container section">
             <div className="section-heading">
-              <div className="eyebrow">One architecture, many domains</div>
+              <div className="eyebrow">One exchange, many governance systems</div>
 
               <h2>
-                Consequence exists everywhere.
+                Every governance architecture needs somewhere to become operational.
               </h2>
 
               <p>
-                TA-14 is designed for any domain where identity, authority,
-                evidence, binding, execution, and outcome must remain
-                reconstructable.
+                TA-14 provides the construction, testing, exchange, review, registry, and verification environment for governance systems operating wherever identity, authority, evidence, execution, and outcome must remain reconstructable.
               </p>
             </div>
 
@@ -1722,8 +1787,7 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                 </a>
 
                 <p>
-                  Build the route. Prove the consequence. Earn reliance through
-                  working records.
+                  Build governance systems. Connect review layers. Test execution routes. Preserve proof.
                 </p>
               </div>
 
@@ -1732,9 +1796,9 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
 
                 <div className="footer-links">
                   <a href="#architecture">Architecture</a>
-                  <a href="#demo">Route Demo</a>
+                  <a href="#demo">Runtime</a>
                   <a href="#pricing">Pricing</a>
-                  <a href="#use-cases">Use Cases</a>
+                  <a href="#use-cases">Ecosystem</a>
                 </div>
               </div>
 
