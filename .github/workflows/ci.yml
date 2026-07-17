@@ -1,12 +1,4 @@
-name: CI
-on:
-  push:
-  pull_request:
-jobs:
-  verify:
-    runs-on: ubuntu-latest
-    steps:
-      - uses:name: CI
+name: Verify
 
 on:
   push:
@@ -15,49 +7,48 @@ on:
   pull_request:
     branches:
       - main
+  workflow_dispatch:
 
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+permissions:
+  contents: read
 
 jobs:
   verify:
+    name: Verify application
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4.2.2
 
       - name: Set up Node.js
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v4.4.0
         with:
-          node-version: 24
+          node-version: "22"
           cache: npm
           cache-dependency-path: package-lock.json
 
-      - name: Show runtime versions
+      - name: Display runtime versions
         run: |
           node --version
           npm --version
 
-      - name: Install stable npm
-        run: npm install --global npm@10.8.0
+      - name: Install pinned npm version
+        run: npm install --global npm@10.8.1
 
-      - name: Clean npm cache
-        run: npm cache clean --force
+      - name: Confirm npm version
+        run: npm --version
 
       - name: Install dependencies
-        run: npm ci --no-audit --no-fund --prefer-offline
+        run: npm ci --no-audit --no-fund
+        timeout-minutes: 12
 
-      - name: Verify platform
-        run: npm run verify
+      - name: Run typecheck
+        run: npm run typecheck
 
-      - name: Build platform
-        run: npm run build actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci
-      - run: npm run verify
+      - name: Run automated tests
+        run: npm test
+
+      - name: Build production application
+        run: npm run build
