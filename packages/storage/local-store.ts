@@ -88,7 +88,20 @@ function normalizeDb(raw: Partial<Db> | undefined): Db {
 }
 
 function useBlobStorage(): boolean {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  /*
+   * Current Vercel Blob connections use short-lived OIDC authentication
+   * automatically inside Vercel Functions and may not expose the legacy
+   * BLOB_READ_WRITE_TOKEN variable.
+   *
+   * BLOB_STORE_ID confirms the connected store. VERCEL confirms that the
+   * code is executing in a Vercel deployment. The legacy token remains
+   * supported for local environments and older project connections.
+   */
+  return (
+    process.env.VERCEL === "1" ||
+    Boolean(process.env.BLOB_STORE_ID) ||
+    Boolean(process.env.BLOB_READ_WRITE_TOKEN)
+  );
 }
 
 async function loadLocal(): Promise<Db> {
@@ -146,6 +159,7 @@ async function saveBlob(db: Db, etag: string | null): Promise<void> {
     await put(BLOB_PATHNAME, body, {
       access: "private",
       contentType: "application/json",
+      addRandomSuffix: false,
       allowOverwrite: true,
       ifMatch: etag,
     });
@@ -156,6 +170,7 @@ async function saveBlob(db: Db, etag: string | null): Promise<void> {
   await put(BLOB_PATHNAME, body, {
     access: "private",
     contentType: "application/json",
+    addRandomSuffix: false,
   });
 }
 
@@ -266,6 +281,7 @@ function appendEvent(db: Db, event: RouteEventInput): RouteEvent {
     .at(-1);
 
   const prevEventHash = prior?.eventHash ?? null;
+
   const eventHash = sha256Canonical({
     ...event,
     prevEventHash,
