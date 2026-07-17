@@ -2,7 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ta14-exchange-platform.netlify.app'),
+  metadataBase: new URL(
+    'https://ta14-exchange-platform-x2g7.vercel.app',
+  ),
   title: {
     default: 'TA-14 Exchange Platform',
     template: '%s | TA-14 Exchange Platform',
