@@ -187,7 +187,7 @@ function isConcurrentBlobWrite(error: unknown): boolean {
 
 async function waitBeforeRetry(attempt: number): Promise<void> {
   const delayMilliseconds =
-    35 * 2 ** attempt + Math.floor(Math.random() * 40);
+    50 * 2 ** attempt + Math.floor(Math.random() * 75);
 
   await new Promise<void>((resolve) => {
     setTimeout(resolve, delayMilliseconds);
@@ -311,6 +311,12 @@ export function verifyEventChain(events: RouteEvent[]): boolean {
 }
 
 export async function signingKey(): Promise<SigningKeyPair> {
+  const existingDb = await load();
+
+  if (existingDb.key) {
+    return existingDb.key;
+  }
+
   return mutate((db) => {
     if (!db.key) {
       db.key = generateDevelopmentSigningKey();
