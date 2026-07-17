@@ -7,7 +7,7 @@
   "packageManager": "npm@10.8.1",
   "engines": {
     "node": ">=22 <25",
-    "npm": "10.8.1"
+    "npm": ">=10.8.1 <11"
   },
   "scripts": {
     "dev": "next dev apps/web",
@@ -20,19 +20,19 @@
     "clean": "node -e \"const fs=require('fs'); for (const path of ['apps/web/.next','coverage']) fs.rmSync(path,{recursive:true,force:true});\""
   },
   "dependencies": {
-    "ajv": "8.17.1",
-    "next": "15.5.7",
-    "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "ajv": "^8.17.1",
+    "next": "^15.5.7",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0"
   },
   "devDependencies": {
-    "@types/node": "22.10.2",
-    "@types/react": "19.2.2",
-    "@types/react-dom": "19.2.2",
-    "typescript": "5.6.3",
-    "vitest": "4.1.10"
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.2.2",
+    "@types/react-dom": "^19.2.2",
+    "typescript": "^5.6.3",
+    "vitest": "^4.1.10"
   },
   "overrides": {
-    "postcss": "8.5.10"
+    "postcss": "^8.5.10"
   }
 }
