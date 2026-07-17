@@ -19,7 +19,7 @@ const modules: AcademyModule[] = [
     description:
       'Learn why a route is more than a workflow. A governance route binds reality, evidence, authority, continuity, and consequence into one inspectable execution path.',
     outcome: 'Identify the route, consequence, accountable actor, and governing boundary.',
-    href: '/learn',
+    href: '/academy/what-is-a-route',
     status: 'Available now',
     accent: 'cyan',
   },
