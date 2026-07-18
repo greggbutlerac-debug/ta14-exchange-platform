@@ -11,6 +11,8 @@ import {
 } from "react";
 import type { TransferRouteDraft } from "../../../lib/route-draft-transfer";
 import { saveStoredRoute } from "../../../lib/route-library";
+import AcademyLabBuilderBridge from "./academy-lab-builder-bridge";
+import type { AcademyLabBuilderDraft } from "./academy-lab-transfer-adapter";
 import EvaluateRouteLink from "./evaluate-route-link";
 import { useRouteBuilderHandoff } from "./use-route-builder-handoff";
 
@@ -481,6 +483,36 @@ export default function BuildRoutePage() {
     );
   }
 
+  function applyAcademyLabDraft(draft: AcademyLabBuilderDraft) {
+    const opened = draft.route;
+
+    setRouteName(
+      opened.metadata.name.trim() || `${draft.labTitle} route`,
+    );
+    setDomain(opened.metadata.domain.trim() || "AI Governance");
+    setOwner(opened.metadata.owner.trim() || "UNKNOWN");
+    setStages(
+      stageDefinitions.map((stage) => ({
+        ...stage,
+        value:
+          opened.chain[stage.key] === "UNKNOWN"
+            ? ""
+            : opened.chain[stage.key],
+      })),
+    );
+    setSelected("reality");
+    setShowJson(false);
+    setCopied(false);
+    setSavedAt(null);
+    setStoredRouteId(null);
+    setLibraryNotice(null);
+    setImportNotice({
+      type: "success",
+      title: "Academy Lab route loaded",
+      message: `${draft.labTitle} transferred ${opened.readiness.completedStages} of 8 defined stages into the Route Builder. Complete any unresolved stages before evaluation.`,
+    });
+  }
+
   function validateImportedRoute(value: unknown): TransferRouteDraft {
     if (!value || typeof value !== "object") {
       throw new Error("The selected file does not contain a route object.");
@@ -737,6 +769,11 @@ export default function BuildRoutePage() {
           </button>
         </div>
       </header>
+
+      <AcademyLabBuilderBridge
+        hasExistingWork={routeHasWork()}
+        onApply={applyAcademyLabDraft}
+      />
 
       {libraryNotice ? (
         <div className="libraryNotice" role="status">
