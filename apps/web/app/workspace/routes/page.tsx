@@ -10,6 +10,7 @@ import {
   type StoredRoute,
 } from "../../../lib/route-library";
 import { savePendingRouteDraft } from "../../../lib/route-draft-transfer";
+import OpenInBuilderButton from "./open-in-builder-button";
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -272,6 +273,13 @@ export default function RouteLibraryPage() {
                   </div>
 
                   <div className="cardActions">
+                    <OpenInBuilderButton
+                      route={item.route}
+                      libraryRouteId={item.id}
+                      className="editAction"
+                    >
+                      Edit in builder →
+                    </OpenInBuilderButton>
                     <button
                       type="button"
                       className="primaryAction"
@@ -636,6 +644,12 @@ export default function RouteLibraryPage() {
           font-size: 11px;
           font-weight: 850;
           cursor: pointer;
+        }
+
+        .cardActions .editAction {
+          border-color: #bcded0;
+          background: #eaf7f2;
+          color: #08724f;
         }
 
         .cardActions .primaryAction {
