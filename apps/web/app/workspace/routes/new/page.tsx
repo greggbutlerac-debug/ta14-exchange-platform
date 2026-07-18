@@ -15,6 +15,8 @@ import {
   type TransferStageKey,
 } from "../../../../lib/route-draft-transfer";
 import { AiGovernanceEvaluationPanel } from "./ai-governance-evaluation-panel";
+import { RouteChainVisualizer } from "./route-chain-visualizer";
+import { RouteMetadataPanel } from "./route-metadata-panel";
 
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 
@@ -502,56 +504,14 @@ export default function NewRoutePage() {
           </aside>
         </section>
 
-        <section
-          style={styles.chain}
-          aria-label="TA-14 canonical route chain"
-        >
-          {chain.map((item) => {
-            const hasValue =
-              draft &&
-              draft.chain[item.key] !== "UNKNOWN";
-
-            const active =
-              selectedStage === item.key;
-
-            return (
-              <button
-                key={item.key}
-                type="button"
-                onClick={() =>
-                  setSelectedStage(item.key)
-                }
-                style={{
-                  ...styles.chainItem,
-                  ...(active
-                    ? styles.chainItemActive
-                    : {}),
-                }}
-              >
-                <span style={styles.chainIndex}>
-                  {item.number}
-                </span>
-
-                <span>{item.label}</span>
-
-                {draft ? (
-                  <span
-                    style={{
-                      ...styles.chainState,
-                      ...(hasValue
-                        ? styles.chainComplete
-                        : styles.chainUnknown),
-                    }}
-                  >
-                    {hasValue ? "✓" : "○"}
-                  </span>
-                ) : (
-                  <span />
-                )}
-              </button>
-            );
-          })}
-        </section>
+        <RouteChainVisualizer
+          stages={chain}
+          draft={draft}
+          selectedStage={selectedStage}
+          onSelectStage={setSelectedStage}
+          variant="horizontal"
+          ariaLabel="TA-14 canonical route chain"
+        />
 
         {draftLoaded && draft ? (
           <section style={styles.transferSection}>
@@ -592,38 +552,21 @@ export default function NewRoutePage() {
             </div>
 
             <div style={styles.transferGrid}>
-              <div style={styles.transferChain}>
-                {chain.map((item) => (
-                  <button
-                    key={item.key}
-                    type="button"
-                    onClick={() =>
-                      setSelectedStage(item.key)
-                    }
-                    style={{
-                      ...styles.transferStage,
-                      ...(selectedStage === item.key
-                        ? styles.transferStageActive
-                        : {}),
-                    }}
-                  >
-                    <span style={styles.transferNumber}>
-                      {item.number}
-                    </span>
+              <RouteChainVisualizer
+                stages={chain}
+                draft={draft}
+                selectedStage={selectedStage}
+                onSelectStage={setSelectedStage}
+                variant="vertical"
+                ariaLabel="Transferred route stages"
+              />
 
-                    <span>{item.label}</span>
-
-                    <span style={styles.transferCheck}>
-                      {draft.chain[item.key] !==
-                      "UNKNOWN"
-                        ? "✓"
-                        : "○"}
-                    </span>
-                  </button>
-                ))}
-              </div>
-
-              <article style={styles.stageReview}>
+              <article
+                id={`route-stage-${selectedStage}`}
+                role="tabpanel"
+                aria-label={`${selectedStageDefinition.label} stage declaration`}
+                style={styles.stageReview}
+              >
                 <div style={styles.stageReviewTop}>
                   <div>
                     <span style={styles.sectionLabel}>
@@ -661,55 +604,7 @@ export default function NewRoutePage() {
                 </div>
               </article>
 
-              <aside style={styles.routeMetadata}>
-                <span style={styles.sectionLabel}>
-                  ROUTE METADATA
-                </span>
-
-                <div style={styles.metadataList}>
-                  <MetadataRow
-                    label="Route"
-                    value={draft.metadata.name}
-                  />
-
-                  <MetadataRow
-                    label="Domain"
-                    value={draft.metadata.domain}
-                  />
-
-                  <MetadataRow
-                    label="Owner"
-                    value={draft.metadata.owner}
-                  />
-
-                  <MetadataRow
-                    label="State"
-                    value={draft.status}
-                  />
-
-                  <MetadataRow
-                    label="Schema"
-                    value={draft.schema}
-                  />
-
-                  <MetadataRow
-                    label="Draft ID"
-                    value={draft.routeId}
-                  />
-
-                  <MetadataRow
-                    label="Version"
-                    value={String(
-                      draft.metadata.version,
-                    )}
-                  />
-
-                  <MetadataRow
-                    label="Stages"
-                    value={`${draft.readiness.completedStages}/${draft.readiness.totalStages}`}
-                  />
-                </div>
-              </aside>
+              <RouteMetadataPanel draft={draft} />
             </div>
           </section>
         ) : null}
@@ -1221,26 +1116,6 @@ function PreviewDetail({
       </span>
 
       <span style={styles.previewDetailValue}>
-        {value}
-      </span>
-    </div>
-  );
-}
-
-function MetadataRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div style={styles.metadataRow}>
-      <span style={styles.metadataLabel}>
-        {label}
-      </span>
-
-      <span style={styles.metadataValue}>
         {value}
       </span>
     </div>
