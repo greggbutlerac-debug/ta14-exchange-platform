@@ -1,301 +1,1329 @@
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
-type StageKey = 'reality' | 'record' | 'continuity' | 'admissibility' | 'binding' | 'commit' | 'execution' | 'outcome';
-type RouteStatus = 'DRAFT' | 'HOLD' | 'READY_FOR_TEST';
+type StageKey =
+  | "reality"
+  | "record"
+  | "continuity"
+  | "admissibility"
+  | "binding"
+  | "commit"
+  | "execution"
+  | "outcome";
+
+type RouteStatus = "DRAFT" | "HOLD" | "READY_FOR_TEST";
 
 type Stage = {
   key: StageKey;
   number: string;
   label: string;
-  prompt: string;
+  userTitle: string;
+  description: string;
   placeholder: string;
   value: string;
 };
 
-const stageDefinitions: Omit<Stage, 'value'>[] = [
-  { key: 'reality', number: '01', label: 'Reality', prompt: 'What real-world condition gives rise to this route?', placeholder: 'Example: Invoice INV-2048 exists for delivered equipment.' },
-  { key: 'record', number: '02', label: 'Record', prompt: 'What durable evidence represents that condition?', placeholder: 'Example: Signed invoice, purchase order, delivery receipt, and supplier identity record.' },
-  { key: 'continuity', number: '03', label: 'Continuity', prompt: 'How will origin, custody, transformations, and versions remain provable?', placeholder: 'Example: Source digests, timestamps, signer identity, immutable version history, and dependency references.' },
-  { key: 'admissibility', number: '04', label: 'Admissibility', prompt: 'What must be true before this route may proceed?', placeholder: 'Example: Invoice matches purchase order; delivery is confirmed; approval threshold is satisfied; evidence is temporally valid.' },
-  { key: 'binding', number: '05', label: 'Binding', prompt: 'Which actor, authority, beneficiary, destination, object, and environment must be bound?', placeholder: 'Example: Finance agent A-17, authority policy AP-4, supplier S-91, account ending 4421, invoice INV-2048, production payment rail.' },
-  { key: 'commit', number: '06', label: 'Commit', prompt: 'What exact route state must be frozen before execution?', placeholder: 'Example: Canonical route payload, evidence dependency set, decision receipt, route digest, and expiry boundary.' },
-  { key: 'execution', number: '07', label: 'Execution', prompt: 'What action may occur, and how will correspondence be checked?', placeholder: 'Example: Release $12,450 to the bound supplier account only when the execution payload matches the committed route digest.' },
-  { key: 'outcome', number: '08', label: 'Outcome', prompt: 'What authoritative artifact will prove what actually happened?', placeholder: 'Example: Settlement receipt, bank trace identifier, final amount, destination confirmation, timestamp, and reconciliation status.' },
+type RouteTemplate = {
+  label: string;
+  domain: string;
+  owner: string;
+  stages: Partial<Record<StageKey, string>>;
+};
+
+const stageDefinitions: Omit<Stage, "value">[] = [
+  {
+    key: "reality",
+    number: "01",
+    label: "Reality",
+    userTitle: "What consequence are you trying to create?",
+    description:
+      "Describe the real-world condition and the action being proposed. State only what is known.",
+    placeholder:
+      "Example: Pay supplier invoice INV-2048 for equipment delivered to the organization.",
+  },
+  {
+    key: "record",
+    number: "02",
+    label: "Record",
+    userTitle: "What evidence supports this request?",
+    description:
+      "Identify the durable records that establish the facts behind the proposed consequence.",
+    placeholder:
+      "Example: Signed invoice, purchase order, delivery confirmation, supplier identity record, and approval evidence.",
+  },
+  {
+    key: "continuity",
+    number: "03",
+    label: "Continuity",
+    userTitle: "How will the evidence remain trustworthy?",
+    description:
+      "Explain how origin, custody, timestamps, transformations, dependencies, and versions remain provable.",
+    placeholder:
+      "Example: Preserve source hashes, timestamps, signer identities, dependency references, and every superseded version.",
+  },
+  {
+    key: "admissibility",
+    number: "04",
+    label: "Admissibility",
+    userTitle: "What must be true before the route may proceed?",
+    description:
+      "Define the evidence, authority, policy, safety, and timing requirements the engine must evaluate.",
+    placeholder:
+      "Example: The invoice must match the purchase order, delivery must be confirmed, and the required approval threshold must be satisfied.",
+  },
+  {
+    key: "binding",
+    number: "05",
+    label: "Binding",
+    userTitle: "Who and what must be bound to this route?",
+    description:
+      "Bind the actor, authority, beneficiary, destination, object, system, and operating environment.",
+    placeholder:
+      "Example: Bind finance actor A-17, policy AP-4, supplier S-91, invoice INV-2048, approved bank destination, amount, currency, and payment environment.",
+  },
+  {
+    key: "commit",
+    number: "06",
+    label: "Commit",
+    userTitle: "What exact route state must be frozen?",
+    description:
+      "Define the canonical route object that cannot silently change after an admissibility decision.",
+    placeholder:
+      "Example: Freeze the route payload, evidence set, authority receipt, bindings, decision, expiry boundary, and route digest.",
+  },
+  {
+    key: "execution",
+    number: "07",
+    label: "Execution",
+    userTitle: "What action may actually occur?",
+    description:
+      "State the permitted action and how execution correspondence will be checked against the committed route.",
+    placeholder:
+      "Example: Release only the committed amount and currency to the bound destination when the execution payload matches the committed digest.",
+  },
+  {
+    key: "outcome",
+    number: "08",
+    label: "Outcome",
+    userTitle: "What will prove what actually happened?",
+    description:
+      "Identify the authoritative outcome artifact and the correspondence checks required after execution.",
+    placeholder:
+      "Example: Preserve the settlement receipt, trace identifier, final amount, destination confirmation, timestamp, and reconciliation result.",
+  },
 ];
 
-const initialStages: Stage[] = stageDefinitions.map((stage) => ({ ...stage, value: '' }));
+const initialStages: Stage[] = stageDefinitions.map((stage) => ({
+  ...stage,
+  value: "",
+}));
 
-const templates: Record<string, Partial<Record<StageKey, string>>> = {
-  'Vendor payment': {
-    reality: 'An approved supplier invoice exists for goods or services received by the organization.',
-    record: 'Invoice, purchase order, delivery confirmation, supplier identity record, and approval evidence.',
-    continuity: 'Preserve source digests, timestamps, signer identities, dependency references, and all superseded versions.',
-    admissibility: 'The invoice must match the purchase order, delivery must be confirmed, the supplier must be active, and approval must satisfy the payment threshold.',
-    binding: 'Bind the requesting actor, approving authority, supplier beneficiary, bank destination, invoice object, amount, currency, and payment environment.',
-    commit: 'Freeze the canonical payment route, evidence set, decision receipt, bindings, expiry time, and route digest.',
-    execution: 'Release only the committed amount and currency to the bound destination through the approved payment rail.',
-    outcome: 'Verify settlement using the processor receipt, bank trace, settled amount, destination confirmation, timestamp, and reconciliation result.',
+const templates: Record<string, RouteTemplate> = {
+  "Vendor payment": {
+    label: "Vendor payment",
+    domain: "Finance",
+    owner: "Finance Operations",
+    stages: {
+      reality:
+        "An approved supplier invoice exists for goods or services received by the organization.",
+      record:
+        "Invoice, purchase order, delivery confirmation, supplier identity record, and approval evidence.",
+      continuity:
+        "Preserve source digests, timestamps, signer identities, dependency references, and every superseded route version.",
+      admissibility:
+        "The invoice must match the purchase order, delivery must be confirmed, the supplier must be active, beneficiary identity must be verified, and approval must satisfy the payment threshold.",
+      binding:
+        "Bind the requesting actor, procurement authority, finance authority, supplier beneficiary, bank destination, invoice, amount, currency, and production payment environment.",
+      commit:
+        "Freeze the canonical payment route, evidence dependency set, decision receipt, bindings, expiry boundary, and route digest.",
+      execution:
+        "Release only the committed amount and currency to the bound beneficiary through the approved payment rail when execution correspondence is confirmed.",
+      outcome:
+        "Verify settlement using the processor receipt, bank trace, settled amount, destination confirmation, timestamp, and reconciliation result.",
+    },
   },
-  'AI agent action': {
-    reality: 'An AI agent has proposed a consequence-bearing action in an operating environment.',
-    record: 'Prompt context, model and tool identifiers, retrieved evidence, proposed action payload, and policy inputs.',
-    continuity: 'Preserve provenance for every input, transformation, model invocation, tool call, correction, and route version.',
-    admissibility: 'Required evidence must be complete, current, attributable, policy-conforming, and sufficient for the proposed consequence.',
-    binding: 'Bind the agent, delegated authority, affected party, tool destination, action object, model version, and execution environment.',
-    commit: 'Commit the exact action payload, evidence dependency graph, authority receipt, admissibility decision, and cryptographic route identity.',
-    execution: 'Permit only tool calls whose actor, arguments, destination, timing, and environment correspond to the committed route.',
-    outcome: 'Capture authoritative tool and system receipts, resulting state, affected resources, exceptions, and independent verification status.',
+  "AI agent action": {
+    label: "AI agent action",
+    domain: "AI Governance",
+    owner: "AI Governance Team",
+    stages: {
+      reality:
+        "An AI agent has proposed a consequence-bearing action in an operating environment.",
+      record:
+        "Prompt context, model and tool identifiers, retrieved evidence, proposed action payload, policy inputs, and affected resources.",
+      continuity:
+        "Preserve provenance for every input, transformation, model invocation, tool call, correction, and route version.",
+      admissibility:
+        "Required evidence must be complete, current, attributable, policy-conforming, and sufficient for the proposed consequence.",
+      binding:
+        "Bind the agent, delegated authority, affected party, tool destination, action object, model version, and execution environment.",
+      commit:
+        "Freeze the exact action payload, evidence dependency graph, authority receipt, admissibility decision, and cryptographic route identity.",
+      execution:
+        "Permit only tool calls whose actor, arguments, destination, timing, and environment correspond to the committed route.",
+      outcome:
+        "Capture authoritative tool and system receipts, resulting state, affected resources, exceptions, and independent verification status.",
+    },
   },
-  'HVAC intervention': {
-    reality: 'A measurable operating condition indicates that an HVAC system may require intervention.',
-    record: 'Analyzer measurements, equipment identity, ambient conditions, electrical readings, airflow evidence, refrigerant data, and video.',
-    continuity: 'Bind measurements to instrument identity, calibration state, technician, property, timestamps, media, and preserved revisions.',
-    admissibility: 'The non-invasive evidence threshold must establish that intervention is justified and that required safety conditions are satisfied.',
-    binding: 'Bind technician, company authority, equipment, property, intervention type, governed tools, refrigerant container, and environmental conditions.',
-    commit: 'Freeze the diagnostic determination, supporting evidence, authorized intervention, limits, material identity, and route digest.',
-    execution: 'Allow only the authorized intervention within committed limits while recording measurements and governed material movement.',
-    outcome: 'Verify post-intervention performance, final readings, material balance, equipment response, technician record, and property outcome.',
+  "HVAC intervention": {
+    label: "HVAC intervention",
+    domain: "HVAC",
+    owner: "Field Operations",
+    stages: {
+      reality:
+        "A measurable operating condition indicates that an HVAC system may require intervention.",
+      record:
+        "Analyzer measurements, equipment identity, ambient conditions, electrical readings, airflow evidence, refrigerant data, and video.",
+      continuity:
+        "Bind measurements to instrument identity, calibration state, technician, property, timestamps, media, and preserved revisions.",
+      admissibility:
+        "The non-invasive evidence threshold must establish that intervention is justified and that required safety conditions are satisfied.",
+      binding:
+        "Bind the technician, company authority, equipment, property, intervention type, governed tools, refrigerant container, and environmental conditions.",
+      commit:
+        "Freeze the diagnostic determination, supporting evidence, authorized intervention, limits, material identity, and route digest.",
+      execution:
+        "Allow only the authorized intervention within committed limits while recording measurements and governed material movement.",
+      outcome:
+        "Verify post-intervention performance, final readings, material balance, equipment response, technician record, and property outcome.",
+    },
   },
 };
 
-function slugify(value: string) {
-  return value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '') || 'untitled-route';
+function slugify(value: string): string {
+  return (
+    value
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "") || "untitled-route"
+  );
+}
+
+function stageState(stage: Stage): "COMPLETE" | "UNKNOWN" {
+  return stage.value.trim() ? "COMPLETE" : "UNKNOWN";
 }
 
 export default function BuildRoutePage() {
-  const [routeName, setRouteName] = useState('Untitled governance route');
-  const [domain, setDomain] = useState('AI Governance');
-  const [owner, setOwner] = useState('UNKNOWN');
+  const [routeName, setRouteName] = useState(
+    "Untitled governance route",
+  );
+  const [domain, setDomain] = useState("AI Governance");
+  const [owner, setOwner] = useState("UNKNOWN");
   const [stages, setStages] = useState<Stage[]>(initialStages);
-  const [selected, setSelected] = useState<StageKey>('reality');
+  const [selected, setSelected] =
+    useState<StageKey>("reality");
   const [showJson, setShowJson] = useState(false);
   const [copied, setCopied] = useState(false);
 
-  const current = stages.find((stage) => stage.key === selected) ?? stages[0];
-  const completed = stages.filter((stage) => stage.value.trim().length > 0).length;
-  const missing = stages.filter((stage) => !stage.value.trim()).map((stage) => stage.label);
-  const status: RouteStatus = completed === 8 ? 'READY_FOR_TEST' : completed >= 4 ? 'HOLD' : 'DRAFT';
+  const currentIndex = stages.findIndex(
+    (stage) => stage.key === selected,
+  );
+
+  const current = stages[currentIndex] ?? stages[0];
+
+  const completed = stages.filter(
+    (stage) => stage.value.trim().length > 0,
+  ).length;
+
+  const missing = stages
+    .filter((stage) => !stage.value.trim())
+    .map((stage) => stage.label);
+
+  const progress = Math.round((completed / 8) * 100);
+
+  const status: RouteStatus =
+    completed === 8
+      ? "READY_FOR_TEST"
+      : completed >= 4
+        ? "HOLD"
+        : "DRAFT";
 
   const route = useMemo(
     () => ({
-      schema: 'TA14_ROUTE_DRAFT_V1',
+      schema: "TA14_ROUTE_DRAFT_V1",
       routeId: `draft:${slugify(routeName)}`,
       status,
       metadata: {
-        name: routeName.trim() || 'Untitled governance route',
-        domain: domain.trim() || 'UNKNOWN',
-        owner: owner.trim() || 'UNKNOWN',
+        name:
+          routeName.trim() || "Untitled governance route",
+        domain: domain.trim() || "UNKNOWN",
+        owner: owner.trim() || "UNKNOWN",
         version: 1,
       },
-      chain: Object.fromEntries(stages.map((stage) => [stage.key, stage.value.trim() || 'UNKNOWN'])),
+      chain: Object.fromEntries(
+        stages.map((stage) => [
+          stage.key,
+          stage.value.trim() || "UNKNOWN",
+        ]),
+      ),
       readiness: {
         completedStages: completed,
         totalStages: 8,
         missingStages: missing,
-        nextAction: completed === 8 ? 'SUBMIT_TO_SANDBOX' : 'COMPLETE_ROUTE_DEFINITION',
+        nextAction:
+          completed === 8
+            ? "SUBMIT_TO_SANDBOX"
+            : "COMPLETE_ROUTE_DEFINITION",
       },
-      governingPrinciple: 'No admissible evidence. No admissible execution.',
+      governingPrinciple:
+        "No admissible evidence. No admissible execution.",
     }),
-    [completed, domain, missing, owner, routeName, stages, status],
+    [
+      completed,
+      domain,
+      missing,
+      owner,
+      routeName,
+      stages,
+      status,
+    ],
   );
 
-  const updateCurrent = (value: string) => {
-    setStages((items) => items.map((stage) => (stage.key === selected ? { ...stage, value } : stage)));
-  };
+  function updateCurrent(value: string) {
+    setStages((items) =>
+      items.map((stage) =>
+        stage.key === selected
+          ? { ...stage, value }
+          : stage,
+      ),
+    );
+  }
 
-  const selectTemplate = (name: string) => {
+  function selectTemplate(name: string) {
     const template = templates[name];
-    setRouteName(name);
-    setStages((items) => items.map((stage) => ({ ...stage, value: template[stage.key] ?? stage.value })));
-    setSelected('reality');
-  };
 
-  const clearRoute = () => {
-    setRouteName('Untitled governance route');
-    setDomain('AI Governance');
-    setOwner('UNKNOWN');
-    setStages(initialStages);
-    setSelected('reality');
+    setRouteName(template.label);
+    setDomain(template.domain);
+    setOwner(template.owner);
+    setStages((items) =>
+      items.map((stage) => ({
+        ...stage,
+        value:
+          template.stages[stage.key] ?? stage.value,
+      })),
+    );
+    setSelected("reality");
     setShowJson(false);
-  };
+  }
 
-  const download = () => {
-    const blob = new Blob([JSON.stringify(route, null, 2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = `${slugify(routeName)}.ta14-route.json`;
+  function clearRoute() {
+    setRouteName("Untitled governance route");
+    setDomain("AI Governance");
+    setOwner("UNKNOWN");
+    setStages(initialStages);
+    setSelected("reality");
+    setShowJson(false);
+    setCopied(false);
+  }
+
+  function goPrevious() {
+    if (currentIndex > 0) {
+      setSelected(stages[currentIndex - 1].key);
+    }
+  }
+
+  function goNext() {
+    if (currentIndex < stages.length - 1) {
+      setSelected(stages[currentIndex + 1].key);
+    }
+  }
+
+  function downloadDraft() {
+    const blob = new Blob(
+      [JSON.stringify(route, null, 2)],
+      {
+        type: "application/json",
+      },
+    );
+
+    const href = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+
+    anchor.href = href;
+    anchor.download = `${slugify(routeName)}.json`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
-    URL.revokeObjectURL(url);
-  };
 
-  const copyJson = async () => {
-    await navigator.clipboard.writeText(JSON.stringify(route, null, 2));
+    URL.revokeObjectURL(href);
+  }
+
+  async function copyJson() {
+    await navigator.clipboard.writeText(
+      JSON.stringify(route, null, 2),
+    );
+
     setCopied(true);
-    window.setTimeout(() => setCopied(false), 1400);
-  };
+
+    window.setTimeout(() => {
+      setCopied(false);
+    }, 1600);
+  }
 
   return (
-    <main className="builder-page">
-      <style>{`
-        * { box-sizing: border-box; }
-        .builder-page { min-height: calc(100vh - 68px); padding: 28px 0 90px; color: #eef8ff; }
-        .wrap { width: min(1440px, calc(100% - 40px)); margin: 0 auto; }
-        .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; padding: 28px 30px; border: 1px solid rgba(120, 183, 219, .15); border-radius: 28px; background: radial-gradient(circle at 86% 8%, rgba(78, 237, 176, .12), transparent 28%), linear-gradient(145deg, rgba(14, 31, 47, .97), rgba(5, 12, 20, .98)); box-shadow: 0 30px 90px rgba(0,0,0,.3); }
-        .eyebrow { color: #67e6f7; font-size: .68rem; font-weight: 950; letter-spacing: .16em; text-transform: uppercase; }
-        h1 { margin: 10px 0 10px; font-size: clamp(2.35rem, 5vw, 5.1rem); line-height: .95; letter-spacing: -.065em; }
-        .subtitle { max-width: 760px; margin: 0; color: #93a8ba; line-height: 1.65; }
-        .top-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 9px; }
-        .button, .action-link { display: inline-flex; align-items: center; justify-content: center; min-height: 43px; padding: 0 16px; border: 1px solid rgba(132, 181, 214, .18); border-radius: 999px; color: #b9cad7; background: rgba(255,255,255,.035); text-decoration: none; font: inherit; font-size: .76rem; font-weight: 900; cursor: pointer; transition: .2s ease; }
-        .button:hover, .action-link:hover { transform: translateY(-2px); border-color: rgba(90, 224, 241, .42); color: #fff; }
-        .button.primary { border: 0; color: #03130e; background: linear-gradient(100deg, #74eaff, #5cf0ae); }
-        .button:disabled { opacity: .35; cursor: not-allowed; transform: none; }
-        .meta { display: grid; grid-template-columns: 1.4fr 1fr 1fr auto; gap: 12px; margin: 18px 0; padding: 16px; border: 1px solid rgba(125, 179, 214, .13); border-radius: 22px; background: rgba(7, 17, 27, .78); }
-        label { color: #9db0c0; font-size: .66rem; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-        input, select, textarea { width: 100%; border: 1px solid rgba(128, 180, 215, .16); outline: none; color: #edf8ff; background: rgba(2, 9, 15, .72); font: inherit; }
-        input, select { height: 44px; margin-top: 7px; padding: 0 12px; border-radius: 13px; }
-        select { color-scheme: dark; }
-        textarea { min-height: 220px; padding: 17px; border-radius: 17px; resize: vertical; line-height: 1.65; }
-        input:focus, select:focus, textarea:focus { border-color: rgba(87, 228, 244, .55); box-shadow: 0 0 0 4px rgba(70, 209, 233, .06); }
-        .status-card { display: flex; flex-direction: column; justify-content: center; min-width: 150px; padding: 0 6px; }
-        .status-label { color: #71879a; font-size: .62rem; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
-        .status { margin-top: 7px; font-size: .78rem; font-weight: 1000; letter-spacing: .05em; }
-        .status.ready { color: #6ff1b7; } .status.hold { color: #ffcb78; } .status.draft { color: #7eddf1; }
-        .workspace { display: grid; grid-template-columns: 250px minmax(0, 1fr) 320px; gap: 16px; }
-        .card { border: 1px solid rgba(126, 179, 213, .13); border-radius: 24px; background: rgba(7, 17, 28, .82); box-shadow: 0 24px 70px rgba(0,0,0,.2); }
-        .sidebar { align-self: start; position: sticky; top: 84px; padding: 17px; }
-        .sidebar-title { margin: 3px 4px 13px; color: #6f8395; font-size: .64rem; font-weight: 950; letter-spacing: .12em; text-transform: uppercase; }
-        .stage-button { display: grid; grid-template-columns: 34px 1fr auto; align-items: center; gap: 10px; width: 100%; margin: 3px 0; padding: 11px 10px; border: 1px solid transparent; border-radius: 14px; color: #8296a8; background: transparent; text-align: left; font: inherit; cursor: pointer; }
-        .stage-button:hover, .stage-button.active { color: #fff; border-color: rgba(91, 218, 240, .17); background: rgba(69, 204, 231, .07); }
-        .stage-number { display: grid; place-items: center; width: 31px; height: 31px; border: 1px solid rgba(128, 179, 213, .14); border-radius: 10px; font-size: .62rem; font-weight: 950; }
-        .stage-button.complete .stage-number { color: #6ff0b8; border-color: rgba(91, 232, 172, .26); background: rgba(65, 220, 157, .06); }
-        .stage-label { font-size: .76rem; font-weight: 900; }
-        .dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.12); }
-        .stage-button.complete .dot { background: #58e9aa; box-shadow: 0 0 13px rgba(88,233,170,.45); }
-        .editor { min-height: 640px; padding: clamp(23px, 3.5vw, 42px); }
-        .editor-head { display: flex; justify-content: space-between; gap: 18px; align-items: flex-start; margin-bottom: 25px; }
-        .editor-kicker { color: #5de3f5; font-size: .66rem; font-weight: 950; letter-spacing: .15em; text-transform: uppercase; }
-        h2 { margin: 9px 0 0; font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -.055em; line-height: 1; }
-        .chain-position { padding: 8px 11px; border-radius: 999px; color: #89a0b2; background: rgba(255,255,255,.04); font-size: .66rem; font-weight: 900; white-space: nowrap; }
-        .prompt { max-width: 760px; margin: 0 0 18px; color: #9dafbe; line-height: 1.7; }
-        .editor-note { display: flex; gap: 10px; margin-top: 14px; padding: 13px 15px; border: 1px solid rgba(255, 193, 96, .15); border-radius: 15px; color: #c7a96f; background: rgba(255, 177, 58, .04); font-size: .74rem; line-height: 1.55; }
-        .stage-nav { display: flex; justify-content: space-between; gap: 10px; margin-top: 24px; padding-top: 22px; border-top: 1px solid rgba(255,255,255,.055); }
-        .right { align-self: start; position: sticky; top: 84px; padding: 18px; }
-        .right h3 { margin: 2px 0 14px; font-size: .9rem; }
-        .meter { height: 7px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.055); }
-        .meter span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, #54d9ff, #57edaa); transition: width .25s ease; }
-        .score { display: flex; justify-content: space-between; margin-top: 9px; color: #8398a9; font-size: .7rem; }
-        .summary { display: grid; gap: 8px; margin-top: 18px; }
-        .summary-row { display: flex; justify-content: space-between; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,.05); color: #869aab; font-size: .72rem; }
-        .summary-row strong { color: #dce8ef; }
-        .missing { margin-top: 18px; padding: 14px; border: 1px solid rgba(255, 190, 87, .13); border-radius: 15px; background: rgba(255, 174, 43, .035); }
-        .missing-title { color: #efbd6e; font-size: .66rem; font-weight: 950; letter-spacing: .1em; text-transform: uppercase; }
-        .missing-list { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
-        .chip { padding: 6px 8px; border-radius: 999px; color: #a9bac7; background: rgba(255,255,255,.045); font-size: .63rem; font-weight: 850; }
-        .templates { margin-top: 18px; }
-        .template-button { width: 100%; margin-top: 7px; padding: 10px 11px; border: 1px solid rgba(126, 181, 215, .13); border-radius: 12px; color: #9fb2c0; background: rgba(255,255,255,.025); text-align: left; font: inherit; font-size: .7rem; font-weight: 850; cursor: pointer; }
-        .template-button:hover { color: #fff; border-color: rgba(87, 225, 242, .35); }
-        .principle { margin-top: 17px; padding: 13px; border-radius: 14px; color: #9fefd0; background: rgba(67, 220, 159, .055); font-size: .7rem; font-weight: 900; line-height: 1.5; }
-        .json-panel { margin-top: 16px; padding: 18px; border: 1px solid rgba(125, 180, 214, .13); border-radius: 22px; background: #030a10; }
-        .json-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
-        .json-head strong { font-size: .78rem; }
-        pre { max-height: 420px; margin: 0; overflow: auto; color: #9fe9d2; font: 11px/1.65 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
-        @media (max-width: 1120px) { .workspace { grid-template-columns: 220px minmax(0,1fr); } .right { position: static; grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; } .right > * { margin-top: 0; } }
-        @media (max-width: 760px) { .wrap { width: min(100% - 22px, 1440px); } .topbar { padding: 25px 20px; flex-direction: column; } .top-actions { justify-content: flex-start; } .meta { grid-template-columns: 1fr; } .workspace { grid-template-columns: 1fr; } .sidebar { position: static; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; } .sidebar-title { grid-column: 1 / -1; } .stage-button { display: flex; justify-content: center; padding: 7px; } .stage-label, .dot { display: none; } .right { grid-column: auto; grid-template-columns: 1fr; } .editor { min-height: auto; } .editor-head { flex-direction: column; } }
-      `}</style>
+    <main className="page">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">
+            TA-14 Exchange · Route construction
+          </p>
+          <h1>Build a Governed Route</h1>
+          <p className="intro">
+            Define the consequence, supporting evidence,
+            authority, binding, execution, and outcome. The
+            canonical chain updates as the route becomes
+            complete.
+          </p>
+        </div>
 
-      <div className="wrap">
-        <header className="topbar">
-          <div>
-            <span className="eyebrow">TA-14 Exchange · Route construction</span>
-            <h1>Visual Route Builder</h1>
-            <p className="subtitle">Construct the complete Reality → Outcome chain. Every empty stage remains explicitly unknown, and a route cannot advance to testing until all eight stages are defined.</p>
-          </div>
-          <div className="top-actions">
-            <Link className="action-link" href="/workspace/discover">← Discovery</Link>
-            <button className="button" type="button" onClick={() => setShowJson((value) => !value)}>{showJson ? 'Hide JSON' : 'Preview JSON'}</button>
-            <button className="button" type="button" onClick={download}>Download draft</button>
-            <button className="button" type="button" onClick={clearRoute}>Clear</button>
-          </div>
-        </header>
+        <div className="topActions">
+          <Link href="/workspace/discover" className="textButton">
+            ← Discovery
+          </Link>
 
-        <section className="meta" aria-label="Route metadata">
-          <label>Route name<input value={routeName} onChange={(event) => setRouteName(event.target.value)} /></label>
-          <label>Domain<select value={domain} onChange={(event) => setDomain(event.target.value)}><option>AI Governance</option><option>Finance</option><option>Healthcare</option><option>Manufacturing</option><option>HVAC</option><option>Government</option><option>Environmental</option><option>Other</option></select></label>
-          <label>Route owner<input value={owner} onChange={(event) => setOwner(event.target.value)} placeholder="Person, team, or organization" /></label>
-          <div className="status-card"><span className="status-label">Construction state</span><span className={`status ${status === 'READY_FOR_TEST' ? 'ready' : status === 'HOLD' ? 'hold' : 'draft'}`}>{status.replaceAll('_', ' ')}</span></div>
+          <button
+            type="button"
+            className="textButton"
+            onClick={() => setShowJson((value) => !value)}
+          >
+            {showJson ? "Hide JSON" : "Preview JSON"}
+          </button>
+
+          <button
+            type="button"
+            className="textButton"
+            onClick={downloadDraft}
+          >
+            Download draft
+          </button>
+
+          <button
+            type="button"
+            className="dangerButton"
+            onClick={clearRoute}
+          >
+            Clear
+          </button>
+        </div>
+      </header>
+
+      <section className="identityGrid">
+        <label>
+          <span>Route name</span>
+          <input
+            value={routeName}
+            onChange={(event) =>
+              setRouteName(event.target.value)
+            }
+          />
+        </label>
+
+        <label>
+          <span>Domain</span>
+          <input
+            value={domain}
+            onChange={(event) =>
+              setDomain(event.target.value)
+            }
+          />
+        </label>
+
+        <label>
+          <span>Route owner</span>
+          <input
+            value={owner}
+            onChange={(event) =>
+              setOwner(event.target.value)
+            }
+          />
+        </label>
+
+        <div className="statusCard">
+          <span>Construction state</span>
+          <strong data-state={status}>{status}</strong>
+        </div>
+      </section>
+
+      <section className="workspace">
+        <aside className="chainPanel">
+          <div className="panelHeading">
+            <div>
+              <p className="eyebrow">Canonical chain</p>
+              <h2>Execution progress</h2>
+            </div>
+
+            <strong>{progress}%</strong>
+          </div>
+
+          <div className="progressTrack">
+            <div
+              className="progressFill"
+              style={{ width: `${progress}%` }}
+            />
+          </div>
+
+          <div className="chain">
+            {stages.map((stage) => {
+              const isSelected = stage.key === selected;
+              const state = stageState(stage);
+
+              return (
+                <button
+                  key={stage.key}
+                  type="button"
+                  className={`chainStage ${
+                    isSelected ? "selected" : ""
+                  }`}
+                  onClick={() => setSelected(stage.key)}
+                >
+                  <span className="stageNumber">
+                    {stage.number}
+                  </span>
+
+                  <span className="stageName">
+                    {stage.label}
+                  </span>
+
+                  <span
+                    className={`stageState ${state.toLowerCase()}`}
+                  >
+                    {state === "COMPLETE" ? "✓" : "○"}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="principle">
+            <span>Governing principle</span>
+            <strong>
+              No admissible evidence. No admissible execution.
+            </strong>
+          </div>
+        </aside>
+
+        <section className="editorPanel">
+          <div className="stageMeta">
+            <div>
+              <p className="eyebrow">
+                Stage {current.number}
+              </p>
+              <h2>{current.label}</h2>
+            </div>
+
+            <span>
+              {currentIndex + 1} / {stages.length}
+            </span>
+          </div>
+
+          <div className="questionBlock">
+            <h3>{current.userTitle}</h3>
+            <p>{current.description}</p>
+          </div>
+
+          <textarea
+            value={current.value}
+            onChange={(event) =>
+              updateCurrent(event.target.value)
+            }
+            placeholder={current.placeholder}
+            rows={10}
+          />
+
+          <div className="ruleCard">
+            <strong>Rule</strong>
+            <p>
+              Do not invent missing facts. Define the required
+              proof, binding, authority, or correspondence.
+              Unsupported values remain UNKNOWN until evidence
+              resolves them.
+            </p>
+          </div>
+
+          <div className="editorActions">
+            <button
+              type="button"
+              className="secondaryButton"
+              onClick={goPrevious}
+              disabled={currentIndex === 0}
+            >
+              ← Previous
+            </button>
+
+            {currentIndex < stages.length - 1 ? (
+              <button
+                type="button"
+                className="primaryButton"
+                onClick={goNext}
+              >
+                Next stage →
+              </button>
+            ) : (
+              <Link
+                href="/workspace/routes/new"
+                className="primaryButton linkButton"
+              >
+                Evaluate route →
+              </Link>
+            )}
+          </div>
         </section>
 
-        <section className="workspace">
-          <aside className="card sidebar" aria-label="Route stages">
-            <div className="sidebar-title">Execution chain</div>
-            {stages.map((stage) => (
-              <button key={stage.key} className={`stage-button ${selected === stage.key ? 'active' : ''} ${stage.value.trim() ? 'complete' : ''}`} type="button" onClick={() => setSelected(stage.key)}>
-                <span className="stage-number">{stage.value.trim() ? '✓' : stage.number}</span>
-                <span className="stage-label">{stage.label}</span>
-                <span className="dot" />
-              </button>
-            ))}
-          </aside>
+        <aside className="readinessPanel">
+          <p className="eyebrow">Construction readiness</p>
 
-          <article className="card editor">
-            <header className="editor-head">
-              <div><span className="editor-kicker">Stage {current.number}</span><h2>{current.label}</h2></div>
-              <span className="chain-position">{stages.findIndex((stage) => stage.key === selected) + 1} / 8</span>
-            </header>
-            <p className="prompt">{current.prompt}</p>
-            <textarea value={current.value} onChange={(event) => updateCurrent(event.target.value)} placeholder={current.placeholder} aria-label={`${current.label} definition`} />
-            <div className="editor-note"><strong>Rule:</strong><span>Do not invent missing facts. Define the required proof, binding, or correspondence. Unsupported values remain <strong>UNKNOWN</strong> until evidence resolves them.</span></div>
-            <nav className="stage-nav" aria-label="Stage navigation">
-              <button className="button" type="button" disabled={stages.findIndex((stage) => stage.key === selected) === 0} onClick={() => setSelected(stages[Math.max(0, stages.findIndex((stage) => stage.key === selected) - 1)].key)}>← Previous</button>
-              {stages.findIndex((stage) => stage.key === selected) < 7 ? (
-                <button className="button primary" type="button" onClick={() => setSelected(stages[stages.findIndex((stage) => stage.key === selected) + 1].key)}>Next stage →</button>
-              ) : (
-                <Link className="action-link" href={completed === 8 ? '/workspace/scanner' : '#'} aria-disabled={completed !== 8}>Send to Scanner →</Link>
-              )}
-            </nav>
-          </article>
+          <div className="score">
+            <strong>{completed}</strong>
+            <span>of 8 stages defined</span>
+          </div>
 
-          <aside className="card right">
-            <div>
-              <h3>Construction readiness</h3>
-              <div className="meter"><span style={{ width: `${(completed / 8) * 100}%` }} /></div>
-              <div className="score"><span>{completed} stages defined</span><strong>{Math.round((completed / 8) * 100)}%</strong></div>
-              <div className="summary">
-                <div className="summary-row"><span>Schema</span><strong>ROUTE_DRAFT_V1</strong></div>
-                <div className="summary-row"><span>Version</span><strong>1</strong></div>
-                <div className="summary-row"><span>Unknown stages</span><strong>{missing.length}</strong></div>
-                <div className="summary-row"><span>Next action</span><strong>{completed === 8 ? 'TEST' : 'COMPLETE'}</strong></div>
+          <div className="metric">
+            <span>Schema</span>
+            <strong>ROUTE_DRAFT_V1</strong>
+          </div>
+
+          <div className="metric">
+            <span>Version</span>
+            <strong>1</strong>
+          </div>
+
+          <div className="metric">
+            <span>Unknown stages</span>
+            <strong>{8 - completed}</strong>
+          </div>
+
+          <div className="metric">
+            <span>Next action</span>
+            <strong>
+              {completed === 8 ? "EVALUATE" : "COMPLETE"}
+            </strong>
+          </div>
+
+          {missing.length > 0 ? (
+            <div className="missingBlock">
+              <span>Unresolved stages</span>
+
+              <div>
+                {missing.map((label) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => {
+                      const stage = stages.find(
+                        (item) => item.label === label,
+                      );
+
+                      if (stage) {
+                        setSelected(stage.key);
+                      }
+                    }}
+                  >
+                    {label}
+                  </button>
+                ))}
               </div>
             </div>
-            <div className="missing">
-              <div className="missing-title">{missing.length ? 'Unresolved stages' : 'Chain complete'}</div>
-              <div className="missing-list">{missing.length ? missing.map((item) => <span className="chip" key={item}>{item}</span>) : <span className="chip">Ready for deterministic testing</span>}</div>
-            </div>
-            <div className="templates">
-              <div className="sidebar-title">Start from a template</div>
-              {Object.keys(templates).map((name) => <button className="template-button" key={name} type="button" onClick={() => selectTemplate(name)}>{name}</button>)}
-            </div>
-            <div className="principle">No admissible evidence.<br />No admissible execution.</div>
-          </aside>
-        </section>
+          ) : (
+            <div className="readyCard">
+              <strong>Route definition complete</strong>
+              <p>
+                All eight stages are defined. Submit the route
+                to the live engine for an admissibility
+                determination.
+              </p>
 
-        {showJson && (
-          <section className="json-panel">
-            <div className="json-head"><strong>TA14_ROUTE_DRAFT_V1</strong><button className="button" type="button" onClick={copyJson}>{copied ? 'Copied' : 'Copy JSON'}</button></div>
-            <pre>{JSON.stringify(route, null, 2)}</pre>
-          </section>
-        )}
-      </div>
+              <Link href="/workspace/routes/new">
+                Evaluate route →
+              </Link>
+            </div>
+          )}
+        </aside>
+      </section>
+
+      <section className="templates">
+        <div>
+          <p className="eyebrow">Guided starting points</p>
+          <h2>Start from a template</h2>
+          <p>
+            Templates provide declared route content only. They
+            do not prove that evidence exists or that authority
+            is valid.
+          </p>
+        </div>
+
+        <div className="templateGrid">
+          {Object.keys(templates).map((name) => (
+            <button
+              key={name}
+              type="button"
+              onClick={() => selectTemplate(name)}
+            >
+              <span>{name}</span>
+              <strong>Load route →</strong>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      {showJson ? (
+        <section className="jsonPanel">
+          <div className="jsonHeader">
+            <div>
+              <p className="eyebrow">Canonical draft</p>
+              <h2>Route JSON</h2>
+            </div>
+
+            <button
+              type="button"
+              className="secondaryButton"
+              onClick={copyJson}
+            >
+              {copied ? "Copied" : "Copy JSON"}
+            </button>
+          </div>
+
+          <pre>{JSON.stringify(route, null, 2)}</pre>
+        </section>
+      ) : null}
+
+      <style jsx>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .page {
+          min-height: 100vh;
+          padding: 42px;
+          background:
+            radial-gradient(
+              circle at top right,
+              rgba(49, 209, 158, 0.09),
+              transparent 30%
+            ),
+            #f5f7f8;
+          color: #10201a;
+          font-family:
+            Inter, ui-sans-serif, system-ui, -apple-system,
+            BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .topbar {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 28px;
+          max-width: 1480px;
+          margin: 0 auto 28px;
+        }
+
+        .eyebrow {
+          margin: 0 0 9px;
+          color: #0f7c5c;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+          margin-top: 0;
+        }
+
+        h1 {
+          margin-bottom: 12px;
+          font-size: clamp(36px, 5vw, 64px);
+          line-height: 0.98;
+          letter-spacing: -0.055em;
+        }
+
+        .intro {
+          max-width: 760px;
+          margin-bottom: 0;
+          color: #5b6b64;
+          font-size: 17px;
+          line-height: 1.65;
+        }
+
+        .topActions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+
+        button,
+        input,
+        textarea {
+          font: inherit;
+        }
+
+        button,
+        a {
+          -webkit-tap-highlight-color: transparent;
+        }
+
+        .textButton,
+        .dangerButton,
+        .secondaryButton,
+        .primaryButton {
+          border-radius: 11px;
+          text-decoration: none;
+          cursor: pointer;
+        }
+
+        .textButton,
+        .dangerButton {
+          padding: 11px 14px;
+          border: 1px solid #dce4df;
+          background: white;
+          color: #263c33;
+          font-size: 13px;
+          font-weight: 800;
+        }
+
+        .dangerButton {
+          color: #a33b3b;
+        }
+
+        .identityGrid {
+          display: grid;
+          grid-template-columns: 1.4fr 1fr 1fr 0.8fr;
+          gap: 14px;
+          max-width: 1480px;
+          margin: 0 auto 18px;
+        }
+
+        .identityGrid label,
+        .statusCard {
+          padding: 16px;
+          border: 1px solid #dde5e0;
+          border-radius: 15px;
+          background: rgba(255, 255, 255, 0.92);
+        }
+
+        .identityGrid label span,
+        .statusCard span {
+          display: block;
+          margin-bottom: 8px;
+          color: #718078;
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .identityGrid input {
+          width: 100%;
+          padding: 0;
+          border: 0;
+          outline: 0;
+          background: transparent;
+          color: #12251c;
+          font-weight: 800;
+        }
+
+        .statusCard strong {
+          display: inline-flex;
+          padding: 7px 10px;
+          border-radius: 999px;
+          background: #edf2ef;
+          font-size: 12px;
+          letter-spacing: 0.06em;
+        }
+
+        .statusCard strong[data-state="HOLD"] {
+          background: #fff3d7;
+          color: #8d5d00;
+        }
+
+        .statusCard strong[data-state="READY_FOR_TEST"] {
+          background: #dcf8eb;
+          color: #08724f;
+        }
+
+        .workspace {
+          display: grid;
+          grid-template-columns: 290px minmax(0, 1fr) 285px;
+          gap: 18px;
+          max-width: 1480px;
+          margin: 0 auto;
+        }
+
+        .chainPanel,
+        .editorPanel,
+        .readinessPanel,
+        .templates,
+        .jsonPanel {
+          border: 1px solid #dce4df;
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.96);
+          box-shadow: 0 20px 60px rgba(20, 47, 36, 0.06);
+        }
+
+        .chainPanel,
+        .readinessPanel {
+          padding: 20px;
+        }
+
+        .panelHeading,
+        .stageMeta,
+        .jsonHeader {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 18px;
+        }
+
+        .panelHeading h2,
+        .stageMeta h2,
+        .jsonHeader h2 {
+          margin-bottom: 0;
+          font-size: 21px;
+          letter-spacing: -0.03em;
+        }
+
+        .panelHeading > strong {
+          color: #0f7c5c;
+          font-size: 22px;
+        }
+
+        .progressTrack {
+          height: 7px;
+          margin: 18px 0;
+          overflow: hidden;
+          border-radius: 999px;
+          background: #e8eeea;
+        }
+
+        .progressFill {
+          height: 100%;
+          border-radius: inherit;
+          background: #14946d;
+          transition: width 180ms ease;
+        }
+
+        .chain {
+          display: grid;
+          gap: 7px;
+        }
+
+        .chainStage {
+          display: grid;
+          grid-template-columns: 36px 1fr 26px;
+          align-items: center;
+          width: 100%;
+          padding: 12px;
+          border: 1px solid transparent;
+          border-radius: 12px;
+          background: transparent;
+          color: #52615a;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .chainStage:hover {
+          background: #f4f8f6;
+        }
+
+        .chainStage.selected {
+          border-color: #bcded0;
+          background: #eaf7f2;
+          color: #10251c;
+        }
+
+        .stageNumber {
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+        }
+
+        .stageName {
+          font-weight: 800;
+        }
+
+        .stageState {
+          display: grid;
+          width: 24px;
+          height: 24px;
+          place-items: center;
+          border-radius: 50%;
+          font-weight: 900;
+        }
+
+        .stageState.complete {
+          background: #d9f5e9;
+          color: #08724f;
+        }
+
+        .stageState.unknown {
+          background: #edf1ef;
+          color: #8a9690;
+        }
+
+        .principle {
+          margin-top: 20px;
+          padding-top: 18px;
+          border-top: 1px solid #e3e9e5;
+        }
+
+        .principle span {
+          display: block;
+          margin-bottom: 7px;
+          color: #7a8781;
+          font-size: 11px;
+          font-weight: 850;
+          text-transform: uppercase;
+        }
+
+        .principle strong {
+          font-size: 13px;
+          line-height: 1.45;
+        }
+
+        .editorPanel {
+          padding: 28px;
+        }
+
+        .stageMeta > span {
+          padding: 8px 11px;
+          border-radius: 999px;
+          background: #eff4f1;
+          color: #52615a;
+          font-size: 12px;
+          font-weight: 850;
+        }
+
+        .questionBlock {
+          max-width: 760px;
+          margin: 38px 0 22px;
+        }
+
+        .questionBlock h3 {
+          margin-bottom: 12px;
+          font-size: clamp(27px, 4vw, 43px);
+          line-height: 1.05;
+          letter-spacing: -0.045em;
+        }
+
+        .questionBlock p {
+          margin-bottom: 0;
+          color: #627169;
+          font-size: 16px;
+          line-height: 1.65;
+        }
+
+        textarea {
+          width: 100%;
+          min-height: 250px;
+          padding: 20px;
+          resize: vertical;
+          border: 1px solid #cfd9d3;
+          border-radius: 15px;
+          outline: none;
+          background: #fbfcfb;
+          color: #14251d;
+          font-size: 16px;
+          line-height: 1.65;
+        }
+
+        textarea:focus {
+          border-color: #4fae8d;
+          box-shadow: 0 0 0 4px rgba(79, 174, 141, 0.12);
+        }
+
+        .ruleCard {
+          margin-top: 16px;
+          padding: 16px 18px;
+          border: 1px solid #e1e7e3;
+          border-radius: 13px;
+          background: #f7f9f8;
+        }
+
+        .ruleCard strong {
+          display: block;
+          margin-bottom: 5px;
+          font-size: 12px;
+          text-transform: uppercase;
+        }
+
+        .ruleCard p {
+          margin-bottom: 0;
+          color: #68766f;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .editorActions {
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          margin-top: 22px;
+        }
+
+        .secondaryButton,
+        .primaryButton {
+          padding: 13px 17px;
+          border: 1px solid #ced8d2;
+          background: white;
+          color: #20382d;
+          font-weight: 850;
+        }
+
+        .primaryButton {
+          border-color: #123c2e;
+          background: #123c2e;
+          color: white;
+        }
+
+        .linkButton {
+          display: inline-flex;
+          align-items: center;
+        }
+
+        .secondaryButton:disabled {
+          opacity: 0.38;
+          cursor: not-allowed;
+        }
+
+        .readinessPanel > .eyebrow {
+          margin-bottom: 22px;
+        }
+
+        .score {
+          margin-bottom: 24px;
+        }
+
+        .score strong {
+          display: block;
+          font-size: 50px;
+          line-height: 1;
+          letter-spacing: -0.06em;
+        }
+
+        .score span {
+          color: #718078;
+          font-size: 13px;
+        }
+
+        .metric {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 13px 0;
+          border-top: 1px solid #e4eae6;
+          font-size: 12px;
+        }
+
+        .metric span {
+          color: #75827c;
+        }
+
+        .metric strong {
+          text-align: right;
+        }
+
+        .missingBlock {
+          margin-top: 20px;
+        }
+
+        .missingBlock > span {
+          display: block;
+          margin-bottom: 10px;
+          color: #75827c;
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .missingBlock > div {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 7px;
+        }
+
+        .missingBlock button {
+          padding: 8px 10px;
+          border: 1px solid #e2e7e4;
+          border-radius: 999px;
+          background: #f6f8f7;
+          color: #4e5e56;
+          font-size: 11px;
+          font-weight: 800;
+          cursor: pointer;
+        }
+
+        .readyCard {
+          margin-top: 20px;
+          padding: 16px;
+          border-radius: 14px;
+          background: #eaf8f2;
+        }
+
+        .readyCard strong {
+          display: block;
+          margin-bottom: 7px;
+        }
+
+        .readyCard p {
+          color: #4d685c;
+          font-size: 13px;
+          line-height: 1.55;
+        }
+
+        .readyCard a {
+          color: #08724f;
+          font-size: 13px;
+          font-weight: 900;
+          text-decoration: none;
+        }
+
+        .templates,
+        .jsonPanel {
+          max-width: 1480px;
+          margin: 18px auto 0;
+          padding: 26px;
+        }
+
+        .templates {
+          display: grid;
+          grid-template-columns: 0.8fr 1.2fr;
+          gap: 28px;
+        }
+
+        .templates h2 {
+          margin-bottom: 10px;
+          font-size: 28px;
+          letter-spacing: -0.04em;
+        }
+
+        .templates p:last-child {
+          margin-bottom: 0;
+          color: #68766f;
+          line-height: 1.6;
+        }
+
+        .templateGrid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+        }
+
+        .templateGrid button {
+          display: flex;
+          min-height: 125px;
+          flex-direction: column;
+          align-items: flex-start;
+          justify-content: space-between;
+          padding: 18px;
+          border: 1px solid #d8e1dc;
+          border-radius: 15px;
+          background: #fbfcfb;
+          color: #173128;
+          text-align: left;
+          cursor: pointer;
+        }
+
+        .templateGrid button:hover {
+          border-color: #72b79e;
+          background: #f0f8f5;
+        }
+
+        .templateGrid span {
+          font-size: 17px;
+          font-weight: 900;
+        }
+
+        .templateGrid strong {
+          color: #0d7d5b;
+          font-size: 12px;
+        }
+
+        .jsonPanel pre {
+          max-height: 620px;
+          overflow: auto;
+          margin: 22px 0 0;
+          padding: 22px;
+          border-radius: 15px;
+          background: #0f1c17;
+          color: #dff6eb;
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        @media (max-width: 1100px) {
+          .identityGrid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .workspace {
+            grid-template-columns: 240px minmax(0, 1fr);
+          }
+
+          .readinessPanel {
+            grid-column: 1 / -1;
+          }
+
+          .templates {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 760px) {
+          .page {
+            padding: 22px 14px;
+          }
+
+          .topbar {
+            flex-direction: column;
+          }
+
+          .topActions {
+            justify-content: flex-start;
+          }
+
+          .identityGrid,
+          .workspace,
+          .templates,
+          .templateGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .chainPanel,
+          .readinessPanel {
+            grid-column: auto;
+          }
+
+          .chain {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .editorPanel {
+            padding: 20px;
+          }
+
+          .questionBlock {
+            margin-top: 28px;
+          }
+
+          .editorActions {
+            flex-direction: column;
+          }
+
+          .secondaryButton,
+          .primaryButton {
+            width: 100%;
+            justify-content: center;
+            text-align: center;
+          }
+        }
+      `}</style>
     </main>
   );
 }
