@@ -48,19 +48,28 @@ const stages: { key: StageKey; number: string; label: string }[] = [
   { key: 'outcome', number: '08', label: 'Outcome' },
 ];
 
+const workflow = ['Source', 'Normalize', 'Preserve UNKNOWN', 'Builder', 'Scanner'];
+
 const sample = JSON.stringify(
   {
     name: 'Autonomous customer refund',
     domain: 'AI Governance',
     owner: 'Customer Operations',
     reality: 'A verified customer dispute exists for a completed transaction.',
-    record: 'Customer request, transaction record, policy version, model recommendation, and human approval evidence.',
-    continuity: 'Preserve source identifiers, digests, timestamps, transformations, dependencies, and superseded versions.',
-    admissibility: 'The dispute must be eligible, evidence must be complete, the policy must be current, and the refund must remain within the approval threshold.',
-    binding: 'Bind the customer, account, transaction, approving authority, refund amount, destination, model version, and execution environment.',
-    commit: 'Freeze the canonical refund payload, evidence set, decision receipt, bindings, route digest, version, and expiry time.',
-    execution: 'Issue only the committed refund amount to the bound destination through the approved payment service.',
-    outcome: 'Verify processor settlement, customer account credit, amount, destination, timestamp, and reconciliation result.',
+    record:
+      'Customer request, transaction record, policy version, model recommendation, and human approval evidence.',
+    continuity:
+      'Preserve source identifiers, digests, timestamps, transformations, dependencies, and superseded versions.',
+    admissibility:
+      'The dispute must be eligible, evidence must be complete, the policy must be current, and the refund must remain within the approval threshold.',
+    binding:
+      'Bind the customer, account, transaction, approving authority, refund amount, destination, model version, and execution environment.',
+    commit:
+      'Freeze the canonical refund payload, evidence set, decision receipt, bindings, route digest, version, and expiry time.',
+    execution:
+      'Issue only the committed refund amount to the bound destination through the approved payment service.',
+    outcome:
+      'Verify processor settlement, customer account credit, amount, destination, timestamp, and reconciliation result.',
   },
   null,
   2,
@@ -154,6 +163,7 @@ export default function UploadRoutePage() {
   const [route, setRoute] = useState<RouteDraft | null>(null);
   const [dragging, setDragging] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [expandedStage, setExpandedStage] = useState<StageKey | null>(null);
 
   const parsedPreview = useMemo(() => {
     if (!source.trim()) return null;
@@ -164,26 +174,38 @@ export default function UploadRoutePage() {
     }
   }, [source]);
 
+  const sourceStatus = useMemo(() => {
+    if (state === 'ERROR') return 'Source rejected';
+    if (route) return 'Normalized';
+    if (source.trim() && parsedPreview) return 'Valid JSON loaded';
+    if (source.trim()) return 'JSON requires correction';
+    return 'Waiting for source';
+  }, [parsedPreview, route, source, state]);
+
   function loadContent(content: string, name: string) {
     setSource(content);
     setFileName(name);
     setRoute(null);
+    setExpandedStage(null);
     setError('');
-    setState('LOADED');
+    setState(content.trim() ? 'LOADED' : 'EMPTY');
   }
 
   async function receiveFile(file?: File) {
     if (!file) return;
+
     if (!file.name.toLowerCase().endsWith('.json') && file.type !== 'application/json') {
       setError('Upload a JSON route file. Other formats are not silently converted.');
       setState('ERROR');
       return;
     }
+
     if (file.size > 1_000_000) {
       setError('The route file exceeds the 1 MB import limit.');
       setState('ERROR');
       return;
     }
+
     loadContent(await file.text(), file.name);
   }
 
@@ -212,6 +234,15 @@ export default function UploadRoutePage() {
     }
   }
 
+  function clearImport() {
+    setSource('');
+    setFileName('');
+    setRoute(null);
+    setError('');
+    setExpandedStage(null);
+    setState('EMPTY');
+  }
+
   function download() {
     if (!route) return;
     const blob = new Blob([JSON.stringify(route, null, 2)], { type: 'application/json' });
@@ -230,155 +261,438 @@ export default function UploadRoutePage() {
     window.setTimeout(() => setCopied(false), 1400);
   }
 
-  const unknowns = route?.importRecord.preservedUnknowns ?? 0;
+  const mapped = route?.importRecord.normalizedFields ?? 0;
+  const unknowns = route?.importRecord.preservedUnknowns ?? 8;
+  const readiness = route?.status ?? 'WAITING';
 
   return (
-    <main className="min-h-screen bg-[#05070a] px-5 py-8 text-white sm:px-8 lg:px-12">
-      <div className="mx-auto max-w-7xl">
-        <header className="mb-10 flex flex-col gap-6 border-b border-white/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
-          <div>
-            <p className="mb-3 text-xs font-semibold uppercase tracking-[0.28em] text-cyan-300">Exchange Workspace · Import</p>
-            <h1 className="max-w-4xl text-4xl font-semibold tracking-[-0.04em] sm:text-6xl">Bring an existing route into TA-14 without hiding what is missing.</h1>
-            <p className="mt-5 max-w-3xl text-base leading-7 text-white/60 sm:text-lg">
-              Upload or paste a JSON route. The importer preserves the source record, maps recognized fields into the Reality → Outcome chain, and leaves unresolved stages explicitly UNKNOWN.
-            </p>
+    <main className="min-h-screen overflow-x-hidden bg-[#05070a] px-4 py-6 text-white sm:px-6 sm:py-8 lg:px-10">
+      <div className="mx-auto w-full max-w-[1500px]">
+        <header className="rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_34%),linear-gradient(145deg,rgba(255,255,255,0.065),rgba(255,255,255,0.018))] p-6 shadow-2xl shadow-black/30 sm:p-8 lg:p-10">
+          <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
+                  Exchange Workspace
+                </span>
+                <span className="text-xs uppercase tracking-[0.22em] text-white/35">Governed route intake</span>
+              </div>
+              <h1 className="mt-5 max-w-5xl text-4xl font-semibold tracking-[-0.045em] sm:text-5xl lg:text-6xl">
+                Import without concealing what the source cannot prove.
+              </h1>
+              <p className="mt-5 max-w-3xl text-base leading-7 text-white/58 sm:text-lg">
+                Preserve the submitted record, normalize recognized fields, expose every unresolved stage, and move the route forward without manufacturing completeness.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <Link
+                href="/workspace"
+                className="rounded-full border border-white/15 bg-black/20 px-5 py-3 text-sm font-semibold text-white/75 transition hover:border-white/35 hover:text-white"
+              >
+                Back to Workspace
+              </Link>
+              <button
+                type="button"
+                onClick={clearImport}
+                className="rounded-full border border-white/15 bg-black/20 px-5 py-3 text-sm font-semibold text-white/75 transition hover:border-white/35 hover:text-white"
+              >
+                Clear intake
+              </button>
+            </div>
           </div>
-          <Link href="/workspace" className="w-fit rounded-full border border-white/15 px-5 py-3 text-sm text-white/75 transition hover:border-white/35 hover:text-white">
-            Back to Workspace
-          </Link>
+
+          <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-black/25">
+            <div className="flex min-w-max items-center gap-2 px-4 py-4 sm:min-w-0 sm:justify-between">
+              {workflow.map((step, index) => {
+                const active =
+                  index === 0 ||
+                  (index === 1 && Boolean(source.trim())) ||
+                  (index === 2 && Boolean(route)) ||
+                  (index > 2 && Boolean(route));
+                return (
+                  <div key={step} className="flex items-center gap-2">
+                    <div
+                      className={`flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${
+                        active
+                          ? 'border-cyan-300/30 bg-cyan-300/10 text-cyan-100'
+                          : 'border-white/10 bg-white/[0.03] text-white/35'
+                      }`}
+                    >
+                      <span className="font-mono text-[10px]">{String(index + 1).padStart(2, '0')}</span>
+                      <span>{step}</span>
+                    </div>
+                    {index < workflow.length - 1 && <span className="text-white/20">→</span>}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </header>
 
-        <section className="grid gap-6 lg:grid-cols-[0.92fr_1.08fr]">
-          <div className="space-y-6">
+        <section className="mt-6 grid gap-6 xl:grid-cols-[0.96fr_1.04fr]">
+          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-black/20 sm:p-7">
+            <div className="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Import console</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">Provide the source route</h2>
+                <p className="mt-2 text-sm leading-6 text-white/48">
+                  Upload a JSON file or paste the original source. The submitted content remains separate from the normalized draft.
+                </p>
+              </div>
+              <span
+                className={`w-fit rounded-full border px-3 py-2 text-xs font-semibold ${
+                  state === 'ERROR'
+                    ? 'border-red-300/25 bg-red-300/10 text-red-100'
+                    : route
+                      ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-100'
+                      : source.trim()
+                        ? 'border-cyan-300/25 bg-cyan-300/10 text-cyan-100'
+                        : 'border-white/10 bg-white/[0.04] text-white/45'
+                }`}
+              >
+                {sourceStatus}
+              </span>
+            </div>
+
             <div
-              onDragOver={(event) => { event.preventDefault(); setDragging(true); }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                setDragging(true);
+              }}
               onDragLeave={() => setDragging(false)}
               onDrop={onDrop}
-              className={`rounded-[2rem] border border-dashed p-8 transition ${dragging ? 'border-cyan-300 bg-cyan-300/10' : 'border-white/15 bg-white/[0.035]'}`}
+              className={`mt-6 rounded-[1.75rem] border border-dashed p-7 text-center transition sm:p-9 ${
+                dragging
+                  ? 'border-cyan-300 bg-cyan-300/10'
+                  : 'border-white/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018))]'
+              }`}
             >
-              <input ref={inputRef} type="file" accept="application/json,.json" className="hidden" onChange={onFileChange} />
-              <p className="text-sm font-semibold text-cyan-200">JSON route intake</p>
-              <h2 className="mt-3 text-2xl font-semibold">Drop a route file here</h2>
-              <p className="mt-3 text-sm leading-6 text-white/55">Maximum 1 MB. The original content is not rewritten in place.</p>
-              <button onClick={() => inputRef.current?.click()} className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-200">
+              <input
+                ref={inputRef}
+                type="file"
+                accept="application/json,.json"
+                className="hidden"
+                onChange={onFileChange}
+              />
+              <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-white/10 bg-black/30 text-2xl text-cyan-200">
+                ⇧
+              </div>
+              <h3 className="mt-5 text-xl font-semibold">Drop a route file here</h3>
+              <p className="mt-2 text-sm text-white/45">JSON only · Maximum 1 MB · Original source preserved</p>
+              <button
+                type="button"
+                onClick={() => inputRef.current?.click()}
+                className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-200"
+              >
                 Choose JSON file
               </button>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/[0.035] p-6">
-              <div className="flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold">Or paste JSON</p>
-                  <p className="mt-1 text-xs text-white/45">Source: {fileName || 'No file selected'}</p>
+            <div className="my-6 flex items-center gap-4">
+              <div className="h-px flex-1 bg-white/10" />
+              <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/30">or paste source</span>
+              <div className="h-px flex-1 bg-white/10" />
+            </div>
+
+            <div className="rounded-[1.75rem] border border-white/10 bg-black/20 p-4 sm:p-5">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold">Source editor</p>
+                  <p className="mt-1 truncate text-xs text-white/40">
+                    {fileName ? `Loaded file: ${fileName}` : 'No file selected · pasted input will be identified separately'}
+                  </p>
                 </div>
-                <button onClick={() => loadContent(sample, 'sample-route.json')} className="rounded-full border border-white/15 px-4 py-2 text-xs text-white/70 hover:border-white/30 hover:text-white">
+                <button
+                  type="button"
+                  onClick={() => loadContent(sample, 'sample-route.json')}
+                  className="w-fit rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/35 hover:text-white"
+                >
                   Load sample
                 </button>
               </div>
+
               <textarea
                 value={source}
                 onChange={(event) => loadContent(event.target.value, '')}
                 spellCheck={false}
                 placeholder={'{\n  "name": "My route",\n  "reality": "..."\n}'}
-                className="mt-5 min-h-[360px] w-full resize-y rounded-2xl border border-white/10 bg-black/35 p-4 font-mono text-xs leading-6 text-white/75 outline-none transition focus:border-cyan-300/50"
+                className="mt-4 min-h-[360px] w-full resize-y rounded-2xl border border-white/10 bg-[#070a0e] p-4 font-mono text-xs leading-6 text-white/76 outline-none transition placeholder:text-white/20 focus:border-cyan-300/45"
               />
-              {error && <p className="mt-4 rounded-xl border border-red-400/25 bg-red-400/10 p-4 text-sm text-red-100">{error}</p>}
+
+              {error && (
+                <div className="mt-4 rounded-2xl border border-red-400/25 bg-red-400/10 p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-200">Import blocked</p>
+                  <p className="mt-2 text-sm leading-6 text-red-100/85">{error}</p>
+                </div>
+              )}
+
               <button
+                type="button"
                 onClick={importRoute}
                 disabled={!parsedPreview}
-                className="mt-5 w-full rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-35"
+                className="mt-5 w-full rounded-full bg-cyan-300 px-5 py-3.5 text-sm font-semibold text-black transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 Normalize into TA-14 route
               </button>
             </div>
           </div>
 
-          <div className="rounded-[2rem] border border-white/10 bg-gradient-to-b from-white/[0.055] to-white/[0.02] p-6 sm:p-8">
-            {!route ? (
-              <div className="flex min-h-[720px] flex-col items-center justify-center text-center">
-                <div className="grid h-20 w-20 place-items-center rounded-full border border-white/10 bg-white/5 text-2xl">↥</div>
-                <h2 className="mt-6 text-2xl font-semibold">No route imported yet</h2>
-                <p className="mt-3 max-w-md text-sm leading-6 text-white/50">Load valid JSON to inspect normalization, preserved unknowns, source identity, and construction readiness.</p>
-              </div>
-            ) : (
+          <div className="rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.018))] p-5 shadow-2xl shadow-black/20 sm:p-7">
+            <div className="flex flex-col gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-start sm:justify-between">
               <div>
-                <div className="flex flex-col gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-start sm:justify-between">
+                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Normalization record</p>
+                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
+                  {route ? route.metadata.name : 'Awaiting route source'}
+                </h2>
+                <p className="mt-2 break-all font-mono text-xs text-white/38">
+                  {route?.routeId ?? 'A normalized route identity will appear here.'}
+                </p>
+              </div>
+              <span
+                className={`w-fit rounded-full border px-4 py-2 text-xs font-semibold ${
+                  route?.status === 'READY_FOR_TEST'
+                    ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-100'
+                    : route?.status === 'HOLD'
+                      ? 'border-amber-300/25 bg-amber-300/10 text-amber-100'
+                      : 'border-white/10 bg-white/[0.04] text-white/40'
+                }`}
+              >
+                {readiness}
+              </span>
+            </div>
+
+            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+              <Metric label="Mapped" value={`${mapped}/8`} detail="recognized stages" />
+              <Metric label="UNKNOWN" value={String(unknowns)} detail="preserved gaps" />
+              <Metric
+                label="Readiness"
+                value={route?.status === 'READY_FOR_TEST' ? 'TEST' : route ? 'HOLD' : '—'}
+                detail={route ? 'construction state' : 'waiting'}
+              />
+            </div>
+
+            {!route ? (
+              <div className="mt-6 rounded-[1.75rem] border border-white/10 bg-black/20 p-5 sm:p-6">
+                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">TA14_ROUTE_DRAFT_V1</p>
-                    <h2 className="mt-3 text-3xl font-semibold">{route.metadata.name}</h2>
-                    <p className="mt-2 font-mono text-xs text-white/45">{route.routeId}</p>
+                    <p className="text-sm font-semibold">Reality → Outcome inspection</p>
+                    <p className="mt-1 text-xs text-white/40">Normalization has not started.</p>
                   </div>
-                  <span className={`w-fit rounded-full border px-4 py-2 text-xs font-semibold ${route.status === 'READY_FOR_TEST' ? 'border-emerald-300/30 bg-emerald-300/10 text-emerald-200' : 'border-amber-300/30 bg-amber-300/10 text-amber-100'}`}>
-                    {route.status}
+                  <span className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
+                    0 of 8 mapped
                   </span>
                 </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-3">
-                  <Metric label="Mapped stages" value={`${route.importRecord.normalizedFields}/8`} />
-                  <Metric label="Preserved UNKNOWN" value={String(unknowns)} />
-                  <Metric label="Source digest" value={route.importRecord.sourceDigest.split(':')[1]} mono />
+                <div className="mt-4 space-y-2">
+                  {stages.map((stage) => (
+                    <div
+                      key={stage.key}
+                      className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 py-3"
+                    >
+                      <span className="font-mono text-[10px] text-white/25">{stage.number}</span>
+                      <span className="text-sm text-white/50">{stage.label}</span>
+                      <span className="ml-auto text-[10px] font-semibold uppercase tracking-[0.16em] text-white/25">
+                        Waiting
+                      </span>
+                    </div>
+                  ))}
                 </div>
 
-                <div className="mt-7 space-y-3">
-                  {stages.map((stage) => {
-                    const value = route.chain[stage.key];
-                    const unresolved = value === 'UNKNOWN';
-                    return (
-                      <div key={stage.key} className={`rounded-2xl border p-4 ${unresolved ? 'border-amber-300/20 bg-amber-300/[0.06]' : 'border-white/10 bg-black/20'}`}>
-                        <div className="flex items-center gap-3">
-                          <span className="font-mono text-xs text-white/35">{stage.number}</span>
-                          <span className="text-sm font-semibold">{stage.label}</span>
-                          <span className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.16em] ${unresolved ? 'text-amber-200' : 'text-emerald-200'}`}>
-                            {unresolved ? 'Unresolved' : 'Mapped'}
-                          </span>
-                        </div>
-                        <p className={`mt-3 text-sm leading-6 ${unresolved ? 'font-mono text-amber-100/80' : 'text-white/58'}`}>{value}</p>
-                      </div>
-                    );
-                  })}
+                <div className="mt-6 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.045] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">Governing principle</p>
+                  <p className="mt-3 text-xl font-semibold tracking-tight">No admissible evidence. No admissible execution.</p>
+                  <p className="mt-3 text-sm leading-6 text-white/45">
+                    Import does not convert missing fields into proof. Unresolved stages remain visible until corrected through a governed version.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/20">
+                  <div className="flex flex-col gap-3 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold">Reality → Outcome inspection</p>
+                      <p className="mt-1 text-xs text-white/40">Select a stage to inspect the normalized value.</p>
+                    </div>
+                    <span className="w-fit rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
+                      {mapped} of 8 mapped
+                    </span>
+                  </div>
+
+                  <div className="divide-y divide-white/[0.07]">
+                    {stages.map((stage) => {
+                      const value = route.chain[stage.key];
+                      const unresolved = value === 'UNKNOWN';
+                      const expanded = expandedStage === stage.key;
+
+                      return (
+                        <button
+                          key={stage.key}
+                          type="button"
+                          onClick={() => setExpandedStage(expanded ? null : stage.key)}
+                          className="block w-full px-5 py-4 text-left transition hover:bg-white/[0.035]"
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="font-mono text-[10px] text-white/28">{stage.number}</span>
+                            <span className="text-sm font-semibold text-white/80">{stage.label}</span>
+                            <span
+                              className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.16em] ${
+                                unresolved ? 'text-amber-200' : 'text-emerald-200'
+                              }`}
+                            >
+                              {unresolved ? 'UNKNOWN' : 'Mapped'}
+                            </span>
+                            <span className="text-white/25">{expanded ? '−' : '+'}</span>
+                          </div>
+                          {expanded && (
+                            <p
+                              className={`mt-3 border-t border-white/[0.07] pt-3 text-sm leading-6 ${
+                                unresolved ? 'font-mono text-amber-100/75' : 'text-white/55'
+                              }`}
+                            >
+                              {value}
+                            </p>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
-                <div className="mt-7 rounded-2xl border border-white/10 bg-black/25 p-5">
-                  <p className="text-sm font-semibold">Import record</p>
-                  <dl className="mt-4 grid gap-3 text-xs sm:grid-cols-2">
+                <div className="mt-6 rounded-[1.75rem] border border-white/10 bg-black/20 p-5">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold">Preserved import record</p>
+                      <p className="mt-1 text-xs text-white/40">Source identity remains attached to the normalized route.</p>
+                    </div>
+                    <span className="break-all rounded-full border border-white/10 px-3 py-2 font-mono text-[10px] text-white/45">
+                      {route.importRecord.sourceDigest}
+                    </span>
+                  </div>
+
+                  <dl className="mt-5 grid gap-4 text-xs sm:grid-cols-2">
                     <Info label="Original file" value={route.importRecord.originalFileName} />
                     <Info label="Original schema" value={route.importRecord.originalSchema} />
                     <Info label="Domain" value={route.metadata.domain} />
                     <Info label="Owner" value={route.metadata.owner} />
+                    <Info label="Source format" value={route.metadata.sourceFormat} />
+                    <Info label="Version" value={String(route.metadata.version)} />
                   </dl>
                 </div>
 
-                <div className="mt-7 grid gap-3 sm:grid-cols-2">
-                  <button onClick={copyRoute} className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white hover:border-white/35">
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  <button
+                    type="button"
+                    onClick={copyRoute}
+                    className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/35"
+                  >
                     {copied ? 'Copied' : 'Copy normalized JSON'}
                   </button>
-                  <button onClick={download} className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black hover:bg-cyan-200">Download route</button>
-                  <Link href="/workspace/build" className="rounded-full border border-white/15 px-5 py-3 text-center text-sm font-semibold text-white hover:border-white/35">Correct in Builder</Link>
-                  <Link href="/workspace/scanner" className="rounded-full bg-cyan-300 px-5 py-3 text-center text-sm font-semibold text-black hover:bg-cyan-200">Open Scanner</Link>
+                  <button
+                    type="button"
+                    onClick={download}
+                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-200"
+                  >
+                    Download route
+                  </button>
+                  <Link
+                    href="/workspace/build"
+                    className="rounded-full border border-white/15 px-5 py-3 text-center text-sm font-semibold text-white transition hover:border-white/35"
+                  >
+                    Correct in Builder
+                  </Link>
+                  <Link
+                    href="/workspace/scanner"
+                    className="rounded-full bg-cyan-300 px-5 py-3 text-center text-sm font-semibold text-black transition hover:bg-cyan-200"
+                  >
+                    Open Scanner
+                  </Link>
                 </div>
-              </div>
+              </>
             )}
           </div>
         </section>
 
-        <section className="mt-8 grid gap-4 md:grid-cols-3">
-          <Principle number="01" title="Preserve the source" text="Import creates a new normalized draft and retains source identity and digest information." />
-          <Principle number="02" title="Never infer completeness" text="Missing stages remain UNKNOWN. The importer does not manufacture evidence or authority." />
-          <Principle number="03" title="Correct through versions" text="Imported drafts advance through the Builder and Scanner before any executable commit exists." />
+        <section className="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.025] p-5 sm:p-7">
+          <div className="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Governed import sequence</p>
+              <h2 className="mt-2 text-2xl font-semibold tracking-tight">The source moves forward without being rewritten into certainty.</h2>
+            </div>
+            <p className="max-w-xl text-sm leading-6 text-white/45">
+              Every imported route remains reviewable because identity, missing stages, and correction history stay visible.
+            </p>
+          </div>
+
+          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+            <Principle
+              number="01"
+              title="Preserve source identity"
+              text="Retain the original filename, source format, schema declaration, and digest before normalization."
+            />
+            <Principle
+              number="02"
+              title="Expose unresolved stages"
+              text="Map only recognized content. Missing evidence, authority, continuity, or correspondence remains UNKNOWN."
+            />
+            <Principle
+              number="03"
+              title="Correct through governed versions"
+              text="Move the normalized draft into the Builder and Scanner before any route can approach executable commitment."
+            />
+          </div>
         </section>
       </div>
     </main>
   );
 }
 
-function Metric({ label, value, mono = false }: { label: string; value: string; mono?: boolean }) {
-  return <div className="rounded-2xl border border-white/10 bg-black/20 p-4"><p className="text-[10px] uppercase tracking-[0.18em] text-white/35">{label}</p><p className={`mt-2 text-lg font-semibold ${mono ? 'font-mono text-sm' : ''}`}>{value}</p></div>;
+function Metric({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail: string;
+}) {
+  return (
+    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/32">{label}</p>
+      <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
+      <p className="mt-1 text-xs text-white/38">{detail}</p>
+    </div>
+  );
 }
 
 function Info({ label, value }: { label: string; value: string }) {
-  return <div><dt className="text-white/35">{label}</dt><dd className="mt-1 break-words text-white/70">{value}</dd></div>;
+  return (
+    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
+      <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">{label}</dt>
+      <dd className="mt-2 break-words text-sm text-white/68">{value}</dd>
+    </div>
+  );
 }
 
-function Principle({ number, title, text: body }: { number: string; title: string; text: string }) {
-  return <div className="rounded-[1.5rem] border border-white/10 bg-white/[0.03] p-5"><p className="font-mono text-xs text-cyan-300">{number}</p><h3 className="mt-3 text-lg font-semibold">{title}</h3><p className="mt-2 text-sm leading-6 text-white/50">{body}</p></div>;
+function Principle({
+  number,
+  title,
+  text: body,
+}: {
+  number: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))] p-5">
+      <div className="flex items-center gap-3">
+        <span className="grid h-9 w-9 place-items-center rounded-full border border-cyan-300/20 bg-cyan-300/10 font-mono text-xs text-cyan-200">
+          {number}
+        </span>
+        <h3 className="text-lg font-semibold">{title}</h3>
+      </div>
+      <p className="mt-4 text-sm leading-6 text-white/48">{body}</p>
+    </div>
+  );
 }
