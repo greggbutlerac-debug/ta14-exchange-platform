@@ -10,6 +10,7 @@ import {
   useState,
 } from "react";
 import type { TransferRouteDraft } from "../../../lib/route-draft-transfer";
+import { saveStoredRoute } from "../../../lib/route-library";
 import EvaluateRouteLink from "./evaluate-route-link";
 
 type StageKey =
@@ -236,26 +237,22 @@ function stageState(stage: Stage): "COMPLETE" | "UNKNOWN" {
 }
 
 export default function BuildRoutePage() {
-  const [routeName, setRouteName] = useState(
-    "Untitled governance route",
-  );
+  const [routeName, setRouteName] = useState("Untitled governance route");
   const [domain, setDomain] = useState("AI Governance");
   const [owner, setOwner] = useState("UNKNOWN");
   const [stages, setStages] = useState<Stage[]>(initialStages);
-  const [selected, setSelected] =
-    useState<StageKey>("reality");
+  const [selected, setSelected] = useState<StageKey>("reality");
   const [showJson, setShowJson] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [importNotice, setImportNotice] =
-    useState<ImportNotice | null>(null);
+  const [importNotice, setImportNotice] = useState<ImportNotice | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [localDraftReady, setLocalDraftReady] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
+  const [storedRouteId, setStoredRouteId] = useState<string | null>(null);
+  const [libraryNotice, setLibraryNotice] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const currentIndex = stages.findIndex(
-    (stage) => stage.key === selected,
-  );
+  const currentIndex = stages.findIndex((stage) => stage.key === selected);
 
   const current = stages[currentIndex] ?? stages[0];
 
@@ -270,11 +267,7 @@ export default function BuildRoutePage() {
   const progress = Math.round((completed / 8) * 100);
 
   const status: RouteStatus =
-    completed === 8
-      ? "READY_FOR_TEST"
-      : completed >= 4
-        ? "HOLD"
-        : "DRAFT";
+    completed === 8 ? "READY_FOR_TEST" : completed >= 4 ? "HOLD" : "DRAFT";
 
   const route = useMemo<TransferRouteDraft>(
     () => ({
@@ -282,64 +275,43 @@ export default function BuildRoutePage() {
       routeId: `draft:${slugify(routeName)}`,
       status,
       metadata: {
-        name:
-          routeName.trim() || "Untitled governance route",
+        name: routeName.trim() || "Untitled governance route",
         domain: domain.trim() || "UNKNOWN",
         owner: owner.trim() || "UNKNOWN",
         version: 1,
       },
       chain: Object.fromEntries(
-        stages.map((stage) => [
-          stage.key,
-          stage.value.trim() || "UNKNOWN",
-        ]),
+        stages.map((stage) => [stage.key, stage.value.trim() || "UNKNOWN"]),
       ) as TransferRouteDraft["chain"],
       readiness: {
         completedStages: completed,
         totalStages: 8,
         missingStages: missing,
         nextAction:
-          completed === 8
-            ? "SUBMIT_TO_SANDBOX"
-            : "COMPLETE_ROUTE_DEFINITION",
+          completed === 8 ? "SUBMIT_TO_SANDBOX" : "COMPLETE_ROUTE_DEFINITION",
       },
-      governingPrinciple:
-        "No admissible evidence. No admissible execution.",
+      governingPrinciple: "No admissible evidence. No admissible execution.",
     }),
-    [
-      completed,
-      domain,
-      missing,
-      owner,
-      routeName,
-      stages,
-      status,
-    ],
+    [completed, domain, missing, owner, routeName, stages, status],
   );
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem(
-        localDraftStorageKey,
-      );
+      const stored = window.localStorage.getItem(localDraftStorageKey);
 
       if (stored) {
         const parsed = JSON.parse(stored) as {
           route?: unknown;
           savedAt?: unknown;
+          storedRouteId?: unknown;
         };
         const restored = validateImportedRoute(parsed.route);
 
         setRouteName(
-          restored.metadata.name.trim() ||
-            "Untitled governance route",
+          restored.metadata.name.trim() || "Untitled governance route",
         );
-        setDomain(
-          restored.metadata.domain.trim() || "UNKNOWN",
-        );
-        setOwner(
-          restored.metadata.owner.trim() || "UNKNOWN",
-        );
+        setDomain(restored.metadata.domain.trim() || "UNKNOWN");
+        setOwner(restored.metadata.owner.trim() || "UNKNOWN");
         setStages(
           stageDefinitions.map((stage) => ({
             ...stage,
@@ -349,9 +321,10 @@ export default function BuildRoutePage() {
                 : restored.chain[stage.key],
           })),
         );
-        setSavedAt(
-          typeof parsed.savedAt === "string"
-            ? parsed.savedAt
+        setSavedAt(typeof parsed.savedAt === "string" ? parsed.savedAt : null);
+        setStoredRouteId(
+          typeof parsed.storedRouteId === "string"
+            ? parsed.storedRouteId
             : null,
         );
         setImportNotice({
@@ -393,27 +366,19 @@ export default function BuildRoutePage() {
         JSON.stringify({
           route,
           savedAt: timestamp,
+          storedRouteId,
         }),
       );
       setSavedAt(timestamp);
     }, 650);
 
     return () => window.clearTimeout(timeout);
-  }, [
-    domain,
-    localDraftReady,
-    owner,
-    route,
-    routeName,
-    stages,
-  ]);
+  }, [domain, localDraftReady, owner, route, routeName, stages, storedRouteId]);
 
   function updateCurrent(value: string) {
     setStages((items) =>
       items.map((stage) =>
-        stage.key === selected
-          ? { ...stage, value }
-          : stage,
+        stage.key === selected ? { ...stage, value } : stage,
       ),
     );
   }
@@ -427,12 +392,13 @@ export default function BuildRoutePage() {
     setStages((items) =>
       items.map((stage) => ({
         ...stage,
-        value:
-          template.stages[stage.key] ?? stage.value,
+        value: template.stages[stage.key] ?? stage.value,
       })),
     );
     setSelected("reality");
     setShowJson(false);
+    setStoredRouteId(null);
+    setLibraryNotice(null);
   }
 
   function clearRoute() {
@@ -445,6 +411,8 @@ export default function BuildRoutePage() {
     setCopied(false);
     setImportNotice(null);
     setSavedAt(null);
+    setStoredRouteId(null);
+    setLibraryNotice(null);
     window.localStorage.removeItem(localDraftStorageKey);
 
     if (fileInputRef.current) {
@@ -473,13 +441,9 @@ export default function BuildRoutePage() {
     );
   }
 
-  function validateImportedRoute(
-    value: unknown,
-  ): TransferRouteDraft {
+  function validateImportedRoute(value: unknown): TransferRouteDraft {
     if (!value || typeof value !== "object") {
-      throw new Error(
-        "The selected file does not contain a route object.",
-      );
+      throw new Error("The selected file does not contain a route object.");
     }
 
     const candidate = value as Partial<TransferRouteDraft>;
@@ -490,13 +454,8 @@ export default function BuildRoutePage() {
       );
     }
 
-    if (
-      !candidate.metadata ||
-      typeof candidate.metadata !== "object"
-    ) {
-      throw new Error(
-        "The route metadata block is missing or invalid.",
-      );
+    if (!candidate.metadata || typeof candidate.metadata !== "object") {
+      throw new Error("The route metadata block is missing or invalid.");
     }
 
     if (
@@ -504,22 +463,16 @@ export default function BuildRoutePage() {
       typeof candidate.metadata.domain !== "string" ||
       typeof candidate.metadata.owner !== "string"
     ) {
-      throw new Error(
-        "Route name, domain, and owner must be text values.",
-      );
+      throw new Error("Route name, domain, and owner must be text values.");
     }
 
     if (!candidate.chain || typeof candidate.chain !== "object") {
-      throw new Error(
-        "The canonical Reality → Outcome chain is missing.",
-      );
+      throw new Error("The canonical Reality → Outcome chain is missing.");
     }
 
     for (const key of routeStageKeys) {
       if (typeof candidate.chain[key] !== "string") {
-        throw new Error(
-          `The ${key} stage is missing or is not a text value.`,
-        );
+        throw new Error(`The ${key} stage is missing or is not a text value.`);
       }
     }
 
@@ -543,8 +496,7 @@ export default function BuildRoutePage() {
       setImportNotice({
         type: "error",
         title: "File is too large",
-        message:
-          "Route drafts must be 1 MB or smaller.",
+        message: "Route drafts must be 1 MB or smaller.",
       });
       return;
     }
@@ -568,12 +520,9 @@ export default function BuildRoutePage() {
       const imported = validateImportedRoute(parsed);
 
       setRouteName(
-        imported.metadata.name.trim() ||
-          "Untitled governance route",
+        imported.metadata.name.trim() || "Untitled governance route",
       );
-      setDomain(
-        imported.metadata.domain.trim() || "UNKNOWN",
-      );
+      setDomain(imported.metadata.domain.trim() || "UNKNOWN");
       setOwner(imported.metadata.owner.trim() || "UNKNOWN");
       setStages(
         stageDefinitions.map((stage) => ({
@@ -587,6 +536,8 @@ export default function BuildRoutePage() {
       setSelected("reality");
       setShowJson(false);
       setCopied(false);
+      setStoredRouteId(null);
+      setLibraryNotice(null);
       setImportNotice({
         type: "success",
         title: "Route imported successfully",
@@ -612,9 +563,7 @@ export default function BuildRoutePage() {
     fileInputRef.current?.click();
   }
 
-  function handleFileSelection(
-    event: ChangeEvent<HTMLInputElement>,
-  ) {
+  function handleFileSelection(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
 
     if (file) {
@@ -622,17 +571,13 @@ export default function BuildRoutePage() {
     }
   }
 
-  function handleDragOver(
-    event: DragEvent<HTMLDivElement>,
-  ) {
+  function handleDragOver(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
     event.stopPropagation();
     setDragActive(true);
   }
 
-  function handleDragLeave(
-    event: DragEvent<HTMLDivElement>,
-  ) {
+  function handleDragLeave(event: DragEvent<HTMLDivElement>) {
     event.preventDefault();
     event.stopPropagation();
 
@@ -653,13 +598,24 @@ export default function BuildRoutePage() {
     }
   }
 
-  function downloadDraft() {
-    const blob = new Blob(
-      [JSON.stringify(route, null, 2)],
-      {
-        type: "application/json",
-      },
+  function saveToLibrary() {
+    const wasExisting = Boolean(storedRouteId);
+    const stored = saveStoredRoute(route, storedRouteId ?? undefined);
+
+    setStoredRouteId(stored.id);
+    setLibraryNotice(
+      wasExisting ? "Saved changes to My Routes." : "Route saved to My Routes.",
     );
+
+    window.setTimeout(() => {
+      setLibraryNotice(null);
+    }, 2200);
+  }
+
+  function downloadDraft() {
+    const blob = new Blob([JSON.stringify(route, null, 2)], {
+      type: "application/json",
+    });
 
     const href = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
@@ -674,9 +630,7 @@ export default function BuildRoutePage() {
   }
 
   async function copyJson() {
-    await navigator.clipboard.writeText(
-      JSON.stringify(route, null, 2),
-    );
+    await navigator.clipboard.writeText(JSON.stringify(route, null, 2));
 
     setCopied(true);
 
@@ -689,15 +643,12 @@ export default function BuildRoutePage() {
     <main className="page">
       <header className="topbar">
         <div>
-          <p className="eyebrow">
-            TA-14 Exchange · Route construction
-          </p>
+          <p className="eyebrow">TA-14 Exchange · Route construction</p>
           <h1>Build a Governed Route</h1>
           <p className="intro">
-            Define the consequence, supporting evidence,
-            authority, binding, execution, and outcome. The
-            canonical chain updates as the route becomes
-            complete.
+            Define the consequence, supporting evidence, authority, binding,
+            execution, and outcome. The canonical chain updates as the route
+            becomes complete.
           </p>
         </div>
 
@@ -717,6 +668,14 @@ export default function BuildRoutePage() {
             </div>
           </div>
 
+          <Link href="/workspace/routes" className="textButton">
+            My Routes
+          </Link>
+
+          <button type="button" className="saveButton" onClick={saveToLibrary}>
+            {storedRouteId ? "Save changes" : "Save to My Routes"}
+          </button>
+
           <Link href="/workspace/discover" className="textButton">
             ← Discovery
           </Link>
@@ -729,32 +688,29 @@ export default function BuildRoutePage() {
             {showJson ? "Hide JSON" : "Preview JSON"}
           </button>
 
-          <button
-            type="button"
-            className="textButton"
-            onClick={downloadDraft}
-          >
+          <button type="button" className="textButton" onClick={downloadDraft}>
             Download draft
           </button>
 
-          <button
-            type="button"
-            className="dangerButton"
-            onClick={clearRoute}
-          >
+          <button type="button" className="dangerButton" onClick={clearRoute}>
             Clear
           </button>
         </div>
       </header>
+
+      {libraryNotice ? (
+        <div className="libraryNotice" role="status">
+          <strong>{libraryNotice}</strong>
+          <Link href="/workspace/routes">Open My Routes →</Link>
+        </div>
+      ) : null}
 
       <section className="identityGrid">
         <label>
           <span>Route name</span>
           <input
             value={routeName}
-            onChange={(event) =>
-              setRouteName(event.target.value)
-            }
+            onChange={(event) => setRouteName(event.target.value)}
           />
         </label>
 
@@ -762,9 +718,7 @@ export default function BuildRoutePage() {
           <span>Domain</span>
           <input
             value={domain}
-            onChange={(event) =>
-              setDomain(event.target.value)
-            }
+            onChange={(event) => setDomain(event.target.value)}
           />
         </label>
 
@@ -772,9 +726,7 @@ export default function BuildRoutePage() {
           <span>Route owner</span>
           <input
             value={owner}
-            onChange={(event) =>
-              setOwner(event.target.value)
-            }
+            onChange={(event) => setOwner(event.target.value)}
           />
         </label>
 
@@ -789,9 +741,8 @@ export default function BuildRoutePage() {
           <p className="eyebrow">Continue an existing route</p>
           <h2>Import a route draft</h2>
           <p>
-            Reopen a TA-14 JSON draft, continue another
-            builder&apos;s work, or inspect a route before
-            evaluation. Imported UNKNOWN values remain
+            Reopen a TA-14 JSON draft, continue another builder&apos;s work, or
+            inspect a route before evaluation. Imported UNKNOWN values remain
             unresolved.
           </p>
         </div>
@@ -824,17 +775,11 @@ export default function BuildRoutePage() {
           <span className="dropIcon">⇧</span>
 
           <div>
-            <strong>
-              Drag and drop a route draft here
-            </strong>
-            <span>
-              or click to browse for a .json file
-            </span>
+            <strong>Drag and drop a route draft here</strong>
+            <span>or click to browse for a .json file</span>
           </div>
 
-          <small>
-            TA14_ROUTE_DRAFT_V1 · Maximum 1 MB
-          </small>
+          <small>TA14_ROUTE_DRAFT_V1 · Maximum 1 MB</small>
         </div>
 
         {importNotice ? (
@@ -860,10 +805,7 @@ export default function BuildRoutePage() {
           </div>
 
           <div className="progressTrack">
-            <div
-              className="progressFill"
-              style={{ width: `${progress}%` }}
-            />
+            <div className="progressFill" style={{ width: `${progress}%` }} />
           </div>
 
           <div className="chain">
@@ -875,22 +817,14 @@ export default function BuildRoutePage() {
                 <button
                   key={stage.key}
                   type="button"
-                  className={`chainStage ${
-                    isSelected ? "selected" : ""
-                  }`}
+                  className={`chainStage ${isSelected ? "selected" : ""}`}
                   onClick={() => setSelected(stage.key)}
                 >
-                  <span className="stageNumber">
-                    {stage.number}
-                  </span>
+                  <span className="stageNumber">{stage.number}</span>
 
-                  <span className="stageName">
-                    {stage.label}
-                  </span>
+                  <span className="stageName">{stage.label}</span>
 
-                  <span
-                    className={`stageState ${state.toLowerCase()}`}
-                  >
+                  <span className={`stageState ${state.toLowerCase()}`}>
                     {state === "COMPLETE" ? "✓" : "○"}
                   </span>
                 </button>
@@ -900,18 +834,14 @@ export default function BuildRoutePage() {
 
           <div className="principle">
             <span>Governing principle</span>
-            <strong>
-              No admissible evidence. No admissible execution.
-            </strong>
+            <strong>No admissible evidence. No admissible execution.</strong>
           </div>
         </aside>
 
         <section className="editorPanel">
           <div className="stageMeta">
             <div>
-              <p className="eyebrow">
-                Stage {current.number}
-              </p>
+              <p className="eyebrow">Stage {current.number}</p>
               <h2>{current.label}</h2>
             </div>
 
@@ -927,9 +857,7 @@ export default function BuildRoutePage() {
 
           <textarea
             value={current.value}
-            onChange={(event) =>
-              updateCurrent(event.target.value)
-            }
+            onChange={(event) => updateCurrent(event.target.value)}
             placeholder={current.placeholder}
             rows={10}
           />
@@ -937,10 +865,9 @@ export default function BuildRoutePage() {
           <div className="ruleCard">
             <strong>Rule</strong>
             <p>
-              Do not invent missing facts. Define the required
-              proof, binding, authority, or correspondence.
-              Unsupported values remain UNKNOWN until evidence
-              resolves them.
+              Do not invent missing facts. Define the required proof, binding,
+              authority, or correspondence. Unsupported values remain UNKNOWN
+              until evidence resolves them.
             </p>
           </div>
 
@@ -955,11 +882,7 @@ export default function BuildRoutePage() {
             </button>
 
             {currentIndex < stages.length - 1 ? (
-              <button
-                type="button"
-                className="primaryButton"
-                onClick={goNext}
-              >
+              <button type="button" className="primaryButton" onClick={goNext}>
                 Next stage →
               </button>
             ) : (
@@ -998,9 +921,7 @@ export default function BuildRoutePage() {
 
           <div className="metric">
             <span>Next action</span>
-            <strong>
-              {completed === 8 ? "EVALUATE" : "COMPLETE"}
-            </strong>
+            <strong>{completed === 8 ? "EVALUATE" : "COMPLETE"}</strong>
           </div>
 
           {missing.length > 0 ? (
@@ -1013,9 +934,7 @@ export default function BuildRoutePage() {
                     key={label}
                     type="button"
                     onClick={() => {
-                      const stage = stages.find(
-                        (item) => item.label === label,
-                      );
+                      const stage = stages.find((item) => item.label === label);
 
                       if (stage) {
                         setSelected(stage.key);
@@ -1031,9 +950,8 @@ export default function BuildRoutePage() {
             <div className="readyCard">
               <strong>Route definition complete</strong>
               <p>
-                All eight stages are defined. Submit the route
-                to the live engine for an admissibility
-                determination.
+                All eight stages are defined. Submit the route to the live
+                engine for an admissibility determination.
               </p>
 
               <EvaluateRouteLink route={route}>
@@ -1049,9 +967,8 @@ export default function BuildRoutePage() {
           <p className="eyebrow">Guided starting points</p>
           <h2>Start from a template</h2>
           <p>
-            Templates provide declared route content only. They
-            do not prove that evidence exists or that authority
-            is valid.
+            Templates provide declared route content only. They do not prove
+            that evidence exists or that authority is valid.
           </p>
         </div>
 
@@ -1098,8 +1015,7 @@ export default function BuildRoutePage() {
         .page {
           min-height: 100vh;
           padding: 42px;
-          background:
-            radial-gradient(
+          background: radial-gradient(
               circle at top right,
               rgba(49, 209, 158, 0.09),
               transparent 30%
@@ -1107,8 +1023,13 @@ export default function BuildRoutePage() {
             #f5f7f8;
           color: #10201a;
           font-family:
-            Inter, ui-sans-serif, system-ui, -apple-system,
-            BlinkMacSystemFont, "Segoe UI", sans-serif;
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
         }
 
         .topbar {
@@ -1208,6 +1129,7 @@ export default function BuildRoutePage() {
 
         .textButton,
         .dangerButton,
+        .saveButton,
         .secondaryButton,
         .primaryButton {
           border-radius: 11px;
@@ -1216,7 +1138,8 @@ export default function BuildRoutePage() {
         }
 
         .textButton,
-        .dangerButton {
+        .dangerButton,
+        .saveButton {
           padding: 11px 14px;
           border: 1px solid #dce4df;
           background: white;
@@ -1227,6 +1150,40 @@ export default function BuildRoutePage() {
 
         .dangerButton {
           color: #a33b3b;
+        }
+
+        .saveButton {
+          border-color: #123c2e;
+          background: #123c2e;
+          color: white;
+          font-size: 13px;
+          font-weight: 850;
+        }
+
+        .libraryNotice {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          max-width: 1480px;
+          margin: 0 auto 18px;
+          padding: 14px 17px;
+          border: 1px solid #b9dfd0;
+          border-radius: 14px;
+          background: #eaf8f2;
+          color: #15513d;
+          box-shadow: 0 14px 35px rgba(20, 47, 36, 0.05);
+        }
+
+        .libraryNotice strong {
+          font-size: 13px;
+        }
+
+        .libraryNotice a {
+          color: #08724f;
+          font-size: 12px;
+          font-weight: 900;
+          text-decoration: none;
         }
 
         .identityGrid {
@@ -1854,6 +1811,11 @@ export default function BuildRoutePage() {
 
           .topActions {
             justify-content: flex-start;
+          }
+
+          .libraryNotice {
+            align-items: flex-start;
+            flex-direction: column;
           }
 
           .identityGrid,
