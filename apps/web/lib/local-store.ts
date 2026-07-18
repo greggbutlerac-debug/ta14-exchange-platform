@@ -1,5 +1,10 @@
 import { get, put } from "@vercel/blob";
-import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
+import {
+  mkdir,
+  readFile,
+  rename,
+  writeFile,
+} from "node:fs/promises";
 import path from "node:path";
 
 import type { AerRecord } from "../../../packages/aer/generate-aer";
@@ -105,10 +110,14 @@ async function saveLocal(db: Db): Promise<void> {
   const file = dataFile();
   const temporaryFile = `${file}.${process.pid}.${Date.now()}.tmp`;
 
-  await writeFile(temporaryFile, JSON.stringify(db, null, 2), {
-    encoding: "utf8",
-    mode: 0o600,
-  });
+  await writeFile(
+    temporaryFile,
+    JSON.stringify(db, null, 2),
+    {
+      encoding: "utf8",
+      mode: 0o600,
+    },
+  );
 
   await rename(temporaryFile, file);
 }
@@ -116,10 +125,14 @@ async function saveLocal(db: Db): Promise<void> {
 async function loadBlob(): Promise<Db> {
   try {
     const result = await get(BLOB_PATHNAME, {
-      access: "public",
+      access: "private",
     });
 
-    if (!result || result.statusCode !== 200 || !result.stream) {
+    if (
+      !result ||
+      result.statusCode !== 200 ||
+      !result.stream
+    ) {
       return emptyDb();
     }
 
@@ -133,12 +146,16 @@ async function loadBlob(): Promise<Db> {
 }
 
 async function saveBlob(db: Db): Promise<void> {
-  await put(BLOB_PATHNAME, JSON.stringify(db, null, 2), {
-    access: "public",
-    contentType: "application/json",
-    addRandomSuffix: false,
-    allowOverwrite: true,
-  });
+  await put(
+    BLOB_PATHNAME,
+    JSON.stringify(db, null, 2),
+    {
+      access: "private",
+      contentType: "application/json",
+      addRandomSuffix: false,
+      allowOverwrite: true,
+    },
+  );
 }
 
 async function mutateLocal<T>(
@@ -337,7 +354,10 @@ export async function getRoute(rid: string) {
 
   const versions = db.routeVersions
     .filter((item) => item.rid === rid)
-    .sort((first, second) => first.version - second.version);
+    .sort(
+      (first, second) =>
+        first.version - second.version,
+    );
 
   if (versions.length === 0) {
     return undefined;
@@ -345,7 +365,9 @@ export async function getRoute(rid: string) {
 
   const events = db.events
     .filter((item) => item.rid === rid)
-    .sort((first, second) => first.at.localeCompare(second.at));
+    .sort((first, second) =>
+      first.at.localeCompare(second.at),
+    );
 
   return {
     latest: versions.at(-1)!,
@@ -368,21 +390,27 @@ export async function getPublicVerificationBundle(
 
   const events = db.events
     .filter((item) => item.rid === rid)
-    .sort((first, second) => first.at.localeCompare(second.at));
+    .sort((first, second) =>
+      first.at.localeCompare(second.at),
+    );
 
   return {
     rid,
+
     publicKey: {
       keyId: db.key.keyId,
       algorithm: "Ed25519",
       publicKeyPem: db.key.publicKeyPem,
       status: "DEVELOPMENT_ONLY",
     },
+
     aer: registry.aer,
+
     eventChain: {
       valid: verifyEventChain(events),
       events,
     },
+
     registry: {
       status: registry.status,
       issuedAt: registry.issuedAt,
