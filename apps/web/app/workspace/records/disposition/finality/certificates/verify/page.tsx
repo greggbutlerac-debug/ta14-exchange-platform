@@ -7,6 +7,7 @@ type VerificationState =
   | "UNVERIFIED"
   | "VALID"
   | "INVALID"
+  | "UNKNOWN"
   | "SUSPENDED"
   | "REVOKED"
   | "SUPERSEDED"
@@ -923,6 +924,7 @@ export default function FinalityCertificateVerificationPage() {
             <option value="UNVERIFIED">UNVERIFIED</option>
             <option value="VALID">VALID</option>
             <option value="INVALID">INVALID</option>
+            <option value="UNKNOWN">UNKNOWN</option>
             <option value="SUSPENDED">SUSPENDED</option>
             <option value="REVOKED">REVOKED</option>
             <option value="SUPERSEDED">SUPERSEDED</option>
