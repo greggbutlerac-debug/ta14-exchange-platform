@@ -90,11 +90,34 @@ const CHAIN = [
   "Commit",
   "Execution",
   "Outcome",
-];
+] as const;
+
+const WORKFLOW = [
+  {
+    number: "01",
+    title: "Inspect the route",
+    body: "Review the complete Reality → Outcome chain.",
+  },
+  {
+    number: "02",
+    title: "Identify the defect",
+    body: "Find the evidence, authority, continuity, or binding failure.",
+  },
+  {
+    number: "03",
+    title: "Repair the route",
+    body: "Restore the conditions required for admissible execution.",
+  },
+  {
+    number: "04",
+    title: "Transfer and evaluate",
+    body: "Open the corrected route in the builder and test its lane.",
+  },
+] as const;
 
 export default function AcademyLabPage() {
   return (
-    <main className="labPage">
+    <main className="page">
       <header className="topbar">
         <div>
           <p className="breadcrumb">Workspace / Academy Lab</p>
@@ -105,7 +128,6 @@ export default function AcademyLabPage() {
           <Link className="secondaryButton" href="/workspace">
             Back to Workspace
           </Link>
-
           <Link className="primaryButton" href="/workspace/build">
             Open Route Builder
           </Link>
@@ -115,23 +137,20 @@ export default function AcademyLabPage() {
       <section className="hero">
         <div className="heroCopy">
           <p className="eyebrow">Guided AI governance practice</p>
-
           <h2>
             Learn admissible execution by finding what makes a route fail.
           </h2>
-
           <p>
-            Each lab presents a consequence-bearing AI route with a deliberate
-            governance defect. Review the complete chain, identify the failure,
-            repair the route, and transfer the corrected structure into the
-            live Route Builder.
+            Each lab presents a consequence-bearing AI route with a
+            deliberate governance defect. Review the complete chain,
+            identify the failure, repair the route, and transfer the
+            corrected structure into the live Route Builder.
           </p>
 
           <div className="heroActions">
             <a className="primaryButton" href="#labs">
               Choose a lab
             </a>
-
             <Link
               className="secondaryButton"
               href="/workspace/evaluation/lanes"
@@ -143,26 +162,31 @@ export default function AcademyLabPage() {
 
         <aside className="principlePanel">
           <p>Governing principle</p>
-          <blockquote>
+          <blockquote style={{ color: "#10251c", opacity: 1, WebkitTextFillColor: "#10251c" }}>
             No admissible evidence.
             <br />
             No admissible execution.
           </blockquote>
 
           <div className="classificationGrid">
-            {["ALLOW", "HOLD", "DENY", "ESCALATE"].map((classification) => (
-              <span
-                data-classification={classification}
-                key={classification}
-              >
-                {classification}
-              </span>
-            ))}
+            {["ALLOW", "HOLD", "DENY", "ESCALATE"].map(
+              (classification) => (
+                <span
+                  data-classification={classification}
+                  key={classification}
+                >
+                  {classification}
+                </span>
+              ),
+            )}
           </div>
         </aside>
       </section>
 
-      <section className="chainPanel" aria-label="TA-14 execution chain">
+      <section
+        className="chainPanel"
+        aria-label="TA-14 execution chain"
+      >
         {CHAIN.map((stage, index) => (
           <div className="chainStage" key={stage}>
             <span>{String(index + 1).padStart(2, "0")}</span>
@@ -180,11 +204,10 @@ export default function AcademyLabPage() {
             <p className="eyebrow">Available exercises</p>
             <h2>Choose the failure you want to learn from.</h2>
           </div>
-
           <p>
-            Labs progress from evidence sufficiency and continuity through
-            runtime revalidation, outcome correspondence, and complete route
-            construction.
+            Labs progress from evidence sufficiency and continuity
+            through runtime revalidation, outcome correspondence, and
+            complete route construction.
           </p>
         </div>
 
@@ -193,7 +216,6 @@ export default function AcademyLabPage() {
             <article className="labCard" key={lab.id}>
               <div className="cardHeader">
                 <span className="labNumber">{lab.number}</span>
-
                 <span
                   className="classification"
                   data-classification={lab.classification}
@@ -203,7 +225,6 @@ export default function AcademyLabPage() {
               </div>
 
               <div className="difficulty">{lab.difficulty}</div>
-
               <h3>{lab.title}</h3>
               <p className="summary">{lab.summary}</p>
 
@@ -214,7 +235,6 @@ export default function AcademyLabPage() {
 
               <div className="focus">
                 <span>Chain focus</span>
-
                 <div>
                   {lab.focus.map((item) => (
                     <b key={item}>{item}</b>
@@ -222,102 +242,60 @@ export default function AcademyLabPage() {
                 </div>
               </div>
 
-              <footer>
-                <Link
-                  className="launchButton"
-                  href={`/workspace/lab/${lab.id}`}
-                >
-                  Launch lab
-                  <span aria-hidden="true">→</span>
-                </Link>
-              </footer>
+              <Link
+                className="launchLink"
+                href={`/workspace/lab/${lab.id}`}
+              >
+                Launch lab →
+              </Link>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="workflowPanel">
-        <div>
-          <p className="eyebrow">Lab workflow</p>
-          <h2>Inspect. Repair. Transfer. Evaluate.</h2>
+      <section className="workflowSection">
+        <div className="sectionHeading workflowHeading">
+          <div>
+            <p className="eyebrow">Lab workflow</p>
+            <h2>Inspect. Repair. Transfer. Evaluate.</h2>
+          </div>
         </div>
 
-        <ol>
-          <li>
-            <span>01</span>
-            <div>
-              <strong>Inspect the route</strong>
-              <p>Review the complete Reality → Outcome chain.</p>
-            </div>
-          </li>
-
-          <li>
-            <span>02</span>
-            <div>
-              <strong>Identify the defect</strong>
-              <p>Find the evidence, authority, continuity, or binding failure.</p>
-            </div>
-          </li>
-
-          <li>
-            <span>03</span>
-            <div>
-              <strong>Repair the route</strong>
-              <p>Restore the conditions required for admissible execution.</p>
-            </div>
-          </li>
-
-          <li>
-            <span>04</span>
-            <div>
-              <strong>Transfer and evaluate</strong>
-              <p>Open the corrected route in the builder and test its lane.</p>
-            </div>
-          </li>
+        <ol className="workflowGrid">
+          {WORKFLOW.map((step) => (
+            <li key={step.number}>
+              <span>{step.number}</span>
+              <h3>{step.title}</h3>
+              <p>{step.body}</p>
+            </li>
+          ))}
         </ol>
       </section>
 
-      <footer className="pageFooter">
-        <span>TA-14 Academy Lab</span>
+      <footer>
+        <strong>TA-14 Academy Lab</strong>
         <span>Practice before consequence</span>
       </footer>
 
-      <style>{`
+      <style jsx>{`
         * {
           box-sizing: border-box;
         }
 
-        html {
-          scroll-behavior: smooth;
-        }
-
-        body {
-          margin: 0;
+        .page {
+          min-height: 100vh;
+          overflow: hidden;
           background:
             radial-gradient(
-              circle at 12% 5%,
-              rgba(15, 124, 91, 0.09),
-              transparent 30%
+              circle at 85% 10%,
+              rgba(26, 142, 105, 0.16),
+              transparent 28%
             ),
-            #f5f7f6;
-          color: #173128;
+            linear-gradient(135deg, #061924 0%, #07151a 48%, #05120f 100%);
+          color: #f5f7fb;
           font-family:
-            Inter,
-            ui-sans-serif,
-            system-ui,
-            -apple-system,
-            BlinkMacSystemFont,
-            "Segoe UI",
-            sans-serif;
-        }
-
-        a {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        .labPage {
-          min-height: 100vh;
+            Inter, ui-sans-serif, system-ui, -apple-system,
+            BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
 
         .topbar {
@@ -325,24 +303,30 @@ export default function AcademyLabPage() {
           align-items: center;
           justify-content: space-between;
           gap: 24px;
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 28px 32px;
-          border-bottom: 1px solid #dce5e0;
+          padding: 28px clamp(24px, 5vw, 76px);
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .breadcrumb {
           margin: 0 0 6px;
-          color: #79867f;
-          font-size: 10px;
-          font-weight: 850;
+          color: rgba(215, 229, 224, 0.58);
+          font-size: 12px;
+          font-weight: 800;
           letter-spacing: 0.08em;
           text-transform: uppercase;
         }
 
-        .topbar h1 {
-          margin: 0;
-          font-size: 20px;
+        h1,
+        h2,
+        h3,
+        p,
+        blockquote {
+          margin-top: 0;
+        }
+
+        h1 {
+          margin-bottom: 0;
+          font-size: 22px;
           letter-spacing: -0.03em;
         }
 
@@ -354,81 +338,64 @@ export default function AcademyLabPage() {
         }
 
         .primaryButton,
-        .secondaryButton,
-        .launchButton {
+        .secondaryButton {
           display: inline-flex;
+          min-height: 44px;
           align-items: center;
           justify-content: center;
-          gap: 10px;
-          min-height: 46px;
           padding: 0 17px;
           border-radius: 11px;
-          font-size: 12px;
-          font-weight: 900;
-          transition:
-            transform 150ms ease,
-            box-shadow 150ms ease;
+          font-size: 13px;
+          font-weight: 850;
+          text-decoration: none;
         }
 
         .primaryButton {
-          border: 1px solid #123c2e;
-          background: #123c2e;
-          color: white;
+          border: 1px solid #2ac18f;
+          background: #21a979;
+          color: #04130e;
         }
 
         .secondaryButton {
-          border: 1px solid #cad7d1;
-          background: rgba(255, 255, 255, 0.85);
-          color: #24463a;
-        }
-
-        .primaryButton:hover,
-        .secondaryButton:hover,
-        .launchButton:hover {
-          transform: translateY(-1px);
-          box-shadow: 0 13px 32px rgba(23, 66, 50, 0.12);
+          border: 1px solid rgba(255, 255, 255, 0.18);
+          background: rgba(255, 255, 255, 0.045);
+          color: #f2f7f5;
         }
 
         .hero {
           display: grid;
-          grid-template-columns:
-            minmax(0, 1.15fr)
-            minmax(350px, 0.85fr);
-          gap: 26px;
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 72px 32px 44px;
+          grid-template-columns: minmax(0, 1.35fr) minmax(380px, 0.92fr);
+          gap: clamp(34px, 6vw, 84px);
+          align-items: stretch;
+          padding: 66px clamp(24px, 5vw, 76px) 48px;
         }
 
         .heroCopy {
-          align-self: center;
-          max-width: 820px;
+          display: flex;
+          min-width: 0;
+          flex-direction: column;
+          justify-content: center;
         }
 
         .eyebrow {
-          margin: 0 0 13px;
-          color: #0e7d5c;
-          font-size: 10px;
+          margin-bottom: 24px;
+          color: #129a73;
+          font-size: 12px;
           font-weight: 950;
           letter-spacing: 0.16em;
           text-transform: uppercase;
         }
 
-        h2,
-        h3,
-        p {
-          margin-top: 0;
-        }
-
-        .hero h2 {
-          margin-bottom: 22px;
-          font-size: clamp(42px, 6vw, 78px);
-          line-height: 0.99;
+        .heroCopy h2 {
+          max-width: 920px;
+          margin-bottom: 28px;
+          font-size: clamp(52px, 6.9vw, 98px);
+          line-height: 0.98;
           letter-spacing: -0.065em;
         }
 
         .heroCopy > p:not(.eyebrow) {
-          max-width: 750px;
+          max-width: 840px;
           margin-bottom: 29px;
           color: #68766f;
           font-size: 18px;
@@ -457,12 +424,14 @@ export default function AcademyLabPage() {
           text-transform: uppercase;
         }
 
-        blockquote {
+        .principlePanel blockquote {
           margin: 0 0 29px;
+          color: #10251c;
           font-size: clamp(27px, 3.2vw, 43px);
           font-weight: 900;
           line-height: 1.11;
           letter-spacing: -0.045em;
+          text-shadow: none;
         }
 
         .classificationGrid {
@@ -470,65 +439,62 @@ export default function AcademyLabPage() {
           grid-template-columns: repeat(2, 1fr);
           gap: 9px;
           padding-top: 22px;
-          border-top: 1px solid #d2dfd8;
+          border-top: 1px solid rgba(16, 37, 28, 0.14);
         }
 
         .classificationGrid span,
         .classification {
           display: inline-flex;
+          min-height: 38px;
           align-items: center;
           justify-content: center;
-          min-height: 35px;
-          padding: 0 10px;
-          border: 1px solid #d8e1dc;
+          padding: 0 14px;
+          border: 1px solid;
           border-radius: 999px;
-          background: #f3f6f4;
-          color: #637169;
-          font-size: 9px;
+          font-size: 11px;
           font-weight: 950;
           letter-spacing: 0.08em;
         }
 
         [data-classification="ALLOW"] {
-          border-color: #abd9c5 !important;
-          background: #e8f8f0 !important;
-          color: #08714f !important;
+          border-color: #9adfc5;
+          background: #e4f7ef;
+          color: #087352;
         }
 
         [data-classification="HOLD"] {
-          border-color: #e2d4aa !important;
-          background: #fff7df !important;
-          color: #886312 !important;
+          border-color: #e9cc84;
+          background: #fff5d9;
+          color: #8a6110;
         }
 
         [data-classification="DENY"] {
-          border-color: #e7bcbc !important;
-          background: #fff0f0 !important;
-          color: #a53a3a !important;
+          border-color: #efb4b4;
+          background: #fff0f0;
+          color: #b03939;
         }
 
         [data-classification="ESCALATE"] {
-          border-color: #cfc5e8 !important;
-          background: #f5f1ff !important;
-          color: #694da2 !important;
+          border-color: #cbbbea;
+          background: #f1ecff;
+          color: #6745ab;
         }
 
         .chainPanel {
           display: grid;
-          grid-template-columns: repeat(8, minmax(0, 1fr));
-          max-width: 1316px;
-          margin: 0 auto 94px;
-          border: 1px solid #dbe4df;
-          border-radius: 18px;
-          background: rgba(255, 255, 255, 0.84);
+          grid-template-columns: repeat(8, 1fr);
+          margin: 0 clamp(24px, 5vw, 76px) 86px;
           overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.035);
         }
 
         .chainStage {
           position: relative;
           min-width: 0;
-          padding: 20px 15px;
-          border-right: 1px solid #dfe7e2;
+          padding: 18px 16px;
+          border-right: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .chainStage:last-child {
@@ -537,54 +503,59 @@ export default function AcademyLabPage() {
 
         .chainStage span {
           display: block;
-          margin-bottom: 6px;
-          color: #0e7d5c;
-          font-size: 9px;
+          margin-bottom: 9px;
+          color: #169c75;
+          font-size: 10px;
           font-weight: 950;
+          letter-spacing: 0.1em;
         }
 
         .chainStage strong {
           display: block;
           overflow: hidden;
-          font-size: 11px;
+          font-size: 12px;
           text-overflow: ellipsis;
         }
 
         .chainStage b {
           position: absolute;
           top: 50%;
-          right: -5px;
+          right: -6px;
           z-index: 1;
-          color: #0e7d5c;
-          font-size: 12px;
           transform: translateY(-50%);
+          color: #21a979;
+          font-size: 13px;
         }
 
-        .labSection {
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 0 32px 100px;
+        .labSection,
+        .workflowSection {
+          padding: 0 clamp(24px, 5vw, 76px) 90px;
         }
 
         .sectionHeading {
-          display: grid;
-          grid-template-columns: 1fr minmax(290px, 0.6fr);
-          gap: 28px;
-          align-items: end;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 40px;
           margin-bottom: 34px;
         }
 
-        .sectionHeading h2,
-        .workflowPanel h2 {
+        .sectionHeading .eyebrow {
+          margin-bottom: 13px;
+        }
+
+        .sectionHeading h2 {
+          max-width: 760px;
           margin-bottom: 0;
-          font-size: clamp(34px, 4.5vw, 58px);
-          line-height: 1.03;
-          letter-spacing: -0.055em;
+          font-size: clamp(34px, 4.6vw, 64px);
+          line-height: 1;
+          letter-spacing: -0.052em;
         }
 
         .sectionHeading > p {
-          margin-bottom: 3px;
-          color: #6b7871;
+          max-width: 470px;
+          margin-bottom: 0;
+          color: rgba(220, 232, 227, 0.6);
           line-height: 1.65;
         }
 
@@ -596,83 +567,88 @@ export default function AcademyLabPage() {
 
         .labCard {
           display: flex;
+          min-height: 500px;
           flex-direction: column;
-          min-height: 100%;
-          padding: 25px;
-          border: 1px solid #dbe4df;
-          border-radius: 21px;
-          background: rgba(255, 255, 255, 0.95);
-          box-shadow: 0 17px 52px rgba(25, 66, 51, 0.05);
+          padding: 24px;
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 20px;
+          background:
+            linear-gradient(
+              155deg,
+              rgba(255, 255, 255, 0.07),
+              rgba(255, 255, 255, 0.025)
+            );
         }
 
         .cardHeader {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 24px;
+          gap: 14px;
+          margin-bottom: 25px;
         }
 
         .labNumber {
-          color: #99a69f;
-          font-size: 11px;
+          color: #169c75;
+          font-size: 12px;
           font-weight: 950;
-          letter-spacing: 0.07em;
+          letter-spacing: 0.11em;
         }
 
         .classification {
-          min-height: 30px;
-          font-size: 8px;
+          min-height: 32px;
+          font-size: 9px;
         }
 
         .difficulty {
+          margin-bottom: 12px;
+          color: rgba(222, 234, 229, 0.48);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .labCard h3 {
+          margin-bottom: 14px;
+          font-size: 28px;
+          letter-spacing: -0.04em;
+        }
+
+        .summary {
+          margin-bottom: 25px;
+          color: rgba(222, 234, 229, 0.67);
+          line-height: 1.62;
+        }
+
+        .objective {
+          margin-bottom: 22px;
+          padding: 16px;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          border-radius: 13px;
+          background: rgba(0, 0, 0, 0.15);
+        }
+
+        .objective span,
+        .focus > span {
+          display: block;
           margin-bottom: 8px;
-          color: #0e7d5c;
+          color: #159772;
           font-size: 9px;
           font-weight: 950;
           letter-spacing: 0.12em;
           text-transform: uppercase;
         }
 
-        .labCard h3 {
-          margin-bottom: 11px;
-          font-size: 27px;
-          line-height: 1.08;
-          letter-spacing: -0.04em;
-        }
-
-        .summary {
-          margin-bottom: 21px;
-          color: #6b7771;
-          line-height: 1.62;
-        }
-
-        .objective {
-          padding: 15px 16px;
-          border-left: 3px solid #0e7d5c;
-          background: #f4f9f6;
-        }
-
-        .objective span,
-        .focus > span {
-          display: block;
-          margin-bottom: 6px;
-          color: #7d8983;
-          font-size: 8px;
-          font-weight: 950;
-          letter-spacing: 0.09em;
-          text-transform: uppercase;
-        }
-
         .objective p {
           margin-bottom: 0;
-          color: #3d574b;
-          font-size: 12px;
-          line-height: 1.5;
+          color: rgba(229, 237, 234, 0.75);
+          font-size: 13px;
+          line-height: 1.55;
         }
 
         .focus {
-          flex: 1;
-          margin-top: 23px;
+          margin-bottom: 24px;
         }
 
         .focus > div {
@@ -683,104 +659,83 @@ export default function AcademyLabPage() {
 
         .focus b {
           padding: 7px 9px;
-          border: 1px solid #dbe4df;
           border-radius: 999px;
-          background: #f7f9f8;
-          color: #50645a;
-          font-size: 9px;
+          background: rgba(255, 255, 255, 0.07);
+          color: rgba(236, 242, 240, 0.76);
+          font-size: 10px;
         }
 
-        .labCard footer {
-          margin-top: 25px;
-          padding-top: 18px;
-          border-top: 1px solid #e2e9e5;
+        .launchLink {
+          margin-top: auto;
+          color: #48d4a5;
+          font-size: 13px;
+          font-weight: 900;
+          text-decoration: none;
         }
 
-        .launchButton {
-          justify-content: space-between;
-          width: 100%;
-          border: 1px solid #cad8d1;
-          background: white;
-          color: #1f4738;
+        .workflowHeading {
+          margin-bottom: 30px;
         }
 
-        .workflowPanel {
+        .workflowGrid {
           display: grid;
-          grid-template-columns: minmax(280px, 0.8fr) 1.2fr;
-          gap: 40px;
-          max-width: 1316px;
-          margin: 0 auto 72px;
-          padding: 40px;
-          border-radius: 24px;
-          background: #163e31;
-          color: white;
-        }
-
-        .workflowPanel .eyebrow {
-          color: #8fe0be;
-        }
-
-        .workflowPanel ol {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 12px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
           margin: 0;
           padding: 0;
           list-style: none;
         }
 
-        .workflowPanel li {
-          display: grid;
-          grid-template-columns: 34px 1fr;
-          gap: 11px;
-          padding: 17px;
-          border: 1px solid rgba(255, 255, 255, 0.13);
-          border-radius: 14px;
-          background: rgba(255, 255, 255, 0.045);
+        .workflowGrid li {
+          padding: 23px;
+          border-top: 1px solid rgba(255, 255, 255, 0.14);
         }
 
-        .workflowPanel li > span {
-          color: #8fe0be;
-          font-size: 10px;
-          font-weight: 950;
-        }
-
-        .workflowPanel li strong {
+        .workflowGrid li > span {
           display: block;
-          margin-bottom: 5px;
-          font-size: 13px;
-        }
-
-        .workflowPanel li p {
-          margin-bottom: 0;
-          color: #c1d3cb;
+          margin-bottom: 30px;
+          color: #159772;
           font-size: 11px;
-          line-height: 1.5;
+          font-weight: 950;
+          letter-spacing: 0.12em;
         }
 
-        .pageFooter {
+        .workflowGrid h3 {
+          margin-bottom: 11px;
+          font-size: 20px;
+        }
+
+        .workflowGrid p {
+          margin-bottom: 0;
+          color: rgba(220, 232, 227, 0.6);
+          line-height: 1.55;
+        }
+
+        footer {
           display: flex;
           justify-content: space-between;
-          max-width: 1380px;
-          margin: 0 auto;
-          padding: 25px 32px 34px;
-          border-top: 1px solid #dbe4df;
-          color: #85918a;
-          font-size: 9px;
-          font-weight: 850;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
+          gap: 20px;
+          padding: 25px clamp(24px, 5vw, 76px);
+          border-top: 1px solid rgba(255, 255, 255, 0.08);
+          color: rgba(223, 234, 230, 0.55);
+          font-size: 12px;
         }
 
-        @media (max-width: 1050px) {
+        footer strong {
+          color: #169c75;
+        }
+
+        @media (max-width: 1120px) {
+          .hero {
+            grid-template-columns: 1fr;
+          }
+
           .labGrid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
           .chainPanel {
             grid-template-columns: repeat(4, 1fr);
-            margin-right: 32px;
-            margin-left: 32px;
           }
 
           .chainStage:nth-child(4) {
@@ -788,19 +743,11 @@ export default function AcademyLabPage() {
           }
 
           .chainStage:nth-child(-n + 4) {
-            border-bottom: 1px solid #dfe7e2;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
           }
         }
 
-        @media (max-width: 850px) {
-          .hero,
-          .sectionHeading,
-          .workflowPanel {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 680px) {
+        @media (max-width: 760px) {
           .topbar {
             align-items: flex-start;
             padding: 20px;
@@ -825,8 +772,8 @@ export default function AcademyLabPage() {
 
           .chainStage,
           .chainStage:nth-child(4) {
-            border-right: 1px solid #dfe7e2;
-            border-bottom: 1px solid #dfe7e2;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
           }
 
           .chainStage:nth-child(even) {
@@ -837,29 +784,29 @@ export default function AcademyLabPage() {
             border-bottom: 0;
           }
 
-          .chainStage b {
-            display: none;
+          .labSection,
+          .workflowSection {
+            padding-right: 20px;
+            padding-left: 20px;
           }
 
-          .labSection {
-            padding: 0 20px 74px;
+          .sectionHeading {
+            align-items: flex-start;
+            flex-direction: column;
           }
 
-          .labGrid {
+          .labGrid,
+          .workflowGrid {
             grid-template-columns: 1fr;
           }
 
-          .workflowPanel {
-            margin: 0 20px 52px;
-            padding: 28px;
+          .labCard {
+            min-height: 0;
           }
 
-          .workflowPanel ol {
-            grid-template-columns: 1fr;
-          }
-
-          .pageFooter {
-            padding: 24px 20px 30px;
+          footer {
+            flex-direction: column;
+            padding: 24px 20px;
           }
         }
       `}</style>
