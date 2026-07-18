@@ -1,49 +1,52 @@
-# TA-14 Global Admissible Execution Exchange — V0.3.1 Integrity-Corrected Vertical Slice
+# TA-14 Global Admissible Execution Exchange
 
-This repository contains a runnable browser application for the first TA-14 Exchange transaction.
+## V0.3.2 — Multi-Domain Route Construction and Evaluation
 
-## What works
+The TA-14 Exchange Platform is a runnable governance workspace for constructing, evaluating, correcting, preserving, and independently verifying consequential execution routes.
 
-- Next.js public landing page and route workspace
-- Vendor-payment route above USD 25,000
-- Initial deterministic HOLD for missing dual authority and beneficiary proof
-- User-entered correction records and a free rerun
-- Append-only route versions that preserve the original HOLD
-- Hash-chained route events with public integrity verification
-- Actor-, organization-, system-, policy-, and payment-bound authority checks
-- Explicit evidence-to-requirement bindings
-- ALLOW / HOLD / DENY / ESCALATE precedence
-- Deterministic decision fingerprint separate from unique receipt identity
-- Ed25519-signed test receipts
-- Signed AER with purpose, scope, authority basis, evidence index, limitations, event history, and verification instructions
-- Simulated preservation and public TA14-RID registry lookup
-- Downloadable verification bundle with development public key, AER, registry boundary, and event chain
-- Ajv validation at route-creation and correction API boundaries
-- Atomic local file replacement, serialized writes, and optimistic route-version checks
+The governing principle is:
 
-## Run locally
+> **No admissible evidence. No admissible execution.**
 
-```bash
-npm install
-npm run dev
-```
+TA-14 does not treat declarations, dashboards, approvals, policy checks, or system confidence as proof that an execution is legitimate.
 
-Open `http://localhost:3000` and select **Start the demonstration route**.
+A consequence-bearing route must remain connected to admissible evidence, valid authority, preserved continuity, explicit bindings, committed intent, corresponding execution, and recorded outcome.
 
-## Verify
+---
 
-```bash
-npm run verify
-```
+## Live application
 
-The release was verified with TypeScript checking, 18 automated tests, and a successful Next.js production build.
+Production deployment:
 
-## Important boundary
+**https://ta14-exchange-platform-theta.vercel.app/**
 
-V0.3.1 is a local demonstration vertical slice. It does **not** charge money, use production authentication, hold production evidence, issue independently verified status, or replace the planned PostgreSQL, managed KMS, Stripe, custody, and enterprise security layers.
+Governance workspace:
 
-Selected bypass, replay, duplicate-payment, execution, and outcome observations are visibly labeled demonstration fixtures. The local JSON store and exported development signing key must not be used in production.
+**https://ta14-exchange-platform-theta.vercel.app/workspace**
 
-## Next release
+Route evaluation workspace:
 
-V0.4 should replace local persistence with managed PostgreSQL and authenticated tenant isolation, add Stripe test-mode entitlements, move signing to managed key infrastructure, add private evidence storage, and execute database, security, backup, and recovery acceptance tests.
+**https://ta14-exchange-platform-theta.vercel.app/workspace/routes/new**
+
+---
+
+## Canonical TA-14 chain
+
+Every route is governed through the same eight-stage admissibility chain:
+
+```text
+Reality
+  ↓
+Record
+  ↓
+Continuity
+  ↓
+Admissibility
+  ↓
+Binding
+  ↓
+Commit
+  ↓
+Execution
+  ↓
+Outcome
