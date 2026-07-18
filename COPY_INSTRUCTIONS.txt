@@ -1,13 +1,448 @@
-TA-14 Exchange Platform - Verified Source Package
+TA-14 EXCHANGE PLATFORM
+V0.3.2 — COPY, VERIFY, AND DEPLOY INSTRUCTIONS
 
-Copy EVERYTHING inside this folder into:
+GOVERNING PRINCIPLE
+
+NO ADMISSIBLE EVIDENCE.
+NO ADMISSIBLE EXECUTION.
+
+
+PURPOSE
+
+These instructions describe how to copy a complete TA-14 Exchange Platform source package into the local Git repository without deleting Git history, then verify and deploy the result.
+
+The current local repository destination is:
+
 C:\Users\gregg\Documents\GitHub\ta14-exchange-platform
 
-Do not copy the outer folder itself.
-Do not delete the existing .git folder in the destination.
 
-Verified before packaging:
-- npm ci: passed
-- TypeScript: passed
-- 18 tests: passed
-- Next.js production build: passed
+IMPORTANT
+
+Copy the CONTENTS of the source package into the repository.
+
+Do not copy the outer package folder itself.
+
+Do not delete or overwrite the existing:
+
+.git
+
+folder.
+
+The .git folder contains repository history, branch information, remote configuration, and commit continuity.
+
+
+SAFE COPY PROCEDURE
+
+1. Close any terminal or editor operation that is actively writing files inside the repository.
+
+2. Open the source package folder.
+
+3. Select everything inside the source package folder.
+
+4. Copy the selected files and folders.
+
+5. Open:
+
+C:\Users\gregg\Documents\GitHub\ta14-exchange-platform
+
+6. Paste the copied contents into that repository folder.
+
+7. Allow Windows to merge matching folders.
+
+8. Replace matching source files only when the package is intended to replace them.
+
+9. Do not delete the .git folder.
+
+10. Do not copy node_modules, .next, coverage, temporary logs, downloaded secrets, or local environment files into GitHub.
+
+
+DO NOT COPY THESE GENERATED OR PRIVATE ITEMS
+
+Do not intentionally include:
+
+node_modules
+.next
+coverage
+*.log
+.env
+.env.local
+.env.production
+.env.development
+private keys
+signing secrets
+API credentials
+access tokens
+database passwords
+payment credentials
+real customer evidence
+protected health information
+regulated records
+
+Generated dependencies and build outputs must be recreated through npm and Next.js.
+
+
+AFTER COPYING
+
+Open a terminal in:
+
+C:\Users\gregg\Documents\GitHub\ta14-exchange-platform
+
+Confirm the repository is still connected to Git:
+
+git status
+
+Confirm the active branch:
+
+git branch --show-current
+
+The expected production branch is normally:
+
+main
+
+
+INSTALL DEPENDENCIES
+
+Run:
+
+npm install
+
+The repository currently uses npm install in its deployment and verification workflow.
+
+Do not switch back to npm ci unless package-lock.json and the deployment environment are confirmed to support it consistently.
+
+
+RUN COMPLETE VERIFICATION
+
+Run:
+
+npm run verify
+
+The complete verification workflow should run:
+
+1. TypeScript checking
+2. Automated tests
+3. Next.js production build
+
+Do not commit or deploy the copied package if verification fails.
+
+
+OPTIONAL INDIVIDUAL CHECKS
+
+TypeScript:
+
+npm run typecheck
+
+Tests:
+
+npm run test
+
+Production build:
+
+npm run build
+
+Development server:
+
+npm run dev
+
+Then open:
+
+http://localhost:3000
+
+
+REVIEW CHANGED FILES
+
+Run:
+
+git status
+
+Review the change summary:
+
+git diff --stat
+
+Review the actual changes:
+
+git diff
+
+Confirm that:
+
+- Only intended files changed
+- No secrets were added
+- No generated build folders were added
+- No local evidence records were added
+- No development signing keys were added
+- No unrelated files were deleted
+- The .git folder remains intact
+- The route domains remain correctly separated
+- Adverse-result preservation was not removed
+- No production capability was falsely claimed
+
+
+STAGE THE CHANGES
+
+To stage all intended changes:
+
+git add .
+
+Review staged files:
+
+git status
+
+Review staged content:
+
+git diff --cached
+
+
+COMMIT THE CHANGES
+
+Use a bounded commit message describing the actual package or change.
+
+Example:
+
+git commit -m "Update TA-14 Exchange Platform V0.3.2 source package"
+
+Prefer one bounded change per commit.
+
+Do not combine unrelated architecture, interface, API, persistence, schema, and documentation changes unless they are inseparable.
+
+
+PUSH TO GITHUB
+
+Push the verified commit:
+
+git push origin main
+
+After pushing:
+
+1. Open the GitHub repository.
+2. Open the Actions tab.
+3. Wait for GitHub Verify to complete.
+4. Confirm all configured checks pass.
+5. Do not continue if GitHub Verify fails.
+
+
+VERCEL DEPLOYMENT
+
+The GitHub repository is connected to Vercel.
+
+After GitHub receives the commit:
+
+1. Wait for the Vercel deployment.
+2. Confirm the production build passes.
+3. Open the live deployment.
+4. Inspect the surface affected by the copied files.
+5. Confirm there are no blank pages, missing components, route failures, or misleading claims.
+
+
+LIVE DEPLOYMENT
+
+Public platform:
+
+https://ta14-exchange-platform-theta.vercel.app/
+
+Governance Workspace:
+
+https://ta14-exchange-platform-theta.vercel.app/workspace
+
+Route Evaluation Workspace:
+
+https://ta14-exchange-platform-theta.vercel.app/workspace/routes/new
+
+
+MINIMUM LIVE SMOKE TEST
+
+After deployment, inspect:
+
+/
+
+Confirm the public platform loads.
+
+
+Inspect:
+
+/workspace
+
+Confirm the Governance Workspace loads and its direct actions remain visible.
+
+
+Inspect:
+
+/workspace/routes/new
+
+Confirm the route evaluation workspace loads.
+
+
+Also inspect the active Visual Route Builder path shown by the workspace navigation.
+
+Confirm:
+
+- No blank page
+- No missing import
+- No hydration failure
+- No server error
+- No broken navigation
+- No missing evaluation panel
+- No incompatible adapter call
+- No lost route domain
+- No hidden HOLD, DENY, or ESCALATE result
+
+
+AI GOVERNANCE CHECK
+
+After deployment:
+
+1. Open the Visual Route Builder.
+2. Construct or load an AI Governance route.
+3. Confirm the route uses the canonical eight-stage chain.
+4. Transfer the route into evaluation.
+5. Confirm the domain remains AI Governance.
+6. Confirm the vendor-payment API is not used.
+7. Confirm the AI Governance evaluation panel appears.
+8. Confirm requirement states are visible.
+9. Confirm declared content is not automatically treated as proof.
+10. Confirm unresolved proof can produce HOLD.
+11. Confirm the deterministic fingerprint appears.
+12. Confirm limitations remain visible.
+
+
+VENDOR-PAYMENT CHECK
+
+Confirm that:
+
+1. The vendor-payment demonstration opens.
+2. The route retains its payment-domain identity.
+3. Missing dual authority and beneficiary proof produce HOLD.
+4. Correction creates a new route version.
+5. The original HOLD remains preserved.
+6. Deterministic decision behavior remains intact.
+7. Verification artifacts remain available.
+
+
+COPY BOUNDARY
+
+Copying files proves only that source files were transferred.
+
+It does not prove:
+
+- The copied code is correct
+- The build will pass
+- The tests will pass
+- The deployment will pass
+- The evidence is true
+- The authority is valid
+- The route is admissible
+- Execution occurred
+- The outcome is verified
+- The platform is production-ready
+
+Those conditions require their own checks and evidence.
+
+
+CURRENT RELEASE BOUNDARY
+
+V0.3.2 is a working development and demonstration platform.
+
+It is not yet a complete production system for:
+
+- Authentication
+- Tenant isolation
+- Private evidence custody
+- Managed signing infrastructure
+- Production payments
+- Independent verification
+- Certification
+- Enterprise security
+- Disaster recovery
+- Regulatory reliance
+
+Do not place production secrets, real regulated evidence, private customer records, protected health information, financial credentials, or production signing keys into this repository or a development deployment.
+
+
+FAILURE PROCEDURE
+
+If npm run verify fails:
+
+1. Stop.
+2. Read the first meaningful error.
+3. Identify the exact file and line.
+4. Correct the smallest responsible surface.
+5. Run npm run verify again.
+6. Do not push until verification passes.
+
+If GitHub Verify fails:
+
+1. Stop.
+2. Open the failed workflow.
+3. Read the first meaningful error.
+4. Correct the responsible file.
+5. Commit the correction.
+6. Push again.
+7. Wait for a clean Verify result.
+
+If Vercel fails:
+
+1. Stop.
+2. Open the deployment logs.
+3. Read the first meaningful build or runtime error.
+4. Correct the responsible file or configuration.
+5. Verify locally.
+6. Push the correction.
+7. Confirm both GitHub and Vercel pass.
+
+
+ROLLBACK
+
+If the copied package deploys successfully but causes a regression:
+
+1. Identify the last known-good commit:
+
+git log --oneline
+
+2. Restore or revert the bounded change.
+
+3. Run:
+
+npm run verify
+
+4. Commit the rollback.
+
+5. Push to GitHub.
+
+6. Confirm GitHub Verify passes.
+
+7. Confirm Vercel deployment passes.
+
+8. Re-test the affected route.
+
+Do not delete preserved route history, prior adverse decisions, or governance records merely because an interface or source-package deployment was rolled back.
+
+
+SUCCESS CONDITION
+
+The copy operation is complete only when:
+
+- Source files were copied into the correct repository
+- The .git folder remained intact
+- npm install completed
+- npm run verify passed
+- Intended changes were reviewed
+- No secrets or generated folders were staged
+- The commit was pushed
+- GitHub Verify passed
+- Vercel deployment passed
+- The affected live routes were inspected
+
+
+FINAL RULE
+
+A copied file is not a verified file.
+
+A passing build is not an admissible route.
+
+A deployment is not proof of evidence, authority, execution, or outcome.
+
+BUILD THE ROUTE.
+PROVE THE AUTHORITY.
+PRESERVE THE CONSEQUENCE.
+
+NO ADMISSIBLE EVIDENCE.
+NO ADMISSIBLE EXECUTION.
