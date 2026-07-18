@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useState } from "react";
+import type { TransferRouteDraft } from "../../../lib/route-draft-transfer";
+import EvaluateRouteLink from "./evaluate-route-link";
 
 type StageKey =
   | "reality"
@@ -241,7 +243,7 @@ export default function BuildRoutePage() {
         ? "HOLD"
         : "DRAFT";
 
-  const route = useMemo(
+  const route = useMemo<TransferRouteDraft>(
     () => ({
       schema: "TA14_ROUTE_DRAFT_V1",
       routeId: `draft:${slugify(routeName)}`,
@@ -258,7 +260,7 @@ export default function BuildRoutePage() {
           stage.key,
           stage.value.trim() || "UNKNOWN",
         ]),
-      ),
+      ) as TransferRouteDraft["chain"],
       readiness: {
         completedStages: completed,
         totalStages: 8,
@@ -562,12 +564,12 @@ export default function BuildRoutePage() {
                 Next stage →
               </button>
             ) : (
-              <Link
-                href="/workspace/routes/new"
+              <EvaluateRouteLink
+                route={route}
                 className="primaryButton linkButton"
               >
                 Evaluate route →
-              </Link>
+              </EvaluateRouteLink>
             )}
           </div>
         </section>
@@ -635,9 +637,9 @@ export default function BuildRoutePage() {
                 determination.
               </p>
 
-              <Link href="/workspace/routes/new">
+              <EvaluateRouteLink route={route}>
                 Evaluate route →
-              </Link>
+              </EvaluateRouteLink>
             </div>
           )}
         </aside>
@@ -1177,11 +1179,14 @@ export default function BuildRoutePage() {
           line-height: 1.55;
         }
 
-        .readyCard a {
+        .readyCard :global(button) {
+          padding: 0;
+          border: 0;
+          background: transparent;
           color: #08724f;
           font-size: 13px;
           font-weight: 900;
-          text-decoration: none;
+          cursor: pointer;
         }
 
         .templates,
