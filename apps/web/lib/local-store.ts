@@ -117,7 +117,6 @@ async function loadBlob(): Promise<Db> {
   try {
     const result = await get(BLOB_PATHNAME, {
       access: "public",
-      useCache: false,
     });
 
     if (!result || result.statusCode !== 200 || !result.stream) {
