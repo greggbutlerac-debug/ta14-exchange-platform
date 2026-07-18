@@ -1,837 +1,879 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-type EntryCard = {
-  href: string;
-  number: string;
-  glyph: string;
-  eyebrow: string;
-  title: string;
-  description: string;
-  action: string;
-  status: string;
-  featured?: boolean;
+export const metadata = {
+  title: "Governance Workspace | TA-14 Exchange Platform",
+  description:
+    "Build, test, verify, preserve, and review consequential execution routes through the TA-14 Governance Workspace.",
 };
 
-const entryCards: EntryCard[] = [
+const primaryActions = [
   {
-    href: '/workspace/discover',
-    number: '01',
-    glyph: '⌁',
-    eyebrow: 'Start with an idea',
-    title: 'Discover My Route',
+    title: "Start a Free Route",
     description:
-      'Describe the system, proposed action, and consequence. TA-14 will help identify the route, accountable actors, evidence needs, authority boundaries, and likely failure points.',
-    action: 'Begin route discovery',
-    status: 'Guided intake',
-    featured: true,
+      "Create a bounded consequential route, declare the evidence and authority required, and run the TA-14 engine.",
+    href: "/workspace/routes/new",
+    label: "Create Route",
   },
   {
-    href: '/workspace/build',
-    number: '02',
-    glyph: '◇',
-    eyebrow: 'Start with a route',
-    title: 'Build a Route',
+    title: "Run the Live Demonstration",
     description:
-      'Construct a bounded consequential route manually. Define the actor, authority, policy, evidence, object, destination, beneficiary, execution, and intended outcome.',
-    action: 'Open manual builder',
-    status: 'Structured construction',
+      "Experience a deterministic HOLD, correct the missing bindings, and produce a preserved execution record.",
+    href: "/workspace/demo",
+    label: "Run Demo",
   },
   {
-    href: '/workspace/upload',
-    number: '03',
-    glyph: '⇧',
-    eyebrow: 'Start with a file',
-    title: 'Upload a Route',
+    title: "Verify a Route",
     description:
-      'Bring an existing route package, JSON record, policy bundle, or implementation artifact into the Exchange for extraction, confirmation, validation, and testing.',
-    action: 'Upload route package',
-    status: 'File intake',
+      "Inspect route identity, receipt continuity, evidence bindings, decision history, execution, and outcome.",
+    href: "/verify",
+    label: "Open Verification",
   },
   {
-    href: '/workspace/paste',
-    number: '04',
-    glyph: '▤',
-    eyebrow: 'Start with text or JSON',
-    title: 'Paste Anything',
+    title: "Search the Public Registry",
     description:
-      'Paste structured or unstructured material. Extracted values remain proposed input until a person confirms them, and anything unsupported remains explicitly unknown.',
-    action: 'Open paste intake',
-    status: 'Evidence-aware extraction',
-  },
-  {
-    href: '/workspace/lab',
-    number: '05',
-    glyph: 'A',
-    eyebrow: 'TA-14 Academy',
-    title: 'Learn to Build',
-    description:
-      'Learn what a route is, why consequence changes governance, how the eight-stage chain works, and how the 24 links determine whether execution remains admissible.',
-    action: 'Enter the Academy Lab',
-    status: 'Learn by constructing',
-    featured: true,
-  },
-  {
-    href: '/workspace/demonstrations',
-    number: '06',
-    glyph: '◎',
-    eyebrow: 'Live route engine',
-    title: 'Test a Prepared Route',
-    description:
-      'Run a working consequential-payment route, inspect the initial HOLD, add missing authority and beneficiary proof, preserve the original version, and issue an AER.',
-    action: 'Launch demonstrations',
-    status: 'Operational now',
-  },
-  {
-    href: '/workspace/scanner',
-    number: '07',
-    glyph: '⌕',
-    eyebrow: 'Readiness review',
-    title: 'Scan for Missing Requirements',
-    description:
-      'Evaluate whether a route package contains the identities, authorities, evidence, bindings, receipts, continuity, and execution correspondence required for testing.',
-    action: 'Open readiness scanner',
-    status: 'Pre-test analysis',
-  },
-  {
-    href: '/verify',
-    number: '08',
-    glyph: '✓',
-    eyebrow: 'Independent inspection',
-    title: 'Verify a Record',
-    description:
-      'Use a TA14-RID to inspect a preserved route record, decision history, declared limitations, event continuity, signatures, and downloadable verification material.',
-    action: 'Open public verification',
-    status: 'Public surface',
+      "Look up durable TA14-RID records, manifests, decisions, corrections, certificates, and current limitations.",
+    href: "/registry",
+    label: "Search Registry",
   },
 ];
 
 const lifecycle = [
-  'Discover',
-  'Construct',
-  'Validate',
-  'Challenge',
-  'Correct',
-  'Preserve',
-  'Replay',
-  'Verify',
+  {
+    step: "01",
+    title: "Route Construction",
+    description: "Define the actor, target, purpose, authority, evidence, policy, destination, and expected consequence.",
+    href: "/workspace/routes/new",
+    action: "Build Route",
+  },
+  {
+    step: "02",
+    title: "Evidence Intake",
+    description: "Bind evidence sources, provenance, freshness, integrity, dependencies, and admissibility conditions.",
+    href: "/workspace/evidence",
+    action: "Submit Evidence",
+  },
+  {
+    step: "03",
+    title: "Admissibility Decision",
+    description: "Run the route through ALLOW, HOLD, DENY, or ESCALATE without hiding adverse results.",
+    href: "/workspace/routes",
+    action: "Evaluate Routes",
+  },
+  {
+    step: "04",
+    title: "Finality & Certificates",
+    description: "Resolve finality, issue certificates, and preserve the exact basis for consequence-bearing reliance.",
+    href: "/workspace/records/disposition/finality",
+    action: "Open Finality",
+  },
+  {
+    step: "05",
+    title: "Reliance",
+    description: "Bind who may rely, for what purpose, against which route, certificate, scope, and time window.",
+    href: "/workspace/records/disposition/finality/certificates/reliance",
+    action: "Manage Reliance",
+  },
+  {
+    step: "06",
+    title: "Closure & Audit",
+    description: "Close reliance, audit the closure record, preserve findings, and identify required remediation.",
+    href: "/workspace/records/disposition/finality/certificates/reliance/closure/audit",
+    action: "Run Closure Audit",
+  },
+  {
+    step: "07",
+    title: "Remediation & Retest",
+    description: "Correct failed conditions, preserve the correction record, and submit the route for independent retest.",
+    href: "/workspace/records/disposition/finality/certificates/reliance/closure/audit/remediation/retest",
+    action: "Open Retest",
+  },
+  {
+    step: "08",
+    title: "Restoration",
+    description: "Restore verified closure only after the failed conditions have been independently resolved and verified.",
+    href: "/workspace/records/disposition/finality/certificates/reliance/closure/audit/remediation/retest/restoration",
+    action: "Review Restoration",
+  },
+  {
+    step: "09",
+    title: "Reauthorization",
+    description: "Request and verify new post-restoration reliance before any renewed consequential execution.",
+    href: "/workspace/records/disposition/finality/certificates/reliance/closure/audit/remediation/retest/restoration/reauthorization",
+    action: "Open Reauthorization",
+  },
+  {
+    step: "10",
+    title: "Activation & Outcome",
+    description: "Activate the bounded route, preserve execution correspondence, and record the actual outcome.",
+    href: "/workspace/records/disposition/finality/certificates/reliance/closure/audit/remediation/retest/restoration/reauthorization/verify/activation",
+    action: "Activate Reliance",
+  },
 ];
 
-const chain = [
-  'Reality',
-  'Record',
-  'Continuity',
-  'Admissibility',
-  'Binding',
-  'Commit',
-  'Execution',
-  'Outcome',
+const exchangeActions = [
+  {
+    title: "Connect an Architecture",
+    description:
+      "Map an independent governance architecture to the TA-14 chain while preserving its identity and boundaries.",
+    href: "/ecosystem",
+    action: "Connect Architecture",
+  },
+  {
+    title: "Request a Governance Review",
+    description:
+      "Submit a bounded system, route, evidence model, or runtime control for scoped review.",
+    href: "/contact",
+    action: "Request Review",
+  },
+  {
+    title: "Join the Partner Review Network",
+    description:
+      "Establish a written partner lane for referrals, scoped challenge, second-layer review, and attribution continuity.",
+    href: "/ecosystem",
+    action: "Explore Partner Lane",
+  },
+  {
+    title: "Request Enterprise Access",
+    description:
+      "Discuss API integration, private workspaces, governed registries, review operations, and production deployment.",
+    href: "/contact",
+    action: "Contact TA-14",
+  },
 ];
 
-export default function WorkspaceOverviewPage() {
+const recentRoutes = [
+  {
+    id: "TA14-RID-DEMO-32500",
+    route: "Vendor payment above USD 25,000",
+    state: "READY",
+    decision: "TESTABLE",
+  },
+  {
+    id: "TA14-RID-REAUTH-014",
+    route: "Post-restoration reliance activation",
+    state: "PENDING",
+    decision: "VERIFY",
+  },
+  {
+    id: "TA14-RID-RET-008",
+    route: "Independent remediation retest",
+    state: "HELD",
+    decision: "HOLD",
+  },
+];
+
+export default function WorkspacePage() {
   return (
-    <main className="overview-page">
-      <style>{`
-        * {
-          box-sizing: border-box;
-        }
-
-        .overview-page {
-          min-height: calc(100vh - 68px);
-          padding: 54px 0 110px;
-          overflow: hidden;
-        }
-
-        .overview-wrap {
-          width: min(1320px, calc(100% - 56px));
-          margin: 0 auto;
-        }
-
-        .overview-hero {
-          position: relative;
-          display: grid;
-          grid-template-columns: minmax(0, 1.28fr) minmax(330px, .72fr);
-          gap: 46px;
-          align-items: end;
-          min-height: 520px;
-          padding: clamp(34px, 6vw, 78px);
-          overflow: hidden;
-          border: 1px solid rgba(137, 174, 213, .16);
-          border-radius: 36px;
-          background:
-            radial-gradient(circle at 82% 25%, rgba(68, 241, 171, .13), transparent 26%),
-            radial-gradient(circle at 20% 0%, rgba(57, 193, 255, .17), transparent 32%),
-            linear-gradient(135deg, rgba(16, 34, 53, .94), rgba(5, 12, 21, .96));
-          box-shadow:
-            0 44px 130px rgba(0, 0, 0, .35),
-            inset 0 0 90px rgba(84, 232, 255, .025);
-        }
-
-        .overview-hero::before {
-          content: "EXCHANGE";
-          position: absolute;
-          right: -12px;
-          bottom: -43px;
-          color: rgba(255, 255, 255, .025);
-          font-size: clamp(6rem, 15vw, 13rem);
-          font-weight: 1000;
-          letter-spacing: -.09em;
-          line-height: 1;
-          pointer-events: none;
-        }
-
-        .hero-copy,
-        .hero-console {
-          position: relative;
-          z-index: 1;
-        }
-
-        .eyebrow {
-          color: #64e6fb;
-          font-size: .72rem;
-          font-weight: 950;
-          letter-spacing: .16em;
-          text-transform: uppercase;
-        }
-
-        .overview-hero h1 {
-          max-width: 860px;
-          margin: 20px 0 24px;
-          font-size: clamp(3.6rem, 7.4vw, 7.7rem);
-          line-height: .9;
-          letter-spacing: -.075em;
-        }
-
-        .gradient-text {
-          color: transparent;
-          background: linear-gradient(100deg, #ffffff 8%, #89ebff 50%, #56f0b2 94%);
-          background-clip: text;
-          -webkit-background-clip: text;
-        }
-
-        .overview-hero p {
-          max-width: 790px;
-          margin: 0;
-          color: #9eb1c5;
-          font-size: clamp(1.05rem, 1.8vw, 1.28rem);
-          line-height: 1.76;
-        }
-
-        .hero-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
-          margin-top: 30px;
-        }
-
-        .primary-link,
-        .secondary-link,
-        .card-link {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 50px;
-          padding: 0 21px;
-          border-radius: 999px;
-          text-decoration: none;
-          font-weight: 900;
-          transition: transform .2s ease, border-color .2s ease, filter .2s ease, background .2s ease;
-        }
-
-        .primary-link {
-          color: #03100c;
-          background: linear-gradient(100deg, #54e8ff, #39f2a1);
-          box-shadow: 0 0 36px rgba(57, 242, 161, .17);
-        }
-
-        .secondary-link {
-          border: 1px solid rgba(142, 180, 219, .24);
-          color: #dce8f6;
-          background: rgba(11, 22, 37, .78);
-        }
-
-        .primary-link:hover,
-        .secondary-link:hover,
-        .card-link:hover {
-          transform: translateY(-2px);
-        }
-
-        .hero-console {
-          padding: 25px;
-          border: 1px solid rgba(84, 232, 255, .19);
-          border-radius: 26px;
-          background: rgba(2, 8, 14, .66);
-          box-shadow: inset 0 0 50px rgba(84, 232, 255, .035);
-          backdrop-filter: blur(14px);
-        }
-
-        .console-head {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 18px;
-          margin-bottom: 22px;
-          padding-bottom: 17px;
-          border-bottom: 1px solid rgba(137, 174, 213, .12);
-        }
-
-        .console-head strong {
-          font-size: .8rem;
-          letter-spacing: .08em;
-          text-transform: uppercase;
-        }
-
-        .live-state {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          color: #74efb6;
-          font-size: .68rem;
-          font-weight: 900;
-          letter-spacing: .1em;
-          text-transform: uppercase;
-        }
-
-        .live-state::before {
-          content: "";
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #4af0aa;
-          box-shadow: 0 0 13px rgba(74, 240, 170, .75);
-        }
-
-        .console-chain {
-          display: grid;
-          gap: 9px;
-        }
-
-        .chain-row {
-          display: grid;
-          grid-template-columns: 28px minmax(0, 1fr) auto;
-          gap: 12px;
-          align-items: center;
-          min-height: 42px;
-          padding: 0 12px;
-          border: 1px solid rgba(137, 174, 213, .11);
-          border-radius: 12px;
-          color: #a9b9c9;
-          background: rgba(8, 17, 29, .55);
-          font-size: .76rem;
-          font-weight: 800;
-        }
-
-        .chain-row span:first-child {
-          color: #567188;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: .66rem;
-        }
-
-        .chain-row b {
-          color: #6fe7ff;
-          font-size: .62rem;
-          letter-spacing: .1em;
-        }
-
-        .overview-section {
-          margin-top: 94px;
-        }
-
-        .section-heading {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 34px;
-          margin-bottom: 28px;
-        }
-
-        .section-heading h2 {
-          max-width: 790px;
-          margin: 12px 0 0;
-          font-size: clamp(2.35rem, 5vw, 4.6rem);
-          line-height: .96;
-          letter-spacing: -.06em;
-        }
-
-        .section-heading p {
-          max-width: 470px;
-          margin: 0;
-          color: #8fa3b8;
-          line-height: 1.7;
-        }
-
-        .entry-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 18px;
-        }
-
-        .entry-card {
-          position: relative;
-          display: flex;
-          min-height: 340px;
-          flex-direction: column;
-          padding: 30px;
-          overflow: hidden;
-          border: 1px solid rgba(137, 174, 213, .14);
-          border-radius: 27px;
-          background: linear-gradient(180deg, rgba(13, 25, 41, .88), rgba(5, 12, 21, .93));
-          box-shadow: 0 28px 80px rgba(0, 0, 0, .24);
-          transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
-        }
-
-        .entry-card:hover {
-          transform: translateY(-4px);
-          border-color: rgba(84, 232, 255, .34);
-          box-shadow: 0 36px 100px rgba(0, 0, 0, .34);
-        }
-
-        .entry-card.featured {
-          border-color: rgba(84, 232, 255, .25);
-          background:
-            radial-gradient(circle at 92% 8%, rgba(72, 239, 170, .10), transparent 30%),
-            linear-gradient(180deg, rgba(16, 33, 50, .94), rgba(5, 13, 22, .95));
-        }
-
-        .entry-card::after {
-          content: "";
-          position: absolute;
-          top: -90px;
-          right: -74px;
-          width: 230px;
-          height: 230px;
-          border-radius: 50%;
-          background: rgba(69, 218, 255, .08);
-          filter: blur(10px);
-        }
-
-        .card-top,
-        .card-copy,
-        .card-bottom {
-          position: relative;
-          z-index: 1;
-        }
-
-        .card-top {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 20px;
-        }
-
-        .card-number {
-          color: #536d84;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: .72rem;
-          font-weight: 900;
-          letter-spacing: .12em;
-        }
-
-        .card-glyph {
-          display: grid;
-          place-items: center;
-          width: 49px;
-          height: 49px;
-          border: 1px solid rgba(126, 193, 225, .19);
-          border-radius: 15px;
-          color: #8beaff;
-          background: rgba(8, 19, 31, .78);
-          font-size: 1.2rem;
-          font-weight: 900;
-          box-shadow: inset 0 0 20px rgba(84, 232, 255, .05);
-        }
-
-        .card-copy {
-          margin-top: 42px;
-        }
-
-        .card-eyebrow {
-          color: #68dff6;
-          font-size: .69rem;
-          font-weight: 900;
-          letter-spacing: .14em;
-          text-transform: uppercase;
-        }
-
-        .entry-card h3 {
-          margin: 10px 0 14px;
-          font-size: clamp(1.75rem, 3vw, 2.5rem);
-          line-height: 1.02;
-          letter-spacing: -.05em;
-        }
-
-        .entry-card p {
-          margin: 0;
-          color: #91a5ba;
-          line-height: 1.68;
-        }
-
-        .card-bottom {
-          display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 20px;
-          margin-top: auto;
-          padding-top: 28px;
-        }
-
-        .card-status {
-          display: grid;
-          gap: 5px;
-          color: #617b91;
-          font-size: .65rem;
-          font-weight: 900;
-          letter-spacing: .11em;
-          text-transform: uppercase;
-        }
-
-        .card-status strong {
-          color: #dfeaf4;
-          font-size: .76rem;
-          letter-spacing: 0;
-          text-transform: none;
-        }
-
-        .card-link {
-          min-height: 43px;
-          padding: 0 16px;
-          border: 1px solid rgba(84, 232, 255, .22);
-          color: #e9f9ff;
-          background: rgba(14, 34, 52, .83);
-          font-size: .76rem;
-          white-space: nowrap;
-        }
-
-        .lifecycle-panel {
-          position: relative;
-          padding: clamp(28px, 5vw, 52px);
-          overflow: hidden;
-          border: 1px solid rgba(84, 232, 255, .18);
-          border-radius: 30px;
-          background:
-            radial-gradient(circle at 84% 30%, rgba(57, 242, 161, .09), transparent 30%),
-            linear-gradient(120deg, rgba(15, 34, 52, .91), rgba(5, 13, 22, .95));
-          box-shadow: 0 34px 100px rgba(0, 0, 0, .28);
-        }
-
-        .lifecycle-panel h2 {
-          max-width: 790px;
-          margin: 12px 0 16px;
-          font-size: clamp(2.4rem, 5vw, 4.4rem);
-          line-height: .98;
-          letter-spacing: -.06em;
-        }
-
-        .lifecycle-panel > p {
-          max-width: 810px;
-          margin: 0;
-          color: #94a8bc;
-          line-height: 1.72;
-        }
-
-        .lifecycle-rail {
-          display: grid;
-          grid-template-columns: repeat(8, minmax(0, 1fr));
-          gap: 8px;
-          margin-top: 34px;
-        }
-
-        .lifecycle-step {
-          position: relative;
-          min-height: 92px;
-          padding: 16px 13px;
-          border: 1px solid rgba(137, 174, 213, .13);
-          border-radius: 16px;
-          color: #dceaf5;
-          background: rgba(4, 11, 19, .57);
-          font-size: .76rem;
-          font-weight: 850;
-        }
-
-        .lifecycle-step span {
-          display: block;
-          margin-bottom: 18px;
-          color: #547086;
-          font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-          font-size: .63rem;
-          letter-spacing: .12em;
-        }
-
-        .lifecycle-step:not(:last-child)::after {
-          content: "→";
-          position: absolute;
-          top: 50%;
-          right: -9px;
-          z-index: 2;
-          color: #4edeb8;
-          transform: translateY(-50%);
-          font-size: .76rem;
-        }
-
-        .academy-banner {
-          display: grid;
-          grid-template-columns: minmax(0, 1.2fr) auto;
-          gap: 34px;
-          align-items: center;
-          margin-top: 22px;
-          padding: clamp(28px, 5vw, 50px);
-          border: 1px solid rgba(84, 232, 255, .2);
-          border-radius: 30px;
-          background:
-            radial-gradient(circle at 88% 40%, rgba(57, 242, 161, .12), transparent 28%),
-            linear-gradient(110deg, rgba(18, 41, 61, .94), rgba(6, 15, 25, .96));
-          box-shadow: 0 35px 100px rgba(0, 0, 0, .29);
-        }
-
-        .academy-banner h2 {
-          max-width: 820px;
-          margin: 12px 0 14px;
-          font-size: clamp(2.35rem, 5vw, 4.3rem);
-          line-height: .98;
-          letter-spacing: -.06em;
-        }
-
-        .academy-banner p {
-          max-width: 820px;
-          margin: 0;
-          color: #9db1c5;
-          line-height: 1.72;
-        }
-
-        .boundary-note {
-          margin-top: 28px;
-          padding: 22px 24px;
-          border: 1px solid rgba(255, 212, 106, .15);
-          border-radius: 18px;
-          color: #aa9f79;
-          background: rgba(255, 212, 106, .04);
-          font-size: .86rem;
-          line-height: 1.65;
-        }
-
-        .boundary-note strong {
-          color: #dfd2a2;
-        }
-
-        @media (max-width: 1120px) {
-          .overview-hero {
-            grid-template-columns: 1fr;
-          }
-
-          .hero-console {
-            max-width: 720px;
-          }
-
-          .lifecycle-rail {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-          }
-
-          .lifecycle-step:nth-child(4)::after {
-            display: none;
-          }
-        }
-
-        @media (max-width: 820px) {
-          .overview-page {
-            padding-top: 30px;
-          }
-
-          .overview-wrap {
-            width: min(1320px, calc(100% - 28px));
-          }
-
-          .overview-hero {
-            min-height: 0;
-            padding: 34px 25px;
-            border-radius: 27px;
-          }
-
-          .overview-hero h1 {
-            font-size: clamp(3.2rem, 15vw, 5.8rem);
-          }
-
-          .section-heading {
-            display: block;
-          }
-
-          .section-heading p {
-            margin-top: 17px;
-          }
-
-          .entry-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .academy-banner {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 620px) {
-          .overview-section {
-            margin-top: 68px;
-          }
-
-          .hero-actions,
-          .card-bottom {
-            align-items: stretch;
-            flex-direction: column;
-          }
-
-          .primary-link,
-          .secondary-link,
-          .card-link {
-            width: 100%;
-          }
-
-          .entry-card {
-            min-height: 0;
-            padding: 23px;
-          }
-
-          .lifecycle-rail {
-            grid-template-columns: 1fr 1fr;
-          }
-
-          .lifecycle-step:nth-child(even)::after {
-            display: none;
-          }
-
-          .lifecycle-step:not(:last-child)::after {
-            right: -8px;
-          }
-        }
-      `}</style>
-
-      <div className="overview-wrap">
-        <section className="overview-hero">
-          <div className="hero-copy">
-            <div className="eyebrow">TA-14 Exchange Workspace</div>
-            <h1>
-              <span className="gradient-text">What are you bringing to the Exchange?</span>
-            </h1>
-            <p>
-              Start with an idea, an existing route, a file, raw text, a prepared demonstration,
-              or a preserved record. Every path enters the same governed route lifecycle and the
-              same admissible execution engine.
-            </p>
-
-            <div className="hero-actions">
-              <Link className="primary-link" href="/workspace/discover">
-                Discover my route →
-              </Link>
-              <Link className="secondary-link" href="/workspace/demonstrations">
-                Run the live demonstration
-              </Link>
-            </div>
-          </div>
-
-          <aside className="hero-console" aria-label="TA-14 execution chain">
-            <div className="console-head">
-              <strong>Execution chain</strong>
-              <span className="live-state">Engine available</span>
-            </div>
-
-            <div className="console-chain">
-              {chain.map((stage, index) => (
-                <div className="chain-row" key={stage}>
-                  <span>0{index + 1}</span>
-                  <span>{stage}</span>
-                  <b>BOUND</b>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </section>
-
-        <section className="overview-section" aria-labelledby="entry-title">
-          <div className="section-heading">
-            <div>
-              <div className="eyebrow">Choose an entry path</div>
-              <h2 id="entry-title">One platform for every stage of route governance.</h2>
-            </div>
-
-            <p>
-              The Workspace is the engine room of the Exchange. Select the form your work is in
-              today, and the platform will carry it toward construction, testing, correction,
-              preservation, replay, and verification.
-            </p>
-          </div>
-
-          <div className="entry-grid">
-            {entryCards.map((card) => (
-              <article className={`entry-card ${card.featured ? 'featured' : ''}`} key={card.href}>
-                <div className="card-top">
-                  <span className="card-number">{card.number}</span>
-                  <span className="card-glyph" aria-hidden="true">
-                    {card.glyph}
-                  </span>
-                </div>
-
-                <div className="card-copy">
-                  <div className="card-eyebrow">{card.eyebrow}</div>
-                  <h3>{card.title}</h3>
-                  <p>{card.description}</p>
-                </div>
-
-                <div className="card-bottom">
-                  <div className="card-status">
-                    Workspace mode
-                    <strong>{card.status}</strong>
-                  </div>
-
-                  <Link className="card-link" href={card.href}>
-                    {card.action} →
-                  </Link>
-                </div>
-              </article>
-            ))}
-          </div>
-        </section>
-
-        <section className="overview-section">
-          <div className="lifecycle-panel">
-            <div className="eyebrow">One continuous record</div>
-            <h2>The route should never disappear between tools.</h2>
-            <p>
-              Discovery, construction, scanning, testing, correction, preservation, replay, and
-              verification are not separate products. They are connected stages operating on the
-              same identified route, version history, evidence boundary, and event chain.
-            </p>
-
-            <div className="lifecycle-rail" aria-label="Exchange route lifecycle">
-              {lifecycle.map((stage, index) => (
-                <div className="lifecycle-step" key={stage}>
-                  <span>0{index + 1}</span>
-                  {stage}
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <article className="academy-banner">
-            <div>
-              <div className="eyebrow">TA-14 Academy of Admissible Execution Governance</div>
-              <h2>Do not just use the route engine. Learn how to construct governance.</h2>
-              <p>
-                Academy lessons will open directly into practical Exchange labs. A learner studies
-                the governing principle, constructs the relevant route section, watches the engine
-                expose failures, corrects the route, and preserves the resulting artifact.
-              </p>
-            </div>
-
-            <Link className="primary-link" href="/workspace/lab">
-              Enter the Academy Lab →
+    <main style={styles.page}>
+      <header style={styles.header}>
+        <Link href="/" style={styles.brand} aria-label="TA-14 Exchange Platform home">
+          <span style={styles.brandMark}>14</span>
+          <span>
+            <strong style={styles.brandTitle}>TA-14 EXCHANGE PLATFORM</strong>
+            <small style={styles.brandSub}>Governance Workspace</small>
+          </span>
+        </Link>
+
+        <nav style={styles.nav} aria-label="Workspace navigation">
+          <Link href="/workspace" style={styles.navLink}>Workspace</Link>
+          <Link href="/workspace/routes" style={styles.navLink}>Routes</Link>
+          <Link href="/verify" style={styles.navLink}>Verification</Link>
+          <Link href="/registry" style={styles.navLink}>Registry</Link>
+          <Link href="/pricing" style={styles.navLink}>Pricing</Link>
+          <Link href="/" style={styles.navLink}>Public Site</Link>
+        </nav>
+      </header>
+
+      <section style={styles.hero}>
+        <div style={styles.heroCopy}>
+          <div style={styles.eyebrow}>GOVERNANCE CONSTRUCTION ENVIRONMENT</div>
+          <h1 style={styles.heroTitle}>
+            Build the route.
+            <br />
+            Prove the authority.
+            <br />
+            Preserve the consequence.
+          </h1>
+          <p style={styles.heroText}>
+            The TA-14 Governance Workspace connects route construction, evidence intake,
+            deterministic challenge, correction, verification, registry continuity,
+            certificates, reliance, audit, restoration, reauthorization, activation,
+            execution, and outcome in one visible operating environment.
+          </p>
+
+          <div style={styles.heroActions}>
+            <Link href="/workspace/routes/new" style={styles.primaryButton}>
+              Start a Free Route
             </Link>
-          </article>
-
-          <div className="boundary-note">
-            <strong>Current release boundary:</strong> the prepared demonstration and custom form
-            use the working consequential-payment route engine. Discovery, upload, paste, Academy,
-            and scanner links establish their permanent locations in the unified Workspace and can
-            be activated sequentially without disturbing the live route transaction.
+            <Link href="/workspace/demo" style={styles.secondaryButton}>
+              Run the Live Demonstration
+            </Link>
           </div>
-        </section>
-      </div>
+
+          <div style={styles.trustRow}>
+            <span style={styles.trustItem}>Evidence Bound</span>
+            <span style={styles.trustItem}>Route Verifiable</span>
+            <span style={styles.trustItem}>Adverse Results Preserved</span>
+          </div>
+        </div>
+
+        <aside style={styles.statusPanel}>
+          <div style={styles.panelTop}>
+            <span style={styles.panelLabel}>WORKSPACE STATUS</span>
+            <span style={styles.liveBadge}>LIVE</span>
+          </div>
+          <div style={styles.metric}>
+            <span style={styles.metricLabel}>Route Engine</span>
+            <strong style={styles.metricValue}>READY</strong>
+          </div>
+          <div style={styles.metric}>
+            <span style={styles.metricLabel}>Decision States</span>
+            <strong style={styles.metricValue}>4</strong>
+          </div>
+          <div style={styles.metric}>
+            <span style={styles.metricLabel}>Lifecycle Stages</span>
+            <strong style={styles.metricValue}>10</strong>
+          </div>
+          <div style={styles.metric}>
+            <span style={styles.metricLabel}>Durable Record</span>
+            <strong style={styles.metricValue}>$9</strong>
+          </div>
+          <Link href="/pricing" style={styles.panelButton}>
+            View Commercial Ladder
+          </Link>
+        </aside>
+      </section>
+
+      <section style={styles.section}>
+        <div style={styles.sectionHeading}>
+          <div>
+            <div style={styles.eyebrow}>START HERE</div>
+            <h2 style={styles.sectionTitle}>Choose what you need to do.</h2>
+          </div>
+          <p style={styles.sectionIntro}>
+            Every major capability has a direct action. No hidden routes. No dead-end pages.
+          </p>
+        </div>
+
+        <div style={styles.actionGrid}>
+          {primaryActions.map((item) => (
+            <article key={item.title} style={styles.actionCard}>
+              <h3 style={styles.cardTitle}>{item.title}</h3>
+              <p style={styles.cardText}>{item.description}</p>
+              <Link href={item.href} style={styles.cardButton}>
+                {item.label}
+                <span aria-hidden="true"> →</span>
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section style={styles.darkSection}>
+        <div style={styles.sectionHeading}>
+          <div>
+            <div style={styles.darkEyebrow}>THE GOVERNING CHAIN</div>
+            <h2 style={styles.darkTitle}>One route from reality to outcome.</h2>
+          </div>
+          <p style={styles.darkIntro}>
+            Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome
+          </p>
+        </div>
+
+        <div style={styles.lifecycleGrid}>
+          {lifecycle.map((item) => (
+            <article key={item.step} style={styles.lifecycleCard}>
+              <div style={styles.step}>{item.step}</div>
+              <h3 style={styles.lifecycleTitle}>{item.title}</h3>
+              <p style={styles.lifecycleText}>{item.description}</p>
+              <Link href={item.href} style={styles.lifecycleButton}>
+                {item.action}
+                <span aria-hidden="true"> ↗</span>
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section style={styles.section}>
+        <div style={styles.splitGrid}>
+          <div>
+            <div style={styles.eyebrow}>ACTIVE WORK</div>
+            <h2 style={styles.sectionTitle}>Recent routes</h2>
+            <p style={styles.sectionIntroLeft}>
+              Inspect current route state, reopen preserved records, or continue the next required action.
+            </p>
+          </div>
+
+          <div style={styles.routeList}>
+            {recentRoutes.map((route) => (
+              <Link
+                href={`/workspace/routes/${route.id}`}
+                key={route.id}
+                style={styles.routeRow}
+              >
+                <div>
+                  <div style={styles.routeId}>{route.id}</div>
+                  <div style={styles.routeName}>{route.route}</div>
+                </div>
+                <div style={styles.routeState}>
+                  <span style={styles.routeBadge}>{route.state}</span>
+                  <strong>{route.decision}</strong>
+                </div>
+              </Link>
+            ))}
+            <Link href="/workspace/routes" style={styles.fullWidthButton}>
+              View All Routes
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section style={styles.exchangeSection}>
+        <div style={styles.sectionHeading}>
+          <div>
+            <div style={styles.eyebrow}>GOVERNANCE EXCHANGE</div>
+            <h2 style={styles.sectionTitle}>Bring your architecture. Connect it here.</h2>
+          </div>
+          <p style={styles.sectionIntro}>
+            TA-14 does not erase independent governance systems. It gives them a bounded,
+            attributable execution route where their claims can be tested and verified.
+          </p>
+        </div>
+
+        <div style={styles.exchangeGrid}>
+          {exchangeActions.map((item) => (
+            <article key={item.title} style={styles.exchangeCard}>
+              <h3 style={styles.cardTitle}>{item.title}</h3>
+              <p style={styles.cardText}>{item.description}</p>
+              <Link href={item.href} style={styles.textLink}>
+                {item.action}
+                <span aria-hidden="true"> →</span>
+              </Link>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section style={styles.cta}>
+        <div>
+          <div style={styles.ctaEyebrow}>NO ADMISSIBLE EVIDENCE. NO ADMISSIBLE EXECUTION.</div>
+          <h2 style={styles.ctaTitle}>Consequences should never outrun their evidence.</h2>
+          <p style={styles.ctaText}>
+            Build and test for free. Preserve one official route identity and its essential continuity for $9.
+          </p>
+        </div>
+        <div style={styles.ctaActions}>
+          <Link href="/workspace/routes/new" style={styles.lightButton}>
+            Start a Route
+          </Link>
+          <Link href="/pricing" style={styles.outlineLightButton}>
+            View Pricing
+          </Link>
+        </div>
+      </section>
+
+      <footer style={styles.footer}>
+        <Link href="/" style={styles.footerBrand}>
+          <span style={styles.brandMark}>14</span>
+          <span>
+            <strong style={styles.brandTitle}>TA-14 EXCHANGE PLATFORM</strong>
+            <small style={styles.brandSub}>Build. Test. Connect. Verify. Preserve.</small>
+          </span>
+        </Link>
+        <div style={styles.footerLinks}>
+          <Link href="/architecture" style={styles.footerLink}>Architecture</Link>
+          <Link href="/runtime" style={styles.footerLink}>Runtime</Link>
+          <Link href="/pricing" style={styles.footerLink}>Pricing</Link>
+          <Link href="/ecosystem" style={styles.footerLink}>Ecosystem</Link>
+          <Link href="/contact" style={styles.footerLink}>Contact</Link>
+        </div>
+      </footer>
     </main>
   );
 }
+
+const styles: Record<string, React.CSSProperties> = {
+  page: {
+    minHeight: "100vh",
+    background: "#f4f5f7",
+    color: "#111827",
+    fontFamily:
+      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  },
+  header: {
+    position: "sticky",
+    top: 0,
+    zIndex: 50,
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 24,
+    padding: "18px clamp(22px, 5vw, 72px)",
+    background: "rgba(244,245,247,0.96)",
+    borderBottom: "1px solid #d9dde4",
+    backdropFilter: "blur(16px)",
+  },
+  brand: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    color: "#111827",
+    textDecoration: "none",
+  },
+  brandMark: {
+    display: "grid",
+    placeItems: "center",
+    width: 42,
+    height: 42,
+    borderRadius: 8,
+    background: "#111827",
+    color: "#ffffff",
+    fontWeight: 800,
+    letterSpacing: "-0.04em",
+  },
+  brandTitle: {
+    display: "block",
+    fontSize: 13,
+    letterSpacing: "0.08em",
+  },
+  brandSub: {
+    display: "block",
+    marginTop: 3,
+    color: "#697386",
+    fontSize: 11,
+    letterSpacing: "0.04em",
+  },
+  nav: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+    gap: 18,
+  },
+  navLink: {
+    color: "#374151",
+    fontSize: 14,
+    fontWeight: 650,
+    textDecoration: "none",
+  },
+  hero: {
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1.5fr) minmax(300px, 0.55fr)",
+    gap: 36,
+    padding: "clamp(60px, 8vw, 120px) clamp(22px, 6vw, 92px)",
+    background:
+      "radial-gradient(circle at 82% 12%, rgba(110, 231, 183, 0.22), transparent 28%), linear-gradient(180deg, #ffffff 0%, #f4f5f7 100%)",
+  },
+  heroCopy: { maxWidth: 880 },
+  eyebrow: {
+    color: "#067a58",
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: "0.18em",
+  },
+  heroTitle: {
+    margin: "22px 0",
+    color: "#0b0f19",
+    fontSize: "clamp(48px, 7vw, 92px)",
+    lineHeight: 0.97,
+    letterSpacing: "-0.065em",
+  },
+  heroText: {
+    maxWidth: 800,
+    color: "#4b5563",
+    fontSize: "clamp(18px, 2vw, 23px)",
+    lineHeight: 1.65,
+  },
+  heroActions: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 14,
+    marginTop: 34,
+  },
+  primaryButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 52,
+    padding: "0 24px",
+    borderRadius: 9,
+    background: "#111827",
+    color: "#ffffff",
+    fontSize: 15,
+    fontWeight: 750,
+    textDecoration: "none",
+  },
+  secondaryButton: {
+    display: "inline-flex",
+    alignItems: "center",
+    justifyContent: "center",
+    minHeight: 52,
+    padding: "0 24px",
+    border: "1px solid #c7ccd4",
+    borderRadius: 9,
+    background: "#ffffff",
+    color: "#111827",
+    fontSize: 15,
+    fontWeight: 750,
+    textDecoration: "none",
+  },
+  trustRow: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+    marginTop: 28,
+  },
+  trustItem: {
+    padding: "8px 11px",
+    border: "1px solid #d9dde4",
+    borderRadius: 999,
+    background: "#ffffff",
+    color: "#4b5563",
+    fontSize: 12,
+    fontWeight: 700,
+  },
+  statusPanel: {
+    alignSelf: "end",
+    padding: 26,
+    border: "1px solid #d9dde4",
+    borderRadius: 16,
+    background: "#ffffff",
+    boxShadow: "0 24px 70px rgba(15, 23, 42, 0.08)",
+  },
+  panelTop: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginBottom: 14,
+  },
+  panelLabel: {
+    color: "#6b7280",
+    fontSize: 11,
+    fontWeight: 800,
+    letterSpacing: "0.16em",
+  },
+  liveBadge: {
+    padding: "5px 8px",
+    borderRadius: 999,
+    background: "#d1fae5",
+    color: "#065f46",
+    fontSize: 10,
+    fontWeight: 900,
+  },
+  metric: {
+    display: "flex",
+    justifyContent: "space-between",
+    gap: 16,
+    padding: "18px 0",
+    borderBottom: "1px solid #e5e7eb",
+  },
+  metricLabel: { color: "#6b7280", fontSize: 14 },
+  metricValue: { color: "#111827", fontSize: 15 },
+  panelButton: {
+    display: "flex",
+    justifyContent: "center",
+    marginTop: 20,
+    padding: "13px 16px",
+    borderRadius: 8,
+    background: "#ecfdf5",
+    color: "#065f46",
+    fontSize: 14,
+    fontWeight: 800,
+    textDecoration: "none",
+  },
+  section: {
+    padding: "clamp(66px, 8vw, 112px) clamp(22px, 6vw, 92px)",
+  },
+  sectionHeading: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "end",
+    gap: 28,
+    marginBottom: 36,
+  },
+  sectionTitle: {
+    margin: "10px 0 0",
+    fontSize: "clamp(34px, 4vw, 58px)",
+    lineHeight: 1.06,
+    letterSpacing: "-0.045em",
+  },
+  sectionIntro: {
+    maxWidth: 560,
+    margin: 0,
+    color: "#6b7280",
+    fontSize: 17,
+    lineHeight: 1.65,
+  },
+  sectionIntroLeft: {
+    maxWidth: 560,
+    color: "#6b7280",
+    fontSize: 17,
+    lineHeight: 1.65,
+  },
+  actionGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(235px, 1fr))",
+    gap: 18,
+  },
+  actionCard: {
+    display: "flex",
+    flexDirection: "column",
+    minHeight: 255,
+    padding: 26,
+    border: "1px solid #d9dde4",
+    borderRadius: 14,
+    background: "#ffffff",
+  },
+  cardTitle: {
+    margin: 0,
+    fontSize: 22,
+    letterSpacing: "-0.025em",
+  },
+  cardText: {
+    flex: 1,
+    color: "#6b7280",
+    fontSize: 15,
+    lineHeight: 1.65,
+  },
+  cardButton: {
+    display: "inline-flex",
+    alignSelf: "flex-start",
+    padding: "11px 14px",
+    borderRadius: 8,
+    background: "#111827",
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: 800,
+    textDecoration: "none",
+  },
+  darkSection: {
+    padding: "clamp(66px, 8vw, 112px) clamp(22px, 6vw, 92px)",
+    background: "#0b0f19",
+    color: "#ffffff",
+  },
+  darkEyebrow: {
+    color: "#6ee7b7",
+    fontSize: 12,
+    fontWeight: 800,
+    letterSpacing: "0.18em",
+  },
+  darkTitle: {
+    margin: "10px 0 0",
+    fontSize: "clamp(34px, 4vw, 58px)",
+    lineHeight: 1.06,
+    letterSpacing: "-0.045em",
+  },
+  darkIntro: {
+    maxWidth: 620,
+    margin: 0,
+    color: "#aeb6c5",
+    fontSize: 16,
+    lineHeight: 1.65,
+  },
+  lifecycleGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))",
+    gap: 16,
+  },
+  lifecycleCard: {
+    display: "flex",
+    flexDirection: "column",
+    minHeight: 275,
+    padding: 24,
+    border: "1px solid #283142",
+    borderRadius: 13,
+    background: "#121826",
+  },
+  step: {
+    color: "#6ee7b7",
+    fontSize: 12,
+    fontWeight: 900,
+    letterSpacing: "0.18em",
+  },
+  lifecycleTitle: {
+    margin: "18px 0 10px",
+    fontSize: 21,
+    letterSpacing: "-0.02em",
+  },
+  lifecycleText: {
+    flex: 1,
+    color: "#aeb6c5",
+    fontSize: 14,
+    lineHeight: 1.65,
+  },
+  lifecycleButton: {
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: 800,
+    textDecoration: "none",
+  },
+  splitGrid: {
+    display: "grid",
+    gridTemplateColumns: "minmax(260px, 0.65fr) minmax(0, 1.35fr)",
+    gap: 50,
+    alignItems: "start",
+  },
+  routeList: {
+    display: "grid",
+    gap: 12,
+  },
+  routeRow: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 20,
+    padding: 20,
+    border: "1px solid #d9dde4",
+    borderRadius: 12,
+    background: "#ffffff",
+    color: "#111827",
+    textDecoration: "none",
+  },
+  routeId: {
+    marginBottom: 6,
+    color: "#067a58",
+    fontSize: 11,
+    fontWeight: 850,
+    letterSpacing: "0.08em",
+  },
+  routeName: {
+    fontSize: 15,
+    fontWeight: 750,
+  },
+  routeState: {
+    display: "flex",
+    alignItems: "center",
+    gap: 10,
+    fontSize: 12,
+  },
+  routeBadge: {
+    padding: "6px 8px",
+    borderRadius: 999,
+    background: "#eef2f7",
+    color: "#4b5563",
+    fontSize: 10,
+    fontWeight: 900,
+  },
+  fullWidthButton: {
+    display: "flex",
+    justifyContent: "center",
+    padding: 15,
+    borderRadius: 9,
+    background: "#111827",
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: 800,
+    textDecoration: "none",
+  },
+  exchangeSection: {
+    padding: "clamp(66px, 8vw, 112px) clamp(22px, 6vw, 92px)",
+    background: "#ffffff",
+  },
+  exchangeGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: 18,
+  },
+  exchangeCard: {
+    display: "flex",
+    flexDirection: "column",
+    minHeight: 240,
+    padding: 25,
+    border: "1px solid #d9dde4",
+    borderRadius: 13,
+    background: "#f8fafc",
+  },
+  textLink: {
+    marginTop: "auto",
+    color: "#067a58",
+    fontSize: 14,
+    fontWeight: 850,
+    textDecoration: "none",
+  },
+  cta: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 30,
+    padding: "clamp(52px, 7vw, 86px) clamp(22px, 6vw, 92px)",
+    background: "#067a58",
+    color: "#ffffff",
+  },
+  ctaEyebrow: {
+    color: "#bbf7d0",
+    fontSize: 11,
+    fontWeight: 850,
+    letterSpacing: "0.16em",
+  },
+  ctaTitle: {
+    maxWidth: 850,
+    margin: "12px 0",
+    fontSize: "clamp(34px, 4vw, 58px)",
+    lineHeight: 1.06,
+    letterSpacing: "-0.045em",
+  },
+  ctaText: {
+    maxWidth: 780,
+    margin: 0,
+    color: "#d1fae5",
+    fontSize: 17,
+    lineHeight: 1.6,
+  },
+  ctaActions: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+    gap: 12,
+    minWidth: 250,
+  },
+  lightButton: {
+    display: "inline-flex",
+    justifyContent: "center",
+    padding: "14px 20px",
+    borderRadius: 8,
+    background: "#ffffff",
+    color: "#065f46",
+    fontSize: 14,
+    fontWeight: 850,
+    textDecoration: "none",
+  },
+  outlineLightButton: {
+    display: "inline-flex",
+    justifyContent: "center",
+    padding: "13px 20px",
+    border: "1px solid rgba(255,255,255,0.5)",
+    borderRadius: 8,
+    color: "#ffffff",
+    fontSize: 14,
+    fontWeight: 850,
+    textDecoration: "none",
+  },
+  footer: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 24,
+    padding: "32px clamp(22px, 6vw, 92px)",
+    borderTop: "1px solid #d9dde4",
+    background: "#f4f5f7",
+  },
+  footerBrand: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    color: "#111827",
+    textDecoration: "none",
+  },
+  footerLinks: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-end",
+    gap: 18,
+  },
+  footerLink: {
+    color: "#4b5563",
+    fontSize: 13,
+    fontWeight: 700,
+    textDecoration: "none",
+  },
+};
