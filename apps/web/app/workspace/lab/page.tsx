@@ -277,7 +277,7 @@ export default function AcademyLabPage() {
         <span>Practice before consequence</span>
       </footer>
 
-      <style jsx>{`
+      <style>{`
         * {
           box-sizing: border-box;
         }
