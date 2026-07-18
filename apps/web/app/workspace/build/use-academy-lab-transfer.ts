@@ -1,95 +1,55 @@
-import type { TransferRouteDraft } from "./route-draft-transfer";
-import type { AcademyLab } from "./academy-labs";
+"use client";
 
-export const ACADEMY_LAB_TRANSFER_SCHEMA =
-  "TA14_ACADEMY_LAB_TRANSFER_V1" as const;
-
-export const ACADEMY_LAB_TRANSFER_KEY =
-  "ta14.academy.lab.transfer.v1";
+import { useEffect, useState } from "react";
 
 export type AcademyLabTransfer = {
-  schema: typeof ACADEMY_LAB_TRANSFER_SCHEMA;
+  schema: "TA14_ACADEMY_LAB_TRANSFER_V1";
   createdAt: string;
   labId: string;
   labTitle: string;
   source: "ACADEMY_LAB";
-  route: TransferRouteDraft;
+  route: {
+    schema: "TA14_ROUTE_DRAFT_V1";
+    routeId: string;
+    status: "DRAFT";
+    metadata: {
+      name: string;
+      domain: string;
+      owner: string;
+      version: number;
+      source: "ACADEMY_LAB";
+      sourceLabId: string;
+    };
+    chain: {
+      reality: string;
+      record: string;
+      continuity: string;
+      admissibility: string;
+      binding: string;
+      commit: string;
+      execution: string;
+      outcome: string;
+    };
+    readiness: {
+      completedStages: number;
+      totalStages: number;
+      missingStages: string[];
+      nextAction: "COMPLETE_ROUTE_DEFINITION";
+    };
+    governingPrinciple: string;
+  };
 };
 
-function canUseSessionStorage(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.sessionStorage !== "undefined"
-  );
-}
+export type AcademyLabTransferState = {
+  checked: boolean;
+  transfer: AcademyLabTransfer | null;
+};
 
-export function createAcademyLabRouteDraft(
-  lab: AcademyLab,
-): TransferRouteDraft {
-  const chain = Object.fromEntries(
-    lab.route.map((stage) => [
-      stage.stage.toLowerCase(),
-      `${stage.evidence} ${stage.question}`,
-    ]),
-  ) as TransferRouteDraft["chain"];
+const ACADEMY_LAB_TRANSFER_KEY =
+  "ta14.academy.lab.transfer.v1";
 
-  return {
-    schema: "TA14_ROUTE_DRAFT_V1",
-    routeId: `academy:${lab.id}`,
-    status: "DRAFT",
-    metadata: {
-      name: `Academy Lab: ${lab.title}`,
-      domain: "AI Governance",
-      owner: "TA-14 Academy",
-      version: 1,
-    },
-    chain,
-    readiness: {
-      completedStages: 0,
-      totalStages: 8,
-      missingStages: [
-        "reality",
-        "record",
-        "continuity",
-        "admissibility",
-        "binding",
-        "commit",
-        "execution",
-        "outcome",
-      ],
-      nextAction: "COMPLETE_ROUTE_DEFINITION",
-    },
-    governingPrinciple:
-      "No admissible evidence. No admissible execution.",
-  };
-}
-
-export function stageAcademyLabTransfer(
-  lab: AcademyLab,
-): AcademyLabTransfer {
-  const transfer: AcademyLabTransfer = {
-    schema: ACADEMY_LAB_TRANSFER_SCHEMA,
-    createdAt: new Date().toISOString(),
-    labId: lab.id,
-    labTitle: lab.title,
-    source: "ACADEMY_LAB",
-    route: createAcademyLabRouteDraft(lab),
-  };
-
-  if (canUseSessionStorage()) {
-    window.sessionStorage.setItem(
-      ACADEMY_LAB_TRANSFER_KEY,
-      JSON.stringify(transfer),
-    );
-  }
-
-  return transfer;
-}
-
-export function consumeAcademyLabTransfer():
-  | AcademyLabTransfer
-  | null {
-  if (!canUseSessionStorage()) {
+function consumeAcademyLabTransfer(): AcademyLabTransfer | null {
+  if (typeof window === "undefined") {
     return null;
   }
 
@@ -106,8 +66,34 @@ export function consumeAcademyLabTransfer():
   );
 
   try {
-    return JSON.parse(raw) as AcademyLabTransfer;
+    const parsed = JSON.parse(raw) as AcademyLabTransfer;
+
+    if (
+      parsed.schema !== "TA14_ACADEMY_LAB_TRANSFER_V1" ||
+      parsed.source !== "ACADEMY_LAB"
+    ) {
+      return null;
+    }
+
+    return parsed;
   } catch {
     return null;
   }
+}
+
+export function useAcademyLabTransfer(): AcademyLabTransferState {
+  const [state, setState] =
+    useState<AcademyLabTransferState>({
+      checked: false,
+      transfer: null,
+    });
+
+  useEffect(() => {
+    setState({
+      checked: true,
+      transfer: consumeAcademyLabTransfer(),
+    });
+  }, []);
+
+  return state;
 }
