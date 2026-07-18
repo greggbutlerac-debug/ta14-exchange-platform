@@ -53,12 +53,13 @@ type Db = {
 
 const BLOB_PATHNAME = "ta14-exchange/runtime/local-store.json";
 
-const dataDir = () =>
+const dataDir = (): string =>
   process.env.TA14_DATA_DIR ?? path.join(process.cwd(), "data");
 
-const dataFile = () => path.join(dataDir(), "local-store.json");
+const dataFile = (): string =>
+  path.join(dataDir(), "local-store.json");
 
-let writeQueue = Promise.resolve();
+let writeQueue: Promise<void> = Promise.resolve();
 
 function emptyDb(): Db {
   return {
@@ -113,24 +114,28 @@ async function saveLocal(db: Db): Promise<void> {
 }
 
 async function loadBlob(): Promise<Db> {
-  const result = await get(BLOB_PATHNAME, {
-    access: "private",
-    useCache: false,
-  });
+  try {
+    const result = await get(BLOB_PATHNAME, {
+      access: "public",
+      useCache: false,
+    });
 
-  if (!result || result.statusCode !== 200 || !result.stream) {
+    if (!result || result.statusCode !== 200 || !result.stream) {
+      return emptyDb();
+    }
+
+    const contents = await new Response(result.stream).text();
+    const parsed = JSON.parse(contents) as Partial<Db>;
+
+    return normalizeDb(parsed);
+  } catch {
     return emptyDb();
   }
-
-  const contents = await new Response(result.stream).text();
-  const parsed = JSON.parse(contents) as Partial<Db>;
-
-  return normalizeDb(parsed);
 }
 
 async function saveBlob(db: Db): Promise<void> {
   await put(BLOB_PATHNAME, JSON.stringify(db, null, 2), {
-    access: "private",
+    access: "public",
     contentType: "application/json",
     addRandomSuffix: false,
     allowOverwrite: true,
@@ -162,15 +167,15 @@ async function mutateBlob<T>(
 async function mutate<T>(
   operation: (db: Db) => Promise<T> | T,
 ): Promise<T> {
-  let release!: () => void;
+  let releaseQueue!: () => void;
 
-  const previous = writeQueue;
+  const previousWrite = writeQueue;
 
   writeQueue = new Promise<void>((resolve) => {
-    release = resolve;
+    releaseQueue = resolve;
   });
 
-  await previous;
+  await previousWrite;
 
   try {
     if (useBlobStorage()) {
@@ -179,7 +184,7 @@ async function mutate<T>(
 
     return await mutateLocal(operation);
   } finally {
-    release();
+    releaseQueue();
   }
 }
 
@@ -191,44 +196,49 @@ async function load(): Promise<Db> {
   return loadLocal();
 }
 
-function appendEvent(db: Db, event: RouteEventInput): RouteEvent {
-  const prior = db.events
+function appendEvent(
+  db: Db,
+  event: RouteEventInput,
+): RouteEvent {
+  const priorEvent = db.events
     .filter((item) => item.rid === event.rid)
     .at(-1);
 
-  const prevEventHash = prior?.eventHash ?? null;
+  const prevEventHash = priorEvent?.eventHash ?? null;
 
   const eventHash = sha256Canonical({
     ...event,
     prevEventHash,
   });
 
-  const stored: RouteEvent = {
+  const storedEvent: RouteEvent = {
     ...event,
     prevEventHash,
     eventHash,
   };
 
-  db.events.push(stored);
+  db.events.push(storedEvent);
 
-  return stored;
+  return storedEvent;
 }
 
-export function verifyEventChain(events: RouteEvent[]): boolean {
-  let previous: string | null = null;
+export function verifyEventChain(
+  events: RouteEvent[],
+): boolean {
+  let previousEventHash: string | null = null;
 
   for (const event of events) {
-    if (event.prevEventHash !== previous) {
+    if (event.prevEventHash !== previousEventHash) {
       return false;
     }
 
-    const { eventHash, ...unsigned } = event;
+    const { eventHash, ...unsignedEvent } = event;
 
-    if (eventHash !== sha256Canonical(unsigned)) {
+    if (eventHash !== sha256Canonical(unsignedEvent)) {
       return false;
     }
 
-    previous = eventHash;
+    previousEventHash = eventHash;
   }
 
   return true;
@@ -280,18 +290,18 @@ export async function appendRouteVersion(
       (item) => item.rid === route.rid,
     );
 
-    const current = Math.max(
+    const currentVersion = Math.max(
       ...versions.map((item) => item.version),
       0,
     );
 
-    if (current !== expectedCurrentVersion) {
+    if (currentVersion !== expectedCurrentVersion) {
       throw new Error(
-        `VERSION_CONFLICT: expected ${expectedCurrentVersion}, current ${current}.`,
+        `VERSION_CONFLICT: expected ${expectedCurrentVersion}, current ${currentVersion}.`,
       );
     }
 
-    if (route.version !== current + 1) {
+    if (route.version !== currentVersion + 1) {
       throw new Error(
         "New route version must increment by exactly one.",
       );
@@ -328,15 +338,15 @@ export async function getRoute(rid: string) {
 
   const versions = db.routeVersions
     .filter((item) => item.rid === rid)
-    .sort((a, b) => a.version - b.version);
+    .sort((first, second) => first.version - second.version);
 
-  if (!versions.length) {
+  if (versions.length === 0) {
     return undefined;
   }
 
   const events = db.events
     .filter((item) => item.rid === rid)
-    .sort((a, b) => a.at.localeCompare(b.at));
+    .sort((first, second) => first.at.localeCompare(second.at));
 
   return {
     latest: versions.at(-1)!,
@@ -347,7 +357,9 @@ export async function getRoute(rid: string) {
   };
 }
 
-export async function getPublicVerificationBundle(rid: string) {
+export async function getPublicVerificationBundle(
+  rid: string,
+) {
   const db = await load();
   const registry = db.registries[rid];
 
@@ -357,7 +369,7 @@ export async function getPublicVerificationBundle(rid: string) {
 
   const events = db.events
     .filter((item) => item.rid === rid)
-    .sort((a, b) => a.at.localeCompare(b.at));
+    .sort((first, second) => first.at.localeCompare(second.at));
 
   return {
     rid,
