@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import {
-  FormEvent,
+  type CSSProperties,
+  type FormEvent,
   useEffect,
   useMemo,
   useState,
@@ -13,6 +14,7 @@ import {
   type TransferRouteDraft,
   type TransferStageKey,
 } from "../../../../lib/route-draft-transfer";
+import { AiGovernanceEvaluationPanel } from "./ai-governance-evaluation-panel";
 
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 
@@ -60,11 +62,11 @@ const initialForm: RouteForm = {
   amountUsd: "27500",
 };
 
-const chain: {
+const chain: Array<{
   key: TransferStageKey;
   number: string;
   label: string;
-}[] = [
+}> = [
   {
     key: "reality",
     number: "01",
@@ -132,6 +134,10 @@ const decisionColors: Record<
   },
 };
 
+function normalizeDomain(value: string): string {
+  return value.trim().toLowerCase().replace(/[_-]+/g, " ");
+}
+
 function isVendorPaymentDraft(
   draft: TransferRouteDraft | null,
 ): boolean {
@@ -139,33 +145,50 @@ function isVendorPaymentDraft(
     return true;
   }
 
-  const domain = draft.metadata.domain
-    .trim()
-    .toLowerCase();
-
-  const name = draft.metadata.name
-    .trim()
-    .toLowerCase();
+  const domain = normalizeDomain(draft.metadata.domain);
+  const name = normalizeDomain(draft.metadata.name);
 
   return (
     domain === "finance" ||
+    domain === "financial governance" ||
+    domain === "vendor payment" ||
+    domain === "payment" ||
     name.includes("vendor payment") ||
     name.includes("supplier payment")
   );
 }
 
+function isAiGovernanceDraft(
+  draft: TransferRouteDraft | null,
+): boolean {
+  if (!draft) {
+    return false;
+  }
+
+  const domain = normalizeDomain(draft.metadata.domain);
+  const name = normalizeDomain(draft.metadata.name);
+
+  return (
+    domain === "ai governance" ||
+    domain === "artificial intelligence governance" ||
+    domain === "ai" ||
+    domain.includes("ai governance") ||
+    name.includes("ai agent") ||
+    name.includes("artificial intelligence")
+  );
+}
+
 export default function NewRoutePage() {
   const [form, setForm] = useState<RouteForm>(initialForm);
-  const [draft, setDraft] =
-    useState<TransferRouteDraft | null>(null);
+  const [draft, setDraft] = useState<TransferRouteDraft | null>(
+    null,
+  );
   const [draftLoaded, setDraftLoaded] = useState(false);
   const [selectedStage, setSelectedStage] =
     useState<TransferStageKey>("reality");
-  const [result, setResult] =
-    useState<CreatedRoute | null>(null);
+  const [result, setResult] = useState<CreatedRoute | null>(null);
   const [error, setError] = useState("");
-  const [correlationId, setCorrelationId] =
-    useState("");
+  const [correlationId, setCorrelationId] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -185,14 +208,19 @@ export default function NewRoutePage() {
             ? transferredDraft.metadata.owner
             : current.organizationName,
         systemName:
-          transferredDraft.metadata.name ||
-          current.systemName,
+          transferredDraft.metadata.name || current.systemName,
       }));
     }
   }, []);
 
   const vendorPaymentCompatible =
     isVendorPaymentDraft(draft);
+
+  const aiGovernanceCompatible =
+    isAiGovernanceDraft(draft);
+
+  const hasRegisteredAdapter =
+    vendorPaymentCompatible || aiGovernanceCompatible;
 
   const formattedAmount = useMemo(() => {
     const value = Number(form.amountUsd);
@@ -255,12 +283,14 @@ export default function NewRoutePage() {
     setCorrelationId("");
   }
 
-  async function submitRoute(event: FormEvent) {
+  async function submitRoute(
+    event: FormEvent<HTMLFormElement>,
+  ) {
     event.preventDefault();
 
     if (!vendorPaymentCompatible) {
       setError(
-        "This route was built for a domain that is not yet connected to the live vendor-payment evaluator. The transferred route remains intact, but it cannot be truthfully submitted through the current payment API.",
+        "This transferred route is not compatible with the vendor-payment API. TA-14 will not relabel the route or invent payment-domain values.",
       );
       return;
     }
@@ -300,10 +330,9 @@ export default function NewRoutePage() {
         }),
       });
 
-      const payload =
-        (await response.json()) as
-          | CreatedRoute
-          | ApiError;
+      const payload = (await response.json()) as
+        | CreatedRoute
+        | ApiError;
 
       if (!response.ok) {
         const failure = payload as ApiError;
@@ -346,7 +375,7 @@ export default function NewRoutePage() {
     "TA-14 Demonstration Organization";
 
   return (
-    <main style={styles.page}>
+    <div style={styles.page}>
       <header style={styles.header}>
         <Link href="/" style={styles.brand}>
           <span style={styles.brandMark}>14</span>
@@ -362,32 +391,26 @@ export default function NewRoutePage() {
           </span>
         </Link>
 
-        <nav style={styles.nav}>
-          <Link
-            href="/workspace"
-            style={styles.navLink}
-          >
+        <nav
+          style={styles.nav}
+          aria-label="Primary navigation"
+        >
+          <Link href="/workspace" style={styles.navLink}>
             Workspace
           </Link>
 
           <Link
-            href="/records"
+            href="/workspace/routes"
             style={styles.navLink}
           >
             Records
           </Link>
 
-          <Link
-            href="/verification"
-            style={styles.navLink}
-          >
+          <Link href="/verify" style={styles.navLink}>
             Verification
           </Link>
 
-          <Link
-            href="/pricing"
-            style={styles.navLink}
-          >
+          <Link href="/pricing" style={styles.navLink}>
             Pricing
           </Link>
 
@@ -418,649 +441,705 @@ export default function NewRoutePage() {
         <span>Evaluation</span>
       </div>
 
-      <section style={styles.hero}>
-        <div>
-          <span style={styles.eyebrow}>
-            {draft
-              ? "TRANSFERRED GOVERNANCE ROUTE"
-              : "NEW CONSEQUENTIAL ROUTE"}
-          </span>
-
-          <h1 style={styles.heroTitle}>
-            Review the route before consequence occurs.
-          </h1>
-
-          <p style={styles.heroText}>
-            {draft
-              ? "The route constructed in the Visual Route Builder has been transferred into the evaluation workspace. Review its complete Reality → Outcome chain before choosing an available live evaluation lane."
-              : "Declare the organization, system, actor, supplier, invoice, beneficiary, and proposed payment. The route will be submitted to the live TA-14 evaluation engine and preserved under a unique RID."}
-          </p>
-        </div>
-
-        <div style={styles.routePreview}>
-          <span style={styles.previewLabel}>
-            ROUTE UNDER REVIEW
-          </span>
-
-          <strong style={styles.previewTitle}>
-            {routeTitle}
-          </strong>
-
-          <div style={styles.previewDetails}>
-            <PreviewDetail
-              label="Domain"
-              value={routeDomain}
-            />
-
-            <PreviewDetail
-              label="Owner"
-              value={routeOwner}
-            />
-
-            <PreviewDetail
-              label="State"
-              value={
-                draft?.status ??
-                "LIVE VENDOR PAYMENT LANE"
-              }
-            />
-
-            {vendorPaymentCompatible ? (
-              <PreviewDetail
-                label="Transaction"
-                value={formattedAmount}
-              />
-            ) : (
-              <PreviewDetail
-                label="Live adapter"
-                value="NOT YET CONNECTED"
-              />
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section style={styles.chain}>
-        {chain.map((item) => {
-          const hasValue =
-            draft &&
-            draft.chain[item.key] !== "UNKNOWN";
-
-          const active =
-            selectedStage === item.key;
-
-          return (
-            <button
-              key={item.key}
-              type="button"
-              onClick={() =>
-                setSelectedStage(item.key)
-              }
-              style={{
-                ...styles.chainItem,
-                ...(active
-                  ? styles.chainItemActive
-                  : {}),
-              }}
-            >
-              <span style={styles.chainIndex}>
-                {item.number}
-              </span>
-
-              <span>{item.label}</span>
-
-              {draft ? (
-                <span
-                  style={{
-                    ...styles.chainState,
-                    ...(hasValue
-                      ? styles.chainComplete
-                      : styles.chainUnknown),
-                  }}
-                >
-                  {hasValue ? "✓" : "○"}
-                </span>
-              ) : null}
-            </button>
-          );
-        })}
-      </section>
-
-      {draftLoaded && draft ? (
-        <section style={styles.transferSection}>
-          <div style={styles.transferHeader}>
-            <div>
-              <span style={styles.sectionLabel}>
-                TRANSFERRED ROUTE MANIFEST
-              </span>
-
-              <h2 style={styles.transferTitle}>
-                {draft.metadata.name}
-              </h2>
-
-              <p style={styles.transferIntro}>
-                This is the route definition preserved by
-                the builder. Declared content is not proof
-                that the underlying evidence or authority
-                exists.
-              </p>
-            </div>
-
-            <div style={styles.transferActions}>
-              <Link
-                href="/workspace/build"
-                style={styles.secondaryLink}
-              >
-                ← Return to builder
-              </Link>
-
-              <button
-                type="button"
-                onClick={removeTransferredDraft}
-                style={styles.clearDraftButton}
-              >
-                Remove transferred draft
-              </button>
-            </div>
-          </div>
-
-          <div style={styles.transferGrid}>
-            <aside style={styles.transferChain}>
-              {chain.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  onClick={() =>
-                    setSelectedStage(item.key)
-                  }
-                  style={{
-                    ...styles.transferStage,
-                    ...(selectedStage === item.key
-                      ? styles.transferStageActive
-                      : {}),
-                  }}
-                >
-                  <span style={styles.transferNumber}>
-                    {item.number}
-                  </span>
-
-                  <span>{item.label}</span>
-
-                  <span style={styles.transferCheck}>
-                    {draft.chain[item.key] !==
-                    "UNKNOWN"
-                      ? "✓"
-                      : "○"}
-                  </span>
-                </button>
-              ))}
-            </aside>
-
-            <article style={styles.stageReview}>
-              <div style={styles.stageReviewTop}>
-                <div>
-                  <span style={styles.sectionLabel}>
-                    STAGE{" "}
-                    {selectedStageDefinition.number}
-                  </span>
-
-                  <h3 style={styles.stageReviewTitle}>
-                    {selectedStageDefinition.label}
-                  </h3>
-                </div>
-
-                <span style={styles.declaredBadge}>
-                  DECLARED
-                </span>
-              </div>
-
-              <p style={styles.stageValue}>
-                {selectedStageValue}
-              </p>
-
-              <div style={styles.stageBoundary}>
-                <strong>
-                  Evaluation boundary
-                </strong>
-
-                <p>
-                  This statement came from the route
-                  builder. The live engine must still
-                  determine whether supporting evidence,
-                  continuity, authority, binding, execution
-                  correspondence, and outcome
-                  correspondence are admissible.
-                </p>
-              </div>
-            </article>
-
-            <aside style={styles.routeMetadata}>
-              <span style={styles.sectionLabel}>
-                ROUTE METADATA
-              </span>
-
-              <MetadataRow
-                label="Schema"
-                value={draft.schema}
-              />
-
-              <MetadataRow
-                label="Draft ID"
-                value={draft.routeId}
-              />
-
-              <MetadataRow
-                label="Domain"
-                value={draft.metadata.domain}
-              />
-
-              <MetadataRow
-                label="Owner"
-                value={draft.metadata.owner}
-              />
-
-              <MetadataRow
-                label="Version"
-                value={String(
-                  draft.metadata.version,
-                )}
-              />
-
-              <MetadataRow
-                label="Stages"
-                value={`${draft.readiness.completedStages}/${draft.readiness.totalStages}`}
-              />
-
-              <MetadataRow
-                label="Builder state"
-                value={draft.status}
-              />
-            </aside>
-          </div>
-        </section>
-      ) : null}
-
-      {!vendorPaymentCompatible && draft ? (
-        <section style={styles.adapterBoundary}>
+      <main>
+        <section style={styles.hero}>
           <div>
-            <span style={styles.adapterEyebrow}>
-              DOMAIN ADAPTER BOUNDARY
+            <span style={styles.eyebrow}>
+              {draft
+                ? "TRANSFERRED GOVERNANCE ROUTE"
+                : "NEW CONSEQUENTIAL ROUTE"}
             </span>
 
-            <h2 style={styles.adapterTitle}>
-              The route transferred correctly.
-              The live evaluator for this domain has not
-              been connected yet.
-            </h2>
+            <h1 style={styles.heroTitle}>
+              Review the route before consequence occurs.
+            </h1>
 
-            <p style={styles.adapterText}>
-              This is a {draft.metadata.domain} route.
-              The current production API evaluates the
-              vendor-payment route schema. TA-14 will not
-              relabel this route as a payment or submit
-              invented supplier, invoice, beneficiary, or
-              financial values merely to force it through
-              an incompatible engine.
+            <p style={styles.heroText}>
+              {draft
+                ? "The route constructed in the Visual Route Builder has been transferred into the evaluation workspace. Review its complete Reality → Outcome chain before choosing an available evaluation lane."
+                : "Declare the organization, system, actor, supplier, invoice, beneficiary, and proposed payment. The payment route will be submitted to the current TA-14 vendor-payment engine and preserved under a unique RID."}
             </p>
           </div>
 
-          <div style={styles.adapterState}>
-            <span style={styles.adapterStateLabel}>
-              ROUTE STATE
+          <aside style={styles.routePreview}>
+            <span style={styles.previewLabel}>
+              ROUTE UNDER REVIEW
             </span>
 
-            <strong style={styles.adapterStateValue}>
-              PRESERVED · ADAPTER REQUIRED
+            <strong style={styles.previewTitle}>
+              {routeTitle}
             </strong>
 
-            <p style={styles.adapterStateText}>
-              The complete route remains available above
-              for review, JSON export, and future domain
-              adapter integration.
-            </p>
-          </div>
-        </section>
-      ) : (
-        <section style={styles.workspaceGrid}>
-          <form
-            onSubmit={submitRoute}
-            style={styles.formCard}
-          >
-            <div style={styles.formHeader}>
-              <div>
-                <span style={styles.sectionLabel}>
-                  LIVE VENDOR-PAYMENT MANIFEST
-                </span>
+            <div style={styles.previewDetails}>
+              <PreviewDetail
+                label="Domain"
+                value={routeDomain}
+              />
 
-                <h2 style={styles.formTitle}>
-                  Define the proposed execution.
-                </h2>
-              </div>
+              <PreviewDetail
+                label="Owner"
+                value={routeOwner}
+              />
 
-              <span style={styles.liveBadge}>
-                LIVE API
-              </span>
-            </div>
-
-            {draft ? (
-              <div style={styles.mappingNotice}>
-                <strong>
-                  Compatible builder route detected
-                </strong>
-
-                <p>
-                  The transferred route is categorized as
-                  a finance or vendor-payment route. The
-                  live payment manifest remains explicit
-                  because organization, actor, supplier,
-                  invoice, beneficiary, and amount must be
-                  bound to the API submission.
-                </p>
-              </div>
-            ) : null}
-
-            <div style={styles.fieldGrid}>
-              <Field
-                label="Organization name"
-                value={form.organizationName}
-                placeholder="Organization"
-                onChange={(value) =>
-                  updateField(
-                    "organizationName",
-                    value,
-                  )
+              <PreviewDetail
+                label="State"
+                value={
+                  draft?.status ?? "NEW_ROUTE"
                 }
               />
 
-              <Field
-                label="System name"
-                value={form.systemName}
-                placeholder="System"
-                onChange={(value) =>
-                  updateField("systemName", value)
+              <PreviewDetail
+                label="Adapter"
+                value={
+                  aiGovernanceCompatible
+                    ? "AI GOVERNANCE"
+                    : vendorPaymentCompatible
+                      ? "VENDOR PAYMENT"
+                      : "NOT REGISTERED"
                 }
               />
-
-              <Field
-                label="Actor ID"
-                value={form.actorId}
-                placeholder="ACTOR-001"
-                onChange={(value) =>
-                  updateField("actorId", value)
-                }
-              />
-
-              <Field
-                label="Supplier ID"
-                value={form.supplierId}
-                placeholder="SUPPLIER-001"
-                onChange={(value) =>
-                  updateField("supplierId", value)
-                }
-              />
-
-              <Field
-                label="Invoice ID"
-                value={form.invoiceId}
-                placeholder="INVOICE-001"
-                onChange={(value) =>
-                  updateField("invoiceId", value)
-                }
-              />
-
-              <Field
-                label="Beneficiary ID"
-                value={form.beneficiaryId}
-                placeholder="BENEFICIARY-001"
-                onChange={(value) =>
-                  updateField(
-                    "beneficiaryId",
-                    value,
-                  )
-                }
-              />
-            </div>
-
-            <Field
-              label="Payment amount in USD"
-              value={form.amountUsd}
-              placeholder="27500"
-              type="number"
-              onChange={(value) =>
-                updateField("amountUsd", value)
-              }
-            />
-
-            <div style={styles.boundaryNotice}>
-              <strong>
-                Demonstration boundary
-              </strong>
-
-              <p style={styles.boundaryText}>
-                This creates a self-declared
-                demonstration route. Supplier, invoice,
-                bypass, replay, duplicate-payment,
-                execution, and outcome observations may
-                include labeled demonstration fixtures.
-                This is not independent certification or
-                legal approval.
-              </p>
-            </div>
-
-            <div style={styles.formActions}>
-              <button
-                type="submit"
-                disabled={submitting}
-                style={{
-                  ...styles.primaryButton,
-                  ...(submitting
-                    ? styles.disabledButton
-                    : {}),
-                }}
-              >
-                {submitting
-                  ? "Creating and signing route..."
-                  : "Create Live TA-14 Route"}
-              </button>
-
-              <button
-                type="button"
-                onClick={clearForm}
-                style={styles.secondaryButton}
-              >
-                Clear Manifest
-              </button>
-            </div>
-          </form>
-
-          <aside style={styles.sideColumn}>
-            {!result && !error ? (
-              <div style={styles.statusCard}>
-                <div style={styles.statusTop}>
-                  <span style={styles.sectionLabel}>
-                    ROUTE ENGINE
-                  </span>
-
-                  <span style={styles.readyBadge}>
-                    READY
-                  </span>
-                </div>
-
-                <h2 style={styles.statusTitle}>
-                  Ready for submission.
-                </h2>
-
-                <p style={styles.statusText}>
-                  The live engine will generate a unique
-                  RID, commit the payment declaration,
-                  evaluate the route, sign the receipt,
-                  and preserve version one.
-                </p>
-
-                <div style={styles.checkList}>
-                  <Check label="Unique route identity" />
-                  <Check label="Deterministic evaluation" />
-                  <Check label="Signed test receipt" />
-                  <Check label="Versioned persistence" />
-                  <Check label="Correlation identifier" />
-                </div>
-              </div>
-            ) : null}
-
-            {error ? (
-              <div style={styles.errorCard}>
-                <div style={styles.statusTop}>
-                  <span style={styles.sectionLabel}>
-                    SUBMISSION FAILURE
-                  </span>
-
-                  <span style={styles.errorBadge}>
-                    ERROR
-                  </span>
-                </div>
-
-                <h2 style={styles.statusTitle}>
-                  The route was not created.
-                </h2>
-
-                <p style={styles.errorText}>
-                  {error}
-                </p>
-
-                {correlationId ? (
-                  <div style={styles.identityBlock}>
-                    <span style={styles.identityLabel}>
-                      CORRELATION ID
-                    </span>
-
-                    <code style={styles.identityValue}>
-                      {correlationId}
-                    </code>
-                  </div>
-                ) : null}
-
-                <p style={styles.statusText}>
-                  Correct the manifest or inspect the
-                  corresponding Vercel Function log before
-                  changing backend code.
-                </p>
-              </div>
-            ) : null}
-
-            {result ? (
-              <div style={styles.resultCard}>
-                <div style={styles.statusTop}>
-                  <span style={styles.sectionLabel}>
-                    SIGNED ROUTE RECEIPT
-                  </span>
-
-                  <span
-                    style={{
-                      ...styles.decisionBadge,
-                      ...decisionColors[
-                        result.decision
-                      ],
-                    }}
-                  >
-                    {result.decision}
-                  </span>
-                </div>
-
-                <h2 style={styles.resultTitle}>
-                  Route created and preserved.
-                </h2>
-
-                <div style={styles.identityBlock}>
-                  <span style={styles.identityLabel}>
-                    ROUTE IDENTITY
-                  </span>
-
-                  <code style={styles.ridValue}>
-                    {result.rid}
-                  </code>
-                </div>
-
-                <div style={styles.details}>
-                  <Detail
-                    label="Organization"
-                    value={result.organizationName}
-                  />
-
-                  <Detail
-                    label="System"
-                    value={result.systemName}
-                  />
-
-                  <Detail
-                    label="Version"
-                    value={String(result.version)}
-                  />
-
-                  <Detail
-                    label="Decision"
-                    value={result.decision}
-                  />
-
-                  <Detail
-                    label="Correlation"
-                    value={result.correlationId}
-                  />
-                </div>
-
-                {result.decision === "HOLD" ? (
-                  <div style={styles.holdNotice}>
-                    <strong>
-                      Expected initial result
-                    </strong>
-
-                    <p style={styles.holdText}>
-                      This vendor-payment route begins on
-                      HOLD because dual authority and
-                      beneficiary verification have not
-                      yet been supplied. The original HOLD
-                      must remain preserved when the route
-                      is corrected.
-                    </p>
-                  </div>
-                ) : null}
-
-                <div style={styles.resultActions}>
-                  <Link
-                    href={`/records?rid=${encodeURIComponent(
-                      result.rid,
-                    )}`}
-                    style={styles.primaryLink}
-                  >
-                    Open Route Records
-                  </Link>
-
-                  <Link
-                    href={`/verification?rid=${encodeURIComponent(
-                      result.rid,
-                    )}`}
-                    style={styles.secondaryLink}
-                  >
-                    Verify RID
-                  </Link>
-                </div>
-              </div>
-            ) : null}
-
-            <div style={styles.principleCard}>
-              <span style={styles.sectionLabelLight}>
-                GOVERNING PRINCIPLE
-              </span>
-
-              <strong style={styles.principle}>
-                NO ADMISSIBLE EVIDENCE.
-                <br />
-                NO ADMISSIBLE EXECUTION.
-              </strong>
             </div>
           </aside>
         </section>
-      )}
-    </main>
+
+        <section
+          style={styles.chain}
+          aria-label="TA-14 canonical route chain"
+        >
+          {chain.map((item) => {
+            const hasValue =
+              draft &&
+              draft.chain[item.key] !== "UNKNOWN";
+
+            const active =
+              selectedStage === item.key;
+
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={() =>
+                  setSelectedStage(item.key)
+                }
+                style={{
+                  ...styles.chainItem,
+                  ...(active
+                    ? styles.chainItemActive
+                    : {}),
+                }}
+              >
+                <span style={styles.chainIndex}>
+                  {item.number}
+                </span>
+
+                <span>{item.label}</span>
+
+                {draft ? (
+                  <span
+                    style={{
+                      ...styles.chainState,
+                      ...(hasValue
+                        ? styles.chainComplete
+                        : styles.chainUnknown),
+                    }}
+                  >
+                    {hasValue ? "✓" : "○"}
+                  </span>
+                ) : (
+                  <span />
+                )}
+              </button>
+            );
+          })}
+        </section>
+
+        {draftLoaded && draft ? (
+          <section style={styles.transferSection}>
+            <div style={styles.transferHeader}>
+              <div>
+                <span style={styles.sectionLabel}>
+                  TRANSFERRED ROUTE MANIFEST
+                </span>
+
+                <h2 style={styles.transferTitle}>
+                  {draft.metadata.name}
+                </h2>
+
+                <p style={styles.transferIntro}>
+                  This is the route definition preserved by
+                  the builder. Declared content is not proof
+                  that the underlying evidence, continuity,
+                  authority, execution, or outcome exists.
+                </p>
+              </div>
+
+              <div style={styles.transferActions}>
+                <Link
+                  href="/workspace/build"
+                  style={styles.secondaryLink}
+                >
+                  ← Return to builder
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={removeTransferredDraft}
+                  style={styles.clearDraftButton}
+                >
+                  Remove transferred route
+                </button>
+              </div>
+            </div>
+
+            <div style={styles.transferGrid}>
+              <div style={styles.transferChain}>
+                {chain.map((item) => (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={() =>
+                      setSelectedStage(item.key)
+                    }
+                    style={{
+                      ...styles.transferStage,
+                      ...(selectedStage === item.key
+                        ? styles.transferStageActive
+                        : {}),
+                    }}
+                  >
+                    <span style={styles.transferNumber}>
+                      {item.number}
+                    </span>
+
+                    <span>{item.label}</span>
+
+                    <span style={styles.transferCheck}>
+                      {draft.chain[item.key] !==
+                      "UNKNOWN"
+                        ? "✓"
+                        : "○"}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <article style={styles.stageReview}>
+                <div style={styles.stageReviewTop}>
+                  <div>
+                    <span style={styles.sectionLabel}>
+                      STAGE{" "}
+                      {selectedStageDefinition.number}
+                    </span>
+
+                    <h3 style={styles.stageReviewTitle}>
+                      {selectedStageDefinition.label}
+                    </h3>
+                  </div>
+
+                  <span style={styles.declaredBadge}>
+                    DECLARED
+                  </span>
+                </div>
+
+                <p style={styles.stageValue}>
+                  {selectedStageValue}
+                </p>
+
+                <div style={styles.stageBoundary}>
+                  <strong>
+                    Evaluation boundary
+                  </strong>
+
+                  <p style={styles.boundaryParagraph}>
+                    This statement came from the route
+                    builder. The evaluator must still
+                    determine whether supporting evidence,
+                    continuity, authority, binding,
+                    execution correspondence, and outcome
+                    correspondence are admissible.
+                  </p>
+                </div>
+              </article>
+
+              <aside style={styles.routeMetadata}>
+                <span style={styles.sectionLabel}>
+                  ROUTE METADATA
+                </span>
+
+                <div style={styles.metadataList}>
+                  <MetadataRow
+                    label="Route"
+                    value={draft.metadata.name}
+                  />
+
+                  <MetadataRow
+                    label="Domain"
+                    value={draft.metadata.domain}
+                  />
+
+                  <MetadataRow
+                    label="Owner"
+                    value={draft.metadata.owner}
+                  />
+
+                  <MetadataRow
+                    label="State"
+                    value={draft.status}
+                  />
+
+                  <MetadataRow
+                    label="Schema"
+                    value={draft.schema}
+                  />
+
+                  <MetadataRow
+                    label="Draft ID"
+                    value={draft.routeId}
+                  />
+
+                  <MetadataRow
+                    label="Version"
+                    value={String(
+                      draft.metadata.version,
+                    )}
+                  />
+
+                  <MetadataRow
+                    label="Stages"
+                    value={`${draft.readiness.completedStages}/${draft.readiness.totalStages}`}
+                  />
+                </div>
+              </aside>
+            </div>
+          </section>
+        ) : null}
+
+        {draft && aiGovernanceCompatible ? (
+          <section style={styles.adapterSection}>
+            <div style={styles.adapterHeader}>
+              <div>
+                <span style={styles.adapterEyebrow}>
+                  AI GOVERNANCE ADAPTER
+                </span>
+
+                <h2 style={styles.adapterTitle}>
+                  The route is connected to its compatible
+                  evaluation lane.
+                </h2>
+
+                <p style={styles.adapterText}>
+                  This route is evaluated as an AI
+                  Governance route. It is not submitted to
+                  the vendor-payment API, and no supplier,
+                  invoice, beneficiary, payment value, or
+                  financial record is invented.
+                </p>
+              </div>
+
+              <div style={styles.adapterState}>
+                <span style={styles.adapterStateLabel}>
+                  ROUTE STATE
+                </span>
+
+                <strong style={styles.adapterStateValue}>
+                  PRESERVED · ADAPTER CONNECTED
+                </strong>
+
+                <p style={styles.adapterStateText}>
+                  Declared route content remains subject to
+                  evidence, authority, execution, and
+                  outcome verification.
+                </p>
+              </div>
+            </div>
+
+            <AiGovernanceEvaluationPanel draft={draft} />
+          </section>
+        ) : null}
+
+        {draft && !hasRegisteredAdapter ? (
+          <section style={styles.adapterBoundary}>
+            <div>
+              <span style={styles.adapterEyebrow}>
+                DOMAIN ADAPTER BOUNDARY
+              </span>
+
+              <h2 style={styles.adapterTitle}>
+                The route transferred correctly. The
+                evaluator for this domain has not been
+                connected yet.
+              </h2>
+
+              <p style={styles.adapterText}>
+                This is a {draft.metadata.domain} route. The
+                current production API evaluates the
+                vendor-payment route schema. TA-14 will not
+                relabel this route as a payment or submit
+                invented supplier, invoice, beneficiary, or
+                financial values merely to force it through
+                an incompatible engine.
+              </p>
+            </div>
+
+            <div style={styles.adapterState}>
+              <span style={styles.adapterStateLabel}>
+                ROUTE STATE
+              </span>
+
+              <strong style={styles.adapterStateValue}>
+                PRESERVED · ADAPTER REQUIRED
+              </strong>
+
+              <p style={styles.adapterStateText}>
+                The complete route remains available above
+                for review and future domain-adapter
+                integration.
+              </p>
+            </div>
+          </section>
+        ) : null}
+
+        {(!draft || vendorPaymentCompatible) && (
+          <section style={styles.workspaceGrid}>
+            <form
+              onSubmit={submitRoute}
+              style={styles.formCard}
+            >
+              <div style={styles.formHeader}>
+                <div>
+                  <span style={styles.sectionLabel}>
+                    LIVE VENDOR-PAYMENT MANIFEST
+                  </span>
+
+                  <h2 style={styles.formTitle}>
+                    Define the proposed execution.
+                  </h2>
+                </div>
+
+                <span style={styles.liveBadge}>
+                  LIVE API
+                </span>
+              </div>
+
+              {draft ? (
+                <div style={styles.mappingNotice}>
+                  <strong>
+                    Compatible builder route detected
+                  </strong>
+
+                  <p style={styles.boundaryParagraph}>
+                    The transferred route is categorized as
+                    a finance or vendor-payment route. The
+                    payment manifest remains explicit
+                    because organization, actor, supplier,
+                    invoice, beneficiary, and amount must be
+                    bound to the API submission.
+                  </p>
+                </div>
+              ) : null}
+
+              <div style={styles.fieldGrid}>
+                <Field
+                  label="Organization name"
+                  value={form.organizationName}
+                  placeholder="Organization"
+                  onChange={(value) =>
+                    updateField(
+                      "organizationName",
+                      value,
+                    )
+                  }
+                />
+
+                <Field
+                  label="System name"
+                  value={form.systemName}
+                  placeholder="System"
+                  onChange={(value) =>
+                    updateField("systemName", value)
+                  }
+                />
+
+                <Field
+                  label="Actor ID"
+                  value={form.actorId}
+                  placeholder="ACTOR-..."
+                  onChange={(value) =>
+                    updateField("actorId", value)
+                  }
+                />
+
+                <Field
+                  label="Supplier ID"
+                  value={form.supplierId}
+                  placeholder="SUPPLIER-..."
+                  onChange={(value) =>
+                    updateField("supplierId", value)
+                  }
+                />
+
+                <Field
+                  label="Invoice ID"
+                  value={form.invoiceId}
+                  placeholder="INVOICE-..."
+                  onChange={(value) =>
+                    updateField("invoiceId", value)
+                  }
+                />
+
+                <Field
+                  label="Beneficiary ID"
+                  value={form.beneficiaryId}
+                  placeholder="BENEFICIARY-..."
+                  onChange={(value) =>
+                    updateField(
+                      "beneficiaryId",
+                      value,
+                    )
+                  }
+                />
+
+                <Field
+                  label="Amount in USD"
+                  value={form.amountUsd}
+                  placeholder="27500"
+                  type="number"
+                  onChange={(value) =>
+                    updateField("amountUsd", value)
+                  }
+                />
+              </div>
+
+              <div style={styles.boundaryNotice}>
+                <strong>
+                  Demonstration boundary
+                </strong>
+
+                <p style={styles.boundaryParagraph}>
+                  This creates a self-declared
+                  vendor-payment demonstration route.
+                  Supplier, invoice, bypass, replay,
+                  duplicate-payment, execution, and outcome
+                  observations may include labeled
+                  demonstration fixtures. This is not
+                  independent certification or legal
+                  approval.
+                </p>
+              </div>
+
+              <div style={styles.formActions}>
+                <button
+                  type="submit"
+                  disabled={submitting}
+                  style={{
+                    ...styles.primaryButton,
+                    ...(submitting
+                      ? styles.disabledButton
+                      : {}),
+                  }}
+                >
+                  {submitting
+                    ? "Creating and signing route..."
+                    : "Create Live TA-14 Route"}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={clearForm}
+                  style={styles.secondaryButton}
+                >
+                  Clear Manifest
+                </button>
+              </div>
+            </form>
+
+            <aside style={styles.sideColumn}>
+              {!result && !error ? (
+                <section style={styles.statusCard}>
+                  <div style={styles.statusTop}>
+                    <span style={styles.sectionLabel}>
+                      ROUTE ENGINE
+                    </span>
+
+                    <span style={styles.readyBadge}>
+                      READY
+                    </span>
+                  </div>
+
+                  <h2 style={styles.statusTitle}>
+                    Ready for submission.
+                  </h2>
+
+                  <p style={styles.statusText}>
+                    The live vendor-payment engine will
+                    generate a unique RID, commit the
+                    payment declaration, evaluate the
+                    route, sign the receipt, and preserve
+                    version one.
+                  </p>
+
+                  <div style={styles.checkList}>
+                    <Check label="Vendor-payment schema" />
+                    <Check label="Deterministic evaluation" />
+                    <Check label="Signed test receipt" />
+                    <Check label="Preserved route version" />
+                  </div>
+                </section>
+              ) : null}
+
+              {error ? (
+                <section style={styles.errorCard}>
+                  <div style={styles.statusTop}>
+                    <span style={styles.sectionLabel}>
+                      SUBMISSION FAILURE
+                    </span>
+
+                    <span style={styles.errorBadge}>
+                      ERROR
+                    </span>
+                  </div>
+
+                  <h2 style={styles.statusTitle}>
+                    The route was not created.
+                  </h2>
+
+                  <p style={styles.errorText}>
+                    {error}
+                  </p>
+
+                  {correlationId ? (
+                    <div style={styles.identityBlock}>
+                      <span style={styles.identityLabel}>
+                        CORRELATION ID
+                      </span>
+
+                      <code
+                        style={styles.identityValue}
+                      >
+                        {correlationId}
+                      </code>
+                    </div>
+                  ) : null}
+
+                  <p style={styles.statusText}>
+                    Correct the manifest or inspect the
+                    corresponding Vercel Function log
+                    before changing backend code.
+                  </p>
+                </section>
+              ) : null}
+
+              {result ? (
+                <section style={styles.resultCard}>
+                  <div style={styles.statusTop}>
+                    <span style={styles.sectionLabel}>
+                      SIGNED ROUTE RECEIPT
+                    </span>
+
+                    <span
+                      style={{
+                        ...styles.decisionBadge,
+                        ...decisionColors[
+                          result.decision
+                        ],
+                      }}
+                    >
+                      {result.decision}
+                    </span>
+                  </div>
+
+                  <h2 style={styles.resultTitle}>
+                    Route created and preserved.
+                  </h2>
+
+                  <div style={styles.identityBlock}>
+                    <span style={styles.identityLabel}>
+                      ROUTE IDENTITY
+                    </span>
+
+                    <code style={styles.ridValue}>
+                      {result.rid}
+                    </code>
+                  </div>
+
+                  <div style={styles.details}>
+                    <Detail
+                      label="Organization"
+                      value={result.organizationName}
+                    />
+
+                    <Detail
+                      label="System"
+                      value={result.systemName}
+                    />
+
+                    <Detail
+                      label="Version"
+                      value={String(result.version)}
+                    />
+
+                    <Detail
+                      label="Created"
+                      value={result.createdAt}
+                    />
+
+                    <Detail
+                      label="Correlation"
+                      value={result.correlationId}
+                    />
+                  </div>
+
+                  {result.decision === "HOLD" ? (
+                    <div style={styles.holdNotice}>
+                      <strong>
+                        Expected initial result
+                      </strong>
+
+                      <p
+                        style={
+                          styles.boundaryParagraph
+                        }
+                      >
+                        This vendor-payment route begins on
+                        HOLD because dual authority and
+                        beneficiary verification have not
+                        yet been supplied. The original HOLD
+                        must remain preserved when the route
+                        is corrected.
+                      </p>
+                    </div>
+                  ) : null}
+
+                  <div style={styles.resultActions}>
+                    <Link
+                      href="/workspace/routes"
+                      style={styles.primaryLink}
+                    >
+                      Open Route Records
+                    </Link>
+
+                    <Link
+                      href="/verify"
+                      style={styles.secondaryLink}
+                    >
+                      Verify RID
+                    </Link>
+                  </div>
+                </section>
+              ) : null}
+
+              <PrincipleCard />
+            </aside>
+          </section>
+        )}
+
+        {draft && !vendorPaymentCompatible ? (
+          <section style={styles.principleSection}>
+            <PrincipleCard />
+          </section>
+        ) : null}
+      </main>
+    </div>
   );
 }
 
@@ -1084,9 +1163,12 @@ function Field({
       </span>
 
       <input
+        required
         type={type}
         value={value}
         placeholder={placeholder}
+        min={type === "number" ? "0.01" : undefined}
+        step={type === "number" ? "0.01" : undefined}
         onChange={(event) =>
           onChange(event.target.value)
         }
@@ -1096,11 +1178,7 @@ function Field({
   );
 }
 
-function Check({
-  label,
-}: {
-  label: string;
-}) {
+function Check({ label }: { label: string }) {
   return (
     <div style={styles.checkItem}>
       <span style={styles.checkMark}>✓</span>
@@ -1118,11 +1196,13 @@ function Detail({
 }) {
   return (
     <div style={styles.detailRow}>
-      <span style={styles.detailLabel}>
+      <dt style={styles.detailLabel}>
         {label}
-      </span>
+      </dt>
 
-      <p style={styles.detailValue}>{value}</p>
+      <dd style={styles.detailValue}>
+        {value}
+      </dd>
     </div>
   );
 }
@@ -1140,9 +1220,9 @@ function PreviewDetail({
         {label}
       </span>
 
-      <strong style={styles.previewDetailValue}>
+      <span style={styles.previewDetailValue}>
         {value}
-      </strong>
+      </span>
     </div>
   );
 }
@@ -1160,14 +1240,30 @@ function MetadataRow({
         {label}
       </span>
 
-      <strong style={styles.metadataValue}>
+      <span style={styles.metadataValue}>
         {value}
-      </strong>
+      </span>
     </div>
   );
 }
 
-const styles: Record<string, React.CSSProperties> = {
+function PrincipleCard() {
+  return (
+    <section style={styles.principleCard}>
+      <span style={styles.sectionLabelLight}>
+        GOVERNING PRINCIPLE
+      </span>
+
+      <strong style={styles.principle}>
+        NO ADMISSIBLE EVIDENCE.
+        <br />
+        NO ADMISSIBLE EXECUTION.
+      </strong>
+    </section>
+  );
+}
+
+const styles: Record<string, CSSProperties> = {
   page: {
     minHeight: "100vh",
     background: "#f4f5f7",
@@ -1175,12 +1271,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontFamily:
       'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   },
-
   header: {
     position: "sticky",
     top: 0,
     zIndex: 40,
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
     gap: 24,
@@ -1189,7 +1285,6 @@ const styles: Record<string, React.CSSProperties> = {
     background: "rgba(244,245,247,0.96)",
     backdropFilter: "blur(16px)",
   },
-
   brand: {
     display: "flex",
     alignItems: "center",
@@ -1197,7 +1292,6 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#111827",
     textDecoration: "none",
   },
-
   brandMark: {
     display: "grid",
     placeItems: "center",
@@ -1208,53 +1302,47 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#ffffff",
     fontWeight: 900,
   },
-
   brandTitle: {
     display: "block",
     fontSize: 13,
     letterSpacing: "0.08em",
   },
-
   brandSub: {
     display: "block",
     marginTop: 3,
     color: "#697386",
     fontSize: 11,
   },
-
   nav: {
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "flex-end",
     gap: 18,
   },
-
   navLink: {
     color: "#374151",
     fontSize: 14,
     fontWeight: 750,
     textDecoration: "none",
   },
-
   breadcrumbs: {
     display: "flex",
+    flexWrap: "wrap",
     gap: 10,
     padding: "16px clamp(20px, 6vw, 92px)",
     borderBottom: "1px solid #e2e5ea",
     color: "#6b7280",
     fontSize: 13,
   },
-
   breadcrumbLink: {
     color: "#067a58",
     fontWeight: 800,
     textDecoration: "none",
   },
-
   hero: {
     display: "grid",
     gridTemplateColumns:
-      "minmax(0, 1fr) minmax(300px, 0.42fr)",
+      "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
     gap: 42,
     alignItems: "end",
     padding:
@@ -1262,14 +1350,12 @@ const styles: Record<string, React.CSSProperties> = {
     background:
       "radial-gradient(circle at 84% 18%, rgba(110,231,183,0.25), transparent 30%), linear-gradient(180deg,#ffffff 0%,#f4f5f7 100%)",
   },
-
   eyebrow: {
     color: "#067a58",
     fontSize: 12,
     fontWeight: 900,
     letterSpacing: "0.17em",
   },
-
   heroTitle: {
     maxWidth: 930,
     margin: "16px 0",
@@ -1277,7 +1363,6 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 0.98,
     letterSpacing: "-0.055em",
   },
-
   heroText: {
     maxWidth: 850,
     marginBottom: 0,
@@ -1285,7 +1370,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: "clamp(17px, 2vw, 21px)",
     lineHeight: 1.65,
   },
-
   routePreview: {
     padding: 26,
     border: "1px solid #d9dde4",
@@ -1294,7 +1378,6 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow:
       "0 18px 55px rgba(15,23,42,0.07)",
   },
-
   previewLabel: {
     display: "block",
     color: "#6b7280",
@@ -1302,7 +1385,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 900,
     letterSpacing: "0.14em",
   },
-
   previewTitle: {
     display: "block",
     margin: "14px 0 18px",
@@ -1310,12 +1392,9 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.1,
     letterSpacing: "-0.035em",
   },
-
   previewDetails: {
     display: "grid",
-    gap: 0,
   },
-
   previewDetail: {
     display: "grid",
     gridTemplateColumns: "95px minmax(0, 1fr)",
@@ -1323,20 +1402,17 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "10px 0",
     borderTop: "1px solid #edf0f3",
   },
-
   previewDetailLabel: {
     color: "#7b8491",
     fontSize: 11,
     fontWeight: 750,
   },
-
   previewDetailValue: {
     color: "#17202e",
     fontSize: 11,
     textAlign: "right",
     overflowWrap: "anywhere",
   },
-
   chain: {
     display: "grid",
     gridTemplateColumns:
@@ -1346,7 +1422,6 @@ const styles: Record<string, React.CSSProperties> = {
     borderBottom: "1px solid #d9dde4",
     background: "#ffffff",
   },
-
   chainItem: {
     display: "grid",
     gridTemplateColumns: "24px 1fr 24px",
@@ -1363,18 +1438,15 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "left",
     cursor: "pointer",
   },
-
   chainItemActive: {
     background: "#eaf8f2",
     color: "#075f47",
   },
-
   chainIndex: {
     color: "#067a58",
     fontSize: 9,
     fontWeight: 900,
   },
-
   chainState: {
     display: "grid",
     placeItems: "center",
@@ -1384,36 +1456,31 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 11,
     fontWeight: 900,
   },
-
   chainComplete: {
     background: "#d1fae5",
     color: "#065f46",
   },
-
   chainUnknown: {
     background: "#edf0f3",
     color: "#8a93a2",
   },
-
   transferSection: {
     padding:
       "clamp(34px, 5vw, 66px) clamp(20px, 6vw, 92px)",
   },
-
   transferHeader: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "flex-start",
     gap: 28,
     marginBottom: 24,
   },
-
   transferTitle: {
     margin: "9px 0 10px",
     fontSize: "clamp(30px, 4vw, 48px)",
     letterSpacing: "-0.045em",
   },
-
   transferIntro: {
     maxWidth: 740,
     marginBottom: 0,
@@ -1421,14 +1488,12 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 15,
     lineHeight: 1.65,
   },
-
   transferActions: {
     display: "flex",
     flexWrap: "wrap",
     justifyContent: "flex-end",
     gap: 10,
   },
-
   clearDraftButton: {
     padding: "12px 16px",
     border: "1px solid #e4b8b8",
@@ -1439,15 +1504,13 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 800,
     cursor: "pointer",
   },
-
   transferGrid: {
     display: "grid",
     gridTemplateColumns:
-      "250px minmax(0, 1fr) 280px",
+      "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
     gap: 18,
     alignItems: "stretch",
   },
-
   transferChain: {
     display: "grid",
     alignContent: "start",
@@ -1457,14 +1520,13 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 15,
     background: "#ffffff",
   },
-
   transferStage: {
     display: "grid",
     gridTemplateColumns: "34px 1fr 24px",
     alignItems: "center",
     gap: 8,
     width: "100%",
-    padding: "12px",
+    padding: 12,
     border: "1px solid transparent",
     borderRadius: 10,
     background: "#ffffff",
@@ -1474,25 +1536,22 @@ const styles: Record<string, React.CSSProperties> = {
     textAlign: "left",
     cursor: "pointer",
   },
-
   transferStageActive: {
     borderColor: "#a9dbc9",
     background: "#eaf8f2",
     color: "#064e3b",
   },
-
   transferNumber: {
     color: "#07805d",
     fontSize: 10,
     fontWeight: 900,
   },
-
   transferCheck: {
     color: "#07805d",
     fontWeight: 900,
   },
-
   stageReview: {
+    minWidth: 0,
     padding: "clamp(24px, 4vw, 40px)",
     border: "1px solid #d9dde4",
     borderRadius: 15,
@@ -1500,20 +1559,18 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow:
       "0 18px 55px rgba(15,23,42,0.05)",
   },
-
   stageReviewTop: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 20,
     alignItems: "flex-start",
   },
-
   stageReviewTitle: {
     margin: "8px 0 0",
     fontSize: "clamp(28px, 4vw, 45px)",
     letterSpacing: "-0.045em",
   },
-
   declaredBadge: {
     padding: "7px 10px",
     borderRadius: 999,
@@ -1522,15 +1579,14 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontWeight: 900,
   },
-
   stageValue: {
     minHeight: 145,
     margin: "34px 0 22px",
     color: "#17202e",
     fontSize: 19,
     lineHeight: 1.7,
+    overflowWrap: "anywhere",
   },
-
   stageBoundary: {
     padding: 18,
     border: "1px solid #d8dce3",
@@ -1540,21 +1596,26 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     lineHeight: 1.65,
   },
-
+  boundaryParagraph: {
+    marginBottom: 0,
+    lineHeight: 1.65,
+  },
   routeMetadata: {
+    minWidth: 0,
     padding: 22,
     border: "1px solid #d9dde4",
     borderRadius: 15,
     background: "#ffffff",
   },
-
+  metadataList: {
+    marginTop: 12,
+  },
   metadataRow: {
     display: "grid",
     gap: 5,
     padding: "13px 0",
     borderBottom: "1px solid #edf0f3",
   },
-
   metadataLabel: {
     color: "#7b8491",
     fontSize: 10,
@@ -1562,17 +1623,32 @@ const styles: Record<string, React.CSSProperties> = {
     letterSpacing: "0.06em",
     textTransform: "uppercase",
   },
-
   metadataValue: {
     color: "#1f2937",
     fontSize: 12,
     overflowWrap: "anywhere",
   },
-
+  adapterSection: {
+    display: "grid",
+    gap: 24,
+    margin:
+      "0 clamp(20px, 6vw, 92px) clamp(40px, 7vw, 90px)",
+  },
+  adapterHeader: {
+    display: "grid",
+    gridTemplateColumns:
+      "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
+    gap: 28,
+    padding: "clamp(28px, 5vw, 50px)",
+    border: "1px solid #8fd9bf",
+    borderRadius: 18,
+    background:
+      "linear-gradient(135deg,#f5fffb 0%,#e8f8f1 100%)",
+  },
   adapterBoundary: {
     display: "grid",
     gridTemplateColumns:
-      "minmax(0, 1.25fr) minmax(280px, 0.75fr)",
+      "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
     gap: 28,
     margin:
       "0 clamp(20px, 6vw, 92px) clamp(40px, 7vw, 90px)",
@@ -1582,14 +1658,12 @@ const styles: Record<string, React.CSSProperties> = {
     background:
       "linear-gradient(135deg,#fffdf4 0%,#fff8df 100%)",
   },
-
   adapterEyebrow: {
-    color: "#8a6200",
+    color: "#067a58",
     fontSize: 11,
     fontWeight: 900,
     letterSpacing: "0.15em",
   },
-
   adapterTitle: {
     maxWidth: 820,
     margin: "14px 0",
@@ -1597,22 +1671,19 @@ const styles: Record<string, React.CSSProperties> = {
     lineHeight: 1.04,
     letterSpacing: "-0.045em",
   },
-
   adapterText: {
     maxWidth: 820,
     marginBottom: 0,
-    color: "#6d5a28",
+    color: "#52675f",
     fontSize: 15,
     lineHeight: 1.75,
   },
-
   adapterState: {
     padding: 24,
     borderRadius: 14,
     background: "#111827",
     color: "#ffffff",
   },
-
   adapterStateLabel: {
     display: "block",
     color: "#a8b2c1",
@@ -1620,7 +1691,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 900,
     letterSpacing: "0.14em",
   },
-
   adapterStateValue: {
     display: "block",
     margin: "17px 0",
@@ -1628,25 +1698,23 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 19,
     lineHeight: 1.4,
   },
-
   adapterStateText: {
     marginBottom: 0,
     color: "#c4ccd8",
     fontSize: 13,
     lineHeight: 1.65,
   },
-
   workspaceGrid: {
     display: "grid",
     gridTemplateColumns:
-      "minmax(0, 1.35fr) minmax(320px, 0.65fr)",
+      "repeat(auto-fit, minmax(min(100%, 340px), 1fr))",
     gap: 24,
     alignItems: "start",
     padding:
       "clamp(34px, 5vw, 70px) clamp(20px, 6vw, 92px)",
   },
-
   formCard: {
+    minWidth: 0,
     padding: "clamp(22px, 4vw, 38px)",
     border: "1px solid #d9dde4",
     borderRadius: 17,
@@ -1654,35 +1722,31 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow:
       "0 18px 55px rgba(15,23,42,0.05)",
   },
-
   formHeader: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     gap: 20,
     alignItems: "flex-start",
     marginBottom: 28,
   },
-
   sectionLabel: {
     color: "#697386",
     fontSize: 10,
     fontWeight: 900,
     letterSpacing: "0.14em",
   },
-
   sectionLabelLight: {
     color: "#9aa8b9",
     fontSize: 10,
     fontWeight: 900,
     letterSpacing: "0.14em",
   },
-
   formTitle: {
     margin: "8px 0 0",
     fontSize: "clamp(28px, 3vw, 42px)",
     letterSpacing: "-0.04em",
   },
-
   liveBadge: {
     padding: "7px 10px",
     borderRadius: 999,
@@ -1691,7 +1755,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontWeight: 900,
   },
-
   mappingNotice: {
     marginBottom: 24,
     padding: 18,
@@ -1702,26 +1765,22 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     lineHeight: 1.65,
   },
-
   fieldGrid: {
     display: "grid",
     gridTemplateColumns:
-      "repeat(auto-fit, minmax(240px, 1fr))",
+      "repeat(auto-fit, minmax(min(100%, 240px), 1fr))",
     gap: 18,
   },
-
   field: {
     display: "grid",
     gap: 8,
     marginBottom: 18,
   },
-
   fieldLabel: {
     color: "#374151",
     fontSize: 13,
     fontWeight: 800,
   },
-
   input: {
     width: "100%",
     boxSizing: "border-box",
@@ -1733,7 +1792,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 14,
     outline: "none",
   },
-
   boundaryNotice: {
     marginTop: 8,
     padding: 18,
@@ -1743,53 +1801,41 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#475569",
     fontSize: 13,
   },
-
-  boundaryText: {
-    marginBottom: 0,
-    color: "#5b6472",
-    fontSize: 13,
-    lineHeight: 1.65,
-  },
-
   formActions: {
     display: "flex",
     flexWrap: "wrap",
     gap: 12,
     marginTop: 22,
   },
-
   primaryButton: {
+    padding: "14px 20px",
     border: 0,
     borderRadius: 9,
     background: "#111827",
     color: "#ffffff",
-    padding: "14px 20px",
     fontSize: 14,
     fontWeight: 850,
     cursor: "pointer",
   },
-
   disabledButton: {
     opacity: 0.55,
     cursor: "not-allowed",
   },
-
   secondaryButton: {
+    padding: "13px 20px",
     border: "1px solid #cbd1d9",
     borderRadius: 9,
     background: "#ffffff",
     color: "#111827",
-    padding: "13px 20px",
     fontSize: 14,
     fontWeight: 800,
     cursor: "pointer",
   },
-
   sideColumn: {
     display: "grid",
+    minWidth: 0,
     gap: 18,
   },
-
   statusCard: {
     padding: 24,
     border: "1px solid #d9dde4",
@@ -1798,7 +1844,6 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow:
       "0 18px 55px rgba(15,23,42,0.05)",
   },
-
   resultCard: {
     padding: 24,
     border: "1px solid #93d8c1",
@@ -1807,7 +1852,6 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow:
       "0 18px 55px rgba(6,122,88,0.09)",
   },
-
   errorCard: {
     padding: 24,
     border: "1px solid #fecaca",
@@ -1816,14 +1860,13 @@ const styles: Record<string, React.CSSProperties> = {
     boxShadow:
       "0 18px 55px rgba(153,27,27,0.08)",
   },
-
   statusTop: {
     display: "flex",
+    flexWrap: "wrap",
     justifyContent: "space-between",
     alignItems: "center",
     gap: 12,
   },
-
   readyBadge: {
     padding: "7px 10px",
     borderRadius: 999,
@@ -1832,7 +1875,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontWeight: 900,
   },
-
   errorBadge: {
     padding: "7px 10px",
     borderRadius: 999,
@@ -1841,34 +1883,29 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 10,
     fontWeight: 900,
   },
-
   decisionBadge: {
     padding: "7px 10px",
     borderRadius: 999,
     fontSize: 10,
     fontWeight: 900,
   },
-
   statusTitle: {
     margin: "22px 0 10px",
     fontSize: 25,
     lineHeight: 1.15,
     letterSpacing: "-0.03em",
   },
-
   resultTitle: {
     margin: "22px 0 18px",
     fontSize: 28,
     lineHeight: 1.1,
     letterSpacing: "-0.04em",
   },
-
   statusText: {
     color: "#667085",
     fontSize: 14,
     lineHeight: 1.65,
   },
-
   errorText: {
     padding: 15,
     borderRadius: 9,
@@ -1877,13 +1914,11 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     lineHeight: 1.6,
   },
-
   checkList: {
     display: "grid",
     gap: 11,
     marginTop: 20,
   },
-
   checkItem: {
     display: "flex",
     alignItems: "center",
@@ -1892,7 +1927,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 13,
     fontWeight: 700,
   },
-
   checkMark: {
     display: "grid",
     placeItems: "center",
@@ -1904,7 +1938,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontWeight: 900,
   },
-
   identityBlock: {
     display: "grid",
     gap: 8,
@@ -1913,33 +1946,27 @@ const styles: Record<string, React.CSSProperties> = {
     borderRadius: 10,
     background: "#0b1020",
   },
-
   identityLabel: {
     color: "#93a4bc",
     fontSize: 9,
     fontWeight: 900,
     letterSpacing: "0.14em",
   },
-
   identityValue: {
     color: "#ffffff",
     fontSize: 12,
     overflowWrap: "anywhere",
   },
-
   ridValue: {
     color: "#69f0c1",
     fontSize: 16,
     fontWeight: 800,
     overflowWrap: "anywhere",
   },
-
   details: {
     display: "grid",
-    gap: 0,
     margin: "20px 0",
   },
-
   detailRow: {
     display: "grid",
     gridTemplateColumns:
@@ -1948,13 +1975,11 @@ const styles: Record<string, React.CSSProperties> = {
     padding: "11px 0",
     borderBottom: "1px solid #edf0f3",
   },
-
   detailLabel: {
     color: "#77808f",
     fontSize: 12,
     fontWeight: 750,
   },
-
   detailValue: {
     margin: 0,
     color: "#1f2937",
@@ -1962,7 +1987,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 750,
     overflowWrap: "anywhere",
   },
-
   holdNotice: {
     padding: 16,
     border: "1px solid #f2d18a",
@@ -1971,19 +1995,12 @@ const styles: Record<string, React.CSSProperties> = {
     color: "#92400e",
     fontSize: 13,
   },
-
-  holdText: {
-    marginBottom: 0,
-    lineHeight: 1.6,
-  },
-
   resultActions: {
     display: "flex",
     flexWrap: "wrap",
     gap: 10,
     marginTop: 20,
   },
-
   primaryLink: {
     display: "inline-flex",
     justifyContent: "center",
@@ -1995,7 +2012,6 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 850,
     textDecoration: "none",
   },
-
   secondaryLink: {
     display: "inline-flex",
     justifyContent: "center",
@@ -2008,14 +2024,16 @@ const styles: Record<string, React.CSSProperties> = {
     fontWeight: 850,
     textDecoration: "none",
   },
-
+  principleSection: {
+    padding:
+      "0 clamp(20px, 6vw, 92px) clamp(40px, 7vw, 90px)",
+  },
   principleCard: {
     padding: 24,
     borderRadius: 15,
     background: "#0b1020",
     color: "#ffffff",
   },
-
   principle: {
     display: "block",
     marginTop: 16,
