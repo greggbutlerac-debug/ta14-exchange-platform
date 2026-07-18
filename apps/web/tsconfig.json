@@ -21,6 +21,12 @@
     "paths": {
       "@vercel/blob": [
         "./node_modules/@vercel/blob"
+      ],
+      "ajv": [
+        "./node_modules/ajv"
+      ],
+      "ajv/*": [
+        "./node_modules/ajv/*"
       ]
     },
     "plugins": [
