@@ -1,20 +1,26 @@
 export const ACADEMY_CATALOG_SCHEMA =
-  "TA14_ACADEMY_CATALOG_V1" as const;
+  "TA14_AI_GOVERNANCE_ACADEMY_CATALOG_V1" as const;
 
 export type AcademyProgramId =
-  | "EPA_608_UNIVERSAL"
-  | "BASIC_HVAC_FOUNDATIONS"
-  | "AIR_CONDITIONING_MADE_SIMPLE"
-  | "AIRFLOW_MADE_SIMPLE"
-  | "ELECTRICITY_MADE_SIMPLE"
-  | "REFRIGERATION_MADE_SIMPLE";
+  | "ADMISSIBLE_EXECUTION_FOUNDATIONS"
+  | "ROUTE_CREATION_AND_DESIGN"
+  | "EVIDENCE_INTEGRITY_AND_PROVENANCE"
+  | "CONTINUITY_AND_BINDING"
+  | "RUNTIME_ADMISSIBILITY_GOVERNANCE"
+  | "REPLAY_RECEIPTS_AND_VERIFICATION";
+
+export type AcademyModuleStatus =
+  | "AVAILABLE"
+  | "IN_DEVELOPMENT"
+  | "PLANNED";
 
 export type AcademyModule = {
   id: string;
   title: string;
   summary: string;
   sequence: number;
-  status: "AVAILABLE" | "IN_DEVELOPMENT" | "PLANNED";
+  status: AcademyModuleStatus;
+  learningOutcomes: readonly string[];
 };
 
 export type AcademyProgram = {
@@ -24,343 +30,388 @@ export type AcademyProgram = {
   shortTitle: string;
   audience: string;
   summary: string;
-  governancePrinciple: string;
+  governingPrinciple: string;
+  status: AcademyModuleStatus;
   delivery: readonly string[];
-  status: "AVAILABLE" | "IN_DEVELOPMENT" | "PLANNED";
   modules: readonly AcademyModule[];
 };
 
 export const ACADEMY_PROGRAMS: readonly AcademyProgram[] = [
   {
     schema: ACADEMY_CATALOG_SCHEMA,
-    id: "EPA_608_UNIVERSAL",
-    title: "TA-14 Academy EPA 608 Universal Preparation",
-    shortTitle: "EPA 608 Universal",
+    id: "ADMISSIBLE_EXECUTION_FOUNDATIONS",
+    title: "TA-14 Admissible Execution Foundations",
+    shortTitle: "Execution Foundations",
     audience:
-      "Entry-level and working HVAC technicians preparing for EPA Section 608 certification.",
+      "AI governance professionals, architects, builders, reviewers, risk leaders, and organizations evaluating consequence-bearing AI systems.",
     summary:
-      "A structured preparation pathway connecting refrigerant knowledge, environmental responsibility, safe handling, and evidence-based intervention discipline.",
-    governancePrinciple:
-      "Refrigerant intervention should occur only when the evidence supports intervention and the technician can preserve an accurate record of what occurred.",
-    delivery: [
-      "Student textbook",
-      "Quick-memory workbook",
-      "Instructor guide",
-      "Knowledge checks",
-      "Practice examinations",
-    ],
+      "Introduces the TA-14 Admissible Execution Architecture and teaches why policy approval, model output, and operator trust are not enough to establish execution legitimacy.",
+    governingPrinciple:
+      "No admissible evidence. No admissible execution.",
     status: "AVAILABLE",
+    delivery: [
+      "Interactive lessons",
+      "Route examples",
+      "Knowledge checks",
+      "Applied review exercises",
+      "Sandbox practice",
+    ],
     modules: [
       {
-        id: "608-core",
-        title: "Core Refrigerant Responsibility",
+        id: "foundations-governance-problem",
+        title: "The AI Governance Execution Problem",
         summary:
-          "Environmental effects, regulatory foundations, safety, recovery, recycling, reclamation, and technician responsibility.",
+          "Why authorization, policy compliance, and model confidence can still produce illegitimate execution.",
         sequence: 1,
         status: "AVAILABLE",
+        learningOutcomes: [
+          "Distinguish governance approval from execution legitimacy",
+          "Identify consequence-bearing execution",
+          "Recognize evidence and continuity failures",
+        ],
       },
       {
-        id: "608-type-i",
-        title: "Type I Appliances",
+        id: "foundations-chain",
+        title: "The TA-14 Execution Chain",
         summary:
-          "Small-appliance service, recovery requirements, evacuation, leak repair principles, and disposal practices.",
+          "Reality, Record, Continuity, Admissibility, Binding, Commit, Execution, and Outcome.",
         sequence: 2,
         status: "AVAILABLE",
+        learningOutcomes: [
+          "Explain each stage of the TA-14 chain",
+          "Identify where a route can lose legitimacy",
+          "Map an AI action to the full chain",
+        ],
       },
       {
-        id: "608-type-ii",
-        title: "Type II Systems",
+        id: "foundations-decisions",
+        title: "ALLOW, HOLD, DENY, and ESCALATE",
         summary:
-          "High-pressure and very-high-pressure systems, charging, recovery, leak response, and service practices.",
+          "How admissibility decisions govern what may happen next without pretending uncertainty has disappeared.",
         sequence: 3,
         status: "AVAILABLE",
-      },
-      {
-        id: "608-type-iii",
-        title: "Type III Systems",
-        summary:
-          "Low-pressure chillers, recovery methods, pressure relationships, leak testing, and safe service procedures.",
-        sequence: 4,
-        status: "AVAILABLE",
-      },
-      {
-        id: "608-universal-review",
-        title: "Universal Review and Examination Readiness",
-        summary:
-          "Integrated review, memory reinforcement, practice questions, and examination strategy.",
-        sequence: 5,
-        status: "AVAILABLE",
+        learningOutcomes: [
+          "Differentiate the four route decisions",
+          "Apply decision states to example routes",
+          "Avoid treating payment or approval as automatic ALLOW",
+        ],
       },
     ],
   },
   {
     schema: ACADEMY_CATALOG_SCHEMA,
-    id: "BASIC_HVAC_FOUNDATIONS",
-    title: "TA-14 Academy Basic HVAC Foundations",
-    shortTitle: "Basic HVAC",
+    id: "ROUTE_CREATION_AND_DESIGN",
+    title: "TA-14 Route Creation and Design",
+    shortTitle: "Route Creation",
     audience:
-      "New technicians, adult learners, workforce-development students, and returning technicians.",
+      "Builders, governance architects, compliance teams, AI product teams, and reviewers creating routes for the TA-14 Exchange Platform.",
     summary:
-      "A complete entry pathway through electrical fundamentals, airflow, refrigeration, charging discipline, system sequence, and thermodynamics.",
-    governancePrinciple:
-      "Technicians should learn the system sequence, establish a baseline, respect thresholds, and make evidence-bound determinations before intervening.",
-    delivery: [
-      "Student textbook",
-      "Student workbook",
-      "Instructor guide",
-      "Laboratory exercises",
-      "Field evidence activities",
-      "Assessment checkpoints",
-    ],
+      "Teaches how to convert a proposed AI action into a structured, reviewable route with explicit evidence, authority, dependencies, gates, and expected outcomes.",
+    governingPrinciple:
+      "A route must make the path to consequence visible before execution occurs.",
     status: "IN_DEVELOPMENT",
+    delivery: [
+      "Route Builder exercises",
+      "JSON route templates",
+      "Worked examples",
+      "Failure-pattern reviews",
+      "Sandbox submissions",
+    ],
     modules: [
       {
-        id: "basic-electrical",
-        title: "Electrical Foundations",
+        id: "route-scope",
+        title: "Define the Consequence-Bearing Action",
         summary:
-          "Atoms, voltage, current, resistance, AC and DC, switch logic, motors, capacitors, meters, and electrical drift.",
+          "Establish the exact action, system boundary, affected parties, and consequence before building the route.",
         sequence: 1,
         status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Write a precise route purpose",
+          "Define the execution boundary",
+          "Separate advisory output from consequence-bearing action",
+        ],
       },
       {
-        id: "basic-airflow",
-        title: "Airflow Foundations",
+        id: "route-inputs",
+        title: "Declare Evidence and Authority Inputs",
         summary:
-          "Static pressure, blower operation, filters, duct systems, fan performance, delivered airflow, and system resistance.",
+          "Identify what evidence is required, who or what supplies authority, and what must remain current.",
         sequence: 2,
         status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Declare required evidence",
+          "Identify authority sources",
+          "Define freshness and validity requirements",
+        ],
       },
       {
-        id: "basic-refrigeration",
-        title: "Refrigeration Foundations",
+        id: "route-gates",
+        title: "Design Admissibility Gates",
         summary:
-          "Pressure-temperature relationships, phase change, saturation, superheat, subcooling, and heat movement.",
+          "Create explicit requirements that determine whether the route may ALLOW, HOLD, DENY, or ESCALATE.",
         sequence: 3,
         status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Create testable requirements",
+          "Avoid vague policy language",
+          "Design fail-closed route behavior",
+        ],
       },
       {
-        id: "basic-charging",
-        title: "Charging Discipline",
+        id: "route-outcomes",
+        title: "Bind Execution to Expected Outcomes",
         summary:
-          "Evidence thresholds, airflow prerequisites, measurement stability, charging methods, and post-intervention verification.",
+          "Define what execution is permitted, what must be recorded, and how outcome correspondence will be tested.",
         sequence: 4,
         status: "IN_DEVELOPMENT",
-      },
-      {
-        id: "basic-sequence",
-        title: "System Sequence of Operation",
-        summary:
-          "Calls, controls, safeties, component order, expected states, and fault isolation through sequence.",
-        sequence: 5,
-        status: "IN_DEVELOPMENT",
-      },
-      {
-        id: "basic-thermodynamics",
-        title: "Applied Thermodynamics",
-        summary:
-          "Sensible and latent heat, enthalpy, psychrometrics, heat transfer, and system performance.",
-        sequence: 6,
-        status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Bind allowed execution to the route",
+          "Define outcome evidence",
+          "Prevent route drift after approval",
+        ],
       },
     ],
   },
   {
     schema: ACADEMY_CATALOG_SCHEMA,
-    id: "AIR_CONDITIONING_MADE_SIMPLE",
-    title: "Air Conditioning Made Simple",
-    shortTitle: "Air Conditioning",
+    id: "EVIDENCE_INTEGRITY_AND_PROVENANCE",
+    title: "Evidence Integrity and Provenance",
+    shortTitle: "Evidence Integrity",
     audience:
-      "Students and technicians who need a clear, practical understanding of complete air-conditioning system operation.",
+      "AI governance, audit, assurance, data, security, and risk professionals responsible for proving what information supported execution.",
     summary:
-      "A plain-language system course connecting components, sequence, airflow, refrigeration, electrical behavior, and evidence-based service.",
-    governancePrinciple:
-      "Understand the whole operating system before changing any part of it.",
+      "Teaches how evidence becomes usable for governance through provenance, integrity, temporal validity, source identification, and contradiction handling.",
+    governingPrinciple:
+      "Evidence that cannot be traced, tested, and preserved cannot support admissible execution.",
+    status: "IN_DEVELOPMENT",
     delivery: [
-      "Textbook",
-      "Workbook",
-      "Instructor edition",
-      "Visual system maps",
-      "Applied exercises",
+      "Evidence mapping exercises",
+      "Provenance reviews",
+      "Integrity failure examples",
+      "Contradiction analysis",
+      "Receipt interpretation",
     ],
+    modules: [
+      {
+        id: "evidence-source",
+        title: "Source and Provenance",
+        summary:
+          "Who or what produced the evidence, how it entered the route, and whether its origin is independently reviewable.",
+        sequence: 1,
+        status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Identify evidence sources",
+          "Document provenance",
+          "Detect unsupported or synthetic claims",
+        ],
+      },
+      {
+        id: "evidence-integrity",
+        title: "Integrity and Tamper Evidence",
+        summary:
+          "How hashing, signatures, immutable references, and preservation support later verification.",
+        sequence: 2,
+        status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Explain integrity controls",
+          "Recognize broken evidence chains",
+          "Understand what cryptographic proof does and does not prove",
+        ],
+      },
+      {
+        id: "evidence-temporal",
+        title: "Temporal Validity and Reality Change",
+        summary:
+          "Why correct evidence can become inadmissible when reality changes before execution.",
+        sequence: 3,
+        status: "IN_DEVELOPMENT",
+        learningOutcomes: [
+          "Define evidence freshness",
+          "Identify stale-route risk",
+          "Require revalidation before consequence",
+        ],
+      },
+    ],
+  },
+  {
+    schema: ACADEMY_CATALOG_SCHEMA,
+    id: "CONTINUITY_AND_BINDING",
+    title: "Continuity, Identity, and Binding",
+    shortTitle: "Continuity and Binding",
+    audience:
+      "Architects and reviewers responsible for keeping evidence, authority, route identity, and execution connected across time and systems.",
+    summary:
+      "Explains how continuity is preserved from initial reality through route identity, authority, commitment, execution, and outcome.",
+    governingPrinciple:
+      "A valid beginning does not legitimize an execution if continuity is lost before consequence occurs.",
     status: "PLANNED",
+    delivery: [
+      "Continuity diagrams",
+      "Identity-binding exercises",
+      "Commit-state examples",
+      "Broken-chain case reviews",
+    ],
     modules: [
       {
-        id: "ac-system-map",
-        title: "The Complete System Map",
+        id: "continuity-route-identity",
+        title: "Route Identity",
         summary:
-          "How electrical, airflow, refrigeration, controls, and heat transfer operate as one system.",
+          "How a route is uniquely identified and protected from unnoticed substitution or mutation.",
         sequence: 1,
         status: "PLANNED",
+        learningOutcomes: [
+          "Define route identity",
+          "Recognize route substitution",
+          "Preserve version correspondence",
+        ],
       },
       {
-        id: "ac-operating-sequence",
-        title: "Operating Sequence",
+        id: "continuity-authority",
+        title: "Authority Continuity",
         summary:
-          "What should happen, in what order, and what each operating state proves.",
+          "How delegated or derived authority remains connected to the route that uses it.",
         sequence: 2,
         status: "PLANNED",
+        learningOutcomes: [
+          "Trace authority origin",
+          "Detect expired or misapplied authority",
+          "Bind authority to scope",
+        ],
       },
       {
-        id: "ac-evidence",
-        title: "Evidence Before Intervention",
+        id: "continuity-commit",
+        title: "Commit Before Execution",
         summary:
-          "Measurements, stability, thresholds, contradictions, and diagnostic determination.",
+          "Why the approved route must be fixed before execution and why post-hoc reconstruction is insufficient.",
         sequence: 3,
         status: "PLANNED",
+        learningOutcomes: [
+          "Explain commit state",
+          "Separate approval from commitment",
+          "Detect execution against an uncommitted route",
+        ],
       },
     ],
   },
   {
     schema: ACADEMY_CATALOG_SCHEMA,
-    id: "AIRFLOW_MADE_SIMPLE",
-    title: "Airflow Made Simple",
-    shortTitle: "Airflow",
+    id: "RUNTIME_ADMISSIBILITY_GOVERNANCE",
+    title: "Runtime Admissibility Governance",
+    shortTitle: "Runtime Governance",
     audience:
-      "HVAC students and technicians learning how air moves through real systems.",
+      "AI runtime teams, platform engineers, governance architects, safety teams, and system owners deploying automated execution.",
     summary:
-      "A field-centered course covering pressure, resistance, blower performance, duct behavior, filtration, distribution, and delivered capacity.",
-    governancePrinciple:
-      "Refrigeration measurements are not admissible for intervention until airflow is established and supported by evidence.",
+      "Teaches how admissibility is revalidated at runtime so a route that was once valid cannot continue acting after evidence, authority, or reality changes.",
+    governingPrinciple:
+      "Admissibility must remain valid through the moment of consequence.",
+    status: "PLANNED",
     delivery: [
-      "Textbook",
-      "Workbook",
-      "Instructor edition",
-      "Static-pressure labs",
-      "Fan-curve exercises",
+      "Runtime gate scenarios",
+      "State-transition exercises",
+      "Failure and recovery patterns",
+      "Escalation design",
+      "Adapter examples",
     ],
-    status: "IN_DEVELOPMENT",
     modules: [
       {
-        id: "airflow-pressure",
-        title: "Pressure and Resistance",
+        id: "runtime-revalidation",
+        title: "Continuous Revalidation",
         summary:
-          "How static pressure develops and what resistance reveals about system condition.",
+          "Rechecking evidence, authority, continuity, and temporal validity before each consequence-bearing action.",
         sequence: 1,
-        status: "IN_DEVELOPMENT",
+        status: "PLANNED",
+        learningOutcomes: [
+          "Design runtime revalidation",
+          "Identify invalidation events",
+          "Stop execution when admissibility changes",
+        ],
       },
       {
-        id: "airflow-blower",
-        title: "Blowers and Fan Performance",
+        id: "runtime-state",
+        title: "Governed State Transitions",
         summary:
-          "Blower speed, fan curves, operating points, and delivered airflow.",
+          "How route decisions control what the system may do next and what evidence must be produced.",
         sequence: 2,
-        status: "IN_DEVELOPMENT",
+        status: "PLANNED",
+        learningOutcomes: [
+          "Map decision states to system behavior",
+          "Design HOLD and ESCALATE paths",
+          "Prevent silent fallback execution",
+        ],
       },
       {
-        id: "airflow-distribution",
-        title: "Duct and Distribution Performance",
+        id: "runtime-adapters",
+        title: "Execution Adapters and Boundaries",
         summary:
-          "Returns, supplies, fittings, leakage, restrictions, balance, and room delivery.",
+          "How governed routes connect to real systems without allowing the adapter to bypass route constraints.",
         sequence: 3,
-        status: "IN_DEVELOPMENT",
+        status: "PLANNED",
+        learningOutcomes: [
+          "Define adapter boundaries",
+          "Bind execution parameters",
+          "Verify execution correspondence",
+        ],
       },
     ],
   },
   {
     schema: ACADEMY_CATALOG_SCHEMA,
-    id: "ELECTRICITY_MADE_SIMPLE",
-    title: "Electricity Made Simple",
-    shortTitle: "Electricity",
+    id: "REPLAY_RECEIPTS_AND_VERIFICATION",
+    title: "Replay Packages, Receipts, and Independent Verification",
+    shortTitle: "Verification",
     audience:
-      "Beginning HVAC learners who need electrical principles explained through practical system behavior.",
+      "Auditors, reviewers, assurance teams, regulators, governance architects, and organizations testing whether an AI execution can be independently reconstructed.",
     summary:
-      "A progressive course from atomic foundations through circuits, controls, motors, capacitors, measurement, safety, and electrical integrity.",
-    governancePrinciple:
-      "Electrical diagnosis must be tied to measured conditions, expected sequence, equipment requirements, and preserved evidence.",
+      "Teaches how preserved route packages, receipts, signatures, dependencies, and outcome records support independent verification after execution.",
+    governingPrinciple:
+      "Verify the route, not the dashboard.",
+    status: "PLANNED",
     delivery: [
-      "Textbook",
-      "Workbook",
-      "Instructor edition",
-      "Meter exercises",
-      "Circuit activities",
+      "Replay package walkthroughs",
+      "Receipt validation exercises",
+      "Signature verification examples",
+      "Independent review scenarios",
+      "Public record interpretation",
     ],
-    status: "IN_DEVELOPMENT",
     modules: [
       {
-        id: "electricity-foundations",
-        title: "Electrical Foundations",
+        id: "verification-replay",
+        title: "Replay Package Structure",
         summary:
-          "Atoms, charge, conductors, voltage, current, resistance, power, and energy.",
+          "The records required to reconstruct what route existed, what evidence supported it, and what decision was reached.",
         sequence: 1,
-        status: "IN_DEVELOPMENT",
+        status: "PLANNED",
+        learningOutcomes: [
+          "Identify replay package contents",
+          "Test route completeness",
+          "Recognize missing dependencies",
+        ],
       },
       {
-        id: "electricity-circuits",
-        title: "Circuits and Switch Logic",
+        id: "verification-receipts",
+        title: "Receipts and Cryptographic Correspondence",
         summary:
-          "Series, parallel, loads, switches, relays, contactors, transformers, and control paths.",
+          "How signed receipts connect route identity, decision, execution, and outcome without relying on operator claims.",
         sequence: 2,
-        status: "IN_DEVELOPMENT",
+        status: "PLANNED",
+        learningOutcomes: [
+          "Interpret signed receipts",
+          "Verify correspondence fields",
+          "Distinguish integrity proof from truth proof",
+        ],
       },
       {
-        id: "electricity-motors",
-        title: "Motors and Capacitors",
+        id: "verification-independent",
+        title: "Independent Verification",
         summary:
-          "Motor types, nameplates, winding behavior, capacitance, starting, running, and failure evidence.",
+          "How an outside reviewer tests the preserved route without trusting the original platform dashboard.",
         sequence: 3,
-        status: "IN_DEVELOPMENT",
-      },
-      {
-        id: "electricity-measurement",
-        title: "The Meter as an Evidence Tool",
-        summary:
-          "Voltage, amperage, resistance, capacitance, insulation, safe measurement, and interpretation.",
-        sequence: 4,
-        status: "IN_DEVELOPMENT",
-      },
-    ],
-  },
-  {
-    schema: ACADEMY_CATALOG_SCHEMA,
-    id: "REFRIGERATION_MADE_SIMPLE",
-    title: "Refrigeration Made Simple",
-    shortTitle: "Refrigeration",
-    audience:
-      "HVAC learners building a practical understanding of the refrigeration cycle and service measurements.",
-    summary:
-      "A clear course connecting pressure, temperature, saturation, phase change, heat transfer, superheat, subcooling, metering, and system evidence.",
-    governancePrinciple:
-      "A refrigerant circuit should not be opened or adjusted merely because a reading appears unusual; the full evidence chain must support intervention.",
-    delivery: [
-      "Textbook",
-      "Workbook",
-      "Instructor edition",
-      "Pressure-temperature exercises",
-      "Cycle-mapping activities",
-    ],
-    status: "IN_DEVELOPMENT",
-    modules: [
-      {
-        id: "refrigeration-cycle",
-        title: "The Refrigeration Cycle",
-        summary:
-          "Compression, condensation, metering, evaporation, and heat movement.",
-        sequence: 1,
-        status: "IN_DEVELOPMENT",
-      },
-      {
-        id: "refrigeration-saturation",
-        title: "Pressure, Temperature, and Saturation",
-        summary:
-          "How refrigerant pressure establishes saturation temperature and phase condition.",
-        sequence: 2,
-        status: "IN_DEVELOPMENT",
-      },
-      {
-        id: "refrigeration-sh-sc",
-        title: "Superheat and Subcooling",
-        summary:
-          "What the measurements mean, when they are valid, and how airflow and load affect them.",
-        sequence: 3,
-        status: "IN_DEVELOPMENT",
-      },
-      {
-        id: "refrigeration-intervention",
-        title: "Evidence-Based Refrigerant Intervention",
-        summary:
-          "Thresholds, prerequisites, contradictions, charging discipline, and post-intervention proof.",
-        sequence: 4,
-        status: "IN_DEVELOPMENT",
+        status: "PLANNED",
+        learningOutcomes: [
+          "Run an independent verification review",
+          "Identify unverifiable claims",
+          "Document verification outcomes",
+        ],
       },
     ],
   },
@@ -381,7 +432,7 @@ export function getAcademyProgram(
 }
 
 export function getAcademyProgramsByStatus(
-  status: AcademyProgram["status"],
+  status: AcademyModuleStatus,
 ): readonly AcademyProgram[] {
   return ACADEMY_PROGRAMS.filter(
     (program) => program.status === status,
