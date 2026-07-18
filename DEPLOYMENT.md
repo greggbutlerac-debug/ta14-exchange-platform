@@ -1,67 +1,91 @@
-# TA-14 Exchange — GitHub and Deployment Steps
+# TA-14 Exchange Platform Deployment Guide
 
-## 1. Create the GitHub repository
+## V0.3.2 — Development and Demonstration Deployment
 
-1. Sign in to GitHub.
-2. Select **New repository**.
-3. Repository name: `ta14-exchange-platform`.
-4. Description: `TA-14 Global Admissible Execution Exchange`.
-5. Choose **Private** while production accounts, keys, and terms are unfinished.
-6. Do not add a README, .gitignore, or license because this package already contains them.
-7. Create the repository and leave the GitHub setup page open.
+This document describes how to verify, deploy, observe, and safely operate the current TA-14 Exchange Platform release.
 
-## 2. Upload from your computer
+The governing principle remains:
 
-Extract this ZIP into a folder, open a terminal in that folder, and run:
+> **No admissible evidence. No admissible execution.**
+
+Deployment success does not convert demonstration infrastructure into production governance infrastructure.
+
+A successful build proves that the application compiled and passed its configured checks. It does not prove production custody, lawful authority, independent verification, evidence truth, or real-world execution.
+
+---
+
+## Current deployment
+
+Public deployment:
+
+**https://ta14-exchange-platform-theta.vercel.app/**
+
+Governance Workspace:
+
+**https://ta14-exchange-platform-theta.vercel.app/workspace**
+
+Route Evaluation Workspace:
+
+**https://ta14-exchange-platform-theta.vercel.app/workspace/routes/new**
+
+Repository:
+
+**https://github.com/greggbutlerac-debug/ta14-exchange-platform**
+
+---
+
+## Current release boundary
+
+V0.3.2 is a working development and demonstration platform.
+
+It currently includes:
+
+- Public TA-14 Exchange pages
+- Governance Workspace
+- Visual Route Builder
+- Eight-stage route construction
+- Browser-based route transfer
+- Vendor-payment demonstration
+- AI Governance route evaluation
+- Adapter-boundary handling
+- Deterministic route decisions
+- Preserved adverse-result behavior
+- Route correction and rerun behavior
+- Signed demonstration receipts
+- Hash-chained route events
+- Public verification surfaces
+- Registry lookup
+- Verification-bundle download
+- Local and evolving managed-storage behavior
+
+It is not yet a complete production implementation of:
+
+- Authentication
+- Tenant isolation
+- Evidence custody
+- Payment processing
+- Managed cryptographic signing
+- Independent verification
+- Certification
+- Enterprise security
+- Disaster recovery
+- Regulatory compliance
+- Production audit separation
+
+---
+
+## Required local environment
+
+Use:
+
+- Node.js 22 through 24
+- npm 10.8.1 through 10.x
+- Git
+- A supported modern browser
+
+Confirm the installed versions:
 
 ```bash
-git init
-git add .
-git commit -m "Launch TA-14 Exchange single-route website"
-git branch -M main
-git remote add origin https://github.com/greggbutlerac-debug/ta14-exchange-platform.git
-git push -u origin main
-```
-
-Replace `YOUR-GITHUB-USERNAME` with the name shown in your GitHub profile URL.
-
-## 3. Test locally
-
-Install Node.js 20 or newer. In the project folder run:
-
-```bash
-npm install
-npm run verify
-npm run dev
-```
-
-Open `http://localhost:3000`.
-
-## 4. Create the hosting project
-
-Vercel is the easiest host for this Next.js release.
-
-1. Sign in to Vercel with GitHub.
-2. Choose **Add New → Project**.
-3. Import `ta14-exchange-platform`.
-4. Framework preset: **Next.js**.
-5. Build command: `npm run build`.
-6. Install command: `npm install`.
-7. Deploy only as a private preview first.
-
-## 5. Important current limitation
-
-The present local JSON persistence is not appropriate for a production multi-instance deployment. A Vercel preview can demonstrate the design, but route continuity may not persist reliably across serverless invocations. Before accepting real $9 payments, replace the local store with managed PostgreSQL and connect production signing, Stripe, email, backups, terms, and privacy controls.
-
-## 6. Production sequence
-
-1. GitHub private repository.
-2. Local verification.
-3. Vercel preview deployment.
-4. Managed PostgreSQL integration.
-5. Authentication and tenant isolation.
-6. Stripe test mode.
-7. Production signing-key service.
-8. Email receipts and public registry continuity.
-9. Legal terms, privacy notice, refund language, and data map.
-10. End-to-end test purchase, refund, restoration, and registry verification.
+node --version
+npm --version
+git --version
