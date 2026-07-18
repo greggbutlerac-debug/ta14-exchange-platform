@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -1166,7 +1167,7 @@ export default function HomePage() {
               <a href="#pricing">Pricing</a>
               <a href="#use-cases">Ecosystem</a>
               <a href="#contact">Contact</a>
-              <a className="button button-primary" href="#demo">
+              <a className="button button-primary" href="/workspace">
                 Open Workspace
               </a>
             </nav>
@@ -1204,7 +1205,7 @@ export default function HomePage() {
               </p>
 
               <div className="hero-actions">
-                <a className="button button-primary" href="#demo">
+                <a className="button button-primary" href="/workspace">
                   Enter the Governance Workspace
                 </a>
 
@@ -1679,7 +1680,7 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   <li>Self-declared AER preview</li>
                 </ul>
 
-                <a className="button button-secondary" href="#demo">
+                <a className="button button-secondary" href="/workspace">
                   Test a Route
                 </a>
               </article>
@@ -1762,7 +1763,7 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
               </p>
 
               <div className="hero-actions">
-                <a className="button button-primary" href="#demo">
+                <a className="button button-primary" href="/workspace">
                   Experience the Route
                 </a>
 
