@@ -12,6 +12,7 @@ import {
 import { savePendingRouteDraft } from "../../../lib/route-draft-transfer";
 import OpenInBuilderButton from "./open-in-builder-button";
 import RouteLibraryTransferPanel from "./route-library-transfer-panel";
+import RouteLibraryMaintenancePanel from "./route-library-maintenance-panel";
 
 function formatDate(value: string): string {
   const date = new Date(value);
@@ -317,6 +318,10 @@ export default function RouteLibraryPage() {
 
       <div className="transferWrap">
         <RouteLibraryTransferPanel onImported={refreshRoutes} />
+      </div>
+
+      <div className="maintenanceWrap">
+        <RouteLibraryMaintenancePanel />
       </div>
 
       <section className="boundaryNote">
@@ -709,6 +714,11 @@ export default function RouteLibraryPage() {
         }
 
         .transferWrap {
+          max-width: 1480px;
+          margin: 18px auto 0;
+        }
+
+        .maintenanceWrap {
           max-width: 1480px;
           margin: 18px auto 0;
         }
