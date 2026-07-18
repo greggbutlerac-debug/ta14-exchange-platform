@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "typecheck": "tsc --noEmit --pretty false",
+    "typecheck": "sh -c 'tsc --noEmit --pretty false > typecheck.log 2>&1 || (cat typecheck.log && exit 2)'",
     "build": "npm run typecheck && next build",
     "start": "next start"
   },
