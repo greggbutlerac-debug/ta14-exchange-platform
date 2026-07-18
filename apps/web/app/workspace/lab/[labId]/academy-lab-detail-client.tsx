@@ -279,17 +279,20 @@ export default function AcademyLabDetailClient({
         }
 
         .topbarInner {
-          width: min(1440px, 92vw);
+          width: calc(100% - 32px);
+          max-width: 1440px;
           min-height: 72px;
-          margin: 0 auto;
+          margin: 0 16px;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 24px;
+          justify-content: flex-start;
+          gap: 28px;
+          overflow: hidden;
         }
 
         .brand {
           display: inline-flex;
+          flex: 0 0 auto;
           align-items: center;
           gap: 11px;
           color: #f5f9ff;
@@ -312,12 +315,17 @@ export default function AcademyLabDetailClient({
 
         .nav {
           display: flex;
+          flex: 0 1 auto;
           flex-wrap: wrap;
-          justify-content: flex-end;
+          justify-content: flex-start;
           gap: 22px;
+          min-width: 0;
+          margin-left: 8px;
         }
 
         .nav a {
+          flex: 0 0 auto;
+          white-space: nowrap;
           color: #9db0c2;
           font-size: 13px;
           font-weight: 750;
@@ -718,7 +726,9 @@ export default function AcademyLabDetailClient({
 
           .topbarInner {
             width: calc(100% - 28px);
+            margin: 0 14px;
             padding: 14px 0;
+            overflow: visible;
           }
 
           .nav {
