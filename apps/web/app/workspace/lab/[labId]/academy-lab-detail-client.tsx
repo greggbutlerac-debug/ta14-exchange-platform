@@ -239,6 +239,12 @@ export default function AcademyLabDetailClient({
           box-sizing: border-box;
         }
 
+        :global(html),
+        :global(body) {
+          max-width: 100%;
+          overflow-x: hidden;
+        }
+
         :global(body) {
           margin: 0;
           background:
@@ -248,7 +254,10 @@ export default function AcademyLabDetailClient({
         }
 
         .page {
+          width: 100%;
+          max-width: 100vw;
           min-height: 100vh;
+          overflow-x: hidden;
           color: #f5f9ff;
           font-family:
             Inter,
@@ -303,6 +312,8 @@ export default function AcademyLabDetailClient({
 
         .nav {
           display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
           gap: 22px;
         }
 
@@ -316,8 +327,19 @@ export default function AcademyLabDetailClient({
         .hero,
         .principle,
         .workspaceGrid {
-          width: min(1440px, 92vw);
+          width: min(1440px, calc(100% - 32px));
+          max-width: 100%;
           margin-inline: auto;
+        }
+
+        .hero > *,
+        .workspaceGrid > *,
+        .mainColumn,
+        .sideColumn,
+        .panel,
+        .sidePanel,
+        .stageContent {
+          min-width: 0;
         }
 
         .hero {
@@ -695,13 +717,20 @@ export default function AcademyLabDetailClient({
           }
 
           .topbarInner {
+            width: calc(100% - 28px);
             padding: 14px 0;
           }
 
           .nav {
             width: 100%;
-            justify-content: space-between;
-            gap: 10px;
+            justify-content: flex-start;
+            gap: 10px 16px;
+          }
+
+          .hero,
+          .principle,
+          .workspaceGrid {
+            width: calc(100% - 28px);
           }
 
           .hero {
