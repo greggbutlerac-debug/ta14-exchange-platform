@@ -4,6 +4,7 @@ import Link from "next/link";
 import {
   type ChangeEvent,
   type DragEvent,
+  useEffect,
   useMemo,
   useRef,
   useState,
@@ -58,6 +59,7 @@ const routeStageKeys: StageKey[] = [
 ];
 
 const maximumImportBytes = 1024 * 1024;
+const localDraftStorageKey = "ta14-exchange-route-builder-draft-v1";
 
 const stageDefinitions: Omit<Stage, "value">[] = [
   {
@@ -247,6 +249,8 @@ export default function BuildRoutePage() {
   const [importNotice, setImportNotice] =
     useState<ImportNotice | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [localDraftReady, setLocalDraftReady] = useState(false);
+  const [savedAt, setSavedAt] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const currentIndex = stages.findIndex(
@@ -313,6 +317,97 @@ export default function BuildRoutePage() {
     ],
   );
 
+  useEffect(() => {
+    try {
+      const stored = window.localStorage.getItem(
+        localDraftStorageKey,
+      );
+
+      if (stored) {
+        const parsed = JSON.parse(stored) as {
+          route?: unknown;
+          savedAt?: unknown;
+        };
+        const restored = validateImportedRoute(parsed.route);
+
+        setRouteName(
+          restored.metadata.name.trim() ||
+            "Untitled governance route",
+        );
+        setDomain(
+          restored.metadata.domain.trim() || "UNKNOWN",
+        );
+        setOwner(
+          restored.metadata.owner.trim() || "UNKNOWN",
+        );
+        setStages(
+          stageDefinitions.map((stage) => ({
+            ...stage,
+            value:
+              restored.chain[stage.key] === "UNKNOWN"
+                ? ""
+                : restored.chain[stage.key],
+          })),
+        );
+        setSavedAt(
+          typeof parsed.savedAt === "string"
+            ? parsed.savedAt
+            : null,
+        );
+        setImportNotice({
+          type: "success",
+          title: "Local draft restored",
+          message:
+            "Your unfinished route was recovered from this browser and can be continued immediately.",
+        });
+      }
+    } catch {
+      window.localStorage.removeItem(localDraftStorageKey);
+    } finally {
+      setLocalDraftReady(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!localDraftReady) {
+      return;
+    }
+
+    const hasWork =
+      routeName !== "Untitled governance route" ||
+      domain !== "AI Governance" ||
+      owner !== "UNKNOWN" ||
+      stages.some((stage) => stage.value.trim().length > 0);
+
+    if (!hasWork) {
+      window.localStorage.removeItem(localDraftStorageKey);
+      setSavedAt(null);
+      return;
+    }
+
+    const timeout = window.setTimeout(() => {
+      const timestamp = new Date().toISOString();
+
+      window.localStorage.setItem(
+        localDraftStorageKey,
+        JSON.stringify({
+          route,
+          savedAt: timestamp,
+        }),
+      );
+      setSavedAt(timestamp);
+    }, 650);
+
+    return () => window.clearTimeout(timeout);
+  }, [
+    domain,
+    localDraftReady,
+    owner,
+    route,
+    routeName,
+    stages,
+  ]);
+
   function updateCurrent(value: string) {
     setStages((items) =>
       items.map((stage) =>
@@ -349,6 +444,8 @@ export default function BuildRoutePage() {
     setShowJson(false);
     setCopied(false);
     setImportNotice(null);
+    setSavedAt(null);
+    window.localStorage.removeItem(localDraftStorageKey);
 
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
@@ -605,6 +702,21 @@ export default function BuildRoutePage() {
         </div>
 
         <div className="topActions">
+          <div className="autosaveState" aria-live="polite">
+            <span className="autosaveDot" />
+            <div>
+              <strong>Autosave active</strong>
+              <small>
+                {savedAt
+                  ? `Saved ${new Date(savedAt).toLocaleTimeString([], {
+                      hour: "numeric",
+                      minute: "2-digit",
+                    })}`
+                  : "Stored in this browser"}
+              </small>
+            </div>
+          </div>
+
           <Link href="/workspace/discover" className="textButton">
             ← Discovery
           </Link>
@@ -1044,6 +1156,43 @@ export default function BuildRoutePage() {
           flex-wrap: wrap;
           justify-content: flex-end;
           gap: 10px;
+        }
+
+        .autosaveState {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          min-height: 42px;
+          padding: 8px 12px;
+          border: 1px solid #cfe4da;
+          border-radius: 11px;
+          background: #f0f8f5;
+        }
+
+        .autosaveDot {
+          width: 9px;
+          height: 9px;
+          flex: 0 0 auto;
+          border-radius: 50%;
+          background: #14946d;
+          box-shadow: 0 0 0 4px rgba(20, 148, 109, 0.12);
+        }
+
+        .autosaveState strong,
+        .autosaveState small {
+          display: block;
+          line-height: 1.2;
+        }
+
+        .autosaveState strong {
+          color: #18523f;
+          font-size: 11px;
+        }
+
+        .autosaveState small {
+          margin-top: 3px;
+          color: #65766e;
+          font-size: 10px;
         }
 
         button,
