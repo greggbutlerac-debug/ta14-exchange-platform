@@ -126,6 +126,7 @@ async function loadBlob(): Promise<Db> {
   try {
     const result = await get(BLOB_PATHNAME, {
       access: "private",
+      useCache: false,
     });
 
     if (
@@ -396,21 +397,17 @@ export async function getPublicVerificationBundle(
 
   return {
     rid,
-
     publicKey: {
       keyId: db.key.keyId,
       algorithm: "Ed25519",
       publicKeyPem: db.key.publicKeyPem,
       status: "DEVELOPMENT_ONLY",
     },
-
     aer: registry.aer,
-
     eventChain: {
       valid: verifyEventChain(events),
       events,
     },
-
     registry: {
       status: registry.status,
       issuedAt: registry.issuedAt,
