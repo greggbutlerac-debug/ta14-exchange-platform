@@ -263,151 +263,102 @@ export default function UploadRoutePage() {
 
   const mapped = route?.importRecord.normalizedFields ?? 0;
   const unknowns = route?.importRecord.preservedUnknowns ?? 8;
-  const readiness = route?.status ?? 'WAITING';
 
   return (
-    <main className="min-h-screen overflow-x-hidden bg-[#05070a] px-4 py-6 text-white sm:px-6 sm:py-8 lg:px-10">
-      <div className="mx-auto w-full max-w-[1500px]">
-        <header className="rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_left,rgba(34,211,238,0.12),transparent_34%),linear-gradient(145deg,rgba(255,255,255,0.065),rgba(255,255,255,0.018))] p-6 shadow-2xl shadow-black/30 sm:p-8 lg:p-10">
-          <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-3">
-                <span className="rounded-full border border-cyan-300/25 bg-cyan-300/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.22em] text-cyan-200">
-                  Exchange Workspace
-                </span>
-                <span className="text-xs uppercase tracking-[0.22em] text-white/35">Governed route intake</span>
+    <main className="uploadPage">
+      <div className="shell">
+        <header className="hero">
+          <div className="heroGlow" />
+          <div className="heroTop">
+            <div>
+              <div className="eyebrowRow">
+                <span className="eyebrowPill">Exchange Workspace</span>
+                <span className="eyebrowText">Governed route intake</span>
               </div>
-              <h1 className="mt-5 max-w-5xl text-4xl font-semibold tracking-[-0.045em] sm:text-5xl lg:text-6xl">
-                Import without concealing what the source cannot prove.
-              </h1>
-              <p className="mt-5 max-w-3xl text-base leading-7 text-white/58 sm:text-lg">
+              <h1>Import without concealing what the source cannot prove.</h1>
+              <p className="heroCopy">
                 Preserve the submitted record, normalize recognized fields, expose every unresolved stage, and move the route forward without manufacturing completeness.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-3">
-              <Link
-                href="/workspace"
-                className="rounded-full border border-white/15 bg-black/20 px-5 py-3 text-sm font-semibold text-white/75 transition hover:border-white/35 hover:text-white"
-              >
+            <div className="heroActions">
+              <Link href="/workspace" className="button secondary">
                 Back to Workspace
               </Link>
-              <button
-                type="button"
-                onClick={clearImport}
-                className="rounded-full border border-white/15 bg-black/20 px-5 py-3 text-sm font-semibold text-white/75 transition hover:border-white/35 hover:text-white"
-              >
+              <button type="button" onClick={clearImport} className="button secondary">
                 Clear intake
               </button>
             </div>
           </div>
 
-          <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-black/25">
-            <div className="flex min-w-max items-center gap-2 px-4 py-4 sm:min-w-0 sm:justify-between">
-              {workflow.map((step, index) => {
-                const active =
-                  index === 0 ||
-                  (index === 1 && Boolean(source.trim())) ||
-                  (index === 2 && Boolean(route)) ||
-                  (index > 2 && Boolean(route));
-                return (
-                  <div key={step} className="flex items-center gap-2">
-                    <div
-                      className={`flex items-center gap-2 rounded-full border px-3 py-2 text-xs font-semibold ${
-                        active
-                          ? 'border-cyan-300/30 bg-cyan-300/10 text-cyan-100'
-                          : 'border-white/10 bg-white/[0.03] text-white/35'
-                      }`}
-                    >
-                      <span className="font-mono text-[10px]">{String(index + 1).padStart(2, '0')}</span>
-                      <span>{step}</span>
-                    </div>
-                    {index < workflow.length - 1 && <span className="text-white/20">→</span>}
+          <div className="workflow">
+            {workflow.map((step, index) => {
+              const active =
+                index === 0 ||
+                (index === 1 && Boolean(source.trim())) ||
+                (index >= 2 && Boolean(route));
+
+              return (
+                <div className="workflowItem" key={step}>
+                  <div className={`workflowStep ${active ? 'active' : ''}`}>
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <strong>{step}</strong>
                   </div>
-                );
-              })}
-            </div>
+                  {index < workflow.length - 1 && <span className="workflowArrow">→</span>}
+                </div>
+              );
+            })}
           </div>
         </header>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[0.96fr_1.04fr]">
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.03] p-5 shadow-2xl shadow-black/20 sm:p-7">
-            <div className="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-start sm:justify-between">
+        <section className="workspaceGrid">
+          <section className="panel">
+            <div className="panelHeader">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Import console</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">Provide the source route</h2>
-                <p className="mt-2 text-sm leading-6 text-white/48">
-                  Upload a JSON file or paste the original source. The submitted content remains separate from the normalized draft.
-                </p>
+                <p className="sectionLabel">Import console</p>
+                <h2>Provide the source route</h2>
+                <p>Upload a JSON file or paste the original source. The submitted content remains separate from the normalized draft.</p>
               </div>
-              <span
-                className={`w-fit rounded-full border px-3 py-2 text-xs font-semibold ${
-                  state === 'ERROR'
-                    ? 'border-red-300/25 bg-red-300/10 text-red-100'
-                    : route
-                      ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-100'
-                      : source.trim()
-                        ? 'border-cyan-300/25 bg-cyan-300/10 text-cyan-100'
-                        : 'border-white/10 bg-white/[0.04] text-white/45'
-                }`}
-              >
-                {sourceStatus}
-              </span>
+              <span className={`statusBadge ${state.toLowerCase()}`}>{sourceStatus}</span>
             </div>
 
             <div
+              className={`dropZone ${dragging ? 'dragging' : ''}`}
               onDragOver={(event) => {
                 event.preventDefault();
                 setDragging(true);
               }}
               onDragLeave={() => setDragging(false)}
               onDrop={onDrop}
-              className={`mt-6 rounded-[1.75rem] border border-dashed p-7 text-center transition sm:p-9 ${
-                dragging
-                  ? 'border-cyan-300 bg-cyan-300/10'
-                  : 'border-white/15 bg-[linear-gradient(145deg,rgba(255,255,255,0.055),rgba(255,255,255,0.018))]'
-              }`}
             >
               <input
                 ref={inputRef}
                 type="file"
                 accept="application/json,.json"
-                className="hidden"
                 onChange={onFileChange}
+                className="fileInput"
               />
-              <div className="mx-auto grid h-16 w-16 place-items-center rounded-2xl border border-white/10 bg-black/30 text-2xl text-cyan-200">
-                ⇧
-              </div>
-              <h3 className="mt-5 text-xl font-semibold">Drop a route file here</h3>
-              <p className="mt-2 text-sm text-white/45">JSON only · Maximum 1 MB · Original source preserved</p>
-              <button
-                type="button"
-                onClick={() => inputRef.current?.click()}
-                className="mt-6 rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-200"
-              >
+              <div className="uploadIcon">⇧</div>
+              <h3>Drop a route file here</h3>
+              <p>JSON only · Maximum 1 MB · Original source preserved</p>
+              <button type="button" onClick={() => inputRef.current?.click()} className="button primary white">
                 Choose JSON file
               </button>
             </div>
 
-            <div className="my-6 flex items-center gap-4">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-[10px] font-semibold uppercase tracking-[0.24em] text-white/30">or paste source</span>
-              <div className="h-px flex-1 bg-white/10" />
+            <div className="separator">
+              <span />
+              <strong>or paste source</strong>
+              <span />
             </div>
 
-            <div className="rounded-[1.75rem] border border-white/10 bg-black/20 p-4 sm:p-5">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold">Source editor</p>
-                  <p className="mt-1 truncate text-xs text-white/40">
-                    {fileName ? `Loaded file: ${fileName}` : 'No file selected · pasted input will be identified separately'}
-                  </p>
+            <div className="editorCard">
+              <div className="editorHeader">
+                <div>
+                  <h3>Source editor</h3>
+                  <p>{fileName ? `Loaded file: ${fileName}` : 'No file selected · pasted input will be identified separately'}</p>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => loadContent(sample, 'sample-route.json')}
-                  className="w-fit rounded-full border border-white/15 px-4 py-2 text-xs font-semibold text-white/70 transition hover:border-white/35 hover:text-white"
-                >
+                <button type="button" onClick={() => loadContent(sample, 'sample-route.json')} className="button small secondary">
                   Load sample
                 </button>
               </div>
@@ -417,13 +368,12 @@ export default function UploadRoutePage() {
                 onChange={(event) => loadContent(event.target.value, '')}
                 spellCheck={false}
                 placeholder={'{\n  "name": "My route",\n  "reality": "..."\n}'}
-                className="mt-4 min-h-[360px] w-full resize-y rounded-2xl border border-white/10 bg-[#070a0e] p-4 font-mono text-xs leading-6 text-white/76 outline-none transition placeholder:text-white/20 focus:border-cyan-300/45"
               />
 
               {error && (
-                <div className="mt-4 rounded-2xl border border-red-400/25 bg-red-400/10 p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-red-200">Import blocked</p>
-                  <p className="mt-2 text-sm leading-6 text-red-100/85">{error}</p>
+                <div className="errorBox">
+                  <strong>Import blocked</strong>
+                  <p>{error}</p>
                 </div>
               )}
 
@@ -431,38 +381,26 @@ export default function UploadRoutePage() {
                 type="button"
                 onClick={importRoute}
                 disabled={!parsedPreview}
-                className="mt-5 w-full rounded-full bg-cyan-300 px-5 py-3.5 text-sm font-semibold text-black transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-30"
+                className="button primary normalizeButton"
               >
                 Normalize into TA-14 route
               </button>
             </div>
-          </div>
+          </section>
 
-          <div className="rounded-[2rem] border border-white/10 bg-[radial-gradient(circle_at_top_right,rgba(34,211,238,0.08),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.05),rgba(255,255,255,0.018))] p-5 shadow-2xl shadow-black/20 sm:p-7">
-            <div className="flex flex-col gap-5 border-b border-white/10 pb-6 sm:flex-row sm:items-start sm:justify-between">
+          <section className="panel resultPanel">
+            <div className="panelHeader">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Normalization record</p>
-                <h2 className="mt-2 text-2xl font-semibold tracking-tight">
-                  {route ? route.metadata.name : 'Awaiting route source'}
-                </h2>
-                <p className="mt-2 break-all font-mono text-xs text-white/38">
-                  {route?.routeId ?? 'A normalized route identity will appear here.'}
-                </p>
+                <p className="sectionLabel">Normalization record</p>
+                <h2>{route ? route.metadata.name : 'Awaiting route source'}</h2>
+                <p className="routeId">{route?.routeId ?? 'A normalized route identity will appear here.'}</p>
               </div>
-              <span
-                className={`w-fit rounded-full border px-4 py-2 text-xs font-semibold ${
-                  route?.status === 'READY_FOR_TEST'
-                    ? 'border-emerald-300/25 bg-emerald-300/10 text-emerald-100'
-                    : route?.status === 'HOLD'
-                      ? 'border-amber-300/25 bg-amber-300/10 text-amber-100'
-                      : 'border-white/10 bg-white/[0.04] text-white/40'
-                }`}
-              >
-                {readiness}
+              <span className={`statusBadge ${route?.status === 'READY_FOR_TEST' ? 'normalized' : route ? 'hold' : 'empty'}`}>
+                {route?.status ?? 'WAITING'}
               </span>
             </div>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="metricGrid">
               <Metric label="Mapped" value={`${mapped}/8`} detail="recognized stages" />
               <Metric label="UNKNOWN" value={String(unknowns)} detail="preserved gaps" />
               <Metric
@@ -473,54 +411,43 @@ export default function UploadRoutePage() {
             </div>
 
             {!route ? (
-              <div className="mt-6 rounded-[1.75rem] border border-white/10 bg-black/20 p-5 sm:p-6">
-                <div className="flex items-center justify-between gap-4 border-b border-white/10 pb-5">
+              <div className="inspectionCard">
+                <div className="inspectionHeader">
                   <div>
-                    <p className="text-sm font-semibold">Reality → Outcome inspection</p>
-                    <p className="mt-1 text-xs text-white/40">Normalization has not started.</p>
+                    <h3>Reality → Outcome inspection</h3>
+                    <p>Normalization has not started.</p>
                   </div>
-                  <span className="rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/35">
-                    0 of 8 mapped
-                  </span>
+                  <span>0 of 8 mapped</span>
                 </div>
 
-                <div className="mt-4 space-y-2">
+                <div className="stageList">
                   {stages.map((stage) => (
-                    <div
-                      key={stage.key}
-                      className="flex items-center gap-3 rounded-xl border border-white/[0.07] bg-white/[0.025] px-4 py-3"
-                    >
-                      <span className="font-mono text-[10px] text-white/25">{stage.number}</span>
-                      <span className="text-sm text-white/50">{stage.label}</span>
-                      <span className="ml-auto text-[10px] font-semibold uppercase tracking-[0.16em] text-white/25">
-                        Waiting
-                      </span>
+                    <div className="stageRow waiting" key={stage.key}>
+                      <span className="stageNumber">{stage.number}</span>
+                      <strong>{stage.label}</strong>
+                      <span className="stageState">Waiting</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="mt-6 rounded-2xl border border-cyan-300/10 bg-cyan-300/[0.045] p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">Governing principle</p>
-                  <p className="mt-3 text-xl font-semibold tracking-tight">No admissible evidence. No admissible execution.</p>
-                  <p className="mt-3 text-sm leading-6 text-white/45">
-                    Import does not convert missing fields into proof. Unresolved stages remain visible until corrected through a governed version.
-                  </p>
+                <div className="principleBox">
+                  <p className="sectionLabel">Governing principle</p>
+                  <h3>No admissible evidence. No admissible execution.</h3>
+                  <p>Import does not convert missing fields into proof. Unresolved stages remain visible until corrected through a governed version.</p>
                 </div>
               </div>
             ) : (
               <>
-                <div className="mt-6 overflow-hidden rounded-[1.75rem] border border-white/10 bg-black/20">
-                  <div className="flex flex-col gap-3 border-b border-white/10 p-5 sm:flex-row sm:items-center sm:justify-between">
+                <div className="inspectionCard">
+                  <div className="inspectionHeader">
                     <div>
-                      <p className="text-sm font-semibold">Reality → Outcome inspection</p>
-                      <p className="mt-1 text-xs text-white/40">Select a stage to inspect the normalized value.</p>
+                      <h3>Reality → Outcome inspection</h3>
+                      <p>Select a stage to inspect the normalized value.</p>
                     </div>
-                    <span className="w-fit rounded-full border border-white/10 px-3 py-1.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
-                      {mapped} of 8 mapped
-                    </span>
+                    <span>{mapped} of 8 mapped</span>
                   </div>
 
-                  <div className="divide-y divide-white/[0.07]">
+                  <div className="stageList">
                     {stages.map((stage) => {
                       const value = route.chain[stage.key];
                       const unresolved = value === 'UNKNOWN';
@@ -528,50 +455,32 @@ export default function UploadRoutePage() {
 
                       return (
                         <button
-                          key={stage.key}
                           type="button"
+                          className={`stageRow ${unresolved ? 'unresolved' : 'mapped'} ${expanded ? 'expanded' : ''}`}
+                          key={stage.key}
                           onClick={() => setExpandedStage(expanded ? null : stage.key)}
-                          className="block w-full px-5 py-4 text-left transition hover:bg-white/[0.035]"
                         >
-                          <div className="flex items-center gap-3">
-                            <span className="font-mono text-[10px] text-white/28">{stage.number}</span>
-                            <span className="text-sm font-semibold text-white/80">{stage.label}</span>
-                            <span
-                              className={`ml-auto text-[10px] font-semibold uppercase tracking-[0.16em] ${
-                                unresolved ? 'text-amber-200' : 'text-emerald-200'
-                              }`}
-                            >
-                              {unresolved ? 'UNKNOWN' : 'Mapped'}
-                            </span>
-                            <span className="text-white/25">{expanded ? '−' : '+'}</span>
-                          </div>
-                          {expanded && (
-                            <p
-                              className={`mt-3 border-t border-white/[0.07] pt-3 text-sm leading-6 ${
-                                unresolved ? 'font-mono text-amber-100/75' : 'text-white/55'
-                              }`}
-                            >
-                              {value}
-                            </p>
-                          )}
+                          <span className="stageNumber">{stage.number}</span>
+                          <strong>{stage.label}</strong>
+                          <span className="stageState">{unresolved ? 'UNKNOWN' : 'Mapped'}</span>
+                          <span className="expandMark">{expanded ? '−' : '+'}</span>
+                          {expanded && <p className="stageValue">{value}</p>}
                         </button>
                       );
                     })}
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-[1.75rem] border border-white/10 bg-black/20 p-5">
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="recordCard">
+                  <div className="recordHeader">
                     <div>
-                      <p className="text-sm font-semibold">Preserved import record</p>
-                      <p className="mt-1 text-xs text-white/40">Source identity remains attached to the normalized route.</p>
+                      <h3>Preserved import record</h3>
+                      <p>Source identity remains attached to the normalized route.</p>
                     </div>
-                    <span className="break-all rounded-full border border-white/10 px-3 py-2 font-mono text-[10px] text-white/45">
-                      {route.importRecord.sourceDigest}
-                    </span>
+                    <code>{route.importRecord.sourceDigest}</code>
                   </div>
 
-                  <dl className="mt-5 grid gap-4 text-xs sm:grid-cols-2">
+                  <dl className="infoGrid">
                     <Info label="Original file" value={route.importRecord.originalFileName} />
                     <Info label="Original schema" value={route.importRecord.originalSchema} />
                     <Info label="Domain" value={route.metadata.domain} />
@@ -581,51 +490,35 @@ export default function UploadRoutePage() {
                   </dl>
                 </div>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  <button
-                    type="button"
-                    onClick={copyRoute}
-                    className="rounded-full border border-white/15 px-5 py-3 text-sm font-semibold text-white transition hover:border-white/35"
-                  >
+                <div className="actionGrid">
+                  <button type="button" onClick={copyRoute} className="button secondary">
                     {copied ? 'Copied' : 'Copy normalized JSON'}
                   </button>
-                  <button
-                    type="button"
-                    onClick={download}
-                    className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-cyan-200"
-                  >
+                  <button type="button" onClick={download} className="button primary white">
                     Download route
                   </button>
-                  <Link
-                    href="/workspace/build"
-                    className="rounded-full border border-white/15 px-5 py-3 text-center text-sm font-semibold text-white transition hover:border-white/35"
-                  >
+                  <Link href="/workspace/build" className="button secondary">
                     Correct in Builder
                   </Link>
-                  <Link
-                    href="/workspace/scanner"
-                    className="rounded-full bg-cyan-300 px-5 py-3 text-center text-sm font-semibold text-black transition hover:bg-cyan-200"
-                  >
+                  <Link href="/workspace/scanner" className="button primary">
                     Open Scanner
                   </Link>
                 </div>
               </>
             )}
-          </div>
+          </section>
         </section>
 
-        <section className="mt-6 rounded-[2rem] border border-white/10 bg-white/[0.025] p-5 sm:p-7">
-          <div className="flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <section className="sequencePanel">
+          <div className="sequenceHeader">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-cyan-300">Governed import sequence</p>
-              <h2 className="mt-2 text-2xl font-semibold tracking-tight">The source moves forward without being rewritten into certainty.</h2>
+              <p className="sectionLabel">Governed import sequence</p>
+              <h2>The source moves forward without being rewritten into certainty.</h2>
             </div>
-            <p className="max-w-xl text-sm leading-6 text-white/45">
-              Every imported route remains reviewable because identity, missing stages, and correction history stay visible.
-            </p>
+            <p>Every imported route remains reviewable because identity, missing stages, and correction history stay visible.</p>
           </div>
 
-          <div className="mt-6 grid gap-4 lg:grid-cols-3">
+          <div className="principleGrid">
             <Principle
               number="01"
               title="Preserve source identity"
@@ -644,55 +537,791 @@ export default function UploadRoutePage() {
           </div>
         </section>
       </div>
+
+      <style jsx>{`
+        .uploadPage {
+          min-height: 100vh;
+          width: 100%;
+          overflow-x: hidden;
+          background:
+            radial-gradient(circle at 20% 0%, rgba(31, 190, 216, 0.08), transparent 30%),
+            radial-gradient(circle at 95% 25%, rgba(25, 224, 174, 0.05), transparent 32%),
+            #061016;
+          color: #f4f7fb;
+          padding: 24px;
+        }
+
+        .shell {
+          width: 100%;
+          max-width: 1480px;
+          margin: 0 auto;
+        }
+
+        .hero,
+        .panel,
+        .sequencePanel {
+          position: relative;
+          border: 1px solid rgba(151, 188, 213, 0.15);
+          background: linear-gradient(145deg, rgba(15, 35, 46, 0.96), rgba(7, 18, 25, 0.98));
+          box-shadow: 0 26px 80px rgba(0, 0, 0, 0.28);
+        }
+
+        .hero {
+          overflow: hidden;
+          border-radius: 28px;
+          padding: 34px;
+        }
+
+        .heroGlow {
+          position: absolute;
+          inset: -120px auto auto -120px;
+          width: 420px;
+          height: 420px;
+          border-radius: 50%;
+          background: rgba(27, 195, 226, 0.11);
+          filter: blur(80px);
+          pointer-events: none;
+        }
+
+        .heroTop {
+          position: relative;
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 30px;
+        }
+
+        .eyebrowRow,
+        .heroActions,
+        .editorHeader,
+        .recordHeader {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .eyebrowPill,
+        .workflowStep,
+        .statusBadge {
+          border: 1px solid rgba(79, 223, 237, 0.24);
+          background: rgba(67, 219, 231, 0.08);
+          color: #8feef4;
+          border-radius: 999px;
+        }
+
+        .eyebrowPill {
+          padding: 7px 11px;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
+
+        .eyebrowText {
+          color: #738b9b;
+          font-size: 12px;
+          font-weight: 700;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        h1 {
+          max-width: 980px;
+          margin: 20px 0 0;
+          font-size: clamp(38px, 4.2vw, 66px);
+          line-height: 1.02;
+          letter-spacing: -0.045em;
+        }
+
+        .heroCopy {
+          max-width: 820px;
+          margin: 20px 0 0;
+          color: #9db0bd;
+          font-size: 17px;
+          line-height: 1.7;
+        }
+
+        .button {
+          appearance: none;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 44px;
+          border-radius: 999px;
+          border: 1px solid transparent;
+          padding: 0 20px;
+          font: inherit;
+          font-size: 13px;
+          font-weight: 800;
+          text-decoration: none;
+          cursor: pointer;
+          transition: 160ms ease;
+        }
+
+        .button:hover {
+          transform: translateY(-1px);
+        }
+
+        .button.primary {
+          border-color: #4edeea;
+          background: linear-gradient(135deg, #63e6f1, #42e7bb);
+          color: #031015;
+        }
+
+        .button.white {
+          border-color: #eef5f7;
+          background: #eef5f7;
+          color: #071017;
+        }
+
+        .button.secondary {
+          border-color: rgba(152, 184, 203, 0.2);
+          background: rgba(5, 14, 20, 0.5);
+          color: #dce7ed;
+        }
+
+        .button.small {
+          min-height: 36px;
+          padding: 0 14px;
+          font-size: 12px;
+        }
+
+        .workflow {
+          position: relative;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          overflow-x: auto;
+          margin-top: 30px;
+          padding: 14px;
+          border: 1px solid rgba(151, 188, 213, 0.12);
+          border-radius: 18px;
+          background: rgba(2, 10, 15, 0.48);
+        }
+
+        .workflowItem {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          flex: 1 0 auto;
+        }
+
+        .workflowStep {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          padding: 9px 13px;
+          border-color: rgba(151, 188, 213, 0.11);
+          background: rgba(255, 255, 255, 0.02);
+          color: #607786;
+          white-space: nowrap;
+        }
+
+        .workflowStep.active {
+          border-color: rgba(79, 223, 237, 0.26);
+          background: rgba(67, 219, 231, 0.08);
+          color: #c7fbff;
+        }
+
+        .workflowStep span {
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 10px;
+        }
+
+        .workflowStep strong {
+          font-size: 12px;
+        }
+
+        .workflowArrow {
+          color: rgba(151, 188, 213, 0.25);
+        }
+
+        .workspaceGrid {
+          display: grid;
+          grid-template-columns: minmax(0, 0.96fr) minmax(0, 1.04fr);
+          gap: 22px;
+          margin-top: 22px;
+        }
+
+        .panel,
+        .sequencePanel {
+          border-radius: 26px;
+          padding: 26px;
+        }
+
+        .panelHeader {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 22px;
+          padding-bottom: 22px;
+          border-bottom: 1px solid rgba(151, 188, 213, 0.12);
+        }
+
+        .sectionLabel {
+          margin: 0;
+          color: #66e2ed;
+          font-size: 10px;
+          font-weight: 800;
+          letter-spacing: 0.2em;
+          text-transform: uppercase;
+        }
+
+        h2 {
+          margin: 8px 0 0;
+          font-size: 26px;
+          line-height: 1.15;
+          letter-spacing: -0.025em;
+        }
+
+        .panelHeader p:not(.sectionLabel),
+        .editorHeader p,
+        .inspectionHeader p,
+        .recordHeader p {
+          margin: 8px 0 0;
+          color: #8197a5;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        .statusBadge {
+          flex: 0 0 auto;
+          padding: 9px 12px;
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .statusBadge.error,
+        .statusBadge.empty {
+          border-color: rgba(151, 188, 213, 0.13);
+          background: rgba(255, 255, 255, 0.03);
+          color: #728795;
+        }
+
+        .statusBadge.hold {
+          border-color: rgba(255, 196, 80, 0.24);
+          background: rgba(255, 196, 80, 0.08);
+          color: #ffd993;
+        }
+
+        .statusBadge.normalized {
+          border-color: rgba(57, 222, 162, 0.24);
+          background: rgba(57, 222, 162, 0.08);
+          color: #8cf2c7;
+        }
+
+        .dropZone {
+          margin-top: 22px;
+          padding: 34px 24px;
+          text-align: center;
+          border: 1px dashed rgba(151, 188, 213, 0.22);
+          border-radius: 24px;
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.012));
+          transition: 160ms ease;
+        }
+
+        .dropZone.dragging {
+          border-color: #61e5ee;
+          background: rgba(72, 221, 232, 0.08);
+        }
+
+        .fileInput {
+          display: none;
+        }
+
+        .uploadIcon {
+          display: grid;
+          place-items: center;
+          width: 62px;
+          height: 62px;
+          margin: 0 auto;
+          border: 1px solid rgba(151, 188, 213, 0.15);
+          border-radius: 18px;
+          background: rgba(2, 10, 15, 0.62);
+          color: #73e8ef;
+          font-size: 26px;
+        }
+
+        .dropZone h3,
+        .editorCard h3,
+        .inspectionCard h3,
+        .recordCard h3,
+        .principleCard h3 {
+          margin: 17px 0 0;
+          font-size: 19px;
+        }
+
+        .dropZone p {
+          margin: 8px 0 20px;
+          color: #738995;
+          font-size: 13px;
+        }
+
+        .separator {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          margin: 22px 0;
+        }
+
+        .separator span {
+          height: 1px;
+          flex: 1;
+          background: rgba(151, 188, 213, 0.12);
+        }
+
+        .separator strong {
+          color: #566e7c;
+          font-size: 10px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
+
+        .editorCard,
+        .inspectionCard,
+        .recordCard {
+          border: 1px solid rgba(151, 188, 213, 0.12);
+          border-radius: 22px;
+          background: rgba(2, 10, 15, 0.45);
+        }
+
+        .editorCard {
+          padding: 20px;
+        }
+
+        .editorHeader {
+          justify-content: space-between;
+        }
+
+        .editorHeader h3,
+        .inspectionHeader h3,
+        .recordHeader h3 {
+          margin: 0;
+        }
+
+        textarea {
+          width: 100%;
+          min-height: 360px;
+          margin-top: 16px;
+          resize: vertical;
+          border: 1px solid rgba(151, 188, 213, 0.13);
+          border-radius: 17px;
+          outline: none;
+          background: #040b10;
+          color: #d9e5eb;
+          padding: 16px;
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 12px;
+          line-height: 1.65;
+          box-sizing: border-box;
+        }
+
+        textarea:focus {
+          border-color: rgba(88, 226, 237, 0.5);
+          box-shadow: 0 0 0 3px rgba(88, 226, 237, 0.06);
+        }
+
+        .normalizeButton {
+          width: 100%;
+          margin-top: 16px;
+        }
+
+        .normalizeButton:disabled {
+          cursor: not-allowed;
+          opacity: 0.3;
+          transform: none;
+        }
+
+        .errorBox {
+          margin-top: 14px;
+          padding: 14px;
+          border: 1px solid rgba(255, 106, 124, 0.25);
+          border-radius: 15px;
+          background: rgba(255, 92, 112, 0.08);
+        }
+
+        .errorBox strong {
+          color: #ffb7c0;
+          font-size: 10px;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
+
+        .errorBox p {
+          margin: 7px 0 0;
+          color: #ffd4d9;
+          font-size: 13px;
+        }
+
+        .routeId {
+          word-break: break-all;
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        }
+
+        .metricGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 22px;
+        }
+
+        .metric {
+          border: 1px solid rgba(151, 188, 213, 0.11);
+          border-radius: 17px;
+          background: rgba(2, 10, 15, 0.42);
+          padding: 16px;
+        }
+
+        .metricLabel {
+          margin: 0;
+          color: #617986;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.17em;
+          text-transform: uppercase;
+        }
+
+        .metricValue {
+          margin: 10px 0 0;
+          font-size: 30px;
+          font-weight: 800;
+          letter-spacing: -0.04em;
+        }
+
+        .metricDetail {
+          margin: 3px 0 0;
+          color: #607682;
+          font-size: 11px;
+        }
+
+        .inspectionCard,
+        .recordCard {
+          margin-top: 20px;
+          overflow: hidden;
+        }
+
+        .inspectionHeader,
+        .recordHeader {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 18px;
+          padding: 18px;
+          border-bottom: 1px solid rgba(151, 188, 213, 0.11);
+        }
+
+        .inspectionHeader > span {
+          border: 1px solid rgba(151, 188, 213, 0.12);
+          border-radius: 999px;
+          padding: 7px 10px;
+          color: #7b909c;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+          white-space: nowrap;
+        }
+
+        .stageList {
+          padding: 10px;
+        }
+
+        .stageRow {
+          position: relative;
+          display: grid;
+          grid-template-columns: 34px 1fr auto auto;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          min-height: 48px;
+          margin: 0 0 7px;
+          border: 1px solid rgba(151, 188, 213, 0.09);
+          border-radius: 13px;
+          background: rgba(255, 255, 255, 0.018);
+          color: #d6e1e7;
+          padding: 10px 12px;
+          text-align: left;
+          box-sizing: border-box;
+        }
+
+        button.stageRow {
+          cursor: pointer;
+          font: inherit;
+        }
+
+        .stageRow:hover {
+          background: rgba(255, 255, 255, 0.03);
+        }
+
+        .stageNumber {
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          color: #546d7b;
+          font-size: 10px;
+        }
+
+        .stageRow strong {
+          font-size: 13px;
+        }
+
+        .stageState {
+          color: #607783;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+        }
+
+        .mapped .stageState {
+          color: #6be7b6;
+        }
+
+        .unresolved .stageState {
+          color: #ffd177;
+        }
+
+        .expandMark {
+          color: #526a77;
+        }
+
+        .stageValue {
+          grid-column: 2 / -1;
+          margin: 4px 0 0;
+          padding-top: 10px;
+          border-top: 1px solid rgba(151, 188, 213, 0.09);
+          color: #94a8b4;
+          font-size: 12px;
+          line-height: 1.6;
+        }
+
+        .principleBox {
+          margin: 10px;
+          padding: 18px;
+          border: 1px solid rgba(79, 223, 237, 0.12);
+          border-radius: 17px;
+          background: rgba(66, 219, 231, 0.045);
+        }
+
+        .principleBox h3 {
+          margin: 10px 0 0;
+          font-size: 20px;
+        }
+
+        .principleBox > p:last-child {
+          margin: 10px 0 0;
+          color: #8297a3;
+          font-size: 13px;
+          line-height: 1.65;
+        }
+
+        .recordHeader code {
+          max-width: 48%;
+          overflow-wrap: anywhere;
+          border: 1px solid rgba(151, 188, 213, 0.11);
+          border-radius: 999px;
+          padding: 8px 10px;
+          color: #728895;
+          font-size: 9px;
+        }
+
+        .infoGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 9px;
+          margin: 0;
+          padding: 16px;
+        }
+
+        .infoItem {
+          border: 1px solid rgba(151, 188, 213, 0.08);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.016);
+          padding: 11px;
+        }
+
+        .infoItem dt {
+          color: #566e7b;
+          font-size: 9px;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .infoItem dd {
+          margin: 7px 0 0;
+          overflow-wrap: anywhere;
+          color: #b5c4cc;
+          font-size: 12px;
+        }
+
+        .actionGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 18px;
+        }
+
+        .sequencePanel {
+          margin-top: 22px;
+        }
+
+        .sequenceHeader {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 26px;
+          padding-bottom: 20px;
+          border-bottom: 1px solid rgba(151, 188, 213, 0.11);
+        }
+
+        .sequenceHeader > p {
+          max-width: 560px;
+          margin: 0;
+          color: #7f949f;
+          font-size: 13px;
+          line-height: 1.65;
+        }
+
+        .principleGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+          margin-top: 20px;
+        }
+
+        .principleCard {
+          border: 1px solid rgba(151, 188, 213, 0.1);
+          border-radius: 19px;
+          background: linear-gradient(145deg, rgba(255, 255, 255, 0.028), rgba(255, 255, 255, 0.01));
+          padding: 18px;
+        }
+
+        .principleTitle {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+        }
+
+        .principleNumber {
+          display: grid;
+          place-items: center;
+          width: 34px;
+          height: 34px;
+          border: 1px solid rgba(79, 223, 237, 0.2);
+          border-radius: 50%;
+          background: rgba(67, 219, 231, 0.07);
+          color: #79e8ef;
+          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+          font-size: 10px;
+        }
+
+        .principleCard h3 {
+          margin: 0;
+          font-size: 16px;
+        }
+
+        .principleCard > p {
+          margin: 14px 0 0;
+          color: #758b97;
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        @media (max-width: 1100px) {
+          .workspaceGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .heroTop,
+          .sequenceHeader {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .uploadPage {
+            padding: 14px;
+          }
+
+          .hero,
+          .panel,
+          .sequencePanel {
+            border-radius: 20px;
+            padding: 20px;
+          }
+
+          .heroTop,
+          .panelHeader,
+          .editorHeader,
+          .recordHeader {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .heroActions {
+            width: 100%;
+            flex-wrap: wrap;
+          }
+
+          .heroActions .button {
+            flex: 1;
+          }
+
+          .metricGrid,
+          .principleGrid,
+          .infoGrid,
+          .actionGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .recordHeader code {
+            max-width: 100%;
+          }
+
+          .stageRow {
+            grid-template-columns: 30px 1fr auto;
+          }
+
+          .expandMark {
+            display: none;
+          }
+
+          .stageValue {
+            grid-column: 2 / -1;
+          }
+        }
+      `}</style>
     </main>
   );
 }
 
-function Metric({
-  label,
-  value,
-  detail,
-}: {
-  label: string;
-  value: string;
-  detail: string;
-}) {
+function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
-      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/32">{label}</p>
-      <p className="mt-3 text-3xl font-semibold tracking-tight">{value}</p>
-      <p className="mt-1 text-xs text-white/38">{detail}</p>
+    <div className="metric">
+      <p className="metricLabel">{label}</p>
+      <p className="metricValue">{value}</p>
+      <p className="metricDetail">{detail}</p>
     </div>
   );
 }
 
 function Info({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-xl border border-white/[0.07] bg-white/[0.025] p-3">
-      <dt className="text-[10px] font-semibold uppercase tracking-[0.16em] text-white/30">{label}</dt>
-      <dd className="mt-2 break-words text-sm text-white/68">{value}</dd>
+    <div className="infoItem">
+      <dt>{label}</dt>
+      <dd>{value}</dd>
     </div>
   );
 }
 
-function Principle({
-  number,
-  title,
-  text: body,
-}: {
-  number: string;
-  title: string;
-  text: string;
-}) {
+function Principle({ number, title, text }: { number: string; title: string; text: string }) {
   return (
-    <div className="rounded-[1.5rem] border border-white/10 bg-[linear-gradient(145deg,rgba(255,255,255,0.045),rgba(255,255,255,0.018))] p-5">
-      <div className="flex items-center gap-3">
-        <span className="grid h-9 w-9 place-items-center rounded-full border border-cyan-300/20 bg-cyan-300/10 font-mono text-xs text-cyan-200">
-          {number}
-        </span>
-        <h3 className="text-lg font-semibold">{title}</h3>
+    <div className="principleCard">
+      <div className="principleTitle">
+        <span className="principleNumber">{number}</span>
+        <h3>{title}</h3>
       </div>
-      <p className="mt-4 text-sm leading-6 text-white/48">{body}</p>
+      <p>{text}</p>
     </div>
   );
 }
