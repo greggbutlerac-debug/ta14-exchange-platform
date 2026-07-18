@@ -12,6 +12,7 @@ import {
 import type { TransferRouteDraft } from "../../../lib/route-draft-transfer";
 import { saveStoredRoute } from "../../../lib/route-library";
 import EvaluateRouteLink from "./evaluate-route-link";
+import { useRouteBuilderHandoff } from "./use-route-builder-handoff";
 
 type StageKey =
   | "reality"
@@ -237,6 +238,7 @@ function stageState(stage: Stage): "COMPLETE" | "UNKNOWN" {
 }
 
 export default function BuildRoutePage() {
+  const { handoff, checked: handoffChecked } = useRouteBuilderHandoff();
   const [routeName, setRouteName] = useState("Untitled governance route");
   const [domain, setDomain] = useState("AI Governance");
   const [owner, setOwner] = useState("UNKNOWN");
@@ -296,7 +298,45 @@ export default function BuildRoutePage() {
   );
 
   useEffect(() => {
+    if (!handoffChecked) {
+      return;
+    }
+
     try {
+      if (handoff) {
+        const opened = handoff.route;
+
+        setRouteName(
+          opened.metadata.name.trim() || "Untitled governance route",
+        );
+        setDomain(opened.metadata.domain.trim() || "UNKNOWN");
+        setOwner(opened.metadata.owner.trim() || "UNKNOWN");
+        setStages(
+          stageDefinitions.map((stage) => ({
+            ...stage,
+            value:
+              opened.chain[stage.key] === "UNKNOWN"
+                ? ""
+                : opened.chain[stage.key],
+          })),
+        );
+        setSelected("reality");
+        setShowJson(false);
+        setCopied(false);
+        setSavedAt(null);
+        setStoredRouteId(handoff.libraryRouteId);
+        setLibraryNotice(null);
+        setImportNotice({
+          type: "success",
+          title: "Saved route opened in builder",
+          message: handoff.libraryRouteId
+            ? `${opened.metadata.name} is connected to its My Routes entry. Saving changes will update that route.`
+            : `${opened.metadata.name} was transferred into the builder as a new working draft.`,
+        });
+
+        return;
+      }
+
       const stored = window.localStorage.getItem(localDraftStorageKey);
 
       if (stored) {
@@ -339,7 +379,7 @@ export default function BuildRoutePage() {
     } finally {
       setLocalDraftReady(true);
     }
-  }, []);
+  }, [handoff, handoffChecked]);
 
   useEffect(() => {
     if (!localDraftReady) {
