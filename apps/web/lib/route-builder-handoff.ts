@@ -65,20 +65,24 @@ export function isTransferRouteDraft(
     return false;
   }
 
-  if (!isRecord(value.metadata)) {
+  const metadata = value.metadata;
+
+  if (!isRecord(metadata)) {
     return false;
   }
 
   if (
-    typeof value.metadata.name !== "string" ||
-    typeof value.metadata.domain !== "string" ||
-    typeof value.metadata.owner !== "string" ||
-    typeof value.metadata.version !== "number"
+    typeof metadata.name !== "string" ||
+    typeof metadata.domain !== "string" ||
+    typeof metadata.owner !== "string" ||
+    typeof metadata.version !== "number"
   ) {
     return false;
   }
 
-  if (!isStringRecord(value.chain)) {
+  const chain = value.chain;
+
+  if (!isStringRecord(chain)) {
     return false;
   }
 
@@ -91,28 +95,30 @@ export function isTransferRouteDraft(
     "commit",
     "execution",
     "outcome",
-  ];
+  ] as const;
 
   if (
     requiredStages.some(
-      (stage) => typeof value.chain[stage] !== "string",
+      (stage) => typeof chain[stage] !== "string",
     )
   ) {
     return false;
   }
 
-  if (!isRecord(value.readiness)) {
+  const readiness = value.readiness;
+
+  if (!isRecord(readiness)) {
     return false;
   }
 
   return (
-    typeof value.readiness.completedStages === "number" &&
-    typeof value.readiness.totalStages === "number" &&
-    Array.isArray(value.readiness.missingStages) &&
-    value.readiness.missingStages.every(
+    typeof readiness.completedStages === "number" &&
+    typeof readiness.totalStages === "number" &&
+    Array.isArray(readiness.missingStages) &&
+    readiness.missingStages.every(
       (item) => typeof item === "string",
     ) &&
-    typeof value.readiness.nextAction === "string" &&
+    typeof readiness.nextAction === "string" &&
     typeof value.governingPrinciple === "string"
   );
 }
