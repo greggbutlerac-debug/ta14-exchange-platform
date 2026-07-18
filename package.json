@@ -2,7 +2,7 @@
   "name": "ta14-exchange-platform",
   "version": "0.3.2",
   "private": true,
-  "description": "TA-14 Global Admissible Execution Exchange website and admissible execution integrity engine.",
+  "description": "TA-14 multi-domain governance workspace for constructing, evaluating, correcting, verifying, and preserving admissible execution routes.",
   "type": "module",
   "packageManager": "npm@10.8.1",
   "engines": {
