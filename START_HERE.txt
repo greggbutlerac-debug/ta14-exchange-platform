@@ -1,26 +1,368 @@
-TA-14 EXCHANGE — COMPLETE CLEAN SOURCE
+TA-14 EXCHANGE PLATFORM
+V0.3.2 — START HERE
 
-This ZIP contains the complete project source needed for the GitHub repository.
-It intentionally excludes node_modules, .next build output, local data, and secrets.
+Build the route.
+Prove the authority.
+Preserve the consequence.
 
-GITHUB UPLOAD
-1. Extract this ZIP.
-2. Open the extracted ta14-exchange-platform folder.
-3. On GitHub, open greggbutlerac-debug/ta14-exchange-platform.
-4. Choose Add file > Upload files.
-5. Drag everything INSIDE the ta14-exchange-platform folder onto the upload page.
-6. Commit directly to the main branch.
+GOVERNING PRINCIPLE
 
-LOCAL RUN
-1. Install Node.js 20.9 or newer.
-2. Open a terminal in the ta14-exchange-platform folder.
-3. Run: npm install
-4. Run: npm run dev
-5. Open: http://localhost:3000
+NO ADMISSIBLE EVIDENCE.
+NO ADMISSIBLE EXECUTION.
 
-FULL VERIFICATION
-Run: npm run verify
 
-CURRENT BOUNDARY
-This is the complete local single-route demonstration source. Live sales still require
-production authentication, PostgreSQL, Stripe, managed signing keys, email, and hosting.
+WHAT THIS REPOSITORY CONTAINS
+
+This repository contains the runnable TA-14 Exchange Platform development and demonstration environment.
+
+The platform supports:
+
+- Public TA-14 Exchange landing pages
+- Governance Workspace
+- Visual Route Builder
+- Canonical eight-stage route construction
+- Route transfer into the evaluation workspace
+- Vendor-payment route evaluation
+- AI Governance route evaluation
+- ALLOW / HOLD / DENY / ESCALATE decisions
+- Preserved adverse results
+- Correction and rerun behavior
+- Route records
+- Public verification
+- Registry lookup
+- Signed demonstration receipts
+- Admissible Execution Records
+- Downloadable verification bundles
+- Hash-chained route-event integrity
+
+
+CANONICAL TA-14 CHAIN
+
+Reality
+  ->
+Record
+  ->
+Continuity
+  ->
+Admissibility
+  ->
+Binding
+  ->
+Commit
+  ->
+Execution
+  ->
+Outcome
+
+A route containing text in all eight stages is not automatically admissible.
+
+Declared content is not evidence.
+
+Unknown is not satisfied.
+
+
+LIVE DEPLOYMENT
+
+Public platform:
+
+https://ta14-exchange-platform-theta.vercel.app/
+
+Governance Workspace:
+
+https://ta14-exchange-platform-theta.vercel.app/workspace
+
+Visual Route Builder:
+
+https://ta14-exchange-platform-theta.vercel.app/workspace/build
+
+Route Evaluation Workspace:
+
+https://ta14-exchange-platform-theta.vercel.app/workspace/routes/new
+
+
+RECOMMENDED FIRST EXPERIENCE
+
+1. Open the Governance Workspace.
+
+2. Open the Visual Route Builder.
+
+3. Construct or load an AI Governance route.
+
+4. Complete the eight declared route stages.
+
+5. Transfer the route into the evaluation workspace.
+
+6. Confirm that the route remains identified as AI Governance.
+
+7. Review the AI Governance adapter result.
+
+8. Observe that declared stages do not automatically produce ALLOW.
+
+9. Review each requirement marked SATISFIED, UNKNOWN, or UNSATISFIED.
+
+10. Confirm that unresolved evidence, authority, execution, or outcome proof produces HOLD.
+
+
+VENDOR-PAYMENT DEMONSTRATION
+
+The original executable demonstration remains available.
+
+It represents a vendor payment above USD 25,000.
+
+The initial route is designed to produce HOLD because required dual authority and beneficiary proof are missing.
+
+The route may then be corrected and rerun.
+
+The original HOLD must remain preserved.
+
+Correction does not erase the adverse decision that came before it.
+
+
+AI GOVERNANCE EVALUATION
+
+The Visual Route Builder can transfer an AI Governance route into the evaluation workspace.
+
+The AI Governance route is not submitted to the vendor-payment API.
+
+The platform does not invent:
+
+- Supplier identity
+- Invoice identity
+- Beneficiary identity
+- Payment value
+- Authority proof
+- Evidence objects
+- Execution receipts
+- Outcome receipts
+
+The AI Governance adapter evaluates the route within its own domain boundary.
+
+A complete textual route may still receive HOLD when required proof remains UNKNOWN.
+
+
+LOCAL INSTALLATION
+
+REQUIREMENTS
+
+- Node.js 22 through 24
+- npm 10.8.1 through 10.x
+
+
+INSTALL DEPENDENCIES
+
+Run:
+
+npm install
+
+
+START DEVELOPMENT SERVER
+
+Run:
+
+npm run dev
+
+Then open:
+
+http://localhost:3000
+
+
+RUN TYPE CHECKING
+
+Run:
+
+npm run typecheck
+
+
+RUN TESTS
+
+Run:
+
+npm run test
+
+
+CREATE PRODUCTION BUILD
+
+Run:
+
+npm run build
+
+
+RUN COMPLETE VERIFICATION
+
+Run:
+
+npm run verify
+
+The verification command runs:
+
+1. TypeScript checking
+2. Automated tests
+3. Next.js production build
+
+
+IMPORTANT DEVELOPMENT BOUNDARY
+
+V0.3.2 is a working development and demonstration platform.
+
+It is not yet a complete production custody, identity, payment, certification, or independent-verification system.
+
+Do not submit production secrets, protected health information, financial credentials, regulated evidence, access tokens, private customer records, or signing keys to a development deployment.
+
+
+CURRENT LIMITATIONS
+
+The current release does not yet provide:
+
+- Complete production authentication
+- Final tenant isolation
+- Production private evidence custody
+- Managed hardware-backed signing keys
+- Final key rotation and revocation
+- Production Stripe entitlement processing
+- Independently operated certification
+- Independently operated verification authority
+- Final enterprise access controls
+- Final disaster-recovery controls
+- Production legal-hold controls
+- Complete production audit separation
+
+Selected execution, bypass, replay, duplicate-payment, and outcome observations remain visibly bounded demonstration fixtures.
+
+
+PERSISTENCE BOUNDARY
+
+Local development records and development storage must be treated as demonstration records.
+
+A visible route record is not automatically a production custody record.
+
+Production deployment requires:
+
+- Authenticated access
+- Tenant separation
+- Durable database persistence
+- Private evidence storage
+- Backup and recovery
+- Retention controls
+- Legal-hold controls
+- Access logging
+- Administrative separation
+- Incident response
+- Disaster recovery
+
+
+SIGNING BOUNDARY
+
+A valid digital signature proves that an artifact corresponds to a signing key and that the signed content has not changed.
+
+It does not automatically prove:
+
+- That the underlying evidence was true
+- That the signer possessed lawful authority
+- That the execution occurred
+- That the outcome was accurate
+- That the system was uncompromised
+- That an independent authority reviewed the route
+
+Development keys must not be used as production trust anchors.
+
+
+FREE TESTING AND DURABLE PRESERVATION
+
+Users may construct and test routes without paying for a favorable decision.
+
+The commercial preservation boundary is separate from the decision.
+
+Payment does not purchase ALLOW.
+
+A preserved route may remain:
+
+- ALLOW
+- HOLD
+- DENY
+- ESCALATE
+
+Adverse decisions must remain preserved exactly as issued.
+
+
+REPOSITORY MAP
+
+.github/workflows
+
+Continuous-integration workflows.
+
+
+apps/web
+
+Next.js public platform, workspace, builder, route pages, APIs, verification surfaces, registry surfaces, route-transfer logic, and domain adapters.
+
+
+database
+
+Database implementation and planning artifacts.
+
+
+docs
+
+Architecture, deployment, security, persistence, boundary, and implementation documentation.
+
+
+packages
+
+Shared route, decision, receipt, integrity, storage, cryptographic, and testing logic.
+
+
+schemas
+
+Route and API validation schemas.
+
+
+tests/acceptance
+
+Acceptance-level verification for consequential-route behavior.
+
+
+NEXT DEVELOPMENT DIRECTION
+
+The next major production steps include:
+
+- Managed PostgreSQL
+- Authenticated tenant isolation
+- Private evidence storage
+- Managed signing infrastructure
+- Key rotation and revocation
+- Stripe entitlement boundaries
+- Official durable route preservation
+- Production registry controls
+- Preserved AI Governance correction history
+- AI Governance reevaluation
+- Execution-receipt intake
+- Outcome-receipt intake
+- Additional domain adapters
+- Adapter registration controls
+- Security acceptance testing
+- Backup and recovery testing
+- Enterprise API integration
+
+
+CORE DISTINCTION
+
+Most governance systems ask whether an action was approved.
+
+TA-14 asks whether the route remained admissible before consequence occurred and whether that legitimacy can survive verification afterward.
+
+
+CONTACT
+
+TA-14 Authority Governance Institution
+
+Public contact:
+
+ta14admissibleexecution@gmail.com
+
+
+BUILD THE ROUTE.
+PROVE THE AUTHORITY.
+PRESERVE THE CONSEQUENCE.
+
+NO ADMISSIBLE EVIDENCE.
+NO ADMISSIBLE EXECUTION.
