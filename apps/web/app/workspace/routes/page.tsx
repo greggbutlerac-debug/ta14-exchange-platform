@@ -5,12 +5,12 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 import type { StoredRoute } from "../../../lib/route-library";
+import { savePendingRouteDraft } from "../../../lib/route-draft-transfer";
 import {
   deleteSupabaseRoute,
   duplicateSupabaseRoute,
   listSupabaseRoutes,
 } from "../../../lib/supabase-route-library";
-import { savePendingRouteDraft } from "../../../lib/route-draft-transfer";
 import OpenInBuilderButton from "./open-in-builder-button";
 
 function formatDate(value: string): string {
@@ -54,6 +54,17 @@ function downloadRoute(item: StoredRoute): void {
   URL.revokeObjectURL(href);
 }
 
+function getErrorMessage(
+  error: unknown,
+  fallbackMessage: string,
+): string {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
+  return fallbackMessage;
+}
+
 export default function RouteLibraryPage() {
   const router = useRouter();
 
@@ -63,4 +74,1010 @@ export default function RouteLibraryPage() {
   const [notice, setNotice] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(true);
-  const [workingRouteId, setWorking
+  const [workingRouteId, setWorkingRouteId] = useState<
+    string | null
+  >(null);
+
+  const showNotice = useCallback((message: string): void => {
+    setNotice(message);
+
+    window.setTimeout(() => {
+      setNotice("");
+    }, 2200);
+  }, []);
+
+  const refreshRoutes = useCallback(async (): Promise<void> => {
+    setLoading(true);
+    setErrorMessage("");
+
+    try {
+      const storedRoutes = await listSupabaseRoutes();
+      setRoutes(storedRoutes);
+    } catch (error) {
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          "The authenticated route library could not be loaded.",
+        ),
+      );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshRoutes();
+  }, [refreshRoutes]);
+
+  const filteredRoutes = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
+
+    return routes.filter((item) => {
+      const matchesStatus =
+        statusFilter === "ALL" ||
+        item.route.status === statusFilter;
+
+      const searchable = [
+        item.route.metadata.name,
+        item.route.metadata.domain,
+        item.route.metadata.owner,
+        item.route.routeId,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      return (
+        matchesStatus &&
+        (!normalizedQuery ||
+          searchable.includes(normalizedQuery))
+      );
+    });
+  }, [query, routes, statusFilter]);
+
+  function evaluateRoute(item: StoredRoute): void {
+    savePendingRouteDraft(item.route);
+    router.push("/workspace/routes/new");
+  }
+
+  async function duplicateRoute(
+    item: StoredRoute,
+  ): Promise<void> {
+    setWorkingRouteId(item.id);
+    setErrorMessage("");
+
+    try {
+      const duplicate = await duplicateSupabaseRoute(item.id);
+
+      if (!duplicate) {
+        throw new Error(
+          "The selected route could not be found.",
+        );
+      }
+
+      await refreshRoutes();
+      showNotice(`Duplicated “${item.route.metadata.name}”.`);
+    } catch (error) {
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          "The selected route could not be duplicated.",
+        ),
+      );
+    } finally {
+      setWorkingRouteId(null);
+    }
+  }
+
+  async function removeRoute(
+    item: StoredRoute,
+  ): Promise<void> {
+    const confirmed = window.confirm(
+      `Delete “${item.route.metadata.name}” from your authenticated route library? This cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setWorkingRouteId(item.id);
+    setErrorMessage("");
+
+    try {
+      const deleted = await deleteSupabaseRoute(item.id);
+
+      if (!deleted) {
+        throw new Error(
+          "The selected route could not be found or deleted.",
+        );
+      }
+
+      setRoutes((currentRoutes) =>
+        currentRoutes.filter(
+          (currentRoute) => currentRoute.id !== item.id,
+        ),
+      );
+
+      showNotice(`Deleted “${item.route.metadata.name}”.`);
+    } catch (error) {
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          "The selected route could not be deleted.",
+        ),
+      );
+    } finally {
+      setWorkingRouteId(null);
+    }
+  }
+
+  return (
+    <main className="page">
+      <header className="topbar">
+        <div>
+          <p className="eyebrow">
+            TA-14 Exchange · Authenticated workspace
+          </p>
+
+          <h1>My Routes</h1>
+
+          <p className="intro">
+            Review, search, duplicate, export, and send your
+            authenticated governance routes into the TA-14 evaluation
+            workspace.
+          </p>
+        </div>
+
+        <div className="topActions">
+          <Link
+            href="/workspace"
+            className="secondaryButton"
+          >
+            ← Workspace
+          </Link>
+
+          <Link
+            href="/workspace/build"
+            className="primaryButton"
+          >
+            Build a route →
+          </Link>
+        </div>
+      </header>
+
+      {notice ? (
+        <div className="notice" role="status">
+          {notice}
+        </div>
+      ) : null}
+
+      {errorMessage ? (
+        <div className="errorNotice" role="alert">
+          <div>
+            <strong>Route-library error</strong>
+            <p>{errorMessage}</p>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              void refreshRoutes();
+            }}
+          >
+            Try again
+          </button>
+        </div>
+      ) : null}
+
+      <section className="summaryGrid">
+        <article>
+          <span>Saved routes</span>
+          <strong>{routes.length}</strong>
+        </article>
+
+        <article>
+          <span>Ready for test</span>
+          <strong>
+            {
+              routes.filter(
+                (item) =>
+                  item.route.status === "READY_FOR_TEST",
+              ).length
+            }
+          </strong>
+        </article>
+
+        <article>
+          <span>On hold</span>
+          <strong>
+            {
+              routes.filter(
+                (item) => item.route.status === "HOLD",
+              ).length
+            }
+          </strong>
+        </article>
+
+        <article>
+          <span>Drafts</span>
+          <strong>
+            {
+              routes.filter(
+                (item) => item.route.status === "DRAFT",
+              ).length
+            }
+          </strong>
+        </article>
+      </section>
+
+      <section className="libraryPanel">
+        <div className="libraryHeader">
+          <div>
+            <p className="eyebrow">Route library</p>
+            <h2>Saved to your authenticated account</h2>
+          </div>
+
+          <div className="filters">
+            <input
+              type="search"
+              value={query}
+              onChange={(event) =>
+                setQuery(event.target.value)
+              }
+              placeholder="Search name, domain, owner…"
+              aria-label="Search saved routes"
+            />
+
+            <select
+              value={statusFilter}
+              onChange={(event) =>
+                setStatusFilter(event.target.value)
+              }
+              aria-label="Filter routes by status"
+            >
+              <option value="ALL">All states</option>
+              <option value="READY_FOR_TEST">
+                Ready for test
+              </option>
+              <option value="HOLD">Hold</option>
+              <option value="DRAFT">Draft</option>
+            </select>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="emptyState compact">
+            <span className="loadingMark" aria-hidden="true">
+              TA-14
+            </span>
+
+            <h2>Loading your routes</h2>
+
+            <p>
+              Retrieving the routes assigned to your authenticated
+              account.
+            </p>
+          </div>
+        ) : routes.length === 0 ? (
+          <div className="emptyState">
+            <span className="emptyMark">01—08</span>
+
+            <h2>No authenticated routes yet</h2>
+
+            <p>
+              Build your first governed route and save it to your
+              account. It will appear here for reuse, evaluation, and
+              governed route management.
+            </p>
+
+            <Link
+              href="/workspace/build"
+              className="primaryButton"
+            >
+              Open Route Builder →
+            </Link>
+          </div>
+        ) : filteredRoutes.length === 0 ? (
+          <div className="emptyState compact">
+            <h2>No routes match these filters</h2>
+            <p>
+              Change the search text or route-state filter.
+            </p>
+          </div>
+        ) : (
+          <div className="routeGrid">
+            {filteredRoutes.map((item) => {
+              const readiness = item.route.readiness;
+
+              const percentage =
+                readiness.totalStages > 0
+                  ? Math.round(
+                      (readiness.completedStages /
+                        readiness.totalStages) *
+                        100,
+                    )
+                  : 0;
+
+              const isWorking =
+                workingRouteId === item.id;
+
+              return (
+                <article
+                  className="routeCard"
+                  key={item.id}
+                >
+                  <div className="cardTopline">
+                    <span
+                      className="status"
+                      data-state={item.route.status}
+                    >
+                      {item.route.status.replaceAll(
+                        "_",
+                        " ",
+                      )}
+                    </span>
+
+                    <span className="updated">
+                      Updated {formatDate(item.updatedAt)}
+                    </span>
+                  </div>
+
+                  <h3>{item.route.metadata.name}</h3>
+
+                  <p className="routeId">
+                    {item.route.routeId}
+                  </p>
+
+                  <div className="metadata">
+                    <div>
+                      <span>Domain</span>
+                      <strong>
+                        {item.route.metadata.domain}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>Owner</span>
+                      <strong>
+                        {item.route.metadata.owner}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>Version</span>
+                      <strong>
+                        {item.route.metadata.version}
+                      </strong>
+                    </div>
+                  </div>
+
+                  <div className="progressBlock">
+                    <div>
+                      <span>Route completeness</span>
+
+                      <strong>
+                        {readiness.completedStages} /{" "}
+                        {readiness.totalStages}
+                      </strong>
+                    </div>
+
+                    <div className="progressTrack">
+                      <div
+                        className="progressFill"
+                        style={{
+                          width: `${percentage}%`,
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  <div className="cardActions">
+                    <OpenInBuilderButton
+                      route={item.route}
+                      libraryRouteId={item.id}
+                      className="editAction"
+                    >
+                      Edit in builder →
+                    </OpenInBuilderButton>
+
+                    <button
+                      type="button"
+                      className="primaryAction"
+                      disabled={isWorking}
+                      onClick={() =>
+                        evaluateRoute(item)
+                      }
+                    >
+                      Evaluate →
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isWorking}
+                      onClick={() =>
+                        downloadRoute(item)
+                      }
+                    >
+                      Download
+                    </button>
+
+                    <button
+                      type="button"
+                      disabled={isWorking}
+                      onClick={() => {
+                        void duplicateRoute(item);
+                      }}
+                    >
+                      {isWorking
+                        ? "Working…"
+                        : "Duplicate"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="deleteAction"
+                      disabled={isWorking}
+                      onClick={() => {
+                        void removeRoute(item);
+                      }}
+                    >
+                      {isWorking ? "Working…" : "Delete"}
+                    </button>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      <section className="boundaryNote">
+        <strong>Authenticated-storage boundary</strong>
+
+        <p>
+          Routes on this page are stored under the currently
+          authenticated account and protected by database Row Level
+          Security. A saved route is not, by itself, an authoritative
+          system record, live evaluation, certification, or proof that
+          declared evidence exists.
+        </p>
+      </section>
+
+      <style jsx>{`
+        * {
+          box-sizing: border-box;
+        }
+
+        .page {
+          min-height: 100vh;
+          padding: 42px;
+          background:
+            radial-gradient(
+              circle at top right,
+              rgba(49, 209, 158, 0.1),
+              transparent 31%
+            ),
+            #f5f7f8;
+          color: #10201a;
+          font-family:
+            Inter,
+            ui-sans-serif,
+            system-ui,
+            -apple-system,
+            BlinkMacSystemFont,
+            "Segoe UI",
+            sans-serif;
+        }
+
+        .topbar,
+        .summaryGrid,
+        .libraryPanel,
+        .boundaryNote,
+        .notice,
+        .errorNotice {
+          max-width: 1480px;
+          margin-right: auto;
+          margin-left: auto;
+        }
+
+        .topbar {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 28px;
+          margin-bottom: 28px;
+        }
+
+        .eyebrow {
+          margin: 0 0 9px;
+          color: #0f7c5c;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
+        }
+
+        h1,
+        h2,
+        h3,
+        p {
+          margin-top: 0;
+        }
+
+        h1 {
+          margin-bottom: 12px;
+          font-size: clamp(42px, 7vw, 78px);
+          line-height: 0.94;
+          letter-spacing: -0.065em;
+        }
+
+        .intro {
+          max-width: 760px;
+          margin-bottom: 0;
+          color: #5b6b64;
+          font-size: 17px;
+          line-height: 1.65;
+        }
+
+        .topActions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+
+        .secondaryButton,
+        .primaryButton {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          padding: 12px 16px;
+          border: 1px solid #ced8d2;
+          border-radius: 11px;
+          background: white;
+          color: #20382d;
+          font-weight: 850;
+          text-decoration: none;
+        }
+
+        .primaryButton {
+          border-color: #123c2e;
+          background: #123c2e;
+          color: white;
+        }
+
+        .notice {
+          margin-bottom: 18px;
+          padding: 13px 16px;
+          border: 1px solid #bcded0;
+          border-radius: 12px;
+          background: #eaf7f2;
+          color: #0c694d;
+          font-size: 13px;
+          font-weight: 850;
+        }
+
+        .errorNotice {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          margin-bottom: 18px;
+          padding: 15px 16px;
+          border: 1px solid #efc1c1;
+          border-radius: 12px;
+          background: #fff1f1;
+          color: #8f2f2f;
+        }
+
+        .errorNotice strong {
+          display: block;
+          margin-bottom: 4px;
+          font-size: 13px;
+        }
+
+        .errorNotice p {
+          margin-bottom: 0;
+          font-size: 12px;
+          line-height: 1.5;
+        }
+
+        .errorNotice button {
+          flex: 0 0 auto;
+          padding: 9px 12px;
+          border: 1px solid #d99898;
+          border-radius: 9px;
+          background: white;
+          color: #8f2f2f;
+          font: inherit;
+          font-size: 12px;
+          font-weight: 850;
+          cursor: pointer;
+        }
+
+        .summaryGrid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+          margin-bottom: 18px;
+        }
+
+        .summaryGrid article {
+          padding: 20px;
+          border: 1px solid #dde5e0;
+          border-radius: 17px;
+          background: rgba(255, 255, 255, 0.94);
+          box-shadow: 0 16px 45px rgba(20, 47, 36, 0.045);
+        }
+
+        .summaryGrid span {
+          display: block;
+          margin-bottom: 10px;
+          color: #718078;
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .summaryGrid strong {
+          font-size: 37px;
+          line-height: 1;
+          letter-spacing: -0.05em;
+        }
+
+        .libraryPanel {
+          padding: 26px;
+          border: 1px solid #dce4df;
+          border-radius: 22px;
+          background: rgba(255, 255, 255, 0.96);
+          box-shadow: 0 20px 60px rgba(20, 47, 36, 0.06);
+        }
+
+        .libraryHeader {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 24px;
+          margin-bottom: 24px;
+        }
+
+        .libraryHeader h2 {
+          margin-bottom: 0;
+          font-size: 29px;
+          letter-spacing: -0.04em;
+        }
+
+        .filters {
+          display: flex;
+          gap: 10px;
+        }
+
+        .filters input,
+        .filters select {
+          min-height: 44px;
+          padding: 10px 13px;
+          border: 1px solid #ced8d2;
+          border-radius: 11px;
+          outline: none;
+          background: #fbfcfb;
+          color: #173128;
+          font: inherit;
+          font-size: 13px;
+        }
+
+        .filters input {
+          min-width: 280px;
+        }
+
+        .filters input:focus,
+        .filters select:focus {
+          border-color: #4fae8d;
+          box-shadow: 0 0 0 4px rgba(79, 174, 141, 0.11);
+        }
+
+        .routeGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .routeCard {
+          padding: 21px;
+          border: 1px solid #dbe3de;
+          border-radius: 17px;
+          background: #fbfcfb;
+        }
+
+        .cardTopline {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          margin-bottom: 18px;
+        }
+
+        .status {
+          display: inline-flex;
+          padding: 7px 10px;
+          border-radius: 999px;
+          background: #edf2ef;
+          color: #53635b;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+        }
+
+        .status[data-state="HOLD"] {
+          background: #fff3d7;
+          color: #8d5d00;
+        }
+
+        .status[data-state="READY_FOR_TEST"] {
+          background: #dcf8eb;
+          color: #08724f;
+        }
+
+        .updated {
+          color: #7a8781;
+          font-size: 11px;
+        }
+
+        .routeCard h3 {
+          margin-bottom: 6px;
+          font-size: 24px;
+          letter-spacing: -0.035em;
+        }
+
+        .routeId {
+          overflow: hidden;
+          margin-bottom: 20px;
+          color: #819088;
+          font-family:
+            ui-monospace,
+            SFMono-Regular,
+            Menlo,
+            Monaco,
+            Consolas,
+            monospace;
+          font-size: 11px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .metadata {
+          display: grid;
+          grid-template-columns: 1fr 1fr 0.55fr;
+          gap: 10px;
+          margin-bottom: 19px;
+        }
+
+        .metadata div {
+          min-width: 0;
+          padding: 12px;
+          border: 1px solid #e1e7e3;
+          border-radius: 12px;
+          background: white;
+        }
+
+        .metadata span,
+        .progressBlock span {
+          display: block;
+          margin-bottom: 5px;
+          color: #7a8781;
+          font-size: 10px;
+          font-weight: 850;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+        }
+
+        .metadata strong {
+          display: block;
+          overflow: hidden;
+          font-size: 12px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .progressBlock > div:first-child {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .progressTrack {
+          height: 7px;
+          margin-top: 9px;
+          overflow: hidden;
+          border-radius: 999px;
+          background: #e8eeea;
+        }
+
+        .progressFill {
+          height: 100%;
+          border-radius: inherit;
+          background: #14946d;
+        }
+
+        .cardActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 21px;
+          padding-top: 17px;
+          border-top: 1px solid #e2e8e4;
+        }
+
+        .cardActions button {
+          padding: 9px 11px;
+          border: 1px solid #d5ded8;
+          border-radius: 9px;
+          background: white;
+          color: #30473d;
+          font: inherit;
+          font-size: 11px;
+          font-weight: 850;
+          cursor: pointer;
+        }
+
+        .cardActions button:disabled {
+          cursor: wait;
+          opacity: 0.58;
+        }
+
+        .cardActions .editAction {
+          border-color: #bcded0;
+          background: #eaf7f2;
+          color: #08724f;
+        }
+
+        .cardActions .primaryAction {
+          border-color: #123c2e;
+          background: #123c2e;
+          color: white;
+        }
+
+        .cardActions .deleteAction {
+          color: #a33b3b;
+        }
+
+        .emptyState {
+          display: grid;
+          min-height: 390px;
+          place-items: center;
+          align-content: center;
+          padding: 48px 20px;
+          text-align: center;
+        }
+
+        .emptyState.compact {
+          min-height: 250px;
+        }
+
+        .emptyMark,
+        .loadingMark {
+          display: grid;
+          width: 86px;
+          height: 86px;
+          margin-bottom: 18px;
+          place-items: center;
+          border: 1px solid #bcded0;
+          border-radius: 50%;
+          background: #eaf7f2;
+          color: #0f7c5c;
+          font-size: 13px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+        }
+
+        .loadingMark {
+          animation: pulse 1.4s ease-in-out infinite;
+        }
+
+        .emptyState h2 {
+          margin-bottom: 10px;
+          font-size: 29px;
+          letter-spacing: -0.04em;
+        }
+
+        .emptyState p {
+          max-width: 570px;
+          margin-bottom: 20px;
+          color: #68766f;
+          line-height: 1.65;
+        }
+
+        .boundaryNote {
+          margin-top: 18px;
+          padding: 18px 20px;
+          border: 1px solid #dde5e0;
+          border-radius: 15px;
+          background: rgba(255, 255, 255, 0.88);
+        }
+
+        .boundaryNote strong {
+          display: block;
+          margin-bottom: 5px;
+          font-size: 12px;
+          text-transform: uppercase;
+        }
+
+        .boundaryNote p {
+          margin-bottom: 0;
+          color: #68766f;
+          font-size: 13px;
+          line-height: 1.6;
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            transform: scale(1);
+            opacity: 1;
+          }
+
+          50% {
+            transform: scale(0.96);
+            opacity: 0.62;
+          }
+        }
+
+        @media (max-width: 900px) {
+          .summaryGrid,
+          .routeGrid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .libraryHeader {
+            align-items: stretch;
+            flex-direction: column;
+          }
+
+          .filters input {
+            flex: 1;
+            min-width: 0;
+          }
+        }
+
+        @media (max-width: 650px) {
+          .page {
+            padding: 22px 14px;
+          }
+
+          .topbar,
+          .filters,
+          .errorNotice {
+            align-items: stretch;
+            flex-direction: column;
+          }
+
+          .topActions {
+            justify-content: flex-start;
+          }
+
+          .summaryGrid,
+          .routeGrid,
+          .metadata {
+            grid-template-columns: 1fr;
+          }
+
+          .filters input,
+          .filters select,
+          .secondaryButton,
+          .primaryButton,
+          .errorNotice button {
+            width: 100%;
+          }
+
+          .libraryPanel {
+            padding: 18px;
+          }
+
+          .cardTopline {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+        }
+      `}</style>
+    </main>
+  );
+}
