@@ -20,6 +20,8 @@
     "clean": "node -e \"const fs=require('fs'); for (const path of ['apps/web/.next','coverage']) fs.rmSync(path,{recursive:true,force:true});\""
   },
   "dependencies": {
+    "@supabase/ssr": "^0.7.0",
+    "@supabase/supabase-js": "^2.57.4",
     "@vercel/blob": "^2.6.1",
     "ajv": "^8.17.1",
     "next": "^15.5.7",
