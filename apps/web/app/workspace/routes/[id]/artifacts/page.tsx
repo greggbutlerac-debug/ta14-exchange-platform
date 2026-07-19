@@ -17,7 +17,11 @@ import {
   type RouteArtifact,
   type RouteArtifactType,
 } from "../../../../../lib/supabase-route-artifacts";
-
+import {
+  openRouteArtifactFile,
+  removeRouteArtifactFile,
+  uploadRouteArtifactFile,
+} from "../../../../../lib/route-artifact-storage";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -35,21 +39,14 @@ type RouteReadiness = {
   score: number;
   maximumScore: number;
   percentage: number;
-  status:
-    | "READY_FOR_REVIEW"
-    | "NEEDS_EVIDENCE"
-    | "NOT_READY";
+  status: "READY_FOR_REVIEW" | "NEEDS_EVIDENCE" | "NOT_READY";
 };
 
-function hasStructuredArtifactJson(
-  artifact: RouteArtifact,
-): boolean {
+function hasStructuredArtifactJson(artifact: RouteArtifact): boolean {
   return Object.keys(artifact.artifactJson ?? {}).length > 0;
 }
 
-function calculateRouteReadiness(
-  artifacts: RouteArtifact[],
-): RouteReadiness {
+function calculateRouteReadiness(artifacts: RouteArtifact[]): RouteReadiness {
   const stages = CANONICAL_ROUTE_STAGES.map((stage) => {
     const stageArtifacts = artifacts.filter(
       (artifact) => artifact.canonicalStage === stage,
@@ -68,15 +65,11 @@ function calculateRouteReadiness(
       };
     }
 
-    const hasHash = stageArtifacts.some(
-      (artifact) => Boolean(artifact.sha256),
+    const hasHash = stageArtifacts.some((artifact) => Boolean(artifact.sha256));
+    const hasRequirementBinding = stageArtifacts.some((artifact) =>
+      Boolean(artifact.requirementKey),
     );
-    const hasRequirementBinding = stageArtifacts.some(
-      (artifact) => Boolean(artifact.requirementKey),
-    );
-    const hasStructuredRecord = stageArtifacts.some(
-      hasStructuredArtifactJson,
-    );
+    const hasStructuredRecord = stageArtifacts.some(hasStructuredArtifactJson);
 
     const score =
       1 +
@@ -92,29 +85,19 @@ function calculateRouteReadiness(
       hasStructuredRecord,
       score,
       maximumScore: 4,
-      status:
-        score === 4
-          ? ("COMPLETE" as const)
-          : ("INCOMPLETE" as const),
+      status: score === 4 ? ("COMPLETE" as const) : ("INCOMPLETE" as const),
     };
   });
 
-  const score = stages.reduce(
-    (total, stage) => total + stage.score,
-    0,
-  );
+  const score = stages.reduce((total, stage) => total + stage.score, 0);
   const maximumScore = stages.reduce(
     (total, stage) => total + stage.maximumScore,
     0,
   );
   const percentage =
-    maximumScore === 0
-      ? 0
-      : Math.round((score / maximumScore) * 100);
+    maximumScore === 0 ? 0 : Math.round((score / maximumScore) * 100);
 
-  const allStagesPresent = stages.every(
-    (stage) => stage.artifactCount > 0,
-  );
+  const allStagesPresent = stages.every((stage) => stage.artifactCount > 0);
   const allStagesComplete = stages.every(
     (stage) => stage.status === "COMPLETE",
   );
@@ -164,10 +147,7 @@ function formatBytes(value: number | null): string {
   return `${(value / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function getErrorMessage(
-  error: unknown,
-  fallbackMessage: string,
-): string {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
   if (error instanceof Error && error.message.trim()) {
     return error.message;
   }
@@ -177,8 +157,7 @@ function getErrorMessage(
 
 export default function RouteArtifactsPage() {
   const params = useParams<{ id: string }>();
-  const routeRecordId =
-    typeof params.id === "string" ? params.id : "";
+  const routeRecordId = typeof params.id === "string" ? params.id : "";
 
   const [route, setRoute] = useState<StoredRoute | null>(null);
   const [artifacts, setArtifacts] = useState<RouteArtifact[]>([]);
@@ -196,12 +175,17 @@ export default function RouteArtifactsPage() {
   const [requirementKey, setRequirementKey] = useState("");
   const [sha256, setSha256] = useState("");
   const [artifactJsonText, setArtifactJsonText] = useState("{}");
-  const [editingArtifactId, setEditingArtifactId] =
-    useState<string | null>(null);
-  const [deletingArtifactId, setDeletingArtifactId] =
-    useState<string | null>(null);
-  const [deleteErrorMessage, setDeleteErrorMessage] =
-    useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [openingArtifactId, setOpeningArtifactId] = useState<string | null>(
+    null,
+  );
+  const [editingArtifactId, setEditingArtifactId] = useState<string | null>(
+    null,
+  );
+  const [deletingArtifactId, setDeletingArtifactId] = useState<string | null>(
+    null,
+  );
+  const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
 
   const readiness = useMemo(
     () => calculateRouteReadiness(artifacts),
@@ -254,22 +238,20 @@ export default function RouteArtifactsPage() {
     setRequirementKey("");
     setSha256("");
     setArtifactJsonText("{}");
+    setSelectedFile(null);
     setEditorMessage("");
     setEditingArtifactId(null);
   };
 
-  const startEditingArtifact = (
-    artifact: RouteArtifact,
-  ): void => {
+  const startEditingArtifact = (artifact: RouteArtifact): void => {
     setArtifactType(artifact.artifactType);
     setCanonicalStage(artifact.canonicalStage);
     setTitle(artifact.title);
     setDescription(artifact.description ?? "");
     setRequirementKey(artifact.requirementKey ?? "");
     setSha256(artifact.sha256 ?? "");
-    setArtifactJsonText(
-      JSON.stringify(artifact.artifactJson ?? {}, null, 2),
-    );
+    setArtifactJsonText(JSON.stringify(artifact.artifactJson ?? {}, null, 2));
+    setSelectedFile(null);
     setEditingArtifactId(artifact.id);
     setEditorMessage("");
     setEditorOpen(true);
@@ -288,6 +270,8 @@ export default function RouteArtifactsPage() {
     setSavingArtifact(true);
     setEditorMessage("");
 
+    let uploadedStoragePath: string | null = null;
+
     try {
       let artifactJson: Record<string, unknown> = {};
 
@@ -301,27 +285,57 @@ export default function RouteArtifactsPage() {
           parsed === null ||
           Array.isArray(parsed)
         ) {
-          throw new Error(
-            "Artifact JSON must be a JSON object.",
-          );
+          throw new Error("Artifact JSON must be a JSON object.");
         }
 
         artifactJson = parsed as Record<string, unknown>;
       }
 
+      const existingArtifact = editingArtifactId
+        ? (artifacts.find((artifact) => artifact.id === editingArtifactId) ??
+          null)
+        : null;
+
+      const uploadedFile = selectedFile
+        ? await uploadRouteArtifactFile({
+            routeRecordId: route.id,
+            file: selectedFile,
+          })
+        : null;
+
+      uploadedStoragePath = uploadedFile?.storagePath ?? null;
+
       if (editingArtifactId) {
-        await updateSupabaseRouteArtifact(
-          editingArtifactId,
-          {
-            artifactType,
-            canonicalStage,
-            requirementKey: requirementKey || null,
-            title,
-            description: description || null,
-            artifactJson,
-            sha256: sha256 || null,
-          },
-        );
+        await updateSupabaseRouteArtifact(editingArtifactId, {
+          artifactType,
+          canonicalStage,
+          requirementKey: requirementKey || null,
+          title,
+          description: description || null,
+          artifactJson,
+          sha256: uploadedFile?.sha256 ?? (sha256 || null),
+          ...(uploadedFile
+            ? {
+                originalFilename: uploadedFile.originalFilename,
+                storagePath: uploadedFile.storagePath,
+                mimeType: uploadedFile.mimeType,
+                sizeBytes: uploadedFile.sizeBytes,
+              }
+            : {}),
+        });
+
+        if (
+          uploadedFile &&
+          existingArtifact?.storagePath &&
+          existingArtifact.storagePath !== uploadedFile.storagePath
+        ) {
+          try {
+            await removeRouteArtifactFile(existingArtifact.storagePath);
+          } catch {
+            // The updated record remains valid. Orphan cleanup can be
+            // retried without reversing the governed record update.
+          }
+        }
       } else {
         await createSupabaseRouteArtifact({
           routeRecordId: route.id,
@@ -332,14 +346,27 @@ export default function RouteArtifactsPage() {
           title,
           description: description || null,
           artifactJson,
-          sha256: sha256 || null,
+          sha256: uploadedFile?.sha256 ?? (sha256 || null),
+          originalFilename: uploadedFile?.originalFilename ?? null,
+          storagePath: uploadedFile?.storagePath ?? null,
+          mimeType: uploadedFile?.mimeType ?? null,
+          sizeBytes: uploadedFile?.sizeBytes ?? null,
         });
       }
 
+      uploadedStoragePath = null;
       await loadWorkspace();
       resetEditor();
       setEditorOpen(false);
     } catch (error) {
+      if (uploadedStoragePath) {
+        try {
+          await removeRouteArtifactFile(uploadedStoragePath);
+        } catch {
+          // Preserve the original error. Storage cleanup can be retried.
+        }
+      }
+
       setEditorMessage(
         getErrorMessage(
           error,
@@ -353,9 +380,26 @@ export default function RouteArtifactsPage() {
     }
   };
 
-  const deleteArtifact = async (
-    artifact: RouteArtifact,
-  ): Promise<void> => {
+  const openArtifactFile = async (artifact: RouteArtifact): Promise<void> => {
+    if (!artifact.storagePath) {
+      return;
+    }
+
+    setOpeningArtifactId(artifact.id);
+    setDeleteErrorMessage("");
+
+    try {
+      await openRouteArtifactFile(artifact.storagePath);
+    } catch (error) {
+      setDeleteErrorMessage(
+        getErrorMessage(error, "The stored artifact file could not be opened."),
+      );
+    } finally {
+      setOpeningArtifactId(null);
+    }
+  };
+
+  const deleteArtifact = async (artifact: RouteArtifact): Promise<void> => {
     const confirmed = window.confirm(
       `Delete "${artifact.title}"? This removes the governed artifact record from this route. This action cannot be undone.`,
     );
@@ -368,14 +412,21 @@ export default function RouteArtifactsPage() {
     setDeleteErrorMessage("");
 
     try {
-      const deleted = await deleteSupabaseRouteArtifact(
-        artifact.id,
-      );
+      const deleted = await deleteSupabaseRouteArtifact(artifact.id);
 
       if (!deleted) {
         throw new Error(
           "The governed artifact was not found or access was denied.",
         );
+      }
+
+      if (artifact.storagePath) {
+        try {
+          await removeRouteArtifactFile(artifact.storagePath);
+        } catch {
+          // The governed record is deleted. Storage cleanup may be
+          // retried separately if the object could not be removed.
+        }
       }
 
       if (editingArtifactId === artifact.id) {
@@ -386,10 +437,7 @@ export default function RouteArtifactsPage() {
       await loadWorkspace();
     } catch (error) {
       setDeleteErrorMessage(
-        getErrorMessage(
-          error,
-          "The governed artifact could not be deleted.",
-        ),
+        getErrorMessage(error, "The governed artifact could not be deleted."),
       );
     } finally {
       setDeletingArtifactId(null);
@@ -434,10 +482,7 @@ export default function RouteArtifactsPage() {
 
           <h1>Loading Evidence & Records</h1>
 
-          <p>
-            Retrieving the authenticated route and its governed
-            artifacts.
-          </p>
+          <p>Retrieving the authenticated route and its governed artifacts.</p>
         </section>
 
         <PageStyles />
@@ -476,9 +521,7 @@ export default function RouteArtifactsPage() {
     <main className="page">
       <header className="topbar">
         <div>
-          <p className="eyebrow">
-            TA-14 Exchange · Authenticated workspace
-          </p>
+          <p className="eyebrow">TA-14 Exchange · Authenticated workspace</p>
 
           <h1>Evidence & Records</h1>
 
@@ -510,10 +553,7 @@ export default function RouteArtifactsPage() {
             {editorOpen ? "Close editor" : "Add governed artifact"}
           </button>
 
-          <Link
-            href="/workspace/routes/new"
-            className="primaryButton"
-          >
+          <Link href="/workspace/routes/new" className="primaryButton">
             Open Evaluation →
           </Link>
         </div>
@@ -544,9 +584,7 @@ export default function RouteArtifactsPage() {
               <select
                 value={artifactType}
                 onChange={(event) =>
-                  setArtifactType(
-                    event.target.value as RouteArtifactType,
-                  )
+                  setArtifactType(event.target.value as RouteArtifactType)
                 }
                 disabled={savingArtifact}
               >
@@ -563,9 +601,7 @@ export default function RouteArtifactsPage() {
               <select
                 value={canonicalStage}
                 onChange={(event) =>
-                  setCanonicalStage(
-                    event.target.value as CanonicalRouteStage,
-                  )
+                  setCanonicalStage(event.target.value as CanonicalRouteStage)
                 }
                 disabled={savingArtifact}
               >
@@ -591,9 +627,7 @@ export default function RouteArtifactsPage() {
               <span>Requirement key</span>
               <input
                 value={requirementKey}
-                onChange={(event) =>
-                  setRequirementKey(event.target.value)
-                }
+                onChange={(event) => setRequirementKey(event.target.value)}
                 placeholder="Optional requirement binding"
                 disabled={savingArtifact}
               />
@@ -604,18 +638,38 @@ export default function RouteArtifactsPage() {
               <input
                 value={sha256}
                 onChange={(event) => setSha256(event.target.value)}
-                placeholder="Optional 64-character digest"
+                placeholder={
+                  selectedFile
+                    ? "Calculated automatically from selected file"
+                    : "Optional 64-character digest"
+                }
+                disabled={savingArtifact || Boolean(selectedFile)}
+              />
+            </label>
+
+            <label className="wideField">
+              <span>Governed file</span>
+              <input
+                type="file"
+                onChange={(event) =>
+                  setSelectedFile(event.target.files?.[0] ?? null)
+                }
                 disabled={savingArtifact}
               />
+              <small className="fileHelp">
+                {selectedFile
+                  ? `${selectedFile.name} · ${formatBytes(selectedFile.size)}`
+                  : editingArtifactId
+                    ? "Choose a file only to replace the existing stored object."
+                    : "Optional. Maximum file size: 50 MB. SHA-256 is calculated automatically before upload."}
+              </small>
             </label>
 
             <label className="wideField">
               <span>Description</span>
               <textarea
                 value={description}
-                onChange={(event) =>
-                  setDescription(event.target.value)
-                }
+                onChange={(event) => setDescription(event.target.value)}
                 placeholder="Describe what this record represents and why it belongs in this route."
                 rows={4}
                 disabled={savingArtifact}
@@ -626,9 +680,7 @@ export default function RouteArtifactsPage() {
               <span>Artifact JSON</span>
               <textarea
                 value={artifactJsonText}
-                onChange={(event) =>
-                  setArtifactJsonText(event.target.value)
-                }
+                onChange={(event) => setArtifactJsonText(event.target.value)}
                 rows={8}
                 spellCheck={false}
                 disabled={savingArtifact}
@@ -674,9 +726,9 @@ export default function RouteArtifactsPage() {
           </div>
 
           <p className="editorBoundary">
-            Creating or updating a record stores and classifies it.
-            Storage alone does not establish admissibility, authority,
-            truth, continuity, execution, or outcome.
+            Creating or updating a record stores and classifies it. Storage
+            alone does not establish admissibility, authority, truth,
+            continuity, execution, or outcome.
           </p>
         </section>
       ) : null}
@@ -687,9 +739,9 @@ export default function RouteArtifactsPage() {
             <p className="eyebrow">Governance Readiness Engine</p>
             <h2>Route readiness</h2>
             <p className="readinessIntro">
-              Readiness is calculated from stage presence, SHA-256
-              evidence, requirement binding, and structured artifact
-              records. It does not itself establish admissibility.
+              Readiness is calculated from stage presence, SHA-256 evidence,
+              requirement binding, and structured artifact records. It does not
+              itself establish admissibility.
             </p>
           </div>
 
@@ -702,9 +754,7 @@ export default function RouteArtifactsPage() {
         </div>
 
         <div className="readinessStatusRow">
-          <span
-            className={`readinessStatus ${readiness.status.toLowerCase()}`}
-          >
+          <span className={`readinessStatus ${readiness.status.toLowerCase()}`}>
             {readiness.status.replaceAll("_", " ")}
           </span>
 
@@ -727,9 +777,7 @@ export default function RouteArtifactsPage() {
                   </strong>
                 </div>
 
-                <span
-                  className={`stageStatus ${stage.status.toLowerCase()}`}
-                >
+                <span className={`stageStatus ${stage.status.toLowerCase()}`}>
                   {stage.status}
                 </span>
               </div>
@@ -749,15 +797,11 @@ export default function RouteArtifactsPage() {
                 </div>
                 <div>
                   <dt>Requirement bound</dt>
-                  <dd>
-                    {stage.hasRequirementBinding ? "Yes" : "No"}
-                  </dd>
+                  <dd>{stage.hasRequirementBinding ? "Yes" : "No"}</dd>
                 </div>
                 <div>
                   <dt>Structured record</dt>
-                  <dd>
-                    {stage.hasStructuredRecord ? "Yes" : "No"}
-                  </dd>
+                  <dd>{stage.hasStructuredRecord ? "Yes" : "No"}</dd>
                 </div>
               </dl>
             </article>
@@ -768,10 +812,7 @@ export default function RouteArtifactsPage() {
       <section className="routePanel">
         <div className="routeHeading">
           <div>
-            <span
-              className="status"
-              data-state={route.route.status}
-            >
+            <span className="status" data-state={route.route.status}>
               {route.route.status.replaceAll("_", " ")}
             </span>
 
@@ -831,9 +872,7 @@ export default function RouteArtifactsPage() {
           <strong>
             {
               artifacts.filter(
-                (artifact) =>
-                  artifact.originalFilename ||
-                  artifact.storagePath,
+                (artifact) => artifact.originalFilename || artifact.storagePath,
               ).length
             }
           </strong>
@@ -842,11 +881,7 @@ export default function RouteArtifactsPage() {
         <article>
           <span>Hashes recorded</span>
           <strong>
-            {
-              artifacts.filter(
-                (artifact) => artifact.sha256,
-              ).length
-            }
+            {artifacts.filter((artifact) => artifact.sha256).length}
           </strong>
         </article>
       </section>
@@ -874,10 +909,9 @@ export default function RouteArtifactsPage() {
             <h2>No governed artifacts yet</h2>
 
             <p>
-              This route is authenticated, but no evidence, authority,
-              commit, execution, outcome, attachment, witness,
-              signature, receipt, video, sensor record, AI output, or
-              human approval has been added.
+              This route is authenticated, but no evidence, authority, commit,
+              execution, outcome, attachment, witness, signature, receipt,
+              video, sensor record, AI output, or human approval has been added.
             </p>
           </div>
         ) : (
@@ -898,35 +932,24 @@ export default function RouteArtifactsPage() {
 
                     <span className="artifactCount">
                       {stageArtifacts.length}{" "}
-                      {stageArtifacts.length === 1
-                        ? "record"
-                        : "records"}
+                      {stageArtifacts.length === 1 ? "record" : "records"}
                     </span>
                   </div>
 
                   {stageArtifacts.length === 0 ? (
                     <p className="stageEmpty">
-                      No governed records are currently assigned to
-                      this stage.
+                      No governed records are currently assigned to this stage.
                     </p>
                   ) : (
                     <div className="artifactGrid">
                       {stageArtifacts.map((artifact) => (
-                        <article
-                          className="artifactCard"
-                          key={artifact.id}
-                        >
+                        <article className="artifactCard" key={artifact.id}>
                           <div className="artifactTopline">
                             <span className="artifactType">
-                              {artifact.artifactType.replaceAll(
-                                "_",
-                                " ",
-                              )}
+                              {artifact.artifactType.replaceAll("_", " ")}
                             </span>
 
-                            <span>
-                              {formatDate(artifact.createdAt)}
-                            </span>
+                            <span>{formatDate(artifact.createdAt)}</span>
                           </div>
 
                           <h4>{artifact.title}</h4>
@@ -934,56 +957,59 @@ export default function RouteArtifactsPage() {
                           {artifact.description ? (
                             <p>{artifact.description}</p>
                           ) : (
-                            <p className="muted">
-                              No description recorded.
-                            </p>
+                            <p className="muted">No description recorded.</p>
                           )}
 
                           <dl>
                             <div>
                               <dt>Requirement</dt>
                               <dd>
-                                {artifact.requirementKey ||
-                                  "Not assigned"}
+                                {artifact.requirementKey || "Not assigned"}
                               </dd>
                             </div>
 
                             <div>
                               <dt>Original file</dt>
                               <dd>
-                                {artifact.originalFilename ||
-                                  "Not recorded"}
+                                {artifact.originalFilename || "Not recorded"}
                               </dd>
                             </div>
 
                             <div>
                               <dt>MIME type</dt>
-                              <dd>
-                                {artifact.mimeType ||
-                                  "Not recorded"}
-                              </dd>
+                              <dd>{artifact.mimeType || "Not recorded"}</dd>
                             </div>
 
                             <div>
                               <dt>Size</dt>
-                              <dd>
-                                {formatBytes(
-                                  artifact.sizeBytes,
-                                )}
-                              </dd>
+                              <dd>{formatBytes(artifact.sizeBytes)}</dd>
                             </div>
                           </dl>
 
                           <div className="artifactActions">
+                            {artifact.storagePath ? (
+                              <button
+                                type="button"
+                                className="openArtifactButton"
+                                onClick={() => {
+                                  void openArtifactFile(artifact);
+                                }}
+                                disabled={
+                                  openingArtifactId === artifact.id ||
+                                  deletingArtifactId === artifact.id
+                                }
+                              >
+                                {openingArtifactId === artifact.id
+                                  ? "Opening..."
+                                  : "Open stored file"}
+                              </button>
+                            ) : null}
+
                             <button
                               type="button"
                               className="editArtifactButton"
-                              onClick={() =>
-                                startEditingArtifact(artifact)
-                              }
-                              disabled={
-                                deletingArtifactId === artifact.id
-                              }
+                              onClick={() => startEditingArtifact(artifact)}
+                              disabled={deletingArtifactId === artifact.id}
                             >
                               Edit governed artifact
                             </button>
@@ -994,9 +1020,7 @@ export default function RouteArtifactsPage() {
                               onClick={() => {
                                 void deleteArtifact(artifact);
                               }}
-                              disabled={
-                                deletingArtifactId === artifact.id
-                              }
+                              disabled={deletingArtifactId === artifact.id}
                             >
                               {deletingArtifactId === artifact.id
                                 ? "Deleting..."
@@ -1007,8 +1031,7 @@ export default function RouteArtifactsPage() {
                           <div className="hashBlock">
                             <span>SHA-256</span>
                             <code>
-                              {artifact.sha256 ||
-                                "No digest recorded"}
+                              {artifact.sha256 || "No digest recorded"}
                             </code>
                           </div>
                         </article>
@@ -1026,11 +1049,11 @@ export default function RouteArtifactsPage() {
         <strong>Governance boundary</strong>
 
         <p>
-          This workspace displays authenticated route artifacts as
-          stored records. Their presence does not independently prove
-          truth, continuity, admissibility, authority, execution, or
-          outcome. Those determinations require the applicable TA-14
-          evaluation and verification controls.
+          This workspace displays authenticated route artifacts as stored
+          records. Their presence does not independently prove truth,
+          continuity, admissibility, authority, execution, or outcome. Those
+          determinations require the applicable TA-14 evaluation and
+          verification controls.
         </p>
       </section>
 
@@ -1053,8 +1076,7 @@ function PageStyles() {
       .page {
         min-height: 100vh;
         padding: 42px;
-        background:
-          radial-gradient(
+        background: radial-gradient(
             circle at top right,
             rgba(49, 209, 158, 0.1),
             transparent 31%
@@ -1223,6 +1245,12 @@ function PageStyles() {
       .editorGrid textarea {
         padding: 12px;
         resize: vertical;
+      }
+
+      .fileHelp {
+        color: #68766f;
+        font-size: 11px;
+        line-height: 1.45;
       }
 
       .editorGrid input:focus,
@@ -1746,6 +1774,17 @@ function PageStyles() {
       .artifactActions button:disabled {
         cursor: not-allowed;
         opacity: 0.55;
+      }
+
+      .openArtifactButton {
+        border: 1px solid #bfe0d2;
+        background: #eefaf5;
+        color: #08724f;
+      }
+
+      .openArtifactButton:hover:not(:disabled) {
+        border-color: #8fc8b2;
+        background: #e3f6ee;
       }
 
       .editArtifactButton {
