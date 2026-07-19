@@ -18,6 +18,120 @@ import {
   type RouteArtifactType,
 } from "../../../../../lib/supabase-route-artifacts";
 
+
+type StageReadiness = {
+  stage: CanonicalRouteStage;
+  artifactCount: number;
+  hasHash: boolean;
+  hasRequirementBinding: boolean;
+  hasStructuredRecord: boolean;
+  score: number;
+  maximumScore: number;
+  status: "COMPLETE" | "INCOMPLETE" | "MISSING";
+};
+
+type RouteReadiness = {
+  stages: StageReadiness[];
+  score: number;
+  maximumScore: number;
+  percentage: number;
+  status:
+    | "READY_FOR_REVIEW"
+    | "NEEDS_EVIDENCE"
+    | "NOT_READY";
+};
+
+function hasStructuredArtifactJson(
+  artifact: RouteArtifact,
+): boolean {
+  return Object.keys(artifact.artifactJson ?? {}).length > 0;
+}
+
+function calculateRouteReadiness(
+  artifacts: RouteArtifact[],
+): RouteReadiness {
+  const stages = CANONICAL_ROUTE_STAGES.map((stage) => {
+    const stageArtifacts = artifacts.filter(
+      (artifact) => artifact.canonicalStage === stage,
+    );
+
+    if (stageArtifacts.length === 0) {
+      return {
+        stage,
+        artifactCount: 0,
+        hasHash: false,
+        hasRequirementBinding: false,
+        hasStructuredRecord: false,
+        score: 0,
+        maximumScore: 4,
+        status: "MISSING" as const,
+      };
+    }
+
+    const hasHash = stageArtifacts.some(
+      (artifact) => Boolean(artifact.sha256),
+    );
+    const hasRequirementBinding = stageArtifacts.some(
+      (artifact) => Boolean(artifact.requirementKey),
+    );
+    const hasStructuredRecord = stageArtifacts.some(
+      hasStructuredArtifactJson,
+    );
+
+    const score =
+      1 +
+      Number(hasHash) +
+      Number(hasRequirementBinding) +
+      Number(hasStructuredRecord);
+
+    return {
+      stage,
+      artifactCount: stageArtifacts.length,
+      hasHash,
+      hasRequirementBinding,
+      hasStructuredRecord,
+      score,
+      maximumScore: 4,
+      status:
+        score === 4
+          ? ("COMPLETE" as const)
+          : ("INCOMPLETE" as const),
+    };
+  });
+
+  const score = stages.reduce(
+    (total, stage) => total + stage.score,
+    0,
+  );
+  const maximumScore = stages.reduce(
+    (total, stage) => total + stage.maximumScore,
+    0,
+  );
+  const percentage =
+    maximumScore === 0
+      ? 0
+      : Math.round((score / maximumScore) * 100);
+
+  const allStagesPresent = stages.every(
+    (stage) => stage.artifactCount > 0,
+  );
+  const allStagesComplete = stages.every(
+    (stage) => stage.status === "COMPLETE",
+  );
+
+  return {
+    stages,
+    score,
+    maximumScore,
+    percentage,
+    status: allStagesComplete
+      ? "READY_FOR_REVIEW"
+      : allStagesPresent
+        ? "NEEDS_EVIDENCE"
+        : "NOT_READY",
+  };
+}
+
 function formatDate(value: string): string {
   const date = new Date(value);
 
@@ -88,6 +202,11 @@ export default function RouteArtifactsPage() {
     useState<string | null>(null);
   const [deleteErrorMessage, setDeleteErrorMessage] =
     useState("");
+
+  const readiness = useMemo(
+    () => calculateRouteReadiness(artifacts),
+    [artifacts],
+  );
 
   const loadWorkspace = useCallback(async (): Promise<void> => {
     if (!routeRecordId) {
@@ -562,6 +681,90 @@ export default function RouteArtifactsPage() {
         </section>
       ) : null}
 
+      <section className="readinessPanel">
+        <div className="readinessHeader">
+          <div>
+            <p className="eyebrow">Governance Readiness Engine</p>
+            <h2>Route readiness</h2>
+            <p className="readinessIntro">
+              Readiness is calculated from stage presence, SHA-256
+              evidence, requirement binding, and structured artifact
+              records. It does not itself establish admissibility.
+            </p>
+          </div>
+
+          <div className="readinessScore">
+            <strong>{readiness.percentage}%</strong>
+            <span>
+              {readiness.score} / {readiness.maximumScore}
+            </span>
+          </div>
+        </div>
+
+        <div className="readinessStatusRow">
+          <span
+            className={`readinessStatus ${readiness.status.toLowerCase()}`}
+          >
+            {readiness.status.replaceAll("_", " ")}
+          </span>
+
+          <span className="readinessBoundary">
+            No admissible evidence. No admissible execution.
+          </span>
+        </div>
+
+        <div className="readinessGrid">
+          {readiness.stages.map((stage) => (
+            <article
+              key={stage.stage}
+              className={`readinessCard ${stage.status.toLowerCase()}`}
+            >
+              <div className="readinessCardHeader">
+                <div>
+                  <span className="stageLabel">{stage.stage}</span>
+                  <strong>
+                    {stage.score} / {stage.maximumScore}
+                  </strong>
+                </div>
+
+                <span
+                  className={`stageStatus ${stage.status.toLowerCase()}`}
+                >
+                  {stage.status}
+                </span>
+              </div>
+
+              <dl className="readinessChecks">
+                <div>
+                  <dt>Artifact present</dt>
+                  <dd>
+                    {stage.artifactCount > 0
+                      ? `Yes (${stage.artifactCount})`
+                      : "No"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>SHA-256 present</dt>
+                  <dd>{stage.hasHash ? "Yes" : "No"}</dd>
+                </div>
+                <div>
+                  <dt>Requirement bound</dt>
+                  <dd>
+                    {stage.hasRequirementBinding ? "Yes" : "No"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>Structured record</dt>
+                  <dd>
+                    {stage.hasStructuredRecord ? "Yes" : "No"}
+                  </dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="routePanel">
         <div className="routeHeading">
           <div>
@@ -964,6 +1167,7 @@ function PageStyles() {
       .routePanel,
       .recordsPanel,
       .editorPanel,
+      .readinessPanel,
       .boundaryNote,
       .statePanel {
         border: 1px solid #dce4df;
@@ -1066,6 +1270,195 @@ function PageStyles() {
         color: #718078;
         font-size: 12px;
         line-height: 1.55;
+      }
+
+      .readinessPanel {
+        max-width: 1480px;
+        margin: 0 auto 18px;
+        padding: 26px;
+        border-radius: 22px;
+      }
+
+      .readinessHeader {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 18px;
+      }
+
+      .readinessHeader h2 {
+        margin: 4px 0 8px;
+      }
+
+      .readinessIntro {
+        max-width: 760px;
+        margin: 0;
+        color: #68766f;
+        font-size: 13px;
+        line-height: 1.6;
+      }
+
+      .readinessScore {
+        min-width: 128px;
+        padding: 16px;
+        border: 1px solid #cde4da;
+        border-radius: 16px;
+        background: #f3fbf7;
+        text-align: center;
+      }
+
+      .readinessScore strong {
+        display: block;
+        color: #08724f;
+        font-size: 34px;
+        line-height: 1;
+      }
+
+      .readinessScore span {
+        display: block;
+        margin-top: 7px;
+        color: #68766f;
+        font-size: 11px;
+        font-weight: 800;
+      }
+
+      .readinessStatusRow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 18px;
+      }
+
+      .readinessStatus,
+      .stageStatus {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .readinessStatus {
+        padding: 8px 11px;
+        font-size: 10px;
+      }
+
+      .stageStatus {
+        padding: 6px 8px;
+        font-size: 9px;
+      }
+
+      .ready_for_review,
+      .stageStatus.complete {
+        background: #e9f8f1;
+        color: #08724f;
+      }
+
+      .needs_evidence,
+      .stageStatus.incomplete {
+        background: #fff7dd;
+        color: #8a5a00;
+      }
+
+      .not_ready,
+      .stageStatus.missing {
+        background: #fff0f0;
+        color: #a12d2d;
+      }
+
+      .readinessBoundary {
+        color: #68766f;
+        font-size: 12px;
+        font-weight: 800;
+      }
+
+      .readinessGrid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .readinessCard {
+        padding: 15px;
+        border: 1px solid #dbe4df;
+        border-radius: 14px;
+        background: #fbfcfb;
+      }
+
+      .readinessCard.complete {
+        border-color: #bfe0d2;
+        background: #f6fcf9;
+      }
+
+      .readinessCard.incomplete {
+        border-color: #ead9a5;
+        background: #fffdf5;
+      }
+
+      .readinessCard.missing {
+        border-color: #eccaca;
+        background: #fffafa;
+      }
+
+      .readinessCardHeader {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .readinessCardHeader > div {
+        display: grid;
+        gap: 4px;
+      }
+
+      .stageLabel {
+        color: #10201a;
+        font-size: 12px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+      }
+
+      .readinessCardHeader strong {
+        color: #68766f;
+        font-size: 11px;
+      }
+
+      .readinessChecks {
+        display: grid;
+        gap: 8px;
+        margin: 0;
+      }
+
+      .readinessChecks div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding-top: 8px;
+        border-top: 1px solid #e4ebe7;
+      }
+
+      .readinessChecks dt,
+      .readinessChecks dd {
+        margin: 0;
+        font-size: 10px;
+      }
+
+      .readinessChecks dt {
+        color: #68766f;
+      }
+
+      .readinessChecks dd {
+        color: #10201a;
+        font-weight: 900;
+        text-align: right;
       }
 
       .routePanel {
@@ -1532,6 +1925,7 @@ function PageStyles() {
         .summaryGrid,
         .artifactGrid,
         .editorGrid,
+        .readinessGrid,
         dl {
           grid-template-columns: 1fr;
         }
@@ -1553,8 +1947,17 @@ function PageStyles() {
 
         .routePanel,
         .recordsPanel,
-        .editorPanel {
+        .editorPanel,
+        .readinessPanel {
           padding: 18px;
+        }
+
+        .readinessHeader {
+          flex-direction: column;
+        }
+
+        .readinessScore {
+          width: 100%;
         }
 
         .editorActions {
