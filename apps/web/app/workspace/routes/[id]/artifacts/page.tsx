@@ -8,9 +8,12 @@ import type { StoredRoute } from "../../../../../lib/route-library";
 import { getSupabaseRoute } from "../../../../../lib/supabase-route-library";
 import {
   CANONICAL_ROUTE_STAGES,
+  ROUTE_ARTIFACT_TYPES,
+  createSupabaseRouteArtifact,
   listSupabaseRouteArtifacts,
   type CanonicalRouteStage,
   type RouteArtifact,
+  type RouteArtifactType,
 } from "../../../../../lib/supabase-route-artifacts";
 
 function formatDate(value: string): string {
@@ -65,6 +68,18 @@ export default function RouteArtifactsPage() {
   const [artifacts, setArtifacts] = useState<RouteArtifact[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState("");
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [savingArtifact, setSavingArtifact] = useState(false);
+  const [editorMessage, setEditorMessage] = useState("");
+  const [artifactType, setArtifactType] =
+    useState<RouteArtifactType>("EVIDENCE");
+  const [canonicalStage, setCanonicalStage] =
+    useState<CanonicalRouteStage>("RECORD");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [requirementKey, setRequirementKey] = useState("");
+  const [sha256, setSha256] = useState("");
+  const [artifactJsonText, setArtifactJsonText] = useState("{}");
 
   const loadWorkspace = useCallback(async (): Promise<void> => {
     if (!routeRecordId) {
@@ -103,6 +118,73 @@ export default function RouteArtifactsPage() {
       setLoading(false);
     }
   }, [routeRecordId]);
+
+  const resetEditor = (): void => {
+    setArtifactType("EVIDENCE");
+    setCanonicalStage("RECORD");
+    setTitle("");
+    setDescription("");
+    setRequirementKey("");
+    setSha256("");
+    setArtifactJsonText("{}");
+    setEditorMessage("");
+  };
+
+  const createArtifact = async (): Promise<void> => {
+    if (!route) {
+      return;
+    }
+
+    setSavingArtifact(true);
+    setEditorMessage("");
+
+    try {
+      let artifactJson: Record<string, unknown> = {};
+
+      const normalizedJson = artifactJsonText.trim();
+
+      if (normalizedJson) {
+        const parsed: unknown = JSON.parse(normalizedJson);
+
+        if (
+          typeof parsed !== "object" ||
+          parsed === null ||
+          Array.isArray(parsed)
+        ) {
+          throw new Error(
+            "Artifact JSON must be a JSON object.",
+          );
+        }
+
+        artifactJson = parsed as Record<string, unknown>;
+      }
+
+      await createSupabaseRouteArtifact({
+        routeRecordId: route.id,
+        routeId: route.route.routeId,
+        artifactType,
+        canonicalStage,
+        requirementKey: requirementKey || null,
+        title,
+        description: description || null,
+        artifactJson,
+        sha256: sha256 || null,
+      });
+
+      await loadWorkspace();
+      resetEditor();
+      setEditorOpen(false);
+    } catch (error) {
+      setEditorMessage(
+        getErrorMessage(
+          error,
+          "The governed artifact could not be created.",
+        ),
+      );
+    } finally {
+      setSavingArtifact(false);
+    }
+  };
 
   useEffect(() => {
     void loadWorkspace();
@@ -191,8 +273,8 @@ export default function RouteArtifactsPage() {
           <h1>Evidence & Records</h1>
 
           <p className="intro">
-            Review the governed records currently bound to this
-            authenticated route. This checkpoint is read-only.
+            Create, classify, and review governed records bound to this
+            authenticated route.
           </p>
         </div>
 
@@ -200,6 +282,17 @@ export default function RouteArtifactsPage() {
           <Link href="/workspace/routes" className="secondaryButton">
             ← My Routes
           </Link>
+
+          <button
+            type="button"
+            className="secondaryButton"
+            onClick={() => {
+              setEditorOpen((current) => !current);
+              setEditorMessage("");
+            }}
+          >
+            {editorOpen ? "Close editor" : "Add governed artifact"}
+          </button>
 
           <Link
             href="/workspace/routes/new"
@@ -209,6 +302,153 @@ export default function RouteArtifactsPage() {
           </Link>
         </div>
       </header>
+
+      {editorOpen ? (
+        <section className="editorPanel">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">Governed Artifact Editor</p>
+              <h2>Create a route-bound record</h2>
+            </div>
+
+            <span className="editorBadge">Authenticated write</span>
+          </div>
+
+          <div className="editorGrid">
+            <label>
+              <span>Artifact type</span>
+              <select
+                value={artifactType}
+                onChange={(event) =>
+                  setArtifactType(
+                    event.target.value as RouteArtifactType,
+                  )
+                }
+                disabled={savingArtifact}
+              >
+                {ROUTE_ARTIFACT_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type.replaceAll("_", " ")}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label>
+              <span>Canonical stage</span>
+              <select
+                value={canonicalStage}
+                onChange={(event) =>
+                  setCanonicalStage(
+                    event.target.value as CanonicalRouteStage,
+                  )
+                }
+                disabled={savingArtifact}
+              >
+                {CANONICAL_ROUTE_STAGES.map((stage) => (
+                  <option key={stage} value={stage}>
+                    {stage}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label className="wideField">
+              <span>Artifact title</span>
+              <input
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
+                placeholder="Example: Procurement authority approval"
+                disabled={savingArtifact}
+              />
+            </label>
+
+            <label>
+              <span>Requirement key</span>
+              <input
+                value={requirementKey}
+                onChange={(event) =>
+                  setRequirementKey(event.target.value)
+                }
+                placeholder="Optional requirement binding"
+                disabled={savingArtifact}
+              />
+            </label>
+
+            <label>
+              <span>SHA-256</span>
+              <input
+                value={sha256}
+                onChange={(event) => setSha256(event.target.value)}
+                placeholder="Optional 64-character digest"
+                disabled={savingArtifact}
+              />
+            </label>
+
+            <label className="wideField">
+              <span>Description</span>
+              <textarea
+                value={description}
+                onChange={(event) =>
+                  setDescription(event.target.value)
+                }
+                placeholder="Describe what this record represents and why it belongs in this route."
+                rows={4}
+                disabled={savingArtifact}
+              />
+            </label>
+
+            <label className="wideField">
+              <span>Artifact JSON</span>
+              <textarea
+                value={artifactJsonText}
+                onChange={(event) =>
+                  setArtifactJsonText(event.target.value)
+                }
+                rows={8}
+                spellCheck={false}
+                disabled={savingArtifact}
+              />
+            </label>
+          </div>
+
+          {editorMessage ? (
+            <p className="editorError" role="alert">
+              {editorMessage}
+            </p>
+          ) : null}
+
+          <div className="editorActions">
+            <button
+              type="button"
+              className="secondaryButton"
+              onClick={resetEditor}
+              disabled={savingArtifact}
+            >
+              Reset
+            </button>
+
+            <button
+              type="button"
+              className="primaryButton"
+              onClick={() => {
+                void createArtifact();
+              }}
+              disabled={savingArtifact || !title.trim()}
+            >
+              {savingArtifact
+                ? "Creating governed artifact..."
+                : "Create governed artifact"}
+            </button>
+          </div>
+
+          <p className="editorBoundary">
+            Creating a record stores and classifies it. Creation alone
+            does not establish admissibility, authority, truth,
+            continuity, execution, or outcome.
+          </p>
+        </section>
+      ) : null}
 
       <section className="routePanel">
         <div className="routeHeading">
@@ -303,7 +543,7 @@ export default function RouteArtifactsPage() {
             <h2>Canonical route stages</h2>
           </div>
 
-          <span className="readOnlyBadge">Read-only checkpoint</span>
+          <span className="readOnlyBadge">Governed inventory</span>
         </div>
 
         {artifacts.length === 0 ? (
@@ -556,6 +796,17 @@ function PageStyles() {
         cursor: pointer;
       }
 
+      button.secondaryButton,
+      button.primaryButton {
+        appearance: none;
+      }
+
+      .secondaryButton:disabled,
+      .primaryButton:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
       .primaryButton {
         border-color: #123c2e;
         background: #123c2e;
@@ -564,11 +815,109 @@ function PageStyles() {
 
       .routePanel,
       .recordsPanel,
+      .editorPanel,
       .boundaryNote,
       .statePanel {
         border: 1px solid #dce4df;
         background: rgba(255, 255, 255, 0.96);
         box-shadow: 0 20px 60px rgba(20, 47, 36, 0.06);
+      }
+
+      .editorPanel {
+        max-width: 1480px;
+        margin: 0 auto 18px;
+        padding: 26px;
+        border-radius: 22px;
+      }
+
+      .editorGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 14px;
+      }
+
+      .editorGrid label {
+        display: grid;
+        gap: 7px;
+      }
+
+      .editorGrid label > span {
+        color: #68766f;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .editorGrid input,
+      .editorGrid select,
+      .editorGrid textarea {
+        width: 100%;
+        border: 1px solid #ced8d2;
+        border-radius: 11px;
+        background: white;
+        color: #10201a;
+        font: inherit;
+        font-size: 13px;
+        outline: none;
+      }
+
+      .editorGrid input,
+      .editorGrid select {
+        min-height: 44px;
+        padding: 0 12px;
+      }
+
+      .editorGrid textarea {
+        padding: 12px;
+        resize: vertical;
+      }
+
+      .editorGrid input:focus,
+      .editorGrid select:focus,
+      .editorGrid textarea:focus {
+        border-color: #0f7c5c;
+        box-shadow: 0 0 0 3px rgba(15, 124, 92, 0.1);
+      }
+
+      .wideField {
+        grid-column: 1 / -1;
+      }
+
+      .editorBadge {
+        display: inline-flex;
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: #eaf7f2;
+        color: #08724f;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .editorActions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .editorError {
+        margin: 14px 0 0;
+        padding: 11px 12px;
+        border: 1px solid #efc1c1;
+        border-radius: 10px;
+        background: #fff8f8;
+        color: #9b2929;
+        font-size: 13px;
+      }
+
+      .editorBoundary {
+        margin: 14px 0 0;
+        color: #718078;
+        font-size: 12px;
+        line-height: 1.55;
       }
 
       .routePanel {
@@ -980,8 +1329,13 @@ function PageStyles() {
         .identityGrid,
         .summaryGrid,
         .artifactGrid,
+        .editorGrid,
         dl {
           grid-template-columns: 1fr;
+        }
+
+        .wideField {
+          grid-column: auto;
         }
 
         .routeDates {
@@ -996,8 +1350,17 @@ function PageStyles() {
         }
 
         .routePanel,
-        .recordsPanel {
+        .recordsPanel,
+        .editorPanel {
           padding: 18px;
+        }
+
+        .editorActions {
+          flex-direction: column-reverse;
+        }
+
+        .editorActions button {
+          width: 100%;
         }
 
         .stageHeader,
