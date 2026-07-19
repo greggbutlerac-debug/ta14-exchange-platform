@@ -40,6 +40,10 @@ import {
 import {
   downloadRouteVerificationExportPackage,
 } from "../../../../../lib/route-verification-receipt-export";
+import {
+  readRouteVerificationExportFile,
+  type RouteVerificationPackageImportResult,
+} from "../../../../../lib/route-verification-receipt-import";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -225,6 +229,10 @@ export default function RouteArtifactsPage() {
     useState<RouteReceiptVerificationResult | null>(null);
   const [verifyingRouteReceipt, setVerifyingRouteReceipt] = useState(false);
   const [routeReceiptVerificationMessage, setRouteReceiptVerificationMessage] =
+    useState("");
+  const [importedRoutePackage, setImportedRoutePackage] =
+    useState<RouteVerificationPackageImportResult | null>(null);
+  const [routePackageImportMessage, setRoutePackageImportMessage] =
     useState("");
 
   const readiness = useMemo(
@@ -527,6 +535,25 @@ export default function RouteArtifactsPage() {
       );
     } finally {
       setPreservingRouteReceipt(false);
+    }
+  };
+
+  const importRouteVerificationPackage = async (
+    file: File,
+  ): Promise<void> => {
+    setRoutePackageImportMessage("");
+
+    try {
+      const result = await readRouteVerificationExportFile(file);
+      setImportedRoutePackage(result);
+    } catch (error) {
+      setImportedRoutePackage(null);
+      setRoutePackageImportMessage(
+        getErrorMessage(
+          error,
+          "The selected route verification package could not be imported.",
+        ),
+      );
     }
   };
 
@@ -1018,12 +1045,77 @@ export default function RouteArtifactsPage() {
               >
                 Export verification package
               </button>
+
+              <label className="importRouteReceiptButton">
+                Import verification package
+                <input
+                  type="file"
+                  accept="application/json,.json"
+                  onChange={(event) => {
+                    const file = event.currentTarget.files?.[0];
+
+                    if (file) {
+                      void importRouteVerificationPackage(file);
+                    }
+
+                    event.currentTarget.value = "";
+                  }}
+                />
+              </label>
             </div>
 
             {routeReceiptVerificationMessage ? (
               <p className="routeReceiptVerificationError" role="alert">
                 {routeReceiptVerificationMessage}
               </p>
+            ) : null}
+
+            {routePackageImportMessage ? (
+              <p className="routePackageImportError" role="alert">
+                {routePackageImportMessage}
+              </p>
+            ) : null}
+
+            {importedRoutePackage ? (
+              <div className="routePackageImportPanel">
+                <div className="routePackageImportTopline">
+                  <span>Imported verification package</span>
+                  <strong>ACCEPTED</strong>
+                </div>
+
+                <div className="routePackageImportMetrics">
+                  <span>
+                    Route: {importedRoutePackage.receipt.routeId}
+                  </span>
+                  <span>
+                    Receipt: {importedRoutePackage.receipt.id}
+                  </span>
+                  <span>
+                    Artifacts: {importedRoutePackage.receipt.artifactCount}
+                  </span>
+                  <span>
+                    Readiness:{" "}
+                    {importedRoutePackage.receipt.readinessPercentage}%
+                  </span>
+                </div>
+
+                <code>
+                  Receipt SHA-256:{" "}
+                  {importedRoutePackage.receipt.receiptSha256}
+                </code>
+
+                <p>
+                  Package type and version were accepted, and all required
+                  receipt fields were parsed successfully.
+                </p>
+
+                <time dateTime={importedRoutePackage.exportPackage.exportedAt}>
+                  Exported{" "}
+                  {new Date(
+                    importedRoutePackage.exportPackage.exportedAt,
+                  ).toLocaleString()}
+                </time>
+              </div>
             ) : null}
 
             {routeReceiptVerification ? (
@@ -2250,7 +2342,8 @@ function PageStyles() {
       }
 
       .verifyRouteReceiptButton,
-      .exportRouteReceiptButton {
+      .exportRouteReceiptButton,
+      .importRouteReceiptButton {
         width: 100%;
         padding: 11px 13px;
         border: 1px solid #b9d9cc;
@@ -2281,9 +2374,96 @@ function PageStyles() {
         background: #f5f7f8;
       }
 
+      .importRouteReceiptButton {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-color: #d8d1eb;
+        background: #faf8ff;
+        color: #5a3d8c;
+        text-align: center;
+      }
+
+      .importRouteReceiptButton:hover {
+        border-color: #b9a9da;
+        background: #f3effc;
+      }
+
+      .importRouteReceiptButton input {
+        display: none;
+      }
+
       .verifyRouteReceiptButton:disabled {
         cursor: not-allowed;
         opacity: 0.55;
+      }
+
+      .routePackageImportPanel {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #d8d1eb;
+        border-radius: 10px;
+        background: #faf8ff;
+      }
+
+      .routePackageImportTopline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .routePackageImportTopline span,
+      .routePackageImportTopline strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      .routePackageImportTopline strong {
+        color: #5a3d8c;
+      }
+
+      .routePackageImportMetrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 9px 0;
+      }
+
+      .routePackageImportMetrics span {
+        padding: 5px 7px;
+        border: 1px solid #e4def1;
+        border-radius: 999px;
+        background: white;
+        color: #5f5470;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .routePackageImportPanel p {
+        margin: 8px 0 0;
+        color: #6f647d;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .routePackageImportPanel time {
+        display: block;
+        margin-top: 7px;
+        color: #84788f;
+        font-size: 9px;
+      }
+
+      .routePackageImportError {
+        margin: 10px 0 0;
+        padding: 10px 11px;
+        border: 1px solid #efc1c1;
+        border-radius: 9px;
+        background: #fff8f8;
+        color: #9b2929;
+        font-size: 11px;
       }
 
       .routeReceiptVerificationPanel {
