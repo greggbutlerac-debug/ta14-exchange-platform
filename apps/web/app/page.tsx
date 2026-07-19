@@ -577,6 +577,259 @@ export default function HomePage() {
           text-transform: uppercase;
         }
 
+
+        .exchange-preview {
+          position: relative;
+          padding: 24px 0 92px;
+        }
+
+        .exchange-dashboard {
+          position: relative;
+          overflow: hidden;
+          border-radius: 32px;
+          border: 1px solid rgba(84, 232, 255, 0.24);
+          background:
+            linear-gradient(145deg, rgba(10, 19, 31, 0.9), rgba(4, 9, 16, 0.78)),
+            radial-gradient(circle at 50% 0%, rgba(41, 167, 255, 0.12), transparent 55%);
+          box-shadow: 0 28px 90px rgba(0,0,0,0.38), 0 0 70px rgba(41,167,255,0.1);
+        }
+
+        .exchange-dashboard::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.035) 45%, transparent 70%);
+          transform: translateX(-100%);
+          animation: dashboardSheen 9s ease-in-out infinite;
+        }
+
+        @keyframes dashboardSheen {
+          0%, 55% { transform: translateX(-100%); }
+          85%, 100% { transform: translateX(100%); }
+        }
+
+        .exchange-dashboard-head {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 20px;
+          padding: 22px 24px;
+          border-bottom: 1px solid rgba(255,255,255,0.07);
+        }
+
+        .live-indicator {
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          color: var(--green);
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .live-pulse {
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: var(--green);
+          box-shadow: 0 0 16px var(--green);
+          animation: livePulse 1.7s ease-in-out infinite;
+        }
+
+        @keyframes livePulse {
+          0%, 100% { transform: scale(0.82); opacity: 0.6; }
+          50% { transform: scale(1.18); opacity: 1; }
+        }
+
+        .exchange-dashboard-body {
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          min-height: 460px;
+        }
+
+        .exchange-metrics {
+          padding: 28px;
+          border-right: 1px solid rgba(255,255,255,0.07);
+          display: grid;
+          align-content: center;
+          gap: 14px;
+        }
+
+        .metric-card {
+          position: relative;
+          overflow: hidden;
+          min-height: 94px;
+          padding: 18px;
+          border-radius: 18px;
+          border: 1px solid rgba(255,255,255,0.07);
+          background: rgba(255,255,255,0.032);
+        }
+
+        .metric-card::before {
+          content: "";
+          position: absolute;
+          inset: auto 0 0;
+          height: 2px;
+          background: linear-gradient(90deg, var(--cyan), var(--green), transparent);
+          transform-origin: left;
+          animation: metricScan 5s ease-in-out infinite;
+        }
+
+        .metric-card:nth-child(2)::before { animation-delay: 0.8s; }
+        .metric-card:nth-child(3)::before { animation-delay: 1.6s; }
+        .metric-card:nth-child(4)::before { animation-delay: 2.4s; }
+
+        @keyframes metricScan {
+          0%, 20% { transform: scaleX(0); opacity: 0; }
+          48% { transform: scaleX(1); opacity: 1; }
+          75%, 100% { transform: scaleX(1); opacity: 0.18; }
+        }
+
+        .metric-card small {
+          display: block;
+          color: var(--muted);
+          font-size: 11px;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+        }
+
+        .metric-card strong {
+          display: block;
+          margin-top: 9px;
+          font-size: 23px;
+          letter-spacing: -0.03em;
+        }
+
+        .route-stream {
+          position: relative;
+          overflow: hidden;
+          padding: 34px 30px;
+          background:
+            linear-gradient(rgba(84,232,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(84,232,255,0.025) 1px, transparent 1px);
+          background-size: 34px 34px;
+        }
+
+        .route-stream-label {
+          position: relative;
+          z-index: 4;
+          color: var(--muted);
+          font-size: 12px;
+          letter-spacing: 0.13em;
+          text-transform: uppercase;
+        }
+
+        .route-orbit {
+          position: absolute;
+          inset: 66px 34px 34px;
+          border-radius: 26px;
+          border: 1px solid rgba(84,232,255,0.12);
+        }
+
+        .route-orbit::before,
+        .route-orbit::after {
+          content: "";
+          position: absolute;
+          border-radius: 50%;
+          border: 1px solid rgba(57,242,161,0.12);
+        }
+
+        .route-orbit::before { width: 62%; height: 62%; left: 19%; top: 19%; }
+        .route-orbit::after { width: 34%; height: 34%; left: 33%; top: 33%; border-color: rgba(255,69,107,0.13); }
+
+        .floating-route {
+          position: absolute;
+          z-index: 3;
+          width: min(260px, 42%);
+          padding: 16px;
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(5, 12, 21, 0.88);
+          box-shadow: 0 14px 38px rgba(0,0,0,0.34);
+          backdrop-filter: blur(12px);
+          animation: floatRoute 7s ease-in-out infinite alternate;
+        }
+
+        .floating-route.one { left: 7%; top: 22%; }
+        .floating-route.two { right: 7%; top: 34%; animation-delay: -2.2s; }
+        .floating-route.three { left: 25%; bottom: 8%; animation-delay: -4.1s; }
+        .floating-route.four { right: 22%; top: 8%; animation-delay: -5.2s; }
+
+        @keyframes floatRoute {
+          from { transform: translate3d(0, -5px, 0); }
+          to { transform: translate3d(10px, 12px, 0); }
+        }
+
+        .floating-route-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          color: white;
+          font-size: 12px;
+          font-weight: 850;
+        }
+
+        .route-decision {
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.12em;
+        }
+
+        .route-decision.allow { color: var(--green); }
+        .route-decision.hold { color: var(--gold); }
+        .route-decision.deny { color: var(--red); }
+        .route-decision.escalate { color: var(--cyan); }
+
+        .floating-route p {
+          margin: 10px 0 0;
+          color: var(--muted);
+          font-size: 11px;
+          line-height: 1.5;
+        }
+
+        .chain-live {
+          position: absolute;
+          left: 8%;
+          right: 8%;
+          top: 50%;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(84,232,255,0.3), rgba(57,242,161,0.8), rgba(84,232,255,0.3), transparent);
+          box-shadow: 0 0 16px rgba(84,232,255,0.24);
+          animation: chainFlow 3.8s linear infinite;
+        }
+
+        @keyframes chainFlow {
+          0% { transform: scaleX(0.25); opacity: 0.25; }
+          50% { transform: scaleX(1); opacity: 1; }
+          100% { transform: scaleX(0.25); opacity: 0.25; }
+        }
+
+        .preview-note {
+          padding: 14px 24px 20px;
+          color: #71859a;
+          font-size: 11px;
+          line-height: 1.55;
+          border-top: 1px solid rgba(255,255,255,0.055);
+        }
+
+        @media (max-width: 900px) {
+          .exchange-dashboard-body { grid-template-columns: 1fr; }
+          .exchange-metrics { border-right: 0; border-bottom: 1px solid rgba(255,255,255,0.07); grid-template-columns: 1fr 1fr; }
+          .route-stream { min-height: 430px; }
+        }
+
+        @media (max-width: 620px) {
+          .exchange-metrics { grid-template-columns: 1fr; }
+          .exchange-dashboard-head { align-items: flex-start; flex-direction: column; }
+          .floating-route { width: 54%; }
+          .floating-route.one { left: 3%; }
+          .floating-route.two { right: 3%; }
+          .floating-route.three { left: 12%; }
+          .floating-route.four { right: 8%; }
+        }
+
         .section { padding: 88px 0; }
 
         .section-heading {
@@ -1195,6 +1448,59 @@ export default function HomePage() {
               <div className="ring three" />
               <div className="core-orb">TA-14<br />CORE</div>
               <div className="core-caption">Full-chain admissible execution</div>
+            </div>
+          </section>
+
+          <section className="container exchange-preview" aria-label="Living governance exchange preview">
+            <div className="exchange-dashboard">
+              <div className="exchange-dashboard-head">
+                <div>
+                  <div className="eyebrow">The Exchange is active</div>
+                  <h2 style={{ margin: '8px 0 0', fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '-0.04em' }}>
+                    Governance moving through the chain.
+                  </h2>
+                </div>
+                <div className="live-indicator"><span className="live-pulse" />Living Exchange Preview</div>
+              </div>
+
+              <div className="exchange-dashboard-body">
+                <div className="exchange-metrics">
+                  <div className="metric-card"><small>Build access</small><strong>Free and unlimited</strong></div>
+                  <div className="metric-card"><small>Decision lanes</small><strong>ALLOW · HOLD · DENY · ESCALATE</strong></div>
+                  <div className="metric-card"><small>Governance depth</small><strong>Eight linked stages</strong></div>
+                  <div className="metric-card"><small>Verification</small><strong>Independent replay surface</strong></div>
+                </div>
+
+                <div className="route-stream">
+                  <div className="route-stream-label">Consequential routes in motion</div>
+                  <div className="route-orbit" />
+                  <div className="chain-live" />
+
+                  <article className="floating-route one">
+                    <div className="floating-route-top"><span>Vendor Payment</span><span className="route-decision hold">HOLD</span></div>
+                    <p>Current authority evidence required before commitment.</p>
+                  </article>
+
+                  <article className="floating-route two">
+                    <div className="floating-route-top"><span>Medical AI</span><span className="route-decision escalate">ESCALATE</span></div>
+                    <p>Human authority requested for consequence-bearing action.</p>
+                  </article>
+
+                  <article className="floating-route three">
+                    <div className="floating-route-top"><span>Autonomous Agent</span><span className="route-decision deny">DENY</span></div>
+                    <p>Destination binding does not match the approved route.</p>
+                  </article>
+
+                  <article className="floating-route four">
+                    <div className="floating-route-top"><span>Environmental System</span><span className="route-decision allow">ALLOW</span></div>
+                    <p>Evidence, continuity, authority, and outcome bound.</p>
+                  </article>
+                </div>
+              </div>
+
+              <div className="preview-note">
+                Visual exchange preview. Route decisions shown here are illustrative; production activity and preserved records remain governed by their actual route evidence and execution state.
+              </div>
             </div>
           </section>
 
