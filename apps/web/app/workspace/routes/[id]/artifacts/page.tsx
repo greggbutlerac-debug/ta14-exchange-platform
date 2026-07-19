@@ -44,6 +44,10 @@ import {
   readRouteVerificationExportFile,
   type RouteVerificationPackageImportResult,
 } from "../../../../../lib/route-verification-receipt-import";
+import {
+  replayImportedRouteVerificationPackage,
+  type ImportedRoutePackageReplayResult,
+} from "../../../../../lib/imported-route-verification-replay";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -234,6 +238,10 @@ export default function RouteArtifactsPage() {
     useState<RouteVerificationPackageImportResult | null>(null);
   const [routePackageImportMessage, setRoutePackageImportMessage] =
     useState("");
+  const [importedRouteReplay, setImportedRouteReplay] =
+    useState<ImportedRoutePackageReplayResult | null>(null);
+  const [replayingImportedPackage, setReplayingImportedPackage] =
+    useState(false);
 
   const readiness = useMemo(
     () => calculateRouteReadiness(artifacts, verificationResults),
@@ -546,6 +554,7 @@ export default function RouteArtifactsPage() {
     try {
       const result = await readRouteVerificationExportFile(file);
       setImportedRoutePackage(result);
+      setImportedRouteReplay(null);
     } catch (error) {
       setImportedRoutePackage(null);
       setRoutePackageImportMessage(
@@ -554,6 +563,23 @@ export default function RouteArtifactsPage() {
           "The selected route verification package could not be imported.",
         ),
       );
+    }
+  };
+
+  const replayImportedPackage = async (): Promise<void> => {
+    if (!importedRoutePackage) {
+      return;
+    }
+
+    setReplayingImportedPackage(true);
+
+    try {
+      const result = await replayImportedRouteVerificationPackage(
+        importedRoutePackage,
+      );
+      setImportedRouteReplay(result);
+    } finally {
+      setReplayingImportedPackage(false);
     }
   };
 
@@ -1108,6 +1134,72 @@ export default function RouteArtifactsPage() {
                   Package type and version were accepted, and all required
                   receipt fields were parsed successfully.
                 </p>
+
+                <button
+                  type="button"
+                  className="replayImportedPackageButton"
+                  onClick={() => {
+                    void replayImportedPackage();
+                  }}
+                  disabled={replayingImportedPackage}
+                >
+                  {replayingImportedPackage
+                    ? "Replaying imported package..."
+                    : "Replay imported package"}
+                </button>
+
+                {importedRouteReplay ? (
+                  <div
+                    className={`importedRouteReplayPanel ${importedRouteReplay.status.toLowerCase()}`}
+                  >
+                    <div className="importedRouteReplayTopline">
+                      <span>Independent replay result</span>
+                      <strong>{importedRouteReplay.status}</strong>
+                    </div>
+
+                    <p>{importedRouteReplay.message}</p>
+
+                    <div className="importedRouteReplayMetrics">
+                      <span>
+                        Digest:{" "}
+                        {importedRouteReplay.hashMatches === null
+                          ? "not calculated"
+                          : importedRouteReplay.hashMatches
+                            ? "match"
+                            : "mismatch"}
+                      </span>
+                      <span>
+                        Artifact references:{" "}
+                        {importedRouteReplay.artifactReceiptReferenceCount}
+                      </span>
+                      <span>
+                        Failures: {importedRouteReplay.failures.length}
+                      </span>
+                    </div>
+
+                    {importedRouteReplay.calculatedSha256 ? (
+                      <code>
+                        Calculated SHA-256:{" "}
+                        {importedRouteReplay.calculatedSha256}
+                      </code>
+                    ) : null}
+
+                    {importedRouteReplay.failures.length > 0 ? (
+                      <ul>
+                        {importedRouteReplay.failures.map((failure) => (
+                          <li key={failure}>{failure}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+
+                    <time dateTime={importedRouteReplay.replayedAt}>
+                      Replayed{" "}
+                      {new Date(
+                        importedRouteReplay.replayedAt,
+                      ).toLocaleString()}
+                    </time>
+                  </div>
+                ) : null}
 
                 <time dateTime={importedRoutePackage.exportPackage.exportedAt}>
                   Exported{" "}
@@ -2445,6 +2537,116 @@ function PageStyles() {
       .routePackageImportPanel p {
         margin: 8px 0 0;
         color: #6f647d;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .replayImportedPackageButton {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border: 1px solid #c9bfe2;
+        border-radius: 9px;
+        background: #f5f1fc;
+        color: #5a3d8c;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .replayImportedPackageButton:hover:not(:disabled) {
+        border-color: #a99aca;
+        background: #eee8f8;
+      }
+
+      .replayImportedPackageButton:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .importedRouteReplayPanel {
+        margin-top: 10px;
+        padding: 11px;
+        border: 1px solid #dfe4e2;
+        border-radius: 9px;
+        background: #ffffff;
+      }
+
+      .importedRouteReplayPanel.verified {
+        border-color: #b9decf;
+        background: #f1faf6;
+      }
+
+      .importedRouteReplayPanel.mismatch {
+        border-color: #edc4c4;
+        background: #fff6f6;
+      }
+
+      .importedRouteReplayPanel.incomplete {
+        border-color: #ead5a3;
+        background: #fffaf0;
+      }
+
+      .importedRouteReplayPanel.unverifiable {
+        border-color: #d4c7ea;
+        background: #faf8ff;
+      }
+
+      .importedRouteReplayTopline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .importedRouteReplayTopline span,
+      .importedRouteReplayTopline strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      .importedRouteReplayPanel.verified strong {
+        color: #08724f;
+      }
+
+      .importedRouteReplayPanel.mismatch strong {
+        color: #a12d2d;
+      }
+
+      .importedRouteReplayPanel.incomplete strong {
+        color: #8a5a00;
+      }
+
+      .importedRouteReplayPanel.unverifiable strong {
+        color: #5a3d8c;
+      }
+
+      .importedRouteReplayMetrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 8px 0;
+      }
+
+      .importedRouteReplayMetrics span {
+        padding: 5px 7px;
+        border: 1px solid #e1e8e4;
+        border-radius: 999px;
+        background: white;
+        color: #53615a;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .importedRouteReplayPanel ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: #6d5f52;
         font-size: 10px;
         line-height: 1.45;
       }
