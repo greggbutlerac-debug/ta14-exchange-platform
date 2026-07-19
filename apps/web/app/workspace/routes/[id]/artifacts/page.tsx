@@ -59,6 +59,10 @@ import {
 import {
   downloadImportedReplayHistoryExport,
 } from "../../../../../lib/imported-route-replay-history-export";
+import {
+  readImportedReplayHistoryFile,
+  type ImportedReplayHistoryImportResult,
+} from "../../../../../lib/imported-route-replay-history-import";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -262,6 +266,12 @@ export default function RouteArtifactsPage() {
   const [importedReplayHistory, setImportedReplayHistory] =
     useState<ImportedRouteReplayReceipt[]>([]);
   const [loadingImportedReplayHistory, setLoadingImportedReplayHistory] =
+    useState(false);
+  const [importedReplayHistoryPackage, setImportedReplayHistoryPackage] =
+    useState<ImportedReplayHistoryImportResult | null>(null);
+  const [importedReplayHistoryMessage, setImportedReplayHistoryMessage] =
+    useState("");
+  const [importingReplayHistory, setImportingReplayHistory] =
     useState(false);
 
   const readiness = useMemo(
@@ -620,6 +630,32 @@ export default function RouteArtifactsPage() {
       setImportedRouteReplay(result);
     } finally {
       setReplayingImportedPackage(false);
+    }
+  };
+
+  const importReplayHistoryPackage = async (
+    file: File,
+  ): Promise<void> => {
+    setImportingReplayHistory(true);
+    setImportedReplayHistoryMessage("");
+    setImportedReplayHistoryPackage(null);
+
+    try {
+      const result = await readImportedReplayHistoryFile(file);
+
+      setImportedReplayHistoryPackage(result);
+      setImportedReplayHistoryMessage(
+        "Replay-history package accepted.",
+      );
+    } catch (error) {
+      setImportedReplayHistoryMessage(
+        getErrorMessage(
+          error,
+          "The replay-history package could not be imported.",
+        ),
+      );
+    } finally {
+      setImportingReplayHistory(false);
     }
   };
 
@@ -1294,6 +1330,124 @@ export default function RouteArtifactsPage() {
                       >
                         {importedReplayReceiptMessage}
                       </p>
+                    ) : null}
+
+                    <label className="importReplayHistoryControl">
+                      <span>
+                        {importingReplayHistory
+                          ? "Importing replay history..."
+                          : "Import replay history"}
+                      </span>
+                      <input
+                        type="file"
+                        accept="application/json,.json"
+                        disabled={importingReplayHistory}
+                        onChange={(event) => {
+                          const file = event.target.files?.[0];
+
+                          if (file) {
+                            void importReplayHistoryPackage(file);
+                          }
+
+                          event.currentTarget.value = "";
+                        }}
+                      />
+                    </label>
+
+                    {importedReplayHistoryMessage ? (
+                      <p
+                        className={
+                          importedReplayHistoryPackage
+                            ? "importReplayHistorySuccess"
+                            : "importReplayHistoryError"
+                        }
+                        role={
+                          importedReplayHistoryPackage
+                            ? undefined
+                            : "alert"
+                        }
+                      >
+                        {importedReplayHistoryMessage}
+                      </p>
+                    ) : null}
+
+                    {importedReplayHistoryPackage ? (
+                      <div className="importedReplayHistoryPackagePanel">
+                        <div>
+                          <span>Imported replay history</span>
+                          <strong>ACCEPTED</strong>
+                        </div>
+
+                        <dl>
+                          <div>
+                            <dt>Source route</dt>
+                            <dd>
+                              {
+                                importedReplayHistoryPackage.package
+                                  .sourceRouteId
+                              }
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Source receipt</dt>
+                            <dd>
+                              {
+                                importedReplayHistoryPackage.package
+                                  .sourceReceiptId
+                              }
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Replay receipts</dt>
+                            <dd>
+                              {
+                                importedReplayHistoryPackage.package
+                                  .replayReceiptCount
+                              }
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Count continuity</dt>
+                            <dd>
+                              {importedReplayHistoryPackage
+                                .receiptCountMatches
+                                ? "MATCH"
+                                : "MISMATCH"}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Receipt continuity</dt>
+                            <dd>
+                              {importedReplayHistoryPackage
+                                .sourceReceiptContinuity
+                                ? "PRESERVED"
+                                : "BROKEN"}
+                            </dd>
+                          </div>
+                          <div>
+                            <dt>Route continuity</dt>
+                            <dd>
+                              {importedReplayHistoryPackage
+                                .sourceRouteContinuity
+                                ? "PRESERVED"
+                                : "BROKEN"}
+                            </dd>
+                          </div>
+                        </dl>
+
+                        <time
+                          dateTime={
+                            importedReplayHistoryPackage.package
+                              .exportedAt
+                          }
+                        >
+                          Exported{" "}
+                          {new Date(
+                            importedReplayHistoryPackage.package
+                              .exportedAt,
+                          ).toLocaleString()}
+                        </time>
+                      </div>
                     ) : null}
 
                     {loadingImportedReplayHistory ? (
@@ -2890,6 +3044,122 @@ function PageStyles() {
         border: 1px solid #efc1c1;
         background: #fff8f8;
         color: #9b2929;
+      }
+
+      .importReplayHistoryControl {
+        display: block;
+        width: 100%;
+        margin-bottom: 9px;
+        padding: 9px 11px;
+        border: 1px solid #b9d9e8;
+        border-radius: 8px;
+        background: #eef8fc;
+        color: #1c6580;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+        text-align: center;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .importReplayHistoryControl:hover {
+        border-color: #8fc1d6;
+        background: #e4f3f9;
+      }
+
+      .importReplayHistoryControl input {
+        display: none;
+      }
+
+      .importReplayHistorySuccess,
+      .importReplayHistoryError {
+        margin: 0 0 9px;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .importReplayHistorySuccess {
+        border: 1px solid #b9decf;
+        background: #f1faf6;
+        color: #08724f;
+      }
+
+      .importReplayHistoryError {
+        border: 1px solid #efc1c1;
+        background: #fff8f8;
+        color: #9b2929;
+      }
+
+      .importedReplayHistoryPackagePanel {
+        margin-bottom: 10px;
+        padding: 10px;
+        border: 1px solid #b9d9e8;
+        border-radius: 9px;
+        background: #f8fcfe;
+      }
+
+      .importedReplayHistoryPackagePanel > div:first-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .importedReplayHistoryPackagePanel > div:first-child span,
+      .importedReplayHistoryPackagePanel > div:first-child strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .importedReplayHistoryPackagePanel > div:first-child strong {
+        color: #08724f;
+      }
+
+      .importedReplayHistoryPackagePanel dl {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+      }
+
+      .importedReplayHistoryPackagePanel dl > div {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr);
+        gap: 8px;
+        padding: 6px 0;
+        border-top: 1px solid #dcecf3;
+      }
+
+      .importedReplayHistoryPackagePanel dt,
+      .importedReplayHistoryPackagePanel dd {
+        margin: 0;
+        font-size: 9px;
+        line-height: 1.35;
+      }
+
+      .importedReplayHistoryPackagePanel dt {
+        color: #667984;
+        font-weight: 800;
+        text-transform: uppercase;
+      }
+
+      .importedReplayHistoryPackagePanel dd {
+        overflow-wrap: anywhere;
+        color: #183847;
+        font-weight: 800;
+        text-align: right;
+      }
+
+      .importedReplayHistoryPackagePanel time {
+        display: block;
+        margin-top: 8px;
+        color: #71848e;
+        font-size: 9px;
       }
 
       .importedReplayHistoryLoading {
