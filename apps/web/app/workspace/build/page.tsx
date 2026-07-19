@@ -10,7 +10,7 @@ import {
   useState,
 } from "react";
 import type { TransferRouteDraft } from "../../../lib/route-draft-transfer";
-import { saveStoredRoute } from "../../../lib/route-library";
+import { saveSupabaseRoute } from "../../../lib/supabase-route-library";
 import AcademyLabBuilderBridge from "./academy-lab-builder-bridge";
 import type { AcademyLabBuilderDraft } from "./academy-lab-transfer-adapter";
 import EvaluateRouteLink from "./evaluate-route-link";
@@ -670,18 +670,38 @@ export default function BuildRoutePage() {
     }
   }
 
-  function saveToLibrary() {
+  async function saveToLibrary() {
     const wasExisting = Boolean(storedRouteId);
-    const stored = saveStoredRoute(route, storedRouteId ?? undefined);
 
-    setStoredRouteId(stored.id);
     setLibraryNotice(
-      wasExisting ? "Saved changes to My Routes." : "Route saved to My Routes.",
+      wasExisting
+        ? "Saving changes to your authenticated route library…"
+        : "Saving route to your authenticated route library…",
     );
 
-    window.setTimeout(() => {
-      setLibraryNotice(null);
-    }, 2200);
+    try {
+      const stored = await saveSupabaseRoute(
+        route,
+        storedRouteId ?? undefined,
+      );
+
+      setStoredRouteId(stored.id);
+      setLibraryNotice(
+        wasExisting
+          ? "Saved changes to My Routes."
+          : "Route saved to My Routes.",
+      );
+
+      window.setTimeout(() => {
+        setLibraryNotice(null);
+      }, 2200);
+    } catch (error) {
+      setLibraryNotice(
+        error instanceof Error
+          ? `Route could not be saved: ${error.message}`
+          : "Route could not be saved to your authenticated account.",
+      );
+    }
   }
 
   function downloadDraft() {
