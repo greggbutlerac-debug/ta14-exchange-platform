@@ -56,6 +56,9 @@ import {
 import {
   listImportedRouteReplayReceipts,
 } from "../../../../../lib/imported-route-replay-history";
+import {
+  downloadImportedReplayHistoryExport,
+} from "../../../../../lib/imported-route-replay-history-export";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -1307,6 +1310,18 @@ export default function RouteArtifactsPage() {
                             {importedReplayHistory.length}
                           </strong>
                         </div>
+
+                        <button
+                          type="button"
+                          className="exportImportedReplayHistoryButton"
+                          onClick={() => {
+                            downloadImportedReplayHistoryExport(
+                              importedReplayHistory,
+                            );
+                          }}
+                        >
+                          Export replay history
+                        </button>
 
                         <div className="importedReplayHistoryList">
                           {importedReplayHistory.map((receipt) => (
@@ -2909,6 +2924,27 @@ function PageStyles() {
 
       .importedReplayHistoryHeader strong {
         color: #5a3d8c;
+      }
+
+      .exportImportedReplayHistoryButton {
+        width: 100%;
+        margin-bottom: 9px;
+        padding: 9px 11px;
+        border: 1px solid #d6c9ea;
+        border-radius: 8px;
+        background: #f4effc;
+        color: #5a3d8c;
+        font: inherit;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .exportImportedReplayHistoryButton:hover {
+        border-color: #bba5dc;
+        background: #ece4f8;
       }
 
       .importedReplayHistoryList {
