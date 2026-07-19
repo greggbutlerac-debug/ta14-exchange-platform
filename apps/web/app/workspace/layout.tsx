@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+import { LogoutButton } from '../../components/auth/logout-button';
 import { requireUser } from '../../lib/auth/require-user';
 
 const workspaceNavigation = [
@@ -28,7 +29,8 @@ export default async function WorkspaceLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await requireUser();
+  const user = await requireUser();
+  const accountEmail = user.email ?? 'Authenticated account';
 
   return (
     <div className="ta14-workspace-frame">
@@ -78,7 +80,12 @@ export default async function WorkspaceLayout({
             linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
           background-size: 42px 42px;
-          mask-image: linear-gradient(to bottom, #000 0%, rgba(0,0,0,.75) 58%, transparent 100%);
+          mask-image: linear-gradient(
+            to bottom,
+            #000 0%,
+            rgba(0,0,0,.75) 58%,
+            transparent 100%
+          );
         }
 
         .ta14-workspace-frame::after {
@@ -94,8 +101,13 @@ export default async function WorkspaceLayout({
         }
 
         @keyframes ta14-drift {
-          from { transform: translateX(-54%) translateY(-8px) scale(.96); }
-          to { transform: translateX(-46%) translateY(28px) scale(1.08); }
+          from {
+            transform: translateX(-54%) translateY(-8px) scale(.96);
+          }
+
+          to {
+            transform: translateX(-46%) translateY(28px) scale(1.08);
+          }
         }
 
         .ta14-command-bar {
@@ -133,8 +145,14 @@ export default async function WorkspaceLayout({
           border: 1px solid rgba(84, 232, 255, .46);
           border-radius: 13px;
           color: #eaffff;
-          background: linear-gradient(145deg, rgba(84, 232, 255, .18), rgba(41, 167, 255, .04));
-          box-shadow: 0 0 28px rgba(41, 167, 255, .18), inset 0 0 18px rgba(84, 232, 255, .05);
+          background: linear-gradient(
+            145deg,
+            rgba(84, 232, 255, .18),
+            rgba(41, 167, 255, .04)
+          );
+          box-shadow:
+            0 0 28px rgba(41, 167, 255, .18),
+            inset 0 0 18px rgba(84, 232, 255, .05);
           font-size: .82rem;
           font-weight: 950;
           letter-spacing: -.03em;
@@ -201,6 +219,31 @@ export default async function WorkspaceLayout({
           padding-right: 18px;
         }
 
+        .ta14-account-identity {
+          display: grid;
+          max-width: 190px;
+          gap: 2px;
+          padding: 0 4px 0 8px;
+          text-align: right;
+        }
+
+        .ta14-account-identity span {
+          color: #5f7890;
+          font-size: .58rem;
+          font-weight: 950;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .ta14-account-identity strong {
+          overflow: hidden;
+          color: #dce8f3;
+          font-size: .7rem;
+          font-weight: 800;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
         .ta14-command-link {
           display: inline-flex;
           align-items: center;
@@ -214,7 +257,10 @@ export default async function WorkspaceLayout({
           text-decoration: none;
           font-size: .74rem;
           font-weight: 850;
-          transition: transform .2s ease, border-color .2s ease, background .2s ease;
+          transition:
+            transform .2s ease,
+            border-color .2s ease,
+            background .2s ease;
         }
 
         .ta14-command-link:hover {
@@ -280,7 +326,11 @@ export default async function WorkspaceLayout({
           text-decoration: none;
           font-size: .79rem;
           font-weight: 800;
-          transition: color .2s ease, border-color .2s ease, background .2s ease, transform .2s ease;
+          transition:
+            color .2s ease,
+            border-color .2s ease,
+            background .2s ease,
+            transform .2s ease;
         }
 
         .ta14-nav-item:hover {
@@ -293,7 +343,11 @@ export default async function WorkspaceLayout({
         .ta14-nav-item.active {
           border-color: rgba(84, 232, 255, .21);
           color: #f1fbff;
-          background: linear-gradient(90deg, rgba(42, 167, 255, .16), rgba(57, 242, 161, .05));
+          background: linear-gradient(
+            90deg,
+            rgba(42, 167, 255, .16),
+            rgba(57, 242, 161, .05)
+          );
           box-shadow: inset 2px 0 0 #54e8ff;
         }
 
@@ -326,8 +380,16 @@ export default async function WorkspaceLayout({
           border: 1px solid rgba(84, 232, 255, .18);
           border-radius: 18px;
           background:
-            radial-gradient(circle at 100% 0%, rgba(84, 232, 255, .14), transparent 42%),
-            linear-gradient(145deg, rgba(15, 32, 49, .92), rgba(5, 13, 22, .92));
+            radial-gradient(
+              circle at 100% 0%,
+              rgba(84, 232, 255, .14),
+              transparent 42%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(15, 32, 49, .92),
+              rgba(5, 13, 22, .92)
+            );
         }
 
         .ta14-academy-card::after {
@@ -401,6 +463,12 @@ export default async function WorkspaceLayout({
           display: none;
         }
 
+        @media (max-width: 1180px) {
+          .ta14-account-identity {
+            display: none;
+          }
+        }
+
         @media (max-width: 1080px) {
           .ta14-command-bar {
             grid-template-columns: 224px minmax(0, 1fr) auto;
@@ -441,7 +509,7 @@ export default async function WorkspaceLayout({
           }
 
           .ta14-command-link.secondary-link {
-            display: inline-flex;
+            display: none;
           }
 
           .ta14-workspace-content {
@@ -500,8 +568,7 @@ export default async function WorkspaceLayout({
             padding-left: 12px;
           }
 
-          .ta14-brand-copy span,
-          .ta14-command-link.secondary-link {
+          .ta14-brand-copy span {
             display: none;
           }
 
@@ -512,9 +579,7 @@ export default async function WorkspaceLayout({
           }
 
           .ta14-command-link {
-            min-height: 36px;
-            padding: 0 12px;
-            font-size: .68rem;
+            display: none;
           }
 
           .ta14-workspace-content {
@@ -541,6 +606,7 @@ export default async function WorkspaceLayout({
       <header className="ta14-command-bar">
         <Link className="ta14-brand" href="/" aria-label="TA-14 Exchange home">
           <span className="ta14-brand-mark">14</span>
+
           <span className="ta14-brand-copy">
             <strong>TA-14 EXCHANGE</strong>
             <span>Admissible Execution Workspace</span>
@@ -549,29 +615,35 @@ export default async function WorkspaceLayout({
 
         <div className="ta14-command-context" aria-label="Workspace status">
           <span className="ta14-live-dot" aria-hidden="true" />
-          <strong>Workspace online</strong>
+          <strong>Authenticated workspace</strong>
           <span>One Exchange · One Engine · One Record</span>
         </div>
 
         <nav className="ta14-command-actions" aria-label="Global navigation">
-          <Link className="ta14-command-link secondary-link" href="/academy">
-            Academy
-          </Link>
+          <div className="ta14-account-identity">
+            <span>Signed in</span>
+            <strong title={accountEmail}>{accountEmail}</strong>
+          </div>
+
           <Link
             className="ta14-command-link secondary-link"
             href="/architecture"
           >
             Architecture
           </Link>
+
           <Link className="ta14-command-link primary" href="/verify">
             Verify record
           </Link>
+
+          <LogoutButton />
         </nav>
       </header>
 
       <aside className="ta14-sidebar" aria-label="Workspace navigation">
         <section className="ta14-nav-section">
           <span className="ta14-nav-label">Build and test</span>
+
           <nav className="ta14-nav-list">
             {workspaceNavigation.map((item) => (
               <Link
@@ -582,8 +654,12 @@ export default async function WorkspaceLayout({
                 <span className="ta14-nav-glyph" aria-hidden="true">
                   {item.glyph}
                 </span>
+
                 <span>{item.label}</span>
-                {!item.active && <span className="ta14-nav-soon">Soon</span>}
+
+                {!item.active && (
+                  <span className="ta14-nav-soon">Soon</span>
+                )}
               </Link>
             ))}
           </nav>
@@ -591,12 +667,14 @@ export default async function WorkspaceLayout({
 
         <section className="ta14-nav-section">
           <span className="ta14-nav-label">Records and proof</span>
+
           <nav className="ta14-nav-list">
             {recordNavigation.map((item) => (
               <Link className="ta14-nav-item" href={item.href} key={item.href}>
                 <span className="ta14-nav-glyph" aria-hidden="true">
                   {item.glyph}
                 </span>
+
                 <span>{item.label}</span>
               </Link>
             ))}
@@ -606,10 +684,12 @@ export default async function WorkspaceLayout({
         <article className="ta14-academy-card">
           <small>TA-14 Academy</small>
           <strong>Learn how consequential routes are built.</strong>
+
           <p>
             Study the chain, enter guided labs, and carry each lesson directly
             into the Exchange.
           </p>
+
           <Link href="/academy">Enter the Academy →</Link>
         </article>
       </aside>
@@ -621,18 +701,22 @@ export default async function WorkspaceLayout({
           <b>◈</b>
           Overview
         </Link>
+
         <Link href="/workspace/build">
           <b>◇</b>
           Build
         </Link>
+
         <Link href="/workspace/lab">
           <b>A</b>
           Academy
         </Link>
+
         <Link href="/records">
           <b>R</b>
           Records
         </Link>
+
         <Link href="/verify">
           <b>✓</b>
           Verify
