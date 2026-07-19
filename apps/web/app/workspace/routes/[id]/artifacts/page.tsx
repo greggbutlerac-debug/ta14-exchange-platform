@@ -33,6 +33,10 @@ import {
   getLatestRouteVerificationReceipt,
   type RouteVerificationReceipt,
 } from "../../../../../lib/route-verification-receipts";
+import {
+  verifyRouteVerificationReceipt,
+  type RouteReceiptVerificationResult,
+} from "../../../../../lib/route-verification-receipt-validator";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -214,6 +218,11 @@ export default function RouteArtifactsPage() {
     useState<RouteVerificationReceipt | null>(null);
   const [preservingRouteReceipt, setPreservingRouteReceipt] = useState(false);
   const [routeReceiptMessage, setRouteReceiptMessage] = useState("");
+  const [routeReceiptVerification, setRouteReceiptVerification] =
+    useState<RouteReceiptVerificationResult | null>(null);
+  const [verifyingRouteReceipt, setVerifyingRouteReceipt] = useState(false);
+  const [routeReceiptVerificationMessage, setRouteReceiptVerificationMessage] =
+    useState("");
 
   const readiness = useMemo(
     () => calculateRouteReadiness(artifacts, verificationResults),
@@ -263,6 +272,8 @@ export default function RouteArtifactsPage() {
       setVerificationMessage("");
       setLatestRouteReceipt(storedRouteReceipt);
       setRouteReceiptMessage("");
+      setRouteReceiptVerification(null);
+      setRouteReceiptVerificationMessage("");
     } catch (error) {
       setRoute(null);
       setArtifacts([]);
@@ -499,6 +510,8 @@ export default function RouteArtifactsPage() {
       });
 
       setLatestRouteReceipt(receipt);
+      setRouteReceiptVerification(null);
+      setRouteReceiptVerificationMessage("");
       setRouteReceiptMessage(
         "Route-level verification receipt preserved successfully.",
       );
@@ -511,6 +524,32 @@ export default function RouteArtifactsPage() {
       );
     } finally {
       setPreservingRouteReceipt(false);
+    }
+  };
+
+  const verifyLatestRouteReceipt = async (): Promise<void> => {
+    if (!latestRouteReceipt) {
+      return;
+    }
+
+    setVerifyingRouteReceipt(true);
+    setRouteReceiptVerificationMessage("");
+
+    try {
+      const result = await verifyRouteVerificationReceipt(
+        latestRouteReceipt,
+      );
+
+      setRouteReceiptVerification(result);
+    } catch (error) {
+      setRouteReceiptVerificationMessage(
+        getErrorMessage(
+          error,
+          "The preserved route receipt could not be verified.",
+        ),
+      );
+    } finally {
+      setVerifyingRouteReceipt(false);
     }
   };
 
@@ -949,6 +988,70 @@ export default function RouteArtifactsPage() {
             </div>
 
             <code>Receipt SHA-256: {latestRouteReceipt.receiptSha256}</code>
+
+            <div className="routeReceiptVerificationActions">
+              <button
+                type="button"
+                className="verifyRouteReceiptButton"
+                onClick={() => {
+                  void verifyLatestRouteReceipt();
+                }}
+                disabled={verifyingRouteReceipt}
+              >
+                {verifyingRouteReceipt
+                  ? "Verifying preserved receipt..."
+                  : "Verify preserved route receipt"}
+              </button>
+            </div>
+
+            {routeReceiptVerificationMessage ? (
+              <p className="routeReceiptVerificationError" role="alert">
+                {routeReceiptVerificationMessage}
+              </p>
+            ) : null}
+
+            {routeReceiptVerification ? (
+              <div
+                className={`routeReceiptVerificationPanel ${routeReceiptVerification.status.toLowerCase()}`}
+              >
+                <div className="routeReceiptVerificationTopline">
+                  <span>Independent receipt verification</span>
+                  <strong>{routeReceiptVerification.status}</strong>
+                </div>
+
+                <p>{routeReceiptVerification.message}</p>
+
+                <div className="routeReceiptVerificationMetrics">
+                  <span>
+                    Digest:{" "}
+                    {routeReceiptVerification.hashMatches
+                      ? "match"
+                      : "mismatch"}
+                  </span>
+                  <span>
+                    References:{" "}
+                    {routeReceiptVerification.existingArtifactReceiptCount} /{" "}
+                    {routeReceiptVerification.referencedArtifactReceiptCount}
+                  </span>
+                  <span>
+                    Missing:{" "}
+                    {routeReceiptVerification.missingArtifactReceiptIds.length}
+                  </span>
+                </div>
+
+                <code>
+                  Calculated SHA-256:{" "}
+                  {routeReceiptVerification.calculatedSha256}
+                </code>
+
+                <time dateTime={routeReceiptVerification.checkedAt}>
+                  Checked{" "}
+                  {new Date(
+                    routeReceiptVerification.checkedAt,
+                  ).toLocaleString()}
+                </time>
+              </div>
+            ) : null}
           </article>
         ) : null}
 
@@ -2121,6 +2224,126 @@ function PageStyles() {
         color: #526058;
         font-size: 9px;
         font-weight: 800;
+      }
+
+      .routeReceiptVerificationActions {
+        margin-top: 14px;
+      }
+
+      .verifyRouteReceiptButton {
+        width: 100%;
+        padding: 11px 13px;
+        border: 1px solid #b9d9cc;
+        border-radius: 10px;
+        background: #eaf7f2;
+        color: #08724f;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .verifyRouteReceiptButton:hover:not(:disabled) {
+        border-color: #87bda8;
+        background: #def2ea;
+      }
+
+      .verifyRouteReceiptButton:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .routeReceiptVerificationPanel {
+        margin-top: 12px;
+        padding: 12px;
+        border: 1px solid #dce4e0;
+        border-radius: 10px;
+        background: #f8faf9;
+      }
+
+      .routeReceiptVerificationPanel.verified {
+        border-color: #b9decf;
+        background: #f1faf6;
+      }
+
+      .routeReceiptVerificationPanel.mismatch {
+        border-color: #edc4c4;
+        background: #fff6f6;
+      }
+
+      .routeReceiptVerificationPanel.missing_references {
+        border-color: #ead5a3;
+        background: #fffaf0;
+      }
+
+      .routeReceiptVerificationTopline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .routeReceiptVerificationTopline span,
+      .routeReceiptVerificationTopline strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      .routeReceiptVerificationPanel.verified strong {
+        color: #08724f;
+      }
+
+      .routeReceiptVerificationPanel.mismatch strong {
+        color: #a12d2d;
+      }
+
+      .routeReceiptVerificationPanel.missing_references strong {
+        color: #8a5a00;
+      }
+
+      .routeReceiptVerificationPanel p {
+        margin: 8px 0;
+        color: #68766f;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .routeReceiptVerificationMetrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .routeReceiptVerificationMetrics span {
+        padding: 5px 7px;
+        border: 1px solid #e1e8e4;
+        border-radius: 999px;
+        background: white;
+        color: #53615a;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .routeReceiptVerificationPanel time {
+        display: block;
+        margin-top: 7px;
+        color: #7a8780;
+        font-size: 9px;
+      }
+
+      .routeReceiptVerificationError {
+        margin: 10px 0 0;
+        padding: 10px 11px;
+        border: 1px solid #efc1c1;
+        border-radius: 9px;
+        background: #fff8f8;
+        color: #9b2929;
+        font-size: 11px;
       }
 
       .routeReceiptCard code {
