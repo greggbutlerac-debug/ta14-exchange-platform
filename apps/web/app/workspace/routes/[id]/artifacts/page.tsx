@@ -48,6 +48,10 @@ import {
   replayImportedRouteVerificationPackage,
   type ImportedRoutePackageReplayResult,
 } from "../../../../../lib/imported-route-verification-replay";
+import {
+  createImportedRouteReplayReceipt,
+  type ImportedRouteReplayReceipt,
+} from "../../../../../lib/imported-route-replay-receipts";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -242,6 +246,12 @@ export default function RouteArtifactsPage() {
     useState<ImportedRoutePackageReplayResult | null>(null);
   const [replayingImportedPackage, setReplayingImportedPackage] =
     useState(false);
+  const [preservingImportedReplay, setPreservingImportedReplay] =
+    useState(false);
+  const [preservedImportedReplayReceipt, setPreservedImportedReplayReceipt] =
+    useState<ImportedRouteReplayReceipt | null>(null);
+  const [importedReplayReceiptMessage, setImportedReplayReceiptMessage] =
+    useState("");
 
   const readiness = useMemo(
     () => calculateRouteReadiness(artifacts, verificationResults),
@@ -555,6 +565,8 @@ export default function RouteArtifactsPage() {
       const result = await readRouteVerificationExportFile(file);
       setImportedRoutePackage(result);
       setImportedRouteReplay(null);
+      setPreservedImportedReplayReceipt(null);
+      setImportedReplayReceiptMessage("");
     } catch (error) {
       setImportedRoutePackage(null);
       setRoutePackageImportMessage(
@@ -580,6 +592,36 @@ export default function RouteArtifactsPage() {
       setImportedRouteReplay(result);
     } finally {
       setReplayingImportedPackage(false);
+    }
+  };
+
+  const preserveImportedReplayReceipt = async (): Promise<void> => {
+    if (!importedRoutePackage || !importedRouteReplay) {
+      return;
+    }
+
+    setPreservingImportedReplay(true);
+    setImportedReplayReceiptMessage("");
+
+    try {
+      const receipt = await createImportedRouteReplayReceipt(
+        importedRoutePackage,
+        importedRouteReplay,
+      );
+
+      setPreservedImportedReplayReceipt(receipt);
+      setImportedReplayReceiptMessage(
+        "Imported replay receipt preserved successfully.",
+      );
+    } catch (error) {
+      setImportedReplayReceiptMessage(
+        getErrorMessage(
+          error,
+          "The imported replay receipt could not be preserved.",
+        ),
+      );
+    } finally {
+      setPreservingImportedReplay(false);
     }
   };
 
@@ -1190,6 +1232,61 @@ export default function RouteArtifactsPage() {
                           <li key={failure}>{failure}</li>
                         ))}
                       </ul>
+                    ) : null}
+
+                    <button
+                      type="button"
+                      className="preserveImportedReplayButton"
+                      onClick={() => {
+                        void preserveImportedReplayReceipt();
+                      }}
+                      disabled={preservingImportedReplay}
+                    >
+                      {preservingImportedReplay
+                        ? "Preserving replay receipt..."
+                        : "Preserve replay receipt"}
+                    </button>
+
+                    {importedReplayReceiptMessage ? (
+                      <p
+                        className={
+                          preservedImportedReplayReceipt
+                            ? "importedReplayReceiptSuccess"
+                            : "importedReplayReceiptError"
+                        }
+                        role={
+                          preservedImportedReplayReceipt
+                            ? undefined
+                            : "alert"
+                        }
+                      >
+                        {importedReplayReceiptMessage}
+                      </p>
+                    ) : null}
+
+                    {preservedImportedReplayReceipt ? (
+                      <div className="preservedImportedReplayReceipt">
+                        <div>
+                          <span>Preserved replay receipt</span>
+                          <strong>
+                            {preservedImportedReplayReceipt.replayStatus}
+                          </strong>
+                        </div>
+                        <code>
+                          Receipt ID:{" "}
+                          {preservedImportedReplayReceipt.id}
+                        </code>
+                        <time
+                          dateTime={
+                            preservedImportedReplayReceipt.createdAt
+                          }
+                        >
+                          Preserved{" "}
+                          {new Date(
+                            preservedImportedReplayReceipt.createdAt,
+                          ).toLocaleString()}
+                        </time>
+                      </div>
                     ) : null}
 
                     <time dateTime={importedRouteReplay.replayedAt}>
@@ -2641,6 +2738,81 @@ function PageStyles() {
         color: #53615a;
         font-size: 9px;
         font-weight: 800;
+      }
+
+      .preserveImportedReplayButton {
+        width: 100%;
+        margin-top: 10px;
+        padding: 10px 12px;
+        border: 1px solid #b9d9cc;
+        border-radius: 9px;
+        background: #eaf7f2;
+        color: #08724f;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        cursor: pointer;
+      }
+
+      .preserveImportedReplayButton:hover:not(:disabled) {
+        border-color: #87bda8;
+        background: #def2ea;
+      }
+
+      .preserveImportedReplayButton:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .importedReplayReceiptSuccess,
+      .importedReplayReceiptError {
+        margin: 9px 0 0;
+        padding: 9px 10px;
+        border-radius: 8px;
+        font-size: 10px;
+        line-height: 1.4;
+      }
+
+      .importedReplayReceiptSuccess {
+        border: 1px solid #b9decf;
+        background: #f1faf6;
+        color: #08724f;
+      }
+
+      .importedReplayReceiptError {
+        border: 1px solid #efc1c1;
+        background: #fff8f8;
+        color: #9b2929;
+      }
+
+      .preservedImportedReplayReceipt {
+        margin-top: 9px;
+        padding: 10px;
+        border: 1px solid #cddfd7;
+        border-radius: 8px;
+        background: #ffffff;
+      }
+
+      .preservedImportedReplayReceipt > div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 7px;
+      }
+
+      .preservedImportedReplayReceipt span,
+      .preservedImportedReplayReceipt strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .preservedImportedReplayReceipt strong {
+        color: #08724f;
       }
 
       .importedRouteReplayPanel ul {
