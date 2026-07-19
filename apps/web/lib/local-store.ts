@@ -1,10 +1,5 @@
 import { get, put } from "@vercel/blob";
-import {
-  mkdir,
-  readFile,
-  rename,
-  writeFile,
-} from "node:fs/promises";
+import { mkdir, readFile, rename, writeFile } from "node:fs/promises";
 import path from "node:path";
 
 import type { AerRecord } from "../../../packages/aer/generate-aer";
@@ -49,10 +44,66 @@ export type RegistryRecord = {
   aer: AerRecord;
 };
 
+export type DraftMaterialClassification =
+  | "Reality"
+  | "Record"
+  | "Authority"
+  | "Binding"
+  | "Commit"
+  | "Execution"
+  | "Outcome"
+  | "Supporting Evidence"
+  | "Unknown";
+
+export type DraftMaterial = {
+  evidenceId: string;
+  filename: string;
+  mediaType: string;
+  sizeBytes: number;
+  classification: DraftMaterialClassification;
+  integrityState: "PENDING" | "INVENTORIED" | "VERIFIED";
+  continuityState: "SOURCE_REVIEW_REQUIRED" | "READY_FOR_SOURCE_REVIEW";
+  sourceLabel?: string;
+  observedAt?: string;
+  receivedAt: string;
+  localFingerprint?: string;
+};
+
+export type DraftRecord = {
+  draftId: string;
+  title: string;
+  recordType: string;
+  ownerId: string;
+  currentStage:
+    | "REALITY"
+    | "EVIDENCE"
+    | "IDENTITY"
+    | "CONTINUITY"
+    | "AUTHORITY"
+    | "ADMISSIBILITY"
+    | "BINDING"
+    | "COMMIT"
+    | "EXECUTION"
+    | "OUTCOME"
+    | "ESTABLISHMENT"
+    | "LIFECYCLE";
+  readinessPercent: number;
+  blockers: string[];
+  warnings: string[];
+  materials: DraftMaterial[];
+  declarations: Record<string, unknown>;
+  relationships: Record<string, unknown>[];
+  lifecycleDraft: Record<string, unknown>;
+  status: "ACTIVE" | "ABANDONED" | "ESTABLISHED";
+  createdAt: string;
+  updatedAt: string;
+};
+
 type Db = {
   routeVersions: StoredRouteVersion[];
   events: RouteEvent[];
   registries: Record<string, RegistryRecord>;
+  drafts: DraftRecord[];
   key?: SigningKeyPair;
 };
 
@@ -61,8 +112,7 @@ const BLOB_PATHNAME = "ta14-exchange/runtime/local-store.json";
 const dataDir = (): string =>
   process.env.TA14_DATA_DIR ?? path.join(process.cwd(), "data");
 
-const dataFile = (): string =>
-  path.join(dataDir(), "local-store.json");
+const dataFile = (): string => path.join(dataDir(), "local-store.json");
 
 let writeQueue: Promise<void> = Promise.resolve();
 
@@ -71,6 +121,7 @@ function emptyDb(): Db {
     routeVersions: [],
     events: [],
     registries: {},
+    drafts: [],
   };
 }
 
@@ -79,6 +130,7 @@ function normalizeDb(raw: Partial<Db> | undefined): Db {
     routeVersions: raw?.routeVersions ?? [],
     events: raw?.events ?? [],
     registries: raw?.registries ?? {},
+    drafts: raw?.drafts ?? [],
     key: raw?.key,
   };
 }
@@ -97,7 +149,6 @@ async function loadLocal(): Promise<Db> {
   try {
     const contents = await readFile(dataFile(), "utf8");
     const parsed = JSON.parse(contents) as Partial<Db>;
-
     return normalizeDb(parsed);
   } catch {
     return emptyDb();
@@ -110,14 +161,10 @@ async function saveLocal(db: Db): Promise<void> {
   const file = dataFile();
   const temporaryFile = `${file}.${process.pid}.${Date.now()}.tmp`;
 
-  await writeFile(
-    temporaryFile,
-    JSON.stringify(db, null, 2),
-    {
-      encoding: "utf8",
-      mode: 0o600,
-    },
-  );
+  await writeFile(temporaryFile, JSON.stringify(db, null, 2), {
+    encoding: "utf8",
+    mode: 0o600,
+  });
 
   await rename(temporaryFile, file);
 }
@@ -126,20 +173,14 @@ async function loadBlob(): Promise<Db> {
   try {
     const result = await get(BLOB_PATHNAME, {
       access: "private",
-      useCache: false,
     });
 
-    if (
-      !result ||
-      result.statusCode !== 200 ||
-      !result.stream
-    ) {
+    if (!result || result.statusCode !== 200 || !result.stream) {
       return emptyDb();
     }
 
     const contents = await new Response(result.stream).text();
     const parsed = JSON.parse(contents) as Partial<Db>;
-
     return normalizeDb(parsed);
   } catch {
     return emptyDb();
@@ -147,16 +188,12 @@ async function loadBlob(): Promise<Db> {
 }
 
 async function saveBlob(db: Db): Promise<void> {
-  await put(
-    BLOB_PATHNAME,
-    JSON.stringify(db, null, 2),
-    {
-      access: "private",
-      contentType: "application/json",
-      addRandomSuffix: false,
-      allowOverwrite: true,
-    },
-  );
+  await put(BLOB_PATHNAME, JSON.stringify(db, null, 2), {
+    access: "private",
+    contentType: "application/json",
+    addRandomSuffix: false,
+    allowOverwrite: true,
+  });
 }
 
 async function mutateLocal<T>(
@@ -164,9 +201,7 @@ async function mutateLocal<T>(
 ): Promise<T> {
   const db = await loadLocal();
   const result = await operation(db);
-
   await saveLocal(db);
-
   return result;
 }
 
@@ -175,9 +210,7 @@ async function mutateBlob<T>(
 ): Promise<T> {
   const db = await loadBlob();
   const result = await operation(db);
-
   await saveBlob(db);
-
   return result;
 }
 
@@ -185,7 +218,6 @@ async function mutate<T>(
   operation: (db: Db) => Promise<T> | T,
 ): Promise<T> {
   let releaseQueue!: () => void;
-
   const previousWrite = writeQueue;
 
   writeQueue = new Promise<void>((resolve) => {
@@ -213,16 +245,12 @@ async function load(): Promise<Db> {
   return loadLocal();
 }
 
-function appendEvent(
-  db: Db,
-  event: RouteEventInput,
-): RouteEvent {
+function appendEvent(db: Db, event: RouteEventInput): RouteEvent {
   const priorEvent = db.events
     .filter((item) => item.rid === event.rid)
     .at(-1);
 
   const prevEventHash = priorEvent?.eventHash ?? null;
-
   const eventHash = sha256Canonical({
     ...event,
     prevEventHash,
@@ -235,13 +263,10 @@ function appendEvent(
   };
 
   db.events.push(storedEvent);
-
   return storedEvent;
 }
 
-export function verifyEventChain(
-  events: RouteEvent[],
-): boolean {
+export function verifyEventChain(events: RouteEvent[]): boolean {
   let previousEventHash: string | null = null;
 
   for (const event of events) {
@@ -292,7 +317,6 @@ export async function createRouteVersion(
 
     db.routeVersions.push(route);
     appendEvent(db, event);
-
     return route;
   });
 }
@@ -319,14 +343,11 @@ export async function appendRouteVersion(
     }
 
     if (route.version !== currentVersion + 1) {
-      throw new Error(
-        "New route version must increment by exactly one.",
-      );
+      throw new Error("New route version must increment by exactly one.");
     }
 
     db.routeVersions.push(route);
     appendEvent(db, event);
-
     return route;
   });
 }
@@ -345,20 +366,15 @@ export async function issueRegistry(
 
     db.registries[rid] = registry;
     appendEvent(db, event);
-
     return registry;
   });
 }
 
 export async function getRoute(rid: string) {
   const db = await load();
-
   const versions = db.routeVersions
     .filter((item) => item.rid === rid)
-    .sort(
-      (first, second) =>
-        first.version - second.version,
-    );
+    .sort((first, second) => first.version - second.version);
 
   if (versions.length === 0) {
     return undefined;
@@ -366,9 +382,7 @@ export async function getRoute(rid: string) {
 
   const events = db.events
     .filter((item) => item.rid === rid)
-    .sort((first, second) =>
-      first.at.localeCompare(second.at),
-    );
+    .sort((first, second) => first.at.localeCompare(second.at));
 
   return {
     latest: versions.at(-1)!,
@@ -379,9 +393,7 @@ export async function getRoute(rid: string) {
   };
 }
 
-export async function getPublicVerificationBundle(
-  rid: string,
-) {
+export async function getPublicVerificationBundle(rid: string) {
   const db = await load();
   const registry = db.registries[rid];
 
@@ -391,9 +403,7 @@ export async function getPublicVerificationBundle(
 
   const events = db.events
     .filter((item) => item.rid === rid)
-    .sort((first, second) =>
-      first.at.localeCompare(second.at),
-    );
+    .sort((first, second) => first.at.localeCompare(second.at));
 
   return {
     rid,
@@ -414,4 +424,82 @@ export async function getPublicVerificationBundle(
       limitations: registry.limitations,
     },
   };
+}
+
+export async function createDraftRecord(
+  draft: DraftRecord,
+): Promise<DraftRecord> {
+  return mutate((db) => {
+    if (db.drafts.some((item) => item.draftId === draft.draftId)) {
+      throw new Error("Draft already exists.");
+    }
+
+    db.drafts.push(draft);
+    return draft;
+  });
+}
+
+export async function listDraftRecords(
+  ownerId?: string,
+): Promise<DraftRecord[]> {
+  const db = await load();
+
+  return db.drafts
+    .filter((draft) => {
+      if (draft.status !== "ACTIVE") {
+        return false;
+      }
+
+      return ownerId ? draft.ownerId === ownerId : true;
+    })
+    .sort((first, second) =>
+      second.updatedAt.localeCompare(first.updatedAt),
+    );
+}
+
+export async function getDraftRecord(
+  draftId: string,
+): Promise<DraftRecord | undefined> {
+  const db = await load();
+  return db.drafts.find((draft) => draft.draftId === draftId);
+}
+
+export async function updateDraftRecord(
+  draftId: string,
+  update: (draft: DraftRecord) => DraftRecord,
+): Promise<DraftRecord> {
+  return mutate((db) => {
+    const index = db.drafts.findIndex(
+      (draft) => draft.draftId === draftId,
+    );
+
+    if (index < 0) {
+      throw new Error("Draft not found.");
+    }
+
+    const current = db.drafts[index];
+    const next = update(current);
+
+    if (next.draftId !== current.draftId) {
+      throw new Error("Draft identity cannot be changed.");
+    }
+
+    if (next.createdAt !== current.createdAt) {
+      throw new Error("Draft creation time cannot be changed.");
+    }
+
+    db.drafts[index] = next;
+    return next;
+  });
+}
+
+export async function abandonDraftRecord(
+  draftId: string,
+  abandonedAt: string,
+): Promise<DraftRecord> {
+  return updateDraftRecord(draftId, (draft) => ({
+    ...draft,
+    status: "ABANDONED",
+    updatedAt: abandonedAt,
+  }));
 }
