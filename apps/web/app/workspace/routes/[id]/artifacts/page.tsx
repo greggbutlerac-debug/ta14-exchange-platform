@@ -24,6 +24,7 @@ import {
 } from "../../../../../lib/route-artifact-storage";
 import {
   createUnverifiedArtifactResult,
+  listLatestArtifactVerificationReceipts,
   verifyRouteArtifactFile,
   type ArtifactVerificationResult,
 } from "../../../../../lib/route-artifact-verification";
@@ -226,10 +227,12 @@ export default function RouteArtifactsPage() {
     setErrorMessage("");
 
     try {
-      const [storedRoute, storedArtifacts] = await Promise.all([
-        getSupabaseRoute(routeRecordId),
-        listSupabaseRouteArtifacts(routeRecordId),
-      ]);
+      const [storedRoute, storedArtifacts, storedVerifications] =
+        await Promise.all([
+          getSupabaseRoute(routeRecordId),
+          listSupabaseRouteArtifacts(routeRecordId),
+          listLatestArtifactVerificationReceipts(routeRecordId),
+        ]);
 
       if (!storedRoute) {
         throw new Error(
@@ -243,7 +246,8 @@ export default function RouteArtifactsPage() {
         Object.fromEntries(
           storedArtifacts.map((artifact) => [
             artifact.id,
-            createUnverifiedArtifactResult(artifact),
+            storedVerifications[artifact.id] ??
+              createUnverifiedArtifactResult(artifact),
           ]),
         ),
       );
@@ -1113,6 +1117,12 @@ export default function RouteArtifactsPage() {
                             </div>
 
                             <p>{verification.message}</p>
+
+                            <p className="verificationReceiptMeta">
+                              {verification.receiptId && verification.checkedAt
+                                ? `Preserved receipt · ${formatDate(verification.checkedAt)}`
+                                : "No preserved verification receipt"}
+                            </p>
 
                             <div className="verificationChecks">
                               <span>
@@ -2014,6 +2024,13 @@ function PageStyles() {
         color: #68766f;
         font-size: 10px;
         line-height: 1.45;
+      }
+
+      .verificationReceiptMeta {
+        margin-top: -2px !important;
+        color: #53615a !important;
+        font-size: 9px !important;
+        font-weight: 800;
       }
 
       .verificationChecks {
