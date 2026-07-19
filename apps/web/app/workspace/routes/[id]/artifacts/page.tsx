@@ -37,6 +37,9 @@ import {
   verifyRouteVerificationReceipt,
   type RouteReceiptVerificationResult,
 } from "../../../../../lib/route-verification-receipt-validator";
+import {
+  downloadRouteVerificationExportPackage,
+} from "../../../../../lib/route-verification-receipt-export";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -1001,6 +1004,19 @@ export default function RouteArtifactsPage() {
                 {verifyingRouteReceipt
                   ? "Verifying preserved receipt..."
                   : "Verify preserved route receipt"}
+              </button>
+
+              <button
+                type="button"
+                className="exportRouteReceiptButton"
+                onClick={() => {
+                  downloadRouteVerificationExportPackage(
+                    latestRouteReceipt,
+                    routeReceiptVerification,
+                  );
+                }}
+              >
+                Export verification package
               </button>
             </div>
 
@@ -2227,10 +2243,14 @@ function PageStyles() {
       }
 
       .routeReceiptVerificationActions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
         margin-top: 14px;
       }
 
-      .verifyRouteReceiptButton {
+      .verifyRouteReceiptButton,
+      .exportRouteReceiptButton {
         width: 100%;
         padding: 11px 13px;
         border: 1px solid #b9d9cc;
@@ -2248,6 +2268,17 @@ function PageStyles() {
       .verifyRouteReceiptButton:hover:not(:disabled) {
         border-color: #87bda8;
         background: #def2ea;
+      }
+
+      .exportRouteReceiptButton {
+        border-color: #d9dfe7;
+        background: #ffffff;
+        color: #263238;
+      }
+
+      .exportRouteReceiptButton:hover {
+        border-color: #aeb9c4;
+        background: #f5f7f8;
       }
 
       .verifyRouteReceiptButton:disabled {
@@ -2647,6 +2678,10 @@ function PageStyles() {
       }
 
       @media (max-width: 980px) {
+        .routeReceiptVerificationActions {
+          grid-template-columns: 1fr;
+        }
+
         .identityGrid,
         .summaryGrid,
         .artifactGrid {
