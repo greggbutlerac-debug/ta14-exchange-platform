@@ -53,6 +53,9 @@ import {
   getLatestImportedRouteReplayReceipt,
   type ImportedRouteReplayReceipt,
 } from "../../../../../lib/imported-route-replay-receipts";
+import {
+  listImportedRouteReplayReceipts,
+} from "../../../../../lib/imported-route-replay-history";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -253,6 +256,10 @@ export default function RouteArtifactsPage() {
     useState<ImportedRouteReplayReceipt | null>(null);
   const [importedReplayReceiptMessage, setImportedReplayReceiptMessage] =
     useState("");
+  const [importedReplayHistory, setImportedReplayHistory] =
+    useState<ImportedRouteReplayReceipt[]>([]);
+  const [loadingImportedReplayHistory, setLoadingImportedReplayHistory] =
+    useState(false);
 
   const readiness = useMemo(
     () => calculateRouteReadiness(artifacts, verificationResults),
@@ -568,12 +575,23 @@ export default function RouteArtifactsPage() {
       setImportedRouteReplay(null);
       setImportedReplayReceiptMessage("");
 
-      const latestReceipt =
-        await getLatestImportedRouteReplayReceipt(
-          result.receipt.id,
-        );
+      setLoadingImportedReplayHistory(true);
 
-      setPreservedImportedReplayReceipt(latestReceipt);
+      try {
+        const [latestReceipt, history] = await Promise.all([
+          getLatestImportedRouteReplayReceipt(
+            result.receipt.id,
+          ),
+          listImportedRouteReplayReceipts(
+            result.receipt.id,
+          ),
+        ]);
+
+        setPreservedImportedReplayReceipt(latestReceipt);
+        setImportedReplayHistory(history);
+      } finally {
+        setLoadingImportedReplayHistory(false);
+      }
     } catch (error) {
       setImportedRoutePackage(null);
       setRoutePackageImportMessage(
@@ -617,6 +635,10 @@ export default function RouteArtifactsPage() {
       );
 
       setPreservedImportedReplayReceipt(receipt);
+      setImportedReplayHistory((current) => [
+        receipt,
+        ...current.filter((item) => item.id !== receipt.id),
+      ]);
       setImportedReplayReceiptMessage(
         "Imported replay receipt preserved successfully.",
       );
@@ -1269,6 +1291,65 @@ export default function RouteArtifactsPage() {
                       >
                         {importedReplayReceiptMessage}
                       </p>
+                    ) : null}
+
+                    {loadingImportedReplayHistory ? (
+                      <p className="importedReplayHistoryLoading">
+                        Loading preserved replay history...
+                      </p>
+                    ) : null}
+
+                    {importedReplayHistory.length > 0 ? (
+                      <div className="importedReplayHistory">
+                        <div className="importedReplayHistoryHeader">
+                          <span>Preserved replay history</span>
+                          <strong>
+                            {importedReplayHistory.length}
+                          </strong>
+                        </div>
+
+                        <div className="importedReplayHistoryList">
+                          {importedReplayHistory.map((receipt) => (
+                            <article
+                              key={receipt.id}
+                              className="importedReplayHistoryItem"
+                            >
+                              <div>
+                                <strong>{receipt.replayStatus}</strong>
+                                <time dateTime={receipt.createdAt}>
+                                  {new Date(
+                                    receipt.createdAt,
+                                  ).toLocaleString()}
+                                </time>
+                              </div>
+
+                              <code>
+                                Receipt ID: {receipt.id}
+                              </code>
+
+                              <div className="importedReplayHistoryMetrics">
+                                <span>
+                                  Digest:{" "}
+                                  {receipt.hashMatches === null
+                                    ? "not calculated"
+                                    : receipt.hashMatches
+                                      ? "match"
+                                      : "mismatch"}
+                                </span>
+                                <span>
+                                  References:{" "}
+                                  {
+                                    receipt.artifactReceiptReferenceCount
+                                  }
+                                </span>
+                                <span>
+                                  Failures: {receipt.failures.length}
+                                </span>
+                              </div>
+                            </article>
+                          ))}
+                        </div>
+                      </div>
                     ) : null}
 
                     {preservedImportedReplayReceipt ? (
@@ -2794,6 +2875,93 @@ function PageStyles() {
         border: 1px solid #efc1c1;
         background: #fff8f8;
         color: #9b2929;
+      }
+
+      .importedReplayHistoryLoading {
+        margin: 9px 0 0;
+        color: #6f647d;
+        font-size: 10px;
+      }
+
+      .importedReplayHistory {
+        margin-top: 10px;
+        padding: 10px;
+        border: 1px solid #ded7ec;
+        border-radius: 9px;
+        background: #fbfaff;
+      }
+
+      .importedReplayHistoryHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-bottom: 8px;
+      }
+
+      .importedReplayHistoryHeader span,
+      .importedReplayHistoryHeader strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+
+      .importedReplayHistoryHeader strong {
+        color: #5a3d8c;
+      }
+
+      .importedReplayHistoryList {
+        display: grid;
+        gap: 8px;
+      }
+
+      .importedReplayHistoryItem {
+        padding: 9px;
+        border: 1px solid #e7e1f1;
+        border-radius: 8px;
+        background: white;
+      }
+
+      .importedReplayHistoryItem > div:first-child {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .importedReplayHistoryItem strong {
+        color: #5a3d8c;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.05em;
+      }
+
+      .importedReplayHistoryItem time {
+        color: #84788f;
+        font-size: 9px;
+      }
+
+      .importedReplayHistoryItem code {
+        display: block;
+        margin-top: 6px;
+      }
+
+      .importedReplayHistoryMetrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 7px;
+      }
+
+      .importedReplayHistoryMetrics span {
+        padding: 4px 6px;
+        border: 1px solid #e7e1f1;
+        border-radius: 999px;
+        background: #faf8ff;
+        color: #5f5470;
+        font-size: 9px;
+        font-weight: 800;
       }
 
       .preservedImportedReplayReceipt {
