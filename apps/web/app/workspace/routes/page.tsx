@@ -479,6 +479,13 @@ export default function RouteLibraryPage() {
                       Edit in builder →
                     </OpenInBuilderButton>
 
+                    <Link
+                      href={`/workspace/routes/${item.id}/artifacts`}
+                      className="recordsAction"
+                    >
+                      Evidence & Records →
+                    </Link>
+
                     <button
                       type="button"
                       className="primaryAction"
@@ -907,7 +914,11 @@ export default function RouteLibraryPage() {
           border-top: 1px solid #e2e8e4;
         }
 
-        .cardActions button {
+        .cardActions button,
+        .cardActions a {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
           padding: 9px 11px;
           border: 1px solid #d5ded8;
           border-radius: 9px;
@@ -916,6 +927,7 @@ export default function RouteLibraryPage() {
           font: inherit;
           font-size: 11px;
           font-weight: 850;
+          text-decoration: none;
           cursor: pointer;
         }
 
@@ -928,6 +940,12 @@ export default function RouteLibraryPage() {
           border-color: #bcded0;
           background: #eaf7f2;
           color: #08724f;
+        }
+
+        .cardActions .recordsAction {
+          border-color: #c8d5ef;
+          background: #eef4ff;
+          color: #244f9e;
         }
 
         .cardActions .primaryAction {
