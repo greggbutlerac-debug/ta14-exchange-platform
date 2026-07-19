@@ -120,25 +120,8 @@ type ExchangeRouteOwnershipRow = {
   route_id: string;
 };
 
-const ARTIFACT_SELECT = [
-  "id",
-  "route_record_id",
-  "user_id",
-  "route_id",
-  "artifact_type",
-  "canonical_stage",
-  "requirement_key",
-  "title",
-  "description",
-  "artifact_json",
-  "sha256",
-  "original_filename",
-  "storage_path",
-  "mime_type",
-  "size_bytes",
-  "created_at",
-  "updated_at",
-].join(",");
+const ARTIFACT_SELECT =
+  "id,route_record_id,user_id,route_id,artifact_type,canonical_stage,requirement_key,title,description,artifact_json,sha256,original_filename,storage_path,mime_type,size_bytes,created_at,updated_at" as const;
 
 function mapRowToRouteArtifact(
   row: ExchangeRouteArtifactRow,
