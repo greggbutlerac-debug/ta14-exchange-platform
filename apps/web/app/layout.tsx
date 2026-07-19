@@ -1,4 +1,7 @@
 import type { Metadata, Viewport } from 'next';
+
+import ShareExchangeButton from '../components/share-exchange-button';
+
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -113,7 +116,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div
+          style={{
+            position: 'fixed',
+            top: '18px',
+            right: '18px',
+            zIndex: 1000,
+          }}
+        >
+          <ShareExchangeButton />
+        </div>
+
+        {children}
+      </body>
     </html>
   );
 }
