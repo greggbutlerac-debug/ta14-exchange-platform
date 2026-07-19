@@ -154,7 +154,7 @@ async function preserveVerificationReceipt(
     throw error;
   }
 
-  return mapReceiptRow(data as VerificationReceiptRow);
+  return mapReceiptRow(data as unknown as VerificationReceiptRow);
 }
 
 export async function listLatestArtifactVerificationReceipts(
@@ -191,7 +191,7 @@ export async function listLatestArtifactVerificationReceipts(
   > = {};
 
   for (const rawRow of data ?? []) {
-    const row = rawRow as VerificationReceiptRow;
+    const row = rawRow as unknown as VerificationReceiptRow;
 
     if (!latestByArtifact[row.artifact_id]) {
       latestByArtifact[row.artifact_id] =
