@@ -1,82 +1,97 @@
-'use client';
+"use client";
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from "react";
 
-type RouteState = 'IDLE' | 'RUNNING' | 'HOLD' | 'ALLOW';
+type RouteState = "IDLE" | "RUNNING" | "HOLD" | "ALLOW";
 
 const chain = [
-  'Reality',
-  'Record',
-  'Continuity',
-  'Admissibility',
-  'Binding',
-  'Commit',
-  'Execution',
-  'Outcome',
+  "Reality",
+  "Record",
+  "Continuity",
+  "Admissibility",
+  "Binding",
+  "Commit",
+  "Execution",
+  "Outcome",
 ];
 
 const useCases = [
   {
-    title: 'AI Agents',
-    text: 'Bind identity, authority, tools, payloads, destinations, and outcomes before autonomous action.',
+    title: "AI Agents and Autonomous Systems",
+    text: "Bind identity, delegated authority, tools, payloads, destinations, commands, and outcomes before autonomous action.",
   },
   {
-    title: 'Finance',
-    text: 'Prove who authorized a transaction, what evidence supported it, and what actually executed.',
+    title: "Finance and Enterprise",
+    text: "Govern vendor payments, procurement, approvals, identity, beneficiary binding, and execution correspondence.",
   },
   {
-    title: 'Healthcare',
-    text: 'Preserve accountable human authority, evidence freshness, model version, override, and outcome.',
+    title: "Healthcare and Critical Operations",
+    text: "Preserve accountable human authority, evidence freshness, model version, escalation, intervention, and outcome.",
   },
   {
-    title: 'Infrastructure',
-    text: 'Govern consequential execution across buildings, energy, environmental systems, and operations.',
+    title: "Built Environment",
+    text: "Govern BAS overrides, AI optimization, critical-space validity, commissioning, alarm resolution, energy, and emergency operation.",
   },
   {
-    title: 'Government',
-    text: 'Create reconstructable records for public authority, administrative action, evidence, and consequence.',
+    title: "Environmental Systems",
+    text: "Govern atmospheric integrity, refrigerant intervention, moisture, pressure, air, remediation, and verified restoration.",
   },
   {
-    title: 'Enterprise',
-    text: 'Turn governance policies into route-level execution controls, receipts, correction, and durable proof.',
+    title: "Manufacturing and Infrastructure",
+    text: "Govern process release, restart, robotics, utilities, quality, critical execution, and recovery.",
+  },
+  {
+    title: "Government and Public Authority",
+    text: "Create reconstructable records for public authority, administrative action, evidence, boundaries, and consequence.",
+  },
+  {
+    title: "Governance Research and Education",
+    text: "Build route libraries, break dependencies, repair HOLD conditions, study decisions, and teach governance through use.",
   },
 ];
 
 const reviewRows = [
   {
-    review: 'Readiness or gap assessment',
-    market: '$15,000–$50,000',
-    marketScope: 'Policies, inventories, maturity, roles, and compliance gaps',
-    ta14: '$3,750',
-    ta14Scope: 'Full-chain first-pass review across Reality through Outcome',
+    review: "Readiness or gap assessment",
+    market: "$15,000–$50,000",
+    marketScope: "Policies, inventories, maturity, roles, and compliance gaps",
+    ta14: "$3,750",
+    ta14Scope: "Full-chain first-pass review across Reality through Outcome",
   },
   {
-    review: 'Governance architecture review',
-    market: '$25,000–$75,000',
-    marketScope: 'Framework, controls, documentation, and organizational design',
-    ta14: '$6,250',
-    ta14Scope: 'Architecture, evidence, continuity, authority, binding, commit, execution, and outcome',
+    review: "Governance architecture review",
+    market: "$25,000–$75,000",
+    marketScope:
+      "Framework, controls, documentation, and organizational design",
+    ta14: "$6,250",
+    ta14Scope:
+      "Architecture, evidence, continuity, authority, binding, commit, execution, and outcome",
   },
   {
-    review: 'Framework implementation review',
-    market: '$40,000–$150,000',
-    marketScope: 'Policies, control implementation, operating model, and regulatory mapping',
-    ta14: 'from $10,000',
-    ta14Scope: 'Multi-route admissibility mapping, broken-link analysis, and governed correction plan',
+    review: "Framework implementation review",
+    market: "$40,000–$150,000",
+    marketScope:
+      "Policies, control implementation, operating model, and regulatory mapping",
+    ta14: "from $10,000",
+    ta14Scope:
+      "Multi-route admissibility mapping, broken-link analysis, and governed correction plan",
   },
   {
-    review: 'Enterprise governance program',
-    market: '$150,000–$500,000+',
-    marketScope: 'Enterprise program design, advisory, documentation, and implementation support',
-    ta14: 'from $37,500',
-    ta14Scope: 'Organization-wide full-chain review, route mapping, boundaries, priorities, and preserved findings',
+    review: "Enterprise governance program",
+    market: "$150,000–$500,000+",
+    marketScope:
+      "Enterprise program design, advisory, documentation, and implementation support",
+    ta14: "from $37,500",
+    ta14Scope:
+      "Organization-wide full-chain review, route mapping, boundaries, priorities, and preserved findings",
   },
   {
-    review: 'Ongoing governance oversight',
-    market: '$8,000–$25,000/mo',
-    marketScope: 'Advisory, policy support, meetings, and program management',
-    ta14: 'from $2,000/mo',
-    ta14Scope: 'Continuous route review, governed-record analysis, correction verification, and escalation support',
+    review: "Ongoing governance oversight",
+    market: "$8,000–$25,000/mo",
+    marketScope: "Advisory, policy support, meetings, and program management",
+    ta14: "from $2,000/mo",
+    ta14Scope:
+      "Continuous route review, governed-record analysis, correction verification, and escalation support",
   },
 ];
 
@@ -92,30 +107,30 @@ function makeHash(value: string) {
     hash = Math.imul(hash, 16777619);
   }
 
-  return (hash >>> 0).toString(16).padStart(8, '0').toUpperCase();
+  return (hash >>> 0).toString(16).padStart(8, "0").toUpperCase();
 }
 
 export default function HomePage() {
-  const [routeState, setRouteState] = useState<RouteState>('IDLE');
+  const [routeState, setRouteState] = useState<RouteState>("IDLE");
   const [activeStage, setActiveStage] = useState(-1);
   const [authorityCorrected, setAuthorityCorrected] = useState(false);
   const [recordOpen, setRecordOpen] = useState(false);
-  const [rid, setRid] = useState('');
-  const [manifestHash, setManifestHash] = useState('');
+  const [rid, setRid] = useState("");
+  const [manifestHash, setManifestHash] = useState("");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const stateLabel = useMemo(() => {
-    if (routeState === 'IDLE') return 'READY';
+    if (routeState === "IDLE") return "READY";
     return routeState;
   }, [routeState]);
 
   useEffect(() => {
-    if (routeState !== 'RUNNING') return;
+    if (routeState !== "RUNNING") return;
 
     if (activeStage >= chain.length - 1) {
       const timer = window.setTimeout(() => {
         if (authorityCorrected) {
-          setRouteState('ALLOW');
+          setRouteState("ALLOW");
           setRecordOpen(true);
 
           const newRid = makeRid();
@@ -126,7 +141,7 @@ export default function HomePage() {
             ),
           );
         } else {
-          setRouteState('HOLD');
+          setRouteState("HOLD");
         }
       }, 650);
 
@@ -142,28 +157,28 @@ export default function HomePage() {
 
   function runRoute() {
     setRecordOpen(false);
-    setRid('');
-    setManifestHash('');
+    setRid("");
+    setManifestHash("");
     setActiveStage(0);
-    setRouteState('RUNNING');
+    setRouteState("RUNNING");
   }
 
   function correctAndRerun() {
     setAuthorityCorrected(true);
     setRecordOpen(false);
-    setRid('');
-    setManifestHash('');
+    setRid("");
+    setManifestHash("");
     setActiveStage(0);
-    setRouteState('RUNNING');
+    setRouteState("RUNNING");
   }
 
   function resetRoute() {
-    setRouteState('IDLE');
+    setRouteState("IDLE");
     setActiveStage(-1);
     setAuthorityCorrected(false);
     setRecordOpen(false);
-    setRid('');
-    setManifestHash('');
+    setRid("");
+    setManifestHash("");
   }
 
   return (
@@ -830,6 +845,141 @@ export default function HomePage() {
           .floating-route.four { right: 8%; }
         }
 
+
+        .path-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 18px;
+          margin-top: 30px;
+        }
+
+        .path-card {
+          position: relative;
+          min-height: 310px;
+          padding: 30px;
+          border-radius: 26px;
+          border: 1px solid var(--line);
+          background: linear-gradient(145deg, rgba(255,255,255,0.05), rgba(255,255,255,0.017));
+          overflow: hidden;
+          display: flex;
+          flex-direction: column;
+          box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+        }
+
+        .path-card::before {
+          content: "";
+          position: absolute;
+          width: 180px;
+          height: 180px;
+          right: -70px;
+          top: -75px;
+          border-radius: 50%;
+          background: radial-gradient(circle, rgba(84,232,255,0.18), transparent 70%);
+          pointer-events: none;
+        }
+
+        .path-card.review::before { background: radial-gradient(circle, rgba(57,242,161,0.15), transparent 70%); }
+        .path-card.partner::before { background: radial-gradient(circle, rgba(255,212,106,0.16), transparent 70%); }
+        .path-card h3 { margin: 20px 0 10px; font-size: 28px; letter-spacing: -0.035em; }
+        .path-card p { color: var(--muted); line-height: 1.7; margin: 0 0 24px; }
+        .path-card .button { margin-top: auto; align-self: flex-start; }
+
+        .object-strip {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: 28px;
+        }
+
+        .object-chip {
+          padding: 10px 13px;
+          border-radius: 999px;
+          border: 1px solid rgba(84,232,255,0.16);
+          background: rgba(84,232,255,0.045);
+          color: #bfd2e6;
+          font-size: 12px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+        }
+
+        .constitutional-shell {
+          border-radius: 30px;
+          border: 1px solid rgba(84,232,255,0.2);
+          background: linear-gradient(145deg, rgba(41,167,255,0.065), rgba(57,242,161,0.03));
+          padding: 38px;
+          box-shadow: var(--shadow-blue);
+        }
+
+        .constitutional-grid {
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 28px;
+          align-items: start;
+        }
+
+        .principle-stack {
+          display: grid;
+          gap: 12px;
+        }
+
+        .principle-row {
+          padding: 16px 18px;
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.065);
+          background: rgba(3,8,14,0.45);
+          color: #b8c9da;
+          line-height: 1.55;
+        }
+
+        .principle-row strong { color: white; }
+
+        .built-spotlight {
+          position: relative;
+          overflow: hidden;
+          border-radius: 32px;
+          padding: 40px;
+          border: 1px solid rgba(57,242,161,0.22);
+          background:
+            radial-gradient(circle at 82% 18%, rgba(57,242,161,0.12), transparent 32%),
+            linear-gradient(145deg, rgba(8,18,29,0.94), rgba(4,9,16,0.86));
+          box-shadow: var(--shadow-green);
+        }
+
+        .building-flow {
+          display: grid;
+          grid-template-columns: repeat(6, 1fr);
+          gap: 10px;
+          margin-top: 30px;
+        }
+
+        .building-step {
+          min-height: 104px;
+          padding: 15px 12px;
+          display: grid;
+          place-items: center;
+          text-align: center;
+          border-radius: 16px;
+          border: 1px solid rgba(255,255,255,0.07);
+          background: rgba(255,255,255,0.03);
+          color: #c2d1df;
+          font-size: 12px;
+          font-weight: 850;
+          line-height: 1.45;
+        }
+
+        .building-step.hold { border-color: rgba(255,212,106,0.3); color: var(--gold); }
+        .building-step.allow { border-color: rgba(57,242,161,0.3); color: var(--green); }
+
+        .boundary-note {
+          margin-top: 24px;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid rgba(84,232,255,0.13);
+          background: rgba(84,232,255,0.04);
+          color: #aebfd0;
+          line-height: 1.65;
+        }
+
         .section { padding: 88px 0; }
 
         .section-heading {
@@ -1108,7 +1258,7 @@ export default function HomePage() {
 
         .state-display.idle { color: var(--cyan); }
         .state-display.running { color: var(--blue); }
-        .state-display.hold { color: var(--red); }
+        .state-display.hold { color: var(--gold); }
         .state-display.allow { color: var(--green); }
 
         .decision-copy {
@@ -1333,7 +1483,7 @@ export default function HomePage() {
             right: 4vw;
             top: 78px;
             padding: 18px;
-            display: ${mobileMenuOpen ? 'grid' : 'none'};
+            display: ${mobileMenuOpen ? "grid" : "none"};
             gap: 14px;
             border-radius: 18px;
             border: 1px solid var(--line);
@@ -1346,6 +1496,9 @@ export default function HomePage() {
           .hero h1 { font-size: 50px; }
 
           .chain-grid,
+          .path-grid,
+          .constitutional-grid,
+          .building-flow,
           .product-grid,
           .records-grid,
           .partner-grid,
@@ -1385,12 +1538,13 @@ export default function HomePage() {
             <nav className="nav-links">
               <a href="#architecture">Architecture</a>
               <a href="#records">Records</a>
+              <a href="#domains">Domains</a>
               <a href="#reviews">Reviews</a>
               <a href="#partners">Partners</a>
               <a href="#demo">Runtime</a>
               <a href="#pricing">Pricing</a>
-              <a className="button button-primary" href="/workspace">
-                Open Workspace
+              <a className="button button-primary" href="/workspace/routes/new">
+                Start Building Free
               </a>
             </nav>
 
@@ -1408,7 +1562,9 @@ export default function HomePage() {
         <main id="top">
           <section className="container hero">
             <div>
-              <div className="eyebrow">Free AI Governance Playground and Workspace</div>
+              <div className="eyebrow">
+                Free AI Governance Playground and Workspace
+              </div>
 
               <h1>
                 Build governance.
@@ -1420,14 +1576,19 @@ export default function HomePage() {
 
               <p className="hero-copy">
                 Enter the TA-14 AI Governance Exchange free—no credit card
-                required. Build AI governance routes, test runtime decisions,
-                expose broken links, correct the route, and preview governed
-                records without paying. Pay only when you choose to preserve a
-                formal run, operate professionally, or request a full-chain review.
+                required. Build AI governance routes, test consequential
+                decisions, expose broken links, correct the route, preview
+                governed records, and understand exactly why execution was
+                allowed, held, denied, or escalated. Pay only when you preserve
+                a formal run, operate a professional workspace, or request a
+                bounded full-chain review.
               </p>
 
               <div className="hero-actions">
-                <a className="button button-primary" href="/workspace">
+                <a
+                  className="button button-primary"
+                  href="/workspace/routes/new"
+                >
                   Start Building Free
                 </a>
                 <a className="button button-secondary" href="#demo">
@@ -1436,9 +1597,18 @@ export default function HomePage() {
               </div>
 
               <div className="signal-row">
-                <span className="signal"><span className="signal-dot blue" />Evidence Bound</span>
-                <span className="signal"><span className="signal-dot green" />Route Verifiable</span>
-                <span className="signal"><span className="signal-dot red" />Adverse Results Preserved</span>
+                <span className="signal">
+                  <span className="signal-dot blue" />
+                  Evidence Bound
+                </span>
+                <span className="signal">
+                  <span className="signal-dot green" />
+                  Route Verifiable
+                </span>
+                <span className="signal">
+                  <span className="signal-dot red" />
+                  Adverse Results Preserved
+                </span>
               </div>
             </div>
 
@@ -1446,78 +1616,189 @@ export default function HomePage() {
               <div className="ring one" />
               <div className="ring two" />
               <div className="ring three" />
-              <div className="core-orb">TA-14<br />CORE</div>
-              <div className="core-caption">Full-chain admissible execution</div>
+              <div className="core-orb">
+                TA-14
+                <br />
+                CORE
+              </div>
+              <div className="core-caption">
+                Full-chain admissible execution
+              </div>
             </div>
           </section>
 
-          <section className="container exchange-preview" aria-label="Living governance exchange preview">
+          <section
+            className="container exchange-preview"
+            aria-label="Living governance exchange preview"
+          >
             <div className="exchange-dashboard">
               <div className="exchange-dashboard-head">
                 <div>
                   <div className="eyebrow">The Exchange is active</div>
-                  <h2 style={{ margin: '8px 0 0', fontSize: 'clamp(28px, 4vw, 44px)', letterSpacing: '-0.04em' }}>
+                  <h2
+                    style={{
+                      margin: "8px 0 0",
+                      fontSize: "clamp(28px, 4vw, 44px)",
+                      letterSpacing: "-0.04em",
+                    }}
+                  >
                     Governance moving through the chain.
                   </h2>
                 </div>
-                <div className="live-indicator"><span className="live-pulse" />Living Exchange Preview</div>
+                <div className="live-indicator">
+                  <span className="live-pulse" />
+                  Living Exchange Preview
+                </div>
               </div>
 
               <div className="exchange-dashboard-body">
                 <div className="exchange-metrics">
-                  <div className="metric-card"><small>Build access</small><strong>Free and unlimited</strong></div>
-                  <div className="metric-card"><small>Decision lanes</small><strong>ALLOW · HOLD · DENY · ESCALATE</strong></div>
-                  <div className="metric-card"><small>Governance depth</small><strong>Eight linked stages</strong></div>
-                  <div className="metric-card"><small>Verification</small><strong>Independent replay surface</strong></div>
+                  <div className="metric-card">
+                    <small>Build access</small>
+                    <strong>Free and unlimited</strong>
+                  </div>
+                  <div className="metric-card">
+                    <small>Decision lanes</small>
+                    <strong>ALLOW · HOLD · DENY · ESCALATE</strong>
+                  </div>
+                  <div className="metric-card">
+                    <small>Governance depth</small>
+                    <strong>Eight linked stages</strong>
+                  </div>
+                  <div className="metric-card">
+                    <small>Verification</small>
+                    <strong>Independent replay surface</strong>
+                  </div>
                 </div>
 
                 <div className="route-stream">
-                  <div className="route-stream-label">Consequential routes in motion</div>
+                  <div className="route-stream-label">
+                    Consequential routes in motion
+                  </div>
                   <div className="route-orbit" />
                   <div className="chain-live" />
 
                   <article className="floating-route one">
-                    <div className="floating-route-top"><span>Vendor Payment</span><span className="route-decision hold">HOLD</span></div>
-                    <p>Current authority evidence required before commitment.</p>
+                    <div className="floating-route-top">
+                      <span>Vendor Payment</span>
+                      <span className="route-decision hold">HOLD</span>
+                    </div>
+                    <p>
+                      Current authority evidence required before commitment.
+                    </p>
                   </article>
 
                   <article className="floating-route two">
-                    <div className="floating-route-top"><span>Medical AI</span><span className="route-decision escalate">ESCALATE</span></div>
-                    <p>Human authority requested for consequence-bearing action.</p>
+                    <div className="floating-route-top">
+                      <span>Medical AI</span>
+                      <span className="route-decision escalate">ESCALATE</span>
+                    </div>
+                    <p>
+                      Human authority requested for consequence-bearing action.
+                    </p>
                   </article>
 
                   <article className="floating-route three">
-                    <div className="floating-route-top"><span>Autonomous Agent</span><span className="route-decision deny">DENY</span></div>
-                    <p>Destination binding does not match the approved route.</p>
+                    <div className="floating-route-top">
+                      <span>Autonomous Agent</span>
+                      <span className="route-decision deny">DENY</span>
+                    </div>
+                    <p>
+                      Destination binding does not match the approved route.
+                    </p>
                   </article>
 
                   <article className="floating-route four">
-                    <div className="floating-route-top"><span>Environmental System</span><span className="route-decision allow">ALLOW</span></div>
-                    <p>Evidence, continuity, authority, and outcome bound.</p>
+                    <div className="floating-route-top">
+                      <span>Building Override</span>
+                      <span className="route-decision allow">ALLOW</span>
+                    </div>
+                    <p>
+                      Duration, release condition, command binding, and outcome
+                      verified.
+                    </p>
                   </article>
                 </div>
               </div>
 
               <div className="preview-note">
-                Visual exchange preview. Route decisions shown here are illustrative; production activity and preserved records remain governed by their actual route evidence and execution state.
+                Visual exchange preview. Route decisions shown here are
+                illustrative; production activity and preserved records remain
+                governed by their actual route evidence and execution state.
               </div>
+            </div>
+          </section>
+
+          <section id="paths" className="container section">
+            <div className="section-heading">
+              <div className="eyebrow">Choose your path</div>
+              <h2>Enter the Exchange where your work begins.</h2>
+              <p>
+                Build and test governance for free, place an existing system
+                under bounded review, or join the qualified network that helps
+                examine consequential execution across domains.
+              </p>
+            </div>
+
+            <div className="path-grid">
+              <article className="path-card">
+                <div className="card-icon">◇</div>
+                <h3>Build and Test Free</h3>
+                <p>
+                  Construct routes, run evaluations, repair HOLD conditions, and
+                  preview governed records without payment.
+                </p>
+                <a
+                  className="button button-primary"
+                  href="/workspace/routes/new"
+                >
+                  Start Building
+                </a>
+              </article>
+
+              <article className="path-card review">
+                <div className="card-icon">◎</div>
+                <h3>Submit a System for Review</h3>
+                <p>
+                  Bring an AI system, governance architecture, operational
+                  workflow, evidence model, or consequential route.
+                </p>
+                <a className="button button-secondary" href="#reviews">
+                  Request a Review
+                </a>
+              </article>
+
+              <article className="path-card partner">
+                <div className="card-icon">⌁</div>
+                <h3>Join the Review Network</h3>
+                <p>
+                  Apply as a qualified governance, evidence, runtime,
+                  cybersecurity, controls, or domain reviewer.
+                </p>
+                <a className="button button-secondary" href="#partners">
+                  Apply as a Partner
+                </a>
+              </article>
             </div>
           </section>
 
           <section id="architecture" className="container section">
             <div className="section-heading">
               <div className="eyebrow">The governing chain</div>
-              <h2>Others review slivers. TA-14 reviews the route.</h2>
+              <h2>Governance must remain visible from Reality to Outcome.</h2>
               <p>
-                A policy can be correct while an execution is still wrong. TA-14
-                evaluates whether reality, evidence, continuity, authority,
-                commitment, execution, and outcome remain admissible together.
+                Policies, approvals, and models can be valuable while an
+                execution route still breaks. TA-14 evaluates whether evidence,
+                continuity, authority, binding, commitment, execution, and
+                measured outcome remain admissible together.
               </p>
             </div>
 
             <div className="chain-grid">
               {chain.map((item) => (
-                <div className="chain-item" key={item}>{item}</div>
+                <div className="chain-item" key={item}>
+                  {item}
+                </div>
               ))}
             </div>
 
@@ -1525,38 +1806,173 @@ export default function HomePage() {
               <article className="card">
                 <div className="card-icon">◇</div>
                 <h3>Build</h3>
-                <p>Model boundaries, actors, authority, evidence, dependencies, rules, commit conditions, execution, and expected outcomes.</p>
+                <p>
+                  Model boundaries, actors, authority, evidence, dependencies,
+                  rules, commit conditions, execution, and expected outcomes.
+                </p>
               </article>
               <article className="card">
                 <div className="card-icon">⚡</div>
                 <h3>Challenge</h3>
-                <p>Inject missing evidence, stale authority, continuity breaks, beneficiary mismatches, bypass attempts, and outcome failures.</p>
+                <p>
+                  Inject missing evidence, stale authority, continuity breaks,
+                  beneficiary mismatches, bypass attempts, and outcome failures.
+                </p>
               </article>
               <article className="card">
                 <div className="card-icon">✓</div>
                 <h3>Verify</h3>
-                <p>Preserve route identity, decision history, correction, receipts, execution correspondence, and replayable proof.</p>
+                <p>
+                  Preserve route identity, decision history, correction,
+                  receipts, execution correspondence, and replayable proof.
+                </p>
               </article>
             </div>
           </section>
 
           <section id="platform" className="container section">
             <div className="section-heading">
-              <div className="eyebrow">One exchange, complete operating surface</div>
+              <div className="eyebrow">
+                One exchange, complete operating surface
+              </div>
               <h2>From governance idea to governed execution record.</h2>
               <p>
                 The Exchange turns governance from a document into a testable,
-                correctable, preservable, independently reviewable execution system.
+                correctable, preservable, independently reviewable execution
+                system.
               </p>
             </div>
 
             <div className="product-grid">
-              <article className="card"><div className="card-icon">⌘</div><h3>Route Construction</h3><p>Build bounded consequential routes and map the complete Reality-to-Outcome chain.</p></article>
-              <article className="card"><div className="card-icon">↯</div><h3>Runtime Testing</h3><p>Run routes, expose exact HOLD and DENY reasons, correct defects, and rerun without hiding adverse results.</p></article>
-              <article className="card"><div className="card-icon">◎</div><h3>Governed Records</h3><p>Create durable records that preserve identity, evidence, authority, decisions, corrections, execution, and outcome.</p></article>
-              <article className="card"><div className="card-icon">◇</div><h3>Independent Review</h3><p>Submit routes, systems, architectures, and enterprise processes for bounded full-chain review.</p></article>
-              <article className="card"><div className="card-icon">#</div><h3>Verification and Replay</h3><p>Verify signatures, hashes, dependencies, continuity, commit integrity, and execution-to-outcome correspondence.</p></article>
-              <article className="card"><div className="card-icon">API</div><h3>Integration Layer</h3><p>Connect governance systems, evidence sources, registries, reviewers, policies, agents, and execution environments.</p></article>
+              <article className="card">
+                <div className="card-icon">⌘</div>
+                <h3>Route Construction</h3>
+                <p>
+                  Build bounded consequential routes and map the complete
+                  Reality-to-Outcome chain.
+                </p>
+              </article>
+              <article className="card">
+                <div className="card-icon">↯</div>
+                <h3>Runtime Testing</h3>
+                <p>
+                  Run routes, expose exact HOLD and DENY reasons, correct
+                  defects, and rerun without hiding adverse results.
+                </p>
+              </article>
+              <article className="card">
+                <div className="card-icon">◎</div>
+                <h3>Governed Records</h3>
+                <p>
+                  Create durable records that preserve identity, evidence,
+                  authority, decisions, corrections, execution, and outcome.
+                </p>
+              </article>
+              <article className="card">
+                <div className="card-icon">◇</div>
+                <h3>Independent Review</h3>
+                <p>
+                  Submit routes, systems, architectures, and enterprise
+                  processes for bounded full-chain review.
+                </p>
+              </article>
+              <article className="card">
+                <div className="card-icon">#</div>
+                <h3>Verification and Replay</h3>
+                <p>
+                  Verify signatures, hashes, dependencies, continuity, commit
+                  integrity, and execution-to-outcome correspondence.
+                </p>
+              </article>
+              <article className="card">
+                <div className="card-icon">API</div>
+                <h3>Integration Layer</h3>
+                <p>
+                  Connect governance systems, evidence sources, registries,
+                  reviewers, policies, agents, and execution environments.
+                </p>
+              </article>
+            </div>
+          </section>
+
+          <section id="constitutional-execution" className="container section">
+            <div className="constitutional-shell">
+              <div className="constitutional-grid">
+                <div>
+                  <div className="eyebrow">Constitutional execution</div>
+                  <h2
+                    style={{
+                      margin: "12px 0 16px",
+                      fontSize: "clamp(36px, 5vw, 58px)",
+                      letterSpacing: "-0.045em",
+                      lineHeight: 1.02,
+                    }}
+                  >
+                    Governance should remain intact until outcome.
+                  </h2>
+                  <p
+                    style={{
+                      color: "var(--muted)",
+                      fontSize: 18,
+                      lineHeight: 1.72,
+                    }}
+                  >
+                    TA-14 governs consequential execution—not merely the policy,
+                    model, recommendation, or approval that preceded it.
+                    Operational systems retain control while the Exchange
+                    preserves and evaluates the route by which evidence becomes
+                    action and action becomes outcome.
+                  </p>
+
+                  <div className="object-strip" aria-label="Execution objects">
+                    {[
+                      "Observation",
+                      "Evidence",
+                      "Identity",
+                      "Authority",
+                      "Rule",
+                      "Dependency",
+                      "Decision",
+                      "Command",
+                      "Execution",
+                      "Outcome",
+                      "Exception",
+                      "Recovery",
+                      "Verification",
+                    ].map((item) => (
+                      <span className="object-chip" key={item}>
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="principle-stack">
+                  <div className="principle-row">
+                    <strong>Evidence before consequence.</strong>
+                    <br />
+                    Required proof must be relevant, attributable, timely, and
+                    bound to the route.
+                  </div>
+                  <div className="principle-row">
+                    <strong>Authority must be explicit.</strong>
+                    <br />
+                    The right to recommend, approve, command, override, release,
+                    or escalate must remain visible.
+                  </div>
+                  <div className="principle-row">
+                    <strong>Boundaries stay declared.</strong>
+                    <br />
+                    Every record states what was evaluated, assumed, unknown,
+                    private, and outside scope.
+                  </div>
+                  <div className="principle-row">
+                    <strong>Uncertainty remains visible.</strong>
+                    <br />A strong record preserves exactly what was proven and
+                    leaves the unproven inspectable.
+                  </div>
+                </div>
+              </div>
             </div>
           </section>
 
@@ -1590,7 +2006,9 @@ export default function HomePage() {
                   <li>Stable route identity and manifest</li>
                   <li>Evidence provenance and continuity</li>
                   <li>Authority and exact-object binding</li>
-                  <li>Decision, correction, commit, execution, and outcome history</li>
+                  <li>
+                    Decision, correction, commit, execution, and outcome history
+                  </li>
                   <li>Independent verification and replay surface</li>
                   <li>Preserved HOLD, DENY, ALLOW, or ESCALATE result</li>
                 </ul>
@@ -1605,16 +2023,19 @@ export default function HomePage() {
                   <div className="eyebrow">TA-14 full-chain reviews</div>
                   <h2>75% less cost. More of the chain.</h2>
                   <p>
-                    Traditional governance engagements often price selected layers
-                    as custom consulting. TA-14 uses structured intake, bounded
-                    review lanes, governed records, reusable evidence requirements,
-                    and the Exchange to reduce overhead without reducing scrutiny.
+                    Traditional governance engagements often price selected
+                    layers as custom consulting. TA-14 uses structured intake,
+                    bounded review lanes, governed records, reusable evidence
+                    requirements, and the Exchange to reduce overhead without
+                    reducing scrutiny.
                   </p>
                 </div>
 
                 <div>
                   <strong>25%</strong>
-                  <span className="market-note">of conventional reference pricing</span>
+                  <span className="market-note">
+                    of conventional reference pricing
+                  </span>
                 </div>
               </div>
 
@@ -1632,7 +2053,9 @@ export default function HomePage() {
                   <tbody>
                     {reviewRows.map((row) => (
                       <tr key={row.review}>
-                        <td><strong>{row.review}</strong></td>
+                        <td>
+                          <strong>{row.review}</strong>
+                        </td>
                         <td>{row.market}</td>
                         <td>{row.marketScope}</td>
                         <td className="ta14-price">{row.ta14}</td>
@@ -1644,10 +2067,11 @@ export default function HomePage() {
               </div>
 
               <p className="market-note">
-                Indicative 2026 market reference ranges. Actual proposals vary by
-                scope, organization size, evidence volume, jurisdiction, technical
-                testing, interviews, implementation requirements, and regulated
-                industry exposure. TA-14 pricing applies to explicitly bounded scopes.
+                Indicative 2026 market reference ranges. Actual proposals vary
+                by scope, organization size, evidence volume, jurisdiction,
+                technical testing, interviews, implementation requirements, and
+                regulated industry exposure. TA-14 pricing applies to explicitly
+                bounded scopes.
               </p>
 
               <div className="two-sided">
@@ -1655,10 +2079,10 @@ export default function HomePage() {
                   <div className="eyebrow">Need your system reviewed?</div>
                   <h3>Put the entire route under review.</h3>
                   <p>
-                    Submit an AI governance architecture, agent system, enterprise
-                    workflow, evidence framework, payment route, environmental
-                    system, healthcare process, or other consequential execution
-                    system.
+                    Submit an AI governance architecture, agent system,
+                    enterprise workflow, evidence framework, payment route,
+                    environmental system, healthcare process, or other
+                    consequential execution system.
                   </p>
                   <ul className="check-list">
                     <li>Full-chain findings</li>
@@ -1680,8 +2104,9 @@ export default function HomePage() {
                   <h3>Is your governance strong enough to review others?</h3>
                   <p>
                     Qualified governance entities, evidence specialists, runtime
-                    systems, reviewers, and domain experts may apply to perform paid,
-                    bounded review work through the TA-14 AI Governance Exchange.
+                    systems, reviewers, and domain experts may apply to perform
+                    paid, bounded review work through the TA-14 AI Governance
+                    Exchange.
                   </p>
                   <ul className="check-list">
                     <li>Paid scoped review opportunities</li>
@@ -1706,9 +2131,10 @@ export default function HomePage() {
               <div className="eyebrow">Live route demonstration</div>
               <h2>Watch a route fail, correct, and become admissible.</h2>
               <p>
-                This demonstration submits a consequential vendor payment, exposes
-                missing authority and beneficiary binding, preserves the HOLD, and
-                reruns the corrected route to generate an admissible execution record.
+                This demonstration submits a consequential vendor payment,
+                exposes missing authority and beneficiary binding, preserves the
+                HOLD, and reruns the corrected route to generate an admissible
+                execution record.
               </p>
             </div>
 
@@ -1723,47 +2149,77 @@ export default function HomePage() {
                 </div>
 
                 <div className="route-fields">
-                  <div className="route-field"><span>Organization</span><span>Northstar Procurement Group</span></div>
-                  <div className="route-field"><span>Supplier</span><span>Apex Industrial Supply</span></div>
-                  <div className="route-field"><span>Invoice</span><span>INV-2026-0716</span></div>
-                  <div className="route-field"><span>Procurement authority</span><span>{authorityCorrected ? 'Current' : 'Missing'}</span></div>
-                  <div className="route-field"><span>Finance authority</span><span>{authorityCorrected ? 'Current' : 'Missing'}</span></div>
-                  <div className="route-field"><span>Beneficiary binding</span><span>{authorityCorrected ? 'Bound' : 'Unproven'}</span></div>
+                  <div className="route-field">
+                    <span>Organization</span>
+                    <span>Northstar Procurement Group</span>
+                  </div>
+                  <div className="route-field">
+                    <span>Supplier</span>
+                    <span>Apex Industrial Supply</span>
+                  </div>
+                  <div className="route-field">
+                    <span>Invoice</span>
+                    <span>INV-2026-0716</span>
+                  </div>
+                  <div className="route-field">
+                    <span>Procurement authority</span>
+                    <span>{authorityCorrected ? "Current" : "Missing"}</span>
+                  </div>
+                  <div className="route-field">
+                    <span>Finance authority</span>
+                    <span>{authorityCorrected ? "Current" : "Missing"}</span>
+                  </div>
+                  <div className="route-field">
+                    <span>Beneficiary binding</span>
+                    <span>{authorityCorrected ? "Bound" : "Unproven"}</span>
+                  </div>
                 </div>
               </article>
 
               <article className="decision-panel">
                 <div className="decision-top">
                   <div className="eyebrow">TA-14 decision receipt</div>
-                  <span className="route-badge">{authorityCorrected ? 'CORRECTED VERSION' : 'VERSION 1'}</span>
+                  <span className="route-badge">
+                    {authorityCorrected ? "CORRECTED VERSION" : "VERSION 1"}
+                  </span>
                 </div>
 
-                <div className={`state-display ${routeState.toLowerCase()}`}>{stateLabel}</div>
+                <div className={`state-display ${routeState.toLowerCase()}`}>
+                  {stateLabel}
+                </div>
 
                 <div className="decision-copy">
-                  {routeState === 'IDLE' && 'The route is ready for deterministic evaluation.'}
-                  {routeState === 'RUNNING' && `Evaluating ${chain[Math.max(activeStage, 0)] ?? 'route'}...`}
-                  {routeState === 'HOLD' && 'Required proof is incomplete but correctable. Current dual authority and beneficiary binding are missing.'}
-                  {routeState === 'ALLOW' && 'All mandatory deterministic requirements are satisfied within the stated route scope.'}
+                  {routeState === "IDLE" &&
+                    "The route is ready for deterministic evaluation."}
+                  {routeState === "RUNNING" &&
+                    `Evaluating ${chain[Math.max(activeStage, 0)] ?? "route"}...`}
+                  {routeState === "HOLD" &&
+                    "Required proof is incomplete but correctable. Current dual authority and beneficiary binding are missing."}
+                  {routeState === "ALLOW" &&
+                    "All mandatory deterministic requirements are satisfied within the stated route scope."}
                 </div>
 
                 <div className="progress-track">
                   {chain.map((item, index) => {
                     const complete =
-                      routeState === 'ALLOW' ||
-                      (routeState === 'RUNNING' && index < activeStage);
-                    const active = routeState === 'RUNNING' && index === activeStage;
-                    const failed = routeState === 'HOLD' && index >= 3 && index <= 4;
+                      routeState === "ALLOW" ||
+                      (routeState === "RUNNING" && index < activeStage);
+                    const active =
+                      routeState === "RUNNING" && index === activeStage;
+                    const failed =
+                      routeState === "HOLD" && index >= 3 && index <= 4;
 
                     return (
                       <div
                         aria-label={item}
                         className={[
-                          'progress-step',
-                          complete ? 'complete' : '',
-                          active ? 'active' : '',
-                          failed ? 'failed' : '',
-                        ].filter(Boolean).join(' ')}
+                          "progress-step",
+                          complete ? "complete" : "",
+                          active ? "active" : "",
+                          failed ? "failed" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
                         key={item}
                       />
                     );
@@ -1771,26 +2227,26 @@ export default function HomePage() {
                 </div>
 
                 <div className="receipt">
-                  {routeState === 'IDLE' &&
-`ROUTE: Vendor payment above USD 25,000
+                  {routeState === "IDLE" &&
+                    `ROUTE: Vendor payment above USD 25,000
 STATUS: TESTABLE
 NEXT ACTION: RUN TA-14 ENGINE`}
 
-                  {routeState === 'RUNNING' &&
-`ROUTE: Vendor payment above USD 25,000
-TESTING: ${chain[Math.max(activeStage, 0)] ?? 'Reality'}
+                  {routeState === "RUNNING" &&
+                    `ROUTE: Vendor payment above USD 25,000
+TESTING: ${chain[Math.max(activeStage, 0)] ?? "Reality"}
 STATE: EVALUATING
 DECISION PRECEDENCE: ACTIVE`}
 
-                  {routeState === 'HOLD' &&
-`RESULT: HOLD
+                  {routeState === "HOLD" &&
+                    `RESULT: HOLD
 TA-14-AUTH-PROC: CURRENT PROCUREMENT AUTHORITY MISSING
 TA-14-AUTH-FIN: CURRENT FINANCE AUTHORITY MISSING
 TA-14-BIND-BEN: BENEFICIARY NOT BOUND TO EXACT PAYMENT OBJECT
 NEXT ACTION: CORRECT FREE AND RERUN`}
 
-                  {routeState === 'ALLOW' &&
-`RESULT: ALLOW
+                  {routeState === "ALLOW" &&
+                    `RESULT: ALLOW
 TA-14-REQ-ALL: SATISFIED
 AUTHORITY: CURRENT DUAL APPROVAL
 BENEFICIARY: BOUND
@@ -1799,18 +2255,58 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                 </div>
 
                 <div className="decision-actions">
-                  {routeState === 'IDLE' && <button className="button button-primary" type="button" onClick={runRoute}>Run Route</button>}
-                  {routeState === 'RUNNING' && <button className="button button-secondary" type="button" disabled>Testing Route…</button>}
-                  {routeState === 'HOLD' && (
+                  {routeState === "IDLE" && (
+                    <button
+                      className="button button-primary"
+                      type="button"
+                      onClick={runRoute}
+                    >
+                      Run Route
+                    </button>
+                  )}
+                  {routeState === "RUNNING" && (
+                    <button
+                      className="button button-secondary"
+                      type="button"
+                      disabled
+                    >
+                      Testing Route…
+                    </button>
+                  )}
+                  {routeState === "HOLD" && (
                     <>
-                      <button className="button button-danger" type="button" onClick={correctAndRerun}>Correct Route and Rerun</button>
-                      <button className="button button-secondary" type="button" onClick={resetRoute}>Reset</button>
+                      <button
+                        className="button button-danger"
+                        type="button"
+                        onClick={correctAndRerun}
+                      >
+                        Correct Route and Rerun
+                      </button>
+                      <button
+                        className="button button-secondary"
+                        type="button"
+                        onClick={resetRoute}
+                      >
+                        Reset
+                      </button>
                     </>
                   )}
-                  {routeState === 'ALLOW' && (
+                  {routeState === "ALLOW" && (
                     <>
-                      <button className="button button-primary" type="button" onClick={() => setRecordOpen(true)}>Open AER Preview</button>
-                      <button className="button button-secondary" type="button" onClick={resetRoute}>Run Again</button>
+                      <button
+                        className="button button-primary"
+                        type="button"
+                        onClick={() => setRecordOpen(true)}
+                      >
+                        Open AER Preview
+                      </button>
+                      <button
+                        className="button button-secondary"
+                        type="button"
+                        onClick={resetRoute}
+                      >
+                        Run Again
+                      </button>
                     </>
                   )}
                 </div>
@@ -1821,19 +2317,39 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
               <article className="record-panel">
                 <div className="record-header">
                   <div>
-                    <div className="record-status">Self-declared AER preview generated</div>
+                    <div className="record-status">
+                      Self-declared AER preview generated
+                    </div>
                     <h3>TA-14 Admissible Execution Record</h3>
                   </div>
                   <span className="route-badge">SIGNED PREVIEW</span>
                 </div>
 
                 <div className="record-grid">
-                  <div className="record-cell"><small>Route identity</small><strong>{rid}</strong></div>
-                  <div className="record-cell"><small>Current state</small><strong>ALLOW</strong></div>
-                  <div className="record-cell"><small>Manifest hash</small><strong>{manifestHash}</strong></div>
-                  <div className="record-cell"><small>Authority basis</small><strong>Current dual authority</strong></div>
-                  <div className="record-cell"><small>Boundary</small><strong>Self-declared demonstration</strong></div>
-                  <div className="record-cell"><small>Next action</small><strong>Preserve durable route record</strong></div>
+                  <div className="record-cell">
+                    <small>Route identity</small>
+                    <strong>{rid}</strong>
+                  </div>
+                  <div className="record-cell">
+                    <small>Current state</small>
+                    <strong>ALLOW</strong>
+                  </div>
+                  <div className="record-cell">
+                    <small>Manifest hash</small>
+                    <strong>{manifestHash}</strong>
+                  </div>
+                  <div className="record-cell">
+                    <small>Authority basis</small>
+                    <strong>Current dual authority</strong>
+                  </div>
+                  <div className="record-cell">
+                    <small>Boundary</small>
+                    <strong>Self-declared demonstration</strong>
+                  </div>
+                  <div className="record-cell">
+                    <small>Next action</small>
+                    <strong>Preserve durable route record</strong>
+                  </div>
                 </div>
               </article>
             )}
@@ -1842,11 +2358,14 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
           <section id="pricing" className="container section">
             <div className="section-heading">
               <div className="eyebrow">Accessible by design</div>
-              <h2>Learn free. Preserve for $9. Operate professionally for $99.</h2>
+              <h2>
+                Learn free. Preserve for $9. Operate professionally for $99.
+              </h2>
               <p>
-                Payment purchases utility, continuity, storage, collaboration, and
-                professional workflow. It never purchases a favorable decision,
-                lowers a threshold, removes a finding, or creates VERIFIED status.
+                Payment purchases utility, continuity, storage, collaboration,
+                and professional workflow. It never purchases a favorable
+                decision, lowers a threshold, removes a finding, or creates
+                VERIFIED status.
               </p>
             </div>
 
@@ -1854,7 +2373,10 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
               <article className="price-card">
                 <div className="price-label">Sandbox</div>
                 <div className="price">Free</div>
-                <p>Build, test, understand, correct, rerun, and preview governed routes.</p>
+                <p>
+                  Build, test, understand, correct, rerun, and preview governed
+                  routes.
+                </p>
                 <ul>
                   <li>Route construction</li>
                   <li>Formal TA-14 test execution</li>
@@ -1862,13 +2384,20 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   <li>Correction guidance</li>
                   <li>Self-declared record preview</li>
                 </ul>
-                <a className="button button-secondary" href="/workspace">Open the Sandbox</a>
+                <a className="button button-secondary" href="/workspace">
+                  Open the Sandbox
+                </a>
               </article>
 
               <article className="price-card">
                 <div className="price-label">Preserved run</div>
-                <div className="price">$9 <small>one time</small></div>
-                <p>Preserve one formal route identity and its essential decision continuity.</p>
+                <div className="price">
+                  $9 <small>one time</small>
+                </div>
+                <p>
+                  Preserve one formal route identity and its essential decision
+                  continuity.
+                </p>
                 <ul>
                   <li>TA-14-RID route identity</li>
                   <li>Issuance timestamp</li>
@@ -1876,13 +2405,20 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   <li>Decision and correction history</li>
                   <li>Stable verification reference</li>
                 </ul>
-                <a className="button button-secondary" href="/workspace">Build Before Preserving</a>
+                <a className="button button-secondary" href="/workspace">
+                  Build Before Preserving
+                </a>
               </article>
 
               <article className="price-card featured">
                 <div className="price-label">TA-14 Exchange Pro</div>
-                <div className="price">$99 <small>/ month</small></div>
-                <p>Professional governance operations for builders, reviewers, and small teams.</p>
+                <div className="price">
+                  $99 <small>/ month</small>
+                </div>
+                <p>
+                  Professional governance operations for builders, reviewers,
+                  and small teams.
+                </p>
                 <ul>
                   <li>Private route and record library</li>
                   <li>Organization workspace for up to five members</li>
@@ -1890,19 +2426,21 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   <li>Version comparison and replay history</li>
                   <li>Professional templates and priority support</li>
                 </ul>
-                <a className="button button-primary" href="/pricing">Explore Exchange Pro</a>
+                <a className="button button-primary" href="/pricing">
+                  Explore Exchange Pro
+                </a>
               </article>
             </div>
           </section>
 
-          <section id="use-cases" className="container section">
+          <section id="domains" className="container section">
             <div className="section-heading">
-              <div className="eyebrow">One exchange, many consequential systems</div>
+              <div className="eyebrow">Applied governance domains</div>
               <h2>AI governance is the entrance—not the limit.</h2>
               <p>
                 The TA-14 AI Governance Exchange begins with AI governance while
-                supporting every domain where authority, evidence, execution, and
-                outcome must remain reconstructable.
+                supporting every domain where authority, evidence, execution,
+                and outcome must remain reconstructable.
               </p>
             </div>
 
@@ -1916,19 +2454,86 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
             </div>
           </section>
 
+          <section id="built-environment" className="container section">
+            <article className="built-spotlight">
+              <div className="section-heading" style={{ marginBottom: 0 }}>
+                <div className="eyebrow">Built environment spotlight</div>
+                <h2>From smart buildings to governed building execution.</h2>
+                <p>
+                  BAS, analytics, digital twins, commissioning, TAB,
+                  cybersecurity, sensors, equipment platforms, and operators
+                  each hold part of the operational truth. TA-14 provides a
+                  neutral route for binding those contributions into inspectable
+                  consequential execution.
+                </p>
+              </div>
+
+              <div
+                className="building-flow"
+                aria-label="Building override governance example"
+              >
+                <div className="building-step">
+                  Room warming
+                  <br />
+                  condition observed
+                </div>
+                <div className="building-step">
+                  Evidence and operator identity captured
+                </div>
+                <div className="building-step hold">
+                  HOLD
+                  <br />
+                  duration and release missing
+                </div>
+                <div className="building-step">
+                  Route corrected and command bound
+                </div>
+                <div className="building-step allow">
+                  ALLOW
+                  <br />
+                  committed before action
+                </div>
+                <div className="building-step">
+                  Automatic control restored and outcome verified
+                </div>
+              </div>
+
+              <div className="boundary-note">
+                <strong>Operational boundary:</strong> TA-14 governs
+                consequential execution inside buildings—not the building
+                itself. The BAS and qualified professionals retain operational
+                control and domain responsibility; the Exchange preserves what
+                evidence, authority, boundaries, action, and outcome were
+                actually demonstrated.
+              </div>
+            </article>
+          </section>
+
           <section className="container section">
             <article className="manifesto">
-              <div className="eyebrow">TA-14 Authority Governance Institution</div>
+              <div className="eyebrow">
+                TA-14 Authority Governance Institution
+              </div>
               <h2>No admissible evidence. No admissible execution.</h2>
               <p>
-                The Exchange is where governance systems become testable, governed
-                records become verifiable, qualified reviewers earn through bounded
-                work, and organizations obtain full-chain scrutiny without
-                conventional consulting overhead.
+                The Exchange is where governance systems become testable,
+                governed records become verifiable, qualified reviewers earn
+                through bounded work, and organizations obtain full-chain
+                scrutiny without conventional consulting overhead.
               </p>
               <div className="hero-actions">
-                <a className="button button-primary" href="/workspace">Experience the Exchange</a>
-                <a className="button button-secondary" href="mailto:ta14admissibleexecution@gmail.com">Contact TA-14</a>
+                <a
+                  className="button button-primary"
+                  href="/workspace/routes/new"
+                >
+                  Start Building Free
+                </a>
+                <a
+                  className="button button-secondary"
+                  href="mailto:ta14admissibleexecution@gmail.com"
+                >
+                  Contact TA-14
+                </a>
               </div>
             </article>
           </section>
@@ -1942,7 +2547,10 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   <span className="brand-mark">TA-14</span>
                   <span>TA-14 AI GOVERNANCE EXCHANGE</span>
                 </a>
-                <p>Build governance routes. Create governed records. Verify consequential execution.</p>
+                <p>
+                  Build governance routes. Create governed records. Verify
+                  consequential execution.
+                </p>
               </div>
 
               <div>
@@ -1959,15 +2567,32 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
               <div>
                 <h4>Contact</h4>
                 <div className="footer-links">
-                  <a href="mailto:ta14admissibleexecution@gmail.com">ta14admissibleexecution@gmail.com</a>
-                  <a href="https://github.com/greggbutlerac-debug" target="_blank" rel="noreferrer">GitHub</a>
-                  <a href="https://ta14-architecture.netlify.app/" target="_blank" rel="noreferrer">Public Architecture</a>
+                  <a href="mailto:ta14admissibleexecution@gmail.com">
+                    ta14admissibleexecution@gmail.com
+                  </a>
+                  <a
+                    href="https://github.com/greggbutlerac-debug"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    GitHub
+                  </a>
+                  <a
+                    href="https://ta14-architecture.netlify.app/"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Public Architecture
+                  </a>
                 </div>
               </div>
             </div>
 
             <div className="footer-bottom">
-              <span>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</span>
+              <span>
+                Reality → Record → Continuity → Admissibility → Binding → Commit
+                → Execution → Outcome
+              </span>
               <span>No admissible evidence. No admissible execution.</span>
             </div>
           </div>
