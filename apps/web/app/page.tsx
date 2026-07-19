@@ -220,6 +220,135 @@ export default function HomePage() {
           min-height: 100vh;
           position: relative;
           overflow: hidden;
+          isolation: isolate;
+        }
+
+        .ambient-scene {
+          position: fixed;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .ambient-orb {
+          position: absolute;
+          border-radius: 50%;
+          filter: blur(24px);
+          opacity: 0.34;
+          will-change: transform;
+        }
+
+        .ambient-orb-one {
+          width: 34vw;
+          height: 34vw;
+          min-width: 360px;
+          min-height: 360px;
+          left: -12vw;
+          top: 6vh;
+          background: radial-gradient(circle, rgba(41, 167, 255, 0.44), rgba(41, 167, 255, 0.02) 68%, transparent 74%);
+          animation: ambientDriftOne 18s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-two {
+          width: 30vw;
+          height: 30vw;
+          min-width: 320px;
+          min-height: 320px;
+          right: -9vw;
+          top: 24vh;
+          background: radial-gradient(circle, rgba(57, 242, 161, 0.3), rgba(57, 242, 161, 0.015) 66%, transparent 74%);
+          animation: ambientDriftTwo 22s ease-in-out infinite alternate;
+        }
+
+        .ambient-orb-three {
+          width: 28vw;
+          height: 28vw;
+          min-width: 300px;
+          min-height: 300px;
+          left: 34vw;
+          bottom: -12vh;
+          background: radial-gradient(circle, rgba(255, 69, 107, 0.22), rgba(255, 69, 107, 0.01) 64%, transparent 74%);
+          animation: ambientDriftThree 24s ease-in-out infinite alternate;
+        }
+
+        .ambient-beam {
+          position: absolute;
+          width: 64vw;
+          height: 2px;
+          opacity: 0.25;
+          background: linear-gradient(90deg, transparent, rgba(84, 232, 255, 0.85), transparent);
+          box-shadow: 0 0 22px rgba(84, 232, 255, 0.32);
+          transform-origin: center;
+        }
+
+        .ambient-beam-one {
+          left: -12vw;
+          top: 33vh;
+          transform: rotate(-14deg);
+          animation: beamSweepOne 16s ease-in-out infinite alternate;
+        }
+
+        .ambient-beam-two {
+          right: -16vw;
+          bottom: 26vh;
+          transform: rotate(16deg);
+          background: linear-gradient(90deg, transparent, rgba(57, 242, 161, 0.75), transparent);
+          box-shadow: 0 0 22px rgba(57, 242, 161, 0.26);
+          animation: beamSweepTwo 19s ease-in-out infinite alternate;
+        }
+
+        .ambient-stars {
+          position: absolute;
+          inset: 0;
+          opacity: 0.34;
+          background-image:
+            radial-gradient(circle at 12% 18%, rgba(255,255,255,0.9) 0 1px, transparent 1.5px),
+            radial-gradient(circle at 68% 22%, rgba(84,232,255,0.9) 0 1px, transparent 1.5px),
+            radial-gradient(circle at 84% 64%, rgba(57,242,161,0.8) 0 1px, transparent 1.5px),
+            radial-gradient(circle at 28% 78%, rgba(255,255,255,0.75) 0 1px, transparent 1.5px),
+            radial-gradient(circle at 48% 48%, rgba(41,167,255,0.75) 0 1px, transparent 1.5px);
+          background-size: 310px 310px, 420px 420px, 360px 360px, 500px 500px, 580px 580px;
+          animation: starDrift 42s linear infinite;
+        }
+
+        @keyframes ambientDriftOne {
+          from { transform: translate3d(0, 0, 0) scale(1); }
+          to { transform: translate3d(18vw, 10vh, 0) scale(1.12); }
+        }
+
+        @keyframes ambientDriftTwo {
+          from { transform: translate3d(0, 0, 0) scale(1); }
+          to { transform: translate3d(-16vw, 14vh, 0) scale(1.08); }
+        }
+
+        @keyframes ambientDriftThree {
+          from { transform: translate3d(0, 0, 0) scale(0.96); }
+          to { transform: translate3d(10vw, -18vh, 0) scale(1.14); }
+        }
+
+        @keyframes beamSweepOne {
+          from { transform: translate3d(-8vw, 0, 0) rotate(-14deg); opacity: 0.12; }
+          to { transform: translate3d(26vw, 12vh, 0) rotate(-8deg); opacity: 0.34; }
+        }
+
+        @keyframes beamSweepTwo {
+          from { transform: translate3d(8vw, 0, 0) rotate(16deg); opacity: 0.1; }
+          to { transform: translate3d(-24vw, -10vh, 0) rotate(9deg); opacity: 0.28; }
+        }
+
+        @keyframes starDrift {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-120px, 90px, 0); }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .ambient-orb,
+          .ambient-beam,
+          .ambient-stars,
+          .ring {
+            animation: none !important;
+          }
         }
 
         .container {
@@ -984,6 +1113,15 @@ export default function HomePage() {
       `}</style>
 
       <div className="site-shell">
+        <div className="ambient-scene" aria-hidden="true">
+          <div className="ambient-orb ambient-orb-one" />
+          <div className="ambient-orb ambient-orb-two" />
+          <div className="ambient-orb ambient-orb-three" />
+          <div className="ambient-beam ambient-beam-one" />
+          <div className="ambient-beam ambient-beam-two" />
+          <div className="ambient-stars" />
+        </div>
+
         <header className="nav">
           <div className="container nav-inner">
             <a className="brand" href="#top">
@@ -1017,29 +1155,30 @@ export default function HomePage() {
         <main id="top">
           <section className="container hero">
             <div>
-              <div className="eyebrow">The TA-14 AI Governance Exchange</div>
+              <div className="eyebrow">Free AI Governance Playground and Workspace</div>
 
               <h1>
                 Build governance.
                 <br />
-                Test the route.
+                Test it free.
                 <br />
                 <span className="gradient-text">Prove the consequence.</span>
               </h1>
 
               <p className="hero-copy">
-                Build AI governance routes, create governed records, obtain
-                full-chain reviews, connect with qualified review partners, and
-                independently verify consequential execution before trust becomes
-                consequence.
+                Enter the TA-14 AI Governance Exchange free—no credit card
+                required. Build AI governance routes, test runtime decisions,
+                expose broken links, correct the route, and preview governed
+                records without paying. Pay only when you choose to preserve a
+                formal run, operate professionally, or request a full-chain review.
               </p>
 
               <div className="hero-actions">
                 <a className="button button-primary" href="/workspace">
-                  Enter the Governance Workspace
+                  Start Building Free
                 </a>
-                <a className="button button-secondary" href="#reviews">
-                  Submit a System for Review
+                <a className="button button-secondary" href="#demo">
+                  See How It Works
                 </a>
               </div>
 
