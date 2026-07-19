@@ -28,6 +28,11 @@ import {
   verifyRouteArtifactFile,
   type ArtifactVerificationResult,
 } from "../../../../../lib/route-artifact-verification";
+import {
+  createRouteVerificationReceipt,
+  getLatestRouteVerificationReceipt,
+  type RouteVerificationReceipt,
+} from "../../../../../lib/route-verification-receipts";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
@@ -75,8 +80,7 @@ function calculateRouteReadiness(
     }
 
     const hasVerifiedIntegrity = stageArtifacts.some(
-      (artifact) =>
-        verificationResults[artifact.id]?.status === "VERIFIED",
+      (artifact) => verificationResults[artifact.id]?.status === "VERIFIED",
     );
     const hasRequirementBinding = stageArtifacts.some((artifact) =>
       Boolean(artifact.requirementKey),
@@ -201,18 +205,18 @@ export default function RouteArtifactsPage() {
   const [verificationResults, setVerificationResults] = useState<
     Record<string, ArtifactVerificationResult>
   >({});
-  const [verifyingArtifactId, setVerifyingArtifactId] =
-    useState<string | null>(null);
+  const [verifyingArtifactId, setVerifyingArtifactId] = useState<string | null>(
+    null,
+  );
   const [verifyingAll, setVerifyingAll] = useState(false);
-  const [verificationMessage, setVerificationMessage] =
-    useState("");
+  const [verificationMessage, setVerificationMessage] = useState("");
+  const [latestRouteReceipt, setLatestRouteReceipt] =
+    useState<RouteVerificationReceipt | null>(null);
+  const [preservingRouteReceipt, setPreservingRouteReceipt] = useState(false);
+  const [routeReceiptMessage, setRouteReceiptMessage] = useState("");
 
   const readiness = useMemo(
-    () =>
-      calculateRouteReadiness(
-        artifacts,
-        verificationResults,
-      ),
+    () => calculateRouteReadiness(artifacts, verificationResults),
     [artifacts, verificationResults],
   );
 
@@ -227,12 +231,17 @@ export default function RouteArtifactsPage() {
     setErrorMessage("");
 
     try {
-      const [storedRoute, storedArtifacts, storedVerifications] =
-        await Promise.all([
-          getSupabaseRoute(routeRecordId),
-          listSupabaseRouteArtifacts(routeRecordId),
-          listLatestArtifactVerificationReceipts(routeRecordId),
-        ]);
+      const [
+        storedRoute,
+        storedArtifacts,
+        storedVerifications,
+        storedRouteReceipt,
+      ] = await Promise.all([
+        getSupabaseRoute(routeRecordId),
+        listSupabaseRouteArtifacts(routeRecordId),
+        listLatestArtifactVerificationReceipts(routeRecordId),
+        getLatestRouteVerificationReceipt(routeRecordId),
+      ]);
 
       if (!storedRoute) {
         throw new Error(
@@ -252,6 +261,8 @@ export default function RouteArtifactsPage() {
         ),
       );
       setVerificationMessage("");
+      setLatestRouteReceipt(storedRouteReceipt);
+      setRouteReceiptMessage("");
     } catch (error) {
       setRoute(null);
       setArtifacts([]);
@@ -416,9 +427,7 @@ export default function RouteArtifactsPage() {
     }
   };
 
-  const verifyArtifact = async (
-    artifact: RouteArtifact,
-  ): Promise<void> => {
+  const verifyArtifact = async (artifact: RouteArtifact): Promise<void> => {
     setVerifyingArtifactId(artifact.id);
     setVerificationMessage("");
 
@@ -431,10 +440,7 @@ export default function RouteArtifactsPage() {
       }));
     } catch (error) {
       setVerificationMessage(
-        getErrorMessage(
-          error,
-          "The governed artifact could not be verified.",
-        ),
+        getErrorMessage(error, "The governed artifact could not be verified."),
       );
     } finally {
       setVerifyingArtifactId(null);
@@ -450,14 +456,10 @@ export default function RouteArtifactsPage() {
     setVerificationMessage("");
 
     try {
-      const results: Record<
-        string,
-        ArtifactVerificationResult
-      > = {};
+      const results: Record<string, ArtifactVerificationResult> = {};
 
       for (const artifact of artifacts) {
-        results[artifact.id] =
-          await verifyRouteArtifactFile(artifact);
+        results[artifact.id] = await verifyRouteArtifactFile(artifact);
       }
 
       setVerificationResults(results);
@@ -470,6 +472,45 @@ export default function RouteArtifactsPage() {
       );
     } finally {
       setVerifyingAll(false);
+    }
+  };
+
+  const preserveRouteReceipt = async (): Promise<void> => {
+    if (!route || artifacts.length === 0) {
+      return;
+    }
+
+    setPreservingRouteReceipt(true);
+    setRouteReceiptMessage("");
+
+    try {
+      const receipt = await createRouteVerificationReceipt({
+        routeRecordId,
+        routeId: route.route.routeId,
+        readinessStatus: readiness.status,
+        readinessScore: readiness.score,
+        readinessMaximumScore: readiness.maximumScore,
+        readinessPercentage: readiness.percentage,
+        artifactVerifications: artifacts.map(
+          (artifact) =>
+            verificationResults[artifact.id] ??
+            createUnverifiedArtifactResult(artifact),
+        ),
+      });
+
+      setLatestRouteReceipt(receipt);
+      setRouteReceiptMessage(
+        "Route-level verification receipt preserved successfully.",
+      );
+    } catch (error) {
+      setRouteReceiptMessage(
+        getErrorMessage(
+          error,
+          "The route-level verification receipt could not be preserved.",
+        ),
+      );
+    } finally {
+      setPreservingRouteReceipt(false);
     }
   };
 
@@ -832,9 +873,9 @@ export default function RouteArtifactsPage() {
             <p className="eyebrow">Governance Readiness Engine</p>
             <h2>Route readiness</h2>
             <p className="readinessIntro">
-              Readiness is calculated from stage presence, verified stored-object
-              integrity, requirement binding, and structured artifact records. It does not
-              itself establish admissibility.
+              Readiness is calculated from stage presence, verified
+              stored-object integrity, requirement binding, and structured
+              artifact records. It does not itself establish admissibility.
             </p>
           </div>
 
@@ -856,6 +897,18 @@ export default function RouteArtifactsPage() {
               ? "Verifying all artifacts..."
               : "Verify all artifacts"}
           </button>
+          <button
+            type="button"
+            className="preserveReceiptButton"
+            onClick={() => {
+              void preserveRouteReceipt();
+            }}
+            disabled={preservingRouteReceipt || artifacts.length === 0}
+          >
+            {preservingRouteReceipt
+              ? "Preserving route receipt..."
+              : "Preserve route receipt"}
+          </button>
         </div>
 
         <div className="readinessStatusRow">
@@ -867,6 +920,37 @@ export default function RouteArtifactsPage() {
             No admissible evidence. No admissible execution.
           </span>
         </div>
+        {routeReceiptMessage ? (
+          <p className="routeReceiptMessage" role="status">
+            {routeReceiptMessage}
+          </p>
+        ) : null}
+
+        {latestRouteReceipt ? (
+          <article className="routeReceiptCard">
+            <div className="routeReceiptTopline">
+              <div>
+                <span>Latest preserved route receipt</span>
+                <strong>
+                  {latestRouteReceipt.readinessStatus.replaceAll("_", " ")}
+                </strong>
+              </div>
+              <time dateTime={latestRouteReceipt.createdAt}>
+                {new Date(latestRouteReceipt.createdAt).toLocaleString()}
+              </time>
+            </div>
+
+            <div className="routeReceiptMetrics">
+              <span>Readiness: {latestRouteReceipt.readinessPercentage}%</span>
+              <span>Verified: {latestRouteReceipt.verifiedCount}</span>
+              <span>Mismatch: {latestRouteReceipt.mismatchCount}</span>
+              <span>Missing: {latestRouteReceipt.missingCount}</span>
+              <span>Unverified: {latestRouteReceipt.unverifiedCount}</span>
+            </div>
+
+            <code>Receipt SHA-256: {latestRouteReceipt.receiptSha256}</code>
+          </article>
+        ) : null}
 
         <div className="readinessGrid">
           {readiness.stages.map((stage) => (
@@ -898,9 +982,7 @@ export default function RouteArtifactsPage() {
                 </div>
                 <div>
                   <dt>Verified integrity</dt>
-                  <dd>
-                    {stage.hasVerifiedIntegrity ? "Yes" : "No"}
-                  </dd>
+                  <dd>{stage.hasVerifiedIntegrity ? "Yes" : "No"}</dd>
                 </div>
                 <div>
                   <dt>Requirement bound</dt>
@@ -1058,179 +1140,175 @@ export default function RouteArtifactsPage() {
                       {stageArtifacts.map((artifact) => {
                         const verification =
                           verificationResults[artifact.id] ??
-                          createUnverifiedArtifactResult(
-                            artifact,
-                          );
+                          createUnverifiedArtifactResult(artifact);
 
                         return (
-                        <article className="artifactCard" key={artifact.id}>
-                          <div className="artifactTopline">
-                            <span className="artifactType">
-                              {artifact.artifactType.replaceAll("_", " ")}
-                            </span>
-
-                            <span>{formatDate(artifact.createdAt)}</span>
-                          </div>
-
-                          <h4>{artifact.title}</h4>
-
-                          {artifact.description ? (
-                            <p>{artifact.description}</p>
-                          ) : (
-                            <p className="muted">No description recorded.</p>
-                          )}
-
-                          <dl>
-                            <div>
-                              <dt>Requirement</dt>
-                              <dd>
-                                {artifact.requirementKey || "Not assigned"}
-                              </dd>
-                            </div>
-
-                            <div>
-                              <dt>Original file</dt>
-                              <dd>
-                                {artifact.originalFilename || "Not recorded"}
-                              </dd>
-                            </div>
-
-                            <div>
-                              <dt>MIME type</dt>
-                              <dd>{artifact.mimeType || "Not recorded"}</dd>
-                            </div>
-
-                            <div>
-                              <dt>Size</dt>
-                              <dd>{formatBytes(artifact.sizeBytes)}</dd>
-                            </div>
-                          </dl>
-
-                          <div
-                            className={`verificationPanel ${verification.status.toLowerCase()}`}
-                          >
-                            <div className="verificationTopline">
-                              <span>Integrity verification</span>
-                              <strong>
-                                {verification.status}
-                              </strong>
-                            </div>
-
-                            <p>{verification.message}</p>
-
-                            <p className="verificationReceiptMeta">
-                              {verification.receiptId && verification.checkedAt
-                                ? `Preserved receipt · ${formatDate(verification.checkedAt)}`
-                                : "No preserved verification receipt"}
-                            </p>
-
-                            <div className="verificationChecks">
-                              <span>
-                                Object:{" "}
-                                {verification.storageObjectPresent
-                                  ? "present"
-                                  : "not confirmed"}
+                          <article className="artifactCard" key={artifact.id}>
+                            <div className="artifactTopline">
+                              <span className="artifactType">
+                                {artifact.artifactType.replaceAll("_", " ")}
                               </span>
-                              <span>
-                                Hash:{" "}
-                                {verification.hashMatches === null
-                                  ? "not checked"
-                                  : verification.hashMatches
-                                    ? "match"
-                                    : "mismatch"}
-                              </span>
-                              <span>
-                                Size:{" "}
-                                {verification.sizeMatches === null
-                                  ? "not checked"
-                                  : verification.sizeMatches
-                                    ? "match"
-                                    : "mismatch"}
-                              </span>
-                              <span>
-                                MIME:{" "}
-                                {verification.mimeTypeMatches === null
-                                  ? "not checked"
-                                  : verification.mimeTypeMatches
-                                    ? "match"
-                                    : "mismatch"}
-                              </span>
+
+                              <span>{formatDate(artifact.createdAt)}</span>
                             </div>
 
-                            {verification.calculatedSha256 ? (
-                              <code>
-                                Calculated:{" "}
-                                {verification.calculatedSha256}
-                              </code>
-                            ) : null}
-                          </div>
+                            <h4>{artifact.title}</h4>
 
-                          <div className="artifactActions">
-                            <button
-                              type="button"
-                              className="verifyArtifactButton"
-                              onClick={() => {
-                                void verifyArtifact(artifact);
-                              }}
-                              disabled={
-                                verifyingAll ||
-                                verifyingArtifactId === artifact.id ||
-                                deletingArtifactId === artifact.id
-                              }
+                            {artifact.description ? (
+                              <p>{artifact.description}</p>
+                            ) : (
+                              <p className="muted">No description recorded.</p>
+                            )}
+
+                            <dl>
+                              <div>
+                                <dt>Requirement</dt>
+                                <dd>
+                                  {artifact.requirementKey || "Not assigned"}
+                                </dd>
+                              </div>
+
+                              <div>
+                                <dt>Original file</dt>
+                                <dd>
+                                  {artifact.originalFilename || "Not recorded"}
+                                </dd>
+                              </div>
+
+                              <div>
+                                <dt>MIME type</dt>
+                                <dd>{artifact.mimeType || "Not recorded"}</dd>
+                              </div>
+
+                              <div>
+                                <dt>Size</dt>
+                                <dd>{formatBytes(artifact.sizeBytes)}</dd>
+                              </div>
+                            </dl>
+
+                            <div
+                              className={`verificationPanel ${verification.status.toLowerCase()}`}
                             >
-                              {verifyingArtifactId === artifact.id
-                                ? "Verifying..."
-                                : "Verify integrity"}
-                            </button>
+                              <div className="verificationTopline">
+                                <span>Integrity verification</span>
+                                <strong>{verification.status}</strong>
+                              </div>
 
-                            {artifact.storagePath ? (
+                              <p>{verification.message}</p>
+
+                              <p className="verificationReceiptMeta">
+                                {verification.receiptId &&
+                                verification.checkedAt
+                                  ? `Preserved receipt · ${formatDate(verification.checkedAt)}`
+                                  : "No preserved verification receipt"}
+                              </p>
+
+                              <div className="verificationChecks">
+                                <span>
+                                  Object:{" "}
+                                  {verification.storageObjectPresent
+                                    ? "present"
+                                    : "not confirmed"}
+                                </span>
+                                <span>
+                                  Hash:{" "}
+                                  {verification.hashMatches === null
+                                    ? "not checked"
+                                    : verification.hashMatches
+                                      ? "match"
+                                      : "mismatch"}
+                                </span>
+                                <span>
+                                  Size:{" "}
+                                  {verification.sizeMatches === null
+                                    ? "not checked"
+                                    : verification.sizeMatches
+                                      ? "match"
+                                      : "mismatch"}
+                                </span>
+                                <span>
+                                  MIME:{" "}
+                                  {verification.mimeTypeMatches === null
+                                    ? "not checked"
+                                    : verification.mimeTypeMatches
+                                      ? "match"
+                                      : "mismatch"}
+                                </span>
+                              </div>
+
+                              {verification.calculatedSha256 ? (
+                                <code>
+                                  Calculated: {verification.calculatedSha256}
+                                </code>
+                              ) : null}
+                            </div>
+
+                            <div className="artifactActions">
                               <button
                                 type="button"
-                                className="openArtifactButton"
+                                className="verifyArtifactButton"
                                 onClick={() => {
-                                  void openArtifactFile(artifact);
+                                  void verifyArtifact(artifact);
                                 }}
                                 disabled={
-                                  openingArtifactId === artifact.id ||
+                                  verifyingAll ||
+                                  verifyingArtifactId === artifact.id ||
                                   deletingArtifactId === artifact.id
                                 }
                               >
-                                {openingArtifactId === artifact.id
-                                  ? "Opening..."
-                                  : "Open stored file"}
+                                {verifyingArtifactId === artifact.id
+                                  ? "Verifying..."
+                                  : "Verify integrity"}
                               </button>
-                            ) : null}
 
-                            <button
-                              type="button"
-                              className="editArtifactButton"
-                              onClick={() => startEditingArtifact(artifact)}
-                              disabled={deletingArtifactId === artifact.id}
-                            >
-                              Edit governed artifact
-                            </button>
+                              {artifact.storagePath ? (
+                                <button
+                                  type="button"
+                                  className="openArtifactButton"
+                                  onClick={() => {
+                                    void openArtifactFile(artifact);
+                                  }}
+                                  disabled={
+                                    openingArtifactId === artifact.id ||
+                                    deletingArtifactId === artifact.id
+                                  }
+                                >
+                                  {openingArtifactId === artifact.id
+                                    ? "Opening..."
+                                    : "Open stored file"}
+                                </button>
+                              ) : null}
 
-                            <button
-                              type="button"
-                              className="deleteArtifactButton"
-                              onClick={() => {
-                                void deleteArtifact(artifact);
-                              }}
-                              disabled={deletingArtifactId === artifact.id}
-                            >
-                              {deletingArtifactId === artifact.id
-                                ? "Deleting..."
-                                : "Delete"}
-                            </button>
-                          </div>
+                              <button
+                                type="button"
+                                className="editArtifactButton"
+                                onClick={() => startEditingArtifact(artifact)}
+                                disabled={deletingArtifactId === artifact.id}
+                              >
+                                Edit governed artifact
+                              </button>
 
-                          <div className="hashBlock">
-                            <span>SHA-256</span>
-                            <code>
-                              {artifact.sha256 || "No digest recorded"}
-                            </code>
-                          </div>
-                        </article>
+                              <button
+                                type="button"
+                                className="deleteArtifactButton"
+                                onClick={() => {
+                                  void deleteArtifact(artifact);
+                                }}
+                                disabled={deletingArtifactId === artifact.id}
+                              >
+                                {deletingArtifactId === artifact.id
+                                  ? "Deleting..."
+                                  : "Delete"}
+                              </button>
+                            </div>
+
+                            <div className="hashBlock">
+                              <span>SHA-256</span>
+                              <code>
+                                {artifact.sha256 || "No digest recorded"}
+                              </code>
+                            </div>
+                          </article>
                         );
                       })}
                     </div>
@@ -1951,7 +2029,8 @@ function PageStyles() {
         white-space: nowrap;
       }
 
-      .verifyAllButton {
+      .verifyAllButton,
+      .preserveReceiptButton {
         min-width: 170px;
         padding: 12px 14px;
         border: 1px solid #b9d9cc;
@@ -1964,9 +2043,92 @@ function PageStyles() {
         cursor: pointer;
       }
 
-      .verifyAllButton:disabled {
+      .verifyAllButton:disabled,
+      .preserveReceiptButton:disabled {
         cursor: not-allowed;
         opacity: 0.55;
+      }
+
+      .preserveReceiptButton {
+        padding: 12px 14px;
+        border: 1px solid #c8d0dd;
+        border-radius: 12px;
+        background: #f4f6fa;
+        color: #25344d;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .routeReceiptMessage {
+        margin: 12px 0 0;
+        padding: 10px 12px;
+        border: 1px solid #d8e2dc;
+        border-radius: 10px;
+        background: #f7faf8;
+        color: #405349;
+        font-size: 12px;
+      }
+
+      .routeReceiptCard {
+        margin-top: 14px;
+        padding: 14px;
+        border: 1px solid #d8e0dc;
+        border-radius: 14px;
+        background: #fbfcfb;
+      }
+
+      .routeReceiptTopline {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .routeReceiptTopline span {
+        display: block;
+        margin-bottom: 4px;
+        color: #6a776f;
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .routeReceiptTopline strong {
+        color: #1f2d26;
+        font-size: 13px;
+      }
+
+      .routeReceiptTopline time {
+        color: #728078;
+        font-size: 10px;
+      }
+
+      .routeReceiptMetrics {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 7px;
+        margin: 12px 0;
+      }
+
+      .routeReceiptMetrics span {
+        padding: 6px 8px;
+        border: 1px solid #e0e7e3;
+        border-radius: 999px;
+        background: white;
+        color: #526058;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .routeReceiptCard code {
+        display: block;
+        overflow-wrap: anywhere;
+        color: #46544c;
+        font-size: 9px;
+        line-height: 1.45;
       }
 
       .verificationPanel {
@@ -2321,7 +2483,8 @@ function PageStyles() {
         }
 
         .readinessScore,
-        .verifyAllButton {
+        .verifyAllButton,
+        .preserveReceiptButton {
           width: 100%;
         }
 
