@@ -11,6 +11,7 @@ import {
   ROUTE_ARTIFACT_TYPES,
   createSupabaseRouteArtifact,
   listSupabaseRouteArtifacts,
+  updateSupabaseRouteArtifact,
   type CanonicalRouteStage,
   type RouteArtifact,
   type RouteArtifactType,
@@ -80,6 +81,8 @@ export default function RouteArtifactsPage() {
   const [requirementKey, setRequirementKey] = useState("");
   const [sha256, setSha256] = useState("");
   const [artifactJsonText, setArtifactJsonText] = useState("{}");
+  const [editingArtifactId, setEditingArtifactId] =
+    useState<string | null>(null);
 
   const loadWorkspace = useCallback(async (): Promise<void> => {
     if (!routeRecordId) {
@@ -128,9 +131,32 @@ export default function RouteArtifactsPage() {
     setSha256("");
     setArtifactJsonText("{}");
     setEditorMessage("");
+    setEditingArtifactId(null);
   };
 
-  const createArtifact = async (): Promise<void> => {
+  const startEditingArtifact = (
+    artifact: RouteArtifact,
+  ): void => {
+    setArtifactType(artifact.artifactType);
+    setCanonicalStage(artifact.canonicalStage);
+    setTitle(artifact.title);
+    setDescription(artifact.description ?? "");
+    setRequirementKey(artifact.requirementKey ?? "");
+    setSha256(artifact.sha256 ?? "");
+    setArtifactJsonText(
+      JSON.stringify(artifact.artifactJson ?? {}, null, 2),
+    );
+    setEditingArtifactId(artifact.id);
+    setEditorMessage("");
+    setEditorOpen(true);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  const saveArtifact = async (): Promise<void> => {
     if (!route) {
       return;
     }
@@ -159,17 +185,32 @@ export default function RouteArtifactsPage() {
         artifactJson = parsed as Record<string, unknown>;
       }
 
-      await createSupabaseRouteArtifact({
-        routeRecordId: route.id,
-        routeId: route.route.routeId,
-        artifactType,
-        canonicalStage,
-        requirementKey: requirementKey || null,
-        title,
-        description: description || null,
-        artifactJson,
-        sha256: sha256 || null,
-      });
+      if (editingArtifactId) {
+        await updateSupabaseRouteArtifact(
+          editingArtifactId,
+          {
+            artifactType,
+            canonicalStage,
+            requirementKey: requirementKey || null,
+            title,
+            description: description || null,
+            artifactJson,
+            sha256: sha256 || null,
+          },
+        );
+      } else {
+        await createSupabaseRouteArtifact({
+          routeRecordId: route.id,
+          routeId: route.route.routeId,
+          artifactType,
+          canonicalStage,
+          requirementKey: requirementKey || null,
+          title,
+          description: description || null,
+          artifactJson,
+          sha256: sha256 || null,
+        });
+      }
 
       await loadWorkspace();
       resetEditor();
@@ -178,7 +219,9 @@ export default function RouteArtifactsPage() {
       setEditorMessage(
         getErrorMessage(
           error,
-          "The governed artifact could not be created.",
+          editingArtifactId
+            ? "The governed artifact could not be updated."
+            : "The governed artifact could not be created.",
         ),
       );
     } finally {
@@ -287,8 +330,14 @@ export default function RouteArtifactsPage() {
             type="button"
             className="secondaryButton"
             onClick={() => {
-              setEditorOpen((current) => !current);
-              setEditorMessage("");
+              if (editorOpen) {
+                resetEditor();
+                setEditorOpen(false);
+                return;
+              }
+
+              resetEditor();
+              setEditorOpen(true);
             }}
           >
             {editorOpen ? "Close editor" : "Add governed artifact"}
@@ -308,10 +357,18 @@ export default function RouteArtifactsPage() {
           <div className="sectionHeading">
             <div>
               <p className="eyebrow">Governed Artifact Editor</p>
-              <h2>Create a route-bound record</h2>
+              <h2>
+                {editingArtifactId
+                  ? "Edit route-bound record"
+                  : "Create a route-bound record"}
+              </h2>
             </div>
 
-            <span className="editorBadge">Authenticated write</span>
+            <span className="editorBadge">
+              {editingArtifactId
+                ? "Authenticated update"
+                : "Authenticated write"}
+            </span>
           </div>
 
           <div className="editorGrid">
@@ -422,30 +479,37 @@ export default function RouteArtifactsPage() {
             <button
               type="button"
               className="secondaryButton"
-              onClick={resetEditor}
+              onClick={() => {
+                resetEditor();
+                setEditorOpen(false);
+              }}
               disabled={savingArtifact}
             >
-              Reset
+              Cancel
             </button>
 
             <button
               type="button"
               className="primaryButton"
               onClick={() => {
-                void createArtifact();
+                void saveArtifact();
               }}
               disabled={savingArtifact || !title.trim()}
             >
               {savingArtifact
-                ? "Creating governed artifact..."
-                : "Create governed artifact"}
+                ? editingArtifactId
+                  ? "Updating governed artifact..."
+                  : "Creating governed artifact..."
+                : editingArtifactId
+                  ? "Update governed artifact"
+                  : "Create governed artifact"}
             </button>
           </div>
 
           <p className="editorBoundary">
-            Creating a record stores and classifies it. Creation alone
-            does not establish admissibility, authority, truth,
-            continuity, execution, or outcome.
+            Creating or updating a record stores and classifies it.
+            Storage alone does not establish admissibility, authority,
+            truth, continuity, execution, or outcome.
           </p>
         </section>
       ) : null}
@@ -652,6 +716,17 @@ export default function RouteArtifactsPage() {
                               </dd>
                             </div>
                           </dl>
+
+                          <div className="artifactActions">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                startEditingArtifact(artifact)
+                              }
+                            >
+                              Edit governed artifact
+                            </button>
+                          </div>
 
                           <div className="hashBlock">
                             <span>SHA-256</span>
@@ -1183,6 +1258,29 @@ function PageStyles() {
         font-weight: 750;
         text-overflow: ellipsis;
         white-space: nowrap;
+      }
+
+      .artifactActions {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 10px;
+      }
+
+      .artifactActions button {
+        padding: 8px 10px;
+        border: 1px solid #c8d5ef;
+        border-radius: 9px;
+        background: #eef4ff;
+        color: #244f9e;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .artifactActions button:hover {
+        border-color: #9eb5e3;
+        background: #e4edff;
       }
 
       .hashBlock {
