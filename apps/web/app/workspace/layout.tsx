@@ -1,5 +1,7 @@
 import Link from 'next/link';
 
+import { requireUser } from '../../lib/auth/require-user';
+
 const workspaceNavigation = [
   { href: '/workspace', label: 'Overview', glyph: '◈', active: true },
   { href: '/workspace/discover', label: 'Discover', glyph: '⌁' },
@@ -8,7 +10,11 @@ const workspaceNavigation = [
   { href: '/workspace/paste', label: 'Paste', glyph: '▤' },
   { href: '/workspace/lab', label: 'Academy Lab', glyph: 'A' },
   { href: '/workspace/scanner', label: 'Scanner', glyph: '⌕' },
-  { href: '/workspace/demonstrations', label: 'Demonstrations', glyph: '◎' },
+  {
+    href: '/workspace/demonstrations',
+    label: 'Demonstrations',
+    glyph: '◎',
+  },
 ];
 
 const recordNavigation = [
@@ -17,11 +23,13 @@ const recordNavigation = [
   { href: '/execution-map', label: 'Execution Map', glyph: '↗' },
 ];
 
-export default function WorkspaceLayout({
+export default async function WorkspaceLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  await requireUser();
+
   return (
     <div className="ta14-workspace-frame">
       <style>{`
@@ -549,7 +557,10 @@ export default function WorkspaceLayout({
           <Link className="ta14-command-link secondary-link" href="/academy">
             Academy
           </Link>
-          <Link className="ta14-command-link secondary-link" href="/architecture">
+          <Link
+            className="ta14-command-link secondary-link"
+            href="/architecture"
+          >
             Architecture
           </Link>
           <Link className="ta14-command-link primary" href="/verify">
