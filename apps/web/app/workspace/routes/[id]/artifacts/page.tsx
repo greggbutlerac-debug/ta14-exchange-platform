@@ -22,11 +22,16 @@ import {
   removeRouteArtifactFile,
   uploadRouteArtifactFile,
 } from "../../../../../lib/route-artifact-storage";
+import {
+  createUnverifiedArtifactResult,
+  verifyRouteArtifactFile,
+  type ArtifactVerificationResult,
+} from "../../../../../lib/route-artifact-verification";
 
 type StageReadiness = {
   stage: CanonicalRouteStage;
   artifactCount: number;
-  hasHash: boolean;
+  hasVerifiedIntegrity: boolean;
   hasRequirementBinding: boolean;
   hasStructuredRecord: boolean;
   score: number;
@@ -46,7 +51,10 @@ function hasStructuredArtifactJson(artifact: RouteArtifact): boolean {
   return Object.keys(artifact.artifactJson ?? {}).length > 0;
 }
 
-function calculateRouteReadiness(artifacts: RouteArtifact[]): RouteReadiness {
+function calculateRouteReadiness(
+  artifacts: RouteArtifact[],
+  verificationResults: Record<string, ArtifactVerificationResult>,
+): RouteReadiness {
   const stages = CANONICAL_ROUTE_STAGES.map((stage) => {
     const stageArtifacts = artifacts.filter(
       (artifact) => artifact.canonicalStage === stage,
@@ -56,7 +64,7 @@ function calculateRouteReadiness(artifacts: RouteArtifact[]): RouteReadiness {
       return {
         stage,
         artifactCount: 0,
-        hasHash: false,
+        hasVerifiedIntegrity: false,
         hasRequirementBinding: false,
         hasStructuredRecord: false,
         score: 0,
@@ -65,7 +73,10 @@ function calculateRouteReadiness(artifacts: RouteArtifact[]): RouteReadiness {
       };
     }
 
-    const hasHash = stageArtifacts.some((artifact) => Boolean(artifact.sha256));
+    const hasVerifiedIntegrity = stageArtifacts.some(
+      (artifact) =>
+        verificationResults[artifact.id]?.status === "VERIFIED",
+    );
     const hasRequirementBinding = stageArtifacts.some((artifact) =>
       Boolean(artifact.requirementKey),
     );
@@ -73,14 +84,14 @@ function calculateRouteReadiness(artifacts: RouteArtifact[]): RouteReadiness {
 
     const score =
       1 +
-      Number(hasHash) +
+      Number(hasVerifiedIntegrity) +
       Number(hasRequirementBinding) +
       Number(hasStructuredRecord);
 
     return {
       stage,
       artifactCount: stageArtifacts.length,
-      hasHash,
+      hasVerifiedIntegrity,
       hasRequirementBinding,
       hasStructuredRecord,
       score,
@@ -186,10 +197,22 @@ export default function RouteArtifactsPage() {
     null,
   );
   const [deleteErrorMessage, setDeleteErrorMessage] = useState("");
+  const [verificationResults, setVerificationResults] = useState<
+    Record<string, ArtifactVerificationResult>
+  >({});
+  const [verifyingArtifactId, setVerifyingArtifactId] =
+    useState<string | null>(null);
+  const [verifyingAll, setVerifyingAll] = useState(false);
+  const [verificationMessage, setVerificationMessage] =
+    useState("");
 
   const readiness = useMemo(
-    () => calculateRouteReadiness(artifacts),
-    [artifacts],
+    () =>
+      calculateRouteReadiness(
+        artifacts,
+        verificationResults,
+      ),
+    [artifacts, verificationResults],
   );
 
   const loadWorkspace = useCallback(async (): Promise<void> => {
@@ -216,6 +239,15 @@ export default function RouteArtifactsPage() {
 
       setRoute(storedRoute);
       setArtifacts(storedArtifacts);
+      setVerificationResults(
+        Object.fromEntries(
+          storedArtifacts.map((artifact) => [
+            artifact.id,
+            createUnverifiedArtifactResult(artifact),
+          ]),
+        ),
+      );
+      setVerificationMessage("");
     } catch (error) {
       setRoute(null);
       setArtifacts([]);
@@ -377,6 +409,63 @@ export default function RouteArtifactsPage() {
       );
     } finally {
       setSavingArtifact(false);
+    }
+  };
+
+  const verifyArtifact = async (
+    artifact: RouteArtifact,
+  ): Promise<void> => {
+    setVerifyingArtifactId(artifact.id);
+    setVerificationMessage("");
+
+    try {
+      const result = await verifyRouteArtifactFile(artifact);
+
+      setVerificationResults((current) => ({
+        ...current,
+        [artifact.id]: result,
+      }));
+    } catch (error) {
+      setVerificationMessage(
+        getErrorMessage(
+          error,
+          "The governed artifact could not be verified.",
+        ),
+      );
+    } finally {
+      setVerifyingArtifactId(null);
+    }
+  };
+
+  const verifyAllArtifacts = async (): Promise<void> => {
+    if (artifacts.length === 0) {
+      return;
+    }
+
+    setVerifyingAll(true);
+    setVerificationMessage("");
+
+    try {
+      const results: Record<
+        string,
+        ArtifactVerificationResult
+      > = {};
+
+      for (const artifact of artifacts) {
+        results[artifact.id] =
+          await verifyRouteArtifactFile(artifact);
+      }
+
+      setVerificationResults(results);
+    } catch (error) {
+      setVerificationMessage(
+        getErrorMessage(
+          error,
+          "Route artifact verification could not be completed.",
+        ),
+      );
+    } finally {
+      setVerifyingAll(false);
     }
   };
 
@@ -739,8 +828,8 @@ export default function RouteArtifactsPage() {
             <p className="eyebrow">Governance Readiness Engine</p>
             <h2>Route readiness</h2>
             <p className="readinessIntro">
-              Readiness is calculated from stage presence, SHA-256 evidence,
-              requirement binding, and structured artifact records. It does not
+              Readiness is calculated from stage presence, verified stored-object
+              integrity, requirement binding, and structured artifact records. It does not
               itself establish admissibility.
             </p>
           </div>
@@ -751,6 +840,18 @@ export default function RouteArtifactsPage() {
               {readiness.score} / {readiness.maximumScore}
             </span>
           </div>
+          <button
+            type="button"
+            className="verifyAllButton"
+            onClick={() => {
+              void verifyAllArtifacts();
+            }}
+            disabled={verifyingAll || artifacts.length === 0}
+          >
+            {verifyingAll
+              ? "Verifying all artifacts..."
+              : "Verify all artifacts"}
+          </button>
         </div>
 
         <div className="readinessStatusRow">
@@ -792,8 +893,10 @@ export default function RouteArtifactsPage() {
                   </dd>
                 </div>
                 <div>
-                  <dt>SHA-256 present</dt>
-                  <dd>{stage.hasHash ? "Yes" : "No"}</dd>
+                  <dt>Verified integrity</dt>
+                  <dd>
+                    {stage.hasVerifiedIntegrity ? "Yes" : "No"}
+                  </dd>
                 </div>
                 <div>
                   <dt>Requirement bound</dt>
@@ -902,6 +1005,12 @@ export default function RouteArtifactsPage() {
           </p>
         ) : null}
 
+        {verificationMessage ? (
+          <p className="verificationError" role="alert">
+            {verificationMessage}
+          </p>
+        ) : null}
+
         {artifacts.length === 0 ? (
           <div className="emptyState">
             <span className="emptyMark">01—08</span>
@@ -942,7 +1051,14 @@ export default function RouteArtifactsPage() {
                     </p>
                   ) : (
                     <div className="artifactGrid">
-                      {stageArtifacts.map((artifact) => (
+                      {stageArtifacts.map((artifact) => {
+                        const verification =
+                          verificationResults[artifact.id] ??
+                          createUnverifiedArtifactResult(
+                            artifact,
+                          );
+
+                        return (
                         <article className="artifactCard" key={artifact.id}>
                           <div className="artifactTopline">
                             <span className="artifactType">
@@ -986,7 +1102,77 @@ export default function RouteArtifactsPage() {
                             </div>
                           </dl>
 
+                          <div
+                            className={`verificationPanel ${verification.status.toLowerCase()}`}
+                          >
+                            <div className="verificationTopline">
+                              <span>Integrity verification</span>
+                              <strong>
+                                {verification.status}
+                              </strong>
+                            </div>
+
+                            <p>{verification.message}</p>
+
+                            <div className="verificationChecks">
+                              <span>
+                                Object:{" "}
+                                {verification.storageObjectPresent
+                                  ? "present"
+                                  : "not confirmed"}
+                              </span>
+                              <span>
+                                Hash:{" "}
+                                {verification.hashMatches === null
+                                  ? "not checked"
+                                  : verification.hashMatches
+                                    ? "match"
+                                    : "mismatch"}
+                              </span>
+                              <span>
+                                Size:{" "}
+                                {verification.sizeMatches === null
+                                  ? "not checked"
+                                  : verification.sizeMatches
+                                    ? "match"
+                                    : "mismatch"}
+                              </span>
+                              <span>
+                                MIME:{" "}
+                                {verification.mimeTypeMatches === null
+                                  ? "not checked"
+                                  : verification.mimeTypeMatches
+                                    ? "match"
+                                    : "mismatch"}
+                              </span>
+                            </div>
+
+                            {verification.calculatedSha256 ? (
+                              <code>
+                                Calculated:{" "}
+                                {verification.calculatedSha256}
+                              </code>
+                            ) : null}
+                          </div>
+
                           <div className="artifactActions">
+                            <button
+                              type="button"
+                              className="verifyArtifactButton"
+                              onClick={() => {
+                                void verifyArtifact(artifact);
+                              }}
+                              disabled={
+                                verifyingAll ||
+                                verifyingArtifactId === artifact.id ||
+                                deletingArtifactId === artifact.id
+                              }
+                            >
+                              {verifyingArtifactId === artifact.id
+                                ? "Verifying..."
+                                : "Verify integrity"}
+                            </button>
+
                             {artifact.storagePath ? (
                               <button
                                 type="button"
@@ -1035,7 +1221,8 @@ export default function RouteArtifactsPage() {
                             </code>
                           </div>
                         </article>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
                 </section>
@@ -1754,6 +1941,116 @@ function PageStyles() {
         white-space: nowrap;
       }
 
+      .verifyAllButton {
+        min-width: 170px;
+        padding: 12px 14px;
+        border: 1px solid #b9d9cc;
+        border-radius: 12px;
+        background: #eaf7f2;
+        color: #08724f;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 900;
+        cursor: pointer;
+      }
+
+      .verifyAllButton:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .verificationPanel {
+        margin-bottom: 10px;
+        padding: 11px;
+        border: 1px solid #dce4e0;
+        border-radius: 10px;
+        background: #f8faf9;
+      }
+
+      .verificationPanel.verified {
+        border-color: #b9decf;
+        background: #f1faf6;
+      }
+
+      .verificationPanel.mismatch {
+        border-color: #ead5a3;
+        background: #fffaf0;
+      }
+
+      .verificationPanel.missing {
+        border-color: #edc4c4;
+        background: #fff6f6;
+      }
+
+      .verificationTopline {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      .verificationTopline span,
+      .verificationTopline strong {
+        font-size: 9px;
+        font-weight: 900;
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      .verificationPanel.verified strong {
+        color: #08724f;
+      }
+
+      .verificationPanel.mismatch strong {
+        color: #8a5a00;
+      }
+
+      .verificationPanel.missing strong {
+        color: #a12d2d;
+      }
+
+      .verificationPanel p {
+        margin: 8px 0;
+        color: #68766f;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+
+      .verificationChecks {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .verificationChecks span {
+        padding: 5px 7px;
+        border: 1px solid #e1e8e4;
+        border-radius: 999px;
+        background: white;
+        color: #53615a;
+        font-size: 9px;
+        font-weight: 800;
+      }
+
+      .verificationPanel code {
+        display: block;
+        overflow-wrap: anywhere;
+        color: #45524c;
+        font-size: 9px;
+        line-height: 1.45;
+      }
+
+      .verificationError {
+        margin: 0 0 16px;
+        padding: 11px 12px;
+        border: 1px solid #efc1c1;
+        border-radius: 10px;
+        background: #fff8f8;
+        color: #9b2929;
+        font-size: 13px;
+      }
+
       .artifactActions {
         display: flex;
         flex-wrap: wrap;
@@ -1774,6 +2071,17 @@ function PageStyles() {
       .artifactActions button:disabled {
         cursor: not-allowed;
         opacity: 0.55;
+      }
+
+      .verifyArtifactButton {
+        border: 1px solid #b9d9cc;
+        background: #eaf7f2;
+        color: #08724f;
+      }
+
+      .verifyArtifactButton:hover:not(:disabled) {
+        border-color: #87bda8;
+        background: #def2ea;
       }
 
       .openArtifactButton {
@@ -1995,7 +2303,8 @@ function PageStyles() {
           flex-direction: column;
         }
 
-        .readinessScore {
+        .readinessScore,
+        .verifyAllButton {
           width: 100%;
         }
 
