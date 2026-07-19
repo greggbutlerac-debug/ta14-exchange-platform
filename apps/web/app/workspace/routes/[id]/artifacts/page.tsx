@@ -10,6 +10,7 @@ import {
   CANONICAL_ROUTE_STAGES,
   ROUTE_ARTIFACT_TYPES,
   createSupabaseRouteArtifact,
+  deleteSupabaseRouteArtifact,
   listSupabaseRouteArtifacts,
   updateSupabaseRouteArtifact,
   type CanonicalRouteStage,
@@ -83,6 +84,10 @@ export default function RouteArtifactsPage() {
   const [artifactJsonText, setArtifactJsonText] = useState("{}");
   const [editingArtifactId, setEditingArtifactId] =
     useState<string | null>(null);
+  const [deletingArtifactId, setDeletingArtifactId] =
+    useState<string | null>(null);
+  const [deleteErrorMessage, setDeleteErrorMessage] =
+    useState("");
 
   const loadWorkspace = useCallback(async (): Promise<void> => {
     if (!routeRecordId) {
@@ -226,6 +231,49 @@ export default function RouteArtifactsPage() {
       );
     } finally {
       setSavingArtifact(false);
+    }
+  };
+
+  const deleteArtifact = async (
+    artifact: RouteArtifact,
+  ): Promise<void> => {
+    const confirmed = window.confirm(
+      `Delete "${artifact.title}"? This removes the governed artifact record from this route. This action cannot be undone.`,
+    );
+
+    if (!confirmed) {
+      return;
+    }
+
+    setDeletingArtifactId(artifact.id);
+    setDeleteErrorMessage("");
+
+    try {
+      const deleted = await deleteSupabaseRouteArtifact(
+        artifact.id,
+      );
+
+      if (!deleted) {
+        throw new Error(
+          "The governed artifact was not found or access was denied.",
+        );
+      }
+
+      if (editingArtifactId === artifact.id) {
+        resetEditor();
+        setEditorOpen(false);
+      }
+
+      await loadWorkspace();
+    } catch (error) {
+      setDeleteErrorMessage(
+        getErrorMessage(
+          error,
+          "The governed artifact could not be deleted.",
+        ),
+      );
+    } finally {
+      setDeletingArtifactId(null);
     }
   };
 
@@ -610,6 +658,12 @@ export default function RouteArtifactsPage() {
           <span className="readOnlyBadge">Governed inventory</span>
         </div>
 
+        {deleteErrorMessage ? (
+          <p className="deleteError" role="alert">
+            {deleteErrorMessage}
+          </p>
+        ) : null}
+
         {artifacts.length === 0 ? (
           <div className="emptyState">
             <span className="emptyMark">01—08</span>
@@ -720,11 +774,30 @@ export default function RouteArtifactsPage() {
                           <div className="artifactActions">
                             <button
                               type="button"
+                              className="editArtifactButton"
                               onClick={() =>
                                 startEditingArtifact(artifact)
                               }
+                              disabled={
+                                deletingArtifactId === artifact.id
+                              }
                             >
                               Edit governed artifact
+                            </button>
+
+                            <button
+                              type="button"
+                              className="deleteArtifactButton"
+                              onClick={() => {
+                                void deleteArtifact(artifact);
+                              }}
+                              disabled={
+                                deletingArtifactId === artifact.id
+                              }
+                            >
+                              {deletingArtifactId === artifact.id
+                                ? "Deleting..."
+                                : "Delete"}
                             </button>
                           </div>
 
@@ -1262,25 +1335,56 @@ function PageStyles() {
 
       .artifactActions {
         display: flex;
+        flex-wrap: wrap;
         justify-content: flex-end;
+        gap: 8px;
         margin-bottom: 10px;
       }
 
       .artifactActions button {
         padding: 8px 10px;
-        border: 1px solid #c8d5ef;
         border-radius: 9px;
-        background: #eef4ff;
-        color: #244f9e;
         font: inherit;
         font-size: 10px;
         font-weight: 900;
         cursor: pointer;
       }
 
-      .artifactActions button:hover {
+      .artifactActions button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+      }
+
+      .editArtifactButton {
+        border: 1px solid #c8d5ef;
+        background: #eef4ff;
+        color: #244f9e;
+      }
+
+      .editArtifactButton:hover:not(:disabled) {
         border-color: #9eb5e3;
         background: #e4edff;
+      }
+
+      .deleteArtifactButton {
+        border: 1px solid #efc1c1;
+        background: #fff4f4;
+        color: #a12d2d;
+      }
+
+      .deleteArtifactButton:hover:not(:disabled) {
+        border-color: #df9999;
+        background: #ffe9e9;
+      }
+
+      .deleteError {
+        margin: 0 0 16px;
+        padding: 11px 12px;
+        border: 1px solid #efc1c1;
+        border-radius: 10px;
+        background: #fff8f8;
+        color: #9b2929;
+        font-size: 13px;
       }
 
       .hashBlock {
