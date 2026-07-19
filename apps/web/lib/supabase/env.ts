@@ -1,30 +1,18 @@
-const REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES = [
-  "NEXT_PUBLIC_SUPABASE_URL",
-  "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-] as const;
-
-type RequiredPublicEnvironmentVariable =
-  (typeof REQUIRED_PUBLIC_ENVIRONMENT_VARIABLES)[number];
-
-function readRequiredEnvironmentVariable(
-  name: RequiredPublicEnvironmentVariable,
-): string {
-  const value = process.env[name]?.trim();
-
-  if (!value) {
-    throw new Error(
-      `Missing required environment variable: ${name}. ` +
-        "Configure it locally and in the Vercel project before using the account system.",
-    );
-  }
-
-  return value;
+export interface SupabasePublicEnvironment {
+  url: string;
+  publishableKey: string;
 }
 
 function readSupabaseUrl(): string {
-  const value = readRequiredEnvironmentVariable(
-    "NEXT_PUBLIC_SUPABASE_URL",
-  );
+  const value =
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+
+  if (!value) {
+    throw new Error(
+      "Missing required environment variable: NEXT_PUBLIC_SUPABASE_URL. " +
+        "Configure it locally and in the Vercel project before using the account system.",
+    );
+  }
 
   let parsedUrl: URL;
 
@@ -36,7 +24,10 @@ function readSupabaseUrl(): string {
     );
   }
 
-  if (parsedUrl.protocol !== "https:" && parsedUrl.hostname !== "localhost") {
+  if (
+    parsedUrl.protocol !== "https:" &&
+    parsedUrl.hostname !== "localhost"
+  ) {
     throw new Error(
       "NEXT_PUBLIC_SUPABASE_URL must use HTTPS unless it points to localhost.",
     );
@@ -45,16 +36,23 @@ function readSupabaseUrl(): string {
   return parsedUrl.toString().replace(/\/$/, "");
 }
 
-export interface SupabasePublicEnvironment {
-  url: string;
-  publishableKey: string;
+function readSupabasePublishableKey(): string {
+  const value =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim();
+
+  if (!value) {
+    throw new Error(
+      "Missing required environment variable: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY. " +
+        "Configure it locally and in the Vercel project before using the account system.",
+    );
+  }
+
+  return value;
 }
 
 export function getSupabasePublicEnvironment(): SupabasePublicEnvironment {
   return {
     url: readSupabaseUrl(),
-    publishableKey: readRequiredEnvironmentVariable(
-      "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY",
-    ),
+    publishableKey: readSupabasePublishableKey(),
   };
 }
