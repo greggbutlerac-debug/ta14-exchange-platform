@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 
 import ShareExchangeButton from '../components/share-exchange-button';
 
 import './globals.css';
+
+const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -129,6 +132,28 @@ export default function RootLayout({
         </div>
 
         {children}
+
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+              window.dataLayer.push(arguments);
+            }
+
+            gtag('js', new Date());
+
+            gtag('config', '${GA_MEASUREMENT_ID}', {
+              page_path: window.location.pathname,
+              anonymize_ip: true
+            });
+          `}
+        </Script>
       </body>
     </html>
   );
