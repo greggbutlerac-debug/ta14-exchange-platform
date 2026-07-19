@@ -361,7 +361,8 @@ export default function HomePage() {
           .ambient-orb,
           .ambient-beam,
           .ambient-stars,
-          .ring {
+          .ring,
+          .air-sensor {
             animation: none !important;
           }
         }
@@ -945,11 +946,46 @@ export default function HomePage() {
           box-shadow: var(--shadow-green);
         }
 
+        .built-lanes {
+          display: grid;
+          grid-template-columns: 0.92fr 1.08fr;
+          gap: 20px;
+          margin-top: 30px;
+        }
+
+        .built-lane {
+          position: relative;
+          overflow: hidden;
+          border-radius: 24px;
+          padding: 26px;
+          border: 1px solid rgba(255,255,255,0.075);
+          background: rgba(255,255,255,0.026);
+        }
+
+        .built-lane.atmospheric {
+          border-color: rgba(84,232,255,0.22);
+          background:
+            radial-gradient(circle at 72% 24%, rgba(84,232,255,0.1), transparent 34%),
+            linear-gradient(145deg, rgba(41,167,255,0.065), rgba(3,8,14,0.42));
+        }
+
+        .built-lane h3 {
+          margin: 10px 0 10px;
+          font-size: clamp(25px, 3vw, 34px);
+          letter-spacing: -0.035em;
+        }
+
+        .built-lane > p {
+          margin: 0;
+          color: var(--muted);
+          line-height: 1.65;
+        }
+
         .building-flow {
           display: grid;
-          grid-template-columns: repeat(6, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 10px;
-          margin-top: 30px;
+          margin-top: 22px;
         }
 
         .building-step {
@@ -969,6 +1005,96 @@ export default function HomePage() {
 
         .building-step.hold { border-color: rgba(255,212,106,0.3); color: var(--gold); }
         .building-step.allow { border-color: rgba(57,242,161,0.3); color: var(--green); }
+
+
+        .air-core {
+          position: relative;
+          min-height: 390px;
+          margin-top: 22px;
+          display: grid;
+          place-items: center;
+          border-radius: 22px;
+          border: 1px solid rgba(84,232,255,0.13);
+          background:
+            linear-gradient(rgba(84,232,255,0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(84,232,255,0.025) 1px, transparent 1px),
+            radial-gradient(circle, rgba(41,167,255,0.08), transparent 62%);
+          background-size: 28px 28px, 28px 28px, auto;
+          overflow: hidden;
+        }
+
+        .air-core::before,
+        .air-core::after {
+          content: "";
+          position: absolute;
+          border-radius: 50%;
+          border: 1px solid rgba(84,232,255,0.15);
+        }
+
+        .air-core::before { width: 290px; height: 290px; }
+        .air-core::after { width: 205px; height: 205px; border-color: rgba(57,242,161,0.13); }
+
+        .air-record-orb {
+          position: relative;
+          z-index: 3;
+          width: 126px;
+          height: 126px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          text-align: center;
+          font-weight: 950;
+          letter-spacing: 0.06em;
+          line-height: 1.15;
+          color: white;
+          background: radial-gradient(circle at 35% 28%, #fff 0 2%, var(--cyan) 4%, #0c507f 36%, #06121f 72%);
+          box-shadow: 0 0 54px rgba(84,232,255,0.4), 0 0 94px rgba(57,242,161,0.12);
+        }
+
+        .air-sensor {
+          position: absolute;
+          z-index: 4;
+          padding: 8px 10px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.1);
+          background: rgba(3,8,14,0.88);
+          color: #c9d9e8;
+          font-size: 10px;
+          font-weight: 850;
+          white-space: nowrap;
+          box-shadow: 0 8px 24px rgba(0,0,0,0.28);
+          animation: airSensorFloat 6s ease-in-out infinite alternate;
+        }
+
+        .air-sensor:nth-of-type(2) { left: 6%; top: 10%; }
+        .air-sensor:nth-of-type(3) { left: 38%; top: 4%; animation-delay: -1s; }
+        .air-sensor:nth-of-type(4) { right: 5%; top: 13%; animation-delay: -2s; }
+        .air-sensor:nth-of-type(5) { left: 2%; top: 38%; animation-delay: -3s; }
+        .air-sensor:nth-of-type(6) { right: 2%; top: 38%; animation-delay: -4s; }
+        .air-sensor:nth-of-type(7) { left: 5%; bottom: 20%; animation-delay: -5s; }
+        .air-sensor:nth-of-type(8) { left: 35%; bottom: 8%; animation-delay: -1.8s; }
+        .air-sensor:nth-of-type(9) { right: 5%; bottom: 20%; animation-delay: -2.8s; }
+        .air-sensor:nth-of-type(10) { left: 18%; top: 25%; animation-delay: -3.8s; }
+        .air-sensor:nth-of-type(11) { right: 18%; top: 25%; animation-delay: -4.8s; }
+        .air-sensor:nth-of-type(12) { left: 17%; bottom: 38%; animation-delay: -0.8s; }
+        .air-sensor:nth-of-type(13) { right: 17%; bottom: 38%; animation-delay: -2.4s; }
+        .air-sensor:nth-of-type(14) { left: 42%; top: 22%; animation-delay: -3.4s; }
+
+        @keyframes airSensorFloat {
+          from { transform: translate3d(0, -3px, 0); }
+          to { transform: translate3d(5px, 7px, 0); }
+        }
+
+        .air-record-footer {
+          margin-top: 16px;
+          padding: 14px 16px;
+          border-radius: 15px;
+          border: 1px solid rgba(57,242,161,0.13);
+          background: rgba(57,242,161,0.035);
+          color: #aec2d2;
+          font-size: 13px;
+          line-height: 1.6;
+        }
 
         .boundary-note {
           margin-top: 24px;
@@ -1498,6 +1624,7 @@ export default function HomePage() {
           .chain-grid,
           .path-grid,
           .constitutional-grid,
+          .built-lanes,
           .building-flow,
           .product-grid,
           .records-grid,
@@ -1864,8 +1991,10 @@ export default function HomePage() {
                 <div className="card-icon">◎</div>
                 <h3>Governed Records</h3>
                 <p>
-                  Create durable records that preserve identity, evidence,
-                  authority, decisions, corrections, execution, and outcome.
+                  Create Admissible Execution Records, Atmospheric Integrity
+                  Records, decision records, review packages, replay packages,
+                  and verification records that preserve identity, evidence,
+                  authority, execution, boundaries, and outcome.
                 </p>
               </article>
               <article className="card">
@@ -2458,53 +2587,117 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
             <article className="built-spotlight">
               <div className="section-heading" style={{ marginBottom: 0 }}>
                 <div className="eyebrow">Built environment spotlight</div>
-                <h2>From smart buildings to governed building execution.</h2>
+                <h2>
+                  Govern what the building does—and preserve what the atmosphere
+                  actually was.
+                </h2>
                 <p>
                   BAS, analytics, digital twins, commissioning, TAB,
                   cybersecurity, sensors, equipment platforms, and operators
-                  each hold part of the operational truth. TA-14 provides a
-                  neutral route for binding those contributions into inspectable
-                  consequential execution.
+                  each hold part of the operational truth. TA-14 binds those
+                  contributions into two connected surfaces: governed building
+                  execution and Atmospheric Integrity Records.
                 </p>
               </div>
 
-              <div
-                className="building-flow"
-                aria-label="Building override governance example"
-              >
-                <div className="building-step">
-                  Room warming
-                  <br />
-                  condition observed
-                </div>
-                <div className="building-step">
-                  Evidence and operator identity captured
-                </div>
-                <div className="building-step hold">
-                  HOLD
-                  <br />
-                  duration and release missing
-                </div>
-                <div className="building-step">
-                  Route corrected and command bound
-                </div>
-                <div className="building-step allow">
-                  ALLOW
-                  <br />
-                  committed before action
-                </div>
-                <div className="building-step">
-                  Automatic control restored and outcome verified
-                </div>
+              <div className="built-lanes">
+                <section className="built-lane">
+                  <div className="eyebrow">Governed building execution</div>
+                  <h3>From command to verified restoration.</h3>
+                  <p>
+                    Preserve why an override, optimization, alarm response,
+                    equipment restart, or operator intervention was permitted,
+                    what actually executed, and whether normal operation was
+                    restored.
+                  </p>
+
+                  <div
+                    className="building-flow"
+                    aria-label="Building override governance example"
+                  >
+                    <div className="building-step">
+                      Room warming
+                      <br />
+                      condition observed
+                    </div>
+                    <div className="building-step">
+                      Evidence and operator identity captured
+                    </div>
+                    <div className="building-step hold">
+                      HOLD
+                      <br />
+                      duration and release missing
+                    </div>
+                    <div className="building-step">
+                      Route corrected and command bound
+                    </div>
+                    <div className="building-step allow">
+                      ALLOW
+                      <br />
+                      committed before action
+                    </div>
+                    <div className="building-step">
+                      Automatic control restored and outcome verified
+                    </div>
+                  </div>
+                </section>
+
+                <section className="built-lane atmospheric">
+                  <div className="eyebrow">Atmospheric Integrity Record</div>
+                  <h3>
+                    Thirteen atmospheric evidence channels. One governed record.
+                  </h3>
+                  <p>
+                    An AIR preserves whether environmental reality supported the
+                    intended activity, which instruments and thresholds were
+                    relied upon, what intervention occurred, and whether the
+                    atmosphere returned to a valid and persistent condition.
+                  </p>
+
+                  <div
+                    className="air-core"
+                    aria-label="Atmospheric Integrity Record evidence channels"
+                  >
+                    <div className="air-record-orb">
+                      TA-14
+                      <br />
+                      AIR
+                    </div>
+                    <span className="air-sensor">Dry-bulb</span>
+                    <span className="air-sensor">Wet-bulb</span>
+                    <span className="air-sensor">Relative humidity</span>
+                    <span className="air-sensor">Dew point</span>
+                    <span className="air-sensor">Enthalpy</span>
+                    <span className="air-sensor">Humidity ratio</span>
+                    <span className="air-sensor">Specific volume</span>
+                    <span className="air-sensor">Pressure</span>
+                    <span className="air-sensor">VOCs</span>
+                    <span className="air-sensor">Radon</span>
+                    <span className="air-sensor">Sound dB</span>
+                    <span className="air-sensor">Particulate matter</span>
+                    <span className="air-sensor">CO₂</span>
+                  </div>
+
+                  <div className="air-record-footer">
+                    <strong>Seven psychrometrics:</strong> dry-bulb, wet-bulb,
+                    relative humidity, dew point, enthalpy, humidity ratio, and
+                    specific volume—joined by pressure, VOCs, radon, sound
+                    level, particulate matter, and CO₂. Additional bounded
+                    atmospheric evidence can be attached when the route requires
+                    it.
+                  </div>
+                </section>
               </div>
 
               <div className="boundary-note">
-                <strong>Operational boundary:</strong> TA-14 governs
-                consequential execution inside buildings—not the building
-                itself. The BAS and qualified professionals retain operational
-                control and domain responsibility; the Exchange preserves what
-                evidence, authority, boundaries, action, and outcome were
-                actually demonstrated.
+                <strong>Connected but distinct:</strong> the BAS explains what
+                the building system sensed, commanded, and executed. The
+                Atmospheric Integrity Record preserves whether the atmospheric
+                reality was valid for the intended activity and whether the
+                intervention produced a verified environmental outcome. TA-14
+                does not replace the BAS, instruments, commissioning, TAB, or
+                qualified professionals; it governs and preserves the
+                inspectable route around consequence.
               </div>
             </article>
           </section>
