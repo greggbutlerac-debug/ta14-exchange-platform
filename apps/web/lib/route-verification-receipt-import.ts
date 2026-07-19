@@ -9,7 +9,11 @@ export type RouteVerificationPackageImportResult = {
 };
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
+  return (
+    typeof value === "object" &&
+    value !== null &&
+    !Array.isArray(value)
+  );
 }
 
 function requireString(
@@ -19,7 +23,9 @@ function requireString(
   const value = record[key];
 
   if (typeof value !== "string" || value.trim() === "") {
-    throw new Error(`Invalid verification package: "${key}" must be a non-empty string.`);
+    throw new Error(
+      `Invalid verification package: "${key}" must be a non-empty string.`,
+    );
   }
 
   return value;
@@ -32,7 +38,24 @@ function requireNumber(
   const value = record[key];
 
   if (typeof value !== "number" || !Number.isFinite(value)) {
-    throw new Error(`Invalid verification package: "${key}" must be a finite number.`);
+    throw new Error(
+      `Invalid verification package: "${key}" must be a finite number.`,
+    );
+  }
+
+  return value;
+}
+
+function requireBoolean(
+  record: Record<string, unknown>,
+  key: string,
+): boolean {
+  const value = record[key];
+
+  if (typeof value !== "boolean") {
+    throw new Error(
+      `Invalid verification package: "${key}" must be a boolean.`,
+    );
   }
 
   return value;
@@ -48,7 +71,9 @@ function requireStringArray(
     !Array.isArray(value) ||
     value.some((item) => typeof item !== "string")
   ) {
-    throw new Error(`Invalid verification package: "${key}" must be an array of strings.`);
+    throw new Error(
+      `Invalid verification package: "${key}" must be an array of strings.`,
+    );
   }
 
   return value;
@@ -56,7 +81,9 @@ function requireStringArray(
 
 function parseReceipt(value: unknown): RouteVerificationReceipt {
   if (!isRecord(value)) {
-    throw new Error("Invalid verification package: receipt is missing.");
+    throw new Error(
+      "Invalid verification package: receipt is missing.",
+    );
   }
 
   const snapshot = value.routeSnapshotJson;
@@ -69,17 +96,22 @@ function parseReceipt(value: unknown): RouteVerificationReceipt {
 
   return {
     id: requireString(value, "id"),
+    routeRecordId: requireString(value, "routeRecordId"),
     routeId: requireString(value, "routeId"),
-    userId: requireString(value, "userId"),
     readinessStatus: requireString(
       value,
       "readinessStatus",
     ) as RouteVerificationReceipt["readinessStatus"],
     readinessScore: requireNumber(value, "readinessScore"),
+    readinessMaximumScore: requireNumber(
+      value,
+      "readinessMaximumScore",
+    ),
     readinessPercentage: requireNumber(
       value,
       "readinessPercentage",
     ),
+    artifactCount: requireNumber(value, "artifactCount"),
     verifiedCount: requireNumber(value, "verifiedCount"),
     mismatchCount: requireNumber(value, "mismatchCount"),
     missingCount: requireNumber(value, "missingCount"),
@@ -118,7 +150,7 @@ function parseValidation(
       value,
       "calculatedSha256",
     ),
-    hashMatches: Boolean(value.hashMatches),
+    hashMatches: requireBoolean(value, "hashMatches"),
     referencedArtifactReceiptCount: requireNumber(
       value,
       "referencedArtifactReceiptCount",
@@ -156,7 +188,8 @@ export function parseRouteVerificationExportPackage(
   }
 
   if (
-    parsed.packageType !== "TA14_ROUTE_VERIFICATION_RECEIPT"
+    parsed.packageType !==
+    "TA14_ROUTE_VERIFICATION_RECEIPT"
   ) {
     throw new Error(
       "Invalid verification package: unsupported package type.",
