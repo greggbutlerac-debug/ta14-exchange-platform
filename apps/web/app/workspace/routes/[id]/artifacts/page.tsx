@@ -50,6 +50,7 @@ import {
 } from "../../../../../lib/imported-route-verification-replay";
 import {
   createImportedRouteReplayReceipt,
+  getLatestImportedRouteReplayReceipt,
   type ImportedRouteReplayReceipt,
 } from "../../../../../lib/imported-route-replay-receipts";
 
@@ -565,8 +566,14 @@ export default function RouteArtifactsPage() {
       const result = await readRouteVerificationExportFile(file);
       setImportedRoutePackage(result);
       setImportedRouteReplay(null);
-      setPreservedImportedReplayReceipt(null);
       setImportedReplayReceiptMessage("");
+
+      const latestReceipt =
+        await getLatestImportedRouteReplayReceipt(
+          result.receipt.id,
+        );
+
+      setPreservedImportedReplayReceipt(latestReceipt);
     } catch (error) {
       setImportedRoutePackage(null);
       setRoutePackageImportMessage(
@@ -1267,7 +1274,9 @@ export default function RouteArtifactsPage() {
                     {preservedImportedReplayReceipt ? (
                       <div className="preservedImportedReplayReceipt">
                         <div>
-                          <span>Preserved replay receipt</span>
+                          <span>
+                            Latest preserved replay receipt
+                          </span>
                           <strong>
                             {preservedImportedReplayReceipt.replayStatus}
                           </strong>
