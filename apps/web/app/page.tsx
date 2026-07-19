@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -16,42 +15,133 @@ const chain = [
   'Outcome',
 ];
 
+const lifecycle = [
+  {
+    number: '01',
+    title: 'Build',
+    text: 'Construct the complete route from present reality through intended outcome.',
+  },
+  {
+    number: '02',
+    title: 'Test',
+    text: 'Challenge evidence, identity, continuity, authority, binding, and execution readiness.',
+  },
+  {
+    number: '03',
+    title: 'Correct',
+    text: 'Receive exact HOLD, DENY, or ESCALATE reasons and repair the route before consequence.',
+  },
+  {
+    number: '04',
+    title: 'Preserve',
+    text: 'Create a governed record containing the route, decision, evidence, receipts, and outcome.',
+  },
+  {
+    number: '05',
+    title: 'Verify',
+    text: 'Check signatures, hashes, dependencies, continuity, and correspondence independently.',
+  },
+  {
+    number: '06',
+    title: 'Replay',
+    text: 'Reconstruct what occurred without depending on trust in a private dashboard.',
+  },
+];
+
+const governedRecordContents = [
+  'Exact route identity and version',
+  'Evidence and provenance references',
+  'Authority and actor bindings',
+  'Applicable rules and thresholds',
+  'Decision state and reason codes',
+  'Correction and rerun history',
+  'Commit and execution receipts',
+  'Cryptographic integrity values',
+  'Outcome correspondence',
+  'Independent replay package',
+];
+
+const platformCapabilities = [
+  {
+    icon: '◇',
+    title: 'Route Construction',
+    text: 'Build a complete Reality-to-Outcome route with declared actors, evidence, rules, authority, intended execution, and outcome.',
+    href: '/workspace/routes/new',
+    action: 'Build a Route',
+  },
+  {
+    icon: '▣',
+    title: 'Governed Record Creation',
+    text: 'Turn an evaluated route into a structured, integrity-bound record that preserves what was known, decided, corrected, executed, and observed.',
+    href: '/workspace/records',
+    action: 'Create a Governed Record',
+  },
+  {
+    icon: '✓',
+    title: 'Independent Verification',
+    text: 'Inspect route identity, evidence integrity, decision receipts, signatures, continuity, commit correspondence, and outcome correspondence.',
+    href: '/workspace/verification',
+    action: 'Open Verification',
+  },
+  {
+    icon: '↻',
+    title: 'Replay and Comparison',
+    text: 'Import, reconstruct, and compare governed route packages so verification does not depend on the originating system.',
+    href: '/workspace',
+    action: 'Enter Workspace',
+  },
+  {
+    icon: '◎',
+    title: 'Governance Exchange',
+    text: 'Prepare governance routes, records, templates, review layers, and verification packages for bounded sharing and future exchange publication.',
+    href: '/workspace',
+    action: 'Explore the Exchange',
+  },
+  {
+    icon: 'API',
+    title: 'Runtime Integration',
+    text: 'Connect external agents, policy engines, registries, evidence systems, and execution environments to a common governed route.',
+    href: 'mailto:ta14admissibleexecution@gmail.com',
+    action: 'Request Integration Access',
+  },
+];
+
 const useCases = [
   {
     title: 'AI Agents',
-    text: 'Bind identity, authority, tools, payloads, destinations, and outcomes before autonomous action.',
+    text: 'Bind identity, delegated authority, tools, payloads, destinations, commitments, and outcomes before autonomous action.',
   },
   {
     title: 'Finance',
-    text: 'Prove who authorized a transaction, what evidence supported it, and what actually executed.',
+    text: 'Prove who authorized a transaction, what evidence supported it, what object was committed, and what actually executed.',
   },
   {
     title: 'Healthcare',
-    text: 'Preserve accountable human authority, evidence freshness, model version, override, and outcome.',
+    text: 'Preserve accountable human authority, evidence freshness, model version, intervention boundaries, overrides, and outcomes.',
   },
   {
     title: 'Infrastructure',
-    text: 'Govern consequential execution across buildings, energy, environmental systems, and operations.',
+    text: 'Govern consequential execution across buildings, energy, environmental systems, industrial operations, and critical controls.',
   },
   {
     title: 'Government',
-    text: 'Create reconstructable records for public authority, administrative action, evidence, and consequence.',
+    text: 'Create reconstructable records for public authority, administrative action, evidence, correction, execution, and consequence.',
   },
   {
     title: 'Enterprise',
-    text: 'Turn governance policies into route-level execution controls, receipts, correction, and durable proof.',
+    text: 'Convert policies and approvals into route-level controls, receipts, correction paths, durable records, and replayable proof.',
   },
 ];
 
 function makeRid() {
-  return `TA14-RID-${Date.now().toString(36).toUpperCase()}`;
+  return `TA-14-RID-${Date.now().toString(36).toUpperCase()}`;
 }
 
 function makeHash(value: string) {
   let hash = 2166136261;
 
-  for (let i = 0; i < value.length; i += 1) {
-    hash ^= value.charCodeAt(i);
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
     hash = Math.imul(hash, 16777619);
   }
 
@@ -68,20 +158,25 @@ export default function HomePage() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const stateLabel = useMemo(() => {
-    if (routeState === 'IDLE') return 'READY';
+    if (routeState === 'IDLE') {
+      return 'READY';
+    }
+
     return routeState;
   }, [routeState]);
 
   useEffect(() => {
-    if (routeState !== 'RUNNING') return;
+    if (routeState !== 'RUNNING') {
+      return;
+    }
 
     if (activeStage >= chain.length - 1) {
       const timer = window.setTimeout(() => {
         if (authorityCorrected) {
+          const newRid = makeRid();
+
           setRouteState('ALLOW');
           setRecordOpen(true);
-
-          const newRid = makeRid();
           setRid(newRid);
           setManifestHash(
             makeHash(
@@ -102,6 +197,10 @@ export default function HomePage() {
 
     return () => window.clearTimeout(timer);
   }, [routeState, activeStage, authorityCorrected]);
+
+  function closeMobileMenu() {
+    setMobileMenuOpen(false);
+  }
 
   function runRoute() {
     setRecordOpen(false);
@@ -134,20 +233,22 @@ export default function HomePage() {
       <style>{`
         :root {
           color-scheme: dark;
-          --bg: #03060b;
+          --bg: #02050a;
           --bg-soft: #07101a;
-          --panel: rgba(10, 19, 31, 0.72);
-          --panel-strong: rgba(8, 15, 26, 0.92);
-          --line: rgba(116, 166, 221, 0.16);
+          --panel: rgba(9, 18, 30, 0.76);
+          --panel-strong: rgba(6, 13, 23, 0.94);
+          --line: rgba(123, 174, 229, 0.17);
+          --line-strong: rgba(84, 232, 255, 0.3);
           --text: #f4f8ff;
-          --muted: #95a8bd;
+          --muted: #98abc0;
+          --muted-light: #bed0e3;
           --blue: #29a7ff;
           --cyan: #54e8ff;
           --green: #39f2a1;
           --red: #ff456b;
           --gold: #ffd46a;
-          --shadow-blue: 0 0 60px rgba(41, 167, 255, 0.18);
-          --shadow-green: 0 0 60px rgba(57, 242, 161, 0.14);
+          --shadow-blue: 0 0 60px rgba(41, 167, 255, 0.17);
+          --shadow-green: 0 0 60px rgba(57, 242, 161, 0.13);
         }
 
         * {
@@ -161,10 +262,22 @@ export default function HomePage() {
         body {
           margin: 0;
           background:
-            radial-gradient(circle at 15% 10%, rgba(41, 167, 255, 0.15), transparent 30%),
-            radial-gradient(circle at 80% 15%, rgba(57, 242, 161, 0.09), transparent 28%),
-            radial-gradient(circle at 50% 85%, rgba(255, 69, 107, 0.08), transparent 34%),
-            linear-gradient(180deg, #02050a 0%, #06101b 48%, #02050a 100%);
+            radial-gradient(
+              circle at 12% 8%,
+              rgba(41, 167, 255, 0.15),
+              transparent 28%
+            ),
+            radial-gradient(
+              circle at 88% 18%,
+              rgba(57, 242, 161, 0.085),
+              transparent 26%
+            ),
+            radial-gradient(
+              circle at 50% 88%,
+              rgba(255, 69, 107, 0.07),
+              transparent 34%
+            ),
+            linear-gradient(180deg, #02050a 0%, #07111d 48%, #02050a 100%);
           color: var(--text);
           font-family:
             Inter,
@@ -181,13 +294,21 @@ export default function HomePage() {
           content: "";
           position: fixed;
           inset: 0;
+          z-index: 0;
           pointer-events: none;
-          opacity: 0.28;
+          opacity: 0.24;
           background-image:
-            linear-gradient(rgba(255,255,255,0.024) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.024) 1px, transparent 1px);
+            linear-gradient(
+              rgba(255, 255, 255, 0.024) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.024) 1px,
+              transparent 1px
+            );
           background-size: 34px 34px;
-          mask-image: linear-gradient(to bottom, black, transparent 88%);
+          mask-image: linear-gradient(to bottom, black, transparent 90%);
         }
 
         a {
@@ -199,51 +320,56 @@ export default function HomePage() {
           font: inherit;
         }
 
+        button:disabled {
+          cursor: wait;
+          opacity: 0.72;
+        }
+
         .site-shell {
-          min-height: 100vh;
           position: relative;
+          min-height: 100vh;
           overflow: hidden;
         }
 
         .ambient {
           position: fixed;
           inset: 0;
+          z-index: 0;
           pointer-events: none;
           overflow: hidden;
-          z-index: 0;
         }
 
         .ambient-orb {
           position: absolute;
           border-radius: 999px;
           filter: blur(90px);
-          opacity: 0.22;
+          opacity: 0.2;
           animation: drift 14s ease-in-out infinite alternate;
         }
 
         .ambient-orb.one {
           width: 430px;
           height: 430px;
-          background: var(--blue);
           top: -180px;
           left: -120px;
+          background: var(--blue);
         }
 
         .ambient-orb.two {
           width: 360px;
           height: 360px;
-          background: var(--green);
-          right: -120px;
           top: 250px;
+          right: -120px;
+          background: var(--green);
           animation-delay: -5s;
         }
 
         .ambient-orb.three {
           width: 320px;
           height: 320px;
-          background: var(--red);
-          left: 38%;
           bottom: -160px;
+          left: 38%;
+          background: var(--red);
           animation-delay: -8s;
         }
 
@@ -251,16 +377,17 @@ export default function HomePage() {
           from {
             transform: translate3d(-24px, -20px, 0) scale(1);
           }
+
           to {
             transform: translate3d(30px, 26px, 0) scale(1.12);
           }
         }
 
         .container {
-          width: min(1180px, 92vw);
-          margin: 0 auto;
           position: relative;
           z-index: 2;
+          width: min(1200px, 92vw);
+          margin: 0 auto;
         }
 
         .nav {
@@ -268,12 +395,12 @@ export default function HomePage() {
           top: 0;
           z-index: 50;
           border-bottom: 1px solid var(--line);
-          background: rgba(3, 7, 13, 0.72);
-          backdrop-filter: blur(18px);
+          background: rgba(3, 7, 13, 0.78);
+          backdrop-filter: blur(20px);
         }
 
         .nav-inner {
-          min-height: 72px;
+          min-height: 76px;
           display: flex;
           align-items: center;
           justify-content: space-between;
@@ -284,38 +411,62 @@ export default function HomePage() {
           display: inline-flex;
           align-items: center;
           gap: 12px;
+          color: var(--text);
           text-decoration: none;
+          font-size: 13px;
           font-weight: 850;
           letter-spacing: 0.08em;
-          font-size: 14px;
         }
 
         .brand-mark {
-          width: 42px;
+          min-width: 64px;
           height: 42px;
+          padding: 0 11px;
           display: grid;
           place-items: center;
-          border-radius: 14px;
           border: 1px solid rgba(84, 232, 255, 0.42);
+          border-radius: 13px;
           background:
-            linear-gradient(145deg, rgba(41, 167, 255, 0.18), rgba(57, 242, 161, 0.08));
+            linear-gradient(
+              145deg,
+              rgba(41, 167, 255, 0.2),
+              rgba(57, 242, 161, 0.08)
+            );
           box-shadow:
-            0 0 26px rgba(84, 232, 255, 0.2),
-            inset 0 0 18px rgba(255,255,255,0.05);
+            0 0 26px rgba(84, 232, 255, 0.18),
+            inset 0 0 18px rgba(255, 255, 255, 0.05);
           color: var(--cyan);
+          font-size: 13px;
           font-weight: 950;
+          letter-spacing: -0.02em;
+        }
+
+        .brand-copy {
+          display: grid;
+          gap: 2px;
+        }
+
+        .brand-copy strong {
+          font-size: 13px;
+          line-height: 1;
+        }
+
+        .brand-copy small {
+          color: var(--muted);
+          font-size: 9px;
+          letter-spacing: 0.16em;
         }
 
         .nav-links {
           display: flex;
           align-items: center;
-          gap: 24px;
+          gap: 21px;
         }
 
         .nav-links a {
-          text-decoration: none;
           color: var(--muted);
-          font-size: 14px;
+          text-decoration: none;
+          font-size: 13px;
           transition: color 180ms ease;
         }
 
@@ -324,30 +475,34 @@ export default function HomePage() {
         }
 
         .menu-button {
-          display: none;
           width: 44px;
           height: 44px;
-          border-radius: 12px;
+          display: none;
+          place-items: center;
           border: 1px solid var(--line);
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.04);
           color: white;
-          background: rgba(255,255,255,0.04);
+          cursor: pointer;
         }
 
         .button {
-          border: 0;
-          border-radius: 14px;
+          min-height: 47px;
           padding: 13px 20px;
-          font-weight: 850;
-          cursor: pointer;
-          text-decoration: none;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           gap: 9px;
+          border: 0;
+          border-radius: 14px;
+          text-decoration: none;
+          font-weight: 850;
+          cursor: pointer;
           transition:
             transform 180ms ease,
             box-shadow 180ms ease,
-            border-color 180ms ease;
+            border-color 180ms ease,
+            background 180ms ease;
         }
 
         .button:hover {
@@ -355,17 +510,22 @@ export default function HomePage() {
         }
 
         .button-primary {
-          color: #04110d;
+          color: #04110d !important;
           background: linear-gradient(90deg, var(--cyan), var(--green));
           box-shadow:
-            0 0 28px rgba(84, 232, 255, 0.23),
+            0 0 28px rgba(84, 232, 255, 0.22),
             0 0 46px rgba(57, 242, 161, 0.1);
         }
 
         .button-secondary {
-          color: var(--text);
           border: 1px solid var(--line);
-          background: rgba(255,255,255,0.045);
+          background: rgba(255, 255, 255, 0.045);
+          color: var(--text) !important;
+        }
+
+        .button-secondary:hover {
+          border-color: var(--line-strong);
+          background: rgba(84, 232, 255, 0.06);
         }
 
         .button-danger {
@@ -375,12 +535,12 @@ export default function HomePage() {
         }
 
         .hero {
-          min-height: calc(100vh - 72px);
+          min-height: calc(100vh - 76px);
+          padding: 86px 0 76px;
           display: grid;
           grid-template-columns: 1.08fr 0.92fr;
-          gap: 54px;
+          gap: 58px;
           align-items: center;
-          padding: 86px 0 72px;
         }
 
         .eyebrow {
@@ -392,11 +552,11 @@ export default function HomePage() {
         }
 
         .hero h1 {
-          margin: 18px 0 22px;
-          font-size: clamp(54px, 7.5vw, 94px);
-          line-height: 0.94;
-          letter-spacing: -0.055em;
           max-width: 850px;
+          margin: 18px 0 24px;
+          font-size: clamp(54px, 7.2vw, 92px);
+          line-height: 0.95;
+          letter-spacing: -0.058em;
         }
 
         .gradient-text {
@@ -408,30 +568,31 @@ export default function HomePage() {
               var(--green) 72%,
               #ffffff 100%
             );
-          color: transparent;
           background-clip: text;
           -webkit-background-clip: text;
+          color: transparent;
         }
 
         .hero-copy {
+          max-width: 730px;
+          margin: 0;
+          color: #b2c4d7;
           font-size: 20px;
-          line-height: 1.7;
-          color: #b0c1d4;
-          max-width: 720px;
+          line-height: 1.72;
         }
 
         .hero-actions {
+          margin-top: 30px;
           display: flex;
           flex-wrap: wrap;
           gap: 14px;
-          margin-top: 30px;
         }
 
         .signal-row {
+          margin-top: 34px;
           display: flex;
           flex-wrap: wrap;
           gap: 18px;
-          margin-top: 34px;
         }
 
         .signal {
@@ -464,32 +625,36 @@ export default function HomePage() {
         }
 
         .execution-core {
-          min-height: 470px;
           position: relative;
+          min-height: 500px;
           display: grid;
           place-items: center;
-          border-radius: 36px;
+          overflow: hidden;
           border: 1px solid var(--line);
+          border-radius: 36px;
           background:
-            linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+            linear-gradient(
+              145deg,
+              rgba(255, 255, 255, 0.046),
+              rgba(255, 255, 255, 0.014)
+            );
           box-shadow:
             var(--shadow-blue),
-            inset 0 0 90px rgba(41,167,255,0.035);
-          overflow: hidden;
+            inset 0 0 90px rgba(41, 167, 255, 0.035);
         }
 
         .execution-core::before {
           content: "";
           position: absolute;
           inset: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.035);
           border-radius: 28px;
-          border: 1px solid rgba(255,255,255,0.035);
         }
 
         .ring {
           position: absolute;
+          border: 1px solid rgba(84, 232, 255, 0.28);
           border-radius: 50%;
-          border: 1px solid rgba(84,232,255,0.28);
         }
 
         .ring.one {
@@ -501,24 +666,28 @@ export default function HomePage() {
         .ring.two {
           width: 260px;
           height: 260px;
-          border-color: rgba(57,242,161,0.26);
+          border-color: rgba(57, 242, 161, 0.26);
           animation: rotateReverse 14s linear infinite;
         }
 
         .ring.three {
           width: 400px;
           height: 160px;
+          border-color: rgba(255, 69, 107, 0.18);
           transform: rotate(24deg);
-          border-color: rgba(255,69,107,0.18);
           animation: pulseRing 4s ease-in-out infinite alternate;
         }
 
         @keyframes rotate {
-          to { transform: rotate(360deg); }
+          to {
+            transform: rotate(360deg);
+          }
         }
 
         @keyframes rotateReverse {
-          to { transform: rotate(-360deg); }
+          to {
+            transform: rotate(-360deg);
+          }
         }
 
         @keyframes pulseRing {
@@ -526,6 +695,7 @@ export default function HomePage() {
             opacity: 0.35;
             transform: rotate(24deg) scale(0.98);
           }
+
           to {
             opacity: 0.8;
             transform: rotate(24deg) scale(1.04);
@@ -533,30 +703,37 @@ export default function HomePage() {
         }
 
         .core-orb {
-          width: 168px;
-          height: 168px;
-          border-radius: 50%;
           position: relative;
           z-index: 4;
+          width: 178px;
+          height: 178px;
           display: grid;
           place-items: center;
-          text-align: center;
-          font-weight: 950;
-          letter-spacing: 0.1em;
+          border-radius: 50%;
           background:
-            radial-gradient(circle at 34% 27%, #ffffff 0 2%, var(--cyan) 4%, #0d4c80 34%, #061321 68%);
+            radial-gradient(
+              circle at 34% 27%,
+              #ffffff 0 2%,
+              var(--cyan) 4%,
+              #0d4c80 34%,
+              #061321 68%
+            );
           box-shadow:
-            0 0 65px rgba(41,167,255,0.5),
-            0 0 110px rgba(57,242,161,0.13),
-            inset 0 0 36px rgba(255,255,255,0.24);
+            0 0 65px rgba(41, 167, 255, 0.5),
+            0 0 110px rgba(57, 242, 161, 0.13),
+            inset 0 0 36px rgba(255, 255, 255, 0.24);
+          text-align: center;
+          font-size: 18px;
+          font-weight: 950;
+          letter-spacing: 0.08em;
         }
 
         .core-node {
           position: absolute;
+          z-index: 5;
           width: 16px;
           height: 16px;
           border-radius: 50%;
-          z-index: 5;
         }
 
         .core-node.a {
@@ -574,41 +751,49 @@ export default function HomePage() {
         }
 
         .core-node.c {
-          bottom: 18%;
           right: 24%;
+          bottom: 18%;
           background: var(--red);
           box-shadow: 0 0 24px var(--red);
         }
 
         .core-caption {
           position: absolute;
-          bottom: 24px;
-          font-size: 12px;
+          bottom: 26px;
           color: var(--muted);
-          letter-spacing: 0.14em;
+          font-size: 11px;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
         }
 
         .section {
-          padding: 88px 0;
+          padding: 94px 0;
+          scroll-margin-top: 86px;
         }
 
         .section-heading {
-          max-width: 780px;
-          margin-bottom: 34px;
+          max-width: 820px;
+          margin-bottom: 38px;
         }
 
         .section-heading h2 {
-          margin: 10px 0 14px;
-          font-size: clamp(38px, 5vw, 58px);
+          margin: 11px 0 15px;
+          font-size: clamp(38px, 5vw, 60px);
           line-height: 1.03;
-          letter-spacing: -0.04em;
+          letter-spacing: -0.043em;
         }
 
         .section-heading p {
+          margin: 0;
           color: var(--muted);
           font-size: 18px;
-          line-height: 1.7;
+          line-height: 1.72;
+        }
+
+        .center-heading {
+          margin-right: auto;
+          margin-left: auto;
+          text-align: center;
         }
 
         .chain-grid {
@@ -619,66 +804,282 @@ export default function HomePage() {
 
         .chain-item {
           position: relative;
-          min-height: 92px;
+          min-height: 96px;
           padding: 16px 10px;
           display: grid;
           place-items: center;
-          border-radius: 16px;
-          text-align: center;
-          font-size: 12px;
-          font-weight: 900;
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
-          border: 1px solid var(--line);
-          background: rgba(255,255,255,0.035);
           overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 16px;
+          background: rgba(255, 255, 255, 0.035);
+          text-align: center;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.065em;
+          text-transform: uppercase;
         }
 
         .chain-item::after {
           content: "";
           position: absolute;
-          inset: auto 0 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
           height: 2px;
-          background: linear-gradient(90deg, transparent, var(--cyan), transparent);
-          opacity: 0.45;
+          background:
+            linear-gradient(
+              90deg,
+              transparent,
+              var(--cyan),
+              transparent
+            );
+          opacity: 0.46;
+        }
+
+        .principle-strip {
+          margin-top: 22px;
+          padding: 22px 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          border: 1px solid rgba(84, 232, 255, 0.2);
+          border-radius: 20px;
+          background:
+            linear-gradient(
+              90deg,
+              rgba(41, 167, 255, 0.07),
+              rgba(57, 242, 161, 0.045)
+            );
+        }
+
+        .principle-strip strong {
+          font-size: 18px;
+        }
+
+        .principle-strip span {
+          color: var(--muted);
+          line-height: 1.6;
+          text-align: right;
+        }
+
+        .lifecycle-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 16px;
+        }
+
+        .lifecycle-card {
+          position: relative;
+          min-height: 218px;
+          padding: 27px;
+          overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 22px;
+          background:
+            linear-gradient(
+              145deg,
+              rgba(255, 255, 255, 0.043),
+              rgba(255, 255, 255, 0.014)
+            );
+        }
+
+        .lifecycle-number {
+          color: var(--cyan);
+          font-size: 12px;
+          font-weight: 950;
+          letter-spacing: 0.15em;
+        }
+
+        .lifecycle-card h3 {
+          margin: 38px 0 10px;
+          font-size: 24px;
+        }
+
+        .lifecycle-card p {
+          margin: 0;
+          color: var(--muted);
+          line-height: 1.68;
+        }
+
+        .lifecycle-card::after {
+          content: attr(data-number);
+          position: absolute;
+          right: 14px;
+          bottom: -24px;
+          color: rgba(255, 255, 255, 0.025);
+          font-size: 110px;
+          font-weight: 950;
+          letter-spacing: -0.08em;
         }
 
         .product-grid {
-          margin-top: 28px;
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 18px;
         }
 
         .card {
-          border-radius: 22px;
-          padding: 26px;
+          padding: 27px;
+          display: flex;
+          flex-direction: column;
           border: 1px solid var(--line);
+          border-radius: 22px;
           background:
-            linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.017));
-          box-shadow: 0 18px 50px rgba(0,0,0,0.22);
+            linear-gradient(
+              145deg,
+              rgba(255, 255, 255, 0.046),
+              rgba(255, 255, 255, 0.016)
+            );
+          box-shadow: 0 18px 50px rgba(0, 0, 0, 0.21);
         }
 
         .card-icon {
-          width: 46px;
-          height: 46px;
+          width: 48px;
+          height: 48px;
           display: grid;
           place-items: center;
+          border: 1px solid rgba(84, 232, 255, 0.18);
           border-radius: 14px;
-          font-size: 22px;
-          background: rgba(84,232,255,0.08);
-          border: 1px solid rgba(84,232,255,0.18);
+          background: rgba(84, 232, 255, 0.08);
+          font-size: 19px;
+          font-weight: 900;
         }
 
         .card h3 {
-          margin: 18px 0 9px;
+          margin: 19px 0 9px;
           font-size: 21px;
         }
 
         .card p {
-          margin: 0;
+          margin: 0 0 22px;
           color: var(--muted);
-          line-height: 1.65;
+          line-height: 1.67;
+        }
+
+        .card-link {
+          margin-top: auto;
+          color: var(--cyan);
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 850;
+        }
+
+        .card-link:hover {
+          color: var(--green);
+        }
+
+        .records-hero {
+          padding: 38px;
+          display: grid;
+          grid-template-columns: 1fr 0.92fr;
+          gap: 30px;
+          align-items: stretch;
+          border: 1px solid rgba(84, 232, 255, 0.2);
+          border-radius: 30px;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(41, 167, 255, 0.09),
+              rgba(57, 242, 161, 0.052),
+              rgba(255, 255, 255, 0.018)
+            );
+          box-shadow: var(--shadow-blue);
+        }
+
+        .records-copy h2 {
+          margin: 12px 0 18px;
+          font-size: clamp(40px, 5vw, 62px);
+          line-height: 1.02;
+          letter-spacing: -0.05em;
+        }
+
+        .records-copy > p {
+          margin: 0;
+          color: var(--muted-light);
+          font-size: 18px;
+          line-height: 1.75;
+        }
+
+        .records-list {
+          margin: 26px 0 0;
+          padding: 0;
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 11px 18px;
+          list-style: none;
+        }
+
+        .records-list li {
+          color: #b9cadd;
+          font-size: 14px;
+          line-height: 1.5;
+        }
+
+        .records-list li::before {
+          content: "✓";
+          margin-right: 9px;
+          color: var(--green);
+          font-weight: 950;
+        }
+
+        .record-comparison {
+          padding: 25px;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 22px;
+          background: rgba(3, 8, 14, 0.54);
+        }
+
+        .comparison-title {
+          margin-bottom: 16px;
+          color: var(--cyan);
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .comparison-header,
+        .comparison-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 12px;
+        }
+
+        .comparison-header {
+          margin-bottom: 8px;
+        }
+
+        .comparison-header div {
+          padding: 12px;
+          border-radius: 12px;
+          background: rgba(255, 255, 255, 0.04);
+          font-size: 13px;
+          font-weight: 900;
+        }
+
+        .comparison-header div:last-child {
+          color: var(--green);
+          background: rgba(57, 242, 161, 0.07);
+        }
+
+        .comparison-row {
+          border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .comparison-row:last-child {
+          border-bottom: 0;
+        }
+
+        .comparison-row div {
+          padding: 12px;
+          color: var(--muted);
+          font-size: 13px;
+          line-height: 1.5;
+        }
+
+        .comparison-row div:last-child {
+          color: #c8d8e8;
         }
 
         .demo-grid {
@@ -690,19 +1091,19 @@ export default function HomePage() {
 
         .route-panel,
         .decision-panel {
-          border-radius: 24px;
+          padding: 27px;
           border: 1px solid var(--line);
+          border-radius: 24px;
           background: var(--panel);
           backdrop-filter: blur(16px);
-          padding: 26px;
         }
 
         .route-title {
+          margin-bottom: 22px;
           display: flex;
           justify-content: space-between;
           align-items: flex-start;
           gap: 16px;
-          margin-bottom: 22px;
         }
 
         .route-title h3 {
@@ -717,10 +1118,12 @@ export default function HomePage() {
         }
 
         .route-badge {
-          white-space: nowrap;
           padding: 8px 11px;
+          display: inline-flex;
+          align-items: center;
+          white-space: nowrap;
+          border: 1px solid rgba(84, 232, 255, 0.24);
           border-radius: 999px;
-          border: 1px solid rgba(84,232,255,0.24);
           color: var(--cyan);
           font-size: 11px;
           font-weight: 900;
@@ -733,13 +1136,13 @@ export default function HomePage() {
         }
 
         .route-field {
+          padding: 14px 16px;
           display: flex;
           justify-content: space-between;
           gap: 20px;
-          padding: 14px 16px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
           border-radius: 14px;
-          background: rgba(255,255,255,0.03);
-          border: 1px solid rgba(255,255,255,0.05);
+          background: rgba(255, 255, 255, 0.03);
         }
 
         .route-field span:first-child {
@@ -774,41 +1177,41 @@ export default function HomePage() {
 
         .state-display.idle {
           color: var(--cyan);
-          text-shadow: 0 0 28px rgba(84,232,255,0.3);
+          text-shadow: 0 0 28px rgba(84, 232, 255, 0.3);
         }
 
         .state-display.running {
           color: var(--blue);
-          text-shadow: 0 0 28px rgba(41,167,255,0.38);
+          text-shadow: 0 0 28px rgba(41, 167, 255, 0.38);
         }
 
         .state-display.hold {
           color: var(--red);
-          text-shadow: 0 0 28px rgba(255,69,107,0.4);
+          text-shadow: 0 0 28px rgba(255, 69, 107, 0.4);
         }
 
         .state-display.allow {
           color: var(--green);
-          text-shadow: 0 0 28px rgba(57,242,161,0.38);
+          text-shadow: 0 0 28px rgba(57, 242, 161, 0.38);
         }
 
         .decision-copy {
+          min-height: 56px;
           color: var(--muted);
           line-height: 1.7;
-          min-height: 56px;
         }
 
         .progress-track {
+          margin: 24px 0;
           display: grid;
           grid-template-columns: repeat(8, 1fr);
           gap: 7px;
-          margin: 24px 0;
         }
 
         .progress-step {
           height: 7px;
           border-radius: 999px;
-          background: rgba(255,255,255,0.07);
+          background: rgba(255, 255, 255, 0.07);
           transition:
             background 220ms ease,
             box-shadow 220ms ease,
@@ -817,25 +1220,27 @@ export default function HomePage() {
 
         .progress-step.active {
           background: var(--blue);
-          box-shadow: 0 0 14px rgba(41,167,255,0.65);
+          box-shadow: 0 0 14px rgba(41, 167, 255, 0.65);
           transform: scaleY(1.35);
         }
 
         .progress-step.complete {
           background: var(--green);
-          box-shadow: 0 0 14px rgba(57,242,161,0.45);
+          box-shadow: 0 0 14px rgba(57, 242, 161, 0.45);
         }
 
         .progress-step.failed {
           background: var(--red);
-          box-shadow: 0 0 14px rgba(255,69,107,0.55);
+          box-shadow: 0 0 14px rgba(255, 69, 107, 0.55);
         }
 
         .receipt {
-          background: #040810;
-          border: 1px solid rgba(255,255,255,0.06);
-          border-radius: 16px;
+          margin-bottom: 20px;
           padding: 17px;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 16px;
+          background: #040810;
+          color: #9bb0c5;
           font-family:
             "SFMono-Regular",
             Consolas,
@@ -843,34 +1248,41 @@ export default function HomePage() {
             monospace;
           font-size: 12px;
           line-height: 1.72;
-          color: #9bb0c5;
           white-space: pre-wrap;
-          margin-bottom: 20px;
         }
 
         .decision-actions {
+          margin-top: auto;
           display: flex;
           flex-wrap: wrap;
           gap: 12px;
-          margin-top: auto;
         }
 
         .record-panel {
           margin-top: 22px;
+          padding: 29px;
+          border: 1px solid rgba(57, 242, 161, 0.25);
           border-radius: 24px;
-          border: 1px solid rgba(57,242,161,0.25);
           background:
-            linear-gradient(135deg, rgba(57,242,161,0.075), rgba(41,167,255,0.055));
-          padding: 28px;
+            linear-gradient(
+              135deg,
+              rgba(57, 242, 161, 0.075),
+              rgba(41, 167, 255, 0.055)
+            );
           box-shadow: var(--shadow-green);
         }
 
         .record-header {
+          margin-bottom: 22px;
           display: flex;
           justify-content: space-between;
-          gap: 18px;
           align-items: flex-start;
-          margin-bottom: 22px;
+          gap: 18px;
+        }
+
+        .record-header h3 {
+          margin: 8px 0 0;
+          font-size: 25px;
         }
 
         .record-status {
@@ -888,18 +1300,18 @@ export default function HomePage() {
         }
 
         .record-cell {
-          border-radius: 14px;
           padding: 15px;
-          background: rgba(3,8,14,0.52);
-          border: 1px solid rgba(255,255,255,0.05);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 14px;
+          background: rgba(3, 8, 14, 0.52);
         }
 
         .record-cell small {
+          margin-bottom: 7px;
           display: block;
           color: var(--muted);
-          margin-bottom: 7px;
-          text-transform: uppercase;
           letter-spacing: 0.1em;
+          text-transform: uppercase;
         }
 
         .record-cell strong {
@@ -907,61 +1319,105 @@ export default function HomePage() {
           word-break: break-word;
         }
 
+        .record-actions {
+          margin-top: 18px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
         .pricing-grid {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 20px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 18px;
         }
 
         .price-card {
           position: relative;
-          border-radius: 26px;
-          padding: 32px;
-          border: 1px solid var(--line);
-          background: linear-gradient(145deg, rgba(255,255,255,0.045), rgba(255,255,255,0.015));
+          padding: 30px;
+          display: flex;
+          flex-direction: column;
           overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 26px;
+          background:
+            linear-gradient(
+              145deg,
+              rgba(255, 255, 255, 0.045),
+              rgba(255, 255, 255, 0.015)
+            );
         }
 
         .price-card.featured {
-          border-color: rgba(57,242,161,0.28);
+          border-color: rgba(57, 242, 161, 0.3);
           box-shadow: var(--shadow-green);
+        }
+
+        .price-card.organization {
+          border-color: rgba(84, 232, 255, 0.27);
+          box-shadow: var(--shadow-blue);
         }
 
         .price-label {
           color: var(--cyan);
+          font-size: 12px;
           font-weight: 900;
           letter-spacing: 0.15em;
           text-transform: uppercase;
-          font-size: 12px;
         }
 
         .price {
-          font-size: 68px;
+          margin: 18px 0 8px;
+          font-size: 56px;
           font-weight: 950;
           letter-spacing: -0.05em;
-          margin: 18px 0 8px;
         }
 
         .price small {
-          font-size: 15px;
           color: var(--muted);
+          font-size: 14px;
           letter-spacing: 0;
         }
 
+        .price-card > p {
+          min-height: 72px;
+          color: var(--muted);
+          line-height: 1.65;
+        }
+
         .price-card ul {
-          list-style: none;
+          margin: 22px 0 26px;
           padding: 0;
-          margin: 24px 0;
           display: grid;
           gap: 12px;
+          list-style: none;
           color: #b4c3d3;
+        }
+
+        .price-card li {
+          line-height: 1.5;
         }
 
         .price-card li::before {
           content: "✓";
-          color: var(--green);
           margin-right: 10px;
+          color: var(--green);
           font-weight: 900;
+        }
+
+        .price-card .button {
+          margin-top: auto;
+        }
+
+        .billing-note {
+          margin-top: 18px;
+          padding: 17px 20px;
+          border: 1px solid rgba(255, 212, 106, 0.17);
+          border-radius: 16px;
+          background: rgba(255, 212, 106, 0.045);
+          color: #c6b98f;
+          font-size: 13px;
+          line-height: 1.65;
         }
 
         .use-case-grid {
@@ -971,11 +1427,11 @@ export default function HomePage() {
         }
 
         .use-case {
-          min-height: 190px;
-          padding: 24px;
-          border-radius: 20px;
+          min-height: 195px;
+          padding: 25px;
           border: 1px solid var(--line);
-          background: rgba(255,255,255,0.026);
+          border-radius: 20px;
+          background: rgba(255, 255, 255, 0.026);
           transition:
             transform 180ms ease,
             border-color 180ms ease,
@@ -984,8 +1440,8 @@ export default function HomePage() {
 
         .use-case:hover {
           transform: translateY(-5px);
-          border-color: rgba(84,232,255,0.26);
-          background: rgba(84,232,255,0.035);
+          border-color: rgba(84, 232, 255, 0.26);
+          background: rgba(84, 232, 255, 0.035);
         }
 
         .use-case h3 {
@@ -995,49 +1451,55 @@ export default function HomePage() {
         .use-case p {
           margin: 0;
           color: var(--muted);
-          line-height: 1.65;
+          line-height: 1.66;
         }
 
         .manifesto {
           position: relative;
+          padding: 48px;
           overflow: hidden;
+          border: 1px solid rgba(84, 232, 255, 0.2);
           border-radius: 30px;
-          padding: 46px;
-          border: 1px solid rgba(84,232,255,0.2);
           background:
-            linear-gradient(135deg, rgba(41,167,255,0.08), rgba(57,242,161,0.05), rgba(255,69,107,0.04));
+            linear-gradient(
+              135deg,
+              rgba(41, 167, 255, 0.08),
+              rgba(57, 242, 161, 0.05),
+              rgba(255, 69, 107, 0.04)
+            );
         }
 
         .manifesto::after {
           content: "TA-14";
           position: absolute;
           right: 22px;
-          bottom: -28px;
-          font-size: 150px;
+          bottom: -30px;
+          color: rgba(255, 255, 255, 0.025);
+          font-size: 148px;
           font-weight: 950;
-          color: rgba(255,255,255,0.025);
           letter-spacing: -0.08em;
         }
 
         .manifesto h2 {
-          max-width: 860px;
-          margin: 0 0 18px;
+          max-width: 900px;
+          margin: 12px 0 18px;
           font-size: clamp(42px, 6vw, 72px);
           line-height: 1;
           letter-spacing: -0.05em;
         }
 
         .manifesto p {
-          max-width: 790px;
+          max-width: 810px;
+          margin: 0;
           color: #b3c4d6;
           font-size: 19px;
           line-height: 1.72;
         }
 
         .footer {
-          border-top: 1px solid var(--line);
-          padding: 52px 0;
           margin-top: 40px;
+          padding: 54px 0;
+          border-top: 1px solid var(--line);
         }
 
         .footer-grid {
@@ -1053,9 +1515,9 @@ export default function HomePage() {
         .footer p,
         .footer a {
           color: var(--muted);
+          font-size: 14px;
           line-height: 1.7;
           text-decoration: none;
-          font-size: 14px;
         }
 
         .footer-links {
@@ -1066,23 +1528,24 @@ export default function HomePage() {
         .footer-bottom {
           margin-top: 34px;
           padding-top: 24px;
-          border-top: 1px solid rgba(255,255,255,0.06);
-          color: #74889d;
-          font-size: 12px;
           display: flex;
           justify-content: space-between;
           gap: 18px;
           flex-wrap: wrap;
+          border-top: 1px solid rgba(255, 255, 255, 0.06);
+          color: #74889d;
+          font-size: 12px;
         }
 
-        @media (max-width: 980px) {
+        @media (max-width: 1040px) {
           .hero,
-          .demo-grid {
+          .demo-grid,
+          .records-hero {
             grid-template-columns: 1fr;
           }
 
           .execution-core {
-            min-height: 390px;
+            min-height: 410px;
           }
 
           .chain-grid {
@@ -1090,28 +1553,41 @@ export default function HomePage() {
           }
 
           .product-grid,
+          .lifecycle-grid,
           .use-case-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .pricing-grid {
             grid-template-columns: 1fr 1fr;
+          }
+
+          .price-card.organization {
+            grid-column: 1 / -1;
           }
         }
 
-        @media (max-width: 720px) {
+        @media (max-width: 780px) {
           .nav-links {
             position: absolute;
-            left: 4vw;
+            top: 82px;
             right: 4vw;
-            top: 78px;
+            left: 4vw;
             padding: 18px;
             display: ${mobileMenuOpen ? 'grid' : 'none'};
             gap: 14px;
-            border-radius: 18px;
             border: 1px solid var(--line);
-            background: rgba(4,9,16,0.96);
+            border-radius: 18px;
+            background: rgba(4, 9, 16, 0.97);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+          }
+
+          .nav-links .button {
+            width: 100%;
           }
 
           .menu-button {
-            display: inline-grid;
-            place-items: center;
+            display: grid;
           }
 
           .hero {
@@ -1119,23 +1595,39 @@ export default function HomePage() {
           }
 
           .hero h1 {
-            font-size: 54px;
+            font-size: 52px;
           }
 
           .chain-grid,
           .product-grid,
+          .lifecycle-grid,
           .pricing-grid,
           .use-case-grid,
           .record-grid,
-          .footer-grid {
+          .footer-grid,
+          .records-list {
             grid-template-columns: 1fr;
+          }
+
+          .price-card.organization {
+            grid-column: auto;
+          }
+
+          .principle-strip {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .principle-strip span {
+            text-align: left;
           }
 
           .progress-track {
             gap: 4px;
           }
 
-          .manifesto {
+          .manifesto,
+          .records-hero {
             padding: 30px;
           }
 
@@ -1143,11 +1635,88 @@ export default function HomePage() {
           .route-title {
             flex-direction: column;
           }
+
+          .comparison-header,
+          .comparison-row {
+            grid-template-columns: 0.8fr 1.2fr;
+          }
+        }
+
+        @media (max-width: 520px) {
+          .brand-copy {
+            display: none;
+          }
+
+          .brand-mark {
+            min-width: 62px;
+          }
+
+          .hero h1 {
+            font-size: 44px;
+          }
+
+          .hero-copy {
+            font-size: 17px;
+          }
+
+          .button {
+            width: 100%;
+          }
+
+          .signal-row {
+            display: grid;
+          }
+
+          .chain-grid {
+            grid-template-columns: 1fr 1fr;
+          }
+
+          .execution-core {
+            min-height: 350px;
+          }
+
+          .ring.one {
+            width: 280px;
+            height: 280px;
+          }
+
+          .ring.two {
+            width: 210px;
+            height: 210px;
+          }
+
+          .core-orb {
+            width: 150px;
+            height: 150px;
+          }
+
+          .route-field {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 7px;
+          }
+
+          .route-field span:last-child {
+            text-align: left;
+          }
+
+          .state-display {
+            font-size: 50px;
+          }
+
+          .comparison-header,
+          .comparison-row {
+            grid-template-columns: 1fr;
+          }
+
+          .comparison-row {
+            padding: 6px 0;
+          }
         }
       `}</style>
 
       <div className="site-shell">
-        <div className="ambient">
+        <div className="ambient" aria-hidden="true">
           <div className="ambient-orb one" />
           <div className="ambient-orb two" />
           <div className="ambient-orb three" />
@@ -1155,19 +1724,45 @@ export default function HomePage() {
 
         <header className="nav">
           <div className="container nav-inner">
-            <a className="brand" href="#top">
-              <span className="brand-mark">14</span>
-              <span>TA-14 EXCHANGE PLATFORM</span>
+            <a className="brand" href="#top" onClick={closeMobileMenu}>
+              <span className="brand-mark">TA-14</span>
+
+              <span className="brand-copy">
+                <strong>EXCHANGE PLATFORM</strong>
+                <small>ADMISSIBLE EXECUTION INFRASTRUCTURE</small>
+              </span>
             </a>
 
-            <nav className="nav-links">
-              <a href="#architecture">Architecture</a>
-              <a href="#platform">Platform</a>
-              <a href="#demo">Runtime</a>
-              <a href="#pricing">Pricing</a>
-              <a href="#use-cases">Ecosystem</a>
-              <a href="#contact">Contact</a>
-              <a className="button button-primary" href="/workspace">
+            <nav className="nav-links" aria-label="Primary navigation">
+              <a href="#architecture" onClick={closeMobileMenu}>
+                Architecture
+              </a>
+
+              <a href="#platform" onClick={closeMobileMenu}>
+                Platform
+              </a>
+
+              <a href="#records" onClick={closeMobileMenu}>
+                Governed Records
+              </a>
+
+              <a href="#demo" onClick={closeMobileMenu}>
+                Live Demo
+              </a>
+
+              <a href="#pricing" onClick={closeMobileMenu}>
+                Pricing
+              </a>
+
+              <a href="#ecosystem" onClick={closeMobileMenu}>
+                Ecosystem
+              </a>
+
+              <a
+                className="button button-primary"
+                href="/workspace"
+                onClick={closeMobileMenu}
+              >
                 Open Workspace
               </a>
             </nav>
@@ -1176,6 +1771,7 @@ export default function HomePage() {
               className="menu-button"
               type="button"
               aria-label="Toggle navigation"
+              aria-expanded={mobileMenuOpen}
               onClick={() => setMobileMenuOpen((open) => !open)}
             >
               ☰
@@ -1187,30 +1783,31 @@ export default function HomePage() {
           <section className="container hero">
             <div>
               <div className="eyebrow">
-                Governance Infrastructure for Builders
+                Build · Test · Correct · Preserve · Verify · Replay
               </div>
 
               <h1>
-                Build the governance system
+                Governance must stand
                 <br />
-                that stands between
+                between intelligence
                 <br />
-                <span className="gradient-text">
-                  intelligence and consequence.
-                </span>
+                <span className="gradient-text">and consequence.</span>
               </h1>
 
               <p className="hero-copy">
-                TA-14 is the exchange platform where AI governance entities, enterprises, reviewers, researchers, and system builders design, test, connect, and verify governance systems before those systems authorize consequential execution.
+                The TA-14 Exchange is a free school, playground, and operating
+                environment where builders turn governance ideas into testable
+                routes, governed records, preserved evidence, and independently
+                replayable proof.
               </p>
 
               <div className="hero-actions">
-                <a className="button button-primary" href="/workspace">
-                  Enter the Governance Workspace
+                <a className="button button-primary" href="/workspace/routes/new">
+                  Build a Governance Route
                 </a>
 
-                <a className="button button-secondary" href="#architecture">
-                  Explore the TA-14 Architecture
+                <a className="button button-secondary" href="#records">
+                  Understand Governed Records
                 </a>
               </div>
 
@@ -1222,7 +1819,7 @@ export default function HomePage() {
 
                 <span className="signal">
                   <span className="signal-dot green" />
-                  Route Verifiable
+                  Independently Verifiable
                 </span>
 
                 <span className="signal">
@@ -1244,25 +1841,27 @@ export default function HomePage() {
               <div className="core-orb">
                 TA-14
                 <br />
-                CORE
+                EXCHANGE
               </div>
 
               <div className="core-caption">
-                Governance system construction layer
+                No admissible evidence. No admissible execution.
               </div>
             </div>
           </section>
 
           <section id="architecture" className="container section">
             <div className="section-heading">
-              <div className="eyebrow">The governing chain</div>
+              <div className="eyebrow">The parent architecture</div>
 
               <h2>
-                A place to build governance—not merely describe it.
+                Governance is not a statement. It is a preserved route.
               </h2>
 
               <p>
-                Bring your own architecture, policy model, agent system, evidence framework, or review layer. TA-14 gives builders a common execution route for testing whether authority, evidence, continuity, binding, commit, execution, and outcome remain admissible together.
+                TA-14 tests whether reality, evidence, continuity, authority,
+                binding, commitment, execution, and outcome remain connected
+                before and after consequence occurs.
               </p>
             </div>
 
@@ -1274,110 +1873,172 @@ export default function HomePage() {
               ))}
             </div>
 
-            <div className="product-grid">
-              <article className="card">
-                <div className="card-icon">◇</div>
-                <h3>Design</h3>
-                <p>
-                  Model your governance system, define its boundaries, identify its authority sources, and map every dependency required before execution.
-                </p>
-              </article>
+            <div className="principle-strip">
+              <strong>No admissible evidence. No admissible execution.</strong>
 
-              <article className="card">
-                <div className="card-icon">⚡</div>
-                <h3>Challenge</h3>
-                <p>
-                  Run route-level challenge tests across identity, evidence integrity, freshness, policy, authority, commit, bypass resistance, replay, and outcome correspondence.
-                </p>
-              </article>
+              <span>
+                Routes are classified as ALLOW, HOLD, DENY, or ESCALATE.
+              </span>
+            </div>
+          </section>
 
-              <article className="card">
-                <div className="card-icon">✓</div>
-                <h3>Connect</h3>
-                <p>
-                  Connect governance entities, review partners, APIs, registries, evidence systems, and execution environments through one preserved route identity.
-                </p>
-              </article>
+          <section className="container section">
+            <div className="section-heading center-heading">
+              <div className="eyebrow">The governed execution lifecycle</div>
+
+              <h2>
+                From an idea to an independently replayable record.
+              </h2>
+
+              <p>
+                The Exchange brings the full lifecycle into one place instead
+                of separating policy design, runtime decisions, evidence,
+                records, and verification across disconnected systems.
+              </p>
+            </div>
+
+            <div className="lifecycle-grid">
+              {lifecycle.map((item) => (
+                <article
+                  className="lifecycle-card"
+                  data-number={item.number}
+                  key={item.number}
+                >
+                  <div className="lifecycle-number">{item.number}</div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </article>
+              ))}
             </div>
           </section>
 
           <section id="platform" className="container section">
             <div className="section-heading">
-              <div className="eyebrow">The governance construction environment</div>
+              <div className="eyebrow">
+                The governance construction environment
+              </div>
 
               <h2>
-                Bring your architecture. Build the system around it.
+                Bring your architecture. Build the governed system around it.
               </h2>
 
               <p>
-                The TA-14 Exchange Platform is designed for governance entities and
-                system builders who need more than a public framework. It provides
-                the workspace where governance models become testable routes,
-                interoperable controls, preserved records, and independently
-                reviewable execution infrastructure.
+                TA-14 does not require independent governance entities to
+                surrender their identities or intellectual property. It
+                provides a common route where their evidence, controls,
+                authority, review layers, decisions, execution, and outcomes
+                can be tested together.
               </p>
             </div>
 
             <div className="product-grid">
-              <article className="card">
-                <div className="card-icon">⌘</div>
-                <h3>Architecture Workspace</h3>
-                <p>
-                  Map your governance model to the TA-14 chain without surrendering
-                  your identity, intellectual property, or independent boundaries.
-                </p>
-              </article>
+              {platformCapabilities.map((item) => (
+                <article className="card" key={item.title}>
+                  <div className="card-icon">{item.icon}</div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
 
-              <article className="card">
-                <div className="card-icon">↯</div>
-                <h3>Runtime Sandbox</h3>
-                <p>
-                  Submit consequential routes, inject failures, test corrections,
-                  inspect decision receipts, and prove how your system behaves before
-                  production consequence.
-                </p>
-              </article>
-
-              <article className="card">
-                <div className="card-icon">◎</div>
-                <h3>Governance Exchange</h3>
-                <p>
-                  Connect review entities, evidence layers, policy engines, agent
-                  controls, registries, APIs, and execution systems through bounded,
-                  attributable interfaces.
-                </p>
-              </article>
-
-              <article className="card">
-                <div className="card-icon">◇</div>
-                <h3>Partner Review Network</h3>
-                <p>
-                  Preserve architectural independence while receiving scoped review,
-                  second-layer challenge, referral continuity, and clearly documented
-                  boundaries.
-                </p>
-              </article>
-
-              <article className="card">
-                <div className="card-icon">#</div>
-                <h3>Public Registry</h3>
-                <p>
-                  Issue stable route identities, preserve manifests and decision
-                  histories, and create a verification surface that does not depend on
-                  trusting a private dashboard.
-                </p>
-              </article>
-
-              <article className="card">
-                <div className="card-icon">API</div>
-                <h3>Integration Layer</h3>
-                <p>
-                  Bind external governance systems to route creation, evidence intake,
-                  decision states, commits, execution receipts, outcomes, and replay
-                  verification.
-                </p>
-              </article>
+                  <a className="card-link" href={item.href}>
+                    {item.action} →
+                  </a>
+                </article>
+              ))}
             </div>
+          </section>
+
+          <section id="records" className="container section">
+            <article className="records-hero">
+              <div className="records-copy">
+                <div className="eyebrow">Governed records</div>
+
+                <h2>
+                  A record says something happened. A governed record shows why
+                  it was allowed to happen.
+                </h2>
+
+                <p>
+                  An ordinary record may preserve a timestamp, event, or system
+                  log. A TA-14 governed record preserves the route from reality
+                  to outcome: what was known, where the evidence came from, who
+                  possessed authority, what rules applied, what decision was
+                  reached, what was corrected, what was committed, what
+                  executed, and whether the final outcome corresponded.
+                </p>
+
+                <ul className="records-list">
+                  {governedRecordContents.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+
+                <div className="hero-actions">
+                  <a
+                    className="button button-primary"
+                    href="/workspace/records"
+                  >
+                    Create a Governed Record
+                  </a>
+
+                  <a
+                    className="button button-secondary"
+                    href="/workspace/routes/new"
+                  >
+                    Start With a Route
+                  </a>
+                </div>
+              </div>
+
+              <div className="record-comparison">
+                <div className="comparison-title">
+                  Record versus governed record
+                </div>
+
+                <div className="comparison-header">
+                  <div>Ordinary Record</div>
+                  <div>TA-14 Governed Record</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>Stores an event</div>
+                  <div>Preserves the complete governed route</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>Shows a timestamp</div>
+                  <div>Preserves temporal validity and continuity</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>Names a user</div>
+                  <div>Binds identity, role, authority, and action</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>Contains a log entry</div>
+                  <div>Contains evidence, rules, decisions, and receipts</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>May show what the system reported</div>
+                  <div>Shows what was proposed, committed, and executed</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>Requires trust in the source system</div>
+                  <div>Supports independent integrity verification</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>May preserve only success</div>
+                  <div>Preserves HOLD, DENY, ESCALATE, and correction history</div>
+                </div>
+
+                <div className="comparison-row">
+                  <div>Difficult to reconstruct</div>
+                  <div>Designed for export, verification, and replay</div>
+                </div>
+              </div>
+            </article>
           </section>
 
           <section id="demo" className="container section">
@@ -1385,11 +2046,14 @@ export default function HomePage() {
               <div className="eyebrow">Live route demonstration</div>
 
               <h2>
-                Experience the shared runtime beneath every governance system.
+                Watch a consequential route fail safely before execution.
               </h2>
 
               <p>
-                This demonstration shows how an external governance system can submit a consequential route into TA-14, receive an exact HOLD, correct the missing authority and beneficiary binding, and generate a preserved execution record after the route becomes admissible.
+                Run the route to receive an exact HOLD. Correct the missing
+                authority and beneficiary binding, rerun it, and watch the
+                Exchange produce a governed-record preview only after the route
+                satisfies the stated requirements.
               </p>
             </div>
 
@@ -1398,9 +2062,7 @@ export default function HomePage() {
                 <div className="route-title">
                   <div>
                     <h3>Vendor Payment Route</h3>
-                    <p>
-                      Procurement Agent v4.2 · Production environment
-                    </p>
+                    <p>Procurement Agent v4.2 · Production environment</p>
                   </div>
 
                   <span className="route-badge">USD 32,500</span>
@@ -1438,9 +2100,7 @@ export default function HomePage() {
 
                   <div className="route-field">
                     <span>Beneficiary binding</span>
-                    <span>
-                      {authorityCorrected ? 'Bound' : 'Unproven'}
-                    </span>
+                    <span>{authorityCorrected ? 'Bound' : 'Unproven'}</span>
                   </div>
                 </div>
               </article>
@@ -1448,6 +2108,7 @@ export default function HomePage() {
               <article className="decision-panel">
                 <div className="decision-top">
                   <div className="eyebrow">TA-14 decision receipt</div>
+
                   <span className="route-badge">
                     {authorityCorrected ? 'CORRECTED VERSION' : 'VERSION 1'}
                   </span>
@@ -1464,7 +2125,9 @@ export default function HomePage() {
                     'The route is ready for deterministic evaluation.'}
 
                   {routeState === 'RUNNING' &&
-                    `Evaluating ${chain[Math.max(activeStage, 0)] ?? 'route'}...`}
+                    `Evaluating ${
+                      chain[Math.max(activeStage, 0)] ?? 'route'
+                    }...`}
 
                   {routeState === 'HOLD' &&
                     'Required proof is incomplete but correctable. Current dual authority and beneficiary binding are missing.'}
@@ -1516,18 +2179,18 @@ DECISION PRECEDENCE: ACTIVE`}
 
                   {routeState === 'HOLD' &&
 `RESULT: HOLD
-TA14-AUTH-PROC: CURRENT PROCUREMENT AUTHORITY MISSING
-TA14-AUTH-FIN: CURRENT FINANCE AUTHORITY MISSING
-TA14-BIND-BEN: BENEFICIARY NOT BOUND TO EXACT PAYMENT OBJECT
-NEXT ACTION: CORRECT FREE AND RERUN`}
+TA-14-AUTH-PROC: CURRENT PROCUREMENT AUTHORITY MISSING
+TA-14-AUTH-FIN: CURRENT FINANCE AUTHORITY MISSING
+TA-14-BIND-BEN: BENEFICIARY NOT BOUND TO EXACT PAYMENT OBJECT
+NEXT ACTION: CORRECT AND RERUN`}
 
                   {routeState === 'ALLOW' &&
 `RESULT: ALLOW
-TA14-REQ-ALL: SATISFIED
+TA-14-REQ-ALL: SATISFIED
 AUTHORITY: CURRENT DUAL APPROVAL
 BENEFICIARY: BOUND
 COMMIT CORRESPONDENCE: SATISFIED
-NEXT ACTION: GENERATE SELF-DECLARED AER`}
+NEXT ACTION: GENERATE GOVERNED-RECORD PREVIEW`}
                 </div>
 
                 <div className="decision-actions">
@@ -1578,7 +2241,7 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                         type="button"
                         onClick={() => setRecordOpen(true)}
                       >
-                        Open AER Preview
+                        Open Governed-Record Preview
                       </button>
 
                       <button
@@ -1599,13 +2262,15 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                 <div className="record-header">
                   <div>
                     <div className="record-status">
-                      Self-declared AER preview generated
+                      Governed-record preview generated
                     </div>
 
                     <h3>TA-14 Admissible Execution Record</h3>
                   </div>
 
-                  <span className="route-badge">SIGNED PREVIEW</span>
+                  <span className="route-badge">
+                    SELF-DECLARED DEMONSTRATION
+                  </span>
                 </div>
 
                 <div className="record-grid">
@@ -1615,7 +2280,7 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   </div>
 
                   <div className="record-cell">
-                    <small>Current state</small>
+                    <small>Decision state</small>
                     <strong>ALLOW</strong>
                   </div>
 
@@ -1630,14 +2295,30 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                   </div>
 
                   <div className="record-cell">
-                    <small>Boundary</small>
-                    <strong>Self-declared demonstration</strong>
+                    <small>Beneficiary binding</small>
+                    <strong>Exact payment object bound</strong>
                   </div>
 
                   <div className="record-cell">
-                    <small>Next action</small>
-                    <strong>Preserve durable route record</strong>
+                    <small>Current boundary</small>
+                    <strong>Interactive front-door demonstration</strong>
                   </div>
+                </div>
+
+                <div className="record-actions">
+                  <a
+                    className="button button-primary"
+                    href="/workspace/records"
+                  >
+                    Create a Governed Record
+                  </a>
+
+                  <a
+                    className="button button-secondary"
+                    href="/workspace/verification"
+                  >
+                    Open Verification Workspace
+                  </a>
                 </div>
               </article>
             )}
@@ -1648,89 +2329,126 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
               <div className="eyebrow">Simple commercial ladder</div>
 
               <h2>
-                Useful without payment. Durable for $9.
+                Free to learn and build. Paid when professional continuity is
+                needed.
               </h2>
 
               <p>
-                Payment purchases utility and continuity. It never purchases a
+                Payment purchases workspace capacity, preservation, team
+                operations, and professional utility. It never purchases a
                 favorable decision, lowers a threshold, removes a finding, or
-                creates independently VERIFIED status.
+                creates independently verified status.
               </p>
             </div>
 
             <div className="pricing-grid">
               <article className="price-card">
-                <div className="price-label">Foundational route</div>
+                <div className="price-label">Free workspace</div>
 
-                <div className="price">
-                  Free
-                </div>
+                <div className="price">Free</div>
 
                 <p>
-                  Build, test, understand, correct, rerun, and preview a
-                  self-declared record.
+                  Learn the architecture, build routes, run tests, correct
+                  failures, and preview governed records.
                 </p>
 
                 <ul>
-                  <li>One bounded consequential route</li>
-                  <li>Formal TA-14 test execution</li>
-                  <li>Exact HOLD reasons</li>
-                  <li>Free correction guidance</li>
-                  <li>Protected correction rerun</li>
-                  <li>Self-declared AER preview</li>
+                  <li>Route construction workspace</li>
+                  <li>Deterministic test execution</li>
+                  <li>ALLOW, HOLD, DENY, and ESCALATE states</li>
+                  <li>Correction guidance and reruns</li>
+                  <li>Governed-record previews</li>
+                  <li>Five active private drafts</li>
                 </ul>
 
                 <a className="button button-secondary" href="/workspace">
-                  Test a Route
+                  Open Free Workspace
                 </a>
               </article>
 
               <article className="price-card featured">
-                <div className="price-label">Durable route record</div>
+                <div className="price-label">TA-14 Exchange Pro</div>
 
                 <div className="price">
-                  $9 <small>one time</small>
+                  $99 <small>per month</small>
                 </div>
 
                 <p>
-                  Preserve one official route identity and its essential
-                  continuity.
+                  Operate a professional governance workspace with private
+                  records, team access, and included preserved runs.
                 </p>
 
                 <ul>
-                  <li>TA14-RID route identity</li>
-                  <li>Signed issuance timestamp</li>
-                  <li>Essential manifest</li>
-                  <li>Decision and correction history</li>
-                  <li>Stable public lookup reference</li>
-                  <li>Current limitations and boundary</li>
+                  <li>Unlimited private route drafts</li>
+                  <li>Private governed-record workspace</li>
+                  <li>Up to five organization members</li>
+                  <li>Five preserved runs included monthly</li>
+                  <li>Version and private replay history</li>
+                  <li>Professional templates and reports</li>
                 </ul>
 
-                <button
+                <a
                   className="button button-primary"
-                  type="button"
-                  onClick={() => {
-                    document
-                      .getElementById('demo')
-                      ?.scrollIntoView({ behavior: 'smooth' });
-                  }}
+                  href="mailto:ta14admissibleexecution@gmail.com?subject=TA-14%20Exchange%20Pro%20Interest"
                 >
-                  Build Before Preserving
-                </button>
+                  Request Pro Access
+                </a>
               </article>
+
+              <article className="price-card organization">
+                <div className="price-label">Organization</div>
+
+                <div className="price">
+                  $299 <small>per month</small>
+                </div>
+
+                <p>
+                  Coordinate larger governance teams with expanded capacity,
+                  administrative controls, and integration readiness.
+                </p>
+
+                <ul>
+                  <li>Up to 25 organization members</li>
+                  <li>Twenty preserved runs included monthly</li>
+                  <li>Advanced role administration</li>
+                  <li>Organization-owned governed records</li>
+                  <li>API and integration pathway</li>
+                  <li>Priority implementation support</li>
+                </ul>
+
+                <a
+                  className="button button-secondary"
+                  href="mailto:ta14admissibleexecution@gmail.com?subject=TA-14%20Organization%20Access"
+                >
+                  Request Organization Access
+                </a>
+              </article>
+            </div>
+
+            <div className="billing-note">
+              Plan architecture and product entitlements are being built into
+              the Exchange. Live subscription billing, automated paid access,
+              and production entitlement enforcement should not be assumed
+              until those systems are completed and verified.
             </div>
           </section>
 
-          <section id="use-cases" className="container section">
+          <section id="ecosystem" className="container section">
             <div className="section-heading">
-              <div className="eyebrow">One exchange, many governance systems</div>
+              <div className="eyebrow">
+                One exchange, many consequential systems
+              </div>
 
               <h2>
-                Every governance architecture needs somewhere to become operational.
+                Every governance architecture needs somewhere to become
+                operational.
               </h2>
 
               <p>
-                TA-14 provides the construction, testing, exchange, review, registry, and verification environment for governance systems operating wherever identity, authority, evidence, execution, and outcome must remain reconstructable.
+                TA-14 provides a shared construction, testing, record,
+                verification, and replay environment wherever identity,
+                evidence, authority, execution, and outcome must remain
+                reconstructable.
               </p>
             </div>
 
@@ -1750,28 +2468,26 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
                 TA-14 Authority Governance Institution
               </div>
 
-              <h2>
-                Consequences should never outrun their evidence.
-              </h2>
+              <h2>Consequences should never outrun their evidence.</h2>
 
               <p>
-                The software can be copied. The canonical identifiers, current
-                specification, registry, signed history, verification network,
-                institutional continuity, and public record cannot be recreated
-                quickly. TA-14 is building the destination for admissible
-                execution.
+                The Exchange is not another policy library, checklist, private
+                risk score, or dashboard asking the world to trust what
+                happened behind the screen. It is a place to build the route,
+                preserve the governed record, verify the integrity, and replay
+                what occurred.
               </p>
 
               <div className="hero-actions">
                 <a className="button button-primary" href="/workspace">
-                  Experience the Route
+                  Enter the TA-14 Exchange
                 </a>
 
                 <a
                   className="button button-secondary"
                   href="mailto:ta14admissibleexecution@gmail.com"
                 >
-                  Request Enterprise Access
+                  Contact TA-14
                 </a>
               </div>
             </article>
@@ -1783,12 +2499,18 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
             <div className="footer-grid">
               <div>
                 <a className="brand" href="#top">
-                  <span className="brand-mark">14</span>
-                  <span>TA-14 EXCHANGE PLATFORM</span>
+                  <span className="brand-mark">TA-14</span>
+
+                  <span className="brand-copy">
+                    <strong>EXCHANGE PLATFORM</strong>
+                    <small>ADMISSIBLE EXECUTION INFRASTRUCTURE</small>
+                  </span>
                 </a>
 
                 <p>
-                  Build governance systems. Connect review layers. Test execution routes. Preserve proof.
+                  Build governance routes. Create governed records. Test
+                  execution. Preserve evidence. Verify integrity. Replay what
+                  occurred.
                 </p>
               </div>
 
@@ -1797,16 +2519,23 @@ NEXT ACTION: GENERATE SELF-DECLARED AER`}
 
                 <div className="footer-links">
                   <a href="#architecture">Architecture</a>
-                  <a href="#demo">Runtime</a>
+                  <a href="#platform">Platform</a>
+                  <a href="#records">Governed Records</a>
+                  <a href="#demo">Live Demonstration</a>
                   <a href="#pricing">Pricing</a>
-                  <a href="#use-cases">Ecosystem</a>
+                  <a href="#ecosystem">Ecosystem</a>
                 </div>
               </div>
 
               <div>
-                <h4>Contact</h4>
+                <h4>Access</h4>
 
                 <div className="footer-links">
+                  <a href="/workspace">Open Workspace</a>
+                  <a href="/workspace/routes/new">Build a Route</a>
+                  <a href="/workspace/records">Governed Records</a>
+                  <a href="/workspace/verification">Verification</a>
+
                   <a href="mailto:ta14admissibleexecution@gmail.com">
                     ta14admissibleexecution@gmail.com
                   </a>
