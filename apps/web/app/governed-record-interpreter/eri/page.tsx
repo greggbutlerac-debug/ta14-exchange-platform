@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 type InterpretationState =
@@ -46,7 +47,8 @@ const CHANNELS: Channel[] = [
     value: '72.4 °F',
     status: 'NORMAL',
     role: 'Thermal state and rate-of-change context.',
-    boundary: 'Temperature alone does not establish comfort, safety, or equipment performance.',
+    boundary:
+      'Temperature alone does not establish comfort, safety, or equipment performance.',
   },
   {
     id: 'relative-humidity',
@@ -56,7 +58,8 @@ const CHANNELS: Channel[] = [
     value: '61.8%',
     status: 'WATCH',
     role: 'Moisture state relative to temperature.',
-    boundary: 'Must be interpreted with temperature, duration, and surface conditions.',
+    boundary:
+      'Must be interpreted with temperature, duration, and surface conditions.',
   },
   {
     id: 'dew-point',
@@ -66,7 +69,8 @@ const CHANNELS: Channel[] = [
     value: '58.5 °F',
     status: 'WATCH',
     role: 'Condensation and moisture-risk context.',
-    boundary: 'Depends on validated temperature and relative-humidity inputs.',
+    boundary:
+      'Depends on validated temperature and relative-humidity inputs.',
   },
   {
     id: 'wet-bulb',
@@ -76,7 +80,8 @@ const CHANNELS: Channel[] = [
     value: '63.7 °F',
     status: 'NORMAL',
     role: 'Combined heat-and-moisture state.',
-    boundary: 'Calculation method and assumptions must remain declared.',
+    boundary:
+      'Calculation method and assumptions must remain declared.',
   },
   {
     id: 'humidity-ratio',
@@ -86,7 +91,8 @@ const CHANNELS: Channel[] = [
     value: '0.0106 lb/lb',
     status: 'WATCH',
     role: 'Absolute moisture content.',
-    boundary: 'Depends on pressure and valid psychrometric inputs.',
+    boundary:
+      'Depends on pressure and valid psychrometric inputs.',
   },
   {
     id: 'enthalpy',
@@ -96,7 +102,8 @@ const CHANNELS: Channel[] = [
     value: '28.9 Btu/lb',
     status: 'NORMAL',
     role: 'Total sensible and latent energy state.',
-    boundary: 'Does not prove HVAC capacity or efficiency by itself.',
+    boundary:
+      'Does not prove HVAC capacity or efficiency by itself.',
   },
   {
     id: 'specific-volume',
@@ -106,7 +113,8 @@ const CHANNELS: Channel[] = [
     value: '13.62 ft³/lb',
     status: 'NORMAL',
     role: 'Air-volume-to-mass relationship.',
-    boundary: 'Requires pressure and psychrometric inputs.',
+    boundary:
+      'Requires pressure and psychrometric inputs.',
   },
   {
     id: 'pressure',
@@ -116,7 +124,8 @@ const CHANNELS: Channel[] = [
     value: '-0.006 in. w.c.',
     status: 'EXCURSION',
     role: 'Pressure relationship to the declared reference space.',
-    boundary: 'Sensor location, reference side, and operating mode are mandatory.',
+    boundary:
+      'Sensor location, reference side, and operating mode are mandatory.',
   },
   {
     id: 'co2',
@@ -126,7 +135,8 @@ const CHANNELS: Channel[] = [
     value: '1,018 ppm',
     status: 'WATCH',
     role: 'Occupancy and ventilation context.',
-    boundary: 'CO₂ is not a universal indoor-air-quality score.',
+    boundary:
+      'CO₂ is not a universal indoor-air-quality score.',
   },
   {
     id: 'voc',
@@ -136,7 +146,8 @@ const CHANNELS: Channel[] = [
     value: '384 ppb',
     status: 'WATCH',
     role: 'Chemical-event pattern and persistence.',
-    boundary: 'Aggregate TVOC does not identify a specific compound or source.',
+    boundary:
+      'Aggregate TVOC does not identify a specific compound or source.',
   },
   {
     id: 'pm',
@@ -146,7 +157,8 @@ const CHANNELS: Channel[] = [
     value: '19.6 µg/m³',
     status: 'EXCURSION',
     role: 'Particulate event, infiltration, and persistence context.',
-    boundary: 'Mass concentration does not prove particle composition or source.',
+    boundary:
+      'Mass concentration does not prove particle composition or source.',
   },
   {
     id: 'radon',
@@ -156,7 +168,8 @@ const CHANNELS: Channel[] = [
     value: '2.1 pCi/L',
     status: 'NORMAL',
     role: 'Long-duration accumulation and exposure context.',
-    boundary: 'Requires an appropriate averaging window and declared test conditions.',
+    boundary:
+      'Requires an appropriate averaging window and declared test conditions.',
   },
   {
     id: 'sound',
@@ -166,7 +179,8 @@ const CHANNELS: Channel[] = [
     value: '67 dBA',
     status: 'WATCH',
     role: 'Noise events, recurrence, and dose-window context.',
-    boundary: 'Environmental and occupational interpretations must remain distinct.',
+    boundary:
+      'Environmental and occupational interpretations must remain distinct.',
   },
 ];
 
@@ -212,15 +226,23 @@ const EVENTS: EventWindow[] = [
 const STATE_STYLES: Record<InterpretationState, string> = {
   STABLE: 'border-emerald-300 bg-emerald-50 text-emerald-800',
   EMERGING_DRIFT: 'border-sky-300 bg-sky-50 text-sky-800',
-  THRESHOLD_EXCURSION: 'border-amber-300 bg-amber-50 text-amber-800',
-  PERSISTENT_EXCURSION: 'border-orange-300 bg-orange-50 text-orange-800',
+  THRESHOLD_EXCURSION:
+    'border-amber-300 bg-amber-50 text-amber-800',
+  PERSISTENT_EXCURSION:
+    'border-orange-300 bg-orange-50 text-orange-800',
   ACUTE_EVENT: 'border-rose-300 bg-rose-50 text-rose-800',
-  COMPOUND_EVENT: 'border-violet-300 bg-violet-50 text-violet-800',
-  POST_INTERVENTION_CHANGE: 'border-cyan-300 bg-cyan-50 text-cyan-800',
-  SENSOR_INTEGRITY_EXCEPTION: 'border-slate-300 bg-slate-100 text-slate-800',
-  CONFLICTING_EVIDENCE: 'border-fuchsia-300 bg-fuchsia-50 text-fuchsia-800',
-  INSUFFICIENT_EVIDENCE: 'border-zinc-300 bg-zinc-100 text-zinc-800',
-  ESCALATION_RECOMMENDED: 'border-red-300 bg-red-50 text-red-800',
+  COMPOUND_EVENT:
+    'border-violet-300 bg-violet-50 text-violet-800',
+  POST_INTERVENTION_CHANGE:
+    'border-cyan-300 bg-cyan-50 text-cyan-800',
+  SENSOR_INTEGRITY_EXCEPTION:
+    'border-slate-300 bg-slate-100 text-slate-800',
+  CONFLICTING_EVIDENCE:
+    'border-fuchsia-300 bg-fuchsia-50 text-fuchsia-800',
+  INSUFFICIENT_EVIDENCE:
+    'border-zinc-300 bg-zinc-100 text-zinc-800',
+  ESCALATION_RECOMMENDED:
+    'border-red-300 bg-red-50 text-red-800',
 };
 
 function channelStyle(status: Channel['status']) {
@@ -240,17 +262,24 @@ function channelStyle(status: Channel['status']) {
 }
 
 export default function EnvironmentalRecordInterpreterPage() {
-  const [activeChannelId, setActiveChannelId] = useState(CHANNELS[7].id);
+  const [activeChannelId, setActiveChannelId] = useState(
+    CHANNELS[7].id,
+  );
   const [activeEventId, setActiveEventId] = useState(EVENTS[0].id);
   const [showGir, setShowGir] = useState(false);
 
   const activeChannel = useMemo(
-    () => CHANNELS.find((channel) => channel.id === activeChannelId) ?? CHANNELS[0],
+    () =>
+      CHANNELS.find(
+        (channel) => channel.id === activeChannelId,
+      ) ?? CHANNELS[0],
     [activeChannelId],
   );
 
   const activeEvent = useMemo(
-    () => EVENTS.find((event) => event.id === activeEventId) ?? EVENTS[0],
+    () =>
+      EVENTS.find((event) => event.id === activeEventId) ??
+      EVENTS[0],
     [activeEventId],
   );
 
@@ -258,6 +287,16 @@ export default function EnvironmentalRecordInterpreterPage() {
     <main className="min-h-screen bg-[#f4f6f7] text-slate-950">
       <section className="border-b border-slate-200 bg-[#073847] text-white">
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+          <div className="mb-8">
+            <Link
+              href="/governed-record-interpreter"
+              className="inline-flex items-center gap-2 rounded-xl border border-cyan-300/30 bg-white/5 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-300/60 hover:bg-white/10 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-[#073847]"
+            >
+              <span aria-hidden="true">←</span>
+              Back to GRI™ Workspace
+            </Link>
+          </div>
+
           <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">
             GRI™ Module 01
           </p>
@@ -269,10 +308,12 @@ export default function EnvironmentalRecordInterpreterPage() {
               </h1>
 
               <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200">
-                Environmental intelligence without evidentiary overreach.
-                Interpret atmospheric, personal, building, hospital, laboratory,
-                HVAC, water, soil, land, and sensor records while preserving the
-                exact boundary between what the record proves and what it cannot prove.
+                Environmental intelligence without evidentiary
+                overreach. Interpret atmospheric, personal, building,
+                hospital, laboratory, HVAC, water, soil, land, and
+                sensor records while preserving the exact boundary
+                between what the record proves and what it cannot
+                prove.
               </p>
             </div>
 
@@ -290,17 +331,26 @@ export default function EnvironmentalRecordInterpreterPage() {
                   <dt className="text-slate-300">Record</dt>
                   <dd className="font-medium">AIR-DEMO-014</dd>
                 </div>
+
                 <div className="flex justify-between gap-4 border-b border-white/10 pb-3">
                   <dt className="text-slate-300">Period</dt>
                   <dd className="font-medium">24 hours</dd>
                 </div>
+
                 <div className="flex justify-between gap-4 border-b border-white/10 pb-3">
-                  <dt className="text-slate-300">Interpretation state</dt>
-                  <dd className="font-medium text-amber-300">HOLD</dd>
+                  <dt className="text-slate-300">
+                    Interpretation state
+                  </dt>
+                  <dd className="font-medium text-amber-300">
+                    HOLD
+                  </dd>
                 </div>
+
                 <div className="flex justify-between gap-4">
                   <dt className="text-slate-300">Module</dt>
-                  <dd className="font-medium">eri.atmospheric 1.1.0</dd>
+                  <dd className="font-medium">
+                    eri.atmospheric 1.1.0
+                  </dd>
                 </div>
               </dl>
             </div>
@@ -322,9 +372,9 @@ export default function EnvironmentalRecordInterpreterPage() {
             </div>
 
             <p className="max-w-2xl text-sm leading-6 text-slate-600">
-              Measured and calculated channels remain distinct. Every value
-              retains its source, unit, timestamp, location, uncertainty, and
-              transformation lineage.
+              Measured and calculated channels remain distinct. Every
+              value retains its source, unit, timestamp, location,
+              uncertainty, and transformation lineage.
             </p>
           </div>
 
@@ -336,7 +386,9 @@ export default function EnvironmentalRecordInterpreterPage() {
                 <button
                   key={channel.id}
                   type="button"
-                  onClick={() => setActiveChannelId(channel.id)}
+                  onClick={() =>
+                    setActiveChannelId(channel.id)
+                  }
                   className={`rounded-2xl border p-4 text-left transition ${
                     active
                       ? 'border-cyan-600 bg-cyan-50 ring-2 ring-cyan-100'
@@ -348,7 +400,10 @@ export default function EnvironmentalRecordInterpreterPage() {
                       <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                         {channel.type}
                       </p>
-                      <h3 className="mt-2 font-semibold">{channel.shortName}</h3>
+
+                      <h3 className="mt-2 font-semibold">
+                        {channel.shortName}
+                      </h3>
                     </div>
 
                     <span
@@ -360,7 +415,9 @@ export default function EnvironmentalRecordInterpreterPage() {
                     </span>
                   </div>
 
-                  <p className="mt-4 text-xl font-semibold">{channel.value}</p>
+                  <p className="mt-4 text-xl font-semibold">
+                    {channel.value}
+                  </p>
                 </button>
               );
             })}
@@ -372,9 +429,13 @@ export default function EnvironmentalRecordInterpreterPage() {
                 Interpretive role
               </p>
 
-              <h3 className="mt-2 text-xl font-semibold">{activeChannel.name}</h3>
+              <h3 className="mt-2 text-xl font-semibold">
+                {activeChannel.name}
+              </h3>
 
-              <p className="mt-3 leading-7 text-slate-700">{activeChannel.role}</p>
+              <p className="mt-3 leading-7 text-slate-700">
+                {activeChannel.role}
+              </p>
             </div>
 
             <div>
@@ -395,7 +456,9 @@ export default function EnvironmentalRecordInterpreterPage() {
               Environmental chronology
             </p>
 
-            <h2 className="mt-2 text-2xl font-semibold">Detected event windows</h2>
+            <h2 className="mt-2 text-2xl font-semibold">
+              Detected event windows
+            </h2>
 
             <div className="mt-6 space-y-3">
               {EVENTS.map((event) => {
@@ -405,7 +468,9 @@ export default function EnvironmentalRecordInterpreterPage() {
                   <button
                     key={event.id}
                     type="button"
-                    onClick={() => setActiveEventId(event.id)}
+                    onClick={() =>
+                      setActiveEventId(event.id)
+                    }
                     className={`w-full rounded-2xl border p-4 text-left transition ${
                       active
                         ? 'border-cyan-600 bg-cyan-50 ring-2 ring-cyan-100'
@@ -414,7 +479,10 @@ export default function EnvironmentalRecordInterpreterPage() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold">{event.title}</p>
+                        <p className="font-semibold">
+                          {event.title}
+                        </p>
+
                         <p className="mt-1 text-sm text-slate-500">
                           {event.start}–{event.end} · {event.id}
                         </p>
@@ -423,7 +491,10 @@ export default function EnvironmentalRecordInterpreterPage() {
                       <span
                         className={`rounded-full border px-3 py-1 text-[10px] font-bold ${STATE_STYLES[event.classification]}`}
                       >
-                        {event.classification.replaceAll('_', ' ')}
+                        {event.classification.replaceAll(
+                          '_',
+                          ' ',
+                        )}
                       </span>
                     </div>
                   </button>
@@ -439,7 +510,9 @@ export default function EnvironmentalRecordInterpreterPage() {
                   Selected event interpretation
                 </p>
 
-                <h2 className="mt-2 text-2xl font-semibold">{activeEvent.title}</h2>
+                <h2 className="mt-2 text-2xl font-semibold">
+                  {activeEvent.title}
+                </h2>
               </div>
 
               <span
@@ -454,13 +527,17 @@ export default function EnvironmentalRecordInterpreterPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-800">
                   Supported finding
                 </p>
-                <p className="mt-3 leading-7 text-slate-700">{activeEvent.finding}</p>
+
+                <p className="mt-3 leading-7 text-slate-700">
+                  {activeEvent.finding}
+                </p>
               </div>
 
               <div className="rounded-2xl border border-rose-200 bg-rose-50 p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-800">
                   Evidentiary limitation
                 </p>
+
                 <p className="mt-3 leading-7 text-slate-700">
                   {activeEvent.limitation}
                 </p>
@@ -524,14 +601,21 @@ export default function EnvironmentalRecordInterpreterPage() {
                   'border-violet-200 bg-violet-50',
                 ],
               ].map(([title, body, tone], index) => (
-                <article key={title} className={`rounded-2xl border p-5 ${tone}`}>
+                <article
+                  key={title}
+                  className={`rounded-2xl border p-5 ${tone}`}
+                >
                   <div className="flex gap-4">
                     <span className="text-xs font-bold tracking-widest text-slate-500">
                       {String(index + 1).padStart(2, '0')}
                     </span>
+
                     <div>
                       <h3 className="font-semibold">{title}</h3>
-                      <p className="mt-2 leading-7 text-slate-700">{body}</p>
+
+                      <p className="mt-2 leading-7 text-slate-700">
+                        {body}
+                      </p>
                     </div>
                   </div>
                 </article>
@@ -551,19 +635,42 @@ export default function EnvironmentalRecordInterpreterPage() {
 
               <dl className="mt-6 space-y-4 text-sm">
                 {[
-                  ['Baseline window', '06:00–08:00 / occupied / negative-pressure mode'],
-                  ['Baseline support', 'Qualified — outdoor reference and door-state incomplete'],
-                  ['Event trigger', 'Pressure below declared contextual threshold'],
-                  ['Persistence rule', 'Continuous or recurrent duration greater than 10 minutes'],
-                  ['Post-intervention record', 'Not yet supplied'],
-                  ['Outcome state', 'HOLD — performance restoration not established'],
+                  [
+                    'Baseline window',
+                    '06:00–08:00 / occupied / negative-pressure mode',
+                  ],
+                  [
+                    'Baseline support',
+                    'Qualified — outdoor reference and door-state incomplete',
+                  ],
+                  [
+                    'Event trigger',
+                    'Pressure below declared contextual threshold',
+                  ],
+                  [
+                    'Persistence rule',
+                    'Continuous or recurrent duration greater than 10 minutes',
+                  ],
+                  [
+                    'Post-intervention record',
+                    'Not yet supplied',
+                  ],
+                  [
+                    'Outcome state',
+                    'HOLD — performance restoration not established',
+                  ],
                 ].map(([term, value]) => (
                   <div
                     key={term}
                     className="border-b border-slate-100 pb-3 last:border-0"
                   >
-                    <dt className="font-semibold text-slate-500">{term}</dt>
-                    <dd className="mt-1 text-slate-900">{value}</dd>
+                    <dt className="font-semibold text-slate-500">
+                      {term}
+                    </dt>
+
+                    <dd className="mt-1 text-slate-900">
+                      {value}
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -575,10 +682,11 @@ export default function EnvironmentalRecordInterpreterPage() {
               </p>
 
               <p className="mt-3 leading-7 text-slate-700">
-                This interpretation does not modify the source evidence, establish
-                medical causation, issue a diagnosis, prescribe treatment, condemn
-                equipment, determine liability, certify compliance, or authorize
-                environmental intervention.
+                This interpretation does not modify the source
+                evidence, establish medical causation, issue a
+                diagnosis, prescribe treatment, condemn equipment,
+                determine liability, certify compliance, or
+                authorize environmental intervention.
               </p>
             </section>
           </div>
@@ -591,7 +699,9 @@ export default function EnvironmentalRecordInterpreterPage() {
                 Governed Interpretation Record
               </p>
 
-              <h2 className="mt-2 text-2xl font-semibold">GIR™ environmental output</h2>
+              <h2 className="mt-2 text-2xl font-semibold">
+                GIR™ environmental output
+              </h2>
             </div>
 
             <button
@@ -599,7 +709,9 @@ export default function EnvironmentalRecordInterpreterPage() {
               onClick={() => setShowGir((value) => !value)}
               className="rounded-xl bg-[#073847] px-4 py-2 text-sm font-semibold text-white hover:bg-[#052c38]"
             >
-              {showGir ? 'Hide GIR™ object' : 'Preview GIR™ object'}
+              {showGir
+                ? 'Hide GIR™ object'
+                : 'Preview GIR™ object'}
             </button>
           </div>
 
@@ -614,11 +726,17 @@ export default function EnvironmentalRecordInterpreterPage() {
               ['Ruleset', 'eri-healthcare-air 1.0.0'],
               ['Replay', 'EXPLANATORY READY'],
             ].map(([term, value]) => (
-              <div key={term} className="rounded-2xl bg-slate-50 p-4">
+              <div
+                key={term}
+                className="rounded-2xl bg-slate-50 p-4"
+              >
                 <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                   {term}
                 </p>
-                <p className="mt-2 break-words text-sm font-semibold">{value}</p>
+
+                <p className="mt-2 break-words text-sm font-semibold">
+                  {value}
+                </p>
               </div>
             ))}
           </div>
@@ -662,6 +780,16 @@ export default function EnvironmentalRecordInterpreterPage() {
 }`}
             </pre>
           )}
+        </section>
+
+        <section className="flex justify-start">
+          <Link
+            href="/governed-record-interpreter"
+            className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition hover:border-cyan-600 hover:bg-cyan-50 focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2"
+          >
+            <span aria-hidden="true">←</span>
+            Return to GRI™ Workspace
+          </Link>
         </section>
       </div>
     </main>
