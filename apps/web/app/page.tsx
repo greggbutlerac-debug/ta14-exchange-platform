@@ -1833,7 +1833,7 @@ export default function HomePage() {
                 </p>
                 <a
                   className="button button-primary"
-                  href="/workspace/ai-governance"
+                  href="/ai-governance"
                 >
                   Enter AI Governance
                 </a>
@@ -1849,7 +1849,7 @@ export default function HomePage() {
                 </p>
                 <a
                   className="button button-secondary"
-                  href="/workspace/governed-records"
+                  href="/governed-records"
                 >
                   Enter Governed Records
                 </a>
@@ -1865,7 +1865,7 @@ export default function HomePage() {
                 </p>
                 <a
                   className="button button-secondary"
-                  href="/workspace/environmental-records"
+                  href="/environmental-records"
                 >
                   Enter Environmental Records
                 </a>
@@ -1881,7 +1881,7 @@ export default function HomePage() {
                 </p>
                 <a
                   className="button button-secondary"
-                  href="/workspace/entity-reviews"
+                  href="/entity-review-center"
                 >
                   Enter Entity Review Center
                 </a>
@@ -2167,7 +2167,7 @@ export default function HomePage() {
                   </ul>
                   <a
                     className="button button-primary"
-                    href="/workspace/entity-reviews"
+                    href="/entity-review-center"
                   >
                     Open the Entity Review Center
                   </a>
