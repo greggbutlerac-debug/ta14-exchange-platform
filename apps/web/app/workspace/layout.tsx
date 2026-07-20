@@ -1,68 +1,8 @@
 import Link from 'next/link';
 
 import { LogoutButton } from '../../components/auth/logout-button';
+import { AiGovernanceNavigation } from '../../components/workspace/ai-governance-navigation';
 import { requireUser } from '../../lib/auth/require-user';
-
-const workspaceNavigation = [
-  {
-    href: '/workspace/ai-governance',
-    label: 'Playground',
-    glyph: '◈',
-  },
-  {
-    href: '/workspace/demonstrations',
-    label: 'Demonstrations',
-    glyph: '◎',
-  },
-  {
-    href: '/workspace/routes/new',
-    label: 'Build a Route',
-    glyph: '◇',
-  },
-  {
-    href: '/workspace/routes',
-    label: 'My AI Routes',
-    glyph: 'R',
-  },
-  {
-    href: '/partner-review-network',
-    label: 'Partner Review Network',
-    glyph: 'P',
-  },
-  {
-    href: '/workspace/ai-governance/pricing',
-    label: 'Pricing',
-    glyph: '$',
-  },
-];
-
-const mobileNavigation = [
-  {
-    href: '/workspace/ai-governance',
-    label: 'Playground',
-    glyph: '◈',
-  },
-  {
-    href: '/workspace/routes/new',
-    label: 'Build',
-    glyph: '◇',
-  },
-  {
-    href: '/workspace/routes',
-    label: 'Routes',
-    glyph: 'R',
-  },
-  {
-    href: '/partner-review-network',
-    label: 'Partners',
-    glyph: 'P',
-  },
-  {
-    href: '/workspace/ai-governance/pricing',
-    label: 'Pricing',
-    glyph: '$',
-  },
-];
 
 export default async function WorkspaceLayout({
   children,
@@ -316,18 +256,30 @@ export default async function WorkspaceLayout({
           outline: none;
         }
 
-        .ta14-nav-item.primary {
+        .ta14-nav-item.active {
           color: #ffffff;
-          border-color: rgba(125,211,252,0.26);
+          border-color: rgba(125,211,252,0.32);
           background:
-            linear-gradient(135deg, rgba(56,189,248,0.14), rgba(14,165,233,0.05));
-          box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+            linear-gradient(135deg, rgba(56,189,248,0.16), rgba(14,165,233,0.06));
+          box-shadow:
+            inset 3px 0 0 #38bdf8,
+            inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
         .ta14-nav-item.partner {
           color: #fde8a8;
           border-color: rgba(251,191,36,0.2);
           background: rgba(245,158,11,0.065);
+        }
+
+        .ta14-nav-item.partner.active {
+          color: #fff7d6;
+          border-color: rgba(251,191,36,0.38);
+          background:
+            linear-gradient(135deg, rgba(245,158,11,0.16), rgba(251,191,36,0.06));
+          box-shadow:
+            inset 3px 0 0 #fbbf24,
+            inset 0 1px 0 rgba(255,255,255,0.05);
         }
 
         .ta14-nav-glyph {
@@ -399,6 +351,18 @@ export default async function WorkspaceLayout({
 
         .ta14-mobile-nav {
           display: none;
+        }
+
+        .ta14-mobile-link.active {
+          color: #ffffff;
+          background: rgba(56,189,248,0.12);
+          box-shadow: inset 0 0 0 1px rgba(125,211,252,0.2);
+        }
+
+        .ta14-mobile-link.partner.active {
+          color: #fff7d6;
+          background: rgba(245,158,11,0.13);
+          box-shadow: inset 0 0 0 1px rgba(251,191,36,0.22);
         }
 
         @media (max-width: 1240px) {
@@ -476,6 +440,10 @@ export default async function WorkspaceLayout({
           .ta14-mobile-link b {
             color: #7dd3fc;
             font-size: 0.82rem;
+          }
+
+          .ta14-mobile-link.partner b {
+            color: #fcd34d;
           }
         }
 
@@ -559,51 +527,9 @@ export default async function WorkspaceLayout({
         </div>
       </header>
 
-      <aside className="ta14-sidebar" aria-label="AI Governance workspace navigation">
-        <section>
-          <span className="ta14-nav-label">AI Governance</span>
-
-          <nav className="ta14-nav-list">
-            {workspaceNavigation.map((item) => (
-              <Link
-                className={`ta14-nav-item${
-                  item.href === '/workspace/ai-governance' ? ' primary' : ''
-                }${
-                  item.href === '/partner-review-network' ? ' partner' : ''
-                }`}
-                href={item.href}
-                key={item.href}
-              >
-                <span className="ta14-nav-glyph" aria-hidden="true">
-                  {item.glyph}
-                </span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
-          </nav>
-        </section>
-
-        <article className="ta14-sidebar-note">
-          <small>TA-14 Partner Review Network</small>
-          <strong>Independent architectures. Written boundaries.</strong>
-          <p>
-            Explore the current partner-review pathways and learn what each
-            governance architecture contributes.
-          </p>
-          <Link href="/partner-review-network">Explore the network →</Link>
-        </article>
-      </aside>
+      <AiGovernanceNavigation />
 
       <main className="ta14-workspace-content">{children}</main>
-
-      <nav className="ta14-mobile-nav" aria-label="Mobile AI Governance navigation">
-        {mobileNavigation.map((item) => (
-          <Link className="ta14-mobile-link" href={item.href} key={item.href}>
-            <b aria-hidden="true">{item.glyph}</b>
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </nav>
     </div>
   );
 }
