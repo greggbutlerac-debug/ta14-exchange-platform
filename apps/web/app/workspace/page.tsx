@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
 
 const PLAYGROUNDS = [
   {
@@ -8,11 +9,11 @@ const PLAYGROUNDS = [
     title: 'AI Governance',
     subtitle: 'Govern consequential AI execution',
     description:
-      'Build, test, verify, replay, and preserve evidence-bound AI execution routes before consequential action occurs.',
-    href: '/workspace/routes/new',
-    action: 'Enter AI Governance Playground',
-    accent: '#63e6ff',
-    glow: 'rgba(99, 230, 255, 0.34)',
+      'Learn how governed routes work, explore guided scenarios, and enter the route-building playground to test authority, evidence, admissibility, execution, and outcome continuity.',
+    href: '/workspace/ai-governance',
+    action: 'Enter AI Governance',
+    accent: '#68e5ff',
+    glow: 'rgba(104, 229, 255, 0.34)',
     icon: 'AI',
   },
   {
@@ -20,11 +21,11 @@ const PLAYGROUNDS = [
     title: 'Governed Records',
     subtitle: 'Turn source material into governed evidence',
     description:
-      'Upload, paste, preserve, validate, interpret, and generate bounded Governed Interpretation Records from submitted evidence.',
-    href: '/governed-record-interpreter',
-    action: 'Enter Governed Records Playground',
-    accent: '#9d8cff',
-    glow: 'rgba(157, 140, 255, 0.34)',
+      'Bring a record, preserve what it proves, expose what it does not prove, and create a replayable governed interpretation without manufacturing certainty.',
+    href: '/workspace/governed-records',
+    action: 'Enter Governed Records',
+    accent: '#a495ff',
+    glow: 'rgba(164, 149, 255, 0.34)',
     icon: 'GR',
   },
   {
@@ -32,22 +33,49 @@ const PLAYGROUNDS = [
     title: 'Environmental Records',
     subtitle: 'Govern land, water, air, and built environments',
     description:
-      'Explore atmospheric, building, hospital, laboratory, manufacturing, land, water, and environmental record interpretation.',
-    href: '/governed-record-interpreter/eri',
-    action: 'Enter Environmental Records Playground',
-    accent: '#59f0b2',
-    glow: 'rgba(89, 240, 178, 0.34)',
+      'Explore atmospheric, building, hospital, laboratory, manufacturing, land, water, and environmental records through bounded interpretation.',
+    href: '/workspace/environmental-records',
+    action: 'Enter Environmental Records',
+    accent: '#62efb9',
+    glow: 'rgba(98, 239, 185, 0.34)',
     icon: 'ER',
   },
+  {
+    number: '04',
+    title: 'Entity Review Center',
+    subtitle: 'Bring the system, program, architecture, or evidence',
+    description:
+      'Submit an AI system, governance program, execution architecture, policy framework, environmental system, or organization for a scoped TA-14 review.',
+    href: '/workspace/entity-reviews',
+    action: 'Enter Entity Review Center',
+    accent: '#ffbf69',
+    glow: 'rgba(255, 191, 105, 0.34)',
+    icon: 'RV',
+  },
 ] as const;
+
+const PRINCIPLES = [
+  'Free to explore',
+  'No credit card required',
+  'Come and go as you please',
+  'Use real tools, not a guided sales demo',
+];
 
 export default function PlaygroundGatewayPage() {
   return (
     <main className="gateway">
       <div className="grid" aria-hidden="true" />
+      <div className="scanline" aria-hidden="true" />
       <div className="aurora auroraOne" aria-hidden="true" />
       <div className="aurora auroraTwo" aria-hidden="true" />
-      <div className="scanline" aria-hidden="true" />
+      <div className="aurora auroraThree" aria-hidden="true" />
+
+      <div className="orbital orbitalOne" aria-hidden="true">
+        <span />
+      </div>
+      <div className="orbital orbitalTwo" aria-hidden="true">
+        <span />
+      </div>
 
       <div className="robot robotLeft" aria-hidden="true">
         <div className="robotHead">
@@ -86,7 +114,10 @@ export default function PlaygroundGatewayPage() {
             <span>TA-14 AI GOVERNANCE EXCHANGE</span>
           </div>
 
-          <p className="eyebrow">PLAYGROUND GATEWAY</p>
+          <div className="freeBadge">
+            <span className="freePulse" />
+            FREE TO PLAY
+          </div>
 
           <h1>
             Which playground
@@ -94,14 +125,34 @@ export default function PlaygroundGatewayPage() {
           </h1>
 
           <p className="intro">
-            Choose one environment. Each playground contains its own tools,
-            records, demonstrations, and governed workflows.
+            TA-14 gives people, organizations, and institutions a place to
+            explore what happens when evidence, authority, interpretation, and
+            execution are governed instead of assumed.
           </p>
+
+          <div className="principles" aria-label="Free access details">
+            {PRINCIPLES.map((principle) => (
+              <span key={principle}>
+                <i aria-hidden="true">✓</i>
+                {principle}
+              </span>
+            ))}
+          </div>
 
           <div className="pulseRule" aria-hidden="true">
             <span />
           </div>
         </header>
+
+        <section className="mission">
+          <div className="missionLabel">WHY THIS EXISTS</div>
+          <p>
+            Society increasingly depends on systems that interpret records,
+            recommend actions, control environments, and affect real people.
+            TA-14 creates a visible path from reality to record, from record to
+            determination, and from determination to accountable execution.
+          </p>
+        </section>
 
         <section className="doors" aria-label="Available TA-14 playgrounds">
           {PLAYGROUNDS.map((playground) => (
@@ -113,7 +164,7 @@ export default function PlaygroundGatewayPage() {
                 {
                   '--accent': playground.accent,
                   '--glow': playground.glow,
-                } as React.CSSProperties
+                } as CSSProperties
               }
             >
               <div className="doorGlow" aria-hidden="true" />
@@ -144,6 +195,18 @@ export default function PlaygroundGatewayPage() {
               </div>
             </Link>
           ))}
+        </section>
+
+        <section className="society">
+          <div>
+            <p className="societyEyebrow">ONE PUBLIC FRONT DOOR</p>
+            <h3>Different domains. One governing discipline.</h3>
+          </div>
+          <p>
+            Each playground has its own tools and purpose, but all four preserve
+            the same principle: records, interpretations, decisions, and
+            executions should remain visible, bounded, and reviewable.
+          </p>
         </section>
 
         <footer className="footer">
@@ -179,10 +242,10 @@ export default function PlaygroundGatewayPage() {
           overflow: hidden;
           color: #f7fbff;
           background:
-            radial-gradient(circle at 50% -10%, rgba(40, 111, 154, 0.28), transparent 35%),
-            radial-gradient(circle at 15% 70%, rgba(70, 78, 190, 0.14), transparent 35%),
-            radial-gradient(circle at 85% 75%, rgba(20, 160, 120, 0.12), transparent 35%),
-            linear-gradient(180deg, #02070d 0%, #04111b 52%, #02070d 100%);
+            radial-gradient(circle at 50% -10%, rgba(40, 111, 154, 0.3), transparent 35%),
+            radial-gradient(circle at 10% 68%, rgba(70, 78, 190, 0.15), transparent 35%),
+            radial-gradient(circle at 90% 76%, rgba(20, 160, 120, 0.13), transparent 35%),
+            linear-gradient(180deg, #02070d 0%, #04111b 50%, #02070d 100%);
           font-family:
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
@@ -196,7 +259,7 @@ export default function PlaygroundGatewayPage() {
             linear-gradient(rgba(100, 210, 255, 0.07) 1px, transparent 1px),
             linear-gradient(90deg, rgba(100, 210, 255, 0.07) 1px, transparent 1px);
           background-size: 54px 54px;
-          mask-image: linear-gradient(to bottom, transparent, black 18%, black 80%, transparent);
+          mask-image: linear-gradient(to bottom, transparent, black 12%, black 86%, transparent);
           animation: gridShift 16s linear infinite;
         }
 
@@ -239,16 +302,63 @@ export default function PlaygroundGatewayPage() {
           animation: driftTwo 22s ease-in-out infinite alternate;
         }
 
+        .auroraThree {
+          top: 42%;
+          left: 42%;
+          width: 26rem;
+          height: 26rem;
+          background: #8f7cff;
+          opacity: 0.08;
+          animation: driftThree 20s ease-in-out infinite alternate;
+        }
+
+        .orbital {
+          position: absolute;
+          z-index: 1;
+          border: 1px solid rgba(115, 229, 255, 0.08);
+          border-radius: 999px;
+          pointer-events: none;
+        }
+
+        .orbital span {
+          position: absolute;
+          top: 50%;
+          left: -4px;
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: #69e7ff;
+          box-shadow: 0 0 18px #69e7ff;
+        }
+
+        .orbitalOne {
+          top: 7rem;
+          left: 50%;
+          width: 58rem;
+          height: 58rem;
+          transform: translateX(-50%);
+          animation: orbit 24s linear infinite;
+        }
+
+        .orbitalTwo {
+          top: 18rem;
+          left: 50%;
+          width: 36rem;
+          height: 36rem;
+          transform: translateX(-50%) rotate(45deg);
+          animation: orbitReverse 18s linear infinite;
+        }
+
         .shell {
           position: relative;
           z-index: 5;
           width: min(1380px, calc(100% - 36px));
           margin: 0 auto;
-          padding: 56px 0 38px;
+          padding: 48px 0 38px;
         }
 
         .hero {
-          max-width: 920px;
+          max-width: 980px;
           margin: 0 auto;
           text-align: center;
         }
@@ -275,16 +385,33 @@ export default function PlaygroundGatewayPage() {
           box-shadow: 0 0 30px rgba(99, 230, 255, 0.08);
         }
 
-        .eyebrow {
-          margin: 62px 0 15px;
-          color: #65e8d2;
-          font-size: 11px;
-          font-weight: 900;
-          letter-spacing: 0.25em;
+        .freeBadge {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          margin-top: 54px;
+          padding: 10px 15px;
+          border: 1px solid rgba(98, 239, 185, 0.24);
+          border-radius: 999px;
+          color: #82f4c5;
+          background: rgba(98, 239, 185, 0.06);
+          box-shadow: 0 0 30px rgba(98, 239, 185, 0.08);
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.2em;
+        }
+
+        .freePulse {
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: #62efb9;
+          box-shadow: 0 0 14px #62efb9;
+          animation: freePulse 2s ease-in-out infinite;
         }
 
         h1 {
-          margin: 0;
+          margin: 25px 0 0;
           font-size: clamp(3.2rem, 8vw, 7.7rem);
           line-height: 0.91;
           letter-spacing: -0.075em;
@@ -301,18 +428,44 @@ export default function PlaygroundGatewayPage() {
         }
 
         .intro {
-          max-width: 720px;
+          max-width: 760px;
           margin: 30px auto 0;
-          color: #91a9b9;
-          font-size: clamp(1rem, 2vw, 1.2rem);
-          line-height: 1.75;
+          color: #9ab0be;
+          font-size: clamp(1rem, 2vw, 1.22rem);
+          line-height: 1.78;
+        }
+
+        .principles {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+          margin-top: 28px;
+        }
+
+        .principles span {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 12px;
+          border: 1px solid rgba(151, 194, 212, 0.12);
+          border-radius: 999px;
+          color: #9fb5c3;
+          background: rgba(255, 255, 255, 0.025);
+          font-size: 11px;
+          font-weight: 750;
+        }
+
+        .principles i {
+          color: #62efb9;
+          font-style: normal;
         }
 
         .pulseRule {
           position: relative;
-          width: min(480px, 75%);
+          width: min(520px, 78%);
           height: 1px;
-          margin: 36px auto 0;
+          margin: 38px auto 0;
           overflow: hidden;
           background: rgba(145, 200, 220, 0.16);
         }
@@ -327,11 +480,37 @@ export default function PlaygroundGatewayPage() {
           animation: pulseRule 3.8s ease-in-out infinite;
         }
 
+        .mission {
+          display: grid;
+          grid-template-columns: 180px minmax(0, 1fr);
+          gap: 26px;
+          align-items: start;
+          max-width: 1040px;
+          margin: 54px auto 0;
+          padding: 22px 0;
+          border-top: 1px solid rgba(151, 194, 212, 0.12);
+          border-bottom: 1px solid rgba(151, 194, 212, 0.12);
+        }
+
+        .missionLabel {
+          color: #64e7d1;
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.2em;
+        }
+
+        .mission p {
+          margin: 0;
+          color: #90a8b7;
+          font-size: 14px;
+          line-height: 1.8;
+        }
+
         .doors {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 22px;
-          margin-top: 58px;
+          margin-top: 50px;
         }
 
         .door {
@@ -339,18 +518,18 @@ export default function PlaygroundGatewayPage() {
           --glow: rgba(99, 230, 255, 0.3);
           position: relative;
           display: flex;
-          min-height: 430px;
+          min-height: 400px;
           flex-direction: column;
           justify-content: space-between;
           overflow: hidden;
-          padding: 26px;
+          padding: 28px;
           border: 1px solid rgba(160, 205, 225, 0.15);
           border-radius: 24px;
           color: inherit;
           text-decoration: none;
           background:
-            linear-gradient(160deg, rgba(15, 37, 50, 0.88), rgba(5, 17, 25, 0.94)),
-            rgba(5, 17, 25, 0.9);
+            linear-gradient(160deg, rgba(15, 37, 50, 0.9), rgba(5, 17, 25, 0.96)),
+            rgba(5, 17, 25, 0.92);
           box-shadow:
             0 30px 70px rgba(0, 0, 0, 0.28),
             inset 0 1px 0 rgba(255, 255, 255, 0.035);
@@ -440,7 +619,7 @@ export default function PlaygroundGatewayPage() {
         }
 
         .doorContent {
-          margin-top: 52px;
+          margin-top: 50px;
         }
 
         .doorSubtitle {
@@ -454,16 +633,17 @@ export default function PlaygroundGatewayPage() {
 
         .door h2 {
           margin: 0;
-          font-size: clamp(2rem, 3.2vw, 3.4rem);
+          font-size: clamp(2.25rem, 4vw, 4.15rem);
           line-height: 0.98;
-          letter-spacing: -0.055em;
+          letter-spacing: -0.06em;
         }
 
         .doorDescription {
+          max-width: 560px;
           margin: 22px 0 0;
           color: #91a8b7;
           font-size: 14px;
-          line-height: 1.72;
+          line-height: 1.74;
         }
 
         .doorAction {
@@ -482,8 +662,8 @@ export default function PlaygroundGatewayPage() {
         .arrow {
           display: grid;
           place-items: center;
-          width: 34px;
-          height: 34px;
+          width: 36px;
+          height: 36px;
           flex: 0 0 auto;
           border-radius: 999px;
           color: #031018;
@@ -532,6 +712,41 @@ export default function PlaygroundGatewayPage() {
           border-left: 1px solid;
         }
 
+        .society {
+          display: grid;
+          grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+          gap: 54px;
+          align-items: center;
+          margin-top: 30px;
+          padding: 34px;
+          border: 1px solid rgba(151, 194, 212, 0.12);
+          border-radius: 22px;
+          background: rgba(7, 23, 33, 0.72);
+          backdrop-filter: blur(14px);
+        }
+
+        .societyEyebrow {
+          margin: 0 0 10px;
+          color: #68e5ff;
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.18em;
+        }
+
+        .society h3 {
+          margin: 0;
+          font-size: clamp(1.8rem, 3vw, 3.1rem);
+          line-height: 1.02;
+          letter-spacing: -0.045em;
+        }
+
+        .society > p {
+          margin: 0;
+          color: #91a8b7;
+          font-size: 14px;
+          line-height: 1.78;
+        }
+
         .footer {
           display: flex;
           align-items: center;
@@ -558,20 +773,20 @@ export default function PlaygroundGatewayPage() {
           z-index: 2;
           width: 145px;
           height: 300px;
-          opacity: 0.14;
+          opacity: 0.12;
           filter: drop-shadow(0 0 18px rgba(101, 232, 210, 0.28));
           pointer-events: none;
         }
 
         .robotLeft {
-          top: 28%;
+          top: 32%;
           left: -28px;
           transform: rotate(4deg);
           animation: robotFloatLeft 8s ease-in-out infinite;
         }
 
         .robotRight {
-          top: 18%;
+          top: 20%;
           right: -36px;
           transform: rotate(-7deg) scale(0.9);
           animation: robotFloatRight 10s ease-in-out infinite;
@@ -710,6 +925,33 @@ export default function PlaygroundGatewayPage() {
           }
         }
 
+        @keyframes driftThree {
+          from {
+            transform: translate(-20px, -20px);
+          }
+          to {
+            transform: translate(80px, 45px);
+          }
+        }
+
+        @keyframes orbit {
+          from {
+            transform: translateX(-50%) rotate(0deg);
+          }
+          to {
+            transform: translateX(-50%) rotate(360deg);
+          }
+        }
+
+        @keyframes orbitReverse {
+          from {
+            transform: translateX(-50%) rotate(45deg);
+          }
+          to {
+            transform: translateX(-50%) rotate(-315deg);
+          }
+        }
+
         @keyframes pulseRule {
           0%,
           20% {
@@ -718,6 +960,18 @@ export default function PlaygroundGatewayPage() {
           75%,
           100% {
             left: 100%;
+          }
+        }
+
+        @keyframes freePulse {
+          0%,
+          100% {
+            opacity: 0.55;
+            transform: scale(0.85);
+          }
+          50% {
+            opacity: 1;
+            transform: scale(1.15);
           }
         }
 
@@ -786,6 +1040,17 @@ export default function PlaygroundGatewayPage() {
         }
 
         @media (max-width: 1040px) {
+          .robot {
+            opacity: 0.06;
+          }
+
+          .mission {
+            grid-template-columns: 1fr;
+            gap: 12px;
+          }
+        }
+
+        @media (max-width: 820px) {
           .doors {
             grid-template-columns: 1fr;
           }
@@ -794,15 +1059,16 @@ export default function PlaygroundGatewayPage() {
             min-height: 360px;
           }
 
-          .robot {
-            opacity: 0.07;
+          .society {
+            grid-template-columns: 1fr;
+            gap: 24px;
           }
         }
 
         @media (max-width: 700px) {
           .shell {
             width: min(100% - 24px, 1380px);
-            padding-top: 30px;
+            padding-top: 28px;
           }
 
           .institution {
@@ -810,8 +1076,8 @@ export default function PlaygroundGatewayPage() {
             letter-spacing: 0.12em;
           }
 
-          .eyebrow {
-            margin-top: 48px;
+          .freeBadge {
+            margin-top: 44px;
           }
 
           h1 {
@@ -819,7 +1085,7 @@ export default function PlaygroundGatewayPage() {
           }
 
           .doors {
-            margin-top: 40px;
+            margin-top: 38px;
           }
 
           .door {
@@ -831,12 +1097,17 @@ export default function PlaygroundGatewayPage() {
             margin-top: 38px;
           }
 
+          .society {
+            padding: 24px;
+          }
+
           .footer {
             flex-wrap: wrap;
             text-align: center;
           }
 
-          .robot {
+          .robot,
+          .orbital {
             display: none;
           }
         }
