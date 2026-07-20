@@ -11,6 +11,9 @@ type NavigationItem = {
   partner?: boolean;
 };
 
+const partnerReviewNetworkHref =
+  '/workspace/ai-governance/partner-review-network';
+
 const workspaceNavigation: NavigationItem[] = [
   {
     href: '/workspace/ai-governance',
@@ -37,10 +40,10 @@ const workspaceNavigation: NavigationItem[] = [
     matchPrefixes: ['/workspace/routes'],
   },
   {
-    href: '/partner-review-network',
+    href: partnerReviewNetworkHref,
     label: 'Partner Review Network',
     glyph: 'P',
-    matchPrefixes: ['/partner-review-network'],
+    matchPrefixes: [partnerReviewNetworkHref],
     partner: true,
   },
   {
@@ -121,7 +124,7 @@ export function AiGovernanceNavigation() {
             Explore the current partner-review pathways and learn what each
             governance architecture contributes.
           </p>
-          <Link href="/partner-review-network">Explore the network →</Link>
+          <Link href={partnerReviewNetworkHref}>Explore the network →</Link>
         </article>
       </aside>
 
