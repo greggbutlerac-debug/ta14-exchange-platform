@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'TA-14 AI Governance Playground',
   description:
-    'Explore AI governance, governed records, building systems, and HVAC operations through guided TA-14 demonstrations.',
+    'Explore AI governance, governed records, building systems, and HVAC operations through guided TA-14 experiences.',
 };
 
 type Playground = {
@@ -28,12 +28,12 @@ const playgrounds: Playground[] = [
     description:
       'Test whether a consequential AI action should be allowed to proceed. Watch TA-14 examine evidence, authority, policy, identity, destination, and expected consequence before execution.',
     examples: [
-      'Run a guided governance demonstration',
-      'Build and test your own route',
+      'Build and test a consequential route',
+      'Declare evidence, authority, identity, and purpose',
       'Experience ALLOW, HOLD, DENY, and ESCALATE',
       'Correct missing evidence without erasing history',
     ],
-    href: '/workspace/demo',
+    href: '/workspace/routes/new',
     action: 'Enter AI Governance',
     status: 'LIVE',
     accent: '#5eead4',
@@ -47,12 +47,12 @@ const playgrounds: Playground[] = [
     description:
       'Bring a governed record and discover what it proves, what it may indicate, what it cannot prove, what evidence is missing, and what governed step should come next.',
     examples: [
-      'Explore GRI™ and ERI™',
+      'Explore ERI™ inside GRI™',
       'Interpret environmental records',
       'Preview a GIR™',
       'Preserve evidence boundaries and replayability',
     ],
-    href: '/governed-record-interpreter',
+    href: '/governed-record-interpreter/eri',
     action: 'Enter Governed Records',
     status: 'LIVE',
     accent: '#7dd3fc',
@@ -100,27 +100,27 @@ const playgrounds: Playground[] = [
 const quickStarts = [
   {
     number: '01',
-    title: 'Show me how it works',
+    title: 'Test an AI action',
     description:
-      'Run a prepared demonstration and watch TA-14 stop an inadmissible action before consequence.',
-    href: '/workspace/demo',
-    action: 'Run guided demo',
+      'Create a consequential route and watch TA-14 examine its evidence, authority, identity, purpose, destination, and expected consequence.',
+    href: '/workspace/routes/new',
+    action: 'Open AI Governance',
   },
   {
     number: '02',
-    title: 'Let me build something',
+    title: 'Build my own route',
     description:
-      'Create a consequential route using your own actor, purpose, evidence, authority, target, and expected outcome.',
+      'Use your own information to define an actor, purpose, authority, evidence, target, policy, and expected outcome.',
     href: '/workspace/routes/new',
-    action: 'Build my route',
+    action: 'Build My Route',
   },
   {
     number: '03',
-    title: 'Let me examine a record',
+    title: 'Interpret a record',
     description:
-      'Open the Governed Record Interpreter and explore bounded interpretation without evidentiary overreach.',
-    href: '/governed-record-interpreter',
-    action: 'Open GRI™',
+      'Open ERI™ and explore bounded environmental interpretation without changing the source evidence or exceeding what it proves.',
+    href: '/governed-record-interpreter/eri',
+    action: 'Open ERI™',
   },
 ];
 
@@ -133,7 +133,7 @@ const learningSteps = [
   {
     step: 'Experience',
     description:
-      'Run a prepared demonstration without needing governance expertise.',
+      'Enter a live experience without needing governance expertise.',
   },
   {
     step: 'Challenge',
@@ -176,26 +176,26 @@ export default function WorkspacePage() {
           </h1>
 
           <p style={styles.heroText}>
-            Choose a playground, run a guided demonstration, or bring
-            your own information. See how evidence, authority,
-            continuity, admissibility, execution, and outcomes work
-            together before real-world consequence.
+            Choose a playground or bring your own information. See
+            how evidence, authority, continuity, admissibility,
+            execution, and outcomes work together before real-world
+            consequence.
           </p>
 
           <div style={styles.heroActions}>
             <Link
-              href="/workspace/demo"
+              href="/workspace/routes/new"
               style={styles.primaryButton}
             >
-              Start the guided experience
+              Enter AI Governance
               <span aria-hidden="true"> →</span>
             </Link>
 
             <Link
-              href="/workspace/routes/new"
+              href="/governed-record-interpreter/eri"
               style={styles.secondaryButton}
             >
-              Build my own route
+              Explore Governed Records
             </Link>
           </div>
 
@@ -203,9 +203,11 @@ export default function WorkspacePage() {
             <span style={styles.trustItem}>
               No expertise required
             </span>
+
             <span style={styles.trustItem}>
               No credit card required
             </span>
+
             <span style={styles.trustItem}>
               Adverse results preserved
             </span>
@@ -216,10 +218,11 @@ export default function WorkspacePage() {
           <div style={styles.heroPanelTop}>
             <div>
               <p style={styles.panelEyebrow}>
-                CURRENT EXPERIENCE
+                LIVE EXPERIENCE
               </p>
+
               <h2 style={styles.panelTitle}>
-                Consequential AI action
+                Consequential AI route
               </h2>
             </div>
 
@@ -227,8 +230,9 @@ export default function WorkspacePage() {
           </div>
 
           <p style={styles.panelDescription}>
-            A proposed vendor payment is submitted without complete
-            procurement authority and beneficiary evidence.
+            Define a proposed consequential action, declare what
+            evidence and authority support it, and submit it to the
+            TA-14 governance route.
           </p>
 
           <div style={styles.routeLine}>
@@ -236,24 +240,29 @@ export default function WorkspacePage() {
             <span style={styles.routeArrow}>→</span>
             <span style={styles.routeNode}>Evidence</span>
             <span style={styles.routeArrow}>→</span>
-            <span style={styles.holdNode}>HOLD</span>
+            <span style={styles.holdNode}>Decision</span>
           </div>
 
           <div style={styles.panelResult}>
             <span style={styles.resultLabel}>
-              TA-14 determination
+              Possible route states
             </span>
+
             <strong style={styles.resultValue}>
-              Execution stopped
+              ALLOW · HOLD · DENY · ESCALATE
             </strong>
+
             <p style={styles.resultText}>
-              Missing authority and beneficiary evidence remain
-              visible until corrected.
+              Missing or conflicting conditions remain visible rather
+              than being hidden behind a generic confidence score.
             </p>
           </div>
 
-          <Link href="/workspace/demo" style={styles.panelButton}>
-            Experience this demonstration
+          <Link
+            href="/workspace/routes/new"
+            style={styles.panelButton}
+          >
+            Build and test a route
           </Link>
         </aside>
       </section>
@@ -261,7 +270,10 @@ export default function WorkspacePage() {
       <section style={styles.introSection}>
         <div style={styles.sectionHeader}>
           <div>
-            <p style={styles.eyebrow}>CHOOSE YOUR EXPERIENCE</p>
+            <p style={styles.eyebrow}>
+              CHOOSE YOUR EXPERIENCE
+            </p>
+
             <h2 style={styles.sectionTitle}>
               Four understandable doors.
             </h2>
@@ -331,6 +343,7 @@ export default function WorkspacePage() {
                         background: playground.accent,
                       }}
                     />
+
                     <span>{example}</span>
                   </li>
                 ))}
@@ -349,6 +362,7 @@ export default function WorkspacePage() {
                 </Link>
               ) : (
                 <div
+                  aria-disabled="true"
                   style={{
                     ...styles.developingButton,
                     borderColor: playground.accentBorder,
@@ -376,8 +390,8 @@ export default function WorkspacePage() {
           </div>
 
           <p style={styles.lightSectionDescription}>
-            Skip the explanation and enter the experience that matches
-            what you came here to do.
+            Skip the explanation and enter the experience that
+            matches what you came here to do.
           </p>
         </div>
 
@@ -411,7 +425,9 @@ export default function WorkspacePage() {
 
       <section style={styles.howItWorksSection}>
         <div style={styles.howItWorksIntro}>
-          <p style={styles.eyebrow}>HOW THE PLAYGROUND WORKS</p>
+          <p style={styles.eyebrow}>
+            HOW THE PLAYGROUND WORKS
+          </p>
 
           <h2 style={styles.sectionTitle}>
             Governance becomes understandable when you can see it.
@@ -437,7 +453,9 @@ export default function WorkspacePage() {
                 )}
               </div>
 
-              <h3 style={styles.learningTitle}>{item.step}</h3>
+              <h3 style={styles.learningTitle}>
+                {item.step}
+              </h3>
 
               <p style={styles.learningDescription}>
                 {item.description}
@@ -532,24 +550,24 @@ export default function WorkspacePage() {
           </h2>
 
           <p style={styles.finalCtaText}>
-            Begin with a guided demonstration, then build and test a
-            route using your own information.
+            Build and test a consequential AI route or examine a
+            governed environmental record.
           </p>
         </div>
 
         <div style={styles.finalCtaActions}>
           <Link
-            href="/workspace/demo"
+            href="/workspace/routes/new"
             style={styles.finalPrimaryButton}
           >
-            Enter the Playground
+            Enter AI Governance
           </Link>
 
           <Link
-            href="/workspace/routes/new"
+            href="/governed-record-interpreter/eri"
             style={styles.finalSecondaryButton}
           >
-            Build My Own Route
+            Explore Governed Records
           </Link>
         </div>
       </section>
