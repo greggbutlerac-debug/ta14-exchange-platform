@@ -219,7 +219,7 @@ export default function AIGovernancePlaygroundPage() {
             <span>AB / BIGMAE / Elias</span>
           </div>
 
-          <Link className="partnerButton" href="/partner-review-network">
+          <Link className="partnerButton" href="/workspace/ai-governance/partner-review-network">
             Explore the Partner Review Network
           </Link>
         </div>
