@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { Suspense, useMemo, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 
 type InterpretationState =
@@ -17,11 +17,7 @@ type InterpretationState =
   | 'INSUFFICIENT_EVIDENCE'
   | 'ESCALATION_RECOMMENDED';
 
-type ChannelStatus =
-  | 'NORMAL'
-  | 'WATCH'
-  | 'EXCURSION'
-  | 'MISSING';
+type ChannelStatus = 'NORMAL' | 'WATCH' | 'EXCURSION' | 'MISSING';
 
 type Channel = {
   id: string;
@@ -43,15 +39,6 @@ type EventWindow = {
   channels: string[];
   finding: string;
   limitation: string;
-};
-
-type FiveLaneItem = {
-  number: string;
-  title: string;
-  body: string;
-  accent: string;
-  background: string;
-  border: string;
 };
 
 const CHANNELS: Channel[] = [
@@ -152,7 +139,7 @@ const CHANNELS: Channel[] = [
     status: 'WATCH',
     role: 'Occupancy and ventilation context.',
     boundary:
-      'CO₂ is not a universal indoor-air-quality score and does not identify every ventilation condition.',
+      'CO₂ is not a universal indoor-air-quality score.',
   },
   {
     id: 'voc',
@@ -239,196 +226,57 @@ const EVENTS: EventWindow[] = [
   },
 ];
 
-const FIVE_LANES: FiveLaneItem[] = [
+const FIVE_LANES = [
   {
-    number: '01',
     title: 'What the record proves',
     body:
       'Pressure performance weakened during three bounded intervals, and two intervals overlapped with increased particulate concentration.',
-    accent: '#34d399',
-    background: 'rgba(52, 211, 153, 0.08)',
-    border: 'rgba(52, 211, 153, 0.24)',
   },
   {
-    number: '02',
     title: 'What the record may indicate',
     body:
       'The pressure and particulate pattern may be consistent with migration or infiltration, but source and pathway are not established.',
-    accent: '#fbbf24',
-    background: 'rgba(251, 191, 36, 0.08)',
-    border: 'rgba(251, 191, 36, 0.24)',
   },
   {
-    number: '03',
     title: 'What the record cannot prove',
     body:
       'The record does not establish infection transmission, occupant harm, negligence, equipment failure, or legal noncompliance.',
-    accent: '#fb7185',
-    background: 'rgba(251, 113, 133, 0.08)',
-    border: 'rgba(251, 113, 133, 0.24)',
   },
   {
-    number: '04',
     title: 'Missing evidence',
     body:
       'Door-state history, current calibration documentation, verified reference-pressure location, and room-use declarations are incomplete.',
-    accent: '#38bdf8',
-    background: 'rgba(56, 189, 248, 0.08)',
-    border: 'rgba(56, 189, 248, 0.24)',
   },
   {
-    number: '05',
     title: 'Recommended next evidence pathway',
     body:
       'Obtain the missing records, extend observation, verify the pressure reference, and route the GIR™ to the designated facility reviewer.',
-    accent: '#c084fc',
-    background: 'rgba(192, 132, 252, 0.08)',
-    border: 'rgba(192, 132, 252, 0.24)',
   },
 ];
 
-const BASELINE_ITEMS = [
-  [
-    'Baseline window',
-    '06:00–08:00 / occupied / negative-pressure mode',
-  ],
-  [
-    'Baseline support',
-    'Qualified — outdoor reference and door-state evidence incomplete',
-  ],
-  [
-    'Event trigger',
-    'Pressure below the declared contextual threshold',
-  ],
-  [
-    'Persistence rule',
-    'Continuous or recurrent duration greater than ten minutes',
-  ],
-  ['Post-intervention record', 'Not yet supplied'],
-  [
-    'Outcome state',
-    'HOLD — performance restoration not established',
-  ],
-];
-
-const GIR_SUMMARY = [
-  ['GIR ID', 'GIR-ERI-DEMO-00014'],
-  ['Decision state', 'HOLD'],
-  ['Interpretation class', 'COMPOUND EVENT'],
-  ['Engine', 'gri-core 0.1.0'],
-  ['Module', 'eri.atmospheric 1.1.0'],
-  ['Ruleset', 'eri-healthcare-air 1.0.0'],
-  ['Replay', 'EXPLANATORY READY'],
-];
-
-function channelTone(status: ChannelStatus) {
-  if (status === 'NORMAL') {
-    return {
-      color: '#6ee7b7',
-      background: 'rgba(52, 211, 153, 0.08)',
-      border: 'rgba(52, 211, 153, 0.24)',
-    };
-  }
-
-  if (status === 'WATCH') {
-    return {
-      color: '#fcd34d',
-      background: 'rgba(251, 191, 36, 0.08)',
-      border: 'rgba(251, 191, 36, 0.24)',
-    };
-  }
-
-  if (status === 'EXCURSION') {
-    return {
-      color: '#fda4af',
-      background: 'rgba(251, 113, 133, 0.08)',
-      border: 'rgba(251, 113, 133, 0.24)',
-    };
-  }
-
-  return {
-    color: '#cbd5e1',
-    background: 'rgba(148, 163, 184, 0.08)',
-    border: 'rgba(148, 163, 184, 0.24)',
-  };
+function tone(status: ChannelStatus) {
+  if (status === 'NORMAL') return { color: '#6ee7b7', border: 'rgba(52,211,153,.3)' };
+  if (status === 'WATCH') return { color: '#fcd34d', border: 'rgba(251,191,36,.3)' };
+  if (status === 'EXCURSION') return { color: '#fda4af', border: 'rgba(251,113,133,.3)' };
+  return { color: '#cbd5e1', border: 'rgba(148,163,184,.3)' };
 }
 
-function stateTone(state: InterpretationState) {
-  if (state === 'COMPOUND_EVENT') {
-    return {
-      color: '#d8b4fe',
-      background: 'rgba(192, 132, 252, 0.09)',
-      border: 'rgba(192, 132, 252, 0.28)',
-    };
-  }
-
-  if (state === 'PERSISTENT_EXCURSION') {
-    return {
-      color: '#fdba74',
-      background: 'rgba(251, 146, 60, 0.09)',
-      border: 'rgba(251, 146, 60, 0.28)',
-    };
-  }
-
-  if (state === 'SENSOR_INTEGRITY_EXCEPTION') {
-    return {
-      color: '#cbd5e1',
-      background: 'rgba(148, 163, 184, 0.09)',
-      border: 'rgba(148, 163, 184, 0.28)',
-    };
-  }
-
-  if (
-    state === 'ACUTE_EVENT' ||
-    state === 'ESCALATION_RECOMMENDED'
-  ) {
-    return {
-      color: '#fda4af',
-      background: 'rgba(251, 113, 133, 0.09)',
-      border: 'rgba(251, 113, 133, 0.28)',
-    };
-  }
-
-  return {
-    color: '#7dd3fc',
-    background: 'rgba(56, 189, 248, 0.09)',
-    border: 'rgba(56, 189, 248, 0.28)',
-  };
-}
-
-export default function EnvironmentalRecordInterpreterPage() {
+function EnvironmentalRecordInterpreterContent() {
   const searchParams = useSearchParams();
+  const sourceRecordId = searchParams.get('record') || 'AIR-DEMO-014';
 
-  const sourceRecordId =
-    searchParams.get('record') || 'AIR-DEMO-014';
-
-  const [activeChannelId, setActiveChannelId] = useState(
-    CHANNELS[7].id,
-  );
-
-  const [activeEventId, setActiveEventId] = useState(
-    EVENTS[0].id,
-  );
-
+  const [activeChannelId, setActiveChannelId] = useState('pressure');
+  const [activeEventId, setActiveEventId] = useState('EVT-001');
   const [showGir, setShowGir] = useState(false);
 
   const activeChannel = useMemo(
-    () =>
-      CHANNELS.find(
-        (channel) => channel.id === activeChannelId,
-      ) ?? CHANNELS[0],
+    () => CHANNELS.find((channel) => channel.id === activeChannelId) ?? CHANNELS[0],
     [activeChannelId],
   );
 
   const activeEvent = useMemo(
-    () =>
-      EVENTS.find((event) => event.id === activeEventId) ??
-      EVENTS[0],
+    () => EVENTS.find((event) => event.id === activeEventId) ?? EVENTS[0],
     [activeEventId],
-  );
-
-  const activeEventTone = stateTone(
-    activeEvent.classification,
   );
 
   return (
@@ -436,524 +284,233 @@ export default function EnvironmentalRecordInterpreterPage() {
       <header style={styles.topBar}>
         <Link href="/workspace" style={styles.brand}>
           <span style={styles.brandMark}>TA</span>
-
           <span>
-            <strong style={styles.brandTitle}>
-              TA-14 AI GOVERNANCE PLAYGROUND
-            </strong>
-
-            <small style={styles.brandSubtitle}>
-              Governed Records Experience
-            </small>
+            <strong style={styles.brandTitle}>TA-14 AI GOVERNANCE PLAYGROUND</strong>
+            <small style={styles.brandSubtitle}>Governed Records Experience</small>
           </span>
         </Link>
 
-        <nav style={styles.topNav}>
-          <Link href="/workspace" style={styles.topNavLink}>
-            Playground Home
-          </Link>
-
-          <Link
-            href="/workspace/routes/new"
-            style={styles.topNavLink}
-          >
-            AI Governance
-          </Link>
-
-          <Link
-            href="/governed-record-interpreter"
-            style={styles.topNavLink}
-          >
-            GRI™ Workspace
-          </Link>
+        <nav style={styles.nav}>
+          <Link href="/workspace" style={styles.navLink}>Playground Home</Link>
+          <Link href="/workspace/routes/new" style={styles.navLink}>AI Governance</Link>
+          <Link href="/governed-record-interpreter" style={styles.navLink}>GRI™ Workspace</Link>
         </nav>
       </header>
 
       <section style={styles.hero}>
-        <div style={styles.heroGlowOne} />
-        <div style={styles.heroGlowTwo} />
-
-        <div style={styles.heroCopy}>
-          <Link
-            href="/workspace"
-            style={styles.returnLink}
-          >
-            <span aria-hidden="true">←</span>
-            Return to Playground Home
-          </Link>
-
-          <p style={styles.eyebrow}>
-            GRI™ MODULE 01 · LIVE
-          </p>
-
-          <h1 style={styles.heroTitle}>
-            ERI™ Environmental
-            <br />
-            Record Interpreter
-          </h1>
-
+        <div>
+          <Link href="/workspace" style={styles.backLink}>← Return to Playground Home</Link>
+          <p style={styles.eyebrow}>GRI™ MODULE 01 · LIVE</p>
+          <h1 style={styles.heroTitle}>ERI™ Environmental Record Interpreter</h1>
           <p style={styles.heroText}>
-            Environmental intelligence without evidentiary
-            overreach. Examine atmospheric, personal, building,
-            hospital, laboratory, HVAC, water, soil, land, and sensor
-            records while preserving the exact boundary between what
-            the record proves and what it cannot prove.
+            Environmental intelligence without evidentiary overreach. Examine environmental
+            records while preserving the exact boundary between what the record proves and
+            what it cannot prove.
           </p>
-
-          <div style={styles.heroTags}>
-            <span style={styles.heroTag}>
-              Source evidence preserved
-            </span>
-
-            <span style={styles.heroTag}>
-              Uncertainty exposed
-            </span>
-
-            <span style={styles.heroTag}>
-              Interpretation bounded
-            </span>
-          </div>
         </div>
 
         <aside style={styles.heroPanel}>
-          <div style={styles.heroPanelHeader}>
+          <div style={styles.panelTop}>
             <div>
-              <p style={styles.panelEyebrow}>
-                CURRENT DEMONSTRATION
-              </p>
-
-              <h2 style={styles.panelTitle}>
-                Healthcare Isolation Room 214
-              </h2>
+              <p style={styles.panelLabel}>CURRENT DEMONSTRATION</p>
+              <h2 style={styles.panelTitle}>Healthcare Isolation Room 214</h2>
             </div>
-
             <span style={styles.holdBadge}>HOLD</span>
           </div>
 
-          <dl style={styles.panelDetails}>
-            <div style={styles.panelDetailRow}>
-              <dt style={styles.panelTerm}>Source record</dt>
-              <dd style={styles.panelValue}>
-                {sourceRecordId}
-              </dd>
-            </div>
-
-            <div style={styles.panelDetailRow}>
-              <dt style={styles.panelTerm}>Covered period</dt>
-              <dd style={styles.panelValue}>24 hours</dd>
-            </div>
-
-            <div style={styles.panelDetailRow}>
-              <dt style={styles.panelTerm}>Module</dt>
-              <dd style={styles.panelValue}>
-                eri.atmospheric 1.1.0
-              </dd>
-            </div>
-
-            <div style={styles.panelDetailRowLast}>
-              <dt style={styles.panelTerm}>Ruleset</dt>
-              <dd style={styles.panelValue}>
-                eri-healthcare-air 1.0.0
-              </dd>
-            </div>
+          <dl style={styles.details}>
+            <div style={styles.detailRow}><dt>Source record</dt><dd>{sourceRecordId}</dd></div>
+            <div style={styles.detailRow}><dt>Covered period</dt><dd>24 hours</dd></div>
+            <div style={styles.detailRow}><dt>Module</dt><dd>eri.atmospheric 1.1.0</dd></div>
+            <div style={styles.detailRow}><dt>Ruleset</dt><dd>eri-healthcare-air 1.0.0</dd></div>
           </dl>
-
-          <div style={styles.panelBoundary}>
-            <span style={styles.panelBoundaryLabel}>
-              BOUNDARY
-            </span>
-
-            <p style={styles.panelBoundaryText}>
-              Interpretation is not diagnosis, authority,
-              intervention, certification, or permission to execute.
-            </p>
-          </div>
         </aside>
       </section>
 
       <section style={styles.content}>
-        <section style={styles.card}>
-          <div style={styles.sectionHeader}>
-            <div>
-              <p style={styles.sectionEyebrow}>
-                THIRTEEN-CHANNEL ATMOSPHERIC CORE
-              </p>
-
-              <h2 style={styles.sectionTitle}>
-                Governed environmental state
-              </h2>
-            </div>
-
-            <p style={styles.sectionDescription}>
-              Measured and calculated channels remain distinct.
-              Every value retains its source, unit, timestamp,
-              location, uncertainty, and transformation lineage.
-            </p>
-          </div>
+        <article style={styles.card}>
+          <p style={styles.eyebrow}>THIRTEEN-CHANNEL ATMOSPHERIC CORE</p>
+          <h2 style={styles.sectionTitle}>Governed environmental state</h2>
 
           <div style={styles.channelGrid}>
             {CHANNELS.map((channel) => {
-              const active =
-                channel.id === activeChannelId;
-
-              const tone = channelTone(channel.status);
+              const selected = channel.id === activeChannelId;
+              const channelTone = tone(channel.status);
 
               return (
                 <button
                   key={channel.id}
                   type="button"
-                  onClick={() =>
-                    setActiveChannelId(channel.id)
-                  }
+                  onClick={() => setActiveChannelId(channel.id)}
                   style={{
-                    ...styles.channelCard,
-                    borderColor: active
-                      ? '#67e8f9'
-                      : tone.border,
-                    background: active
-                      ? 'rgba(56, 189, 248, 0.13)'
-                      : tone.background,
-                    boxShadow: active
-                      ? '0 0 0 2px rgba(103, 232, 249, 0.14)'
-                      : 'none',
+                    ...styles.channel,
+                    borderColor: selected ? '#67e8f9' : channelTone.border,
+                    boxShadow: selected ? '0 0 0 2px rgba(103,232,249,.18)' : 'none',
                   }}
                 >
-                  <div style={styles.channelCardTop}>
-                    <span style={styles.channelType}>
-                      {channel.type}
-                    </span>
-
-                    <span
-                      style={{
-                        ...styles.channelStatus,
-                        color: tone.color,
-                        borderColor: tone.border,
-                        background: tone.background,
-                      }}
-                    >
+                  <div style={styles.channelTop}>
+                    <span style={styles.channelType}>{channel.type}</span>
+                    <span style={{ ...styles.status, color: channelTone.color }}>
                       {channel.status}
                     </span>
                   </div>
-
-                  <h3 style={styles.channelName}>
-                    {channel.shortName}
-                  </h3>
-
-                  <p style={styles.channelValue}>
-                    {channel.value}
-                  </p>
+                  <h3 style={styles.channelName}>{channel.shortName}</h3>
+                  <p style={styles.channelValue}>{channel.value}</p>
                 </button>
               );
             })}
           </div>
 
-          <div style={styles.channelExplanation}>
-            <div style={styles.explanationColumn}>
-              <p style={styles.supportedEyebrow}>
-                INTERPRETIVE ROLE
-              </p>
-
-              <h3 style={styles.explanationTitle}>
-                {activeChannel.name}
-              </h3>
-
-              <p style={styles.explanationText}>
-                {activeChannel.role}
-              </p>
+          <div style={styles.boundaryGrid}>
+            <div>
+              <p style={styles.supportedLabel}>INTERPRETIVE ROLE</p>
+              <h3>{activeChannel.name}</h3>
+              <p style={styles.bodyText}>{activeChannel.role}</p>
             </div>
-
-            <div style={styles.explanationColumn}>
-              <p style={styles.boundaryEyebrow}>
-                REQUIRED BOUNDARY
-              </p>
-
-              <p style={styles.explanationText}>
-                {activeChannel.boundary}
-              </p>
+            <div>
+              <p style={styles.limitLabel}>REQUIRED BOUNDARY</p>
+              <p style={styles.bodyText}>{activeChannel.boundary}</p>
             </div>
           </div>
-        </section>
+        </article>
 
-        <section style={styles.twoColumnGrid}>
+        <section style={styles.twoCol}>
           <article style={styles.card}>
-            <p style={styles.sectionEyebrow}>
-              ENVIRONMENTAL CHRONOLOGY
-            </p>
-
-            <h2 style={styles.sectionTitleSmall}>
-              Detected event windows
-            </h2>
+            <p style={styles.eyebrow}>ENVIRONMENTAL CHRONOLOGY</p>
+            <h2 style={styles.sectionTitle}>Detected event windows</h2>
 
             <div style={styles.eventList}>
-              {EVENTS.map((event) => {
-                const active =
-                  event.id === activeEventId;
-
-                const tone = stateTone(
-                  event.classification,
-                );
-
-                return (
-                  <button
-                    key={event.id}
-                    type="button"
-                    onClick={() =>
-                      setActiveEventId(event.id)
-                    }
-                    style={{
-                      ...styles.eventButton,
-                      borderColor: active
-                        ? '#67e8f9'
-                        : 'rgba(148, 163, 184, 0.16)',
-                      background: active
-                        ? 'rgba(56, 189, 248, 0.10)'
-                        : 'rgba(255, 255, 255, 0.025)',
-                    }}
-                  >
-                    <div style={styles.eventButtonTop}>
-                      <div>
-                        <h3 style={styles.eventTitle}>
-                          {event.title}
-                        </h3>
-
-                        <p style={styles.eventMeta}>
-                          {event.start}–{event.end} ·{' '}
-                          {event.id}
-                        </p>
-                      </div>
-
-                      <span
-                        style={{
-                          ...styles.eventBadge,
-                          color: tone.color,
-                          background: tone.background,
-                          borderColor: tone.border,
-                        }}
-                      >
-                        {event.classification.replaceAll(
-                          '_',
-                          ' ',
-                        )}
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
+              {EVENTS.map((event) => (
+                <button
+                  key={event.id}
+                  type="button"
+                  onClick={() => setActiveEventId(event.id)}
+                  style={{
+                    ...styles.eventButton,
+                    borderColor: event.id === activeEventId
+                      ? '#67e8f9'
+                      : 'rgba(148,163,184,.18)',
+                  }}
+                >
+                  <strong>{event.title}</strong>
+                  <span style={styles.eventMeta}>
+                    {event.start}–{event.end} · {event.id}
+                  </span>
+                </button>
+              ))}
             </div>
           </article>
 
           <article style={styles.card}>
-            <div style={styles.selectedEventHeader}>
-              <div>
-                <p style={styles.sectionEyebrow}>
-                  SELECTED EVENT INTERPRETATION
-                </p>
-
-                <h2 style={styles.sectionTitleSmall}>
-                  {activeEvent.title}
-                </h2>
-              </div>
-
-              <span
-                style={{
-                  ...styles.selectedEventBadge,
-                  color: activeEventTone.color,
-                  background:
-                    activeEventTone.background,
-                  borderColor: activeEventTone.border,
-                }}
-              >
-                {activeEvent.classification.replaceAll(
-                  '_',
-                  ' ',
-                )}
-              </span>
-            </div>
+            <p style={styles.eyebrow}>SELECTED EVENT INTERPRETATION</p>
+            <h2 style={styles.sectionTitle}>{activeEvent.title}</h2>
 
             <div style={styles.findingGrid}>
-              <div style={styles.supportedFinding}>
-                <p style={styles.supportedEyebrow}>
-                  SUPPORTED FINDING
-                </p>
-
-                <p style={styles.findingText}>
-                  {activeEvent.finding}
-                </p>
+              <div style={styles.supportedBox}>
+                <p style={styles.supportedLabel}>SUPPORTED FINDING</p>
+                <p style={styles.bodyText}>{activeEvent.finding}</p>
               </div>
-
-              <div style={styles.limitationFinding}>
-                <p style={styles.boundaryEyebrow}>
-                  EVIDENTIARY LIMITATION
-                </p>
-
-                <p style={styles.findingText}>
-                  {activeEvent.limitation}
-                </p>
+              <div style={styles.limitBox}>
+                <p style={styles.limitLabel}>EVIDENTIARY LIMITATION</p>
+                <p style={styles.bodyText}>{activeEvent.limitation}</p>
               </div>
             </div>
 
             <div style={styles.boundChannels}>
-              <p style={styles.boundChannelsLabel}>
-                BOUND CHANNELS
-              </p>
-
-              <div style={styles.boundChannelList}>
-                {activeEvent.channels.map((channel) => (
-                  <span
-                    key={channel}
-                    style={styles.boundChannel}
-                  >
-                    {channel}
-                  </span>
-                ))}
-              </div>
+              {activeEvent.channels.map((channel) => (
+                <span key={channel} style={styles.pill}>{channel}</span>
+              ))}
             </div>
           </article>
         </section>
 
-        <section style={styles.twoColumnGrid}>
+        <section style={styles.twoCol}>
           <article style={styles.card}>
-            <p style={styles.sectionEyebrow}>
-              FIVE-LANE INTELLIGENCE MODEL
-            </p>
-
-            <h2 style={styles.sectionTitleSmall}>
-              Environmental interpretation
-            </h2>
+            <p style={styles.eyebrow}>FIVE-LANE INTELLIGENCE MODEL</p>
+            <h2 style={styles.sectionTitle}>Environmental interpretation</h2>
 
             <div style={styles.laneList}>
-              {FIVE_LANES.map((lane) => (
-                <div
-                  key={lane.title}
-                  style={{
-                    ...styles.laneCard,
-                    background: lane.background,
-                    borderColor: lane.border,
-                  }}
-                >
-                  <span
-                    style={{
-                      ...styles.laneNumber,
-                      color: lane.accent,
-                    }}
-                  >
-                    {lane.number}
+              {FIVE_LANES.map((lane, index) => (
+                <div key={lane.title} style={styles.lane}>
+                  <span style={styles.laneNumber}>
+                    {String(index + 1).padStart(2, '0')}
                   </span>
-
                   <div>
-                    <h3 style={styles.laneTitle}>
-                      {lane.title}
-                    </h3>
-
-                    <p style={styles.laneText}>
-                      {lane.body}
-                    </p>
+                    <h3 style={styles.laneTitle}>{lane.title}</h3>
+                    <p style={styles.bodyText}>{lane.body}</p>
                   </div>
                 </div>
               ))}
             </div>
           </article>
 
-          <div style={styles.stack}>
-            <article style={styles.card}>
-              <p style={styles.sectionEyebrow}>
-                BASELINE AND OUTCOME LOGIC
+          <article style={styles.card}>
+            <p style={styles.eyebrow}>BASELINE AND OUTCOME LOGIC</p>
+            <h2 style={styles.sectionTitle}>No invented baseline. No assumed success.</h2>
+
+            <dl style={styles.baselineList}>
+              {[
+                ['Baseline window', '06:00–08:00 / occupied / negative-pressure mode'],
+                ['Baseline support', 'Qualified — outdoor reference and door-state incomplete'],
+                ['Event trigger', 'Pressure below declared contextual threshold'],
+                ['Persistence rule', 'Continuous or recurrent duration greater than ten minutes'],
+                ['Post-intervention record', 'Not yet supplied'],
+                ['Outcome state', 'HOLD — performance restoration not established'],
+              ].map(([term, value]) => (
+                <div key={term} style={styles.detailRow}>
+                  <dt>{term}</dt>
+                  <dd>{value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            <div style={styles.nonNegotiable}>
+              <p style={styles.limitLabel}>NON-NEGOTIABLE BOUNDARY</p>
+              <p style={styles.bodyText}>
+                This interpretation does not modify source evidence, establish medical
+                causation, issue a diagnosis, prescribe treatment, determine liability,
+                certify compliance, or authorize environmental intervention.
               </p>
-
-              <h2 style={styles.sectionTitleSmall}>
-                No invented baseline.
-                <br />
-                No assumed success.
-              </h2>
-
-              <dl style={styles.baselineList}>
-                {BASELINE_ITEMS.map(([term, value]) => (
-                  <div
-                    key={term}
-                    style={styles.baselineRow}
-                  >
-                    <dt style={styles.baselineTerm}>
-                      {term}
-                    </dt>
-
-                    <dd style={styles.baselineValue}>
-                      {value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </article>
-
-            <article style={styles.boundaryCard}>
-              <p style={styles.boundaryEyebrow}>
-                NON-NEGOTIABLE BOUNDARY
-              </p>
-
-              <p style={styles.boundaryCardText}>
-                This interpretation does not modify the source
-                evidence, establish medical causation, issue a
-                diagnosis, prescribe treatment, condemn equipment,
-                determine liability, certify compliance, or
-                authorize environmental intervention.
-              </p>
-            </article>
-          </div>
+            </div>
+          </article>
         </section>
 
-        <section style={styles.card}>
+        <article style={styles.card}>
           <div style={styles.girHeader}>
             <div>
-              <p style={styles.sectionEyebrow}>
-                GOVERNED INTERPRETATION RECORD
-              </p>
-
-              <h2 style={styles.sectionTitleSmall}>
-                GIR™ environmental output
-              </h2>
+              <p style={styles.eyebrow}>GOVERNED INTERPRETATION RECORD</p>
+              <h2 style={styles.sectionTitle}>GIR™ environmental output</h2>
             </div>
 
             <button
               type="button"
-              onClick={() =>
-                setShowGir((value) => !value)
-              }
-              style={styles.girButton}
+              onClick={() => setShowGir((value) => !value)}
+              style={styles.primaryButton}
             >
-              {showGir
-                ? 'Hide GIR™ object'
-                : 'Preview GIR™ object'}
+              {showGir ? 'Hide GIR™ object' : 'Preview GIR™ object'}
             </button>
           </div>
 
           <div style={styles.girGrid}>
-            <div style={styles.girSummaryCard}>
-              <p style={styles.girSummaryLabel}>
-                SOURCE BINDING
-              </p>
-
-              <p style={styles.girSummaryValue}>
-                {sourceRecordId}
-              </p>
-            </div>
-
-            {GIR_SUMMARY.map(([term, value]) => (
-              <div
-                key={term}
-                style={styles.girSummaryCard}
-              >
-                <p style={styles.girSummaryLabel}>
-                  {term}
-                </p>
-
-                <p style={styles.girSummaryValue}>
-                  {value}
-                </p>
+            {[
+              ['GIR ID', 'GIR-ERI-DEMO-00014'],
+              ['Source binding', sourceRecordId],
+              ['Decision state', 'HOLD'],
+              ['Interpretation class', 'COMPOUND EVENT'],
+              ['Engine', 'gri-core 0.1.0'],
+              ['Module', 'eri.atmospheric 1.1.0'],
+              ['Ruleset', 'eri-healthcare-air 1.0.0'],
+              ['Replay', 'EXPLANATORY READY'],
+            ].map(([term, value]) => (
+              <div key={term} style={styles.summaryCard}>
+                <p style={styles.summaryLabel}>{term}</p>
+                <p style={styles.summaryValue}>{value}</p>
               </div>
             ))}
           </div>
 
           {showGir && (
-            <pre style={styles.girObject}>
+            <pre style={styles.pre}>
 {`{
   "gir_id": "GIR-ERI-DEMO-00014",
   "source_record_ids": ["${sourceRecordId}"],
@@ -991,50 +548,40 @@ export default function EnvironmentalRecordInterpreterPage() {
 }`}
             </pre>
           )}
-        </section>
-
-        <section style={styles.returnSection}>
-          <div>
-            <p style={styles.sectionEyebrow}>
-              CONTINUE EXPLORING
-            </p>
-
-            <h2 style={styles.returnTitle}>
-              Return to the playground or open GRI™.
-            </h2>
-          </div>
-
-          <div style={styles.returnActions}>
-            <Link
-              href="/workspace"
-              style={styles.returnPrimary}
-            >
-              Playground Home
-            </Link>
-
-            <Link
-              href="/governed-record-interpreter"
-              style={styles.returnSecondary}
-            >
-              Open GRI™ Workspace
-            </Link>
-          </div>
-        </section>
+        </article>
       </section>
     </main>
+  );
+}
+
+function EriLoadingState() {
+  return (
+    <main style={styles.loadingPage}>
+      <div style={styles.loadingCard}>
+        <p style={styles.eyebrow}>TA-14 AI GOVERNANCE PLAYGROUND</p>
+        <h1 style={styles.loadingTitle}>Loading ERI™</h1>
+        <p style={styles.bodyText}>Preparing the governed environmental record experience.</p>
+      </div>
+    </main>
+  );
+}
+
+export default function EnvironmentalRecordInterpreterPage() {
+  return (
+    <Suspense fallback={<EriLoadingState />}>
+      <EnvironmentalRecordInterpreterContent />
+    </Suspense>
   );
 }
 
 const styles: Record<string, React.CSSProperties> = {
   page: {
     minHeight: '100vh',
-    overflowX: 'hidden',
     background: '#06131d',
     color: '#f8fafc',
     fontFamily:
       'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
   },
-
   topBar: {
     position: 'sticky',
     top: 0,
@@ -1045,11 +592,10 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: 18,
     padding: '15px clamp(20px, 4vw, 64px)',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.14)',
-    background: 'rgba(5, 18, 27, 0.94)',
+    borderBottom: '1px solid rgba(148,163,184,.14)',
+    background: 'rgba(5,18,27,.94)',
     backdropFilter: 'blur(18px)',
   },
-
   brand: {
     display: 'flex',
     alignItems: 'center',
@@ -1057,608 +603,302 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#f8fafc',
     textDecoration: 'none',
   },
-
   brandMark: {
     display: 'grid',
     placeItems: 'center',
     width: 42,
     height: 42,
-    border: '1px solid rgba(103, 232, 249, 0.32)',
+    border: '1px solid rgba(103,232,249,.32)',
     borderRadius: 12,
-    background: 'rgba(56, 189, 248, 0.08)',
     color: '#67e8f9',
     fontSize: 13,
     fontWeight: 900,
   },
-
   brandTitle: {
     display: 'block',
     fontSize: 12,
-    letterSpacing: '0.1em',
+    letterSpacing: '.1em',
   },
-
   brandSubtitle: {
     display: 'block',
     marginTop: 3,
     color: '#7f96a7',
     fontSize: 10,
-    letterSpacing: '0.05em',
   },
-
-  topNav: {
+  nav: {
     display: 'flex',
     flexWrap: 'wrap',
     gap: 10,
   },
-
-  topNavLink: {
+  navLink: {
     padding: '9px 12px',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
+    border: '1px solid rgba(148,163,184,.15)',
     borderRadius: 999,
     color: '#c5d4de',
     fontSize: 12,
     fontWeight: 750,
     textDecoration: 'none',
   },
-
   hero: {
-    position: 'relative',
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 380px), 1fr))',
     alignItems: 'center',
     gap: 48,
-    padding:
-      'clamp(62px, 8vw, 118px) clamp(22px, 6vw, 92px)',
-    overflow: 'hidden',
-    background:
-      'linear-gradient(135deg, #071724 0%, #08232c 55%, #071c1a 100%)',
+    padding: 'clamp(62px, 8vw, 118px) clamp(22px, 6vw, 92px)',
+    background: 'linear-gradient(135deg, #071724 0%, #08232c 55%, #071c1a 100%)',
   },
-
-  heroGlowOne: {
-    position: 'absolute',
-    top: '-35%',
-    right: '-8%',
-    width: 680,
-    height: 680,
-    borderRadius: '50%',
-    background:
-      'radial-gradient(circle, rgba(45, 212, 191, 0.16), transparent 68%)',
-    pointerEvents: 'none',
-  },
-
-  heroGlowTwo: {
-    position: 'absolute',
-    bottom: '-55%',
-    left: '10%',
-    width: 620,
-    height: 620,
-    borderRadius: '50%',
-    background:
-      'radial-gradient(circle, rgba(56, 189, 248, 0.13), transparent 68%)',
-    pointerEvents: 'none',
-  },
-
-  heroCopy: {
-    position: 'relative',
-    zIndex: 1,
-  },
-
-  returnLink: {
+  backLink: {
     display: 'inline-flex',
-    alignItems: 'center',
-    gap: 8,
-    marginBottom: 35,
+    marginBottom: 32,
     color: '#a5f3fc',
     fontSize: 13,
     fontWeight: 800,
     textDecoration: 'none',
   },
-
   eyebrow: {
     margin: 0,
     color: '#5eead4',
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: 900,
-    letterSpacing: '0.2em',
+    letterSpacing: '.18em',
   },
-
   heroTitle: {
-    margin: '20px 0 26px',
-    fontSize: 'clamp(48px, 6.7vw, 92px)',
-    lineHeight: 0.94,
-    letterSpacing: '-0.065em',
+    margin: '18px 0 24px',
+    fontSize: 'clamp(48px, 6.5vw, 90px)',
+    lineHeight: .95,
+    letterSpacing: '-.06em',
   },
-
   heroText: {
-    maxWidth: 820,
+    maxWidth: 780,
     margin: 0,
     color: '#a8bac7',
     fontSize: 'clamp(17px, 1.8vw, 21px)',
     lineHeight: 1.7,
   },
-
-  heroTags: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 10,
-    marginTop: 30,
-  },
-
-  heroTag: {
-    padding: '8px 11px',
-    border: '1px solid rgba(148, 163, 184, 0.16)',
-    borderRadius: 999,
-    color: '#9db2c0',
-    fontSize: 11,
-    fontWeight: 750,
-  },
-
   heroPanel: {
-    position: 'relative',
-    zIndex: 1,
     padding: 27,
-    border: '1px solid rgba(125, 211, 252, 0.2)',
+    border: '1px solid rgba(125,211,252,.2)',
     borderRadius: 24,
-    background:
-      'linear-gradient(145deg, rgba(15, 38, 51, 0.93), rgba(8, 24, 33, 0.9))',
-    boxShadow: '0 30px 90px rgba(0, 0, 0, 0.28)',
+    background: 'rgba(10,29,39,.92)',
   },
-
-  heroPanelHeader: {
+  panelTop: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
     gap: 18,
   },
-
-  panelEyebrow: {
+  panelLabel: {
     margin: 0,
     color: '#7dd3fc',
     fontSize: 10,
     fontWeight: 900,
-    letterSpacing: '0.17em',
+    letterSpacing: '.16em',
   },
-
   panelTitle: {
     margin: '10px 0 0',
     fontSize: 24,
-    lineHeight: 1.15,
-    letterSpacing: '-0.035em',
   },
-
   holdBadge: {
+    alignSelf: 'flex-start',
     padding: '7px 10px',
-    border: '1px solid rgba(251, 191, 36, 0.3)',
+    border: '1px solid rgba(251,191,36,.3)',
     borderRadius: 999,
-    background: 'rgba(251, 191, 36, 0.09)',
     color: '#fcd34d',
     fontSize: 10,
     fontWeight: 900,
-    letterSpacing: '0.09em',
   },
-
-  panelDetails: {
+  details: {
     display: 'grid',
-    gap: 0,
-    margin: '24px 0 0',
+    margin: '22px 0 0',
   },
-
-  panelDetailRow: {
+  detailRow: {
     display: 'flex',
     justifyContent: 'space-between',
-    gap: 24,
-    padding: '14px 0',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.12)',
-  },
-
-  panelDetailRowLast: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    gap: 24,
-    padding: '14px 0',
-  },
-
-  panelTerm: {
-    color: '#879cab',
+    gap: 22,
+    padding: '13px 0',
+    borderBottom: '1px solid rgba(148,163,184,.12)',
+    color: '#a8bac7',
     fontSize: 12,
   },
-
-  panelValue: {
-    margin: 0,
-    color: '#e4edf2',
-    fontSize: 12,
-    fontWeight: 800,
-    textAlign: 'right',
-  },
-
-  panelBoundary: {
-    marginTop: 18,
-    padding: 17,
-    border: '1px solid rgba(251, 113, 133, 0.2)',
-    borderRadius: 15,
-    background: 'rgba(251, 113, 133, 0.06)',
-  },
-
-  panelBoundaryLabel: {
-    color: '#fda4af',
-    fontSize: 9,
-    fontWeight: 900,
-    letterSpacing: '0.15em',
-  },
-
-  panelBoundaryText: {
-    margin: '8px 0 0',
-    color: '#b9c7d0',
-    fontSize: 12,
-    lineHeight: 1.6,
-  },
-
   content: {
     display: 'grid',
     gap: 24,
-    padding:
-      'clamp(36px, 5vw, 72px) clamp(18px, 5vw, 78px) clamp(70px, 8vw, 120px)',
-    background: '#07151e',
+    padding: 'clamp(36px, 5vw, 72px) clamp(18px, 5vw, 78px) clamp(70px, 8vw, 120px)',
   },
-
   card: {
     padding: 'clamp(22px, 3vw, 32px)',
-    border: '1px solid rgba(148, 163, 184, 0.15)',
+    border: '1px solid rgba(148,163,184,.15)',
     borderRadius: 24,
-    background:
-      'linear-gradient(145deg, rgba(13, 35, 46, 0.9), rgba(8, 25, 34, 0.92))',
-    boxShadow: '0 25px 70px rgba(0, 0, 0, 0.12)',
+    background: 'linear-gradient(145deg, rgba(13,35,46,.9), rgba(8,25,34,.92))',
   },
-
-  sectionHeader: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'flex-end',
-    gap: 24,
-  },
-
-  sectionEyebrow: {
-    margin: 0,
-    color: '#67e8f9',
-    fontSize: 10,
-    fontWeight: 900,
-    letterSpacing: '0.18em',
-  },
-
   sectionTitle: {
     margin: '10px 0 0',
-    fontSize: 'clamp(30px, 4vw, 50px)',
-    lineHeight: 1.04,
-    letterSpacing: '-0.045em',
+    fontSize: 'clamp(28px, 3.4vw, 46px)',
+    lineHeight: 1.05,
+    letterSpacing: '-.045em',
   },
-
-  sectionTitleSmall: {
-    margin: '10px 0 0',
-    fontSize: 'clamp(27px, 3vw, 39px)',
-    lineHeight: 1.08,
-    letterSpacing: '-0.04em',
-  },
-
-  sectionDescription: {
-    maxWidth: 650,
-    margin: 0,
-    color: '#8fa4b3',
-    fontSize: 14,
-    lineHeight: 1.7,
-  },
-
   channelGrid: {
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(170px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(170px, 1fr))',
     gap: 12,
     marginTop: 28,
   },
-
-  channelCard: {
-    minHeight: 150,
+  channel: {
+    minHeight: 145,
     padding: 16,
     border: '1px solid',
     borderRadius: 17,
+    background: 'rgba(255,255,255,.025)',
     color: '#f8fafc',
     cursor: 'pointer',
     textAlign: 'left',
     font: 'inherit',
   },
-
-  channelCardTop: {
+  channelTop: {
     display: 'flex',
     justifyContent: 'space-between',
-    alignItems: 'flex-start',
     gap: 10,
   },
-
   channelType: {
     color: '#8298a8',
     fontSize: 9,
     fontWeight: 850,
-    letterSpacing: '0.1em',
     textTransform: 'uppercase',
   },
-
-  channelStatus: {
-    padding: '5px 7px',
-    border: '1px solid',
-    borderRadius: 999,
+  status: {
     fontSize: 8,
     fontWeight: 900,
-    letterSpacing: '0.08em',
   },
-
   channelName: {
-    margin: '25px 0 0',
+    margin: '24px 0 0',
     fontSize: 16,
-    letterSpacing: '-0.025em',
   },
-
   channelValue: {
     margin: '10px 0 0',
     color: '#d8e5ec',
     fontSize: 18,
     fontWeight: 850,
   },
-
-  channelExplanation: {
+  boundaryGrid: {
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(260px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
     gap: 18,
     marginTop: 22,
     padding: 22,
-    border: '1px solid rgba(148, 163, 184, 0.15)',
+    border: '1px solid rgba(148,163,184,.15)',
     borderRadius: 18,
-    background: 'rgba(3, 14, 22, 0.35)',
+    background: 'rgba(3,14,22,.35)',
   },
-
-  explanationColumn: {
-    minWidth: 0,
-  },
-
-  supportedEyebrow: {
+  supportedLabel: {
     margin: 0,
     color: '#6ee7b7',
     fontSize: 9,
     fontWeight: 900,
-    letterSpacing: '0.16em',
+    letterSpacing: '.14em',
   },
-
-  boundaryEyebrow: {
+  limitLabel: {
     margin: 0,
     color: '#fda4af',
     fontSize: 9,
     fontWeight: 900,
-    letterSpacing: '0.16em',
+    letterSpacing: '.14em',
   },
-
-  explanationTitle: {
-    margin: '10px 0 0',
-    fontSize: 20,
-    letterSpacing: '-0.025em',
-  },
-
-  explanationText: {
-    margin: '10px 0 0',
+  bodyText: {
     color: '#a8bac7',
     fontSize: 14,
     lineHeight: 1.7,
   },
-
-  twoColumnGrid: {
+  twoCol: {
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(min(100%, 390px), 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 390px), 1fr))',
     gap: 24,
   },
-
   eventList: {
     display: 'grid',
     gap: 11,
     marginTop: 24,
   },
-
   eventButton: {
-    width: '100%',
+    display: 'grid',
+    gap: 7,
     padding: 17,
     border: '1px solid',
     borderRadius: 16,
+    background: 'rgba(255,255,255,.025)',
     color: '#f8fafc',
     cursor: 'pointer',
     textAlign: 'left',
     font: 'inherit',
   },
-
-  eventButtonTop: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 14,
-  },
-
-  eventTitle: {
-    margin: 0,
-    fontSize: 16,
-  },
-
   eventMeta: {
-    margin: '7px 0 0',
     color: '#7f95a5',
     fontSize: 11,
   },
-
-  eventBadge: {
-    maxWidth: 180,
-    padding: '6px 8px',
-    border: '1px solid',
-    borderRadius: 999,
-    fontSize: 8,
-    fontWeight: 900,
-    letterSpacing: '0.07em',
-    textAlign: 'center',
-  },
-
-  selectedEventHeader: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    gap: 18,
-  },
-
-  selectedEventBadge: {
-    padding: '7px 10px',
-    border: '1px solid',
-    borderRadius: 999,
-    fontSize: 9,
-    fontWeight: 900,
-    letterSpacing: '0.07em',
-  },
-
   findingGrid: {
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(220px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
     gap: 14,
-    marginTop: 25,
+    marginTop: 24,
   },
-
-  supportedFinding: {
+  supportedBox: {
     padding: 19,
-    border: '1px solid rgba(52, 211, 153, 0.22)',
+    border: '1px solid rgba(52,211,153,.22)',
     borderRadius: 17,
-    background: 'rgba(52, 211, 153, 0.07)',
+    background: 'rgba(52,211,153,.07)',
   },
-
-  limitationFinding: {
+  limitBox: {
     padding: 19,
-    border: '1px solid rgba(251, 113, 133, 0.22)',
+    border: '1px solid rgba(251,113,133,.22)',
     borderRadius: 17,
-    background: 'rgba(251, 113, 133, 0.07)',
+    background: 'rgba(251,113,133,.07)',
   },
-
-  findingText: {
-    margin: '11px 0 0',
-    color: '#b4c3cd',
-    fontSize: 14,
-    lineHeight: 1.7,
-  },
-
   boundChannels: {
-    marginTop: 16,
-    padding: 18,
-    border: '1px solid rgba(148, 163, 184, 0.13)',
-    borderRadius: 16,
-    background: 'rgba(3, 14, 22, 0.28)',
-  },
-
-  boundChannelsLabel: {
-    margin: 0,
-    color: '#7f95a5',
-    fontSize: 9,
-    fontWeight: 900,
-    letterSpacing: '0.16em',
-  },
-
-  boundChannelList: {
     display: 'flex',
     flexWrap: 'wrap',
     gap: 8,
-    marginTop: 12,
+    marginTop: 16,
   },
-
-  boundChannel: {
+  pill: {
     padding: '7px 10px',
-    border: '1px solid rgba(148, 163, 184, 0.18)',
+    border: '1px solid rgba(148,163,184,.18)',
     borderRadius: 999,
     color: '#d2dee6',
     fontSize: 11,
     fontWeight: 800,
   },
-
   laneList: {
     display: 'grid',
     gap: 12,
     marginTop: 24,
   },
-
-  laneCard: {
+  lane: {
     display: 'grid',
     gridTemplateColumns: '38px minmax(0, 1fr)',
     gap: 15,
     padding: 18,
-    border: '1px solid',
+    border: '1px solid rgba(148,163,184,.16)',
     borderRadius: 17,
+    background: 'rgba(255,255,255,.025)',
   },
-
   laneNumber: {
+    color: '#67e8f9',
     fontSize: 10,
     fontWeight: 900,
-    letterSpacing: '0.13em',
   },
-
   laneTitle: {
     margin: 0,
     fontSize: 15,
   },
-
-  laneText: {
-    margin: '8px 0 0',
-    color: '#b2c1cb',
-    fontSize: 13,
-    lineHeight: 1.68,
-  },
-
-  stack: {
-    display: 'grid',
-    gap: 24,
-  },
-
   baselineList: {
     display: 'grid',
-    gap: 0,
-    margin: '22px 0 0',
+    marginTop: 22,
   },
-
-  baselineRow: {
-    padding: '13px 0',
-    borderBottom: '1px solid rgba(148, 163, 184, 0.11)',
+  nonNegotiable: {
+    marginTop: 22,
+    padding: 19,
+    border: '1px solid rgba(251,113,133,.22)',
+    borderRadius: 17,
+    background: 'rgba(251,113,133,.07)',
   },
-
-  baselineTerm: {
-    color: '#7f95a5',
-    fontSize: 11,
-    fontWeight: 800,
-  },
-
-  baselineValue: {
-    margin: '6px 0 0',
-    color: '#d4e0e7',
-    fontSize: 13,
-    lineHeight: 1.55,
-  },
-
-  boundaryCard: {
-    padding: 'clamp(22px, 3vw, 30px)',
-    border: '1px solid rgba(251, 113, 133, 0.24)',
-    borderRadius: 24,
-    background:
-      'linear-gradient(145deg, rgba(73, 26, 37, 0.52), rgba(34, 17, 25, 0.52))',
-  },
-
-  boundaryCardText: {
-    margin: '14px 0 0',
-    color: '#d8bec5',
-    fontSize: 15,
-    lineHeight: 1.75,
-  },
-
   girHeader: {
     display: 'flex',
     flexWrap: 'wrap',
@@ -1666,112 +906,73 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: 'center',
     gap: 18,
   },
-
-  girButton: {
+  primaryButton: {
     padding: '12px 16px',
     border: 0,
     borderRadius: 999,
-    background:
-      'linear-gradient(90deg, #67e8f9 0%, #34d399 100%)',
+    background: 'linear-gradient(90deg, #67e8f9 0%, #34d399 100%)',
     color: '#04151b',
     cursor: 'pointer',
     font: 'inherit',
     fontSize: 12,
     fontWeight: 900,
   },
-
   girGrid: {
     display: 'grid',
-    gridTemplateColumns:
-      'repeat(auto-fit, minmax(180px, 1fr))',
+    gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
     gap: 12,
     marginTop: 25,
   },
-
-  girSummaryCard: {
+  summaryCard: {
     padding: 16,
-    border: '1px solid rgba(148, 163, 184, 0.13)',
+    border: '1px solid rgba(148,163,184,.13)',
     borderRadius: 15,
-    background: 'rgba(3, 14, 22, 0.3)',
+    background: 'rgba(3,14,22,.3)',
   },
-
-  girSummaryLabel: {
+  summaryLabel: {
     margin: 0,
     color: '#7f95a5',
     fontSize: 9,
     fontWeight: 900,
-    letterSpacing: '0.13em',
+    textTransform: 'uppercase',
   },
-
-  girSummaryValue: {
+  summaryValue: {
     margin: '9px 0 0',
     overflowWrap: 'anywhere',
     color: '#e1ebf0',
     fontSize: 12,
     fontWeight: 800,
   },
-
-  girObject: {
+  pre: {
     margin: '22px 0 0',
     padding: 20,
     overflowX: 'auto',
-    border: '1px solid rgba(103, 232, 249, 0.14)',
+    border: '1px solid rgba(103,232,249,.14)',
     borderRadius: 17,
     background: '#020a10',
     color: '#b8d6df',
     fontSize: 11,
     lineHeight: 1.75,
   },
-
-  returnSection: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 28,
-    padding: 'clamp(25px, 4vw, 38px)',
-    border: '1px solid rgba(94, 234, 212, 0.18)',
+  loadingPage: {
+    minHeight: '100vh',
+    display: 'grid',
+    placeItems: 'center',
+    background: '#06131d',
+    color: '#f8fafc',
+    fontFamily:
+      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  },
+  loadingCard: {
+    maxWidth: 560,
+    padding: 32,
+    border: '1px solid rgba(103,232,249,.2)',
     borderRadius: 24,
-    background:
-      'linear-gradient(135deg, rgba(45, 212, 191, 0.10), rgba(56, 189, 248, 0.06))',
+    background: 'rgba(8,29,40,.92)',
   },
-
-  returnTitle: {
-    maxWidth: 680,
-    margin: '10px 0 0',
-    fontSize: 'clamp(27px, 3vw, 42px)',
-    lineHeight: 1.08,
-    letterSpacing: '-0.04em',
-  },
-
-  returnActions: {
-    display: 'flex',
-    flexWrap: 'wrap',
-    gap: 11,
-  },
-
-  returnPrimary: {
-    display: 'inline-flex',
-    justifyContent: 'center',
-    padding: '13px 18px',
-    borderRadius: 999,
-    background:
-      'linear-gradient(90deg, #67e8f9 0%, #34d399 100%)',
-    color: '#04151b',
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: 'none',
-  },
-
-  returnSecondary: {
-    display: 'inline-flex',
-    justifyContent: 'center',
-    padding: '12px 18px',
-    border: '1px solid rgba(148, 163, 184, 0.2)',
-    borderRadius: 999,
-    color: '#d5e1e8',
-    fontSize: 12,
-    fontWeight: 850,
-    textDecoration: 'none',
+  loadingTitle: {
+    margin: '12px 0',
+    fontSize: 42,
+    letterSpacing: '-.04em',
   },
 };
