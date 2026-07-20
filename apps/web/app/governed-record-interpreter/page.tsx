@@ -3,18 +3,19 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
-type DecisionState = 'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE';
-type ValidationState = 'VERIFIED' | 'QUALIFIED' | 'MISSING' | 'FAILED';
+import {
+  GOVERNED_DEMO_RECORDS,
+  getGovernedDemoRecord,
+} from '../../lib/governed-record-demo';
+import type {
+  GovernedRecordDecision,
+} from '../../lib/governed-record';
 
-type DemoRecord = {
-  id: string;
-  label: string;
-  className: string;
-  subject: string;
-  period: string;
-  state: DecisionState;
-  summary: string;
-};
+type ValidationState =
+  | 'VERIFIED'
+  | 'QUALIFIED'
+  | 'MISSING'
+  | 'FAILED';
 
 type Lane = {
   title: string;
@@ -22,39 +23,6 @@ type Lane = {
   body: string;
   tone: string;
 };
-
-const DEMO_RECORDS: DemoRecord[] = [
-  {
-    id: 'AIR-DEMO-014',
-    label: 'Building Atmospheric Integrity Record',
-    className: 'AIR',
-    subject: 'Healthcare Isolation Room 214',
-    period: 'July 18–19, 2026',
-    state: 'HOLD',
-    summary:
-      'Negative-pressure continuity was interrupted during three documented intervals. Door-state evidence is incomplete.',
-  },
-  {
-    id: 'PAIR-DEMO-007',
-    label: 'Personal Atmospheric Integrity Record',
-    className: 'PAIR',
-    subject: 'Authorized exposure chronology',
-    period: 'July 17–19, 2026',
-    state: 'ESCALATE',
-    summary:
-      'Repeated exposure overlap is visible, but clinical interpretation requires an authorized professional review lane.',
-  },
-  {
-    id: 'BER-DEMO-022',
-    label: 'Building Environmental Record',
-    className: 'BUILDING',
-    subject: 'Commercial Office — AHU-3 Zone',
-    period: 'July 1–19, 2026',
-    state: 'ALLOW',
-    summary:
-      'The post-intervention record documents sustained change against the declared baseline within the stated scope.',
-  },
-];
 
 const VALIDATIONS: Array<{
   name: string;
@@ -64,27 +32,32 @@ const VALIDATIONS: Array<{
   {
     name: 'Integrity',
     state: 'VERIFIED',
-    detail: 'Source digest and attachment manifest match the preserved intake object.',
+    detail:
+      'Source digest and attachment manifest match the preserved intake object.',
   },
   {
     name: 'Provenance',
     state: 'QUALIFIED',
-    detail: 'Sensor identity is present; latest field-calibration certificate is not attached.',
+    detail:
+      'Sensor identity is present; latest field-calibration certificate is not attached.',
   },
   {
     name: 'Continuity',
     state: 'MISSING',
-    detail: 'Three event-sensitive gaps overlap the pressure excursion window.',
+    detail:
+      'Three event-sensitive gaps overlap the pressure excursion window.',
   },
   {
     name: 'Admissibility',
     state: 'QUALIFIED',
-    detail: 'Suitable for bounded interpretation, not unrestricted reliance.',
+    detail:
+      'Suitable for bounded interpretation, not unrestricted reliance.',
   },
   {
     name: 'Context',
     state: 'MISSING',
-    detail: 'Door-state history and declared room-use status are incomplete.',
+    detail:
+      'Door-state history and declared room-use status are incomplete.',
   },
 ];
 
@@ -136,7 +109,7 @@ const WORKFLOW = [
   'Seal',
 ];
 
-function stateClass(state: DecisionState) {
+function stateClass(state: GovernedRecordDecision) {
   if (state === 'ALLOW') {
     return 'bg-emerald-100 text-emerald-800 border-emerald-300';
   }
@@ -169,16 +142,18 @@ function validationClass(state: ValidationState) {
 }
 
 export default function GovernedRecordInterpreterPage() {
-  const [selectedRecordId, setSelectedRecordId] = useState(DEMO_RECORDS[0].id);
+  const [selectedRecordId, setSelectedRecordId] = useState(
+    GOVERNED_DEMO_RECORDS[0].id,
+  );
   const [activeStep, setActiveStep] = useState(4);
   const [showTrace, setShowTrace] = useState(false);
   const [showReceipt, setShowReceipt] = useState(false);
-  const [moduleId, setModuleId] = useState('eri.environmental.v1');
+  const [moduleId, setModuleId] = useState(
+    'eri.environmental.v1',
+  );
 
   const selectedRecord = useMemo(
-    () =>
-      DEMO_RECORDS.find((record) => record.id === selectedRecordId) ??
-      DEMO_RECORDS[0],
+    () => getGovernedDemoRecord(selectedRecordId),
     [selectedRecordId],
   );
 
@@ -196,17 +171,21 @@ export default function GovernedRecordInterpreterPage() {
             </h1>
 
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200 sm:text-xl">
-              Turn governed records into bounded, traceable, replayable
-              interpretations without changing the source evidence or pretending
-              that interpretation is authority.
+              Turn governed records into bounded, traceable,
+              replayable interpretations without changing the source
+              evidence or pretending that interpretation is
+              authority.
             </p>
 
             <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-300/10 p-5 text-cyan-50">
-              <p className="font-semibold">Constitutional boundary</p>
+              <p className="font-semibold">
+                Constitutional boundary
+              </p>
 
               <p className="mt-2 leading-7">
-                No interpretation may exceed the evidence, authority, context,
-                continuity, provenance, or declared scope that governs it.
+                No interpretation may exceed the evidence, authority,
+                context, continuity, provenance, or declared scope
+                that governs it.
               </p>
             </div>
           </div>
@@ -270,14 +249,17 @@ export default function GovernedRecordInterpreterPage() {
             </div>
 
             <div className="mt-6 space-y-3">
-              {DEMO_RECORDS.map((record) => {
-                const selected = record.id === selectedRecordId;
+              {GOVERNED_DEMO_RECORDS.map((record) => {
+                const selected =
+                  record.id === selectedRecordId;
 
                 return (
                   <button
                     key={record.id}
                     type="button"
-                    onClick={() => setSelectedRecordId(record.id)}
+                    onClick={() =>
+                      setSelectedRecordId(record.id)
+                    }
                     className={`w-full rounded-2xl border p-4 text-left transition ${
                       selected
                         ? 'border-cyan-600 bg-cyan-50 ring-2 ring-cyan-100'
@@ -286,7 +268,9 @@ export default function GovernedRecordInterpreterPage() {
                   >
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
-                        <p className="font-semibold">{record.label}</p>
+                        <p className="font-semibold">
+                          {record.label}
+                        </p>
 
                         <p className="mt-1 text-sm text-slate-500">
                           {record.id}
@@ -295,10 +279,10 @@ export default function GovernedRecordInterpreterPage() {
 
                       <span
                         className={`rounded-full border px-3 py-1 text-xs font-bold ${stateClass(
-                          record.state,
+                          record.decision,
                         )}`}
                       >
-                        {record.state}
+                        {record.decision}
                       </span>
                     </div>
 
@@ -311,12 +295,14 @@ export default function GovernedRecordInterpreterPage() {
             </div>
 
             <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
-              <p className="text-sm font-semibold">Supported intake</p>
+              <p className="text-sm font-semibold">
+                Supported intake
+              </p>
 
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                PDF, CSV, JSON, AIR, PAIR, laboratory report, sensor package,
-                HVAC diagnostic record, building record, and governed replay
-                package.
+                PDF, CSV, JSON, AIR, PAIR, laboratory report,
+                sensor package, HVAC diagnostic record, building
+                record, and governed replay package.
               </p>
             </div>
           </div>
@@ -335,23 +321,29 @@ export default function GovernedRecordInterpreterPage() {
 
               <span
                 className={`rounded-full border px-3 py-1 text-xs font-bold ${stateClass(
-                  selectedRecord.state,
+                  selectedRecord.decision,
                 )}`}
               >
-                {selectedRecord.state}
+                {selectedRecord.decision}
               </span>
             </div>
 
             <dl className="mt-6 grid gap-4 sm:grid-cols-2">
               {[
                 ['Record ID', selectedRecord.id],
-                ['Record class', selectedRecord.className],
+                ['Record class', selectedRecord.recordClass],
                 ['Subject', selectedRecord.subject],
                 ['Covered period', selectedRecord.period],
                 ['Source digest', 'sha256: 4c9a…be21'],
-                ['Preservation state', 'Immutable intake object'],
+                [
+                  'Preservation state',
+                  'Immutable intake object',
+                ],
               ].map(([term, value]) => (
-                <div key={term} className="rounded-2xl bg-slate-50 p-4">
+                <div
+                  key={term}
+                  className="rounded-2xl bg-slate-50 p-4"
+                >
                   <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     {term}
                   </dt>
@@ -364,25 +356,37 @@ export default function GovernedRecordInterpreterPage() {
             </dl>
 
             <div className="mt-6">
-              <label htmlFor="module" className="text-sm font-semibold">
+              <label
+                htmlFor="module"
+                className="text-sm font-semibold"
+              >
                 Interpretation module
               </label>
 
               <select
                 id="module"
                 value={moduleId}
-                onChange={(event) => setModuleId(event.target.value)}
+                onChange={(event) =>
+                  setModuleId(event.target.value)
+                }
                 className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-cyan-600 focus:ring-2"
               >
                 <option value="eri.environmental.v1">
-                  ERI™ Environmental Record Interpreter — Module 01 — Live
+                  ERI™ Environmental Record Interpreter — Module
+                  01 — Live
                 </option>
 
-                <option value="air.atmospheric.v1" disabled>
+                <option
+                  value="air.atmospheric.v1"
+                  disabled
+                >
                   AIR Interpreter — Planned
                 </option>
 
-                <option value="pair.personal.v1" disabled>
+                <option
+                  value="pair.personal.v1"
+                  disabled
+                >
                   PAIR Interpreter — Planned
                 </option>
 
@@ -392,9 +396,10 @@ export default function GovernedRecordInterpreterPage() {
               </select>
 
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                ERI™ is the first live module inside the GRI™ constitutional
-                interpretation platform. Future modules remain unavailable until
-                they are separately implemented and verified.
+                ERI™ is the first live module inside the GRI™
+                constitutional interpretation platform. Future
+                modules remain unavailable until they are separately
+                implemented and verified.
               </p>
 
               <div className="mt-5 rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
@@ -409,14 +414,17 @@ export default function GovernedRecordInterpreterPage() {
                     </p>
 
                     <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
-                      Open the live environmental interpretation workspace for
-                      the selected governed record. Opening a module does not
-                      authorize a decision, bind an actor, or permit execution.
+                      Open the live environmental interpretation
+                      workspace for the selected governed record.
+                      Opening a module does not authorize a decision,
+                      bind an actor, or permit execution.
                     </p>
                   </div>
 
                   <Link
-                    href="/governed-record-interpreter/eri"
+                    href={`/governed-record-interpreter/eri?record=${encodeURIComponent(
+                      selectedRecord.id,
+                    )}`}
                     className="inline-flex items-center justify-center rounded-xl bg-[#0a6a80] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#07596d] focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2"
                   >
                     Launch ERI™ Module 01
@@ -440,9 +448,9 @@ export default function GovernedRecordInterpreterPage() {
             </div>
 
             <p className="max-w-xl text-sm leading-6 text-slate-600">
-              GRI™ separates cryptographic integrity, provenance quality,
-              continuity, context, and interpretive support instead of hiding
-              them inside one confidence score.
+              GRI™ separates cryptographic integrity, provenance
+              quality, continuity, context, and interpretive support
+              instead of hiding them inside one confidence score.
             </p>
           </div>
 
@@ -485,10 +493,14 @@ export default function GovernedRecordInterpreterPage() {
 
               <button
                 type="button"
-                onClick={() => setShowTrace((value) => !value)}
+                onClick={() =>
+                  setShowTrace((value) => !value)
+                }
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
               >
-                {showTrace ? 'Hide evidence trace' : 'Open evidence trace'}
+                {showTrace
+                  ? 'Hide evidence trace'
+                  : 'Open evidence trace'}
               </button>
             </div>
 
@@ -526,7 +538,7 @@ export default function GovernedRecordInterpreterPage() {
                 <pre className="mt-4 overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-200">
 {`claim_id: GIR-CLAIM-001
 statement: "Three pressure excursions occurred below the declared threshold."
-source_record: AIR-DEMO-014
+source_record: ${selectedRecord.id}
 source_fragments: [pressure.samples.441-498, pressure.samples.731-759]
 rule_id: eri.pressure.excursion.v1
 context: isolation-room-214 / occupied / negative-pressure-mode
@@ -549,22 +561,22 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
 
               <div className="mt-5 space-y-4 text-sm leading-6 text-slate-700">
                 <p>
-                  <strong>Prohibited:</strong> diagnosis, clinical causation,
-                  legal liability, engineering approval, regulatory
-                  determination, payment authority, or direct environmental
-                  control.
+                  <strong>Prohibited:</strong> diagnosis, clinical
+                  causation, legal liability, engineering approval,
+                  regulatory determination, payment authority, or
+                  direct environmental control.
                 </p>
 
                 <p>
-                  <strong>Required:</strong> evidence link, context fit, module
-                  authority, causation boundary, expiry, and reviewer requirement
-                  for every material claim.
+                  <strong>Required:</strong> evidence link, context
+                  fit, module authority, causation boundary, expiry,
+                  and reviewer requirement for every material claim.
                 </p>
               </div>
 
               <div className="mt-6 rounded-2xl border border-rose-200 bg-white p-4 text-sm leading-6 text-rose-800">
-                When a claim cannot be bounded safely, GRI™ rejects, qualifies,
-                or escalates it and records why.
+                When a claim cannot be bounded safely, GRI™ rejects,
+                qualifies, or escalates it and records why.
               </div>
             </section>
 
@@ -584,18 +596,31 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
                     'Bounded healthcare environmental interpretation',
                   ],
                   ['Authority', 'Facilities review only'],
-                  ['Jurisdiction', 'Organization policy — demo'],
-                  ['Privacy', 'Restricted environmental record'],
+                  [
+                    'Jurisdiction',
+                    'Organization policy — demo',
+                  ],
+                  [
+                    'Privacy',
+                    'Restricted environmental record',
+                  ],
                   ['Review', 'Technical reviewer required'],
-                  ['Expiry', 'Reinterpret after new calibration evidence'],
+                  [
+                    'Expiry',
+                    'Reinterpret after new calibration evidence',
+                  ],
                 ].map(([term, value]) => (
                   <div
                     key={term}
                     className="border-b border-slate-100 pb-3 last:border-0"
                   >
-                    <dt className="font-semibold text-slate-500">{term}</dt>
+                    <dt className="font-semibold text-slate-500">
+                      {term}
+                    </dt>
 
-                    <dd className="mt-1 text-slate-900">{value}</dd>
+                    <dd className="mt-1 text-slate-900">
+                      {value}
+                    </dd>
                   </div>
                 ))}
               </dl>
@@ -611,11 +636,13 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
                   Governed output
                 </p>
 
-                <h2 className="mt-2 text-2xl font-semibold">GIR™ preview</h2>
+                <h2 className="mt-2 text-2xl font-semibold">
+                  GIR™ preview
+                </h2>
               </div>
 
               <span className="rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
-                DRAFT — HOLD
+                DRAFT — {selectedRecord.decision}
               </span>
             </div>
 
@@ -625,12 +652,24 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
                 ['Source binding', selectedRecord.id],
                 ['GRI engine', 'gri-core 0.1.0'],
                 ['Module', moduleId],
-                ['Ruleset', 'eri-healthcare-pressure 1.0.0'],
-                ['Review state', 'Technical review required'],
+                [
+                  'Ruleset',
+                  'eri-healthcare-pressure 1.0.0',
+                ],
+                [
+                  'Review state',
+                  'Technical review required',
+                ],
                 ['Receipt state', 'Not sealed'],
-                ['Replay state', 'Draft package available'],
+                [
+                  'Replay state',
+                  'Draft package available',
+                ],
               ].map(([term, value]) => (
-                <div key={term} className="rounded-2xl bg-slate-50 p-4">
+                <div
+                  key={term}
+                  className="rounded-2xl bg-slate-50 p-4"
+                >
                   <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     {term}
                   </dt>
@@ -645,10 +684,14 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
             <div className="mt-6 flex flex-wrap gap-3">
               <button
                 type="button"
-                onClick={() => setShowReceipt((value) => !value)}
+                onClick={() =>
+                  setShowReceipt((value) => !value)
+                }
                 className="rounded-xl bg-[#082234] px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800"
               >
-                {showReceipt ? 'Hide receipt' : 'Preview receipt'}
+                {showReceipt
+                  ? 'Hide receipt'
+                  : 'Preview receipt'}
               </button>
 
               <button
@@ -662,10 +705,11 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
             {showReceipt && (
               <pre className="mt-5 overflow-x-auto rounded-2xl bg-slate-950 p-5 text-xs leading-6 text-slate-200">
 {`receipt_id: GIR-RCPT-00014
+source_record_id: ${selectedRecord.id}
 source_manifest_hash: sha256:4c9a...be21
 gir_hash: pending_seal
 engine_version: gri-core-0.1.0
-module_version: eri.environmental.v1.1
+module_version: eri.environmental.v1
 ruleset_version: eri-healthcare-pressure-1.0.0
 review_state: REQUIRED
 replay_package_id: RP-GIR-00014`}
@@ -683,9 +727,9 @@ replay_package_id: RP-GIR-00014`}
             </h2>
 
             <p className="mt-4 leading-7 text-slate-600">
-              A newer module or ruleset may produce a better-supported
-              interpretation, but it does not erase what was known, under which
-              rules, by whom, and when.
+              A newer module or ruleset may produce a
+              better-supported interpretation, but it does not erase
+              what was known, under which rules, by whom, and when.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -702,8 +746,8 @@ replay_package_id: RP-GIR-00014`}
                 </span>
 
                 <span className="mt-2 block text-sm leading-6 text-slate-600">
-                  Normalize context, units, evidence quality, and declared
-                  success criteria.
+                  Normalize context, units, evidence quality, and
+                  declared success criteria.
                 </span>
               </button>
 
@@ -720,7 +764,8 @@ replay_package_id: RP-GIR-00014`}
                 </span>
 
                 <span className="mt-2 block text-sm leading-6 text-slate-600">
-                  Create a new GIR™ linked to the same immutable source record.
+                  Create a new GIR™ linked to the same immutable
+                  source record.
                 </span>
               </button>
             </div>
