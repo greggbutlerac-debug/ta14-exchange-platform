@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
 
-import ShareExchangeButton from '../components/share-exchange-button';
-
 import './globals.css';
 
 const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
@@ -121,17 +119,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div
-          style={{
-            position: 'fixed',
-            top: '18px',
-            right: '18px',
-            zIndex: 1000,
-          }}
-        >
-          <ShareExchangeButton />
-        </div>
-
         {children}
 
         <Script
