@@ -202,6 +202,37 @@ export default function AIGovernancePlaygroundPage() {
         </div>
       </section>
 
+      <section className="partnerNetwork">
+        <div className="partnerNetworkCopy">
+          <p className="eyebrow">TA-14 Partner Review Network</p>
+          <h2>Three independent governance pathways. One bounded review network.</h2>
+          <p>
+            Explore the current TA-14 Partner Review Network, including Elias /
+            LOVE-OS, AnchorStack, and AB / BIGMAE / Elias. Each pathway preserves
+            the partner's independent architecture while adding written review
+            boundaries and TA-14 second-layer admissible-execution review.
+          </p>
+
+          <div className="partnerPills" aria-label="Current partner pathways">
+            <span>Elias / LOVE-OS</span>
+            <span>AnchorStack</span>
+            <span>AB / BIGMAE / Elias</span>
+          </div>
+
+          <Link className="partnerButton" href="/partner-review-network">
+            Explore the Partner Review Network
+          </Link>
+        </div>
+
+        <div className="partnerNetworkEmblem">
+          <img
+            src="/images/ta-14-partner-review-network-emblem.png"
+            alt="TA-14 Partner Review Network emblem"
+          />
+          <p>Interactive partner profiles and governance boundaries</p>
+        </div>
+      </section>
+
       <section className="boundary">
         <div>
           <p className="eyebrow">Declared boundary</p>
@@ -257,6 +288,7 @@ export default function AIGovernancePlaygroundPage() {
         .hero,
         .chainPanel,
         .section,
+        .partnerNetwork,
         .boundary,
         .playgroundFooter {
           position: relative;
@@ -596,6 +628,100 @@ export default function AIGovernancePlaygroundPage() {
           color: var(--green);
         }
 
+        .partnerNetwork {
+          display: grid;
+          grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+          gap: clamp(28px, 5vw, 64px);
+          align-items: center;
+          margin-top: 72px;
+          padding: clamp(28px, 5vw, 52px);
+          overflow: hidden;
+          border: 1px solid rgba(255, 191, 105, 0.24);
+          border-radius: 24px;
+          background:
+            radial-gradient(circle at 88% 18%, rgba(255, 191, 105, 0.12), transparent 34%),
+            linear-gradient(145deg, rgba(16, 34, 47, 0.96), rgba(8, 20, 29, 0.96));
+          box-shadow: 0 28px 72px rgba(0, 0, 0, 0.24);
+        }
+
+        .partnerNetwork h2 {
+          max-width: 760px;
+          margin: 0;
+          font-size: clamp(2.1rem, 4vw, 4.4rem);
+          line-height: 1;
+          letter-spacing: -0.055em;
+        }
+
+        .partnerNetworkCopy > p:not(.eyebrow) {
+          max-width: 760px;
+          margin: 20px 0 0;
+          color: #91a8b6;
+          line-height: 1.78;
+        }
+
+        .partnerPills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+          margin-top: 24px;
+        }
+
+        .partnerPills span {
+          padding: 8px 11px;
+          border: 1px solid rgba(104, 229, 255, 0.18);
+          border-radius: 999px;
+          color: #c9eefa;
+          background: rgba(104, 229, 255, 0.05);
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .partnerButton {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 48px;
+          margin-top: 28px;
+          padding: 0 19px;
+          border-radius: 12px;
+          color: #171006;
+          background: linear-gradient(135deg, #ffe0a6, #ffbf69);
+          font-size: 13px;
+          font-weight: 900;
+          text-decoration: none;
+          transition: transform 180ms ease, box-shadow 180ms ease;
+        }
+
+        .partnerButton:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 14px 36px rgba(255, 191, 105, 0.16);
+        }
+
+        .partnerNetworkEmblem {
+          padding: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.09);
+          border-radius: 24px;
+          background: rgba(2, 10, 16, 0.52);
+          text-align: center;
+        }
+
+        .partnerNetworkEmblem img {
+          display: block;
+          width: 100%;
+          max-width: 420px;
+          margin: 0 auto;
+          border-radius: 18px;
+        }
+
+        .partnerNetworkEmblem p {
+          margin: 14px 0 2px;
+          color: #8da4b2;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
         .boundary {
           display: grid;
           grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
@@ -641,6 +767,7 @@ export default function AIGovernancePlaygroundPage() {
 
         @media (max-width: 980px) {
           .heroGrid,
+          .partnerNetwork,
           .boundary {
             grid-template-columns: 1fr;
           }
