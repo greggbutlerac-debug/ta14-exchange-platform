@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
 type DecisionState = 'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE';
@@ -136,16 +137,34 @@ const WORKFLOW = [
 ];
 
 function stateClass(state: DecisionState) {
-  if (state === 'ALLOW') return 'bg-emerald-100 text-emerald-800 border-emerald-300';
-  if (state === 'HOLD') return 'bg-amber-100 text-amber-800 border-amber-300';
-  if (state === 'DENY') return 'bg-rose-100 text-rose-800 border-rose-300';
+  if (state === 'ALLOW') {
+    return 'bg-emerald-100 text-emerald-800 border-emerald-300';
+  }
+
+  if (state === 'HOLD') {
+    return 'bg-amber-100 text-amber-800 border-amber-300';
+  }
+
+  if (state === 'DENY') {
+    return 'bg-rose-100 text-rose-800 border-rose-300';
+  }
+
   return 'bg-violet-100 text-violet-800 border-violet-300';
 }
 
 function validationClass(state: ValidationState) {
-  if (state === 'VERIFIED') return 'text-emerald-700 bg-emerald-50 border-emerald-200';
-  if (state === 'QUALIFIED') return 'text-amber-700 bg-amber-50 border-amber-200';
-  if (state === 'FAILED') return 'text-rose-700 bg-rose-50 border-rose-200';
+  if (state === 'VERIFIED') {
+    return 'text-emerald-700 bg-emerald-50 border-emerald-200';
+  }
+
+  if (state === 'QUALIFIED') {
+    return 'text-amber-700 bg-amber-50 border-amber-200';
+  }
+
+  if (state === 'FAILED') {
+    return 'text-rose-700 bg-rose-50 border-rose-200';
+  }
+
   return 'text-sky-700 bg-sky-50 border-sky-200';
 }
 
@@ -157,7 +176,9 @@ export default function GovernedRecordInterpreterPage() {
   const [moduleId, setModuleId] = useState('eri.environmental.v1');
 
   const selectedRecord = useMemo(
-    () => DEMO_RECORDS.find((record) => record.id === selectedRecordId) ?? DEMO_RECORDS[0],
+    () =>
+      DEMO_RECORDS.find((record) => record.id === selectedRecordId) ??
+      DEMO_RECORDS[0],
     [selectedRecordId],
   );
 
@@ -169,18 +190,23 @@ export default function GovernedRecordInterpreterPage() {
             <p className="mb-5 text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">
               TA-14 AI Governance Exchange
             </p>
+
             <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
               GRI™ Governed Record Interpreter
             </h1>
+
             <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-200 sm:text-xl">
-              Turn governed records into bounded, traceable, replayable interpretations without
-              changing the source evidence or pretending that interpretation is authority.
+              Turn governed records into bounded, traceable, replayable
+              interpretations without changing the source evidence or pretending
+              that interpretation is authority.
             </p>
+
             <div className="mt-8 rounded-2xl border border-cyan-400/30 bg-cyan-300/10 p-5 text-cyan-50">
               <p className="font-semibold">Constitutional boundary</p>
+
               <p className="mt-2 leading-7">
-                No interpretation may exceed the evidence, authority, context, continuity,
-                provenance, or declared scope that governs it.
+                No interpretation may exceed the evidence, authority, context,
+                continuity, provenance, or declared scope that governs it.
               </p>
             </div>
           </div>
@@ -193,6 +219,7 @@ export default function GovernedRecordInterpreterPage() {
             {WORKFLOW.map((step, index) => {
               const active = index === activeStep;
               const complete = index < activeStep;
+
               return (
                 <button
                   key={step}
@@ -209,7 +236,10 @@ export default function GovernedRecordInterpreterPage() {
                   <span className="block text-xs font-semibold uppercase tracking-widest opacity-75">
                     {String(index + 1).padStart(2, '0')}
                   </span>
-                  <span className="mt-1 block text-sm font-semibold">{step}</span>
+
+                  <span className="mt-1 block text-sm font-semibold">
+                    {step}
+                  </span>
                 </button>
               );
             })}
@@ -225,8 +255,12 @@ export default function GovernedRecordInterpreterPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
                   Governed record intake
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Select or upload a record</h2>
+
+                <h2 className="mt-2 text-2xl font-semibold">
+                  Select or upload a record
+                </h2>
               </div>
+
               <button
                 type="button"
                 className="rounded-xl bg-[#0a6a80] px-4 py-2 text-sm font-semibold text-white hover:bg-[#07596d]"
@@ -238,6 +272,7 @@ export default function GovernedRecordInterpreterPage() {
             <div className="mt-6 space-y-3">
               {DEMO_RECORDS.map((record) => {
                 const selected = record.id === selectedRecordId;
+
                 return (
                   <button
                     key={record.id}
@@ -252,15 +287,24 @@ export default function GovernedRecordInterpreterPage() {
                     <div className="flex flex-wrap items-center justify-between gap-3">
                       <div>
                         <p className="font-semibold">{record.label}</p>
-                        <p className="mt-1 text-sm text-slate-500">{record.id}</p>
+
+                        <p className="mt-1 text-sm text-slate-500">
+                          {record.id}
+                        </p>
                       </div>
+
                       <span
-                        className={`rounded-full border px-3 py-1 text-xs font-bold ${stateClass(record.state)}`}
+                        className={`rounded-full border px-3 py-1 text-xs font-bold ${stateClass(
+                          record.state,
+                        )}`}
                       >
                         {record.state}
                       </span>
                     </div>
-                    <p className="mt-3 text-sm leading-6 text-slate-600">{record.summary}</p>
+
+                    <p className="mt-3 text-sm leading-6 text-slate-600">
+                      {record.summary}
+                    </p>
                   </button>
                 );
               })}
@@ -268,9 +312,11 @@ export default function GovernedRecordInterpreterPage() {
 
             <div className="mt-6 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
               <p className="text-sm font-semibold">Supported intake</p>
+
               <p className="mt-2 text-sm leading-6 text-slate-600">
-                PDF, CSV, JSON, AIR, PAIR, laboratory report, sensor package, HVAC diagnostic
-                record, building record, and governed replay package.
+                PDF, CSV, JSON, AIR, PAIR, laboratory report, sensor package,
+                HVAC diagnostic record, building record, and governed replay
+                package.
               </p>
             </div>
           </div>
@@ -281,10 +327,16 @@ export default function GovernedRecordInterpreterPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
                   Bound source
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">{selectedRecord.label}</h2>
+
+                <h2 className="mt-2 text-2xl font-semibold">
+                  {selectedRecord.label}
+                </h2>
               </div>
+
               <span
-                className={`rounded-full border px-3 py-1 text-xs font-bold ${stateClass(selectedRecord.state)}`}
+                className={`rounded-full border px-3 py-1 text-xs font-bold ${stateClass(
+                  selectedRecord.state,
+                )}`}
               >
                 {selectedRecord.state}
               </span>
@@ -303,7 +355,10 @@ export default function GovernedRecordInterpreterPage() {
                   <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     {term}
                   </dt>
-                  <dd className="mt-2 text-sm font-medium text-slate-900">{value}</dd>
+
+                  <dd className="mt-2 text-sm font-medium text-slate-900">
+                    {value}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -312,21 +367,62 @@ export default function GovernedRecordInterpreterPage() {
               <label htmlFor="module" className="text-sm font-semibold">
                 Interpretation module
               </label>
+
               <select
                 id="module"
                 value={moduleId}
                 onChange={(event) => setModuleId(event.target.value)}
                 className="mt-2 w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-cyan-600 focus:ring-2"
               >
-                <option value="eri.environmental.v1">ERI™ Environmental Interpreter — v1.1</option>
-                <option value="air.atmospheric.v1">AIR Interpreter — Planned</option>
-                <option value="pair.personal.v1">PAIR Interpreter — Planned</option>
-                <option value="ai.route.v1">AI Route Interpreter — Planned</option>
+                <option value="eri.environmental.v1">
+                  ERI™ Environmental Record Interpreter — Module 01 — Live
+                </option>
+
+                <option value="air.atmospheric.v1" disabled>
+                  AIR Interpreter — Planned
+                </option>
+
+                <option value="pair.personal.v1" disabled>
+                  PAIR Interpreter — Planned
+                </option>
+
+                <option value="ai.route.v1" disabled>
+                  AI Route Interpreter — Planned
+                </option>
               </select>
+
               <p className="mt-3 text-sm leading-6 text-slate-600">
-                ERI™ is the first active module inside the GRI™ constitutional interpretation
-                platform.
+                ERI™ is the first live module inside the GRI™ constitutional
+                interpretation platform. Future modules remain unavailable until
+                they are separately implemented and verified.
               </p>
+
+              <div className="mt-5 rounded-2xl border border-cyan-200 bg-cyan-50 p-5">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
+                      Live interpretation module
+                    </p>
+
+                    <p className="mt-2 font-semibold text-slate-950">
+                      ERI™ Environmental Record Interpreter
+                    </p>
+
+                    <p className="mt-2 max-w-xl text-sm leading-6 text-slate-600">
+                      Open the live environmental interpretation workspace for
+                      the selected governed record. Opening a module does not
+                      authorize a decision, bind an actor, or permit execution.
+                    </p>
+                  </div>
+
+                  <Link
+                    href="/governed-record-interpreter/eri"
+                    className="inline-flex items-center justify-center rounded-xl bg-[#0a6a80] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#07596d] focus:outline-none focus:ring-2 focus:ring-cyan-600 focus:ring-offset-2"
+                  >
+                    Launch ERI™ Module 01
+                  </Link>
+                </div>
+              </div>
             </div>
           </div>
         </section>
@@ -337,11 +433,16 @@ export default function GovernedRecordInterpreterPage() {
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
                 Constitutional validation
               </p>
-              <h2 className="mt-2 text-2xl font-semibold">Validation matrix</h2>
+
+              <h2 className="mt-2 text-2xl font-semibold">
+                Validation matrix
+              </h2>
             </div>
+
             <p className="max-w-xl text-sm leading-6 text-slate-600">
-              GRI™ separates cryptographic integrity, provenance quality, continuity, context, and
-              interpretive support instead of hiding them inside one confidence score.
+              GRI™ separates cryptographic integrity, provenance quality,
+              continuity, context, and interpretive support instead of hiding
+              them inside one confidence score.
             </p>
           </div>
 
@@ -349,11 +450,21 @@ export default function GovernedRecordInterpreterPage() {
             {VALIDATIONS.map((validation) => (
               <article
                 key={validation.name}
-                className={`rounded-2xl border p-4 ${validationClass(validation.state)}`}
+                className={`rounded-2xl border p-4 ${validationClass(
+                  validation.state,
+                )}`}
               >
-                <p className="text-xs font-bold uppercase tracking-wider">{validation.state}</p>
-                <h3 className="mt-2 font-semibold text-slate-950">{validation.name}</h3>
-                <p className="mt-3 text-sm leading-6 text-slate-700">{validation.detail}</p>
+                <p className="text-xs font-bold uppercase tracking-wider">
+                  {validation.state}
+                </p>
+
+                <h3 className="mt-2 font-semibold text-slate-950">
+                  {validation.name}
+                </h3>
+
+                <p className="mt-3 text-sm leading-6 text-slate-700">
+                  {validation.detail}
+                </p>
               </article>
             ))}
           </div>
@@ -366,8 +477,12 @@ export default function GovernedRecordInterpreterPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
                   Five-Lane Intelligence Model
                 </p>
-                <h2 className="mt-2 text-2xl font-semibold">Bounded interpretation</h2>
+
+                <h2 className="mt-2 text-2xl font-semibold">
+                  Bounded interpretation
+                </h2>
               </div>
+
               <button
                 type="button"
                 onClick={() => setShowTrace((value) => !value)}
@@ -379,14 +494,23 @@ export default function GovernedRecordInterpreterPage() {
 
             <div className="mt-6 space-y-4">
               {LANES.map((lane) => (
-                <article key={lane.title} className={`rounded-2xl border p-5 ${lane.tone}`}>
+                <article
+                  key={lane.title}
+                  className={`rounded-2xl border p-5 ${lane.tone}`}
+                >
                   <div className="flex gap-4">
                     <span className="text-xs font-bold tracking-widest text-slate-500">
                       {lane.eyebrow}
                     </span>
+
                     <div>
-                      <h3 className="font-semibold text-slate-950">{lane.title}</h3>
-                      <p className="mt-2 leading-7 text-slate-700">{lane.body}</p>
+                      <h3 className="font-semibold text-slate-950">
+                        {lane.title}
+                      </h3>
+
+                      <p className="mt-2 leading-7 text-slate-700">
+                        {lane.body}
+                      </p>
                     </div>
                   </div>
                 </article>
@@ -398,6 +522,7 @@ export default function GovernedRecordInterpreterPage() {
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
                   Claim-to-evidence trace
                 </p>
+
                 <pre className="mt-4 overflow-x-auto whitespace-pre-wrap text-xs leading-6 text-slate-200">
 {`claim_id: GIR-CLAIM-001
 statement: "Three pressure excursions occurred below the declared threshold."
@@ -417,21 +542,29 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-rose-700">
                 Boundary Engine
               </p>
-              <h2 className="mt-2 text-2xl font-semibold">Interpretation restraint</h2>
+
+              <h2 className="mt-2 text-2xl font-semibold">
+                Interpretation restraint
+              </h2>
+
               <div className="mt-5 space-y-4 text-sm leading-6 text-slate-700">
                 <p>
-                  <strong>Prohibited:</strong> diagnosis, clinical causation, legal liability,
-                  engineering approval, regulatory determination, payment authority, or direct
-                  environmental control.
+                  <strong>Prohibited:</strong> diagnosis, clinical causation,
+                  legal liability, engineering approval, regulatory
+                  determination, payment authority, or direct environmental
+                  control.
                 </p>
+
                 <p>
-                  <strong>Required:</strong> evidence link, context fit, module authority,
-                  causation boundary, expiry, and reviewer requirement for every material claim.
+                  <strong>Required:</strong> evidence link, context fit, module
+                  authority, causation boundary, expiry, and reviewer requirement
+                  for every material claim.
                 </p>
               </div>
+
               <div className="mt-6 rounded-2xl border border-rose-200 bg-white p-4 text-sm leading-6 text-rose-800">
-                When a claim cannot be bounded safely, GRI™ rejects, qualifies, or escalates it and
-                records why.
+                When a claim cannot be bounded safely, GRI™ rejects, qualifies,
+                or escalates it and records why.
               </div>
             </section>
 
@@ -439,18 +572,29 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
                 Context binding
               </p>
-              <h2 className="mt-2 text-2xl font-semibold">Declared reliance</h2>
+
+              <h2 className="mt-2 text-2xl font-semibold">
+                Declared reliance
+              </h2>
+
               <dl className="mt-5 space-y-4 text-sm">
                 {[
-                  ['Purpose', 'Bounded healthcare environmental interpretation'],
+                  [
+                    'Purpose',
+                    'Bounded healthcare environmental interpretation',
+                  ],
                   ['Authority', 'Facilities review only'],
                   ['Jurisdiction', 'Organization policy — demo'],
                   ['Privacy', 'Restricted environmental record'],
                   ['Review', 'Technical reviewer required'],
                   ['Expiry', 'Reinterpret after new calibration evidence'],
                 ].map(([term, value]) => (
-                  <div key={term} className="border-b border-slate-100 pb-3 last:border-0">
+                  <div
+                    key={term}
+                    className="border-b border-slate-100 pb-3 last:border-0"
+                  >
                     <dt className="font-semibold text-slate-500">{term}</dt>
+
                     <dd className="mt-1 text-slate-900">{value}</dd>
                   </div>
                 ))}
@@ -466,8 +610,10 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
                 <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
                   Governed output
                 </p>
+
                 <h2 className="mt-2 text-2xl font-semibold">GIR™ preview</h2>
               </div>
+
               <span className="rounded-full border border-amber-300 bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">
                 DRAFT — HOLD
               </span>
@@ -488,7 +634,10 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
                   <dt className="text-xs font-semibold uppercase tracking-wider text-slate-500">
                     {term}
                   </dt>
-                  <dd className="mt-2 break-words text-sm font-medium">{value}</dd>
+
+                  <dd className="mt-2 break-words text-sm font-medium">
+                    {value}
+                  </dd>
                 </div>
               ))}
             </dl>
@@ -501,6 +650,7 @@ boundary: Does not establish cause, infection transmission, or clinical outcome.
               >
                 {showReceipt ? 'Hide receipt' : 'Preview receipt'}
               </button>
+
               <button
                 type="button"
                 className="rounded-xl border border-slate-300 px-4 py-2 text-sm font-semibold hover:bg-slate-50"
@@ -527,10 +677,15 @@ replay_package_id: RP-GIR-00014`}
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-700">
               Compare and reinterpret
             </p>
-            <h2 className="mt-2 text-2xl font-semibold">Preserve history, never rewrite it</h2>
+
+            <h2 className="mt-2 text-2xl font-semibold">
+              Preserve history, never rewrite it
+            </h2>
+
             <p className="mt-4 leading-7 text-slate-600">
-              A newer module or ruleset may produce a better-supported interpretation, but it does
-              not erase what was known, under which rules, by whom, and when.
+              A newer module or ruleset may produce a better-supported
+              interpretation, but it does not erase what was known, under which
+              rules, by whom, and when.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
@@ -541,11 +696,17 @@ replay_package_id: RP-GIR-00014`}
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Comparison
                 </span>
-                <span className="mt-2 block font-semibold">Before vs. after intervention</span>
+
+                <span className="mt-2 block font-semibold">
+                  Before vs. after intervention
+                </span>
+
                 <span className="mt-2 block text-sm leading-6 text-slate-600">
-                  Normalize context, units, evidence quality, and declared success criteria.
+                  Normalize context, units, evidence quality, and declared
+                  success criteria.
                 </span>
               </button>
+
               <button
                 type="button"
                 className="rounded-2xl border border-slate-200 p-5 text-left hover:border-cyan-500 hover:bg-cyan-50"
@@ -553,7 +714,11 @@ replay_package_id: RP-GIR-00014`}
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-500">
                   Reinterpretation
                 </span>
-                <span className="mt-2 block font-semibold">Apply a newer module version</span>
+
+                <span className="mt-2 block font-semibold">
+                  Apply a newer module version
+                </span>
+
                 <span className="mt-2 block text-sm leading-6 text-slate-600">
                   Create a new GIR™ linked to the same immutable source record.
                 </span>
@@ -568,8 +733,12 @@ replay_package_id: RP-GIR-00014`}
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-cyan-300">
                 What GRI™ is not
               </p>
-              <h2 className="mt-3 text-3xl font-semibold">Interpretation is not authority.</h2>
+
+              <h2 className="mt-3 text-3xl font-semibold">
+                Interpretation is not authority.
+              </h2>
             </div>
+
             <div className="grid gap-4 sm:grid-cols-2">
               {[
                 'Not a generic summarizer or chatbot',
@@ -579,8 +748,13 @@ replay_package_id: RP-GIR-00014`}
                 'Not a controller or remediation command',
                 'Not permission to execute consequential action',
               ].map((item) => (
-                <div key={item} className="rounded-2xl border border-white/15 bg-white/5 p-4">
-                  <p className="text-sm font-semibold text-slate-100">{item}</p>
+                <div
+                  key={item}
+                  className="rounded-2xl border border-white/15 bg-white/5 p-4"
+                >
+                  <p className="text-sm font-semibold text-slate-100">
+                    {item}
+                  </p>
                 </div>
               ))}
             </div>
