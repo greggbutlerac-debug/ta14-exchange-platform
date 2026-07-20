@@ -36,33 +36,6 @@ const workspaceNavigation = [
   },
 ];
 
-const topNavigation = [
-  {
-    href: '/workspace/ai-governance',
-    label: 'Playground',
-  },
-  {
-    href: '/workspace/demonstrations',
-    label: 'Demonstrations',
-  },
-  {
-    href: '/workspace/routes/new',
-    label: 'Build',
-  },
-  {
-    href: '/workspace/routes',
-    label: 'My Routes',
-  },
-  {
-    href: '/partner-review-network',
-    label: 'Partner Network',
-  },
-  {
-    href: '/workspace/ai-governance/pricing',
-    label: 'Pricing',
-  },
-];
-
 const mobileNavigation = [
   {
     href: '/workspace/ai-governance',
@@ -165,9 +138,11 @@ export default async function WorkspaceLayout({
           top: 0;
           z-index: 50;
           min-height: 76px;
-          display: grid;
-          grid-template-columns: 270px minmax(0, 1fr) auto;
+          display: flex;
           align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          padding-right: 16px;
           border-bottom: 1px solid rgba(255,255,255,0.09);
           background: rgba(3, 8, 15, 0.9);
           box-shadow: 0 18px 45px rgba(0,0,0,0.24);
@@ -176,6 +151,7 @@ export default async function WorkspaceLayout({
 
         .ta14-brand {
           min-height: 76px;
+          width: 270px;
           display: flex;
           align-items: center;
           gap: 12px;
@@ -222,32 +198,26 @@ export default async function WorkspaceLayout({
           text-overflow: ellipsis;
         }
 
-        .ta14-top-navigation {
+        .ta14-account-actions {
           min-width: 0;
           display: flex;
           align-items: center;
-          gap: 5px;
-          padding: 0 16px;
-          overflow-x: auto;
-          scrollbar-width: none;
+          justify-content: flex-end;
+          gap: 12px;
         }
 
-        .ta14-top-navigation::-webkit-scrollbar {
-          display: none;
-        }
-
-        .ta14-top-link {
+        .ta14-return-link {
           min-height: 40px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          flex: 0 0 auto;
-          padding: 0 13px;
-          border: 1px solid transparent;
+          padding: 0 14px;
+          border: 1px solid rgba(255,255,255,0.12);
           border-radius: 12px;
-          color: #b9c6d8;
-          font-size: 0.79rem;
-          font-weight: 700;
+          color: #dbeafe;
+          background: rgba(255,255,255,0.04);
+          font-size: 0.78rem;
+          font-weight: 800;
           transition:
             color 160ms ease,
             border-color 160ms ease,
@@ -255,37 +225,18 @@ export default async function WorkspaceLayout({
             transform 160ms ease;
         }
 
-        .ta14-top-link:hover,
-        .ta14-top-link:focus-visible {
+        .ta14-return-link:hover,
+        .ta14-return-link:focus-visible {
           color: #ffffff;
-          border-color: rgba(125,211,252,0.24);
-          background: rgba(56,189,248,0.08);
+          border-color: rgba(125,211,252,0.35);
+          background: rgba(56,189,248,0.09);
           transform: translateY(-1px);
           outline: none;
         }
 
-        .ta14-top-link.partner {
-          color: #fde68a;
-          border-color: rgba(251,191,36,0.2);
-          background: rgba(245,158,11,0.07);
-        }
-
-        .ta14-top-link.return {
-          color: #dbeafe;
-          border-color: rgba(255,255,255,0.1);
-          background: rgba(255,255,255,0.035);
-        }
-
-        .ta14-account-actions {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          padding-right: 16px;
-        }
-
         .ta14-account-identity {
           min-width: 0;
-          max-width: 180px;
+          max-width: 220px;
           display: grid;
           gap: 2px;
           text-align: right;
@@ -451,17 +402,9 @@ export default async function WorkspaceLayout({
         }
 
         @media (max-width: 1240px) {
-          .ta14-command-bar {
-            grid-template-columns: 250px minmax(0, 1fr) auto;
-          }
-
           .ta14-brand {
+            width: 250px;
             padding-left: 14px;
-          }
-
-          .ta14-top-link {
-            padding-inline: 10px;
-            font-size: 0.74rem;
           }
 
           .ta14-account-identity {
@@ -478,12 +421,14 @@ export default async function WorkspaceLayout({
         }
 
         @media (max-width: 960px) {
-          .ta14-command-bar {
-            grid-template-columns: 220px minmax(0, 1fr) auto;
-          }
-
           .ta14-sidebar {
             display: none;
+          }
+
+          .ta14-brand {
+            width: auto;
+            min-width: 220px;
+            border-right: 0;
           }
 
           .ta14-workspace-content {
@@ -536,24 +481,18 @@ export default async function WorkspaceLayout({
 
         @media (max-width: 760px) {
           .ta14-command-bar {
-            grid-template-columns: minmax(0, 1fr) auto;
             min-height: 66px;
+            padding-right: 10px;
           }
 
           .ta14-brand {
             min-height: 66px;
-            border-right: 0;
+            min-width: 0;
+            padding-left: 12px;
           }
 
-          .ta14-top-navigation {
-            display: none;
-          }
-
-          .ta14-account-actions {
-            padding-right: 10px;
-          }
-
-          .ta14-brand-copy span {
+          .ta14-brand-copy span,
+          .ta14-return-link {
             display: none;
           }
         }
@@ -606,32 +545,16 @@ export default async function WorkspaceLayout({
           </span>
         </Link>
 
-        <nav
-          className="ta14-top-navigation"
-          aria-label="AI Governance workspace navigation"
-        >
-          {topNavigation.map((item) => (
-            <Link
-              className={`ta14-top-link${
-                item.href === '/partner-review-network' ? ' partner' : ''
-              }`}
-              href={item.href}
-              key={item.href}
-            >
-              {item.label}
-            </Link>
-          ))}
-
-          <Link className="ta14-top-link return" href="/">
+        <div className="ta14-account-actions">
+          <Link className="ta14-return-link" href="/">
             Return to Exchange
           </Link>
-        </nav>
 
-        <div className="ta14-account-actions">
           <div className="ta14-account-identity">
             <span>Signed in</span>
             <strong title={accountEmail}>{accountEmail}</strong>
           </div>
+
           <LogoutButton />
         </div>
       </header>
@@ -639,6 +562,7 @@ export default async function WorkspaceLayout({
       <aside className="ta14-sidebar" aria-label="AI Governance workspace navigation">
         <section>
           <span className="ta14-nav-label">AI Governance</span>
+
           <nav className="ta14-nav-list">
             {workspaceNavigation.map((item) => (
               <Link
