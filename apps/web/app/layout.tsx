@@ -12,12 +12,12 @@ export const metadata: Metadata = {
     'https://ta14-exchange-platform-x2g7.vercel.app',
   ),
   title: {
-    default: 'TA-14 Exchange Platform',
-    template: '%s | TA-14 Exchange Platform',
+    default: 'TA-14 AI Governance Exchange',
+    template: '%s | TA-14 AI Governance Exchange',
   },
   description:
-    'Build, test, correct, preserve, and verify consequential execution routes through TA-14 admissible execution records.',
-  applicationName: 'TA-14 Exchange Platform',
+    'Build, test, correct, preserve, and independently verify consequential execution routes through TA-14 admissible execution records.',
+  applicationName: 'TA-14 AI Governance Exchange',
   authors: [
     {
       name: 'Greggory Don Butler',
@@ -27,6 +27,7 @@ export const metadata: Metadata = {
   publisher: 'TA-14 Authority Governance Institution',
   keywords: [
     'TA-14',
+    'TA-14 AI Governance Exchange',
     'Admissible Execution',
     'AI Governance',
     'Execution Governance',
@@ -47,25 +48,25 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: '/',
-    siteName: 'TA-14 Exchange Platform',
-    title: 'TA-14 Exchange Platform',
+    siteName: 'TA-14 AI Governance Exchange',
+    title: 'TA-14 AI Governance Exchange',
     description:
-      'Every consequence has a route. TA-14 proves whether it should exist.',
+      'Constitutional execution for the physical and digital world. No admissible evidence. No admissible execution.',
     images: [
       {
-        url: '/ta14-social-preview.png',
+        url: '/opengraph-image.png',
         width: 1200,
         height: 630,
-        alt: 'TA-14 Global Admissible Execution Exchange',
+        alt: 'TA-14 AI Governance Exchange',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TA-14 Exchange Platform',
+    title: 'TA-14 AI Governance Exchange',
     description:
-      'Every consequence has a route. TA-14 proves whether it should exist.',
-    images: ['/ta14-social-preview.png'],
+      'Constitutional execution for the physical and digital world. No admissible evidence. No admissible execution.',
+    images: ['/opengraph-image.png'],
   },
   robots: {
     index: true,
