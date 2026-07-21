@@ -3,6 +3,15 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+const WORKSPACE_ROUTES = {
+  build: "/workspace/build",
+  corrections: "/workspace/corrections",
+  demonstrations: "/workspace/demonstrations",
+  receipts: "/workspace/receipts",
+  replay: "/workspace/replay",
+  scanner: "/workspace/scanner",
+} as const;
+
 type VerificationState = "VERIFIED" | "DIVERGENT" | "INCOMPLETE" | "DISPUTED";
 type CheckState = "PASS" | "FAIL" | "UNKNOWN";
 
@@ -38,8 +47,31 @@ type ReplayPackage = {
   };
 };
 
+type VerificationInput =
+  | ReplayPackage
+  | {
+      schema?: string;
+      replay?: ReplayPackage;
+      receipt?: unknown;
+      verificationBoundary?: unknown;
+    };
+
+function normalizeReplayPackage(input: VerificationInput): ReplayPackage {
+  if (
+    input &&
+    typeof input === "object" &&
+    "replay" in input &&
+    input.replay &&
+    typeof input.replay === "object"
+  ) {
+    return input.replay;
+  }
+
+  return input as ReplayPackage;
+}
+
 const verifiedSample: ReplayPackage = {
-  schema: "TA14_REPLAY_PACKAGE_V1",
+  schema: "TA-14_REPLAY_PACKAGE_V1",
   routeId: "vendor-payment-2026-0717-0042",
   routeVersion: "3.0.0",
   decision: "ALLOW",
@@ -55,7 +87,7 @@ const verifiedSample: ReplayPackage = {
     outcome: { receiptId: "outcome-0042", status: "SETTLED" },
   },
   dependencies: ["prop-0042", "adm-0042", "commit-0042", "exec-0042", "outcome-0042"],
-  signatures: [{ signer: "ta14-exchange-demo", signature: "demo-signature-present" }],
+  signatures: [{ signer: "ta-14-exchange-demo", signature: "demo-signature-present" }],
   outcome: {
     status: "SETTLED",
     correspondence: true,
@@ -88,7 +120,7 @@ function inspect(pkg: ReplayPackage): VerificationCheck[] {
   const dependencies = pkg.dependencies ?? [];
 
   const routeIdentity = present(pkg.routeId) && present(pkg.routeVersion);
-  const schemaKnown = pkg.schema === "TA14_REPLAY_PACKAGE_V1";
+  const schemaKnown = pkg.schema === "TA-14_REPLAY_PACKAGE_V1";
   const routeCommitMatch = present(pkg.routeDigest) && pkg.routeDigest === pkg.committedDigest;
   const executionMatch = present(pkg.executionDigest) && pkg.executionDigest === pkg.committedDigest;
   const allReceipts = receiptNames.every((name) => present(receipts[name]));
@@ -107,7 +139,7 @@ function inspect(pkg: ReplayPackage): VerificationCheck[] {
       id: "schema",
       label: "Replay schema",
       detail: schemaKnown
-        ? "The package declares TA14_REPLAY_PACKAGE_V1."
+        ? "The package declares TA-14_REPLAY_PACKAGE_V1."
         : "The replay schema is missing or unsupported.",
       state: schemaKnown ? "PASS" : "UNKNOWN",
     },
@@ -263,10 +295,13 @@ export default function ReplayVerificationPage() {
 
     window.setTimeout(() => {
       try {
-        const parsed = JSON.parse(text) as ReplayPackage;
-        setPackageValue(parsed);
+        const parsed = JSON.parse(text) as VerificationInput;
+        const normalized = normalizeReplayPackage(parsed);
+        setPackageValue(normalized);
         setParseError("");
-        setNotice(`Verification completed: ${deriveState(inspect(parsed))}.`);
+        setNotice(
+          `Verification completed: ${deriveState(inspect(normalized))}.`,
+        );
       } catch (error) {
         setParseError(error instanceof Error ? error.message : "Invalid JSON.");
         setNotice("The package could not be parsed. Nothing was verified.");
@@ -309,7 +344,7 @@ export default function ReplayVerificationPage() {
 
   function downloadReport() {
     const report = {
-      schema: "TA14_REPLAY_VERIFICATION_REPORT_V1",
+      schema: "TA-14_REPLAY_VERIFICATION_REPORT_V1",
       generatedAt: new Date().toISOString(),
       routeId: packageValue.routeId ?? "UNKNOWN",
       routeVersion: packageValue.routeVersion ?? "UNKNOWN",
@@ -328,8 +363,10 @@ export default function ReplayVerificationPage() {
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement("a");
     anchor.href = url;
-    anchor.download = `${packageValue.routeId ?? "ta14-route"}-verification-report.json`;
+    anchor.download = `${packageValue.routeId ?? "ta-14-route"}-verification-report.json`;
+    document.body.appendChild(anchor);
     anchor.click();
+    anchor.remove();
     URL.revokeObjectURL(url);
     setNotice("Verification report downloaded.");
   }
@@ -376,12 +413,13 @@ export default function ReplayVerificationPage() {
               </p>
 
               <div className="heroActions">
-                <button className="primaryButton" onClick={() => verifyText()}>
+                <button className="primaryButton" type="button" onClick={() => verifyText()}>
                   {isVerifying ? "Verifying route..." : "Verify current package"}
                   <ArrowIcon />
                 </button>
                 <button
                   className="secondaryButton"
+                  type="button"
                   onClick={() => loadSample(divergentSample, "Divergent sample")}
                 >
                   Test divergence
@@ -448,7 +486,10 @@ export default function ReplayVerificationPage() {
             <div className="chain">
               {chain.map(([label, state], index) => (
                 <div className="chainSegment" key={label}>
-                  <div className={`chainNode ${statusClass(state ?? "UNKNOWN")}`}>
+                  <div
+                    aria-label={`${label}: ${state ?? "UNKNOWN"}`}
+                    className={`chainNode ${statusClass(state ?? "UNKNOWN")}`}
+                  >
                     <span>{String(index + 1).padStart(2, "0")}</span>
                     <strong>{label}</strong>
                   </div>
@@ -521,11 +562,13 @@ export default function ReplayVerificationPage() {
 
               <div className="sampleActions">
                 <button
+                  type="button"
                   onClick={() => loadSample(verifiedSample, "Verified sample")}
                 >
                   Load verified sample
                 </button>
                 <button
+                  type="button"
                   onClick={() => loadSample(divergentSample, "Divergent sample")}
                 >
                   Load divergence
@@ -534,6 +577,7 @@ export default function ReplayVerificationPage() {
 
               <button
                 className="advancedToggle"
+                type="button"
                 onClick={() => setAdvancedOpen((open) => !open)}
                 aria-expanded={advancedOpen}
               >
@@ -553,6 +597,7 @@ export default function ReplayVerificationPage() {
               {parseError ? <div className="errorPanel">{parseError}</div> : null}
 
               <button
+                type="button"
                 onClick={() => verifyText()}
                 className="primaryButton fullButton"
                 disabled={isVerifying}
@@ -581,13 +626,20 @@ export default function ReplayVerificationPage() {
                   <span>VERIFICATION RESULT</span>
                   <h2>{verificationState}</h2>
                 </div>
-                <button className="secondaryButton" onClick={downloadReport}>
+                <button className="secondaryButton" type="button" onClick={downloadReport}>
                   Download report
                 </button>
               </div>
 
               <div className="resultMeter">
-                <div className="meterTrack">
+                <div
+                  aria-label="Structural verification score"
+                  aria-valuemax={100}
+                  aria-valuemin={0}
+                  aria-valuenow={score}
+                  className="meterTrack"
+                  role="progressbar"
+                >
                   <div className="meterFill" style={{ width: `${score}%` }} />
                 </div>
                 <div className="meterLabels">
@@ -634,24 +686,24 @@ export default function ReplayVerificationPage() {
                 <span>NEXT ACTION</span>
                 <h3>Move from verification to governed correction.</h3>
                 <p>
-                  Divergent and incomplete packages should return to the
-                  builder or scanner. The original package remains preserved;
-                  corrections create a new version rather than rewriting
-                  history.
+                  Divergent and incomplete packages should enter the Correction
+                  Studio. The original package remains preserved; correction
+                  creates a new route version that must be tested and replayed
+                  again rather than rewriting history.
                 </p>
               </div>
 
               <div className="nextLinks">
-                <Link href="/workspace/scanner">
-                  Open scanner
+                <Link href={WORKSPACE_ROUTES.corrections}>
+                  Open Correction Studio
                   <ArrowIcon />
                 </Link>
-                <Link href="/workspace/build">
-                  Open builder
+                <Link href={WORKSPACE_ROUTES.replay}>
+                  Open Replay Console
                   <ArrowIcon />
                 </Link>
-                <Link href="/workspace/demonstrations">
-                  Run demonstration
+                <Link href={WORKSPACE_ROUTES.receipts}>
+                  Open Receipt Vault
                   <ArrowIcon />
                 </Link>
               </div>
@@ -695,7 +747,7 @@ export default function ReplayVerificationPage() {
           </div>
 
           <div className="certificateFooter">
-            <button className="primaryButton" onClick={downloadReport}>
+            <button className="primaryButton" type="button" onClick={downloadReport}>
               Download certificate
               <ArrowIcon />
             </button>
@@ -936,6 +988,17 @@ export default function ReplayVerificationPage() {
         .primaryButton:hover,
         .secondaryButton:hover {
           transform: translateY(-2px);
+        }
+
+        .primaryButton:focus-visible,
+        .secondaryButton:focus-visible,
+        .sampleActions button:focus-visible,
+        .advancedToggle:focus-visible,
+        .dropZone:focus-within,
+        .nextLinks a:focus-visible,
+        .jsonEditor:focus-visible {
+          outline: 3px solid rgba(114, 231, 228, .72);
+          outline-offset: 4px;
         }
 
         .primaryButton:disabled {
