@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+const WORKSPACE_ROUTES = {
+  build: "/workspace/build",
+  registry: "/workspace/registry",
+  verify: "/workspace/verify",
+} as const;
+
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 type TestMode = "SIMULATION" | "SIGNED";
 type RouteKey = "vendor" | "agent" | "hvac";
@@ -28,21 +34,21 @@ type TestResult = {
 
 const routes = {
   vendor: {
-    rid: "TA14-RID-VP-0042",
+    rid: "TA-14-RID-VP-0042",
     name: "Governed Vendor Payment",
     domain: "Finance",
     description:
       "Tests invoice, purchase-order, supplier-account, approver, commit, execution, and settlement correspondence.",
   },
   agent: {
-    rid: "TA14-RID-AI-0018",
+    rid: "TA-14-RID-AI-0018",
     name: "Bounded AI Agent Action",
     domain: "AI Governance",
     description:
       "Tests delegated authority, tool scope, evidence continuity, action binding, execution correspondence, and outcome verification.",
   },
   hvac: {
-    rid: "TA14-RID-HVAC-0009",
+    rid: "TA-14-RID-HVAC-0009",
     name: "Analyzer-Governed Refrigerant Intervention",
     domain: "HVAC",
     description:
@@ -55,8 +61,8 @@ const routes = {
 
 const initialHistory: TestResult[] = [
   {
-    testId: "TA14-TEST-9F21C4",
-    routeId: "TA14-RID-VP-0042",
+    testId: "TA-14-TEST-9F21C4",
+    routeId: "TA-14-RID-VP-0042",
     routeName: "Governed Vendor Payment",
     mode: "SIMULATION",
     decision: "ALLOW",
@@ -66,8 +72,8 @@ const initialHistory: TestResult[] = [
     receipt: {},
   },
   {
-    testId: "TA14-TEST-7A11B8",
-    routeId: "TA14-RID-AI-0018",
+    testId: "TA-14-TEST-7A11B8",
+    routeId: "TA-14-RID-AI-0018",
     routeName: "Bounded AI Agent Action",
     mode: "SIMULATION",
     decision: "HOLD",
@@ -86,7 +92,11 @@ const initialHistory: TestResult[] = [
 ];
 
 function makeId(prefix: string) {
-  return `${prefix}-${Math.random().toString(16).slice(2, 8).toUpperCase()}`;
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+    return `${prefix}-${crypto.randomUUID().slice(0, 8).toUpperCase()}`;
+  }
+
+  return `${prefix}-${Date.now().toString(16).slice(-8).toUpperCase()}`;
 }
 
 function downloadJson(filename: string, value: unknown) {
@@ -207,10 +217,10 @@ export default function RouteTestingDeskPage() {
 
   function runTest() {
     const createdAt = new Date().toISOString();
-    const testId = makeId("TA14-TEST");
+    const testId = makeId("TA-14-TEST");
 
     const receipt = {
-      schema: "TA14_ROUTE_TEST_RECEIPT_V1",
+      schema: "TA_14_ROUTE_TEST_RECEIPT_V1",
       testId,
       route: {
         rid: selectedRoute.rid,
@@ -368,6 +378,15 @@ export default function RouteTestingDeskPage() {
         }
 
         .button:hover, .button-secondary:hover { transform: translateY(-2px); }
+
+        .button:focus-visible,
+        .button-secondary:focus-visible,
+        .choice:focus-within,
+        .switch:focus-visible,
+        select:focus-visible {
+          outline: 3px solid rgba(108, 233, 255, .72);
+          outline-offset: 4px;
+        }
 
         .button {
           border: 0;
@@ -718,13 +737,13 @@ export default function RouteTestingDeskPage() {
               created real-world authority.
             </p>
             <div className="hero-actions">
-              <Link className="button" href="/workspace/build">
+              <Link className="button" href={WORKSPACE_ROUTES.build}>
                 Build a route
               </Link>
-              <Link className="button-secondary" href="/workspace/registry">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.registry}>
                 Open registry
               </Link>
-              <Link className="button-secondary" href="/workspace/verify">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.verify}>
                 Verify a receipt
               </Link>
             </div>
@@ -791,6 +810,8 @@ export default function RouteTestingDeskPage() {
                     >
                       <input
                         type="radio"
+                        name="test-mode"
+                        value={item}
                         checked={mode === item}
                         onChange={() => setMode(item)}
                       />
@@ -850,6 +871,9 @@ export default function RouteTestingDeskPage() {
                         <span>{item.detail}</span>
                       </div>
                       <button
+                        aria-label={`${item.title}: ${
+                          item.value ? "asserted true" : "asserted false"
+                        }`}
                         aria-pressed={item.value}
                         className={`switch ${item.value ? "on" : ""}`}
                         type="button"
@@ -889,7 +913,14 @@ export default function RouteTestingDeskPage() {
                 {current ? current.score : preview.score}
                 <small>/100</small>
               </div>
-              <div className="progress">
+              <div
+                aria-label="Route readiness score"
+                aria-valuemax={100}
+                aria-valuemin={0}
+                aria-valuenow={current ? current.score : preview.score}
+                className="progress"
+                role="progressbar"
+              >
                 <div
                   style={{
                     width: `${current ? current.score : preview.score}%`,
