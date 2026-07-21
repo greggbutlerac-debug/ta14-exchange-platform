@@ -1,4 +1,4 @@
-/* TA-14 ANIMATED HOMEPAGE V3 - RELIABLE GOLDEN GATEWAYS + CALMER COSMIC FIELD - 2026-07-21 */
+/* TA-14 ANIMATED HOMEPAGE V6 - PARTNER REVIEW NETWORK CTA + WORKSPACE-ONLY PRICING - 2026-07-21 */
 "use client";
 
 import Link from "next/link";
@@ -313,6 +313,9 @@ export default function HomePage() {
 
   return (
     <main className="page-shell">
+      <a className="skip-link" href="#main-content">
+        Skip to main content
+      </a>
       <div className="cosmic-background" aria-hidden="true">
         <div className="star-field star-field-one" />
         <div className="star-field star-field-two" />
@@ -352,19 +355,20 @@ export default function HomePage() {
         </button>
 
         <nav className={mobileMenuOpen ? "main-nav open" : "main-nav"}>
-          <a href="#start">Start Here</a>
-          <a href="#map">Exchange Map</a>
-          <a href="#playgrounds">Playgrounds</a>
-          <a href="#results">Results</a>
-          <a href="#gallery">Route Gallery</a>
-          <Link href="/account">Sign In</Link>
-          <Link className="nav-cta" href="/workspace">
+          <a href="#start" onClick={() => setMobileMenuOpen(false)}>Start Here</a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Exchange Map</a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Workspaces</a>
+          <a href="#results" onClick={() => setMobileMenuOpen(false)}>Results</a>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>Route Gallery</a>
+          <a href="#partner-review-network" onClick={() => setMobileMenuOpen(false)}>Partner Network</a>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+          <Link className="nav-cta" href="/workspace" onClick={() => setMobileMenuOpen(false)}>
             Open Workspace
           </Link>
         </nav>
       </header>
 
-      <section className="hero section-wrap">
+      <section className="hero section-wrap" id="main-content">
         <div className="hero-copy">
           <p className="eyebrow">Free AI Governance Playground and Workspace</p>
           <h1>
@@ -505,7 +509,12 @@ export default function HomePage() {
           <div className="map-connector">↓</div>
           <div className="map-workspaces">
             {playgrounds.map((item, index) => (
-              <Link className="gateway-link" href={item.href} key={item.title}>
+              <Link
+                className="gateway-link"
+                href={item.href}
+                key={item.title}
+                aria-label={`${item.action}. ${item.text}`}
+              >
                 <article className={`gateway gateway-${index + 1}`}>
                   <div className="gateway-head">
                     <span className="gateway-badge">{item.badge}</span>
@@ -523,6 +532,12 @@ export default function HomePage() {
                     <div className="door-frame" aria-hidden="true">
                       <div className="door-rays" />
                       <div className="door-glow" />
+                      <div className="door-interior">
+                        <span className="portal-particle particle-one" />
+                        <span className="portal-particle particle-two" />
+                        <span className="portal-particle particle-three" />
+                        <span className="portal-horizon" />
+                      </div>
                       <div className="door-arch" />
                       <div className="door-panel">
                         <span>{item.badge}</span>
@@ -533,7 +548,12 @@ export default function HomePage() {
                     </div>
                   </div>
                   <span className="gateway-action">
-                    {item.action}
+                    <span className="gateway-action-default">
+                      {item.action}
+                    </span>
+                    <span className="gateway-action-hover">
+                      Enter workspace
+                    </span>
                     <b>→</b>
                   </span>
                 </article>
@@ -552,38 +572,6 @@ export default function HomePage() {
             next, and how to return later.
           </p>
         </div>
-      </section>
-
-      <section className="section-wrap" id="playgrounds">
-        <div className="section-heading split-heading">
-          <div>
-            <p className="eyebrow">Four connected playgrounds</p>
-            <h2>Choose where your work begins.</h2>
-          </div>
-          <p>
-            Each playground applies the same TA-14 discipline to a different
-            class of consequential evidence and execution. The structure remains
-            familiar even when the domain changes.
-          </p>
-        </div>
-        <div className="playground-grid">
-          {playgrounds.map((item) => (
-            <article className="playground-card" key={item.title}>
-              <span className="playground-badge">{item.badge}</span>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
-              <Link href={item.href}>
-                {item.action} <span>→</span>
-              </Link>
-            </article>
-          ))}
-        </div>
-        <p className="public-principle">
-          <strong>Public access principle:</strong> the playgrounds are open for
-          education, experimentation, and route development. A favorable result
-          cannot be purchased. Pricing and professional operations appear only
-          after the visitor chooses a lane.
-        </p>
       </section>
 
       <section className="section-wrap chain-section" id="architecture">
@@ -1032,6 +1020,82 @@ export default function HomePage() {
         </div>
       </section>
 
+      <section
+        className="section-wrap partner-network"
+        id="partner-review-network"
+      >
+        <div className="partner-network-shell">
+          <div className="partner-network-copy">
+            <p className="eyebrow">TA-14 Partner Review Network</p>
+            <h2>Do you believe your governance can stand up to bounded review?</h2>
+            <p className="partner-lead">
+              The Partner Review Network is for governance organizations,
+              evidence specialists, cybersecurity teams, controls
+              professionals, runtime systems, and domain experts that can
+              perform consequence-bearing review within clearly declared
+              boundaries.
+            </p>
+            <p>
+              Applicants are evaluated for demonstrated governance discipline,
+              evidence practices, declared scope, review boundaries, and their
+              ability to preserve uncertainty rather than conceal it.
+              Acceptance is never automatic and cannot be purchased.
+            </p>
+            <div className="partner-actions">
+              <Link className="button primary" href="/workspace/entity-review">
+                Learn How the Network Works
+              </Link>
+              <a
+                className="button secondary"
+                href="mailto:ta14admissibleexecution@gmail.com?subject=TA-14%20Partner%20Review%20Network%20Application%20Interest"
+              >
+                Apply for Consideration
+              </a>
+            </div>
+            <p className="partner-boundary">
+              Application requirements, review terms, and any applicable fees
+              are presented only inside the relevant review area—not on the
+              public homepage. Payment never guarantees acceptance,
+              certification, favorable findings, or review work.
+            </p>
+          </div>
+
+          <aside className="partner-network-panel" aria-label="Partner Review Network process">
+            <p className="eyebrow">Bounded participation</p>
+            <ol>
+              <li>
+                <span>01</span>
+                <div>
+                  <strong>Declare your domain</strong>
+                  <p>Identify exactly what you are qualified to review.</p>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <strong>Submit supporting material</strong>
+                  <p>Provide evidence of methods, boundaries, and prior work.</p>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <strong>Receive bounded evaluation</strong>
+                  <p>TA-14 reviews the material without guaranteeing acceptance.</p>
+                </div>
+              </li>
+              <li>
+                <span>04</span>
+                <div>
+                  <strong>Enter an approved lane</strong>
+                  <p>Accepted participants work only within declared authority.</p>
+                </div>
+              </li>
+            </ol>
+          </aside>
+        </div>
+      </section>
+
       <section className="section-wrap built-environment">
         <div className="section-heading split-heading">
           <div>
@@ -1133,18 +1197,19 @@ export default function HomePage() {
         </div>
         <div>
           <h3>Exchange</h3>
-          <a href="#start">Start Here</a>
-          <a href="#map">Exchange Map</a>
-          <a href="#playgrounds">Playgrounds</a>
+          <a href="#start" onClick={() => setMobileMenuOpen(false)}>Start Here</a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Exchange Map</a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Workspaces</a>
           <a href="#results">Results Exchange</a>
-          <a href="#gallery">Route Gallery</a>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>Route Gallery</a>
+          <a href="#partner-review-network" onClick={() => setMobileMenuOpen(false)}>Partner Review Network</a>
         </div>
         <div>
           <h3>Operate</h3>
           <Link href="/workspace">Open Workspace</Link>
           <Link href="/workspace/governed-records">Governed Records</Link>
           <Link href="/workspace/entity-review">Entity Review Center</Link>
-          <Link href="/account">Sign In</Link>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
         </div>
         <div>
           <h3>Contact</h3>
@@ -1175,7 +1240,7 @@ export default function HomePage() {
         </p>
       </footer>
 
-      <style>{`
+      <style jsx>{`
         :global(*) {
           box-sizing: border-box;
         }
@@ -1195,8 +1260,7 @@ export default function HomePage() {
           min-height: 100vh;
           overflow: hidden;
           isolation: isolate;
-          background:
-            radial-gradient(
+          background: radial-gradient(
               circle at 10% 5%,
               rgba(76, 109, 255, 0.18),
               transparent 28%
@@ -1224,11 +1288,28 @@ export default function HomePage() {
             transparent 34%
           );
         }
+        .skip-link {
+          position: fixed;
+          top: 12px;
+          left: 12px;
+          z-index: 1000;
+          padding: 10px 14px;
+          border: 1px solid rgba(109, 240, 207, 0.75);
+          border-radius: 10px;
+          color: #061019;
+          background: #6df0cf;
+          font-weight: 900;
+          transform: translateY(-160%);
+          transition: transform 0.2s ease;
+        }
+        .skip-link:focus {
+          transform: translateY(0);
+        }
         .star-field {
           position: absolute;
           inset: -20%;
           background-repeat: repeat;
-          opacity: 0.2;
+          opacity: 0.28;
         }
         .star-field-one {
           background-image: radial-gradient(
@@ -1236,7 +1317,7 @@ export default function HomePage() {
             rgba(255, 255, 255, 0.9) 0 1px,
             transparent 1.6px
           );
-          background-size: 158px 158px;
+          background-size: 112px 112px;
           animation: starDrift 55s linear infinite;
         }
         .star-field-two {
@@ -1245,9 +1326,19 @@ export default function HomePage() {
             rgba(114, 226, 193, 0.9) 0 1px,
             transparent 1.8px
           );
-          background-size: 249px 249px;
+          background-size: 176px 176px;
           animation: starDriftReverse 78s linear infinite;
-          opacity: 0.14;
+          opacity: 0.2;
+        }
+        .star-field-three {
+          background-image: radial-gradient(
+            circle,
+            rgba(157, 183, 255, 0.85) 0 1.2px,
+            transparent 2px
+          );
+          background-size: 190px 190px;
+          animation: starPulse 9s ease-in-out infinite alternate;
+          opacity: 0.22;
         }
         .orbit {
           position: absolute;
@@ -1368,6 +1459,16 @@ export default function HomePage() {
         @keyframes starDriftReverse {
           to {
             transform: translate3d(-180px, 145px, 0);
+          }
+        }
+        @keyframes starPulse {
+          from {
+            opacity: 0.12;
+            transform: scale(0.98);
+          }
+          to {
+            opacity: 0.38;
+            transform: scale(1.02);
           }
         }
         @keyframes orbitSpin {
@@ -1871,9 +1972,8 @@ export default function HomePage() {
         .map-workspaces {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 22px;
+          gap: 20px;
           align-items: stretch;
-          overflow: visible;
         }
         .gateway-link {
           display: block;
@@ -1889,25 +1989,43 @@ export default function HomePage() {
           --gold-rgb: 255, 200, 87;
           position: relative;
           display: flex;
-          min-height: 520px;
+          min-height: 470px;
           height: 100%;
           flex-direction: column;
           padding: 22px;
           overflow: hidden;
-          border: 1px solid rgba(var(--gold-rgb), 0.42);
+          border: 1px solid rgba(var(--accent-rgb), 0.34);
           border-radius: 24px;
           color: #f7f9ff;
-          background:
-            radial-gradient(circle at 74% 58%, rgba(var(--gold-rgb), 0.11), transparent 30%),
-            linear-gradient(160deg, rgba(var(--accent-rgb), 0.09), rgba(7, 12, 23, 0.96) 43%, rgba(3, 7, 14, 0.99));
-          box-shadow: 0 20px 70px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
-          transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
+          background: radial-gradient(
+              circle at 74% 58%,
+              rgba(var(--gold-rgb), 0.11),
+              transparent 30%
+            ),
+            linear-gradient(
+              160deg,
+              rgba(var(--accent-rgb), 0.09),
+              rgba(7, 12, 23, 0.96) 43%,
+              rgba(3, 7, 14, 0.99)
+            );
+          box-shadow:
+            0 20px 70px rgba(0, 0, 0, 0.42),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          transition:
+            transform 0.35s ease,
+            border-color 0.35s ease,
+            box-shadow 0.35s ease;
         }
         .gateway::before {
           content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, 0.08) 49%, transparent 62%);
+          background: linear-gradient(
+            115deg,
+            transparent 36%,
+            rgba(255, 255, 255, 0.08) 49%,
+            transparent 62%
+          );
           transform: translateX(-115%);
           transition: transform 0.9s ease;
         }
@@ -1916,104 +2034,380 @@ export default function HomePage() {
           position: absolute;
           inset: auto 8% 0;
           height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(var(--gold-rgb), 0.85), transparent);
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(var(--gold-rgb), 0.85),
+            transparent
+          );
           box-shadow: 0 0 20px rgba(var(--gold-rgb), 0.55);
         }
-        .gateway-link:focus-visible { outline: none; }
-        .gateway-link:focus-visible .gateway,
-        .gateway-link:hover .gateway {
+        .gateway-link:hover .gateway,
+        .gateway-link:focus-visible .gateway {
           transform: translateY(-10px) scale(1.012);
           border-color: rgba(var(--gold-rgb), 0.76);
-          box-shadow: 0 30px 100px rgba(var(--gold-rgb), 0.13), 0 18px 70px rgba(0, 0, 0, 0.5);
+          box-shadow:
+            0 30px 100px rgba(var(--gold-rgb), 0.13),
+            0 18px 70px rgba(0, 0, 0, 0.5);
         }
-        .gateway-link:focus-visible .gateway::before,
-        .gateway-link:hover .gateway::before { transform: translateX(115%); }
-        .gateway-2 { --accent: #4aa3ff; --accent-rgb: 74, 163, 255; }
-        .gateway-3 { --accent: #c46cff; --accent-rgb: 196, 108, 255; }
-        .gateway-4 { --accent: #ffad32; --accent-rgb: 255, 173, 50; }
-        .gateway-head, .gateway-body, .gateway-action { position: relative; z-index: 2; }
-        .gateway-head { display: flex; gap: 14px; align-items: flex-start; }
+        .gateway-link:hover .gateway::before,
+        .gateway-link:focus-visible .gateway::before {
+          transform: translateX(115%);
+        }
+        .gateway-2 {
+          --accent: #4aa3ff;
+          --accent-rgb: 74, 163, 255;
+        }
+        .gateway-3 {
+          --accent: #c46cff;
+          --accent-rgb: 196, 108, 255;
+        }
+        .gateway-4 {
+          --accent: #ffad32;
+          --accent-rgb: 255, 173, 50;
+        }
+        .gateway-head,
+        .gateway-body,
+        .gateway-action {
+          position: relative;
+          z-index: 2;
+        }
+        .gateway-head {
+          display: flex;
+          gap: 14px;
+          align-items: flex-start;
+        }
         .gateway-badge {
-          display: grid; width: 54px; height: 54px; flex: 0 0 54px; place-items: center;
-          border: 1px solid rgba(var(--accent-rgb), 0.82); border-radius: 14px; color: var(--accent);
-          background: rgba(var(--accent-rgb), 0.09); box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.15);
-          font-size: 1.2rem; font-weight: 950;
+          display: grid;
+          width: 54px;
+          height: 54px;
+          flex: 0 0 54px;
+          place-items: center;
+          border: 1px solid rgba(var(--accent-rgb), 0.82);
+          border-radius: 14px;
+          color: var(--accent);
+          background: rgba(var(--accent-rgb), 0.09);
+          box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.15);
+          font-size: 1.2rem;
+          font-weight: 950;
         }
-        .gateway-head strong { display: block; margin-top: 2px; font-size: 1.08rem; }
-        .gateway-head small { display: block; margin-top: 7px; color: #9baac0; font-size: 0.77rem; line-height: 1.5; }
-        .gateway-body { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 10px; align-items: end; flex: 1; margin-top: 20px; }
-        .gateway-body ul { margin: 0 0 18px; padding: 0; list-style: none; }
-        .gateway-body li { position: relative; margin: 0 0 11px; padding-left: 18px; color: #c8d3e3; font-size: 0.75rem; }
-        .gateway-body li::before { content: "✦"; position: absolute; left: 0; color: var(--accent); font-size: 0.62rem; }
-        .door-frame { position: relative; min-height: 250px; align-self: end; perspective: 900px; }
+        .gateway-head strong {
+          display: block;
+          margin-top: 2px;
+          font-size: 1.08rem;
+        }
+        .gateway-head small {
+          display: block;
+          margin-top: 7px;
+          color: #9baac0;
+          font-size: 0.77rem;
+          line-height: 1.5;
+        }
+        .gateway-body {
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 10px;
+          align-items: end;
+          flex: 1;
+          margin-top: 20px;
+        }
+        .gateway-body ul {
+          margin: 0 0 18px;
+          padding: 0;
+          list-style: none;
+        }
+        .gateway-body li {
+          position: relative;
+          margin: 0 0 11px;
+          padding-left: 18px;
+          color: #c8d3e3;
+          font-size: 0.75rem;
+        }
+        .gateway-body li::before {
+          content: "✦";
+          position: absolute;
+          left: 0;
+          color: var(--accent);
+          font-size: 0.62rem;
+        }
+        .door-frame {
+          position: relative;
+          min-height: 250px;
+          align-self: end;
+          perspective: 900px;
+        }
         .door-rays {
-          position: absolute; left: 50%; bottom: 20px; width: 210px; height: 230px; transform: translateX(-50%);
-          background: repeating-conic-gradient(from 180deg at 50% 100%, rgba(var(--gold-rgb), 0.13) 0 3deg, transparent 3deg 14deg);
-          filter: blur(1px); opacity: 0.52; animation: raysBreathe 4.8s ease-in-out infinite;
+          position: absolute;
+          left: 50%;
+          bottom: 20px;
+          width: 210px;
+          height: 230px;
+          transform: translateX(-50%);
+          background: repeating-conic-gradient(
+            from 180deg at 50% 100%,
+            rgba(var(--gold-rgb), 0.13) 0 3deg,
+            transparent 3deg 14deg
+          );
+          filter: blur(1px);
+          opacity: 0.52;
+          animation: raysBreathe 4.8s ease-in-out infinite;
         }
         .door-glow {
-          position: absolute; left: 50%; bottom: 16px; width: 150px; height: 220px; transform: translateX(-50%);
-          border-radius: 76px 76px 10px 10px; background: rgba(var(--gold-rgb), 0.24); filter: blur(30px);
+          position: absolute;
+          left: 50%;
+          bottom: 16px;
+          width: 150px;
+          height: 220px;
+          transform: translateX(-50%);
+          border-radius: 76px 76px 10px 10px;
+          background: rgba(var(--gold-rgb), 0.24);
+          filter: blur(30px);
           animation: doorPulse 3.8s ease-in-out infinite;
         }
+        .door-interior {
+          position: absolute;
+          left: 50%;
+          bottom: 24px;
+          width: 118px;
+          height: 194px;
+          overflow: hidden;
+          transform: translateX(-50%);
+          border-radius: 58px 58px 6px 6px;
+          background:
+            radial-gradient(circle at 50% 62%, rgba(255, 247, 205, 0.9) 0 3%, transparent 4%),
+            radial-gradient(circle at 50% 76%, rgba(var(--accent-rgb), 0.36), transparent 54%),
+            linear-gradient(180deg, #030915 0%, rgba(var(--accent-rgb), 0.22) 58%, rgba(var(--gold-rgb), 0.26) 100%);
+          box-shadow:
+            inset 0 0 34px rgba(var(--accent-rgb), 0.25),
+            0 0 30px rgba(var(--gold-rgb), 0.34);
+        }
+        .portal-horizon {
+          position: absolute;
+          left: 12%;
+          right: 12%;
+          bottom: 24%;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(255, 240, 177, 0.9), transparent);
+          box-shadow: 0 0 15px rgba(var(--gold-rgb), 0.9);
+        }
+        .portal-particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #fff6c8;
+          box-shadow: 0 0 10px rgba(var(--gold-rgb), 1);
+          animation: portalDrift 3.6s ease-in-out infinite;
+        }
+        .particle-one { left: 24%; top: 34%; animation-delay: -0.8s; }
+        .particle-two { right: 22%; top: 48%; animation-delay: -2.1s; }
+        .particle-three { left: 52%; top: 20%; animation-delay: -1.4s; }
         .door-arch {
-          position: absolute; left: 50%; bottom: 22px; width: 142px; height: 216px; transform: translateX(-50%);
-          border: 3px solid rgba(var(--gold-rgb), 0.9); border-bottom: 0; border-radius: 74px 74px 4px 4px;
-          box-shadow: 0 0 18px rgba(var(--gold-rgb), 0.55), inset 0 0 20px rgba(var(--gold-rgb), 0.12);
+          position: absolute;
+          left: 50%;
+          bottom: 22px;
+          width: 142px;
+          height: 216px;
+          transform: translateX(-50%);
+          border: 2px solid rgba(var(--gold-rgb), 0.72);
+          border-bottom: 0;
+          border-radius: 74px 74px 4px 4px;
+          box-shadow:
+            0 0 18px rgba(var(--gold-rgb), 0.55),
+            inset 0 0 20px rgba(var(--gold-rgb), 0.12);
         }
         .door-panel {
-          position: absolute; left: 50%; bottom: 22px; width: 124px; height: 200px;
-          transform: translateX(-50%) rotateY(-4deg); transform-origin: left center;
-          border: 4px solid var(--gold-bright); border-bottom-width: 7px; border-radius: 64px 64px 7px 7px / 54px 54px 7px 7px;
-          background:
-            linear-gradient(90deg, rgba(255,255,255,.08), transparent 18%, transparent 82%, rgba(255,255,255,.06)),
-            linear-gradient(180deg, rgba(var(--gold-rgb), 0.42), rgba(65, 36, 4, 0.92) 48%, rgba(17, 10, 2, 0.98));
-          box-shadow: 0 0 14px rgba(var(--gold-rgb), 0.95), 0 0 44px rgba(var(--gold-rgb), 0.55), inset 0 0 34px rgba(var(--gold-rgb), 0.24);
-          transition: transform 0.55s cubic-bezier(.2,.8,.2,1), box-shadow 0.45s ease;
+          position: absolute;
+          left: 50%;
+          bottom: 22px;
+          width: 124px;
+          height: 200px;
+          transform: translateX(-50%) rotateY(-4deg);
+          transform-origin: left center;
+          border: 3px solid var(--gold);
+          border-bottom-width: 6px;
+          border-radius: 64px 64px 7px 7px / 54px 54px 7px 7px;
+          background: linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.08),
+              transparent 18%,
+              transparent 82%,
+              rgba(255, 255, 255, 0.06)
+            ),
+            linear-gradient(
+              180deg,
+              rgba(var(--gold-rgb), 0.42),
+              rgba(65, 36, 4, 0.92) 48%,
+              rgba(17, 10, 2, 0.98)
+            );
+          box-shadow:
+            0 0 14px rgba(var(--gold-rgb), 0.95),
+            0 0 44px rgba(var(--gold-rgb), 0.55),
+            inset 0 0 34px rgba(var(--gold-rgb), 0.24);
+          transition:
+            transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+            box-shadow 0.45s ease;
         }
-        .gateway-link:focus-visible .door-panel,
-        .gateway-link:hover .door-panel {
+        .gateway-link:hover .door-panel,
+        .gateway-link:focus-visible .door-panel {
           transform: translateX(-50%) rotateY(-26deg) translateZ(10px);
-          box-shadow: 0 0 24px rgba(var(--gold-rgb), 1), 0 0 76px rgba(var(--gold-rgb), 0.78), inset 0 0 42px rgba(var(--gold-rgb), 0.34);
+          box-shadow:
+            0 0 24px rgba(var(--gold-rgb), 1),
+            0 0 76px rgba(var(--gold-rgb), 0.78),
+            inset 0 0 42px rgba(var(--gold-rgb), 0.34);
         }
         .door-panel::before {
-          content: ""; position: absolute; inset: 15px; border: 1px solid rgba(255, 235, 165, 0.58);
-          border-radius: 49px 49px 4px 4px / 42px 42px 4px 4px; box-shadow: inset 0 0 18px rgba(var(--gold-rgb), 0.2);
+          content: "";
+          position: absolute;
+          inset: 15px;
+          border: 1px solid rgba(255, 235, 165, 0.58);
+          border-radius: 49px 49px 4px 4px / 42px 42px 4px 4px;
+          box-shadow: inset 0 0 18px rgba(var(--gold-rgb), 0.2);
         }
         .door-panel::after {
-          content: ""; position: absolute; left: 50%; top: 14px; bottom: 14px; width: 1px;
-          background: linear-gradient(transparent, rgba(255,239,183,.5), transparent);
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 14px;
+          bottom: 14px;
+          width: 1px;
+          background: linear-gradient(
+            transparent,
+            rgba(255, 239, 183, 0.5),
+            transparent
+          );
         }
         .door-panel span {
-          position: absolute; left: 50%; top: 52%; display: grid; width: 58px; height: 58px; transform: translate(-50%, -50%);
-          place-items: center; border: 2px solid var(--gold-bright); border-radius: 50%; color: #fff7d1;
-          background: rgba(74, 42, 4, 0.7); box-shadow: 0 0 26px rgba(var(--gold-rgb), 0.72); font-size: 1.2rem; font-weight: 950;
+          position: absolute;
+          left: 50%;
+          top: 52%;
+          display: grid;
+          width: 58px;
+          height: 58px;
+          transform: translate(-50%, -50%);
+          place-items: center;
+          border: 2px solid var(--gold-bright);
+          border-radius: 50%;
+          color: #fff7d1;
+          background: rgba(74, 42, 4, 0.7);
+          box-shadow: 0 0 26px rgba(var(--gold-rgb), 0.72);
+          font-size: 1.2rem;
+          font-weight: 950;
         }
         .door-knob {
-          position: absolute; right: 14px; top: 54%; width: 7px; height: 7px; border-radius: 50%;
-          background: #fff0a8; box-shadow: 0 0 9px rgba(var(--gold-rgb), 1);
+          position: absolute;
+          right: 14px;
+          top: 54%;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #fff0a8;
+          box-shadow: 0 0 9px rgba(var(--gold-rgb), 1);
         }
         .door-threshold {
-          position: absolute; left: 50%; bottom: 15px; width: 168px; height: 22px; transform: translateX(-50%) perspective(100px) rotateX(55deg);
-          border: 1px solid rgba(var(--gold-rgb), 0.72); background: linear-gradient(180deg, rgba(var(--gold-rgb), 0.48), rgba(var(--gold-rgb), 0.06));
+          position: absolute;
+          left: 50%;
+          bottom: 15px;
+          width: 168px;
+          height: 22px;
+          transform: translateX(-50%) perspective(100px) rotateX(55deg);
+          border: 1px solid rgba(var(--gold-rgb), 0.72);
+          background: linear-gradient(
+            180deg,
+            rgba(var(--gold-rgb), 0.48),
+            rgba(var(--gold-rgb), 0.06)
+          );
           box-shadow: 0 0 30px rgba(var(--gold-rgb), 0.5);
         }
         .door-step {
-          position: absolute; left: 50%; bottom: 5px; width: 182px; height: 15px; transform: translateX(-50%);
-          border: 1px solid rgba(var(--gold-rgb), 0.7); border-radius: 50%; background: rgba(var(--gold-rgb), 0.2);
+          position: absolute;
+          left: 50%;
+          bottom: 5px;
+          width: 182px;
+          height: 15px;
+          transform: translateX(-50%);
+          border: 1px solid rgba(var(--gold-rgb), 0.7);
+          border-radius: 50%;
+          background: rgba(var(--gold-rgb), 0.2);
           box-shadow: 0 0 34px rgba(var(--gold-rgb), 0.45);
         }
         .gateway-action {
-          display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 14px 15px;
-          border: 1px solid rgba(var(--gold-rgb), 0.78); border-radius: 11px; color: #fff8dc;
-          background: linear-gradient(180deg, rgba(var(--gold-rgb), 0.48), rgba(88, 49, 4, 0.62));
-          box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 28px rgba(var(--gold-rgb), 0.14); font-size: 0.84rem; font-weight: 900;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 10px;
+          padding: 14px 15px;
+          border: 1px solid rgba(var(--gold-rgb), 0.78);
+          border-radius: 11px;
+          color: #fff8dc;
+          background: linear-gradient(
+            180deg,
+            rgba(var(--gold-rgb), 0.48),
+            rgba(88, 49, 4, 0.62)
+          );
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            0 8px 28px rgba(var(--gold-rgb), 0.14);
+          font-size: 0.84rem;
+          font-weight: 900;
         }
-        .gateway-action b { font-size: 1.2rem; transition: transform 0.25s ease; }
-        .gateway-link:focus-visible .gateway-action b,
-        .gateway-link:hover .gateway-action b { transform: translateX(6px); }
-        @keyframes doorPulse { 0%,100% { opacity:.45; transform:translateX(-50%) scale(.96); } 50% { opacity:.9; transform:translateX(-50%) scale(1.04); } }
-        @keyframes raysBreathe { 0%,100% { opacity:.28; transform:translateX(-50%) scale(.96); } 50% { opacity:.65; transform:translateX(-50%) scale(1.04); } }
+        .gateway-action-default,
+        .gateway-action-hover {
+          transition:
+            opacity 0.22s ease,
+            transform 0.22s ease;
+        }
+        .gateway-action-hover {
+          position: absolute;
+          left: 15px;
+          opacity: 0;
+          transform: translateY(7px);
+        }
+        .gateway-action b {
+          margin-left: auto;
+          font-size: 1.2rem;
+          transition: transform 0.25s ease;
+        }
+        .gateway-link:hover .gateway-action-default,
+        .gateway-link:focus-visible .gateway-action-default {
+          opacity: 0;
+          transform: translateY(-7px);
+        }
+        .gateway-link:hover .gateway-action-hover,
+        .gateway-link:focus-visible .gateway-action-hover {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .gateway-link:hover .gateway-action b,
+        .gateway-link:focus-visible .gateway-action b {
+          transform: translateX(6px);
+        }
+        @keyframes doorPulse {
+          0%,
+          100% {
+            opacity: 0.45;
+            transform: translateX(-50%) scale(0.96);
+          }
+          50% {
+            opacity: 0.9;
+            transform: translateX(-50%) scale(1.04);
+          }
+        }
+        @keyframes raysBreathe {
+          0%,
+          100% {
+            opacity: 0.28;
+            transform: translateX(-50%) scale(0.96);
+          }
+          50% {
+            opacity: 0.65;
+            transform: translateX(-50%) scale(1.04);
+          }
+        }
+        @keyframes portalDrift {
+          0%, 100% { transform: translate3d(0, 8px, 0) scale(0.8); opacity: 0.25; }
+          50% { transform: translate3d(3px, -16px, 0) scale(1.25); opacity: 1; }
+        }
         .map-shared {
           display: grid;
           grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -2033,229 +2427,6 @@ export default function HomePage() {
           max-width: 850px;
           margin: 24px auto 0;
           text-align: center;
-        }
-        .playground-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
-        }
-        .playground-card {
-          display: flex;
-          flex-direction: column;
-          min-height: 340px;
-          padding: 22px;
-        }
-        .playground-badge {
-          display: inline-grid;
-          place-items: center;
-          width: 46px;
-          height: 46px;
-          margin-bottom: 38px;
-          border: 1px solid rgba(114, 226, 193, 0.34);
-          border-radius: 13px;
-          color: #72e2c1;
-          font-weight: 950;
-        }
-        .playground-card p {
-          font-size: 0.91rem;
-        }
-        .playground-card a {
-          display: flex;
-          justify-content: space-between;
-          margin-top: auto;
-          padding-top: 18px;
-          border-top: 1px solid rgba(147, 172, 215, 0.12);
-          color: #e9f1ff;
-          text-decoration: none;
-          font-weight: 850;
-        }
-        .public-principle,
-        .boundary-note {
-          margin: 18px 0 0;
-          padding: 16px 18px;
-          border-left: 3px solid #72e2c1;
-          background: rgba(114, 226, 193, 0.05);
-        }
-        .chain-row {
-          display: grid;
-          grid-template-columns: repeat(8, minmax(0, 1fr));
-          gap: 8px;
-        }
-        .chain-row div {
-          min-height: 110px;
-          padding: 13px;
-          border: 1px solid rgba(145, 170, 212, 0.15);
-          border-radius: 14px;
-          background: rgba(8, 14, 26, 0.7);
-        }
-        .chain-row span {
-          display: block;
-          margin-bottom: 25px;
-          color: #72e2c1;
-          font-size: 0.7rem;
-          font-weight: 900;
-        }
-        .chain-row strong {
-          font-size: 0.82rem;
-        }
-        .three-principles {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
-          margin-top: 18px;
-        }
-        .three-principles article {
-          padding: 22px;
-        }
-        .three-principles article > span {
-          color: #72e2c1;
-          font-size: 1.5rem;
-        }
-        .demo-grid {
-          display: grid;
-          grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-          gap: 18px;
-        }
-        .route-card,
-        .receipt {
-          padding: 22px;
-        }
-        .route-card-head,
-        .receipt-head,
-        .result-meta,
-        .standing {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 16px;
-        }
-        .route-card-head > strong {
-          font-size: 1.5rem;
-        }
-        .route-data {
-          margin-top: 22px;
-        }
-        .route-data dd {
-          max-width: 55%;
-        }
-        .receipt {
-          border-top-width: 4px;
-        }
-        .receipt-idle {
-          border-top-color: #72819b;
-        }
-        .receipt-running {
-          border-top-color: #9db7ff;
-        }
-        .receipt-hold {
-          border-top-color: #ffc56a;
-        }
-        .receipt-allow {
-          border-top-color: #72e2c1;
-        }
-        .receipt-head > strong {
-          padding: 8px 10px;
-          border: 1px solid currentColor;
-          border-radius: 9px;
-          letter-spacing: 0.1em;
-        }
-        .receipt-copy {
-          min-height: 55px;
-        }
-        .receipt-chain {
-          display: grid;
-          grid-template-columns: repeat(8, minmax(0, 1fr));
-          gap: 5px;
-        }
-        .receipt-chain span {
-          padding: 8px 2px;
-          border: 1px solid rgba(146, 171, 213, 0.13);
-          border-radius: 8px;
-          color: #65748a;
-          text-align: center;
-          font-size: 0.62rem;
-        }
-        .receipt-chain .complete {
-          color: #72e2c1;
-          border-color: rgba(114, 226, 193, 0.35);
-          background: rgba(114, 226, 193, 0.08);
-        }
-        .receipt-chain .active {
-          color: #9db7ff;
-          border-color: rgba(157, 183, 255, 0.4);
-          background: rgba(157, 183, 255, 0.08);
-        }
-        .receipt-chain .failed {
-          color: #ffc56a;
-          border-color: rgba(255, 197, 106, 0.4);
-          background: rgba(255, 197, 106, 0.08);
-        }
-        pre {
-          min-height: 130px;
-          margin: 18px 0 0;
-          padding: 15px;
-          overflow: auto;
-          border: 1px solid rgba(145, 170, 212, 0.13);
-          border-radius: 13px;
-          color: #9fb0c8;
-          background: #04070d;
-          font-size: 0.73rem;
-          line-height: 1.65;
-          white-space: pre-wrap;
-        }
-        .record-preview {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 18px;
-          margin-top: 18px;
-          padding: 22px;
-        }
-        .record-preview > span {
-          padding: 8px 10px;
-          border: 1px solid rgba(114, 226, 193, 0.34);
-          border-radius: 9px;
-          color: #72e2c1;
-          font-size: 0.7rem;
-          font-weight: 900;
-        }
-        .record-preview dl {
-          grid-column: 1 / -1;
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 10px;
-        }
-        .record-preview dl div {
-          padding: 12px;
-          border: 1px solid rgba(146, 171, 213, 0.12);
-          border-radius: 11px;
-          background: rgba(5, 9, 17, 0.65);
-        }
-        .record-preview dd {
-          margin-top: 6px;
-          text-align: left;
-          word-break: break-word;
-        }
-        .results-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
-        }
-        .result-card {
-          min-height: 280px;
-          padding: 20px;
-        }
-        .result-card h3 {
-          margin-top: 34px;
-        }
-        .result-card p {
-          font-size: 0.9rem;
-        }
-        .standing {
-          margin-top: 24px;
-          padding-top: 14px;
-          border-top: 1px solid rgba(145, 171, 213, 0.12);
-          color: #6f7f96;
-          font-size: 0.7rem;
         }
         .results-path {
           display: grid;
@@ -2407,6 +2578,102 @@ export default function HomePage() {
           background: rgba(114, 226, 193, 0.04);
           font-size: 0.76rem;
         }
+        .partner-network-shell {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(0, 1.2fr) minmax(330px, 0.8fr);
+          gap: clamp(24px, 4vw, 52px);
+          overflow: hidden;
+          padding: clamp(26px, 5vw, 58px);
+          border: 1px solid rgba(224, 183, 88, 0.3);
+          border-radius: 28px;
+          background:
+            radial-gradient(circle at 12% 10%, rgba(224, 183, 88, 0.12), transparent 34%),
+            linear-gradient(135deg, rgba(13, 19, 32, 0.96), rgba(6, 10, 19, 0.95));
+          box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+        }
+        .partner-network-shell::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 30%, rgba(255, 228, 151, 0.05), transparent 70%);
+          transform: translateX(-100%);
+          animation: partnerSweep 9s ease-in-out infinite;
+        }
+        .partner-network-copy,
+        .partner-network-panel {
+          position: relative;
+          z-index: 1;
+        }
+        .partner-network-copy h2 {
+          max-width: 900px;
+          margin-bottom: 18px;
+        }
+        .partner-lead {
+          color: #d4deec;
+          font-size: clamp(1rem, 1.6vw, 1.18rem);
+        }
+        .partner-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin: 28px 0 18px;
+        }
+        .partner-boundary {
+          max-width: 880px;
+          margin-bottom: 0;
+          padding: 14px 16px;
+          border-left: 3px solid rgba(224, 183, 88, 0.72);
+          color: #98a7bb;
+          background: rgba(224, 183, 88, 0.05);
+          font-size: 0.84rem;
+        }
+        .partner-network-panel {
+          padding: 22px;
+          border: 1px solid rgba(224, 183, 88, 0.2);
+          border-radius: 20px;
+          background: rgba(4, 8, 16, 0.68);
+        }
+        .partner-network-panel ol {
+          display: grid;
+          gap: 12px;
+          margin: 18px 0 0;
+          padding: 0;
+          list-style: none;
+        }
+        .partner-network-panel li {
+          display: grid;
+          grid-template-columns: 42px 1fr;
+          gap: 12px;
+          padding: 14px;
+          border: 1px solid rgba(149, 174, 216, 0.12);
+          border-radius: 14px;
+          background: rgba(12, 18, 30, 0.64);
+        }
+        .partner-network-panel li > span {
+          display: grid;
+          width: 36px;
+          height: 36px;
+          place-items: center;
+          border: 1px solid rgba(224, 183, 88, 0.5);
+          border-radius: 10px;
+          color: #f0ca6e;
+          font-size: 0.74rem;
+          font-weight: 900;
+        }
+        .partner-network-panel strong {
+          color: #edf3fb;
+        }
+        .partner-network-panel p {
+          margin: 4px 0 0;
+          font-size: 0.8rem;
+        }
+        @keyframes partnerSweep {
+          0%, 72%, 100% { transform: translateX(-100%); opacity: 0; }
+          82% { opacity: 1; }
+          94% { transform: translateX(100%); opacity: 0; }
+        }
         .final-cta {
           text-align: center;
         }
@@ -2478,7 +2745,6 @@ export default function HomePage() {
             max-width: 840px;
           }
           .journey-grid,
-          .playground-grid,
           .results-grid,
           .domain-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -2523,7 +2789,8 @@ export default function HomePage() {
           }
           .split-heading,
           .demo-grid,
-          .coming-panel {
+          .coming-panel,
+          .partner-network-shell {
             grid-template-columns: 1fr;
             gap: 18px;
           }
@@ -2566,7 +2833,6 @@ export default function HomePage() {
             grid-column: 1 / -1;
           }
           .journey-grid,
-          .playground-grid,
           .results-grid,
           .gallery-grid,
           .surface-grid,
