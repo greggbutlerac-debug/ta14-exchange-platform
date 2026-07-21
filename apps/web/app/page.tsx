@@ -1,4 +1,4 @@
-/* TA-14 ANIMATED HOMEPAGE V6 - PARTNER REVIEW NETWORK CTA + WORKSPACE-ONLY PRICING - 2026-07-21 */
+/* TA-14 ANIMATED HOMEPAGE V7 - POLISHED LINKS + PARTNER PRICING ROUTE - 2026-07-21 */
 "use client";
 
 import Link from "next/link";
@@ -1045,13 +1045,16 @@ export default function HomePage() {
               <Link className="button primary" href="/workspace/entity-review">
                 Learn How the Network Works
               </Link>
-              <a
-                className="button secondary"
-                href="mailto:ta14admissibleexecution@gmail.com?subject=TA-14%20Partner%20Review%20Network%20Application%20Interest"
+              <Link
+                className="button secondary partner-apply-button"
+                href="/workspace/entity-review/partner-review-network/pricing"
               >
-                Apply for Consideration
-              </a>
+                Review Qualification Options
+              </Link>
             </div>
+            <p className="partner-route-note">
+              Continue to the Partner Review Network pricing and qualification page to review the fee, readiness requirements, and submission process.
+            </p>
             <p className="partner-boundary">
               Application requirements, review terms, and any applicable fees
               are presented only inside the relevant review area—not on the
@@ -1240,20 +1243,28 @@ export default function HomePage() {
         </p>
       </footer>
 
-      <style jsx>{`
-        :global(*) {
+      <style>{`
+        * {
           box-sizing: border-box;
         }
-        :global(html) {
+        html {
           scroll-behavior: smooth;
         }
-        :global(body) {
+        body {
           margin: 0;
           background: #050811;
           color: #f4f7ff;
         }
-        :global(a) {
+        a {
           color: inherit;
+          text-decoration: none;
+          text-decoration-thickness: 0;
+          text-underline-offset: 0;
+        }
+        a:focus-visible,
+        button:focus-visible {
+          outline: 2px solid #72e2c1;
+          outline-offset: 4px;
         }
         .page-shell {
           position: relative;
@@ -1545,23 +1556,64 @@ export default function HomePage() {
         .main-nav {
           display: flex;
           align-items: center;
-          gap: 18px;
+          gap: 6px;
+          padding: 5px;
+          border: 1px solid rgba(145, 170, 213, 0.13);
+          border-radius: 999px;
+          background: rgba(8, 14, 26, 0.62);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
         }
         .main-nav a {
-          color: #afbdd3;
-          text-decoration: none;
-          font-size: 0.84rem;
-          font-weight: 700;
+          position: relative;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 38px;
+          padding: 0 12px;
+          border: 1px solid transparent;
+          border-radius: 999px;
+          color: #b8c5d9;
+          text-decoration: none !important;
+          font-size: 0.8rem;
+          font-weight: 800;
+          letter-spacing: 0.01em;
+          transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .main-nav a::after {
+          content: "";
+          position: absolute;
+          right: 16px;
+          bottom: 6px;
+          left: 16px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, #72e2c1, transparent);
+          transform: scaleX(0);
+          transition: transform 0.2s ease;
         }
         .main-nav a:hover {
-          color: #fff;
+          color: #ffffff;
+          border-color: rgba(114, 226, 193, 0.2);
+          background: rgba(114, 226, 193, 0.07);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
+          transform: translateY(-1px);
+        }
+        .main-nav a:hover::after {
+          transform: scaleX(1);
         }
         .main-nav .nav-cta {
-          padding: 10px 14px;
-          border: 1px solid #72e2c1;
-          border-radius: 999px;
+          padding: 0 16px;
+          border: 1px solid rgba(114, 226, 193, 0.9);
           color: #06120e;
-          background: #72e2c1;
+          background: linear-gradient(135deg, #83f4d7, #45cba8);
+          box-shadow: 0 8px 26px rgba(69, 203, 168, 0.2);
+        }
+        .main-nav .nav-cta::after {
+          display: none;
+        }
+        .main-nav .nav-cta:hover {
+          color: #04100d;
+          background: linear-gradient(135deg, #a2ffe7, #5ce0bd);
+          box-shadow: 0 12px 34px rgba(69, 203, 168, 0.32);
         }
         .menu-button {
           display: none;
@@ -2662,6 +2714,45 @@ export default function HomePage() {
           font-size: 0.74rem;
           font-weight: 900;
         }
+
+        .button {
+          text-decoration: none !important;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .button:hover {
+          transform: translateY(-2px);
+        }
+        .button.primary:hover {
+          box-shadow: 0 14px 36px rgba(62, 216, 177, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+        .button.secondary:hover,
+        .button.ghost:hover {
+          border-color: rgba(114, 226, 193, 0.52);
+          background: rgba(114, 226, 193, 0.09);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+        .partner-apply-button {
+          border-color: rgba(240, 202, 110, 0.72) !important;
+          color: #ffe5a0 !important;
+          background: linear-gradient(135deg, rgba(240, 202, 110, 0.14), rgba(240, 168, 65, 0.06)) !important;
+          box-shadow: 0 12px 34px rgba(222, 167, 55, 0.12);
+        }
+        .partner-apply-button:hover {
+          border-color: #f0ca6e !important;
+          background: linear-gradient(135deg, rgba(240, 202, 110, 0.24), rgba(240, 168, 65, 0.1)) !important;
+          box-shadow: 0 16px 42px rgba(222, 167, 55, 0.2);
+        }
+        .partner-route-note {
+          max-width: 780px;
+          margin: 14px 0 0;
+          padding: 12px 14px;
+          border-left: 2px solid rgba(240, 202, 110, 0.75);
+          border-radius: 0 10px 10px 0;
+          color: #c7d1e1;
+          background: rgba(240, 202, 110, 0.055);
+          font-size: 0.86rem;
+        }
         .partner-network-panel strong {
           color: #edf3fb;
         }
@@ -2705,9 +2796,24 @@ export default function HomePage() {
           gap: 10px;
         }
         .site-footer a {
+          position: relative;
+          display: inline-flex;
+          width: fit-content;
+          align-items: center;
+          min-height: 30px;
+          padding: 4px 8px;
+          margin-left: -8px;
+          border-radius: 8px;
           color: #aab8cd;
-          text-decoration: none;
+          text-decoration: none !important;
           font-size: 0.82rem;
+          font-weight: 650;
+          transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+        }
+        .site-footer a:hover {
+          color: #ffffff;
+          background: rgba(114, 226, 193, 0.07);
+          transform: translateX(3px);
         }
         .site-footer p {
           margin-bottom: 0;
