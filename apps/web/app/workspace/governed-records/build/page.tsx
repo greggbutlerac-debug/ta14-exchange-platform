@@ -1,7 +1,59 @@
 'use client';
 
 import Link from 'next/link';
-import { FormEvent, useMemo, useState } from 'react';
+import { ChangeEvent, DragEvent, FormEvent, useMemo, useRef, useState } from 'react';
+
+type UploadedEvidenceFile = {
+  id: string;
+  name: string;
+  size: number;
+  type: string;
+};
+
+const BUILD_ACTIONS = [
+  {
+    label: 'Build the Record',
+    href: '/workspace/governed-records/build',
+    description: 'Construct a new governed record.',
+    active: true,
+  },
+  {
+    label: 'Governed Records Home',
+    href: '/workspace/governed-records',
+    description: 'Return to the Governed Records front door.',
+    active: false,
+  },
+  {
+    label: 'Look Up a Record',
+    href: '/workspace/governed-records/my-records',
+    description: 'Search the governed record library.',
+    active: false,
+  },
+  {
+    label: 'Continuity Review',
+    href: '/workspace/governed-records/continuity-review',
+    description: 'Inspect custody, sequence, and gaps.',
+    active: false,
+  },
+  {
+    label: 'Record Comparison',
+    href: '/workspace/governed-records/comparison',
+    description: 'Compare bounded record states.',
+    active: false,
+  },
+  {
+    label: 'Preserved Records',
+    href: '/workspace/governed-records/preserved-records',
+    description: 'Open preserved versions and history.',
+    active: false,
+  },
+  {
+    label: 'Verification',
+    href: '/workspace/governed-records/verification',
+    description: 'Verify identity and record integrity.',
+    active: false,
+  },
+] as const;
 
 type EvidenceItem = {
   id: string;
@@ -56,7 +108,10 @@ export default function BuildGovernedRecordPage() {
     'Corrections create a new version. Prior preserved states remain visible.',
   );
   const [evidence, setEvidence] = useState<EvidenceItem[]>(INITIAL_EVIDENCE);
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedEvidenceFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
   const [status, setStatus] = useState<'draft' | 'review-ready'>('draft');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const completion = useMemo(() => {
     const required = [
@@ -124,6 +179,43 @@ export default function BuildGovernedRecordPage() {
     );
   }
 
+  function addUploadedFiles(files: FileList | File[]) {
+    const acceptedFiles = Array.from(files).map((file) => ({
+      id: `${file.name}-${file.size}-${file.lastModified}-${Math.random()}`,
+      name: file.name,
+      size: file.size,
+      type: file.type || 'Unknown file type',
+    }));
+
+    setUploadedFiles((current) => [...current, ...acceptedFiles]);
+  }
+
+  function handleFileSelection(event: ChangeEvent<HTMLInputElement>) {
+    if (event.target.files) {
+      addUploadedFiles(event.target.files);
+      event.target.value = '';
+    }
+  }
+
+  function handleDrop(event: DragEvent<HTMLDivElement>) {
+    event.preventDefault();
+    setIsDragging(false);
+
+    if (event.dataTransfer.files.length > 0) {
+      addUploadedFiles(event.dataTransfer.files);
+    }
+  }
+
+  function removeUploadedFile(id: string) {
+    setUploadedFiles((current) => current.filter((file) => file.id !== id));
+  }
+
+  function formatFileSize(size: number) {
+    if (size < 1024) return `${size} B`;
+    if (size < 1024 * 1024) return `${Math.round(size / 1024)} KB`;
+    return `${(size / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatus('review-ready');
@@ -131,7 +223,44 @@ export default function BuildGovernedRecordPage() {
 
   return (
     <main className="builderShell">
-      <section className="workspace">
+      <div className="builderFrame">
+        <aside className="builderActions" aria-label="Governed Records actions">
+          <div className="actionRailIntro">
+            <p className="eyebrow">Governed Records</p>
+            <h1>Record actions</h1>
+            <p>
+              Keep every major Governed Records action available while the
+              record is being constructed.
+            </p>
+          </div>
+
+          <nav className="actionRailNav">
+            {BUILD_ACTIONS.map((action, index) => (
+              <Link
+                className={action.active ? 'actionRailLink active' : 'actionRailLink'}
+                href={action.href}
+                key={action.href}
+              >
+                <span>{String(index + 1).padStart(2, '0')}</span>
+                <div>
+                  <strong>{action.label}</strong>
+                  <small>{action.description}</small>
+                </div>
+                <b>→</b>
+              </Link>
+            ))}
+          </nav>
+
+          <div className="actionBoundary">
+            <strong>Record first.</strong>
+            <p>
+              Interpretation, determination, and optimization remain separate
+              governed layers.
+            </p>
+          </div>
+        </aside>
+
+        <section className="workspace">
         <header className="pageHeader">
           <div>
             <p className="eyebrow">Construct</p>
@@ -260,6 +389,76 @@ export default function BuildGovernedRecordPage() {
                   + Add evidence item
                 </button>
               </div>
+
+
+              <div
+                className={isDragging ? 'dropZone dragging' : 'dropZone'}
+                onDragEnter={(event) => {
+                  event.preventDefault();
+                  setIsDragging(true);
+                }}
+                onDragOver={(event) => event.preventDefault()}
+                onDragLeave={(event) => {
+                  event.preventDefault();
+                  if (event.currentTarget === event.target) {
+                    setIsDragging(false);
+                  }
+                }}
+                onDrop={handleDrop}
+              >
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  onChange={handleFileSelection}
+                  accept=".pdf,.csv,.json,.txt,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.webp,.zip"
+                />
+                <div className="dropIcon">⇩</div>
+                <div>
+                  <strong>Drag and drop the evidence package here.</strong>
+                  <p>
+                    Add reports, sensor exports, images, spreadsheets, signed
+                    statements, structured data, or supporting record packages.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  Choose files
+                </button>
+              </div>
+
+              {uploadedFiles.length > 0 ? (
+                <div className="uploadedFiles">
+                  <div className="uploadedFilesHeader">
+                    <strong>Attached evidence files</strong>
+                    <span>{uploadedFiles.length} selected</span>
+                  </div>
+                  {uploadedFiles.map((file) => (
+                    <div className="uploadedFile" key={file.id}>
+                      <span className="fileGlyph">FILE</span>
+                      <div>
+                        <strong>{file.name}</strong>
+                        <small>
+                          {file.type} · {formatFileSize(file.size)}
+                        </small>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => removeUploadedFile(file.id)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ))}
+                  <p className="uploadBoundary">
+                    Files are staged in this browser interface only. Durable
+                    upload, storage, hashing, and preservation require the
+                    connected record backend.
+                  </p>
+                </div>
+              ) : null}
 
               <div className="evidenceStack">
                 {evidence.map((item, index) => (
@@ -467,7 +666,8 @@ export default function BuildGovernedRecordPage() {
             </Link>
           </section>
         ) : null}
-      </section>
+        </section>
+      </div>
 
       <style>{`
         .builderShell {
@@ -484,6 +684,139 @@ export default function BuildGovernedRecordPage() {
             linear-gradient(180deg, #061018 0%, #03090e 100%);
         }
 
+
+
+        .builderFrame {
+          display: grid;
+          grid-template-columns: 310px minmax(0, 1fr);
+          min-height: 100vh;
+        }
+
+        .builderActions {
+          position: sticky;
+          top: 0;
+          align-self: start;
+          height: 100vh;
+          overflow-y: auto;
+          padding: 34px 20px 24px;
+          border-right: 1px solid var(--line);
+          background:
+            radial-gradient(circle at 18% 0%, rgba(110, 231, 255, 0.08), transparent 30%),
+            rgba(4, 14, 21, 0.97);
+          backdrop-filter: blur(18px);
+        }
+
+        .actionRailIntro {
+          padding: 0 6px 22px;
+        }
+
+        .actionRailIntro h1 {
+          margin: 0;
+          font-size: 2rem;
+          line-height: 1;
+          letter-spacing: -0.05em;
+        }
+
+        .actionRailIntro > p:last-child {
+          margin: 13px 0 0;
+          color: #78909e;
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        .actionRailNav {
+          display: grid;
+          gap: 8px;
+        }
+
+        .actionRailLink {
+          display: grid;
+          grid-template-columns: 34px minmax(0, 1fr) auto;
+          gap: 10px;
+          align-items: center;
+          min-height: 66px;
+          padding: 10px;
+          border: 1px solid rgba(145, 205, 225, 0.1);
+          border-radius: 13px;
+          color: #a0b3be;
+          text-decoration: none;
+          background: rgba(110, 231, 255, 0.018);
+          transition: transform 160ms ease, border-color 160ms ease, background 160ms ease;
+        }
+
+        .actionRailLink:hover {
+          transform: translateX(3px);
+          border-color: rgba(110, 231, 255, 0.32);
+          background: rgba(110, 231, 255, 0.055);
+        }
+
+        .actionRailLink.active {
+          color: #031118;
+          border-color: rgba(110, 231, 255, 0.5);
+          background: linear-gradient(135deg, var(--cyan), var(--green));
+          box-shadow: 0 16px 40px rgba(102, 240, 189, 0.1);
+        }
+
+        .actionRailLink > span {
+          display: grid;
+          width: 32px;
+          height: 32px;
+          place-items: center;
+          border: 1px solid rgba(110, 231, 255, 0.15);
+          border-radius: 9px;
+          color: var(--cyan);
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .actionRailLink.active > span {
+          border-color: rgba(3, 17, 24, 0.2);
+          color: #031118;
+        }
+
+        .actionRailLink strong,
+        .actionRailLink small {
+          display: block;
+        }
+
+        .actionRailLink strong {
+          font-size: 11px;
+        }
+
+        .actionRailLink small {
+          margin-top: 4px;
+          color: #69818e;
+          font-size: 9px;
+          line-height: 1.4;
+        }
+
+        .actionRailLink.active small {
+          color: rgba(3, 17, 24, 0.67);
+        }
+
+        .actionRailLink b {
+          font-size: 11px;
+        }
+
+        .actionBoundary {
+          margin-top: 20px;
+          padding: 16px;
+          border: 1px solid rgba(102, 240, 189, 0.16);
+          border-radius: 13px;
+          background: rgba(102, 240, 189, 0.035);
+        }
+
+        .actionBoundary strong {
+          color: var(--green);
+          font-size: 11px;
+        }
+
+        .actionBoundary p {
+          margin: 7px 0 0;
+          color: #789186;
+          font-size: 10px;
+          line-height: 1.55;
+        }
 
         .workspace {
           width: min(1240px, 100%);
@@ -686,6 +1019,159 @@ export default function BuildGovernedRecordPage() {
           color: var(--cyan);
           background: rgba(110, 231, 255, 0.05);
           font-size: 11px;
+        }
+
+
+        .dropZone {
+          position: relative;
+          display: grid;
+          grid-template-columns: 58px minmax(0, 1fr) auto;
+          gap: 18px;
+          align-items: center;
+          margin-bottom: 18px;
+          padding: 24px;
+          border: 1px dashed rgba(110, 231, 255, 0.38);
+          border-radius: 17px;
+          background:
+            radial-gradient(circle at 10% 50%, rgba(110, 231, 255, 0.08), transparent 30%),
+            rgba(3, 14, 21, 0.72);
+          transition: border-color 160ms ease, background 160ms ease, transform 160ms ease;
+        }
+
+        .dropZone.dragging {
+          transform: translateY(-2px);
+          border-color: var(--green);
+          background:
+            radial-gradient(circle at 10% 50%, rgba(102, 240, 189, 0.14), transparent 34%),
+            rgba(5, 25, 25, 0.88);
+        }
+
+        .dropZone input {
+          position: absolute;
+          width: 1px;
+          height: 1px;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .dropIcon {
+          display: grid;
+          width: 56px;
+          height: 56px;
+          place-items: center;
+          border: 1px solid rgba(110, 231, 255, 0.28);
+          border-radius: 14px;
+          color: var(--cyan);
+          background: rgba(110, 231, 255, 0.055);
+          font-size: 1.45rem;
+          font-weight: 900;
+        }
+
+        .dropZone strong {
+          display: block;
+          font-size: 15px;
+        }
+
+        .dropZone p {
+          margin: 6px 0 0;
+          color: #718b98;
+          font-size: 11px;
+          line-height: 1.55;
+        }
+
+        .dropZone button {
+          min-height: 42px;
+          padding: 0 15px;
+          border: 1px solid rgba(110, 231, 255, 0.3);
+          border-radius: 10px;
+          color: var(--cyan);
+          background: rgba(110, 231, 255, 0.06);
+          cursor: pointer;
+          font-weight: 900;
+        }
+
+        .uploadedFiles {
+          display: grid;
+          gap: 9px;
+          margin-bottom: 18px;
+          padding: 16px;
+          border: 1px solid rgba(102, 240, 189, 0.15);
+          border-radius: 15px;
+          background: rgba(102, 240, 189, 0.025);
+        }
+
+        .uploadedFilesHeader {
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          padding: 0 2px 7px;
+        }
+
+        .uploadedFilesHeader strong {
+          font-size: 12px;
+        }
+
+        .uploadedFilesHeader span {
+          color: var(--green);
+          font-size: 10px;
+          font-weight: 900;
+        }
+
+        .uploadedFile {
+          display: grid;
+          grid-template-columns: 42px minmax(0, 1fr) auto;
+          gap: 12px;
+          align-items: center;
+          padding: 11px;
+          border: 1px solid rgba(145, 205, 225, 0.1);
+          border-radius: 11px;
+          background: rgba(2, 12, 18, 0.55);
+        }
+
+        .fileGlyph {
+          display: grid;
+          width: 40px;
+          height: 36px;
+          place-items: center;
+          border: 1px solid rgba(110, 231, 255, 0.17);
+          border-radius: 8px;
+          color: var(--cyan);
+          font-size: 8px;
+          font-weight: 900;
+        }
+
+        .uploadedFile strong,
+        .uploadedFile small {
+          display: block;
+        }
+
+        .uploadedFile strong {
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          font-size: 11px;
+        }
+
+        .uploadedFile small {
+          margin-top: 4px;
+          color: #647d89;
+          font-size: 9px;
+        }
+
+        .uploadedFile button {
+          border: 0;
+          color: #c18b8b;
+          background: transparent;
+          cursor: pointer;
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .uploadBoundary {
+          margin: 4px 2px 0;
+          color: #607984;
+          font-size: 9px;
+          line-height: 1.5;
         }
 
         .evidenceStack {
