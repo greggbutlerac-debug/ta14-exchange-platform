@@ -1,4 +1,4 @@
-/* TA-14 ANIMATED HOMEPAGE - GATEWAY DOORS + COSMIC MOTION - 2026-07-21 */
+/* TA-14 ANIMATED HOMEPAGE V3 - RELIABLE GOLDEN GATEWAYS + CALMER COSMIC FIELD - 2026-07-21 */
 "use client";
 
 import Link from "next/link";
@@ -316,7 +316,6 @@ export default function HomePage() {
       <div className="cosmic-background" aria-hidden="true">
         <div className="star-field star-field-one" />
         <div className="star-field star-field-two" />
-        <div className="star-field star-field-three" />
         <div className="orbit orbit-one">
           <span />
         </div>
@@ -506,36 +505,38 @@ export default function HomePage() {
           <div className="map-connector">↓</div>
           <div className="map-workspaces">
             {playgrounds.map((item, index) => (
-              <Link
-                className={`gateway gateway-${index + 1}`}
-                href={item.href}
-                key={item.title}
-              >
-                <div className="gateway-head">
-                  <span className="gateway-badge">{item.badge}</span>
-                  <div>
-                    <strong>{item.title}</strong>
-                    <small>{item.text}</small>
-                  </div>
-                </div>
-                <div className="gateway-body">
-                  <ul>
-                    {item.bullets.map((bullet) => (
-                      <li key={bullet}>{bullet}</li>
-                    ))}
-                  </ul>
-                  <div className="door-frame" aria-hidden="true">
-                    <div className="door-glow" />
-                    <div className="door-panel">
-                      <span>{item.badge}</span>
+              <Link className="gateway-link" href={item.href} key={item.title}>
+                <article className={`gateway gateway-${index + 1}`}>
+                  <div className="gateway-head">
+                    <span className="gateway-badge">{item.badge}</span>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <small>{item.text}</small>
                     </div>
-                    <div className="door-step" />
                   </div>
-                </div>
-                <span className="gateway-action">
-                  {item.action}
-                  <b>→</b>
-                </span>
+                  <div className="gateway-body">
+                    <ul>
+                      {item.bullets.map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
+                    </ul>
+                    <div className="door-frame" aria-hidden="true">
+                      <div className="door-rays" />
+                      <div className="door-glow" />
+                      <div className="door-arch" />
+                      <div className="door-panel">
+                        <span>{item.badge}</span>
+                        <i className="door-knob" />
+                      </div>
+                      <div className="door-threshold" />
+                      <div className="door-step" />
+                    </div>
+                  </div>
+                  <span className="gateway-action">
+                    {item.action}
+                    <b>→</b>
+                  </span>
+                </article>
               </Link>
             ))}
           </div>
@@ -1174,7 +1175,7 @@ export default function HomePage() {
         </p>
       </footer>
 
-      <style jsx>{`
+      <style>{`
         :global(*) {
           box-sizing: border-box;
         }
@@ -1227,7 +1228,7 @@ export default function HomePage() {
           position: absolute;
           inset: -20%;
           background-repeat: repeat;
-          opacity: 0.5;
+          opacity: 0.2;
         }
         .star-field-one {
           background-image: radial-gradient(
@@ -1235,7 +1236,7 @@ export default function HomePage() {
             rgba(255, 255, 255, 0.9) 0 1px,
             transparent 1.6px
           );
-          background-size: 72px 72px;
+          background-size: 158px 158px;
           animation: starDrift 55s linear infinite;
         }
         .star-field-two {
@@ -1244,19 +1245,9 @@ export default function HomePage() {
             rgba(114, 226, 193, 0.9) 0 1px,
             transparent 1.8px
           );
-          background-size: 118px 118px;
+          background-size: 249px 249px;
           animation: starDriftReverse 78s linear infinite;
-          opacity: 0.34;
-        }
-        .star-field-three {
-          background-image: radial-gradient(
-            circle,
-            rgba(157, 183, 255, 0.85) 0 1.2px,
-            transparent 2px
-          );
-          background-size: 190px 190px;
-          animation: starPulse 9s ease-in-out infinite alternate;
-          opacity: 0.22;
+          opacity: 0.14;
         }
         .orbit {
           position: absolute;
@@ -1377,16 +1368,6 @@ export default function HomePage() {
         @keyframes starDriftReverse {
           to {
             transform: translate3d(-180px, 145px, 0);
-          }
-        }
-        @keyframes starPulse {
-          from {
-            opacity: 0.12;
-            transform: scale(0.98);
-          }
-          to {
-            opacity: 0.38;
-            transform: scale(1.02);
           }
         }
         @keyframes orbitSpin {
@@ -1890,271 +1871,149 @@ export default function HomePage() {
         .map-workspaces {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 20px;
+          gap: 22px;
           align-items: stretch;
+          overflow: visible;
+        }
+        .gateway-link {
+          display: block;
+          min-width: 0;
+          color: inherit;
+          text-decoration: none;
         }
         .gateway {
-          --gate: #72e2c1;
-          --gate-rgb: 114, 226, 193;
+          --accent: #72e2c1;
+          --accent-rgb: 114, 226, 193;
+          --gold: #ffc857;
+          --gold-bright: #fff0a8;
+          --gold-rgb: 255, 200, 87;
           position: relative;
           display: flex;
-          min-height: 430px;
+          min-height: 520px;
+          height: 100%;
           flex-direction: column;
-          padding: 20px;
+          padding: 22px;
           overflow: hidden;
-          border: 1px solid rgba(var(--gate-rgb), 0.32);
-          border-radius: 22px;
-          color: #f6f8ff;
-          text-decoration: none;
-          background: linear-gradient(
-            160deg,
-            rgba(var(--gate-rgb), 0.08),
-            rgba(7, 12, 23, 0.94) 42%,
-            rgba(4, 8, 15, 0.98)
-          );
-          box-shadow:
-            0 18px 70px rgba(0, 0, 0, 0.34),
-            inset 0 1px 0 rgba(255, 255, 255, 0.04);
-          transition:
-            transform 0.35s ease,
-            border-color 0.35s ease,
-            box-shadow 0.35s ease;
+          border: 1px solid rgba(var(--gold-rgb), 0.42);
+          border-radius: 24px;
+          color: #f7f9ff;
+          background:
+            radial-gradient(circle at 74% 58%, rgba(var(--gold-rgb), 0.11), transparent 30%),
+            linear-gradient(160deg, rgba(var(--accent-rgb), 0.09), rgba(7, 12, 23, 0.96) 43%, rgba(3, 7, 14, 0.99));
+          box-shadow: 0 20px 70px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          transition: transform 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease;
         }
         .gateway::before {
           content: "";
           position: absolute;
           inset: 0;
-          background: radial-gradient(
-            circle at 72% 52%,
-            rgba(var(--gate-rgb), 0.16),
-            transparent 35%
-          );
-          opacity: 0.7;
-          transition: opacity 0.35s ease;
+          background: linear-gradient(115deg, transparent 36%, rgba(255, 255, 255, 0.08) 49%, transparent 62%);
+          transform: translateX(-115%);
+          transition: transform 0.9s ease;
         }
         .gateway::after {
           content: "";
           position: absolute;
-          inset: -40% -20%;
-          background: linear-gradient(
-            115deg,
-            transparent 40%,
-            rgba(255, 255, 255, 0.08) 49%,
-            transparent 58%
-          );
-          transform: translateX(-65%) rotate(8deg);
-          transition: transform 0.8s ease;
+          inset: auto 8% 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(var(--gold-rgb), 0.85), transparent);
+          box-shadow: 0 0 20px rgba(var(--gold-rgb), 0.55);
         }
-        .gateway:hover {
-          transform: translateY(-10px) scale(1.01);
-          border-color: rgba(var(--gate-rgb), 0.82);
-          box-shadow:
-            0 24px 90px rgba(var(--gate-rgb), 0.16),
-            0 18px 70px rgba(0, 0, 0, 0.45);
+        .gateway-link:focus-visible { outline: none; }
+        .gateway-link:focus-visible .gateway,
+        .gateway-link:hover .gateway {
+          transform: translateY(-10px) scale(1.012);
+          border-color: rgba(var(--gold-rgb), 0.76);
+          box-shadow: 0 30px 100px rgba(var(--gold-rgb), 0.13), 0 18px 70px rgba(0, 0, 0, 0.5);
         }
-        .gateway:hover::after {
-          transform: translateX(65%) rotate(8deg);
-        }
-        .gateway-2 {
-          --gate: #4aa3ff;
-          --gate-rgb: 74, 163, 255;
-        }
-        .gateway-3 {
-          --gate: #c46cff;
-          --gate-rgb: 196, 108, 255;
-        }
-        .gateway-4 {
-          --gate: #ffbf3f;
-          --gate-rgb: 255, 191, 63;
-        }
-        .gateway-head,
-        .gateway-body,
-        .gateway-action {
-          position: relative;
-          z-index: 2;
-        }
-        .gateway-head {
-          display: flex;
-          gap: 14px;
-          align-items: flex-start;
-        }
+        .gateway-link:focus-visible .gateway::before,
+        .gateway-link:hover .gateway::before { transform: translateX(115%); }
+        .gateway-2 { --accent: #4aa3ff; --accent-rgb: 74, 163, 255; }
+        .gateway-3 { --accent: #c46cff; --accent-rgb: 196, 108, 255; }
+        .gateway-4 { --accent: #ffad32; --accent-rgb: 255, 173, 50; }
+        .gateway-head, .gateway-body, .gateway-action { position: relative; z-index: 2; }
+        .gateway-head { display: flex; gap: 14px; align-items: flex-start; }
         .gateway-badge {
-          display: grid;
-          width: 54px;
-          height: 54px;
-          flex: 0 0 54px;
-          place-items: center;
-          border: 1px solid rgba(var(--gate-rgb), 0.78);
-          border-radius: 14px;
-          color: var(--gate);
-          background: rgba(var(--gate-rgb), 0.08);
-          box-shadow: 0 0 24px rgba(var(--gate-rgb), 0.12);
-          font-size: 1.2rem;
-          font-weight: 950;
+          display: grid; width: 54px; height: 54px; flex: 0 0 54px; place-items: center;
+          border: 1px solid rgba(var(--accent-rgb), 0.82); border-radius: 14px; color: var(--accent);
+          background: rgba(var(--accent-rgb), 0.09); box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.15);
+          font-size: 1.2rem; font-weight: 950;
         }
-        .gateway-head strong {
-          display: block;
-          margin-top: 2px;
-          font-size: 1.08rem;
-        }
-        .gateway-head small {
-          display: block;
-          margin-top: 7px;
-          color: #9baac0;
-          font-size: 0.77rem;
-          line-height: 1.5;
-        }
-        .gateway-body {
-          display: grid;
-          grid-template-columns: 0.95fr 1.05fr;
-          gap: 8px;
-          align-items: end;
-          flex: 1;
-          margin-top: 22px;
-        }
-        .gateway-body ul {
-          margin: 0 0 14px;
-          padding: 0;
-          list-style: none;
-        }
-        .gateway-body li {
-          position: relative;
-          margin: 0 0 11px;
-          padding-left: 18px;
-          color: #c8d3e3;
-          font-size: 0.76rem;
-        }
-        .gateway-body li::before {
-          content: "✦";
-          position: absolute;
-          left: 0;
-          color: var(--gate);
-          font-size: 0.62rem;
-        }
-        .door-frame {
-          position: relative;
-          min-height: 210px;
-          align-self: end;
-          perspective: 700px;
+        .gateway-head strong { display: block; margin-top: 2px; font-size: 1.08rem; }
+        .gateway-head small { display: block; margin-top: 7px; color: #9baac0; font-size: 0.77rem; line-height: 1.5; }
+        .gateway-body { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 10px; align-items: end; flex: 1; margin-top: 20px; }
+        .gateway-body ul { margin: 0 0 18px; padding: 0; list-style: none; }
+        .gateway-body li { position: relative; margin: 0 0 11px; padding-left: 18px; color: #c8d3e3; font-size: 0.75rem; }
+        .gateway-body li::before { content: "✦"; position: absolute; left: 0; color: var(--accent); font-size: 0.62rem; }
+        .door-frame { position: relative; min-height: 250px; align-self: end; perspective: 900px; }
+        .door-rays {
+          position: absolute; left: 50%; bottom: 20px; width: 210px; height: 230px; transform: translateX(-50%);
+          background: repeating-conic-gradient(from 180deg at 50% 100%, rgba(var(--gold-rgb), 0.13) 0 3deg, transparent 3deg 14deg);
+          filter: blur(1px); opacity: 0.52; animation: raysBreathe 4.8s ease-in-out infinite;
         }
         .door-glow {
-          position: absolute;
-          inset: 26px 2px 5px;
-          border-radius: 54% 54% 10px 10px / 34% 34% 10px 10px;
-          background: rgba(var(--gate-rgb), 0.25);
-          filter: blur(24px);
+          position: absolute; left: 50%; bottom: 16px; width: 150px; height: 220px; transform: translateX(-50%);
+          border-radius: 76px 76px 10px 10px; background: rgba(var(--gold-rgb), 0.24); filter: blur(30px);
           animation: doorPulse 3.8s ease-in-out infinite;
         }
-        .door-panel {
-          position: absolute;
-          left: 50%;
-          bottom: 18px;
-          width: 116px;
-          height: 176px;
-          transform: translateX(-50%) rotateY(-5deg);
-          border: 3px solid var(--gate);
-          border-bottom-width: 5px;
-          border-radius: 58px 58px 8px 8px / 48px 48px 8px 8px;
-          background:
-            linear-gradient(
-              180deg,
-              rgba(var(--gate-rgb), 0.18),
-              rgba(2, 7, 14, 0.92)
-            ),
-            repeating-linear-gradient(
-              90deg,
-              transparent 0 18px,
-              rgba(var(--gate-rgb), 0.08) 18px 19px
-            );
-          box-shadow:
-            0 0 12px rgba(var(--gate-rgb), 0.9),
-            0 0 36px rgba(var(--gate-rgb), 0.5),
-            inset 0 0 28px rgba(var(--gate-rgb), 0.24);
-          transition:
-            transform 0.45s ease,
-            box-shadow 0.45s ease;
+        .door-arch {
+          position: absolute; left: 50%; bottom: 22px; width: 142px; height: 216px; transform: translateX(-50%);
+          border: 3px solid rgba(var(--gold-rgb), 0.9); border-bottom: 0; border-radius: 74px 74px 4px 4px;
+          box-shadow: 0 0 18px rgba(var(--gold-rgb), 0.55), inset 0 0 20px rgba(var(--gold-rgb), 0.12);
         }
-        .gateway:hover .door-panel {
-          transform: translateX(-50%) rotateY(-18deg) translateZ(8px);
-          box-shadow:
-            0 0 20px rgba(var(--gate-rgb), 1),
-            0 0 60px rgba(var(--gate-rgb), 0.7),
-            inset 0 0 38px rgba(var(--gate-rgb), 0.3);
+        .door-panel {
+          position: absolute; left: 50%; bottom: 22px; width: 124px; height: 200px;
+          transform: translateX(-50%) rotateY(-4deg); transform-origin: left center;
+          border: 4px solid var(--gold-bright); border-bottom-width: 7px; border-radius: 64px 64px 7px 7px / 54px 54px 7px 7px;
+          background:
+            linear-gradient(90deg, rgba(255,255,255,.08), transparent 18%, transparent 82%, rgba(255,255,255,.06)),
+            linear-gradient(180deg, rgba(var(--gold-rgb), 0.42), rgba(65, 36, 4, 0.92) 48%, rgba(17, 10, 2, 0.98));
+          box-shadow: 0 0 14px rgba(var(--gold-rgb), 0.95), 0 0 44px rgba(var(--gold-rgb), 0.55), inset 0 0 34px rgba(var(--gold-rgb), 0.24);
+          transition: transform 0.55s cubic-bezier(.2,.8,.2,1), box-shadow 0.45s ease;
+        }
+        .gateway-link:focus-visible .door-panel,
+        .gateway-link:hover .door-panel {
+          transform: translateX(-50%) rotateY(-26deg) translateZ(10px);
+          box-shadow: 0 0 24px rgba(var(--gold-rgb), 1), 0 0 76px rgba(var(--gold-rgb), 0.78), inset 0 0 42px rgba(var(--gold-rgb), 0.34);
         }
         .door-panel::before {
-          content: "";
-          position: absolute;
-          inset: 14px;
-          border: 1px solid rgba(var(--gate-rgb), 0.42);
-          border-radius: 46px 46px 4px 4px / 38px 38px 4px 4px;
+          content: ""; position: absolute; inset: 15px; border: 1px solid rgba(255, 235, 165, 0.58);
+          border-radius: 49px 49px 4px 4px / 42px 42px 4px 4px; box-shadow: inset 0 0 18px rgba(var(--gold-rgb), 0.2);
+        }
+        .door-panel::after {
+          content: ""; position: absolute; left: 50%; top: 14px; bottom: 14px; width: 1px;
+          background: linear-gradient(transparent, rgba(255,239,183,.5), transparent);
         }
         .door-panel span {
-          position: absolute;
-          left: 50%;
-          top: 52%;
-          display: grid;
-          width: 58px;
-          height: 58px;
-          transform: translate(-50%, -50%);
-          place-items: center;
-          border: 2px solid var(--gate);
-          border-radius: 50%;
-          color: #fff;
-          background: rgba(var(--gate-rgb), 0.18);
-          box-shadow: 0 0 24px rgba(var(--gate-rgb), 0.5);
-          font-size: 1.2rem;
-          font-weight: 950;
+          position: absolute; left: 50%; top: 52%; display: grid; width: 58px; height: 58px; transform: translate(-50%, -50%);
+          place-items: center; border: 2px solid var(--gold-bright); border-radius: 50%; color: #fff7d1;
+          background: rgba(74, 42, 4, 0.7); box-shadow: 0 0 26px rgba(var(--gold-rgb), 0.72); font-size: 1.2rem; font-weight: 950;
+        }
+        .door-knob {
+          position: absolute; right: 14px; top: 54%; width: 7px; height: 7px; border-radius: 50%;
+          background: #fff0a8; box-shadow: 0 0 9px rgba(var(--gold-rgb), 1);
+        }
+        .door-threshold {
+          position: absolute; left: 50%; bottom: 15px; width: 168px; height: 22px; transform: translateX(-50%) perspective(100px) rotateX(55deg);
+          border: 1px solid rgba(var(--gold-rgb), 0.72); background: linear-gradient(180deg, rgba(var(--gold-rgb), 0.48), rgba(var(--gold-rgb), 0.06));
+          box-shadow: 0 0 30px rgba(var(--gold-rgb), 0.5);
         }
         .door-step {
-          position: absolute;
-          left: 50%;
-          bottom: 7px;
-          width: 148px;
-          height: 16px;
-          transform: translateX(-50%);
-          border: 1px solid rgba(var(--gate-rgb), 0.65);
-          border-radius: 50%;
-          background: rgba(var(--gate-rgb), 0.18);
-          box-shadow: 0 0 28px rgba(var(--gate-rgb), 0.42);
+          position: absolute; left: 50%; bottom: 5px; width: 182px; height: 15px; transform: translateX(-50%);
+          border: 1px solid rgba(var(--gold-rgb), 0.7); border-radius: 50%; background: rgba(var(--gold-rgb), 0.2);
+          box-shadow: 0 0 34px rgba(var(--gold-rgb), 0.45);
         }
         .gateway-action {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          margin-top: 8px;
-          padding: 13px 15px;
-          border: 1px solid rgba(var(--gate-rgb), 0.7);
-          border-radius: 11px;
-          color: #fff;
-          background: linear-gradient(
-            180deg,
-            rgba(var(--gate-rgb), 0.52),
-            rgba(var(--gate-rgb), 0.22)
-          );
-          box-shadow:
-            inset 0 1px 0 rgba(255, 255, 255, 0.18),
-            0 8px 26px rgba(var(--gate-rgb), 0.12);
-          font-size: 0.84rem;
-          font-weight: 900;
+          display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding: 14px 15px;
+          border: 1px solid rgba(var(--gold-rgb), 0.78); border-radius: 11px; color: #fff8dc;
+          background: linear-gradient(180deg, rgba(var(--gold-rgb), 0.48), rgba(88, 49, 4, 0.62));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.2), 0 8px 28px rgba(var(--gold-rgb), 0.14); font-size: 0.84rem; font-weight: 900;
         }
-        .gateway-action b {
-          font-size: 1.2rem;
-          transition: transform 0.25s ease;
-        }
-        .gateway:hover .gateway-action b {
-          transform: translateX(5px);
-        }
-        @keyframes doorPulse {
-          0%,
-          100% {
-            opacity: 0.45;
-            transform: scale(0.96);
-          }
-          50% {
-            opacity: 0.9;
-            transform: scale(1.04);
-          }
-        }
+        .gateway-action b { font-size: 1.2rem; transition: transform 0.25s ease; }
+        .gateway-link:focus-visible .gateway-action b,
+        .gateway-link:hover .gateway-action b { transform: translateX(6px); }
+        @keyframes doorPulse { 0%,100% { opacity:.45; transform:translateX(-50%) scale(.96); } 50% { opacity:.9; transform:translateX(-50%) scale(1.04); } }
+        @keyframes raysBreathe { 0%,100% { opacity:.28; transform:translateX(-50%) scale(.96); } 50% { opacity:.65; transform:translateX(-50%) scale(1.04); } }
         .map-shared {
           display: grid;
           grid-template-columns: repeat(8, minmax(0, 1fr));
