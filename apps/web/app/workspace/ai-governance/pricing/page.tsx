@@ -351,7 +351,10 @@ export default function AIGovernancePricingPage() {
         </div>
 
         <div style={styles.freeActions}>
-          <Link href="/workspace/demo" style={styles.primaryButton}>
+          <Link
+            href="/workspace/ai-governance/demonstrations/free-guided-demo"
+            style={styles.primaryButton}
+          >
             Run a Free Guided Demo
           </Link>
           <Link href="/workspace/routes/new" style={styles.secondaryDarkButton}>
