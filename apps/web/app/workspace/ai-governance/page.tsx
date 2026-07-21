@@ -1,4 +1,20 @@
+import Image from 'next/image';
 import Link from 'next/link';
+
+const WORKSPACE_ROUTES = {
+  home: '/workspace',
+  aiGovernance: '/workspace/ai-governance',
+  build: '/workspace/build',
+  testing: '/workspace/testing',
+  corrections: '/workspace/corrections',
+  routes: '/workspace/routes',
+  registry: '/workspace/registry',
+  replay: '/workspace/replay',
+  verify: '/workspace/verify',
+  receipts: '/workspace/receipts',
+  preservation: '/workspace/preservation',
+  partnerReviewNetwork: '/workspace/ai-governance/partner-review-network',
+} as const;
 
 const PRIMARY_TOOLS = [
   {
@@ -6,7 +22,7 @@ const PRIMARY_TOOLS = [
     title: 'Build a Governed AI Route',
     description:
       'Define the proposed consequence through Reality, Record, Continuity, Admissibility, Binding, Commit, Execution, and Outcome.',
-    href: '/workspace/build',
+    href: WORKSPACE_ROUTES.build,
     action: 'Open Route Builder',
     glyph: '◇',
   },
@@ -15,7 +31,7 @@ const PRIMARY_TOOLS = [
     title: 'Test the Route',
     description:
       'Run repeatable simulations, expose missing evidence or authority, and receive an ALLOW, HOLD, DENY, or ESCALATE determination.',
-    href: '/workspace/testing',
+    href: WORKSPACE_ROUTES.testing,
     action: 'Open Testing Desk',
     glyph: '◎',
   },
@@ -24,7 +40,7 @@ const PRIMARY_TOOLS = [
     title: 'Resolve Broken Links',
     description:
       'Return findings to the route, correct the precise failed stage, and preserve the difference between the prior and corrected state.',
-    href: '/workspace/corrections',
+    href: WORKSPACE_ROUTES.corrections,
     action: 'Open Corrections',
     glyph: '↺',
   },
@@ -35,42 +51,42 @@ const RECORD_TOOLS = [
     title: 'My Routes',
     description:
       'Open account-scoped and locally preserved route drafts without returning to the general workspace gateway.',
-    href: '/workspace/routes',
+    href: WORKSPACE_ROUTES.routes,
     glyph: 'R',
   },
   {
     title: 'Route Registry',
     description:
       'Inspect registered route identities, states, domains, and preserved governance references.',
-    href: '/workspace/registry',
+    href: WORKSPACE_ROUTES.registry,
     glyph: '⌁',
   },
   {
     title: 'Replay',
     description:
       'Re-evaluate preserved route packages and compare current findings with earlier determinations.',
-    href: '/workspace/replay',
+    href: WORKSPACE_ROUTES.replay,
     glyph: '▶',
   },
   {
     title: 'Verification',
     description:
       'Verify receipts and preserved artifacts independently from the interface that created them.',
-    href: '/workspace/verify',
+    href: WORKSPACE_ROUTES.verify,
     glyph: '✓',
   },
   {
     title: 'Receipts',
     description:
       'Review the records produced by route testing, review, correction, and execution-boundary activity.',
-    href: '/workspace/receipts',
+    href: WORKSPACE_ROUTES.receipts,
     glyph: '▤',
   },
   {
     title: 'Preservation',
     description:
       'Preserve canonical route state, dependencies, findings, and continuity before consequential execution.',
-    href: '/workspace/preservation',
+    href: WORKSPACE_ROUTES.preservation,
     glyph: '⬡',
   },
 ] as const;
@@ -113,10 +129,10 @@ export default function AIGovernancePlaygroundPage() {
             </p>
 
             <div className="heroActions">
-              <Link className="primaryButton" href="/workspace/build">
+              <Link className="primaryButton" href={WORKSPACE_ROUTES.build}>
                 Build an AI Route
               </Link>
-              <Link className="secondaryButton" href="/workspace/testing">
+              <Link className="secondaryButton" href={WORKSPACE_ROUTES.testing}>
                 Run a Free Simulation
               </Link>
             </div>
@@ -219,15 +235,19 @@ export default function AIGovernancePlaygroundPage() {
             <span>AB / BIGMAE / Elias</span>
           </div>
 
-          <Link className="partnerButton" href="/workspace/ai-governance/partner-review-network">
+          <Link className="partnerButton" href={WORKSPACE_ROUTES.partnerReviewNetwork}>
             Explore the Partner Review Network
           </Link>
         </div>
 
         <div className="partnerNetworkEmblem">
-          <img
+          <Image
             src="/images/ta-14-partner-review-network-emblem.png"
             alt="TA-14 Partner Review Network emblem"
+            width={420}
+            height={420}
+            sizes="(max-width: 980px) 100vw, 420px"
+            priority={false}
           />
           <p>Interactive partner profiles and governance boundaries</p>
         </div>
@@ -249,8 +269,8 @@ export default function AIGovernancePlaygroundPage() {
 
       <footer className="playgroundFooter">
         <Link href="/">← Public homepage</Link>
-        <Link href="/workspace">All playgrounds</Link>
-        <Link href="/workspace/routes">My Routes →</Link>
+        <Link href={WORKSPACE_ROUTES.home}>All playgrounds</Link>
+        <Link href={WORKSPACE_ROUTES.routes}>My Routes →</Link>
       </footer>
 
       <style>{`
@@ -414,6 +434,16 @@ export default function AIGovernancePlaygroundPage() {
         .primaryButton:hover,
         .secondaryButton:hover {
           transform: translateY(-2px);
+        }
+
+        .primaryButton:focus-visible,
+        .secondaryButton:focus-visible,
+        .primaryCard:focus-visible,
+        .recordCard:focus-visible,
+        .partnerButton:focus-visible,
+        .playgroundFooter a:focus-visible {
+          outline: 3px solid rgba(104, 229, 255, 0.72);
+          outline-offset: 4px;
         }
 
         .principleCard {
