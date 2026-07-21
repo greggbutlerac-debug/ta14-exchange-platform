@@ -1,1616 +1,1728 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 
-type ContinuityState = "CONTINUOUS" | "LIMITED" | "HOLD" | "BROKEN";
+type ReviewState = "IDLE" | "HOLD" | "READY";
+type ContinuityStatus =
+  | "DRAFT"
+  | "READY_FOR_REVIEW"
+  | "PRESERVED"
+  | "SUPERSEDED"
+  | "WITHDRAWN";
 
-type TimelineEvent = {
-  id: string;
-  start: string;
-  end: string;
-  source: string;
-  authority: string;
-  standing: "CURRENT" | "LIMITED" | "EXPIRED" | "UNKNOWN";
-  reset: boolean;
+type ContinuityFinding = {
+  findingId: string;
+  category:
+    | "TIME"
+    | "CUSTODY"
+    | "VERSION"
+    | "IDENTITY"
+    | "TRANSMISSION"
+    | "CALIBRATION"
+    | "SOURCE"
+    | "OTHER";
+  severity: "LOW" | "MODERATE" | "HIGH" | "CRITICAL";
+  statement: string;
+  evidenceReference: string;
+  boundary: string;
 };
 
-type Finding = {
-  code: string;
+type ContinuityReviewRecord = {
+  reviewId: string;
+  sourceInterpretationId: string;
+  sourceRecordId: string;
   title: string;
-  location: string;
-  effect: string;
-  consequence: string;
-  severity: "info" | "limited" | "hold" | "broken";
+  reviewerName: string;
+  reviewerOrganization: string;
+  status: ContinuityStatus;
+  version: string;
+  declaredStart: string;
+  declaredEnd: string;
+  expectedDuration: string;
+  capturedDuration: string;
+  missingIntervals: string;
+  custodyStatement: string;
+  identityStatement: string;
+  versionStatement: string;
+  transmissionStatement: string;
+  calibrationStatement: string;
+  sourceAuthorityStatement: string;
+  continuityDetermination:
+    | "NOT_ASSESSED"
+    | "CONTINUOUS"
+    | "PARTIAL"
+    | "BROKEN"
+    | "DISPUTED";
+  determinationReason: string;
+  whatContinuitySupports: string;
+  whatContinuityDoesNotSupport: string;
+  requiredNextEvidence: string;
+  findings: ContinuityFinding[];
+  createdAt: string;
+  updatedAt: string;
 };
 
-const sampleEvents: TimelineEvent[] = [
-  {
-    id: "EV-001",
-    start: "2026-07-20T08:00",
-    end: "2026-07-20T10:00",
-    source: "AIR-HUB-04",
-    authority: "Facilities Operations",
-    standing: "CURRENT",
-    reset: false,
-  },
-  {
-    id: "EV-002",
-    start: "2026-07-20T10:00",
-    end: "2026-07-20T12:00",
-    source: "AIR-HUB-04",
-    authority: "Facilities Operations",
-    standing: "CURRENT",
-    reset: false,
-  },
-  {
-    id: "EV-003",
-    start: "2026-07-20T12:20",
-    end: "2026-07-20T14:00",
-    source: "AIR-HUB-04",
-    authority: "Facilities Operations",
-    standing: "CURRENT",
-    reset: false,
-  },
-];
+const WORKSPACE_KEY = "ta14-continuity-review-workspace-v1";
+const LIBRARY_KEY = "ta14-continuity-review-library-v1";
 
-const emptyEvent = (): TimelineEvent => ({
-  id: `EV-${Math.random().toString(36).slice(2, 7).toUpperCase()}`,
-  start: "",
-  end: "",
-  source: "",
-  authority: "",
-  standing: "UNKNOWN",
-  reset: false,
-});
+const emptyReview: ContinuityReviewRecord = {
+  reviewId: "",
+  sourceInterpretationId: "",
+  sourceRecordId: "",
+  title: "",
+  reviewerName: "",
+  reviewerOrganization: "",
+  status: "DRAFT",
+  version: "1.0",
+  declaredStart: "",
+  declaredEnd: "",
+  expectedDuration: "",
+  capturedDuration: "",
+  missingIntervals: "",
+  custodyStatement: "",
+  identityStatement: "",
+  versionStatement: "",
+  transmissionStatement: "",
+  calibrationStatement: "",
+  sourceAuthorityStatement: "",
+  continuityDetermination: "NOT_ASSESSED",
+  determinationReason: "",
+  whatContinuitySupports: "",
+  whatContinuityDoesNotSupport: "",
+  requiredNextEvidence: "",
+  findings: [],
+  createdAt: "",
+  updatedAt: "",
+};
 
-function minutes(value: string): number | null {
-  if (!value) return null;
-  const date = new Date(value);
-  const time = date.getTime();
-  return Number.isNaN(time) ? null : Math.round(time / 60000);
-}
+const determinationLabels: Record<
+  ContinuityReviewRecord["continuityDetermination"],
+  string
+> = {
+  NOT_ASSESSED: "Not Assessed",
+  CONTINUOUS: "Continuous Within Declared Boundary",
+  PARTIAL: "Partially Continuous",
+  BROKEN: "Continuity Broken",
+  DISPUTED: "Continuity Disputed",
+};
 
-function evaluate(
-  recordId: string,
-  recordClass: string,
-  declaredSource: string,
-  sourceAuthority: string,
-  declaredStart: string,
-  declaredEnd: string,
-  evidenceStanding: string,
-  events: TimelineEvent[],
-): { state: ContinuityState; findings: Finding[] } {
-  const findings: Finding[] = [];
+const statusLabels: Record<ContinuityStatus, string> = {
+  DRAFT: "Draft",
+  READY_FOR_REVIEW: "Ready for Review",
+  PRESERVED: "Preserved",
+  SUPERSEDED: "Superseded",
+  WITHDRAWN: "Withdrawn",
+};
 
-  if (
-    !recordId.trim() ||
-    !recordClass.trim() ||
-    !declaredSource.trim() ||
-    !sourceAuthority.trim() ||
-    !declaredStart ||
-    !declaredEnd ||
-    !evidenceStanding.trim()
-  ) {
-    findings.push({
-      code: "CR-HOLD-001",
-      title: "Required continuity boundary is missing",
-      location: "Record identity and declared boundary",
-      effect:
-        "The review cannot establish the identity, period, source, authority, or evidence standing needed to test continuity.",
-      consequence:
-        "The record remains on HOLD until the missing boundary is supplied or formally excepted.",
-      severity: "hold",
-    });
-  }
+function createIdentifier(prefix: string) {
+  const now = new Date();
+  const date = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("");
+  const time = [
+    String(now.getHours()).padStart(2, "0"),
+    String(now.getMinutes()).padStart(2, "0"),
+    String(now.getSeconds()).padStart(2, "0"),
+  ].join("");
+  const random = Math.random().toString(36).slice(2, 7).toUpperCase();
 
-  const valid = events
-    .map((event, index) => ({
-      event,
-      index,
-      start: minutes(event.start),
-      end: minutes(event.end),
-    }))
-    .filter(
-      (
-        item,
-      ): item is {
-        event: TimelineEvent;
-        index: number;
-        start: number;
-        end: number;
-      } => item.start !== null && item.end !== null,
-    );
-
-  if (events.length === 0) {
-    findings.push({
-      code: "CR-HOLD-002",
-      title: "No sequence has been supplied",
-      location: "Timeline",
-      effect: "No ordered evidence intervals are available for review.",
-      consequence:
-        "Continuity cannot be evaluated until at least one interval is supplied.",
-      severity: "hold",
-    });
-  }
-
-  valid.forEach(({ event, index, start, end }) => {
-    if (end <= start) {
-      findings.push({
-        code: "CR-BROKEN-001",
-        title: "Interval end does not follow interval start",
-        location: `${event.id || `Event ${index + 1}`}`,
-        effect: "The event order is internally invalid.",
-        consequence:
-          "This interval cannot support an ordered continuity chain.",
-        severity: "broken",
-      });
-    }
-
-    if (!event.source.trim() || !event.authority.trim()) {
-      findings.push({
-        code: "CR-HOLD-003",
-        title: "Source or authority is unresolved",
-        location: `${event.id || `Event ${index + 1}`}`,
-        effect:
-          "The interval cannot be attributed to a declared source and accountable authority.",
-        consequence:
-          "The affected interval cannot advance to stronger admissibility review.",
-        severity: "hold",
-      });
-    }
-
-    if (event.standing === "EXPIRED" || event.standing === "UNKNOWN") {
-      findings.push({
-        code: "CR-HOLD-004",
-        title: "Evidence standing is unresolved",
-        location: `${event.id || `Event ${index + 1}`}`,
-        effect:
-          "The interval lacks current calibration or declared evidence standing.",
-        consequence:
-          "The affected interval remains bounded and cannot support whole-period continuity.",
-        severity: "hold",
-      });
-    }
-
-    if (event.standing === "LIMITED") {
-      findings.push({
-        code: "CR-LIMITED-001",
-        title: "Evidence standing is limited",
-        location: `${event.id || `Event ${index + 1}`}`,
-        effect:
-          "The interval may remain reviewable only within its declared limitation.",
-        consequence:
-          "Any downstream conclusion must be restricted to the standing that remains.",
-        severity: "limited",
-      });
-    }
-
-    if (event.reset) {
-      findings.push({
-        code: "CR-BROKEN-002",
-        title: "Unexplained reset declared",
-        location: `${event.id || `Event ${index + 1}`}`,
-        effect:
-          "The sequence indicates a reset without an attached continuity explanation.",
-        consequence:
-          "Whole-period continuity is defeated unless the reset is independently bounded.",
-        severity: "broken",
-      });
-    }
-  });
-
-  for (let index = 1; index < valid.length; index += 1) {
-    const previous = valid[index - 1];
-    const current = valid[index];
-
-    if (current.start < previous.start) {
-      findings.push({
-        code: "CR-BROKEN-003",
-        title: "Out-of-order interval detected",
-        location: `${previous.event.id} → ${current.event.id}`,
-        effect:
-          "The submitted sequence reverses chronological order.",
-        consequence:
-          "The declared chain cannot support whole-period continuity.",
-        severity: "broken",
-      });
-    }
-
-    if (current.start < previous.end) {
-      findings.push({
-        code: "CR-BROKEN-004",
-        title: "Duplicated or overlapping interval",
-        location: `${previous.event.id} / ${current.event.id}`,
-        effect:
-          "Two intervals claim the same portion of the declared period.",
-        consequence:
-          "The record cannot establish a single unambiguous sequence for the overlap.",
-        severity: "broken",
-      });
-    }
-
-    if (current.start > previous.end) {
-      const gap = current.start - previous.end;
-      findings.push({
-        code: gap > 60 ? "CR-BROKEN-005" : "CR-LIMITED-002",
-        title:
-          gap > 60
-            ? "Material continuity gap detected"
-            : "Bounded continuity gap detected",
-        location: `${previous.event.id} → ${current.event.id}`,
-        effect: `${gap} minutes are not represented by the submitted sequence.`,
-        consequence:
-          gap > 60
-            ? "Whole-period continuity is defeated across the missing interval."
-            : "Review remains possible only outside the missing interval.",
-        severity: gap > 60 ? "broken" : "limited",
-      });
-    }
-
-    if (
-      current.event.source.trim() &&
-      previous.event.source.trim() &&
-      current.event.source !== previous.event.source
-    ) {
-      findings.push({
-        code: "CR-BROKEN-006",
-        title: "Source identity changed",
-        location: `${previous.event.id} → ${current.event.id}`,
-        effect:
-          "The evidence source changes without a preserved transfer or binding record.",
-        consequence:
-          "Source continuity is broken unless the transition is independently established.",
-        severity: "broken",
-      });
-    }
-
-    if (
-      current.event.authority.trim() &&
-      previous.event.authority.trim() &&
-      current.event.authority !== previous.event.authority
-    ) {
-      findings.push({
-        code: "CR-HOLD-005",
-        title: "Authority changed without continuity evidence",
-        location: `${previous.event.id} → ${current.event.id}`,
-        effect:
-          "Accountability changes across the route without an attached authority transfer.",
-        consequence:
-          "The route remains on HOLD at the authority transition.",
-        severity: "hold",
-      });
-    }
-  }
-
-  const declaredStartMinutes = minutes(declaredStart);
-  const declaredEndMinutes = minutes(declaredEnd);
-
-  if (
-    declaredStartMinutes !== null &&
-    declaredEndMinutes !== null &&
-    valid.length > 0
-  ) {
-    const first = valid[0];
-    const last = valid[valid.length - 1];
-
-    if (declaredEndMinutes <= declaredStartMinutes) {
-      findings.push({
-        code: "CR-BROKEN-007",
-        title: "Declared review period is invalid",
-        location: "Declared period",
-        effect: "The declared end does not follow the declared start.",
-        consequence:
-          "The continuity review cannot establish a valid period boundary.",
-        severity: "broken",
-      });
-    }
-
-    if (
-      first.start > declaredStartMinutes ||
-      last.end < declaredEndMinutes
-    ) {
-      findings.push({
-        code: "CR-LIMITED-003",
-        title: "Captured period does not cover the declared period",
-        location: "Declared period versus captured sequence",
-        effect:
-          "The submitted events do not fully occupy the period presented for review.",
-        consequence:
-          "The review must be restricted to the captured interval only.",
-        severity: "limited",
-      });
-    }
-  }
-
-  if (
-    declaredSource.trim() &&
-    events.some(
-      (event) =>
-        event.source.trim() && event.source.trim() !== declaredSource.trim(),
-    )
-  ) {
-    findings.push({
-      code: "CR-BROKEN-008",
-      title: "Timeline source conflicts with declared source",
-      location: "Record header versus timeline",
-      effect:
-        "One or more intervals are attributed to a source different from the declared record source.",
-      consequence:
-        "The record cannot support a single-source continuity claim.",
-      severity: "broken",
-    });
-  }
-
-  if (findings.some((finding) => finding.severity === "broken")) {
-    return { state: "BROKEN", findings };
-  }
-
-  if (findings.some((finding) => finding.severity === "hold")) {
-    return { state: "HOLD", findings };
-  }
-
-  if (findings.some((finding) => finding.severity === "limited")) {
-    return { state: "LIMITED", findings };
-  }
-
-  return {
-    state: "CONTINUOUS",
-    findings: [
-      {
-        code: "CR-CONT-001",
-        title: "No material continuity break detected",
-        location: "Declared review boundary",
-        effect:
-          "The submitted sequence remains connected across the supplied source, authority, timing, and evidence-standing fields.",
-        consequence:
-          "The record may advance to the next bounded review layer. This does not prove the underlying condition acceptable.",
-        severity: "info",
-      },
-    ],
-  };
+  return `TA-14-${prefix}-${date}-${time}-${random}`;
 }
 
 export default function ContinuityReviewPage() {
-  const [recordId, setRecordId] = useState("AIR-2026-0720-04");
-  const [recordClass, setRecordClass] = useState(
-    "Atmospheric Integrity Record",
-  );
-  const [declaredSource, setDeclaredSource] = useState("AIR-HUB-04");
-  const [sourceAuthority, setSourceAuthority] = useState(
-    "Facilities Operations",
-  );
-  const [declaredStart, setDeclaredStart] = useState("2026-07-20T08:00");
-  const [declaredEnd, setDeclaredEnd] = useState("2026-07-20T14:00");
-  const [evidenceStanding, setEvidenceStanding] = useState(
-    "Current calibration declaration",
-  );
-  const [events, setEvents] = useState<TimelineEvent[]>(sampleEvents);
-  const [hasRun, setHasRun] = useState(true);
+  const [review, setReview] = useState<ContinuityReviewRecord>(emptyReview);
+  const [library, setLibrary] = useState<ContinuityReviewRecord[]>([]);
+  const [state, setState] = useState<ReviewState>("IDLE");
+  const [notice, setNotice] = useState("");
+  const [findingDraft, setFindingDraft] = useState({
+    category: "TIME" as ContinuityFinding["category"],
+    severity: "MODERATE" as ContinuityFinding["severity"],
+    statement: "",
+    evidenceReference: "",
+    boundary: "",
+  });
 
-  const result = useMemo(
-    () =>
-      evaluate(
-        recordId,
-        recordClass,
-        declaredSource,
-        sourceAuthority,
-        declaredStart,
-        declaredEnd,
-        evidenceStanding,
-        events,
-      ),
-    [
-      recordId,
-      recordClass,
-      declaredSource,
-      sourceAuthority,
-      declaredStart,
-      declaredEnd,
-      evidenceStanding,
-      events,
-    ],
-  );
+  useEffect(() => {
+    const savedWorkspace = window.localStorage.getItem(WORKSPACE_KEY);
+    const savedLibrary = window.localStorage.getItem(LIBRARY_KEY);
 
-  const stateCopy: Record<
-    ContinuityState,
-    { title: string; text: string; next: string }
-  > = {
-    CONTINUOUS: {
-      title: "Continuity retained within the declared boundary",
-      text: "No material sequence break was detected in the submitted evidence route.",
-      next: "The record may advance to comparison or verification, subject to those separate review boundaries.",
-    },
-    LIMITED: {
-      title: "Continuity is bounded",
-      text: "Some intervals retain standing, but the record does not support an unrestricted whole-period conclusion.",
-      next: "Restrict downstream use to the intervals that remain connected.",
-    },
-    HOLD: {
-      title: "Required continuity evidence is unresolved",
-      text: "A required identity, period, source, authority, or evidence-standing boundary is missing or unresolved.",
-      next: "Supply or formally except the missing boundary before advancing.",
-    },
-    BROKEN: {
-      title: "The declared continuity chain is broken",
-      text: "Material sequence, source, authority, overlap, reset, or period defects defeat the whole-period continuity claim.",
-      next: "Preserve this adverse result and correct the underlying record route without erasing the original finding.",
-    },
-  };
+    if (savedWorkspace) {
+      try {
+        const parsed = JSON.parse(savedWorkspace) as ContinuityReviewRecord;
+        setReview(parsed);
+        setState(
+          parsed.continuityDetermination !== "NOT_ASSESSED" ? "READY" : "IDLE",
+        );
+      } catch {
+        window.localStorage.removeItem(WORKSPACE_KEY);
+      }
+    }
 
-  const updateEvent = (
-    id: string,
-    patch: Partial<TimelineEvent>,
+    if (savedLibrary) {
+      try {
+        const parsed = JSON.parse(savedLibrary) as ContinuityReviewRecord[];
+        setLibrary(Array.isArray(parsed) ? parsed : []);
+      } catch {
+        window.localStorage.removeItem(LIBRARY_KEY);
+      }
+    }
+  }, []);
+
+  const updateReview = <K extends keyof ContinuityReviewRecord>(
+    field: K,
+    value: ContinuityReviewRecord[K],
   ) => {
-    setEvents((current) =>
-      current.map((event) =>
-        event.id === id ? { ...event, ...patch } : event,
-      ),
+    setReview((current) => ({
+      ...current,
+      [field]: value,
+    }));
+    setState("IDLE");
+  };
+
+  const continuityScore = useMemo(() => {
+    const fields = [
+      review.declaredStart,
+      review.declaredEnd,
+      review.expectedDuration,
+      review.capturedDuration,
+      review.custodyStatement,
+      review.identityStatement,
+      review.versionStatement,
+      review.transmissionStatement,
+      review.calibrationStatement,
+      review.sourceAuthorityStatement,
+    ];
+
+    return Math.round(
+      (fields.filter((field) => field.trim()).length / fields.length) * 100,
     );
-    setHasRun(false);
-  };
+  }, [review]);
 
-  const loadCleanSample = () => {
-    setRecordId("AIR-2026-0720-04");
-    setRecordClass("Atmospheric Integrity Record");
-    setDeclaredSource("AIR-HUB-04");
-    setSourceAuthority("Facilities Operations");
-    setDeclaredStart("2026-07-20T08:00");
-    setDeclaredEnd("2026-07-20T14:00");
-    setEvidenceStanding("Current calibration declaration");
-    setEvents([
-      {
-        id: "EV-001",
-        start: "2026-07-20T08:00",
-        end: "2026-07-20T10:00",
-        source: "AIR-HUB-04",
-        authority: "Facilities Operations",
-        standing: "CURRENT",
-        reset: false,
-      },
-      {
-        id: "EV-002",
-        start: "2026-07-20T10:00",
-        end: "2026-07-20T12:00",
-        source: "AIR-HUB-04",
-        authority: "Facilities Operations",
-        standing: "CURRENT",
-        reset: false,
-      },
-      {
-        id: "EV-003",
-        start: "2026-07-20T12:00",
-        end: "2026-07-20T14:00",
-        source: "AIR-HUB-04",
-        authority: "Facilities Operations",
-        standing: "CURRENT",
-        reset: false,
-      },
-    ]);
-    setHasRun(true);
-  };
+  const hasExplicitGap = useMemo(
+    () =>
+      /missing|gap|interruption|unavailable|lost|broken/i.test(
+        review.missingIntervals,
+      ),
+    [review.missingIntervals],
+  );
 
-  const loadBrokenSample = () => {
-    setRecordId("AIR-2026-0720-04");
-    setRecordClass("Atmospheric Integrity Record");
-    setDeclaredSource("AIR-HUB-04");
-    setSourceAuthority("Facilities Operations");
-    setDeclaredStart("2026-07-20T08:00");
-    setDeclaredEnd("2026-07-20T14:00");
-    setEvidenceStanding("Current calibration declaration");
-    setEvents(sampleEvents);
-    setHasRun(true);
-  };
+  function loadSample() {
+    setReview({
+      ...emptyReview,
+      title: "Continuity Review — AIR-2026-07-20-118",
+      sourceInterpretationId: "TA-14-GIR-SAMPLE",
+      sourceRecordId: "AIR-2026-07-20-118",
+      reviewerName: "",
+      reviewerOrganization: "",
+      declaredStart: "2026-07-19 00:00 ET",
+      declaredEnd: "2026-07-19 23:59 ET",
+      expectedDuration: "23h 59m",
+      capturedDuration: "23h 41m",
+      missingIntervals: "Missing interval: 14:11–14:29 ET",
+      custodyStatement:
+        "The submitted record declares a building sensor network as source, but does not provide a complete custody log from capture through interpretation.",
+      identityStatement:
+        "The record identifies six sensing nodes, but node-level identity and device binding are not fully preserved in the submitted text.",
+      versionStatement:
+        "No explicit version history or supersession statement was included with the source record.",
+      transmissionStatement:
+        "Transmission path, export method, and transformation history are not declared.",
+      calibrationStatement:
+        "Calibration is current for four of six sensing nodes; two nodes remain unresolved.",
+      sourceAuthorityStatement:
+        "The source is declared as a building sensor network. Authority to make a whole-period atmospheric claim is not independently established.",
+      continuityDetermination: "PARTIAL",
+      determinationReason:
+        "The declared period contains an 18-minute missing interval, incomplete calibration coverage, and unresolved custody and transmission history.",
+      whatContinuitySupports:
+        "The record can support bounded interpretation of the intervals and sensing nodes for which data, identity, and calibration standing are adequately preserved.",
+      whatContinuityDoesNotSupport:
+        "The record does not support unrestricted proof for the entire declared period or for sensing nodes whose calibration and identity remain unresolved.",
+      requiredNextEvidence:
+        "Provide node-level identity, complete timestamps, missing-interval explanation, export history, custody log, and calibration evidence for all six sensing nodes.",
+      findings: [],
+      createdAt: "",
+      updatedAt: "",
+    });
+    setState("READY");
+    setNotice("Sample continuity review loaded.");
+  }
+
+  function evaluateContinuity() {
+    const required = [
+      review.title,
+      review.declaredStart,
+      review.declaredEnd,
+      review.expectedDuration,
+      review.capturedDuration,
+      review.determinationReason,
+    ];
+
+    if (required.some((field) => !field.trim())) {
+      setState("HOLD");
+      setNotice(
+        "Continuity review placed on HOLD because required boundary and determination fields are incomplete.",
+      );
+      return;
+    }
+
+    setState("READY");
+    setNotice(
+      "Continuity review generated. The determination remains bounded to the declarations and evidence entered here.",
+    );
+  }
+
+  function saveDraft() {
+    const timestamp = new Date().toISOString();
+    const next: ContinuityReviewRecord = {
+      ...review,
+      reviewId: review.reviewId || createIdentifier("CR"),
+      status: "DRAFT",
+      createdAt: review.createdAt || timestamp,
+      updatedAt: timestamp,
+    };
+
+    setReview(next);
+    window.localStorage.setItem(WORKSPACE_KEY, JSON.stringify(next));
+    setNotice(`${next.reviewId} has been saved as a browser-local draft.`);
+  }
+
+  function preserveReview() {
+    if (state !== "READY") {
+      setNotice("Generate the continuity review before preserving it.");
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    const next: ContinuityReviewRecord = {
+      ...review,
+      reviewId: review.reviewId || createIdentifier("CR"),
+      status: review.status === "DRAFT" ? "PRESERVED" : review.status,
+      createdAt: review.createdAt || timestamp,
+      updatedAt: timestamp,
+    };
+
+    const exists = library.some((item) => item.reviewId === next.reviewId);
+    const nextLibrary = exists
+      ? library.map((item) => (item.reviewId === next.reviewId ? next : item))
+      : [next, ...library];
+
+    setReview(next);
+    setLibrary(nextLibrary);
+    window.localStorage.setItem(WORKSPACE_KEY, JSON.stringify(next));
+    window.localStorage.setItem(LIBRARY_KEY, JSON.stringify(nextLibrary));
+    setNotice(
+      `${next.reviewId} has been preserved in this browser. Preservation does not independently establish continuity or admissibility.`,
+    );
+  }
+
+  function clearWorkspace() {
+    setReview(emptyReview);
+    setState("IDLE");
+    setFindingDraft({
+      category: "TIME",
+      severity: "MODERATE",
+      statement: "",
+      evidenceReference: "",
+      boundary: "",
+    });
+    window.localStorage.removeItem(WORKSPACE_KEY);
+    setNotice(
+      "The working continuity review has been cleared. Preserved reviews remain available below.",
+    );
+  }
+
+  function addFinding(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!findingDraft.statement.trim()) {
+      setNotice("Continuity finding statement is required.");
+      return;
+    }
+
+    const finding: ContinuityFinding = {
+      findingId: createIdentifier("CF"),
+      category: findingDraft.category,
+      severity: findingDraft.severity,
+      statement: findingDraft.statement.trim(),
+      evidenceReference: findingDraft.evidenceReference.trim(),
+      boundary: findingDraft.boundary.trim(),
+    };
+
+    setReview((current) => ({
+      ...current,
+      findings: [...current.findings, finding],
+    }));
+
+    setFindingDraft({
+      category: "TIME",
+      severity: "MODERATE",
+      statement: "",
+      evidenceReference: "",
+      boundary: "",
+    });
+
+    setNotice(`${finding.findingId} has been added.`);
+  }
+
+  function removeFinding(findingId: string) {
+    setReview((current) => ({
+      ...current,
+      findings: current.findings.filter(
+        (item) => item.findingId !== findingId,
+      ),
+    }));
+    setNotice(`${findingId} has been removed.`);
+  }
+
+  function openReview(item: ContinuityReviewRecord) {
+    setReview(item);
+    setState(
+      item.continuityDetermination !== "NOT_ASSESSED" ? "READY" : "IDLE",
+    );
+    window.localStorage.setItem(WORKSPACE_KEY, JSON.stringify(item));
+    setNotice(`${item.reviewId} has been reopened.`);
+    document.getElementById("review")?.scrollIntoView({ behavior: "smooth" });
+  }
+
+  function removeReview(reviewId: string) {
+    const nextLibrary = library.filter((item) => item.reviewId !== reviewId);
+    setLibrary(nextLibrary);
+    window.localStorage.setItem(LIBRARY_KEY, JSON.stringify(nextLibrary));
+    setNotice(`${reviewId} has been removed from this browser.`);
+  }
+
+  function exportReview(item: ContinuityReviewRecord) {
+    const blob = new Blob([JSON.stringify(item, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${item.reviewId}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
 
   return (
-    <main className="page-shell">
-      <div className="stars stars-one" />
-      <div className="stars stars-two" />
+    <>
+      <style>{`
+        :root {
+          --cr-bg: #05070a;
+          --cr-panel: rgba(10, 15, 21, 0.9);
+          --cr-border: rgba(102, 190, 255, 0.16);
+          --cr-text: #f6f9fc;
+          --cr-muted: #93a1ae;
+          --cr-blue: #66beff;
+          --cr-cyan: #6ce7e0;
+          --cr-gold: #ffd27a;
+          --cr-red: #ff9898;
+          --cr-green: #8be0b1;
+        }
 
-      <header className="topbar">
-        <Link className="brand" href="/workspace/governed-records">
-          <span className="brand-mark">TA-14</span>
-          <span>
-            <strong>Governed Records</strong>
-            <small>Continuity Review</small>
-          </span>
-        </Link>
+        .cr-page {
+          position: relative;
+          min-height: 100vh;
+          overflow: hidden;
+          color: var(--cr-text);
+          background:
+            radial-gradient(circle at 12% 8%, rgba(102,190,255,0.13), transparent 29%),
+            radial-gradient(circle at 88% 13%, rgba(108,231,224,0.09), transparent 26%),
+            linear-gradient(180deg, #05070a 0%, #081018 52%, #040609 100%);
+        }
 
-        <nav aria-label="Governed Records">
-          <Link href="/workspace/governed-records/my-records">My Records</Link>
-          <Link
-            className="active"
-            href="/workspace/governed-records/continuity-review"
-          >
-            Continuity Review
-          </Link>
-          <Link href="/workspace/governed-records/comparison">
-            Record Comparison
-          </Link>
-          <Link href="/workspace/governed-records/verification">
-            Verification
-          </Link>
-        </nav>
-      </header>
-
-      <section className="hero">
-        <div>
-          <p className="eyebrow">RECORD → CONTINUITY</p>
-          <h1>Determine whether the evidence remains connected.</h1>
-          <p className="hero-copy">
-            Review ordered intervals, source identity, authority, evidence
-            standing, resets, overlaps, and gaps without rewriting the original
-            record or converting continuity into diagnosis.
-          </p>
-        </div>
-
-        <div className={`state-card state-${result.state.toLowerCase()}`}>
-          <span>Current determination</span>
-          <strong>{hasRun ? result.state : "NOT RUN"}</strong>
-          <p>
-            {hasRun
-              ? stateCopy[result.state].text
-              : "The record changed. Run the review to refresh the determination."}
-          </p>
-        </div>
-      </section>
-
-      <section className="canon-strip">
-        <span>Reality</span>
-        <b>→</b>
-        <span>Record</span>
-        <b>→</b>
-        <strong>Continuity</strong>
-        <b>→</b>
-        <span>Admissibility</span>
-        <b>→</b>
-        <span>Binding</span>
-        <b>→</b>
-        <span>Commit</span>
-        <b>→</b>
-        <span>Execution</span>
-        <b>→</b>
-        <span>Outcome</span>
-      </section>
-
-      <section className="workspace-grid">
-        <div className="panel source-panel">
-          <div className="panel-heading">
-            <div>
-              <p className="eyebrow">PRESERVED SOURCE BOUNDARY</p>
-              <h2>Record identity</h2>
-            </div>
-            <span className="badge">Source not altered</span>
-          </div>
-
-          <div className="field-grid">
-            <label>
-              <span>Record identity</span>
-              <input
-                value={recordId}
-                onChange={(event) => {
-                  setRecordId(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-
-            <label>
-              <span>Record class</span>
-              <input
-                value={recordClass}
-                onChange={(event) => {
-                  setRecordClass(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-
-            <label>
-              <span>Declared source</span>
-              <input
-                value={declaredSource}
-                onChange={(event) => {
-                  setDeclaredSource(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-
-            <label>
-              <span>Source authority</span>
-              <input
-                value={sourceAuthority}
-                onChange={(event) => {
-                  setSourceAuthority(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-
-            <label>
-              <span>Declared start</span>
-              <input
-                type="datetime-local"
-                value={declaredStart}
-                onChange={(event) => {
-                  setDeclaredStart(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-
-            <label>
-              <span>Declared end</span>
-              <input
-                type="datetime-local"
-                value={declaredEnd}
-                onChange={(event) => {
-                  setDeclaredEnd(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-
-            <label className="wide">
-              <span>Calibration or evidence standing</span>
-              <input
-                value={evidenceStanding}
-                onChange={(event) => {
-                  setEvidenceStanding(event.target.value);
-                  setHasRun(false);
-                }}
-              />
-            </label>
-          </div>
-        </div>
-
-        <aside className="panel boundary-panel">
-          <p className="eyebrow">SEPARATION RULE</p>
-          <h2>This review does not diagnose.</h2>
-          <p>
-            Continuity review tests whether evidence remains connected across
-            the declared route. It does not determine whether the underlying
-            environment, system, person, organization, or outcome is safe,
-            healthy, compliant, correct, or optimized.
-          </p>
-          <div className="boundary-list">
-            <span>Original record</span>
-            <strong>Preserved</strong>
-            <span>Continuity artifact</span>
-            <strong>Generated separately</strong>
-            <span>Diagnosis</span>
-            <strong>Not performed</strong>
-            <span>Optimization</span>
-            <strong>Not performed</strong>
-          </div>
-        </aside>
-      </section>
-
-      <section className="panel timeline-panel">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">ORDERED EVIDENCE ROUTE</p>
-            <h2>Timeline intervals</h2>
-          </div>
-
-          <div className="button-row">
-            <button type="button" onClick={loadCleanSample}>
-              Load continuous sample
-            </button>
-            <button type="button" onClick={loadBrokenSample}>
-              Load gap sample
-            </button>
-            <button
-              className="primary"
-              type="button"
-              onClick={() => setHasRun(true)}
-            >
-              Run continuity review
-            </button>
-          </div>
-        </div>
-
-        <div className="timeline-table">
-          <div className="timeline-head">
-            <span>Event</span>
-            <span>Start</span>
-            <span>End</span>
-            <span>Source</span>
-            <span>Authority</span>
-            <span>Standing</span>
-            <span>Reset</span>
-            <span />
-          </div>
-
-          {events.map((event) => (
-            <div className="timeline-row" key={event.id}>
-              <input
-                aria-label="Event identity"
-                value={event.id}
-                onChange={(change) =>
-                  updateEvent(event.id, { id: change.target.value })
-                }
-              />
-              <input
-                aria-label="Interval start"
-                type="datetime-local"
-                value={event.start}
-                onChange={(change) =>
-                  updateEvent(event.id, { start: change.target.value })
-                }
-              />
-              <input
-                aria-label="Interval end"
-                type="datetime-local"
-                value={event.end}
-                onChange={(change) =>
-                  updateEvent(event.id, { end: change.target.value })
-                }
-              />
-              <input
-                aria-label="Source"
-                value={event.source}
-                onChange={(change) =>
-                  updateEvent(event.id, { source: change.target.value })
-                }
-              />
-              <input
-                aria-label="Authority"
-                value={event.authority}
-                onChange={(change) =>
-                  updateEvent(event.id, { authority: change.target.value })
-                }
-              />
-              <select
-                aria-label="Evidence standing"
-                value={event.standing}
-                onChange={(change) =>
-                  updateEvent(event.id, {
-                    standing: change.target
-                      .value as TimelineEvent["standing"],
-                  })
-                }
-              >
-                <option value="CURRENT">Current</option>
-                <option value="LIMITED">Limited</option>
-                <option value="EXPIRED">Expired</option>
-                <option value="UNKNOWN">Unknown</option>
-              </select>
-              <label className="reset-check">
-                <input
-                  type="checkbox"
-                  checked={event.reset}
-                  onChange={(change) =>
-                    updateEvent(event.id, { reset: change.target.checked })
-                  }
-                />
-                <span>Reset</span>
-              </label>
-              <button
-                className="icon-button"
-                type="button"
-                aria-label={`Remove ${event.id}`}
-                onClick={() => {
-                  setEvents((current) =>
-                    current.filter((item) => item.id !== event.id),
-                  );
-                  setHasRun(false);
-                }}
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-
-        <button
-          className="add-button"
-          type="button"
-          onClick={() => {
-            setEvents((current) => [...current, emptyEvent()]);
-            setHasRun(false);
-          }}
-        >
-          + Add interval
-        </button>
-      </section>
-
-      <section className="result-grid">
-        <div className={`panel determination state-${result.state.toLowerCase()}`}>
-          <div className="panel-heading">
-            <div>
-              <p className="eyebrow">CONTINUITY DETERMINATION</p>
-              <h2>{hasRun ? result.state : "NOT RUN"}</h2>
-            </div>
-            <span className="determination-chip">
-              {hasRun ? result.findings.length : 0} finding
-              {hasRun && result.findings.length === 1 ? "" : "s"}
-            </span>
-          </div>
-
-          <h3>
-            {hasRun
-              ? stateCopy[result.state].title
-              : "The submitted route has changed"}
-          </h3>
-          <p>
-            {hasRun
-              ? stateCopy[result.state].next
-              : "Run the continuity review to generate a fresh bounded determination."}
-          </p>
-        </div>
-
-        <div className="panel proof-panel">
-          <p className="eyebrow">BOUNDARY OF PROOF</p>
-          <div>
-            <h3>What this review can prove</h3>
-            <p>
-              Whether the submitted sequence remains connected across its
-              declared identity, timing, source, authority, and evidence
-              standing.
-            </p>
-          </div>
-          <div>
-            <h3>What this review does not prove</h3>
-            <p>
-              Safety, health, compliance, correctness, diagnosis, causation,
-              optimization, or that the underlying real-world condition was
-              acceptable.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <section className="panel findings-panel">
-        <div className="panel-heading">
-          <div>
-            <p className="eyebrow">EVIDENCE-BOUND FINDINGS</p>
-            <h2>Why the route received this determination</h2>
-          </div>
-        </div>
-
-        <div className="findings-list">
-          {(hasRun ? result.findings : []).map((finding) => (
-            <article
-              className={`finding finding-${finding.severity}`}
-              key={`${finding.code}-${finding.location}`}
-            >
-              <div className="finding-code">{finding.code}</div>
-              <div>
-                <h3>{finding.title}</h3>
-                <dl>
-                  <div>
-                    <dt>Evidence location</dt>
-                    <dd>{finding.location}</dd>
-                  </div>
-                  <div>
-                    <dt>Effect on continuity</dt>
-                    <dd>{finding.effect}</dd>
-                  </div>
-                  <div>
-                    <dt>Bounded consequence</dt>
-                    <dd>{finding.consequence}</dd>
-                  </div>
-                </dl>
-              </div>
-            </article>
-          ))}
-
-          {!hasRun ? (
-            <div className="empty-state">
-              The timeline changed. Run the review to generate a new continuity
-              artifact.
-            </div>
-          ) : null}
-        </div>
-      </section>
-
-      <section className="next-panel">
-        <div>
-          <p className="eyebrow">NEXT ADMISSIBLE STEP</p>
-          <h2>Continue without collapsing the review layers.</h2>
-          <p>
-            Comparison and verification remain separate activities. Opening
-            either page does not upgrade this determination or erase an adverse
-            finding.
-          </p>
-        </div>
-
-        <div className="next-actions">
-          <Link href="/workspace/governed-records/comparison">
-            <span>Compare two records</span>
-            <strong>Open Record Comparison →</strong>
-          </Link>
-          <Link href="/workspace/governed-records/verification">
-            <span>Inspect verification standing</span>
-            <strong>Open Verification →</strong>
-          </Link>
-        </div>
-      </section>
-
-      <footer>
-        <strong>No admissible evidence. No admissible execution.</strong>
-        <span>
-          The record, continuity review, interpretation, diagnosis, and
-          optimization remain distinct artifacts.
-        </span>
-      </footer>
-
-      <style jsx>{`
-        :global(*) {
+        .cr-page *,
+        .cr-page *::before,
+        .cr-page *::after {
           box-sizing: border-box;
         }
 
-        :global(html) {
-          background: #04100f;
+        .cr-space {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          overflow: hidden;
         }
 
-        :global(body) {
-          margin: 0;
-          background: #04100f;
-          color: #eef8f4;
-          font-family:
-            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-            "Segoe UI", sans-serif;
+        .cr-grid {
+          position: absolute;
+          inset: 0;
+          opacity: 0.11;
+          background-image:
+            linear-gradient(rgba(102,190,255,0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(102,190,255,0.05) 1px, transparent 1px);
+          background-size: 72px 72px;
+          animation: crGrid 25s linear infinite;
+          mask-image: radial-gradient(circle at center, black, transparent 86%);
         }
 
-        :global(a) {
+        .cr-line {
+          position: absolute;
+          top: 28%;
+          left: -20%;
+          width: 70vw;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, var(--cr-blue), transparent);
+          opacity: 0.22;
+          transform: rotate(12deg);
+          animation: crLine 18s linear infinite;
+        }
+
+        .cr-orbit {
+          position: absolute;
+          right: -140px;
+          top: 90px;
+          width: 430px;
+          height: 430px;
+          border: 1px solid rgba(102,190,255,0.14);
+          border-radius: 50%;
+          animation: crOrbit 30s linear infinite;
+        }
+
+        .cr-orbit::after {
+          content: "";
+          position: absolute;
+          top: 50%;
+          left: -6px;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: var(--cr-cyan);
+          box-shadow: 0 0 22px var(--cr-cyan);
+        }
+
+        .cr-shell {
+          position: relative;
+          z-index: 1;
+          width: min(1260px, calc(100% - 28px));
+          margin: 0 auto;
+          padding: 24px 0 70px;
+        }
+
+        .cr-topbar {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 20px;
+          padding-bottom: 22px;
+          border-bottom: 1px solid rgba(102,190,255,0.11);
+        }
+
+        .cr-brand,
+        .cr-return {
           color: inherit;
           text-decoration: none;
         }
 
-        button,
-        input,
-        select {
-          font: inherit;
-        }
-
-        .page-shell {
-          position: relative;
-          min-height: 100vh;
-          overflow: hidden;
-          padding: 0 28px 48px;
-          background:
-            radial-gradient(circle at 12% 6%, rgba(37, 190, 152, 0.13), transparent 28%),
-            radial-gradient(circle at 84% 18%, rgba(194, 151, 67, 0.12), transparent 24%),
-            linear-gradient(180deg, #061513 0%, #03100f 48%, #020b0b 100%);
-          isolation: isolate;
-        }
-
-        .stars {
-          position: fixed;
-          inset: 0;
-          pointer-events: none;
-          z-index: -1;
-          opacity: 0.42;
-          background-image:
-            radial-gradient(circle, rgba(255, 255, 255, 0.8) 1px, transparent 1px),
-            radial-gradient(circle, rgba(120, 255, 219, 0.58) 1px, transparent 1px);
-          background-size: 86px 86px, 137px 137px;
-          background-position: 0 0, 21px 39px;
-        }
-
-        .stars-two {
-          opacity: 0.18;
-          transform: scale(1.2);
-        }
-
-        .topbar {
-          width: min(1500px, 100%);
-          margin: 0 auto;
-          min-height: 82px;
+        .cr-brand {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-          border-bottom: 1px solid rgba(153, 213, 196, 0.15);
-        }
-
-        .brand {
-          display: inline-flex;
-          align-items: center;
           gap: 12px;
-        }
-
-        .brand-mark {
-          display: grid;
-          place-items: center;
-          width: 48px;
-          height: 48px;
-          border-radius: 16px;
-          border: 1px solid rgba(213, 181, 102, 0.65);
-          color: #f2d694;
-          background: linear-gradient(145deg, rgba(211, 170, 75, 0.18), rgba(18, 52, 45, 0.92));
-          box-shadow: inset 0 0 24px rgba(247, 211, 127, 0.08);
           font-weight: 900;
-          font-size: 13px;
         }
 
-        .brand > span:last-child {
+        .cr-mark {
           display: grid;
-          gap: 3px;
+          width: 46px;
+          height: 46px;
+          place-items: center;
+          border: 1px solid rgba(102,190,255,0.26);
+          border-radius: 14px;
+          color: var(--cr-blue);
+          background: rgba(102,190,255,0.07);
+          font-size: 11px;
         }
 
-        .brand strong {
-          font-size: 14px;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
-        }
-
-        .brand small {
-          color: #8eaaa2;
-        }
-
-        nav {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-        }
-
-        nav a {
-          padding: 10px 12px;
-          border-radius: 999px;
-          color: #91aaa3;
+        .cr-return {
+          color: #a9b5c0;
           font-size: 13px;
-          transition: 160ms ease;
-        }
-
-        nav a:hover,
-        nav a:focus-visible,
-        nav a.active {
-          color: #f7fffc;
-          background: rgba(34, 128, 105, 0.18);
-          outline: none;
-        }
-
-        .hero {
-          width: min(1500px, 100%);
-          margin: 0 auto;
-          padding: 78px 0 34px;
-          display: grid;
-          grid-template-columns: minmax(0, 1.4fr) minmax(290px, 0.6fr);
-          gap: 36px;
-          align-items: end;
-        }
-
-        .eyebrow {
-          margin: 0 0 10px;
-          color: #73d9bd;
-          font-size: 12px;
           font-weight: 800;
+        }
+
+        .cr-hero {
+          display: grid;
+          grid-template-columns: minmax(0, 1.15fr) minmax(310px, 0.85fr);
+          gap: 60px;
+          align-items: center;
+          padding: 70px 0 54px;
+        }
+
+        .cr-kicker {
+          color: var(--cr-blue);
+          font-size: 10px;
+          font-weight: 950;
           letter-spacing: 0.16em;
-        }
-
-        h1 {
-          max-width: 900px;
-          margin: 0;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: clamp(42px, 6vw, 82px);
-          line-height: 0.98;
-          letter-spacing: -0.045em;
-        }
-
-        .hero-copy {
-          max-width: 820px;
-          margin: 24px 0 0;
-          color: #a8beb8;
-          font-size: 18px;
-          line-height: 1.75;
-        }
-
-        .state-card,
-        .panel,
-        .next-panel {
-          border: 1px solid rgba(135, 191, 176, 0.16);
-          background: linear-gradient(180deg, rgba(10, 33, 29, 0.92), rgba(5, 20, 18, 0.92));
-          box-shadow: 0 18px 70px rgba(0, 0, 0, 0.22);
-          backdrop-filter: blur(16px);
-        }
-
-        .state-card {
-          padding: 24px;
-          border-radius: 24px;
-        }
-
-        .state-card span {
-          display: block;
-          color: #809b94;
-          font-size: 12px;
-          letter-spacing: 0.1em;
           text-transform: uppercase;
         }
 
-        .state-card strong {
+        .cr-hero h1 {
+          max-width: 880px;
+          margin: 18px 0 18px;
+          font-size: clamp(3rem, 7vw, 6.7rem);
+          line-height: 0.94;
+          letter-spacing: -0.065em;
+        }
+
+        .cr-hero h1 span {
           display: block;
-          margin: 8px 0;
-          font-size: 30px;
+          color: transparent;
+          background: linear-gradient(90deg, white, var(--cr-blue), var(--cr-cyan));
+          background-clip: text;
+          -webkit-background-clip: text;
         }
 
-        .state-card p {
+        .cr-hero p {
+          max-width: 790px;
           margin: 0;
-          color: #b4c8c2;
-          line-height: 1.6;
+          color: var(--cr-muted);
+          font-size: 16px;
+          line-height: 1.76;
         }
 
-        .state-continuous {
-          border-color: rgba(82, 223, 164, 0.45);
-        }
-
-        .state-limited {
-          border-color: rgba(230, 189, 93, 0.45);
-        }
-
-        .state-hold {
-          border-color: rgba(240, 167, 75, 0.48);
-        }
-
-        .state-broken {
-          border-color: rgba(241, 102, 102, 0.52);
-        }
-
-        .canon-strip {
-          width: min(1500px, 100%);
-          margin: 0 auto 28px;
-          display: flex;
-          gap: 12px;
-          align-items: center;
-          justify-content: center;
-          flex-wrap: wrap;
-          padding: 14px 20px;
-          border-radius: 18px;
-          border: 1px solid rgba(116, 186, 166, 0.14);
-          background: rgba(4, 18, 16, 0.72);
-          color: #738e87;
-          font-size: 13px;
-        }
-
-        .canon-strip strong {
-          color: #e8c976;
-        }
-
-        .canon-strip b {
-          color: #43665d;
-        }
-
-        .workspace-grid,
-        .result-grid {
-          width: min(1500px, 100%);
-          margin: 0 auto 24px;
-          display: grid;
-          grid-template-columns: minmax(0, 1.45fr) minmax(300px, 0.55fr);
-          gap: 24px;
-        }
-
-        .panel {
-          border-radius: 24px;
+        .cr-score {
           padding: 28px;
+          border: 1px solid var(--cr-border);
+          border-radius: 24px;
+          background: var(--cr-panel);
+          box-shadow: 0 28px 70px rgba(0,0,0,0.26);
+          backdrop-filter: blur(22px);
         }
 
-        .panel-heading {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 20px;
+        .cr-score small {
+          color: var(--cr-blue);
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        .cr-score strong {
+          display: block;
+          margin: 12px 0;
+          font-size: 4.4rem;
+          line-height: 1;
+          letter-spacing: -0.07em;
+        }
+
+        .cr-progress {
+          height: 8px;
+          overflow: hidden;
+          border-radius: 999px;
+          background: rgba(255,255,255,0.07);
+        }
+
+        .cr-progress span {
+          display: block;
+          height: 100%;
+          border-radius: inherit;
+          background: linear-gradient(90deg, var(--cr-blue), var(--cr-cyan));
+        }
+
+        .cr-score p {
+          margin-top: 16px;
+          font-size: 12px;
+        }
+
+        .cr-notice {
+          margin-bottom: 18px;
+          padding: 14px 16px;
+          border: 1px solid rgba(102,190,255,0.2);
+          border-radius: 14px;
+          color: #c9e8ff;
+          background: rgba(102,190,255,0.055);
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        .cr-section {
+          padding: 58px 0;
+        }
+
+        .cr-section-head {
+          max-width: 850px;
           margin-bottom: 24px;
         }
 
-        h2,
-        h3,
-        p {
-          margin-top: 0;
+        .cr-section-head small {
+          color: var(--cr-blue);
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
         }
 
-        h2 {
-          margin-bottom: 0;
-          font-size: 28px;
+        .cr-section-head h2 {
+          margin: 10px 0 10px;
+          font-size: clamp(2rem, 4.2vw, 4rem);
+          line-height: 1.03;
+          letter-spacing: -0.05em;
         }
 
-        h3 {
-          line-height: 1.35;
+        .cr-section-head p {
+          margin: 0;
+          color: var(--cr-muted);
+          line-height: 1.72;
         }
 
-        .badge,
-        .determination-chip {
-          padding: 8px 11px;
-          border-radius: 999px;
-          background: rgba(80, 187, 156, 0.12);
-          border: 1px solid rgba(80, 187, 156, 0.22);
-          color: #9ce0ce;
-          font-size: 12px;
-          white-space: nowrap;
+        .cr-panel,
+        .cr-card,
+        .cr-finding,
+        .cr-record-card,
+        .cr-result,
+        .cr-empty {
+          border: 1px solid var(--cr-border);
+          background: var(--cr-panel);
+          box-shadow: 0 24px 65px rgba(0,0,0,0.22);
+          backdrop-filter: blur(20px);
         }
 
-        .field-grid {
+        .cr-panel {
+          border-radius: 24px;
+          padding: 22px;
+        }
+
+        .cr-form-grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 16px;
         }
 
-        label {
-          display: grid;
-          gap: 8px;
-        }
-
-        label > span {
-          color: #9bb1ab;
-          font-size: 12px;
-          font-weight: 700;
-          letter-spacing: 0.04em;
-        }
-
-        .wide {
+        .cr-wide {
           grid-column: 1 / -1;
         }
 
-        input,
-        select {
-          width: 100%;
-          min-width: 0;
-          border: 1px solid rgba(133, 184, 170, 0.16);
-          border-radius: 13px;
-          padding: 12px 13px;
-          color: #f4fffc;
-          background: rgba(3, 16, 14, 0.82);
-          outline: none;
-        }
-
-        input:focus,
-        select:focus {
-          border-color: rgba(100, 226, 192, 0.58);
-          box-shadow: 0 0 0 3px rgba(55, 185, 149, 0.1);
-        }
-
-        .boundary-panel p {
-          color: #a9bdb7;
-          line-height: 1.7;
-        }
-
-        .boundary-list {
+        .cr-label {
           display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 12px 18px;
-          margin-top: 24px;
-          padding-top: 22px;
-          border-top: 1px solid rgba(140, 184, 172, 0.14);
-        }
-
-        .boundary-list span {
-          color: #7f9a93;
-        }
-
-        .boundary-list strong {
-          color: #dcebe7;
-          text-align: right;
-        }
-
-        .timeline-panel,
-        .findings-panel {
-          width: min(1500px, 100%);
-          margin: 0 auto 24px;
-        }
-
-        .button-row {
-          display: flex;
-          gap: 10px;
-          flex-wrap: wrap;
-          justify-content: flex-end;
-        }
-
-        button,
-        .next-actions a {
-          border: 1px solid rgba(134, 186, 172, 0.18);
-          border-radius: 12px;
-          padding: 11px 14px;
-          color: #dbeae6;
-          background: rgba(7, 27, 24, 0.9);
-          cursor: pointer;
-          transition: 160ms ease;
-        }
-
-        button:hover,
-        button:focus-visible,
-        .next-actions a:hover,
-        .next-actions a:focus-visible {
-          border-color: rgba(105, 221, 190, 0.5);
-          transform: translateY(-1px);
-          outline: none;
-        }
-
-        button.primary {
-          color: #042019;
-          background: linear-gradient(135deg, #7ce5c6, #d9bd6a);
-          border-color: transparent;
-          font-weight: 800;
-        }
-
-        .timeline-table {
-          overflow-x: auto;
-        }
-
-        .timeline-head,
-        .timeline-row {
-          display: grid;
-          grid-template-columns:
-            110px minmax(180px, 1fr) minmax(180px, 1fr)
-            minmax(140px, 0.8fr) minmax(170px, 1fr) 130px 80px 44px;
-          gap: 10px;
-          align-items: center;
-          min-width: 1180px;
-        }
-
-        .timeline-head {
-          padding: 0 4px 10px;
-          color: #6f8c84;
-          font-size: 11px;
-          font-weight: 800;
+          gap: 8px;
+          color: #b8c3cd;
+          font-size: 10px;
+          font-weight: 900;
           letter-spacing: 0.08em;
           text-transform: uppercase;
         }
 
-        .timeline-row {
-          padding: 12px 0;
-          border-top: 1px solid rgba(136, 183, 171, 0.1);
+        .cr-input,
+        .cr-textarea,
+        .cr-select {
+          width: 100%;
+          border: 1px solid rgba(102,190,255,0.14);
+          border-radius: 12px;
+          color: white;
+          background: rgba(3,8,12,0.76);
+          outline: none;
         }
 
-        .reset-check {
-          display: flex;
-          align-items: center;
-          gap: 8px;
+        .cr-input,
+        .cr-select {
+          min-height: 48px;
+          padding: 0 13px;
         }
 
-        .reset-check input {
-          width: auto;
+        .cr-textarea {
+          min-height: 145px;
+          padding: 13px;
+          resize: vertical;
+          line-height: 1.65;
         }
 
-        .icon-button {
+        .cr-input:focus,
+        .cr-textarea:focus,
+        .cr-select:focus {
+          border-color: rgba(102,190,255,0.46);
+          box-shadow: 0 0 0 3px rgba(102,190,255,0.06);
+        }
+
+        .cr-select option {
+          color: white;
+          background: #081018;
+        }
+
+        .cr-grid-cards {
           display: grid;
-          place-items: center;
-          width: 38px;
-          height: 38px;
-          padding: 0;
-          color: #f29a9a;
-          font-size: 22px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
         }
 
-        .add-button {
+        .cr-card {
+          border-radius: 20px;
+          padding: 19px;
+        }
+
+        .cr-card textarea {
+          min-height: 190px;
+        }
+
+        .cr-actions,
+        .cr-card-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
           margin-top: 18px;
         }
 
-        .determination h2 {
-          font-size: 38px;
-          letter-spacing: 0.04em;
+        .cr-button,
+        .cr-link {
+          display: inline-flex;
+          min-height: 44px;
+          align-items: center;
+          justify-content: center;
+          padding: 0 16px;
+          border: 1px solid var(--cr-border);
+          border-radius: 12px;
+          color: white;
+          background: rgba(255,255,255,0.04);
+          font-size: 12px;
+          font-weight: 900;
+          cursor: pointer;
+          text-decoration: none;
         }
 
-        .determination > p,
-        .proof-panel p {
-          color: #a8bdb7;
+        .cr-button.primary {
+          color: #061019;
+          border-color: transparent;
+          background: linear-gradient(135deg, var(--cr-blue), var(--cr-cyan));
+        }
+
+        .cr-button.danger {
+          color: #ffc6c6;
+          border-color: rgba(255,130,130,0.18);
+        }
+
+        .cr-result {
+          margin-top: 18px;
+          border-radius: 22px;
+          padding: 22px;
+        }
+
+        .cr-result.hold {
+          border-color: rgba(255,210,122,0.22);
+          background: rgba(43,31,12,0.52);
+        }
+
+        .cr-result.ready {
+          border-color: rgba(139,224,177,0.22);
+        }
+
+        .cr-result h3 {
+          margin: 0 0 9px;
+          font-size: 1.45rem;
+        }
+
+        .cr-result p {
+          margin: 0;
+          color: var(--cr-muted);
           line-height: 1.7;
         }
 
-        .proof-panel {
-          display: grid;
-          gap: 16px;
-        }
-
-        .proof-panel > div {
-          padding: 18px;
-          border-radius: 16px;
-          background: rgba(3, 15, 13, 0.62);
-          border: 1px solid rgba(131, 185, 171, 0.12);
-        }
-
-        .proof-panel h3 {
-          margin-bottom: 8px;
-        }
-
-        .proof-panel p {
-          margin-bottom: 0;
-        }
-
-        .findings-list {
+        .cr-finding-list {
           display: grid;
           gap: 14px;
+          margin-top: 18px;
         }
 
-        .finding {
+        .cr-finding {
           display: grid;
-          grid-template-columns: 132px minmax(0, 1fr);
-          gap: 20px;
-          padding: 20px;
+          grid-template-columns: 48px 1fr;
+          gap: 16px;
           border-radius: 18px;
-          border: 1px solid rgba(133, 184, 170, 0.14);
-          background: rgba(3, 16, 14, 0.62);
+          padding: 18px;
         }
 
-        .finding-limited {
-          border-color: rgba(223, 186, 88, 0.3);
-        }
-
-        .finding-hold {
-          border-color: rgba(238, 157, 65, 0.34);
-        }
-
-        .finding-broken {
-          border-color: rgba(241, 99, 99, 0.38);
-        }
-
-        .finding-code {
-          align-self: start;
-          padding: 8px 10px;
-          border-radius: 10px;
-          color: #82d9c1;
-          background: rgba(76, 180, 151, 0.11);
-          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-          font-size: 12px;
-        }
-
-        .finding h3 {
-          margin-bottom: 15px;
-        }
-
-        dl {
-          margin: 0;
+        .cr-finding-index {
+          width: 44px;
+          height: 44px;
           display: grid;
+          place-items: center;
+          border-radius: 12px;
+          color: var(--cr-blue);
+          background: rgba(102,190,255,0.09);
+          font-size: 11px;
+          font-weight: 950;
+        }
+
+        .cr-finding-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           gap: 12px;
         }
 
-        dl > div {
-          display: grid;
-          grid-template-columns: 170px minmax(0, 1fr);
-          gap: 18px;
-        }
-
-        dt {
-          color: #6f8c84;
-          font-size: 12px;
-          font-weight: 800;
-          letter-spacing: 0.05em;
+        .cr-finding-top span {
+          color: var(--cr-blue);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
         }
 
-        dd {
-          margin: 0;
-          color: #b7c9c4;
+        .cr-finding-top button {
+          border: 0;
+          padding: 0;
+          color: var(--cr-red);
+          background: transparent;
+          cursor: pointer;
+          font-size: 10px;
+          font-weight: 900;
+          text-transform: uppercase;
+        }
+
+        .cr-finding h3 {
+          margin: 10px 0 11px;
+          font-size: 1.08rem;
+        }
+
+        .cr-finding p {
+          margin: 7px 0 0;
+          color: var(--cr-muted);
+          font-size: 12px;
           line-height: 1.6;
         }
 
-        .empty-state {
-          padding: 26px;
-          border-radius: 16px;
-          border: 1px dashed rgba(137, 187, 173, 0.2);
-          color: #8ea59f;
+        .cr-library-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .cr-record-card {
+          border-radius: 20px;
+          padding: 20px;
+        }
+
+        .cr-record-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          color: var(--cr-blue);
+          font-size: 10px;
+          font-weight: 900;
+          text-transform: uppercase;
+        }
+
+        .cr-record-id {
+          margin-top: 12px;
+          color: #72808c;
+          font: 10px/1.5 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+          overflow-wrap: anywhere;
+        }
+
+        .cr-record-card h3 {
+          margin: 10px 0 8px;
+          font-size: 1.2rem;
+        }
+
+        .cr-record-card > p {
+          color: var(--cr-muted);
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        .cr-meta {
+          display: grid;
+          gap: 7px;
+          margin-top: 15px;
+        }
+
+        .cr-meta div {
+          display: grid;
+          grid-template-columns: 112px 1fr;
+          gap: 10px;
+          font-size: 11px;
+        }
+
+        .cr-meta dt {
+          color: #72808c;
+          font-weight: 900;
+          text-transform: uppercase;
+        }
+
+        .cr-meta dd {
+          margin: 0;
+          color: #d9e4eb;
+        }
+
+        .cr-empty {
+          border-radius: 20px;
+          padding: 34px;
+          color: var(--cr-muted);
           text-align: center;
         }
 
-        .next-panel {
-          width: min(1500px, 100%);
-          margin: 0 auto;
-          border-radius: 26px;
-          padding: 28px;
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(360px, 0.8fr);
-          gap: 30px;
-          align-items: center;
+        @keyframes crGrid {
+          from { transform: translateX(0); }
+          to { transform: translateX(72px); }
         }
 
-        .next-panel p {
-          color: #a7bbb5;
-          line-height: 1.7;
-          margin-bottom: 0;
+        @keyframes crLine {
+          from { translate: -15vw 0; }
+          to { translate: 60vw 0; }
         }
 
-        .next-actions {
-          display: grid;
-          gap: 12px;
+        @keyframes crOrbit {
+          to { transform: rotate(360deg); }
         }
 
-        .next-actions a {
-          display: grid;
-          gap: 6px;
-          padding: 16px 18px;
+        @media (max-width: 940px) {
+          .cr-hero {
+            grid-template-columns: 1fr;
+            gap: 30px;
+          }
+
+          .cr-score {
+            max-width: 620px;
+          }
         }
 
-        .next-actions span {
-          color: #809991;
-          font-size: 12px;
-        }
-
-        .next-actions strong {
-          color: #edf8f4;
-        }
-
-        footer {
-          width: min(1500px, 100%);
-          margin: 34px auto 0;
-          padding: 22px 0 0;
-          display: flex;
-          gap: 16px;
-          justify-content: space-between;
-          color: #6f8881;
-          border-top: 1px solid rgba(136, 184, 171, 0.12);
-          font-size: 12px;
-        }
-
-        footer strong {
-          color: #c9aa59;
-        }
-
-        @media (max-width: 1050px) {
-          .hero,
-          .workspace-grid,
-          .result-grid,
-          .next-panel {
+        @media (max-width: 760px) {
+          .cr-form-grid,
+          .cr-grid-cards,
+          .cr-library-grid {
             grid-template-columns: 1fr;
           }
 
-          nav {
-            display: none;
-          }
-        }
-
-        @media (max-width: 720px) {
-          .page-shell {
-            padding-inline: 16px;
-          }
-
-          .topbar {
-            min-height: 72px;
-          }
-
-          .hero {
-            padding-top: 54px;
-          }
-
-          .panel {
-            padding: 21px;
-          }
-
-          .field-grid {
-            grid-template-columns: 1fr;
-          }
-
-          .wide {
+          .cr-wide {
             grid-column: auto;
           }
+        }
 
-          .panel-heading {
+        @media (max-width: 680px) {
+          .cr-shell {
+            width: min(100% - 18px, 1260px);
+          }
+
+          .cr-topbar {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .cr-hero h1 {
+            font-size: clamp(3rem, 15vw, 5rem);
+          }
+
+          .cr-actions,
+          .cr-card-actions {
             display: grid;
-          }
-
-          .button-row {
-            justify-content: flex-start;
-          }
-
-          .finding {
             grid-template-columns: 1fr;
           }
 
-          dl > div {
-            grid-template-columns: 1fr;
-            gap: 5px;
+          .cr-button,
+          .cr-link {
+            width: 100%;
           }
 
-          footer {
-            display: grid;
+          .cr-finding {
+            grid-template-columns: 1fr;
+          }
+
+          .cr-meta div {
+            grid-template-columns: 95px 1fr;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          *,
-          *::before,
-          *::after {
-            scroll-behavior: auto !important;
-            transition: none !important;
-          }
-
-          .stars {
-            display: none;
+          .cr-grid,
+          .cr-line,
+          .cr-orbit {
+            animation: none;
           }
         }
       `}</style>
-    </main>
+
+      <div className="cr-page">
+        <div className="cr-space" aria-hidden="true">
+          <div className="cr-grid" />
+          <div className="cr-line" />
+          <div className="cr-orbit" />
+        </div>
+
+        <main className="cr-shell">
+          <header className="cr-topbar">
+            <Link className="cr-brand" href="/workspace/governed-records">
+              <span className="cr-mark">TA-14</span>
+              <span>Continuity Review</span>
+            </Link>
+
+            <Link
+              className="cr-return"
+              href="/workspace/governed-records/interpreter"
+            >
+              Return to Governed Record Interpreter
+            </Link>
+          </header>
+
+          <section className="cr-hero">
+            <div>
+              <div className="cr-kicker">Governed Continuity Review</div>
+              <h1>
+                Determine whether the record
+                <span>remained intact across time.</span>
+              </h1>
+              <p>
+                Review time coverage, custody, identity, version history,
+                transmission, calibration, and source authority before any
+                record is permitted to support a stronger admissibility claim.
+              </p>
+            </div>
+
+            <aside className="cr-score">
+              <small>Continuity Field Completion</small>
+              <strong>{continuityScore}%</strong>
+              <div className="cr-progress">
+                <span style={{ width: `${continuityScore}%` }} />
+              </div>
+              <p>
+                Completion means fields contain declarations. It does not prove
+                continuity, authenticity, custody, or admissibility.
+              </p>
+            </aside>
+          </section>
+
+          {notice ? (
+            <div className="cr-notice" role="status">
+              {notice}
+            </div>
+          ) : null}
+
+          <section className="cr-section" id="review">
+            <div className="cr-section-head">
+              <small>01 — Review Identity</small>
+              <h2>Identify the review and its source artifacts.</h2>
+            </div>
+
+            <div className="cr-panel">
+              <div className="cr-form-grid">
+                <label className="cr-label cr-wide">
+                  Review title
+                  <input
+                    className="cr-input"
+                    value={review.title}
+                    onChange={(event) =>
+                      updateReview("title", event.target.value)
+                    }
+                    placeholder="Continuity Review of..."
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Source interpretation ID
+                  <input
+                    className="cr-input"
+                    value={review.sourceInterpretationId}
+                    onChange={(event) =>
+                      updateReview(
+                        "sourceInterpretationId",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="TA-14-GIR-..."
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Source record ID
+                  <input
+                    className="cr-input"
+                    value={review.sourceRecordId}
+                    onChange={(event) =>
+                      updateReview("sourceRecordId", event.target.value)
+                    }
+                    placeholder="AIR-..., GR-..., AER-..."
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Reviewer name
+                  <input
+                    className="cr-input"
+                    value={review.reviewerName}
+                    onChange={(event) =>
+                      updateReview("reviewerName", event.target.value)
+                    }
+                    placeholder="Reviewer"
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Reviewer organization
+                  <input
+                    className="cr-input"
+                    value={review.reviewerOrganization}
+                    onChange={(event) =>
+                      updateReview(
+                        "reviewerOrganization",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="Organization"
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Status
+                  <select
+                    className="cr-select"
+                    value={review.status}
+                    onChange={(event) =>
+                      updateReview(
+                        "status",
+                        event.target.value as ContinuityStatus,
+                      )
+                    }
+                  >
+                    {Object.entries(statusLabels).map(([value, label]) => (
+                      <option value={value} key={value}>
+                        {label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="cr-label">
+                  Version
+                  <input
+                    className="cr-input"
+                    value={review.version}
+                    onChange={(event) =>
+                      updateReview("version", event.target.value)
+                    }
+                    placeholder="1.0"
+                  />
+                </label>
+              </div>
+
+              <div className="cr-actions">
+                <button
+                  className="cr-button"
+                  type="button"
+                  onClick={loadSample}
+                >
+                  Load Sample
+                </button>
+              </div>
+            </div>
+          </section>
+
+          <section className="cr-section">
+            <div className="cr-section-head">
+              <small>02 — Time Continuity</small>
+              <h2>Compare the declared period with the period actually captured.</h2>
+            </div>
+
+            <div className="cr-panel">
+              <div className="cr-form-grid">
+                <label className="cr-label">
+                  Declared start
+                  <input
+                    className="cr-input"
+                    value={review.declaredStart}
+                    onChange={(event) =>
+                      updateReview("declaredStart", event.target.value)
+                    }
+                    placeholder="Start timestamp"
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Declared end
+                  <input
+                    className="cr-input"
+                    value={review.declaredEnd}
+                    onChange={(event) =>
+                      updateReview("declaredEnd", event.target.value)
+                    }
+                    placeholder="End timestamp"
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Expected duration
+                  <input
+                    className="cr-input"
+                    value={review.expectedDuration}
+                    onChange={(event) =>
+                      updateReview("expectedDuration", event.target.value)
+                    }
+                    placeholder="Expected capture duration"
+                  />
+                </label>
+
+                <label className="cr-label">
+                  Captured duration
+                  <input
+                    className="cr-input"
+                    value={review.capturedDuration}
+                    onChange={(event) =>
+                      updateReview("capturedDuration", event.target.value)
+                    }
+                    placeholder="Actual captured duration"
+                  />
+                </label>
+
+                <label className="cr-label cr-wide">
+                  Missing intervals, interruptions, or unavailable periods
+                  <textarea
+                    className="cr-textarea"
+                    value={review.missingIntervals}
+                    onChange={(event) =>
+                      updateReview("missingIntervals", event.target.value)
+                    }
+                    placeholder="List every missing interval or state that none were declared."
+                  />
+                </label>
+              </div>
+            </div>
+          </section>
+
+          <section className="cr-section">
+            <div className="cr-section-head">
+              <small>03 — Continuity Dimensions</small>
+              <h2>Keep each continuity question separate.</h2>
+            </div>
+
+            <div className="cr-grid-cards">
+              {[
+                {
+                  label: "Custody continuity",
+                  field: "custodyStatement" as const,
+                  value: review.custodyStatement,
+                  placeholder:
+                    "Who held, stored, transferred, or controlled the record from capture through review?",
+                },
+                {
+                  label: "Identity continuity",
+                  field: "identityStatement" as const,
+                  value: review.identityStatement,
+                  placeholder:
+                    "How were devices, people, entities, systems, and source records bound to stable identities?",
+                },
+                {
+                  label: "Version continuity",
+                  field: "versionStatement" as const,
+                  value: review.versionStatement,
+                  placeholder:
+                    "Which version was reviewed, and how were amendments, replacements, and supersession preserved?",
+                },
+                {
+                  label: "Transmission continuity",
+                  field: "transmissionStatement" as const,
+                  value: review.transmissionStatement,
+                  placeholder:
+                    "How was the record exported, transmitted, transformed, copied, or imported?",
+                },
+                {
+                  label: "Calibration continuity",
+                  field: "calibrationStatement" as const,
+                  value: review.calibrationStatement,
+                  placeholder:
+                    "Was calibration standing preserved across all relevant devices and periods?",
+                },
+                {
+                  label: "Source authority continuity",
+                  field: "sourceAuthorityStatement" as const,
+                  value: review.sourceAuthorityStatement,
+                  placeholder:
+                    "Did the source retain authority to support the declared record and requested conclusion?",
+                },
+              ].map((item) => (
+                <label className="cr-card cr-label" key={item.label}>
+                  {item.label}
+                  <textarea
+                    className="cr-textarea"
+                    value={item.value}
+                    onChange={(event) =>
+                      updateReview(item.field, event.target.value)
+                    }
+                    placeholder={item.placeholder}
+                  />
+                </label>
+              ))}
+            </div>
+          </section>
+
+          <section className="cr-section">
+            <div className="cr-section-head">
+              <small>04 — Continuity Determination</small>
+              <h2>State the determination without hiding the reason.</h2>
+            </div>
+
+            <div className="cr-panel">
+              <div className="cr-form-grid">
+                <label className="cr-label cr-wide">
+                  Continuity determination
+                  <select
+                    className="cr-select"
+                    value={review.continuityDetermination}
+                    onChange={(event) =>
+                      updateReview(
+                        "continuityDetermination",
+                        event.target
+                          .value as ContinuityReviewRecord["continuityDetermination"],
+                      )
+                    }
+                  >
+                    {Object.entries(determinationLabels).map(
+                      ([value, label]) => (
+                        <option value={value} key={value}>
+                          {label}
+                        </option>
+                      ),
+                    )}
+                  </select>
+                </label>
+
+                <label className="cr-label cr-wide">
+                  Determination reason
+                  <textarea
+                    className="cr-textarea"
+                    value={review.determinationReason}
+                    onChange={(event) =>
+                      updateReview(
+                        "determinationReason",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="Explain exactly why this continuity determination was reached."
+                  />
+                </label>
+
+                <label className="cr-label">
+                  What continuity supports
+                  <textarea
+                    className="cr-textarea"
+                    value={review.whatContinuitySupports}
+                    onChange={(event) =>
+                      updateReview(
+                        "whatContinuitySupports",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="State the bounded claims that continuity permits."
+                  />
+                </label>
+
+                <label className="cr-label">
+                  What continuity does not support
+                  <textarea
+                    className="cr-textarea"
+                    value={review.whatContinuityDoesNotSupport}
+                    onChange={(event) =>
+                      updateReview(
+                        "whatContinuityDoesNotSupport",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="State the conclusions continuity cannot support."
+                  />
+                </label>
+
+                <label className="cr-label cr-wide">
+                  Required next evidence
+                  <textarea
+                    className="cr-textarea"
+                    value={review.requiredNextEvidence}
+                    onChange={(event) =>
+                      updateReview(
+                        "requiredNextEvidence",
+                        event.target.value,
+                      )
+                    }
+                    placeholder="List the evidence needed to cure gaps or support a stronger determination."
+                  />
+                </label>
+              </div>
+
+              <div className="cr-actions">
+                <button
+                  className="cr-button primary"
+                  type="button"
+                  onClick={evaluateContinuity}
+                >
+                  Generate Continuity Review
+                </button>
+              </div>
+            </div>
+
+            {state === "HOLD" ? (
+              <div className="cr-result hold">
+                <h3>HOLD — continuity boundary incomplete.</h3>
+                <p>
+                  Required time, duration, title, and determination fields must
+                  be present before a bounded continuity review can be generated.
+                </p>
+              </div>
+            ) : null}
+
+            {state === "READY" ? (
+              <div className="cr-result ready">
+                <h3>
+                  {determinationLabels[review.continuityDetermination]}
+                </h3>
+                <p>{review.determinationReason}</p>
+                {hasExplicitGap ? (
+                  <p>
+                    An explicit interruption, missing interval, or continuity
+                    gap is present in the declared review record.
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+          </section>
+
+          <section className="cr-section">
+            <div className="cr-section-head">
+              <small>05 — Structured Findings</small>
+              <h2>Preserve every continuity issue as a separate finding.</h2>
+            </div>
+
+            <form className="cr-panel" onSubmit={addFinding}>
+              <div className="cr-form-grid">
+                <label className="cr-label">
+                  Category
+                  <select
+                    className="cr-select"
+                    value={findingDraft.category}
+                    onChange={(event) =>
+                      setFindingDraft((current) => ({
+                        ...current,
+                        category: event.target
+                          .value as ContinuityFinding["category"],
+                      }))
+                    }
+                  >
+                    <option value="TIME">Time</option>
+                    <option value="CUSTODY">Custody</option>
+                    <option value="VERSION">Version</option>
+                    <option value="IDENTITY">Identity</option>
+                    <option value="TRANSMISSION">Transmission</option>
+                    <option value="CALIBRATION">Calibration</option>
+                    <option value="SOURCE">Source Authority</option>
+                    <option value="OTHER">Other</option>
+                  </select>
+                </label>
+
+                <label className="cr-label">
+                  Severity
+                  <select
+                    className="cr-select"
+                    value={findingDraft.severity}
+                    onChange={(event) =>
+                      setFindingDraft((current) => ({
+                        ...current,
+                        severity: event.target
+                          .value as ContinuityFinding["severity"],
+                      }))
+                    }
+                  >
+                    <option value="LOW">Low</option>
+                    <option value="MODERATE">Moderate</option>
+                    <option value="HIGH">High</option>
+                    <option value="CRITICAL">Critical</option>
+                  </select>
+                </label>
+
+                <label className="cr-label cr-wide">
+                  Finding statement
+                  <textarea
+                    className="cr-textarea"
+                    value={findingDraft.statement}
+                    onChange={(event) =>
+                      setFindingDraft((current) => ({
+                        ...current,
+                        statement: event.target.value,
+                      }))
+                    }
+                    placeholder="State the continuity finding."
+                  />
+                </label>
+
+                <label className="cr-label cr-wide">
+                  Evidence reference
+                  <input
+                    className="cr-input"
+                    value={findingDraft.evidenceReference}
+                    onChange={(event) =>
+                      setFindingDraft((current) => ({
+                        ...current,
+                        evidenceReference: event.target.value,
+                      }))
+                    }
+                    placeholder="Timestamp, evidence ID, source field, log entry, version, or file"
+                  />
+                </label>
+
+                <label className="cr-label cr-wide">
+                  Finding boundary
+                  <textarea
+                    className="cr-textarea"
+                    value={findingDraft.boundary}
+                    onChange={(event) =>
+                      setFindingDraft((current) => ({
+                        ...current,
+                        boundary: event.target.value,
+                      }))
+                    }
+                    placeholder="State what this finding does not establish."
+                  />
+                </label>
+              </div>
+
+              <div className="cr-actions">
+                <button className="cr-button primary" type="submit">
+                  Add Continuity Finding
+                </button>
+              </div>
+            </form>
+
+            <div className="cr-finding-list">
+              {review.findings.map((item, index) => (
+                <article className="cr-finding" key={item.findingId}>
+                  <div className="cr-finding-index">
+                    {String(index + 1).padStart(2, "0")}
+                  </div>
+                  <div>
+                    <div className="cr-finding-top">
+                      <span>
+                        {item.category} · {item.severity}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeFinding(item.findingId)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                    <h3>{item.statement}</h3>
+                    <p>Evidence: {item.evidenceReference || "Not declared"}</p>
+                    <p>Boundary: {item.boundary || "Not declared"}</p>
+                  </div>
+                </article>
+              ))}
+
+              {review.findings.length === 0 ? (
+                <div className="cr-empty">
+                  No structured continuity findings have been added.
+                </div>
+              ) : null}
+            </div>
+          </section>
+
+          <section className="cr-section">
+            <div className="cr-section-head">
+              <small>06 — Preserve Review</small>
+              <h2>Preserve the continuity artifact separately.</h2>
+              <p>
+                A continuity review does not rewrite the source record or the
+                governed interpretation. It creates a distinct review artifact.
+              </p>
+            </div>
+
+            <div className="cr-actions">
+              <button className="cr-button" type="button" onClick={saveDraft}>
+                Save Working Review
+              </button>
+              <button
+                className="cr-button primary"
+                type="button"
+                onClick={preserveReview}
+              >
+                Preserve Continuity Review
+              </button>
+              <button
+                className="cr-button danger"
+                type="button"
+                onClick={clearWorkspace}
+              >
+                Clear Working Review
+              </button>
+              <Link
+                className="cr-link"
+                href="/workspace/governed-records/interpreter"
+              >
+                Return to Interpreter
+              </Link>
+            </div>
+          </section>
+
+          <section className="cr-section">
+            <div className="cr-section-head">
+              <small>07 — Preserved Reviews</small>
+              <h2>Browser-local continuity review history.</h2>
+            </div>
+
+            {library.length ? (
+              <div className="cr-library-grid">
+                {library.map((item) => (
+                  <article className="cr-record-card" key={item.reviewId}>
+                    <div className="cr-record-top">
+                      <span>{item.status}</span>
+                      <span>v{item.version}</span>
+                    </div>
+
+                    <div className="cr-record-id">{item.reviewId}</div>
+                    <h3>{item.title}</h3>
+                    <p>{item.determinationReason}</p>
+
+                    <dl className="cr-meta">
+                      <div>
+                        <dt>Determination</dt>
+                        <dd>
+                          {determinationLabels[item.continuityDetermination]}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt>Source record</dt>
+                        <dd>{item.sourceRecordId || "Not declared"}</dd>
+                      </div>
+                      <div>
+                        <dt>Findings</dt>
+                        <dd>{item.findings.length}</dd>
+                      </div>
+                      <div>
+                        <dt>Updated</dt>
+                        <dd>{new Date(item.updatedAt).toLocaleString()}</dd>
+                      </div>
+                    </dl>
+
+                    <div className="cr-card-actions">
+                      <button
+                        className="cr-button primary"
+                        type="button"
+                        onClick={() => openReview(item)}
+                      >
+                        Open
+                      </button>
+                      <button
+                        className="cr-button"
+                        type="button"
+                        onClick={() => exportReview(item)}
+                      >
+                        Export JSON
+                      </button>
+                      <button
+                        className="cr-button danger"
+                        type="button"
+                        onClick={() => removeReview(item.reviewId)}
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : (
+              <div className="cr-empty">
+                No continuity reviews have been preserved in this browser.
+              </div>
+            )}
+          </section>
+        </main>
+      </div>
+    </>
   );
 }
