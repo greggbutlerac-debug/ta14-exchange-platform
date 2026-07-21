@@ -1,620 +1,405 @@
-import type { Metadata } from 'next';
+// apps/web/app/marketplace/page.tsx
+'use client';
+
 import Link from 'next/link';
 
-import {
-  marketplaceActions,
-  marketplaceRoutes,
-} from '../../lib/marketplace-routes';
+const MARKETPLACE_LINKS = {
+  opportunities: '/marketplace/opportunities',
+  postNeed: '/marketplace/post-a-need',
+  professionals: '/marketplace/professionals',
+  governedRecords: '/marketplace/governed-records',
+  routes: '/marketplace/routes',
+  dashboard: '/marketplace/dashboard',
+} as const;
 
-export const metadata: Metadata = {
-  title: 'TA-14 AI Governance Exchange Marketplace',
-  description:
-    'Discover governance professionals, organizations, opportunities, records, reviews, and governed collaboration pathways inside the TA-14 AI Governance Exchange Marketplace.',
-};
-
-const categories = [
+const marketplaceAreas = [
   {
-    title: 'Governance Professionals',
+    number: '01',
+    eyebrow: 'GOVERNANCE NEEDS',
+    title: 'Opportunities',
     description:
-      'Find independent architects, reviewers, verification specialists, domain experts, record stewards, and implementation partners.',
-    href: marketplaceRoutes.professionals,
-    eyebrow: 'PEOPLE',
-    metric: '6 featured profiles',
+      'Browse bounded requests for independent review, route design, evidence mapping, governed interpretation, technical analysis, and other governance work.',
+    primaryLabel: 'Browse opportunities',
+    primaryHref: MARKETPLACE_LINKS.opportunities,
+    secondaryLabel: 'Post a governance need',
+    secondaryHref: MARKETPLACE_LINKS.postNeed,
+    state: 'CONNECTED',
   },
   {
-    title: 'Governance Organizations',
+    number: '02',
+    eyebrow: 'EVIDENCE-BASED PROFESSIONALS',
+    title: 'Professional Profiles',
     description:
-      'Explore governance practices, review entities, verification laboratories, record institutions, and partner organizations.',
-    href: marketplaceRoutes.organizations,
-    eyebrow: 'INSTITUTIONS',
-    metric: '6 featured organizations',
+      'Discover professionals through declared competence, qualifications, routes, governed records, review history, visible limitations, and preserved outcomes.',
+    primaryLabel: 'Browse professionals',
+    primaryHref: MARKETPLACE_LINKS.professionals,
+    secondaryLabel: 'Open professional dashboard',
+    secondaryHref: MARKETPLACE_LINKS.dashboard,
+    state: 'CONNECTED',
   },
   {
-    title: 'Open Opportunities',
+    number: '03',
+    eyebrow: 'RECORD-CENTERED WORK',
+    title: 'Governed Record Requests',
     description:
-      'Browse governance needs, review requests, implementation scopes, licensing opportunities, and collaboration pathways.',
-    href: marketplaceRoutes.opportunities,
-    eyebrow: 'WORK',
-    metric: 'Governed opportunities',
+      'Find requests for record creation, continuity review, interpretation, comparison, verification, and preservation across operational and governance domains.',
+    primaryLabel: 'Browse record requests',
+    primaryHref: MARKETPLACE_LINKS.governedRecords,
+    secondaryLabel: 'Find record specialists',
+    secondaryHref: MARKETPLACE_LINKS.professionals,
+    state: 'CONNECTED',
   },
   {
-    title: 'Governed Records',
+    number: '04',
+    eyebrow: 'REUSABLE GOVERNANCE',
+    title: 'Route Marketplace',
     description:
-      'Explore environmental, atmospheric, building, hospital, HVAC, land, water, and laboratory record offerings.',
-    href: marketplaceRoutes.records,
-    eyebrow: 'RECORDS',
-    metric: '8 record categories',
+      'Inspect bounded governance routes with declared inputs, evidence requirements, outputs, verification state, limitations, versions, and commercial models.',
+    primaryLabel: 'Browse governed routes',
+    primaryHref: MARKETPLACE_LINKS.routes,
+    secondaryLabel: 'Request a custom route',
+    secondaryHref: MARKETPLACE_LINKS.postNeed,
+    state: 'CONNECTED',
   },
   {
-    title: 'Independent Reviews',
+    number: '05',
+    eyebrow: 'PROFESSIONAL WORKSPACE',
+    title: 'Professional Dashboard',
     description:
-      'Read bounded architecture reviews, execution-route findings, continuity reviews, technical verifications, and domain assessments.',
-    href: marketplaceRoutes.reviews,
-    eyebrow: 'REVIEW',
-    metric: '6 published reviews',
-  },
-  {
-    title: 'Post a Governance Need',
-    description:
-      'Declare the problem, consequential action, required evidence, expected deliverable, budget, timing, and visibility.',
-    href: marketplaceActions.postNeed.href,
-    eyebrow: 'START HERE',
-    metric: 'Guided intake',
+      'Manage opportunity matches, responses, routes, governed records, readiness state, review history, and professional boundaries from one workspace.',
+    primaryLabel: 'Open dashboard',
+    primaryHref: MARKETPLACE_LINKS.dashboard,
+    secondaryLabel: 'View opportunities',
+    secondaryHref: MARKETPLACE_LINKS.opportunities,
+    state: 'CONNECTED',
   },
 ];
 
-const featuredActivity = [
+const workflow = [
   {
-    type: 'REVIEW',
-    title: 'Runtime Refusal Architecture Review',
-    detail: 'Passed with bounded corrections',
-    href: '/marketplace/reviews/runtime-refusal-architecture-review',
+    number: '01',
+    title: 'Need declared',
+    description: 'The requester states the problem, consequence, scope, evidence state, and desired result.',
   },
   {
-    type: 'ORGANIZATION',
-    title: 'Replay Integrity Lab',
-    detail: 'Execution verification laboratory',
-    href: '/marketplace/organizations/replay-integrity-lab',
+    number: '02',
+    title: 'Boundary preserved',
+    description: 'The request remains separate from certification, authority, execution, and unsupported claims.',
   },
   {
-    type: 'PROFESSIONAL',
-    title: 'Nina Patel',
-    detail: 'Independent governance reviewer',
-    href: '/marketplace/professionals/nina-patel',
+    number: '03',
+    title: 'Professionals respond',
+    description: 'Responders declare expertise, proposed scope, limitations, conflicts, and dependencies.',
   },
   {
-    type: 'RECORD',
-    title: 'Building Environmental Record',
-    detail: 'Daily governed environmental evidence',
-    href: '/marketplace/records/building-environmental-record',
-  },
-];
-
-const ecosystem = [
-  {
-    name: 'TA-14 AI Governance Registry',
-    responsibility:
-      'Register, preserve, version, and discover governance architectures.',
-    state: 'Separate product',
+    number: '04',
+    title: 'Work is selected',
+    description: 'A future live system will preserve selection, authorization, scope, identity, and payment state.',
   },
   {
-    name: 'TA-14 AI Governance Exchange',
-    responsibility:
-      'Build, evaluate, test, and preserve governed execution routes.',
-    state: 'Core platform',
+    number: '05',
+    title: 'Evidence is produced',
+    description: 'Routes, reviews, interpretations, findings, records, and outcomes remain inspectable.',
   },
   {
-    name: 'Marketplace',
-    responsibility:
-      'Connect architecture owners, reviewers, organizations, and governance needs.',
-    state: 'This product',
-  },
-  {
-    name: 'Partner Review Network',
-    responsibility:
-      'Provide independent bounded review, mapping, testing, and replication.',
-    state: 'Connected layer',
+    number: '06',
+    title: 'History remains',
+    description: 'Versions, challenges, corrections, boundaries, receipts, and final states remain attributable.',
   },
 ];
 
-function ArrowIcon() {
+export default function MarketplacePage() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none">
-      <path
-        d="M5 12h14M13 6l6 6-6 6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CheckIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none">
-      <path
-        d="m5 12.5 4 4L19 7"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function AlertIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none">
-      <path
-        d="M12 8v5M12 17.2v.1M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"
-        stroke="currentColor"
-        strokeWidth="1.6"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function GridIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none">
-      <path
-        d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z"
-        stroke="currentColor"
-        strokeWidth="1.5"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-export default function MarketplaceLandingPage() {
-  return (
-    <main className="marketplacePage">
-      <div className="backgroundLayer" aria-hidden="true">
-        <div className="glow glowOne" />
-        <div className="glow glowTwo" />
-        <div className="star starOne" />
-        <div className="star starTwo" />
-        <div className="star starThree" />
-        <div className="line lineOne" />
-        <div className="line lineTwo" />
+    <main className="page-shell">
+      <div className="cosmos" aria-hidden="true">
+        <span className="star star-one" />
+        <span className="star star-two" />
+        <span className="star star-three" />
+        <span className="star star-four" />
+        <span className="orbit orbit-one">
+          <span />
+        </span>
+        <span className="orbit orbit-two">
+          <span />
+        </span>
+        <span className="route-line route-one" />
+        <span className="route-line route-two" />
       </div>
 
-      <section className="heroSection">
-        <div className="pageShell">
-          <div className="heroGrid">
-            <div>
-              <span className="kicker">TA-14 AI GOVERNANCE EXCHANGE MARKETPLACE</span>
-              <h1>Where governance architectures find work, review, evidence, and collaborators.</h1>
-              <p className="heroLead">
-                The Marketplace connects organizations with governance
-                professionals, review entities, verification laboratories,
-                record institutions, implementation partners, and architecture
-                owners through declared scopes and preserved evidence.
-              </p>
-
-              <div className="heroActions">
-                <Link
-                  aria-label={marketplaceActions.postNeed.description}
-                  className="primaryButton"
-                  href={marketplaceActions.postNeed.href}
-                >
-                  Post a Governance Need
-                  <ArrowIcon />
-                </Link>
-                <a className="secondaryButton" href="#marketplace-categories">
-                  Explore the Marketplace
-                </a>
-              </div>
-
-              <div className="boundaryNotice">
-                <AlertIcon />
-                <span>
-                  The Marketplace structure is now visible, but live accounts,
-                  search, matching, messaging, evidence rooms, contracting,
-                  payment, licensing, reputation, and dispute workflows are not
-                  fully connected yet.
-                </span>
-              </div>
-            </div>
-
-            <aside className="heroPanel">
-              <div className="heroPanelHeader">
-                <span>MARKETPLACE MODEL</span>
-                <strong>Discover by declared role, scope, evidence, and review history.</strong>
-              </div>
-
-              {[
-                ['Professionals', 'Independent people and domain specialists'],
-                ['Organizations', 'Practices, labs, institutions, and review entities'],
-                ['Opportunities', 'Governance needs, work, licensing, and collaboration'],
-                ['Records', 'Governed evidence and interpretation offerings'],
-                ['Reviews', 'Bounded findings, gaps, and verification history'],
-                ['Engagement', 'Scoped contact, contracting, and delivery pathways'],
-              ].map(([title, description], index) => (
-                <div className="heroPanelRow" key={title}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <strong>{title}</strong>
-                  <small>{description}</small>
-                </div>
-              ))}
-            </aside>
+      <div className="content-shell">
+        <header className="hero">
+          <div className="hero-topline">
+            <span className="eyebrow">TA-14 Collaborative Governance Marketplace</span>
+            <span className="connection-badge">CORE WORKSPACES CONNECTED</span>
           </div>
-        </div>
-      </section>
 
-      <section className="sectionBlock sectionTint" id="marketplace-categories">
-        <div className="pageShell">
-          <div className="sectionHeading">
-            <div>
-              <span className="kicker">MARKETPLACE DIRECTORY</span>
-              <h2>Enter through the category that matches your need.</h2>
-            </div>
+          <h1>
+            Find the work.
+            <br />
+            Preserve the boundaries.
+          </h1>
+
+          <p className="hero-copy">
+            The TA-14 Marketplace is a governed coordination environment for people who need
+            review, interpretation, route design, evidence mapping, professional expertise, and
+            preserved governance work.
+          </p>
+
+          <div className="hero-boundary">
+            <strong>The Marketplace does not certify people, routes, records, or outcomes.</strong>
             <p>
-              Each Marketplace path preserves a different responsibility.
-              Professionals are not organizations. Reviews are not
-              certifications. Records are not diagnoses. Opportunities are not
-              execution authority.
+              It creates a visible pathway for declaring needs, qualifications, evidence,
+              limitations, scope, responses, work products, review history, and future commercial
+              relationships without confusing participation with authority.
             </p>
           </div>
 
-          <div className="categoryGrid">
-            {categories.map((category) => (
-              <Link className="categoryCard" href={category.href} key={category.title}>
-                <div className="categoryTopline">
-                  <span>{category.eyebrow}</span>
-                  <GridIcon />
-                </div>
-                <h3>{category.title}</h3>
-                <p>{category.description}</p>
-                <div className="categoryFooter">
-                  <span>{category.metric}</span>
-                  <strong>
-                    Open
-                    <ArrowIcon />
-                  </strong>
-                </div>
-              </Link>
-            ))}
+          <div className="action-row">
+            <Link className="primary-button" href={MARKETPLACE_LINKS.opportunities}>
+              Browse opportunities
+            </Link>
+            <Link className="secondary-button" href={MARKETPLACE_LINKS.postNeed}>
+              Post a governance need
+            </Link>
+            <Link className="text-link" href={MARKETPLACE_LINKS.professionals}>
+              Browse professionals
+            </Link>
           </div>
-        </div>
-      </section>
+        </header>
 
-      <section className="sectionBlock">
-        <div className="pageShell activityLayout">
-          <div>
-            <span className="kicker">MARKETPLACE ACTIVITY</span>
-            <h2>See what the ecosystem is preserving and reviewing.</h2>
+        <section className="marketplace-status" aria-label="Marketplace workspace status">
+          <article>
+            <span>Opportunity workspace</span>
+            <strong>CONNECTED</strong>
+          </article>
+          <article>
+            <span>Professional profiles</span>
+            <strong>CONNECTED</strong>
+          </article>
+          <article>
+            <span>Governed record requests</span>
+            <strong>CONNECTED</strong>
+          </article>
+          <article>
+            <span>Route Marketplace</span>
+            <strong>CONNECTED</strong>
+          </article>
+          <article>
+            <span>Professional dashboard</span>
+            <strong>CONNECTED</strong>
+          </article>
+          <article>
+            <span>Live backend services</span>
+            <strong>NOT YET CONNECTED</strong>
+          </article>
+        </section>
+
+        <section className="marketplace-grid-section">
+          <div className="section-intro">
+            <span className="eyebrow">MARKETPLACE WORKSPACES</span>
+            <h2>Every primary Marketplace pathway now has a destination.</h2>
             <p>
-              The live Marketplace will surface recent profiles, organizations,
-              open needs, record offerings, published reviews, and verified
-              activity. The current cards are demonstration records already
-              built into the Marketplace.
+              These workspaces are currently front-end demonstrations. They intentionally avoid
+              claiming live messaging, matching, identity verification, contracting, payment,
+              licensing, or data persistence.
             </p>
           </div>
 
-          <div className="activityList">
-            {featuredActivity.map((item) => (
-              <Link className="activityCard" href={item.href} key={item.title}>
-                <span>{item.type}</span>
-                <div>
-                  <strong>{item.title}</strong>
-                  <small>{item.detail}</small>
+          <div className="marketplace-grid">
+            {marketplaceAreas.map((area) => (
+              <article className="marketplace-card" key={area.title}>
+                <div className="card-topline">
+                  <span>{area.number}</span>
+                  <span className="card-state">{area.state}</span>
                 </div>
-                <ArrowIcon />
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
 
-      <section className="sectionBlock sectionTint">
-        <div className="pageShell">
-          <div className="sectionHeading">
-            <div>
-              <span className="kicker">HOW THE MARKETPLACE WORKS</span>
-              <h2>Bring the need. Declare the scope. Preserve the work.</h2>
-            </div>
-            <p>
-              The Marketplace should not begin with vague introductions. It
-              should begin with a declared governance need, consequential
-              action, evidence package, expected deliverable, and reviewable
-              engagement boundary.
-            </p>
-          </div>
+                <span className="eyebrow">{area.eyebrow}</span>
+                <h3>{area.title}</h3>
+                <p>{area.description}</p>
 
-          <div className="processGrid">
-            {[
-              ['01', 'Declare', 'State the problem, consequential action, evidence, boundaries, budget, and timing.'],
-              ['02', 'Discover', 'Find professionals, organizations, records, and reviewers by declared scope and evidence.'],
-              ['03', 'Match', 'Compare fit, conflicts, availability, methods, reviews, and proof boundaries.'],
-              ['04', 'Engage', 'Open a governed contact route with permissions, terms, deliverables, and accountability.'],
-              ['05', 'Deliver', 'Preserve submissions, versions, reviews, decisions, corrections, and final artifacts.'],
-              ['06', 'Verify', 'Publish or retain bounded evidence of what was reviewed, delivered, and concluded.'],
-            ].map(([number, title, description]) => (
-              <article className="processCard" key={number}>
-                <span>{number}</span>
-                <h3>{title}</h3>
-                <p>{description}</p>
+                <div className="card-actions">
+                  <Link className="card-primary" href={area.primaryHref}>
+                    {area.primaryLabel}
+                  </Link>
+                  <Link className="card-secondary" href={area.secondaryHref}>
+                    {area.secondaryLabel}
+                  </Link>
+                </div>
               </article>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="sectionBlock">
-        <div className="pageShell ecosystemPanel">
-          <div>
-            <span className="kicker">TA-14 ECOSYSTEM SEPARATION</span>
-            <h2>The Marketplace connects the products. It does not replace them.</h2>
+        <section className="workflow-section">
+          <div className="section-intro narrow">
+            <span className="eyebrow">GOVERNED MARKETPLACE SEQUENCE</span>
+            <h2>Commercial coordination should not erase admissibility.</h2>
             <p>
-              The TA-14 AI Governance Registry remains a separate future product
-              for permanent architecture registration, chronology, versions,
-              documents, and discovery. The Marketplace connects architecture
-              owners with work, review, licensing, services, and collaboration.
-            </p>
-
-            <div className="ecosystemList">
-              {ecosystem.map((item) => (
-                <div key={item.name}>
-                  <div>
-                    <strong>{item.name}</strong>
-                    <p>{item.responsibility}</p>
-                  </div>
-                  <span>{item.state}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <aside className="separationCard">
-            <span>PRODUCT BOUNDARY</span>
-            <h3>Registry and Marketplace remain distinct.</h3>
-            <div className="smallList">
-              {[
-                'Registry records what an architecture is and when it was registered.',
-                'Marketplace connects that architecture to people, organizations, work, review, and licensing.',
-                'Exchange evaluates specific governed execution routes.',
-                'Partner Review Network provides independent bounded review.',
-              ].map((item) => (
-                <div key={item}>
-                  <CheckIcon />
-                  <small>{item}</small>
-                </div>
-              ))}
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      <section className="sectionBlock sectionTint">
-        <div className="pageShell trustPanel">
-          <div>
-            <span className="kicker">MARKETPLACE TRUST MODEL</span>
-            <h2>Trust should follow preserved evidence, not profile language.</h2>
-            <p>
-              The Marketplace distinguishes registration, documentation,
-              identity verification, independent review, technical
-              verification, delivery history, and execution authority. No one
-              badge should silently imply all of them.
+              The Marketplace should preserve the difference between expressing a need, proposing
+              work, selecting a professional, authorizing a scope, producing evidence, and relying
+              on an outcome.
             </p>
           </div>
 
-          <div className="trustGrid">
-            {[
-              ['REGISTERED', 'A Marketplace profile or record exists.'],
-              ['DOCUMENTED', 'Supporting materials or methods were supplied.'],
-              ['IDENTITY VERIFIED', 'A person or organization identity was checked.'],
-              ['INDEPENDENTLY REVIEWED', 'A separate reviewer examined a declared scope.'],
-              ['TECHNICALLY VERIFIED', 'A specific replay, signature, continuity, or dependency check passed.'],
-              ['DELIVERED', 'A declared engagement produced preserved deliverables.'],
-            ].map(([state, description]) => (
-              <div key={state}>
-                <strong>{state}</strong>
-                <span>{description}</span>
-              </div>
+          <div className="workflow-grid">
+            {workflow.map((step) => (
+              <article key={step.number}>
+                <span>{step.number}</span>
+                <h3>{step.title}</h3>
+                <p>{step.description}</p>
+              </article>
             ))}
           </div>
-        </div>
-      </section>
+        </section>
 
-      <section className="sectionBlock">
-        <div className="pageShell ctaPanel">
-          <div>
-            <span className="kicker">START WITH THE NEED</span>
-            <h2>What governance work needs to be done?</h2>
-            <p>
-              Post the problem, consequential action, current evidence,
-              expected deliverable, desired reviewer or specialist, budget,
-              timing, visibility, and known conflicts. The Marketplace can then
-              route the need without pretending that every expert, record, or
-              organization is interchangeable.
-            </p>
+        <section className="architecture-section">
+          <div className="architecture-card">
+            <span className="eyebrow">WHAT THE MARKETPLACE PRESERVES</span>
+            <h2>A transaction is not the whole record.</h2>
 
-            <div className="requirementsGrid">
-              {[
-                'Governance need',
-                'Consequential action',
-                'Evidence available',
-                'Scope and exclusions',
-                'Expected deliverable',
-                'Budget and timing',
-                'Visibility preference',
-                'Known conflicts',
-              ].map((item) => (
-                <div key={item}>
-                  <CheckIcon />
-                  <span>{item}</span>
-                </div>
-              ))}
+            <div className="architecture-grid">
+              <article>
+                <span>Need identity</span>
+                <strong>Who requested what, when, and why?</strong>
+              </article>
+              <article>
+                <span>Scope identity</span>
+                <strong>What work was proposed, accepted, rejected, or changed?</strong>
+              </article>
+              <article>
+                <span>Evidence state</span>
+                <strong>What evidence existed, what was missing, and what changed?</strong>
+              </article>
+              <article>
+                <span>Professional identity</span>
+                <strong>Who performed the work, under which declared qualifications?</strong>
+              </article>
+              <article>
+                <span>Boundary identity</span>
+                <strong>What was explicitly outside the scope or authority?</strong>
+              </article>
+              <article>
+                <span>Outcome identity</span>
+                <strong>What was produced, reviewed, challenged, corrected, and preserved?</strong>
+              </article>
             </div>
           </div>
+        </section>
 
-          <div className="ctaActions">
-            <Link
-              aria-label={marketplaceActions.postNeed.description}
-              className="primaryButton"
-              href={marketplaceActions.postNeed.href}
-            >
-              Post a Governance Need
-              <ArrowIcon />
-            </Link>
-            <Link className="secondaryButton" href={marketplaceRoutes.reviews}>
-              Browse Independent Reviews
-            </Link>
-            <small>
-              Live matching and engagement workflows will be connected after
-              the Marketplace front-end architecture is complete.
-            </small>
-          </div>
-        </div>
-      </section>
-
-      <section className="finalSection">
-        <div className="pageShell finalPanel">
-          <div>
-            <span className="kicker">MARKETPLACE PRINCIPLE</span>
-            <h2>Others review slivers. TA-14 reviews the route.</h2>
-            <p>
-              The Marketplace is where governed architectures, bounded
-              professionals, independent reviewers, attributable organizations,
-              preserved records, and consequential needs become discoverable
-              without collapsing their responsibilities.
-            </p>
+        <section className="boundary-section">
+          <div className="boundary-heading">
+            <span className="eyebrow">PLATFORM BOUNDARIES</span>
+            <h2>Connected pages do not imply connected authority.</h2>
           </div>
 
-          <div className="finalActions">
-            <Link
-              aria-label={marketplaceActions.postNeed.description}
-              className="primaryButton"
-              href={marketplaceActions.postNeed.href}
-            >
-              Enter the Marketplace
-              <ArrowIcon />
-            </Link>
-            <Link className="secondaryButton" href="/">
-              Return to TA-14 Exchange
-            </Link>
+          <div className="boundary-grid">
+            <article>
+              <span>NO LIVE MATCHING</span>
+              <p>
+                Demonstration fit and opportunity states do not represent a live recommendation
+                engine or verified professional match.
+              </p>
+            </article>
+            <article>
+              <span>NO IDENTITY VERIFICATION</span>
+              <p>
+                Demonstration profiles and organizations are not authenticated, licensed,
+                certified, or independently verified.
+              </p>
+            </article>
+            <article>
+              <span>NO CONTRACTING</span>
+              <p>
+                Preview responses, invitations, and license requests do not create agreements,
+                obligations, authority, or commercial rights.
+              </p>
+            </article>
+            <article>
+              <span>NO PAYMENT PROCESSING</span>
+              <p>
+                Demonstration prices and commercial models do not process funds, escrow payments,
+                commissions, refunds, or Marketplace fees.
+              </p>
+            </article>
+            <article>
+              <span>NO CERTIFICATION</span>
+              <p>
+                Listings, records, routes, reviews, and profile metrics do not establish compliance,
+                certification, admissibility, or regulator acceptance.
+              </p>
+            </article>
+            <article>
+              <span>NO EXECUTION AUTHORITY</span>
+              <p>
+                The Marketplace may coordinate governance work, but it does not itself authorize
+                consequential execution.
+              </p>
+            </article>
           </div>
+        </section>
 
-          <div className="maxim">
-            No admissible evidence. No admissible execution.
+        <section className="final-cta">
+          <span className="eyebrow">THE MARKETPLACE FRONT DOOR IS CONNECTED</span>
+          <h2>Choose the path that matches the work you are trying to govern.</h2>
+          <p>
+            Browse opportunities, find a professional, request a governed record, inspect reusable
+            routes, or enter the professional dashboard. Each path now leads to a working
+            Marketplace workspace.
+          </p>
+
+          <div className="final-action-grid">
+            <Link href={MARKETPLACE_LINKS.opportunities}>Browse opportunities</Link>
+            <Link href={MARKETPLACE_LINKS.professionals}>Browse professionals</Link>
+            <Link href={MARKETPLACE_LINKS.governedRecords}>Governed record requests</Link>
+            <Link href={MARKETPLACE_LINKS.routes}>Route Marketplace</Link>
+            <Link href={MARKETPLACE_LINKS.dashboard}>Professional dashboard</Link>
+            <Link href={MARKETPLACE_LINKS.postNeed}>Post a governance need</Link>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
 
-      <style>{`
-        :root {
-          --bg: #041019;
-          --border: rgba(118, 213, 220, 0.2);
-          --border-strong: rgba(118, 213, 220, 0.42);
-          --text: #f3fbfc;
-          --muted: #a9c1c8;
-          --teal: #67e0df;
-          --blue: #62a9ff;
-          --gold: #ffd878;
-          --violet: #bca4ff;
-        }
-
-        * {
+      <style jsx>{`
+        :global(*) {
           box-sizing: border-box;
         }
 
-        html {
+        :global(html) {
           scroll-behavior: smooth;
         }
 
-        body {
+        :global(body) {
           margin: 0;
-          background: var(--bg);
+          color: #eef8ff;
+          background: #06111d;
         }
 
-        .marketplacePage {
-          position: relative;
+        :global(a) {
+          color: inherit;
+        }
+
+        .page-shell {
           min-height: 100vh;
+          position: relative;
           overflow: hidden;
-          color: var(--text);
           background:
-            radial-gradient(circle at 12% 8%, rgba(37, 185, 189, 0.15), transparent 30%),
-            radial-gradient(circle at 86% 18%, rgba(98, 169, 255, 0.12), transparent 28%),
-            linear-gradient(180deg, #031019 0%, #071821 54%, #031019 100%);
+            linear-gradient(rgba(4, 15, 26, 0.79), rgba(4, 15, 26, 0.97)),
+            radial-gradient(circle at 15% 4%, rgba(22, 139, 181, 0.18), transparent 34%),
+            radial-gradient(circle at 84% 8%, rgba(116, 72, 198, 0.14), transparent 31%);
         }
 
-        .marketplacePage::before {
-          content: '';
+        .content-shell {
+          width: min(1180px, calc(100% - 36px));
+          margin: 0 auto;
+          padding: 78px 0 96px;
+          position: relative;
+          z-index: 2;
+        }
+
+        .cosmos {
           position: fixed;
           inset: 0;
           pointer-events: none;
-          opacity: 0.22;
-          background-image:
-            linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-          background-size: 42px 42px;
-          mask-image: linear-gradient(to bottom, black, transparent 88%);
-        }
-
-        .backgroundLayer {
-          position: absolute;
-          inset: 0;
-          z-index: 0;
-          overflow: hidden;
-          pointer-events: none;
-        }
-
-        .glow {
-          position: absolute;
-          width: 390px;
-          height: 390px;
-          border-radius: 50%;
-          filter: blur(95px);
-          opacity: 0.13;
-          animation: glowPulse 9s ease-in-out infinite;
-        }
-
-        .glowOne {
-          top: 4%;
-          left: -130px;
-          background: var(--teal);
-        }
-
-        .glowTwo {
-          top: 40%;
-          right: -150px;
-          background: var(--violet);
-          animation-delay: 3s;
-        }
-
-        .line {
-          position: absolute;
-          height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(103, 224, 223, 0.58),
-            transparent
-          );
-          filter: drop-shadow(0 0 7px rgba(103, 224, 223, 0.35));
-          animation: lineMove 13s linear infinite;
-        }
-
-        .lineOne {
-          top: 13%;
-          left: -10%;
-          width: 46vw;
-          transform: rotate(17deg);
-        }
-
-        .lineTwo {
-          top: 58%;
-          right: -8%;
-          width: 38vw;
-          transform: rotate(-19deg);
-          animation-delay: -6s;
+          opacity: 0.72;
         }
 
         .star {
@@ -622,39 +407,94 @@ export default function MarketplaceLandingPage() {
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: white;
-          box-shadow: 0 0 12px white;
-          animation: twinkle 4.2s ease-in-out infinite;
+          background: #e8fbff;
+          box-shadow: 0 0 16px rgba(139, 229, 255, 0.95);
+          animation: drift 13s ease-in-out infinite;
         }
 
-        .starOne { top: 7%; left: 24%; }
-        .starTwo { top: 16%; right: 14%; animation-delay: 1.2s; }
-        .starThree { top: 44%; left: 7%; animation-delay: 2.4s; }
-
-        .pageShell {
-          position: relative;
-          z-index: 2;
-          width: min(1180px, calc(100% - 40px));
-          margin: 0 auto;
+        .star-one {
+          top: 13%;
+          left: 8%;
         }
 
-        .heroSection {
-          padding: 112px 0 104px;
+        .star-two {
+          top: 29%;
+          right: 11%;
+          animation-delay: -5s;
         }
 
-        .heroGrid {
-          display: grid;
-          grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.72fr);
-          gap: 58px;
-          align-items: center;
+        .star-three {
+          bottom: 24%;
+          left: 15%;
+          animation-delay: -9s;
         }
 
-        .kicker {
-          display: inline-flex;
-          color: var(--teal);
-          font-size: 0.74rem;
-          font-weight: 850;
-          letter-spacing: 0.16em;
+        .star-four {
+          bottom: 11%;
+          right: 17%;
+          animation-delay: -3s;
+        }
+
+        .orbit {
+          position: absolute;
+          width: 320px;
+          height: 320px;
+          border: 1px solid rgba(103, 205, 233, 0.12);
+          border-radius: 50%;
+          animation: rotate 32s linear infinite;
+        }
+
+        .orbit span {
+          position: absolute;
+          width: 9px;
+          height: 9px;
+          border-radius: 50%;
+          background: #84e7fa;
+          box-shadow: 0 0 20px rgba(99, 218, 242, 0.9);
+          left: 50%;
+          top: -5px;
+        }
+
+        .orbit-one {
+          right: -165px;
+          top: 5%;
+        }
+
+        .orbit-two {
+          left: -185px;
+          bottom: 12%;
+          width: 390px;
+          height: 390px;
+          animation-direction: reverse;
+        }
+
+        .route-line {
+          position: absolute;
+          width: 42vw;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(78, 204, 233, 0.34), transparent);
+          animation: pulse 7s ease-in-out infinite;
+        }
+
+        .route-one {
+          top: 24%;
+          left: -7%;
+          transform: rotate(-18deg);
+        }
+
+        .route-two {
+          right: -5%;
+          bottom: 22%;
+          transform: rotate(22deg);
+          animation-delay: -3s;
+        }
+
+        .eyebrow {
+          display: inline-block;
+          color: #72d8ef;
+          font-size: 0.75rem;
+          font-weight: 900;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
         }
 
@@ -665,736 +505,492 @@ export default function MarketplaceLandingPage() {
           margin-top: 0;
         }
 
-        h1 {
-          margin: 14px 0 24px;
-          font-size: clamp(3.35rem, 6.8vw, 7rem);
-          line-height: 0.94;
-          letter-spacing: -0.063em;
-          text-wrap: balance;
+        .hero {
+          max-width: 1040px;
+          padding-bottom: 60px;
         }
 
-        .heroLead {
-          max-width: 780px;
-          color: var(--muted);
-          font-size: clamp(1.05rem, 1.6vw, 1.28rem);
-          line-height: 1.75;
-        }
-
-        .heroActions,
-        .finalActions {
+        .hero-topline {
           display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          align-items: center;
           flex-wrap: wrap;
-          gap: 14px;
-          margin-top: 32px;
         }
 
-        .primaryButton,
-        .secondaryButton {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          min-height: 48px;
-          padding: 0 20px;
+        .connection-badge {
+          border: 1px solid rgba(80, 220, 164, 0.28);
           border-radius: 999px;
-          text-decoration: none;
-          font-size: 0.94rem;
-          font-weight: 800;
-          transition:
-            transform 180ms ease,
-            border-color 180ms ease,
-            background 180ms ease,
-            box-shadow 180ms ease;
-        }
-
-        .primaryButton {
-          color: #031114;
-          background: linear-gradient(135deg, var(--teal), #b2f7f1);
-          box-shadow: 0 12px 34px rgba(37, 185, 189, 0.24);
-        }
-
-        .secondaryButton {
-          color: var(--text);
-          border: 1px solid var(--border-strong);
-          background: rgba(10, 30, 42, 0.64);
-          backdrop-filter: blur(12px);
-        }
-
-        .primaryButton:hover,
-        .secondaryButton:hover {
-          transform: translateY(-2px);
-        }
-
-        .secondaryButton:hover {
-          border-color: var(--teal);
-          background: rgba(14, 42, 54, 0.9);
-        }
-
-        .boundaryNotice {
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
-          max-width: 760px;
-          margin-top: 28px;
-          padding: 14px 16px;
-          border: 1px solid rgba(255, 216, 120, 0.22);
-          border-radius: 14px;
-          color: #eadfbf;
-          background: rgba(255, 216, 120, 0.06);
-          font-size: 0.85rem;
-          line-height: 1.6;
-        }
-
-        .boundaryNotice svg {
-          flex: 0 0 auto;
-          margin-top: 2px;
-          color: var(--gold);
-        }
-
-        .heroPanel {
-          padding: 24px;
-          border: 1px solid var(--border-strong);
-          border-radius: 26px;
-          background:
-            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.13), transparent 30%),
-            linear-gradient(145deg, rgba(9, 32, 44, 0.92), rgba(4, 17, 25, 0.97));
-          box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
-        }
-
-        .heroPanelHeader {
-          display: grid;
-          gap: 6px;
-          margin-bottom: 20px;
-          padding-bottom: 18px;
-          border-bottom: 1px solid rgba(118, 213, 220, 0.15);
-        }
-
-        .heroPanelHeader span {
-          color: var(--teal);
-          font-size: 0.68rem;
-          font-weight: 850;
-          letter-spacing: 0.15em;
-        }
-
-        .heroPanelHeader strong {
-          line-height: 1.45;
-        }
-
-        .heroPanelRow {
-          display: grid;
-          grid-template-columns: 34px minmax(94px, auto) 1fr;
-          gap: 12px;
-          align-items: center;
-          padding: 13px 0;
-          border-bottom: 1px solid rgba(118, 213, 220, 0.09);
-        }
-
-        .heroPanelRow:last-child {
-          border-bottom: 0;
-        }
-
-        .heroPanelRow > span {
-          width: 30px;
-          height: 30px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          color: #031114;
-          background: var(--teal);
+          padding: 9px 12px;
+          color: #8af0c6;
+          background: rgba(42, 145, 103, 0.08);
           font-size: 0.7rem;
           font-weight: 900;
-        }
-
-        .heroPanelRow strong {
-          font-size: 0.86rem;
-        }
-
-        .heroPanelRow small {
-          color: var(--muted);
-          line-height: 1.45;
-        }
-
-        .sectionBlock {
-          position: relative;
-          padding: 105px 0;
-          scroll-margin-top: 70px;
-        }
-
-        .sectionTint {
-          border-top: 1px solid rgba(118, 213, 220, 0.08);
-          border-bottom: 1px solid rgba(118, 213, 220, 0.08);
-          background: linear-gradient(
-            180deg,
-            rgba(9, 28, 39, 0.66),
-            rgba(5, 18, 26, 0.45)
-          );
-        }
-
-        .sectionHeading {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(320px, 480px);
-          gap: 38px;
-          align-items: end;
-          margin-bottom: 48px;
-        }
-
-        .sectionHeading h2,
-        .activityLayout h2,
-        .ecosystemPanel h2,
-        .trustPanel h2,
-        .ctaPanel h2,
-        .finalPanel h2 {
-          margin: 10px 0 0;
-          font-size: clamp(2.3rem, 4.6vw, 4.9rem);
-          line-height: 1.04;
-          letter-spacing: -0.052em;
-          text-wrap: balance;
-        }
-
-        .sectionHeading p,
-        .activityLayout > div:first-child p,
-        .ecosystemPanel > div:first-child > p,
-        .trustPanel > div:first-child p,
-        .ctaPanel p,
-        .finalPanel p {
-          margin: 0;
-          color: var(--muted);
-          font-size: 1.03rem;
-          line-height: 1.75;
-        }
-
-        .categoryGrid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 16px;
-        }
-
-        .categoryCard {
-          display: grid;
-          min-height: 305px;
-          padding: 24px;
-          border: 1px solid var(--border);
-          border-radius: 20px;
-          color: var(--text);
-          text-decoration: none;
-          background:
-            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.08), transparent 28%),
-            linear-gradient(145deg, rgba(10, 31, 43, 0.84), rgba(4, 18, 27, 0.95));
-          box-shadow: 0 18px 46px rgba(0, 0, 0, 0.14);
-          transition:
-            transform 180ms ease,
-            border-color 180ms ease,
-            box-shadow 180ms ease;
-        }
-
-        .categoryCard:hover {
-          transform: translateY(-4px);
-          border-color: var(--border-strong);
-          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.22);
-        }
-
-        .categoryTopline {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 12px;
-        }
-
-        .categoryTopline span {
-          color: var(--teal);
-          font-size: 0.66rem;
-          font-weight: 850;
-          letter-spacing: 0.12em;
-        }
-
-        .categoryTopline svg {
-          color: var(--teal);
-        }
-
-        .categoryCard h3 {
-          margin: 44px 0 14px;
-          font-size: 1.55rem;
-          letter-spacing: -0.025em;
-        }
-
-        .categoryCard p {
-          margin: 0;
-          color: var(--muted);
-          line-height: 1.67;
-        }
-
-        .categoryFooter {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          align-items: center;
-          margin-top: auto;
-          padding-top: 24px;
-          border-top: 1px solid rgba(118, 213, 220, 0.1);
-        }
-
-        .categoryFooter > span {
-          color: #78959d;
-          font-size: 0.72rem;
-        }
-
-        .categoryFooter strong {
-          display: inline-flex;
-          align-items: center;
-          gap: 7px;
-          color: var(--teal);
-          font-size: 0.8rem;
-        }
-
-        .activityLayout {
-          display: grid;
-          grid-template-columns: minmax(0, 0.85fr) minmax(430px, 1.15fr);
-          gap: 58px;
-          align-items: start;
-        }
-
-        .activityLayout > div:first-child p {
-          margin-top: 20px;
-        }
-
-        .activityList {
-          display: grid;
-          gap: 12px;
-        }
-
-        .activityCard {
-          display: grid;
-          grid-template-columns: 100px 1fr auto;
-          gap: 15px;
-          align-items: center;
-          padding: 16px;
-          border: 1px solid rgba(118, 213, 220, 0.14);
-          border-radius: 14px;
-          color: var(--text);
-          text-decoration: none;
-          background: rgba(255, 255, 255, 0.018);
-          transition: border-color 180ms ease, transform 180ms ease;
-        }
-
-        .activityCard:hover {
-          transform: translateX(3px);
-          border-color: var(--border-strong);
-        }
-
-        .activityCard > span {
-          color: var(--gold);
-          font-size: 0.65rem;
-          font-weight: 850;
           letter-spacing: 0.09em;
         }
 
-        .activityCard > div {
+        h1 {
+          margin: 24px 0 24px;
+          font-size: clamp(3.4rem, 8vw, 7.4rem);
+          line-height: 0.92;
+          letter-spacing: -0.06em;
+        }
+
+        .hero-copy {
+          max-width: 840px;
+          color: #b8ced9;
+          font-size: 1.13rem;
+          line-height: 1.8;
+        }
+
+        .hero-boundary {
+          max-width: 890px;
+          margin-top: 28px;
+          border-left: 3px solid #dfba58;
+          border-radius: 0 16px 16px 0;
+          padding: 19px 21px;
+          background: rgba(205, 152, 31, 0.075);
+        }
+
+        .hero-boundary p {
+          margin: 7px 0 0;
+          color: #c4b88e;
+          line-height: 1.66;
+        }
+
+        .action-row {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 12px;
+          margin-top: 31px;
+        }
+
+        .primary-button,
+        .secondary-button {
+          border-radius: 999px;
+          padding: 14px 21px;
+          font-weight: 900;
+          text-decoration: none;
+          transition: transform 180ms ease;
+        }
+
+        .primary-button {
+          border: 1px solid #87e4f8;
+          color: #031019;
+          background: linear-gradient(135deg, #a5efff, #56cae7);
+          box-shadow: 0 12px 34px rgba(60, 191, 222, 0.18);
+        }
+
+        .secondary-button {
+          border: 1px solid rgba(147, 208, 227, 0.3);
+          color: #eaf9ff;
+          background: rgba(10, 29, 44, 0.82);
+        }
+
+        .primary-button:hover,
+        .secondary-button:hover {
+          transform: translateY(-2px);
+        }
+
+        .text-link {
+          color: #95cddd;
+          font-weight: 800;
+          text-decoration: none;
+        }
+
+        .marketplace-status {
           display: grid;
-          gap: 5px;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 10px;
+          padding-bottom: 82px;
         }
 
-        .activityCard small {
-          color: var(--muted);
+        .marketplace-status article {
+          min-height: 116px;
+          padding: 16px;
+          border: 1px solid rgba(103, 194, 218, 0.15);
+          border-radius: 18px;
+          background: rgba(9, 29, 44, 0.7);
         }
 
-        .activityCard > svg {
-          color: var(--teal);
+        .marketplace-status span {
+          display: block;
+          min-height: 39px;
+          color: #789aaa;
+          font-size: 0.72rem;
+          line-height: 1.35;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
         }
 
-        .processGrid {
+        .marketplace-status strong {
+          display: block;
+          margin-top: 20px;
+          color: #8cebc5;
+          font-size: 0.78rem;
+          line-height: 1.4;
+        }
+
+        .marketplace-status article:last-child strong {
+          color: #ffe19a;
+        }
+
+        .section-intro {
+          max-width: 900px;
+          margin-bottom: 30px;
+        }
+
+        .section-intro.narrow {
+          max-width: 820px;
+        }
+
+        .section-intro h2,
+        .boundary-heading h2 {
+          margin: 12px 0 16px;
+          font-size: clamp(2.3rem, 5vw, 4.6rem);
+          line-height: 1;
+          letter-spacing: -0.045em;
+        }
+
+        .section-intro p {
+          color: #a9bec8;
+          font-size: 1.04rem;
+          line-height: 1.74;
+        }
+
+        .marketplace-grid-section {
+          padding-bottom: 88px;
+        }
+
+        .marketplace-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 18px;
+        }
+
+        .marketplace-card {
+          display: flex;
+          flex-direction: column;
+          min-height: 370px;
+          padding: 27px;
+          border: 1px solid rgba(103, 194, 220, 0.17);
+          border-radius: 26px;
+          background:
+            linear-gradient(145deg, rgba(14, 38, 55, 0.93), rgba(7, 23, 36, 0.9));
+          box-shadow: 0 22px 56px rgba(0, 0, 0, 0.16);
+        }
+
+        .marketplace-card:last-child {
+          grid-column: span 2;
+          min-height: 310px;
+        }
+
+        .card-topline {
+          display: flex;
+          justify-content: space-between;
+          gap: 15px;
+          margin-bottom: 38px;
+          color: #7192a1;
+          font-size: 0.73rem;
+        }
+
+        .card-state {
+          color: #8cebc5;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+        }
+
+        .marketplace-card h3 {
+          margin: 11px 0 13px;
+          font-size: clamp(1.8rem, 3vw, 2.8rem);
+          letter-spacing: -0.035em;
+        }
+
+        .marketplace-card p {
+          max-width: 680px;
+          color: #a5bbc6;
+          line-height: 1.7;
+        }
+
+        .card-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+          margin-top: auto;
+          padding-top: 28px;
+        }
+
+        .card-primary,
+        .card-secondary {
+          border-radius: 999px;
+          padding: 12px 16px;
+          font-size: 0.88rem;
+          font-weight: 900;
+          text-decoration: none;
+        }
+
+        .card-primary {
+          color: #04121a;
+          background: #76dcef;
+        }
+
+        .card-secondary {
+          border: 1px solid rgba(132, 203, 223, 0.25);
+          color: #dff7ff;
+          background: rgba(255, 255, 255, 0.025);
+        }
+
+        .workflow-section {
+          padding-bottom: 88px;
+        }
+
+        .workflow-grid {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 16px;
+          gap: 13px;
         }
 
-        .processCard {
-          min-height: 245px;
+        .workflow-grid article {
+          min-height: 220px;
           padding: 22px;
-          border: 1px solid var(--border);
-          border-radius: 18px;
-          background: linear-gradient(
-            145deg,
-            rgba(10, 31, 43, 0.8),
-            rgba(4, 18, 27, 0.94)
-          );
+          border: 1px solid rgba(103, 194, 220, 0.15);
+          border-radius: 21px;
+          background: rgba(10, 30, 45, 0.72);
         }
 
-        .processCard > span {
-          display: grid;
-          place-items: center;
-          width: 38px;
-          height: 38px;
-          border-radius: 50%;
-          color: #031114;
-          background: var(--teal);
-          font-size: 0.72rem;
-          font-weight: 900;
+        .workflow-grid > article > span {
+          color: #5ed0e9;
+          font-size: 0.75rem;
         }
 
-        .processCard h3 {
-          margin: 36px 0 11px;
-          font-size: 1.3rem;
+        .workflow-grid h3 {
+          margin: 44px 0 11px;
+          font-size: 1.35rem;
         }
 
-        .processCard p {
-          margin: 0;
-          color: var(--muted);
-          line-height: 1.65;
+        .workflow-grid p {
+          color: #95acb7;
+          line-height: 1.62;
         }
 
-        .ecosystemPanel {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.45fr);
-          gap: 42px;
-          align-items: start;
+        .architecture-section {
+          padding-bottom: 88px;
         }
 
-        .ecosystemPanel > div:first-child > p {
-          margin-top: 20px;
-        }
-
-        .ecosystemList {
-          display: grid;
-          gap: 10px;
-          margin-top: 28px;
-        }
-
-        .ecosystemList > div {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 18px;
-          align-items: center;
-          padding: 15px;
-          border: 1px solid rgba(118, 213, 220, 0.12);
-          border-radius: 13px;
-          background: rgba(255, 255, 255, 0.018);
-        }
-
-        .ecosystemList > div > div {
-          display: grid;
-          gap: 5px;
-        }
-
-        .ecosystemList p {
-          margin: 0;
-          color: var(--muted);
-          font-size: 0.8rem;
-          line-height: 1.5;
-        }
-
-        .ecosystemList > div > span {
-          color: var(--gold);
-          font-size: 0.67rem;
-          font-weight: 850;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .separationCard {
-          padding: 24px;
-          border: 1px solid rgba(188, 164, 255, 0.22);
-          border-radius: 22px;
-          background:
-            radial-gradient(circle at 0 0, rgba(188, 164, 255, 0.12), transparent 30%),
-            linear-gradient(145deg, rgba(22, 23, 45, 0.88), rgba(4, 18, 27, 0.96));
-        }
-
-        .separationCard > span {
-          color: #d7c9ff;
-          font-size: 0.68rem;
-          font-weight: 850;
-          letter-spacing: 0.12em;
-        }
-
-        .separationCard h3 {
-          margin: 12px 0 20px;
-          font-size: 1.55rem;
-          line-height: 1.2;
-        }
-
-        .smallList {
-          display: grid;
-          gap: 12px;
-        }
-
-        .smallList > div {
-          display: flex;
-          gap: 9px;
-          align-items: flex-start;
-          color: #dcebed;
-        }
-
-        .smallList svg {
-          flex: 0 0 auto;
-          margin-top: 2px;
-          color: var(--teal);
-        }
-
-        .smallList small {
-          line-height: 1.55;
-        }
-
-        .trustPanel {
-          display: grid;
-          grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
-          gap: 50px;
-          align-items: start;
-        }
-
-        .trustPanel > div:first-child p {
-          margin-top: 20px;
-        }
-
-        .trustGrid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-        }
-
-        .trustGrid > div {
-          display: grid;
-          gap: 7px;
-          padding: 14px;
-          border: 1px solid rgba(118, 213, 220, 0.13);
-          border-radius: 13px;
-          background: rgba(255, 255, 255, 0.018);
-        }
-
-        .trustGrid strong {
-          color: var(--gold);
-          font-size: 0.68rem;
-          letter-spacing: 0.08em;
-        }
-
-        .trustGrid span {
-          color: #d8cfb9;
-          font-size: 0.76rem;
-          line-height: 1.5;
-        }
-
-        .ctaPanel {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
-          gap: 44px;
-          align-items: center;
-          padding: 34px;
-          border: 1px solid var(--border-strong);
-          border-radius: 28px;
-          background:
-            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.12), transparent 26%),
-            linear-gradient(145deg, rgba(9, 32, 44, 0.9), rgba(4, 17, 25, 0.96));
-        }
-
-        .ctaPanel p {
-          margin-top: 18px;
-        }
-
-        .requirementsGrid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-          margin-top: 26px;
-        }
-
-        .requirementsGrid > div {
-          display: flex;
-          gap: 9px;
-          align-items: center;
-          padding: 11px 12px;
-          border: 1px solid rgba(118, 213, 220, 0.12);
-          border-radius: 11px;
-          background: rgba(255, 255, 255, 0.018);
-          color: #dcebed;
-          font-size: 0.78rem;
-        }
-
-        .requirementsGrid svg {
-          flex: 0 0 auto;
-          color: var(--teal);
-        }
-
-        .ctaActions {
-          display: grid;
-          gap: 12px;
-          align-content: center;
-        }
-
-        .ctaActions .primaryButton,
-        .ctaActions .secondaryButton {
-          width: 100%;
-        }
-
-        .ctaActions small {
-          color: #8fa8ae;
-          line-height: 1.55;
-          text-align: center;
-        }
-
-        .finalSection {
-          padding: 60px 0 80px;
-        }
-
-        .finalPanel {
-          display: grid;
-          gap: 30px;
-          padding: 42px;
-          border: 1px solid var(--border-strong);
+        .architecture-card {
+          padding: clamp(28px, 5vw, 54px);
+          border: 1px solid rgba(116, 204, 227, 0.18);
           border-radius: 30px;
           background:
-            radial-gradient(circle at 86% 12%, rgba(98, 169, 255, 0.13), transparent 32%),
-            radial-gradient(circle at 10% 88%, rgba(103, 224, 223, 0.12), transparent 32%),
-            linear-gradient(145deg, rgba(8, 30, 42, 0.95), rgba(3, 15, 23, 0.98));
+            radial-gradient(circle at top left, rgba(48, 171, 204, 0.1), transparent 42%),
+            linear-gradient(145deg, rgba(14, 38, 55, 0.95), rgba(7, 23, 36, 0.92));
         }
 
-        .finalPanel p {
-          max-width: 860px;
-          margin-top: 18px;
+        .architecture-card h2 {
+          max-width: 850px;
+          margin: 13px 0 30px;
+          font-size: clamp(2.3rem, 5vw, 4.5rem);
+          letter-spacing: -0.045em;
         }
 
-        .maxim {
-          padding-top: 24px;
-          border-top: 1px solid rgba(118, 213, 220, 0.14);
-          color: var(--teal);
-          font-size: 0.84rem;
-          font-weight: 850;
-          letter-spacing: 0.14em;
+        .architecture-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .architecture-grid article {
+          min-height: 150px;
+          padding: 19px;
+          border: 1px solid rgba(111, 198, 221, 0.13);
+          border-radius: 18px;
+          background: rgba(255, 255, 255, 0.022);
+        }
+
+        .architecture-grid span {
+          display: block;
+          color: #7798a7;
+          font-size: 0.7rem;
           text-transform: uppercase;
+          letter-spacing: 0.08em;
         }
 
-        @keyframes glowPulse {
+        .architecture-grid strong {
+          display: block;
+          margin-top: 36px;
+          line-height: 1.47;
+        }
+
+        .boundary-section {
+          padding-bottom: 82px;
+        }
+
+        .boundary-heading {
+          max-width: 840px;
+          margin-bottom: 30px;
+        }
+
+        .boundary-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .boundary-grid article {
+          border-left: 3px solid #dfba58;
+          border-radius: 0 17px 17px 0;
+          padding: 20px;
+          background: rgba(205, 152, 31, 0.07);
+        }
+
+        .boundary-grid span {
+          color: #e5c66d;
+          font-size: 0.71rem;
+          font-weight: 900;
+          letter-spacing: 0.09em;
+        }
+
+        .boundary-grid p {
+          margin: 12px 0 0;
+          color: #bcb28e;
+          line-height: 1.62;
+        }
+
+        .final-cta {
+          padding: clamp(34px, 6vw, 66px);
+          border: 1px solid rgba(117, 205, 228, 0.19);
+          border-radius: 32px;
+          text-align: center;
+          background:
+            radial-gradient(circle at top, rgba(56, 173, 205, 0.11), transparent 48%),
+            rgba(10, 30, 46, 0.84);
+        }
+
+        .final-cta h2 {
+          max-width: 920px;
+          margin: 13px auto 17px;
+          font-size: clamp(2.3rem, 5vw, 4.7rem);
+          line-height: 1;
+          letter-spacing: -0.045em;
+        }
+
+        .final-cta p {
+          max-width: 810px;
+          margin: 0 auto;
+          color: #aabec9;
+          line-height: 1.75;
+        }
+
+        .final-action-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 11px;
+          margin-top: 32px;
+        }
+
+        .final-action-grid a {
+          border: 1px solid rgba(126, 207, 228, 0.22);
+          border-radius: 16px;
+          padding: 15px;
+          color: #dcf7ff;
+          background: rgba(255, 255, 255, 0.025);
+          font-weight: 900;
+          text-decoration: none;
+        }
+
+        .final-action-grid a:hover {
+          border-color: rgba(126, 207, 228, 0.52);
+          background: rgba(82, 190, 219, 0.08);
+        }
+
+        @keyframes drift {
           0%,
           100% {
-            opacity: 0.09;
-            transform: scale(0.92);
+            transform: translate3d(0, 0, 0) scale(0.9);
+            opacity: 0.46;
           }
           50% {
-            opacity: 0.17;
-            transform: scale(1.08);
-          }
-        }
-
-        @keyframes lineMove {
-          0% {
-            opacity: 0;
-            translate: -12% 0;
-          }
-          20%,
-          80% {
-            opacity: 0.72;
-          }
-          100% {
-            opacity: 0;
-            translate: 38% 0;
-          }
-        }
-
-        @keyframes twinkle {
-          0%,
-          100% {
-            opacity: 0.25;
-            transform: scale(0.8);
-          }
-          50% {
+            transform: translate3d(18px, -22px, 0) scale(1.35);
             opacity: 1;
-            transform: scale(1.35);
           }
         }
 
-        @media (max-width: 1020px) {
-          .heroGrid,
-          .sectionHeading,
-          .activityLayout,
-          .ecosystemPanel,
-          .trustPanel,
-          .ctaPanel {
-            grid-template-columns: 1fr;
+        @keyframes rotate {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 0.2;
+          }
+          50% {
+            opacity: 0.78;
+          }
+        }
+
+        @media (max-width: 1060px) {
+          .marketplace-status {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
           }
 
-          .categoryGrid,
-          .processGrid {
+          .architecture-grid,
+          .boundary-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
 
-        @media (max-width: 760px) {
-          .pageShell {
-            width: min(100% - 24px, 1180px);
-          }
-
-          .heroSection {
-            padding: 78px 0 86px;
-          }
-
-          .sectionBlock {
-            padding: 78px 0;
-          }
-
-          .categoryGrid,
-          .processGrid,
-          .trustGrid,
-          .requirementsGrid {
+        @media (max-width: 780px) {
+          .marketplace-grid,
+          .workflow-grid,
+          .architecture-grid,
+          .boundary-grid,
+          .final-action-grid {
             grid-template-columns: 1fr;
           }
 
-          .heroPanelRow {
-            grid-template-columns: 32px 1fr;
+          .marketplace-card:last-child {
+            grid-column: auto;
           }
 
-          .heroPanelRow small {
-            grid-column: 2;
-          }
-
-          .activityCard {
-            grid-template-columns: 82px 1fr auto;
-          }
-
-          .ecosystemList > div {
-            grid-template-columns: 1fr;
-          }
-
-          .ctaPanel,
-          .finalPanel {
-            padding: 28px 22px;
+          .marketplace-card {
+            min-height: 330px;
           }
         }
 
-        @media (max-width: 520px) {
-          h1 {
-            font-size: clamp(2.8rem, 16vw, 4.3rem);
+        @media (max-width: 600px) {
+          .content-shell {
+            width: min(100% - 24px, 1180px);
+            padding-top: 52px;
           }
 
-          .heroActions,
-          .finalActions {
+          .marketplace-status {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .hero-topline {
+            align-items: flex-start;
             flex-direction: column;
-            align-items: stretch;
-          }
-
-          .primaryButton,
-          .secondaryButton {
-            width: 100%;
-          }
-
-          .activityCard {
-            grid-template-columns: 1fr auto;
-          }
-
-          .activityCard > span {
-            grid-column: 1 / -1;
-          }
-
-          .categoryCard {
-            min-height: 285px;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          *,
-          *::before,
-          *::after {
-            scroll-behavior: auto !important;
-            animation-duration: 0.001ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.001ms !important;
+          :global(html) {
+            scroll-behavior: auto;
+          }
+
+          .star,
+          .orbit,
+          .route-line {
+            animation: none;
+          }
+
+          .primary-button,
+          .secondary-button {
+            transition: none;
           }
         }
       `}</style>
