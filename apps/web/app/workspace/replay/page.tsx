@@ -3,6 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+const WORKSPACE_ROUTES = {
+  verify: "/workspace/verify",
+  receipts: "/workspace/receipts",
+  registry: "/workspace/registry",
+} as const;
+
 type ReplayState = "READY" | "INCOMPLETE" | "DIVERGENT" | "REVOKED";
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 
@@ -37,12 +43,12 @@ type ReplayPackage = {
 
 const packages: ReplayPackage[] = [
   {
-    replayId: "TA14-REPLAY-72A91F",
-    routeId: "TA14-RID-VP-0042",
+    replayId: "TA-14-REPLAY-72A91F",
+    routeId: "TA-14-RID-VP-0042",
     routeName: "Governed Vendor Payment",
     routeVersion: "3.1.0",
-    receiptId: "TA14-RCPT-7C3A19",
-    executionId: "TA14-EXEC-45B01E",
+    receiptId: "TA-14-RCPT-7C3A19",
+    executionId: "TA-14-EXEC-45B01E",
     state: "READY",
     decision: "ALLOW",
     createdAt: "2026-07-17T18:22:00.000Z",
@@ -102,12 +108,12 @@ const packages: ReplayPackage[] = [
     ],
   },
   {
-    replayId: "TA14-REPLAY-219C4D",
-    routeId: "TA14-RID-AI-0018",
+    replayId: "TA-14-REPLAY-219C4D",
+    routeId: "TA-14-RID-AI-0018",
     routeName: "Bounded AI Agent Action",
     routeVersion: "1.4.2",
-    receiptId: "TA14-RCPT-4B88E1",
-    executionId: "TA14-EXEC-0087AA",
+    receiptId: "TA-14-RCPT-4B88E1",
+    executionId: "TA-14-EXEC-0087AA",
     state: "DIVERGENT",
     decision: "HOLD",
     createdAt: "2026-07-17T17:52:00.000Z",
@@ -167,11 +173,11 @@ const packages: ReplayPackage[] = [
     ],
   },
   {
-    replayId: "TA14-REPLAY-CC5210",
-    routeId: "TA14-RID-HVAC-0009",
+    replayId: "TA-14-REPLAY-CC5210",
+    routeId: "TA-14-RID-HVAC-0009",
     routeName: "Analyzer-Governed Refrigerant Intervention",
     routeVersion: "2.0.0",
-    receiptId: "TA14-RCPT-2E913F",
+    receiptId: "TA-14-RCPT-2E913F",
     executionId: "UNKNOWN",
     state: "INCOMPLETE",
     decision: "ESCALATE",
@@ -299,7 +305,7 @@ export default function ReplayConsolePage() {
   );
 
   const replayReport = {
-    schema: "TA14_REPLAY_REPORT_V1",
+    schema: "TA_14_REPLAY_REPORT_V1",
     generatedAt: new Date().toISOString(),
     replay: selected,
     correspondence: {
@@ -417,6 +423,16 @@ export default function ReplayConsolePage() {
 
         .button:hover, .button-secondary:hover, .small-button:hover {
           transform: translateY(-2px);
+        }
+
+        .button:focus-visible,
+        .button-secondary:focus-visible,
+        .small-button:focus-visible,
+        .replay-row:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+          outline: 3px solid rgba(104, 232, 251, .72);
+          outline-offset: 4px;
         }
 
         .button {
@@ -728,13 +744,13 @@ export default function ReplayConsolePage() {
             </p>
 
             <div className="hero-actions">
-              <Link className="button" href="/workspace/verify">
+              <Link className="button" href={WORKSPACE_ROUTES.verify}>
                 Verify a package
               </Link>
-              <Link className="button-secondary" href="/workspace/receipts">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.receipts}>
                 Open receipt vault
               </Link>
-              <Link className="button-secondary" href="/workspace/registry">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.registry}>
                 Open registry
               </Link>
             </div>
@@ -827,7 +843,14 @@ export default function ReplayConsolePage() {
               <span className={`pill ${selected.state}`}>{selected.state}</span>
             </div>
 
-            <div className="progress">
+            <div
+              aria-label="Replay correspondence"
+              aria-valuemax={100}
+              aria-valuemin={0}
+              aria-valuenow={correspondence}
+              className="progress"
+              role="progressbar"
+            >
               <div style={{ width: `${correspondence}%` }} />
             </div>
 
@@ -843,7 +866,14 @@ export default function ReplayConsolePage() {
                     <span className="stage-label">Observed</span>
                     <div className="stage-value">{step.observed}</div>
                   </div>
-                  <div className={`match ${step.matches ? "yes" : "no"}`}>
+                  <div
+                    aria-label={
+                      step.matches
+                        ? `${step.stage} corresponds`
+                        : `${step.stage} does not correspond`
+                    }
+                    className={`match ${step.matches ? "yes" : "no"}`}
+                  >
                     {step.matches ? "✓" : "!"}
                   </div>
                 </article>
@@ -879,7 +909,7 @@ export default function ReplayConsolePage() {
               >
                 Download report
               </button>
-              <Link className="small-button" href="/workspace/verify">
+              <Link className="small-button" href={WORKSPACE_ROUTES.verify}>
                 Verify package
               </Link>
             </div>
