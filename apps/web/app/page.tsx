@@ -66,7 +66,7 @@ const playgrounds = [
     badge: "AI",
     title: "AI Governance",
     text: "Build, test, correct, and verify consequential AI routes across identity, delegated authority, evidence, tools, payloads, commitments, execution, and outcome.",
-    href: "/workspace",
+    href: "/workspace/ai-governance",
     action: "Enter AI Governance",
     bullets: [
       "AI agents",
@@ -546,7 +546,7 @@ export default function HomePage() {
           <div className="map-connector">↓</div>
           <div className="map-workspaces">
             {playgrounds.map((item, index) => (
-              <Link
+              <a
                 className="gateway-link"
                 href={item.href}
                 key={item.title}
@@ -594,7 +594,7 @@ export default function HomePage() {
                     <b>→</b>
                   </span>
                 </article>
-              </Link>
+              </a>
             ))}
           </div>
           <div className="map-connector">↓</div>
@@ -1015,6 +1015,14 @@ export default function HomePage() {
             preserves the route that made the event admissible—or the exact
             reasons it was held, denied, or escalated.
           </p>
+        </div>
+        <div className="governed-records-entry">
+          <a className="button primary" href="/workspace/governed-records">
+            Enter Governed Records
+          </a>
+          <a className="button secondary" href="/workspace/governed-records/build">
+            Build the Record
+          </a>
         </div>
         <div className="comparison-grid">
           <article className="ordinary">
@@ -2736,6 +2744,13 @@ export default function HomePage() {
         }
         .surface-grid h3 {
           margin-top: 38px;
+        }
+        .governed-records-entry {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 12px;
+          margin: -10px 0 28px;
         }
         .comparison-grid {
           display: grid;
