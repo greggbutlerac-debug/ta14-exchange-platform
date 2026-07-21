@@ -1,4 +1,4 @@
-/* TA-14 ANIMATED HOMEPAGE V7 - POLISHED LINKS + PARTNER PRICING ROUTE - 2026-07-21 */
+/* TA-14 ANIMATED HOMEPAGE V9 - CLICKABLE MAP + CLEAN CHAIN + PARTNER ROUTING - 2026-07-21 */
 "use client";
 
 import Link from "next/link";
@@ -355,14 +355,35 @@ export default function HomePage() {
         </button>
 
         <nav className={mobileMenuOpen ? "main-nav open" : "main-nav"}>
-          <a href="#start" onClick={() => setMobileMenuOpen(false)}>Start Here</a>
-          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Exchange Map</a>
-          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Workspaces</a>
-          <a href="#results" onClick={() => setMobileMenuOpen(false)}>Results</a>
-          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>Route Gallery</a>
-          <a href="#partner-review-network" onClick={() => setMobileMenuOpen(false)}>Partner Network</a>
-          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
-          <Link className="nav-cta" href="/workspace" onClick={() => setMobileMenuOpen(false)}>
+          <a href="#start" onClick={() => setMobileMenuOpen(false)}>
+            Start Here
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Exchange Map
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Workspaces
+          </a>
+          <a href="#results" onClick={() => setMobileMenuOpen(false)}>
+            Results
+          </a>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>
+            Route Gallery
+          </a>
+          <a
+            href="#partner-review-network"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Partner Network
+          </a>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
+            Sign In
+          </Link>
+          <Link
+            className="nav-cta"
+            href="/workspace"
+            onClick={() => setMobileMenuOpen(false)}
+          >
             Open Workspace
           </Link>
         </nav>
@@ -490,22 +511,38 @@ export default function HomePage() {
         </div>
 
         <div className="map-board">
-          <div className="map-node top-node">
+          <a
+            className="map-node map-node-link top-node"
+            href="#main-content"
+            aria-label="Return to the TA-14 AI Governance Exchange front gate"
+          >
             <small>Front gate</small>
             <strong>TA-14 AI Governance Exchange</strong>
             <span>
               Understand the institution and the complete governing chain.
             </span>
+            <b className="map-node-action">
+              Return to the front gate <i>↑</i>
+            </b>
+          </a>
+          <div className="map-connector" aria-hidden="true">
+            ↓
           </div>
-          <div className="map-connector">↓</div>
-          <div className="map-node middle-node">
+          <a
+            className="map-node map-node-link middle-node"
+            href="#start"
+            aria-label="Open Start Here and the Workspace Directory"
+          >
             <small>Visitor center</small>
             <strong>Start Here + Workspace Directory</strong>
             <span>
               Learn the journey, choose the evidence class, and enter the right
               workspace.
             </span>
-          </div>
+            <b className="map-node-action">
+              Open Start Here <i>→</i>
+            </b>
+          </a>
           <div className="map-connector">↓</div>
           <div className="map-workspaces">
             {playgrounds.map((item, index) => (
@@ -585,15 +622,22 @@ export default function HomePage() {
             remain admissible together.
           </p>
         </div>
-        <div className="chain-row">
+        <div className="ta14-chain-track" aria-label="TA-14 governing chain">
           {chain.map((stage, index) => (
-            <div key={stage}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
+            <div className="ta14-chain-stage" key={stage}>
+              <span className="ta14-chain-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
               <strong>{stage}</strong>
+              {index < chain.length - 1 ? (
+                <i className="ta14-chain-arrow" aria-hidden="true">
+                  →
+                </i>
+              ) : null}
             </div>
           ))}
         </div>
-        <div className="three-principles">
+        <div className="ta14-principles-grid">
           <article>
             <span>◇</span>
             <h3>Build</h3>
@@ -1027,33 +1071,39 @@ export default function HomePage() {
         <div className="partner-network-shell">
           <div className="partner-network-copy">
             <p className="eyebrow">TA-14 Partner Review Network</p>
-            <h2>Do you believe your governance can stand up to bounded review?</h2>
+            <h2>
+              Do you believe your governance can stand up to bounded review?
+            </h2>
             <p className="partner-lead">
               The Partner Review Network is for governance organizations,
-              evidence specialists, cybersecurity teams, controls
-              professionals, runtime systems, and domain experts that can
-              perform consequence-bearing review within clearly declared
-              boundaries.
+              evidence specialists, cybersecurity teams, controls professionals,
+              runtime systems, and domain experts that can perform
+              consequence-bearing review within clearly declared boundaries.
             </p>
             <p>
               Applicants are evaluated for demonstrated governance discipline,
               evidence practices, declared scope, review boundaries, and their
-              ability to preserve uncertainty rather than conceal it.
-              Acceptance is never automatic and cannot be purchased.
+              ability to preserve uncertainty rather than conceal it. Acceptance
+              is never automatic and cannot be purchased.
             </p>
             <div className="partner-actions">
-              <Link className="button primary" href="/workspace/entity-review">
-                Learn How the Network Works
+              <Link
+                className="button primary"
+                href="/workspace/entity-review/partner-review-network/pricing"
+              >
+                Explore Qualification & Pricing
               </Link>
               <Link
                 className="button secondary partner-apply-button"
                 href="/workspace/entity-review/partner-review-network/pricing"
               >
-                Review Qualification Options
+                Begin Partner Qualification
               </Link>
             </div>
             <p className="partner-route-note">
-              Continue to the Partner Review Network pricing and qualification page to review the fee, readiness requirements, and submission process.
+              Continue to the Partner Review Network pricing and qualification
+              page to review the fee, readiness requirements, and submission
+              process.
             </p>
             <p className="partner-boundary">
               Application requirements, review terms, and any applicable fees
@@ -1063,7 +1113,10 @@ export default function HomePage() {
             </p>
           </div>
 
-          <aside className="partner-network-panel" aria-label="Partner Review Network process">
+          <aside
+            className="partner-network-panel"
+            aria-label="Partner Review Network process"
+          >
             <p className="eyebrow">Bounded participation</p>
             <ol>
               <li>
@@ -1077,21 +1130,27 @@ export default function HomePage() {
                 <span>02</span>
                 <div>
                   <strong>Submit supporting material</strong>
-                  <p>Provide evidence of methods, boundaries, and prior work.</p>
+                  <p>
+                    Provide evidence of methods, boundaries, and prior work.
+                  </p>
                 </div>
               </li>
               <li>
                 <span>03</span>
                 <div>
                   <strong>Receive bounded evaluation</strong>
-                  <p>TA-14 reviews the material without guaranteeing acceptance.</p>
+                  <p>
+                    TA-14 reviews the material without guaranteeing acceptance.
+                  </p>
                 </div>
               </li>
               <li>
                 <span>04</span>
                 <div>
                   <strong>Enter an approved lane</strong>
-                  <p>Accepted participants work only within declared authority.</p>
+                  <p>
+                    Accepted participants work only within declared authority.
+                  </p>
                 </div>
               </li>
             </ol>
@@ -1200,19 +1259,34 @@ export default function HomePage() {
         </div>
         <div>
           <h3>Exchange</h3>
-          <a href="#start" onClick={() => setMobileMenuOpen(false)}>Start Here</a>
-          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Exchange Map</a>
-          <a href="#map" onClick={() => setMobileMenuOpen(false)}>Workspaces</a>
+          <a href="#start" onClick={() => setMobileMenuOpen(false)}>
+            Start Here
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Exchange Map
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Workspaces
+          </a>
           <a href="#results">Results Exchange</a>
-          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>Route Gallery</a>
-          <a href="#partner-review-network" onClick={() => setMobileMenuOpen(false)}>Partner Review Network</a>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>
+            Route Gallery
+          </a>
+          <a
+            href="#partner-review-network"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Partner Review Network
+          </a>
         </div>
         <div>
           <h3>Operate</h3>
           <Link href="/workspace">Open Workspace</Link>
           <Link href="/workspace/governed-records">Governed Records</Link>
           <Link href="/workspace/entity-review">Entity Review Center</Link>
-          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>Sign In</Link>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
+            Sign In
+          </Link>
         </div>
         <div>
           <h3>Contact</h3>
@@ -1938,7 +2012,7 @@ export default function HomePage() {
         .comparison-grid article,
         .domain-grid article,
         .built-grid article,
-        .three-principles article {
+        .ta14-principles-grid article {
           border: 1px solid rgba(149, 174, 216, 0.14);
           border-radius: 18px;
           background: rgba(10, 16, 29, 0.68);
@@ -2015,6 +2089,54 @@ export default function HomePage() {
           color: #8492a8;
           font-size: 0.86rem;
         }
+        .map-node-link {
+          position: relative;
+          display: block;
+          color: inherit;
+          text-decoration: none;
+          cursor: pointer;
+          overflow: hidden;
+          box-shadow: 0 16px 50px rgba(0, 0, 0, 0.24);
+          transition: transform 0.25s ease, border-color 0.25s ease,
+            box-shadow 0.25s ease, background 0.25s ease;
+        }
+        .map-node-link::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(110deg, transparent 30%, rgba(114, 226, 193, 0.1) 48%, transparent 66%);
+          transform: translateX(-120%);
+          transition: transform 0.7s ease;
+        }
+        .map-node-link:hover,
+        .map-node-link:focus-visible {
+          transform: translateY(-4px);
+          border-color: rgba(114, 226, 193, 0.52);
+          background: rgba(10, 18, 31, 0.92);
+          box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34), 0 0 35px rgba(114, 226, 193, 0.08);
+        }
+        .map-node-link:hover::before,
+        .map-node-link:focus-visible::before { transform: translateX(120%); }
+        .map-node-action {
+          position: relative;
+          z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          margin-top: 14px;
+          padding: 8px 13px;
+          border: 1px solid rgba(114, 226, 193, 0.18);
+          border-radius: 999px;
+          color: #c9f8e8;
+          background: rgba(114, 226, 193, 0.06);
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+        }
+        .map-node-action i { color: #72e2c1; font-style: normal; transition: transform 0.2s ease; }
+        .map-node-link:hover .map-node-action i,
+        .map-node-link:focus-visible .map-node-action i { transform: translateX(3px); }
         .map-connector {
           padding: 12px;
           color: #72e2c1;
@@ -2434,6 +2556,66 @@ export default function HomePage() {
         .gateway-link:focus-visible .gateway-action b {
           transform: translateX(6px);
         }
+        .chain-section { overflow: hidden; }
+        .ta14-chain-track {
+          display: grid;
+          grid-template-columns: repeat(8, minmax(0, 1fr));
+          gap: 10px;
+          margin: 42px 0 24px;
+        }
+        .ta14-chain-stage {
+          position: relative;
+          display: flex;
+          min-height: 112px;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 16px 14px;
+          border: 1px solid rgba(114, 226, 193, 0.18);
+          border-radius: 16px;
+          background: radial-gradient(circle at 20% 0%, rgba(114, 226, 193, 0.1), transparent 42%), rgba(8, 15, 27, 0.82);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+        .ta14-chain-number { color: #72e2c1; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.12em; }
+        .ta14-chain-stage strong { color: #f5f8ff; font-size: 0.9rem; line-height: 1.2; }
+        .ta14-chain-arrow {
+          position: absolute;
+          top: 50%;
+          right: -11px;
+          z-index: 3;
+          display: grid;
+          width: 20px;
+          height: 20px;
+          place-items: center;
+          transform: translateY(-50%);
+          border: 1px solid rgba(114, 226, 193, 0.22);
+          border-radius: 50%;
+          color: #72e2c1;
+          background: #08101d;
+          font-size: 0.68rem;
+          font-style: normal;
+        }
+        .ta14-principles-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .ta14-principles-grid article {
+          position: relative;
+          min-height: 190px;
+          padding: 24px;
+          overflow: hidden;
+          background: linear-gradient(145deg, rgba(114, 226, 193, 0.055), transparent 52%), rgba(8, 14, 25, 0.8);
+        }
+        .ta14-principles-grid article > span {
+          display: grid;
+          width: 42px;
+          height: 42px;
+          margin-bottom: 28px;
+          place-items: center;
+          border: 1px solid rgba(114, 226, 193, 0.24);
+          border-radius: 12px;
+          color: #72e2c1;
+          background: rgba(114, 226, 193, 0.07);
+          font-size: 1.1rem;
+        }
+        .ta14-principles-grid h3 { margin: 0 0 10px; font-size: 1.05rem; }
+        .ta14-principles-grid p { margin: 0; color: #9aa9bf; font-size: 0.9rem; line-height: 1.7; }
         @keyframes doorPulse {
           0%,
           100% {
@@ -2858,7 +3040,7 @@ export default function HomePage() {
           .map-workspaces {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
-          .chain-row,
+          .ta14-chain-track,
           .map-shared {
             grid-template-columns: repeat(4, minmax(0, 1fr));
           }
@@ -2900,11 +3082,13 @@ export default function HomePage() {
             grid-template-columns: 1fr;
             gap: 18px;
           }
-          .three-principles,
+          .ta14-principles-grid,
           .gallery-grid,
           .surface-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
+          .ta14-chain-track { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+          .ta14-chain-stage:nth-child(4n) .ta14-chain-arrow { display: none; }
           .record-preview dl {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
@@ -2943,16 +3127,18 @@ export default function HomePage() {
           .gallery-grid,
           .surface-grid,
           .domain-grid,
-          .three-principles,
+          .ta14-principles-grid,
           .comparison-grid,
           .built-grid {
             grid-template-columns: 1fr;
           }
           .map-workspaces,
-          .chain-row,
+          .ta14-chain-track,
           .map-shared {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
+          .ta14-chain-stage:nth-child(2n) .ta14-chain-arrow { display: none; }
+          .ta14-chain-stage { min-height: 96px; }
           .results-path {
             grid-template-columns: 1fr;
           }
