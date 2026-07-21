@@ -1,786 +1,689 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+// apps/web/app/marketplace/post-a-need/page.tsx
+'use client';
 
-export const metadata: Metadata = {
-  title: 'Post a Governance Need',
-  description:
-    'Declare a consequential governance need inside the TA-14 AI Governance Exchange Marketplace.',
+import Link from 'next/link';
+import { FormEvent, useMemo, useState } from 'react';
+
+type NeedType =
+  | 'AI governance'
+  | 'Governed record'
+  | 'Route design'
+  | 'Independent review'
+  | 'Verification'
+  | 'Environmental integrity'
+  | 'Other';
+
+type Visibility = 'Public opportunity' | 'Private invitation' | 'Draft only';
+
+type FormState = {
+  title: string;
+  organization: string;
+  contactName: string;
+  email: string;
+  needType: NeedType;
+  domain: string;
+  consequentialAction: string;
+  existingEvidence: string;
+  desiredDeliverable: string;
+  timeline: string;
+  budget: string;
+  requiredExpertise: string;
+  visibility: Visibility;
+  consent: boolean;
 };
 
-const intakeSections = [
+const initialState: FormState = {
+  title: '',
+  organization: '',
+  contactName: '',
+  email: '',
+  needType: 'AI governance',
+  domain: '',
+  consequentialAction: '',
+  existingEvidence: '',
+  desiredDeliverable: '',
+  timeline: '',
+  budget: '',
+  requiredExpertise: '',
+  visibility: 'Draft only',
+  consent: false,
+};
+
+const MARKETPLACE_ROUTES = {
+  home: '/marketplace',
+  opportunities: '/marketplace/opportunities',
+  professionals: '/marketplace/professionals',
+  governedRecords: '/marketplace/governed-records',
+  routes: '/marketplace/routes',
+} as const;
+
+const guidedMission = [
   {
-    number: '01',
-    title: 'The Real Problem',
-    description:
-      'Describe the actual situation that must be governed before describing a software feature, policy, dashboard, or model.',
-    why:
-      'Governance fails when the requested solution is declared before the problem, affected reality, and consequential decision are understood.',
-    examples: [
-      'A vendor payment may be released without verified procurement authority.',
-      'A hospital environmental record lacks continuity across multiple contributors.',
-      'An AI-generated public statement may be published without required disclosure.',
-    ],
+    label: 'Define the need',
+    text: 'Describe the real governance problem instead of starting with a product or service request.',
   },
   {
-    number: '02',
-    title: 'The Consequential Action',
-    description:
-      'Identify what may be approved, denied, paid, changed, released, executed, escalated, or preserved.',
-    why:
-      'The Exchange must know what action creates consequence so the route can govern the action rather than merely describe it.',
-    examples: [
-      'Release payment',
-      'Approve access',
-      'Publish content',
-      'Change equipment state',
-      'Issue a governed interpretation',
-    ],
+    label: 'Declare the consequence',
+    text: 'Identify what decision, action, person, system, payment, record, or outcome may be affected.',
   },
   {
-    number: '03',
-    title: 'Evidence and Continuity',
-    description:
-      'Declare what evidence already exists, where it came from, who controls it, and whether continuity can be shown.',
-    why:
-      'A conclusion without attributable evidence and continuity cannot become admissible execution.',
-    examples: [
-      'Signed approvals',
-      'Sensor records',
-      'Laboratory reports',
-      'Source documents',
-      'Identity and authority records',
-    ],
+    label: 'Expose the evidence state',
+    text: 'Show what evidence already exists, what is missing, and what cannot yet be verified.',
   },
   {
-    number: '04',
-    title: 'Authority and Boundaries',
-    description:
-      'Identify who may contribute, review, approve, verify, execute, own, or challenge the resulting work.',
-    why:
-      'Contribution authority is not approval authority, and approval authority is not execution authority.',
-    examples: [
-      'Requester',
-      'Record Steward',
-      'Domain specialist',
-      'Independent reviewer',
-      'Verifier',
-      'Execution authority',
-    ],
-  },
-  {
-    number: '05',
-    title: 'Deliverable and Proof',
-    description:
-      'State what must be delivered and how success will be tested without overstating what the result proves.',
-    why:
-      'The Marketplace should produce a bounded artifact, not an undefined promise of compliance, safety, accuracy, or certainty.',
-    examples: [
-      'Governance route',
-      'Governed record',
-      'Independent review',
-      'Verification receipt',
-      'Replay package',
-      'Implementation architecture',
-    ],
+    label: 'Bound the deliverable',
+    text: 'Request a specific route, record, review, interpretation, verification, or implementation artifact.',
   },
 ];
 
-const domains = [
-  'AI Governance',
-  'Financial Execution Governance',
-  'Environmental Integrity Governance',
-  'Healthcare Governance',
-  'Building and BAS Governance',
-  'HVAC Performance Governance',
-  'Public-Sector Governance',
-  'Data and Evidence Governance',
-  'Other or Cross-Domain',
+const needCards: Array<{
+  type: NeedType;
+  title: string;
+  description: string;
+}> = [
+  {
+    type: 'AI governance',
+    title: 'AI Governance Need',
+    description: 'Classify, map, test, or document an AI governance requirement.',
+  },
+  {
+    type: 'Governed record',
+    title: 'Governed Record',
+    description: 'Request creation, interpretation, continuity review, or preservation of a record.',
+  },
+  {
+    type: 'Route design',
+    title: 'Governance Route',
+    description: 'Build an evidence-bound route from requirement through decision and outcome.',
+  },
+  {
+    type: 'Independent review',
+    title: 'Independent Review',
+    description: 'Request a bounded review from a qualified governance professional.',
+  },
+  {
+    type: 'Verification',
+    title: 'Verification',
+    description: 'Evaluate a declared route, receipt, replay package, or evidence chain.',
+  },
+  {
+    type: 'Environmental integrity',
+    title: 'Environmental Integrity',
+    description: 'Request work involving land, water, air, building, HVAC, hospital, or laboratory records.',
+  },
 ];
 
-const deliverables = [
-  'Custom governance route',
-  'Governed record framework',
-  'Governed interpretation',
-  'Independent architecture review',
-  'Evidence continuity review',
-  'Verification and replay package',
-  'Implementation plan',
-  'Other bounded deliverable',
-];
+function FieldGuide({ children }: { children: React.ReactNode }) {
+  return <p className="field-guide">{children}</p>;
+}
 
-const expertise = [
-  'Governance architecture',
-  'Evidence and records',
-  'Independent review',
-  'Verification',
-  'Domain specialist',
-  'Legal or regulatory interpretation',
-  'Technical implementation',
-  'Operational execution',
-];
+function ProgressBar({ completed, total }: { completed: number; total: number }) {
+  const percent = Math.round((completed / total) * 100);
 
-function ArrowIcon() {
   return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-    >
-      <path
-        d="M5 12h14M13 6l6 6-6 6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
+    <div className="progress-shell" aria-label={`Form completion: ${percent}%`}>
+      <div className="progress-meta">
+        <span>Opportunity readiness</span>
+        <strong>{percent}%</strong>
+      </div>
+      <div
+        className="progress-track"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={percent}
+      >
+        <div className="progress-fill" style={{ width: `${percent}%` }} />
+      </div>
+    </div>
   );
 }
 
-function SparkIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-    >
-      <path
-        d="M12 2l1.5 6.5L20 10l-6.5 1.5L12 18l-1.5-6.5L4 10l6.5-1.5L12 2Z"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+export default function PostAGovernanceNeedPage() {
+  const [form, setForm] = useState<FormState>(initialState);
+  const [submitted, setSubmitted] = useState(false);
 
-function CheckIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      width="18"
-      height="18"
-      fill="none"
-    >
-      <path
-        d="m5 12.5 4 4L19 7"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+  const completedFields = useMemo(() => {
+    const checks = [
+      form.title.trim(),
+      form.organization.trim(),
+      form.contactName.trim(),
+      form.email.trim(),
+      form.domain.trim(),
+      form.consequentialAction.trim(),
+      form.desiredDeliverable.trim(),
+      form.timeline.trim(),
+      form.requiredExpertise.trim(),
+      form.consent ? 'yes' : '',
+    ];
 
-export default function PostGovernanceNeedPage() {
+    return checks.filter(Boolean).length;
+  }, [form]);
+
+  const update = <K extends keyof FormState>(key: K, value: FormState[K]) => {
+    setForm((current) => ({ ...current, [key]: value }));
+    setSubmitted(false);
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (!form.consent) {
+      return;
+    }
+
+    setSubmitted(true);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const resetForm = () => {
+    setForm(initialState);
+    setSubmitted(false);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <main className="needPage">
-      <div className="background" aria-hidden="true">
-        <div className="glow glowOne" />
-        <div className="glow glowTwo" />
-        <div className="line lineOne" />
-        <div className="line lineTwo" />
-        <div className="star starOne" />
-        <div className="star starTwo" />
-        <div className="star starThree" />
-        <div className="star starFour" />
+    <main className="page-shell">
+      <div className="cosmos" aria-hidden="true">
+        <span className="star star-one" />
+        <span className="star star-two" />
+        <span className="star star-three" />
+        <span className="star star-four" />
+        <span className="star star-five" />
+        <span className="orbit orbit-one">
+          <span />
+        </span>
+        <span className="orbit orbit-two">
+          <span />
+        </span>
+        <span className="route-line route-line-one" />
+        <span className="route-line route-line-two" />
       </div>
 
-      <section className="hero">
-        <div className="shell">
-          <Link className="backLink" href="/marketplace">
-            <span aria-hidden="true">←</span>
-            Back to Marketplace
-          </Link>
+      <div className="content-shell">
+        <nav className="breadcrumbs" aria-label="Breadcrumb">
+          <Link href={MARKETPLACE_ROUTES.home}>Marketplace</Link>
+          <span aria-hidden="true">/</span>
+          <span>Post a Governance Need</span>
+        </nav>
 
-          <div className="heroGrid">
-            <div>
-              <span className="kicker">MARKETPLACE GUIDED INTAKE</span>
+        {submitted ? (
+          <section className="success-panel" aria-live="polite">
+            <div className="status-badge">DEMONSTRATION DRAFT CREATED</div>
+            <h1>Your governance need has been structured.</h1>
+            <p>
+              This front-end demonstration does not publish data or create a live marketplace
+              opportunity. It shows the record that will be created once Marketplace persistence,
+              review, and publication workflows are connected.
+            </p>
+
+            <div className="summary-grid">
+              <article>
+                <span>Opportunity</span>
+                <strong>{form.title || 'Untitled governance need'}</strong>
+              </article>
+              <article>
+                <span>Need type</span>
+                <strong>{form.needType}</strong>
+              </article>
+              <article>
+                <span>Visibility</span>
+                <strong>{form.visibility}</strong>
+              </article>
+              <article>
+                <span>Timeline</span>
+                <strong>{form.timeline || 'Not declared'}</strong>
+              </article>
+            </div>
+
+            <div className="boundary-box">
+              <strong>Marketplace boundary</strong>
+              <p>
+                Submission does not certify the opportunity, verify the requester, guarantee a
+                match, establish legal compliance, or authorize consequential execution.
+              </p>
+            </div>
+
+            <div className="action-row">
+              <button type="button" className="primary-button" onClick={resetForm}>
+                Create another draft
+              </button>
+              <Link className="secondary-button" href={MARKETPLACE_ROUTES.home}>
+                Return to Marketplace
+              </Link>
+            </div>
+          </section>
+        ) : (
+          <>
+            <header className="hero">
+              <div className="eyebrow">TA-14 Collaborative Governance Marketplace</div>
               <h1>Post a Governance Need</h1>
-              <p className="heroLead">
-                Bring the real problem into the TA-14 AI Governance Exchange.
-                Declare the consequential action, the available evidence, the
-                authorities involved, the intended deliverable, and the proof
-                boundaries before qualified contributors are invited.
+              <p className="hero-copy">
+                Describe what must be governed, what may be affected, what evidence exists, and
+                what bounded result you need. The Marketplace should begin with the consequence,
+                not with a generic job listing.
               </p>
 
-              <div className="heroActions">
-                <a className="primaryButton" href="#intake">
-                  Begin guided intake
-                  <ArrowIcon />
+              <div className="hero-actions">
+                <a className="primary-button" href="#guided-intake">
+                  Start guided intake
                 </a>
-                <a className="secondaryButton" href="#how-it-works">
-                  Understand the process
-                </a>
+                <Link className="secondary-button" href={MARKETPLACE_ROUTES.home}>
+                  Return to Marketplace
+                </Link>
               </div>
+            </header>
 
-              <div className="boundaryNotice">
-                <SparkIcon />
-                <span>
-                  This page establishes the Marketplace intake architecture.
-                  Submission, file storage, matching, messaging, payments, and
-                  proposal workflows are not connected yet.
-                </span>
-              </div>
-            </div>
-
-            <div className="heroPanel" aria-label="Governance need structure">
-              <div className="heroPanelHeader">
-                <span>GOVERNANCE NEED</span>
-                <strong>Five declarations before matching</strong>
-              </div>
-
-              {[
-                'Problem',
-                'Consequence',
-                'Evidence',
-                'Authority',
-                'Proof',
-              ].map((item, index) => (
-                <div className="heroPanelRow" key={item}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <strong>{item}</strong>
-                  <small>
-                    {index === 0
-                      ? 'What is actually happening?'
-                      : index === 1
-                        ? 'What action creates consequence?'
-                        : index === 2
-                          ? 'What can be shown and traced?'
-                          : index === 3
-                            ? 'Who may do what?'
-                            : 'How will success be tested?'}
-                  </small>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="section" id="how-it-works">
-        <div className="shell">
-          <div className="sectionHeading">
-            <div>
-              <span className="kicker">GUIDED MISSION SYSTEM</span>
-              <h2>The intake explains every question before asking it.</h2>
-            </div>
-            <p>
-              A requester should not need to arrive speaking governance
-              language. Each declaration includes plain guidance, examples, and
-              a clear explanation of why the information matters.
-            </p>
-          </div>
-
-          <div className="explanationGrid">
-            {intakeSections.map((section) => (
-              <article className="explanationCard" key={section.number}>
-                <div className="cardNumber">{section.number}</div>
-                <h3>{section.title}</h3>
-                <p>{section.description}</p>
-
-                <div className="whyBox">
-                  <span>WHY ARE WE ASKING THIS?</span>
-                  <p>{section.why}</p>
-                </div>
-
-                <div className="exampleList">
-                  <span>Examples</span>
-                  {section.examples.map((example) => (
-                    <div className="exampleItem" key={example}>
-                      <CheckIcon />
-                      <small>{example}</small>
-                    </div>
-                  ))}
-                </div>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="section sectionTint" id="intake">
-        <div className="shell">
-          <div className="sectionHeading">
-            <div>
-              <span className="kicker">GOVERNANCE NEED DECLARATION</span>
-              <h2>Structured intake preview</h2>
-            </div>
-            <p>
-              Complete these sections before the opportunity is published,
-              privately shared, or matched with qualified contributors.
-            </p>
-          </div>
-
-          <form className="intakeForm">
-            <fieldset className="formSection">
-              <legend>
-                <span>01</span>
-                Requester and organization
-              </legend>
-
-              <div className="fieldGrid twoColumns">
-                <label>
-                  <span>Requester name</span>
-                  <input
-                    type="text"
-                    name="requesterName"
-                    placeholder="Full name"
-                  />
-                </label>
-
-                <label>
-                  <span>Organization</span>
-                  <input
-                    type="text"
-                    name="organization"
-                    placeholder="Organization or independent requester"
-                  />
-                </label>
-
-                <label>
-                  <span>Email</span>
-                  <input
-                    type="email"
-                    name="email"
-                    placeholder="name@example.com"
-                  />
-                </label>
-
-                <label>
-                  <span>Requester role</span>
-                  <input
-                    type="text"
-                    name="requesterRole"
-                    placeholder="Founder, operator, counsel, engineer..."
-                  />
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset className="formSection">
-              <legend>
-                <span>02</span>
-                Problem and domain
-              </legend>
-
-              <div className="fieldGrid">
-                <label>
-                  <span>Governance need title</span>
-                  <input
-                    type="text"
-                    name="title"
-                    placeholder="A clear title for the problem that must be governed"
-                  />
-                  <small>
-                    Describe the need, not the solution you assume must be built.
-                  </small>
-                </label>
-
-                <label>
-                  <span>Domain</span>
-                  <select name="domain" defaultValue="">
-                    <option value="" disabled>
-                      Select the primary domain
-                    </option>
-                    {domains.map((domain) => (
-                      <option value={domain} key={domain}>
-                        {domain}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <span>What is actually happening?</span>
-                  <textarea
-                    name="problem"
-                    rows={7}
-                    placeholder="Describe the real-world condition, current process, observed failure, ambiguity, or unresolved risk."
-                  />
-                  <small>
-                    Include who is affected, where it occurs, and what currently
-                    happens without governance.
-                  </small>
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset className="formSection">
-              <legend>
-                <span>03</span>
-                Consequential action
-              </legend>
-
-              <div className="fieldGrid">
-                <label>
-                  <span>What action may occur?</span>
-                  <textarea
-                    name="consequentialAction"
-                    rows={5}
-                    placeholder="What may be approved, denied, paid, released, changed, executed, escalated, or preserved?"
-                  />
-                </label>
-
-                <label>
-                  <span>What happens if the action is wrong?</span>
-                  <textarea
-                    name="consequence"
-                    rows={5}
-                    placeholder="Describe the operational, financial, environmental, legal, medical, public, or evidentiary consequence."
-                  />
-                </label>
-
-                <div className="guidedPrompt">
-                  <SparkIcon />
-                  <div>
-                    <strong>Guided Mission prompt</strong>
-                    <p>
-                      A route cannot govern consequence until the action that
-                      creates consequence is declared.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </fieldset>
-
-            <fieldset className="formSection">
-              <legend>
-                <span>04</span>
-                Evidence and continuity
-              </legend>
-
-              <div className="fieldGrid">
-                <label>
-                  <span>What evidence already exists?</span>
-                  <textarea
-                    name="existingEvidence"
-                    rows={6}
-                    placeholder="List records, approvals, sensor data, reports, contracts, policies, logs, images, video, or other source evidence."
-                  />
-                </label>
-
-                <label>
-                  <span>Known evidence gaps</span>
-                  <textarea
-                    name="evidenceGaps"
-                    rows={4}
-                    placeholder="What is missing, stale, unverifiable, unattributed, inaccessible, or disputed?"
-                  />
-                </label>
-
-                <label>
-                  <span>Continuity concerns</span>
-                  <textarea
-                    name="continuity"
-                    rows={4}
-                    placeholder="Describe custody, transfer, version, timestamp, source, or identity concerns."
-                  />
-                </label>
-
-                <label className="uploadPreview">
-                  <span>Supporting files</span>
-                  <input type="file" name="files" multiple disabled />
-                  <small>
-                    File upload will be connected with authenticated storage in
-                    a later build. Do not treat this preview as a live upload.
-                  </small>
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset className="formSection">
-              <legend>
-                <span>05</span>
-                Authority and contributor needs
-              </legend>
-
-              <div className="fieldGrid">
-                <label>
-                  <span>Known authority holders</span>
-                  <textarea
-                    name="authorityHolders"
-                    rows={4}
-                    placeholder="Who may contribute, review, approve, verify, execute, own, or challenge the work?"
-                  />
-                </label>
-
-                <div>
-                  <span className="fieldLabel">Expertise requested</span>
-                  <div className="choiceGrid">
-                    {expertise.map((item) => (
-                      <label className="choiceCard" key={item}>
-                        <input type="checkbox" name="expertise" value={item} />
-                        <span>{item}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <label>
-                  <span>Conflicts or exclusions</span>
-                  <textarea
-                    name="conflicts"
-                    rows={4}
-                    placeholder="Declare prohibited relationships, conflicts, restricted parties, or required independence."
-                  />
-                </label>
-              </div>
-            </fieldset>
-
-            <fieldset className="formSection">
-              <legend>
-                <span>06</span>
-                Deliverable, timing, and budget
-              </legend>
-
-              <div className="fieldGrid twoColumns">
-                <label>
-                  <span>Desired deliverable</span>
-                  <select name="deliverable" defaultValue="">
-                    <option value="" disabled>
-                      Select the intended deliverable
-                    </option>
-                    {deliverables.map((deliverable) => (
-                      <option value={deliverable} key={deliverable}>
-                        {deliverable}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <span>Target completion</span>
-                  <input type="date" name="targetDate" />
-                </label>
-
-                <label>
-                  <span>Budget range</span>
-                  <input
-                    type="text"
-                    name="budget"
-                    placeholder="$2,500-$5,000 or request proposals"
-                  />
-                </label>
-
-                <label>
-                  <span>Opportunity visibility</span>
-                  <select name="visibility" defaultValue="private">
-                    <option value="private">Private invitation</option>
-                    <option value="network">Partner Review Network</option>
-                    <option value="public">Public marketplace</option>
-                  </select>
-                </label>
-              </div>
-
-              <div className="fieldGrid">
-                <label>
-                  <span>How will success be tested?</span>
-                  <textarea
-                    name="successTest"
-                    rows={6}
-                    placeholder="Describe required test cases, replay, comparison, acceptance criteria, independent review, or post-intervention evidence."
-                  />
-                </label>
-
-                <label>
-                  <span>What must the deliverable not claim?</span>
-                  <textarea
-                    name="proofBoundary"
-                    rows={4}
-                    placeholder="Declare exclusions, unresolved matters, and claims that would exceed the available evidence or review scope."
-                  />
-                </label>
-              </div>
-            </fieldset>
-
-            <div className="submissionPanel">
-              <div>
-                <span className="kicker">SUBMISSION BOUNDARY</span>
-                <h3>This is an architectural preview, not a live intake.</h3>
+            <section className="mission-section" aria-labelledby="guided-mission-title">
+              <div className="section-heading">
+                <span>Guided Mission</span>
+                <h2 id="guided-mission-title">Why this intake is different</h2>
                 <p>
-                  The final workflow will require authentication, preservation,
-                  review of required fields, visibility selection, and explicit
-                  confirmation before an opportunity can be published.
+                  Every question exists to protect scope, continuity, attribution, and
+                  admissibility.
                 </p>
               </div>
 
-              <button className="disabledButton" type="button" disabled>
-                Submission not connected
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
-
-      <section className="section">
-        <div className="shell assuranceGrid">
-          <div>
-            <span className="kicker">WHAT HAPPENS NEXT</span>
-            <h2>A declared need becomes a governed opportunity.</h2>
-            <p>
-              Once connected, the Exchange will preserve the intake as a
-              versioned request, identify the required contributor roles, allow
-              public or private matching, receive bounded proposals, and open a
-              governed collaboration workspace.
-            </p>
-          </div>
-
-          <div className="assuranceSteps">
-            {[
-              'Review required declarations',
-              'Confirm visibility and invitation scope',
-              'Identify qualification requirements',
-              'Receive bounded proposals',
-              'Select contributors',
-              'Open governed work environment',
-            ].map((item, index) => (
-              <div className="assuranceStep" key={item}>
-                <span>{String(index + 1).padStart(2, '0')}</span>
-                <strong>{item}</strong>
+              <div className="mission-grid">
+                {guidedMission.map((item, index) => (
+                  <article className="mission-card" key={item.label}>
+                    <span className="mission-number">{String(index + 1).padStart(2, '0')}</span>
+                    <h3>{item.label}</h3>
+                    <p>{item.text}</p>
+                  </article>
+                ))}
               </div>
-            ))}
-          </div>
-        </div>
-      </section>
+            </section>
 
-      <section className="finalSection">
-        <div className="shell finalPanel">
-          <div>
-            <span className="kicker">TA-14 MARKETPLACE</span>
-            <h2>Bring the problem before building the answer.</h2>
-            <p>
-              The Marketplace begins with reality, evidence, continuity,
-              authority, and declared consequence. Only then should a route,
-              record, review, or implementation be proposed.
-            </p>
-          </div>
+            <section className="door-section" aria-labelledby="need-type-title">
+              <div className="section-heading">
+                <span>Choose a doorway</span>
+                <h2 id="need-type-title">What kind of governance help do you need?</h2>
+              </div>
 
-          <div className="finalActions">
-            <Link className="primaryButton" href="/marketplace">
-              Return to Marketplace
-              <ArrowIcon />
-            </Link>
-            <Link className="secondaryButton" href="/workspace">
-              Open Workspace
-            </Link>
-          </div>
+              <div className="door-grid">
+                {needCards.map((card) => {
+                  const selected = form.needType === card.type;
 
-          <div className="maxim">
-            No admissible evidence. No admissible execution.
-          </div>
-        </div>
-      </section>
+                  return (
+                    <button
+                      className={`door-card${selected ? ' selected' : ''}`}
+                      key={card.type}
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => update('needType', card.type)}
+                    >
+                      <span className="door-light" />
+                      <strong>{card.title}</strong>
+                      <p>{card.description}</p>
+                      <span className="door-action">
+                        {selected ? 'Selected' : 'Choose this doorway'}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
 
-      <style>{`
-        :root {
-          --bg: #041019;
-          --panel: rgba(8, 29, 40, 0.84);
-          --border: rgba(118, 213, 220, 0.2);
-          --border-strong: rgba(118, 213, 220, 0.42);
-          --text: #f3fbfc;
-          --muted: #a9c1c8;
-          --teal: #67e0df;
-          --blue: #62a9ff;
-          --gold: #ffd878;
-          --violet: #bca4ff;
-        }
+            <section id="guided-intake" className="intake-layout">
+              <aside className="intake-aside">
+                <div className="sticky-panel">
+                  <span className="panel-kicker">Opportunity record</span>
+                  <h2>Build a bounded request</h2>
+                  <p>
+                    Complete the declared facts. Missing information remains visible instead of
+                    being silently assumed.
+                  </p>
 
-        * {
+                  <ProgressBar completed={completedFields} total={10} />
+
+                  <div className="record-preview">
+                    <div>
+                      <span>Type</span>
+                      <strong>{form.needType}</strong>
+                    </div>
+                    <div>
+                      <span>Domain</span>
+                      <strong>{form.domain || 'Not declared'}</strong>
+                    </div>
+                    <div>
+                      <span>Visibility</span>
+                      <strong>{form.visibility}</strong>
+                    </div>
+                    <div>
+                      <span>Evidence</span>
+                      <strong>{form.existingEvidence ? 'Declared' : 'Not declared'}</strong>
+                    </div>
+                  </div>
+                </div>
+              </aside>
+
+              <form className="intake-form" onSubmit={handleSubmit}>
+                <section className="form-section">
+                  <div className="form-section-heading">
+                    <span>01</span>
+                    <div>
+                      <h2>Requester and opportunity identity</h2>
+                      <p>Establish who is asking and how the request should be recognized.</p>
+                    </div>
+                  </div>
+
+                  <div className="field-grid two-columns">
+                    <label>
+                      Opportunity title
+                      <input
+                        required
+                        value={form.title}
+                        onChange={(event) => update('title', event.target.value)}
+                        placeholder="Example: Independent review of an AI hiring route"
+                      />
+                      <FieldGuide>Use a specific outcome-oriented title.</FieldGuide>
+                    </label>
+
+                    <label>
+                      Organization
+                      <input
+                        required
+                        value={form.organization}
+                        onChange={(event) => update('organization', event.target.value)}
+                        placeholder="Organization or project name"
+                      />
+                    </label>
+
+                    <label>
+                      Contact name
+                      <input
+                        required
+                        value={form.contactName}
+                        onChange={(event) => update('contactName', event.target.value)}
+                        placeholder="Primary requester"
+                      />
+                    </label>
+
+                    <label>
+                      Contact email
+                      <input
+                        required
+                        type="email"
+                        value={form.email}
+                        onChange={(event) => update('email', event.target.value)}
+                        placeholder="name@example.com"
+                      />
+                    </label>
+                  </div>
+                </section>
+
+                <section className="form-section">
+                  <div className="form-section-heading">
+                    <span>02</span>
+                    <div>
+                      <h2>Governance scope</h2>
+                      <p>Describe the domain, consequence, and current evidence state.</p>
+                    </div>
+                  </div>
+
+                  <div className="field-grid">
+                    <label>
+                      Domain
+                      <input
+                        required
+                        value={form.domain}
+                        onChange={(event) => update('domain', event.target.value)}
+                        placeholder="AI, healthcare, finance, environmental, BAS, public sector..."
+                      />
+                      <FieldGuide>
+                        State the operating domain, not merely the technology name.
+                      </FieldGuide>
+                    </label>
+
+                    <label>
+                      Consequential action or outcome
+                      <textarea
+                        required
+                        rows={5}
+                        value={form.consequentialAction}
+                        onChange={(event) => update('consequentialAction', event.target.value)}
+                        placeholder="What decision, action, person, payment, system, record, or outcome could be affected?"
+                      />
+                      <FieldGuide>
+                        This is the center of the request. Explain what may bind, change, deny,
+                        approve, release, or affect someone.
+                      </FieldGuide>
+                    </label>
+
+                    <label>
+                      Existing evidence
+                      <textarea
+                        rows={5}
+                        value={form.existingEvidence}
+                        onChange={(event) => update('existingEvidence', event.target.value)}
+                        placeholder="Documents, logs, policies, tests, records, screenshots, source code, receipts, or known gaps"
+                      />
+                      <FieldGuide>
+                        It is acceptable to state that evidence is missing, disputed, inaccessible,
+                        or stale.
+                      </FieldGuide>
+                    </label>
+                  </div>
+                </section>
+
+                <section className="form-section">
+                  <div className="form-section-heading">
+                    <span>03</span>
+                    <div>
+                      <h2>Requested result</h2>
+                      <p>Bound the deliverable, qualifications, timing, and commercial expectations.</p>
+                    </div>
+                  </div>
+
+                  <div className="field-grid">
+                    <label>
+                      Desired deliverable
+                      <textarea
+                        required
+                        rows={5}
+                        value={form.desiredDeliverable}
+                        onChange={(event) => update('desiredDeliverable', event.target.value)}
+                        placeholder="Example: Article-level applicability map, governed route, evidence-gap report, and independent review"
+                      />
+                    </label>
+
+                    <div className="field-grid two-columns">
+                      <label>
+                        Timeline
+                        <input
+                          required
+                          value={form.timeline}
+                          onChange={(event) => update('timeline', event.target.value)}
+                          placeholder="Example: 30 days"
+                        />
+                      </label>
+
+                      <label>
+                        Budget or commercial range
+                        <input
+                          value={form.budget}
+                          onChange={(event) => update('budget', event.target.value)}
+                          placeholder="Optional"
+                        />
+                      </label>
+                    </div>
+
+                    <label>
+                      Required expertise
+                      <textarea
+                        required
+                        rows={4}
+                        value={form.requiredExpertise}
+                        onChange={(event) => update('requiredExpertise', event.target.value)}
+                        placeholder="Domains, credentials, review experience, technical disciplines, jurisdictions, or independence requirements"
+                      />
+                    </label>
+                  </div>
+                </section>
+
+                <section className="form-section">
+                  <div className="form-section-heading">
+                    <span>04</span>
+                    <div>
+                      <h2>Visibility and publication state</h2>
+                      <p>
+                        Keep drafting, prepare a private invitation, or plan a public opportunity.
+                      </p>
+                    </div>
+                  </div>
+
+                  <fieldset className="choice-grid">
+                    <legend>Choose visibility</legend>
+                    {(
+                      [
+                        {
+                          value: 'Draft only',
+                          text: 'Save as a private draft until persistence is connected.',
+                        },
+                        {
+                          value: 'Private invitation',
+                          text: 'Prepare a scoped invitation for selected professionals.',
+                        },
+                        {
+                          value: 'Public opportunity',
+                          text: 'Prepare a public marketplace listing after review.',
+                        },
+                      ] as Array<{ value: Visibility; text: string }>
+                    ).map((option) => (
+                      <label
+                        className={`choice-card${
+                          form.visibility === option.value ? ' selected' : ''
+                        }`}
+                        key={option.value}
+                      >
+                        <input
+                          type="radio"
+                          name="visibility"
+                          value={option.value}
+                          checked={form.visibility === option.value}
+                          onChange={() => update('visibility', option.value)}
+                        />
+                        <strong>{option.value}</strong>
+                        <span>{option.text}</span>
+                      </label>
+                    ))}
+                  </fieldset>
+                </section>
+
+                <section className="form-section final-section">
+                  <label className="consent-row">
+                    <input
+                      type="checkbox"
+                      checked={form.consent}
+                      onChange={(event) => update('consent', event.target.checked)}
+                    />
+                    <span>
+                      I understand this demonstration creates only a browser-local preview. It does
+                      not publish an opportunity, verify identities, collect payment, establish
+                      legal compliance, or authorize execution.
+                    </span>
+                  </label>
+
+                  <div className="boundary-box">
+                    <strong>No evidence is silently supplied.</strong>
+                    <p>
+                      The future Marketplace workflow must preserve missing facts, disputed claims,
+                      scope limits, reviewer independence, version history, and the original
+                      request.
+                    </p>
+                  </div>
+
+                  <div className="submit-row">
+                    <button className="primary-button" type="submit" disabled={!form.consent}>
+                      Create demonstration draft
+                    </button>
+                    <button className="text-button" type="button" onClick={resetForm}>
+                      Clear form
+                    </button>
+                  </div>
+                </section>
+              </form>
+            </section>
+
+            <section className="how-it-works">
+              <div className="section-heading">
+                <span>Governed exchange sequence</span>
+                <h2>What happens after a need is posted?</h2>
+              </div>
+
+              <div className="sequence">
+                {[
+                  'Request preserved',
+                  'Scope reviewed',
+                  'Professionals matched',
+                  'Evidence exchanged',
+                  'Work performed',
+                  'Review completed',
+                  'Records preserved',
+                ].map((step, index) => (
+                  <div className="sequence-step" key={step}>
+                    <span>{index + 1}</span>
+                    <strong>{step}</strong>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </>
+        )}
+      </div>
+
+      <style jsx>{`
+        :global(*) {
           box-sizing: border-box;
         }
 
-        html {
+        :global(html) {
           scroll-behavior: smooth;
         }
 
-        body {
+        :global(body) {
           margin: 0;
-          background: var(--bg);
-        }
-
-        .needPage {
-          position: relative;
-          min-height: 100vh;
-          overflow: hidden;
-          color: var(--text);
           background:
-            radial-gradient(circle at 12% 8%, rgba(37, 185, 189, 0.15), transparent 30%),
-            radial-gradient(circle at 86% 18%, rgba(98, 169, 255, 0.12), transparent 28%),
-            linear-gradient(180deg, #031019 0%, #071821 54%, #031019 100%);
+            radial-gradient(circle at 20% 10%, rgba(32, 142, 181, 0.16), transparent 30%),
+            radial-gradient(circle at 78% 4%, rgba(114, 69, 199, 0.15), transparent 31%),
+            #06111d;
+          color: #eef8ff;
         }
 
-        .needPage::before {
-          content: '';
+        :global(a) {
+          color: inherit;
+        }
+
+        button,
+        input,
+        textarea {
+          font: inherit;
+        }
+
+        .page-shell {
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+          background:
+            linear-gradient(rgba(5, 17, 29, 0.76), rgba(5, 17, 29, 0.96)),
+            radial-gradient(circle at center, rgba(23, 101, 137, 0.12), transparent 56%);
+        }
+
+        .content-shell {
+          width: min(1180px, calc(100% - 36px));
+          margin: 0 auto;
+          padding: 34px 0 90px;
+          position: relative;
+          z-index: 2;
+        }
+
+        .cosmos {
           position: fixed;
           inset: 0;
           pointer-events: none;
-          opacity: 0.22;
-          background-image:
-            linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
-          background-size: 42px 42px;
-          mask-image: linear-gradient(to bottom, black, transparent 88%);
-        }
-
-        .background {
-          position: absolute;
-          inset: 0;
           z-index: 0;
-          overflow: hidden;
-          pointer-events: none;
-        }
-
-        .glow {
-          position: absolute;
-          width: 380px;
-          height: 380px;
-          border-radius: 50%;
-          filter: blur(90px);
-          opacity: 0.13;
-          animation: glowPulse 9s ease-in-out infinite;
-        }
-
-        .glowOne {
-          top: 4%;
-          left: -130px;
-          background: var(--teal);
-        }
-
-        .glowTwo {
-          top: 40%;
-          right: -150px;
-          background: var(--blue);
-          animation-delay: 3s;
-        }
-
-        .line {
-          position: absolute;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(103, 224, 223, 0.58), transparent);
-          filter: drop-shadow(0 0 7px rgba(103, 224, 223, 0.35));
-          animation: lineMove 13s linear infinite;
-        }
-
-        .lineOne {
-          top: 13%;
-          left: -10%;
-          width: 46vw;
-          transform: rotate(17deg);
-        }
-
-        .lineTwo {
-          top: 58%;
-          right: -8%;
-          width: 38vw;
-          transform: rotate(-19deg);
-          animation-delay: -6s;
+          opacity: 0.8;
         }
 
         .star {
@@ -788,59 +691,126 @@ export default function PostGovernanceNeedPage() {
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: white;
-          box-shadow: 0 0 12px white;
-          animation: twinkle 4.2s ease-in-out infinite;
+          background: #dff8ff;
+          box-shadow: 0 0 16px rgba(157, 234, 255, 0.95);
+          animation: drift 13s ease-in-out infinite;
         }
 
-        .starOne { top: 7%; left: 24%; }
-        .starTwo { top: 16%; right: 14%; animation-delay: 1.2s; }
-        .starThree { top: 44%; left: 7%; animation-delay: 2.4s; }
-        .starFour { top: 74%; right: 22%; animation-delay: 0.8s; }
+        .star-one {
+          top: 14%;
+          left: 8%;
+        }
 
-        .shell {
-          position: relative;
-          z-index: 2;
-          width: min(1160px, calc(100% - 40px));
-          margin: 0 auto;
+        .star-two {
+          top: 28%;
+          right: 12%;
+          animation-delay: -4s;
+        }
+
+        .star-three {
+          top: 61%;
+          left: 15%;
+          animation-delay: -8s;
+        }
+
+        .star-four {
+          top: 76%;
+          right: 18%;
+          animation-delay: -2s;
+        }
+
+        .star-five {
+          top: 44%;
+          left: 52%;
+          animation-delay: -10s;
+        }
+
+        .orbit {
+          position: absolute;
+          width: 280px;
+          height: 280px;
+          border: 1px solid rgba(104, 211, 238, 0.13);
+          border-radius: 50%;
+          animation: rotate 28s linear infinite;
+        }
+
+        .orbit span {
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          background: #8feaff;
+          box-shadow: 0 0 22px rgba(77, 210, 242, 0.9);
+          left: 50%;
+          top: -5px;
+        }
+
+        .orbit-one {
+          top: 7%;
+          right: -120px;
+        }
+
+        .orbit-two {
+          bottom: 10%;
+          left: -140px;
+          width: 360px;
+          height: 360px;
+          animation-direction: reverse;
+          animation-duration: 34s;
+        }
+
+        .route-line {
+          position: absolute;
+          height: 1px;
+          width: 34vw;
+          background: linear-gradient(90deg, transparent, rgba(74, 211, 239, 0.32), transparent);
+          transform: rotate(-18deg);
+          animation: pulse 7s ease-in-out infinite;
+        }
+
+        .route-line-one {
+          top: 23%;
+          left: 3%;
+        }
+
+        .route-line-two {
+          bottom: 22%;
+          right: 4%;
+          transform: rotate(24deg);
+          animation-delay: -3s;
+        }
+
+        .breadcrumbs {
+          display: flex;
+          gap: 10px;
+          align-items: center;
+          color: #9dc9dc;
+          font-size: 0.88rem;
+          margin-bottom: 56px;
+        }
+
+        .breadcrumbs a {
+          text-decoration: none;
+        }
+
+        .breadcrumbs a:hover {
+          color: #ffffff;
         }
 
         .hero {
-          padding: 86px 0 80px;
+          max-width: 900px;
+          padding-bottom: 70px;
         }
 
-        .backLink {
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-          margin-bottom: 52px;
-          color: var(--muted);
-          text-decoration: none;
-          font-size: 0.9rem;
-          font-weight: 700;
-          transition: color 180ms ease, transform 180ms ease;
-        }
-
-        .backLink:hover {
-          color: var(--teal);
-          transform: translateX(-3px);
-        }
-
-        .heroGrid {
-          display: grid;
-          grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.72fr);
-          gap: 58px;
-          align-items: center;
-        }
-
-        .kicker {
-          display: inline-flex;
-          align-items: center;
-          color: var(--teal);
-          font-size: 0.75rem;
-          font-weight: 850;
-          letter-spacing: 0.16em;
+        .eyebrow,
+        .panel-kicker,
+        .section-heading > span {
+          display: inline-block;
+          color: #78d9f0;
           text-transform: uppercase;
+          letter-spacing: 0.15em;
+          font-size: 0.78rem;
+          font-weight: 800;
         }
 
         h1,
@@ -851,709 +821,649 @@ export default function PostGovernanceNeedPage() {
         }
 
         h1 {
-          margin: 14px 0 24px;
-          font-size: clamp(3.3rem, 7vw, 7rem);
+          margin: 18px 0 22px;
+          font-size: clamp(3rem, 8vw, 6.8rem);
           line-height: 0.94;
-          letter-spacing: -0.06em;
-          text-wrap: balance;
+          letter-spacing: -0.055em;
+          max-width: 850px;
         }
 
-        .heroLead {
-          max-width: 750px;
-          color: var(--muted);
-          font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+        .hero-copy {
+          max-width: 760px;
+          font-size: clamp(1.05rem, 2vw, 1.35rem);
           line-height: 1.75;
+          color: #bed4df;
         }
 
-        .heroActions,
-        .finalActions {
+        .hero-actions,
+        .action-row,
+        .submit-row {
           display: flex;
-          flex-wrap: wrap;
           gap: 14px;
-          margin-top: 32px;
-        }
-
-        .primaryButton,
-        .secondaryButton {
-          display: inline-flex;
+          flex-wrap: wrap;
           align-items: center;
-          justify-content: center;
-          gap: 10px;
-          min-height: 48px;
-          padding: 0 20px;
+          margin-top: 30px;
+        }
+
+        .primary-button,
+        .secondary-button,
+        .text-button {
           border-radius: 999px;
-          text-decoration: none;
-          font-size: 0.94rem;
+          padding: 14px 22px;
           font-weight: 800;
-          transition: transform 180ms ease, border-color 180ms ease, background 180ms ease, box-shadow 180ms ease;
+          text-decoration: none;
+          transition:
+            transform 180ms ease,
+            border-color 180ms ease,
+            background 180ms ease;
         }
 
-        .primaryButton {
-          color: #031114;
-          background: linear-gradient(135deg, var(--teal), #b2f7f1);
-          box-shadow: 0 12px 34px rgba(37, 185, 189, 0.24);
+        .primary-button {
+          border: 1px solid #81e3fa;
+          color: #031019;
+          background: linear-gradient(135deg, #a6efff, #55cbe9);
+          box-shadow: 0 12px 34px rgba(61, 193, 226, 0.2);
+          cursor: pointer;
         }
 
-        .secondaryButton {
-          color: var(--text);
-          border: 1px solid var(--border-strong);
-          background: rgba(10, 30, 42, 0.64);
-          backdrop-filter: blur(12px);
+        .primary-button:disabled {
+          opacity: 0.45;
+          cursor: not-allowed;
         }
 
-        .primaryButton:hover,
-        .secondaryButton:hover {
+        .primary-button:not(:disabled):hover,
+        .secondary-button:hover {
           transform: translateY(-2px);
         }
 
-        .primaryButton:hover {
-          box-shadow: 0 16px 42px rgba(37, 185, 189, 0.34);
+        .secondary-button {
+          border: 1px solid rgba(151, 211, 230, 0.34);
+          background: rgba(11, 31, 47, 0.76);
+          color: #edfaff;
         }
 
-        .secondaryButton:hover {
-          border-color: var(--teal);
-          background: rgba(14, 42, 54, 0.9);
+        .text-button {
+          border: 0;
+          color: #9fd5e5;
+          background: transparent;
+          cursor: pointer;
         }
 
-        .boundaryNotice {
-          display: flex;
-          align-items: flex-start;
-          gap: 10px;
+        .mission-section,
+        .door-section,
+        .how-it-works {
+          padding: 40px 0 84px;
+        }
+
+        .section-heading {
           max-width: 760px;
-          margin-top: 28px;
-          padding: 14px 16px;
-          border: 1px solid rgba(255, 216, 120, 0.22);
-          border-radius: 14px;
-          color: #eadfbf;
-          background: rgba(255, 216, 120, 0.06);
-          font-size: 0.85rem;
-          line-height: 1.6;
+          margin-bottom: 28px;
         }
 
-        .boundaryNotice svg {
-          flex: 0 0 auto;
-          margin-top: 2px;
-          color: var(--gold);
+        .section-heading h2 {
+          margin: 10px 0 12px;
+          font-size: clamp(2rem, 4vw, 3.6rem);
+          letter-spacing: -0.04em;
         }
 
-        .heroPanel {
-          padding: 24px;
-          border: 1px solid var(--border-strong);
-          border-radius: 26px;
-          background:
-            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.13), transparent 30%),
-            linear-gradient(145deg, rgba(9, 32, 44, 0.92), rgba(4, 17, 25, 0.97));
-          box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
-        }
-
-        .heroPanelHeader {
-          display: grid;
-          gap: 6px;
-          margin-bottom: 20px;
-          padding-bottom: 18px;
-          border-bottom: 1px solid rgba(118, 213, 220, 0.15);
-        }
-
-        .heroPanelHeader span {
-          color: var(--teal);
-          font-size: 0.68rem;
-          font-weight: 850;
-          letter-spacing: 0.15em;
-        }
-
-        .heroPanelHeader strong {
-          font-size: 1.25rem;
-        }
-
-        .heroPanelRow {
-          display: grid;
-          grid-template-columns: 34px minmax(86px, auto) 1fr;
-          gap: 12px;
-          align-items: center;
-          padding: 14px 0;
-          border-bottom: 1px solid rgba(118, 213, 220, 0.09);
-        }
-
-        .heroPanelRow:last-child {
-          border-bottom: 0;
-        }
-
-        .heroPanelRow > span {
-          width: 30px;
-          height: 30px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          color: #031114;
-          background: var(--teal);
-          font-size: 0.7rem;
-          font-weight: 900;
-          box-shadow: 0 0 16px rgba(103, 224, 223, 0.28);
-        }
-
-        .heroPanelRow strong {
-          font-size: 0.9rem;
-        }
-
-        .heroPanelRow small {
-          color: var(--muted);
-          font-size: 0.75rem;
-          line-height: 1.45;
-        }
-
-        .section {
-          position: relative;
-          padding: 105px 0;
-          scroll-margin-top: 70px;
-        }
-
-        .sectionTint {
-          border-top: 1px solid rgba(118, 213, 220, 0.08);
-          border-bottom: 1px solid rgba(118, 213, 220, 0.08);
-          background: linear-gradient(180deg, rgba(9, 28, 39, 0.66), rgba(5, 18, 26, 0.45));
-        }
-
-        .sectionHeading {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(300px, 470px);
-          gap: 38px;
-          align-items: end;
-          margin-bottom: 48px;
-        }
-
-        .sectionHeading h2,
-        .assuranceGrid h2,
-        .finalPanel h2 {
-          margin: 10px 0 0;
-          font-size: clamp(2.25rem, 4.5vw, 4.8rem);
-          line-height: 1.04;
-          letter-spacing: -0.05em;
-          text-wrap: balance;
-        }
-
-        .sectionHeading p,
-        .assuranceGrid > div:first-child p,
-        .finalPanel p {
-          margin: 0;
-          color: var(--muted);
-          font-size: 1.03rem;
-          line-height: 1.75;
-        }
-
-        .explanationGrid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 20px;
-        }
-
-        .explanationCard {
-          position: relative;
-          overflow: hidden;
-          padding: 28px;
-          border: 1px solid var(--border);
-          border-radius: 24px;
-          background: linear-gradient(145deg, rgba(10, 31, 43, 0.86), rgba(4, 18, 27, 0.95));
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16);
-        }
-
-        .explanationCard:last-child {
-          grid-column: 1 / -1;
-        }
-
-        .cardNumber {
-          position: absolute;
-          top: 16px;
-          right: 22px;
-          color: rgba(103, 224, 223, 0.12);
-          font-size: 4.6rem;
-          font-weight: 900;
-          line-height: 1;
-        }
-
-        .explanationCard h3 {
-          position: relative;
-          z-index: 2;
-          margin-bottom: 12px;
-          font-size: 1.55rem;
-        }
-
-        .explanationCard > p {
-          position: relative;
-          z-index: 2;
-          max-width: 680px;
-          color: var(--muted);
+        .section-heading p {
+          color: #aebfca;
           line-height: 1.7;
         }
 
-        .whyBox {
+        .mission-grid {
+          display: grid;
+          grid-template-columns: repeat(4, 1fr);
+          gap: 14px;
+        }
+
+        .mission-card {
+          min-height: 230px;
+          border: 1px solid rgba(112, 200, 224, 0.18);
+          border-radius: 24px;
+          padding: 24px;
+          background: linear-gradient(
+            145deg,
+            rgba(17, 43, 61, 0.94),
+            rgba(8, 24, 38, 0.82)
+          );
+        }
+
+        .mission-number {
+          display: inline-flex;
+          color: #58d1ed;
+          font-size: 0.82rem;
+          margin-bottom: 50px;
+        }
+
+        .mission-card h3 {
+          font-size: 1.2rem;
+        }
+
+        .mission-card p {
+          color: #aabdc8;
+          line-height: 1.65;
+        }
+
+        .door-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 18px;
+        }
+
+        .door-card {
+          min-height: 270px;
           position: relative;
-          z-index: 2;
-          margin-top: 22px;
-          padding: 16px;
-          border: 1px solid rgba(255, 216, 120, 0.18);
-          border-radius: 14px;
-          background: rgba(255, 216, 120, 0.05);
+          overflow: hidden;
+          padding: 28px;
+          border-radius: 26px 26px 10px 10px;
+          border: 1px solid rgba(238, 199, 94, 0.34);
+          color: #fff9e3;
+          text-align: left;
+          cursor: pointer;
+          background:
+            linear-gradient(90deg, rgba(75, 47, 6, 0.92), rgba(155, 108, 20, 0.86)),
+            #6a470b;
+          box-shadow:
+            inset 0 0 40px rgba(255, 213, 92, 0.06),
+            0 18px 45px rgba(0, 0, 0, 0.18);
+          transition:
+            transform 180ms ease,
+            border-color 180ms ease,
+            box-shadow 180ms ease;
         }
 
-        .whyBox span,
-        .exampleList > span {
+        .door-card::before,
+        .door-card::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: rgba(255, 232, 170, 0.24);
+        }
+
+        .door-card::before {
+          left: 14px;
+        }
+
+        .door-card::after {
+          right: 14px;
+        }
+
+        .door-card:hover,
+        .door-card.selected {
+          transform: translateY(-5px);
+          border-color: rgba(255, 224, 134, 0.9);
+          box-shadow:
+            inset 0 0 60px rgba(255, 224, 134, 0.11),
+            0 22px 55px rgba(7, 12, 17, 0.34);
+        }
+
+        .door-light {
+          width: 7px;
+          height: 7px;
+          position: absolute;
+          right: 28px;
+          top: 50%;
+          border-radius: 50%;
+          background: #fff3bb;
+          box-shadow: 0 0 18px #ffe17d;
+        }
+
+        .door-card strong {
           display: block;
-          color: var(--gold);
-          font-size: 0.66rem;
-          font-weight: 850;
-          letter-spacing: 0.14em;
+          max-width: 78%;
+          font-size: 1.5rem;
+          line-height: 1.1;
         }
 
-        .whyBox p {
-          margin: 8px 0 0;
-          color: #e8dfc8;
+        .door-card p {
+          margin: 72px 0 25px;
+          color: rgba(255, 246, 214, 0.78);
+          line-height: 1.58;
+        }
+
+        .door-action {
+          font-size: 0.82rem;
+          font-weight: 800;
+          color: #fff0aa;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+        }
+
+        .intake-layout {
+          display: grid;
+          grid-template-columns: 310px minmax(0, 1fr);
+          gap: 28px;
+          align-items: start;
+          padding-top: 36px;
+        }
+
+        .sticky-panel {
+          position: sticky;
+          top: 24px;
+          border-radius: 26px;
+          border: 1px solid rgba(105, 205, 233, 0.2);
+          background: rgba(8, 27, 43, 0.88);
+          padding: 25px;
+          backdrop-filter: blur(18px);
+        }
+
+        .sticky-panel h2 {
+          margin: 10px 0;
+          font-size: 1.7rem;
+        }
+
+        .sticky-panel > p {
+          color: #aebfca;
           line-height: 1.6;
         }
 
-        .exampleList {
-          position: relative;
-          z-index: 2;
-          display: grid;
-          gap: 9px;
-          margin-top: 20px;
+        .progress-shell {
+          padding: 22px 0;
         }
 
-        .exampleList > span {
-          color: var(--teal);
-          margin-bottom: 2px;
-        }
-
-        .exampleItem {
+        .progress-meta {
           display: flex;
-          gap: 9px;
-          align-items: flex-start;
-          color: #dcebed;
+          justify-content: space-between;
+          margin-bottom: 9px;
+          color: #c7e3ec;
+          font-size: 0.84rem;
         }
 
-        .exampleItem svg {
-          flex: 0 0 auto;
-          margin-top: 1px;
-          color: var(--teal);
+        .progress-track {
+          height: 8px;
+          border-radius: 999px;
+          background: rgba(144, 204, 220, 0.12);
+          overflow: hidden;
         }
 
-        .exampleItem small {
-          line-height: 1.5;
+        .progress-fill {
+          height: 100%;
+          border-radius: inherit;
+          background: linear-gradient(90deg, #4ccbe9, #9deaff);
+          transition: width 220ms ease;
         }
 
-        .intakeForm {
+        .record-preview {
           display: grid;
-          gap: 22px;
+          gap: 10px;
+          padding-top: 8px;
         }
 
-        .formSection {
-          margin: 0;
-          padding: 28px;
-          border: 1px solid var(--border);
-          border-radius: 24px;
+        .record-preview div {
+          padding: 13px;
+          border-radius: 15px;
+          background: rgba(255, 255, 255, 0.035);
+        }
+
+        .record-preview span,
+        .summary-grid span {
+          display: block;
+          color: #7fa5b6;
+          font-size: 0.73rem;
+          text-transform: uppercase;
+          letter-spacing: 0.08em;
+          margin-bottom: 5px;
+        }
+
+        .record-preview strong {
+          font-size: 0.91rem;
+        }
+
+        .intake-form {
+          display: grid;
+          gap: 20px;
+        }
+
+        .form-section,
+        .success-panel {
+          border-radius: 28px;
+          border: 1px solid rgba(103, 194, 220, 0.18);
           background:
-            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.08), transparent 25%),
-            linear-gradient(145deg, rgba(10, 31, 43, 0.82), rgba(4, 18, 27, 0.95));
+            linear-gradient(145deg, rgba(14, 38, 55, 0.94), rgba(7, 23, 36, 0.9));
+          padding: clamp(24px, 4vw, 42px);
+          box-shadow: 0 22px 60px rgba(0, 0, 0, 0.18);
         }
 
-        .formSection legend {
+        .form-section-heading {
           display: flex;
-          gap: 12px;
-          align-items: center;
-          padding: 0 10px;
-          color: var(--text);
-          font-size: 1.08rem;
-          font-weight: 850;
-        }
-
-        .formSection legend span {
-          width: 34px;
-          height: 34px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          color: #031114;
-          background: var(--teal);
-          font-size: 0.72rem;
-          font-weight: 900;
-          box-shadow: 0 0 16px rgba(103, 224, 223, 0.25);
-        }
-
-        .fieldGrid {
-          display: grid;
           gap: 18px;
-          margin-top: 12px;
+          align-items: flex-start;
+          padding-bottom: 26px;
+          margin-bottom: 26px;
+          border-bottom: 1px solid rgba(113, 197, 220, 0.14);
         }
 
-        .twoColumns {
+        .form-section-heading > span {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          flex: 0 0 42px;
+          height: 42px;
+          border-radius: 50%;
+          background: rgba(86, 202, 232, 0.12);
+          color: #79dff5;
+          font-weight: 900;
+        }
+
+        .form-section-heading h2 {
+          margin: 2px 0 7px;
+          font-size: 1.55rem;
+        }
+
+        .form-section-heading p {
+          color: #9fb4c0;
+          margin-bottom: 0;
+        }
+
+        .field-grid {
+          display: grid;
+          gap: 20px;
+        }
+
+        .two-columns {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
-        label {
-          display: grid;
-          gap: 8px;
-        }
-
-        label > span,
-        .fieldLabel {
-          color: #dcebed;
-          font-size: 0.83rem;
+        label,
+        legend {
           font-weight: 800;
-        }
-
-        label > small,
-        .uploadPreview small {
-          color: #78959d;
-          font-size: 0.75rem;
-          line-height: 1.5;
+          color: #eaf8fd;
         }
 
         input,
-        textarea,
-        select {
-          width: 100%;
-          border: 1px solid rgba(118, 213, 220, 0.18);
-          border-radius: 12px;
-          color: var(--text);
-          background: rgba(2, 14, 22, 0.72);
-          font: inherit;
-          outline: none;
-          transition: border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
-        }
-
-        input,
-        select {
-          min-height: 48px;
-          padding: 0 14px;
-        }
-
         textarea {
-          padding: 13px 14px;
+          display: block;
+          width: 100%;
+          margin-top: 9px;
+          border: 1px solid rgba(130, 207, 227, 0.22);
+          border-radius: 15px;
+          padding: 14px 15px;
+          color: #f5fbff;
+          background: rgba(4, 16, 27, 0.78);
+          outline: none;
           resize: vertical;
-          line-height: 1.55;
+        }
+
+        input:focus,
+        textarea:focus {
+          border-color: #71d9f0;
+          box-shadow: 0 0 0 3px rgba(79, 203, 232, 0.13);
         }
 
         input::placeholder,
         textarea::placeholder {
-          color: #607b83;
+          color: #648091;
         }
 
-        input:focus,
-        textarea:focus,
-        select:focus {
-          border-color: var(--teal);
-          background: rgba(4, 21, 30, 0.92);
-          box-shadow: 0 0 0 3px rgba(103, 224, 223, 0.08);
-        }
-
-        select option {
-          color: #07151c;
-          background: white;
-        }
-
-        .guidedPrompt {
-          display: flex;
-          gap: 12px;
-          align-items: flex-start;
-          padding: 16px;
-          border: 1px solid rgba(188, 164, 255, 0.2);
-          border-radius: 14px;
-          background: rgba(188, 164, 255, 0.06);
-        }
-
-        .guidedPrompt svg {
-          flex: 0 0 auto;
-          margin-top: 2px;
-          color: var(--violet);
-        }
-
-        .guidedPrompt strong {
-          color: #e8e1ff;
-        }
-
-        .guidedPrompt p {
-          margin: 5px 0 0;
-          color: #bcb3d5;
+        .field-guide {
+          margin: 8px 0 0;
+          color: #7894a3;
+          font-size: 0.82rem;
           line-height: 1.55;
+          font-weight: 500;
         }
 
-        .uploadPreview {
-          padding: 16px;
-          border: 1px dashed rgba(118, 213, 220, 0.28);
-          border-radius: 14px;
-          background: rgba(103, 224, 223, 0.025);
-        }
-
-        .uploadPreview input {
-          opacity: 0.5;
-        }
-
-        .choiceGrid {
+        .choice-grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-          margin-top: 10px;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 14px;
+          padding: 0;
+          margin: 0;
+          border: 0;
         }
 
-        .choiceCard {
+        .choice-grid legend {
+          grid-column: 1 / -1;
+          margin-bottom: 4px;
+        }
+
+        .choice-card {
+          position: relative;
+          min-height: 160px;
+          border: 1px solid rgba(113, 196, 219, 0.18);
+          border-radius: 20px;
+          padding: 20px;
+          cursor: pointer;
+          background: rgba(255, 255, 255, 0.025);
+        }
+
+        .choice-card.selected {
+          border-color: #63d4ed;
+          background: rgba(78, 196, 224, 0.08);
+        }
+
+        .choice-card input {
+          position: absolute;
+          opacity: 0;
+          pointer-events: none;
+        }
+
+        .choice-card strong,
+        .choice-card span {
+          display: block;
+        }
+
+        .choice-card strong {
+          margin-bottom: 16px;
+        }
+
+        .choice-card span {
+          color: #93adba;
+          line-height: 1.55;
+          font-weight: 500;
+        }
+
+        .consent-row {
           display: flex;
-          gap: 10px;
-          align-items: center;
-          min-height: 46px;
-          padding: 10px 12px;
-          border: 1px solid rgba(118, 213, 220, 0.14);
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.018);
+          align-items: flex-start;
+          gap: 13px;
+          line-height: 1.6;
         }
 
-        .choiceCard input {
-          width: 16px;
-          min-height: auto;
-          height: 16px;
-          margin: 0;
-          accent-color: var(--teal);
+        .consent-row input {
+          flex: 0 0 20px;
+          width: 20px;
+          height: 20px;
+          margin: 3px 0 0;
+          accent-color: #53cde9;
         }
 
-        .choiceCard span {
-          color: #dcebed;
-          font-size: 0.78rem;
+        .boundary-box {
+          margin-top: 24px;
+          border-left: 3px solid #dfba58;
+          border-radius: 0 16px 16px 0;
+          padding: 18px 20px;
+          background: rgba(205, 152, 31, 0.08);
         }
 
-        .submissionPanel {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 24px;
-          align-items: center;
-          padding: 26px;
-          border: 1px solid rgba(255, 216, 120, 0.22);
-          border-radius: 22px;
-          background: rgba(255, 216, 120, 0.055);
-        }
-
-        .submissionPanel h3 {
-          margin: 8px 0;
-          font-size: 1.35rem;
-        }
-
-        .submissionPanel p {
-          max-width: 760px;
-          margin: 0;
-          color: #cfc5aa;
+        .boundary-box p {
+          margin: 8px 0 0;
+          color: #c6b98f;
           line-height: 1.65;
         }
 
-        .disabledButton {
-          min-height: 48px;
-          padding: 0 18px;
-          border: 1px solid rgba(255, 255, 255, 0.12);
-          border-radius: 999px;
-          color: #789098;
-          background: rgba(255, 255, 255, 0.035);
-          font-weight: 800;
-          cursor: not-allowed;
-        }
-
-        .assuranceGrid {
+        .sequence {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(380px, 0.8fr);
-          gap: 60px;
-          align-items: start;
-        }
-
-        .assuranceGrid > div:first-child p {
-          margin-top: 20px;
-        }
-
-        .assuranceSteps {
-          display: grid;
+          grid-template-columns: repeat(7, 1fr);
           gap: 10px;
         }
 
-        .assuranceStep {
-          display: grid;
-          grid-template-columns: 42px 1fr;
-          gap: 12px;
-          align-items: center;
-          padding: 14px;
-          border: 1px solid rgba(118, 213, 220, 0.13);
-          border-radius: 14px;
-          background: rgba(255, 255, 255, 0.018);
+        .sequence-step {
+          min-height: 130px;
+          border: 1px solid rgba(103, 197, 220, 0.15);
+          border-radius: 18px;
+          padding: 16px;
+          background: rgba(11, 32, 48, 0.72);
         }
 
-        .assuranceStep span {
-          width: 34px;
-          height: 34px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          color: #031114;
-          background: var(--teal);
-          font-size: 0.7rem;
+        .sequence-step span {
+          display: inline-flex;
+          color: #60d4ee;
+          margin-bottom: 38px;
+          font-size: 0.8rem;
+        }
+
+        .sequence-step strong {
+          display: block;
+          font-size: 0.92rem;
+          line-height: 1.35;
+        }
+
+        .success-panel {
+          max-width: 960px;
+          margin: 20px auto 0;
+          padding: clamp(32px, 6vw, 70px);
+        }
+
+        .status-badge {
+          display: inline-block;
+          border: 1px solid rgba(100, 222, 179, 0.38);
+          border-radius: 999px;
+          padding: 8px 12px;
+          color: #8aefc5;
+          background: rgba(54, 170, 126, 0.08);
+          font-size: 0.74rem;
           font-weight: 900;
+          letter-spacing: 0.1em;
         }
 
-        .assuranceStep strong {
-          font-size: 0.9rem;
+        .success-panel h1 {
+          font-size: clamp(2.6rem, 6vw, 5.4rem);
+          margin-top: 24px;
         }
 
-        .finalSection {
-          padding: 60px 0 80px;
+        .success-panel > p {
+          max-width: 760px;
+          color: #aebfca;
+          line-height: 1.75;
+          font-size: 1.08rem;
         }
 
-        .finalPanel {
+        .summary-grid {
           display: grid;
-          gap: 30px;
-          padding: 42px;
-          border: 1px solid var(--border-strong);
-          border-radius: 30px;
-          background:
-            radial-gradient(circle at 86% 12%, rgba(98, 169, 255, 0.13), transparent 32%),
-            radial-gradient(circle at 10% 88%, rgba(103, 224, 223, 0.12), transparent 32%),
-            linear-gradient(145deg, rgba(8, 30, 42, 0.95), rgba(3, 15, 23, 0.98));
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-top: 34px;
         }
 
-        .finalPanel p {
-          max-width: 820px;
-          margin-top: 20px;
+        .summary-grid article {
+          border-radius: 16px;
+          padding: 17px;
+          background: rgba(255, 255, 255, 0.035);
         }
 
-        .maxim {
-          padding-top: 24px;
-          border-top: 1px solid rgba(118, 213, 220, 0.14);
-          color: var(--teal);
-          font-size: 0.84rem;
-          font-weight: 850;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
+        .summary-grid strong {
+          line-height: 1.45;
         }
 
-        @keyframes glowPulse {
+        @keyframes drift {
           0%,
           100% {
-            opacity: 0.09;
-            transform: scale(0.92);
+            transform: translate3d(0, 0, 0) scale(0.9);
+            opacity: 0.48;
           }
           50% {
-            opacity: 0.17;
-            transform: scale(1.08);
-          }
-        }
-
-        @keyframes lineMove {
-          0% {
-            opacity: 0;
-            translate: -12% 0;
-          }
-          20%,
-          80% {
-            opacity: 0.72;
-          }
-          100% {
-            opacity: 0;
-            translate: 38% 0;
-          }
-        }
-
-        @keyframes twinkle {
-          0%,
-          100% {
-            opacity: 0.25;
-            transform: scale(0.8);
-          }
-          50% {
+            transform: translate3d(18px, -24px, 0) scale(1.35);
             opacity: 1;
-            transform: scale(1.35);
+          }
+        }
+
+        @keyframes rotate {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @keyframes pulse {
+          0%,
+          100% {
+            opacity: 0.22;
+          }
+          50% {
+            opacity: 0.78;
           }
         }
 
         @media (max-width: 980px) {
-          .heroGrid,
-          .sectionHeading,
-          .assuranceGrid {
+          .mission-grid,
+          .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .door-grid {
+            grid-template-columns: repeat(2, 1fr);
+          }
+
+          .intake-layout {
             grid-template-columns: 1fr;
           }
 
-          .explanationGrid {
-            grid-template-columns: 1fr;
+          .sticky-panel {
+            position: relative;
+            top: 0;
           }
 
-          .explanationCard:last-child {
-            grid-column: auto;
-          }
-
-          .submissionPanel {
-            grid-template-columns: 1fr;
+          .sequence {
+            grid-template-columns: repeat(4, 1fr);
           }
         }
 
-        @media (max-width: 700px) {
-          .shell {
-            width: min(100% - 24px, 1160px);
+        @media (max-width: 680px) {
+          .content-shell {
+            width: min(100% - 24px, 1180px);
+            padding-top: 22px;
+          }
+
+          .breadcrumbs {
+            margin-bottom: 40px;
+          }
+
+          .mission-grid,
+          .door-grid,
+          .summary-grid,
+          .two-columns,
+          .choice-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .mission-card,
+          .door-card {
+            min-height: 220px;
+          }
+
+          .sequence {
+            grid-template-columns: repeat(2, 1fr);
           }
 
           .hero {
-            padding-top: 56px;
+            padding-bottom: 44px;
           }
 
-          .backLink {
-            margin-bottom: 38px;
-          }
-
-          .section {
-            padding: 78px 0;
-          }
-
-          .twoColumns,
-          .choiceGrid {
-            grid-template-columns: 1fr;
-          }
-
-          .formSection,
-          .explanationCard {
-            padding: 22px 18px;
-          }
-
-          .heroPanelRow {
-            grid-template-columns: 32px 1fr;
-          }
-
-          .heroPanelRow small {
-            grid-column: 2;
-          }
-
-          .finalPanel {
-            padding: 30px 22px;
-          }
-        }
-
-        @media (max-width: 480px) {
-          h1 {
-            font-size: clamp(2.8rem, 16vw, 4.2rem);
-          }
-
-          .heroActions,
-          .finalActions {
-            align-items: stretch;
-            flex-direction: column;
-          }
-
-          .primaryButton,
-          .secondaryButton {
-            width: 100%;
-          }
-
-          .heroPanel {
-            padding: 18px;
+          .mission-section,
+          .door-section,
+          .how-it-works {
+            padding-bottom: 58px;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          *,
-          *::before,
-          *::after {
-            scroll-behavior: auto !important;
-            animation-duration: 0.001ms !important;
-            animation-iteration-count: 1 !important;
-            transition-duration: 0.001ms !important;
+          :global(html) {
+            scroll-behavior: auto;
+          }
+
+          .star,
+          .orbit,
+          .route-line {
+            animation: none;
+          }
+
+          .primary-button,
+          .secondary-button,
+          .door-card {
+            transition: none;
           }
         }
       `}</style>
