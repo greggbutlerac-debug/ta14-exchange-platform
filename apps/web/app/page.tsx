@@ -154,11 +154,6 @@ const exchangeSteps = [
 
 export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [activeDoor, setActiveDoor] = useState<string | null>(null);
-
-  const toggleDoor = (doorNumber: string) => {
-    setActiveDoor((current) => (current === doorNumber ? null : doorNumber));
-  };
 
   return (
     <main className="page-shell">
@@ -273,101 +268,78 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="door-stack">
-          {doors.map((door, index) => {
-            const isOpen = activeDoor === door.number;
-
-            return (
+        <div className="door-stack redesigned-door-stack">
+          {doors.map((door, index) => (
             <article
-              className={`door-card gold-door door-${index + 1} ${isOpen ? "is-open" : ""}`}
+              className={`destination-door-card destination-${index + 1}`}
               id={`door-${door.number}`}
               key={door.title}
             >
-              <button
-                className="gold-door-face"
-                type="button"
-                aria-expanded={isOpen}
-                aria-controls={`door-panel-${door.number}`}
-                onClick={() => toggleDoor(door.number)}
-              >
-                <span className="doorway-light" aria-hidden="true" />
-                <span className="doorway-floor-light" aria-hidden="true" />
-                <span className="gold-door-slab" aria-hidden="true">
-                  <span className="gold-door-frame" />
-                  <span className="gold-door-panel panel-top" />
-                  <span className="gold-door-panel panel-middle" />
-                  <span className="gold-door-panel panel-bottom" />
-                  <span className="gold-door-handle" />
-                  <span className="gold-door-light" />
-                </span>
-
-                <span className="door-number">{door.number}</span>
-                <span className="door-emblem">
-                  <span>{door.badge}</span>
-                  <i />
-                </span>
-
-                <span className="gold-door-copy">
-                  <span className="door-kicker">PRIMARY EXCHANGE DOOR</span>
-                  <span className="intent-question">{door.question}</span>
-                  <span className="gold-door-title">{door.title}</span>
-                  <span className="gold-door-statement">{door.statement}</span>
-                  <span className="gold-door-instruction">
-                    {isOpen ? "Close this door" : "Open this door"}
-                    <b>{isOpen ? "−" : "+"}</b>
+              <div className="physical-door-column">
+                <Link
+                  className="real-door-link"
+                  href={door.href}
+                  aria-label={`${door.action}: ${door.title}`}
+                >
+                  <span className="real-doorway-light" aria-hidden="true" />
+                  <span className="real-door-frame" aria-hidden="true">
+                    <span className="real-door-casing casing-top" />
+                    <span className="real-door-casing casing-left" />
+                    <span className="real-door-casing casing-right" />
+                    <span className="real-door-slab">
+                      <span className="wood-grain grain-one" />
+                      <span className="wood-grain grain-two" />
+                      <span className="raised-panel raised-panel-one" />
+                      <span className="raised-panel raised-panel-two" />
+                      <span className="raised-panel raised-panel-three" />
+                      <span className="raised-panel raised-panel-four" />
+                      <span className="door-plate" />
+                      <span className="door-knob" />
+                      <span className="door-hinge hinge-one" />
+                      <span className="door-hinge hinge-two" />
+                      <span className="door-hinge hinge-three" />
+                    </span>
                   </span>
-                </span>
 
-                <span className="star-burst burst-one" aria-hidden="true" />
-                <span className="star-burst burst-two" aria-hidden="true" />
-                <span className="star-burst burst-three" aria-hidden="true" />
-                <span className="star-burst burst-four" aria-hidden="true" />
-                <span className="star-burst burst-five" aria-hidden="true" />
-              </button>
+                  <span className="door-sign">
+                    <small>DOOR {door.number}</small>
+                    <strong>{door.badge}</strong>
+                  </span>
 
-              <div
-                className="door-panel"
-                id={`door-panel-${door.number}`}
-                hidden={!isOpen}
-              >
-                <div className={`door-visual visual-${index + 1}`} aria-hidden="true">
-                  <div className="visual-grid" />
-                  <div className="visual-core">
-                    <span>{door.badge}</span>
-                  </div>
-                  <span className="visual-node node-a" />
-                  <span className="visual-node node-b" />
-                  <span className="visual-node node-c" />
-                  <span className="visual-node node-d" />
-                  <span className="visual-route route-a" />
-                  <span className="visual-route route-b" />
-                  <span className="visual-route route-c" />
-                </div>
+                  <span className="door-enter-prompt">
+                    Enter
+                    <b>→</b>
+                  </span>
+                </Link>
+              </div>
 
-                <div className="door-content">
-                <div className="door-explanation">
-                  <p>{door.description}</p>
-                  <ul>
-                    {door.attributes.map((attribute) => (
-                      <li key={attribute}>
-                        <span>✓</span>
-                        {attribute}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+              <div className="destination-door-content">
+                <p className="door-kicker">PRIMARY EXCHANGE DOOR {door.number}</p>
+                <p className="intent-question">{door.question}</p>
+                <h3>{door.title}</h3>
+                <p className="destination-statement">{door.statement}</p>
+                <p className="destination-description">{door.description}</p>
 
-                <div className="door-actions">
-                  <Link className="button primary door-primary" href={door.href}>
+                <ul className="destination-attributes">
+                  {door.attributes.map((attribute) => (
+                    <li key={attribute}>
+                      <span>✓</span>
+                      {attribute}
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="destination-actions">
+                  <Link className="button primary destination-primary" href={door.href}>
                     {door.action}
                     <span>→</span>
                   </Link>
 
-                  <div className="route-buttons">
+                  <div className="destination-route-links">
                     {door.links.map((link) => (
                       <Link
                         key={link.label}
-                        className={link.kind === "special" ? "route-chip special" : "route-chip"}
+                        className={link.kind === "special" ? "destination-chip special" : "destination-chip"}
                         href={link.href}
                       >
                         {link.label}
@@ -375,17 +347,15 @@ export default function HomePage() {
                     ))}
                   </div>
 
-                  <Link className="marketplace-button" href="/marketplace">
+                  <Link className="destination-marketplace" href="/marketplace">
                     <span>Marketplace</span>
                     <strong>{door.marketplaceLabel}</strong>
                     <b>↗</b>
                   </Link>
                 </div>
-                </div>
               </div>
             </article>
-            );
-          })}
+          ))}
         </div>
       </section>
 
@@ -2079,6 +2049,455 @@ export default function HomePage() {
 
           .footer-chain {
             grid-column: 1;
+          }
+        }
+
+
+        /* Redesigned physical destination doors */
+        .redesigned-door-stack {
+          display: grid;
+          gap: 30px;
+        }
+
+        .destination-door-card {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(245px, 330px) minmax(0, 1fr);
+          gap: clamp(34px, 5vw, 76px);
+          align-items: center;
+          min-height: 530px;
+          padding: clamp(28px, 4.6vw, 60px);
+          overflow: hidden;
+          border: 1px solid rgba(255, 215, 112, 0.28);
+          border-radius: 30px;
+          background:
+            radial-gradient(circle at 12% 50%, rgba(255, 198, 64, 0.09), transparent 34%),
+            linear-gradient(135deg, rgba(255, 244, 190, 0.035), transparent 32%),
+            rgba(8, 13, 23, 0.92);
+          box-shadow:
+            0 34px 100px rgba(0, 0, 0, 0.38),
+            inset 0 0 0 1px rgba(255, 255, 255, 0.018);
+        }
+
+        .destination-door-card::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          opacity: 0.3;
+          background-image:
+            linear-gradient(rgba(255, 215, 112, 0.05) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 215, 112, 0.05) 1px, transparent 1px);
+          background-size: 42px 42px;
+          mask-image: linear-gradient(90deg, black, transparent 48%);
+          pointer-events: none;
+        }
+
+        .physical-door-column,
+        .destination-door-content {
+          position: relative;
+          z-index: 2;
+        }
+
+        .physical-door-column {
+          display: flex;
+          justify-content: center;
+        }
+
+        .real-door-link {
+          position: relative;
+          display: block;
+          width: min(100%, 286px);
+          height: 420px;
+          padding: 16px 18px 20px;
+          border-radius: 12px 12px 4px 4px;
+          perspective: 1500px;
+          isolation: isolate;
+          transition: transform 0.25s ease, filter 0.25s ease;
+        }
+
+        .real-door-link:hover,
+        .real-door-link:focus-visible {
+          transform: translateY(-7px);
+          filter: brightness(1.08);
+          outline: none;
+        }
+
+        .real-doorway-light {
+          position: absolute;
+          inset: 17px 18px 20px;
+          z-index: -1;
+          border-radius: 4px;
+          opacity: 0;
+          background:
+            radial-gradient(circle at 60% 48%, rgba(255, 255, 239, 0.98), rgba(255, 224, 137, 0.9) 22%, rgba(255, 182, 39, 0.34) 52%, transparent 76%);
+          box-shadow:
+            0 0 55px rgba(255, 191, 43, 0.36),
+            inset 0 0 62px rgba(255, 235, 165, 0.5);
+          transition: opacity 0.38s ease;
+        }
+
+        .real-door-link:hover .real-doorway-light,
+        .real-door-link:focus-visible .real-doorway-light {
+          opacity: 1;
+        }
+
+        .real-door-frame {
+          position: absolute;
+          inset: 0;
+          display: block;
+          border-radius: 13px 13px 3px 3px;
+          background: linear-gradient(90deg, #3f2608, #b97816 9%, #6d410b 18%, #2d1a05 50%, #70450c 82%, #bd7c18 92%, #3b2307);
+          box-shadow:
+            0 26px 42px rgba(0, 0, 0, 0.48),
+            inset 0 0 0 2px rgba(255, 221, 139, 0.35),
+            inset 0 0 0 7px rgba(38, 22, 4, 0.82);
+        }
+
+        .real-door-casing {
+          position: absolute;
+          z-index: 4;
+          display: block;
+          background: linear-gradient(90deg, #3f2406, #d08a1d 45%, #71430b 72%, #241403);
+          box-shadow: inset 0 0 0 1px rgba(255, 227, 151, 0.24);
+        }
+
+        .casing-top {
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 18px;
+          border-radius: 12px 12px 0 0;
+        }
+
+        .casing-left,
+        .casing-right {
+          top: 0;
+          bottom: 0;
+          width: 18px;
+        }
+
+        .casing-left { left: 0; }
+        .casing-right { right: 0; transform: scaleX(-1); }
+
+        .real-door-slab {
+          position: absolute;
+          inset: 18px 18px 20px;
+          z-index: 2;
+          display: block;
+          overflow: hidden;
+          border: 1px solid rgba(255, 222, 139, 0.42);
+          border-radius: 3px 3px 1px 1px;
+          transform-origin: left center;
+          transform-style: preserve-3d;
+          background:
+            linear-gradient(90deg, rgba(255,255,255,0.05), transparent 8%, transparent 86%, rgba(0,0,0,0.27)),
+            linear-gradient(115deg, #4a2a08 0%, #8d5511 22%, #5b3509 44%, #a76816 67%, #4b2a07 100%);
+          box-shadow:
+            inset -12px 0 22px rgba(0, 0, 0, 0.27),
+            inset 8px 0 16px rgba(255, 217, 119, 0.06),
+            0 10px 24px rgba(0, 0, 0, 0.32);
+          transition: transform 0.72s cubic-bezier(0.18, 0.82, 0.22, 1), box-shadow 0.4s ease;
+        }
+
+        .real-door-link:hover .real-door-slab,
+        .real-door-link:focus-visible .real-door-slab {
+          transform: rotateY(-24deg);
+          box-shadow:
+            28px 9px 30px rgba(0, 0, 0, 0.48),
+            inset -22px 0 24px rgba(0, 0, 0, 0.36);
+        }
+
+        .wood-grain {
+          position: absolute;
+          inset: -10%;
+          opacity: 0.15;
+          background: repeating-linear-gradient(86deg, transparent 0 13px, rgba(255, 225, 148, 0.3) 14px, transparent 16px 31px);
+          transform: rotate(2deg);
+        }
+
+        .grain-two {
+          opacity: 0.11;
+          transform: rotate(-3deg) scaleX(-1);
+        }
+
+        .raised-panel {
+          position: absolute;
+          left: 13%;
+          right: 13%;
+          border: 2px solid rgba(48, 25, 3, 0.72);
+          background:
+            linear-gradient(145deg, rgba(255, 215, 117, 0.12), transparent 36%),
+            rgba(73, 39, 5, 0.18);
+          box-shadow:
+            inset 0 0 0 5px rgba(181, 112, 23, 0.18),
+            inset 0 0 0 7px rgba(28, 14, 2, 0.43),
+            inset 6px 7px 16px rgba(255, 210, 100, 0.05),
+            0 2px 5px rgba(0, 0, 0, 0.24);
+        }
+
+        .raised-panel-one { top: 8%; height: 20%; }
+        .raised-panel-two { top: 33%; height: 20%; }
+        .raised-panel-three { top: 58%; height: 14%; }
+        .raised-panel-four { top: 76%; height: 15%; }
+
+        .door-plate {
+          position: absolute;
+          top: 52%;
+          right: 8%;
+          width: 22px;
+          height: 44px;
+          border: 1px solid #f1cc72;
+          border-radius: 10px;
+          background: linear-gradient(90deg, #75460b, #e8bd58 48%, #8d5a12);
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.38);
+          transform: translateY(-50%);
+        }
+
+        .door-knob {
+          position: absolute;
+          top: 52%;
+          right: 4.5%;
+          width: 18px;
+          height: 18px;
+          border: 2px solid #ffe7a5;
+          border-radius: 50%;
+          background: radial-gradient(circle at 35% 30%, #fff1bf, #c98916 38%, #704008 72%);
+          box-shadow:
+            0 0 0 4px rgba(49, 27, 3, 0.88),
+            0 0 15px rgba(255, 205, 82, 0.28);
+          transform: translateY(-50%);
+        }
+
+        .door-hinge {
+          position: absolute;
+          left: 0;
+          width: 9px;
+          height: 28px;
+          border-radius: 0 4px 4px 0;
+          background: linear-gradient(90deg, #382006, #c58a2a, #5b3509);
+        }
+
+        .hinge-one { top: 16%; }
+        .hinge-two { top: 48%; }
+        .hinge-three { top: 80%; }
+
+        .door-sign {
+          position: absolute;
+          z-index: 7;
+          top: 50px;
+          left: 50%;
+          display: grid;
+          place-items: center;
+          width: 74px;
+          min-height: 74px;
+          padding: 8px;
+          border: 1px solid rgba(255, 229, 163, 0.7);
+          border-radius: 8px;
+          color: #ffe8ad;
+          background: linear-gradient(145deg, rgba(255, 220, 128, 0.18), rgba(37, 20, 3, 0.88));
+          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.36);
+          transform: translateX(-50%);
+          text-align: center;
+        }
+
+        .door-sign small,
+        .door-sign strong {
+          display: block;
+        }
+
+        .door-sign small {
+          font-size: 0.52rem;
+          font-weight: 950;
+          letter-spacing: 0.1em;
+        }
+
+        .door-sign strong {
+          margin-top: 3px;
+          font-size: 1.15rem;
+        }
+
+        .door-enter-prompt {
+          position: absolute;
+          z-index: 7;
+          right: 32px;
+          bottom: 35px;
+          display: inline-flex;
+          align-items: center;
+          gap: 7px;
+          padding: 8px 11px;
+          border: 1px solid rgba(255, 226, 151, 0.52);
+          border-radius: 999px;
+          color: #ffe8aa;
+          background: rgba(23, 13, 2, 0.82);
+          font-size: 0.69rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+          transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .real-door-link:hover .door-enter-prompt,
+        .real-door-link:focus-visible .door-enter-prompt {
+          transform: translateX(4px);
+          background: rgba(96, 55, 6, 0.9);
+        }
+
+        .destination-door-content {
+          max-width: 870px;
+        }
+
+        .destination-door-content h3 {
+          margin: 0 0 13px;
+          color: #ffffff;
+          font-size: clamp(2.2rem, 4.3vw, 4.55rem);
+          line-height: 0.98;
+          letter-spacing: -0.055em;
+        }
+
+        .destination-statement {
+          max-width: 810px;
+          margin-bottom: 14px;
+          color: #f5dfad;
+          font-size: clamp(1.02rem, 1.6vw, 1.28rem);
+          font-weight: 850;
+          line-height: 1.5;
+        }
+
+        .destination-description {
+          max-width: 830px;
+          margin-bottom: 22px;
+          color: #aeb9ca;
+          font-size: 0.98rem;
+        }
+
+        .destination-attributes {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 9px 18px;
+          margin: 0 0 27px;
+          padding: 0;
+          list-style: none;
+        }
+
+        .destination-attributes li {
+          display: flex;
+          gap: 9px;
+          align-items: flex-start;
+          color: #cbd4e2;
+          font-size: 0.84rem;
+          font-weight: 750;
+          line-height: 1.45;
+        }
+
+        .destination-attributes li span {
+          color: #f2c55c;
+          font-weight: 950;
+        }
+
+        .destination-actions {
+          display: grid;
+          gap: 14px;
+        }
+
+        .destination-primary {
+          width: fit-content;
+          gap: 11px;
+          min-width: 205px;
+        }
+
+        .destination-route-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .destination-chip {
+          display: inline-flex;
+          align-items: center;
+          min-height: 38px;
+          padding: 0 12px;
+          border: 1px solid rgba(130, 157, 197, 0.2);
+          border-radius: 999px;
+          color: #b8c3d3;
+          background: rgba(12, 21, 35, 0.7);
+          font-size: 0.73rem;
+          font-weight: 850;
+          transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+        }
+
+        .destination-chip:hover {
+          color: #fff;
+          border-color: rgba(255, 211, 103, 0.46);
+          transform: translateY(-2px);
+        }
+
+        .destination-chip.special {
+          color: #f0cc75;
+          border-color: rgba(255, 211, 103, 0.3);
+        }
+
+        .destination-marketplace {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          gap: 12px;
+          align-items: center;
+          width: min(100%, 610px);
+          padding: 13px 15px;
+          border: 1px solid rgba(109, 230, 201, 0.18);
+          border-radius: 14px;
+          color: #dce9e6;
+          background: rgba(8, 25, 29, 0.52);
+        }
+
+        .destination-marketplace span {
+          color: #69e2c2;
+          font-size: 0.7rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .destination-marketplace strong {
+          font-size: 0.82rem;
+        }
+
+        .destination-marketplace b {
+          color: #69e2c2;
+        }
+
+        @media (max-width: 900px) {
+          .destination-door-card {
+            grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
+            gap: 30px;
+          }
+
+          .real-door-link {
+            height: 380px;
+          }
+
+          .destination-attributes {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 700px) {
+          .destination-door-card {
+            grid-template-columns: 1fr;
+            min-height: 0;
+            padding: 28px 20px 32px;
+          }
+
+          .physical-door-column {
+            justify-content: flex-start;
+          }
+
+          .real-door-link {
+            width: 225px;
+            height: 330px;
+          }
+
+          .destination-door-content h3 {
+            font-size: clamp(2.15rem, 12vw, 3.2rem);
           }
         }
 
