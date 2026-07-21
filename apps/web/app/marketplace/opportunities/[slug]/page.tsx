@@ -2,6 +2,11 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
+import {
+  marketplaceActions,
+  marketplaceRoutes,
+} from '../../../../lib/marketplace-routes';
+
 type OpportunityRecord = {
   slug: string;
   title: string;
@@ -372,7 +377,7 @@ export default async function OpportunityDetailPage({
 
       <section className="heroSection">
         <div className="pageShell">
-          <Link className="backLink" href="/marketplace#opportunities">
+          <Link className="backLink" href={marketplaceRoutes.opportunities}>
             <span aria-hidden="true">←</span>
             Back to Marketplace Opportunities
           </Link>
@@ -626,11 +631,18 @@ export default async function OpportunityDetailPage({
           </div>
 
           <div className="finalActions">
-            <Link className="primaryButton" href="/marketplace/post-a-need">
+            <Link
+              aria-label={marketplaceActions.postNeed.description}
+              className="primaryButton"
+              href={marketplaceActions.postNeed.href}
+            >
               Post a Governance Need
               <ArrowIcon />
             </Link>
-            <Link className="secondaryButton" href="/marketplace">
+            <Link
+              className="secondaryButton"
+              href={marketplaceRoutes.home}
+            >
               Return to Marketplace
             </Link>
           </div>
