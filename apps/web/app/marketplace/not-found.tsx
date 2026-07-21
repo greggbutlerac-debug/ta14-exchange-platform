@@ -1,8 +1,19 @@
 import Link from 'next/link';
 
+import {
+  marketplaceActions,
+  marketplaceRoutes,
+} from '../../lib/marketplace-routes';
+
 function ArrowIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+    >
       <path
         d="M5 12h14M13 6l6 6-6 6"
         stroke="currentColor"
@@ -16,7 +27,13 @@ function ArrowIcon() {
 
 function SearchIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="22" height="22" fill="none">
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+    >
       <circle
         cx="11"
         cy="11"
@@ -33,6 +50,29 @@ function SearchIcon() {
     </svg>
   );
 }
+
+const recoveryRoutes = [
+  {
+    label: 'Browse Opportunities',
+    href: marketplaceRoutes.opportunities,
+  },
+  {
+    label: 'Browse Professionals',
+    href: marketplaceRoutes.professionals,
+  },
+  {
+    label: 'Browse Organizations',
+    href: marketplaceRoutes.organizations,
+  },
+  {
+    label: 'Browse Records',
+    href: marketplaceRoutes.records,
+  },
+  {
+    label: 'Browse Reviews',
+    href: marketplaceRoutes.reviews,
+  },
+] as const;
 
 export default function MarketplaceNotFound() {
   return (
@@ -53,6 +93,7 @@ export default function MarketplaceNotFound() {
             </div>
 
             <span className="kicker">MARKETPLACE ROUTE NOT FOUND</span>
+
             <h1>This Marketplace record is not available.</h1>
 
             <p className="lead">
@@ -72,44 +113,28 @@ export default function MarketplaceNotFound() {
             </div>
 
             <div className="actionGrid">
-              <Link className="primaryButton" href="/marketplace">
+              <Link
+                className="primaryButton"
+                href={marketplaceRoutes.home}
+              >
                 Return to Marketplace
                 <ArrowIcon />
               </Link>
 
-              <Link
-                className="secondaryButton"
-                href="/marketplace/opportunities"
-              >
-                Browse Opportunities
-              </Link>
-
-              <Link
-                className="secondaryButton"
-                href="/marketplace/professionals"
-              >
-                Browse Professionals
-              </Link>
-
-              <Link
-                className="secondaryButton"
-                href="/marketplace/organizations"
-              >
-                Browse Organizations
-              </Link>
-
-              <Link className="secondaryButton" href="/marketplace/records">
-                Browse Records
-              </Link>
-
-              <Link className="secondaryButton" href="/marketplace/reviews">
-                Browse Reviews
-              </Link>
+              {recoveryRoutes.map((route) => (
+                <Link
+                  className="secondaryButton"
+                  href={route.href}
+                  key={route.href}
+                >
+                  {route.label}
+                </Link>
+              ))}
             </div>
 
             <div className="postNeedPanel">
               <div>
-                <span>CAN'T FIND THE RIGHT ROUTE?</span>
+                <span>CAN&apos;T FIND THE RIGHT ROUTE?</span>
                 <strong>Declare the governance need instead.</strong>
                 <p>
                   Post the problem, consequential action, evidence available,
@@ -118,10 +143,11 @@ export default function MarketplaceNotFound() {
               </div>
 
               <Link
+                aria-label={marketplaceActions.postNeed.description}
                 className="postNeedButton"
-                href="/marketplace/post-a-need"
+                href={marketplaceActions.postNeed.href}
               >
-                Post a Governance Need
+                {marketplaceActions.postNeed.label}
                 <ArrowIcon />
               </Link>
             </div>
@@ -160,8 +186,16 @@ export default function MarketplaceNotFound() {
           overflow: hidden;
           color: var(--text);
           background:
-            radial-gradient(circle at 14% 12%, rgba(37, 185, 189, 0.15), transparent 30%),
-            radial-gradient(circle at 86% 18%, rgba(188, 164, 255, 0.12), transparent 28%),
+            radial-gradient(
+              circle at 14% 12%,
+              rgba(37, 185, 189, 0.15),
+              transparent 30%
+            ),
+            radial-gradient(
+              circle at 86% 18%,
+              rgba(188, 164, 255, 0.12),
+              transparent 28%
+            ),
             linear-gradient(180deg, #031019 0%, #071821 54%, #031019 100%);
         }
 
@@ -172,8 +206,15 @@ export default function MarketplaceNotFound() {
           pointer-events: none;
           opacity: 0.22;
           background-image:
-            linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+            linear-gradient(
+              rgba(255, 255, 255, 0.025) 1px,
+              transparent 1px
+            ),
+            linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.025) 1px,
+              transparent 1px
+            );
           background-size: 42px 42px;
           mask-image: linear-gradient(to bottom, black, transparent 88%);
         }
@@ -255,9 +296,21 @@ export default function MarketplaceNotFound() {
           border: 1px solid var(--border-strong);
           border-radius: 30px;
           background:
-            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.11), transparent 29%),
-            radial-gradient(circle at 100% 0, rgba(188, 164, 255, 0.1), transparent 28%),
-            linear-gradient(145deg, rgba(9, 31, 43, 0.94), rgba(4, 17, 25, 0.98));
+            radial-gradient(
+              circle at 0 0,
+              rgba(103, 224, 223, 0.11),
+              transparent 29%
+            ),
+            radial-gradient(
+              circle at 100% 0,
+              rgba(188, 164, 255, 0.1),
+              transparent 28%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(9, 31, 43, 0.94),
+              rgba(4, 17, 25, 0.98)
+            );
           box-shadow: 0 34px 90px rgba(0, 0, 0, 0.34);
           text-align: center;
         }
@@ -392,7 +445,11 @@ export default function MarketplaceNotFound() {
           border: 1px solid rgba(188, 164, 255, 0.2);
           border-radius: 20px;
           background:
-            radial-gradient(circle at 0 0, rgba(188, 164, 255, 0.1), transparent 28%),
+            radial-gradient(
+              circle at 0 0,
+              rgba(188, 164, 255, 0.1),
+              transparent 28%
+            ),
             rgba(188, 164, 255, 0.035);
           text-align: left;
         }
@@ -449,6 +506,7 @@ export default function MarketplaceNotFound() {
             opacity: 0.09;
             transform: scale(0.92);
           }
+
           50% {
             opacity: 0.17;
             transform: scale(1.08);
@@ -461,6 +519,7 @@ export default function MarketplaceNotFound() {
             opacity: 0.25;
             transform: scale(0.8);
           }
+
           50% {
             opacity: 1;
             transform: scale(1.35);
