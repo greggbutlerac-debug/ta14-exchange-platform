@@ -26,6 +26,8 @@ const RECORD_TYPES = [
   'Other Governed Record',
 ] as const;
 
+type RecordType = (typeof RECORD_TYPES)[number];
+
 const INITIAL_EVIDENCE: EvidenceItem[] = [
   {
     id: 'evidence-1',
@@ -48,42 +50,51 @@ const SIDEBAR_LINKS = [
     label: 'Governed Records Home',
     href: '/workspace/governed-records',
     glyph: '⌂',
+    active: false,
   },
   {
     label: 'My Records',
     href: '/workspace/governed-records/my-records',
     glyph: 'R',
+    active: false,
   },
   {
     label: 'Continuity Review',
     href: '/workspace/governed-records/continuity-review',
     glyph: 'C',
+    active: false,
   },
   {
     label: 'Record Comparison',
     href: '/workspace/governed-records/comparison',
     glyph: '≋',
+    active: false,
   },
   {
     label: 'Preserved Records',
     href: '/workspace/governed-records/preserved-records',
     glyph: 'P',
+    active: false,
   },
   {
     label: 'Verification',
     href: '/workspace/governed-records/verification',
     glyph: '✓',
+    active: false,
   },
   {
     label: 'Pricing',
     href: '/workspace/governed-records/pricing',
     glyph: '$',
+    active: false,
   },
 ] as const;
 
 export default function BuildGovernedRecordPage() {
   const [title, setTitle] = useState('');
-  const [recordType, setRecordType] = useState(RECORD_TYPES[0]);
+  const [recordType, setRecordType] = useState<RecordType>(
+    RECORD_TYPES[0],
+  );
   const [recordOwner, setRecordOwner] = useState('');
   const [recordAuthority, setRecordAuthority] = useState('');
   const [realityStatement, setRealityStatement] = useState('');
@@ -182,7 +193,9 @@ export default function BuildGovernedRecordPage() {
         <nav className="sidebarNav" aria-label="Governed Records navigation">
           {SIDEBAR_LINKS.map((item) => (
             <Link
-              className={`sidebarLink ${item.active ? 'active' : ''}`}
+              className={`sidebarLink ${
+                item.active ? 'active' : ''
+              }`}
               href={item.href}
               key={item.href}
             >
@@ -251,7 +264,7 @@ export default function BuildGovernedRecordPage() {
                   <select
                     value={recordType}
                     onChange={(event) =>
-                      setRecordType(event.target.value as (typeof RECORD_TYPES)[number])
+                      setRecordType(event.target.value as RecordType)
                     }
                   >
                     {RECORD_TYPES.map((type) => (
