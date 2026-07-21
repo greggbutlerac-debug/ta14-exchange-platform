@@ -25,7 +25,17 @@ type IntakeState = {
   requestedReviewer: string;
 };
 
+type EntityReviewRequest = {
+  requestId: string;
+  createdAt: string;
+  updatedAt: string;
+  status: "DRAFT" | "READY_FOR_REVIEW";
+  intake: IntakeState;
+  boundaryStatement: string;
+};
+
 const STORAGE_KEY = "ta14-entity-review-intake-v1";
+const REQUESTS_STORAGE_KEY = "ta14-entity-review-requests-v1";
 
 const reviewTypes: Array<{
   title: ReviewType;
@@ -122,6 +132,8 @@ export default function EntityReviewPage() {
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [showIntake, setShowIntake] = useState(false);
   const [notice, setNotice] = useState("");
+  const [requests, setRequests] = useState<EntityReviewRequest[]>([]);
+  const [activeRequestId, setActiveRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(STORAGE_KEY);
@@ -162,6 +174,21 @@ export default function EntityReviewPage() {
     );
   }, [searchParams]);
 
+  useEffect(() => {
+    const savedRequests = window.localStorage.getItem(REQUESTS_STORAGE_KEY);
+
+    if (!savedRequests) {
+      return;
+    }
+
+    try {
+      const parsed = JSON.parse(savedRequests) as EntityReviewRequest[];
+      setRequests(Array.isArray(parsed) ? parsed : []);
+    } catch {
+      window.localStorage.removeItem(REQUESTS_STORAGE_KEY);
+    }
+  }, []);
+
   const selectedType = useMemo(
     () => reviewTypes.find((item) => item.title === intake.reviewType),
     [intake.reviewType],
@@ -176,6 +203,118 @@ export default function EntityReviewPage() {
       [key]: value,
     }));
     setNotice("");
+  };
+
+  const createRequestId = () => {
+    const date = new Date();
+    const datePart = [
+      date.getFullYear(),
+      String(date.getMonth() + 1).padStart(2, "0"),
+      String(date.getDate()).padStart(2, "0"),
+    ].join("");
+
+    const timePart = [
+      String(date.getHours()).padStart(2, "0"),
+      String(date.getMinutes()).padStart(2, "0"),
+      String(date.getSeconds()).padStart(2, "0"),
+    ].join("");
+
+    const randomPart = Math.random().toString(36).slice(2, 7).toUpperCase();
+
+    return `TA-14-ER-${datePart}-${timePart}-${randomPart}`;
+  };
+
+  const persistRequests = (nextRequests: EntityReviewRequest[]) => {
+    setRequests(nextRequests);
+    window.localStorage.setItem(
+      REQUESTS_STORAGE_KEY,
+      JSON.stringify(nextRequests),
+    );
+  };
+
+  const preserveAsRequest = (status: EntityReviewRequest["status"]) => {
+    if (!intake.entityName.trim() || !intake.objective.trim()) {
+      setNotice(
+        "Entity name and review objective are required before a review request record can be preserved.",
+      );
+      setShowIntake(true);
+      return;
+    }
+
+    const timestamp = new Date().toISOString();
+    const existing = activeRequestId
+      ? requests.find((request) => request.requestId === activeRequestId)
+      : undefined;
+
+    const request: EntityReviewRequest = {
+      requestId: existing?.requestId ?? createRequestId(),
+      createdAt: existing?.createdAt ?? timestamp,
+      updatedAt: timestamp,
+      status,
+      intake,
+      boundaryStatement:
+        "This record preserves a declared Entity Review request. It does not prove reviewer qualification, reviewer acceptance, review completion, certification, regulatory compliance, or the truth of the underlying claims.",
+    };
+
+    const nextRequests = existing
+      ? requests.map((item) =>
+          item.requestId === request.requestId ? request : item,
+        )
+      : [request, ...requests];
+
+    persistRequests(nextRequests);
+    setActiveRequestId(request.requestId);
+    setSavedAt(timestamp);
+
+    window.localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        intake,
+        savedAt: timestamp,
+      }),
+    );
+
+    setNotice(
+      `${request.requestId} has been preserved locally with status ${status}. It has not been transmitted or accepted by a reviewer.`,
+    );
+  };
+
+  const loadRequest = (request: EntityReviewRequest) => {
+    setIntake(request.intake);
+    setActiveRequestId(request.requestId);
+    setSavedAt(request.updatedAt);
+    setShowIntake(true);
+    setNotice(
+      `${request.requestId} has been loaded from this browser's local Entity Review request history.`,
+    );
+    document.getElementById("intake")?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const deleteRequest = (requestId: string) => {
+    const nextRequests = requests.filter(
+      (request) => request.requestId !== requestId,
+    );
+    persistRequests(nextRequests);
+
+    if (activeRequestId === requestId) {
+      setActiveRequestId(null);
+    }
+
+    setNotice(`${requestId} has been removed from this browser.`);
+  };
+
+  const exportRequest = (request: EntityReviewRequest) => {
+    const blob = new Blob([JSON.stringify(request, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = `${request.requestId}.json`;
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
   };
 
   const saveIntake = (event: FormEvent<HTMLFormElement>) => {
@@ -193,7 +332,7 @@ export default function EntityReviewPage() {
 
     setSavedAt(timestamp);
     setNotice(
-      "Your draft intake has been preserved in this browser. It has not been submitted, reviewed, certified, or transmitted.",
+      "Your working intake has been preserved in this browser. Use Preserve Review Request when you are ready to create an identified request record.",
     );
   };
 
@@ -201,7 +340,10 @@ export default function EntityReviewPage() {
     window.localStorage.removeItem(STORAGE_KEY);
     setIntake(initialState);
     setSavedAt(null);
-    setNotice("The browser-local intake draft has been cleared.");
+    setActiveRequestId(null);
+    setNotice(
+      "The working intake has been cleared. Preserved request records remain in the local request history.",
+    );
   };
 
   return (
@@ -229,6 +371,7 @@ export default function EntityReviewPage() {
           <a href="#review-types">Review Types</a>
           <a href="#review-process">Process</a>
           <a href="#intake">Intake</a>
+          <a href="#request-history">Requests</a>
           <Link href="/marketplace/professionals">Find a Reviewer</Link>
           <Link className="top-cta" href="/">Return Home</Link>
         </nav>
@@ -424,6 +567,17 @@ export default function EntityReviewPage() {
 
         {showIntake ? (
           <form className="intake-form" onSubmit={saveIntake}>
+            {activeRequestId ? (
+              <div className="active-request-banner">
+                <span>ACTIVE ENTITY REVIEW REQUEST</span>
+                <strong>{activeRequestId}</strong>
+                <p>
+                  Saving or preserving now updates this request record rather
+                  than creating a duplicate.
+                </p>
+              </div>
+            ) : null}
+
             <div className="selected-review">
               <span>Selected review object</span>
               <strong>{intake.reviewType}</strong>
@@ -558,17 +712,31 @@ export default function EntityReviewPage() {
             </div>
 
             <div className="form-actions">
-              <button className="button primary" type="submit">
-                Preserve Intake Draft
+              <button className="button secondary" type="submit">
+                Save Working Intake
+              </button>
+              <button
+                className="button primary"
+                type="button"
+                onClick={() => preserveAsRequest("DRAFT")}
+              >
+                Preserve Review Request
+              </button>
+              <button
+                className="button ready-button"
+                type="button"
+                onClick={() => preserveAsRequest("READY_FOR_REVIEW")}
+              >
+                Mark Ready for Review
               </button>
               <button
                 className="button ghost danger"
                 type="button"
                 onClick={clearIntake}
               >
-                Clear Draft
+                Clear Working Intake
               </button>
-              <Link className="button secondary" href="/marketplace/professionals">
+              <Link className="button ghost" href="/marketplace/professionals">
                 Find a Reviewer
               </Link>
             </div>
@@ -597,6 +765,107 @@ export default function EntityReviewPage() {
               </p>
             </div>
           </button>
+        )}
+      </section>
+
+      <section className="shell section request-library" id="request-history">
+        <div className="section-heading">
+          <p className="eyebrow">LOCAL REQUEST HISTORY</p>
+          <h2>Preserved Entity Review Requests</h2>
+          <p>
+            These records exist only in this browser. They are working governance
+            artifacts, not proof that a reviewer has received, accepted, or
+            completed the requested review.
+          </p>
+        </div>
+
+        {requests.length ? (
+          <div className="request-grid">
+            {requests.map((request) => (
+              <article className="request-card" key={request.requestId}>
+                <div className="request-card-top">
+                  <span className={`request-status ${request.status.toLowerCase()}`}>
+                    {request.status.replaceAll("_", " ")}
+                  </span>
+                  <span>
+                    Updated {new Date(request.updatedAt).toLocaleString()}
+                  </span>
+                </div>
+
+                <p className="request-id">{request.requestId}</p>
+                <h3>{request.intake.entityName}</h3>
+                <strong>{request.intake.reviewType}</strong>
+                <p>{request.intake.objective}</p>
+
+                <dl>
+                  <div>
+                    <dt>Requested reviewer</dt>
+                    <dd>
+                      {request.intake.requestedReviewer || "Not yet declared"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>Responsible party</dt>
+                    <dd>{request.intake.owner || "Not yet declared"}</dd>
+                  </div>
+                  <div>
+                    <dt>Created</dt>
+                    <dd>{new Date(request.createdAt).toLocaleString()}</dd>
+                  </div>
+                </dl>
+
+                <p className="request-boundary">
+                  {request.boundaryStatement}
+                </p>
+
+                <div className="request-actions">
+                  <button
+                    className="button primary"
+                    type="button"
+                    onClick={() => loadRequest(request)}
+                  >
+                    Open Request
+                  </button>
+                  <button
+                    className="button secondary"
+                    type="button"
+                    onClick={() => exportRequest(request)}
+                  >
+                    Export JSON
+                  </button>
+                  <button
+                    className="button ghost danger"
+                    type="button"
+                    onClick={() => deleteRequest(request.requestId)}
+                  >
+                    Remove
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="empty-request-library">
+            <span>NO PRESERVED REQUESTS YET</span>
+            <h3>Your first identified request will appear here.</h3>
+            <p>
+              Complete the intake, preserve the request, and the Exchange will
+              create a browser-local identifier, timestamp, status, and
+              exportable record.
+            </p>
+            <button
+              className="button primary"
+              type="button"
+              onClick={() => {
+                setShowIntake(true);
+                document
+                  .getElementById("intake")
+                  ?.scrollIntoView({ behavior: "smooth" });
+              }}
+            >
+              Create First Review Request
+            </button>
+          </div>
         )}
       </section>
 
@@ -1493,6 +1762,190 @@ export default function EntityReviewPage() {
           margin: 5px 0 0;
         }
 
+        .active-request-banner {
+          margin-bottom: 18px;
+          padding: 16px 18px;
+          border: 1px solid rgba(255, 205, 103, 0.26);
+          border-radius: 15px;
+          background: rgba(255, 193, 73, 0.06);
+        }
+
+        .active-request-banner span,
+        .active-request-banner strong {
+          display: block;
+        }
+
+        .active-request-banner span {
+          color: #d8b76e;
+          font-size: 0.69rem;
+          font-weight: 950;
+          letter-spacing: 0.12em;
+        }
+
+        .active-request-banner strong {
+          margin-top: 5px;
+          color: #ffe0a0;
+          font-size: 1.02rem;
+        }
+
+        .active-request-banner p {
+          margin: 5px 0 0;
+          font-size: 0.79rem;
+        }
+
+        .ready-button {
+          color: #0a1712;
+          border-color: #8ce8bd;
+          background: #8ce8bd;
+        }
+
+        .request-library {
+          padding-top: 80px;
+        }
+
+        .request-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .request-card {
+          padding: 24px;
+          border: 1px solid rgba(205, 160, 255, 0.16);
+          border-radius: 22px;
+          background:
+            radial-gradient(
+              circle at 92% 4%,
+              rgba(191, 119, 255, 0.08),
+              transparent 31%
+            ),
+            rgba(13, 10, 23, 0.78);
+          box-shadow: 0 25px 75px rgba(0, 0, 0, 0.26);
+        }
+
+        .request-card-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+
+        .request-card-top > span:last-child {
+          color: #85798f;
+          font-size: 0.72rem;
+          text-align: right;
+        }
+
+        .request-status {
+          padding: 6px 9px;
+          border: 1px solid rgba(205, 160, 255, 0.18);
+          border-radius: 999px;
+          color: #bba8c7;
+          font-size: 0.67rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
+        }
+
+        .request-status.ready_for_review {
+          color: #99ecc7;
+          border-color: rgba(140, 232, 189, 0.35);
+          background: rgba(140, 232, 189, 0.06);
+        }
+
+        .request-id {
+          margin-bottom: 8px;
+          color: #d7a5ff;
+          font-size: 0.72rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
+        }
+
+        .request-card h3 {
+          margin-bottom: 6px;
+          font-size: 1.45rem;
+        }
+
+        .request-card > strong {
+          display: block;
+          margin-bottom: 14px;
+          color: #d8c9e3;
+          font-size: 0.82rem;
+        }
+
+        .request-card dl {
+          display: grid;
+          gap: 10px;
+          margin: 22px 0;
+        }
+
+        .request-card dl div {
+          display: grid;
+          grid-template-columns: 150px 1fr;
+          gap: 12px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(205, 160, 255, 0.1);
+        }
+
+        .request-card dt {
+          color: #82758d;
+          font-size: 0.72rem;
+          font-weight: 850;
+        }
+
+        .request-card dd {
+          margin: 0;
+          color: #c5b9ce;
+          font-size: 0.8rem;
+        }
+
+        .request-boundary {
+          padding: 13px;
+          border: 1px solid rgba(205, 160, 255, 0.12);
+          border-radius: 12px;
+          background: rgba(7, 5, 12, 0.55);
+          font-size: 0.75rem;
+        }
+
+        .request-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+          margin-top: 18px;
+        }
+
+        .request-actions .button {
+          min-height: 42px;
+          padding: 0 13px;
+          font-size: 0.75rem;
+        }
+
+        .empty-request-library {
+          padding: 54px;
+          border: 1px solid rgba(205, 160, 255, 0.16);
+          border-radius: 23px;
+          text-align: center;
+          background: rgba(13, 10, 23, 0.75);
+        }
+
+        .empty-request-library > span {
+          color: #d7a5ff;
+          font-size: 0.7rem;
+          font-weight: 950;
+          letter-spacing: 0.14em;
+        }
+
+        .empty-request-library h3 {
+          margin: 12px 0;
+          font-size: 1.6rem;
+        }
+
+        .empty-request-library p {
+          max-width: 700px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
         .connected-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1605,7 +2058,191 @@ export default function EntityReviewPage() {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .connected-grid {
+          .active-request-banner {
+          margin-bottom: 18px;
+          padding: 16px 18px;
+          border: 1px solid rgba(255, 205, 103, 0.26);
+          border-radius: 15px;
+          background: rgba(255, 193, 73, 0.06);
+        }
+
+        .active-request-banner span,
+        .active-request-banner strong {
+          display: block;
+        }
+
+        .active-request-banner span {
+          color: #d8b76e;
+          font-size: 0.69rem;
+          font-weight: 950;
+          letter-spacing: 0.12em;
+        }
+
+        .active-request-banner strong {
+          margin-top: 5px;
+          color: #ffe0a0;
+          font-size: 1.02rem;
+        }
+
+        .active-request-banner p {
+          margin: 5px 0 0;
+          font-size: 0.79rem;
+        }
+
+        .ready-button {
+          color: #0a1712;
+          border-color: #8ce8bd;
+          background: #8ce8bd;
+        }
+
+        .request-library {
+          padding-top: 80px;
+        }
+
+        .request-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .request-card {
+          padding: 24px;
+          border: 1px solid rgba(205, 160, 255, 0.16);
+          border-radius: 22px;
+          background:
+            radial-gradient(
+              circle at 92% 4%,
+              rgba(191, 119, 255, 0.08),
+              transparent 31%
+            ),
+            rgba(13, 10, 23, 0.78);
+          box-shadow: 0 25px 75px rgba(0, 0, 0, 0.26);
+        }
+
+        .request-card-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 20px;
+        }
+
+        .request-card-top > span:last-child {
+          color: #85798f;
+          font-size: 0.72rem;
+          text-align: right;
+        }
+
+        .request-status {
+          padding: 6px 9px;
+          border: 1px solid rgba(205, 160, 255, 0.18);
+          border-radius: 999px;
+          color: #bba8c7;
+          font-size: 0.67rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
+        }
+
+        .request-status.ready_for_review {
+          color: #99ecc7;
+          border-color: rgba(140, 232, 189, 0.35);
+          background: rgba(140, 232, 189, 0.06);
+        }
+
+        .request-id {
+          margin-bottom: 8px;
+          color: #d7a5ff;
+          font-size: 0.72rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
+        }
+
+        .request-card h3 {
+          margin-bottom: 6px;
+          font-size: 1.45rem;
+        }
+
+        .request-card > strong {
+          display: block;
+          margin-bottom: 14px;
+          color: #d8c9e3;
+          font-size: 0.82rem;
+        }
+
+        .request-card dl {
+          display: grid;
+          gap: 10px;
+          margin: 22px 0;
+        }
+
+        .request-card dl div {
+          display: grid;
+          grid-template-columns: 150px 1fr;
+          gap: 12px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(205, 160, 255, 0.1);
+        }
+
+        .request-card dt {
+          color: #82758d;
+          font-size: 0.72rem;
+          font-weight: 850;
+        }
+
+        .request-card dd {
+          margin: 0;
+          color: #c5b9ce;
+          font-size: 0.8rem;
+        }
+
+        .request-boundary {
+          padding: 13px;
+          border: 1px solid rgba(205, 160, 255, 0.12);
+          border-radius: 12px;
+          background: rgba(7, 5, 12, 0.55);
+          font-size: 0.75rem;
+        }
+
+        .request-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+          margin-top: 18px;
+        }
+
+        .request-actions .button {
+          min-height: 42px;
+          padding: 0 13px;
+          font-size: 0.75rem;
+        }
+
+        .empty-request-library {
+          padding: 54px;
+          border: 1px solid rgba(205, 160, 255, 0.16);
+          border-radius: 23px;
+          text-align: center;
+          background: rgba(13, 10, 23, 0.75);
+        }
+
+        .empty-request-library > span {
+          color: #d7a5ff;
+          font-size: 0.7rem;
+          font-weight: 950;
+          letter-spacing: 0.14em;
+        }
+
+        .empty-request-library h3 {
+          margin: 12px 0;
+          font-size: 1.6rem;
+        }
+
+        .empty-request-library p {
+          max-width: 700px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .connected-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
@@ -1659,6 +2296,7 @@ export default function EntityReviewPage() {
           .type-grid,
           .process-grid,
           .connected-grid,
+          .request-grid,
           .form-grid {
             grid-template-columns: 1fr;
           }
