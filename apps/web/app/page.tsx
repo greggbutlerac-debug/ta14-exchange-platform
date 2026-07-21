@@ -19,6 +19,7 @@ type Door = {
   number: string;
   badge: string;
   title: string;
+  question: string;
   statement: string;
   description: string;
   href: string;
@@ -37,6 +38,7 @@ const doors: Door[] = [
     number: "01",
     badge: "AI",
     title: "AI Governance Store",
+    question: "I want to govern AI.",
     statement: "Build, test, register, study, and strengthen AI governance.",
     description:
       "Enter the operating side of the Exchange for consequential AI systems, agents, architectures, routes, governance tools, laboratories, education, and implementation support.",
@@ -62,6 +64,7 @@ const doors: Door[] = [
     number: "02",
     badge: "GR",
     title: "Governed Records",
+    question: "I want to preserve or interpret a record.",
     statement: "Preserve what happened, why it happened, and what the record can prove.",
     description:
       "Create, interpret, verify, compare, and preserve records that keep identity, chronology, evidence, authority, boundaries, determinations, execution, and outcomes visible.",
@@ -87,6 +90,7 @@ const doors: Door[] = [
     number: "03",
     badge: "ER",
     title: "Environmental Records",
+    question: "I want to govern environmental evidence.",
     statement: "Turn land, water, air, building, and atmospheric evidence into governed records.",
     description:
       "Bring environmental reality into a record system that separates observation from interpretation, diagnosis, optimization, intervention, and verified outcome.",
@@ -112,6 +116,7 @@ const doors: Door[] = [
     number: "04",
     badge: "◎",
     title: "Entity Review",
+    question: "I want to review an organization or system.",
     statement: "Examine the entity, not merely the document it presents.",
     description:
       "Submit organizations, AI systems, governance programs, architectures, partners, operational systems, or consequential routes for bounded review across the full evidence chain.",
@@ -149,6 +154,11 @@ const exchangeSteps = [
 
 export default function HomePage() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeDoor, setActiveDoor] = useState<string | null>(null);
+
+  const toggleDoor = (doorNumber: string) => {
+    setActiveDoor((current) => (current === doorNumber ? null : doorNumber));
+  };
 
   return (
     <main className="page-shell">
@@ -264,26 +274,73 @@ export default function HomePage() {
         </div>
 
         <div className="door-stack">
-          {doors.map((door, index) => (
+          {doors.map((door, index) => {
+            const isOpen = activeDoor === door.number;
+
+            return (
             <article
-              className={`door-card door-${index + 1}`}
+              className={`door-card gold-door door-${index + 1} ${isOpen ? "is-open" : ""}`}
               id={`door-${door.number}`}
               key={door.title}
             >
-              <div className="door-identity">
-                <div className="door-number">{door.number}</div>
-                <div className="door-emblem">
+              <button
+                className="gold-door-face"
+                type="button"
+                aria-expanded={isOpen}
+                aria-controls={`door-panel-${door.number}`}
+                onClick={() => toggleDoor(door.number)}
+              >
+                <span className="gold-door-frame" aria-hidden="true" />
+                <span className="gold-door-panel panel-top" aria-hidden="true" />
+                <span className="gold-door-panel panel-middle" aria-hidden="true" />
+                <span className="gold-door-panel panel-bottom" aria-hidden="true" />
+                <span className="gold-door-handle" aria-hidden="true" />
+                <span className="gold-door-light" aria-hidden="true" />
+
+                <span className="door-number">{door.number}</span>
+                <span className="door-emblem">
                   <span>{door.badge}</span>
                   <i />
-                </div>
-                <div>
-                  <p className="door-kicker">PRIMARY EXCHANGE DOOR</p>
-                  <h3>{door.title}</h3>
-                  <strong>{door.statement}</strong>
-                </div>
-              </div>
+                </span>
 
-              <div className="door-content">
+                <span className="gold-door-copy">
+                  <span className="door-kicker">PRIMARY EXCHANGE DOOR</span>
+                  <span className="intent-question">{door.question}</span>
+                  <span className="gold-door-title">{door.title}</span>
+                  <span className="gold-door-statement">{door.statement}</span>
+                  <span className="gold-door-instruction">
+                    {isOpen ? "Close this door" : "Open this door"}
+                    <b>{isOpen ? "−" : "+"}</b>
+                  </span>
+                </span>
+
+                <span className="star-burst burst-one" aria-hidden="true" />
+                <span className="star-burst burst-two" aria-hidden="true" />
+                <span className="star-burst burst-three" aria-hidden="true" />
+                <span className="star-burst burst-four" aria-hidden="true" />
+                <span className="star-burst burst-five" aria-hidden="true" />
+              </button>
+
+              <div
+                className="door-panel"
+                id={`door-panel-${door.number}`}
+                hidden={!isOpen}
+              >
+                <div className={`door-visual visual-${index + 1}`} aria-hidden="true">
+                  <div className="visual-grid" />
+                  <div className="visual-core">
+                    <span>{door.badge}</span>
+                  </div>
+                  <span className="visual-node node-a" />
+                  <span className="visual-node node-b" />
+                  <span className="visual-node node-c" />
+                  <span className="visual-node node-d" />
+                  <span className="visual-route route-a" />
+                  <span className="visual-route route-b" />
+                  <span className="visual-route route-c" />
+                </div>
+
+                <div className="door-content">
                 <div className="door-explanation">
                   <p>{door.description}</p>
                   <ul>
@@ -320,9 +377,11 @@ export default function HomePage() {
                     <b>↗</b>
                   </Link>
                 </div>
+                </div>
               </div>
             </article>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -1010,42 +1069,148 @@ export default function HomePage() {
 
         .door-card {
           position: relative;
-          padding: clamp(25px, 4vw, 48px);
+          border: 0;
           border-radius: 30px;
-          overflow: hidden;
+          overflow: visible;
+          background: transparent;
+          box-shadow: none;
+          backdrop-filter: none;
         }
 
         .door-card::before {
-          content: "";
-          position: absolute;
-          inset: 0 auto 0 0;
-          width: 4px;
-          background: linear-gradient(180deg, #74e4c6, transparent);
+          display: none;
         }
 
-        .door-2::before {
-          background: linear-gradient(180deg, #8aa8ff, transparent);
-        }
-
-        .door-3::before {
-          background: linear-gradient(180deg, #6ed5ff, transparent);
-        }
-
-        .door-4::before {
-          background: linear-gradient(180deg, #c888ff, transparent);
-        }
-
-        .door-identity {
+        .gold-door-face {
+          position: relative;
           display: grid;
           grid-template-columns: 58px 88px minmax(0, 1fr);
           gap: 20px;
           align-items: center;
-          padding-bottom: 28px;
-          border-bottom: 1px solid rgba(151,178,220,.13);
+          width: 100%;
+          min-height: 365px;
+          padding: clamp(30px, 5vw, 58px);
+          overflow: hidden;
+          border: 1px solid rgba(255, 215, 112, 0.8);
+          border-radius: 30px;
+          color: #fff9e8;
+          text-align: left;
+          cursor: pointer;
+          background:
+            linear-gradient(135deg, rgba(255,244,190,.12), transparent 26%),
+            linear-gradient(180deg, #2e210b 0%, #171006 48%, #090703 100%);
+          box-shadow:
+            0 30px 95px rgba(0,0,0,.48),
+            inset 0 0 0 2px rgba(129,82,10,.75),
+            inset 0 0 0 8px rgba(255,206,88,.08),
+            inset 0 0 70px rgba(255,188,52,.08);
+          transition:
+            transform .32s ease,
+            box-shadow .32s ease,
+            border-color .32s ease;
+        }
+
+        .gold-door-face:hover,
+        .gold-door-face:focus-visible {
+          transform: translateY(-5px) perspective(1200px) rotateX(1deg);
+          border-color: #ffe09a;
+          box-shadow:
+            0 40px 120px rgba(0,0,0,.56),
+            0 0 45px rgba(255,195,58,.18),
+            inset 0 0 0 2px rgba(150,96,12,.9),
+            inset 0 0 0 8px rgba(255,221,128,.11),
+            inset 0 0 90px rgba(255,195,58,.12);
+          outline: none;
+        }
+
+        .gold-door.is-open .gold-door-face {
+          transform: perspective(1300px) rotateY(-2.2deg) translateX(-5px);
+          border-color: #ffe9ae;
+          box-shadow:
+            26px 34px 110px rgba(0,0,0,.62),
+            0 0 70px rgba(255,195,58,.24),
+            inset 0 0 0 2px rgba(173,112,14,.95),
+            inset 0 0 0 8px rgba(255,226,143,.13);
+        }
+
+        .gold-door-frame {
+          position: absolute;
+          inset: 18px;
+          border: 2px solid rgba(255,215,112,.34);
+          border-radius: 21px;
+          box-shadow:
+            inset 0 0 0 7px rgba(93,57,7,.75),
+            0 0 26px rgba(255,197,61,.08);
+          pointer-events: none;
+        }
+
+        .gold-door-panel {
+          position: absolute;
+          right: 5.2%;
+          width: 30%;
+          border: 1px solid rgba(255,215,112,.3);
+          border-radius: 12px;
+          background:
+            linear-gradient(145deg, rgba(255,220,128,.09), transparent 45%),
+            rgba(79,48,7,.2);
+          box-shadow:
+            inset 0 0 0 5px rgba(18,12,3,.5),
+            inset 0 0 35px rgba(255,190,37,.05);
+          pointer-events: none;
+        }
+
+        .panel-top {
+          top: 12%;
+          height: 21%;
+        }
+
+        .panel-middle {
+          top: 38%;
+          height: 21%;
+        }
+
+        .panel-bottom {
+          top: 64%;
+          height: 24%;
+        }
+
+        .gold-door-handle {
+          position: absolute;
+          right: 7.2%;
+          top: 50%;
+          width: 16px;
+          height: 16px;
+          border: 2px solid #ffe39c;
+          border-radius: 50%;
+          background: #b97a12;
+          box-shadow:
+            0 0 0 5px rgba(59,35,5,.92),
+            0 0 21px rgba(255,202,73,.48);
+          transform: translateY(-50%);
+          pointer-events: none;
+        }
+
+        .gold-door-light {
+          position: absolute;
+          top: -38%;
+          left: 17%;
+          width: 34%;
+          height: 170%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,239,179,.14),
+            transparent
+          );
+          transform: rotate(18deg);
+          animation: goldSweep 8s ease-in-out infinite;
+          pointer-events: none;
         }
 
         .door-number {
-          color: #5f6f85;
+          position: relative;
+          z-index: 3;
+          color: #c7973b;
           font-size: .8rem;
           font-weight: 950;
           letter-spacing: .12em;
@@ -1053,40 +1218,234 @@ export default function HomePage() {
 
         .door-emblem {
           position: relative;
+          z-index: 3;
           display: grid;
           place-items: center;
           width: 82px;
           height: 82px;
-          border: 1px solid rgba(116,228,198,.38);
+          border: 1px solid rgba(255,219,126,.7);
           border-radius: 22px;
-          color: #74e4c6;
-          background: rgba(116,228,198,.07);
+          color: #ffe19a;
+          background:
+            radial-gradient(circle, rgba(255,218,118,.18), rgba(83,48,4,.38));
           font-size: 1.25rem;
           font-weight: 950;
-          box-shadow: inset 0 0 30px rgba(116,228,198,.05);
+          box-shadow:
+            inset 0 0 30px rgba(255,210,91,.11),
+            0 0 30px rgba(255,195,58,.08);
         }
 
         .door-emblem i {
           position: absolute;
           inset: 10px;
-          border: 1px solid rgba(116,228,198,.13);
+          border: 1px solid rgba(255,224,147,.25);
           border-radius: 16px;
           animation: pulse 4s ease-in-out infinite;
         }
 
-        .door-identity h3 {
-          margin: 0 0 6px;
-          font-size: clamp(2rem, 3.7vw, 4rem);
-          letter-spacing: -.045em;
+        .gold-door-copy {
+          position: relative;
+          z-index: 3;
+          display: block;
+          max-width: 760px;
+          padding-right: 29%;
         }
 
-        .door-identity > div:last-child > strong {
-          color: #dbe6f7;
-          font-size: 1.02rem;
-          line-height: 1.5;
+        .door-kicker {
+          display: block;
+          margin: 0 0 10px;
+          color: #e8b951;
         }
+
+        .intent-question {
+          display: block;
+          margin: 0 0 9px;
+          color: #fff7df;
+          font-size: clamp(1rem, 1.5vw, 1.32rem);
+          font-weight: 900;
+          letter-spacing: -.02em;
+        }
+
+        .gold-door-title {
+          display: block;
+          margin-bottom: 9px;
+          color: #fff;
+          font-size: clamp(2.2rem, 4.2vw, 4.7rem);
+          font-weight: 950;
+          line-height: .96;
+          letter-spacing: -.055em;
+        }
+
+        .gold-door-statement {
+          display: block;
+          max-width: 690px;
+          color: #d7c8a4;
+          font-size: 1rem;
+          font-weight: 760;
+          line-height: 1.58;
+        }
+
+        .gold-door-instruction {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
+          margin-top: 25px;
+          color: #ffe29b;
+          font-size: .78rem;
+          font-weight: 950;
+          letter-spacing: .1em;
+          text-transform: uppercase;
+        }
+
+        .gold-door-instruction b {
+          display: grid;
+          place-items: center;
+          width: 28px;
+          height: 28px;
+          border: 1px solid rgba(255,221,136,.48);
+          border-radius: 50%;
+          font-size: 1.1rem;
+        }
+
+        .star-burst {
+          position: absolute;
+          z-index: 7;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          opacity: 0;
+          background: #fff9d9;
+          box-shadow:
+            0 0 9px #fff,
+            0 0 20px #ffd66d,
+            0 0 42px rgba(255,193,43,.9);
+          pointer-events: none;
+        }
+
+        .burst-one { top: 18%; left: 14%; }
+        .burst-two { top: 22%; right: 16%; }
+        .burst-three { bottom: 20%; left: 24%; }
+        .burst-four { bottom: 14%; right: 27%; }
+        .burst-five { top: 52%; left: 52%; }
+
+        .gold-door.is-open .star-burst {
+          animation: explodeStar 1.15s cubic-bezier(.17,.84,.31,1) both;
+        }
+
+        .gold-door.is-open .burst-two { animation-delay: .08s; }
+        .gold-door.is-open .burst-three { animation-delay: .14s; }
+        .gold-door.is-open .burst-four { animation-delay: .2s; }
+        .gold-door.is-open .burst-five { animation-delay: .26s; }
+
+        .door-panel {
+          margin: 16px 20px 0;
+          padding: clamp(24px, 4vw, 44px);
+          border: 1px solid rgba(255,215,112,.24);
+          border-radius: 0 0 28px 28px;
+          background:
+            radial-gradient(circle at 50% 0%, rgba(255,195,58,.08), transparent 38%),
+            rgba(10,14,23,.94);
+          box-shadow: 0 28px 85px rgba(0,0,0,.38);
+          animation: revealPanel .36s ease both;
+        }
+
+        .door-visual {
+          position: relative;
+          z-index: 1;
+          height: 215px;
+          margin: 0 0 24px;
+          border: 1px solid rgba(255,215,112,.16);
+          border-radius: 22px;
+          overflow: hidden;
+          background:
+            radial-gradient(circle at 50% 50%, rgba(255,197,61,.11), transparent 28%),
+            rgba(4,9,18,.7);
+        }
+
+        .visual-grid {
+          position: absolute;
+          inset: 0;
+          opacity: .22;
+          background-image:
+            linear-gradient(rgba(255,215,112,.1) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,215,112,.1) 1px, transparent 1px);
+          background-size: 32px 32px;
+          mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
+        }
+
+        .visual-core {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          display: grid;
+          place-items: center;
+          width: 92px;
+          height: 92px;
+          border: 1px solid rgba(255,219,126,.52);
+          border-radius: 50%;
+          color: #ffe19a;
+          background: radial-gradient(circle, rgba(255,212,94,.17), rgba(4,9,18,.94) 70%);
+          box-shadow: 0 0 50px rgba(255,195,58,.18);
+          transform: translate(-50%, -50%);
+          animation: corePulse 4.5s ease-in-out infinite;
+        }
+
+        .visual-core::before,
+        .visual-core::after {
+          content: "";
+          position: absolute;
+          border: 1px solid rgba(255,219,126,.18);
+          border-radius: 50%;
+          animation: rotate 16s linear infinite;
+        }
+
+        .visual-core::before { inset: -34px; }
+        .visual-core::after {
+          inset: -62px;
+          animation-direction: reverse;
+          animation-duration: 24s;
+        }
+
+        .visual-core span {
+          font-weight: 950;
+          letter-spacing: .08em;
+        }
+
+        .visual-node {
+          position: absolute;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: #ffd76f;
+          box-shadow: 0 0 16px rgba(255,207,83,.85);
+          animation: nodeFloat 5s ease-in-out infinite;
+        }
+
+        .node-a { left: 15%; top: 28%; }
+        .node-b { right: 17%; top: 24%; animation-delay: -1.4s; }
+        .node-c { left: 23%; bottom: 23%; animation-delay: -2.6s; }
+        .node-d { right: 24%; bottom: 22%; animation-delay: -3.6s; }
+
+        .visual-route {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 32%;
+          height: 1px;
+          transform-origin: left center;
+          background: linear-gradient(90deg, rgba(255,211,100,.82), transparent);
+          filter: drop-shadow(0 0 5px rgba(255,202,73,.52));
+          animation: routeGlow 3.2s ease-in-out infinite;
+        }
+
+        .route-a { transform: rotate(-150deg); }
+        .route-b { transform: rotate(-30deg); animation-delay: -1.1s; }
+        .route-c { transform: rotate(145deg); animation-delay: -2.1s; }
 
         .door-content {
+
+          position: relative;
+          z-index: 3;
           display: grid;
           grid-template-columns: minmax(0, 1.12fr) minmax(360px, .88fr);
           gap: clamp(30px, 5vw, 70px);
@@ -1396,6 +1755,72 @@ export default function HomePage() {
           50% { opacity: 1; transform: scale(1.04); }
         }
 
+        @keyframes goldSweep {
+          0%, 15% { transform: translateX(-180%) rotate(18deg); opacity: 0; }
+          34% { opacity: 1; }
+          62%, 100% { transform: translateX(330%) rotate(18deg); opacity: 0; }
+        }
+
+        @keyframes explodeStar {
+          0% {
+            opacity: 0;
+            transform: scale(.15);
+          }
+          18% {
+            opacity: 1;
+            transform: scale(1.8);
+          }
+          45% {
+            opacity: .9;
+            transform: scale(5.5);
+            box-shadow:
+              0 0 14px #fff,
+              0 0 38px #ffd66d,
+              0 0 90px rgba(255,193,43,.95);
+          }
+          100% {
+            opacity: 0;
+            transform: scale(12);
+          }
+        }
+
+        @keyframes revealPanel {
+          from {
+            opacity: 0;
+            transform: translateY(-18px) scale(.985);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+          }
+        }
+
+        @keyframes corePulse {
+          0%, 100% { transform: translate(-50%, -50%) scale(.96); }
+          50% { transform: translate(-50%, -50%) scale(1.04); }
+        }
+
+        @keyframes nodeFloat {
+          0%, 100% { transform: translate3d(0, 0, 0); opacity: .65; }
+          50% { transform: translate3d(0, -12px, 0); opacity: 1; }
+        }
+
+        @keyframes routeGlow {
+          0%, 100% { opacity: .22; }
+          50% { opacity: .95; }
+        }
+
+        @keyframes environmentalMorph {
+          0%, 100% {
+            transform: translate(-50%, -50%) scale(.97) rotate(0deg);
+            border-radius: 48% 52% 45% 55% / 55% 43% 57% 45%;
+          }
+          50% {
+            transform: translate(-50%, -50%) scale(1.04) rotate(4deg);
+            border-radius: 55% 45% 58% 42% / 44% 58% 42% 56%;
+          }
+        }
+
         @media (max-width: 1100px) {
           .hero {
             grid-template-columns: 1fr;
@@ -1445,13 +1870,21 @@ export default function HomePage() {
             justify-content: flex-start;
           }
 
-          .door-identity {
+          .gold-door-face {
             grid-template-columns: 50px 75px 1fr;
           }
 
           .door-emblem {
             width: 70px;
             height: 70px;
+          }
+
+          .gold-door-copy {
+            padding-right: 22%;
+          }
+
+          .gold-door-panel {
+            width: 22%;
           }
 
           .steps-grid {
@@ -1482,9 +1915,11 @@ export default function HomePage() {
             display: none;
           }
 
-          .door-identity {
-            grid-template-columns: 46px 62px 1fr;
-            gap: 11px;
+          .gold-door-face {
+            grid-template-columns: 42px 58px 1fr;
+            gap: 10px;
+            min-height: 330px;
+            padding: 24px 18px;
           }
 
           .door-emblem {
@@ -1497,12 +1932,26 @@ export default function HomePage() {
             font-size: .7rem;
           }
 
-          .door-identity h3 {
-            font-size: 1.65rem;
+          .gold-door-title {
+            font-size: 1.75rem;
           }
 
-          .door-identity > div:last-child > strong {
+          .gold-door-copy {
+            padding-right: 0;
+          }
+
+          .gold-door-statement {
             display: none;
+          }
+
+          .gold-door-panel,
+          .gold-door-handle {
+            display: none;
+          }
+
+          .door-panel {
+            margin-left: 0;
+            margin-right: 0;
           }
 
           .steps-grid,
@@ -1527,7 +1976,14 @@ export default function HomePage() {
           .orbit,
           .moving-line,
           .nova,
-          .door-emblem i {
+          .door-emblem i,
+          .visual-core,
+          .visual-core::before,
+          .visual-core::after,
+          .visual-node,
+          .visual-route,
+          .gold-door-light,
+          .star-burst {
             animation: none;
           }
         }
