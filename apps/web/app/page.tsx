@@ -37,7 +37,7 @@ const doors: Door[] = [
   {
     number: "01",
     badge: "AI",
-    title: "AI Governance Store",
+    title: "AI Governance Playground",
     question: "I want to govern AI.",
     statement: "Build, test, register, study, and strengthen AI governance.",
     description:
@@ -290,12 +290,16 @@ export default function HomePage() {
                 aria-controls={`door-panel-${door.number}`}
                 onClick={() => toggleDoor(door.number)}
               >
-                <span className="gold-door-frame" aria-hidden="true" />
-                <span className="gold-door-panel panel-top" aria-hidden="true" />
-                <span className="gold-door-panel panel-middle" aria-hidden="true" />
-                <span className="gold-door-panel panel-bottom" aria-hidden="true" />
-                <span className="gold-door-handle" aria-hidden="true" />
-                <span className="gold-door-light" aria-hidden="true" />
+                <span className="doorway-light" aria-hidden="true" />
+                <span className="doorway-floor-light" aria-hidden="true" />
+                <span className="gold-door-slab" aria-hidden="true">
+                  <span className="gold-door-frame" />
+                  <span className="gold-door-panel panel-top" />
+                  <span className="gold-door-panel panel-middle" />
+                  <span className="gold-door-panel panel-bottom" />
+                  <span className="gold-door-handle" />
+                  <span className="gold-door-light" />
+                </span>
 
                 <span className="door-number">{door.number}</span>
                 <span className="door-emblem">
@@ -508,7 +512,7 @@ export default function HomePage() {
 
         <div>
           <h3>Doors</h3>
-          <Link href="/workspace/ai-governance">AI Governance Store</Link>
+          <Link href="/workspace/ai-governance">AI Governance Playground</Link>
           <Link href="/workspace/governed-records">Governed Records</Link>
           <Link href="/workspace/environmental-records">Environmental Records</Link>
           <Link href="/workspace/entity-review">Entity Review</Link>
@@ -1123,6 +1127,94 @@ export default function HomePage() {
           outline: none;
         }
 
+        .gold-door-slab {
+          position: absolute;
+          inset: 0;
+          z-index: 1;
+          display: block;
+          overflow: hidden;
+          border-radius: inherit;
+          transform-origin: left center;
+          transform-style: preserve-3d;
+          backface-visibility: hidden;
+          transition:
+            transform .72s cubic-bezier(.2,.75,.2,1),
+            filter .45s ease,
+            box-shadow .45s ease;
+          background:
+            linear-gradient(135deg, rgba(255,244,190,.12), transparent 26%),
+            linear-gradient(180deg, #2e210b 0%, #171006 48%, #090703 100%);
+          box-shadow:
+            inset 0 0 0 2px rgba(129,82,10,.75),
+            inset 0 0 0 8px rgba(255,206,88,.08),
+            inset 0 0 70px rgba(255,188,52,.08);
+          pointer-events: none;
+        }
+
+        .gold-door-face:hover .gold-door-slab,
+        .gold-door-face:focus-visible .gold-door-slab {
+          transform: perspective(1450px) rotateY(-34deg) translateX(-7px);
+          filter: brightness(1.08);
+          box-shadow:
+            30px 10px 50px rgba(0,0,0,.52),
+            inset -18px 0 32px rgba(0,0,0,.28),
+            inset 0 0 0 2px rgba(150,96,12,.9),
+            inset 0 0 0 8px rgba(255,221,128,.11);
+        }
+
+        .gold-door.is-open .gold-door-slab {
+          transform: perspective(1450px) rotateY(-48deg) translateX(-10px);
+          filter: brightness(1.12);
+        }
+
+        .doorway-light {
+          position: absolute;
+          inset: 8px;
+          z-index: 0;
+          border-radius: 24px;
+          opacity: 0;
+          background:
+            radial-gradient(circle at 72% 48%, rgba(255,255,242,.98) 0 5%, rgba(255,235,158,.94) 14%, rgba(255,189,54,.48) 37%, transparent 72%),
+            linear-gradient(90deg, rgba(255,194,55,.06), rgba(255,238,173,.52));
+          box-shadow:
+            inset 0 0 85px rgba(255,231,147,.74),
+            0 0 75px rgba(255,196,55,.46),
+            0 0 150px rgba(255,177,25,.24);
+          transition: opacity .5s ease, filter .5s ease;
+          pointer-events: none;
+        }
+
+        .gold-door-face:hover .doorway-light,
+        .gold-door-face:focus-visible .doorway-light,
+        .gold-door.is-open .doorway-light {
+          opacity: 1;
+          filter: brightness(1.16);
+          animation: doorwayFlicker 2.8s ease-in-out infinite;
+        }
+
+        .doorway-floor-light {
+          position: absolute;
+          z-index: 0;
+          right: 3%;
+          bottom: -27%;
+          width: 58%;
+          height: 58%;
+          opacity: 0;
+          border-radius: 50%;
+          background: radial-gradient(ellipse, rgba(255,235,165,.68), rgba(255,184,41,.22) 44%, transparent 72%);
+          filter: blur(8px);
+          transform: perspective(700px) rotateX(67deg);
+          transition: opacity .52s ease, transform .52s ease;
+          pointer-events: none;
+        }
+
+        .gold-door-face:hover .doorway-floor-light,
+        .gold-door-face:focus-visible .doorway-floor-light,
+        .gold-door.is-open .doorway-floor-light {
+          opacity: 1;
+          transform: perspective(700px) rotateX(67deg) scale(1.12);
+        }
+
         .gold-door.is-open .gold-door-face {
           transform: perspective(1300px) rotateY(-2.2deg) translateX(-5px);
           border-color: #ffe9ae;
@@ -1209,7 +1301,7 @@ export default function HomePage() {
 
         .door-number {
           position: relative;
-          z-index: 3;
+          z-index: 4;
           color: #c7973b;
           font-size: .8rem;
           font-weight: 950;
@@ -1218,7 +1310,7 @@ export default function HomePage() {
 
         .door-emblem {
           position: relative;
-          z-index: 3;
+          z-index: 4;
           display: grid;
           place-items: center;
           width: 82px;
@@ -1245,10 +1337,19 @@ export default function HomePage() {
 
         .gold-door-copy {
           position: relative;
-          z-index: 3;
+          z-index: 4;
           display: block;
           max-width: 760px;
-          padding-right: 29%;
+          padding: 18px 31% 18px 18px;
+          border-radius: 18px;
+          transition: background .35s ease, backdrop-filter .35s ease;
+        }
+
+        .gold-door-face:hover .gold-door-copy,
+        .gold-door-face:focus-visible .gold-door-copy,
+        .gold-door.is-open .gold-door-copy {
+          background: rgba(8, 6, 2, .68);
+          backdrop-filter: blur(6px);
         }
 
         .door-kicker {
@@ -1755,6 +1856,11 @@ export default function HomePage() {
           50% { opacity: 1; transform: scale(1.04); }
         }
 
+        @keyframes doorwayFlicker {
+          0%, 100% { filter: brightness(1.03); }
+          50% { filter: brightness(1.19); }
+        }
+
         @keyframes goldSweep {
           0%, 15% { transform: translateX(-180%) rotate(18deg); opacity: 0; }
           34% { opacity: 1; }
@@ -1949,6 +2055,12 @@ export default function HomePage() {
             display: none;
           }
 
+          .gold-door-face:hover .gold-door-slab,
+          .gold-door-face:focus-visible .gold-door-slab,
+          .gold-door.is-open .gold-door-slab {
+            transform: perspective(1000px) rotateY(-24deg) translateX(-4px);
+          }
+
           .door-panel {
             margin-left: 0;
             margin-right: 0;
@@ -1983,6 +2095,9 @@ export default function HomePage() {
           .visual-node,
           .visual-route,
           .gold-door-light,
+          .gold-door-slab,
+          .doorway-light,
+          .doorway-floor-light,
           .star-burst {
             animation: none;
           }
