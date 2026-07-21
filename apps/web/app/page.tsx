@@ -1,8 +1,10 @@
-/* TA-14 ANIMATED HOMEPAGE V9 - CLICKABLE MAP + CLEAN CHAIN + PARTNER ROUTING - 2026-07-21 */
+/* TA-14 ANIMATED HOMEPAGE V10 - EU AI ACT FRONT DOOR + POLISH PASS - 2026-07-21 */
 "use client";
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+
+import EuAiActHomepageSection from "../components/eu-ai-act-homepage-section";
 
 type RouteState = "IDLE" | "RUNNING" | "HOLD" | "ALLOW";
 type ResultState = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
@@ -364,6 +366,9 @@ export default function HomePage() {
           <a href="#map" onClick={() => setMobileMenuOpen(false)}>
             Workspaces
           </a>
+          <a href="#eu-ai-act" onClick={() => setMobileMenuOpen(false)}>
+            EU AI Act
+          </a>
           <a href="#results" onClick={() => setMobileMenuOpen(false)}>
             Results
           </a>
@@ -410,6 +415,9 @@ export default function HomePage() {
             <a className="button secondary" href="#start">
               Start Here
             </a>
+            <Link className="button eu-act-hero-button" href="/eu-ai-act">
+              EU AI Act Requirements
+            </Link>
             <Link className="button ghost" href="/account">
               Sign In
             </Link>
@@ -467,6 +475,10 @@ export default function HomePage() {
           </p>
         </div>
       </section>
+
+      <div id="eu-ai-act" className="eu-ai-act-homepage-anchor">
+        <EuAiActHomepageSection />
+      </div>
 
       <section className="section-wrap start-here" id="start">
         <div className="section-heading split-heading">
@@ -1277,6 +1289,8 @@ export default function HomePage() {
             Workspaces
           </a>
           <a href="#results">Results Exchange</a>
+          <Link href="/eu-ai-act">EU AI Act</Link>
+          <Link href="/eu-ai-act/requirements">EU AI Act Requirements</Link>
           <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>
             Route Gallery
           </a>
@@ -1292,6 +1306,11 @@ export default function HomePage() {
           <Link href="/workspace">Open Workspace</Link>
           <Link href="/workspace/governed-records">Governed Records</Link>
           <Link href="/workspace/entity-review">Entity Review Center</Link>
+          <Link href="/eu-ai-act/article-50">Article 50 Transparency</Link>
+          <Link href="/eu-ai-act/high-risk">High-Risk AI Systems</Link>
+          <Link href="/eu-ai-act/fundamental-rights">
+            Fundamental Rights Assessment
+          </Link>
           <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
             Sign In
           </Link>
@@ -1656,7 +1675,7 @@ export default function HomePage() {
           border-radius: 999px;
           color: #b8c5d9;
           text-decoration: none !important;
-          font-size: 0.8rem;
+          font-size: 0.77rem;
           font-weight: 800;
           letter-spacing: 0.01em;
           transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
@@ -1804,6 +1823,38 @@ export default function HomePage() {
         .ghost {
           border: 1px solid transparent;
           color: #b7c3d7;
+        }
+        .eu-act-hero-button {
+          border: 1px solid rgba(240, 202, 110, 0.78);
+          color: #ffe7a7;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(240, 202, 110, 0.16),
+              rgba(240, 168, 65, 0.055)
+            ),
+            rgba(18, 27, 46, 0.82);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 12px 34px rgba(214, 156, 44, 0.11);
+        }
+        .eu-act-hero-button:hover {
+          border-color: #f4d47e;
+          color: #fff1c5;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(240, 202, 110, 0.25),
+              rgba(240, 168, 65, 0.09)
+            ),
+            rgba(18, 27, 46, 0.9);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.12),
+            0 16px 42px rgba(214, 156, 44, 0.19);
+        }
+        .eu-ai-act-homepage-anchor {
+          position: relative;
+          scroll-margin-top: 76px;
         }
         .trust-row {
           display: flex;
@@ -3039,6 +3090,20 @@ export default function HomePage() {
             transition-duration: 0.01ms !important;
           }
         }
+        @media (max-width: 1320px) {
+          .site-header {
+            padding-right: 24px;
+            padding-left: 24px;
+          }
+          .main-nav {
+            gap: 3px;
+          }
+          .main-nav a {
+            padding-right: 9px;
+            padding-left: 9px;
+            font-size: 0.73rem;
+          }
+        }
         @media (max-width: 1180px) {
           .hero {
             grid-template-columns: 1fr;
@@ -3066,7 +3131,7 @@ export default function HomePage() {
             grid-column: 1 / -1;
           }
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1060px) {
           .menu-button {
             display: inline-grid;
             place-items: center;
