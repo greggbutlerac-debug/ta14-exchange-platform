@@ -405,7 +405,7 @@ export default function RecordsPage() {
           <Link href="/records" aria-current="page">
             Records
           </Link>
-          <Link href="/verification">Verification</Link>
+          <Link href="/workspace/verify">Verification</Link>
         </nav>
       </header>
 
