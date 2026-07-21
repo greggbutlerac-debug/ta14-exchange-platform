@@ -30,7 +30,7 @@ const primaryNavigation = [
   },
   {
     label: 'Verification',
-    href: '/verification',
+    href: '/workspace/verify',
   },
 ] as const;
 
