@@ -1,31 +1,9 @@
 import Link from 'next/link';
 
-const marketplaceNavigation = [
-  {
-    label: 'Marketplace Home',
-    href: '/marketplace',
-  },
-  {
-    label: 'Opportunities',
-    href: '/marketplace/opportunities',
-  },
-  {
-    label: 'Professionals',
-    href: '/marketplace/professionals',
-  },
-  {
-    label: 'Organizations',
-    href: '/marketplace/organizations',
-  },
-  {
-    label: 'Records',
-    href: '/marketplace/records',
-  },
-  {
-    label: 'Reviews',
-    href: '/marketplace/reviews',
-  },
-];
+import {
+  marketplaceActions,
+  marketplaceNavigation,
+} from '../../lib/marketplace-routes';
 
 export default function MarketplaceLayout({
   children,
@@ -46,17 +24,22 @@ export default function MarketplaceLayout({
             aria-label="Marketplace navigation"
           >
             {marketplaceNavigation.map((item) => (
-              <Link href={item.href} key={item.href}>
+              <Link
+                aria-label={item.description}
+                href={item.href}
+                key={item.key}
+              >
                 {item.label}
               </Link>
             ))}
           </nav>
 
           <Link
+            aria-label={marketplaceActions.postNeed.description}
             className="marketplaceNavAction"
-            href="/marketplace/post-a-need"
+            href={marketplaceActions.postNeed.href}
           >
-            Post a Governance Need
+            {marketplaceActions.postNeed.label}
           </Link>
         </div>
       </div>
