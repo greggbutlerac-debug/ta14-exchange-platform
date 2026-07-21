@@ -1,6 +1,11 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+import {
+  marketplaceActions,
+  marketplaceRoutes,
+} from '../../lib/marketplace-routes';
+
 export const metadata: Metadata = {
   title: 'TA-14 AI Governance Exchange Marketplace',
   description:
@@ -12,7 +17,7 @@ const categories = [
     title: 'Governance Professionals',
     description:
       'Find independent architects, reviewers, verification specialists, domain experts, record stewards, and implementation partners.',
-    href: '/marketplace/professionals',
+    href: marketplaceRoutes.professionals,
     eyebrow: 'PEOPLE',
     metric: '6 featured profiles',
   },
@@ -20,7 +25,7 @@ const categories = [
     title: 'Governance Organizations',
     description:
       'Explore governance practices, review entities, verification laboratories, record institutions, and partner organizations.',
-    href: '/marketplace/organizations',
+    href: marketplaceRoutes.organizations,
     eyebrow: 'INSTITUTIONS',
     metric: '6 featured organizations',
   },
@@ -28,7 +33,7 @@ const categories = [
     title: 'Open Opportunities',
     description:
       'Browse governance needs, review requests, implementation scopes, licensing opportunities, and collaboration pathways.',
-    href: '/marketplace/opportunities',
+    href: marketplaceRoutes.opportunities,
     eyebrow: 'WORK',
     metric: 'Governed opportunities',
   },
@@ -36,7 +41,7 @@ const categories = [
     title: 'Governed Records',
     description:
       'Explore environmental, atmospheric, building, hospital, HVAC, land, water, and laboratory record offerings.',
-    href: '/marketplace/records',
+    href: marketplaceRoutes.records,
     eyebrow: 'RECORDS',
     metric: '8 record categories',
   },
@@ -44,7 +49,7 @@ const categories = [
     title: 'Independent Reviews',
     description:
       'Read bounded architecture reviews, execution-route findings, continuity reviews, technical verifications, and domain assessments.',
-    href: '/marketplace/reviews',
+    href: marketplaceRoutes.reviews,
     eyebrow: 'REVIEW',
     metric: '6 published reviews',
   },
@@ -52,7 +57,7 @@ const categories = [
     title: 'Post a Governance Need',
     description:
       'Declare the problem, consequential action, required evidence, expected deliverable, budget, timing, and visibility.',
-    href: '/marketplace/post-a-need',
+    href: marketplaceActions.postNeed.href,
     eyebrow: 'START HERE',
     metric: 'Guided intake',
   },
@@ -194,7 +199,11 @@ export default function MarketplaceLandingPage() {
               </p>
 
               <div className="heroActions">
-                <Link className="primaryButton" href="/marketplace/post-a-need">
+                <Link
+                  aria-label={marketplaceActions.postNeed.description}
+                  className="primaryButton"
+                  href={marketplaceActions.postNeed.href}
+                >
                   Post a Governance Need
                   <ArrowIcon />
                 </Link>
@@ -447,11 +456,15 @@ export default function MarketplaceLandingPage() {
           </div>
 
           <div className="ctaActions">
-            <Link className="primaryButton" href="/marketplace/post-a-need">
+            <Link
+              aria-label={marketplaceActions.postNeed.description}
+              className="primaryButton"
+              href={marketplaceActions.postNeed.href}
+            >
               Post a Governance Need
               <ArrowIcon />
             </Link>
-            <Link className="secondaryButton" href="/marketplace/reviews">
+            <Link className="secondaryButton" href={marketplaceRoutes.reviews}>
               Browse Independent Reviews
             </Link>
             <small>
@@ -476,7 +489,11 @@ export default function MarketplaceLandingPage() {
           </div>
 
           <div className="finalActions">
-            <Link className="primaryButton" href="/marketplace/post-a-need">
+            <Link
+              aria-label={marketplaceActions.postNeed.description}
+              className="primaryButton"
+              href={marketplaceActions.postNeed.href}
+            >
               Enter the Marketplace
               <ArrowIcon />
             </Link>
