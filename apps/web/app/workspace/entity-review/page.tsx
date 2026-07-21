@@ -175,6 +175,37 @@ export default function EntityReviewPage() {
   }, [searchParams]);
 
   useEffect(() => {
+    const requestedId = searchParams.get("request");
+
+    if (!requestedId || requests.length === 0) {
+      return;
+    }
+
+    const matchingRequest = requests.find(
+      (request) => request.requestId === requestedId,
+    );
+
+    if (!matchingRequest) {
+      setNotice(
+        `${requestedId} was not found in this browser's local Entity Review request history.`,
+      );
+      return;
+    }
+
+    setIntake(matchingRequest.intake);
+    setActiveRequestId(matchingRequest.requestId);
+    setSavedAt(matchingRequest.updatedAt);
+    setShowIntake(true);
+    setNotice(
+      `${matchingRequest.requestId} has been reopened for editing. Changes remain local until the request is preserved again.`,
+    );
+
+    window.setTimeout(() => {
+      document.getElementById("intake")?.scrollIntoView({ behavior: "smooth" });
+    }, 50);
+  }, [requests, searchParams]);
+
+  useEffect(() => {
     const savedRequests = window.localStorage.getItem(REQUESTS_STORAGE_KEY);
 
     if (!savedRequests) {
@@ -575,6 +606,14 @@ export default function EntityReviewPage() {
                   Saving or preserving now updates this request record rather
                   than creating a duplicate.
                 </p>
+                <Link
+                  className="active-record-link"
+                  href={`/workspace/entity-review/requests/${encodeURIComponent(
+                    activeRequestId,
+                  )}`}
+                >
+                  View preserved record
+                </Link>
               </div>
             ) : null}
 
@@ -819,12 +858,20 @@ export default function EntityReviewPage() {
                 </p>
 
                 <div className="request-actions">
-                  <button
+                  <Link
                     className="button primary"
+                    href={`/workspace/entity-review/requests/${encodeURIComponent(
+                      request.requestId,
+                    )}`}
+                  >
+                    View Record
+                  </Link>
+                  <button
+                    className="button secondary"
                     type="button"
                     onClick={() => loadRequest(request)}
                   >
-                    Open Request
+                    Edit Request
                   </button>
                   <button
                     className="button secondary"
@@ -1793,6 +1840,16 @@ export default function EntityReviewPage() {
           font-size: 0.79rem;
         }
 
+        .active-record-link {
+          display: inline-flex;
+          margin-top: 10px;
+          color: #ffe0a0;
+          font-size: 0.76rem;
+          font-weight: 900;
+          text-decoration: underline;
+          text-underline-offset: 4px;
+        }
+
         .ready-button {
           color: #0a1712;
           border-color: #8ce8bd;
@@ -2087,6 +2144,16 @@ export default function EntityReviewPage() {
         .active-request-banner p {
           margin: 5px 0 0;
           font-size: 0.79rem;
+        }
+
+        .active-record-link {
+          display: inline-flex;
+          margin-top: 10px;
+          color: #ffe0a0;
+          font-size: 0.76rem;
+          font-weight: 900;
+          text-decoration: underline;
+          text-underline-offset: 4px;
         }
 
         .ready-button {
