@@ -2,6 +2,11 @@ import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 
+import {
+  marketplaceActions,
+  marketplaceRoutes,
+} from '../lib/marketplace-routes';
+
 import './globals.css';
 
 const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
@@ -17,7 +22,7 @@ const primaryNavigation = [
   },
   {
     label: 'Marketplace',
-    href: '/marketplace',
+    href: marketplaceRoutes.home,
   },
   {
     label: 'Records',
@@ -27,7 +32,7 @@ const primaryNavigation = [
     label: 'Verification',
     href: '/verification',
   },
-];
+] as const;
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -151,13 +156,19 @@ export default function RootLayout({
               aria-label="TA-14 AI Governance Exchange home"
             >
               <span className="siteBrandMark">TA-14</span>
+
               <span className="siteBrandText">
                 <strong>AI Governance Exchange</strong>
-                <small>No admissible evidence. No admissible execution.</small>
+                <small>
+                  No admissible evidence. No admissible execution.
+                </small>
               </span>
             </Link>
 
-            <nav className="siteNavigation" aria-label="Primary navigation">
+            <nav
+              className="siteNavigation"
+              aria-label="Primary navigation"
+            >
               {primaryNavigation.map((item) => (
                 <Link href={item.href} key={item.href}>
                   {item.label}
@@ -165,8 +176,12 @@ export default function RootLayout({
               ))}
             </nav>
 
-            <Link className="siteHeaderAction" href="/marketplace/post-a-need">
-              Post a Need
+            <Link
+              aria-label={marketplaceActions.postNeed.description}
+              className="siteHeaderAction"
+              href={marketplaceActions.postNeed.href}
+            >
+              {marketplaceActions.postNeed.shortLabel}
             </Link>
           </div>
         </header>
