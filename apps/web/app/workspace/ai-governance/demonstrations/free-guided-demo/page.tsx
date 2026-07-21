@@ -1,156 +1,115 @@
-"use client";
-
 import Link from "next/link";
-import { useMemo, useState } from "react";
 
-type Step = {
-  label: string;
-  title: string;
-  explanation: string;
-  evidence: string[];
-  decision: "RECORD" | "HOLD" | "CORRECT" | "PRESERVE";
+export const metadata = {
+  title: "AI Governance Demonstrations | TA-14 AI Governance Exchange",
+  description:
+    "Explore TA-14 AI governance demonstrations showing how consequential routes are recorded, evaluated, held, corrected, preserved, and replayed.",
 };
 
-const steps: Step[] = [
+const demonstrations = [
   {
-    label: "01 · REALITY",
-    title: "A consequential payment is proposed",
-    explanation:
-      "An AI-enabled workflow requests permission to release $27,500 to a vendor. The request exists, but existence is not authority.",
-    evidence: [
-      "Declared payment amount: $27,500",
-      "Named vendor",
-      "Declared business purpose",
-      "Initiating user recorded",
-    ],
-    decision: "RECORD",
-  },
-  {
-    label: "02 · RECORD",
-    title: "The available evidence is captured",
-    explanation:
-      "TA-14 records what is present without turning missing information into an assumption. The route now has a reviewable starting state.",
-    evidence: [
-      "Payment request preserved",
-      "Vendor identity submitted",
-      "Supporting purpose recorded",
-      "No procurement approval attached",
-    ],
-    decision: "RECORD",
-  },
-  {
-    label: "03 · CONTINUITY",
-    title: "The route tests whether the evidence stays connected",
-    explanation:
-      "The request, authority, beneficiary, and intended outcome must remain bound to the same route. Here, continuity is incomplete.",
-    evidence: [
-      "Request continuity present",
-      "Finance authority unproven",
-      "Procurement authority missing",
-      "Beneficiary verification incomplete",
-    ],
+    status: "LIVE",
     decision: "HOLD",
+    title: "Free Guided Vendor Payment Demo",
+    summary:
+      "Walk through a $27,500 vendor-payment route and see how missing authority and unverified beneficiary evidence stop execution before commit.",
+    lessons: [
+      "Reality is recorded without assumption",
+      "Authority must be proven",
+      "Missing evidence produces HOLD",
+      "Correction does not erase the original state",
+    ],
+    href: "/workspace/ai-governance/demonstrations/free-guided-demo",
+    cta: "Run Guided Demo",
+    featured: true,
   },
   {
-    label: "04 · ADMISSIBILITY",
-    title: "The route is classified before execution",
-    explanation:
-      "A strong model or confident recommendation cannot repair missing authority. The route cannot proceed merely because the action appears reasonable.",
-    evidence: [
-      "Required authority not established",
-      "Beneficiary not sufficiently verified",
-      "Evidence boundary declared",
-      "Execution prevented before commit",
+    status: "AVAILABLE",
+    decision: "ALLOW",
+    title: "Admissible Route Demonstration",
+    summary:
+      "Review a route that satisfies its declared evidence, authority, continuity, binding, commit, execution, and outcome requirements.",
+    lessons: [
+      "Evidence is sufficient",
+      "Authority remains current",
+      "Binding is established",
+      "Execution may proceed",
     ],
-    decision: "HOLD",
+    href: "/workspace/ai-governance",
+    cta: "Open Playground",
+    featured: false,
   },
   {
-    label: "05 · CORRECTION",
-    title: "The system declares what must change",
-    explanation:
-      "A governed HOLD is not a dead end. It identifies the exact missing evidence required for reconsideration without erasing the original failure state.",
-    evidence: [
-      "Attach procurement approval",
-      "Prove finance authority",
-      "Verify the beneficiary",
-      "Preserve all corrections in the same route",
+    status: "AVAILABLE",
+    decision: "DENY",
+    title: "Inadmissible Request Demonstration",
+    summary:
+      "See how a malformed or unauthorized request is refused before it can bind to a protected consequence.",
+    lessons: [
+      "The object lacks standing",
+      "Bind is refused",
+      "No downstream command is emitted",
+      "The refusal remains reviewable",
     ],
-    decision: "CORRECT",
+    href: "/workspace/ai-governance",
+    cta: "Test a Denied Route",
+    featured: false,
   },
   {
-    label: "06 · OUTCOME",
-    title: "The decision and correction path are preserved",
-    explanation:
-      "The result is a bounded, reviewable governance record showing what was proposed, what was proven, why execution was held, and what happens next.",
-    evidence: [
-      "Original state retained",
-      "Decision basis retained",
-      "Correction requirements declared",
-      "Outcome state available for replay",
+    status: "AVAILABLE",
+    decision: "ESCALATE",
+    title: "Human Authority Escalation",
+    summary:
+      "Explore a route that cannot be safely resolved automatically and must be transferred to a declared human authority.",
+    lessons: [
+      "Automation boundary is declared",
+      "Authority transfer is preserved",
+      "Execution remains blocked",
+      "Escalation does not imply approval",
     ],
-    decision: "PRESERVE",
+    href: "/workspace/ai-governance",
+    cta: "Test Escalation",
+    featured: false,
   },
 ];
 
-const decisionClass: Record<Step["decision"], string> = {
-  RECORD: "record",
-  HOLD: "hold",
-  CORRECT: "correct",
-  PRESERVE: "preserve",
-};
-
-export default function FreeGuidedDemoPage() {
-  const [active, setActive] = useState(0);
-  const [revealed, setRevealed] = useState(false);
-
-  const step = steps[active];
-  const progress = useMemo(
-    () => Math.round(((active + 1) / steps.length) * 100),
-    [active],
-  );
-
-  function selectStep(index: number) {
-    setActive(index);
-    setRevealed(false);
-  }
-
+export default function AIGovernanceDemonstrationsPage() {
   return (
     <>
       <style>{`
         :root {
-          --fgd-bg: #030712;
-          --fgd-panel: rgba(7, 15, 28, 0.84);
-          --fgd-border: rgba(255,255,255,0.10);
-          --fgd-text: #f7fbff;
-          --fgd-muted: #9fb0c4;
-          --fgd-cyan: #54e8ff;
-          --fgd-violet: #b59bff;
-          --fgd-amber: #ffd66e;
-          --fgd-red: #ff9292;
-          --fgd-green: #75f0b2;
+          --demo-bg: #030712;
+          --demo-panel: rgba(8, 17, 31, 0.84);
+          --demo-border: rgba(255, 255, 255, 0.1);
+          --demo-text: #f8fbff;
+          --demo-muted: #9fb0c4;
+          --demo-cyan: #58e6ff;
+          --demo-violet: #b7a2ff;
+          --demo-amber: #ffd66b;
+          --demo-green: #75efb0;
+          --demo-red: #ff9191;
         }
 
-        .fgd-page {
+        .demo-page {
           min-height: 100vh;
-          color: var(--fgd-text);
+          color: var(--demo-text);
           background:
-            radial-gradient(circle at 12% 12%, rgba(84,232,255,0.15), transparent 28%),
-            radial-gradient(circle at 88% 18%, rgba(181,155,255,0.14), transparent 31%),
-            radial-gradient(circle at 50% 95%, rgba(255,214,110,0.08), transparent 30%),
-            linear-gradient(180deg, #020611 0%, #07111e 52%, #02060d 100%);
+            radial-gradient(circle at 12% 10%, rgba(88, 230, 255, 0.14), transparent 28%),
+            radial-gradient(circle at 88% 18%, rgba(183, 162, 255, 0.14), transparent 30%),
+            linear-gradient(180deg, #020611 0%, #07121f 52%, #02060d 100%);
         }
 
-        .fgd-page *,
-        .fgd-page *::before,
-        .fgd-page *::after {
+        .demo-page *,
+        .demo-page *::before,
+        .demo-page *::after {
           box-sizing: border-box;
         }
 
-        .fgd-grid {
+        .demo-grid-bg {
           position: fixed;
           inset: 0;
           pointer-events: none;
-          opacity: 0.12;
+          opacity: 0.1;
           background-image:
             linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
@@ -158,641 +117,493 @@ export default function FreeGuidedDemoPage() {
           mask-image: radial-gradient(circle at center, black, transparent 82%);
         }
 
-        .fgd-shell {
+        .demo-shell {
           position: relative;
           z-index: 1;
           width: min(1180px, calc(100% - 40px));
           margin: 0 auto;
-          padding: 30px 0 80px;
+          padding: 28px 0 76px;
         }
 
-        .fgd-topbar {
+        .demo-topbar {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 18px;
-          margin-bottom: 26px;
+          gap: 20px;
+          margin-bottom: 30px;
         }
 
-        .fgd-brand,
-        .fgd-back {
+        .demo-brand,
+        .demo-return {
           color: white;
           text-decoration: none;
         }
 
-        .fgd-brand {
+        .demo-brand {
           display: flex;
           align-items: center;
           gap: 12px;
           font-weight: 900;
         }
 
-        .fgd-mark {
+        .demo-mark {
           display: grid;
-          width: 44px;
-          height: 44px;
+          width: 46px;
+          height: 46px;
           place-items: center;
-          border: 1px solid rgba(84,232,255,0.25);
+          border: 1px solid rgba(88,230,255,0.25);
           border-radius: 14px;
-          color: #c9f7ff;
-          background: rgba(84,232,255,0.08);
+          color: #c7f8ff;
+          background: rgba(88,230,255,0.08);
           font-size: 11px;
           letter-spacing: 0.08em;
         }
 
-        .fgd-back {
-          color: #c6d3e0;
+        .demo-return {
+          color: #c2cfdb;
           font-size: 14px;
           font-weight: 800;
         }
 
-        .fgd-hero {
-          display: grid;
-          grid-template-columns: 1.1fr 0.9fr;
-          gap: 34px;
-          align-items: center;
-          padding: 48px;
-          border: 1px solid var(--fgd-border);
+        .demo-hero {
+          padding: 54px;
+          border: 1px solid var(--demo-border);
           border-radius: 34px;
-          background: rgba(4,11,22,0.72);
+          background: rgba(4, 11, 22, 0.72);
           backdrop-filter: blur(22px);
-          box-shadow: 0 30px 100px rgba(0,0,0,0.38);
+          box-shadow: 0 30px 100px rgba(0,0,0,0.36);
         }
 
-        .fgd-kicker {
+        .demo-kicker {
           display: inline-flex;
           align-items: center;
           gap: 9px;
           padding: 8px 13px;
-          border: 1px solid rgba(84,232,255,0.22);
+          border: 1px solid rgba(88,230,255,0.22);
           border-radius: 999px;
-          color: #c9f7ff;
-          background: rgba(84,232,255,0.065);
+          color: #c7f8ff;
+          background: rgba(88,230,255,0.06);
           font-size: 11px;
           font-weight: 900;
           letter-spacing: 0.15em;
           text-transform: uppercase;
         }
 
-        .fgd-kicker::before {
+        .demo-kicker::before {
           content: "";
           width: 8px;
           height: 8px;
           border-radius: 50%;
-          background: var(--fgd-cyan);
-          box-shadow: 0 0 14px rgba(84,232,255,0.9);
+          background: var(--demo-cyan);
+          box-shadow: 0 0 14px rgba(88,230,255,0.85);
         }
 
-        .fgd-title {
+        .demo-title {
+          max-width: 920px;
           margin: 22px 0 18px;
-          font-size: clamp(46px, 6vw, 76px);
+          font-size: clamp(48px, 7vw, 82px);
           line-height: 0.98;
           letter-spacing: -0.055em;
         }
 
-        .fgd-title span {
+        .demo-title span {
           display: block;
           color: transparent;
-          background: linear-gradient(90deg, #aaf6ff, #ffffff 48%, #d3c5ff);
+          background: linear-gradient(90deg, #a9f5ff, #ffffff 48%, #d3c7ff);
           background-clip: text;
           -webkit-background-clip: text;
         }
 
-        .fgd-lead {
+        .demo-lead {
+          max-width: 880px;
           margin: 0;
-          color: #b9c8d8;
+          color: #b5c4d3;
           font-size: 18px;
           line-height: 1.72;
         }
 
-        .fgd-case {
-          padding: 28px;
-          border: 1px solid var(--fgd-border);
-          border-radius: 26px;
+        .demo-chain {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+          margin-top: 34px;
+        }
+
+        .demo-chain-item {
+          padding: 16px;
+          border: 1px solid var(--demo-border);
+          border-radius: 17px;
           background: rgba(255,255,255,0.035);
         }
 
-        .fgd-case-label {
-          color: var(--fgd-cyan);
+        .demo-chain-item strong {
+          display: block;
+          color: white;
+          font-size: 14px;
+        }
+
+        .demo-chain-item span {
+          display: block;
+          margin-top: 6px;
+          color: var(--demo-muted);
+          font-size: 12px;
+          line-height: 1.5;
+        }
+
+        .demo-section {
+          margin-top: 34px;
+        }
+
+        .demo-section-head {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 24px;
+          margin-bottom: 18px;
+        }
+
+        .demo-eyebrow {
+          color: var(--demo-cyan);
           font-size: 11px;
           font-weight: 900;
-          letter-spacing: 0.16em;
+          letter-spacing: 0.15em;
           text-transform: uppercase;
         }
 
-        .fgd-amount {
-          margin: 12px 0 4px;
-          font-size: 44px;
-          font-weight: 950;
+        .demo-section h2 {
+          margin: 10px 0 0;
+          font-size: clamp(30px, 4vw, 48px);
           letter-spacing: -0.04em;
         }
 
-        .fgd-case p {
+        .demo-section-head p {
+          max-width: 520px;
           margin: 0;
-          color: var(--fgd-muted);
+          color: var(--demo-muted);
           line-height: 1.65;
         }
 
-        .fgd-hold {
-          display: flex;
-          justify-content: space-between;
-          gap: 16px;
-          margin-top: 22px;
-          padding-top: 20px;
-          border-top: 1px solid var(--fgd-border);
-        }
-
-        .fgd-hold strong {
-          color: var(--fgd-amber);
-          font-size: 24px;
-        }
-
-        .fgd-hold span {
-          color: var(--fgd-muted);
-          font-size: 13px;
-          text-align: right;
-        }
-
-        .fgd-workspace {
+        .demo-card-grid {
           display: grid;
-          grid-template-columns: 280px minmax(0,1fr);
-          gap: 24px;
-          margin-top: 34px;
-        }
-
-        .fgd-sidebar,
-        .fgd-stage {
-          border: 1px solid var(--fgd-border);
-          border-radius: 28px;
-          background: var(--fgd-panel);
-          backdrop-filter: blur(22px);
-        }
-
-        .fgd-sidebar {
-          padding: 22px;
-        }
-
-        .fgd-progress-row {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          color: #d7e4ef;
-          font-size: 12px;
-          font-weight: 850;
-        }
-
-        .fgd-progress {
-          height: 8px;
-          margin: 13px 0 22px;
-          overflow: hidden;
-          border-radius: 999px;
-          background: rgba(255,255,255,0.07);
-        }
-
-        .fgd-progress > div {
-          height: 100%;
-          border-radius: inherit;
-          background: linear-gradient(90deg, var(--fgd-cyan), var(--fgd-violet));
-          transition: width 220ms ease;
-        }
-
-        .fgd-step-list {
-          display: grid;
-          gap: 9px;
-        }
-
-        .fgd-step {
-          display: grid;
-          grid-template-columns: 38px 1fr;
-          gap: 11px;
-          align-items: center;
-          width: 100%;
-          padding: 11px;
-          border: 1px solid transparent;
-          border-radius: 15px;
-          color: #b7c5d4;
-          background: transparent;
-          text-align: left;
-          cursor: pointer;
-        }
-
-        .fgd-step:hover {
-          color: white;
-          background: rgba(255,255,255,0.04);
-        }
-
-        .fgd-step.active {
-          color: white;
-          border-color: rgba(84,232,255,0.20);
-          background: rgba(84,232,255,0.07);
-        }
-
-        .fgd-step-number {
-          display: grid;
-          width: 38px;
-          height: 38px;
-          place-items: center;
-          border: 1px solid var(--fgd-border);
-          border-radius: 12px;
-          font-size: 12px;
-          font-weight: 900;
-        }
-
-        .fgd-step-title {
-          font-size: 13px;
-          font-weight: 850;
-        }
-
-        .fgd-stage {
-          min-height: 560px;
-          padding: 34px;
-        }
-
-        .fgd-stage-head {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 18px;
         }
 
-        .fgd-eyebrow {
-          color: var(--fgd-cyan);
-          font-size: 11px;
+        .demo-card {
+          display: flex;
+          flex-direction: column;
+          min-height: 430px;
+          padding: 26px;
+          border: 1px solid var(--demo-border);
+          border-radius: 24px;
+          background: var(--demo-panel);
+          backdrop-filter: blur(20px);
+        }
+
+        .demo-card.featured {
+          grid-column: 1 / -1;
+          min-height: 360px;
+          background:
+            linear-gradient(135deg, rgba(88,230,255,0.08), rgba(183,162,255,0.055)),
+            var(--demo-panel);
+        }
+
+        .demo-card-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+        }
+
+        .demo-status,
+        .demo-decision {
+          display: inline-flex;
+          align-items: center;
+          padding: 7px 10px;
+          border-radius: 999px;
+          font-size: 10px;
           font-weight: 900;
-          letter-spacing: 0.16em;
+          letter-spacing: 0.11em;
+        }
+
+        .demo-status {
+          color: #c7f8ff;
+          border: 1px solid rgba(88,230,255,0.2);
+          background: rgba(88,230,255,0.07);
+        }
+
+        .demo-decision {
+          border: 1px solid var(--demo-border);
+        }
+
+        .demo-decision.allow {
+          color: #c9f7dd;
+          background: rgba(117,239,176,0.07);
+        }
+
+        .demo-decision.hold {
+          color: #ffe8a6;
+          background: rgba(255,214,107,0.07);
+        }
+
+        .demo-decision.deny {
+          color: #ffc4c4;
+          background: rgba(255,145,145,0.07);
+        }
+
+        .demo-decision.escalate {
+          color: #ddd3ff;
+          background: rgba(183,162,255,0.07);
+        }
+
+        .demo-card h3 {
+          margin: 24px 0 12px;
+          font-size: clamp(26px, 3vw, 38px);
+          line-height: 1.08;
+          letter-spacing: -0.04em;
+        }
+
+        .demo-summary {
+          margin: 0;
+          color: #aebdcc;
+          line-height: 1.72;
+        }
+
+        .demo-lessons-title {
+          margin-top: 24px;
+          color: var(--demo-cyan);
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.14em;
           text-transform: uppercase;
         }
 
-        .fgd-stage h2 {
-          margin: 12px 0 14px;
-          font-size: clamp(30px, 4vw, 48px);
-          line-height: 1.05;
-          letter-spacing: -0.04em;
+        .demo-lessons {
+          flex: 1;
+          margin: 14px 0 24px;
+          padding-left: 20px;
+          color: #d8e4ee;
         }
 
-        .fgd-decision {
-          padding: 8px 12px;
-          border: 1px solid var(--fgd-border);
-          border-radius: 999px;
-          font-size: 11px;
-          font-weight: 900;
-          letter-spacing: 0.10em;
+        .demo-lessons li {
+          margin-bottom: 9px;
+          line-height: 1.5;
         }
 
-        .fgd-decision.record { color: #c9f7ff; background: rgba(84,232,255,0.07); }
-        .fgd-decision.hold { color: #ffe8a8; background: rgba(255,214,110,0.07); }
-        .fgd-decision.correct { color: #ded4ff; background: rgba(181,155,255,0.07); }
-        .fgd-decision.preserve { color: #c9f8dd; background: rgba(117,240,178,0.07); }
-
-        .fgd-explanation {
-          margin: 0;
-          color: #afbfce;
-          line-height: 1.75;
-        }
-
-        .fgd-question {
-          margin-top: 28px;
-          padding: 24px;
-          border: 1px solid rgba(181,155,255,0.18);
-          border-radius: 22px;
-          background: rgba(181,155,255,0.05);
-        }
-
-        .fgd-question h3 {
-          margin: 10px 0 0;
-          font-size: 22px;
-          line-height: 1.4;
-        }
-
-        .fgd-reveal {
-          display: inline-flex;
-          min-height: 46px;
-          align-items: center;
-          justify-content: center;
-          margin-top: 20px;
-          padding: 0 18px;
-          border: 1px solid rgba(84,232,255,0.24);
-          border-radius: 13px;
-          color: #03100c;
-          background: linear-gradient(90deg, var(--fgd-cyan), #92f2ff);
-          font-weight: 900;
-          cursor: pointer;
-        }
-
-        .fgd-evidence {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0,1fr));
-          gap: 12px;
-          margin-top: 18px;
-        }
-
-        .fgd-evidence-item {
-          padding: 15px;
-          border: 1px solid rgba(84,232,255,0.15);
-          border-radius: 16px;
-          color: #d7e5f1;
-          background: rgba(84,232,255,0.04);
-          font-size: 14px;
-          line-height: 1.55;
-        }
-
-        .fgd-navigation {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          margin-top: 30px;
-          padding-top: 24px;
-          border-top: 1px solid var(--fgd-border);
-        }
-
-        .fgd-button,
-        .fgd-link {
-          display: inline-flex;
-          min-height: 46px;
-          align-items: center;
-          justify-content: center;
-          padding: 0 18px;
-          border: 1px solid var(--fgd-border);
-          border-radius: 13px;
-          color: white;
-          background: rgba(255,255,255,0.045);
-          text-decoration: none;
-          font-weight: 850;
-          cursor: pointer;
-        }
-
-        .fgd-button:hover,
-        .fgd-link:hover {
-          background: rgba(255,255,255,0.08);
-        }
-
-        .fgd-button:disabled {
-          opacity: 0.35;
-          cursor: not-allowed;
-        }
-
-        .fgd-link.primary {
-          color: #03100c;
-          border-color: transparent;
-          background: linear-gradient(90deg, var(--fgd-cyan), #92f2ff);
-        }
-
-        .fgd-conclusion {
-          margin-top: 34px;
-          padding: 34px;
-          border: 1px solid rgba(84,232,255,0.17);
-          border-radius: 28px;
-          background: linear-gradient(
-            135deg,
-            rgba(84,232,255,0.07),
-            rgba(181,155,255,0.05),
-            rgba(255,214,110,0.04)
-          );
-        }
-
-        .fgd-conclusion h2 {
-          margin: 12px 0 14px;
-          font-size: clamp(30px,4vw,48px);
-          letter-spacing: -0.04em;
-        }
-
-        .fgd-conclusion p {
-          max-width: 860px;
-          margin: 0;
-          color: #b8c7d7;
-          line-height: 1.75;
-        }
-
-        .fgd-actions {
+        .demo-actions {
           display: flex;
           flex-wrap: wrap;
-          gap: 12px;
-          margin-top: 24px;
+          gap: 11px;
         }
 
-        @media (max-width: 920px) {
-          .fgd-hero,
-          .fgd-workspace {
+        .demo-primary,
+        .demo-secondary {
+          display: inline-flex;
+          min-height: 48px;
+          align-items: center;
+          justify-content: center;
+          padding: 0 18px;
+          border-radius: 13px;
+          text-decoration: none;
+          font-weight: 900;
+        }
+
+        .demo-primary {
+          color: #03100c;
+          background: linear-gradient(90deg, var(--demo-cyan), #93f1ff);
+        }
+
+        .demo-secondary {
+          color: white;
+          border: 1px solid var(--demo-border);
+          background: rgba(255,255,255,0.045);
+        }
+
+        .demo-principle {
+          margin-top: 34px;
+          padding: 34px;
+          border: 1px solid rgba(88,230,255,0.16);
+          border-radius: 26px;
+          background:
+            linear-gradient(135deg, rgba(88,230,255,0.06), rgba(183,162,255,0.04));
+        }
+
+        .demo-principle h2 {
+          margin: 10px 0 14px;
+          font-size: clamp(30px, 4vw, 46px);
+          letter-spacing: -0.04em;
+        }
+
+        .demo-principle p {
+          max-width: 900px;
+          margin: 0;
+          color: #b5c4d3;
+          line-height: 1.75;
+        }
+
+        @media (max-width: 900px) {
+          .demo-card-grid,
+          .demo-chain {
             grid-template-columns: 1fr;
+          }
+
+          .demo-card.featured {
+            grid-column: auto;
+          }
+
+          .demo-section-head {
+            align-items: flex-start;
+            flex-direction: column;
           }
         }
 
-        @media (max-width: 680px) {
-          .fgd-shell {
+        @media (max-width: 660px) {
+          .demo-shell {
             width: min(100% - 24px, 1180px);
             padding-top: 16px;
           }
 
-          .fgd-topbar,
-          .fgd-stage-head,
-          .fgd-navigation {
-            align-items: stretch;
+          .demo-topbar {
+            align-items: flex-start;
             flex-direction: column;
           }
 
-          .fgd-hero,
-          .fgd-stage,
-          .fgd-conclusion {
+          .demo-hero,
+          .demo-card,
+          .demo-principle {
             padding: 24px;
-            border-radius: 24px;
+            border-radius: 23px;
           }
 
-          .fgd-title {
+          .demo-title {
             font-size: 46px;
           }
 
-          .fgd-decision {
-            align-self: flex-start;
-          }
-
-          .fgd-evidence {
-            grid-template-columns: 1fr;
-          }
-
-          .fgd-button,
-          .fgd-link {
+          .demo-primary,
+          .demo-secondary {
             width: 100%;
           }
         }
       `}</style>
 
-      <div className="fgd-page">
-        <div className="fgd-grid" aria-hidden="true" />
+      <div className="demo-page">
+        <div className="demo-grid-bg" aria-hidden="true" />
 
-        <main className="fgd-shell">
-          <header className="fgd-topbar">
-            <Link className="fgd-brand" href="/workspace/ai-governance">
-              <span className="fgd-mark">TA-14</span>
+        <main className="demo-shell">
+          <header className="demo-topbar">
+            <Link className="demo-brand" href="/workspace/ai-governance">
+              <span className="demo-mark">TA-14</span>
               <span>AI Governance Exchange</span>
             </Link>
 
-            <Link className="fgd-back" href="/workspace/ai-governance">
+            <Link className="demo-return" href="/workspace/ai-governance">
               Return to AI Governance Playground
             </Link>
           </header>
 
-          <section className="fgd-hero">
-            <div>
-              <div className="fgd-kicker">Free Guided Demonstration</div>
-              <h1 className="fgd-title">
-                Watch a route become
-                <span>governable before execution.</span>
-              </h1>
-              <p className="fgd-lead">
-                Walk through a consequence-bearing AI governance route one
-                decision at a time. No payment, technical knowledge, or sales
-                conversation is required.
-              </p>
-            </div>
+          <section className="demo-hero">
+            <div className="demo-kicker">AI Governance Demonstrations</div>
 
-            <aside className="fgd-case">
-              <div className="fgd-case-label">Demonstration route</div>
-              <div className="fgd-amount">$27,500</div>
-              <p>
-                Vendor payment requested through an AI-assisted operational
-                workflow.
-              </p>
-              <div className="fgd-hold">
-                <strong>HOLD</strong>
-                <span>
-                  Missing authority
-                  <br />
-                  Beneficiary unproven
-                </span>
-              </div>
-            </aside>
-          </section>
+            <h1 className="demo-title">
+              See what happens
+              <span>before consequential execution.</span>
+            </h1>
 
-          <section className="fgd-workspace">
-            <aside className="fgd-sidebar">
-              <div className="fgd-progress-row">
-                <span>Guided progress</span>
-                <span>{progress}%</span>
-              </div>
-
-              <div className="fgd-progress" aria-hidden="true">
-                <div style={{ width: `${progress}%` }} />
-              </div>
-
-              <div className="fgd-step-list">
-                {steps.map((item, index) => (
-                  <button
-                    className={`fgd-step ${index === active ? "active" : ""}`}
-                    key={item.label}
-                    type="button"
-                    onClick={() => selectStep(index)}
-                  >
-                    <span className="fgd-step-number">
-                      {String(index + 1).padStart(2, "0")}
-                    </span>
-                    <span className="fgd-step-title">{item.title}</span>
-                  </button>
-                ))}
-              </div>
-            </aside>
-
-            <article className="fgd-stage">
-              <div className="fgd-stage-head">
-                <div>
-                  <div className="fgd-eyebrow">{step.label}</div>
-                  <h2>{step.title}</h2>
-                </div>
-
-                <span
-                  className={`fgd-decision ${decisionClass[step.decision]}`}
-                >
-                  {step.decision}
-                </span>
-              </div>
-
-              <p className="fgd-explanation">{step.explanation}</p>
-
-              <div className="fgd-question">
-                <div className="fgd-eyebrow">What does the route show?</div>
-                <h3>
-                  Reveal the evidence and boundary recorded at this stage.
-                </h3>
-
-                {!revealed ? (
-                  <button
-                    className="fgd-reveal"
-                    type="button"
-                    onClick={() => setRevealed(true)}
-                  >
-                    Reveal This Stage
-                  </button>
-                ) : (
-                  <div className="fgd-evidence">
-                    {step.evidence.map((item) => (
-                      <div className="fgd-evidence-item" key={item}>
-                        {item}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              <div className="fgd-navigation">
-                <button
-                  className="fgd-button"
-                  type="button"
-                  disabled={active === 0}
-                  onClick={() => selectStep(active - 1)}
-                >
-                  Previous Stage
-                </button>
-
-                {active < steps.length - 1 ? (
-                  <button
-                    className="fgd-button"
-                    type="button"
-                    onClick={() => selectStep(active + 1)}
-                  >
-                    Continue the Route
-                  </button>
-                ) : (
-                  <Link
-                    className="fgd-link primary"
-                    href="/workspace/ai-governance/build"
-                  >
-                    Build a Free AI Route
-                  </Link>
-                )}
-              </div>
-            </article>
-          </section>
-
-          <section className="fgd-conclusion">
-            <div className="fgd-eyebrow">What this demonstration proves</div>
-            <h2>A governed route is more than a model decision.</h2>
-            <p>
-              TA-14 separates the underlying record from diagnosis, correction,
-              execution, and outcome. The original failed state remains visible.
-              Missing evidence remains missing. Authority must be proven before
-              commit. The formed outcome can then be preserved and replayed under
-              scrutiny.
+            <p className="demo-lead">
+              These demonstrations show how TA-14 records reality, preserves
+              evidence boundaries, evaluates authority and continuity, and
+              prevents an inadmissible route from forming a protected
+              consequence.
             </p>
 
-            <div className="fgd-actions">
-              <Link
-                className="fgd-link primary"
-                href="/workspace/ai-governance/build"
-              >
-                Build a Free AI Route
-              </Link>
-              <Link
-                className="fgd-link"
-                href="/workspace/ai-governance/demonstrations"
-              >
-                View All Demonstrations
-              </Link>
-              <Link
-                className="fgd-link"
-                href="/workspace/ai-governance/pricing"
-              >
-                Return to Pricing
-              </Link>
+            <div className="demo-chain">
+              <div className="demo-chain-item">
+                <strong>ALLOW</strong>
+                <span>Declared conditions are satisfied.</span>
+              </div>
+              <div className="demo-chain-item">
+                <strong>HOLD</strong>
+                <span>Correction or additional evidence is required.</span>
+              </div>
+              <div className="demo-chain-item">
+                <strong>DENY</strong>
+                <span>The request lacks standing or violates its boundary.</span>
+              </div>
+              <div className="demo-chain-item">
+                <strong>ESCALATE</strong>
+                <span>A declared human authority must decide.</span>
+              </div>
             </div>
+          </section>
+
+          <section className="demo-section">
+            <div className="demo-section-head">
+              <div>
+                <div className="demo-eyebrow">Current demonstration library</div>
+                <h2>Choose a route and inspect the decision.</h2>
+              </div>
+
+              <p>
+                Start with the guided demonstration, then use the playground to
+                construct, break, correct, and replay your own AI governance
+                routes.
+              </p>
+            </div>
+
+            <div className="demo-card-grid">
+              {demonstrations.map((demo) => (
+                <article
+                  className={`demo-card ${demo.featured ? "featured" : ""}`}
+                  key={demo.title}
+                >
+                  <div className="demo-card-top">
+                    <span className="demo-status">{demo.status}</span>
+                    <span
+                      className={`demo-decision ${demo.decision.toLowerCase()}`}
+                    >
+                      {demo.decision}
+                    </span>
+                  </div>
+
+                  <h3>{demo.title}</h3>
+                  <p className="demo-summary">{demo.summary}</p>
+
+                  <div className="demo-lessons-title">What this route shows</div>
+                  <ul className="demo-lessons">
+                    {demo.lessons.map((lesson) => (
+                      <li key={lesson}>{lesson}</li>
+                    ))}
+                  </ul>
+
+                  <div className="demo-actions">
+                    <Link className="demo-primary" href={demo.href}>
+                      {demo.cta}
+                    </Link>
+
+                    {demo.featured ? (
+                      <Link
+                        className="demo-secondary"
+                        href="/workspace/ai-governance/pricing"
+                      >
+                        View Governance Services
+                      </Link>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="demo-principle">
+            <div className="demo-eyebrow">Governing principle</div>
+            <h2>No admissible evidence. No admissible execution.</h2>
+            <p>
+              A demonstration is not merely a result screen. It must reveal the
+              route, evidence boundary, authority condition, decision basis,
+              correction requirement, and preserved outcome so another reviewer
+              can understand what happened without reconstructing the event from
+              memory.
+            </p>
           </section>
         </main>
       </div>
