@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+const WORKSPACE_ROUTES = {
+  testing: "/workspace/testing",
+  verify: "/workspace/verify",
+  registry: "/workspace/registry",
+} as const;
+
+
 type ReceiptState = "SIMULATION" | "PAYMENT_REQUIRED" | "SIGNED" | "REVOKED";
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 
@@ -25,10 +32,10 @@ type ReceiptRecord = {
 
 const initialReceipts: ReceiptRecord[] = [
   {
-    receiptId: "TA14-RCPT-7C3A19",
-    routeId: "TA14-RID-VP-0042",
+    receiptId: "TA-14-RCPT-7C3A19",
+    routeId: "TA-14-RID-VP-0042",
     routeName: "Governed Vendor Payment",
-    testId: "TA14-TEST-9F21C4",
+    testId: "TA-14-TEST-9F21C4",
     state: "SIGNED",
     decision: "ALLOW",
     issuedAt: "2026-07-17T18:16:00.000Z",
@@ -42,10 +49,10 @@ const initialReceipts: ReceiptRecord[] = [
       "Example signed test receipt retained to demonstrate the receipt vault interface.",
   },
   {
-    receiptId: "TA14-RCPT-4B88E1",
-    routeId: "TA14-RID-AI-0018",
+    receiptId: "TA-14-RCPT-4B88E1",
+    routeId: "TA-14-RID-AI-0018",
     routeName: "Bounded AI Agent Action",
-    testId: "TA14-TEST-7A11B8",
+    testId: "TA-14-TEST-7A11B8",
     state: "SIMULATION",
     decision: "HOLD",
     issuedAt: "2026-07-17T17:40:00.000Z",
@@ -59,10 +66,10 @@ const initialReceipts: ReceiptRecord[] = [
       "Free simulation receipt. It is not a production signature and does not authorize execution.",
   },
   {
-    receiptId: "TA14-RCPT-2E913F",
-    routeId: "TA14-RID-HVAC-0009",
+    receiptId: "TA-14-RCPT-2E913F",
+    routeId: "TA-14-RID-HVAC-0009",
     routeName: "Analyzer-Governed Refrigerant Intervention",
-    testId: "TA14-TEST-5D02C7",
+    testId: "TA-14-TEST-5D02C7",
     state: "PAYMENT_REQUIRED",
     decision: "ESCALATE",
     issuedAt: "2026-07-17T15:04:00.000Z",
@@ -76,10 +83,10 @@ const initialReceipts: ReceiptRecord[] = [
       "Signed-test request prepared. Payment and server-side issuance have not yet occurred.",
   },
   {
-    receiptId: "TA14-RCPT-1A044D",
-    routeId: "TA14-RID-HR-0003",
+    receiptId: "TA-14-RCPT-1A044D",
+    routeId: "TA-14-RID-HR-0003",
     routeName: "Automated Candidate Rejection",
-    testId: "TA14-TEST-1B229A",
+    testId: "TA-14-TEST-1B229A",
     state: "REVOKED",
     decision: "DENY",
     issuedAt: "2026-07-15T11:22:00.000Z",
@@ -167,7 +174,7 @@ export default function ReceiptVaultPage() {
 
   const exportPackage = selected
     ? {
-        schema: "TA14_TEST_RECEIPT_PACKAGE_V1",
+        schema: "TA_14_TEST_RECEIPT_PACKAGE_V1",
         exportedAt: new Date().toISOString(),
         receipt: selected,
         verificationBoundary: {
@@ -282,6 +289,16 @@ export default function ReceiptVaultPage() {
 
         .button:hover, .button-secondary:hover, .small-button:hover {
           transform: translateY(-2px);
+        }
+
+        .button:focus-visible,
+        .button-secondary:focus-visible,
+        .small-button:focus-visible,
+        .receipt-row:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+          outline:3px solid rgba(108,233,255,.72);
+          outline-offset:4px;
         }
 
         .button {
@@ -535,13 +552,13 @@ export default function ReceiptVaultPage() {
             </p>
 
             <div className="hero-actions">
-              <Link className="button" href="/workspace/testing">
+              <Link className="button" href={WORKSPACE_ROUTES.testing}>
                 Run a route test
               </Link>
-              <Link className="button-secondary" href="/workspace/verify">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.verify}>
                 Open verifier
               </Link>
-              <Link className="button-secondary" href="/workspace/registry">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.registry}>
                 Open registry
               </Link>
             </div>
@@ -689,7 +706,7 @@ export default function ReceiptVaultPage() {
                 >
                   Download package
                 </button>
-                <Link className="small-button" href="/workspace/verify">
+                <Link className="small-button" href={WORKSPACE_ROUTES.verify}>
                   Verify receipt
                 </Link>
               </div>
