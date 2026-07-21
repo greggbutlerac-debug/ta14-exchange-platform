@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
 
 type ReviewType =
   | "Organization"
@@ -21,6 +22,7 @@ type IntakeState = {
   evidence: string;
   knownConcerns: string;
   requestedOutcome: string;
+  requestedReviewer: string;
 };
 
 const STORAGE_KEY = "ta14-entity-review-intake-v1";
@@ -111,9 +113,11 @@ const initialState: IntakeState = {
   evidence: "",
   knownConcerns: "",
   requestedOutcome: "",
+  requestedReviewer: "",
 };
 
 export default function EntityReviewPage() {
+  const searchParams = useSearchParams();
   const [intake, setIntake] = useState<IntakeState>(initialState);
   const [savedAt, setSavedAt] = useState<string | null>(null);
   const [showIntake, setShowIntake] = useState(false);
@@ -140,6 +144,23 @@ export default function EntityReviewPage() {
       window.localStorage.removeItem(STORAGE_KEY);
     }
   }, []);
+
+  useEffect(() => {
+    const reviewer = searchParams.get("reviewer");
+
+    if (!reviewer) {
+      return;
+    }
+
+    setIntake((current) => ({
+      ...current,
+      requestedReviewer: reviewer,
+    }));
+    setShowIntake(true);
+    setNotice(
+      `${reviewer} has been carried into this intake as the requested reviewer or review route. Selection does not establish qualification, availability, acceptance, or certification.`,
+    );
+  }, [searchParams]);
 
   const selectedType = useMemo(
     () => reviewTypes.find((item) => item.title === intake.reviewType),
@@ -407,6 +428,18 @@ export default function EntityReviewPage() {
               <span>Selected review object</span>
               <strong>{intake.reviewType}</strong>
               <p>{selectedType?.description}</p>
+
+              {intake.requestedReviewer ? (
+                <div className="requested-reviewer">
+                  <span>Requested reviewer or review route</span>
+                  <strong>{intake.requestedReviewer}</strong>
+                  <p>
+                    This is a requested match only. Qualification, independence,
+                    availability, conflicts, authority, and acceptance remain to
+                    be established.
+                  </p>
+                </div>
+              ) : null}
             </div>
 
             <div className="form-grid">
@@ -460,6 +493,17 @@ export default function EntityReviewPage() {
                     updateField("contact", event.target.value)
                   }
                   placeholder="Name or email for the proposed review"
+                />
+              </label>
+
+              <label className="wide">
+                <span>Requested reviewer or review route</span>
+                <input
+                  value={intake.requestedReviewer}
+                  onChange={(event) =>
+                    updateField("requestedReviewer", event.target.value)
+                  }
+                  placeholder="Optional: reviewer, specialist, laboratory, or network route"
                 />
               </label>
 
@@ -1326,6 +1370,27 @@ export default function EntityReviewPage() {
         .selected-review p {
           margin: 7px 0 0;
           font-size: 0.88rem;
+        }
+
+        .requested-reviewer {
+          margin-top: 18px;
+          padding-top: 18px;
+          border-top: 1px solid rgba(205, 160, 255, 0.16);
+        }
+
+        .requested-reviewer span {
+          color: #a894b5;
+        }
+
+        .requested-reviewer strong {
+          color: #f0d9ff;
+          font-size: 1.02rem;
+        }
+
+        .requested-reviewer p {
+          max-width: 850px;
+          color: #9b8fa5;
+          font-size: 0.79rem;
         }
 
         .form-grid {
