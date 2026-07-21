@@ -249,6 +249,7 @@ export default function ReplayVerificationPage() {
   );
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [isVerifying, setIsVerifying] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
 
   const checks = useMemo(() => inspect(packageValue), [packageValue]);
   const verificationState = useMemo(() => deriveState(checks), [checks]);
@@ -470,15 +471,51 @@ export default function ReplayVerificationPage() {
                 </div>
               </div>
 
-              <label className="dropZone">
+              <label
+                className={`dropZone ${isDragging ? "dropZoneActive" : ""}`}
+                onDragEnter={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsDragging(true);
+                }}
+                onDragOver={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  event.dataTransfer.dropEffect = "copy";
+                  setIsDragging(true);
+                }}
+                onDragLeave={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+
+                  if (event.currentTarget.contains(event.relatedTarget as Node | null)) {
+                    return;
+                  }
+
+                  setIsDragging(false);
+                }}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setIsDragging(false);
+                  handleFile(event.dataTransfer.files?.[0]);
+                }}
+              >
                 <span className="uploadOrb">+</span>
-                <strong>Drop replay package here</strong>
+                <strong>
+                  {isDragging
+                    ? "Release to load replay package"
+                    : "Drop replay package here"}
+                </strong>
                 <small>JSON only · maximum file size 1 MB</small>
                 <span className="browseButton">Browse file</span>
                 <input
                   type="file"
                   accept="application/json,.json"
-                  onChange={(event) => handleFile(event.target.files?.[0])}
+                  onChange={(event) => {
+                    handleFile(event.target.files?.[0]);
+                    event.currentTarget.value = "";
+                  }}
                 />
               </label>
 
@@ -1149,12 +1186,21 @@ export default function ReplayVerificationPage() {
           transition: border-color 180ms ease, background 180ms ease, transform 180ms ease;
         }
 
-        .dropZone:hover {
+        .dropZone:hover,
+        .dropZoneActive {
           transform: translateY(-2px);
           border-color: var(--teal);
           background:
-            radial-gradient(circle at center, rgba(114,231,228,.12), transparent 52%),
-            rgba(255,255,255,.018);
+            radial-gradient(circle at center, rgba(114,231,228,.15), transparent 52%),
+            rgba(114,231,228,.035);
+          box-shadow:
+            inset 0 0 0 1px rgba(114,231,228,.12),
+            0 0 34px rgba(114,231,228,.1);
+        }
+
+        .dropZoneActive .uploadOrb {
+          transform: scale(1.08);
+          box-shadow: 0 0 46px rgba(114,231,228,.42);
         }
 
         .dropZone input {
@@ -1172,6 +1218,7 @@ export default function ReplayVerificationPage() {
           box-shadow: 0 0 34px rgba(114,231,228,.26);
           font-size: 1.8rem;
           font-weight: 500;
+          transition: transform 180ms ease, box-shadow 180ms ease;
         }
 
         .dropZone strong {
