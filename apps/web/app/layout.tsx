@@ -21,6 +21,10 @@ const primaryNavigation = [
     href: '/workspace',
   },
   {
+    label: 'EU AI Act',
+    href: '/eu-ai-act',
+  },
+  {
     label: 'Marketplace',
     href: marketplaceRoutes.home,
   },
@@ -43,7 +47,7 @@ export const metadata: Metadata = {
     template: '%s | TA-14 AI Governance Exchange',
   },
   description:
-    'Build, test, correct, preserve, and independently verify consequential execution routes through TA-14 admissible execution records.',
+    'Build, test, correct, preserve, and independently verify AI governance routes, governed records, and European Union Artificial Intelligence Act obligations through the TA-14 AI Governance Exchange.',
   applicationName: 'TA-14 AI Governance Exchange',
   authors: [
     {
@@ -55,6 +59,18 @@ export const metadata: Metadata = {
   keywords: [
     'TA-14',
     'TA-14 AI Governance Exchange',
+    'European Union Artificial Intelligence Act',
+    'EU AI Act',
+    'Regulation (EU) 2024/1689',
+    'EU AI Act Requirements',
+    'Article 50 Transparency',
+    'High-Risk AI Systems',
+    'Fundamental Rights Impact Assessment',
+    'GPAI',
+    'General-Purpose AI',
+    'AI Compliance',
+    'AI Governance Laboratory',
+    'AI Governance Playground',
     'Admissible Execution',
     'AI Governance',
     'Execution Governance',
@@ -78,7 +94,7 @@ export const metadata: Metadata = {
     siteName: 'TA-14 AI Governance Exchange',
     title: 'TA-14 AI Governance Exchange',
     description:
-      'Constitutional execution for the physical and digital world. No admissible evidence. No admissible execution.',
+      'Build, test, and verify AI governance. Explore the European Union AI Act through interactive governance routes, governed records, and admissible execution.',
     images: [
       {
         url: '/opengraph-image.png',
@@ -92,7 +108,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'TA-14 AI Governance Exchange',
     description:
-      'Constitutional execution for the physical and digital world. No admissible evidence. No admissible execution.',
+      'Build, test, and verify AI governance. Explore the European Union AI Act through interactive governance routes, governed records, and admissible execution.',
     images: ['/opengraph-image.png'],
   },
   robots: {
@@ -189,6 +205,108 @@ export default function RootLayout({
         <div className="siteContent">{children}</div>
 
         <Script
+          id="ta14-structured-data"
+          type="application/ld+json"
+          strategy="afterInteractive"
+        >
+          {JSON.stringify({
+            '@context': 'https://schema.org',
+            '@graph': [
+              {
+                '@type': 'Organization',
+                '@id':
+                  'https://ta14-exchange-platform-x2g7.vercel.app/#organization',
+                name: 'TA-14 Authority Governance Institution',
+                url: 'https://ta14-exchange-platform-x2g7.vercel.app',
+                founder: {
+                  '@type': 'Person',
+                  name: 'Greggory Don Butler',
+                },
+              },
+              {
+                '@type': 'WebSite',
+                '@id':
+                  'https://ta14-exchange-platform-x2g7.vercel.app/#website',
+                url: 'https://ta14-exchange-platform-x2g7.vercel.app',
+                name: 'TA-14 AI Governance Exchange',
+                description:
+                  'An interactive AI governance exchange for governed routes, governed records, verification, and European Union Artificial Intelligence Act requirements.',
+                publisher: {
+                  '@id':
+                    'https://ta14-exchange-platform-x2g7.vercel.app/#organization',
+                },
+                inLanguage: 'en-US',
+              },
+              {
+                '@type': 'SoftwareApplication',
+                '@id':
+                  'https://ta14-exchange-platform-x2g7.vercel.app/#application',
+                name: 'TA-14 AI Governance Exchange',
+                applicationCategory: 'BusinessApplication',
+                operatingSystem: 'Web',
+                url: 'https://ta14-exchange-platform-x2g7.vercel.app',
+                description:
+                  'A web-based AI governance laboratory for building, testing, correcting, preserving, and independently verifying consequential governance routes.',
+                creator: {
+                  '@id':
+                    'https://ta14-exchange-platform-x2g7.vercel.app/#organization',
+                },
+                offers: {
+                  '@type': 'Offer',
+                  price: '0',
+                  priceCurrency: 'USD',
+                  category: 'Free AI governance workspace access',
+                },
+                featureList: [
+                  'AI governance route construction',
+                  'Governed record creation',
+                  'Admissible execution testing',
+                  'Independent verification',
+                  'EU AI Act requirements exploration',
+                  'Article 50 transparency workspace',
+                  'High-risk AI lifecycle governance',
+                  'Fundamental rights impact assessment support',
+                ],
+              },
+              {
+                '@type': 'LearningResource',
+                '@id':
+                  'https://ta14-exchange-platform-x2g7.vercel.app/eu-ai-act#learning-resource',
+                name: 'TA-14 EU AI Act Governance Laboratory',
+                url:
+                  'https://ta14-exchange-platform-x2g7.vercel.app/eu-ai-act',
+                description:
+                  'A source-linked interactive learning and governance environment for exploring Regulation (EU) 2024/1689, applicable roles, obligations, evidence expectations, and governed implementation routes.',
+                learningResourceType: [
+                  'Interactive governance laboratory',
+                  'Requirements registry',
+                  'AI governance playground',
+                ],
+                educationalUse: [
+                  'Instruction',
+                  'Governance modeling',
+                  'Requirements mapping',
+                  'Scenario testing',
+                ],
+                teaches: [
+                  'European Union Artificial Intelligence Act',
+                  'Regulation (EU) 2024/1689',
+                  'Article 50 transparency',
+                  'High-risk AI systems',
+                  'Fundamental rights impact assessment',
+                  'General-purpose AI governance',
+                ],
+                isPartOf: {
+                  '@id':
+                    'https://ta14-exchange-platform-x2g7.vercel.app/#website',
+                },
+                inLanguage: 'en-US',
+              },
+            ],
+          })}
+        </Script>
+
+        <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="afterInteractive"
         />
@@ -280,7 +398,7 @@ export default function RootLayout({
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
+            gap: 4px;
           }
 
           .siteNavigation a {
@@ -288,18 +406,41 @@ export default function RootLayout({
             align-items: center;
             justify-content: center;
             min-height: 38px;
-            padding: 0 12px;
+            padding: 0 10px;
             border: 1px solid transparent;
             border-radius: 999px;
             color: #a9c1c8;
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.76rem;
             font-weight: 750;
             transition:
               color 180ms ease,
               border-color 180ms ease,
               background 180ms ease,
               transform 180ms ease;
+          }
+
+          .siteNavigation a[href='/eu-ai-act'] {
+            border-color: rgba(240, 202, 110, 0.28);
+            color: #ffe4a0;
+            background:
+              linear-gradient(
+                135deg,
+                rgba(240, 202, 110, 0.1),
+                rgba(240, 168, 65, 0.035)
+              );
+          }
+
+          .siteNavigation a[href='/eu-ai-act']:hover,
+          .siteNavigation a[href='/eu-ai-act']:focus-visible {
+            border-color: rgba(240, 202, 110, 0.62);
+            color: #fff1c2;
+            background:
+              linear-gradient(
+                135deg,
+                rgba(240, 202, 110, 0.18),
+                rgba(240, 168, 65, 0.07)
+              );
           }
 
           .siteNavigation a:hover,
