@@ -6,6 +6,20 @@ import { useMemo, useState } from 'react';
 
 type RouteState = 'READY TO MAP' | 'EVIDENCE GAP' | 'REVIEW REQUIRED';
 
+type RoleCard = {
+  title: string;
+  description: string;
+  href: string;
+  badge: string;
+};
+
+type RequirementCard = {
+  title: string;
+  description: string;
+  href: string;
+  status: 'Available' | 'Expanding' | 'Planned';
+};
+
 type TransparencyPathway = {
   id: string;
   article: string;
@@ -129,6 +143,163 @@ const transparencyPathways: TransparencyPathway[] = [
   },
 ];
 
+const roleCards: RoleCard[] = [
+  {
+    title: 'Provider',
+    description:
+      'You develop an AI system or general-purpose AI model and place it on the market or put it into service under your name or trademark.',
+    href: '/eu-ai-act/roles/provider',
+    badge: 'PR',
+  },
+  {
+    title: 'Deployer',
+    description:
+      'You use an AI system under your authority in a professional or organisational context.',
+    href: '/eu-ai-act/roles/deployer',
+    badge: 'DE',
+  },
+  {
+    title: 'Importer',
+    description:
+      'You place an AI system bearing the name or trademark of a provider established outside the Union on the Union market.',
+    href: '/eu-ai-act/roles/importer',
+    badge: 'IM',
+  },
+  {
+    title: 'Distributor',
+    description:
+      'You make an AI system available on the Union market without being the provider or importer.',
+    href: '/eu-ai-act/roles/distributor',
+    badge: 'DI',
+  },
+  {
+    title: 'Product Manufacturer',
+    description:
+      'You place an AI system on the market or put it into service together with your product under your own name or trademark.',
+    href: '/eu-ai-act/roles/product-manufacturer',
+    badge: 'PM',
+  },
+  {
+    title: 'Authorised Representative',
+    description:
+      'You are established in the Union and hold a written mandate to perform specified tasks on behalf of a provider.',
+    href: '/eu-ai-act/roles/authorised-representative',
+    badge: 'AR',
+  },
+  {
+    title: 'GPAI Provider',
+    description:
+      'You develop or place a general-purpose AI model on the market and need a model-level governance pathway.',
+    href: '/eu-ai-act/gpai',
+    badge: 'GP',
+  },
+  {
+    title: 'Not Sure?',
+    description:
+      'Use a guided classification route to identify possible roles, system categories, and next questions without treating the output as legal advice.',
+    href: '/eu-ai-act/classifier',
+    badge: '?',
+  },
+];
+
+const requirementCards: RequirementCard[] = [
+  {
+    title: 'Risk Classification',
+    description:
+      'Determine whether a system is prohibited, high-risk, transparency-scoped, limited-risk, or outside a claimed category.',
+    href: '/eu-ai-act/risk-classification',
+    status: 'Expanding',
+  },
+  {
+    title: 'Prohibited Practices',
+    description:
+      'Map use cases against prohibited-practice categories, exceptions, evidence, and escalation boundaries.',
+    href: '/eu-ai-act/prohibited-practices',
+    status: 'Planned',
+  },
+  {
+    title: 'High-Risk AI Systems',
+    description:
+      'Explore lifecycle duties, risk management, data governance, documentation, oversight, logging, and monitoring.',
+    href: '/eu-ai-act/high-risk',
+    status: 'Available',
+  },
+  {
+    title: 'General-Purpose AI',
+    description:
+      'Separate model-provider duties, systemic-risk pathways, technical information, copyright policy, and downstream support.',
+    href: '/eu-ai-act/gpai',
+    status: 'Expanding',
+  },
+  {
+    title: 'Article 50 Transparency',
+    description:
+      'Map direct-interaction disclosure, synthetic-content marking, biometric notice, deepfakes, and public-interest text.',
+    href: '#article-50-workspace',
+    status: 'Available',
+  },
+  {
+    title: 'Conformity Assessment',
+    description:
+      'Preserve the selected assessment route, evidence package, reviewers, findings, corrections, and resulting standing.',
+    href: '/eu-ai-act/conformity-assessment',
+    status: 'Planned',
+  },
+  {
+    title: 'Post-Market Monitoring',
+    description:
+      'Govern continuing performance, incidents, material changes, corrective action, and evidence validity after deployment.',
+    href: '/eu-ai-act/post-market-monitoring',
+    status: 'Planned',
+  },
+  {
+    title: 'Incident Reporting',
+    description:
+      'Create bounded routes for detection, classification, chronology, notification, correction, and preserved outcome.',
+    href: '/eu-ai-act/incident-reporting',
+    status: 'Planned',
+  },
+  {
+    title: 'Human Oversight',
+    description:
+      'Define accountable human authority, intervention capability, escalation, competence, and override boundaries.',
+    href: '/eu-ai-act/human-oversight',
+    status: 'Expanding',
+  },
+  {
+    title: 'Technical Documentation',
+    description:
+      'Bind system identity, intended purpose, architecture, data, testing, limits, versions, changes, and evidence ownership.',
+    href: '/eu-ai-act/technical-documentation',
+    status: 'Planned',
+  },
+  {
+    title: 'Fundamental Rights Impact Assessment',
+    description:
+      'Structure affected-person context, risks, safeguards, governance decisions, review, and retained limitations.',
+    href: '/eu-ai-act/fundamental-rights',
+    status: 'Available',
+  },
+  {
+    title: 'Recordkeeping and Logs',
+    description:
+      'Preserve identity, chronology, provenance, access, decisions, interventions, changes, and outcomes.',
+    href: '/eu-ai-act/recordkeeping',
+    status: 'Expanding',
+  },
+];
+
+const governanceJourney = [
+  ['01', 'Identify', 'Identify the actor, system, model, product, use case, jurisdiction, and intended purpose.'],
+  ['02', 'Classify', 'Separate role classification, system category, risk category, and claimed exceptions.'],
+  ['03', 'Determine Applicability', 'State why each obligation is included, excluded, conditional, or unresolved.'],
+  ['04', 'Map Requirements', 'Translate applicable requirements into bounded evidence and decision routes.'],
+  ['05', 'Preserve Evidence', 'Bind claims to documents, tests, owners, versions, chronology, and limitations.'],
+  ['06', 'Review', 'Challenge reasoning, expose gaps, preserve objections, and correct without erasing history.'],
+  ['07', 'Governed Record', 'Create a dated, attributable record of applicability, evidence, decisions, and boundaries.'],
+  ['08', 'Independent Verification', 'Test whether the preserved package still corresponds to the claimed implementation.'],
+] as const;
+
 const routeStateClass: Record<RouteState, string> = {
   'READY TO MAP': 'ready',
   'EVIDENCE GAP': 'gap',
@@ -137,6 +308,12 @@ const routeStateClass: Record<RouteState, string> = {
 
 const platformRoutes = {
   marketplace: '/marketplace',
+  requirements: '/eu-ai-act/requirements',
+  classifier: '/eu-ai-act/classifier',
+  article50: '/eu-ai-act/article-50',
+  highRisk: '/eu-ai-act/high-risk',
+  fundamentalRights: '/eu-ai-act/fundamental-rights',
+  gpai: '/eu-ai-act/gpai',
   opportunities: '/marketplace/opportunities',
   professionals: '/marketplace/professionals',
   governedRecords: '/marketplace/governed-records',
@@ -236,6 +413,9 @@ export default function EuAiActPage() {
             <a className="primary-button" href="#article-50-workspace">
               Open Article 50 workspace
             </a>
+            <Link className="secondary-button" href="/eu-ai-act/classifier">
+              Classify My Role or System
+            </Link>
             <Link className="secondary-button" href={platformRoutes.routes}>
               Browse governance routes
             </Link>
@@ -266,6 +446,126 @@ export default function EuAiActPage() {
             <strong>PERMITTED</strong>
             <p>Non-signatories remain responsible for demonstrating adequate alternative measures.</p>
           </article>
+        </section>
+
+        <section className="role-section" id="role-navigator">
+          <div className="section-heading">
+            <span className="eyebrow">ROLE NAVIGATOR</span>
+            <h2>Begin with the role you actually hold.</h2>
+            <p>
+              Different actors can carry different obligations for the same system or model.
+              Choose the closest role to open a bounded pathway, or use guided classification
+              when the answer is not yet established.
+            </p>
+          </div>
+
+          <div className="role-grid">
+            {roleCards.map((item) => (
+              <Link className="role-card" href={item.href} key={item.title}>
+                <span className="role-badge">{item.badge}</span>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <strong>Open role pathway →</strong>
+              </Link>
+            ))}
+          </div>
+
+          <div className="classification-banner">
+            <div>
+              <span className="eyebrow">GUIDED CLASSIFICATION</span>
+              <h3>I do not know whether my system is high-risk—or which role applies.</h3>
+              <p>
+                Walk through a bounded sequence of questions that separates declared facts,
+                unresolved facts, possible classifications, exceptions, and evidence still needed.
+              </p>
+            </div>
+            <Link className="primary-button" href="/eu-ai-act/classifier">
+              Start Guided Classification
+            </Link>
+          </div>
+        </section>
+
+        <section className="requirements-section" id="requirements">
+          <div className="section-heading">
+            <span className="eyebrow">REQUIREMENTS EXPLORER</span>
+            <h2>Open the Act by governance problem—not by guesswork.</h2>
+            <p>
+              Each destination should preserve the legal source, actor, applicability basis,
+              evidence expectations, unresolved questions, review route, and governed outputs.
+            </p>
+          </div>
+
+          <div className="requirements-grid">
+            {requirementCards.map((item) => (
+              <Link className="requirement-card" href={item.href} key={item.title}>
+                <div className="requirement-card-top">
+                  <span>{item.title}</span>
+                  <small className={`requirement-status status-${item.status.toLowerCase()}`}>
+                    {item.status}
+                  </small>
+                </div>
+                <p>{item.description}</p>
+                <strong>Explore requirement →</strong>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="journey-section">
+          <div className="section-heading">
+            <span className="eyebrow">GOVERNANCE PROGRESS MAP</span>
+            <h2>Move from an uncertain system description to a verifiable governed record.</h2>
+          </div>
+
+          <div className="governance-journey" aria-label="EU AI Act governance progress map">
+            {governanceJourney.map(([number, title, description], index) => (
+              <article key={number}>
+                <span>{number}</span>
+                <h3>{title}</h3>
+                <p>{description}</p>
+                {index < governanceJourney.length - 1 ? (
+                  <i aria-hidden="true">→</i>
+                ) : null}
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="source-boundary-section">
+          <div>
+            <span className="eyebrow">SOURCE-BOUND GOVERNANCE</span>
+            <h2>The platform must point back to the controlling source.</h2>
+          </div>
+          <div className="source-boundary-grid">
+            <article>
+              <strong>Official Article</strong>
+              <p>
+                Each requirement route should identify the controlling article and preserve
+                the exact source version used for the determination.
+              </p>
+            </article>
+            <article>
+              <strong>Relevant Recitals</strong>
+              <p>
+                Recitals may provide context but should remain distinguishable from binding
+                operative provisions.
+              </p>
+            </article>
+            <article>
+              <strong>Official Guidance</strong>
+              <p>
+                Commission, AI Office, Board, standards, and authority guidance should be dated,
+                attributed, and never silently substituted for the Regulation.
+              </p>
+            </article>
+            <article>
+              <strong>TA-14 Boundary</strong>
+              <p>
+                TA-14 structures governance routes and evidence. It does not replace the official
+                text, competent legal advice, conformity assessment, or regulator judgment.
+              </p>
+            </article>
+          </div>
         </section>
 
         <section className="principle-section">
@@ -821,6 +1121,292 @@ export default function EuAiActPage() {
           line-height: 1.57;
         }
 
+        .role-section,
+        .requirements-section,
+        .journey-section,
+        .source-boundary-section,
+        .role-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 13px;
+        }
+
+        .role-card {
+          position: relative;
+          display: flex;
+          min-height: 270px;
+          flex-direction: column;
+          padding: 22px;
+          overflow: hidden;
+          border: 1px solid rgba(103, 194, 220, 0.16);
+          border-radius: 21px;
+          color: inherit;
+          background:
+            radial-gradient(circle at 10% 0%, rgba(112, 216, 239, 0.09), transparent 42%),
+            rgba(10, 30, 45, 0.74);
+          text-decoration: none;
+          transition:
+            transform 180ms ease,
+            border-color 180ms ease,
+            box-shadow 180ms ease;
+        }
+
+        .role-card::after,
+        .requirement-card::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 28%, rgba(255, 255, 255, 0.055), transparent 72%);
+          transform: translateX(-120%);
+          transition: transform 650ms ease;
+        }
+
+        .role-card:hover,
+        .role-card:focus-visible {
+          transform: translateY(-5px);
+          border-color: rgba(112, 216, 239, 0.46);
+          box-shadow: 0 22px 64px rgba(0, 0, 0, 0.22);
+          outline: none;
+        }
+
+        .role-card:hover::after,
+        .role-card:focus-visible::after,
+        .requirement-card:hover::after,
+        .requirement-card:focus-visible::after {
+          transform: translateX(120%);
+        }
+
+        .role-badge {
+          display: grid;
+          width: 48px;
+          height: 48px;
+          place-items: center;
+          border: 1px solid rgba(112, 216, 239, 0.34);
+          border-radius: 14px;
+          color: #8de8fa;
+          background: rgba(112, 216, 239, 0.07);
+          font-weight: 950;
+        }
+
+        .role-card h3 {
+          margin: 34px 0 10px;
+          font-size: 1.22rem;
+        }
+
+        .role-card p {
+          color: #94abb6;
+          line-height: 1.62;
+        }
+
+        .role-card strong {
+          margin-top: auto;
+          color: #9feaff;
+          font-size: 0.82rem;
+        }
+
+        .classification-banner {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 26px;
+          align-items: center;
+          margin-top: 18px;
+          padding: 26px;
+          border: 1px solid rgba(218, 177, 69, 0.25);
+          border-radius: 22px;
+          background:
+            radial-gradient(circle at 5% 0%, rgba(218, 177, 69, 0.12), transparent 36%),
+            rgba(29, 26, 19, 0.55);
+        }
+
+        .classification-banner h3 {
+          margin: 9px 0 8px;
+          font-size: 1.5rem;
+        }
+
+        .classification-banner p {
+          margin: 0;
+          color: #b8b08d;
+          line-height: 1.65;
+        }
+
+        .requirements-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 13px;
+        }
+
+        .requirement-card {
+          position: relative;
+          display: flex;
+          min-height: 220px;
+          flex-direction: column;
+          padding: 21px;
+          overflow: hidden;
+          border: 1px solid rgba(103, 194, 220, 0.15);
+          border-radius: 19px;
+          color: inherit;
+          background: rgba(10, 30, 45, 0.72);
+          text-decoration: none;
+          transition:
+            transform 180ms ease,
+            border-color 180ms ease,
+            background 180ms ease;
+        }
+
+        .requirement-card:hover,
+        .requirement-card:focus-visible {
+          transform: translateY(-4px);
+          border-color: rgba(103, 194, 220, 0.42);
+          background: rgba(20, 53, 73, 0.8);
+          outline: none;
+        }
+
+        .requirement-card-top {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: flex-start;
+        }
+
+        .requirement-card-top > span {
+          max-width: 70%;
+          color: #eefaff;
+          font-size: 1.05rem;
+          font-weight: 900;
+        }
+
+        .requirement-status {
+          padding: 6px 8px;
+          border-radius: 999px;
+          font-size: 0.62rem;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .status-available {
+          color: #8cebc3;
+          background: rgba(45, 163, 113, 0.11);
+        }
+
+        .status-expanding {
+          color: #ffe09a;
+          background: rgba(184, 131, 27, 0.11);
+        }
+
+        .status-planned {
+          color: #a7dcff;
+          background: rgba(52, 129, 178, 0.11);
+        }
+
+        .requirement-card p {
+          margin: 28px 0 18px;
+          color: #94abb6;
+          line-height: 1.62;
+        }
+
+        .requirement-card strong {
+          margin-top: auto;
+          color: #9feaff;
+          font-size: 0.82rem;
+        }
+
+        .governance-journey {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 13px;
+        }
+
+        .governance-journey article {
+          position: relative;
+          min-height: 225px;
+          padding: 20px;
+          border: 1px solid rgba(103, 194, 220, 0.15);
+          border-radius: 19px;
+          background:
+            radial-gradient(circle at 20% 0%, rgba(112, 216, 239, 0.075), transparent 42%),
+            rgba(10, 30, 45, 0.72);
+        }
+
+        .governance-journey article > span {
+          color: #70d8ef;
+          font-size: 0.72rem;
+          font-weight: 950;
+          letter-spacing: 0.1em;
+        }
+
+        .governance-journey h3 {
+          margin: 44px 0 10px;
+          font-size: 1.15rem;
+        }
+
+        .governance-journey p {
+          margin: 0;
+          color: #94abb6;
+          line-height: 1.58;
+        }
+
+        .governance-journey i {
+          position: absolute;
+          top: 50%;
+          right: -12px;
+          z-index: 2;
+          display: grid;
+          width: 24px;
+          height: 24px;
+          place-items: center;
+          transform: translateY(-50%);
+          border: 1px solid rgba(112, 216, 239, 0.24);
+          border-radius: 50%;
+          color: #70d8ef;
+          background: #071523;
+          font-size: 0.72rem;
+          font-style: normal;
+        }
+
+        .source-boundary-section {
+          display: grid;
+          grid-template-columns: minmax(280px, 0.75fr) minmax(0, 1.25fr);
+          gap: 36px;
+          align-items: start;
+        }
+
+        .source-boundary-section h2 {
+          margin: 12px 0 0;
+          font-size: clamp(2.1rem, 4vw, 3.7rem);
+          line-height: 1;
+          letter-spacing: -0.045em;
+        }
+
+        .source-boundary-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .source-boundary-grid article {
+          min-height: 200px;
+          padding: 21px;
+          border: 1px solid rgba(218, 177, 69, 0.19);
+          border-radius: 18px;
+          background: rgba(193, 132, 18, 0.055);
+        }
+
+        .source-boundary-grid strong {
+          color: #ffe29a;
+        }
+
+        .source-boundary-grid p {
+          margin: 28px 0 0;
+          color: #b8ae87;
+          line-height: 1.65;
+        }
+
+        .role-section,
+        .requirements-section,
+        .journey-section,
+        .source-boundary-section,
         .principle-section,
         .article-workspace,
         .code-section,
@@ -1239,8 +1825,25 @@ export default function EuAiActPage() {
             grid-template-columns: repeat(3, minmax(0, 1fr));
           }
 
-          .integration-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+          .integration-grid,
+          .role-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .requirements-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .governance-journey {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .governance-journey article:nth-child(2n) i {
+            display: none;
+          }
+
+          .source-boundary-section {
+            grid-template-columns: 1fr;
           }
         }
 
@@ -1249,7 +1852,14 @@ export default function EuAiActPage() {
           .pathway-grid,
           .comparison-grid,
           .record-grid,
-          .integration-grid {
+          .integration-grid,
+          .role-grid,
+          .requirements-grid,
+          .source-boundary-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .classification-banner {
             grid-template-columns: 1fr;
           }
 
@@ -1270,8 +1880,13 @@ export default function EuAiActPage() {
 
           .status-grid,
           .chain,
-          .two-column {
+          .two-column,
+          .governance-journey {
             grid-template-columns: 1fr;
+          }
+
+          .governance-journey i {
+            display: none;
           }
         }
 
@@ -1286,8 +1901,15 @@ export default function EuAiActPage() {
           }
 
           .primary-button,
-          .secondary-button {
+          .secondary-button,
+          .role-card,
+          .requirement-card {
             transition: none;
+          }
+
+          .role-card::after,
+          .requirement-card::after {
+            display: none;
           }
         }
       `}</style>
