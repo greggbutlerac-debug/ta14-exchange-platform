@@ -1,8 +1,13 @@
-/* apps/web/app/page.tsx */
+/* TA-14 ANIMATED HOMEPAGE V10 - EU AI ACT FRONT DOOR + POLISH PASS - 2026-07-21 */
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import EuAiActHomepageSection from "../components/eu-ai-act-homepage-section";
+
+type RouteState = "IDLE" | "RUNNING" | "HOLD" | "ALLOW";
+type ResultState = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 
 const chain = [
   "Reality",
@@ -13,391 +18,999 @@ const chain = [
   "Commit",
   "Execution",
   "Outcome",
+];
+
+const journey = [
+  [
+    "01",
+    "Learn",
+    "Understand the TA-14 chain and the difference between a claim and a governed route.",
+  ],
+  [
+    "02",
+    "Choose",
+    "Enter the workspace that matches the evidence or consequence you need to govern.",
+  ],
+  [
+    "03",
+    "Build or upload",
+    "Construct a route, bring a record, or submit a system for bounded review.",
+  ],
+  [
+    "04",
+    "Run",
+    "Expose missing evidence, stale authority, continuity breaks, and binding failures.",
+  ],
+  [
+    "05",
+    "Correct",
+    "Repair HOLD conditions without erasing the original result or uncertainty.",
+  ],
+  [
+    "06",
+    "Preserve",
+    "Create a governed record that keeps identity, boundaries, decisions, and outcome visible.",
+  ],
+  [
+    "07",
+    "Verify",
+    "Replay the route and test whether the preserved package still corresponds to execution.",
+  ],
+  [
+    "08",
+    "Publish",
+    "Optionally share a bounded result for others to inspect, challenge, and learn from.",
+  ],
 ] as const;
 
-type Door = {
-  number: string;
-  badge: string;
-  title: string;
-  question: string;
-  statement: string;
-  description: string;
-  href: string;
-  action: string;
-  marketplaceLabel: string;
-  attributes: string[];
-  links: Array<{
-    label: string;
-    href: string;
-    kind?: "special";
-  }>;
-};
-
-const doors: Door[] = [
+const playgrounds = [
   {
-    number: "01",
     badge: "AI",
-    title: "AI Governance Playground",
-    question: "I want to govern AI.",
-    statement: "Build, test, register, study, and strengthen AI governance.",
-    description:
-      "Enter the operating side of the Exchange for consequential AI systems, agents, architectures, routes, governance tools, laboratories, education, and implementation support.",
+    title: "AI Governance",
+    text: "Build, test, correct, and verify consequential AI routes across identity, delegated authority, evidence, tools, payloads, commitments, execution, and outcome.",
     href: "/workspace/ai-governance",
     action: "Enter AI Governance",
-    marketplaceLabel: "AI Governance Marketplace",
-    attributes: [
-      "Free governance playground",
-      "Route construction and testing",
-      "Runtime evaluation",
-      "AI governance architectures",
-      "Governance education",
-      "Specialized laboratories",
-    ],
-    links: [
-      { label: "Open Playground", href: "/workspace/ai-governance" },
-      { label: "Build a Route", href: "/workspace/build" },
-      { label: "Browse AI Governance Registry", href: "/ai-governance-registry" },
-      { label: "Explore EU AI Act", href: "/eu-ai-act", kind: "special" },
+    bullets: [
+      "AI agents",
+      "Tools and APIs",
+      "Payloads",
+      "Commitments",
+      "Outcomes",
     ],
   },
   {
-    number: "02",
     badge: "GR",
     title: "Governed Records",
-    question: "I want to preserve or interpret a record.",
-    statement: "Preserve what happened, why it happened, and what the record can prove.",
-    description:
-      "Create, interpret, verify, compare, and preserve records that keep identity, chronology, evidence, authority, boundaries, determinations, execution, and outcomes visible.",
+    text: "Bring an existing record and receive a bounded interpretation that preserves what the evidence proves, what it does not prove, and which conclusions remain inadmissible.",
     href: "/workspace/governed-records",
     action: "Enter Governed Records",
-    marketplaceLabel: "Governed Records Marketplace",
-    attributes: [
-      "Governed record creation",
-      "Evidence and chronology preservation",
-      "Version continuity",
+    bullets: [
+      "Upload records",
       "Bounded interpretation",
-      "Verification and replay",
-      "Outcome records",
-    ],
-    links: [
-      { label: "Create a Record", href: "/workspace/governed-records/build" },
-      { label: "Open Record Interpreter", href: "/workspace/governed-records" },
-      { label: "Verify a Record", href: "/verification" },
-      { label: "EU AI Act Evidence Records", href: "/eu-ai-act", kind: "special" },
+      "Preserve uncertainty",
+      "Compare",
+      "Export record",
     ],
   },
   {
-    number: "03",
     badge: "ER",
     title: "Environmental Records",
-    question: "I want to govern environmental evidence.",
-    statement: "Turn land, water, air, building, and atmospheric evidence into governed records.",
-    description:
-      "Bring environmental reality into a record system that separates observation from interpretation, diagnosis, optimization, intervention, and verified outcome.",
+    text: "Interpret land, water, air, atmospheric, building, hospital, laboratory, HVAC, sensor, and environmental evidence without reducing reality to an unsupported score.",
     href: "/workspace/environmental-records",
     action: "Enter Environmental Records",
-    marketplaceLabel: "Environmental Records Marketplace",
-    attributes: [
-      "Atmospheric Integrity Records",
-      "Personal and building records",
-      "Land, water, and air evidence",
-      "HVAC and IAQ records",
-      "Hospital and laboratory records",
-      "Baseline, drift, and restoration",
-    ],
-    links: [
-      { label: "Explore Record Types", href: "/workspace/environmental-records" },
-      { label: "Open Environmental Interpreter", href: "/workspace/environmental-records" },
-      { label: "View Atmospheric Records", href: "/workspace/environmental-records" },
-      { label: "Building and HVAC Evidence", href: "/workspace/environmental-records" },
+    bullets: [
+      "Atmospheric integrity",
+      "Environmental data",
+      "Building systems",
+      "IAQ and sensors",
+      "Land, water, air",
     ],
   },
   {
-    number: "04",
     badge: "◎",
-    title: "Entity Review",
-    question: "I want to review an organization or system.",
-    statement: "Examine the entity, not merely the document it presents.",
-    description:
-      "Submit organizations, AI systems, governance programs, architectures, partners, operational systems, or consequential routes for bounded review across the full evidence chain.",
+    title: "Entity Review Center",
+    text: "Submit an organization, governance program, AI system, operational architecture, or consequential route for bounded full-chain review.",
     href: "/workspace/entity-review",
-    action: "Enter Entity Review",
-    marketplaceLabel: "Entity Review Marketplace",
-    attributes: [
-      "Organization and system review",
-      "Governance readiness",
-      "Evidence-gap analysis",
-      "Architectural review",
-      "Partner Review Network",
-      "Bounded findings and review records",
+    action: "Enter Entity Review Center",
+    bullets: [
+      "Organizations",
+      "AI systems",
+      "Architectures",
+      "Route reviews",
+      "Certification status",
     ],
-    links: [
-      { label: "Start Entity Review", href: "/workspace/entity-review" },
-      { label: "Find a Reviewer", href: "/marketplace/professionals" },
-      {
-        label: "Partner Review Network",
-        href: "/workspace/entity-review/partner-review-network/pricing",
-      },
-      { label: "EU AI Act Entity Review", href: "/eu-ai-act", kind: "special" },
-    ],
+  },
+] as const;
+
+const resultCards: Array<{
+  domain: string;
+  title: string;
+  state: ResultState;
+  summary: string;
+  standing: string;
+}> = [
+  {
+    domain: "Finance",
+    title: "Vendor payment above authority threshold",
+    state: "HOLD",
+    summary:
+      "Current procurement and finance authority were missing before commitment.",
+    standing: "Illustrative result",
+  },
+  {
+    domain: "Healthcare AI",
+    title: "Model-supported treatment prioritization",
+    state: "ESCALATE",
+    summary:
+      "Accountable human authority was required before consequence-bearing action.",
+    standing: "Illustrative result",
+  },
+  {
+    domain: "Autonomous Agent",
+    title: "External tool execution request",
+    state: "DENY",
+    summary:
+      "The destination binding did not match the approved execution route.",
+    standing: "Illustrative result",
+  },
+  {
+    domain: "Built Environment",
+    title: "Time-bounded building override",
+    state: "ALLOW",
+    summary:
+      "Authority, duration, release condition, command binding, and outcome were established.",
+    standing: "Illustrative result",
   },
 ];
 
-const exchangeSteps = [
-  ["01", "Choose a door", "Enter the section that matches what you are bringing to the Exchange."],
-  ["02", "Declare the object", "Identify the system, record, entity, route, or environmental evidence."],
-  ["03", "Build or bring evidence", "Construct a route, upload a record, or assemble a review package."],
-  ["04", "Expose the gaps", "Identify missing evidence, stale authority, continuity breaks, and unsupported claims."],
-  ["05", "Review and correct", "Repair defects without erasing the original result, uncertainty, or chronology."],
-  ["06", "Preserve the outcome", "Create a bounded record that can be inspected, replayed, and verified."],
+const routeGallery = [
+  [
+    "AI",
+    "Autonomous Agent Tool Call",
+    "Identity → authority → tool → payload → destination → outcome",
+  ],
+  [
+    "BAS",
+    "Critical Room Override",
+    "Environmental evidence → operator authority → override → release → restoration",
+  ],
+  [
+    "Environmental",
+    "Atmospheric Integrity Record",
+    "Observation → qualification → interpretation → intervention → verified outcome",
+  ],
+  [
+    "Healthcare",
+    "Human Authority Escalation",
+    "Model recommendation → evidence freshness → accountable review → action",
+  ],
+  [
+    "Finance",
+    "Vendor Payment",
+    "Invoice → dual authority → beneficiary binding → commit → payment outcome",
+  ],
+  [
+    "Refrigeration",
+    "Non-Invasive Entry Threshold",
+    "Baseline → evidence → threshold → intervention → performance record",
+  ],
 ] as const;
 
+const useCases = [
+  [
+    "AI Agents and Autonomous Systems",
+    "Bind identity, delegated authority, tools, payloads, destinations, commands, and outcomes before autonomous action.",
+  ],
+  [
+    "Finance and Enterprise",
+    "Govern vendor payments, procurement, approvals, identity, beneficiary binding, and execution correspondence.",
+  ],
+  [
+    "Healthcare and Critical Operations",
+    "Preserve accountable human authority, evidence freshness, model version, escalation, intervention, and outcome.",
+  ],
+  [
+    "Built Environment",
+    "Govern BAS overrides, AI optimization, critical-space validity, commissioning, alarm resolution, energy, and emergency operation.",
+  ],
+  [
+    "Environmental Systems",
+    "Govern atmospheric integrity, refrigerant intervention, moisture, pressure, air, remediation, and verified restoration.",
+  ],
+  [
+    "Manufacturing and Infrastructure",
+    "Govern process release, restart, robotics, utilities, quality, critical execution, and recovery.",
+  ],
+  [
+    "Government and Public Authority",
+    "Create reconstructable records for public authority, administrative action, evidence, boundaries, and consequence.",
+  ],
+  [
+    "Governance Research and Education",
+    "Build route libraries, break dependencies, repair HOLD conditions, study decisions, and teach governance through use.",
+  ],
+] as const;
+
+function makeRid() {
+  return `TA-14-RID-${Date.now().toString(36).toUpperCase()}`;
+}
+
+function makeHash(value: string) {
+  let hash = 2166136261;
+  for (let index = 0; index < value.length; index += 1) {
+    hash ^= value.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return (hash >>> 0).toString(16).padStart(8, "0").toUpperCase();
+}
+
 export default function HomePage() {
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const [routeState, setRouteState] = useState<RouteState>("IDLE");
+  const [activeStage, setActiveStage] = useState(-1);
+  const [authorityCorrected, setAuthorityCorrected] = useState(false);
+  const [recordOpen, setRecordOpen] = useState(false);
+  const [rid, setRid] = useState("");
+  const [manifestHash, setManifestHash] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const stateLabel = useMemo(
+    () => (routeState === "IDLE" ? "READY" : routeState),
+    [routeState],
+  );
+
+  useEffect(() => {
+    if (routeState !== "RUNNING") return;
+
+    if (activeStage >= chain.length - 1) {
+      const timer = window.setTimeout(() => {
+        if (authorityCorrected) {
+          const nextRid = makeRid();
+          setRouteState("ALLOW");
+          setRecordOpen(true);
+          setRid(nextRid);
+          setManifestHash(
+            makeHash(
+              `${nextRid}|vendor-payment|dual-authority|beneficiary-binding|allow`,
+            ),
+          );
+        } else {
+          setRouteState("HOLD");
+        }
+      }, 650);
+      return () => window.clearTimeout(timer);
+    }
+
+    const timer = window.setTimeout(() => {
+      setActiveStage((current) => current + 1);
+    }, 420);
+
+    return () => window.clearTimeout(timer);
+  }, [routeState, activeStage, authorityCorrected]);
+
+  function runRoute() {
+    setRecordOpen(false);
+    setRid("");
+    setManifestHash("");
+    setActiveStage(0);
+    setRouteState("RUNNING");
+  }
+
+  function correctAndRerun() {
+    setAuthorityCorrected(true);
+    setRecordOpen(false);
+    setRid("");
+    setManifestHash("");
+    setActiveStage(0);
+    setRouteState("RUNNING");
+  }
+
+  function resetRoute() {
+    setRouteState("IDLE");
+    setActiveStage(-1);
+    setAuthorityCorrected(false);
+    setRecordOpen(false);
+    setRid("");
+    setManifestHash("");
+  }
 
   return (
     <main className="page-shell">
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
-
-      <div className="ambient" aria-hidden="true">
-        <span className="star-field stars-one" />
-        <span className="star-field stars-two" />
-        <span className="orbit orbit-one"><i /></span>
-        <span className="orbit orbit-two"><i /></span>
-        <span className="moving-line line-one" />
-        <span className="moving-line line-two" />
-        <span className="nova nova-one" />
-        <span className="nova nova-two" />
+      <div className="cosmic-background" aria-hidden="true">
+        <div className="star-field star-field-one" />
+        <div className="star-field star-field-two" />
+        <div className="orbit orbit-one">
+          <span />
+        </div>
+        <div className="orbit orbit-two">
+          <span />
+        </div>
+        <div className="orbit orbit-three">
+          <span />
+        </div>
+        <div className="moving-line line-one" />
+        <div className="moving-line line-two" />
+        <div className="moving-line line-three" />
+        <div className="nova nova-one" />
+        <div className="nova nova-two" />
       </div>
-
       <header className="site-header">
-        <Link className="brand" href="/" aria-label="TA-14 AI Governance Exchange home">
+        <Link
+          className="brand"
+          href="/"
+          aria-label="TA-14 AI Governance Exchange home"
+        >
           <span className="brand-mark">TA-14</span>
-          <span className="brand-copy">
-            <strong>TA-14</strong>
-            <small>AI GOVERNANCE EXCHANGE</small>
-          </span>
+          <span>TA-14 AI GOVERNANCE EXCHANGE</span>
         </Link>
 
         <button
           className="menu-button"
           type="button"
-          aria-expanded={mobileOpen}
           aria-label="Toggle navigation"
-          onClick={() => setMobileOpen((open) => !open)}
+          aria-expanded={mobileMenuOpen}
+          onClick={() => setMobileMenuOpen((open) => !open)}
         >
           ☰
         </button>
 
-        <nav className={mobileOpen ? "main-nav open" : "main-nav"}>
-          <a href="#doors" onClick={() => setMobileOpen(false)}>Four Doors</a>
-          <a href="#how-it-works" onClick={() => setMobileOpen(false)}>How It Works</a>
-          <Link href="/marketplace" onClick={() => setMobileOpen(false)}>Marketplace</Link>
-          <Link href="/account" onClick={() => setMobileOpen(false)}>Sign In</Link>
-          <Link className="nav-cta" href="/workspace" onClick={() => setMobileOpen(false)}>
-            Open Exchange
+        <nav className={mobileMenuOpen ? "main-nav open" : "main-nav"}>
+          <a href="#start" onClick={() => setMobileMenuOpen(false)}>
+            Start Here
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Exchange Map
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Workspaces
+          </a>
+          <a href="#eu-ai-act" onClick={() => setMobileMenuOpen(false)}>
+            EU AI Act
+          </a>
+          <a href="#results" onClick={() => setMobileMenuOpen(false)}>
+            Results
+          </a>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>
+            Route Gallery
+          </a>
+          <a
+            href="#partner-review-network"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Partner Network
+          </a>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
+            Sign In
+          </Link>
+          <Link
+            className="nav-cta"
+            href="/workspace"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Open Workspace
           </Link>
         </nav>
       </header>
 
       <section className="hero section-wrap" id="main-content">
         <div className="hero-copy">
-          <p className="eyebrow">THE FRONT DOOR TO THE COMPLETE EXCHANGE</p>
+          <p className="eyebrow">Free AI Governance Playground and Workspace</p>
           <h1>
-            Four doors.
-            <span>One governed exchange.</span>
+            Build governance.
+            <span>Test it free.</span>
+            Prove the consequence.
           </h1>
-          <p className="hero-lead">
-            The TA-14 AI Governance Exchange is where people bring AI governance,
-            governed records, environmental records, and entities for building,
-            interpretation, testing, preservation, review, marketplace exchange,
-            and verification.
+          <p className="hero-text">
+            Enter the TA-14 AI Governance Exchange free—no credit card required.
+            Learn where to begin, choose the right workspace, test consequential
+            routes, preserve adverse results, and see why execution was allowed,
+            held, denied, or escalated.
           </p>
-          <p className="hero-support">
-            The homepage explains the institution. Each door takes you into a
-            dedicated operating environment with its own tools, records, routes,
-            specialists, and bounded outcomes.
-          </p>
-          <div className="hero-actions">
-            <a className="button primary" href="#doors">Choose Your Door</a>
-            <Link className="button secondary" href="/workspace">Open the Exchange</Link>
-            <Link className="button ghost" href="/marketplace">Visit Marketplace</Link>
+          <div className="button-row">
+            <Link className="button primary" href="/workspace">
+              Open the Free Workspace
+            </Link>
+            <a className="button secondary" href="#start">
+              Start Here
+            </a>
+            <Link className="button eu-act-hero-button" href="/eu-ai-act">
+              EU AI Act Requirements
+            </Link>
+            <Link className="button ghost" href="/account">
+              Sign In
+            </Link>
           </div>
           <div className="trust-row">
-            <span>Declaration without certification</span>
-            <span>Preservation without ownership</span>
-            <span>Review without silent authority transfer</span>
+            <span>Evidence Bound</span>
+            <span>Route Verifiable</span>
+            <span>Adverse Results Preserved</span>
           </div>
         </div>
 
-        <aside className="exchange-compass" aria-label="Exchange overview">
-          <div className="compass-core">
+        <div className="hero-console">
+          <div className="console-core">
             <span>TA-14</span>
-            <strong>EXCHANGE</strong>
-            <small>Reality to Outcome</small>
+            <strong>CORE</strong>
+            <small>Full-chain admissible execution</small>
           </div>
-          <div className="compass-grid">
-            {doors.map((door) => (
-              <a key={door.title} href={`#door-${door.number}`}>
-                <span>{door.badge}</span>
-                <div>
-                  <strong>{door.title}</strong>
-                  <small>{door.statement}</small>
-                </div>
-                <b>→</b>
+          <div className="console-status">
+            <p className="eyebrow">The Exchange is active</p>
+            <h2>Governance moving through the chain.</h2>
+            <dl>
+              <div>
+                <dt>Build access</dt>
+                <dd>Free and unlimited</dd>
+              </div>
+              <div>
+                <dt>Decision lanes</dt>
+                <dd>ALLOW · HOLD · DENY · ESCALATE</dd>
+              </div>
+              <div>
+                <dt>Governance depth</dt>
+                <dd>Eight linked stages</dd>
+              </div>
+              <div>
+                <dt>Verification</dt>
+                <dd>Independent replay surface</dd>
+              </div>
+            </dl>
+          </div>
+          <div className="motion-list">
+            {resultCards.map((result) => (
+              <div key={result.title}>
+                <span>{result.domain}</span>
+                <strong className={`state state-${result.state.toLowerCase()}`}>
+                  {result.state}
+                </strong>
+                <small>{result.summary}</small>
+              </div>
+            ))}
+          </div>
+          <p className="console-note">
+            Visual exchange preview. Results shown here are illustrative;
+            production activity remains governed by its actual route evidence
+            and execution state.
+          </p>
+        </div>
+      </section>
+
+      <div id="eu-ai-act" className="eu-ai-act-homepage-anchor">
+        <EuAiActHomepageSection />
+      </div>
+
+      <section className="section-wrap start-here" id="start">
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">New to TA-14?</p>
+            <h2>Start here. Never wonder where to go next.</h2>
+          </div>
+          <p>
+            Every visitor follows the same understandable journey—from learning
+            the chain to optionally publishing a bounded result for the
+            governance community.
+          </p>
+        </div>
+        <div className="journey-grid">
+          {journey.map(([number, title, text]) => (
+            <article className="journey-card" key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
+          ))}
+        </div>
+        <div className="journey-line" aria-label="TA-14 visitor journey">
+          {journey.map(([, title], index) => (
+            <div key={title}>
+              <strong>{title}</strong>
+              {index < journey.length - 1 ? <span>→</span> : null}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="section-wrap exchange-map" id="map">
+        <div className="section-heading centered">
+          <p className="eyebrow">Exchange Map</p>
+          <h2>See the whole system before choosing a door.</h2>
+          <p>
+            Home explains the institution. Start Here introduces the route. The
+            Workspace Directory sends each visitor into the correct operating
+            surface.
+          </p>
+        </div>
+
+        <div className="map-board">
+          <a
+            className="map-node map-node-link top-node"
+            href="#main-content"
+            aria-label="Return to the TA-14 AI Governance Exchange front gate"
+          >
+            <small>Front gate</small>
+            <strong>TA-14 AI Governance Exchange</strong>
+            <span>
+              Understand the institution and the complete governing chain.
+            </span>
+            <b className="map-node-action">
+              Return to the front gate <i>↑</i>
+            </b>
+          </a>
+          <div className="map-connector" aria-hidden="true">
+            ↓
+          </div>
+          <a
+            className="map-node map-node-link middle-node"
+            href="#start"
+            aria-label="Open Start Here and the Workspace Directory"
+          >
+            <small>Visitor center</small>
+            <strong>Start Here + Workspace Directory</strong>
+            <span>
+              Learn the journey, choose the evidence class, and enter the right
+              workspace.
+            </span>
+            <b className="map-node-action">
+              Open Start Here <i>→</i>
+            </b>
+          </a>
+          <div className="map-connector">↓</div>
+          <div className="map-workspaces">
+            {playgrounds.map((item, index) => (
+              <a
+                className="gateway-link"
+                href={item.href}
+                key={item.title}
+                aria-label={`${item.action}. ${item.text}`}
+              >
+                <article className={`gateway gateway-${index + 1}`}>
+                  <div className="gateway-head">
+                    <span className="gateway-badge">{item.badge}</span>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <small>{item.text}</small>
+                    </div>
+                  </div>
+                  <div className="gateway-body">
+                    <ul>
+                      {item.bullets.map((bullet) => (
+                        <li key={bullet}>{bullet}</li>
+                      ))}
+                    </ul>
+                    <div className="door-frame" aria-hidden="true">
+                      <div className="door-rays" />
+                      <div className="door-glow" />
+                      <div className="door-interior">
+                        <span className="portal-particle particle-one" />
+                        <span className="portal-particle particle-two" />
+                        <span className="portal-particle particle-three" />
+                        <span className="portal-horizon" />
+                      </div>
+                      <div className="door-arch" />
+                      <div className="door-panel">
+                        <span>{item.badge}</span>
+                        <i className="door-knob" />
+                      </div>
+                      <div className="door-threshold" />
+                      <div className="door-step" />
+                    </div>
+                  </div>
+                  <span className="gateway-action">
+                    <span className="gateway-action-default">
+                      {item.action}
+                    </span>
+                    <span className="gateway-action-hover">
+                      Enter workspace
+                    </span>
+                    <b>→</b>
+                  </span>
+                </article>
               </a>
             ))}
           </div>
-          <p>
-            The Marketplace connects every door. The AI Governance Registry belongs
-            only inside AI Governance.
+          <div className="map-connector">↓</div>
+          <div className="map-shared">
+            {chain.map((stage) => (
+              <span key={stage}>{stage}</span>
+            ))}
+          </div>
+          <p className="map-caption">
+            Different doors. One constitutional chain. Every workspace should
+            show where the visitor is, what can be done there, what happens
+            next, and how to return later.
           </p>
-        </aside>
+        </div>
       </section>
 
-      <section className="section-wrap doors-section" id="doors">
-        <div className="section-heading">
-          <p className="eyebrow">THE FOUR PRIMARY DOORS</p>
-          <h2>Choose what you are bringing to the Exchange.</h2>
+      <section className="section-wrap chain-section" id="architecture">
+        <div className="section-heading centered">
+          <p className="eyebrow">The governing chain</p>
+          <h2>Governance must remain visible from Reality to Outcome.</h2>
           <p>
-            Each door is represented once. Each card explains its purpose,
-            identifies its major capabilities, and provides direct routes into
-            the areas that belong inside it.
+            Policies, approvals, and models can be valuable while an execution
+            route still breaks. TA-14 evaluates whether evidence, continuity,
+            authority, binding, commitment, execution, and measured outcome
+            remain admissible together.
+          </p>
+        </div>
+        <div className="ta14-chain-track" aria-label="TA-14 governing chain">
+          {chain.map((stage, index) => (
+            <div className="ta14-chain-stage" key={stage}>
+              <span className="ta14-chain-number">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <strong>{stage}</strong>
+              {index < chain.length - 1 ? (
+                <i className="ta14-chain-arrow" aria-hidden="true">
+                  →
+                </i>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        <div className="ta14-principles-grid">
+          <article>
+            <span>◇</span>
+            <h3>Build</h3>
+            <p>
+              Model boundaries, actors, authority, evidence, dependencies,
+              rules, commit conditions, execution, and expected outcomes.
+            </p>
+          </article>
+          <article>
+            <span>⚡</span>
+            <h3>Challenge</h3>
+            <p>
+              Inject missing evidence, stale authority, continuity breaks,
+              beneficiary mismatches, bypass attempts, and outcome failures.
+            </p>
+          </article>
+          <article>
+            <span>✓</span>
+            <h3>Verify</h3>
+            <p>
+              Preserve route identity, decision history, correction, receipts,
+              execution correspondence, and replayable proof.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="section-wrap live-demo" id="demo">
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">Live route demonstration</p>
+            <h2>Watch a route fail, correct, and become admissible.</h2>
+          </div>
+          <p>
+            Submit a consequential vendor payment, expose missing authority and
+            beneficiary binding, preserve the HOLD, then correct and rerun the
+            route.
           </p>
         </div>
 
-        <div className="door-stack redesigned-door-stack">
-          {doors.map((door, index) => (
-            <article
-              className={`destination-door-card destination-${index + 1}`}
-              id={`door-${door.number}`}
-              key={door.title}
-            >
-              <div className="physical-door-column">
-                <Link
-                  className="real-door-link"
-                  href={door.href}
-                  aria-label={`${door.action}: ${door.title}`}
+        <div className="demo-grid">
+          <article className="route-card">
+            <div className="route-card-head">
+              <div>
+                <p className="eyebrow">Vendor Payment Route</p>
+                <h3>Procurement Agent v4.2</h3>
+              </div>
+              <strong>USD 32,500</strong>
+            </div>
+            <dl className="route-data">
+              <div>
+                <dt>Organization</dt>
+                <dd>Northstar Procurement Group</dd>
+              </div>
+              <div>
+                <dt>Supplier</dt>
+                <dd>Apex Industrial Supply</dd>
+              </div>
+              <div>
+                <dt>Invoice</dt>
+                <dd>INV-2026-0716</dd>
+              </div>
+              <div>
+                <dt>Procurement authority</dt>
+                <dd>{authorityCorrected ? "Current" : "Missing"}</dd>
+              </div>
+              <div>
+                <dt>Finance authority</dt>
+                <dd>{authorityCorrected ? "Current" : "Missing"}</dd>
+              </div>
+              <div>
+                <dt>Beneficiary binding</dt>
+                <dd>{authorityCorrected ? "Bound" : "Unproven"}</dd>
+              </div>
+            </dl>
+          </article>
+
+          <article className={`receipt receipt-${routeState.toLowerCase()}`}>
+            <div className="receipt-head">
+              <div>
+                <p className="eyebrow">TA-14 decision receipt</p>
+                <small>
+                  {authorityCorrected ? "CORRECTED VERSION" : "VERSION 1"}
+                </small>
+              </div>
+              <strong>{stateLabel}</strong>
+            </div>
+            <p className="receipt-copy">
+              {routeState === "IDLE" &&
+                "The route is ready for deterministic evaluation."}
+              {routeState === "RUNNING" &&
+                `Evaluating ${chain[Math.max(activeStage, 0)] ?? "route"}...`}
+              {routeState === "HOLD" &&
+                "Required proof is incomplete but correctable. Current dual authority and beneficiary binding are missing."}
+              {routeState === "ALLOW" &&
+                "All mandatory deterministic requirements are satisfied within the stated route scope."}
+            </p>
+            <div className="receipt-chain">
+              {chain.map((stage, index) => {
+                const complete =
+                  routeState === "ALLOW" ||
+                  (routeState === "RUNNING" && index < activeStage);
+                const active =
+                  routeState === "RUNNING" && index === activeStage;
+                const failed =
+                  routeState === "HOLD" && index >= 3 && index <= 4;
+                return (
+                  <span
+                    className={
+                      complete
+                        ? "complete"
+                        : active
+                          ? "active"
+                          : failed
+                            ? "failed"
+                            : ""
+                    }
+                    key={stage}
+                  >
+                    {stage}
+                  </span>
+                );
+              })}
+            </div>
+            <pre>
+              {routeState === "IDLE" &&
+                "ROUTE: Vendor payment above USD 25,000\nSTATUS: TESTABLE\nNEXT ACTION: RUN TA-14 ENGINE"}
+              {routeState === "RUNNING" &&
+                `ROUTE: Vendor payment above USD 25,000\nTESTING: ${chain[Math.max(activeStage, 0)] ?? "Reality"}\nSTATE: EVALUATING`}
+              {routeState === "HOLD" &&
+                "RESULT: HOLD\nTA-14-AUTH-PROC: CURRENT PROCUREMENT AUTHORITY MISSING\nTA-14-AUTH-FIN: CURRENT FINANCE AUTHORITY MISSING\nTA-14-BIND-BEN: BENEFICIARY NOT BOUND\nNEXT ACTION: CORRECT FREE AND RERUN"}
+              {routeState === "ALLOW" &&
+                "RESULT: ALLOW\nTA-14-REQ-ALL: SATISFIED\nAUTHORITY: CURRENT DUAL APPROVAL\nBENEFICIARY: BOUND\nCOMMIT CORRESPONDENCE: SATISFIED"}
+            </pre>
+            <div className="button-row">
+              {routeState === "IDLE" && (
+                <button
+                  className="button primary"
+                  type="button"
+                  onClick={runRoute}
                 >
-                  <span className="real-doorway-light" aria-hidden="true" />
-                  <span className="real-door-frame" aria-hidden="true">
-                    <span className="real-door-casing casing-top" />
-                    <span className="real-door-casing casing-left" />
-                    <span className="real-door-casing casing-right" />
-                    <span className="real-door-slab">
-                      <span className="wood-grain grain-one" />
-                      <span className="wood-grain grain-two" />
-                      <span className="raised-panel raised-panel-one" />
-                      <span className="raised-panel raised-panel-two" />
-                      <span className="raised-panel raised-panel-three" />
-                      <span className="raised-panel raised-panel-four" />
-                      <span className="door-plate" />
-                      <span className="door-knob" />
-                      <span className="door-hinge hinge-one" />
-                      <span className="door-hinge hinge-two" />
-                      <span className="door-hinge hinge-three" />
-                    </span>
-                  </span>
+                  Run Route
+                </button>
+              )}
+              {routeState === "RUNNING" && (
+                <button className="button primary" type="button" disabled>
+                  Testing Route…
+                </button>
+              )}
+              {routeState === "HOLD" && (
+                <>
+                  <button
+                    className="button primary"
+                    type="button"
+                    onClick={correctAndRerun}
+                  >
+                    Correct Route and Rerun
+                  </button>
+                  <button
+                    className="button secondary"
+                    type="button"
+                    onClick={resetRoute}
+                  >
+                    Reset
+                  </button>
+                </>
+              )}
+              {routeState === "ALLOW" && (
+                <>
+                  <button
+                    className="button primary"
+                    type="button"
+                    onClick={() => setRecordOpen(true)}
+                  >
+                    Open AER Preview
+                  </button>
+                  <button
+                    className="button secondary"
+                    type="button"
+                    onClick={resetRoute}
+                  >
+                    Run Again
+                  </button>
+                </>
+              )}
+            </div>
+          </article>
+        </div>
 
-                  <span className="door-sign">
-                    <small>DOOR {door.number}</small>
-                    <strong>{door.badge}</strong>
-                  </span>
-
-                  <span className="door-enter-prompt">
-                    Enter
-                    <b>→</b>
-                  </span>
-                </Link>
+        {recordOpen && rid ? (
+          <article className="record-preview">
+            <div>
+              <p className="eyebrow">Self-declared AER preview generated</p>
+              <h3>TA-14 Admissible Execution Record</h3>
+            </div>
+            <span>SIGNED PREVIEW</span>
+            <dl>
+              <div>
+                <dt>Route identity</dt>
+                <dd>{rid}</dd>
               </div>
-
-              <div className="destination-door-content">
-                <p className="door-kicker">PRIMARY EXCHANGE DOOR {door.number}</p>
-                <p className="intent-question">{door.question}</p>
-                <h3>{door.title}</h3>
-                <p className="destination-statement">{door.statement}</p>
-                <p className="destination-description">{door.description}</p>
-
-                <ul className="destination-attributes">
-                  {door.attributes.map((attribute) => (
-                    <li key={attribute}>
-                      <span>✓</span>
-                      {attribute}
-                    </li>
-                  ))}
-                </ul>
-
-                <div className="destination-actions">
-                  <Link className="button primary destination-primary" href={door.href}>
-                    {door.action}
-                    <span>→</span>
-                  </Link>
-
-                  <div className="destination-route-links">
-                    {door.links.map((link) => (
-                      <Link
-                        key={link.label}
-                        className={link.kind === "special" ? "destination-chip special" : "destination-chip"}
-                        href={link.href}
-                      >
-                        {link.label}
-                      </Link>
-                    ))}
-                  </div>
-
-                  <Link className="destination-marketplace" href="/marketplace">
-                    <span>Marketplace</span>
-                    <strong>{door.marketplaceLabel}</strong>
-                    <b>↗</b>
-                  </Link>
-                </div>
+              <div>
+                <dt>Current state</dt>
+                <dd>ALLOW</dd>
               </div>
+              <div>
+                <dt>Manifest hash</dt>
+                <dd>{manifestHash}</dd>
+              </div>
+              <div>
+                <dt>Authority basis</dt>
+                <dd>Current dual authority</dd>
+              </div>
+              <div>
+                <dt>Boundary</dt>
+                <dd>Self-declared demonstration</dd>
+              </div>
+              <div>
+                <dt>Next action</dt>
+                <dd>Preserve durable route record</dd>
+              </div>
+            </dl>
+          </article>
+        ) : null}
+      </section>
+
+      <section className="section-wrap results-section" id="results">
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">Governance Results Exchange</p>
+            <h2>See what people tested—not merely what they claimed.</h2>
+          </div>
+          <p>
+            Published results should become a bounded public evidence library
+            where people can inspect outcomes, learn from adverse decisions,
+            compare corrections, and distinguish self-declared work from
+            independently verified work.
+          </p>
+        </div>
+
+        <div className="results-grid">
+          {resultCards.map((result) => (
+            <article className="result-card" key={result.title}>
+              <div className="result-meta">
+                <span>{result.domain}</span>
+                <strong className={`state state-${result.state.toLowerCase()}`}>
+                  {result.state}
+                </strong>
+              </div>
+              <h3>{result.title}</h3>
+              <p>{result.summary}</p>
+              <div className="standing">
+                <span>{result.standing}</span>
+                <span>Replay unavailable</span>
+              </div>
+            </article>
+          ))}
+        </div>
+
+        <div className="results-path">
+          <div>
+            <strong>Published Results</strong>
+            <span>Bounded public outcomes</span>
+          </div>
+          <div>
+            <strong>Open Challenges</strong>
+            <span>Invite qualified scrutiny</span>
+          </div>
+          <div>
+            <strong>Corrections & Retests</strong>
+            <span>Preserve the route from failure to repair</span>
+          </div>
+          <div>
+            <strong>Verified Results</strong>
+            <span>Separate independent verification from declaration</span>
+          </div>
+        </div>
+
+        <div className="coming-panel">
+          <div>
+            <p className="eyebrow">Planned public destination</p>
+            <h3>/workspace/ai-governance/results</h3>
+          </div>
+          <p>
+            This homepage previews the Results Exchange without pretending the
+            public publishing backend is already live. Build the dedicated
+            workspace only after publication boundaries, sanitization, standing
+            labels, moderation, and replay links are implemented.
+          </p>
+        </div>
+      </section>
+
+      <section className="section-wrap" id="gallery">
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">Route Gallery</p>
+            <h2>Learn governance by opening a route.</h2>
+          </div>
+          <p>
+            Reusable examples shorten the distance between curiosity and
+            participation. Each route should eventually support inspection,
+            copying, testing, replay, and verification according to its
+            standing.
+          </p>
+        </div>
+        <div className="gallery-grid">
+          {routeGallery.map(([domain, title, route]) => (
+            <article className="gallery-card" key={title}>
+              <span>{domain}</span>
+              <h3>{title}</h3>
+              <p>{route}</p>
+              <small>Illustrative route template</small>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="section-wrap marketplace-bridge">
-        <div className="marketplace-shell">
-          <div>
-            <p className="eyebrow">ONE MARKETPLACE ACROSS ALL FOUR DOORS</p>
-            <h2>The Marketplace connects needs, systems, records, entities, and specialists.</h2>
-            <p>
-              Post a governance need, find work, request a governed record, locate
-              environmental record capabilities, discover qualified reviewers, or
-              browse proven routes without turning the Marketplace into a fifth
-              competing front door.
-            </p>
-          </div>
-          <div className="marketplace-actions">
-            <Link className="button primary" href="/marketplace">Open Marketplace</Link>
-            <Link className="button secondary" href="/marketplace/opportunities">
-              Browse Opportunities
-            </Link>
-            <Link className="button secondary" href="/marketplace/professionals">
-              Find Professionals
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className="section-wrap how-section" id="how-it-works">
+      <section className="section-wrap operating-surface">
         <div className="section-heading centered">
-          <p className="eyebrow">HOW THE EXCHANGE WORKS</p>
-          <h2>Explain first. Operate second. Preserve the result.</h2>
+          <p className="eyebrow">One exchange, complete operating surface</p>
+          <h2>From governance idea to governed execution record.</h2>
           <p>
-            The front door helps visitors choose the correct environment. The
-            dedicated workspace then carries the actual record, route, review,
-            interpretation, correction, and verification process.
+            The Exchange turns governance from a document into a testable,
+            correctable, preservable, independently reviewable execution system.
           </p>
         </div>
-
-        <div className="steps-grid">
-          {exchangeSteps.map(([number, title, text]) => (
-            <article key={number}>
-              <span>{number}</span>
+        <div className="surface-grid">
+          {[
+            [
+              "⌘",
+              "Route Construction",
+              "Build bounded consequential routes and map the complete Reality-to-Outcome chain.",
+            ],
+            [
+              "↯",
+              "Runtime Testing",
+              "Run routes, expose exact HOLD and DENY reasons, correct defects, and rerun without hiding adverse results.",
+            ],
+            [
+              "◎",
+              "Governed Records",
+              "Preserve route identity, provenance, continuity, authority, decisions, execution, boundaries, and outcome.",
+            ],
+            [
+              "◇",
+              "Independent Review",
+              "Submit routes, systems, architectures, and enterprise processes for bounded full-chain review.",
+            ],
+            [
+              "#",
+              "Verification and Replay",
+              "Verify signatures, hashes, dependencies, continuity, commit integrity, and execution-to-outcome correspondence.",
+            ],
+            [
+              "API",
+              "Integration Layer",
+              "Connect evidence sources, registries, reviewers, policies, agents, and execution environments.",
+            ],
+          ].map(([icon, title, text]) => (
+            <article key={title}>
+              <span>{icon}</span>
               <h3>{title}</h3>
               <p>{text}</p>
             </article>
@@ -405,97 +1018,303 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="section-wrap chain-section">
+      <section className="section-wrap governed-records">
         <div className="section-heading centered">
-          <p className="eyebrow">ONE CONSTITUTIONAL CHAIN</p>
-          <h2>Different doors. The same demand for admissibility.</h2>
+          <p className="eyebrow">Governed records</p>
+          <h2>A record should prove more than what someone typed.</h2>
           <p>
-            Every workspace must keep the underlying route visible from observed
-            reality through preserved outcome.
+            A conventional record may capture an event. A governed record
+            preserves the route that made the event admissible—or the exact
+            reasons it was held, denied, or escalated.
           </p>
         </div>
+        <div className="governed-records-entry">
+          <a className="button primary" href="/workspace/governed-records">
+            Enter Governed Records
+          </a>
+          <a className="button secondary" href="/workspace/governed-records/builder">
+            Build the Record
+          </a>
+        </div>
+        <div className="comparison-grid">
+          <article className="ordinary">
+            <p className="eyebrow">Ordinary record</p>
+            <h3>What happened was recorded.</h3>
+            <ul>
+              <li>Timestamp and event data</li>
+              <li>Submitted documents</li>
+              <li>Declared approval state</li>
+              <li>Limited reconstruction</li>
+            </ul>
+          </article>
+          <article className="governed">
+            <p className="eyebrow">TA-14 governed record</p>
+            <h3>Why the consequence was—or was not—admissible.</h3>
+            <ul>
+              <li>Stable route identity and manifest</li>
+              <li>Evidence provenance and continuity</li>
+              <li>Authority and exact-object binding</li>
+              <li>
+                Decision, correction, commit, execution, and outcome history
+              </li>
+              <li>Independent verification and replay surface</li>
+              <li>Preserved HOLD, DENY, ALLOW, or ESCALATE result</li>
+            </ul>
+          </article>
+        </div>
+      </section>
 
-        <div className="chain-track" aria-label="TA-14 governing chain">
-          {chain.map((stage, index) => (
-            <div key={stage}>
-              <span>{String(index + 1).padStart(2, "0")}</span>
-              <strong>{stage}</strong>
-              {index < chain.length - 1 ? <i>→</i> : null}
-            </div>
+      <section className="section-wrap domains-section" id="domains">
+        <div className="section-heading centered">
+          <p className="eyebrow">Applied governance domains</p>
+          <h2>AI governance is the entrance—not the limit.</h2>
+          <p>
+            The TA-14 AI Governance Exchange supports every domain where
+            authority, evidence, execution, and outcome must remain
+            reconstructable.
+          </p>
+        </div>
+        <div className="domain-grid">
+          {useCases.map(([title, text]) => (
+            <article key={title}>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="section-wrap boundary-section">
-        <div className="boundary-grid">
-          <article>
-            <p className="eyebrow">THE EXCHANGE DOES</p>
-            <h3>Make governance inspectable.</h3>
-            <ul>
-              <li>Expose evidence and continuity</li>
-              <li>Preserve declarations and boundaries</li>
-              <li>Separate records from interpretation</li>
-              <li>Make review scope visible</li>
-              <li>Preserve adverse and uncertain outcomes</li>
-            </ul>
-          </article>
-          <article>
-            <p className="eyebrow">THE EXCHANGE DOES NOT</p>
-            <h3>Silently manufacture authority.</h3>
-            <ul>
-              <li>Does not certify every declaration</li>
-              <li>Does not transfer ownership through preservation</li>
-              <li>Does not merge independent review authorities</li>
-              <li>Does not erase chronology when a route is corrected</li>
-              <li>Does not turn a score into admissible evidence</li>
-            </ul>
-          </article>
+      <section
+        className="section-wrap partner-network"
+        id="partner-review-network"
+      >
+        <div className="partner-network-shell">
+          <div className="partner-network-copy">
+            <p className="eyebrow">TA-14 Partner Review Network</p>
+            <h2>
+              Do you believe your governance can stand up to bounded review?
+            </h2>
+            <p className="partner-lead">
+              The Partner Review Network is for governance organizations,
+              evidence specialists, cybersecurity teams, controls professionals,
+              runtime systems, and domain experts that can perform
+              consequence-bearing review within clearly declared boundaries.
+            </p>
+            <p>
+              Applicants are evaluated for demonstrated governance discipline,
+              evidence practices, declared scope, review boundaries, and their
+              ability to preserve uncertainty rather than conceal it. Acceptance
+              is never automatic and cannot be purchased.
+            </p>
+            <div className="partner-actions">
+              <Link
+                className="button primary"
+                href="/workspace/entity-review/partner-review-network/pricing"
+              >
+                Explore Qualification & Pricing
+              </Link>
+              <Link
+                className="button secondary partner-apply-button"
+                href="/workspace/entity-review/partner-review-network/pricing"
+              >
+                Begin Partner Qualification
+              </Link>
+            </div>
+            <p className="partner-route-note">
+              Continue to the Partner Review Network pricing and qualification
+              page to review the fee, readiness requirements, and submission
+              process.
+            </p>
+            <p className="partner-boundary">
+              Application requirements, review terms, and any applicable fees
+              are presented only inside the relevant review area—not on the
+              public homepage. Payment never guarantees acceptance,
+              certification, favorable findings, or review work.
+            </p>
+          </div>
+
+          <aside
+            className="partner-network-panel"
+            aria-label="Partner Review Network process"
+          >
+            <p className="eyebrow">Bounded participation</p>
+            <ol>
+              <li>
+                <span>01</span>
+                <div>
+                  <strong>Declare your domain</strong>
+                  <p>Identify exactly what you are qualified to review.</p>
+                </div>
+              </li>
+              <li>
+                <span>02</span>
+                <div>
+                  <strong>Submit supporting material</strong>
+                  <p>
+                    Provide evidence of methods, boundaries, and prior work.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span>03</span>
+                <div>
+                  <strong>Receive bounded evaluation</strong>
+                  <p>
+                    TA-14 reviews the material without guaranteeing acceptance.
+                  </p>
+                </div>
+              </li>
+              <li>
+                <span>04</span>
+                <div>
+                  <strong>Enter an approved lane</strong>
+                  <p>
+                    Accepted participants work only within declared authority.
+                  </p>
+                </div>
+              </li>
+            </ol>
+          </aside>
         </div>
       </section>
 
-      <section className="section-wrap final-cta">
-        <p className="eyebrow">TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
+      <section className="section-wrap built-environment">
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow">Built environment spotlight</p>
+            <h2>
+              Govern what the building does—and preserve what the atmosphere
+              actually was.
+            </h2>
+          </div>
+          <p>
+            BAS, analytics, digital twins, commissioning, TAB, cybersecurity,
+            sensors, equipment platforms, and operators each hold part of the
+            operational truth.
+          </p>
+        </div>
+        <div className="built-grid">
+          <article>
+            <p className="eyebrow">Governed building execution</p>
+            <h3>From command to verified restoration.</h3>
+            <div className="mini-route">
+              <span>Room warming observed</span>
+              <i>→</i>
+              <span>Evidence and operator identity captured</span>
+              <i>→</i>
+              <strong>HOLD</strong>
+              <i>→</i>
+              <span>Route corrected and command bound</span>
+              <i>→</i>
+              <strong>ALLOW</strong>
+              <i>→</i>
+              <span>Control restored and outcome verified</span>
+            </div>
+          </article>
+          <article>
+            <p className="eyebrow">Atmospheric Integrity Record</p>
+            <h3>
+              Thirteen atmospheric evidence channels. One governed record.
+            </h3>
+            <div className="sensor-cloud">
+              {[
+                "Dry-bulb",
+                "Wet-bulb",
+                "Relative humidity",
+                "Dew point",
+                "Enthalpy",
+                "Humidity ratio",
+                "Specific volume",
+                "Pressure",
+                "VOCs",
+                "Radon",
+                "Sound dB",
+                "Particulate matter",
+                "CO₂",
+              ].map((sensor) => (
+                <span key={sensor}>{sensor}</span>
+              ))}
+            </div>
+          </article>
+        </div>
+        <p className="boundary-note">
+          Connected but distinct: BAS explains what the building system sensed,
+          commanded, and executed. The Atmospheric Integrity Record preserves
+          whether atmospheric reality was valid for the intended activity and
+          whether the intervention produced a verified environmental outcome.
+        </p>
+      </section>
+
+      <section className="final-cta section-wrap">
+        <p className="eyebrow">TA-14 Authority Governance Institution</p>
         <h2>No admissible evidence. No admissible execution.</h2>
         <p>
-          Choose the door that matches what you are bringing. Enter the operating
-          environment. Build, preserve, review, interpret, test, and verify the
-          route without allowing one domain to take over the entire Exchange.
+          The Exchange is where governance systems become testable, governed
+          records become verifiable, qualified reviewers work within declared
+          boundaries, and organizations obtain full-chain scrutiny.
         </p>
-        <div className="final-actions">
-          <a className="button primary" href="#doors">Choose a Door</a>
-          <Link className="button secondary" href="/workspace">Open Exchange</Link>
-          <Link className="button ghost" href="/marketplace">Visit Marketplace</Link>
+        <div className="button-row centered-buttons">
+          <Link className="button primary" href="/workspace">
+            Open the Free Workspace
+          </Link>
+          <a
+            className="button secondary"
+            href="mailto:ta14admissibleexecution@gmail.com"
+          >
+            Contact TA-14
+          </a>
         </div>
       </section>
 
       <footer className="site-footer">
-        <div className="footer-brand">
+        <div>
           <Link className="brand" href="/">
             <span className="brand-mark">TA-14</span>
-            <span className="brand-copy">
-              <strong>TA-14</strong>
-              <small>AI GOVERNANCE EXCHANGE</small>
-            </span>
+            <span>TA-14 AI GOVERNANCE EXCHANGE</span>
           </Link>
-          <p>Four doors. One governed exchange. One visible chain.</p>
+          <p>
+            Build governance routes. Create governed records. Verify
+            consequential execution.
+          </p>
         </div>
-
         <div>
-          <h3>Doors</h3>
-          <Link href="/workspace/ai-governance">AI Governance Playground</Link>
+          <h3>Exchange</h3>
+          <a href="#start" onClick={() => setMobileMenuOpen(false)}>
+            Start Here
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Exchange Map
+          </a>
+          <a href="#map" onClick={() => setMobileMenuOpen(false)}>
+            Workspaces
+          </a>
+          <a href="#results">Results Exchange</a>
+          <Link href="/eu-ai-act">EU AI Act</Link>
+          <Link href="/eu-ai-act/requirements">EU AI Act Requirements</Link>
+          <a href="#gallery" onClick={() => setMobileMenuOpen(false)}>
+            Route Gallery
+          </a>
+          <a
+            href="#partner-review-network"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Partner Review Network
+          </a>
+        </div>
+        <div>
+          <h3>Operate</h3>
+          <Link href="/workspace">Open Workspace</Link>
           <Link href="/workspace/governed-records">Governed Records</Link>
-          <Link href="/workspace/environmental-records">Environmental Records</Link>
-          <Link href="/workspace/entity-review">Entity Review</Link>
+          <Link href="/workspace/entity-review">Entity Review Center</Link>
+          <Link href="/eu-ai-act/article-50">Article 50 Transparency</Link>
+          <Link href="/eu-ai-act/high-risk">High-Risk AI Systems</Link>
+          <Link href="/eu-ai-act/fundamental-rights">
+            Fundamental Rights Assessment
+          </Link>
+          <Link href="/account" onClick={() => setMobileMenuOpen(false)}>
+            Sign In
+          </Link>
         </div>
-
-        <div>
-          <h3>Shared Routes</h3>
-          <Link href="/marketplace">Marketplace</Link>
-          <Link href="/ai-governance-registry">AI Governance Registry</Link>
-          <Link href="/verification">Verification</Link>
-          <Link href="/account">Sign In</Link>
-        </div>
-
         <div>
           <h3>Contact</h3>
           <a href="mailto:ta14admissibleexecution@gmail.com">
@@ -508,2017 +1327,1920 @@ export default function HomePage() {
           >
             GitHub
           </a>
+          <a
+            href="https://ta14-architecture.netlify.app"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Public Architecture
+          </a>
         </div>
-
         <p className="footer-chain">
           Reality → Record → Continuity → Admissibility → Binding → Commit →
           Execution → Outcome
         </p>
+        <p className="footer-canon">
+          No admissible evidence. No admissible execution.
+        </p>
       </footer>
 
-      <style jsx>{`
-        :global(*) {
+      <style>{`
+        * {
           box-sizing: border-box;
         }
-
-        :global(html) {
+        html {
           scroll-behavior: smooth;
         }
-
-        :global(body) {
+        body {
           margin: 0;
-          color: #f5f8ff;
           background: #050811;
+          color: #f4f7ff;
         }
-
-        :global(a) {
+        a {
           color: inherit;
           text-decoration: none;
+          text-decoration-thickness: 0;
+          text-underline-offset: 0;
         }
-
-        :global(button) {
-          font: inherit;
+        a:focus-visible,
+        button:focus-visible {
+          outline: 2px solid #72e2c1;
+          outline-offset: 4px;
         }
-
         .page-shell {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
           isolation: isolate;
-          background:
-            radial-gradient(circle at 8% 3%, rgba(45, 107, 255, 0.18), transparent 27%),
-            radial-gradient(circle at 90% 4%, rgba(44, 226, 182, 0.12), transparent 23%),
-            linear-gradient(180deg, #060914 0%, #09111e 48%, #050811 100%);
+          background: radial-gradient(
+              circle at 10% 5%,
+              rgba(76, 109, 255, 0.18),
+              transparent 28%
+            ),
+            radial-gradient(
+              circle at 86% 3%,
+              rgba(47, 226, 181, 0.12),
+              transparent 24%
+            ),
+            linear-gradient(180deg, #070a13 0%, #09101d 42%, #050811 100%);
         }
-
-        .page-shell > :not(.ambient) {
+        .page-shell > :not(.cosmic-background) {
           position: relative;
           z-index: 2;
         }
-
-        .ambient {
+        .cosmic-background {
           position: fixed;
           inset: 0;
           z-index: 0;
-          pointer-events: none;
           overflow: hidden;
+          pointer-events: none;
+          background: radial-gradient(
+            circle at 50% 18%,
+            rgba(42, 94, 138, 0.12),
+            transparent 34%
+          );
         }
-
-        .star-field {
-          position: absolute;
-          inset: -25%;
-          background-repeat: repeat;
-        }
-
-        .stars-one {
-          opacity: 0.28;
-          background-image: radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.7px);
-          background-size: 118px 118px;
-          animation: starDrift 58s linear infinite;
-        }
-
-        .stars-two {
-          opacity: 0.18;
-          background-image: radial-gradient(circle, rgba(100,230,201,.9) 0 1px, transparent 1.7px);
-          background-size: 181px 181px;
-          animation: starDriftReverse 76s linear infinite;
-        }
-
-        .orbit {
-          position: absolute;
-          border: 1px solid rgba(109, 230, 201, 0.11);
-          border-radius: 50%;
-          animation: rotate 42s linear infinite;
-        }
-
-        .orbit i {
-          position: absolute;
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: #74e4c6;
-          box-shadow: 0 0 18px #74e4c6, 0 0 44px rgba(116,228,198,.55);
-        }
-
-        .orbit-one {
-          width: 620px;
-          height: 620px;
-          top: 6%;
-          left: -260px;
-        }
-
-        .orbit-one i {
-          right: -4px;
-          top: 48%;
-        }
-
-        .orbit-two {
-          width: 760px;
-          height: 760px;
-          top: 37%;
-          right: -330px;
-          animation-duration: 57s;
-          animation-direction: reverse;
-        }
-
-        .orbit-two i {
-          left: 13%;
-          top: 11%;
-          background: #95b0ff;
-          box-shadow: 0 0 18px #95b0ff, 0 0 44px rgba(149,176,255,.5);
-        }
-
-        .moving-line {
-          position: absolute;
-          width: 45vw;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(116,228,198,.65), transparent);
-          filter: drop-shadow(0 0 8px rgba(116,228,198,.42));
-          opacity: .35;
-          animation: sweep 17s ease-in-out infinite;
-        }
-
-        .line-one {
-          top: 20%;
-          left: -48vw;
-          transform: rotate(16deg);
-        }
-
-        .line-two {
-          top: 66%;
-          right: -48vw;
-          transform: rotate(-12deg);
-          animation-delay: -8s;
-        }
-
-        .nova {
-          position: absolute;
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #fff;
-          box-shadow: 0 0 18px #fff, 0 0 42px #74e4c6;
-          animation: nova 8s ease-in-out infinite;
-        }
-
-        .nova-one {
-          top: 16%;
-          left: 79%;
-        }
-
-        .nova-two {
-          top: 72%;
-          left: 16%;
-          animation-delay: -4s;
-        }
-
         .skip-link {
           position: fixed;
           top: 12px;
           left: 12px;
           z-index: 1000;
           padding: 10px 14px;
-          border-radius: 9px;
-          color: #06110e;
-          background: #74e4c6;
+          border: 1px solid rgba(109, 240, 207, 0.75);
+          border-radius: 10px;
+          color: #061019;
+          background: #6df0cf;
           font-weight: 900;
-          transform: translateY(-170%);
+          transform: translateY(-160%);
+          transition: transform 0.2s ease;
         }
-
         .skip-link:focus {
           transform: translateY(0);
         }
-
+        .star-field {
+          position: absolute;
+          inset: -20%;
+          background-repeat: repeat;
+          opacity: 0.28;
+        }
+        .star-field-one {
+          background-image: radial-gradient(
+            circle,
+            rgba(255, 255, 255, 0.9) 0 1px,
+            transparent 1.6px
+          );
+          background-size: 112px 112px;
+          animation: starDrift 55s linear infinite;
+        }
+        .star-field-two {
+          background-image: radial-gradient(
+            circle,
+            rgba(114, 226, 193, 0.9) 0 1px,
+            transparent 1.8px
+          );
+          background-size: 176px 176px;
+          animation: starDriftReverse 78s linear infinite;
+          opacity: 0.2;
+        }
+        .star-field-three {
+          background-image: radial-gradient(
+            circle,
+            rgba(157, 183, 255, 0.85) 0 1.2px,
+            transparent 2px
+          );
+          background-size: 190px 190px;
+          animation: starPulse 9s ease-in-out infinite alternate;
+          opacity: 0.22;
+        }
+        .orbit {
+          position: absolute;
+          border: 1px solid rgba(114, 226, 193, 0.12);
+          border-radius: 50%;
+          animation: orbitSpin 38s linear infinite;
+        }
+        .orbit span {
+          position: absolute;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #72e2c1;
+          box-shadow:
+            0 0 18px #72e2c1,
+            0 0 42px rgba(114, 226, 193, 0.55);
+        }
+        .orbit-one {
+          width: 560px;
+          height: 560px;
+          top: 8%;
+          left: -190px;
+        }
+        .orbit-one span {
+          top: 49%;
+          right: -4px;
+        }
+        .orbit-two {
+          width: 760px;
+          height: 760px;
+          right: -320px;
+          top: 30%;
+          animation-duration: 52s;
+          animation-direction: reverse;
+          border-color: rgba(157, 183, 255, 0.1);
+        }
+        .orbit-two span {
+          left: 18%;
+          top: 8%;
+          background: #9db7ff;
+          box-shadow:
+            0 0 18px #9db7ff,
+            0 0 42px rgba(157, 183, 255, 0.5);
+        }
+        .orbit-three {
+          width: 360px;
+          height: 360px;
+          left: 42%;
+          bottom: -210px;
+          animation-duration: 29s;
+          border-color: rgba(196, 108, 255, 0.1);
+        }
+        .orbit-three span {
+          right: 7%;
+          bottom: 18%;
+          background: #c46cff;
+          box-shadow:
+            0 0 18px #c46cff,
+            0 0 42px rgba(196, 108, 255, 0.48);
+        }
+        .moving-line {
+          position: absolute;
+          width: 42vw;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(114, 226, 193, 0.7),
+            transparent
+          );
+          filter: drop-shadow(0 0 8px rgba(114, 226, 193, 0.5));
+          animation: lineSweep 16s ease-in-out infinite;
+          opacity: 0.36;
+        }
+        .line-one {
+          top: 18%;
+          left: -45vw;
+          transform: rotate(18deg);
+        }
+        .line-two {
+          top: 58%;
+          right: -48vw;
+          transform: rotate(-13deg);
+          animation-delay: -6s;
+        }
+        .line-three {
+          bottom: 8%;
+          left: -45vw;
+          transform: rotate(6deg);
+          animation-delay: -11s;
+        }
+        .nova {
+          position: absolute;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #fff;
+          box-shadow:
+            0 0 16px #fff,
+            0 0 36px #72e2c1,
+            0 0 80px rgba(114, 226, 193, 0.75);
+          animation: novaBurst 7.5s ease-in-out infinite;
+        }
+        .nova-one {
+          left: 74%;
+          top: 14%;
+        }
+        .nova-two {
+          left: 18%;
+          top: 68%;
+          animation-delay: -3.8s;
+        }
+        @keyframes starDrift {
+          to {
+            transform: translate3d(160px, 110px, 0);
+          }
+        }
+        @keyframes starDriftReverse {
+          to {
+            transform: translate3d(-180px, 145px, 0);
+          }
+        }
+        @keyframes starPulse {
+          from {
+            opacity: 0.12;
+            transform: scale(0.98);
+          }
+          to {
+            opacity: 0.38;
+            transform: scale(1.02);
+          }
+        }
+        @keyframes orbitSpin {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+        @keyframes lineSweep {
+          0%,
+          15% {
+            transform: translateX(0) rotate(18deg);
+            opacity: 0;
+          }
+          35% {
+            opacity: 0.45;
+          }
+          80%,
+          100% {
+            transform: translateX(165vw) rotate(18deg);
+            opacity: 0;
+          }
+        }
+        @keyframes novaBurst {
+          0%,
+          84%,
+          100% {
+            transform: scale(0.2);
+            opacity: 0.1;
+          }
+          88% {
+            transform: scale(1.4);
+            opacity: 1;
+          }
+          92% {
+            transform: scale(5);
+            opacity: 0.24;
+          }
+        }
         .site-header {
           position: sticky;
           top: 0;
-          z-index: 60;
+          z-index: 50;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 24px;
           min-height: 76px;
-          padding: 13px clamp(18px, 4vw, 62px);
-          border-bottom: 1px solid rgba(151, 178, 220, 0.14);
-          background: rgba(5, 8, 17, 0.87);
+          padding: 14px clamp(18px, 4vw, 64px);
+          border-bottom: 1px solid rgba(158, 178, 217, 0.14);
+          background: rgba(5, 8, 17, 0.86);
           backdrop-filter: blur(18px);
         }
-
         .brand {
           display: inline-flex;
           align-items: center;
           gap: 12px;
+          color: #eaf1ff;
+          text-decoration: none;
+          font-size: 0.78rem;
+          font-weight: 850;
+          letter-spacing: 0.08em;
         }
-
         .brand-mark {
           display: inline-grid;
           place-items: center;
-          min-width: 58px;
-          height: 40px;
-          padding: 0 9px;
-          border: 1px solid rgba(116, 228, 198, 0.46);
+          min-width: 54px;
+          height: 38px;
+          padding: 0 8px;
+          border: 1px solid rgba(112, 226, 193, 0.42);
           border-radius: 10px;
-          color: #74e4c6;
-          background: rgba(116, 228, 198, 0.07);
-          font-weight: 950;
+          color: #72e2c1;
+          background: rgba(114, 226, 193, 0.08);
         }
-
-        .brand-copy {
-          display: grid;
-          gap: 2px;
-        }
-
-        .brand-copy strong {
-          font-size: .78rem;
-          letter-spacing: .08em;
-        }
-
-        .brand-copy small {
-          color: #8795aa;
-          font-size: .67rem;
-          font-weight: 850;
-          letter-spacing: .11em;
-        }
-
         .main-nav {
           display: flex;
           align-items: center;
           gap: 6px;
           padding: 5px;
-          border: 1px solid rgba(151, 178, 220, 0.13);
+          border: 1px solid rgba(145, 170, 213, 0.13);
           border-radius: 999px;
-          background: rgba(8, 14, 26, 0.66);
+          background: rgba(8, 14, 26, 0.62);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035);
         }
-
         .main-nav a {
+          position: relative;
           display: inline-flex;
           align-items: center;
           justify-content: center;
           min-height: 38px;
-          padding: 0 13px;
+          padding: 0 12px;
           border: 1px solid transparent;
           border-radius: 999px;
           color: #b8c5d9;
-          font-size: .8rem;
+          text-decoration: none !important;
+          font-size: 0.77rem;
           font-weight: 800;
-          transition: .2s ease;
+          letter-spacing: 0.01em;
+          transition: color 0.2s ease, background 0.2s ease, border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
         }
-
+        .main-nav a::after {
+          content: "";
+          position: absolute;
+          right: 16px;
+          bottom: 6px;
+          left: 16px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, #72e2c1, transparent);
+          transform: scaleX(0);
+          transition: transform 0.2s ease;
+        }
         .main-nav a:hover {
-          color: #fff;
-          border-color: rgba(116, 228, 198, 0.22);
-          background: rgba(116, 228, 198, 0.07);
+          color: #ffffff;
+          border-color: rgba(114, 226, 193, 0.2);
+          background: rgba(114, 226, 193, 0.07);
+          box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
           transform: translateY(-1px);
         }
-
-        .main-nav .nav-cta {
-          color: #06110e;
-          border-color: #74e4c6;
-          background: linear-gradient(135deg, #8af0d4, #49cbaa);
+        .main-nav a:hover::after {
+          transform: scaleX(1);
         }
-
+        .main-nav .nav-cta {
+          padding: 0 16px;
+          border: 1px solid rgba(114, 226, 193, 0.9);
+          color: #06120e;
+          background: linear-gradient(135deg, #83f4d7, #45cba8);
+          box-shadow: 0 8px 26px rgba(69, 203, 168, 0.2);
+        }
+        .main-nav .nav-cta::after {
+          display: none;
+        }
+        .main-nav .nav-cta:hover {
+          color: #04100d;
+          background: linear-gradient(135deg, #a2ffe7, #5ce0bd);
+          box-shadow: 0 12px 34px rgba(69, 203, 168, 0.32);
+        }
         .menu-button {
           display: none;
           width: 42px;
           height: 42px;
-          border: 1px solid rgba(151, 178, 220, 0.2);
+          border: 1px solid rgba(160, 181, 219, 0.2);
           border-radius: 10px;
           color: #fff;
-          background: rgba(15, 23, 39, 0.8);
+          background: rgba(14, 22, 38, 0.8);
         }
-
         .section-wrap {
-          width: min(1450px, calc(100% - 34px));
+          width: min(1480px, calc(100% - 32px));
           margin: 0 auto;
-          padding: 92px 0;
+          padding: 88px 0;
         }
-
         .hero {
           display: grid;
-          grid-template-columns: minmax(0, 1.08fr) minmax(410px, .92fr);
-          gap: clamp(35px, 6vw, 95px);
+          grid-template-columns: minmax(0, 1.04fr) minmax(420px, 0.96fr);
+          gap: clamp(32px, 6vw, 90px);
           align-items: center;
           min-height: calc(100vh - 76px);
         }
-
-        .eyebrow,
-        .door-kicker {
-          margin: 0 0 11px;
-          color: #74e4c6;
-          font-size: .72rem;
-          font-weight: 950;
-          letter-spacing: .15em;
+        .eyebrow {
+          margin: 0 0 10px;
+          color: #72e2c1;
+          font-size: 0.72rem;
+          font-weight: 900;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
         }
-
-        h1, h2, h3, p {
+        h1,
+        h2,
+        h3,
+        p {
           margin-top: 0;
         }
-
         h1 {
-          max-width: 900px;
-          margin-bottom: 27px;
-          font-size: clamp(3.5rem, 7.2vw, 7rem);
-          line-height: .92;
-          letter-spacing: -.07em;
+          max-width: 920px;
+          margin-bottom: 28px;
+          font-size: clamp(3.3rem, 7.4vw, 7.2rem);
+          line-height: 0.92;
+          letter-spacing: -0.07em;
         }
-
         h1 span {
           display: block;
-          color: #74e4c6;
+          color: #72e2c1;
         }
-
         h2 {
           margin-bottom: 18px;
-          font-size: clamp(2.25rem, 4.7vw, 4.8rem);
+          font-size: clamp(2.1rem, 4.5vw, 4.7rem);
           line-height: 1;
-          letter-spacing: -.052em;
+          letter-spacing: -0.05em;
         }
-
         h3 {
           margin-bottom: 10px;
+          font-size: 1.18rem;
         }
-
         p {
-          color: #a9b7ca;
-          line-height: 1.72;
+          color: #a8b5c9;
+          line-height: 1.7;
         }
-
-        .hero-lead {
-          max-width: 820px;
-          font-size: clamp(1.05rem, 1.6vw, 1.3rem);
+        .hero-text {
+          max-width: 790px;
+          font-size: clamp(1rem, 1.5vw, 1.22rem);
         }
-
-        .hero-support {
-          max-width: 760px;
-        }
-
-        .hero-actions,
-        .final-actions,
-        .marketplace-actions {
+        .button-row {
           display: flex;
           flex-wrap: wrap;
-          gap: 11px;
+          gap: 12px;
           margin-top: 28px;
         }
-
         .button {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-height: 47px;
-          padding: 0 19px;
+          min-height: 46px;
+          padding: 0 18px;
           border-radius: 12px;
-          font-weight: 900;
-          transition: transform .18s ease, border-color .18s ease;
+          text-decoration: none;
+          font-weight: 850;
+          transition:
+            transform 0.16s ease,
+            border-color 0.16s ease;
         }
-
         .button:hover {
           transform: translateY(-2px);
         }
-
+        button.button {
+          font: inherit;
+          cursor: pointer;
+        }
+        button.button:disabled {
+          cursor: wait;
+          opacity: 0.7;
+        }
         .primary {
-          border: 1px solid #74e4c6;
-          color: #06110e;
-          background: #74e4c6;
+          border: 1px solid #72e2c1;
+          color: #07130f;
+          background: #72e2c1;
         }
-
         .secondary {
-          border: 1px solid rgba(151, 178, 220, 0.3);
-          color: #eff5ff;
-          background: rgba(18, 28, 47, 0.82);
+          border: 1px solid rgba(159, 183, 225, 0.3);
+          color: #e8f0ff;
+          background: rgba(18, 27, 46, 0.8);
         }
-
         .ghost {
           border: 1px solid transparent;
-          color: #b9c7db;
+          color: #b7c3d7;
         }
-
+        .eu-act-hero-button {
+          border: 1px solid rgba(240, 202, 110, 0.78);
+          color: #ffe7a7;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(240, 202, 110, 0.16),
+              rgba(240, 168, 65, 0.055)
+            ),
+            rgba(18, 27, 46, 0.82);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.08),
+            0 12px 34px rgba(214, 156, 44, 0.11);
+        }
+        .eu-act-hero-button:hover {
+          border-color: #f4d47e;
+          color: #fff1c5;
+          background:
+            linear-gradient(
+              135deg,
+              rgba(240, 202, 110, 0.25),
+              rgba(240, 168, 65, 0.09)
+            ),
+            rgba(18, 27, 46, 0.9);
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.12),
+            0 16px 42px rgba(214, 156, 44, 0.19);
+        }
+        .eu-ai-act-homepage-anchor {
+          position: relative;
+          scroll-margin-top: 76px;
+        }
         .trust-row {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
           margin-top: 28px;
         }
-
         .trust-row span {
           padding: 7px 10px;
-          border: 1px solid rgba(151, 178, 220, 0.17);
+          border: 1px solid rgba(147, 172, 216, 0.17);
           border-radius: 999px;
-          color: #9faec2;
-          background: rgba(10, 16, 29, 0.64);
-          font-size: .75rem;
+          color: #a6b5cb;
+          background: rgba(10, 16, 29, 0.62);
+          font-size: 0.76rem;
           font-weight: 760;
         }
-
-        .exchange-compass,
-        .door-card,
-        .marketplace-shell,
-        .steps-grid article,
-        .boundary-grid article {
-          border: 1px solid rgba(151, 178, 220, 0.16);
-          background: rgba(10, 16, 29, 0.78);
-          box-shadow: 0 32px 100px rgba(0,0,0,.32);
+        .hero-console,
+        .panel,
+        .map-board,
+        .route-card,
+        .receipt,
+        .record-preview,
+        .coming-panel {
+          border: 1px solid rgba(149, 174, 216, 0.17);
+          border-radius: 24px;
+          background: rgba(10, 16, 29, 0.82);
+          box-shadow: 0 35px 110px rgba(0, 0, 0, 0.34);
           backdrop-filter: blur(18px);
         }
-
-        .exchange-compass {
-          padding: 25px;
-          border-radius: 27px;
+        .hero-console {
+          position: relative;
+          padding: 24px;
+          overflow: hidden;
         }
-
-        .compass-core {
-          display: grid;
-          place-items: center;
-          width: 145px;
-          height: 145px;
-          margin: 0 auto 31px;
-          border: 1px solid rgba(116, 228, 198, 0.45);
+        .hero-console::before {
+          content: "";
+          position: absolute;
+          inset: -40% auto auto -20%;
+          width: 420px;
+          height: 420px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(116,228,198,.18), rgba(45,89,101,.06) 58%, transparent 60%);
-          box-shadow: 0 0 60px rgba(116,228,198,.15);
+          background: rgba(68, 103, 255, 0.16);
+          filter: blur(50px);
         }
-
-        .compass-core span {
-          font-size: 1.35rem;
-          font-weight: 950;
-        }
-
-        .compass-core strong {
-          margin-top: -27px;
-          color: #74e4c6;
-          font-size: .68rem;
-          letter-spacing: .18em;
-        }
-
-        .compass-core small {
-          margin-top: -28px;
-          color: #7e8da2;
-        }
-
-        .compass-grid {
-          display: grid;
-          gap: 9px;
-        }
-
-        .compass-grid a {
-          display: grid;
-          grid-template-columns: 42px 1fr auto;
-          gap: 13px;
-          align-items: center;
-          padding: 13px;
-          border: 1px solid rgba(151, 178, 220, 0.12);
-          border-radius: 14px;
-          background: rgba(5,10,19,.66);
-          transition: .2s ease;
-        }
-
-        .compass-grid a:hover {
-          border-color: rgba(116, 228, 198, 0.38);
-          transform: translateX(4px);
-        }
-
-        .compass-grid a > span {
+        .console-core {
+          position: relative;
           display: grid;
           place-items: center;
-          width: 42px;
-          height: 42px;
-          border-radius: 11px;
-          color: #74e4c6;
-          background: rgba(116,228,198,.08);
+          width: 132px;
+          height: 132px;
+          margin: 2px auto 26px;
+          border: 1px solid rgba(114, 226, 193, 0.45);
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(114, 226, 193, 0.18),
+            rgba(36, 72, 83, 0.06) 58%,
+            transparent 60%
+          );
+          box-shadow: 0 0 55px rgba(114, 226, 193, 0.16);
+        }
+        .console-core span {
+          font-size: 1.3rem;
           font-weight: 950;
         }
-
-        .compass-grid strong,
-        .compass-grid small {
-          display: block;
+        .console-core strong {
+          margin-top: -26px;
+          color: #72e2c1;
+          font-size: 0.68rem;
+          letter-spacing: 0.2em;
         }
-
-        .compass-grid small {
-          margin-top: 3px;
-          color: #78879c;
+        .console-core small {
+          position: absolute;
+          bottom: -24px;
+          width: 220px;
+          color: #7f8da4;
+          text-align: center;
+        }
+        .console-status {
+          position: relative;
+          margin-top: 44px;
+        }
+        .console-status h2 {
+          font-size: 1.75rem;
+        }
+        dl {
+          margin: 0;
+        }
+        .console-status dl,
+        .route-data {
+          display: grid;
+          gap: 1px;
+          overflow: hidden;
+          border: 1px solid rgba(145, 169, 209, 0.12);
+          border-radius: 14px;
+          background: rgba(145, 169, 209, 0.08);
+        }
+        .console-status dl div,
+        .route-data div {
+          display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          padding: 11px 12px;
+          background: rgba(6, 10, 19, 0.78);
+        }
+        dt {
+          color: #77859b;
+          font-size: 0.74rem;
+          font-weight: 850;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+        dd {
+          margin: 0;
+          color: #d9e4f6;
+          text-align: right;
+        }
+        .motion-list {
+          display: grid;
+          gap: 8px;
+          margin-top: 18px;
+        }
+        .motion-list > div {
+          display: grid;
+          grid-template-columns: minmax(110px, 0.8fr) auto minmax(0, 1.6fr);
+          gap: 12px;
+          align-items: center;
+          padding: 10px 12px;
+          border: 1px solid rgba(147, 171, 214, 0.11);
+          border-radius: 12px;
+          background: rgba(6, 10, 19, 0.62);
+        }
+        .motion-list span {
+          color: #d7e2f4;
+          font-size: 0.78rem;
+          font-weight: 800;
+        }
+        .motion-list small {
+          color: #7f8da3;
           line-height: 1.4;
         }
-
-        .compass-grid b {
-          color: #74e4c6;
+        .state {
+          display: inline-flex;
+          width: fit-content;
+          padding: 5px 8px;
+          border-radius: 7px;
+          font-size: 0.68rem;
+          font-weight: 950;
+          letter-spacing: 0.08em;
         }
-
-        .exchange-compass > p {
-          margin: 17px 0 0;
-          color: #718096;
-          font-size: .75rem;
+        .state-allow {
+          color: #72e2c1;
+          background: rgba(114, 226, 193, 0.11);
         }
-
+        .state-hold {
+          color: #ffc56a;
+          background: rgba(255, 197, 106, 0.11);
+        }
+        .state-deny {
+          color: #ff7d8e;
+          background: rgba(255, 125, 142, 0.11);
+        }
+        .state-escalate {
+          color: #9db7ff;
+          background: rgba(157, 183, 255, 0.11);
+        }
+        .console-note {
+          margin: 16px 0 0;
+          color: #69778c;
+          font-size: 0.72rem;
+          line-height: 1.55;
+        }
         .section-heading {
           max-width: 980px;
-          margin-bottom: 36px;
+          margin-bottom: 34px;
         }
-
         .section-heading > p:last-child {
-          max-width: 850px;
+          max-width: 820px;
           margin-bottom: 0;
           font-size: 1.03rem;
         }
-
+        .split-heading {
+          display: grid;
+          grid-template-columns: minmax(0, 1.1fr) minmax(340px, 0.9fr);
+          gap: 50px;
+          max-width: none;
+          align-items: end;
+        }
+        .split-heading h2 {
+          margin-bottom: 0;
+        }
         .centered {
           margin-left: auto;
           margin-right: auto;
           text-align: center;
         }
-
         .centered > p:last-child {
           margin-left: auto;
           margin-right: auto;
         }
-
-        .doors-section {
-          padding-top: 118px;
+        .start-here {
+          border-top: 1px solid rgba(145, 170, 213, 0.11);
         }
-
-        .door-stack {
+        .journey-grid {
           display: grid;
-          gap: 24px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
         }
-
-        .door-card {
-          position: relative;
-          border: 0;
-          border-radius: 30px;
-          overflow: visible;
-          background: transparent;
-          box-shadow: none;
-          backdrop-filter: none;
+        .journey-card,
+        .playground-card,
+        .result-card,
+        .gallery-card,
+        .surface-grid article,
+        .comparison-grid article,
+        .domain-grid article,
+        .built-grid article,
+        .ta14-principles-grid article {
+          border: 1px solid rgba(149, 174, 216, 0.14);
+          border-radius: 18px;
+          background: rgba(10, 16, 29, 0.68);
         }
-
-        .door-card::before {
-          display: none;
+        .journey-card {
+          min-height: 210px;
+          padding: 18px;
         }
-
-        .gold-door-face {
-          position: relative;
-          display: grid;
-          grid-template-columns: 58px 88px minmax(0, 1fr);
-          gap: 20px;
+        .journey-card > span {
+          display: inline-grid;
+          place-items: center;
+          width: 38px;
+          height: 38px;
+          margin-bottom: 22px;
+          border: 1px solid rgba(114, 226, 193, 0.34);
+          border-radius: 10px;
+          color: #72e2c1;
+          font-weight: 900;
+        }
+        .journey-card p {
+          margin-bottom: 0;
+          font-size: 0.88rem;
+        }
+        .journey-line {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 14px;
+          margin-top: 24px;
+          padding: 17px;
+          border: 1px solid rgba(148, 172, 214, 0.12);
+          border-radius: 16px;
+          background: rgba(7, 12, 23, 0.75);
+        }
+        .journey-line div {
+          display: flex;
           align-items: center;
-          width: 100%;
-          min-height: 365px;
-          padding: clamp(30px, 5vw, 58px);
-          overflow: hidden;
-          border: 1px solid rgba(255, 215, 112, 0.8);
-          border-radius: 30px;
-          color: #fff9e8;
-          text-align: left;
+          gap: 14px;
+          color: #cbd7e9;
+          font-size: 0.78rem;
+        }
+        .journey-line span {
+          color: #56657c;
+        }
+        .map-board {
+          padding: clamp(20px, 4vw, 46px);
+        }
+        .map-node {
+          max-width: 690px;
+          margin: auto;
+          padding: 18px;
+          border: 1px solid rgba(145, 171, 216, 0.17);
+          border-radius: 16px;
+          text-align: center;
+          background: rgba(6, 11, 21, 0.76);
+        }
+        .map-node small,
+        .map-node span {
+          display: block;
+        }
+        .map-node small {
+          margin-bottom: 6px;
+          color: #72e2c1;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+        .map-node strong {
+          display: block;
+          margin-bottom: 6px;
+          font-size: 1.2rem;
+        }
+        .map-node span {
+          color: #8492a8;
+          font-size: 0.86rem;
+        }
+        .map-node-link {
+          position: relative;
+          display: block;
+          color: inherit;
+          text-decoration: none;
           cursor: pointer;
-          background:
-            linear-gradient(135deg, rgba(255,244,190,.12), transparent 26%),
-            linear-gradient(180deg, #2e210b 0%, #171006 48%, #090703 100%);
-          box-shadow:
-            0 30px 95px rgba(0,0,0,.48),
-            inset 0 0 0 2px rgba(129,82,10,.75),
-            inset 0 0 0 8px rgba(255,206,88,.08),
-            inset 0 0 70px rgba(255,188,52,.08);
-          transition:
-            transform .32s ease,
-            box-shadow .32s ease,
-            border-color .32s ease;
+          overflow: hidden;
+          box-shadow: 0 16px 50px rgba(0, 0, 0, 0.24);
+          transition: transform 0.25s ease, border-color 0.25s ease,
+            box-shadow 0.25s ease, background 0.25s ease;
         }
-
-        .gold-door-face:hover,
-        .gold-door-face:focus-visible {
-          transform: translateY(-5px) perspective(1200px) rotateX(1deg);
-          border-color: #ffe09a;
-          box-shadow:
-            0 40px 120px rgba(0,0,0,.56),
-            0 0 45px rgba(255,195,58,.18),
-            inset 0 0 0 2px rgba(150,96,12,.9),
-            inset 0 0 0 8px rgba(255,221,128,.11),
-            inset 0 0 90px rgba(255,195,58,.12);
-          outline: none;
-        }
-
-        .gold-door-slab {
+        .map-node-link::before {
+          content: "";
           position: absolute;
           inset: 0;
+          background: linear-gradient(110deg, transparent 30%, rgba(114, 226, 193, 0.1) 48%, transparent 66%);
+          transform: translateX(-120%);
+          transition: transform 0.7s ease;
+        }
+        .map-node-link:hover,
+        .map-node-link:focus-visible {
+          transform: translateY(-4px);
+          border-color: rgba(114, 226, 193, 0.52);
+          background: rgba(10, 18, 31, 0.92);
+          box-shadow: 0 22px 70px rgba(0, 0, 0, 0.34), 0 0 35px rgba(114, 226, 193, 0.08);
+        }
+        .map-node-link:hover::before,
+        .map-node-link:focus-visible::before { transform: translateX(120%); }
+        .map-node-action {
+          position: relative;
           z-index: 1;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          margin-top: 14px;
+          padding: 8px 13px;
+          border: 1px solid rgba(114, 226, 193, 0.18);
+          border-radius: 999px;
+          color: #c9f8e8;
+          background: rgba(114, 226, 193, 0.06);
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+        }
+        .map-node-action i { color: #72e2c1; font-style: normal; transition: transform 0.2s ease; }
+        .map-node-link:hover .map-node-action i,
+        .map-node-link:focus-visible .map-node-action i { transform: translateX(3px); }
+        .map-connector {
+          padding: 12px;
+          color: #72e2c1;
+          text-align: center;
+          font-size: 1.3rem;
+        }
+        .map-workspaces {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 20px;
+          align-items: stretch;
+        }
+        .gateway-link {
           display: block;
+          min-width: 0;
+          color: inherit;
+          text-decoration: none;
+        }
+        .gateway {
+          --accent: #72e2c1;
+          --accent-rgb: 114, 226, 193;
+          --gold: #ffc857;
+          --gold-bright: #fff0a8;
+          --gold-rgb: 255, 200, 87;
+          position: relative;
+          display: flex;
+          min-height: 470px;
+          height: 100%;
+          flex-direction: column;
+          padding: 22px;
           overflow: hidden;
-          border-radius: inherit;
-          transform-origin: left center;
-          transform-style: preserve-3d;
-          backface-visibility: hidden;
-          transition:
-            transform .72s cubic-bezier(.2,.75,.2,1),
-            filter .45s ease,
-            box-shadow .45s ease;
-          background:
-            linear-gradient(135deg, rgba(255,244,190,.12), transparent 26%),
-            linear-gradient(180deg, #2e210b 0%, #171006 48%, #090703 100%);
-          box-shadow:
-            inset 0 0 0 2px rgba(129,82,10,.75),
-            inset 0 0 0 8px rgba(255,206,88,.08),
-            inset 0 0 70px rgba(255,188,52,.08);
-          pointer-events: none;
-        }
-
-        .gold-door-face:hover .gold-door-slab,
-        .gold-door-face:focus-visible .gold-door-slab {
-          transform: perspective(1450px) rotateY(-34deg) translateX(-7px);
-          filter: brightness(1.08);
-          box-shadow:
-            30px 10px 50px rgba(0,0,0,.52),
-            inset -18px 0 32px rgba(0,0,0,.28),
-            inset 0 0 0 2px rgba(150,96,12,.9),
-            inset 0 0 0 8px rgba(255,221,128,.11);
-        }
-
-        .gold-door.is-open .gold-door-slab {
-          transform: perspective(1450px) rotateY(-48deg) translateX(-10px);
-          filter: brightness(1.12);
-        }
-
-        .doorway-light {
-          position: absolute;
-          inset: 8px;
-          z-index: 0;
+          border: 1px solid rgba(var(--accent-rgb), 0.34);
           border-radius: 24px;
-          opacity: 0;
-          background:
-            radial-gradient(circle at 72% 48%, rgba(255,255,242,.98) 0 5%, rgba(255,235,158,.94) 14%, rgba(255,189,54,.48) 37%, transparent 72%),
-            linear-gradient(90deg, rgba(255,194,55,.06), rgba(255,238,173,.52));
+          color: #f7f9ff;
+          background: radial-gradient(
+              circle at 74% 58%,
+              rgba(var(--gold-rgb), 0.11),
+              transparent 30%
+            ),
+            linear-gradient(
+              160deg,
+              rgba(var(--accent-rgb), 0.09),
+              rgba(7, 12, 23, 0.96) 43%,
+              rgba(3, 7, 14, 0.99)
+            );
           box-shadow:
-            inset 0 0 85px rgba(255,231,147,.74),
-            0 0 75px rgba(255,196,55,.46),
-            0 0 150px rgba(255,177,25,.24);
-          transition: opacity .5s ease, filter .5s ease;
-          pointer-events: none;
+            0 20px 70px rgba(0, 0, 0, 0.42),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+          transition:
+            transform 0.35s ease,
+            border-color 0.35s ease,
+            box-shadow 0.35s ease;
         }
-
-        .gold-door-face:hover .doorway-light,
-        .gold-door-face:focus-visible .doorway-light,
-        .gold-door.is-open .doorway-light {
-          opacity: 1;
-          filter: brightness(1.16);
-          animation: doorwayFlicker 2.8s ease-in-out infinite;
-        }
-
-        .doorway-floor-light {
+        .gateway::before {
+          content: "";
           position: absolute;
-          z-index: 0;
-          right: 3%;
-          bottom: -27%;
-          width: 58%;
-          height: 58%;
-          opacity: 0;
-          border-radius: 50%;
-          background: radial-gradient(ellipse, rgba(255,235,165,.68), rgba(255,184,41,.22) 44%, transparent 72%);
-          filter: blur(8px);
-          transform: perspective(700px) rotateX(67deg);
-          transition: opacity .52s ease, transform .52s ease;
-          pointer-events: none;
+          inset: 0;
+          background: linear-gradient(
+            115deg,
+            transparent 36%,
+            rgba(255, 255, 255, 0.08) 49%,
+            transparent 62%
+          );
+          transform: translateX(-115%);
+          transition: transform 0.9s ease;
         }
-
-        .gold-door-face:hover .doorway-floor-light,
-        .gold-door-face:focus-visible .doorway-floor-light,
-        .gold-door.is-open .doorway-floor-light {
-          opacity: 1;
-          transform: perspective(700px) rotateX(67deg) scale(1.12);
-        }
-
-        .gold-door.is-open .gold-door-face {
-          transform: perspective(1300px) rotateY(-2.2deg) translateX(-5px);
-          border-color: #ffe9ae;
-          box-shadow:
-            26px 34px 110px rgba(0,0,0,.62),
-            0 0 70px rgba(255,195,58,.24),
-            inset 0 0 0 2px rgba(173,112,14,.95),
-            inset 0 0 0 8px rgba(255,226,143,.13);
-        }
-
-        .gold-door-frame {
+        .gateway::after {
+          content: "";
           position: absolute;
-          inset: 18px;
-          border: 2px solid rgba(255,215,112,.34);
-          border-radius: 21px;
-          box-shadow:
-            inset 0 0 0 7px rgba(93,57,7,.75),
-            0 0 26px rgba(255,197,61,.08);
-          pointer-events: none;
-        }
-
-        .gold-door-panel {
-          position: absolute;
-          right: 5.2%;
-          width: 30%;
-          border: 1px solid rgba(255,215,112,.3);
-          border-radius: 12px;
-          background:
-            linear-gradient(145deg, rgba(255,220,128,.09), transparent 45%),
-            rgba(79,48,7,.2);
-          box-shadow:
-            inset 0 0 0 5px rgba(18,12,3,.5),
-            inset 0 0 35px rgba(255,190,37,.05);
-          pointer-events: none;
-        }
-
-        .panel-top {
-          top: 12%;
-          height: 21%;
-        }
-
-        .panel-middle {
-          top: 38%;
-          height: 21%;
-        }
-
-        .panel-bottom {
-          top: 64%;
-          height: 24%;
-        }
-
-        .gold-door-handle {
-          position: absolute;
-          right: 7.2%;
-          top: 50%;
-          width: 16px;
-          height: 16px;
-          border: 2px solid #ffe39c;
-          border-radius: 50%;
-          background: #b97a12;
-          box-shadow:
-            0 0 0 5px rgba(59,35,5,.92),
-            0 0 21px rgba(255,202,73,.48);
-          transform: translateY(-50%);
-          pointer-events: none;
-        }
-
-        .gold-door-light {
-          position: absolute;
-          top: -38%;
-          left: 17%;
-          width: 34%;
-          height: 170%;
+          inset: auto 8% 0;
+          height: 1px;
           background: linear-gradient(
             90deg,
             transparent,
-            rgba(255,239,179,.14),
+            rgba(var(--gold-rgb), 0.85),
             transparent
           );
-          transform: rotate(18deg);
-          animation: goldSweep 8s ease-in-out infinite;
-          pointer-events: none;
+          box-shadow: 0 0 20px rgba(var(--gold-rgb), 0.55);
         }
-
-        .door-number {
-          position: relative;
-          z-index: 4;
-          color: #c7973b;
-          font-size: .8rem;
-          font-weight: 950;
-          letter-spacing: .12em;
-        }
-
-        .door-emblem {
-          position: relative;
-          z-index: 4;
-          display: grid;
-          place-items: center;
-          width: 82px;
-          height: 82px;
-          border: 1px solid rgba(255,219,126,.7);
-          border-radius: 22px;
-          color: #ffe19a;
-          background:
-            radial-gradient(circle, rgba(255,218,118,.18), rgba(83,48,4,.38));
-          font-size: 1.25rem;
-          font-weight: 950;
+        .gateway-link:hover .gateway,
+        .gateway-link:focus-visible .gateway {
+          transform: translateY(-10px) scale(1.012);
+          border-color: rgba(var(--gold-rgb), 0.76);
           box-shadow:
-            inset 0 0 30px rgba(255,210,91,.11),
-            0 0 30px rgba(255,195,58,.08);
+            0 30px 100px rgba(var(--gold-rgb), 0.13),
+            0 18px 70px rgba(0, 0, 0, 0.5);
         }
-
-        .door-emblem i {
-          position: absolute;
-          inset: 10px;
-          border: 1px solid rgba(255,224,147,.25);
-          border-radius: 16px;
-          animation: pulse 4s ease-in-out infinite;
+        .gateway-link:hover .gateway::before,
+        .gateway-link:focus-visible .gateway::before {
+          transform: translateX(115%);
         }
-
-        .gold-door-copy {
+        .gateway-2 {
+          --accent: #4aa3ff;
+          --accent-rgb: 74, 163, 255;
+        }
+        .gateway-3 {
+          --accent: #c46cff;
+          --accent-rgb: 196, 108, 255;
+        }
+        .gateway-4 {
+          --accent: #ffad32;
+          --accent-rgb: 255, 173, 50;
+        }
+        .gateway-head,
+        .gateway-body,
+        .gateway-action {
           position: relative;
-          z-index: 4;
-          display: block;
-          max-width: 760px;
-          padding: 18px 31% 18px 18px;
-          border-radius: 18px;
-          transition: background .35s ease, backdrop-filter .35s ease;
+          z-index: 2;
         }
-
-        .gold-door-face:hover .gold-door-copy,
-        .gold-door-face:focus-visible .gold-door-copy,
-        .gold-door.is-open .gold-door-copy {
-          background: rgba(8, 6, 2, .68);
-          backdrop-filter: blur(6px);
+        .gateway-head {
+          display: flex;
+          gap: 14px;
+          align-items: flex-start;
         }
-
-        .door-kicker {
-          display: block;
-          margin: 0 0 10px;
-          color: #e8b951;
-        }
-
-        .intent-question {
-          display: block;
-          margin: 0 0 9px;
-          color: #fff7df;
-          font-size: clamp(1rem, 1.5vw, 1.32rem);
-          font-weight: 900;
-          letter-spacing: -.02em;
-        }
-
-        .gold-door-title {
-          display: block;
-          margin-bottom: 9px;
-          color: #fff;
-          font-size: clamp(2.2rem, 4.2vw, 4.7rem);
-          font-weight: 950;
-          line-height: .96;
-          letter-spacing: -.055em;
-        }
-
-        .gold-door-statement {
-          display: block;
-          max-width: 690px;
-          color: #d7c8a4;
-          font-size: 1rem;
-          font-weight: 760;
-          line-height: 1.58;
-        }
-
-        .gold-door-instruction {
-          display: inline-flex;
-          align-items: center;
-          gap: 12px;
-          margin-top: 25px;
-          color: #ffe29b;
-          font-size: .78rem;
-          font-weight: 950;
-          letter-spacing: .1em;
-          text-transform: uppercase;
-        }
-
-        .gold-door-instruction b {
+        .gateway-badge {
           display: grid;
+          width: 54px;
+          height: 54px;
+          flex: 0 0 54px;
           place-items: center;
-          width: 28px;
-          height: 28px;
-          border: 1px solid rgba(255,221,136,.48);
-          border-radius: 50%;
-          font-size: 1.1rem;
-        }
-
-        .star-burst {
-          position: absolute;
-          z-index: 7;
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          opacity: 0;
-          background: #fff9d9;
-          box-shadow:
-            0 0 9px #fff,
-            0 0 20px #ffd66d,
-            0 0 42px rgba(255,193,43,.9);
-          pointer-events: none;
-        }
-
-        .burst-one { top: 18%; left: 14%; }
-        .burst-two { top: 22%; right: 16%; }
-        .burst-three { bottom: 20%; left: 24%; }
-        .burst-four { bottom: 14%; right: 27%; }
-        .burst-five { top: 52%; left: 52%; }
-
-        .gold-door.is-open .star-burst {
-          animation: explodeStar 1.15s cubic-bezier(.17,.84,.31,1) both;
-        }
-
-        .gold-door.is-open .burst-two { animation-delay: .08s; }
-        .gold-door.is-open .burst-three { animation-delay: .14s; }
-        .gold-door.is-open .burst-four { animation-delay: .2s; }
-        .gold-door.is-open .burst-five { animation-delay: .26s; }
-
-        .door-panel {
-          margin: 16px 20px 0;
-          padding: clamp(24px, 4vw, 44px);
-          border: 1px solid rgba(255,215,112,.24);
-          border-radius: 0 0 28px 28px;
-          background:
-            radial-gradient(circle at 50% 0%, rgba(255,195,58,.08), transparent 38%),
-            rgba(10,14,23,.94);
-          box-shadow: 0 28px 85px rgba(0,0,0,.38);
-          animation: revealPanel .36s ease both;
-        }
-
-        .door-visual {
-          position: relative;
-          z-index: 1;
-          height: 215px;
-          margin: 0 0 24px;
-          border: 1px solid rgba(255,215,112,.16);
-          border-radius: 22px;
-          overflow: hidden;
-          background:
-            radial-gradient(circle at 50% 50%, rgba(255,197,61,.11), transparent 28%),
-            rgba(4,9,18,.7);
-        }
-
-        .visual-grid {
-          position: absolute;
-          inset: 0;
-          opacity: .22;
-          background-image:
-            linear-gradient(rgba(255,215,112,.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,215,112,.1) 1px, transparent 1px);
-          background-size: 32px 32px;
-          mask-image: linear-gradient(90deg, transparent, black 20%, black 80%, transparent);
-        }
-
-        .visual-core {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          display: grid;
-          place-items: center;
-          width: 92px;
-          height: 92px;
-          border: 1px solid rgba(255,219,126,.52);
-          border-radius: 50%;
-          color: #ffe19a;
-          background: radial-gradient(circle, rgba(255,212,94,.17), rgba(4,9,18,.94) 70%);
-          box-shadow: 0 0 50px rgba(255,195,58,.18);
-          transform: translate(-50%, -50%);
-          animation: corePulse 4.5s ease-in-out infinite;
-        }
-
-        .visual-core::before,
-        .visual-core::after {
-          content: "";
-          position: absolute;
-          border: 1px solid rgba(255,219,126,.18);
-          border-radius: 50%;
-          animation: rotate 16s linear infinite;
-        }
-
-        .visual-core::before { inset: -34px; }
-        .visual-core::after {
-          inset: -62px;
-          animation-direction: reverse;
-          animation-duration: 24s;
-        }
-
-        .visual-core span {
+          border: 1px solid rgba(var(--accent-rgb), 0.82);
+          border-radius: 14px;
+          color: var(--accent);
+          background: rgba(var(--accent-rgb), 0.09);
+          box-shadow: 0 0 24px rgba(var(--accent-rgb), 0.15);
+          font-size: 1.2rem;
           font-weight: 950;
-          letter-spacing: .08em;
         }
-
-        .visual-node {
-          position: absolute;
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: #ffd76f;
-          box-shadow: 0 0 16px rgba(255,207,83,.85);
-          animation: nodeFloat 5s ease-in-out infinite;
+        .gateway-head strong {
+          display: block;
+          margin-top: 2px;
+          font-size: 1.08rem;
         }
-
-        .node-a { left: 15%; top: 28%; }
-        .node-b { right: 17%; top: 24%; animation-delay: -1.4s; }
-        .node-c { left: 23%; bottom: 23%; animation-delay: -2.6s; }
-        .node-d { right: 24%; bottom: 22%; animation-delay: -3.6s; }
-
-        .visual-route {
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 32%;
-          height: 1px;
-          transform-origin: left center;
-          background: linear-gradient(90deg, rgba(255,211,100,.82), transparent);
-          filter: drop-shadow(0 0 5px rgba(255,202,73,.52));
-          animation: routeGlow 3.2s ease-in-out infinite;
+        .gateway-head small {
+          display: block;
+          margin-top: 7px;
+          color: #9baac0;
+          font-size: 0.77rem;
+          line-height: 1.5;
         }
-
-        .route-a { transform: rotate(-150deg); }
-        .route-b { transform: rotate(-30deg); animation-delay: -1.1s; }
-        .route-c { transform: rotate(145deg); animation-delay: -2.1s; }
-
-        .door-content {
-
-          position: relative;
-          z-index: 3;
+        .gateway-body {
           display: grid;
-          grid-template-columns: minmax(0, 1.12fr) minmax(360px, .88fr);
-          gap: clamp(30px, 5vw, 70px);
-          padding-top: 30px;
-        }
-
-        .door-explanation > p {
-          max-width: 760px;
-          font-size: 1.04rem;
-        }
-
-        .door-explanation ul,
-        .boundary-grid ul {
-          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
           gap: 10px;
-          margin: 24px 0 0;
+          align-items: end;
+          flex: 1;
+          margin-top: 20px;
+        }
+        .gateway-body ul {
+          margin: 0 0 18px;
           padding: 0;
           list-style: none;
         }
-
-        .door-explanation li {
-          display: flex;
-          gap: 11px;
-          align-items: center;
-          color: #cfdaea;
+        .gateway-body li {
+          position: relative;
+          margin: 0 0 11px;
+          padding-left: 18px;
+          color: #c8d3e3;
+          font-size: 0.75rem;
         }
-
-        .door-explanation li span {
-          color: #74e4c6;
+        .gateway-body li::before {
+          content: "✦";
+          position: absolute;
+          left: 0;
+          color: var(--accent);
+          font-size: 0.62rem;
         }
-
-        .door-actions {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
+        .door-frame {
+          position: relative;
+          min-height: 250px;
+          align-self: end;
+          perspective: 900px;
         }
-
-        .door-primary {
-          justify-content: space-between;
-          min-height: 58px;
-          padding: 0 22px;
-          font-size: 1rem;
+        .door-rays {
+          position: absolute;
+          left: 50%;
+          bottom: 20px;
+          width: 210px;
+          height: 230px;
+          transform: translateX(-50%);
+          background: repeating-conic-gradient(
+            from 180deg at 50% 100%,
+            rgba(var(--gold-rgb), 0.13) 0 3deg,
+            transparent 3deg 14deg
+          );
+          filter: blur(1px);
+          opacity: 0.52;
+          animation: raysBreathe 4.8s ease-in-out infinite;
         }
-
-        .route-buttons {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
+        .door-glow {
+          position: absolute;
+          left: 50%;
+          bottom: 16px;
+          width: 150px;
+          height: 220px;
+          transform: translateX(-50%);
+          border-radius: 76px 76px 10px 10px;
+          background: rgba(var(--gold-rgb), 0.24);
+          filter: blur(30px);
+          animation: doorPulse 3.8s ease-in-out infinite;
         }
-
-        .route-chip {
-          display: inline-flex;
-          align-items: center;
-          min-height: 38px;
-          padding: 0 12px;
-          border: 1px solid rgba(151,178,220,.18);
-          border-radius: 999px;
-          color: #bdcadc;
-          background: rgba(6,11,21,.62);
-          font-size: .76rem;
-          font-weight: 820;
-          transition: .18s ease;
-        }
-
-        .route-chip:hover {
-          color: #fff;
-          border-color: rgba(116,228,198,.38);
-          transform: translateY(-1px);
-        }
-
-        .route-chip.special {
-          color: #d7e1ff;
-          border-color: rgba(138,168,255,.28);
-          background: rgba(103,129,216,.08);
-        }
-
-        .marketplace-button {
-          display: grid;
-          grid-template-columns: 1fr auto;
-          gap: 4px 12px;
-          align-items: center;
-          margin-top: 2px;
-          padding: 13px 15px;
-          border: 1px solid rgba(151,178,220,.15);
-          border-radius: 13px;
-          background: rgba(5,10,19,.58);
-        }
-
-        .marketplace-button span {
-          color: #728197;
-          font-size: .67rem;
-          font-weight: 900;
-          letter-spacing: .09em;
-          text-transform: uppercase;
-        }
-
-        .marketplace-button strong {
-          grid-column: 1;
-          color: #d9e5f5;
-          font-size: .82rem;
-        }
-
-        .marketplace-button b {
-          grid-column: 2;
-          grid-row: 1 / span 2;
-          color: #74e4c6;
-        }
-
-        .marketplace-shell {
-          display: grid;
-          grid-template-columns: minmax(0, 1.2fr) minmax(320px, .8fr);
-          gap: 50px;
-          align-items: center;
-          padding: clamp(30px, 5vw, 58px);
-          border-radius: 30px;
+        .door-interior {
+          position: absolute;
+          left: 50%;
+          bottom: 24px;
+          width: 118px;
+          height: 194px;
+          overflow: hidden;
+          transform: translateX(-50%);
+          border-radius: 58px 58px 6px 6px;
           background:
-            radial-gradient(circle at 92% 20%, rgba(116,228,198,.11), transparent 35%),
-            rgba(10,16,29,.8);
+            radial-gradient(circle at 50% 62%, rgba(255, 247, 205, 0.9) 0 3%, transparent 4%),
+            radial-gradient(circle at 50% 76%, rgba(var(--accent-rgb), 0.36), transparent 54%),
+            linear-gradient(180deg, #030915 0%, rgba(var(--accent-rgb), 0.22) 58%, rgba(var(--gold-rgb), 0.26) 100%);
+          box-shadow:
+            inset 0 0 34px rgba(var(--accent-rgb), 0.25),
+            0 0 30px rgba(var(--gold-rgb), 0.34);
         }
-
-        .marketplace-shell h2 {
-          font-size: clamp(2rem, 4vw, 4rem);
+        .portal-horizon {
+          position: absolute;
+          left: 12%;
+          right: 12%;
+          bottom: 24%;
+          height: 2px;
+          background: linear-gradient(90deg, transparent, rgba(255, 240, 177, 0.9), transparent);
+          box-shadow: 0 0 15px rgba(var(--gold-rgb), 0.9);
         }
-
-        .marketplace-actions {
-          justify-content: flex-end;
-          margin-top: 0;
+        .portal-particle {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: #fff6c8;
+          box-shadow: 0 0 10px rgba(var(--gold-rgb), 1);
+          animation: portalDrift 3.6s ease-in-out infinite;
         }
-
-        .steps-grid {
+        .particle-one { left: 24%; top: 34%; animation-delay: -0.8s; }
+        .particle-two { right: 22%; top: 48%; animation-delay: -2.1s; }
+        .particle-three { left: 52%; top: 20%; animation-delay: -1.4s; }
+        .door-arch {
+          position: absolute;
+          left: 50%;
+          bottom: 22px;
+          width: 142px;
+          height: 216px;
+          transform: translateX(-50%);
+          border: 2px solid rgba(var(--gold-rgb), 0.72);
+          border-bottom: 0;
+          border-radius: 74px 74px 4px 4px;
+          box-shadow:
+            0 0 18px rgba(var(--gold-rgb), 0.55),
+            inset 0 0 20px rgba(var(--gold-rgb), 0.12);
+        }
+        .door-panel {
+          position: absolute;
+          left: 50%;
+          bottom: 22px;
+          width: 124px;
+          height: 200px;
+          transform: translateX(-50%) rotateY(-4deg);
+          transform-origin: left center;
+          border: 3px solid var(--gold);
+          border-bottom-width: 6px;
+          border-radius: 64px 64px 7px 7px / 54px 54px 7px 7px;
+          background: linear-gradient(
+              90deg,
+              rgba(255, 255, 255, 0.08),
+              transparent 18%,
+              transparent 82%,
+              rgba(255, 255, 255, 0.06)
+            ),
+            linear-gradient(
+              180deg,
+              rgba(var(--gold-rgb), 0.42),
+              rgba(65, 36, 4, 0.92) 48%,
+              rgba(17, 10, 2, 0.98)
+            );
+          box-shadow:
+            0 0 14px rgba(var(--gold-rgb), 0.95),
+            0 0 44px rgba(var(--gold-rgb), 0.55),
+            inset 0 0 34px rgba(var(--gold-rgb), 0.24);
+          transition:
+            transform 0.55s cubic-bezier(0.2, 0.8, 0.2, 1),
+            box-shadow 0.45s ease;
+        }
+        .gateway-link:hover .door-panel,
+        .gateway-link:focus-visible .door-panel {
+          transform: translateX(-50%) rotateY(-26deg) translateZ(10px);
+          box-shadow:
+            0 0 24px rgba(var(--gold-rgb), 1),
+            0 0 76px rgba(var(--gold-rgb), 0.78),
+            inset 0 0 42px rgba(var(--gold-rgb), 0.34);
+        }
+        .door-panel::before {
+          content: "";
+          position: absolute;
+          inset: 15px;
+          border: 1px solid rgba(255, 235, 165, 0.58);
+          border-radius: 49px 49px 4px 4px / 42px 42px 4px 4px;
+          box-shadow: inset 0 0 18px rgba(var(--gold-rgb), 0.2);
+        }
+        .door-panel::after {
+          content: "";
+          position: absolute;
+          left: 50%;
+          top: 14px;
+          bottom: 14px;
+          width: 1px;
+          background: linear-gradient(
+            transparent,
+            rgba(255, 239, 183, 0.5),
+            transparent
+          );
+        }
+        .door-panel span {
+          position: absolute;
+          left: 50%;
+          top: 52%;
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
-        }
-
-        .steps-grid article {
-          min-height: 230px;
-          padding: 23px;
-          border-radius: 20px;
-        }
-
-        .steps-grid article > span {
-          display: grid;
+          width: 58px;
+          height: 58px;
+          transform: translate(-50%, -50%);
           place-items: center;
+          border: 2px solid var(--gold-bright);
+          border-radius: 50%;
+          color: #fff7d1;
+          background: rgba(74, 42, 4, 0.7);
+          box-shadow: 0 0 26px rgba(var(--gold-rgb), 0.72);
+          font-size: 1.2rem;
+          font-weight: 950;
+        }
+        .door-knob {
+          position: absolute;
+          right: 14px;
+          top: 54%;
+          width: 7px;
+          height: 7px;
+          border-radius: 50%;
+          background: #fff0a8;
+          box-shadow: 0 0 9px rgba(var(--gold-rgb), 1);
+        }
+        .door-threshold {
+          position: absolute;
+          left: 50%;
+          bottom: 15px;
+          width: 168px;
+          height: 22px;
+          transform: translateX(-50%) perspective(100px) rotateX(55deg);
+          border: 1px solid rgba(var(--gold-rgb), 0.72);
+          background: linear-gradient(
+            180deg,
+            rgba(var(--gold-rgb), 0.48),
+            rgba(var(--gold-rgb), 0.06)
+          );
+          box-shadow: 0 0 30px rgba(var(--gold-rgb), 0.5);
+        }
+        .door-step {
+          position: absolute;
+          left: 50%;
+          bottom: 5px;
+          width: 182px;
+          height: 15px;
+          transform: translateX(-50%);
+          border: 1px solid rgba(var(--gold-rgb), 0.7);
+          border-radius: 50%;
+          background: rgba(var(--gold-rgb), 0.2);
+          box-shadow: 0 0 34px rgba(var(--gold-rgb), 0.45);
+        }
+        .gateway-action {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 10px;
+          padding: 14px 15px;
+          border: 1px solid rgba(var(--gold-rgb), 0.78);
+          border-radius: 11px;
+          color: #fff8dc;
+          background: linear-gradient(
+            180deg,
+            rgba(var(--gold-rgb), 0.48),
+            rgba(88, 49, 4, 0.62)
+          );
+          box-shadow:
+            inset 0 1px 0 rgba(255, 255, 255, 0.2),
+            0 8px 28px rgba(var(--gold-rgb), 0.14);
+          font-size: 0.84rem;
+          font-weight: 900;
+        }
+        .gateway-action-default,
+        .gateway-action-hover {
+          transition:
+            opacity 0.22s ease,
+            transform 0.22s ease;
+        }
+        .gateway-action-hover {
+          position: absolute;
+          left: 15px;
+          opacity: 0;
+          transform: translateY(7px);
+        }
+        .gateway-action b {
+          margin-left: auto;
+          font-size: 1.2rem;
+          transition: transform 0.25s ease;
+        }
+        .gateway-link:hover .gateway-action-default,
+        .gateway-link:focus-visible .gateway-action-default {
+          opacity: 0;
+          transform: translateY(-7px);
+        }
+        .gateway-link:hover .gateway-action-hover,
+        .gateway-link:focus-visible .gateway-action-hover {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .gateway-link:hover .gateway-action b,
+        .gateway-link:focus-visible .gateway-action b {
+          transform: translateX(6px);
+        }
+        .chain-section { overflow: hidden; }
+        .ta14-chain-track {
+          display: grid;
+          grid-template-columns: repeat(8, minmax(0, 1fr));
+          gap: 10px;
+          margin: 42px 0 24px;
+        }
+        .ta14-chain-stage {
+          position: relative;
+          display: flex;
+          min-height: 112px;
+          flex-direction: column;
+          justify-content: space-between;
+          padding: 16px 14px;
+          border: 1px solid rgba(114, 226, 193, 0.18);
+          border-radius: 16px;
+          background: radial-gradient(circle at 20% 0%, rgba(114, 226, 193, 0.1), transparent 42%), rgba(8, 15, 27, 0.82);
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+        }
+        .ta14-chain-number { color: #72e2c1; font-size: 0.72rem; font-weight: 900; letter-spacing: 0.12em; }
+        .ta14-chain-stage strong { color: #f5f8ff; font-size: 0.9rem; line-height: 1.2; }
+        .ta14-chain-arrow {
+          position: absolute;
+          top: 50%;
+          right: -11px;
+          z-index: 3;
+          display: grid;
+          width: 20px;
+          height: 20px;
+          place-items: center;
+          transform: translateY(-50%);
+          border: 1px solid rgba(114, 226, 193, 0.22);
+          border-radius: 50%;
+          color: #72e2c1;
+          background: #08101d;
+          font-size: 0.68rem;
+          font-style: normal;
+        }
+        .ta14-principles-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+        .ta14-principles-grid article {
+          position: relative;
+          min-height: 190px;
+          padding: 24px;
+          overflow: hidden;
+          background: linear-gradient(145deg, rgba(114, 226, 193, 0.055), transparent 52%), rgba(8, 14, 25, 0.8);
+        }
+        .ta14-principles-grid article > span {
+          display: grid;
           width: 42px;
           height: 42px;
           margin-bottom: 28px;
-          border: 1px solid rgba(116,228,198,.35);
-          border-radius: 11px;
-          color: #74e4c6;
-          font-weight: 950;
+          place-items: center;
+          border: 1px solid rgba(114, 226, 193, 0.24);
+          border-radius: 12px;
+          color: #72e2c1;
+          background: rgba(114, 226, 193, 0.07);
+          font-size: 1.1rem;
         }
-
-        .steps-grid h3 {
-          font-size: 1.2rem;
+        .ta14-principles-grid h3 { margin: 0 0 10px; font-size: 1.05rem; }
+        .ta14-principles-grid p { margin: 0; color: #9aa9bf; font-size: 0.9rem; line-height: 1.7; }
+        @keyframes doorPulse {
+          0%,
+          100% {
+            opacity: 0.45;
+            transform: translateX(-50%) scale(0.96);
+          }
+          50% {
+            opacity: 0.9;
+            transform: translateX(-50%) scale(1.04);
+          }
         }
-
-        .steps-grid p {
-          margin-bottom: 0;
-          font-size: .9rem;
+        @keyframes raysBreathe {
+          0%,
+          100% {
+            opacity: 0.28;
+            transform: translateX(-50%) scale(0.96);
+          }
+          50% {
+            opacity: 0.65;
+            transform: translateX(-50%) scale(1.04);
+          }
         }
-
-        .chain-track {
+        @keyframes portalDrift {
+          0%, 100% { transform: translate3d(0, 8px, 0) scale(0.8); opacity: 0.25; }
+          50% { transform: translate3d(3px, -16px, 0) scale(1.25); opacity: 1; }
+        }
+        .map-shared {
           display: grid;
           grid-template-columns: repeat(8, minmax(0, 1fr));
           gap: 8px;
         }
-
-        .chain-track div {
-          position: relative;
-          min-height: 120px;
+        .map-shared span {
+          padding: 11px 5px;
+          border: 1px solid rgba(114, 226, 193, 0.18);
+          border-radius: 10px;
+          color: #b7c8df;
+          text-align: center;
+          background: rgba(114, 226, 193, 0.04);
+          font-size: 0.72rem;
+          font-weight: 800;
+        }
+        .map-caption {
+          max-width: 850px;
+          margin: 24px auto 0;
+          text-align: center;
+        }
+        .results-path {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 18px;
+        }
+        .results-path div {
           padding: 16px;
-          border: 1px solid rgba(151,178,220,.14);
-          border-radius: 16px;
-          background: rgba(10,16,29,.7);
+          border: 1px solid rgba(145, 171, 213, 0.12);
+          border-radius: 14px;
+          background: rgba(7, 12, 23, 0.7);
         }
-
-        .chain-track span {
-          color: #74e4c6;
-          font-size: .7rem;
-          font-weight: 950;
-        }
-
-        .chain-track strong {
+        .results-path strong,
+        .results-path span {
           display: block;
-          margin-top: 47px;
-          font-size: .88rem;
         }
-
-        .chain-track i {
-          position: absolute;
-          top: 50%;
-          right: -9px;
-          z-index: 2;
-          color: #526178;
-          font-style: normal;
+        .results-path span {
+          margin-top: 5px;
+          color: #718097;
+          font-size: 0.76rem;
         }
-
-        .boundary-grid {
+        .coming-panel {
+          display: grid;
+          grid-template-columns: minmax(260px, 0.6fr) minmax(0, 1.4fr);
+          gap: 30px;
+          align-items: center;
+          margin-top: 18px;
+          padding: 22px;
+        }
+        .coming-panel h3 {
+          margin-bottom: 0;
+          word-break: break-word;
+        }
+        .coming-panel p {
+          margin-bottom: 0;
+        }
+        .gallery-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .gallery-card {
+          min-height: 230px;
+          padding: 20px;
+        }
+        .gallery-card > span {
+          color: #72e2c1;
+          font-size: 0.72rem;
+          font-weight: 900;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+        .gallery-card h3 {
+          margin-top: 40px;
+        }
+        .gallery-card small {
+          color: #67768c;
+        }
+        .surface-grid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .surface-grid article {
+          min-height: 240px;
+          padding: 22px;
+        }
+        .surface-grid article > span {
+          color: #72e2c1;
+          font-size: 1.25rem;
+          font-weight: 900;
+        }
+        .surface-grid h3 {
+          margin-top: 38px;
+        }
+        .governed-records-entry {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 12px;
+          margin: -10px 0 28px;
+        }
+        .comparison-grid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 18px;
         }
-
-        .boundary-grid article {
-          padding: clamp(28px, 4vw, 45px);
-          border-radius: 26px;
+        .comparison-grid article {
+          padding: 26px;
+        }
+        .comparison-grid .governed {
+          border-color: rgba(114, 226, 193, 0.3);
+          background: linear-gradient(
+            145deg,
+            rgba(17, 41, 42, 0.72),
+            rgba(9, 16, 29, 0.8)
+          );
+        }
+        ul {
+          margin: 20px 0 0;
+          padding-left: 20px;
+          color: #aebbd0;
+          line-height: 1.8;
+        }
+        .domain-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+        }
+        .domain-grid article {
+          min-height: 200px;
+          padding: 20px;
+        }
+        .domain-grid p {
+          margin-bottom: 0;
+          font-size: 0.88rem;
+        }
+        .built-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 18px;
+        }
+        .built-grid article {
+          padding: 24px;
+        }
+        .mini-route {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          align-items: center;
+          margin-top: 22px;
+          color: #8291a8;
+          font-size: 0.76rem;
+        }
+        .mini-route span,
+        .mini-route strong {
+          padding: 8px 10px;
+          border: 1px solid rgba(146, 171, 213, 0.13);
+          border-radius: 9px;
+        }
+        .mini-route strong {
+          color: #72e2c1;
+        }
+        .sensor-cloud {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 22px;
+        }
+        .sensor-cloud span {
+          padding: 8px 10px;
+          border: 1px solid rgba(114, 226, 193, 0.16);
+          border-radius: 999px;
+          color: #b9c9dd;
+          background: rgba(114, 226, 193, 0.04);
+          font-size: 0.76rem;
+        }
+        .partner-network-shell {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(0, 1.2fr) minmax(330px, 0.8fr);
+          gap: clamp(24px, 4vw, 52px);
+          overflow: hidden;
+          padding: clamp(26px, 5vw, 58px);
+          border: 1px solid rgba(224, 183, 88, 0.3);
+          border-radius: 28px;
+          background:
+            radial-gradient(circle at 12% 10%, rgba(224, 183, 88, 0.12), transparent 34%),
+            linear-gradient(135deg, rgba(13, 19, 32, 0.96), rgba(6, 10, 19, 0.95));
+          box-shadow: 0 28px 90px rgba(0, 0, 0, 0.34);
+        }
+        .partner-network-shell::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background: linear-gradient(110deg, transparent 30%, rgba(255, 228, 151, 0.05), transparent 70%);
+          transform: translateX(-100%);
+          animation: partnerSweep 9s ease-in-out infinite;
+        }
+        .partner-network-copy,
+        .partner-network-panel {
+          position: relative;
+          z-index: 1;
+        }
+        .partner-network-copy h2 {
+          max-width: 900px;
+          margin-bottom: 18px;
+        }
+        .partner-lead {
+          color: #d4deec;
+          font-size: clamp(1rem, 1.6vw, 1.18rem);
+        }
+        .partner-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin: 28px 0 18px;
+        }
+        .partner-boundary {
+          max-width: 880px;
+          margin-bottom: 0;
+          padding: 14px 16px;
+          border-left: 3px solid rgba(224, 183, 88, 0.72);
+          color: #98a7bb;
+          background: rgba(224, 183, 88, 0.05);
+          font-size: 0.84rem;
+        }
+        .partner-network-panel {
+          padding: 22px;
+          border: 1px solid rgba(224, 183, 88, 0.2);
+          border-radius: 20px;
+          background: rgba(4, 8, 16, 0.68);
+        }
+        .partner-network-panel ol {
+          display: grid;
+          gap: 12px;
+          margin: 18px 0 0;
+          padding: 0;
+          list-style: none;
+        }
+        .partner-network-panel li {
+          display: grid;
+          grid-template-columns: 42px 1fr;
+          gap: 12px;
+          padding: 14px;
+          border: 1px solid rgba(149, 174, 216, 0.12);
+          border-radius: 14px;
+          background: rgba(12, 18, 30, 0.64);
+        }
+        .partner-network-panel li > span {
+          display: grid;
+          width: 36px;
+          height: 36px;
+          place-items: center;
+          border: 1px solid rgba(224, 183, 88, 0.5);
+          border-radius: 10px;
+          color: #f0ca6e;
+          font-size: 0.74rem;
+          font-weight: 900;
         }
 
-        .boundary-grid h3 {
-          font-size: clamp(1.8rem, 3vw, 3rem);
+        .button {
+          text-decoration: none !important;
+          box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+          transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background 0.2s ease;
         }
-
-        .boundary-grid li {
-          color: #c0ccdc;
+        .button:hover {
+          transform: translateY(-2px);
         }
-
+        .button.primary:hover {
+          box-shadow: 0 14px 36px rgba(62, 216, 177, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.18);
+        }
+        .button.secondary:hover,
+        .button.ghost:hover {
+          border-color: rgba(114, 226, 193, 0.52);
+          background: rgba(114, 226, 193, 0.09);
+          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
+        }
+        .partner-apply-button {
+          border-color: rgba(240, 202, 110, 0.72) !important;
+          color: #ffe5a0 !important;
+          background: linear-gradient(135deg, rgba(240, 202, 110, 0.14), rgba(240, 168, 65, 0.06)) !important;
+          box-shadow: 0 12px 34px rgba(222, 167, 55, 0.12);
+        }
+        .partner-apply-button:hover {
+          border-color: #f0ca6e !important;
+          background: linear-gradient(135deg, rgba(240, 202, 110, 0.24), rgba(240, 168, 65, 0.1)) !important;
+          box-shadow: 0 16px 42px rgba(222, 167, 55, 0.2);
+        }
+        .partner-route-note {
+          max-width: 780px;
+          margin: 14px 0 0;
+          padding: 12px 14px;
+          border-left: 2px solid rgba(240, 202, 110, 0.75);
+          border-radius: 0 10px 10px 0;
+          color: #c7d1e1;
+          background: rgba(240, 202, 110, 0.055);
+          font-size: 0.86rem;
+        }
+        .partner-network-panel strong {
+          color: #edf3fb;
+        }
+        .partner-network-panel p {
+          margin: 4px 0 0;
+          font-size: 0.8rem;
+        }
+        @keyframes partnerSweep {
+          0%, 72%, 100% { transform: translateX(-100%); opacity: 0; }
+          82% { opacity: 1; }
+          94% { transform: translateX(100%); opacity: 0; }
+        }
         .final-cta {
-          max-width: 1060px;
           text-align: center;
         }
-
-        .final-cta p {
-          max-width: 850px;
+        .final-cta > p {
+          max-width: 820px;
           margin-left: auto;
           margin-right: auto;
         }
-
-        .final-actions {
+        .centered-buttons {
           justify-content: center;
         }
-
         .site-footer {
           display: grid;
-          grid-template-columns: 1.4fr repeat(3, minmax(160px, .65fr));
-          gap: 32px;
-          width: min(1450px, calc(100% - 34px));
-          margin: 0 auto;
-          padding: 65px 0 34px;
-          border-top: 1px solid rgba(151,178,220,.13);
+          grid-template-columns: 1.4fr repeat(3, 0.7fr);
+          gap: 34px;
+          padding: 54px clamp(18px, 4vw, 64px) 28px;
+          border-top: 1px solid rgba(145, 170, 213, 0.13);
+          background: #04070d;
         }
-
         .site-footer h3 {
-          margin-bottom: 15px;
-          color: #dfe9f7;
-          font-size: .82rem;
-          letter-spacing: .08em;
+          color: #8492a8;
+          font-size: 0.72rem;
+          letter-spacing: 0.12em;
           text-transform: uppercase;
         }
-
-        .site-footer > div:not(.footer-brand) {
+        .site-footer > div {
           display: flex;
           flex-direction: column;
           gap: 10px;
         }
-
         .site-footer a {
-          color: #8f9eb3;
-          font-size: .82rem;
+          position: relative;
+          display: inline-flex;
+          width: fit-content;
+          align-items: center;
+          min-height: 30px;
+          padding: 4px 8px;
+          margin-left: -8px;
+          border-radius: 8px;
+          color: #aab8cd;
+          text-decoration: none !important;
+          font-size: 0.82rem;
+          font-weight: 650;
+          transition: color 0.2s ease, background 0.2s ease, transform 0.2s ease;
         }
-
         .site-footer a:hover {
-          color: #fff;
+          color: #ffffff;
+          background: rgba(114, 226, 193, 0.07);
+          transform: translateX(3px);
         }
-
-        .footer-brand p {
-          max-width: 360px;
-          margin-top: 18px;
+        .site-footer p {
+          margin-bottom: 0;
+          font-size: 0.82rem;
         }
-
-        .footer-chain {
+        .footer-chain,
+        .footer-canon {
           grid-column: 1 / -1;
-          margin: 20px 0 0;
-          padding-top: 22px;
-          border-top: 1px solid rgba(151,178,220,.1);
-          color: #65748a;
+          padding-top: 18px;
+          border-top: 1px solid rgba(145, 170, 213, 0.1);
           text-align: center;
-          font-size: .78rem;
         }
-
-        @keyframes starDrift {
-          to { transform: translate3d(170px, 120px, 0); }
+        .footer-canon {
+          padding-top: 0;
+          border-top: 0;
+          color: #72e2c1 !important;
+          font-weight: 850;
         }
-
-        @keyframes starDriftReverse {
-          to { transform: translate3d(-180px, 145px, 0); }
-        }
-
-        @keyframes rotate {
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes sweep {
-          0%, 15% { transform: translateX(0) rotate(16deg); opacity: 0; }
-          35% { opacity: .42; }
-          80%, 100% { transform: translateX(165vw) rotate(16deg); opacity: 0; }
-        }
-
-        @keyframes nova {
-          0%, 84%, 100% { transform: scale(.2); opacity: .1; }
-          88% { transform: scale(1.4); opacity: 1; }
-          92% { transform: scale(5); opacity: .22; }
-        }
-
-        @keyframes pulse {
-          0%, 100% { opacity: .35; transform: scale(.96); }
-          50% { opacity: 1; transform: scale(1.04); }
-        }
-
-        @keyframes doorwayFlicker {
-          0%, 100% { filter: brightness(1.03); }
-          50% { filter: brightness(1.19); }
-        }
-
-        @keyframes goldSweep {
-          0%, 15% { transform: translateX(-180%) rotate(18deg); opacity: 0; }
-          34% { opacity: 1; }
-          62%, 100% { transform: translateX(330%) rotate(18deg); opacity: 0; }
-        }
-
-        @keyframes explodeStar {
-          0% {
-            opacity: 0;
-            transform: scale(.15);
-          }
-          18% {
-            opacity: 1;
-            transform: scale(1.8);
-          }
-          45% {
-            opacity: .9;
-            transform: scale(5.5);
-            box-shadow:
-              0 0 14px #fff,
-              0 0 38px #ffd66d,
-              0 0 90px rgba(255,193,43,.95);
-          }
-          100% {
-            opacity: 0;
-            transform: scale(12);
+        @media (prefers-reduced-motion: reduce) {
+          *,
+          *::before,
+          *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
           }
         }
-
-        @keyframes revealPanel {
-          from {
-            opacity: 0;
-            transform: translateY(-18px) scale(.985);
+        @media (max-width: 1320px) {
+          .site-header {
+            padding-right: 24px;
+            padding-left: 24px;
           }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
+          .main-nav {
+            gap: 3px;
           }
-        }
-
-        @keyframes corePulse {
-          0%, 100% { transform: translate(-50%, -50%) scale(.96); }
-          50% { transform: translate(-50%, -50%) scale(1.04); }
-        }
-
-        @keyframes nodeFloat {
-          0%, 100% { transform: translate3d(0, 0, 0); opacity: .65; }
-          50% { transform: translate3d(0, -12px, 0); opacity: 1; }
-        }
-
-        @keyframes routeGlow {
-          0%, 100% { opacity: .22; }
-          50% { opacity: .95; }
-        }
-
-        @keyframes environmentalMorph {
-          0%, 100% {
-            transform: translate(-50%, -50%) scale(.97) rotate(0deg);
-            border-radius: 48% 52% 45% 55% / 55% 43% 57% 45%;
-          }
-          50% {
-            transform: translate(-50%, -50%) scale(1.04) rotate(4deg);
-            border-radius: 55% 45% 58% 42% / 44% 58% 42% 56%;
+          .main-nav a {
+            padding-right: 9px;
+            padding-left: 9px;
+            font-size: 0.73rem;
           }
         }
-
-        @media (max-width: 1100px) {
+        @media (max-width: 1180px) {
           .hero {
             grid-template-columns: 1fr;
-            padding-top: 80px;
+            padding-top: 58px;
           }
-
-          .exchange-compass {
-            max-width: 760px;
+          .hero-console {
+            max-width: 840px;
           }
-
-          .door-content,
-          .marketplace-shell {
-            grid-template-columns: 1fr;
+          .journey-grid,
+          .results-grid,
+          .domain-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
-
-          .marketplace-actions {
-            justify-content: flex-start;
+          .map-workspaces {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
-
-          .chain-track {
+          .ta14-chain-track,
+          .map-shared {
             grid-template-columns: repeat(4, minmax(0, 1fr));
           }
-        }
-
-        @media (max-width: 850px) {
-          .menu-button {
-            display: block;
-          }
-
-          .main-nav {
-            position: absolute;
-            top: 66px;
-            right: 16px;
-            display: none;
-            width: min(330px, calc(100vw - 32px));
-            padding: 12px;
-            border-radius: 18px;
-            flex-direction: column;
-            align-items: stretch;
-          }
-
-          .main-nav.open {
-            display: flex;
-          }
-
-          .main-nav a {
-            justify-content: flex-start;
-          }
-
-          .gold-door-face {
-            grid-template-columns: 50px 75px 1fr;
-          }
-
-          .door-emblem {
-            width: 70px;
-            height: 70px;
-          }
-
-          .gold-door-copy {
-            padding-right: 22%;
-          }
-
-          .gold-door-panel {
-            width: 22%;
-          }
-
-          .steps-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
           .site-footer {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+            grid-template-columns: repeat(3, 1fr);
           }
-
-          .footer-chain {
+          .site-footer > div:first-child {
             grid-column: 1 / -1;
           }
         }
-
-        @media (max-width: 620px) {
-          .section-wrap {
-            width: min(100% - 24px, 1450px);
-            padding: 70px 0;
+        @media (max-width: 1060px) {
+          .menu-button {
+            display: inline-grid;
+            place-items: center;
           }
-
-          .site-header {
-            padding-left: 12px;
-            padding-right: 12px;
-          }
-
-          .brand-copy small {
+          .main-nav {
+            position: absolute;
+            top: 76px;
+            left: 16px;
+            right: 16px;
             display: none;
-          }
-
-          .gold-door-face {
-            grid-template-columns: 42px 58px 1fr;
-            gap: 10px;
-            min-height: 330px;
-            padding: 24px 18px;
-          }
-
-          .door-emblem {
-            width: 58px;
-            height: 58px;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 16px;
+            border: 1px solid rgba(145, 170, 213, 0.18);
             border-radius: 16px;
+            background: rgba(5, 8, 17, 0.97);
           }
-
-          .door-number {
-            font-size: .7rem;
+          .main-nav.open {
+            display: flex;
           }
-
-          .gold-door-title {
-            font-size: 1.75rem;
+          .main-nav a {
+            padding: 10px;
           }
-
-          .gold-door-copy {
-            padding-right: 0;
+          .split-heading,
+          .demo-grid,
+          .coming-panel,
+          .partner-network-shell {
+            grid-template-columns: 1fr;
+            gap: 18px;
           }
-
-          .gold-door-statement {
+          .ta14-principles-grid,
+          .gallery-grid,
+          .surface-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .ta14-chain-track { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+          .ta14-chain-stage:nth-child(4n) .ta14-chain-arrow { display: none; }
+          .record-preview dl {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .results-path {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (max-width: 650px) {
+          .site-header {
+            min-height: 68px;
+          }
+          .brand > span:last-child {
             display: none;
           }
-
-          .gold-door-panel,
-          .gold-door-handle {
-            display: none;
+          .main-nav {
+            top: 68px;
           }
-
-          .gold-door-face:hover .gold-door-slab,
-          .gold-door-face:focus-visible .gold-door-slab,
-          .gold-door.is-open .gold-door-slab {
-            transform: perspective(1000px) rotateY(-24deg) translateX(-4px);
+          .section-wrap {
+            width: min(100% - 24px, 1480px);
+            padding: 64px 0;
           }
-
-          .door-panel {
-            margin-left: 0;
-            margin-right: 0;
+          .hero {
+            min-height: auto;
           }
-
-          .steps-grid,
-          .boundary-grid,
-          .chain-track,
+          h1 {
+            font-size: clamp(3rem, 17vw, 5rem);
+          }
+          .motion-list > div {
+            grid-template-columns: 1fr auto;
+          }
+          .motion-list small {
+            grid-column: 1 / -1;
+          }
+          .journey-grid,
+          .results-grid,
+          .gallery-grid,
+          .surface-grid,
+          .domain-grid,
+          .ta14-principles-grid,
+          .comparison-grid,
+          .built-grid {
+            grid-template-columns: 1fr;
+          }
+          .map-workspaces,
+          .ta14-chain-track,
+          .map-shared {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+          .ta14-chain-stage:nth-child(2n) .ta14-chain-arrow { display: none; }
+          .ta14-chain-stage { min-height: 96px; }
+          .results-path {
+            grid-template-columns: 1fr;
+          }
+          .receipt-chain {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+          }
+          .record-preview {
+            grid-template-columns: 1fr;
+          }
+          .record-preview dl {
+            grid-column: auto;
+            grid-template-columns: 1fr;
+          }
           .site-footer {
             grid-template-columns: 1fr;
           }
-
-          .chain-track i {
-            display: none;
+          .site-footer > div:first-child {
+            grid-column: auto;
           }
-
-          .footer-chain {
-            grid-column: 1;
-          }
-        }
-
-
-        /* Redesigned physical destination doors */
-        .redesigned-door-stack {
-          display: grid;
-          gap: 30px;
-        }
-
-        .destination-door-card {
-          position: relative;
-          display: grid;
-          grid-template-columns: minmax(245px, 330px) minmax(0, 1fr);
-          gap: clamp(34px, 5vw, 76px);
-          align-items: center;
-          min-height: 530px;
-          padding: clamp(28px, 4.6vw, 60px);
-          overflow: hidden;
-          border: 1px solid rgba(255, 215, 112, 0.28);
-          border-radius: 30px;
-          background:
-            radial-gradient(circle at 12% 50%, rgba(255, 198, 64, 0.09), transparent 34%),
-            linear-gradient(135deg, rgba(255, 244, 190, 0.035), transparent 32%),
-            rgba(8, 13, 23, 0.92);
-          box-shadow:
-            0 34px 100px rgba(0, 0, 0, 0.38),
-            inset 0 0 0 1px rgba(255, 255, 255, 0.018);
-        }
-
-        .destination-door-card::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          opacity: 0.3;
-          background-image:
-            linear-gradient(rgba(255, 215, 112, 0.05) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255, 215, 112, 0.05) 1px, transparent 1px);
-          background-size: 42px 42px;
-          mask-image: linear-gradient(90deg, black, transparent 48%);
-          pointer-events: none;
-        }
-
-        .physical-door-column,
-        .destination-door-content {
-          position: relative;
-          z-index: 2;
-        }
-
-        .physical-door-column {
-          display: flex;
-          justify-content: center;
-        }
-
-        .real-door-link {
-          position: relative;
-          display: block;
-          width: min(100%, 286px);
-          height: 420px;
-          padding: 16px 18px 20px;
-          border-radius: 12px 12px 4px 4px;
-          perspective: 1500px;
-          isolation: isolate;
-          transition: transform 0.25s ease, filter 0.25s ease;
-        }
-
-        .real-door-link:hover,
-        .real-door-link:focus-visible {
-          transform: translateY(-7px);
-          filter: brightness(1.08);
-          outline: none;
-        }
-
-        .real-doorway-light {
-          position: absolute;
-          inset: 17px 18px 20px;
-          z-index: -1;
-          border-radius: 4px;
-          opacity: 0;
-          background:
-            radial-gradient(circle at 60% 48%, rgba(255, 255, 239, 0.98), rgba(255, 224, 137, 0.9) 22%, rgba(255, 182, 39, 0.34) 52%, transparent 76%);
-          box-shadow:
-            0 0 55px rgba(255, 191, 43, 0.36),
-            inset 0 0 62px rgba(255, 235, 165, 0.5);
-          transition: opacity 0.38s ease;
-        }
-
-        .real-door-link:hover .real-doorway-light,
-        .real-door-link:focus-visible .real-doorway-light {
-          opacity: 1;
-        }
-
-        .real-door-frame {
-          position: absolute;
-          inset: 0;
-          display: block;
-          border-radius: 13px 13px 3px 3px;
-          background: linear-gradient(90deg, #3f2608, #b97816 9%, #6d410b 18%, #2d1a05 50%, #70450c 82%, #bd7c18 92%, #3b2307);
-          box-shadow:
-            0 26px 42px rgba(0, 0, 0, 0.48),
-            inset 0 0 0 2px rgba(255, 221, 139, 0.35),
-            inset 0 0 0 7px rgba(38, 22, 4, 0.82);
-        }
-
-        .real-door-casing {
-          position: absolute;
-          z-index: 4;
-          display: block;
-          background: linear-gradient(90deg, #3f2406, #d08a1d 45%, #71430b 72%, #241403);
-          box-shadow: inset 0 0 0 1px rgba(255, 227, 151, 0.24);
-        }
-
-        .casing-top {
-          top: 0;
-          left: 0;
-          right: 0;
-          height: 18px;
-          border-radius: 12px 12px 0 0;
-        }
-
-        .casing-left,
-        .casing-right {
-          top: 0;
-          bottom: 0;
-          width: 18px;
-        }
-
-        .casing-left { left: 0; }
-        .casing-right { right: 0; transform: scaleX(-1); }
-
-        .real-door-slab {
-          position: absolute;
-          inset: 18px 18px 20px;
-          z-index: 2;
-          display: block;
-          overflow: hidden;
-          border: 1px solid rgba(255, 222, 139, 0.42);
-          border-radius: 3px 3px 1px 1px;
-          transform-origin: left center;
-          transform-style: preserve-3d;
-          background:
-            linear-gradient(90deg, rgba(255,255,255,0.05), transparent 8%, transparent 86%, rgba(0,0,0,0.27)),
-            linear-gradient(115deg, #4a2a08 0%, #8d5511 22%, #5b3509 44%, #a76816 67%, #4b2a07 100%);
-          box-shadow:
-            inset -12px 0 22px rgba(0, 0, 0, 0.27),
-            inset 8px 0 16px rgba(255, 217, 119, 0.06),
-            0 10px 24px rgba(0, 0, 0, 0.32);
-          transition: transform 0.72s cubic-bezier(0.18, 0.82, 0.22, 1), box-shadow 0.4s ease;
-        }
-
-        .real-door-link:hover .real-door-slab,
-        .real-door-link:focus-visible .real-door-slab {
-          transform: rotateY(-24deg);
-          box-shadow:
-            28px 9px 30px rgba(0, 0, 0, 0.48),
-            inset -22px 0 24px rgba(0, 0, 0, 0.36);
-        }
-
-        .wood-grain {
-          position: absolute;
-          inset: -10%;
-          opacity: 0.15;
-          background: repeating-linear-gradient(86deg, transparent 0 13px, rgba(255, 225, 148, 0.3) 14px, transparent 16px 31px);
-          transform: rotate(2deg);
-        }
-
-        .grain-two {
-          opacity: 0.11;
-          transform: rotate(-3deg) scaleX(-1);
-        }
-
-        .raised-panel {
-          position: absolute;
-          left: 13%;
-          right: 13%;
-          border: 2px solid rgba(48, 25, 3, 0.72);
-          background:
-            linear-gradient(145deg, rgba(255, 215, 117, 0.12), transparent 36%),
-            rgba(73, 39, 5, 0.18);
-          box-shadow:
-            inset 0 0 0 5px rgba(181, 112, 23, 0.18),
-            inset 0 0 0 7px rgba(28, 14, 2, 0.43),
-            inset 6px 7px 16px rgba(255, 210, 100, 0.05),
-            0 2px 5px rgba(0, 0, 0, 0.24);
-        }
-
-        .raised-panel-one { top: 8%; height: 20%; }
-        .raised-panel-two { top: 33%; height: 20%; }
-        .raised-panel-three { top: 58%; height: 14%; }
-        .raised-panel-four { top: 76%; height: 15%; }
-
-        .door-plate {
-          position: absolute;
-          top: 52%;
-          right: 8%;
-          width: 22px;
-          height: 44px;
-          border: 1px solid #f1cc72;
-          border-radius: 10px;
-          background: linear-gradient(90deg, #75460b, #e8bd58 48%, #8d5a12);
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.38);
-          transform: translateY(-50%);
-        }
-
-        .door-knob {
-          position: absolute;
-          top: 52%;
-          right: 4.5%;
-          width: 18px;
-          height: 18px;
-          border: 2px solid #ffe7a5;
-          border-radius: 50%;
-          background: radial-gradient(circle at 35% 30%, #fff1bf, #c98916 38%, #704008 72%);
-          box-shadow:
-            0 0 0 4px rgba(49, 27, 3, 0.88),
-            0 0 15px rgba(255, 205, 82, 0.28);
-          transform: translateY(-50%);
-        }
-
-        .door-hinge {
-          position: absolute;
-          left: 0;
-          width: 9px;
-          height: 28px;
-          border-radius: 0 4px 4px 0;
-          background: linear-gradient(90deg, #382006, #c58a2a, #5b3509);
-        }
-
-        .hinge-one { top: 16%; }
-        .hinge-two { top: 48%; }
-        .hinge-three { top: 80%; }
-
-        .door-sign {
-          position: absolute;
-          z-index: 7;
-          top: 50px;
-          left: 50%;
-          display: grid;
-          place-items: center;
-          width: 74px;
-          min-height: 74px;
-          padding: 8px;
-          border: 1px solid rgba(255, 229, 163, 0.7);
-          border-radius: 8px;
-          color: #ffe8ad;
-          background: linear-gradient(145deg, rgba(255, 220, 128, 0.18), rgba(37, 20, 3, 0.88));
-          box-shadow: 0 8px 22px rgba(0, 0, 0, 0.36);
-          transform: translateX(-50%);
-          text-align: center;
-        }
-
-        .door-sign small,
-        .door-sign strong {
-          display: block;
-        }
-
-        .door-sign small {
-          font-size: 0.52rem;
-          font-weight: 950;
-          letter-spacing: 0.1em;
-        }
-
-        .door-sign strong {
-          margin-top: 3px;
-          font-size: 1.15rem;
-        }
-
-        .door-enter-prompt {
-          position: absolute;
-          z-index: 7;
-          right: 32px;
-          bottom: 35px;
-          display: inline-flex;
-          align-items: center;
-          gap: 7px;
-          padding: 8px 11px;
-          border: 1px solid rgba(255, 226, 151, 0.52);
-          border-radius: 999px;
-          color: #ffe8aa;
-          background: rgba(23, 13, 2, 0.82);
-          font-size: 0.69rem;
-          font-weight: 950;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-          transition: transform 0.2s ease, background 0.2s ease;
-        }
-
-        .real-door-link:hover .door-enter-prompt,
-        .real-door-link:focus-visible .door-enter-prompt {
-          transform: translateX(4px);
-          background: rgba(96, 55, 6, 0.9);
-        }
-
-        .destination-door-content {
-          max-width: 870px;
-        }
-
-        .destination-door-content h3 {
-          margin: 0 0 13px;
-          color: #ffffff;
-          font-size: clamp(2.2rem, 4.3vw, 4.55rem);
-          line-height: 0.98;
-          letter-spacing: -0.055em;
-        }
-
-        .destination-statement {
-          max-width: 810px;
-          margin-bottom: 14px;
-          color: #f5dfad;
-          font-size: clamp(1.02rem, 1.6vw, 1.28rem);
-          font-weight: 850;
-          line-height: 1.5;
-        }
-
-        .destination-description {
-          max-width: 830px;
-          margin-bottom: 22px;
-          color: #aeb9ca;
-          font-size: 0.98rem;
-        }
-
-        .destination-attributes {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 9px 18px;
-          margin: 0 0 27px;
-          padding: 0;
-          list-style: none;
-        }
-
-        .destination-attributes li {
-          display: flex;
-          gap: 9px;
-          align-items: flex-start;
-          color: #cbd4e2;
-          font-size: 0.84rem;
-          font-weight: 750;
-          line-height: 1.45;
-        }
-
-        .destination-attributes li span {
-          color: #f2c55c;
-          font-weight: 950;
-        }
-
-        .destination-actions {
-          display: grid;
-          gap: 14px;
-        }
-
-        .destination-primary {
-          width: fit-content;
-          gap: 11px;
-          min-width: 205px;
-        }
-
-        .destination-route-links {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-        }
-
-        .destination-chip {
-          display: inline-flex;
-          align-items: center;
-          min-height: 38px;
-          padding: 0 12px;
-          border: 1px solid rgba(130, 157, 197, 0.2);
-          border-radius: 999px;
-          color: #b8c3d3;
-          background: rgba(12, 21, 35, 0.7);
-          font-size: 0.73rem;
-          font-weight: 850;
-          transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-        }
-
-        .destination-chip:hover {
-          color: #fff;
-          border-color: rgba(255, 211, 103, 0.46);
-          transform: translateY(-2px);
-        }
-
-        .destination-chip.special {
-          color: #f0cc75;
-          border-color: rgba(255, 211, 103, 0.3);
-        }
-
-        .destination-marketplace {
-          display: grid;
-          grid-template-columns: auto 1fr auto;
-          gap: 12px;
-          align-items: center;
-          width: min(100%, 610px);
-          padding: 13px 15px;
-          border: 1px solid rgba(109, 230, 201, 0.18);
-          border-radius: 14px;
-          color: #dce9e6;
-          background: rgba(8, 25, 29, 0.52);
-        }
-
-        .destination-marketplace span {
-          color: #69e2c2;
-          font-size: 0.7rem;
-          font-weight: 950;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .destination-marketplace strong {
-          font-size: 0.82rem;
-        }
-
-        .destination-marketplace b {
-          color: #69e2c2;
-        }
-
-        @media (max-width: 900px) {
-          .destination-door-card {
-            grid-template-columns: minmax(210px, 260px) minmax(0, 1fr);
-            gap: 30px;
-          }
-
-          .real-door-link {
-            height: 380px;
-          }
-
-          .destination-attributes {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 700px) {
-          .destination-door-card {
-            grid-template-columns: 1fr;
-            min-height: 0;
-            padding: 28px 20px 32px;
-          }
-
-          .physical-door-column {
-            justify-content: flex-start;
-          }
-
-          .real-door-link {
-            width: 225px;
-            height: 330px;
-          }
-
-          .destination-door-content h3 {
-            font-size: clamp(2.15rem, 12vw, 3.2rem);
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          :global(html) { scroll-behavior: auto; }
-          .star-field,
-          .orbit,
-          .moving-line,
-          .nova,
-          .door-emblem i,
-          .visual-core,
-          .visual-core::before,
-          .visual-core::after,
-          .visual-node,
-          .visual-route,
-          .gold-door-light,
-          .gold-door-slab,
-          .doorway-light,
-          .doorway-floor-light,
-          .star-burst {
-            animation: none;
+          .footer-chain,
+          .footer-canon {
+            grid-column: auto;
           }
         }
       `}</style>
