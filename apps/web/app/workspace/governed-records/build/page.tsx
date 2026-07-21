@@ -39,57 +39,8 @@ const INITIAL_EVIDENCE: EvidenceItem[] = [
   },
 ];
 
-const SIDEBAR_LINKS = [
-  {
-    label: 'Build the Record',
-    href: '/workspace/governed-records/build',
-    glyph: '＋',
-    active: true,
-  },
-  {
-    label: 'Governed Records Home',
-    href: '/workspace/governed-records',
-    glyph: '⌂',
-    active: false,
-  },
-  {
-    label: 'My Records',
-    href: '/workspace/governed-records/my-records',
-    glyph: 'R',
-    active: false,
-  },
-  {
-    label: 'Continuity Review',
-    href: '/workspace/governed-records/continuity-review',
-    glyph: 'C',
-    active: false,
-  },
-  {
-    label: 'Record Comparison',
-    href: '/workspace/governed-records/comparison',
-    glyph: '≋',
-    active: false,
-  },
-  {
-    label: 'Preserved Records',
-    href: '/workspace/governed-records/preserved-records',
-    glyph: 'P',
-    active: false,
-  },
-  {
-    label: 'Verification',
-    href: '/workspace/governed-records/verification',
-    glyph: '✓',
-    active: false,
-  },
-  {
-    label: 'Pricing',
-    href: '/workspace/governed-records/pricing',
-    glyph: '$',
-    active: false,
-  },
-] as const;
 
+// Shared Governed Records navigation is supplied by ../layout.tsx.
 export default function BuildGovernedRecordPage() {
   const [title, setTitle] = useState('');
   const [recordType, setRecordType] = useState<RecordType>(
@@ -180,37 +131,6 @@ export default function BuildGovernedRecordPage() {
 
   return (
     <main className="builderShell">
-      <aside className="sidebar">
-        <div className="sidebarBrand">
-          <p className="eyebrow">TA-14 Governed Records</p>
-          <h1>Record Workspace</h1>
-          <p>
-            Begin with declared reality. Keep evidence separate from interpretation,
-            determination, diagnosis, and optimization.
-          </p>
-        </div>
-
-        <nav className="sidebarNav" aria-label="Governed Records navigation">
-          {SIDEBAR_LINKS.map((item) => (
-            <Link
-              className={`sidebarLink ${
-                item.active ? 'active' : ''
-              }`}
-              href={item.href}
-              key={item.href}
-            >
-              <span>{item.glyph}</span>
-              <strong>{item.label}</strong>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="sidebarPrinciple">
-          <span className="statusDot" />
-          <p>No admissible evidence. No admissible execution.</p>
-        </div>
-      </aside>
-
       <section className="workspace">
         <header className="pageHeader">
           <div>
@@ -556,8 +476,7 @@ export default function BuildGovernedRecordPage() {
           --violet: #aa9cff;
           --amber: #ffc978;
           --line: rgba(145, 205, 225, 0.16);
-          display: grid;
-          grid-template-columns: 290px minmax(0, 1fr);
+          display: block;
           min-height: 100vh;
           color: #f3f9fc;
           background:
@@ -565,122 +484,9 @@ export default function BuildGovernedRecordPage() {
             linear-gradient(180deg, #061018 0%, #03090e 100%);
         }
 
-        .sidebar {
-          position: sticky;
-          top: 0;
-          display: flex;
-          height: 100vh;
-          flex-direction: column;
-          padding: 28px 20px 22px;
-          border-right: 1px solid var(--line);
-          background: rgba(4, 14, 21, 0.94);
-          backdrop-filter: blur(18px);
-        }
-
-        .eyebrow {
-          margin: 0 0 10px;
-          color: var(--cyan);
-          font-size: 10px;
-          font-weight: 900;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-        }
-
-        .sidebarBrand h1 {
-          margin: 0;
-          font-size: 1.65rem;
-          letter-spacing: -0.04em;
-        }
-
-        .sidebarBrand > p:last-child {
-          margin: 14px 0 0;
-          color: #8299a7;
-          font-size: 12px;
-          line-height: 1.65;
-        }
-
-        .sidebarNav {
-          display: grid;
-          gap: 7px;
-          margin-top: 30px;
-        }
-
-        .sidebarLink {
-          display: grid;
-          grid-template-columns: 38px minmax(0, 1fr);
-          gap: 10px;
-          align-items: center;
-          min-height: 48px;
-          padding: 6px 10px;
-          border: 1px solid transparent;
-          border-radius: 12px;
-          color: #8fa7b5;
-          text-decoration: none;
-          transition: border-color 170ms ease, background 170ms ease, color 170ms ease;
-        }
-
-        .sidebarLink span {
-          display: grid;
-          place-items: center;
-          width: 34px;
-          height: 34px;
-          border: 1px solid rgba(110, 231, 255, 0.14);
-          border-radius: 9px;
-          font-size: 13px;
-          font-weight: 900;
-        }
-
-        .sidebarLink strong {
-          font-size: 12px;
-        }
-
-        .sidebarLink:hover {
-          color: #dff7ff;
-          border-color: rgba(110, 231, 255, 0.18);
-          background: rgba(110, 231, 255, 0.04);
-        }
-
-        .sidebarLink.active {
-          color: #031118;
-          border-color: rgba(110, 231, 255, 0.44);
-          background: linear-gradient(135deg, var(--cyan), var(--green));
-        }
-
-        .sidebarLink.active span {
-          border-color: rgba(3, 17, 24, 0.18);
-        }
-
-        .sidebarPrinciple {
-          display: flex;
-          gap: 10px;
-          align-items: flex-start;
-          margin-top: auto;
-          padding: 15px;
-          border: 1px solid rgba(102, 240, 189, 0.16);
-          border-radius: 13px;
-          background: rgba(102, 240, 189, 0.035);
-        }
-
-        .statusDot {
-          width: 8px;
-          height: 8px;
-          margin-top: 4px;
-          flex: 0 0 auto;
-          border-radius: 99px;
-          background: var(--green);
-          box-shadow: 0 0 14px rgba(102, 240, 189, 0.8);
-        }
-
-        .sidebarPrinciple p {
-          margin: 0;
-          color: #9bb7aa;
-          font-size: 10px;
-          font-weight: 800;
-          line-height: 1.5;
-        }
 
         .workspace {
-          width: min(1180px, 100%);
+          width: min(1240px, 100%);
           margin: 0 auto;
           padding: 42px clamp(20px, 4vw, 62px) 70px;
         }
@@ -1009,25 +815,6 @@ export default function BuildGovernedRecordPage() {
         }
 
         @media (max-width: 980px) {
-          .builderShell {
-            grid-template-columns: 1fr;
-          }
-
-          .sidebar {
-            position: relative;
-            height: auto;
-            border-right: 0;
-            border-bottom: 1px solid var(--line);
-          }
-
-          .sidebarNav {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .sidebarPrinciple {
-            margin-top: 22px;
-          }
-
           .pageHeader,
           .reviewPanel {
             align-items: flex-start;
@@ -1040,7 +827,6 @@ export default function BuildGovernedRecordPage() {
             padding-inline: 12px;
           }
 
-          .sidebarNav,
           .twoColumns {
             grid-template-columns: 1fr;
           }
