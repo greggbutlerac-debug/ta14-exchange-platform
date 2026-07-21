@@ -1,1080 +1,989 @@
-'use client';
-
 import Link from 'next/link';
-import { FormEvent, useMemo, useState } from 'react';
 
-type EvidenceItem = {
-  id: string;
-  label: string;
-  source: string;
-  capturedAt: string;
-  authority: string;
-  notes: string;
-};
-
-const RECORD_TYPES = [
-  'Atmospheric Integrity Record',
-  'Personal Atmospheric Integrity Record',
-  'Building Environmental Record',
-  'Hospital Environmental Record',
-  'Laboratory Record',
-  'HVAC Diagnostic Record',
-  'Sensor Evidence Package',
-  'Operational Event Record',
-  'Financial Execution Record',
-  'AI Governance Record',
-  'Other Governed Record',
+const GOVERNED_RECORD_ELEMENTS = [
+  {
+    number: '01',
+    title: 'Declared reality',
+    description:
+      'The record begins with a bounded statement of what was observed, measured, received, or asserted. It does not begin with a conclusion.',
+  },
+  {
+    number: '02',
+    title: 'Identified source',
+    description:
+      'The person, instrument, system, organization, or authority that produced each element is identified rather than implied.',
+  },
+  {
+    number: '03',
+    title: 'Preserved continuity',
+    description:
+      'Time, sequence, custody, version history, gaps, overlaps, and changes remain visible from creation through later use.',
+  },
+  {
+    number: '04',
+    title: 'Proof boundaries',
+    description:
+      'The record explicitly states what the evidence proves, what it does not prove, and where interpretation must stop.',
+  },
+  {
+    number: '05',
+    title: 'Authority and admissibility',
+    description:
+      'The authority to create, alter, interpret, bind, preserve, or rely on the record is declared and reviewable.',
+  },
+  {
+    number: '06',
+    title: 'Independent verification',
+    description:
+      'Identity, integrity, source, continuity, authority, and preservation can be checked without trusting the interface that created the record.',
+  },
 ] as const;
 
-const INITIAL_EVIDENCE: EvidenceItem[] = [
+const RECORD_DIFFERENCES = [
   {
-    id: 'evidence-1',
-    label: '',
-    source: '',
-    capturedAt: '',
-    authority: '',
-    notes: '',
-  },
-];
-
-const SIDEBAR_LINKS = [
-  {
-    label: 'Build the Record',
-    href: '/workspace/governed-records/build',
-    glyph: '＋',
-    active: true,
+    label: 'Creation',
+    ordinary: 'Captures information.',
+    governed: 'Captures information under declared rules, identity, source, and authority.',
   },
   {
-    label: 'Governed Records Home',
-    href: '/workspace/governed-records',
-    glyph: '⌂',
+    label: 'Meaning',
+    ordinary: 'Meaning is often assumed by whoever reads it.',
+    governed: 'Meaning is bounded by explicit proof limits and declared interpretation rules.',
   },
   {
-    label: 'My Records',
-    href: '/workspace/governed-records/my-records',
-    glyph: 'R',
+    label: 'Change',
+    ordinary: 'May be edited, replaced, or overwritten without a durable history.',
+    governed: 'Corrections create traceable versions while preserving the prior state.',
   },
   {
-    label: 'Continuity Review',
-    href: '/workspace/governed-records/continuity-review',
-    glyph: 'C',
+    label: 'Continuity',
+    ordinary: 'A timestamp may exist, but gaps and custody are often unclear.',
+    governed: 'Sequence, gaps, overlaps, custody, and source changes are reviewable.',
   },
   {
-    label: 'Record Comparison',
-    href: '/workspace/governed-records/comparison',
-    glyph: '≋',
-  },
-  {
-    label: 'Preserved Records',
-    href: '/workspace/governed-records/preserved-records',
-    glyph: 'P',
+    label: 'Authority',
+    ordinary: 'Possession of the record may be mistaken for authority over it.',
+    governed: 'Authority to create, interpret, approve, bind, or use the record is separated.',
   },
   {
     label: 'Verification',
-    href: '/workspace/governed-records/verification',
-    glyph: '✓',
+    ordinary: 'Usually depends on trusting the creator or platform.',
+    governed: 'Can be independently checked against preserved references and declared conditions.',
   },
   {
-    label: 'Pricing',
-    href: '/workspace/governed-records/pricing',
-    glyph: '$',
+    label: 'Use',
+    ordinary: 'May be treated as sufficient merely because it exists.',
+    governed: 'Cannot support consequential use beyond what its evidence and authority admit.',
   },
 ] as const;
 
-export default function BuildGovernedRecordPage() {
-  const [title, setTitle] = useState('');
-  const [recordType, setRecordType] = useState<(typeof RECORD_TYPES)[number]>(
-    RECORD_TYPES[0],
-  );
-  const [recordOwner, setRecordOwner] = useState('');
-  const [recordAuthority, setRecordAuthority] = useState('');
-  const [realityStatement, setRealityStatement] = useState('');
-  const [proofStatement, setProofStatement] = useState('');
-  const [nonProofStatement, setNonProofStatement] = useState('');
-  const [continuityStatement, setContinuityStatement] = useState('');
-  const [correctionRule, setCorrectionRule] = useState(
-    'Corrections create a new version. Prior preserved states remain visible.',
-  );
-  const [evidence, setEvidence] = useState<EvidenceItem[]>(INITIAL_EVIDENCE);
-  const [status, setStatus] = useState<'draft' | 'review-ready'>('draft');
+const ACTIONS = [
+  {
+    eyebrow: 'Create',
+    title: 'Build a Governed Record',
+    description:
+      'Construct a record from declared reality, source evidence, continuity, authority, and proof boundaries.',
+    href: '/workspace/governed-records/build',
+    action: 'Build the Record',
+    glyph: '＋',
+  },
+  {
+    eyebrow: 'Find',
+    title: 'Look Up a Record',
+    description:
+      'Open your record library and locate records by identity, type, date, state, source, or preserved reference.',
+    href: '/workspace/governed-records/my-records',
+    action: 'Open My Records',
+    glyph: '⌕',
+  },
+  {
+    eyebrow: 'Examine',
+    title: 'Review Continuity',
+    description:
+      'Inspect sequence, gaps, overlaps, source changes, authority changes, and continuity standing.',
+    href: '/workspace/governed-records/continuity-review',
+    action: 'Open Continuity Review',
+    glyph: 'C',
+  },
+  {
+    eyebrow: 'Compare',
+    title: 'Compare Record States',
+    description:
+      'Compare two governed records while keeping comparison separate from diagnosis and optimization.',
+    href: '/workspace/governed-records/comparison',
+    action: 'Open Comparison',
+    glyph: '≋',
+  },
+  {
+    eyebrow: 'Preserve',
+    title: 'Open Preserved Records',
+    description:
+      'Review immutable versions, correction history, integrity references, and preservation receipts.',
+    href: '/workspace/governed-records/preserved-records',
+    action: 'Open Preserved Records',
+    glyph: 'P',
+  },
+  {
+    eyebrow: 'Verify',
+    title: 'Verify a Record',
+    description:
+      'Check identity, integrity, source, authority, continuity, preservation, and proof boundaries.',
+    href: '/workspace/governed-records/verification',
+    action: 'Open Verification',
+    glyph: '✓',
+  },
+] as const;
 
-  const completion = useMemo(() => {
-    const required = [
-      title,
-      recordType,
-      recordOwner,
-      recordAuthority,
-      realityStatement,
-      proofStatement,
-      nonProofStatement,
-      continuityStatement,
-    ];
-
-    const completedRequired = required.filter((value) => value.trim().length > 0).length;
-    const evidenceComplete = evidence.some(
-      (item) =>
-        item.label.trim() &&
-        item.source.trim() &&
-        item.capturedAt.trim() &&
-        item.authority.trim(),
-    );
-
-    return Math.round(
-      ((completedRequired + (evidenceComplete ? 1 : 0)) / (required.length + 1)) * 100,
-    );
-  }, [
-    title,
-    recordType,
-    recordOwner,
-    recordAuthority,
-    realityStatement,
-    proofStatement,
-    nonProofStatement,
-    continuityStatement,
-    evidence,
-  ]);
-
-  function updateEvidence(
-    id: string,
-    field: keyof Omit<EvidenceItem, 'id'>,
-    value: string,
-  ) {
-    setEvidence((current) =>
-      current.map((item) => (item.id === id ? { ...item, [field]: value } : item)),
-    );
-  }
-
-  function addEvidenceItem() {
-    setEvidence((current) => [
-      ...current,
-      {
-        id: `evidence-${Date.now()}`,
-        label: '',
-        source: '',
-        capturedAt: '',
-        authority: '',
-        notes: '',
-      },
-    ]);
-  }
-
-  function removeEvidenceItem(id: string) {
-    setEvidence((current) =>
-      current.length === 1 ? current : current.filter((item) => item.id !== id),
-    );
-  }
-
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setStatus('review-ready');
-  }
-
+export default function GovernedRecordsHomePage() {
   return (
-    <main className="builderShell">
-      <aside className="sidebar">
-        <div className="sidebarBrand">
-          <p className="eyebrow">TA-14 Governed Records</p>
-          <h1>Record Workspace</h1>
+    <main className="recordsHome">
+      <section className="hero">
+        <div className="heroGlow" aria-hidden="true" />
+        <div className="heroGrid">
+          <div className="heroCopy">
+            <p className="eyebrow">TA-14 Governed Records</p>
+            <h1>
+              A record says
+              <span>something happened.</span>
+            </h1>
+            <h2>A governed record shows what can be admitted about it.</h2>
+            <p className="lede">
+              A record may contain facts, measurements, statements, files,
+              timestamps, or signatures. But the existence of information does
+              not establish its identity, continuity, authority, integrity,
+              meaning, or permissible use.
+            </p>
+            <p>
+              A governed record preserves those boundaries. It separates the
+              evidence from the interpretation, the interpretation from the
+              determination, and the determination from any later approval,
+              optimization, or execution.
+            </p>
+
+            <div className="heroActions">
+              <Link className="primaryButton" href="/workspace/governed-records/build">
+                Build the Record
+              </Link>
+              <Link className="secondaryButton" href="/workspace/governed-records/my-records">
+                Look Up a Record
+              </Link>
+            </div>
+          </div>
+
+          <aside className="principleCard">
+            <p className="eyebrow">Governing principle</p>
+            <blockquote>
+              No admissible evidence.
+              <br />
+              No admissible execution.
+            </blockquote>
+            <div className="principleLine" />
+            <p>
+              A governed record does not make a claim true. It preserves the
+              evidence, authority, continuity, and proof boundaries needed to
+              determine what may legitimately be concluded or done.
+            </p>
+          </aside>
+        </div>
+      </section>
+
+      <section className="definitionSection">
+        <div className="sectionHeading">
+          <p className="eyebrow">The essential distinction</p>
+          <h2>Information becomes governable only when its boundaries remain attached.</h2>
+        </div>
+
+        <div className="definitionGrid">
+          <article className="definitionCard ordinaryCard">
+            <span className="definitionLabel">A record</span>
+            <h3>Preserves content.</h3>
+            <p>
+              It may show a reading, statement, transaction, inspection,
+              decision, event, or condition. It can be useful and accurate, yet
+              still fail under scrutiny because the source, sequence,
+              authority, integrity, or limits are missing.
+            </p>
+            <ul>
+              <li>May contain evidence</li>
+              <li>May include a timestamp</li>
+              <li>May identify a creator</li>
+              <li>May still leave meaning and authority ambiguous</li>
+            </ul>
+          </article>
+
+          <article className="definitionCard governedCard">
+            <span className="definitionLabel">A governed record</span>
+            <h3>Preserves content and the conditions governing its use.</h3>
+            <p>
+              It keeps the record connected to declared reality, source,
+              identity, continuity, authority, integrity, proof boundaries,
+              version history, and independent verification.
+            </p>
+            <ul>
+              <li>Separates evidence from interpretation</li>
+              <li>Declares what is proven and not proven</li>
+              <li>Preserves corrections without erasing prior states</li>
+              <li>Constrains consequential use to admitted evidence</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+
+      <section className="comparisonSection">
+        <div className="sectionHeading narrow">
+          <p className="eyebrow">Side-by-side</p>
+          <h2>The difference is not formatting. It is governability.</h2>
           <p>
-            Begin with declared reality. Keep evidence separate from interpretation,
-            determination, diagnosis, and optimization.
+            A polished report, signed form, sensor dashboard, database row, or
+            exported PDF may still be only a record. Governance comes from the
+            preserved conditions surrounding the record.
           </p>
         </div>
 
-        <nav className="sidebarNav" aria-label="Governed Records navigation">
-          {SIDEBAR_LINKS.map((item) => (
-            <Link
-              className={`sidebarLink ${
-                'active' in item && item.active ? 'active' : ''
-              }`}
-              href={item.href}
-              key={item.href}
-            >
-              <span>{item.glyph}</span>
-              <strong>{item.label}</strong>
-            </Link>
+        <div className="comparisonTable" role="table" aria-label="Record and governed record comparison">
+          <div className="comparisonHeader" role="row">
+            <span role="columnheader">Condition</span>
+            <strong role="columnheader">Record</strong>
+            <strong role="columnheader">Governed record</strong>
+          </div>
+
+          {RECORD_DIFFERENCES.map((item) => (
+            <div className="comparisonRow" role="row" key={item.label}>
+              <span className="comparisonLabel" role="cell">{item.label}</span>
+              <p role="cell">{item.ordinary}</p>
+              <p className="governedAnswer" role="cell">{item.governed}</p>
+            </div>
           ))}
-        </nav>
-
-        <div className="sidebarPrinciple">
-          <span className="statusDot" />
-          <p>No admissible evidence. No admissible execution.</p>
         </div>
-      </aside>
-
-      <section className="workspace">
-        <header className="pageHeader">
-          <div>
-            <p className="eyebrow">Construct</p>
-            <h2>Build the governed record.</h2>
-            <p>
-              Capture the record first. Declare its source, continuity, authority,
-              and proof boundaries before anyone interprets or acts on it.
-            </p>
-          </div>
-
-          <div className="completionCard">
-            <span>{completion}%</span>
-            <div>
-              <strong>Record completion</strong>
-              <small>
-                {status === 'review-ready'
-                  ? 'Ready for bounded review'
-                  : 'Draft record'}
-              </small>
-            </div>
-          </div>
-        </header>
-
-        <form onSubmit={handleSubmit}>
-          <section className="formSection">
-            <div className="sectionNumber">01</div>
-            <div className="sectionContent">
-              <div className="sectionHeading">
-                <p className="eyebrow">Record identity</p>
-                <h3>Identify the record before describing what it contains.</h3>
-                <p>
-                  Identity must remain stable across review, correction, preservation,
-                  comparison, and verification.
-                </p>
-              </div>
-
-              <div className="fieldGrid twoColumns">
-                <label>
-                  <span>Record title</span>
-                  <input
-                    value={title}
-                    onChange={(event) => setTitle(event.target.value)}
-                    placeholder="Example: Building Atmospheric Integrity Record — July 21"
-                    required
-                  />
-                </label>
-
-                <label>
-                  <span>Record type</span>
-                  <select
-                    value={recordType}
-                    onChange={(event) =>
-                      setRecordType(event.target.value as (typeof RECORD_TYPES)[number])
-                    }
-                  >
-                    {RECORD_TYPES.map((type) => (
-                      <option value={type} key={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-
-                <label>
-                  <span>Record owner</span>
-                  <input
-                    value={recordOwner}
-                    onChange={(event) => setRecordOwner(event.target.value)}
-                    placeholder="Person, facility, organization, or system"
-                    required
-                  />
-                </label>
-
-                <label>
-                  <span>Governing authority</span>
-                  <input
-                    value={recordAuthority}
-                    onChange={(event) => setRecordAuthority(event.target.value)}
-                    placeholder="Who has authority to create and preserve this record?"
-                    required
-                  />
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <section className="formSection">
-            <div className="sectionNumber">02</div>
-            <div className="sectionContent">
-              <div className="sectionHeading">
-                <p className="eyebrow">Declared reality</p>
-                <h3>State what was actually observed, measured, received, or asserted.</h3>
-                <p>
-                  Do not begin with a diagnosis, recommendation, score, or conclusion.
-                  Describe the bounded reality entering the record.
-                </p>
-              </div>
-
-              <label>
-                <span>Reality statement</span>
-                <textarea
-                  value={realityStatement}
-                  onChange={(event) => setRealityStatement(event.target.value)}
-                  placeholder="Describe the condition, event, measurement period, transaction, inspection, or operational state that this record preserves."
-                  rows={7}
-                  required
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="formSection">
-            <div className="sectionNumber">03</div>
-            <div className="sectionContent">
-              <div className="sectionHeading evidenceHeading">
-                <div>
-                  <p className="eyebrow">Evidence package</p>
-                  <h3>Attach each evidentiary element to its source and authority.</h3>
-                  <p>
-                    A file, reading, image, statement, or sensor stream does not govern
-                    itself. Every item needs a declared origin and custody point.
-                  </p>
-                </div>
-
-                <button type="button" className="addButton" onClick={addEvidenceItem}>
-                  + Add evidence item
-                </button>
-              </div>
-
-              <div className="evidenceStack">
-                {evidence.map((item, index) => (
-                  <article className="evidenceCard" key={item.id}>
-                    <div className="evidenceCardHeader">
-                      <div>
-                        <span>Evidence item {String(index + 1).padStart(2, '0')}</span>
-                        <strong>
-                          {item.label.trim() || 'Unidentified evidence'}
-                        </strong>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeEvidenceItem(item.id)}
-                        disabled={evidence.length === 1}
-                      >
-                        Remove
-                      </button>
-                    </div>
-
-                    <div className="fieldGrid twoColumns">
-                      <label>
-                        <span>Evidence label</span>
-                        <input
-                          value={item.label}
-                          onChange={(event) =>
-                            updateEvidence(item.id, 'label', event.target.value)
-                          }
-                          placeholder="Sensor export, inspection image, signed statement..."
-                        />
-                      </label>
-
-                      <label>
-                        <span>Source</span>
-                        <input
-                          value={item.source}
-                          onChange={(event) =>
-                            updateEvidence(item.id, 'source', event.target.value)
-                          }
-                          placeholder="Instrument, person, platform, facility, laboratory..."
-                        />
-                      </label>
-
-                      <label>
-                        <span>Captured or received at</span>
-                        <input
-                          type="datetime-local"
-                          value={item.capturedAt}
-                          onChange={(event) =>
-                            updateEvidence(item.id, 'capturedAt', event.target.value)
-                          }
-                        />
-                      </label>
-
-                      <label>
-                        <span>Evidence authority</span>
-                        <input
-                          value={item.authority}
-                          onChange={(event) =>
-                            updateEvidence(item.id, 'authority', event.target.value)
-                          }
-                          placeholder="Who was authorized to produce or submit it?"
-                        />
-                      </label>
-                    </div>
-
-                    <label>
-                      <span>Evidence notes</span>
-                      <textarea
-                        value={item.notes}
-                        onChange={(event) =>
-                          updateEvidence(item.id, 'notes', event.target.value)
-                        }
-                        placeholder="Calibration, collection method, known limitations, custody, missing intervals, or other relevant conditions."
-                        rows={4}
-                      />
-                    </label>
-                  </article>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <section className="formSection">
-            <div className="sectionNumber">04</div>
-            <div className="sectionContent">
-              <div className="sectionHeading">
-                <p className="eyebrow">Continuity</p>
-                <h3>Declare the sequence and any known breaks.</h3>
-                <p>
-                  Continuity is not created by hiding gaps. It is preserved by making
-                  sequence, custody, overlaps, omissions, and changes visible.
-                </p>
-              </div>
-
-              <label>
-                <span>Continuity statement</span>
-                <textarea
-                  value={continuityStatement}
-                  onChange={(event) => setContinuityStatement(event.target.value)}
-                  placeholder="Describe the collection period, custody, sequence, known gaps, source changes, transfer points, and version history."
-                  rows={6}
-                  required
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="formSection">
-            <div className="sectionNumber">05</div>
-            <div className="sectionContent">
-              <div className="sectionHeading">
-                <p className="eyebrow">Proof boundaries</p>
-                <h3>State what the record proves—and where proof stops.</h3>
-                <p>
-                  A governed record is not admissible merely because it is detailed.
-                  Its permitted meaning must remain bounded by the evidence.
-                </p>
-              </div>
-
-              <div className="fieldGrid twoColumns">
-                <label>
-                  <span>What this record proves</span>
-                  <textarea
-                    value={proofStatement}
-                    onChange={(event) => setProofStatement(event.target.value)}
-                    placeholder="State only the claims directly supported by the admitted evidence."
-                    rows={7}
-                    required
-                  />
-                </label>
-
-                <label>
-                  <span>What this record does not prove</span>
-                  <textarea
-                    value={nonProofStatement}
-                    onChange={(event) => setNonProofStatement(event.target.value)}
-                    placeholder="Declare unsupported conclusions, missing periods, excluded causes, absent authority, or other limits."
-                    rows={7}
-                    required
-                  />
-                </label>
-              </div>
-            </div>
-          </section>
-
-          <section className="formSection">
-            <div className="sectionNumber">06</div>
-            <div className="sectionContent">
-              <div className="sectionHeading">
-                <p className="eyebrow">Correction and preservation</p>
-                <h3>Preserve the prior state when the record changes.</h3>
-                <p>
-                  Correction must not erase history. A changed record becomes a new
-                  version connected to the original state and reason for correction.
-                </p>
-              </div>
-
-              <label>
-                <span>Correction rule</span>
-                <textarea
-                  value={correctionRule}
-                  onChange={(event) => setCorrectionRule(event.target.value)}
-                  rows={4}
-                />
-              </label>
-            </div>
-          </section>
-
-          <section className="reviewPanel">
-            <div>
-              <p className="eyebrow">Bounded submission</p>
-              <h3>Prepare the record for review.</h3>
-              <p>
-                This action does not diagnose the condition, approve an intervention,
-                confer authority, or prove an outcome. It prepares the declared record
-                for continuity, admissibility, preservation, and verification review.
-              </p>
-            </div>
-
-            <div className="reviewActions">
-              <button type="button" className="secondaryAction">
-                Save Draft
-              </button>
-              <button type="submit" className="primaryAction">
-                Prepare for Review
-              </button>
-            </div>
-          </section>
-        </form>
-
-        {status === 'review-ready' ? (
-          <section className="successPanel" aria-live="polite">
-            <div className="successIcon">✓</div>
-            <div>
-              <p className="eyebrow">Draft determination</p>
-              <h3>Record prepared for bounded review.</h3>
-              <p>
-                The record has not yet been verified, preserved, interpreted, or
-                admitted for consequential use.
-              </p>
-            </div>
-            <Link href="/workspace/governed-records/continuity-review">
-              Continue to Continuity Review →
-            </Link>
-          </section>
-        ) : null}
       </section>
 
+      <section className="anatomySection">
+        <div className="sectionHeading">
+          <p className="eyebrow">Anatomy of a governed record</p>
+          <h2>Six conditions that keep evidence from becoming detached from reality.</h2>
+        </div>
+
+        <div className="anatomyGrid">
+          {GOVERNED_RECORD_ELEMENTS.map((item) => (
+            <article className="anatomyCard" key={item.number}>
+              <span>{item.number}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="separationSection">
+        <div className="separationCopy">
+          <p className="eyebrow">Intentional separation</p>
+          <h2>The record is not the diagnosis, determination, or optimization.</h2>
+          <p>
+            The record preserves what entered the system. Interpretation
+            explains the bounded meaning of that evidence. A diagnostic
+            determination applies declared rules to the admitted evidence.
+            Optimization proposes what might improve the condition. These
+            layers must remain separate so that one cannot silently rewrite or
+            corrupt another.
+          </p>
+        </div>
+
+        <div className="separationFlow" aria-label="Governed records separation">
+          <div>
+            <span>01</span>
+            <strong>Record</strong>
+            <small>What was preserved</small>
+          </div>
+          <i>→</i>
+          <div>
+            <span>02</span>
+            <strong>Interpretation</strong>
+            <small>What it can mean</small>
+          </div>
+          <i>→</i>
+          <div>
+            <span>03</span>
+            <strong>Determination</strong>
+            <small>What rules admit</small>
+          </div>
+          <i>→</i>
+          <div>
+            <span>04</span>
+            <strong>Optimization</strong>
+            <small>What may improve it</small>
+          </div>
+        </div>
+      </section>
+
+      <section className="actionSection">
+        <div className="sectionHeading actionHeading">
+          <p className="eyebrow">Enter the workspace</p>
+          <h2>Build, find, examine, preserve, and verify the record.</h2>
+          <p>
+            Start with the evidence. Keep every later layer bounded by what the
+            record can actually support.
+          </p>
+        </div>
+
+        <div className="actionGrid">
+          {ACTIONS.map((action, index) => (
+            <Link
+              className={`actionCard ${index === 0 ? 'featuredAction' : ''}`}
+              href={action.href}
+              key={action.title}
+            >
+              <div className="actionTop">
+                <span className="actionGlyph">{action.glyph}</span>
+                <span className="actionArrow">↗</span>
+              </div>
+              <p className="eyebrow">{action.eyebrow}</p>
+              <h3>{action.title}</h3>
+              <p>{action.description}</p>
+              <strong>{action.action}</strong>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section className="finalCta">
+        <div>
+          <p className="eyebrow">Begin with reality</p>
+          <h2>Do not start with a conclusion. Build the record first.</h2>
+        </div>
+        <div className="finalActions">
+          <Link className="primaryButton" href="/workspace/governed-records/build">
+            Build the Record
+          </Link>
+          <Link className="secondaryButton" href="/workspace/governed-records/pricing">
+            View Pricing
+          </Link>
+        </div>
+      </section>
+
+      <footer className="footer">
+        <Link href="/workspace/ai-governance">← AI Governance</Link>
+        <span>No admissible evidence. No admissible execution.</span>
+        <Link href="/workspace/governed-records/my-records">My Records →</Link>
+      </footer>
+
       <style>{`
-        .builderShell {
+        .recordsHome {
           --cyan: #6ee7ff;
           --green: #66f0bd;
           --violet: #aa9cff;
           --amber: #ffc978;
+          --ink: #061018;
+          --panel: rgba(9, 25, 36, 0.88);
           --line: rgba(145, 205, 225, 0.16);
-          display: grid;
-          grid-template-columns: 290px minmax(0, 1fr);
           min-height: 100vh;
-          color: #f3f9fc;
+          padding: 42px clamp(16px, 4vw, 64px) 54px;
+          color: #f4fafc;
           background:
-            radial-gradient(circle at 85% 4%, rgba(110, 231, 255, 0.1), transparent 25%),
+            radial-gradient(circle at 82% 6%, rgba(110, 231, 255, 0.12), transparent 28%),
+            radial-gradient(circle at 7% 46%, rgba(170, 156, 255, 0.08), transparent 30%),
             linear-gradient(180deg, #061018 0%, #03090e 100%);
         }
 
-        .sidebar {
-          position: sticky;
-          top: 0;
-          display: flex;
-          height: 100vh;
-          flex-direction: column;
-          padding: 28px 20px 22px;
-          border-right: 1px solid var(--line);
-          background: rgba(4, 14, 21, 0.94);
-          backdrop-filter: blur(18px);
+        .recordsHome::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          opacity: 0.24;
+          background-image:
+            linear-gradient(rgba(110, 231, 255, 0.04) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(110, 231, 255, 0.04) 1px, transparent 1px);
+          background-size: 48px 48px;
+          mask-image: linear-gradient(to bottom, black, transparent 90%);
+        }
+
+        .hero,
+        .definitionSection,
+        .comparisonSection,
+        .anatomySection,
+        .separationSection,
+        .actionSection,
+        .finalCta,
+        .footer {
+          position: relative;
+          z-index: 1;
+          width: min(1240px, 100%);
+          margin-inline: auto;
+        }
+
+        .hero {
+          position: relative;
+          overflow: hidden;
+          padding: clamp(28px, 5vw, 68px);
+          border: 1px solid var(--line);
+          border-radius: 30px;
+          background:
+            linear-gradient(145deg, rgba(15, 39, 53, 0.96), rgba(5, 16, 24, 0.98));
+          box-shadow: 0 34px 92px rgba(0, 0, 0, 0.3);
+        }
+
+        .heroGlow {
+          position: absolute;
+          top: -190px;
+          right: -120px;
+          width: 480px;
+          height: 480px;
+          border-radius: 999px;
+          background: var(--cyan);
+          filter: blur(120px);
+          opacity: 0.14;
+        }
+
+        .heroGrid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+          gap: clamp(34px, 6vw, 80px);
+          align-items: end;
         }
 
         .eyebrow {
-          margin: 0 0 10px;
+          margin: 0 0 13px;
           color: var(--cyan);
-          font-size: 10px;
+          font-size: 11px;
           font-weight: 900;
           letter-spacing: 0.16em;
           text-transform: uppercase;
         }
 
-        .sidebarBrand h1 {
+        .hero h1 {
+          max-width: 880px;
           margin: 0;
-          font-size: 1.65rem;
+          font-size: clamp(3.4rem, 7vw, 7.8rem);
+          line-height: 0.88;
+          letter-spacing: -0.075em;
+        }
+
+        .hero h1 span {
+          display: block;
+          margin-top: 0.13em;
+          color: transparent;
+          background: linear-gradient(90deg, #ffffff, var(--cyan), var(--green));
+          background-clip: text;
+          -webkit-background-clip: text;
+        }
+
+        .hero h2 {
+          max-width: 760px;
+          margin: 30px 0 0;
+          color: #d7e9f0;
+          font-size: clamp(1.35rem, 2.6vw, 2.35rem);
+          line-height: 1.2;
           letter-spacing: -0.04em;
         }
 
-        .sidebarBrand > p:last-child {
-          margin: 14px 0 0;
-          color: #8299a7;
-          font-size: 12px;
-          line-height: 1.65;
+        .heroCopy > p:not(.eyebrow) {
+          max-width: 780px;
+          color: #96adba;
+          font-size: 15px;
+          line-height: 1.82;
         }
 
-        .sidebarNav {
-          display: grid;
-          gap: 7px;
+        .heroCopy .lede {
+          margin-top: 24px;
+          color: #b7cbd4;
+          font-size: 16px;
+        }
+
+        .heroActions,
+        .finalActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
           margin-top: 30px;
         }
 
-        .sidebarLink {
-          display: grid;
-          grid-template-columns: 38px minmax(0, 1fr);
-          gap: 10px;
+        .primaryButton,
+        .secondaryButton {
+          display: inline-flex;
           align-items: center;
-          min-height: 48px;
-          padding: 6px 10px;
-          border: 1px solid transparent;
+          justify-content: center;
+          min-height: 50px;
+          padding: 0 20px;
           border-radius: 12px;
-          color: #8fa7b5;
-          text-decoration: none;
-          transition: border-color 170ms ease, background 170ms ease, color 170ms ease;
-        }
-
-        .sidebarLink span {
-          display: grid;
-          place-items: center;
-          width: 34px;
-          height: 34px;
-          border: 1px solid rgba(110, 231, 255, 0.14);
-          border-radius: 9px;
           font-size: 13px;
           font-weight: 900;
+          text-decoration: none;
+          transition: transform 180ms ease, border-color 180ms ease;
         }
 
-        .sidebarLink strong {
-          font-size: 12px;
-        }
-
-        .sidebarLink:hover {
-          color: #dff7ff;
-          border-color: rgba(110, 231, 255, 0.18);
-          background: rgba(110, 231, 255, 0.04);
-        }
-
-        .sidebarLink.active {
+        .primaryButton {
           color: #031118;
-          border-color: rgba(110, 231, 255, 0.44);
           background: linear-gradient(135deg, var(--cyan), var(--green));
         }
 
-        .sidebarLink.active span {
-          border-color: rgba(3, 17, 24, 0.18);
+        .secondaryButton {
+          border: 1px solid rgba(110, 231, 255, 0.27);
+          color: #dcf7ff;
+          background: rgba(110, 231, 255, 0.055);
         }
 
-        .sidebarPrinciple {
-          display: flex;
-          gap: 10px;
-          align-items: flex-start;
-          margin-top: auto;
-          padding: 15px;
-          border: 1px solid rgba(102, 240, 189, 0.16);
-          border-radius: 13px;
-          background: rgba(102, 240, 189, 0.035);
+        .primaryButton:hover,
+        .secondaryButton:hover {
+          transform: translateY(-2px);
         }
 
-        .statusDot {
-          width: 8px;
-          height: 8px;
-          margin-top: 4px;
-          flex: 0 0 auto;
-          border-radius: 99px;
-          background: var(--green);
-          box-shadow: 0 0 14px rgba(102, 240, 189, 0.8);
-        }
-
-        .sidebarPrinciple p {
-          margin: 0;
-          color: #9bb7aa;
-          font-size: 10px;
-          font-weight: 800;
-          line-height: 1.5;
-        }
-
-        .workspace {
-          width: min(1180px, 100%);
-          margin: 0 auto;
-          padding: 42px clamp(20px, 4vw, 62px) 70px;
-        }
-
-        .pageHeader {
-          display: flex;
-          justify-content: space-between;
-          gap: 28px;
-          align-items: flex-end;
-          margin-bottom: 30px;
-        }
-
-        .pageHeader h2 {
-          margin: 0;
-          font-size: clamp(2.8rem, 5vw, 5.8rem);
-          line-height: 0.93;
-          letter-spacing: -0.065em;
-        }
-
-        .pageHeader > div:first-child > p:last-child {
-          max-width: 760px;
-          margin: 18px 0 0;
-          color: #8fa7b5;
-          line-height: 1.72;
-        }
-
-        .completionCard {
-          display: flex;
-          min-width: 220px;
-          gap: 14px;
-          align-items: center;
-          padding: 16px 18px;
-          border: 1px solid var(--line);
-          border-radius: 15px;
-          background: rgba(8, 24, 34, 0.84);
-        }
-
-        .completionCard > span {
-          color: var(--green);
-          font-size: 1.5rem;
-          font-weight: 900;
-        }
-
-        .completionCard strong,
-        .completionCard small {
-          display: block;
-        }
-
-        .completionCard strong {
-          font-size: 12px;
-        }
-
-        .completionCard small {
-          margin-top: 4px;
-          color: #78909e;
-          font-size: 10px;
-        }
-
-        form {
-          display: grid;
-          gap: 18px;
-        }
-
-        .formSection {
-          display: grid;
-          grid-template-columns: 62px minmax(0, 1fr);
-          overflow: hidden;
-          border: 1px solid var(--line);
+        .principleCard {
+          padding: 28px;
+          border: 1px solid rgba(102, 240, 189, 0.22);
           border-radius: 22px;
-          background: rgba(7, 22, 31, 0.88);
+          background: rgba(3, 14, 21, 0.75);
         }
 
-        .sectionNumber {
-          display: flex;
-          justify-content: center;
-          padding-top: 31px;
-          border-right: 1px solid var(--line);
-          color: #547181;
-          font-size: 10px;
-          font-weight: 900;
-          letter-spacing: 0.12em;
-          background: rgba(110, 231, 255, 0.025);
+        .principleCard blockquote {
+          margin: 20px 0;
+          font-size: clamp(1.6rem, 3vw, 2.45rem);
+          line-height: 1.14;
+          font-weight: 850;
+          letter-spacing: -0.045em;
         }
 
-        .sectionContent {
-          padding: clamp(24px, 4vw, 38px);
+        .principleLine {
+          height: 1px;
+          margin: 22px 0;
+          background: linear-gradient(90deg, var(--green), transparent);
         }
 
-        .sectionHeading {
-          max-width: 780px;
-          margin-bottom: 25px;
-        }
-
-        .sectionHeading h3,
-        .reviewPanel h3,
-        .successPanel h3 {
+        .principleCard > p:last-child {
           margin: 0;
-          font-size: clamp(1.65rem, 3vw, 2.8rem);
-          line-height: 1;
-          letter-spacing: -0.05em;
-        }
-
-        .sectionHeading > p:last-child,
-        .reviewPanel p:last-child,
-        .successPanel p {
-          margin: 13px 0 0;
-          color: #849dab;
+          color: #8fa7b5;
           font-size: 13px;
           line-height: 1.72;
         }
 
-        .fieldGrid {
-          display: grid;
-          gap: 16px;
+        .definitionSection,
+        .comparisonSection,
+        .anatomySection,
+        .actionSection {
+          padding-top: 82px;
         }
 
-        .twoColumns {
+        .sectionHeading {
+          max-width: 930px;
+          margin-bottom: 30px;
+        }
+
+        .sectionHeading.narrow {
+          max-width: 760px;
+        }
+
+        .sectionHeading h2,
+        .separationCopy h2,
+        .finalCta h2 {
+          margin: 0;
+          font-size: clamp(2.2rem, 4.5vw, 4.8rem);
+          line-height: 0.98;
+          letter-spacing: -0.058em;
+        }
+
+        .sectionHeading > p:last-child {
+          margin: 18px 0 0;
+          color: #8fa7b5;
+          line-height: 1.78;
+        }
+
+        .definitionGrid {
+          display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-
-        label {
-          display: grid;
-          gap: 8px;
-        }
-
-        label > span {
-          color: #bfd1d9;
-          font-size: 11px;
-          font-weight: 800;
-        }
-
-        input,
-        select,
-        textarea {
-          width: 100%;
-          box-sizing: border-box;
-          border: 1px solid rgba(145, 205, 225, 0.17);
-          border-radius: 11px;
-          outline: none;
-          color: #eaf6fa;
-          background: rgba(3, 13, 20, 0.74);
-          font: inherit;
-          transition: border-color 160ms ease, box-shadow 160ms ease;
-        }
-
-        input,
-        select {
-          min-height: 47px;
-          padding: 0 13px;
-        }
-
-        textarea {
-          resize: vertical;
-          padding: 13px;
-          line-height: 1.6;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-          border-color: rgba(110, 231, 255, 0.52);
-          box-shadow: 0 0 0 3px rgba(110, 231, 255, 0.07);
-        }
-
-        input::placeholder,
-        textarea::placeholder {
-          color: #526b79;
-        }
-
-        select option {
-          color: #edf8fb;
-          background: #07131c;
-        }
-
-        .evidenceHeading {
-          display: flex;
-          justify-content: space-between;
-          gap: 20px;
-          align-items: flex-start;
-          max-width: none;
-        }
-
-        .addButton,
-        .secondaryAction,
-        .primaryAction {
-          border: 0;
-          border-radius: 11px;
-          cursor: pointer;
-          font-weight: 900;
-        }
-
-        .addButton {
-          min-height: 42px;
-          flex: 0 0 auto;
-          padding: 0 14px;
-          border: 1px solid rgba(110, 231, 255, 0.22);
-          color: var(--cyan);
-          background: rgba(110, 231, 255, 0.05);
-          font-size: 11px;
-        }
-
-        .evidenceStack {
-          display: grid;
-          gap: 14px;
-        }
-
-        .evidenceCard {
-          padding: 20px;
-          border: 1px solid rgba(145, 205, 225, 0.13);
-          border-radius: 16px;
-          background: rgba(2, 12, 18, 0.5);
-        }
-
-        .evidenceCardHeader {
-          display: flex;
-          justify-content: space-between;
           gap: 18px;
-          margin-bottom: 18px;
         }
 
-        .evidenceCardHeader span,
-        .evidenceCardHeader strong {
-          display: block;
+        .definitionCard {
+          padding: clamp(26px, 4vw, 42px);
+          border: 1px solid var(--line);
+          border-radius: 24px;
+          background: rgba(8, 24, 34, 0.83);
         }
 
-        .evidenceCardHeader span {
-          color: var(--green);
-          font-size: 9px;
+        .governedCard {
+          border-color: rgba(102, 240, 189, 0.28);
+          background:
+            radial-gradient(circle at 90% 10%, rgba(102, 240, 189, 0.09), transparent 34%),
+            rgba(8, 27, 35, 0.9);
+        }
+
+        .definitionLabel {
+          display: inline-flex;
+          padding: 7px 10px;
+          border: 1px solid rgba(110, 231, 255, 0.2);
+          border-radius: 999px;
+          color: var(--cyan);
+          font-size: 10px;
           font-weight: 900;
           letter-spacing: 0.12em;
           text-transform: uppercase;
         }
 
-        .evidenceCardHeader strong {
-          margin-top: 5px;
-          font-size: 14px;
+        .governedCard .definitionLabel {
+          border-color: rgba(102, 240, 189, 0.25);
+          color: var(--green);
         }
 
-        .evidenceCardHeader button {
-          border: 0;
-          cursor: pointer;
-          color: #b88787;
-          background: transparent;
+        .definitionCard h3 {
+          margin: 24px 0 16px;
+          font-size: clamp(1.8rem, 3vw, 3.1rem);
+          letter-spacing: -0.05em;
+        }
+
+        .definitionCard p,
+        .definitionCard li {
+          color: #91a8b6;
+          line-height: 1.76;
+        }
+
+        .definitionCard ul {
+          margin: 24px 0 0;
+          padding-left: 20px;
+        }
+
+        .definitionCard li + li {
+          margin-top: 8px;
+        }
+
+        .comparisonTable {
+          overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 22px;
+          background: rgba(7, 21, 30, 0.9);
+        }
+
+        .comparisonHeader,
+        .comparisonRow {
+          display: grid;
+          grid-template-columns: 0.55fr 1fr 1fr;
+          gap: 0;
+        }
+
+        .comparisonHeader {
+          color: #cfe3eb;
+          background: rgba(110, 231, 255, 0.06);
+          font-size: 11px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .comparisonHeader > *,
+        .comparisonRow > * {
+          margin: 0;
+          padding: 18px 20px;
+          border-right: 1px solid var(--line);
+        }
+
+        .comparisonHeader > *:last-child,
+        .comparisonRow > *:last-child {
+          border-right: 0;
+        }
+
+        .comparisonRow {
+          border-top: 1px solid var(--line);
+        }
+
+        .comparisonRow p {
+          color: #8fa7b5;
+          font-size: 13px;
+          line-height: 1.68;
+        }
+
+        .comparisonLabel {
+          color: #dbeaf0;
+          font-size: 12px;
+          font-weight: 850;
+        }
+
+        .comparisonRow .governedAnswer {
+          color: #b9e9d6;
+          background: rgba(102, 240, 189, 0.025);
+        }
+
+        .anatomyGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .anatomyCard {
+          min-height: 240px;
+          padding: 26px;
+          border: 1px solid var(--line);
+          border-radius: 20px;
+          background:
+            linear-gradient(145deg, rgba(12, 32, 44, 0.9), rgba(5, 16, 24, 0.96));
+        }
+
+        .anatomyCard > span {
+          color: var(--green);
           font-size: 10px;
-          font-weight: 800;
+          font-weight: 900;
+          letter-spacing: 0.13em;
         }
 
-        .evidenceCardHeader button:disabled {
-          cursor: not-allowed;
-          opacity: 0.3;
+        .anatomyCard h3 {
+          margin: 42px 0 13px;
+          font-size: 1.45rem;
+          letter-spacing: -0.035em;
         }
 
-        .evidenceCard > label {
-          margin-top: 16px;
+        .anatomyCard p {
+          margin: 0;
+          color: #8ca4b2;
+          font-size: 13px;
+          line-height: 1.7;
         }
 
-        .reviewPanel {
+        .separationSection {
+          display: grid;
+          grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+          gap: clamp(34px, 5vw, 70px);
+          align-items: center;
+          margin-top: 82px;
+          padding: clamp(30px, 5vw, 54px);
+          border: 1px solid rgba(170, 156, 255, 0.24);
+          border-radius: 26px;
+          background:
+            radial-gradient(circle at 90% 15%, rgba(170, 156, 255, 0.1), transparent 36%),
+            rgba(12, 20, 34, 0.82);
+        }
+
+        .separationCopy p:last-child {
+          color: #9ca9b9;
+          line-height: 1.8;
+        }
+
+        .separationFlow {
+          display: grid;
+          grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+          gap: 10px;
+          align-items: center;
+        }
+
+        .separationFlow > div {
+          min-height: 150px;
+          padding: 18px;
+          border: 1px solid rgba(170, 156, 255, 0.18);
+          border-radius: 16px;
+          background: rgba(5, 12, 22, 0.62);
+        }
+
+        .separationFlow span,
+        .separationFlow strong,
+        .separationFlow small {
+          display: block;
+        }
+
+        .separationFlow span {
+          color: var(--violet);
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .separationFlow strong {
+          margin-top: 32px;
+          font-size: 13px;
+        }
+
+        .separationFlow small {
+          margin-top: 7px;
+          color: #7f8b9d;
+          line-height: 1.4;
+        }
+
+        .separationFlow i {
+          color: var(--violet);
+          font-style: normal;
+        }
+
+        .actionHeading {
+          max-width: 790px;
+        }
+
+        .actionGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .actionCard {
+          display: flex;
+          min-height: 300px;
+          flex-direction: column;
+          padding: 25px;
+          border: 1px solid var(--line);
+          border-radius: 20px;
+          color: inherit;
+          text-decoration: none;
+          background: rgba(8, 23, 33, 0.82);
+          transition: transform 190ms ease, border-color 190ms ease, box-shadow 190ms ease;
+        }
+
+        .actionCard:hover {
+          transform: translateY(-6px);
+          border-color: rgba(110, 231, 255, 0.38);
+          box-shadow: 0 22px 56px rgba(0, 0, 0, 0.26);
+        }
+
+        .featuredAction {
+          grid-column: span 2;
+          background:
+            radial-gradient(circle at 12% 18%, rgba(110, 231, 255, 0.1), transparent 34%),
+            linear-gradient(145deg, rgba(13, 39, 52, 0.96), rgba(6, 20, 29, 0.96));
+        }
+
+        .actionTop {
           display: flex;
           justify-content: space-between;
-          gap: 30px;
-          align-items: center;
-          padding: clamp(26px, 4vw, 40px);
-          border: 1px solid rgba(102, 240, 189, 0.23);
-          border-radius: 22px;
-          background:
-            radial-gradient(circle at 8% 50%, rgba(102, 240, 189, 0.09), transparent 30%),
-            rgba(6, 27, 29, 0.86);
+          margin-bottom: 42px;
         }
 
-        .reviewPanel > div:first-child {
-          max-width: 740px;
-        }
-
-        .reviewActions {
-          display: flex;
-          flex: 0 0 auto;
-          gap: 10px;
-        }
-
-        .secondaryAction,
-        .primaryAction {
-          min-height: 48px;
-          padding: 0 18px;
-          font-size: 11px;
-        }
-
-        .secondaryAction {
-          border: 1px solid rgba(110, 231, 255, 0.22);
-          color: #d9f5fc;
-          background: rgba(110, 231, 255, 0.04);
-        }
-
-        .primaryAction {
-          color: #031118;
-          background: linear-gradient(135deg, var(--cyan), var(--green));
-        }
-
-        .successPanel {
-          display: grid;
-          grid-template-columns: auto minmax(0, 1fr) auto;
-          gap: 18px;
-          align-items: center;
-          margin-top: 18px;
-          padding: 22px;
-          border: 1px solid rgba(102, 240, 189, 0.3);
-          border-radius: 18px;
-          background: rgba(7, 35, 31, 0.82);
-        }
-
-        .successIcon {
+        .actionGlyph {
           display: grid;
           place-items: center;
           width: 48px;
           height: 48px;
+          border: 1px solid rgba(110, 231, 255, 0.24);
           border-radius: 14px;
-          color: #032018;
-          background: var(--green);
+          color: var(--cyan);
+          background: rgba(110, 231, 255, 0.055);
+          font-size: 19px;
           font-weight: 900;
         }
 
-        .successPanel a {
+        .actionArrow {
+          color: #577484;
+          font-size: 20px;
+        }
+
+        .actionCard h3 {
+          margin: 0;
+          font-size: 1.55rem;
+          letter-spacing: -0.035em;
+        }
+
+        .actionCard > p:not(.eyebrow) {
+          flex: 1;
+          margin: 15px 0 26px;
+          color: #8fa7b5;
+          font-size: 13px;
+          line-height: 1.72;
+        }
+
+        .actionCard > strong {
           color: var(--green);
+          font-size: 12px;
+        }
+
+        .finalCta {
+          display: flex;
+          justify-content: space-between;
+          gap: 34px;
+          align-items: center;
+          margin-top: 82px;
+          padding: clamp(30px, 5vw, 54px);
+          border: 1px solid rgba(102, 240, 189, 0.24);
+          border-radius: 25px;
+          background:
+            radial-gradient(circle at 10% 50%, rgba(102, 240, 189, 0.1), transparent 32%),
+            rgba(7, 27, 30, 0.86);
+        }
+
+        .finalCta h2 {
+          max-width: 760px;
+        }
+
+        .finalActions {
+          flex-shrink: 0;
+          margin-top: 0;
+        }
+
+        .footer {
+          display: flex;
+          justify-content: space-between;
+          gap: 18px;
+          margin-top: 34px;
+          padding: 22px 4px 0;
+          border-top: 1px solid var(--line);
+          color: #718b99;
           font-size: 11px;
-          font-weight: 900;
+          font-weight: 750;
+        }
+
+        .footer a {
+          color: #87a1b0;
           text-decoration: none;
         }
 
-        @media (max-width: 980px) {
-          .builderShell {
+        .footer a:hover {
+          color: var(--cyan);
+        }
+
+        @media (max-width: 1000px) {
+          .heroGrid,
+          .separationSection {
             grid-template-columns: 1fr;
           }
 
-          .sidebar {
-            position: relative;
-            height: auto;
-            border-right: 0;
-            border-bottom: 1px solid var(--line);
-          }
-
-          .sidebarNav {
+          .anatomyGrid,
+          .actionGrid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .sidebarPrinciple {
-            margin-top: 22px;
+          .featuredAction {
+            grid-column: span 2;
           }
 
-          .pageHeader,
-          .reviewPanel {
+          .separationFlow {
+            grid-template-columns: 1fr;
+          }
+
+          .separationFlow i {
+            transform: rotate(90deg);
+            text-align: center;
+          }
+
+          .finalCta {
             align-items: flex-start;
             flex-direction: column;
           }
         }
 
-        @media (max-width: 700px) {
-          .workspace {
+        @media (max-width: 720px) {
+          .recordsHome {
             padding-inline: 12px;
           }
 
-          .sidebarNav,
-          .twoColumns {
+          .hero {
+            padding: 26px 20px 30px;
+            border-radius: 21px;
+          }
+
+          .hero h1 {
+            font-size: clamp(3.1rem, 16vw, 5.4rem);
+          }
+
+          .definitionGrid,
+          .anatomyGrid,
+          .actionGrid {
             grid-template-columns: 1fr;
           }
 
-          .pageHeader {
-            align-items: stretch;
+          .featuredAction {
+            grid-column: auto;
           }
 
-          .completionCard {
-            min-width: 0;
+          .comparisonTable {
+            overflow-x: auto;
           }
 
-          .formSection {
-            grid-template-columns: 1fr;
+          .comparisonHeader,
+          .comparisonRow {
+            min-width: 760px;
           }
 
-          .sectionNumber {
-            justify-content: flex-start;
-            padding: 13px 18px;
-            border-right: 0;
-            border-bottom: 1px solid var(--line);
-          }
-
-          .evidenceHeading,
-          .reviewPanel,
-          .reviewActions {
+          .footer {
             flex-direction: column;
-          }
-
-          .reviewActions {
-            width: 100%;
-          }
-
-          .reviewActions button {
-            width: 100%;
-          }
-
-          .successPanel {
-            grid-template-columns: auto minmax(0, 1fr);
-          }
-
-          .successPanel a {
-            grid-column: 1 / -1;
           }
         }
       `}</style>
