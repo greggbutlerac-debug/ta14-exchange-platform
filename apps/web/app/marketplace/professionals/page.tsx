@@ -1,631 +1,430 @@
-// apps/web/app/marketplace/professionals/page.tsx
-'use client';
+"use client";
 
-import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import Link from "next/link";
+import { useMemo, useState } from "react";
 
-type ProfessionalStatus = 'AVAILABLE' | 'LIMITED AVAILABILITY' | 'NOT ACCEPTING WORK';
-
-type Professional = {
-  id: string;
+type Reviewer = {
   name: string;
-  title: string;
-  organization: string;
-  location: string;
-  status: ProfessionalStatus;
-  verificationState: 'DECLARED' | 'PARTIALLY EVIDENCED' | 'REVIEWED';
-  summary: string;
-  domains: string[];
-  services: string[];
-  qualifications: string[];
-  evidenceSignals: string[];
-  boundaries: string[];
-  completedReviews: number;
-  publishedRoutes: number;
-  governedRecords: number;
-  responseTime: string;
-  availability: string;
+  role: string;
+  lane: string;
+  availability: "Available" | "Limited" | "By Request";
+  specialties: string[];
+  description: string;
 };
 
-const MARKETPLACE_ROUTES = {
-  home: '/marketplace',
-  opportunities: '/marketplace/opportunities',
-  postNeed: '/marketplace/post-a-need',
-  governedRecords: '/marketplace/governed-records',
-  routes: '/marketplace/routes',
-  dashboard: '/marketplace/dashboard',
-} as const;
-
-const PROFESSIONALS: Professional[] = [
+const reviewers: Reviewer[] = [
   {
-    id: 'TA-14-PRO-001',
-    name: 'Dr. Elena Marlowe',
-    title: 'Independent AI Governance Reviewer',
-    organization: 'Marlowe Governance Studio',
-    location: 'London, United Kingdom',
-    status: 'AVAILABLE',
-    verificationState: 'PARTIALLY EVIDENCED',
-    summary:
-      'Independent reviewer focused on AI governance applicability, evidence mapping, human oversight, high-risk pathways, and bounded review records.',
-    domains: [
-      'AI Governance',
-      'Employment Systems',
-      'EU AI Act',
-      'Independent Review',
+    name: "Partner Review Network",
+    role: "Independent Review Network",
+    lane: "Multi-Lane Review",
+    availability: "By Request",
+    specialties: [
+      "Entity Review",
+      "Governance Architecture",
+      "Evidence Integrity",
+      "Consequential Routes",
     ],
-    services: [
-      'Applicability review',
-      'Evidence-gap analysis',
-      'Human-oversight assessment',
-      'Independent review records',
-    ],
-    qualifications: [
-      'AI governance research',
-      'Employment-system review',
-      'Regulatory evidence mapping',
-    ],
-    evidenceSignals: [
-      'Three published route artifacts',
-      'Six preserved review records',
-      'Declared conflict policy',
-      'Visible review boundaries',
-    ],
-    boundaries: [
-      'Not legal counsel',
-      'Does not issue conformity assessments',
-      'Does not certify compliance',
-    ],
-    completedReviews: 18,
-    publishedRoutes: 3,
-    governedRecords: 11,
-    responseTime: 'Within 3 business days',
-    availability: 'Accepting two review scopes',
+    description:
+      "A bounded network path for review needs that require multiple specialists, independent lanes, or a second-layer TA-14 review.",
   },
   {
-    id: 'TA-14-PRO-002',
-    name: 'Marcus Vale',
-    title: 'Environmental Record Continuity Specialist',
-    organization: 'Continuity Evidence Lab',
-    location: 'Toronto, Canada',
-    status: 'LIMITED AVAILABILITY',
-    verificationState: 'DECLARED',
-    summary:
-      'Environmental record specialist working across atmospheric, building, HVAC, and healthcare records with emphasis on identity, chronology, continuity, and interpretation boundaries.',
-    domains: [
-      'Environmental Integrity',
-      'Atmospheric Records',
-      'Buildings',
-      'HVAC',
+    name: "Governance Architecture Reviewer",
+    role: "Architecture Review",
+    lane: "Scoped Review Candidate",
+    availability: "Available",
+    specialties: [
+      "AI Governance",
+      "Authority Boundaries",
+      "Runtime Governance",
+      "Admissible Execution",
     ],
-    services: [
-      'Record continuity review',
-      'Evidence identity review',
-      'Governed interpretation',
-      'Post-intervention comparison',
-    ],
-    qualifications: [
-      'Building systems analysis',
-      'Sensor and instrument records',
-      'Environmental chronology reconstruction',
-    ],
-    evidenceSignals: [
-      'Two demonstration governed records',
-      'One route artifact',
-      'Declared instrument limitations',
-      'Visible interpretation boundaries',
-    ],
-    boundaries: [
-      'Interpretation is not diagnosis',
-      'No medical conclusions',
-      'Optimization requires separate authorization',
-    ],
-    completedReviews: 9,
-    publishedRoutes: 1,
-    governedRecords: 7,
-    responseTime: 'Within 5 business days',
-    availability: 'One limited scope available',
+    description:
+      "Reviews whether governance architecture connects evidence, authority, binding, execution, and preserved outcomes without silently merging them.",
   },
   {
-    id: 'TA-14-PRO-003',
-    name: 'Amina Rahman',
-    title: 'Financial Execution Integrity Reviewer',
-    organization: 'Bounded Authority Partners',
-    location: 'New York, United States',
-    status: 'AVAILABLE',
-    verificationState: 'REVIEWED',
-    summary:
-      'Reviewer focused on payment authority, procurement evidence, beneficiary identity, approval continuity, route challenge, and non-execution HOLD states.',
-    domains: [
-      'Financial Execution Integrity',
-      'Procurement',
-      'Payment Authority',
-      'Challenge Review',
+    name: "Evidence Integrity Reviewer",
+    role: "Evidence and Records Review",
+    lane: "Scoped Review Candidate",
+    availability: "Available",
+    specialties: [
+      "Governed Records",
+      "Continuity",
+      "Record Interpretation",
+      "Outcome Evidence",
     ],
-    services: [
-      'Authority-chain review',
-      'Beneficiary-evidence review',
-      'Payment route challenge',
-      'Corrective governance design',
-    ],
-    qualifications: [
-      'Financial controls',
-      'Procurement governance',
-      'Execution-route review',
-    ],
-    evidenceSignals: [
-      'Eight preserved challenge records',
-      'Four reviewed route artifacts',
-      'Declared independence policy',
-      'Visible reason-code methodology',
-    ],
-    boundaries: [
-      'Does not move funds',
-      'Does not create authority',
-      'Does not verify bank ownership without evidence',
-    ],
-    completedReviews: 22,
-    publishedRoutes: 4,
-    governedRecords: 14,
-    responseTime: 'Within 2 business days',
-    availability: 'Accepting one challenge review',
+    description:
+      "Examines what a record proves, what it does not prove, whether continuity is preserved, and where evidence becomes inadmissible or incomplete.",
   },
   {
-    id: 'TA-14-PRO-004',
-    name: 'Dr. Rafael Chen',
-    title: 'Healthcare Facilities Governance Reviewer',
-    organization: 'Clinical Systems Evidence Group',
-    location: 'Boston, United States',
-    status: 'NOT ACCEPTING WORK',
-    verificationState: 'PARTIALLY EVIDENCED',
-    summary:
-      'Healthcare facilities reviewer focused on isolation-room records, environmental continuity, BMS evidence, alarm history, and bounded facilities interpretation.',
-    domains: [
-      'Healthcare Facilities',
-      'Environmental Records',
-      'BMS',
-      'Isolation Rooms',
+    name: "Operational Systems Reviewer",
+    role: "Operational Environment Review",
+    lane: "Specialized Review",
+    availability: "Limited",
+    specialties: [
+      "Buildings",
+      "Environmental Systems",
+      "Healthcare Environments",
+      "Industrial Operations",
     ],
-    services: [
-      'Hospital environmental review',
-      'BMS chronology reconstruction',
-      'Threshold comparison',
-      'Evidence-gap reporting',
+    description:
+      "Reviews real-world environments where software, people, machines, measurements, interventions, and consequences interact.",
+  },
+  {
+    name: "EU AI Act Review Route",
+    role: "Regulatory Readiness Review",
+    lane: "Specialized Laboratory",
+    availability: "By Request",
+    specialties: [
+      "Role Identification",
+      "Article 50",
+      "High-Risk AI",
+      "Evidence Readiness",
     ],
-    qualifications: [
-      'Healthcare building systems',
-      'Pressure-control records',
-      'Facilities event reconstruction',
+    description:
+      "A specialized review path for entities that need to examine EU AI Act roles, obligations, evidence, and implementation boundaries.",
+  },
+  {
+    name: "Partner or Reviewer Candidate",
+    role: "Network Qualification Review",
+    lane: "Partner-Track Candidate",
+    availability: "By Request",
+    specialties: [
+      "Reviewer Boundaries",
+      "Independent Architecture",
+      "Referral Lanes",
+      "Partner Review Network",
     ],
-    evidenceSignals: [
-      'Five preserved review records',
-      'Two hospital demonstration studies',
-      'Declared clinical boundary',
-      'Visible evidence dependencies',
-    ],
-    boundaries: [
-      'No clinical diagnosis',
-      'No infection-control determination',
-      'No legal compliance certification',
-    ],
-    completedReviews: 13,
-    publishedRoutes: 2,
-    governedRecords: 10,
-    responseTime: 'Not currently responding',
-    availability: 'Waitlist only',
+    description:
+      "A route for proposed reviewers, specialists, and governance partners to declare their architecture, boundaries, evidence, and proposed review lane.",
   },
 ];
 
-const domainFilters = [
-  'All',
-  'AI Governance',
-  'Environmental Integrity',
-  'Financial Execution Integrity',
-  'Healthcare Facilities',
-] as const;
+const specialties = [
+  "All",
+  "AI Governance",
+  "Governed Records",
+  "Evidence Integrity",
+  "Governance Architecture",
+  "Environmental Systems",
+  "EU AI Act",
+  "Partner Review Network",
+];
 
-const availabilityFilters = [
-  'All',
-  'AVAILABLE',
-  'LIMITED AVAILABILITY',
-  'NOT ACCEPTING WORK',
-] as const;
+export default function ProfessionalMarketplacePage() {
+  const [selectedSpecialty, setSelectedSpecialty] = useState("All");
+  const [query, setQuery] = useState("");
 
-function statusClass(status: ProfessionalStatus) {
-  return `status-${status.toLowerCase().replaceAll(' ', '-')}`;
-}
+  const filteredReviewers = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase();
 
-function verificationClass(state: Professional['verificationState']) {
-  return `verification-${state.toLowerCase().replaceAll(' ', '-')}`;
-}
-
-export default function MarketplaceProfessionalsPage() {
-  const [query, setQuery] = useState('');
-  const [domain, setDomain] = useState<(typeof domainFilters)[number]>('All');
-  const [availability, setAvailability] =
-    useState<(typeof availabilityFilters)[number]>('All');
-
-  const filteredProfessionals = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-
-    return PROFESSIONALS.filter((professional) => {
-      const queryMatch =
-        !normalized ||
-        [
-          professional.id,
-          professional.name,
-          professional.title,
-          professional.organization,
-          professional.location,
-          professional.summary,
-          ...professional.domains,
-          ...professional.services,
-          ...professional.qualifications,
-        ]
-          .join(' ')
+    return reviewers.filter((reviewer) => {
+      const matchesSpecialty =
+        selectedSpecialty === "All" ||
+        reviewer.specialties.some((specialty) =>
+          specialty.toLowerCase().includes(selectedSpecialty.toLowerCase()),
+        ) ||
+        reviewer.name
           .toLowerCase()
-          .includes(normalized);
+          .includes(selectedSpecialty.toLowerCase());
 
-      const domainMatch =
-        domain === 'All' ||
-        professional.domains.some((item) => item === domain || item.startsWith(domain));
+      const searchable = [
+        reviewer.name,
+        reviewer.role,
+        reviewer.lane,
+        reviewer.description,
+        ...reviewer.specialties,
+      ]
+        .join(" ")
+        .toLowerCase();
 
-      const availabilityMatch =
-        availability === 'All' || professional.status === availability;
-
-      return queryMatch && domainMatch && availabilityMatch;
+      return (
+        matchesSpecialty &&
+        (!normalizedQuery || searchable.includes(normalizedQuery))
+      );
     });
-  }, [availability, domain, query]);
+  }, [query, selectedSpecialty]);
 
   return (
-    <main className="page-shell">
-      <div className="cosmos" aria-hidden="true">
-        <span className="star star-one" />
-        <span className="star star-two" />
-        <span className="star star-three" />
-        <span className="star star-four" />
-        <span className="orbit orbit-one">
-          <span />
-        </span>
-        <span className="orbit orbit-two">
-          <span />
-        </span>
-        <span className="route-line route-one" />
-        <span className="route-line route-two" />
+    <main className="marketplace-page">
+      <div className="ambient" aria-hidden="true">
+        <span className="nova nova-one" />
+        <span className="nova nova-two" />
+        <span className="nova nova-three" />
+        <span className="moving-line line-one" />
+        <span className="moving-line line-two" />
+        <span className="orbit orbit-one" />
+        <span className="orbit orbit-two" />
       </div>
 
-      <div className="content-shell">
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          <Link href={MARKETPLACE_ROUTES.home}>Marketplace</Link>
-          <span>/</span>
-          <span>Professionals</span>
-        </nav>
+      <header className="topbar">
+        <Link className="brand" href="/">
+          <span>TA-14</span>
+          <div>
+            <strong>Reviewer Marketplace</strong>
+            <small>TA-14 AI Governance Exchange</small>
+          </div>
+        </Link>
 
-        <header className="hero">
-          <span className="eyebrow">TA-14 Collaborative Governance Marketplace</span>
-          <h1>Governance Professionals</h1>
-          <p className="hero-copy">
-            Discover professionals through declared expertise, inspectable work, route artifacts,
-            governed records, review history, evidence signals, availability, and explicit
-            limitations.
+        <nav>
+          <Link href="/workspace/entity-review">Entity Review</Link>
+          <Link href="/marketplace">Marketplace</Link>
+          <Link href="/workspace/entity-review/partner-review-network/pricing">
+            Partner Network
+          </Link>
+          <Link className="nav-cta" href="/">
+            Four Doors
+          </Link>
+        </nav>
+      </header>
+
+      <section className="hero shell">
+        <div>
+          <p className="eyebrow">INDEPENDENT REVIEW CAPACITY</p>
+          <h1>
+            Find the right reviewer
+            <span>for the declared review object.</span>
+          </h1>
+          <p className="lead">
+            Reviewer selection begins with scope. Choose the entity, system,
+            architecture, record, environmental environment, regulatory duty, or
+            consequential route that actually requires review.
           </p>
 
-          <div className="boundary-banner">
-            <strong>A profile is a professional declaration, not universal authority.</strong>
-            <p>
-              Marketplace profiles do not independently establish identity, licensing,
-              certification, legal authority, regulator acceptance, competence for every scope, or
-              guaranteed performance.
-            </p>
-          </div>
-
-          <div className="action-row">
-            <Link className="primary-button" href={MARKETPLACE_ROUTES.opportunities}>
-              Browse opportunities
+          <div className="hero-actions">
+            <Link className="button primary" href="/workspace/entity-review">
+              Begin Entity Review Intake
             </Link>
-            <Link className="secondary-button" href={MARKETPLACE_ROUTES.postNeed}>
-              Post a governance need
-            </Link>
-            <Link className="text-link" href={MARKETPLACE_ROUTES.dashboard}>
-              Open professional dashboard
+            <Link
+              className="button secondary"
+              href="/workspace/entity-review/partner-review-network/pricing"
+            >
+              Explore Partner Review Network
             </Link>
           </div>
-        </header>
 
-        <section className="summary-grid" aria-label="Professional directory summary">
-          <article>
-            <span>Professional demonstrations</span>
-            <strong>{PROFESSIONALS.length}</strong>
-          </article>
-          <article>
-            <span>Available now</span>
-            <strong>{PROFESSIONALS.filter((item) => item.status === 'AVAILABLE').length}</strong>
-          </article>
-          <article>
-            <span>Completed reviews</span>
-            <strong>{PROFESSIONALS.reduce((total, item) => total + item.completedReviews, 0)}</strong>
-          </article>
-          <article>
-            <span>Published routes</span>
-            <strong>{PROFESSIONALS.reduce((total, item) => total + item.publishedRoutes, 0)}</strong>
-          </article>
-          <article>
-            <span>Governed records</span>
-            <strong>{PROFESSIONALS.reduce((total, item) => total + item.governedRecords, 0)}</strong>
-          </article>
-          <article>
-            <span>Identity verification</span>
-            <strong>NOT CONNECTED</strong>
-          </article>
-        </section>
-
-        <section className="filter-panel">
-          <div className="filter-heading">
-            <span className="eyebrow">PROFESSIONAL EXPLORER</span>
-            <h2>Find expertise by domain, service, or availability</h2>
+          <div className="boundary-row">
+            <span>Independent lanes</span>
+            <span>Declared scope</span>
+            <span>Visible limitations</span>
+            <span>No automatic certification</span>
           </div>
+        </div>
 
+        <aside className="market-map">
+          <div className="market-core">
+            <span>REVIEW</span>
+            <strong>MARKETPLACE</strong>
+          </div>
+          <span className="ring ring-one" />
+          <span className="ring ring-two" />
+          <span className="ring ring-three" />
+          <div className="market-node node-one">Entity</div>
+          <div className="market-node node-two">Evidence</div>
+          <div className="market-node node-three">Architecture</div>
+          <div className="market-node node-four">Environment</div>
+          <div className="market-node node-five">Regulation</div>
+          <div className="market-node node-six">Outcome</div>
+        </aside>
+      </section>
+
+      <section className="shell controls-section">
+        <div className="section-heading">
+          <p className="eyebrow">SEARCH REVIEW CAPACITY</p>
+          <h2>Do not choose a reviewer before choosing the review lane.</h2>
+          <p>
+            A reviewer may be qualified for one declared lane and unqualified for
+            another. Search by the actual object, evidence, architecture, or duty
+            under review.
+          </p>
+        </div>
+
+        <div className="controls">
           <label>
-            Search professionals
+            <span>Search reviewers and specialties</span>
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search name, organization, domain, service, qualification, or profile ID"
+              placeholder="Search entity review, evidence, architecture, EU AI Act..."
             />
           </label>
 
-          <div className="filter-groups">
-            <div>
-              <span className="filter-label">Domain</span>
-              <div className="filter-row">
-                {domainFilters.map((item) => (
-                  <button
-                    key={item}
-                    className={domain === item ? 'filter-button selected' : 'filter-button'}
-                    type="button"
-                    onClick={() => setDomain(item)}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <span className="filter-label">Availability</span>
-              <div className="filter-row">
-                {availabilityFilters.map((item) => (
-                  <button
-                    key={item}
-                    className={
-                      availability === item ? 'filter-button selected' : 'filter-button'
-                    }
-                    type="button"
-                    onClick={() => setAvailability(item)}
-                  >
-                    {item}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="filters" aria-label="Reviewer specialty filters">
+            {specialties.map((specialty) => (
+              <button
+                className={selectedSpecialty === specialty ? "active" : ""}
+                type="button"
+                key={specialty}
+                onClick={() => setSelectedSpecialty(specialty)}
+              >
+                {specialty}
+              </button>
+            ))}
           </div>
-        </section>
-
-        <div className="results-meta">
-          <span>{filteredProfessionals.length} professional demonstration(s)</span>
-          <span>Every card opens a connected dynamic professional profile.</span>
         </div>
 
-        <section className="professional-grid">
-          {filteredProfessionals.map((professional) => (
-            <article className="professional-card" key={professional.id}>
-              <div className="card-topline">
-                <span className={`status-badge ${statusClass(professional.status)}`}>
-                  {professional.status}
+        <div className="results-heading">
+          <strong>{filteredReviewers.length} review routes shown</strong>
+          <span>
+            Marketplace participation does not itself establish qualification,
+            authority, or certification.
+          </span>
+        </div>
+
+        <div className="reviewer-grid">
+          {filteredReviewers.map((reviewer, index) => (
+            <article className="reviewer-card" key={reviewer.name}>
+              <div className="card-top">
+                <span className="card-number">
+                  {String(index + 1).padStart(2, "0")}
                 </span>
                 <span
-                  className={`verification-badge ${verificationClass(
-                    professional.verificationState,
-                  )}`}
+                  className={`availability ${reviewer.availability
+                    .toLowerCase()
+                    .replace(" ", "-")}`}
                 >
-                  {professional.verificationState}
+                  {reviewer.availability}
                 </span>
               </div>
 
-              <div className="identity-row">
-                <span className="identity-mark">
-                  {professional.name
-                    .split(' ')
-                    .filter((part) => !part.includes('.'))
-                    .slice(0, 2)
-                    .map((part) => part[0])
-                    .join('')}
-                </span>
+              <p className="lane">{reviewer.lane}</p>
+              <h3>{reviewer.name}</h3>
+              <strong className="role">{reviewer.role}</strong>
+              <p>{reviewer.description}</p>
 
-                <div>
-                  <span className="professional-id">{professional.id}</span>
-                  <h2>{professional.name}</h2>
-                  <p className="title">{professional.title}</p>
-                  <p className="organization">{professional.organization}</p>
-                </div>
-              </div>
-
-              <p className="summary">{professional.summary}</p>
-
-              <div className="tag-row">
-                {professional.domains.slice(0, 4).map((item) => (
-                  <span key={item}>{item}</span>
+              <div className="specialty-list">
+                {reviewer.specialties.map((specialty) => (
+                  <span key={specialty}>{specialty}</span>
                 ))}
-              </div>
-
-              <div className="metrics-grid">
-                <div>
-                  <span>Completed reviews</span>
-                  <strong>{professional.completedReviews}</strong>
-                </div>
-                <div>
-                  <span>Published routes</span>
-                  <strong>{professional.publishedRoutes}</strong>
-                </div>
-                <div>
-                  <span>Governed records</span>
-                  <strong>{professional.governedRecords}</strong>
-                </div>
-                <div>
-                  <span>Response time</span>
-                  <strong>{professional.responseTime}</strong>
-                </div>
-              </div>
-
-              <div className="evidence-panel">
-                <span>Visible evidence signals</span>
-                <ul>
-                  {professional.evidenceSignals.slice(0, 3).map((item) => (
-                    <li key={item}>{item}</li>
-                  ))}
-                </ul>
-              </div>
-
-              <div className="boundary-preview">
-                <span>Declared boundary</span>
-                <p>{professional.boundaries[0]}</p>
               </div>
 
               <div className="card-actions">
                 <Link
-                  className="card-primary"
-                  href={`/marketplace/professionals/${professional.id}`}
+                  className="button primary"
+                  href={`/workspace/entity-review?reviewer=${encodeURIComponent(
+                    reviewer.name,
+                  )}`}
                 >
-                  Open professional profile
+                  Start Review Intake
                 </Link>
-                <Link className="card-secondary" href={MARKETPLACE_ROUTES.postNeed}>
-                  Post a relevant need
-                </Link>
+
+                {reviewer.name === "EU AI Act Review Route" ? (
+                  <Link className="button ghost" href="/eu-ai-act">
+                    Open Laboratory
+                  </Link>
+                ) : reviewer.name === "Partner Review Network" ||
+                  reviewer.name === "Partner or Reviewer Candidate" ? (
+                  <Link
+                    className="button ghost"
+                    href="/workspace/entity-review/partner-review-network/pricing"
+                  >
+                    View Network
+                  </Link>
+                ) : null}
               </div>
             </article>
           ))}
-        </section>
+        </div>
 
-        {filteredProfessionals.length === 0 && (
-          <section className="empty-state">
-            <h2>No demonstration professionals match those filters.</h2>
-            <p>Clear the search or select another domain or availability state.</p>
-            <button
-              type="button"
-              onClick={() => {
-                setQuery('');
-                setDomain('All');
-                setAvailability('All');
-              }}
-            >
-              Reset filters
-            </button>
-          </section>
-        )}
-
-        <section className="reputation-section">
-          <div className="section-intro">
-            <span className="eyebrow">EVIDENCE-BASED REPUTATION</span>
-            <h2>Reputation should come from inspectable work, not unexplained stars.</h2>
+        {filteredReviewers.length === 0 ? (
+          <div className="empty-state">
+            <span>NO DIRECT MATCH</span>
+            <h3>Declare the review need instead.</h3>
             <p>
-              A future Marketplace reputation system should distinguish declared experience,
-              independently reviewed evidence, preserved work products, client feedback, challenge
-              history, corrections, disputes, and outcomes.
+              The current marketplace view does not contain a matching lane.
+              Begin an Entity Review intake so the need can be defined before a
+              reviewer is selected.
             </p>
-          </div>
-
-          <div className="reputation-grid">
-            <article>
-              <span>01</span>
-              <h3>Identity record</h3>
-              <p>Who is making the professional claim, under what organization and jurisdiction?</p>
-            </article>
-            <article>
-              <span>02</span>
-              <h3>Qualification evidence</h3>
-              <p>Which credentials, publications, projects, or records support the declared role?</p>
-            </article>
-            <article>
-              <span>03</span>
-              <h3>Scope history</h3>
-              <p>What work was accepted, declined, completed, corrected, or challenged?</p>
-            </article>
-            <article>
-              <span>04</span>
-              <h3>Route artifacts</h3>
-              <p>Which reusable methods have visible versions, evidence requirements, and limits?</p>
-            </article>
-            <article>
-              <span>05</span>
-              <h3>Governed records</h3>
-              <p>Which work products preserve scope, evidence, findings, boundaries, and outcome?</p>
-            </article>
-            <article>
-              <span>06</span>
-              <h3>Dispute continuity</h3>
-              <p>How were objections, corrections, withdrawals, and superseded claims preserved?</p>
-            </article>
-          </div>
-        </section>
-
-        <section className="pathway-section">
-          <div className="section-intro">
-            <span className="eyebrow">CONNECTED PATHWAYS</span>
-            <h2>The professional directory now leads somewhere useful.</h2>
-            <p>
-              Each profile card opens a dynamic professional workspace, and every secondary action
-              routes to an existing Marketplace page rather than a placeholder or dead route.
-            </p>
-          </div>
-
-          <div className="pathway-grid">
-            <Link href={MARKETPLACE_ROUTES.opportunities}>
-              <span>01</span>
-              <h3>Browse opportunities</h3>
-              <p>Find bounded governance, review, record, route, and evidence work.</p>
-            </Link>
-            <Link href={MARKETPLACE_ROUTES.postNeed}>
-              <span>02</span>
-              <h3>Post a governance need</h3>
-              <p>Declare the problem, evidence state, consequence, timeline, and requested work.</p>
-            </Link>
-            <Link href={MARKETPLACE_ROUTES.governedRecords}>
-              <span>03</span>
-              <h3>Governed record requests</h3>
-              <p>Browse continuity, interpretation, comparison, and record-preservation scopes.</p>
-            </Link>
-            <Link href={MARKETPLACE_ROUTES.routes}>
-              <span>04</span>
-              <h3>Route Marketplace</h3>
-              <p>Inspect bounded route artifacts with versions, outputs, and limitations.</p>
-            </Link>
-            <Link href={MARKETPLACE_ROUTES.dashboard}>
-              <span>05</span>
-              <h3>Professional dashboard</h3>
-              <p>Manage profile readiness, responses, routes, records, and opportunity matches.</p>
+            <Link className="button primary" href="/workspace/entity-review">
+              Declare Review Need
             </Link>
           </div>
-        </section>
+        ) : null}
+      </section>
 
-        <section className="final-cta">
-          <span className="eyebrow">DECLARATION IS NOT VERIFICATION</span>
-          <h2>Open the professional record before relying on the professional claim.</h2>
+      <section className="shell process-section">
+        <div className="section-heading centered">
+          <p className="eyebrow">HOW REVIEWER SELECTION WORKS</p>
+          <h2>Selection should follow the evidence and authority boundary.</h2>
+        </div>
+
+        <div className="process-grid">
+          {[
+            [
+              "01",
+              "Declare the review object",
+              "Identify the organization, system, architecture, record, environment, partner, or consequential route.",
+            ],
+            [
+              "02",
+              "Define the review question",
+              "State what the review must determine and what remains outside scope.",
+            ],
+            [
+              "03",
+              "Match the review lane",
+              "Find a reviewer whose declared specialty matches the object and question.",
+            ],
+            [
+              "04",
+              "Preserve independence",
+              "Keep reviewer identity, authority, limitations, conflicts, and dissent visible.",
+            ],
+            [
+              "05",
+              "Issue bounded findings",
+              "Preserve what was supported, what remained unresolved, and what the review did not establish.",
+            ],
+          ].map(([number, title, description]) => (
+            <article key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{description}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="shell network-section">
+        <div>
+          <p className="eyebrow">PARTNER REVIEW NETWORK</p>
+          <h2>Some entities require more than one review lane.</h2>
           <p>
-            Each connected profile exposes domains, qualifications, services, review history,
-            portfolio artifacts, governed records, professional boundaries, availability, and
-            demonstration contact pathways.
+            A consequential system may require governance architecture review,
+            evidence review, environmental or operational expertise, regulatory
+            review, and a second-layer TA-14 examination. The Partner Review
+            Network preserves those lanes rather than pretending one reviewer is
+            universally qualified.
           </p>
+        </div>
 
-          <div className="action-row centered-actions">
-            <Link className="primary-button" href={MARKETPLACE_ROUTES.opportunities}>
-              Browse opportunities
-            </Link>
-            <Link className="secondary-button" href={MARKETPLACE_ROUTES.dashboard}>
-              Open professional dashboard
-            </Link>
+        <div className="network-actions">
+          <Link
+            className="button primary"
+            href="/workspace/entity-review/partner-review-network/pricing"
+          >
+            Explore Network Participation
+          </Link>
+          <Link className="button secondary" href="/workspace/entity-review">
+            Submit an Entity Review Intake
+          </Link>
+        </div>
+      </section>
+
+      <footer>
+        <Link className="brand" href="/">
+          <span>TA-14</span>
+          <div>
+            <strong>Reviewer Marketplace</strong>
+            <small>TA-14 AI Governance Exchange</small>
           </div>
-        </section>
-      </div>
+        </Link>
+
+        <p>
+          Reviewer visibility is not certification. Findings remain bounded by
+          declared scope, evidence, authority, and preserved review records.
+        </p>
+      </footer>
 
       <style jsx>{`
         :global(*) {
@@ -638,155 +437,234 @@ export default function MarketplaceProfessionalsPage() {
 
         :global(body) {
           margin: 0;
-          color: #eef8ff;
-          background: #06111d;
+          color: #f9f7ff;
+          background: #05060a;
         }
 
         :global(a) {
           color: inherit;
+          text-decoration: none;
         }
 
-        button,
-        input {
+        :global(button),
+        :global(input) {
           font: inherit;
         }
 
-        .page-shell {
-          min-height: 100vh;
+        .marketplace-page {
           position: relative;
+          min-height: 100vh;
           overflow: hidden;
+          isolation: isolate;
           background:
-            linear-gradient(rgba(4, 15, 26, 0.8), rgba(4, 15, 26, 0.97)),
-            radial-gradient(circle at 15% 5%, rgba(21, 140, 181, 0.18), transparent 34%),
-            radial-gradient(circle at 83% 7%, rgba(114, 70, 196, 0.14), transparent 31%);
+            radial-gradient(
+              circle at 9% 2%,
+              rgba(116, 228, 198, 0.12),
+              transparent 27%
+            ),
+            radial-gradient(
+              circle at 91% 10%,
+              rgba(255, 197, 71, 0.09),
+              transparent 24%
+            ),
+            linear-gradient(180deg, #06080d 0%, #091016 48%, #05060a 100%);
         }
 
-        .content-shell {
-          width: min(1180px, calc(100% - 36px));
-          margin: 0 auto;
-          padding: 34px 0 96px;
+        .marketplace-page > :not(.ambient) {
           position: relative;
           z-index: 2;
         }
 
-        .cosmos {
+        .ambient {
           position: fixed;
           inset: 0;
+          z-index: 0;
+          overflow: hidden;
           pointer-events: none;
-          opacity: 0.72;
         }
 
-        .star {
+        .nova {
           position: absolute;
-          width: 4px;
-          height: 4px;
+          width: 7px;
+          height: 7px;
           border-radius: 50%;
-          background: #e8fbff;
-          box-shadow: 0 0 16px rgba(139, 229, 255, 0.95);
-          animation: drift 13s ease-in-out infinite;
+          background: #fff;
+          box-shadow:
+            0 0 11px #fff,
+            0 0 28px rgba(116, 228, 198, 0.95);
+          animation: explode 10s ease-in-out infinite;
         }
 
-        .star-one {
-          top: 14%;
+        .nova-one {
+          top: 15%;
+          left: 83%;
+        }
+
+        .nova-two {
+          top: 57%;
           left: 8%;
+          animation-delay: -3.2s;
         }
 
-        .star-two {
-          top: 31%;
-          right: 11%;
-          animation-delay: -5s;
+        .nova-three {
+          top: 81%;
+          left: 69%;
+          animation-delay: -6.3s;
         }
 
-        .star-three {
-          bottom: 26%;
-          left: 15%;
-          animation-delay: -9s;
+        .moving-line {
+          position: absolute;
+          width: 43vw;
+          height: 1px;
+          opacity: 0.3;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(116, 228, 198, 0.78),
+            transparent
+          );
+          animation: travel 19s linear infinite;
         }
 
-        .star-four {
-          bottom: 11%;
-          right: 17%;
-          animation-delay: -3s;
+        .line-one {
+          top: 30%;
+          left: -50vw;
+          transform: rotate(11deg);
+        }
+
+        .line-two {
+          top: 72%;
+          right: -50vw;
+          transform: rotate(-14deg);
+          animation-delay: -8.5s;
         }
 
         .orbit {
           position: absolute;
-          width: 320px;
-          height: 320px;
-          border: 1px solid rgba(103, 205, 233, 0.12);
+          width: 650px;
+          height: 650px;
+          border: 1px solid rgba(116, 228, 198, 0.07);
           border-radius: 50%;
-          animation: rotate 32s linear infinite;
-        }
-
-        .orbit span {
-          position: absolute;
-          width: 9px;
-          height: 9px;
-          border-radius: 50%;
-          background: #84e7fa;
-          box-shadow: 0 0 20px rgba(99, 218, 242, 0.9);
-          left: 50%;
-          top: -5px;
+          animation: rotate 52s linear infinite;
         }
 
         .orbit-one {
-          right: -165px;
-          top: 5%;
+          top: 6%;
+          left: -330px;
         }
 
         .orbit-two {
-          left: -185px;
-          bottom: 12%;
-          width: 390px;
-          height: 390px;
+          right: -370px;
+          top: 44%;
+          width: 800px;
+          height: 800px;
           animation-direction: reverse;
+          animation-duration: 69s;
         }
 
-        .route-line {
-          position: absolute;
-          width: 42vw;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(78, 204, 233, 0.34), transparent);
-          animation: pulse 7s ease-in-out infinite;
+        .shell {
+          width: min(1420px, calc(100% - 34px));
+          margin: 0 auto;
         }
 
-        .route-one {
-          top: 24%;
-          left: -7%;
-          transform: rotate(-18deg);
-        }
-
-        .route-two {
-          right: -5%;
-          bottom: 22%;
-          transform: rotate(22deg);
-          animation-delay: -3s;
-        }
-
-        .breadcrumbs {
+        .topbar {
+          position: sticky;
+          top: 0;
+          z-index: 50;
           display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
-          color: #8eb4c5;
-          font-size: 0.88rem;
-          margin-bottom: 58px;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          min-height: 76px;
+          padding: 13px clamp(18px, 4vw, 62px);
+          border-bottom: 1px solid rgba(116, 228, 198, 0.13);
+          background: rgba(5, 7, 10, 0.89);
+          backdrop-filter: blur(18px);
         }
 
-        .breadcrumbs a {
-          text-decoration: none;
+        .brand {
+          display: inline-flex;
+          align-items: center;
+          gap: 12px;
         }
 
-        .breadcrumbs a:hover,
-        .text-link:hover {
-          color: #ffffff;
+        .brand > span {
+          display: grid;
+          place-items: center;
+          min-width: 60px;
+          height: 42px;
+          padding: 0 9px;
+          border: 1px solid rgba(116, 228, 198, 0.5);
+          border-radius: 11px;
+          color: #8df0d5;
+          background: rgba(116, 228, 198, 0.07);
+          font-weight: 950;
+        }
+
+        .brand div {
+          display: grid;
+          gap: 2px;
+        }
+
+        .brand strong {
+          font-size: 0.82rem;
+          letter-spacing: 0.08em;
+        }
+
+        .brand small {
+          color: #798b87;
+          font-size: 0.68rem;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        nav {
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          padding: 5px;
+          border: 1px solid rgba(116, 228, 198, 0.12);
+          border-radius: 999px;
+          background: rgba(8, 13, 16, 0.77);
+        }
+
+        nav a {
+          display: inline-flex;
+          align-items: center;
+          min-height: 38px;
+          padding: 0 13px;
+          border-radius: 999px;
+          color: #97aaa6;
+          font-size: 0.77rem;
+          font-weight: 850;
+        }
+
+        nav a:hover {
+          color: #fff;
+          background: rgba(116, 228, 198, 0.08);
+        }
+
+        nav .nav-cta {
+          color: #06100d;
+          background: #74e4c6;
+        }
+
+        .hero {
+          display: grid;
+          grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
+          gap: clamp(45px, 7vw, 100px);
+          align-items: center;
+          min-height: calc(100vh - 76px);
+          padding: 90px 0;
         }
 
         .eyebrow {
-          display: inline-block;
-          color: #72d8ef;
-          font-size: 0.75rem;
-          font-weight: 900;
-          letter-spacing: 0.14em;
+          margin: 0 0 12px;
+          color: #74e4c6;
+          font-size: 0.72rem;
+          font-weight: 950;
+          letter-spacing: 0.16em;
           text-transform: uppercase;
         }
 
@@ -797,555 +675,571 @@ export default function MarketplaceProfessionalsPage() {
           margin-top: 0;
         }
 
-        .hero {
-          max-width: 980px;
-          padding-bottom: 54px;
-        }
-
         h1 {
-          margin: 18px 0 22px;
-          font-size: clamp(3rem, 7vw, 6.5rem);
-          line-height: 0.95;
-          letter-spacing: -0.055em;
+          max-width: 920px;
+          margin-bottom: 25px;
+          font-size: clamp(3.6rem, 7vw, 7.2rem);
+          line-height: 0.92;
+          letter-spacing: -0.07em;
         }
 
-        .hero-copy {
-          max-width: 840px;
-          color: #b8ced9;
-          font-size: 1.1rem;
-          line-height: 1.78;
+        h1 span {
+          display: block;
+          color: #74e4c6;
         }
 
-        .boundary-banner {
-          margin-top: 26px;
-          border-left: 3px solid #dfba58;
-          border-radius: 0 15px 15px 0;
-          padding: 18px 20px;
-          background: rgba(205, 152, 31, 0.075);
+        h2 {
+          margin-bottom: 18px;
+          font-size: clamp(2.25rem, 4.7vw, 4.9rem);
+          line-height: 1;
+          letter-spacing: -0.054em;
         }
 
-        .boundary-banner p {
-          margin: 7px 0 0;
-          color: #c4b88e;
-          line-height: 1.65;
+        p {
+          color: #9cacaa;
+          line-height: 1.72;
         }
 
-        .action-row {
+        .lead {
+          max-width: 830px;
+          color: #c9d6d3;
+          font-size: clamp(1.08rem, 1.65vw, 1.34rem);
+        }
+
+        .hero-actions,
+        .network-actions,
+        .card-actions {
           display: flex;
           flex-wrap: wrap;
+          gap: 11px;
+          margin-top: 28px;
+        }
+
+        .button {
+          display: inline-flex;
           align-items: center;
-          gap: 12px;
-          margin-top: 30px;
-        }
-
-        .primary-button,
-        .secondary-button {
-          border-radius: 999px;
-          padding: 14px 21px;
+          justify-content: center;
+          min-height: 48px;
+          padding: 0 19px;
+          border: 1px solid transparent;
+          border-radius: 12px;
           font-weight: 900;
-          text-decoration: none;
-          transition: transform 180ms ease;
+          transition: 0.18s ease;
         }
 
-        .primary-button {
-          border: 1px solid #87e4f8;
-          color: #031019;
-          background: linear-gradient(135deg, #a5efff, #56cae7);
-          box-shadow: 0 12px 34px rgba(60, 191, 222, 0.18);
-        }
-
-        .secondary-button {
-          border: 1px solid rgba(147, 208, 227, 0.3);
-          color: #eaf9ff;
-          background: rgba(10, 29, 44, 0.82);
-        }
-
-        .primary-button:hover,
-        .secondary-button:hover {
+        .button:hover {
           transform: translateY(-2px);
         }
 
-        .text-link {
-          color: #95cddd;
+        .primary {
+          color: #06100d;
+          border-color: #74e4c6;
+          background: #74e4c6;
+        }
+
+        .secondary {
+          color: #effffb;
+          border-color: rgba(116, 228, 198, 0.26);
+          background: rgba(11, 25, 22, 0.83);
+        }
+
+        .ghost {
+          color: #a8bbb7;
+          background: transparent;
+        }
+
+        .boundary-row {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 28px;
+        }
+
+        .boundary-row span {
+          padding: 7px 10px;
+          border: 1px solid rgba(116, 228, 198, 0.15);
+          border-radius: 999px;
+          color: #91a39f;
+          background: rgba(8, 14, 16, 0.67);
+          font-size: 0.74rem;
           font-weight: 800;
-          text-decoration: none;
         }
 
-        .summary-grid {
-          display: grid;
-          grid-template-columns: repeat(6, minmax(0, 1fr));
-          gap: 10px;
-          padding-bottom: 64px;
-        }
-
-        .summary-grid article {
-          min-height: 115px;
-          padding: 16px;
-          border: 1px solid rgba(103, 194, 218, 0.15);
-          border-radius: 18px;
-          background: rgba(9, 29, 44, 0.72);
-        }
-
-        .summary-grid span {
-          display: block;
-          min-height: 38px;
-          color: #789aaa;
-          font-size: 0.72rem;
-          line-height: 1.35;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-        }
-
-        .summary-grid strong {
-          display: block;
-          margin-top: 19px;
-          font-size: 1.5rem;
-        }
-
-        .summary-grid article:last-child strong {
-          color: #ffe09a;
-          font-size: 0.78rem;
-        }
-
-        .filter-panel {
-          padding: clamp(24px, 4vw, 40px);
-          border: 1px solid rgba(103, 194, 220, 0.18);
-          border-radius: 28px;
+        .market-map {
+          position: relative;
+          min-height: 570px;
+          border: 1px solid rgba(116, 228, 198, 0.16);
+          border-radius: 50%;
           background:
-            linear-gradient(145deg, rgba(14, 38, 55, 0.94), rgba(7, 23, 36, 0.91));
-          box-shadow: 0 22px 60px rgba(0, 0, 0, 0.18);
+            radial-gradient(
+              circle,
+              rgba(116, 228, 198, 0.1),
+              transparent 48%
+            ),
+            rgba(7, 12, 14, 0.69);
+          box-shadow:
+            0 35px 110px rgba(0, 0, 0, 0.42),
+            inset 0 0 90px rgba(116, 228, 198, 0.04);
         }
 
-        .filter-heading h2 {
-          margin: 9px 0 25px;
-          font-size: clamp(2rem, 4vw, 3.4rem);
-          letter-spacing: -0.04em;
+        .market-core {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          z-index: 3;
+          display: grid;
+          place-items: center;
+          width: 155px;
+          height: 155px;
+          border: 1px solid rgba(141, 240, 213, 0.55);
+          border-radius: 50%;
+          color: #91f0d6;
+          background: radial-gradient(
+            circle,
+            rgba(116, 228, 198, 0.17),
+            rgba(7, 12, 14, 0.96) 70%
+          );
+          box-shadow: 0 0 60px rgba(116, 228, 198, 0.18);
+          transform: translate(-50%, -50%);
+          animation: corePulse 4.5s ease-in-out infinite;
+        }
+
+        .market-core span,
+        .market-core strong {
+          display: block;
+        }
+
+        .market-core span {
+          font-size: 1.2rem;
+          font-weight: 950;
+        }
+
+        .market-core strong {
+          margin-top: -34px;
+          font-size: 0.64rem;
+          letter-spacing: 0.16em;
+        }
+
+        .ring {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          border: 1px solid rgba(116, 228, 198, 0.12);
+          border-radius: 50%;
+          transform: translate(-50%, -50%);
+          animation: rotate 37s linear infinite;
+        }
+
+        .ring-one {
+          width: 235px;
+          height: 235px;
+        }
+
+        .ring-two {
+          width: 365px;
+          height: 365px;
+          animation-direction: reverse;
+          animation-duration: 49s;
+        }
+
+        .ring-three {
+          width: 490px;
+          height: 490px;
+          animation-duration: 63s;
+        }
+
+        .market-node {
+          position: absolute;
+          z-index: 4;
+          min-width: 112px;
+          padding: 11px;
+          border: 1px solid rgba(116, 228, 198, 0.2);
+          border-radius: 13px;
+          color: #c7d9d4;
+          text-align: center;
+          background: rgba(8, 14, 16, 0.88);
+          font-size: 0.79rem;
+          font-weight: 850;
+        }
+
+        .node-one {
+          top: 7%;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+
+        .node-two {
+          top: 23%;
+          right: 4%;
+        }
+
+        .node-three {
+          right: 5%;
+          bottom: 20%;
+        }
+
+        .node-four {
+          bottom: 6%;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+
+        .node-five {
+          bottom: 20%;
+          left: 5%;
+        }
+
+        .node-six {
+          top: 23%;
+          left: 4%;
+        }
+
+        .controls-section,
+        .process-section {
+          padding: 110px 0;
+        }
+
+        .section-heading {
+          max-width: 980px;
+          margin-bottom: 38px;
+        }
+
+        .section-heading > p:last-child {
+          max-width: 860px;
+          font-size: 1.03rem;
+        }
+
+        .centered {
+          margin-left: auto;
+          margin-right: auto;
+          text-align: center;
+        }
+
+        .controls {
+          display: grid;
+          gap: 18px;
+          padding: 24px;
+          border: 1px solid rgba(116, 228, 198, 0.15);
+          border-radius: 22px;
+          background: rgba(7, 13, 15, 0.78);
         }
 
         label {
-          display: block;
-          color: #edfaff;
-          font-weight: 800;
+          display: grid;
+          gap: 8px;
+        }
+
+        label span {
+          color: #c4d2cf;
+          font-size: 0.78rem;
+          font-weight: 850;
         }
 
         input {
           width: 100%;
-          display: block;
-          margin-top: 9px;
-          padding: 14px 15px;
-          border: 1px solid rgba(130, 207, 227, 0.22);
-          border-radius: 14px;
-          color: #f5fbff;
-          background: rgba(4, 16, 27, 0.78);
+          min-height: 51px;
+          padding: 0 14px;
+          border: 1px solid rgba(116, 228, 198, 0.17);
+          border-radius: 12px;
+          color: #f4fffc;
+          background: rgba(4, 8, 10, 0.85);
           outline: none;
         }
 
         input:focus {
-          border-color: #70d8ef;
-          box-shadow: 0 0 0 3px rgba(76, 198, 227, 0.13);
+          border-color: rgba(141, 240, 213, 0.7);
+          box-shadow: 0 0 0 3px rgba(116, 228, 198, 0.07);
         }
 
-        input::placeholder {
-          color: #648091;
-        }
-
-        .filter-groups {
-          display: grid;
-          gap: 20px;
-          margin-top: 22px;
-        }
-
-        .filter-label {
-          display: block;
-          margin-bottom: 9px;
-          color: #7998a7;
-          font-size: 0.72rem;
-          font-weight: 900;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .filter-row {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 9px;
-        }
-
-        .filter-button {
-          border: 1px solid rgba(123, 202, 224, 0.18);
-          border-radius: 999px;
-          padding: 10px 13px;
-          color: #acd3df;
-          background: rgba(255, 255, 255, 0.025);
-          cursor: pointer;
-        }
-
-        .filter-button.selected {
-          border-color: #67d4eb;
-          color: #031019;
-          background: #77dff4;
-          font-weight: 900;
-        }
-
-        .results-meta {
-          display: flex;
-          justify-content: space-between;
-          gap: 16px;
-          padding: 18px 4px;
-          color: #7f9cab;
-          font-size: 0.82rem;
-        }
-
-        .professional-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 18px;
-        }
-
-        .professional-card {
-          display: flex;
-          flex-direction: column;
-          padding: 25px;
-          border: 1px solid rgba(103, 194, 220, 0.17);
-          border-radius: 24px;
-          background:
-            linear-gradient(145deg, rgba(14, 38, 55, 0.93), rgba(7, 23, 36, 0.9));
-          box-shadow: 0 22px 56px rgba(0, 0, 0, 0.15);
-        }
-
-        .card-topline {
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          align-items: center;
-        }
-
-        .status-badge,
-        .verification-badge {
-          display: inline-flex;
-          width: fit-content;
-          border-radius: 999px;
-          padding: 7px 9px;
-          font-size: 0.68rem;
-          font-weight: 900;
-          letter-spacing: 0.07em;
-        }
-
-        .status-available {
-          color: #89efc5;
-          border: 1px solid rgba(74, 213, 156, 0.3);
-          background: rgba(53, 163, 119, 0.1);
-        }
-
-        .status-limited-availability {
-          color: #ffe29a;
-          border: 1px solid rgba(228, 179, 54, 0.3);
-          background: rgba(184, 131, 27, 0.1);
-        }
-
-        .status-not-accepting-work {
-          color: #bac4ca;
-          border: 1px solid rgba(160, 174, 182, 0.25);
-          background: rgba(107, 121, 129, 0.08);
-        }
-
-        .verification-declared {
-          color: #a9c6d1;
-          background: rgba(89, 119, 132, 0.11);
-        }
-
-        .verification-partially-evidenced {
-          color: #ffe29a;
-          background: rgba(184, 131, 27, 0.11);
-        }
-
-        .verification-reviewed {
-          color: #9bdcff;
-          background: rgba(60, 135, 180, 0.11);
-        }
-
-        .identity-row {
-          display: grid;
-          grid-template-columns: 72px minmax(0, 1fr);
-          gap: 16px;
-          margin-top: 24px;
-          align-items: center;
-        }
-
-        .identity-mark {
-          width: 72px;
-          height: 72px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 50%;
-          color: #fff0b2;
-          background: linear-gradient(145deg, #8d5d0c, #4c3005);
-          font-size: 1.35rem;
-          font-weight: 900;
-        }
-
-        .professional-id {
-          color: #70909f;
-          font-size: 0.74rem;
-        }
-
-        .professional-card h2 {
-          margin: 7px 0 6px;
-          font-size: 1.55rem;
-          letter-spacing: -0.025em;
-        }
-
-        .title {
-          margin-bottom: 4px;
-          color: #e8cf82;
-          font-weight: 800;
-        }
-
-        .organization {
-          margin-bottom: 0;
-          color: #8fa9b4;
-          font-size: 0.88rem;
-        }
-
-        .summary {
-          margin-top: 22px;
-          color: #a7bdc8;
-          line-height: 1.68;
-        }
-
-        .tag-row {
+        .filters {
           display: flex;
           flex-wrap: wrap;
           gap: 8px;
-          margin-top: 10px;
         }
 
-        .tag-row span {
-          border: 1px solid rgba(118, 201, 223, 0.18);
+        .filters button {
+          min-height: 38px;
+          padding: 0 13px;
+          border: 1px solid rgba(116, 228, 198, 0.15);
           border-radius: 999px;
-          padding: 8px 10px;
-          color: #9fc9d5;
-          background: rgba(255, 255, 255, 0.022);
-          font-size: 0.74rem;
+          color: #97aaa6;
+          cursor: pointer;
+          background: rgba(5, 10, 12, 0.66);
+          font-size: 0.76rem;
+          font-weight: 850;
         }
 
-        .metrics-grid {
+        .filters button:hover,
+        .filters button.active {
+          color: #06100d;
+          border-color: #74e4c6;
+          background: #74e4c6;
+        }
+
+        .results-heading {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 25px;
+          margin: 28px 0 17px;
+        }
+
+        .results-heading strong {
+          color: #d7e4e1;
+        }
+
+        .results-heading span {
+          max-width: 660px;
+          color: #778884;
+          font-size: 0.78rem;
+          text-align: right;
+        }
+
+        .reviewer-grid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 10px;
-          margin-top: 20px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 15px;
         }
 
-        .metrics-grid div {
-          min-height: 84px;
-          padding: 13px;
-          border-radius: 14px;
-          background: rgba(255, 255, 255, 0.028);
+        .reviewer-card {
+          display: flex;
+          flex-direction: column;
+          min-height: 520px;
+          padding: 24px;
+          border: 1px solid rgba(116, 228, 198, 0.14);
+          border-radius: 22px;
+          background:
+            radial-gradient(
+              circle at 90% 5%,
+              rgba(116, 228, 198, 0.07),
+              transparent 32%
+            ),
+            rgba(7, 13, 15, 0.78);
+          box-shadow: 0 25px 75px rgba(0, 0, 0, 0.27);
         }
 
-        .metrics-grid span,
-        .evidence-panel > span,
-        .boundary-preview > span {
-          display: block;
-          margin-bottom: 7px;
-          color: #7593a2;
-          font-size: 0.69rem;
+        .card-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 15px;
+          margin-bottom: 26px;
+        }
+
+        .card-number {
+          color: #74e4c6;
+          font-size: 0.72rem;
+          font-weight: 950;
+          letter-spacing: 0.12em;
+        }
+
+        .availability {
+          padding: 6px 9px;
+          border: 1px solid rgba(116, 228, 198, 0.17);
+          border-radius: 999px;
+          color: #9cb1ac;
+          font-size: 0.67rem;
+          font-weight: 900;
           text-transform: uppercase;
-          letter-spacing: 0.07em;
         }
 
-        .metrics-grid strong {
-          font-size: 0.86rem;
-          line-height: 1.4;
+        .availability.available {
+          color: #89e8cf;
         }
 
-        .evidence-panel {
-          margin-top: 12px;
-          padding: 17px;
-          border: 1px solid rgba(79, 205, 151, 0.18);
-          border-radius: 16px;
-          background: rgba(46, 145, 105, 0.055);
+        .availability.limited {
+          color: #e4c27d;
         }
 
-        .evidence-panel ul {
-          margin: 0;
-          padding-left: 18px;
-          color: #a8c3ba;
-          line-height: 1.62;
+        .lane {
+          margin-bottom: 8px;
+          color: #74e4c6;
+          font-size: 0.69rem;
+          font-weight: 900;
+          letter-spacing: 0.11em;
+          text-transform: uppercase;
         }
 
-        .boundary-preview {
-          margin-top: 12px;
-          border-left: 3px solid #dfba58;
-          border-radius: 0 14px 14px 0;
-          padding: 15px 17px;
-          background: rgba(205, 152, 31, 0.07);
+        .reviewer-card h3 {
+          margin-bottom: 7px;
+          font-size: 1.45rem;
         }
 
-        .boundary-preview p {
-          margin: 0;
-          color: #c2b78e;
-          line-height: 1.58;
+        .role {
+          display: block;
+          margin-bottom: 15px;
+          color: #c8d5d2;
+          font-size: 0.82rem;
+        }
+
+        .reviewer-card > p:not(.lane) {
+          font-size: 0.9rem;
+        }
+
+        .specialty-list {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 7px;
+          margin: 18px 0 24px;
+        }
+
+        .specialty-list span {
+          padding: 6px 8px;
+          border: 1px solid rgba(116, 228, 198, 0.13);
+          border-radius: 999px;
+          color: #90a39e;
+          background: rgba(5, 10, 12, 0.58);
+          font-size: 0.69rem;
+          font-weight: 800;
         }
 
         .card-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 10px;
           margin-top: auto;
-          padding-top: 22px;
         }
 
-        .card-primary,
-        .card-secondary {
-          border-radius: 999px;
-          padding: 12px 16px;
-          font-size: 0.86rem;
-          font-weight: 900;
-          text-decoration: none;
-        }
-
-        .card-primary {
-          color: #04121a;
-          background: #76dcef;
-        }
-
-        .card-secondary {
-          border: 1px solid rgba(132, 203, 223, 0.25);
-          color: #dff7ff;
-          background: rgba(255, 255, 255, 0.025);
+        .card-actions .button {
+          min-height: 43px;
+          padding: 0 13px;
+          font-size: 0.76rem;
         }
 
         .empty-state {
-          margin-top: 18px;
-          padding: 48px 24px;
-          border: 1px dashed rgba(127, 199, 219, 0.22);
+          margin-top: 17px;
+          padding: 48px;
+          border: 1px solid rgba(116, 228, 198, 0.15);
           border-radius: 22px;
           text-align: center;
-          color: #8fa9b5;
+          background: rgba(7, 13, 15, 0.76);
         }
 
-        .empty-state button {
-          margin-top: 13px;
-          border: 1px solid rgba(126, 207, 228, 0.23);
-          border-radius: 999px;
-          padding: 11px 15px;
-          color: #dff8ff;
-          background: rgba(66, 178, 207, 0.07);
-          font-weight: 800;
-          cursor: pointer;
+        .empty-state > span {
+          color: #74e4c6;
+          font-size: 0.7rem;
+          font-weight: 950;
+          letter-spacing: 0.14em;
         }
 
-        .reputation-section,
-        .pathway-section {
-          padding-top: 82px;
+        .empty-state h3 {
+          margin: 10px 0;
+          font-size: 1.7rem;
         }
 
-        .section-intro {
-          max-width: 900px;
-          margin-bottom: 28px;
+        .empty-state p {
+          max-width: 680px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
-        .section-intro h2 {
-          margin: 12px 0 15px;
-          font-size: clamp(2.2rem, 5vw, 4.4rem);
-          letter-spacing: -0.045em;
-        }
-
-        .section-intro p {
-          color: #a8bdc7;
-          line-height: 1.72;
-        }
-
-        .reputation-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .reputation-grid article {
-          min-height: 225px;
-          padding: 21px;
-          border: 1px solid rgba(103, 194, 220, 0.15);
-          border-radius: 20px;
-          background: rgba(10, 30, 45, 0.72);
-        }
-
-        .reputation-grid > article > span,
-        .pathway-grid a > span {
-          color: #5ed0e9;
-          font-size: 0.75rem;
-        }
-
-        .reputation-grid h3,
-        .pathway-grid h3 {
-          margin: 43px 0 10px;
-          font-size: 1.2rem;
-        }
-
-        .reputation-grid p,
-        .pathway-grid p {
-          color: #95acb7;
-          line-height: 1.6;
-        }
-
-        .pathway-grid {
+        .process-grid {
           display: grid;
           grid-template-columns: repeat(5, minmax(0, 1fr));
-          gap: 11px;
+          gap: 13px;
         }
 
-        .pathway-grid a {
-          min-height: 225px;
-          padding: 20px;
-          border: 1px solid rgba(103, 194, 220, 0.15);
-          border-radius: 19px;
-          background: rgba(10, 30, 45, 0.72);
-          text-decoration: none;
+        .process-grid article {
+          min-height: 285px;
+          padding: 23px;
+          border: 1px solid rgba(116, 228, 198, 0.14);
+          border-radius: 20px;
+          background: rgba(7, 13, 15, 0.74);
         }
 
-        .pathway-grid a:hover {
-          border-color: rgba(103, 194, 220, 0.42);
-          background: rgba(20, 53, 73, 0.78);
+        .process-grid article > span {
+          display: grid;
+          place-items: center;
+          width: 42px;
+          height: 42px;
+          margin-bottom: 28px;
+          border: 1px solid rgba(116, 228, 198, 0.3);
+          border-radius: 11px;
+          color: #74e4c6;
+          font-weight: 950;
         }
 
-        .final-cta {
-          max-width: 930px;
-          margin: 80px auto 0;
-          padding: clamp(32px, 5vw, 58px);
-          border: 1px solid rgba(117, 205, 228, 0.19);
-          border-radius: 30px;
-          text-align: center;
+        .process-grid h3 {
+          font-size: 1.1rem;
+        }
+
+        .process-grid p {
+          margin-bottom: 0;
+          font-size: 0.85rem;
+        }
+
+        .network-section {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          gap: 55px;
+          align-items: center;
+          margin-bottom: 110px;
+          padding: clamp(34px, 6vw, 72px);
+          border: 1px solid rgba(255, 197, 71, 0.2);
+          border-radius: 29px;
           background:
-            radial-gradient(circle at top, rgba(56, 173, 205, 0.11), transparent 48%),
-            rgba(10, 30, 46, 0.84);
+            radial-gradient(
+              circle at 90% 20%,
+              rgba(255, 197, 71, 0.09),
+              transparent 36%
+            ),
+            rgba(12, 14, 13, 0.84);
+          box-shadow: 0 35px 105px rgba(0, 0, 0, 0.31);
         }
 
-        .final-cta h2 {
-          margin: 12px 0 16px;
-          font-size: clamp(2rem, 4vw, 3.5rem);
-          letter-spacing: -0.035em;
+        .network-section > div:first-child {
+          max-width: 880px;
         }
 
-        .final-cta p {
-          color: #aabec9;
-          line-height: 1.75;
+        .network-section .eyebrow {
+          color: #e8bd5d;
         }
 
-        .centered-actions {
-          justify-content: center;
+        .network-actions {
+          flex-direction: column;
+          min-width: 280px;
+          margin-top: 0;
         }
 
-        @keyframes drift {
+        footer {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 35px;
+          width: min(1420px, calc(100% - 34px));
+          margin: 0 auto;
+          padding: 38px 0;
+          border-top: 1px solid rgba(116, 228, 198, 0.12);
+        }
+
+        footer p {
+          max-width: 760px;
+          margin: 0;
+          color: #6e7f7b;
+          font-size: 0.76rem;
+          text-align: right;
+        }
+
+        @keyframes explode {
           0%,
+          83%,
           100% {
-            transform: translate3d(0, 0, 0) scale(0.9);
-            opacity: 0.46;
+            opacity: 0.1;
+            transform: scale(0.15);
           }
-          50% {
-            transform: translate3d(18px, -22px, 0) scale(1.35);
+          87% {
             opacity: 1;
+            transform: scale(1.4);
+          }
+          92% {
+            opacity: 0.25;
+            transform: scale(7);
+          }
+        }
+
+        @keyframes travel {
+          from {
+            transform: translateX(0) rotate(11deg);
+          }
+          to {
+            transform: translateX(170vw) rotate(11deg);
           }
         }
 
@@ -1355,62 +1249,90 @@ export default function MarketplaceProfessionalsPage() {
           }
         }
 
-        @keyframes pulse {
+        @keyframes corePulse {
           0%,
           100% {
-            opacity: 0.2;
+            transform: translate(-50%, -50%) scale(0.96);
           }
           50% {
-            opacity: 0.78;
+            transform: translate(-50%, -50%) scale(1.04);
           }
         }
 
-        @media (max-width: 1080px) {
-          .summary-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-
-          .pathway-grid {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-          }
-        }
-
-        @media (max-width: 800px) {
-          .professional-grid,
-          .reputation-grid,
-          .pathway-grid {
+        @media (max-width: 1120px) {
+          .hero {
             grid-template-columns: 1fr;
           }
 
-          .results-meta {
-            flex-direction: column;
-          }
-        }
-
-        @media (max-width: 600px) {
-          .content-shell {
-            width: min(100% - 24px, 1180px);
-            padding-top: 22px;
+          .market-map {
+            width: min(620px, 100%);
           }
 
-          .breadcrumbs {
-            margin-bottom: 42px;
-          }
-
-          .summary-grid,
-          .metrics-grid {
+          .reviewer-grid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
-        }
 
-        @media (max-width: 430px) {
-          .summary-grid,
-          .metrics-grid {
+          .process-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .network-section {
             grid-template-columns: 1fr;
           }
 
-          .identity-row {
+          .network-actions {
+            min-width: 0;
+          }
+        }
+
+        @media (max-width: 850px) {
+          nav {
+            display: none;
+          }
+
+          .results-heading {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .results-heading span {
+            text-align: left;
+          }
+        }
+
+        @media (max-width: 650px) {
+          .shell {
+            width: min(100% - 24px, 1420px);
+          }
+
+          .hero,
+          .controls-section,
+          .process-section {
+            padding: 75px 0;
+          }
+
+          .market-map {
+            min-height: 490px;
+            border-radius: 28px;
+          }
+
+          .market-node {
+            min-width: 96px;
+            padding: 8px;
+          }
+
+          .reviewer-grid,
+          .process-grid {
             grid-template-columns: 1fr;
+          }
+
+          footer {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          footer p {
+            text-align: left;
           }
         }
 
@@ -1419,15 +1341,12 @@ export default function MarketplaceProfessionalsPage() {
             scroll-behavior: auto;
           }
 
-          .star,
+          .nova,
+          .moving-line,
           .orbit,
-          .route-line {
+          .ring,
+          .market-core {
             animation: none;
-          }
-
-          .primary-button,
-          .secondary-button {
-            transition: none;
           }
         }
       `}</style>
