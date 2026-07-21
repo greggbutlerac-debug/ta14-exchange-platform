@@ -3,6 +3,13 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 
+const WORKSPACE_ROUTES = {
+  testing: "/workspace/testing",
+  review: "/workspace/review",
+  registry: "/workspace/registry",
+} as const;
+
+
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 type Severity = "BLOCKING" | "WARNING" | "INFO";
 type CorrectionState =
@@ -39,8 +46,8 @@ type Finding = {
 
 const initialFindings: Finding[] = [
   {
-    findingId: "TA14-FIND-5B19D2",
-    routeId: "TA14-RID-AI-0018",
+    findingId: "TA-14-FIND-5B19D2",
+    routeId: "TA-14-RID-AI-0018",
     routeName: "Bounded AI Agent Action",
     stage: "Binding",
     severity: "BLOCKING",
@@ -55,11 +62,11 @@ const initialFindings: Finding[] = [
       "Replace the general delegation with a route-bound authority object and require the runtime gate to validate its current state before commit.",
     owner: "Example Organization",
     openedAt: "2026-07-17T18:41:00.000Z",
-    source: "TA14-REV-41A92C",
+    source: "TA-14-REV-41A92C",
   },
   {
-    findingId: "TA14-FIND-C8820A",
-    routeId: "TA14-RID-HVAC-0009",
+    findingId: "TA-14-FIND-C8820A",
+    routeId: "TA-14-RID-HVAC-0009",
     routeName: "Analyzer-Governed Refrigerant Intervention",
     stage: "Continuity",
     severity: "BLOCKING",
@@ -74,11 +81,11 @@ const initialFindings: Finding[] = [
       "Register the analyzer key, bind it to the device identity, and add a current revocation check to the pre-execution route.",
     owner: "Transparent Air",
     openedAt: "2026-07-17T15:34:00.000Z",
-    source: "TA14-REV-07D3E1",
+    source: "TA-14-REV-07D3E1",
   },
   {
-    findingId: "TA14-FIND-119AE4",
-    routeId: "TA14-RID-VP-0042",
+    findingId: "TA-14-FIND-119AE4",
+    routeId: "TA-14-RID-VP-0042",
     routeName: "Governed Vendor Payment",
     stage: "Outcome",
     severity: "WARNING",
@@ -93,11 +100,11 @@ const initialFindings: Finding[] = [
       "Define a 24-hour pending window, then transition to ESCALATE when an authoritative settlement receipt remains unavailable.",
     owner: "TA-14 Exchange",
     openedAt: "2026-07-16T20:24:00.000Z",
-    source: "TA14-REPLAY-72A91F",
+    source: "TA-14-REPLAY-72A91F",
   },
   {
-    findingId: "TA14-FIND-7D31F0",
-    routeId: "TA14-RID-HR-0003",
+    findingId: "TA-14-FIND-7D31F0",
+    routeId: "TA-14-RID-HR-0003",
     routeName: "Automated Candidate Rejection",
     stage: "Admissibility",
     severity: "BLOCKING",
@@ -112,7 +119,7 @@ const initialFindings: Finding[] = [
       "Rejected. Create a new route version that preserves human review and does not permit autonomous rejection.",
     owner: "Example Organization",
     openedAt: "2026-07-14T13:05:00.000Z",
-    source: "TA14-REV-512E0B",
+    source: "TA-14-REV-512E0B",
   },
 ];
 
@@ -203,7 +210,7 @@ export default function RouteCorrectionStudioPage() {
   );
 
   const correctionPackage = {
-    schema: "TA14_ROUTE_CORRECTION_PACKAGE_V1",
+    schema: "TA_14_ROUTE_CORRECTION_PACKAGE_V1",
     generatedAt: new Date().toISOString(),
     finding: selected,
     correctionBoundary: {
@@ -336,6 +343,16 @@ export default function RouteCorrectionStudioPage() {
 
         .button:hover, .button-secondary:hover, .small-button:hover {
           transform: translateY(-2px);
+        }
+
+        .button:focus-visible,
+        .button-secondary:focus-visible,
+        .small-button:focus-visible,
+        .finding-row:focus-visible,
+        input:focus-visible,
+        select:focus-visible {
+          outline:3px solid rgba(113,228,250,.72);
+          outline-offset:4px;
         }
 
         .button {
@@ -608,13 +625,13 @@ export default function RouteCorrectionStudioPage() {
             </p>
 
             <div className="hero-actions">
-              <Link className="button" href="/workspace/testing">
+              <Link className="button" href={WORKSPACE_ROUTES.testing}>
                 Retest a route
               </Link>
-              <Link className="button-secondary" href="/workspace/review">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.review}>
                 Open Review Desk
               </Link>
-              <Link className="button-secondary" href="/workspace/registry">
+              <Link className="button-secondary" href={WORKSPACE_ROUTES.registry}>
                 Open registry
               </Link>
             </div>
@@ -780,7 +797,7 @@ export default function RouteCorrectionStudioPage() {
               >
                 Download package
               </button>
-              <Link className="small-button" href="/workspace/testing">
+              <Link className="small-button" href={WORKSPACE_ROUTES.testing}>
                 Retest route
               </Link>
             </div>
