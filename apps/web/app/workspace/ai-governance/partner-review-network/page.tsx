@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 type Partner = {
   name: string;
@@ -94,574 +94,969 @@ const partners: Partner[] = [
   },
 ];
 
-const accentClasses = {
-  cyan: {
-    ring: "border-cyan-300/30",
-    glow: "shadow-[0_0_60px_rgba(34,211,238,0.12)]",
-    badge: "border-cyan-300/25 bg-cyan-300/10 text-cyan-100",
-    dot: "bg-cyan-300",
-    text: "text-cyan-200",
-  },
-  violet: {
-    ring: "border-violet-300/30",
-    glow: "shadow-[0_0_60px_rgba(167,139,250,0.12)]",
-    badge: "border-violet-300/25 bg-violet-300/10 text-violet-100",
-    dot: "bg-violet-300",
-    text: "text-violet-200",
-  },
-  amber: {
-    ring: "border-amber-300/30",
-    glow: "shadow-[0_0_60px_rgba(252,211,77,0.12)]",
-    badge: "border-amber-300/25 bg-amber-300/10 text-amber-100",
-    dot: "bg-amber-300",
-    text: "text-amber-200",
-  },
-};
-
-function CosmicBackground() {
-  const stars = Array.from({ length: 56 }, (_, index) => ({
-    id: index,
-    left: `${(index * 37) % 100}%`,
-    top: `${(index * 53) % 100}%`,
-    size: index % 7 === 0 ? 3 : index % 3 === 0 ? 2 : 1,
-    delay: `${(index % 9) * 0.55}s`,
-    duration: `${3.8 + (index % 6) * 0.7}s`,
-  }));
-
-  return (
-    <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden bg-[#030712]">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_20%,rgba(14,165,233,0.14),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(139,92,246,0.12),transparent_32%),radial-gradient(circle_at_50%_82%,rgba(245,158,11,0.07),transparent_30%)]" />
-
-      <div className="absolute inset-0 opacity-[0.13] [background-image:linear-gradient(rgba(148,163,184,0.2)_1px,transparent_1px),linear-gradient(90deg,rgba(148,163,184,0.2)_1px,transparent_1px)] [background-size:72px_72px] [mask-image:radial-gradient(circle_at_center,black,transparent_78%)]" />
-
-      {stars.map((star) => (
-        <span
-          key={star.id}
-          className="cosmic-star absolute rounded-full bg-white"
-          style={{
-            left: star.left,
-            top: star.top,
-            width: `${star.size}px`,
-            height: `${star.size}px`,
-            animationDelay: star.delay,
-            animationDuration: star.duration,
-          }}
-        />
-      ))}
-
-      <div className="orbit orbit-one">
-        <span className="orbit-node bg-cyan-300 shadow-[0_0_24px_rgba(34,211,238,0.95)]" />
-      </div>
-      <div className="orbit orbit-two">
-        <span className="orbit-node bg-violet-300 shadow-[0_0_24px_rgba(167,139,250,0.95)]" />
-      </div>
-      <div className="orbit orbit-three">
-        <span className="orbit-node bg-amber-300 shadow-[0_0_24px_rgba(252,211,77,0.9)]" />
-      </div>
-
-      <div className="network-line line-one" />
-      <div className="network-line line-two" />
-      <div className="network-line line-three" />
-      <div className="network-line line-four" />
-
-      <div className="absolute left-[8%] top-[18%] h-72 w-72 rounded-full border border-cyan-300/10" />
-      <div className="absolute right-[6%] top-[32%] h-[28rem] w-[28rem] rounded-full border border-violet-300/10" />
-      <div className="absolute bottom-[-12rem] left-[34%] h-[34rem] w-[34rem] rounded-full border border-amber-300/10" />
-    </div>
-  );
-}
-
-function PartnerCard({ partner, index }: { partner: Partner; index: number }) {
-  const [open, setOpen] = useState(false);
-  const accent = accentClasses[partner.accent];
-
-  return (
-    <article
-      className={`group relative overflow-hidden rounded-[30px] border ${accent.ring} bg-slate-950/55 ${accent.glow} backdrop-blur-2xl transition duration-500 hover:-translate-y-1 hover:bg-slate-950/70`}
-    >
-      <div className="absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
-        <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/[0.035] blur-2xl" />
-        <div className="absolute bottom-0 left-0 h-px w-full bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-      </div>
-
-      <div className="relative p-6 sm:p-8">
-        <div className="flex items-start justify-between gap-5">
-          <div className="flex min-w-0 items-center gap-4">
-            <div
-              className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl border ${accent.ring} bg-white/[0.05] text-sm font-black tracking-[0.14em] text-white`}
-            >
-              {partner.initials}
-            </div>
-
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                Pathway {String(index + 1).padStart(2, "0")}
-              </p>
-              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-white">
-                {partner.name}
-              </h2>
-            </div>
-          </div>
-
-          <span
-            className={`hidden rounded-full border px-3 py-1 text-xs font-semibold sm:inline-flex ${accent.badge}`}
-          >
-            Independent
-          </span>
-        </div>
-
-        <div className="mt-6">
-          <span className="inline-flex rounded-full border border-amber-300/20 bg-amber-300/[0.08] px-3 py-1 text-xs font-semibold uppercase tracking-[0.14em] text-amber-100">
-            {partner.status}
-          </span>
-        </div>
-
-        <p className={`mt-5 text-sm font-semibold leading-6 ${accent.text}`}>
-          {partner.lane}
-        </p>
-
-        <p className="mt-4 text-base leading-7 text-slate-300">
-          {partner.summary}
-        </p>
-
-        <button
-          type="button"
-          aria-expanded={open}
-          onClick={() => setOpen((current) => !current)}
-          className="mt-7 inline-flex min-h-12 w-full items-center justify-between rounded-2xl border border-white/10 bg-white/[0.045] px-5 py-3 text-left font-semibold text-white transition hover:border-white/25 hover:bg-white/[0.075] focus:outline-none focus:ring-2 focus:ring-cyan-300 sm:w-auto sm:min-w-[310px]"
-        >
-          <span>{open ? "Close Governance View" : "Open Governance View"}</span>
-          <span
-            aria-hidden="true"
-            className={`ml-5 text-xl transition-transform duration-300 ${
-              open ? "rotate-45" : ""
-            }`}
-          >
-            +
-          </span>
-        </button>
-      </div>
-
-      <div
-        className={`relative grid transition-[grid-template-rows] duration-500 ease-out ${
-          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
-        }`}
-      >
-        <div className="overflow-hidden">
-          <div className="border-t border-white/10 bg-black/25 p-6 sm:p-8">
-            <div className="grid gap-8 lg:grid-cols-[0.9fr_1.1fr]">
-              <section>
-                <p className={`text-xs font-bold uppercase tracking-[0.22em] ${accent.text}`}>
-                  Specialized review surfaces
-                </p>
-
-                <ul className="mt-5 space-y-3">
-                  {partner.governs.map((item) => (
-                    <li
-                      key={item}
-                      className="flex gap-3 text-sm leading-6 text-slate-200"
-                    >
-                      <span
-                        aria-hidden="true"
-                        className={`mt-2 h-1.5 w-1.5 shrink-0 rounded-full ${accent.dot}`}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
-              </section>
-
-              <section className="space-y-6">
-                <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-sky-200">
-                    Network contribution
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-slate-300">
-                    {partner.contribution}
-                  </p>
-                </div>
-
-                <div className="rounded-2xl border border-amber-300/15 bg-amber-300/[0.035] p-5">
-                  <p className="text-xs font-bold uppercase tracking-[0.22em] text-amber-200">
-                    Declared boundary
-                  </p>
-                  <p className="mt-3 text-sm leading-7 text-slate-300">
-                    {partner.boundary}
-                  </p>
-                </div>
-              </section>
-            </div>
-
-            <div className="mt-7 border-t border-white/10 pt-6">
-              <a
-                href={partner.pathwayUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-white px-5 py-3 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-300"
-              >
-                Open Full Public Pathway
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export default function PartnerReviewNetworkWorkspacePage() {
+  const [openPartner, setOpenPartner] = useState<number | null>(0);
+
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 72 }, (_, index) => ({
+        left: `${(index * 37) % 100}%`,
+        top: `${(index * 53) % 100}%`,
+        size: index % 9 === 0 ? 3 : index % 4 === 0 ? 2 : 1,
+        delay: `${(index % 12) * 0.35}s`,
+      })),
+    [],
+  );
+
   return (
     <>
-      <CosmicBackground />
-
-      <main className="relative isolate overflow-hidden px-5 py-8 sm:px-8 sm:py-10 lg:px-10 xl:px-12">
-        <section className="mx-auto max-w-7xl">
-          <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-slate-950/45 p-6 shadow-[0_30px_120px_rgba(0,0,0,0.45)] backdrop-blur-2xl sm:p-8 lg:p-12">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_78%_28%,rgba(34,211,238,0.11),transparent_24%),radial-gradient(circle_at_18%_80%,rgba(139,92,246,0.1),transparent_28%)]" />
-            <div className="absolute left-[64%] top-1/2 hidden h-[34rem] w-[34rem] -translate-y-1/2 rounded-full border border-white/10 lg:block" />
-            <div className="absolute left-[69%] top-1/2 hidden h-[25rem] w-[25rem] -translate-y-1/2 rounded-full border border-cyan-300/15 lg:block" />
-            <div className="absolute left-[74%] top-1/2 hidden h-[16rem] w-[16rem] -translate-y-1/2 rounded-full border border-violet-300/15 lg:block" />
-
-            <div className="relative grid items-center gap-10 lg:grid-cols-[1.18fr_0.82fr]">
-              <div>
-                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-2">
-                  <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(34,211,238,0.95)]" />
-                  <span className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-100">
-                    Independent Governance Network
-                  </span>
-                </div>
-
-                <h1 className="mt-6 max-w-4xl text-4xl font-semibold tracking-[-0.045em] text-white sm:text-5xl lg:text-6xl">
-                  TA-14 Partner
-                  <span className="block bg-gradient-to-r from-cyan-200 via-white to-violet-200 bg-clip-text text-transparent">
-                    Review Network
-                  </span>
-                </h1>
-
-                <p className="mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-                  Independent architectures remain independent. Their specialized
-                  findings enter a written pathway, meet declared boundaries, and
-                  receive TA-14 second-layer admissible-execution review.
-                </p>
-
-                <div className="mt-8 flex flex-wrap gap-3">
-                  <a
-                    href="#network"
-                    className="inline-flex min-h-12 items-center justify-center rounded-xl bg-white px-6 py-3 font-bold text-slate-950 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-300"
-                  >
-                    Enter the Network
-                  </a>
-                  <a
-                    href="#architecture"
-                    className="inline-flex min-h-12 items-center justify-center rounded-xl border border-white/15 bg-white/[0.045] px-6 py-3 font-semibold text-white transition hover:border-white/30 hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-cyan-300"
-                  >
-                    See the Architecture
-                  </a>
-                </div>
-              </div>
-
-              <div className="relative mx-auto aspect-square w-full max-w-[430px]">
-                <div className="absolute inset-[7%] animate-[spin_28s_linear_infinite] rounded-full border border-cyan-300/20" />
-                <div className="absolute inset-[18%] animate-[spin_20s_linear_infinite_reverse] rounded-full border border-violet-300/20" />
-                <div className="absolute inset-[29%] animate-[spin_14s_linear_infinite] rounded-full border border-amber-300/20" />
-
-                <div className="absolute left-1/2 top-[7%] h-3 w-3 -translate-x-1/2 rounded-full bg-cyan-300 shadow-[0_0_22px_rgba(34,211,238,1)]" />
-                <div className="absolute right-[13%] top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-violet-300 shadow-[0_0_22px_rgba(167,139,250,1)]" />
-                <div className="absolute bottom-[11%] left-[22%] h-3 w-3 rounded-full bg-amber-300 shadow-[0_0_22px_rgba(252,211,77,1)]" />
-
-                <div className="absolute inset-[24%] rounded-full border border-white/10 bg-slate-950/65 p-5 shadow-[0_0_90px_rgba(34,211,238,0.12)] backdrop-blur-xl">
-                  <img
-                    src="/images/ta-14-partner-review-network-emblem.png"
-                    alt="TA-14 Partner Review Network emblem"
-                    className="h-full w-full rounded-full object-contain"
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="network"
-          className="mx-auto max-w-7xl scroll-mt-28 py-16 sm:py-20"
-        >
-          <div className="grid gap-10 lg:grid-cols-[0.7fr_1.3fr]">
-            <div className="lg:sticky lg:top-28 lg:self-start">
-              <p className="text-sm font-bold uppercase tracking-[0.22em] text-cyan-200">
-                Current pathways
-              </p>
-              <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-                Three specialized governance lenses. One bounded network.
-              </h2>
-              <p className="mt-5 text-base leading-8 text-slate-300">
-                Each pathway declares what it reviews, what it contributes, and
-                what it does not prove. TA-14 does not absorb the partner
-                architecture. It reviews the consequence-bearing route around it.
-              </p>
-
-              <div className="mt-8 rounded-3xl border border-cyan-300/15 bg-cyan-300/[0.045] p-6 backdrop-blur-xl">
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-200">
-                  Network rule
-                </p>
-                <p className="mt-4 text-xl font-semibold leading-8 text-white">
-                  Independence is preserved. Boundaries are written. Claims stay
-                  attached to evidence.
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-6">
-              {partners.map((partner, index) => (
-                <PartnerCard
-                  key={partner.name}
-                  partner={partner}
-                  index={index}
-                />
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section
-          id="architecture"
-          className="mx-auto max-w-7xl scroll-mt-28 overflow-hidden rounded-[34px] border border-white/10 bg-slate-950/50 p-6 shadow-[0_30px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:p-8 lg:p-10"
-        >
-          <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.22em] text-violet-200">
-              Network architecture
-            </p>
-            <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white sm:text-4xl">
-              Specialized governance without architectural absorption
-            </h2>
-          </div>
-
-          <div className="relative mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            <div className="absolute left-[12%] right-[12%] top-10 hidden h-px bg-gradient-to-r from-cyan-300/20 via-white/25 to-amber-300/20 xl:block" />
-
-            {[
-              [
-                "01",
-                "Independent architecture",
-                "The partner preserves its own identity, methods, system, expertise, and review layer.",
-              ],
-              [
-                "02",
-                "Written boundary",
-                "The pathway states what is reviewed, what the evidence supports, and what remains outside scope.",
-              ],
-              [
-                "03",
-                "Specialized assessment",
-                "The partner reviews the governance surfaces inside its declared field of competence.",
-              ],
-              [
-                "04",
-                "TA-14 second layer",
-                "TA-14 reviews whether the larger consequence-bearing route supports admissible execution.",
-              ],
-            ].map(([number, title, text], index) => (
-              <article
-                key={number}
-                className="relative rounded-[26px] border border-white/10 bg-white/[0.035] p-6 transition duration-300 hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.055]"
-              >
-                <div
-                  className={`relative z-10 grid h-12 w-12 place-items-center rounded-2xl border text-sm font-black ${
-                    index === 0
-                      ? "border-cyan-300/25 bg-cyan-300/10 text-cyan-100"
-                      : index === 1
-                        ? "border-violet-300/25 bg-violet-300/10 text-violet-100"
-                        : index === 2
-                          ? "border-amber-300/25 bg-amber-300/10 text-amber-100"
-                          : "border-white/15 bg-white/[0.06] text-white"
-                  }`}
-                >
-                  {number}
-                </div>
-                <h3 className="mt-6 text-xl font-semibold text-white">{title}</h3>
-                <p className="mt-3 text-sm leading-7 text-slate-300">{text}</p>
-              </article>
-            ))}
-          </div>
-
-          <div className="mt-10 rounded-[28px] border border-cyan-300/15 bg-[linear-gradient(135deg,rgba(34,211,238,0.07),rgba(139,92,246,0.05),rgba(245,158,11,0.04))] p-7 sm:p-8">
-            <p className="text-xs font-bold uppercase tracking-[0.22em] text-cyan-200">
-              The TA-14 admissibility chain
-            </p>
-            <p className="mt-5 text-xl font-semibold leading-9 text-white sm:text-2xl">
-              Reality → Record → Continuity → Admissibility → Binding → Commit →
-              Execution → Outcome
-            </p>
-            <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300">
-              A specialized review may be strong without being route-complete.
-              TA-14 asks whether the evidence, authority, binding, execution, and
-              formed outcome remain admissible across the entire route.
-            </p>
-          </div>
-        </section>
-
-        <section className="mx-auto max-w-5xl py-16 text-center sm:py-20">
-          <div className="mx-auto mb-7 h-px w-40 bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
-          <p className="text-sm font-bold uppercase tracking-[0.22em] text-amber-200">
-            Network principle
-          </p>
-          <h2 className="mt-5 text-3xl font-semibold tracking-tight text-white sm:text-5xl">
-            No admissible evidence.
-            <span className="block text-slate-300">No admissible execution.</span>
-          </h2>
-          <p className="mx-auto mt-6 max-w-3xl text-lg leading-8 text-slate-300">
-            The TA-14 Partner Review Network does not sell blanket approval. It
-            preserves independence, written boundaries, evidence discipline, and
-            second-layer scrutiny before stronger claims are permitted.
-          </p>
-        </section>
-      </main>
-
-      <style jsx global>{`
-        @keyframes starPulse {
-          0%,
-          100% {
-            opacity: 0.18;
-            transform: scale(0.8);
-          }
-          50% {
-            opacity: 0.95;
-            transform: scale(1.35);
-          }
+      <style>{`
+        :root {
+          --prn-bg: #030712;
+          --prn-panel: rgba(7, 15, 28, 0.78);
+          --prn-panel-strong: rgba(5, 11, 22, 0.94);
+          --prn-line: rgba(255, 255, 255, 0.10);
+          --prn-text: #f7fbff;
+          --prn-muted: #9fb0c4;
+          --prn-cyan: #54e8ff;
+          --prn-violet: #b59bff;
+          --prn-amber: #ffd66e;
         }
 
-        @keyframes orbitSpin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
+        .prn-page {
+          position: relative;
+          min-height: 100vh;
+          overflow: hidden;
+          color: var(--prn-text);
+          background:
+            radial-gradient(circle at 12% 12%, rgba(28, 183, 255, 0.16), transparent 28%),
+            radial-gradient(circle at 88% 18%, rgba(153, 102, 255, 0.14), transparent 30%),
+            radial-gradient(circle at 52% 92%, rgba(255, 190, 66, 0.08), transparent 28%),
+            linear-gradient(180deg, #020611 0%, #06101c 54%, #02060d 100%);
         }
 
-        @keyframes orbitSpinReverse {
-          from {
-            transform: rotate(360deg);
-          }
-          to {
-            transform: rotate(0deg);
-          }
+        .prn-page *,
+        .prn-page *::before,
+        .prn-page *::after {
+          box-sizing: border-box;
         }
 
-        @keyframes lineDrift {
-          0% {
-            transform: translate3d(-12%, -8%, 0) rotate(var(--angle));
-            opacity: 0.12;
-          }
-          50% {
-            opacity: 0.45;
-          }
-          100% {
-            transform: translate3d(14%, 10%, 0) rotate(var(--angle));
-            opacity: 0.12;
-          }
+        .prn-background {
+          position: fixed;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          overflow: hidden;
         }
 
-        .cosmic-star {
-          animation-name: starPulse;
-          animation-timing-function: ease-in-out;
-          animation-iteration-count: infinite;
-        }
-
-        .orbit {
+        .prn-grid {
           position: absolute;
-          border-radius: 9999px;
-          border: 1px solid rgba(255, 255, 255, 0.08);
-          animation-timing-function: linear;
-          animation-iteration-count: infinite;
+          inset: 0;
+          opacity: 0.13;
+          background-image:
+            linear-gradient(rgba(255,255,255,0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,0.06) 1px, transparent 1px);
+          background-size: 72px 72px;
+          mask-image: radial-gradient(circle at center, black, transparent 82%);
         }
 
-        .orbit-one {
+        .prn-star {
+          position: absolute;
+          border-radius: 999px;
+          background: white;
+          animation: prnStar 4.8s ease-in-out infinite;
+        }
+
+        .prn-orbit {
+          position: absolute;
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 50%;
+          animation: prnSpin 36s linear infinite;
+        }
+
+        .prn-orbit.one {
           width: 42rem;
           height: 42rem;
-          left: -14rem;
+          left: -15rem;
           top: 8rem;
-          animation-name: orbitSpin;
-          animation-duration: 38s;
         }
 
-        .orbit-two {
+        .prn-orbit.two {
           width: 34rem;
           height: 34rem;
-          right: -11rem;
-          top: 22rem;
-          animation-name: orbitSpinReverse;
-          animation-duration: 31s;
+          right: -12rem;
+          top: 24rem;
+          animation-direction: reverse;
+          animation-duration: 29s;
         }
 
-        .orbit-three {
+        .prn-orbit.three {
           width: 48rem;
           height: 48rem;
-          left: 28%;
-          bottom: -28rem;
-          animation-name: orbitSpin;
-          animation-duration: 46s;
+          left: 30%;
+          bottom: -30rem;
+          animation-duration: 44s;
         }
 
-        .orbit-node {
+        .prn-orbit::after {
+          content: "";
           position: absolute;
           left: 50%;
           top: -5px;
           width: 10px;
           height: 10px;
-          border-radius: 9999px;
-          transform: translateX(-50%);
+          border-radius: 50%;
+          background: var(--prn-cyan);
+          box-shadow: 0 0 24px rgba(84, 232, 255, 0.95);
         }
 
-        .network-line {
+        .prn-shell {
+          position: relative;
+          z-index: 2;
+          width: min(1240px, calc(100% - 40px));
+          margin: 0 auto;
+          padding: 34px 0 76px;
+        }
+
+        .prn-hero {
+          position: relative;
+          display: grid;
+          grid-template-columns: 1.16fr 0.84fr;
+          align-items: center;
+          gap: 44px;
+          overflow: hidden;
+          padding: 52px;
+          border: 1px solid var(--prn-line);
+          border-radius: 36px;
+          background: rgba(4, 11, 22, 0.66);
+          backdrop-filter: blur(24px);
+          box-shadow: 0 30px 110px rgba(0, 0, 0, 0.42);
+        }
+
+        .prn-hero::before {
+          content: "";
           position: absolute;
-          width: 48rem;
-          height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(125, 211, 252, 0.55),
-            rgba(196, 181, 253, 0.35),
-            transparent
-          );
-          transform-origin: center;
-          animation: lineDrift 14s ease-in-out infinite alternate;
+          inset: 0;
+          pointer-events: none;
+          background:
+            radial-gradient(circle at 80% 25%, rgba(84,232,255,0.12), transparent 25%),
+            radial-gradient(circle at 18% 82%, rgba(181,155,255,0.10), transparent 28%);
         }
 
-        .line-one {
-          --angle: 18deg;
-          left: -8rem;
-          top: 22%;
+        .prn-copy,
+        .prn-visual {
+          position: relative;
+          z-index: 1;
         }
 
-        .line-two {
-          --angle: -22deg;
-          right: -12rem;
-          top: 42%;
-          animation-delay: -4s;
+        .prn-kicker {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 9px 14px;
+          border: 1px solid rgba(84,232,255,0.22);
+          border-radius: 999px;
+          color: #c9f7ff;
+          background: rgba(84,232,255,0.07);
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
         }
 
-        .line-three {
-          --angle: 9deg;
-          left: 14%;
-          top: 68%;
-          animation-delay: -7s;
+        .prn-kicker::before {
+          content: "";
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: var(--prn-cyan);
+          box-shadow: 0 0 14px rgba(84,232,255,0.95);
+          animation: prnPulse 2s ease-in-out infinite;
         }
 
-        .line-four {
-          --angle: -11deg;
-          right: 6%;
-          top: 82%;
-          animation-delay: -10s;
+        .prn-title {
+          margin: 24px 0 20px;
+          font-size: clamp(48px, 6.6vw, 82px);
+          line-height: 0.95;
+          letter-spacing: -0.055em;
+        }
+
+        .prn-title span {
+          display: block;
+          color: transparent;
+          background: linear-gradient(90deg, #aaf6ff, #ffffff 46%, #d3c5ff);
+          background-clip: text;
+          -webkit-background-clip: text;
+        }
+
+        .prn-lead {
+          max-width: 760px;
+          margin: 0;
+          color: #b8c7d8;
+          font-size: 18px;
+          line-height: 1.75;
+        }
+
+        .prn-actions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 28px;
+        }
+
+        .prn-button {
+          display: inline-flex;
+          min-height: 48px;
+          align-items: center;
+          justify-content: center;
+          padding: 0 22px;
+          border: 1px solid var(--prn-line);
+          border-radius: 14px;
+          color: white;
+          background: rgba(255,255,255,0.045);
+          text-decoration: none;
+          font-weight: 850;
+          transition: transform 180ms ease, background 180ms ease, border-color 180ms ease;
+        }
+
+        .prn-button.primary {
+          color: #03100c;
+          border-color: transparent;
+          background: linear-gradient(90deg, var(--prn-cyan), #8cf0ff);
+        }
+
+        .prn-button:hover {
+          transform: translateY(-2px);
+          border-color: rgba(255,255,255,0.24);
+          background: rgba(255,255,255,0.08);
+        }
+
+        .prn-button.primary:hover {
+          background: linear-gradient(90deg, #8cf0ff, #c5f8ff);
+        }
+
+        .prn-visual {
+          display: grid;
+          place-items: center;
+          aspect-ratio: 1;
+          width: min(100%, 430px);
+          margin: 0 auto;
+        }
+
+        .prn-ring {
+          position: absolute;
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 50%;
+          animation: prnSpin 24s linear infinite;
+        }
+
+        .prn-ring.one { inset: 4%; border-color: rgba(84,232,255,0.22); }
+        .prn-ring.two { inset: 16%; border-color: rgba(181,155,255,0.22); animation-direction: reverse; animation-duration: 18s; }
+        .prn-ring.three { inset: 28%; border-color: rgba(255,214,110,0.22); animation-duration: 12s; }
+
+        .prn-core {
+          position: absolute;
+          inset: 24%;
+          display: grid;
+          place-items: center;
+          overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.10);
+          border-radius: 50%;
+          background:
+            radial-gradient(circle at 35% 30%, #ffffff 0 2%, #54e8ff 4%, #0b4d78 34%, #05111f 70%);
+          box-shadow:
+            0 0 80px rgba(84,232,255,0.24),
+            inset 0 0 36px rgba(255,255,255,0.16);
+        }
+
+        .prn-core img {
+          width: 100%;
+          height: 100%;
+          object-fit: contain;
+        }
+
+        .prn-core-fallback {
+          text-align: center;
+          font-weight: 950;
+          letter-spacing: 0.11em;
+          line-height: 1.35;
+        }
+
+        .prn-section {
+          padding: 84px 0 0;
+          scroll-margin-top: 100px;
+        }
+
+        .prn-network-grid {
+          display: grid;
+          grid-template-columns: minmax(270px, 0.68fr) minmax(0, 1.32fr);
+          gap: 34px;
+          align-items: start;
+        }
+
+        .prn-sticky {
+          position: sticky;
+          top: 28px;
+        }
+
+        .prn-eyebrow {
+          color: var(--prn-cyan);
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.18em;
+          text-transform: uppercase;
+        }
+
+        .prn-section-title {
+          margin: 14px 0 14px;
+          font-size: clamp(34px, 4.4vw, 56px);
+          line-height: 1.04;
+          letter-spacing: -0.04em;
+        }
+
+        .prn-section-copy {
+          margin: 0;
+          color: var(--prn-muted);
+          font-size: 16px;
+          line-height: 1.75;
+        }
+
+        .prn-rule {
+          margin-top: 28px;
+          padding: 24px;
+          border: 1px solid rgba(84,232,255,0.16);
+          border-radius: 24px;
+          background: rgba(84,232,255,0.045);
+          backdrop-filter: blur(16px);
+        }
+
+        .prn-rule strong {
+          display: block;
+          margin-top: 12px;
+          font-size: 21px;
+          line-height: 1.45;
+        }
+
+        .prn-card-stack {
+          display: grid;
+          gap: 20px;
+        }
+
+        .prn-card {
+          position: relative;
+          overflow: hidden;
+          border: 1px solid var(--prn-line);
+          border-radius: 28px;
+          background: var(--prn-panel);
+          backdrop-filter: blur(22px);
+          box-shadow: 0 20px 70px rgba(0,0,0,0.26);
+          transition: transform 220ms ease, border-color 220ms ease, background 220ms ease;
+        }
+
+        .prn-card:hover {
+          transform: translateY(-3px);
+          background: rgba(7, 15, 28, 0.90);
+        }
+
+        .prn-card.cyan { border-color: rgba(84,232,255,0.24); }
+        .prn-card.violet { border-color: rgba(181,155,255,0.24); }
+        .prn-card.amber { border-color: rgba(255,214,110,0.24); }
+
+        .prn-card-main {
+          padding: 28px;
+        }
+
+        .prn-card-head {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 18px;
+        }
+
+        .prn-partner-id {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .prn-initials {
+          display: grid;
+          width: 56px;
+          height: 56px;
+          place-items: center;
+          border: 1px solid var(--prn-line);
+          border-radius: 17px;
+          background: rgba(255,255,255,0.045);
+          font-weight: 950;
+          letter-spacing: 0.12em;
+        }
+
+        .prn-pathway {
+          color: #7f92a8;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
+        }
+
+        .prn-card h3 {
+          margin: 5px 0 0;
+          font-size: 26px;
+          letter-spacing: -0.025em;
+        }
+
+        .prn-independent {
+          padding: 7px 11px;
+          border: 1px solid var(--prn-line);
+          border-radius: 999px;
+          color: #dce8f5;
+          background: rgba(255,255,255,0.04);
+          font-size: 11px;
+          font-weight: 850;
+        }
+
+        .prn-status {
+          display: inline-flex;
+          margin-top: 22px;
+          padding: 7px 11px;
+          border: 1px solid rgba(255,214,110,0.20);
+          border-radius: 999px;
+          color: #ffe8a8;
+          background: rgba(255,214,110,0.07);
+          font-size: 11px;
+          font-weight: 850;
+          letter-spacing: 0.10em;
+          text-transform: uppercase;
+        }
+
+        .prn-lane {
+          margin: 18px 0 0;
+          font-weight: 800;
+          line-height: 1.55;
+        }
+
+        .prn-card.cyan .prn-lane { color: #aaf6ff; }
+        .prn-card.violet .prn-lane { color: #d8ccff; }
+        .prn-card.amber .prn-lane { color: #ffe4a1; }
+
+        .prn-summary {
+          margin: 14px 0 0;
+          color: #b6c5d6;
+          line-height: 1.72;
+        }
+
+        .prn-toggle {
+          display: inline-flex;
+          min-width: 290px;
+          min-height: 48px;
+          align-items: center;
+          justify-content: space-between;
+          margin-top: 22px;
+          padding: 0 17px;
+          border: 1px solid var(--prn-line);
+          border-radius: 14px;
+          color: white;
+          background: rgba(255,255,255,0.04);
+          font-weight: 850;
+          cursor: pointer;
+        }
+
+        .prn-toggle:hover {
+          background: rgba(255,255,255,0.07);
+        }
+
+        .prn-detail {
+          overflow: hidden;
+          border-top: 1px solid var(--prn-line);
+          background: rgba(0,0,0,0.20);
+        }
+
+        .prn-detail-inner {
+          display: grid;
+          grid-template-columns: 0.86fr 1.14fr;
+          gap: 28px;
+          padding: 28px;
+        }
+
+        .prn-detail h4 {
+          margin: 0 0 14px;
+          color: var(--prn-cyan);
+          font-size: 11px;
+          letter-spacing: 0.17em;
+          text-transform: uppercase;
+        }
+
+        .prn-list {
+          display: grid;
+          gap: 10px;
+          margin: 0;
+          padding: 0;
+          list-style: none;
+        }
+
+        .prn-list li {
+          position: relative;
+          padding-left: 17px;
+          color: #cad6e3;
+          font-size: 14px;
+          line-height: 1.55;
+        }
+
+        .prn-list li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0.62em;
+          width: 6px;
+          height: 6px;
+          border-radius: 50%;
+          background: var(--prn-cyan);
+          box-shadow: 0 0 10px rgba(84,232,255,0.7);
+        }
+
+        .prn-box {
+          padding: 18px;
+          border: 1px solid var(--prn-line);
+          border-radius: 17px;
+          background: rgba(255,255,255,0.035);
+        }
+
+        .prn-box + .prn-box {
+          margin-top: 12px;
+        }
+
+        .prn-box.amber {
+          border-color: rgba(255,214,110,0.15);
+          background: rgba(255,214,110,0.035);
+        }
+
+        .prn-box p {
+          margin: 8px 0 0;
+          color: #b4c4d4;
+          font-size: 14px;
+          line-height: 1.67;
+        }
+
+        .prn-detail-action {
+          grid-column: 1 / -1;
+          padding-top: 20px;
+          border-top: 1px solid var(--prn-line);
+        }
+
+        .prn-architecture {
+          padding: 34px;
+          border: 1px solid var(--prn-line);
+          border-radius: 32px;
+          background: var(--prn-panel);
+          backdrop-filter: blur(22px);
+          box-shadow: 0 24px 90px rgba(0,0,0,0.26);
+        }
+
+        .prn-steps {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 34px;
+        }
+
+        .prn-step {
+          padding: 22px;
+          border: 1px solid var(--prn-line);
+          border-radius: 20px;
+          background: rgba(255,255,255,0.035);
+        }
+
+        .prn-step-number {
+          display: grid;
+          width: 46px;
+          height: 46px;
+          place-items: center;
+          border: 1px solid rgba(84,232,255,0.22);
+          border-radius: 14px;
+          color: #c9f7ff;
+          background: rgba(84,232,255,0.07);
+          font-weight: 950;
+        }
+
+        .prn-step h3 {
+          margin: 18px 0 9px;
+          font-size: 19px;
+        }
+
+        .prn-step p {
+          margin: 0;
+          color: var(--prn-muted);
+          font-size: 14px;
+          line-height: 1.64;
+        }
+
+        .prn-chain {
+          margin-top: 26px;
+          padding: 28px;
+          border: 1px solid rgba(84,232,255,0.16);
+          border-radius: 24px;
+          background:
+            linear-gradient(135deg, rgba(84,232,255,0.07), rgba(181,155,255,0.05), rgba(255,214,110,0.04));
+        }
+
+        .prn-chain strong {
+          display: block;
+          margin-top: 14px;
+          font-size: clamp(20px, 2.4vw, 30px);
+          line-height: 1.5;
+        }
+
+        .prn-chain p {
+          max-width: 900px;
+          margin: 15px 0 0;
+          color: #b8c6d5;
+          line-height: 1.72;
+        }
+
+        .prn-principle {
+          padding: 86px 20px 16px;
+          text-align: center;
+        }
+
+        .prn-principle h2 {
+          margin: 16px 0 0;
+          font-size: clamp(42px, 6vw, 72px);
+          line-height: 1;
+          letter-spacing: -0.05em;
+        }
+
+        .prn-principle h2 span {
+          display: block;
+          color: #aab9ca;
+        }
+
+        .prn-principle p {
+          max-width: 850px;
+          margin: 22px auto 0;
+          color: var(--prn-muted);
+          font-size: 17px;
+          line-height: 1.75;
+        }
+
+        @keyframes prnSpin {
+          to { transform: rotate(360deg); }
+        }
+
+        @keyframes prnPulse {
+          0%, 100% { opacity: 0.45; transform: scale(0.85); }
+          50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        @keyframes prnStar {
+          0%, 100% { opacity: 0.18; transform: scale(0.8); }
+          50% { opacity: 0.9; transform: scale(1.25); }
+        }
+
+        @media (max-width: 980px) {
+          .prn-hero,
+          .prn-network-grid {
+            grid-template-columns: 1fr;
+          }
+
+          .prn-sticky {
+            position: relative;
+            top: auto;
+          }
+
+          .prn-visual {
+            max-width: 390px;
+          }
+
+          .prn-steps {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 720px) {
+          .prn-shell {
+            width: min(100% - 24px, 1240px);
+            padding-top: 16px;
+          }
+
+          .prn-hero,
+          .prn-architecture {
+            padding: 24px;
+            border-radius: 24px;
+          }
+
+          .prn-title {
+            font-size: 48px;
+          }
+
+          .prn-card-main,
+          .prn-detail-inner {
+            padding: 22px;
+          }
+
+          .prn-detail-inner,
+          .prn-steps {
+            grid-template-columns: 1fr;
+          }
+
+          .prn-card-head {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .prn-toggle {
+            width: 100%;
+            min-width: 0;
+          }
+
+          .prn-independent {
+            display: none;
+          }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          .cosmic-star,
-          .orbit,
-          .network-line {
-            animation: none !important;
+          .prn-page *,
+          .prn-page *::before,
+          .prn-page *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
           }
         }
       `}</style>
+
+      <div className="prn-page">
+        <div className="prn-background" aria-hidden="true">
+          <div className="prn-grid" />
+          {stars.map((star, index) => (
+            <span
+              key={index}
+              className="prn-star"
+              style={{
+                left: star.left,
+                top: star.top,
+                width: `${star.size}px`,
+                height: `${star.size}px`,
+                animationDelay: star.delay,
+              }}
+            />
+          ))}
+          <div className="prn-orbit one" />
+          <div className="prn-orbit two" />
+          <div className="prn-orbit three" />
+        </div>
+
+        <main className="prn-shell">
+          <section className="prn-hero">
+            <div className="prn-copy">
+              <div className="prn-kicker">Independent Governance Network</div>
+
+              <h1 className="prn-title">
+                TA-14 Partner
+                <span>Review Network</span>
+              </h1>
+
+              <p className="prn-lead">
+                Independent architectures remain independent. Their specialized
+                findings enter a written pathway, meet declared boundaries, and
+                receive TA-14 second-layer admissible-execution review.
+              </p>
+
+              <div className="prn-actions">
+                <a className="prn-button primary" href="#network">
+                  Enter the Network
+                </a>
+                <a className="prn-button" href="#architecture">
+                  See the Architecture
+                </a>
+              </div>
+            </div>
+
+            <div className="prn-visual" aria-label="TA-14 Partner Review Network">
+              <div className="prn-ring one" />
+              <div className="prn-ring two" />
+              <div className="prn-ring three" />
+              <div className="prn-core">
+                <div className="prn-core-fallback">
+                  TA-14
+                  <br />
+                  PARTNER
+                  <br />
+                  NETWORK
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="network" className="prn-section">
+            <div className="prn-network-grid">
+              <div className="prn-sticky">
+                <div className="prn-eyebrow">Current pathways</div>
+                <h2 className="prn-section-title">
+                  Three specialized governance lenses. One bounded network.
+                </h2>
+                <p className="prn-section-copy">
+                  Each pathway declares what it reviews, what it contributes, and
+                  what it does not prove. TA-14 does not absorb the partner
+                  architecture. It reviews the consequence-bearing route around it.
+                </p>
+
+                <div className="prn-rule">
+                  <div className="prn-eyebrow">Network rule</div>
+                  <strong>
+                    Independence is preserved. Boundaries are written. Claims stay
+                    attached to evidence.
+                  </strong>
+                </div>
+              </div>
+
+              <div className="prn-card-stack">
+                {partners.map((partner, index) => {
+                  const open = openPartner === index;
+
+                  return (
+                    <article className={`prn-card ${partner.accent}`} key={partner.name}>
+                      <div className="prn-card-main">
+                        <div className="prn-card-head">
+                          <div className="prn-partner-id">
+                            <div className="prn-initials">{partner.initials}</div>
+                            <div>
+                              <div className="prn-pathway">
+                                Pathway {String(index + 1).padStart(2, "0")}
+                              </div>
+                              <h3>{partner.name}</h3>
+                            </div>
+                          </div>
+                          <span className="prn-independent">Independent</span>
+                        </div>
+
+                        <span className="prn-status">{partner.status}</span>
+                        <p className="prn-lane">{partner.lane}</p>
+                        <p className="prn-summary">{partner.summary}</p>
+
+                        <button
+                          className="prn-toggle"
+                          type="button"
+                          aria-expanded={open}
+                          onClick={() => setOpenPartner(open ? null : index)}
+                        >
+                          <span>
+                            {open ? "Close Governance View" : "Open Governance View"}
+                          </span>
+                          <span aria-hidden="true">{open ? "×" : "+"}</span>
+                        </button>
+                      </div>
+
+                      {open && (
+                        <div className="prn-detail">
+                          <div className="prn-detail-inner">
+                            <section>
+                              <h4>Specialized review surfaces</h4>
+                              <ul className="prn-list">
+                                {partner.governs.map((item) => (
+                                  <li key={item}>{item}</li>
+                                ))}
+                              </ul>
+                            </section>
+
+                            <section>
+                              <div className="prn-box">
+                                <h4>Network contribution</h4>
+                                <p>{partner.contribution}</p>
+                              </div>
+
+                              <div className="prn-box amber">
+                                <h4>Declared boundary</h4>
+                                <p>{partner.boundary}</p>
+                              </div>
+                            </section>
+
+                            <div className="prn-detail-action">
+                              <a
+                                className="prn-button primary"
+                                href={partner.pathwayUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                              >
+                                Open Full Public Pathway
+                              </a>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
+
+          <section id="architecture" className="prn-section">
+            <div className="prn-architecture">
+              <div className="prn-eyebrow">Network architecture</div>
+              <h2 className="prn-section-title">
+                Specialized governance without architectural absorption
+              </h2>
+
+              <div className="prn-steps">
+                {[
+                  [
+                    "01",
+                    "Independent architecture",
+                    "The partner preserves its own identity, methods, system, expertise, and review layer.",
+                  ],
+                  [
+                    "02",
+                    "Written boundary",
+                    "The pathway states what is reviewed, what the evidence supports, and what remains outside scope.",
+                  ],
+                  [
+                    "03",
+                    "Specialized assessment",
+                    "The partner reviews the governance surfaces inside its declared field of competence.",
+                  ],
+                  [
+                    "04",
+                    "TA-14 second layer",
+                    "TA-14 reviews whether the larger consequence-bearing route supports admissible execution.",
+                  ],
+                ].map(([number, title, text]) => (
+                  <article className="prn-step" key={number}>
+                    <div className="prn-step-number">{number}</div>
+                    <h3>{title}</h3>
+                    <p>{text}</p>
+                  </article>
+                ))}
+              </div>
+
+              <div className="prn-chain">
+                <div className="prn-eyebrow">The TA-14 admissibility chain</div>
+                <strong>
+                  Reality → Record → Continuity → Admissibility → Binding → Commit
+                  → Execution → Outcome
+                </strong>
+                <p>
+                  A specialized review may be strong without being route-complete.
+                  TA-14 asks whether the evidence, authority, binding, execution,
+                  and formed outcome remain admissible across the entire route.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className="prn-principle">
+            <div className="prn-eyebrow">Network principle</div>
+            <h2>
+              No admissible evidence.
+              <span>No admissible execution.</span>
+            </h2>
+            <p>
+              The TA-14 Partner Review Network does not sell blanket approval. It
+              preserves independence, written boundaries, evidence discipline, and
+              second-layer scrutiny before stronger claims are permitted.
+            </p>
+          </section>
+        </main>
+      </div>
     </>
   );
 }
