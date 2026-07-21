@@ -2,220 +2,114 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Governance Exchange Marketplace',
+  title: 'TA-14 AI Governance Exchange Marketplace',
   description:
-    'Post governance needs, find qualified builders, request governed records, and explore proven routes inside the TA-14 AI Governance Exchange.',
+    'Discover governance professionals, organizations, opportunities, records, reviews, and governed collaboration pathways inside the TA-14 AI Governance Exchange Marketplace.',
 };
 
-type Doorway = {
-  eyebrow: string;
-  title: string;
-  description: string;
-  href: string;
-  action: string;
-  status: string;
-};
-
-type Opportunity = {
-  title: string;
-  domain: string;
-  deliverable: string;
-  budget: string;
-  timing: string;
-  visibility: string;
-  qualifications: string[];
-  state: 'OPEN' | 'INVITATION ONLY' | 'PREVIEW';
-};
-
-type Professional = {
-  name: string;
-  role: string;
-  organization: string;
-  domains: string[];
-  credentialStatus: string;
-  availability: string;
-};
-
-const doorways: Doorway[] = [
+const categories = [
   {
-    eyebrow: 'FOR ORGANIZATIONS',
+    title: 'Governance Professionals',
+    description:
+      'Find independent architects, reviewers, verification specialists, domain experts, record stewards, and implementation partners.',
+    href: '/marketplace/professionals',
+    eyebrow: 'PEOPLE',
+    metric: '6 featured profiles',
+  },
+  {
+    title: 'Governance Organizations',
+    description:
+      'Explore governance practices, review entities, verification laboratories, record institutions, and partner organizations.',
+    href: '/marketplace/organizations',
+    eyebrow: 'INSTITUTIONS',
+    metric: '6 featured organizations',
+  },
+  {
+    title: 'Open Opportunities',
+    description:
+      'Browse governance needs, review requests, implementation scopes, licensing opportunities, and collaboration pathways.',
+    href: '/marketplace/opportunities',
+    eyebrow: 'WORK',
+    metric: 'Governed opportunities',
+  },
+  {
+    title: 'Governed Records',
+    description:
+      'Explore environmental, atmospheric, building, hospital, HVAC, land, water, and laboratory record offerings.',
+    href: '/marketplace/records',
+    eyebrow: 'RECORDS',
+    metric: '8 record categories',
+  },
+  {
+    title: 'Independent Reviews',
+    description:
+      'Read bounded architecture reviews, execution-route findings, continuity reviews, technical verifications, and domain assessments.',
+    href: '/marketplace/reviews',
+    eyebrow: 'REVIEW',
+    metric: '6 published reviews',
+  },
+  {
     title: 'Post a Governance Need',
     description:
-      'Describe the real problem, the consequential action, the evidence already available, the authorities involved, and the governed deliverable you need.',
-    href: '#post-a-need',
-    action: 'Preview need intake',
-    status: 'INTAKE COMING NEXT',
-  },
-  {
-    eyebrow: 'FOR BUILDERS AND REVIEWERS',
-    title: 'Find Governance Work',
-    description:
-      'Explore bounded opportunities calling for governance architects, record creators, reviewers, verifiers, and domain specialists.',
-    href: '#opportunities',
-    action: 'View opportunities',
-    status: 'DEMONSTRATION DATA',
-  },
-  {
-    eyebrow: 'FOR RECORD REQUESTERS',
-    title: 'Request a Governed Record',
-    description:
-      'Invite qualified contributors to assemble a record with attributable evidence, continuity review, verification, and declared proof boundaries.',
-    href: '#governed-records',
-    action: 'Explore record requests',
-    status: 'WORKFLOW PREVIEW',
-  },
-  {
-    eyebrow: 'FOR BUYERS AND LICENSEES',
-    title: 'Browse Proven Routes',
-    description:
-      'Explore governance routes tested against declared scenarios and available for delivery, transfer, or licensing within stated boundaries.',
-    href: '#proven-routes',
-    action: 'Browse route preview',
-    status: 'LIBRARY PREVIEW',
+      'Declare the problem, consequential action, required evidence, expected deliverable, budget, timing, and visibility.',
+    href: '/marketplace/post-a-need',
+    eyebrow: 'START HERE',
+    metric: 'Guided intake',
   },
 ];
 
-const processSteps = [
+const featuredActivity = [
   {
-    number: '01',
-    title: 'Declare the Need',
-    description:
-      'State the problem, consequential action, affected parties, evidence, authority, exclusions, timing, budget, and intended deliverable.',
+    type: 'REVIEW',
+    title: 'Runtime Refusal Architecture Review',
+    detail: 'Passed with bounded corrections',
+    href: '/marketplace/reviews/runtime-refusal-architecture-review',
   },
   {
-    number: '02',
-    title: 'Select Qualified Contributors',
-    description:
-      'Review qualifications, credential standing, scope, conflicts, prior work, proposal terms, and availability.',
+    type: 'ORGANIZATION',
+    title: 'Replay Integrity Lab',
+    detail: 'Execution verification laboratory',
+    href: '/marketplace/organizations/replay-integrity-lab',
   },
   {
-    number: '03',
-    title: 'Build and Test Together',
-    description:
-      'Collaborate inside a bounded workspace where evidence, questions, changes, challenges, approvals, and tests remain attributable.',
+    type: 'PROFESSIONAL',
+    title: 'Nina Patel',
+    detail: 'Independent governance reviewer',
+    href: '/marketplace/professionals/nina-patel',
   },
   {
-    number: '04',
-    title: 'Verify, Preserve, and Deliver',
-    description:
-      'Deliver a versioned artifact with verification results, exceptions, proof boundaries, authorship, rights, and preservation history.',
-  },
-];
-
-const opportunities: Opportunity[] = [
-  {
-    title: 'High-Risk Vendor Payment Approval Route',
-    domain: 'Financial Execution Governance',
-    deliverable: 'Custom consequential execution route',
-    budget: '$3,200 fixed scope',
-    timing: 'Requested within 12 days',
-    visibility: 'Public demonstration opportunity',
-    qualifications: [
-      'AI governance architecture',
-      'Financial controls',
-      'Route testing',
-    ],
-    state: 'OPEN',
-  },
-  {
-    title: 'Hospital Environmental Record Framework',
-    domain: 'Healthcare Environmental Governance',
-    deliverable: 'Governed record template and continuity review',
-    budget: '$12,000 proposed budget',
-    timing: 'Four-week target',
-    visibility: 'Invitation-only example',
-    qualifications: [
-      'Healthcare operations',
-      'Environmental records',
-      'Evidence continuity',
-    ],
-    state: 'INVITATION ONLY',
-  },
-  {
-    title: 'HVAC Baseline and Post-Intervention Record',
-    domain: 'HVAC Performance Governance',
-    deliverable: 'Record workflow, evidence requirements, and verification',
-    budget: '$2,100 fixed scope',
-    timing: 'Two-week target',
-    visibility: 'Public demonstration opportunity',
-    qualifications: [
-      'HVAC diagnostics',
-      'Performance measurement',
-      'Evidence-governed records',
-    ],
-    state: 'PREVIEW',
+    type: 'RECORD',
+    title: 'Building Environmental Record',
+    detail: 'Daily governed environmental evidence',
+    href: '/marketplace/records/building-environmental-record',
   },
 ];
 
-const professionals: Professional[] = [
+const ecosystem = [
   {
-    name: 'Demonstration Governance Architect',
-    role: 'Consequential Route Builder',
-    organization: 'Independent Marketplace Provider',
-    domains: ['AI Governance', 'Execution Routes', 'Replay and Verification'],
-    credentialStatus: 'Self-declared - not independently verified',
-    availability: 'Accepting bounded proposals',
+    name: 'TA-14 AI Governance Registry',
+    responsibility:
+      'Register, preserve, version, and discover governance architectures.',
+    state: 'Separate product',
   },
   {
-    name: 'Demonstration Environmental Specialist',
-    role: 'Governed Record Contributor',
-    organization: 'Independent Marketplace Provider',
-    domains: ['Indoor Air Quality', 'Environmental Records', 'Continuity Review'],
-    credentialStatus: 'Evidence submission preview',
-    availability: 'Available for invited collaboration',
+    name: 'TA-14 AI Governance Exchange',
+    responsibility:
+      'Build, evaluate, test, and preserve governed execution routes.',
+    state: 'Core platform',
   },
   {
-    name: 'Demonstration Independent Reviewer',
-    role: 'Route and Record Reviewer',
-    organization: 'Independent Marketplace Provider',
-    domains: ['Challenge Review', 'Evidence Boundaries', 'Verification Scope'],
-    credentialStatus: 'Review process not yet connected',
-    availability: 'Available for independent review',
-  },
-];
-
-const trustControls = [
-  {
-    title: 'Identity',
-    description:
-      'Every material action is tied to a known account and displayed participant identity.',
+    name: 'Marketplace',
+    responsibility:
+      'Connect architecture owners, reviewers, organizations, and governance needs.',
+    state: 'This product',
   },
   {
-    title: 'Attribution',
-    description:
-      'Every contribution preserves author, timestamp, source, and workspace context.',
+    name: 'Partner Review Network',
+    responsibility:
+      'Provide independent bounded review, mapping, testing, and replication.',
+    state: 'Connected layer',
   },
-  {
-    title: 'Continuity',
-    description:
-      'Evidence lineage and custody remain visible from intake through delivery.',
-  },
-  {
-    title: 'Authority',
-    description:
-      'Contribution, approval, execution, verification, and ownership remain separate powers.',
-  },
-  {
-    title: 'Versioning',
-    description:
-      'Accepted content is not silently overwritten. Changes create traceable versions.',
-  },
-  {
-    title: 'Proof Boundaries',
-    description:
-      'Every verification artifact states what was tested and what remains outside scope.',
-  },
-];
-
-const routeChain = [
-  'Reality',
-  'Record',
-  'Continuity',
-  'Admissibility',
-  'Binding',
-  'Commit',
-  'Execution',
-  'Outcome',
 ];
 
 function ArrowIcon() {
@@ -232,22 +126,9 @@ function ArrowIcon() {
   );
 }
 
-function SparkIcon() {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none">
-      <path
-        d="M12 2l1.5 6.5L20 10l-6.5 1.5L12 18l-1.5-6.5L4 10l6.5-1.5L12 2Z"
-        stroke="currentColor"
-        strokeWidth="1.4"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
 function CheckIcon() {
   return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none">
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="17" height="17" fill="none">
       <path
         d="m5 12.5 4 4L19 7"
         stroke="currentColor"
@@ -259,154 +140,165 @@ function CheckIcon() {
   );
 }
 
-function OrbitVisual() {
+function AlertIcon() {
   return (
-    <div className="orbitVisual" aria-hidden="true">
-      <div className="orbitCore">
-        <span>TA-14</span>
-        <small>Governed Exchange</small>
-      </div>
-      <div className="orbit orbitOne">
-        <div className="orbitNode nodeOne">Need</div>
-      </div>
-      <div className="orbit orbitTwo">
-        <div className="orbitNode nodeTwo">Build</div>
-      </div>
-      <div className="orbit orbitThree">
-        <div className="orbitNode nodeThree">Verify</div>
-      </div>
-      <div className="orbit orbitFour">
-        <div className="orbitNode nodeFour">Deliver</div>
-      </div>
-      <div className="pulseRing pulseRingOne" />
-      <div className="pulseRing pulseRingTwo" />
-    </div>
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none">
+      <path
+        d="M12 8v5M12 17.2v.1M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
-export default function MarketplacePage() {
+function GridIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20" fill="none">
+      <path
+        d="M4 4h6v6H4V4Zm10 0h6v6h-6V4ZM4 14h6v6H4v-6Zm10 0h6v6h-6v-6Z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export default function MarketplaceLandingPage() {
   return (
     <main className="marketplacePage">
       <div className="backgroundLayer" aria-hidden="true">
+        <div className="glow glowOne" />
+        <div className="glow glowTwo" />
         <div className="star starOne" />
         <div className="star starTwo" />
         <div className="star starThree" />
-        <div className="star starFour" />
-        <div className="star starFive" />
-        <div className="star starSix" />
         <div className="line lineOne" />
         <div className="line lineTwo" />
-        <div className="line lineThree" />
-        <div className="glow glowOne" />
-        <div className="glow glowTwo" />
-        <div className="glow glowThree" />
       </div>
 
       <section className="heroSection">
-        <div className="pageShell heroGrid">
-          <div className="heroCopy">
-            <div className="eyebrow">
-              <span className="eyebrowDot" />
-              TA-14 AI GOVERNANCE EXCHANGE
+        <div className="pageShell">
+          <div className="heroGrid">
+            <div>
+              <span className="kicker">TA-14 AI GOVERNANCE EXCHANGE MARKETPLACE</span>
+              <h1>Where governance architectures find work, review, evidence, and collaborators.</h1>
+              <p className="heroLead">
+                The Marketplace connects organizations with governance
+                professionals, review entities, verification laboratories,
+                record institutions, implementation partners, and architecture
+                owners through declared scopes and preserved evidence.
+              </p>
+
+              <div className="heroActions">
+                <Link className="primaryButton" href="/marketplace/post-a-need">
+                  Post a Governance Need
+                  <ArrowIcon />
+                </Link>
+                <a className="secondaryButton" href="#marketplace-categories">
+                  Explore the Marketplace
+                </a>
+              </div>
+
+              <div className="boundaryNotice">
+                <AlertIcon />
+                <span>
+                  The Marketplace structure is now visible, but live accounts,
+                  search, matching, messaging, evidence rooms, contracting,
+                  payment, licensing, reputation, and dispute workflows are not
+                  fully connected yet.
+                </span>
+              </div>
             </div>
 
-            <h1>
-              Bring the problem.
-              <br />
-              Find the qualified people.
-              <br />
-              <span>Build it together. Prove what works.</span>
-            </h1>
+            <aside className="heroPanel">
+              <div className="heroPanelHeader">
+                <span>MARKETPLACE MODEL</span>
+                <strong>Discover by declared role, scope, evidence, and review history.</strong>
+              </div>
 
-            <p className="heroLead">
-              The Governance Exchange Marketplace is a governed meeting place
-              where organizations can request consequential governance,
-              qualified people can build or review it, and the completed route
-              or governed record can be tested, verified, preserved, delivered,
-              sold, or licensed.
-            </p>
-
-            <div className="heroActions">
-              <Link className="primaryButton" href="#post-a-need">
-                Post a Governance Need
-                <ArrowIcon />
-              </Link>
-              <Link className="secondaryButton" href="#opportunities">
-                Find Governance Work
-              </Link>
-            </div>
-
-            <div className="heroBoundary">
-              <SparkIcon />
-              <span>
-                Demonstration front door. Live marketplace data, payments,
-                automated credential verification, and real-time collaboration
-                are not yet connected.
-              </span>
-            </div>
+              {[
+                ['Professionals', 'Independent people and domain specialists'],
+                ['Organizations', 'Practices, labs, institutions, and review entities'],
+                ['Opportunities', 'Governance needs, work, licensing, and collaboration'],
+                ['Records', 'Governed evidence and interpretation offerings'],
+                ['Reviews', 'Bounded findings, gaps, and verification history'],
+                ['Engagement', 'Scoped contact, contracting, and delivery pathways'],
+              ].map(([title, description], index) => (
+                <div className="heroPanelRow" key={title}>
+                  <span>{String(index + 1).padStart(2, '0')}</span>
+                  <strong>{title}</strong>
+                  <small>{description}</small>
+                </div>
+              ))}
+            </aside>
           </div>
-
-          <div className="heroVisualWrap">
-            <OrbitVisual />
-
-            <div className="floatingCard floatingCardOne">
-              <span className="floatingLabel">REQUEST</span>
-              <strong>Governance need declared</strong>
-              <small>Identity - evidence - authority - scope</small>
-            </div>
-
-            <div className="floatingCard floatingCardTwo">
-              <span className="floatingLabel">VERIFY</span>
-              <strong>Bounded proof preserved</strong>
-              <small>Method - version - exceptions - reviewer</small>
-            </div>
-          </div>
-        </div>
-
-        <div className="pageShell chainPanel" aria-label="TA-14 governance chain">
-          {routeChain.map((item, index) => (
-            <div className="chainItem" key={item}>
-              <div className="chainNode">{index + 1}</div>
-              <span>{item}</span>
-              {index < routeChain.length - 1 ? (
-                <div className="chainConnector" aria-hidden="true" />
-              ) : null}
-            </div>
-          ))}
         </div>
       </section>
 
-      <section className="sectionBlock" id="post-a-need">
+      <section className="sectionBlock sectionTint" id="marketplace-categories">
         <div className="pageShell">
           <div className="sectionHeading">
             <div>
-              <span className="sectionKicker">MARKETPLACE ENTRANCES</span>
-              <h2>Four ways to enter the governed exchange</h2>
+              <span className="kicker">MARKETPLACE DIRECTORY</span>
+              <h2>Enter through the category that matches your need.</h2>
             </div>
             <p>
-              Each path begins with a different need, but every path preserves
-              attribution, authority, continuity, versioning, and declared proof
-              boundaries.
+              Each Marketplace path preserves a different responsibility.
+              Professionals are not organizations. Reviews are not
+              certifications. Records are not diagnoses. Opportunities are not
+              execution authority.
             </p>
           </div>
 
-          <div className="doorwayGrid">
-            {doorways.map((card, index) => (
-              <article className="doorwayCard" key={card.title}>
-                <div className="cardNumber">
-                  {String(index + 1).padStart(2, '0')}
+          <div className="categoryGrid">
+            {categories.map((category) => (
+              <Link className="categoryCard" href={category.href} key={category.title}>
+                <div className="categoryTopline">
+                  <span>{category.eyebrow}</span>
+                  <GridIcon />
                 </div>
-                <div className="cardTopline">
-                  <span>{card.eyebrow}</span>
-                  <span className="statusBadge">{card.status}</span>
+                <h3>{category.title}</h3>
+                <p>{category.description}</p>
+                <div className="categoryFooter">
+                  <span>{category.metric}</span>
+                  <strong>
+                    Open
+                    <ArrowIcon />
+                  </strong>
                 </div>
-                <h3>{card.title}</h3>
-                <p>{card.description}</p>
-                <Link className="textLink" href={card.href}>
-                  {card.action}
-                  <ArrowIcon />
-                </Link>
-              </article>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="sectionBlock">
+        <div className="pageShell activityLayout">
+          <div>
+            <span className="kicker">MARKETPLACE ACTIVITY</span>
+            <h2>See what the ecosystem is preserving and reviewing.</h2>
+            <p>
+              The live Marketplace will surface recent profiles, organizations,
+              open needs, record offerings, published reviews, and verified
+              activity. The current cards are demonstration records already
+              built into the Marketplace.
+            </p>
+          </div>
+
+          <div className="activityList">
+            {featuredActivity.map((item) => (
+              <Link className="activityCard" href={item.href} key={item.title}>
+                <span>{item.type}</span>
+                <div>
+                  <strong>{item.title}</strong>
+                  <small>{item.detail}</small>
+                </div>
+                <ArrowIcon />
+              </Link>
             ))}
           </div>
         </div>
@@ -414,387 +306,182 @@ export default function MarketplacePage() {
 
       <section className="sectionBlock sectionTint">
         <div className="pageShell">
-          <div className="sectionHeading compactHeading">
+          <div className="sectionHeading">
             <div>
-              <span className="sectionKicker">HOW IT WORKS</span>
-              <h2>From declared need to governed delivery</h2>
+              <span className="kicker">HOW THE MARKETPLACE WORKS</span>
+              <h2>Bring the need. Declare the scope. Preserve the work.</h2>
             </div>
             <p>
-              The Exchange does not end at introduction. It preserves the work itself.
+              The Marketplace should not begin with vague introductions. It
+              should begin with a declared governance need, consequential
+              action, evidence package, expected deliverable, and reviewable
+              engagement boundary.
             </p>
           </div>
 
           <div className="processGrid">
-            {processSteps.map((step, index) => (
-              <article className="processCard" key={step.number}>
-                <div className="processNumber">{step.number}</div>
-                <h3>{step.title}</h3>
-                <p>{step.description}</p>
-                <div className="processLine">
-                  <span className="processPulse" />
-                  {index < processSteps.length - 1 ? (
-                    <span className="processTrail" />
-                  ) : null}
-                </div>
+            {[
+              ['01', 'Declare', 'State the problem, consequential action, evidence, boundaries, budget, and timing.'],
+              ['02', 'Discover', 'Find professionals, organizations, records, and reviewers by declared scope and evidence.'],
+              ['03', 'Match', 'Compare fit, conflicts, availability, methods, reviews, and proof boundaries.'],
+              ['04', 'Engage', 'Open a governed contact route with permissions, terms, deliverables, and accountability.'],
+              ['05', 'Deliver', 'Preserve submissions, versions, reviews, decisions, corrections, and final artifacts.'],
+              ['06', 'Verify', 'Publish or retain bounded evidence of what was reviewed, delivered, and concluded.'],
+            ].map(([number, title, description]) => (
+              <article className="processCard" key={number}>
+                <span>{number}</span>
+                <h3>{title}</h3>
+                <p>{description}</p>
               </article>
             ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="sectionBlock" id="opportunities">
-        <div className="pageShell">
-          <div className="sectionHeading">
-            <div>
-              <span className="sectionKicker">OPEN OPPORTUNITIES</span>
-              <h2>Problems waiting for governed work</h2>
-            </div>
-            <p>
-              These are demonstration opportunities used to establish the
-              information architecture. They are not live solicitations.
-            </p>
-          </div>
-
-          <div className="opportunityGrid">
-            {opportunities.map((opportunity) => (
-              <article className="opportunityCard" key={opportunity.title}>
-                <div className="opportunityHeader">
-                  <span className="decisionBadge">{opportunity.state}</span>
-                  <span className="demoLabel">DEMONSTRATION</span>
-                </div>
-
-                <span className="opportunityDomain">{opportunity.domain}</span>
-                <h3>{opportunity.title}</h3>
-
-                <div className="opportunityMeta">
-                  <div>
-                    <span>Deliverable</span>
-                    <strong>{opportunity.deliverable}</strong>
-                  </div>
-                  <div>
-                    <span>Budget</span>
-                    <strong>{opportunity.budget}</strong>
-                  </div>
-                  <div>
-                    <span>Timing</span>
-                    <strong>{opportunity.timing}</strong>
-                  </div>
-                  <div>
-                    <span>Visibility</span>
-                    <strong>{opportunity.visibility}</strong>
-                  </div>
-                </div>
-
-                <div className="qualificationList">
-                  <span className="listLabel">Requested qualifications</span>
-                  {opportunity.qualifications.map((qualification) => (
-                    <span className="qualificationChip" key={qualification}>
-                      {qualification}
-                    </span>
-                  ))}
-                </div>
-
-                <Link className="cardButton" href="#opportunities">
-                  View opportunity preview
-                  <ArrowIcon />
-                </Link>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="sectionBlock sectionTint" id="professionals">
-        <div className="pageShell">
-          <div className="sectionHeading">
-            <div>
-              <span className="sectionKicker">QUALIFIED PROFESSIONALS</span>
-              <h2>Scope before reputation</h2>
-            </div>
-            <p>
-              Ratings never substitute for qualifications or evidence.
-              Credential status, review state, scope, restrictions, and standing
-              must remain visible.
-            </p>
-          </div>
-
-          <div className="professionalGrid">
-            {professionals.map((professional, index) => (
-              <article className="professionalCard" key={professional.name}>
-                <div className="professionalTop">
-                  <div className="avatar" aria-hidden="true">
-                    {String(index + 1).padStart(2, '0')}
-                  </div>
-                  <span className="profileStatus">DEMONSTRATION PROFILE</span>
-                </div>
-
-                <h3>{professional.name}</h3>
-                <p className="professionalRole">{professional.role}</p>
-                <p className="professionalOrg">{professional.organization}</p>
-
-                <div className="profileDetails">
-                  <div>
-                    <span>Credential standing</span>
-                    <strong>{professional.credentialStatus}</strong>
-                  </div>
-                  <div>
-                    <span>Availability</span>
-                    <strong>{professional.availability}</strong>
-                  </div>
-                </div>
-
-                <div className="qualificationList">
-                  {professional.domains.map((domain) => (
-                    <span className="qualificationChip" key={domain}>
-                      {domain}
-                    </span>
-                  ))}
-                </div>
-
-                <Link className="textLink" href="#professionals">
-                  View professional registry preview
-                  <ArrowIcon />
-                </Link>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section className="sectionBlock" id="governed-records">
-        <div className="pageShell recordFeature">
-          <div className="recordFeatureCopy">
-            <span className="sectionKicker">GOVERNED RECORDS</span>
-            <h2>One record. Multiple bounded contributors.</h2>
-            <p>
-              A governed record may require a technician, physician, engineer,
-              laboratory, owner, patient, reviewer, or verifier. Each person
-              contributes only within assigned scope. Every material addition
-              remains attributable.
-            </p>
-
-            <div className="recordSteps">
-              <div className="recordStep">
-                <CheckIcon />
-                <span>Declare the record, purpose, subject, and timeframe.</span>
-              </div>
-              <div className="recordStep">
-                <CheckIcon />
-                <span>Assign an accountable Record Steward.</span>
-              </div>
-              <div className="recordStep">
-                <CheckIcon />
-                <span>Invite bounded contributors and authority holders.</span>
-              </div>
-              <div className="recordStep">
-                <CheckIcon />
-                <span>
-                  Capture baseline, intervention, post-state, continuity, and
-                  verification.
-                </span>
-              </div>
-              <div className="recordStep">
-                <CheckIcon />
-                <span>
-                  Preserve a bounded completion or certification status without
-                  overstating technical certainty.
-                </span>
-              </div>
-            </div>
-
-            <Link className="primaryButton" href="#governed-records">
-              Request a Governed Record
-              <ArrowIcon />
-            </Link>
-          </div>
-
-          <div className="recordFeatureVisual" aria-hidden="true">
-            <div className="recordCenter">
-              <span>GOVERNED</span>
-              <strong>RECORD</strong>
-              <small>Attributable - bounded - preserved</small>
-            </div>
-
-            <div className="contributor contributorOne">
-              <span>01</span>
-              <strong>Requester</strong>
-            </div>
-            <div className="contributor contributorTwo">
-              <span>02</span>
-              <strong>Specialist</strong>
-            </div>
-            <div className="contributor contributorThree">
-              <span>03</span>
-              <strong>Reviewer</strong>
-            </div>
-            <div className="contributor contributorFour">
-              <span>04</span>
-              <strong>Verifier</strong>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="sectionBlock sectionTint" id="proven-routes">
-        <div className="pageShell routeFeature">
-          <div className="routeVisual" aria-hidden="true">
-            <div className="routeRail">
-              {routeChain.map((item, index) => (
-                <div className="routeRailItem" key={item}>
-                  <div className="routeRailNode">
-                    <span>{index + 1}</span>
-                  </div>
-                  <div>
-                    <strong>{item}</strong>
-                    <small>
-                      {index === 0
-                        ? 'Declared source state'
-                        : index === 1
-                          ? 'Evidence-bearing record'
-                          : index === 2
-                            ? 'Lineage and custody'
-                            : index === 3
-                              ? 'Proof threshold'
-                              : index === 4
-                                ? 'Actor, object, authority'
-                                : index === 5
-                                  ? 'Consequential commitment'
-                                  : index === 6
-                                    ? 'Bounded action'
-                                    : 'Observed result'}
-                    </small>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="routeFeatureCopy">
-            <span className="sectionKicker">PROVEN ROUTE LIBRARY</span>
-            <h2>Routes can become governed products</h2>
-            <p>
-              A route can be created once, tested against declared scenarios,
-              preserved as a versioned artifact, and later sold or licensed
-              within clearly stated scope, maintenance terms, and proof boundaries.
-            </p>
-
-            <div className="routeProductCard">
-              <div className="routeProductHeader">
-                <span>DEMONSTRATION ROUTE PRODUCT</span>
-                <span className="decisionBadge">VERIFICATION PREVIEW</span>
-              </div>
-              <h3>Consequential Vendor Payment Route</h3>
-              <p>
-                Intended to prevent execution when procurement authority,
-                financial authority, beneficiary identity, or evidence
-                continuity is unresolved.
-              </p>
-              <div className="routeProductMeta">
-                <span>Declared cases: 12</span>
-                <span>Decisions: ALLOW - HOLD - DENY - ESCALATE</span>
-                <span>Commercial model: one-time delivery or license</span>
-              </div>
-            </div>
-
-            <Link className="secondaryButton" href="#proven-routes">
-              Browse route library preview
-            </Link>
           </div>
         </div>
       </section>
 
       <section className="sectionBlock">
-        <div className="pageShell">
-          <div className="sectionHeading">
-            <div>
-              <span className="sectionKicker">MARKETPLACE TRUST ARCHITECTURE</span>
-              <h2>The Exchange preserves more than a transaction</h2>
-            </div>
+        <div className="pageShell ecosystemPanel">
+          <div>
+            <span className="kicker">TA-14 ECOSYSTEM SEPARATION</span>
+            <h2>The Marketplace connects the products. It does not replace them.</h2>
             <p>
-              A governed marketplace must preserve who contributed, under what
-              authority, to which version, with what evidence, and within what
-              boundaries.
+              The TA-14 AI Governance Registry remains a separate future product
+              for permanent architecture registration, chronology, versions,
+              documents, and discovery. The Marketplace connects architecture
+              owners with work, review, licensing, services, and collaboration.
+            </p>
+
+            <div className="ecosystemList">
+              {ecosystem.map((item) => (
+                <div key={item.name}>
+                  <div>
+                    <strong>{item.name}</strong>
+                    <p>{item.responsibility}</p>
+                  </div>
+                  <span>{item.state}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <aside className="separationCard">
+            <span>PRODUCT BOUNDARY</span>
+            <h3>Registry and Marketplace remain distinct.</h3>
+            <div className="smallList">
+              {[
+                'Registry records what an architecture is and when it was registered.',
+                'Marketplace connects that architecture to people, organizations, work, review, and licensing.',
+                'Exchange evaluates specific governed execution routes.',
+                'Partner Review Network provides independent bounded review.',
+              ].map((item) => (
+                <div key={item}>
+                  <CheckIcon />
+                  <small>{item}</small>
+                </div>
+              ))}
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className="sectionBlock sectionTint">
+        <div className="pageShell trustPanel">
+          <div>
+            <span className="kicker">MARKETPLACE TRUST MODEL</span>
+            <h2>Trust should follow preserved evidence, not profile language.</h2>
+            <p>
+              The Marketplace distinguishes registration, documentation,
+              identity verification, independent review, technical
+              verification, delivery history, and execution authority. No one
+              badge should silently imply all of them.
             </p>
           </div>
 
           <div className="trustGrid">
-            {trustControls.map((control, index) => (
-              <article className="trustCard" key={control.title}>
-                <div className="trustIndex">
-                  {String(index + 1).padStart(2, '0')}
-                </div>
-                <h3>{control.title}</h3>
-                <p>{control.description}</p>
-              </article>
+            {[
+              ['REGISTERED', 'A Marketplace profile or record exists.'],
+              ['DOCUMENTED', 'Supporting materials or methods were supplied.'],
+              ['IDENTITY VERIFIED', 'A person or organization identity was checked.'],
+              ['INDEPENDENTLY REVIEWED', 'A separate reviewer examined a declared scope.'],
+              ['TECHNICALLY VERIFIED', 'A specific replay, signature, continuity, or dependency check passed.'],
+              ['DELIVERED', 'A declared engagement produced preserved deliverables.'],
+            ].map(([state, description]) => (
+              <div key={state}>
+                <strong>{state}</strong>
+                <span>{description}</span>
+              </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="sectionBlock missionSection">
-        <div className="pageShell missionPanel">
-          <div className="missionIcon">
-            <SparkIcon />
-          </div>
-
-          <div className="missionCopy">
-            <span className="sectionKicker">TA-14 GUIDED MISSION SYSTEM</span>
-            <h2>Every difficult question should explain why it matters.</h2>
+      <section className="sectionBlock">
+        <div className="pageShell ctaPanel">
+          <div>
+            <span className="kicker">START WITH THE NEED</span>
+            <h2>What governance work needs to be done?</h2>
             <p>
-              Marketplace intake should not assume that a requester already
-              speaks governance language. Every field should include plain
-              guidance, examples, and a deeper &quot;Why are we asking
-              this?&quot; explanation.
+              Post the problem, consequential action, current evidence,
+              expected deliverable, desired reviewer or specialist, budget,
+              timing, visibility, and known conflicts. The Marketplace can then
+              route the need without pretending that every expert, record, or
+              organization is interchangeable.
             </p>
+
+            <div className="requirementsGrid">
+              {[
+                'Governance need',
+                'Consequential action',
+                'Evidence available',
+                'Scope and exclusions',
+                'Expected deliverable',
+                'Budget and timing',
+                'Visibility preference',
+                'Known conflicts',
+              ].map((item) => (
+                <div key={item}>
+                  <CheckIcon />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
-          <div className="missionQuestions">
-            <div className="missionQuestion">
-              <span>What problem must be governed?</span>
-              <small>
-                Describe the actual situation, not merely the desired software feature.
-              </small>
-            </div>
-            <div className="missionQuestion">
-              <span>What consequential action may occur?</span>
-              <small>
-                Identify what can be approved, denied, paid, changed, released,
-                executed, or preserved.
-              </small>
-            </div>
-            <div className="missionQuestion">
-              <span>How will success be proven?</span>
-              <small>
-                Define test cases, replay, comparison, performance evidence, or
-                acceptance criteria.
-              </small>
-            </div>
+          <div className="ctaActions">
+            <Link className="primaryButton" href="/marketplace/post-a-need">
+              Post a Governance Need
+              <ArrowIcon />
+            </Link>
+            <Link className="secondaryButton" href="/marketplace/reviews">
+              Browse Independent Reviews
+            </Link>
+            <small>
+              Live matching and engagement workflows will be connected after
+              the Marketplace front-end architecture is complete.
+            </small>
           </div>
         </div>
       </section>
 
-      <section className="finalCtaSection">
-        <div className="pageShell finalCta">
+      <section className="finalSection">
+        <div className="pageShell finalPanel">
           <div>
-            <span className="sectionKicker">THE CATEGORY STATEMENT</span>
-            <h2>
-              Consequential governance can now be requested, built, tested,
-              verified, preserved, delivered, sold, licensed, and improved
-              inside one governed exchange.
-            </h2>
+            <span className="kicker">MARKETPLACE PRINCIPLE</span>
+            <h2>Others review slivers. TA-14 reviews the route.</h2>
             <p>
-              Every material contribution remains tied to identity, authority,
-              evidence, continuity, version, and declared proof boundaries.
+              The Marketplace is where governed architectures, bounded
+              professionals, independent reviewers, attributable organizations,
+              preserved records, and consequential needs become discoverable
+              without collapsing their responsibilities.
             </p>
           </div>
 
           <div className="finalActions">
-            <Link className="primaryButton" href="#post-a-need">
-              Post a Governance Need
+            <Link className="primaryButton" href="/marketplace/post-a-need">
+              Enter the Marketplace
               <ArrowIcon />
             </Link>
-            <Link className="secondaryButton" href="#professionals">
-              Browse Professionals
+            <Link className="secondaryButton" href="/">
+              Return to TA-14 Exchange
             </Link>
           </div>
 
@@ -806,15 +493,15 @@ export default function MarketplacePage() {
 
       <style>{`
         :root {
-          --market-bg: #041019;
-          --market-border: rgba(118, 213, 220, 0.2);
-          --market-border-strong: rgba(118, 213, 220, 0.42);
-          --market-text: #f2fbfc;
-          --market-muted: #a9c1c8;
-          --market-teal: #67e0df;
-          --market-blue: #62a9ff;
-          --market-gold: #ffd878;
-          --market-violet: #bca4ff;
+          --bg: #041019;
+          --border: rgba(118, 213, 220, 0.2);
+          --border-strong: rgba(118, 213, 220, 0.42);
+          --text: #f3fbfc;
+          --muted: #a9c1c8;
+          --teal: #67e0df;
+          --blue: #62a9ff;
+          --gold: #ffd878;
+          --violet: #bca4ff;
         }
 
         * {
@@ -827,18 +514,18 @@ export default function MarketplacePage() {
 
         body {
           margin: 0;
-          background: var(--market-bg);
+          background: var(--bg);
         }
 
         .marketplacePage {
           position: relative;
           min-height: 100vh;
           overflow: hidden;
-          color: var(--market-text);
+          color: var(--text);
           background:
-            radial-gradient(circle at 15% 10%, rgba(37, 185, 189, 0.14), transparent 30%),
-            radial-gradient(circle at 82% 18%, rgba(98, 169, 255, 0.12), transparent 30%),
-            linear-gradient(180deg, #031019 0%, #061620 55%, #031019 100%);
+            radial-gradient(circle at 12% 8%, rgba(37, 185, 189, 0.15), transparent 30%),
+            radial-gradient(circle at 86% 18%, rgba(98, 169, 255, 0.12), transparent 28%),
+            linear-gradient(180deg, #031019 0%, #071821 54%, #031019 100%);
         }
 
         .marketplacePage::before {
@@ -851,7 +538,7 @@ export default function MarketplacePage() {
             linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
             linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
           background-size: 42px 42px;
-          mask-image: linear-gradient(to bottom, black, transparent 85%);
+          mask-image: linear-gradient(to bottom, black, transparent 88%);
         }
 
         .backgroundLayer {
@@ -862,54 +549,70 @@ export default function MarketplacePage() {
           pointer-events: none;
         }
 
-        .star {
-          position: absolute;
-          width: 4px;
-          height: 4px;
-          border-radius: 999px;
-          background: white;
-          box-shadow: 0 0 12px rgba(255, 255, 255, 0.95);
-          animation: twinkle 4.5s ease-in-out infinite;
-        }
-
-        .starOne { top: 4%; left: 12%; animation-delay: 0.4s; }
-        .starTwo { top: 8%; right: 11%; animation-delay: 1.2s; }
-        .starThree { top: 19%; left: 48%; animation-delay: 2.1s; }
-        .starFour { top: 43%; right: 17%; animation-delay: 0.9s; }
-        .starFive { top: 63%; left: 8%; animation-delay: 2.7s; }
-        .starSix { top: 82%; right: 29%; animation-delay: 1.7s; }
-
-        .line {
-          position: absolute;
-          height: 1px;
-          transform-origin: left center;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(103, 224, 223, 0.6),
-            transparent
-          );
-          filter: drop-shadow(0 0 8px rgba(103, 224, 223, 0.35));
-          animation: lineDrift 14s linear infinite;
-        }
-
-        .lineOne { width: 44vw; top: 14%; left: -8%; transform: rotate(18deg); }
-        .lineTwo { width: 38vw; top: 52%; right: -10%; transform: rotate(-22deg); animation-delay: -6s; }
-        .lineThree { width: 34vw; bottom: 14%; left: 21%; transform: rotate(11deg); animation-delay: -10s; }
-
         .glow {
           position: absolute;
-          width: 360px;
-          height: 360px;
+          width: 390px;
+          height: 390px;
           border-radius: 50%;
-          filter: blur(80px);
+          filter: blur(95px);
           opacity: 0.13;
           animation: glowPulse 9s ease-in-out infinite;
         }
 
-        .glowOne { top: 8%; left: -120px; background: var(--market-teal); }
-        .glowTwo { top: 32%; right: -150px; background: var(--market-blue); animation-delay: 3s; }
-        .glowThree { bottom: 4%; left: 36%; background: var(--market-violet); animation-delay: 6s; }
+        .glowOne {
+          top: 4%;
+          left: -130px;
+          background: var(--teal);
+        }
+
+        .glowTwo {
+          top: 40%;
+          right: -150px;
+          background: var(--violet);
+          animation-delay: 3s;
+        }
+
+        .line {
+          position: absolute;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(103, 224, 223, 0.58),
+            transparent
+          );
+          filter: drop-shadow(0 0 7px rgba(103, 224, 223, 0.35));
+          animation: lineMove 13s linear infinite;
+        }
+
+        .lineOne {
+          top: 13%;
+          left: -10%;
+          width: 46vw;
+          transform: rotate(17deg);
+        }
+
+        .lineTwo {
+          top: 58%;
+          right: -8%;
+          width: 38vw;
+          transform: rotate(-19deg);
+          animation-delay: -6s;
+        }
+
+        .star {
+          position: absolute;
+          width: 4px;
+          height: 4px;
+          border-radius: 50%;
+          background: white;
+          box-shadow: 0 0 12px white;
+          animation: twinkle 4.2s ease-in-out infinite;
+        }
+
+        .starOne { top: 7%; left: 24%; }
+        .starTwo { top: 16%; right: 14%; animation-delay: 1.2s; }
+        .starThree { top: 44%; left: 7%; animation-delay: 2.4s; }
 
         .pageShell {
           position: relative;
@@ -919,43 +622,23 @@ export default function MarketplacePage() {
         }
 
         .heroSection {
-          position: relative;
-          min-height: 860px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          padding: 96px 0 48px;
+          padding: 112px 0 104px;
         }
 
         .heroGrid {
           display: grid;
-          grid-template-columns: minmax(0, 1.1fr) minmax(380px, 0.9fr);
-          gap: 54px;
+          grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.72fr);
+          gap: 58px;
           align-items: center;
         }
 
-        .heroCopy {
-          max-width: 760px;
-        }
-
-        .eyebrow,
-        .sectionKicker {
+        .kicker {
           display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          color: var(--market-teal);
-          font-size: 0.76rem;
-          font-weight: 800;
+          color: var(--teal);
+          font-size: 0.74rem;
+          font-weight: 850;
           letter-spacing: 0.16em;
           text-transform: uppercase;
-        }
-
-        .eyebrowDot {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: var(--market-teal);
-          box-shadow: 0 0 18px rgba(103, 224, 223, 0.9);
         }
 
         h1,
@@ -966,30 +649,17 @@ export default function MarketplacePage() {
         }
 
         h1 {
-          margin-bottom: 28px;
-          font-size: clamp(3rem, 6vw, 6.4rem);
-          line-height: 0.98;
-          letter-spacing: -0.055em;
-          font-weight: 760;
+          margin: 14px 0 24px;
+          font-size: clamp(3.35rem, 6.8vw, 7rem);
+          line-height: 0.94;
+          letter-spacing: -0.063em;
           text-wrap: balance;
         }
 
-        h1 span {
-          color: transparent;
-          background: linear-gradient(
-            90deg,
-            var(--market-teal),
-            var(--market-blue),
-            var(--market-violet)
-          );
-          background-clip: text;
-          -webkit-background-clip: text;
-        }
-
         .heroLead {
-          max-width: 720px;
-          color: var(--market-muted);
-          font-size: clamp(1.05rem, 1.5vw, 1.28rem);
+          max-width: 780px;
+          color: var(--muted);
+          font-size: clamp(1.05rem, 1.6vw, 1.28rem);
           line-height: 1.75;
         }
 
@@ -998,16 +668,11 @@ export default function MarketplacePage() {
           display: flex;
           flex-wrap: wrap;
           gap: 14px;
-          align-items: center;
-        }
-
-        .heroActions {
           margin-top: 32px;
         }
 
         .primaryButton,
-        .secondaryButton,
-        .cardButton {
+        .secondaryButton {
           display: inline-flex;
           align-items: center;
           justify-content: center;
@@ -1016,8 +681,8 @@ export default function MarketplacePage() {
           padding: 0 20px;
           border-radius: 999px;
           text-decoration: none;
-          font-size: 0.95rem;
-          font-weight: 750;
+          font-size: 0.94rem;
+          font-weight: 800;
           transition:
             transform 180ms ease,
             border-color 180ms ease,
@@ -1027,260 +692,115 @@ export default function MarketplacePage() {
 
         .primaryButton {
           color: #031114;
-          background: linear-gradient(135deg, var(--market-teal), #aef7f0);
+          background: linear-gradient(135deg, var(--teal), #b2f7f1);
           box-shadow: 0 12px 34px rgba(37, 185, 189, 0.24);
         }
 
         .secondaryButton {
-          color: var(--market-text);
-          border: 1px solid var(--market-border-strong);
-          background: rgba(10, 30, 42, 0.62);
+          color: var(--text);
+          border: 1px solid var(--border-strong);
+          background: rgba(10, 30, 42, 0.64);
           backdrop-filter: blur(12px);
         }
 
         .primaryButton:hover,
-        .secondaryButton:hover,
-        .cardButton:hover,
-        .textLink:hover {
+        .secondaryButton:hover {
           transform: translateY(-2px);
         }
 
-        .primaryButton:hover {
-          box-shadow: 0 16px 42px rgba(37, 185, 189, 0.36);
-        }
-
         .secondaryButton:hover {
-          border-color: var(--market-teal);
-          background: rgba(14, 42, 54, 0.88);
+          border-color: var(--teal);
+          background: rgba(14, 42, 54, 0.9);
         }
 
-        .heroBoundary {
+        .boundaryNotice {
           display: flex;
-          gap: 10px;
           align-items: flex-start;
-          max-width: 740px;
+          gap: 10px;
+          max-width: 760px;
           margin-top: 28px;
           padding: 14px 16px;
           border: 1px solid rgba(255, 216, 120, 0.22);
           border-radius: 14px;
           color: #eadfbf;
           background: rgba(255, 216, 120, 0.06);
-          font-size: 0.86rem;
+          font-size: 0.85rem;
           line-height: 1.6;
         }
 
-        .heroBoundary svg {
+        .boundaryNotice svg {
           flex: 0 0 auto;
           margin-top: 2px;
-          color: var(--market-gold);
+          color: var(--gold);
         }
 
-        .heroVisualWrap {
-          position: relative;
-          min-height: 520px;
-          display: grid;
-          place-items: center;
-        }
-
-        .orbitVisual {
-          position: relative;
-          width: min(500px, 86vw);
-          aspect-ratio: 1;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-        }
-
-        .orbitVisual::before {
-          content: '';
-          position: absolute;
-          inset: 12%;
-          border-radius: 50%;
+        .heroPanel {
+          padding: 24px;
+          border: 1px solid var(--border-strong);
+          border-radius: 26px;
           background:
-            radial-gradient(circle at 45% 42%, rgba(103, 224, 223, 0.2), transparent 36%),
-            radial-gradient(circle at 60% 65%, rgba(98, 169, 255, 0.12), transparent 38%);
-          filter: blur(6px);
+            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.13), transparent 30%),
+            linear-gradient(145deg, rgba(9, 32, 44, 0.92), rgba(4, 17, 25, 0.97));
+          box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
         }
 
-        .orbitCore {
-          position: relative;
-          z-index: 5;
-          width: 178px;
-          height: 178px;
+        .heroPanelHeader {
           display: grid;
-          place-content: center;
-          text-align: center;
-          border: 1px solid rgba(103, 224, 223, 0.48);
-          border-radius: 50%;
-          background:
-            radial-gradient(circle at 32% 25%, rgba(255, 255, 255, 0.16), transparent 28%),
-            linear-gradient(145deg, rgba(9, 40, 50, 0.95), rgba(5, 18, 29, 0.96));
-          box-shadow:
-            0 0 0 14px rgba(103, 224, 223, 0.035),
-            0 0 70px rgba(37, 185, 189, 0.2),
-            inset 0 0 40px rgba(103, 224, 223, 0.08);
+          gap: 6px;
+          margin-bottom: 20px;
+          padding-bottom: 18px;
+          border-bottom: 1px solid rgba(118, 213, 220, 0.15);
         }
 
-        .orbitCore span {
-          color: var(--market-teal);
-          font-size: 2.2rem;
+        .heroPanelHeader span {
+          color: var(--teal);
+          font-size: 0.68rem;
           font-weight: 850;
-          letter-spacing: -0.04em;
+          letter-spacing: 0.15em;
         }
 
-        .orbitCore small {
-          margin-top: 6px;
-          color: var(--market-muted);
-          font-size: 0.74rem;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
+        .heroPanelHeader strong {
+          line-height: 1.45;
         }
 
-        .orbit {
-          position: absolute;
-          border: 1px solid rgba(103, 224, 223, 0.18);
-          border-radius: 50%;
-          animation: orbitSpin 18s linear infinite;
-        }
-
-        .orbitOne { inset: 9%; }
-        .orbitTwo { inset: 19%; animation-duration: 14s; animation-direction: reverse; }
-        .orbitThree { inset: 29%; animation-duration: 11s; }
-        .orbitFour { inset: 39%; animation-duration: 9s; animation-direction: reverse; }
-
-        .orbitNode {
-          position: absolute;
-          min-width: 68px;
-          height: 34px;
+        .heroPanelRow {
           display: grid;
-          place-items: center;
-          padding: 0 12px;
-          border: 1px solid rgba(103, 224, 223, 0.42);
-          border-radius: 999px;
-          color: var(--market-text);
-          background: rgba(7, 24, 35, 0.94);
-          box-shadow: 0 0 20px rgba(37, 185, 189, 0.16);
-          font-size: 0.72rem;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .nodeOne { top: -18px; left: 50%; transform: translateX(-50%); }
-        .nodeTwo { top: 50%; right: -38px; transform: translateY(-50%); }
-        .nodeThree { bottom: -18px; left: 50%; transform: translateX(-50%); }
-        .nodeFour { top: 50%; left: -36px; transform: translateY(-50%); }
-
-        .pulseRing {
-          position: absolute;
-          inset: 37%;
-          border: 1px solid rgba(98, 169, 255, 0.4);
-          border-radius: 50%;
-          animation: pulseRing 4.5s ease-out infinite;
-        }
-
-        .pulseRingTwo {
-          animation-delay: 2.2s;
-        }
-
-        .floatingCard {
-          position: absolute;
-          z-index: 6;
-          min-width: 210px;
-          padding: 14px 16px;
-          border: 1px solid var(--market-border);
-          border-radius: 16px;
-          background: rgba(7, 24, 35, 0.82);
-          box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
-          backdrop-filter: blur(14px);
-          animation: floatCard 6s ease-in-out infinite;
-        }
-
-        .floatingCardOne { top: 90px; left: -12px; }
-        .floatingCardTwo { right: -6px; bottom: 84px; animation-delay: 2.7s; }
-
-        .floatingCard strong,
-        .floatingCard small {
-          display: block;
-        }
-
-        .floatingCard strong {
-          margin-top: 5px;
-          font-size: 0.92rem;
-        }
-
-        .floatingCard small {
-          margin-top: 5px;
-          color: var(--market-muted);
-          font-size: 0.72rem;
-          line-height: 1.5;
-        }
-
-        .floatingLabel {
-          color: var(--market-teal);
-          font-size: 0.65rem;
-          font-weight: 850;
-          letter-spacing: 0.16em;
-        }
-
-        .chainPanel {
-          display: grid;
-          grid-template-columns: repeat(8, 1fr);
-          gap: 8px;
-          margin-top: 72px;
-          padding: 18px;
-          border: 1px solid var(--market-border);
-          border-radius: 20px;
-          background: rgba(5, 20, 29, 0.72);
-          backdrop-filter: blur(12px);
-        }
-
-        .chainItem {
-          position: relative;
-          min-width: 0;
-          display: flex;
+          grid-template-columns: 34px minmax(94px, auto) 1fr;
+          gap: 12px;
           align-items: center;
-          gap: 8px;
+          padding: 13px 0;
+          border-bottom: 1px solid rgba(118, 213, 220, 0.09);
         }
 
-        .chainNode {
-          position: relative;
-          z-index: 2;
-          width: 28px;
-          height: 28px;
-          flex: 0 0 28px;
+        .heroPanelRow:last-child {
+          border-bottom: 0;
+        }
+
+        .heroPanelRow > span {
+          width: 30px;
+          height: 30px;
           display: grid;
           place-items: center;
           border-radius: 50%;
           color: #031114;
-          background: var(--market-teal);
-          box-shadow: 0 0 18px rgba(103, 224, 223, 0.35);
-          font-size: 0.72rem;
+          background: var(--teal);
+          font-size: 0.7rem;
           font-weight: 900;
         }
 
-        .chainItem span {
-          position: relative;
-          z-index: 2;
-          min-width: 0;
-          color: #d7eaed;
-          font-size: 0.76rem;
-          font-weight: 750;
+        .heroPanelRow strong {
+          font-size: 0.86rem;
         }
 
-        .chainConnector {
-          position: absolute;
-          z-index: 1;
-          left: calc(100% - 10px);
-          width: 24px;
-          height: 1px;
-          background: linear-gradient(90deg, var(--market-teal), transparent);
+        .heroPanelRow small {
+          color: var(--muted);
+          line-height: 1.45;
         }
 
         .sectionBlock {
           position: relative;
-          padding: 110px 0;
-          scroll-margin-top: 80px;
+          padding: 105px 0;
+          scroll-margin-top: 70px;
         }
 
         .sectionTint {
@@ -1288,730 +808,440 @@ export default function MarketplacePage() {
           border-bottom: 1px solid rgba(118, 213, 220, 0.08);
           background: linear-gradient(
             180deg,
-            rgba(9, 28, 39, 0.64),
-            rgba(5, 18, 26, 0.42)
+            rgba(9, 28, 39, 0.66),
+            rgba(5, 18, 26, 0.45)
           );
         }
 
         .sectionHeading {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(280px, 460px);
-          gap: 36px;
+          grid-template-columns: minmax(0, 1fr) minmax(320px, 480px);
+          gap: 38px;
           align-items: end;
           margin-bottom: 48px;
         }
 
         .sectionHeading h2,
-        .recordFeatureCopy h2,
-        .routeFeatureCopy h2,
-        .missionCopy h2,
-        .finalCta h2 {
+        .activityLayout h2,
+        .ecosystemPanel h2,
+        .trustPanel h2,
+        .ctaPanel h2,
+        .finalPanel h2 {
           margin: 10px 0 0;
-          font-size: clamp(2.15rem, 4vw, 4.25rem);
-          line-height: 1.06;
-          letter-spacing: -0.045em;
+          font-size: clamp(2.3rem, 4.6vw, 4.9rem);
+          line-height: 1.04;
+          letter-spacing: -0.052em;
           text-wrap: balance;
         }
 
         .sectionHeading p,
-        .recordFeatureCopy > p,
-        .routeFeatureCopy > p,
-        .missionCopy p,
-        .finalCta p {
+        .activityLayout > div:first-child p,
+        .ecosystemPanel > div:first-child > p,
+        .trustPanel > div:first-child p,
+        .ctaPanel p,
+        .finalPanel p {
           margin: 0;
-          color: var(--market-muted);
-          font-size: 1.04rem;
+          color: var(--muted);
+          font-size: 1.03rem;
           line-height: 1.75;
         }
 
-        .compactHeading {
-          margin-bottom: 44px;
-        }
-
-        .doorwayGrid {
+        .categoryGrid {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 20px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
         }
 
-        .doorwayCard,
-        .processCard,
-        .opportunityCard,
-        .professionalCard,
-        .trustCard {
-          position: relative;
-          overflow: hidden;
-          border: 1px solid var(--market-border);
-          background: linear-gradient(
-            145deg,
-            rgba(10, 31, 43, 0.84),
-            rgba(4, 18, 27, 0.94)
-          );
-          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16);
-        }
-
-        .doorwayCard::before,
-        .opportunityCard::before,
-        .professionalCard::before,
-        .trustCard::before {
-          content: '';
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          background: radial-gradient(
-            circle at 0 0,
-            rgba(103, 224, 223, 0.12),
-            transparent 34%
-          );
-        }
-
-        .doorwayCard {
-          min-height: 330px;
-          padding: 30px;
-          border-radius: 24px;
+        .categoryCard {
+          display: grid;
+          min-height: 305px;
+          padding: 24px;
+          border: 1px solid var(--border);
+          border-radius: 20px;
+          color: var(--text);
+          text-decoration: none;
+          background:
+            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.08), transparent 28%),
+            linear-gradient(145deg, rgba(10, 31, 43, 0.84), rgba(4, 18, 27, 0.95));
+          box-shadow: 0 18px 46px rgba(0, 0, 0, 0.14);
           transition:
             transform 180ms ease,
             border-color 180ms ease,
             box-shadow 180ms ease;
         }
 
-        .doorwayCard:hover {
+        .categoryCard:hover {
           transform: translateY(-4px);
-          border-color: var(--market-border-strong);
-          box-shadow: 0 26px 60px rgba(0, 0, 0, 0.24);
+          border-color: var(--border-strong);
+          box-shadow: 0 25px 60px rgba(0, 0, 0, 0.22);
         }
 
-        .cardNumber {
-          position: absolute;
-          top: 20px;
-          right: 24px;
-          color: rgba(103, 224, 223, 0.12);
-          font-size: 4rem;
-          font-weight: 900;
-          line-height: 1;
-        }
-
-        .cardTopline {
-          position: relative;
-          z-index: 2;
+        .categoryTopline {
           display: flex;
           justify-content: space-between;
-          gap: 16px;
           align-items: center;
-          margin-bottom: 34px;
+          gap: 12px;
         }
 
-        .cardTopline > span:first-child,
-        .opportunityDomain,
-        .listLabel {
-          color: var(--market-teal);
-          font-size: 0.7rem;
+        .categoryTopline span {
+          color: var(--teal);
+          font-size: 0.66rem;
           font-weight: 850;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
+          letter-spacing: 0.12em;
         }
 
-        .statusBadge,
-        .decisionBadge,
-        .demoLabel,
-        .profileStatus {
-          display: inline-flex;
-          align-items: center;
-          min-height: 28px;
-          padding: 0 10px;
-          border-radius: 999px;
-          font-size: 0.62rem;
-          font-weight: 850;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-          white-space: nowrap;
+        .categoryTopline svg {
+          color: var(--teal);
         }
 
-        .statusBadge,
-        .profileStatus {
-          color: #d7e4e8;
-          border: 1px solid rgba(169, 193, 200, 0.22);
-          background: rgba(169, 193, 200, 0.06);
-        }
-
-        .doorwayCard h3,
-        .opportunityCard h3,
-        .professionalCard h3,
-        .routeProductCard h3 {
-          position: relative;
-          z-index: 2;
-          margin-bottom: 14px;
+        .categoryCard h3 {
+          margin: 44px 0 14px;
           font-size: 1.55rem;
-          line-height: 1.2;
           letter-spacing: -0.025em;
         }
 
-        .doorwayCard p,
-        .opportunityCard p,
-        .professionalCard p,
-        .trustCard p,
-        .routeProductCard p {
-          position: relative;
-          z-index: 2;
-          color: var(--market-muted);
-          line-height: 1.7;
+        .categoryCard p {
+          margin: 0;
+          color: var(--muted);
+          line-height: 1.67;
         }
 
-        .textLink {
-          position: relative;
-          z-index: 2;
+        .categoryFooter {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          align-items: center;
+          margin-top: auto;
+          padding-top: 24px;
+          border-top: 1px solid rgba(118, 213, 220, 0.1);
+        }
+
+        .categoryFooter > span {
+          color: #78959d;
+          font-size: 0.72rem;
+        }
+
+        .categoryFooter strong {
           display: inline-flex;
           align-items: center;
-          gap: 8px;
-          margin-top: 22px;
-          color: var(--market-teal);
+          gap: 7px;
+          color: var(--teal);
+          font-size: 0.8rem;
+        }
+
+        .activityLayout {
+          display: grid;
+          grid-template-columns: minmax(0, 0.85fr) minmax(430px, 1.15fr);
+          gap: 58px;
+          align-items: start;
+        }
+
+        .activityLayout > div:first-child p {
+          margin-top: 20px;
+        }
+
+        .activityList {
+          display: grid;
+          gap: 12px;
+        }
+
+        .activityCard {
+          display: grid;
+          grid-template-columns: 100px 1fr auto;
+          gap: 15px;
+          align-items: center;
+          padding: 16px;
+          border: 1px solid rgba(118, 213, 220, 0.14);
+          border-radius: 14px;
+          color: var(--text);
           text-decoration: none;
-          font-weight: 800;
-          transition: transform 180ms ease;
+          background: rgba(255, 255, 255, 0.018);
+          transition: border-color 180ms ease, transform 180ms ease;
+        }
+
+        .activityCard:hover {
+          transform: translateX(3px);
+          border-color: var(--border-strong);
+        }
+
+        .activityCard > span {
+          color: var(--gold);
+          font-size: 0.65rem;
+          font-weight: 850;
+          letter-spacing: 0.09em;
+        }
+
+        .activityCard > div {
+          display: grid;
+          gap: 5px;
+        }
+
+        .activityCard small {
+          color: var(--muted);
+        }
+
+        .activityCard > svg {
+          color: var(--teal);
         }
 
         .processGrid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 18px;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
         }
 
         .processCard {
-          min-height: 270px;
-          padding: 26px;
-          border-radius: 20px;
-        }
-
-        .processNumber {
-          color: var(--market-teal);
-          font-size: 2.4rem;
-          font-weight: 900;
-          letter-spacing: -0.04em;
-        }
-
-        .processCard h3 {
-          margin: 28px 0 12px;
-          font-size: 1.25rem;
-        }
-
-        .processCard p {
-          color: var(--market-muted);
-          line-height: 1.65;
-        }
-
-        .processLine {
-          position: absolute;
-          right: 0;
-          bottom: 22px;
-          left: 26px;
-          display: flex;
-          align-items: center;
-        }
-
-        .processPulse {
-          width: 10px;
-          height: 10px;
-          flex: 0 0 10px;
-          border-radius: 50%;
-          background: var(--market-teal);
-          box-shadow: 0 0 16px rgba(103, 224, 223, 0.75);
-          animation: nodePulse 2.5s ease-in-out infinite;
-        }
-
-        .processTrail {
-          flex: 1;
-          height: 1px;
-          margin-left: 8px;
-          background: linear-gradient(90deg, var(--market-teal), transparent);
-        }
-
-        .opportunityGrid,
-        .professionalGrid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 20px;
-        }
-
-        .opportunityCard,
-        .professionalCard {
-          padding: 26px;
-          border-radius: 22px;
-        }
-
-        .opportunityHeader,
-        .professionalTop,
-        .routeProductHeader {
-          position: relative;
-          z-index: 2;
-          display: flex;
-          justify-content: space-between;
-          gap: 12px;
-          align-items: center;
-          margin-bottom: 26px;
-        }
-
-        .decisionBadge {
-          color: #042125;
-          background: var(--market-gold);
-        }
-
-        .demoLabel {
-          color: var(--market-muted);
-          border: 1px solid rgba(169, 193, 200, 0.16);
-        }
-
-        .opportunityDomain {
-          position: relative;
-          z-index: 2;
-          display: block;
-          margin-bottom: 12px;
-        }
-
-        .opportunityMeta,
-        .profileDetails {
-          position: relative;
-          z-index: 2;
-          display: grid;
-          gap: 10px;
-          margin: 24px 0;
-        }
-
-        .opportunityMeta > div,
-        .profileDetails > div {
-          display: grid;
-          gap: 4px;
-          padding: 12px 14px;
-          border: 1px solid rgba(118, 213, 220, 0.12);
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.018);
-        }
-
-        .opportunityMeta span,
-        .profileDetails span {
-          color: #77939b;
-          font-size: 0.68rem;
-          font-weight: 800;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-        }
-
-        .opportunityMeta strong,
-        .profileDetails strong {
-          color: #e2f0f2;
-          font-size: 0.83rem;
-          line-height: 1.5;
-        }
-
-        .qualificationList {
-          position: relative;
-          z-index: 2;
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 18px;
-        }
-
-        .listLabel {
-          width: 100%;
-          margin-bottom: 4px;
-        }
-
-        .qualificationChip {
-          display: inline-flex;
-          align-items: center;
-          min-height: 30px;
-          padding: 0 10px;
-          border: 1px solid rgba(103, 224, 223, 0.15);
-          border-radius: 999px;
-          color: #d8ecef;
-          background: rgba(103, 224, 223, 0.07);
-          font-size: 0.72rem;
-          line-height: 1.4;
-        }
-
-        .cardButton {
-          position: relative;
-          z-index: 2;
-          width: 100%;
-          margin-top: 24px;
-          color: var(--market-text);
-          border: 1px solid var(--market-border-strong);
-          background: rgba(103, 224, 223, 0.06);
-        }
-
-        .avatar {
-          width: 52px;
-          height: 52px;
-          display: grid;
-          place-items: center;
-          border-radius: 16px;
-          color: #031114;
-          background: linear-gradient(145deg, var(--market-teal), var(--market-blue));
-          box-shadow: 0 10px 26px rgba(37, 185, 189, 0.2);
-          font-weight: 900;
-        }
-
-        .professionalRole {
-          margin-bottom: 4px;
-          color: var(--market-teal) !important;
-          font-weight: 750;
-        }
-
-        .professionalOrg {
-          margin-bottom: 0;
-          font-size: 0.86rem;
-        }
-
-        .recordFeature,
-        .routeFeature {
-          display: grid;
-          grid-template-columns: minmax(0, 1fr) minmax(420px, 0.9fr);
-          gap: 68px;
-          align-items: center;
-        }
-
-        .recordFeatureCopy > p,
-        .routeFeatureCopy > p {
-          margin-top: 22px;
-        }
-
-        .recordSteps {
-          display: grid;
-          gap: 12px;
-          margin: 30px 0 32px;
-        }
-
-        .recordStep {
-          display: flex;
-          gap: 12px;
-          align-items: flex-start;
-          color: #d9e9ec;
-          line-height: 1.6;
-        }
-
-        .recordStep svg {
-          flex: 0 0 auto;
-          margin-top: 3px;
-          color: var(--market-teal);
-        }
-
-        .recordFeatureVisual {
-          position: relative;
-          min-height: 520px;
-          display: grid;
-          place-items: center;
-          overflow: hidden;
-          border: 1px solid var(--market-border);
-          border-radius: 28px;
-          background:
-            radial-gradient(circle at center, rgba(103, 224, 223, 0.1), transparent 42%),
-            linear-gradient(145deg, rgba(9, 31, 43, 0.9), rgba(4, 17, 25, 0.96));
-        }
-
-        .recordFeatureVisual::before {
-          content: '';
-          position: absolute;
-          inset: 12%;
-          border: 1px dashed rgba(103, 224, 223, 0.16);
-          border-radius: 50%;
-          animation: orbitSpin 28s linear infinite;
-        }
-
-        .recordCenter {
-          position: relative;
-          z-index: 4;
-          width: 190px;
-          height: 190px;
-          display: grid;
-          place-content: center;
-          text-align: center;
-          border: 1px solid var(--market-border-strong);
-          border-radius: 28px;
-          background: rgba(4, 18, 27, 0.92);
-          box-shadow: 0 0 60px rgba(37, 185, 189, 0.16);
-          transform: rotate(45deg);
-        }
-
-        .recordCenter > * {
-          transform: rotate(-45deg);
-        }
-
-        .recordCenter span {
-          color: var(--market-teal);
-          font-size: 0.72rem;
-          font-weight: 850;
-          letter-spacing: 0.16em;
-        }
-
-        .recordCenter strong {
-          margin: 8px 0;
-          font-size: 1.7rem;
-          letter-spacing: -0.04em;
-        }
-
-        .recordCenter small {
-          color: var(--market-muted);
-          font-size: 0.65rem;
-        }
-
-        .contributor {
-          position: absolute;
-          z-index: 3;
-          display: grid;
-          gap: 2px;
-          min-width: 118px;
-          padding: 12px 14px;
-          border: 1px solid rgba(103, 224, 223, 0.25);
-          border-radius: 14px;
-          background: rgba(7, 24, 35, 0.9);
-          box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .contributor span {
-          color: var(--market-teal);
-          font-size: 0.62rem;
-          font-weight: 850;
-          letter-spacing: 0.1em;
-        }
-
-        .contributor strong {
-          font-size: 0.82rem;
-        }
-
-        .contributorOne { top: 54px; left: 38px; }
-        .contributorTwo { top: 64px; right: 34px; }
-        .contributorThree { right: 42px; bottom: 54px; }
-        .contributorFour { bottom: 62px; left: 34px; }
-
-        .routeFeature {
-          grid-template-columns: minmax(420px, 0.9fr) minmax(0, 1fr);
-        }
-
-        .routeVisual {
-          padding: 28px;
-          border: 1px solid var(--market-border);
-          border-radius: 26px;
+          min-height: 245px;
+          padding: 22px;
+          border: 1px solid var(--border);
+          border-radius: 18px;
           background: linear-gradient(
             145deg,
-            rgba(9, 31, 43, 0.88),
-            rgba(4, 17, 25, 0.96)
+            rgba(10, 31, 43, 0.8),
+            rgba(4, 18, 27, 0.94)
           );
         }
 
-        .routeRail {
-          display: grid;
-          gap: 8px;
-        }
-
-        .routeRailItem {
-          display: grid;
-          grid-template-columns: 48px 1fr;
-          gap: 14px;
-          align-items: center;
-          min-height: 64px;
-          padding: 10px 12px;
-          border: 1px solid rgba(118, 213, 220, 0.11);
-          border-radius: 14px;
-          background: rgba(255, 255, 255, 0.018);
-        }
-
-        .routeRailNode {
-          width: 42px;
-          height: 42px;
+        .processCard > span {
           display: grid;
           place-items: center;
-          border: 1px solid var(--market-border-strong);
+          width: 38px;
+          height: 38px;
           border-radius: 50%;
           color: #031114;
-          background: var(--market-teal);
-          box-shadow: 0 0 18px rgba(103, 224, 223, 0.24);
+          background: var(--teal);
+          font-size: 0.72rem;
           font-weight: 900;
         }
 
-        .routeRailItem strong,
-        .routeRailItem small {
-          display: block;
+        .processCard h3 {
+          margin: 36px 0 11px;
+          font-size: 1.3rem;
         }
 
-        .routeRailItem strong {
-          font-size: 0.92rem;
+        .processCard p {
+          margin: 0;
+          color: var(--muted);
+          line-height: 1.65;
         }
 
-        .routeRailItem small {
-          margin-top: 3px;
-          color: var(--market-muted);
-          font-size: 0.72rem;
+        .ecosystemPanel {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.45fr);
+          gap: 42px;
+          align-items: start;
         }
 
-        .routeProductCard {
-          margin: 28px 0;
-          padding: 22px;
-          border: 1px solid var(--market-border);
-          border-radius: 20px;
-          background: rgba(8, 28, 40, 0.72);
+        .ecosystemPanel > div:first-child > p {
+          margin-top: 20px;
         }
 
-        .routeProductHeader > span:first-child {
-          color: var(--market-teal);
+        .ecosystemList {
+          display: grid;
+          gap: 10px;
+          margin-top: 28px;
+        }
+
+        .ecosystemList > div {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 18px;
+          align-items: center;
+          padding: 15px;
+          border: 1px solid rgba(118, 213, 220, 0.12);
+          border-radius: 13px;
+          background: rgba(255, 255, 255, 0.018);
+        }
+
+        .ecosystemList > div > div {
+          display: grid;
+          gap: 5px;
+        }
+
+        .ecosystemList p {
+          margin: 0;
+          color: var(--muted);
+          font-size: 0.8rem;
+          line-height: 1.5;
+        }
+
+        .ecosystemList > div > span {
+          color: var(--gold);
+          font-size: 0.67rem;
+          font-weight: 850;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .separationCard {
+          padding: 24px;
+          border: 1px solid rgba(188, 164, 255, 0.22);
+          border-radius: 22px;
+          background:
+            radial-gradient(circle at 0 0, rgba(188, 164, 255, 0.12), transparent 30%),
+            linear-gradient(145deg, rgba(22, 23, 45, 0.88), rgba(4, 18, 27, 0.96));
+        }
+
+        .separationCard > span {
+          color: #d7c9ff;
           font-size: 0.68rem;
           font-weight: 850;
-          letter-spacing: 0.13em;
+          letter-spacing: 0.12em;
         }
 
-        .routeProductMeta {
+        .separationCard h3 {
+          margin: 12px 0 20px;
+          font-size: 1.55rem;
+          line-height: 1.2;
+        }
+
+        .smallList {
           display: grid;
-          gap: 8px;
-          margin-top: 18px;
+          gap: 12px;
         }
 
-        .routeProductMeta span {
-          padding: 9px 11px;
-          border: 1px solid rgba(118, 213, 220, 0.1);
-          border-radius: 10px;
+        .smallList > div {
+          display: flex;
+          gap: 9px;
+          align-items: flex-start;
           color: #dcebed;
-          font-size: 0.76rem;
+        }
+
+        .smallList svg {
+          flex: 0 0 auto;
+          margin-top: 2px;
+          color: var(--teal);
+        }
+
+        .smallList small {
+          line-height: 1.55;
+        }
+
+        .trustPanel {
+          display: grid;
+          grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+          gap: 50px;
+          align-items: start;
+        }
+
+        .trustPanel > div:first-child p {
+          margin-top: 20px;
         }
 
         .trustGrid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
         }
 
-        .trustCard {
-          min-height: 210px;
-          padding: 24px;
-          border-radius: 20px;
-        }
-
-        .trustIndex {
-          color: rgba(103, 224, 223, 0.4);
-          font-size: 2rem;
-          font-weight: 900;
-        }
-
-        .trustCard h3 {
-          margin: 24px 0 10px;
-          font-size: 1.2rem;
-        }
-
-        .missionSection {
-          padding-top: 70px;
-        }
-
-        .missionPanel {
+        .trustGrid > div {
           display: grid;
-          grid-template-columns: auto minmax(0, 1fr) minmax(360px, 0.8fr);
-          gap: 28px;
-          align-items: start;
+          gap: 7px;
+          padding: 14px;
+          border: 1px solid rgba(118, 213, 220, 0.13);
+          border-radius: 13px;
+          background: rgba(255, 255, 255, 0.018);
+        }
+
+        .trustGrid strong {
+          color: var(--gold);
+          font-size: 0.68rem;
+          letter-spacing: 0.08em;
+        }
+
+        .trustGrid span {
+          color: #d8cfb9;
+          font-size: 0.76rem;
+          line-height: 1.5;
+        }
+
+        .ctaPanel {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+          gap: 44px;
+          align-items: center;
           padding: 34px;
-          border: 1px solid var(--market-border-strong);
+          border: 1px solid var(--border-strong);
           border-radius: 28px;
           background:
             radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.12), transparent 26%),
             linear-gradient(145deg, rgba(9, 32, 44, 0.9), rgba(4, 17, 25, 0.96));
         }
 
-        .missionIcon {
-          width: 54px;
-          height: 54px;
-          display: grid;
-          place-items: center;
-          border: 1px solid var(--market-border-strong);
-          border-radius: 16px;
-          color: var(--market-teal);
-          background: rgba(103, 224, 223, 0.08);
-        }
-
-        .missionCopy p {
+        .ctaPanel p {
           margin-top: 18px;
         }
 
-        .missionQuestions {
+        .requirementsGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 26px;
+        }
+
+        .requirementsGrid > div {
+          display: flex;
+          gap: 9px;
+          align-items: center;
+          padding: 11px 12px;
+          border: 1px solid rgba(118, 213, 220, 0.12);
+          border-radius: 11px;
+          background: rgba(255, 255, 255, 0.018);
+          color: #dcebed;
+          font-size: 0.78rem;
+        }
+
+        .requirementsGrid svg {
+          flex: 0 0 auto;
+          color: var(--teal);
+        }
+
+        .ctaActions {
           display: grid;
           gap: 12px;
+          align-content: center;
         }
 
-        .missionQuestion {
-          padding: 16px;
-          border: 1px solid rgba(118, 213, 220, 0.12);
-          border-radius: 14px;
-          background: rgba(255, 255, 255, 0.02);
+        .ctaActions .primaryButton,
+        .ctaActions .secondaryButton {
+          width: 100%;
         }
 
-        .missionQuestion span,
-        .missionQuestion small {
-          display: block;
-        }
-
-        .missionQuestion span {
-          color: var(--market-text);
-          font-weight: 800;
-        }
-
-        .missionQuestion small {
-          margin-top: 6px;
-          color: var(--market-muted);
+        .ctaActions small {
+          color: #8fa8ae;
           line-height: 1.55;
+          text-align: center;
         }
 
-        .finalCtaSection {
-          position: relative;
-          padding: 120px 0 80px;
+        .finalSection {
+          padding: 60px 0 80px;
         }
 
-        .finalCta {
+        .finalPanel {
           display: grid;
-          gap: 32px;
-          padding: 44px;
-          border: 1px solid var(--market-border-strong);
+          gap: 30px;
+          padding: 42px;
+          border: 1px solid var(--border-strong);
           border-radius: 30px;
           background:
-            radial-gradient(circle at 82% 18%, rgba(98, 169, 255, 0.14), transparent 34%),
-            radial-gradient(circle at 12% 84%, rgba(103, 224, 223, 0.12), transparent 34%),
+            radial-gradient(circle at 86% 12%, rgba(98, 169, 255, 0.13), transparent 32%),
+            radial-gradient(circle at 10% 88%, rgba(103, 224, 223, 0.12), transparent 32%),
             linear-gradient(145deg, rgba(8, 30, 42, 0.95), rgba(3, 15, 23, 0.98));
         }
 
-        .finalCta p {
-          max-width: 820px;
-          margin-top: 20px;
+        .finalPanel p {
+          max-width: 860px;
+          margin-top: 18px;
         }
 
         .maxim {
-          padding-top: 26px;
+          padding-top: 24px;
           border-top: 1px solid rgba(118, 213, 220, 0.14);
-          color: var(--market-teal);
-          font-size: 0.86rem;
+          color: var(--teal);
+          font-size: 0.84rem;
           font-weight: 850;
           letter-spacing: 0.14em;
           text-transform: uppercase;
-        }
-
-        @keyframes twinkle {
-          0%,
-          100% {
-            opacity: 0.25;
-            transform: scale(0.8);
-          }
-          50% {
-            opacity: 1;
-            transform: scale(1.35);
-          }
-        }
-
-        @keyframes lineDrift {
-          0% {
-            opacity: 0;
-            transform: translateX(-10%) rotate(var(--line-angle, 0deg));
-          }
-          20%,
-          80% {
-            opacity: 0.75;
-          }
-          100% {
-            opacity: 0;
-            transform: translateX(40%) rotate(var(--line-angle, 0deg));
-          }
         }
 
         @keyframes glowPulse {
@@ -2026,76 +1256,46 @@ export default function MarketplacePage() {
           }
         }
 
-        @keyframes orbitSpin {
-          from {
-            transform: rotate(0deg);
-          }
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes pulseRing {
+        @keyframes lineMove {
           0% {
-            opacity: 0.7;
-            transform: scale(0.72);
+            opacity: 0;
+            translate: -12% 0;
+          }
+          20%,
+          80% {
+            opacity: 0.72;
           }
           100% {
             opacity: 0;
-            transform: scale(2.3);
+            translate: 38% 0;
           }
         }
 
-        @keyframes floatCard {
+        @keyframes twinkle {
           0%,
           100% {
-            transform: translateY(0);
+            opacity: 0.25;
+            transform: scale(0.8);
           }
           50% {
-            transform: translateY(-10px);
-          }
-        }
-
-        @keyframes nodePulse {
-          0%,
-          100% {
-            transform: scale(0.9);
-            opacity: 0.7;
-          }
-          50% {
-            transform: scale(1.2);
             opacity: 1;
+            transform: scale(1.35);
           }
         }
 
-        @media (max-width: 1050px) {
+        @media (max-width: 1020px) {
           .heroGrid,
-          .recordFeature,
-          .routeFeature,
-          .missionPanel {
+          .sectionHeading,
+          .activityLayout,
+          .ecosystemPanel,
+          .trustPanel,
+          .ctaPanel {
             grid-template-columns: 1fr;
           }
 
-          .heroVisualWrap {
-            min-height: 470px;
-          }
-
+          .categoryGrid,
           .processGrid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .opportunityGrid,
-          .professionalGrid,
-          .trustGrid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .chainPanel {
-            grid-template-columns: repeat(4, 1fr);
-          }
-
-          .chainConnector {
-            display: none;
           }
         }
 
@@ -2105,67 +1305,51 @@ export default function MarketplacePage() {
           }
 
           .heroSection {
-            min-height: auto;
-            padding-top: 72px;
-          }
-
-          .heroGrid {
-            gap: 24px;
-          }
-
-          .heroVisualWrap {
-            min-height: 390px;
-          }
-
-          .floatingCard {
-            display: none;
-          }
-
-          .chainPanel {
-            grid-template-columns: repeat(2, 1fr);
-            margin-top: 32px;
+            padding: 78px 0 86px;
           }
 
           .sectionBlock {
-            padding: 80px 0;
+            padding: 78px 0;
           }
 
-          .sectionHeading {
-            grid-template-columns: 1fr;
-            gap: 18px;
-          }
-
-          .doorwayGrid,
+          .categoryGrid,
           .processGrid,
-          .opportunityGrid,
-          .professionalGrid,
-          .trustGrid {
+          .trustGrid,
+          .requirementsGrid {
             grid-template-columns: 1fr;
           }
 
-          .recordFeatureVisual {
-            min-height: 430px;
+          .heroPanelRow {
+            grid-template-columns: 32px 1fr;
           }
 
-          .contributorOne { top: 28px; left: 20px; }
-          .contributorTwo { top: 38px; right: 18px; }
-          .contributorThree { right: 24px; bottom: 34px; }
-          .contributorFour { bottom: 44px; left: 18px; }
+          .heroPanelRow small {
+            grid-column: 2;
+          }
 
-          .finalCta {
+          .activityCard {
+            grid-template-columns: 82px 1fr auto;
+          }
+
+          .ecosystemList > div {
+            grid-template-columns: 1fr;
+          }
+
+          .ctaPanel,
+          .finalPanel {
             padding: 28px 22px;
           }
         }
 
-        @media (max-width: 480px) {
+        @media (max-width: 520px) {
           h1 {
-            font-size: clamp(2.55rem, 15vw, 4rem);
+            font-size: clamp(2.8rem, 16vw, 4.3rem);
           }
 
           .heroActions,
           .finalActions {
-            align-items: stretch;
             flex-direction: column;
+            align-items: stretch;
           }
 
           .primaryButton,
@@ -2173,34 +1357,16 @@ export default function MarketplacePage() {
             width: 100%;
           }
 
-          .orbitVisual {
-            width: 340px;
-            max-width: 92vw;
+          .activityCard {
+            grid-template-columns: 1fr auto;
           }
 
-          .orbitCore {
-            width: 142px;
-            height: 142px;
+          .activityCard > span {
+            grid-column: 1 / -1;
           }
 
-          .orbitCore span {
-            font-size: 1.75rem;
-          }
-
-          .orbitNode {
-            min-width: 56px;
-            padding: 0 8px;
-            font-size: 0.62rem;
-          }
-
-          .recordCenter {
-            width: 148px;
-            height: 148px;
-          }
-
-          .contributor {
-            min-width: 98px;
-            padding: 10px;
+          .categoryCard {
+            min-height: 285px;
           }
         }
 
