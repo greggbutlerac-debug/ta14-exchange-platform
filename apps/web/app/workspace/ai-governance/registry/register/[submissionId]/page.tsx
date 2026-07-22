@@ -5,6 +5,83 @@ import { createBrowserClient } from '@supabase/ssr';
 import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
+type RegistryEvidence = {
+  id: string;
+  original_filename: string;
+  mime_type: string | null;
+  size_bytes: number | null;
+  sha256_hex: string | null;
+  evidence_relationship: string | null;
+  evidence_classification: string | null;
+  description: string | null;
+  visibility: string | null;
+  evidence_state: string | null;
+  submitted_at: string | null;
+};
+
+type RegistryPublication = {
+  id: string;
+  publication_type: string | null;
+  title: string | null;
+  authors: string | null;
+  publisher_or_platform: string | null;
+  publication_date: string | null;
+  url: string | null;
+  doi: string | null;
+  isbn: string | null;
+  relationship_to_governance: string | null;
+};
+
+type RegistryRepository = {
+  id: string;
+  provider: string | null;
+  repository_name: string | null;
+  repository_owner: string | null;
+  repository_url: string | null;
+  release_or_tag: string | null;
+  commit_sha: string | null;
+  license: string | null;
+  relationship_to_governance: string | null;
+};
+
+type RegistryZenodoRecord = {
+  id: string;
+  title: string | null;
+  record_url: string | null;
+  doi: string | null;
+  concept_doi: string | null;
+  zenodo_record_id: string | null;
+  version: string | null;
+  publication_date: string | null;
+  creators: string | null;
+  relationship_to_governance: string | null;
+};
+
+type RegistryPatentRecord = {
+  id: string;
+  title: string | null;
+  jurisdiction: string | null;
+  filing_type: string | null;
+  application_status: string | null;
+  application_number: string | null;
+  publication_number: string | null;
+  patent_number: string | null;
+  filing_date: string | null;
+  grant_date: string | null;
+  inventors: string | null;
+  applicant_or_assignee: string | null;
+  official_url: string | null;
+  relationship_to_governance: string | null;
+};
+
+type RegistryReviewNote = {
+  id: string;
+  review_stage: string | null;
+  note_type: string | null;
+  note_text: string | null;
+  created_at: string | null;
+};
+
 type RegistrySubmission = {
   id: string;
   governance_name: string;
@@ -21,6 +98,16 @@ type RegistrySubmission = {
   submitted_at: string | null;
   reviewed_at: string | null;
   accepted_at: string | null;
+  finalized_at?: string | null;
+  published_at?: string | null;
+  review_pathway?: string | null;
+  claimant_name?: string | null;
+  current_steward?: string | null;
+  organization_name?: string | null;
+  authority_basis?: string | null;
+  ownership_declaration?: string | null;
+  license_statement?: string | null;
+  known_disputes?: string | null;
   created_at: string | null;
   updated_at: string | null;
 };
@@ -56,6 +143,13 @@ export default function RegistrySubmissionWorkspacePage() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [error, setError] = useState('');
+  const [evidence, setEvidence] = useState<RegistryEvidence[]>([]);
+  const [publications, setPublications] = useState<RegistryPublication[]>([]);
+  const [repositories, setRepositories] = useState<RegistryRepository[]>([]);
+  const [zenodoRecords, setZenodoRecords] = useState<RegistryZenodoRecord[]>([]);
+  const [patentRecords, setPatentRecords] = useState<RegistryPatentRecord[]>([]);
+  const [reviewNotes, setReviewNotes] = useState<RegistryReviewNote[]>([]);
+  const [relatedLoading, setRelatedLoading] = useState(false);
 
   const supabase = useMemo(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -111,6 +205,16 @@ export default function RegistrySubmissionWorkspacePage() {
               'submitted_at',
               'reviewed_at',
               'accepted_at',
+              'finalized_at',
+              'published_at',
+              'review_pathway',
+              'claimant_name',
+              'current_steward',
+              'organization_name',
+              'authority_basis',
+              'ownership_declaration',
+              'license_statement',
+              'known_disputes',
               'created_at',
               'updated_at',
             ].join(','),
@@ -128,6 +232,53 @@ export default function RegistrySubmissionWorkspacePage() {
         }
 
         setRecord(data as unknown as RegistrySubmission);
+
+        setRelatedLoading(true);
+        const [
+          evidenceResult,
+          publicationsResult,
+          repositoriesResult,
+          zenodoResult,
+          patentsResult,
+          notesResult,
+        ] = await Promise.all([
+          supabase
+            .from('ai_governance_registry_evidence')
+            .select('id,original_filename,mime_type,size_bytes,sha256_hex,evidence_relationship,evidence_classification,description,visibility,evidence_state,submitted_at')
+            .eq('submission_id', submissionId)
+            .order('submitted_at', { ascending: true }),
+          supabase
+            .from('ai_governance_registry_publications')
+            .select('id,publication_type,title,authors,publisher_or_platform,publication_date,url,doi,isbn,relationship_to_governance')
+            .eq('submission_id', submissionId)
+            .order('publication_date', { ascending: true }),
+          supabase
+            .from('ai_governance_registry_repositories')
+            .select('id,provider,repository_name,repository_owner,repository_url,release_or_tag,commit_sha,license,relationship_to_governance')
+            .eq('submission_id', submissionId),
+          supabase
+            .from('ai_governance_registry_zenodo_records')
+            .select('id,title,record_url,doi,concept_doi,zenodo_record_id,version,publication_date,creators,relationship_to_governance')
+            .eq('submission_id', submissionId),
+          supabase
+            .from('ai_governance_registry_patent_records')
+            .select('id,title,jurisdiction,filing_type,application_status,application_number,publication_number,patent_number,filing_date,grant_date,inventors,applicant_or_assignee,official_url,relationship_to_governance')
+            .eq('submission_id', submissionId),
+          supabase
+            .from('ai_governance_registry_review_notes')
+            .select('id,review_stage,note_type,note_text,created_at')
+            .eq('submission_id', submissionId)
+            .order('created_at', { ascending: true }),
+        ]);
+
+        if (!cancelled) {
+          setEvidence((evidenceResult.data ?? []) as RegistryEvidence[]);
+          setPublications((publicationsResult.data ?? []) as RegistryPublication[]);
+          setRepositories((repositoriesResult.data ?? []) as RegistryRepository[]);
+          setZenodoRecords((zenodoResult.data ?? []) as RegistryZenodoRecord[]);
+          setPatentRecords((patentsResult.data ?? []) as RegistryPatentRecord[]);
+          setReviewNotes((notesResult.data ?? []) as RegistryReviewNote[]);
+        }
       } catch (caught) {
         if (cancelled) return;
 
@@ -137,7 +288,10 @@ export default function RegistrySubmissionWorkspacePage() {
             : 'The Registry record could not be loaded.',
         );
       } finally {
-        if (!cancelled) setLoading(false);
+        if (!cancelled) {
+          setLoading(false);
+          setRelatedLoading(false);
+        }
       }
     }
 
@@ -154,9 +308,194 @@ export default function RegistrySubmissionWorkspacePage() {
   }, [submissionId, supabase]);
 
   const isDraft = record?.status?.toLowerCase() === 'draft';
+  const normalizedStatus = record?.status?.toLowerCase() ?? '';
+  const isDraft = normalizedStatus === 'draft';
   const isRegistered =
-    record?.status?.toLowerCase() === 'registered' &&
-    Boolean(record.registry_identifier);
+    ['registered', 'published'].includes(normalizedStatus) &&
+    Boolean(record?.registry_identifier);
+
+  const lifecycleStages = [
+    { key: 'draft', label: 'Draft' },
+    { key: 'submitted', label: 'Submitted' },
+    { key: 'administrative_review', label: 'Administrative Review' },
+    { key: 'identity_review', label: 'Identity Review' },
+    { key: 'evidence_review', label: 'Evidence Review' },
+    { key: 'accepted', label: 'Registry Acceptance' },
+    { key: 'identifier_assigned', label: 'Identifier Assigned' },
+    { key: 'published', label: 'Published' },
+  ];
+
+  const currentLifecycleIndex = (() => {
+    if (!record) return 0;
+    if (['published', 'registered'].includes(normalizedStatus) && record.registry_identifier) return 7;
+    if (record.registry_identifier) return 6;
+    if (record.accepted_at || normalizedStatus === 'accepted') return 5;
+    if (normalizedStatus === 'evidence_review') return 4;
+    if (normalizedStatus === 'identity_review') return 3;
+    if (normalizedStatus === 'administrative_review' || normalizedStatus === 'under_review') return 2;
+    if (record.submitted_at || normalizedStatus === 'submitted') return 1;
+    return 0;
+  })();
+
+  const readiness = useMemo(() => {
+    if (!record) {
+      return {
+        identity: 0,
+        attribution: 0,
+        claims: 0,
+        nonClaims: 0,
+        evidence: 0,
+        versioning: 0,
+        publications: 0,
+        repositories: 0,
+        overall: 0,
+      };
+    }
+
+    const ratio = (items: unknown[]) =>
+      Math.round((items.filter(Boolean).length / Math.max(items.length, 1)) * 100);
+
+    const scores = {
+      identity: ratio([
+        record.governance_name,
+        record.short_name || true,
+        record.current_version,
+        record.governance_category,
+        record.plain_language_description,
+      ]),
+      attribution: ratio([
+        record.claimant_name,
+        record.current_steward || record.claimant_name,
+        record.organization_name || true,
+        record.authority_basis,
+      ]),
+      claims: ratio([record.formal_claims]),
+      nonClaims: ratio([record.explicit_non_claims, record.limitations || true]),
+      evidence: Math.min(100, evidence.length * 20),
+      versioning: ratio([
+        record.current_version,
+        record.updated_at,
+        record.created_at,
+      ]),
+      publications: Math.min(100, publications.length * 25),
+      repositories: Math.min(
+        100,
+        repositories.length * 30 + zenodoRecords.length * 20 + patentRecords.length * 10,
+      ),
+    };
+
+    return {
+      ...scores,
+      overall: Math.round(
+        Object.values(scores).reduce((total, value) => total + value, 0) /
+          Object.values(scores).length,
+      ),
+    };
+  }, [
+    record,
+    evidence.length,
+    publications.length,
+    repositories.length,
+    zenodoRecords.length,
+    patentRecords.length,
+  ]);
+
+  const lifecycleAction = (() => {
+    if (!record) return null;
+    if (['published', 'registered'].includes(normalizedStatus) && record.registry_identifier) {
+      return {
+        label: 'Open Permanent Record',
+        href: `/workspace/ai-governance/registry/records/${encodeURIComponent(record.registry_identifier)}`,
+        className: 'primaryButton',
+      };
+    }
+    if (normalizedStatus === 'superseded') {
+      return {
+        label: 'Compare Versions',
+        href: `/workspace/ai-governance/registry/records/${encodeURIComponent(record.registry_identifier ?? record.id)}?view=versions`,
+        className: 'secondaryButton',
+      };
+    }
+    if (normalizedStatus === 'disputed') {
+      return {
+        label: 'Open Dispute Workspace',
+        href: `/workspace/ai-governance/registry/register/${encodeURIComponent(record.id)}?view=dispute`,
+        className: 'primaryButton dangerAction',
+      };
+    }
+    if (isDraft) {
+      return {
+        label: 'Continue Draft',
+        href: `/workspace/ai-governance/registry/register?draft=${encodeURIComponent(record.id)}`,
+        className: 'primaryButton',
+      };
+    }
+    if (['submitted', 'administrative_review', 'identity_review', 'evidence_review', 'under_review'].includes(normalizedStatus)) {
+      return {
+        label: 'View Review Status',
+        href: `#review-notes`,
+        className: 'primaryButton',
+      };
+    }
+    if (normalizedStatus === 'accepted') {
+      return {
+        label: 'Await Registry Identifier',
+        href: '#lifecycle',
+        className: 'secondaryButton',
+      };
+    }
+    return {
+      label: 'Return to My Records',
+      href: '/workspace/ai-governance/registry/my-records',
+      className: 'secondaryButton',
+    };
+  })();
+
+  function downloadWorkspaceReceipt() {
+    if (!record) return;
+
+    const receipt = {
+      receiptType: 'TA-14 AI Governance Registry Submission Workspace Receipt',
+      generatedAt: new Date().toISOString(),
+      submission: {
+        id: record.id,
+        governanceName: record.governance_name,
+        status: record.status,
+        registryIdentifier: record.registry_identifier,
+        currentVersion: record.current_version,
+        createdAt: record.created_at,
+        updatedAt: record.updated_at,
+        submittedAt: record.submitted_at,
+        reviewedAt: record.reviewed_at,
+        acceptedAt: record.accepted_at,
+      },
+      packageCounts: {
+        evidence: evidence.length,
+        publications: publications.length,
+        repositories: repositories.length,
+        zenodoRecords: zenodoRecords.length,
+        patentRecords: patentRecords.length,
+        reviewNotes: reviewNotes.length,
+      },
+      readiness,
+      registryBoundary:
+        'This receipt documents the current state of an account-scoped Registry submission. It is not certification, public registration, legal validation, regulatory approval, or proof of technical performance.',
+    };
+
+    const blob = new Blob([JSON.stringify(receipt, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = `${record.short_name || record.governance_name || 'registry-submission'}-workspace-receipt.json`
+      .toLowerCase()
+      .replace(/[^a-z0-9.-]+/g, '-');
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+    URL.revokeObjectURL(url);
+  }
 
   return (
     <main className="pageShell">
@@ -362,7 +701,282 @@ export default function RegistrySubmissionWorkspacePage() {
                 <dt>Accepted</dt>
                 <dd>{formatDate(record.accepted_at)}</dd>
               </div>
+              <div>
+                <dt>Finalized</dt>
+                <dd>{formatDate(record.finalized_at ?? null)}</dd>
+              </div>
+              <div>
+                <dt>Published</dt>
+                <dd>{formatDate(record.published_at ?? null)}</dd>
+              </div>
             </dl>
+          </section>
+
+          <section id="lifecycle" className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">REGISTRY PROGRESS TIMELINE</p>
+              <h2>Lifecycle stages remain separate and reviewable.</h2>
+              <p className="sectionLead">
+                The highlighted stage shows the current preserved state. Later stages are not implied
+                until the Registry records them.
+              </p>
+            </div>
+
+            <div className="lifecycleTimeline">
+              {lifecycleStages.map((stage, index) => (
+                <div
+                  key={stage.key}
+                  className={`${index < currentLifecycleIndex ? 'completed' : ''} ${
+                    index === currentLifecycleIndex ? 'current' : ''
+                  }`}
+                >
+                  <span>{index < currentLifecycleIndex ? '✓' : String(index + 1).padStart(2, '0')}</span>
+                  <strong>{stage.label}</strong>
+                  {index < lifecycleStages.length - 1 ? <i>→</i> : null}
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">REGISTRY READINESS DASHBOARD</p>
+              <h2>Quality indicators for the preserved intake.</h2>
+              <p className="sectionLead">
+                These indicators describe completeness and supporting-record coverage. They are not
+                certification, endorsement, technical validation, or a legal finding.
+              </p>
+            </div>
+
+            <div className="readinessSummary">
+              <div>
+                <span>Overall Registry Readiness</span>
+                <strong>{readiness.overall}%</strong>
+              </div>
+              <p>
+                {relatedLoading
+                  ? 'Loading supporting Registry records.'
+                  : `${evidence.length} evidence file(s), ${publications.length} publication(s), ${repositories.length} repository record(s), ${zenodoRecords.length} Zenodo record(s), and ${patentRecords.length} patent record(s) are currently associated with this submission.`}
+              </p>
+            </div>
+
+            <div className="readinessGrid">
+              {[
+                ['Identity completeness', readiness.identity],
+                ['Attribution completeness', readiness.attribution],
+                ['Claims completeness', readiness.claims],
+                ['Non-claims completeness', readiness.nonClaims],
+                ['Evidence completeness', readiness.evidence],
+                ['Version documentation', readiness.versioning],
+                ['Publication coverage', readiness.publications],
+                ['Repository coverage', readiness.repositories],
+              ].map(([itemLabel, value]) => (
+                <article key={String(itemLabel)}>
+                  <div>
+                    <span>{itemLabel}</span>
+                    <strong>{value}%</strong>
+                  </div>
+                  <div className="scoreTrack">
+                    <i style={{ width: `${value}%` }} />
+                  </div>
+                </article>
+              ))}
+            </div>
+          </section>
+
+          <section className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">EVIDENCE WORKSPACE</p>
+              <h2>The complete supporting package.</h2>
+              <p className="sectionLead">
+                Evidence, publications, repositories, deposits, patents, and rights declarations
+                remain distinguishable because they carry different evidentiary meanings.
+              </p>
+            </div>
+
+            <div className="evidenceWorkspace">
+              <article className="evidenceGroup">
+                <div className="groupHeading">
+                  <div><span>EV</span><h3>Evidence Files</h3></div>
+                  <strong>{evidence.length}</strong>
+                </div>
+                {evidence.length === 0 ? (
+                  <p className="emptyState">No evidence files are currently visible for this submission.</p>
+                ) : (
+                  <div className="recordList">
+                    {evidence.map((item) => (
+                      <div key={item.id}>
+                        <div>
+                          <strong>{item.original_filename}</strong>
+                          <span>{label(item.evidence_classification)} · {label(item.evidence_relationship)}</span>
+                        </div>
+                        <p>{item.description || 'No evidence description recorded.'}</p>
+                        <code>{item.sha256_hex || 'SHA-256 unavailable'}</code>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </article>
+
+              <article className="evidenceGroup">
+                <div className="groupHeading">
+                  <div><span>PB</span><h3>Publications</h3></div>
+                  <strong>{publications.length}</strong>
+                </div>
+                {publications.length === 0 ? (
+                  <p className="emptyState">No publications are currently associated with this submission.</p>
+                ) : (
+                  <div className="recordList compactList">
+                    {publications.map((item) => (
+                      <div key={item.id}>
+                        <div>
+                          <strong>{item.title || 'Untitled publication'}</strong>
+                          <span>{label(item.publication_type)} · {item.authors || 'Author not declared'}</span>
+                        </div>
+                        <p>{item.relationship_to_governance || 'Relationship not described.'}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </article>
+
+              <article className="evidenceGroup">
+                <div className="groupHeading">
+                  <div><span>GH</span><h3>Repositories</h3></div>
+                  <strong>{repositories.length}</strong>
+                </div>
+                {repositories.length === 0 ? (
+                  <p className="emptyState">No software repositories are currently associated with this submission.</p>
+                ) : (
+                  <div className="recordList compactList">
+                    {repositories.map((item) => (
+                      <div key={item.id}>
+                        <div>
+                          <strong>{item.repository_name || 'Unnamed repository'}</strong>
+                          <span>{label(item.provider)} · {item.repository_owner || 'Owner not declared'}</span>
+                        </div>
+                        <p>{item.relationship_to_governance || item.repository_url || 'Relationship not described.'}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </article>
+
+              <article className="evidenceGroup">
+                <div className="groupHeading">
+                  <div><span>ZE</span><h3>Zenodo Records</h3></div>
+                  <strong>{zenodoRecords.length}</strong>
+                </div>
+                {zenodoRecords.length === 0 ? (
+                  <p className="emptyState">No Zenodo deposits are currently associated with this submission.</p>
+                ) : (
+                  <div className="recordList compactList">
+                    {zenodoRecords.map((item) => (
+                      <div key={item.id}>
+                        <div>
+                          <strong>{item.title || 'Untitled Zenodo record'}</strong>
+                          <span>{item.doi || item.concept_doi || item.zenodo_record_id || 'Identifier not declared'}</span>
+                        </div>
+                        <p>{item.relationship_to_governance || 'Relationship not described.'}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </article>
+
+              <article className="evidenceGroup">
+                <div className="groupHeading">
+                  <div><span>IP</span><h3>Patent Records</h3></div>
+                  <strong>{patentRecords.length}</strong>
+                </div>
+                {patentRecords.length === 0 ? (
+                  <p className="emptyState">No patent records are currently associated with this submission.</p>
+                ) : (
+                  <div className="recordList compactList">
+                    {patentRecords.map((item) => (
+                      <div key={item.id}>
+                        <div>
+                          <strong>{item.title || 'Untitled patent record'}</strong>
+                          <span>{item.application_number || item.patent_number || 'Identifier not declared'} · {label(item.application_status)}</span>
+                        </div>
+                        <p>{item.relationship_to_governance || 'Relationship not described.'}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </article>
+
+              <article className="evidenceGroup rightsGroup">
+                <div className="groupHeading">
+                  <div><span>RT</span><h3>Rights & Disputes</h3></div>
+                </div>
+                <dl className="rightsList">
+                  <div><dt>Ownership declaration</dt><dd>{record.ownership_declaration || 'Not declared'}</dd></div>
+                  <div><dt>License statement</dt><dd>{record.license_statement || 'Not declared'}</dd></div>
+                  <div><dt>Known disputes</dt><dd>{record.known_disputes || 'None recorded'}</dd></div>
+                </dl>
+              </article>
+            </div>
+          </section>
+
+          <section className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">INTAKE RECEIPT</p>
+              <h2>Download a snapshot of the current submission state.</h2>
+              <p className="sectionLead">
+                The receipt preserves lifecycle state, timestamps, supporting-record counts, and
+                readiness indicators. It does not create a public Registry identifier.
+              </p>
+            </div>
+
+            <div className="receiptPanel">
+              <dl>
+                <div><dt>Draft or submission ID</dt><dd className="mono">{record.id}</dd></div>
+                <div><dt>Registry identifier</dt><dd className="mono">{record.registry_identifier || 'Pending'}</dd></div>
+                <div><dt>Submitted</dt><dd>{formatDate(record.submitted_at)}</dd></div>
+                <div><dt>Current lifecycle state</dt><dd>{label(record.status)}</dd></div>
+                <div><dt>Evidence package</dt><dd>{evidence.length} file(s)</dd></div>
+                <div><dt>Readiness snapshot</dt><dd>{readiness.overall}%</dd></div>
+              </dl>
+
+              <button type="button" className="primaryButton" onClick={downloadWorkspaceReceipt}>
+                Download Workspace Receipt
+              </button>
+            </div>
+          </section>
+
+          <section id="review-notes" className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">REGISTRY REVIEW NOTES</p>
+              <h2>Preserved review activity and clarification history.</h2>
+              <p className="sectionLead">
+                Administrative observations, identity questions, evidence findings, clarification
+                requests, registrant responses, and final dispositions remain attributable.
+              </p>
+            </div>
+
+            {reviewNotes.length === 0 ? (
+              <div className="emptyReviewState">
+                <strong>No Registry review notes have been recorded yet.</strong>
+                <p>
+                  This space is reserved for preserved review activity. The absence of a note does
+                  not imply approval, acceptance, or completion.
+                </p>
+              </div>
+            ) : (
+              <div className="reviewTimeline">
+                {reviewNotes.map((note, index) => (
+                  <article key={note.id}>
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    <div>
+                      <small>{label(note.review_stage)} · {formatDate(note.created_at)}</small>
+                      <h3>{label(note.note_type, 'Review Note')}</h3>
+                      <p>{note.note_text || 'No review note text preserved.'}</p>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
 
           <section className="actionCard">
@@ -381,32 +995,11 @@ export default function RegistrySubmissionWorkspacePage() {
               </p>
             </div>
 
-            {isRegistered ? (
-              <Link
-                href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
-                  record.registry_identifier ?? '',
-                )}`}
-                className="primaryButton"
-              >
-                Open Permanent Record
+            {lifecycleAction ? (
+              <Link href={lifecycleAction.href} className={lifecycleAction.className}>
+                {lifecycleAction.label}
               </Link>
-            ) : isDraft ? (
-              <Link
-                href={`/workspace/ai-governance/registry/register?draft=${encodeURIComponent(
-                  record.id,
-                )}`}
-                className="primaryButton"
-              >
-                Continue Draft
-              </Link>
-            ) : (
-              <Link
-                href="/workspace/ai-governance/registry/my-records"
-                className="secondaryButton"
-              >
-                Return to My Records
-              </Link>
-            )}
+            ) : null}
           </section>
         </>
       ) : null}
@@ -685,6 +1278,372 @@ const styles = `
     gap: 14px;
   }
 
+  .sectionLead {
+    max-width: 860px;
+    margin: 0;
+    color: #9eafc7;
+    line-height: 1.7;
+  }
+
+  .lifecycleTimeline {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .lifecycleTimeline > div {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 30px 1fr;
+    gap: 8px;
+    align-items: center;
+    padding: 12px;
+    position: relative;
+    border: 1px solid rgba(164, 190, 231, 0.11);
+    border-radius: 13px;
+    background: rgba(7, 17, 33, 0.4);
+  }
+
+  .lifecycleTimeline > div > span {
+    width: 28px;
+    height: 28px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #8394ab;
+    background: rgba(255,255,255,.04);
+    font-size: .68rem;
+    font-weight: 900;
+  }
+
+  .lifecycleTimeline > div > strong {
+    font-size: .78rem;
+    line-height: 1.25;
+  }
+
+  .lifecycleTimeline > div > i {
+    display: none;
+  }
+
+  .lifecycleTimeline > div.completed {
+    border-color: rgba(127, 228, 196, 0.22);
+    background: rgba(20, 79, 65, 0.17);
+  }
+
+  .lifecycleTimeline > div.completed > span {
+    color: #071610;
+    background: #7fe4c4;
+  }
+
+  .lifecycleTimeline > div.current {
+    border-color: rgba(255, 210, 127, 0.5);
+    background: rgba(96, 65, 22, 0.28);
+    box-shadow: 0 0 0 2px rgba(255, 210, 127, 0.06);
+  }
+
+  .lifecycleTimeline > div.current > span {
+    color: #171005;
+    background: #ffd27f;
+  }
+
+  .readinessSummary {
+    margin-bottom: 18px;
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    border: 1px solid rgba(255, 210, 127, 0.18);
+    border-radius: 16px;
+    background: rgba(84, 56, 20, 0.18);
+  }
+
+  .readinessSummary > div span {
+    display: block;
+    color: #aebdd4;
+    font-size: .72rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .readinessSummary > div strong {
+    display: block;
+    margin-top: 4px;
+    color: #ffd27f;
+    font-size: 2.6rem;
+  }
+
+  .readinessSummary p {
+    max-width: 680px;
+    margin: 0;
+    color: #aebdd4;
+    line-height: 1.65;
+  }
+
+  .readinessGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .readinessGrid article {
+    padding: 15px;
+    border: 1px solid rgba(164, 190, 231, 0.11);
+    border-radius: 13px;
+    background: rgba(7, 17, 33, 0.4);
+  }
+
+  .readinessGrid article > div:first-child {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .readinessGrid span {
+    color: #96a7bf;
+    font-size: .74rem;
+  }
+
+  .readinessGrid strong {
+    color: #d9e8f6;
+    font-size: .78rem;
+  }
+
+  .scoreTrack {
+    height: 6px;
+    margin-top: 12px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(255,255,255,.06);
+  }
+
+  .scoreTrack i {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #74b7ff, #7fe4c4, #ffd27f);
+  }
+
+  .evidenceWorkspace {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+  }
+
+  .evidenceGroup {
+    min-width: 0;
+    padding: 18px;
+    border: 1px solid rgba(164, 190, 231, 0.11);
+    border-radius: 16px;
+    background: rgba(7, 17, 33, 0.4);
+  }
+
+  .rightsGroup {
+    grid-column: 1 / -1;
+  }
+
+  .groupHeading {
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .groupHeading > div {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .groupHeading > div > span {
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    color: #171005;
+    background: linear-gradient(145deg, #ffe4a6, #e8a33d);
+    font-family: Georgia, serif;
+    font-weight: 900;
+  }
+
+  .groupHeading h3 {
+    margin: 0;
+    font-size: 1.08rem;
+  }
+
+  .groupHeading > strong {
+    min-width: 34px;
+    height: 30px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    color: #c8f6e7;
+    background: rgba(31, 71, 91, 0.42);
+    font-size: .78rem;
+  }
+
+  .recordList {
+    display: grid;
+    gap: 10px;
+  }
+
+  .recordList > div {
+    min-width: 0;
+    padding: 13px;
+    border: 1px solid rgba(164, 190, 231, 0.09);
+    border-radius: 12px;
+    background: rgba(4, 12, 25, 0.45);
+  }
+
+  .recordList > div > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .recordList strong {
+    overflow-wrap: anywhere;
+  }
+
+  .recordList span {
+    color: #8193ac;
+    font-size: .7rem;
+    text-align: right;
+  }
+
+  .recordList p {
+    margin: 8px 0;
+    color: #9fafc5;
+    font-size: .78rem;
+    line-height: 1.55;
+  }
+
+  .recordList code {
+    display: block;
+    overflow-wrap: anywhere;
+    color: #8fc0ef;
+    font-size: .66rem;
+  }
+
+  .compactList p {
+    margin-bottom: 0;
+  }
+
+  .emptyState {
+    margin: 0;
+    padding: 14px;
+    border: 1px dashed rgba(164, 190, 231, 0.14);
+    border-radius: 12px;
+    color: #8798af;
+    background: rgba(255,255,255,.02);
+  }
+
+  .rightsList {
+    margin: 0;
+    display: grid;
+    gap: 10px;
+  }
+
+  .rightsList > div {
+    padding: 13px;
+    border: 1px solid rgba(164, 190, 231, 0.09);
+    border-radius: 12px;
+    background: rgba(4, 12, 25, 0.45);
+  }
+
+  .receiptPanel {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 24px;
+    padding: 20px;
+    border: 1px solid rgba(127, 228, 196, 0.16);
+    border-radius: 16px;
+    background: rgba(20, 79, 65, 0.12);
+  }
+
+  .receiptPanel dl {
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    flex: 1;
+  }
+
+  .receiptPanel dl > div {
+    min-width: 0;
+  }
+
+  .emptyReviewState {
+    padding: 22px;
+    border: 1px dashed rgba(164, 190, 231, 0.16);
+    border-radius: 16px;
+    background: rgba(255,255,255,.02);
+  }
+
+  .emptyReviewState strong {
+    color: #dce8f6;
+  }
+
+  .emptyReviewState p {
+    margin: 7px 0 0;
+    color: #8fa0b8;
+    line-height: 1.65;
+  }
+
+  .reviewTimeline {
+    display: grid;
+    gap: 12px;
+  }
+
+  .reviewTimeline article {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 14px;
+    padding: 16px;
+    border: 1px solid rgba(164, 190, 231, 0.11);
+    border-radius: 14px;
+    background: rgba(7, 17, 33, 0.4);
+  }
+
+  .reviewTimeline article > span {
+    width: 40px;
+    height: 40px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    color: #171005;
+    background: #ffd27f;
+    font-size: .72rem;
+    font-weight: 900;
+  }
+
+  .reviewTimeline small {
+    color: #7fe4c4;
+    font-size: .68rem;
+    font-weight: 900;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .reviewTimeline h3 {
+    margin: 5px 0 7px;
+  }
+
+  .reviewTimeline p {
+    margin: 0;
+    color: #9fafc5;
+    line-height: 1.65;
+  }
+
+  .dangerAction {
+    border-color: rgba(255, 124, 145, 0.55);
+    background: linear-gradient(135deg, #ffd2d9, #d75b72);
+  }
+
   .actionCard {
     padding: 26px;
     display: flex;
@@ -762,11 +1721,36 @@ const styles = `
     50% { transform: scale(1.2); opacity: 1; }
   }
 
+  @media (max-width: 1100px) {
+    .lifecycleTimeline {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .readinessGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
   @media (max-width: 920px) {
     .hero,
     .detailGrid,
-    .statementGrid {
+    .statementGrid,
+    .evidenceWorkspace {
       grid-template-columns: 1fr;
+    }
+
+    .rightsGroup {
+      grid-column: auto;
+    }
+
+    .readinessSummary,
+    .receiptPanel {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .receiptPanel dl {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     .actionCard {
@@ -789,6 +1773,20 @@ const styles = `
     .primaryButton,
     .secondaryButton {
       width: 100%;
+    }
+
+    .lifecycleTimeline,
+    .readinessGrid,
+    .receiptPanel dl {
+      grid-template-columns: 1fr;
+    }
+
+    .recordList > div > div {
+      flex-direction: column;
+    }
+
+    .recordList span {
+      text-align: left;
     }
   }
 
