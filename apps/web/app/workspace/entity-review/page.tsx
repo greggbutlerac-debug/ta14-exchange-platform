@@ -1,1008 +1,330 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
 
-type ReviewType =
-  | "Organization"
-  | "AI System"
-  | "Governance Program"
-  | "Architecture"
-  | "Operational System"
-  | "Partner or Reviewer"
-  | "Consequential Route";
-
-type IntakeState = {
-  entityName: string;
-  reviewType: ReviewType;
-  owner: string;
-  contact: string;
-  objective: string;
-  evidence: string;
-  knownConcerns: string;
-  requestedOutcome: string;
-  requestedReviewer: string;
-};
-
-type EntityReviewRequest = {
-  requestId: string;
-  createdAt: string;
-  updatedAt: string;
-  status: "DRAFT" | "READY_FOR_REVIEW";
-  intake: IntakeState;
-  boundaryStatement: string;
-};
-
-const STORAGE_KEY = "ta14-entity-review-intake-v1";
-const REQUESTS_STORAGE_KEY = "ta14-entity-review-requests-v1";
-
-const reviewTypes: Array<{
-  title: ReviewType;
-  description: string;
-  examples: string[];
-}> = [
+const reviewTypes = [
   {
-    title: "Organization",
+    title: "Organization Review",
     description:
-      "Review whether an organization can support the authority, evidence, continuity, accountability, and review obligations it declares.",
-    examples: [
-      "Enterprise governance readiness",
-      "Institutional authority structure",
-      "Evidence custody and accountability",
-    ],
+      "Review an organization’s declared governance architecture, authority structure, evidence practices, review boundaries, and execution controls.",
+    href: "/workspace/entity-review/organization",
+    action: "Start organization review",
   },
   {
-    title: "AI System",
+    title: "AI System Review",
     description:
-      "Examine the system, its consequential routes, declared controls, evidence boundaries, and preserved outcomes.",
-    examples: [
-      "Agentic systems",
-      "Decision-support systems",
-      "Automated consequential execution",
-    ],
+      "Review an AI system across identity, purpose, authority, evidence, tools, payloads, commitments, execution conditions, and outcomes.",
+    href: "/workspace/entity-review/ai-system",
+    action: "Start AI system review",
   },
   {
-    title: "Governance Program",
+    title: "Architecture Review",
     description:
-      "Review whether a governance program governs the full route or only isolated documents, policies, scores, or approvals.",
-    examples: [
-      "AI governance programs",
-      "Risk and compliance programs",
-      "Internal control frameworks",
-    ],
+      "Examine a governance, runtime, operational, or technical architecture without treating a diagram or claim as proof of performance.",
+    href: "/workspace/entity-review/architecture",
+    action: "Start architecture review",
   },
   {
-    title: "Architecture",
+    title: "Consequential Route Review",
     description:
-      "Evaluate the structure that binds evidence, authority, review, execution, and outcomes without silently merging them.",
-    examples: [
-      "Governance architecture",
-      "Evidence architecture",
-      "Runtime authorization architecture",
-    ],
-  },
-  {
-    title: "Operational System",
-    description:
-      "Review a real-world operational environment where software, people, machines, records, and consequences interact.",
-    examples: [
-      "Buildings and infrastructure",
-      "Healthcare environments",
-      "Industrial or environmental systems",
-    ],
-  },
-  {
-    title: "Partner or Reviewer",
-    description:
-      "Assess a proposed reviewer, specialist, or partner without treating participation as automatic certification.",
-    examples: [
-      "Partner Review Network candidate",
-      "Independent specialist",
-      "Review-lane qualification",
-    ],
-  },
-  {
-    title: "Consequential Route",
-    description:
-      "Review one specific route from reality and evidence through authority, execution, and preserved outcome.",
-    examples: [
-      "Payment authorization",
-      "High-risk AI action",
-      "Operational intervention",
-    ],
+      "Review a complete route from declared reality and evidence through authority, commitment, execution, and outcome verification.",
+    href: "/workspace/entity-review/route",
+    action: "Start route review",
   },
 ];
 
-const initialState: IntakeState = {
-  entityName: "",
-  reviewType: "Organization",
-  owner: "",
-  contact: "",
-  objective: "",
-  evidence: "",
-  knownConcerns: "",
-  requestedOutcome: "",
-  requestedReviewer: "",
-};
+const reviewLayers = [
+  "Identity",
+  "Declared purpose",
+  "Scope",
+  "Authority",
+  "Evidence",
+  "Continuity",
+  "Architecture",
+  "Tools and dependencies",
+  "Payloads",
+  "Commitments",
+  "Execution controls",
+  "Outcome verification",
+  "Change history",
+  "Limitations",
+];
+
+const partnerLanes = [
+  {
+    name: "Boundary-only",
+    text: "A specialist identifies limits, exclusions, and conditions without reviewing the whole entity.",
+  },
+  {
+    name: "Referral-only",
+    text: "A partner identifies the appropriate review route and transfers the entity without making a final determination.",
+  },
+  {
+    name: "Scoped review",
+    text: "A qualified reviewer examines a declared layer while preserving the limits of that specialty.",
+  },
+  {
+    name: "Partner-track",
+    text: "A reviewer participates in a broader governed route with attributable findings and second-layer review.",
+  },
+];
 
 export default function EntityReviewPage() {
-  const searchParams = useSearchParams();
-  const [intake, setIntake] = useState<IntakeState>(initialState);
-  const [savedAt, setSavedAt] = useState<string | null>(null);
-  const [showIntake, setShowIntake] = useState(false);
-  const [notice, setNotice] = useState("");
-  const [requests, setRequests] = useState<EntityReviewRequest[]>([]);
-  const [activeRequestId, setActiveRequestId] = useState<string | null>(null);
-
-  useEffect(() => {
-    const saved = window.localStorage.getItem(STORAGE_KEY);
-
-    if (!saved) {
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(saved) as {
-        intake?: IntakeState;
-        savedAt?: string;
-      };
-
-      if (parsed.intake) {
-        setIntake(parsed.intake);
-        setSavedAt(parsed.savedAt ?? null);
-      }
-    } catch {
-      window.localStorage.removeItem(STORAGE_KEY);
-    }
-  }, []);
-
-  useEffect(() => {
-    const reviewer = searchParams.get("reviewer");
-
-    if (!reviewer) {
-      return;
-    }
-
-    setIntake((current) => ({
-      ...current,
-      requestedReviewer: reviewer,
-    }));
-    setShowIntake(true);
-    setNotice(
-      `${reviewer} has been carried into this intake as the requested reviewer or review route. Selection does not establish qualification, availability, acceptance, or certification.`,
-    );
-  }, [searchParams]);
-
-  useEffect(() => {
-    const requestedId = searchParams.get("request");
-
-    if (!requestedId || requests.length === 0) {
-      return;
-    }
-
-    const matchingRequest = requests.find(
-      (request) => request.requestId === requestedId,
-    );
-
-    if (!matchingRequest) {
-      setNotice(
-        `${requestedId} was not found in this browser's local Entity Review request history.`,
-      );
-      return;
-    }
-
-    setIntake(matchingRequest.intake);
-    setActiveRequestId(matchingRequest.requestId);
-    setSavedAt(matchingRequest.updatedAt);
-    setShowIntake(true);
-    setNotice(
-      `${matchingRequest.requestId} has been reopened for editing. Changes remain local until the request is preserved again.`,
-    );
-
-    window.setTimeout(() => {
-      document.getElementById("intake")?.scrollIntoView({ behavior: "smooth" });
-    }, 50);
-  }, [requests, searchParams]);
-
-  useEffect(() => {
-    const savedRequests = window.localStorage.getItem(REQUESTS_STORAGE_KEY);
-
-    if (!savedRequests) {
-      return;
-    }
-
-    try {
-      const parsed = JSON.parse(savedRequests) as EntityReviewRequest[];
-      setRequests(Array.isArray(parsed) ? parsed : []);
-    } catch {
-      window.localStorage.removeItem(REQUESTS_STORAGE_KEY);
-    }
-  }, []);
-
-  const selectedType = useMemo(
-    () => reviewTypes.find((item) => item.title === intake.reviewType),
-    [intake.reviewType],
-  );
-
-  const updateField = <K extends keyof IntakeState>(
-    key: K,
-    value: IntakeState[K],
-  ) => {
-    setIntake((current) => ({
-      ...current,
-      [key]: value,
-    }));
-    setNotice("");
-  };
-
-  const createRequestId = () => {
-    const date = new Date();
-    const datePart = [
-      date.getFullYear(),
-      String(date.getMonth() + 1).padStart(2, "0"),
-      String(date.getDate()).padStart(2, "0"),
-    ].join("");
-
-    const timePart = [
-      String(date.getHours()).padStart(2, "0"),
-      String(date.getMinutes()).padStart(2, "0"),
-      String(date.getSeconds()).padStart(2, "0"),
-    ].join("");
-
-    const randomPart = Math.random().toString(36).slice(2, 7).toUpperCase();
-
-    return `TA-14-ER-${datePart}-${timePart}-${randomPart}`;
-  };
-
-  const persistRequests = (nextRequests: EntityReviewRequest[]) => {
-    setRequests(nextRequests);
-    window.localStorage.setItem(
-      REQUESTS_STORAGE_KEY,
-      JSON.stringify(nextRequests),
-    );
-  };
-
-  const preserveAsRequest = (status: EntityReviewRequest["status"]) => {
-    if (!intake.entityName.trim() || !intake.objective.trim()) {
-      setNotice(
-        "Entity name and review objective are required before a review request record can be preserved.",
-      );
-      setShowIntake(true);
-      return;
-    }
-
-    const timestamp = new Date().toISOString();
-    const existing = activeRequestId
-      ? requests.find((request) => request.requestId === activeRequestId)
-      : undefined;
-
-    const request: EntityReviewRequest = {
-      requestId: existing?.requestId ?? createRequestId(),
-      createdAt: existing?.createdAt ?? timestamp,
-      updatedAt: timestamp,
-      status,
-      intake,
-      boundaryStatement:
-        "This record preserves a declared Entity Review request. It does not prove reviewer qualification, reviewer acceptance, review completion, certification, regulatory compliance, or the truth of the underlying claims.",
-    };
-
-    const nextRequests = existing
-      ? requests.map((item) =>
-          item.requestId === request.requestId ? request : item,
-        )
-      : [request, ...requests];
-
-    persistRequests(nextRequests);
-    setActiveRequestId(request.requestId);
-    setSavedAt(timestamp);
-
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        intake,
-        savedAt: timestamp,
-      }),
-    );
-
-    setNotice(
-      `${request.requestId} has been preserved locally with status ${status}. It has not been transmitted or accepted by a reviewer.`,
-    );
-  };
-
-  const loadRequest = (request: EntityReviewRequest) => {
-    setIntake(request.intake);
-    setActiveRequestId(request.requestId);
-    setSavedAt(request.updatedAt);
-    setShowIntake(true);
-    setNotice(
-      `${request.requestId} has been loaded from this browser's local Entity Review request history.`,
-    );
-    document.getElementById("intake")?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  const deleteRequest = (requestId: string) => {
-    const nextRequests = requests.filter(
-      (request) => request.requestId !== requestId,
-    );
-    persistRequests(nextRequests);
-
-    if (activeRequestId === requestId) {
-      setActiveRequestId(null);
-    }
-
-    setNotice(`${requestId} has been removed from this browser.`);
-  };
-
-  const exportRequest = (request: EntityReviewRequest) => {
-    const blob = new Blob([JSON.stringify(request, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${request.requestId}.json`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    anchor.remove();
-    URL.revokeObjectURL(url);
-  };
-
-  const saveIntake = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-
-    const timestamp = new Date().toISOString();
-
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({
-        intake,
-        savedAt: timestamp,
-      }),
-    );
-
-    setSavedAt(timestamp);
-    setNotice(
-      "Your working intake has been preserved in this browser. Use Preserve Review Request when you are ready to create an identified request record.",
-    );
-  };
-
-  const clearIntake = () => {
-    window.localStorage.removeItem(STORAGE_KEY);
-    setIntake(initialState);
-    setSavedAt(null);
-    setActiveRequestId(null);
-    setNotice(
-      "The working intake has been cleared. Preserved request records remain in the local request history.",
-    );
-  };
-
   return (
-    <main className="entity-page">
-      <div className="ambient" aria-hidden="true">
-        <span className="star star-one" />
-        <span className="star star-two" />
-        <span className="star star-three" />
-        <span className="line line-one" />
-        <span className="line line-two" />
-        <span className="orbit orbit-one" />
-        <span className="orbit orbit-two" />
-      </div>
+    <main>
+      <div className="stars starsOne" />
+      <div className="stars starsTwo" />
+      <div className="glow glowOne" />
+      <div className="glow glowTwo" />
 
-      <header className="topbar">
-        <Link className="brand" href="/">
-          <span>TA-14</span>
-          <div>
+      <header className="topbar shell">
+        <Link href="/" className="brand">
+          <span className="brandMark">TA-14</span>
+          <span>
             <strong>Entity Review</strong>
             <small>TA-14 AI Governance Exchange</small>
-          </div>
+          </span>
         </Link>
 
         <nav>
-          <a href="#review-types">Review Types</a>
-          <a href="#review-process">Process</a>
-          <a href="#intake">Intake</a>
-          <a href="#request-history">Requests</a>
-          <Link href="/marketplace/professionals">Find a Reviewer</Link>
-          <Link className="top-cta" href="/">Return Home</Link>
+          <Link href="/">Home</Link>
+          <Link href="/workspace/ai-governance">AI Governance</Link>
+          <Link href="/workspace/governed-records">Governed Records</Link>
+          <Link href="/workspace/environmental-records">
+            Environmental Records
+          </Link>
         </nav>
       </header>
 
       <section className="hero shell">
-        <div className="hero-copy">
+        <div className="heroCopy">
           <p className="eyebrow">ENTITY REVIEW WORKSPACE</p>
-          <h1>
-            Review the entity,
-            <span>not merely its claims.</span>
-          </h1>
+          <h1>Review the whole route, not a polished fragment.</h1>
           <p className="lead">
-            Bring an organization, AI system, governance program, architecture,
-            operational system, proposed partner, reviewer, or consequential
-            route into a bounded review environment.
-          </p>
-          <p>
-            Entity Review examines what the entity declares, what evidence it can
-            preserve, what authority it actually holds, where continuity breaks,
-            what remains unproven, and which outcomes can be responsibly stated.
+            Submit an organization, AI system, governance architecture,
+            operational model, or consequential route for bounded review across
+            identity, authority, evidence, continuity, commitments, execution,
+            and outcomes.
           </p>
 
-          <div className="hero-actions">
-            <button
-              className="button primary"
-              type="button"
-              onClick={() => {
-                setShowIntake(true);
-                window.setTimeout(() => {
-                  document
-                    .getElementById("intake")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }, 20);
-              }}
+          <div className="heroActions">
+            <Link
+              className="primaryButton"
+              href="/workspace/entity-review/new"
             >
-              Begin Entity Review Intake
-            </button>
-            <Link className="button secondary" href="/marketplace/professionals">
-              Find an Independent Reviewer
+              Start an Entity Review
+              <span>→</span>
             </Link>
             <Link
-              className="button ghost"
-              href="/workspace/entity-review/partner-review-network/pricing"
+              className="secondaryButton"
+              href="/workspace/entity-review/status"
             >
-              Partner Review Network
+              Review Status
             </Link>
-          </div>
-
-          <div className="boundary-row">
-            <span>Bounded findings</span>
-            <span>Visible review scope</span>
-            <span>No automatic certification</span>
-            <span>No silent authority transfer</span>
           </div>
         </div>
 
-        <aside className="review-map" aria-label="Entity review map">
-          <div className="map-core">
-            <span>ENTITY</span>
-            <strong>UNDER REVIEW</strong>
+        <div className="reviewVisual" aria-hidden="true">
+          <div className="reviewRing ringOne" />
+          <div className="reviewRing ringTwo" />
+          <div className="reviewRing ringThree" />
+
+          <div className="reviewCore">
+            <span className="coreMark">◎</span>
+            <strong>Entity Review</strong>
+            <small>Full-chain · Bounded · Attributable</small>
           </div>
 
-          {[
-            ["Evidence", "What exists?"],
-            ["Authority", "Who may act?"],
-            ["Continuity", "What remains connected?"],
-            ["Boundaries", "What is not proven?"],
-            ["Review", "Who examined it?"],
-            ["Outcome", "What may be stated?"],
-          ].map(([title, question], index) => (
-            <div className={`map-node node-${index + 1}`} key={title}>
-              <strong>{title}</strong>
-              <small>{question}</small>
-            </div>
-          ))}
-
-          <span className="map-ring ring-one" />
-          <span className="map-ring ring-two" />
-          <span className="map-ring ring-three" />
-        </aside>
+          <span className="node nodeOne">ID</span>
+          <span className="node nodeTwo">EV</span>
+          <span className="node nodeThree">AU</span>
+          <span className="node nodeFour">EX</span>
+          <span className="node nodeFive">OUT</span>
+        </div>
       </section>
 
-      <section className="shell section" id="review-types">
-        <div className="section-heading">
-          <p className="eyebrow">WHAT CAN BE REVIEWED</p>
-          <h2>Choose the entity that actually carries the risk.</h2>
+      <section className="principle shell">
+        <p className="eyebrow">THE REVIEW PRINCIPLE</p>
+        <h2>Others may review a sliver. TA-14 reviews the route.</h2>
+        <p>
+          A favorable policy, control, model card, risk score, or architecture
+          diagram does not establish that the complete entity can support
+          admissible execution. Entity Review preserves the whole chain and the
+          boundary of every finding.
+        </p>
+      </section>
+
+      <section className="reviewTypes shell">
+        <div className="sectionIntro">
+          <p className="eyebrow">CHOOSE THE ENTITY</p>
+          <h2>Start with what is actually being reviewed.</h2>
           <p>
-            The review object must be declared before evidence is interpreted.
-            A document review is not automatically an organization review, and a
-            policy review is not automatically a system review.
+            Every review begins with a declared entity, purpose, scope, evidence
+            boundary, and review question.
           </p>
         </div>
 
-        <div className="type-grid">
-          {reviewTypes.map((item) => (
-            <button
-              className={
-                intake.reviewType === item.title
-                  ? "type-card selected"
-                  : "type-card"
-              }
-              type="button"
-              key={item.title}
-              onClick={() => {
-                updateField("reviewType", item.title);
-                setShowIntake(true);
-              }}
-            >
-              <span className="selection-mark">
-                {intake.reviewType === item.title ? "✓" : "○"}
-              </span>
+        <div className="reviewGrid">
+          {reviewTypes.map((item, index) => (
+            <article key={item.title}>
+              <span className="number">{String(index + 1).padStart(2, "0")}</span>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
-              <ul>
-                {item.examples.map((example) => (
-                  <li key={example}>{example}</li>
-                ))}
-              </ul>
-              <strong>Select review type →</strong>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="shell section" id="review-process">
-        <div className="section-heading centered">
-          <p className="eyebrow">BOUNDED REVIEW PROCESS</p>
-          <h2>The review must preserve what it knows and what it does not know.</h2>
-        </div>
-
-        <div className="process-grid">
-          {[
-            [
-              "01",
-              "Declare the entity",
-              "Identify exactly what is being reviewed, who owns it, and what remains outside the review boundary.",
-            ],
-            [
-              "02",
-              "Define the review question",
-              "State the decision, concern, readiness question, architecture question, or consequential route under examination.",
-            ],
-            [
-              "03",
-              "Assemble evidence",
-              "Bring policies, records, architecture, runtime evidence, authorities, outcomes, and declared limitations.",
-            ],
-            [
-              "04",
-              "Test continuity",
-              "Examine whether the evidence remains connected to identity, time, authority, execution, and outcome.",
-            ],
-            [
-              "05",
-              "Preserve findings",
-              "Record supported findings, unresolved gaps, dissent, uncertainty, and the exact scope of the review.",
-            ],
-            [
-              "06",
-              "Issue the bounded outcome",
-              "State what the review supports without silently converting review participation into certification.",
-            ],
-          ].map(([number, title, description]) => (
-            <article key={number}>
-              <span>{number}</span>
-              <h3>{title}</h3>
-              <p>{description}</p>
+              <Link href={item.href}>
+                {item.action}
+                <span>→</span>
+              </Link>
             </article>
           ))}
         </div>
       </section>
 
-      <section className="shell section intake-section" id="intake">
-        <div className="intake-heading">
-          <div>
-            <p className="eyebrow">ENTITY REVIEW INTAKE</p>
-            <h2>Start with a declaration, not a conclusion.</h2>
-            <p>
-              This first intake is browser-local. Saving it preserves a working
-              draft on this device only. It does not submit the entity for review.
-            </p>
-          </div>
-
-          <button
-            className="button secondary"
-            type="button"
-            onClick={() => setShowIntake((current) => !current)}
-          >
-            {showIntake ? "Hide Intake" : "Open Intake"}
-          </button>
-        </div>
-
-        {showIntake ? (
-          <form className="intake-form" onSubmit={saveIntake}>
-            {activeRequestId ? (
-              <div className="active-request-banner">
-                <span>ACTIVE ENTITY REVIEW REQUEST</span>
-                <strong>{activeRequestId}</strong>
-                <p>
-                  Saving or preserving now updates this request record rather
-                  than creating a duplicate.
-                </p>
-                <Link
-                  className="active-record-link"
-                  href={`/workspace/entity-review/requests/${encodeURIComponent(
-                    activeRequestId,
-                  )}`}
-                >
-                  View preserved record
-                </Link>
-              </div>
-            ) : null}
-
-            <div className="selected-review">
-              <span>Selected review object</span>
-              <strong>{intake.reviewType}</strong>
-              <p>{selectedType?.description}</p>
-
-              {intake.requestedReviewer ? (
-                <div className="requested-reviewer">
-                  <span>Requested reviewer or review route</span>
-                  <strong>{intake.requestedReviewer}</strong>
-                  <p>
-                    This is a requested match only. Qualification, independence,
-                    availability, conflicts, authority, and acceptance remain to
-                    be established.
-                  </p>
-                </div>
-              ) : null}
-            </div>
-
-            <div className="form-grid">
-              <label>
-                <span>Entity name</span>
-                <input
-                  value={intake.entityName}
-                  onChange={(event) =>
-                    updateField("entityName", event.target.value)
-                  }
-                  placeholder="Name the organization, system, architecture, or route"
-                  required
-                />
-              </label>
-
-              <label>
-                <span>Review type</span>
-                <select
-                  value={intake.reviewType}
-                  onChange={(event) =>
-                    updateField(
-                      "reviewType",
-                      event.target.value as ReviewType,
-                    )
-                  }
-                >
-                  {reviewTypes.map((item) => (
-                    <option key={item.title} value={item.title}>
-                      {item.title}
-                    </option>
-                  ))}
-                </select>
-              </label>
-
-              <label>
-                <span>Owner or responsible party</span>
-                <input
-                  value={intake.owner}
-                  onChange={(event) =>
-                    updateField("owner", event.target.value)
-                  }
-                  placeholder="Who is responsible for the entity?"
-                />
-              </label>
-
-              <label>
-                <span>Contact</span>
-                <input
-                  value={intake.contact}
-                  onChange={(event) =>
-                    updateField("contact", event.target.value)
-                  }
-                  placeholder="Name or email for the proposed review"
-                />
-              </label>
-
-              <label className="wide">
-                <span>Requested reviewer or review route</span>
-                <input
-                  value={intake.requestedReviewer}
-                  onChange={(event) =>
-                    updateField("requestedReviewer", event.target.value)
-                  }
-                  placeholder="Optional: reviewer, specialist, laboratory, or network route"
-                />
-              </label>
-
-              <label className="wide">
-                <span>Review objective</span>
-                <textarea
-                  value={intake.objective}
-                  onChange={(event) =>
-                    updateField("objective", event.target.value)
-                  }
-                  placeholder="What question must the review answer?"
-                  rows={4}
-                  required
-                />
-              </label>
-
-              <label className="wide">
-                <span>Evidence currently available</span>
-                <textarea
-                  value={intake.evidence}
-                  onChange={(event) =>
-                    updateField("evidence", event.target.value)
-                  }
-                  placeholder="Describe the records, policies, system evidence, authorities, architecture, runtime evidence, or outcomes available."
-                  rows={5}
-                />
-              </label>
-
-              <label className="wide">
-                <span>Known concerns or suspected gaps</span>
-                <textarea
-                  value={intake.knownConcerns}
-                  onChange={(event) =>
-                    updateField("knownConcerns", event.target.value)
-                  }
-                  placeholder="What is already disputed, uncertain, missing, stale, or unverified?"
-                  rows={4}
-                />
-              </label>
-
-              <label className="wide">
-                <span>Requested outcome</span>
-                <textarea
-                  value={intake.requestedOutcome}
-                  onChange={(event) =>
-                    updateField("requestedOutcome", event.target.value)
-                  }
-                  placeholder="What bounded output, finding, readiness review, or route review is being requested?"
-                  rows={4}
-                />
-              </label>
-            </div>
-
-            <div className="form-actions">
-              <button className="button secondary" type="submit">
-                Save Working Intake
-              </button>
-              <button
-                className="button primary"
-                type="button"
-                onClick={() => preserveAsRequest("DRAFT")}
-              >
-                Preserve Review Request
-              </button>
-              <button
-                className="button ready-button"
-                type="button"
-                onClick={() => preserveAsRequest("READY_FOR_REVIEW")}
-              >
-                Mark Ready for Review
-              </button>
-              <button
-                className="button ghost danger"
-                type="button"
-                onClick={clearIntake}
-              >
-                Clear Working Intake
-              </button>
-              <Link className="button ghost" href="/marketplace/professionals">
-                Find a Reviewer
-              </Link>
-            </div>
-
-            {savedAt ? (
-              <p className="saved-time">
-                Last preserved locally:{" "}
-                {new Date(savedAt).toLocaleString()}
-              </p>
-            ) : null}
-
-            {notice ? <p className="notice">{notice}</p> : null}
-          </form>
-        ) : (
-          <button
-            className="closed-intake"
-            type="button"
-            onClick={() => setShowIntake(true)}
-          >
-            <span>+</span>
-            <div>
-              <strong>Open the Entity Review intake</strong>
-              <p>
-                Declare the entity, review objective, evidence, concerns, and
-                requested bounded outcome.
-              </p>
-            </div>
-          </button>
-        )}
-      </section>
-
-      <section className="shell section request-library" id="request-history">
-        <div className="section-heading">
-          <p className="eyebrow">LOCAL REQUEST HISTORY</p>
-          <h2>Preserved Entity Review Requests</h2>
+      <section className="layers shell">
+        <div>
+          <p className="eyebrow">REVIEW LAYERS</p>
+          <h2>A review can remain complete without pretending every layer is valid.</h2>
           <p>
-            These records exist only in this browser. They are working governance
-            artifacts, not proof that a reviewer has received, accepted, or
-            completed the requested review.
+            Each layer can be supported, unresolved, disputed, outside scope, or
+            insufficient. Missing evidence remains visible instead of being
+            silently converted into confidence.
           </p>
         </div>
 
-        {requests.length ? (
-          <div className="request-grid">
-            {requests.map((request) => (
-              <article className="request-card" key={request.requestId}>
-                <div className="request-card-top">
-                  <span className={`request-status ${request.status.toLowerCase()}`}>
-                    {request.status.replaceAll("_", " ")}
-                  </span>
-                  <span>
-                    Updated {new Date(request.updatedAt).toLocaleString()}
-                  </span>
-                </div>
-
-                <p className="request-id">{request.requestId}</p>
-                <h3>{request.intake.entityName}</h3>
-                <strong>{request.intake.reviewType}</strong>
-                <p>{request.intake.objective}</p>
-
-                <dl>
-                  <div>
-                    <dt>Requested reviewer</dt>
-                    <dd>
-                      {request.intake.requestedReviewer || "Not yet declared"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Responsible party</dt>
-                    <dd>{request.intake.owner || "Not yet declared"}</dd>
-                  </div>
-                  <div>
-                    <dt>Created</dt>
-                    <dd>{new Date(request.createdAt).toLocaleString()}</dd>
-                  </div>
-                </dl>
-
-                <p className="request-boundary">
-                  {request.boundaryStatement}
-                </p>
-
-                <div className="request-actions">
-                  <Link
-                    className="button primary"
-                    href={`/workspace/entity-review/requests/${encodeURIComponent(
-                      request.requestId,
-                    )}`}
-                  >
-                    View Record
-                  </Link>
-                  <button
-                    className="button secondary"
-                    type="button"
-                    onClick={() => loadRequest(request)}
-                  >
-                    Edit Request
-                  </button>
-                  <button
-                    className="button secondary"
-                    type="button"
-                    onClick={() => exportRequest(request)}
-                  >
-                    Export JSON
-                  </button>
-                  <button
-                    className="button ghost danger"
-                    type="button"
-                    onClick={() => deleteRequest(request.requestId)}
-                  >
-                    Remove
-                  </button>
-                </div>
-              </article>
-            ))}
-          </div>
-        ) : (
-          <div className="empty-request-library">
-            <span>NO PRESERVED REQUESTS YET</span>
-            <h3>Your first identified request will appear here.</h3>
-            <p>
-              Complete the intake, preserve the request, and the Exchange will
-              create a browser-local identifier, timestamp, status, and
-              exportable record.
-            </p>
-            <button
-              className="button primary"
-              type="button"
-              onClick={() => {
-                setShowIntake(true);
-                document
-                  .getElementById("intake")
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }}
-            >
-              Create First Review Request
-            </button>
-          </div>
-        )}
+        <div className="layerGrid">
+          {reviewLayers.map((item) => (
+            <span key={item}>{item}</span>
+          ))}
+        </div>
       </section>
 
-      <section className="shell section connected-section">
-        <div className="section-heading centered">
-          <p className="eyebrow">CONNECTED ENTITY REVIEW ROUTES</p>
-          <h2>Review may require more than one independent lane.</h2>
+      <section className="outcomes shell">
+        <div className="outcomeIntro">
+          <p className="eyebrow">REVIEW OUTCOMES</p>
+          <h2>A review produces a bounded record—not a marketing badge.</h2>
+        </div>
+
+        <div className="outcomeGrid">
+          <article className="allow">
+            <span>ALLOW</span>
+            <h3>Supported for the declared route</h3>
+            <p>
+              The submitted evidence and authority support the stated review
+              condition within the preserved scope.
+            </p>
+          </article>
+
+          <article className="hold">
+            <span>HOLD</span>
+            <h3>Evidence or authority is incomplete</h3>
+            <p>
+              The route cannot advance until specified missing or unresolved
+              conditions are corrected.
+            </p>
+          </article>
+
+          <article className="deny">
+            <span>DENY</span>
+            <h3>The declared route is not admissible</h3>
+            <p>
+              Evidence, authority, continuity, or execution conditions conflict
+              with the declared route.
+            </p>
+          </article>
+
+          <article className="escalate">
+            <span>ESCALATE</span>
+            <h3>Specialized or higher authority is required</h3>
+            <p>
+              The review exceeds the present scope, authority, expertise, or
+              evidence boundary.
+            </p>
+          </article>
+        </div>
+      </section>
+
+      <section className="partnerNetwork shell">
+        <div className="partnerIntro">
+          <p className="eyebrow">PARTNER REVIEW NETWORK</p>
+          <h2>Independent expertise without collapsing review boundaries.</h2>
           <p>
-            Entity Review can connect a declared need to the appropriate
-            specialist, marketplace opportunity, governance laboratory, or
-            Partner Review Network path.
+            Qualified partners can review specialized layers while their
+            findings remain attributable, bounded, and available for second-layer
+            TA-14 review.
+          </p>
+
+          <Link
+            className="partnerButton"
+            href="/workspace/entity-review/partner-network"
+          >
+            Explore the Partner Review Network
+            <span>→</span>
+          </Link>
+        </div>
+
+        <div className="partnerLanes">
+          {partnerLanes.map((lane) => (
+            <article key={lane.name}>
+              <h3>{lane.name}</h3>
+              <p>{lane.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="euSection shell">
+        <div>
+          <p className="eyebrow">EU AI ACT</p>
+          <h2>Review an entity against applicable EU AI Act requirements.</h2>
+          <p>
+            Identify applicable obligations, map each requirement to the
+            relevant entity and evidence layer, preserve declared compliance
+            measures, and expose unresolved or unsupported claims.
           </p>
         </div>
 
-        <div className="connected-grid">
-          <Link href="/marketplace/professionals">
-            <span>01</span>
-            <h3>Find a Reviewer</h3>
-            <p>Locate independent professionals and specialized review capacity.</p>
-            <strong>Open reviewer marketplace →</strong>
-          </Link>
-
-          <Link href="/marketplace">
-            <span>02</span>
-            <h3>Post a Review Need</h3>
-            <p>Bring the entity-review requirement into the shared Marketplace.</p>
-            <strong>Open marketplace →</strong>
-          </Link>
-
-          <Link href="/workspace/entity-review/partner-review-network/pricing">
-            <span>03</span>
-            <h3>Partner Review Network</h3>
-            <p>Explore independent review lanes, participation, and review scope.</p>
-            <strong>Explore the network →</strong>
-          </Link>
-
-          <Link href="/eu-ai-act">
-            <span>04</span>
-            <h3>EU AI Act Entity Review</h3>
-            <p>
-              Enter the specialized laboratory when the review question is
-              directly connected to EU AI Act roles, duties, or evidence.
-            </p>
-            <strong>Open specialized route →</strong>
-          </Link>
-        </div>
-      </section>
-
-      <section className="shell final-section">
-        <p className="eyebrow">ENTITY REVIEW BOUNDARY</p>
-        <h2>Review is not the same as certification.</h2>
-        <p>
-          The Exchange can preserve declarations, scope, evidence, reviewers,
-          findings, disagreement, uncertainty, and outcomes. It does not silently
-          create authority that the entity or reviewer does not possess.
-        </p>
-        <div className="hero-actions final-actions">
-          <button
-            className="button primary"
-            type="button"
-            onClick={() => {
-              setShowIntake(true);
-              document
-                .getElementById("intake")
-                ?.scrollIntoView({ behavior: "smooth" });
-            }}
-          >
-            Begin Entity Review
-          </button>
-          <Link className="button secondary" href="/marketplace/professionals">
-            Find a Reviewer
-          </Link>
-          <Link className="button ghost" href="/">
-            Return to Four Doors
-          </Link>
-        </div>
-      </section>
-
-      <footer>
-        <Link className="brand" href="/">
-          <span>TA-14</span>
-          <div>
-            <strong>Entity Review</strong>
-            <small>TA-14 AI Governance Exchange</small>
-          </div>
+        <Link
+          className="euButton"
+          href="/workspace/entity-review/eu-ai-act"
+        >
+          EU AI Act Entity Review
+          <span>→</span>
         </Link>
+      </section>
+
+      <section className="boundary shell">
+        <div>
+          <p className="eyebrow">BOUNDARY</p>
+          <h2>Submission does not equal approval, certification, or legal compliance.</h2>
+        </div>
         <p>
-          Reality → Record → Continuity → Admissibility → Binding → Commit →
-          Execution → Outcome
+          Entity Review creates a dated, attributable, bounded record of what
+          was submitted, what was examined, what was supported, what remained
+          unresolved, and which reviewer or authority made each finding.
         </p>
+      </section>
+
+      <section className="finalCta shell">
+        <div>
+          <p className="eyebrow">BEGIN THE REVIEW</p>
+          <h2>Bring the entity. Declare the route. Preserve the evidence.</h2>
+          <p>
+            Start with the entity and review question, then build the complete
+            attributable chain around it.
+          </p>
+        </div>
+
+        <Link
+          className="primaryButton"
+          href="/workspace/entity-review/new"
+        >
+          Start Entity Review
+          <span>→</span>
+        </Link>
+      </section>
+
+      <footer className="shell">
+        <span>TA-14 Authority Governance Institution</span>
+        <Link href="/">Return to the four doors</Link>
       </footer>
 
       <style jsx>{`
@@ -1011,1077 +333,637 @@ export default function EntityReviewPage() {
         }
 
         :global(html) {
-          scroll-behavior: smooth;
+          background: #090a0d;
         }
 
         :global(body) {
           margin: 0;
-          color: #f8f6ff;
-          background: #06050b;
+          color: #fffaf0;
+          background:
+            radial-gradient(circle at 12% 8%, rgba(255, 177, 30, 0.12), transparent 28%),
+            radial-gradient(circle at 88% 24%, rgba(202, 118, 22, 0.1), transparent 28%),
+            linear-gradient(180deg, #090a0d 0%, #11100f 50%, #08090d 100%);
+          font-family:
+            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+            "Segoe UI", sans-serif;
         }
 
-        :global(a) {
-          color: inherit;
-          text-decoration: none;
-        }
-
-        :global(button),
-        :global(input),
-        :global(select),
-        :global(textarea) {
-          font: inherit;
-        }
-
-        .entity-page {
-          position: relative;
+        main {
           min-height: 100vh;
+          position: relative;
           overflow: hidden;
           isolation: isolate;
-          background:
-            radial-gradient(circle at 8% 5%, rgba(178, 107, 255, 0.15), transparent 28%),
-            radial-gradient(circle at 90% 12%, rgba(255, 193, 73, 0.08), transparent 24%),
-            linear-gradient(180deg, #080711 0%, #0d0a17 48%, #06050b 100%);
         }
 
-        .entity-page > :not(.ambient) {
+        .shell {
+          width: min(1260px, calc(100% - 36px));
+          margin-inline: auto;
           position: relative;
           z-index: 2;
         }
 
-        .ambient {
+        .stars {
           position: fixed;
-          inset: 0;
+          inset: -12%;
           pointer-events: none;
-          z-index: 0;
-          overflow: hidden;
+          z-index: -4;
+          opacity: 0.34;
         }
 
-        .star {
-          position: absolute;
-          width: 7px;
-          height: 7px;
-          border-radius: 50%;
-          background: #fff;
-          box-shadow:
-            0 0 12px #fff,
-            0 0 31px rgba(207, 157, 255, 0.95);
-          animation: explode 9s ease-in-out infinite;
+        .starsOne {
+          background-image:
+            radial-gradient(circle, rgba(255,255,255,.72) 0 1px, transparent 1.4px);
+          background-size: 92px 92px;
+          animation: starDrift 34s linear infinite;
         }
 
-        .star-one {
-          top: 14%;
-          left: 82%;
+        .starsTwo {
+          background-image:
+            radial-gradient(circle, rgba(255,183,48,.6) 0 1px, transparent 1.4px);
+          background-size: 156px 156px;
+          background-position: 39px 58px;
+          animation: starDrift 48s linear infinite reverse;
         }
 
-        .star-two {
-          top: 62%;
-          left: 9%;
-          animation-delay: -3s;
+        .glow {
+          position: fixed;
+          width: 470px;
+          height: 470px;
+          border-radius: 999px;
+          filter: blur(120px);
+          opacity: 0.11;
+          z-index: -3;
+          animation: glowMove 14s ease-in-out infinite alternate;
         }
 
-        .star-three {
-          top: 80%;
-          left: 71%;
+        .glowOne {
+          left: -170px;
+          top: -180px;
+          background: #ffb31e;
+        }
+
+        .glowTwo {
+          right: -180px;
+          top: 44%;
+          background: #ca6f18;
           animation-delay: -6s;
         }
 
-        .line {
-          position: absolute;
-          width: 42vw;
-          height: 1px;
-          opacity: 0.28;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(205, 160, 255, 0.8),
-            transparent
-          );
-          animation: travel 18s linear infinite;
-        }
-
-        .line-one {
-          top: 31%;
-          left: -50vw;
-          transform: rotate(12deg);
-        }
-
-        .line-two {
-          top: 73%;
-          right: -50vw;
-          transform: rotate(-15deg);
-          animation-delay: -9s;
-        }
-
-        .orbit {
-          position: absolute;
-          width: 620px;
-          height: 620px;
-          border: 1px solid rgba(207, 157, 255, 0.08);
-          border-radius: 50%;
-          animation: rotate 49s linear infinite;
-        }
-
-        .orbit-one {
-          top: 7%;
-          left: -300px;
-        }
-
-        .orbit-two {
-          right: -340px;
-          top: 43%;
-          width: 760px;
-          height: 760px;
-          animation-direction: reverse;
-          animation-duration: 65s;
-        }
-
-        .shell {
-          width: min(1420px, calc(100% - 34px));
-          margin: 0 auto;
-        }
-
         .topbar {
-          position: sticky;
-          top: 0;
-          z-index: 50;
+          min-height: 84px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 24px;
-          min-height: 76px;
-          padding: 13px clamp(18px, 4vw, 62px);
-          border-bottom: 1px solid rgba(205, 160, 255, 0.14);
-          background: rgba(6, 5, 11, 0.88);
-          backdrop-filter: blur(18px);
+          border-bottom: 1px solid rgba(190, 160, 112, 0.17);
         }
 
         .brand {
-          display: inline-flex;
+          display: flex;
           align-items: center;
           gap: 12px;
+          color: white;
+          text-decoration: none;
         }
 
-        .brand > span {
+        .brandMark {
+          min-width: 64px;
+          height: 38px;
+          border-radius: 999px;
           display: grid;
           place-items: center;
-          min-width: 60px;
-          height: 42px;
-          padding: 0 9px;
-          border: 1px solid rgba(224, 188, 255, 0.5);
-          border-radius: 11px;
-          color: #e2bcff;
-          background: rgba(191, 119, 255, 0.08);
-          font-weight: 950;
+          color: #1a1003;
+          background: linear-gradient(135deg, #ffb31f, #ffe7a8);
+          font-size: 13px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
         }
 
-        .brand div {
-          display: grid;
-          gap: 2px;
-        }
-
-        .brand strong {
-          font-size: 0.82rem;
-          letter-spacing: 0.08em;
+        .brand > span:last-child {
+          display: flex;
+          flex-direction: column;
         }
 
         .brand small {
-          color: #8e829b;
-          font-size: 0.68rem;
-          font-weight: 850;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
+          color: #958a78;
+          margin-top: 2px;
         }
 
         nav {
           display: flex;
-          align-items: center;
-          gap: 5px;
-          padding: 5px;
-          border: 1px solid rgba(205, 160, 255, 0.13);
-          border-radius: 999px;
-          background: rgba(13, 10, 23, 0.72);
+          gap: 22px;
         }
 
-        nav a {
-          display: inline-flex;
-          align-items: center;
-          min-height: 38px;
-          padding: 0 13px;
-          border-radius: 999px;
-          color: #b8afc3;
-          font-size: 0.78rem;
-          font-weight: 850;
-        }
-
-        nav a:hover {
-          color: #fff;
-          background: rgba(205, 160, 255, 0.08);
-        }
-
-        nav .top-cta {
-          color: #170a20;
-          background: #d7a5ff;
+        nav a,
+        footer a {
+          color: #b9ae9e;
+          text-decoration: none;
+          font-size: 14px;
         }
 
         .hero {
+          min-height: 650px;
           display: grid;
-          grid-template-columns: minmax(0, 1.08fr) minmax(430px, 0.92fr);
-          gap: clamp(45px, 7vw, 100px);
+          grid-template-columns: 1.12fr 0.88fr;
+          gap: 50px;
           align-items: center;
-          min-height: calc(100vh - 76px);
-          padding: 90px 0;
+          padding: 76px 0;
         }
 
         .eyebrow {
-          margin: 0 0 12px;
-          color: #d7a5ff;
-          font-size: 0.73rem;
-          font-weight: 950;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
-        }
-
-        h1,
-        h2,
-        h3,
-        p {
-          margin-top: 0;
+          margin: 0;
+          color: #ffb421;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.18em;
         }
 
         h1 {
-          max-width: 920px;
-          margin-bottom: 25px;
-          font-size: clamp(3.6rem, 7vw, 7.2rem);
-          line-height: 0.92;
-          letter-spacing: -0.07em;
-        }
-
-        h1 span {
-          display: block;
-          color: #d7a5ff;
-        }
-
-        h2 {
-          margin-bottom: 18px;
-          font-size: clamp(2.25rem, 4.7vw, 4.9rem);
-          line-height: 1;
-          letter-spacing: -0.054em;
-        }
-
-        p {
-          color: #aaa1b4;
-          line-height: 1.72;
+          max-width: 850px;
+          margin: 18px 0 22px;
+          font-size: clamp(48px, 7vw, 90px);
+          line-height: 0.98;
+          letter-spacing: -0.06em;
         }
 
         .lead {
-          max-width: 820px;
-          font-size: clamp(1.08rem, 1.65vw, 1.34rem);
-          color: #d0c6d9;
+          max-width: 760px;
+          margin: 0;
+          color: #b5aa9b;
+          font-size: 18px;
+          line-height: 1.68;
         }
 
-        .hero-copy > p:not(.eyebrow) {
-          max-width: 830px;
-        }
-
-        .hero-actions,
-        .form-actions {
+        .heroActions {
           display: flex;
           flex-wrap: wrap;
-          gap: 11px;
-          margin-top: 28px;
+          gap: 12px;
+          margin-top: 30px;
         }
 
-        .button {
+        .primaryButton,
+        .secondaryButton,
+        .partnerButton,
+        .euButton {
+          min-height: 54px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-height: 48px;
-          padding: 0 19px;
-          border: 1px solid transparent;
-          border-radius: 12px;
-          cursor: pointer;
-          font-weight: 900;
-          transition: 0.18s ease;
-        }
-
-        .button:hover {
-          transform: translateY(-2px);
-        }
-
-        .primary {
-          color: #16091f;
-          border-color: #d7a5ff;
-          background: #d7a5ff;
-        }
-
-        .secondary {
-          color: #f5edff;
-          border-color: rgba(205, 160, 255, 0.28);
-          background: rgba(31, 20, 43, 0.84);
-        }
-
-        .ghost {
-          color: #bcaec8;
-          background: transparent;
-        }
-
-        .danger {
-          color: #f4a7ac;
-        }
-
-        .boundary-row {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          margin-top: 28px;
-        }
-
-        .boundary-row span {
-          padding: 7px 10px;
-          border: 1px solid rgba(205, 160, 255, 0.16);
-          border-radius: 999px;
-          color: #a79caf;
-          background: rgba(13, 10, 23, 0.64);
-          font-size: 0.74rem;
-          font-weight: 800;
-        }
-
-        .review-map {
-          position: relative;
-          min-height: 570px;
-          border: 1px solid rgba(205, 160, 255, 0.17);
-          border-radius: 50%;
-          background:
-            radial-gradient(circle, rgba(191, 119, 255, 0.11), transparent 48%),
-            rgba(11, 8, 19, 0.68);
-          box-shadow:
-            0 35px 110px rgba(0, 0, 0, 0.42),
-            inset 0 0 90px rgba(191, 119, 255, 0.05);
-        }
-
-        .map-core {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          z-index: 3;
-          display: grid;
-          place-items: center;
-          width: 155px;
-          height: 155px;
-          border: 1px solid rgba(224, 188, 255, 0.55);
-          border-radius: 50%;
-          color: #e8c9ff;
-          background: radial-gradient(
-            circle,
-            rgba(191, 119, 255, 0.2),
-            rgba(11, 8, 19, 0.96) 70%
-          );
-          box-shadow: 0 0 60px rgba(191, 119, 255, 0.2);
-          transform: translate(-50%, -50%);
-          animation: corePulse 4.5s ease-in-out infinite;
-        }
-
-        .map-core span,
-        .map-core strong {
-          display: block;
-        }
-
-        .map-core span {
-          font-size: 1.2rem;
-          font-weight: 950;
-        }
-
-        .map-core strong {
-          margin-top: -34px;
-          font-size: 0.65rem;
-          letter-spacing: 0.16em;
-        }
-
-        .map-node {
-          position: absolute;
-          z-index: 4;
-          width: 150px;
-          padding: 12px;
-          border: 1px solid rgba(205, 160, 255, 0.22);
+          gap: 24px;
           border-radius: 14px;
-          background: rgba(13, 10, 23, 0.88);
-          box-shadow: 0 14px 40px rgba(0, 0, 0, 0.28);
+          padding: 0 20px;
+          text-decoration: none;
+          font-weight: 850;
         }
 
-        .map-node strong,
-        .map-node small {
-          display: block;
+        .primaryButton {
+          color: #1b1002;
+          background: linear-gradient(135deg, #ffb51f, #ffe6a4);
+          box-shadow: 0 14px 38px rgba(255, 174, 28, 0.18);
         }
 
-        .map-node strong {
-          color: #e4c7fb;
+        .secondaryButton {
+          color: #efe6d8;
+          border: 1px solid rgba(187, 156, 107, 0.27);
+          background: rgba(255, 255, 255, 0.035);
         }
 
-        .map-node small {
-          margin-top: 4px;
-          color: #84778f;
-        }
-
-        .node-1 {
-          top: 7%;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-
-        .node-2 {
-          top: 23%;
-          right: 3%;
-        }
-
-        .node-3 {
-          right: 5%;
-          bottom: 19%;
-        }
-
-        .node-4 {
-          bottom: 5%;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-
-        .node-5 {
-          bottom: 19%;
-          left: 5%;
-        }
-
-        .node-6 {
-          top: 23%;
-          left: 3%;
-        }
-
-        .map-ring {
-          position: absolute;
-          top: 50%;
-          left: 50%;
-          border: 1px solid rgba(205, 160, 255, 0.13);
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          animation: rotate 35s linear infinite;
-        }
-
-        .ring-one {
-          width: 240px;
-          height: 240px;
-        }
-
-        .ring-two {
-          width: 370px;
-          height: 370px;
-          animation-direction: reverse;
-          animation-duration: 48s;
-        }
-
-        .ring-three {
-          width: 495px;
-          height: 495px;
-          animation-duration: 62s;
-        }
-
-        .section {
-          padding: 110px 0;
-        }
-
-        .section-heading {
-          max-width: 970px;
-          margin-bottom: 38px;
-        }
-
-        .section-heading > p:last-child {
-          max-width: 850px;
-          font-size: 1.03rem;
-        }
-
-        .centered {
-          margin-left: auto;
-          margin-right: auto;
-          text-align: center;
-        }
-
-        .centered > p:last-child {
-          margin-left: auto;
-          margin-right: auto;
-        }
-
-        .type-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 15px;
-        }
-
-        .type-card {
+        .reviewVisual {
+          min-height: 470px;
           position: relative;
-          min-height: 355px;
-          padding: 24px;
-          border: 1px solid rgba(205, 160, 255, 0.15);
-          border-radius: 22px;
-          color: inherit;
-          text-align: left;
-          cursor: pointer;
-          background: rgba(13, 10, 23, 0.76);
-          box-shadow: 0 25px 70px rgba(0, 0, 0, 0.25);
-          transition: 0.2s ease;
-        }
-
-        .type-card:hover,
-        .type-card.selected {
-          border-color: rgba(224, 188, 255, 0.52);
-          transform: translateY(-4px);
-          background:
-            radial-gradient(
-              circle at 90% 8%,
-              rgba(191, 119, 255, 0.12),
-              transparent 35%
-            ),
-            rgba(17, 12, 28, 0.88);
-        }
-
-        .selection-mark {
           display: grid;
           place-items: center;
-          width: 38px;
-          height: 38px;
-          margin-bottom: 25px;
-          border: 1px solid rgba(205, 160, 255, 0.3);
-          border-radius: 50%;
-          color: #d7a5ff;
         }
 
-        .type-card h3 {
-          font-size: 1.35rem;
-        }
-
-        .type-card p {
-          font-size: 0.9rem;
-        }
-
-        .type-card ul {
-          display: grid;
-          gap: 7px;
-          margin: 20px 0 26px;
-          padding: 0;
-          list-style: none;
-        }
-
-        .type-card li {
-          color: #b8adbf;
-          font-size: 0.83rem;
-        }
-
-        .type-card li::before {
-          content: "✓";
-          margin-right: 8px;
-          color: #d7a5ff;
-        }
-
-        .type-card > strong:last-child {
-          color: #dec0f4;
-          font-size: 0.8rem;
-        }
-
-        .process-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
-        }
-
-        .process-grid article,
-        .connected-grid a {
-          padding: 25px;
-          border: 1px solid rgba(205, 160, 255, 0.15);
-          border-radius: 21px;
-          background: rgba(13, 10, 23, 0.75);
-          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.23);
-        }
-
-        .process-grid article {
-          min-height: 245px;
-        }
-
-        .process-grid article > span,
-        .connected-grid a > span {
-          display: grid;
-          place-items: center;
-          width: 42px;
-          height: 42px;
-          margin-bottom: 29px;
-          border: 1px solid rgba(205, 160, 255, 0.33);
-          border-radius: 11px;
-          color: #d7a5ff;
-          font-weight: 950;
-        }
-
-        .process-grid h3,
-        .connected-grid h3 {
-          font-size: 1.2rem;
-        }
-
-        .process-grid p,
-        .connected-grid p {
-          margin-bottom: 0;
-          font-size: 0.9rem;
-        }
-
-        .intake-section {
-          padding-top: 90px;
-        }
-
-        .intake-heading {
+        .reviewCore {
+          width: 210px;
+          height: 210px;
+          border-radius: 999px;
           display: flex;
-          align-items: flex-end;
-          justify-content: space-between;
-          gap: 30px;
-          margin-bottom: 32px;
-        }
-
-        .intake-heading > div {
-          max-width: 850px;
-        }
-
-        .intake-form {
-          padding: clamp(26px, 5vw, 56px);
-          border: 1px solid rgba(205, 160, 255, 0.19);
-          border-radius: 28px;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(255, 190, 71, 0.72);
           background:
-            radial-gradient(
-              circle at 90% 0%,
-              rgba(191, 119, 255, 0.1),
-              transparent 34%
-            ),
-            rgba(12, 9, 21, 0.9);
-          box-shadow: 0 35px 100px rgba(0, 0, 0, 0.34);
+            radial-gradient(circle, rgba(255, 180, 31, 0.16), rgba(24, 16, 6, 0.96) 68%);
+          box-shadow:
+            0 0 50px rgba(255, 175, 25, 0.28),
+            inset 0 0 34px rgba(255, 181, 31, 0.15);
+          z-index: 3;
         }
 
-        .selected-review {
-          margin-bottom: 30px;
-          padding: 18px;
-          border: 1px solid rgba(205, 160, 255, 0.18);
-          border-radius: 16px;
-          background: rgba(191, 119, 255, 0.05);
+        .coreMark {
+          font-size: 52px;
+          color: #ffd16c;
+          line-height: 1;
         }
 
-        .selected-review span,
-        .selected-review strong {
-          display: block;
+        .reviewCore strong {
+          margin-top: 8px;
+          font-size: 22px;
         }
 
-        .selected-review span {
-          color: #8f8199;
-          font-size: 0.7rem;
-          font-weight: 900;
-          letter-spacing: 0.12em;
+        .reviewCore small {
+          margin-top: 7px;
+          color: #d2a95f;
+          font-size: 10px;
+          letter-spacing: 0.08em;
           text-transform: uppercase;
         }
 
-        .selected-review strong {
-          margin-top: 6px;
-          color: #e3c4fa;
-          font-size: 1.25rem;
+        .reviewRing {
+          position: absolute;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 180, 34, 0.2);
+          animation: rotate 22s linear infinite;
         }
 
-        .selected-review p {
-          margin: 7px 0 0;
-          font-size: 0.88rem;
+        .ringOne {
+          width: 285px;
+          height: 285px;
         }
 
-        .requested-reviewer {
-          margin-top: 18px;
-          padding-top: 18px;
-          border-top: 1px solid rgba(205, 160, 255, 0.16);
+        .ringTwo {
+          width: 365px;
+          height: 365px;
+          animation-duration: 31s;
+          animation-direction: reverse;
         }
 
-        .requested-reviewer span {
-          color: #a894b5;
+        .ringThree {
+          width: 445px;
+          height: 445px;
+          animation-duration: 39s;
         }
 
-        .requested-reviewer strong {
-          color: #f0d9ff;
-          font-size: 1.02rem;
-        }
-
-        .requested-reviewer p {
-          max-width: 850px;
-          color: #9b8fa5;
-          font-size: 0.79rem;
-        }
-
-        .form-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 18px;
-        }
-
-        label {
-          display: grid;
-          gap: 8px;
-        }
-
-        label span {
-          color: #cfc3d8;
-          font-size: 0.78rem;
-          font-weight: 850;
-        }
-
-        label.wide {
-          grid-column: 1 / -1;
-        }
-
-        input,
-        select,
-        textarea {
-          width: 100%;
-          border: 1px solid rgba(205, 160, 255, 0.18);
-          border-radius: 12px;
-          color: #f8f4fb;
-          background: rgba(7, 5, 12, 0.82);
-          outline: none;
-        }
-
-        input,
-        select {
-          min-height: 48px;
-          padding: 0 13px;
-        }
-
-        textarea {
-          padding: 13px;
-          resize: vertical;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-          border-color: rgba(224, 188, 255, 0.65);
-          box-shadow: 0 0 0 3px rgba(191, 119, 255, 0.08);
-        }
-
-        .saved-time {
-          margin: 17px 0 0;
-          color: #8e8198;
-          font-size: 0.78rem;
-        }
-
-        .notice {
-          margin: 12px 0 0;
-          padding: 12px 14px;
-          border: 1px solid rgba(205, 160, 255, 0.17);
-          border-radius: 12px;
-          color: #cdbed8;
-          background: rgba(191, 119, 255, 0.05);
-          font-size: 0.82rem;
-        }
-
-        .closed-intake {
-          display: grid;
-          grid-template-columns: 64px 1fr;
-          gap: 18px;
-          align-items: center;
-          width: 100%;
-          padding: 30px;
-          border: 1px solid rgba(205, 160, 255, 0.17);
-          border-radius: 23px;
-          color: inherit;
-          text-align: left;
-          cursor: pointer;
-          background: rgba(13, 10, 23, 0.76);
-        }
-
-        .closed-intake > span {
+        .node {
+          position: absolute;
+          width: 48px;
+          height: 48px;
+          border-radius: 999px;
           display: grid;
           place-items: center;
-          width: 58px;
-          height: 58px;
-          border: 1px solid rgba(224, 188, 255, 0.42);
-          border-radius: 50%;
-          color: #d7a5ff;
-          font-size: 1.5rem;
-        }
-
-        .closed-intake strong {
-          font-size: 1.1rem;
-        }
-
-        .closed-intake p {
-          margin: 5px 0 0;
-        }
-
-        .active-request-banner {
-          margin-bottom: 18px;
-          padding: 16px 18px;
-          border: 1px solid rgba(255, 205, 103, 0.26);
-          border-radius: 15px;
-          background: rgba(255, 193, 73, 0.06);
-        }
-
-        .active-request-banner span,
-        .active-request-banner strong {
-          display: block;
-        }
-
-        .active-request-banner span {
-          color: #d8b76e;
-          font-size: 0.69rem;
-          font-weight: 950;
-          letter-spacing: 0.12em;
-        }
-
-        .active-request-banner strong {
-          margin-top: 5px;
-          color: #ffe0a0;
-          font-size: 1.02rem;
-        }
-
-        .active-request-banner p {
-          margin: 5px 0 0;
-          font-size: 0.79rem;
-        }
-
-        .active-record-link {
-          display: inline-flex;
-          margin-top: 10px;
-          color: #ffe0a0;
-          font-size: 0.76rem;
+          border: 1px solid rgba(255, 191, 72, 0.55);
+          background: rgba(42, 26, 6, 0.94);
+          color: #ffd476;
+          font-size: 11px;
           font-weight: 900;
-          text-decoration: underline;
-          text-underline-offset: 4px;
+          box-shadow: 0 0 18px rgba(255, 174, 25, 0.2);
+          z-index: 4;
         }
 
-        .ready-button {
-          color: #0a1712;
-          border-color: #8ce8bd;
-          background: #8ce8bd;
+        .nodeOne {
+          top: 52px;
+          left: 42%;
         }
 
-        .request-library {
-          padding-top: 80px;
+        .nodeTwo {
+          left: 34px;
+          top: 47%;
         }
 
-        .request-grid {
+        .nodeThree {
+          right: 38px;
+          top: 36%;
+        }
+
+        .nodeFour {
+          left: 24%;
+          bottom: 40px;
+        }
+
+        .nodeFive {
+          right: 20%;
+          bottom: 50px;
+        }
+
+        .principle,
+        .layers,
+        .outcomes,
+        .partnerNetwork,
+        .euSection,
+        .boundary,
+        .finalCta {
+          border: 1px solid rgba(181, 148, 96, 0.17);
+          background:
+            linear-gradient(180deg, rgba(24, 20, 15, 0.91), rgba(12, 11, 10, 0.96));
+          border-radius: 26px;
+          box-shadow: 0 22px 70px rgba(0, 0, 0, 0.24);
+        }
+
+        .principle {
+          padding: 52px;
+          text-align: center;
+        }
+
+        .principle h2,
+        .sectionIntro h2,
+        .layers h2,
+        .outcomes h2,
+        .partnerNetwork h2,
+        .euSection h2,
+        .boundary h2,
+        .finalCta h2 {
+          margin: 14px 0 16px;
+          font-size: clamp(32px, 5vw, 56px);
+          line-height: 1.04;
+          letter-spacing: -0.045em;
+        }
+
+        .principle > p:not(.eyebrow),
+        .sectionIntro > p:not(.eyebrow),
+        .layers p:not(.eyebrow),
+        .outcomes p,
+        .partnerNetwork p:not(.eyebrow),
+        .euSection p:not(.eyebrow),
+        .boundary > p,
+        .finalCta p:not(.eyebrow) {
+          color: #b4aa9d;
+          line-height: 1.68;
+        }
+
+        .principle > p:not(.eyebrow) {
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .reviewTypes {
+          padding: 90px 0;
+        }
+
+        .sectionIntro {
+          max-width: 740px;
+          margin-bottom: 34px;
+        }
+
+        .sectionIntro > p:not(.eyebrow) {
+          margin: 0;
+        }
+
+        .reviewGrid {
           display: grid;
           grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 16px;
+          gap: 18px;
         }
 
-        .request-card {
-          padding: 24px;
-          border: 1px solid rgba(205, 160, 255, 0.16);
+        .reviewGrid article {
+          min-height: 300px;
+          padding: 30px;
           border-radius: 22px;
+          border: 1px solid rgba(176, 144, 95, 0.18);
           background:
-            radial-gradient(
-              circle at 92% 4%,
-              rgba(191, 119, 255, 0.08),
-              transparent 31%
-            ),
-            rgba(13, 10, 23, 0.78);
-          box-shadow: 0 25px 75px rgba(0, 0, 0, 0.26);
+            linear-gradient(180deg, rgba(25, 21, 16, 0.88), rgba(12, 11, 10, 0.96));
+          transition:
+            transform 220ms ease,
+            border-color 220ms ease;
         }
 
-        .request-card-top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 20px;
+        .reviewGrid article:hover {
+          transform: translateY(-5px);
+          border-color: rgba(255, 180, 34, 0.48);
         }
 
-        .request-card-top > span:last-child {
-          color: #85798f;
-          font-size: 0.72rem;
-          text-align: right;
+        .number {
+          color: #ffb421;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
         }
 
-        .request-status {
-          padding: 6px 9px;
-          border: 1px solid rgba(205, 160, 255, 0.18);
-          border-radius: 999px;
-          color: #bba8c7;
-          font-size: 0.67rem;
-          font-weight: 950;
-          letter-spacing: 0.08em;
+        .reviewGrid h3 {
+          margin: 18px 0 12px;
+          font-size: 28px;
+          letter-spacing: -0.03em;
         }
 
-        .request-status.ready_for_review {
-          color: #99ecc7;
-          border-color: rgba(140, 232, 189, 0.35);
-          background: rgba(140, 232, 189, 0.06);
+        .reviewGrid p {
+          color: #b4aa9d;
+          line-height: 1.65;
+          min-height: 84px;
         }
 
-        .request-id {
-          margin-bottom: 8px;
-          color: #d7a5ff;
-          font-size: 0.72rem;
-          font-weight: 950;
-          letter-spacing: 0.08em;
-        }
-
-        .request-card h3 {
-          margin-bottom: 6px;
-          font-size: 1.45rem;
-        }
-
-        .request-card > strong {
-          display: block;
-          margin-bottom: 14px;
-          color: #d8c9e3;
-          font-size: 0.82rem;
-        }
-
-        .request-card dl {
-          display: grid;
-          gap: 10px;
-          margin: 22px 0;
-        }
-
-        .request-card dl div {
-          display: grid;
-          grid-template-columns: 150px 1fr;
-          gap: 12px;
-          padding-top: 10px;
-          border-top: 1px solid rgba(205, 160, 255, 0.1);
-        }
-
-        .request-card dt {
-          color: #82758d;
-          font-size: 0.72rem;
+        .reviewGrid a {
+          display: inline-flex;
+          gap: 20px;
+          color: #ffc457;
+          text-decoration: none;
           font-weight: 850;
         }
 
-        .request-card dd {
-          margin: 0;
-          color: #c5b9ce;
-          font-size: 0.8rem;
+        .layers {
+          padding: 42px;
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 42px;
+          align-items: center;
         }
 
-        .request-boundary {
-          padding: 13px;
-          border: 1px solid rgba(205, 160, 255, 0.12);
-          border-radius: 12px;
-          background: rgba(7, 5, 12, 0.55);
-          font-size: 0.75rem;
+        .layers h2 {
+          font-size: clamp(30px, 4.5vw, 50px);
         }
 
-        .request-actions {
+        .layerGrid {
           display: flex;
           flex-wrap: wrap;
-          gap: 9px;
-          margin-top: 18px;
+          gap: 10px;
         }
 
-        .request-actions .button {
-          min-height: 42px;
-          padding: 0 13px;
-          font-size: 0.75rem;
+        .layerGrid span {
+          padding: 10px 13px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 182, 36, 0.2);
+          background: rgba(180, 112, 20, 0.06);
+          color: #f1e5d3;
+          font-size: 13px;
+          font-weight: 750;
         }
 
-        .empty-request-library {
-          padding: 54px;
-          border: 1px solid rgba(205, 160, 255, 0.16);
-          border-radius: 23px;
-          text-align: center;
-          background: rgba(13, 10, 23, 0.75);
+        .outcomes {
+          margin-top: 22px;
+          padding: 42px;
         }
 
-        .empty-request-library > span {
-          color: #d7a5ff;
-          font-size: 0.7rem;
-          font-weight: 950;
-          letter-spacing: 0.14em;
+        .outcomeIntro {
+          max-width: 920px;
         }
 
-        .empty-request-library h3 {
-          margin: 12px 0;
-          font-size: 1.6rem;
+        .outcomes h2 {
+          font-size: clamp(30px, 4.5vw, 50px);
         }
 
-        .empty-request-library p {
-          max-width: 700px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-
-        .connected-grid {
+        .outcomeGrid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 14px;
+          margin-top: 30px;
         }
 
-        .connected-grid a {
-          min-height: 300px;
-          transition: 0.2s ease;
+        .outcomeGrid article {
+          padding: 24px 20px;
+          border-radius: 18px;
+          border: 1px solid rgba(181, 149, 102, 0.16);
+          background: rgba(100, 73, 34, 0.05);
         }
 
-        .connected-grid a:hover {
-          border-color: rgba(224, 188, 255, 0.5);
-          transform: translateY(-4px);
+        .outcomeGrid span {
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.15em;
         }
 
-        .connected-grid a > strong:last-child {
-          display: block;
-          margin-top: 24px;
-          color: #ddbbf7;
-          font-size: 0.8rem;
+        .outcomeGrid h3 {
+          margin: 15px 0 10px;
+          font-size: 21px;
+          line-height: 1.15;
         }
 
-        .final-section {
-          padding: 120px 0;
-          text-align: center;
+        .outcomeGrid p {
+          margin: 0;
+          line-height: 1.58;
         }
 
-        .final-section > p {
-          max-width: 860px;
-          margin-left: auto;
-          margin-right: auto;
+        .allow span {
+          color: #6fe0b3;
         }
 
-        .final-actions {
-          justify-content: center;
+        .hold span {
+          color: #ffd15d;
+        }
+
+        .deny span {
+          color: #ff7a7a;
+        }
+
+        .escalate span {
+          color: #b99aff;
+        }
+
+        .partnerNetwork {
+          margin-top: 22px;
+          padding: 42px;
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 42px;
+          align-items: start;
+        }
+
+        .partnerNetwork h2 {
+          font-size: clamp(30px, 4.5vw, 48px);
+        }
+
+        .partnerButton {
+          margin-top: 8px;
+          color: #fff3da;
+          border: 1px solid rgba(255, 184, 42, 0.32);
+          background: rgba(168, 101, 17, 0.09);
+        }
+
+        .partnerLanes {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .partnerLanes article {
+          padding: 20px;
+          border-radius: 17px;
+          border: 1px solid rgba(179, 145, 95, 0.16);
+          background: rgba(96, 67, 29, 0.05);
+        }
+
+        .partnerLanes h3 {
+          margin: 0 0 8px;
+          font-size: 20px;
+        }
+
+        .partnerLanes p {
+          margin: 0;
+          line-height: 1.56;
+        }
+
+        .euSection {
+          margin-top: 22px;
+          padding: 38px 42px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 40px;
+        }
+
+        .euSection > div {
+          max-width: 820px;
+        }
+
+        .euSection h2 {
+          font-size: clamp(28px, 4vw, 42px);
+        }
+
+        .euButton {
+          flex: 0 0 auto;
+          color: #fff7e7;
+          border: 1px solid rgba(255, 184, 42, 0.34);
+          background: rgba(173, 104, 17, 0.1);
+        }
+
+        .boundary {
+          margin-top: 22px;
+          padding: 42px;
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 36px;
+          align-items: center;
+        }
+
+        .boundary h2 {
+          font-size: clamp(28px, 4vw, 44px);
+        }
+
+        .boundary > p {
+          margin: 0;
+        }
+
+        .finalCta {
+          margin-top: 74px;
+          padding: 54px 46px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 30px;
+        }
+
+        .finalCta > div {
+          max-width: 760px;
+        }
+
+        .finalCta h2 {
+          font-size: clamp(36px, 5vw, 58px);
         }
 
         footer {
+          min-height: 120px;
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 30px;
-          width: min(1420px, calc(100% - 34px));
-          margin: 0 auto;
-          padding: 38px 0;
-          border-top: 1px solid rgba(205, 160, 255, 0.13);
+          gap: 24px;
+          color: #887d6e;
+          font-size: 12px;
         }
 
-        footer p {
-          margin: 0;
-          color: #71667b;
-          font-size: 0.76rem;
-          text-align: right;
-        }
-
-        @keyframes explode {
-          0%,
-          83%,
-          100% {
-            opacity: 0.1;
-            transform: scale(0.15);
-          }
-          87% {
-            opacity: 1;
-            transform: scale(1.4);
-          }
-          92% {
-            opacity: 0.25;
-            transform: scale(7);
-          }
-        }
-
-        @keyframes travel {
+        @keyframes starDrift {
           from {
-            transform: translateX(0) rotate(12deg);
+            transform: translate3d(0, 0, 0);
           }
           to {
-            transform: translateX(170vw) rotate(12deg);
+            transform: translate3d(90px, 140px, 0);
+          }
+        }
+
+        @keyframes glowMove {
+          from {
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+          to {
+            transform: translate3d(55px, 35px, 0) scale(1.1);
           }
         }
 
@@ -2091,308 +973,64 @@ export default function EntityReviewPage() {
           }
         }
 
-        @keyframes corePulse {
-          0%,
-          100% {
-            transform: translate(-50%, -50%) scale(0.96);
-          }
-          50% {
-            transform: translate(-50%, -50%) scale(1.04);
-          }
-        }
-
-        @media (max-width: 1100px) {
-          .hero {
-            grid-template-columns: 1fr;
-          }
-
-          .review-map {
-            width: min(620px, 100%);
-          }
-
-          .type-grid,
-          .process-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .active-request-banner {
-          margin-bottom: 18px;
-          padding: 16px 18px;
-          border: 1px solid rgba(255, 205, 103, 0.26);
-          border-radius: 15px;
-          background: rgba(255, 193, 73, 0.06);
-        }
-
-        .active-request-banner span,
-        .active-request-banner strong {
-          display: block;
-        }
-
-        .active-request-banner span {
-          color: #d8b76e;
-          font-size: 0.69rem;
-          font-weight: 950;
-          letter-spacing: 0.12em;
-        }
-
-        .active-request-banner strong {
-          margin-top: 5px;
-          color: #ffe0a0;
-          font-size: 1.02rem;
-        }
-
-        .active-request-banner p {
-          margin: 5px 0 0;
-          font-size: 0.79rem;
-        }
-
-        .active-record-link {
-          display: inline-flex;
-          margin-top: 10px;
-          color: #ffe0a0;
-          font-size: 0.76rem;
-          font-weight: 900;
-          text-decoration: underline;
-          text-underline-offset: 4px;
-        }
-
-        .ready-button {
-          color: #0a1712;
-          border-color: #8ce8bd;
-          background: #8ce8bd;
-        }
-
-        .request-library {
-          padding-top: 80px;
-        }
-
-        .request-grid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 16px;
-        }
-
-        .request-card {
-          padding: 24px;
-          border: 1px solid rgba(205, 160, 255, 0.16);
-          border-radius: 22px;
-          background:
-            radial-gradient(
-              circle at 92% 4%,
-              rgba(191, 119, 255, 0.08),
-              transparent 31%
-            ),
-            rgba(13, 10, 23, 0.78);
-          box-shadow: 0 25px 75px rgba(0, 0, 0, 0.26);
-        }
-
-        .request-card-top {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          margin-bottom: 20px;
-        }
-
-        .request-card-top > span:last-child {
-          color: #85798f;
-          font-size: 0.72rem;
-          text-align: right;
-        }
-
-        .request-status {
-          padding: 6px 9px;
-          border: 1px solid rgba(205, 160, 255, 0.18);
-          border-radius: 999px;
-          color: #bba8c7;
-          font-size: 0.67rem;
-          font-weight: 950;
-          letter-spacing: 0.08em;
-        }
-
-        .request-status.ready_for_review {
-          color: #99ecc7;
-          border-color: rgba(140, 232, 189, 0.35);
-          background: rgba(140, 232, 189, 0.06);
-        }
-
-        .request-id {
-          margin-bottom: 8px;
-          color: #d7a5ff;
-          font-size: 0.72rem;
-          font-weight: 950;
-          letter-spacing: 0.08em;
-        }
-
-        .request-card h3 {
-          margin-bottom: 6px;
-          font-size: 1.45rem;
-        }
-
-        .request-card > strong {
-          display: block;
-          margin-bottom: 14px;
-          color: #d8c9e3;
-          font-size: 0.82rem;
-        }
-
-        .request-card dl {
-          display: grid;
-          gap: 10px;
-          margin: 22px 0;
-        }
-
-        .request-card dl div {
-          display: grid;
-          grid-template-columns: 150px 1fr;
-          gap: 12px;
-          padding-top: 10px;
-          border-top: 1px solid rgba(205, 160, 255, 0.1);
-        }
-
-        .request-card dt {
-          color: #82758d;
-          font-size: 0.72rem;
-          font-weight: 850;
-        }
-
-        .request-card dd {
-          margin: 0;
-          color: #c5b9ce;
-          font-size: 0.8rem;
-        }
-
-        .request-boundary {
-          padding: 13px;
-          border: 1px solid rgba(205, 160, 255, 0.12);
-          border-radius: 12px;
-          background: rgba(7, 5, 12, 0.55);
-          font-size: 0.75rem;
-        }
-
-        .request-actions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 9px;
-          margin-top: 18px;
-        }
-
-        .request-actions .button {
-          min-height: 42px;
-          padding: 0 13px;
-          font-size: 0.75rem;
-        }
-
-        .empty-request-library {
-          padding: 54px;
-          border: 1px solid rgba(205, 160, 255, 0.16);
-          border-radius: 23px;
-          text-align: center;
-          background: rgba(13, 10, 23, 0.75);
-        }
-
-        .empty-request-library > span {
-          color: #d7a5ff;
-          font-size: 0.7rem;
-          font-weight: 950;
-          letter-spacing: 0.14em;
-        }
-
-        .empty-request-library h3 {
-          margin: 12px 0;
-          font-size: 1.6rem;
-        }
-
-        .empty-request-library p {
-          max-width: 700px;
-          margin-left: auto;
-          margin-right: auto;
-        }
-
-        .connected-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-        }
-
-        @media (max-width: 850px) {
+        @media (max-width: 900px) {
           nav {
             display: none;
           }
 
-          .intake-heading {
-            align-items: flex-start;
-            flex-direction: column;
-          }
-        }
-
-        @media (max-width: 650px) {
-          .shell {
-            width: min(100% - 24px, 1420px);
-          }
-
           .hero,
-          .section {
-            padding: 75px 0;
-          }
-
-          .review-map {
-            min-height: 490px;
-            border-radius: 28px;
-          }
-
-          .map-node {
-            width: 125px;
-            padding: 9px;
-          }
-
-          .node-2,
-          .node-3 {
-            right: 1%;
-          }
-
-          .node-5,
-          .node-6 {
-            left: 1%;
-          }
-
-          .ring-three {
-            width: 430px;
-            height: 430px;
-          }
-
-          .type-grid,
-          .process-grid,
-          .connected-grid,
-          .request-grid,
-          .form-grid {
+          .layers,
+          .partnerNetwork,
+          .boundary {
             grid-template-columns: 1fr;
           }
 
-          label.wide {
-            grid-column: auto;
+          .outcomeGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          footer {
-            align-items: flex-start;
+          .euSection,
+          .finalCta {
             flex-direction: column;
-          }
-
-          footer p {
-            text-align: left;
+            align-items: flex-start;
           }
         }
 
-        @media (prefers-reduced-motion: reduce) {
-          :global(html) {
-            scroll-behavior: auto;
+        @media (max-width: 680px) {
+          .shell {
+            width: min(100% - 20px, 1260px);
           }
 
-          .star,
-          .line,
-          .orbit,
-          .map-core,
-          .map-ring {
-            animation: none;
+          .hero {
+            min-height: auto;
+            padding: 58px 0;
+          }
+
+          .reviewVisual {
+            min-height: 430px;
+            transform: scale(0.8);
+          }
+
+          .principle,
+          .layers,
+          .outcomes,
+          .partnerNetwork,
+          .euSection,
+          .boundary,
+          .finalCta {
+            padding: 28px 24px;
+          }
+
+          .reviewGrid,
+          .outcomeGrid,
+          .partnerLanes {
+            grid-template-columns: 1fr;
+          }
+
+          footer {
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
           }
         }
       `}</style>
