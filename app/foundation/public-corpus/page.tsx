@@ -1,218 +1,107 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
-import {
-  CORPUS_CATEGORY_LABELS,
-  CORPUS_COUNTS,
-  CORPUS_TOTAL,
-  TA14_PUBLIC_CORPUS,
-  type CorpusCategory,
-  type CorpusRecord,
-} from "./corpus";
+import type { CSSProperties } from "react";
 
-const categories: Array<"ALL" | CorpusCategory> = [
-  "ALL",
-  "BOOK",
-  "ARTICLE",
-  "ZENODO",
-  "PATENT",
-  "STANDARD",
-  "REPOSITORY",
-  "SITE",
-  "IMPLEMENTATION",
-  "CHRONOLOGY",
+const foundationDomains = [
+  {
+    code: "01",
+    title: "Complete TA-14 Public Corpus",
+    text: "Search the master institutional ledger containing books, articles, Zenodo and DOI records, patent applications, repositories, sites, implementations, and public chronology.",
+    href: "/foundation/public-corpus",
+    featured: true,
+  },
+  {
+    code: "02",
+    title: "Institution & Stewardship",
+    text: "The named institution, founder, authorship, stewardship, declared ownership, contact route, and responsibility for maintaining the public record.",
+    href: "/workspace/ai-governance/registry#foundation",
+  },
+  {
+    code: "03",
+    title: "Founding Architecture",
+    text: "The TA-14 Admissible Execution Architecture, governing chain, architecture family, scope, claims, non-claims, and declared boundaries.",
+    href: "/registry/ta-14-admissible-execution-architecture",
+  },
+  {
+    code: "04",
+    title: "Standards Family",
+    text: "Named standards, methods, thresholds, route classifications, admissibility disciplines, and implementation requirements associated with TA-14.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "05",
+    title: "Public Chronology",
+    text: "Dated declarations, releases, public milestones, publication history, architecture versions, and institutional development.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "06",
+    title: "Books & Long-Form Publications",
+    text: "Published books, manuals, workbooks, and long-form records documenting the architecture and its applied domains.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "07",
+    title: "Articles & Public Essays",
+    text: "Medium, Substack, AutomatedBuildings, and other public articles preserving the development and application of TA-14.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "08",
+    title: "Zenodo & DOI Records",
+    text: "Persistent public architecture and standards deposits supporting attribution, chronology, provenance, and inspection.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "09",
+    title: "Patent Applications & Filing Lineage",
+    text: "Patent references, filing chronology, invention relationships, ownership declarations, and rights assertions preserved as bounded public claims.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "10",
+    title: "GitHub & Technical Artifacts",
+    text: "Repositories, source code, public implementations, schemas, demonstrations, records, and technical artifacts associated with TA-14.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "11",
+    title: "Reference Implementations",
+    text: "Operational examples showing how TA-14 architecture is translated into governed routes, records, review, verification, and execution controls.",
+    href: "/foundation/public-corpus",
+  },
+  {
+    code: "12",
+    title: "Claims, Challenges & Corrections",
+    text: "Declared claims, explicit non-claims, limitations, disputes, objections, corrections, superseded versions, and challenge routes.",
+    href: "/registry/about",
+  },
 ];
 
-const categoryDescriptions: Record<CorpusCategory, string> = {
-  BOOK:
-    "Books, manuals, workbooks, and long-form publications documenting the TA-14 architecture and its applied domains.",
-  ARTICLE:
-    "Public articles, essays, industry publications, and chronological explanations of the TA-14 body of work.",
-  ZENODO:
-    "Persistent public deposits, DOI records, and architecture lineage preserved through Zenodo.",
-  PATENT:
-    "Patent applications, filing lineage, related inventions, and declared rights records.",
-  STANDARD:
-    "TA-14 standards, protocols, methods, and public implementation requirements.",
-  REPOSITORY:
-    "Public GitHub repositories preserving code, architecture, demonstrations, and implementation history.",
-  SITE:
-    "Public architecture, doctrine, patent-position, and institutional presentation sites.",
-  IMPLEMENTATION:
-    "Operational systems and reference implementations translating TA-14 architecture into usable public tools.",
-  CHRONOLOGY:
-    "Dated milestones showing the development of TA-14 from field evidence discipline to admissible execution governance.",
-};
+const corpusRoutes = [
+  ["All Publications", "/foundation/public-corpus"],
+  ["All Books", "/foundation/public-corpus"],
+  ["All Articles", "/foundation/public-corpus"],
+  ["All Zenodo Records", "/foundation/public-corpus"],
+  ["All Patent Applications", "/foundation/public-corpus"],
+  ["All Standards", "/foundation/public-corpus"],
+  ["All GitHub Repositories", "/foundation/public-corpus"],
+  ["All Implementations", "/foundation/public-corpus"],
+];
 
-function formatStatus(status: string) {
-  return status
-    .split("_")
-    .map((part) => part.charAt(0) + part.slice(1).toLowerCase())
-    .join(" ");
-}
+const chain = [
+  "Reality",
+  "Record",
+  "Continuity",
+  "Admissibility",
+  "Binding",
+  "Commit",
+  "Execution",
+  "Outcome",
+];
 
-function RecordCard({ record }: { record: CorpusRecord }) {
-  return (
-    <article className="recordCard">
-      <div className="recordHeader">
-        <span className={`categoryPill category-${record.category.toLowerCase()}`}>
-          {record.category}
-        </span>
-        <span className="statusPill">{formatStatus(record.status)}</span>
-      </div>
-
-      <h3>{record.title}</h3>
-
-      <div className="recordDetails">
-        {record.date ? (
-          <span>
-            <strong>Date</strong>
-            {record.date}
-          </span>
-        ) : (
-          <span>
-            <strong>Year</strong>
-            {record.year}
-          </span>
-        )}
-
-        {record.author ? (
-          <span>
-            <strong>Author / steward</strong>
-            {record.author}
-          </span>
-        ) : null}
-
-        {record.platform ? (
-          <span>
-            <strong>Platform</strong>
-            {record.platform}
-          </span>
-        ) : null}
-
-        {record.identifier ? (
-          <span>
-            <strong>Identifier</strong>
-            <code>{record.identifier}</code>
-          </span>
-        ) : null}
-      </div>
-
-      {record.description ? <p className="description">{record.description}</p> : null}
-
-      {record.relationship ? (
-        <div className="relationship">
-          <strong>Relationship to the TA-14 corpus</strong>
-          <p>{record.relationship}</p>
-        </div>
-      ) : null}
-
-      {record.tags?.length ? (
-        <div className="tags">
-          {record.tags.map((tag) => (
-            <span key={tag}>{tag}</span>
-          ))}
-        </div>
-      ) : null}
-
-      <div className="recordFooter">
-        <span>{record.id}</span>
-        {record.href ? (
-          <a href={record.href} target="_blank" rel="noreferrer">
-            Open public record ↗
-          </a>
-        ) : (
-          <span className="pending">Direct public link pending</span>
-        )}
-      </div>
-    </article>
-  );
-}
-
-export default function PublicCorpusPage() {
-  const [query, setQuery] = useState("");
-  const [activeCategory, setActiveCategory] =
-    useState<"ALL" | CorpusCategory>("ALL");
-  const [activeYear, setActiveYear] = useState("ALL");
-  const [sortOrder, setSortOrder] = useState<"NEWEST" | "OLDEST" | "TITLE">(
-    "NEWEST",
-  );
-
-  const years = useMemo(
-    () =>
-      Array.from(new Set(TA14_PUBLIC_CORPUS.map((record) => record.year))).sort(
-        (a, b) => b - a,
-      ),
-    [],
-  );
-
-  const filteredRecords = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-
-    const matching = TA14_PUBLIC_CORPUS.filter((record) => {
-      const categoryMatch =
-        activeCategory === "ALL" || record.category === activeCategory;
-      const yearMatch =
-        activeYear === "ALL" || record.year === Number(activeYear);
-
-      const searchable = [
-        record.title,
-        record.date,
-        record.year,
-        record.author,
-        record.platform,
-        record.status,
-        record.identifier,
-        record.description,
-        record.relationship,
-        record.sourceClass,
-        ...(record.tags ?? []),
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .toLowerCase();
-
-      const queryMatch = !normalized || searchable.includes(normalized);
-
-      return categoryMatch && yearMatch && queryMatch;
-    });
-
-    return [...matching].sort((a, b) => {
-      if (sortOrder === "TITLE") {
-        return a.title.localeCompare(b.title);
-      }
-
-      const aDate = a.date ?? `${a.year}-01-01`;
-      const bDate = b.date ?? `${b.year}-01-01`;
-
-      return sortOrder === "NEWEST"
-        ? bDate.localeCompare(aDate)
-        : aDate.localeCompare(bDate);
-    });
-  }, [activeCategory, activeYear, query, sortOrder]);
-
-  const groupedRecords = useMemo(() => {
-    if (activeCategory !== "ALL") {
-      return [
-        {
-          category: activeCategory,
-          records: filteredRecords,
-        },
-      ];
-    }
-
-    return categories
-      .filter((category): category is CorpusCategory => category !== "ALL")
-      .map((category) => ({
-        category,
-        records: filteredRecords.filter(
-          (record) => record.category === category,
-        ),
-      }))
-      .filter((group) => group.records.length > 0);
-  }, [activeCategory, filteredRecords]);
-
+export default function FoundationPage() {
   return (
     <main className="page">
       <div className="cosmos" aria-hidden="true">
@@ -220,324 +109,244 @@ export default function PublicCorpusPage() {
         <div className="stars starsTwo" />
         <div className="glow glowBlue" />
         <div className="glow glowGold" />
+        <div className="route routeOne" />
+        <div className="route routeTwo" />
         <div className="orbit orbitOne" />
         <div className="orbit orbitTwo" />
-        <div className="line lineOne" />
-        <div className="line lineTwo" />
       </div>
 
       <header className="topbar">
-        <Link href="/foundation" className="brand">
+        <Link href="/" className="brand">
           <span className="brandMark">TA-14</span>
           <span>
-            <strong>TA-14 Public Corpus</strong>
-            <small>Complete institutional evidence ledger</small>
+            <strong>TA-14 Credentials & Public Record</strong>
+            <small>Identity • Corpus • Architecture • Evidence</small>
           </span>
         </Link>
 
-        <nav aria-label="Public corpus navigation">
-          <a href="#search">Search</a>
-          <a href="#records">All Records</a>
-          <a href="#categories">Categories</a>
-          <Link href="/foundation">Credentials</Link>
+        <nav aria-label="Foundation navigation">
+          <a href="#credentials-record">Credentials</a>
+          <Link href="/foundation/public-corpus">Public Corpus</Link>
+          <a href="#evidence-map">Evidence Map</a>
+          <a href="#boundary">Boundary</a>
           <Link href="/registry">Registry</Link>
         </nav>
 
-        <Link className="topAction" href="/workspace">
-          Open Exchange
+        <Link className="topAction" href="/foundation/public-corpus">
+          Search Corpus
         </Link>
       </header>
 
       <section className="hero shell">
-        <p className="eyebrow">TA-14 FOUNDATION • COMPLETE PUBLIC CORPUS</p>
+        <div className="seal" aria-hidden="true">
+          <span>TA-14</span>
+          <strong>FOUNDATION</strong>
+          <i />
+          <i />
+          <i />
+        </div>
+
+        <p className="eyebrow">TA-14 CREDENTIALS & PUBLIC RECORD</p>
 
         <h1>
-          The whole body of work,
-          <em> in one searchable place.</em>
+          Who we are should be visible
+          <em> in one public record.</em>
         </h1>
 
         <p className="heroLead">
-          This is the master institutional ledger for TA-14 books, articles,
-          public deposits, patent applications, standards, repositories,
-          implementations, architecture sites, and dated milestones. Visitors
-          should not have to search the internet one document at a time to
-          understand the size, chronology, or lineage of the work.
+          This is the public credentials entrance for TA-14: institution,
+          founder and stewardship identity, declared claims and boundaries,
+          founding architecture, chronology, publications, repositories,
+          filings, demonstrations, reference implementations, and challenge
+          routes.
         </p>
 
         <div className="heroActions">
-          <a className="button gold" href="#search">
-            Search the complete corpus <span>↓</span>
+          <Link className="button gold" href="/foundation/public-corpus">
+            Search the Complete Public Corpus <span>↗</span>
+          </Link>
+          <a className="button primary" href="#evidence-map">
+            Explore the Credentials Record <span>↓</span>
           </a>
-          <a className="button primary" href="#categories">
-            Browse by category <span>↓</span>
-          </a>
-          <Link className="button glass" href="/foundation">
-            Return to credentials <span>↗</span>
+          <Link className="button glass" href="/registry">
+            Open the AI Governance Registry <span>↗</span>
           </Link>
         </div>
 
-        <div className="summaryGrid">
-          <article>
-            <strong>{CORPUS_TOTAL}</strong>
-            <span>structured public records currently entered</span>
-          </article>
-          <article>
-            <strong>{CORPUS_COUNTS.BOOK}</strong>
-            <span>books and long-form publications</span>
-          </article>
-          <article>
-            <strong>{CORPUS_COUNTS.ARTICLE}</strong>
-            <span>articles and public essays</span>
-          </article>
-          <article>
-            <strong>{CORPUS_COUNTS.ZENODO}</strong>
-            <span>Zenodo and DOI records</span>
-          </article>
-          <article>
-            <strong>{CORPUS_COUNTS.PATENT}</strong>
-            <span>patent and filing records</span>
-          </article>
-          <article>
-            <strong>
-              {CORPUS_COUNTS.REPOSITORY +
-                CORPUS_COUNTS.SITE +
-                CORPUS_COUNTS.IMPLEMENTATION}
-            </strong>
-            <span>repositories, sites, and implementations</span>
-          </article>
-        </div>
-      </section>
-
-      <section id="search" className="searchSection shell">
-        <div className="sectionHeading">
-          <p className="eyebrow">SEARCH & FILTER</p>
-          <h2>Find any entered TA-14 record by title, date, identifier, or subject.</h2>
-          <p>
-            Search terms are matched against titles, authors, platforms,
-            identifiers, descriptions, relationships, and tags.
-          </p>
-        </div>
-
-        <div className="searchPanel">
-          <label className="searchField">
-            <span>Search the complete corpus</span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              type="search"
-              placeholder="Try: admissibility, AIR, EU AI Act, refrigerant, evidence, execution…"
-            />
-          </label>
-
-          <div className="controlRow">
-            <label>
-              <span>Category</span>
-              <select
-                value={activeCategory}
-                onChange={(event) =>
-                  setActiveCategory(
-                    event.target.value as "ALL" | CorpusCategory,
-                  )
-                }
-              >
-                <option value="ALL">All categories</option>
-                {categories
-                  .filter(
-                    (category): category is CorpusCategory =>
-                      category !== "ALL",
-                  )
-                  .map((category) => (
-                    <option key={category} value={category}>
-                      {CORPUS_CATEGORY_LABELS[category]}
-                    </option>
-                  ))}
-              </select>
-            </label>
-
-            <label>
-              <span>Year</span>
-              <select
-                value={activeYear}
-                onChange={(event) => setActiveYear(event.target.value)}
-              >
-                <option value="ALL">All years</option>
-                {years.map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <label>
-              <span>Sort</span>
-              <select
-                value={sortOrder}
-                onChange={(event) =>
-                  setSortOrder(
-                    event.target.value as "NEWEST" | "OLDEST" | "TITLE",
-                  )
-                }
-              >
-                <option value="NEWEST">Newest first</option>
-                <option value="OLDEST">Oldest first</option>
-                <option value="TITLE">Title A–Z</option>
-              </select>
-            </label>
-          </div>
-
-          <div className="activeSummary">
-            <span>
-              {filteredRecords.length} of {CORPUS_TOTAL} records shown
-            </span>
-            {(query ||
-              activeCategory !== "ALL" ||
-              activeYear !== "ALL" ||
-              sortOrder !== "NEWEST") && (
-              <button
-                type="button"
-                onClick={() => {
-                  setQuery("");
-                  setActiveCategory("ALL");
-                  setActiveYear("ALL");
-                  setSortOrder("NEWEST");
-                }}
-              >
-                Clear all filters
-              </button>
-            )}
-          </div>
-        </div>
-      </section>
-
-      <section id="categories" className="categorySection shell">
-        <div className="sectionHeading">
-          <p className="eyebrow">PUBLIC CORPUS CATEGORIES</p>
-          <h2>Open the part of the record you need.</h2>
-        </div>
-
-        <div className="categoryGrid">
-          {categories
-            .filter(
-              (category): category is CorpusCategory => category !== "ALL",
-            )
-            .map((category, index) => (
-              <button
-                type="button"
-                key={category}
-                onClick={() => {
-                  setActiveCategory(category);
-                  document
-                    .getElementById("records")
-                    ?.scrollIntoView({ behavior: "smooth" });
-                }}
-              >
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <strong>{CORPUS_CATEGORY_LABELS[category]}</strong>
-                  <p>{categoryDescriptions[category]}</p>
-                </div>
-                <b>{CORPUS_COUNTS[category]}</b>
-              </button>
-            ))}
-        </div>
-      </section>
-
-      <section id="records" className="recordsSection shell">
-        <div className="recordsHeading">
+        <div className="corpusCallout">
           <div>
-            <p className="eyebrow">MASTER RECORD LIST</p>
-            <h2>
-              {activeCategory === "ALL"
-                ? "All entered public records"
-                : CORPUS_CATEGORY_LABELS[activeCategory]}
-            </h2>
-          </div>
-          <span>{filteredRecords.length} visible records</span>
-        </div>
-
-        {filteredRecords.length === 0 ? (
-          <div className="emptyState">
-            <h3>No matching public record was found.</h3>
+            <span className="status">COMPLETE PUBLIC CORPUS ACTIVE</span>
+            <h2>The whole kit and caboodle now has a permanent front door.</h2>
             <p>
-              Clear the filters or search a broader term. This result only means
-              the current structured corpus does not contain a matching entry.
+              Books, articles, public deposits, DOI records, patent applications,
+              standards, repositories, architecture sites, implementations, and
+              public chronology are available through one searchable ledger.
             </p>
           </div>
-        ) : (
-          <div className="recordGroups">
-            {groupedRecords.map((group) => (
-              <section className="recordGroup" key={group.category}>
-                <div className="groupHeading">
-                  <div>
-                    <span>{group.category}</span>
-                    <h3>{CORPUS_CATEGORY_LABELS[group.category]}</h3>
-                  </div>
-                  <strong>{group.records.length}</strong>
-                </div>
 
-                <div className="recordGrid">
-                  {group.records.map((record) => (
-                    <RecordCard record={record} key={record.id} />
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
-        )}
+          <Link href="/foundation/public-corpus">
+            <strong>Open the Complete TA-14 Public Corpus</strong>
+            <span>Search every entered record →</span>
+          </Link>
+        </div>
       </section>
 
-      <section className="boundary shell">
-        <div>
-          <p className="eyebrow">PUBLIC CORPUS BOUNDARY</p>
-          <h2>This ledger preserves what TA-14 claims, published, filed, and implemented.</h2>
+      <section id="credentials-record" className="recordSection shell">
+        <div className="recordCopy">
+          <span className="status">PUBLIC CREDENTIAL RECORD ACTIVE</span>
+          <p className="eyebrow">IDENTITY & STEWARDSHIP</p>
+          <h2>TA-14 Authority Governance Institution</h2>
           <p>
-            Inclusion in this corpus is a public-record function. It does not
-            automatically establish legal priority, patent validity,
-            certification, accreditation, regulatory approval, independent
-            validation, or proof that every implementation performs as claimed.
-            Those determinations require their own evidence and review.
+            This record lets any visitor inspect who TA-14 says it is, who
+            claims and stewards the architecture, what has been architected and
+            published, what evidence is publicly available, what remains only a
+            declared claim, and where challenge, correction, or dispute should
+            be directed.
+          </p>
+
+          <div className="identityGrid">
+            <div>
+              <small>Institution</small>
+              <strong>TA-14 Authority Governance Institution</strong>
+            </div>
+            <div>
+              <small>Founder and steward</small>
+              <strong>Greggory Don Butler</strong>
+            </div>
+            <div>
+              <small>Public record identifier</small>
+              <strong>TA-14-CREDENTIALS-000001</strong>
+            </div>
+            <div>
+              <small>Visibility and status</small>
+              <strong>Public • Active</strong>
+            </div>
+          </div>
+        </div>
+
+        <div className="chainPanel">
+          <p className="eyebrow">THE TA-14 GOVERNING CHAIN</p>
+          <div className="chain">
+            {chain.map((item, index) => (
+              <div key={item}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item}</strong>
+                {index < chain.length - 1 && <i>→</i>}
+              </div>
+            ))}
+          </div>
+          <p>
+            Each link remains distinguishable so evidence, authority,
+            determination, execution, and outcome cannot silently collapse into
+            one another.
+          </p>
+        </div>
+      </section>
+
+      <section className="corpusRoutes shell">
+        <div className="sectionHeading">
+          <p className="eyebrow">DIRECT CORPUS ACCESS</p>
+          <h2>Do not make visitors hunt for the record.</h2>
+          <p>
+            Every major publication and evidence category opens the same master
+            ledger, where visitors can search, filter, sort, and inspect the
+            entered records.
           </p>
         </div>
 
-        <div className="boundaryCards">
+        <div className="routeGrid">
+          {corpusRoutes.map(([label, href], index) => (
+            <Link href={href} key={label}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <strong>{label}</strong>
+              <b>→</b>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section id="evidence-map" className="mapSection shell">
+        <div className="sectionHeading">
+          <p className="eyebrow">CREDENTIALS & EVIDENCE MAP</p>
+          <h2>Every category of public proof in one entrance.</h2>
+          <p>
+            Each category answers a different question: who claims the work,
+            what was created, when it appeared, where it was published, what
+            was implemented, and what remains bounded, disputed, or unverified.
+          </p>
+        </div>
+
+        <div className="foundationGrid">
+          {foundationDomains.map((item, index) => (
+            <Link
+              href={item.href}
+              className={`foundationCard ${item.featured ? "featured" : ""}`}
+              key={item.title}
+              style={{ "--delay": `${index * 0.04}s` } as CSSProperties}
+            >
+              <span>{item.code}</span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+              <div>
+                Open record <b>→</b>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      <section id="boundary" className="boundarySection shell">
+        <div>
+          <p className="eyebrow">CREDENTIALS BOUNDARY</p>
+          <h2>Public proof is not the same as independent validation.</h2>
+          <p>
+            This credentials record documents identity, stewardship,
+            architecture, chronology, publications, repositories, filings,
+            implementations, claims, non-claims, and declared boundaries. It
+            does not automatically provide legal priority, regulatory approval,
+            accreditation, certification, independent validation, or proof that
+            any implementation performs as claimed.
+          </p>
+        </div>
+
+        <div className="boundaryGrid">
           <article>
-            <strong>What this page does</strong>
+            <strong>The Public Corpus preserves</strong>
             <p>
-              Makes titles, dates, identifiers, chronology, links, scope, and
-              relationships visible and searchable.
+              Titles, dates, identifiers, public links, chronology, categories,
+              relationships, status, and declared scope.
             </p>
           </article>
           <article>
-            <strong>What the Registry does</strong>
+            <strong>The Registry preserves</strong>
             <p>
-              Preserves governance registrations, claims, non-claims, evidence,
-              status, disputes, and version history.
+              Individual dated and attributable governance records, including
+              claims, non-claims, evidence, disputes, status, and version history.
             </p>
           </article>
           <article>
-            <strong>What verification must do</strong>
+            <strong>Verification must still establish</strong>
             <p>
-              Determine whether a particular claim, route, execution, or
-              outcome remains supported by admissible evidence.
+              Whether a specific implementation, route, execution, or outcome
+              remains supported by admissible evidence.
             </p>
           </article>
         </div>
       </section>
 
       <section className="closing shell">
-        <p className="eyebrow">TA-14 FOUNDATION</p>
-        <h2>A visitor should be able to see the lineage without being told to go find it.</h2>
+        <p className="eyebrow">TA-14 CREDENTIALS & PUBLIC RECORD</p>
+        <h2>Start with who we are. Then inspect the complete body of work.</h2>
 
         <div className="heroActions">
-          <a className="button gold" href="#search">
-            Search again <span>↑</span>
-          </a>
-          <Link className="button primary" href="/foundation">
-            Open credentials home <span>↗</span>
+          <Link className="button gold" href="/foundation/public-corpus">
+            Open Complete Public Corpus <span>↗</span>
           </Link>
-          <Link className="button glass" href="/registry">
-            Open Registry <span>↗</span>
+          <Link className="button primary" href="/workspace/ai-governance/registry">
+            Open Architectural Registry <span>↗</span>
+          </Link>
+          <Link className="button glass" href="/workspace">
+            Enter the Exchange <span>↗</span>
           </Link>
         </div>
 
@@ -545,10 +354,9 @@ export default function PublicCorpusPage() {
       </section>
 
       <footer className="shell">
-        <span>TA-14 Complete Public Corpus</span>
+        <span>TA-14 Credentials & Public Record</span>
         <span>
-          Books • Articles • DOI Records • Patents • Standards • Repositories •
-          Implementations
+          Identity • Corpus • Architecture • Publications • Filings • Evidence
         </span>
       </footer>
 
@@ -557,8 +365,8 @@ export default function PublicCorpusPage() {
           color-scheme: dark;
           --bg: #020711;
           --text: #f5f9ff;
-          --muted: #a7b9c5;
-          --blue: #73dff0;
+          --muted: #a9bac6;
+          --blue: #72dff0;
           --gold: #f1c36d;
         }
 
@@ -573,8 +381,8 @@ export default function PublicCorpusPage() {
 
         body {
           margin: 0;
-          color: var(--text);
           background: var(--bg);
+          color: var(--text);
           font-family: Inter, ui-sans-serif, system-ui, -apple-system,
             BlinkMacSystemFont, "Segoe UI", sans-serif;
         }
@@ -584,24 +392,18 @@ export default function PublicCorpusPage() {
           text-decoration: none;
         }
 
-        button,
-        input,
-        select {
-          font: inherit;
-        }
-
         .page {
           min-height: 100vh;
           position: relative;
           overflow: hidden;
           isolation: isolate;
           background:
-            radial-gradient(circle at 50% 0%, rgba(29, 105, 166, 0.2), transparent 32%),
-            linear-gradient(180deg, #020711, #07121e 52%, #020711);
+            radial-gradient(circle at 50% 0%, rgba(31, 104, 164, 0.2), transparent 34%),
+            linear-gradient(180deg, #020711, #07121e 55%, #020711);
         }
 
         .shell {
-          width: min(1380px, calc(100% - 40px));
+          width: min(1320px, calc(100% - 40px));
           margin-inline: auto;
           position: relative;
           z-index: 2;
@@ -610,8 +412,8 @@ export default function PublicCorpusPage() {
         .cosmos {
           position: fixed;
           inset: 0;
-          pointer-events: none;
           overflow: hidden;
+          pointer-events: none;
           z-index: -2;
         }
 
@@ -623,96 +425,94 @@ export default function PublicCorpusPage() {
         .starsOne {
           background-image: radial-gradient(
             circle,
-            rgba(255, 255, 255, 0.82) 0 1px,
+            rgba(255, 255, 255, 0.8) 0 1px,
             transparent 1.4px
           );
-          background-size: 92px 92px;
-          animation: drift 54s linear infinite;
+          background-size: 96px 96px;
+          animation: drift 50s linear infinite;
         }
 
         .starsTwo {
           background-image: radial-gradient(
             circle,
-            rgba(103, 216, 241, 0.76) 0 1px,
+            rgba(102, 214, 241, 0.72) 0 1px,
             transparent 1.5px
           );
-          background-size: 157px 157px;
-          animation: drift 70s linear infinite reverse;
+          background-size: 161px 161px;
+          animation: drift 68s linear infinite reverse;
         }
 
         .glow {
           position: absolute;
-          width: 720px;
-          height: 720px;
+          width: 680px;
+          height: 680px;
           border-radius: 50%;
-          filter: blur(130px);
-          opacity: 0.14;
+          filter: blur(120px);
+          opacity: 0.15;
         }
 
         .glowBlue {
-          left: -330px;
-          top: 8%;
+          left: -300px;
+          top: 12%;
           background: #087ed2;
         }
 
         .glowGold {
-          right: -350px;
-          top: 42%;
+          right: -340px;
+          top: 40%;
           background: #c78220;
         }
 
-        .orbit {
+        .route {
           position: absolute;
-          width: 480px;
-          height: 480px;
-          border-radius: 50%;
-          border: 1px solid rgba(116, 221, 242, 0.12);
-        }
-
-        .orbitOne {
-          left: -220px;
-          top: 24%;
-          animation: spin 32s linear infinite;
-        }
-
-        .orbitTwo {
-          right: -250px;
-          top: 61%;
-          width: 620px;
-          height: 620px;
-          border-color: rgba(241, 195, 109, 0.11);
-          animation: spin 44s linear infinite reverse;
-        }
-
-        .line {
-          position: absolute;
-          width: 90vw;
+          width: 85vw;
           height: 1px;
           background: linear-gradient(
             90deg,
             transparent,
             rgba(111, 218, 239, 0.5),
-            rgba(242, 191, 109, 0.42),
+            rgba(242, 191, 109, 0.45),
             transparent
           );
         }
 
-        .lineOne {
-          top: 31%;
-          left: -35%;
+        .routeOne {
+          top: 28%;
+          left: -20%;
           transform: rotate(-8deg);
-          animation: routeMove 20s linear infinite;
+          animation: routeMove 18s linear infinite;
         }
 
-        .lineTwo {
-          top: 73%;
-          right: -40%;
+        .routeTwo {
+          top: 70%;
+          right: -25%;
           transform: rotate(10deg);
-          animation: routeMove 26s linear infinite reverse;
+          animation: routeMove 24s linear infinite reverse;
+        }
+
+        .orbit {
+          position: absolute;
+          width: 520px;
+          height: 520px;
+          border: 1px solid rgba(111, 218, 239, 0.1);
+          border-radius: 50%;
+        }
+
+        .orbitOne {
+          left: -290px;
+          top: 36%;
+          animation: spin 35s linear infinite;
+        }
+
+        .orbitTwo {
+          right: -330px;
+          top: 66%;
+          border-color: rgba(242, 191, 109, 0.11);
+          animation: spin 47s linear infinite reverse;
         }
 
         .topbar {
-          width: min(1500px, calc(100% - 36px));
+          width: min(1480px, calc(100% - 36px));
           min-height: 76px;
           margin: 18px auto 0;
           padding: 12px 14px 12px 18px;
@@ -724,7 +524,7 @@ export default function PublicCorpusPage() {
           gap: 24px;
           border: 1px solid rgba(123, 208, 232, 0.18);
           border-radius: 20px;
-          background: rgba(2, 10, 19, 0.76);
+          background: rgba(2, 10, 19, 0.74);
           backdrop-filter: blur(18px);
         }
 
@@ -789,19 +589,77 @@ export default function PublicCorpusPage() {
           align-items: center;
           padding: 0 17px;
           border-radius: 13px;
-          border: 1px solid rgba(137, 205, 255, 0.27);
+          border: 1px solid rgba(242, 191, 109, 0.34);
+          color: #ffe2a3;
           background: linear-gradient(
             180deg,
-            rgba(34, 79, 112, 0.76),
-            rgba(8, 27, 43, 0.88)
+            rgba(91, 58, 14, 0.66),
+            rgba(31, 22, 9, 0.86)
           );
           font-size: 11px;
           font-weight: 900;
         }
 
         .hero {
-          padding: 118px 0 92px;
+          padding: 100px 0 105px;
           text-align: center;
+        }
+
+        .seal {
+          width: 190px;
+          height: 190px;
+          margin: 0 auto 30px;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          border: 2px solid rgba(242, 191, 109, 0.56);
+          background: radial-gradient(
+            circle,
+            rgba(83, 200, 224, 0.18),
+            rgba(6, 21, 34, 0.95) 62%
+          );
+          box-shadow:
+            0 0 70px rgba(74, 195, 225, 0.18),
+            inset 0 0 35px rgba(255, 192, 66, 0.08);
+        }
+
+        .seal span {
+          color: var(--blue);
+          font-size: 12px;
+          font-weight: 950;
+          letter-spacing: 0.2em;
+        }
+
+        .seal strong {
+          margin-top: 8px;
+          color: #ffe3a2;
+          font-family: Georgia, serif;
+          font-size: 23px;
+          letter-spacing: 0.05em;
+        }
+
+        .seal i {
+          position: absolute;
+          inset: 15px;
+          border-radius: 50%;
+          border: 1px solid rgba(111, 218, 239, 0.24);
+          animation: spin 15s linear infinite;
+        }
+
+        .seal i:nth-of-type(2) {
+          inset: 32px;
+          border-color: rgba(242, 191, 109, 0.25);
+          animation-direction: reverse;
+          animation-duration: 11s;
+        }
+
+        .seal i:nth-of-type(3) {
+          inset: -22px;
+          border-color: rgba(197, 126, 255, 0.18);
+          animation-duration: 22s;
         }
 
         .eyebrow {
@@ -812,17 +670,11 @@ export default function PublicCorpusPage() {
           letter-spacing: 0.22em;
         }
 
-        h1,
-        h2,
-        h3,
-        p {
-          margin-top: 0;
-        }
-
         .hero h1,
+        .corpusCallout h2,
+        .recordCopy h2,
         .sectionHeading h2,
-        .recordsHeading h2,
-        .boundary h2,
+        .boundarySection h2,
         .closing h2 {
           font-family: Georgia, "Times New Roman", serif;
           letter-spacing: -0.048em;
@@ -830,10 +682,10 @@ export default function PublicCorpusPage() {
         }
 
         .hero h1 {
-          max-width: 1180px;
-          margin: 18px auto 23px;
-          font-size: clamp(54px, 7.6vw, 104px);
-          line-height: 0.94;
+          max-width: 1120px;
+          margin: 18px auto 22px;
+          font-size: clamp(52px, 7.2vw, 100px);
+          line-height: 0.95;
           font-weight: 500;
         }
 
@@ -843,7 +695,7 @@ export default function PublicCorpusPage() {
         }
 
         .heroLead {
-          max-width: 1000px;
+          max-width: 960px;
           margin: 0 auto;
           color: #c0d0da;
           font-size: 18px;
@@ -878,23 +730,13 @@ export default function PublicCorpusPage() {
         .button.primary {
           color: #031019;
           border-color: #a8effa;
-          background: linear-gradient(
-            135deg,
-            #c7f5ff,
-            #68d2ec 62%,
-            #339fc1
-          );
+          background: linear-gradient(135deg, #c7f5ff, #68d2ec 62%, #339fc1);
         }
 
         .button.gold {
           color: #281600;
           border-color: #f6d487;
-          background: linear-gradient(
-            135deg,
-            #fff0b0,
-            #efbd58 62%,
-            #b66e12
-          );
+          background: linear-gradient(135deg, #fff0b0, #efbd58 62%, #b66e12);
         }
 
         .button.glass {
@@ -907,187 +749,280 @@ export default function PublicCorpusPage() {
           );
         }
 
-        .summaryGrid {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
-          gap: 10px;
-          margin-top: 58px;
-        }
-
-        .summaryGrid article {
-          min-height: 132px;
-          padding: 18px 14px;
-          display: flex;
-          flex-direction: column;
+        .status {
+          display: inline-flex;
+          min-height: 31px;
           align-items: center;
-          justify-content: center;
-          border-radius: 18px;
-          border: 1px solid rgba(109, 216, 255, 0.15);
-          background: rgba(6, 22, 35, 0.76);
+          padding: 0 11px;
+          margin-bottom: 24px;
+          border-radius: 999px;
+          border: 1px solid rgba(242, 191, 109, 0.3);
+          color: #ffdf9c;
+          background: rgba(104, 62, 10, 0.16);
+          font-size: 9px;
+          font-weight: 950;
+          letter-spacing: 0.1em;
         }
 
-        .summaryGrid strong {
-          color: var(--gold);
-          font-family: Georgia, serif;
-          font-size: 42px;
-          font-weight: 500;
+        .corpusCallout {
+          max-width: 1120px;
+          margin: 58px auto 0;
+          padding: 26px;
+          display: grid;
+          grid-template-columns: 1fr 320px;
+          align-items: center;
+          gap: 24px;
+          text-align: left;
+          border: 1px solid rgba(242, 191, 109, 0.31);
+          border-radius: 25px;
+          background:
+            radial-gradient(circle at 100% 0%, rgba(242, 191, 109, 0.14), transparent 40%),
+            linear-gradient(145deg, rgba(14, 35, 52, 0.95), rgba(6, 17, 28, 0.98));
         }
 
-        .summaryGrid span {
-          margin-top: 7px;
-          color: #93a8b7;
-          font-size: 10px;
-          line-height: 1.45;
-          font-weight: 850;
-          text-transform: uppercase;
-          letter-spacing: 0.06em;
-        }
-
-        .searchSection,
-        .categorySection,
-        .recordsSection {
-          padding: 100px 0;
-        }
-
-        .sectionHeading {
-          max-width: 980px;
-        }
-
-        .sectionHeading h2,
-        .recordsHeading h2,
-        .boundary h2,
-        .closing h2 {
-          margin: 12px 0 16px;
-          font-size: clamp(40px, 5vw, 70px);
+        .corpusCallout h2 {
+          margin: 0 0 12px;
+          font-size: clamp(34px, 4vw, 52px);
           line-height: 1;
           font-weight: 500;
         }
 
+        .corpusCallout p {
+          margin: 0;
+          color: #adbec9;
+          line-height: 1.68;
+        }
+
+        .corpusCallout > a {
+          min-height: 150px;
+          padding: 24px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          border-radius: 18px;
+          color: #251600;
+          background: linear-gradient(135deg, #fff0b0, #efbd58 64%, #b66e12);
+          transition: transform 0.22s ease;
+        }
+
+        .corpusCallout > a:hover {
+          transform: translateY(-4px);
+        }
+
+        .corpusCallout > a strong {
+          font-family: Georgia, serif;
+          font-size: 24px;
+          line-height: 1.1;
+        }
+
+        .corpusCallout > a span {
+          margin-top: 12px;
+          font-size: 10px;
+          font-weight: 950;
+          text-transform: uppercase;
+        }
+
+        .recordSection {
+          display: grid;
+          grid-template-columns: 1.08fr 0.92fr;
+          gap: 24px;
+          padding: 90px 0;
+        }
+
+        .recordCopy,
+        .chainPanel {
+          padding: 38px;
+          border-radius: 28px;
+          border: 1px solid rgba(112, 210, 234, 0.17);
+          background: linear-gradient(
+            145deg,
+            rgba(12, 35, 51, 0.92),
+            rgba(5, 16, 28, 0.97)
+          );
+        }
+
+        .recordCopy h2,
+        .sectionHeading h2,
+        .boundarySection h2,
+        .closing h2 {
+          margin: 12px 0 16px;
+          font-size: clamp(40px, 5vw, 68px);
+          line-height: 1;
+          font-weight: 500;
+        }
+
+        .recordCopy > p:last-of-type,
         .sectionHeading > p:last-child,
-        .boundary > div:first-child > p:last-child {
+        .boundarySection > div:first-child > p:last-child {
           color: var(--muted);
           line-height: 1.75;
         }
 
-        .searchPanel {
-          margin-top: 38px;
-          padding: 24px;
+        .identityGrid {
           display: grid;
-          gap: 20px;
-          border: 1px solid rgba(112, 210, 234, 0.18);
-          border-radius: 24px;
-          background: linear-gradient(
-            145deg,
-            rgba(11, 31, 47, 0.92),
-            rgba(4, 15, 25, 0.96)
-          );
+          grid-template-columns: repeat(2, 1fr);
+          gap: 10px;
+          margin-top: 28px;
         }
 
-        .searchField,
-        .controlRow label {
+        .identityGrid div {
+          padding: 15px;
+          border-radius: 14px;
+          border: 1px solid rgba(109, 216, 255, 0.14);
+          background: rgba(4, 20, 33, 0.72);
+        }
+
+        .identityGrid small {
+          display: block;
+          color: #8099aa;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .identityGrid strong {
+          display: block;
+          margin-top: 7px;
+          font-family: Georgia, serif;
+          font-size: 16px;
+        }
+
+        .chain {
           display: grid;
           gap: 9px;
+          margin-top: 24px;
         }
 
-        .searchField > span,
-        .controlRow label > span {
-          color: #b8cad6;
-          font-size: 10px;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.09em;
-        }
-
-        input,
-        select {
-          width: 100%;
-          min-height: 54px;
-          padding: 0 16px;
-          color: white;
-          border: 1px solid rgba(109, 216, 255, 0.22);
-          border-radius: 13px;
-          background: rgba(2, 10, 18, 0.86);
-          outline: none;
-        }
-
-        input:focus,
-        select:focus {
-          border-color: var(--gold);
-          box-shadow: 0 0 0 3px rgba(241, 195, 109, 0.1);
-        }
-
-        .controlRow {
+        .chain > div {
+          min-height: 48px;
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 12px;
-        }
-
-        .activeSummary {
-          min-height: 44px;
-          display: flex;
+          grid-template-columns: 42px 1fr 24px;
           align-items: center;
-          justify-content: space-between;
-          gap: 16px;
-          color: #8fa4b2;
-          font-size: 11px;
-          font-weight: 900;
-          text-transform: uppercase;
-          letter-spacing: 0.07em;
+          gap: 12px;
+          padding: 0 14px;
+          border-radius: 12px;
+          border: 1px solid rgba(242, 191, 109, 0.16);
+          background: rgba(71, 45, 9, 0.11);
         }
 
-        .activeSummary button {
-          min-height: 38px;
-          padding: 0 12px;
-          color: #ffe1a0;
-          border: 1px solid rgba(241, 195, 109, 0.28);
-          border-radius: 999px;
-          background: rgba(99, 62, 10, 0.16);
-          cursor: pointer;
-          font-size: 10px;
-          font-weight: 900;
+        .chain span {
+          color: var(--blue);
+          font-size: 9px;
+          font-weight: 950;
         }
 
-        .categoryGrid {
+        .chain strong {
+          font-family: Georgia, serif;
+          font-size: 16px;
+        }
+
+        .chain i {
+          color: var(--gold);
+          font-style: normal;
+        }
+
+        .chainPanel > p:last-child {
+          color: #9fb0bb;
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        .corpusRoutes,
+        .mapSection {
+          padding: 100px 0;
+        }
+
+        .sectionHeading {
+          max-width: 950px;
+        }
+
+        .routeGrid {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(4, 1fr);
+          gap: 12px;
+          margin-top: 38px;
+        }
+
+        .routeGrid a {
+          min-height: 145px;
+          padding: 20px;
+          display: grid;
+          grid-template-columns: 34px 1fr 18px;
+          align-items: center;
+          gap: 12px;
+          border: 1px solid rgba(242, 191, 109, 0.19);
+          border-radius: 17px;
+          background: linear-gradient(
+            145deg,
+            rgba(16, 36, 52, 0.9),
+            rgba(6, 17, 28, 0.97)
+          );
+          transition:
+            transform 0.22s ease,
+            border-color 0.22s ease;
+        }
+
+        .routeGrid a:hover {
+          transform: translateY(-5px);
+          border-color: rgba(242, 191, 109, 0.5);
+        }
+
+        .routeGrid span {
+          color: var(--blue);
+          font-size: 9px;
+          font-weight: 950;
+        }
+
+        .routeGrid strong {
+          font-family: Georgia, serif;
+          font-size: 19px;
+          font-weight: 500;
+        }
+
+        .routeGrid b {
+          color: var(--gold);
+        }
+
+        .foundationGrid {
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
           gap: 14px;
           margin-top: 40px;
         }
 
-        .categoryGrid button {
-          min-height: 250px;
-          padding: 24px;
-          display: grid;
-          grid-template-columns: 42px 1fr auto;
-          gap: 15px;
-          align-items: start;
-          color: white;
-          text-align: left;
+        .foundationCard {
+          min-height: 255px;
+          padding: 25px;
+          display: flex;
+          flex-direction: column;
           border-radius: 22px;
           border: 1px solid rgba(109, 216, 255, 0.16);
           background:
-            radial-gradient(
-              circle at 100% 0%,
-              rgba(109, 216, 255, 0.08),
-              transparent 38%
-            ),
-            linear-gradient(
-              155deg,
-              rgba(12, 35, 54, 0.92),
-              rgba(4, 15, 26, 0.97)
-            );
-          cursor: pointer;
+            radial-gradient(circle at 100% 0%, rgba(109, 216, 255, 0.08), transparent 38%),
+            linear-gradient(155deg, rgba(12, 35, 54, 0.92), rgba(4, 15, 26, 0.97));
           transition:
             transform 0.24s ease,
             border-color 0.24s ease;
+          animation: rise 0.6s ease both;
+          animation-delay: var(--delay);
         }
 
-        .categoryGrid button:hover {
+        .foundationCard.featured {
+          grid-column: 1 / -1;
+          min-height: 280px;
+          border-color: rgba(242, 191, 109, 0.4);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(242, 191, 109, 0.16), transparent 40%),
+            linear-gradient(155deg, rgba(25, 42, 54, 0.95), rgba(9, 18, 27, 0.98));
+        }
+
+        .foundationCard:hover {
           transform: translateY(-6px);
           border-color: rgba(242, 191, 109, 0.44);
         }
 
-        .categoryGrid button > span {
+        .foundationCard > span {
           width: 40px;
           height: 40px;
           display: grid;
@@ -1099,333 +1034,63 @@ export default function PublicCorpusPage() {
           font-weight: 950;
         }
 
-        .categoryGrid strong {
-          display: block;
-          margin-bottom: 11px;
+        .foundationCard h3 {
+          margin: 24px 0 10px;
           font-family: Georgia, serif;
-          font-size: 25px;
+          font-size: 28px;
           font-weight: 500;
         }
 
-        .categoryGrid p {
+        .foundationCard p {
           margin: 0;
           color: #9fb1bc;
-          font-size: 12px;
-          line-height: 1.66;
+          font-size: 13px;
+          line-height: 1.68;
         }
 
-        .categoryGrid b {
-          min-width: 35px;
-          height: 35px;
-          display: grid;
-          place-items: center;
-          border-radius: 999px;
-          color: #241600;
-          background: linear-gradient(135deg, #fff0b0, #efbd58);
-          font-size: 11px;
-        }
-
-        .recordsHeading {
+        .foundationCard div {
           display: flex;
-          align-items: end;
           justify-content: space-between;
-          gap: 24px;
-          margin-bottom: 35px;
-        }
-
-        .recordsHeading > div {
-          max-width: 1000px;
-        }
-
-        .recordsHeading > span {
-          color: #91a6b5;
-          font-size: 11px;
-          font-weight: 900;
-          white-space: nowrap;
-        }
-
-        .recordGroups {
-          display: grid;
-          gap: 68px;
-        }
-
-        .recordGroup {
-          display: grid;
-          gap: 20px;
-        }
-
-        .groupHeading {
-          min-height: 78px;
-          padding: 0 20px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 20px;
-          border-bottom: 1px solid rgba(109, 216, 255, 0.18);
-        }
-
-        .groupHeading span {
-          color: var(--gold);
-          font-size: 9px;
-          font-weight: 950;
-          letter-spacing: 0.16em;
-        }
-
-        .groupHeading h3 {
-          margin: 5px 0 0;
-          font-family: Georgia, serif;
-          font-size: 31px;
-          font-weight: 500;
-        }
-
-        .groupHeading > strong {
-          width: 46px;
-          height: 46px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          color: var(--blue);
-          border: 1px solid rgba(109, 216, 255, 0.25);
-          font-size: 12px;
-        }
-
-        .recordGrid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 13px;
-        }
-
-        .recordCard {
-          min-width: 0;
-          padding: 22px;
-          display: flex;
-          flex-direction: column;
-          border-radius: 20px;
-          border: 1px solid rgba(109, 216, 255, 0.13);
-          background: linear-gradient(
-            145deg,
-            rgba(11, 31, 47, 0.86),
-            rgba(4, 15, 25, 0.95)
-          );
-        }
-
-        .recordHeader {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: space-between;
-          gap: 8px;
-        }
-
-        .categoryPill,
-        .statusPill {
-          min-height: 27px;
-          padding: 0 9px;
-          display: inline-flex;
-          align-items: center;
-          border-radius: 999px;
-          font-size: 8px;
-          font-weight: 950;
-          letter-spacing: 0.08em;
-        }
-
-        .categoryPill {
-          color: #041117;
-          background: linear-gradient(135deg, #c7f5ff, #68d2ec);
-        }
-
-        .statusPill {
-          color: #ffe4a6;
-          border: 1px solid rgba(241, 195, 109, 0.24);
-          background: rgba(91, 58, 12, 0.16);
-        }
-
-        .recordCard h3 {
-          margin: 20px 0 18px;
-          font-family: Georgia, serif;
-          font-size: 26px;
-          line-height: 1.18;
-          font-weight: 500;
-        }
-
-        .recordDetails {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 8px;
-        }
-
-        .recordDetails > span {
-          min-width: 0;
-          padding: 11px;
-          display: grid;
-          gap: 5px;
-          border-radius: 12px;
-          background: rgba(255, 255, 255, 0.035);
-          color: #b9c9d3;
-          font-size: 11px;
-          overflow-wrap: anywhere;
-        }
-
-        .recordDetails strong {
-          color: #778f9f;
-          font-size: 8px;
-          text-transform: uppercase;
-          letter-spacing: 0.08em;
-        }
-
-        .recordDetails code {
-          color: #c2e4f2;
-          font-size: 10px;
-          overflow-wrap: anywhere;
-        }
-
-        .description {
-          margin: 16px 0 0;
-          color: #aebfca;
-          font-size: 12px;
-          line-height: 1.65;
-        }
-
-        .relationship {
-          margin-top: 16px;
-          padding: 14px;
-          border-left: 2px solid rgba(241, 195, 109, 0.5);
-          background: rgba(102, 63, 10, 0.09);
-        }
-
-        .relationship strong {
-          color: #f4d58e;
-          font-size: 9px;
-          text-transform: uppercase;
-          letter-spacing: 0.07em;
-        }
-
-        .relationship p {
-          margin: 7px 0 0;
-          color: #b4c3cc;
-          font-size: 11px;
-          line-height: 1.55;
-        }
-
-        .tags {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 6px;
-          margin-top: 16px;
-        }
-
-        .tags span {
-          padding: 6px 8px;
-          border-radius: 999px;
-          color: #91a9b8;
-          background: rgba(255, 255, 255, 0.04);
-          font-size: 9px;
-          font-weight: 800;
-        }
-
-        .recordFooter {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
           margin-top: auto;
-          padding-top: 20px;
-        }
-
-        .recordFooter > span:first-child {
-          color: #6e8594;
-          font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
-          font-size: 8px;
-          overflow-wrap: anywhere;
-        }
-
-        .recordFooter a,
-        .pending {
-          min-height: 39px;
-          padding: 0 11px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          border-radius: 11px;
-          font-size: 9px;
+          padding-top: 24px;
+          color: #ddf4ff;
+          font-size: 11px;
           font-weight: 900;
-          text-align: center;
         }
 
-        .recordFooter a {
-          color: #ffe1a0;
-          border: 1px solid rgba(241, 195, 109, 0.27);
-          background: rgba(100, 64, 14, 0.16);
-        }
-
-        .pending {
-          color: #758894;
-          border: 1px solid rgba(117, 136, 148, 0.14);
-          background: rgba(255, 255, 255, 0.025);
-        }
-
-        .emptyState {
-          padding: 70px 24px;
-          text-align: center;
-          border: 1px solid rgba(109, 216, 255, 0.15);
-          border-radius: 22px;
-          background: rgba(5, 18, 30, 0.75);
-        }
-
-        .emptyState h3 {
-          font-family: Georgia, serif;
-          font-size: 34px;
-          font-weight: 500;
-        }
-
-        .emptyState p {
-          max-width: 680px;
-          margin: 0 auto;
-          color: var(--muted);
-          line-height: 1.7;
-        }
-
-        .boundary {
-          margin-top: 80px;
-          padding: 72px 42px;
+        .boundarySection {
+          padding: 70px 42px;
           border-radius: 30px;
           border: 1px solid rgba(242, 191, 109, 0.22);
           background:
-            radial-gradient(
-              circle at 0 0,
-              rgba(183, 112, 26, 0.14),
-              transparent 35%
-            ),
-            linear-gradient(
-              145deg,
-              rgba(11, 28, 43, 0.95),
-              rgba(4, 13, 23, 0.98)
-            );
+            radial-gradient(circle at 0 0, rgba(183, 112, 26, 0.14), transparent 35%),
+            linear-gradient(145deg, rgba(11, 28, 43, 0.95), rgba(4, 13, 23, 0.98));
         }
 
-        .boundary > div:first-child {
-          max-width: 980px;
+        .boundarySection > div:first-child {
+          max-width: 930px;
         }
 
-        .boundaryCards {
+        .boundaryGrid {
           display: grid;
           grid-template-columns: repeat(3, 1fr);
           gap: 12px;
           margin-top: 34px;
         }
 
-        .boundaryCards article {
+        .boundaryGrid article {
           padding: 22px;
           border-radius: 17px;
           border: 1px solid rgba(109, 216, 255, 0.14);
           background: rgba(5, 20, 33, 0.73);
         }
 
-        .boundaryCards strong {
+        .boundaryGrid strong {
           font-family: Georgia, serif;
           font-size: 20px;
         }
 
-        .boundaryCards p {
+        .boundaryGrid p {
           color: #9fb0bc;
           font-size: 12px;
           line-height: 1.65;
@@ -1433,21 +1098,13 @@ export default function PublicCorpusPage() {
 
         .closing {
           margin-top: 110px;
-          padding: 80px 32px;
+          padding: 78px 32px;
           text-align: center;
           border-radius: 30px;
           border: 1px solid rgba(242, 191, 109, 0.22);
           background:
-            radial-gradient(
-              circle at 50% 0%,
-              rgba(242, 191, 109, 0.12),
-              transparent 40%
-            ),
-            linear-gradient(
-              145deg,
-              rgba(24, 25, 29, 0.94),
-              rgba(5, 15, 25, 0.98)
-            );
+            radial-gradient(circle at 50% 0%, rgba(242, 191, 109, 0.12), transparent 40%),
+            linear-gradient(145deg, rgba(24, 25, 29, 0.94), rgba(5, 15, 25, 0.98));
         }
 
         .closing > strong {
@@ -1498,38 +1155,40 @@ export default function PublicCorpusPage() {
           }
         }
 
-        @media (max-width: 1180px) {
+        @keyframes rise {
+          from {
+            opacity: 0;
+            transform: translateY(18px);
+          }
+
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+
+        @media (max-width: 1120px) {
           .topbar nav {
             display: none;
           }
 
-          .summaryGrid {
-            grid-template-columns: repeat(3, 1fr);
+          .recordSection,
+          .corpusCallout {
+            grid-template-columns: 1fr;
           }
 
-          .categoryGrid {
+          .routeGrid {
             grid-template-columns: repeat(2, 1fr);
           }
         }
 
-        @media (max-width: 860px) {
-          .recordGrid {
-            grid-template-columns: 1fr;
-          }
-
-          .controlRow,
-          .boundaryCards {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 700px) {
+        @media (max-width: 760px) {
           .shell {
-            width: min(100% - 24px, 1380px);
+            width: min(100% - 24px, 1320px);
           }
 
           .topbar {
-            width: min(100% - 22px, 1500px);
+            width: min(100% - 22px, 1480px);
           }
 
           .brand small,
@@ -1538,7 +1197,7 @@ export default function PublicCorpusPage() {
           }
 
           .hero {
-            padding: 82px 0 78px;
+            padding: 76px 0 82px;
           }
 
           .heroLead {
@@ -1550,40 +1209,22 @@ export default function PublicCorpusPage() {
             justify-content: center;
           }
 
-          .summaryGrid,
-          .categoryGrid,
-          .recordDetails {
-            grid-template-columns: 1fr;
-          }
-
-          .searchPanel,
-          .boundary,
-          .closing {
+          .recordCopy,
+          .chainPanel,
+          .boundarySection,
+          .corpusCallout {
             padding: 28px 20px;
           }
 
-          .categoryGrid button {
-            grid-template-columns: 42px 1fr;
+          .foundationGrid,
+          .identityGrid,
+          .boundaryGrid,
+          .routeGrid {
+            grid-template-columns: 1fr;
           }
 
-          .categoryGrid b {
-            grid-column: 1 / -1;
-          }
-
-          .recordsHeading {
-            align-items: flex-start;
-            flex-direction: column;
-          }
-
-          .recordFooter,
-          .activeSummary {
-            align-items: flex-start;
-            flex-direction: column;
-          }
-
-          .recordFooter a,
-          .pending {
-            width: 100%;
+          .foundationCard.featured {
+            grid-column: auto;
           }
 
           footer {
