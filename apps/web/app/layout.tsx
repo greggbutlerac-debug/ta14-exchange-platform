@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
 
+import SiteSearch from '../components/site-search';
 import {
   marketplaceActions,
   marketplaceRoutes,
@@ -21,10 +22,6 @@ const primaryNavigation = [
     href: '/workspace',
   },
   {
-    label: 'EU AI Act',
-    href: '/eu-ai-act',
-  },
-  {
     label: 'Marketplace',
     href: marketplaceRoutes.home,
   },
@@ -34,7 +31,15 @@ const primaryNavigation = [
   },
   {
     label: 'Verification',
-    href: '/workspace/verify',
+    href: '/verification',
+  },
+  {
+    label: 'Foundation',
+    href: '/foundation',
+  },
+  {
+    label: 'Public Corpus',
+    href: '/foundation/public-corpus',
   },
 ] as const;
 
@@ -47,7 +52,7 @@ export const metadata: Metadata = {
     template: '%s | TA-14 AI Governance Exchange',
   },
   description:
-    'Build, test, correct, preserve, and independently verify AI governance routes, governed records, and European Union Artificial Intelligence Act obligations through the TA-14 AI Governance Exchange.',
+    'Build, test, correct, preserve, and independently verify consequential execution routes through TA-14 admissible execution records.',
   applicationName: 'TA-14 AI Governance Exchange',
   authors: [
     {
@@ -59,18 +64,6 @@ export const metadata: Metadata = {
   keywords: [
     'TA-14',
     'TA-14 AI Governance Exchange',
-    'European Union Artificial Intelligence Act',
-    'EU AI Act',
-    'Regulation (EU) 2024/1689',
-    'EU AI Act Requirements',
-    'Article 50 Transparency',
-    'High-Risk AI Systems',
-    'Fundamental Rights Impact Assessment',
-    'GPAI',
-    'General-Purpose AI',
-    'AI Compliance',
-    'AI Governance Laboratory',
-    'AI Governance Playground',
     'Admissible Execution',
     'AI Governance',
     'Execution Governance',
@@ -82,6 +75,8 @@ export const metadata: Metadata = {
     'Consequential Execution',
     'TA14-RID',
     'Global Admissible Execution Exchange',
+    'TA-14 Public Corpus',
+    'TA-14 AI Governance Registry',
   ],
   category: 'technology',
   alternates: {
@@ -94,7 +89,7 @@ export const metadata: Metadata = {
     siteName: 'TA-14 AI Governance Exchange',
     title: 'TA-14 AI Governance Exchange',
     description:
-      'Build, test, and verify AI governance. Explore the European Union AI Act through interactive governance routes, governed records, and admissible execution.',
+      'Constitutional execution for the physical and digital world. No admissible evidence. No admissible execution.',
     images: [
       {
         url: '/opengraph-image.png',
@@ -108,7 +103,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'TA-14 AI Governance Exchange',
     description:
-      'Build, test, and verify AI governance. Explore the European Union AI Act through interactive governance routes, governed records, and admissible execution.',
+      'Constitutional execution for the physical and digital world. No admissible evidence. No admissible execution.',
     images: ['/opengraph-image.png'],
   },
   robots: {
@@ -192,119 +187,21 @@ export default function RootLayout({
               ))}
             </nav>
 
-            <Link
-              aria-label={marketplaceActions.postNeed.description}
-              className="siteHeaderAction"
-              href={marketplaceActions.postNeed.href}
-            >
-              {marketplaceActions.postNeed.shortLabel}
-            </Link>
+            <div className="siteHeaderTools">
+              <SiteSearch />
+
+              <Link
+                aria-label={marketplaceActions.postNeed.description}
+                className="siteHeaderAction"
+                href={marketplaceActions.postNeed.href}
+              >
+                {marketplaceActions.postNeed.shortLabel}
+              </Link>
+            </div>
           </div>
         </header>
 
         <div className="siteContent">{children}</div>
-
-        <Script
-          id="ta14-structured-data"
-          type="application/ld+json"
-          strategy="afterInteractive"
-        >
-          {JSON.stringify({
-            '@context': 'https://schema.org',
-            '@graph': [
-              {
-                '@type': 'Organization',
-                '@id':
-                  'https://ta14-exchange-platform-x2g7.vercel.app/#organization',
-                name: 'TA-14 Authority Governance Institution',
-                url: 'https://ta14-exchange-platform-x2g7.vercel.app',
-                founder: {
-                  '@type': 'Person',
-                  name: 'Greggory Don Butler',
-                },
-              },
-              {
-                '@type': 'WebSite',
-                '@id':
-                  'https://ta14-exchange-platform-x2g7.vercel.app/#website',
-                url: 'https://ta14-exchange-platform-x2g7.vercel.app',
-                name: 'TA-14 AI Governance Exchange',
-                description:
-                  'An interactive AI governance exchange for governed routes, governed records, verification, and European Union Artificial Intelligence Act requirements.',
-                publisher: {
-                  '@id':
-                    'https://ta14-exchange-platform-x2g7.vercel.app/#organization',
-                },
-                inLanguage: 'en-US',
-              },
-              {
-                '@type': 'SoftwareApplication',
-                '@id':
-                  'https://ta14-exchange-platform-x2g7.vercel.app/#application',
-                name: 'TA-14 AI Governance Exchange',
-                applicationCategory: 'BusinessApplication',
-                operatingSystem: 'Web',
-                url: 'https://ta14-exchange-platform-x2g7.vercel.app',
-                description:
-                  'A web-based AI governance laboratory for building, testing, correcting, preserving, and independently verifying consequential governance routes.',
-                creator: {
-                  '@id':
-                    'https://ta14-exchange-platform-x2g7.vercel.app/#organization',
-                },
-                offers: {
-                  '@type': 'Offer',
-                  price: '0',
-                  priceCurrency: 'USD',
-                  category: 'Free AI governance workspace access',
-                },
-                featureList: [
-                  'AI governance route construction',
-                  'Governed record creation',
-                  'Admissible execution testing',
-                  'Independent verification',
-                  'EU AI Act requirements exploration',
-                  'Article 50 transparency workspace',
-                  'High-risk AI lifecycle governance',
-                  'Fundamental rights impact assessment support',
-                ],
-              },
-              {
-                '@type': 'LearningResource',
-                '@id':
-                  'https://ta14-exchange-platform-x2g7.vercel.app/eu-ai-act#learning-resource',
-                name: 'TA-14 EU AI Act Governance Laboratory',
-                url:
-                  'https://ta14-exchange-platform-x2g7.vercel.app/eu-ai-act',
-                description:
-                  'A source-linked interactive learning and governance environment for exploring Regulation (EU) 2024/1689, applicable roles, obligations, evidence expectations, and governed implementation routes.',
-                learningResourceType: [
-                  'Interactive governance laboratory',
-                  'Requirements registry',
-                  'AI governance playground',
-                ],
-                educationalUse: [
-                  'Instruction',
-                  'Governance modeling',
-                  'Requirements mapping',
-                  'Scenario testing',
-                ],
-                teaches: [
-                  'European Union Artificial Intelligence Act',
-                  'Regulation (EU) 2024/1689',
-                  'Article 50 transparency',
-                  'High-risk AI systems',
-                  'Fundamental rights impact assessment',
-                  'General-purpose AI governance',
-                ],
-                isPartOf: {
-                  '@id':
-                    'https://ta14-exchange-platform-x2g7.vercel.app/#website',
-                },
-                inLanguage: 'en-US',
-              },
-            ],
-          })}
-        </Script>
 
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
@@ -345,12 +242,12 @@ export default function RootLayout({
           }
 
           .siteHeaderInner {
-            width: min(1240px, calc(100% - 32px));
+            width: min(1480px, calc(100% - 32px));
             min-height: 76px;
             margin: 0 auto;
             display: grid;
-            grid-template-columns: auto 1fr auto;
-            gap: 28px;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 22px;
             align-items: center;
           }
 
@@ -395,6 +292,7 @@ export default function RootLayout({
           }
 
           .siteNavigation {
+            min-width: 0;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -411,36 +309,14 @@ export default function RootLayout({
             border-radius: 999px;
             color: #a9c1c8;
             text-decoration: none;
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             font-weight: 750;
+            white-space: nowrap;
             transition:
               color 180ms ease,
               border-color 180ms ease,
               background 180ms ease,
               transform 180ms ease;
-          }
-
-          .siteNavigation a[href='/eu-ai-act'] {
-            border-color: rgba(240, 202, 110, 0.28);
-            color: #ffe4a0;
-            background:
-              linear-gradient(
-                135deg,
-                rgba(240, 202, 110, 0.1),
-                rgba(240, 168, 65, 0.035)
-              );
-          }
-
-          .siteNavigation a[href='/eu-ai-act']:hover,
-          .siteNavigation a[href='/eu-ai-act']:focus-visible {
-            border-color: rgba(240, 202, 110, 0.62);
-            color: #fff1c2;
-            background:
-              linear-gradient(
-                135deg,
-                rgba(240, 202, 110, 0.18),
-                rgba(240, 168, 65, 0.07)
-              );
           }
 
           .siteNavigation a:hover,
@@ -452,19 +328,27 @@ export default function RootLayout({
             outline: none;
           }
 
+          .siteHeaderTools {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+          }
+
           .siteHeaderAction {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            min-height: 40px;
+            min-height: 42px;
             padding: 0 16px;
             border-radius: 999px;
             color: #031114;
             background: linear-gradient(135deg, #67e0df, #b2f7f1);
             box-shadow: 0 10px 28px rgba(37, 185, 189, 0.18);
             text-decoration: none;
-            font-size: 0.8rem;
+            font-size: 0.76rem;
             font-weight: 850;
+            white-space: nowrap;
             transition:
               transform 180ms ease,
               box-shadow 180ms ease;
@@ -481,11 +365,11 @@ export default function RootLayout({
             min-height: calc(100vh - 76px);
           }
 
-          @media (max-width: 1040px) {
+          @media (max-width: 1320px) {
             .siteHeaderInner {
               grid-template-columns: auto auto;
               justify-content: space-between;
-              gap: 18px;
+              gap: 16px;
               padding: 12px 0;
             }
 
@@ -503,9 +387,9 @@ export default function RootLayout({
             }
           }
 
-          @media (max-width: 620px) {
+          @media (max-width: 720px) {
             .siteHeaderInner {
-              width: min(100% - 20px, 1240px);
+              width: min(100% - 20px, 1480px);
             }
 
             .siteBrandText small {
@@ -523,9 +407,9 @@ export default function RootLayout({
             }
 
             .siteHeaderAction {
-              min-height: 36px;
+              min-height: 40px;
               padding: 0 12px;
-              font-size: 0.72rem;
+              font-size: 0.7rem;
             }
 
             .siteNavigation {
@@ -539,9 +423,19 @@ export default function RootLayout({
             }
           }
 
-          @media (max-width: 430px) {
+          @media (max-width: 510px) {
             .siteBrandText {
               display: none;
+            }
+
+            .siteHeaderTools {
+              gap: 6px;
+            }
+
+            .siteHeaderAction {
+              max-width: 118px;
+              overflow: hidden;
+              text-overflow: ellipsis;
             }
           }
 
