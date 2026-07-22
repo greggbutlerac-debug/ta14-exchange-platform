@@ -314,14 +314,15 @@ export default function HomePage() {
           <div className="registryStars"><i/><i/><i/><i/><i/><i/></div>
         </div>
         <div className="featureCopy">
-          <span className="statusFlag">COMING SOON</span>
+          <span className="statusFlag">REGISTRY INTAKE OPEN</span>
           <p className="eyebrow">TA-14 AI GOVERNANCE REGISTRY</p>
-          <h2>Give governance architectures a dated, searchable, attributable public record.</h2>
-          <p>The Registry will preserve what a governance system calls itself, when it was established, who claims it, what it claims to govern, what it explicitly does not claim, which versions exist, and which evidence supports the record.</p>
+          <h2>Establish a dated, searchable, attributable governance record.</h2>
+          <p>The Registry now provides a governed front door for declaring an AI governance architecture, preserving who claims it, what it claims to govern, what it explicitly does not claim, which evidence supports the declaration, and how the record changes over time.</p>
           <div className="registryList">{registryFields.map(item => <span key={item}><i>◆</i>{item}</span>)}</div>
           <div className="featureActions">
-            <Link className="grandButton gold" href="/workspace/ai-governance">Enter AI Governance <Arrow /></Link>
-            <Link className="grandButton glass" href="/workspace/governed-records">Prepare a Governed Record <Arrow /></Link>
+            <Link className="grandButton gold" href="/workspace/ai-governance/registry/register">Register Governance <Arrow /></Link>
+            <Link className="grandButton primary" href="/workspace/ai-governance/registry/records">Search Public Registry <Arrow /></Link>
+            <Link className="grandButton glass" href="/workspace/ai-governance/registry">Open Registry Institution <Arrow /></Link>
           </div>
         </div>
       </section>
