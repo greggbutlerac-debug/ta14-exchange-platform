@@ -586,7 +586,7 @@ export default async function RegistrySubmissionReviewPage({
         registryIdentifier={submission.registry_identifier}
       />
 
-      <style jsx global>{styles}</style>
+      <style dangerouslySetInnerHTML={{ __html: styles }} />
     </main>
   );
 }
