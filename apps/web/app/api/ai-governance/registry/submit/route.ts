@@ -259,32 +259,42 @@ export async function GET(request: NextRequest) {
       return errorResponse('Authentication required.', 401);
     }
 
-    const { data: submission, error } = await supabase
+    const { data: submissionData, error } = await supabase
       .from('ai_governance_registry_submissions')
-      .select(
-        [
-          'id',
-          'status',
-          'submitted_at',
-          'intake_locked_at',
-          'requested_review_pathway',
-          'registry_identifier',
-          'updated_at',
-        ].join(','),
-      )
+      .select('*')
       .eq('id', submissionId)
       .eq('owner_user_id', user.id)
       .single();
 
-    if (error || !submission) {
+    if (error || !submissionData) {
       return errorResponse('Registry submission was not found.', 404);
     }
 
+    const submission = submissionData as {
+      id: string;
+      status: string;
+      submitted_at: string | null;
+      intake_locked_at: string | null;
+      requested_review_pathway: string | null;
+      registry_identifier: string | null;
+      updated_at: string | null;
+    };
+
     return NextResponse.json({
-      submission,
+      submission: {
+        id: submission.id,
+        status: submission.status,
+        submitted_at: submission.submitted_at,
+        intake_locked_at: submission.intake_locked_at,
+        requested_review_pathway: submission.requested_review_pathway,
+        registry_identifier: submission.registry_identifier,
+        updated_at: submission.updated_at,
+      },
       editable:
         submission.status === 'draft' && !submission.registry_identifier,
-      locked: submission.status !== 'draft' || Boolean(submission.registry_identifier),
+      locked:
+        submission.status !== 'draft' ||
+        Boolean(submission.registry_identifier),
     });
   } catch (error) {
     return errorResponse(
