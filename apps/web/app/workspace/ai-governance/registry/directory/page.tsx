@@ -336,14 +336,26 @@ export default function RegistryDirectoryPage() {
                     <span>{record.evidenceCount ?? 0} evidence records</span>
                     <span>{record.disputeCount ?? 0} disputes</span>
                   </div>
-                  <Link
-                    href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
-                      record.registryIdentifier,
-                    )}`}
-                    className="record-link"
-                  >
-                    Open Permanent Record <b aria-hidden="true">→</b>
-                  </Link>
+
+                  <div className="record-actions">
+                    <Link
+                      href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                        record.registryIdentifier,
+                      )}/citation`}
+                      className="record-link record-link-secondary"
+                    >
+                      Cite Record
+                    </Link>
+
+                    <Link
+                      href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                        record.registryIdentifier,
+                      )}`}
+                      className="record-link"
+                    >
+                      Open Permanent Record <b aria-hidden="true">→</b>
+                    </Link>
+                  </div>
                 </div>
               </article>
             ))}
@@ -547,8 +559,10 @@ export default function RegistryDirectoryPage() {
         .domain-list { display: flex; flex-wrap: wrap; gap: 7px; }
         .domain-list span { padding: 7px 9px; border: 1px solid rgba(115,205,255,.16); border-radius: 999px; color: #a9c8da; background: rgba(8,31,48,.65); font-size: 9px; }
         .record-footer { margin-top: auto; padding-top: 18px; display: flex; justify-content: space-between; align-items: end; gap: 15px; border-top: 1px solid rgba(126,191,240,.12); }
-        .record-footer > div { display: grid; gap: 5px; color: #7f96a8; font-size: 9px; }
+        .record-footer > div:first-child { display: grid; gap: 5px; color: #7f96a8; font-size: 9px; }
+        .record-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: 10px; }
         .record-link { color: var(--blue); font-size: 11px; font-weight: 900; }
+        .record-link-secondary { padding: 7px 10px; border: 1px solid rgba(125,203,255,.2); border-radius: 10px; background: rgba(8,24,40,.62); }
         .record-link b { margin-left: 7px; font-size: 16px; }
 
         .institutional-note {
