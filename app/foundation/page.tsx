@@ -6,63 +6,63 @@ import type { CSSProperties } from "react";
 const foundationDomains = [
   {
     code: "01",
-    title: "Foundational Architectural Registry",
-    text: "The canonical public record for TA-14 architecture, chronology, stewardship, claims, boundaries, standards, publications, repositories, and implementations.",
-    href: "/workspace/ai-governance/registry",
+    title: "Institution & Stewardship",
+    text: "The named institution, founder, authorship, stewardship, declared ownership, contact route, and responsibility for maintaining the public record.",
+    href: "/workspace/ai-governance/registry#foundation",
   },
   {
     code: "02",
-    title: "Architecture Family",
-    text: "The connected architectural systems governing admissibility, evidence, records, continuity, binding, commitment, execution, and outcomes.",
-    href: "/architecture",
+    title: "Founding Architecture",
+    text: "The TA-14 Admissible Execution Architecture, governing chain, architecture family, scope, claims, non-claims, and declared boundaries.",
+    href: "/registry/ta-14-admissible-execution-architecture",
   },
   {
     code: "03",
     title: "Standards Family",
-    text: "The named standards, methods, chains, thresholds, classifications, and implementation disciplines associated with TA-14.",
+    text: "Named standards, methods, thresholds, route classifications, admissibility disciplines, and implementation requirements associated with TA-14.",
     href: "/workspace/ai-governance/registry#standards",
   },
   {
     code: "04",
     title: "Public Chronology",
-    text: "A preserved timeline of declarations, publications, releases, architecture records, reference implementations, and institutional development.",
+    text: "Dated declarations, releases, public milestones, publication history, architecture versions, and institutional development.",
     href: "/workspace/ai-governance/registry#timeline",
   },
   {
     code: "05",
-    title: "Books and Articles",
-    text: "Public works that document the development, explanation, scope, and application of the TA-14 architecture.",
+    title: "Books & Articles",
+    text: "Published books, technical articles, public explanations, and written works documenting the architecture and its applications.",
     href: "/workspace/ai-governance/registry#publications",
   },
   {
     code: "06",
-    title: "Zenodo and Public Records",
-    text: "Dated public deposits and research records supporting attribution, chronology, and inspectable provenance.",
+    title: "Zenodo & Public Deposits",
+    text: "Dated public records and research deposits supporting attribution, chronology, provenance, and public inspection.",
     href: "/workspace/ai-governance/registry#publications",
   },
   {
     code: "07",
-    title: "GitHub Repositories",
-    text: "Public code, platform implementations, demonstrations, and technical artifacts connected to the Foundation.",
+    title: "GitHub & Technical Artifacts",
+    text: "Repositories, code, public platform implementations, demonstrations, records, and technical artifacts associated with TA-14.",
     href: "/workspace/ai-governance/registry#implementations",
   },
   {
     code: "08",
-    title: "Reference Implementations",
-    text: "Operational examples showing how the architecture is translated into governed records, routes, verification, and execution controls.",
-    href: "/workspace/ai-governance/registry#implementations",
+    title: "Filings & Rights Declarations",
+    text: "Patent references, filings, ownership declarations, licensing statements, and rights assertions preserved as public claims rather than automatic legal conclusions.",
+    href: "/registry/ta-14-admissible-execution-architecture",
   },
   {
     code: "09",
-    title: "TA-14 AI Governance Exchange",
-    text: "The public platform where governance routes can be built, tested, preserved, reviewed, and verified.",
+    title: "Reference Implementations",
+    text: "Operational examples showing how TA-14 architecture is translated into governed routes, records, review, verification, and execution controls.",
     href: "/workspace",
   },
   {
     code: "10",
-    title: "AI Governance Registry",
-    text: "The public registration system for dated, attributable, searchable governance architecture records.",
-    href: "/registry",
+    title: "Claims, Challenges & Corrections",
+    text: "Declared claims, explicit non-claims, limitations, disputes, objections, corrections, superseded versions, and challenge routes.",
+    href: "/registry/about",
   },
 ];
 
@@ -93,14 +93,14 @@ export default function FoundationPage() {
         <Link href="/" className="brand">
           <span className="brandMark">TA-14</span>
           <span>
-            <strong>TA-14 Foundation</strong>
-            <small>Architecture • Standards • Public Record</small>
+            <strong>TA-14 Credentials & Public Record</strong>
+            <small>Identity • Claims • Architecture • Evidence</small>
           </span>
         </Link>
 
         <nav aria-label="Foundation navigation">
-          <a href="#foundation-record">Foundation Record</a>
-          <a href="#foundation-map">Foundation Map</a>
+          <a href="#credentials-record">Credentials Record</a>
+          <a href="#evidence-map">Evidence Map</a>
           <a href="#boundary">Boundary</a>
           <Link href="/registry">Registry</Link>
         </nav>
@@ -119,24 +119,24 @@ export default function FoundationPage() {
           <i />
         </div>
 
-        <p className="eyebrow">THE PARENT PUBLIC RECORD</p>
+        <p className="eyebrow">TA-14 CREDENTIALS & PUBLIC RECORD</p>
 
         <h1>
-          The architecture should have a home
-          <em> before it has an implementation.</em>
+          Who we are should be visible
+          <em> in one public record.</em>
         </h1>
 
         <p className="heroLead">
-          The TA-14 Foundation is the public institutional record connecting
-          the architecture family, standards family, chronology, books,
-          articles, Zenodo records, GitHub repositories, reference
-          implementations, the TA-14 AI Governance Exchange, and the AI
-          Governance Registry.
+          This is the public credentials entrance for TA-14: institution,
+          founder and stewardship identity, declared claims and boundaries,
+          founding architecture, chronology, publications, repositories,
+          filings, demonstrations, reference implementations, and challenge
+          routes.
         </p>
 
         <div className="heroActions">
-          <a className="button gold" href="#foundation-map">
-            Explore the Foundation <span>↓</span>
+          <a className="button gold" href="#evidence-map">
+            Explore the Credentials Record <span>↓</span>
           </a>
           <Link className="button primary" href="/workspace/ai-governance/registry">
             Open the Architectural Registry <span>↗</span>
@@ -147,35 +147,35 @@ export default function FoundationPage() {
         </div>
       </section>
 
-      <section id="foundation-record" className="recordSection shell">
+      <section id="credentials-record" className="recordSection shell">
         <div className="recordCopy">
-          <span className="status">FOUNDATIONAL PUBLIC RECORD ACTIVE</span>
-          <p className="eyebrow">FOUNDATION IDENTITY</p>
-          <h2>TA-14 Foundation</h2>
+          <span className="status">PUBLIC CREDENTIAL RECORD ACTIVE</span>
+          <p className="eyebrow">IDENTITY & STEWARDSHIP</p>
+          <h2>TA-14 Authority Governance Institution</h2>
           <p>
-            The Foundation preserves the identity, provenance, chronology,
-            relationships, publications, implementations, and institutional
-            lineage of the TA-14 architecture. It exists so the architecture
-            can be inspected as a connected public record rather than
-            encountered only through isolated pages, claims, or products.
+            This record is intended to let any visitor inspect who TA-14 says it
+            is, who claims and stewards the architecture, what has been
+            architected and published, what evidence is publicly available,
+            what remains only a declared claim, and where challenge,
+            correction, or dispute should be directed.
           </p>
 
           <div className="identityGrid">
             <div>
-              <small>Foundation identifier</small>
-              <strong>TA-14-FOUNDATION-000001</strong>
+              <small>Institution</small>
+              <strong>TA-14 Authority Governance Institution</strong>
             </div>
             <div>
-              <small>Record type</small>
-              <strong>Foundational Architectural Record</strong>
+              <small>Founder and steward</small>
+              <strong>Greggory Don Butler</strong>
             </div>
             <div>
-              <small>Visibility</small>
-              <strong>Public</strong>
+              <small>Public record identifier</small>
+              <strong>TA-14-CREDENTIALS-000001</strong>
             </div>
             <div>
-              <small>Status</small>
-              <strong>Active</strong>
+              <small>Visibility and status</small>
+              <strong>Public • Active</strong>
             </div>
           </div>
         </div>
@@ -199,14 +199,14 @@ export default function FoundationPage() {
         </div>
       </section>
 
-      <section id="foundation-map" className="mapSection shell">
+      <section id="evidence-map" className="mapSection shell">
         <div className="sectionHeading">
-          <p className="eyebrow">FOUNDATION MAP</p>
-          <h2>Every major TA-14 public record in one institutional entrance.</h2>
+          <p className="eyebrow">CREDENTIALS & EVIDENCE MAP</p>
+          <h2>Every category of public proof in one entrance.</h2>
           <p>
-            These are not interchangeable pages. Each preserves a different
-            part of the Foundation and links back to the larger architectural
-            record.
+            Each category answers a different question: who claims the work,
+            what was created, when it appeared, where it was published, what
+            was implemented, and what remains bounded, disputed, or unverified.
           </p>
         </div>
 
@@ -231,21 +231,21 @@ export default function FoundationPage() {
 
       <section id="boundary" className="boundarySection shell">
         <div>
-          <p className="eyebrow">FOUNDATION BOUNDARY</p>
-          <h2>A public foundation is not a certification authority.</h2>
+          <p className="eyebrow">CREDENTIALS BOUNDARY</p>
+          <h2>Public proof is not the same as independent validation.</h2>
           <p>
-            The TA-14 Foundation documents architecture, identity, provenance,
-            chronology, relationships, publications, implementations, claims,
-            and declared boundaries. It does not automatically provide legal
-            priority, regulatory approval, accreditation, certification,
-            independent validation, or proof that any implementation performs
-            as claimed.
+            This credentials record documents identity, stewardship,
+            architecture, chronology, publications, repositories, filings,
+            implementations, claims, non-claims, and declared boundaries. It
+            does not automatically provide legal priority, regulatory approval,
+            accreditation, certification, independent validation, or proof that
+            any implementation performs as claimed.
           </p>
         </div>
 
         <div className="boundaryGrid">
           <article>
-            <strong>The Foundation preserves</strong>
+            <strong>The credentials record preserves</strong>
             <p>
               Architecture, chronology, stewardship, public evidence,
               publications, repositories, versions, relationships, and
@@ -270,8 +270,8 @@ export default function FoundationPage() {
       </section>
 
       <section className="closing shell">
-        <p className="eyebrow">TA-14 FOUNDATION</p>
-        <h2>Start with the public record. Then inspect the architecture.</h2>
+        <p className="eyebrow">TA-14 CREDENTIALS & PUBLIC RECORD</p>
+        <h2>Start with who we are. Then inspect what we built.</h2>
         <div className="heroActions">
           <Link className="button gold" href="/workspace/ai-governance/registry">
             Open Architectural Registry <span>↗</span>
@@ -284,8 +284,8 @@ export default function FoundationPage() {
       </section>
 
       <footer className="shell">
-        <span>TA-14 Foundation</span>
-        <span>Architecture • Standards • Chronology • Public Record</span>
+        <span>TA-14 Credentials & Public Record</span>
+        <span>Identity • Claims • Architecture • Publications • Evidence</span>
       </footer>
 
       <style jsx global>{`
