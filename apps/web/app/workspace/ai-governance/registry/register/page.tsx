@@ -327,7 +327,8 @@ export default function RegisterGovernancePage() {
   const [repositories, setRepositories] = useState<RepositoryRecord[]>([]);
   const [zenodoRecords, setZenodoRecords] = useState<ZenodoRecord[]>([]);
   const [patentRecords, setPatentRecords] = useState<PatentRecord[]>([]);
-
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [draftBusy, setDraftBusy] = useState(false);
 
   const totalSize = useMemo(
     () => files.reduce((total, item) => total + item.file.size, 0),
@@ -457,43 +458,264 @@ export default function RegisterGovernancePage() {
     setPatentRecords((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item));
   }
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem(DRAFT_KEY);
-    if (!saved) return;
-    try {
-      const parsed = JSON.parse(saved) as { form?: FormState; publications?: PublicationRecord[]; repositories?: RepositoryRecord[]; zenodoRecords?: ZenodoRecord[]; patentRecords?: PatentRecord[] };
-      if (parsed.form) {
-        setForm({ ...initialForm, ...parsed.form });
-        setPublications(parsed.publications ?? []);
-        setRepositories(parsed.repositories ?? []);
-        setZenodoRecords(parsed.zenodoRecords ?? []);
-        setPatentRecords(parsed.patentRecords ?? []);
-        setMessage('A browser draft is available. Evidence files must be reattached because browsers do not preserve local files in saved drafts.');
-      }
-    } catch {
-      window.localStorage.removeItem(DRAFT_KEY);
-    }
-  }, []);
+  function hydrateFromServerDraft(draft: any) {
+    const submission = draft.submission ?? {};
 
-  function saveDraft() {
-    window.localStorage.setItem(
-      DRAFT_KEY,
-      JSON.stringify({ savedAt: new Date().toISOString(), form, publications, repositories, zenodoRecords, patentRecords }),
+    setDraftId(submission.id ?? null);
+    setForm({
+      ...initialForm,
+      governanceName: submission.governance_name ?? '',
+      shortName: submission.short_name ?? '',
+      currentVersion: submission.current_version ?? '',
+      effectiveVersionDate: submission.effective_version_date ?? '',
+      establishmentDate: submission.claimed_establishment_date ?? '',
+      governanceCategory: submission.governance_category ?? '',
+      claimantName: submission.claimant_name ?? '',
+      claimantType: submission.claimant_type ?? initialForm.claimantType,
+      authorityRole: submission.submitter_authority_role ?? initialForm.authorityRole,
+      authorityEvidence: submission.authority_basis ?? '',
+      stewardName: submission.current_steward ?? '',
+      organization: submission.organization_name ?? '',
+      contactEmail: submission.contact_email ?? '',
+      website: submission.public_website ?? '',
+      jurisdiction: submission.geographic_scope ?? '',
+      regulatoryScope: submission.regulatory_scope ?? '',
+      plainDescription: submission.plain_language_description ?? '',
+      claims: submission.formal_claims ?? '',
+      nonClaims: submission.explicit_non_claims ?? '',
+      limitations: submission.known_limitations ?? '',
+      ownershipDeclaration: submission.ownership_declaration ?? '',
+      license: submission.license_statement ?? '',
+      recordVisibility:
+        submission.record_visibility === 'public'
+          ? 'PUBLIC'
+          : submission.record_visibility === 'selective'
+            ? 'CONTROLLED'
+            : 'PRIVATE',
+      contactVisibility:
+        submission.public_contact_mode === 'public_email'
+          ? 'PUBLIC_EMAIL'
+          : submission.public_contact_mode === 'website_only'
+            ? 'WEBSITE_ONLY'
+            : submission.public_contact_mode === 'private'
+              ? 'PRIVATE'
+              : 'REGISTRY_FORM',
+      allowReviewRequests: Boolean(submission.allow_review_requests),
+      allowCollaboration: Boolean(submission.allow_collaboration_inquiries),
+      allowDisputeNotices: Boolean(submission.allow_dispute_notices),
+      disputes: submission.known_disputes ?? '',
+      reviewPathway: submission.requested_review_pathway ?? initialForm.reviewPathway,
+      publicContact: submission.public_contact_mode !== 'private',
+      authorityConfirmed: Boolean(submission.authority_declaration_accepted),
+      accuracyConfirmed: Boolean(submission.accuracy_declaration_accepted),
+      boundaryConfirmed: Boolean(submission.registry_boundary_accepted),
+    });
+
+    setPublications(
+      (draft.publications ?? []).map((item: any) => ({
+        id: item.id ?? crypto.randomUUID(),
+        publicationType: item.publication_type ?? 'Article',
+        title: item.title ?? '',
+        authors: item.authors ?? '',
+        publisherOrPlatform: item.publisher_or_platform ?? '',
+        publicationDate: item.publication_date ?? '',
+        url: item.url ?? '',
+        doi: item.doi ?? '',
+        isbn: item.isbn ?? '',
+        citationText: item.citation_text ?? '',
+        description: item.abstract_or_description ?? '',
+        relationshipToGovernance: item.relationship_to_governance ?? '',
+        visibility: item.visibility === 'public' ? 'PUBLIC' : item.visibility === 'selective' ? 'CONTROLLED' : 'PRIVATE',
+      })),
     );
-    setErrors([]);
-    setMessage('Draft saved in this browser. Evidence files are not included and must be reattached when the draft is resumed.');
+
+    setRepositories(
+      (draft.repositories ?? []).map((item: any) => ({
+        id: item.id ?? crypto.randomUUID(),
+        provider: (item.provider
+          ? item.provider.charAt(0).toUpperCase() + item.provider.slice(1)
+          : 'GitHub') as RepositoryRecord['provider'],
+        repositoryName: item.repository_name ?? '',
+        repositoryOwner: item.repository_owner ?? '',
+        repositoryUrl: item.repository_url ?? '',
+        defaultBranch: item.default_branch ?? '',
+        releaseOrTag: item.release_or_tag ?? '',
+        commitSha: item.commit_sha ?? '',
+        license: item.license ?? '',
+        accessState: (item.access_state ?? 'public').toUpperCase() as RepositoryRecord['accessState'],
+        description: item.description ?? '',
+        relationshipToGovernance: item.relationship_to_governance ?? '',
+      })),
+    );
+
+    setZenodoRecords(
+      (draft.zenodoRecords ?? []).map((item: any) => ({
+        id: item.id ?? crypto.randomUUID(),
+        title: item.title ?? '',
+        recordUrl: item.record_url ?? '',
+        doi: item.doi ?? '',
+        conceptDoi: item.concept_doi ?? '',
+        zenodoRecordId: item.zenodo_record_id ?? '',
+        version: item.version ?? '',
+        publicationDate: item.publication_date ?? '',
+        creators: item.creators ?? '',
+        resourceType: item.resource_type ?? '',
+        description: item.description ?? '',
+        relationshipToGovernance: item.relationship_to_governance ?? '',
+        visibility: item.visibility === 'public' ? 'PUBLIC' : item.visibility === 'selective' ? 'CONTROLLED' : 'PRIVATE',
+      })),
+    );
+
+    setPatentRecords(
+      (draft.patentRecords ?? []).map((item: any) => ({
+        id: item.id ?? crypto.randomUUID(),
+        title: item.title ?? '',
+        jurisdiction: item.jurisdiction ?? '',
+        filingType: item.filing_type ?? '',
+        applicationStatus: item.application_status ?? '',
+        applicationNumber: item.application_number ?? '',
+        publicationNumber: item.publication_number ?? '',
+        patentNumber: item.patent_number ?? '',
+        filingDate: item.filing_date ?? '',
+        publicationDate: item.publication_date ?? '',
+        grantDate: item.grant_date ?? '',
+        priorityDate: item.priority_date ?? '',
+        inventors: item.inventors ?? '',
+        applicantOrAssignee: item.applicant_or_assignee ?? '',
+        officialUrl: item.official_url ?? '',
+        description: item.description ?? '',
+        relationshipToGovernance: item.relationship_to_governance ?? '',
+        convertedFromId: '',
+        continuationOfId: '',
+        visibility: item.visibility === 'public' ? 'PUBLIC' : item.visibility === 'selective' ? 'CONTROLLED' : 'PRIVATE',
+      })),
+    );
   }
 
-  function discardDraft() {
-    window.localStorage.removeItem(DRAFT_KEY);
-    setForm(initialForm);
-    setFiles([]);
-    setPublications([]);
-    setRepositories([]);
-    setZenodoRecords([]);
-    setPatentRecords([]);
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resumeDraft() {
+      try {
+        const response = await fetch('/api/ai-governance/registry/drafts', {
+          method: 'GET',
+          cache: 'no-store',
+        });
+
+        if (response.ok) {
+          const payload = await response.json();
+          if (!cancelled && payload.draft) {
+            hydrateFromServerDraft(payload.draft);
+            setMessage('Private Registry draft resumed from your signed-in account. Evidence files must be reattached.');
+            return;
+          }
+        }
+      } catch {
+        // Browser-local recovery below remains available as a resilience layer.
+      }
+
+      const saved = window.localStorage.getItem(DRAFT_KEY);
+      if (!saved || cancelled) return;
+
+      try {
+        const parsed = JSON.parse(saved) as {
+          form?: FormState;
+          publications?: PublicationRecord[];
+          repositories?: RepositoryRecord[];
+          zenodoRecords?: ZenodoRecord[];
+          patentRecords?: PatentRecord[];
+        };
+        if (parsed.form) {
+          setForm({ ...initialForm, ...parsed.form });
+          setPublications(parsed.publications ?? []);
+          setRepositories(parsed.repositories ?? []);
+          setZenodoRecords(parsed.zenodoRecords ?? []);
+          setPatentRecords(parsed.patentRecords ?? []);
+          setMessage('A browser recovery draft was loaded. Save it while signed in to preserve it under your account. Evidence files must be reattached.');
+        }
+      } catch {
+        window.localStorage.removeItem(DRAFT_KEY);
+      }
+    }
+
+    resumeDraft();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  async function saveDraft() {
+    setDraftBusy(true);
     setErrors([]);
-    setMessage('Browser draft discarded.');
+
+    const recoveryPayload = {
+      savedAt: new Date().toISOString(),
+      form,
+      publications,
+      repositories,
+      zenodoRecords,
+      patentRecords,
+    };
+    window.localStorage.setItem(DRAFT_KEY, JSON.stringify(recoveryPayload));
+
+    try {
+      const response = await fetch('/api/ai-governance/registry/drafts', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: draftId ?? undefined,
+          form,
+          publications,
+          repositories,
+          zenodoRecords,
+          patentRecords,
+        }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload.error ?? 'Unable to save the Registry draft.');
+      }
+
+      setDraftId(payload.draftId);
+      setMessage('Private draft saved to your signed-in Registry account. It is not publicly visible and is not a registered record.');
+    } catch (error) {
+      setErrors([error instanceof Error ? error.message : 'Unable to save the Registry draft.']);
+      setMessage('A browser recovery copy was preserved, but the account-backed draft was not saved.');
+    } finally {
+      setDraftBusy(false);
+    }
+  }
+
+  async function discardDraft() {
+    setDraftBusy(true);
+    setErrors([]);
+
+    try {
+      if (draftId) {
+        const response = await fetch(`/api/ai-governance/registry/drafts?id=${encodeURIComponent(draftId)}`, {
+          method: 'DELETE',
+        });
+        const payload = await response.json();
+        if (!response.ok) {
+          throw new Error(payload.error ?? 'Unable to delete the Registry draft.');
+        }
+      }
+
+      window.localStorage.removeItem(DRAFT_KEY);
+      setDraftId(null);
+      setForm(initialForm);
+      setFiles([]);
+      setPublications([]);
+      setRepositories([]);
+      setZenodoRecords([]);
+      setPatentRecords([]);
+      setMessage('Private Registry draft discarded.');
+    } catch (error) {
+      setErrors([error instanceof Error ? error.message : 'Unable to discard the Registry draft.']);
+    } finally {
+      setDraftBusy(false);
+    }
   }
 
   function reviewMissingItems() {
@@ -651,9 +873,9 @@ export default function RegisterGovernancePage() {
           <div className="progress-fill" style={{ width: `${requiredCompletion}%` }} />
         </div>
         <div className="progress-actions">
-          <button type="button" className="mini-button" onClick={saveDraft}>Save Draft</button>
+          <button type="button" className="mini-button" onClick={saveDraft} disabled={draftBusy}>{draftBusy ? 'Saving…' : draftId ? 'Update Draft' : 'Save Draft'}</button>
           <button type="button" className="mini-button" onClick={reviewMissingItems}>Review Missing Items</button>
-          <button type="button" className="mini-button danger" onClick={discardDraft}>Discard Draft</button>
+          <button type="button" className="mini-button danger" onClick={discardDraft} disabled={draftBusy}>Discard Draft</button>
         </div>
         <div className="progress-meta">
           <span>{files.length} evidence files</span>
