@@ -204,11 +204,14 @@ export default function AiGovernanceRegistryPage() {
             </span>
           </div>
           <div className="hero-actions">
-            <a className="polished-button polished-button-primary" href="#record">
+            <PolishedLink href="/workspace/ai-governance/registry/register" variant="primary">
+              Register Governance
+            </PolishedLink>
+            <a className="polished-button polished-button-bronze" href="#record">
               <span>Examine the Registry Record</span>
               <span className="button-arrow" aria-hidden="true">↓</span>
             </a>
-            <a className="polished-button polished-button-bronze" href="#method">
+            <a className="polished-button polished-button-secondary" href="#method">
               <span>Read the Registry Method</span>
               <span className="button-arrow" aria-hidden="true">→</span>
             </a>
@@ -355,16 +358,19 @@ export default function AiGovernanceRegistryPage() {
       <section className="section-shell launch-section">
         <div className="launch-card">
           <div>
-            <p className="eyebrow">FOUNDATIONAL RELEASE</p>
-            <h2>The front door is now established.</h2>
+            <p className="eyebrow">REGISTRY INTAKE NOW OPEN</p>
+            <h2>Establish the first governed Registry record.</h2>
             <span>
-              The next build phase will connect governed intake, identity and authority declarations,
-              evidence submission, review events, searchable public records, version lineage, dispute
-              notices, and exportable registry receipts.
+              Begin a formal registration with identity, stewardship, scope, claims, explicit non-claims,
+              evidence references, ownership and licensing declarations, visibility controls, and a
+              drag-and-drop evidence package prepared for governed review.
             </span>
           </div>
           <div className="launch-actions">
-            <PolishedLink href="/workspace" variant="primary">
+            <PolishedLink href="/workspace/ai-governance/registry/register" variant="primary">
+              Begin Registration
+            </PolishedLink>
+            <PolishedLink href="/workspace" variant="bronze">
               Enter the Exchange Workspace
             </PolishedLink>
             <Link href="/" className="polished-button polished-button-secondary">
