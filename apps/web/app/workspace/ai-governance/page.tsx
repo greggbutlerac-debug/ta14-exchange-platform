@@ -64,7 +64,7 @@ export default function AIGovernancePage() {
         <nav>
           <Link href="/">Home</Link>
           <Link href="/workspace">Workspace</Link>
-          <Link href="/workspace/ai-governance/registry#foundation">Foundation</Link>
+          <Link href="/foundation">Credentials</Link>
           <Link href="/workspace/governed-records">Records</Link>
           <Link href="/workspace/entity-review">Entity Review</Link>
         </nav>
@@ -127,70 +127,80 @@ export default function AIGovernancePage() {
         </div>
       </section>
 
-      <section className="foundationEntry shell">
-        <div className="foundationSeal" aria-hidden="true">
-          <div className="foundationOrbit foundationOrbitOne">
+      <section className="credentialsEntry shell">
+        <div className="credentialsSeal" aria-hidden="true">
+          <div className="credentialsOrbit credentialsOrbitOne">
             <span />
           </div>
-          <div className="foundationOrbit foundationOrbitTwo">
+          <div className="credentialsOrbit credentialsOrbitTwo">
             <span />
           </div>
-          <div className="foundationCore">
+          <div className="credentialsCore">
             <strong>TA-14</strong>
-            <small>Foundation</small>
+            <small>Credentials</small>
           </div>
         </div>
 
-        <div className="foundationCopy">
-          <p className="eyebrow">TA-14 FOUNDATIONAL ARCHITECTURAL REGISTRY</p>
-          <h2>Every governance system needs a foundation.</h2>
+        <div className="credentialsCopy">
+          <p className="eyebrow">TA-14 CREDENTIALS & PUBLIC RECORD</p>
+          <h2>Everything we claim. Everything we can show.</h2>
           <p>
-            Before routes are built, records are preserved, reviews are
-            performed, or compliance pathways are explored, there must be a
-            publicly attributable architectural foundation describing what the
-            governance system is, how it is organized, what standards support
-            it, where its public record exists, and how its implementations
-            relate to one another.
+            Inspect the institution, founder and stewardship identity,
+            architecture, standards, chronology, claims, non-claims,
+            publications, repositories, filings, demonstrations, reference
+            implementations, and correction routes behind the TA-14 AI
+            Governance Exchange.
           </p>
 
-          <div className="foundationLinks" aria-label="Foundation record contents">
+          <div className="credentialsLinks" aria-label="TA-14 credentials record contents">
             {[
+              "Institution",
+              "Founder & Stewardship",
               "Architecture",
-              "Standards Family",
-              "Google Sites Archive",
-              "Books and Articles",
-              "Zenodo Records",
-              "GitHub Repositories",
+              "Standards",
+              "Claims",
+              "Non-Claims",
+              "Public Timeline",
+              "Books",
+              "Articles",
+              "GitHub",
+              "Zenodo",
+              "Patents & Filings",
+              "Registry Records",
+              "Demonstrations",
               "Reference Implementations",
-              "TA-14 AI Governance Exchange",
+              "Partner Review Network",
+              "Exchange Platform",
+              "Environmental Integrity Governance",
+              "Atmospheric Integrity Records",
+              "EU AI Act Work",
+              "Challenges & Corrections",
             ].map((item) => (
               <span key={item}>{item}</span>
             ))}
           </div>
 
-          <div className="foundationBoundary">
-            <strong>Foundational record, not external certification.</strong>
+          <div className="credentialsBoundary">
+            <strong>Public evidence is not the same as independent certification.</strong>
             <span>
-              The registry connects documented architecture, chronology,
-              publications, standards, and implementations while preserving the
-              boundary between public record, independent validation,
-              regulatory approval, and legal determination.
+              The credentials record preserves identity, attribution,
+              chronology, architecture, publications, technical artifacts,
+              claims, boundaries, disputes, and corrections without converting
+              them into regulatory approval, legal priority, or proof that
+              every implementation performs as claimed.
             </span>
           </div>
 
-          <div className="foundationActions">
-            <Link
-              className="primaryButton"
-              href="/workspace/ai-governance/registry#foundation"
-            >
-              Explore the TA-14 Foundation
+          <div className="credentialsActions">
+            <Link className="primaryButton" href="/foundation">
+              Open TA-14 Credentials & Public Record
               <span>→</span>
             </Link>
             <Link
               className="secondaryButton"
               href="/workspace/ai-governance/registry"
             >
-              View the Complete Registry
+              Browse the Architectural Registry
             </Link>
           </div>
         </div>
@@ -269,7 +279,7 @@ export default function AIGovernancePage() {
 
       <footer className="shell">
         <span>TA-14 Authority Governance Institution</span>
-        <Link href="/">Return to the four doors</Link>
+        <Link href="/">Return to the Exchange homepage</Link>
       </footer>
 
       <style jsx>{`
@@ -554,7 +564,7 @@ export default function AIGovernancePage() {
         }
 
         .principle,
-        .foundationEntry,
+        .credentialsEntry,
         .euSection,
         .boundary,
         .finalCta {
@@ -570,7 +580,7 @@ export default function AIGovernancePage() {
           text-align: center;
         }
 
-        .foundationEntry {
+        .credentialsEntry {
           margin-top: 28px;
           padding: 54px;
           display: grid;
@@ -584,14 +594,14 @@ export default function AIGovernancePage() {
             linear-gradient(145deg, rgba(14, 29, 47, 0.94), rgba(7, 13, 24, 0.97));
         }
 
-        .foundationSeal {
+        .credentialsSeal {
           min-height: 300px;
           position: relative;
           display: grid;
           place-items: center;
         }
 
-        .foundationCore {
+        .credentialsCore {
           width: 152px;
           height: 152px;
           border-radius: 999px;
@@ -608,13 +618,13 @@ export default function AIGovernancePage() {
           z-index: 2;
         }
 
-        .foundationCore strong {
+        .credentialsCore strong {
           color: #f2cf89;
           font-size: 26px;
           letter-spacing: 0.05em;
         }
 
-        .foundationCore small {
+        .credentialsCore small {
           margin-top: 7px;
           color: #91c9d2;
           text-transform: uppercase;
@@ -622,14 +632,14 @@ export default function AIGovernancePage() {
           font-size: 10px;
         }
 
-        .foundationOrbit {
+        .credentialsOrbit {
           position: absolute;
           border-radius: 999px;
           border: 1px solid rgba(104, 214, 207, 0.22);
           animation: rotate 22s linear infinite;
         }
 
-        .foundationOrbit span {
+        .credentialsOrbit span {
           position: absolute;
           top: 50%;
           right: -5px;
@@ -640,12 +650,12 @@ export default function AIGovernancePage() {
           box-shadow: 0 0 16px #6fe1d3;
         }
 
-        .foundationOrbitOne {
+        .credentialsOrbitOne {
           width: 220px;
           height: 220px;
         }
 
-        .foundationOrbitTwo {
+        .credentialsOrbitTwo {
           width: 286px;
           height: 286px;
           border-color: rgba(230, 177, 91, 0.22);
@@ -653,19 +663,19 @@ export default function AIGovernancePage() {
           animation-direction: reverse;
         }
 
-        .foundationOrbitTwo span {
+        .credentialsOrbitTwo span {
           background: #e2a854;
           box-shadow: 0 0 16px #e2a854;
         }
 
-        .foundationCopy h2 {
+        .credentialsCopy h2 {
           margin: 14px 0 16px;
           font-size: clamp(36px, 5vw, 58px);
           line-height: 1.04;
           letter-spacing: -0.045em;
         }
 
-        .foundationCopy > p:not(.eyebrow) {
+        .credentialsCopy > p:not(.eyebrow) {
           margin: 0;
           max-width: 840px;
           color: #a6b7c9;
@@ -673,24 +683,24 @@ export default function AIGovernancePage() {
           line-height: 1.72;
         }
 
-        .foundationLinks {
+        .credentialsLinks {
           display: flex;
           flex-wrap: wrap;
           gap: 9px;
           margin-top: 26px;
         }
 
-        .foundationLinks span {
-          padding: 9px 12px;
+        .credentialsLinks span {
+          padding: 8px 11px;
           border-radius: 999px;
           border: 1px solid rgba(113, 224, 210, 0.18);
           background: rgba(73, 189, 176, 0.07);
           color: #c9f4ee;
-          font-size: 11px;
+          font-size: 10px;
           font-weight: 800;
         }
 
-        .foundationBoundary {
+        .credentialsBoundary {
           display: grid;
           gap: 6px;
           margin-top: 24px;
@@ -700,18 +710,18 @@ export default function AIGovernancePage() {
           background: rgba(95, 58, 20, 0.15);
         }
 
-        .foundationBoundary strong {
+        .credentialsBoundary strong {
           color: #efd099;
           font-size: 15px;
         }
 
-        .foundationBoundary span {
+        .credentialsBoundary span {
           color: #aab9c7;
           font-size: 13px;
           line-height: 1.62;
         }
 
-        .foundationActions {
+        .credentialsActions {
           display: flex;
           flex-wrap: wrap;
           gap: 12px;
@@ -939,7 +949,7 @@ export default function AIGovernancePage() {
             min-height: 460px;
           }
 
-          .foundationEntry,
+          .credentialsEntry,
           .euSection,
           .boundary,
           .finalCta {
@@ -948,7 +958,7 @@ export default function AIGovernancePage() {
             align-items: flex-start;
           }
 
-          .foundationSeal {
+          .credentialsSeal {
             width: 100%;
             min-height: 280px;
           }
@@ -970,18 +980,18 @@ export default function AIGovernancePage() {
           }
 
           .principle,
-          .foundationEntry,
+          .credentialsEntry,
           .euSection,
           .boundary,
           .finalCta {
             padding: 28px 24px;
           }
 
-          .foundationEntry {
+          .credentialsEntry {
             gap: 18px;
           }
 
-          .foundationSeal {
+          .credentialsSeal {
             transform: scale(0.84);
             min-height: 240px;
           }
