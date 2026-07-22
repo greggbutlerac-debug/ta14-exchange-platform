@@ -2,209 +2,329 @@
 
 import Link from "next/link";
 
-const doors = [
+const workspaces = [
   {
+    id: "ai-governance",
     code: "AI",
     title: "AI Governance",
-    description:
-      "Build, test, correct, and verify consequential AI routes.",
-    items: ["AI agents", "Tools and APIs", "Payloads", "Commitments", "Outcomes"],
     href: "/workspace/ai-governance",
-    action: "Enter AI Governance",
-    accent: "#67dfcf",
+    description:
+      "Build, test, correct, and verify consequential AI routes before they become execution.",
+    points: [
+      "Agents, models, tools, and APIs",
+      "Authority, evidence, and commit gates",
+      "Runtime decisions and outcome verification",
+    ],
   },
   {
+    id: "governed-records",
     code: "GR",
     title: "Governed Records",
-    description:
-      "Create, upload, interpret, preserve, and review governed records.",
-    items: [
-      "Create records",
-      "Upload records",
-      "Bounded interpretation",
-      "Preserve uncertainty",
-      "Export records",
-    ],
     href: "/workspace/governed-records",
-    action: "Enter Governed Records",
-    accent: "#5eafff",
+    description:
+      "Create, upload, interpret, preserve, and review records without collapsing evidence into conclusion.",
+    points: [
+      "Create and upload governed records",
+      "Preserve uncertainty and limitations",
+      "Export attributable evidence packages",
+    ],
   },
   {
+    id: "environmental-records",
     code: "ER",
     title: "Environmental Records",
-    description:
-      "Interpret land, water, air, building, hospital, HVAC, and sensor evidence.",
-    items: [
-      "Atmospheric integrity",
-      "Environmental data",
-      "Building systems",
-      "IAQ and sensors",
-      "Land, water, air",
-    ],
     href: "/workspace/environmental-records",
-    action: "Enter Environmental Records",
-    accent: "#c271ff",
+    description:
+      "Interpret land, water, air, building, hospital, HVAC, and sensor evidence through bounded environmental review.",
+    points: [
+      "Atmospheric and environmental integrity",
+      "Buildings, IAQ, HVAC, and sensors",
+      "Land, water, air, and outcome records",
+    ],
   },
   {
+    id: "entity-review",
     code: "◎",
     title: "Entity Review",
-    description:
-      "Submit an organization, AI system, architecture, program, or route for review.",
-    items: [
-      "Organizations",
-      "AI systems",
-      "Architectures",
-      "Route reviews",
-      "Review status",
-    ],
     href: "/workspace/entity-review",
-    action: "Enter Entity Review",
-    accent: "#ffb320",
+    description:
+      "Submit an organization, AI system, architecture, program, or route for independent governed review.",
+    points: [
+      "Organizations and AI systems",
+      "Architectures and governance programs",
+      "Review findings, status, and boundaries",
+    ],
+  },
+];
+
+const discipline = [
+  {
+    number: "01",
+    title: "Build and test",
+    text: "Use AI Governance to examine consequential routes, inputs, authorities, failure states, and outcomes.",
+  },
+  {
+    number: "02",
+    title: "Preserve the evidence",
+    text: "Use Governed Records to keep the original record distinct from interpretation and determination.",
+  },
+  {
+    number: "03",
+    title: "Interpret the environment",
+    text: "Use Environmental Records to examine land, water, air, buildings, HVAC, hospitals, and sensor evidence.",
+  },
+  {
+    number: "04",
+    title: "Review the whole entity",
+    text: "Use Entity Review when the object under scrutiny is an organization, system, architecture, or route.",
   },
 ];
 
 export default function HomePage() {
   return (
-    <main id="top">
-      <div className="starField starFieldOne" />
-      <div className="starField starFieldTwo" />
-      <div className="ambient ambientOne" />
-      <div className="ambient ambientTwo" />
+    <main>
+      <div className="cosmos" aria-hidden="true">
+        <div className="starField starsOne" />
+        <div className="starField starsTwo" />
+        <div className="starField starsThree" />
 
-      <header className="header shell">
+        <div className="movingLine lineOne" />
+        <div className="movingLine lineTwo" />
+        <div className="movingLine lineThree" />
+
+        <div className="burst burstOne">
+          {Array.from({ length: 12 }).map((_, index) => (
+            <i key={index} style={{ "--i": index } as React.CSSProperties} />
+          ))}
+        </div>
+
+        <div className="burst burstTwo">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <i key={index} style={{ "--i": index } as React.CSSProperties} />
+          ))}
+        </div>
+
+        <div className="orbitSystem orbitSystemOne">
+          <div className="orbit orbitA">
+            <span />
+          </div>
+          <div className="orbit orbitB">
+            <span />
+          </div>
+          <div className="orbitCore" />
+        </div>
+
+        <div className="orbitSystem orbitSystemTwo">
+          <div className="orbit orbitA">
+            <span />
+          </div>
+          <div className="orbit orbitB">
+            <span />
+          </div>
+          <div className="orbitCore" />
+        </div>
+
+        <div className="floatingSphere sphereOne" />
+        <div className="floatingSphere sphereTwo" />
+        <div className="floatingSphere sphereThree" />
+      </div>
+
+      <header className="topbar shell">
         <Link href="/" className="brand">
-          <span className="brandBadge">TA-14</span>
+          <span className="brandMark">TA-14</span>
           <span className="brandText">
             <strong>AI Governance Exchange</strong>
             <small>No admissible evidence. No admissible execution.</small>
           </span>
         </Link>
 
-        <Link href="/workspace" className="headerButton">
+        <nav>
+          <Link href="/">Exchange</Link>
+          <Link href="/workspace">Workspace</Link>
+          <Link href="/workspace/ai-governance/eu-ai-act">EU AI Act</Link>
+          <Link href="/marketplace">Marketplace</Link>
+          <Link href="/workspace/governed-records">Records</Link>
+          <Link href="/workspace/verification">Verification</Link>
+          <Link href="/marketplace/post">Post a Need</Link>
+        </nav>
+
+        <Link href="/workspace" className="workspaceButton">
           Open Workspace
+          <span>→</span>
         </Link>
       </header>
 
       <section className="hero shell">
-        <p className="eyebrow">TA-14 AI GOVERNANCE EXCHANGE</p>
-        <h1>Choose the door that matches the work.</h1>
-        <p className="heroText">
-          Four governed workspaces. Each preserves its own evidence boundary,
-          purpose, and review path.
+        <div className="heroBadge">
+          <span>TA-14</span>
+          <strong>AI Governance Exchange</strong>
+        </div>
+
+        <p className="eyebrow">THE FRONT DOOR TO GOVERNED WORK</p>
+
+        <h1>Choose the door that matches what you are bringing.</h1>
+
+        <p className="lead">
+          Four governed workspaces. Each one preserves its own evidence
+          boundary, purpose, and review path so records, interpretation,
+          determination, optimization, and execution do not corrupt one
+          another.
         </p>
 
-        <div className="startPrompt">
-          <span>Open a door to begin</span>
-          <b aria-hidden="true">↓</b>
+        <div className="heroActions">
+          <a className="primaryButton" href="#doors">
+            Open a Door
+            <span>↓</span>
+          </a>
+
+          <Link className="secondaryButton" href="/workspace">
+            Enter the Full Workspace
+            <span>→</span>
+          </Link>
         </div>
       </section>
 
-      <section className="doors shell">
-        {doors.map((door) => (
-          <article
-            className="doorCard"
-            style={{ "--door-accent": door.accent } as React.CSSProperties}
-            key={door.title}
-          >
-            <div className="doorTitleRow">
-              <div className="categoryIcon">{door.code}</div>
-              <div>
-                <h2>{door.title}</h2>
-                <p>{door.description}</p>
-              </div>
-            </div>
-
-            <div className="doorContent">
-              <ul>
-                {door.items.map((item) => (
-                  <li key={item}>{item}</li>
-                ))}
-              </ul>
-
-              <div className="goldenDoor" aria-hidden="true">
-                <div className="lightRays" />
-                <div className="outerGlow" />
-                <div className="doorFrame">
-                  <div className="doorPanel">
-                    <div className="doorMedallion">{door.code}</div>
-                    <span className="doorKnob" />
-                    <span className="doorLine doorLineOne" />
-                    <span className="doorLine doorLineTwo" />
-                  </div>
-                </div>
-                <div className="threshold thresholdOne" />
-                <div className="threshold thresholdTwo" />
-                <div className="threshold thresholdThree" />
-              </div>
-            </div>
-
-            <Link href={door.href} className="enterButton">
-              <span>{door.action}</span>
-              <b aria-hidden="true">→</b>
-            </Link>
-          </article>
-        ))}
-      </section>
-
-      <section className="shortExplanation shell">
-        <div>
-          <p className="eyebrow">ONE GOVERNING DISCIPLINE</p>
-          <h2>Reality → Record → Continuity → Admissibility → Execution → Outcome</h2>
-        </div>
-        <p>
-          TA-14 separates records, interpretations, determinations, and
-          execution so each layer remains attributable and open to scrutiny.
-        </p>
-      </section>
-
-      <section className="smallCards shell">
-        <article>
-          <span>01</span>
-          <h3>Build and test</h3>
-          <p>Use the AI Governance workspace to examine consequential routes.</p>
-        </article>
-        <article>
-          <span>02</span>
-          <h3>Preserve the evidence</h3>
-          <p>Use Governed Records to create a bounded, attributable record.</p>
-        </article>
-        <article>
-          <span>03</span>
-          <h3>Review the whole entity</h3>
-          <p>Use Entity Review for organizations, systems, architectures, and routes.</p>
-        </article>
-      </section>
-
-      <section className="euNote shell">
-        <div>
-          <p className="eyebrow">EU AI ACT</p>
-          <h2>EU AI Act workflows are available inside the relevant doors.</h2>
+      <section className="doorsSection shell" id="doors">
+        <div className="sectionIntro">
+          <p className="eyebrow">FOUR GOVERNED WORKSPACES</p>
+          <h2>The entire door is the invitation.</h2>
           <p>
-            Enter AI Governance, Governed Records, or Entity Review to access
-            the applicable requirements and supporting governance workflows.
+            Hover over any portal to open it slightly and reveal the light
+            beyond. Click anywhere on the door to enter that workspace.
           </p>
         </div>
+
+        <div className="doorsGrid">
+          {workspaces.map((workspace) => (
+            <Link
+              key={workspace.id}
+              href={workspace.href}
+              className={`portalCard ${workspace.id}`}
+              aria-label={`Enter ${workspace.title}`}
+            >
+              <div className="portalScene">
+                <div className="portalFloor">
+                  <div className="lightSpill" />
+                </div>
+
+                <div className="doorFrame">
+                  <div className="doorGlow" />
+                  <div className="doorPanel">
+                    <div className="doorFace">
+                      <span className="doorCode">{workspace.code}</span>
+                      <span className="doorTitle">{workspace.title}</span>
+                    </div>
+
+                    <div className="doorEdge" />
+                    <div className="doorInterior">
+                      <div className="interiorLight" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="portalContent">
+                <span className="portalKicker">{workspace.code}</span>
+                <h3>{workspace.title}</h3>
+                <p>{workspace.description}</p>
+
+                <ul>
+                  {workspace.points.map((point) => (
+                    <li key={point}>{point}</li>
+                  ))}
+                </ul>
+
+                <div className="portalAction">
+                  Enter {workspace.title}
+                  <span>→</span>
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </section>
 
-      <section className="finalPrompt shell">
+      <section className="discipline shell">
+        <div className="disciplineHeader">
+          <div>
+            <p className="eyebrow">ONE GOVERNING DISCIPLINE</p>
+            <h2>Reality → Record → Continuity → Admissibility → Execution → Outcome</h2>
+          </div>
+
+          <p>
+            TA-14 separates records, interpretations, determinations,
+            optimizations, and execution so each layer remains attributable,
+            inspectable, and open to scrutiny.
+          </p>
+        </div>
+
+        <div className="disciplineGrid">
+          {discipline.map((item) => (
+            <article key={item.number}>
+              <span>{item.number}</span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="actSection shell">
+        <div className="actVisual" aria-hidden="true">
+          <div className="actRing ringOne" />
+          <div className="actRing ringTwo" />
+          <div className="actCore">
+            <span>EU</span>
+            <strong>AI ACT</strong>
+          </div>
+        </div>
+
+        <div className="actCopy">
+          <p className="eyebrow">EU AI ACT</p>
+          <h2>Regulatory workflows live inside the workspaces they actually govern.</h2>
+          <p>
+            Enter AI Governance for requirements and routes, Governed Records
+            for evidence obligations, or Entity Review for requirement-by-
+            requirement review. The Act is not treated as a detached compliance
+            page.
+          </p>
+
+          <div className="actActions">
+            <Link className="primaryButton" href="/workspace/ai-governance/eu-ai-act">
+              Open EU AI Act Workspace
+              <span>→</span>
+            </Link>
+
+            <Link className="secondaryButton" href="/workspace/governed-records/eu-ai-act">
+              View Record Requirements
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section className="finalCta shell">
         <div>
           <p className="eyebrow">START AT THE FRONT DOOR</p>
           <h2>Choose the workspace that matches what you are bringing.</h2>
+          <p>
+            Start with the object, record, environment, or entity under
+            scrutiny. The Exchange will preserve the boundary from there.
+          </p>
         </div>
-        <a
-          href="#top"
-          onClick={(event) => {
-            event.preventDefault();
-            window.scrollTo({ top: 0, behavior: "smooth" });
-          }}
-        >
-          Return to the doors ↑
+
+        <a className="returnButton" href="#doors">
+          Return to the Doors
+          <span>↑</span>
         </a>
       </section>
 
-      <footer className="footer shell">
-        <span>TA-14 Authority Governance Institution</span>
-        <span>No admissible evidence. No admissible execution.</span>
+      <footer className="shell">
+        <div>
+          <strong>TA-14 Authority Governance Institution</strong>
+          <span>No admissible evidence. No admissible execution.</span>
+        </div>
+
+        <Link href="/workspace">Open Workspace</Link>
       </footer>
 
       <style jsx>{`
@@ -213,17 +333,17 @@ export default function HomePage() {
         }
 
         :global(html) {
-          background: #050b15;
+          background: #02070d;
           scroll-behavior: smooth;
         }
 
         :global(body) {
           margin: 0;
-          color: #f6f8fc;
+          color: #f6fbff;
           background:
-            radial-gradient(circle at 15% 8%, rgba(55, 200, 183, 0.08), transparent 26%),
-            radial-gradient(circle at 85% 20%, rgba(68, 105, 177, 0.09), transparent 28%),
-            linear-gradient(180deg, #050b15 0%, #08101d 48%, #050913 100%);
+            radial-gradient(circle at 18% 0%, rgba(23, 104, 145, 0.15), transparent 32%),
+            radial-gradient(circle at 84% 18%, rgba(2, 73, 109, 0.12), transparent 28%),
+            linear-gradient(180deg, #02070d 0%, #06111c 46%, #02070d 100%);
           font-family:
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
@@ -237,708 +357,1066 @@ export default function HomePage() {
         }
 
         .shell {
-          width: min(1660px, calc(100% - 36px));
+          width: min(1320px, calc(100% - 40px));
           margin-inline: auto;
           position: relative;
-          z-index: 2;
+          z-index: 3;
+        }
+
+        .cosmos {
+          position: fixed;
+          inset: 0;
+          overflow: hidden;
+          pointer-events: none;
+          z-index: -5;
         }
 
         .starField {
-          position: fixed;
-          inset: -10%;
-          pointer-events: none;
-          z-index: -5;
-          opacity: 0.34;
+          position: absolute;
+          inset: -15%;
+          opacity: 0.42;
         }
 
-        .starFieldOne {
+        .starsOne {
           background-image:
-            radial-gradient(circle, rgba(255,255,255,.75) 0 1px, transparent 1.5px);
-          background-size: 94px 94px;
-          animation: starDrift 36s linear infinite;
+            radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.5px);
+          background-size: 98px 98px;
+          animation: starDriftOne 40s linear infinite;
         }
 
-        .starFieldTwo {
+        .starsTwo {
           background-image:
-            radial-gradient(circle, rgba(108,222,211,.55) 0 1px, transparent 1.5px);
-          background-size: 164px 164px;
-          background-position: 48px 62px;
-          animation: starDrift 50s linear infinite reverse;
+            radial-gradient(circle, rgba(88,205,255,.7) 0 1px, transparent 1.5px);
+          background-size: 156px 156px;
+          background-position: 47px 63px;
+          animation: starDriftTwo 52s linear infinite reverse;
         }
 
-        .ambient {
-          position: fixed;
-          width: 520px;
-          height: 520px;
+        .starsThree {
+          background-image:
+            radial-gradient(circle, rgba(255,210,112,.72) 0 1px, transparent 1.5px);
+          background-size: 244px 244px;
+          background-position: 83px 27px;
+          opacity: 0.24;
+          animation: starPulse 8s ease-in-out infinite alternate;
+        }
+
+        .movingLine {
+          position: absolute;
+          width: 62vw;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(95, 205, 255, 0.52),
+            transparent
+          );
+          filter: drop-shadow(0 0 8px rgba(95, 205, 255, 0.45));
+          transform-origin: center;
+        }
+
+        .lineOne {
+          left: -12vw;
+          top: 24%;
+          transform: rotate(13deg);
+          animation: lineSweepOne 14s linear infinite;
+        }
+
+        .lineTwo {
+          right: -22vw;
+          top: 62%;
+          transform: rotate(-18deg);
+          animation: lineSweepTwo 18s linear infinite;
+        }
+
+        .lineThree {
+          left: 18vw;
+          top: 82%;
+          transform: rotate(6deg);
+          animation: lineSweepThree 24s linear infinite;
+        }
+
+        .burst {
+          position: absolute;
+          width: 160px;
+          height: 160px;
+        }
+
+        .burst i {
+          --angle: calc(var(--i) * 30deg);
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 70px;
+          height: 1px;
+          transform-origin: left center;
+          transform: rotate(var(--angle)) scaleX(0.08);
+          background: linear-gradient(
+            90deg,
+            rgba(255, 220, 138, 0.9),
+            transparent
+          );
+          opacity: 0;
+          animation: explode 5.8s ease-out infinite;
+          animation-delay: calc(var(--i) * 70ms);
+        }
+
+        .burstOne {
+          left: 6%;
+          top: 18%;
+        }
+
+        .burstTwo {
+          right: 8%;
+          top: 44%;
+          transform: scale(0.72);
+        }
+
+        .orbitSystem {
+          position: absolute;
+          width: 260px;
+          height: 260px;
+        }
+
+        .orbitSystemOne {
+          right: 5%;
+          top: 7%;
+        }
+
+        .orbitSystemTwo {
+          left: 5%;
+          bottom: 10%;
+          transform: scale(0.7);
+        }
+
+        .orbit {
+          position: absolute;
+          inset: 0;
           border-radius: 999px;
-          filter: blur(130px);
-          opacity: 0.1;
-          z-index: -4;
-          pointer-events: none;
-          animation: ambientMove 16s ease-in-out infinite alternate;
+          border: 1px solid rgba(80, 189, 244, 0.18);
         }
 
-        .ambientOne {
-          background: #50dec9;
-          left: -230px;
-          top: -210px;
+        .orbitA {
+          animation: orbitSpin 21s linear infinite;
         }
 
-        .ambientTwo {
-          background: #6d62ff;
-          right: -220px;
-          top: 42%;
-          animation-delay: -7s;
+        .orbitB {
+          inset: 34px;
+          border-color: rgba(255, 194, 89, 0.2);
+          animation: orbitSpin 15s linear infinite reverse;
         }
 
-        .header {
-          min-height: 82px;
-          display: flex;
+        .orbit span {
+          position: absolute;
+          top: 50%;
+          right: -6px;
+          width: 12px;
+          height: 12px;
+          border-radius: 999px;
+          background: #70d2ff;
+          box-shadow: 0 0 18px rgba(112, 210, 255, 0.9);
+        }
+
+        .orbitB span {
+          top: 8%;
+          right: 18%;
+          background: #ffd16f;
+          box-shadow: 0 0 18px rgba(255, 209, 111, 0.9);
+        }
+
+        .orbitCore {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 28px;
+          height: 28px;
+          transform: translate(-50%, -50%);
+          border-radius: 999px;
+          background: radial-gradient(circle, #d8f6ff 0%, #5fc4f2 45%, transparent 70%);
+          box-shadow: 0 0 32px rgba(95, 196, 242, 0.7);
+        }
+
+        .floatingSphere {
+          position: absolute;
+          border-radius: 999px;
+          background:
+            radial-gradient(circle at 30% 28%, rgba(255,255,255,.95), rgba(101,206,255,.72) 20%, rgba(11,89,132,.38) 55%, transparent 72%);
+          box-shadow: 0 0 22px rgba(87, 195, 255, 0.48);
+        }
+
+        .sphereOne {
+          width: 18px;
+          height: 18px;
+          left: 23%;
+          top: 14%;
+          animation: sphereFloat 7s ease-in-out infinite alternate;
+        }
+
+        .sphereTwo {
+          width: 10px;
+          height: 10px;
+          right: 18%;
+          top: 68%;
+          animation: sphereFloat 9s ease-in-out infinite alternate-reverse;
+        }
+
+        .sphereThree {
+          width: 24px;
+          height: 24px;
+          left: 48%;
+          bottom: 8%;
+          animation: sphereFloat 11s ease-in-out infinite alternate;
+        }
+
+        .topbar {
+          min-height: 92px;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
           align-items: center;
-          justify-content: space-between;
-          gap: 22px;
-          border-bottom: 1px solid rgba(134, 155, 190, 0.15);
+          gap: 28px;
+          border-bottom: 1px solid rgba(107, 162, 190, 0.15);
         }
 
         .brand {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 13px;
           color: white;
           text-decoration: none;
         }
 
-        .brandBadge {
-          min-width: 66px;
-          height: 40px;
-          border-radius: 999px;
+        .brandMark {
+          min-width: 68px;
+          height: 42px;
           display: grid;
           place-items: center;
-          color: #06100f;
-          background: linear-gradient(135deg, #5cdbc9, #b9fff7);
+          border-radius: 999px;
+          color: #07111a;
+          background: linear-gradient(135deg, #72cff8, #d9f7ff);
           font-size: 13px;
           font-weight: 950;
-          letter-spacing: 0.05em;
+          letter-spacing: 0.06em;
+          box-shadow: 0 0 24px rgba(84, 196, 244, 0.2);
         }
 
         .brandText {
           display: flex;
           flex-direction: column;
-          gap: 2px;
+        }
+
+        .brandText strong {
+          font-size: 15px;
         }
 
         .brandText small {
-          color: #8193a8;
+          margin-top: 3px;
+          color: #7f9cad;
           font-size: 11px;
         }
 
-        .headerButton {
-          padding: 11px 17px;
-          border-radius: 999px;
-          border: 1px solid rgba(103, 221, 206, 0.3);
-          background: rgba(70, 200, 184, 0.07);
-          color: #dffff9;
+        nav {
+          display: flex;
+          justify-content: center;
+          gap: 22px;
+        }
+
+        nav a {
+          color: #a8bcc8;
           text-decoration: none;
           font-size: 13px;
-          font-weight: 850;
+          font-weight: 750;
+          transition:
+            color 180ms ease,
+            transform 180ms ease;
+        }
+
+        nav a:hover {
+          color: #f4fbff;
+          transform: translateY(-1px);
+        }
+
+        .workspaceButton {
+          min-height: 44px;
+          display: inline-flex;
+          align-items: center;
+          gap: 14px;
+          padding: 0 16px;
+          border-radius: 12px;
+          color: #07111a;
+          background: linear-gradient(135deg, #6ccaf4, #d9f7ff);
+          text-decoration: none;
+          font-size: 13px;
+          font-weight: 900;
+          box-shadow: 0 12px 30px rgba(52, 166, 219, 0.18);
         }
 
         .hero {
+          min-height: 680px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          padding: 90px 0 84px;
           text-align: center;
-          padding: 76px 20px 40px;
+        }
+
+        .heroBadge {
+          display: inline-flex;
+          align-items: center;
+          gap: 10px;
+          padding: 8px 14px;
+          border-radius: 999px;
+          border: 1px solid rgba(112, 205, 245, 0.22);
+          background: rgba(28, 86, 117, 0.08);
+          box-shadow: inset 0 0 18px rgba(92, 197, 240, 0.05);
+        }
+
+        .heroBadge span {
+          color: #7ad3fa;
+          font-weight: 950;
+        }
+
+        .heroBadge strong {
+          color: #dcecf3;
+          font-size: 13px;
         }
 
         .eyebrow {
           margin: 0;
-          color: #70ddce;
+          color: #72d1f8;
           font-size: 11px;
-          font-weight: 900;
+          font-weight: 950;
           letter-spacing: 0.18em;
         }
 
-        .hero h1 {
-          max-width: 980px;
-          margin: 17px auto 18px;
-          font-size: clamp(44px, 7vw, 86px);
-          line-height: 0.98;
-          letter-spacing: -0.055em;
+        .hero > .eyebrow {
+          margin-top: 24px;
         }
 
-        .heroText {
-          max-width: 730px;
-          margin: 0 auto;
-          color: #9dafc4;
-          font-size: 18px;
-          line-height: 1.65;
+        h1 {
+          max-width: 1080px;
+          margin: 18px 0 22px;
+          font-size: clamp(58px, 8vw, 108px);
+          line-height: 0.94;
+          letter-spacing: -0.065em;
+          text-wrap: balance;
         }
 
-        .startPrompt {
-          width: min(830px, 92%);
-          margin: 34px auto 0;
-          min-height: 64px;
+        .lead {
+          max-width: 860px;
+          margin: 0;
+          color: #9eb4c1;
+          font-size: 19px;
+          line-height: 1.72;
+        }
+
+        .heroActions {
           display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 12px;
+          margin-top: 32px;
+        }
+
+        .primaryButton,
+        .secondaryButton,
+        .returnButton {
+          min-height: 54px;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          gap: 14px;
-          border: 1px solid rgba(104, 220, 206, 0.18);
-          border-radius: 18px;
-          background: rgba(6, 15, 27, 0.75);
-          color: #e2fff9;
-          font-weight: 850;
+          gap: 22px;
+          padding: 0 20px;
+          border-radius: 14px;
+          text-decoration: none;
+          font-weight: 900;
         }
 
-        .startPrompt b {
-          color: #5edccb;
-          animation: bounce 1.5s ease-in-out infinite;
+        .primaryButton {
+          color: #07111a;
+          background: linear-gradient(135deg, #69caf4, #dcf8ff);
+          box-shadow: 0 14px 38px rgba(71, 183, 231, 0.19);
         }
 
-        .doors {
+        .secondaryButton,
+        .returnButton {
+          color: #e7f5fb;
+          border: 1px solid rgba(107, 186, 222, 0.24);
+          background: rgba(20, 53, 72, 0.18);
+        }
+
+        .doorsSection {
+          padding: 28px 0 34px;
+        }
+
+        .sectionIntro {
+          max-width: 900px;
+        }
+
+        .sectionIntro h2,
+        .disciplineHeader h2,
+        .actCopy h2,
+        .finalCta h2 {
+          margin: 14px 0 16px;
+          font-size: clamp(38px, 5.6vw, 68px);
+          line-height: 1;
+          letter-spacing: -0.05em;
+        }
+
+        .sectionIntro > p:not(.eyebrow),
+        .disciplineHeader > p,
+        .actCopy > p:not(.eyebrow),
+        .finalCta p:not(.eyebrow) {
+          color: #9eb3c1;
+          line-height: 1.7;
+        }
+
+        .doorsGrid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 20px;
-          padding-bottom: 76px;
-        }
-
-        .doorCard {
-          min-height: 700px;
-          display: flex;
-          flex-direction: column;
-          padding: 28px;
-          border-radius: 30px;
-          border: 1px solid color-mix(in srgb, var(--door-accent) 48%, transparent);
-          background:
-            radial-gradient(circle at 50% 72%, rgba(255, 177, 31, 0.08), transparent 34%),
-            linear-gradient(180deg, rgba(13, 22, 37, 0.95), rgba(6, 11, 22, 0.98));
-          box-shadow:
-            0 28px 90px rgba(0, 0, 0, 0.32),
-            inset 0 1px 0 rgba(255,255,255,.035);
-          position: relative;
-          overflow: hidden;
-          transition:
-            transform 230ms ease,
-            border-color 230ms ease;
-        }
-
-        .doorCard:hover {
-          transform: translateY(-6px);
-          border-color: var(--door-accent);
-        }
-
-        .doorTitleRow {
-          display: grid;
-          grid-template-columns: 66px 1fr;
           gap: 18px;
-          min-height: 180px;
+          margin-top: 34px;
+        }
+
+        .portalCard {
           position: relative;
-          z-index: 2;
-        }
-
-        .categoryIcon {
-          width: 66px;
-          height: 66px;
-          border-radius: 18px;
-          display: grid;
-          place-items: center;
-          border: 1px solid var(--door-accent);
-          background: color-mix(in srgb, var(--door-accent) 9%, transparent);
-          color: var(--door-accent);
-          font-size: 23px;
-          font-weight: 950;
-        }
-
-        .doorTitleRow h2 {
-          margin: 3px 0 10px;
-          font-size: 25px;
-          letter-spacing: -0.03em;
-        }
-
-        .doorTitleRow p {
-          margin: 0;
-          color: #9fafc3;
-          line-height: 1.57;
-          font-size: 14px;
-        }
-
-        .doorContent {
-          flex: 1;
-          display: grid;
-          grid-template-columns: minmax(116px, 0.72fr) minmax(175px, 1.28fr);
-          gap: 12px;
-          align-items: end;
-          position: relative;
-          z-index: 2;
-        }
-
-        ul {
-          list-style: none;
-          padding: 0;
-          margin: 0 0 30px;
-        }
-
-        li {
-          margin: 0 0 16px;
-          padding-left: 20px;
-          color: #c5d0df;
-          font-size: 14px;
-          line-height: 1.4;
-          position: relative;
-        }
-
-        li::before {
-          content: "✦";
-          position: absolute;
-          left: 0;
-          top: 3px;
-          color: var(--door-accent);
-          font-size: 10px;
-        }
-
-        .goldenDoor {
-          height: 350px;
-          display: flex;
-          align-items: flex-end;
-          justify-content: center;
-          position: relative;
-          filter: drop-shadow(0 0 22px rgba(255, 184, 48, 0.45));
-        }
-
-        .lightRays {
-          position: absolute;
-          inset: 0 -26px 24px;
-          clip-path: polygon(36% 0, 64% 0, 100% 100%, 0 100%);
-          opacity: 0.42;
+          min-height: 650px;
+          overflow: hidden;
+          border-radius: 28px;
+          border: 1px solid rgba(195, 154, 73, 0.28);
           background:
-            repeating-conic-gradient(
-              from 190deg at 50% 100%,
-              transparent 0 7deg,
-              rgba(255, 196, 76, 0.9) 8deg 9deg,
-              transparent 10deg 20deg
-            );
-          animation: rays 3.5s ease-in-out infinite alternate;
+            radial-gradient(circle at 50% 22%, rgba(255, 204, 105, 0.08), transparent 28%),
+            linear-gradient(180deg, rgba(12, 18, 24, 0.96), rgba(5, 10, 15, 0.98));
+          color: inherit;
+          text-decoration: none;
+          box-shadow:
+            0 28px 80px rgba(0, 0, 0, 0.26),
+            inset 0 1px 0 rgba(255, 255, 255, 0.025);
+          transition:
+            transform 260ms ease,
+            border-color 260ms ease,
+            box-shadow 260ms ease;
         }
 
-        .outerGlow {
+        .portalCard:hover,
+        .portalCard:focus-visible {
+          transform: translateY(-9px);
+          border-color: rgba(255, 203, 104, 0.68);
+          box-shadow:
+            0 38px 100px rgba(0, 0, 0, 0.34),
+            0 0 44px rgba(255, 182, 46, 0.1);
+          outline: none;
+        }
+
+        .portalScene {
+          position: relative;
+          height: 360px;
+          overflow: hidden;
+          perspective: 1100px;
+          background:
+            radial-gradient(circle at 50% 26%, rgba(255, 202, 102, 0.12), transparent 26%),
+            linear-gradient(180deg, rgba(3, 8, 13, 0.4), rgba(8, 11, 12, 0.96));
+        }
+
+        .portalScene::before {
+          content: "";
           position: absolute;
-          bottom: 36px;
-          width: 235px;
-          height: 280px;
-          border-radius: 120px 120px 20px 20px;
-          background: radial-gradient(
-            ellipse at 50% 65%,
-            rgba(255, 189, 48, 0.32),
-            rgba(255, 180, 27, 0.09) 48%,
-            transparent 72%
-          );
-          filter: blur(8px);
-          animation: glowPulse 2.8s ease-in-out infinite alternate;
+          inset: 0;
+          background:
+            linear-gradient(90deg, transparent 49.5%, rgba(255, 215, 137, 0.08) 50%, transparent 50.5%);
+          opacity: 0.7;
+        }
+
+        .portalFloor {
+          position: absolute;
+          left: -10%;
+          right: -10%;
+          bottom: -4px;
+          height: 125px;
+          transform: perspective(340px) rotateX(62deg);
+          transform-origin: bottom;
+          background:
+            linear-gradient(90deg, transparent, rgba(255, 190, 70, 0.05), transparent),
+            linear-gradient(180deg, rgba(74, 47, 10, 0.05), rgba(5, 8, 10, 0.92));
+        }
+
+        .portalFloor::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background:
+            repeating-linear-gradient(
+              90deg,
+              transparent 0 44px,
+              rgba(255, 205, 109, 0.06) 45px 46px
+            );
+          opacity: 0.5;
+        }
+
+        .lightSpill {
+          position: absolute;
+          left: 50%;
+          top: 0;
+          width: 30px;
+          height: 110px;
+          transform: translateX(-50%) scaleX(0.12);
+          transform-origin: top center;
+          clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
+          background:
+            linear-gradient(
+              180deg,
+              rgba(255, 246, 190, 0.88),
+              rgba(255, 192, 68, 0.48) 46%,
+              transparent 100%
+            );
+          filter: blur(3px);
+          opacity: 0;
+          transition:
+            transform 420ms cubic-bezier(.2,.72,.2,1),
+            opacity 280ms ease;
         }
 
         .doorFrame {
-          width: 190px;
-          height: 275px;
-          padding: 17px;
-          border-radius: 100px 100px 12px 12px;
-          border: 4px solid #ffc44d;
+          position: absolute;
+          left: 50%;
+          top: 24px;
+          width: 170px;
+          height: 280px;
+          transform: translateX(-50%);
+          border-radius: 10px 10px 4px 4px;
+          border: 8px solid #a26b16;
           background:
-            linear-gradient(180deg, rgba(255, 202, 91, 0.17), rgba(75, 40, 3, 0.96)),
-            #251500;
+            linear-gradient(90deg, #6c3f08, #e3ad45 18%, #8a510d 50%, #e0aa41 82%, #603704);
           box-shadow:
-            0 0 12px #ffd263,
-            0 0 28px rgba(255, 181, 28, 0.85),
-            0 0 60px rgba(255, 171, 13, 0.42),
-            inset 0 0 28px rgba(255, 193, 61, 0.38);
-          position: relative;
-          z-index: 3;
-          animation: doorPulse 3s ease-in-out infinite alternate;
+            0 0 0 2px rgba(255, 215, 133, 0.4),
+            0 0 38px rgba(255, 176, 43, 0.2),
+            inset 0 0 22px rgba(255, 224, 154, 0.16);
         }
 
-        .doorFrame::before {
-          content: "";
+        .doorGlow {
           position: absolute;
-          inset: -17px;
-          border-radius: 116px 116px 11px 11px;
-          border: 1px solid rgba(255, 198, 76, 0.72);
-          border-bottom: 0;
-        }
-
-        .doorFrame::after {
-          content: "";
-          position: absolute;
-          inset: -29px -24px -8px;
-          border-radius: 130px 130px 13px 13px;
-          border: 1px solid rgba(255, 188, 48, 0.35);
-          border-bottom: 0;
+          inset: 5px;
+          border-radius: 4px;
+          background: rgba(255, 214, 130, 0.2);
+          filter: blur(14px);
+          opacity: 0.4;
+          transition: opacity 280ms ease;
         }
 
         .doorPanel {
-          width: 100%;
-          height: 100%;
-          border-radius: 78px 78px 7px 7px;
-          border: 1px solid #ffe09a;
-          background:
-            linear-gradient(90deg, transparent 49.4%, rgba(255,239,190,.22) 50%, transparent 50.6%),
-            linear-gradient(180deg, rgba(255, 206, 94, 0.15), rgba(65, 34, 3, 0.78));
-          position: relative;
-          display: grid;
-          place-items: center;
-          box-shadow: inset 0 0 24px rgba(255, 188, 45, 0.28);
-        }
-
-        .doorMedallion {
-          width: 72px;
-          height: 72px;
-          border-radius: 999px;
-          display: grid;
-          place-items: center;
-          border: 2px solid #fff1c2;
-          background: rgba(47, 25, 2, 0.92);
-          color: #fff3c7;
-          font-size: 21px;
-          font-weight: 950;
-          box-shadow:
-            0 0 16px #ffc24b,
-            inset 0 0 16px rgba(255, 197, 72, 0.2);
-        }
-
-        .doorKnob {
           position: absolute;
-          width: 11px;
-          height: 11px;
-          right: -6px;
-          top: 50%;
-          border-radius: 999px;
-          background: #fff0a9;
-          box-shadow:
-            0 0 7px #fff1ac,
-            0 0 16px #ffb819;
+          inset: 7px;
+          transform-origin: left center;
+          transform-style: preserve-3d;
+          transition:
+            transform 460ms cubic-bezier(.2,.7,.15,1),
+            box-shadow 280ms ease;
         }
 
-        .doorLine {
+        .doorFace,
+        .doorInterior {
           position: absolute;
-          left: 16px;
-          right: 16px;
-          height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(255, 220, 137, 0.42),
-            transparent
-          );
+          inset: 0;
+          backface-visibility: hidden;
         }
 
-        .doorLineOne {
-          top: 29%;
-        }
-
-        .doorLineTwo {
-          bottom: 25%;
-        }
-
-        .threshold {
-          position: absolute;
-          bottom: 4px;
-          border-radius: 50%;
-          border: 1px solid rgba(255, 194, 64, 0.8);
-          transform: perspective(120px) rotateX(67deg);
-          box-shadow:
-            0 0 9px rgba(255, 190, 54, 0.7),
-            inset 0 0 9px rgba(255, 194, 58, 0.22);
-        }
-
-        .thresholdOne {
-          width: 230px;
-          height: 40px;
-        }
-
-        .thresholdTwo {
-          width: 260px;
-          height: 48px;
-          bottom: -2px;
-          opacity: 0.65;
-        }
-
-        .thresholdThree {
-          width: 290px;
-          height: 56px;
-          bottom: -8px;
-          opacity: 0.32;
-        }
-
-        .enterButton {
-          min-height: 66px;
-          margin-top: 18px;
-          padding: 0 20px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          border-radius: 15px;
-          border: 1px solid #eeb23b;
-          background:
-            linear-gradient(180deg, rgba(183, 132, 36, 0.82), rgba(77, 43, 5, 0.97));
-          box-shadow:
-            inset 0 1px 0 rgba(255,255,255,.2),
-            0 12px 30px rgba(0,0,0,.25);
-          color: #fff6dc;
-          text-decoration: none;
-          font-weight: 900;
-          position: relative;
+        .doorFace {
           z-index: 3;
-        }
-
-        .shortExplanation {
-          padding: 62px 48px;
-          display: grid;
-          grid-template-columns: 1.15fr 0.85fr;
-          gap: 44px;
+          display: flex;
+          flex-direction: column;
           align-items: center;
-          border-top: 1px solid rgba(127, 148, 181, 0.15);
-          border-bottom: 1px solid rgba(127, 148, 181, 0.15);
+          justify-content: center;
+          gap: 12px;
+          border-radius: 3px;
+          background:
+            linear-gradient(90deg, rgba(255,255,255,.06), transparent 18%, transparent 82%, rgba(0,0,0,.18)),
+            repeating-linear-gradient(
+              90deg,
+              #c88a23 0 22px,
+              #b4781e 22px 44px
+            );
+          border: 1px solid rgba(255, 228, 170, 0.42);
+          box-shadow:
+            inset 0 0 0 3px rgba(90, 49, 3, 0.34),
+            inset 0 0 24px rgba(255, 216, 134, 0.14);
         }
 
-        .shortExplanation h2,
-        .euNote h2,
-        .finalPrompt h2 {
-          margin: 12px 0 0;
-          font-size: clamp(30px, 4vw, 48px);
-          line-height: 1.05;
-          letter-spacing: -0.045em;
+        .doorFace::before,
+        .doorFace::after {
+          content: "";
+          position: absolute;
+          left: 17px;
+          right: 17px;
+          border: 2px solid rgba(90, 49, 3, 0.5);
+          border-radius: 3px;
         }
 
-        .shortExplanation > p {
-          margin: 0;
-          color: #9fafc2;
-          line-height: 1.68;
+        .doorFace::before {
+          top: 18px;
+          height: 74px;
         }
 
-        .smallCards {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 18px;
-          padding: 62px 0;
+        .doorFace::after {
+          bottom: 18px;
+          height: 74px;
         }
 
-        .smallCards article {
-          min-height: 210px;
-          padding: 28px;
-          border-radius: 20px;
-          border: 1px solid rgba(131, 153, 188, 0.16);
-          background: linear-gradient(
-            180deg,
-            rgba(13, 22, 37, 0.84),
-            rgba(7, 13, 24, 0.92)
-          );
+        .doorCode {
+          position: relative;
+          z-index: 2;
+          color: #fff2c8;
+          font-size: 46px;
+          font-weight: 950;
+          text-shadow:
+            0 0 18px rgba(255, 214, 124, 0.58),
+            0 2px 0 rgba(87, 45, 0, 0.7);
         }
 
-        .smallCards span {
-          color: #69dbcc;
-          font-size: 11px;
+        .doorTitle {
+          position: relative;
+          z-index: 2;
+          max-width: 120px;
+          color: #fff5d8;
+          text-align: center;
+          font-size: 14px;
           font-weight: 900;
+          line-height: 1.18;
+        }
+
+        .doorEdge {
+          position: absolute;
+          top: 0;
+          right: -12px;
+          width: 12px;
+          height: 100%;
+          transform-origin: left center;
+          transform: rotateY(90deg);
+          background: linear-gradient(180deg, #f1bd55, #6a3905);
+        }
+
+        .doorInterior {
+          z-index: 1;
+          overflow: hidden;
+          border-radius: 3px;
+          background:
+            radial-gradient(circle at 50% 40%, rgba(255, 250, 210, 1), rgba(255, 196, 72, 0.88) 32%, rgba(164, 80, 9, 0.7) 68%, #351601 100%);
+          box-shadow: inset 0 0 30px rgba(255, 247, 195, 0.45);
+        }
+
+        .interiorLight {
+          position: absolute;
+          inset: 0;
+          background:
+            linear-gradient(180deg, rgba(255,255,255,.55), transparent 20%),
+            radial-gradient(circle at 50% 55%, rgba(255,255,255,.72), transparent 34%);
+          animation: interiorPulse 2.8s ease-in-out infinite alternate;
+        }
+
+        .portalCard:hover .doorPanel,
+        .portalCard:focus-visible .doorPanel {
+          transform: rotateY(-24deg) translateX(-4px);
+          box-shadow: 18px 0 28px rgba(255, 195, 69, 0.13);
+        }
+
+        .portalCard:hover .lightSpill,
+        .portalCard:focus-visible .lightSpill {
+          opacity: 1;
+          transform: translateX(-50%) scaleX(3.6);
+        }
+
+        .portalCard:hover .doorGlow,
+        .portalCard:focus-visible .doorGlow {
+          opacity: 0.9;
+        }
+
+        .portalContent {
+          padding: 26px 24px 28px;
+        }
+
+        .portalKicker {
+          color: #f0b84f;
+          font-size: 11px;
+          font-weight: 950;
           letter-spacing: 0.16em;
         }
 
-        .smallCards h3 {
-          margin: 17px 0 10px;
-          font-size: 25px;
-          letter-spacing: -0.03em;
+        .portalContent h3 {
+          margin: 10px 0 12px;
+          font-size: 29px;
+          letter-spacing: -0.035em;
         }
 
-        .smallCards p {
+        .portalContent > p {
           margin: 0;
-          color: #9fafc2;
-          line-height: 1.62;
+          min-height: 88px;
+          color: #9eb2bf;
+          line-height: 1.58;
         }
 
-        .euNote {
-          padding: 28px 34px;
-          border-radius: 20px;
-          border: 1px solid rgba(129, 151, 186, 0.14);
-          background: rgba(8, 15, 27, 0.7);
+        .portalContent ul {
+          display: grid;
+          gap: 8px;
+          margin: 20px 0 0;
+          padding: 0;
+          list-style: none;
         }
 
-        .euNote h2 {
-          font-size: clamp(23px, 3vw, 34px);
+        .portalContent li {
+          position: relative;
+          padding-left: 18px;
+          color: #d6e2e8;
+          font-size: 13px;
+          line-height: 1.45;
         }
 
-        .euNote p:not(.eyebrow) {
-          max-width: 900px;
-          margin: 12px 0 0;
-          color: #96a7ba;
-          line-height: 1.62;
+        .portalContent li::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0.55em;
+          width: 7px;
+          height: 7px;
+          border-radius: 999px;
+          background: #e8b349;
+          box-shadow: 0 0 10px rgba(232, 179, 73, 0.55);
         }
 
-        .finalPrompt {
-          margin-top: 58px;
-          padding: 48px 40px;
+        .portalAction {
+          min-height: 48px;
+          margin-top: 24px;
+          padding: 0 14px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          border-radius: 12px;
+          border: 1px solid rgba(232, 179, 73, 0.24);
+          background: rgba(181, 111, 14, 0.06);
+          color: #f8ce7a;
+          font-size: 13px;
+          font-weight: 900;
+          transition:
+            background 180ms ease,
+            border-color 180ms ease;
+        }
+
+        .portalCard:hover .portalAction,
+        .portalCard:focus-visible .portalAction {
+          border-color: rgba(255, 207, 114, 0.55);
+          background: rgba(186, 116, 20, 0.12);
+        }
+
+        .discipline,
+        .actSection,
+        .finalCta {
+          border: 1px solid rgba(99, 166, 195, 0.16);
+          background:
+            linear-gradient(180deg, rgba(8, 21, 31, 0.9), rgba(3, 10, 15, 0.95));
+          border-radius: 28px;
+          box-shadow: 0 26px 80px rgba(0, 0, 0, 0.25);
+        }
+
+        .discipline {
+          margin-top: 84px;
+          padding: 48px;
+        }
+
+        .disciplineHeader {
+          display: grid;
+          grid-template-columns: 1.05fr 0.95fr;
+          gap: 38px;
+          align-items: end;
+        }
+
+        .disciplineHeader > p {
+          margin: 0;
+        }
+
+        .disciplineGrid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 34px;
+        }
+
+        .disciplineGrid article {
+          min-height: 230px;
+          padding: 22px;
+          border-radius: 18px;
+          border: 1px solid rgba(104, 177, 207, 0.16);
+          background: rgba(32, 87, 111, 0.05);
+        }
+
+        .disciplineGrid span {
+          color: #69cdf7;
+          font-size: 11px;
+          font-weight: 950;
+          letter-spacing: 0.16em;
+        }
+
+        .disciplineGrid h3 {
+          margin: 16px 0 10px;
+          font-size: 24px;
+        }
+
+        .disciplineGrid p {
+          margin: 0;
+          color: #9fb3c0;
+          line-height: 1.58;
+        }
+
+        .actSection {
+          margin-top: 22px;
+          padding: 48px;
+          display: grid;
+          grid-template-columns: 0.78fr 1.22fr;
+          gap: 42px;
+          align-items: center;
+        }
+
+        .actVisual {
+          min-height: 330px;
+          position: relative;
+          display: grid;
+          place-items: center;
+        }
+
+        .actRing {
+          position: absolute;
+          border-radius: 999px;
+          border: 1px solid rgba(101, 194, 232, 0.22);
+        }
+
+        .ringOne {
+          width: 290px;
+          height: 290px;
+          animation: orbitSpin 18s linear infinite;
+        }
+
+        .ringTwo {
+          width: 220px;
+          height: 220px;
+          border-color: rgba(255, 196, 79, 0.22);
+          animation: orbitSpin 13s linear infinite reverse;
+        }
+
+        .actCore {
+          width: 150px;
+          height: 150px;
+          border-radius: 999px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(107, 205, 245, 0.42);
+          background:
+            radial-gradient(circle, rgba(83, 180, 223, 0.14), rgba(6, 17, 26, 0.95) 68%);
+          box-shadow:
+            0 0 36px rgba(84, 191, 236, 0.18),
+            inset 0 0 22px rgba(84, 191, 236, 0.08);
+        }
+
+        .actCore span {
+          color: #75d4fb;
+          font-size: 34px;
+          font-weight: 950;
+        }
+
+        .actCore strong {
+          margin-top: 3px;
+          color: #edf9fd;
+          font-size: 16px;
+        }
+
+        .actActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 26px;
+        }
+
+        .finalCta {
+          margin-top: 78px;
+          padding: 56px 48px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          gap: 30px;
-          border-radius: 26px;
-          border: 1px solid rgba(103, 218, 202, 0.18);
-          background: linear-gradient(
-            180deg,
-            rgba(12, 22, 37, 0.9),
-            rgba(7, 13, 24, 0.95)
-          );
+          gap: 34px;
         }
 
-        .finalPrompt > div {
-          max-width: 850px;
+        .finalCta > div {
+          max-width: 820px;
         }
 
-        .finalPrompt a {
-          min-width: 205px;
-          padding: 14px 18px;
-          border-radius: 999px;
-          border: 1px solid rgba(104, 220, 206, 0.28);
-          background: rgba(75, 200, 184, 0.07);
-          color: #dcfff9;
-          text-decoration: none;
-          text-align: center;
-          font-weight: 850;
-        }
-
-        .footer {
-          min-height: 110px;
+        footer {
+          min-height: 130px;
           display: flex;
           align-items: center;
           justify-content: space-between;
           gap: 24px;
-          color: #728397;
+          color: #768d9a;
           font-size: 12px;
         }
 
-        @keyframes starDrift {
-          from {
-            transform: translate3d(0, 0, 0);
+        footer > div {
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+        }
+
+        footer strong {
+          color: #a9bbc5;
+        }
+
+        footer a {
+          color: #8fd8f8;
+          text-decoration: none;
+          font-weight: 850;
+        }
+
+        @keyframes starDriftOne {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(110px, 150px, 0); }
+        }
+
+        @keyframes starDriftTwo {
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(-130px, 100px, 0); }
+        }
+
+        @keyframes starPulse {
+          from { opacity: 0.14; transform: scale(0.98); }
+          to { opacity: 0.34; transform: scale(1.02); }
+        }
+
+        @keyframes lineSweepOne {
+          0% { transform: translateX(-28vw) rotate(13deg); opacity: 0; }
+          15% { opacity: 0.6; }
+          80% { opacity: 0.35; }
+          100% { transform: translateX(105vw) rotate(13deg); opacity: 0; }
+        }
+
+        @keyframes lineSweepTwo {
+          0% { transform: translateX(28vw) rotate(-18deg); opacity: 0; }
+          18% { opacity: 0.5; }
+          85% { opacity: 0.3; }
+          100% { transform: translateX(-105vw) rotate(-18deg); opacity: 0; }
+        }
+
+        @keyframes lineSweepThree {
+          0% { transform: translateX(-55vw) rotate(6deg); opacity: 0; }
+          20% { opacity: 0.38; }
+          82% { opacity: 0.28; }
+          100% { transform: translateX(92vw) rotate(6deg); opacity: 0; }
+        }
+
+        @keyframes explode {
+          0%, 58% {
+            transform: rotate(var(--angle)) scaleX(0.08);
+            opacity: 0;
           }
-          to {
-            transform: translate3d(90px, 140px, 0);
+          65% {
+            opacity: 0.9;
+          }
+          100% {
+            transform: rotate(var(--angle)) scaleX(1.15);
+            opacity: 0;
           }
         }
 
-        @keyframes ambientMove {
-          from {
-            transform: translate3d(0, 0, 0) scale(1);
-          }
-          to {
-            transform: translate3d(60px, 38px, 0) scale(1.12);
-          }
+        @keyframes orbitSpin {
+          to { transform: rotate(360deg); }
         }
 
-        @keyframes bounce {
-          0%, 100% {
-            transform: translateY(0);
-          }
-          50% {
-            transform: translateY(5px);
-          }
+        @keyframes sphereFloat {
+          from { transform: translate3d(0, -10px, 0); }
+          to { transform: translate3d(18px, 14px, 0); }
         }
 
-        @keyframes rays {
-          from {
-            opacity: 0.25;
-            transform: scaleX(0.94);
-          }
-          to {
-            opacity: 0.5;
-            transform: scaleX(1.06);
-          }
+        @keyframes interiorPulse {
+          from { opacity: 0.48; }
+          to { opacity: 0.84; }
         }
 
-        @keyframes glowPulse {
-          from {
-            opacity: 0.65;
-            transform: scale(0.96);
+        @media (max-width: 1120px) {
+          .topbar {
+            grid-template-columns: auto auto;
           }
-          to {
-            opacity: 1;
-            transform: scale(1.05);
-          }
-        }
 
-        @keyframes doorPulse {
-          from {
-            filter: brightness(0.92);
+          nav {
+            display: none;
           }
-          to {
-            filter: brightness(1.18);
-          }
-        }
 
-        @media (max-width: 1420px) {
-          .doors {
+          .doorsGrid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .doorCard {
-            min-height: 660px;
+          .disciplineGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
 
-        @media (max-width: 900px) {
-          .shortExplanation {
+        @media (max-width: 820px) {
+          .disciplineHeader,
+          .actSection {
             grid-template-columns: 1fr;
           }
 
-          .smallCards {
-            grid-template-columns: 1fr;
-          }
-
-          .finalPrompt {
+          .finalCta {
             flex-direction: column;
             align-items: flex-start;
           }
+
+          .actVisual {
+            min-height: 290px;
+          }
         }
 
-        @media (max-width: 720px) {
-          .shell,
-          .header {
-            width: min(100% - 20px, 1660px);
+        @media (max-width: 640px) {
+          .shell {
+            width: min(100% - 20px, 1320px);
           }
 
-          .brandText small,
-          .headerButton {
+          .brandText small {
+            display: none;
+          }
+
+          .workspaceButton {
+            padding: 0 12px;
+          }
+
+          .workspaceButton span {
             display: none;
           }
 
           .hero {
-            padding-top: 54px;
+            min-height: auto;
+            padding: 72px 0 62px;
           }
 
-          .doors {
+          h1 {
+            font-size: clamp(48px, 16vw, 72px);
+          }
+
+          .doorsGrid,
+          .disciplineGrid {
             grid-template-columns: 1fr;
           }
 
-          .doorCard {
-            min-height: auto;
-            padding: 22px;
+          .portalCard {
+            min-height: 630px;
           }
 
-          .doorTitleRow {
-            min-height: auto;
-            margin-bottom: 22px;
+          .discipline,
+          .actSection,
+          .finalCta {
+            padding: 30px 24px;
           }
 
-          .doorContent {
-            grid-template-columns: 1fr;
+          .actVisual {
+            transform: scale(0.86);
           }
 
-          ul {
-            margin-bottom: 4px;
-          }
-
-          .goldenDoor {
-            height: 350px;
-          }
-
-          .shortExplanation,
-          .euNote,
-          .finalPrompt {
-            padding: 28px 24px;
-          }
-
-          .footer {
+          footer {
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
