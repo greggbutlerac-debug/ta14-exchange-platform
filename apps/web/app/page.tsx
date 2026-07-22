@@ -80,7 +80,7 @@ const workspaces = [
     id: "registry",
     code: "RG",
     title: "AI Governance Registry",
-    href: "/workspace/ai-governance/registry",
+    href: "/registry",
     kicker: "ESTABLISH A DATED AND ATTRIBUTABLE RECORD",
     description:
       "Register governance architectures as searchable, versioned records with preserved identity, stewardship, claims, non-claims, evidence, lineage, and status.",
@@ -317,12 +317,12 @@ export default function HomePage() {
           <span className="statusFlag">REGISTRY INTAKE OPEN</span>
           <p className="eyebrow">TA-14 AI GOVERNANCE REGISTRY</p>
           <h2>Establish a dated, searchable, attributable governance record.</h2>
-          <p>The Registry now provides a governed front door for declaring an AI governance architecture, preserving who claims it, what it claims to govern, what it explicitly does not claim, which evidence supports the declaration, and how the record changes over time.</p>
+          <p>The public AI Governance Registry preserves dated, attributable, searchable governance architecture records. Visitors can open the complete TA-14 Founding Architecture Record, enter the public Registry, or use the interactive Registry Workspace to build and manage registry entries.</p>
           <div className="registryList">{registryFields.map(item => <span key={item}><i>◆</i>{item}</span>)}</div>
           <div className="featureActions">
-            <Link className="grandButton gold" href="/workspace/ai-governance/registry/register">Register Governance <Arrow /></Link>
-            <Link className="grandButton primary" href="/workspace/ai-governance/registry/records">Search Public Registry <Arrow /></Link>
-            <Link className="grandButton glass" href="/workspace/ai-governance/registry">Open Registry Institution <Arrow /></Link>
+            <Link className="grandButton gold" href="/registry">Open AI Governance Registry <Arrow /></Link>
+            <Link className="grandButton primary" href="/registry/ta-14-admissible-execution-architecture">View the TA-14 Founding Architecture Record <Arrow /></Link>
+            <Link className="grandButton glass" href="/workspace/ai-governance/registry">Open Registry Workspace <Arrow /></Link>
           </div>
         </div>
       </section>
