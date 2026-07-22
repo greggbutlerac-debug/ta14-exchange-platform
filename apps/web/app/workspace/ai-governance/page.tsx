@@ -64,6 +64,7 @@ export default function AIGovernancePage() {
         <nav>
           <Link href="/">Home</Link>
           <Link href="/workspace">Workspace</Link>
+          <Link href="/workspace/ai-governance/registry#foundation">Foundation</Link>
           <Link href="/workspace/governed-records">Records</Link>
           <Link href="/workspace/entity-review">Entity Review</Link>
         </nav>
@@ -123,6 +124,75 @@ export default function AIGovernancePage() {
               {index < chain.length - 1 && <b>→</b>}
             </div>
           ))}
+        </div>
+      </section>
+
+      <section className="foundationEntry shell">
+        <div className="foundationSeal" aria-hidden="true">
+          <div className="foundationOrbit foundationOrbitOne">
+            <span />
+          </div>
+          <div className="foundationOrbit foundationOrbitTwo">
+            <span />
+          </div>
+          <div className="foundationCore">
+            <strong>TA-14</strong>
+            <small>Foundation</small>
+          </div>
+        </div>
+
+        <div className="foundationCopy">
+          <p className="eyebrow">TA-14 FOUNDATIONAL ARCHITECTURAL REGISTRY</p>
+          <h2>Every governance system needs a foundation.</h2>
+          <p>
+            Before routes are built, records are preserved, reviews are
+            performed, or compliance pathways are explored, there must be a
+            publicly attributable architectural foundation describing what the
+            governance system is, how it is organized, what standards support
+            it, where its public record exists, and how its implementations
+            relate to one another.
+          </p>
+
+          <div className="foundationLinks" aria-label="Foundation record contents">
+            {[
+              "Architecture",
+              "Standards Family",
+              "Google Sites Archive",
+              "Books and Articles",
+              "Zenodo Records",
+              "GitHub Repositories",
+              "Reference Implementations",
+              "TA-14 AI Governance Exchange",
+            ].map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </div>
+
+          <div className="foundationBoundary">
+            <strong>Foundational record, not external certification.</strong>
+            <span>
+              The registry connects documented architecture, chronology,
+              publications, standards, and implementations while preserving the
+              boundary between public record, independent validation,
+              regulatory approval, and legal determination.
+            </span>
+          </div>
+
+          <div className="foundationActions">
+            <Link
+              className="primaryButton"
+              href="/workspace/ai-governance/registry#foundation"
+            >
+              Explore the TA-14 Foundation
+              <span>→</span>
+            </Link>
+            <Link
+              className="secondaryButton"
+              href="/workspace/ai-governance/registry"
+            >
+              View the Complete Registry
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -484,6 +554,7 @@ export default function AIGovernancePage() {
         }
 
         .principle,
+        .foundationEntry,
         .euSection,
         .boundary,
         .finalCta {
@@ -497,6 +568,154 @@ export default function AIGovernancePage() {
         .principle {
           padding: 52px;
           text-align: center;
+        }
+
+        .foundationEntry {
+          margin-top: 28px;
+          padding: 54px;
+          display: grid;
+          grid-template-columns: 300px 1fr;
+          gap: 54px;
+          align-items: center;
+          border-color: rgba(203, 160, 81, 0.26);
+          background:
+            radial-gradient(circle at 12% 20%, rgba(64, 171, 204, 0.2), transparent 34%),
+            radial-gradient(circle at 88% 18%, rgba(203, 144, 62, 0.12), transparent 28%),
+            linear-gradient(145deg, rgba(14, 29, 47, 0.94), rgba(7, 13, 24, 0.97));
+        }
+
+        .foundationSeal {
+          min-height: 300px;
+          position: relative;
+          display: grid;
+          place-items: center;
+        }
+
+        .foundationCore {
+          width: 152px;
+          height: 152px;
+          border-radius: 999px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(237, 194, 109, 0.52);
+          background:
+            radial-gradient(circle at 36% 28%, rgba(85, 184, 214, 0.32), rgba(7, 20, 33, 0.97) 68%);
+          box-shadow:
+            0 0 54px rgba(80, 188, 217, 0.18),
+            inset 0 0 36px rgba(225, 169, 81, 0.1);
+          z-index: 2;
+        }
+
+        .foundationCore strong {
+          color: #f2cf89;
+          font-size: 26px;
+          letter-spacing: 0.05em;
+        }
+
+        .foundationCore small {
+          margin-top: 7px;
+          color: #91c9d2;
+          text-transform: uppercase;
+          letter-spacing: 0.15em;
+          font-size: 10px;
+        }
+
+        .foundationOrbit {
+          position: absolute;
+          border-radius: 999px;
+          border: 1px solid rgba(104, 214, 207, 0.22);
+          animation: rotate 22s linear infinite;
+        }
+
+        .foundationOrbit span {
+          position: absolute;
+          top: 50%;
+          right: -5px;
+          width: 10px;
+          height: 10px;
+          border-radius: 999px;
+          background: #6fe1d3;
+          box-shadow: 0 0 16px #6fe1d3;
+        }
+
+        .foundationOrbitOne {
+          width: 220px;
+          height: 220px;
+        }
+
+        .foundationOrbitTwo {
+          width: 286px;
+          height: 286px;
+          border-color: rgba(230, 177, 91, 0.22);
+          animation-duration: 31s;
+          animation-direction: reverse;
+        }
+
+        .foundationOrbitTwo span {
+          background: #e2a854;
+          box-shadow: 0 0 16px #e2a854;
+        }
+
+        .foundationCopy h2 {
+          margin: 14px 0 16px;
+          font-size: clamp(36px, 5vw, 58px);
+          line-height: 1.04;
+          letter-spacing: -0.045em;
+        }
+
+        .foundationCopy > p:not(.eyebrow) {
+          margin: 0;
+          max-width: 840px;
+          color: #a6b7c9;
+          font-size: 16px;
+          line-height: 1.72;
+        }
+
+        .foundationLinks {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+          margin-top: 26px;
+        }
+
+        .foundationLinks span {
+          padding: 9px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(113, 224, 210, 0.18);
+          background: rgba(73, 189, 176, 0.07);
+          color: #c9f4ee;
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .foundationBoundary {
+          display: grid;
+          gap: 6px;
+          margin-top: 24px;
+          padding: 18px 20px;
+          border-radius: 16px;
+          border: 1px solid rgba(224, 173, 91, 0.22);
+          background: rgba(95, 58, 20, 0.15);
+        }
+
+        .foundationBoundary strong {
+          color: #efd099;
+          font-size: 15px;
+        }
+
+        .foundationBoundary span {
+          color: #aab9c7;
+          font-size: 13px;
+          line-height: 1.62;
+        }
+
+        .foundationActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 26px;
         }
 
         .principle h2,
@@ -720,12 +939,18 @@ export default function AIGovernancePage() {
             min-height: 460px;
           }
 
+          .foundationEntry,
           .euSection,
           .boundary,
           .finalCta {
             grid-template-columns: 1fr;
             flex-direction: column;
             align-items: flex-start;
+          }
+
+          .foundationSeal {
+            width: 100%;
+            min-height: 280px;
           }
         }
 
@@ -745,10 +970,20 @@ export default function AIGovernancePage() {
           }
 
           .principle,
+          .foundationEntry,
           .euSection,
           .boundary,
           .finalCta {
             padding: 28px 24px;
+          }
+
+          .foundationEntry {
+            gap: 18px;
+          }
+
+          .foundationSeal {
+            transform: scale(0.84);
+            min-height: 240px;
           }
 
           .capabilityGrid {
