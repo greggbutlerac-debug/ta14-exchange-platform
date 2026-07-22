@@ -4,135 +4,118 @@ import Link from "next/link";
 
 const workspaces = [
   {
-    id: "ai-governance",
+    id: "ai",
     code: "AI",
     title: "AI Governance",
     href: "/workspace/ai-governance",
     description:
       "Build, test, correct, and verify consequential AI routes before they become execution.",
-    points: [
-      "Agents, models, tools, and APIs",
+    color: "#60a9ff",
+    glow: "rgba(74, 150, 255, 0.42)",
+    features: [
+      "AI agents, models, tools, and APIs",
       "Authority, evidence, and commit gates",
       "Runtime decisions and outcome verification",
+      "Execution routes with full integrity",
     ],
   },
   {
-    id: "governed-records",
+    id: "gr",
     code: "GR",
     title: "Governed Records",
     href: "/workspace/governed-records",
     description:
       "Create, upload, interpret, preserve, and review records without collapsing evidence into conclusion.",
-    points: [
+    color: "#9ee648",
+    glow: "rgba(147, 226, 60, 0.36)",
+    features: [
       "Create and upload governed records",
+      "Bounded interpretation and review",
       "Preserve uncertainty and limitations",
       "Export attributable evidence packages",
     ],
   },
   {
-    id: "environmental-records",
+    id: "er",
     code: "ER",
     title: "Environmental Records",
     href: "/workspace/environmental-records",
     description:
       "Interpret land, water, air, building, hospital, HVAC, and sensor evidence through bounded environmental review.",
-    points: [
+    color: "#5de2ec",
+    glow: "rgba(59, 214, 225, 0.36)",
+    features: [
       "Atmospheric and environmental integrity",
       "Buildings, IAQ, HVAC, and sensors",
       "Land, water, air, and outcome records",
+      "Daily records with bounded interpretation",
     ],
   },
   {
-    id: "entity-review",
+    id: "entity",
     code: "◎",
     title: "Entity Review",
     href: "/workspace/entity-review",
     description:
       "Submit an organization, AI system, architecture, program, or route for independent governed review.",
-    points: [
+    color: "#dc7dff",
+    glow: "rgba(201, 92, 255, 0.38)",
+    features: [
       "Organizations and AI systems",
       "Architectures and governance programs",
-      "Review findings, status, and boundaries",
+      "Route reviews, findings, and boundaries",
+      "Review status with clear outcomes",
     ],
   },
 ];
 
-const discipline = [
-  {
-    number: "01",
-    title: "Build and test",
-    text: "Use AI Governance to examine consequential routes, inputs, authorities, failure states, and outcomes.",
-  },
-  {
-    number: "02",
-    title: "Preserve the evidence",
-    text: "Use Governed Records to keep the original record distinct from interpretation and determination.",
-  },
-  {
-    number: "03",
-    title: "Interpret the environment",
-    text: "Use Environmental Records to examine land, water, air, buildings, HVAC, hospitals, and sensor evidence.",
-  },
-  {
-    number: "04",
-    title: "Review the whole entity",
-    text: "Use Entity Review when the object under scrutiny is an organization, system, architecture, or route.",
-  },
+const chain = [
+  ["Reality", "◉"],
+  ["Record", "▤"],
+  ["Continuity", "∞"],
+  ["Admissibility", "⬡"],
+  ["Execution", "▷"],
+  ["Outcome", "♛"],
+];
+
+const steps = [
+  ["01", "Build and test", "Use AI Governance to examine consequential AI routes."],
+  ["02", "Preserve the evidence", "Use Governed Records to create a bounded record."],
+  ["03", "Review the whole entity", "Use Entity Review for organizations, systems, architectures, and routes."],
 ];
 
 export default function HomePage() {
   return (
     <main>
       <div className="cosmos" aria-hidden="true">
-        <div className="starField starsOne" />
-        <div className="starField starsTwo" />
-        <div className="starField starsThree" />
-
-        <div className="movingLine lineOne" />
-        <div className="movingLine lineTwo" />
-        <div className="movingLine lineThree" />
-
-        <div className="burst burstOne">
-          {Array.from({ length: 12 }).map((_, index) => (
-            <i key={index} style={{ "--i": index } as React.CSSProperties} />
-          ))}
+        <div className="stars starsOne" />
+        <div className="stars starsTwo" />
+        <div className="stars starsThree" />
+        <div className="line lineOne" />
+        <div className="line lineTwo" />
+        <div className="line lineThree" />
+        <div className="orbitCluster orbitLeft">
+          <span className="planet planetBlue" />
+          <span className="planet planetGold" />
+          <i className="orbit orbitA" />
+          <i className="orbit orbitB" />
+          <i className="orbit orbitC" />
         </div>
-
-        <div className="burst burstTwo">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <i key={index} style={{ "--i": index } as React.CSSProperties} />
-          ))}
+        <div className="orbitCluster orbitRight">
+          <span className="planet planetGold large" />
+          <span className="planet planetBlue small" />
+          <i className="orbit orbitA" />
+          <i className="orbit orbitB" />
+          <i className="orbit orbitC" />
         </div>
-
-        <div className="orbitSystem orbitSystemOne">
-          <div className="orbit orbitA">
-            <span />
-          </div>
-          <div className="orbit orbitB">
-            <span />
-          </div>
-          <div className="orbitCore" />
-        </div>
-
-        <div className="orbitSystem orbitSystemTwo">
-          <div className="orbit orbitA">
-            <span />
-          </div>
-          <div className="orbit orbitB">
-            <span />
-          </div>
-          <div className="orbitCore" />
-        </div>
-
-        <div className="floatingSphere sphereOne" />
-        <div className="floatingSphere sphereTwo" />
-        <div className="floatingSphere sphereThree" />
+        <div className="burst burstOne" />
+        <div className="burst burstTwo" />
       </div>
 
       <header className="topbar shell">
         <Link href="/" className="brand">
           <span className="brandMark">TA-14</span>
-          <span className="brandText">
+          <span>
             <strong>AI Governance Exchange</strong>
             <small>No admissible evidence. No admissible execution.</small>
           </span>
@@ -141,190 +124,179 @@ export default function HomePage() {
         <nav>
           <Link href="/">Exchange</Link>
           <Link href="/workspace">Workspace</Link>
-          <Link href="/workspace/ai-governance/eu-ai-act">EU AI Act</Link>
+          <Link className="navActive" href="/workspace/ai-governance/eu-ai-act">
+            EU AI Act
+          </Link>
           <Link href="/marketplace">Marketplace</Link>
           <Link href="/workspace/governed-records">Records</Link>
           <Link href="/workspace/verification">Verification</Link>
-          <Link href="/marketplace/post">Post a Need</Link>
         </nav>
 
-        <Link href="/workspace" className="workspaceButton">
-          Open Workspace
-          <span>→</span>
+        <Link className="postButton" href="/marketplace/post">
+          Post a Need
+          <span>✦</span>
         </Link>
       </header>
 
       <section className="hero shell">
-        <div className="heroBadge">
-          <span>TA-14</span>
-          <strong>AI Governance Exchange</strong>
-        </div>
-
-        <p className="eyebrow">THE FRONT DOOR TO GOVERNED WORK</p>
-
-        <h1>Choose the door that matches what you are bringing.</h1>
-
-        <p className="lead">
-          Four governed workspaces. Each one preserves its own evidence
-          boundary, purpose, and review path so records, interpretation,
-          determination, optimization, and execution do not corrupt one
-          another.
+        <p className="eyebrow">TA-14 AI GOVERNANCE EXCHANGE</p>
+        <h1>
+          Choose the door that matches <em>the work.</em>
+        </h1>
+        <p>
+          Four governed workspaces. Each preserves its own evidence boundary,
+          purpose, and review path.
         </p>
-
-        <div className="heroActions">
-          <a className="primaryButton" href="#doors">
-            Open a Door
-            <span>↓</span>
-          </a>
-
-          <Link className="secondaryButton" href="/workspace">
-            Enter the Full Workspace
-            <span>→</span>
-          </Link>
-        </div>
       </section>
 
-      <section className="doorsSection shell" id="doors">
-        <div className="sectionIntro">
-          <p className="eyebrow">FOUR GOVERNED WORKSPACES</p>
-          <h2>The entire door is the invitation.</h2>
-          <p>
-            Hover over any portal to open it slightly and reveal the light
-            beyond. Click anywhere on the door to enter that workspace.
-          </p>
-        </div>
+      <section className="doors shell">
+        {workspaces.map((workspace) => (
+          <Link
+            href={workspace.href}
+            className="workspace"
+            key={workspace.id}
+            style={
+              {
+                "--accent": workspace.color,
+                "--accentGlow": workspace.glow,
+              } as React.CSSProperties
+            }
+          >
+            <div className="doorStage">
+              <div className="columns leftColumn">
+                <i />
+                <i />
+                <i />
+              </div>
+              <div className="columns rightColumn">
+                <i />
+                <i />
+                <i />
+              </div>
 
-        <div className="doorsGrid">
-          {workspaces.map((workspace) => (
-            <Link
-              key={workspace.id}
-              href={workspace.href}
-              className={`portalCard ${workspace.id}`}
-              aria-label={`Enter ${workspace.title}`}
-            >
-              <div className="portalScene">
-                <div className="portalFloor">
-                  <div className="lightSpill" />
+              <div className="archFrame">
+                <div className="archCrown">
+                  <i className="crownLine one" />
+                  <i className="crownLine two" />
+                  <i className="crownLine three" />
+                  <span className="crownGem" />
                 </div>
 
-                <div className="doorFrame">
-                  <div className="doorGlow" />
-                  <div className="doorPanel">
-                    <div className="doorFace">
-                      <span className="doorCode">{workspace.code}</span>
-                      <span className="doorTitle">{workspace.title}</span>
+                <div className="doorOpening">
+                  <div className="lightWithin" />
+                  <div className="doorLeaf">
+                    <div className="doorEmblem">
+                      <span>{workspace.code}</span>
                     </div>
-
-                    <div className="doorEdge" />
-                    <div className="doorInterior">
-                      <div className="interiorLight" />
+                    <div className="doorPanels">
+                      <i />
+                      <i />
+                      <i />
+                      <i />
                     </div>
+                    <span className="doorHandle" />
                   </div>
                 </div>
               </div>
 
-              <div className="portalContent">
-                <span className="portalKicker">{workspace.code}</span>
-                <h3>{workspace.title}</h3>
-                <p>{workspace.description}</p>
-
-                <ul>
-                  {workspace.points.map((point) => (
-                    <li key={point}>{point}</li>
-                  ))}
-                </ul>
-
-                <div className="portalAction">
-                  Enter {workspace.title}
-                  <span>→</span>
-                </div>
+              <div className="steps">
+                <i />
+                <i />
+                <i />
               </div>
-            </Link>
-          ))}
-        </div>
+
+              <div className="lightSpill" />
+            </div>
+
+            <div className="workspaceCard">
+              <span className="miniCode">{workspace.code}</span>
+              <h2>{workspace.title}</h2>
+              <p>{workspace.description}</p>
+
+              <ul>
+                {workspace.features.map((feature) => (
+                  <li key={feature}>
+                    <span>✧</span>
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+
+              <div className="workspaceCta">
+                Enter {workspace.title}
+                <span>→</span>
+              </div>
+            </div>
+          </Link>
+        ))}
       </section>
 
-      <section className="discipline shell">
-        <div className="disciplineHeader">
-          <div>
-            <p className="eyebrow">ONE GOVERNING DISCIPLINE</p>
-            <h2>Reality → Record → Continuity → Admissibility → Execution → Outcome</h2>
+      <section className="governanceBand shell">
+        <div className="chainBlock">
+          <p className="bandEyebrow">ONE GOVERNING DISCIPLINE</p>
+          <div className="chain">
+            {chain.map(([label, icon], index) => (
+              <div className="chainNode" key={label}>
+                <span className="chainIcon">{icon}</span>
+                <strong>{label}</strong>
+                {index < chain.length - 1 && <i>→</i>}
+              </div>
+            ))}
           </div>
-
           <p>
-            TA-14 separates records, interpretations, determinations,
-            optimizations, and execution so each layer remains attributable,
-            inspectable, and open to scrutiny.
+            TA-14 separates records, interpretations, determinations, and execution
+            so each layer remains attributable and open to scrutiny.
           </p>
         </div>
 
-        <div className="disciplineGrid">
-          {discipline.map((item) => (
-            <article key={item.number}>
-              <span>{item.number}</span>
-              <h3>{item.title}</h3>
-              <p>{item.text}</p>
+        <div className="stepsBlock">
+          {steps.map(([number, title, text]) => (
+            <article key={number}>
+              <span>{number}</span>
+              <div>
+                <strong>{title}</strong>
+                <p>{text}</p>
+              </div>
             </article>
           ))}
         </div>
-      </section>
 
-      <section className="actSection shell">
-        <div className="actVisual" aria-hidden="true">
-          <div className="actRing ringOne" />
-          <div className="actRing ringTwo" />
-          <div className="actCore">
-            <span>EU</span>
-            <strong>AI ACT</strong>
+        <div className="euBlock">
+          <div className="euShield">
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
+            <span>✦</span>
           </div>
-        </div>
-
-        <div className="actCopy">
-          <p className="eyebrow">EU AI ACT</p>
-          <h2>Regulatory workflows live inside the workspaces they actually govern.</h2>
-          <p>
-            Enter AI Governance for requirements and routes, Governed Records
-            for evidence obligations, or Entity Review for requirement-by-
-            requirement review. The Act is not treated as a detached compliance
-            page.
-          </p>
-
-          <div className="actActions">
-            <Link className="primaryButton" href="/workspace/ai-governance/eu-ai-act">
-              Open EU AI Act Workspace
+          <div>
+            <p className="bandEyebrow">EU AI ACT</p>
+            <h3>Relevant workflows live inside the relevant doors.</h3>
+            <p>
+              Enter AI Governance, Governed Records, or Entity Review to access
+              requirements and supporting governance workflows.
+            </p>
+            <Link href="/workspace/ai-governance/eu-ai-act">
+              Explore EU AI Act Workflows
               <span>→</span>
             </Link>
-
-            <Link className="secondaryButton" href="/workspace/governed-records/eu-ai-act">
-              View Record Requirements
-            </Link>
           </div>
         </div>
       </section>
 
-      <section className="finalCta shell">
+      <section className="frontDoor shell">
+        <p>START AT THE FRONT DOOR</p>
         <div>
-          <p className="eyebrow">START AT THE FRONT DOOR</p>
-          <h2>Choose the workspace that matches what you are bringing.</h2>
-          <p>
-            Start with the object, record, environment, or entity under
-            scrutiny. The Exchange will preserve the boundary from there.
-          </p>
+          <i />
+          <span>Choose the workspace that matches what you are bringing.</span>
+          <i />
         </div>
-
-        <a className="returnButton" href="#doors">
-          Return to the Doors
-          <span>↑</span>
-        </a>
       </section>
 
       <footer className="shell">
-        <div>
-          <strong>TA-14 Authority Governance Institution</strong>
-          <span>No admissible evidence. No admissible execution.</span>
-        </div>
-
-        <Link href="/workspace">Open Workspace</Link>
+        <strong>TA-14 Authority Governance Institution</strong>
+        <span>No admissible evidence. No admissible execution.</span>
       </footer>
 
       <style jsx>{`
@@ -333,17 +305,15 @@ export default function HomePage() {
         }
 
         :global(html) {
-          background: #02070d;
-          scroll-behavior: smooth;
+          background: #020711;
         }
 
         :global(body) {
           margin: 0;
-          color: #f6fbff;
+          color: #f9fbff;
           background:
-            radial-gradient(circle at 18% 0%, rgba(23, 104, 145, 0.15), transparent 32%),
-            radial-gradient(circle at 84% 18%, rgba(2, 73, 109, 0.12), transparent 28%),
-            linear-gradient(180deg, #02070d 0%, #06111c 46%, #02070d 100%);
+            radial-gradient(circle at 50% -8%, rgba(31, 100, 165, 0.2), transparent 34%),
+            linear-gradient(180deg, #020711 0%, #07111e 48%, #030711 100%);
           font-family:
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
@@ -357,7 +327,7 @@ export default function HomePage() {
         }
 
         .shell {
-          width: min(1320px, calc(100% - 40px));
+          width: min(1500px, calc(100% - 36px));
           margin-inline: auto;
           position: relative;
           z-index: 3;
@@ -371,210 +341,189 @@ export default function HomePage() {
           z-index: -5;
         }
 
-        .starField {
+        .stars {
           position: absolute;
-          inset: -15%;
-          opacity: 0.42;
+          inset: -12%;
         }
 
         .starsOne {
-          background-image:
-            radial-gradient(circle, rgba(255,255,255,.9) 0 1px, transparent 1.5px);
-          background-size: 98px 98px;
-          animation: starDriftOne 40s linear infinite;
+          background-image: radial-gradient(circle, rgba(255,255,255,.85) 0 1px, transparent 1.5px);
+          background-size: 110px 110px;
+          animation: starsOne 42s linear infinite;
         }
 
         .starsTwo {
-          background-image:
-            radial-gradient(circle, rgba(88,205,255,.7) 0 1px, transparent 1.5px);
-          background-size: 156px 156px;
-          background-position: 47px 63px;
-          animation: starDriftTwo 52s linear infinite reverse;
+          background-image: radial-gradient(circle, rgba(69,180,255,.72) 0 1px, transparent 1.5px);
+          background-size: 170px 170px;
+          background-position: 44px 67px;
+          animation: starsTwo 56s linear infinite reverse;
         }
 
         .starsThree {
-          background-image:
-            radial-gradient(circle, rgba(255,210,112,.72) 0 1px, transparent 1.5px);
-          background-size: 244px 244px;
-          background-position: 83px 27px;
-          opacity: 0.24;
-          animation: starPulse 8s ease-in-out infinite alternate;
+          background-image: radial-gradient(circle, rgba(255,190,65,.75) 0 1px, transparent 1.5px);
+          background-size: 250px 250px;
+          background-position: 90px 28px;
+          opacity: .32;
+          animation: pulseStars 7s ease-in-out infinite alternate;
         }
 
-        .movingLine {
+        .line {
           position: absolute;
-          width: 62vw;
           height: 1px;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            rgba(95, 205, 255, 0.52),
-            transparent
-          );
-          filter: drop-shadow(0 0 8px rgba(95, 205, 255, 0.45));
-          transform-origin: center;
+          width: 70vw;
+          background: linear-gradient(90deg, transparent, rgba(90,190,255,.55), transparent);
+          filter: drop-shadow(0 0 8px rgba(90,190,255,.45));
         }
 
         .lineOne {
-          left: -12vw;
           top: 24%;
-          transform: rotate(13deg);
-          animation: lineSweepOne 14s linear infinite;
+          left: -15%;
+          transform: rotate(-9deg);
+          animation: lineOne 16s linear infinite;
         }
 
         .lineTwo {
-          right: -22vw;
-          top: 62%;
-          transform: rotate(-18deg);
-          animation: lineSweepTwo 18s linear infinite;
+          top: 60%;
+          right: -20%;
+          transform: rotate(11deg);
+          animation: lineTwo 20s linear infinite;
         }
 
         .lineThree {
-          left: 18vw;
-          top: 82%;
-          transform: rotate(6deg);
-          animation: lineSweepThree 24s linear infinite;
+          top: 78%;
+          left: 10%;
+          transform: rotate(-4deg);
+          animation: lineThree 24s linear infinite;
         }
 
-        .burst {
+        .orbitCluster {
           position: absolute;
-          width: 160px;
-          height: 160px;
+          width: 360px;
+          height: 240px;
         }
 
-        .burst i {
-          --angle: calc(var(--i) * 30deg);
-          position: absolute;
-          left: 50%;
-          top: 50%;
-          width: 70px;
-          height: 1px;
-          transform-origin: left center;
-          transform: rotate(var(--angle)) scaleX(0.08);
-          background: linear-gradient(
-            90deg,
-            rgba(255, 220, 138, 0.9),
-            transparent
-          );
-          opacity: 0;
-          animation: explode 5.8s ease-out infinite;
-          animation-delay: calc(var(--i) * 70ms);
+        .orbitLeft {
+          left: -30px;
+          top: 70px;
         }
 
-        .burstOne {
-          left: 6%;
-          top: 18%;
-        }
-
-        .burstTwo {
-          right: 8%;
-          top: 44%;
-          transform: scale(0.72);
-        }
-
-        .orbitSystem {
-          position: absolute;
-          width: 260px;
-          height: 260px;
-        }
-
-        .orbitSystemOne {
-          right: 5%;
-          top: 7%;
-        }
-
-        .orbitSystemTwo {
-          left: 5%;
-          bottom: 10%;
-          transform: scale(0.7);
+        .orbitRight {
+          right: -40px;
+          top: 80px;
+          transform: scale(.9);
         }
 
         .orbit {
           position: absolute;
-          inset: 0;
-          border-radius: 999px;
-          border: 1px solid rgba(80, 189, 244, 0.18);
-        }
-
-        .orbitA {
-          animation: orbitSpin 21s linear infinite;
+          left: 0;
+          right: 0;
+          top: 50%;
+          height: 120px;
+          border: 1px solid rgba(255,181,47,.45);
+          border-radius: 50%;
+          transform: rotate(-12deg);
         }
 
         .orbitB {
-          inset: 34px;
-          border-color: rgba(255, 194, 89, 0.2);
-          animation: orbitSpin 15s linear infinite reverse;
+          transform: rotate(13deg) scale(.82);
+          opacity: .7;
         }
 
-        .orbit span {
+        .orbitC {
+          transform: rotate(-28deg) scale(.62);
+          opacity: .55;
+        }
+
+        .planet {
           position: absolute;
-          top: 50%;
-          right: -6px;
-          width: 12px;
-          height: 12px;
+          z-index: 2;
           border-radius: 999px;
-          background: #70d2ff;
-          box-shadow: 0 0 18px rgba(112, 210, 255, 0.9);
         }
 
-        .orbitB span {
-          top: 8%;
-          right: 18%;
-          background: #ffd16f;
-          box-shadow: 0 0 18px rgba(255, 209, 111, 0.9);
+        .planetBlue {
+          left: 95px;
+          top: 54px;
+          width: 72px;
+          height: 72px;
+          background:
+            radial-gradient(circle at 34% 30%, #d9f5ff, #3c97ff 24%, #0d2e76 58%, #06112c 75%);
+          box-shadow: 0 0 28px rgba(67,152,255,.65);
         }
 
-        .orbitCore {
+        .planetGold {
+          left: 24px;
+          top: 118px;
+          width: 38px;
+          height: 38px;
+          background:
+            radial-gradient(circle at 34% 30%, #fff4b2, #f5ad27 34%, #7c3604 70%);
+          box-shadow: 0 0 22px rgba(255,173,39,.7);
+        }
+
+        .planetGold.large {
+          left: 195px;
+          top: 36px;
+          width: 66px;
+          height: 66px;
+        }
+
+        .planetBlue.small {
+          left: 70px;
+          top: 126px;
+          width: 26px;
+          height: 26px;
+        }
+
+        .burst {
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background: #fff0a6;
+          box-shadow:
+            0 0 18px rgba(255,222,112,.95),
+            0 0 40px rgba(255,180,54,.55);
+          transform: rotate(45deg);
+          animation: burst 4.8s ease-in-out infinite;
+        }
+
+        .burst::before,
+        .burst::after {
+          content: "";
           position: absolute;
           left: 50%;
           top: 50%;
-          width: 28px;
-          height: 28px;
+          background: linear-gradient(90deg, transparent, #ffe49a, transparent);
           transform: translate(-50%, -50%);
-          border-radius: 999px;
-          background: radial-gradient(circle, #d8f6ff 0%, #5fc4f2 45%, transparent 70%);
-          box-shadow: 0 0 32px rgba(95, 196, 242, 0.7);
         }
 
-        .floatingSphere {
-          position: absolute;
-          border-radius: 999px;
-          background:
-            radial-gradient(circle at 30% 28%, rgba(255,255,255,.95), rgba(101,206,255,.72) 20%, rgba(11,89,132,.38) 55%, transparent 72%);
-          box-shadow: 0 0 22px rgba(87, 195, 255, 0.48);
+        .burst::before {
+          width: 82px;
+          height: 1px;
         }
 
-        .sphereOne {
-          width: 18px;
-          height: 18px;
-          left: 23%;
-          top: 14%;
-          animation: sphereFloat 7s ease-in-out infinite alternate;
+        .burst::after {
+          width: 1px;
+          height: 82px;
         }
 
-        .sphereTwo {
-          width: 10px;
-          height: 10px;
-          right: 18%;
-          top: 68%;
-          animation: sphereFloat 9s ease-in-out infinite alternate-reverse;
-        }
-
-        .sphereThree {
-          width: 24px;
-          height: 24px;
+        .burstOne {
           left: 48%;
-          bottom: 8%;
-          animation: sphereFloat 11s ease-in-out infinite alternate;
+          top: 16%;
+        }
+
+        .burstTwo {
+          right: 8%;
+          top: 24%;
+          animation-delay: -2.1s;
         }
 
         .topbar {
-          min-height: 92px;
+          min-height: 70px;
           display: grid;
           grid-template-columns: auto 1fr auto;
           align-items: center;
-          gap: 28px;
-          border-bottom: 1px solid rgba(107, 162, 190, 0.15);
+          gap: 24px;
+          border-bottom: 1px solid rgba(92, 142, 174, 0.16);
         }
 
         .brand {
@@ -586,840 +535,822 @@ export default function HomePage() {
         }
 
         .brandMark {
-          min-width: 68px;
+          min-width: 76px;
           height: 42px;
+          border-radius: 999px;
           display: grid;
           place-items: center;
-          border-radius: 999px;
-          color: #07111a;
-          background: linear-gradient(135deg, #72cff8, #d9f7ff);
-          font-size: 13px;
+          border: 1px solid rgba(255, 194, 72, 0.75);
+          color: #ffd166;
           font-weight: 950;
-          letter-spacing: 0.06em;
-          box-shadow: 0 0 24px rgba(84, 196, 244, 0.2);
+          letter-spacing: .06em;
+          box-shadow: inset 0 0 16px rgba(255, 184, 50, 0.08);
         }
 
-        .brandText {
+        .brand > span:last-child {
           display: flex;
           flex-direction: column;
         }
 
-        .brandText strong {
-          font-size: 15px;
+        .brand strong {
+          font-size: 17px;
         }
 
-        .brandText small {
+        .brand small {
           margin-top: 3px;
-          color: #7f9cad;
+          color: #ffcf67;
           font-size: 11px;
         }
 
         nav {
           display: flex;
           justify-content: center;
-          gap: 22px;
+          gap: 28px;
         }
 
         nav a {
-          color: #a8bcc8;
+          color: #c5d3dc;
           text-decoration: none;
           font-size: 13px;
-          font-weight: 750;
-          transition:
-            color 180ms ease,
-            transform 180ms ease;
+          font-weight: 800;
         }
 
         nav a:hover {
-          color: #f4fbff;
-          transform: translateY(-1px);
+          color: white;
         }
 
-        .workspaceButton {
+        .navActive {
+          padding: 12px 18px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 190, 64, 0.38);
+          color: #ffd273 !important;
+          background: rgba(112, 74, 10, 0.12);
+        }
+
+        .postButton {
           min-height: 44px;
           display: inline-flex;
           align-items: center;
-          gap: 14px;
-          padding: 0 16px;
-          border-radius: 12px;
-          color: #07111a;
-          background: linear-gradient(135deg, #6ccaf4, #d9f7ff);
+          gap: 16px;
+          padding: 0 20px;
+          border-radius: 999px;
+          border: 1px solid rgba(255, 190, 64, 0.46);
+          color: #ffe2a1;
+          background: rgba(83, 55, 8, 0.18);
           text-decoration: none;
           font-size: 13px;
           font-weight: 900;
-          box-shadow: 0 12px 30px rgba(52, 166, 219, 0.18);
+          box-shadow: 0 0 20px rgba(255, 170, 31, 0.12);
+        }
+
+        .postButton span {
+          color: #ffd15f;
+          text-shadow: 0 0 16px rgba(255, 203, 82, 0.9);
         }
 
         .hero {
-          min-height: 680px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          padding: 90px 0 84px;
+          padding: 22px 0 10px;
           text-align: center;
         }
 
-        .heroBadge {
-          display: inline-flex;
-          align-items: center;
-          gap: 10px;
-          padding: 8px 14px;
-          border-radius: 999px;
-          border: 1px solid rgba(112, 205, 245, 0.22);
-          background: rgba(28, 86, 117, 0.08);
-          box-shadow: inset 0 0 18px rgba(92, 197, 240, 0.05);
-        }
-
-        .heroBadge span {
-          color: #7ad3fa;
-          font-weight: 950;
-        }
-
-        .heroBadge strong {
-          color: #dcecf3;
-          font-size: 13px;
-        }
-
-        .eyebrow {
+        .eyebrow,
+        .bandEyebrow {
           margin: 0;
-          color: #72d1f8;
+          color: #63d4ed;
           font-size: 11px;
           font-weight: 950;
-          letter-spacing: 0.18em;
+          letter-spacing: .24em;
         }
 
-        .hero > .eyebrow {
-          margin-top: 24px;
+        .hero h1 {
+          margin: 8px 0 6px;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(40px, 5.6vw, 72px);
+          line-height: .98;
+          letter-spacing: -.04em;
         }
 
-        h1 {
-          max-width: 1080px;
-          margin: 18px 0 22px;
-          font-size: clamp(58px, 8vw, 108px);
-          line-height: 0.94;
-          letter-spacing: -0.065em;
-          text-wrap: balance;
+        .hero h1 em {
+          color: #ffc541;
+          font-style: italic;
         }
 
-        .lead {
-          max-width: 860px;
+        .hero > p:last-child {
           margin: 0;
-          color: #9eb4c1;
-          font-size: 19px;
-          line-height: 1.72;
+          color: #d1dde4;
+          font-size: 16px;
         }
 
-        .heroActions {
-          display: flex;
-          flex-wrap: wrap;
-          justify-content: center;
-          gap: 12px;
-          margin-top: 32px;
-        }
-
-        .primaryButton,
-        .secondaryButton,
-        .returnButton {
-          min-height: 54px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 22px;
-          padding: 0 20px;
-          border-radius: 14px;
-          text-decoration: none;
-          font-weight: 900;
-        }
-
-        .primaryButton {
-          color: #07111a;
-          background: linear-gradient(135deg, #69caf4, #dcf8ff);
-          box-shadow: 0 14px 38px rgba(71, 183, 231, 0.19);
-        }
-
-        .secondaryButton,
-        .returnButton {
-          color: #e7f5fb;
-          border: 1px solid rgba(107, 186, 222, 0.24);
-          background: rgba(20, 53, 72, 0.18);
-        }
-
-        .doorsSection {
-          padding: 28px 0 34px;
-        }
-
-        .sectionIntro {
-          max-width: 900px;
-        }
-
-        .sectionIntro h2,
-        .disciplineHeader h2,
-        .actCopy h2,
-        .finalCta h2 {
-          margin: 14px 0 16px;
-          font-size: clamp(38px, 5.6vw, 68px);
-          line-height: 1;
-          letter-spacing: -0.05em;
-        }
-
-        .sectionIntro > p:not(.eyebrow),
-        .disciplineHeader > p,
-        .actCopy > p:not(.eyebrow),
-        .finalCta p:not(.eyebrow) {
-          color: #9eb3c1;
-          line-height: 1.7;
-        }
-
-        .doorsGrid {
+        .doors {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
           gap: 18px;
-          margin-top: 34px;
+          margin-top: 16px;
         }
 
-        .portalCard {
-          position: relative;
-          min-height: 650px;
-          overflow: hidden;
-          border-radius: 28px;
-          border: 1px solid rgba(195, 154, 73, 0.28);
-          background:
-            radial-gradient(circle at 50% 22%, rgba(255, 204, 105, 0.08), transparent 28%),
-            linear-gradient(180deg, rgba(12, 18, 24, 0.96), rgba(5, 10, 15, 0.98));
+        .workspace {
+          display: block;
+          min-width: 0;
           color: inherit;
           text-decoration: none;
-          box-shadow:
-            0 28px 80px rgba(0, 0, 0, 0.26),
-            inset 0 1px 0 rgba(255, 255, 255, 0.025);
-          transition:
-            transform 260ms ease,
-            border-color 260ms ease,
-            box-shadow 260ms ease;
         }
 
-        .portalCard:hover,
-        .portalCard:focus-visible {
-          transform: translateY(-9px);
-          border-color: rgba(255, 203, 104, 0.68);
-          box-shadow:
-            0 38px 100px rgba(0, 0, 0, 0.34),
-            0 0 44px rgba(255, 182, 46, 0.1);
-          outline: none;
-        }
-
-        .portalScene {
+        .doorStage {
           position: relative;
-          height: 360px;
-          overflow: hidden;
+          height: 285px;
+          overflow: visible;
           perspective: 1100px;
-          background:
-            radial-gradient(circle at 50% 26%, rgba(255, 202, 102, 0.12), transparent 26%),
-            linear-gradient(180deg, rgba(3, 8, 13, 0.4), rgba(8, 11, 12, 0.96));
         }
 
-        .portalScene::before {
+        .archFrame {
+          position: absolute;
+          left: 50%;
+          bottom: 42px;
+          width: 176px;
+          height: 205px;
+          transform: translateX(-50%);
+          border: 8px solid #b87b16;
+          border-radius: 92px 92px 10px 10px;
+          background:
+            linear-gradient(90deg, #6c3e05, #f0bd54 18%, #9c5d0c 50%, #f1bf55 82%, #653804);
+          box-shadow:
+            0 0 0 2px rgba(255, 222, 153, 0.5),
+            0 0 26px rgba(255, 182, 45, 0.35),
+            inset 0 0 18px rgba(255, 232, 180, 0.18);
+        }
+
+        .archFrame::before {
           content: "";
+          position: absolute;
+          left: -18px;
+          right: -18px;
+          top: 84px;
+          height: 12px;
+          background: linear-gradient(180deg, #f4c968, #8c5109);
+          border-radius: 4px;
+          box-shadow: 0 0 10px rgba(255, 197, 79, 0.35);
+        }
+
+        .archCrown {
+          position: absolute;
+          left: 50%;
+          top: -20px;
+          width: 116px;
+          height: 74px;
+          transform: translateX(-50%);
+          border-radius: 70px 70px 14px 14px;
+          border: 2px solid rgba(255, 224, 160, 0.5);
+          background:
+            radial-gradient(circle at 50% 70%, rgba(255, 221, 146, 0.16), transparent 56%),
+            linear-gradient(180deg, #d89a28, #7d4305);
+          overflow: hidden;
+        }
+
+        .crownLine {
+          position: absolute;
+          left: 50%;
+          bottom: 4px;
+          width: 2px;
+          height: 62px;
+          background: linear-gradient(180deg, #ffe4a5, #6f3702);
+          transform-origin: bottom center;
+        }
+
+        .crownLine.one {
+          transform: rotate(-28deg);
+        }
+
+        .crownLine.two {
+          transform: rotate(0deg);
+        }
+
+        .crownLine.three {
+          transform: rotate(28deg);
+        }
+
+        .crownGem {
+          position: absolute;
+          left: 50%;
+          top: 10px;
+          width: 20px;
+          height: 20px;
+          transform: translateX(-50%) rotate(45deg);
+          border: 1px solid #ffe2a0;
+          background: linear-gradient(135deg, #fff4bd, #f4ae24 55%, #7b3400);
+          box-shadow: 0 0 16px rgba(255, 194, 65, 0.7);
+        }
+
+        .doorOpening {
+          position: absolute;
+          left: 10px;
+          right: 10px;
+          top: 10px;
+          bottom: 8px;
+          overflow: hidden;
+          border-radius: 74px 74px 2px 2px;
+          background:
+            radial-gradient(circle at 50% 42%, #fff6c6 0%, #ffc44d 32%, #a84e03 64%, #321300 100%);
+          box-shadow: inset 0 0 32px rgba(255, 246, 197, 0.5);
+        }
+
+        .lightWithin {
           position: absolute;
           inset: 0;
           background:
-            linear-gradient(90deg, transparent 49.5%, rgba(255, 215, 137, 0.08) 50%, transparent 50.5%);
-          opacity: 0.7;
+            linear-gradient(180deg, rgba(255,255,255,.65), transparent 30%),
+            radial-gradient(circle at 50% 48%, rgba(255,255,255,.76), transparent 36%);
+          animation: lightPulse 2.6s ease-in-out infinite alternate;
         }
 
-        .portalFloor {
-          position: absolute;
-          left: -10%;
-          right: -10%;
-          bottom: -4px;
-          height: 125px;
-          transform: perspective(340px) rotateX(62deg);
-          transform-origin: bottom;
-          background:
-            linear-gradient(90deg, transparent, rgba(255, 190, 70, 0.05), transparent),
-            linear-gradient(180deg, rgba(74, 47, 10, 0.05), rgba(5, 8, 10, 0.92));
-        }
-
-        .portalFloor::after {
-          content: "";
+        .doorLeaf {
           position: absolute;
           inset: 0;
+          transform-origin: left center;
+          transform-style: preserve-3d;
+          border-radius: 72px 72px 2px 2px;
           background:
-            repeating-linear-gradient(
-              90deg,
-              transparent 0 44px,
-              rgba(255, 205, 109, 0.06) 45px 46px
-            );
-          opacity: 0.5;
+            linear-gradient(90deg, rgba(255,255,255,.08), transparent 18%, transparent 82%, rgba(0,0,0,.22)),
+            linear-gradient(90deg, #b97514 0 18%, #d49523 18% 36%, #b97514 36% 52%, #d49523 52% 70%, #a8630d 70% 100%);
+          border: 1px solid rgba(255, 227, 166, 0.5);
+          box-shadow:
+            inset 0 0 0 3px rgba(93, 51, 5, 0.35),
+            inset 0 0 22px rgba(255, 222, 151, 0.12);
+          transition:
+            transform 520ms cubic-bezier(.2,.75,.18,1),
+            box-shadow 280ms ease;
+          z-index: 2;
+        }
+
+        .doorEmblem {
+          position: absolute;
+          left: 50%;
+          top: 28px;
+          width: 74px;
+          height: 74px;
+          transform: translateX(-50%);
+          border-radius: 999px;
+          border: 5px solid #c78a20;
+          background:
+            radial-gradient(circle at 50% 50%, color-mix(in srgb, var(--accent) 70%, #06111a), #09111a 72%);
+          box-shadow:
+            0 0 0 2px rgba(255, 225, 157, 0.55),
+            0 0 22px var(--accentGlow);
+          display: grid;
+          place-items: center;
+        }
+
+        .doorEmblem span {
+          color: #fff4c7;
+          font-size: 28px;
+          font-weight: 950;
+          text-shadow: 0 0 14px var(--accentGlow);
+        }
+
+        .doorPanels {
+          position: absolute;
+          left: 22px;
+          right: 22px;
+          top: 115px;
+          bottom: 20px;
+          display: grid;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 9px;
+        }
+
+        .doorPanels i {
+          border: 2px solid rgba(101, 54, 5, 0.62);
+          border-radius: 3px;
+          box-shadow:
+            inset 0 0 0 2px rgba(255, 214, 132, 0.12),
+            inset 0 0 12px rgba(77, 36, 0, 0.22);
+        }
+
+        .doorHandle {
+          position: absolute;
+          right: 14px;
+          top: 58%;
+          width: 8px;
+          height: 8px;
+          border-radius: 999px;
+          background: #fff0aa;
+          box-shadow: 0 0 10px rgba(255, 231, 151, 0.85);
+        }
+
+        .columns {
+          position: absolute;
+          bottom: 38px;
+          width: 26px;
+          height: 170px;
+          display: flex;
+          gap: 2px;
+          z-index: 3;
+        }
+
+        .leftColumn {
+          left: calc(50% - 112px);
+        }
+
+        .rightColumn {
+          right: calc(50% - 112px);
+        }
+
+        .columns i {
+          flex: 1;
+          border-radius: 4px;
+          background:
+            linear-gradient(90deg, #6c3a04, #e8b64f 45%, #8b4e08 80%);
+          box-shadow: 0 0 10px rgba(255, 189, 60, 0.25);
+        }
+
+        .steps {
+          position: absolute;
+          left: 50%;
+          bottom: 16px;
+          width: 236px;
+          transform: translateX(-50%);
+          display: grid;
+          gap: 4px;
+          z-index: 4;
+        }
+
+        .steps i {
+          height: 9px;
+          border-radius: 2px;
+          background: linear-gradient(180deg, #d79b2e, #704000);
+          box-shadow: 0 2px 8px rgba(255, 180, 39, 0.3);
+        }
+
+        .steps i:nth-child(2) {
+          margin-inline: -10px;
+        }
+
+        .steps i:nth-child(3) {
+          margin-inline: -20px;
         }
 
         .lightSpill {
           position: absolute;
           left: 50%;
-          top: 0;
-          width: 30px;
-          height: 110px;
-          transform: translateX(-50%) scaleX(0.12);
+          bottom: 0;
+          width: 40px;
+          height: 74px;
+          transform: translateX(-50%) scaleX(.15);
           transform-origin: top center;
-          clip-path: polygon(45% 0, 55% 0, 100% 100%, 0 100%);
-          background:
-            linear-gradient(
-              180deg,
-              rgba(255, 246, 190, 0.88),
-              rgba(255, 192, 68, 0.48) 46%,
-              transparent 100%
-            );
+          clip-path: polygon(44% 0, 56% 0, 100% 100%, 0 100%);
+          background: linear-gradient(180deg, rgba(255, 248, 205, .94), rgba(255, 185, 45, .56) 42%, transparent 100%);
           filter: blur(3px);
           opacity: 0;
           transition:
-            transform 420ms cubic-bezier(.2,.72,.2,1),
-            opacity 280ms ease;
-        }
-
-        .doorFrame {
-          position: absolute;
-          left: 50%;
-          top: 24px;
-          width: 170px;
-          height: 280px;
-          transform: translateX(-50%);
-          border-radius: 10px 10px 4px 4px;
-          border: 8px solid #a26b16;
-          background:
-            linear-gradient(90deg, #6c3f08, #e3ad45 18%, #8a510d 50%, #e0aa41 82%, #603704);
-          box-shadow:
-            0 0 0 2px rgba(255, 215, 133, 0.4),
-            0 0 38px rgba(255, 176, 43, 0.2),
-            inset 0 0 22px rgba(255, 224, 154, 0.16);
-        }
-
-        .doorGlow {
-          position: absolute;
-          inset: 5px;
-          border-radius: 4px;
-          background: rgba(255, 214, 130, 0.2);
-          filter: blur(14px);
-          opacity: 0.4;
-          transition: opacity 280ms ease;
-        }
-
-        .doorPanel {
-          position: absolute;
-          inset: 7px;
-          transform-origin: left center;
-          transform-style: preserve-3d;
-          transition:
-            transform 460ms cubic-bezier(.2,.7,.15,1),
-            box-shadow 280ms ease;
-        }
-
-        .doorFace,
-        .doorInterior {
-          position: absolute;
-          inset: 0;
-          backface-visibility: hidden;
-        }
-
-        .doorFace {
-          z-index: 3;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          border-radius: 3px;
-          background:
-            linear-gradient(90deg, rgba(255,255,255,.06), transparent 18%, transparent 82%, rgba(0,0,0,.18)),
-            repeating-linear-gradient(
-              90deg,
-              #c88a23 0 22px,
-              #b4781e 22px 44px
-            );
-          border: 1px solid rgba(255, 228, 170, 0.42);
-          box-shadow:
-            inset 0 0 0 3px rgba(90, 49, 3, 0.34),
-            inset 0 0 24px rgba(255, 216, 134, 0.14);
-        }
-
-        .doorFace::before,
-        .doorFace::after {
-          content: "";
-          position: absolute;
-          left: 17px;
-          right: 17px;
-          border: 2px solid rgba(90, 49, 3, 0.5);
-          border-radius: 3px;
-        }
-
-        .doorFace::before {
-          top: 18px;
-          height: 74px;
-        }
-
-        .doorFace::after {
-          bottom: 18px;
-          height: 74px;
-        }
-
-        .doorCode {
-          position: relative;
-          z-index: 2;
-          color: #fff2c8;
-          font-size: 46px;
-          font-weight: 950;
-          text-shadow:
-            0 0 18px rgba(255, 214, 124, 0.58),
-            0 2px 0 rgba(87, 45, 0, 0.7);
-        }
-
-        .doorTitle {
-          position: relative;
-          z-index: 2;
-          max-width: 120px;
-          color: #fff5d8;
-          text-align: center;
-          font-size: 14px;
-          font-weight: 900;
-          line-height: 1.18;
-        }
-
-        .doorEdge {
-          position: absolute;
-          top: 0;
-          right: -12px;
-          width: 12px;
-          height: 100%;
-          transform-origin: left center;
-          transform: rotateY(90deg);
-          background: linear-gradient(180deg, #f1bd55, #6a3905);
-        }
-
-        .doorInterior {
+            transform 500ms cubic-bezier(.2,.75,.18,1),
+            opacity 260ms ease;
           z-index: 1;
-          overflow: hidden;
-          border-radius: 3px;
-          background:
-            radial-gradient(circle at 50% 40%, rgba(255, 250, 210, 1), rgba(255, 196, 72, 0.88) 32%, rgba(164, 80, 9, 0.7) 68%, #351601 100%);
-          box-shadow: inset 0 0 30px rgba(255, 247, 195, 0.45);
         }
 
-        .interiorLight {
-          position: absolute;
-          inset: 0;
-          background:
-            linear-gradient(180deg, rgba(255,255,255,.55), transparent 20%),
-            radial-gradient(circle at 50% 55%, rgba(255,255,255,.72), transparent 34%);
-          animation: interiorPulse 2.8s ease-in-out infinite alternate;
+        .workspace:hover .doorLeaf,
+        .workspace:focus-visible .doorLeaf {
+          transform: rotateY(-28deg) translateX(-5px);
+          box-shadow: 20px 0 34px rgba(255, 190, 57, 0.2);
         }
 
-        .portalCard:hover .doorPanel,
-        .portalCard:focus-visible .doorPanel {
-          transform: rotateY(-24deg) translateX(-4px);
-          box-shadow: 18px 0 28px rgba(255, 195, 69, 0.13);
-        }
-
-        .portalCard:hover .lightSpill,
-        .portalCard:focus-visible .lightSpill {
+        .workspace:hover .lightSpill,
+        .workspace:focus-visible .lightSpill {
           opacity: 1;
-          transform: translateX(-50%) scaleX(3.6);
+          transform: translateX(-50%) scaleX(4.7);
         }
 
-        .portalCard:hover .doorGlow,
-        .portalCard:focus-visible .doorGlow {
-          opacity: 0.9;
+        .workspace:hover .archFrame,
+        .workspace:focus-visible .archFrame {
+          box-shadow:
+            0 0 0 2px rgba(255, 222, 153, 0.65),
+            0 0 42px rgba(255, 182, 45, 0.5),
+            inset 0 0 18px rgba(255, 232, 180, 0.18);
         }
 
-        .portalContent {
-          padding: 26px 24px 28px;
+        .workspaceCard {
+          min-height: 330px;
+          margin-top: -2px;
+          padding: 20px 20px 18px;
+          border-radius: 16px;
+          border: 1px solid color-mix(in srgb, var(--accent) 35%, transparent);
+          background:
+            radial-gradient(circle at 50% 0%, var(--accentGlow), transparent 42%),
+            linear-gradient(180deg, rgba(7, 18, 30, .96), rgba(4, 10, 18, .98));
+          box-shadow:
+            0 14px 40px rgba(0,0,0,.28),
+            inset 0 1px 0 rgba(255,255,255,.03);
+          transition:
+            transform 220ms ease,
+            border-color 220ms ease,
+            box-shadow 220ms ease;
         }
 
-        .portalKicker {
-          color: #f0b84f;
-          font-size: 11px;
+        .workspace:hover .workspaceCard,
+        .workspace:focus-visible .workspaceCard {
+          transform: translateY(-5px);
+          border-color: var(--accent);
+          box-shadow:
+            0 22px 50px rgba(0,0,0,.34),
+            0 0 30px var(--accentGlow);
+        }
+
+        .miniCode {
+          display: inline-grid;
+          place-items: center;
+          min-width: 28px;
+          height: 28px;
+          padding: 0 7px;
+          border-radius: 6px;
+          border: 1px solid var(--accent);
+          color: var(--accent);
+          background: color-mix(in srgb, var(--accent) 10%, transparent);
+          font-size: 12px;
           font-weight: 950;
-          letter-spacing: 0.16em;
+          box-shadow: 0 0 12px var(--accentGlow);
         }
 
-        .portalContent h3 {
-          margin: 10px 0 12px;
-          font-size: 29px;
-          letter-spacing: -0.035em;
+        .workspaceCard h2 {
+          margin: 10px 0 6px;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 27px;
+          letter-spacing: -.025em;
         }
 
-        .portalContent > p {
+        .workspaceCard > p {
+          min-height: 72px;
           margin: 0;
-          min-height: 88px;
-          color: #9eb2bf;
-          line-height: 1.58;
+          color: color-mix(in srgb, var(--accent) 78%, white);
+          line-height: 1.45;
         }
 
-        .portalContent ul {
+        .workspaceCard ul {
           display: grid;
           gap: 8px;
-          margin: 20px 0 0;
+          margin: 16px 0 0;
           padding: 0;
           list-style: none;
         }
 
-        .portalContent li {
-          position: relative;
-          padding-left: 18px;
-          color: #d6e2e8;
-          font-size: 13px;
-          line-height: 1.45;
+        .workspaceCard li {
+          display: grid;
+          grid-template-columns: 16px 1fr;
+          gap: 8px;
+          color: #d4e0e8;
+          font-size: 12px;
+          line-height: 1.4;
         }
 
-        .portalContent li::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 0.55em;
-          width: 7px;
-          height: 7px;
-          border-radius: 999px;
-          background: #e8b349;
-          box-shadow: 0 0 10px rgba(232, 179, 73, 0.55);
+        .workspaceCard li span {
+          color: var(--accent);
+          text-shadow: 0 0 10px var(--accentGlow);
         }
 
-        .portalAction {
-          min-height: 48px;
-          margin-top: 24px;
+        .workspaceCta {
+          min-height: 42px;
+          margin-top: 16px;
           padding: 0 14px;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          border-radius: 12px;
-          border: 1px solid rgba(232, 179, 73, 0.24);
-          background: rgba(181, 111, 14, 0.06);
-          color: #f8ce7a;
-          font-size: 13px;
+          justify-content: center;
+          gap: 18px;
+          border-radius: 8px;
+          border: 1px solid var(--accent);
+          color: color-mix(in srgb, var(--accent) 70%, white);
+          background: color-mix(in srgb, var(--accent) 8%, transparent);
+          box-shadow: inset 0 0 16px color-mix(in srgb, var(--accent) 8%, transparent);
+          font-size: 12px;
           font-weight: 900;
-          transition:
-            background 180ms ease,
-            border-color 180ms ease;
         }
 
-        .portalCard:hover .portalAction,
-        .portalCard:focus-visible .portalAction {
-          border-color: rgba(255, 207, 114, 0.55);
-          background: rgba(186, 116, 20, 0.12);
-        }
-
-        .discipline,
-        .actSection,
-        .finalCta {
-          border: 1px solid rgba(99, 166, 195, 0.16);
+        .governanceBand {
+          display: grid;
+          grid-template-columns: 1.12fr .9fr 1fr;
+          gap: 28px;
+          margin-top: 18px;
+          padding: 18px 24px;
+          border-radius: 20px;
+          border: 1px solid rgba(255, 185, 54, .32);
           background:
-            linear-gradient(180deg, rgba(8, 21, 31, 0.9), rgba(3, 10, 15, 0.95));
-          border-radius: 28px;
-          box-shadow: 0 26px 80px rgba(0, 0, 0, 0.25);
+            radial-gradient(circle at 15% 0%, rgba(255, 172, 32, .07), transparent 35%),
+            linear-gradient(180deg, rgba(6, 16, 27, .96), rgba(3, 9, 16, .98));
+          box-shadow: 0 18px 50px rgba(0,0,0,.3);
         }
 
-        .discipline {
-          margin-top: 84px;
-          padding: 48px;
+        .bandEyebrow {
+          color: #ffc64e;
+          letter-spacing: .12em;
         }
 
-        .disciplineHeader {
+        .chain {
           display: grid;
-          grid-template-columns: 1.05fr 0.95fr;
-          gap: 38px;
-          align-items: end;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 4px;
+          margin-top: 12px;
         }
 
-        .disciplineHeader > p {
-          margin: 0;
-        }
-
-        .disciplineGrid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 14px;
-          margin-top: 34px;
-        }
-
-        .disciplineGrid article {
-          min-height: 230px;
-          padding: 22px;
-          border-radius: 18px;
-          border: 1px solid rgba(104, 177, 207, 0.16);
-          background: rgba(32, 87, 111, 0.05);
-        }
-
-        .disciplineGrid span {
-          color: #69cdf7;
-          font-size: 11px;
-          font-weight: 950;
-          letter-spacing: 0.16em;
-        }
-
-        .disciplineGrid h3 {
-          margin: 16px 0 10px;
-          font-size: 24px;
-        }
-
-        .disciplineGrid p {
-          margin: 0;
-          color: #9fb3c0;
-          line-height: 1.58;
-        }
-
-        .actSection {
-          margin-top: 22px;
-          padding: 48px;
-          display: grid;
-          grid-template-columns: 0.78fr 1.22fr;
-          gap: 42px;
-          align-items: center;
-        }
-
-        .actVisual {
-          min-height: 330px;
+        .chainNode {
           position: relative;
+          text-align: center;
+        }
+
+        .chainIcon {
+          width: 46px;
+          height: 46px;
+          margin: 0 auto 6px;
           display: grid;
           place-items: center;
+          border-radius: 999px;
+          border: 2px solid #ffc345;
+          color: #ffd87c;
+          background: rgba(112, 69, 5, .16);
+          box-shadow: 0 0 15px rgba(255, 184, 48, .18);
+          font-size: 20px;
         }
 
-        .actRing {
+        .chainNode strong {
+          display: block;
+          color: #ffd16b;
+          font-size: 10px;
+        }
+
+        .chainNode i {
           position: absolute;
+          right: -8px;
+          top: 18px;
+          color: #f6b62f;
+          font-style: normal;
+        }
+
+        .chainBlock > p:last-child {
+          margin: 12px 0 0;
+          color: #aebdc7;
+          font-size: 11px;
+          line-height: 1.45;
+          text-align: center;
+        }
+
+        .stepsBlock {
+          display: grid;
+          gap: 10px;
+          padding-inline: 10px;
+          border-left: 1px solid rgba(255,185,54,.18);
+          border-right: 1px solid rgba(255,185,54,.18);
+        }
+
+        .stepsBlock article {
+          display: grid;
+          grid-template-columns: 42px 1fr;
+          gap: 12px;
+          align-items: start;
+        }
+
+        .stepsBlock article > span {
+          width: 38px;
+          height: 38px;
+          display: grid;
+          place-items: center;
           border-radius: 999px;
-          border: 1px solid rgba(101, 194, 232, 0.22);
+          border: 1px solid rgba(255, 190, 65, .52);
+          color: #ffd168;
+          font-size: 12px;
+          font-weight: 900;
         }
 
-        .ringOne {
-          width: 290px;
-          height: 290px;
-          animation: orbitSpin 18s linear infinite;
+        .stepsBlock strong {
+          color: #f3f6f8;
+          font-size: 13px;
         }
 
-        .ringTwo {
-          width: 220px;
-          height: 220px;
-          border-color: rgba(255, 196, 79, 0.22);
-          animation: orbitSpin 13s linear infinite reverse;
+        .stepsBlock p {
+          margin: 3px 0 0;
+          color: #a6b6c0;
+          font-size: 11px;
+          line-height: 1.35;
         }
 
-        .actCore {
-          width: 150px;
-          height: 150px;
-          border-radius: 999px;
-          display: flex;
-          flex-direction: column;
+        .euBlock {
+          display: grid;
+          grid-template-columns: 94px 1fr;
+          gap: 18px;
+          align-items: center;
+        }
+
+        .euShield {
+          width: 82px;
+          height: 96px;
+          position: relative;
+          clip-path: polygon(50% 0, 92% 14%, 86% 74%, 50% 100%, 14% 74%, 8% 14%);
+          border: 2px solid #ffc24a;
+          background: linear-gradient(180deg, #16418f, #071b4a);
+          box-shadow: 0 0 22px rgba(40, 111, 220, .3);
+        }
+
+        .euShield span {
+          position: absolute;
+          color: #ffd139;
+          font-size: 11px;
+        }
+
+        .euShield span:nth-child(1) { left: 34px; top: 14px; }
+        .euShield span:nth-child(2) { right: 16px; top: 28px; }
+        .euShield span:nth-child(3) { right: 18px; bottom: 22px; }
+        .euShield span:nth-child(4) { left: 34px; bottom: 12px; }
+        .euShield span:nth-child(5) { left: 16px; bottom: 22px; }
+        .euShield span:nth-child(6) { left: 14px; top: 28px; }
+
+        .euBlock h3 {
+          margin: 6px 0 5px;
+          color: #f6f8fa;
+          font-size: 15px;
+        }
+
+        .euBlock p:not(.bandEyebrow) {
+          margin: 0;
+          color: #aab9c3;
+          font-size: 11px;
+          line-height: 1.4;
+        }
+
+        .euBlock a {
+          min-height: 34px;
+          margin-top: 10px;
+          padding: 0 12px;
+          display: inline-flex;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(107, 205, 245, 0.42);
-          background:
-            radial-gradient(circle, rgba(83, 180, 223, 0.14), rgba(6, 17, 26, 0.95) 68%);
-          box-shadow:
-            0 0 36px rgba(84, 191, 236, 0.18),
-            inset 0 0 22px rgba(84, 191, 236, 0.08);
+          gap: 14px;
+          border-radius: 8px;
+          border: 1px solid rgba(255, 190, 65, .54);
+          color: #ffd273;
+          background: rgba(112, 70, 5, .14);
+          text-decoration: none;
+          font-size: 11px;
+          font-weight: 900;
         }
 
-        .actCore span {
-          color: #75d4fb;
-          font-size: 34px;
+        .frontDoor {
+          padding: 16px 0 8px;
+          text-align: center;
+        }
+
+        .frontDoor > p {
+          margin: 0;
+          color: #63d4ed;
+          font-size: 11px;
           font-weight: 950;
+          letter-spacing: .32em;
         }
 
-        .actCore strong {
-          margin-top: 3px;
-          color: #edf9fd;
-          font-size: 16px;
-        }
-
-        .actActions {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 12px;
-          margin-top: 26px;
-        }
-
-        .finalCta {
-          margin-top: 78px;
-          padding: 56px 48px;
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          gap: 34px;
-        }
-
-        .finalCta > div {
-          max-width: 820px;
-        }
-
-        footer {
-          min-height: 130px;
+        .frontDoor > div {
+          margin-top: 8px;
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          gap: 24px;
-          color: #768d9a;
+          justify-content: center;
+          gap: 16px;
+          color: #c3d0d8;
           font-size: 12px;
         }
 
-        footer > div {
+        .frontDoor i {
+          width: 96px;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, #ffc03d);
+        }
+
+        .frontDoor i:last-child {
+          background: linear-gradient(90deg, #ffc03d, transparent);
+        }
+
+        footer {
+          min-height: 78px;
           display: flex;
-          flex-direction: column;
-          gap: 5px;
+          justify-content: space-between;
+          align-items: center;
+          color: #718694;
+          font-size: 11px;
         }
 
         footer strong {
-          color: #a9bbc5;
+          color: #94a8b4;
         }
 
-        footer a {
-          color: #8fd8f8;
-          text-decoration: none;
-          font-weight: 850;
+        @keyframes starsOne {
+          from { transform: translate3d(0,0,0); }
+          to { transform: translate3d(110px,145px,0); }
         }
 
-        @keyframes starDriftOne {
-          from { transform: translate3d(0, 0, 0); }
-          to { transform: translate3d(110px, 150px, 0); }
+        @keyframes starsTwo {
+          from { transform: translate3d(0,0,0); }
+          to { transform: translate3d(-120px,100px,0); }
         }
 
-        @keyframes starDriftTwo {
-          from { transform: translate3d(0, 0, 0); }
-          to { transform: translate3d(-130px, 100px, 0); }
+        @keyframes pulseStars {
+          from { opacity: .18; transform: scale(.98); }
+          to { opacity: .4; transform: scale(1.02); }
         }
 
-        @keyframes starPulse {
-          from { opacity: 0.14; transform: scale(0.98); }
-          to { opacity: 0.34; transform: scale(1.02); }
+        @keyframes lineOne {
+          from { transform: translateX(-30vw) rotate(-9deg); opacity: 0; }
+          16% { opacity: .5; }
+          82% { opacity: .35; }
+          to { transform: translateX(105vw) rotate(-9deg); opacity: 0; }
         }
 
-        @keyframes lineSweepOne {
-          0% { transform: translateX(-28vw) rotate(13deg); opacity: 0; }
-          15% { opacity: 0.6; }
-          80% { opacity: 0.35; }
-          100% { transform: translateX(105vw) rotate(13deg); opacity: 0; }
+        @keyframes lineTwo {
+          from { transform: translateX(30vw) rotate(11deg); opacity: 0; }
+          18% { opacity: .45; }
+          85% { opacity: .3; }
+          to { transform: translateX(-105vw) rotate(11deg); opacity: 0; }
         }
 
-        @keyframes lineSweepTwo {
-          0% { transform: translateX(28vw) rotate(-18deg); opacity: 0; }
-          18% { opacity: 0.5; }
-          85% { opacity: 0.3; }
-          100% { transform: translateX(-105vw) rotate(-18deg); opacity: 0; }
+        @keyframes lineThree {
+          from { transform: translateX(-50vw) rotate(-4deg); opacity: 0; }
+          20% { opacity: .38; }
+          82% { opacity: .28; }
+          to { transform: translateX(90vw) rotate(-4deg); opacity: 0; }
         }
 
-        @keyframes lineSweepThree {
-          0% { transform: translateX(-55vw) rotate(6deg); opacity: 0; }
-          20% { opacity: 0.38; }
-          82% { opacity: 0.28; }
-          100% { transform: translateX(92vw) rotate(6deg); opacity: 0; }
+        @keyframes burst {
+          0%, 55%, 100% { transform: rotate(45deg) scale(.35); opacity: .15; }
+          66% { transform: rotate(45deg) scale(1.15); opacity: 1; }
         }
 
-        @keyframes explode {
-          0%, 58% {
-            transform: rotate(var(--angle)) scaleX(0.08);
-            opacity: 0;
-          }
-          65% {
-            opacity: 0.9;
-          }
-          100% {
-            transform: rotate(var(--angle)) scaleX(1.15);
-            opacity: 0;
-          }
+        @keyframes lightPulse {
+          from { opacity: .48; }
+          to { opacity: .88; }
         }
 
-        @keyframes orbitSpin {
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes sphereFloat {
-          from { transform: translate3d(0, -10px, 0); }
-          to { transform: translate3d(18px, 14px, 0); }
-        }
-
-        @keyframes interiorPulse {
-          from { opacity: 0.48; }
-          to { opacity: 0.84; }
-        }
-
-        @media (max-width: 1120px) {
-          .topbar {
-            grid-template-columns: auto auto;
-          }
-
+        @media (max-width: 1200px) {
           nav {
             display: none;
           }
 
-          .doorsGrid {
+          .topbar {
+            grid-template-columns: 1fr auto;
+          }
+
+          .doors {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .disciplineGrid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-        }
-
-        @media (max-width: 820px) {
-          .disciplineHeader,
-          .actSection {
+          .governanceBand {
             grid-template-columns: 1fr;
           }
 
-          .finalCta {
-            flex-direction: column;
-            align-items: flex-start;
-          }
-
-          .actVisual {
-            min-height: 290px;
+          .stepsBlock {
+            border: 0;
+            border-top: 1px solid rgba(255,185,54,.18);
+            border-bottom: 1px solid rgba(255,185,54,.18);
+            padding-block: 14px;
           }
         }
 
-        @media (max-width: 640px) {
+        @media (max-width: 700px) {
           .shell {
-            width: min(100% - 20px, 1320px);
+            width: min(100% - 20px, 1500px);
           }
 
-          .brandText small {
+          .brand small {
             display: none;
           }
 
-          .workspaceButton {
-            padding: 0 12px;
+          .postButton {
+            padding: 0 14px;
           }
 
-          .workspaceButton span {
+          .postButton span {
             display: none;
           }
 
           .hero {
-            min-height: auto;
-            padding: 72px 0 62px;
+            padding-top: 30px;
           }
 
-          h1 {
-            font-size: clamp(48px, 16vw, 72px);
-          }
-
-          .doorsGrid,
-          .disciplineGrid {
+          .doors {
             grid-template-columns: 1fr;
           }
 
-          .portalCard {
-            min-height: 630px;
+          .workspaceCard > p {
+            min-height: auto;
           }
 
-          .discipline,
-          .actSection,
-          .finalCta {
-            padding: 30px 24px;
+          .chain {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            row-gap: 14px;
           }
 
-          .actVisual {
-            transform: scale(0.86);
+          .chainNode i {
+            display: none;
+          }
+
+          .euBlock {
+            grid-template-columns: 1fr;
           }
 
           footer {
             flex-direction: column;
             justify-content: center;
             align-items: flex-start;
+            gap: 6px;
           }
         }
       `}</style>
