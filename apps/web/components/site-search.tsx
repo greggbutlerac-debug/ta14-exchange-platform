@@ -2,10 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
-import {
-  TA14_PUBLIC_CORPUS,
-  type CorpusRecord,
-} from "../app/foundation/public-corpus/corpus";
 
 type SiteSearchItem = {
   id: string;
@@ -14,10 +10,9 @@ type SiteSearchItem = {
   href: string;
   type: string;
   keywords: string[];
-  external?: boolean;
 };
 
-const SITE_ROUTES: SiteSearchItem[] = [
+const SEARCH_ITEMS: SiteSearchItem[] = [
   {
     id: "home",
     title: "TA-14 AI Governance Exchange",
@@ -68,6 +63,8 @@ const SITE_ROUTES: SiteSearchItem[] = [
       "Zenodo",
       "DOI",
       "GitHub",
+      "standards",
+      "chronology",
     ],
   },
   {
@@ -86,22 +83,58 @@ const SITE_ROUTES: SiteSearchItem[] = [
     ],
   },
   {
+    id: "registry-workspace",
+    title: "AI Governance Registry Workspace",
+    description:
+      "Open the registry workspace for submissions, records, review, and registration.",
+    href: "/workspace/ai-governance/registry",
+    type: "Registry",
+    keywords: ["registry workspace", "submission", "register", "review"],
+  },
+  {
+    id: "registry-register",
+    title: "Register a Governance Architecture",
+    description:
+      "Begin a new AI governance registry submission.",
+    href: "/workspace/ai-governance/registry/register",
+    type: "Registry Action",
+    keywords: ["register", "submission", "governance architecture", "intake"],
+  },
+  {
     id: "records",
     title: "Governed Records",
     description:
       "Create, inspect, preserve, and verify governed records.",
+    href: "/records",
+    type: "Records",
+    keywords: ["records", "governed records", "evidence", "preserve"],
+  },
+  {
+    id: "workspace-records",
+    title: "Workspace Records",
+    description:
+      "Open governed records inside the Exchange workspace.",
     href: "/workspace/records",
     type: "Workspace Tool",
-    keywords: ["records", "governed records", "evidence", "preserve"],
+    keywords: ["records", "workspace records", "evidence"],
   },
   {
     id: "verification",
     title: "Verification",
     description:
       "Inspect verification records, receipts, replay history, and route evidence.",
+    href: "/verification",
+    type: "Verification",
+    keywords: ["verification", "receipts", "replay", "proof"],
+  },
+  {
+    id: "workspace-verification",
+    title: "Workspace Verification",
+    description:
+      "Inspect verification activity inside the Exchange workspace.",
     href: "/workspace/verification",
     type: "Workspace Tool",
-    keywords: ["verification", "receipts", "replay", "proof"],
+    keywords: ["workspace verification", "receipts", "replay"],
   },
   {
     id: "execution-map",
@@ -122,6 +155,51 @@ const SITE_ROUTES: SiteSearchItem[] = [
     keywords: ["my routes", "saved routes", "account"],
   },
   {
+    id: "route-builder",
+    title: "Route Builder",
+    description:
+      "Build and preserve an AI governance route for testing and review.",
+    href: "/workspace/build",
+    type: "Workspace Tool",
+    keywords: ["route builder", "build", "route", "governance"],
+  },
+  {
+    id: "upload",
+    title: "Upload Governance Materials",
+    description:
+      "Upload governance documents and supporting evidence for review.",
+    href: "/workspace/upload",
+    type: "Workspace Tool",
+    keywords: ["upload", "documents", "evidence", "files"],
+  },
+  {
+    id: "paste",
+    title: "Paste Governance Materials",
+    description:
+      "Paste governance text directly into the Exchange workspace.",
+    href: "/workspace/paste",
+    type: "Workspace Tool",
+    keywords: ["paste", "text", "governance material"],
+  },
+  {
+    id: "scanner",
+    title: "Governance Scanner",
+    description:
+      "Scan governance materials for route, evidence, authority, and continuity issues.",
+    href: "/workspace/scanner",
+    type: "Workspace Tool",
+    keywords: ["scanner", "scan", "evidence gaps", "authority"],
+  },
+  {
+    id: "demonstrations",
+    title: "Demonstrations",
+    description:
+      "Open TA-14 public demonstrations and test routes.",
+    href: "/workspace/demonstrations",
+    type: "Demonstrations",
+    keywords: ["demonstrations", "demo", "test route", "playground"],
+  },
+  {
     id: "eu-ai-act",
     title: "EU AI Act Requirements",
     description:
@@ -129,6 +207,15 @@ const SITE_ROUTES: SiteSearchItem[] = [
     href: "/workspace/ai-governance/eu-ai-act",
     type: "Regulatory",
     keywords: ["EU AI Act", "requirements", "Article 50", "compliance"],
+  },
+  {
+    id: "marketplace",
+    title: "TA-14 Governance Marketplace",
+    description:
+      "Open the marketplace for governance needs, review services, and collaboration.",
+    href: "/marketplace",
+    type: "Marketplace",
+    keywords: ["marketplace", "post need", "services", "review"],
   },
   {
     id: "partner-review-network",
@@ -148,50 +235,6 @@ const SITE_ROUTES: SiteSearchItem[] = [
     type: "Academy",
     keywords: ["academy", "HVACDR", "education", "training"],
   },
-];
-
-function corpusToSearchItem(record: CorpusRecord): SiteSearchItem {
-  return {
-    id: `corpus-${record.id}`,
-    title: record.title,
-    description:
-      record.relationship ??
-      record.description ??
-      `${record.category} record in the TA-14 Complete Public Corpus.`,
-    href: record.href ?? `/foundation/public-corpus#${record.id}`,
-    type:
-      record.category === "BOOK"
-        ? "Book"
-        : record.category === "ARTICLE"
-          ? "Article"
-          : record.category === "ZENODO"
-            ? "Zenodo / DOI"
-            : record.category === "PATENT"
-              ? "Patent Application"
-              : record.category === "REPOSITORY"
-                ? "Repository"
-                : record.category === "IMPLEMENTATION"
-                  ? "Implementation"
-                  : record.category === "CHRONOLOGY"
-                    ? "Chronology"
-                    : record.category,
-    keywords: [
-      record.category,
-      record.date ?? "",
-      String(record.year),
-      record.author ?? "",
-      record.platform ?? "",
-      record.identifier ?? "",
-      record.status,
-      ...(record.tags ?? []),
-    ].filter(Boolean),
-    external: Boolean(record.href),
-  };
-}
-
-const SEARCH_ITEMS: SiteSearchItem[] = [
-  ...SITE_ROUTES,
-  ...TA14_PUBLIC_CORPUS.map(corpusToSearchItem),
 ];
 
 function scoreItem(item: SiteSearchItem, terms: string[]) {
@@ -225,7 +268,7 @@ export default function SiteSearch() {
       .filter(Boolean);
 
     if (!terms.length) {
-      return SITE_ROUTES.slice(0, 8);
+      return SEARCH_ITEMS.slice(0, 10);
     }
 
     return SEARCH_ITEMS.map((item) => ({
@@ -305,14 +348,7 @@ export default function SiteSearch() {
 
     if (event.key === "Enter" && results[activeIndex]) {
       event.preventDefault();
-      const result = results[activeIndex];
-
-      if (result.external) {
-        window.open(result.href, "_blank", "noopener,noreferrer");
-      } else {
-        window.location.href = result.href;
-      }
-
+      window.location.href = results[activeIndex].href;
       setOpen(false);
     }
   }
@@ -352,7 +388,7 @@ export default function SiteSearch() {
                   onChange={(event) => setQuery(event.target.value)}
                   onKeyDown={handleInputKeyDown}
                   type="search"
-                  placeholder="Search publications, patents, records, tools, standards…"
+                  placeholder="Search pages, records, tools, registry, corpus…"
                   aria-label="Search"
                 />
                 <button
@@ -366,64 +402,36 @@ export default function SiteSearch() {
 
               <div className="searchScope">
                 <span>Entire TA-14 AI Governance Exchange</span>
-                <span>{SEARCH_ITEMS.length} indexed destinations and records</span>
+                <span>{SEARCH_ITEMS.length} indexed platform destinations</span>
               </div>
             </header>
 
             <div className="searchResults" role="listbox">
               {results.length ? (
-                results.map((result, index) => {
-                  const content = (
-                    <>
-                      <span className="resultType">{result.type}</span>
-                      <span className="resultCopy">
-                        <strong>{result.title}</strong>
-                        <small>{result.description}</small>
-                      </span>
-                      <span className="resultArrow">
-                        {result.external ? "↗" : "→"}
-                      </span>
-                    </>
-                  );
-
-                  if (result.external) {
-                    return (
-                      <a
-                        key={result.id}
-                        href={result.href}
-                        target="_blank"
-                        rel="noreferrer"
-                        className={index === activeIndex ? "active" : ""}
-                        role="option"
-                        aria-selected={index === activeIndex}
-                        onMouseEnter={() => setActiveIndex(index)}
-                        onClick={() => setOpen(false)}
-                      >
-                        {content}
-                      </a>
-                    );
-                  }
-
-                  return (
-                    <Link
-                      key={result.id}
-                      href={result.href}
-                      className={index === activeIndex ? "active" : ""}
-                      role="option"
-                      aria-selected={index === activeIndex}
-                      onMouseEnter={() => setActiveIndex(index)}
-                      onClick={() => setOpen(false)}
-                    >
-                      {content}
-                    </Link>
-                  );
-                })
+                results.map((result, index) => (
+                  <Link
+                    key={result.id}
+                    href={result.href}
+                    className={index === activeIndex ? "active" : ""}
+                    role="option"
+                    aria-selected={index === activeIndex}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => setOpen(false)}
+                  >
+                    <span className="resultType">{result.type}</span>
+                    <span className="resultCopy">
+                      <strong>{result.title}</strong>
+                      <small>{result.description}</small>
+                    </span>
+                    <span className="resultArrow">→</span>
+                  </Link>
+                ))
               ) : (
                 <div className="noResults">
-                  <strong>No matching indexed record was found.</strong>
+                  <strong>No matching platform destination was found.</strong>
                   <p>
-                    Try a broader term such as “AIR,” “admissibility,”
-                    “refrigerant,” “EU AI Act,” “patent,” or “record.”
+                    Try a broader term such as “registry,” “records,”
+                    “verification,” “EU AI Act,” “academy,” or “corpus.”
                   </p>
                   <Link
                     href="/foundation/public-corpus"
