@@ -1,441 +1,603 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import type { CSSProperties } from "react";
+import Link from 'next/link';
+import { useMemo, useState } from 'react';
 
-const workspaces = [
+type RegistryStatus =
+  | 'Submitted'
+  | 'Under Review'
+  | 'Registered'
+  | 'Disputed'
+  | 'Superseded'
+  | 'Withdrawn'
+  | 'Archived';
+
+type PillTone = 'blue' | 'gold' | 'green' | 'violet' | 'red' | 'slate';
+
+const STATUS_TONES: Record<RegistryStatus, PillTone> = {
+  Submitted: 'blue',
+  'Under Review': 'gold',
+  Registered: 'green',
+  Disputed: 'red',
+  Superseded: 'violet',
+  Withdrawn: 'slate',
+  Archived: 'slate',
+};
+
+const REGISTRY_FIELDS = [
+  ['Identity', 'Governance name, registry identifier, version, category, steward, and contact route.'],
+  ['Scope', 'What the architecture claims to govern, where it applies, and which actors or systems it covers.'],
+  ['Claims', 'Precisely stated governance, evidence, review, runtime, and execution claims.'],
+  ['Non-claims', 'What the submission does not establish, certify, guarantee, or authorize.'],
+  ['Evidence', 'Supporting publications, repositories, demonstrations, standards mappings, filings, and records.'],
+  ['Provenance', 'Who submitted the record, when it was submitted, what changed, and which source produced each assertion.'],
+  ['Lifecycle', 'Current status, effective dates, previous versions, superseding versions, disputes, withdrawals, and archival state.'],
+  ['Rights', 'Ownership, licensing, attribution, permitted use, confidentiality, and disclosure declarations.'],
+];
+
+const LEGITIMACY_CONTROLS = [
   {
-    id: "ai",
-    code: "AI",
-    title: "AI Governance",
-    href: "/workspace/ai-governance",
-    kicker: "GOVERN CONSEQUENTIAL AI EXECUTION",
-    description:
-      "Build, test, challenge, correct, preserve, and verify AI governance routes before consequential execution is permitted to proceed.",
-    color: "#62afff",
-    glow: "rgba(63, 154, 255, .56)",
-    world: "aiWorld",
-    features: [
-      "Agents, models, tools, APIs, and automated decisions",
-      "Authority, evidence, admissibility, and commit gates",
-      "ALLOW, HOLD, DENY, and ESCALATE route decisions",
-      "Runtime records tied to verified outcomes",
-    ],
+    number: '01',
+    title: 'Persistent identity',
+    text: 'Every accepted record receives a stable TA-14 registry identifier that does not change when descriptive metadata is updated.',
   },
   {
-    id: "records",
-    code: "GR",
-    title: "Governed & Environmental Records",
-    href: "/workspace/governed-records",
-    kicker: "PRESERVE REALITY BEFORE INTERPRETATION",
-    description:
-      "Create, upload, preserve, and interpret governed records across environmental, atmospheric, building, hospital, HVAC, land, water, and air domains.",
-    color: "#78e6b0",
-    glow: "rgba(92, 224, 167, .52)",
-    world: "recordsWorld",
-    features: [
-      "Governed, environmental, and atmospheric records",
-      "Bounded interpretation with explicit limitations",
-      "Separate record, determination, intervention, and outcome",
-      "Attributable chronology, ownership, lineage, and exports",
-    ],
+    number: '02',
+    title: 'Immutable event history',
+    text: 'Submission, review, amendment, dispute, supersession, withdrawal, and archival events remain visible as a dated chain.',
   },
   {
-    id: "entity",
-    code: "ER",
-    title: "Entity Review",
-    href: "/workspace/entity-review",
-    kicker: "REVIEW THE WHOLE GOVERNANCE ENTITY",
-    description:
-      "Submit an organization, AI system, governance architecture, program, product, implementation, or route for independent governed review.",
-    color: "#dd83ff",
-    glow: "rgba(199, 91, 255, .55)",
-    world: "entityWorld",
-    features: [
-      "Organizations, systems, architectures, and programs",
-      "Declared claims, non-claims, evidence, and boundaries",
-      "Independent findings, objections, and corrections",
-      "Visible review status and preserved outcomes",
-    ],
+    number: '03',
+    title: 'Attributable provenance',
+    text: 'Records distinguish the claimant, submitter, steward, reviewer, evidence source, and system-generated events.',
   },
   {
-    id: "eu",
-    code: "EU",
-    title: "European Union Artificial Intelligence Act",
-    href: "/workspace/ai-governance/eu-ai-act",
-    kicker: "TURN LEGAL DUTIES INTO INSPECTABLE ROUTES",
-    description:
-      "Translate EU AI Act roles, classifications, duties, evidence dependencies, transparency requirements, and unresolved questions into governed implementation pathways.",
-    color: "#ffd15c",
-    glow: "rgba(255, 196, 65, .52)",
-    world: "euWorld",
-    features: [
-      "Actor roles, system classification, and applicability",
-      "High-risk duties and Article 50 transparency",
-      "Evidence routes, records, testing, and documentation",
-      "Implementation boundaries without checklist theater",
-    ],
+    number: '04',
+    title: 'Version integrity',
+    text: 'Material changes create a new version connected to the prior version rather than silently rewriting history.',
   },
   {
-    id: "registry",
-    code: "RG",
-    title: "AI Governance Registry",
-    href: "/workspace/ai-governance/registry",
-    kicker: "ESTABLISH A DATED AND ATTRIBUTABLE RECORD",
-    description:
-      "Register governance architectures as searchable, versioned records with preserved identity, stewardship, claims, non-claims, evidence, lineage, and status.",
-    color: "#f2b95f",
-    glow: "rgba(236, 164, 57, .52)",
-    world: "registryWorld",
-    features: [
-      "Governance identity and registry identifier",
-      "Claims, non-claims, scope, and limitations",
-      "Evidence, publications, repositories, and demonstrations",
-      "Version history, lineage, ownership, and status",
-    ],
+    number: '05',
+    title: 'Claims and non-claims',
+    text: 'Every record separates affirmative claims from limitations so registration cannot be mistaken for certification.',
+  },
+  {
+    number: '06',
+    title: 'Evidence traceability',
+    text: 'Evidence is identified by source, date, relationship, access state, and integrity information where available.',
+  },
+  {
+    number: '07',
+    title: 'Dispute and correction route',
+    text: 'Affected parties can challenge attribution, ownership, scope, evidence, or material accuracy without erasing the original record.',
+  },
+  {
+    number: '08',
+    title: 'Explicit governance boundary',
+    text: 'The Registry preserves declarations and evidence; it does not grant regulatory approval, legal priority, or technical validity.',
   },
 ];
 
-const chain = [
-  ["Reality", "◉"],
-  ["Record", "▤"],
-  ["Continuity", "∞"],
-  ["Admissibility", "⬡"],
-  ["Binding", "⌁"],
-  ["Commit", "◆"],
-  ["Execution", "▷"],
-  ["Outcome", "♛"],
+const REFERENCE_FOUNDATIONS = [
+  {
+    label: 'NIST AI RMF',
+    text: 'Systematic documentation, defined responsibilities, lifecycle governance, transparency, and accountability.',
+  },
+  {
+    label: 'W3C PROV',
+    text: 'Provenance relationships among entities, activities, agents, derivations, and responsibility.',
+  },
+  {
+    label: 'DataCite practice',
+    text: 'Consistent metadata, persistent identification, related resources, contributors, dates, and version relationships.',
+  },
+  {
+    label: 'EU AI Act',
+    text: 'Registration and transparency concepts for regulated AI systems, while keeping this Registry independent and non-governmental.',
+  },
 ];
 
-const exchangeCapabilities = [
-  ["01", "Build governance routes", "Translate consequential decisions into inspectable inputs, authorities, evidence gates, failure states, and governed outcomes."],
-  ["02", "Preserve governed records", "Keep the source record separate from interpretation, determination, intervention, and outcome so the evidence remains admissible."],
-  ["03", "Request independent review", "Bring organizations, systems, architectures, records, or routes into a bounded review process with visible findings and limitations."],
-  ["04", "Verify execution", "Test whether the preserved route still corresponds to the implementation, authority, evidence, execution, and claimed result."],
-];
-
-const marketplaceItems = [
-  ["Post a governance need", "Describe the system, record, route, evidence gap, or review scope you need help with.", "/marketplace/post"],
-  ["Find governance work", "Discover bounded opportunities for evidence mapping, route review, implementation, and verification.", "/marketplace"],
-  ["Discover reviewers", "Find professionals through declared expertise, visible artifacts, evidence signals, and stated limitations.", "/marketplace"],
-  ["Build review reputation", "Preserve completed scopes, findings, outcomes, and review history instead of relying on unsupported claims.", "/marketplace"],
-];
-
-const registryFields = [
-  "Governance identity and registry identifier",
-  "Founder, author, steward, or organization",
-  "Establishment date and registration timestamp",
-  "Claims, non-claims, limitations, and scope",
-  "Version history, status, ownership, and licensing",
-  "Evidence, publications, repositories, demonstrations, and supporting documents",
-];
-
-const networkSteps = [
-  ["Declare", "State the reviewer, scope, expertise, boundaries, conflicts, and evidence requirements."],
-  ["Review", "Inspect the route, architecture, record, implementation, or entity without silently expanding the scope."],
-  ["Preserve", "Retain findings, objections, corrections, limitations, and superseded versions."],
-  ["Verify", "Test whether the reviewed implementation still corresponds to the evidence and claimed outcome."],
-];
-
-function Arrow() {
-  return <span aria-hidden="true">↗</span>;
+function Pill({ children, tone = 'blue' }: { children: React.ReactNode; tone?: PillTone }) {
+  return <span className={`pill pill-${tone}`}>{children}</span>;
 }
 
-export default function HomePage() {
+function PolishedLink({
+  href,
+  children,
+  variant = 'primary',
+}: {
+  href: string;
+  children: React.ReactNode;
+  variant?: 'primary' | 'secondary' | 'bronze';
+}) {
   return (
-    <main>
+    <Link href={href} className={`polished-button polished-button-${variant}`}>
+      <span>{children}</span>
+      <span aria-hidden="true" className="button-arrow">
+        →
+      </span>
+    </Link>
+  );
+}
+
+function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
+  return (
+    <div className="section-heading">
+      <p>{eyebrow}</p>
+      <h2>{title}</h2>
+      <div className="title-rule" />
+      <span>{text}</span>
+    </div>
+  );
+}
+
+export default function AiGovernanceRegistryPage() {
+  const [activeStatus, setActiveStatus] = useState<RegistryStatus>('Registered');
+  const statusCopy = useMemo(
+    () =>
+      ({
+        Submitted: 'A registrant has delivered a record, but completeness and identity checks are not finished.',
+        'Under Review': 'The record is being checked for completeness, attribution, conflicts, evidence references, and publication readiness.',
+        Registered: 'The record has passed registry intake controls and has been assigned a stable public or controlled identifier.',
+        Disputed: 'A documented challenge affects one or more claims, identities, rights, evidence sources, or scope statements.',
+        Superseded: 'A later version now represents the current declaration, while this version remains preserved and citable.',
+        Withdrawn: 'The steward has withdrawn the record from active representation; the withdrawal event and prior history remain preserved.',
+        Archived: 'The record is no longer active but remains retained for historical, evidentiary, or research continuity.',
+      })[activeStatus],
+    [activeStatus],
+  );
+
+  return (
+    <main className="registry-page">
       <div className="cosmos" aria-hidden="true">
-        <div className="nebula nebulaOne" />
-        <div className="nebula nebulaTwo" />
-        <div className="stars starsOne" />
-        <div className="stars starsTwo" />
-        <div className="stars starsThree" />
-        <div className="constellation constellationOne"><i/><i/><i/><i/><i/></div>
-        <div className="constellation constellationTwo"><i/><i/><i/><i/></div>
-        <div className="shooting shootingOne" />
-        <div className="shooting shootingTwo" />
-        <div className="shooting shootingThree" />
-        <div className="governedRoutes">
-          <i className="route routeOne" />
-          <i className="route routeTwo" />
-          <i className="route routeThree" />
-          <i className="route routeFour" />
-        </div>
-        <div className="orbitCluster orbitLeft">
-          <span className="planet planetBlue" />
-          <span className="planet planetGold" />
-          <span className="moon moonOne" />
-          <i className="orbit orbitA" />
-          <i className="orbit orbitB" />
-          <i className="orbit orbitC" />
-        </div>
-        <div className="orbitCluster orbitRight">
-          <span className="planet planetGold large" />
-          <span className="planet planetBlue small" />
-          <span className="moon moonTwo" />
-          <i className="orbit orbitA" />
-          <i className="orbit orbitB" />
-          <i className="orbit orbitC" />
-        </div>
-        <div className="burst burstOne" />
-        <div className="burst burstTwo" />
-        <div className="burst burstThree" />
-        <div className="burst burstFour" />
-        <div className="burst burstFive" />
-        <div className="burst burstSix" />
-        <div className="burst burstSeven" />
-        <div className="ambient ambientOne" />
-        <div className="ambient ambientTwo" />
-        <div className="cosmicDust dustOne" />
-        <div className="cosmicDust dustTwo" />
+        <div className="stars stars-a" />
+        <div className="stars stars-b" />
+        <div className="orb orb-one" />
+        <div className="orb orb-two" />
+        <div className="orb orb-three" />
+        <div className="orbit orbit-one" />
+        <div className="orbit orbit-two" />
       </div>
 
-      {/* Primary navigation is provided by the shared site header. */}
+      <header className="topbar">
+        <Link href="/" className="brand" aria-label="TA-14 AI Governance Exchange home">
+          <span className="brand-mark">TA-14</span>
+          <span className="brand-copy">
+            <strong>AI Governance Registry</strong>
+            <small>TA-14 AI Governance Exchange</small>
+          </span>
+        </Link>
+        <nav aria-label="Registry navigation">
+          <a href="#record">Registry Record</a>
+          <a href="#integrity">Integrity Controls</a>
+          <a href="#status">Status Model</a>
+          <a href="#method">Method</a>
+        </nav>
+        <PolishedLink href="/workspace" variant="secondary">
+          Open Workspace
+        </PolishedLink>
+      </header>
 
-      <section className="institution shell">
-        <p>TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
-        <div className="institutionRule"><i/><span>THE PUBLIC ENTRANCE TO ADMISSIBLE EXECUTION</span><i/></div>
+      <section className="hero">
+        <div className="hero-seal" aria-hidden="true">
+          <div className="seal-ring seal-ring-a" />
+          <div className="seal-ring seal-ring-b" />
+          <div className="seal-core">TA-14</div>
+        </div>
+        <div className="hero-copy">
+          <p className="eyebrow">A DATED, SEARCHABLE, ATTRIBUTABLE PUBLIC RECORD</p>
+          <h1>
+            The TA-14
+            <span>AI Governance Registry</span>
+          </h1>
+          <p className="hero-summary">
+            A governed record of what an AI governance architecture calls itself, who claims it,
+            what it claims to govern, when the declaration was made, which evidence supports it,
+            and how the record changes over time.
+          </p>
+          <div className="hero-boundary">
+            <strong>Registration is not certification.</strong>
+            <span>
+              The Registry preserves identity, declarations, evidence, provenance, version history,
+              and disputes. It does not determine legal validity, regulatory approval, technical
+              efficacy, ownership priority, or fitness for use.
+            </span>
+          </div>
+          <div className="hero-actions">
+            <a className="polished-button polished-button-primary" href="#record">
+              <span>Examine the Registry Record</span>
+              <span className="button-arrow" aria-hidden="true">↓</span>
+            </a>
+            <a className="polished-button polished-button-bronze" href="#method">
+              <span>Read the Registry Method</span>
+              <span className="button-arrow" aria-hidden="true">→</span>
+            </a>
+          </div>
+          <div className="trust-strip" aria-label="Registry principles">
+            <span>Persistent identity</span>
+            <span>Version lineage</span>
+            <span>Evidence traceability</span>
+            <span>Claims and non-claims</span>
+            <span>Dispute preservation</span>
+          </div>
+        </div>
       </section>
 
-      <section className="hero shell">
-        <div className="heroSeal" aria-hidden="true">
-          <span>TA-14</span>
-          <i/><i/><i/>
-        </div>
-        <p className="eyebrow">THE GRAND EXCHANGE HALL</p>
-        <h1>
-          AI governance should not end with a policy. It should become an
-          <em> inspectable route to execution.</em>
-        </h1>
-        <p className="heroLead">
-          The TA-14 AI Governance Exchange is a free governance playground and institutional workspace for building, testing, preserving, reviewing, and verifying consequential AI routes. It separates the law, the claim, the evidence, the determination, the commitment, the execution, and the outcome so one layer cannot silently corrupt another.
-        </p>
-        <div className="heroActions">
-          <Link className="grandButton primary" href="/workspace">Open the Exchange <Arrow /></Link>
-          <Link className="grandButton gold" href="#five-doors">Choose a Governed Door <span>↓</span></Link>
-          <Link className="grandButton glass" href="/workspace/ai-governance/eu-ai-act">Explore the EU AI Act <Arrow /></Link>
-          <Link className="grandButton glass" href="/marketplace">Enter the Marketplace <Arrow /></Link>
-        </div>
-        <div className="heroDefinition">
-          <article><span>WHAT IT IS</span><strong>A governed execution exchange</strong><p>Build and inspect the route from evidence to execution instead of trusting an unsupported conclusion.</p></article>
-          <article><span>WHO IT SERVES</span><strong>Builders, deployers, reviewers, and institutions</strong><p>Use it for AI systems, governance architectures, records, organizations, environmental evidence, and regulated pathways.</p></article>
-          <article><span>WHAT IT PRESERVES</span><strong>Attributable evidence and boundaries</strong><p>Keep ownership, chronology, versions, limitations, objections, decisions, and outcomes visible under scrutiny.</p></article>
-        </div>
+      <section className="institutional-banner">
+        <p>THE REGISTRY PRESERVES THE DECLARATION. IT DOES NOT ENDORSE THE DECLARATION.</p>
       </section>
 
-      <section className="hall shell" id="five-doors">
-        <div className="hallArchitecture" aria-hidden="true"><i/><i/><i/><i/><i/></div>
-        <div className="hallGlow" aria-hidden="true" />
-        <div className="sectionIntro centeredIntro">
-          <p className="eyebrow">FIVE PRIMARY GOVERNANCE DESTINATIONS</p>
-          <h2>Choose the institution that governs what you need to build, preserve, review, interpret, or establish.</h2>
-          <p>Each doorway opens into a distinct governed institution. Their routes connect across the Exchange, but their evidence boundaries, authorities, records, and review purposes remain explicit.</p>
-        </div>
-
-        <div className="doors">
-          {workspaces.map((workspace) => (
-            <Link
-              href={workspace.href}
-              className="workspace"
-              key={workspace.id}
-              style={{ "--accent": workspace.color, "--accentGlow": workspace.glow } as CSSProperties}
-            >
-              <div className="doorStage">
-                <div className="portalHalo" />
-                <div className="sparkField">
-                  {Array.from({ length: 14 }).map((_, index) => <i key={index} style={{ "--n": index } as CSSProperties} />)}
-                </div>
-                <div className="columns leftColumn"><i/><i/><i/></div>
-                <div className="columns rightColumn"><i/><i/><i/></div>
-                <div className="archFrame">
-                  <div className="archCrown"><i className="crownLine one"/><i className="crownLine two"/><i className="crownLine three"/><span className="crownGem"/></div>
-                  <div className="doorOpening">
-                    <div className={`portalWorld ${workspace.world}`}>
-                      <span className="worldGrid"/><span className="worldOrb orbOne"/><span className="worldOrb orbTwo"/><span className="worldOrb orbThree"/>
-                      <span className="worldLine worldLineOne"/><span className="worldLine worldLineTwo"/><span className="worldLine worldLineThree"/>
-                      <span className="worldParticle p1"/><span className="worldParticle p2"/><span className="worldParticle p3"/><span className="worldParticle p4"/><span className="worldParticle p5"/>
-                    </div>
-                    <div className="lightWithin" />
-                    <div className="thresholdMessage">
-                      <span>{workspace.code}</span>
-                      <strong>{workspace.title}</strong>
-                      <small>ENTER GOVERNED WORKSPACE</small>
-                    </div>
-                    <div className="doorLeaf singleDoor">
-                      <div className="doorEmblem"><span>{workspace.code}</span></div>
-                      <div className="doorPanels"><i/><i/><i/><i/><i/><i/></div>
-                      <span className="hinge h1"/><span className="hinge h2"/><span className="hinge h3"/>
-                      <span className="doorHandle" />
-                      <span className="doorKeyPlate" />
-                    </div>
-                  </div>
-                </div>
-                <div className="steps"><i/><i/><i/></div>
-                <div className="lightSpill" />
-                <div className="floorReflection" />
-              </div>
-
-              <div className="workspaceCard">
-                <span className="miniCode">{workspace.code}</span>
-                <p className="workspaceKicker">{workspace.kicker}</p>
-                <h3>{workspace.title}</h3>
-                <p>{workspace.description}</p>
-                <ul>{workspace.features.map((feature) => <li key={feature}><span>✦</span>{feature}</li>)}</ul>
-                <div className="workspaceCta">Enter {workspace.title}<span>→</span></div>
-              </div>
-            </Link>
+      <section id="record" className="section-shell">
+        <SectionTitle
+          eyebrow="THE CORE REGISTRY RECORD"
+          title="A record designed to remain understandable under scrutiny."
+          text="Each registration must preserve enough identity, context, limitation, evidence, and history for another person to determine exactly what was declared and what the Registry did—and did not—verify."
+        />
+        <div className="record-grid">
+          {REGISTRY_FIELDS.map(([title, text], index) => (
+            <article className="record-card" key={title}>
+              <div className="record-number">{String(index + 1).padStart(2, '0')}</div>
+              <h3>{title}</h3>
+              <p>{text}</p>
+            </article>
           ))}
         </div>
-        <div className="obsidianFloor" aria-hidden="true" />
       </section>
 
-      <section className="exchangeExplanation shell">
-        <div className="sectionIntro">
-          <p className="eyebrow">WHAT THE EXCHANGE ACTUALLY DOES</p>
-          <h2>It converts consequential claims into routes that can be inspected.</h2>
-          <p>The Exchange is not another dashboard that declares governance complete. It is the place where governance is built as a visible chain of evidence, authority, review, commitment, execution, and outcome.</p>
+      <section id="integrity" className="section-shell integrity-section">
+        <SectionTitle
+          eyebrow="REGISTRY LEGITIMACY CONTROLS"
+          title="Legitimacy comes from controls, not appearance."
+          text="A serious registry must preserve stable identity, provenance, version history, correction routes, transparent status, and clear boundaries between recording a claim and validating it."
+        />
+        <div className="control-list">
+          {LEGITIMACY_CONTROLS.map((control) => (
+            <article key={control.number} className="control-row">
+              <span>{control.number}</span>
+              <div>
+                <h3>{control.title}</h3>
+                <p>{control.text}</p>
+              </div>
+              <div className="control-check" aria-label="Required control">REQUIRED</div>
+            </article>
+          ))}
         </div>
-        <div className="capabilityGrid">
-          {exchangeCapabilities.map(([number,title,text]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></article>)}
-        </div>
-        <div className="chainVault">
-          <p className="bandEyebrow">THE TA-14 GOVERNING CHAIN</p>
-          <div className="chain">
-            {chain.map(([label, icon], index) => <div className="chainNode" key={label}><span className="chainIcon">{icon}</span><strong>{label}</strong>{index < chain.length - 1 && <i>→</i>}</div>)}
+      </section>
+
+      <section id="status" className="section-shell status-section">
+        <SectionTitle
+          eyebrow="PUBLIC STATUS MODEL"
+          title="No record is forced into a false binary."
+          text="The Registry shows where a record is in its lifecycle and preserves adverse events instead of quietly deleting inconvenient history."
+        />
+        <div className="status-panel">
+          <div className="status-tabs" role="tablist" aria-label="Registry statuses">
+            {(Object.keys(STATUS_TONES) as RegistryStatus[]).map((status) => (
+              <button
+                key={status}
+                type="button"
+                role="tab"
+                aria-selected={activeStatus === status}
+                onClick={() => setActiveStatus(status)}
+                className={activeStatus === status ? 'active' : ''}
+              >
+                <Pill tone={STATUS_TONES[status]}>{status}</Pill>
+              </button>
+            ))}
           </div>
-          <p>Each link may depend on the prior link, but no link is allowed to disappear into the next. That separation is what keeps the route open to scrutiny.</p>
-        </div>
-      </section>
-
-      <section className="featureSection registrySection shell">
-        <div className="registryVault" aria-hidden="true">
-          <div className="vaultDoor"><span>TA-14</span><i/><i/><i/><i/></div>
-          <div className="vaultGlow" />
-          <div className="registryStars"><i/><i/><i/><i/><i/><i/></div>
-        </div>
-        <div className="featureCopy">
-          <span className="statusFlag">COMING SOON</span>
-          <p className="eyebrow">TA-14 AI GOVERNANCE REGISTRY</p>
-          <h2>Give governance architectures a dated, searchable, attributable public record.</h2>
-          <p>The Registry will preserve what a governance system calls itself, when it was established, who claims it, what it claims to govern, what it explicitly does not claim, which versions exist, and which evidence supports the record.</p>
-          <div className="registryList">{registryFields.map(item => <span key={item}><i>◆</i>{item}</span>)}</div>
-          <div className="featureActions">
-            <Link className="grandButton gold" href="/workspace/ai-governance">Enter AI Governance <Arrow /></Link>
-            <Link className="grandButton glass" href="/workspace/governed-records">Prepare a Governed Record <Arrow /></Link>
+          <div className="status-explainer">
+            <div className="status-led" />
+            <div>
+              <p>SELECTED REGISTRY STATE</p>
+              <h3>{activeStatus}</h3>
+              <span>{statusCopy}</span>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="featureSection euSection shell">
-        <div className="featureCopy">
-          <p className="eyebrow">EU AI ACT GOVERNANCE WORKSPACE</p>
-          <h2>Turn legal obligations into inspectable applicability and evidence routes.</h2>
-          <p>Explore actor roles, system classification, high-risk duties, Article 50 transparency, evidence dependencies, unresolved questions, review pathways, records, and implementation boundaries without confusing a checklist with proof.</p>
-          <div className="statStrip"><span><b>2 AUG 2026</b>Article 50 transparency obligations apply</span><span><b>PROVIDERS</b>Systems, models, marking, disclosure, and evidence</span><span><b>DEPLOYERS</b>Use context, notice, deepfakes, and public-interest text</span></div>
-          <div className="featureActions">
-            <Link className="grandButton primary" href="/workspace/ai-governance/eu-ai-act">Open EU AI Act Workspace <Arrow /></Link>
-            <Link className="grandButton glass" href="/workspace/ai-governance">Open AI Governance <Arrow /></Link>
-          </div>
-        </div>
-        <div className="euUniverse" aria-hidden="true">
-          <div className="euPlanet"><span>EU</span>{Array.from({length:12}).map((_,i)=><i key={i} style={{"--i":i} as CSSProperties}/>)}</div>
-          <div className="euOrbit one"/><div className="euOrbit two"/><div className="euOrbit three"/>
-          <div className="articleMarkers"><span>50(1)</span><span>50(2)</span><span>50(3)</span><span>50(4)</span></div>
+      <section className="section-shell architecture-section">
+        <SectionTitle
+          eyebrow="THE REGISTRY CHAIN"
+          title="Every published record must remain connected to its origin and history."
+          text="The chain is designed to make silent substitution, orphaned evidence, unattributed claims, and invisible corrections harder to conceal."
+        />
+        <div className="chain" aria-label="Registry chain">
+          {['Declaration', 'Identity', 'Evidence', 'Review', 'Registration', 'Version', 'Dispute', 'Archive'].map(
+            (item, index, array) => (
+              <div className="chain-item" key={item}>
+                <span>{item}</span>
+                {index < array.length - 1 && <b aria-hidden="true">→</b>}
+              </div>
+            ),
+          )}
         </div>
       </section>
 
-      <section className="marketplaceSection shell">
-        <div className="marketplaceHeader">
+      <section id="method" className="section-shell method-section">
+        <SectionTitle
+          eyebrow="REFERENCE-INFORMED METHOD"
+          title="Built from established practices, without pretending to be a government register."
+          text="The operating model draws from authoritative documentation, provenance, metadata, lifecycle, and registration concepts. TA-14 remains responsible for its own registry rules, controls, and public representations."
+        />
+        <div className="reference-grid">
+          {REFERENCE_FOUNDATIONS.map((reference) => (
+            <article key={reference.label}>
+              <Pill tone="gold">{reference.label}</Pill>
+              <p>{reference.text}</p>
+            </article>
+          ))}
+        </div>
+        <div className="method-boundaries">
           <div>
-            <p className="eyebrow">THE GOVERNANCE MARKETPLACE</p>
-            <h2>Find work, post needs, discover reviewers, and build visible governance reputation.</h2>
+            <p>THE REGISTRY MAY VERIFY</p>
+            <ul>
+              <li>That required fields were submitted.</li>
+              <li>That a submitter completed an identity or authority check defined by registry policy.</li>
+              <li>That cited evidence was accessible at the recorded time.</li>
+              <li>That the published record matches the accepted registry version.</li>
+              <li>That status and history events were recorded by the Registry.</li>
+            </ul>
           </div>
-          <Link className="grandButton gold" href="/marketplace">Open Marketplace <Arrow /></Link>
-        </div>
-        <div className="marketGrid">
-          {marketplaceItems.map(([title,text,href],index)=><Link href={href} key={title}><span>{String(index+1).padStart(2,"0")}</span><div className="marketOrb"/><h3>{title}</h3><p>{text}</p><b>Open pathway <Arrow /></b></Link>)}
-        </div>
-      </section>
-
-      <section className="featureSection networkSection shell">
-        <div className="networkVisual" aria-hidden="true">
-          <div className="networkCore">PRN</div>
-          {Array.from({length:8}).map((_,i)=><span key={i} style={{"--i":i} as CSSProperties}/>) }
-          <i className="networkRing one"/><i className="networkRing two"/><i className="networkRing three"/>
-        </div>
-        <div className="featureCopy">
-          <p className="eyebrow">TA-14 PARTNER REVIEW NETWORK</p>
-          <h2>Independent architectures remain independent. Review becomes connected.</h2>
-          <p>The Partner Review Network creates bounded review lanes for specialized governance systems and professionals. It preserves each partner's identity, scope, expertise, limitations, findings, and review history while adding a second TA-14 review layer where appropriate.</p>
-          <div className="networkSteps">{networkSteps.map(([title,text],i)=><article key={title}><span>{i+1}</span><div><strong>{title}</strong><p>{text}</p></div></article>)}</div>
-          <div className="featureActions"><Link className="grandButton primary" href="/marketplace">Discover Review Pathways <Arrow /></Link><Link className="grandButton glass" href="/marketplace/post">Post a Review Need <Arrow /></Link></div>
+          <div>
+            <p>THE REGISTRY DOES NOT, BY REGISTRATION ALONE, VERIFY</p>
+            <ul>
+              <li>That the governance architecture works as claimed.</li>
+              <li>That the claimant owns every underlying idea or right.</li>
+              <li>That the architecture complies with any law or standard.</li>
+              <li>That a regulator, standards body, or independent reviewer endorses it.</li>
+              <li>That a registration creates legal priority, exclusivity, certification, or admissibility.</li>
+            </ul>
+          </div>
         </div>
       </section>
 
-      <section className="recordsConstellation shell">
-        <div className="sectionIntro centeredIntro">
-          <p className="eyebrow">RECORDS ARE NOT CONCLUSIONS</p>
-          <h2>Preserve the record. Bound the interpretation. Separate the determination.</h2>
-          <p>Environmental records now live inside the broader Governed Records institution. The source record remains separate from interpretation, diagnosis, determination, intervention, optimization, and outcome so the evidence can survive scrutiny.</p>
-        </div>
-        <div className="recordsPair">
-          <article className="recordWorld green"><div className="recordVisual"><i/><i/><i/><span>GR</span></div><h3>Governed Records</h3><p>Create, upload, preserve, interpret, review, version, and export records with explicit proof boundaries.</p><Link className="polishedAction" href="/workspace/governed-records">Open Governed Records <Arrow /></Link></article>
-          <article className="recordWorld blue"><div className="recordVisual atmosphere"><i/><i/><i/><span>ER</span></div><h3>Environmental Records</h3><p>Enter the environmental domain within Governed Records for atmospheric, building, hospital, HVAC, sensor, land, water, and air evidence.</p><Link className="polishedAction" href="/workspace/governed-records/environmental">Open Environmental Records <Arrow /></Link></article>
+      <section className="section-shell launch-section">
+        <div className="launch-card">
+          <div>
+            <p className="eyebrow">FOUNDATIONAL RELEASE</p>
+            <h2>The front door is now established.</h2>
+            <span>
+              The next build phase will connect governed intake, identity and authority declarations,
+              evidence submission, review events, searchable public records, version lineage, dispute
+              notices, and exportable registry receipts.
+            </span>
+          </div>
+          <div className="launch-actions">
+            <PolishedLink href="/workspace" variant="primary">
+              Enter the Exchange Workspace
+            </PolishedLink>
+            <Link href="/" className="polished-button polished-button-secondary">
+              <span>Return to the Grand Exchange Hall</span>
+              <span aria-hidden="true" className="button-arrow">←</span>
+            </Link>
+          </div>
         </div>
       </section>
 
-      <section className="verificationSection shell">
-        <div className="verificationBeam" aria-hidden="true"><span/><span/><span/></div>
-        <div className="featureCopy">
-          <p className="eyebrow">RUNTIME VERIFICATION</p>
-          <h2>Approval is not the end of governance. The route must remain admissible through execution.</h2>
-          <p>Verification asks whether the identity, authority, evidence, continuity, binding, commit, execution, and outcome still correspond to the preserved route. When they do not, the system should HOLD, DENY, or ESCALATE instead of pretending the earlier approval still applies.</p>
-          <div className="featureActions"><Link className="grandButton primary" href="/workspace/verification">Open Verification <Arrow /></Link><Link className="grandButton glass" href="/workspace">Open Workspace <Arrow /></Link></div>
+      <footer>
+        <div>
+          <strong>TA-14 AI Governance Registry</strong>
+          <span>A registry of declarations, evidence, provenance, status, and lineage.</span>
         </div>
-      </section>
+        <p>No admissible evidence. No admissible execution.</p>
+      </footer>
 
-      <section className="closingTemple shell">
-        <div className="closingBurst" aria-hidden="true"/>
-        <p className="eyebrow">TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
-        <h2>Choose the correct door. Preserve the evidence. Govern the route. Verify the outcome.</h2>
-        <p>The TA-14 AI Governance Exchange is open as a playground for builders, institutions, reviewers, founders, deployers, and anyone prepared to make consequential governance inspectable.</p>
-        <div className="heroActions centeredActions"><Link className="grandButton primary" href="/workspace">Enter the Exchange <Arrow /></Link><Link className="grandButton gold" href="/marketplace/post">Post a Governance Need <Arrow /></Link></div>
-        <div className="sealChain">{chain.map(([label],index)=><span key={label}>{label}{index<chain.length-1&&<i>→</i>}</span>)}</div>
-        <strong>No admissible evidence. No admissible execution.</strong>
-      </section>
+      <style jsx global>{`
+        :root {
+          color-scheme: dark;
+          --ink: #eef7ff;
+          --muted: #9eb2c5;
+          --line: rgba(137, 196, 255, 0.2);
+          --panel: rgba(5, 16, 29, 0.82);
+          --panel-strong: rgba(7, 20, 35, 0.96);
+          --blue: #6ed8ff;
+          --deep-blue: #208cff;
+          --bronze: #d59a45;
+          --gold: #ffd587;
+          --green: #69e2b1;
+          --red: #ff8585;
+          --violet: #c7a0ff;
+          --shadow: 0 24px 90px rgba(0, 0, 0, 0.38);
+        }
 
-      <footer className="shell"><span>TA-14 AI Governance Exchange</span><span>Architectural legibility without architectural assimilation.</span></footer>
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; background: #020914; color: var(--ink); }
+        a { color: inherit; text-decoration: none; }
+        button { font: inherit; }
 
-      <style jsx>{`
-        :global(*){box-sizing:border-box}
-        :global(html){background:#020711;scroll-behavior:smooth}
-        :global(body){margin:0;color:#f8fbff;background:#020711;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-        :global(a){color:inherit}
-        main{min-height:100vh;position:relative;overflow:hidden;isolation:isolate;background:linear-gradient(180deg,rgba(2,7,17,.6),rgba(3,9,17,.9))}
-        .shell{width:min(1540px,calc(100% - 36px));margin-inline:auto;position:relative;z-index:3}
-        .cosmos{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:-5;background:radial-gradient(circle at 50% -8%,rgba(26,102,171,.2),transparent 35%),linear-gradient(180deg,#020711,#07111e 48%,#030711)}
-        .nebula{position:absolute;width:800px;height:800px;border-radius:50%;filter:blur(110px);opacity:.15;animation:nebulaFloat 18s ease-in-out infinite alternate}.nebulaOne{left:-280px;top:28%;background:#075fca}.nebulaTwo{right:-260px;top:50%;background:#9d4bff;animation-delay:-8s}
-        .stars{position:absolute;inset:-12%}.starsOne{background-image:radial-gradient(circle,rgba(255,255,255,.88) 0 1px,transparent 1.5px);background-size:106px 106px;animation:starsOne 42s linear infinite}.starsTwo{background-image:radial-gradient(circle,rgba(69,180,255,.76) 0 1px,transparent 1.5px);background-size:168px 168px;background-position:44px 67px;animation:starsTwo 56s linear infinite reverse}.starsThree{background-image:radial-gradient(circle,rgba(255,190,65,.8) 0 1px,transparent 1.5px);background-size:248px 248px;background-position:90px 28px;opacity:.34;animation:pulseStars 7s ease-in-out infinite alternate}
-        .shooting{position:absolute;width:190px;height:2px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.95));filter:drop-shadow(0 0 7px #8bdfff);opacity:0;transform:rotate(-24deg);animation:shooting 8s linear infinite}.shooting::after{content:"";position:absolute;right:0;top:-2px;width:6px;height:6px;border-radius:50%;background:white;box-shadow:0 0 16px white}.shootingOne{left:-20%;top:18%}.shootingTwo{left:20%;top:46%;animation-delay:-3.2s}.shootingThree{left:65%;top:72%;animation-delay:-5.7s}
-        .constellation{position:absolute;width:360px;height:240px;opacity:.2}.constellationOne{left:6%;top:33%}.constellationTwo{right:8%;top:64%;transform:rotate(17deg)}.constellation i{position:absolute;width:5px;height:5px;border-radius:50%;background:#9de7ff;box-shadow:0 0 12px #5bc9f0}.constellation i::after{content:"";position:absolute;left:3px;top:2px;width:110px;height:1px;background:linear-gradient(90deg,rgba(116,214,239,.55),transparent);transform:rotate(var(--r,20deg));transform-origin:left}.constellation i:nth-child(1){left:10%;top:20%;--r:28deg}.constellation i:nth-child(2){left:35%;top:42%;--r:-18deg}.constellation i:nth-child(3){left:63%;top:27%;--r:42deg}.constellation i:nth-child(4){left:75%;top:66%;--r:160deg}.constellation i:nth-child(5){left:26%;top:76%;--r:-50deg}
-        .route{position:absolute;height:1px;width:74vw;background:linear-gradient(90deg,transparent,rgba(90,190,255,.65),rgba(255,194,72,.52),transparent);filter:drop-shadow(0 0 8px rgba(90,190,255,.45))}.route::after{content:"";position:absolute;top:-3px;left:25%;width:7px;height:7px;border-radius:999px;background:#ffe7a5;box-shadow:0 0 18px rgba(255,211,103,.9);animation:packet 6s linear infinite}.routeOne{top:20%;left:-15%;transform:rotate(-9deg);animation:lineOne 16s linear infinite}.routeTwo{top:44%;right:-20%;transform:rotate(11deg);animation:lineTwo 20s linear infinite}.routeThree{top:68%;left:10%;transform:rotate(-4deg);animation:lineThree 24s linear infinite}.routeFour{top:88%;right:-20%;transform:rotate(7deg);animation:lineTwo 27s linear infinite reverse}
-        .orbitCluster{position:absolute;width:390px;height:260px;animation:drift 12s ease-in-out infinite alternate}.orbitLeft{left:-34px;top:72px}.orbitRight{right:-46px;top:78px;transform:scale(.92);animation-delay:-4s}.orbit{position:absolute;left:0;right:0;top:50%;height:126px;border:1px solid rgba(255,181,47,.45);border-radius:50%;transform:rotate(-12deg);animation:orbitPulse 5s ease-in-out infinite alternate}.orbitB{transform:rotate(13deg) scale(.82);opacity:.7}.orbitC{transform:rotate(-28deg) scale(.62);opacity:.55}.planet,.moon{position:absolute;z-index:2;border-radius:999px}.planetBlue{left:98px;top:54px;width:76px;height:76px;background:radial-gradient(circle at 34% 30%,#d9f5ff,#3c97ff 24%,#0d2e76 58%,#06112c 75%);box-shadow:0 0 34px rgba(67,152,255,.7)}.planetGold{left:24px;top:122px;width:40px;height:40px;background:radial-gradient(circle at 34% 30%,#fff4b2,#f5ad27 34%,#7c3604 70%);box-shadow:0 0 26px rgba(255,173,39,.75)}.planetGold.large{left:205px;top:34px;width:72px;height:72px}.planetBlue.small{left:72px;top:132px;width:28px;height:28px}.moon{width:16px;height:16px;background:radial-gradient(circle at 30% 30%,#fff,#8bb6d6 45%,#20354c 80%);box-shadow:0 0 14px rgba(179,225,255,.55);animation:moonOrbit 9s linear infinite}.moonOne{left:170px;top:170px}.moonTwo{left:110px;top:46px;animation-direction:reverse}
-        .ambient{position:absolute;width:440px;height:440px;border-radius:50%;filter:blur(80px);opacity:.16;animation:ambientBreath 9s ease-in-out infinite alternate}.ambientOne{left:12%;top:34%;background:#0a69ff}.ambientTwo{right:10%;top:42%;background:#ff9f1a;animation-delay:-3s}.burst{position:absolute;width:10px;height:10px;background:#fff0a6;box-shadow:0 0 18px rgba(255,222,112,.95),0 0 40px rgba(255,180,54,.55);transform:rotate(45deg);animation:burst 4.8s ease-in-out infinite}.burst::before,.burst::after{content:"";position:absolute;left:50%;top:50%;background:linear-gradient(90deg,transparent,#ffe49a,transparent);transform:translate(-50%,-50%)}.burst::before{width:86px;height:1px}.burst::after{width:1px;height:86px}.burstOne{left:48%;top:14%}.burstTwo{right:8%;top:27%;animation-delay:-2.1s}.burstThree{left:9%;top:74%;animation-delay:-3.4s}.burstFour{left:22%;top:43%;animation-delay:-1.2s;transform:rotate(45deg) scale(.72)}.burstFive{right:24%;top:62%;animation-delay:-4.3s;transform:rotate(45deg) scale(.86)}.burstSix{left:66%;top:32%;animation-delay:-5.7s;transform:rotate(45deg) scale(.58)}.burstSeven{right:5%;top:84%;animation-delay:-2.9s;transform:rotate(45deg) scale(.7)}.cosmicDust{position:absolute;width:4px;height:4px;border-radius:50%;background:#ffeab2;box-shadow:90px 40px #9be9ff,180px 130px #fff,270px 60px #ffd477,350px 190px #bc8aff,480px 10px #fff;animation:dustDrift 13s linear infinite}.dustOne{left:5%;top:28%}.dustTwo{right:6%;top:55%;animation-delay:-6s}
-        .institution{padding-top:25px;text-align:center}.institution>p{margin:0;color:#d6be86;font-size:10px;font-weight:950;letter-spacing:.34em}.institutionRule{margin-top:11px;display:flex;align-items:center;justify-content:center;gap:18px}.institutionRule span{color:#ffe7b0;font-family:Georgia,"Times New Roman",serif;font-size:17px;letter-spacing:.16em}.institutionRule i{width:130px;height:1px;background:linear-gradient(90deg,transparent,#c78a22)}.institutionRule i:last-child{background:linear-gradient(90deg,#c78a22,transparent)}
-        .hero{padding:52px 0 58px;text-align:center}.heroSeal{width:112px;height:112px;margin:0 auto 22px;position:relative;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(255,201,92,.42);background:radial-gradient(circle,rgba(255,185,52,.14),rgba(6,21,38,.84) 66%);box-shadow:0 0 60px rgba(255,180,42,.13),inset 0 0 30px rgba(91,189,255,.08)}.heroSeal span{color:#ffe39a;font-family:Georgia,serif;font-weight:900;font-size:22px;letter-spacing:.08em}.heroSeal i{position:absolute;inset:12px;border:1px solid rgba(112,216,239,.25);border-radius:50%;animation:sealSpin 16s linear infinite}.heroSeal i:nth-child(3){inset:24px;animation-direction:reverse;animation-duration:11s}.heroSeal i:nth-child(4){inset:37px;border-color:rgba(255,198,74,.35);animation-duration:8s}.eyebrow,.bandEyebrow{margin:0;color:#70dff3;font-size:11px;font-weight:950;letter-spacing:.24em}.hero h1{max-width:1260px;margin:15px auto 20px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(48px,6.1vw,94px);line-height:.96;letter-spacing:-.055em;text-wrap:balance}.hero h1 em{color:#ffc541;font-style:italic;text-shadow:0 0 34px rgba(255,184,48,.18)}.heroLead{max-width:1060px;margin:0 auto;color:#c7d6de;font-size:18px;line-height:1.7;text-wrap:balance}.heroActions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:30px}.grandButton{min-height:52px;padding:0 22px;display:inline-flex;align-items:center;justify-content:center;gap:14px;border-radius:14px;border:1px solid transparent;text-decoration:none;font-size:13px;font-weight:950;position:relative;overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s}.grandButton::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 20%,rgba(255,255,255,.28) 46%,transparent 70%);transform:translateX(-130%);transition:transform .6s}.grandButton:hover{transform:translateY(-4px)}.grandButton:hover::before{transform:translateX(130%)}.grandButton.primary{color:#031019;background:linear-gradient(135deg,#c8f7ff,#65d5ef 65%,#36a8ca);border-color:#a2effd;box-shadow:0 16px 34px rgba(61,190,220,.23),inset 0 1px rgba(255,255,255,.72)}.grandButton.gold{color:#261500;background:linear-gradient(135deg,#ffeba9,#efb944 64%,#b87310);border-color:#f5d073;box-shadow:0 16px 34px rgba(225,164,42,.2),inset 0 1px rgba(255,255,255,.55)}.grandButton.glass{color:#e9fbff;border-color:rgba(124,215,236,.29);background:linear-gradient(180deg,rgba(18,49,68,.9),rgba(7,24,38,.92));box-shadow:inset 0 1px rgba(255,255,255,.05)}.grandButton.glass:hover{border-color:#70d8ef;box-shadow:0 14px 30px rgba(29,151,183,.15)}.heroDefinition{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:42px;text-align:left}.heroDefinition article{padding:23px;border:1px solid rgba(111,202,225,.16);border-radius:19px;background:linear-gradient(145deg,rgba(12,35,50,.72),rgba(6,19,31,.8));box-shadow:0 18px 42px rgba(0,0,0,.15)}.heroDefinition span{color:#7698a7;font-size:10px;font-weight:950;letter-spacing:.12em}.heroDefinition strong{display:block;margin:14px 0 8px;font-family:Georgia,serif;font-size:21px}.heroDefinition p{margin:0;color:#9eb2bc;font-size:13px;line-height:1.58}
-        .sectionIntro{max-width:1050px}.centeredIntro{margin:0 auto;text-align:center}.sectionIntro h2,.featureCopy h2,.marketplaceHeader h2,.closingTemple h2{margin:12px 0 16px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(38px,4.7vw,70px);line-height:.99;letter-spacing:-.045em;text-wrap:balance}.sectionIntro>p:last-child,.featureCopy>p:not(.eyebrow),.marketplaceHeader p,.closingTemple>p:not(.eyebrow){color:#aebfc8;font-size:16px;line-height:1.7}
-        .hall{scroll-margin-top:20px;padding:56px 18px 54px;border-radius:34px;border:1px solid rgba(255,194,74,.17);background:linear-gradient(180deg,rgba(7,18,30,.55),rgba(3,8,14,.24)),radial-gradient(circle at 50% 0%,rgba(255,185,57,.09),transparent 42%);box-shadow:inset 0 1px rgba(255,255,255,.03),0 34px 90px rgba(0,0,0,.3);overflow:hidden}.hallArchitecture{position:absolute;inset:0;opacity:.18;pointer-events:none}.hallArchitecture i{position:absolute;top:0;bottom:0;width:4px;background:linear-gradient(180deg,#dda33a,transparent 72%);box-shadow:0 0 24px #c17c13}.hallArchitecture i:nth-child(1){left:4%}.hallArchitecture i:nth-child(2){left:25%}.hallArchitecture i:nth-child(3){left:50%}.hallArchitecture i:nth-child(4){left:75%}.hallArchitecture i:nth-child(5){right:4%}.hallGlow{position:absolute;left:50%;top:-160px;width:1000px;height:420px;transform:translateX(-50%);background:radial-gradient(ellipse,rgba(255,200,99,.14),transparent 68%);filter:blur(24px);pointer-events:none}.doors{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px;margin-top:44px;position:relative;z-index:2}.workspace{display:block;min-width:0;color:inherit;text-decoration:none}.doorStage{position:relative;height:480px;overflow:visible;perspective:1800px}.portalHalo{position:absolute;left:50%;top:36px;width:245px;height:320px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,var(--accentGlow),transparent 68%);filter:blur(26px);opacity:.45;transition:.45s}.archFrame{position:absolute;left:50%;bottom:68px;width:218px;height:340px;transform:translateX(-50%);border:12px solid #b87b16;border-radius:132px 132px 16px 16px;background:linear-gradient(90deg,#633604,#f1c869 17%,#a76510 50%,#f6d07a 82%,#5e3203),repeating-linear-gradient(100deg,rgba(255,255,255,.08) 0 2px,transparent 2px 8px);box-shadow:0 0 0 3px rgba(255,222,153,.5),0 0 36px rgba(255,182,45,.36),inset 0 0 20px rgba(255,232,180,.18);transition:.52s cubic-bezier(.2,.75,.18,1)}.archFrame::before{content:"";position:absolute;left:-28px;right:-28px;top:132px;height:16px;background:linear-gradient(180deg,#f7d07a,#8c5109);border-radius:4px;box-shadow:0 0 12px rgba(255,197,79,.36)}.archCrown{position:absolute;left:50%;top:-31px;width:164px;height:104px;transform:translateX(-50%);border-radius:96px 96px 18px 18px;border:2px solid rgba(255,224,160,.5);background:radial-gradient(circle at 50% 70%,rgba(255,221,146,.16),transparent 56%),linear-gradient(180deg,#e2aa3b,#764005);overflow:hidden}.crownLine{position:absolute;left:50%;bottom:4px;width:2px;height:90px;background:linear-gradient(180deg,#ffe4a5,#6f3702);transform-origin:bottom}.crownLine.one{transform:rotate(-28deg)}.crownLine.two{transform:rotate(0)}.crownLine.three{transform:rotate(28deg)}.crownGem{position:absolute;left:50%;top:14px;width:27px;height:27px;transform:translateX(-50%) rotate(45deg);border:1px solid #ffe2a0;background:linear-gradient(135deg,#fff4bd,#f4ae24 55%,#7b3400);box-shadow:0 0 18px rgba(255,194,65,.75)}.doorOpening{position:absolute;left:12px;right:12px;top:12px;bottom:10px;overflow:hidden;border-radius:112px 112px 5px 5px;background:#07101b;box-shadow:inset 0 0 40px rgba(255,246,197,.3);transform-style:preserve-3d}.portalWorld{position:absolute;inset:0;overflow:hidden;background:radial-gradient(circle at 50% 44%,color-mix(in srgb,var(--accent) 44%,white),transparent 10%),radial-gradient(circle at 50% 54%,var(--accentGlow),transparent 46%),linear-gradient(180deg,#07111b,#02080f);opacity:.9}.worldGrid{position:absolute;inset:0;opacity:.25;background-image:linear-gradient(color-mix(in srgb,var(--accent) 42%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--accent) 42%,transparent) 1px,transparent 1px);background-size:26px 26px;transform:perspective(280px) rotateX(58deg) scale(1.4);transform-origin:center bottom;animation:gridMove 10s linear infinite}.worldOrb{position:absolute;border-radius:999px;background:var(--accent);box-shadow:0 0 18px var(--accentGlow);animation:worldFloat 5.5s ease-in-out infinite alternate}.orbOne{width:14px;height:14px;left:25%;top:34%}.orbTwo{width:9px;height:9px;right:22%;top:48%;animation-delay:-2s}.orbThree{width:7px;height:7px;left:48%;top:22%;animation-delay:-3.4s}.worldLine{position:absolute;height:1px;background:linear-gradient(90deg,transparent,var(--accent),transparent);filter:drop-shadow(0 0 5px var(--accentGlow));transform-origin:left;animation:worldSweep 4.8s linear infinite}.worldLineOne{width:150px;left:18px;top:90px;transform:rotate(22deg)}.worldLineTwo{width:165px;left:34px;top:150px;transform:rotate(-16deg);animation-delay:-1.4s}.worldLineThree{width:130px;left:54px;top:210px;transform:rotate(8deg);animation-delay:-2.8s}.worldParticle{position:absolute;width:4px;height:4px;border-radius:999px;background:color-mix(in srgb,var(--accent) 82%,white);box-shadow:0 0 10px var(--accentGlow);animation:particleRise 6s linear infinite}.p1{left:18%;bottom:8%}.p2{left:36%;bottom:0;animation-delay:-1.4s}.p3{left:54%;bottom:12%;animation-delay:-2.8s}.p4{left:72%;bottom:4%;animation-delay:-4.1s}.p5{left:86%;bottom:18%;animation-delay:-5.2s}.recordsWorld::after{content:"";position:absolute;inset:52px 45px 62px;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,244,210,.62)),repeating-linear-gradient(180deg,transparent 0 11px,rgba(50,65,42,.18) 11px 12px);border-radius:4px;transform:rotate(-4deg);opacity:.2;box-shadow:24px 16px rgba(255,255,255,.08),-16px 24px rgba(255,255,255,.06)}.environmentWorld::before,.environmentWorld::after{content:"";position:absolute;left:-20%;width:140%;height:44px;border-radius:50%;border-top:2px solid color-mix(in srgb,var(--accent) 72%,transparent);filter:blur(2px);animation:airflow 5s ease-in-out infinite alternate}.environmentWorld::before{top:42%;transform:rotate(-8deg)}.environmentWorld::after{top:62%;transform:rotate(9deg);animation-delay:-2s}.entityWorld::after{content:"";position:absolute;inset:50px 30px 68px;border:1px solid color-mix(in srgb,var(--accent) 56%,transparent);clip-path:polygon(50% 0,100% 25%,88% 82%,50% 100%,12% 82%,0 25%);box-shadow:inset 0 0 24px var(--accentGlow);animation:entityPulse 3.8s ease-in-out infinite alternate}.euWorld::after{content:"EU";position:absolute;left:50%;top:48%;width:116px;height:116px;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:50%;border:2px solid #ffd15c;color:#fff4bf;background:radial-gradient(circle,#2453b8,#071846 72%);box-shadow:0 0 36px rgba(255,204,77,.3);font-family:Georgia,serif;font-size:34px;font-weight:900}.registryWorld::after{content:"RG";position:absolute;left:50%;top:48%;width:112px;height:112px;transform:translate(-50%,-50%);display:grid;place-items:center;border-radius:18px;border:3px double #f2b95f;color:#fff0c1;background:linear-gradient(145deg,#563006,#1a1005);box-shadow:0 0 36px rgba(236,164,57,.34),inset 0 0 24px rgba(255,210,115,.12);font-family:Georgia,serif;font-size:31px;font-weight:900}.lightWithin{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.54),transparent 28%),radial-gradient(circle at 50% 48%,rgba(255,255,255,.48),transparent 36%);animation:lightPulse 2.6s ease-in-out infinite alternate}.thresholdMessage{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;opacity:0;transform:scale(.9);transition:.45s;z-index:1}.thresholdMessage span{width:72px;height:72px;display:grid;place-items:center;border-radius:50%;border:2px solid var(--accent);color:white;background:rgba(4,18,30,.58);box-shadow:0 0 28px var(--accentGlow);font-size:24px;font-weight:950}.thresholdMessage strong{font-family:Georgia,serif;font-size:22px}.thresholdMessage small{color:var(--accent);font-size:9px;font-weight:950;letter-spacing:.14em}.doorLeaf{position:absolute;inset:0;transform-style:preserve-3d;border:1px solid rgba(255,227,166,.56);background:linear-gradient(100deg,rgba(255,255,255,.18),transparent 18%,transparent 78%,rgba(0,0,0,.3)),repeating-linear-gradient(96deg,rgba(255,255,255,.04) 0 2px,transparent 2px 7px),linear-gradient(90deg,#925309,#d99c2b 38%,#b87514 62%,#7e4607);box-shadow:inset 0 0 0 3px rgba(93,51,5,.38),inset 0 0 25px rgba(255,222,151,.13),0 8px 24px rgba(0,0,0,.25);transition:transform 720ms cubic-bezier(.16,.78,.16,1),filter .32s,box-shadow .32s;z-index:3}.doorLeaf::after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 24%,rgba(255,255,255,.3) 42%,transparent 58%);transform:translateX(-130%);animation:bronzeSweep 7s ease-in-out infinite}.singleDoor{transform-origin:left center;border-radius:110px 110px 5px 5px}.doorEmblem{position:absolute;left:50%;top:45px;width:88px;height:88px;transform:translateX(-50%);border-radius:50%;border:5px solid #c78a20;background:radial-gradient(circle,color-mix(in srgb,var(--accent) 70%,#06111a),#09111a 72%);box-shadow:0 0 0 2px rgba(255,225,157,.55),0 0 24px var(--accentGlow);display:grid;place-items:center;overflow:hidden}.doorEmblem span{color:#fff4c7;font-size:26px;font-weight:950;text-shadow:0 0 14px var(--accentGlow)}.doorPanels{position:absolute;left:18px;right:18px;top:151px;bottom:28px;display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);gap:9px}.doorPanels i{border:2px solid rgba(101,54,5,.62);border-radius:3px;box-shadow:inset 0 0 0 2px rgba(255,214,132,.12),inset 0 0 12px rgba(77,36,0,.22)}.hinge{position:absolute;left:4px;width:10px;height:38px;border-radius:4px;background:linear-gradient(90deg,#5e3202,#f1c35e,#693902);box-shadow:0 0 8px rgba(255,198,76,.35)}.h1{top:25%}.h2{top:48%}.h3{top:72%}.doorHandle{position:absolute;right:18px;top:58%;width:14px;height:14px;border-radius:50%;background:#fff0aa;box-shadow:0 0 12px rgba(255,231,151,.85);transition:.24s}.doorKeyPlate{position:absolute;right:16px;top:64%;width:18px;height:34px;border-radius:8px;background:linear-gradient(90deg,#6b3803,#f0bf57,#754104);box-shadow:0 0 8px rgba(255,198,76,.28)}.columns{position:absolute;bottom:60px;width:36px;height:274px;display:flex;gap:2px;z-index:4}.leftColumn{left:calc(50% - 142px)}.rightColumn{right:calc(50% - 142px)}.columns i{flex:1;border-radius:4px;background:linear-gradient(90deg,#653704,#f0c96b 45%,#8b4e08 80%);box-shadow:0 0 14px rgba(255,189,60,.28)}.steps{position:absolute;left:50%;bottom:18px;width:286px;transform:translateX(-50%);display:grid;gap:5px;z-index:5}.steps i{height:12px;border-radius:2px;background:linear-gradient(180deg,#e0aa44,#704000);box-shadow:0 2px 9px rgba(255,180,39,.32)}.steps i:nth-child(2){margin-inline:-15px}.steps i:nth-child(3){margin-inline:-30px}.lightSpill{position:absolute;left:50%;bottom:-4px;width:80px;height:190px;transform:translateX(-50%) scaleX(.12);transform-origin:top;clip-path:polygon(44% 0,56% 0,100% 100%,0 100%);background:linear-gradient(180deg,rgba(255,248,205,1),rgba(255,185,45,.72) 42%,transparent);filter:blur(5px);opacity:0;transition:.72s cubic-bezier(.2,.75,.18,1);z-index:2}.floorReflection{position:absolute;left:50%;bottom:-28px;width:240px;height:126px;transform:translateX(-50%) perspective(260px) rotateX(62deg);background:radial-gradient(ellipse,var(--accentGlow),transparent 68%);filter:blur(10px);opacity:.2;transition:.62s}.sparkField{position:absolute;inset:50px 20px 40px;opacity:0;transition:.35s}.sparkField i{position:absolute;left:calc((var(--n) * 17%) % 92%);top:calc((var(--n) * 29%) % 84%);width:5px;height:5px;border-radius:50%;background:color-mix(in srgb,var(--accent) 72%,white);box-shadow:0 0 13px var(--accentGlow);animation:sparkPop 2.6s ease-in-out infinite;animation-delay:calc(var(--n) * -.17s)}.workspace:hover .singleDoor,.workspace:focus-visible .singleDoor{transform:translateZ(26px) rotateY(-16deg) translateX(-3px);filter:saturate(1.18) brightness(1.1);box-shadow:inset 0 0 0 3px rgba(93,51,5,.38),inset 0 0 25px rgba(255,222,151,.16),24px 18px 40px rgba(0,0,0,.52)}.workspace:hover .doorHandle,.workspace:focus-visible .doorHandle{transform:rotate(40deg) scale(1.3);box-shadow:0 0 20px rgba(255,240,170,1)}.workspace:hover .lightSpill,.workspace:focus-visible .lightSpill{opacity:1;transform:translateX(-50%) scaleX(5.6)}.workspace:hover .portalHalo,.workspace:focus-visible .portalHalo{opacity:.95;transform:translateX(-50%) scale(1.16)}.workspace:hover .floorReflection,.workspace:focus-visible .floorReflection{opacity:.52;transform:translateX(-50%) perspective(260px) rotateX(62deg) scale(1.25)}.workspace:hover .archFrame,.workspace:focus-visible .archFrame{transform:translateX(-50%) translateY(-6px) scale(1.02);box-shadow:0 0 0 3px rgba(255,222,153,.7),0 0 58px rgba(255,182,45,.56),inset 0 0 20px rgba(255,232,180,.18)}.workspace:hover .thresholdMessage,.workspace:focus-visible .thresholdMessage{opacity:1;transform:scale(1)}.workspace:hover .sparkField,.workspace:focus-visible .sparkField{opacity:1}.workspaceCard{min-height:372px;margin-top:-10px;padding:22px 20px 20px;border-radius:18px;border:1px solid color-mix(in srgb,var(--accent) 35%,transparent);background:linear-gradient(180deg,rgba(53,35,12,.96),rgba(16,13,10,.98));box-shadow:0 16px 44px rgba(0,0,0,.3),inset 0 1px rgba(255,255,255,.03);transition:.28s}.workspace:hover .workspaceCard,.workspace:focus-visible .workspaceCard{transform:translateY(-10px);border-color:var(--accent);box-shadow:0 28px 60px rgba(0,0,0,.4),0 0 34px var(--accentGlow)}.miniCode{display:inline-grid;place-items:center;min-width:30px;height:30px;padding:0 8px;border-radius:7px;border:1px solid var(--accent);color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);font-size:12px;font-weight:950;box-shadow:0 0 12px var(--accentGlow)}.workspaceKicker{min-height:auto!important;margin:12px 0 0!important;color:var(--accent)!important;font-size:9px!important;font-weight:950;letter-spacing:.12em}.workspaceCard h3{margin:9px 0 8px;font-family:Georgia,"Times New Roman",serif;font-size:25px;letter-spacing:-.025em}.workspaceCard>p{min-height:88px;margin:0;color:color-mix(in srgb,var(--accent) 70%,white);line-height:1.5;font-size:14px}.workspaceCard ul{display:grid;gap:9px;margin:17px 0 0;padding:0;list-style:none}.workspaceCard li{display:grid;grid-template-columns:16px 1fr;gap:8px;color:#d4e0e8;font-size:12px;line-height:1.4}.workspaceCard li span{color:var(--accent);text-shadow:0 0 10px var(--accentGlow)}.workspaceCta{min-height:46px;margin-top:18px;padding:0 14px;display:flex;align-items:center;justify-content:center;gap:18px;border-radius:10px;border:1px solid var(--accent);color:color-mix(in srgb,var(--accent) 70%,white);background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 12%,transparent),rgba(0,0,0,.08));box-shadow:inset 0 0 18px color-mix(in srgb,var(--accent) 8%,transparent);font-size:12px;font-weight:900}.obsidianFloor{position:absolute;left:-6%;right:-6%;bottom:-150px;height:310px;background:linear-gradient(180deg,rgba(7,12,18,.1),rgba(0,0,0,.82)),repeating-linear-gradient(90deg,transparent 0 119px,rgba(255,255,255,.025) 120px),repeating-linear-gradient(0deg,transparent 0 59px,rgba(255,255,255,.018) 60px);transform:perspective(700px) rotateX(66deg);transform-origin:center top;opacity:.78;z-index:0}
-        .exchangeExplanation{padding:125px 0 20px}.capabilityGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:34px}.capabilityGrid article{min-height:250px;padding:24px;border:1px solid rgba(100,195,218,.16);border-radius:22px;background:radial-gradient(circle at 100% 0%,rgba(83,205,236,.08),transparent 42%),linear-gradient(145deg,rgba(13,37,53,.86),rgba(6,21,34,.92));transition:.25s}.capabilityGrid article:hover{transform:translateY(-7px);border-color:rgba(112,216,239,.52);box-shadow:0 24px 56px rgba(0,0,0,.24)}.capabilityGrid span{width:45px;height:45px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(112,216,239,.4);color:#8de8fa;background:rgba(58,177,207,.07);font-size:12px;font-weight:950}.capabilityGrid h3{margin:28px 0 10px;font-size:20px}.capabilityGrid p{color:#96adb7;line-height:1.6}.chainVault{margin-top:24px;padding:28px;border:1px solid rgba(255,185,54,.28);border-radius:24px;background:radial-gradient(circle at 50% 0%,rgba(255,172,32,.08),transparent 38%),linear-gradient(180deg,rgba(6,16,27,.96),rgba(3,9,16,.98));box-shadow:0 20px 56px rgba(0,0,0,.28)}.bandEyebrow{color:#ffc64e;letter-spacing:.12em}.chain{display:grid;grid-template-columns:repeat(8,1fr);gap:4px;margin-top:18px}.chainNode{position:relative;text-align:center}.chainIcon{width:52px;height:52px;margin:0 auto 8px;display:grid;place-items:center;border-radius:50%;border:2px solid #ffc345;color:#ffd87c;background:rgba(112,69,5,.16);box-shadow:0 0 18px rgba(255,184,48,.2);font-size:20px}.chainNode strong{display:block;color:#ffd16b;font-size:10px}.chainNode i{position:absolute;right:-7px;top:18px;color:#f6b62f;font-style:normal}.chainVault>p:last-child{max-width:980px;margin:18px auto 0;color:#aebdc7;line-height:1.6;text-align:center}
-        .featureSection{min-height:690px;margin-top:118px;padding:52px;display:grid;grid-template-columns:1fr 1.15fr;gap:72px;align-items:center;border:1px solid rgba(103,194,220,.17);border-radius:32px;background:radial-gradient(circle at 0 0,rgba(69,179,228,.09),transparent 40%),linear-gradient(145deg,rgba(12,31,47,.9),rgba(5,15,26,.96));box-shadow:0 30px 80px rgba(0,0,0,.24);overflow:hidden}.featureCopy{position:relative;z-index:2}.featureCopy p{max-width:840px}.featureActions{display:flex;flex-wrap:wrap;gap:12px;margin-top:26px}.statusFlag{display:inline-flex;min-height:31px;align-items:center;padding:0 11px;margin-bottom:16px;border-radius:999px;border:1px solid rgba(255,194,72,.36);color:#ffe09b;background:rgba(111,69,5,.14);font-size:10px;font-weight:950;letter-spacing:.12em}.registryVault{height:500px;position:relative;display:grid;place-items:center}.vaultDoor{width:360px;height:430px;position:relative;border-radius:180px 180px 26px 26px;border:18px solid #a9680d;background:radial-gradient(circle at 50% 42%,rgba(255,211,110,.14),transparent 18%),repeating-radial-gradient(circle at 50% 45%,transparent 0 44px,rgba(255,220,145,.14) 45px 47px),linear-gradient(110deg,#5a3003,#d79a29 18%,#8b4d08 50%,#e4ae45 78%,#573003);box-shadow:0 0 0 3px rgba(255,223,158,.5),0 0 65px rgba(255,177,33,.28),inset 0 0 50px rgba(54,24,0,.58)}.vaultDoor span{position:absolute;left:50%;top:42%;transform:translate(-50%,-50%);width:116px;height:116px;display:grid;place-items:center;border-radius:50%;border:10px double #f3c75f;color:#fff1b8;background:#251500;box-shadow:0 0 30px rgba(255,198,68,.35);font-family:Georgia,serif;font-size:25px;font-weight:900}.vaultDoor i{position:absolute;left:50%;top:42%;width:130px;height:10px;background:linear-gradient(90deg,#633403,#f6d075,#633403);transform-origin:center}.vaultDoor i:nth-child(2){transform:translate(-50%,-50%) rotate(0)}.vaultDoor i:nth-child(3){transform:translate(-50%,-50%) rotate(45deg)}.vaultDoor i:nth-child(4){transform:translate(-50%,-50%) rotate(90deg)}.vaultDoor i:nth-child(5){transform:translate(-50%,-50%) rotate(135deg)}.vaultGlow{position:absolute;width:430px;height:430px;border-radius:50%;background:radial-gradient(circle,rgba(255,183,48,.22),transparent 65%);filter:blur(35px);animation:ambientBreath 4s ease-in-out infinite alternate}.registryStars i{position:absolute;width:7px;height:7px;border-radius:50%;background:#ffe6a2;box-shadow:0 0 17px #ffc64b;animation:sparkPop 3s ease-in-out infinite}.registryStars i:nth-child(1){left:8%;top:18%}.registryStars i:nth-child(2){right:12%;top:28%;animation-delay:-1s}.registryStars i:nth-child(3){left:14%;bottom:24%;animation-delay:-1.8s}.registryStars i:nth-child(4){right:8%;bottom:15%;animation-delay:-2.4s}.registryStars i:nth-child(5){left:48%;top:3%;animation-delay:-.7s}.registryStars i:nth-child(6){right:34%;bottom:4%;animation-delay:-2.7s}.registryList{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:24px}.registryList span{display:flex;gap:10px;align-items:flex-start;padding:13px;border:1px solid rgba(255,197,76,.14);border-radius:12px;color:#c8d4da;background:rgba(255,255,255,.02);font-size:12px;line-height:1.45}.registryList i{color:#ffc95d;font-style:normal}.euSection{grid-template-columns:1.15fr 1fr;background:radial-gradient(circle at 100% 20%,rgba(42,88,211,.18),transparent 40%),linear-gradient(145deg,rgba(9,27,61,.93),rgba(4,14,31,.98))}.statStrip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:24px}.statStrip span{padding:15px;border:1px solid rgba(92,156,255,.18);border-radius:13px;color:#9eb0ca;background:rgba(255,255,255,.025);font-size:11px;line-height:1.45}.statStrip b{display:block;margin-bottom:5px;color:#ffd266;font-size:12px}.euUniverse{height:500px;position:relative;display:grid;place-items:center}.euPlanet{width:210px;height:210px;position:relative;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle at 35% 30%,#4b8cff,#123b9c 40%,#061642 74%);box-shadow:0 0 80px rgba(49,104,255,.45),inset -20px -20px 50px rgba(0,0,0,.4)}.euPlanet span{font-family:Georgia,serif;font-size:54px;color:white;text-shadow:0 0 24px rgba(255,255,255,.4)}.euPlanet i{position:absolute;left:50%;top:50%;width:8px;height:8px;border-radius:50%;background:#ffd33e;box-shadow:0 0 12px #ffd33e;transform:rotate(calc(var(--i)*30deg)) translateY(-77px)}.euOrbit{position:absolute;width:420px;height:170px;border:1px solid rgba(255,207,70,.35);border-radius:50%;animation:orbitSpin 16s linear infinite}.euOrbit.two{transform:rotate(60deg) scale(.78);animation-direction:reverse}.euOrbit.three{transform:rotate(-55deg) scale(.58);animation-duration:11s}.articleMarkers span{position:absolute;min-width:58px;height:34px;display:grid;place-items:center;border-radius:999px;border:1px solid rgba(255,207,70,.4);color:#ffe08d;background:rgba(9,25,63,.86);font-size:11px;font-weight:950;box-shadow:0 0 18px rgba(255,190,45,.13)}.articleMarkers span:nth-child(1){left:4%;top:20%}.articleMarkers span:nth-child(2){right:3%;top:28%}.articleMarkers span:nth-child(3){left:8%;bottom:22%}.articleMarkers span:nth-child(4){right:10%;bottom:14%}
-        .marketplaceSection{margin-top:118px;padding:58px 48px;border:1px solid rgba(255,191,67,.2);border-radius:32px;background:radial-gradient(circle at 50% 0%,rgba(255,184,40,.09),transparent 42%),linear-gradient(145deg,rgba(28,24,18,.9),rgba(6,16,27,.97));box-shadow:0 30px 80px rgba(0,0,0,.25)}.marketplaceHeader{display:flex;justify-content:space-between;gap:30px;align-items:end}.marketplaceHeader>div{max-width:1050px}.marketGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:15px;margin-top:34px}.marketGrid a{min-height:300px;padding:24px;display:flex;flex-direction:column;position:relative;overflow:hidden;border:1px solid rgba(255,198,76,.16);border-radius:21px;color:inherit;text-decoration:none;background:linear-gradient(145deg,rgba(43,33,19,.72),rgba(8,19,30,.92));transition:.25s}.marketGrid a::before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 100% 0%,rgba(255,191,65,.14),transparent 42%);opacity:0;transition:.25s}.marketGrid a:hover{transform:translateY(-8px);border-color:rgba(255,203,96,.58);box-shadow:0 24px 60px rgba(0,0,0,.3)}.marketGrid a:hover::before{opacity:1}.marketGrid>a>span{color:#9f7a35;font-size:11px;font-weight:950}.marketOrb{width:64px;height:64px;margin:28px 0 20px;border-radius:50%;border:1px solid rgba(255,203,96,.42);background:radial-gradient(circle,#ffd474,#9b5c0a 40%,#241300 72%);box-shadow:0 0 30px rgba(255,183,45,.2)}.marketGrid h3{font-size:21px}.marketGrid p{color:#aaafa9;line-height:1.6}.marketGrid b{display:inline-flex;align-items:center;gap:10px;margin-top:auto;color:#ffd478;font-size:12px}
-        .networkSection{grid-template-columns:1fr 1.18fr}.networkVisual{height:500px;position:relative;display:grid;place-items:center}.networkCore{width:120px;height:120px;display:grid;place-items:center;border-radius:50%;border:2px solid #d493ff;color:#f4dcff;background:radial-gradient(circle,#b96df1,#3a1359 60%,#11071b);box-shadow:0 0 55px rgba(190,103,241,.42);font-size:28px;font-weight:950}.networkVisual>span{position:absolute;left:50%;top:50%;width:48px;height:48px;border-radius:50%;border:1px solid #72dff3;background:radial-gradient(circle,#a7f1ff,#176986 64%,#061821);box-shadow:0 0 22px rgba(85,207,233,.35);transform:rotate(calc(var(--i)*45deg)) translateY(-180px)}.networkRing{position:absolute;width:370px;height:370px;border-radius:50%;border:1px solid rgba(112,216,239,.25);animation:orbitSpin 18s linear infinite}.networkRing.two{width:290px;height:180px;border-color:rgba(221,131,255,.28);transform:rotate(35deg);animation-direction:reverse}.networkRing.three{width:430px;height:190px;border-color:rgba(255,199,74,.2);transform:rotate(-42deg);animation-duration:24s}.networkSteps{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:24px}.networkSteps article{display:grid;grid-template-columns:38px 1fr;gap:12px;padding:14px;border:1px solid rgba(189,108,241,.16);border-radius:13px;background:rgba(255,255,255,.02)}.networkSteps article>span{width:34px;height:34px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(210,141,255,.38);color:#e7b9ff;font-size:11px;font-weight:950}.networkSteps strong{font-size:13px}.networkSteps p{margin:4px 0 0!important;color:#9daeb8!important;font-size:11px!important;line-height:1.45!important}
-        .recordsConstellation{padding-top:130px}.recordsPair{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:36px}.recordWorld{min-height:470px;padding:36px;border:1px solid rgba(103,194,220,.17);border-radius:28px;background:linear-gradient(145deg,rgba(13,37,53,.88),rgba(6,21,34,.94));box-shadow:0 24px 70px rgba(0,0,0,.22)}.recordVisual{height:220px;position:relative;display:grid;place-items:center;border-radius:22px;background:radial-gradient(circle,rgba(146,229,74,.22),transparent 54%),linear-gradient(180deg,#07141e,#031018);overflow:hidden}.recordVisual i{position:absolute;width:180px;height:120px;border:1px solid rgba(158,232,76,.3);border-radius:8px;transform:rotate(-5deg);background:repeating-linear-gradient(180deg,rgba(255,255,255,.04) 0 10px,transparent 10px 20px)}.recordVisual i:nth-child(2){transform:translate(30px,14px) rotate(4deg)}.recordVisual i:nth-child(3){transform:translate(-28px,24px) rotate(-10deg)}.recordVisual span{position:relative;z-index:2;width:86px;height:86px;display:grid;place-items:center;border-radius:50%;border:2px solid #9ee84c;color:#efffd9;background:rgba(21,53,20,.72);box-shadow:0 0 28px rgba(143,225,62,.35);font-size:27px;font-weight:950}.recordVisual.atmosphere{background:radial-gradient(circle,rgba(67,218,230,.24),transparent 54%),linear-gradient(180deg,#07141e,#031018)}.recordVisual.atmosphere i{width:150%;height:40px;border:0;border-top:2px solid rgba(101,232,241,.42);border-radius:50%;background:none;animation:airflow 5s ease-in-out infinite alternate}.recordVisual.atmosphere i:nth-child(2){top:35%;transform:rotate(-8deg)}.recordVisual.atmosphere i:nth-child(3){top:60%;transform:rotate(8deg);animation-delay:-2s}.recordVisual.atmosphere span{border-color:#65e8f1;background:rgba(7,48,56,.72);box-shadow:0 0 28px rgba(67,218,230,.35)}.recordWorld h3{margin:26px 0 10px;font-family:Georgia,serif;font-size:32px}.recordWorld p{color:#9fb2bc;line-height:1.65}.recordWorld a{min-height:46px;margin-top:18px;padding:0 16px;display:inline-flex;align-items:center;gap:13px;border-radius:11px;border:1px solid rgba(112,216,239,.35);color:#c9f6ff;background:rgba(36,129,153,.09);text-decoration:none;font-size:12px;font-weight:950}.polishedAction{position:relative;overflow:hidden;box-shadow:inset 0 1px rgba(255,255,255,.08),0 10px 24px rgba(0,0,0,.18);transition:transform .25s,border-color .25s,box-shadow .25s}.polishedAction::before{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 22%,rgba(255,255,255,.22) 46%,transparent 70%);transform:translateX(-130%);transition:transform .58s}.polishedAction:hover{transform:translateY(-3px);border-color:#77e5f5;box-shadow:inset 0 1px rgba(255,255,255,.12),0 16px 30px rgba(0,0,0,.28),0 0 24px rgba(75,205,231,.15)}.polishedAction:hover::before{transform:translateX(130%)}
-        .verificationSection{min-height:610px;margin-top:118px;padding:56px;display:grid;grid-template-columns:1fr 1.1fr;gap:70px;align-items:center;border:1px solid rgba(103,194,220,.17);border-radius:32px;background:radial-gradient(circle at 0 50%,rgba(38,173,223,.14),transparent 44%),linear-gradient(145deg,rgba(8,29,43,.94),rgba(4,14,24,.98));overflow:hidden}.verificationBeam{height:450px;position:relative}.verificationBeam::before{content:"";position:absolute;left:50%;top:2%;bottom:2%;width:2px;background:linear-gradient(180deg,transparent,#70e0f4,#ffd46f,transparent);box-shadow:0 0 22px #70e0f4}.verificationBeam::after{content:"";position:absolute;left:50%;top:50%;width:360px;height:360px;transform:translate(-50%,-50%);border-radius:50%;border:1px solid rgba(112,216,239,.24);box-shadow:0 0 70px rgba(59,198,230,.14),inset 0 0 70px rgba(255,199,76,.08);animation:sealSpin 18s linear infinite}.verificationBeam span{position:absolute;left:50%;width:110px;height:110px;transform:translateX(-50%) rotate(45deg);border:1px solid rgba(255,212,109,.38);background:rgba(4,24,35,.74);box-shadow:0 0 30px rgba(68,206,235,.2)}.verificationBeam span:nth-child(1){top:8%}.verificationBeam span:nth-child(2){top:38%;width:140px;height:140px}.verificationBeam span:nth-child(3){bottom:8%}
-        .closingTemple{margin-top:120px;padding:80px 36px;text-align:center;border:1px solid rgba(255,191,67,.24);border-radius:34px;background:radial-gradient(circle at 50% 0%,rgba(255,194,73,.12),transparent 42%),linear-gradient(145deg,rgba(27,28,33,.92),rgba(6,15,25,.98));box-shadow:0 34px 90px rgba(0,0,0,.3);overflow:hidden}.closingTemple h2{max-width:1100px;margin:16px auto}.closingTemple>p:not(.eyebrow){max-width:930px;margin:0 auto}.centeredActions{justify-content:center}.closingBurst{position:absolute;left:50%;top:-190px;width:480px;height:480px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,rgba(255,210,113,.2),transparent 64%);filter:blur(20px);animation:ambientBreath 4s ease-in-out infinite alternate}.sealChain{margin:34px auto 18px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 14px;color:#ffd06a;font-family:Georgia,serif;font-size:16px}.sealChain span{display:inline-flex;align-items:center;gap:14px}.sealChain i{color:#b87818;font-style:normal}.closingTemple>strong{color:#f6e0a7;font-size:15px}footer{min-height:90px;display:flex;justify-content:space-between;align-items:center;color:#718694;font-size:11px}
-        @keyframes starsOne{to{transform:translate3d(110px,145px,0)}}@keyframes starsTwo{to{transform:translate3d(-120px,100px,0)}}@keyframes pulseStars{from{opacity:.18;transform:scale(.98)}to{opacity:.42;transform:scale(1.02)}}@keyframes shooting{0%{transform:translate(-20vw,-10vh) rotate(-24deg);opacity:0}8%{opacity:1}35%{opacity:0}100%{transform:translate(140vw,70vh) rotate(-24deg);opacity:0}}@keyframes lineOne{from{transform:translateX(-30vw) rotate(-9deg);opacity:0}16%{opacity:.5}82%{opacity:.35}to{transform:translateX(105vw) rotate(-9deg);opacity:0}}@keyframes lineTwo{from{transform:translateX(30vw) rotate(11deg);opacity:0}18%{opacity:.45}85%{opacity:.3}to{transform:translateX(-105vw) rotate(11deg);opacity:0}}@keyframes lineThree{from{transform:translateX(-50vw) rotate(-4deg);opacity:0}20%{opacity:.38}82%{opacity:.28}to{transform:translateX(90vw) rotate(-4deg);opacity:0}}@keyframes packet{from{transform:translateX(-20vw);opacity:0}15%{opacity:1}80%{opacity:1}to{transform:translateX(80vw);opacity:0}}@keyframes burst{0%,55%,100%{transform:rotate(45deg) scale(.35);opacity:.15}66%{transform:rotate(45deg) scale(1.15);opacity:1}}@keyframes drift{to{translate:8px 12px}}@keyframes ambientBreath{from{transform:scale(.92);opacity:.1}to{transform:scale(1.08);opacity:.22}}@keyframes nebulaFloat{to{transform:translate(70px,-40px) scale(1.12)}}@keyframes orbitPulse{to{opacity:.72;filter:drop-shadow(0 0 10px rgba(255,190,58,.25))}}@keyframes moonOrbit{to{transform:rotate(360deg) translateX(120px) rotate(-360deg)}}@keyframes dustDrift{to{transform:translate(160px,-100px);opacity:0}}@keyframes sealSpin{to{transform:rotate(360deg)}}@keyframes gridMove{to{background-position:0 26px,26px 0}}@keyframes worldFloat{from{transform:translate3d(-4px,-6px,0) scale(.9)}to{transform:translate3d(7px,12px,0) scale(1.15)}}@keyframes worldSweep{from{opacity:0;translate:-30px 0}25%{opacity:.8}75%{opacity:.55}to{opacity:0;translate:70px 0}}@keyframes particleRise{from{transform:translateY(18px) scale(.7);opacity:0}20%{opacity:.8}80%{opacity:.6}to{transform:translateY(-240px) scale(1.2);opacity:0}}@keyframes bronzeSweep{0%,58%{transform:translateX(-130%)}78%,100%{transform:translateX(130%)}}@keyframes airflow{from{translate:-14px -4px;opacity:.28}to{translate:16px 6px;opacity:.7}}@keyframes entityPulse{from{transform:scale(.94) rotate(-2deg);opacity:.35}to{transform:scale(1.04) rotate(2deg);opacity:.75}}@keyframes lightPulse{from{opacity:.42}to{opacity:.88}}@keyframes sparkPop{0%,100%{transform:scale(.3);opacity:.15}50%{transform:scale(1.5);opacity:1}}@keyframes orbitSpin{to{rotate:360deg}}
-        @media(max-width:1280px){.doors{grid-template-columns:repeat(3,1fr)}.doorStage{height:500px}.capabilityGrid,.marketGrid{grid-template-columns:repeat(2,1fr)}.featureSection,.verificationSection{grid-template-columns:1fr}.registryVault,.euUniverse,.networkVisual,.verificationBeam{order:2}.chain{grid-template-columns:repeat(4,1fr);row-gap:18px}.chainNode i{display:none}}
-        @media(max-width:980px){.doors{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.shell{width:min(100% - 20px,1540px)}.institutionRule i{width:42px}.institutionRule span{font-size:13px;letter-spacing:.08em}.hero{padding-top:38px}.hero h1{font-size:clamp(42px,12vw,64px)}.heroLead{font-size:16px}.heroDefinition,.doors,.capabilityGrid,.marketGrid,.recordsPair,.registryList,.statStrip,.networkSteps{grid-template-columns:1fr}.heroActions .grandButton,.featureActions .grandButton{width:100%}.hall{padding-inline:10px}.doorStage{height:475px}.featureSection,.marketplaceSection,.verificationSection{padding:34px 20px;margin-top:80px}.marketplaceHeader{display:grid}.chain{grid-template-columns:repeat(2,1fr)}.registryVault,.euUniverse,.networkVisual,.verificationBeam{height:390px}.vaultDoor{transform:scale(.78)}.euUniverse{transform:scale(.8)}.networkVisual{transform:scale(.8)}.sectionIntro h2,.featureCopy h2,.marketplaceHeader h2,.closingTemple h2{font-size:clamp(34px,10vw,52px)}footer{flex-direction:column;align-items:flex-start;justify-content:center;gap:6px}}
-        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:1ms!important;animation-iteration-count:1!important;transition-duration:1ms!important;scroll-behavior:auto!important}}
+        .registry-page {
+          min-height: 100vh;
+          overflow: hidden;
+          position: relative;
+          background:
+            radial-gradient(circle at 50% 10%, rgba(25, 100, 170, 0.22), transparent 32%),
+            linear-gradient(180deg, #020713 0%, #06111e 52%, #020812 100%);
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .cosmos { position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden; }
+        .stars { position: absolute; inset: -20%; opacity: .7; background-repeat: repeat; }
+        .stars-a { background-image: radial-gradient(circle, rgba(255,255,255,.8) 0 1px, transparent 1.4px); background-size: 88px 88px; animation: drift 45s linear infinite; }
+        .stars-b { background-image: radial-gradient(circle, rgba(110,216,255,.8) 0 1px, transparent 1.7px); background-size: 143px 143px; transform: rotate(18deg); animation: drift 68s linear infinite reverse; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(.3px); box-shadow: 0 0 70px currentColor; opacity: .72; }
+        .orb-one { width: 16px; height: 16px; color: #54caff; background: currentColor; top: 16%; left: 7%; animation: float 8s ease-in-out infinite; }
+        .orb-two { width: 26px; height: 26px; color: #f7aa36; background: currentColor; top: 11%; right: 7%; animation: float 11s ease-in-out infinite reverse; }
+        .orb-three { width: 9px; height: 9px; color: #89f4ff; background: currentColor; top: 48%; right: 14%; animation: float 7s ease-in-out infinite; }
+        .orbit { position: absolute; border: 1px solid rgba(213,154,69,.22); border-radius: 50%; transform: rotate(-18deg); }
+        .orbit-one { width: 420px; height: 120px; top: 6%; left: -130px; }
+        .orbit-two { width: 520px; height: 150px; top: 9%; right: -180px; transform: rotate(16deg); }
+
+        .topbar, .hero, .section-shell, .institutional-banner, footer { position: relative; z-index: 2; }
+        .topbar {
+          width: min(1480px, calc(100% - 40px));
+          margin: 18px auto 0;
+          min-height: 76px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          padding: 12px 14px 12px 18px;
+          border: 1px solid rgba(147, 205, 255, .18);
+          border-radius: 20px;
+          background: rgba(2, 10, 19, .72);
+          backdrop-filter: blur(18px);
+          box-shadow: 0 16px 60px rgba(0,0,0,.25);
+        }
+        .brand { display: flex; align-items: center; gap: 12px; min-width: 270px; }
+        .brand-mark { display: grid; place-items: center; width: 52px; height: 52px; border-radius: 16px; border: 1px solid rgba(255,213,135,.55); background: linear-gradient(145deg, rgba(213,154,69,.25), rgba(26,98,155,.18)); color: var(--gold); font-weight: 900; font-size: 13px; box-shadow: inset 0 0 22px rgba(255,213,135,.08), 0 0 30px rgba(74,176,255,.1); }
+        .brand-copy { display: flex; flex-direction: column; gap: 3px; }
+        .brand-copy strong { font-family: Georgia, 'Times New Roman', serif; font-size: 17px; letter-spacing: .02em; }
+        .brand-copy small { color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+        .topbar nav { display: flex; align-items: center; gap: 8px; }
+        .topbar nav a { padding: 10px 13px; border-radius: 12px; color: #bed0df; font-size: 12px; font-weight: 800; letter-spacing: .04em; transition: .25s ease; }
+        .topbar nav a:hover { color: white; background: rgba(105,197,255,.1); box-shadow: inset 0 0 0 1px rgba(105,197,255,.16); transform: translateY(-1px); }
+
+        .polished-button { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 46px; padding: 0 18px; border-radius: 14px; border: 1px solid transparent; font-size: 12px; font-weight: 900; letter-spacing: .045em; overflow: hidden; transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease; }
+        .polished-button::before { content: ''; position: absolute; inset: 0; background: linear-gradient(110deg, transparent 25%, rgba(255,255,255,.18) 48%, transparent 70%); transform: translateX(-130%); transition: transform .6s ease; }
+        .polished-button:hover::before { transform: translateX(130%); }
+        .polished-button:hover { transform: translateY(-2px); }
+        .polished-button-primary { color: #00111e; background: linear-gradient(135deg, #b6efff, #65c9ff 55%, #3a9ff6); border-color: rgba(196,242,255,.9); box-shadow: 0 12px 30px rgba(55,172,255,.24), inset 0 1px rgba(255,255,255,.7); }
+        .polished-button-primary:hover { box-shadow: 0 16px 42px rgba(55,172,255,.34), inset 0 1px rgba(255,255,255,.8); }
+        .polished-button-secondary { color: #dceeff; background: linear-gradient(180deg, rgba(36,76,108,.7), rgba(8,26,42,.86)); border-color: rgba(136,204,255,.28); box-shadow: inset 0 1px rgba(255,255,255,.08), 0 10px 24px rgba(0,0,0,.2); }
+        .polished-button-bronze { color: #fff3d9; background: linear-gradient(180deg, rgba(140,91,34,.86), rgba(61,36,15,.9)); border-color: rgba(255,205,120,.42); box-shadow: inset 0 1px rgba(255,239,201,.16), 0 12px 30px rgba(174,103,30,.16); }
+        .button-arrow { font-size: 18px; line-height: 1; transition: transform .2s ease; }
+        .polished-button:hover .button-arrow { transform: translateX(3px); }
+
+        .hero { width: min(1280px, calc(100% - 40px)); margin: 0 auto; padding: 116px 0 90px; display: grid; grid-template-columns: 280px 1fr; align-items: center; gap: 70px; }
+        .hero-seal { width: 260px; aspect-ratio: 1; position: relative; display: grid; place-items: center; border-radius: 50%; filter: drop-shadow(0 30px 60px rgba(0,0,0,.3)); }
+        .seal-ring { position: absolute; border-radius: 50%; border: 1px solid rgba(255,213,135,.35); }
+        .seal-ring-a { inset: 0; animation: spin 30s linear infinite; box-shadow: inset 0 0 50px rgba(71,174,255,.08), 0 0 60px rgba(71,174,255,.08); }
+        .seal-ring-a::before, .seal-ring-a::after { content:''; position:absolute; width:12px; height:12px; border-radius:50%; background: var(--blue); box-shadow:0 0 24px var(--blue); top:16px; left:50%; }
+        .seal-ring-a::after { background:var(--bronze); box-shadow:0 0 24px var(--bronze); top:auto; bottom:16px; }
+        .seal-ring-b { inset: 28px; border-style: dashed; border-color: rgba(110,216,255,.35); animation: spin 22s linear infinite reverse; }
+        .seal-core { width: 146px; aspect-ratio: 1; display: grid; place-items: center; border-radius: 50%; font-family: Georgia, serif; font-weight: 900; letter-spacing: .08em; font-size: 28px; color: var(--gold); border: 1px solid rgba(255,213,135,.52); background: radial-gradient(circle at 40% 30%, rgba(39,114,170,.6), rgba(5,20,34,.95) 65%); box-shadow: inset 0 0 45px rgba(99,203,255,.14), 0 0 70px rgba(39,141,219,.2); }
+        .hero-copy { max-width: 940px; }
+        .eyebrow { margin: 0 0 18px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .24em; text-transform: uppercase; }
+        .hero h1 { margin: 0; max-width: 980px; font-family: Georgia, 'Times New Roman', serif; font-size: clamp(44px, 7vw, 88px); line-height: .98; letter-spacing: -.045em; font-weight: 500; }
+        .hero h1 span { display: block; margin-top: 8px; color: transparent; background: linear-gradient(100deg, #f8fbff 0%, #7fdcff 42%, #ffd089 82%); -webkit-background-clip: text; background-clip: text; font-style: italic; }
+        .hero-summary { max-width: 900px; margin: 30px 0 0; color: #c4d3e0; font-size: 17px; line-height: 1.8; }
+        .hero-boundary { margin-top: 30px; max-width: 930px; padding: 18px 20px; border-radius: 16px; border: 1px solid rgba(255,199,108,.26); background: linear-gradient(90deg, rgba(113,67,17,.23), rgba(9,24,38,.72)); display: grid; gap: 5px; }
+        .hero-boundary strong { color: #ffe1a8; font-family: Georgia, serif; font-size: 17px; }
+        .hero-boundary span { color: #c6d1db; line-height: 1.6; font-size: 13px; }
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+        .trust-strip { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
+        .trust-strip span { padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(132,198,247,.16); background: rgba(9,31,49,.62); color: #a9c4d8; font-size: 10px; font-weight: 800; letter-spacing: .045em; }
+
+        .institutional-banner { border-top: 1px solid rgba(255,206,125,.2); border-bottom: 1px solid rgba(255,206,125,.2); background: linear-gradient(90deg, rgba(71,42,12,.16), rgba(10,31,48,.7), rgba(71,42,12,.16)); }
+        .institutional-banner p { width: min(1200px, calc(100% - 40px)); margin: 0 auto; padding: 19px 0; text-align: center; color: #f3d49d; font-family: Georgia, serif; font-size: 13px; letter-spacing: .14em; }
+
+        .section-shell { width: min(1200px, calc(100% - 40px)); margin: 0 auto; padding: 110px 0; }
+        .section-heading { max-width: 860px; margin-bottom: 50px; }
+        .section-heading > p { margin: 0 0 12px; color: var(--blue); font-size: 10px; font-weight: 900; letter-spacing: .22em; }
+        .section-heading h2 { margin: 0; font-family: Georgia, serif; font-size: clamp(32px, 5vw, 54px); line-height: 1.08; font-weight: 500; letter-spacing: -.025em; }
+        .title-rule { width: 90px; height: 2px; margin: 22px 0; background: linear-gradient(90deg, var(--bronze), var(--blue)); box-shadow: 0 0 20px rgba(90,194,255,.3); }
+        .section-heading > span { display: block; color: #aebfce; font-size: 15px; line-height: 1.8; }
+
+        .record-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .record-card { position: relative; min-height: 220px; padding: 26px 23px; border-radius: 20px; border: 1px solid rgba(126,191,240,.16); background: linear-gradient(155deg, rgba(12,35,54,.86), rgba(4,15,26,.9)); box-shadow: var(--shadow); overflow: hidden; transition: transform .25s ease, border-color .25s ease; }
+        .record-card::after { content:''; position:absolute; width:140px; height:140px; border-radius:50%; right:-72px; bottom:-72px; border:1px solid rgba(213,154,69,.14); box-shadow:0 0 60px rgba(74,168,235,.07); }
+        .record-card:hover { transform: translateY(-5px); border-color: rgba(126,210,255,.35); }
+        .record-number { color: var(--bronze); font-family: Georgia, serif; font-size: 13px; letter-spacing: .15em; }
+        .record-card h3 { margin: 42px 0 11px; font-family: Georgia, serif; font-size: 23px; font-weight: 500; }
+        .record-card p { margin: 0; color: #9fb2c2; font-size: 13px; line-height: 1.65; }
+
+        .integrity-section { padding-top: 60px; }
+        .control-list { display: grid; gap: 10px; }
+        .control-row { display: grid; grid-template-columns: 62px 1fr auto; gap: 22px; align-items: center; padding: 20px 22px; border: 1px solid rgba(126,191,240,.14); border-radius: 17px; background: linear-gradient(90deg, rgba(10,31,48,.85), rgba(4,15,26,.78)); transition: .25s ease; }
+        .control-row:hover { transform: translateX(4px); border-color: rgba(126,210,255,.32); }
+        .control-row > span { color: var(--gold); font-family: Georgia, serif; font-size: 17px; }
+        .control-row h3 { margin: 0 0 5px; font-family: Georgia, serif; font-weight: 500; font-size: 20px; }
+        .control-row p { margin: 0; color: #9fb2c2; font-size: 13px; line-height: 1.55; }
+        .control-check { padding: 8px 10px; border-radius: 999px; background: rgba(60,190,139,.11); border: 1px solid rgba(105,226,177,.28); color: var(--green); font-size: 9px; font-weight: 900; letter-spacing: .12em; }
+
+        .status-section { padding-top: 60px; }
+        .status-panel { padding: 22px; border-radius: 24px; border: 1px solid rgba(126,191,240,.18); background: rgba(5,17,29,.86); box-shadow: var(--shadow); }
+        .status-tabs { display: flex; flex-wrap: wrap; gap: 8px; }
+        .status-tabs button { border: 0; background: transparent; padding: 0; cursor: pointer; border-radius: 999px; opacity: .62; transition: .2s ease; }
+        .status-tabs button:hover, .status-tabs button.active { opacity: 1; transform: translateY(-2px); }
+        .pill { display: inline-flex; align-items: center; min-height: 30px; padding: 0 12px; border-radius: 999px; font-size: 10px; font-weight: 900; letter-spacing: .055em; border: 1px solid; }
+        .pill-blue { color:#81dcff; background:rgba(47,151,216,.12); border-color:rgba(94,202,255,.3); }
+        .pill-gold { color:#ffd98e; background:rgba(181,119,37,.13); border-color:rgba(255,205,120,.3); }
+        .pill-green { color:#77e4b7; background:rgba(54,181,130,.12); border-color:rgba(105,226,177,.3); }
+        .pill-violet { color:#cfadff; background:rgba(133,88,194,.13); border-color:rgba(199,160,255,.3); }
+        .pill-red { color:#ff9a9a; background:rgba(197,60,60,.12); border-color:rgba(255,133,133,.3); }
+        .pill-slate { color:#bac8d4; background:rgba(132,151,168,.1); border-color:rgba(172,190,205,.24); }
+        .status-explainer { margin-top: 24px; min-height: 180px; display: flex; align-items: center; gap: 22px; padding: 26px; border-radius: 18px; background: linear-gradient(135deg, rgba(17,49,74,.68), rgba(5,17,29,.96)); border: 1px solid rgba(111,199,255,.14); }
+        .status-led { width: 14px; height: 14px; flex: 0 0 auto; border-radius: 50%; background: var(--green); box-shadow: 0 0 25px var(--green); }
+        .status-explainer p { margin: 0 0 8px; color: var(--blue); font-size: 9px; font-weight: 900; letter-spacing: .19em; }
+        .status-explainer h3 { margin: 0 0 10px; font-family: Georgia, serif; font-size: 32px; font-weight: 500; }
+        .status-explainer span { color: #aebfce; line-height: 1.7; }
+
+        .architecture-section { padding-top: 60px; }
+        .chain { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 28px; border-radius: 22px; background: linear-gradient(90deg, rgba(85,49,13,.2), rgba(7,29,46,.85)); border: 1px solid rgba(255,205,120,.16); }
+        .chain-item { display: flex; align-items: center; gap: 10px; }
+        .chain-item span { display: grid; place-items: center; min-height: 48px; padding: 0 15px; border-radius: 14px; border: 1px solid rgba(132,203,255,.2); background: rgba(4,17,29,.84); font-family: Georgia, serif; font-size: 14px; }
+        .chain-item b { color: var(--bronze); font-size: 18px; }
+
+        .method-section { padding-top: 60px; }
+        .reference-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+        .reference-grid article { min-height: 175px; padding: 22px; border-radius: 18px; border: 1px solid rgba(126,191,240,.15); background: rgba(6,21,34,.82); }
+        .reference-grid p { margin: 28px 0 0; color: #aebfce; line-height: 1.65; font-size: 13px; }
+        .method-boundaries { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 28px; }
+        .method-boundaries > div { padding: 27px; border-radius: 20px; border: 1px solid rgba(126,191,240,.16); background: linear-gradient(155deg, rgba(12,35,54,.78), rgba(4,15,26,.9)); }
+        .method-boundaries > div:last-child { border-color: rgba(255,151,121,.18); background: linear-gradient(155deg, rgba(61,30,25,.45), rgba(15,13,19,.92)); }
+        .method-boundaries p { margin: 0 0 18px; color: var(--gold); font-size: 10px; font-weight: 900; letter-spacing: .16em; }
+        .method-boundaries ul { margin: 0; padding-left: 20px; color: #afc0cf; }
+        .method-boundaries li { margin: 10px 0; line-height: 1.55; font-size: 13px; }
+
+        .launch-section { padding-top: 60px; }
+        .launch-card { display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center; padding: 42px; border-radius: 26px; border: 1px solid rgba(255,205,120,.23); background: radial-gradient(circle at 20% 0%, rgba(60,142,204,.24), transparent 45%), linear-gradient(135deg, rgba(47,30,12,.75), rgba(5,20,34,.96) 55%); box-shadow: var(--shadow); }
+        .launch-card h2 { margin: 0 0 14px; font-family: Georgia, serif; font-weight: 500; font-size: clamp(30px, 4vw, 48px); }
+        .launch-card span { color: #b3c2cf; line-height: 1.7; }
+        .launch-actions { display: grid; gap: 10px; min-width: 280px; }
+
+        footer { width: min(1200px, calc(100% - 40px)); margin: 0 auto; padding: 45px 0 60px; border-top: 1px solid rgba(126,191,240,.15); display: flex; justify-content: space-between; gap: 30px; color: #8499aa; }
+        footer div { display: grid; gap: 5px; }
+        footer strong { color: #d7e7f3; font-family: Georgia, serif; font-size: 16px; }
+        footer span, footer p { margin: 0; font-size: 12px; }
+        footer p { color: var(--gold); font-family: Georgia, serif; font-style: italic; }
+
+        @keyframes drift { from { transform: translate3d(0,0,0); } to { transform: translate3d(120px,80px,0); } }
+        @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-18px); } }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        @media (max-width: 1100px) {
+          .topbar nav { display: none; }
+          .hero { grid-template-columns: 210px 1fr; gap: 38px; }
+          .hero-seal { width: 200px; }
+          .record-grid, .reference-grid { grid-template-columns: repeat(2, 1fr); }
+          .launch-card { grid-template-columns: 1fr; gap: 28px; }
+          .launch-actions { display: flex; flex-wrap: wrap; }
+        }
+        @media (max-width: 760px) {
+          .topbar { width: min(100% - 22px, 1480px); min-height: 68px; }
+          .brand { min-width: 0; }
+          .brand-copy small { display: none; }
+          .topbar > .polished-button { display: none; }
+          .hero { width: min(100% - 28px, 1280px); padding: 74px 0 68px; grid-template-columns: 1fr; gap: 34px; }
+          .hero-seal { width: 180px; margin: 0 auto; }
+          .hero-copy { text-align: center; }
+          .hero-summary { font-size: 15px; }
+          .hero-boundary { text-align: left; }
+          .hero-actions, .trust-strip { justify-content: center; }
+          .institutional-banner p { font-size: 10px; line-height: 1.7; }
+          .section-shell { width: min(100% - 28px, 1200px); padding: 80px 0; }
+          .record-grid, .reference-grid, .method-boundaries { grid-template-columns: 1fr; }
+          .control-row { grid-template-columns: 45px 1fr; }
+          .control-check { display: none; }
+          .chain { align-items: stretch; }
+          .chain-item { flex: 1 1 100%; }
+          .chain-item span { flex: 1; }
+          .chain-item b { transform: rotate(90deg); }
+          .launch-card { padding: 28px 22px; }
+          .launch-actions { display: grid; min-width: 0; }
+          footer { width: min(100% - 28px, 1200px); flex-direction: column; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+        }
       `}</style>
     </main>
   );
