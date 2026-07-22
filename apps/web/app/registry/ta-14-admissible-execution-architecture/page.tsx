@@ -2,196 +2,105 @@
 
 import Link from 'next/link';
 
-type GatewayCard = {
-  number: string;
-  title: string;
-  description: string;
-  href: string;
-  status?: string;
-};
-
-const recordCards: GatewayCard[] = [
+const registrySections = [
   {
     number: '01',
     title: 'Founding Declaration',
     description:
-      'Identity, establishment claim, founder attribution, institutional stewardship, submission authority, and the permanent Registry boundary.',
+      'The formal public declaration establishing the TA-14 Admissible Execution Architecture, its purpose, founder, steward, and institutional intent.',
     href: '/registry/ta-14-admissible-execution-architecture/founding-declaration',
-    status: 'Founding record',
+    status: 'LIVE',
   },
   {
     number: '02',
     title: 'Governance Identity',
     description:
-      'The official name, short name, version, effective date, claimed establishment date, governance category, visibility, and Registry identifier.',
+      'The canonical identity record for the architecture, including Registry identifier, founder, steward, version, status, and naming rules.',
     href: '/registry/ta-14-admissible-execution-architecture/governance-identity',
-    status: 'Identity',
+    status: 'LIVE',
   },
   {
     number: '03',
-    title: 'Claims and Non-Claims',
+    title: 'Claims and Boundaries',
     description:
-      'Affirmative architectural claims remain visibly separated from limitations, prohibited inferences, and matters the Registry does not establish.',
+      'The architecture’s affirmative claims, explicit non-claims, declared limitations, prohibited inferences, and governance boundaries.',
     href: '/registry/ta-14-admissible-execution-architecture/claims-and-boundaries',
-    status: 'Bounded claims',
+    status: 'LIVE',
   },
   {
     number: '04',
-    title: 'Canonical Architecture',
+    title: 'Chronology',
     description:
-      'Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome, with route states and separation controls.',
-    href: '/foundation/architectures',
-    status: 'Architecture',
+      'The preserved public timeline of books, filings, public claims, repositories, demonstrations, platform development, and institutional formation.',
+    href: '/registry/ta-14-admissible-execution-architecture/chronology',
+    status: 'LIVE',
   },
   {
     number: '05',
-    title: 'Public Chronology',
+    title: 'Publications',
     description:
-      'Dated publications, declarations, filings, repositories, platform development, corrections, supersessions, and source-binding work.',
-    href: '/foundation/chronology',
-    status: 'Chronology',
+      'The publication record connecting books, articles, training materials, and public writings to the development of the architecture.',
+    href: '/registry/ta-14-admissible-execution-architecture/publications',
+    status: 'LIVE',
   },
   {
     number: '06',
-    title: 'Canonical Concepts',
+    title: 'Supporting Evidence',
     description:
-      'Admissibility, continuity, governed records, diagnostic determination, binding, execution, and other defined TA-14 concepts.',
-    href: '/foundation/concepts',
-    status: 'Foundation',
+      'The evidence-control record for provenance, attribution, source, date, version, continuity, corroboration, disputes, and limitations.',
+    href: '/registry/ta-14-admissible-execution-architecture/evidence',
+    status: 'LIVE',
   },
   {
     number: '07',
-    title: 'Publications and Articles',
+    title: 'Patent and Filing Records',
     description:
-      'Books, articles, reports, papers, presentations, institutional declarations, and the exact claims each publication can support.',
-    href: '/foundation/publications',
-    status: 'Publication record',
+      'The declared patent and filing chronology associated with TA-14, preserved without overstating legal rights, validity, or priority.',
+    href: '/registry/ta-14-admissible-execution-architecture/patents',
+    status: 'LIVE',
   },
   {
     number: '08',
-    title: 'Software and Repositories',
+    title: 'Rights and Stewardship',
     description:
-      'The TA-14 AI Governance Exchange repository, implementation history, verified builds, demonstrations, route systems, and software boundaries.',
-    href: 'https://github.com/greggbutlerac-debug/ta14-exchange-platform',
-    status: 'Public repository',
+      'The record separating founder attribution, ownership claims, institutional custody, licensing, stewardship authority, and succession.',
+    href: '/registry/ta-14-admissible-execution-architecture/rights',
+    status: 'LIVE',
   },
   {
     number: '09',
-    title: 'Patent and Invention Records',
+    title: 'Version History',
     description:
-      'Applications, filing dates, provisional and non-provisional status, declared lineage, related architectures, and explicit evidentiary limits.',
-    href: '/registry/ta-14-admissible-execution-architecture/patents',
-    status: 'IP record',
+      'The preserved amendment and supersession record showing how the architecture changes without erasing prior versions or challenges.',
+    href: '/registry/ta-14-admissible-execution-architecture/versions',
+    status: 'LIVE',
   },
   {
     number: '10',
-    title: 'Environmental and Operational Architectures',
+    title: 'Challenges and Disputes',
     description:
-      'Environmental integrity governance, atmospheric records, HVAC diagnostic governance, refrigerant governance, BAS/BMS, and governed interpretation.',
-    href: '/registry/ta-14-admissible-execution-architecture/environmental-architectures',
-    status: 'Domain architectures',
-  },
-  {
-    number: '11',
-    title: 'Institutional Ecosystem',
-    description:
-      'The Foundation, Exchange, Registry, Academy, Partner Review Network, governed-record systems, and the TA-14 Authority Governance Institution.',
-    href: '/registry/ta-14-admissible-execution-architecture/ecosystem',
-    status: 'Institutional map',
-  },
-  {
-    number: '12',
-    title: 'Evidence and Downloads',
-    description:
-      'Registry manifest, evidence inventory, publication index, patent index, chronology, hashes, version history, and future preserved artifacts.',
-    href: '/registry/ta-14-admissible-execution-architecture/evidence',
-    status: 'Evidence package',
-  },
-  {
-    number: '13',
-    title: 'Rights and Attribution',
-    description:
-      'Ownership assertions, stewardship, permitted use, reserved rights, contribution boundaries, and known attribution conflicts.',
-    href: '/registry/ta-14-admissible-execution-architecture/rights-and-attribution',
-    status: 'Rights',
-  },
-  {
-    number: '14',
-    title: 'Challenges, Corrections, and Review',
-    description:
-      'Submit a chronology challenge, attribution dispute, correction request, competing claim, or bounded governed-review request.',
+      'The public route for submitting, preserving, reviewing, and resolving material challenges to claims, evidence, chronology, standing, or scope.',
     href: '/registry/ta-14-admissible-execution-architecture/challenges',
-    status: 'Public accountability',
+    status: 'NEXT',
   },
 ];
 
-const chain = [
-  'Reality',
-  'Record',
-  'Continuity',
-  'Admissibility',
-  'Binding',
-  'Commit',
-  'Execution',
-  'Outcome',
-];
-
-const architecturePrinciples = [
+const quickLinks = [
   {
-    title: 'Record before diagnosis',
-    text:
-      'The record preserves what was observed, received, measured, submitted, or declared. It does not silently become a determination.',
+    label: 'Open TA-14 AI Governance Registry',
+    href: '/registry',
   },
   {
-    title: 'Determination before optimization',
-    text:
-      'A diagnostic or governance determination must remain distinguishable from recommendations, preferences, sales logic, and intervention design.',
+    label: 'Open TA-14 AI Governance Exchange',
+    href: '/workspace',
   },
   {
-    title: 'Authority before execution',
-    text:
-      'A route cannot become consequence-bearing merely because information exists. Applicable authority, binding, and commitment must be visible.',
-  },
-  {
-    title: 'Outcome after execution',
-    text:
-      'Execution must be followed by an attributable outcome record so performance can be compared with the original state and declared objective.',
+    label: 'Open Governed Records',
+    href: '/workspace/ai-governance/records',
   },
 ];
 
-const routeStates = [
-  {
-    name: 'ALLOW',
-    text:
-      'The declared evidence, continuity, authority, and route conditions are sufficient for the bounded use being evaluated.',
-  },
-  {
-    name: 'HOLD',
-    text:
-      'The route remains incomplete, unresolved, stale, contradictory, or insufficient and must not silently proceed.',
-  },
-  {
-    name: 'DENY',
-    text:
-      'A material prohibition, failed requirement, invalid authority, or disqualifying condition prevents the declared execution.',
-  },
-  {
-    name: 'ESCALATE',
-    text:
-      'The route requires competent human, institutional, legal, regulatory, technical, or domain-specific review.',
-  },
-];
-
-const ecosystemLinks = [
-  ['TA-14 Foundation', '/foundation'],
-  ['TA-14 AI Governance Exchange', '/'],
-  ['TA-14 AI Governance Registry', '/registry'],
-  ['TA-14 Academy', '/academy'],
-  ['Partner Review Network', '/partners'],
-  ['Governed Records', '/workspace/records'],
-];
-
-export default function Ta14AdmissibleExecutionArchitecturePage() {
+export default function ArchitectureRegistryBridgePage() {
   return (
     <main className="page">
       <div className="background" aria-hidden="true">
@@ -199,41 +108,39 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         <div className="stars stars-two" />
         <div className="glow glow-one" />
         <div className="glow glow-two" />
-        <div className="glow glow-three" />
         <div className="orbit orbit-one" />
         <div className="orbit orbit-two" />
       </div>
 
       <header className="topbar">
         <Link href="/registry" className="brand">
-          <span className="brand-seal">TA-14</span>
+          <span className="brand-mark">TA-14</span>
           <span>
-            <strong>Admissible Execution Architecture</strong>
-            <small>Permanent Registry Founding Record</small>
+            <strong>AI Governance Registry</strong>
+            <small>Architecture Record Bridge</small>
           </span>
         </Link>
 
-        <nav aria-label="Architecture page navigation">
-          <a href="#record">Founding Record</a>
-          <a href="#architecture">Architecture</a>
-          <a href="#gateway">Record Gateway</a>
-          <a href="#boundary">Boundary</a>
+        <nav aria-label="Registry bridge navigation">
+          <a href="#record">Architecture Record</a>
+          <a href="#sections">Registry Sections</a>
+          <a href="#access">Exchange Access</a>
         </nav>
 
         <Link href="/registry" className="top-action">
-          Return to Registry
+          Registry Home
         </Link>
       </header>
 
-      <section className="hero">
-        <div className="hero-badge-row">
+      <section className="hero" id="record">
+        <div className="status-row">
           <span>TA-14-AIGR-0001</span>
-          <span>ACTIVE</span>
-          <span>VERSION 1.0</span>
+          <span>FOUNDING ARCHITECTURE</span>
           <span>PUBLIC</span>
+          <span>ACTIVE</span>
         </div>
 
-        <p className="eyebrow">PERMANENT SYSTEM-SEEDED FOUNDING ARCHITECTURE</p>
+        <p className="eyebrow">ONE ARCHITECTURE • ONE PUBLIC RECORD • EVERY SECTION CONNECTED</p>
 
         <h1>
           TA-14 Admissible
@@ -241,300 +148,131 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         </h1>
 
         <p className="hero-copy">
-          The parent governance architecture underlying the TA-14 Foundation,
-          AI Governance Exchange, AI Governance Registry, Academy, Partner
-          Review Network, governed-record systems, and domain-specific
-          environmental and operational architectures.
+          This is the public bridge into the complete founding Registry record.
+          Every completed architecture page is connected below so the entire
+          record can be opened, reviewed, shared, and challenged online.
         </p>
 
         <div className="hero-actions">
-          <a href="#gateway" className="button button-primary">
-            Open the Complete Record Gateway
+          <a href="#sections" className="button button-primary">
+            Open the Complete Record
             <span aria-hidden="true">↓</span>
           </a>
-          <Link href="/foundation" className="button button-secondary">
-            Open the TA-14 Foundation
-            <span aria-hidden="true">→</span>
-          </Link>
+
           <Link href="/registry" className="button button-secondary">
-            Return to the Registry
+            Return to Registry
             <span aria-hidden="true">←</span>
           </Link>
         </div>
 
-        <div className="hero-notice">
-          <strong>Permanent inclusion is not self-certification.</strong>
-          <p>
-            This system-seeded record preserves the identity, chronology,
-            claims, boundaries, publications, implementations, and evidence
-            associated with the architecture underlying the Registry. Its
-            presence does not establish legal compliance, regulatory approval,
-            ownership priority, technical effectiveness, certification,
-            endorsement, or fitness for a particular use.
-          </p>
-        </div>
-      </section>
-
-      <section id="record" className="section shell">
-        <div className="section-heading">
-          <p className="eyebrow">FOUNDING RECORD</p>
-          <h2>The Registry begins by preserving the architecture that created it.</h2>
-          <p>
-            TA-14 does not bypass the Registry boundary. Its founding record is
-            permanently visible so the public can inspect what it calls itself,
-            who claims it, what it claims, what it does not claim, and which
-            records support its chronology.
-          </p>
-        </div>
-
-        <div className="identity-grid">
-          <article>
-            <span>Registry identifier</span>
+        <div className="identity-strip">
+          <div>
+            <small>Registry Identifier</small>
             <strong>TA-14-AIGR-0001</strong>
-            <p>Permanent founding architecture record.</p>
-          </article>
-
-          <article>
-            <span>Governance name</span>
-            <strong>TA-14 Admissible Execution Architecture</strong>
-            <p>The full public governance name.</p>
-          </article>
-
-          <article>
-            <span>Short name</span>
-            <strong>TA-14</strong>
-            <p>Transparent Air TA-14 institutional architecture.</p>
-          </article>
-
-          <article>
-            <span>Current version</span>
-            <strong>1.0</strong>
-            <p>Effective July 22, 2026.</p>
-          </article>
-
-          <article>
-            <span>Claimed establishment date</span>
-            <strong>May 1, 2025</strong>
-            <p>Subject to chronology evidence, correction, and challenge.</p>
-          </article>
-
-          <article>
-            <span>Founder and steward</span>
-            <strong>Greggory Don Butler</strong>
-            <p>Acting through the TA-14 Authority Governance Institution.</p>
-          </article>
-
-          <article>
-            <span>Record class</span>
-            <strong>Founding Architecture Record</strong>
-            <p>System-seeded, public, versioned, and challengeable.</p>
-          </article>
-
-          <article>
-            <span>Requested pathway</span>
-            <strong>Record-only registration</strong>
-            <p>Registration remains separate from certification or endorsement.</p>
-          </article>
+          </div>
+          <div>
+            <small>Architecture Status</small>
+            <strong>Active</strong>
+          </div>
+          <div>
+            <small>Visibility</small>
+            <strong>Public</strong>
+          </div>
+          <div>
+            <small>Current Version</small>
+            <strong>v1.0</strong>
+          </div>
         </div>
       </section>
 
-      <section id="architecture" className="section shell architecture-section">
+      <section id="sections" className="section shell">
         <div className="section-heading">
-          <p className="eyebrow">CANONICAL ARCHITECTURE</p>
-          <h2>The route from reality to consequence must remain inspectable.</h2>
+          <p className="eyebrow">COMPLETE REGISTRY RECORD</p>
+          <h2>Open every part of the architecture from one public page.</h2>
           <p>
-            TA-14 requires consequence-bearing execution to remain connected to
-            the evidence, continuity, authority, binding, commitment, and
-            outcome records that support it.
+            Each section remains separate so identity, claims, chronology,
+            evidence, rights, filings, and versions cannot be silently blended
+            into one unbounded conclusion.
           </p>
         </div>
 
-        <div className="chain" aria-label="TA-14 canonical chain">
-          {chain.map((item, index) => (
-            <div className="chain-item" key={item}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <strong>{item}</strong>
-              {index < chain.length - 1 && <b aria-hidden="true">→</b>}
-            </div>
-          ))}
-        </div>
+        <div className="registry-grid">
+          {registrySections.map((section) => (
+            <Link key={section.number} href={section.href} className="registry-card">
+              <div className="card-topline">
+                <span>{section.number}</span>
+                <strong className={section.status === 'NEXT' ? 'next' : ''}>
+                  {section.status}
+                </strong>
+              </div>
 
-        <div className="principle-grid">
-          {architecturePrinciples.map((principle, index) => (
-            <article key={principle.title}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <h3>{principle.title}</h3>
-              <p>{principle.text}</p>
-            </article>
-          ))}
-        </div>
+              <h3>{section.title}</h3>
+              <p>{section.description}</p>
 
-        <div className="state-grid">
-          {routeStates.map((state) => (
-            <article key={state.name}>
-              <strong>{state.name}</strong>
-              <p>{state.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section id="gateway" className="section shell gateway-section">
-        <div className="section-heading">
-          <p className="eyebrow">COMPLETE RECORD GATEWAY</p>
-          <h2>Every major TA-14 record class has its own permanent route.</h2>
-          <p>
-            This gateway is the public front door to the complete founding
-            architecture. Each card opens the relevant record, archive,
-            publication surface, repository, evidence package, or accountability
-            route.
-          </p>
-        </div>
-
-        <div className="gateway-grid">
-          {recordCards.map((card) => {
-            const isExternal = card.href.startsWith('http');
-
-            return (
-              <article className="gateway-card" key={card.number}>
-                <div className="gateway-topline">
-                  <span>{card.number}</span>
-                  {card.status && <small>{card.status}</small>}
-                </div>
-
-                <h3>{card.title}</h3>
-                <p>{card.description}</p>
-
-                {isExternal ? (
-                  <a href={card.href} target="_blank" rel="noreferrer">
-                    Open record
-                    <span aria-hidden="true">↗</span>
-                  </a>
-                ) : (
-                  <Link href={card.href}>
-                    Open record
-                    <span aria-hidden="true">→</span>
-                  </Link>
-                )}
-              </article>
-            );
-          })}
-        </div>
-      </section>
-
-      <section className="section shell ecosystem-section">
-        <div className="section-heading">
-          <p className="eyebrow">TA-14 INSTITUTIONAL ECOSYSTEM</p>
-          <h2>One parent architecture, multiple bounded institutional surfaces.</h2>
-          <p>
-            Each surface has a different role. None should be allowed to
-            impersonate another.
-          </p>
-        </div>
-
-        <div className="ecosystem-links">
-          {ecosystemLinks.map(([label, href]) => (
-            <Link href={href} key={label}>
-              <span>{label}</span>
-              <b aria-hidden="true">→</b>
+              <div className="card-action">
+                <span>{section.status === 'NEXT' ? 'Open when completed' : 'Open record'}</span>
+                <b aria-hidden="true">→</b>
+              </div>
             </Link>
           ))}
         </div>
       </section>
 
-      <section id="boundary" className="section shell boundary-section">
-        <div className="boundary-card">
-          <p className="eyebrow">REGISTRY BOUNDARY</p>
-          <h2>What this permanent record does—and does not—establish.</h2>
-
-          <div className="boundary-columns">
-            <div>
-              <h3>This record preserves</h3>
-              <ul>
-                <li>The declared identity of the architecture.</li>
-                <li>The claimant, founder, steward, and institution.</li>
-                <li>The claimed chronology and associated public records.</li>
-                <li>The architecture’s affirmative claims and explicit non-claims.</li>
-                <li>Version history, corrections, disputes, and supersessions.</li>
-                <li>Publications, repositories, filings, and evidence relationships.</li>
-              </ul>
-            </div>
-
-            <div>
-              <h3>This record does not establish</h3>
-              <ul>
-                <li>Legal compliance or regulatory approval.</li>
-                <li>Technical efficacy or production readiness.</li>
-                <li>Ownership priority or exclusive intellectual-property rights.</li>
-                <li>Certification, accreditation, endorsement, or standards conformity.</li>
-                <li>The truth of every claim or authenticity of every source.</li>
-                <li>Fitness for any particular organization, domain, or use.</li>
-              </ul>
-            </div>
+      <section id="access" className="section shell access-section">
+        <div className="access-card">
+          <div>
+            <p className="eyebrow">TA-14 EXCHANGE ACCESS</p>
+            <h2>The Registry preserves the architecture. The Exchange lets people test it.</h2>
+            <p>
+              Move directly from the public founding record into the TA-14 AI
+              Governance Exchange, workspace, and governed-record environment.
+            </p>
           </div>
 
-          <div className="boundary-actions">
-            <Link
-              href="/registry/ta-14-admissible-execution-architecture/challenges"
-              className="button button-primary"
-            >
-              Submit a Challenge or Correction
-              <span aria-hidden="true">→</span>
-            </Link>
-
-            <Link
-              href="/registry/ta-14-admissible-execution-architecture/evidence"
-              className="button button-secondary"
-            >
-              Review the Evidence Package
-              <span aria-hidden="true">→</span>
-            </Link>
+          <div className="access-actions">
+            {quickLinks.map((link) => (
+              <Link key={link.href} href={link.href} className="access-link">
+                <span>{link.label}</span>
+                <b aria-hidden="true">→</b>
+              </Link>
+            ))}
           </div>
+        </div>
+      </section>
+
+      <section className="section shell principle-section">
+        <div className="principle-card">
+          <p className="eyebrow">CANONICAL TA-14 CHAIN</p>
+          <h2>
+            Reality → Record → Continuity → Admissibility → Binding → Commit →
+            Execution → Outcome
+          </h2>
+          <p>
+            The Registry preserves what the architecture claims to be. The
+            Exchange demonstrates how governed routes, records, verification,
+            and execution boundaries behave in practice.
+          </p>
         </div>
       </section>
 
       <footer className="footer shell">
-        <div className="footer-seal">
-          <span>TA-14</span>
-          <small>AUTHORITY</small>
-        </div>
-
         <div>
-          <p className="eyebrow">OFFICE OF THE FOUNDER</p>
-          <h2>TA-14 Authority Governance Institution</h2>
-          <p>
-            Steward of the TA-14 Foundation, AI Governance Exchange, AI
-            Governance Registry, and the Public Canon of Admissible Execution.
-          </p>
-
-          <div className="footer-meta">
-            <span>Greggory Don Butler</span>
-            <a href="mailto:TA-14AdmissibleExecution@gmail.com">
-              TA-14AdmissibleExecution@gmail.com
-            </a>
-            <a href="tel:+13863377215">+1 (386) 337-7215</a>
-          </div>
-
-          <strong className="motto">
-            No admissible evidence. No admissible execution.
-          </strong>
+          <strong>TA-14 Admissible Execution Architecture</strong>
+          <span>Permanent Registry record TA-14-AIGR-0001.</span>
         </div>
+
+        <p>No admissible evidence. No admissible execution.</p>
       </footer>
 
       <style jsx global>{`
         :root {
           color-scheme: dark;
-          --bg: #030813;
-          --panel: rgba(7, 20, 35, 0.88);
-          --panel-strong: rgba(8, 22, 38, 0.96);
+          --bg: #020813;
           --text: #f2f7ff;
-          --muted: #a6b6c8;
-          --line: rgba(128, 190, 239, 0.18);
-          --blue: #69d5ff;
-          --blue-strong: #2c96ef;
-          --gold: #f1bd68;
-          --green: #6ee3b1;
-          --red: #ff8e8e;
+          --muted: #a8b7c6;
+          --line: rgba(129, 192, 239, 0.18);
+          --blue: #6dd8ff;
+          --gold: #f2bf6d;
         }
 
         * {
@@ -561,8 +299,8 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           min-height: 100vh;
           overflow: hidden;
           background:
-            radial-gradient(circle at 50% 0%, rgba(34, 108, 176, 0.22), transparent 31%),
-            linear-gradient(180deg, #020711 0%, #06121f 50%, #020811 100%);
+            radial-gradient(circle at 50% 0%, rgba(38, 112, 178, 0.22), transparent 32%),
+            linear-gradient(180deg, #020711 0%, #06121f 52%, #020811 100%);
           font-family:
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
@@ -579,7 +317,7 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         .stars {
           position: absolute;
           inset: -20%;
-          opacity: 0.65;
+          opacity: 0.7;
           background-repeat: repeat;
         }
 
@@ -589,71 +327,63 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
             rgba(255, 255, 255, 0.82) 0 1px,
             transparent 1.4px
           );
-          background-size: 93px 93px;
+          background-size: 91px 91px;
           animation: drift 48s linear infinite;
         }
 
         .stars-two {
           background-image: radial-gradient(
             circle,
-            rgba(105, 213, 255, 0.84) 0 1px,
-            transparent 1.6px
+            rgba(109, 216, 255, 0.8) 0 1px,
+            transparent 1.7px
           );
-          background-size: 151px 151px;
-          animation: drift 70s linear infinite reverse;
+          background-size: 149px 149px;
+          animation: drift 72s linear infinite reverse;
         }
 
         .glow {
           position: absolute;
           border-radius: 50%;
           filter: blur(120px);
-          opacity: 0.22;
+          opacity: 0.2;
         }
 
         .glow-one {
-          width: 520px;
-          height: 520px;
-          top: 4%;
+          width: 560px;
+          height: 560px;
+          top: 0;
           left: -220px;
-          background: #2b8bd4;
+          background: #2a8bd3;
         }
 
         .glow-two {
-          width: 620px;
-          height: 620px;
-          top: 38%;
-          right: -330px;
-          background: #ba7a24;
-        }
-
-        .glow-three {
-          width: 520px;
-          height: 520px;
-          bottom: 8%;
-          left: 18%;
-          background: #176d8d;
+          width: 660px;
+          height: 660px;
+          top: 35%;
+          right: -340px;
+          background: #b87822;
         }
 
         .orbit {
           position: absolute;
-          border: 1px solid rgba(241, 189, 104, 0.15);
+          border: 1px solid rgba(242, 191, 109, 0.15);
           border-radius: 50%;
         }
 
         .orbit-one {
           width: 620px;
-          height: 170px;
+          height: 180px;
           top: 5%;
           left: -180px;
-          transform: rotate(-16deg);
+          transform: rotate(-17deg);
         }
 
         .orbit-two {
           width: 720px;
-          height: 220px;
-          top: 10%;
+          height: 210px;
+          top: 8%;
           right: -260px;
-          transform: rotate(17deg);
+          transform: rotate(16deg);
         }
 
         .topbar,
@@ -684,19 +414,19 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           display: flex;
           align-items: center;
           gap: 13px;
-          min-width: 310px;
+          min-width: 280px;
         }
 
-        .brand-seal {
+        .brand-mark {
           width: 52px;
           height: 52px;
           display: grid;
           place-items: center;
           border-radius: 16px;
-          border: 1px solid rgba(241, 189, 104, 0.48);
+          border: 1px solid rgba(242, 191, 109, 0.46);
           background: linear-gradient(
             145deg,
-            rgba(139, 86, 28, 0.35),
+            rgba(138, 86, 29, 0.34),
             rgba(29, 100, 153, 0.22)
           );
           color: var(--gold);
@@ -715,10 +445,10 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         }
 
         .brand small {
-          color: #92a9bc;
+          color: #91a9bc;
           font-size: 10px;
           font-weight: 800;
-          letter-spacing: 0.09em;
+          letter-spacing: 0.1em;
           text-transform: uppercase;
         }
 
@@ -731,7 +461,7 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         .topbar nav a {
           padding: 10px 12px;
           border-radius: 11px;
-          color: #b4c8d8;
+          color: #b5c8d8;
           font-size: 12px;
           font-weight: 800;
           transition: 0.2s ease;
@@ -739,7 +469,7 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
 
         .topbar nav a:hover {
           color: white;
-          background: rgba(105, 213, 255, 0.08);
+          background: rgba(109, 216, 255, 0.08);
           transform: translateY(-1px);
         }
 
@@ -750,7 +480,7 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           justify-content: center;
           padding: 0 17px;
           border-radius: 13px;
-          border: 1px solid rgba(137, 205, 255, 0.28);
+          border: 1px solid rgba(137, 205, 255, 0.27);
           background: linear-gradient(
             180deg,
             rgba(34, 79, 112, 0.76),
@@ -762,13 +492,13 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         }
 
         .hero {
-          width: min(1280px, calc(100% - 40px));
+          width: min(1240px, calc(100% - 40px));
           margin: 0 auto;
-          padding: 120px 0 95px;
+          padding: 118px 0 88px;
           text-align: center;
         }
 
-        .hero-badge-row {
+        .status-row {
           display: flex;
           flex-wrap: wrap;
           justify-content: center;
@@ -776,7 +506,7 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           margin-bottom: 28px;
         }
 
-        .hero-badge-row span {
+        .status-row span {
           min-height: 31px;
           display: inline-flex;
           align-items: center;
@@ -790,10 +520,10 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           letter-spacing: 0.1em;
         }
 
-        .hero-badge-row span:first-child,
-        .hero-badge-row span:nth-child(3) {
+        .status-row span:first-child,
+        .status-row span:nth-child(2) {
           color: #ffdb98;
-          border-color: rgba(241, 189, 104, 0.3);
+          border-color: rgba(242, 191, 109, 0.3);
           background: rgba(100, 62, 20, 0.2);
         }
 
@@ -810,10 +540,10 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           max-width: 1120px;
           margin: 0 auto;
           font-family: Georgia, "Times New Roman", serif;
-          font-size: clamp(56px, 8.5vw, 112px);
+          font-size: clamp(58px, 9vw, 116px);
           font-weight: 500;
-          line-height: 0.93;
-          letter-spacing: -0.055em;
+          line-height: 0.92;
+          letter-spacing: -0.058em;
         }
 
         .hero h1 span {
@@ -832,10 +562,10 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         }
 
         .hero-copy {
-          max-width: 940px;
+          max-width: 890px;
           margin: 34px auto 0;
           color: #c0cfdb;
-          font-size: clamp(18px, 2.2vw, 25px);
+          font-size: clamp(17px, 2vw, 23px);
           line-height: 1.72;
         }
 
@@ -888,32 +618,37 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           );
         }
 
-        .hero-notice {
-          max-width: 1030px;
-          margin: 36px auto 0;
-          padding: 22px 24px;
+        .identity-strip {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+          max-width: 980px;
+          margin: 42px auto 0;
+        }
+
+        .identity-strip div {
+          padding: 18px;
+          border-radius: 16px;
+          border: 1px solid rgba(109, 216, 255, 0.16);
+          background: rgba(5, 22, 36, 0.74);
           text-align: left;
-          border-radius: 18px;
-          border: 1px solid rgba(241, 189, 104, 0.26);
-          background: linear-gradient(
-            90deg,
-            rgba(98, 59, 18, 0.25),
-            rgba(8, 25, 40, 0.8)
-          );
         }
 
-        .hero-notice strong {
+        .identity-strip small {
           display: block;
-          color: #ffe0a5;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 19px;
+          color: #809caf;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
         }
 
-        .hero-notice p {
-          margin: 8px 0 0;
-          color: #bdc9d4;
-          font-size: 13px;
-          line-height: 1.7;
+        .identity-strip strong {
+          display: block;
+          margin-top: 8px;
+          color: #e7f5ff;
+          font-family: Georgia, serif;
+          font-size: 18px;
         }
 
         .shell {
@@ -926,13 +661,13 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
         }
 
         .section-heading {
-          max-width: 900px;
+          max-width: 920px;
           margin-bottom: 46px;
         }
 
         .section-heading h2,
-        .boundary-card h2,
-        .footer h2 {
+        .access-card h2,
+        .principle-card h2 {
           margin: 0;
           font-family: Georgia, "Times New Roman", serif;
           font-size: clamp(36px, 5vw, 60px);
@@ -941,307 +676,117 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           letter-spacing: -0.035em;
         }
 
-        .section-heading > p:last-child {
+        .section-heading > p:last-child,
+        .access-card p,
+        .principle-card p {
           margin: 20px 0 0;
           color: var(--muted);
           font-size: 15px;
           line-height: 1.8;
         }
 
-        .identity-grid {
+        .registry-grid {
           display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 13px;
-        }
-
-        .identity-grid article {
-          min-height: 190px;
-          padding: 24px;
-          border: 1px solid var(--line);
-          border-radius: 19px;
-          background: linear-gradient(
-            155deg,
-            rgba(12, 35, 54, 0.88),
-            rgba(4, 15, 26, 0.92)
-          );
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-        }
-
-        .identity-grid span {
-          color: var(--gold);
-          font-size: 9px;
-          font-weight: 900;
-          letter-spacing: 0.12em;
-          text-transform: uppercase;
-        }
-
-        .identity-grid strong {
-          display: block;
-          margin-top: 34px;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 21px;
-          font-weight: 500;
-          line-height: 1.2;
-        }
-
-        .identity-grid p {
-          margin: 11px 0 0;
-          color: #99adbd;
-          font-size: 12px;
-          line-height: 1.6;
-        }
-
-        .architecture-section {
-          padding-top: 60px;
-        }
-
-        .chain {
-          display: grid;
-          grid-template-columns: repeat(8, minmax(0, 1fr));
-          gap: 8px;
-          padding: 24px;
-          border-radius: 22px;
-          border: 1px solid rgba(241, 189, 104, 0.2);
-          background: linear-gradient(
-            90deg,
-            rgba(84, 50, 15, 0.22),
-            rgba(5, 23, 38, 0.86)
-          );
-        }
-
-        .chain-item {
-          position: relative;
-          min-height: 98px;
-          display: grid;
-          place-items: center;
-          align-content: center;
-          gap: 8px;
-          padding: 14px 10px;
-          border-radius: 15px;
-          border: 1px solid rgba(128, 193, 240, 0.16);
-          background: rgba(4, 18, 30, 0.86);
-        }
-
-        .chain-item span {
-          color: var(--gold);
-          font-size: 9px;
-          font-weight: 900;
-        }
-
-        .chain-item strong {
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 15px;
-          font-weight: 500;
-        }
-
-        .chain-item b {
-          position: absolute;
-          right: -8px;
-          color: var(--gold);
-          z-index: 2;
-        }
-
-        .principle-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 14px;
-          margin-top: 24px;
         }
 
-        .principle-grid article {
-          min-height: 250px;
+        .registry-card {
+          min-height: 285px;
+          display: flex;
+          flex-direction: column;
           padding: 26px;
-          border-radius: 20px;
+          border-radius: 22px;
           border: 1px solid var(--line);
           background: linear-gradient(
             155deg,
-            rgba(11, 33, 51, 0.86),
-            rgba(4, 15, 26, 0.92)
+            rgba(12, 35, 54, 0.9),
+            rgba(4, 15, 26, 0.94)
           );
+          transition:
+            transform 0.22s ease,
+            border-color 0.22s ease,
+            box-shadow 0.22s ease;
         }
 
-        .principle-grid span {
+        .registry-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(109, 216, 255, 0.38);
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+        }
+
+        .card-topline {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .card-topline span {
           color: var(--gold);
           font-family: Georgia, serif;
-          font-size: 12px;
+          font-size: 13px;
         }
 
-        .principle-grid h3 {
-          margin: 42px 0 12px;
+        .card-topline strong {
+          padding: 6px 9px;
+          border-radius: 999px;
+          border: 1px solid rgba(109, 216, 255, 0.18);
+          background: rgba(10, 44, 69, 0.5);
+          color: #8edcff;
+          font-size: 8px;
+          letter-spacing: 0.08em;
+        }
+
+        .card-topline strong.next {
+          color: #ffd58b;
+          border-color: rgba(242, 191, 109, 0.24);
+          background: rgba(96, 59, 19, 0.25);
+        }
+
+        .registry-card h3 {
+          margin: 40px 0 12px;
           font-family: Georgia, "Times New Roman", serif;
-          font-size: 23px;
+          font-size: 30px;
           font-weight: 500;
         }
 
-        .principle-grid p {
+        .registry-card p {
           margin: 0;
           color: #9fb1c0;
           font-size: 13px;
-          line-height: 1.68;
+          line-height: 1.72;
         }
 
-        .state-grid {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 12px;
-          margin-top: 18px;
-        }
-
-        .state-grid article {
-          padding: 20px;
-          border-radius: 18px;
-          border: 1px solid var(--line);
-          background: rgba(5, 19, 32, 0.82);
-        }
-
-        .state-grid strong {
-          color: var(--blue);
-          font-size: 11px;
-          letter-spacing: 0.14em;
-        }
-
-        .state-grid p {
-          margin: 12px 0 0;
-          color: #a8b8c6;
-          font-size: 12px;
-          line-height: 1.62;
-        }
-
-        .gateway-section {
-          padding-top: 60px;
-        }
-
-        .gateway-grid {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 14px;
-        }
-
-        .gateway-card {
-          min-height: 290px;
-          display: flex;
-          flex-direction: column;
-          padding: 25px;
-          border-radius: 21px;
-          border: 1px solid rgba(128, 192, 239, 0.17);
-          background:
-            radial-gradient(
-              circle at 88% 0%,
-              rgba(44, 150, 239, 0.12),
-              transparent 34%
-            ),
-            linear-gradient(
-              155deg,
-              rgba(11, 32, 50, 0.9),
-              rgba(4, 14, 24, 0.94)
-            );
-          box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-          transition:
-            transform 0.22s ease,
-            border-color 0.22s ease;
-        }
-
-        .gateway-card:hover {
-          transform: translateY(-5px);
-          border-color: rgba(241, 189, 104, 0.32);
-        }
-
-        .gateway-topline {
+        .card-action {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 16px;
-        }
-
-        .gateway-topline > span {
-          color: var(--gold);
-          font-family: Georgia, serif;
-          font-size: 12px;
-        }
-
-        .gateway-topline small {
-          padding: 6px 9px;
-          border-radius: 999px;
-          border: 1px solid rgba(115, 194, 247, 0.18);
-          color: #8fb8d3;
-          font-size: 8px;
-          font-weight: 900;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
-        }
-
-        .gateway-card h3 {
-          margin: 38px 0 12px;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 25px;
-          font-weight: 500;
-          line-height: 1.15;
-        }
-
-        .gateway-card p {
-          margin: 0;
-          color: #9fb0bf;
-          font-size: 13px;
-          line-height: 1.68;
-        }
-
-        .gateway-card > a {
+          gap: 20px;
           margin-top: auto;
-          padding-top: 26px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          color: #cdeeff;
+          padding-top: 28px;
+          color: #d9f0ff;
           font-size: 11px;
           font-weight: 900;
-          letter-spacing: 0.07em;
-          text-transform: uppercase;
         }
 
-        .gateway-card > a span {
-          color: var(--gold);
+        .card-action b {
           font-size: 18px;
         }
 
-        .ecosystem-section {
+        .access-section,
+        .principle-section {
           padding-top: 60px;
         }
 
-        .ecosystem-links {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 12px;
-        }
-
-        .ecosystem-links a {
-          min-height: 80px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 18px;
-          padding: 20px;
-          border-radius: 17px;
-          border: 1px solid var(--line);
-          background: rgba(5, 20, 33, 0.84);
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 18px;
-        }
-
-        .ecosystem-links b {
-          color: var(--gold);
-        }
-
-        .boundary-section {
-          padding-top: 60px;
-        }
-
-        .boundary-card {
+        .access-card,
+        .principle-card {
           padding: 42px;
           border-radius: 28px;
-          border: 1px solid rgba(241, 189, 104, 0.25);
+          border: 1px solid rgba(242, 191, 109, 0.22);
           background:
             radial-gradient(
-              circle at 12% 0%,
+              circle at 10% 0%,
               rgba(189, 119, 32, 0.15),
               transparent 34%
             ),
@@ -1250,129 +795,94 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
               rgba(9, 28, 45, 0.96),
               rgba(4, 13, 23, 0.98)
             );
-          box-shadow: 0 28px 90px rgba(0, 0, 0, 0.32);
+          box-shadow: 0 28px 90px rgba(0, 0, 0, 0.3);
         }
 
-        .boundary-columns {
+        .access-card {
           display: grid;
-          grid-template-columns: 1fr 1fr;
-          gap: 16px;
-          margin-top: 34px;
+          grid-template-columns: 1.1fr 0.9fr;
+          gap: 34px;
+          align-items: center;
         }
 
-        .boundary-columns > div {
-          padding: 26px;
-          border-radius: 20px;
-          border: 1px solid var(--line);
-          background: rgba(5, 20, 33, 0.78);
-        }
-
-        .boundary-columns > div:last-child {
-          border-color: rgba(255, 142, 142, 0.16);
-          background: rgba(47, 20, 23, 0.34);
-        }
-
-        .boundary-columns h3 {
-          margin: 0 0 17px;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 22px;
-          font-weight: 500;
-        }
-
-        .boundary-columns ul {
-          margin: 0;
-          padding-left: 20px;
-          color: #aebecb;
-        }
-
-        .boundary-columns li {
-          margin: 10px 0;
-          font-size: 13px;
-          line-height: 1.6;
-        }
-
-        .boundary-actions {
-          display: flex;
-          flex-wrap: wrap;
+        .access-actions {
+          display: grid;
           gap: 12px;
-          margin-top: 28px;
+        }
+
+        .access-link {
+          min-height: 58px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          padding: 0 18px;
+          border-radius: 15px;
+          border: 1px solid rgba(109, 216, 255, 0.18);
+          background: linear-gradient(
+            180deg,
+            rgba(28, 68, 98, 0.72),
+            rgba(7, 23, 37, 0.9)
+          );
+          color: #e6f5ff;
+          font-size: 12px;
+          font-weight: 900;
+          transition: transform 0.2s ease;
+        }
+
+        .access-link:hover {
+          transform: translateX(4px);
+        }
+
+        .principle-card {
+          text-align: center;
+        }
+
+        .principle-card h2 {
+          max-width: 1050px;
+          margin: 0 auto;
+          color: transparent;
+          background: linear-gradient(90deg, #f7fbff, #78dcff, #ffd28a);
+          -webkit-background-clip: text;
+          background-clip: text;
+        }
+
+        .principle-card p {
+          max-width: 840px;
+          margin-left: auto;
+          margin-right: auto;
         }
 
         .footer {
-          display: grid;
-          grid-template-columns: 170px 1fr;
-          gap: 46px;
-          margin-top: 20px;
-          margin-bottom: 38px;
-          padding: 50px;
-          border: 1px solid rgba(128, 190, 239, 0.16);
-          border-radius: 30px;
-          background: linear-gradient(
-            155deg,
-            rgba(10, 30, 47, 0.94),
-            rgba(3, 12, 21, 0.98)
-          );
-        }
-
-        .footer-seal {
-          width: 150px;
-          height: 150px;
-          display: grid;
-          place-items: center;
-          border-radius: 50%;
-          border: 1px solid rgba(241, 189, 104, 0.42);
-          background: radial-gradient(
-            circle,
-            rgba(44, 129, 186, 0.25),
-            rgba(5, 19, 32, 0.94)
-          );
-          box-shadow: inset 0 0 0 8px rgba(255, 255, 255, 0.02);
-        }
-
-        .footer-seal span {
-          color: var(--gold);
-          font-family: Georgia, serif;
-          font-size: 28px;
-          font-weight: 900;
-        }
-
-        .footer-seal small {
-          margin-top: -42px;
-          color: #87a9c1;
-          font-size: 8px;
-          font-weight: 900;
-          letter-spacing: 0.22em;
-        }
-
-        .footer h2 {
-          font-size: clamp(31px, 4vw, 50px);
-        }
-
-        .footer > div:last-child > p:not(.eyebrow) {
-          max-width: 860px;
-          color: #aebdca;
-          line-height: 1.7;
-        }
-
-        .footer-meta {
           display: flex;
-          flex-wrap: wrap;
-          gap: 10px 18px;
-          margin-top: 26px;
-          padding-top: 22px;
+          justify-content: space-between;
+          gap: 30px;
+          padding: 45px 0 60px;
           border-top: 1px solid var(--line);
-          color: #a6bac9;
+          color: #8599aa;
+        }
+
+        .footer div {
+          display: grid;
+          gap: 5px;
+        }
+
+        .footer strong {
+          color: #d7e7f3;
+          font-family: Georgia, serif;
+          font-size: 16px;
+        }
+
+        .footer span,
+        .footer p {
+          margin: 0;
           font-size: 12px;
         }
 
-        .motto {
-          display: block;
-          margin-top: 24px;
-          color: #f2d198;
-          font-family: Georgia, "Times New Roman", serif;
-          font-size: 24px;
+        .footer p {
+          color: var(--gold);
+          font-family: Georgia, serif;
           font-style: italic;
-          font-weight: 500;
         }
 
         @keyframes drift {
@@ -1384,23 +894,17 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           }
         }
 
-        @media (max-width: 1100px) {
+        @media (max-width: 1000px) {
           .topbar nav {
             display: none;
           }
 
-          .identity-grid,
-          .principle-grid,
-          .state-grid {
+          .identity-strip {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .chain {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-          }
-
-          .gateway-grid {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+          .access-card {
+            grid-template-columns: 1fr;
           }
         }
 
@@ -1419,8 +923,8 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           }
 
           .hero {
-            width: min(100% - 28px, 1280px);
-            padding: 80px 0 72px;
+            width: min(100% - 28px, 1240px);
+            padding: 80px 0 70px;
           }
 
           .shell {
@@ -1428,44 +932,21 @@ export default function Ta14AdmissibleExecutionArchitecturePage() {
           }
 
           .section {
-            padding: 78px 0;
+            padding: 76px 0;
           }
 
-          .identity-grid,
-          .principle-grid,
-          .state-grid,
-          .gateway-grid,
-          .ecosystem-links,
-          .boundary-columns {
+          .registry-grid,
+          .identity-strip {
             grid-template-columns: 1fr;
           }
 
-          .chain {
-            grid-template-columns: 1fr;
-          }
-
-          .chain-item {
-            min-height: 76px;
-          }
-
-          .chain-item b {
-            right: 50%;
-            bottom: -15px;
-            transform: rotate(90deg);
-          }
-
-          .boundary-card {
+          .access-card,
+          .principle-card {
             padding: 30px 22px;
           }
 
           .footer {
-            grid-template-columns: 1fr;
-            padding: 34px 24px;
-          }
-
-          .footer-seal {
-            width: 130px;
-            height: 130px;
+            flex-direction: column;
           }
         }
 
