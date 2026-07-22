@@ -1,70 +1,29 @@
-import Link from 'next/link';
-import { createServerClient } from '@supabase/ssr';
-import { cookies } from 'next/headers';
-import { redirect } from 'next/navigation';
+'use client';
 
-type RegistrySubmission = {
+import Link from 'next/link';
+import { createBrowserClient } from '@supabase/ssr';
+import { useEffect, useMemo, useState } from 'react';
+
+type ReviewQueueItem = {
   id: string;
   governance_name: string;
   short_name: string | null;
-  claimant_name: string;
-  organization_name: string | null;
-  governance_category: string;
-  current_version: string;
+  current_version: string | null;
+  governance_category: string | null;
+  record_visibility: string | null;
   status: string;
   submitted_at: string | null;
   updated_at: string | null;
-  requested_review_pathway: string | null;
-  record_visibility: string | null;
-  registry_identifier: string | null;
+  created_at: string | null;
 };
 
-function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+type QueueFilter = 'all' | 'submitted' | 'accepted' | 'disputed';
 
-  if (!url || !anonKey) {
-    throw new Error('Supabase environment variables are not configured.');
-  }
-
-  return createServerClient(url, anonKey, {
-    cookies: {
-      getAll() {
-        return cookieStore.getAll();
-      },
-      setAll(values) {
-        try {
-          values.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
-        } catch {
-          // Server Components can read the current authenticated session even
-          // when response-cookie mutation is unavailable.
-        }
-      },
-    },
-  });
-}
-
-function parseReviewerEmails(): Set<string> {
-  return new Set(
-    (process.env.TA14_REGISTRY_REVIEWER_EMAILS ?? '')
-      .split(',')
-      .map((email) => email.trim().toLowerCase())
-      .filter(Boolean),
-  );
-}
-
-function formatDate(value: string | null): string {
-  if (!value) {
-    return 'Not recorded';
-  }
+function formatDate(value: string | null) {
+  if (!value) return 'Not recorded';
 
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
+  if (Number.isNaN(date.getTime())) return value;
 
   return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
@@ -72,599 +31,787 @@ function formatDate(value: string | null): string {
   }).format(date);
 }
 
-function statusLabel(status: string): string {
-  switch (status) {
-    case 'under_review':
-      return 'Under Review';
-    case 'submitted':
-      return 'Submitted';
-    case 'hold':
-      return 'Hold';
-    case 'escalated':
-      return 'Escalated';
-    default:
-      return status.replaceAll('_', ' ');
-  }
+function label(value: string | null | undefined, fallback = 'Not declared') {
+  if (!value?.trim()) return fallback;
+
+  return value
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function statusClass(status: string): string {
-  switch (status) {
-    case 'under_review':
-      return 'status statusReview';
-    case 'hold':
-      return 'status statusHold';
-    case 'escalated':
-      return 'status statusEscalated';
-    default:
-      return 'status statusSubmitted';
-  }
+function normalizedStatus(value: string) {
+  return value.trim().toLowerCase().replaceAll(' ', '_');
 }
 
-export default async function RegistryReviewPage() {
-  const cookieStore = await cookies();
-  const supabase = createSupabaseClient(cookieStore);
+export default function RegistryReviewerQueuePage() {
+  const [records, setRecords] = useState<ReviewQueueItem[]>([]);
+  const [filter, setFilter] = useState<QueueFilter>('all');
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const supabase = useMemo(() => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
-  if (!user) {
-    redirect(
-      '/sign-in?next=/workspace/ai-governance/registry/review',
+    if (!url || !anonKey) return null;
+
+    return createBrowserClient(url, anonKey);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadQueue() {
+      setLoading(true);
+      setError('');
+
+      try {
+        if (!supabase) {
+          throw new Error('Supabase environment variables are not configured.');
+        }
+
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError) throw sessionError;
+
+        if (!session?.access_token) {
+          throw new Error(
+            'Your reviewer session is missing or expired. Sign in again.',
+          );
+        }
+
+        const { data, error: queryError } = await supabase
+          .from('ai_governance_registry_submissions')
+          .select(
+            [
+              'id',
+              'governance_name',
+              'short_name',
+              'current_version',
+              'governance_category',
+              'record_visibility',
+              'status',
+              'submitted_at',
+              'updated_at',
+              'created_at',
+            ].join(','),
+          )
+          .in('status', ['submitted', 'accepted', 'disputed'])
+          .order('submitted_at', { ascending: true, nullsFirst: false });
+
+        if (queryError) throw queryError;
+        if (cancelled) return;
+
+        setRecords((data ?? []) as ReviewQueueItem[]);
+      } catch (caught) {
+        if (cancelled) return;
+
+        setError(
+          caught instanceof Error
+            ? caught.message
+            : 'The reviewer queue could not be loaded.',
+        );
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    void loadQueue();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase]);
+
+  const filteredRecords = useMemo(() => {
+    const query = search.trim().toLowerCase();
+
+    return records.filter((record) => {
+      const status = normalizedStatus(record.status);
+      const matchesFilter =
+        filter === 'all' ||
+        (filter === 'submitted' && status === 'submitted') ||
+        (filter === 'accepted' && status === 'accepted') ||
+        (filter === 'disputed' && status === 'disputed');
+
+      if (!matchesFilter) return false;
+      if (!query) return true;
+
+      return [
+        record.governance_name,
+        record.short_name,
+        record.current_version,
+        record.governance_category,
+        record.id,
+      ]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(query));
+    });
+  }, [filter, records, search]);
+
+  const counts = useMemo(() => {
+    return records.reduce(
+      (current, record) => {
+        const status = normalizedStatus(record.status);
+
+        current.all += 1;
+        if (status === 'submitted') current.submitted += 1;
+        if (status === 'accepted') current.accepted += 1;
+        if (status === 'disputed') current.disputed += 1;
+
+        return current;
+      },
+      { all: 0, submitted: 0, accepted: 0, disputed: 0 },
     );
-  }
-
-  const reviewerEmails = parseReviewerEmails();
-  const reviewerEmail = user.email?.toLowerCase() ?? '';
-  const isReviewer = reviewerEmails.has(reviewerEmail);
-
-  if (!isReviewer) {
-    return (
-      <main className="pageShell">
-        <section className="accessPanel">
-          <p className="eyebrow">TA-14 AI GOVERNANCE REGISTRY</p>
-          <h1>Registry Review Console</h1>
-          <p className="lead">
-            This workspace is restricted to authorized Registry reviewers.
-          </p>
-          <div className="boundaryBox">
-            <strong>Access boundary</strong>
-            <p>
-              Signing in does not create reviewer authority. Reviewer access
-              must be explicitly assigned by the TA-14 AI Governance Registry.
-            </p>
-          </div>
-          <Link
-            className="buttonSecondary"
-            href="/workspace/ai-governance/registry"
-          >
-            Return to Registry
-          </Link>
-        </section>
-
-        <style>{styles}</style>
-      </main>
-    );
-  }
-
-  const { data, error } = await supabase
-    .from('ai_governance_registry_submissions')
-    .select('*')
-    .in('status', ['submitted', 'under_review', 'hold', 'escalated'])
-    .order('submitted_at', { ascending: true });
-
-  const submissions = (data ?? []) as RegistrySubmission[];
-
-  const counts = submissions.reduce(
-    (accumulator, submission) => {
-      if (submission.status === 'submitted') accumulator.submitted += 1;
-      if (submission.status === 'under_review') accumulator.underReview += 1;
-      if (submission.status === 'hold') accumulator.hold += 1;
-      if (submission.status === 'escalated') accumulator.escalated += 1;
-      return accumulator;
-    },
-    { submitted: 0, underReview: 0, hold: 0, escalated: 0 },
-  );
+  }, [records]);
 
   return (
     <main className="pageShell">
+      <div className="stars starsOne" aria-hidden="true" />
+      <div className="stars starsTwo" aria-hidden="true" />
+      <div className="orbit orbitOne" aria-hidden="true" />
+      <div className="orbit orbitTwo" aria-hidden="true" />
+
+      <nav className="topBar">
+        <Link
+          href="/workspace/ai-governance/registry"
+          className="secondaryButton"
+        >
+          Registry Home
+        </Link>
+
+        <Link
+          href="/workspace/ai-governance/registry/directory"
+          className="textLink"
+        >
+          Public Directory
+        </Link>
+      </nav>
+
       <section className="hero">
         <div>
-          <p className="eyebrow">AUTHORIZED REVIEW WORKSPACE</p>
-          <h1>TA-14 Registry Review Console</h1>
+          <p className="eyebrow">CONTROLLED REVIEW WORKSPACE</p>
+          <h1>Registry Reviewer Queue</h1>
           <p className="lead">
-            Inspect submitted governance records, verify their preserved
-            evidence boundaries, and route each intake through a bounded
-            Registry decision.
+            Review submitted AI governance records, preserve bounded reviewer
+            decisions, resolve disputes, and finalize only records that have
+            reached the required lifecycle state.
           </p>
         </div>
 
-        <div className="reviewerCard">
-          <span>Signed in reviewer</span>
-          <strong>{user.email}</strong>
-          <small>
-            Reviewer access permits review activity. It does not authorize
-            certification, endorsement, or claims beyond the Registry record.
-          </small>
+        <aside className="boundaryPanel">
+          <p className="eyebrow">REVIEW BOUNDARY</p>
+          <strong>Review is not certification.</strong>
+          <p>
+            Reviewer actions evaluate Registry completeness and lifecycle
+            requirements. They do not certify effectiveness, legality, safety,
+            compliance, or operational fitness.
+          </p>
+        </aside>
+      </section>
+
+      <section className="controlCard">
+        <div className="filterRow" role="group" aria-label="Queue filters">
+          {(
+            [
+              ['all', 'All', counts.all],
+              ['submitted', 'Submitted', counts.submitted],
+              ['accepted', 'Accepted', counts.accepted],
+              ['disputed', 'Disputed', counts.disputed],
+            ] as const
+          ).map(([value, text, count]) => (
+            <button
+              key={value}
+              type="button"
+              className={filter === value ? 'filter activeFilter' : 'filter'}
+              onClick={() => setFilter(value)}
+            >
+              {text}
+              <span>{count}</span>
+            </button>
+          ))}
         </div>
+
+        <label className="searchBox">
+          <span>Search reviewer queue</span>
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Governance name, category, version, or submission ID"
+          />
+        </label>
       </section>
 
-      <section className="metrics" aria-label="Registry review queue metrics">
-        <article>
-          <span>Awaiting Review</span>
-          <strong>{counts.submitted}</strong>
-        </article>
-        <article>
-          <span>Under Review</span>
-          <strong>{counts.underReview}</strong>
-        </article>
-        <article>
-          <span>On Hold</span>
-          <strong>{counts.hold}</strong>
-        </article>
-        <article>
-          <span>Escalated</span>
-          <strong>{counts.escalated}</strong>
-        </article>
-      </section>
-
-      <section className="boundaryBox">
-        <strong>Registry decision boundary</strong>
-        <p>
-          Review determines whether the submitted identity, attribution,
-          claims, non-claims, limitations, authority basis, and supporting
-          record are sufficiently preserved for registration. It does not
-          certify that the governance architecture works, is legally
-          sufficient, or is suitable for any particular execution.
-        </p>
-      </section>
-
-      <section className="queueSection">
-        <div className="sectionHeading">
+      {loading ? (
+        <section className="stateCard">
+          <span className="pulseDot" aria-hidden="true" />
           <div>
-            <p className="eyebrow">SUBMITTED RECORDS</p>
-            <h2>Review Queue</h2>
-          </div>
-          <Link
-            className="buttonSecondary"
-            href="/workspace/ai-governance/registry"
-          >
-            Open Registry Institution
-          </Link>
-        </div>
-
-        {error ? (
-          <div className="errorBox">
-            <strong>Unable to load the review queue.</strong>
-            <p>{error.message}</p>
-          </div>
-        ) : submissions.length === 0 ? (
-          <div className="emptyState">
-            <strong>No Registry submissions are awaiting review.</strong>
+            <p className="eyebrow">REVIEWER QUEUE</p>
+            <h2>Loading controlled submissions.</h2>
             <p>
-              New records will appear here after a registrant completes the
-              intake, preserves evidence, accepts the declarations, and submits
-              the record for review.
+              Retrieving records available under the current reviewer
+              permissions.
             </p>
           </div>
-        ) : (
-          <div className="queueList">
-            {submissions.map((submission) => (
-              <article className="submissionCard" key={submission.id}>
+        </section>
+      ) : null}
+
+      {!loading && error ? (
+        <section className="stateCard errorCard">
+          <div>
+            <p className="eyebrow">QUEUE UNAVAILABLE</p>
+            <h2>The reviewer queue could not be opened.</h2>
+            <p>{error}</p>
+          </div>
+
+          <button
+            type="button"
+            className="primaryButton"
+            onClick={() => window.location.reload()}
+          >
+            Try Again
+          </button>
+        </section>
+      ) : null}
+
+      {!loading && !error && filteredRecords.length === 0 ? (
+        <section className="stateCard">
+          <div>
+            <p className="eyebrow">NO MATCHING RECORDS</p>
+            <h2>The current reviewer queue is clear.</h2>
+            <p>
+              No submissions match this lifecycle filter and search query.
+            </p>
+          </div>
+        </section>
+      ) : null}
+
+      {!loading && !error && filteredRecords.length > 0 ? (
+        <section className="queueGrid">
+          {filteredRecords.map((record) => {
+            const status = normalizedStatus(record.status);
+
+            return (
+              <article className="recordCard" key={record.id}>
                 <div className="cardTop">
                   <div>
-                    <div className="titleLine">
-                      <h3>{submission.governance_name}</h3>
-                      <span className={statusClass(submission.status)}>
-                        {statusLabel(submission.status)}
-                      </span>
-                    </div>
-                    {submission.short_name ? (
-                      <p className="shortName">{submission.short_name}</p>
-                    ) : null}
+                    <p className="eyebrow">{label(record.status)}</p>
+                    <h2>{record.governance_name}</h2>
                   </div>
+
+                  <span className={`statusBadge status-${status}`}>
+                    {label(record.status)}
+                  </span>
+                </div>
+
+                <p className="submissionId">{record.id}</p>
+
+                <dl className="detailGrid">
+                  <div>
+                    <dt>Short name</dt>
+                    <dd>{record.short_name || 'Not declared'}</dd>
+                  </div>
+                  <div>
+                    <dt>Category</dt>
+                    <dd>{label(record.governance_category)}</dd>
+                  </div>
+                  <div>
+                    <dt>Version</dt>
+                    <dd>{record.current_version || 'Not declared'}</dd>
+                  </div>
+                  <div>
+                    <dt>Visibility</dt>
+                    <dd>{label(record.record_visibility)}</dd>
+                  </div>
+                  <div>
+                    <dt>Submitted</dt>
+                    <dd>{formatDate(record.submitted_at)}</dd>
+                  </div>
+                  <div>
+                    <dt>Last updated</dt>
+                    <dd>{formatDate(record.updated_at || record.created_at)}</dd>
+                  </div>
+                </dl>
+
+                <div className="cardFooter">
+                  <p>
+                    Open the controlled submission to review evidence,
+                    preserve a decision, manage a dispute, or finalize an
+                    accepted record.
+                  </p>
+
                   <Link
-                    className="buttonPrimary"
-                    href={`/workspace/ai-governance/registry/review/${submission.id}`}
+                    href={`/workspace/ai-governance/registry/review/${encodeURIComponent(
+                      record.id,
+                    )}`}
+                    className="primaryButton"
                   >
                     Open Review
                   </Link>
                 </div>
-
-                <dl className="recordGrid">
-                  <div>
-                    <dt>Claimant</dt>
-                    <dd>{submission.claimant_name}</dd>
-                  </div>
-                  <div>
-                    <dt>Organization</dt>
-                    <dd>{submission.organization_name || 'Not declared'}</dd>
-                  </div>
-                  <div>
-                    <dt>Category</dt>
-                    <dd>{submission.governance_category}</dd>
-                  </div>
-                  <div>
-                    <dt>Version</dt>
-                    <dd>{submission.current_version}</dd>
-                  </div>
-                  <div>
-                    <dt>Review pathway</dt>
-                    <dd>
-                      {submission.requested_review_pathway || 'Standard review'}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>Submitted</dt>
-                    <dd>{formatDate(submission.submitted_at)}</dd>
-                  </div>
-                  <div>
-                    <dt>Visibility request</dt>
-                    <dd>{submission.record_visibility || 'Private'}</dd>
-                  </div>
-                  <div>
-                    <dt>Registry identifier</dt>
-                    <dd>
-                      {submission.registry_identifier || 'Not yet assigned'}
-                    </dd>
-                  </div>
-                </dl>
               </article>
-            ))}
-          </div>
-        )}
-      </section>
+            );
+          })}
+        </section>
+      ) : null}
 
-      <style>{styles}</style>
+      <style jsx global>{styles}</style>
     </main>
   );
 }
 
 const styles = `
-  :global(*) {
+  * {
     box-sizing: border-box;
   }
 
-  :global(body) {
+  body {
     margin: 0;
     background:
-      radial-gradient(circle at 15% 15%, rgba(78, 124, 255, 0.16), transparent 34rem),
-      radial-gradient(circle at 85% 10%, rgba(114, 255, 213, 0.10), transparent 30rem),
+      radial-gradient(circle at 10% 8%, rgba(72, 122, 255, 0.18), transparent 32rem),
+      radial-gradient(circle at 88% 12%, rgba(103, 231, 195, 0.12), transparent 30rem),
+      radial-gradient(circle at 50% 95%, rgba(255, 184, 82, 0.08), transparent 32rem),
       #07101f;
     color: #eef4ff;
   }
 
   .pageShell {
+    position: relative;
     min-height: 100vh;
-    padding: 48px 24px 80px;
+    overflow: hidden;
+    padding: 32px 24px 88px;
   }
 
+  .pageShell > *:not(.stars):not(.orbit) {
+    position: relative;
+    z-index: 2;
+  }
+
+  .stars {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.42;
+    background-image:
+      radial-gradient(circle, rgba(255,255,255,.8) 0 1px, transparent 1.3px);
+    background-size: 54px 54px;
+    animation: starDrift 28s linear infinite;
+  }
+
+  .starsTwo {
+    opacity: 0.18;
+    background-size: 86px 86px;
+    animation-duration: 48s;
+    animation-direction: reverse;
+  }
+
+  .orbit {
+    position: fixed;
+    width: 430px;
+    height: 430px;
+    border: 1px solid rgba(127, 228, 196, 0.12);
+    border-radius: 50%;
+    pointer-events: none;
+    animation: rotateOrbit 36s linear infinite;
+  }
+
+  .orbit::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    top: 22px;
+    left: 210px;
+    border-radius: 50%;
+    background: rgba(127, 228, 196, 0.85);
+    box-shadow: 0 0 24px rgba(127, 228, 196, 0.9);
+  }
+
+  .orbitOne {
+    top: 4%;
+    right: -200px;
+  }
+
+  .orbitTwo {
+    width: 540px;
+    height: 540px;
+    left: -250px;
+    bottom: 2%;
+    animation-duration: 52s;
+    animation-direction: reverse;
+  }
+
+  .topBar,
   .hero,
-  .queueSection,
-  .metrics,
-  .boundaryBox,
-  .accessPanel {
+  .controlCard,
+  .queueGrid,
+  .stateCard {
     width: min(1180px, 100%);
     margin-inline: auto;
   }
 
+  .topBar {
+    margin-bottom: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+  }
+
   .hero {
+    margin-bottom: 20px;
     display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.8fr);
-    gap: 28px;
-    align-items: end;
-    margin-bottom: 28px;
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+    gap: 24px;
+  }
+
+  .hero > div,
+  .boundaryPanel,
+  .controlCard,
+  .recordCard,
+  .stateCard {
+    border: 1px solid rgba(164, 190, 231, 0.18);
+    background: rgba(11, 25, 47, 0.86);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+    backdrop-filter: blur(18px);
+  }
+
+  .hero > div,
+  .boundaryPanel,
+  .controlCard,
+  .recordCard,
+  .stateCard {
+    border-radius: 24px;
+  }
+
+  .hero > div {
+    padding: clamp(28px, 5vw, 52px);
+  }
+
+  .boundaryPanel {
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  .boundaryPanel strong {
+    margin-bottom: 12px;
+    font-size: 1.7rem;
   }
 
   h1,
   h2,
-  h3,
   p {
     margin-top: 0;
   }
 
   h1 {
-    max-width: 820px;
     margin-bottom: 18px;
-    font-size: clamp(2.5rem, 6vw, 5.6rem);
-    line-height: 0.96;
+    font-size: clamp(2.8rem, 6vw, 5.8rem);
+    line-height: 0.95;
     letter-spacing: -0.055em;
   }
 
   h2 {
-    margin-bottom: 0;
-    font-size: clamp(1.8rem, 3vw, 3rem);
+    margin-bottom: 10px;
+    font-size: clamp(1.45rem, 2.8vw, 2.2rem);
     letter-spacing: -0.035em;
   }
 
-  h3 {
-    margin-bottom: 0;
-    font-size: 1.35rem;
-  }
-
   .eyebrow {
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     color: #7fe4c4;
-    font-size: 0.78rem;
-    font-weight: 800;
+    font-size: 0.76rem;
+    font-weight: 900;
     letter-spacing: 0.18em;
   }
 
-  .lead {
-    max-width: 760px;
+  .lead,
+  .boundaryPanel p,
+  .recordCard p,
+  .stateCard p {
     margin-bottom: 0;
-    color: #b9c7df;
-    font-size: 1.08rem;
-    line-height: 1.75;
+    color: #aebdd4;
+    line-height: 1.7;
   }
 
-  .reviewerCard,
-  .boundaryBox,
-  .submissionCard,
-  .emptyState,
-  .errorBox,
-  .accessPanel {
-    border: 1px solid rgba(164, 190, 231, 0.18);
-    background: rgba(11, 25, 47, 0.82);
-    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
-    backdrop-filter: blur(18px);
+  .controlCard {
+    margin-bottom: 18px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr);
+    gap: 20px;
+    align-items: end;
   }
 
-  .reviewerCard {
-    padding: 22px;
-    border-radius: 22px;
+  .filterRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 9px;
   }
 
-  .reviewerCard span,
-  .reviewerCard small {
-    display: block;
-    color: #91a2be;
+  .filter {
+    min-height: 42px;
+    padding: 8px 12px;
+    display: inline-flex;
+    gap: 8px;
+    align-items: center;
+    border: 1px solid rgba(164, 190, 231, 0.2);
+    border-radius: 999px;
+    background: rgba(8, 19, 37, 0.58);
+    color: #c3cee0;
+    font: inherit;
+    font-weight: 850;
+    cursor: pointer;
   }
 
-  .reviewerCard strong {
-    display: block;
-    margin: 8px 0 16px;
+  .filter span {
+    min-width: 24px;
+    padding: 3px 6px;
+    border-radius: 999px;
+    background: rgba(127, 228, 196, 0.12);
+    color: #9ff0d6;
+    text-align: center;
+    font-size: 0.76rem;
+  }
+
+  .activeFilter {
+    border-color: rgba(127, 228, 196, 0.55);
+    background: rgba(31, 71, 91, 0.6);
+    color: #effff9;
+  }
+
+  .searchBox {
+    display: grid;
+    gap: 7px;
+    color: #9dadc3;
+    font-size: 0.74rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .searchBox input {
+    min-height: 46px;
+    width: 100%;
+    border: 1px solid rgba(164, 190, 231, 0.22);
+    border-radius: 12px;
+    outline: none;
+    padding: 0 14px;
+    background: rgba(7, 17, 33, 0.72);
+    color: #eef4ff;
+    font: inherit;
+  }
+
+  .searchBox input:focus {
+    border-color: rgba(127, 228, 196, 0.7);
+    box-shadow: 0 0 0 3px rgba(127, 228, 196, 0.08);
+  }
+
+  .queueGrid {
+    display: grid;
+    gap: 16px;
+  }
+
+  .recordCard {
+    padding: 24px;
+  }
+
+  .cardTop,
+  .cardFooter {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+  }
+
+  .statusBadge {
+    padding: 8px 11px;
+    flex: 0 0 auto;
+    border: 1px solid rgba(164, 190, 231, 0.22);
+    border-radius: 999px;
+    color: #dbe7f9;
+    font-size: 0.77rem;
+    font-weight: 900;
+  }
+
+  .status-submitted {
+    border-color: rgba(126, 182, 255, 0.42);
+    background: rgba(69, 111, 174, 0.22);
+    color: #bcd9ff;
+  }
+
+  .status-accepted {
+    border-color: rgba(127, 228, 196, 0.42);
+    background: rgba(34, 118, 92, 0.22);
+    color: #bff7e5;
+  }
+
+  .status-disputed {
+    border-color: rgba(255, 184, 82, 0.42);
+    background: rgba(161, 99, 20, 0.22);
+    color: #ffdda7;
+  }
+
+  .submissionId {
+    margin: 2px 0 18px !important;
+    color: #ffd27f !important;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 0.8rem;
     overflow-wrap: anywhere;
   }
 
-  .reviewerCard small {
-    line-height: 1.6;
-  }
-
-  .metrics {
+  .detailGrid {
+    margin: 0 0 20px;
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 14px;
-    margin-bottom: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
   }
 
-  .metrics article {
-    padding: 20px;
-    border: 1px solid rgba(164, 190, 231, 0.15);
-    border-radius: 18px;
-    background: rgba(13, 29, 54, 0.72);
-  }
-
-  .metrics span {
-    display: block;
-    color: #9cadc8;
-    font-size: 0.78rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-  }
-
-  .metrics strong {
-    display: block;
-    margin-top: 10px;
-    font-size: 2rem;
-  }
-
-  .boundaryBox {
-    margin-bottom: 34px;
-    padding: 20px 22px;
-    border-left: 4px solid #7fe4c4;
-    border-radius: 16px;
-  }
-
-  .boundaryBox strong {
-    display: block;
-    margin-bottom: 7px;
-  }
-
-  .boundaryBox p {
-    margin-bottom: 0;
-    color: #b8c6dc;
-    line-height: 1.65;
-  }
-
-  .queueSection {
-    padding-top: 8px;
-  }
-
-  .sectionHeading,
-  .cardTop,
-  .titleLine {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .sectionHeading {
-    margin-bottom: 20px;
-  }
-
-  .queueList {
-    display: grid;
-    gap: 18px;
-  }
-
-  .submissionCard {
-    padding: 24px;
-    border-radius: 22px;
-  }
-
-  .shortName {
-    margin: 8px 0 0;
-    color: #91a2be;
-  }
-
-  .status {
-    display: inline-flex;
-    padding: 7px 10px;
-    border: 1px solid transparent;
-    border-radius: 999px;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    white-space: nowrap;
-  }
-
-  .statusSubmitted {
-    border-color: rgba(108, 166, 255, 0.45);
-    background: rgba(60, 116, 205, 0.17);
-    color: #9ec8ff;
-  }
-
-  .statusReview {
-    border-color: rgba(127, 228, 196, 0.45);
-    background: rgba(53, 170, 135, 0.16);
-    color: #9df0d5;
-  }
-
-  .statusHold {
-    border-color: rgba(255, 202, 92, 0.45);
-    background: rgba(173, 118, 20, 0.16);
-    color: #ffd98c;
-  }
-
-  .statusEscalated {
-    border-color: rgba(255, 124, 145, 0.45);
-    background: rgba(173, 49, 76, 0.16);
-    color: #ffadbb;
-  }
-
-  .recordGrid {
-    display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 18px;
-    margin: 24px 0 0;
-  }
-
-  .recordGrid div {
+  .detailGrid > div {
     min-width: 0;
+    padding: 14px;
+    border: 1px solid rgba(164, 190, 231, 0.1);
+    border-radius: 13px;
+    background: rgba(7, 17, 33, 0.36);
   }
 
-  .recordGrid dt {
+  dt {
     margin-bottom: 6px;
     color: #8092ae;
-    font-size: 0.75rem;
-    font-weight: 800;
+    font-size: 0.68rem;
+    font-weight: 900;
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
 
-  .recordGrid dd {
+  dd {
     margin: 0;
-    color: #e6edfa;
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
 
-  .buttonPrimary,
-  .buttonSecondary {
+  .cardFooter {
+    align-items: center;
+    padding-top: 18px;
+    border-top: 1px solid rgba(164, 190, 231, 0.1);
+  }
+
+  .cardFooter p {
+    max-width: 720px;
+  }
+
+  .stateCard {
+    min-height: 300px;
+    padding: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 28px;
+  }
+
+  .errorCard {
+    border-color: rgba(255, 124, 145, 0.28);
+  }
+
+  .pulseDot {
+    width: 16px;
+    height: 16px;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: #7fe4c4;
+    box-shadow: 0 0 28px rgba(127, 228, 196, 0.9);
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+
+  .primaryButton,
+  .secondaryButton {
+    min-height: 46px;
+    padding: 11px 17px;
     display: inline-flex;
-    min-height: 44px;
     align-items: center;
     justify-content: center;
-    padding: 11px 16px;
-    border-radius: 12px;
+    border-radius: 13px;
+    font: inherit;
+    font-weight: 900;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .primaryButton {
+    border: 1px solid rgba(255, 226, 167, 0.72);
+    background: linear-gradient(135deg, #ffe4a6, #e8a33d);
+    color: #171005;
+  }
+
+  .secondaryButton {
+    border: 1px solid rgba(164, 190, 231, 0.3);
+    background: rgba(15, 34, 63, 0.74);
+    color: #eef4ff;
+  }
+
+  .textLink {
+    color: #9ec8ff;
     font-weight: 800;
     text-decoration: none;
-    transition:
-      transform 160ms ease,
-      border-color 160ms ease,
-      background 160ms ease;
   }
 
-  .buttonPrimary {
-    border: 1px solid #7fe4c4;
-    background: #7fe4c4;
-    color: #07101f;
+  @keyframes starDrift {
+    from { transform: translate3d(0, 0, 0); }
+    to { transform: translate3d(54px, 54px, 0); }
   }
 
-  .buttonSecondary {
-    border: 1px solid rgba(164, 190, 231, 0.32);
-    background: rgba(15, 34, 63, 0.7);
-    color: #eaf1ff;
+  @keyframes rotateOrbit {
+    to { transform: rotate(360deg); }
   }
 
-  .buttonPrimary:hover,
-  .buttonSecondary:hover {
-    transform: translateY(-1px);
+  @keyframes pulse {
+    0%, 100% { transform: scale(0.85); opacity: 0.6; }
+    50% { transform: scale(1.2); opacity: 1; }
   }
 
-  .emptyState,
-  .errorBox {
-    padding: 30px;
-    border-radius: 20px;
-  }
-
-  .emptyState p,
-  .errorBox p {
-    margin: 8px 0 0;
-    color: #aebdd3;
-    line-height: 1.65;
-  }
-
-  .errorBox {
-    border-color: rgba(255, 124, 145, 0.38);
-  }
-
-  .accessPanel {
-    max-width: 760px;
-    margin-top: 8vh;
-    padding: 38px;
-    border-radius: 26px;
-  }
-
-  .accessPanel .buttonSecondary {
-    margin-top: 8px;
-  }
-
-  @media (max-width: 900px) {
-    .hero {
+  @media (max-width: 920px) {
+    .hero,
+    .controlCard,
+    .detailGrid {
       grid-template-columns: 1fr;
     }
 
-    .metrics,
-    .recordGrid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .cardFooter {
+      align-items: stretch;
+      flex-direction: column;
     }
   }
 
-  @media (max-width: 620px) {
+  @media (max-width: 650px) {
     .pageShell {
       padding-inline: 16px;
     }
 
-    .metrics,
-    .recordGrid {
-      grid-template-columns: 1fr;
-    }
-
-    .sectionHeading,
+    .topBar,
     .cardTop,
-    .titleLine {
-      align-items: flex-start;
+    .stateCard {
+      align-items: stretch;
       flex-direction: column;
     }
 
-    .buttonPrimary,
-    .buttonSecondary {
+    .primaryButton,
+    .secondaryButton {
       width: 100%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stars,
+    .orbit,
+    .pulseDot {
+      animation: none;
     }
   }
 `;
