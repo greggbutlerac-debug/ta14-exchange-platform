@@ -5,12 +5,44 @@ import {
   ChangeEvent,
   DragEvent,
   FormEvent,
+  useEffect,
   useMemo,
   useRef,
   useState,
 } from 'react';
 
 type Visibility = 'PUBLIC' | 'CONTROLLED' | 'PRIVATE';
+type ContactVisibility = 'REGISTRY_FORM' | 'WEBSITE_ONLY' | 'PUBLIC_EMAIL' | 'PRIVATE';
+type AuthorityRole =
+  | 'Founder'
+  | 'Author'
+  | 'Current steward'
+  | 'Organization representative'
+  | 'Legal representative'
+  | 'Authorized submitter'
+  | 'Contributor'
+  | 'Third-party claimant'
+  | 'Other';
+type ReviewPathway =
+  | 'Record-only registration'
+  | 'Administrative completeness review'
+  | 'Identity and authority review'
+  | 'Evidence review'
+  | 'Independent governance review'
+  | 'Partner Review Network review'
+  | 'Public dispute resolution pathway';
+type EvidenceRelationship =
+  | 'Identity'
+  | 'Establishment date'
+  | 'Authorship'
+  | 'Governance claim'
+  | 'Technical architecture'
+  | 'Public disclosure'
+  | 'Ownership or licensing'
+  | 'Demonstration'
+  | 'Independent review'
+  | 'Regulatory mapping'
+  | 'Other';
 type EvidenceCategory =
   | 'Founding declaration'
   | 'Governance specification'
@@ -29,16 +61,21 @@ type EvidenceFile = {
   category: EvidenceCategory;
   description: string;
   visibility: Visibility;
+  relationship: EvidenceRelationship;
+  sha256: string;
 };
 
 type FormState = {
   governanceName: string;
   shortName: string;
   currentVersion: string;
+  effectiveVersionDate: string;
   establishmentDate: string;
   governanceCategory: string;
   claimantName: string;
   claimantType: string;
+  authorityRole: AuthorityRole;
+  authorityEvidence: string;
   stewardName: string;
   organization: string;
   contactEmail: string;
@@ -52,6 +89,12 @@ type FormState = {
   ownershipDeclaration: string;
   license: string;
   recordVisibility: Visibility;
+  contactVisibility: ContactVisibility;
+  allowReviewRequests: boolean;
+  allowCollaboration: boolean;
+  allowDisputeNotices: boolean;
+  disputes: string;
+  reviewPathway: ReviewPathway;
   publicContact: boolean;
   authorityConfirmed: boolean;
   accuracyConfirmed: boolean;
@@ -92,14 +135,41 @@ const evidenceCategories: EvidenceCategory[] = [
   'Other supporting evidence',
 ];
 
+
+const evidenceRelationships: EvidenceRelationship[] = [
+  'Identity',
+  'Establishment date',
+  'Authorship',
+  'Governance claim',
+  'Technical architecture',
+  'Public disclosure',
+  'Ownership or licensing',
+  'Demonstration',
+  'Independent review',
+  'Regulatory mapping',
+  'Other',
+];
+
+const DRAFT_KEY = 'ta14-ai-governance-registry-intake-draft-v2';
+
+async function sha256File(file: File) {
+  const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
+  return Array.from(new Uint8Array(digest))
+    .map((value) => value.toString(16).padStart(2, '0'))
+    .join('');
+}
+
 const initialForm: FormState = {
   governanceName: '',
   shortName: '',
   currentVersion: '1.0',
+  effectiveVersionDate: '',
   establishmentDate: '',
   governanceCategory: '',
   claimantName: '',
   claimantType: 'Individual founder or author',
+  authorityRole: 'Founder',
+  authorityEvidence: '',
   stewardName: '',
   organization: '',
   contactEmail: '',
@@ -113,6 +183,12 @@ const initialForm: FormState = {
   ownershipDeclaration: '',
   license: '',
   recordVisibility: 'PUBLIC',
+  contactVisibility: 'REGISTRY_FORM',
+  allowReviewRequests: true,
+  allowCollaboration: true,
+  allowDisputeNotices: true,
+  disputes: '',
+  reviewPathway: 'Record-only registration',
   publicContact: false,
   authorityConfirmed: false,
   accuracyConfirmed: false,
@@ -148,14 +224,18 @@ export default function RegisterGovernancePage() {
     const checks = [
       form.governanceName,
       form.currentVersion,
+      form.effectiveVersionDate,
       form.establishmentDate,
       form.governanceCategory,
       form.claimantName,
+      form.authorityRole,
+      form.authorityEvidence,
       form.contactEmail,
       form.plainDescription,
       form.claims,
       form.nonClaims,
       form.ownershipDeclaration,
+      form.reviewPathway,
       form.authorityConfirmed,
       form.accuracyConfirmed,
       form.boundaryConfirmed,
@@ -164,12 +244,15 @@ export default function RegisterGovernancePage() {
     return Math.round((complete / checks.length) * 100);
   }, [form]);
 
+  const requiredItems = 17;
+  const missingRequired = Math.max(0, Math.ceil(requiredItems * (100 - requiredCompletion) / 100));
+
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
     setMessage('');
   }
 
-  function addFiles(incoming: File[]) {
+  async function addFiles(incoming: File[]) {
     const nextErrors: string[] = [];
     const currentKeys = new Set(
       files.map((item) => `${item.file.name}:${item.file.size}:${item.file.lastModified}`),
@@ -209,6 +292,8 @@ export default function RegisterGovernancePage() {
         category: 'Other supporting evidence',
         description: '',
         visibility: form.recordVisibility,
+        relationship: 'Other',
+        sha256: await sha256File(file),
       });
     }
 
@@ -232,7 +317,7 @@ export default function RegisterGovernancePage() {
 
   function updateEvidence(
     id: string,
-    changes: Partial<Pick<EvidenceFile, 'category' | 'description' | 'visibility'>>,
+    changes: Partial<Pick<EvidenceFile, 'category' | 'description' | 'visibility' | 'relationship'>>,
   ) {
     setFiles((current) =>
       current.map((item) => (item.id === id ? { ...item, ...changes } : item)),
@@ -244,13 +329,56 @@ export default function RegisterGovernancePage() {
     setMessage('Evidence file removed from this intake package.');
   }
 
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(DRAFT_KEY);
+    if (!saved) return;
+    try {
+      const parsed = JSON.parse(saved) as { form?: FormState };
+      if (parsed.form) {
+        setForm({ ...initialForm, ...parsed.form });
+        setMessage('A browser draft is available. Evidence files must be reattached because browsers do not preserve local files in saved drafts.');
+      }
+    } catch {
+      window.localStorage.removeItem(DRAFT_KEY);
+    }
+  }, []);
+
+  function saveDraft() {
+    window.localStorage.setItem(
+      DRAFT_KEY,
+      JSON.stringify({ savedAt: new Date().toISOString(), form }),
+    );
+    setErrors([]);
+    setMessage('Draft saved in this browser. Evidence files are not included and must be reattached when the draft is resumed.');
+  }
+
+  function discardDraft() {
+    window.localStorage.removeItem(DRAFT_KEY);
+    setForm(initialForm);
+    setFiles([]);
+    setErrors([]);
+    setMessage('Browser draft discarded.');
+  }
+
+  function reviewMissingItems() {
+    validate();
+    document.querySelector<HTMLElement>('[data-required-incomplete="true"]')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    });
+  }
+
   function validate() {
     const nextErrors: string[] = [];
     if (!form.governanceName.trim()) nextErrors.push('Governance name is required.');
     if (!form.currentVersion.trim()) nextErrors.push('Current version is required.');
+    if (!form.effectiveVersionDate) nextErrors.push('Effective version date is required.');
     if (!form.establishmentDate) nextErrors.push('Claimed establishment date is required.');
     if (!form.governanceCategory.trim()) nextErrors.push('Governance category is required.');
     if (!form.claimantName.trim()) nextErrors.push('Claimant name is required.');
+    if (!form.authorityRole) nextErrors.push('Submission authority role is required.');
+    if (!form.authorityEvidence.trim()) nextErrors.push('Authority evidence or explanation is required.');
     if (!form.contactEmail.trim()) nextErrors.push('Contact email is required.');
     if (!form.plainDescription.trim()) nextErrors.push('Plain-language description is required.');
     if (!form.claims.trim()) nextErrors.push('At least one affirmative claim is required.');
@@ -261,6 +389,8 @@ export default function RegisterGovernancePage() {
     if (!form.authorityConfirmed) nextErrors.push('Submission authority must be confirmed.');
     if (!form.accuracyConfirmed) nextErrors.push('Accuracy declaration must be confirmed.');
     if (!form.boundaryConfirmed) nextErrors.push('Registry boundary must be acknowledged.');
+
+    if (!form.reviewPathway) nextErrors.push('A requested review pathway is required.');
 
     const undocumented = files.filter((item) => !item.description.trim());
     if (undocumented.length > 0) {
@@ -285,8 +415,10 @@ export default function RegisterGovernancePage() {
         sizeBytes: item.file.size,
         lastModified: new Date(item.file.lastModified).toISOString(),
         category: item.category,
+        relationship: item.relationship,
         description: item.description,
         visibility: item.visibility,
+        sha256: item.sha256,
       })),
     };
   }
@@ -345,6 +477,9 @@ export default function RegisterGovernancePage() {
           <Link href="/workspace/ai-governance/registry" className="nav-button">
             Registry Method
           </Link>
+          <Link href="/workspace/ai-governance/registry/records" className="nav-button">
+            Search Registry
+          </Link>
           <Link href="/workspace" className="nav-button">
             Open Workspace
           </Link>
@@ -371,10 +506,15 @@ export default function RegisterGovernancePage() {
       <section className="progress-panel" aria-label="Intake completion">
         <div>
           <span>Required intake completion</span>
-          <strong>{requiredCompletion}%</strong>
+          <strong>{requiredCompletion}% · {missingRequired} required item{missingRequired === 1 ? '' : 's'} remain</strong>
         </div>
         <div className="progress-track">
           <div className="progress-fill" style={{ width: `${requiredCompletion}%` }} />
+        </div>
+        <div className="progress-actions">
+          <button type="button" className="mini-button" onClick={saveDraft}>Save Draft</button>
+          <button type="button" className="mini-button" onClick={reviewMissingItems}>Review Missing Items</button>
+          <button type="button" className="mini-button danger" onClick={discardDraft}>Discard Draft</button>
         </div>
         <div className="progress-meta">
           <span>{files.length} evidence files</span>
@@ -417,7 +557,17 @@ export default function RegisterGovernancePage() {
                 placeholder="1.0"
               />
             </label>
-            <label>
+            <label data-required-incomplete={!form.effectiveVersionDate}>
+              Effective version date <em>Required</em>
+              <span className="date-wrap">
+                <input
+                  type="date"
+                  value={form.effectiveVersionDate}
+                  onChange={(event) => updateField('effectiveVersionDate', event.target.value)}
+                />
+              </span>
+            </label>
+            <label data-required-incomplete={!form.establishmentDate}>
               Claimed establishment date <em>Required</em>
               <span className="date-wrap">
                 <input
@@ -481,6 +631,25 @@ export default function RegisterGovernancePage() {
                 <option>Joint claimants</option>
               </select>
             </label>
+            <label data-required-incomplete={!form.authorityRole}>
+              Submission authority role <em>Required</em>
+              <select
+                value={form.authorityRole}
+                onChange={(event) => updateField('authorityRole', event.target.value as AuthorityRole)}
+              >
+                {['Founder','Author','Current steward','Organization representative','Legal representative','Authorized submitter','Contributor','Third-party claimant','Other'].map((role) => (
+                  <option key={role}>{role}</option>
+                ))}
+              </select>
+            </label>
+            <label data-required-incomplete={!form.authorityEvidence.trim()}>
+              Authority evidence or explanation <em>Required</em>
+              <input
+                value={form.authorityEvidence}
+                onChange={(event) => updateField('authorityEvidence', event.target.value)}
+                placeholder="Appointment, authorization, founding record, public role, or disclosed limitation"
+              />
+            </label>
             <label>
               Current steward
               <input
@@ -516,14 +685,25 @@ export default function RegisterGovernancePage() {
               />
             </label>
           </div>
-          <label className="check-row">
-            <input
-              type="checkbox"
-              checked={form.publicContact}
-              onChange={(event) => updateField('publicContact', event.target.checked)}
-            />
-            <span>Permit the Registry to display the submitted contact route publicly.</span>
-          </label>
+          <div className="field-grid two">
+            <label>
+              Public contact treatment
+              <select
+                value={form.contactVisibility}
+                onChange={(event) => updateField('contactVisibility', event.target.value as ContactVisibility)}
+              >
+                <option value="REGISTRY_FORM">Registry-managed contact form</option>
+                <option value="WEBSITE_ONLY">Display website only</option>
+                <option value="PUBLIC_EMAIL">Display submitted email publicly</option>
+                <option value="PRIVATE">Keep contact private</option>
+              </select>
+            </label>
+          </div>
+          <div className="contact-permissions">
+            <label className="check-row"><input type="checkbox" checked={form.allowReviewRequests} onChange={(event) => updateField('allowReviewRequests', event.target.checked)} /><span>Allow governed review requests.</span></label>
+            <label className="check-row"><input type="checkbox" checked={form.allowCollaboration} onChange={(event) => updateField('allowCollaboration', event.target.checked)} /><span>Allow collaboration inquiries.</span></label>
+            <label className="check-row"><input type="checkbox" checked={form.allowDisputeNotices} onChange={(event) => updateField('allowDisputeNotices', event.target.checked)} /><span>Allow formal dispute notices.</span></label>
+          </div>
         </section>
 
         <section className="form-section">
@@ -672,7 +852,8 @@ export default function RegisterGovernancePage() {
                         Remove
                       </button>
                     </div>
-                    <div className="field-grid two compact">
+                    <div className="hash-line"><strong>SHA-256</strong><code>{item.sha256}</code></div>
+                    <div className="field-grid three compact">
                       <label>
                         Evidence category
                         <select
@@ -685,6 +866,17 @@ export default function RegisterGovernancePage() {
                         >
                           {evidenceCategories.map((category) => (
                             <option key={category}>{category}</option>
+                          ))}
+                        </select>
+                      </label>
+                      <label>
+                        Declared evidence relationship
+                        <select
+                          value={item.relationship}
+                          onChange={(event) => updateEvidence(item.id, { relationship: event.target.value as EvidenceRelationship })}
+                        >
+                          {evidenceRelationships.map((relationship) => (
+                            <option key={relationship}>{relationship}</option>
                           ))}
                         </select>
                       </label>
@@ -753,6 +945,32 @@ export default function RegisterGovernancePage() {
             </label>
           </div>
 
+          <label>
+            Known disputes, competing claims, or attribution conflicts
+            <textarea
+              rows={6}
+              value={form.disputes}
+              onChange={(event) => updateField('disputes', event.target.value)}
+              placeholder="Disclose contested authorship, ownership disagreements, former collaborators, competing establishment dates, known objections, or pending proceedings. State 'None known' when appropriate."
+            />
+          </label>
+
+          <div className="review-pathway-panel">
+            <label data-required-incomplete={!form.reviewPathway}>
+              Requested Registry pathway <em>Required</em>
+              <select value={form.reviewPathway} onChange={(event) => updateField('reviewPathway', event.target.value as ReviewPathway)}>
+                <option>Record-only registration</option>
+                <option>Administrative completeness review</option>
+                <option>Identity and authority review</option>
+                <option>Evidence review</option>
+                <option>Independent governance review</option>
+                <option>Partner Review Network review</option>
+                <option>Public dispute resolution pathway</option>
+              </select>
+            </label>
+            <p>The selected pathway defines the requested depth of review. Registration alone remains distinct from certification, endorsement, legal compliance, or technical validation.</p>
+          </div>
+
           <div className="declaration-stack">
             <label className="declaration-row">
               <input
@@ -819,18 +1037,16 @@ export default function RegisterGovernancePage() {
             <div className="eyebrow">REVIEW-READY INTAKE PACKAGE</div>
             <h2>Preserve the declaration before requesting registration.</h2>
             <p>
-              Generate a JSON manifest containing the completed registration metadata and
-              evidence manifest. Files stay on this device until persistent Registry
-              storage and review workflow are connected.
+              Review and validate the registration, then download a local JSON manifest containing the metadata, declared evidence relationships, and SHA-256 file hashes. No files or registration data are currently transmitted to or preserved by the TA-14 AI Governance Registry. A Registry record does not exist until intake is formally submitted, accepted, assigned an identifier, and preserved by the Registry.
             </p>
           </div>
           <div className="submission-actions">
             <button type="button" className="secondary-button" onClick={downloadManifest}>
-              Generate Intake Manifest
+              Download Intake Manifest
               <span>↓</span>
             </button>
             <button type="submit" className="primary-button large">
-              Validate Intake Package
+              Review & Validate Intake
               <span>✓</span>
             </button>
           </div>
@@ -891,6 +1107,9 @@ export default function RegisterGovernancePage() {
         .progress-panel strong { color: #f0c979; }
         .progress-track { height: 9px; margin: 13px 0; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.08); }
         .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, #7cb6e8, #e8bc68); transition: width .3s ease; }
+        .progress-actions { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+        .mini-button { border: 1px solid rgba(219,177,102,.38); border-radius: 10px; padding: 9px 12px; cursor: pointer; color: #f7edd7; background: rgba(67,48,25,.48); font-weight: 750; }
+        .mini-button.danger { border-color: rgba(226,124,92,.4); color: #ffd9cc; background: rgba(92,35,24,.3); }
         .progress-meta { color: #9eabc0; font-size: 12px; text-transform: uppercase; letter-spacing: .09em; }
         form { display: grid; gap: 22px; }
         .form-section { padding: clamp(22px, 4vw, 38px); border: 1px solid rgba(151,169,199,.2); border-radius: 24px; background: linear-gradient(180deg, rgba(15,24,43,.94), rgba(8,13,25,.96)); box-shadow: 0 25px 70px rgba(0,0,0,.22); }
@@ -915,6 +1134,13 @@ export default function RegisterGovernancePage() {
         .check-row span, .declaration-row span { font-weight: 500; line-height: 1.55; color: #cbd4e2; }
         .declaration-row strong { display: block; margin-bottom: 3px; color: #fff4d9; }
         .declaration-stack { display: grid; gap: 12px; }
+        .contact-permissions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+        .review-pathway-panel { display: grid; gap: 12px; margin: 22px 0; padding: 18px; border: 1px solid rgba(232,188,104,.28); border-radius: 16px; background: rgba(232,188,104,.055); }
+        .review-pathway-panel p { margin: 0; color: #aeb9ca; line-height: 1.55; }
+        .hash-line { display: grid; gap: 5px; margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.24); }
+        .hash-line strong { color: #e9c474; font-size: 11px; letter-spacing: .12em; }
+        .hash-line code { overflow-wrap: anywhere; color: #adc6df; font-size: 11px; }
+        [data-required-incomplete="true"] input, [data-required-incomplete="true"] select, [data-required-incomplete="true"] textarea { border-color: rgba(232,188,104,.55); }
         .drop-zone { display: grid; justify-items: center; gap: 12px; padding: clamp(34px, 7vw, 70px) 20px; text-align: center; border: 1px dashed rgba(232,188,104,.55); border-radius: 22px; background: radial-gradient(circle at 50% 30%, rgba(69,111,164,.18), transparent 58%), rgba(4,10,20,.6); transition: border-color .2s ease, background .2s ease, transform .2s ease; }
         .drop-zone.drag-active { border-color: #ffd98e; background: rgba(70,55,29,.42); transform: scale(1.005); }
         .drop-zone h3 { margin-bottom: 0; font-family: Georgia, serif; font-size: 28px; }
@@ -958,7 +1184,7 @@ export default function RegisterGovernancePage() {
           .topbar, footer { align-items: stretch; flex-direction: column; }
           .topbar nav { justify-content: stretch; }
           .topbar nav .nav-button { flex: 1; justify-content: center; }
-          .field-grid.two, .field-grid.three { grid-template-columns: 1fr; }
+          .field-grid.two, .field-grid.three, .contact-permissions { grid-template-columns: 1fr; }
           .form-section { padding: 20px 16px; }
           .section-heading { gap: 12px; }
           .evidence-item { flex-direction: column; }
