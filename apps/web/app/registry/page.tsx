@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 const registryEntries = [
   {
-    label: 'TA-14 Foundation',
+    label: 'TA-14 Credentials & Public Record',
     title: 'Explore the Parent Public Record',
     description:
       'Open the architecture, standards family, chronology, books, articles, Zenodo records, GitHub repositories, reference implementations, and institutional systems that support the Exchange.',
@@ -16,7 +16,7 @@ const registryEntries = [
     label: 'Foundational Architectural Registry',
     title: 'Open the TA-14 Architectural Registry',
     description:
-      'Inspect the canonical architectural record that connects the TA-14 Foundation, architecture family, standards family, public chronology, publications, repositories, and implementations.',
+      'Inspect the canonical architectural record that connects the TA-14 Credentials & Public Record, architecture family, standards family, public chronology, publications, repositories, and implementations.',
     href: '/workspace/ai-governance/registry',
     status: 'ARCHITECTURAL RECORD',
   },
@@ -79,7 +79,7 @@ export default function RegistryHomePage() {
           <a href="#institutional-hierarchy">Registry Structure</a>
           <a href="#founding-record">Founding Record</a>
           <a href="#registry-access">Registry Access</a>
-          <Link href="/workspace/ai-governance/registry#foundation">TA-14 Foundation</Link>
+          <Link href="/foundation">TA-14 Credentials & Public Record</Link>
         </nav>
 
         <Link href="/workspace" className="top-action">
@@ -114,10 +114,10 @@ export default function RegistryHomePage() {
 
         <div className="hero-actions">
           <Link
-            href="/workspace/ai-governance/registry#foundation"
+            href="/foundation"
             className="button button-gold"
           >
-            Explore the TA-14 Foundation
+            Explore the TA-14 Credentials & Public Record
             <span aria-hidden="true">→</span>
           </Link>
 
@@ -150,12 +150,12 @@ export default function RegistryHomePage() {
 
         <div className="hierarchy-grid">
           <Link
-            href="/workspace/ai-governance/registry#foundation"
+            href="/foundation"
             className="hierarchy-card foundation-layer"
           >
             <span className="hierarchy-number">01</span>
-            <p>THE PARENT PUBLIC RECORD</p>
-            <h3>TA-14 Foundation</h3>
+            <p>THE CREDENTIALS & PARENT PUBLIC RECORD</p>
+            <h3>TA-14 Credentials & Public Record</h3>
             <strong>
               Architecture, standards, chronology, publications, repositories,
               reference implementations, and institutional systems.
@@ -207,7 +207,7 @@ export default function RegistryHomePage() {
         </div>
 
         <div className="hierarchy-chain" aria-label="Registry hierarchy">
-          <span>TA-14 Foundation</span>
+          <span>TA-14 Credentials & Public Record</span>
           <b>→</b>
           <span>Foundational Architectural Registry</span>
           <b>→</b>
@@ -349,7 +349,7 @@ export default function RegistryHomePage() {
       <footer className="footer shell">
         <div>
           <strong>TA-14 Registry Institution</strong>
-          <span>Foundation, architecture, registration, and public records kept distinct.</span>
+          <span>Credentials, architecture, registration, and public records kept distinct.</span>
         </div>
 
         <p>No admissible evidence. No admissible execution.</p>
