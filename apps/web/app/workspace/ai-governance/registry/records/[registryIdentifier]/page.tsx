@@ -226,6 +226,24 @@ export default function PermanentPublicRegistryRecordPage() {
                 {record.category ? <span>{record.category}</span> : null}
                 {record.version ? <span>Version {record.version}</span> : null}
               </div>
+
+              <div className="heroActions">
+                <Link
+                  href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                    record.registryIdentifier,
+                  )}/citation`}
+                  className="primaryButton"
+                >
+                  Cite This Record
+                </Link>
+
+                <Link
+                  href="/workspace/ai-governance/registry/directory"
+                  className="secondaryButton"
+                >
+                  Browse Public Directory
+                </Link>
+              </div>
             </div>
 
             <aside className="recordSeal">
@@ -620,6 +638,13 @@ const styles = `
     display: flex;
     flex-wrap: wrap;
     gap: 9px;
+  }
+
+  .heroActions {
+    margin-top: 22px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 11px;
   }
 
   .heroBadges span,
