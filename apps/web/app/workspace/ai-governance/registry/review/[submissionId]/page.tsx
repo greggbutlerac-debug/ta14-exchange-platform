@@ -3,6 +3,8 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
+import FinalizeRegistrationPanel from './FinalizeRegistrationPanel';
+
 type PageProps = {
   params: Promise<{ submissionId: string }>;
 };
@@ -42,8 +44,13 @@ type RegistrySubmission = Record<string, unknown> & {
   accuracy_declaration_accepted: boolean;
   registry_boundary_accepted: boolean;
   status: string;
+  review_decision?: string | null;
+  review_rationale?: string | null;
+  reviewed_at?: string | null;
+  reviewed_by_user_id?: string | null;
   submitted_at: string | null;
   intake_locked_at: string | null;
+  accepted_at?: string | null;
   registry_identifier: string | null;
   created_at: string | null;
   updated_at: string | null;
@@ -88,7 +95,7 @@ function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) 
             cookieStore.set(name, value, options);
           });
         } catch {
-          // Existing authenticated cookies remain readable.
+          // Existing authenticated cookies remain readable in a Server Component.
         }
       },
     },
@@ -105,14 +112,8 @@ function parseReviewerEmails(): Set<string> {
 }
 
 function text(value: unknown, fallback = 'Not declared'): string {
-  if (typeof value === 'string' && value.trim()) {
-    return value;
-  }
-
-  if (typeof value === 'number') {
-    return String(value);
-  }
-
+  if (typeof value === 'string' && value.trim()) return value;
+  if (typeof value === 'number') return String(value);
   return fallback;
 }
 
@@ -121,15 +122,10 @@ function boolLabel(value: unknown): string {
 }
 
 function formatDate(value: unknown): string {
-  if (typeof value !== 'string' || !value) {
-    return 'Not recorded';
-  }
+  if (typeof value !== 'string' || !value) return 'Not recorded';
 
   const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
+  if (Number.isNaN(date.getTime())) return value;
 
   return new Intl.DateTimeFormat('en-US', {
     dateStyle: 'medium',
@@ -151,9 +147,9 @@ function formatBytes(value: number): string {
 }
 
 function statusLabel(status: string): string {
-  return status.replaceAll('_', ' ').replace(/\b\w/g, (letter) =>
-    letter.toUpperCase(),
-  );
+  return status
+    .replaceAll('_', ' ')
+    .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function displayRecordValue(value: unknown): string {
@@ -161,17 +157,9 @@ function displayRecordValue(value: unknown): string {
     return 'Not declared';
   }
 
-  if (typeof value === 'boolean') {
-    return value ? 'Yes' : 'No';
-  }
-
-  if (Array.isArray(value)) {
-    return value.map((item) => String(item)).join(', ');
-  }
-
-  if (typeof value === 'object') {
-    return JSON.stringify(value, null, 2);
-  }
+  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
+  if (Array.isArray(value)) return value.map(String).join(', ');
+  if (typeof value === 'object') return JSON.stringify(value, null, 2);
 
   return String(value);
 }
@@ -193,12 +181,12 @@ function RecordList({
     <div className="recordStack">
       {records.map((record, index) => (
         <article className="sourceCard" key={record.id}>
-          <div className="sourceNumber">Record {index + 1}</div>
+          <p className="sourceNumber">Record {index + 1}</p>
           <dl className="detailGrid">
             {fields.map(({ key, label }) => (
               <div key={key}>
                 <dt>{label}</dt>
-                <dd className={key.includes('description') ? 'longText' : ''}>
+                <dd className={key.includes('hash') ? 'hash' : undefined}>
                   {displayRecordValue(record[key])}
                 </dd>
               </div>
@@ -278,7 +266,7 @@ export default async function RegistrySubmissionReviewPage({
       .from('ai_governance_registry_events')
       .select('*')
       .eq('submission_id', submissionId)
-      .order('created_at', { ascending: true }),
+      .order('occurred_at', { ascending: true }),
     supabase
       .from('ai_governance_registry_disputes')
       .select('*')
@@ -311,15 +299,15 @@ export default async function RegistrySubmissionReviewPage({
 
   return (
     <main className="pageShell">
-      <div className="topBar">
+      <nav className="topBar">
         <Link
-          className="buttonSecondary"
           href="/workspace/ai-governance/registry/review"
+          className="buttonSecondary"
         >
           Back to Review Queue
         </Link>
         <span className="reviewerIdentity">{user.email}</span>
-      </div>
+      </nav>
 
       <section className="hero">
         <div>
@@ -374,6 +362,7 @@ export default async function RegistrySubmissionReviewPage({
           <p className="eyebrow">IDENTITY AND SCOPE</p>
           <h2>Governance Record</h2>
         </div>
+
         <dl className="detailGrid">
           <div><dt>Governance name</dt><dd>{submission.governance_name}</dd></div>
           <div><dt>Short name</dt><dd>{text(submission.short_name)}</dd></div>
@@ -383,7 +372,10 @@ export default async function RegistrySubmissionReviewPage({
           <div><dt>Effective version date</dt><dd>{text(submission.effective_version_date)}</dd></div>
           <div><dt>Geographic scope</dt><dd>{text(submission.geographic_scope)}</dd></div>
           <div><dt>Regulatory scope</dt><dd>{text(submission.regulatory_scope)}</dd></div>
-          <div className="spanFull"><dt>Plain-language description</dt><dd className="longText">{submission.plain_language_description}</dd></div>
+          <div className="spanFull">
+            <dt>Plain-language description</dt>
+            <dd className="longText">{submission.plain_language_description}</dd>
+          </div>
         </dl>
       </section>
 
@@ -392,6 +384,7 @@ export default async function RegistrySubmissionReviewPage({
           <p className="eyebrow">AUTHORITY AND ATTRIBUTION</p>
           <h2>Claimant Record</h2>
         </div>
+
         <dl className="detailGrid">
           <div><dt>Claimant</dt><dd>{submission.claimant_name}</dd></div>
           <div><dt>Claimant type</dt><dd>{submission.claimant_type}</dd></div>
@@ -401,9 +394,18 @@ export default async function RegistrySubmissionReviewPage({
           <div><dt>Contact email</dt><dd>{submission.contact_email}</dd></div>
           <div><dt>Public contact mode</dt><dd>{submission.public_contact_mode}</dd></div>
           <div><dt>Public website</dt><dd>{text(submission.public_website)}</dd></div>
-          <div className="spanFull"><dt>Authority basis</dt><dd className="longText">{submission.authority_basis}</dd></div>
-          <div className="spanFull"><dt>Ownership declaration</dt><dd className="longText">{submission.ownership_declaration}</dd></div>
-          <div className="spanFull"><dt>License statement</dt><dd className="longText">{text(submission.license_statement)}</dd></div>
+          <div className="spanFull">
+            <dt>Authority basis</dt>
+            <dd className="longText">{submission.authority_basis}</dd>
+          </div>
+          <div className="spanFull">
+            <dt>Ownership declaration</dt>
+            <dd className="longText">{submission.ownership_declaration}</dd>
+          </div>
+          <div className="spanFull">
+            <dt>License statement</dt>
+            <dd className="longText">{text(submission.license_statement)}</dd>
+          </div>
         </dl>
       </section>
 
@@ -412,6 +414,7 @@ export default async function RegistrySubmissionReviewPage({
           <p className="eyebrow">CLAIMS AND BOUNDARIES</p>
           <h2>Declared Governance Position</h2>
         </div>
+
         <div className="narrativeStack">
           <article><h3>Formal claims</h3><p>{submission.formal_claims}</p></article>
           <article><h3>Explicit non-claims</h3><p>{submission.explicit_non_claims}</p></article>
@@ -425,6 +428,7 @@ export default async function RegistrySubmissionReviewPage({
           <p className="eyebrow">DECLARATIONS</p>
           <h2>Registrant Attestations</h2>
         </div>
+
         <dl className="detailGrid">
           <div><dt>Authority declaration</dt><dd>{boolLabel(submission.authority_declaration_accepted)}</dd></div>
           <div><dt>Accuracy declaration</dt><dd>{boolLabel(submission.accuracy_declaration_accepted)}</dd></div>
@@ -449,7 +453,7 @@ export default async function RegistrySubmissionReviewPage({
           <div className="recordStack">
             {evidence.map((record, index) => (
               <article className="sourceCard" key={record.id}>
-                <div className="sourceNumber">Evidence {index + 1}</div>
+                <p className="sourceNumber">Evidence {index + 1}</p>
                 <dl className="detailGrid">
                   <div><dt>Filename</dt><dd>{record.original_filename}</dd></div>
                   <div><dt>Type</dt><dd>{record.mime_type}</dd></div>
@@ -469,173 +473,127 @@ export default async function RegistrySubmissionReviewPage({
       </section>
 
       <section className="sectionCard">
-        <div className="sectionHeading">
-          <p className="eyebrow">PUBLICATIONS</p>
-          <h2>Articles, Books, Papers, and Reports</h2>
-        </div>
+        <div className="sectionHeading"><p className="eyebrow">PUBLICATIONS</p><h2>Articles, Books, Papers, and Reports</h2></div>
         <RecordList
           records={publications}
-          emptyMessage="No publication records were submitted."
+          emptyMessage="No publication records were found."
           fields={[
-            { key: 'publication_type', label: 'Type' },
             { key: 'title', label: 'Title' },
-            { key: 'authors', label: 'Authors' },
-            { key: 'publisher_or_platform', label: 'Publisher or platform' },
+            { key: 'publication_type', label: 'Type' },
+            { key: 'publisher', label: 'Publisher' },
             { key: 'publication_date', label: 'Publication date' },
-            { key: 'doi', label: 'DOI' },
-            { key: 'isbn', label: 'ISBN' },
             { key: 'url', label: 'URL' },
-            { key: 'relationship_to_governance', label: 'Relationship' },
-            { key: 'citation_text', label: 'Citation' },
-            { key: 'abstract_or_description', label: 'Description' },
           ]}
         />
       </section>
 
       <section className="sectionCard">
-        <div className="sectionHeading">
-          <p className="eyebrow">SOFTWARE RECORDS</p>
-          <h2>GitHub and Other Repositories</h2>
-        </div>
+        <div className="sectionHeading"><p className="eyebrow">SOFTWARE RECORDS</p><h2>GitHub and Other Repositories</h2></div>
         <RecordList
           records={repositories}
-          emptyMessage="No repository records were submitted."
+          emptyMessage="No repository records were found."
           fields={[
-            { key: 'provider', label: 'Provider' },
             { key: 'repository_name', label: 'Repository' },
-            { key: 'repository_owner', label: 'Owner' },
             { key: 'repository_url', label: 'URL' },
+            { key: 'repository_provider', label: 'Provider' },
             { key: 'default_branch', label: 'Default branch' },
-            { key: 'release_or_tag', label: 'Release or tag' },
-            { key: 'commit_sha', label: 'Commit SHA' },
-            { key: 'license', label: 'License' },
-            { key: 'access_state', label: 'Access state' },
-            { key: 'relationship_to_governance', label: 'Relationship' },
-            { key: 'description', label: 'Description' },
+            { key: 'commit_reference', label: 'Commit reference' },
           ]}
         />
       </section>
 
       <section className="sectionCard">
-        <div className="sectionHeading">
-          <p className="eyebrow">ZENODO</p>
-          <h2>DOIs, Concept DOIs, and Versions</h2>
-        </div>
+        <div className="sectionHeading"><p className="eyebrow">ZENODO</p><h2>DOIs, Concept DOIs, and Versions</h2></div>
         <RecordList
           records={zenodoRecords}
-          emptyMessage="No Zenodo records were submitted."
+          emptyMessage="No Zenodo records were found."
           fields={[
             { key: 'title', label: 'Title' },
-            { key: 'record_url', label: 'Record URL' },
             { key: 'doi', label: 'DOI' },
             { key: 'concept_doi', label: 'Concept DOI' },
-            { key: 'zenodo_record_id', label: 'Zenodo ID' },
             { key: 'version', label: 'Version' },
-            { key: 'publication_date', label: 'Publication date' },
-            { key: 'creators', label: 'Creators' },
-            { key: 'resource_type', label: 'Resource type' },
-            { key: 'relationship_to_governance', label: 'Relationship' },
-            { key: 'description', label: 'Description' },
+            { key: 'record_url', label: 'Record URL' },
           ]}
         />
       </section>
 
       <section className="sectionCard">
-        <div className="sectionHeading">
-          <p className="eyebrow">PATENT RECORDS</p>
-          <h2>Applications, Lineage, Publications, and Grants</h2>
-        </div>
+        <div className="sectionHeading"><p className="eyebrow">PATENT RECORDS</p><h2>Applications, Lineage, Publications, and Grants</h2></div>
         <RecordList
           records={patentRecords}
-          emptyMessage="No patent records were submitted."
+          emptyMessage="No patent records were found."
           fields={[
             { key: 'title', label: 'Title' },
             { key: 'jurisdiction', label: 'Jurisdiction' },
-            { key: 'filing_type', label: 'Filing type' },
-            { key: 'application_status', label: 'Status' },
             { key: 'application_number', label: 'Application number' },
-            { key: 'publication_number', label: 'Publication number' },
-            { key: 'patent_number', label: 'Patent number' },
             { key: 'filing_date', label: 'Filing date' },
-            { key: 'publication_date', label: 'Publication date' },
-            { key: 'grant_date', label: 'Grant date' },
-            { key: 'priority_date', label: 'Priority date' },
-            { key: 'inventors', label: 'Inventors' },
-            { key: 'applicant_or_assignee', label: 'Applicant or assignee' },
-            { key: 'converted_from_patent_record_id', label: 'Converted from' },
-            { key: 'continuation_of_patent_record_id', label: 'Continuation of' },
-            { key: 'official_url', label: 'Official URL' },
-            { key: 'relationship_to_governance', label: 'Relationship' },
-            { key: 'description', label: 'Description' },
+            { key: 'patent_status', label: 'Status' },
           ]}
         />
       </section>
 
       <section className="sectionCard">
-        <div className="sectionHeading">
-          <p className="eyebrow">DISPUTES</p>
-          <h2>Dispute and Challenge Record</h2>
-        </div>
+        <div className="sectionHeading"><p className="eyebrow">DISPUTES</p><h2>Dispute and Challenge Record</h2></div>
         <RecordList
           records={disputes}
-          emptyMessage="No dispute records are attached to this submission."
+          emptyMessage="No dispute records were found."
           fields={[
             { key: 'dispute_type', label: 'Type' },
             { key: 'status', label: 'Status' },
-            { key: 'submitted_by_name', label: 'Submitted by' },
             { key: 'summary', label: 'Summary' },
-            { key: 'details', label: 'Details' },
-            { key: 'created_at', label: 'Created' },
+            { key: 'created_at', label: 'Opened' },
             { key: 'resolved_at', label: 'Resolved' },
           ]}
         />
       </section>
 
       <section className="sectionCard">
-        <div className="sectionHeading">
-          <p className="eyebrow">LIFECYCLE HISTORY</p>
-          <h2>Registry Events</h2>
-        </div>
+        <div className="sectionHeading"><p className="eyebrow">LIFECYCLE HISTORY</p><h2>Registry Events</h2></div>
         <RecordList
           records={events}
-          emptyMessage="No lifecycle events were found."
+          emptyMessage="No Registry lifecycle events were found."
           fields={[
             { key: 'event_type', label: 'Event type' },
-            { key: 'from_status', label: 'From status' },
-            { key: 'to_status', label: 'To status' },
             { key: 'event_summary', label: 'Summary' },
-            { key: 'event_payload', label: 'Payload' },
-            { key: 'created_at', label: 'Created' },
+            { key: 'actor_label', label: 'Actor' },
+            { key: 'actor_role', label: 'Role' },
+            { key: 'occurred_at', label: 'Occurred' },
+            { key: 'event_hash', label: 'Event hash' },
           ]}
         />
       </section>
 
-      <section className="decisionPanel">
-        <div>
-          <p className="eyebrow">NEXT REVIEW INSTITUTION</p>
-          <h2>Reviewer Decision</h2>
-          <p>
-            The decision controls are intentionally not active yet. The next
-            file will add the bounded decision API for return, hold, escalate,
-            or accept for registration, with an immutable rationale record.
-          </p>
+      <section className="sectionCard">
+        <div className="sectionHeading">
+          <p className="eyebrow">REVIEW DETERMINATION</p>
+          <h2>Latest Bounded Decision</h2>
         </div>
-        <div className="decisionButtons" aria-label="Inactive decision preview">
-          <button disabled>Return for Correction</button>
-          <button disabled>Hold</button>
-          <button disabled>Escalate</button>
-          <button disabled>Accept for Registration</button>
-        </div>
+
+        <dl className="detailGrid">
+          <div><dt>Decision</dt><dd>{text(submission.review_decision, 'No decision recorded')}</dd></div>
+          <div><dt>Reviewed at</dt><dd>{formatDate(submission.reviewed_at)}</dd></div>
+          <div><dt>Accepted at</dt><dd>{formatDate(submission.accepted_at)}</dd></div>
+          <div className="spanFull">
+            <dt>Reviewer rationale</dt>
+            <dd className="longText">{text(submission.review_rationale, 'No rationale recorded')}</dd>
+          </div>
+        </dl>
       </section>
 
-      <style>{styles}</style>
+      <FinalizeRegistrationPanel
+        submissionId={submission.id}
+        status={submission.status}
+        registryIdentifier={submission.registry_identifier}
+      />
+
+      <style jsx global>{styles}</style>
     </main>
   );
 }
 
 const styles = `
-  :global(*) { box-sizing: border-box; }
-  :global(body) {
+  * { box-sizing: border-box; }
+  body {
     margin: 0;
     background:
       radial-gradient(circle at 12% 8%, rgba(81, 125, 255, 0.18), transparent 34rem),
@@ -643,316 +601,123 @@ const styles = `
       #07101f;
     color: #eef4ff;
   }
-
-  .pageShell {
-    min-height: 100vh;
-    padding: 34px 24px 84px;
-  }
-
-  .topBar,
-  .hero,
-  .boundaryBox,
-  .sectionCard,
-  .decisionPanel,
-  .errorBox {
+  .pageShell { min-height: 100vh; padding: 34px 24px 84px; }
+  .topBar, .hero, .boundaryBox, .sectionCard, .errorBox {
     width: min(1180px, 100%);
     margin-inline: auto;
   }
-
   .topBar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 18px;
-    margin-bottom: 34px;
+    display: flex; justify-content: space-between; align-items: center;
+    gap: 18px; margin-bottom: 34px;
   }
-
-  .reviewerIdentity {
-    color: #91a2be;
-    overflow-wrap: anywhere;
-  }
-
+  .reviewerIdentity { color: #91a2be; overflow-wrap: anywhere; }
   .hero {
-    display: grid;
-    grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.75fr);
-    gap: 26px;
-    align-items: end;
-    margin-bottom: 24px;
+    display: grid; grid-template-columns: minmax(0, 1.7fr) minmax(280px, 0.75fr);
+    gap: 26px; align-items: end; margin-bottom: 24px;
   }
-
   h1, h2, h3, p { margin-top: 0; }
-
   h1 {
-    margin-bottom: 18px;
-    font-size: clamp(2.45rem, 5.8vw, 5.4rem);
-    line-height: 0.97;
-    letter-spacing: -0.055em;
+    margin-bottom: 18px; font-size: clamp(2.45rem, 5.8vw, 5.4rem);
+    line-height: 0.97; letter-spacing: -0.055em;
   }
-
   h2 {
-    margin-bottom: 0;
-    font-size: clamp(1.65rem, 3vw, 2.7rem);
+    margin-bottom: 0; font-size: clamp(1.65rem, 3vw, 2.7rem);
     letter-spacing: -0.035em;
   }
-
   h3 {
-    margin-bottom: 10px;
-    font-size: 1rem;
-    color: #7fe4c4;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    margin-bottom: 10px; font-size: 1rem; color: #7fe4c4;
+    text-transform: uppercase; letter-spacing: 0.08em;
   }
-
   .eyebrow {
-    margin-bottom: 10px;
-    color: #7fe4c4;
-    font-size: 0.76rem;
-    font-weight: 800;
-    letter-spacing: 0.18em;
+    margin-bottom: 10px; color: #7fe4c4; font-size: 0.76rem;
+    font-weight: 800; letter-spacing: 0.18em;
   }
-
   .lead {
-    max-width: 790px;
-    margin-bottom: 0;
-    color: #b9c7df;
-    font-size: 1.06rem;
-    line-height: 1.75;
+    max-width: 790px; margin-bottom: 0; color: #b9c7df;
+    font-size: 1.06rem; line-height: 1.75;
   }
-
-  .statusPanel,
-  .boundaryBox,
-  .sectionCard,
-  .decisionPanel,
-  .errorBox {
+  .statusPanel, .boundaryBox, .sectionCard, .errorBox {
     border: 1px solid rgba(164, 190, 231, 0.18);
     background: rgba(11, 25, 47, 0.84);
     box-shadow: 0 24px 80px rgba(0, 0, 0, 0.24);
     backdrop-filter: blur(18px);
   }
-
-  .statusPanel {
-    padding: 22px;
-    border-radius: 22px;
-  }
-
+  .statusPanel { padding: 22px; border-radius: 22px; }
   .statusPanel > span {
-    color: #91a2be;
-    font-size: 0.78rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+    color: #91a2be; font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.08em;
   }
-
   .statusPanel > strong {
-    display: block;
-    margin: 8px 0 18px;
-    font-size: 1.55rem;
+    display: block; margin: 8px 0 18px; font-size: 1.55rem;
   }
-
-  .statusPanel dl,
-  .detailGrid {
-    margin: 0;
-  }
-
-  .statusPanel dl {
-    display: grid;
-    gap: 12px;
-  }
-
+  .statusPanel dl, .detailGrid { margin: 0; }
+  .statusPanel dl { display: grid; gap: 12px; }
   .statusPanel dl div {
-    padding-top: 12px;
-    border-top: 1px solid rgba(164, 190, 231, 0.12);
+    padding-top: 12px; border-top: 1px solid rgba(164, 190, 231, 0.12);
   }
-
   dt {
-    margin-bottom: 6px;
-    color: #8092ae;
-    font-size: 0.73rem;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+    margin-bottom: 6px; color: #8092ae; font-size: 0.73rem;
+    font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase;
   }
-
-  dd {
-    margin: 0;
-    line-height: 1.55;
-    overflow-wrap: anywhere;
+  dd { margin: 0; line-height: 1.55; overflow-wrap: anywhere; }
+  .boundaryBox, .errorBox {
+    margin-bottom: 22px; padding: 20px 22px;
+    border-left: 4px solid #7fe4c4; border-radius: 16px;
   }
-
-  .boundaryBox,
-  .errorBox {
-    margin-bottom: 22px;
-    padding: 20px 22px;
-    border-left: 4px solid #7fe4c4;
-    border-radius: 16px;
+  .boundaryBox strong, .errorBox strong {
+    display: block; margin-bottom: 7px;
   }
-
-  .boundaryBox strong,
-  .errorBox strong {
-    display: block;
-    margin-bottom: 7px;
+  .boundaryBox p, .errorBox p {
+    margin-bottom: 0; color: #b8c6dc; line-height: 1.65;
   }
-
-  .boundaryBox p,
-  .errorBox p {
-    margin-bottom: 0;
-    color: #b8c6dc;
-    line-height: 1.65;
-  }
-
-  .errorBox {
-    border-left-color: #ff7c91;
-  }
-
+  .errorBox { border-left-color: #ff7c91; }
   .sectionCard {
-    margin-bottom: 18px;
-    padding: 26px;
-    border-radius: 22px;
+    margin-bottom: 18px; padding: 26px; border-radius: 22px;
   }
-
-  .sectionHeading {
-    margin-bottom: 22px;
-  }
-
+  .sectionHeading { margin-bottom: 22px; }
   .detailGrid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 19px;
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 19px;
   }
-
   .detailGrid > div {
-    min-width: 0;
-    padding: 15px;
+    min-width: 0; padding: 15px;
     border: 1px solid rgba(164, 190, 231, 0.11);
-    border-radius: 14px;
-    background: rgba(7, 17, 33, 0.38);
+    border-radius: 14px; background: rgba(7, 17, 33, 0.38);
   }
-
-  .detailGrid .spanFull {
-    grid-column: 1 / -1;
-  }
-
-  .longText {
-    white-space: pre-wrap;
-    line-height: 1.7;
-  }
-
+  .detailGrid .spanFull { grid-column: 1 / -1; }
+  .longText { white-space: pre-wrap; line-height: 1.7; }
   .hash {
     font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-    font-size: 0.82rem;
-    word-break: break-all;
+    font-size: 0.82rem; word-break: break-all;
   }
-
-  .narrativeStack,
-  .recordStack {
-    display: grid;
-    gap: 14px;
+  .narrativeStack, .recordStack { display: grid; gap: 14px; }
+  .narrativeStack article, .sourceCard {
+    padding: 20px; border: 1px solid rgba(164, 190, 231, 0.12);
+    border-radius: 16px; background: rgba(7, 17, 33, 0.42);
   }
-
-  .narrativeStack article,
-  .sourceCard {
-    padding: 20px;
-    border: 1px solid rgba(164, 190, 231, 0.12);
-    border-radius: 16px;
-    background: rgba(7, 17, 33, 0.42);
-  }
-
   .narrativeStack p {
-    margin-bottom: 0;
-    color: #d5deec;
-    white-space: pre-wrap;
-    line-height: 1.75;
+    margin-bottom: 0; color: #d5deec; white-space: pre-wrap; line-height: 1.75;
   }
-
   .sourceNumber {
-    margin-bottom: 15px;
-    color: #9ec8ff;
-    font-size: 0.75rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
+    margin-bottom: 15px; color: #9ec8ff; font-size: 0.75rem;
+    font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;
   }
-
-  .emptyLine {
-    margin-bottom: 0;
-    color: #9cadc8;
-    line-height: 1.65;
-  }
-
-  .decisionPanel {
-    display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr);
-    gap: 24px;
-    margin-top: 28px;
-    padding: 28px;
-    border-radius: 22px;
-  }
-
-  .decisionPanel p:last-child {
-    margin: 14px 0 0;
-    color: #b8c6dc;
-    line-height: 1.7;
-  }
-
-  .decisionButtons {
-    display: grid;
-    gap: 10px;
-  }
-
-  .decisionButtons button {
-    min-height: 46px;
-    border: 1px solid rgba(164, 190, 231, 0.22);
-    border-radius: 12px;
-    background: rgba(15, 34, 63, 0.56);
-    color: #7f8ca2;
-    font-weight: 800;
-    cursor: not-allowed;
-  }
-
+  .emptyLine { margin-bottom: 0; color: #9cadc8; line-height: 1.65; }
   .buttonSecondary {
-    display: inline-flex;
-    min-height: 44px;
-    align-items: center;
-    justify-content: center;
-    padding: 11px 16px;
+    display: inline-flex; min-height: 44px; align-items: center;
+    justify-content: center; padding: 11px 16px;
     border: 1px solid rgba(164, 190, 231, 0.32);
-    border-radius: 12px;
-    background: rgba(15, 34, 63, 0.7);
-    color: #eaf1ff;
-    font-weight: 800;
-    text-decoration: none;
+    border-radius: 12px; background: rgba(15, 34, 63, 0.7);
+    color: #eaf1ff; font-weight: 800; text-decoration: none;
   }
-
   @media (max-width: 900px) {
-    .hero,
-    .decisionPanel {
-      grid-template-columns: 1fr;
-    }
-
-    .detailGrid {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
+    .hero { grid-template-columns: 1fr; }
+    .detailGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   }
-
   @media (max-width: 620px) {
-    .pageShell {
-      padding-inline: 16px;
-    }
-
-    .topBar {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-
-    .detailGrid {
-      grid-template-columns: 1fr;
-    }
-
-    .detailGrid .spanFull {
-      grid-column: auto;
-    }
-
-    .buttonSecondary {
-      width: 100%;
-    }
+    .pageShell { padding-inline: 16px; }
+    .topBar { align-items: flex-start; flex-direction: column; }
+    .detailGrid { grid-template-columns: 1fr; }
+    .detailGrid .spanFull { grid-column: auto; }
+    .buttonSecondary { width: 100%; }
   }
 `;
