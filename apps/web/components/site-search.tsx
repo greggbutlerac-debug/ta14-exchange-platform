@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   TA14_PUBLIC_CORPUS,
   type CorpusRecord,
-} from "@/app/foundation/public-corpus/corpus";
+} from "../app/foundation/public-corpus/corpus";
 
 type SiteSearchItem = {
   id: string;
