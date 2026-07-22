@@ -1,5 +1,7 @@
+"use client";
+
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { useParams } from "next/navigation";
 
 type RolePathway = {
   slug: string;
@@ -840,42 +842,93 @@ const aliases: Record<string, string> = {
   distributor: "distributor",
 };
 
-export function generateStaticParams() {
-  return Object.keys(rolePathways).map((role) => ({ role }));
-}
-
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ role: string }>;
-}) {
-  const { role } = await params;
-  const key = aliases[role.toLowerCase()] ?? role.toLowerCase();
+export default function EuAiActRolePathwayPage() {
+  const params = useParams<{ role: string }>();
+  const rawRole = Array.isArray(params?.role) ? params.role[0] : params?.role;
+  const normalizedRole = rawRole?.toLowerCase() ?? "";
+  const key = aliases[normalizedRole] ?? normalizedRole;
   const pathway = rolePathways[key];
 
   if (!pathway) {
-    return {
-      title: "EU AI Act Role Pathway | TA-14",
-    };
-  }
+    return (
+      <main className="missingRole">
+        <section>
+          <span>TA-14 EU AI ACT</span>
+          <h1>Role pathway not found.</h1>
+          <p>
+            The requested role does not match an available EU AI Act operator
+            pathway.
+          </p>
+          <Link href="/eu-ai-act">Return to the EU AI Act workspace</Link>
+        </section>
 
-  return {
-    title: `${pathway.title} EU AI Act Pathway | TA-14`,
-    description: `A bounded TA-14 EU AI Act governance pathway for the ${pathway.title} role.`,
-  };
-}
+        <style jsx>{`
+          :global(*) {
+            box-sizing: border-box;
+          }
 
-export default async function EuAiActRolePathwayPage({
-  params,
-}: {
-  params: Promise<{ role: string }>;
-}) {
-  const { role } = await params;
-  const key = aliases[role.toLowerCase()] ?? role.toLowerCase();
-  const pathway = rolePathways[key];
+          :global(body) {
+            margin: 0;
+            background: #030914;
+            color: #f4f9ff;
+            font-family:
+              Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+              "Segoe UI", sans-serif;
+          }
 
-  if (!pathway) {
-    notFound();
+          .missingRole {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 24px;
+            background:
+              radial-gradient(circle at 50% 20%, rgba(47, 142, 209, 0.15), transparent 35%),
+              #030914;
+          }
+
+          section {
+            width: min(720px, 100%);
+            padding: 42px;
+            border: 1px solid rgba(109, 210, 245, 0.24);
+            border-radius: 24px;
+            background: rgba(8, 21, 32, 0.92);
+            text-align: center;
+          }
+
+          span {
+            color: #6dd2f5;
+            font-size: 11px;
+            font-weight: 950;
+            letter-spacing: 0.18em;
+          }
+
+          h1 {
+            margin: 16px 0 12px;
+            font-size: clamp(42px, 8vw, 72px);
+            letter-spacing: -0.05em;
+          }
+
+          p {
+            color: #9fb3c0;
+            line-height: 1.65;
+          }
+
+          a {
+            min-height: 50px;
+            margin-top: 18px;
+            padding: 0 18px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            color: #06131d;
+            background: linear-gradient(135deg, #67caf6, #d8f7ff);
+            text-decoration: none;
+            font-weight: 900;
+          }
+        `}</style>
+      </main>
+    );
   }
 
   return (
