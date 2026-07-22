@@ -19,16 +19,16 @@ type TransparencyPathway = {
 };
 
 const routes = {
-  article50: "/eu-ai-act/requirements/article-50",
-  classification: "/eu-ai-act/requirements/risk-classification",
-  prohibited: "/eu-ai-act/requirements/prohibited-practices",
-  highRisk: "/eu-ai-act/requirements/high-risk",
+  article50: "#article-50-workspace",
+  classification: "#guided-classification",
+  prohibited: "#requirements-explorer",
+  highRisk: "#requirements-explorer",
   marketplace: "/marketplace",
-  opportunities: "/marketplace/opportunities",
-  professionals: "/marketplace/professionals",
+  opportunities: "/marketplace",
+  professionals: "/marketplace",
   governedRecords: "/workspace/governed-records",
-  governanceRoutes: "/marketplace/routes",
-  registry: "/ai-governance-registry",
+  governanceRoutes: "/workspace",
+  registry: "/workspace",
 } as const;
 
 const roles = [
@@ -221,8 +221,8 @@ export default function EuAiActPage() {
             <div className="action-row">
               <Link className="button primary-button" href={routes.article50}>Open Article 50 Workspace <Arrow /></Link>
               <Link className="button gold-button" href={routes.classification}>Classify My Role or System <Arrow /></Link>
-              <Link className="button glass-button" href={routes.governanceRoutes}>Browse Governance Routes <Arrow /></Link>
-              <Link className="button glass-button" href={routes.professionals}>Find an Independent Reviewer <Arrow /></Link>
+              <Link className="button glass-button" href={routes.governanceRoutes}>Open AI Governance Workspace <Arrow /></Link>
+              <Link className="button glass-button" href={routes.professionals}>Open Reviewer Marketplace <Arrow /></Link>
             </div>
           </div>
 
@@ -273,7 +273,7 @@ export default function EuAiActPage() {
           />
           <div className="role-grid">
             {roles.map(([code, title, slug, copy]) => (
-              <Link className="role-card" href={`/eu-ai-act/roles/${slug}`} key={title}>
+              <Link className="role-card" href={slug === "not-sure" ? "#guided-classification" : "#article-50-workspace"} key={title}>
                 <span className="role-code">{code}</span>
                 <h3>{title}</h3>
                 <p>{copy}</p>
@@ -283,7 +283,7 @@ export default function EuAiActPage() {
           </div>
         </section>
 
-        <section className="guided-panel">
+        <section className="guided-panel" id="guided-classification">
           <div className="guided-orb">?</div>
           <div>
             <span className="eyebrow">GUIDED CLASSIFICATION</span>
@@ -293,7 +293,7 @@ export default function EuAiActPage() {
           <Link className="button primary-button" href={routes.classification}>Start Guided Classification <Arrow /></Link>
         </section>
 
-        <section className="page-section">
+        <section className="page-section" id="requirements-explorer">
           <SectionHeading
             eyebrow="REQUIREMENTS EXPLORER"
             title="Open the Act by governance problem—not by guesswork."
@@ -312,7 +312,7 @@ export default function EuAiActPage() {
               </Link>
             ))}
           </div>
-          <div className="roadmap-note" id="requirements-roadmap">
+          <div className="roadmap-note" id="requirements-roadmap" tabIndex={-1}>
             <span>PLATFORM ROADMAP</span>
             <p>Planned and expanding modules return here rather than sending visitors to unfinished destinations. Available modules open their dedicated workspaces.</p>
           </div>
@@ -361,12 +361,12 @@ export default function EuAiActPage() {
           </article>
         </section>
 
-        <section className="page-section">
+        <section className="page-section" id="article-50-workspace">
           <SectionHeading
             eyebrow="ARTICLE 50 TRANSPARENCY WORKSPACE"
             title="Map the obligation before claiming the outcome."
             copy="These demonstration pathways separate provider and deployer duties, identify evidence dependencies, expose missing proof, and define review-ready outputs."
-            action={<Link className="section-action" href={routes.article50}>Open full Article 50 workspace <Arrow /></Link>}
+            action={<Link className="section-action" href={routes.article50}>Jump to Article 50 Pathways <Arrow /></Link>}
           />
 
           <div className="filter-panel">
@@ -423,8 +423,8 @@ export default function EuAiActPage() {
                 </div>
 
                 <div className="card-actions">
-                  <Link className="button primary-button compact" href={routes.article50}>Open Route Workspace <Arrow /></Link>
-                  <Link className="button glass-button compact" href={routes.professionals}>Find Reviewer <Arrow /></Link>
+                  <Link className="button primary-button compact" href={routes.article50}>Inspect Article 50 Route <Arrow /></Link>
+                  <Link className="button glass-button compact" href={routes.professionals}>Open Marketplace <Arrow /></Link>
                 </div>
               </article>
             ))}
@@ -583,7 +583,7 @@ export default function EuAiActPage() {
         .status-grid strong{display:block;margin:34px 0 12px;font-size:1.38rem}
         .status-grid p{color:#93aab5;line-height:1.55}
 
-        .page-section{padding-top:86px}
+        .page-section{padding-top:86px;scroll-margin-top:28px}
         .section-heading{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:end;margin-bottom:30px}
         .section-heading>div{max-width:990px}
         .section-heading h2,.split-section h2,.final-cta h2{margin:12px 0 15px;font-family:Georgia,"Times New Roman",serif;font-size:clamp(2.4rem,4.7vw,5rem);line-height:.98;letter-spacing:-.052em;text-wrap:balance}
@@ -600,9 +600,9 @@ export default function EuAiActPage() {
         .role-code{width:46px;height:46px;display:grid;place-items:center;border-radius:12px;border:1px solid rgba(112,216,239,.46);color:#8ee8fa;background:rgba(63,185,213,.08);font-size:.8rem;font-weight:950;box-shadow:inset 0 0 14px rgba(64,184,213,.08)}
         .role-card h3{margin:27px 0 10px;font-size:1.27rem}
         .role-card p{color:#94abb6;line-height:1.58}
-        .card-link{width:fit-content;margin-top:auto;color:#9de8f7;font-size:.77rem;font-weight:950;border-bottom:1px solid rgba(112,216,239,.33);padding-bottom:4px;position:relative;z-index:1}
+        .card-link{width:fit-content;margin-top:auto;min-height:38px;padding:0 13px;border-radius:10px;border:1px solid rgba(112,216,239,.25);color:#baf3ff;background:linear-gradient(180deg,rgba(44,139,165,.13),rgba(14,51,69,.12));box-shadow:inset 0 1px 0 rgba(255,255,255,.04);font-size:.77rem;font-weight:950;position:relative;z-index:1;transition:transform .2s,border-color .2s,box-shadow .2s,background .2s}.card-link:hover{transform:translateY(-2px);border-color:#70d8ef;background:linear-gradient(180deg,rgba(67,175,202,.2),rgba(15,65,85,.18));box-shadow:0 10px 24px rgba(44,157,184,.13)}
 
-        .guided-panel{display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:24px;align-items:center;margin-top:28px;padding:28px;border:1px solid rgba(134,111,239,.28);border-radius:24px;background:radial-gradient(circle at 0 50%,rgba(116,83,235,.15),transparent 36%),linear-gradient(145deg,rgba(24,24,55,.92),rgba(8,19,34,.94))}
+        .guided-panel{scroll-margin-top:28px;display:grid;grid-template-columns:82px minmax(0,1fr) auto;gap:24px;align-items:center;margin-top:28px;padding:28px;border:1px solid rgba(134,111,239,.28);border-radius:24px;background:radial-gradient(circle at 0 50%,rgba(116,83,235,.15),transparent 36%),linear-gradient(145deg,rgba(24,24,55,.92),rgba(8,19,34,.94))}
         .guided-orb{width:68px;height:68px;display:grid;place-items:center;border-radius:999px;border:1px solid #a38cff;color:#d7ccff;background:rgba(123,91,233,.12);box-shadow:0 0 28px rgba(123,91,233,.18);font-size:1.6rem;font-weight:950}
         .guided-panel h2{margin:8px 0;font-size:1.72rem}
         .guided-panel p{margin:0;color:#aeb7cb;line-height:1.6}
