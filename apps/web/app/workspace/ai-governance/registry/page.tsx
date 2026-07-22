@@ -204,7 +204,7 @@ export default function AiGovernanceRegistryPage() {
             </span>
           </div>
           <div className="hero-actions">
-            <PolishedLink href="/workspace/ai-governance/registry/new" variant="primary">
+            <PolishedLink href="/workspace/ai-governance/registry/register" variant="primary">
               Register a Governance Architecture
             </PolishedLink>
             <PolishedLink href="/workspace/ai-governance/registry/directory" variant="bronze">
@@ -363,13 +363,13 @@ export default function AiGovernanceRegistryPage() {
             </span>
           </div>
           <div className="launch-actions">
-            <PolishedLink href="/workspace/ai-governance/registry/new" variant="primary">
+            <PolishedLink href="/workspace/ai-governance/registry/register" variant="primary">
               Begin a Registry Filing
             </PolishedLink>
             <PolishedLink href="/workspace/ai-governance/registry/directory" variant="secondary">
               Open the Public Directory
             </PolishedLink>
-            <PolishedLink href="/workspace/ai-governance/registry/my" variant="bronze">
+            <PolishedLink href="/workspace/ai-governance/registry/my-records" variant="bronze">
               Open My Registry Records
             </PolishedLink>
           </div>
