@@ -1,835 +1,1356 @@
-import Link from "next/link";
+"use client";
 
-export const metadata = {
-  title: "AI Governance Pricing | TA-14 AI Governance Exchange",
-  description:
-    "Interactive AI governance pricing with market comparisons, TA-14 pricing at 75% below benchmark, service details, and direct workflow actions.",
+import Link from "next/link";
+import { useMemo, useState } from "react";
+
+type BillingMode = "Monthly" | "Annual";
+
+type Plan = {
+  id: string;
+  name: string;
+  audience: string;
+  monthlyPrice: number;
+  annualPrice: number;
+  priceLabel?: string;
+  description: string;
+  featured?: boolean;
+  features: string[];
+  boundaries: string[];
+  cta: string;
+  href: string;
 };
+
+const plans: Plan[] = [
+  {
+    id: "playground",
+    name: "Free Playground",
+    audience: "Explore the architecture",
+    monthlyPrice: 0,
+    annualPrice: 0,
+    description:
+      "Build routes, test governance logic, explore records, and learn how TA-14 separates evidence, authority, execution, and outcomes.",
+    features: [
+      "Unlimited draft route building",
+      "Governance playground access",
+      "Sample review flows",
+      "Demonstration records",
+      "Route and evidence education",
+      "No payment required",
+    ],
+    boundaries: [
+      "Draft and demonstration use",
+      "No preserved governed run",
+      "No formal review determination",
+      "No execution authority",
+    ],
+    cta: "Open Free Playground",
+    href: "/workspace",
+  },
+  {
+    id: "preserved-run",
+    name: "Preserved Governed Run",
+    audience: "One consequential route",
+    monthlyPrice: 9,
+    annualPrice: 9,
+    priceLabel: "$9 per preserved run",
+    description:
+      "Preserve one governed route evaluation with attributable inputs, findings, decision state, evidence references, and replay history.",
+    featured: true,
+    features: [
+      "One preserved route evaluation",
+      "ALLOW / HOLD / DENY / ESCALATE result",
+      "Evidence and authority references",
+      "Governance decision record",
+      "Replay-verification history",
+      "Downloadable route artifact",
+    ],
+    boundaries: [
+      "Price applies per preserved run",
+      "Does not include specialist review",
+      "Does not create certification",
+      "Execution remains separately governed",
+    ],
+    cta: "Preserve a Governed Run",
+    href: "/workspace/routes",
+  },
+  {
+    id: "pro",
+    name: "TA-14 Exchange Pro",
+    audience: "Builders and governance teams",
+    monthlyPrice: 99,
+    annualPrice: 990,
+    description:
+      "A working environment for teams that build, test, preserve, compare, and improve consequential governance routes.",
+    features: [
+      "Expanded preserved-run allowance",
+      "Private route library",
+      "Reusable route templates",
+      "Version and comparison history",
+      "Team workspace controls",
+      "Priority record exports",
+      "Advanced replay analysis",
+      "Governance drift visibility",
+    ],
+    boundaries: [
+      "Professional workspace, not certification",
+      "Specialist review priced separately",
+      "Storage and usage limits may apply",
+      "Execution services remain separate",
+    ],
+    cta: "Choose Exchange Pro",
+    href: "/account",
+  },
+  {
+    id: "organization",
+    name: "Organization",
+    audience: "Operational governance programs",
+    monthlyPrice: 499,
+    annualPrice: 4990,
+    description:
+      "Organization-level governance infrastructure for multiple teams, systems, routes, records, reviewers, and controlled review workflows.",
+    features: [
+      "Organization-scoped workspaces",
+      "Multiple users and roles",
+      "Governed record libraries",
+      "Review and authority assignments",
+      "Organization route templates",
+      "Governance history and chain audit",
+      "Priority support",
+      "Implementation planning session",
+    ],
+    boundaries: [
+      "Final scope confirmed before activation",
+      "Partner and specialist fees are separate",
+      "Custom integration work is not included",
+      "No implied legal or regulatory approval",
+    ],
+    cta: "Request Organization Access",
+    href: "/workspace/entity-review",
+  },
+];
 
 const services = [
   {
-    category: "Preservation",
-    title: "Preserved Governed Run",
-    market: "$750",
-    ta14: "$187.50",
-    savings: "$562.50",
+    title: "Entity Review",
+    price: "Scoped separately",
     description:
-      "Preserve a completed AI governance run with its route state, decision, evidence references, correction history, and final outcome status.",
-    includes: [
-      "Durable route snapshot",
-      "Decision basis",
-      "Correction history",
-      "Downloadable preserved record",
-    ],
-    href: "/workspace/routes",
-    cta: "Choose a Route",
-    sampleHref: "/workspace/records",
+      "Review an organization, AI system, governance architecture, deployment, or consequential route against a declared question and evidence set.",
   },
   {
-    category: "Record",
-    title: "Admissible Execution Record",
-    market: "$1,500",
-    ta14: "$375",
-    savings: "$1,125",
+    title: "Partner Review Network",
+    price: "$450 qualification review",
     description:
-      "Generate a bounded execution record covering Reality through Outcome, including authority, binding, commit, execution, and result.",
-    includes: [
-      "Complete eight-stage route record",
-      "Evidence and authority boundaries",
-      "Commit and execution state",
-      "Outcome declaration",
-    ],
-    href: "/workspace/routes/new",
-    cta: "Build a Route",
-    sampleHref: "/workspace/records",
+      "Application review for governance systems, reviewers, and specialists seeking a bounded Partner Review Network lane.",
   },
   {
-    category: "Verification",
-    title: "Signed Verification Package",
-    market: "$2,500",
-    ta14: "$625",
-    savings: "$1,875",
+    title: "Specialist Review",
+    price: "Based on scope",
     description:
-      "Create a verification package suitable for internal review, procurement, audit preparation, or external reliance.",
-    includes: [
-      "Verification receipt",
-      "Route digest",
-      "Evidence continuity summary",
-      "Export-ready package",
-    ],
-    href: "/verify",
-    cta: "Open Verification",
-    sampleHref: "/workspace/records",
+      "Independent technical, legal, risk, data, cybersecurity, operational, environmental, or sector-specific review.",
   },
   {
-    category: "Comparison",
-    title: "Replay and Route Comparison",
-    market: "$3,000",
-    ta14: "$750",
-    savings: "$2,250",
+    title: "Governed Implementation",
+    price: "Custom",
     description:
-      "Compare an original failed or held route against a corrected route without erasing the prior state.",
-    includes: [
-      "Original route preservation",
-      "Corrected route replay",
-      "Difference analysis",
-      "Decision change explanation",
-    ],
-    href: "/workspace/routes",
-    cta: "Select Routes",
-    sampleHref: "/verify",
-  },
-  {
-    category: "Review",
-    title: "Independent AI Route Review",
-    market: "$8,000",
-    ta14: "$2,000",
-    savings: "$6,000",
-    description:
-      "Independent full-chain review of a consequential AI route, including evidence, authority, continuity, binding, commit, execution, and outcome.",
-    includes: [
-      "Full-chain review",
-      "Declared findings",
-      "Boundary and gap analysis",
-      "Correction recommendations",
-    ],
-    href: "/workspace/entity-review-center",
-    cta: "Start Review Intake",
-    sampleHref: "/workspace/routes/new",
-  },
-  {
-    category: "Entity Review",
-    title: "AI Governance Entity Review",
-    market: "$25,000",
-    ta14: "$6,250",
-    savings: "$18,750",
-    description:
-      "Review how an organization governs consequential AI across policies, routes, authorities, records, runtime decisions, and outcomes.",
-    includes: [
-      "Governance readiness assessment",
-      "Route and authority sampling",
-      "Evidence integrity findings",
-      "Executive review package",
-    ],
-    href: "/workspace/entity-review-center",
-    cta: "Begin Entity Review",
-    sampleHref: "/entity-review-center",
-  },
-  {
-    category: "Runtime",
-    title: "Runtime Governance Integration",
-    market: "$40,000+",
-    ta14: "$10,000+",
-    savings: "$30,000+",
-    description:
-      "Connect TA-14 governance controls to a live AI agent, application, workflow, toolchain, or consequential execution environment.",
-    includes: [
-      "Integration discovery",
-      "Route and control mapping",
-      "Commit-gate design",
-      "Verification and deployment support",
-    ],
-    href: "/workspace/routes/new",
-    cta: "Map an Integration",
-    sampleHref: "/workspace/ai-governance",
-  },
-  {
-    category: "Enterprise",
-    title: "Enterprise AI Governance Program",
-    market: "$100,000+",
-    ta14: "$25,000+",
-    savings: "$75,000+",
-    description:
-      "A scoped enterprise program for multiple AI systems, teams, authorities, review lanes, records, and runtime governance requirements.",
-    includes: [
-      "Multi-system governance architecture",
-      "Organizational authority mapping",
-      "Review and preservation workflows",
-      "Phased implementation plan",
-    ],
-    href: "/workspace/entity-review-center",
-    cta: "Start Enterprise Scope",
-    sampleHref: "/ai-governance",
+      "Architecture, workflow, integration, record, review, and execution-governance implementation for operational environments.",
   },
 ];
 
-const filters = [
-  "All Services",
-  "Preservation",
-  "Record",
-  "Verification",
-  "Comparison",
-  "Review",
-  "Entity Review",
-  "Runtime",
-  "Enterprise",
+const comparisonRows = [
+  {
+    category: "AI governance assessment",
+    typical: "$750–$1,500+",
+    ta14: "Free exploration or $9 preserved run",
+  },
+  {
+    category: "Specialized governance review",
+    typical: "$8,000+",
+    ta14: "Scoped review based on actual route and evidence",
+  },
+  {
+    category: "Enterprise governance engagement",
+    typical: "$25,000+",
+    ta14: "Organization workspace from $499/month; implementation separate",
+  },
+  {
+    category: "Partner qualification",
+    typical: "Opaque or invitation-only",
+    ta14: "$450 documented qualification review",
+  },
 ];
 
-export default function AIGovernancePricingPage() {
+export default function AiGovernancePricingPage() {
+  const [billingMode, setBillingMode] = useState<BillingMode>("Monthly");
+
+  const savings = useMemo(() => {
+    const monthly = plans
+      .filter((plan) => plan.monthlyPrice > 0 && plan.id !== "preserved-run")
+      .reduce((total, plan) => total + plan.monthlyPrice * 12, 0);
+    const annual = plans
+      .filter((plan) => plan.annualPrice > 0 && plan.id !== "preserved-run")
+      .reduce((total, plan) => total + plan.annualPrice, 0);
+
+    return monthly - annual;
+  }, []);
+
   return (
-    <main style={styles.page}>
-      <header style={styles.header}>
-        <Link href="/workspace/ai-governance" style={styles.brand}>
-          <span style={styles.brandMark}>TA-14</span>
+    <main>
+      <div className="stars starsOne" />
+      <div className="stars starsTwo" />
+      <div className="glow glowOne" />
+      <div className="glow glowTwo" />
+
+      <header className="topbar shell">
+        <Link href="/workspace/ai-governance" className="brand">
+          <span className="brandMark">TA-14</span>
           <span>
-            <strong style={styles.brandTitle}>AI GOVERNANCE PRICING</strong>
-            <small style={styles.brandSub}>Interactive service marketplace</small>
+            <strong>AI Governance Pricing</strong>
+            <small>TA-14 AI Governance Exchange</small>
           </span>
         </Link>
 
-        <nav style={styles.nav}>
-          <Link href="/workspace/ai-governance" style={styles.navLink}>
-            Playground
-          </Link>
-          <Link href="/workspace/routes/new" style={styles.navLink}>
-            Build
-          </Link>
-          <Link href="/workspace/routes" style={styles.navLink}>
-            My Routes
-          </Link>
-          <Link href="/" style={styles.returnButton}>
-            Return to Exchange
-          </Link>
+        <nav>
+          <Link href="/">Home</Link>
+          <Link href="/workspace/ai-governance">AI Governance</Link>
+          <Link href="/workspace/governed-records">Governed Records</Link>
+          <Link href="/workspace/entity-review">Entity Review</Link>
         </nav>
       </header>
 
-      <section style={styles.hero}>
-        <div style={styles.eyebrow}>TRANSPARENT AI GOVERNANCE PRICING</div>
-        <h1 style={styles.heroTitle}>
-          See the market.
-          <br />
-          See the TA-14 price.
-          <br />
-          Choose what happens next.
-        </h1>
-        <p style={styles.heroText}>
-          Exploration, route construction, correction, and learning remain free. When you choose
-          preservation, verification, professional review, runtime integration, or enterprise
-          implementation, the exact price appears before commitment. TA-14 is priced at 25% of the
-          benchmark market price—75% lower.
-        </p>
+      <section className="hero shell">
+        <div className="heroCopy">
+          <p className="eyebrow">PRICING</p>
+          <h1>Start free. Pay when the governance work becomes worth preserving.</h1>
+          <p className="lead">
+            Explore the exchange without charge, preserve a governed run for
+            $9, or move into professional and organization workspaces when the
+            route requires reusable records, team controls, review, and
+            governance continuity.
+          </p>
 
-        <div style={styles.heroActions}>
-          <Link href="#services" style={styles.primaryButton}>
-            Explore Services
-          </Link>
-          <Link href="/workspace/ai-governance" style={styles.secondaryButton}>
-            Return to Free Playground
-          </Link>
+          <div className="heroActions">
+            <Link className="primaryButton" href="/workspace">
+              Open Free Playground
+              <span>→</span>
+            </Link>
+            <a className="secondaryButton" href="#plans">
+              Compare Plans
+            </a>
+          </div>
         </div>
 
-        <div style={styles.marketStrip}>
-          <div>
-            <span style={styles.marketLabel}>MARKET BENCHMARK</span>
-            <strong style={styles.marketValue}>100%</strong>
+        <div className="priceVisual" aria-hidden="true">
+          <div className="priceCore">
+            <small>PRESERVED RUN</small>
+            <strong>$9</strong>
+            <span>Governed · Attributable · Replayable</span>
           </div>
-          <div>
-            <span style={styles.marketLabel}>TA-14 PRICE</span>
-            <strong style={styles.marketValue}>25%</strong>
+
+          <div className="orbit orbitOne">
+            <i />
           </div>
-          <div>
-            <span style={styles.marketLabel}>CUSTOMER SAVINGS</span>
-            <strong style={styles.marketValue}>75%</strong>
+          <div className="orbit orbitTwo">
+            <i />
           </div>
         </div>
       </section>
 
-      <section id="services" style={styles.servicesSection}>
-        <div style={styles.sectionHeading}>
+      <section className="principle shell">
+        <p className="eyebrow">THE PRICING PRINCIPLE</p>
+        <h2>Experimentation should be accessible. Consequential evidence should be preserved.</h2>
+        <p>
+          TA-14 does not charge simply because someone wants to learn, build, or
+          test a route. Pricing begins when a user asks the exchange to preserve
+          a governed run, maintain a professional workspace, conduct an
+          attributable review, or support operational implementation.
+        </p>
+      </section>
+
+      <section className="plansSection shell" id="plans">
+        <div className="plansHeader">
           <div>
-            <div style={styles.eyebrowDark}>INTERACTIVE SERVICE MARKETPLACE</div>
-            <h2 style={styles.sectionTitle}>Choose a service and enter the correct workflow.</h2>
+            <p className="eyebrow">WORKSPACE PLANS</p>
+            <h2>Choose the level of preservation and governance you need.</h2>
           </div>
-          <p style={styles.sectionIntro}>
-            Every service card shows the benchmark market price, the TA-14 price, the savings,
-            what is included, and the next action. Nothing is hidden behind a sales conversation.
+
+          <div className="billingToggle" aria-label="Billing mode">
+            <button
+              type="button"
+              className={billingMode === "Monthly" ? "active" : ""}
+              onClick={() => setBillingMode("Monthly")}
+            >
+              Monthly
+            </button>
+            <button
+              type="button"
+              className={billingMode === "Annual" ? "active" : ""}
+              onClick={() => setBillingMode("Annual")}
+            >
+              Annual
+            </button>
+          </div>
+        </div>
+
+        <div className="plansGrid">
+          {plans.map((plan) => {
+            const displayedPrice =
+              billingMode === "Annual" ? plan.annualPrice : plan.monthlyPrice;
+            const suffix =
+              plan.id === "preserved-run"
+                ? ""
+                : billingMode === "Annual"
+                  ? "/year"
+                  : "/month";
+
+            return (
+              <article
+                className={`planCard ${plan.featured ? "featured" : ""}`}
+                key={plan.id}
+              >
+                {plan.featured && <span className="featuredFlag">CORE ENTRY</span>}
+
+                <span className="audience">{plan.audience}</span>
+                <h3>{plan.name}</h3>
+
+                <div className="planPrice">
+                  {plan.priceLabel ? (
+                    <strong className="priceLabel">{plan.priceLabel}</strong>
+                  ) : (
+                    <>
+                      <strong>${displayedPrice.toLocaleString()}</strong>
+                      <small>{displayedPrice === 0 ? "" : suffix}</small>
+                    </>
+                  )}
+                </div>
+
+                <p className="planDescription">{plan.description}</p>
+
+                <Link className="planButton" href={plan.href}>
+                  {plan.cta}
+                  <span>→</span>
+                </Link>
+
+                <div className="planDetails">
+                  <div>
+                    <span className="detailLabel">Included</span>
+                    <ul>
+                      {plan.features.map((feature) => (
+                        <li key={feature}>{feature}</li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div className="boundaries">
+                    <span className="detailLabel">Boundaries</span>
+                    <ul>
+                      {plan.boundaries.map((boundary) => (
+                        <li key={boundary}>{boundary}</li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+
+        {billingMode === "Annual" && (
+          <div className="annualNotice">
+            Annual pricing shown. Across the listed professional and
+            organization plans, the annual options preserve ${savings.toLocaleString()} compared
+            with twelve monthly payments.
+          </div>
+        )}
+      </section>
+
+      <section className="nineDollar shell">
+        <div className="nineDollarVisual">
+          <span>$9</span>
+          <small>per preserved governed run</small>
+        </div>
+
+        <div>
+          <p className="eyebrow">THE PRESERVED RUN</p>
+          <h2>The $9 price is for preservation—not for clicking a button.</h2>
+          <p>
+            A preserved governed run retains the declared route, submitted
+            inputs, evidence references, authority conditions, decision state,
+            findings, timestamps, and replay-verification history. It creates a
+            record that can be inspected later.
+          </p>
+
+          <div className="runFlow">
+            <span>Build</span>
+            <i>→</i>
+            <span>Test</span>
+            <i>→</i>
+            <span>Review</span>
+            <i>→</i>
+            <span>Preserve</span>
+            <i>→</i>
+            <span>Replay</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="services shell">
+        <div className="sectionIntro">
+          <p className="eyebrow">REVIEW AND IMPLEMENTATION</p>
+          <h2>Some governance work cannot be reduced to a subscription.</h2>
+          <p>
+            Reviews and implementations are priced according to the entity,
+            evidence volume, specialties required, route complexity, authority
+            boundary, and expected deliverables.
           </p>
         </div>
 
-        <div style={styles.filterRow}>
-          {filters.map((filter, index) => (
-            <a
-              key={filter}
-              href={index === 0 ? "#services" : `#${filter.toLowerCase().replaceAll(" ", "-")}`}
-              style={index === 0 ? styles.filterActive : styles.filter}
-            >
-              {filter}
-            </a>
-          ))}
-        </div>
-
-        <div style={styles.serviceGrid}>
+        <div className="servicesGrid">
           {services.map((service) => (
-            <article
-              key={service.title}
-              id={service.category.toLowerCase().replaceAll(" ", "-")}
-              style={styles.serviceCard}
-            >
-              <div style={styles.cardHeader}>
-                <span style={styles.category}>{service.category}</span>
-                <span style={styles.discountBadge}>75% LOWER</span>
-              </div>
-
-              <h3 style={styles.cardTitle}>{service.title}</h3>
-              <p style={styles.cardDescription}>{service.description}</p>
-
-              <div style={styles.pricePanel}>
-                <div style={styles.priceRow}>
-                  <span style={styles.priceLabel}>Typical market</span>
-                  <strong style={styles.marketPrice}>{service.market}</strong>
-                </div>
-                <div style={styles.priceRow}>
-                  <span style={styles.priceLabel}>TA-14 price</span>
-                  <strong style={styles.ta14Price}>{service.ta14}</strong>
-                </div>
-                <div style={styles.savingsRow}>
-                  <span>You save</span>
-                  <strong>{service.savings}</strong>
-                </div>
-              </div>
-
-              <div style={styles.includesTitle}>WHAT YOU RECEIVE</div>
-              <ul style={styles.includesList}>
-                {service.includes.map((item) => (
-                  <li key={item} style={styles.includesItem}>
-                    {item}
-                  </li>
-                ))}
-              </ul>
-
-              <div style={styles.cardActions}>
-                <Link href={service.href} style={styles.cardPrimaryButton}>
-                  {service.cta}
-                </Link>
-                <Link href={service.sampleHref} style={styles.cardSecondaryButton}>
-                  View Related Workspace
-                </Link>
-              </div>
+            <article key={service.title}>
+              <span>{service.price}</span>
+              <h3>{service.title}</h3>
+              <p>{service.description}</p>
             </article>
           ))}
         </div>
       </section>
 
-      <section style={styles.howItWorks}>
-        <div>
-          <div style={styles.eyebrow}>PRICING AT THE POINT OF ACTION</div>
-          <h2 style={styles.howTitle}>The price follows the user’s choice.</h2>
-          <p style={styles.howText}>
-            A user may build and test freely. When they select a paid action, the platform should
-            show the exact service, market benchmark, TA-14 price, savings, deliverable, and why
-            payment is required before continuing.
+      <section className="comparison shell">
+        <div className="sectionIntro">
+          <p className="eyebrow">MARKET POSITION</p>
+          <h2>Others often price the report. TA-14 prices the route and the evidence.</h2>
+          <p>
+            These examples are positioning references, not promises that every
+            engagement has the same scope. Final review and implementation
+            pricing depends on the work actually required.
           </p>
         </div>
 
-        <div style={styles.steps}>
-          <div style={styles.step}>
-            <span style={styles.stepNumber}>01</span>
-            <strong>Choose an action</strong>
-            <p>Preserve, verify, review, compare, integrate, or scope an enterprise program.</p>
+        <div className="comparisonTable">
+          <div className="tableRow tableHead">
+            <span>Category</span>
+            <span>Typical market framing</span>
+            <span>TA-14 entry</span>
           </div>
-          <div style={styles.step}>
-            <span style={styles.stepNumber}>02</span>
-            <strong>See the exact price</strong>
-            <p>The selected service appears with its market benchmark and 75% savings.</p>
-          </div>
-          <div style={styles.step}>
-            <span style={styles.stepNumber}>03</span>
-            <strong>Enter the workflow</strong>
-            <p>The selected service carries forward into the correct route, record, or intake page.</p>
-          </div>
+
+          {comparisonRows.map((row) => (
+            <div className="tableRow" key={row.category}>
+              <strong>{row.category}</strong>
+              <span>{row.typical}</span>
+              <span>{row.ta14}</span>
+            </div>
+          ))}
         </div>
       </section>
 
-      <section style={styles.freeSection}>
+      <section className="whatYouPayFor shell">
         <div>
-          <div style={styles.eyebrowDark}>WHAT REMAINS FREE</div>
-          <h2 style={styles.freeTitle}>The playground is not a sales wall.</h2>
-          <p style={styles.freeText}>
-            Users can explore scenarios, build routes, deliberately break them, understand ALLOW,
-            HOLD, DENY, and ESCALATE, correct failures, and learn the TA-14 chain without payment.
+          <p className="eyebrow">WHAT YOU ARE PAYING FOR</p>
+          <h2>Not a score. Not a badge. Not a confident paragraph.</h2>
+        </div>
+
+        <div className="payGrid">
+          <article>
+            <span>01</span>
+            <h3>Attribution</h3>
+            <p>Who submitted, reviewed, decided, changed, or executed.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Evidence continuity</h3>
+            <p>Which source, version, custody, time, and route support the finding.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Bounded determination</h3>
+            <p>What is supported, unsupported, held, denied, or escalated.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Preserved history</h3>
+            <p>What changed without erasing the earlier governance state.</p>
+          </article>
+          <article>
+            <span>05</span>
+            <h3>Replay</h3>
+            <p>Whether the decision can be inspected against the preserved record.</p>
+          </article>
+          <article>
+            <span>06</span>
+            <h3>Outcome verification</h3>
+            <p>Whether execution produced the claimed result after the decision.</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="boundary shell">
+        <div>
+          <p className="eyebrow">BOUNDARY</p>
+          <h2>Payment does not create admissibility by itself.</h2>
+        </div>
+
+        <p>
+          A paid run, plan, review, or application only creates access to the
+          stated service. Admissibility depends on the actual evidence,
+          continuity, authority, scope, findings, execution controls, and
+          outcome records preserved within the route.
+        </p>
+      </section>
+
+      <section className="finalCta shell">
+        <div>
+          <p className="eyebrow">START WHERE YOU ARE</p>
+          <h2>Build for free. Preserve the route when it becomes consequential.</h2>
+          <p>
+            Enter the playground without payment or move directly into a
+            preserved governed run.
           </p>
         </div>
 
-        <div style={styles.freeActions}>
-          <Link
-            href="/workspace/ai-governance/demonstrations/free-guided-demo"
-            style={styles.primaryButton}
-          >
-            Run a Free Guided Demo
+        <div className="finalActions">
+          <Link className="primaryButton" href="/workspace">
+            Open Free Playground
+            <span>→</span>
           </Link>
-          <Link href="/workspace/routes/new" style={styles.secondaryDarkButton}>
-            Build a Free AI Route
+          <Link className="secondaryButton" href="/workspace/routes">
+            Start a $9 Preserved Run
           </Link>
         </div>
       </section>
 
-      <footer style={styles.footer}>
-        <div>
-          <strong>TA-14 Authority Governance Institution</strong>
-          <div style={styles.footerSub}>No admissible evidence. No admissible execution.</div>
-        </div>
-
-        <div style={styles.footerLinks}>
-          <Link href="/workspace/ai-governance" style={styles.footerLink}>
-            AI Governance Playground
-          </Link>
-          <Link href="/ai-governance" style={styles.footerLink}>
-            Public Introduction
-          </Link>
-          <Link href="/" style={styles.footerLink}>
-            Exchange Home
-          </Link>
-        </div>
+      <footer className="shell">
+        <span>TA-14 Authority Governance Institution</span>
+        <Link href="/workspace/ai-governance">Return to AI Governance</Link>
       </footer>
+
+      <style jsx>{`
+        :global(*) {
+          box-sizing: border-box;
+        }
+
+        :global(html) {
+          background: #040914;
+          scroll-behavior: smooth;
+        }
+
+        :global(body) {
+          margin: 0;
+          color: #f7fbff;
+          background:
+            radial-gradient(circle at 12% 8%, rgba(52, 118, 230, 0.13), transparent 28%),
+            radial-gradient(circle at 88% 24%, rgba(63, 200, 255, 0.1), transparent 28%),
+            linear-gradient(180deg, #040914 0%, #07101f 50%, #050914 100%);
+          font-family:
+            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+            "Segoe UI", sans-serif;
+        }
+
+        main {
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .shell {
+          width: min(1260px, calc(100% - 36px));
+          margin-inline: auto;
+          position: relative;
+          z-index: 2;
+        }
+
+        .stars {
+          position: fixed;
+          inset: -12%;
+          pointer-events: none;
+          z-index: -4;
+          opacity: 0.34;
+        }
+
+        .starsOne {
+          background-image:
+            radial-gradient(circle, rgba(255,255,255,.75) 0 1px, transparent 1.4px);
+          background-size: 92px 92px;
+          animation: starDrift 34s linear infinite;
+        }
+
+        .starsTwo {
+          background-image:
+            radial-gradient(circle, rgba(91,176,255,.62) 0 1px, transparent 1.4px);
+          background-size: 156px 156px;
+          background-position: 39px 58px;
+          animation: starDrift 48s linear infinite reverse;
+        }
+
+        .glow {
+          position: fixed;
+          width: 470px;
+          height: 470px;
+          border-radius: 999px;
+          filter: blur(120px);
+          opacity: 0.12;
+          z-index: -3;
+          animation: glowMove 14s ease-in-out infinite alternate;
+        }
+
+        .glowOne {
+          left: -170px;
+          top: -180px;
+          background: #346dff;
+        }
+
+        .glowTwo {
+          right: -180px;
+          top: 44%;
+          background: #31bdf4;
+          animation-delay: -6s;
+        }
+
+        .topbar {
+          min-height: 84px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          border-bottom: 1px solid rgba(132, 154, 188, 0.16);
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: white;
+          text-decoration: none;
+        }
+
+        .brandMark {
+          min-width: 64px;
+          height: 38px;
+          border-radius: 999px;
+          display: grid;
+          place-items: center;
+          color: #04111d;
+          background: linear-gradient(135deg, #5caeff, #c5efff);
+          font-size: 13px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+        }
+
+        .brand > span:last-child {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .brand small {
+          color: #7e91a6;
+          margin-top: 2px;
+        }
+
+        nav {
+          display: flex;
+          gap: 22px;
+        }
+
+        nav a,
+        footer a {
+          color: #a9b8ca;
+          text-decoration: none;
+          font-size: 14px;
+        }
+
+        .hero {
+          min-height: 650px;
+          display: grid;
+          grid-template-columns: 1.12fr 0.88fr;
+          gap: 50px;
+          align-items: center;
+          padding: 76px 0;
+        }
+
+        .eyebrow {
+          margin: 0;
+          color: #68b6ff;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.18em;
+        }
+
+        h1 {
+          max-width: 890px;
+          margin: 18px 0 22px;
+          font-size: clamp(48px, 7vw, 88px);
+          line-height: 0.98;
+          letter-spacing: -0.06em;
+        }
+
+        .lead {
+          max-width: 770px;
+          margin: 0;
+          color: #9fb0c4;
+          font-size: 18px;
+          line-height: 1.68;
+        }
+
+        .heroActions,
+        .finalActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 30px;
+        }
+
+        .primaryButton,
+        .secondaryButton {
+          min-height: 54px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 24px;
+          border-radius: 14px;
+          padding: 0 20px;
+          text-decoration: none;
+          font-weight: 850;
+        }
+
+        .primaryButton {
+          color: #04111d;
+          background: linear-gradient(135deg, #5caeff, #c3edff);
+          box-shadow: 0 14px 38px rgba(71, 160, 255, 0.18);
+        }
+
+        .secondaryButton {
+          color: #dce8f4;
+          border: 1px solid rgba(130, 162, 188, 0.25);
+          background: rgba(255, 255, 255, 0.035);
+        }
+
+        .priceVisual {
+          min-height: 470px;
+          position: relative;
+          display: grid;
+          place-items: center;
+        }
+
+        .priceCore {
+          width: 245px;
+          height: 245px;
+          border-radius: 999px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(105, 181, 255, 0.7);
+          background:
+            radial-gradient(circle, rgba(64, 137, 255, 0.18), rgba(7, 18, 36, 0.97) 68%);
+          box-shadow:
+            0 0 50px rgba(67, 146, 255, 0.28),
+            inset 0 0 34px rgba(64, 151, 255, 0.15);
+          z-index: 3;
+        }
+
+        .priceCore small {
+          color: #78bbff;
+          font-weight: 900;
+          letter-spacing: 0.14em;
+        }
+
+        .priceCore strong {
+          margin: 8px 0;
+          font-size: 82px;
+          line-height: 0.92;
+          letter-spacing: -0.08em;
+        }
+
+        .priceCore span {
+          max-width: 175px;
+          color: #91a8bd;
+          text-align: center;
+          font-size: 12px;
+        }
+
+        .orbit {
+          position: absolute;
+          border-radius: 999px;
+          border: 1px solid rgba(100, 174, 255, 0.2);
+          animation: rotate 22s linear infinite;
+        }
+
+        .orbit i {
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          right: -5px;
+          top: 50%;
+          border-radius: 999px;
+          background: #6fb8ff;
+          box-shadow: 0 0 14px #6fb8ff;
+        }
+
+        .orbitOne {
+          width: 340px;
+          height: 340px;
+        }
+
+        .orbitTwo {
+          width: 450px;
+          height: 450px;
+          animation-duration: 32s;
+          animation-direction: reverse;
+        }
+
+        .orbitTwo i {
+          background: #ffd75e;
+          box-shadow: 0 0 14px #ffd75e;
+        }
+
+        .principle,
+        .plansSection,
+        .nineDollar,
+        .services,
+        .comparison,
+        .whatYouPayFor,
+        .boundary,
+        .finalCta {
+          border: 1px solid rgba(131, 155, 189, 0.16);
+          background:
+            linear-gradient(180deg, rgba(12, 21, 36, 0.9), rgba(7, 13, 24, 0.94));
+          border-radius: 26px;
+          box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22);
+        }
+
+        .principle {
+          padding: 52px;
+          text-align: center;
+        }
+
+        .principle h2,
+        .plansHeader h2,
+        .nineDollar h2,
+        .sectionIntro h2,
+        .whatYouPayFor h2,
+        .boundary h2,
+        .finalCta h2 {
+          margin: 14px 0 16px;
+          font-size: clamp(32px, 5vw, 56px);
+          line-height: 1.04;
+          letter-spacing: -0.045em;
+        }
+
+        .principle > p:not(.eyebrow),
+        .nineDollar p,
+        .sectionIntro > p:not(.eyebrow),
+        .boundary > p,
+        .finalCta p:not(.eyebrow) {
+          color: #9fafc2;
+          line-height: 1.68;
+        }
+
+        .principle > p:not(.eyebrow) {
+          max-width: 860px;
+          margin: 0 auto;
+        }
+
+        .plansSection,
+        .nineDollar,
+        .services,
+        .comparison,
+        .whatYouPayFor,
+        .boundary {
+          margin-top: 22px;
+          padding: 42px;
+        }
+
+        .plansHeader {
+          display: flex;
+          justify-content: space-between;
+          align-items: end;
+          gap: 28px;
+        }
+
+        .plansHeader > div:first-child {
+          max-width: 820px;
+        }
+
+        .billingToggle {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 6px;
+          min-width: 230px;
+          padding: 5px;
+          border-radius: 14px;
+          border: 1px solid rgba(126, 157, 193, 0.17);
+          background: rgba(4, 11, 22, 0.72);
+        }
+
+        .billingToggle button {
+          min-height: 40px;
+          border: 0;
+          border-radius: 10px;
+          background: transparent;
+          color: #96a8bc;
+          cursor: pointer;
+          font-weight: 850;
+        }
+
+        .billingToggle button.active {
+          background: rgba(72, 154, 239, 0.14);
+          color: #eaf6ff;
+        }
+
+        .plansGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+          margin-top: 30px;
+        }
+
+        .planCard {
+          position: relative;
+          padding: 28px;
+          border-radius: 22px;
+          border: 1px solid rgba(128, 155, 188, 0.16);
+          background: rgba(8, 16, 29, 0.86);
+        }
+
+        .planCard.featured {
+          border-color: rgba(103, 185, 255, 0.55);
+          box-shadow:
+            0 0 0 1px rgba(90, 169, 247, 0.08),
+            0 24px 60px rgba(40, 125, 214, 0.11);
+        }
+
+        .featuredFlag {
+          position: absolute;
+          right: 22px;
+          top: 22px;
+          padding: 6px 9px;
+          border-radius: 999px;
+          color: #98d2ff;
+          background: rgba(64, 145, 228, 0.1);
+          border: 1px solid rgba(93, 177, 255, 0.22);
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+        }
+
+        .audience {
+          color: #72b9ff;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .planCard h3 {
+          margin: 12px 0 0;
+          font-size: 31px;
+          letter-spacing: -0.04em;
+        }
+
+        .planPrice {
+          min-height: 70px;
+          margin-top: 18px;
+          display: flex;
+          align-items: baseline;
+          gap: 8px;
+        }
+
+        .planPrice strong {
+          font-size: 54px;
+          letter-spacing: -0.065em;
+        }
+
+        .planPrice strong.priceLabel {
+          font-size: 34px;
+          letter-spacing: -0.04em;
+        }
+
+        .planPrice small {
+          color: #8598ad;
+          font-weight: 700;
+        }
+
+        .planDescription {
+          min-height: 76px;
+          color: #9fafc2;
+          line-height: 1.6;
+        }
+
+        .planButton {
+          min-height: 48px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 18px;
+          margin-top: 20px;
+          padding: 0 15px;
+          border-radius: 12px;
+          border: 1px solid rgba(99, 179, 255, 0.25);
+          background: rgba(66, 142, 224, 0.07);
+          color: #8bc9ff;
+          text-decoration: none;
+          font-weight: 850;
+        }
+
+        .planDetails {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 20px;
+          margin-top: 25px;
+          padding-top: 24px;
+          border-top: 1px solid rgba(130, 155, 188, 0.12);
+        }
+
+        .detailLabel {
+          color: #72b9ff;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .boundaries .detailLabel {
+          color: #ffc876;
+        }
+
+        ul {
+          margin: 12px 0 0;
+          padding-left: 20px;
+          color: #b6c4d4;
+        }
+
+        li {
+          margin-bottom: 9px;
+          line-height: 1.5;
+        }
+
+        .annualNotice {
+          margin-top: 18px;
+          padding: 15px 18px;
+          border-radius: 14px;
+          border: 1px solid rgba(88, 213, 159, 0.19);
+          background: rgba(54, 178, 126, 0.06);
+          color: #a8dec5;
+          line-height: 1.55;
+        }
+
+        .nineDollar {
+          display: grid;
+          grid-template-columns: 0.55fr 1.45fr;
+          gap: 38px;
+          align-items: center;
+        }
+
+        .nineDollarVisual {
+          min-height: 300px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border-radius: 22px;
+          border: 1px solid rgba(100, 181, 255, 0.36);
+          background:
+            radial-gradient(circle, rgba(69, 151, 237, 0.13), transparent 55%),
+            rgba(5, 13, 25, 0.8);
+          text-align: center;
+        }
+
+        .nineDollarVisual span {
+          color: #dff4ff;
+          font-size: 112px;
+          font-weight: 950;
+          line-height: 0.9;
+          letter-spacing: -0.08em;
+        }
+
+        .nineDollarVisual small {
+          max-width: 175px;
+          margin-top: 14px;
+          color: #7da6ca;
+          line-height: 1.45;
+        }
+
+        .nineDollar h2 {
+          font-size: clamp(30px, 4.7vw, 50px);
+        }
+
+        .runFlow {
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 10px;
+          margin-top: 22px;
+        }
+
+        .runFlow span {
+          padding: 9px 12px;
+          border-radius: 999px;
+          border: 1px solid rgba(99, 179, 255, 0.2);
+          color: #d5e8fa;
+          font-size: 12px;
+          font-weight: 800;
+        }
+
+        .runFlow i {
+          color: #5daaff;
+          font-style: normal;
+        }
+
+        .sectionIntro {
+          max-width: 900px;
+        }
+
+        .sectionIntro h2 {
+          font-size: clamp(32px, 4.8vw, 54px);
+        }
+
+        .servicesGrid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 28px;
+        }
+
+        .servicesGrid article,
+        .payGrid article {
+          padding: 22px;
+          border-radius: 18px;
+          border: 1px solid rgba(112, 168, 219, 0.16);
+          background: rgba(58, 118, 185, 0.05);
+        }
+
+        .servicesGrid span {
+          color: #74baff;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .servicesGrid h3 {
+          margin: 15px 0 10px;
+          font-size: 22px;
+        }
+
+        .servicesGrid p,
+        .payGrid p {
+          margin: 0;
+          color: #9fafc2;
+          line-height: 1.58;
+        }
+
+        .comparisonTable {
+          margin-top: 28px;
+          overflow: hidden;
+          border-radius: 18px;
+          border: 1px solid rgba(128, 155, 188, 0.16);
+        }
+
+        .tableRow {
+          display: grid;
+          grid-template-columns: 0.9fr 0.85fr 1.25fr;
+          gap: 16px;
+          padding: 18px 20px;
+          border-top: 1px solid rgba(128, 155, 188, 0.12);
+          color: #aebed0;
+        }
+
+        .tableRow:first-child {
+          border-top: 0;
+        }
+
+        .tableHead {
+          background: rgba(68, 143, 223, 0.08);
+          color: #75bcff;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .tableRow strong {
+          color: #e4eef8;
+        }
+
+        .whatYouPayFor {
+          display: grid;
+          grid-template-columns: 0.8fr 1.2fr;
+          gap: 34px;
+          align-items: start;
+        }
+
+        .whatYouPayFor h2 {
+          font-size: clamp(30px, 4.5vw, 48px);
+        }
+
+        .payGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .payGrid span {
+          color: #69b3ff;
+          font-size: 11px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
+        }
+
+        .payGrid h3 {
+          margin: 14px 0 8px;
+          font-size: 21px;
+        }
+
+        .boundary {
+          display: grid;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 36px;
+          align-items: center;
+        }
+
+        .boundary h2 {
+          font-size: clamp(30px, 4.5vw, 48px);
+        }
+
+        .boundary > p {
+          margin: 0;
+        }
+
+        .finalCta {
+          margin-top: 74px;
+          padding: 54px 46px;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 30px;
+        }
+
+        .finalCta > div:first-child {
+          max-width: 690px;
+        }
+
+        .finalActions {
+          margin-top: 0;
+          justify-content: flex-end;
+        }
+
+        footer {
+          min-height: 120px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          color: #74869a;
+          font-size: 12px;
+        }
+
+        @keyframes starDrift {
+          from {
+            transform: translate3d(0, 0, 0);
+          }
+          to {
+            transform: translate3d(90px, 140px, 0);
+          }
+        }
+
+        @keyframes glowMove {
+          from {
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+          to {
+            transform: translate3d(55px, 35px, 0) scale(1.1);
+          }
+        }
+
+        @keyframes rotate {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @media (max-width: 980px) {
+          nav {
+            display: none;
+          }
+
+          .hero,
+          .nineDollar,
+          .whatYouPayFor,
+          .boundary {
+            grid-template-columns: 1fr;
+          }
+
+          .servicesGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .finalCta {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .finalActions {
+            justify-content: flex-start;
+          }
+        }
+
+        @media (max-width: 720px) {
+          .shell {
+            width: min(100% - 20px, 1260px);
+          }
+
+          .hero {
+            min-height: auto;
+            padding: 58px 0;
+          }
+
+          .priceVisual {
+            min-height: 430px;
+            transform: scale(0.8);
+          }
+
+          .principle,
+          .plansSection,
+          .nineDollar,
+          .services,
+          .comparison,
+          .whatYouPayFor,
+          .boundary,
+          .finalCta {
+            padding: 28px 24px;
+          }
+
+          .plansHeader {
+            flex-direction: column;
+            align-items: flex-start;
+          }
+
+          .billingToggle {
+            width: 100%;
+          }
+
+          .plansGrid,
+          .planDetails,
+          .servicesGrid,
+          .payGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .tableRow {
+            grid-template-columns: 1fr;
+          }
+
+          .tableHead {
+            display: none;
+          }
+
+          footer {
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+          }
+        }
+      `}</style>
     </main>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  page: {
-    minHeight: "100vh",
-    background: "#f4f7f9",
-    color: "#0d1822",
-    fontFamily:
-      'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  },
-  header: {
-    position: "sticky",
-    top: 0,
-    zIndex: 50,
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 24,
-    padding: "16px clamp(18px, 4vw, 58px)",
-    borderBottom: "1px solid rgba(148, 163, 184, 0.18)",
-    background: "rgba(6, 17, 29, 0.96)",
-    backdropFilter: "blur(18px)",
-  },
-  brand: {
-    display: "flex",
-    alignItems: "center",
-    gap: 12,
-    color: "#ffffff",
-    textDecoration: "none",
-  },
-  brandMark: {
-    display: "grid",
-    placeItems: "center",
-    minWidth: 54,
-    height: 42,
-    padding: "0 10px",
-    borderRadius: 10,
-    background: "linear-gradient(135deg, #4fdcff, #7a8cff)",
-    color: "#04101b",
-    fontSize: 13,
-    fontWeight: 950,
-  },
-  brandTitle: {
-    display: "block",
-    fontSize: 13,
-    letterSpacing: "0.1em",
-  },
-  brandSub: {
-    display: "block",
-    marginTop: 3,
-    color: "#8da4b7",
-    fontSize: 11,
-  },
-  nav: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "flex-end",
-    alignItems: "center",
-    gap: 16,
-  },
-  navLink: {
-    color: "#b8c8d6",
-    fontSize: 13,
-    fontWeight: 700,
-    textDecoration: "none",
-  },
-  returnButton: {
-    padding: "10px 14px",
-    border: "1px solid rgba(110, 231, 255, 0.34)",
-    borderRadius: 9,
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: 800,
-    textDecoration: "none",
-  },
-  hero: {
-    padding: "clamp(72px, 9vw, 128px) clamp(24px, 7vw, 104px)",
-    background:
-      "radial-gradient(circle at 82% 10%, rgba(79, 220, 255, 0.2), transparent 28%), radial-gradient(circle at 20% 22%, rgba(122, 140, 255, 0.14), transparent 35%), #07131f",
-    color: "#ffffff",
-  },
-  eyebrow: {
-    color: "#5fe0ff",
-    fontSize: 11,
-    fontWeight: 900,
-    letterSpacing: "0.18em",
-  },
-  eyebrowDark: {
-    color: "#08758b",
-    fontSize: 11,
-    fontWeight: 900,
-    letterSpacing: "0.18em",
-  },
-  heroTitle: {
-    maxWidth: 1100,
-    margin: "20px 0",
-    fontSize: "clamp(48px, 7vw, 92px)",
-    lineHeight: 0.98,
-    letterSpacing: "-0.06em",
-  },
-  heroText: {
-    maxWidth: 900,
-    color: "#a8bdcc",
-    fontSize: "clamp(17px, 2vw, 22px)",
-    lineHeight: 1.65,
-  },
-  heroActions: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 14,
-    marginTop: 32,
-  },
-  primaryButton: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 52,
-    padding: "0 22px",
-    borderRadius: 10,
-    background: "linear-gradient(135deg, #59e4ff, #8290ff)",
-    color: "#04101b",
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: "none",
-  },
-  secondaryButton: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 52,
-    padding: "0 22px",
-    border: "1px solid rgba(148, 163, 184, 0.34)",
-    borderRadius: 10,
-    background: "rgba(255,255,255,0.03)",
-    color: "#ffffff",
-    fontSize: 14,
-    fontWeight: 800,
-    textDecoration: "none",
-  },
-  marketStrip: {
-    display: "grid",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    gap: 1,
-    maxWidth: 900,
-    marginTop: 52,
-    overflow: "hidden",
-    border: "1px solid rgba(148, 163, 184, 0.2)",
-    borderRadius: 14,
-    background: "rgba(148, 163, 184, 0.18)",
-  },
-  marketLabel: {
-    display: "block",
-    padding: "20px 20px 6px",
-    background: "#0b1d2d",
-    color: "#8299aa",
-    fontSize: 10,
-    fontWeight: 900,
-    letterSpacing: "0.13em",
-  },
-  marketValue: {
-    display: "block",
-    padding: "0 20px 22px",
-    background: "#0b1d2d",
-    color: "#ffffff",
-    fontSize: 34,
-  },
-  servicesSection: {
-    padding: "clamp(64px, 8vw, 110px) clamp(24px, 6vw, 82px)",
-  },
-  sectionHeading: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "end",
-    gap: 28,
-    marginBottom: 30,
-  },
-  sectionTitle: {
-    maxWidth: 820,
-    margin: "10px 0 0",
-    fontSize: "clamp(34px, 4vw, 58px)",
-    lineHeight: 1.05,
-    letterSpacing: "-0.045em",
-  },
-  sectionIntro: {
-    maxWidth: 560,
-    margin: 0,
-    color: "#687581",
-    fontSize: 16,
-    lineHeight: 1.65,
-  },
-  filterRow: {
-    display: "flex",
-    flexWrap: "wrap",
-    gap: 9,
-    marginBottom: 28,
-  },
-  filter: {
-    padding: "9px 13px",
-    border: "1px solid #d6dee5",
-    borderRadius: 999,
-    background: "#ffffff",
-    color: "#60707c",
-    fontSize: 12,
-    fontWeight: 800,
-    textDecoration: "none",
-  },
-  filterActive: {
-    padding: "9px 13px",
-    border: "1px solid #0d8298",
-    borderRadius: 999,
-    background: "#dff7fb",
-    color: "#075d70",
-    fontSize: 12,
-    fontWeight: 900,
-    textDecoration: "none",
-  },
-  serviceGrid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-    gap: 20,
-  },
-  serviceCard: {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: 620,
-    padding: 25,
-    border: "1px solid #d8e0e6",
-    borderRadius: 16,
-    background: "#ffffff",
-    boxShadow: "0 18px 55px rgba(15, 23, 32, 0.055)",
-  },
-  cardHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 12,
-    marginBottom: 24,
-  },
-  category: {
-    color: "#0d7d92",
-    fontSize: 11,
-    fontWeight: 900,
-    letterSpacing: "0.14em",
-    textTransform: "uppercase",
-  },
-  discountBadge: {
-    padding: "6px 9px",
-    borderRadius: 999,
-    background: "#dcfce7",
-    color: "#166534",
-    fontSize: 10,
-    fontWeight: 950,
-  },
-  cardTitle: {
-    margin: 0,
-    fontSize: 28,
-    lineHeight: 1.1,
-    letterSpacing: "-0.035em",
-  },
-  cardDescription: {
-    minHeight: 92,
-    color: "#687682",
-    fontSize: 14,
-    lineHeight: 1.65,
-  },
-  pricePanel: {
-    margin: "18px 0 24px",
-    padding: 17,
-    border: "1px solid #dde5ea",
-    borderRadius: 12,
-    background: "#f7fafb",
-  },
-  priceRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 16,
-    padding: "7px 0",
-  },
-  priceLabel: {
-    color: "#6e7b86",
-    fontSize: 13,
-  },
-  marketPrice: {
-    color: "#7a8791",
-    fontSize: 17,
-    textDecoration: "line-through",
-  },
-  ta14Price: {
-    color: "#08758b",
-    fontSize: 22,
-  },
-  savingsRow: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: 16,
-    marginTop: 9,
-    paddingTop: 13,
-    borderTop: "1px solid #dce4e9",
-    color: "#166534",
-    fontSize: 13,
-  },
-  includesTitle: {
-    color: "#6f7d88",
-    fontSize: 10,
-    fontWeight: 900,
-    letterSpacing: "0.14em",
-  },
-  includesList: {
-    flex: 1,
-    margin: "13px 0 24px",
-    paddingLeft: 20,
-  },
-  includesItem: {
-    marginBottom: 9,
-    color: "#4d5c68",
-    fontSize: 13,
-    lineHeight: 1.5,
-  },
-  cardActions: {
-    display: "grid",
-    gap: 10,
-  },
-  cardPrimaryButton: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: 48,
-    padding: "0 16px",
-    borderRadius: 9,
-    background: "#0b7d92",
-    color: "#ffffff",
-    fontSize: 13,
-    fontWeight: 900,
-    textDecoration: "none",
-  },
-  cardSecondaryButton: {
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    minHeight: 46,
-    padding: "0 16px",
-    border: "1px solid #d4dde4",
-    borderRadius: 9,
-    color: "#52616c",
-    fontSize: 13,
-    fontWeight: 800,
-    textDecoration: "none",
-  },
-  howItWorks: {
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 1fr) minmax(320px, 0.9fr)",
-    gap: 50,
-    padding: "clamp(64px, 8vw, 108px) clamp(24px, 6vw, 82px)",
-    background: "#091725",
-    color: "#ffffff",
-  },
-  howTitle: {
-    margin: "12px 0",
-    fontSize: "clamp(34px, 4vw, 58px)",
-    lineHeight: 1.05,
-    letterSpacing: "-0.045em",
-  },
-  howText: {
-    maxWidth: 760,
-    color: "#9fb4c3",
-    fontSize: 16,
-    lineHeight: 1.65,
-  },
-  steps: {
-    display: "grid",
-    gap: 13,
-  },
-  step: {
-    padding: 20,
-    border: "1px solid rgba(148, 163, 184, 0.2)",
-    borderRadius: 13,
-    background: "#0e2132",
-  },
-  stepNumber: {
-    display: "block",
-    marginBottom: 10,
-    color: "#71e7ff",
-    fontSize: 11,
-    fontWeight: 950,
-  },
-  freeSection: {
-    display: "grid",
-    gridTemplateColumns: "minmax(0, 1.2fr) minmax(280px, 0.8fr)",
-    gap: 42,
-    alignItems: "center",
-    padding: "clamp(58px, 7vw, 92px) clamp(24px, 6vw, 82px)",
-    background: "#dff8fd",
-  },
-  freeTitle: {
-    margin: "12px 0",
-    fontSize: "clamp(34px, 4vw, 58px)",
-    lineHeight: 1.05,
-    letterSpacing: "-0.045em",
-  },
-  freeText: {
-    maxWidth: 760,
-    margin: 0,
-    color: "#526a77",
-    fontSize: 16,
-    lineHeight: 1.65,
-  },
-  freeActions: {
-    display: "grid",
-    gap: 12,
-  },
-  secondaryDarkButton: {
-    display: "inline-flex",
-    alignItems: "center",
-    justifyContent: "center",
-    minHeight: 52,
-    padding: "0 22px",
-    border: "1px solid rgba(15, 23, 32, 0.25)",
-    borderRadius: 10,
-    color: "#0c1b25",
-    fontSize: 14,
-    fontWeight: 900,
-    textDecoration: "none",
-  },
-  footer: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    gap: 24,
-    padding: "30px clamp(24px, 6vw, 82px)",
-    background: "#06111d",
-    color: "#dce8ef",
-  },
-  footerSub: {
-    marginTop: 4,
-    color: "#71899a",
-    fontSize: 12,
-  },
-  footerLinks: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "flex-end",
-    gap: 16,
-  },
-  footerLink: {
-    color: "#93a9b8",
-    fontSize: 12,
-    fontWeight: 700,
-    textDecoration: "none",
-  },
-};
