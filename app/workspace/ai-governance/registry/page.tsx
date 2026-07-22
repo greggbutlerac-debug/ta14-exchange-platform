@@ -415,7 +415,7 @@ export default function AiGovernanceRegistryPage() {
           </span>
         </Link>
         <nav aria-label="Registry navigation">
-          <a href="#foundation">TA-14 Foundation</a>
+          <Link href="/foundation">Credentials & Public Record</Link>
           <a href="#architecture-family">Architecture</a>
           <a href="#standards-family">Standards</a>
           <a href="#public-record">Public Record</a>
@@ -453,10 +453,10 @@ export default function AiGovernanceRegistryPage() {
             </span>
           </div>
           <div className="hero-actions">
-            <a className="polished-button polished-button-primary" href="#foundation">
-              <span>Open the TA-14 Foundation Record</span>
-              <span className="button-arrow" aria-hidden="true">↓</span>
-            </a>
+            <Link className="polished-button polished-button-primary" href="/foundation">
+              <span>Open TA-14 Credentials & Public Record</span>
+              <span className="button-arrow" aria-hidden="true">→</span>
+            </Link>
             <a className="polished-button polished-button-bronze" href="#record">
               <span>Examine the Registry Method</span>
               <span className="button-arrow" aria-hidden="true">→</span>
@@ -476,11 +476,37 @@ export default function AiGovernanceRegistryPage() {
         <p>THE REGISTRY PRESERVES THE DECLARATION. IT DOES NOT ENDORSE THE DECLARATION.</p>
       </section>
 
+      <section className="registry-hierarchy" aria-label="TA-14 institutional hierarchy">
+        <div className="hierarchy-label">
+          <span>INSTITUTIONAL HIERARCHY</span>
+          <strong>This Registry sits inside the TA-14 public record.</strong>
+        </div>
+        <div className="hierarchy-chain">
+          {[
+            'TA-14 Credentials & Public Record',
+            'Foundational Architectural Registry',
+            'Architecture Family',
+            'Standards Family',
+            'Reference Implementations',
+            'AI Governance Registry',
+          ].map((item, index, array) => (
+            <div key={item}>
+              {index === 0 ? (
+                <Link href="/foundation">{item}</Link>
+              ) : (
+                <span>{item}</span>
+              )}
+              {index < array.length - 1 && <b aria-hidden="true">→</b>}
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section id="foundation" className="section-shell foundation-section">
         <SectionTitle
           eyebrow="FOUNDATIONAL ARCHITECTURAL REGISTRY"
           title="The canonical TA-14 foundation record."
-          text="This is the parent registry record connecting the TA-14 architecture family, standards, publications, public chronology, code repositories, and operational Exchange."
+          text="This is the canonical architectural registry record beneath the TA-14 Credentials & Public Record, connecting the architecture family, standards, public corpus, repositories, and operational Exchange."
         />
 
         <div className="foundation-record">
@@ -510,6 +536,22 @@ export default function AiGovernanceRegistryPage() {
               <span>Current state</span>
               <strong>Active and expanding</strong>
             </div>
+          </div>
+
+          <div className="parent-record-card">
+            <div>
+              <p>PARENT PUBLIC RECORD</p>
+              <h4>TA-14 Credentials & Public Record</h4>
+              <span>
+                The parent record preserves institutional identity, founder and stewardship,
+                chronology, publications, repositories, filings, claims, non-claims, public
+                evidence, disputes, and correction routes. This page focuses specifically on the
+                architecture and registry relationships beneath that institutional record.
+              </span>
+            </div>
+            <PolishedLink href="/foundation" variant="bronze">
+              Open Parent Record
+            </PolishedLink>
           </div>
 
           <div className="foundation-tabs" role="tablist" aria-label="TA-14 foundation record">
@@ -793,16 +835,70 @@ export default function AiGovernanceRegistryPage() {
       </section>
 
       <section className="section-shell launch-section">
-        <div className="launch-card">
-          <div>
-            <p className="eyebrow">FOUNDATIONAL RECORD ESTABLISHED</p>
-            <h2>The TA-14 foundation now has a public registry home.</h2>
+        <div className="continue-panel">
+          <div className="continue-heading">
+            <p className="eyebrow">CONTINUE EXPLORING</p>
+            <h2>Move from institutional identity into architecture, requirements, records, and review.</h2>
             <span>
-              The page now connects the foundational architecture, standards family, public corpus,
-              repositories, operational Exchange, registry controls, status model, and explicit
-              non-claims in one attributable record.
+              The credentials record establishes who TA-14 is and what public evidence supports its
+              claims. The Registry preserves the architecture. The Exchange provides the operational
+              workspace.
             </span>
           </div>
+
+          <div className="continue-grid">
+            {[
+              {
+                title: 'TA-14 Credentials & Public Record',
+                text: 'Institutional identity, stewardship, chronology, publications, repositories, claims, non-claims, and public evidence.',
+                href: '/foundation',
+              },
+              {
+                title: 'AI Governance Exchange',
+                text: 'Build, test, preserve, and review consequential AI governance routes.',
+                href: '/workspace/ai-governance',
+              },
+              {
+                title: 'EU AI Act Requirements',
+                text: 'Explore requirement pathways and the evidence used to support declared compliance approaches.',
+                href: '/workspace/ai-governance/eu-ai-act',
+              },
+              {
+                title: 'Governed Records',
+                text: 'Preserve what was submitted, reviewed, determined, committed, and executed.',
+                href: '/workspace/governed-records',
+              },
+              {
+                title: 'Partner Review Network',
+                text: 'Explore bounded independent review roles, partner pathways, and review relationships.',
+                href: '/workspace/entity-review',
+              },
+              {
+                title: 'Architectural Registry',
+                text: 'Remain on the registry method, controls, status model, and architecture relationships.',
+                href: '#foundation',
+              },
+              {
+                title: 'Standards Family',
+                text: 'Inspect the named standards, protocols, replay methods, and conformance boundaries.',
+                href: '#standards-family',
+              },
+              {
+                title: 'Reference Implementations',
+                text: 'Review the public architecture site, admissible execution gate, and Exchange implementation layers.',
+                href: '#implementations',
+              },
+            ].map((item) => (
+              <Link key={item.title} href={item.href} className="continue-card">
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
+                </div>
+                <span aria-hidden="true">→</span>
+              </Link>
+            ))}
+          </div>
+
           <div className="launch-actions">
             <PolishedLink href="/workspace" variant="primary">
               Enter the Exchange Workspace
@@ -815,7 +911,7 @@ export default function AiGovernanceRegistryPage() {
               Open the Public Repository
             </PolishedLink>
             <Link href="/" className="polished-button polished-button-secondary">
-              <span>Return to the Grand Exchange Hall</span>
+              <span>Return to the Exchange Homepage</span>
               <span aria-hidden="true" className="button-arrow">←</span>
             </Link>
           </div>
@@ -876,7 +972,7 @@ export default function AiGovernanceRegistryPage() {
         .orbit-one { width: 420px; height: 120px; top: 6%; left: -130px; }
         .orbit-two { width: 520px; height: 150px; top: 9%; right: -180px; transform: rotate(16deg); }
 
-        .topbar, .hero, .section-shell, .institutional-banner, footer { position: relative; z-index: 2; }
+        .topbar, .hero, .section-shell, .institutional-banner, .registry-hierarchy, footer { position: relative; z-index: 2; }
         .topbar {
           width: min(1540px, calc(100% - 40px));
           margin: 18px auto 0;
@@ -935,6 +1031,16 @@ export default function AiGovernanceRegistryPage() {
         .institutional-banner { border-top: 1px solid rgba(255,206,125,.2); border-bottom: 1px solid rgba(255,206,125,.2); background: linear-gradient(90deg, rgba(71,42,12,.16), rgba(10,31,48,.7), rgba(71,42,12,.16)); }
         .institutional-banner p { width: min(1200px, calc(100% - 40px)); margin: 0 auto; padding: 19px 0; text-align: center; color: #f3d49d; font-family: Georgia, serif; font-size: 13px; letter-spacing: .14em; }
 
+        .registry-hierarchy { width: min(1200px, calc(100% - 40px)); margin: 34px auto 0; padding: 24px; border: 1px solid rgba(126,191,240,.18); border-radius: 22px; background: linear-gradient(145deg, rgba(8,28,45,.9), rgba(4,15,26,.95)); box-shadow: var(--shadow); }
+        .hierarchy-label { display: flex; align-items: baseline; justify-content: space-between; gap: 20px; padding-bottom: 18px; border-bottom: 1px solid rgba(126,191,240,.13); }
+        .hierarchy-label span { color: var(--blue); font-size: 9px; font-weight: 900; letter-spacing: .18em; }
+        .hierarchy-label strong { color: #d8e8f3; font-family: Georgia, serif; font-size: 18px; font-weight: 500; }
+        .hierarchy-chain { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; padding-top: 20px; }
+        .hierarchy-chain div { display: flex; align-items: center; gap: 9px; }
+        .hierarchy-chain span, .hierarchy-chain a { display: grid; place-items: center; min-height: 42px; padding: 0 13px; border-radius: 12px; border: 1px solid rgba(132,203,255,.18); background: rgba(4,17,29,.82); color: #dbeaf5; font-family: Georgia, serif; font-size: 12px; }
+        .hierarchy-chain a { border-color: rgba(255,205,120,.3); color: var(--gold); }
+        .hierarchy-chain b { color: var(--bronze); }
+
         .section-shell { width: min(1200px, calc(100% - 40px)); margin: 0 auto; padding: 110px 0; }
         .compact-section { padding-top: 70px; }
         .section-heading { max-width: 900px; margin-bottom: 50px; }
@@ -954,6 +1060,11 @@ export default function AiGovernanceRegistryPage() {
         .foundation-meta div:last-child { border-right: 0; }
         .foundation-meta span { color: var(--blue); font-size: 9px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
         .foundation-meta strong { color: #eaf5ff; font-family: Georgia, serif; font-size: 17px; font-weight: 500; }
+
+        .parent-record-card { display: grid; grid-template-columns: 1fr auto; gap: 28px; align-items: center; padding: 28px 34px; border-bottom: 1px solid rgba(126,191,240,.14); background: linear-gradient(90deg, rgba(92,56,17,.2), rgba(5,20,34,.72)); }
+        .parent-record-card p { margin: 0 0 8px; color: var(--gold); font-size: 9px; font-weight: 900; letter-spacing: .17em; }
+        .parent-record-card h4 { margin: 0 0 9px; font-family: Georgia, serif; font-size: 25px; font-weight: 500; }
+        .parent-record-card > div > span { display: block; max-width: 820px; color: #aebfce; line-height: 1.65; font-size: 13px; }
         .foundation-tabs { display: flex; flex-wrap: wrap; gap: 8px; padding: 24px 30px; border-bottom: 1px solid rgba(126,191,240,.13); }
         .foundation-tabs button { border: 1px solid rgba(132,203,255,.18); background: rgba(4,17,29,.72); color: #a8bed0; min-height: 38px; padding: 0 14px; border-radius: 999px; cursor: pointer; font-size: 10px; font-weight: 900; letter-spacing: .05em; transition: .2s ease; }
         .foundation-tabs button:hover, .foundation-tabs button.active { color: #03101b; border-color: rgba(190,238,255,.8); background: linear-gradient(135deg, #c8f3ff, #67c9ff); transform: translateY(-2px); }
@@ -1060,10 +1171,17 @@ export default function AiGovernanceRegistryPage() {
         .method-boundaries li { margin: 10px 0; line-height: 1.55; font-size: 13px; }
 
         .launch-section { padding-top: 60px; }
-        .launch-card { display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center; padding: 42px; border-radius: 26px; border: 1px solid rgba(255,205,120,.23); background: radial-gradient(circle at 20% 0%, rgba(60,142,204,.24), transparent 45%), linear-gradient(135deg, rgba(47,30,12,.75), rgba(5,20,34,.96) 55%); box-shadow: var(--shadow); }
-        .launch-card h2 { margin: 0 0 14px; font-family: Georgia, serif; font-weight: 500; font-size: clamp(30px, 4vw, 48px); }
-        .launch-card span { color: #b3c2cf; line-height: 1.7; }
-        .launch-actions { display: grid; gap: 10px; min-width: 300px; }
+        .continue-panel { padding: 42px; border-radius: 26px; border: 1px solid rgba(255,205,120,.23); background: radial-gradient(circle at 20% 0%, rgba(60,142,204,.24), transparent 45%), linear-gradient(135deg, rgba(47,30,12,.75), rgba(5,20,34,.96) 55%); box-shadow: var(--shadow); }
+        .continue-heading { max-width: 900px; }
+        .continue-heading h2 { margin: 0 0 14px; font-family: Georgia, serif; font-weight: 500; font-size: clamp(30px, 4vw, 48px); }
+        .continue-heading > span { display: block; color: #b3c2cf; line-height: 1.7; }
+        .continue-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 32px; }
+        .continue-card { min-height: 160px; padding: 22px; border-radius: 18px; border: 1px solid rgba(126,191,240,.16); background: rgba(5,18,31,.82); display: flex; justify-content: space-between; gap: 24px; transition: .24s ease; }
+        .continue-card:hover { transform: translateY(-4px); border-color: rgba(126,210,255,.36); background: rgba(8,28,45,.92); }
+        .continue-card h3 { margin: 0 0 10px; font-family: Georgia, serif; font-size: 21px; font-weight: 500; }
+        .continue-card p { margin: 0; color: #9fb2c2; line-height: 1.6; font-size: 13px; }
+        .continue-card > span { color: var(--gold); font-size: 22px; }
+        .launch-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
 
         footer { width: min(1200px, calc(100% - 40px)); margin: 0 auto; padding: 45px 0 60px; border-top: 1px solid rgba(126,191,240,.15); display: flex; justify-content: space-between; gap: 30px; color: #8499aa; }
         footer div { display: grid; gap: 5px; }
@@ -1085,7 +1203,7 @@ export default function AiGovernanceRegistryPage() {
           .implementation-grid article { min-height: 280px; }
           .foundation-meta { grid-template-columns: repeat(2, 1fr); }
           .foundation-meta div:nth-child(2) { border-right: 0; }
-          .launch-card { grid-template-columns: 1fr; gap: 28px; }
+          .continue-grid { grid-template-columns: 1fr; }
           .launch-actions { display: flex; flex-wrap: wrap; }
         }
 
@@ -1101,12 +1219,19 @@ export default function AiGovernanceRegistryPage() {
           .hero-boundary { text-align: left; }
           .hero-actions, .trust-strip { justify-content: center; }
           .institutional-banner p { font-size: 10px; line-height: 1.7; }
+          .registry-hierarchy { width: min(100% - 28px, 1200px); margin-top: 24px; padding: 20px; }
+          .hierarchy-label { display: grid; }
+          .hierarchy-chain { align-items: stretch; }
+          .hierarchy-chain div { flex: 1 1 100%; }
+          .hierarchy-chain span, .hierarchy-chain a { flex: 1; }
+          .hierarchy-chain b { transform: rotate(90deg); }
           .section-shell { width: min(100% - 28px, 1200px); padding: 80px 0; }
           .compact-section { padding-top: 50px; }
           .foundation-header { flex-direction: column; }
           .foundation-meta { grid-template-columns: 1fr; }
           .foundation-meta div { border-right: 0; border-bottom: 1px solid rgba(126,191,240,.12); }
           .foundation-meta div:last-child { border-bottom: 0; }
+          .parent-record-card { grid-template-columns: 1fr; padding: 24px 22px; }
           .foundation-detail { grid-template-columns: 1fr; padding: 26px 22px; }
           .foundation-tabs { padding: 20px; }
           .foundation-chain { align-items: stretch; padding: 22px; }
@@ -1131,7 +1256,8 @@ export default function AiGovernanceRegistryPage() {
           .chain-item { flex: 1 1 100%; }
           .chain-item span { flex: 1; }
           .chain-item b { transform: rotate(90deg); }
-          .launch-card { padding: 28px 22px; }
+          .continue-panel { padding: 28px 22px; }
+          .continue-grid { grid-template-columns: 1fr; }
           .launch-actions { display: grid; min-width: 0; }
           footer { width: min(100% - 28px, 1200px); flex-direction: column; }
         }
