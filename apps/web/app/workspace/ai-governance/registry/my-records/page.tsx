@@ -422,14 +422,25 @@ export default function MyRegistryRecordsPage() {
 
                 <div className="recordActions">
                   {isRegistered ? (
-                    <Link
-                      href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
-                        record.registryIdentifier ?? '',
-                      )}`}
-                      className="primaryButton"
-                    >
-                      Open Permanent Record
-                    </Link>
+                    <>
+                      <Link
+                        href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                          record.registryIdentifier ?? '',
+                        )}/citation`}
+                        className="secondaryButton"
+                      >
+                        Cite Record
+                      </Link>
+
+                      <Link
+                        href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                          record.registryIdentifier ?? '',
+                        )}`}
+                        className="primaryButton"
+                      >
+                        Open Permanent Record
+                      </Link>
+                    </>
                   ) : (
                     <Link
                       href={`/workspace/ai-governance/registry/register/${encodeURIComponent(
@@ -826,6 +837,9 @@ const styles = `
 
   .recordActions {
     margin-top: auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
   }
 
   .primaryButton,
@@ -854,8 +868,9 @@ const styles = `
     color: #eef4ff;
   }
 
-  .recordActions .primaryButton {
-    width: 100%;
+  .recordActions .primaryButton,
+  .recordActions .secondaryButton {
+    flex: 1 1 190px;
   }
 
   .stateCard {
