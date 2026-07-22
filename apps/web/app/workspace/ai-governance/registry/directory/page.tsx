@@ -154,7 +154,7 @@ export default function RegistryDirectoryPage() {
           <Link href="/workspace/ai-governance/registry" className="button button-secondary">
             Registry Home
           </Link>
-          <Link href="/workspace/ai-governance/registry/new" className="button button-primary">
+          <Link href="/workspace/ai-governance/registry/register" className="button button-primary">
             Register an Architecture
           </Link>
         </div>
@@ -236,12 +236,12 @@ export default function RegistryDirectoryPage() {
             <span className="state-code">PUBLIC DATA CONNECTION NEXT</span>
             <h2>The directory page is established.</h2>
             <p>
-              The public Registry data endpoint has not yet been connected. The next file will connect
-              finalized, public governance records to this directory without exposing private drafts,
-              submitted records, reviewer notes, or controlled evidence.
+              The public Registry directory is connected to finalized, publication-safe records.
+              Private drafts, submitted records, reviewer notes, and controlled evidence remain outside
+              the public projection.
             </p>
             <div className="state-actions">
-              <Link href="/workspace/ai-governance/registry/new" className="button button-primary">
+              <Link href="/workspace/ai-governance/registry/register" className="button button-primary">
                 Begin a Registry Filing
               </Link>
               <Link href="/workspace/ai-governance/registry" className="button button-secondary">
@@ -260,7 +260,7 @@ export default function RegistryDirectoryPage() {
               only after review, finalization, permanent identifier assignment, and authorization for
               public visibility.
             </p>
-            <Link href="/workspace/ai-governance/registry/new" className="button button-primary">
+            <Link href="/workspace/ai-governance/registry/register" className="button button-primary">
               Register the First Architecture
             </Link>
           </div>
