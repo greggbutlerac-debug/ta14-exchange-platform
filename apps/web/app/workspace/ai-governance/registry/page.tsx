@@ -173,8 +173,8 @@ export default function AiGovernanceRegistryPage() {
           <a href="#status">Status Model</a>
           <a href="#method">Method</a>
         </nav>
-        <PolishedLink href="/workspace" variant="secondary">
-          Open Workspace
+        <PolishedLink href="/workspace/ai-governance/registry/directory" variant="secondary">
+          Browse Registry
         </PolishedLink>
       </header>
 
@@ -204,17 +204,12 @@ export default function AiGovernanceRegistryPage() {
             </span>
           </div>
           <div className="hero-actions">
-            <PolishedLink href="/workspace/ai-governance/registry/register" variant="primary">
-              Register Governance
+            <PolishedLink href="/workspace/ai-governance/registry/new" variant="primary">
+              Register a Governance Architecture
             </PolishedLink>
-            <a className="polished-button polished-button-bronze" href="#record">
-              <span>Examine the Registry Record</span>
-              <span className="button-arrow" aria-hidden="true">↓</span>
-            </a>
-            <a className="polished-button polished-button-secondary" href="#method">
-              <span>Read the Registry Method</span>
-              <span className="button-arrow" aria-hidden="true">→</span>
-            </a>
+            <PolishedLink href="/workspace/ai-governance/registry/directory" variant="bronze">
+              Browse Registered Governances
+            </PolishedLink>
           </div>
           <div className="trust-strip" aria-label="Registry principles">
             <span>Persistent identity</span>
@@ -358,25 +353,25 @@ export default function AiGovernanceRegistryPage() {
       <section className="section-shell launch-section">
         <div className="launch-card">
           <div>
-            <p className="eyebrow">REGISTRY INTAKE NOW OPEN</p>
-            <h2>Establish the first governed Registry record.</h2>
+            <p className="eyebrow">FOUNDATIONAL RELEASE</p>
+            <h2>The front door is now established.</h2>
             <span>
-              Begin a formal registration with identity, stewardship, scope, claims, explicit non-claims,
-              evidence references, ownership and licensing declarations, visibility controls, and a
-              drag-and-drop evidence package prepared for governed review.
+              The Registry is moving from institutional design into operation. Governance architectures
+              can enter governed intake, preserve identity and authority declarations, submit evidence,
+              proceed through review, receive a permanent Registry identifier, and appear in the public
+              directory when public visibility is authorized.
             </span>
           </div>
           <div className="launch-actions">
-            <PolishedLink href="/workspace/ai-governance/registry/register" variant="primary">
-              Begin Registration
+            <PolishedLink href="/workspace/ai-governance/registry/new" variant="primary">
+              Begin a Registry Filing
             </PolishedLink>
-            <PolishedLink href="/workspace" variant="bronze">
-              Enter the Exchange Workspace
+            <PolishedLink href="/workspace/ai-governance/registry/directory" variant="secondary">
+              Open the Public Directory
             </PolishedLink>
-            <Link href="/" className="polished-button polished-button-secondary">
-              <span>Return to the Grand Exchange Hall</span>
-              <span aria-hidden="true" className="button-arrow">←</span>
-            </Link>
+            <PolishedLink href="/workspace/ai-governance/registry/my" variant="bronze">
+              Open My Registry Records
+            </PolishedLink>
           </div>
         </div>
       </section>
