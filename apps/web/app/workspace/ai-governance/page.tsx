@@ -1,402 +1,372 @@
-import Image from 'next/image';
-import Link from 'next/link';
+"use client";
 
-const WORKSPACE_ROUTES = {
-  home: '/workspace',
-  aiGovernance: '/workspace/ai-governance',
-  build: '/workspace/build',
-  testing: '/workspace/testing',
-  corrections: '/workspace/corrections',
-  routes: '/workspace/routes',
-  registry: '/workspace/registry',
-  replay: '/workspace/replay',
-  verify: '/workspace/verify',
-  receipts: '/workspace/receipts',
-  preservation: '/workspace/preservation',
-  partnerReviewNetwork: '/workspace/ai-governance/partner-review-network',
-} as const;
+import Link from "next/link";
 
-const PRIMARY_TOOLS = [
+const capabilities = [
   {
-    eyebrow: 'Construct',
-    title: 'Build a Governed AI Route',
+    title: "Build a Governance Route",
     description:
-      'Define the proposed consequence through Reality, Record, Continuity, Admissibility, Binding, Commit, Execution, and Outcome.',
-    href: WORKSPACE_ROUTES.build,
-    action: 'Open Route Builder',
-    glyph: '◇',
+      "Define identity, delegated authority, evidence, tools, payloads, commitments, execution boundaries, and intended outcomes.",
+    href: "/workspace/routes/new",
+    action: "Build route",
   },
   {
-    eyebrow: 'Evaluate',
-    title: 'Test the Route',
+    title: "Test a Consequential Route",
     description:
-      'Run repeatable simulations, expose missing evidence or authority, and receive an ALLOW, HOLD, DENY, or ESCALATE determination.',
-    href: WORKSPACE_ROUTES.testing,
-    action: 'Open Testing Desk',
-    glyph: '◎',
+      "Run a route through the TA-14 governance chain and identify HOLD, DENY, ESCALATE, or ALLOW conditions.",
+    href: "/workspace",
+    action: "Open playground",
   },
   {
-    eyebrow: 'Correct',
-    title: 'Resolve Broken Links',
+    title: "Preserve the Record",
     description:
-      'Return findings to the route, correct the precise failed stage, and preserve the difference between the prior and corrected state.',
-    href: WORKSPACE_ROUTES.corrections,
-    action: 'Open Corrections',
-    glyph: '↺',
+      "Create governed records that preserve what was submitted, reviewed, determined, and executed.",
+    href: "/workspace/governed-records",
+    action: "Open records",
   },
-] as const;
+  {
+    title: "Submit for Entity Review",
+    description:
+      "Bring an AI system, organization, architecture, governance program, or operational route into bounded full-chain review.",
+    href: "/workspace/entity-review",
+    action: "Open review",
+  },
+];
 
-const RECORD_TOOLS = [
-  {
-    title: 'My Routes',
-    description:
-      'Open account-scoped and locally preserved route drafts without returning to the general workspace gateway.',
-    href: WORKSPACE_ROUTES.routes,
-    glyph: 'R',
-  },
-  {
-    title: 'Route Registry',
-    description:
-      'Inspect registered route identities, states, domains, and preserved governance references.',
-    href: WORKSPACE_ROUTES.registry,
-    glyph: '⌁',
-  },
-  {
-    title: 'Replay',
-    description:
-      'Re-evaluate preserved route packages and compare current findings with earlier determinations.',
-    href: WORKSPACE_ROUTES.replay,
-    glyph: '▶',
-  },
-  {
-    title: 'Verification',
-    description:
-      'Verify receipts and preserved artifacts independently from the interface that created them.',
-    href: WORKSPACE_ROUTES.verify,
-    glyph: '✓',
-  },
-  {
-    title: 'Receipts',
-    description:
-      'Review the records produced by route testing, review, correction, and execution-boundary activity.',
-    href: WORKSPACE_ROUTES.receipts,
-    glyph: '▤',
-  },
-  {
-    title: 'Preservation',
-    description:
-      'Preserve canonical route state, dependencies, findings, and continuity before consequential execution.',
-    href: WORKSPACE_ROUTES.preservation,
-    glyph: '⬡',
-  },
-] as const;
+const chain = [
+  "Reality",
+  "Record",
+  "Continuity",
+  "Admissibility",
+  "Binding",
+  "Commit",
+  "Execution",
+  "Outcome",
+];
 
-const CHAIN = [
-  'Reality',
-  'Record',
-  'Continuity',
-  'Admissibility',
-  'Binding',
-  'Commit',
-  'Execution',
-  'Outcome',
-] as const;
-
-export default function AIGovernancePlaygroundPage() {
+export default function AIGovernancePage() {
   return (
-    <main className="aiPlayground">
-      <section className="hero">
-        <div className="heroGlow" aria-hidden="true" />
+    <main>
+      <div className="stars starsOne" />
+      <div className="stars starsTwo" />
+      <div className="orb orbOne" />
+      <div className="orb orbTwo" />
 
-        <div className="heroTopline">
-          <span className="statusDot" />
-          DEDICATED PLAYGROUND · AI GOVERNANCE
+      <header className="topbar shell">
+        <Link href="/" className="brand">
+          <span className="brandMark">TA-14</span>
+          <span>
+            <strong>AI Governance</strong>
+            <small>TA-14 AI Governance Exchange</small>
+          </span>
+        </Link>
+
+        <nav>
+          <Link href="/">Home</Link>
+          <Link href="/workspace">Workspace</Link>
+          <Link href="/workspace/governed-records">Records</Link>
+          <Link href="/workspace/entity-review">Entity Review</Link>
+        </nav>
+      </header>
+
+      <section className="hero shell">
+        <div className="heroCopy">
+          <p className="eyebrow">AI GOVERNANCE WORKSPACE</p>
+          <h1>Govern the route before the route governs the outcome.</h1>
+          <p className="lead">
+            Build, test, correct, preserve, and review consequential AI routes
+            without collapsing evidence, authority, commitments, execution, and
+            outcomes into one unsupported claim.
+          </p>
+
+          <div className="heroActions">
+            <Link className="primaryButton" href="/workspace">
+              Open AI Governance Playground
+              <span>→</span>
+            </Link>
+            <Link className="secondaryButton" href="/workspace/routes/new">
+              Build a New Route
+            </Link>
+          </div>
         </div>
 
-        <div className="heroGrid">
-          <div>
-            <p className="eyebrow">TA-14 AI Governance Exchange</p>
-            <h1>
-              Govern the route
-              <span>before the AI acts.</span>
-            </h1>
-            <p className="heroCopy">
-              This is the dedicated AI Governance playground. Build a
-              consequence-bearing route, test its evidence and authority,
-              correct failed links, preserve the admitted state, and verify the
-              resulting record without being sent back through the general
-              workspace gateway.
-            </p>
+        <div className="heroVisual" aria-hidden="true">
+          <div className="orbit orbitOne">
+            <span />
+          </div>
+          <div className="orbit orbitTwo">
+            <span />
+          </div>
+          <div className="orbit orbitThree">
+            <span />
+          </div>
+          <div className="core">
+            <strong>AI</strong>
+            <small>Governed Route</small>
+          </div>
+        </div>
+      </section>
 
-            <div className="heroActions">
-              <Link className="primaryButton" href={WORKSPACE_ROUTES.build}>
-                Build an AI Route
-              </Link>
-              <Link className="secondaryButton" href={WORKSPACE_ROUTES.testing}>
-                Run a Free Simulation
-              </Link>
+      <section className="principle shell">
+        <p className="eyebrow">THE GOVERNING PRINCIPLE</p>
+        <h2>No admissible evidence. No admissible execution.</h2>
+        <p>
+          TA-14 preserves each governance layer separately so records,
+          interpretations, determinations, commitments, and execution cannot
+          silently corrupt one another.
+        </p>
+
+        <div className="chain">
+          {chain.map((item, index) => (
+            <div className="chainStep" key={item}>
+              <span>{item}</span>
+              {index < chain.length - 1 && <b>→</b>}
             </div>
-          </div>
-
-          <aside className="principleCard">
-            <p className="eyebrow">Governing principle</p>
-            <blockquote>
-              No admissible evidence.
-              <br />
-              No admissible execution.
-            </blockquote>
-            <p>
-              A confident model output, policy declaration, approval screen, or
-              dashboard status is not proof that a consequential action is
-              legitimate.
-            </p>
-          </aside>
-        </div>
-      </section>
-
-      <section className="chainPanel" aria-label="TA-14 admissibility chain">
-        {CHAIN.map((stage, index) => (
-          <div className="chainItem" key={stage}>
-            <span>{String(index + 1).padStart(2, '0')}</span>
-            <strong>{stage}</strong>
-            {index < CHAIN.length - 1 ? (
-              <i aria-hidden="true">→</i>
-            ) : null}
-          </div>
-        ))}
-      </section>
-
-      <section className="section">
-        <div className="sectionHeading">
-          <p className="eyebrow">Start here</p>
-          <h2>Build, test, and correct the actual route.</h2>
-          <p>
-            These are the primary working areas for AI governance. Each opens
-            directly into its own tool rather than returning you to the
-            workspace choice screen.
-          </p>
-        </div>
-
-        <div className="primaryGrid">
-          {PRIMARY_TOOLS.map((tool) => (
-            <Link className="primaryCard" href={tool.href} key={tool.title}>
-              <div className="cardTop">
-                <span className="cardGlyph">{tool.glyph}</span>
-                <span className="cardArrow">↗</span>
-              </div>
-              <p className="eyebrow">{tool.eyebrow}</p>
-              <h3>{tool.title}</h3>
-              <p>{tool.description}</p>
-              <strong>{tool.action}</strong>
-            </Link>
           ))}
         </div>
       </section>
 
-      <section className="section">
-        <div className="sectionHeading compact">
-          <p className="eyebrow">Continue the lifecycle</p>
-          <h2>Preserve and verify what the route became.</h2>
+      <section className="capabilities shell">
+        <div className="sectionIntro">
+          <p className="eyebrow">BEGIN HERE</p>
+          <h2>Choose what you need to do.</h2>
           <p>
-            AI governance does not end with a test result. The route, findings,
-            corrections, replay history, receipts, and verification path must
-            remain connected.
+            Each route enters through the same chain, but every task preserves
+            its own scope and evidence boundary.
           </p>
         </div>
 
-        <div className="recordGrid">
-          {RECORD_TOOLS.map((tool) => (
-            <Link className="recordCard" href={tool.href} key={tool.title}>
-              <span className="recordGlyph">{tool.glyph}</span>
-              <div>
-                <h3>{tool.title}</h3>
-                <p>{tool.description}</p>
-              </div>
-              <span className="recordArrow">→</span>
-            </Link>
+        <div className="capabilityGrid">
+          {capabilities.map((item, index) => (
+            <article key={item.title}>
+              <span className="number">{String(index + 1).padStart(2, "0")}</span>
+              <h3>{item.title}</h3>
+              <p>{item.description}</p>
+              <Link href={item.href}>
+                {item.action}
+                <span>→</span>
+              </Link>
+            </article>
           ))}
         </div>
       </section>
 
-      <section className="partnerNetwork">
-        <div className="partnerNetworkCopy">
-          <p className="eyebrow">TA-14 Partner Review Network</p>
-          <h2>Three independent governance pathways. One bounded review network.</h2>
-          <p>
-            Explore the current TA-14 Partner Review Network, including Elias /
-            LOVE-OS, AnchorStack, and AB / BIGMAE / Elias. Each pathway preserves
-            the partner's independent architecture while adding written review
-            boundaries and TA-14 second-layer admissible-execution review.
-          </p>
-
-          <div className="partnerPills" aria-label="Current partner pathways">
-            <span>Elias / LOVE-OS</span>
-            <span>AnchorStack</span>
-            <span>AB / BIGMAE / Elias</span>
-          </div>
-
-          <Link className="partnerButton" href={WORKSPACE_ROUTES.partnerReviewNetwork}>
-            Explore the Partner Review Network
-          </Link>
-        </div>
-
-        <div className="partnerNetworkEmblem">
-          <Image
-            src="/images/ta-14-partner-review-network-emblem.png"
-            alt="TA-14 Partner Review Network emblem"
-            width={420}
-            height={420}
-            sizes="(max-width: 980px) 100vw, 420px"
-            priority={false}
-          />
-          <p>Interactive partner profiles and governance boundaries</p>
-        </div>
-      </section>
-
-      <section className="boundary">
+      <section className="euSection shell">
         <div>
-          <p className="eyebrow">Declared boundary</p>
-          <h2>A simulation is not production authority.</h2>
+          <p className="eyebrow">EU AI ACT</p>
+          <h2>Review applicable requirements inside the governance workspace.</h2>
+          <p>
+            Explore EU AI Act requirements, map them to the relevant TA-14
+            governance layers, and preserve the evidence used to support each
+            declared compliance approach.
+          </p>
+        </div>
+
+        <Link className="euButton" href="/workspace/ai-governance/eu-ai-act">
+          EU AI Act Requirements
+          <span>→</span>
+        </Link>
+      </section>
+
+      <section className="boundary shell">
+        <div>
+          <p className="eyebrow">BOUNDARY</p>
+          <h2>TA-14 does not turn a governance claim into a certification.</h2>
         </div>
         <p>
-          Free exploration can reveal route defects and teach the TA-14
-          discipline. It does not manufacture evidence, validate a false
-          assertion, confer organizational authority, or create a
-          production-admissible execution receipt. Those boundaries must remain
-          explicit.
+          The platform creates attributable records, exposes missing evidence,
+          preserves unresolved conditions, and supports bounded review. It does
+          not certify that an AI system, organization, architecture, or route is
+          legally compliant merely because it has been submitted.
         </p>
       </section>
 
-      <footer className="playgroundFooter">
-        <Link href="/">← Public homepage</Link>
-        <Link href={WORKSPACE_ROUTES.home}>All playgrounds</Link>
-        <Link href={WORKSPACE_ROUTES.routes}>My Routes →</Link>
+      <section className="finalCta shell">
+        <div>
+          <p className="eyebrow">AI GOVERNANCE PLAYGROUND</p>
+          <h2>Bring the route. Test the chain.</h2>
+          <p>
+            Start with a consequential AI route and see exactly where evidence,
+            authority, continuity, or commitments are insufficient.
+          </p>
+        </div>
+
+        <Link className="primaryButton" href="/workspace">
+          Enter the Playground
+          <span>→</span>
+        </Link>
+      </section>
+
+      <footer className="shell">
+        <span>TA-14 Authority Governance Institution</span>
+        <Link href="/">Return to the four doors</Link>
       </footer>
 
-      <style>{`
-        .aiPlayground {
-          --cyan: #68e5ff;
-          --green: #62efb9;
-          --violet: #a495ff;
-          --ink: #071019;
-          --panel: rgba(9, 25, 36, 0.84);
-          --line: rgba(145, 205, 225, 0.16);
-          position: relative;
-          min-height: 100vh;
-          padding: 42px clamp(18px, 4vw, 64px) 56px;
-          overflow: hidden;
-          color: #f3f9fc;
+      <style jsx>{`
+        :global(*) {
+          box-sizing: border-box;
+        }
+
+        :global(html) {
+          background: #040914;
+        }
+
+        :global(body) {
+          margin: 0;
           background:
-            radial-gradient(circle at 78% 8%, rgba(104, 229, 255, 0.12), transparent 28%),
-            radial-gradient(circle at 8% 48%, rgba(164, 149, 255, 0.09), transparent 34%),
-            linear-gradient(180deg, #061019 0%, #03090e 100%);
+            radial-gradient(circle at 12% 8%, rgba(66, 207, 190, 0.13), transparent 28%),
+            radial-gradient(circle at 88% 22%, rgba(56, 104, 180, 0.13), transparent 26%),
+            linear-gradient(180deg, #040914 0%, #07101f 50%, #050914 100%);
+          color: #f7fbff;
+          font-family:
+            Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+            "Segoe UI", sans-serif;
         }
 
-        .aiPlayground::before {
-          content: "";
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          opacity: 0.28;
-          background-image:
-            linear-gradient(rgba(104, 229, 255, 0.045) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(104, 229, 255, 0.045) 1px, transparent 1px);
-          background-size: 48px 48px;
-          mask-image: linear-gradient(to bottom, black, transparent 90%);
-        }
-
-        .hero,
-        .chainPanel,
-        .section,
-        .partnerNetwork,
-        .boundary,
-        .playgroundFooter {
+        main {
+          min-height: 100vh;
           position: relative;
-          z-index: 1;
-          width: min(1240px, 100%);
+          overflow: hidden;
+          isolation: isolate;
+        }
+
+        .shell {
+          width: min(1260px, calc(100% - 36px));
           margin-inline: auto;
+          position: relative;
+          z-index: 2;
+        }
+
+        .stars {
+          position: fixed;
+          inset: -12%;
+          pointer-events: none;
+          z-index: -4;
+          opacity: 0.34;
+        }
+
+        .starsOne {
+          background-image:
+            radial-gradient(circle, rgba(255,255,255,.75) 0 1px, transparent 1.4px);
+          background-size: 92px 92px;
+          animation: starDrift 34s linear infinite;
+        }
+
+        .starsTwo {
+          background-image:
+            radial-gradient(circle, rgba(99,225,209,.62) 0 1px, transparent 1.4px);
+          background-size: 156px 156px;
+          background-position: 39px 58px;
+          animation: starDrift 48s linear infinite reverse;
+        }
+
+        .orb {
+          position: fixed;
+          width: 470px;
+          height: 470px;
+          border-radius: 999px;
+          filter: blur(120px);
+          opacity: 0.12;
+          z-index: -3;
+          animation: orbMove 14s ease-in-out infinite alternate;
+        }
+
+        .orbOne {
+          left: -170px;
+          top: -180px;
+          background: #56dec9;
+        }
+
+        .orbTwo {
+          right: -180px;
+          top: 44%;
+          background: #625eff;
+          animation-delay: -6s;
+        }
+
+        .topbar {
+          min-height: 84px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          border-bottom: 1px solid rgba(132, 154, 188, 0.16);
+        }
+
+        .brand {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          color: white;
+          text-decoration: none;
+        }
+
+        .brandMark {
+          min-width: 64px;
+          height: 38px;
+          border-radius: 999px;
+          display: grid;
+          place-items: center;
+          color: #03110f;
+          background: linear-gradient(135deg, #57d9c8, #b8fff7);
+          font-size: 13px;
+          font-weight: 900;
+          letter-spacing: 0.05em;
+        }
+
+        .brand > span:last-child {
+          display: flex;
+          flex-direction: column;
+        }
+
+        .brand small {
+          color: #7e91a6;
+          margin-top: 2px;
+        }
+
+        nav {
+          display: flex;
+          gap: 22px;
+        }
+
+        nav a,
+        footer a {
+          color: #a9b8ca;
+          text-decoration: none;
+          font-size: 14px;
         }
 
         .hero {
-          padding: clamp(28px, 5vw, 68px);
-          overflow: hidden;
-          border: 1px solid var(--line);
-          border-radius: 28px;
-          background:
-            linear-gradient(145deg, rgba(15, 39, 53, 0.94), rgba(5, 16, 24, 0.96));
-          box-shadow: 0 32px 90px rgba(0, 0, 0, 0.28);
+          min-height: 650px;
+          display: grid;
+          grid-template-columns: 1.2fr 0.8fr;
+          gap: 40px;
+          align-items: center;
+          padding: 76px 0;
         }
 
-        .heroGlow {
-          position: absolute;
-          top: -180px;
-          right: -120px;
-          width: 440px;
-          height: 440px;
-          border-radius: 999px;
-          background: var(--cyan);
-          filter: blur(110px);
-          opacity: 0.14;
-        }
-
-        .heroTopline,
         .eyebrow {
-          color: var(--cyan);
+          margin: 0;
+          color: #71dfd0;
           font-size: 11px;
           font-weight: 900;
-          letter-spacing: 0.16em;
-          text-transform: uppercase;
+          letter-spacing: 0.18em;
         }
 
-        .heroTopline {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          margin-bottom: 36px;
+        h1 {
+          max-width: 850px;
+          margin: 18px 0 22px;
+          font-size: clamp(48px, 7vw, 92px);
+          line-height: 0.98;
+          letter-spacing: -0.06em;
         }
 
-        .statusDot {
-          width: 8px;
-          height: 8px;
-          border-radius: 999px;
-          background: var(--green);
-          box-shadow: 0 0 16px var(--green);
-        }
-
-        .heroGrid {
-          display: grid;
-          grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-          gap: clamp(30px, 6vw, 76px);
-          align-items: end;
-        }
-
-        .eyebrow {
-          margin: 0 0 13px;
-        }
-
-        .hero h1 {
-          max-width: 780px;
-          margin: 0;
-          font-size: clamp(3.2rem, 7vw, 7.4rem);
-          line-height: 0.9;
-          letter-spacing: -0.07em;
-        }
-
-        .hero h1 span {
-          display: block;
-          margin-top: 0.12em;
-          color: transparent;
-          background: linear-gradient(90deg, #fff, var(--cyan), var(--green));
-          background-clip: text;
-          -webkit-background-clip: text;
-        }
-
-        .heroCopy {
+        .lead {
           max-width: 760px;
-          margin: 28px 0 0;
-          color: #9bb1bf;
-          font-size: 16px;
-          line-height: 1.8;
+          margin: 0;
+          color: #9fb0c4;
+          font-size: 18px;
+          line-height: 1.68;
         }
 
         .heroActions {
@@ -407,458 +377,396 @@ export default function AIGovernancePlaygroundPage() {
         }
 
         .primaryButton,
-        .secondaryButton {
+        .secondaryButton,
+        .euButton {
+          min-height: 54px;
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          min-height: 48px;
-          padding: 0 19px;
-          border-radius: 12px;
-          font-size: 13px;
-          font-weight: 850;
+          gap: 24px;
+          border-radius: 14px;
+          padding: 0 20px;
           text-decoration: none;
-          transition: transform 180ms ease, border-color 180ms ease;
+          font-weight: 850;
         }
 
         .primaryButton {
-          color: #031118;
-          background: linear-gradient(135deg, var(--cyan), var(--green));
+          color: #04110f;
+          background: linear-gradient(135deg, #5bd9c9, #b4fff6);
+          box-shadow: 0 14px 38px rgba(70, 214, 196, 0.18);
         }
 
         .secondaryButton {
-          border: 1px solid rgba(104, 229, 255, 0.25);
-          color: #dff7ff;
-          background: rgba(104, 229, 255, 0.055);
+          color: #dce8f4;
+          border: 1px solid rgba(130, 162, 188, 0.25);
+          background: rgba(255, 255, 255, 0.035);
         }
 
-        .primaryButton:hover,
-        .secondaryButton:hover {
-          transform: translateY(-2px);
+        .heroVisual {
+          min-height: 440px;
+          position: relative;
+          display: grid;
+          place-items: center;
         }
 
-        .primaryButton:focus-visible,
-        .secondaryButton:focus-visible,
-        .primaryCard:focus-visible,
-        .recordCard:focus-visible,
-        .partnerButton:focus-visible,
-        .playgroundFooter a:focus-visible {
-          outline: 3px solid rgba(104, 229, 255, 0.72);
-          outline-offset: 4px;
+        .core {
+          width: 190px;
+          height: 190px;
+          border-radius: 999px;
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          border: 1px solid rgba(102, 226, 211, 0.62);
+          background:
+            radial-gradient(circle, rgba(84, 218, 200, 0.18), rgba(5, 15, 25, 0.93) 62%);
+          box-shadow:
+            0 0 50px rgba(84, 218, 200, 0.22),
+            inset 0 0 34px rgba(84, 218, 200, 0.12);
         }
 
-        .principleCard {
-          padding: 26px;
-          border: 1px solid rgba(98, 239, 185, 0.2);
-          border-radius: 20px;
-          background: rgba(4, 15, 22, 0.72);
-        }
-
-        .principleCard blockquote {
-          margin: 18px 0;
-          color: #fff;
-          font-size: clamp(1.45rem, 3vw, 2.25rem);
-          line-height: 1.18;
-          font-weight: 800;
+        .core strong {
+          font-size: 52px;
           letter-spacing: -0.04em;
         }
 
-        .principleCard > p:last-child {
-          margin: 0;
-          color: #8fa6b4;
-          font-size: 13px;
-          line-height: 1.7;
+        .core small {
+          margin-top: 6px;
+          color: #84dacc;
+          text-transform: uppercase;
+          letter-spacing: 0.14em;
         }
 
-        .chainPanel {
-          display: grid;
-          grid-template-columns: repeat(8, minmax(0, 1fr));
-          margin-top: 18px;
-          border: 1px solid var(--line);
-          border-radius: 18px;
-          overflow: hidden;
-          background: rgba(7, 20, 29, 0.9);
+        .orbit {
+          position: absolute;
+          border-radius: 999px;
+          border: 1px solid rgba(105, 221, 208, 0.2);
+          animation: rotate 18s linear infinite;
         }
 
-        .chainItem {
-          position: relative;
-          min-width: 0;
-          padding: 17px 12px;
-          border-right: 1px solid var(--line);
+        .orbit span {
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          border-radius: 999px;
+          background: #72e3d4;
+          box-shadow: 0 0 14px #72e3d4;
+          top: 50%;
+          right: -5px;
+        }
+
+        .orbitOne {
+          width: 260px;
+          height: 260px;
+        }
+
+        .orbitTwo {
+          width: 340px;
+          height: 340px;
+          animation-duration: 26s;
+          animation-direction: reverse;
+        }
+
+        .orbitTwo span {
+          background: #78aaff;
+          box-shadow: 0 0 14px #78aaff;
+        }
+
+        .orbitThree {
+          width: 420px;
+          height: 420px;
+          animation-duration: 34s;
+        }
+
+        .orbitThree span {
+          background: #c178ff;
+          box-shadow: 0 0 14px #c178ff;
+        }
+
+        .principle,
+        .euSection,
+        .boundary,
+        .finalCta {
+          border: 1px solid rgba(131, 155, 189, 0.16);
+          background:
+            linear-gradient(180deg, rgba(12, 21, 36, 0.9), rgba(7, 13, 24, 0.94));
+          border-radius: 26px;
+          box-shadow: 0 22px 70px rgba(0, 0, 0, 0.22);
+        }
+
+        .principle {
+          padding: 52px;
           text-align: center;
         }
 
-        .chainItem:last-child {
-          border-right: 0;
+        .principle h2,
+        .sectionIntro h2,
+        .euSection h2,
+        .boundary h2,
+        .finalCta h2 {
+          margin: 14px 0 16px;
+          font-size: clamp(32px, 5vw, 56px);
+          line-height: 1.04;
+          letter-spacing: -0.045em;
         }
 
-        .chainItem span {
-          display: block;
-          margin-bottom: 5px;
-          color: #527080;
-          font-size: 9px;
-          font-weight: 900;
+        .principle > p:not(.eyebrow),
+        .sectionIntro > p:not(.eyebrow),
+        .euSection p:not(.eyebrow),
+        .boundary > p,
+        .finalCta p:not(.eyebrow) {
+          color: #9fafc2;
+          line-height: 1.68;
         }
 
-        .chainItem strong {
-          color: #c9dce5;
-          font-size: 10px;
-          letter-spacing: 0.05em;
-          text-transform: uppercase;
+        .principle > p:not(.eyebrow) {
+          max-width: 780px;
+          margin: 0 auto;
         }
 
-        .chainItem i {
-          position: absolute;
-          top: 50%;
-          right: -5px;
-          z-index: 2;
-          color: var(--green);
-          font-style: normal;
-          transform: translateY(-50%);
+        .chain {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-top: 30px;
         }
 
-        .section {
-          padding-top: 72px;
+        .chainStep {
+          display: flex;
+          align-items: center;
+          gap: 12px;
         }
 
-        .sectionHeading {
-          max-width: 790px;
-          margin-bottom: 28px;
+        .chainStep span {
+          padding: 10px 15px;
+          border-radius: 999px;
+          border: 1px solid rgba(105, 224, 208, 0.2);
+          background: rgba(72, 195, 179, 0.07);
+          color: #ddfff9;
+          font-size: 13px;
+          font-weight: 800;
         }
 
-        .sectionHeading.compact {
+        .chainStep b {
+          color: #5bd9c8;
+        }
+
+        .capabilities {
+          padding: 90px 0;
+        }
+
+        .sectionIntro {
           max-width: 720px;
+          margin-bottom: 34px;
         }
 
-        .sectionHeading h2,
-        .boundary h2 {
+        .sectionIntro > p:not(.eyebrow) {
           margin: 0;
-          font-size: clamp(2.1rem, 4vw, 4.4rem);
-          line-height: 1;
-          letter-spacing: -0.055em;
         }
 
-        .sectionHeading > p:last-child {
-          margin: 18px 0 0;
-          color: #8fa7b6;
-          line-height: 1.75;
-        }
-
-        .primaryGrid {
+        .capabilityGrid {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 18px;
         }
 
-        .primaryCard {
-          display: flex;
-          min-height: 330px;
-          flex-direction: column;
-          padding: 26px;
-          border: 1px solid var(--line);
-          border-radius: 20px;
-          color: inherit;
-          text-decoration: none;
+        .capabilityGrid article {
+          min-height: 290px;
+          padding: 30px;
+          border-radius: 22px;
+          border: 1px solid rgba(130, 154, 188, 0.17);
           background:
-            linear-gradient(145deg, rgba(12, 32, 44, 0.9), rgba(5, 16, 24, 0.94));
-          transition: transform 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+            linear-gradient(180deg, rgba(13, 22, 38, 0.86), rgba(7, 13, 24, 0.94));
+          transition:
+            transform 220ms ease,
+            border-color 220ms ease;
         }
 
-        .primaryCard:hover {
-          transform: translateY(-7px);
-          border-color: rgba(104, 229, 255, 0.42);
-          box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+        .capabilityGrid article:hover {
+          transform: translateY(-5px);
+          border-color: rgba(95, 221, 205, 0.46);
         }
 
-        .cardTop {
+        .number {
+          color: #61dccb;
+          font-size: 12px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
+        }
+
+        .capabilityGrid h3 {
+          margin: 18px 0 12px;
+          font-size: 28px;
+          letter-spacing: -0.03em;
+        }
+
+        .capabilityGrid p {
+          color: #9eafc2;
+          line-height: 1.65;
+          min-height: 82px;
+        }
+
+        .capabilityGrid a {
+          display: inline-flex;
+          gap: 20px;
+          color: #7de5d7;
+          text-decoration: none;
+          font-weight: 850;
+        }
+
+        .euSection {
+          padding: 38px 42px;
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 48px;
+          gap: 40px;
         }
 
-        .cardGlyph,
-        .recordGlyph {
-          display: grid;
-          place-items: center;
-          width: 48px;
-          height: 48px;
-          border: 1px solid rgba(104, 229, 255, 0.25);
-          border-radius: 14px;
-          color: var(--cyan);
-          background: rgba(104, 229, 255, 0.055);
-          font-weight: 900;
+        .euSection > div {
+          max-width: 820px;
         }
 
-        .cardArrow {
-          color: #577484;
-          font-size: 21px;
+        .euSection h2 {
+          font-size: clamp(28px, 4vw, 42px);
         }
 
-        .primaryCard h3,
-        .recordCard h3 {
-          margin: 0;
-          font-size: 1.55rem;
-          letter-spacing: -0.035em;
-        }
-
-        .primaryCard > p:not(.eyebrow) {
-          flex: 1;
-          margin: 16px 0 28px;
-          color: #91a8b6;
-          font-size: 14px;
-          line-height: 1.7;
-        }
-
-        .primaryCard > strong {
-          color: var(--green);
-          font-size: 12px;
-        }
-
-        .recordGrid {
-          display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-          gap: 14px;
-        }
-
-        .recordCard {
-          display: grid;
-          grid-template-columns: auto minmax(0, 1fr) auto;
-          gap: 18px;
-          align-items: center;
-          padding: 22px;
-          border: 1px solid var(--line);
-          border-radius: 17px;
-          color: inherit;
-          text-decoration: none;
-          background: rgba(8, 23, 33, 0.78);
-          transition: transform 180ms ease, border-color 180ms ease;
-        }
-
-        .recordCard:hover {
-          transform: translateX(4px);
-          border-color: rgba(98, 239, 185, 0.34);
-        }
-
-        .recordGlyph {
-          width: 43px;
-          height: 43px;
-          border-color: rgba(98, 239, 185, 0.22);
-          color: var(--green);
-          background: rgba(98, 239, 185, 0.045);
-        }
-
-        .recordCard p {
-          margin: 8px 0 0;
-          color: #8199a8;
-          font-size: 12px;
-          line-height: 1.6;
-        }
-
-        .recordArrow {
-          color: var(--green);
-        }
-
-        .partnerNetwork {
-          display: grid;
-          grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
-          gap: clamp(28px, 5vw, 64px);
-          align-items: center;
-          margin-top: 72px;
-          padding: clamp(28px, 5vw, 52px);
-          overflow: hidden;
-          border: 1px solid rgba(255, 191, 105, 0.24);
-          border-radius: 24px;
-          background:
-            radial-gradient(circle at 88% 18%, rgba(255, 191, 105, 0.12), transparent 34%),
-            linear-gradient(145deg, rgba(16, 34, 47, 0.96), rgba(8, 20, 29, 0.96));
-          box-shadow: 0 28px 72px rgba(0, 0, 0, 0.24);
-        }
-
-        .partnerNetwork h2 {
-          max-width: 760px;
-          margin: 0;
-          font-size: clamp(2.1rem, 4vw, 4.4rem);
-          line-height: 1;
-          letter-spacing: -0.055em;
-        }
-
-        .partnerNetworkCopy > p:not(.eyebrow) {
-          max-width: 760px;
-          margin: 20px 0 0;
-          color: #91a8b6;
-          line-height: 1.78;
-        }
-
-        .partnerPills {
-          display: flex;
-          flex-wrap: wrap;
-          gap: 9px;
-          margin-top: 24px;
-        }
-
-        .partnerPills span {
-          padding: 8px 11px;
-          border: 1px solid rgba(104, 229, 255, 0.18);
-          border-radius: 999px;
-          color: #c9eefa;
-          background: rgba(104, 229, 255, 0.05);
-          font-size: 11px;
-          font-weight: 800;
-        }
-
-        .partnerButton {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          min-height: 48px;
-          margin-top: 28px;
-          padding: 0 19px;
-          border-radius: 12px;
-          color: #171006;
-          background: linear-gradient(135deg, #ffe0a6, #ffbf69);
-          font-size: 13px;
-          font-weight: 900;
-          text-decoration: none;
-          transition: transform 180ms ease, box-shadow 180ms ease;
-        }
-
-        .partnerButton:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 14px 36px rgba(255, 191, 105, 0.16);
-        }
-
-        .partnerNetworkEmblem {
-          padding: 18px;
-          border: 1px solid rgba(255, 255, 255, 0.09);
-          border-radius: 24px;
-          background: rgba(2, 10, 16, 0.52);
-          text-align: center;
-        }
-
-        .partnerNetworkEmblem img {
-          display: block;
-          width: 100%;
-          max-width: 420px;
-          margin: 0 auto;
-          border-radius: 18px;
-        }
-
-        .partnerNetworkEmblem p {
-          margin: 14px 0 2px;
-          color: #8da4b2;
-          font-size: 11px;
-          font-weight: 800;
-          letter-spacing: 0.08em;
-          text-transform: uppercase;
+        .euButton {
+          flex: 0 0 auto;
+          color: #f5fbff;
+          border: 1px solid rgba(119, 164, 255, 0.34);
+          background: rgba(75, 107, 171, 0.12);
         }
 
         .boundary {
+          margin-top: 22px;
+          padding: 42px;
           display: grid;
-          grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-          gap: 50px;
+          grid-template-columns: 0.9fr 1.1fr;
+          gap: 36px;
           align-items: center;
-          margin-top: 72px;
-          padding: clamp(28px, 5vw, 48px);
-          border: 1px solid rgba(255, 191, 105, 0.2);
-          border-radius: 22px;
-          background: rgba(31, 23, 13, 0.48);
         }
 
-        .boundary .eyebrow {
-          color: #ffbf69;
+        .boundary h2 {
+          font-size: clamp(28px, 4vw, 44px);
         }
 
         .boundary > p {
           margin: 0;
-          color: #a8a092;
-          font-size: 14px;
-          line-height: 1.8;
         }
 
-        .playgroundFooter {
+        .finalCta {
+          margin-top: 74px;
+          padding: 54px 46px;
           display: flex;
           justify-content: space-between;
-          gap: 18px;
-          margin-top: 34px;
-          padding: 22px 4px 0;
-          border-top: 1px solid var(--line);
+          align-items: center;
+          gap: 30px;
         }
 
-        .playgroundFooter a {
-          color: #87a1b0;
+        .finalCta > div {
+          max-width: 760px;
+        }
+
+        .finalCta h2 {
+          font-size: clamp(36px, 5vw, 58px);
+        }
+
+        footer {
+          min-height: 120px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          color: #74869a;
           font-size: 12px;
-          font-weight: 750;
-          text-decoration: none;
         }
 
-        .playgroundFooter a:hover {
-          color: var(--cyan);
-        }
-
-        @media (max-width: 980px) {
-          .heroGrid,
-          .partnerNetwork,
-          .boundary {
-            grid-template-columns: 1fr;
+        @keyframes starDrift {
+          from {
+            transform: translate3d(0, 0, 0);
           }
-
-          .primaryGrid {
-            grid-template-columns: 1fr;
-          }
-
-          .primaryCard {
-            min-height: 280px;
-          }
-
-          .chainPanel {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-          }
-
-          .chainItem:nth-child(4) {
-            border-right: 0;
-          }
-
-          .chainItem:nth-child(-n + 4) {
-            border-bottom: 1px solid var(--line);
+          to {
+            transform: translate3d(90px, 140px, 0);
           }
         }
 
-        @media (max-width: 700px) {
-          .aiPlayground {
-            padding-inline: 12px;
+        @keyframes orbMove {
+          from {
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+          to {
+            transform: translate3d(55px, 35px, 0) scale(1.1);
+          }
+        }
+
+        @keyframes rotate {
+          to {
+            transform: rotate(360deg);
+          }
+        }
+
+        @media (max-width: 900px) {
+          nav {
+            display: none;
           }
 
           .hero {
-            padding: 25px 20px 28px;
-            border-radius: 20px;
-          }
-
-          .hero h1 {
-            font-size: clamp(3rem, 16vw, 5.2rem);
-          }
-
-          .recordGrid {
             grid-template-columns: 1fr;
           }
 
-          .chainPanel {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+          .heroVisual {
+            min-height: 460px;
           }
 
-          .chainItem {
-            border-bottom: 1px solid var(--line);
-          }
-
-          .chainItem:nth-child(even) {
-            border-right: 0;
-          }
-
-          .chainItem:nth-child(n + 7) {
-            border-bottom: 0;
-          }
-
-          .playgroundFooter {
+          .euSection,
+          .boundary,
+          .finalCta {
+            grid-template-columns: 1fr;
             flex-direction: column;
+            align-items: flex-start;
+          }
+        }
+
+        @media (max-width: 680px) {
+          .shell {
+            width: min(100% - 20px, 1260px);
+          }
+
+          .hero {
+            min-height: auto;
+            padding: 58px 0;
+          }
+
+          .heroVisual {
+            transform: scale(0.78);
+            min-height: 380px;
+          }
+
+          .principle,
+          .euSection,
+          .boundary,
+          .finalCta {
+            padding: 28px 24px;
+          }
+
+          .capabilityGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .chain {
+            justify-content: flex-start;
+          }
+
+          .chainStep b {
+            display: none;
+          }
+
+          footer {
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
           }
         }
       `}</style>
