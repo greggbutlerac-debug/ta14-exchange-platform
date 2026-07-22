@@ -307,7 +307,6 @@ export default function RegistrySubmissionWorkspacePage() {
     };
   }, [submissionId, supabase]);
 
-  const isDraft = record?.status?.toLowerCase() === 'draft';
   const normalizedStatus = record?.status?.toLowerCase() ?? '';
   const isDraft = normalizedStatus === 'draft';
   const isRegistered =
