@@ -372,6 +372,9 @@ export default function AiGovernanceRegistryPage() {
             <PolishedLink href="/workspace/ai-governance/registry/my-records" variant="bronze">
               Open My Registry Records
             </PolishedLink>
+            <PolishedLink href="/workspace/ai-governance/registry/review" variant="secondary">
+              Open Reviewer Queue
+            </PolishedLink>
           </div>
         </div>
       </section>
