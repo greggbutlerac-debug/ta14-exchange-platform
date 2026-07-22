@@ -4,13 +4,29 @@ import Link from 'next/link';
 
 const registryEntries = [
   {
+    label: 'TA-14 Foundation',
+    title: 'Explore the Parent Public Record',
+    description:
+      'Open the architecture, standards family, chronology, books, articles, Zenodo records, GitHub repositories, reference implementations, and institutional systems that support the Exchange.',
+    href: '/workspace/ai-governance/registry#foundation',
+    status: 'FOUNDATION',
+    primary: true,
+  },
+  {
+    label: 'Foundational Architectural Registry',
+    title: 'Open the TA-14 Architectural Registry',
+    description:
+      'Inspect the canonical architectural record that connects the TA-14 Foundation, architecture family, standards family, public chronology, publications, repositories, and implementations.',
+    href: '/workspace/ai-governance/registry',
+    status: 'ARCHITECTURAL RECORD',
+  },
+  {
     label: 'Founding Architecture Record',
     title: 'TA-14 Admissible Execution Architecture',
     description:
       'Open the complete public founding record, including identity, claims, chronology, publications, evidence, filings, rights, stewardship, versions, and challenges.',
     href: '/registry/ta-14-admissible-execution-architecture',
     status: 'PUBLIC RECORD',
-    primary: true,
   },
   {
     label: 'Registry Purpose',
@@ -54,15 +70,16 @@ export default function RegistryHomePage() {
         <Link href="/" className="brand">
           <span className="brand-mark">TA-14</span>
           <span>
-            <strong>AI Governance Registry</strong>
-            <small>Public Architecture Records</small>
+            <strong>TA-14 Registry Institution</strong>
+            <small>Foundation • Architecture • Public Records</small>
           </span>
         </Link>
 
         <nav aria-label="Registry navigation">
+          <a href="#institutional-hierarchy">Registry Structure</a>
           <a href="#founding-record">Founding Record</a>
           <a href="#registry-access">Registry Access</a>
-          <Link href="/workspace">Exchange Workspace</Link>
+          <Link href="/workspace/ai-governance/registry#foundation">TA-14 Foundation</Link>
         </nav>
 
         <Link href="/workspace" className="top-action">
@@ -72,40 +89,131 @@ export default function RegistryHomePage() {
 
       <section className="hero">
         <div className="status-row">
-          <span>TA-14 AI GOVERNANCE REGISTRY</span>
+          <span>TA-14 REGISTRY INSTITUTION</span>
+          <span>FOUNDATIONAL</span>
           <span>PUBLIC</span>
           <span>ATTRIBUTABLE</span>
           <span>CHALLENGEABLE</span>
         </div>
 
         <p className="eyebrow">
-          IDENTITY • CHRONOLOGY • CLAIMS • EVIDENCE • STEWARDSHIP
+          FOUNDATION • ARCHITECTURE • REGISTRATION • PUBLIC RECORD
         </p>
 
         <h1>
-          Governance architectures need
-          <span>a public record.</span>
+          A governance record should show
+          <span>what institution it belongs to.</span>
         </h1>
 
         <p className="hero-copy">
-          The TA-14 AI Governance Registry preserves what an architecture calls
-          itself, who claims it, when it was established, what it claims to
-          govern, what evidence supports it, and where its boundaries remain.
+          The TA-14 Registry Institution separates the parent Foundation, the
+          Foundational Architectural Registry, the AI Governance Registry, and
+          individual registry records so visitors can distinguish architecture
+          from registration, and registration from certification.
         </p>
 
         <div className="hero-actions">
           <Link
-            href="/registry/ta-14-admissible-execution-architecture"
+            href="/workspace/ai-governance/registry#foundation"
+            className="button button-gold"
+          >
+            Explore the TA-14 Foundation
+            <span aria-hidden="true">→</span>
+          </Link>
+
+          <Link
+            href="/workspace/ai-governance/registry"
             className="button button-primary"
           >
-            Open the TA-14 Founding Architecture Record
+            Open the Architectural Registry
             <span aria-hidden="true">→</span>
           </Link>
 
           <a href="#registry-access" className="button button-secondary">
-            Explore the Registry
+            Enter the AI Governance Registry
             <span aria-hidden="true">↓</span>
           </a>
+        </div>
+      </section>
+
+      <section id="institutional-hierarchy" className="section shell hierarchy-section">
+        <div className="section-heading hierarchy-heading">
+          <p className="eyebrow">INSTITUTIONAL HIERARCHY</p>
+          <h2>Four distinct layers. One connected public record.</h2>
+          <p>
+            Each layer has a different purpose. Keeping them separate prevents
+            a public architecture from being mistaken for a registration, and
+            prevents a registration from being mistaken for certification,
+            validation, legal approval, or proof of performance.
+          </p>
+        </div>
+
+        <div className="hierarchy-grid">
+          <Link
+            href="/workspace/ai-governance/registry#foundation"
+            className="hierarchy-card foundation-layer"
+          >
+            <span className="hierarchy-number">01</span>
+            <p>THE PARENT PUBLIC RECORD</p>
+            <h3>TA-14 Foundation</h3>
+            <strong>
+              Architecture, standards, chronology, publications, repositories,
+              reference implementations, and institutional systems.
+            </strong>
+            <div>Explore the Foundation <b aria-hidden="true">→</b></div>
+          </Link>
+
+          <Link
+            href="/workspace/ai-governance/registry"
+            className="hierarchy-card architecture-layer"
+          >
+            <span className="hierarchy-number">02</span>
+            <p>THE CANONICAL ARCHITECTURAL RECORD</p>
+            <h3>Foundational Architectural Registry</h3>
+            <strong>
+              The connected registry of the TA-14 architecture family,
+              standards family, public timeline, evidence relationships, and
+              implementations.
+            </strong>
+            <div>Open the Architectural Registry <b aria-hidden="true">→</b></div>
+          </Link>
+
+          <a href="#registry-access" className="hierarchy-card registry-layer">
+            <span className="hierarchy-number">03</span>
+            <p>THE REGISTRATION INSTITUTION</p>
+            <h3>AI Governance Registry</h3>
+            <strong>
+              A dated, searchable, attributable system for preserving
+              governance architecture records submitted by TA-14 or third
+              parties.
+            </strong>
+            <div>Enter the AI Governance Registry <b aria-hidden="true">↓</b></div>
+          </a>
+
+          <Link
+            href="/registry/ta-14-admissible-execution-architecture"
+            className="hierarchy-card record-layer"
+          >
+            <span className="hierarchy-number">04</span>
+            <p>THE INDIVIDUAL ENTRY</p>
+            <h3>Registry Record</h3>
+            <strong>
+              A bounded record containing a particular architecture's identity,
+              steward, claims, non-claims, evidence, chronology, version, and
+              status.
+            </strong>
+            <div>Open the Founding Record <b aria-hidden="true">→</b></div>
+          </Link>
+        </div>
+
+        <div className="hierarchy-chain" aria-label="Registry hierarchy">
+          <span>TA-14 Foundation</span>
+          <b>→</b>
+          <span>Foundational Architectural Registry</span>
+          <b>→</b>
+          <span>AI Governance Registry</span>
+          <b>→</b>
+          <span>Individual Registry Records</span>
         </div>
       </section>
 
@@ -174,11 +282,12 @@ export default function RegistryHomePage() {
       <section id="registry-access" className="section shell access-section">
         <div className="section-heading">
           <p className="eyebrow">REGISTRY ACCESS</p>
-          <h2>Enter the Registry through the route that matches what you need.</h2>
+          <h2>Enter the correct registry layer for the work you need to do.</h2>
           <p>
-            The founding record is live now. Additional registration,
-            discovery, and Registry guidance routes can be connected as those
-            pages are completed.
+            Open the parent Foundation, inspect the canonical Architectural
+            Registry, review the founding record, learn the Registry boundary,
+            prepare a new architecture submission, or browse registered
+            governance architectures.
           </p>
         </div>
 
@@ -239,8 +348,8 @@ export default function RegistryHomePage() {
 
       <footer className="footer shell">
         <div>
-          <strong>TA-14 AI Governance Registry</strong>
-          <span>Public records for identifiable governance architectures.</span>
+          <strong>TA-14 Registry Institution</strong>
+          <span>Foundation, architecture, registration, and public records kept distinct.</span>
         </div>
 
         <p>No admissible evidence. No admissible execution.</p>
@@ -599,6 +708,18 @@ export default function RegistryHomePage() {
           );
         }
 
+        .button-gold {
+          color: #271500;
+          border-color: rgba(255, 224, 158, 0.9);
+          background: linear-gradient(
+            135deg,
+            #fff0b8,
+            #f2bf6d 58%,
+            #bd7419
+          );
+          box-shadow: 0 14px 34px rgba(214, 146, 35, 0.22);
+        }
+
         .shell {
           width: min(1200px, calc(100% - 40px));
           margin: 0 auto;
@@ -606,6 +727,166 @@ export default function RegistryHomePage() {
 
         .section {
           padding: 100px 0;
+        }
+
+        .hierarchy-section {
+          padding-top: 52px;
+        }
+
+        .hierarchy-heading {
+          max-width: 960px;
+        }
+
+        .hierarchy-grid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 14px;
+          margin-top: 42px;
+        }
+
+        .hierarchy-card {
+          min-height: 390px;
+          display: flex;
+          flex-direction: column;
+          padding: 25px;
+          position: relative;
+          overflow: hidden;
+          border-radius: 24px;
+          border: 1px solid rgba(109, 216, 255, 0.18);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(109, 216, 255, 0.1), transparent 38%),
+            linear-gradient(155deg, rgba(12, 35, 54, 0.92), rgba(4, 15, 26, 0.97));
+          transition:
+            transform 0.24s ease,
+            border-color 0.24s ease,
+            box-shadow 0.24s ease;
+        }
+
+        .hierarchy-card::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(
+            115deg,
+            transparent 20%,
+            rgba(255, 255, 255, 0.08) 48%,
+            transparent 72%
+          );
+          transform: translateX(-130%);
+          transition: transform 0.65s ease;
+        }
+
+        .hierarchy-card:hover {
+          transform: translateY(-7px);
+          border-color: rgba(109, 216, 255, 0.42);
+          box-shadow: 0 24px 58px rgba(0, 0, 0, 0.3);
+        }
+
+        .hierarchy-card:hover::after {
+          transform: translateX(130%);
+        }
+
+        .foundation-layer {
+          border-color: rgba(242, 191, 109, 0.32);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(242, 191, 109, 0.16), transparent 40%),
+            linear-gradient(155deg, rgba(50, 34, 14, 0.94), rgba(6, 17, 28, 0.98));
+        }
+
+        .architecture-layer {
+          border-color: rgba(109, 216, 255, 0.3);
+        }
+
+        .registry-layer {
+          border-color: rgba(167, 126, 255, 0.25);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(157, 102, 255, 0.13), transparent 40%),
+            linear-gradient(155deg, rgba(20, 26, 51, 0.94), rgba(5, 14, 27, 0.98));
+        }
+
+        .record-layer {
+          border-color: rgba(108, 226, 178, 0.24);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(93, 220, 169, 0.11), transparent 40%),
+            linear-gradient(155deg, rgba(11, 40, 40, 0.92), rgba(4, 15, 26, 0.98));
+        }
+
+        .hierarchy-number {
+          width: 46px;
+          height: 46px;
+          display: grid;
+          place-items: center;
+          border-radius: 50%;
+          border: 1px solid rgba(109, 216, 255, 0.28);
+          color: #9de4ff;
+          background: rgba(28, 103, 139, 0.11);
+          font-size: 11px;
+          font-weight: 900;
+        }
+
+        .foundation-layer .hierarchy-number {
+          color: #ffdc98;
+          border-color: rgba(242, 191, 109, 0.36);
+          background: rgba(132, 79, 15, 0.14);
+        }
+
+        .hierarchy-card > p {
+          margin: 30px 0 0;
+          color: var(--gold);
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+        }
+
+        .hierarchy-card h3 {
+          margin: 11px 0 14px;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 30px;
+          font-weight: 500;
+          line-height: 1.04;
+        }
+
+        .hierarchy-card > strong {
+          color: #a8bac8;
+          font-size: 12px;
+          font-weight: 500;
+          line-height: 1.7;
+        }
+
+        .hierarchy-card > div {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-top: auto;
+          padding-top: 30px;
+          color: #d9f2ff;
+          font-size: 11px;
+          font-weight: 900;
+        }
+
+        .hierarchy-chain {
+          margin-top: 18px;
+          padding: 18px 22px;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          justify-content: center;
+          gap: 10px 14px;
+          border-radius: 17px;
+          border: 1px solid rgba(242, 191, 109, 0.22);
+          background: rgba(33, 24, 11, 0.46);
+        }
+
+        .hierarchy-chain span {
+          color: #d8e5ee;
+          font-size: 11px;
+          font-weight: 800;
+        }
+
+        .hierarchy-chain b {
+          color: var(--gold);
+          font-weight: 900;
         }
 
         .featured-record {
@@ -962,6 +1243,10 @@ export default function RegistryHomePage() {
             display: none;
           }
 
+          .hierarchy-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
           .featured-record {
             grid-template-columns: 1fr;
           }
@@ -1005,8 +1290,13 @@ export default function RegistryHomePage() {
           .record-details,
           .record-map,
           .registry-grid,
-          .boundary-grid {
+          .boundary-grid,
+          .hierarchy-grid {
             grid-template-columns: 1fr;
+          }
+
+          .hierarchy-card {
+            min-height: 330px;
           }
 
           .boundary-card {
