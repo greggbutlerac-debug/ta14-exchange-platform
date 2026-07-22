@@ -106,7 +106,7 @@ export default function RegistryReviewerQueuePage() {
         if (queryError) throw queryError;
         if (cancelled) return;
 
-        setRecords((data ?? []) as ReviewQueueItem[]);
+        setRecords((data ?? []) as unknown as ReviewQueueItem[]);
       } catch (caught) {
         if (cancelled) return;
 
