@@ -65,6 +65,77 @@ type EvidenceFile = {
   sha256: string;
 };
 
+
+type PublicationRecord = {
+  id: string;
+  publicationType: string;
+  title: string;
+  authors: string;
+  publisherOrPlatform: string;
+  publicationDate: string;
+  url: string;
+  doi: string;
+  isbn: string;
+  citationText: string;
+  description: string;
+  relationshipToGovernance: string;
+  visibility: Visibility;
+};
+
+type RepositoryRecord = {
+  id: string;
+  provider: 'GitHub' | 'GitLab' | 'Bitbucket' | 'Codeberg' | 'Other';
+  repositoryName: string;
+  repositoryOwner: string;
+  repositoryUrl: string;
+  defaultBranch: string;
+  releaseOrTag: string;
+  commitSha: string;
+  license: string;
+  accessState: 'PUBLIC' | 'PRIVATE' | 'RESTRICTED';
+  description: string;
+  relationshipToGovernance: string;
+};
+
+type ZenodoRecord = {
+  id: string;
+  title: string;
+  recordUrl: string;
+  doi: string;
+  conceptDoi: string;
+  zenodoRecordId: string;
+  version: string;
+  publicationDate: string;
+  creators: string;
+  resourceType: string;
+  description: string;
+  relationshipToGovernance: string;
+  visibility: Visibility;
+};
+
+type PatentRecord = {
+  id: string;
+  title: string;
+  jurisdiction: string;
+  filingType: string;
+  applicationStatus: string;
+  applicationNumber: string;
+  publicationNumber: string;
+  patentNumber: string;
+  filingDate: string;
+  publicationDate: string;
+  grantDate: string;
+  priorityDate: string;
+  inventors: string;
+  applicantOrAssignee: string;
+  officialUrl: string;
+  description: string;
+  relationshipToGovernance: string;
+  convertedFromId: string;
+  continuationOfId: string;
+  visibility: Visibility;
+};
+
 type FormState = {
   governanceName: string;
   shortName: string;
@@ -150,7 +221,44 @@ const evidenceRelationships: EvidenceRelationship[] = [
   'Other',
 ];
 
-const DRAFT_KEY = 'ta14-ai-governance-registry-intake-draft-v2';
+const DRAFT_KEY = 'ta14-ai-governance-registry-intake-draft-v3';
+
+function createPublication(): PublicationRecord {
+  return {
+    id: crypto.randomUUID(), publicationType: 'Article', title: '', authors: '',
+    publisherOrPlatform: '', publicationDate: '', url: '', doi: '', isbn: '',
+    citationText: '', description: '', relationshipToGovernance: '', visibility: 'PUBLIC',
+  };
+}
+
+function createRepository(): RepositoryRecord {
+  return {
+    id: crypto.randomUUID(), provider: 'GitHub', repositoryName: '', repositoryOwner: '',
+    repositoryUrl: '', defaultBranch: '', releaseOrTag: '', commitSha: '', license: '',
+    accessState: 'PUBLIC', description: '', relationshipToGovernance: '',
+  };
+}
+
+function createZenodo(): ZenodoRecord {
+  return {
+    id: crypto.randomUUID(), title: '', recordUrl: '', doi: '', conceptDoi: '',
+    zenodoRecordId: '', version: '', publicationDate: '', creators: '', resourceType: '',
+    description: '', relationshipToGovernance: '', visibility: 'PUBLIC',
+  };
+}
+
+function createPatent(): PatentRecord {
+  return {
+    id: crypto.randomUUID(), title: '', jurisdiction: 'United States',
+    filingType: 'Provisional application', applicationStatus: 'Filed',
+    applicationNumber: '', publicationNumber: '', patentNumber: '', filingDate: '',
+    publicationDate: '', grantDate: '', priorityDate: '', inventors: '',
+    applicantOrAssignee: '', officialUrl: '', description: '',
+    relationshipToGovernance: '', convertedFromId: '', continuationOfId: '',
+    visibility: 'PUBLIC',
+  };
+}
+
 
 async function sha256File(file: File) {
   const digest = await crypto.subtle.digest('SHA-256', await file.arrayBuffer());
@@ -214,6 +322,12 @@ export default function RegisterGovernancePage() {
   const [dragActive, setDragActive] = useState(false);
   const [message, setMessage] = useState('');
   const [errors, setErrors] = useState<string[]>([]);
+
+  const [publications, setPublications] = useState<PublicationRecord[]>([]);
+  const [repositories, setRepositories] = useState<RepositoryRecord[]>([]);
+  const [zenodoRecords, setZenodoRecords] = useState<ZenodoRecord[]>([]);
+  const [patentRecords, setPatentRecords] = useState<PatentRecord[]>([]);
+
 
   const totalSize = useMemo(
     () => files.reduce((total, item) => total + item.file.size, 0),
@@ -330,13 +444,30 @@ export default function RegisterGovernancePage() {
   }
 
 
+  function updatePublication(id: string, changes: Partial<PublicationRecord>) {
+    setPublications((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item));
+  }
+  function updateRepository(id: string, changes: Partial<RepositoryRecord>) {
+    setRepositories((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item));
+  }
+  function updateZenodo(id: string, changes: Partial<ZenodoRecord>) {
+    setZenodoRecords((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item));
+  }
+  function updatePatent(id: string, changes: Partial<PatentRecord>) {
+    setPatentRecords((current) => current.map((item) => item.id === id ? { ...item, ...changes } : item));
+  }
+
   useEffect(() => {
     const saved = window.localStorage.getItem(DRAFT_KEY);
     if (!saved) return;
     try {
-      const parsed = JSON.parse(saved) as { form?: FormState };
+      const parsed = JSON.parse(saved) as { form?: FormState; publications?: PublicationRecord[]; repositories?: RepositoryRecord[]; zenodoRecords?: ZenodoRecord[]; patentRecords?: PatentRecord[] };
       if (parsed.form) {
         setForm({ ...initialForm, ...parsed.form });
+        setPublications(parsed.publications ?? []);
+        setRepositories(parsed.repositories ?? []);
+        setZenodoRecords(parsed.zenodoRecords ?? []);
+        setPatentRecords(parsed.patentRecords ?? []);
         setMessage('A browser draft is available. Evidence files must be reattached because browsers do not preserve local files in saved drafts.');
       }
     } catch {
@@ -347,7 +478,7 @@ export default function RegisterGovernancePage() {
   function saveDraft() {
     window.localStorage.setItem(
       DRAFT_KEY,
-      JSON.stringify({ savedAt: new Date().toISOString(), form }),
+      JSON.stringify({ savedAt: new Date().toISOString(), form, publications, repositories, zenodoRecords, patentRecords }),
     );
     setErrors([]);
     setMessage('Draft saved in this browser. Evidence files are not included and must be reattached when the draft is resumed.');
@@ -357,6 +488,10 @@ export default function RegisterGovernancePage() {
     window.localStorage.removeItem(DRAFT_KEY);
     setForm(initialForm);
     setFiles([]);
+    setPublications([]);
+    setRepositories([]);
+    setZenodoRecords([]);
+    setPatentRecords([]);
     setErrors([]);
     setMessage('Browser draft discarded.');
   }
@@ -409,6 +544,10 @@ export default function RegisterGovernancePage() {
       registryBoundary:
         'This intake package records a declaration and supporting evidence. It is not certification, legal validation, regulatory approval, technical verification, or an ownership determination.',
       registration: form,
+      publications,
+      repositories,
+      zenodoRecords,
+      patentRecords,
       evidenceManifest: files.map((item) => ({
         filename: item.file.name,
         mediaType: item.file.type || 'application/octet-stream',
@@ -918,6 +1057,135 @@ export default function RegisterGovernancePage() {
           <div className="section-heading">
             <span>05</span>
             <div>
+              <h2>Publications, Repositories, Zenodo, and Patents</h2>
+              <p>Preserve each external source as its own repeatable, attributable Registry record.</p>
+            </div>
+          </div>
+
+          <div className="source-boundary">
+            <strong>Links are not interchangeable.</strong>
+            <p>An article, a GitHub repository, a Zenodo deposit, a patent application, and a granted patent carry different identifiers, dates, states, and evidentiary meanings. Each remains separately declared.</p>
+          </div>
+
+          <div className="source-group">
+            <div className="source-group-heading">
+              <div><span>AR</span><h3>Articles and Publications</h3></div>
+              <button type="button" className="mini-button" onClick={() => setPublications((current) => [...current, createPublication()])}>Add Publication</button>
+            </div>
+            {publications.length === 0 && <p className="empty-state">No publications added. Add articles, books, papers, reports, standards, white papers, presentations, or websites.</p>}
+            {publications.map((item, index) => (
+              <article className="source-card" key={item.id}>
+                <div className="source-card-title"><strong>Publication {index + 1}</strong><button type="button" className="remove-button" onClick={() => setPublications((current) => current.filter((entry) => entry.id !== item.id))}>Remove</button></div>
+                <div className="field-grid three compact">
+                  <label>Publication type<select value={item.publicationType} onChange={(e) => updatePublication(item.id, { publicationType: e.target.value })}><option>Article</option><option>Book</option><option>Book chapter</option><option>Paper</option><option>Report</option><option>Standard</option><option>White paper</option><option>Presentation</option><option>Website</option><option>Other</option></select></label>
+                  <label>Title<input value={item.title} onChange={(e) => updatePublication(item.id, { title: e.target.value })} /></label>
+                  <label>Authors<input value={item.authors} onChange={(e) => updatePublication(item.id, { authors: e.target.value })} /></label>
+                  <label>Publisher or platform<input value={item.publisherOrPlatform} onChange={(e) => updatePublication(item.id, { publisherOrPlatform: e.target.value })} /></label>
+                  <label>Publication date<input type="date" value={item.publicationDate} onChange={(e) => updatePublication(item.id, { publicationDate: e.target.value })} /></label>
+                  <label>Public URL<input type="url" value={item.url} onChange={(e) => updatePublication(item.id, { url: e.target.value })} placeholder="https://" /></label>
+                  <label>DOI<input value={item.doi} onChange={(e) => updatePublication(item.id, { doi: e.target.value })} /></label>
+                  <label>ISBN<input value={item.isbn} onChange={(e) => updatePublication(item.id, { isbn: e.target.value })} /></label>
+                  <label>Visibility<select value={item.visibility} onChange={(e) => updatePublication(item.id, { visibility: e.target.value as Visibility })}><option value="PUBLIC">Public</option><option value="CONTROLLED">Controlled</option><option value="PRIVATE">Private</option></select></label>
+                </div>
+                <label>Citation text<input value={item.citationText} onChange={(e) => updatePublication(item.id, { citationText: e.target.value })} /></label>
+                <label>Description<textarea rows={3} value={item.description} onChange={(e) => updatePublication(item.id, { description: e.target.value })} /></label>
+                <label>Relationship to this governance architecture<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updatePublication(item.id, { relationshipToGovernance: e.target.value })} /></label>
+              </article>
+            ))}
+          </div>
+
+          <div className="source-group">
+            <div className="source-group-heading">
+              <div><span>GH</span><h3>GitHub and Software Repositories</h3></div>
+              <button type="button" className="mini-button" onClick={() => setRepositories((current) => [...current, createRepository()])}>Add GitHub Repository</button>
+            </div>
+            {repositories.length === 0 && <p className="empty-state">No repositories added. GitHub receives its own dedicated record rather than being hidden in a general links field.</p>}
+            {repositories.map((item, index) => (
+              <article className="source-card" key={item.id}>
+                <div className="source-card-title"><strong>Repository {index + 1}</strong><button type="button" className="remove-button" onClick={() => setRepositories((current) => current.filter((entry) => entry.id !== item.id))}>Remove</button></div>
+                <div className="field-grid three compact">
+                  <label>Provider<select value={item.provider} onChange={(e) => updateRepository(item.id, { provider: e.target.value as RepositoryRecord['provider'] })}><option>GitHub</option><option>GitLab</option><option>Bitbucket</option><option>Codeberg</option><option>Other</option></select></label>
+                  <label>Repository name<input value={item.repositoryName} onChange={(e) => updateRepository(item.id, { repositoryName: e.target.value })} /></label>
+                  <label>Repository owner<input value={item.repositoryOwner} onChange={(e) => updateRepository(item.id, { repositoryOwner: e.target.value })} /></label>
+                  <label>Repository URL<input type="url" value={item.repositoryUrl} onChange={(e) => updateRepository(item.id, { repositoryUrl: e.target.value })} placeholder="https://github.com/..." /></label>
+                  <label>Default branch<input value={item.defaultBranch} onChange={(e) => updateRepository(item.id, { defaultBranch: e.target.value })} placeholder="main" /></label>
+                  <label>Release or tag<input value={item.releaseOrTag} onChange={(e) => updateRepository(item.id, { releaseOrTag: e.target.value })} /></label>
+                  <label>Commit SHA<input value={item.commitSha} onChange={(e) => updateRepository(item.id, { commitSha: e.target.value })} /></label>
+                  <label>License<input value={item.license} onChange={(e) => updateRepository(item.id, { license: e.target.value })} /></label>
+                  <label>Access state<select value={item.accessState} onChange={(e) => updateRepository(item.id, { accessState: e.target.value as RepositoryRecord['accessState'] })}><option value="PUBLIC">Public</option><option value="PRIVATE">Private</option><option value="RESTRICTED">Restricted</option></select></label>
+                </div>
+                <label>Description<textarea rows={3} value={item.description} onChange={(e) => updateRepository(item.id, { description: e.target.value })} /></label>
+                <label>Relationship to this governance architecture<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updateRepository(item.id, { relationshipToGovernance: e.target.value })} /></label>
+              </article>
+            ))}
+          </div>
+
+          <div className="source-group">
+            <div className="source-group-heading">
+              <div><span>ZE</span><h3>Zenodo Records</h3></div>
+              <button type="button" className="mini-button" onClick={() => setZenodoRecords((current) => [...current, createZenodo()])}>Add Zenodo Record</button>
+            </div>
+            {zenodoRecords.length === 0 && <p className="empty-state">No Zenodo records added. Add one deposit, then another, without collapsing separate DOIs or versions.</p>}
+            {zenodoRecords.map((item, index) => (
+              <article className="source-card" key={item.id}>
+                <div className="source-card-title"><strong>Zenodo Record {index + 1}</strong><button type="button" className="remove-button" onClick={() => setZenodoRecords((current) => current.filter((entry) => entry.id !== item.id))}>Remove</button></div>
+                <div className="field-grid three compact">
+                  <label>Title<input value={item.title} onChange={(e) => updateZenodo(item.id, { title: e.target.value })} /></label>
+                  <label>Zenodo record URL<input type="url" value={item.recordUrl} onChange={(e) => updateZenodo(item.id, { recordUrl: e.target.value })} placeholder="https://zenodo.org/records/..." /></label>
+                  <label>Record DOI<input value={item.doi} onChange={(e) => updateZenodo(item.id, { doi: e.target.value })} /></label>
+                  <label>Concept DOI<input value={item.conceptDoi} onChange={(e) => updateZenodo(item.id, { conceptDoi: e.target.value })} /></label>
+                  <label>Zenodo record ID<input value={item.zenodoRecordId} onChange={(e) => updateZenodo(item.id, { zenodoRecordId: e.target.value })} /></label>
+                  <label>Version<input value={item.version} onChange={(e) => updateZenodo(item.id, { version: e.target.value })} /></label>
+                  <label>Publication date<input type="date" value={item.publicationDate} onChange={(e) => updateZenodo(item.id, { publicationDate: e.target.value })} /></label>
+                  <label>Creators<input value={item.creators} onChange={(e) => updateZenodo(item.id, { creators: e.target.value })} /></label>
+                  <label>Resource type<input value={item.resourceType} onChange={(e) => updateZenodo(item.id, { resourceType: e.target.value })} /></label>
+                  <label>Visibility<select value={item.visibility} onChange={(e) => updateZenodo(item.id, { visibility: e.target.value as Visibility })}><option value="PUBLIC">Public</option><option value="CONTROLLED">Controlled</option><option value="PRIVATE">Private</option></select></label>
+                </div>
+                <label>Description<textarea rows={3} value={item.description} onChange={(e) => updateZenodo(item.id, { description: e.target.value })} /></label>
+                <label>Relationship to this governance architecture<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updateZenodo(item.id, { relationshipToGovernance: e.target.value })} /></label>
+              </article>
+            ))}
+          </div>
+
+          <div className="source-group">
+            <div className="source-group-heading">
+              <div><span>IP</span><h3>Patent Applications and Granted Patents</h3></div>
+              <button type="button" className="mini-button" onClick={() => setPatentRecords((current) => [...current, createPatent()])}>Add Patent Application or Patent</button>
+            </div>
+            {patentRecords.length === 0 && <p className="empty-state">No patent records added. Applications and granted patents remain distinct, with conversion and continuation lineage preserved.</p>}
+            {patentRecords.map((item, index) => (
+              <article className="source-card" key={item.id}>
+                <div className="source-card-title"><strong>Patent Record {index + 1}</strong><button type="button" className="remove-button" onClick={() => setPatentRecords((current) => current.filter((entry) => entry.id !== item.id))}>Remove</button></div>
+                <div className="field-grid three compact">
+                  <label>Title<input value={item.title} onChange={(e) => updatePatent(item.id, { title: e.target.value })} /></label>
+                  <label>Jurisdiction<input value={item.jurisdiction} onChange={(e) => updatePatent(item.id, { jurisdiction: e.target.value })} /></label>
+                  <label>Filing type<select value={item.filingType} onChange={(e) => updatePatent(item.id, { filingType: e.target.value })}><option>Provisional application</option><option>Non-provisional application</option><option>PCT application</option><option>Continuation</option><option>Continuation-in-part</option><option>Divisional</option><option>Reissue application</option><option>Utility patent</option><option>Design patent</option><option>Plant patent</option><option>Foreign application</option><option>Other</option></select></label>
+                  <label>Status<select value={item.applicationStatus} onChange={(e) => updatePatent(item.id, { applicationStatus: e.target.value })}><option>Draft</option><option>Filed</option><option>Pending</option><option>Published</option><option>Allowed</option><option>Granted</option><option>Abandoned</option><option>Rejected</option><option>Expired</option><option>Lapsed</option><option>Withdrawn</option></select></label>
+                  <label>Application number<input value={item.applicationNumber} onChange={(e) => updatePatent(item.id, { applicationNumber: e.target.value })} /></label>
+                  <label>Publication number<input value={item.publicationNumber} onChange={(e) => updatePatent(item.id, { publicationNumber: e.target.value })} /></label>
+                  <label>Patent number<input value={item.patentNumber} onChange={(e) => updatePatent(item.id, { patentNumber: e.target.value })} /></label>
+                  <label>Filing date<input type="date" value={item.filingDate} onChange={(e) => updatePatent(item.id, { filingDate: e.target.value })} /></label>
+                  <label>Publication date<input type="date" value={item.publicationDate} onChange={(e) => updatePatent(item.id, { publicationDate: e.target.value })} /></label>
+                  <label>Grant date<input type="date" value={item.grantDate} onChange={(e) => updatePatent(item.id, { grantDate: e.target.value })} /></label>
+                  <label>Priority date<input type="date" value={item.priorityDate} onChange={(e) => updatePatent(item.id, { priorityDate: e.target.value })} /></label>
+                  <label>Inventors<input value={item.inventors} onChange={(e) => updatePatent(item.id, { inventors: e.target.value })} /></label>
+                  <label>Applicant or assignee<input value={item.applicantOrAssignee} onChange={(e) => updatePatent(item.id, { applicantOrAssignee: e.target.value })} /></label>
+                  <label>Official URL<input type="url" value={item.officialUrl} onChange={(e) => updatePatent(item.id, { officialUrl: e.target.value })} placeholder="https://" /></label>
+                  <label>Visibility<select value={item.visibility} onChange={(e) => updatePatent(item.id, { visibility: e.target.value as Visibility })}><option value="PUBLIC">Public</option><option value="CONTROLLED">Controlled</option><option value="PRIVATE">Private</option></select></label>
+                  <label>Converted from application<select value={item.convertedFromId} onChange={(e) => updatePatent(item.id, { convertedFromId: e.target.value })}><option value="">None declared</option>{patentRecords.filter((candidate) => candidate.id !== item.id).map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.applicationNumber || candidate.title || 'Untitled patent record'}</option>)}</select></label>
+                  <label>Continuation of<select value={item.continuationOfId} onChange={(e) => updatePatent(item.id, { continuationOfId: e.target.value })}><option value="">None declared</option>{patentRecords.filter((candidate) => candidate.id !== item.id).map((candidate) => <option key={candidate.id} value={candidate.id}>{candidate.applicationNumber || candidate.title || 'Untitled patent record'}</option>)}</select></label>
+                </div>
+                <label>Description<textarea rows={3} value={item.description} onChange={(e) => updatePatent(item.id, { description: e.target.value })} /></label>
+                <label>Relationship to this governance architecture<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updatePatent(item.id, { relationshipToGovernance: e.target.value })} /></label>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="form-section">
+          <div className="section-heading">
+            <span>06</span>
+            <div>
               <h2>Rights and Declarations</h2>
               <p>Preserve authority, ownership assertions, licensing, and submission boundaries.</p>
             </div>
@@ -1137,6 +1405,19 @@ export default function RegisterGovernancePage() {
         .contact-permissions { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
         .review-pathway-panel { display: grid; gap: 12px; margin: 22px 0; padding: 18px; border: 1px solid rgba(232,188,104,.28); border-radius: 16px; background: rgba(232,188,104,.055); }
         .review-pathway-panel p { margin: 0; color: #aeb9ca; line-height: 1.55; }
+
+        .source-boundary { margin-bottom: 24px; padding: 17px 19px; border-left: 3px solid #79b4e6; border-radius: 0 14px 14px 0; background: rgba(60,105,151,.1); }
+        .source-boundary strong { color: #bcdfff; }
+        .source-boundary p { margin: 5px 0 0; color: #b8c6d8; line-height: 1.55; }
+        .source-group { display: grid; gap: 14px; padding: 22px 0; border-top: 1px solid rgba(151,169,199,.16); }
+        .source-group:first-of-type { border-top: 0; }
+        .source-group-heading, .source-card-title { display: flex; justify-content: space-between; align-items: center; gap: 14px; }
+        .source-group-heading > div { display: flex; align-items: center; gap: 12px; }
+        .source-group-heading span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 10px; color: #170f07; background: linear-gradient(145deg, #e3bb70, #86531f); font-family: Georgia, serif; font-weight: 900; }
+        .source-group-heading h3 { margin: 0; font-family: Georgia, serif; font-size: clamp(21px, 3vw, 29px); font-weight: 500; }
+        .empty-state { margin: 0; padding: 18px; border: 1px dashed rgba(151,169,199,.22); border-radius: 14px; color: #98a8bd; background: rgba(255,255,255,.02); }
+        .source-card { display: grid; gap: 15px; padding: 19px; border: 1px solid rgba(151,169,199,.22); border-radius: 18px; background: rgba(255,255,255,.025); }
+        .source-card-title strong { color: #f1ce89; font-family: Georgia, serif; font-size: 18px; }
         .hash-line { display: grid; gap: 5px; margin: 0 0 14px; padding: 10px 12px; border-radius: 10px; background: rgba(0,0,0,.24); }
         .hash-line strong { color: #e9c474; font-size: 11px; letter-spacing: .12em; }
         .hash-line code { overflow-wrap: anywhere; color: #adc6df; font-size: 11px; }
@@ -1185,6 +1466,8 @@ export default function RegisterGovernancePage() {
           .topbar nav { justify-content: stretch; }
           .topbar nav .nav-button { flex: 1; justify-content: center; }
           .field-grid.two, .field-grid.three, .contact-permissions { grid-template-columns: 1fr; }
+          .source-group-heading, .source-card-title { align-items: stretch; flex-direction: column; }
+          .source-group-heading .mini-button, .source-card-title .remove-button { width: 100%; }
           .form-section { padding: 20px 16px; }
           .section-heading { gap: 12px; }
           .evidence-item { flex-direction: column; }
