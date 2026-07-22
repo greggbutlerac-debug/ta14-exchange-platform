@@ -65,6 +65,23 @@ type EvidenceFile = {
   sha256: string;
 };
 
+type PreservedEvidence = {
+  id: string;
+  submission_id: string;
+  original_filename: string;
+  mime_type: string;
+  size_bytes: number;
+  sha256_hex: string;
+  evidence_relationship: string;
+  evidence_classification: string | null;
+  description: string;
+  visibility: 'public' | 'private' | 'selective';
+  evidence_state: string;
+  submitted_at: string;
+  storage_bucket: string | null;
+  storage_path: string | null;
+};
+
 
 type PublicationRecord = {
   id: string;
@@ -329,6 +346,9 @@ export default function RegisterGovernancePage() {
   const [patentRecords, setPatentRecords] = useState<PatentRecord[]>([]);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [draftBusy, setDraftBusy] = useState(false);
+  const [preservedEvidence, setPreservedEvidence] = useState<PreservedEvidence[]>([]);
+  const [evidenceBusyId, setEvidenceBusyId] = useState<string | null>(null);
+  const [evidenceListBusy, setEvidenceListBusy] = useState(false);
 
   const totalSize = useMemo(
     () => files.reduce((total, item) => total + item.file.size, 0),
@@ -442,6 +462,93 @@ export default function RegisterGovernancePage() {
   function removeEvidence(id: string) {
     setFiles((current) => current.filter((item) => item.id !== id));
     setMessage('Evidence file removed from this intake package.');
+  }
+
+  async function loadPreservedEvidence(submissionId: string) {
+    setEvidenceListBusy(true);
+    try {
+      const response = await fetch(
+        `/api/ai-governance/registry/evidence?submissionId=${encodeURIComponent(submissionId)}`,
+        { method: 'GET', cache: 'no-store' },
+      );
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Unable to load preserved evidence.');
+      setPreservedEvidence(payload.evidence ?? []);
+    } catch (error) {
+      setErrors((current) => [
+        ...current,
+        error instanceof Error ? error.message : 'Unable to load preserved evidence.',
+      ]);
+    } finally {
+      setEvidenceListBusy(false);
+    }
+  }
+
+  async function preserveEvidence(item: EvidenceFile) {
+    if (!draftId) {
+      setErrors(['Save the Registry intake as a private draft before preserving evidence files.']);
+      document.querySelector('.progress-panel')?.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+    if (!item.description.trim()) {
+      setErrors([`${item.file.name}: describe what this file supports before preserving it.`]);
+      return;
+    }
+
+    setEvidenceBusyId(item.id);
+    setErrors([]);
+    try {
+      const body = new FormData();
+      body.append('file', item.file);
+      body.append('submissionId', draftId);
+      body.append('evidenceRelationship', item.relationship);
+      body.append('evidenceClassification', item.category);
+      body.append('description', item.description.trim());
+      body.append(
+        'visibility',
+        item.visibility === 'PUBLIC'
+          ? 'public'
+          : item.visibility === 'CONTROLLED'
+            ? 'selective'
+            : 'private',
+      );
+
+      const response = await fetch('/api/ai-governance/registry/evidence', {
+        method: 'POST',
+        body,
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Unable to preserve evidence.');
+
+      setPreservedEvidence((current) => [...current, payload.evidence]);
+      setFiles((current) => current.filter((candidate) => candidate.id !== item.id));
+      setMessage(`${item.file.name} is preserved, hashed, private by policy, and bound to this Registry draft.`);
+    } catch (error) {
+      setErrors([
+        error instanceof Error ? error.message : `Unable to preserve ${item.file.name}.`,
+      ]);
+    } finally {
+      setEvidenceBusyId(null);
+    }
+  }
+
+  async function deletePreservedEvidence(id: string) {
+    setEvidenceBusyId(id);
+    setErrors([]);
+    try {
+      const response = await fetch(
+        `/api/ai-governance/registry/evidence?id=${encodeURIComponent(id)}`,
+        { method: 'DELETE' },
+      );
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Unable to delete evidence.');
+      setPreservedEvidence((current) => current.filter((item) => item.id !== id));
+      setMessage('The preserved evidence object and its draft metadata were deleted.');
+    } catch (error) {
+      setErrors([error instanceof Error ? error.message : 'Unable to delete evidence.']);
+    } finally {
+      setEvidenceBusyId(null);
+    }
   }
 
 
@@ -606,7 +713,10 @@ export default function RegisterGovernancePage() {
           const payload = await response.json();
           if (!cancelled && payload.draft) {
             hydrateFromServerDraft(payload.draft);
-            setMessage('Private Registry draft resumed from your signed-in account. Evidence files must be reattached.');
+            if (payload.draft.submission?.id) {
+              await loadPreservedEvidence(payload.draft.submission.id);
+            }
+            setMessage('Private Registry draft resumed from your signed-in account, including preserved evidence metadata.');
             return;
           }
         }
@@ -678,7 +788,8 @@ export default function RegisterGovernancePage() {
       }
 
       setDraftId(payload.draftId);
-      setMessage('Private draft saved to your signed-in Registry account. It is not publicly visible and is not a registered record.');
+      await loadPreservedEvidence(payload.draftId);
+      setMessage('Private draft saved to your signed-in Registry account. Evidence files may now be preserved and bound to this draft.');
     } catch (error) {
       setErrors([error instanceof Error ? error.message : 'Unable to save the Registry draft.']);
       setMessage('A browser recovery copy was preserved, but the account-backed draft was not saved.');
@@ -706,6 +817,7 @@ export default function RegisterGovernancePage() {
       setDraftId(null);
       setForm(initialForm);
       setFiles([]);
+      setPreservedEvidence([]);
       setPublications([]);
       setRepositories([]);
       setZenodoRecords([]);
@@ -1205,13 +1317,24 @@ export default function RegisterGovernancePage() {
                           {item.file.type || 'Unspecified media type'}
                         </p>
                       </div>
-                      <button
-                        type="button"
-                        className="remove-button"
-                        onClick={() => removeEvidence(item.id)}
-                      >
-                        Remove
-                      </button>
+                      <div className="file-actions">
+                        <button
+                          type="button"
+                          className="primary-button compact-button"
+                          disabled={!draftId || evidenceBusyId === item.id}
+                          onClick={() => preserveEvidence(item)}
+                        >
+                          {evidenceBusyId === item.id ? 'Preserving…' : draftId ? 'Preserve Evidence' : 'Save Draft First'}
+                        </button>
+                        <button
+                          type="button"
+                          className="remove-button"
+                          disabled={evidenceBusyId === item.id}
+                          onClick={() => removeEvidence(item.id)}
+                        >
+                          Remove
+                        </button>
+                      </div>
                     </div>
                     <div className="hash-line"><strong>SHA-256</strong><code>{item.sha256}</code></div>
                     <div className="field-grid three compact">
@@ -1273,6 +1396,62 @@ export default function RegisterGovernancePage() {
               ))}
             </div>
           )}
+
+          <div className="preserved-evidence-panel">
+            <div className="preserved-heading">
+              <div>
+                <span className="status-kicker">ACCOUNT-BACKED EVIDENCE</span>
+                <h3>Preserved and bound to this draft</h3>
+              </div>
+              <span className="preserved-count">
+                {evidenceListBusy ? 'Loading…' : `${preservedEvidence.length} preserved`}
+              </span>
+            </div>
+            {!draftId && (
+              <p className="empty-state">Save the intake as a private draft before uploading evidence to Registry storage.</p>
+            )}
+            {draftId && !evidenceListBusy && preservedEvidence.length === 0 && (
+              <p className="empty-state">No evidence files have been preserved for this draft yet.</p>
+            )}
+            {preservedEvidence.length > 0 && (
+              <div className="preserved-list">
+                {preservedEvidence.map((item) => (
+                  <article className="preserved-item" key={item.id}>
+                    <div className="preserved-status" aria-label="Preserved evidence status">✓</div>
+                    <div className="preserved-body">
+                      <div className="file-header">
+                        <div>
+                          <h3>{item.original_filename}</h3>
+                          <p>{bytesToSize(item.size_bytes)} · {item.mime_type}</p>
+                        </div>
+                        <button
+                          type="button"
+                          className="remove-button"
+                          disabled={evidenceBusyId === item.id}
+                          onClick={() => deletePreservedEvidence(item.id)}
+                        >
+                          {evidenceBusyId === item.id ? 'Deleting…' : 'Delete Draft Evidence'}
+                        </button>
+                      </div>
+                      <div className="evidence-badges">
+                        <span>Preserved</span>
+                        <span>SHA-256 hashed</span>
+                        <span>Bound to draft</span>
+                        <span>{item.visibility === 'public' ? 'Public after registration' : item.visibility === 'selective' ? 'Controlled access' : 'Private'}</span>
+                      </div>
+                      <p className="preserved-description">{item.description}</p>
+                      <div className="hash-line"><strong>SHA-256</strong><code>{item.sha256_hex}</code></div>
+                      <div className="preserved-meta">
+                        <span><strong>Relationship:</strong> {item.evidence_relationship}</span>
+                        <span><strong>Classification:</strong> {item.evidence_classification || 'Not specified'}</span>
+                        <span><strong>Preserved:</strong> {new Date(item.submitted_at).toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+          </div>
         </section>
 
         <section className="form-section">
@@ -1527,7 +1706,7 @@ export default function RegisterGovernancePage() {
             <div className="eyebrow">REVIEW-READY INTAKE PACKAGE</div>
             <h2>Preserve the declaration before requesting registration.</h2>
             <p>
-              Review and validate the registration, then download a local JSON manifest containing the metadata, declared evidence relationships, and SHA-256 file hashes. No files or registration data are currently transmitted to or preserved by the TA-14 AI Governance Registry. A Registry record does not exist until intake is formally submitted, accepted, assigned an identifier, and preserved by the Registry.
+              Review and validate the registration, then download a JSON manifest containing the metadata, declared evidence relationships, and SHA-256 file hashes. Private drafts and uploaded evidence are now preserved under the signed-in account, but they are not public Registry records. A public Registry record does not exist until intake is formally submitted, reviewed, accepted, assigned an identifier, and published by the Registry.
             </p>
           </div>
           <div className="submission-actions">
@@ -1666,6 +1845,23 @@ export default function RegisterGovernancePage() {
         .file-header h3 { overflow-wrap: anywhere; margin-bottom: 4px; font-size: 17px; }
         .file-header p { margin-bottom: 0; color: #8f9db1; font-size: 12px; }
         .remove-button { padding: 9px 12px; border-radius: 10px; cursor: pointer; color: #ffd8ca; border-color: rgba(226,124,92,.42); background: rgba(94,34,23,.28); }
+        .file-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+        .compact-button { padding: 9px 12px; border-radius: 10px; font-size: 12px; }
+        button:disabled { cursor: not-allowed; opacity: .5; transform: none !important; }
+        .preserved-evidence-panel { display: grid; gap: 16px; margin-top: 24px; padding: 20px; border: 1px solid rgba(104,190,150,.3); border-radius: 20px; background: rgba(20,72,51,.12); }
+        .preserved-heading { display: flex; justify-content: space-between; align-items: center; gap: 16px; }
+        .preserved-heading h3 { margin: 4px 0 0; font-family: Georgia, serif; font-size: 25px; font-weight: 500; }
+        .status-kicker { color: #8ee0b9; font-size: 10px; font-weight: 850; letter-spacing: .15em; }
+        .preserved-count { padding: 8px 11px; border: 1px solid rgba(104,190,150,.35); border-radius: 999px; color: #b8f2d6; background: rgba(34,103,73,.22); font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+        .preserved-list { display: grid; gap: 12px; }
+        .preserved-item { display: flex; gap: 14px; padding: 17px; border: 1px solid rgba(104,190,150,.24); border-radius: 17px; background: rgba(5,18,15,.48); }
+        .preserved-status { display: grid; place-items: center; flex: 0 0 42px; height: 42px; border-radius: 50%; color: #07140e; background: linear-gradient(145deg, #9ae9c1, #3d956c); font-weight: 950; }
+        .preserved-body { min-width: 0; flex: 1; }
+        .evidence-badges { display: flex; flex-wrap: wrap; gap: 7px; margin-bottom: 12px; }
+        .evidence-badges span { padding: 6px 9px; border: 1px solid rgba(104,190,150,.28); border-radius: 999px; color: #bdebd5; background: rgba(42,109,79,.18); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .06em; }
+        .preserved-description { margin: 0 0 12px; color: #c5d4cc; line-height: 1.55; }
+        .preserved-meta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 9px; color: #9db4a8; font-size: 11px; }
+        .preserved-meta strong { color: #d4eadf; }
         .notice-panel { padding: 18px 22px; border: 1px solid rgba(126,177,221,.38); border-radius: 16px; color: #d9ecff; background: rgba(24,64,100,.34); }
         .notice-panel.has-errors { border-color: rgba(230,128,93,.55); color: #ffe1d4; background: rgba(92,35,24,.34); }
         .notice-panel ul { margin: 10px 0 0; padding-left: 20px; line-height: 1.7; }
@@ -1694,7 +1890,11 @@ export default function RegisterGovernancePage() {
           .section-heading { gap: 12px; }
           .evidence-item { flex-direction: column; }
           .file-header { flex-direction: column; }
-          .remove-button { width: 100%; }
+          .file-actions { width: 100%; flex-direction: column; }
+          .file-actions button, .remove-button { width: 100%; }
+          .preserved-heading { align-items: stretch; flex-direction: column; }
+          .preserved-item { flex-direction: column; }
+          .preserved-meta { grid-template-columns: 1fr; }
           footer .nav-button { justify-content: center; }
         }
         @media (prefers-reduced-motion: reduce) {
