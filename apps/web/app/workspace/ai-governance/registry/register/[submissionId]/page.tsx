@@ -127,7 +127,7 @@ export default function RegistrySubmissionWorkspacePage() {
           return;
         }
 
-        setRecord(data as RegistrySubmission);
+        setRecord(data as unknown as RegistrySubmission);
       } catch (caught) {
         if (cancelled) return;
 
