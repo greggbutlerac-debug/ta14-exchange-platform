@@ -8,6 +8,7 @@ import {
   createGovernanceDraft,
   deleteGovernanceDraft,
   exportGovernanceDraft,
+  evaluateRouteReadiness,
   listGovernanceDrafts,
   loadGovernanceDraft,
   saveGovernanceDraft,
@@ -230,35 +231,16 @@ export default function NewRuntimeExecutionRoutePage() {
     initializedRef.current = true;
   }, []);
 
-  const completion = useMemo(() => {
-    const visibleFields = RUNTIME_EXECUTION_LANE.sections.flatMap(
-      (section) =>
-        section.fields.filter((field) =>
-          fieldIsVisible(field, values),
-        ),
-    );
+  const readiness = useMemo(
+    () => evaluateRouteReadiness(RUNTIME_EXECUTION_LANE, values),
+    [values],
+  );
 
-    const requiredFields = visibleFields.filter(
-      (field) => field.required,
-    );
-
-    const completedRequiredFields = requiredFields.filter((field) =>
-      fieldIsComplete(field, values),
-    );
-
-    return {
-      completed: completedRequiredFields.length,
-      total: requiredFields.length,
-      percentage:
-        requiredFields.length === 0
-          ? 100
-          : Math.round(
-              (completedRequiredFields.length /
-                requiredFields.length) *
-                100,
-            ),
-    };
-  }, [values]);
+  const completion = {
+    completed: readiness.completedRequiredFields,
+    total: readiness.totalRequiredFields,
+    percentage: readiness.completionPercentage,
+  };
 
   useEffect(() => {
     if (!initializedRef.current || !draft) {
@@ -279,9 +261,7 @@ export default function NewRuntimeExecutionRoutePage() {
         ...draft,
         title,
         lifecycleState:
-          completion.percentage === 100
-            ? "READY_FOR_TEST"
-            : "DRAFT",
+          readiness.ready ? "READY_FOR_TEST" : "DRAFT",
         values,
       });
 
@@ -304,7 +284,7 @@ export default function NewRuntimeExecutionRoutePage() {
     return () => {
       window.clearTimeout(timeoutId);
     };
-  }, [completion.percentage, draft, values]);
+  }, [draft, readiness.ready, values]);
 
   function updateValue(key: string, value: JsonValue) {
     setValues((current) => ({
@@ -386,9 +366,7 @@ export default function NewRuntimeExecutionRoutePage() {
         ...draft,
         values,
         lifecycleState:
-          completion.percentage === 100
-            ? "READY_FOR_TEST"
-            : "DRAFT",
+          readiness.ready ? "READY_FOR_TEST" : "DRAFT",
       }),
     );
 
@@ -693,27 +671,81 @@ export default function NewRuntimeExecutionRoutePage() {
 
                 <span
                   className={`rounded-full border px-4 py-2 text-sm font-bold ${
-                    completion.percentage === 100
+                    readiness.ready
                       ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-200"
-                      : "border-amber-300/30 bg-amber-300/10 text-amber-200"
+                      : readiness.status === "INVALID"
+                        ? "border-rose-300/30 bg-rose-300/10 text-rose-200"
+                        : "border-amber-300/30 bg-amber-300/10 text-amber-200"
                   }`}
                 >
-                  {completion.percentage === 100
-                    ? "Ready for validation"
-                    : "Intake incomplete"}
+                  {readiness.ready
+                    ? "Ready for testing"
+                    : readiness.status === "INVALID"
+                      ? "Validation errors"
+                      : "Intake incomplete"}
                 </span>
               </div>
+
+              {readiness.issues.length > 0 ? (
+                <div className="mt-6 rounded-2xl border border-rose-300/20 bg-rose-300/[0.05] p-5">
+                  <h3 className="text-sm font-black uppercase tracking-[0.16em] text-rose-200">
+                    Readiness issues
+                  </h3>
+                  <div className="mt-4 space-y-3">
+                    {readiness.issues.map((item, index) => (
+                      <button
+                        key={`${item.fieldKey}-${item.code}-${index}`}
+                        type="button"
+                        onClick={() => {
+                          const section =
+                            RUNTIME_EXECUTION_LANE.sections.find(
+                              (candidate) =>
+                                candidate.sectionId ===
+                                item.sectionId,
+                            );
+
+                          if (section) {
+                            setActiveSectionId(section.sectionId);
+                            window.scrollTo({
+                              top: 0,
+                              behavior: "smooth",
+                            });
+                          }
+                        }}
+                        className="block w-full rounded-xl border border-white/10 bg-slate-950/70 p-4 text-left transition hover:border-rose-300/30"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-3">
+                          <span className="text-sm font-bold text-slate-200">
+                            {item.message}
+                          </span>
+                          <span className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] font-bold text-slate-500">
+                            {item.code.replaceAll("_", " ")}
+                          </span>
+                        </div>
+                        <p className="mt-2 text-xs text-slate-600">
+                          Field: {item.fieldKey}
+                        </p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
 
               <pre className="mt-6 max-h-[34rem] overflow-auto rounded-2xl border border-white/10 bg-slate-950 p-5 text-xs leading-6 text-slate-300">
                 {JSON.stringify(
                   {
                     laneId: RUNTIME_EXECUTION_LANE.laneId,
                     laneVersion: RUNTIME_EXECUTION_LANE.version,
-                    lifecycleState:
-                      completion.percentage === 100
-                        ? "READY_FOR_TEST"
-                        : "DRAFT",
-                    values,
+                    lifecycleState: readiness.ready
+                      ? "READY_FOR_TEST"
+                      : "DRAFT",
+                    readiness: {
+                      status: readiness.status,
+                      completionPercentage:
+                        readiness.completionPercentage,
+                      issueCount: readiness.issues.length,
+                    },
+                    values: readiness.normalizedValues,
                   },
                   null,
                   2,
@@ -721,10 +753,9 @@ export default function NewRuntimeExecutionRoutePage() {
               </pre>
 
               <div className="mt-5 rounded-2xl border border-white/10 bg-slate-900/60 p-4 text-sm leading-6 text-slate-400">
-                This page currently builds and previews the route
-                configuration in memory. Persistence, evidence upload,
-                gate evaluation, and scenario execution will be connected
-                in the next implementation files.
+                Draft persistence and structural readiness validation are
+                active. Evidence upload, gate evaluation, scenario execution,
+                and governed-record preservation remain separate later stages.
               </div>
             </div>
           ) : null}
