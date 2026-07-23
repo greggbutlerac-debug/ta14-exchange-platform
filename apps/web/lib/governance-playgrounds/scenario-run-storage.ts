@@ -156,6 +156,14 @@ export function createStoredScenarioRun(
   input: CreateStoredScenarioRunInput,
 ): StoredScenarioRun {
   const timestamp = new Date().toISOString();
+  const observedDetermination =
+    input.scenarioRun.determination;
+
+  if (!observedDetermination) {
+    throw new Error(
+      "A stored scenario run requires an observed determination.",
+    );
+  }
 
   return {
     schemaVersion: SCENARIO_RUN_SCHEMA_VERSION,
@@ -167,7 +175,7 @@ export function createStoredScenarioRun(
     scenarioId: input.scenarioRun.scenarioId,
     scenarioTitle: input.scenarioTitle,
     expectedDetermination: input.expectedDetermination,
-    observedDetermination: input.scenarioRun.determination,
+    observedDetermination,
     scenarioRun: input.scenarioRun,
     verification: input.verification,
     metadata: input.metadata ?? {},
