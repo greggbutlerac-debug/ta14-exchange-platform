@@ -155,3 +155,14 @@ export type {
   RuntimeExecutionEvidenceType,
   RuntimeExecutionScenario,
 } from "./lanes/runtime-execution";
+
+export {
+  assertValidLaneDefinition,
+  validateLaneDefinition,
+} from "./validate";
+
+export type {
+  ValidationIssue,
+  ValidationResult,
+  ValidationSeverity,
+} from "./validate";
