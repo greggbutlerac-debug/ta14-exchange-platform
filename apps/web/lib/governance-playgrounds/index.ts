@@ -178,3 +178,22 @@ export type {
   ScenarioVerificationResult,
   ScenarioVerificationSeverity,
 } from "./scenario-verification";
+
+export {
+  GOVERNANCE_DRAFT_SCHEMA_VERSION,
+  GOVERNANCE_DRAFT_STORAGE_PREFIX,
+  clearGovernanceDrafts,
+  createGovernanceDraft,
+  deleteGovernanceDraft,
+  exportGovernanceDraft,
+  importGovernanceDraft,
+  listGovernanceDrafts,
+  loadGovernanceDraft,
+  saveGovernanceDraft,
+} from "./draft-storage";
+
+export type {
+  GovernanceDraftImportResult,
+  GovernanceDraftPayload,
+  GovernanceDraftSummary,
+} from "./draft-storage";
