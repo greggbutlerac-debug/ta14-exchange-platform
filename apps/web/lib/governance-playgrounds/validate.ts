@@ -163,8 +163,12 @@ function validateScenario(
 
   if (
     scenario.expectedDetermination === "ALLOW" &&
-    Object.values(scenario.expectedGateStatuses).some((status) =>
-      ["FAIL", "UNRESOLVED", "ESCALATED", "NOT_TESTED"].includes(status),
+    Object.values(scenario.expectedGateStatuses).some(
+      (status) =>
+        status !== undefined &&
+        ["FAIL", "UNRESOLVED", "ESCALATED", "NOT_TESTED"].includes(
+          status,
+        ),
     )
   ) {
     issues.push(
