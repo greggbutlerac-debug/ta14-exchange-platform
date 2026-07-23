@@ -197,3 +197,13 @@ export type {
   GovernanceDraftPayload,
   GovernanceDraftSummary,
 } from "./draft-storage";
+
+export {
+  evaluateRouteReadiness,
+} from "./route-readiness";
+
+export type {
+  RouteReadinessIssue,
+  RouteReadinessResult,
+  RouteReadinessStatus,
+} from "./route-readiness";
