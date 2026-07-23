@@ -1,5 +1,7 @@
 import Link from "next/link";
 
+import GovernancePlaygroundsNav from "../../../../components/governance-playgrounds-nav";
+
 import {
   RUNTIME_EXECUTION_LANE,
   RUNTIME_EXECUTION_SCENARIOS,
@@ -24,8 +26,14 @@ export default function RuntimeExecutionPlaygroundPage() {
 
   return (
     <main className="min-h-screen bg-slate-950 text-white">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-10 px-6 py-10 lg:px-10">
-        <header className="rounded-3xl border border-white/10 bg-white/[0.04] p-7 shadow-2xl shadow-cyan-950/20 backdrop-blur md:p-10">
+      <div className="mx-auto grid w-full max-w-[92rem] gap-6 px-5 py-6 lg:grid-cols-[310px_minmax(0,1fr)] lg:px-8">
+        <GovernancePlaygroundsNav
+          activeLaneId="runtime-execution"
+          className="h-fit lg:sticky lg:top-6"
+        />
+
+        <div className="flex min-w-0 flex-col gap-10">
+          <header className="rounded-3xl border border-white/10 bg-white/[0.04] p-7 shadow-2xl shadow-cyan-950/20 backdrop-blur md:p-10">
           <div className="mb-5 flex flex-wrap items-center gap-3 text-sm">
             <Link
               href="/ai-governance/playground"
@@ -264,6 +272,7 @@ export default function RuntimeExecutionPlaygroundPage() {
             </Link>
           </div>
         </section>
+        </div>
       </div>
     </main>
   );
