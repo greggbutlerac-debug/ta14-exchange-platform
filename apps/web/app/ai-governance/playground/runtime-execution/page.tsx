@@ -4,7 +4,7 @@ import {
   RUNTIME_EXECUTION_LANE,
   RUNTIME_EXECUTION_SCENARIOS,
   SHARED_GATE_DEFINITIONS,
-} from "@/lib/governance-playgrounds";
+} from "../../../../lib/governance-playgrounds";
 
 const outcomeStyles = {
   ALLOW:
