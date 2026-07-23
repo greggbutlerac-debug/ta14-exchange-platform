@@ -124,9 +124,14 @@ function fieldIsComplete(
 
 export default function NewRuntimeExecutionRoutePage() {
   const [values, setValues] = useState<FormState>(buildInitialState);
-  const [activeSectionId, setActiveSectionId] = useState(
-    RUNTIME_EXECUTION_LANE.sections[0]?.sectionId ?? "",
-  );
+  type RuntimeSectionId =
+    (typeof RUNTIME_EXECUTION_LANE.sections)[number]["sectionId"];
+
+  const [activeSectionId, setActiveSectionId] =
+    useState<RuntimeSectionId>(
+      RUNTIME_EXECUTION_LANE.sections[0]?.sectionId ??
+        "route-identity",
+    );
   const [showPreview, setShowPreview] = useState(false);
 
   const activeSection =
