@@ -207,3 +207,24 @@ export type {
   RouteReadinessResult,
   RouteReadinessStatus,
 } from "./route-readiness";
+
+export {
+  SCENARIO_RUN_SCHEMA_VERSION,
+  SCENARIO_RUN_STORAGE_PREFIX,
+  clearStoredScenarioRuns,
+  createStoredScenarioRun,
+  deleteStoredScenarioRun,
+  exportStoredScenarioRun,
+  importStoredScenarioRun,
+  listStoredScenarioRuns,
+  loadStoredScenarioRun,
+  saveStoredScenarioRun,
+} from "./scenario-run-storage";
+
+export type {
+  CreateStoredScenarioRunInput,
+  ScenarioRunImportResult,
+  ScenarioRunSummary,
+  StoredScenarioRun,
+} from "./scenario-run-storage";
+
