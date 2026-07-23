@@ -249,7 +249,7 @@ const CORPUS_SEARCH_ITEMS: SiteSearchItem[] = TA14_PUBLIC_CORPUS.map((record) =>
     record.description ??
     record.relationship ??
     `${CORPUS_CATEGORY_LABELS[record.category]} public record.`,
-  href: `/foundation/public-corpus?category=${record.category}`,
+  href: `/foundation/public-corpus/${record.id}`,
   type: CORPUS_CATEGORY_LABELS[record.category],
   keywords: [
     record.category,
