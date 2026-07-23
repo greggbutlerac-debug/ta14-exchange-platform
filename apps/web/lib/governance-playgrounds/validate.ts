@@ -1,10 +1,10 @@
-import {
-  GOVERNANCE_PLAYGROUND_BY_LANE,
-  SHARED_GATE_BY_ID,
-  type GovernanceLaneId,
-  type LaneDefinition,
-  type ScenarioDefinition,
-} from ".";
+import { GOVERNANCE_PLAYGROUND_BY_LANE } from "./registry";
+import { SHARED_GATE_BY_ID } from "./gates";
+import type {
+  GovernanceLaneId,
+  LaneDefinition,
+  ScenarioDefinition,
+} from "./types";
 
 /**
  * TA-14 Governance-Specific Playgrounds
