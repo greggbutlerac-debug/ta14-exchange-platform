@@ -7,6 +7,7 @@ import {
   RUNTIME_EXECUTION_SCENARIOS,
   SHARED_GATE_DEFINITIONS,
   verifyScenarioRun,
+  type FailureInjection,
   type GateResult,
   type GateResultStatus,
   type RouteDetermination,
@@ -67,9 +68,14 @@ function createGateResult(
 }
 
 export default function RuntimeScenarioRunnerPage() {
-  const [selectedScenarioId, setSelectedScenarioId] = useState(
-    RUNTIME_EXECUTION_SCENARIOS[0]?.scenarioId ?? "",
-  );
+  type RuntimeScenarioId =
+    (typeof RUNTIME_EXECUTION_SCENARIOS)[number]["scenarioId"];
+
+  const [selectedScenarioId, setSelectedScenarioId] =
+    useState<RuntimeScenarioId>(
+      RUNTIME_EXECUTION_SCENARIOS[0]?.scenarioId ??
+        "RUNTIME-BASELINE-ALLOW",
+    );
   const [observedDetermination, setObservedDetermination] =
     useState<RouteDetermination>(
       RUNTIME_EXECUTION_SCENARIOS[0]?.expectedDetermination ??
@@ -247,7 +253,7 @@ export default function RuntimeScenarioRunnerPage() {
                     Failure injections
                   </h3>
                   <div className="mt-3 grid gap-3 md:grid-cols-2">
-                    {selectedScenario.injections.map((injection) => (
+                    {(selectedScenario.injections as readonly FailureInjection[]).map((injection) => (
                       <div
                         key={injection.injectionId}
                         className="rounded-2xl border border-white/10 bg-slate-950/70 p-4"
