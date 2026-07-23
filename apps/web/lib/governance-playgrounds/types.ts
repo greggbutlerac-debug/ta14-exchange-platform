@@ -222,11 +222,11 @@ export interface AuthorityDeclaration {
     | "OTHER";
   holder: ActorReference;
   scope: string;
-  sourceEvidenceIds: EvidenceId[];
+  sourceEvidenceIds: readonly EvidenceId[];
   validFrom?: ISODateTimeString;
   validUntil?: ISODateTimeString;
   revokedAt?: ISODateTimeString;
-  limitations: string[];
+  limitations: readonly string[];
 }
 
 export interface GovernanceClaim {
@@ -236,11 +236,11 @@ export interface GovernanceClaim {
   laneId: GovernanceLaneId;
   title: string;
   plainLanguageClaim: string;
-  claimedControlLayers: GovernanceLaneId[];
-  claimedScope: string[];
-  explicitNonClaims: string[];
-  limitations: string[];
-  supportingEvidenceIds: EvidenceId[];
+  claimedControlLayers: readonly GovernanceLaneId[];
+  claimedScope: readonly string[];
+  explicitNonClaims: readonly string[];
+  limitations: readonly string[];
+  supportingEvidenceIds: readonly EvidenceId[];
   status: "ACTIVE" | "SUPERSEDED" | "DISPUTED" | "WITHDRAWN";
   audit: AuditStamp;
   version: VersionStamp;
@@ -265,9 +265,9 @@ export interface EvidenceReference {
   collectedAt?: ISODateTimeString;
   transformedFromEvidenceId?: EvidenceId;
   transformationDescription?: string;
-  custodyNotes?: string[];
+  custodyNotes?: readonly string[];
   rightsDeclaration?: string;
-  conflictsWithEvidenceIds?: EvidenceId[];
+  conflictsWithEvidenceIds?: readonly EvidenceId[];
   metadata?: Record<string, JsonValue>;
   audit: AuditStamp;
 }
@@ -324,17 +324,17 @@ export interface GateDefinition {
   shortTitle: string;
   purpose: string;
   requirementLevel: GateRequirementLevel;
-  applicableLanes: GovernanceLaneId[];
-  applicabilityRules: ApplicabilityRule[];
-  requiredFieldKeys: string[];
-  requiredEvidenceTypes: string[];
-  dependencies: GateId[];
-  passConditions: EvaluationCondition[];
-  failConditions: EvaluationCondition[];
-  escalationConditions: EvaluationCondition[];
-  outputClaims: string[];
-  prohibitedClaims: string[];
-  remediationGuidance: string[];
+  applicableLanes: readonly GovernanceLaneId[];
+  applicabilityRules: readonly ApplicabilityRule[];
+  requiredFieldKeys: readonly string[];
+  requiredEvidenceTypes: readonly string[];
+  dependencies: readonly GateId[];
+  passConditions: readonly EvaluationCondition[];
+  failConditions: readonly EvaluationCondition[];
+  escalationConditions: readonly EvaluationCondition[];
+  outputClaims: readonly string[];
+  prohibitedClaims: readonly string[];
+  remediationGuidance: readonly string[];
 }
 
 export interface GateFinding {
@@ -342,8 +342,8 @@ export interface GateFinding {
   severity: "INFO" | "LOW" | "MEDIUM" | "HIGH" | "CRITICAL";
   title: string;
   description: string;
-  evidenceIds: EvidenceId[];
-  affectedFieldKeys: string[];
+  evidenceIds: readonly EvidenceId[];
+  affectedFieldKeys: readonly string[];
   remediation?: string;
 }
 
@@ -352,9 +352,9 @@ export interface GateResult {
   status: GateResultStatus;
   requirementLevel: GateRequirementLevel;
   summary: string;
-  findings: GateFinding[];
-  supportingEvidenceIds: EvidenceId[];
-  conflictingEvidenceIds: EvidenceId[];
+  findings: readonly GateFinding[];
+  supportingEvidenceIds: readonly EvidenceId[];
+  conflictingEvidenceIds: readonly EvidenceId[];
   evaluatedAt: ISODateTimeString;
   evaluatedBy: ActorReference | { system: "TA14_EVALUATOR" };
   evaluatorVersion: string;
@@ -374,8 +374,8 @@ export interface PlaygroundFieldDefinition {
   required: boolean;
   placeholder?: string;
   defaultValue?: JsonValue;
-  options?: PlaygroundFieldOption[];
-  appliesWhen?: ApplicabilityRule[];
+  options?: readonly PlaygroundFieldOption[];
+  appliesWhen?: readonly ApplicabilityRule[];
   validation?: {
     minLength?: number;
     maxLength?: number;
@@ -390,7 +390,7 @@ export interface PlaygroundSectionDefinition {
   title: string;
   description: string;
   order: number;
-  fields: PlaygroundFieldDefinition[];
+  fields: readonly PlaygroundFieldDefinition[];
 }
 
 export interface FailureInjection {
@@ -421,11 +421,11 @@ export interface ScenarioDefinition {
   description: string;
   scenarioClass: ScenarioClass;
   required: boolean;
-  preconditions: EvaluationCondition[];
-  injections: FailureInjection[];
+  preconditions: readonly EvaluationCondition[];
+  injections: readonly FailureInjection[];
   expectedGateStatuses: Partial<Record<GateId, GateResultStatus>>;
   expectedDetermination: RouteDetermination;
-  recoveryRequirements: string[];
+  recoveryRequirements: readonly string[];
 }
 
 export interface ScenarioRun {
@@ -435,8 +435,8 @@ export interface ScenarioRun {
   status: ScenarioRunStatus;
   startedAt?: ISODateTimeString;
   completedAt?: ISODateTimeString;
-  injectionsApplied: FailureInjection[];
-  gateResults: GateResult[];
+  injectionsApplied: readonly FailureInjection[];
+  gateResults: readonly GateResult[];
   determination?: RouteDetermination;
   error?: string;
 }
@@ -447,7 +447,7 @@ export interface DeterminationReason {
   title: string;
   description: string;
   severity: "INFO" | "WARNING" | "BLOCKING";
-  evidenceIds: EvidenceId[];
+  evidenceIds: readonly EvidenceId[];
 }
 
 export interface BoundedDetermination {
@@ -456,13 +456,13 @@ export interface BoundedDetermination {
   laneId: GovernanceLaneId;
   determination: RouteDetermination;
   summary: string;
-  reasons: DeterminationReason[];
-  gateResults: GateResult[];
-  scenarioRunIds: string[];
-  claimsSupported: string[];
-  claimsNotSupported: string[];
-  unresolvedQuestions: string[];
-  explicitNonClaims: string[];
+  reasons: readonly DeterminationReason[];
+  gateResults: readonly GateResult[];
+  scenarioRunIds: readonly string[];
+  claimsSupported: readonly string[];
+  claimsNotSupported: readonly string[];
+  unresolvedQuestions: readonly string[];
+  explicitNonClaims: readonly string[];
   validFrom: ISODateTimeString;
   validUntil?: ISODateTimeString;
   invalidatedAt?: ISODateTimeString;
@@ -483,16 +483,16 @@ export interface GovernanceRoute {
   title: string;
   description: string;
   owner: ActorReference;
-  collaborators: ActorReference[];
+  collaborators: readonly ActorReference[];
   lifecycleState: RouteLifecycleState;
   visibility: RecordVisibility;
-  declaredClaimIds: string[];
-  authorityDeclarations: AuthorityDeclaration[];
+  declaredClaimIds: readonly string[];
+  authorityDeclarations: readonly AuthorityDeclaration[];
   values: Record<string, JsonValue>;
-  evidenceIds: EvidenceId[];
-  scenarioRunIds: string[];
+  evidenceIds: readonly EvidenceId[];
+  scenarioRunIds: readonly string[];
   latestDeterminationId?: string;
-  tags: string[];
+  tags: readonly string[];
   audit: AuditStamp;
   version: VersionStamp;
 }
@@ -518,11 +518,11 @@ export interface CrossLaneHandoff {
   sourceLaneId: GovernanceLaneId;
   targetRouteId?: RouteId;
   targetLaneId: GovernanceLaneId;
-  transferredRecordIds: RecordId[];
-  transferredEvidenceIds: EvidenceId[];
-  transferredClaims: string[];
+  transferredRecordIds: readonly RecordId[];
+  transferredEvidenceIds: readonly EvidenceId[];
+  transferredClaims: readonly string[];
   nonTransferredAuthority: true;
-  limitations: string[];
+  limitations: readonly string[];
   createdAt: ISODateTimeString;
   createdBy: ActorReference;
   acceptedAt?: ISODateTimeString;
@@ -536,8 +536,8 @@ export interface ChallengeRecord {
   status: ChallengeStatus;
   submittedBy: ActorReference;
   basis: string;
-  disputedFindingIds: string[];
-  counterevidenceIds: EvidenceId[];
+  disputedFindingIds: readonly string[];
+  counterevidenceIds: readonly EvidenceId[];
   providerResponse?: string;
   resolution?: string;
   resolutionRecordId?: RecordId;
@@ -550,13 +550,13 @@ export interface LaneDefinition {
   name: string;
   shortName: string;
   description: string;
-  claimsGoverned: string[];
-  nonClaims: string[];
-  sections: PlaygroundSectionDefinition[];
-  gateIds: GateId[];
-  evidenceTypes: string[];
-  scenarioIds: ScenarioId[];
-  determinationGuidance: string[];
+  claimsGoverned: readonly string[];
+  nonClaims: readonly string[];
+  sections: readonly PlaygroundSectionDefinition[];
+  gateIds: readonly GateId[];
+  evidenceTypes: readonly string[];
+  scenarioIds: readonly ScenarioId[];
+  determinationGuidance: readonly string[];
   enabled: boolean;
   version: string;
 }
@@ -594,8 +594,8 @@ export interface PlaygroundRegistryEntry {
  * - all required scenarios are complete.
  */
 export interface DeterminationInput {
-  gateResults: GateResult[];
-  requiredScenarioRuns: ScenarioRun[];
+  gateResults: readonly GateResult[];
+  requiredScenarioRuns: readonly ScenarioRun[];
   prohibitedConditionProven: boolean;
   authorityBoundaryExceeded: boolean;
   designatedEscalationPresent: boolean;
@@ -604,7 +604,7 @@ export interface DeterminationInput {
 
 export interface DeterminationOutput {
   determination: RouteDetermination;
-  reasonCodes: string[];
+  reasonCodes: readonly string[];
 }
 
 export function isGovernanceLaneId(value: string): value is GovernanceLaneId {
