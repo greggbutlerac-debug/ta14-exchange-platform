@@ -166,3 +166,15 @@ export type {
   ValidationResult,
   ValidationSeverity,
 } from "./validate";
+
+export {
+  allRequiredScenarioRunsValid,
+  verifyRequiredScenarioRuns,
+  verifyScenarioRun,
+} from "./scenario-verification";
+
+export type {
+  ScenarioVerificationIssue,
+  ScenarioVerificationResult,
+  ScenarioVerificationSeverity,
+} from "./scenario-verification";
