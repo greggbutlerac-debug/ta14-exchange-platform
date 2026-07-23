@@ -68,6 +68,12 @@ export default function RuntimeExecutionPlaygroundPage() {
             >
               Build a Runtime Route
             </Link>
+            <Link
+              href="/ai-governance/playground/runtime-execution/scenarios"
+              className="rounded-xl border border-cyan-300/30 bg-cyan-300/[0.06] px-6 py-3 font-semibold text-cyan-100 transition hover:border-cyan-300/60 hover:bg-cyan-300/10"
+            >
+              Run Governance Scenarios
+            </Link>
             <a
               href="#how-it-works"
               className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-white transition hover:border-white/35 hover:bg-white/5"
@@ -264,12 +270,20 @@ export default function RuntimeExecutionPlaygroundPage() {
               </p>
             </div>
 
-            <Link
-              href="/ai-governance/playground/runtime-execution/new"
-              className="inline-flex min-w-56 justify-center rounded-xl bg-white px-6 py-3 font-bold text-slate-950 transition hover:bg-cyan-100"
-            >
-              Start Runtime Route
-            </Link>
+            <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+              <Link
+                href="/ai-governance/playground/runtime-execution/new"
+                className="inline-flex min-w-56 justify-center rounded-xl bg-white px-6 py-3 font-bold text-slate-950 transition hover:bg-cyan-100"
+              >
+                Start Runtime Route
+              </Link>
+              <Link
+                href="/ai-governance/playground/runtime-execution/scenarios"
+                className="inline-flex min-w-56 justify-center rounded-xl border border-white/20 px-6 py-3 font-bold text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/[0.06]"
+              >
+                Open Scenario Runner
+              </Link>
+            </div>
           </div>
         </section>
         </div>
