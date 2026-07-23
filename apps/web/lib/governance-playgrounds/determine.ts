@@ -78,7 +78,9 @@ function unique(values: string[]): string[] {
   return [...new Set(values)];
 }
 
-function requiredGateResults(gateResults: GateResult[]): GateResult[] {
+function requiredGateResults(
+  gateResults: readonly GateResult[],
+): GateResult[] {
   return gateResults.filter(
     (result) =>
       result.requirementLevel === "MANDATORY" ||
