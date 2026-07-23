@@ -386,9 +386,11 @@ export function mostRestrictiveDetermination(
     return "HOLD";
   }
 
-  return determinations.reduce<RouteDetermination>((mostRestrictive, next) =>
-    determinationRank(next) > determinationRank(mostRestrictive)
-      ? next
-      : mostRestrictive,
+  return determinations.reduce<RouteDetermination>(
+    (mostRestrictive, next) =>
+      determinationRank(next) > determinationRank(mostRestrictive)
+        ? next
+        : mostRestrictive,
+    "ALLOW",
   );
 }
