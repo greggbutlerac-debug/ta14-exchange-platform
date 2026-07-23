@@ -62,7 +62,11 @@ function RecordCard({ record }: { record: CorpusRecord }) {
         <span className="statusPill">{formatStatus(record.status)}</span>
       </div>
 
-      <h3>{record.title}</h3>
+      <h3>
+  <Link href={`/foundation/public-corpus/${record.id}`}>
+    {record.title}
+  </Link>
+</h3>
 
       <div className="recordDetails">
         {record.date ? (
@@ -1626,6 +1630,24 @@ export default function PublicCorpusPage() {
             scroll-behavior: auto !important;
           }
         }
+
+        .recordCardLink {
+          display: block;
+          height: 100%;
+          color: inherit;
+          text-decoration: none;
+        }
+
+        .recordCardLink:focus-visible {
+          outline: 2px solid #f1c36d;
+          outline-offset: 4px;
+          border-radius: 14px;
+        }
+
+        .recordCardLink:hover h3 {
+          color: #f1c36d;
+        }
+
       `}</style>
     </main>
   );
