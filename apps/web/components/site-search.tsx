@@ -3,6 +3,11 @@
 import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import {
+  CORPUS_CATEGORY_LABELS,
+  TA14_PUBLIC_CORPUS,
+} from "../app/foundation/public-corpus/corpus";
+
 type SiteSearchItem = {
   id: string;
   title: string;
@@ -12,7 +17,7 @@ type SiteSearchItem = {
   keywords: string[];
 };
 
-const SEARCH_ITEMS: SiteSearchItem[] = [
+const STATIC_SEARCH_ITEMS: SiteSearchItem[] = [
   {
     id: "home",
     title: "TA-14 AI Governance Exchange",
@@ -237,6 +242,34 @@ const SEARCH_ITEMS: SiteSearchItem[] = [
   },
 ];
 
+const CORPUS_SEARCH_ITEMS: SiteSearchItem[] = TA14_PUBLIC_CORPUS.map((record) => ({
+  id: `corpus-${record.id}`,
+  title: record.title,
+  description:
+    record.description ??
+    record.relationship ??
+    `${CORPUS_CATEGORY_LABELS[record.category]} public record.`,
+  href: `/foundation/public-corpus?category=${record.category}`,
+  type: CORPUS_CATEGORY_LABELS[record.category],
+  keywords: [
+    record.category,
+    record.author ?? "",
+    record.platform ?? "",
+    record.status,
+    record.identifier ?? "",
+    record.date ?? "",
+    String(record.year),
+    record.relationship ?? "",
+    record.sourceClass ?? "",
+    ...(record.tags ?? []),
+  ].filter(Boolean),
+}));
+
+const SEARCH_ITEMS: SiteSearchItem[] = [
+  ...STATIC_SEARCH_ITEMS,
+  ...CORPUS_SEARCH_ITEMS,
+];
+
 function scoreItem(item: SiteSearchItem, terms: string[]) {
   const title = item.title.toLowerCase();
   const type = item.type.toLowerCase();
@@ -401,8 +434,8 @@ export default function SiteSearch() {
               </div>
 
               <div className="searchScope">
-                <span>Entire TA-14 AI Governance Exchange</span>
-                <span>{SEARCH_ITEMS.length} indexed platform destinations</span>
+                <span>Entire TA-14 AI Governance Exchange and Public Corpus</span>
+                <span>{SEARCH_ITEMS.length} indexed pages and public records</span>
               </div>
             </header>
 
