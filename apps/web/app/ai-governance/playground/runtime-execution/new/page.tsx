@@ -1,15 +1,45 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 
 import {
   RUNTIME_EXECUTION_LANE,
+  createGovernanceDraft,
+  deleteGovernanceDraft,
+  exportGovernanceDraft,
+  listGovernanceDrafts,
+  loadGovernanceDraft,
+  saveGovernanceDraft,
+  type GovernanceDraftPayload,
+  type GovernanceDraftSummary,
   type JsonValue,
   type PlaygroundFieldDefinition,
 } from "../../../../../lib/governance-playgrounds";
 
 type FormState = Record<string, JsonValue>;
+
+const RUNTIME_DRAFT_ID_STORAGE_KEY =
+  "ta14:runtime-execution:last-draft-id";
+
+function downloadTextFile(
+  filename: string,
+  content: string,
+): void {
+  const blob = new Blob([content], {
+    type: "application/json;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+
+  URL.revokeObjectURL(url);
+}
 
 function initialValueForField(
   field: PlaygroundFieldDefinition,
@@ -133,11 +163,72 @@ export default function NewRuntimeExecutionRoutePage() {
         "route-identity",
     );
   const [showPreview, setShowPreview] = useState(false);
+  const [draft, setDraft] =
+    useState<GovernanceDraftPayload | null>(null);
+  const [draftSummaries, setDraftSummaries] = useState<
+    GovernanceDraftSummary[]
+  >([]);
+  const [saveStatus, setSaveStatus] = useState<
+    "RESTORING" | "SAVED" | "SAVING" | "UNSAVED"
+  >("RESTORING");
+  const [draftMessage, setDraftMessage] = useState(
+    "Checking for a saved Runtime route draft.",
+  );
+  const initializedRef = useRef(false);
 
   const activeSection =
     RUNTIME_EXECUTION_LANE.sections.find(
       (section) => section.sectionId === activeSectionId,
     ) ?? RUNTIME_EXECUTION_LANE.sections[0];
+
+  useEffect(() => {
+    const lastDraftId = window.localStorage.getItem(
+      RUNTIME_DRAFT_ID_STORAGE_KEY,
+    );
+
+    const existingDraft =
+      lastDraftId
+        ? loadGovernanceDraft(
+            RUNTIME_EXECUTION_LANE.laneId,
+            lastDraftId,
+          )
+        : undefined;
+
+    const nextDraft =
+      existingDraft ??
+      createGovernanceDraft({
+        laneId: RUNTIME_EXECUTION_LANE.laneId,
+        laneVersion: RUNTIME_EXECUTION_LANE.version,
+        title: "Untitled Runtime route",
+        values: buildInitialState(),
+      });
+
+    if (existingDraft) {
+      setValues({
+        ...buildInitialState(),
+        ...existingDraft.values,
+      });
+      setDraftMessage(
+        `Restored draft saved ${new Date(
+          existingDraft.updatedAt,
+        ).toLocaleString()}.`,
+      );
+    } else {
+      const savedDraft = saveGovernanceDraft(nextDraft);
+      window.localStorage.setItem(
+        RUNTIME_DRAFT_ID_STORAGE_KEY,
+        savedDraft.draftId,
+      );
+      setDraftMessage("New Runtime route draft created.");
+    }
+
+    setDraft(existingDraft ?? nextDraft);
+    setDraftSummaries(
+      listGovernanceDrafts(RUNTIME_EXECUTION_LANE.laneId),
+    );
+    setSaveStatus("SAVED");
+    initializedRef.current = true;
+  }, []);
 
   const completion = useMemo(() => {
     const visibleFields = RUNTIME_EXECUTION_LANE.sections.flatMap(
@@ -169,11 +260,157 @@ export default function NewRuntimeExecutionRoutePage() {
     };
   }, [values]);
 
+  useEffect(() => {
+    if (!initializedRef.current || !draft) {
+      return;
+    }
+
+    setSaveStatus("SAVING");
+
+    const timeoutId = window.setTimeout(() => {
+      const titleValue = values.routeTitle;
+      const title =
+        typeof titleValue === "string" &&
+        titleValue.trim().length > 0
+          ? titleValue.trim()
+          : "Untitled Runtime route";
+
+      const savedDraft = saveGovernanceDraft({
+        ...draft,
+        title,
+        lifecycleState:
+          completion.percentage === 100
+            ? "READY_FOR_TEST"
+            : "DRAFT",
+        values,
+      });
+
+      setDraft(savedDraft);
+      setDraftSummaries(
+        listGovernanceDrafts(RUNTIME_EXECUTION_LANE.laneId),
+      );
+      window.localStorage.setItem(
+        RUNTIME_DRAFT_ID_STORAGE_KEY,
+        savedDraft.draftId,
+      );
+      setSaveStatus("SAVED");
+      setDraftMessage(
+        `Saved locally ${new Date(
+          savedDraft.updatedAt,
+        ).toLocaleTimeString()}.`,
+      );
+    }, 700);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [completion.percentage, draft, values]);
+
   function updateValue(key: string, value: JsonValue) {
     setValues((current) => ({
       ...current,
       [key]: value,
     }));
+  }
+
+  function restoreDraft(draftId: string) {
+    const restoredDraft = loadGovernanceDraft(
+      RUNTIME_EXECUTION_LANE.laneId,
+      draftId,
+    );
+
+    if (!restoredDraft) {
+      setDraftMessage("That local draft could not be restored.");
+      return;
+    }
+
+    setValues({
+      ...buildInitialState(),
+      ...restoredDraft.values,
+    });
+    setDraft(restoredDraft);
+    setDraftMessage(
+      `Restored "${restoredDraft.title}" from ${new Date(
+        restoredDraft.updatedAt,
+      ).toLocaleString()}.`,
+    );
+    setSaveStatus("SAVED");
+    window.localStorage.setItem(
+      RUNTIME_DRAFT_ID_STORAGE_KEY,
+      restoredDraft.draftId,
+    );
+  }
+
+  function startNewDraft() {
+    const newDraft = saveGovernanceDraft(
+      createGovernanceDraft({
+        laneId: RUNTIME_EXECUTION_LANE.laneId,
+        laneVersion: RUNTIME_EXECUTION_LANE.version,
+        title: "Untitled Runtime route",
+        values: buildInitialState(),
+      }),
+    );
+
+    setValues(buildInitialState());
+    setDraft(newDraft);
+    setDraftSummaries(
+      listGovernanceDrafts(RUNTIME_EXECUTION_LANE.laneId),
+    );
+    setDraftMessage("New local draft created.");
+    setSaveStatus("SAVED");
+    window.localStorage.setItem(
+      RUNTIME_DRAFT_ID_STORAGE_KEY,
+      newDraft.draftId,
+    );
+  }
+
+  function exportCurrentDraft() {
+    if (!draft) {
+      return;
+    }
+
+    const titleValue = values.routeTitle;
+    const safeTitle =
+      typeof titleValue === "string" &&
+      titleValue.trim().length > 0
+        ? titleValue
+            .trim()
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, "-")
+            .replace(/^-+|-+$/g, "")
+        : "runtime-route";
+
+    downloadTextFile(
+      `${safeTitle || "runtime-route"}-draft.json`,
+      exportGovernanceDraft({
+        ...draft,
+        values,
+        lifecycleState:
+          completion.percentage === 100
+            ? "READY_FOR_TEST"
+            : "DRAFT",
+      }),
+    );
+
+    setDraftMessage("Draft exported as JSON.");
+  }
+
+  function deleteCurrentDraft() {
+    if (!draft) {
+      return;
+    }
+
+    deleteGovernanceDraft(
+      RUNTIME_EXECUTION_LANE.laneId,
+      draft.draftId,
+    );
+    window.localStorage.removeItem(
+      RUNTIME_DRAFT_ID_STORAGE_KEY,
+    );
+    startNewDraft();
+    setDraftMessage(
+      "Previous local draft deleted. A new blank draft was created.",
+    );
   }
 
   function goToSection(direction: "previous" | "next") {
@@ -222,6 +459,79 @@ export default function NewRuntimeExecutionRoutePage() {
             Complete the route from identity through replay. Required
             fields are evaluated before testing can begin.
           </p>
+
+          <div className="mt-6 rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.04] p-4">
+            <div className="flex items-center justify-between gap-3">
+              <span className="text-xs font-bold uppercase tracking-[0.16em] text-cyan-200">
+                Local draft
+              </span>
+              <span className="text-xs font-semibold text-slate-400">
+                {saveStatus === "SAVING"
+                  ? "Saving..."
+                  : saveStatus === "RESTORING"
+                    ? "Restoring..."
+                    : "Saved"}
+              </span>
+            </div>
+            <p className="mt-2 text-xs leading-5 text-slate-500">
+              {draftMessage}
+            </p>
+
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={startNewDraft}
+                className="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-300/40"
+              >
+                New Draft
+              </button>
+              <button
+                type="button"
+                onClick={exportCurrentDraft}
+                disabled={!draft}
+                className="rounded-lg border border-white/10 px-3 py-2 text-xs font-bold text-slate-200 transition hover:border-cyan-300/40 disabled:opacity-40"
+              >
+                Export JSON
+              </button>
+            </div>
+
+            {draftSummaries.length > 1 ? (
+              <select
+                value={draft?.draftId ?? ""}
+                onChange={(event) =>
+                  restoreDraft(event.target.value)
+                }
+                className="mt-3 w-full rounded-lg border border-white/10 bg-slate-950 px-3 py-2 text-xs text-slate-200 outline-none focus:border-cyan-300/50"
+              >
+                {draftSummaries.map((summary) => (
+                  <option
+                    key={summary.draftId}
+                    value={summary.draftId}
+                  >
+                    {summary.title} ·{" "}
+                    {new Date(
+                      summary.updatedAt,
+                    ).toLocaleDateString()}
+                  </option>
+                ))}
+              </select>
+            ) : null}
+
+            <button
+              type="button"
+              onClick={deleteCurrentDraft}
+              disabled={!draft}
+              className="mt-3 w-full rounded-lg border border-rose-300/15 px-3 py-2 text-xs font-bold text-rose-200 transition hover:border-rose-300/40 hover:bg-rose-300/[0.05] disabled:opacity-40"
+            >
+              Delete Current Draft
+            </button>
+
+            <p className="mt-3 text-[11px] leading-5 text-slate-600">
+              Local drafts are editable browser data. They are not
+              governed records, evidence, determinations, or proof of
+              execution.
+            </p>
+          </div>
 
           <div className="mt-6 rounded-2xl border border-white/10 bg-slate-900/70 p-4">
             <div className="flex items-center justify-between text-sm">
