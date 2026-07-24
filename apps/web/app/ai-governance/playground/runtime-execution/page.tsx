@@ -75,6 +75,12 @@ export default function RuntimeExecutionPlaygroundPage() {
               Run Governance Scenarios
             </Link>
             <Link
+              href="/ai-governance/playground/runtime-execution/evidence"
+              className="rounded-xl border border-emerald-300/25 bg-emerald-300/[0.05] px-6 py-3 font-semibold text-emerald-100 transition hover:border-emerald-300/50 hover:bg-emerald-300/10"
+            >
+              Attach Runtime Evidence
+            </Link>
+            <Link
               href="/ai-governance/playground/runtime-execution/history"
               className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-white transition hover:border-cyan-300/40 hover:bg-white/5"
             >
@@ -288,6 +294,12 @@ export default function RuntimeExecutionPlaygroundPage() {
                 className="inline-flex min-w-56 justify-center rounded-xl border border-white/20 px-6 py-3 font-bold text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/[0.06]"
               >
                 Open Scenario Runner
+              </Link>
+              <Link
+                href="/ai-governance/playground/runtime-execution/evidence"
+                className="inline-flex min-w-56 justify-center rounded-xl border border-emerald-300/25 px-6 py-3 font-bold text-emerald-100 transition hover:border-emerald-300/50 hover:bg-emerald-300/[0.05]"
+              >
+                Open Evidence Workspace
               </Link>
               <Link
                 href="/ai-governance/playground/runtime-execution/history"
