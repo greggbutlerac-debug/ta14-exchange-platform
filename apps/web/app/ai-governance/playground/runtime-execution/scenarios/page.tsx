@@ -1,17 +1,25 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import {
+  RUNTIME_EXECUTION_LANE,
   RUNTIME_EXECUTION_SCENARIOS,
   SHARED_GATE_DEFINITIONS,
+  createStoredScenarioRun,
+  exportStoredScenarioRun,
+  listStoredScenarioRuns,
+  loadStoredScenarioRun,
+  saveStoredScenarioRun,
   verifyScenarioRun,
   type FailureInjection,
   type GateResult,
   type GateResultStatus,
   type RouteDetermination,
   type ScenarioRun,
+  type ScenarioRunSummary,
+  type StoredScenarioRun,
 } from "../../../../../lib/governance-playgrounds";
 
 type GateStatusDraft = Record<string, GateResultStatus>;
@@ -43,6 +51,24 @@ const statusStyles: Record<GateResultStatus, string> = {
 
 function nowIso(): string {
   return new Date().toISOString();
+}
+
+function downloadJson(
+  filename: string,
+  content: string,
+): void {
+  const blob = new Blob([content], {
+    type: "application/json;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
 }
 
 function createGateResult(
@@ -96,6 +122,14 @@ export default function RuntimeScenarioRunnerPage() {
           )
         : {};
     });
+  const [storedRuns, setStoredRuns] = useState<
+    ScenarioRunSummary[]
+  >([]);
+  const [selectedStoredRunId, setSelectedStoredRunId] =
+    useState("");
+  const [storageMessage, setStorageMessage] = useState(
+    "Scenario runs are stored locally and remain separate from governed records.",
+  );
 
   const selectedScenario =
     RUNTIME_EXECUTION_SCENARIOS.find(
@@ -129,6 +163,110 @@ export default function RuntimeScenarioRunnerPage() {
 
     return verifyScenarioRun(selectedScenario, scenarioRun);
   }, [scenarioRun, selectedScenario]);
+
+  useEffect(() => {
+    setStoredRuns(
+      listStoredScenarioRuns(RUNTIME_EXECUTION_LANE.laneId),
+    );
+  }, []);
+
+  function saveCurrentRun() {
+    const storedRun = saveStoredScenarioRun(
+      createStoredScenarioRun({
+        laneId: RUNTIME_EXECUTION_LANE.laneId,
+        laneVersion: RUNTIME_EXECUTION_LANE.version,
+        scenarioTitle: selectedScenario.title,
+        expectedDetermination:
+          selectedScenario.expectedDetermination,
+        scenarioRun,
+        verification,
+        metadata: {
+          source: "runtime-scenario-runner",
+          preservationClass: "LOCAL_TEST_RUN",
+        },
+      }),
+    );
+
+    setStoredRuns(
+      listStoredScenarioRuns(RUNTIME_EXECUTION_LANE.laneId),
+    );
+    setSelectedStoredRunId(storedRun.storedRunId);
+    setStorageMessage(
+      `Saved ${verification.valid ? "verified" : "invalid"} run locally at ${new Date(
+        storedRun.updatedAt,
+      ).toLocaleTimeString()}.`,
+    );
+  }
+
+  function restoreStoredRun(storedRunId: string) {
+    const storedRun = loadStoredScenarioRun(
+      RUNTIME_EXECUTION_LANE.laneId,
+      storedRunId,
+    );
+
+    if (!storedRun) {
+      setStorageMessage("The selected scenario run could not be loaded.");
+      return;
+    }
+
+    const matchingScenario = RUNTIME_EXECUTION_SCENARIOS.find(
+      (scenario) => scenario.scenarioId === storedRun.scenarioId,
+    );
+
+    if (!matchingScenario) {
+      setStorageMessage(
+        "The stored run references a scenario that is no longer available.",
+      );
+      return;
+    }
+
+    setSelectedScenarioId(matchingScenario.scenarioId);
+    setObservedDetermination(
+      storedRun.observedDetermination,
+    );
+    setGateStatuses(
+      Object.fromEntries(
+        storedRun.scenarioRun.gateResults.map((result) => [
+          result.gateId,
+          result.status,
+        ]),
+      ),
+    );
+    setSelectedStoredRunId(storedRun.storedRunId);
+    setStorageMessage(
+      `Loaded run saved ${new Date(
+        storedRun.updatedAt,
+      ).toLocaleString()}.`,
+    );
+  }
+
+  function exportSelectedRun() {
+    const storedRun: StoredScenarioRun | undefined =
+      selectedStoredRunId
+        ? loadStoredScenarioRun(
+            RUNTIME_EXECUTION_LANE.laneId,
+            selectedStoredRunId,
+          )
+        : undefined;
+
+    if (!storedRun) {
+      setStorageMessage(
+        "Save or select a stored scenario run before exporting.",
+      );
+      return;
+    }
+
+    const safeTitle = storedRun.scenarioTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-+|-+$/g, "");
+
+    downloadJson(
+      `${safeTitle || "runtime-scenario"}-run.json`,
+      exportStoredScenarioRun(storedRun),
+    );
+    setStorageMessage("Stored scenario run exported as JSON.");
+  }
 
   function selectScenario(scenarioId: string) {
     const nextScenario = RUNTIME_EXECUTION_SCENARIOS.find(
@@ -362,6 +500,95 @@ export default function RuntimeScenarioRunnerPage() {
                   );
                 })}
               </div>
+            </article>
+
+            <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 md:p-8">
+              <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">
+                    Local test-run storage
+                  </p>
+                  <h2 className="mt-2 text-2xl font-black">
+                    Preserve this observed run
+                  </h2>
+                  <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-500">
+                    Stored runs preserve what was observed and whether it
+                    matched the scenario. They are not governed records,
+                    evidence of real execution, or certification.
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={saveCurrentRun}
+                    className="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200"
+                  >
+                    Save Current Run
+                  </button>
+                  <button
+                    type="button"
+                    onClick={exportSelectedRun}
+                    className="rounded-xl border border-white/15 px-5 py-3 text-sm font-bold text-white transition hover:border-cyan-300/40"
+                  >
+                    Export Selected
+                  </button>
+                </div>
+              </div>
+
+              <p className="mt-4 text-sm text-slate-500">
+                {storageMessage}
+              </p>
+
+              {storedRuns.length > 0 ? (
+                <div className="mt-6 grid gap-3 md:grid-cols-2">
+                  {storedRuns.map((run) => (
+                    <button
+                      key={run.storedRunId}
+                      type="button"
+                      onClick={() =>
+                        restoreStoredRun(run.storedRunId)
+                      }
+                      className={`rounded-2xl border p-4 text-left transition ${
+                        selectedStoredRunId === run.storedRunId
+                          ? "border-cyan-300/50 bg-cyan-300/[0.08]"
+                          : "border-white/10 bg-slate-950/60 hover:border-white/20"
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="font-bold text-slate-200">
+                          {run.scenarioTitle}
+                        </span>
+                        <span
+                          className={`rounded-full border px-2.5 py-1 text-[10px] font-black ${
+                            run.valid
+                              ? "border-emerald-300/30 text-emerald-200"
+                              : "border-rose-300/30 text-rose-200"
+                          }`}
+                        >
+                          {run.valid ? "VALID" : "INVALID"}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs leading-5 text-slate-500">
+                        Expected {run.expectedDetermination} · Observed{" "}
+                        {run.observedDetermination}
+                      </p>
+                      <p className="mt-1 text-xs text-slate-600">
+                        {run.issueCount} issue
+                        {run.issueCount === 1 ? "" : "s"} ·{" "}
+                        {new Date(
+                          run.updatedAt,
+                        ).toLocaleString()}
+                      </p>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="mt-6 rounded-2xl border border-dashed border-white/10 p-6 text-sm text-slate-600">
+                  No Runtime scenario runs have been stored in this
+                  browser.
+                </div>
+              )}
             </article>
 
             <article
