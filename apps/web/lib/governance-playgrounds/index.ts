@@ -228,3 +228,19 @@ export type {
   StoredScenarioRun,
 } from "./scenario-run-storage";
 
+export {
+  RUNTIME_TEST_SESSION_SCHEMA_VERSION,
+  RUNTIME_TEST_SESSION_STORAGE_KEY,
+  clearRuntimeTestSession,
+  createRuntimeTestSession,
+  exportRuntimeTestSession,
+  loadRuntimeTestSession,
+  saveRuntimeTestSession,
+  selectRuntimeDraftForTesting,
+  updateRuntimeTestSessionRoute,
+} from "./runtime-test-session";
+
+export type {
+  RuntimeTestSession,
+} from "./runtime-test-session";
+
