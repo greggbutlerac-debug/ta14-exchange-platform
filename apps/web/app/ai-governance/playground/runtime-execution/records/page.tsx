@@ -171,8 +171,9 @@ export default function RuntimeRecordCandidateReviewPage() {
     const candidate = saveGovernedRecordCandidate(
       assembleGovernedRecordCandidate({
         testSession:
-          testSession?.routeDraftId ===
-          storedRun.routeDraftId
+          testSession &&
+          testSession.routeDraftId ===
+            storedRun.routeDraftId
             ? testSession
             : undefined,
         storedRun,
