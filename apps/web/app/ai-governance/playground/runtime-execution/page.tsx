@@ -74,6 +74,12 @@ export default function RuntimeExecutionPlaygroundPage() {
             >
               Run Governance Scenarios
             </Link>
+            <Link
+              href="/ai-governance/playground/runtime-execution/history"
+              className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-white transition hover:border-cyan-300/40 hover:bg-white/5"
+            >
+              Review Test-Run History
+            </Link>
             <a
               href="#how-it-works"
               className="rounded-xl border border-white/15 px-6 py-3 font-semibold text-white transition hover:border-white/35 hover:bg-white/5"
@@ -282,6 +288,12 @@ export default function RuntimeExecutionPlaygroundPage() {
                 className="inline-flex min-w-56 justify-center rounded-xl border border-white/20 px-6 py-3 font-bold text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/[0.06]"
               >
                 Open Scenario Runner
+              </Link>
+              <Link
+                href="/ai-governance/playground/runtime-execution/history"
+                className="inline-flex min-w-56 justify-center rounded-xl border border-white/20 px-6 py-3 font-bold text-white transition hover:border-cyan-300/50 hover:bg-cyan-300/[0.06]"
+              >
+                View Run History
               </Link>
             </div>
           </div>
