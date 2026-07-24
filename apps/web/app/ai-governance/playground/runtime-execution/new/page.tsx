@@ -156,6 +156,7 @@ function fieldIsComplete(
 }
 
 export default function NewRuntimeExecutionRoutePage() {
+  const router = useRouter();
   const [values, setValues] = useState<FormState>(buildInitialState);
   type RuntimeSectionId =
     (typeof RUNTIME_EXECUTION_LANE.sections)[number]["sectionId"];
