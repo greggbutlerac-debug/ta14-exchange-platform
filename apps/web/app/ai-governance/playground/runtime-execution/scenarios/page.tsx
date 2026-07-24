@@ -8,6 +8,7 @@ import {
   RUNTIME_EXECUTION_SCENARIOS,
   SHARED_GATE_DEFINITIONS,
   createStoredScenarioRun,
+  determineFromGateResults,
   exportStoredScenarioRun,
   listStoredScenarioRuns,
   loadRuntimeTestSession,
@@ -33,13 +34,6 @@ const statusOptions: readonly GateResultStatus[] = [
   "ESCALATED",
   "NOT_APPLICABLE",
   "NOT_TESTED",
-];
-
-const determinationOptions: readonly RouteDetermination[] = [
-  "ALLOW",
-  "HOLD",
-  "DENY",
-  "ESCALATE",
 ];
 
 const statusStyles: Record<GateResultStatus, string> = {
@@ -104,11 +98,6 @@ export default function RuntimeScenarioRunnerPage() {
       RUNTIME_EXECUTION_SCENARIOS[0]?.scenarioId ??
         "RUNTIME-BASELINE-ALLOW",
     );
-  const [observedDetermination, setObservedDetermination] =
-    useState<RouteDetermination>(
-      RUNTIME_EXECUTION_SCENARIOS[0]?.expectedDetermination ??
-        "HOLD",
-    );
   const [gateStatuses, setGateStatuses] =
     useState<GateStatusDraft>(() => {
       const firstScenario = RUNTIME_EXECUTION_SCENARIOS[0];
@@ -140,6 +129,25 @@ export default function RuntimeScenarioRunnerPage() {
       (scenario) => scenario.scenarioId === selectedScenarioId,
     ) ?? RUNTIME_EXECUTION_SCENARIOS[0];
 
+  const observedGateResults = useMemo(
+    () =>
+      Object.entries(gateStatuses).map(([gateId, status]) =>
+        createGateResult(gateId, status),
+      ),
+    [gateStatuses],
+  );
+
+  const automaticDetermination = useMemo(
+    () =>
+      determineFromGateResults(observedGateResults, {
+        designatedEscalationPresent:
+          observedGateResults.some(
+            (result) => result.status === "ESCALATED",
+          ),
+      }),
+    [observedGateResults],
+  );
+
   const scenarioRun = useMemo<ScenarioRun | null>(() => {
     if (!selectedScenario) {
       return null;
@@ -148,17 +156,21 @@ export default function RuntimeScenarioRunnerPage() {
     return {
       scenarioRunId: `manual-${selectedScenario.scenarioId}`,
       scenarioId: selectedScenario.scenarioId,
-      routeId: "runtime-route-preview",
+      routeId:
+        testSession?.routeDraftId ?? "runtime-route-preview",
       status: "COMPLETED",
       startedAt: nowIso(),
       completedAt: nowIso(),
       injectionsApplied: selectedScenario.injections,
-      gateResults: Object.entries(gateStatuses).map(
-        ([gateId, status]) => createGateResult(gateId, status),
-      ),
-      determination: observedDetermination,
+      gateResults: observedGateResults,
+      determination: automaticDetermination.determination,
     };
-  }, [gateStatuses, observedDetermination, selectedScenario]);
+  }, [
+    automaticDetermination.determination,
+    observedGateResults,
+    selectedScenario,
+    testSession?.routeDraftId,
+  ]);
 
   const verification = useMemo(() => {
     if (!selectedScenario || !scenarioRun) {
@@ -238,9 +250,6 @@ export default function RuntimeScenarioRunnerPage() {
     }
 
     setSelectedScenarioId(matchingScenario.scenarioId);
-    setObservedDetermination(
-      storedRun.observedDetermination,
-    );
     setGateStatuses(
       Object.fromEntries(
         storedRun.scenarioRun.gateResults.map((result) => [
@@ -295,7 +304,6 @@ export default function RuntimeScenarioRunnerPage() {
     }
 
     setSelectedScenarioId(nextScenario.scenarioId);
-    setObservedDetermination(nextScenario.expectedDetermination);
     setGateStatuses(
       Object.fromEntries(
         Object.entries(nextScenario.expectedGateStatuses).map(
@@ -471,28 +479,17 @@ export default function RuntimeScenarioRunnerPage() {
                   </h2>
                 </div>
 
-                <label className="text-sm font-bold text-slate-300">
-                  Observed determination
-                  <select
-                    value={observedDetermination}
-                    onChange={(event) =>
-                      setObservedDetermination(
-                        event.target
-                          .value as RouteDetermination,
-                      )
-                    }
-                    className="ml-3 rounded-xl border border-white/10 bg-slate-950 px-4 py-2 text-white outline-none focus:border-cyan-300/50"
-                  >
-                    {determinationOptions.map((determination) => (
-                      <option
-                        key={determination}
-                        value={determination}
-                      >
-                        {determination}
-                      </option>
-                    ))}
-                  </select>
-                </label>
+                <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.05] px-5 py-4">
+                  <p className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">
+                    Automatic determination
+                  </p>
+                  <p className="mt-1 text-xl font-black text-cyan-100">
+                    {automaticDetermination.determination}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-600">
+                    Calculated from the observed gate results.
+                  </p>
+                </div>
               </div>
 
               <div className="mt-6 space-y-3">
@@ -670,6 +667,29 @@ export default function RuntimeScenarioRunnerPage() {
                 >
                   {verification.valid ? "VALID" : "INVALID"}
                 </span>
+              </div>
+
+              <div className="mt-6 rounded-2xl border border-white/10 bg-slate-950/60 p-5">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">
+                  Determination basis
+                </p>
+                <div className="mt-3 space-y-2">
+                  {automaticDetermination.reasons.map(
+                    (reason, index) => (
+                      <div
+                        key={`${reason.code}-${index}`}
+                        className="rounded-xl border border-white/10 bg-white/[0.02] p-3"
+                      >
+                        <p className="text-sm font-bold text-slate-200">
+                          {reason.message}
+                        </p>
+                        <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-slate-600">
+                          {reason.code.replaceAll("_", " ")}
+                        </p>
+                      </div>
+                    ),
+                  )}
+                </div>
               </div>
 
               <div className="mt-6 grid gap-4 md:grid-cols-4">
