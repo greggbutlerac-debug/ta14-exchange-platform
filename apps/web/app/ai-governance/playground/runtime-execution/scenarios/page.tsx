@@ -10,6 +10,7 @@ import {
   createStoredScenarioRun,
   exportStoredScenarioRun,
   listStoredScenarioRuns,
+  loadRuntimeTestSession,
   loadStoredScenarioRun,
   saveStoredScenarioRun,
   verifyScenarioRun,
@@ -18,6 +19,7 @@ import {
   type GateResultStatus,
   type RouteDetermination,
   type ScenarioRun,
+  type RuntimeTestSession,
   type ScenarioRunSummary,
   type StoredScenarioRun,
 } from "../../../../../lib/governance-playgrounds";
@@ -130,6 +132,8 @@ export default function RuntimeScenarioRunnerPage() {
   const [storageMessage, setStorageMessage] = useState(
     "Scenario runs are stored locally and remain separate from governed records.",
   );
+  const [testSession, setTestSession] =
+    useState<RuntimeTestSession | null>(null);
 
   const selectedScenario =
     RUNTIME_EXECUTION_SCENARIOS.find(
@@ -168,6 +172,7 @@ export default function RuntimeScenarioRunnerPage() {
     setStoredRuns(
       listStoredScenarioRuns(RUNTIME_EXECUTION_LANE.laneId),
     );
+    setTestSession(loadRuntimeTestSession() ?? null);
   }, []);
 
   function saveCurrentRun() {
@@ -182,6 +187,8 @@ export default function RuntimeScenarioRunnerPage() {
       createStoredScenarioRun({
         laneId: RUNTIME_EXECUTION_LANE.laneId,
         laneVersion: RUNTIME_EXECUTION_LANE.version,
+        routeDraftId: testSession?.routeDraftId,
+        routeTitle: testSession?.routeTitle,
         scenarioTitle: selectedScenario.title,
         expectedDetermination:
           selectedScenario.expectedDetermination,
@@ -190,6 +197,9 @@ export default function RuntimeScenarioRunnerPage() {
         metadata: {
           source: "runtime-scenario-runner",
           preservationClass: "LOCAL_TEST_RUN",
+          activeTestSessionId: testSession?.sessionId ?? null,
+          routeValuesSnapshot:
+            testSession?.routeValues ?? {},
         },
       }),
     );
@@ -326,6 +336,40 @@ export default function RuntimeScenarioRunnerPage() {
             {RUNTIME_EXECUTION_SCENARIOS.length} required scenarios
           </span>
         </div>
+
+        <section className="mb-6 rounded-3xl border border-cyan-300/20 bg-cyan-300/[0.05] p-5 md:p-6">
+          <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
+            <div>
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-300">
+                Active route under test
+              </p>
+              <h2 className="mt-2 text-xl font-black">
+                {testSession?.routeTitle ??
+                  "No Runtime route selected"}
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-slate-500">
+                {testSession
+                  ? `Draft ${testSession.routeDraftId} selected ${new Date(
+                      testSession.selectedAt,
+                    ).toLocaleString()}.`
+                  : "Build a ready Runtime route and send it to testing before preserving route-linked scenario runs."}
+              </p>
+            </div>
+
+            {testSession ? (
+              <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-4 py-2 text-sm font-black text-emerald-200">
+                ROUTE LINKED
+              </span>
+            ) : (
+              <Link
+                href="/ai-governance/playground/runtime-execution/new"
+                className="rounded-xl border border-cyan-300/30 px-5 py-3 text-sm font-bold text-cyan-100 transition hover:border-cyan-300/60 hover:bg-cyan-300/[0.06]"
+              >
+                Build and Select Route
+              </Link>
+            )}
+          </div>
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-[320px_minmax(0,1fr)]">
           <aside className="h-fit rounded-3xl border border-white/10 bg-white/[0.04] p-5 lg:sticky lg:top-6">
