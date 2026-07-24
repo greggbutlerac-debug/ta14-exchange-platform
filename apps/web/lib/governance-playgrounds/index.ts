@@ -305,3 +305,20 @@ export type {
   RuntimeGovernedRecordPayload,
 } from "./runtime-governed-record-candidate";
 
+export {
+  GOVERNED_RECORD_CANDIDATE_STORAGE_PREFIX,
+  GOVERNED_RECORD_CANDIDATE_STORAGE_VERSION,
+  clearGovernedRecordCandidates,
+  deleteGovernedRecordCandidate,
+  exportGovernedRecordCandidate,
+  importGovernedRecordCandidate,
+  listGovernedRecordCandidates,
+  loadGovernedRecordCandidate,
+  saveGovernedRecordCandidate,
+} from "./runtime-governed-record-candidate-storage";
+
+export type {
+  GovernedRecordCandidateImportResult,
+  GovernedRecordCandidateSummary,
+} from "./runtime-governed-record-candidate-storage";
+
