@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import Link from 'next/link';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 
 import SiteSearch from '../components/site-search';
 import {
@@ -446,6 +447,7 @@ export default function RootLayout({
             }
           }
         `}</style>
+        <Analytics />
       </body>
     </html>
   );
