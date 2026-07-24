@@ -244,3 +244,16 @@ export type {
   RuntimeTestSession,
 } from "./runtime-test-session";
 
+export {
+  countGateResultStatuses,
+  determineFromGateResults,
+  determineFromGateStatusMap,
+} from "./scenario-determination";
+
+export type {
+  GateDeterminationContext,
+  GateDeterminationOptions,
+  GateDeterminationResult,
+  GateStatusCount,
+} from "./scenario-determination";
+
