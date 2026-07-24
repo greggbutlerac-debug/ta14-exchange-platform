@@ -278,3 +278,14 @@ export type {
   RuntimeEvidenceSummary,
 } from "./runtime-evidence-storage";
 
+export {
+  bindEvidenceToGateResults,
+  buildGateEvidenceBindings,
+  evidenceAttachmentCounts,
+} from "./runtime-evidence-binding";
+
+export type {
+  EvidenceBindingResult,
+  GateEvidenceBinding,
+} from "./runtime-evidence-binding";
+
