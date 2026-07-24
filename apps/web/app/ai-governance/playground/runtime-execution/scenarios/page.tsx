@@ -163,10 +163,10 @@ export default function RuntimeScenarioRunnerPage() {
       completedAt: nowIso(),
       injectionsApplied: selectedScenario.injections,
       gateResults: observedGateResults,
-      determination: automaticDetermination.determination,
+      determination: automaticDetermination.output.determination,
     };
   }, [
-    automaticDetermination.determination,
+    automaticDetermination.output.determination,
     observedGateResults,
     selectedScenario,
     testSession?.routeDraftId,
@@ -484,7 +484,7 @@ export default function RuntimeScenarioRunnerPage() {
                     Automatic determination
                   </p>
                   <p className="mt-1 text-xl font-black text-cyan-100">
-                    {automaticDetermination.determination}
+                    {automaticDetermination.output.determination}
                   </p>
                   <p className="mt-1 text-xs text-slate-600">
                     Calculated from the observed gate results.
@@ -674,17 +674,19 @@ export default function RuntimeScenarioRunnerPage() {
                   Determination basis
                 </p>
                 <div className="mt-3 space-y-2">
-                  {automaticDetermination.reasons.map(
-                    (reason, index) => (
+                  {automaticDetermination.output.reasonCodes.map(
+                    (reasonCode, index) => (
                       <div
-                        key={`${reason.code}-${index}`}
+                        key={`${reasonCode}-${index}`}
                         className="rounded-xl border border-white/10 bg-white/[0.02] p-3"
                       >
                         <p className="text-sm font-bold text-slate-200">
-                          {reason.message}
+                          {reasonCode
+                            .replaceAll("_", " ")
+                            .toLowerCase()}
                         </p>
                         <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-slate-600">
-                          {reason.code.replaceAll("_", " ")}
+                          {reasonCode.replaceAll("_", " ")}
                         </p>
                       </div>
                     ),
