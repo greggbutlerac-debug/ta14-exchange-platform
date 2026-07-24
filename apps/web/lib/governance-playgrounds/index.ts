@@ -257,3 +257,24 @@ export type {
   GateStatusCount,
 } from "./scenario-determination";
 
+export {
+  RUNTIME_EVIDENCE_SCHEMA_VERSION,
+  RUNTIME_EVIDENCE_STORAGE_PREFIX,
+  clearRuntimeEvidenceAttachments,
+  createRuntimeEvidenceAttachment,
+  deleteRuntimeEvidenceAttachment,
+  exportRuntimeEvidenceAttachment,
+  listRuntimeEvidenceAttachments,
+  loadRuntimeEvidenceAttachment,
+  saveRuntimeEvidenceAttachment,
+  toEvidenceReference,
+} from "./runtime-evidence-storage";
+
+export type {
+  CreateRuntimeEvidenceAttachmentInput,
+  EvidenceRelationship,
+  EvidenceSourceType,
+  RuntimeEvidenceAttachment,
+  RuntimeEvidenceSummary,
+} from "./runtime-evidence-storage";
+
