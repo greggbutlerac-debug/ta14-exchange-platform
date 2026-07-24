@@ -234,7 +234,7 @@ export function assembleGovernedRecordCandidate(
       blockingIssues.length === 0
         ? "READY_FOR_REVIEW"
         : "INCOMPLETE",
-    visibility: input.visibility ?? "OWNER_ONLY",
+    visibility: input.visibility ?? "PRIVATE",
     routeDraftId,
     testSessionId,
     storedRunId: storedRun.storedRunId,
