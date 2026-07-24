@@ -173,8 +173,8 @@ export function createRuntimeEvidenceAttachment(
     sourceUrl: input.sourceUrl,
     contentText: input.contentText,
     contentHash: input.contentHash,
-    status: input.status ?? "PRESENT",
-    visibility: input.visibility ?? "PRIVATE",
+    status: input.status ?? "UPLOADED",
+    visibility: input.visibility ?? "OWNER_ONLY",
     capturedAt: input.capturedAt,
     attachedAt: timestamp,
     updatedAt: timestamp,
@@ -371,12 +371,32 @@ export function toEvidenceReference(
 ): EvidenceReference {
   return {
     evidenceId: attachment.evidenceId,
+    routeId:
+      attachment.routeDraftId ?? "UNBOUND_RUNTIME_ROUTE",
     title: attachment.title,
+    description: attachment.description,
+    evidenceType: attachment.sourceType,
     status: attachment.status,
     visibility: attachment.visibility,
-    source: attachment.sourceUrl ?? attachment.fileName,
-    capturedAt: attachment.capturedAt,
+    sourceUri: attachment.sourceUrl,
+    storagePath: attachment.fileName,
     contentHash: attachment.contentHash,
+    mediaType: attachment.mediaType,
+    collectedAt: attachment.capturedAt,
+    metadata: {
+      ...attachment.metadata,
+      attachmentId: attachment.attachmentId,
+      relationship: attachment.relationship,
+      testSessionId: attachment.testSessionId ?? null,
+      gateId: attachment.gateId ?? null,
+      contentText: attachment.contentText ?? null,
+    },
+    audit: {
+      createdAt: attachment.attachedAt,
+      createdBy: "TA14_RUNTIME_PLAYGROUND",
+      updatedAt: attachment.updatedAt,
+      updatedBy: "TA14_RUNTIME_PLAYGROUND",
+    },
   };
 }
 
