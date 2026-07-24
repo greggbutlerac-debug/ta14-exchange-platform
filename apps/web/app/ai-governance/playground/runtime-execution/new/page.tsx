@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 import {
   RUNTIME_EXECUTION_LANE,
@@ -12,6 +13,7 @@ import {
   listGovernanceDrafts,
   loadGovernanceDraft,
   saveGovernanceDraft,
+  selectRuntimeDraftForTesting,
   type GovernanceDraftPayload,
   type GovernanceDraftSummary,
   type JsonValue,
@@ -391,6 +393,41 @@ export default function NewRuntimeExecutionRoutePage() {
     );
   }
 
+  function sendRouteToTesting() {
+    if (!draft || !readiness.ready) {
+      setDraftMessage(
+        "Resolve all readiness issues before sending this route to testing.",
+      );
+      setShowPreview(true);
+      return;
+    }
+
+    const titleValue = values.routeTitle;
+    const title =
+      typeof titleValue === "string" &&
+      titleValue.trim().length > 0
+        ? titleValue.trim()
+        : "Untitled Runtime route";
+
+    const savedDraft = saveGovernanceDraft({
+      ...draft,
+      title,
+      lifecycleState: "READY_FOR_TEST",
+      values: readiness.normalizedValues,
+    });
+
+    selectRuntimeDraftForTesting(savedDraft);
+    setDraft(savedDraft);
+    setSaveStatus("SAVED");
+    setDraftMessage(
+      `"${savedDraft.title}" is now the active route under test.`,
+    );
+
+    router.push(
+      "/ai-governance/playground/runtime-execution/scenarios",
+    );
+  }
+
   function goToSection(direction: "previous" | "next") {
     const currentIndex =
       RUNTIME_EXECUTION_LANE.sections.findIndex(
@@ -669,7 +706,17 @@ export default function NewRuntimeExecutionRoutePage() {
                   </h2>
                 </div>
 
-                <span
+                <div className="flex flex-wrap items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={sendRouteToTesting}
+                    disabled={!readiness.ready || !draft}
+                    className="rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Send Route to Testing
+                  </button>
+
+                  <span
                   className={`rounded-full border px-4 py-2 text-sm font-bold ${
                     readiness.ready
                       ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-200"
@@ -683,7 +730,8 @@ export default function NewRuntimeExecutionRoutePage() {
                     : readiness.status === "INVALID"
                       ? "Validation errors"
                       : "Intake incomplete"}
-                </span>
+                  </span>
+                </div>
               </div>
 
               {readiness.issues.length > 0 ? (
