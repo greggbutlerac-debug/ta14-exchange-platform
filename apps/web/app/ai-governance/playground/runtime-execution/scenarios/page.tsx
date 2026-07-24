@@ -171,6 +171,13 @@ export default function RuntimeScenarioRunnerPage() {
   }, []);
 
   function saveCurrentRun() {
+    if (!scenarioRun || !verification) {
+      setStorageMessage(
+        "The current scenario run is not ready to be stored.",
+      );
+      return;
+    }
+
     const storedRun = saveStoredScenarioRun(
       createStoredScenarioRun({
         laneId: RUNTIME_EXECUTION_LANE.laneId,
