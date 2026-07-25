@@ -1,17 +1,17 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { governanceLibraryCatalog } from "@/lib/governance-library/catalog";
+import { governanceLibraryCatalog } from "../../../lib/governance-library/catalog";
 import {
   getGovernanceLibraryRecordBySlug,
   getRelatedGovernanceRecords,
-} from "@/lib/governance-library/search";
+} from "../../../lib/governance-library/search";
 import type {
   GovernanceAuthorityLevel,
   GovernanceEvidenceType,
   GovernanceLifecycleStage,
   Ta14ChainLink,
-} from "@/lib/governance-library/types";
+} from "../../../lib/governance-library/types";
 
 type GovernanceLibraryRecordPageProps = {
   params:
