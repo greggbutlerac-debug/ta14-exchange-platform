@@ -6,10 +6,25 @@ import { createClient } from "@supabase/supabase-js";
 const VISIT_COOKIE = "ta14_visit_id";
 
 type SiteActivityRpcRow = {
-  visitors: number | null;
-  page_views: number | null;
+  id: number | null;
+  total_visitors: number | string | null;
+  total_page_views: number | string | null;
+  first_recorded_at: string | null;
   updated_at: string | null;
 };
+
+function toSafeNumber(value: number | string | null | undefined): number {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+
+  return 0;
+}
 
 export async function POST(_req: NextRequest) {
   try {
@@ -69,8 +84,9 @@ export async function POST(_req: NextRequest) {
     const response = NextResponse.json({
       counted: true,
       newVisitor: isNewVisitor,
-      visitors: result?.visitors ?? 0,
-      pageViews: result?.page_views ?? 0,
+      visitors: toSafeNumber(result?.total_visitors),
+      pageViews: toSafeNumber(result?.total_page_views),
+      firstRecordedAt: result?.first_recorded_at ?? null,
       updatedAt: result?.updated_at ?? null,
     });
 
