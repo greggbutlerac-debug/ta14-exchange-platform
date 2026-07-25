@@ -59,7 +59,7 @@ export function evaluateRuntimePreservationReadiness(
     );
   }
 
-  if (!candidate.payload.storedRunId) {
+  if (!candidate.storedRunId) {
     reasons.push(
       "The candidate is missing its stored scenario-run identifier.",
     );
@@ -71,7 +71,7 @@ export function evaluateRuntimePreservationReadiness(
     );
   }
 
-  if (candidate.payload.boundEvidence.length === 0) {
+  if (candidate.payload.evidenceIds.length === 0) {
     reasons.push(
       "The candidate contains no bound evidence references.",
     );
