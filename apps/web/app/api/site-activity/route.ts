@@ -6,13 +6,12 @@ import { createClient } from "@supabase/supabase-js";
 const VISIT_COOKIE = "ta14_visit_id";
 
 type SiteActivityRpcRow = {
-  new_visitor: boolean | null;
   visitors: number | null;
   page_views: number | null;
   updated_at: string | null;
 };
 
-export async function POST(req: NextRequest) {
+export async function POST(_req: NextRequest) {
   try {
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -31,21 +30,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = (await req.json().catch(() => ({}))) as {
-      path?: unknown;
-    };
-
-    const path =
-      typeof body.path === "string" && body.path.trim().length > 0
-        ? body.path.trim().slice(0, 2048)
-        : "/";
-
     const cookieStore = await cookies();
-    let visitId = cookieStore.get(VISIT_COOKIE)?.value;
-
-    if (!visitId) {
-      visitId = randomUUID();
-    }
+    const existingVisitId = cookieStore.get(VISIT_COOKIE)?.value;
+    const isNewVisitor = !existingVisitId;
+    const visitId = existingVisitId ?? randomUUID();
 
     const supabase = createClient(supabaseUrl, serviceRoleKey, {
       auth: {
@@ -57,8 +45,7 @@ export async function POST(req: NextRequest) {
     const { data, error } = await supabase.rpc(
       "increment_ta14_site_activity",
       {
-        p_visit_id: visitId,
-        p_path: path,
+        p_new_visitor: isNewVisitor,
       }
     );
 
@@ -81,7 +68,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json({
       counted: true,
-      newVisitor: result?.new_visitor ?? false,
+      newVisitor: isNewVisitor,
       visitors: result?.visitors ?? 0,
       pageViews: result?.page_views ?? 0,
       updatedAt: result?.updated_at ?? null,
