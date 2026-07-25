@@ -43,6 +43,21 @@ function isLikelyAutomatedRequest(request: NextRequest): boolean {
   ].some((token) => userAgent.includes(token));
 }
 
+function buildSupabaseHeaders(serviceKey: string): HeadersInit {
+  const headers: Record<string, string> = {
+    apikey: serviceKey,
+    "Content-Type": "application/json",
+  };
+
+  // Legacy service_role keys are JWTs and may be used as bearer tokens.
+  // Modern sb_secret_ keys are opaque API keys and must not be treated as JWTs.
+  if (!serviceKey.startsWith("sb_secret_")) {
+    headers.Authorization = `Bearer ${serviceKey}`;
+  }
+
+  return headers;
+}
+
 async function incrementSiteActivity(
   isNewVisitor: boolean,
 ): Promise<SiteActivityRecord> {
@@ -57,11 +72,7 @@ async function incrementSiteActivity(
     `${supabaseUrl}/rest/v1/rpc/increment_ta14_site_activity`,
     {
       method: "POST",
-      headers: {
-        apikey: serviceRoleKey,
-        Authorization: `Bearer ${serviceRoleKey}`,
-        "Content-Type": "application/json",
-      },
+      headers: buildSupabaseHeaders(serviceRoleKey),
       body: JSON.stringify({
         p_new_visitor: isNewVisitor,
       }),
