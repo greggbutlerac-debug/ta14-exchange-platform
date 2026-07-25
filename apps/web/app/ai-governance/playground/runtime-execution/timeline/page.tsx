@@ -54,7 +54,7 @@ export default function RuntimeTimelinePage() {
                 className="rounded-3xl border border-white/10 bg-white/[0.04] p-6"
               >
                 <div className="flex flex-wrap items-start justify-between gap-5">
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap gap-2">
                       <span className="rounded-full border border-white/15 bg-white/[0.05] px-3 py-1 text-xs uppercase tracking-[0.14em]">
                         {record.status}
@@ -89,11 +89,8 @@ export default function RuntimeTimelinePage() {
                       />
 
                       <Info
-                        label="Authority"
-                        value={
-                          record.payload.authority ??
-                          "Not specified"
-                        }
+                        label="Record Status"
+                        value={record.status}
                       />
                     </div>
                   </div>
@@ -140,9 +137,7 @@ function Info({
         {label}
       </p>
 
-      <p className="mt-2 text-sm text-white/75">
-        {value}
-      </p>
+      <p className="mt-2 text-sm text-white/75">{value}</p>
     </div>
   );
 }
