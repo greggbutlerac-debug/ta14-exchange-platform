@@ -18,3 +18,4 @@ export * from "./runtime-governed-record-candidate-storage";
 export * from "./runtime-preserved-governed-record";
 export * from "./runtime-preserved-governed-record-storage";
 export * from "./runtime-preservation-readiness";
+export * from "./runtime-preservation-service";
