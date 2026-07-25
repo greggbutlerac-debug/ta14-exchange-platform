@@ -1,10 +1,88 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
-
-import { GovernanceLibraryNavigation } from "../../components/governance-library/GovernanceLibraryNavigation";
 
 type GovernanceLibraryLayoutProps = {
   children: ReactNode;
 };
+
+const navigationSections = [
+  {
+    label: "Library",
+    links: [
+      { href: "/governance-library", label: "Overview" },
+      { href: "/governance-library/dictionary", label: "AI Governance Dictionary" },
+      { href: "/governance-library?category=law", label: "Laws" },
+      { href: "/governance-library?category=standard", label: "Standards" },
+      { href: "/governance-library?category=framework", label: "Frameworks" },
+    ],
+  },
+  {
+    label: "Governance Systems",
+    links: [
+      {
+        href: "/governance-library?category=management-system",
+        label: "Management Systems",
+      },
+      {
+        href: "/governance-library?category=risk-management",
+        label: "Risk Management",
+      },
+      { href: "/governance-library?category=testing", label: "Testing" },
+      {
+        href: "/governance-library?category=sector-governance",
+        label: "Sector Governance",
+      },
+    ],
+  },
+  {
+    label: "Execution Tools",
+    links: [
+      { href: "/governance-library/crosswalks", label: "Crosswalks" },
+      {
+        href: "/governance-library/applicability",
+        label: "Applicability Engine",
+      },
+      { href: "/ai-governance/build-a-route", label: "TA-14 Route Builder" },
+    ],
+  },
+];
+
+function GovernanceLibraryNavigation() {
+  return (
+    <nav aria-label="AI Governance Library">
+      <Link href="/governance-library" className="block">
+        <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
+          TA-14
+        </p>
+        <h2 className="mt-1 text-lg font-semibold text-white">
+          AI Governance Library
+        </h2>
+      </Link>
+
+      <div className="mt-7 space-y-7">
+        {navigationSections.map((section) => (
+          <section key={section.label}>
+            <p className="px-3 text-xs font-semibold uppercase tracking-[0.16em] text-slate-500">
+              {section.label}
+            </p>
+
+            <div className="mt-2 space-y-1">
+              {section.links.map((link) => (
+                <Link
+                  key={`${section.label}-${link.href}-${link.label}`}
+                  href={link.href}
+                  className="block rounded-lg px-3 py-2 text-sm text-slate-300 transition hover:bg-white/[0.06] hover:text-white"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </nav>
+  );
+}
 
 export default function GovernanceLibraryLayout({
   children,
