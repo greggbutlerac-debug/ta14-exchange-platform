@@ -87,6 +87,13 @@ const cards = [
       "Reconstruct the preserved governance context of a Runtime governed record for review without authorizing a new execution.",
     status: "Ready",
   },
+  {
+    title: "Runtime Audit",
+    href: "/ai-governance/playground/runtime-execution/audit",
+    description:
+      "Inspect preserved Runtime governance records, review audit dimensions, and navigate to integrity, verification, evidence, timeline, and replay workspaces.",
+    status: "Ready",
+  },
 ];
 
 export default function RuntimeExecutionPage() {
@@ -149,10 +156,10 @@ export default function RuntimeExecutionPage() {
             candidacy, preservation approval, immutable record
             creation, integrity-envelope generation, independent
             verification, searchable review, chronological inspection,
-            and bounded replay. No preserved Runtime record should be
-            treated as proof beyond the evidence, authority,
-            continuity, limitations, and execution boundaries
-            contained within that record.
+            bounded replay, and structured audit. No preserved Runtime
+            record should be treated as proof beyond the evidence,
+            authority, continuity, limitations, and execution
+            boundaries contained within that record.
           </p>
         </section>
       </div>
