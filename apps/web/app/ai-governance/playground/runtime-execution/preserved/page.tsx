@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import {
@@ -82,10 +83,7 @@ export default function RuntimePreservedRecordsPage() {
       record.recordId,
     );
 
-    downloadJson(
-      `${record.recordId}.json`,
-      json,
-    );
+    downloadJson(`${record.recordId}.json`, json);
   }
 
   return (
@@ -201,13 +199,24 @@ export default function RuntimePreservedRecordsPage() {
                       </p>
                     </div>
 
-                    <button
-                      type="button"
-                      onClick={() => handleExport(record)}
-                      className="rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[0.09]"
-                    >
-                      Export JSON
-                    </button>
+                    <div className="flex flex-wrap gap-3">
+                      <Link
+                        href={`/ai-governance/playground/runtime-execution/preserved/${encodeURIComponent(
+                          record.recordId,
+                        )}`}
+                        className="rounded-xl border border-sky-300/25 bg-sky-300/10 px-4 py-2.5 text-sm font-semibold text-sky-100 transition hover:border-sky-200/45 hover:bg-sky-300/15"
+                      >
+                        Open Record
+                      </Link>
+
+                      <button
+                        type="button"
+                        onClick={() => handleExport(record)}
+                        className="rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/[0.09]"
+                      >
+                        Export JSON
+                      </button>
+                    </div>
                   </div>
 
                   <dl className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
