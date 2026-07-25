@@ -120,13 +120,24 @@ export default function RuntimePreservedRecordDetailPage() {
             ← Preserved records
           </Link>
 
-          <button
-            type="button"
-            onClick={handleExport}
-            className="rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold transition hover:border-white/30 hover:bg-white/[0.09]"
-          >
-            Export JSON
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <Link
+              href={`/ai-governance/playground/runtime-execution/preserved/${encodeURIComponent(
+                recordId,
+              )}/envelope`}
+              className="rounded-xl border border-sky-300/30 bg-sky-300/10 px-4 py-2.5 text-sm font-semibold text-sky-100 transition hover:border-sky-200/50 hover:bg-sky-300/15"
+            >
+              Open Integrity Envelope
+            </Link>
+
+            <button
+              type="button"
+              onClick={handleExport}
+              className="rounded-xl border border-white/15 bg-white/[0.05] px-4 py-2.5 text-sm font-semibold transition hover:border-white/30 hover:bg-white/[0.09]"
+            >
+              Export JSON
+            </button>
+          </div>
         </div>
 
         <header className="mt-5 rounded-3xl border border-white/10 bg-white/[0.035] p-6 shadow-2xl shadow-black/30 sm:p-8">
