@@ -1,5 +1,5 @@
-import { governanceLibraryRecords } from "@/lib/governance-library";
 import Link from "next/link";
+import { governanceLibraryRecords } from "../../../lib/governance-library";
 
 export default function GovernanceLibrarySearchPage() {
   const records = [...governanceLibraryRecords].sort((a, b) =>
@@ -26,7 +26,7 @@ export default function GovernanceLibrarySearchPage() {
         <div className="mt-10 rounded-xl border border-white/10 bg-white/5 p-6">
           <input
             type="text"
-            placeholder="Search (UI placeholder for future live search)..."
+            placeholder="Search functionality coming next"
             className="w-full rounded-lg border border-white/10 bg-[#09111f] px-4 py-3 outline-none"
             disabled
           />
@@ -37,21 +37,20 @@ export default function GovernanceLibrarySearchPage() {
             <Link
               key={record.slug}
               href={`/governance-library/${record.slug}`}
-              className="rounded-xl border border-white/10 bg-white/5 p-5 hover:border-sky-400/40 transition"
+              className="rounded-xl border border-white/10 bg-white/5 p-5 transition hover:border-sky-400/40"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between gap-4">
                 <h2 className="text-xl font-semibold">{record.title}</h2>
-                <span className="rounded-full bg-sky-400/10 px-3 py-1 text-xs uppercase text-sky-300">
+
+                <span className="shrink-0 rounded-full bg-sky-400/10 px-3 py-1 text-xs uppercase text-sky-300">
                   {record.recordType}
                 </span>
               </div>
 
-              <p className="mt-3 text-slate-300">
-                {record.summary}
-              </p>
+              <p className="mt-3 text-slate-300">{record.summary}</p>
 
               <div className="mt-4 flex flex-wrap gap-2">
-                {record.categories.map((category) => (
+                {record.categories.map((category: string) => (
                   <span
                     key={category}
                     className="rounded-full border border-white/10 px-2 py-1 text-xs text-slate-300"
