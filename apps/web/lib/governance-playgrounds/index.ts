@@ -21,3 +21,4 @@ export * from "./runtime-preservation-readiness";
 export * from "./runtime-preservation-service";
 export * from "./runtime-preserved-record-verification";
 export * from "./runtime-preserved-record-integrity";
+export * from "./runtime-preserved-record-envelope";
