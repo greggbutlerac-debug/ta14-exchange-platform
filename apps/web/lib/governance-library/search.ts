@@ -4,6 +4,7 @@ import {
   governanceLibraryRecordBySlug,
 } from "./catalog";
 import type {
+  GovernanceCrosswalk,
   GovernanceLibraryFilter,
   GovernanceLibraryRecord,
   GovernanceLibrarySearchResult,
@@ -297,10 +298,7 @@ export function getGovernanceLibraryStats(): GovernanceLibraryStats {
     stats.byStatus[record.status] =
       (stats.byStatus[record.status] ?? 0) + 1;
 
-    if (
-      !stats.lastUpdatedAt ||
-      record.updatedAt > stats.lastUpdatedAt
-    ) {
+    if (!stats.lastUpdatedAt || record.updatedAt > stats.lastUpdatedAt) {
       stats.lastUpdatedAt = record.updatedAt;
     }
   }
@@ -308,41 +306,36 @@ export function getGovernanceLibraryStats(): GovernanceLibraryStats {
   return stats;
 }
 
+export type RelatedGovernanceRecord = {
+  record: GovernanceLibraryRecord;
+  relationship: GovernanceCrosswalk["relationship"];
+  explanation: string;
+  confidence: GovernanceCrosswalk["confidence"];
+};
+
 export function getRelatedGovernanceRecords(
   recordId: string,
-): Array<{
-  record: GovernanceLibraryRecord;
-  relationship: string;
-  explanation: string;
-  confidence: string;
-}> {
+): RelatedGovernanceRecord[] {
   const sourceRecord = getGovernanceLibraryRecordById(recordId);
 
   if (!sourceRecord?.crosswalks?.length) return [];
 
-  return sourceRecord.crosswalks
-    .map((crosswalk) => {
-      const record = getGovernanceLibraryRecordById(
-        crosswalk.targetRecordId,
-      );
+  const relatedRecords: RelatedGovernanceRecord[] = [];
 
-      if (!record) return null;
-
-      return {
-        record,
-        relationship: crosswalk.relationship,
-        explanation: crosswalk.explanation,
-        confidence: crosswalk.confidence,
-      };
-    })
-    .filter(
-      (
-        item,
-      ): item is {
-        record: GovernanceLibraryRecord;
-        relationship: string;
-        explanation: string;
-        confidence: string;
-      } => item !== null,
+  for (const crosswalk of sourceRecord.crosswalks) {
+    const record = getGovernanceLibraryRecordById(
+      crosswalk.targetRecordId,
     );
+
+    if (!record) continue;
+
+    relatedRecords.push({
+      record,
+      relationship: crosswalk.relationship,
+      explanation: crosswalk.explanation,
+      confidence: crosswalk.confidence,
+    });
+  }
+
+  return relatedRecords;
 }
