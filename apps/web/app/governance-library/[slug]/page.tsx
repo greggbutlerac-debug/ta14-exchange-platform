@@ -14,13 +14,9 @@ import type {
 } from "../../../lib/governance-library/types";
 
 type GovernanceLibraryRecordPageProps = {
-  params:
-    | {
-        slug: string;
-      }
-    | Promise<{
-        slug: string;
-      }>;
+  params: Promise<{
+    slug: string;
+  }>;
 };
 
 const toTitleCase = (value: string): string =>
