@@ -54,10 +54,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const { data, error } = await supabase.rpc("record_site_activity", {
-      p_visit_id: visitId,
-      p_path: path,
-    });
+    const { data, error } = await supabase.rpc(
+      "increment_ta14_site_activity",
+      {
+        p_visit_id: visitId,
+        p_path: path,
+      }
+    );
 
     if (error) {
       console.error("Site activity RPC error:", error);
