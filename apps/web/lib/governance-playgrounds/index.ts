@@ -20,3 +20,4 @@ export * from "./runtime-preserved-governed-record-storage";
 export * from "./runtime-preservation-readiness";
 export * from "./runtime-preservation-service";
 export * from "./runtime-preserved-record-verification";
+export * from "./runtime-preserved-record-integrity";
