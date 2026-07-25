@@ -1,0 +1,1 @@
+export default function LawsPage(){return <main className='min-h-screen bg-[#050816] text-white'><div className='mx-auto max-w-7xl px-6 py-16'><h1 className='text-5xl font-bold'>AI Governance Laws</h1></div></main>}
