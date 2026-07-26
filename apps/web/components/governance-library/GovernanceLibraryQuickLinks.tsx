@@ -12,10 +12,7 @@ const quickLinks = [
 export default function GovernanceLibraryQuickLinks() {
   return (
     <aside className="rounded-2xl border border-white/10 bg-white/5 p-6">
-      <h2 className="text-lg font-semibold text-white">
-        Quick Access
-      </h2>
-
+      <h2 className="text-lg font-semibold text-white">Quick Access</h2>
       <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {quickLinks.map((link) => (
           <Link
