@@ -659,7 +659,7 @@ export const AUDIT_ASSURANCE_SECTIONS = [
 export const AUDIT_ASSURANCE_SCENARIOS = [
   {
     scenarioId: "AUDIT-ASSURANCE-BASELINE-ALLOW",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Independent reproducible assurance baseline",
     description:
       "An independent auditor can reproduce the governance determination from complete, traceable, and preserved evidence.",
@@ -687,7 +687,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-MISSING-EVIDENCE",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Mandatory audit evidence missing",
     description:
       "A mandatory record required to support the audit conclusion is unavailable.",
@@ -718,7 +718,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-BROKEN-CHAIN-OF-CUSTODY",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Broken evidence chain of custody",
     description:
       "Evidence cannot be reliably linked from source collection through audit use and preservation.",
@@ -750,7 +750,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-SAMPLING-FAILURE",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Sampling method unsupported",
     description:
       "The sample is biased, incomplete, too small, or disconnected from the declared population and materiality.",
@@ -782,7 +782,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-EVIDENCE-CONFLICT",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Conflicting audit evidence",
     description:
       "Material evidence supports incompatible conclusions about control operation, execution, or outcome.",
@@ -813,7 +813,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-INDEPENDENCE-VIOLATION",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Auditor independence impaired",
     description:
       "The reviewer participated in designing, operating, approving, or financially benefiting from the audited control or route.",
@@ -845,7 +845,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-INCORRECT-CRITERIA",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Incorrect audit criteria applied",
     description:
       "The audit uses criteria that are superseded, irrelevant, incomplete, or outside the declared scope.",
@@ -878,7 +878,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-CONTROL-NOT-REPRODUCIBLE",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Control determination cannot be reproduced",
     description:
       "The auditor cannot obtain the same determination from the preserved inputs, rules, authority, and control configuration.",
@@ -910,7 +910,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-REMEDIATION-MISSING",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Material finding lacks remediation",
     description:
       "A material finding remains open without an accountable owner, corrective action, due date, or escalation.",
@@ -942,7 +942,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-FAILED-RETEST",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Remediation retest failed",
     description:
       "Corrective action was declared complete, but independent retesting shows the control or record defect persists.",
@@ -973,7 +973,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-OUTCOME-MISMATCH",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Outcome contradicts assurance opinion",
     description:
       "Subsequent execution or outcome evidence materially contradicts the issued assurance conclusion.",
@@ -1004,7 +1004,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-AUDIT-DRIFT",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Audit scope or evidence drift",
     description:
       "The audited system, criteria, controls, data, or evidence population changes after opinion issuance.",
@@ -1037,7 +1037,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-EVIDENCE-EXPIRED",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Assurance evidence expired",
     description:
       "A time-bounded audit, test, certification, or remediation-verification record is no longer current.",
@@ -1068,7 +1068,7 @@ export const AUDIT_ASSURANCE_SCENARIOS = [
   },
   {
     scenarioId: "AUDIT-ASSURANCE-RECOVERY-REPLAY",
-    laneId: "audit-assurance",
+    laneId: "outcome-assurance",
     title: "Corrected audit recovery and replay",
     description:
       "A prior assurance failure is corrected, independently verified, preserved, and replayed without altering the original record.",
@@ -1104,7 +1104,7 @@ export type AuditAssuranceScenario =
   (typeof AUDIT_ASSURANCE_SCENARIOS)[number];
 
 export const AUDIT_ASSURANCE_LANE = {
-  laneId: "audit-assurance",
+  laneId: "outcome-assurance",
   name: "Audit & Assurance Governance Playground",
   shortName: "Audit & Assurance",
   description:
