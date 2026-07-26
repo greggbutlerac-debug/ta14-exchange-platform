@@ -4,7 +4,7 @@ const quickLinks = [
   { href: "/governance-library/all", label: "All Records" },
   { href: "/governance-library/category", label: "Categories" },
   { href: "/governance-library/jurisdiction", label: "Jurisdictions" },
-  { href: "/governance-library/type", label: "Record Types" },
+  { href: "/governance-library/type", labapps/web/components/governance-library/GovernanceLibraryQuickLinks.tsxel: "Record Types" },
   { href: "/governance-library/topics", label: "Topics" },
   { href: "/governance-library/references", label: "Official References" },
 ];
