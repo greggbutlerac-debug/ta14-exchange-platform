@@ -1,11 +1,11 @@
 import Link from "next/link";
-import GovernanceLibraryQuickLinks from "../../../components/governance-library/GovernanceLibraryQuickLinks";
+import GovernanceLibraryQuickLinks from "@/components/governance-library/GovernanceLibraryQuickLinks";
 import {
   governanceLibraryRecords,
-} from "../../../lib/governance-library";
+} from "@/lib/governance-library";
 import type {
   GovernanceLibraryRecord,
-} from "../../../lib/governance-library/records-foundational";
+} from "@/lib/governance-library/records-foundational";
 
 export default function GovernanceLibraryAllPage() {
   const records: GovernanceLibraryRecord[] = [...governanceLibraryRecords].sort(
