@@ -700,7 +700,7 @@ export const DECISION_GOVERNANCE_SECTIONS = [
 export const DECISION_GOVERNANCE_SCENARIOS = [
   {
     scenarioId: "DECISION-BASELINE-ALLOW",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Approved decision baseline",
     description:
       "The decision identity, scope, actors, authority, criteria, evidence, review, commit controls, records, and replay conditions are complete and current.",
@@ -728,7 +728,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-MISSING-MANDATORY-EVIDENCE",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Mandatory evidence is missing",
     description:
       "A required evidence item is absent at the time the determination is evaluated.",
@@ -759,7 +759,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-EVIDENCE-CONFLICT",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Material evidence conflict",
     description:
       "Two current, apparently authoritative evidence items materially contradict one another.",
@@ -792,7 +792,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-AUTHORITY-CONFLICT",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Conflicting decision authorities",
     description:
       "Two actors or authorities claim incompatible control over the same decision.",
@@ -805,7 +805,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
         title: "Create authority conflict",
         description:
           "Introduce incompatible current authority records for the same decision.",
-        mutationType: "CREATE_AUTHORITY_CONFLICT",
+        mutationType: "ALTER_ROUTE_FIELD",
         target: "decisionAuthority",
       },
     ],
@@ -824,7 +824,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-CRITERIA-CHANGED-AFTER-REVIEW",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Decision criteria change after review",
     description:
       "A material criterion, threshold, or rule changes after evaluation but before commit or execution.",
@@ -857,7 +857,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-UNAUTHORIZED-OVERRIDE",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Unauthorized override attempt",
     description:
       "An actor without valid override authority attempts to replace or bypass the bounded determination.",
@@ -890,7 +890,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-HUMAN-JUDGMENT-REQUIRED",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Human judgment is required",
     description:
       "The decision reaches a declared condition that cannot be resolved by automated criteria alone.",
@@ -923,7 +923,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-CONFLICT-OF-INTEREST",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Reviewer conflict of interest",
     description:
       "The assigned evaluator or approver has a disqualifying relationship or interest affecting the decision.",
@@ -936,7 +936,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
         title: "Create reviewer conflict",
         description:
           "Assign a reviewer with a material conflict of interest.",
-        mutationType: "ALTER_ACTOR",
+        mutationType: "ALTER_ROUTE_FIELD",
         target: "actors",
         value: "conflicted-reviewer",
       },
@@ -956,7 +956,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-SELF-APPROVAL",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Requester attempts self-approval",
     description:
       "The same actor requests, evaluates, and approves the decision in violation of separation-of-duties requirements.",
@@ -990,7 +990,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-EXECUTION-DIFFERS",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Execution differs from the approved decision",
     description:
       "The execution receipt shows a materially different subject, amount, destination, action, or sequence than the preserved decision.",
@@ -1023,7 +1023,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-OUTCOME-NOT-SUPPORTED",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Outcome does not support the decision claim",
     description:
       "The decision and execution occur as approved, but the measured outcome does not support the claimed result or benefit.",
@@ -1054,7 +1054,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-SUPERSEDED-BY-NEW-EVIDENCE",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Decision superseded by new material evidence",
     description:
       "New authoritative evidence materially changes the basis of a previously preserved decision.",
@@ -1067,7 +1067,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
         title: "Add superseding evidence",
         description:
           "Introduce new authoritative evidence that changes a material decision criterion.",
-        mutationType: "ADD_EVIDENCE",
+        mutationType: "ALTER_ROUTE_FIELD",
         target: "requiredEvidence",
         value: "new-material-authoritative-evidence",
       },
@@ -1087,7 +1087,7 @@ export const DECISION_GOVERNANCE_SCENARIOS = [
   },
   {
     scenarioId: "DECISION-RECOVERY-REPLAY",
-    laneId: "decision-governance",
+    laneId: "decision",
     title: "Corrected decision recovery and replay",
     description:
       "A prior HOLD, DENY, or ESCALATE condition is corrected, preserved, replayed, and issued as a new bounded determination.",
@@ -1123,7 +1123,7 @@ export type DecisionGovernanceScenario =
   (typeof DECISION_GOVERNANCE_SCENARIOS)[number];
 
 export const DECISION_GOVERNANCE_LANE = {
-  laneId: "decision-governance",
+  laneId: "decision",
   name: "Decision Governance Playground",
   shortName: "Decision Governance",
   description:
