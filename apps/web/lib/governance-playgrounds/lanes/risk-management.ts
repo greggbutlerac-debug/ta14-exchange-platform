@@ -671,7 +671,7 @@ export const RISK_MANAGEMENT_SECTIONS = [
 export const RISK_MANAGEMENT_SCENARIOS = [
   {
     scenarioId: "RISK-MANAGEMENT-BASELINE-ALLOW",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Risk-managed execution baseline",
     description:
       "Material risks are identified, supported, owned, treated, tested, within tolerance, accepted by valid authority, and bound to execution.",
@@ -699,7 +699,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-MISSING-MATERIAL-RISK",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Material risk omitted",
     description:
       "A foreseeable material risk is absent from the risk register and control mapping.",
@@ -731,7 +731,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-INVALID-RISK-OWNER",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Risk owner lacks authority",
     description:
       "The assigned risk owner is identifiable but lacks authority for the declared risk class or acceptance level.",
@@ -762,7 +762,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-RISK-EXCEEDS-TOLERANCE",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Residual risk exceeds tolerance",
     description:
       "Residual risk remains above the approved tolerance after declared controls are applied.",
@@ -794,7 +794,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-UNAUTHORIZED-RISK-ACCEPTANCE",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Unauthorized risk acceptance",
     description:
       "An actor accepts residual risk beyond their delegated authority.",
@@ -825,7 +825,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-CONTROL-EVIDENCE-MISSING",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Control test evidence missing",
     description:
       "Risk treatment relies on a mandatory control without current evidence that the control is operating effectively.",
@@ -856,7 +856,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-CONFLICTING-RISK-EVIDENCE",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Conflicting risk evidence",
     description:
       "Material evidence supports incompatible likelihood, impact, or residual-risk determinations.",
@@ -887,7 +887,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-CRITERIA-CHANGED",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Risk criteria changed after review",
     description:
       "Risk scoring criteria, appetite, or tolerance changes after approval and before execution.",
@@ -919,7 +919,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-DEPENDENCY-FAILURE",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Critical dependency risk realized",
     description:
       "A critical dependency becomes unavailable or untrusted, invalidating the risk treatment assumptions.",
@@ -951,7 +951,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-EXECUTION-MISMATCH",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Execution exceeds approved risk boundary",
     description:
       "The action executes outside the scope, amount, destination, or condition used in the approved risk assessment.",
@@ -983,7 +983,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-OUTCOME-MISMATCH",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Outcome exceeds expected residual risk",
     description:
       "Outcome evidence shows greater harm, frequency, severity, or control failure than the accepted residual-risk determination.",
@@ -1014,7 +1014,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-RISK-EVIDENCE-EXPIRED",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Risk evidence expired",
     description:
       "A required risk assessment, control test, or acceptance record has expired.",
@@ -1045,7 +1045,7 @@ export const RISK_MANAGEMENT_SCENARIOS = [
   },
   {
     scenarioId: "RISK-MANAGEMENT-RECOVERY-REPLAY",
-    laneId: "risk-management",
+    laneId: "risk",
     title: "Corrected risk recovery and replay",
     description:
       "A prior risk-governance failure is corrected, preserved, independently reviewed, and replayed before restoration.",
@@ -1081,7 +1081,7 @@ export type RiskManagementScenario =
   (typeof RISK_MANAGEMENT_SCENARIOS)[number];
 
 export const RISK_MANAGEMENT_LANE = {
-  laneId: "risk-management",
+  laneId: "risk",
   name: "Risk Management Governance Playground",
   shortName: "Risk Management",
   description:
