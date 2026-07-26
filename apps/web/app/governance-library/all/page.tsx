@@ -1,15 +1,10 @@
 import Link from "next/link";
-import GovernanceLibraryQuickLinks from "@/components/governance-library/GovernanceLibraryQuickLinks";
-import {
-  governanceLibraryRecords,
-} from "@/lib/governance-library";
-import type {
-  GovernanceLibraryRecord,
-} from "@/lib/governance-library/records-foundational";
+import GovernanceLibraryQuickLinks from "../../../components/governance-library/GovernanceLibraryQuickLinks";
+import { governanceLibraryRecords } from "../../../lib/governance-library";
 
 export default function GovernanceLibraryAllPage() {
-  const records: GovernanceLibraryRecord[] = [...governanceLibraryRecords].sort(
-    (a, b) => a.title.localeCompare(b.title)
+  const records = [...governanceLibraryRecords].sort((a, b) =>
+    a.title.localeCompare(b.title)
   );
 
   return (
@@ -39,7 +34,7 @@ export default function GovernanceLibraryAllPage() {
       </div>
 
       <section className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-        {records.map((record: GovernanceLibraryRecord) => (
+        {records.map((record) => (
           <Link
             key={record.slug}
             href={`/governance-library/${record.slug}`}
