@@ -6,12 +6,14 @@ import type {
 import type { SharedGateId } from "../gates";
 
 /**
- * TA-14 Runtime & Execution Governance Playground
+ * TA-14 Runtime Execution Governance Playground
  *
- * Reference implementation for every future governance-specific lane.
+ * Governs the final pre-execution and runtime boundary where an approved
+ * decision becomes a permitted, held, denied, or escalated action.
  *
- * This lane tests whether an approved route remains bounded, authorized,
- * evidenced, constrained, interruptible, and attributable during execution.
+ * Governing sequence:
+ * Reality -> Record -> Continuity -> Admissibility -> Binding -> Commit ->
+ * Execution -> Outcome
  */
 
 export const RUNTIME_EXECUTION_GATE_IDS = [
@@ -33,21 +35,28 @@ export const RUNTIME_EXECUTION_GATE_IDS = [
 
 export const RUNTIME_EXECUTION_EVIDENCE_TYPES = [
   "GOVERNANCE_CLAIM_SUPPORT",
-  "ACTOR_IDENTITY",
-  "ROUTE_SUPPORTING_EVIDENCE",
-  "AUTHORITY_SOURCE",
-  "CONTROL_IMPLEMENTATION",
-  "DEPENDENCY_IDENTITY",
-  "OVERSIGHT_QUALIFICATION",
-  "EXECUTION_CONTROL",
-  "INTERVENTION_TEST",
-  "RECORD_CONTINUITY",
-  "OUTCOME_EVIDENCE",
-  "REPLAY_RESULT",
-  "TOOL_PERMISSION_RECORD",
-  "RUNTIME_ENVIRONMENT_RECORD",
+  "ROUTE_IDENTITY_RECORD",
+  "EXECUTION_TARGET_RECORD",
+  "ACTOR_IDENTITY_RECORD",
+  "SYSTEM_IDENTITY_RECORD",
+  "MODEL_IDENTITY_RECORD",
+  "DATA_IDENTITY_RECORD",
+  "TOOL_IDENTITY_RECORD",
+  "EVIDENCE_RECORD",
+  "AUTHORITY_RECORD",
+  "RULE_RECORD",
+  "CONTROL_RECORD",
+  "DEPENDENCY_RECORD",
+  "HUMAN_OVERSIGHT_RECORD",
+  "EXCEPTION_RECORD",
+  "ESCALATION_RECORD",
   "COMMIT_AUTHORIZATION",
+  "EXECUTION_INTENT_RECORD",
   "EXECUTION_RECEIPT",
+  "OUTCOME_EVIDENCE",
+  "INCIDENT_RECORD",
+  "REMEDIATION_RECORD",
+  "REPLAY_RESULT",
 ] as const;
 
 export type RuntimeExecutionEvidenceType =
@@ -55,441 +64,525 @@ export type RuntimeExecutionEvidenceType =
 
 export const RUNTIME_EXECUTION_SECTIONS = [
   {
-    sectionId: "route-identity",
-    title: "Route Identity",
+    sectionId: "runtime-execution-route-identity",
+    title: "Execution Route Identity",
     description:
-      "Identify the exact execution route, governed object, environment, and version being tested.",
+      "Identify the exact route, system, actor, model, data, tool, target, environment, version, and execution purpose.",
     order: 10,
     fields: [
       {
         key: "routeTitle",
-        label: "Route title",
-        description: "A specific name for this execution route.",
+        label: "Execution route title",
         type: "text",
         required: true,
-        placeholder: "Vendor payment approval and execution",
+        placeholder: "Production execution route",
         validation: { minLength: 3, maxLength: 160 },
       },
       {
         key: "routeDescription",
-        label: "Route description",
-        description:
-          "Describe the action from initiation through execution and outcome.",
+        label: "Execution route description",
         type: "textarea",
         required: true,
         placeholder:
-          "Describe what initiates the route, what decisions occur, who commits execution, and what result is expected.",
-        validation: { minLength: 20, maxLength: 4000 },
-      },
-      {
-        key: "governedObjectType",
-        label: "Governed object type",
-        type: "select",
-        required: true,
-        options: [
-          { value: "agent-action", label: "Agent action" },
-          { value: "api-call", label: "API call" },
-          { value: "automated-decision", label: "Automated decision" },
-          { value: "financial-transaction", label: "Financial transaction" },
-          { value: "model-deployment", label: "Model deployment" },
-          { value: "system-change", label: "System change" },
-          { value: "workflow", label: "Workflow" },
-          { value: "other", label: "Other consequential execution" },
-        ],
-      },
-      {
-        key: "governedObjectIdentifier",
-        label: "Governed object identifier",
-        description:
-          "A stable identifier for the exact workflow, agent, service, deployment, transaction, or action.",
-        type: "text",
-        required: true,
-        placeholder: "runtime-route:vendor-payment:v1",
-        validation: { minLength: 3, maxLength: 240 },
-      },
-      {
-        key: "environment",
-        label: "Execution environment",
-        type: "select",
-        required: true,
-        options: [
-          { value: "simulation", label: "Simulation" },
-          { value: "sandbox", label: "Sandbox" },
-          { value: "staging", label: "Staging" },
-          { value: "production", label: "Production" },
-          { value: "hybrid", label: "Hybrid or multi-environment" },
-        ],
-      },
-      {
-        key: "routeVersion",
-        label: "Route version",
-        type: "text",
-        required: true,
-        placeholder: "1.0.0",
-        validation: { minLength: 1, maxLength: 80 },
-      },
-    ],
-  },
-  {
-    sectionId: "claim-boundary",
-    title: "Governance Claim and Boundary",
-    description:
-      "State what the runtime governance architecture claims to control and where that claim ends.",
-    order: 20,
-    fields: [
-      {
-        key: "governanceClaim",
-        label: "Runtime governance claim",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "This architecture constrains execution to approved actors, tools, authority, evidence, sequence, and limits.",
-        validation: { minLength: 20, maxLength: 3000 },
-      },
-      {
-        key: "claimedControlLayers",
-        label: "Claimed runtime controls",
-        type: "multiselect",
-        required: true,
-        options: [
-          { value: "identity", label: "Identity" },
-          { value: "authority", label: "Authority" },
-          { value: "evidence", label: "Evidence" },
-          { value: "tools", label: "Tools and APIs" },
-          { value: "sequence", label: "Execution sequence" },
-          { value: "limits", label: "Execution limits" },
-          { value: "intervention", label: "Intervention and shutdown" },
-          { value: "records", label: "Execution records" },
-          { value: "outcomes", label: "Outcome correspondence" },
-        ],
-      },
-      {
-        key: "explicitNonClaims",
-        label: "Explicit non-claims",
-        description:
-          "State what the architecture does not prove or control.",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "This test does not prove legal compliance, model truthfulness, cybersecurity, or outcome causation unless separately tested.",
-        validation: { minLength: 10, maxLength: 3000 },
-      },
-      {
-        key: "inScope",
-        label: "In scope",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Actors, systems, tools, actions, environments, time period, and jurisdictions included.",
-        validation: { minLength: 10, maxLength: 3000 },
-      },
-      {
-        key: "outOfScope",
-        label: "Out of scope",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Excluded actors, systems, tools, actions, environments, time periods, and jurisdictions.",
-        validation: { minLength: 10, maxLength: 3000 },
-      },
-      {
-        key: "jurisdiction",
-        label: "Jurisdiction or regulatory context",
-        type: "text",
-        required: true,
-        placeholder: "United States - Florida",
-        validation: { minLength: 2, maxLength: 240 },
-      },
-    ],
-  },
-  {
-    sectionId: "actors-authority",
-    title: "Actors and Authority",
-    description:
-      "Identify who initiates, evaluates, authorizes, commits, executes, supervises, and receives the result.",
-    order: 30,
-    fields: [
-      {
-        key: "actors",
-        label: "Material actors",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"id":"actor-1","type":"human","role":"route owner"},{"id":"agent-1","type":"agent","role":"executor"}]',
-      },
-      {
-        key: "responsibilityMap",
-        label: "Responsibility map",
-        type: "json",
-        required: true,
-        placeholder:
-          '{"initiate":"actor-1","approve":"actor-2","commit":"service-1","execute":"agent-1"}',
-      },
-      {
-        key: "authorityDeclarations",
-        label: "Authority declarations",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"holder":"actor-2","scope":"Approve vendor payments up to 50000 USD","validUntil":"2026-12-31T23:59:59Z"}]',
-      },
-      {
-        key: "commitAuthority",
-        label: "Commit authority",
-        description:
-          "Identify the actor or service permitted to make execution binding.",
-        type: "text",
-        required: true,
-        placeholder: "finance-controller-role",
-        validation: { minLength: 2, maxLength: 240 },
-      },
-    ],
-  },
-  {
-    sectionId: "evidence-controls",
-    title: "Evidence and Control Binding",
-    description:
-      "Declare the evidence required at runtime and bind each governance requirement to an enforceable control.",
-    order: 40,
-    fields: [
-      {
-        key: "evidenceStatement",
-        label: "Evidence sufficiency statement",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Identify the minimum evidence required before the route may proceed.",
-        validation: { minLength: 20, maxLength: 4000 },
-      },
-      {
-        key: "requiredRuntimeEvidence",
-        label: "Required runtime evidence",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"type":"AUTHORITY_SOURCE","requiredAt":"commit"},{"type":"DEPENDENCY_IDENTITY","requiredAt":"execution"}]',
-      },
-      {
-        key: "controlBindings",
-        label: "Rule-to-control bindings",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"rule":"Payment requires finance authority","control":"commit gate rejects absent authority","failure":"HOLD"}]',
-      },
-      {
-        key: "evidenceFreshnessRules",
-        label: "Evidence freshness rules",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"evidenceType":"AUTHORITY_SOURCE","maximumAgeMinutes":60}]',
-      },
-    ],
-  },
-  {
-    sectionId: "dependencies-tools",
-    title: "Dependencies, Tools, and Permissions",
-    description:
-      "Identify every material model, dataset, tool, API, vendor, credential, service, and environment dependency.",
-    order: 50,
-    fields: [
-      {
-        key: "dependencies",
-        label: "Material dependencies",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"id":"payments-api","type":"api","version":"2026-07","approved":true}]',
-      },
-      {
-        key: "approvedTools",
-        label: "Approved tools and APIs",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"tool":"payments-api","actions":["validate-beneficiary","submit-payment"]}]',
-      },
-      {
-        key: "prohibitedTools",
-        label: "Prohibited tools and actions",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"tool":"shell","reason":"No operating-system command authority"}]',
-      },
-      {
-        key: "credentialBoundary",
-        label: "Credential and permission boundary",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Describe which credentials exist, who controls them, and which exact actions they permit.",
-        validation: { minLength: 20, maxLength: 4000 },
-      },
-      {
-        key: "dependencyChangePolicy",
-        label: "Dependency change policy",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "State what changes invalidate prior approval and require replay.",
-        validation: { minLength: 10, maxLength: 3000 },
-      },
-    ],
-  },
-  {
-    sectionId: "execution-intervention",
-    title: "Execution Constraints and Intervention",
-    description:
-      "Define the route sequence, binding limits, failure responses, escalation path, and recovery process.",
-    order: 60,
-    fields: [
-      {
-        key: "executionConstraints",
-        label: "Execution constraints",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"constraint":"amount <= 50000","enforcementPoint":"commit","failure":"HOLD"}]',
-      },
-      {
-        key: "requiredSequence",
-        label: "Required execution sequence",
-        type: "json",
-        required: true,
-        placeholder:
-          '["identify","validate-evidence","validate-authority","bind-controls","commit","execute","record","verify-outcome"]',
-      },
-      {
-        key: "holdConditions",
-        label: "HOLD conditions",
-        type: "json",
-        required: true,
-        placeholder:
-          '["missing evidence","expired evidence","failed mandatory gate","material drift"]',
-      },
-      {
-        key: "denyConditions",
-        label: "DENY conditions",
-        type: "json",
-        required: true,
-        placeholder:
-          '["prohibited action","authority exceeded","explicit boundary violation"]',
-      },
-      {
-        key: "escalationConditions",
-        label: "ESCALATE conditions",
-        type: "json",
-        required: true,
-        placeholder:
-          '["conflicting authority","unresolved evidence conflict","required human judgment"]',
-      },
-      {
-        key: "recoveryProcedure",
-        label: "Recovery procedure",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Describe safe stop, rollback, evidence preservation, correction, reauthorization, and replay.",
+          "Describe the proposed action, target, actor, system, consequences, and why runtime governance is required.",
         validation: { minLength: 20, maxLength: 5000 },
       },
       {
-        key: "humanOversightRequired",
-        label: "Human oversight required",
-        type: "boolean",
+        key: "routeIdentifier",
+        label: "Stable route identifier",
+        type: "text",
         required: true,
-        defaultValue: true,
+        placeholder: "runtime-execution:route:2026-001",
+        validation: { minLength: 3, maxLength: 300 },
       },
       {
-        key: "oversightActors",
-        label: "Oversight actors",
+        key: "systemIdentity",
+        label: "Executing system identity",
         type: "json",
         required: true,
-        appliesWhen: [
-          {
-            ruleId: "RUNTIME-OVERSIGHT-01",
-            description: "Required when human oversight is enabled.",
-            field: "humanOversightRequired",
-            operator: "equals",
-            expected: true,
-          },
-        ],
         placeholder:
-          '[{"actorId":"reviewer-1","qualification":"finance authority","independent":true}]',
+          '{"systemId":"SYS-001","name":"Governed Runtime","version":"1.0.0","environment":"production"}',
       },
       {
-        key: "interventionPowers",
-        label: "Human intervention powers",
-        type: "multiselect",
+        key: "actorIdentity",
+        label: "Execution actor identity",
+        type: "json",
         required: true,
-        appliesWhen: [
-          {
-            ruleId: "RUNTIME-OVERSIGHT-02",
-            description: "Required when human oversight is enabled.",
-            field: "humanOversightRequired",
-            operator: "equals",
-            expected: true,
-          },
-        ],
+        placeholder:
+          '{"actorId":"ACT-001","type":"service","role":"authorized executor","status":"active"}',
+      },
+      {
+        key: "executionTarget",
+        label: "Execution target",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"targetId":"TARGET-001","type":"external system","destination":"approved endpoint"}',
+      },
+      {
+        key: "modelIdentity",
+        label: "Model identity",
+        type: "json",
+        required: false,
+        placeholder:
+          '{"modelId":"MODEL-001","version":"1.0.0","provider":"approved provider"}',
+      },
+      {
+        key: "dataIdentity",
+        label: "Data identity",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"dataPackageId":"DATA-001","version":"2026.1","source":"approved source"}',
+      },
+      {
+        key: "toolIdentity",
+        label: "Tool identity",
+        type: "json",
+        required: false,
+        placeholder:
+          '{"toolId":"TOOL-001","version":"1.0.0","scope":"approved action"}',
+      },
+    ],
+  },
+  {
+    sectionId: "runtime-execution-intent-scope",
+    title: "Execution Intent, Scope, and Boundary",
+    description:
+      "Define the exact proposed action, permitted scope, prohibited actions, irreversible consequences, destinations, and non-claims.",
+    order: 20,
+    fields: [
+      {
+        key: "executionIntent",
+        label: "Execution intent",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "State exactly what action is proposed, why, for whom, against what target, and with what expected result.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "permittedActions",
+        label: "Permitted actions",
+        type: "json",
+        required: true,
+        placeholder:
+          '["approved transaction","approved system update","approved notification"]',
+      },
+      {
+        key: "prohibitedActions",
+        label: "Prohibited actions",
+        type: "json",
+        required: true,
+        placeholder:
+          '["unapproved destination","scope expansion","credential change","record deletion","silent override"]',
+      },
+      {
+        key: "executionParameters",
+        label: "Execution parameters",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"amount":27500,"currency":"USD","destination":"approved beneficiary","maximumAttempts":1}',
+      },
+      {
+        key: "scopeBoundary",
+        label: "Scope boundary",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"actor":"ACT-001","target":"TARGET-001","environment":"production","timeWindow":"approved window"}',
+      },
+      {
+        key: "irreversibleConsequences",
+        label: "Irreversible consequences",
+        type: "json",
+        required: true,
+        placeholder:
+          '["external funds transfer","public disclosure","physical actuation","permanent deletion"]',
+      },
+      {
+        key: "nonClaims",
+        label: "Explicit non-claims",
+        type: "json",
+        required: true,
+        placeholder:
+          '["approval does not extend beyond this exact action","runtime permission does not certify universal safety"]',
+      },
+    ],
+  },
+  {
+    sectionId: "runtime-execution-evidence-authority",
+    title: "Evidence, Authority, and Admissibility",
+    description:
+      "Establish the evidence, source authority, approval authority, actor authority, validity windows, conflicts, and admissibility conditions required before commitment.",
+    order: 30,
+    fields: [
+      {
+        key: "evidenceInventory",
+        label: "Execution evidence inventory",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"evidenceId":"EV-001","type":"EVIDENCE_RECORD","supports":"execution condition","status":"current"}]',
+      },
+      {
+        key: "evidenceQualityMethod",
+        label: "Evidence quality method",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe how accuracy, completeness, attribution, timeliness, relevance, integrity, and reproducibility are assessed.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "authorityInventory",
+        label: "Authority inventory",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"authorityId":"AUTH-001","role":"execution approver","scope":"TARGET-001","status":"active"}]',
+      },
+      {
+        key: "actorAuthority",
+        label: "Actor execution authority",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"actorId":"ACT-001","authorityId":"AUTH-ACT-001","scope":"approved route only","status":"active"}',
+      },
+      {
+        key: "approvalRecord",
+        label: "Approval record",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"approvalId":"APR-001","decision":"approved","routeId":"runtime-execution:route:2026-001","status":"active"}',
+      },
+      {
+        key: "validityWindow",
+        label: "Validity window",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"validFrom":"2026-07-01T00:00:00Z","validUntil":"2026-07-01T01:00:00Z"}',
+      },
+      {
+        key: "evidenceConflicts",
+        label: "Known evidence conflicts",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"conflictId":"CONFLICT-001","status":"resolved","resolution":"independent verification"}]',
+      },
+      {
+        key: "missingEvidenceBehavior",
+        label: "Missing evidence behavior",
+        type: "select",
+        required: true,
         options: [
-          { value: "inspect", label: "Inspect evidence" },
-          { value: "hold", label: "Place route on HOLD" },
-          { value: "deny", label: "DENY execution" },
-          { value: "modify", label: "Request correction" },
-          { value: "stop", label: "Stop active execution" },
-          { value: "rollback", label: "Initiate rollback" },
-          { value: "escalate", label: "Escalate for independent review" },
+          { value: "hold", label: "HOLD" },
+          { value: "deny", label: "DENY" },
+          { value: "escalate", label: "ESCALATE" },
+          { value: "fail-closed", label: "Fail closed" },
         ],
       },
     ],
   },
   {
-    sectionId: "records-outcomes-replay",
-    title: "Records, Outcomes, and Replay",
+    sectionId: "runtime-execution-rules-controls",
+    title: "Rules, Controls, Dependencies, and Binding",
     description:
-      "Define the preserved record chain, expected outcome, validity period, and material replay triggers.",
-    order: 70,
+      "Bind the proposed action to the applicable rules, thresholds, controls, dependencies, exception policy, and fail-closed behavior.",
+    order: 40,
     fields: [
       {
-        key: "recordPlan",
-        label: "Record preservation plan",
+        key: "governingRules",
+        label: "Governing rules",
         type: "json",
         required: true,
         placeholder:
-          '["DECLARED_GOVERNANCE_CLAIM","TEST_CONFIGURATION","OBSERVED_TEST_RESULT","TA14_BOUNDED_DETERMINATION"]',
+          '[{"ruleId":"RULE-001","condition":"all mandatory gates pass","result":"eligible for commit"}]',
       },
       {
-        key: "approvedIntention",
-        label: "Approved intention",
+        key: "decisionThresholds",
+        label: "Decision thresholds",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"allow":"all mandatory conditions satisfied","hold":"evidence incomplete","deny":"authority invalid","escalate":"material conflict"}',
+      },
+      {
+        key: "controlInventory",
+        label: "Execution controls",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"controlId":"CTRL-001","objective":"prevent out-of-scope execution","type":"preventive","status":"active"}]',
+      },
+      {
+        key: "controlTesting",
+        label: "Control testing",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"controlId":"CTRL-001","testDate":"2026-07-20","result":"effective","evidenceId":"EV-CTRL-001"}]',
+      },
+      {
+        key: "dependencies",
+        label: "Critical dependencies",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"dependencyId":"DEP-001","type":"identity provider","critical":true,"status":"available"}]',
+      },
+      {
+        key: "bindingMethod",
+        label: "Execution binding method",
         type: "textarea",
         required: true,
-        placeholder: "State the exact approved action and intended result.",
-        validation: { minLength: 10, maxLength: 3000 },
+        placeholder:
+          "Describe how actor, model, data, tools, evidence, authority, rules, controls, target, parameters, and validity window are bound into one immutable commit.",
+        validation: { minLength: 20, maxLength: 7000 },
       },
       {
-        key: "outcomeAvailable",
-        label: "Outcome currently available",
+        key: "exceptionPolicy",
+        label: "Exception policy",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe who may request, approve, constrain, expire, monitor, revoke, and preserve an execution exception.",
+        validation: { minLength: 20, maxLength: 5000 },
+      },
+      {
+        key: "controlFailureBehavior",
+        label: "Control failure behavior",
+        type: "select",
+        required: true,
+        options: [
+          { value: "fail-closed", label: "Fail closed" },
+          { value: "hold", label: "HOLD" },
+          { value: "deny", label: "DENY" },
+          { value: "escalate", label: "ESCALATE" },
+        ],
+      },
+    ],
+  },
+  {
+    sectionId: "runtime-execution-commit-release",
+    title: "Commit, Release, and Intervention",
+    description:
+      "Define commitment authority, release conditions, runtime checks, human intervention, stop authority, rollback, and blocked-intervention behavior.",
+    order: 50,
+    fields: [
+      {
+        key: "commitAuthority",
+        label: "Commit authority",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"role":"authorized committer","scope":"approved route only","status":"active"}]',
+      },
+      {
+        key: "preCommitConditions",
+        label: "Pre-commit conditions",
+        type: "json",
+        required: true,
+        placeholder:
+          '["identity verified","evidence current","authority valid","controls effective","dependencies healthy","target confirmed"]',
+      },
+      {
+        key: "releaseConditions",
+        label: "Release conditions",
+        type: "json",
+        required: true,
+        placeholder:
+          '["commit hash matches","parameters unchanged","validity window open","runtime controls active"]',
+      },
+      {
+        key: "runtimeChecks",
+        label: "Runtime checks",
+        type: "json",
+        required: true,
+        placeholder:
+          '["actor revalidation","target revalidation","parameter comparison","dependency health","scope comparison"]',
+      },
+      {
+        key: "humanOversightModel",
+        label: "Human oversight model",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe when human review, intervention, stop authority, escalation, and post-execution review are required.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "interventionTriggers",
+        label: "Intervention triggers",
+        type: "json",
+        required: true,
+        placeholder:
+          '["evidence conflict","authority loss","parameter change","target change","control failure","dependency failure","unexpected runtime state"]',
+      },
+      {
+        key: "rollbackContainment",
+        label: "Rollback and containment",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"rollbackAvailable":true,"containmentAvailable":true,"maximumContainmentTimeSeconds":30}',
+      },
+      {
+        key: "blockedInterventionBehavior",
+        label: "Behavior when intervention is blocked",
+        type: "select",
+        required: true,
+        options: [
+          { value: "deny", label: "DENY" },
+          { value: "fail-closed", label: "Fail closed" },
+          { value: "hold", label: "HOLD" },
+          { value: "emergency-stop", label: "Emergency stop" },
+        ],
+      },
+    ],
+  },
+  {
+    sectionId: "runtime-execution-monitoring-incidents",
+    title: "Monitoring, Incidents, Drift, and Remediation",
+    description:
+      "Monitor pre-release state, runtime behavior, execution mismatches, drift, incidents, escalation, suspension, remediation, and controlled restoration.",
+    order: 60,
+    fields: [
+      {
+        key: "runtimeMonitoringPlan",
+        label: "Runtime monitoring plan",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe monitoring of actor, model, data, tools, target, parameters, controls, dependencies, latency, failures, and outcome signals.",
+        validation: { minLength: 20, maxLength: 7000 },
+      },
+      {
+        key: "monitoringSignals",
+        label: "Monitoring signals",
+        type: "json",
+        required: true,
+        placeholder:
+          '["identity change","authority revocation","model change","data change","tool change","target change","control failure","execution mismatch","outcome mismatch"]',
+      },
+      {
+        key: "driftTriggers",
+        label: "Drift triggers",
+        type: "json",
+        required: true,
+        placeholder:
+          '["model version drift","data package drift","tool version drift","scope drift","parameter drift","environment drift"]',
+      },
+      {
+        key: "incidentTriggers",
+        label: "Incident triggers",
+        type: "json",
+        required: true,
+        placeholder:
+          '["unauthorized release","wrong target","wrong amount","failed control","blocked stop","unexpected side effect","record discontinuity"]',
+      },
+      {
+        key: "escalationPath",
+        label: "Escalation path",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"level":1,"role":"runtime operator"},{"level":2,"role":"governance authority"},{"level":3,"role":"executive or legal authority"}]',
+      },
+      {
+        key: "suspensionTriggers",
+        label: "Suspension triggers",
+        type: "json",
+        required: true,
+        placeholder:
+          '["invalid authority","critical evidence loss","uncontrolled execution","material mismatch","critical incident","failed remediation"]',
+      },
+      {
+        key: "remediationProcess",
+        label: "Remediation process",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe containment, reversal, evidence preservation, impact assessment, correction, verification, reapproval, replay, and restoration.",
+        validation: { minLength: 20, maxLength: 7000 },
+      },
+      {
+        key: "restorationConditions",
+        label: "Restoration conditions",
+        type: "json",
+        required: true,
+        placeholder:
+          '["root cause corrected","controls retested","authority renewed","evidence complete","independent verification complete","replay passes"]',
+      },
+    ],
+  },
+  {
+    sectionId: "runtime-execution-records-outcomes",
+    title: "Execution Records, Outcomes, and Replay",
+    description:
+      "Preserve what was proposed, admitted, committed, released, executed, changed, observed, remediated, and replayed.",
+    order: 70,
+    fields: [
+      {
+        key: "requiredRecords",
+        label: "Required preserved records",
+        type: "json",
+        required: true,
+        placeholder:
+          '["ROUTE_IDENTITY_RECORD","EXECUTION_INTENT_RECORD","EVIDENCE_RECORD","AUTHORITY_RECORD","RULE_RECORD","CONTROL_RECORD","COMMIT_AUTHORIZATION","EXECUTION_RECEIPT","OUTCOME_EVIDENCE","REPLAY_RESULT"]',
+      },
+      {
+        key: "recordIntegrityMethod",
+        label: "Record integrity method",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe timestamps, signatures, hashes, immutable commit references, append-only preservation, correction handling, retention, and access control.",
+        validation: { minLength: 20, maxLength: 7000 },
+      },
+      {
+        key: "commitRecord",
+        label: "Commit authorization",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"commitId":"COMMIT-001","routeId":"runtime-execution:route:2026-001","hash":"sha256:...","decision":"ALLOW"}',
+      },
+      {
+        key: "executionAvailable",
+        label: "Execution occurred",
         type: "boolean",
         required: true,
         defaultValue: false,
       },
       {
-        key: "executedAction",
-        label: "Executed action",
-        type: "textarea",
+        key: "executionReceipt",
+        label: "Execution receipt",
+        type: "json",
         required: false,
         appliesWhen: [
           {
-            ruleId: "RUNTIME-OUTCOME-01",
-            description: "Required after execution occurs.",
-            field: "outcomeAvailable",
+            ruleId: "RUNTIME-EXECUTION-RECEIPT-01",
+            description: "Required when execution has occurred.",
+            field: "executionAvailable",
             operator: "equals",
             expected: true,
           },
         ],
-        placeholder: "State what actually executed.",
-        validation: { maxLength: 4000 },
+        placeholder:
+          '{"executionId":"EXEC-001","commitId":"COMMIT-001","actor":"ACT-001","target":"TARGET-001","status":"completed"}',
+      },
+      {
+        key: "outcomeAvailable",
+        label: "Outcome evidence available",
+        type: "boolean",
+        required: true,
+        defaultValue: false,
       },
       {
         key: "measuredOutcome",
@@ -498,23 +591,16 @@ export const RUNTIME_EXECUTION_SECTIONS = [
         required: false,
         appliesWhen: [
           {
-            ruleId: "RUNTIME-OUTCOME-02",
-            description: "Required when an outcome is available.",
+            ruleId: "RUNTIME-EXECUTION-OUTCOME-01",
+            description: "Required when outcome evidence is available.",
             field: "outcomeAvailable",
             operator: "equals",
             expected: true,
           },
         ],
-        placeholder: "State the observed result and measurement method.",
-        validation: { maxLength: 4000 },
-      },
-      {
-        key: "validityWindow",
-        label: "Determination validity window",
-        type: "text",
-        required: true,
-        placeholder: "Until execution or 60 minutes, whichever occurs first",
-        validation: { minLength: 3, maxLength: 500 },
+        placeholder:
+          "Describe whether the actual execution and outcome matched the committed action, parameters, target, scope, controls, and expected result.",
+        validation: { maxLength: 6000 },
       },
       {
         key: "replayTriggers",
@@ -522,16 +608,16 @@ export const RUNTIME_EXECUTION_SECTIONS = [
         type: "json",
         required: true,
         placeholder:
-          '["authority change","evidence expiration","tool change","model change","data change","environment change","control change","execution mismatch"]',
+          '["evidence expiry","authority change","model change","data change","tool change","target change","execution mismatch","outcome mismatch","incident"]',
       },
       {
-        key: "driftMonitoringPlan",
-        label: "Drift monitoring plan",
+        key: "continuingValidityMethod",
+        label: "Continuing validity method",
         type: "textarea",
         required: true,
         placeholder:
-          "Describe how runtime state is compared with the approved route before commit, during execution, and after outcome.",
-        validation: { minLength: 20, maxLength: 5000 },
+          "Describe how route identity, evidence, authority, controls, dependencies, commit, execution, outcome, drift, incidents, and remediation are revalidated.",
+        validation: { minLength: 20, maxLength: 7000 },
       },
     ],
   },
@@ -539,11 +625,11 @@ export const RUNTIME_EXECUTION_SECTIONS = [
 
 export const RUNTIME_EXECUTION_SCENARIOS = [
   {
-    scenarioId: "RUNTIME-BASELINE-ALLOW",
+    scenarioId: "RUNTIME-EXECUTION-BASELINE-ALLOW",
     laneId: "runtime-execution",
-    title: "Approved baseline route",
+    title: "Complete admissible runtime execution",
     description:
-      "All required evidence, authority, dependencies, controls, intervention capabilities, and records are present and current.",
+      "The exact route, actor, model, data, tool, target, evidence, authority, controls, dependencies, commit, release, and replay requirements are complete and current.",
     scenarioClass: "BASELINE",
     required: true,
     preconditions: [],
@@ -567,85 +653,84 @@ export const RUNTIME_EXECUTION_SCENARIOS = [
     recoveryRequirements: [],
   },
   {
-    scenarioId: "RUNTIME-AUTHORITY-EXPIRES",
+    scenarioId: "RUNTIME-EXECUTION-MISSING-ROUTE-IDENTITY",
     laneId: "runtime-execution",
-    title: "Authority expires before commit",
+    title: "Execution route identity missing",
     description:
-      "The route is approved, but the authorizing actor's authority expires before execution becomes binding.",
+      "The exact system, actor, target, model, data, tool, environment, or version cannot be uniquely identified.",
     scenarioClass: "SINGLE_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-AUTHORITY-EXPIRES-I01",
-        title: "Expire commit authority",
+        injectionId: "RUNTIME-EXECUTION-MISSING-ROUTE-IDENTITY-I01",
+        title: "Remove route identity",
         description:
-          "Set the commit authority validity end time before the commit event.",
-        mutationType: "REVOKE_AUTHORITY",
-        target: "commitAuthority",
+          "Remove evidence binding the proposed action to one exact route.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "ROUTE_IDENTITY_RECORD",
       },
     ],
     expectedGateStatuses: {
-      G06_AUTHORITY_VALIDITY: "FAIL",
-      G10_EXECUTION_CONSTRAINT: "FAIL",
-      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+      G01_ROUTE_IDENTITY: "FAIL",
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G12_RECORD_CONTINUITY: "FAIL",
     },
     expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Obtain valid authority.",
-      "Preserve the expired authority result.",
-      "Replay the route before commit.",
+      "Reconstruct the exact route identity.",
+      "Bind actor, target, environment, and versions.",
+      "Replay before commitment.",
     ],
   },
   {
-    scenarioId: "RUNTIME-UNAPPROVED-TOOL",
+    scenarioId: "RUNTIME-EXECUTION-ACTOR-IDENTITY-MISSING",
     laneId: "runtime-execution",
-    title: "Unapproved tool selected",
+    title: "Execution actor identity missing",
     description:
-      "The executing model or agent attempts to use a tool or API that is not part of the approved route.",
-    scenarioClass: "ADVERSARIAL",
+      "The human, service, agent, model, or system attempting execution cannot be uniquely identified.",
+    scenarioClass: "SINGLE_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-UNAPPROVED-TOOL-I01",
-        title: "Substitute unapproved tool",
+        injectionId: "RUNTIME-EXECUTION-ACTOR-IDENTITY-MISSING-I01",
+        title: "Remove actor identity",
         description:
-          "Replace an approved dependency with a tool outside the declared permission boundary.",
-        mutationType: "CHANGE_TOOL",
-        target: "approvedTools",
-        value: "unapproved-tool",
+          "Remove the record identifying the execution actor.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "ACTOR_IDENTITY_RECORD",
       },
     ],
     expectedGateStatuses: {
-      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G04_ACTOR_IDENTITY: "FAIL",
+      G06_AUTHORITY_VALIDITY: "FAIL",
       G10_EXECUTION_CONSTRAINT: "FAIL",
-      G11_INTERVENTION_ESCALATION: "PASS",
     },
     expectedDetermination: "DENY",
     recoveryRequirements: [
-      "Block the unapproved tool.",
-      "Preserve the attempted action.",
-      "Require a new route if the tool is necessary.",
+      "Verify the actor identity.",
+      "Rebind valid actor authority.",
+      "Issue a new commit decision.",
     ],
   },
   {
-    scenarioId: "RUNTIME-EVIDENCE-STALE",
+    scenarioId: "RUNTIME-EXECUTION-EVIDENCE-EXPIRED",
     laneId: "runtime-execution",
-    title: "Required evidence becomes stale",
+    title: "Required execution evidence expired",
     description:
-      "Evidence was current at review but exceeds its freshness limit before commit.",
+      "A mandatory evidence record is outside its approved validity window before release.",
     scenarioClass: "POST_ALLOW_DRIFT",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-EVIDENCE-STALE-I01",
-        title: "Expire runtime evidence",
+        injectionId: "RUNTIME-EXECUTION-EVIDENCE-EXPIRED-I01",
+        title: "Expire execution evidence",
         description:
-          "Advance time beyond the declared evidence freshness window.",
+          "Expire a mandatory evidence record supporting runtime admissibility.",
         mutationType: "EXPIRE_EVIDENCE",
-        target: "requiredRuntimeEvidence",
+        target: "EVIDENCE_RECORD",
       },
     ],
     expectedGateStatuses: {
@@ -655,146 +740,379 @@ export const RUNTIME_EXECUTION_SCENARIOS = [
     },
     expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Refresh or replace the stale evidence.",
-      "Re-evaluate affected gates.",
-      "Issue a new bounded determination.",
+      "Refresh the expired evidence.",
+      "Confirm no material route drift.",
+      "Recommit and replay before release.",
     ],
   },
   {
-    scenarioId: "RUNTIME-EVIDENCE-CONFLICT",
+    scenarioId: "RUNTIME-EXECUTION-AUTHORITY-REVOKED",
     laneId: "runtime-execution",
-    title: "Material evidence conflict",
+    title: "Execution authority revoked",
     description:
-      "Two current evidence sources materially disagree about a required execution condition.",
+      "Approval, actor, commit, or release authority is revoked after route preparation.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-AUTHORITY-REVOKED-I01",
+        title: "Revoke execution authority",
+        description:
+          "Invalidate a mandatory authority record before execution.",
+        mutationType: "REVOKE_AUTHORITY",
+        target: "AUTHORITY_RECORD",
+      },
+    ],
+    expectedGateStatuses: {
+      G06_AUTHORITY_VALIDITY: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Stop release.",
+      "Obtain valid replacement authority.",
+      "Issue a new approval and commit.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-EVIDENCE-CONFLICT",
+    laneId: "runtime-execution",
+    title: "Material execution evidence conflict",
+    description:
+      "Authoritative records disagree about the actor, target, amount, destination, condition, authority, or expected result.",
     scenarioClass: "COMPOUND_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-EVIDENCE-CONFLICT-I01",
-        title: "Create evidence conflict",
+        injectionId: "RUNTIME-EXECUTION-EVIDENCE-CONFLICT-I01",
+        title: "Create execution evidence conflict",
         description:
-          "Introduce a second evidence item that contradicts the first on a material route fact.",
+          "Introduce contradictory evidence for a material execution condition.",
         mutationType: "CREATE_EVIDENCE_CONFLICT",
-        target: "requiredRuntimeEvidence",
+        target: "evidenceInventory",
       },
     ],
     expectedGateStatuses: {
-      G05_EVIDENCE_SUFFICIENCY: "ESCALATED",
-      G12_RECORD_CONTINUITY: "PASS",
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G11_INTERVENTION_ESCALATION: "PASS",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
     },
     expectedDetermination: "ESCALATE",
     recoveryRequirements: [
-      "Preserve both conflicting evidence items.",
-      "Assign an authorized independent reviewer.",
-      "Resolve or explicitly bound the conflict.",
+      "Preserve all conflicting evidence.",
+      "Resolve through independent authority.",
+      "Do not recommit until resolved.",
     ],
   },
   {
-    scenarioId: "RUNTIME-HUMAN-CANNOT-STOP",
+    scenarioId: "RUNTIME-EXECUTION-SCOPE-DRIFT",
     laneId: "runtime-execution",
-    title: "Human reviewer cannot stop execution",
+    title: "Execution scope changed after approval",
     description:
-      "The route represents human oversight, but the reviewer lacks timely stop or HOLD capability.",
-    scenarioClass: "ADVERSARIAL",
+      "The actor, target, destination, amount, environment, purpose, or action expands beyond the approved scope.",
+    scenarioClass: "POST_ALLOW_DRIFT",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-HUMAN-CANNOT-STOP-I01",
-        title: "Remove intervention power",
+        injectionId: "RUNTIME-EXECUTION-SCOPE-DRIFT-I01",
+        title: "Alter execution scope",
         description:
-          "Prevent the designated human reviewer from stopping or holding the route.",
-        mutationType: "BLOCK_HUMAN_INTERVENTION",
-        target: "interventionPowers",
+          "Expand the proposed execution beyond the preserved boundary.",
+        mutationType: "ALTER_ROUTE_FIELD",
+        target: "scopeBoundary",
+        value: "expanded-unapproved-scope",
       },
     ],
     expectedGateStatuses: {
-      G09_HUMAN_OVERSIGHT: "FAIL",
-      G11_INTERVENTION_ESCALATION: "FAIL",
+      G03_SCOPE_BOUNDARY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
     },
-    expectedDetermination: "HOLD",
+    expectedDetermination: "DENY",
     recoveryRequirements: [
-      "Grant and test real stop authority.",
-      "Verify that execution fails closed during reviewer unavailability.",
+      "Reject the altered action.",
+      "Create a new bounded route for any proposed expansion.",
+      "Reevaluate and recommit.",
     ],
   },
   {
-    scenarioId: "RUNTIME-ROUTE-EXCEEDS-LIMIT",
+    scenarioId: "RUNTIME-EXECUTION-CONTROL-FAILURE",
     laneId: "runtime-execution",
-    title: "Execution exceeds an explicit limit",
+    title: "Mandatory runtime control failed",
     description:
-      "The execution request exceeds a declared financial, operational, temporal, geographic, or action boundary.",
+      "A preventive, detective, release, target, parameter, or containment control is ineffective or unavailable.",
     scenarioClass: "SINGLE_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-ROUTE-EXCEEDS-LIMIT-I01",
-        title: "Exceed approved constraint",
+        injectionId: "RUNTIME-EXECUTION-CONTROL-FAILURE-I01",
+        title: "Remove control effectiveness evidence",
         description:
-          "Alter a route value so the requested execution exceeds an explicit approved limit.",
-        mutationType: "ALTER_ROUTE_FIELD",
-        target: "executionConstraints",
-        value: "outside-approved-boundary",
+          "Remove evidence showing a mandatory runtime control is effective.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "CONTROL_RECORD",
       },
     ],
     expectedGateStatuses: {
-      G03_SCOPE_BOUNDARY: "FAIL",
-      G06_AUTHORITY_VALIDITY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
       G10_EXECUTION_CONSTRAINT: "FAIL",
     },
-    expectedDetermination: "DENY",
+    expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Reduce the request to the approved limit or create a new route.",
-      "Obtain authority appropriate to the expanded action.",
+      "Restore or replace the control.",
+      "Test operating effectiveness.",
+      "Recommit before release.",
     ],
   },
   {
-    scenarioId: "RUNTIME-EXECUTION-MISMATCH",
+    scenarioId: "RUNTIME-EXECUTION-DEPENDENCY-FAILURE",
     laneId: "runtime-execution",
-    title: "Executed action differs from approved route",
+    title: "Critical runtime dependency failed",
     description:
-      "The route receives approval, but the execution receipt shows a materially different action.",
+      "A critical identity, data, tool, network, target, authorization, or infrastructure dependency is unavailable or untrusted.",
+    scenarioClass: "COMPOUND_FAILURE",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-DEPENDENCY-FAILURE-I01",
+        title: "Alter dependency status",
+        description:
+          "Set a critical execution dependency to failed.",
+        mutationType: "ALTER_ROUTE_FIELD",
+        target: "dependencies",
+        value: "critical-runtime-dependency-failed",
+      },
+    ],
+    expectedGateStatuses: {
+      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G11_INTERVENTION_ESCALATION: "PASS",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Restore or replace the dependency.",
+      "Verify continuity and integrity.",
+      "Replay before execution.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-MODEL-CHANGE",
+    laneId: "runtime-execution",
+    title: "Model changed after commit",
+    description:
+      "The model identity, version, configuration, or provider release differs from the committed route.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-MODEL-CHANGE-I01",
+        title: "Change runtime model",
+        description:
+          "Replace or modify the committed model.",
+        mutationType: "CHANGE_MODEL",
+        target: "modelIdentity",
+      },
+    ],
+    expectedGateStatuses: {
+      G01_ROUTE_IDENTITY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Stop execution.",
+      "Evaluate and approve the changed model.",
+      "Create a new commit and replay.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-DATA-CHANGE",
+    laneId: "runtime-execution",
+    title: "Data changed after commit",
+    description:
+      "The input package, source, schema, value, provenance, or quality condition differs from the committed route.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-DATA-CHANGE-I01",
+        title: "Change runtime data",
+        description:
+          "Alter the data package bound to the commit.",
+        mutationType: "CHANGE_DATA",
+        target: "dataIdentity",
+      },
+    ],
+    expectedGateStatuses: {
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Preserve the changed data identity.",
+      "Revalidate provenance and effect.",
+      "Recommit before execution.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-TOOL-CHANGE",
+    laneId: "runtime-execution",
+    title: "Tool changed after commit",
+    description:
+      "A material tool, connector, API, actuator, service, or execution component differs from the committed route.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-TOOL-CHANGE-I01",
+        title: "Change runtime tool",
+        description:
+          "Replace a tool bound to the approved commit.",
+        mutationType: "CHANGE_TOOL",
+        target: "toolIdentity",
+      },
+    ],
+    expectedGateStatuses: {
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Identify and validate the changed tool.",
+      "Retest controls and dependencies.",
+      "Create a new commit before release.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-HUMAN-INTERVENTION-BLOCKED",
+    laneId: "runtime-execution",
+    title: "Required human intervention blocked",
+    description:
+      "The authorized human cannot pause, deny, redirect, contain, reverse, or stop execution.",
+    scenarioClass: "ADVERSARIAL",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-HUMAN-INTERVENTION-BLOCKED-I01",
+        title: "Block runtime intervention",
+        description:
+          "Disable the required human intervention or stop mechanism.",
+        mutationType: "BLOCK_HUMAN_INTERVENTION",
+        target: "humanOversightModel",
+      },
+    ],
+    expectedGateStatuses: {
+      G09_HUMAN_OVERSIGHT: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G11_INTERVENTION_ESCALATION: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Restore intervention authority and mechanism.",
+      "Test stop and containment capability.",
+      "Recommit before execution.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-EXECUTION-MISMATCH",
+    laneId: "runtime-execution",
+    title: "Actual execution differs from commit",
+    description:
+      "The actual actor, target, destination, model, data, tool, amount, parameter, timing, or action differs from the immutable commit.",
     scenarioClass: "EXECUTION_MISMATCH",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "RUNTIME-EXECUTION-MISMATCH-I01",
-        title: "Create execution mismatch",
+        injectionId: "RUNTIME-EXECUTION-EXECUTION-MISMATCH-I01",
+        title: "Create runtime execution mismatch",
         description:
-          "Change a material execution parameter after approval and before or during execution.",
+          "Cause actual execution to differ from the committed route.",
         mutationType: "CREATE_EXECUTION_MISMATCH",
-        target: "executedAction",
+        target: "executionReceipt",
       },
     ],
     expectedGateStatuses: {
+      G03_SCOPE_BOUNDARY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
       G10_EXECUTION_CONSTRAINT: "FAIL",
+      G12_RECORD_CONTINUITY: "PASS",
+      G13_OUTCOME_CORRESPONDENCE: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Stop or contain the mismatched execution.",
+      "Preserve the commit and actual execution evidence.",
+      "Investigate, remediate, and replay.",
+    ],
+  },
+  {
+    scenarioId: "RUNTIME-EXECUTION-OUTCOME-MISMATCH",
+    laneId: "runtime-execution",
+    title: "Execution outcome contradicts approved claim",
+    description:
+      "The measured outcome does not correspond to the committed action, target, parameters, controls, or expected result.",
+    scenarioClass: "EXECUTION_MISMATCH",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "RUNTIME-EXECUTION-OUTCOME-MISMATCH-I01",
+        title: "Create runtime outcome mismatch",
+        description:
+          "Provide outcome evidence that contradicts the approved execution claim.",
+        mutationType: "CREATE_OUTCOME_MISMATCH",
+        target: "measuredOutcome",
+      },
+    ],
+    expectedGateStatuses: {
       G12_RECORD_CONTINUITY: "PASS",
       G13_OUTCOME_CORRESPONDENCE: "FAIL",
       G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
     },
-    expectedDetermination: "DENY",
+    expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Stop or reverse the mismatched execution where possible.",
-      "Preserve the approved and actual execution records separately.",
-      "Open an incident and correction route.",
+      "Preserve the actual outcome evidence.",
+      "Assess impact and contain continuing effects.",
+      "Remediate and replay before restored reliance.",
     ],
   },
   {
-    scenarioId: "RUNTIME-RECOVERY-REPLAY",
+    scenarioId: "RUNTIME-EXECUTION-RECOVERY-REPLAY",
     laneId: "runtime-execution",
-    title: "Corrected route recovery and replay",
+    title: "Corrected runtime recovery and replay",
     description:
-      "A prior HOLD condition is corrected, preserved, and replayed without overwriting the original result.",
+      "A prior runtime execution failure is corrected, independently verified, preserved, and replayed before restored execution.",
     scenarioClass: "RECOVERY",
     required: true,
     preconditions: [],
     injections: [],
     expectedGateStatuses: {
+      G01_ROUTE_IDENTITY: "PASS",
+      G02_GOVERNANCE_CLAIM: "PASS",
+      G03_SCOPE_BOUNDARY: "PASS",
+      G04_ACTOR_IDENTITY: "PASS",
       G05_EVIDENCE_SUFFICIENCY: "PASS",
       G06_AUTHORITY_VALIDITY: "PASS",
+      G07_RULE_CONTROL_BINDING: "PASS",
+      G08_DEPENDENCY_INTEGRITY: "PASS",
+      G09_HUMAN_OVERSIGHT: "PASS",
       G10_EXECUTION_CONSTRAINT: "PASS",
       G11_INTERVENTION_ESCALATION: "PASS",
       G12_RECORD_CONTINUITY: "PASS",
@@ -802,40 +1120,9 @@ export const RUNTIME_EXECUTION_SCENARIOS = [
     },
     expectedDetermination: "ALLOW",
     recoveryRequirements: [
-      "Preserve the original failed or held result.",
-      "Link the corrected route to the prior version.",
-      "Issue a new determination rather than editing the old one.",
-    ],
-  },
-  {
-    scenarioId: "RUNTIME-OUTCOME-MISMATCH",
-    laneId: "runtime-execution",
-    title: "Outcome does not support the approved claim",
-    description:
-      "The approved action executes as configured, but the observed outcome does not support the claimed benefit or intended result.",
-    scenarioClass: "EXECUTION_MISMATCH",
-    required: true,
-    preconditions: [],
-    injections: [
-      {
-        injectionId: "RUNTIME-OUTCOME-MISMATCH-I01",
-        title: "Create outcome mismatch",
-        description:
-          "Provide an outcome record that does not correspond to the approved intention or claimed benefit.",
-        mutationType: "CREATE_OUTCOME_MISMATCH",
-        target: "measuredOutcome",
-      },
-    ],
-    expectedGateStatuses: {
-      G10_EXECUTION_CONSTRAINT: "PASS",
-      G12_RECORD_CONTINUITY: "PASS",
-      G13_OUTCOME_CORRESPONDENCE: "FAIL",
-    },
-    expectedDetermination: "HOLD",
-    recoveryRequirements: [
-      "Separate successful execution from successful outcome.",
-      "Correct unsupported benefit claims.",
-      "Determine whether intervention or redesign is required.",
+      "Preserve the original failure, commit, execution, and determination.",
+      "Link remediation, renewed evidence, authority, control testing, and independent verification.",
+      "Issue a new commit and replay result without altering the original record.",
     ],
   },
 ] as const satisfies readonly ScenarioDefinition[];
@@ -845,25 +1132,28 @@ export type RuntimeExecutionScenario =
 
 export const RUNTIME_EXECUTION_LANE = {
   laneId: "runtime-execution",
-  name: "Runtime & Execution Governance Playground",
-  shortName: "Runtime & Execution",
+  name: "Runtime Execution Governance Playground",
+  shortName: "Runtime Execution",
   description:
-    "Test whether governance remains valid from approval through commit, execution, intervention, record preservation, outcome, and replay.",
+    "Test the final admissibility boundary where approved evidence, authority, scope, controls, dependencies, and intent are bound into a commit before an action is permitted to execute.",
   claimsGoverned: [
-    "The route executes only within its declared identity and scope.",
-    "Execution is supported by current evidence and valid authority.",
-    "Only approved dependencies, tools, permissions, and sequence are used.",
-    "Material failures produce bounded HOLD, DENY, or ESCALATE behavior.",
-    "Required human oversight possesses real intervention capability.",
-    "The approved route, actual execution, and measured outcome remain distinguishable and traceable.",
-    "Material drift invalidates or holds prior authorization until replay.",
+    "The exact route, actor, system, model, data, tool, target, environment, and execution purpose are identified.",
+    "The proposed action, scope, parameters, destination, consequences, prohibited actions, and non-claims are explicit.",
+    "Evidence is attributable, current, sufficient, and free of unresolved material conflict before commitment.",
+    "Approval, actor, commit, release, intervention, and exception authorities are valid and bounded.",
+    "Rules, thresholds, controls, dependencies, targets, parameters, and failure behavior are bound into one immutable commit.",
+    "Runtime release is permitted only when the live state still matches the committed state.",
+    "Human intervention, stop authority, rollback, containment, escalation, and fail-closed behavior remain operational.",
+    "Material model, data, tool, target, parameter, scope, environment, or authority changes invalidate the prior commit.",
+    "Execution receipts prove what actually executed.",
+    "Outcome evidence proves whether controlled execution produced the approved result.",
   ],
   nonClaims: [
-    "This lane does not independently prove legal or regulatory compliance.",
-    "This lane does not prove that a model output is true or unbiased.",
-    "This lane does not prove cybersecurity, privacy, or data quality unless those controls are separately evidenced and tested.",
-    "This lane does not prove outcome causation.",
-    "An ALLOW determination applies only to the tested route, evidence, authority, dependencies, environment, time, and evaluator version.",
+    "Approval alone does not prove admissible execution.",
+    "A commit does not authorize any action beyond the exact preserved route and validity window.",
+    "Monitoring alone does not prevent unauthorized or mismatched execution.",
+    "A successful system response does not prove the correct actor, target, parameters, authority, or outcome.",
+    "An ALLOW determination applies only to the exact evidence, authority, actor, model, data, tools, target, parameters, controls, dependencies, environment, and validity window preserved.",
   ],
   sections: RUNTIME_EXECUTION_SECTIONS,
   gateIds: RUNTIME_EXECUTION_GATE_IDS,
@@ -872,10 +1162,10 @@ export const RUNTIME_EXECUTION_LANE = {
     (scenario) => scenario.scenarioId,
   ),
   determinationGuidance: [
-    "DENY when execution is prohibited, authority is exceeded, or an explicit route boundary would be violated.",
-    "ESCALATE when material evidence or authority conflicts require independent judgment.",
-    "HOLD when mandatory evidence, authority, testing, constraint, intervention, outcome, or replay requirements remain incomplete or failed.",
-    "ALLOW only when all applicable mandatory gates pass and all required scenarios complete with expected bounded behavior.",
+    "DENY when actor or authority is invalid, scope changes, intervention is blocked, the committed identity changes, or actual execution differs from the commit.",
+    "ESCALATE when material evidence conflicts or superior governance, legal, safety, financial, technical, or executive authority is required.",
+    "HOLD when evidence, controls, dependencies, validity, data, tools, monitoring, continuity, outcome evidence, or remediation is incomplete, expired, changed, or unresolved.",
+    "ALLOW only when all applicable gates pass and the live execution state exactly matches the bounded, evidence-supported, authority-backed, control-bound immutable commit.",
   ],
   enabled: true,
   version: "1.0.0",
