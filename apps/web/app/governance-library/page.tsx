@@ -205,9 +205,11 @@ export default function GovernanceLibraryPage() {
 
           <div className="architectureGrid">
             {architectures.map((architecture, index) => (
-              <article
+              <Link
                 className="architectureCard"
                 key={architecture.lane}
+                href={`/workspace?lane=${architecture.lane}`}
+                aria-label={`Open ${architecture.title} governed lane`}
                 style={
                   {
                     "--accent": architecture.accent,
@@ -235,13 +237,10 @@ export default function GovernanceLibraryPage() {
                   <span>Execution</span>
                 </div>
 
-                <Link
-                  href={`/workspace?lane=${architecture.lane}`}
-                  className="laneButton"
-                >
+                <div className="laneButton" aria-hidden="true">
                   Open governed lane <span>→</span>
-                </Link>
-              </article>
+                </div>
+              </Link>
             ))}
           </div>
         </section>
@@ -519,6 +518,8 @@ export default function GovernanceLibraryPage() {
           box-shadow:
             0 24px 58px rgba(0, 0, 0, 0.31),
             inset 0 1px rgba(255, 255, 255, 0.04);
+          text-decoration: none;
+          cursor: pointer;
           transition: transform 0.28s ease, border-color 0.28s ease,
             box-shadow 0.28s ease;
         }
