@@ -4,231 +4,78 @@ import Link from "next/link";
 import type { CSSProperties } from "react";
 
 const sources = [
-  {
-    code: "EU",
-    name: "EU AI Act",
-    expanded: "European Union Artificial Intelligence Act",
-    type: "Regulation",
-    description:
-      "Legal duties tied to actor roles, system classes, prohibited uses, transparency, risk, documentation, oversight, and enforcement.",
-    href: "/workspace/ai-governance/eu-ai-act",
-    accent: "#63e6ff",
-  },
-  {
-    code: "NIST",
-    name: "NIST AI RMF",
-    expanded:
-      "National Institute of Standards and Technology Artificial Intelligence Risk Management Framework",
-    type: "Framework",
-    description:
-      "A structured framework for governing AI risk through the Govern, Map, Measure, and Manage functions.",
-    href: "/governance-library/dictionary?term=NIST%20AI%20RMF",
-    accent: "#8eb6ff",
-  },
-  {
-    code: "42001",
-    name: "ISO/IEC 42001",
-    expanded: "Artificial intelligence management system standard",
-    type: "Standard",
-    description:
-      "Management-system requirements for organizations developing, providing, or using artificial intelligence.",
-    href: "/governance-library/dictionary?term=ISO%2FIEC%2042001",
-    accent: "#72e6b2",
-  },
-  {
-    code: "23894",
-    name: "ISO/IEC 23894",
-    expanded: "Artificial intelligence risk management guidance",
-    type: "Standard",
-    description:
-      "Guidance for identifying, analyzing, evaluating, treating, and monitoring artificial-intelligence risks.",
-    href: "/governance-library/dictionary?term=ISO%2FIEC%2023894",
-    accent: "#b7ef68",
-  },
-  {
-    code: "38507",
-    name: "ISO/IEC 38507",
-    expanded:
-      "Governance implications of the use of artificial intelligence by organizations",
-    type: "Standard",
-    description:
-      "Governing-body responsibilities and organizational oversight implications associated with AI use.",
-    href: "/governance-library/dictionary?term=ISO%2FIEC%2038507",
-    accent: "#ffc65c",
-  },
-  {
-    code: "OECD",
-    name: "OECD AI Principles",
-    expanded: "Organisation for Economic Co-operation and Development AI Principles",
-    type: "Principles",
-    description:
-      "Widely referenced principles concerning trustworthy artificial intelligence and public policy.",
-    href: "/governance-library/dictionary?term=OECD%20AI%20Principles",
-    accent: "#c68cff",
-  },
-  {
-    code: "UN",
-    name: "UNESCO Recommendation",
-    expanded:
-      "United Nations Educational, Scientific and Cultural Organization Recommendation on the Ethics of Artificial Intelligence",
-    type: "Recommendation",
-    description:
-      "An international ethics- and rights-oriented recommendation addressing artificial intelligence.",
-    href: "/governance-library/dictionary?term=UNESCO%20AI%20Recommendation",
-    accent: "#ff8db5",
-  },
-  {
-    code: "AIV",
-    name: "AI Verify",
-    expanded: "Singapore AI governance testing framework and toolkit",
-    type: "Testing framework",
-    description:
-      "Structured testing and documentation of governance principles and technical practices.",
-    href: "/governance-library/dictionary?term=AI%20Verify",
-    accent: "#ff826f",
-  },
+  { code:"EU", name:"EU AI Act", expanded:"European Union Artificial Intelligence Act", type:"Regulation", authority:"Binding legal instrument", description:"Legal duties tied to actor roles, system classes, prohibited uses, transparency, risk, documentation, oversight, and enforcement.", href:"/workspace/ai-governance/eu-ai-act", accent:"#63e6ff" },
+  { code:"NIST", name:"NIST AI RMF", expanded:"National Institute of Standards and Technology Artificial Intelligence Risk Management Framework", type:"Framework", authority:"Voluntary risk framework", description:"A structured framework for governing AI risk through the Govern, Map, Measure, and Manage functions.", href:"/governance-library/dictionary?term=NIST%20AI%20RMF", accent:"#8eb6ff" },
+  { code:"42001", name:"ISO/IEC 42001", expanded:"Artificial intelligence management system standard", type:"Standard", authority:"Management system standard", description:"Management-system requirements for organizations developing, providing, or using artificial intelligence.", href:"/governance-library/dictionary?term=ISO%2FIEC%2042001", accent:"#72e6b2" },
+  { code:"23894", name:"ISO/IEC 23894", expanded:"Artificial intelligence risk management guidance", type:"Standard", authority:"Risk management guidance", description:"Guidance for identifying, analyzing, evaluating, treating, and monitoring artificial-intelligence risks.", href:"/governance-library/dictionary?term=ISO%2FIEC%2023894", accent:"#b7ef68" },
+  { code:"38507", name:"ISO/IEC 38507", expanded:"Governance implications of the use of artificial intelligence by organizations", type:"Standard", authority:"Governing-body guidance", description:"Governing-body responsibilities and organizational oversight implications associated with AI use.", href:"/governance-library/dictionary?term=ISO%2FIEC%2038507", accent:"#ffc65c" },
+  { code:"OECD", name:"OECD AI Principles", expanded:"Organisation for Economic Co-operation and Development AI Principles", type:"Principles", authority:"International policy principles", description:"Widely referenced principles concerning trustworthy artificial intelligence and public policy.", href:"/governance-library/dictionary?term=OECD%20AI%20Principles", accent:"#c68cff" },
+  { code:"UN", name:"UNESCO Recommendation", expanded:"United Nations Educational, Scientific and Cultural Organization Recommendation on the Ethics of Artificial Intelligence", type:"Recommendation", authority:"International recommendation", description:"An international ethics- and rights-oriented recommendation addressing artificial intelligence.", href:"/governance-library/dictionary?term=UNESCO%20AI%20Recommendation", accent:"#ff8db5" },
+  { code:"AIV", name:"AI Verify", expanded:"Singapore AI governance testing framework and toolkit", type:"Testing framework", authority:"Testing and assurance system", description:"Structured testing and documentation of governance principles and technical practices.", href:"/governance-library/dictionary?term=AI%20Verify", accent:"#ff826f" },
 ];
 
 const categories = [
-  ["Laws & Regulations", "Binding legal instruments, duties, prohibitions, enforcement structures, and jurisdiction-specific obligations.", "/governance-library?category=law"],
-  ["Standards", "Technical, management-system, risk, governance, and assurance standards.", "/governance-library?category=standard"],
-  ["Frameworks", "Structured systems for risk, trustworthiness, accountability, and organizational governance.", "/governance-library?category=framework"],
-  ["Principles & Recommendations", "Ethical, rights-based, public-interest, and policy guidance.", "/governance-library?category=principles"],
-  ["Testing & Assurance", "Impact assessments, red teaming, conformity review, assurance cases, and validation.", "/governance-library?category=testing"],
-  ["Sector Overlays", "Healthcare, finance, buildings, public services, infrastructure, insurance, and other domains.", "/governance-library?category=sector-governance"],
+  ["01","Laws & Regulations","Binding legal instruments, duties, prohibitions, enforcement structures, and jurisdiction-specific obligations.","/governance-library?category=law","Binding authority"],
+  ["02","Standards","Technical, management-system, risk, governance, and assurance standards.","/governance-library?category=standard","Normative systems"],
+  ["03","Frameworks","Structured systems for risk, trustworthiness, accountability, and organizational governance.","/governance-library?category=framework","Operational guidance"],
+  ["04","Principles & Recommendations","Ethical, rights-based, public-interest, and policy guidance.","/governance-library?category=principles","Policy direction"],
+  ["05","Testing & Assurance","Impact assessments, red teaming, conformity review, assurance cases, and validation.","/governance-library?category=testing","Verification systems"],
+  ["06","Sector Overlays","Healthcare, finance, buildings, public services, infrastructure, insurance, and other domains.","/governance-library?category=sector-governance","Domain application"],
 ];
+
+const journey = ["Learn","Determine","Map","Build","Test","Review","Verify","Export"];
 
 export default function GovernanceLibraryPage() {
   return (
     <main className="libraryPage">
+      <div className="ambient one"/><div className="ambient two"/><div className="gridOverlay"/>
       <section className="shell">
         <div className="topbar">
           <Link href="/" className="button quiet">← Return to Exchange</Link>
-          <Link href="/workspace/ai-governance" className="button primary">
-            Enter AI Governance →
-          </Link>
+          <div className="topbarCenter"><span className="statusDot"/>Institutional source intelligence</div>
+          <Link href="/workspace/ai-governance" className="button primary">Enter AI Governance →</Link>
         </div>
 
         <header className="hero">
-          <div className="seal">GL</div>
+          <div className="heroOrbit"><div className="orbit orbitOne"/><div className="orbit orbitTwo"/><div className="seal"><span>GL</span><small>TA-14</small></div></div>
           <p className="eyebrow">TA-14 AI GOVERNANCE LIBRARY</p>
-          <h1>Decode the landscape before governing within it.</h1>
-          <p className="lead">
-            Explore laws, regulations, standards, frameworks, principles,
-            recommendations, testing systems, and sector overlays. Every source
-            remains connected to its issuer, class, authority, version,
-            applicability, evidence expectations, and TA-14 execution pathway.
-          </p>
-          <div className="journey">
-            {["Learn", "Determine", "Map", "Build", "Test", "Review", "Verify", "Export"].map(
-              (item, index, all) => (
-                <span key={item}>
-                  <strong>{item}</strong>
-                  {index < all.length - 1 ? <i>→</i> : null}
-                </span>
-              ),
-            )}
-          </div>
+          <h1>Decode the landscape<span> before governing within it.</span></h1>
+          <p className="lead">Explore laws, regulations, standards, frameworks, principles, recommendations, testing systems, and sector overlays. Every source remains connected to its issuer, class, authority, version, applicability, evidence expectations, and TA-14 execution pathway.</p>
+          <div className="heroMeta"><div><span>08</span><small>Initial source modules</small></div><div><span>06</span><small>Governance source classes</small></div><div><span>01</span><small>Institutional boundary</small></div></div>
         </header>
 
-        <section className="categorySection">
-          <div className="heading">
-            <div>
-              <p className="eyebrow">EXPLORE BY SOURCE TYPE</p>
-              <h2>Know what kind of authority you are looking at.</h2>
-            </div>
-            <p>
-              A regulation is not a standard. A standard is not a framework. A
-              framework is not a certification. The Library keeps each source
-              type and boundary visible.
-            </p>
-          </div>
+        <section className="journeyPanel">
+          <div className="journeyIntro"><p className="eyebrow gold">GOVERNANCE JOURNEY</p><h2>Move from understanding to preserved proof.</h2></div>
+          <div className="journey">{journey.map((label,index)=><div className="journeyStep" key={label}><span>{String(index+1).padStart(2,"0")}</span><strong>{label}</strong>{index<journey.length-1?<i>→</i>:null}</div>)}</div>
+        </section>
 
-          <div className="categoryGrid">
-            {categories.map(([title, description, href], index) => (
-              <Link className="categoryCard" href={href} key={title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <h3>{title}</h3>
-                <p>{description}</p>
-                <strong>Explore category →</strong>
-              </Link>
-            ))}
-          </div>
+        <section className="categorySection">
+          <div className="heading"><div><p className="eyebrow">EXPLORE BY SOURCE TYPE</p><h2>Know what kind of authority you are looking at.</h2></div><p>A regulation is not a standard. A standard is not a framework. A framework is not a certification. The Library keeps every source class and every boundary visible.</p></div>
+          <div className="categoryGrid">{categories.map(([code,title,description,href,tag])=><Link className="categoryCard" href={href} key={title}><div className="categoryTop"><span className="categoryNumber">{code}</span><span className="categoryTag">{tag}</span></div><div className="categoryGlyph"><span/><span/><span/></div><h3>{title}</h3><p>{description}</p><div className="cardAction"><strong>Explore category</strong><span>→</span></div></Link>)}</div>
         </section>
 
         <section className="sourceSection">
-          <div className="heading">
-            <div>
-              <p className="eyebrow">INITIAL GOVERNANCE MODULES</p>
-              <h2>The sources organizations encounter most often.</h2>
-            </div>
-            <p>
-              Acronyms are expanded at the point of use and connected to a
-              source-authority record rather than presented as unexplained
-              abbreviations.
-            </p>
-          </div>
-
-          <div className="sourceGrid">
-            {sources.map((source, index) => (
-              <Link
-                href={source.href}
-                key={source.name}
-                className="sourceCard"
-                style={{ "--accent": source.accent } as CSSProperties}
-              >
-                <div className="sourceTop">
-                  <span className="sourceCode">{source.code}</span>
-                  <span className="number">{String(index + 1).padStart(2, "0")}</span>
-                </div>
-                <p className="sourceType">{source.type}</p>
-                <h3>{source.name}</h3>
-                <p className="expanded">{source.expanded}</p>
-                <p className="description">{source.description}</p>
-                <strong>Open library entry →</strong>
-              </Link>
-            ))}
-          </div>
+          <div className="heading"><div><p className="eyebrow">INITIAL GOVERNANCE MODULES</p><h2>The sources organizations encounter most often.</h2></div><p>Acronyms are expanded at the point of use and connected to a source-authority record rather than presented as unexplained abbreviations.</p></div>
+          <div className="sourceGrid">{sources.map((source,index)=><Link href={source.href} key={source.name} className="sourceCard" style={{"--accent":source.accent} as CSSProperties}><div className="sourceGlow"/><div className="sourceTop"><span className="sourceCode">{source.code}</span><span className="number">{String(index+1).padStart(2,"0")}</span></div><div className="authorityStrip"><span className="authorityDot"/><span>{source.authority}</span></div><p className="sourceType">{source.type}</p><h3>{source.name}</h3><p className="expanded">{source.expanded}</p><p className="description">{source.description}</p><div className="sourceFooter"><span>Issuer</span><span>Class</span><span>Authority</span><span>Version</span></div><div className="cardAction sourceAction"><strong>Open library entry</strong><span>→</span></div></Link>)}</div>
         </section>
 
-        <section className="boundary">
-          <p className="eyebrow gold">SOURCE AND INTERPRETATION BOUNDARY</p>
-          <h2>The Library explains governance. It does not fabricate authority.</h2>
-          <p>
-            Every entry should preserve the issuing body, official source,
-            version, dates, legal or normative force, interpretation status,
-            relationships, unresolved questions, and review history. Summaries
-            and TA-14 implementation routes do not replace original source
-            materials, legal advice, accreditation, conformity assessment, or
-            independent certification.
-          </p>
-          <div className="actions">
-            <Link href="/governance-library/dictionary" className="button primary">
-              Open Acronym Dictionary →
-            </Link>
-            <Link href="/governance-library/applicability" className="button goldButton">
-              Find What Applies →
-            </Link>
-          </div>
-        </section>
+        <section className="boundary"><div className="boundaryHalo"/><div className="boundarySeal"><span>SB</span><small>Source boundary</small></div><p className="eyebrow gold">SOURCE AND INTERPRETATION BOUNDARY</p><h2>The Library explains governance. It does not fabricate authority.</h2><p>Every entry should preserve the issuing body, official source, version, dates, legal or normative force, interpretation status, relationships, unresolved questions, and review history. Summaries and TA-14 implementation routes do not replace original source materials, legal advice, accreditation, conformity assessment, or independent certification.</p><div className="boundaryGrid"><article><span>PROVES</span><strong>Source identity and interpreted scope</strong></article><article><span>DOES NOT PROVE</span><strong>Certification, legal advice, or conformity</strong></article><article><span>REQUIRES</span><strong>Review, evidence, authority, and version control</strong></article></div><div className="actions"><Link href="/governance-library/dictionary" className="button primary">Open Acronym Dictionary →</Link><Link href="/governance-library/applicability" className="button goldButton">Find What Applies →</Link></div></section>
       </section>
 
       <style jsx>{`
-        .libraryPage{min-height:100vh;color:#f7fbff}.shell{width:min(1480px,calc(100% - 40px));margin:auto;padding:24px 0 80px}
-        .topbar{display:flex;justify-content:space-between;gap:14px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:18px;background:rgba(4,17,29,.74);backdrop-filter:blur(16px)}
-        .button{min-height:46px;padding:0 17px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
-        .quiet{color:#c4d5de;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.18)}.primary{color:#041a23;border:1px solid #aaf2ff;background:linear-gradient(135deg,#d9fbff,#76deef 64%,#38aeca)}
-        .goldButton{color:#241704;border:1px solid #ffe09a;background:linear-gradient(135deg,#fff0bd,#eeb84b)}
-        .hero{max-width:1120px;margin:auto;padding:82px 0 68px;text-align:center}.seal{width:112px;height:112px;margin:0 auto 26px;display:grid;place-items:center;border:1px solid rgba(255,199,82,.4);border-radius:50%;color:#ffe5a0;background:radial-gradient(circle,rgba(255,193,64,.14),rgba(4,18,30,.86) 66%);font:900 34px Georgia,serif}
-        .eyebrow{margin:0;color:#6fe8ff;font-size:10px;font-weight:950;letter-spacing:.22em;text-transform:uppercase}.eyebrow.gold{color:#efbd59}
-        h1,h2,h3{font-family:Georgia,"Times New Roman",serif}.hero h1{max-width:1050px;margin:14px auto 0;font-size:clamp(52px,6.5vw,94px);line-height:.96;letter-spacing:-.052em}.lead{max-width:900px;margin:26px auto 0;color:#b3c6cf;font-size:18px;line-height:1.72}
-        .journey{margin:35px auto 0;display:flex;flex-wrap:wrap;justify-content:center;gap:10px}.journey span{display:flex;align-items:center;gap:10px}.journey strong{padding:9px 13px;border:1px solid rgba(99,230,255,.16);border-radius:999px;background:rgba(99,230,255,.055);font-size:10px;letter-spacing:.08em;text-transform:uppercase}.journey i{color:#e5b956;font-style:normal}
-        .categorySection,.sourceSection{padding:38px 0}.heading{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:40px;margin-bottom:32px}.heading h2,.boundary h2{margin:12px 0 0;font-size:clamp(38px,4.5vw,66px);line-height:1;letter-spacing:-.045em}.heading>p{margin:0;color:#9fb2bc;font-size:15px;line-height:1.7}
-        .categoryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:17px}.categoryCard{min-height:250px;padding:24px;display:flex;flex-direction:column;border:1px solid rgba(99,230,255,.14);border-radius:24px;color:inherit;text-decoration:none;background:linear-gradient(145deg,rgba(10,31,47,.93),rgba(4,14,24,.97));box-shadow:0 22px 50px rgba(0,0,0,.26);transition:.25s}.categoryCard:hover{transform:translateY(-6px);border-color:rgba(99,230,255,.5)}.categoryCard>span{color:#72dff2;font-size:10px;font-weight:900}.categoryCard h3{margin:25px 0 0;font-size:28px;line-height:1.05}.categoryCard p{flex:1;color:#9db1bb;font-size:14px;line-height:1.65}.categoryCard strong{color:#8fefff;font-size:12px}
-        .sourceGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:17px}.sourceCard{--accent:#63e6ff;min-height:370px;padding:23px;display:flex;flex-direction:column;border:1px solid color-mix(in srgb,var(--accent) 30%,rgba(255,255,255,.06));border-radius:25px;color:inherit;text-decoration:none;background:linear-gradient(145deg,rgba(10,29,46,.95),rgba(4,13,23,.98));box-shadow:0 22px 54px rgba(0,0,0,.3);transition:.26s}.sourceCard:hover{transform:translateY(-7px);border-color:var(--accent);box-shadow:0 28px 64px rgba(0,0,0,.38),0 0 28px color-mix(in srgb,var(--accent) 24%,transparent)}
-        .sourceTop{display:flex;justify-content:space-between}.sourceCode{min-width:66px;height:66px;padding:0 10px;display:grid;place-items:center;border:1px solid var(--accent);border-radius:18px;color:var(--accent);background:rgba(0,0,0,.22);font-size:16px;font-weight:950}.number{color:#6d8390;font-size:9px;font-weight:900}.sourceType{margin:25px 0 0;color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}.sourceCard h3{margin:10px 0 0;font-size:29px}.expanded{margin:10px 0 0;color:#d2dde2;font-size:13px;line-height:1.5}.description{flex:1;color:#94aab5;font-size:14px;line-height:1.65}.sourceCard strong{color:var(--accent);font-size:12px}
-        .boundary{margin-top:75px;padding:50px 34px;border:1px solid rgba(255,197,82,.22);border-radius:30px;background:radial-gradient(circle at 50% 0%,rgba(255,185,44,.1),transparent 42%),linear-gradient(180deg,rgba(8,20,33,.96),rgba(3,10,18,.98));text-align:center}.boundary h2{max-width:1000px;margin:14px auto 0}.boundary>p:not(.eyebrow){max-width:980px;margin:24px auto 0;color:#a4b4bc;font-size:15px;line-height:1.75}.actions{margin-top:28px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
-        @media(max-width:1180px){.sourceGrid{grid-template-columns:repeat(2,1fr)}}@media(max-width:900px){.categoryGrid{grid-template-columns:repeat(2,1fr)}.heading{grid-template-columns:1fr;gap:16px}}@media(max-width:650px){.shell{width:calc(100% - 22px)}.topbar{flex-direction:column}.button{width:100%}.hero{padding:58px 0}.categoryGrid,.sourceGrid{grid-template-columns:1fr}.boundary{padding:40px 20px}}
+        .libraryPage{position:relative;min-height:100vh;overflow:hidden;color:#f7fbff;background:radial-gradient(circle at 50% -10%,rgba(31,120,169,.18),transparent 36%),radial-gradient(circle at 8% 34%,rgba(65,203,227,.08),transparent 24%),radial-gradient(circle at 88% 66%,rgba(239,185,89,.07),transparent 27%),linear-gradient(180deg,#04101b 0%,#020913 48%,#01060c 100%)}
+        .ambient,.gridOverlay{position:fixed;inset:0;pointer-events:none}.one{background:radial-gradient(circle at 20% 10%,rgba(99,230,255,.08),transparent 24%);animation:driftOne 14s ease-in-out infinite alternate}.two{background:radial-gradient(circle at 78% 34%,rgba(255,197,82,.06),transparent 23%);animation:driftTwo 17s ease-in-out infinite alternate}.gridOverlay{opacity:.16;background-image:linear-gradient(rgba(255,255,255,.018) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.018) 1px,transparent 1px);background-size:48px 48px;mask-image:linear-gradient(to bottom,black,transparent 82%)}
+        .shell{position:relative;z-index:2;width:min(1480px,calc(100% - 40px));margin:auto;padding:24px 0 90px}.topbar{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:14px;padding:12px;border:1px solid rgba(255,255,255,.09);border-radius:20px;background:linear-gradient(180deg,rgba(8,26,42,.88),rgba(4,15,26,.76));box-shadow:0 16px 50px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.03);backdrop-filter:blur(18px)}
+        .topbarCenter{display:flex;align-items:center;gap:9px;color:#8fa9b6;font-size:10px;font-weight:900;letter-spacing:.13em;text-transform:uppercase}.statusDot{width:7px;height:7px;border-radius:50%;background:#72e6b2;box-shadow:0 0 16px rgba(114,230,178,.9)}
+        .button{min-height:46px;padding:0 17px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;text-decoration:none;font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;transition:.22s}.button:hover{transform:translateY(-2px)}.quiet{justify-self:start;color:#c4d5de;border:1px solid rgba(255,255,255,.1);background:rgba(0,0,0,.18)}.primary{justify-self:end;color:#041a23;border:1px solid #aaf2ff;background:linear-gradient(135deg,#d9fbff,#76deef 64%,#38aeca);box-shadow:0 10px 30px rgba(76,204,226,.18)}.goldButton{color:#241704;border:1px solid #ffe09a;background:linear-gradient(135deg,#fff0bd,#eeb84b);box-shadow:0 10px 30px rgba(238,184,75,.16)}
+        .hero{max-width:1180px;margin:auto;padding:94px 0 72px;text-align:center}.heroOrbit{position:relative;width:150px;height:150px;margin:0 auto 30px;display:grid;place-items:center}.orbit{position:absolute;inset:0;border:1px solid rgba(99,230,255,.18);border-radius:50%}.orbitOne{transform:rotate(18deg) scaleX(1.16);animation:rotateOne 16s linear infinite}.orbitTwo{transform:rotate(-32deg) scaleY(1.12);border-color:rgba(255,199,82,.14);animation:rotateTwo 22s linear infinite reverse}.seal{position:relative;z-index:2;width:112px;height:112px;display:grid;place-items:center;align-content:center;gap:3px;border:1px solid rgba(255,199,82,.44);border-radius:50%;color:#ffe5a0;background:radial-gradient(circle at 50% 35%,rgba(255,220,146,.18),transparent 34%),radial-gradient(circle,rgba(255,193,64,.12),rgba(4,18,30,.95) 68%);box-shadow:0 0 60px rgba(255,193,64,.11),inset 0 0 30px rgba(255,255,255,.03)}.seal span{font:900 34px Georgia,serif}.seal small{color:#8da6b2;font-size:8px;font-weight:900;letter-spacing:.2em}
+        .eyebrow{margin:0;color:#6fe8ff;font-size:10px;font-weight:950;letter-spacing:.22em;text-transform:uppercase}.eyebrow.gold{color:#efbd59}h1,h2,h3{font-family:Georgia,"Times New Roman",serif}.hero h1{max-width:1100px;margin:15px auto 0;font-size:clamp(54px,6.7vw,98px);line-height:.94;letter-spacing:-.056em;text-wrap:balance}.hero h1 span{display:block;color:#9fb4bf;font-style:italic;font-weight:500}.lead{max-width:930px;margin:28px auto 0;color:#afc1ca;font-size:18px;line-height:1.75}.heroMeta{max-width:760px;margin:38px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.heroMeta div{padding:16px 18px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(6,20,32,.58)}.heroMeta span{display:block;color:#f0d28f;font:700 25px Georgia,serif}.heroMeta small{display:block;margin-top:5px;color:#788f9a;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}
+        .journeyPanel{padding:32px;display:grid;grid-template-columns:.8fr 1.2fr;gap:34px;align-items:center;border:1px solid rgba(255,197,82,.18);border-radius:28px;background:radial-gradient(circle at 0 0,rgba(255,193,64,.09),transparent 30%),linear-gradient(145deg,rgba(11,30,46,.9),rgba(4,14,24,.95));box-shadow:0 26px 70px rgba(0,0,0,.27)}.journeyIntro h2{margin:10px 0 0;font-size:clamp(32px,3.8vw,54px);line-height:1;letter-spacing:-.04em}.journey{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.journeyStep{position:relative;min-height:88px;padding:14px;display:flex;flex-direction:column;justify-content:center;border:1px solid rgba(99,230,255,.11);border-radius:15px;background:rgba(1,9,16,.36)}.journeyStep span{color:#708792;font-size:9px;font-weight:900}.journeyStep strong{margin-top:7px;color:#d8f7fb;font-size:11px;letter-spacing:.07em;text-transform:uppercase}.journeyStep i{position:absolute;right:-9px;top:36px;z-index:3;color:#e5b956;font-style:normal}
+        .categorySection,.sourceSection{padding:88px 0 0}.heading{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:40px;margin-bottom:34px}.heading h2,.boundary h2{margin:12px 0 0;font-size:clamp(40px,4.6vw,68px);line-height:.98;letter-spacing:-.048em}.heading>p{margin:0;color:#98adb7;font-size:15px;line-height:1.75}.categoryGrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}.categoryCard{position:relative;min-height:300px;padding:25px;display:flex;flex-direction:column;overflow:hidden;border:1px solid rgba(99,230,255,.13);border-radius:26px;color:inherit;text-decoration:none;background:radial-gradient(circle at 100% 0,rgba(99,230,255,.07),transparent 30%),linear-gradient(145deg,rgba(10,31,47,.95),rgba(4,14,24,.98));box-shadow:0 24px 58px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.025);transition:.26s}.categoryCard:hover{transform:translateY(-8px);border-color:rgba(99,230,255,.48);box-shadow:0 32px 70px rgba(0,0,0,.36),0 0 34px rgba(99,230,255,.08)}.categoryTop{display:flex;justify-content:space-between;align-items:center;gap:10px}.categoryNumber{color:#74dff1;font-size:10px;font-weight:900;letter-spacing:.12em}.categoryTag{padding:7px 10px;border:1px solid rgba(255,255,255,.08);border-radius:999px;color:#7f96a1;background:rgba(0,0,0,.16);font-size:8px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.categoryGlyph{width:74px;height:50px;margin-top:28px;display:flex;align-items:flex-end;gap:7px}.categoryGlyph span{width:16px;border:1px solid rgba(99,230,255,.38);border-radius:6px 6px 2px 2px;background:linear-gradient(180deg,rgba(99,230,255,.18),rgba(99,230,255,.03))}.categoryGlyph span:nth-child(1){height:27px}.categoryGlyph span:nth-child(2){height:42px}.categoryGlyph span:nth-child(3){height:35px}.categoryCard h3{margin:23px 0 0;font-size:29px;line-height:1.03}.categoryCard p{flex:1;color:#96abb5;font-size:14px;line-height:1.68}.cardAction{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:18px;padding-top:16px;border-top:1px solid rgba(255,255,255,.06);color:#8fefff;font-size:11px;letter-spacing:.04em}.cardAction span{font-size:18px}
+        .sourceGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px}.sourceCard{--accent:#63e6ff;position:relative;min-height:460px;padding:24px;display:flex;flex-direction:column;overflow:hidden;border:1px solid color-mix(in srgb,var(--accent) 28%,rgba(255,255,255,.05));border-radius:27px;color:inherit;text-decoration:none;background:linear-gradient(145deg,rgba(10,29,46,.96),rgba(4,13,23,.99));box-shadow:0 24px 58px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.025);transition:.27s}.sourceGlow{position:absolute;inset:-100px -80px auto auto;width:220px;height:220px;border-radius:50%;background:color-mix(in srgb,var(--accent) 12%,transparent);filter:blur(18px);opacity:.55}.sourceCard:hover{transform:translateY(-9px);border-color:var(--accent);box-shadow:0 34px 76px rgba(0,0,0,.4),0 0 34px color-mix(in srgb,var(--accent) 18%,transparent)}.sourceTop{position:relative;z-index:2;display:flex;justify-content:space-between}.sourceCode{min-width:68px;height:68px;padding:0 11px;display:grid;place-items:center;border:1px solid var(--accent);border-radius:18px;color:var(--accent);background:rgba(0,0,0,.24);box-shadow:inset 0 0 18px color-mix(in srgb,var(--accent) 8%,transparent),0 0 22px color-mix(in srgb,var(--accent) 8%,transparent);font-size:16px;font-weight:950}.number{color:#627985;font-size:9px;font-weight:900}.authorityStrip{margin-top:24px;display:flex;align-items:center;gap:8px;color:#8096a1;font-size:9px;font-weight:900;letter-spacing:.09em;text-transform:uppercase}.authorityDot{width:6px;height:6px;border-radius:50%;background:var(--accent);box-shadow:0 0 12px color-mix(in srgb,var(--accent) 70%,transparent)}.sourceType{margin:17px 0 0;color:var(--accent);font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}.sourceCard h3{margin:9px 0 0;font-size:30px;line-height:1.02}.expanded{margin:11px 0 0;color:#d1dde2;font-size:13px;line-height:1.5}.description{flex:1;color:#91a7b2;font-size:14px;line-height:1.67}.sourceFooter{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}.sourceFooter span{padding:7px 5px;border:1px solid rgba(255,255,255,.05);border-radius:7px;color:#617782;background:rgba(0,0,0,.15);font-size:7px;font-weight:900;text-align:center;letter-spacing:.05em;text-transform:uppercase}.sourceAction{color:var(--accent)}
+        .boundary{position:relative;margin-top:90px;padding:58px 36px;overflow:hidden;border:1px solid rgba(255,197,82,.24);border-radius:32px;background:radial-gradient(circle at 50% 0,rgba(255,185,44,.12),transparent 42%),linear-gradient(180deg,rgba(8,20,33,.97),rgba(3,10,18,.99));box-shadow:0 28px 78px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.025);text-align:center}.boundaryHalo{position:absolute;inset:-260px auto auto 50%;width:520px;height:520px;transform:translateX(-50%);border:1px solid rgba(255,197,82,.08);border-radius:50%}.boundarySeal{position:relative;z-index:2;width:82px;height:82px;margin:0 auto 22px;display:grid;place-items:center;align-content:center;gap:3px;border:1px solid rgba(255,197,82,.32);border-radius:50%;background:rgba(0,0,0,.18)}.boundarySeal span{color:#f2ca75;font:700 23px Georgia,serif}.boundarySeal small{color:#788b94;font-size:6px;font-weight:900;letter-spacing:.1em;text-transform:uppercase}.boundary h2{position:relative;z-index:2;max-width:1040px;margin:14px auto 0}.boundary>p:not(.eyebrow){position:relative;z-index:2;max-width:980px;margin:24px auto 0;color:#a4b4bc;font-size:15px;line-height:1.78}.boundaryGrid{position:relative;z-index:2;max-width:1080px;margin:32px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.boundaryGrid article{padding:20px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(0,0,0,.17)}.boundaryGrid span{display:block;color:#e3b759;font-size:8px;font-weight:900;letter-spacing:.12em}.boundaryGrid strong{display:block;margin-top:9px;color:#d9e4e8;font-size:12px;line-height:1.45}.actions{position:relative;z-index:2;margin-top:30px;display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+        @keyframes rotateOne{from{transform:rotate(18deg) scaleX(1.16)}to{transform:rotate(378deg) scaleX(1.16)}}@keyframes rotateTwo{from{transform:rotate(-32deg) scaleY(1.12)}to{transform:rotate(328deg) scaleY(1.12)}}@keyframes driftOne{from{transform:translate3d(-1%,-1%,0)}to{transform:translate3d(2%,1%,0)}}@keyframes driftTwo{from{transform:translate3d(1%,0,0)}to{transform:translate3d(-2%,2%,0)}}
+        @media(max-width:1180px){.sourceGrid{grid-template-columns:repeat(2,1fr)}.journeyPanel{grid-template-columns:1fr}}@media(max-width:900px){.categoryGrid{grid-template-columns:repeat(2,1fr)}.heading{grid-template-columns:1fr;gap:16px}.topbar{grid-template-columns:1fr 1fr}.topbarCenter{display:none}.heroMeta,.boundaryGrid{grid-template-columns:1fr}}@media(max-width:650px){.shell{width:calc(100% - 22px)}.topbar{grid-template-columns:1fr}.quiet,.primary{justify-self:stretch}.button{width:100%}.hero{padding:62px 0}.hero h1{font-size:clamp(45px,14vw,68px)}.categoryGrid,.sourceGrid,.journey{grid-template-columns:1fr}.journeyStep i{display:none}.journeyPanel,.boundary{padding:38px 20px}.categorySection,.sourceSection{padding-top:68px}}
       `}</style>
     </main>
   );
