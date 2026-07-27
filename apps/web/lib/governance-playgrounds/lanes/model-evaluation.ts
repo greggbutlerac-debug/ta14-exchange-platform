@@ -8,11 +8,13 @@ import type { SharedGateId } from "../gates";
 /**
  * TA-14 Model Evaluation Governance Playground
  *
- * Tests whether a specific model remains identified, bounded, evaluated,
- * authorized, monitored, reviewable, and valid for its declared use.
+ * Governs whether a model evaluation is attributable, scoped, reproducible,
+ * representative, authorized, preserved, and sufficient to support a bounded
+ * deployment or execution claim.
  *
- * Governing principle:
- * No admissible evidence. No admissible execution.
+ * Governing sequence:
+ * Reality -> Record -> Continuity -> Admissibility -> Binding -> Commit ->
+ * Execution -> Outcome
  */
 
 export const MODEL_EVALUATION_GATE_IDS = [
@@ -34,25 +36,35 @@ export const MODEL_EVALUATION_GATE_IDS = [
 
 export const MODEL_EVALUATION_EVIDENCE_TYPES = [
   "GOVERNANCE_CLAIM_SUPPORT",
-  "MODEL_IDENTITY",
+  "MODEL_IDENTITY_RECORD",
   "MODEL_VERSION_RECORD",
-  "MODEL_CARD",
-  "INTENDED_USE_DECLARATION",
-  "PROHIBITED_USE_DECLARATION",
-  "EVALUATION_DATASET_RECORD",
-  "EVALUATION_METHOD",
-  "BENCHMARK_RESULT",
-  "ROBUSTNESS_TEST_RESULT",
-  "BIAS_OR_FAIRNESS_TEST_RESULT",
-  "SAFETY_TEST_RESULT",
+  "MODEL_PROVENANCE_RECORD",
+  "EVALUATION_PLAN",
+  "EVALUATION_SCOPE_RECORD",
+  "DATASET_IDENTITY_RECORD",
+  "DATASET_PROVENANCE_RECORD",
+  "DATASET_QUALITY_RECORD",
+  "BENCHMARK_DEFINITION_RECORD",
+  "METRIC_DEFINITION_RECORD",
+  "THRESHOLD_RECORD",
+  "BASELINE_RECORD",
+  "TEST_HARNESS_RECORD",
+  "REPRODUCIBILITY_RECORD",
+  "ROBUSTNESS_RECORD",
+  "SAFETY_EVALUATION_RECORD",
+  "FAIRNESS_EVALUATION_RECORD",
+  "SECURITY_EVALUATION_RECORD",
   "LIMITATION_RECORD",
-  "APPROVAL_AUTHORITY",
-  "DEPLOYMENT_CONTEXT_RECORD",
-  "HUMAN_REVIEW_PLAN",
-  "MONITORING_PLAN",
-  "DRIFT_RESULT",
+  "HUMAN_REVIEW_RECORD",
+  "AUTHORITY_RECORD",
+  "APPROVAL_RECORD",
   "CHANGE_RECORD",
-  "RETIREMENT_RECORD",
+  "DRIFT_RECORD",
+  "COMMIT_AUTHORIZATION",
+  "EXECUTION_RECEIPT",
+  "OUTCOME_EVIDENCE",
+  "INCIDENT_RECORD",
+  "REMEDIATION_RECORD",
   "REPLAY_RESULT",
 ] as const;
 
@@ -61,10 +73,10 @@ export type ModelEvaluationEvidenceType =
 
 export const MODEL_EVALUATION_SECTIONS = [
   {
-    sectionId: "model-identity",
-    title: "Model Identity",
+    sectionId: "model-evaluation-identity",
+    title: "Model and Evaluation Identity",
     description:
-      "Identify the exact model, version, provider, artifact, configuration, and deployment context being evaluated.",
+      "Identify the exact model, version, provider, owner, evaluation route, environment, intended decision, and validity period.",
     order: 10,
     fields: [
       {
@@ -72,34 +84,40 @@ export const MODEL_EVALUATION_SECTIONS = [
         label: "Evaluation route title",
         type: "text",
         required: true,
-        placeholder: "Customer-support model release evaluation",
+        placeholder: "Production model evaluation route",
         validation: { minLength: 3, maxLength: 160 },
       },
       {
         key: "routeDescription",
-        label: "Evaluation description",
+        label: "Evaluation route description",
         type: "textarea",
         required: true,
         placeholder:
-          "Describe the model, intended use, deployment context, material decisions, affected parties, and evaluation objective.",
-        validation: { minLength: 20, maxLength: 4000 },
+          "Describe the model, evaluation purpose, deployment decision, execution claim, and governed consequences.",
+        validation: { minLength: 20, maxLength: 5000 },
+      },
+      {
+        key: "evaluationRouteIdentifier",
+        label: "Stable evaluation route identifier",
+        type: "text",
+        required: true,
+        placeholder: "model-evaluation:route:2026-001",
+        validation: { minLength: 3, maxLength: 300 },
       },
       {
         key: "modelName",
         label: "Model name",
         type: "text",
         required: true,
-        placeholder: "support-assistant-model",
+        placeholder: "Governed Decision Model",
         validation: { minLength: 2, maxLength: 240 },
       },
       {
         key: "modelIdentifier",
         label: "Stable model identifier",
-        description:
-          "A stable identifier for the exact model artifact or hosted model endpoint.",
         type: "text",
         required: true,
-        placeholder: "model:support-assistant:2026-07-26",
+        placeholder: "model:provider:family:release",
         validation: { minLength: 3, maxLength: 300 },
       },
       {
@@ -112,181 +130,329 @@ export const MODEL_EVALUATION_SECTIONS = [
       },
       {
         key: "modelProvider",
-        label: "Model provider or owner",
+        label: "Model provider",
         type: "text",
         required: true,
-        placeholder: "Organization or provider name",
+        placeholder: "Model Provider",
         validation: { minLength: 2, maxLength: 240 },
       },
       {
-        key: "modelType",
-        label: "Model type",
-        type: "select",
+        key: "evaluationOwner",
+        label: "Evaluation owner",
+        type: "text",
         required: true,
-        options: [
-          { value: "classification", label: "Classification" },
-          { value: "regression", label: "Regression" },
-          { value: "ranking", label: "Ranking or recommendation" },
-          { value: "generative-language", label: "Generative language" },
-          { value: "generative-image", label: "Generative image" },
-          { value: "multimodal", label: "Multimodal" },
-          { value: "forecasting", label: "Forecasting" },
-          { value: "anomaly-detection", label: "Anomaly detection" },
-          { value: "other", label: "Other" },
-        ],
+        placeholder: "Independent Evaluation Authority",
+        validation: { minLength: 2, maxLength: 240 },
       },
       {
-        key: "deploymentContext",
-        label: "Deployment context",
+        key: "deploymentEnvironment",
+        label: "Target environment",
         type: "select",
         required: true,
         options: [
           { value: "research", label: "Research" },
-          { value: "simulation", label: "Simulation" },
           { value: "sandbox", label: "Sandbox" },
           { value: "staging", label: "Staging" },
           { value: "production", label: "Production" },
-          { value: "embedded-third-party", label: "Embedded in third-party system" },
+        ],
+      },
+      {
+        key: "evaluationDate",
+        label: "Evaluation date",
+        type: "date",
+        required: true,
+      },
+      {
+        key: "validUntil",
+        label: "Evaluation validity end",
+        type: "date",
+        required: true,
+      },
+    ],
+  },
+  {
+    sectionId: "model-evaluation-claim-scope",
+    title: "Evaluation Claim, Scope, and Boundary",
+    description:
+      "Define exactly what the evaluation claims, the intended use, population, operating conditions, exclusions, limitations, and prohibited extrapolations.",
+    order: 20,
+    fields: [
+      {
+        key: "evaluationClaim",
+        label: "Evaluation claim",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "State exactly what the evaluation demonstrates and what deployment or execution decision it is intended to support.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "claimBasis",
+        label: "Claim basis",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe the evidence, benchmarks, metrics, datasets, thresholds, controls, reviewers, and assumptions supporting the claim.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "intendedUse",
+        label: "Intended use",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe the exact users, decisions, tasks, systems, populations, environments, and consequences covered.",
+        validation: { minLength: 20, maxLength: 5000 },
+      },
+      {
+        key: "evaluationScope",
+        label: "Evaluation scope",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"tasks":["classification"],"populations":["approved population"],"environments":["production-v1"],"languages":["en"]}',
+      },
+      {
+        key: "outOfScope",
+        label: "Out-of-scope conditions",
+        type: "json",
+        required: true,
+        placeholder:
+          '["unseen populations","unsupported languages","autonomous high-impact execution","use after material model change"]',
+      },
+      {
+        key: "prohibitedExtrapolations",
+        label: "Prohibited extrapolations",
+        type: "json",
+        required: true,
+        placeholder:
+          '["benchmark success equals universal safety","average performance equals subgroup performance","offline score equals runtime control"]',
+      },
+      {
+        key: "knownLimitations",
+        label: "Known limitations",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"limitationId":"LIM-001","description":"reduced performance under distribution shift","materiality":"high"}]',
+      },
+      {
+        key: "consequenceLevel",
+        label: "Consequence level",
+        type: "select",
+        required: true,
+        options: [
+          { value: "low", label: "Low" },
+          { value: "moderate", label: "Moderate" },
+          { value: "high", label: "High" },
+          { value: "critical", label: "Critical" },
         ],
       },
     ],
   },
   {
-    sectionId: "claim-boundary",
-    title: "Governance Claim and Use Boundary",
+    sectionId: "model-evaluation-data-benchmarks",
+    title: "Datasets, Benchmarks, and Metrics",
     description:
-      "State what the evaluation claims to establish, the uses it covers, and the uses it does not support.",
-    order: 20,
-    fields: [
-      {
-        key: "governanceClaim",
-        label: "Model governance claim",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "This evaluation supports use of the identified model for the declared task, population, environment, and decision boundary.",
-        validation: { minLength: 20, maxLength: 3000 },
-      },
-      {
-        key: "intendedUses",
-        label: "Intended uses",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Describe each approved task, user group, environment, decision context, and output use.",
-        validation: { minLength: 10, maxLength: 4000 },
-      },
-      {
-        key: "prohibitedUses",
-        label: "Prohibited uses",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "List uses that are not supported, approved, or permitted by this evaluation.",
-        validation: { minLength: 10, maxLength: 4000 },
-      },
-      {
-        key: "inScope",
-        label: "In scope",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Models, versions, prompts, adapters, populations, languages, environments, tasks, and time period included.",
-        validation: { minLength: 10, maxLength: 4000 },
-      },
-      {
-        key: "outOfScope",
-        label: "Out of scope",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Excluded models, versions, populations, languages, tasks, environments, and downstream uses.",
-        validation: { minLength: 10, maxLength: 4000 },
-      },
-      {
-        key: "explicitNonClaims",
-        label: "Explicit non-claims",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "This evaluation does not prove universal truthfulness, legal compliance, cybersecurity, runtime control, or outcome causation.",
-        validation: { minLength: 10, maxLength: 3000 },
-      },
-    ],
-  },
-  {
-    sectionId: "evaluation-design",
-    title: "Evaluation Design",
-    description:
-      "Define the evaluation questions, datasets, methods, metrics, thresholds, and known limitations.",
+      "Establish dataset identity, provenance, representativeness, contamination controls, benchmark definitions, metrics, thresholds, and baselines.",
     order: 30,
     fields: [
       {
-        key: "evaluationObjectives",
-        label: "Evaluation objectives",
+        key: "datasetInventory",
+        label: "Evaluation dataset inventory",
         type: "json",
         required: true,
         placeholder:
-          '[{"objective":"answer quality","metric":"task success rate","threshold":0.9}]',
+          '[{"datasetId":"DS-001","name":"Evaluation Set","version":"2026.1","purpose":"primary benchmark","status":"current"}]',
       },
       {
-        key: "evaluationDatasets",
-        label: "Evaluation datasets",
+        key: "datasetProvenance",
+        label: "Dataset provenance",
         type: "json",
         required: true,
         placeholder:
-          '[{"datasetId":"eval-set-1","version":"2026-07","population":"declared users","approved":true}]',
+          '[{"datasetId":"DS-001","sources":["source-a"],"collectionPeriod":"2025-2026","authority":"approved custodian"}]',
       },
       {
-        key: "evaluationMethods",
-        label: "Evaluation methods",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"method":"held-out benchmark","reviewers":["evaluator-1"],"repeatable":true}]',
-      },
-      {
-        key: "metricsAndThresholds",
-        label: "Metrics and acceptance thresholds",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"metric":"critical error rate","operator":"<=","threshold":0.01,"failure":"HOLD"}]',
-      },
-      {
-        key: "subgroupEvaluationPlan",
-        label: "Subgroup and affected-party evaluation plan",
+        key: "representativenessMethod",
+        label: "Representativeness method",
         type: "textarea",
         required: true,
         placeholder:
-          "Describe relevant subgroups, languages, accessibility conditions, edge cases, and affected-party considerations.",
-        validation: { minLength: 20, maxLength: 5000 },
+          "Describe how the evaluation population corresponds to the intended deployment population and known edge conditions.",
+        validation: { minLength: 20, maxLength: 6000 },
       },
       {
-        key: "knownLimitations",
-        label: "Known model and evaluation limitations",
-        type: "textarea",
+        key: "contaminationControls",
+        label: "Contamination and leakage controls",
+        type: "json",
         required: true,
         placeholder:
-          "State known blind spots, unsupported conditions, dataset limits, uncertainty, and unresolved risks.",
-        validation: { minLength: 20, maxLength: 5000 },
+          '["training overlap analysis","deduplication","hidden holdout","prompt leakage review","benchmark memorization checks"]',
+      },
+      {
+        key: "benchmarkDefinitions",
+        label: "Benchmark definitions",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"benchmarkId":"BM-001","task":"approved task","datasetId":"DS-001","protocol":"frozen-v1"}]',
+      },
+      {
+        key: "metricDefinitions",
+        label: "Metric definitions",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"metricId":"MET-001","name":"accuracy","calculation":"correct/total","direction":"higher-is-better"}]',
+      },
+      {
+        key: "decisionThresholds",
+        label: "Decision thresholds",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"allow":{"MET-001":">=0.95"},"hold":{"MET-001":"0.90-0.949"},"deny":{"MET-001":"<0.90"}}',
+      },
+      {
+        key: "baselineComparison",
+        label: "Baseline comparison",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"baselineId":"BASE-001","type":"previous approved model","version":"0.9.0","comparison":"non-inferior"}]',
+      },
+      {
+        key: "subgroupEvaluation",
+        label: "Subgroup evaluation",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"group":"approved subgroup","metric":"MET-001","result":0.95,"threshold":0.93}]',
       },
     ],
   },
   {
-    sectionId: "authority-approval",
-    title: "Authority and Approval",
+    sectionId: "model-evaluation-methods-controls",
+    title: "Evaluation Methods, Controls, and Reproducibility",
     description:
-      "Identify who is qualified and authorized to design, perform, interpret, approve, restrict, or reject the evaluation.",
+      "Define the test harness, prompts or inputs, configurations, seeds, tools, reviewers, reproducibility, robustness, and control testing.",
     order: 40,
     fields: [
       {
-        key: "evaluationActors",
-        label: "Evaluation actors",
+        key: "evaluationProtocol",
+        label: "Evaluation protocol",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe the frozen evaluation procedure, ordering, sampling, prompts, input transformation, scoring, exclusions, and review steps.",
+        validation: { minLength: 20, maxLength: 7000 },
+      },
+      {
+        key: "testHarness",
+        label: "Test harness",
         type: "json",
         required: true,
         placeholder:
-          '[{"actorId":"evaluator-1","role":"independent evaluator","qualification":"model assurance"}]',
+          '{"harnessId":"HARNESS-001","version":"1.0.0","repositoryCommit":"abc123","environment":"frozen"}',
+      },
+      {
+        key: "modelConfiguration",
+        label: "Model configuration",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"temperature":0,"topP":1,"seed":42,"systemPromptVersion":"SP-001","toolAccess":"disabled"}',
+      },
+      {
+        key: "reproducibilityMethod",
+        label: "Reproducibility method",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe environment capture, version pinning, seeds, dependency locks, reruns, variance limits, and independent reproduction.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "robustnessTests",
+        label: "Robustness tests",
+        type: "json",
+        required: true,
+        placeholder:
+          '["input perturbation","distribution shift","missing fields","adversarial examples","tool failure","latency stress"]',
+      },
+      {
+        key: "safetyTests",
+        label: "Safety evaluation",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"testId":"SAFE-001","risk":"unsafe recommendation","result":"pass","evidenceId":"EV-SAFE-001"}]',
+      },
+      {
+        key: "securityTests",
+        label: "Security evaluation",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"testId":"SEC-001","risk":"prompt injection","result":"pass","evidenceId":"EV-SEC-001"}]',
+      },
+      {
+        key: "fairnessTests",
+        label: "Fairness and differential performance evaluation",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"testId":"FAIR-001","groups":["A","B"],"metric":"error-rate-gap","result":"within-threshold"}]',
+      },
+      {
+        key: "controlTesting",
+        label: "Evaluation control testing",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"controlId":"CTRL-EVAL-001","objective":"prevent dataset leakage","result":"effective"}]',
+      },
+    ],
+  },
+  {
+    sectionId: "model-evaluation-review-approval",
+    title: "Review, Authority, and Approval",
+    description:
+      "Define evaluator identity, independence, competence, conflicts, approval authority, decision rationale, exceptions, and deployment conditions.",
+    order: 50,
+    fields: [
+      {
+        key: "evaluatorIdentity",
+        label: "Evaluator identity and role",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"person":"authorized evaluator","role":"lead evaluator","organization":"independent review function"}]',
+      },
+      {
+        key: "evaluatorCompetence",
+        label: "Evaluator competence",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"role":"lead evaluator","requirements":["domain expertise","statistical evaluation","model safety","governance"]}]',
+      },
+      {
+        key: "independenceControls",
+        label: "Independence controls",
+        type: "json",
+        required: true,
+        placeholder:
+          '["separation from development","conflict disclosure","independent challenge","protected escalation"]',
+      },
+      {
+        key: "evidenceConflicts",
+        label: "Known evidence conflicts",
+        type: "json",
+        required: true,
+        placeholder:
+          '[{"conflictId":"CONFLICT-001","status":"resolved","resolution":"independent rerun"}]',
       },
       {
         key: "approvalAuthority",
@@ -294,187 +460,210 @@ export const MODEL_EVALUATION_SECTIONS = [
         type: "json",
         required: true,
         placeholder:
-          '[{"holder":"model-risk-committee","scope":"approve production use","validUntil":"2027-01-01T00:00:00Z"}]',
+          '[{"authorityId":"AUTH-001","role":"model approval authority","scope":"production version 1.0.0","status":"active"}]',
       },
       {
-        key: "conflictOfInterestControls",
-        label: "Conflict-of-interest controls",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Describe reviewer independence, disclosure requirements, recusal rules, and separation from commercial influence.",
-        validation: { minLength: 20, maxLength: 4000 },
-      },
-      {
-        key: "releaseDecisionBoundary",
-        label: "Release decision boundary",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "State who may approve release, what conditions they may waive, and what conditions cannot be waived.",
-        validation: { minLength: 20, maxLength: 4000 },
-      },
-    ],
-  },
-  {
-    sectionId: "dependencies-changes",
-    title: "Dependencies and Material Changes",
-    description:
-      "Identify every dependency that can materially affect model behavior or invalidate the evaluation.",
-    order: 50,
-    fields: [
-      {
-        key: "modelDependencies",
-        label: "Material model dependencies",
+        key: "approvalRecord",
+        label: "Approval record",
         type: "json",
         required: true,
         placeholder:
-          '[{"type":"base-model","identifier":"provider:model:v3","version":"3.1"},{"type":"adapter","identifier":"support-lora","version":"1.2"}]',
+          '{"approvalId":"APR-001","decision":"approved","scope":"bounded intended use","conditions":["runtime monitoring","no scope expansion"]}',
       },
       {
-        key: "promptAndConfiguration",
-        label: "Prompt, system instruction, and configuration boundary",
-        type: "json",
-        required: true,
-        placeholder:
-          '{"systemPromptVersion":"4","temperature":0.2,"toolsEnabled":false}',
-      },
-      {
-        key: "dataDependencies",
-        label: "Training, retrieval, and reference data dependencies",
-        type: "json",
-        required: true,
-        placeholder:
-          '[{"dataset":"knowledge-base","version":"2026-07-01","approved":true}]',
-      },
-      {
-        key: "materialChangePolicy",
-        label: "Material change and re-evaluation policy",
+        key: "exceptionPolicy",
+        label: "Exception policy",
         type: "textarea",
         required: true,
         placeholder:
-          "State which model, prompt, adapter, data, tool, environment, provider, or threshold changes invalidate the prior evaluation.",
+          "Describe whether exceptions are allowed, who may approve them, their maximum duration and scope, required controls, and replay conditions.",
         validation: { minLength: 20, maxLength: 5000 },
       },
       {
-        key: "versionVerificationMethod",
-        label: "Model version verification method",
-        type: "textarea",
+        key: "deploymentConditions",
+        label: "Deployment conditions",
+        type: "json",
         required: true,
         placeholder:
-          "Describe how the evaluated model artifact is matched to the model actually deployed or invoked.",
-        validation: { minLength: 20, maxLength: 4000 },
+          '["exact approved model version","approved configuration","approved data boundary","runtime controls active","monitoring enabled"]',
+      },
+      {
+        key: "failedThresholdBehavior",
+        label: "Behavior when a mandatory threshold fails",
+        type: "select",
+        required: true,
+        options: [
+          { value: "deny", label: "DENY" },
+          { value: "hold", label: "HOLD" },
+          { value: "escalate", label: "ESCALATE" },
+          { value: "limited-mode", label: "Approved limited mode only" },
+        ],
       },
     ],
   },
   {
-    sectionId: "oversight-monitoring",
-    title: "Human Oversight, Monitoring, and Intervention",
+    sectionId: "model-evaluation-change-drift-monitoring",
+    title: "Change, Drift, and Monitoring",
     description:
-      "Define ongoing monitoring, human review, incident response, restriction, rollback, and retirement controls.",
+      "Define material changes, evaluation expiry, model drift, data drift, tool drift, performance monitoring, incident triggers, suspension, and re-evaluation.",
     order: 60,
     fields: [
       {
-        key: "humanReviewRequired",
-        label: "Human review required",
-        type: "boolean",
+        key: "materialChangeTriggers",
+        label: "Material change triggers",
+        type: "json",
         required: true,
-        defaultValue: true,
+        placeholder:
+          '["model weights change","model provider change","system prompt change","tool change","dataset change","task change","population change","threshold change"]',
       },
       {
-        key: "humanReviewPlan",
-        label: "Human review plan",
+        key: "driftMonitoringPlan",
+        label: "Drift monitoring plan",
         type: "textarea",
         required: true,
+        placeholder:
+          "Describe monitoring for model, data, task, population, environment, performance, calibration, safety, and dependency drift.",
+        validation: { minLength: 20, maxLength: 7000 },
+      },
+      {
+        key: "driftThresholds",
+        label: "Drift thresholds",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"performanceDrop":">2%","subgroupGapIncrease":">1%","distributionShift":"material","safetyIncidentCount":">0 critical"}',
+      },
+      {
+        key: "monitoringSignals",
+        label: "Monitoring signals",
+        type: "json",
+        required: true,
+        placeholder:
+          '["model hash change","configuration change","input distribution shift","metric degradation","incident","execution mismatch","outcome mismatch"]',
+      },
+      {
+        key: "suspensionTriggers",
+        label: "Suspension triggers",
+        type: "json",
+        required: true,
+        placeholder:
+          '["invalid model identity","expired evaluation","critical threshold failure","unresolved evidence conflict","material drift","unsafe outcome"]',
+      },
+      {
+        key: "reEvaluationRequirements",
+        label: "Re-evaluation requirements",
+        type: "json",
+        required: true,
+        placeholder:
+          '["new frozen model identity","updated datasets","full mandatory benchmark suite","independent review","new approval","replay result"]',
+      },
+      {
+        key: "incidentProcedure",
+        label: "Evaluation incident procedure",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe containment, evidence preservation, impact assessment, notification, correction, re-evaluation, approval, and replay.",
+        validation: { minLength: 20, maxLength: 6000 },
+      },
+      {
+        key: "remediationVerification",
+        label: "Remediation verification",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"independentVerification":true,"fullRetest":true,"reapprovalRequired":true,"replayRequired":true}',
+      },
+    ],
+  },
+  {
+    sectionId: "model-evaluation-records-execution-outcomes",
+    title: "Records, Execution Binding, Outcomes, and Replay",
+    description:
+      "Preserve the evaluated model, evidence, approval, committed deployment, actual execution, outcomes, changes, remediation, and continuing validity.",
+    order: 70,
+    fields: [
+      {
+        key: "requiredRecords",
+        label: "Required preserved records",
+        type: "json",
+        required: true,
+        placeholder:
+          '["MODEL_IDENTITY_RECORD","EVALUATION_PLAN","DATASET_IDENTITY_RECORD","BENCHMARK_DEFINITION_RECORD","METRIC_DEFINITION_RECORD","THRESHOLD_RECORD","REPRODUCIBILITY_RECORD","APPROVAL_RECORD","EXECUTION_RECEIPT","OUTCOME_EVIDENCE","REPLAY_RESULT"]',
+      },
+      {
+        key: "recordIntegrityMethod",
+        label: "Record integrity method",
+        type: "textarea",
+        required: true,
+        placeholder:
+          "Describe timestamps, signatures, hashes, dataset fingerprints, model hashes, environment capture, append-only preservation, corrections, retention, and access.",
+        validation: { minLength: 20, maxLength: 7000 },
+      },
+      {
+        key: "commitBinding",
+        label: "Commit binding",
+        type: "json",
+        required: true,
+        placeholder:
+          '{"modelId":"model:provider:family:release","modelVersion":"1.0.0","configId":"CFG-001","approvalId":"APR-001","scope":"approved intended use"}',
+      },
+      {
+        key: "executionAvailable",
+        label: "Execution record available",
+        type: "boolean",
+        required: true,
+        defaultValue: false,
+      },
+      {
+        key: "executionReceipt",
+        label: "Execution receipt",
+        type: "json",
+        required: false,
         appliesWhen: [
           {
-            ruleId: "MODEL-REVIEW-01",
-            description: "Required when human review is enabled.",
-            field: "humanReviewRequired",
+            ruleId: "MODEL-EVALUATION-EXECUTION-01",
+            description: "Required when the evaluated model has executed.",
+            field: "executionAvailable",
             operator: "equals",
             expected: true,
           },
         ],
         placeholder:
-          "Describe reviewer qualification, sampling, timing, authority, intervention power, and documentation.",
-        validation: { minLength: 20, maxLength: 5000 },
+          '{"executionId":"exec-001","modelId":"model:provider:family:release","modelVersion":"1.0.0","configId":"CFG-001","status":"completed"}',
       },
       {
-        key: "monitoringMetrics",
-        label: "Production monitoring metrics",
-        type: "json",
+        key: "outcomeAvailable",
+        label: "Outcome evidence available",
+        type: "boolean",
         required: true,
-        placeholder:
-          '[{"metric":"critical error rate","window":"24h","threshold":0.01,"response":"HOLD"}]',
+        defaultValue: false,
       },
       {
-        key: "driftDetectionPlan",
-        label: "Drift detection plan",
+        key: "measuredOutcome",
+        label: "Measured outcome",
         type: "textarea",
-        required: true,
+        required: false,
+        appliesWhen: [
+          {
+            ruleId: "MODEL-EVALUATION-OUTCOME-01",
+            description: "Required when outcome evidence is available.",
+            field: "outcomeAvailable",
+            operator: "equals",
+            expected: true,
+          },
+        ],
         placeholder:
-          "Describe behavior, data, population, context, performance, and provider drift detection.",
-        validation: { minLength: 20, maxLength: 5000 },
-      },
-      {
-        key: "incidentResponsePlan",
-        label: "Incident response and restriction plan",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Describe containment, suspension, rollback, notification, correction, re-evaluation, and preservation.",
-        validation: { minLength: 20, maxLength: 5000 },
-      },
-      {
-        key: "retirementCriteria",
-        label: "Restriction and retirement criteria",
-        type: "json",
-        required: true,
-        placeholder:
-          '["unresolved critical failure","provider withdrawal","material unbounded drift","expired approval"]',
-      },
-    ],
-  },
-  {
-    sectionId: "records-replay",
-    title: "Records, Validity, and Replay",
-    description:
-      "Define the preserved evaluation record, validity window, challenge route, and mandatory replay triggers.",
-    order: 70,
-    fields: [
-      {
-        key: "recordPlan",
-        label: "Evaluation record preservation plan",
-        type: "json",
-        required: true,
-        placeholder:
-          '["DECLARED_GOVERNANCE_CLAIM","TEST_CONFIGURATION","OBSERVED_TEST_RESULT","TA14_BOUNDED_DETERMINATION"]',
-      },
-      {
-        key: "evaluationValidityWindow",
-        label: "Evaluation validity window",
-        type: "text",
-        required: true,
-        placeholder:
-          "Valid for 90 days or until any material model, data, prompt, tool, provider, or environment change",
-        validation: { minLength: 3, maxLength: 600 },
+          "Describe whether runtime behavior and measured outcomes corresponded to the approved evaluation claim, thresholds, scope, and limitations.",
+        validation: { maxLength: 6000 },
       },
       {
         key: "replayTriggers",
-        label: "Mandatory replay triggers",
+        label: "Replay triggers",
         type: "json",
         required: true,
         placeholder:
-          '["model version change","prompt change","dataset change","provider change","threshold change","new affected population","material incident"]',
-      },
-      {
-        key: "challengeProcess",
-        label: "Challenge and counterevidence process",
-        type: "textarea",
-        required: true,
-        placeholder:
-          "Describe how findings may be challenged, how counterevidence is preserved, and who resolves the dispute.",
-        validation: { minLength: 20, maxLength: 5000 },
+          '["evaluation expiry","model change","data change","tool change","configuration change","threshold change","incident","execution mismatch","outcome mismatch"]',
       },
       {
         key: "continuingValidityMethod",
@@ -482,8 +671,8 @@ export const MODEL_EVALUATION_SECTIONS = [
         type: "textarea",
         required: true,
         placeholder:
-          "Describe how the current deployed model is continuously matched to the approved evaluation boundary.",
-        validation: { minLength: 20, maxLength: 5000 },
+          "Describe how model identity, evidence, datasets, benchmarks, thresholds, approvals, deployment binding, runtime outcomes, drift, remediation, and changes are revalidated.",
+        validation: { minLength: 20, maxLength: 7000 },
       },
     ],
   },
@@ -491,11 +680,11 @@ export const MODEL_EVALUATION_SECTIONS = [
 
 export const MODEL_EVALUATION_SCENARIOS = [
   {
-    scenarioId: "MODEL-BASELINE-ALLOW",
+    scenarioId: "MODEL-EVALUATION-BASELINE-ALLOW",
     laneId: "model-evaluation",
-    title: "Approved model evaluation baseline",
+    title: "Complete model evaluation baseline",
     description:
-      "The identified model, version, use, datasets, methods, thresholds, authority, monitoring, and records are complete and current.",
+      "The exact model, scope, datasets, benchmarks, metrics, thresholds, methods, reviewers, approval, deployment conditions, and replay requirements are complete and current.",
     scenarioClass: "BASELINE",
     required: true,
     preconditions: [],
@@ -519,119 +708,178 @@ export const MODEL_EVALUATION_SCENARIOS = [
     recoveryRequirements: [],
   },
   {
-    scenarioId: "MODEL-VERSION-MISMATCH",
+    scenarioId: "MODEL-EVALUATION-MODEL-IDENTITY-MISSING",
     laneId: "model-evaluation",
-    title: "Deployed model version differs from evaluated version",
+    title: "Model identity missing",
     description:
-      "The model presented for use does not match the exact model artifact or hosted version that was evaluated.",
-    scenarioClass: "EXECUTION_MISMATCH",
-    required: true,
-    preconditions: [],
-    injections: [
-      {
-        injectionId: "MODEL-VERSION-MISMATCH-I01",
-        title: "Change model version",
-        description:
-          "Replace the evaluated model version with a materially different version.",
-        mutationType: "CHANGE_MODEL",
-        target: "modelVersion",
-        value: "unevaluated-version",
-      },
-    ],
-    expectedGateStatuses: {
-      G01_ROUTE_IDENTITY: "FAIL",
-      G08_DEPENDENCY_INTEGRITY: "FAIL",
-      G10_EXECUTION_CONSTRAINT: "FAIL",
-      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
-    },
-    expectedDetermination: "DENY",
-    recoveryRequirements: [
-      "Block use of the unevaluated model version.",
-      "Preserve the mismatch record.",
-      "Evaluate the new version before release.",
-    ],
-  },
-  {
-    scenarioId: "MODEL-OUT-OF-SCOPE-USE",
-    laneId: "model-evaluation",
-    title: "Model used outside the evaluated purpose",
-    description:
-      "A model evaluated for one task, population, language, or environment is proposed for a materially different use.",
+      "The evaluated model, version, provider, hash, or configuration cannot be uniquely identified.",
     scenarioClass: "SINGLE_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "MODEL-OUT-OF-SCOPE-USE-I01",
-        title: "Change intended use",
+        injectionId: "MODEL-EVALUATION-MODEL-IDENTITY-MISSING-I01",
+        title: "Remove model identity record",
         description:
-          "Alter the requested model use beyond the declared evaluation boundary.",
-        mutationType: "ALTER_ROUTE_FIELD",
-        target: "intendedUses",
-        value: "outside-evaluated-use",
+          "Remove the evidence binding the evaluation to an exact model.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "MODEL_IDENTITY_RECORD",
+      },
+    ],
+    expectedGateStatuses: {
+      G01_ROUTE_IDENTITY: "FAIL",
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G12_RECORD_CONTINUITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Reconstruct the exact model identity and version.",
+      "Bind the configuration and provider.",
+      "Re-run and replay the evaluation.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-UNSUPPORTED-CLAIM",
+    laneId: "model-evaluation",
+    title: "Evaluation claim exceeds evidence",
+    description:
+      "The evaluation claim is broader than the tested tasks, populations, environments, metrics, or consequences.",
+    scenarioClass: "SINGLE_FAILURE",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-UNSUPPORTED-CLAIM-I01",
+        title: "Remove evaluation claim support",
+        description:
+          "Remove evidence supporting a material evaluation claim.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "GOVERNANCE_CLAIM_SUPPORT",
       },
     ],
     expectedGateStatuses: {
       G02_GOVERNANCE_CLAIM: "FAIL",
       G03_SCOPE_BOUNDARY: "FAIL",
-      G06_AUTHORITY_VALIDITY: "FAIL",
-      G10_EXECUTION_CONSTRAINT: "FAIL",
-    },
-    expectedDetermination: "DENY",
-    recoveryRequirements: [
-      "Return the use to the evaluated boundary or create a new evaluation route.",
-      "Obtain approval appropriate to the expanded use.",
-    ],
-  },
-  {
-    scenarioId: "MODEL-EVALUATION-DATASET-CHANGED",
-    laneId: "model-evaluation",
-    title: "Evaluation dataset changes after approval",
-    description:
-      "A benchmark or evaluation dataset is replaced, altered, or reweighted after the original determination.",
-    scenarioClass: "POST_ALLOW_DRIFT",
-    required: true,
-    preconditions: [],
-    injections: [
-      {
-        injectionId: "MODEL-EVALUATION-DATASET-CHANGED-I01",
-        title: "Change evaluation dataset",
-        description:
-          "Replace the approved evaluation dataset with a materially different dataset.",
-        mutationType: "CHANGE_DATA",
-        target: "evaluationDatasets",
-        value: "unapproved-evaluation-dataset",
-      },
-    ],
-    expectedGateStatuses: {
       G05_EVIDENCE_SUFFICIENCY: "FAIL",
-      G08_DEPENDENCY_INTEGRITY: "FAIL",
-      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
     },
     expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Preserve the original and changed dataset records.",
-      "Re-run affected evaluations.",
-      "Issue a new bounded determination.",
+      "Narrow the claim or expand the evaluation.",
+      "Preserve explicit limitations and non-claims.",
+      "Replay before approval.",
     ],
   },
   {
-    scenarioId: "MODEL-CRITICAL-THRESHOLD-FAILURE",
+    scenarioId: "MODEL-EVALUATION-DATASET-PROVENANCE-MISSING",
     laneId: "model-evaluation",
-    title: "Critical evaluation threshold fails",
+    title: "Evaluation dataset provenance missing",
     description:
-      "The model fails a mandatory safety, robustness, fairness, reliability, or task-performance threshold.",
+      "The origin, authority, collection method, transformation, version, or custody of a material evaluation dataset is unavailable.",
     scenarioClass: "SINGLE_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "MODEL-CRITICAL-THRESHOLD-FAILURE-I01",
-        title: "Fail mandatory threshold",
+        injectionId: "MODEL-EVALUATION-DATASET-PROVENANCE-MISSING-I01",
+        title: "Remove dataset provenance",
         description:
-          "Alter an observed evaluation result so a mandatory threshold is not met.",
+          "Remove provenance evidence for a mandatory evaluation dataset.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "DATASET_PROVENANCE_RECORD",
+      },
+    ],
+    expectedGateStatuses: {
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G12_RECORD_CONTINUITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Restore dataset provenance and custody.",
+      "Verify transformations and version.",
+      "Re-run affected evaluations.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-DATASET-CONTAMINATION",
+    laneId: "model-evaluation",
+    title: "Benchmark contamination detected",
+    description:
+      "Training overlap, memorization, leakage, prompt disclosure, or repeated tuning materially compromises benchmark validity.",
+    scenarioClass: "COMPOUND_FAILURE",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-DATASET-CONTAMINATION-I01",
+        title: "Create contamination evidence conflict",
+        description:
+          "Introduce conflicting evidence showing likely benchmark contamination.",
+        mutationType: "CREATE_EVIDENCE_CONFLICT",
+        target: "contaminationControls",
+      },
+    ],
+    expectedGateStatuses: {
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G11_INTERVENTION_ESCALATION: "PASS",
+    },
+    expectedDetermination: "ESCALATE",
+    recoveryRequirements: [
+      "Preserve contamination evidence.",
+      "Replace or quarantine the affected benchmark.",
+      "Perform an independent clean evaluation.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-NONREPRESENTATIVE-DATA",
+    laneId: "model-evaluation",
+    title: "Evaluation population not representative",
+    description:
+      "The tested dataset does not adequately represent the intended deployment population, conditions, language, geography, or edge cases.",
+    scenarioClass: "COMPOUND_FAILURE",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-NONREPRESENTATIVE-DATA-I01",
+        title: "Alter evaluation population",
+        description:
+          "Change the evaluated population so it no longer corresponds to the intended use.",
         mutationType: "ALTER_ROUTE_FIELD",
-        target: "metricsAndThresholds",
+        target: "evaluationScope",
+        value: "nonrepresentative-evaluation-population",
+      },
+    ],
+    expectedGateStatuses: {
+      G03_SCOPE_BOUNDARY: "FAIL",
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Add representative data and edge conditions.",
+      "Recalculate subgroup results.",
+      "Narrow deployment until evidence is sufficient.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-THRESHOLD-FAILURE",
+    laneId: "model-evaluation",
+    title: "Mandatory evaluation threshold failed",
+    description:
+      "The model fails a required performance, safety, fairness, security, robustness, or calibration threshold.",
+    scenarioClass: "SINGLE_FAILURE",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-THRESHOLD-FAILURE-I01",
+        title: "Alter threshold result",
+        description:
+          "Set a mandatory benchmark result below the approved threshold.",
+        mutationType: "ALTER_ROUTE_FIELD",
+        target: "decisionThresholds",
         value: "mandatory-threshold-failed",
       },
     ],
@@ -639,135 +887,358 @@ export const MODEL_EVALUATION_SCENARIOS = [
       G05_EVIDENCE_SUFFICIENCY: "PASS",
       G07_RULE_CONTROL_BINDING: "FAIL",
       G10_EXECUTION_CONSTRAINT: "FAIL",
-      G12_RECORD_CONTINUITY: "PASS",
     },
-    expectedDetermination: "HOLD",
+    expectedDetermination: "DENY",
     recoveryRequirements: [
-      "Restrict release or use.",
-      "Correct the model, method, or use boundary.",
-      "Repeat the failed evaluation.",
+      "Do not approve the failed model for the claimed use.",
+      "Remediate or narrow scope.",
+      "Perform a new independent evaluation.",
     ],
   },
   {
-    scenarioId: "MODEL-EVIDENCE-CONFLICT",
+    scenarioId: "MODEL-EVALUATION-REPRODUCIBILITY-FAILURE",
     laneId: "model-evaluation",
-    title: "Independent evaluations materially conflict",
+    title: "Evaluation cannot be reproduced",
     description:
-      "Two current and credible evaluation records reach materially different findings about the same model and use.",
+      "Independent reruns materially differ because the harness, model configuration, environment, seed, dependency, or scoring process is incomplete or unstable.",
     scenarioClass: "COMPOUND_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "MODEL-EVIDENCE-CONFLICT-I01",
-        title: "Create evaluation conflict",
+        injectionId: "MODEL-EVALUATION-REPRODUCIBILITY-FAILURE-I01",
+        title: "Remove reproducibility record",
         description:
-          "Introduce a second valid evaluation result that contradicts a material finding.",
-        mutationType: "CREATE_EVIDENCE_CONFLICT",
-        target: "evaluationMethods",
+          "Remove evidence needed to independently reproduce the evaluation.",
+        mutationType: "REMOVE_EVIDENCE",
+        target: "REPRODUCIBILITY_RECORD",
       },
     ],
     expectedGateStatuses: {
-      G05_EVIDENCE_SUFFICIENCY: "ESCALATED",
-      G06_AUTHORITY_VALIDITY: "PASS",
-      G12_RECORD_CONTINUITY: "PASS",
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G12_RECORD_CONTINUITY: "FAIL",
     },
-    expectedDetermination: "ESCALATE",
+    expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Preserve both evaluation records.",
-      "Assign an authorized independent reviewer.",
-      "Resolve or explicitly bound the disagreement.",
+      "Freeze the harness, environment, configuration, and dependencies.",
+      "Perform independent reruns.",
+      "Preserve variance and resolution evidence.",
     ],
   },
   {
-    scenarioId: "MODEL-HUMAN-REVIEW-INEFFECTIVE",
+    scenarioId: "MODEL-EVALUATION-EVIDENCE-CONFLICT",
     laneId: "model-evaluation",
-    title: "Required human review is not operational",
+    title: "Material evaluation evidence conflict",
     description:
-      "Human review is declared, but reviewers lack qualification, access, time, authority, or intervention capability.",
-    scenarioClass: "ADVERSARIAL",
+      "Authoritative evaluation records materially disagree about a benchmark result, threshold, limitation, safety condition, or approval basis.",
+    scenarioClass: "COMPOUND_FAILURE",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "MODEL-HUMAN-REVIEW-INEFFECTIVE-I01",
-        title: "Block meaningful human review",
+        injectionId: "MODEL-EVALUATION-EVIDENCE-CONFLICT-I01",
+        title: "Create evaluation evidence conflict",
         description:
-          "Prevent the designated reviewer from inspecting or restricting the model.",
-        mutationType: "BLOCK_HUMAN_INTERVENTION",
-        target: "humanReviewPlan",
+          "Introduce contradictory evidence for a material evaluation result.",
+        mutationType: "CREATE_EVIDENCE_CONFLICT",
+        target: "benchmarkDefinitions",
       },
     ],
     expectedGateStatuses: {
-      G09_HUMAN_OVERSIGHT: "FAIL",
-      G11_INTERVENTION_ESCALATION: "FAIL",
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G11_INTERVENTION_ESCALATION: "PASS",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
     },
-    expectedDetermination: "HOLD",
+    expectedDetermination: "ESCALATE",
     recoveryRequirements: [
-      "Provide qualified reviewers with timely access and real intervention authority.",
-      "Test the review and restriction process.",
+      "Preserve all conflicting evidence.",
+      "Perform an independent adjudication and rerun.",
+      "Suspend approval until resolved.",
     ],
   },
   {
-    scenarioId: "MODEL-PRODUCTION-DRIFT",
+    scenarioId: "MODEL-EVALUATION-APPROVAL-AUTHORITY-REVOKED",
     laneId: "model-evaluation",
-    title: "Production behavior materially drifts",
+    title: "Model approval authority revoked",
     description:
-      "Observed production behavior, inputs, populations, or performance materially departs from the evaluated boundary.",
+      "The authority supporting evaluation approval or deployment commitment is no longer valid.",
     scenarioClass: "POST_ALLOW_DRIFT",
     required: true,
     preconditions: [],
     injections: [
       {
-        injectionId: "MODEL-PRODUCTION-DRIFT-I01",
-        title: "Introduce material model drift",
+        injectionId: "MODEL-EVALUATION-APPROVAL-AUTHORITY-REVOKED-I01",
+        title: "Revoke approval authority",
         description:
-          "Alter production behavior or context beyond the declared monitoring threshold.",
-        mutationType: "ALTER_ROUTE_FIELD",
-        target: "driftDetectionPlan",
-        value: "material-drift-detected",
+          "Invalidate the authority that approved the evaluated model.",
+        mutationType: "REVOKE_AUTHORITY",
+        target: "AUTHORITY_RECORD",
       },
     ],
     expectedGateStatuses: {
-      G03_SCOPE_BOUNDARY: "FAIL",
-      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G06_AUTHORITY_VALIDITY: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Suspend deployment reliance.",
+      "Obtain valid replacement authority.",
+      "Issue a new approval and replay result.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-EXPIRED",
+    laneId: "model-evaluation",
+    title: "Evaluation validity expired",
+    description:
+      "The preserved evaluation is outside its approved validity window.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-EXPIRED-I01",
+        title: "Expire evaluation evidence",
+        description:
+          "Expire the evaluation record supporting deployment.",
+        mutationType: "EXPIRE_EVIDENCE",
+        target: "EVALUATION_PLAN",
+      },
+    ],
+    expectedGateStatuses: {
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
       G10_EXECUTION_CONSTRAINT: "FAIL",
       G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
     },
     expectedDetermination: "HOLD",
     recoveryRequirements: [
-      "Restrict or suspend affected use.",
-      "Preserve drift evidence.",
-      "Re-evaluate the current model and context.",
+      "Perform the required re-evaluation.",
+      "Confirm no material drift occurred.",
+      "Issue renewed approval before execution.",
     ],
   },
   {
-    scenarioId: "MODEL-RECOVERY-REPLAY",
+    scenarioId: "MODEL-EVALUATION-MODEL-CHANGE",
     laneId: "model-evaluation",
-    title: "Corrected model evaluation and replay",
+    title: "Model changed after evaluation",
     description:
-      "A prior failed or held evaluation is corrected, preserved, repeated, and issued as a new determination.",
+      "The model identity, weights, provider release, architecture, or configuration changes after approval.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-MODEL-CHANGE-I01",
+        title: "Change evaluated model",
+        description:
+          "Replace or modify the approved model.",
+        mutationType: "CHANGE_MODEL",
+        target: "modelVersion",
+      },
+    ],
+    expectedGateStatuses: {
+      G01_ROUTE_IDENTITY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Identify and preserve the changed model.",
+      "Repeat all applicable mandatory evaluations.",
+      "Obtain new approval and replay.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-DATA-CHANGE",
+    laneId: "model-evaluation",
+    title: "Evaluation data changed after approval",
+    description:
+      "A material dataset, source, population, schema, labeling rule, transformation, or quality condition changes after approval.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-DATA-CHANGE-I01",
+        title: "Change evaluation data",
+        description:
+          "Alter a material dataset used by the evaluation.",
+        mutationType: "CHANGE_DATA",
+        target: "datasetInventory",
+      },
+    ],
+    expectedGateStatuses: {
+      G05_EVIDENCE_SUFFICIENCY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Document and assess the changed data.",
+      "Revalidate provenance, representativeness, and contamination controls.",
+      "Re-run affected benchmarks.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-TOOL-CHANGE",
+    laneId: "model-evaluation",
+    title: "Evaluation tool or harness changed",
+    description:
+      "The test harness, scorer, runtime, dependency, connector, or evaluation tool changes after approval.",
+    scenarioClass: "POST_ALLOW_DRIFT",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-TOOL-CHANGE-I01",
+        title: "Change evaluation tool",
+        description:
+          "Replace a material evaluation tool or harness component.",
+        mutationType: "CHANGE_TOOL",
+        target: "testHarness",
+      },
+    ],
+    expectedGateStatuses: {
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G08_DEPENDENCY_INTEGRITY: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Identify and validate the changed tool.",
+      "Reproduce baseline results.",
+      "Re-run affected evaluations and replay.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-HUMAN-INTERVENTION-BLOCKED",
+    laneId: "model-evaluation",
+    title: "Independent evaluation intervention blocked",
+    description:
+      "The evaluator, reviewer, or approval authority cannot challenge, stop, hold, deny, or escalate the evaluation route.",
+    scenarioClass: "ADVERSARIAL",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-HUMAN-INTERVENTION-BLOCKED-I01",
+        title: "Block evaluator intervention",
+        description:
+          "Prevent required human review or stop authority.",
+        mutationType: "BLOCK_HUMAN_INTERVENTION",
+        target: "independenceControls",
+      },
+    ],
+    expectedGateStatuses: {
+      G09_HUMAN_OVERSIGHT: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G11_INTERVENTION_ESCALATION: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Restore independent review and stop authority.",
+      "Reassess affected evaluation decisions.",
+      "Replay before approval.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-EXECUTION-MISMATCH",
+    laneId: "model-evaluation",
+    title: "Deployed model differs from evaluated model",
+    description:
+      "The model, version, configuration, prompt, tool access, data boundary, or environment used in execution differs from the evaluated and approved route.",
+    scenarioClass: "EXECUTION_MISMATCH",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-EXECUTION-MISMATCH-I01",
+        title: "Create model execution mismatch",
+        description:
+          "Cause runtime execution to use a model or configuration different from the approved evaluation.",
+        mutationType: "CREATE_EXECUTION_MISMATCH",
+        target: "executionReceipt",
+      },
+    ],
+    expectedGateStatuses: {
+      G01_ROUTE_IDENTITY: "FAIL",
+      G03_SCOPE_BOUNDARY: "FAIL",
+      G07_RULE_CONTROL_BINDING: "FAIL",
+      G10_EXECUTION_CONSTRAINT: "FAIL",
+      G12_RECORD_CONTINUITY: "PASS",
+      G13_OUTCOME_CORRESPONDENCE: "FAIL",
+    },
+    expectedDetermination: "DENY",
+    recoveryRequirements: [
+      "Stop the mismatched deployment.",
+      "Preserve the evaluated and actual runtime identities.",
+      "Investigate, remediate, re-evaluate, and replay.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-OUTCOME-MISMATCH",
+    laneId: "model-evaluation",
+    title: "Runtime outcome contradicts evaluation claim",
+    description:
+      "Measured runtime behavior or outcomes materially contradict the approved evaluation claim, threshold, limitation, subgroup result, or expected control performance.",
+    scenarioClass: "EXECUTION_MISMATCH",
+    required: true,
+    preconditions: [],
+    injections: [
+      {
+        injectionId: "MODEL-EVALUATION-OUTCOME-MISMATCH-I01",
+        title: "Create model outcome mismatch",
+        description:
+          "Provide outcome evidence that contradicts the approved evaluation.",
+        mutationType: "CREATE_OUTCOME_MISMATCH",
+        target: "measuredOutcome",
+      },
+    ],
+    expectedGateStatuses: {
+      G12_RECORD_CONTINUITY: "PASS",
+      G13_OUTCOME_CORRESPONDENCE: "FAIL",
+      G14_REPLAY_CONTINUING_VALIDITY: "FAIL",
+    },
+    expectedDetermination: "HOLD",
+    recoveryRequirements: [
+      "Preserve the contradictory outcome evidence.",
+      "Suspend or narrow deployment as required.",
+      "Reassess the claim, thresholds, datasets, controls, and model before replay.",
+    ],
+  },
+  {
+    scenarioId: "MODEL-EVALUATION-RECOVERY-REPLAY",
+    laneId: "model-evaluation",
+    title: "Corrected model evaluation recovery and replay",
+    description:
+      "A prior evaluation failure is corrected, independently verified, preserved, and replayed before renewed approval or deployment.",
     scenarioClass: "RECOVERY",
     required: true,
     preconditions: [],
     injections: [],
     expectedGateStatuses: {
       G01_ROUTE_IDENTITY: "PASS",
+      G02_GOVERNANCE_CLAIM: "PASS",
       G03_SCOPE_BOUNDARY: "PASS",
+      G04_ACTOR_IDENTITY: "PASS",
       G05_EVIDENCE_SUFFICIENCY: "PASS",
       G06_AUTHORITY_VALIDITY: "PASS",
       G07_RULE_CONTROL_BINDING: "PASS",
       G08_DEPENDENCY_INTEGRITY: "PASS",
       G09_HUMAN_OVERSIGHT: "PASS",
       G10_EXECUTION_CONSTRAINT: "PASS",
+      G11_INTERVENTION_ESCALATION: "PASS",
       G12_RECORD_CONTINUITY: "PASS",
       G14_REPLAY_CONTINUING_VALIDITY: "PASS",
     },
     expectedDetermination: "ALLOW",
     recoveryRequirements: [
-      "Preserve the original determination and failed findings.",
-      "Link the corrected evaluation to the prior version.",
-      "Issue a new determination without editing the prior record.",
+      "Preserve the original failed evaluation and determination.",
+      "Link corrected evidence, reruns, independent review, renewed authority, and remediation verification.",
+      "Issue a new replay result without altering the original record.",
     ],
   },
 ] as const satisfies readonly ScenarioDefinition[];
@@ -780,22 +1251,25 @@ export const MODEL_EVALUATION_LANE = {
   name: "Model Evaluation Governance Playground",
   shortName: "Model Evaluation",
   description:
-    "Test whether a specific model, version, use, evaluation method, threshold, approval, monitoring plan, and continuing-validity claim remain bounded and supported.",
+    "Test whether model evaluations are identifiable, bounded, representative, reproducible, independently reviewed, authority-backed, deployment-bound, outcome-verified, and continuously valid.",
   claimsGoverned: [
-    "The exact model and version under evaluation are identified.",
-    "The model is evaluated only for declared tasks, populations, environments, and use boundaries.",
-    "Evaluation methods, datasets, metrics, and thresholds are explicit and reviewable.",
-    "Release authority is valid and bounded.",
-    "Material model, data, prompt, provider, environment, or use changes invalidate prior approval until replay.",
-    "Production monitoring and human intervention are operational where required.",
-    "Evaluation findings, limitations, conflicts, corrections, and supersession remain preserved.",
+    "The exact evaluated model, version, provider, configuration, evaluation route, environment, owner, and validity period are identified.",
+    "The evaluation claim is explicit, bounded, evidence-supported, and limited to the tested tasks, populations, environments, and consequences.",
+    "Datasets are attributable, governed, representative, versioned, and protected against contamination and leakage.",
+    "Benchmarks, metrics, thresholds, subgroup tests, and baselines are defined before the result is interpreted.",
+    "The evaluation protocol, harness, configuration, environment, dependencies, scoring, and reproducibility evidence are preserved.",
+    "Safety, security, fairness, robustness, calibration, and limitation evidence are included when applicable.",
+    "Evaluators and approval authorities are competent, independent, attributable, and valid.",
+    "Deployment is bound to the exact evaluated model, configuration, scope, controls, and validity window.",
+    "Material model, data, tool, task, threshold, environment, or population changes require renewed evaluation and replay.",
+    "Runtime outcomes prove whether the approved evaluation claim remained valid in operation.",
   ],
   nonClaims: [
-    "This lane does not prove that every model output is true, safe, fair, or lawful.",
-    "This lane does not independently prove training-data ownership, privacy compliance, cybersecurity, or runtime enforcement.",
-    "Passing an evaluation does not authorize use outside the tested model, version, purpose, population, language, environment, threshold, or validity period.",
-    "This lane does not prove downstream outcome causation.",
-    "An ALLOW determination applies only to the preserved evidence, methods, thresholds, dependencies, authority, context, and evaluator version tested.",
+    "A benchmark score alone does not authorize deployment or execution.",
+    "An evaluation does not prove universal safety, legality, fairness, security, or suitability beyond its preserved scope.",
+    "Offline evaluation does not replace runtime governance, monitoring, execution control, or outcome evidence.",
+    "Average performance does not prove subgroup, edge-case, or out-of-distribution performance.",
+    "An ALLOW determination applies only to the exact model, configuration, data, benchmarks, thresholds, scope, controls, environment, and validity window preserved.",
   ],
   sections: MODEL_EVALUATION_SECTIONS,
   gateIds: MODEL_EVALUATION_GATE_IDS,
@@ -804,10 +1278,10 @@ export const MODEL_EVALUATION_LANE = {
     (scenario) => scenario.scenarioId,
   ),
   determinationGuidance: [
-    "DENY when the model identity, version, or proposed use falls outside the evaluated and authorized boundary.",
-    "ESCALATE when material evaluation evidence, authority, or interpretation conflicts require independent judgment.",
-    "HOLD when mandatory evaluation evidence, thresholds, monitoring, oversight, change control, or replay requirements remain incomplete or failed.",
-    "ALLOW only when all applicable mandatory gates pass and all required scenarios demonstrate the expected bounded behavior.",
+    "DENY when a mandatory threshold fails, approval authority is invalid, human intervention is blocked, or the deployed model differs from the evaluated and approved model.",
+    "ESCALATE when material evidence conflicts, benchmark contamination is unresolved, or superior technical, governance, legal, safety, or executive authority is required.",
+    "HOLD when model identity, datasets, provenance, representativeness, reproducibility, evaluation validity, tools, controls, review evidence, drift status, or outcome evidence is incomplete, expired, changed, or unresolved.",
+    "ALLOW only when all applicable gates pass and the exact model is supported by bounded claims, admissible evaluation evidence, valid authority, effective controls, preserved deployment binding, and continuing validity.",
   ],
   enabled: true,
   version: "1.0.0",
