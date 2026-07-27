@@ -325,7 +325,8 @@ export default function EuAiActRequirementsPage() {
   const unmappedCount = requirements.filter((item) => item.status === "Unmapped").length;
 
   return (
-    <main>
+    <main className="euPage">
+      <div className="gridOverlay" />
       <div className="stars starsOne" />
       <div className="stars starsTwo" />
       <div className="glow glowOne" />
@@ -349,7 +350,13 @@ export default function EuAiActRequirementsPage() {
       </header>
 
       <section className="hero shell">
+        <div className="heroFrame heroFrameOne" />
+        <div className="heroFrame heroFrameTwo" />
         <div className="heroCopy">
+          <div className="authorityRow">
+            <span className="authorityPill">Binding EU regulation</span>
+            <span className="authorityPill muted">Requirement mapping workspace</span>
+          </div>
           <p className="eyebrow">EU AI ACT WORKSPACE</p>
           <h1>Map every applicable requirement to evidence that can survive review.</h1>
           <p className="lead">
@@ -373,6 +380,10 @@ export default function EuAiActRequirementsPage() {
         </div>
 
         <div className="visual" aria-hidden="true">
+          <div className="visualCaption">
+            <span>Official instrument</span>
+            <strong>Regulation (EU) 2024/1689</strong>
+          </div>
           <div className="europe">
             <span className="euStars">✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦</span>
             <strong>EU</strong>
@@ -388,6 +399,7 @@ export default function EuAiActRequirementsPage() {
       </section>
 
       <section className="boundaryNotice shell">
+        <div className="boundaryIcon">LB</div>
         <p className="eyebrow">IMPORTANT BOUNDARY</p>
         <h2>This workspace supports compliance evidence. It does not provide legal certification.</h2>
         <p>
@@ -399,6 +411,7 @@ export default function EuAiActRequirementsPage() {
       </section>
 
       <section className="summary shell">
+        <div className="summaryRail" />
         <article>
           <span>{requirements.length}</span>
           <strong>Requirements listed</strong>
@@ -418,6 +431,7 @@ export default function EuAiActRequirementsPage() {
       </section>
 
       <section className="requirementsSection shell" id="requirements">
+        <div className="sectionGlow" />
         <div className="sectionIntro">
           <p className="eyebrow">REQUIREMENT LIBRARY</p>
           <h2>Review the applicable obligation and the evidence needed to support it.</h2>
@@ -458,7 +472,7 @@ export default function EuAiActRequirementsPage() {
             const isOpen = expanded === item.id;
 
             return (
-              <article className={`requirement ${isOpen ? "open" : ""}`} key={item.id}>
+              <article className={`requirement ${isOpen ? "open" : ""} ${item.status.toLowerCase()}`} key={item.id}>
                 <button
                   type="button"
                   className="requirementHeader"
@@ -537,6 +551,7 @@ export default function EuAiActRequirementsPage() {
       </section>
 
       <section className="workflow shell">
+        <div className="workflowRail" />
         <div>
           <p className="eyebrow">GOVERNED COMPLIANCE WORKFLOW</p>
           <h2>Requirement → Evidence → Review → Determination → Preservation</h2>
@@ -567,6 +582,7 @@ export default function EuAiActRequirementsPage() {
       </section>
 
       <section className="finalCta shell">
+        <div className="ctaGlow" />
         <div>
           <p className="eyebrow">NEXT STEP</p>
           <h2>Turn the requirement list into an attributable review record.</h2>
@@ -591,6 +607,348 @@ export default function EuAiActRequirementsPage() {
       </footer>
 
       <style jsx>{`
+
+        .euPage {
+          background:
+            radial-gradient(circle at 50% -8%, rgba(66, 144, 255, 0.08), transparent 34%),
+            radial-gradient(circle at 12% 32%, rgba(65, 214, 255, 0.05), transparent 24%);
+        }
+
+        .gridOverlay {
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: -2;
+          opacity: 0.16;
+          background-image:
+            linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+          background-size: 48px 48px;
+          mask-image: linear-gradient(to bottom, black, transparent 86%);
+        }
+
+        .topbar {
+          margin-top: 18px;
+          padding: 0 18px;
+          border: 1px solid rgba(132, 154, 188, 0.16);
+          border-radius: 20px;
+          background:
+            linear-gradient(180deg, rgba(13, 27, 47, 0.88), rgba(7, 15, 27, 0.82));
+          box-shadow:
+            0 18px 54px rgba(0,0,0,.26),
+            inset 0 1px 0 rgba(255,255,255,.035);
+          backdrop-filter: blur(18px);
+        }
+
+        .hero {
+          position: relative;
+          min-height: 690px;
+          margin-top: 22px;
+          padding-inline: 46px;
+          border: 1px solid rgba(125, 170, 223, 0.14);
+          border-radius: 34px;
+          background:
+            radial-gradient(circle at 76% 42%, rgba(66, 145, 255, 0.11), transparent 27%),
+            linear-gradient(145deg, rgba(10, 22, 39, 0.91), rgba(4, 10, 20, 0.95));
+          box-shadow:
+            0 34px 90px rgba(0,0,0,.34),
+            inset 0 1px 0 rgba(255,255,255,.03);
+          overflow: hidden;
+        }
+
+        .heroFrame {
+          position: absolute;
+          border: 1px solid rgba(102, 181, 255, 0.08);
+          border-radius: 999px;
+          pointer-events: none;
+        }
+
+        .heroFrameOne {
+          width: 620px;
+          height: 620px;
+          right: -180px;
+          top: -220px;
+        }
+
+        .heroFrameTwo {
+          width: 420px;
+          height: 420px;
+          left: -220px;
+          bottom: -230px;
+          border-color: rgba(255, 216, 102, 0.06);
+        }
+
+        .authorityRow {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 9px;
+          margin-bottom: 18px;
+        }
+
+        .authorityPill {
+          display: inline-flex;
+          align-items: center;
+          min-height: 30px;
+          padding: 0 12px;
+          border: 1px solid rgba(107, 188, 255, 0.28);
+          border-radius: 999px;
+          color: #9fd2ff;
+          background: rgba(62, 139, 224, 0.08);
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: .1em;
+          text-transform: uppercase;
+        }
+
+        .authorityPill.muted {
+          color: #8fa2b5;
+          border-color: rgba(255,255,255,.08);
+          background: rgba(255,255,255,.025);
+        }
+
+        .visualCaption {
+          position: absolute;
+          top: 8px;
+          right: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          padding: 12px 14px;
+          border: 1px solid rgba(255,255,255,.08);
+          border-radius: 14px;
+          background: rgba(5, 13, 25, .65);
+          backdrop-filter: blur(12px);
+        }
+
+        .visualCaption span {
+          color: #71869b;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .visualCaption strong {
+          color: #d9ebfb;
+          font-size: 11px;
+        }
+
+        .boundaryNotice,
+        .requirementsSection,
+        .workflow,
+        .finalCta {
+          position: relative;
+          overflow: hidden;
+          border-radius: 30px;
+          box-shadow:
+            0 28px 80px rgba(0, 0, 0, 0.28),
+            inset 0 1px 0 rgba(255,255,255,.025);
+        }
+
+        .boundaryIcon {
+          width: 76px;
+          height: 76px;
+          margin: 0 auto 18px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(255, 216, 102, .26);
+          border-radius: 50%;
+          color: #f5d680;
+          background: rgba(255, 216, 102, .04);
+          font: 700 22px Georgia, serif;
+          box-shadow: 0 0 36px rgba(255, 216, 102, .08);
+        }
+
+        .summary {
+          position: relative;
+          padding-top: 34px;
+        }
+
+        .summaryRail,
+        .workflowRail {
+          position: absolute;
+          left: 0;
+          right: 0;
+          top: 0;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(106, 184, 255, .5), transparent);
+        }
+
+        .summary article {
+          position: relative;
+          overflow: hidden;
+          min-height: 150px;
+          border-radius: 22px;
+          background:
+            radial-gradient(circle at 100% 0%, rgba(109, 184, 255, .08), transparent 40%),
+            linear-gradient(145deg, rgba(14, 27, 45, .88), rgba(7, 14, 26, .95));
+          box-shadow:
+            0 20px 56px rgba(0,0,0,.24),
+            inset 0 1px 0 rgba(255,255,255,.025);
+        }
+
+        .summary article::after {
+          content: "";
+          position: absolute;
+          width: 120px;
+          height: 120px;
+          right: -52px;
+          bottom: -62px;
+          border: 1px solid rgba(109, 184, 255, .08);
+          border-radius: 50%;
+        }
+
+        .summary span {
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 42px;
+        }
+
+        .sectionGlow {
+          position: absolute;
+          width: 420px;
+          height: 420px;
+          right: -190px;
+          top: -190px;
+          border-radius: 50%;
+          background: rgba(76, 160, 255, .08);
+          filter: blur(40px);
+          pointer-events: none;
+        }
+
+        .requirementsSection {
+          background:
+            radial-gradient(circle at 100% 0%, rgba(66, 145, 255, .08), transparent 28%),
+            linear-gradient(180deg, rgba(12, 21, 36, 0.94), rgba(7, 13, 24, 0.97));
+        }
+
+        .filters {
+          padding: 18px;
+          border: 1px solid rgba(127, 159, 194, 0.14);
+          border-radius: 18px;
+          background: rgba(4, 11, 22, 0.42);
+        }
+
+        .requirement {
+          position: relative;
+          border-radius: 20px;
+          background:
+            linear-gradient(145deg, rgba(10, 20, 35, .96), rgba(6, 13, 24, .98));
+          box-shadow:
+            0 16px 44px rgba(0,0,0,.2),
+            inset 0 1px 0 rgba(255,255,255,.02);
+          transition:
+            transform .22s ease,
+            border-color .22s ease,
+            box-shadow .22s ease;
+        }
+
+        .requirement::before {
+          content: "";
+          position: absolute;
+          inset: 0 auto 0 0;
+          width: 3px;
+          background: #69b6ff;
+          opacity: .6;
+        }
+
+        .requirement.partial::before {
+          background: #ffd875;
+        }
+
+        .requirement.unmapped::before {
+          background: #ff9292;
+        }
+
+        .requirement:hover {
+          transform: translateY(-2px);
+          border-color: rgba(91, 174, 255, 0.34);
+          box-shadow:
+            0 22px 54px rgba(0,0,0,.26),
+            0 0 24px rgba(81, 163, 255, .05);
+        }
+
+        .requirement.open {
+          box-shadow:
+            0 26px 64px rgba(0,0,0,.3),
+            0 0 32px rgba(91, 174, 255, .07);
+        }
+
+        .articleBadge {
+          min-height: 64px;
+          border-radius: 16px;
+          background:
+            radial-gradient(circle at 50% 0%, rgba(102, 181, 255, .12), transparent 60%),
+            rgba(61, 139, 224, 0.07);
+          box-shadow: inset 0 0 18px rgba(102, 181, 255, .04);
+        }
+
+        .requirementBody {
+          background:
+            linear-gradient(180deg, rgba(10,20,36,.48), rgba(6,13,24,.24));
+        }
+
+        .evidenceTags span {
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.025);
+        }
+
+        .workflow {
+          padding-top: 50px;
+        }
+
+        .workflowGrid article {
+          position: relative;
+          min-height: 210px;
+          overflow: hidden;
+          border-radius: 20px;
+          background:
+            radial-gradient(circle at 100% 0%, rgba(91, 174, 255, .08), transparent 40%),
+            linear-gradient(145deg, rgba(12, 28, 48, .74), rgba(6, 14, 26, .9));
+          box-shadow:
+            0 18px 48px rgba(0,0,0,.2),
+            inset 0 1px 0 rgba(255,255,255,.025);
+        }
+
+        .workflowGrid article::after {
+          content: "";
+          position: absolute;
+          width: 110px;
+          height: 110px;
+          right: -54px;
+          bottom: -58px;
+          border: 1px solid rgba(105, 179, 255, .08);
+          border-radius: 50%;
+        }
+
+        .workflowGrid span {
+          display: inline-flex;
+          width: 42px;
+          height: 42px;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(105,179,255,.22);
+          border-radius: 12px;
+          background: rgba(69, 144, 226, .08);
+        }
+
+        .finalCta {
+          min-height: 320px;
+          background:
+            radial-gradient(circle at 85% 50%, rgba(75, 162, 255, .13), transparent 30%),
+            radial-gradient(circle at 12% 0%, rgba(255, 216, 102, .06), transparent 28%),
+            linear-gradient(145deg, rgba(11, 25, 43, .96), rgba(5, 12, 23, .99));
+        }
+
+        .ctaGlow {
+          position: absolute;
+          width: 420px;
+          height: 420px;
+          right: -150px;
+          top: -120px;
+          border-radius: 50%;
+          border: 1px solid rgba(102,181,255,.08);
+          pointer-events: none;
+        }
+
         :global(*) {
           box-sizing: border-box;
         }
