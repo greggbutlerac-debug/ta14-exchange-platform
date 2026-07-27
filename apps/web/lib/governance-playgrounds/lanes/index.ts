@@ -1,7 +1,8 @@
 /**
  * TA-14 Governance Playground Lane Registry
  *
- * Central export and ordered registry for every supported governance lane.
+ * This registry includes only lane modules that currently exist in the repository.
+ * Add security-third-party and outcome-assurance after those files are uploaded.
  */
 
 export { AGENT_TOOLS_LANE } from "./agent-tools";
@@ -11,11 +12,9 @@ export { DECISION_LANE } from "./decision";
 export { GENERAL_LANE } from "./general";
 export { HUMAN_OVERSIGHT_LANE } from "./human-oversight";
 export { MODEL_EVALUATION_LANE } from "./model-evaluation";
-export { OUTCOME_ASSURANCE_LANE } from "./outcome-assurance";
 export { POLICY_CONTROLS_LANE } from "./policy-controls";
 export { RISK_LANE } from "./risk";
 export { RUNTIME_EXECUTION_LANE } from "./runtime-execution";
-export { SECURITY_THIRD_PARTY_LANE } from "./security-third-party";
 
 import { AGENT_TOOLS_LANE } from "./agent-tools";
 import { COMPLIANCE_REGULATORY_LANE } from "./compliance-regulatory";
@@ -24,25 +23,21 @@ import { DECISION_LANE } from "./decision";
 import { GENERAL_LANE } from "./general";
 import { HUMAN_OVERSIGHT_LANE } from "./human-oversight";
 import { MODEL_EVALUATION_LANE } from "./model-evaluation";
-import { OUTCOME_ASSURANCE_LANE } from "./outcome-assurance";
 import { POLICY_CONTROLS_LANE } from "./policy-controls";
 import { RISK_LANE } from "./risk";
 import { RUNTIME_EXECUTION_LANE } from "./runtime-execution";
-import { SECURITY_THIRD_PARTY_LANE } from "./security-third-party";
 
 export const GOVERNANCE_PLAYGROUND_LANES = [
   GENERAL_LANE,
   DECISION_LANE,
   RISK_LANE,
-  DATA_PROVENANCE_LANE,
+  RUNTIME_EXECUTION_LANE,
   MODEL_EVALUATION_LANE,
+  DATA_PROVENANCE_LANE,
   AGENT_TOOLS_LANE,
   HUMAN_OVERSIGHT_LANE,
   POLICY_CONTROLS_LANE,
   COMPLIANCE_REGULATORY_LANE,
-  SECURITY_THIRD_PARTY_LANE,
-  RUNTIME_EXECUTION_LANE,
-  OUTCOME_ASSURANCE_LANE,
 ] as const;
 
 export type GovernancePlaygroundLane =
@@ -57,12 +52,10 @@ export const GOVERNANCE_PLAYGROUND_LANE_IDS =
 export const GOVERNANCE_PLAYGROUND_LANES_BY_ID =
   Object.fromEntries(
     GOVERNANCE_PLAYGROUND_LANES.map((lane) => [lane.laneId, lane]),
-  ) as {
-    [LaneId in GovernancePlaygroundLaneId]: Extract<
-      GovernancePlaygroundLane,
-      { laneId: LaneId }
-    >;
-  };
+  ) as Record<
+    GovernancePlaygroundLaneId,
+    GovernancePlaygroundLane
+  >;
 
 export function getGovernancePlaygroundLane(
   laneId: string,
