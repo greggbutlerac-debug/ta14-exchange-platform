@@ -236,7 +236,7 @@ export default function GovernanceLibraryPage() {
                 </div>
 
                 <Link
-                  href={`/ai-governance/playground?lane=${architecture.lane}`}
+                  href={`/workspace?lane=${architecture.lane}`}
                   className="laneButton"
                 >
                   Open governed lane <span>→</span>
