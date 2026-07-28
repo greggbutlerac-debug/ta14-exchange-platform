@@ -11,21 +11,52 @@ type NavigationItem = {
   partner?: boolean;
 };
 
+const aiGovernanceHomeHref = '/workspace/ai-governance';
+const playgroundHref = '/workspace/ai-governance/playground';
+const demonstrationsHref = '/workspace/ai-governance/demonstrations';
+const euAiActHref = '/workspace/ai-governance/eu-ai-act';
+const governanceLibraryHref = '/workspace/ai-governance/library';
+const registryHref = '/workspace/ai-governance/registry';
 const partnerReviewNetworkHref =
   '/workspace/ai-governance/partner-review-network';
+const pricingHref = '/workspace/ai-governance/pricing';
 
 const workspaceNavigation: NavigationItem[] = [
   {
-    href: '/workspace/ai-governance',
-    label: 'Playground',
-    glyph: '◈',
-    matchPrefixes: ['/workspace/ai-governance'],
+    href: aiGovernanceHomeHref,
+    label: 'Workspace Home',
+    glyph: '⌂',
+    matchPrefixes: [aiGovernanceHomeHref],
   },
   {
-    href: '/workspace/demonstrations',
+    href: playgroundHref,
+    label: 'Playground',
+    glyph: '◈',
+    matchPrefixes: [playgroundHref],
+  },
+  {
+    href: demonstrationsHref,
     label: 'Demonstrations',
     glyph: '◎',
-    matchPrefixes: ['/workspace/demonstrations'],
+    matchPrefixes: [demonstrationsHref],
+  },
+  {
+    href: euAiActHref,
+    label: 'EU AI Act',
+    glyph: 'EU',
+    matchPrefixes: [euAiActHref],
+  },
+  {
+    href: governanceLibraryHref,
+    label: 'Governance Library',
+    glyph: 'L',
+    matchPrefixes: [governanceLibraryHref],
+  },
+  {
+    href: registryHref,
+    label: 'Registry',
+    glyph: 'RG',
+    matchPrefixes: [registryHref],
   },
   {
     href: '/workspace/routes/new',
@@ -47,24 +78,22 @@ const workspaceNavigation: NavigationItem[] = [
     partner: true,
   },
   {
-    href: '/workspace/ai-governance/pricing',
+    href: pricingHref,
     label: 'Pricing',
     glyph: '$',
-    matchPrefixes: ['/workspace/ai-governance/pricing'],
+    matchPrefixes: [pricingHref],
   },
 ];
 
 const mobileNavigation: NavigationItem[] = [
   workspaceNavigation[0],
-  workspaceNavigation[2],
-  workspaceNavigation[3],
-  workspaceNavigation[4],
-  workspaceNavigation[5],
+  workspaceNavigation[1],
+  workspaceNavigation[6],
+  workspaceNavigation[7],
+  workspaceNavigation[8],
 ];
 
 function isItemActive(pathname: string, item: NavigationItem) {
-  const prefixes = item.matchPrefixes ?? [item.href];
-
   if (item.href === '/workspace/routes') {
     return (
       pathname === '/workspace/routes' ||
@@ -73,9 +102,11 @@ function isItemActive(pathname: string, item: NavigationItem) {
     );
   }
 
-  if (item.href === '/workspace/ai-governance') {
-    return pathname === '/workspace/ai-governance';
+  if (item.href === aiGovernanceHomeHref) {
+    return pathname === aiGovernanceHomeHref;
   }
+
+  const prefixes = item.matchPrefixes ?? [item.href];
 
   return prefixes.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
