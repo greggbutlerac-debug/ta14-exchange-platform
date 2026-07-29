@@ -3,228 +3,395 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
-type GateState = "SUPPORTED" | "DEFECT" | "UNRESOLVED" | "NOT_REVIEWED";
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
+type AnchorState = "SUPPORTED" | "DEFECT" | "UNRESOLVED" | "NOT_REVIEWED";
+type Severity = "NONE" | "LOW" | "MATERIAL" | "CRITICAL";
+type Confidence = "LOW" | "MODERATE" | "HIGH";
 
-type Gate = {
-  id: string;
-  anchor: string;
-  title: string;
+type AnchorKey =
+  | "reality"
+  | "record"
+  | "continuity"
+  | "admissibility"
+  | "binding"
+  | "commit"
+  | "execution"
+  | "outcome";
+
+type AnchorDefinition = {
+  key: AnchorKey;
+  label: string;
+  shortLabel: string;
   question: string;
-  support: string;
-  failure: string;
+  supportedPrompt: string;
+  defectPrompt: string;
+  unresolvedPrompt: string;
+  failureSignals: string[];
 };
 
-type RouteScenario = {
+type Mission = {
   id: string;
   title: string;
   domain: string;
-  request: string;
-  evidence: string[];
-  defects: string[];
+  consequence: string;
+  routeSummary: string;
+  evidencePackage: string[];
+  knownChanges: string[];
+  hiddenRisk: string;
   expectedDecision: Decision;
-  rationale: string;
+  expectedSeverity: Severity;
+  expectedDefects: AnchorKey[];
+  explanation: string;
 };
 
-type GateRecord = {
-  state: GateState;
+type AnchorReview = {
+  state: AnchorState;
   note: string;
+  source: string;
+  correctiveAction: string;
 };
 
-type ScenarioRecord = {
+type MissionReview = {
   reviewer: string;
-  gates: Record<string, GateRecord>;
+  organization: string;
+  reviewedAt: string;
+  anchorReviews: Record<AnchorKey, AnchorReview>;
+  severity: Severity;
+  confidence: Confidence;
   decision: Decision | "";
   rationale: string;
-  remediation: string;
+  challengeQuestion: string;
+  remediationPlan: string;
+  verificationPlan: string;
   completed: boolean;
-  reviewedAt: string;
 };
 
-const STORAGE_KEY = "ta14-academy-route-validation-workshop-v2";
+type PersistedState = {
+  version: "3.0";
+  updatedAt: string;
+  activeMissionId: string;
+  reviews: Record<string, MissionReview>;
+};
 
-const gates: Gate[] = [
+const STORAGE_KEY = "ta14-academy-route-validation-workshop-v3";
+
+const anchors: AnchorDefinition[] = [
   {
-    id: "reality",
-    anchor: "Reality",
-    title: "The execution subject is correctly established",
-    question: "Does the route identify the actual person, system, asset, event, environment, or transaction that will be affected?",
-    support: "Preserve identifiers, timestamps, location, system state, and other facts that establish the execution subject.",
-    failure: "A substituted, ambiguous, stale, simulated, or unverified reality cannot support binding consequence.",
+    key: "reality",
+    label: "Reality",
+    shortLabel: "01",
+    question: "Does the route begin from the condition that actually exists now?",
+    supportedPrompt: "Identify the present condition, subject, environment, and consequence boundary that remain verified.",
+    defectPrompt: "Describe any mismatch, substitution, assumption, stale condition, or invented fact at the beginning of the route.",
+    unresolvedPrompt: "Identify what cannot yet be known and what evidence is required to establish reality.",
+    failureSignals: [
+      "The route relies on an assumed condition rather than a verified condition.",
+      "The subject, system, person, asset, or environment cannot be specifically identified.",
+      "A material condition changed after the route was constructed.",
+    ],
   },
   {
-    id: "record",
-    anchor: "Record",
-    title: "The evidence package is preserved",
-    question: "Is the evidence attributable, inspectable, current enough, and connected to the identified reality?",
-    support: "Cite the record, evidence package, source, version, timestamp, and custody basis.",
-    failure: "Missing, unverifiable, contradicted, or unattributed evidence requires the route to pause.",
+    key: "record",
+    label: "Record",
+    shortLabel: "02",
+    question: "Is the reality preserved in an attributable and reviewable record?",
+    supportedPrompt: "Cite the record, source, timestamp, instrument, author, version, or evidence package supporting the route.",
+    defectPrompt: "Identify missing attribution, incomplete evidence, contradictory records, or evidence that cannot be independently inspected.",
+    unresolvedPrompt: "State which record element remains unavailable and whether a replacement record can be lawfully obtained.",
+    failureSignals: [
+      "The route cites conclusions without preserving the underlying evidence.",
+      "The record lacks timestamps, attribution, version history, or source identity.",
+      "The record was altered without a preserved change history.",
+    ],
   },
   {
-    id: "continuity",
-    anchor: "Continuity",
-    title: "No unexplained break exists",
-    question: "Can the route be traced continuously from reality through the current request without an ungoverned gap?",
-    support: "Preserve handoffs, versions, dependency changes, custody, and all material transitions.",
-    failure: "An unexplained break prevents the route from proving that current evidence still corresponds to current reality.",
+    key: "continuity",
+    label: "Continuity",
+    shortLabel: "03",
+    question: "Can the evidence be traced continuously from capture to the present review?",
+    supportedPrompt: "Describe custody, version, handoff, revalidation, elapsed time, and dependency checks preserving correspondence.",
+    defectPrompt: "Locate the unexplained gap, broken handoff, stale interval, or version discontinuity.",
+    unresolvedPrompt: "State which interval cannot be accounted for and what revalidation must occur.",
+    failureSignals: [
+      "There is an ungoverned interval between evidence capture and execution.",
+      "A handoff occurred without attributable receipt or acceptance.",
+      "The route cannot prove that the current condition still corresponds to the original record.",
+    ],
   },
   {
-    id: "admissibility",
-    anchor: "Admissibility",
-    title: "The evidence is fit for this decision",
-    question: "Is the available evidence sufficient, current, relevant, reliable, and within the decision boundary?",
-    support: "Explain why the evidence is admissible for this exact determination now.",
-    failure: "Evidence may exist and still be inadmissible because it is stale, incomplete, irrelevant, or outside scope.",
+    key: "admissibility",
+    label: "Admissibility",
+    shortLabel: "04",
+    question: "Is the evidence sufficient, current, relevant, and conflict-resolved for this exact decision?",
+    supportedPrompt: "Explain why the evidence is enough for this consequence and why remaining uncertainty does not defeat the decision.",
+    defectPrompt: "Identify insufficiency, staleness, unresolved conflict, missing threshold, or evidence that supports a different conclusion.",
+    unresolvedPrompt: "Define the uncertainty that prevents an admissibility determination and the evidence needed to resolve it.",
+    failureSignals: [
+      "The route treats available evidence as sufficient merely because it exists.",
+      "Conflicting evidence was ignored or explained away without review.",
+      "The decision threshold was never defined.",
+    ],
   },
   {
-    id: "binding",
-    anchor: "Binding",
-    title: "Valid authority supports the consequence",
-    question: "Does a current authority permit this actor or system to bind this action to reality?",
-    support: "Identify the policy, delegation, role, approval, contract, order, or legal source supporting the action.",
-    failure: "Identity, access, or technical capability does not alone establish binding authority.",
+    key: "binding",
+    label: "Binding",
+    shortLabel: "05",
+    question: "Does a valid authority have power to bind this exact decision and consequence?",
+    supportedPrompt: "Identify the governing authority, role, delegation, jurisdiction, limits, and conditions that remain valid.",
+    defectPrompt: "Identify expired, absent, exceeded, conditional, conflicted, or incorrectly delegated authority.",
+    unresolvedPrompt: "State which authority question requires qualified review before the route can bind.",
+    failureSignals: [
+      "The actor has system access but lacks authority for the consequence.",
+      "The approval applies to a different action, subject, jurisdiction, or threshold.",
+      "Authority expired or was superseded before execution.",
+    ],
   },
   {
-    id: "commit",
-    anchor: "Commit",
-    title: "The exact approved state is preserved",
-    question: "Is the decision, version, evidence basis, boundary, and intended execution committed before action?",
-    support: "Preserve the approved instruction, version history, decision record, and rollback conditions.",
-    failure: "An uncommitted or silently modified route cannot prove what was actually authorized.",
+    key: "commit",
+    label: "Commit",
+    shortLabel: "06",
+    question: "Is the approved state fixed, attributable, versioned, and protected from silent change?",
+    supportedPrompt: "Identify the approved version, decision record, limits, dependencies, rationale, and accountable authority.",
+    defectPrompt: "Identify an unversioned change, mutable approval, missing rationale, or dependency that changed after commitment.",
+    unresolvedPrompt: "State what must be fixed before an execution state can be committed.",
+    failureSignals: [
+      "The route can change after approval without renewed review.",
+      "The approved execution package lacks a preserved version or fingerprint.",
+      "Dependencies are referenced but not frozen or revalidated.",
+    ],
   },
   {
-    id: "execution",
-    anchor: "Execution",
-    title: "The proposed method corresponds to the approved method",
-    question: "Will execution use the same controls, sequence, limits, actor, tools, and safeguards that were reviewed?",
-    support: "Record the procedure, control set, stop conditions, monitoring method, and exception path.",
-    failure: "Method drift, control bypass, or scope expansion invalidates the original route approval.",
+    key: "execution",
+    label: "Execution",
+    shortLabel: "07",
+    question: "Is the proposed action precisely bounded, controlled, and correspondent to the approved route?",
+    supportedPrompt: "Define the exact action, operator, sequence, duration, controls, stop conditions, rollback, and prohibited actions.",
+    defectPrompt: "Identify scope expansion, method substitution, bypassed control, missing stop condition, or execution drift.",
+    unresolvedPrompt: "State which execution element is too ambiguous to permit consequence.",
+    failureSignals: [
+      "The approved action and the actual action are not the same.",
+      "The route lacks stop conditions, rollback, supervision, or bounded duration.",
+      "A tool or operator changed without revalidation.",
+    ],
   },
   {
-    id: "outcome",
-    anchor: "Outcome",
-    title: "The result can be verified and preserved",
-    question: "Can the consequence be observed, tested, attributed, challenged, and preserved after execution?",
-    support: "Define expected result, acceptance criteria, monitoring, reversal path, and outcome evidence.",
-    failure: "A route is incomplete when it cannot prove what happened after consequence occurred.",
+    key: "outcome",
+    label: "Outcome",
+    shortLabel: "08",
+    question: "Can the result be verified, preserved, challenged, and linked back to the authorized execution?",
+    supportedPrompt: "Define success, failure, observation period, evidence capture, attribution, review, and challenge path.",
+    defectPrompt: "Identify an unverifiable result, missing outcome evidence, absent monitoring, or consequence beyond the approved boundary.",
+    unresolvedPrompt: "State what must be observable or preserved before outcome verification is possible.",
+    failureSignals: [
+      "The route ends when the action occurs rather than when the outcome is verified.",
+      "No independent evidence proves that the intended result occurred.",
+      "Adverse consequences have no preserved challenge or correction path.",
+    ],
   },
 ];
 
-const scenarios: RouteScenario[] = [
+const missions: Mission[] = [
   {
-    id: "autonomous-refund",
-    title: "Autonomous Customer Refund",
-    domain: "Financial execution integrity",
-    request: "Release a $7,850 refund automatically after a customer-service model classifies the complaint as valid.",
-    evidence: [
-      "Customer and transaction identities are verified.",
-      "The original purchase record is preserved.",
-      "The model output includes a confidence score and reason codes.",
-      "A refund policy exists for amounts below $5,000.",
+    id: "facility-restart",
+    title: "Facility Restart After Environmental Drift",
+    domain: "Environmental integrity governance",
+    consequence: "Restarting the facility could expose occupants and equipment to an unresolved moisture and pressure condition.",
+    routeSummary: "A facility shutdown route was constructed from a verified high-dew-point condition. Operations now requests restart based on a verbal report that the condition has improved.",
+    evidencePackage: [
+      "Original atmospheric integrity record with timestamped dew point and pressure data.",
+      "Shutdown authorization tied to the original evidence package.",
+      "A verbal statement from maintenance that the space feels dry.",
+      "No preserved post-remediation sensor record.",
     ],
-    defects: [
-      "The requested refund exceeds the automated authority threshold.",
-      "No authorized reviewer has approved the higher consequence.",
-      "The model used a policy summary rather than the current governing policy version.",
+    knownChanges: [
+      "Outdoor conditions changed materially.",
+      "A temporary dehumidifier was moved between zones.",
+      "No current continuity record proves the original risk is resolved.",
     ],
-    expectedDecision: "ESCALATE",
-    rationale: "The claim may be supported, but the amount exceeds delegated automated authority and the governing policy source is not current. A qualified authority must rebind the route.",
-  },
-  {
-    id: "hvac-intervention",
-    title: "HVAC Refrigerant Intervention",
-    domain: "Environmental and mechanical governance",
-    request: "Add refrigerant based on low suction pressure observed before airflow was verified.",
-    evidence: [
-      "Equipment identity and service location are preserved.",
-      "A low-pressure observation is recorded.",
-      "The technician is EPA 608 certified.",
-    ],
-    defects: [
-      "Airflow and static pressure were not established.",
-      "No primary refrigerant determination is preserved.",
-      "Current superheat or subcooling evidence is missing.",
-      "Certification establishes handling authority, not diagnostic admissibility.",
-    ],
+    hiddenRisk: "The actor requesting restart has operational access but no authority to supersede the environmental hold.",
     expectedDecision: "HOLD",
-    rationale: "The proposed intervention lacks an admissible diagnostic basis. The route must pause until airflow, load, and refrigerant evidence establish the actual condition.",
+    expectedSeverity: "MATERIAL",
+    expectedDefects: ["record", "continuity", "admissibility", "binding", "outcome"],
+    explanation: "The route cannot move from shutdown to restart on an unpreserved verbal assurance. Current environmental evidence and valid release authority are required before execution.",
   },
   {
-    id: "access-revocation",
-    title: "Privileged Access Revocation",
-    domain: "Identity and access governance",
-    request: "Immediately revoke a contractor's production access after the contract termination event is confirmed.",
-    evidence: [
-      "The contractor identity is verified.",
-      "The termination event is preserved and attributable.",
-      "The access account and affected systems are identified.",
-      "The security policy expressly requires immediate revocation.",
-      "The revocation action is logged and reversible by an authorized administrator.",
+    id: "model-release",
+    title: "AI Model Release With a Changed Dependency",
+    domain: "Enterprise AI governance",
+    consequence: "A changed retrieval source could alter recommendations delivered to regulated users.",
+    routeSummary: "A model release was approved after testing against a fixed knowledge source. The deployment team replaced that source with a newer index to improve performance.",
+    evidencePackage: [
+      "Approved evaluation package for model version 4.2.",
+      "Signed deployment record naming the original retrieval index.",
+      "Change ticket showing the newer index was substituted after approval.",
+      "No regression test for the substituted index.",
     ],
-    defects: [],
+    knownChanges: [
+      "A material dependency changed after commitment.",
+      "The model binary is unchanged.",
+      "The expected user population and consequence remain unchanged.",
+    ],
+    hiddenRisk: "The deployment team assumes that an unchanged model means an unchanged governed execution.",
+    expectedDecision: "HOLD",
+    expectedSeverity: "CRITICAL",
+    expectedDefects: ["continuity", "admissibility", "commit", "execution", "outcome"],
+    explanation: "The dependency substitution breaks correspondence between the tested route and the proposed execution. The combined system must be revalidated before release.",
+  },
+  {
+    id: "payment-threshold",
+    title: "Automated Payment Above the Approved Threshold",
+    domain: "Financial execution integrity",
+    consequence: "A payment may bind beyond the amount and authority originally reviewed.",
+    routeSummary: "A claim was approved below an automated payment threshold. A later fee increased the amount above that threshold, but the system still presents the original approval token.",
+    evidencePackage: [
+      "Claimant identity and eligibility record.",
+      "Original approval for the lower payment amount.",
+      "System-generated fee added after approval.",
+      "Current payment instruction above the automated threshold.",
+    ],
+    knownChanges: [
+      "The financial consequence increased.",
+      "The payment destination remains verified.",
+      "No qualified reviewer approved the new amount.",
+    ],
+    hiddenRisk: "The route appears technically complete because the approval token remains valid in the system.",
+    expectedDecision: "ESCALATE",
+    expectedSeverity: "MATERIAL",
+    expectedDefects: ["binding", "commit", "execution"],
+    explanation: "The original approval cannot silently stretch to a larger consequence. The correct disposition is escalation to the authority assigned to the higher threshold.",
+  },
+  {
+    id: "registry-acceptance",
+    title: "Governed Record Registry Acceptance",
+    domain: "Governed records",
+    consequence: "Acceptance makes the record available as an official institutional artifact.",
+    routeSummary: "An inspection package has completed review and is ready for acceptance into the governed registry.",
+    evidencePackage: [
+      "Attributable inspection record with verified asset identity.",
+      "Complete evidence package and hash manifest.",
+      "Preserved version history and reviewer disposition.",
+      "Valid acceptance authority and registry scope.",
+      "Defined post-acceptance verification and challenge path.",
+    ],
+    knownChanges: [],
+    hiddenRisk: "The reviewer must still verify that the acceptance action exactly matches the approved registry scope.",
     expectedDecision: "ALLOW",
-    rationale: "Reality, evidence, authority, scope, method, and outcome verification all correspond to the required revocation action.",
+    expectedSeverity: "NONE",
+    expectedDefects: [],
+    explanation: "The route remains complete, continuous, attributable, bounded, and verifiable. Acceptance is supported if the reviewer confirms each anchor without contradiction.",
   },
   {
-    id: "medical-denial",
-    title: "Automated Treatment Denial",
-    domain: "High-consequence decision governance",
-    request: "Deny a requested treatment because a prediction model classifies the patient as unlikely to benefit.",
-    evidence: [
-      "The patient identity and request are preserved.",
-      "The model output is available.",
+    id: "clinical-alert",
+    title: "Clinical Alert With Conflicting Evidence",
+    domain: "High-consequence decision support",
+    consequence: "An automated escalation could trigger intervention based on a conflicted patient state.",
+    routeSummary: "A clinical alert recommends immediate escalation. One current measurement supports the alert, while a second verified source contradicts it.",
+    evidencePackage: [
+      "Timestamped alert from the monitoring system.",
+      "A separate verified measurement captured within the same interval.",
+      "The two sources are materially inconsistent.",
+      "No conflict-resolution protocol has been completed.",
     ],
-    defects: [
-      "The model was not validated for the patient's condition and population.",
-      "Material clinical evidence is missing from the input record.",
-      "No qualified clinical authority reviewed the denial.",
-      "No challenge or appeal path is included before consequence.",
+    knownChanges: [
+      "The patient's condition may be changing rapidly.",
+      "Both sources are attributable and current.",
+      "The governing route requires qualified review when evidence conflicts.",
     ],
-    expectedDecision: "DENY",
-    rationale: "The route cannot lawfully or operationally support the denial because evidence fitness, authority, and challenge protections are absent.",
+    hiddenRisk: "The urgency of the alert may pressure the reviewer to treat one source as dispositive without preserving the conflict.",
+    expectedDecision: "ESCALATE",
+    expectedSeverity: "CRITICAL",
+    expectedDefects: ["admissibility", "execution"],
+    explanation: "Current evidence exists, but it is not yet admissible for autonomous binding because the conflict is unresolved. Qualified escalation preserves urgency without pretending certainty.",
   },
 ];
 
-function blankRecord(): ScenarioRecord {
+const stateDescriptions: Record<AnchorState, string> = {
+  SUPPORTED: "The anchor is affirmatively supported by preserved evidence.",
+  DEFECT: "A material defect prevents this anchor from supporting execution.",
+  UNRESOLVED: "The anchor cannot yet be classified because required evidence or authority is missing.",
+  NOT_REVIEWED: "No review determination has been preserved for this anchor.",
+};
+
+const stateLabels: Record<AnchorState, string> = {
+  SUPPORTED: "Supported",
+  DEFECT: "Defect",
+  UNRESOLVED: "Unresolved",
+  NOT_REVIEWED: "Not reviewed",
+};
+
+const decisions: Array<{ value: Decision; title: string; description: string }> = [
+  { value: "ALLOW", title: "ALLOW", description: "Every required anchor is supported and the execution remains inside its approved boundary." },
+  { value: "HOLD", title: "HOLD", description: "A correctable defect or unresolved condition prevents execution now." },
+  { value: "DENY", title: "DENY", description: "The route lacks a lawful or admissible basis and cannot be corrected within this request." },
+  { value: "ESCALATE", title: "ESCALATE", description: "A qualified authority must resolve a conflict, threshold, or consequence beyond the reviewer’s scope." },
+];
+
+function emptyAnchorReview(): AnchorReview {
+  return { state: "NOT_REVIEWED", note: "", source: "", correctiveAction: "" };
+}
+
+function createMissionReview(): MissionReview {
   return {
     reviewer: "",
-    gates: Object.fromEntries(gates.map((gate) => [gate.id, { state: "NOT_REVIEWED", note: "" }])) as Record<string, GateRecord>,
+    organization: "",
+    reviewedAt: "",
+    anchorReviews: anchors.reduce((accumulator, anchor) => {
+      accumulator[anchor.key] = emptyAnchorReview();
+      return accumulator;
+    }, {} as Record<AnchorKey, AnchorReview>),
+    severity: "NONE",
+    confidence: "MODERATE",
     decision: "",
     rationale: "",
-    remediation: "",
+    challengeQuestion: "",
+    remediationPlan: "",
+    verificationPlan: "",
     completed: false,
-    reviewedAt: "",
   };
 }
 
+function createInitialReviews(): Record<string, MissionReview> {
+  return missions.reduce((accumulator, mission) => {
+    accumulator[mission.id] = createMissionReview();
+    return accumulator;
+  }, {} as Record<string, MissionReview>);
+}
+
+function downloadJson(filename: string, payload: unknown) {
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
 export default function RouteValidationWorkshopPage() {
-  const [activeScenarioId, setActiveScenarioId] = useState(scenarios[0].id);
-  const [records, setRecords] = useState<Record<string, ScenarioRecord>>(() =>
-    Object.fromEntries(scenarios.map((scenario) => [scenario.id, blankRecord()]))
-  );
+  const [activeMissionId, setActiveMissionId] = useState(missions[0].id);
+  const [reviews, setReviews] = useState<Record<string, MissionReview>>(createInitialReviews);
+  const [activeAnchor, setActiveAnchor] = useState<AnchorKey>("reality");
   const [hydrated, setHydrated] = useState(false);
-  const [showAnswer, setShowAnswer] = useState(false);
-  const [exportMessage, setExportMessage] = useState("");
+  const [saveState, setSaveState] = useState<"idle" | "saved" | "error">("idle");
+  const [showReference, setShowReference] = useState(false);
+  const [showFailureSignals, setShowFailureSignals] = useState(false);
 
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as { activeScenarioId?: string; records?: Record<string, ScenarioRecord> };
-        if (parsed.activeScenarioId) setActiveScenarioId(parsed.activeScenarioId);
-        if (parsed.records) {
-          setRecords((current) => {
-            const next = { ...current };
-            for (const scenario of scenarios) {
-              const saved = parsed.records?.[scenario.id];
-              if (saved) next[scenario.id] = { ...blankRecord(), ...saved };
-            }
-            return next;
-          });
+        const parsed = JSON.parse(raw) as Partial<PersistedState>;
+        if (parsed.version === "3.0" && parsed.reviews) {
+          setReviews((current) => ({ ...current, ...parsed.reviews }));
+          if (parsed.activeMissionId && missions.some((mission) => mission.id === parsed.activeMissionId)) {
+            setActiveMissionId(parsed.activeMissionId);
+          }
         }
       }
     } catch {
-      // Ignore malformed local state and continue with a clean workshop.
+      setSaveState("error");
     } finally {
       setHydrated(true);
     }
@@ -232,240 +399,660 @@ export default function RouteValidationWorkshopPage() {
 
   useEffect(() => {
     if (!hydrated) return;
-    window.localStorage.setItem(
-      STORAGE_KEY,
-      JSON.stringify({ version: "2.0", activeScenarioId, records, updatedAt: new Date().toISOString() })
+    const timeout = window.setTimeout(() => {
+      try {
+        const state: PersistedState = {
+          version: "3.0",
+          updatedAt: new Date().toISOString(),
+          activeMissionId,
+          reviews,
+        };
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        setSaveState("saved");
+      } catch {
+        setSaveState("error");
+      }
+    }, 400);
+
+    return () => window.clearTimeout(timeout);
+  }, [activeMissionId, hydrated, reviews]);
+
+  const activeMission = useMemo(
+    () => missions.find((mission) => mission.id === activeMissionId) ?? missions[0],
+    [activeMissionId],
+  );
+
+  const activeReview = reviews[activeMission.id] ?? createMissionReview();
+  const activeDefinition = anchors.find((anchor) => anchor.key === activeAnchor) ?? anchors[0];
+  const activeAnchorReview = activeReview.anchorReviews[activeAnchor];
+
+  const missionMetrics = useMemo(() => {
+    const records = Object.values(activeReview.anchorReviews);
+    const supported = records.filter((record) => record.state === "SUPPORTED").length;
+    const defects = records.filter((record) => record.state === "DEFECT").length;
+    const unresolved = records.filter((record) => record.state === "UNRESOLVED").length;
+    const reviewed = records.filter((record) => record.state !== "NOT_REVIEWED").length;
+    const notesComplete = records.filter((record) => record.note.trim().length >= 25).length;
+    const anchorScore = Math.round((reviewed / anchors.length) * 60);
+    const noteScore = Math.round((notesComplete / anchors.length) * 20);
+    const decisionScore = activeReview.decision ? 10 : 0;
+    const rationaleScore = activeReview.rationale.trim().length >= 50 ? 10 : 0;
+    const readiness = anchorScore + noteScore + decisionScore + rationaleScore;
+    return { supported, defects, unresolved, reviewed, notesComplete, readiness };
+  }, [activeReview]);
+
+  const globalMetrics = useMemo(() => {
+    const missionReviews = missions.map((mission) => reviews[mission.id] ?? createMissionReview());
+    const completed = missionReviews.filter((review) => review.completed).length;
+    const anchorsReviewed = missionReviews.reduce(
+      (total, review) => total + Object.values(review.anchorReviews).filter((record) => record.state !== "NOT_REVIEWED").length,
+      0,
     );
-  }, [activeScenarioId, records, hydrated]);
+    const totalAnchors = missions.length * anchors.length;
+    const progress = Math.round(((anchorsReviewed + completed * 2) / (totalAnchors + missions.length * 2)) * 100);
+    return { completed, anchorsReviewed, totalAnchors, progress };
+  }, [reviews]);
 
-  useEffect(() => {
-    setShowAnswer(false);
-    setExportMessage("");
-  }, [activeScenarioId]);
+  const decisionConflict = useMemo(() => {
+    if (!activeReview.decision) return "Select a decision after completing the anchor review.";
+    if (activeReview.decision === "ALLOW" && (missionMetrics.defects > 0 || missionMetrics.unresolved > 0 || missionMetrics.reviewed < anchors.length)) {
+      return "ALLOW conflicts with the preserved route record because at least one anchor is defective, unresolved, or not reviewed.";
+    }
+    if (activeReview.decision === "DENY" && missionMetrics.defects === 0 && missionMetrics.unresolved === 0) {
+      return "DENY requires a preserved basis. The current anchor record contains no defect or unresolved condition.";
+    }
+    if (activeReview.decision === "HOLD" && missionMetrics.defects === 0 && missionMetrics.unresolved === 0) {
+      return "HOLD should identify the correctable defect or unresolved condition preventing execution now.";
+    }
+    return "The selected decision is structurally consistent with the current route review.";
+  }, [activeReview.decision, missionMetrics]);
 
-  const activeScenario = scenarios.find((scenario) => scenario.id === activeScenarioId) ?? scenarios[0];
-  const activeRecord = records[activeScenario.id] ?? blankRecord();
+  const canComplete =
+    missionMetrics.reviewed === anchors.length &&
+    missionMetrics.notesComplete === anchors.length &&
+    Boolean(activeReview.decision) &&
+    activeReview.rationale.trim().length >= 50 &&
+    activeReview.reviewer.trim().length >= 2 &&
+    activeReview.reviewedAt.trim().length > 0 &&
+    !(activeReview.decision === "ALLOW" && (missionMetrics.defects > 0 || missionMetrics.unresolved > 0));
 
-  const counts = useMemo(() => {
-    const values = Object.values(activeRecord.gates);
-    return {
-      supported: values.filter((gate) => gate.state === "SUPPORTED").length,
-      defect: values.filter((gate) => gate.state === "DEFECT").length,
-      unresolved: values.filter((gate) => gate.state === "UNRESOLVED").length,
-      reviewed: values.filter((gate) => gate.state !== "NOT_REVIEWED").length,
-    };
-  }, [activeRecord.gates]);
-
-  const completion = Math.round((counts.reviewed / gates.length) * 100);
-  const completedMissions = Object.values(records).filter((record) => record.completed).length;
-
-  function updateRecord(updater: (record: ScenarioRecord) => ScenarioRecord) {
-    setRecords((current) => ({ ...current, [activeScenario.id]: updater(current[activeScenario.id] ?? blankRecord()) }));
+  function updateReview(mutator: (review: MissionReview) => MissionReview) {
+    setReviews((current) => ({
+      ...current,
+      [activeMission.id]: mutator(current[activeMission.id] ?? createMissionReview()),
+    }));
+    setSaveState("idle");
   }
 
-  function updateGate(gateId: string, patch: Partial<GateRecord>) {
-    updateRecord((record) => ({
-      ...record,
+  function updateAnchorReview(patch: Partial<AnchorReview>) {
+    updateReview((review) => ({
+      ...review,
       completed: false,
-      gates: { ...record.gates, [gateId]: { ...record.gates[gateId], ...patch } },
+      anchorReviews: {
+        ...review.anchorReviews,
+        [activeAnchor]: { ...review.anchorReviews[activeAnchor], ...patch },
+      },
     }));
   }
 
-  function finalizeReview() {
-    if (counts.reviewed < gates.length || !activeRecord.decision || !activeRecord.rationale.trim()) return;
-    updateRecord((record) => ({ ...record, completed: true, reviewedAt: new Date().toISOString() }));
+  function setMission(id: string) {
+    setActiveMissionId(id);
+    setActiveAnchor("reality");
+    setShowReference(false);
+    setShowFailureSignals(false);
   }
 
   function resetMission() {
-    setRecords((current) => ({ ...current, [activeScenario.id]: blankRecord() }));
-    setShowAnswer(false);
-    setExportMessage("");
+    if (!window.confirm("Reset this mission review? This removes the saved work for the active mission.")) return;
+    setReviews((current) => ({ ...current, [activeMission.id]: createMissionReview() }));
+    setActiveAnchor("reality");
+    setShowReference(false);
+    setShowFailureSignals(false);
   }
 
-  function exportRecord() {
+  function completeMission() {
+    if (!canComplete) return;
+    updateReview((review) => ({ ...review, completed: true }));
+  }
+
+  function exportMission() {
     const payload = {
       recordType: "TA-14 Academy Route Validation Record",
-      schemaVersion: "2.0",
+      recordVersion: "3.0",
       exportedAt: new Date().toISOString(),
-      scenario: activeScenario,
-      learnerRecord: activeRecord,
-      governingRule: "No admissible evidence. No admissible execution.",
+      principle: "No admissible evidence. No admissible execution.",
+      mission: activeMission,
+      review: activeReview,
+      metrics: missionMetrics,
+      structuralWarning: decisionConflict,
     };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `TA-14_Route_Validation_${activeScenario.id}_${new Date().toISOString().slice(0, 10)}.json`;
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    URL.revokeObjectURL(url);
-    setExportMessage("Governed validation record exported.");
+    downloadJson(`ta14-route-validation-${activeMission.id}-${Date.now()}.json`, payload);
   }
 
-  const decisionConflict = Boolean(activeRecord.decision && activeRecord.decision !== activeScenario.expectedDecision);
+  function exportWorkshop() {
+    const payload = {
+      recordType: "TA-14 Academy Route Validation Workshop Transcript",
+      recordVersion: "3.0",
+      exportedAt: new Date().toISOString(),
+      principle: "No admissible evidence. No admissible execution.",
+      progress: globalMetrics,
+      missions: missions.map((mission) => ({ mission, review: reviews[mission.id] ?? createMissionReview() })),
+    };
+    downloadJson(`ta14-route-validation-workshop-${Date.now()}.json`, payload);
+  }
 
   return (
-    <main className="pageShell">
-      <div className="ambient ambientOne" aria-hidden="true" />
-      <div className="ambient ambientTwo" aria-hidden="true" />
+    <main className="workshopPage">
+      <div className="cosmos" aria-hidden="true">
+        <span className="orb orbOne" />
+        <span className="orb orbTwo" />
+        <span className="orb orbThree" />
+        <span className="gridGlow" />
+      </div>
 
       <header className="topbar">
-        <Link href="/academy" className="brand">
+        <Link className="brand" href="/academy">
           <span className="brandMark">TA-14</span>
-          <span><strong>Academy</strong><small>Route Validation Workshop</small></span>
+          <span className="brandText">
+            <strong>Academy</strong>
+            <small>Route Validation Workshop</small>
+          </span>
         </Link>
-        <nav>
-          <Link href="/academy/dashboard">Mission Control</Link>
+
+        <nav aria-label="Academy navigation">
+          <Link href="/academy/routes">Route Reading</Link>
           <Link href="/academy/route-construction-lab">Construction Lab</Link>
           <Link href="/academy/review">Review Workspace</Link>
+          <Link href="/academy/dashboard">Mission Control</Link>
         </nav>
       </header>
 
       <section className="hero">
-        <div>
-          <p className="eyebrow">Applied governance workshop</p>
-          <h1>Validate the route <em>before consequence becomes real.</em></h1>
-          <p className="heroCopy">
-            A route is not valid because it looks complete. It is valid only when each governing anchor is supported by current, attributable, admissible evidence and valid authority for the exact execution proposed now.
+        <div className="heroCopy">
+          <p className="eyebrow">Challenge the route before consequence</p>
+          <h1>
+            A complete route is not automatically
+            <em> an admissible route.</em>
+          </h1>
+          <p className="heroSummary">
+            Inspect every anchor, preserve every defect, and determine whether the proposed execution has earned the right to proceed now. This workshop teaches route validation as an independent discipline—not as a final glance at an already favored decision.
           </p>
-        </div>
-        <div className="heroRule">
-          <span>Constitutional rule</span>
-          <strong>No admissible evidence.<br />No admissible execution.</strong>
-          <p>{completedMissions} of {scenarios.length} workshop missions completed</p>
-        </div>
-      </section>
 
-      <section className="missionTabs" aria-label="Validation missions">
-        {scenarios.map((scenario, index) => (
-          <button
-            type="button"
-            key={scenario.id}
-            className={scenario.id === activeScenario.id ? "active" : ""}
-            onClick={() => setActiveScenarioId(scenario.id)}
-          >
-            <span>{String(index + 1).padStart(2, "0")}</span>
-            <div><strong>{scenario.title}</strong><small>{scenario.domain}</small></div>
-            {records[scenario.id]?.completed && <b>✓</b>}
-          </button>
-        ))}
-      </section>
-
-      <section className="missionBrief">
-        <div>
-          <p className="eyebrow">Execution request</p>
-          <h2>{activeScenario.title}</h2>
-          <p className="request">{activeScenario.request}</p>
-        </div>
-        <div className="briefColumns">
-          <article>
-            <h3>Preserved evidence</h3>
-            <ul>{activeScenario.evidence.map((item) => <li key={item}>{item}</li>)}</ul>
-          </article>
-          <article className="defectBrief">
-            <h3>Known route pressure</h3>
-            {activeScenario.defects.length ? (
-              <ul>{activeScenario.defects.map((item) => <li key={item}>{item}</li>)}</ul>
-            ) : <p>No disclosed defect. Validate independently rather than assuming the route is admissible.</p>}
-          </article>
-        </div>
-      </section>
-
-      <section className="workshopGrid">
-        <aside className="progressPanel">
-          <p className="eyebrow">Validation status</p>
-          <div className="progressNumber"><strong>{completion}%</strong><span>{counts.reviewed} of {gates.length} anchors reviewed</span></div>
-          <div className="track"><span style={{ width: `${completion}%` }} /></div>
-          <div className="metricGrid">
-            <div><strong>{counts.supported}</strong><span>Supported</span></div>
-            <div><strong>{counts.defect}</strong><span>Defects</span></div>
-            <div><strong>{counts.unresolved}</strong><span>Unresolved</span></div>
+          <div className="heroRule">
+            <span>Governing principle</span>
+            <strong>No admissible evidence. No admissible execution.</strong>
           </div>
-          <label className="reviewerField">Reviewer or learner
-            <input value={activeRecord.reviewer} onChange={(e) => updateRecord((record) => ({ ...record, reviewer: e.target.value }))} placeholder="Name or identifier" />
-          </label>
-          <div className="statusRule">
-            <strong>{counts.defect > 0 || counts.unresolved > 0 ? "Route not cleared" : counts.reviewed === gates.length ? "All anchors supported" : "Review incomplete"}</strong>
-            <p>Completion is not authorization. Your final determination must correspond to the preserved record.</p>
+        </div>
+
+        <aside className="heroStatus">
+          <p className="eyebrow">Workshop progress</p>
+          <div className="largeProgress">
+            <strong>{globalMetrics.progress}%</strong>
+            <span>{globalMetrics.completed} of {missions.length} missions completed</span>
+          </div>
+          <div className="progressTrack"><span style={{ width: `${globalMetrics.progress}%` }} /></div>
+          <dl>
+            <div><dt>Anchors reviewed</dt><dd>{globalMetrics.anchorsReviewed}/{globalMetrics.totalAnchors}</dd></div>
+            <div><dt>Saved state</dt><dd>{saveState === "saved" ? "Preserved" : saveState === "error" ? "Save error" : "Updating"}</dd></div>
+            <div><dt>Version</dt><dd>Workshop 3.0</dd></div>
+          </dl>
+          <button type="button" className="secondaryButton full" onClick={exportWorkshop}>Export workshop transcript</button>
+        </aside>
+      </section>
+
+      <section className="missionStrip" aria-label="Validation missions">
+        {missions.map((mission, index) => {
+          const review = reviews[mission.id] ?? createMissionReview();
+          const isActive = mission.id === activeMission.id;
+          return (
+            <button key={mission.id} type="button" onClick={() => setMission(mission.id)} className={`missionTab ${isActive ? "active" : ""} ${review.completed ? "complete" : ""}`}>
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <div><strong>{mission.title}</strong><small>{mission.domain}</small></div>
+              <em>{review.completed ? "Complete" : "Open"}</em>
+            </button>
+          );
+        })}
+      </section>
+
+      <section className="missionOverview">
+        <div className="missionTitleBlock">
+          <p className="eyebrow">Active validation mission</p>
+          <h2>{activeMission.title}</h2>
+          <p>{activeMission.routeSummary}</p>
+        </div>
+
+        <div className="consequenceBox">
+          <span>Consequence at stake</span>
+          <strong>{activeMission.consequence}</strong>
+        </div>
+
+        <div className="overviewGrid">
+          <article>
+            <span className="cardKicker">Evidence package</span>
+            <ul>{activeMission.evidencePackage.map((item) => <li key={item}>{item}</li>)}</ul>
+          </article>
+          <article>
+            <span className="cardKicker">Known changes</span>
+            {activeMission.knownChanges.length > 0 ? <ul>{activeMission.knownChanges.map((item) => <li key={item}>{item}</li>)}</ul> : <p className="emptyState">No material changes are disclosed in the mission record.</p>}
+          </article>
+          <article className="riskCard">
+            <span className="cardKicker">Validation pressure</span>
+            <p>{activeMission.hiddenRisk}</p>
+          </article>
+        </div>
+      </section>
+
+      <section className="metricsGrid" aria-label="Mission metrics">
+        <MetricCard label="Review readiness" value={`${missionMetrics.readiness}%`} note="Anchor review, notes, decision, and rationale" />
+        <MetricCard label="Supported" value={String(missionMetrics.supported)} note="Affirmatively preserved anchors" tone="supported" />
+        <MetricCard label="Defects" value={String(missionMetrics.defects)} note="Material route failures" tone="defect" />
+        <MetricCard label="Unresolved" value={String(missionMetrics.unresolved)} note="Evidence or authority still required" tone="unresolved" />
+      </section>
+
+      <section className="validationWorkspace">
+        <aside className="anchorRail">
+          <div className="railHeader">
+            <p className="eyebrow">Eight-anchor inspection</p>
+            <strong>Select an anchor</strong>
+          </div>
+
+          <div className="anchorList">
+            {anchors.map((anchor) => {
+              const state = activeReview.anchorReviews[anchor.key].state;
+              return (
+                <button key={anchor.key} type="button" className={`anchorButton ${activeAnchor === anchor.key ? "active" : ""} state-${state.toLowerCase()}`} onClick={() => { setActiveAnchor(anchor.key); setShowFailureSignals(false); }}>
+                  <span>{anchor.shortLabel}</span>
+                  <div><strong>{anchor.label}</strong><small>{stateLabels[state]}</small></div>
+                  <em>{state === "SUPPORTED" ? "✓" : state === "DEFECT" ? "!" : state === "UNRESOLVED" ? "?" : "—"}</em>
+                </button>
+              );
+            })}
+          </div>
+
+          <div className="railProgress">
+            <span>{missionMetrics.reviewed}/{anchors.length} anchors reviewed</span>
+            <div><i style={{ width: `${Math.round((missionMetrics.reviewed / anchors.length) * 100)}%` }} /></div>
           </div>
         </aside>
 
-        <div className="gateStack">
-          {gates.map((gate, index) => {
-            const record = activeRecord.gates[gate.id];
-            return (
-              <article className={`gateCard state-${record.state.toLowerCase()}`} key={gate.id}>
-                <div className="gateHeader">
-                  <div className="gateIndex">{String(index + 1).padStart(2, "0")}</div>
-                  <div><p>{gate.anchor}</p><h3>{gate.title}</h3><span>{gate.question}</span></div>
-                </div>
-                <div className="guidance"><p><strong>Support requires:</strong> {gate.support}</p><p><strong>Failure condition:</strong> {gate.failure}</p></div>
-                <div className="stateButtons">
-                  {(["SUPPORTED", "DEFECT", "UNRESOLVED", "NOT_REVIEWED"] as GateState[]).map((state) => (
-                    <button type="button" key={state} className={record.state === state ? "selected" : ""} onClick={() => updateGate(gate.id, { state })}>{state.replace("_", " ")}</button>
-                  ))}
-                </div>
-                <label>Validation note
-                  <textarea value={record.note} onChange={(e) => updateGate(gate.id, { note: e.target.value })} placeholder="Preserve the evidence, source, limitation, conflict, or unresolved question supporting this state." />
-                </label>
-              </article>
-            );
-          })}
-        </div>
+        <article className="reviewPanel">
+          <header className="reviewHeader">
+            <div>
+              <p className="eyebrow">Anchor {activeDefinition.shortLabel}</p>
+              <h2>{activeDefinition.label}</h2>
+              <p>{activeDefinition.question}</p>
+            </div>
+            <button type="button" className="textButton" onClick={() => setShowFailureSignals((current) => !current)}>
+              {showFailureSignals ? "Hide failure signals" : "Show failure signals"}
+            </button>
+          </header>
+
+          {showFailureSignals && (
+            <div className="failureSignals">
+              <strong>Common failure signals</strong>
+              <ul>{activeDefinition.failureSignals.map((signal) => <li key={signal}>{signal}</li>)}</ul>
+            </div>
+          )}
+
+          <div className="stateSelector" role="group" aria-label={`${activeDefinition.label} validation state`}>
+            {(["SUPPORTED", "DEFECT", "UNRESOLVED", "NOT_REVIEWED"] as AnchorState[]).map((state) => (
+              <button key={state} type="button" onClick={() => updateAnchorReview({ state })} className={activeAnchorReview.state === state ? "selected" : ""}>
+                <strong>{stateLabels[state]}</strong>
+                <span>{stateDescriptions[state]}</span>
+              </button>
+            ))}
+          </div>
+
+          <div className="promptBox">
+            <span>Review guidance</span>
+            <p>
+              {activeAnchorReview.state === "SUPPORTED" && activeDefinition.supportedPrompt}
+              {activeAnchorReview.state === "DEFECT" && activeDefinition.defectPrompt}
+              {activeAnchorReview.state === "UNRESOLVED" && activeDefinition.unresolvedPrompt}
+              {activeAnchorReview.state === "NOT_REVIEWED" && "Select a state before preserving the anchor analysis."}
+            </p>
+          </div>
+
+          <div className="fieldStack">
+            <label>
+              <span>Validation analysis</span>
+              <textarea value={activeAnchorReview.note} onChange={(event) => updateAnchorReview({ note: event.target.value })} placeholder="State what the route proves, what it fails to prove, and why that matters before consequence." rows={8} />
+              <small>{activeAnchorReview.note.trim().length}/25 minimum characters for completion</small>
+            </label>
+
+            <div className="twoColumnFields">
+              <label>
+                <span>Evidence or authority source</span>
+                <textarea value={activeAnchorReview.source} onChange={(event) => updateAnchorReview({ source: event.target.value })} placeholder="Identify the record, source, version, role, threshold, or evidence package reviewed." rows={5} />
+              </label>
+              <label>
+                <span>Corrective action or revalidation</span>
+                <textarea value={activeAnchorReview.correctiveAction} onChange={(event) => updateAnchorReview({ correctiveAction: event.target.value })} placeholder="State what must change, be obtained, or be revalidated before this anchor can support execution." rows={5} />
+              </label>
+            </div>
+          </div>
+
+          <footer className="reviewFooter">
+            <button type="button" className="secondaryButton" disabled={activeAnchor === anchors[0].key} onClick={() => {
+              const index = anchors.findIndex((anchor) => anchor.key === activeAnchor);
+              if (index > 0) setActiveAnchor(anchors[index - 1].key);
+            }}>← Previous anchor</button>
+            <span>{stateLabels[activeAnchorReview.state]} · {activeAnchorReview.note.trim().length >= 25 ? "Analysis sufficient" : "Analysis incomplete"}</span>
+            <button type="button" className="primaryButton" disabled={activeAnchor === anchors[anchors.length - 1].key} onClick={() => {
+              const index = anchors.findIndex((anchor) => anchor.key === activeAnchor);
+              if (index < anchors.length - 1) setActiveAnchor(anchors[index + 1].key);
+            }}>Next anchor →</button>
+          </footer>
+        </article>
       </section>
 
-      <section className="determinationPanel">
-        <div className="determinationIntro">
-          <p className="eyebrow">Final route determination</p>
-          <h2>What has this route earned the right to do?</h2>
-          <p>Select the result supported by the completed validation record—not the result the requester prefers.</p>
+      <section className="determinationSection">
+        <div className="sectionHeading">
+          <div>
+            <p className="eyebrow">Final route determination</p>
+            <h2>What has this route earned the right to do?</h2>
+            <p>A determination must correspond to the preserved anchor record. It cannot be selected first and justified afterward.</p>
+          </div>
+          <div className={`structuralNotice ${decisionConflict.startsWith("The selected") ? "consistent" : "warning"}`}>
+            <span>Structural check</span>
+            <strong>{decisionConflict}</strong>
+          </div>
         </div>
+
         <div className="decisionGrid">
-          {(["ALLOW", "HOLD", "DENY", "ESCALATE"] as Decision[]).map((decision) => (
-            <button type="button" key={decision} className={activeRecord.decision === decision ? "selected" : ""} onClick={() => updateRecord((record) => ({ ...record, decision, completed: false }))}>
-              <strong>{decision}</strong>
-              <span>{decision === "ALLOW" && "Every required condition is affirmatively supported."}{decision === "HOLD" && "A correctable evidentiary or continuity defect remains."}{decision === "DENY" && "The action is outside admissible or lawful execution."}{decision === "ESCALATE" && "A qualified authority must resolve or rebind the route."}</span>
+          {decisions.map((item) => (
+            <button key={item.value} type="button" onClick={() => updateReview((review) => ({ ...review, completed: false, decision: item.value }))} className={`decisionCard decision-${item.value.toLowerCase()} ${activeReview.decision === item.value ? "selected" : ""}`}>
+              <span>{item.value === "ALLOW" ? "A" : item.value === "HOLD" ? "H" : item.value === "DENY" ? "D" : "E"}</span>
+              <div><strong>{item.title}</strong><p>{item.description}</p></div>
             </button>
           ))}
         </div>
-        <div className="textGrid">
-          <label>Decision rationale<textarea value={activeRecord.rationale} onChange={(e) => updateRecord((record) => ({ ...record, rationale: e.target.value, completed: false }))} placeholder="Explain how the evidence and gate states support the selected determination." /></label>
-          <label>Required remediation or next action<textarea value={activeRecord.remediation} onChange={(e) => updateRecord((record) => ({ ...record, remediation: e.target.value }))} placeholder="Define what must occur before the route can be reconsidered or executed." /></label>
+
+        <div className="determinationFields">
+          <label>
+            <span>Decision rationale</span>
+            <textarea rows={7} value={activeReview.rationale} onChange={(event) => updateReview((review) => ({ ...review, completed: false, rationale: event.target.value }))} placeholder="Explain how the anchor record supports the decision, including defects, uncertainty, authority, boundary, and consequence." />
+            <small>{activeReview.rationale.trim().length}/50 minimum characters</small>
+          </label>
+
+          <div className="threeColumnFields">
+            <label><span>Defect severity</span><select value={activeReview.severity} onChange={(event) => updateReview((review) => ({ ...review, completed: false, severity: event.target.value as Severity }))}><option>NONE</option><option>LOW</option><option>MATERIAL</option><option>CRITICAL</option></select></label>
+            <label><span>Reviewer confidence</span><select value={activeReview.confidence} onChange={(event) => updateReview((review) => ({ ...review, completed: false, confidence: event.target.value as Confidence }))}><option>LOW</option><option>MODERATE</option><option>HIGH</option></select></label>
+            <label><span>Review date and time</span><input type="datetime-local" value={activeReview.reviewedAt} onChange={(event) => updateReview((review) => ({ ...review, completed: false, reviewedAt: event.target.value }))} /></label>
+          </div>
+
+          <div className="twoColumnFields">
+            <label><span>Reviewer name</span><input value={activeReview.reviewer} onChange={(event) => updateReview((review) => ({ ...review, completed: false, reviewer: event.target.value }))} placeholder="Attributable reviewer" /></label>
+            <label><span>Organization or learning cohort</span><input value={activeReview.organization} onChange={(event) => updateReview((review) => ({ ...review, completed: false, organization: event.target.value }))} placeholder="Optional organization" /></label>
+          </div>
+
+          <div className="twoColumnFields">
+            <label><span>Challenge question</span><textarea rows={5} value={activeReview.challengeQuestion} onChange={(event) => updateReview((review) => ({ ...review, completed: false, challengeQuestion: event.target.value }))} placeholder="What is the strongest question an independent reviewer should ask before accepting this determination?" /></label>
+            <label><span>Remediation plan</span><textarea rows={5} value={activeReview.remediationPlan} onChange={(event) => updateReview((review) => ({ ...review, completed: false, remediationPlan: event.target.value }))} placeholder="What exact evidence, authority, correction, or revalidation would change the disposition?" /></label>
+          </div>
+
+          <label><span>Outcome verification plan</span><textarea rows={5} value={activeReview.verificationPlan} onChange={(event) => updateReview((review) => ({ ...review, completed: false, verificationPlan: event.target.value }))} placeholder="Define what must be observed, preserved, and reviewed after execution or remediation." /></label>
         </div>
-
-        {decisionConflict && <div className="warning"><strong>Decision conflict detected.</strong><p>Your selected determination differs from the workshop reference determination. Recheck the route or preserve a defensible reason for the difference.</p></div>}
-
-        <div className="actionRow">
-          <button type="button" className="primary" onClick={finalizeReview} disabled={counts.reviewed < gates.length || !activeRecord.decision || !activeRecord.rationale.trim()}>{activeRecord.completed ? "Validation completed" : "Complete validation"}</button>
-          <button type="button" onClick={() => setShowAnswer((current) => !current)}>{showAnswer ? "Hide reference analysis" : "Reveal reference analysis"}</button>
-          <button type="button" onClick={exportRecord} disabled={!activeRecord.completed}>Export governed record</button>
-          <button type="button" className="danger" onClick={resetMission}>Reset mission</button>
-        </div>
-        {exportMessage && <p className="exportMessage">{exportMessage}</p>}
-
-        {showAnswer && <article className="referenceAnswer"><span>Reference determination</span><strong>{activeScenario.expectedDecision}</strong><p>{activeScenario.rationale}</p></article>}
       </section>
 
-      <section className="completionBand">
-        <div><p className="eyebrow">Workshop progression</p><h2>{completedMissions === scenarios.length ? "Route validation workshop complete." : "Continue until every mission produces a preserved determination."}</h2></div>
-        <div className="footerLinks"><Link href="/academy/route-construction-lab">← Route Construction Lab</Link><Link href="/academy/review">Continue to Review Workspace →</Link></div>
+      <section className="referenceSection">
+        <div>
+          <p className="eyebrow">Instructor reference</p>
+          <h2>Compare your preserved reasoning—not just your final answer.</h2>
+          <p>The reference is revealed only after the learner has had the opportunity to make an attributable determination.</p>
+        </div>
+        <button type="button" className="secondaryButton" onClick={() => setShowReference((current) => !current)}>{showReference ? "Hide reference analysis" : "Reveal reference analysis"}</button>
+
+        {showReference && (
+          <div className="referenceCard">
+            <div className="referenceDecision"><span>Reference disposition</span><strong>{activeMission.expectedDecision}</strong><small>{activeMission.expectedSeverity} severity</small></div>
+            <div><span>Expected anchor defects</span><div className="tagList">{activeMission.expectedDefects.length > 0 ? activeMission.expectedDefects.map((key) => <em key={key}>{anchors.find((anchor) => anchor.key === key)?.label}</em>) : <em>None</em>}</div></div>
+            <div><span>Reference explanation</span><p>{activeMission.explanation}</p></div>
+            <div className={`comparison ${activeReview.decision === activeMission.expectedDecision ? "match" : "mismatch"}`}><strong>{activeReview.decision === activeMission.expectedDecision ? "Your decision matches the reference disposition." : "Your decision differs from the reference disposition."}</strong><p>A different answer is not automatically invalid, but it must be defensible from the preserved route record and governing boundary.</p></div>
+          </div>
+        )}
       </section>
+
+      <section className="completionSection">
+        <div className="completionSummary">
+          <p className="eyebrow">Mission completion</p>
+          <h2>{activeReview.completed ? "Validation record preserved." : "Complete the attributable route record."}</h2>
+          <p>{activeReview.completed ? "This mission is marked complete and remains available for review, export, reset, or further challenge." : "Every anchor requires a state and meaningful analysis. The final determination requires attribution, timing, and a preserved rationale."}</p>
+
+          <div className="completionChecklist">
+            <ChecklistItem complete={missionMetrics.reviewed === anchors.length} label="All eight anchors reviewed" />
+            <ChecklistItem complete={missionMetrics.notesComplete === anchors.length} label="Every anchor contains meaningful analysis" />
+            <ChecklistItem complete={Boolean(activeReview.decision)} label="Final determination selected" />
+            <ChecklistItem complete={activeReview.rationale.trim().length >= 50} label="Decision rationale preserved" />
+            <ChecklistItem complete={activeReview.reviewer.trim().length >= 2} label="Reviewer is attributable" />
+            <ChecklistItem complete={Boolean(activeReview.reviewedAt)} label="Review time preserved" />
+          </div>
+        </div>
+
+        <div className="completionActions">
+          <button type="button" className="primaryButton large" disabled={!canComplete} onClick={completeMission}>{activeReview.completed ? "Mission complete" : "Complete mission"}</button>
+          <button type="button" className="secondaryButton" onClick={exportMission}>Export validation record</button>
+          <button type="button" className="dangerButton" onClick={resetMission}>Reset active mission</button>
+        </div>
+      </section>
+
+      <footer className="pageFooter">
+        <div><span className="brandMark small">TA-14</span><p>Route validation is the discipline of proving that a proposed execution still corresponds to admissible reality.</p></div>
+        <nav><Link href="/academy/route-construction-lab">← Route Construction Lab</Link><Link href="/academy/review">Continue to Review Workspace →</Link></nav>
+      </footer>
 
       <style jsx>{`
-        :global(*){box-sizing:border-box} :global(body){margin:0;background:#05080d;color:#edf4f7;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-        .pageShell{min-height:100vh;position:relative;overflow:hidden;background:radial-gradient(circle at top left,rgba(49,173,194,.12),transparent 32%),linear-gradient(180deg,#071018 0%,#05080d 58%,#080d12 100%)}
-        .ambient{position:fixed;border-radius:999px;filter:blur(120px);pointer-events:none;opacity:.28}.ambientOne{width:360px;height:360px;background:#16a0b8;top:110px;right:-120px}.ambientTwo{width:280px;height:280px;background:#b7832f;bottom:40px;left:-100px}
-        .topbar{max-width:1500px;margin:auto;padding:24px 38px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid rgba(255,255,255,.08);position:relative;z-index:2}.brand{display:flex;gap:14px;align-items:center;text-decoration:none;color:#fff}.brandMark{display:grid;place-items:center;width:58px;height:58px;border:1px solid rgba(117,222,232,.5);background:rgba(15,88,99,.32);font-weight:900;letter-spacing:.05em}.brand strong,.brand small{display:block}.brand strong{font-size:16px;letter-spacing:.18em;text-transform:uppercase}.brand small{margin-top:4px;color:#8da5af}.topbar nav{display:flex;gap:9px;flex-wrap:wrap}.topbar nav a,.footerLinks a{color:#b8cad1;text-decoration:none;border:1px solid rgba(255,255,255,.1);padding:10px 14px;border-radius:999px;font-size:13px}.topbar nav a:hover,.footerLinks a:hover{color:#fff;border-color:#48c5d2}
-        .hero{max-width:1500px;margin:auto;padding:78px 38px 46px;display:grid;grid-template-columns:minmax(0,1.5fr) minmax(280px,.5fr);gap:48px;align-items:end;position:relative;z-index:1}.eyebrow{text-transform:uppercase;letter-spacing:.2em;color:#65d3dc;font-size:12px;font-weight:800;margin:0 0 13px}.hero h1{font-size:clamp(44px,6vw,84px);line-height:.96;max-width:1050px;margin:0;letter-spacing:-.055em}.hero h1 em{font-style:normal;color:#79d9df}.heroCopy{font-size:18px;line-height:1.75;color:#a9bdc5;max-width:950px;margin:28px 0 0}.heroRule{border:1px solid rgba(103,211,220,.26);background:rgba(8,22,29,.74);padding:27px;box-shadow:0 24px 80px rgba(0,0,0,.28)}.heroRule span{display:block;text-transform:uppercase;letter-spacing:.17em;color:#78939d;font-size:11px}.heroRule strong{display:block;margin:15px 0;font-size:22px;line-height:1.35}.heroRule p{margin:0;color:#65d3dc}
-        .missionTabs{max-width:1500px;margin:0 auto;padding:0 38px 34px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.missionTabs button{display:flex;text-align:left;align-items:center;gap:13px;padding:16px;border:1px solid rgba(255,255,255,.1);background:rgba(10,17,23,.72);color:#c8d5da;cursor:pointer}.missionTabs button.active{border-color:#59ccd6;background:rgba(28,111,122,.24);color:#fff}.missionTabs button>span{color:#58c9d4;font-size:12px}.missionTabs button div{min-width:0;flex:1}.missionTabs strong,.missionTabs small{display:block}.missionTabs strong{font-size:13px}.missionTabs small{margin-top:5px;color:#758b94;font-size:11px}.missionTabs b{color:#7de59e}
-        .missionBrief{max-width:1424px;margin:0 auto 28px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,rgba(14,27,36,.95),rgba(8,14,20,.95));padding:32px}.missionBrief h2{font-size:34px;margin:0 0 12px}.request{font-size:19px;color:#c8d7dc;line-height:1.6}.briefColumns{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:26px}.briefColumns article{border:1px solid rgba(255,255,255,.09);background:rgba(0,0,0,.16);padding:21px}.briefColumns h3{margin:0 0 13px;font-size:15px;color:#7ad6dd}.briefColumns ul{margin:0;padding-left:20px;color:#aebfc6;line-height:1.65}.defectBrief{border-color:rgba(224,155,69,.24)!important}.defectBrief h3{color:#e4ad61}.defectBrief p{color:#aebfc6;line-height:1.65}
-        .workshopGrid{max-width:1424px;margin:0 auto;display:grid;grid-template-columns:300px minmax(0,1fr);gap:22px;align-items:start}.progressPanel{position:sticky;top:18px;border:1px solid rgba(255,255,255,.1);background:rgba(7,14,20,.92);padding:24px}.progressNumber strong{display:block;font-size:48px}.progressNumber span{color:#849aa3;font-size:12px}.track{height:7px;background:#131e25;margin:20px 0;overflow:hidden}.track span{display:block;height:100%;background:linear-gradient(90deg,#2ba8b6,#78dde3)}.metricGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metricGrid div{padding:11px 6px;text-align:center;background:#0b151c;border:1px solid rgba(255,255,255,.07)}.metricGrid strong,.metricGrid span{display:block}.metricGrid span{font-size:9px;text-transform:uppercase;color:#778b94;margin-top:4px}.reviewerField{display:block;margin-top:22px;color:#91a6ae;font-size:12px}.reviewerField input{width:100%;margin-top:8px;padding:12px;background:#071016;border:1px solid rgba(255,255,255,.12);color:#fff}.statusRule{margin-top:18px;padding:17px;border-left:3px solid #d89e4b;background:rgba(198,132,39,.08)}.statusRule strong{font-size:14px}.statusRule p{font-size:12px;color:#8da1a9;line-height:1.55;margin-bottom:0}
-        .gateStack{display:grid;gap:14px}.gateCard{border:1px solid rgba(255,255,255,.1);background:rgba(9,16,22,.88);padding:25px;transition:.2s}.gateCard.state-supported{border-color:rgba(72,193,126,.38)}.gateCard.state-defect{border-color:rgba(228,94,87,.45)}.gateCard.state-unresolved{border-color:rgba(226,164,73,.45)}.gateHeader{display:grid;grid-template-columns:50px 1fr;gap:16px}.gateIndex{width:48px;height:48px;display:grid;place-items:center;background:#0d222a;border:1px solid rgba(77,198,210,.27);color:#66d1da;font-size:12px}.gateHeader p{margin:0 0 4px;color:#64d0da;font-size:11px;letter-spacing:.16em;text-transform:uppercase}.gateHeader h3{margin:0;font-size:21px}.gateHeader span{display:block;color:#9cb0b8;margin-top:9px;line-height:1.55}.guidance{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:19px 0}.guidance p{margin:0;padding:14px;background:#081118;color:#879ca5;font-size:12px;line-height:1.55}.guidance strong{color:#c9d7dc}.stateButtons{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.stateButtons button,.actionRow button{border:1px solid rgba(255,255,255,.12);background:#0a151c;color:#9db0b7;padding:11px;cursor:pointer;font-size:11px;font-weight:800}.stateButtons button.selected{border-color:#5ed0d9;color:#fff;background:rgba(44,148,159,.22)}.gateCard label,.textGrid label{display:block;margin-top:16px;color:#8fa4ac;font-size:12px}.gateCard textarea,.textGrid textarea{width:100%;min-height:92px;margin-top:8px;padding:13px;resize:vertical;background:#060d12;border:1px solid rgba(255,255,255,.12);color:#edf4f7;line-height:1.55}
-        .determinationPanel{max-width:1424px;margin:30px auto 0;padding:34px;border:1px solid rgba(99,209,219,.22);background:linear-gradient(145deg,rgba(13,31,39,.96),rgba(7,12,17,.96))}.determinationIntro{max-width:900px}.determinationIntro h2{font-size:38px;margin:0 0 10px}.determinationIntro>p:last-child{color:#9db0b8;line-height:1.65}.decisionGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:27px 0}.decisionGrid button{text-align:left;padding:19px;border:1px solid rgba(255,255,255,.11);background:#081118;color:#a9bac1;cursor:pointer}.decisionGrid button.selected{border-color:#5ed2dc;background:rgba(34,138,149,.23);color:#fff}.decisionGrid strong,.decisionGrid span{display:block}.decisionGrid strong{font-size:17px}.decisionGrid span{font-size:11px;line-height:1.5;margin-top:8px;color:#8499a2}.textGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.textGrid textarea{min-height:135px}.warning{margin-top:18px;border-left:4px solid #e09f43;background:rgba(204,132,37,.1);padding:18px}.warning p{margin:6px 0 0;color:#aebec4}.actionRow{display:flex;gap:9px;flex-wrap:wrap;margin-top:23px}.actionRow button{padding:13px 17px}.actionRow button.primary{background:#55cbd4;color:#041013;border-color:#55cbd4}.actionRow button.danger{border-color:rgba(225,87,82,.35);color:#e89b97}.actionRow button:disabled{opacity:.35;cursor:not-allowed}.exportMessage{color:#76dda0}.referenceAnswer{margin-top:22px;padding:24px;border:1px solid rgba(117,222,154,.3);background:rgba(37,118,73,.1)}.referenceAnswer span,.referenceAnswer strong{display:block}.referenceAnswer span{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:#77dda0}.referenceAnswer strong{font-size:30px;margin:7px 0}.referenceAnswer p{color:#aec2b5;line-height:1.65}.completionBand{max-width:1424px;margin:28px auto 0;padding:32px 0 54px;display:flex;justify-content:space-between;gap:20px;align-items:end}.completionBand h2{margin:0;max-width:850px}.footerLinks{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
-        @media(max-width:1050px){.hero,.workshopGrid{grid-template-columns:1fr}.progressPanel{position:relative;top:auto}.missionTabs{grid-template-columns:1fr 1fr}.briefColumns,.textGrid{grid-template-columns:1fr}.hero{padding-top:52px}.heroRule{max-width:480px}}
-        @media(max-width:720px){.topbar{padding:18px;align-items:flex-start}.topbar nav{display:none}.hero,.missionTabs{padding-left:18px;padding-right:18px}.missionTabs{grid-template-columns:1fr}.missionBrief,.workshopGrid,.determinationPanel,.completionBand{margin-left:18px;margin-right:18px}.missionBrief,.determinationPanel{padding:22px}.guidance,.decisionGrid,.stateButtons{grid-template-columns:1fr}.completionBand{align-items:flex-start;flex-direction:column}.footerLinks{justify-content:flex-start}.hero h1{font-size:45px}.missionBrief h2,.determinationIntro h2{font-size:28px}.gateCard{padding:18px}.gateHeader{grid-template-columns:1fr}.gateIndex{width:40px;height:40px}}
+        :global(*) { box-sizing: border-box; }
+        :global(body) { margin: 0; background: #020711; }
+        .workshopPage { position: relative; min-height: 100vh; overflow: hidden; color: #e8f2ff; background: radial-gradient(circle at 14% 6%, rgba(16,185,129,.09), transparent 28%), radial-gradient(circle at 86% 18%, rgba(34,211,238,.09), transparent 30%), linear-gradient(180deg,#020711 0%,#04101d 52%,#020711 100%); font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+        .cosmos { position: fixed; inset: 0; pointer-events: none; overflow: hidden; }
+        .orb { position: absolute; border-radius: 999px; filter: blur(100px); opacity: .28; }
+        .orbOne { width: 420px; height: 420px; left: -160px; top: 200px; background: #0ea5e9; }
+        .orbTwo { width: 500px; height: 500px; right: -220px; top: 720px; background: #10b981; }
+        .orbThree { width: 360px; height: 360px; left: 44%; bottom: -180px; background: #8b5cf6; }
+        .gridGlow { position: absolute; inset: 0; opacity: .18; background-image: linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px), linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px); background-size: 54px 54px; mask-image: linear-gradient(to bottom,black,transparent 82%); }
+        .topbar,.hero,.missionStrip,.missionOverview,.metricsGrid,.validationWorkspace,.determinationSection,.referenceSection,.completionSection,.pageFooter { position: relative; z-index: 1; width: min(1480px, calc(100% - 40px)); margin-inline: auto; }
+        .topbar { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 28px 0 22px; border-bottom: 1px solid rgba(148,163,184,.16); }
+        .brand { display: inline-flex; align-items: center; gap: 13px; color: inherit; text-decoration: none; }
+        .brandMark { display: inline-grid; place-items: center; min-width: 68px; height: 44px; padding: 0 13px; border: 1px solid rgba(34,211,238,.32); border-radius: 13px; background: rgba(34,211,238,.09); color: #67e8f9; font-weight: 950; letter-spacing: .14em; box-shadow: inset 0 0 22px rgba(34,211,238,.05); }
+        .brandMark.small { min-width: 60px; height: 38px; font-size: 12px; }
+        .brandText { display: grid; gap: 2px; }
+        .brandText strong { font-size: 14px; }
+        .brandText small { color: #8191a8; font-size: 12px; }
+        .topbar nav,.pageFooter nav { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; }
+        .topbar nav a,.pageFooter nav a { color: #b7c7da; text-decoration: none; font-size: 13px; font-weight: 700; padding: 10px 14px; border: 1px solid rgba(148,163,184,.13); border-radius: 999px; background: rgba(255,255,255,.025); transition: .2s ease; }
+        .topbar nav a:hover,.pageFooter nav a:hover { color: white; border-color: rgba(34,211,238,.38); transform: translateY(-1px); }
+        .hero { display: grid; grid-template-columns: minmax(0,1fr) 360px; gap: 44px; align-items: center; padding: 74px 0 54px; }
+        .eyebrow { margin: 0 0 13px; color: #5eead4; font-size: 11px; font-weight: 900; letter-spacing: .24em; text-transform: uppercase; }
+        .hero h1 { max-width: 980px; margin: 0; color: #fff; font-size: clamp(44px,6.1vw,86px); line-height: .98; letter-spacing: -.055em; }
+        .hero h1 em { display: block; margin-top: 8px; color: transparent; font-style: normal; background: linear-gradient(90deg,#67e8f9,#6ee7b7,#c4b5fd); -webkit-background-clip: text; background-clip: text; }
+        .heroSummary { max-width: 920px; margin: 27px 0 0; color: #aebed1; font-size: 18px; line-height: 1.8; }
+        .heroRule { display: inline-grid; gap: 5px; margin-top: 28px; padding: 16px 20px; border: 1px solid rgba(94,234,212,.22); border-radius: 18px; background: rgba(16,185,129,.06); }
+        .heroRule span,.heroStatus dt,.cardKicker,.consequenceBox span,.promptBox span,.determinationFields label>span,.fieldStack label>span,.referenceCard>div>span { color: #7f92aa; font-size: 10px; font-weight: 900; letter-spacing: .17em; text-transform: uppercase; }
+        .heroRule strong { color: #d7fff5; font-size: 15px; }
+        .heroStatus { padding: 25px; border: 1px solid rgba(148,163,184,.16); border-radius: 28px; background: linear-gradient(180deg,rgba(255,255,255,.065),rgba(255,255,255,.025)); box-shadow: 0 24px 80px rgba(0,0,0,.32); backdrop-filter: blur(16px); }
+        .largeProgress { display: grid; gap: 4px; }
+        .largeProgress strong { font-size: 52px; line-height: 1; color: white; }
+        .largeProgress span { color: #9fb0c5; font-size: 13px; }
+        .progressTrack { height: 8px; margin: 18px 0 20px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.08); }
+        .progressTrack span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#22d3ee,#34d399); transition: width .35s ease; }
+        .heroStatus dl { display: grid; gap: 10px; margin: 0 0 20px; }
+        .heroStatus dl div { display: flex; justify-content: space-between; gap: 20px; padding: 11px 0; border-bottom: 1px solid rgba(148,163,184,.1); }
+        .heroStatus dd { margin: 0; color: white; font-size: 12px; font-weight: 800; }
+        .missionStrip { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px; padding-bottom: 26px; }
+        .missionTab { position: relative; display: grid; grid-template-columns: 34px 1fr; gap: 11px; align-items: center; min-height: 92px; padding: 15px; text-align: left; color: #d9e7f7; border: 1px solid rgba(148,163,184,.13); border-radius: 20px; background: rgba(255,255,255,.025); cursor: pointer; transition: .2s ease; }
+        .missionTab:hover { transform: translateY(-2px); border-color: rgba(34,211,238,.3); }
+        .missionTab.active { border-color: rgba(34,211,238,.45); background: linear-gradient(180deg,rgba(34,211,238,.11),rgba(255,255,255,.03)); box-shadow: 0 16px 48px rgba(8,145,178,.09); }
+        .missionTab.complete { box-shadow: inset 0 0 0 1px rgba(52,211,153,.18); }
+        .missionTab>span { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; color: #67e8f9; background: rgba(34,211,238,.1); font-size: 11px; font-weight: 900; }
+        .missionTab div { min-width: 0; display: grid; gap: 5px; }
+        .missionTab strong { overflow: hidden; color: white; font-size: 12px; line-height: 1.35; text-overflow: ellipsis; }
+        .missionTab small { color: #778aa2; font-size: 10px; }
+        .missionTab em { position: absolute; right: 12px; bottom: 9px; color: #5f7289; font-size: 9px; font-style: normal; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+        .missionTab.complete em { color: #6ee7b7; }
+        .missionOverview { padding: 34px; border: 1px solid rgba(148,163,184,.14); border-radius: 30px; background: linear-gradient(145deg,rgba(9,20,35,.92),rgba(5,13,24,.86)); box-shadow: 0 26px 80px rgba(0,0,0,.24); }
+        .missionTitleBlock h2,.determinationSection h2,.referenceSection h2,.completionSection h2 { margin: 0; color: white; font-size: clamp(30px,4vw,52px); letter-spacing: -.035em; }
+        .missionTitleBlock>p:last-child,.sectionHeading>div>p:last-child,.referenceSection>div>p:last-child,.completionSummary>p { max-width: 940px; color: #a8b9cc; font-size: 15px; line-height: 1.75; }
+        .consequenceBox { display: grid; gap: 8px; margin-top: 24px; padding: 18px 20px; border-left: 3px solid #fb7185; border-radius: 0 17px 17px 0; background: rgba(244,63,94,.06); }
+        .consequenceBox strong { color: #ffe4e9; font-size: 14px; line-height: 1.6; }
+        .overviewGrid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; margin-top: 23px; }
+        .overviewGrid article { min-height: 190px; padding: 21px; border: 1px solid rgba(148,163,184,.12); border-radius: 21px; background: rgba(255,255,255,.027); }
+        .overviewGrid ul,.failureSignals ul { display: grid; gap: 10px; margin: 16px 0 0; padding: 0; list-style: none; }
+        .overviewGrid li,.failureSignals li { position: relative; padding-left: 17px; color: #b5c5d7; font-size: 13px; line-height: 1.55; }
+        .overviewGrid li::before,.failureSignals li::before { content:""; position:absolute; left:0; top:.62em; width:6px; height:6px; border-radius:99px; background:#22d3ee; }
+        .riskCard { border-color: rgba(251,191,36,.18)!important; background: rgba(245,158,11,.045)!important; }
+        .riskCard p,.emptyState { color: #c6d3e2; font-size: 13px; line-height: 1.7; }
+        .metricsGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-top: 18px; }
+        .metricCard { display: grid; gap: 4px; min-height: 118px; padding: 20px; border: 1px solid rgba(148,163,184,.13); border-radius: 22px; background: rgba(255,255,255,.027); }
+        .metricCard span { color: #8092a9; font-size: 10px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+        .metricCard strong { color: white; font-size: 31px; }
+        .metricCard small { color: #71849b; font-size: 11px; }
+        .metricCard.supported { border-color: rgba(52,211,153,.2); }
+        .metricCard.defect { border-color: rgba(251,113,133,.2); }
+        .metricCard.unresolved { border-color: rgba(251,191,36,.2); }
+        .validationWorkspace { display: grid; grid-template-columns: 330px minmax(0,1fr); gap: 18px; margin-top: 20px; }
+        .anchorRail,.reviewPanel,.determinationSection,.referenceSection,.completionSection { border: 1px solid rgba(148,163,184,.14); background: rgba(5,14,26,.82); box-shadow: 0 24px 70px rgba(0,0,0,.23); backdrop-filter: blur(14px); }
+        .anchorRail { align-self: start; position: sticky; top: 18px; padding: 19px; border-radius: 26px; }
+        .railHeader { padding: 4px 4px 15px; }
+        .railHeader strong { color: white; font-size: 14px; }
+        .anchorList { display: grid; gap: 8px; }
+        .anchorButton { display: grid; grid-template-columns: 40px 1fr 22px; gap: 11px; align-items: center; width: 100%; min-height: 67px; padding: 11px; text-align: left; color: #c9d8e8; border: 1px solid rgba(148,163,184,.1); border-radius: 16px; background: rgba(255,255,255,.018); cursor: pointer; transition: .18s ease; }
+        .anchorButton:hover,.anchorButton.active { border-color: rgba(34,211,238,.34); background: rgba(34,211,238,.055); }
+        .anchorButton>span { display: grid; place-items: center; width: 38px; height: 38px; border-radius: 12px; color: #7dd3fc; background: rgba(14,165,233,.08); font-size: 10px; font-weight: 900; }
+        .anchorButton div { display: grid; gap: 4px; }
+        .anchorButton strong { color: white; font-size: 12px; }
+        .anchorButton small { color: #70839a; font-size: 10px; }
+        .anchorButton em { font-style: normal; font-weight: 900; color: #64748b; }
+        .anchorButton.state-supported em { color: #6ee7b7; }
+        .anchorButton.state-defect em { color: #fb7185; }
+        .anchorButton.state-unresolved em { color: #fbbf24; }
+        .railProgress { display: grid; gap: 8px; margin-top: 17px; padding: 14px 4px 2px; border-top: 1px solid rgba(148,163,184,.1); }
+        .railProgress>span { color: #71839a; font-size: 10px; font-weight: 800; }
+        .railProgress>div { height: 6px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.07); }
+        .railProgress i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#22d3ee,#34d399); }
+        .reviewPanel { min-width: 0; padding: 31px; border-radius: 28px; }
+        .reviewHeader { display: flex; justify-content: space-between; gap: 26px; align-items: start; }
+        .reviewHeader h2 { margin: 0; color: white; font-size: 42px; letter-spacing: -.035em; }
+        .reviewHeader>div>p:last-child { max-width: 780px; color: #aab9ca; font-size: 15px; line-height: 1.7; }
+        .textButton { flex: 0 0 auto; padding: 10px 13px; color: #8bdff0; border: 1px solid rgba(34,211,238,.18); border-radius: 12px; background: rgba(34,211,238,.04); cursor: pointer; font-size: 11px; font-weight: 800; }
+        .failureSignals { margin-top: 20px; padding: 18px; border: 1px solid rgba(251,191,36,.16); border-radius: 18px; background: rgba(245,158,11,.035); }
+        .failureSignals strong { color: #fde68a; font-size: 12px; }
+        .stateSelector { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin-top: 24px; }
+        .stateSelector button { min-height: 130px; padding: 16px; text-align: left; color: #bdcad8; border: 1px solid rgba(148,163,184,.12); border-radius: 18px; background: rgba(255,255,255,.022); cursor: pointer; transition: .18s ease; }
+        .stateSelector button:hover,.stateSelector button.selected { transform: translateY(-2px); border-color: rgba(34,211,238,.37); background: rgba(34,211,238,.065); }
+        .stateSelector strong { display: block; color: white; font-size: 11px; letter-spacing: .08em; }
+        .stateSelector span { display: block; margin-top: 9px; color: #8293a8; font-size: 11px; line-height: 1.55; }
+        .promptBox { display: grid; gap: 7px; margin-top: 15px; padding: 16px 18px; border-left: 3px solid #22d3ee; border-radius: 0 15px 15px 0; background: rgba(34,211,238,.045); }
+        .promptBox p { margin: 0; color: #c7d7e7; font-size: 13px; line-height: 1.65; }
+        .fieldStack,.determinationFields { display: grid; gap: 16px; margin-top: 22px; }
+        label { display: grid; gap: 8px; }
+        textarea,input,select { width: 100%; color: #eaf4ff; border: 1px solid rgba(148,163,184,.14); border-radius: 15px; background: rgba(0,0,0,.22); outline: none; transition: .18s ease; }
+        textarea { resize: vertical; min-height: 110px; padding: 14px 15px; font: inherit; font-size: 13px; line-height: 1.65; }
+        input,select { height: 47px; padding: 0 14px; font: inherit; font-size: 12px; }
+        textarea:focus,input:focus,select:focus { border-color: rgba(34,211,238,.44); box-shadow: 0 0 0 3px rgba(34,211,238,.06); }
+        textarea::placeholder,input::placeholder { color: #506278; }
+        label small { color: #5f7188; font-size: 10px; }
+        .twoColumnFields { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 14px; }
+        .threeColumnFields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 14px; }
+        .reviewFooter { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 23px; padding-top: 20px; border-top: 1px solid rgba(148,163,184,.11); }
+        .reviewFooter>span { color: #6f8197; font-size: 10px; font-weight: 800; text-align: center; }
+        button { font: inherit; }
+        .primaryButton,.secondaryButton,.dangerButton { display: inline-flex; align-items: center; justify-content: center; min-height: 45px; padding: 0 17px; border-radius: 13px; cursor: pointer; font-size: 11px; font-weight: 900; letter-spacing: .03em; transition: .18s ease; }
+        .primaryButton { color: #031018; border: 1px solid rgba(103,232,249,.7); background: linear-gradient(135deg,#67e8f9,#5eead4); }
+        .primaryButton:hover:not(:disabled),.secondaryButton:hover:not(:disabled),.dangerButton:hover:not(:disabled) { transform: translateY(-1px); }
+        .primaryButton:disabled,.secondaryButton:disabled { opacity: .4; cursor: not-allowed; }
+        .secondaryButton { color: #c8d8e9; border: 1px solid rgba(148,163,184,.18); background: rgba(255,255,255,.035); }
+        .dangerButton { color: #fecdd3; border: 1px solid rgba(251,113,133,.23); background: rgba(244,63,94,.06); }
+        .full { width: 100%; }
+        .large { min-height: 56px; font-size: 12px; }
+        .determinationSection,.referenceSection,.completionSection { margin-top: 20px; padding: 34px; border-radius: 30px; }
+        .sectionHeading { display: grid; grid-template-columns: minmax(0,1fr) 380px; gap: 24px; align-items: start; }
+        .structuralNotice { display: grid; gap: 7px; padding: 17px; border: 1px solid rgba(251,191,36,.18); border-radius: 17px; background: rgba(245,158,11,.04); }
+        .structuralNotice.consistent { border-color: rgba(52,211,153,.2); background: rgba(16,185,129,.04); }
+        .structuralNotice span { color: #93a4b9; font-size: 9px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
+        .structuralNotice strong { color: #e5edf7; font-size: 11px; line-height: 1.55; }
+        .decisionGrid { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; margin-top: 25px; }
+        .decisionCard { display: grid; grid-template-columns: 46px 1fr; gap: 13px; min-height: 150px; padding: 18px; text-align: left; color: #becddd; border: 1px solid rgba(148,163,184,.13); border-radius: 20px; background: rgba(255,255,255,.022); cursor: pointer; transition: .2s ease; }
+        .decisionCard:hover,.decisionCard.selected { transform: translateY(-2px); border-color: rgba(34,211,238,.35); background: rgba(34,211,238,.055); }
+        .decisionCard>span { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 14px; color: white; background: rgba(255,255,255,.06); font-weight: 950; }
+        .decisionCard strong { color: white; font-size: 14px; letter-spacing: .08em; }
+        .decisionCard p { margin: 8px 0 0; color: #8395aa; font-size: 11px; line-height: 1.55; }
+        .decision-allow.selected { border-color: rgba(52,211,153,.4); background: rgba(16,185,129,.07); }
+        .decision-hold.selected { border-color: rgba(251,191,36,.4); background: rgba(245,158,11,.07); }
+        .decision-deny.selected { border-color: rgba(251,113,133,.4); background: rgba(244,63,94,.07); }
+        .decision-escalate.selected { border-color: rgba(196,181,253,.42); background: rgba(139,92,246,.07); }
+        .referenceSection { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: start; }
+        .referenceCard { grid-column: 1/-1; display: grid; grid-template-columns: 210px 1fr 1.4fr; gap: 14px; padding-top: 22px; border-top: 1px solid rgba(148,163,184,.11); }
+        .referenceCard>div { padding: 18px; border: 1px solid rgba(148,163,184,.12); border-radius: 18px; background: rgba(255,255,255,.022); }
+        .referenceDecision { display: grid; align-content: start; gap: 8px; }
+        .referenceDecision strong { color: #6ee7b7; font-size: 29px; }
+        .referenceDecision small { color: #8798ad; font-size: 10px; }
+        .referenceCard p { color: #b5c5d7; font-size: 12px; line-height: 1.65; }
+        .tagList { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+        .tagList em { padding: 7px 10px; color: #beeaf2; border: 1px solid rgba(34,211,238,.18); border-radius: 999px; background: rgba(34,211,238,.045); font-size: 10px; font-style: normal; font-weight: 800; }
+        .comparison { grid-column: 1/-1; }
+        .comparison strong { color: #e8f2ff; font-size: 13px; }
+        .comparison.match { border-color: rgba(52,211,153,.2)!important; }
+        .comparison.mismatch { border-color: rgba(251,191,36,.2)!important; }
+        .completionSection { display: grid; grid-template-columns: minmax(0,1fr) 290px; gap: 36px; align-items: center; }
+        .completionChecklist { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; margin-top: 22px; }
+        .checklistItem { display: flex; align-items: center; gap: 10px; min-height: 43px; padding: 10px 12px; border: 1px solid rgba(148,163,184,.1); border-radius: 13px; background: rgba(255,255,255,.018); }
+        .checklistItem span { display: grid; place-items: center; width: 23px; height: 23px; border-radius: 8px; color: #64748b; background: rgba(255,255,255,.05); font-size: 10px; font-weight: 900; }
+        .checklistItem.complete span { color: #042f2e; background: #6ee7b7; }
+        .checklistItem strong { color: #aebed1; font-size: 10px; }
+        .completionActions { display: grid; gap: 10px; }
+        .pageFooter { display: flex; align-items: center; justify-content: space-between; gap: 28px; padding: 40px 0 54px; }
+        .pageFooter>div { display: flex; align-items: center; gap: 14px; }
+        .pageFooter p { max-width: 570px; margin: 0; color: #71839a; font-size: 11px; line-height: 1.55; }
+        @media (max-width: 1180px) {
+          .hero { grid-template-columns: 1fr; }
+          .heroStatus { max-width: 620px; }
+          .missionStrip { grid-template-columns: repeat(2,minmax(0,1fr)); }
+          .overviewGrid { grid-template-columns: 1fr 1fr; }
+          .overviewGrid .riskCard { grid-column: 1/-1; }
+          .metricsGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+          .validationWorkspace { grid-template-columns: 280px minmax(0,1fr); }
+          .stateSelector,.decisionGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+          .sectionHeading { grid-template-columns: 1fr; }
+          .referenceCard { grid-template-columns: 1fr 1fr; }
+          .referenceCard>div:nth-child(3) { grid-column: 1/-1; }
+        }
+        @media (max-width: 820px) {
+          .topbar { align-items: flex-start; flex-direction: column; }
+          .hero { padding-top: 48px; }
+          .hero h1 { font-size: clamp(42px,12vw,68px); }
+          .missionStrip { grid-template-columns: 1fr; }
+          .overviewGrid,.metricsGrid,.validationWorkspace,.twoColumnFields,.threeColumnFields,.completionSection,.referenceSection { grid-template-columns: 1fr; }
+          .anchorRail { position: static; }
+          .anchorList { grid-template-columns: repeat(2,minmax(0,1fr)); }
+          .reviewHeader { flex-direction: column; }
+          .referenceSection .secondaryButton { justify-self: start; }
+          .referenceCard { grid-template-columns: 1fr; }
+          .referenceCard>div:nth-child(3),.comparison { grid-column: auto; }
+          .completionChecklist { grid-template-columns: 1fr; }
+          .pageFooter { align-items: flex-start; flex-direction: column; }
+        }
+        @media (max-width: 560px) {
+          .topbar,.hero,.missionStrip,.missionOverview,.metricsGrid,.validationWorkspace,.determinationSection,.referenceSection,.completionSection,.pageFooter { width: min(100% - 24px,1480px); }
+          .topbar nav { width: 100%; }
+          .topbar nav a { flex: 1 1 auto; text-align: center; }
+          .heroSummary { font-size: 16px; }
+          .missionOverview,.reviewPanel,.determinationSection,.referenceSection,.completionSection { padding: 22px; border-radius: 23px; }
+          .anchorList,.stateSelector,.decisionGrid { grid-template-columns: 1fr; }
+          .reviewFooter { align-items: stretch; flex-direction: column; }
+          .reviewFooter>span { order: -1; }
+          .pageFooter nav { width: 100%; align-items: stretch; flex-direction: column; }
+          .pageFooter nav a { text-align: center; }
+        }
       `}</style>
     </main>
   );
+}
+
+function MetricCard({ label, value, note, tone = "" }: { label: string; value: string; note: string; tone?: string }) {
+  return <article className={`metricCard ${tone}`}><span>{label}</span><strong>{value}</strong><small>{note}</small></article>;
+}
+
+function ChecklistItem({ complete, label }: { complete: boolean; label: string }) {
+  return <div className={`checklistItem ${complete ? "complete" : ""}`}><span>{complete ? "✓" : "—"}</span><strong>{label}</strong></div>;
 }
