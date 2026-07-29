@@ -237,6 +237,24 @@ const workspaces = [
       "Version history, lineage, ownership, and status",
     ],
   },
+  {
+    id: "academy",
+    code: "AC",
+    title: "TA-14 Academy",
+    href: "/academy",
+    kicker: "LEARN GOVERNANCE BEFORE AUTOMATION",
+    description:
+      "Enter the Exchange's unified educational operating system to understand governed routes, inspect admissible execution architecture, practice bounded construction, and progress toward scope-controlled competency.",
+    color: "#39f2a1",
+    glow: "rgba(57, 242, 161, .52)",
+    world: "academyWorld",
+    features: [
+      "Start Here orientation before consequential tools",
+      "Governance thinking and eight-anchor architecture",
+      "Guided route construction, simulation, and review",
+      "Competency evidence without implied credential authority",
+    ],
+  },
 ];
 
 const chain = [
@@ -360,7 +378,7 @@ export default function HomePage() {
         <div className="heroActions">
           <Link className="grandButton primary" href="/workspace">Open the Exchange <Arrow /></Link>
           <Link className="grandButton gold" href="/foundation">Explore the TA-14 Foundation <Arrow /></Link>
-          <Link className="grandButton glass" href="#six-doors">Choose a Governed Door <span>↓</span></Link>
+          <Link className="grandButton glass" href="#seven-doors">Choose a Governed Door <span>↓</span></Link>
           <Link className="grandButton glass" href="/workspace/ai-governance/eu-ai-act">Explore the EU AI Act <Arrow /></Link>
           <Link className="grandButton glass" href="/marketplace">Enter the Marketplace <Arrow /></Link>
         </div>
@@ -371,11 +389,11 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="hall shell" id="six-doors">
+      <section className="hall shell" id="seven-doors">
         <div className="hallArchitecture" aria-hidden="true"><i/><i/><i/><i/><i/></div>
         <div className="hallGlow" aria-hidden="true" />
         <div className="sectionIntro centeredIntro">
-          <p className="eyebrow">SIX PRIMARY GOVERNANCE DESTINATIONS</p>
+          <p className="eyebrow">SEVEN PRIMARY GOVERNANCE DESTINATIONS</p>
           <h2>Choose the institution that governs what you need to build, preserve, review, interpret, or establish.</h2>
           <p>Each doorway opens into a distinct governed institution. Their routes connect across the Exchange, but their evidence boundaries, authorities, records, and review purposes remain explicit.</p>
         </div>
