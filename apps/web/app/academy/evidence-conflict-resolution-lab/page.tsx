@@ -315,6 +315,13 @@ const stateLabels: Record<AnchorState, string> = {
   NOT_REVIEWED: "Not reviewed",
 };
 
+const stateDescriptions: Record<AnchorState, string> = {
+  SUPPORTED: "The available record affirmatively supports this governance anchor.",
+  DEFECT: "The record contains a material deficiency that prevents reliance on this anchor.",
+  UNRESOLVED: "The available information is insufficient or conflicting and requires further review.",
+  NOT_REVIEWED: "No attributable determination has been preserved for this anchor yet.",
+};
+
 const decisions: Array<{ value: Decision; title: string; description: string }> = [
   { value: "ALLOW", title: "ALLOW", description: "Every required anchor is supported and the execution remains inside its approved boundary." },
   { value: "HOLD", title: "HOLD", description: "A correctable defect or unresolved condition prevents execution now." },
