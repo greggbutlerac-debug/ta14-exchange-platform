@@ -59,7 +59,658 @@ type Competency = {
   description: string;
 };
 
-const STORAGE_KEY = "ta14-academy-credential-dashboard-v4";
+const STORAGE_KEY = "ta14-academy-credential-dashboard-v5";
+
+type CredentialStandard = {
+  id: string;
+  title: string;
+  rule: string;
+  evidence: string;
+  failure: string;
+};
+
+type CredentialPathway = {
+  id: string;
+  title: string;
+  level: string;
+  purpose: string;
+  requirements: string[];
+  renewal: string;
+};
+
+const credentialStandards: CredentialStandard[] = [
+  {
+    id: "CS-01",
+    title: "Defined scope",
+    rule: "Every credential must state exactly what capability was evaluated and the boundary beyond which no claim is made.",
+    evidence: "Published credential definition, version, competency map, and assessment blueprint.",
+    failure: "A broad title is used as a substitute for a bounded capability claim.",
+  },
+  {
+    id: "CS-02",
+    title: "Named issuer",
+    rule: "The issuing institution and accountable authority must be attributable.",
+    evidence: "Issuer identity, authority record, and issuance signature.",
+    failure: "The verifier cannot determine who accepted responsibility for issuance.",
+  },
+  {
+    id: "CS-03",
+    title: "Current version",
+    rule: "The credential must identify the curriculum and assessment version under which it was earned.",
+    evidence: "Versioned curriculum, rubric, and change log.",
+    failure: "A superseded version is presented as though it were current.",
+  },
+  {
+    id: "CS-04",
+    title: "Identity binding",
+    rule: "The credential must be bound to the learner who produced the accepted evidence.",
+    evidence: "Identity proofing record and learner-to-evidence linkage.",
+    failure: "The submitted work cannot be reliably attributed to the credential holder.",
+  },
+  {
+    id: "CS-05",
+    title: "Competency evidence",
+    rule: "Attendance and lesson completion cannot substitute for demonstrated competency.",
+    evidence: "Scored artifacts, simulations, reviews, and assessor findings.",
+    failure: "The record proves participation but not capability.",
+  },
+  {
+    id: "CS-06",
+    title: "Independent assessment",
+    rule: "High-consequence credentials require an assessment process separate from simple content completion.",
+    evidence: "Assessment attempt, rubric, assessor identity, and determination.",
+    failure: "The same unreviewed activity both teaches and certifies the learner.",
+  },
+  {
+    id: "CS-07",
+    title: "Critical gates",
+    rule: "Essential governance failures cannot be averaged away by strong performance elsewhere.",
+    evidence: "Critical-failure checklist and gate outcomes.",
+    failure: "A learner passes despite failing authority, evidence, continuity, or boundary controls.",
+  },
+  {
+    id: "CS-08",
+    title: "Assessor attribution",
+    rule: "Every material assessment determination must identify the responsible assessor.",
+    evidence: "Assessor identity, role, qualification, and signed finding.",
+    failure: "A score exists without accountable human or institutional review.",
+  },
+  {
+    id: "CS-09",
+    title: "Evidence preservation",
+    rule: "Accepted evidence must remain retrievable, attributable, and connected to the credential event.",
+    evidence: "Evidence manifest, hashes, timestamps, and retention policy.",
+    failure: "The institution cannot reproduce the basis for issuance.",
+  },
+  {
+    id: "CS-10",
+    title: "Appeal availability",
+    rule: "The learner must have a bounded way to challenge errors without erasing prior determinations.",
+    evidence: "Appeal record, response, correction history, and final disposition.",
+    failure: "Corrections overwrite the original record or no challenge path exists.",
+  },
+  {
+    id: "CS-11",
+    title: "Expiration logic",
+    rule: "Expiration and renewal must reflect how quickly the demonstrated capability can become stale.",
+    evidence: "Validity period, renewal rule, and revalidation schedule.",
+    failure: "The credential remains active indefinitely despite material architecture changes.",
+  },
+  {
+    id: "CS-12",
+    title: "Renewal evidence",
+    rule: "Renewal must require current evidence rather than payment or affirmation alone.",
+    evidence: "Continuing practice record, updated assessment, or scoped revalidation.",
+    failure: "The credential renews without evidence that capability remains current.",
+  },
+  {
+    id: "CS-13",
+    title: "Suspension control",
+    rule: "The institution must be able to suspend reliance while material concerns are reviewed.",
+    evidence: "Suspension event, reason, effective time, and review owner.",
+    failure: "A known integrity concern exists but the credential still appears fully active.",
+  },
+  {
+    id: "CS-14",
+    title: "Revocation control",
+    rule: "Revocation must be attributable, reviewable, and preserved as a status event.",
+    evidence: "Revocation authority, finding, notice, and registry update.",
+    failure: "The record silently disappears or remains verifiable after revocation.",
+  },
+  {
+    id: "CS-15",
+    title: "Status freshness",
+    rule: "Verification must return the current state rather than a static image or outdated export.",
+    evidence: "Authoritative status endpoint and last-updated timestamp.",
+    failure: "A screenshot is accepted as proof of current standing.",
+  },
+  {
+    id: "CS-16",
+    title: "Registry handoff",
+    rule: "Academy eligibility and Registry issuance must remain separate institutional events.",
+    evidence: "Eligibility package, issuance request, Registry response, and identifier.",
+    failure: "The Academy page invents or duplicates an authoritative Registry credential.",
+  },
+  {
+    id: "CS-17",
+    title: "No execution authority",
+    rule: "A credential must never be represented as automatic permission for a consequential action.",
+    evidence: "Boundary statement and execution revalidation requirement.",
+    failure: "The holder treats training status as current operational authority.",
+  },
+  {
+    id: "CS-18",
+    title: "Context limitation",
+    rule: "Capability demonstrated in one domain or consequence class cannot be generalized without support.",
+    evidence: "Domain, role, system, and consequence scope.",
+    failure: "A narrow credential is used to justify unrelated high-consequence work.",
+  },
+  {
+    id: "CS-19",
+    title: "Continuity of competence",
+    rule: "Material gaps in practice or evidence continuity must trigger review.",
+    evidence: "Practice history, continuing evidence, and gap analysis.",
+    failure: "The holder has not exercised the capability for years but remains unreviewed.",
+  },
+  {
+    id: "CS-20",
+    title: "Conflict disclosure",
+    rule: "Assessor and issuer conflicts must be declared and managed.",
+    evidence: "Conflict statement, recusal record, and alternate reviewer assignment.",
+    failure: "A financially or personally conflicted assessor makes the final determination.",
+  },
+  {
+    id: "CS-21",
+    title: "Correction history",
+    rule: "Credential corrections must create a new attributable version rather than erase the prior state.",
+    evidence: "Version history, correction reason, and effective timestamp.",
+    failure: "The historical record is silently rewritten.",
+  },
+  {
+    id: "CS-22",
+    title: "Privacy boundary",
+    rule: "Public verification should disclose only what is needed to validate the credential.",
+    evidence: "Disclosure policy and public/private field map.",
+    failure: "Sensitive learner evidence is exposed to prove status.",
+  },
+  {
+    id: "CS-23",
+    title: "Portability boundary",
+    rule: "Exports must preserve provenance and warn when detached from the authoritative source.",
+    evidence: "Signed export, source URI, and verification instructions.",
+    failure: "A portable file is treated as authoritative after its source status changes.",
+  },
+  {
+    id: "CS-24",
+    title: "Outcome verification",
+    rule: "The institution must be able to verify that issuance, renewal, suspension, or revocation produced the intended registry outcome.",
+    evidence: "Registry receipt, status check, and reconciliation record.",
+    failure: "The Academy assumes the downstream status changed without verification.",
+  },
+];
+
+
+
+type LifecycleEvent = {
+  id: string;
+  stage: string;
+  question: string;
+  requiredRecord: string;
+  determination: string;
+  nextAction: string;
+};
+
+const lifecycleEvents: LifecycleEvent[] = [
+  {
+    id: "LC-01",
+    stage: "Definition",
+    question: "What exact capability will the credential claim?",
+    requiredRecord: "Credential definition and bounded scope",
+    determination: "HOLD until the claim is precise",
+    nextAction: "Publish the versioned credential definition.",
+  },
+  {
+    id: "LC-02",
+    stage: "Authority",
+    question: "Who has authority to establish this credential?",
+    requiredRecord: "Institutional authority record",
+    determination: "HOLD without accountable authority",
+    nextAction: "Bind the credential to an authorized owner.",
+  },
+  {
+    id: "LC-03",
+    stage: "Curriculum mapping",
+    question: "Which learning experiences support the claimed capability?",
+    requiredRecord: "Curriculum-to-competency crosswalk",
+    determination: "HOLD when coverage is incomplete",
+    nextAction: "Resolve uncovered competencies.",
+  },
+  {
+    id: "LC-04",
+    stage: "Assessment blueprint",
+    question: "How will capability be tested independently of completion?",
+    requiredRecord: "Assessment blueprint and critical gates",
+    determination: "HOLD without independent evaluation",
+    nextAction: "Approve the assessment design.",
+  },
+  {
+    id: "LC-05",
+    stage: "Assessor qualification",
+    question: "Who may evaluate the evidence?",
+    requiredRecord: "Assessor qualification and conflict record",
+    determination: "ESCALATE unresolved conflicts",
+    nextAction: "Assign a qualified independent assessor.",
+  },
+  {
+    id: "LC-06",
+    stage: "Learner identity",
+    question: "Whose evidence is being evaluated?",
+    requiredRecord: "Identity binding and learner profile",
+    determination: "DENY unverifiable attribution",
+    nextAction: "Complete identity proofing.",
+  },
+  {
+    id: "LC-07",
+    stage: "Prerequisite review",
+    question: "Has the learner satisfied required prior capability?",
+    requiredRecord: "Prerequisite evidence manifest",
+    determination: "HOLD missing prerequisites",
+    nextAction: "Complete or challenge prerequisite findings.",
+  },
+  {
+    id: "LC-08",
+    stage: "Learning completion",
+    question: "Were required learning activities completed?",
+    requiredRecord: "Versioned completion transcript",
+    determination: "HOLD incomplete curriculum",
+    nextAction: "Finish required learning activities.",
+  },
+  {
+    id: "LC-09",
+    stage: "Evidence submission",
+    question: "Has the learner submitted the required practical evidence?",
+    requiredRecord: "Evidence package and provenance manifest",
+    determination: "HOLD incomplete evidence",
+    nextAction: "Submit missing or corrected artifacts.",
+  },
+  {
+    id: "LC-10",
+    stage: "Evidence integrity",
+    question: "Can the evidence be attributed and reproduced?",
+    requiredRecord: "Hashes, timestamps, source records",
+    determination: "DENY materially compromised evidence",
+    nextAction: "Replace or independently reconstruct evidence.",
+  },
+  {
+    id: "LC-11",
+    stage: "Knowledge assessment",
+    question: "Does the learner understand the governing architecture?",
+    requiredRecord: "Scored knowledge assessment",
+    determination: "HOLD below threshold",
+    nextAction: "Complete targeted remediation and reassessment.",
+  },
+  {
+    id: "LC-12",
+    stage: "Practical assessment",
+    question: "Can the learner perform the bounded capability?",
+    requiredRecord: "Observed practical assessment",
+    determination: "HOLD unsupported capability",
+    nextAction: "Repeat the practical evaluation.",
+  },
+  {
+    id: "LC-13",
+    stage: "Critical-gate review",
+    question: "Did any non-compensable failure occur?",
+    requiredRecord: "Critical failure checklist",
+    determination: "DENY when a prohibited failure is confirmed",
+    nextAction: "Remediate and submit a new attempt.",
+  },
+  {
+    id: "LC-14",
+    stage: "Assessor determination",
+    question: "What outcome does the complete record support?",
+    requiredRecord: "Signed assessor finding",
+    determination: "ESCALATE ambiguous or conflicted findings",
+    nextAction: "Conduct calibration or secondary review.",
+  },
+  {
+    id: "LC-15",
+    stage: "Appeal window",
+    question: "Has the learner had a fair opportunity to challenge error?",
+    requiredRecord: "Notice, appeal, and response record",
+    determination: "HOLD while a valid appeal is active",
+    nextAction: "Resolve the appeal without erasing history.",
+  },
+  {
+    id: "LC-16",
+    stage: "Eligibility decision",
+    question: "Has the Academy supported credential eligibility?",
+    requiredRecord: "Eligibility determination package",
+    determination: "ALLOW only when all gates pass",
+    nextAction: "Freeze the eligibility package.",
+  },
+  {
+    id: "LC-17",
+    stage: "Registry request",
+    question: "Has issuance been requested from the authoritative Registry?",
+    requiredRecord: "Registry issuance request",
+    determination: "HOLD until acknowledged",
+    nextAction: "Transmit the bounded package.",
+  },
+  {
+    id: "LC-18",
+    stage: "Issuance verification",
+    question: "Did the Registry actually issue the credential?",
+    requiredRecord: "Registry receipt and identifier",
+    determination: "HOLD without verified issuance",
+    nextAction: "Reconcile the request and Registry response.",
+  },
+  {
+    id: "LC-19",
+    stage: "Public verification",
+    question: "Can a verifier inspect current status safely?",
+    requiredRecord: "Verification endpoint and disclosure map",
+    determination: "HOLD stale or excessive disclosure",
+    nextAction: "Correct status freshness or privacy controls.",
+  },
+  {
+    id: "LC-20",
+    stage: "Practice continuity",
+    question: "Is the demonstrated capability still current?",
+    requiredRecord: "Continuing practice evidence",
+    determination: "HOLD after material inactivity",
+    nextAction: "Require scoped revalidation.",
+  },
+  {
+    id: "LC-21",
+    stage: "Renewal review",
+    question: "Does current evidence support renewal?",
+    requiredRecord: "Renewal assessment package",
+    determination: "ALLOW, HOLD, DENY, or ESCALATE",
+    nextAction: "Record the renewal determination.",
+  },
+  {
+    id: "LC-22",
+    stage: "Suspension review",
+    question: "Is temporary reliance unsafe or uncertain?",
+    requiredRecord: "Suspension finding and effective time",
+    determination: "HOLD credential reliance",
+    nextAction: "Investigate and preserve the review record.",
+  },
+  {
+    id: "LC-23",
+    stage: "Revocation review",
+    question: "Does the evidence support permanent withdrawal?",
+    requiredRecord: "Revocation authority and final finding",
+    determination: "DENY continued reliance",
+    nextAction: "Update the Registry and notify affected parties.",
+  },
+  {
+    id: "LC-24",
+    stage: "Outcome reconciliation",
+    question: "Did every intended status change reach all authoritative systems?",
+    requiredRecord: "Reconciliation and verification record",
+    determination: "ESCALATE inconsistent outcomes",
+    nextAction: "Correct downstream records and preserve the discrepancy.",
+  },
+];
+
+
+
+type RenewalScenario = {
+  id: string;
+  trigger: string;
+  risk: string;
+  evidence: string;
+  response: string;
+};
+
+const renewalScenarios: RenewalScenario[] = [
+  {
+    id: "RN-01",
+    trigger: "Credential reaches its scheduled renewal window",
+    risk: "The demonstrated capability may no longer reflect the current architecture or assessment standard.",
+    evidence: "Current practice record, updated knowledge assessment, and version-difference review.",
+    response: "HOLD renewal until current evidence supports continued standing.",
+  },
+  {
+    id: "RN-02",
+    trigger: "Material curriculum version change",
+    risk: "The holder was assessed against a superseded competency model.",
+    evidence: "Change-impact analysis and targeted bridge assessment.",
+    response: "Require bounded transition evidence rather than automatic migration.",
+  },
+  {
+    id: "RN-03",
+    trigger: "Critical governance principle changes",
+    risk: "Prior evidence may support a practice that is no longer admissible.",
+    evidence: "Principle-change briefing, scenario assessment, and signed acknowledgement.",
+    response: "Suspend affected scope until revalidation is complete.",
+  },
+  {
+    id: "RN-04",
+    trigger: "Extended inactivity in the credentialed role",
+    risk: "Capability continuity cannot be inferred from an old issuance event.",
+    evidence: "Recent practice evidence or supervised re-entry assessment.",
+    response: "HOLD active standing for the affected capability scope.",
+  },
+  {
+    id: "RN-05",
+    trigger: "Quality review identifies repeated material defects",
+    risk: "Current performance conflicts with the original competency determination.",
+    evidence: "Defect history, corrective action record, and independent reassessment.",
+    response: "ESCALATE for suspension, remediation, or scoped limitation.",
+  },
+  {
+    id: "RN-06",
+    trigger: "Assessor conflict discovered after issuance",
+    risk: "The original determination may not have been independent or reliable.",
+    evidence: "Conflict investigation and secondary evidence review.",
+    response: "HOLD reliance while the issuance basis is independently revalidated.",
+  },
+  {
+    id: "RN-07",
+    trigger: "Evidence integrity challenge",
+    risk: "The artifact package may not belong to the holder or may have been altered.",
+    evidence: "Provenance reconstruction, identity confirmation, and artifact verification.",
+    response: "DENY renewal when material integrity cannot be restored.",
+  },
+  {
+    id: "RN-08",
+    trigger: "Credential scope is expanded",
+    risk: "The existing evidence does not support the additional role, domain, or consequence class.",
+    evidence: "New scope definition and incremental competency assessment.",
+    response: "Treat expansion as a new eligibility event, not routine renewal.",
+  },
+  {
+    id: "RN-09",
+    trigger: "Registry and Academy status disagree",
+    risk: "Verifiers may rely on an incorrect current state.",
+    evidence: "Status reconciliation, event receipts, and source-of-truth review.",
+    response: "ESCALATE and suppress unsupported public claims until reconciled.",
+  },
+  {
+    id: "RN-10",
+    trigger: "Applicable law, standard, or institutional policy changes",
+    risk: "The credential definition may no longer cover the obligations now attached to the role.",
+    evidence: "Obligation mapping and targeted compliance assessment.",
+    response: "Require bridge evidence for materially affected competencies.",
+  },
+  {
+    id: "RN-11",
+    trigger: "Holder requests reinstatement after suspension",
+    risk: "The condition that caused suspension may remain unresolved.",
+    evidence: "Corrective action proof, current assessment, and independent disposition.",
+    response: "ALLOW reinstatement only after verified closure of the suspension basis.",
+  },
+  {
+    id: "RN-12",
+    trigger: "Holder requests reinstatement after revocation",
+    risk: "A revoked credential cannot be silently reactivated as though no adverse event occurred.",
+    evidence: "New application, complete reassessment, and preserved revocation history.",
+    response: "Create a new issuance decision while retaining the prior revoked record.",
+  },
+];
+
+const credentialPathways: CredentialPathway[] = [
+  {
+    id: "foundation",
+    title: "Execution Admissibility Foundations",
+    level: "Foundation",
+    purpose: "Establishes the common language and visible architecture required before applied work begins",
+    requirements: [
+      "Complete eight foundation lessons",
+      "Pass the architecture knowledge assessment",
+      "Submit one governed-route review",
+      "Complete the foundation capstone",
+    ],
+    renewal: "Revalidate when the foundational architecture or assessment version materially changes.",
+  },
+  {
+    id: "builder",
+    title: "Governed Route Builder",
+    level: "Practitioner",
+    purpose: "Demonstrates the ability to construct bounded governed routes from purpose through outcome preservation.",
+    requirements: [
+      "Complete Route Construction Lab",
+      "Build three accepted route packages",
+      "Resolve one evidence conflict",
+      "Pass applied construction review",
+    ],
+    renewal: "Renew through current route evidence and a version-change assessment.",
+  },
+  {
+    id: "analyst",
+    title: "Route Validation Analyst",
+    level: "Applied",
+    purpose: "Demonstrates the ability to inspect routes, classify defects, and preserve supportable findings.",
+    requirements: [
+      "Complete Validation Workshop",
+      "Review five route packages",
+      "Pass challenge and appeal lab",
+      "Receive assessor acceptance",
+    ],
+    renewal: "Renew with recent review evidence and calibration participation.",
+  },
+  {
+    id: "simulator",
+    title: "Execution Simulation Practitioner",
+    level: "Applied",
+    purpose: "Demonstrates controlled simulation of consequence-bearing execution conditions.",
+    requirements: [
+      "Complete simulation foundations",
+      "Run twelve preserved scenarios",
+      "Identify earliest failure in four cases",
+      "Pass simulation debrief assessment",
+    ],
+    renewal: "Renew through current scenario work and critical-gate revalidation.",
+  },
+  {
+    id: "reviewer",
+    title: "Admissibility Review Practitioner",
+    level: "Professional",
+    purpose: "Demonstrates bounded review across evidence, authority, continuity, and execution correspondence.",
+    requirements: [
+      "Complete Review Workspace pathway",
+      "Produce six accepted findings packages",
+      "Pass independent reviewer assessment",
+      "Complete conflict disclosure",
+    ],
+    renewal: "Renew with peer-calibrated review evidence and an updated rubric assessment.",
+  },
+  {
+    id: "assessor",
+    title: "Credential Assessor",
+    level: "Professional",
+    purpose: "Demonstrates the ability to evaluate competency evidence without confusing completion with capability.",
+    requirements: [
+      "Hold prerequisite practitioner credential",
+      "Complete assessor development",
+      "Score shadow assessments",
+      "Pass assessor calibration board",
+    ],
+    renewal: "Renew annually through calibration and quality-review evidence.",
+  },
+  {
+    id: "instructor",
+    title: "TA-14 Academy Instructor",
+    level: "Professional",
+    purpose: "Demonstrates instructional capability while preserving the distinction between teaching, assessment, and issuance.",
+    requirements: [
+      "Complete faculty development",
+      "Deliver observed instruction",
+      "Pass curriculum-boundary review",
+      "Maintain conflict controls",
+    ],
+    renewal: "Renew through teaching evidence, learner outcomes, and curriculum-version update training.",
+  },
+  {
+    id: "executive",
+    title: "Governed Execution Executive",
+    level: "Executive",
+    purpose: "Demonstrates leadership capability for institutional adoption, authority, and accountability.",
+    requirements: [
+      "Complete executive pathway",
+      "Approve a bounded governance charter",
+      "Pass consequence and authority simulation",
+      "Submit institutional implementation plan",
+    ],
+    renewal: "Renew through current governance evidence and executive scenario revalidation.",
+  },
+  {
+    id: "provider",
+    title: "AI Provider Governance Lead",
+    level: "Sector",
+    purpose: "Demonstrates provider-side governance capability across design, evidence, release, and post-deployment controls.",
+    requirements: [
+      "Complete provider pathway",
+      "Map provider obligations",
+      "Build release admissibility route",
+      "Pass provider incident simulation",
+    ],
+    renewal: "Renew when material regulatory, architecture, or product-scope changes occur.",
+  },
+  {
+    id: "deployer",
+    title: "AI Deployer Governance Lead",
+    level: "Sector",
+    purpose: "Demonstrates deployer-side capability for context, authority, monitoring, and human oversight.",
+    requirements: [
+      "Complete deployer pathway",
+      "Document deployment boundary",
+      "Build monitoring and escalation route",
+      "Pass operational assessment",
+    ],
+    renewal: "Renew through deployment evidence and current operational scenario review.",
+  },
+  {
+    id: "auditor",
+    title: "Admissible Execution Auditor",
+    level: "Expert",
+    purpose: "Demonstrates independent inspection of institutional governance claims and preserved execution records.",
+    requirements: [
+      "Hold reviewer credential",
+      "Complete auditor pathway",
+      "Perform supervised audit",
+      "Defend findings before review panel",
+    ],
+    renewal: "Renew through audit practice, independence review, and calibration.",
+  },
+  {
+    id: "architect",
+    title: "Admissible Execution Architect",
+    level: "Expert",
+    purpose: "Demonstrates advanced capability to design complete, consequence-aware governance systems.",
+    requirements: [
+      "Hold prerequisite professional credentials",
+      "Complete architecture studio",
+      "Defend complete institutional route",
+      "Pass expert board review",
+    ],
+    renewal: "Renew through current architecture evidence, publication, and expert revalidation.",
+  },
+];
+
 
 const credentials: Credential[] = [
   {
@@ -690,6 +1341,172 @@ export default function CredentialDashboardPage() {
         </section>
       )}
 
+
+
+      <section className="credentialPathwaysSection">
+        <div className="sectionLead">
+          <p className="eyebrow">Credential architecture</p>
+          <h2>Progression is evidence-bound, scope-bounded, and versioned.</h2>
+          <p>
+            The Academy can determine eligibility and preserve the evidence package. It does not
+            silently issue a Registry credential, broaden the learner&apos;s scope, or convert training
+            completion into execution authority.
+          </p>
+        </div>
+        <div className="pathwayGrid">
+          {credentialPathways.map((pathway, index) => (
+            <article key={pathway.id} className="pathwayCard">
+              <header>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <small>{pathway.level}</small>
+                  <h3>{pathway.title}</h3>
+                </div>
+              </header>
+              <p>{pathway.purpose}</p>
+              <h4>Eligibility requirements</h4>
+              <ul>
+                {pathway.requirements.map((requirement) => (
+                  <li key={requirement}>{requirement}</li>
+                ))}
+              </ul>
+              <footer>
+                <strong>Renewal boundary</strong>
+                <span>{pathway.renewal}</span>
+              </footer>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="standardsSection">
+        <div className="sectionLead">
+          <p className="eyebrow">Twenty-four institutional controls</p>
+          <h2>Credential integrity must survive verification and challenge.</h2>
+          <p>
+            These controls define the minimum institutional posture for issuance, renewal,
+            suspension, revocation, portability, and Registry correspondence.
+          </p>
+        </div>
+        <div className="standardsGrid">
+          {credentialStandards.map((standard) => (
+            <article key={standard.id} className="standardCard">
+              <header>
+                <span>{standard.id}</span>
+                <h3>{standard.title}</h3>
+              </header>
+              <div>
+                <strong>Control</strong>
+                <p>{standard.rule}</p>
+              </div>
+              <div>
+                <strong>Required evidence</strong>
+                <p>{standard.evidence}</p>
+              </div>
+              <div className="failureBlock">
+                <strong>Failure condition</strong>
+                <p>{standard.failure}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      </section>
+
+
+
+      <section className="lifecycleSection">
+        <div className="sectionLead">
+          <p className="eyebrow">Credential lifecycle</p>
+          <h2>Twenty-four preserved events from definition through reconciliation.</h2>
+          <p>
+            A trustworthy credential is not a single badge-generation event. It is a connected
+            institutional lifecycle in which every material decision remains attributable,
+            challengeable, versioned, and verifiable.
+          </p>
+        </div>
+        <div className="lifecycleTable" role="table" aria-label="Credential lifecycle controls">
+          <div className="lifecycleHeader" role="row">
+            <span role="columnheader">Stage</span>
+            <span role="columnheader">Governing question</span>
+            <span role="columnheader">Required record</span>
+            <span role="columnheader">Determination</span>
+            <span role="columnheader">Next action</span>
+          </div>
+          {lifecycleEvents.map((event) => (
+            <article className="lifecycleRow" role="row" key={event.id}>
+              <div role="cell">
+                <span>{event.id}</span>
+                <strong>{event.stage}</strong>
+              </div>
+              <p role="cell">{event.question}</p>
+              <p role="cell">{event.requiredRecord}</p>
+              <p role="cell" className="lifecycleDetermination">{event.determination}</p>
+              <p role="cell">{event.nextAction}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
+
+
+      <section className="renewalSection">
+        <div className="sectionLead">
+          <p className="eyebrow">Renewal and status control</p>
+          <h2>Standing must remain current after issuance.</h2>
+          <p>
+            Renewal is a revalidation event. Suspension, reinstatement, scope expansion,
+            and revocation each require their own evidence and attributable determination.
+          </p>
+        </div>
+        <div className="renewalGrid">
+          {renewalScenarios.map((scenario) => (
+            <article key={scenario.id} className="renewalCard">
+              <header>
+                <span>{scenario.id}</span>
+                <h3>{scenario.trigger}</h3>
+              </header>
+              <dl>
+                <div>
+                  <dt>Integrity risk</dt>
+                  <dd>{scenario.risk}</dd>
+                </div>
+                <div>
+                  <dt>Required evidence</dt>
+                  <dd>{scenario.evidence}</dd>
+                </div>
+                <div>
+                  <dt>Governed response</dt>
+                  <dd>{scenario.response}</dd>
+                </div>
+              </dl>
+            </article>
+          ))}
+        </div>
+      </section>
+
+      <section className="registryHandoff">
+        <div>
+          <p className="eyebrow">Registry correspondence</p>
+          <h2>Eligibility is not issuance.</h2>
+          <p>
+            When all Academy requirements are satisfied, the system prepares a bounded eligibility
+            package for the existing Registry. The Registry remains responsible for the authoritative
+            credential event, identifier, current status, and verification response.
+          </p>
+        </div>
+        <ol>
+          <li><span>01</span><div><strong>Freeze the evidence manifest</strong><p>Preserve accepted evidence, versions, assessor findings, and critical-gate outcomes.</p></div></li>
+          <li><span>02</span><div><strong>Determine eligibility</strong><p>Return ALLOW, HOLD, DENY, or ESCALATE without inventing missing requirements.</p></div></li>
+          <li><span>03</span><div><strong>Request Registry issuance</strong><p>Transmit the bounded package to the authoritative institutional Registry.</p></div></li>
+          <li><span>04</span><div><strong>Verify the resulting event</strong><p>Confirm the Registry identifier and status before presenting the credential as issued.</p></div></li>
+        </ol>
+        <div className="handoffActions">
+          <Link href="/academy/assessment">Open Assessment Center →</Link>
+          <Link href="/academy/credential-registry">Open Credential Registry →</Link>
+          <Link href="/verify">Open Exchange Verification →</Link>
+        </div>
+      </section>
+
       <section className="boundaryNotice">
         <div>
           <span>Credential boundary</span>
@@ -917,6 +1734,242 @@ export default function CredentialDashboardPage() {
         .verificationChecklist strong, .verificationChecklist p { display: block; }
         .verificationChecklist p { margin: 4px 0 0; color: #869dab; line-height: 1.45; font-size: .85rem; }
         .verificationChecklist a { color: #86eee2; text-decoration: none; font-weight: 850; }
+
+
+
+        .renewalSection {
+          max-width: 1420px;
+          margin: 28px auto 0;
+          padding: 28px;
+          position: relative;
+          z-index: 1;
+          border-radius: 22px;
+          background: rgba(8, 18, 27, .92);
+          border: 1px solid rgba(255, 255, 255, .08);
+        }
+        .renewalGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 15px;
+          margin-top: 24px;
+        }
+        .renewalCard {
+          padding: 20px;
+          border-radius: 17px;
+          background: rgba(255,255,255,.024);
+          border: 1px solid rgba(255,255,255,.075);
+        }
+        .renewalCard header {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          gap: 12px;
+          align-items: start;
+        }
+        .renewalCard header span {
+          color: #79e3d6;
+          font-size: .7rem;
+          font-weight: 950;
+          letter-spacing: .09em;
+        }
+        .renewalCard h3 {
+          margin: 0;
+          font-size: 1rem;
+          line-height: 1.35;
+        }
+        .renewalCard dl {
+          margin: 18px 0 0;
+          display: grid;
+          gap: 13px;
+        }
+        .renewalCard dl div {
+          padding-top: 12px;
+          border-top: 1px solid rgba(255,255,255,.065);
+        }
+        .renewalCard dt {
+          color: #cbe0e9;
+          font-size: .68rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: .08em;
+        }
+        .renewalCard dd {
+          margin: 6px 0 0;
+          color: #91a7b5;
+          line-height: 1.5;
+          font-size: .84rem;
+        }
+        @media (max-width: 1120px) {
+          .renewalGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+        @media (max-width: 680px) {
+          .renewalSection {
+            padding: 19px;
+          }
+          .renewalGrid {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .lifecycleSection {
+          max-width: 1420px;
+          margin: 28px auto 0;
+          padding: 28px;
+          position: relative;
+          z-index: 1;
+          border-radius: 22px;
+          background: rgba(8, 18, 27, .92);
+          border: 1px solid rgba(255, 255, 255, .08);
+        }
+        .lifecycleTable {
+          margin-top: 24px;
+          overflow: hidden;
+          border-radius: 18px;
+          border: 1px solid rgba(255, 255, 255, .08);
+        }
+        .lifecycleHeader,
+        .lifecycleRow {
+          display: grid;
+          grid-template-columns: .72fr 1.4fr 1.15fr 1fr 1.2fr;
+          gap: 0;
+        }
+        .lifecycleHeader {
+          background: rgba(111, 225, 211, .08);
+        }
+        .lifecycleHeader span {
+          padding: 14px 16px;
+          color: #8beadd;
+          font-size: .68rem;
+          font-weight: 900;
+          text-transform: uppercase;
+          letter-spacing: .09em;
+          border-right: 1px solid rgba(255, 255, 255, .06);
+        }
+        .lifecycleRow {
+          background: rgba(255, 255, 255, .018);
+          border-top: 1px solid rgba(255, 255, 255, .06);
+        }
+        .lifecycleRow:nth-child(even) {
+          background: rgba(255, 255, 255, .03);
+        }
+        .lifecycleRow > div,
+        .lifecycleRow > p {
+          margin: 0;
+          padding: 16px;
+          border-right: 1px solid rgba(255, 255, 255, .055);
+        }
+        .lifecycleRow > div span,
+        .lifecycleRow > div strong {
+          display: block;
+        }
+        .lifecycleRow > div span {
+          color: #75e1d4;
+          font-size: .69rem;
+          font-weight: 900;
+          letter-spacing: .09em;
+        }
+        .lifecycleRow > div strong {
+          margin-top: 5px;
+          color: #e4f2f8;
+          font-size: .88rem;
+        }
+        .lifecycleRow > p {
+          color: #94a9b6;
+          line-height: 1.48;
+          font-size: .83rem;
+        }
+        .lifecycleRow .lifecycleDetermination {
+          color: #ffd28d;
+          font-weight: 800;
+        }
+        @media (max-width: 1040px) {
+          .lifecycleHeader {
+            display: none;
+          }
+          .lifecycleRow {
+            grid-template-columns: 1fr 1fr;
+            padding: 8px;
+          }
+          .lifecycleRow > div,
+          .lifecycleRow > p {
+            border-right: 0;
+            border-bottom: 1px solid rgba(255, 255, 255, .055);
+          }
+        }
+        @media (max-width: 680px) {
+          .lifecycleSection {
+            padding: 19px;
+          }
+          .lifecycleRow {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        .credentialPathwaysSection, .standardsSection, .registryHandoff {
+          max-width: 1420px;
+          margin: 28px auto 0;
+          position: relative;
+          z-index: 1;
+        }
+        .credentialPathwaysSection, .standardsSection, .registryHandoff {
+          padding: 28px;
+          border-radius: 22px;
+          background: rgba(8, 18, 27, .92);
+          border: 1px solid rgba(255, 255, 255, .08);
+          box-shadow: 0 20px 70px rgba(0, 0, 0, .22);
+        }
+        .sectionLead { max-width: 920px; }
+        .sectionLead h2 { margin: 8px 0 10px; font-size: clamp(1.75rem, 3vw, 2.55rem); }
+        .sectionLead > p:last-child { color: #94aab8; line-height: 1.7; }
+        .pathwayGrid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-top: 24px; }
+        .pathwayCard { display: flex; flex-direction: column; min-height: 440px; padding: 22px; border-radius: 18px; background: rgba(255,255,255,.025); border: 1px solid rgba(255,255,255,.075); }
+        .pathwayCard header { display: grid; grid-template-columns: auto 1fr; gap: 14px; align-items: start; }
+        .pathwayCard header > span { width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px; color: #081219; font-weight: 950; background: linear-gradient(145deg, #69dfd2, #8ab3ff); }
+        .pathwayCard small { color: #73dfd2; text-transform: uppercase; letter-spacing: .11em; font-weight: 850; }
+        .pathwayCard h3 { margin: 5px 0 0; font-size: 1.12rem; }
+        .pathwayCard > p { color: #96acb9; line-height: 1.6; min-height: 76px; }
+        .pathwayCard h4 { margin: 8px 0; font-size: .78rem; color: #cde5ef; text-transform: uppercase; letter-spacing: .08em; }
+        .pathwayCard ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+        .pathwayCard li { position: relative; padding-left: 18px; color: #a8bbc7; line-height: 1.45; font-size: .88rem; }
+        .pathwayCard li::before { content: "✓"; position: absolute; left: 0; color: #75e1d4; font-weight: 900; }
+        .pathwayCard footer { margin-top: auto; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.07); }
+        .pathwayCard footer strong, .pathwayCard footer span { display: block; }
+        .pathwayCard footer strong { color: #79e2d6; font-size: .72rem; text-transform: uppercase; letter-spacing: .09em; }
+        .pathwayCard footer span { margin-top: 7px; color: #8fa5b3; line-height: 1.5; font-size: .84rem; }
+        .standardsGrid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-top: 24px; }
+        .standardCard { padding: 22px; border-radius: 18px; background: rgba(255,255,255,.022); border: 1px solid rgba(255,255,255,.07); }
+        .standardCard header { display: flex; gap: 12px; align-items: center; padding-bottom: 14px; border-bottom: 1px solid rgba(255,255,255,.07); }
+        .standardCard header span { color: #76e2d5; font-size: .72rem; font-weight: 950; letter-spacing: .1em; }
+        .standardCard h3 { margin: 0; font-size: 1.06rem; }
+        .standardCard > div { margin-top: 14px; }
+        .standardCard strong { color: #cfe4ed; font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; }
+        .standardCard p { margin: 6px 0 0; color: #93a9b7; line-height: 1.55; font-size: .88rem; }
+        .standardCard .failureBlock { padding: 13px; border-radius: 13px; background: rgba(255, 183, 77, .06); border: 1px solid rgba(255, 183, 77, .14); }
+        .standardCard .failureBlock strong { color: #ffc878; }
+        .registryHandoff { display: grid; grid-template-columns: .9fr 1.1fr; gap: 28px; }
+        .registryHandoff h2 { margin: 8px 0; font-size: 2rem; }
+        .registryHandoff > div > p:last-child { color: #98adba; line-height: 1.7; }
+        .registryHandoff ol { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+        .registryHandoff li { display: grid; grid-template-columns: auto 1fr; gap: 13px; padding: 14px; border-radius: 14px; background: rgba(255,255,255,.025); }
+        .registryHandoff li > span { color: #79e3d6; font-weight: 950; }
+        .registryHandoff li strong, .registryHandoff li p { display: block; }
+        .registryHandoff li p { margin: 4px 0 0; color: #8ea4b2; line-height: 1.45; font-size: .86rem; }
+        .handoffActions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 10px; }
+        .handoffActions a { padding: 11px 14px; border-radius: 11px; color: #92f0e5; text-decoration: none; font-weight: 850; background: rgba(89, 218, 202, .07); border: 1px solid rgba(89, 218, 202, .2); }
+        @media (max-width: 1180px) {
+          .pathwayGrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        }
+        @media (max-width: 900px) {
+          .standardsGrid, .registryHandoff { grid-template-columns: 1fr; }
+          .handoffActions { grid-column: auto; }
+        }
+        @media (max-width: 680px) {
+          .credentialPathwaysSection, .standardsSection, .registryHandoff { padding: 19px; }
+          .pathwayGrid, .standardsGrid { grid-template-columns: 1fr; }
+          .pathwayCard { min-height: auto; }
+        }
+
         .boundaryNotice { margin-top: 24px; border-radius: 18px; padding: 22px 24px; display: grid; grid-template-columns: .8fr 1.2fr; gap: 26px; border-left: 4px solid #78e2d5; }
         .boundaryNotice span, .boundaryNotice strong { display: block; }
         .boundaryNotice span { color: #75dfd2; text-transform: uppercase; letter-spacing: .12em; font-size: .68rem; }
