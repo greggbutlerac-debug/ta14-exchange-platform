@@ -319,9 +319,6 @@ export default function AcademyPage() {
           --academy-rail-width: 292px;
         }
 
-        .academy-framework > .academy-sidebar {
-          display: none !important;
-        }
 
         .academy-framework > .academy-content {
           margin-left: 0 !important;
@@ -442,6 +439,7 @@ export default function AcademyPage() {
         }
 
         .academyRail {
+          display: none !important;
           position: fixed;
           inset: 0 auto 0 0;
           z-index: 90;
@@ -699,7 +697,7 @@ export default function AcademyPage() {
           position: relative;
           z-index: 2;
           min-height: 100vh;
-          margin-left: var(--academy-rail-width);
+          margin-left: 0;
         }
 
         .academyTopbar {
@@ -1573,7 +1571,7 @@ export default function AcademyPage() {
           .academyCapabilityGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }
         }
 
-        @media (max-width: 760px) {
+        @media (max-width: 1020px) {
           .academyRail { display: none; }
           .academyMain { margin-left: 0; }
           .academyContent { padding-right: 24px; padding-left: 24px; padding-bottom: 110px; }
