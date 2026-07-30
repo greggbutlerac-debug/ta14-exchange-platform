@@ -320,12 +320,10 @@ export default function AcademyPage() {
         }
 
 
+        /* The shared Academy layout owns the permanent left rail and content offset. */
         .academy-framework > .academy-content {
-          margin-left: 0 !important;
-        }
-
-        .academy-framework > .academy-progress-line {
-          left: 0 !important;
+          min-width: 0;
+          width: auto;
         }
 
         .academyEntrance {
