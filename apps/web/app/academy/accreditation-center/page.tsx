@@ -497,6 +497,7 @@ export default function AccreditationCenterPage() {
   const [newInstitution, setNewInstitution] = useState({ name: "", jurisdiction: "United States", program: "Applied Route Reviewer", owner: "" });
   const [newFinding, setNewFinding] = useState({ title: "", institutionId: initialInstitutions[0].id, standard: "AC-01", severity: "MINOR" as Severity, owner: "", due: "2026-08-30" });
   const importRef = useRef<HTMLInputElement>(null);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     try {
@@ -513,8 +514,29 @@ export default function AccreditationCenterPage() {
 
   useEffect(() => {
     if (!loaded) return;
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    } catch {
+      setNotice("Local persistence unavailable; changes remain in this session");
+    }
   }, [state, loaded]);
+
+  useEffect(() => {
+    function handleKeyboard(event: KeyboardEvent) {
+      const target = event.target as HTMLElement | null;
+      const typing = target?.tagName === "INPUT" || target?.tagName === "TEXTAREA" || target?.tagName === "SELECT" || target?.isContentEditable;
+      if (event.key === "/" && !typing) {
+        event.preventDefault();
+        searchRef.current?.focus();
+      }
+      if (event.key === "Escape") {
+        setShowNewInstitution(false);
+        setShowNewFinding(false);
+      }
+    }
+    window.addEventListener("keydown", handleKeyboard);
+    return () => window.removeEventListener("keydown", handleKeyboard);
+  }, []);
 
   const selectedInstitution = state.institutions.find((item) => item.id === state.selectedInstitutionId) ?? state.institutions[0];
   const selectedApplication = state.applications.find((item) => item.id === state.selectedApplicationId) ?? state.applications[0];
@@ -560,6 +582,14 @@ export default function AccreditationCenterPage() {
     const reviews = state.reviews.filter((item) => item.state !== "COMPLETE").map((item) => ({ id: item.id, type: "Review", title: item.title, due: item.due, institutionId: item.institutionId }));
     return [...findings, ...reviews].sort((a, b) => daysUntil(a.due) - daysUntil(b.due)).slice(0, 7);
   }, [state.findings, state.reviews]);
+
+  const portfolioExposure = useMemo(() => {
+    const overdueFindings = state.findings.filter((item) => item.state !== "CLOSED" && daysUntil(item.due) < 0).length;
+    const expiringEvidence = state.evidence.filter((item) => item.expiresAt && daysUntil(item.expiresAt) >= 0 && daysUntil(item.expiresAt) <= 45).length;
+    const expiredAuthority = state.instructors.filter((item) => item.state === "EXPIRED" || daysUntil(item.expiresAt) < 0).length;
+    const heldInstitutions = state.institutions.filter((item) => item.determination === "HOLD" || item.determination === "ESCALATE").length;
+    return { overdueFindings, expiringEvidence, expiredAuthority, heldInstitutions };
+  }, [state.findings, state.evidence, state.instructors, state.institutions]);
 
   function update<K extends keyof PersistedState>(key: K, value: PersistedState[K]) {
     setState((previous) => ({ ...previous, [key]: value }));
@@ -729,10 +759,11 @@ export default function AccreditationCenterPage() {
           </div>
         </div>
         <div className="hero-actions">
-          <button className="secondary" onClick={() => importRef.current?.click()}>Import JSON</button>
-          <button className="secondary" onClick={exportWorkspace}>Export JSON</button>
-          <button className="secondary" onClick={exportReport}>Export register</button>
-          <button className="primary" onClick={() => setShowNewInstitution(true)}>New institution</button>
+          <button type="button" className="secondary" onClick={() => importRef.current?.click()}>Import JSON</button>
+          <button type="button" className="secondary" onClick={exportWorkspace}>Export JSON</button>
+          <button type="button" className="secondary" onClick={exportReport}>Export register</button>
+          <button type="button" className="secondary" onClick={() => window.print()}>Print brief</button>
+          <button type="button" className="primary" onClick={() => setShowNewInstitution(true)}>New institution</button>
           <input ref={importRef} type="file" accept="application/json,.json" onChange={importWorkspace} hidden />
         </div>
       </header>
@@ -744,6 +775,30 @@ export default function AccreditationCenterPage() {
           <p>No institution may bind the Academy to a claim of quality, competence, or authorization unless the evidence, authority, continuity, scope, and review conditions remain admissible for that exact claim.</p>
         </div>
         <StatusPill label={notice} tone="#8bb8ff" />
+      </section>
+
+      <section className="recognition-boundary" aria-label="Accreditation recognition boundary">
+        <div className="boundary-icon">TA</div>
+        <div>
+          <span>Recognition boundary</span>
+          <strong>TA-14 Academy accreditation is an institutional governance determination within the TA-14 system.</strong>
+          <p>It does not by itself represent approval by the U.S. Department of Education, CHEA, a state licensing board, or another external accrediting authority. Every public claim must preserve the issuing authority, exact scope, effective date, conditions, and current standing.</p>
+        </div>
+      </section>
+
+      <section className="command-deck" aria-label="Portfolio risk command deck">
+        <button onClick={() => { update("findingFilter", "OVERDUE"); update("tab", "findings"); }}>
+          <span>Overdue findings</span><strong>{portfolioExposure.overdueFindings}</strong><small>Requires corrective-action control</small>
+        </button>
+        <button onClick={() => update("tab", "evidence")}>
+          <span>Evidence expiring</span><strong>{portfolioExposure.expiringEvidence}</strong><small>Within the next 45 days</small>
+        </button>
+        <button onClick={() => update("tab", "instructors")}>
+          <span>Authority exceptions</span><strong>{portfolioExposure.expiredAuthority}</strong><small>Expired or lapsed authorization</small>
+        </button>
+        <button onClick={() => update("tab", "institutions")}>
+          <span>Bounded standing</span><strong>{portfolioExposure.heldInstitutions}</strong><small>HOLD or ESCALATE posture</small>
+        </button>
       </section>
 
       <section className="metrics six">
@@ -758,14 +813,14 @@ export default function AccreditationCenterPage() {
       <section className="workspace-tools">
         <div className="search-wrap">
           <span>⌕</span>
-          <input value={state.query} onChange={(event) => update("query", event.target.value)} placeholder="Search institutions, evidence, reviewers, findings, standards…" />
+          <input ref={searchRef} value={state.query} onChange={(event) => update("query", event.target.value)} placeholder="Search institutions, evidence, reviewers, findings, standards…" aria-label="Search Accreditation Center" /><kbd>/</kbd>
         </div>
         <div className="local-state"><span className={`pulse ${loaded ? "ready" : ""}`} />{loaded ? "Local persistence active" : "Loading workspace"}</div>
       </section>
 
       <nav className="tabs" aria-label="Accreditation Center sections">
         {tabs.map((tab) => (
-          <button key={tab.id} className={state.tab === tab.id ? "active" : ""} onClick={() => update("tab", tab.id)} title={tab.description}>
+          <button type="button" key={tab.id} className={state.tab === tab.id ? "active" : ""} onClick={() => update("tab", tab.id)} title={tab.description}>
             <span>{tab.label}</span><small>{tab.description}</small>
           </button>
         ))}
@@ -775,7 +830,7 @@ export default function AccreditationCenterPage() {
         <>
           <section className="dashboard-grid">
             <article className="panel span-two">
-              <PanelTitle title="Institutional standing" subtitle="Current readiness, evidence, determination, and unresolved conditions" action={<button className="text-button" onClick={() => update("tab", "institutions")}>Open register →</button>} />
+              <PanelTitle title="Institutional standing" subtitle="Current readiness, evidence, determination, and unresolved conditions" action={<button type="button" className="text-button" onClick={() => update("tab", "institutions")}>Open register →</button>} />
               <div className="institution-cards">
                 {state.institutions.map((institution) => (
                   <button key={institution.id} className="institution-card" onClick={() => { update("selectedInstitutionId", institution.id); update("tab", "institutions"); }}>
@@ -812,7 +867,7 @@ export default function AccreditationCenterPage() {
             </article>
 
             <article className="panel">
-              <PanelTitle title="Evidence health" subtitle="Repository admissibility by status" action={<button className="text-button" onClick={() => update("tab", "evidence")}>Open repository →</button>} />
+              <PanelTitle title="Evidence health" subtitle="Repository admissibility by status" action={<button type="button" className="text-button" onClick={() => update("tab", "evidence")}>Open repository →</button>} />
               <div className="status-bars">
                 {(["ACCEPTED", "UNDER_REVIEW", "UNVERIFIED", "REJECTED", "EXPIRED"] as EvidenceState[]).map((evidenceState) => {
                   const count = state.evidence.filter((item) => item.state === evidenceState).length;
@@ -823,7 +878,7 @@ export default function AccreditationCenterPage() {
             </article>
 
             <article className="panel">
-              <PanelTitle title="Recent audit activity" subtitle="Preserved institutional actions and determinations" action={<button className="text-button" onClick={() => update("tab", "reports")}>Full audit →</button>} />
+              <PanelTitle title="Recent audit activity" subtitle="Preserved institutional actions and determinations" action={<button type="button" className="text-button" onClick={() => update("tab", "reports")}>Full audit →</button>} />
               <div className="audit-list compact">
                 {state.audit.slice(0, 5).map((event) => <AuditRow key={event.id} event={event} institution={state.institutions.find((item) => item.id === event.institutionId)} />)}
               </div>
@@ -835,7 +890,7 @@ export default function AccreditationCenterPage() {
       {state.tab === "institutions" && (
         <section className="split-layout">
           <article className="panel list-panel">
-            <PanelTitle title="Institution register" subtitle="Search and select an institutional accreditation record" action={<button className="text-button" onClick={() => setShowNewInstitution(true)}>+ Add institution</button>} />
+            <PanelTitle title="Institution register" subtitle="Search and select an institutional accreditation record" action={<button type="button" className="text-button" onClick={() => setShowNewInstitution(true)}>+ Add institution</button>} />
             <div className="filter-row"><select value={state.institutionFilter} onChange={(event) => update("institutionFilter", event.target.value as PersistedState["institutionFilter"])}><option value="ALL">All standing</option>{Object.keys(accreditationTone).map((value) => <option key={value}>{value}</option>)}</select><span>{filteredInstitutions.length} records</span></div>
             <div className="select-list">
               {filteredInstitutions.map((institution) => <button key={institution.id} className={institution.id === selectedInstitution.id ? "select-row selected" : "select-row"} onClick={() => update("selectedInstitutionId", institution.id)}><div><strong>{institution.name}</strong><span>{institution.code} · {institution.program}</span></div><div className="row-status"><StatusPill label={institution.state} tone={accreditationTone[institution.state]} /><small>{institution.readiness}% ready</small></div></button>)}
@@ -899,7 +954,7 @@ export default function AccreditationCenterPage() {
 
       {state.tab === "findings" && (
         <section className="split-layout">
-          <article className="panel list-panel"><PanelTitle title="Findings and corrective action" subtitle="Deficiency, ownership, due date, action, and independent closure" action={<button className="text-button" onClick={() => setShowNewFinding(true)}>+ Open finding</button>} /><div className="filter-row"><select value={state.findingFilter} onChange={(event) => update("findingFilter", event.target.value as PersistedState["findingFilter"])}><option value="ALL">All finding states</option>{["OPEN", "CORRECTIVE_ACTION", "VERIFICATION", "CLOSED", "OVERDUE"].map((value) => <option key={value}>{value}</option>)}</select><span>{filteredFindings.length} findings</span></div><div className="select-list">{filteredFindings.map((finding) => <button key={finding.id} className={finding.id === selectedFinding.id ? "select-row selected" : "select-row"} onClick={() => update("selectedFindingId", finding.id)}><div><strong><span className="code-chip">{finding.standard}</span>{finding.title}</strong><span>{state.institutions.find((item) => item.id === finding.institutionId)?.name} · due {formatDate(finding.due)}</span></div><div className="row-status"><StatusPill label={finding.severity} tone={severityTone[finding.severity]} /><small>{finding.state.replaceAll("_", " ")}</small></div></button>)}</div></article>
+          <article className="panel list-panel"><PanelTitle title="Findings and corrective action" subtitle="Deficiency, ownership, due date, action, and independent closure" action={<button type="button" className="text-button" onClick={() => setShowNewFinding(true)}>+ Open finding</button>} /><div className="filter-row"><select value={state.findingFilter} onChange={(event) => update("findingFilter", event.target.value as PersistedState["findingFilter"])}><option value="ALL">All finding states</option>{["OPEN", "CORRECTIVE_ACTION", "VERIFICATION", "CLOSED", "OVERDUE"].map((value) => <option key={value}>{value}</option>)}</select><span>{filteredFindings.length} findings</span></div><div className="select-list">{filteredFindings.map((finding) => <button key={finding.id} className={finding.id === selectedFinding.id ? "select-row selected" : "select-row"} onClick={() => update("selectedFindingId", finding.id)}><div><strong><span className="code-chip">{finding.standard}</span>{finding.title}</strong><span>{state.institutions.find((item) => item.id === finding.institutionId)?.name} · due {formatDate(finding.due)}</span></div><div className="row-status"><StatusPill label={finding.severity} tone={severityTone[finding.severity]} /><small>{finding.state.replaceAll("_", " ")}</small></div></button>)}</div></article>
           <article className="panel detail-panel"><div className="detail-heading"><div><span className="record-code">{selectedFinding.id}</span><h2>{selectedFinding.title}</h2><p>{selectedFinding.standard} · {state.institutions.find((item) => item.id === selectedFinding.institutionId)?.name}</p></div><div className="heading-pills"><StatusPill label={selectedFinding.severity} tone={severityTone[selectedFinding.severity]} /><StatusPill label={selectedFinding.state} tone="#8bb8ff" /></div></div><div className="form-grid three"><Field label="Finding state"><select value={selectedFinding.state} onChange={(event) => patchFinding({ state: event.target.value as FindingState })}>{["OPEN", "CORRECTIVE_ACTION", "VERIFICATION", "CLOSED", "OVERDUE"].map((value) => <option key={value}>{value}</option>)}</select></Field><Field label="Severity"><select value={selectedFinding.severity} onChange={(event) => patchFinding({ severity: event.target.value as Severity })}>{["CRITICAL", "MAJOR", "MINOR", "OBSERVATION"].map((value) => <option key={value}>{value}</option>)}</select></Field><Field label="Due date"><input type="date" value={selectedFinding.due} onChange={(event) => patchFinding({ due: event.target.value })} /></Field></div><Field label="Finding description"><textarea rows={5} value={selectedFinding.description} onChange={(event) => patchFinding({ description: event.target.value })} /></Field><Field label="Corrective action"><textarea rows={6} value={selectedFinding.correctiveAction} onChange={(event) => patchFinding({ correctiveAction: event.target.value })} /></Field><Field label="Verification record"><textarea rows={5} value={selectedFinding.verification} onChange={(event) => patchFinding({ verification: event.target.value })} /></Field><div className="decision-note"><strong>Closure condition</strong><p>A finding is not closed because an action was promised. Closure requires admissible evidence that the action occurred, the deficiency was corrected, and an authorized independent reviewer verified the result.</p></div></article>
         </section>
       )}
@@ -976,14 +1031,14 @@ export default function AccreditationCenterPage() {
       {state.tab === "reports" && (
         <>
           <section className="dashboard-grid reports">
-            <article className="panel span-two"><PanelTitle title="Institutional readiness register" subtitle="Exportable board and accreditation management view" action={<button className="text-button" onClick={exportReport}>Download CSV</button>} /><div className="table-wrap"><table><thead><tr><th>Institution</th><th>State</th><th>Decision</th><th>Readiness</th><th>Evidence</th><th>Findings</th><th>Valid through</th></tr></thead><tbody>{state.institutions.map((institution) => <tr key={institution.id}><td><strong>{institution.name}</strong><small>{institution.code}</small></td><td><StatusPill label={institution.state} tone={accreditationTone[institution.state]} /></td><td><StatusPill label={institution.determination} tone={determinationTone[institution.determination]} /></td><td>{institution.readiness}%</td><td>{institution.evidenceComplete}%</td><td>{institution.openFindings}</td><td>{institution.validThrough}</td></tr>)}</tbody></table></div></article>
+            <article className="panel span-two"><PanelTitle title="Institutional readiness register" subtitle="Exportable board and accreditation management view" action={<button type="button" className="text-button" onClick={exportReport}>Download CSV</button>} /><div className="table-wrap"><table><thead><tr><th>Institution</th><th>State</th><th>Decision</th><th>Readiness</th><th>Evidence</th><th>Findings</th><th>Valid through</th></tr></thead><tbody>{state.institutions.map((institution) => <tr key={institution.id}><td><strong>{institution.name}</strong><small>{institution.code}</small></td><td><StatusPill label={institution.state} tone={accreditationTone[institution.state]} /></td><td><StatusPill label={institution.determination} tone={determinationTone[institution.determination]} /></td><td>{institution.readiness}%</td><td>{institution.evidenceComplete}%</td><td>{institution.openFindings}</td><td>{institution.validThrough}</td></tr>)}</tbody></table></div></article>
             <article className="panel"><PanelTitle title="Coverage profile" subtitle="Standard coverage across the portfolio" /><div className="coverage-list">{state.standards.map((standard) => { const evidenceCount = state.evidence.filter((item) => item.standardId === standard.id && item.state === "ACCEPTED").length; const coverage = clamp(evidenceCount * 25); return <div key={standard.id}><div><span>{standard.code}</span><strong>{standard.title}</strong><small>{evidenceCount} accepted artifacts</small></div><div className="mini-score">{coverage}%</div></div>; })}</div></article>
           </section>
           <section className="panel audit-panel"><PanelTitle title="Audit timeline" subtitle="Attributable actions, object references, and preserved detail" /><div className="audit-list">{state.audit.map((event) => <AuditRow key={event.id} event={event} institution={state.institutions.find((item) => item.id === event.institutionId)} />)}</div></section>
         </>
       )}
 
-      <footer><div><strong>No admissible evidence. No admissible execution.</strong><span>Accreditation Center · local workspace · {loaded ? "preserved" : "loading"}</span></div><div><Link href="/academy">Academy</Link><Link href="/academy/certification-engine">Certification Engine</Link><button onClick={resetWorkspace}>Reset workspace</button></div></footer>
+      <footer><div><strong>No admissible evidence. No admissible execution.</strong><span>Accreditation Center · institutional assurance workspace · {loaded ? "preserved" : "loading"}</span></div><div><Link href="/academy">Academy</Link><Link href="/academy/certification-engine">Certification Engine</Link><button onClick={() => window.print()}>Print</button><button onClick={resetWorkspace}>Reset workspace</button></div></footer>
 
       {showNewInstitution && <Modal title="Create institutional record" onClose={() => setShowNewInstitution(false)}><form onSubmit={createInstitution} className="modal-form"><Field label="Institution name"><input autoFocus value={newInstitution.name} onChange={(event) => setNewInstitution((previous) => ({ ...previous, name: event.target.value }))} /></Field><div className="form-grid two"><Field label="Jurisdiction"><input value={newInstitution.jurisdiction} onChange={(event) => setNewInstitution((previous) => ({ ...previous, jurisdiction: event.target.value }))} /></Field><Field label="Accountable executive"><input value={newInstitution.owner} onChange={(event) => setNewInstitution((previous) => ({ ...previous, owner: event.target.value }))} /></Field></div><Field label="Program"><select value={newInstitution.program} onChange={(event) => setNewInstitution((previous) => ({ ...previous, program: event.target.value }))}><option>Applied Route Reviewer</option><option>Governance Route Author</option><option>Runtime Governance Steward</option><option>Institutional Accreditation</option></select></Field><div className="modal-actions"><button type="button" className="secondary" onClick={() => setShowNewInstitution(false)}>Cancel</button><button type="submit" className="primary">Create record</button></div></form></Modal>}
 
@@ -1033,6 +1088,20 @@ export default function AccreditationCenterPage() {
         @media(max-width:700px){.governance-hero,.matrix-banner,.site-review-header,.panel-room-header,.surveillance-header{flex-direction:column}.constitution-mark,.visit-readiness,.quorum-card,.standing-card,.matrix-summary{width:100%;min-width:0}.governance-scoreboard,.surveillance-metrics{grid-template-columns:repeat(2,1fr)}.governance-side-stack,.surveillance-side-stack{grid-template-columns:1fr}.assurance-question-grid{grid-template-columns:1fr}.matrix-record{grid-template-columns:1fr}.matrix-disposition,.matrix-confidence,.matrix-findings{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.evidence-package{grid-template-columns:1fr}.activity-fact-grid,.scope-document-grid,.standard-correspondence,.signature-grid{grid-template-columns:1fr}.agenda-item{grid-template-columns:65px 1fr}.agenda-item>.status-pill{grid-column:2}.sample-row,.watch-row,.material-change{grid-template-columns:1fr}.deliberation-score-grid,.motion-options{grid-template-columns:repeat(2,1fr)}.decision-definition{grid-template-columns:1fr}.relied-evidence-list>div{grid-template-columns:1fr}.decision-document-head{flex-direction:column}.decision-document-footer{flex-direction:column;gap:6px}}
         @media(max-width:900px){.page-shell{padding:26px 16px 38px}.hero{flex-direction:column}.hero-actions{max-width:none;justify-content:flex-start}.governance-banner{grid-template-columns:auto 1fr}.governance-banner>.status-pill{grid-column:1/-1;justify-self:start}.dashboard-grid,.split-layout,.reports{grid-template-columns:1fr}.dashboard-grid .span-two{grid-column:auto}.institution-cards{grid-template-columns:1fr}.list-panel{max-height:none}.tabs{grid-template-columns:repeat(2,1fr)}.score-grid,.form-grid.three{grid-template-columns:1fr}.audit-row{grid-template-columns:1fr}.audit-row>div:last-child{margin-top:-8px}.audit-row time{margin-bottom:-7px}}
         @media(max-width:620px){.metrics{grid-template-columns:repeat(2,1fr)}.workspace-tools{align-items:flex-start;flex-direction:column}.tabs{grid-template-columns:1fr}.tabs button small{display:none}.form-grid.two,.evidence-question-grid,.metadata-grid,.check-grid{grid-template-columns:1fr}.detail-heading{flex-direction:column}.heading-pills{justify-content:flex-start}.dual-progress{flex-direction:column}.dual-progress>.progress-wrap{width:100%}.governance-banner{grid-template-columns:1fr}.banner-mark{display:none}.metrics .metric{padding:14px}.metric strong{font-size:24px}footer{align-items:flex-start;flex-direction:column}}
+        .recognition-boundary,.command-deck{max-width:1560px;margin-left:auto;margin-right:auto;position:relative;z-index:1}
+        .recognition-boundary{display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:flex-start;margin-bottom:16px;padding:17px 19px;border:1px solid rgba(139,184,255,.24);border-radius:16px;background:linear-gradient(110deg,rgba(23,50,92,.65),rgba(10,18,31,.78));box-shadow:0 18px 45px rgba(0,0,0,.18)}
+        .boundary-icon{width:44px;height:44px;display:grid;place-items:center;border-radius:13px;border:1px solid rgba(139,184,255,.4);background:rgba(139,184,255,.1);color:#bcd5ff;font-size:12px;font-weight:950;letter-spacing:.12em}
+        .recognition-boundary span{display:block;color:#8bb8ff;font-size:10px;text-transform:uppercase;letter-spacing:.18em;font-weight:900;margin-bottom:5px}.recognition-boundary strong{display:block;color:#edf4ff;font-size:14px}.recognition-boundary p{margin:6px 0 0;color:#91a1b8;font-size:12px;line-height:1.6;max-width:1180px}
+        .command-deck{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.command-deck button{position:relative;overflow:hidden;text-align:left;border:1px solid rgba(104,132,177,.22);border-radius:15px;padding:15px 16px;background:linear-gradient(145deg,rgba(13,22,38,.98),rgba(7,12,22,.98));color:#e9eef8;transition:transform .18s ease,border-color .18s ease,background .18s ease}.command-deck button:before{content:"";position:absolute;inset:0 auto 0 0;width:3px;background:linear-gradient(#8bb8ff,#f7c948);opacity:.7}.command-deck button:hover{transform:translateY(-2px);border-color:rgba(139,184,255,.48);background:linear-gradient(145deg,rgba(18,31,53,.98),rgba(8,14,25,.98))}.command-deck span,.command-deck small{display:block}.command-deck span{color:#8797ad;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.command-deck strong{display:block;font-size:27px;margin:5px 0 3px;letter-spacing:-.04em}.command-deck small{color:#68778d;font-size:10px;line-height:1.4}
+        .search-wrap kbd{margin-left:auto;border:1px solid #2b3950;border-bottom-color:#3d506f;background:#111a29;color:#8da0bb;border-radius:6px;padding:2px 7px;font-size:10px;box-shadow:0 1px 0 rgba(255,255,255,.04)}
+        .tabs{position:sticky;top:8px;z-index:20;padding:8px;border:1px solid rgba(86,109,147,.18);border-radius:17px;background:rgba(5,9,16,.84);backdrop-filter:blur(18px);box-shadow:0 16px 35px rgba(0,0,0,.22)}
+        .tabs button{transition:transform .16s ease,border-color .16s ease,background .16s ease}.tabs button:hover{transform:translateY(-1px);border-color:#3c557a;background:#0d1727}
+        .panel,.metric{backdrop-filter:blur(14px)}.panel{transition:border-color .18s ease,box-shadow .18s ease}.panel:hover{border-color:rgba(116,148,199,.32);box-shadow:0 25px 75px rgba(0,0,0,.3)}
+        .primary,.secondary{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.primary:hover,.secondary:hover{transform:translateY(-1px)}.primary:hover{box-shadow:0 10px 24px rgba(220,232,255,.16)}.secondary:hover{border-color:#496286}
+        :global(:focus-visible){outline:2px solid #8bb8ff;outline-offset:3px}
+        @media print{.orb,.grid-overlay,.hero-actions,.workspace-tools,.tabs,.text-button,footer button,.command-deck{display:none!important}.page-shell{padding:18px;background:#fff;color:#111}.panel,.metric,.governance-banner,.recognition-boundary{box-shadow:none;background:#fff;color:#111;border-color:#cfd6df}.hero-copy,.panel-title p,.metric span,.metric small,.recognition-boundary p{color:#444}.dashboard-grid{break-inside:avoid}.hero h1{font-size:42px}.status-pill{color:#111!important;border-color:#777!important;background:#fff!important}}
+        @media(max-width:1080px){.command-deck{grid-template-columns:repeat(2,minmax(0,1fr))}}
+        @media(max-width:760px){.recognition-boundary{grid-template-columns:1fr}.command-deck{grid-template-columns:1fr}.tabs{position:relative;top:auto;padding:0;border:0;background:transparent;backdrop-filter:none}.search-wrap kbd{display:none}}
       `}</style>
     </main>
   );
