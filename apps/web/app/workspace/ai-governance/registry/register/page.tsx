@@ -258,9 +258,25 @@ const wizardSteps = [
   { number: '14', title: 'Preview & Receipt', short: 'Preview' },
 ] as const;
 
+
+function safeId() {
+  try {
+    if (typeof globalThis.crypto?.randomUUID === 'function') {
+      return globalThis.crypto.randomUUID();
+    }
+  } catch {
+    // Fall through to a non-cryptographic UI identifier.
+  }
+  return `ta14-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function asArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
 function createPublication(): PublicationRecord {
   return {
-    id: crypto.randomUUID(), publicationType: 'Article', title: '', authors: '',
+    id: safeId(), publicationType: 'Article', title: '', authors: '',
     publisherOrPlatform: '', publicationDate: '', url: '', doi: '', isbn: '',
     citationText: '', description: '', relationshipToGovernance: '', visibility: 'PUBLIC',
   };
@@ -268,7 +284,7 @@ function createPublication(): PublicationRecord {
 
 function createRepository(): RepositoryRecord {
   return {
-    id: crypto.randomUUID(), provider: 'GitHub', repositoryName: '', repositoryOwner: '',
+    id: safeId(), provider: 'GitHub', repositoryName: '', repositoryOwner: '',
     repositoryUrl: '', defaultBranch: '', releaseOrTag: '', commitSha: '', license: '',
     accessState: 'PUBLIC', description: '', relationshipToGovernance: '',
   };
@@ -276,7 +292,7 @@ function createRepository(): RepositoryRecord {
 
 function createZenodo(): ZenodoRecord {
   return {
-    id: crypto.randomUUID(), title: '', recordUrl: '', doi: '', conceptDoi: '',
+    id: safeId(), title: '', recordUrl: '', doi: '', conceptDoi: '',
     zenodoRecordId: '', version: '', publicationDate: '', creators: '', resourceType: '',
     description: '', relationshipToGovernance: '', visibility: 'PUBLIC',
   };
@@ -284,7 +300,7 @@ function createZenodo(): ZenodoRecord {
 
 function createPatent(): PatentRecord {
   return {
-    id: crypto.randomUUID(), title: '', jurisdiction: 'United States',
+    id: safeId(), title: '', jurisdiction: 'United States',
     filingType: 'Provisional application', applicationStatus: 'Filed',
     applicationNumber: '', publicationNumber: '', patentNumber: '', filingDate: '',
     publicationDate: '', grantDate: '', priorityDate: '', inventors: '',
@@ -443,7 +459,7 @@ export default function RegisterGovernancePage() {
       currentKeys.add(key);
       prospectiveTotal += file.size;
       accepted.push({
-        id: crypto.randomUUID(),
+        id: safeId(),
         file,
         category: 'Other supporting evidence',
         description: '',
@@ -640,8 +656,8 @@ export default function RegisterGovernancePage() {
     });
 
     setPublications(
-      (draft.publications ?? []).map((item: any) => ({
-        id: item.id ?? crypto.randomUUID(),
+      asArray<any>(draft.publications).map((item: any) => ({
+        id: item.id ?? safeId(),
         publicationType: item.publication_type ?? 'Article',
         title: item.title ?? '',
         authors: item.authors ?? '',
@@ -658,8 +674,8 @@ export default function RegisterGovernancePage() {
     );
 
     setRepositories(
-      (draft.repositories ?? []).map((item: any) => ({
-        id: item.id ?? crypto.randomUUID(),
+      asArray<any>(draft.repositories).map((item: any) => ({
+        id: item.id ?? safeId(),
         provider: (item.provider
           ? item.provider.charAt(0).toUpperCase() + item.provider.slice(1)
           : 'GitHub') as RepositoryRecord['provider'],
@@ -677,8 +693,8 @@ export default function RegisterGovernancePage() {
     );
 
     setZenodoRecords(
-      (draft.zenodoRecords ?? []).map((item: any) => ({
-        id: item.id ?? crypto.randomUUID(),
+      asArray<any>(draft.zenodoRecords).map((item: any) => ({
+        id: item.id ?? safeId(),
         title: item.title ?? '',
         recordUrl: item.record_url ?? '',
         doi: item.doi ?? '',
@@ -695,8 +711,8 @@ export default function RegisterGovernancePage() {
     );
 
     setPatentRecords(
-      (draft.patentRecords ?? []).map((item: any) => ({
-        id: item.id ?? crypto.randomUUID(),
+      asArray<any>(draft.patentRecords).map((item: any) => ({
+        id: item.id ?? safeId(),
         title: item.title ?? '',
         jurisdiction: item.jurisdiction ?? '',
         filingType: item.filing_type ?? '',
@@ -745,7 +761,12 @@ export default function RegisterGovernancePage() {
         // Browser-local recovery below remains available as a resilience layer.
       }
 
-      const saved = window.localStorage.getItem(DRAFT_KEY);
+      let saved: string | null = null;
+      try {
+        saved = window.localStorage.getItem(DRAFT_KEY);
+      } catch {
+        return;
+      }
       if (!saved || cancelled) return;
 
       try {
@@ -758,10 +779,10 @@ export default function RegisterGovernancePage() {
         };
         if (parsed.form) {
           setForm({ ...initialForm, ...parsed.form });
-          setPublications(parsed.publications ?? []);
-          setRepositories(parsed.repositories ?? []);
-          setZenodoRecords(parsed.zenodoRecords ?? []);
-          setPatentRecords(parsed.patentRecords ?? []);
+          setPublications(asArray<PublicationRecord>(parsed.publications));
+          setRepositories(asArray<RepositoryRecord>(parsed.repositories));
+          setZenodoRecords(asArray<ZenodoRecord>(parsed.zenodoRecords));
+          setPatentRecords(asArray<PatentRecord>(parsed.patentRecords));
           setMessage('A browser recovery draft was loaded. Save it while signed in to preserve it under your account. Evidence files must be reattached.');
         }
       } catch {
