@@ -1080,7 +1080,26 @@ export default function RegisterGovernancePage() {
             form.boundaryConfirmed,
         );
       case 13:
-        return validate();
+        return Boolean(
+          form.governanceName.trim() &&
+            form.currentVersion.trim() &&
+            form.effectiveVersionDate &&
+            form.establishmentDate &&
+            form.governanceCategory.trim() &&
+            form.claimantName.trim() &&
+            form.authorityRole &&
+            form.authorityEvidence.trim() &&
+            form.contactEmail.trim() &&
+            form.plainDescription.trim() &&
+            form.claims.trim() &&
+            form.nonClaims.trim() &&
+            form.ownershipDeclaration.trim() &&
+            form.reviewPathway &&
+            form.authorityConfirmed &&
+            form.accuracyConfirmed &&
+            form.boundaryConfirmed &&
+            files.every((item) => item.description.trim()),
+        );
       default:
         return true;
     }
