@@ -13,6 +13,14 @@ type AcademyLesson = {
   labHref?: string;
 };
 
+type AcademyNavigationItem = {
+  label: string;
+  href: string;
+  glyph: string;
+  match?: string[];
+  accent?: 'standard' | 'gold' | 'green';
+};
+
 const lessons: AcademyLesson[] = [
   {
     number: '01',
@@ -72,6 +80,81 @@ const lessons: AcademyLesson[] = [
   },
 ];
 
+const academyNavigation: AcademyNavigationItem[] = [
+  {
+    label: 'Academy Home',
+    href: '/academy',
+    glyph: 'AC',
+  },
+  {
+    label: 'Start Here',
+    href: '/academy/start',
+    glyph: '01',
+    match: ['/academy/start', '/academy/what-is-a-route'],
+    accent: 'green',
+  },
+  {
+    label: 'Mission Control',
+    href: '/academy/dashboard',
+    glyph: 'MC',
+  },
+  {
+    label: 'Architecture Explorer',
+    href: '/academy/architecture-explorer',
+    glyph: 'AR',
+  },
+  {
+    label: 'Learning Routes',
+    href: '/academy/routes',
+    glyph: 'RT',
+  },
+  {
+    label: 'Simulation Center',
+    href: '/academy/simulator',
+    glyph: 'SIM',
+    match: [
+      '/academy/simulator',
+      '/academy/execution-boundary-lab',
+      '/academy/evidence-conflict-resolution-lab',
+      '/academy/route-construction-lab',
+      '/academy/route-validation-workshop',
+      '/academy/runtime-governance-lab',
+      '/academy/decision-record-lab',
+      '/academy/challenge-and-appeal-lab',
+      '/academy/governed-execution-studio',
+    ],
+  },
+  {
+    label: 'Review Workspace',
+    href: '/academy/review',
+    glyph: 'RV',
+  },
+  {
+    label: 'Assessment Center',
+    href: '/academy/assessment',
+    glyph: 'AS',
+  },
+  {
+    label: 'Credentials',
+    href: '/academy/credential-dashboard',
+    glyph: 'CR',
+    match: [
+      '/academy/credential-dashboard',
+      '/academy/credential-registry',
+      '/academy/certification-engine',
+    ],
+    accent: 'gold',
+  },
+];
+
+const mobileNavigation = [
+  academyNavigation[0],
+  academyNavigation[1],
+  academyNavigation[2],
+  academyNavigation[5],
+  academyNavigation[7],
+];
+
 const STORAGE_KEY = 'ta14-academy-completed-lessons-v1';
 
 function readCompletedLessons(): string[] {
@@ -90,6 +173,15 @@ function readCompletedLessons(): string[] {
   }
 }
 
+function isNavigationItemActive(pathname: string, item: AcademyNavigationItem) {
+  if (item.href === '/academy') return pathname === '/academy';
+
+  const matches = item.match ?? [item.href];
+  return matches.some(
+    (match) => pathname === match || pathname.startsWith(`${match}/`),
+  );
+}
+
 export default function AcademyLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [completedLessons, setCompletedLessons] = useState<string[]>([]);
@@ -100,6 +192,10 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
     setCompletedLessons(readCompletedLessons());
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    setPanelOpen(false);
+  }, [pathname]);
 
   const currentIndex = useMemo(
     () => lessons.findIndex((lesson) => lesson.href === pathname),
@@ -113,7 +209,6 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
       ? lessons[currentIndex + 1]
       : null;
 
-  const isAcademyHome = pathname === '/academy';
   const completedCount = completedLessons.filter((href) =>
     lessons.some((lesson) => lesson.href === href),
   ).length;
@@ -121,6 +216,14 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
   const currentIsComplete = currentLesson
     ? completedLessons.includes(currentLesson.href)
     : false;
+
+  const continueHref = useMemo(() => {
+    const firstIncomplete = lessons.find(
+      (lesson) =>
+        lesson.status === 'live' && !completedLessons.includes(lesson.href),
+    );
+    return firstIncomplete?.href ?? '/academy/dashboard';
+  }, [completedLessons]);
 
   function toggleCurrentLessonComplete() {
     if (!currentLesson) return;
@@ -135,21 +238,281 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
     });
   }
 
-  if (isAcademyHome || !currentLesson) {
-    return <>{children}</>;
-  }
-
   return (
     <div className="academy-framework">
       <style>{`
         .academy-framework {
           position: relative;
           min-height: 100vh;
+          color: #eff8ff;
+          background:
+            radial-gradient(circle at 16% -8%, rgba(84, 232, 255, .12), transparent 30%),
+            radial-gradient(circle at 92% 10%, rgba(57, 242, 161, .07), transparent 26%),
+            #030a11;
+          font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .academy-framework::before {
+          position: fixed;
+          inset: 0;
+          z-index: 0;
+          pointer-events: none;
+          content: "";
+          opacity: .18;
+          background-image:
+            linear-gradient(rgba(255,255,255,.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
+          background-size: 44px 44px;
+          mask-image: linear-gradient(to bottom, #000, rgba(0,0,0,.68) 58%, transparent);
+        }
+
+        .academy-sidebar {
+          position: fixed;
+          top: 0;
+          bottom: 0;
+          left: 0;
+          z-index: 70;
+          width: 270px;
+          display: flex;
+          flex-direction: column;
+          overflow-y: auto;
+          padding: 18px 14px 22px;
+          border-right: 1px solid rgba(126, 174, 211, .14);
+          background:
+            radial-gradient(circle at 50% 0%, rgba(84, 232, 255, .09), transparent 26%),
+            rgba(3, 9, 16, .94);
+          box-shadow: 18px 0 54px rgba(0,0,0,.18);
+          backdrop-filter: blur(22px);
+        }
+
+        .academy-sidebar-brand {
+          display: grid;
+          grid-template-columns: 44px minmax(0, 1fr);
+          align-items: center;
+          gap: 11px;
+          min-height: 62px;
+          padding: 8px 8px 16px;
+          border-bottom: 1px solid rgba(126, 174, 211, .13);
+          color: #fff;
+          text-decoration: none;
+        }
+
+        .academy-brand-mark {
+          width: 44px;
+          height: 44px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(84, 232, 255, .34);
+          border-radius: 14px;
+          color: #dffaff;
+          background: linear-gradient(145deg, rgba(84, 232, 255, .20), rgba(15, 34, 49, .76));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.14), 0 12px 28px rgba(45, 205, 236, .12);
+          font-size: .72rem;
+          font-weight: 950;
+          letter-spacing: -.03em;
+        }
+
+        .academy-brand-copy {
+          min-width: 0;
+          display: grid;
+          gap: 3px;
+        }
+
+        .academy-brand-copy strong {
+          color: #fff;
+          font-size: .82rem;
+          letter-spacing: .12em;
+        }
+
+        .academy-brand-copy span {
+          overflow: hidden;
+          color: #8198ac;
+          font-size: .67rem;
+          white-space: nowrap;
+          text-overflow: ellipsis;
+        }
+
+        .academy-sidebar-return {
+          min-height: 39px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 14px 7px 18px;
+          border: 1px solid rgba(138, 177, 211, .18);
+          border-radius: 12px;
+          color: #c9d9e7;
+          background: rgba(255,255,255,.025);
+          text-decoration: none;
+          font-size: .72rem;
+          font-weight: 850;
+          transition: 160ms ease;
+        }
+
+        .academy-sidebar-return:hover,
+        .academy-sidebar-return:focus-visible {
+          color: #fff;
+          border-color: rgba(84, 232, 255, .34);
+          background: rgba(84, 232, 255, .07);
+          outline: none;
+          transform: translateY(-1px);
+        }
+
+        .academy-nav-label {
+          display: block;
+          padding: 0 10px 9px;
+          color: #62798d;
+          font-size: .64rem;
+          font-weight: 900;
+          letter-spacing: .17em;
+          text-transform: uppercase;
+        }
+
+        .academy-sidebar-nav {
+          display: grid;
+          gap: 6px;
+        }
+
+        .academy-nav-item {
+          min-height: 47px;
+          display: grid;
+          grid-template-columns: 31px minmax(0, 1fr);
+          align-items: center;
+          gap: 10px;
+          padding: 7px 10px;
+          border: 1px solid transparent;
+          border-radius: 13px;
+          color: #aebfd0;
+          text-decoration: none;
+          font-size: .79rem;
+          font-weight: 760;
+          transition: 160ms ease;
+        }
+
+        .academy-nav-item:hover,
+        .academy-nav-item:focus-visible {
+          color: #fff;
+          border-color: rgba(84, 232, 255, .20);
+          background: rgba(84, 232, 255, .055);
+          outline: none;
+          transform: translateX(2px);
+        }
+
+        .academy-nav-item.active {
+          color: #fff;
+          border-color: rgba(84, 232, 255, .28);
+          background: linear-gradient(135deg, rgba(84, 232, 255, .14), rgba(57, 242, 161, .035));
+          box-shadow: inset 3px 0 0 #54e8ff;
+        }
+
+        .academy-nav-item.gold {
+          color: #f2db9b;
+        }
+
+        .academy-nav-item.gold.active {
+          border-color: rgba(242, 196, 86, .30);
+          background: linear-gradient(135deg, rgba(242, 196, 86, .13), rgba(242, 196, 86, .035));
+          box-shadow: inset 3px 0 0 #f2c456;
+        }
+
+        .academy-nav-item.green.active {
+          border-color: rgba(57, 242, 161, .29);
+          background: linear-gradient(135deg, rgba(57, 242, 161, .13), rgba(84, 232, 255, .035));
+          box-shadow: inset 3px 0 0 #39f2a1;
+        }
+
+        .academy-nav-glyph {
+          width: 30px;
+          height: 30px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(255,255,255,.09);
+          border-radius: 9px;
+          color: #6feaff;
+          background: rgba(255,255,255,.025);
+          font-size: .57rem;
+          font-weight: 950;
+          letter-spacing: -.02em;
+        }
+
+        .academy-nav-item.gold .academy-nav-glyph {
+          color: #f2c456;
+          border-color: rgba(242, 196, 86, .20);
+        }
+
+        .academy-nav-item.green .academy-nav-glyph {
+          color: #65f1b5;
+          border-color: rgba(57, 242, 161, .20);
+        }
+
+        .academy-cta-card {
+          margin-top: auto;
+          padding: 17px;
+          border: 1px solid rgba(57, 242, 161, .20);
+          border-radius: 18px;
+          background:
+            radial-gradient(circle at 100% 0%, rgba(84, 232, 255, .13), transparent 42%),
+            linear-gradient(145deg, rgba(57, 242, 161, .075), rgba(255,255,255,.02));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+        }
+
+        .academy-cta-card small {
+          display: block;
+          color: #65f1b5;
+          font-size: .62rem;
+          font-weight: 950;
+          letter-spacing: .14em;
+          text-transform: uppercase;
+        }
+
+        .academy-cta-card strong {
+          display: block;
+          margin-top: 8px;
+          color: #fff;
+          font-size: .91rem;
+          line-height: 1.38;
+        }
+
+        .academy-cta-card p {
+          margin: 8px 0 13px;
+          color: #8fa6b8;
+          font-size: .71rem;
+          line-height: 1.55;
+        }
+
+        .academy-cta-button {
+          min-height: 42px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 12px;
+          color: #03120d;
+          background: linear-gradient(105deg, #54e8ff, #39f2a1);
+          box-shadow: 0 12px 28px rgba(57, 242, 161, .13);
+          text-decoration: none;
+          font-size: .73rem;
+          font-weight: 950;
+        }
+
+        .academy-cta-secondary {
+          display: flex;
+          justify-content: center;
+          margin-top: 10px;
+          color: #a9c5d5;
+          text-decoration: none;
+          font-size: .68rem;
+          font-weight: 800;
+        }
+
+        .academy-content {
+          position: relative;
+          z-index: 1;
+          min-height: 100vh;
+          margin-left: 270px;
         }
 
         .academy-progress-line {
           position: fixed;
-          inset: 0 0 auto;
+          inset: 0 0 auto 270px;
           z-index: 80;
           height: 3px;
           background: rgba(111, 145, 177, .16);
@@ -181,8 +544,8 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           box-shadow: 0 18px 60px rgba(0, 0, 0, .30);
           backdrop-filter: blur(18px);
           cursor: pointer;
-          font: 900 .78rem/1 Inter, ui-sans-serif, system-ui, sans-serif;
-          letter-spacing: .04em;
+          font: 900 .74rem/1 Inter, ui-sans-serif, system-ui, sans-serif;
+          letter-spacing: .03em;
         }
 
         .academy-launcher-dot {
@@ -420,12 +783,89 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           cursor: not-allowed;
         }
 
+        .academy-mobile-nav {
+          display: none;
+        }
+
+        @media (max-width: 1180px) {
+          .academy-sidebar {
+            width: 248px;
+          }
+
+          .academy-content {
+            margin-left: 248px;
+          }
+
+          .academy-progress-line {
+            left: 248px;
+          }
+        }
+
+        @media (max-width: 960px) {
+          .academy-sidebar {
+            display: none;
+          }
+
+          .academy-content {
+            margin-left: 0;
+            padding-bottom: 78px;
+          }
+
+          .academy-progress-line {
+            left: 0;
+          }
+
+          .academy-mobile-nav {
+            position: fixed;
+            right: 10px;
+            bottom: 10px;
+            left: 10px;
+            z-index: 88;
+            min-height: 64px;
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 3px;
+            padding: 7px;
+            border: 1px solid rgba(126, 174, 211, .18);
+            border-radius: 19px;
+            background: rgba(3, 9, 16, .95);
+            box-shadow: 0 22px 60px rgba(0,0,0,.44);
+            backdrop-filter: blur(22px);
+          }
+
+          .academy-mobile-link {
+            min-width: 0;
+            display: grid;
+            place-items: center;
+            align-content: center;
+            gap: 3px;
+            padding: 5px 2px;
+            border-radius: 12px;
+            color: #9fb2c3;
+            text-decoration: none;
+            font-size: .58rem;
+            font-weight: 850;
+            text-align: center;
+          }
+
+          .academy-mobile-link b {
+            color: #63eaff;
+            font-size: .66rem;
+          }
+
+          .academy-mobile-link.active {
+            color: #fff;
+            background: rgba(84, 232, 255, .10);
+            box-shadow: inset 0 0 0 1px rgba(84, 232, 255, .18);
+          }
+        }
+
         @media (max-width: 720px) {
           .academy-launcher {
             top: auto;
             right: 12px;
-            bottom: 12px;
-            min-height: 48px;
+            bottom: 86px;
+            min-height: 46px;
           }
 
           .academy-panel {
@@ -438,24 +878,96 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
         }
       `}</style>
 
+      <aside className="academy-sidebar" aria-label="TA-14 Academy navigation">
+        <Link className="academy-sidebar-brand" href="/academy">
+          <span className="academy-brand-mark">TA-14</span>
+          <span className="academy-brand-copy">
+            <strong>TA-14 ACADEMY</strong>
+            <span>Governance learning institution</span>
+          </span>
+        </Link>
+
+        <Link className="academy-sidebar-return" href="/">
+          ← Return to Exchange
+        </Link>
+
+        <section>
+          <span className="academy-nav-label">Academy</span>
+          <nav className="academy-sidebar-nav">
+            {academyNavigation.map((item) => {
+              const active = isNavigationItemActive(pathname, item);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={active ? 'page' : undefined}
+                  className={`academy-nav-item${active ? ' active' : ''}${
+                    item.accent ? ` ${item.accent}` : ''
+                  }`}
+                >
+                  <span className="academy-nav-glyph" aria-hidden="true">
+                    {item.glyph}
+                  </span>
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+        </section>
+
+        <article className="academy-cta-card">
+          <small>Primary action</small>
+          <strong>Continue your governed learning route.</strong>
+          <p>
+            Move from orientation into applied route construction, simulation,
+            review, assessment, and evidence-backed credential progression.
+          </p>
+          <Link className="academy-cta-button" href={continueHref}>
+            {completedCount > 0 ? 'Continue Learning →' : 'Start the Academy →'}
+          </Link>
+          <Link className="academy-cta-secondary" href="/academy/dashboard">
+            Open Mission Control
+          </Link>
+        </article>
+      </aside>
+
       <div className="academy-progress-line" aria-hidden="true">
         <span style={{ width: `${progress}%` }} />
       </div>
 
-      {children}
+      <div className="academy-content">{children}</div>
 
-      <button
-        type="button"
-        className="academy-launcher"
-        onClick={() => setPanelOpen(true)}
-        aria-label="Open Academy lesson navigation"
-        aria-expanded={panelOpen}
-      >
-        <span className="academy-launcher-dot" />
-        Lesson {currentLesson.number} · {hydrated ? `${progress}% complete` : 'Academy'}
-      </button>
+      <nav className="academy-mobile-nav" aria-label="Mobile Academy navigation">
+        {mobileNavigation.map((item) => {
+          const active = isNavigationItemActive(pathname, item);
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              aria-current={active ? 'page' : undefined}
+              className={`academy-mobile-link${active ? ' active' : ''}`}
+            >
+              <b aria-hidden="true">{item.glyph}</b>
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
+      </nav>
 
-      {panelOpen ? (
+      {currentLesson ? (
+        <button
+          type="button"
+          className="academy-launcher"
+          onClick={() => setPanelOpen(true)}
+          aria-label="Open Academy lesson navigation"
+          aria-expanded={panelOpen}
+        >
+          <span className="academy-launcher-dot" />
+          Lesson {currentLesson.number} · {hydrated ? `${progress}% complete` : 'Academy'}
+        </button>
+      ) : null}
+
+      {panelOpen && currentLesson ? (
         <>
           <button
             type="button"
