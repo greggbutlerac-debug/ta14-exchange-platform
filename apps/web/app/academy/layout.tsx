@@ -801,7 +801,7 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           }
         }
 
-        @media (max-width: 960px) {
+        @media (max-width: 760px) {
           .academy-sidebar {
             display: none;
           }
