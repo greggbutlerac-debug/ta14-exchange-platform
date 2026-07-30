@@ -7,7 +7,7 @@
  * accreditation intelligence, executive reporting, and preserved audit history.
  */
 
-import { ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useMemo, useRef, useState } from "react";
 
 type ViewKey = "overview" | "enrollment" | "competency" | "faculty" | "programs" | "credentials" | "evidence" | "compliance" | "risk" | "reports" | "audit";
 type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
@@ -362,7 +362,7 @@ function Reports({reports,setReports}:{reports:ReportRecord[];setReports:(v:Repo
 function Audit({entries}:{entries:AuditEntry[]}){return <section className="panel"><div className="timeline">{entries.map(e=><article key={e.id}><div className={`dot ${e.determination.toLowerCase()}`}/><div><span>{new Date(e.at).toLocaleString()} · {e.actor}</span><h4>{e.action}</h4><p>{e.object} — {e.detail}</p></div><b className={`pill ${e.determination.toLowerCase()}`}>{e.determination}</b></article>)}</div></section>}
 
 function Stat({label,value}:{label:string;value:string|number}){return <article className="stat"><span>{label}</span><strong>{value}</strong></article>}
-function Table({headers,rows}:{headers:string[];rows:(string|number|JSX.Element)[][]}){return <div className="table-wrap"><table><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{rows.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}>{cell}</td>)}</tr>)}</tbody></table></div>}
+function Table({headers,rows}:{headers:string[];rows:ReactNode[][]}){return <div className="table-wrap"><table><thead><tr>{headers.map(h=><th key={h}>{h}</th>)}</tr></thead><tbody>{rows.map((row,i)=><tr key={i}>{row.map((cell,j)=><td key={j}>{cell}</td>)}</tr>)}</tbody></table></div>}
 
 function Style(){return <style jsx global>{`
 :root{--bg:#061018;--panel:#0a1721;--panel2:#0d1d29;--line:rgba(155,220,233,.16);--text:#ecfbff;--muted:#8eaab4;--cyan:#8de8ef;--gold:#d8b56b;--green:#7dd9aa;--amber:#efc879;--red:#ec8f8f;--violet:#baa7ef}
