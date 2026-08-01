@@ -1416,7 +1416,7 @@ function downloadText(name: string, value: unknown) {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.suspendObjectURL(url);
+  URL.revokeObjectURL(url);
 }
 
 function Panel({
