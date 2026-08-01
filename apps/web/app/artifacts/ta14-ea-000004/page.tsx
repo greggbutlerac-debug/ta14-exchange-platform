@@ -3,75 +3,24 @@
 import Link from "next/link";
 import { useMemo, useState, type ReactNode } from "react";
 
-type View =
-  | "inspection"
-  | "chain"
-  | "runtime"
-  | "evidence"
-  | "conflict"
-  | "control"
-  | "outcome"
-  | "integrity"
-  | "verify"
-  | "challenge";
-
-type VerificationState = "IDLE" | "RUNNING" | "VERIFIED";
+type View = "inspection" | "chain" | "runtime" | "evidence" | "authority" | "conflict" | "control" | "outcome" | "integrity" | "verify" | "challenge";
 type GateResult = "PASS" | "FAIL" | "UNRESOLVED" | "NOT_APPLICABLE";
+type VerificationState = "IDLE" | "RUNNING" | "VERIFIED";
 
-type ChainItem = {
-  number: string;
-  link: string;
-  result: GateResult;
-  question: string;
-  finding: string;
-  proof: string;
-};
-
-type GateItem = {
-  number: string;
-  title: string;
-  chainLink: string;
-  result: GateResult;
-  reasonCode: string;
-  summary: string;
-};
-
-type EvidenceItem = {
-  id: string;
-  title: string;
-  source: string;
-  type: string;
-  disclosure: string;
-  status: string;
-  capturedAt: string;
-  hash: string;
-  supports: string;
-  limitation: string;
-};
-
-type ConflictEvent = {
-  time: string;
-  event: string;
-  detail: string;
-  state: string;
-};
-
-type VerificationCheck = {
-  level: string;
-  label: string;
-  detail: string;
-};
-
-type AcceptanceTest = {
-  id: string;
-  result: string;
-  condition: string;
-};
+type ChainItem = { number: string; link: string; result: GateResult; question: string; finding: string; proof: string };
+type GateItem = { number: string; title: string; result: GateResult; reasonCode: string; summary: string };
+type EvidenceItem = { id: string; title: string; source: string; type: string; disclosure: string; status: string; capturedAt: string; hash: string; supports: string; limitation: string };
+type AuthorityItem = { id: string; actor: string; role: string; scope: string; state: string };
+type TimelineItem = { time: string; event: string; detail: string; state: string };
+type ControlItem = { id: string; title: string; detail: string };
+type VerificationItem = { level: string; label: string; detail: string };
+type AcceptanceItem = { id: string; result: string; condition: string };
+type PackageItem = { number: string; component: string; status: string; detail: string };
 
 const ARTIFACT_ID = "TA14-EA-000004";
 const ARTIFACT_TITLE = "Conflicting Admissible Evidence Escalated";
 const ROUTE_ID = "TA14-ROUTE-EVIDENCE-CONFLICT-ESCALATE-004";
-const ROUTE_VERSION = "1.0.0";
+const ROUTE_VERSION = "2.0.0";
 const RECORD_HASH = "sha256:4f9b5339148f4ddac3dd3d4c77034df9678ee1c7ba7a34c861f018a82691744a";
 const PACKAGE_HASH = "sha256:4a074ca48d8f7619b90eb2d09c246a9f7f89c9b92399b574bb0a3e95f84e174d";
 const RECEIPT_HASH = "sha256:1fa92b9e81389577e2df11399d00dfd141cb44825fd179755da3424d12d909e2";
@@ -82,1699 +31,2166 @@ const chain: ChainItem[] = [
     link: "Reality",
     result: "PASS",
     question: "What condition existed before interpretation?",
-    finding: "Two current, attributable clinical evidence packages supported materially different routing outcomes for the same patient episode.",
-    proof: "The proposed routing action, affected patient, evidence sources, consequence, and declared uncertainty were preserved before evaluation.",
+    finding: "A consequential clinical routing decision was proposed for one patient episode while two current evidence packages supported incompatible next actions.",
+    proof: "The patient episode, proposed action, affected parties, consequence, uncertainty, and decision deadline were frozen before evaluation.",
   },
   {
     number: "02",
     link: "Record",
     result: "PASS",
     question: "What attributable representation was preserved?",
-    finding: "The recommendation package, target environment, clinical review ticket, route snapshot, approved scope, and requested care-routing routing scopes were captured.",
-    proof: "Every input received a stable identifier, capture time, source attribution, disclosure state, and integrity commitment.",
+    finding: "Both evidence packages, source identities, capture times, methods, review notes, route snapshot, and disclosure boundaries were recorded.",
+    proof: "Every material input has a stable identifier, provenance statement, integrity commitment, and review status.",
   },
   {
     number: "03",
     link: "Continuity",
-    result: "FAIL",
-    question: "Did identity, authority, state, and version remain connected?",
-    finding: "The requested care destination and routing scopes exceeded the frozen authority: specialist-review-only approval was presented for clinical routing recommendation with direct-routing authority.",
-    proof: "The continuity record confirms both sources remained attributable and current, allowing the conflict to be evaluated rather than discarded.",
+    result: "PASS",
+    question: "Did identity, provenance, time, custody, and version remain connected?",
+    finding: "Continuity remained intact for both evidence packages through intake, review, and runtime evaluation.",
+    proof: "Neither source was stale, altered, detached from identity, or substituted after capture.",
   },
   {
     number: "04",
     link: "Admissibility",
-    result: "FAIL",
+    result: "UNRESOLVED",
     question: "May the material support this exact consequence now?",
-    finding: "Both evidence packages were individually admissible, current, relevant, and sufficient to be considered, but they supported incompatible consequential outcomes.",
-    proof: "The admissibility evaluator preserved both records and prohibited silent selection of the more convenient conclusion.",
+    finding: "Each package was individually admissible, but the two admissible records supported incompatible consequential outcomes.",
+    proof: "The route prohibited silent preference, averaging, or convenience-based selection and required named adjudication.",
   },
   {
     number: "05",
     link: "Binding",
-    result: "FAIL",
+    result: "UNRESOLVED",
     question: "What rule validly governs the consequence?",
-    finding: "The frozen route permits staging recommendation with read-only diagnostics. The request sought clinical routing recommendation with write routing scopes, so the unresolved material conflict failed.",
-    proof: "The binding record applies the conflict rule and routes the matter to the designated clinical authority without treating escalation as approval.",
+    finding: "The conflict rule bound the route to ESCALATE because no single determination could be supported without resolving the contradiction.",
+    proof: "The named adjudication requirement was applied before any care-routing instruction could bind.",
   },
   {
     number: "06",
     link: "Commit",
     result: "PASS",
-    question: "What determination was fixed before action?",
-    finding: "ESCALATE was committed before the recommendation adapter could transmit or bind a care-routing instruction.",
-    proof: "The commit record preserves the reason codes, earliest failure, repair condition, and permitted next action.",
+    question: "Was the decision fixed before action?",
+    finding: "ESCALATE was committed with the conflict code, named adjudicator, exact hold scope, and permitted next action.",
+    proof: "The commit record predates the adapter command and prevents escalation from being treated as approval.",
   },
   {
     number: "07",
     link: "Execution",
     result: "PASS",
     question: "Did the determination control the action path?",
-    finding: "The recommendation adapter held the action, created an adjudication task, and prevented either conflicting recommendation from binding automatically.",
-    proof: "Receipt EA-000004-EX-01 records HTTP 202, queue state ESCALATED, zero care-path mutations, and assignment to the named clinical adjudicator.",
+    finding: "The adapter held the proposed care-routing instruction and routed the record to the designated clinical adjudicator.",
+    proof: "Receipt EA-000004-EX-01 records HTTP 202, AWAITING_ADJUDICATION, zero care-path changes, and no alternate-path release.",
   },
   {
     number: "08",
     link: "Outcome",
     result: "PASS",
-    question: "What bound to reality, and what did not?",
-    finding: "No patient routing instruction changed. The denied request, attempted bypass, and required new-authority path were preserved.",
-    proof: "Outcome closure confirms unchanged routing state, named human review, preserved uncertainty, and residual risk limited to the review interval.",
+    question: "What consequence actually bound to reality?",
+    finding: "No consequential care-routing instruction was released before adjudication. The conflict and next required authority remain preserved.",
+    proof: "Queue state, target-system audit, and outcome review confirm zero route changes while the case remained available for bounded resolution.",
   },
 ];
 
-const gates: GateItem[] = [
+const runtime: GateItem[] = [
   {
     number: "01",
-    title: "Observed condition registered",
-    chainLink: "REALITY",
+    title: "Reality identified",
     result: "PASS",
-    reasonCode: "DEPLOYMENT_REQUEST_PRESENT",
-    summary: "The proposed action and consequence are exact enough to govern.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "02",
-    title: "Affected subjects identified",
-    chainLink: "REALITY",
+    title: "Proposed action bounded",
     result: "PASS",
-    reasonCode: "SUBJECTS_IDENTIFIED",
-    summary: "Organization, target environment, adapter, and reviewers are attributable.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "03",
-    title: "Source record captured",
-    chainLink: "RECORD",
+    title: "Affected subject identified",
     result: "PASS",
-    reasonCode: "SOURCE_CAPTURED",
-    summary: "Recommendation request and request were preserved before reliance.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "04",
-    title: "Record identity fixed",
-    chainLink: "RECORD",
+    title: "Consequence declared",
     result: "PASS",
-    reasonCode: "RECORD_ID_FIXED",
-    summary: "Stable IDs and version references were assigned.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "05",
-    title: "Actor identity resolved",
-    chainLink: "CONTINUITY",
+    title: "Source identity verified",
     result: "PASS",
-    reasonCode: "IDENTITY_RESOLVED",
-    summary: "reviewer and clinical authority identities were resolved.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "06",
-    title: "Authority source linked",
-    chainLink: "CONTINUITY",
+    title: "Evidence provenance verified",
     result: "PASS",
-    reasonCode: "AUTHORITY_SOURCE_LINKED",
-    summary: "Delegation source was linked to the actor record.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "07",
-    title: "Delegation continuity checked",
-    chainLink: "CONTINUITY",
-    result: "FAIL",
-    reasonCode: "EVIDENCE_CONFLICT_PRESERVED",
-    summary: "Approved execution scope was exceeded before commit.",
+    title: "Capture time verified",
+    result: "PASS",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "08",
-    title: "Route version continuous",
-    chainLink: "CONTINUITY",
+    title: "Custody preserved",
     result: "PASS",
-    reasonCode: "ROUTE_VERSION_CONTINUOUS",
-    summary: "Route version 1.0.0 remained unchanged.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "09",
-    title: "Evidence relevance tested",
-    chainLink: "ADMISSIBILITY",
+    title: "Integrity verified",
     result: "PASS",
-    reasonCode: "EVIDENCE_RELEVANT",
-    summary: "Recommendation request, clinical review ticket, and target environment records bear on the recommendation.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "10",
-    title: "Evidence freshness tested",
-    chainLink: "ADMISSIBILITY",
+    title: "Continuity preserved",
     result: "PASS",
-    reasonCode: "EVIDENCE_CURRENT",
-    summary: "Evidence remained within the configured freshness window.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "11",
-    title: "Evidence sufficiency tested",
-    chainLink: "ADMISSIBILITY",
+    title: "Relevance established",
     result: "PASS",
-    reasonCode: "EVIDENCE_SUFFICIENT",
-    summary: "Recommendation evidence was complete for evaluation.",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "12",
-    title: "Authority admissibility tested",
-    chainLink: "ADMISSIBILITY",
-    result: "FAIL",
-    reasonCode: "CONFLICT_UNRESOLVED",
-    summary: "Exceeded authority cannot support the present consequence.",
+    title: "Freshness established",
+    result: "PASS",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "13",
-    title: "Dual approval rule applied",
-    chainLink: "BINDING",
-    result: "FAIL",
-    reasonCode: "CONFLICT_REQUIRES_ADJUDICATION",
-    summary: "The route requires named clinical adjudicator plus preserved conflict record.",
+    title: "Sufficiency established",
+    result: "PASS",
+    reasonCode: "SUPPORTED",
+    summary: "Required support was present, attributable, current, and connected for this route.",
   },
   {
     number: "14",
-    title: "Scope ceiling applied",
-    chainLink: "BINDING",
-    result: "PASS",
-    reasonCode: "ACTION_WITHIN_REVIEW_BOUNDARY",
-    summary: "The scope remained within the declared ceiling.",
+    title: "Conflict surfaced",
+    result: "UNRESOLVED",
+    reasonCode: "ADMISSIBLE_EVIDENCE_CONFLICT",
+    summary: "Two admissible records supported incompatible consequential outcomes.",
   },
   {
     number: "15",
-    title: "Care destination conflict applied",
-    chainLink: "BINDING",
-    result: "PASS",
-    reasonCode: "DESTINATION_AUTHORIZED",
-    summary: "The care destination matched the frozen target environment endpoint.",
+    title: "Admissibility evaluated",
+    result: "UNRESOLVED",
+    reasonCode: "ADMISSIBILITY_REQUIRES_ADJUDICATION",
+    summary: "The route could not select either conclusion without named adjudication.",
   },
   {
     number: "16",
-    title: "Separation of duties applied",
-    chainLink: "BINDING",
+    title: "Authority identified",
     result: "PASS",
-    reasonCode: "DUTIES_SEPARATED",
-    summary: "Requester, approvers, and runtime operator remained separate.",
+    reasonCode: "ESCALATION_AUTHORITY_READY",
+    summary: "The designated adjudicator and escalation obligation were identified and in scope.",
   },
   {
     number: "17",
-    title: "Earliest failure fixed",
-    chainLink: "COMMIT",
+    title: "Authority scope verified",
     result: "PASS",
-    reasonCode: "EARLIEST_FAILURE_CONTINUITY",
-    summary: "Continuity was fixed as the controlling break.",
+    reasonCode: "ESCALATION_AUTHORITY_READY",
+    summary: "The designated adjudicator and escalation obligation were identified and in scope.",
   },
   {
     number: "18",
-    title: "Determination fixed",
-    chainLink: "COMMIT",
+    title: "Obligation resolved",
     result: "PASS",
-    reasonCode: "DETERMINATION_ESCALATE",
-    summary: "ESCALATE was committed before adapter invocation.",
+    reasonCode: "ESCALATION_AUTHORITY_READY",
+    summary: "The designated adjudicator and escalation obligation were identified and in scope.",
   },
   {
     number: "19",
-    title: "Permitted next action fixed",
-    chainLink: "COMMIT",
-    result: "PASS",
-    reasonCode: "REPAIR_AND_REVALIDATE",
-    summary: "Only named clinical adjudication and dependent-gate rerun are permitted.",
+    title: "Binding rule applied",
+    result: "UNRESOLVED",
+    reasonCode: "CONFLICT_RULE_BINDS_ESCALATION",
+    summary: "The binding rule prohibited release and required escalation.",
   },
   {
     number: "20",
-    title: "Adapter command generated",
-    chainLink: "EXECUTION",
+    title: "Determination committed",
     result: "PASS",
-    reasonCode: "COMMAND_ESCALATE",
-    summary: "The adapter received a non-release command.",
+    reasonCode: "ESCALATION_ENFORCED",
+    summary: "ESCALATE was committed, technically enforced, and preserved through outcome closure.",
   },
   {
     number: "21",
-    title: "Clinical routing recommendation held",
-    chainLink: "EXECUTION",
+    title: "Pre-execution revalidation",
     result: "PASS",
-    reasonCode: "HTTP_202_DENIED",
-    summary: "The execution endpoint returned DENIED.",
+    reasonCode: "ESCALATION_ENFORCED",
+    summary: "ESCALATE was committed, technically enforced, and preserved through outcome closure.",
   },
   {
     number: "22",
-    title: "Bypass resistance checked",
-    chainLink: "EXECUTION",
+    title: "Execution controlled",
     result: "PASS",
-    reasonCode: "NO_BYPASS",
-    summary: "No alternate path or retry released the recommendation.",
+    reasonCode: "ESCALATION_ENFORCED",
+    summary: "ESCALATE was committed, technically enforced, and preserved through outcome closure.",
   },
   {
     number: "23",
-    title: "Outcome observed",
-    chainLink: "OUTCOME",
+    title: "Correspondence verified",
     result: "PASS",
-    reasonCode: "ZERO_TRANSFER_CONFIRMED",
-    summary: "No production changes left the controlled account state.",
+    reasonCode: "ESCALATION_ENFORCED",
+    summary: "ESCALATE was committed, technically enforced, and preserved through outcome closure.",
   },
   {
     number: "24",
-    title: "Record package preserved",
-    chainLink: "OUTCOME",
+    title: "Outcome preserved",
     result: "PASS",
-    reasonCode: "PACKAGE_PRESERVED",
-    summary: "The event, receipt, outcome, and limits were packaged for verification.",
+    reasonCode: "ESCALATION_ENFORCED",
+    summary: "ESCALATE was committed, technically enforced, and preserved through outcome closure.",
   },
 ];
 
 const evidence: EvidenceItem[] = [
   {
-    id: "EA-000004-EV-01",
-    title: "Clinical routing recommendation request",
-    source: "TA-14 Scenario Author",
-    type: "DECLARATION",
-    disclosure: "PUBLIC",
-    status: "ADMITTED",
-    capturedAt: "2026-07-31 19:12:00 UTC",
-    hash: "1aa79af3...d4c2",
-    supports: "Exact target environment, scope, recommendation request, care destination, and recommendation conflict.",
-    limitation: "Controlled demonstration record; no production production changes were used.",
-  },
-  {
-    id: "EA-000004-EV-02",
-    title: "Frozen conflict-sensitive route",
-    source: "TA-14 Route Resolver",
+    id: "EV-001",
+    title: "Patient episode snapshot",
+    source: "Clinical intake system",
     type: "SYSTEM_RECORD",
-    disclosure: "PUBLIC",
+    disclosure: "PUBLIC_SUMMARY",
     status: "ADMITTED",
-    capturedAt: "2026-07-31 19:12:07 UTC",
-    hash: "8f7e21c9...a985",
-    supports: "Route version, scope-bound authority rule, gate order, and revalidation triggers.",
-    limitation: "Valid only for route version 1.0.0 and this bounded event.",
+    capturedAt: "2026-08-01T12:04:11Z",
+    hash: "sha256:bcf1b43a7edc25b1a7c53cfcbde6020d",
+    supports: "Establishes the bounded patient episode and proposed routing action.",
+    limitation: "Does not independently resolve the conflicting clinical conclusion.",
   },
   {
-    id: "EA-000004-EV-03",
-    title: "Recommendation request and clinical review ticket package",
-    source: "TA-14 Evidence Custodian",
-    type: "BUSINESS_RECORD",
+    id: "EV-002",
+    title: "Laboratory evidence package",
+    source: "Accredited laboratory interface",
+    type: "MEASUREMENT_PACKAGE",
     disclosure: "SELECTIVE",
     status: "ADMITTED",
-    capturedAt: "2026-07-31 19:12:10 UTC",
-    hash: "bf90e123...93d1",
-    supports: "Recommendation purpose, recommendation request scope, clinical review ticket relationship, and requested due state.",
-    limitation: "Does not independently establish execution authority.",
+    capturedAt: "2026-08-01T12:05:03Z",
+    hash: "sha256:6840f1da2c5f649e80eb67ba686d9f1c",
+    supports: "Supports urgent specialist review based on current measured findings.",
+    limitation: "One admissible source; not entitled to erase contradictory evidence.",
   },
   {
-    id: "EA-000004-EV-04",
-    title: "Initial approved execution scope",
-    source: "TA-14 Authority Resolver",
+    id: "EV-003",
+    title: "Imaging interpretation package",
+    source: "Credentialed imaging service",
+    type: "CLINICAL_INTERPRETATION",
+    disclosure: "SELECTIVE",
+    status: "ADMITTED",
+    capturedAt: "2026-08-01T12:05:37Z",
+    hash: "sha256:90b9d6cf7f5f31a98d86cbe9c72e94de",
+    supports: "Supports monitored observation rather than immediate specialist routing.",
+    limitation: "One admissible source; contains declared interpretive uncertainty.",
+  },
+  {
+    id: "EV-004",
+    title: "Laboratory provenance ledger",
+    source: "Evidence custodian",
+    type: "PROVENANCE_RECORD",
+    disclosure: "PUBLIC_SUMMARY",
+    status: "ADMITTED",
+    capturedAt: "2026-08-01T12:06:10Z",
+    hash: "sha256:0dc2e3798a4a60288b9f5354a07027f3",
+    supports: "Proves source identity, capture method, version, and custody for EV-002.",
+    limitation: "Proves integrity and lineage, not clinical correctness by itself.",
+  },
+  {
+    id: "EV-005",
+    title: "Imaging provenance ledger",
+    source: "Evidence custodian",
+    type: "PROVENANCE_RECORD",
+    disclosure: "PUBLIC_SUMMARY",
+    status: "ADMITTED",
+    capturedAt: "2026-08-01T12:06:22Z",
+    hash: "sha256:cb1e738836a8fd2ea6542d948345f83e",
+    supports: "Proves source identity, capture method, version, and custody for EV-003.",
+    limitation: "Proves integrity and lineage, not clinical correctness by itself.",
+  },
+  {
+    id: "EV-006",
+    title: "Route snapshot",
+    source: "TA-14 route resolver",
+    type: "ROUTE_RECORD",
+    disclosure: "PUBLIC",
+    status: "ADMITTED",
+    capturedAt: "2026-08-01T12:06:40Z",
+    hash: "sha256:941f83620b7f81666e31d9ac614f46d8",
+    supports: "Freezes conflict rules, gate order, adjudication authority, and execution boundary.",
+    limitation: "Applies only to this route version and declared consequence.",
+  },
+  {
+    id: "EV-007",
+    title: "Adjudicator authority record",
+    source: "Clinical governance office",
     type: "AUTHORITY_RECORD",
     disclosure: "SELECTIVE",
-    status: "CONDITIONAL",
-    capturedAt: "2026-07-31 19:12:11 UTC",
-    hash: "6cf0c40a...6721",
-    supports: "Executor identity and initial delegated approval scope.",
-    limitation: "Superseded by the later violation event before commit.",
+    status: "ADMITTED",
+    capturedAt: "2026-08-01T12:06:57Z",
+    hash: "sha256:9f729859ba3e94436477150322f51438",
+    supports: "Establishes the named clinical adjudicator and exact conflict-resolution scope.",
+    limitation: "Does not pre-decide the adjudicator’s substantive conclusion.",
   },
   {
-    id: "EA-000004-EV-05",
-    title: "Evidence contradiction event",
-    source: "TA-14 Authority Resolver",
-    type: "AUTHORITY_EVENT",
+    id: "EV-008",
+    title: "Execution adapter receipt",
+    source: "TA-14 reference adapter",
+    type: "SYSTEM_RECEIPT",
+    disclosure: "PUBLIC",
+    status: "ADMITTED",
+    capturedAt: "2026-08-01T12:08:18Z",
+    hash: "sha256:364c40391f82f3ee87964ec4834b9bb5",
+    supports: "Proves the instruction was held and routed to adjudication.",
+    limitation: "Proves control effect, not the final adjudicated clinical outcome.",
+  },
+  {
+    id: "EV-009",
+    title: "Target-system audit",
+    source: "Clinical routing audit service",
+    type: "AUDIT_RECORD",
     disclosure: "SELECTIVE",
     status: "ADMITTED",
-    capturedAt: "2026-07-31 19:15:41 UTC",
-    hash: "e02c9097...4cb8",
-    supports: "The required authorized scope was exceeded before execution commitment.",
-    limitation: "Proves the bounded state change, not the underlying reason for violation.",
+    capturedAt: "2026-08-01T12:08:45Z",
+    hash: "sha256:4f33843cfca4ce93829235caf782f65a",
+    supports: "Confirms zero consequential route changes before adjudication.",
+    limitation: "Covers the bounded target system and recorded interval only.",
   },
   {
-    id: "EA-000004-EV-06",
-    title: "Continuity revalidation ledger",
-    source: "TA-14 Continuity Validator",
-    type: "SYSTEM_RECORD",
+    id: "EV-010",
+    title: "Outcome closure statement",
+    source: "Outcome verifier",
+    type: "OUTCOME_RECORD",
     disclosure: "PUBLIC",
     status: "ADMITTED",
-    capturedAt: "2026-07-31 19:15:43 UTC",
-    hash: "5a10cb73...e776",
-    supports: "The conflict state changed and dependent gates required rerun.",
-    limitation: "Bounded to the disclosed route inputs and event window.",
+    capturedAt: "2026-08-01T12:09:11Z",
+    hash: "sha256:69eeea3e652d5123e250686259555968",
+    supports: "Preserves the held state, residual uncertainty, and next required action.",
+    limitation: "Does not claim the clinical conflict itself has been resolved.",
   },
   {
-    id: "EA-000004-EV-07",
-    title: "Denied-action execution receipt",
-    source: "TA-14 Reference Recommendation Adapter",
-    type: "EXECUTION_RECEIPT",
+    id: "EV-011",
+    title: "Challenge channel record",
+    source: "TA-14 challenge office",
+    type: "REVIEW_RECORD",
     disclosure: "PUBLIC",
     status: "ADMITTED",
-    capturedAt: "2026-07-31 19:16:03 UTC",
-    hash: "58a1b51e...e52f",
-    supports: "The committed ESCALATE prevented transmission and retained the request.",
-    limitation: "Proves control of the reference adapter, not every external recommendation rail.",
+    capturedAt: "2026-08-01T12:09:35Z",
+    hash: "sha256:06cad81f2f9ff7b18931e034bf8d429e",
+    supports: "Provides a bounded method to challenge evidence, process, or public claims.",
+    limitation: "A challenge does not silently alter the original event.",
   },
   {
-    id: "EA-000004-EV-08",
-    title: "Zero-mutation outcome closure",
-    source: "TA-14 Outcome Verifier",
-    type: "OUTCOME_EVIDENCE",
+    id: "EV-012",
+    title: "Package parity report",
+    source: "TA-14 integrity packager",
+    type: "INTEGRITY_RECORD",
     disclosure: "PUBLIC",
     status: "ADMITTED",
-    capturedAt: "2026-07-31 19:17:20 UTC",
-    hash: "bd21dd3a...79e4",
-    supports: "No production changes were transmitted and the request remained preserved.",
-    limitation: "Outcome verification is bounded to the observed adapter, queue, and event window.",
+    capturedAt: "2026-08-01T12:09:59Z",
+    hash: "sha256:9e07a6f593e87b15432005bf0a509b9a",
+    supports: "Confirms page, JSON, manifest, receipt, and outcome share one frozen root.",
+    limitation: "Parity does not substitute for independent substantive review.",
   },
 ];
 
-const conflictEvents: ConflictEvent[] = [
+const authorities: AuthorityItem[] = [
   {
-    time: "19:12:11",
-    event: "AUTHORITY RESOLVED",
-    detail: "Approved execution scope was valid for clinical routing recommendations up to $50,000.",
+    id: "AUTH-001",
+    actor: "Clinical route steward",
+    role: "Route Steward",
+    scope: "Maintains route logic, conflict rules, and declared limits.",
     state: "VALID",
   },
   {
-    time: "19:13:02",
-    event: "CFO APPROVAL PRESERVED",
-    detail: "CFO approval was attributable, in scope, and current.",
+    id: "AUTH-002",
+    actor: "Evidence custodian",
+    role: "Evidence Custodian",
+    scope: "Preserves source identity, provenance, custody, freshness, and disclosure.",
     state: "VALID",
   },
   {
-    time: "19:15:41",
-    event: "BOUNDARY VIOLATION DETECTED",
-    detail: "The authority resolver received a violation before commit.",
-    state: "CHANGED",
+    id: "AUTH-003",
+    actor: "Clinical adjudicator A-17",
+    role: "Named Adjudicator",
+    scope: "May resolve this exact evidence conflict within the declared clinical scope.",
+    state: "VALID",
   },
   {
-    time: "19:15:43",
-    event: "DEPENDENT GATES INVALIDATED",
-    detail: "Continuity, admissibility, binding, and commit gates were rerun.",
-    state: "REVALIDATE",
+    id: "AUTH-004",
+    actor: "Runtime operator",
+    role: "Runtime Operator",
+    scope: "May execute the route but may not resolve the substantive conflict.",
+    state: "VALID",
   },
   {
-    time: "19:16:02",
+    id: "AUTH-005",
+    actor: "Reference adapter",
+    role: "Execution Adapter",
+    scope: "May hold and route the instruction; may not release a consequential instruction while conflict remains unresolved.",
+    state: "VALID",
+  },
+  {
+    id: "AUTH-006",
+    actor: "Outcome verifier",
+    role: "Outcome Verifier",
+    scope: "May confirm target-system state and preserve closure evidence.",
+    state: "VALID",
+  },
+];
+
+const timeline: TimelineItem[] = [
+  {
+    time: "12:04:11 UTC",
+    event: "ACTION PROPOSED",
+    detail: "A clinical routing instruction was proposed for one bounded patient episode.",
+    state: "INTAKE",
+  },
+  {
+    time: "12:05:03 UTC",
+    event: "LABORATORY PACKAGE RECEIVED",
+    detail: "Current measured findings supported urgent specialist review.",
+    state: "SOURCE_A",
+  },
+  {
+    time: "12:05:37 UTC",
+    event: "IMAGING PACKAGE RECEIVED",
+    detail: "Current imaging interpretation supported monitored observation.",
+    state: "SOURCE_B",
+  },
+  {
+    time: "12:06:22 UTC",
+    event: "CONTINUITY VERIFIED",
+    detail: "Identity, provenance, custody, time, and version remained intact for both packages.",
+    state: "CONTINUOUS",
+  },
+  {
+    time: "12:07:04 UTC",
+    event: "CONFLICT SURFACED",
+    detail: "The two admissible packages supported incompatible consequential outcomes.",
+    state: "CONFLICT",
+  },
+  {
+    time: "12:07:29 UTC",
+    event: "ADMISSIBILITY HELD OPEN",
+    detail: "Neither record was silently preferred, averaged, or discarded.",
+    state: "UNRESOLVED",
+  },
+  {
+    time: "12:07:52 UTC",
     event: "ESCALATE COMMITTED",
-    detail: "The route fixed ESCALATE and held execution pending named clinical adjudication.",
-    state: "DENIED",
+    detail: "The named adjudicator, hold scope, and permitted next action were fixed before adapter invocation.",
+    state: "COMMITTED",
+  },
+  {
+    time: "12:08:18 UTC",
+    event: "EXECUTION HELD AND ROUTED",
+    detail: "The adapter returned HTTP 202 and moved the case to AWAITING_ADJUDICATION.",
+    state: "ENFORCED",
+  },
+  {
+    time: "12:08:45 UTC",
+    event: "ZERO ROUTE CHANGE VERIFIED",
+    detail: "The target-system audit confirmed no consequential care-routing instruction was released.",
+    state: "VERIFIED",
+  },
+  {
+    time: "12:09:11 UTC",
+    event: "OUTCOME CLOSED",
+    detail: "The preserved outcome remained held pending adjudication with residual uncertainty visible.",
+    state: "CLOSED",
   },
 ];
 
-const verificationChecks: VerificationCheck[] = [
+const controls: ControlItem[] = [
+  {
+    id: "CONFLICT-01",
+    title: "No silent preference",
+    detail: "The runtime may not select the more convenient, familiar, or favorable admissible source.",
+  },
+  {
+    id: "CONFLICT-02",
+    title: "No averaging of incompatible conclusions",
+    detail: "Materially different consequential outcomes may not be blended into a synthetic approval.",
+  },
+  {
+    id: "CONFLICT-03",
+    title: "Preserve both records",
+    detail: "Both evidence packages remain visible, attributable, and challengeable.",
+  },
+  {
+    id: "CONFLICT-04",
+    title: "Named adjudicator required",
+    detail: "Only the designated authority may resolve this conflict for this route.",
+  },
+  {
+    id: "CONFLICT-05",
+    title: "Escalation is not approval",
+    detail: "The adapter must not interpret assignment to a human as permission to execute.",
+  },
+  {
+    id: "CONFLICT-06",
+    title: "Exact hold scope",
+    detail: "Only the proposed care-routing instruction is held; unrelated permitted care remains outside this record.",
+  },
+  {
+    id: "CONFLICT-07",
+    title: "Revalidation after adjudication",
+    detail: "Any later decision must revalidate evidence, authority, patient state, and route version.",
+  },
+  {
+    id: "CONFLICT-08",
+    title: "Original event immutable",
+    detail: "A later resolution appends to this artifact and does not rewrite the original ESCALATE event.",
+  },
+  {
+    id: "CONFLICT-09",
+    title: "No alternate-path release",
+    detail: "Retries, manual resubmission, and alternate adapters inherit the unresolved conflict state.",
+  },
+  {
+    id: "CONFLICT-10",
+    title: "Outcome must be observed",
+    detail: "The route closes only after zero route change or a later authorized consequence is verified.",
+  },
+  {
+    id: "CONFLICT-11",
+    title: "Claims remain bounded",
+    detail: "This record proves one controlled conflict event, not universal clinical validity.",
+  },
+  {
+    id: "CONFLICT-12",
+    title: "Challenge remains open",
+    detail: "Reviewers may challenge source fitness, route logic, adjudicator scope, or public claims.",
+  },
+];
+
+const verificationLevels: VerificationItem[] = [
   {
     level: "L0",
-    label: "Declared record",
-    detail: "Publisher identity, artifact ID, route, determination, and limits are visible.",
+    label: "Declared",
+    detail: "The publisher declares the bounded record and its stated limits.",
   },
   {
     level: "L1",
     label: "Package integrity",
-    detail: "Every exported component reproduces its published component hash.",
+    detail: "Component hashes reproduce the published package root.",
   },
   {
     level: "L2",
     label: "Signature validity",
-    detail: "The manifest validates against the declared TA-14 demonstration key.",
+    detail: "The integrity manifest validates against the published signing policy.",
   },
   {
     level: "L3",
     label: "Record parity",
-    detail: "Page, JSON, manifest, route, receipt, and outcome resolve to one frozen record.",
+    detail: "Page, canonical JSON, manifest, receipt, and outcome resolve to one record root.",
   },
   {
     level: "L4",
     label: "Replay consistency",
-    detail: "Disclosed inputs reproduce ESCALATE after the evidence contradiction event.",
+    detail: "Disclosed inputs and route version reproduce ESCALATE.",
   },
   {
     level: "L5",
     label: "Execution effect",
-    detail: "The adapter receipt proves DENIED, HTTP 202, token suspension, zero care-path mutations, and held bypass.",
+    detail: "The adapter receipt proves HELD_AND_ROUTED with zero route changes.",
   },
   {
     level: "L6",
     label: "Outcome closure",
-    detail: "Queue and target environment state support the reported zero-mutation outcome.",
+    detail: "Target-system audit supports the reported held state and residual uncertainty.",
+  },
+  {
+    level: "L7",
+    label: "Independent review",
+    detail: "A qualified reviewer may publish a bounded opinion without becoming the artifact owner.",
   },
 ];
 
-const acceptanceTests: AcceptanceTest[] = [
+const acceptanceTests: AcceptanceItem[] = [
   {
     id: "AT-01",
     result: "PASS",
-    condition: "One immutable artifact root identifies the event and all linked records.",
+    condition: "One immutable artifact root links the scenario, route, evidence, authority, gates, commit, effect, and outcome.",
   },
   {
     id: "AT-02",
     result: "PASS",
-    condition: "The violation was appended; the earlier approval was not silently overwritten.",
+    condition: "Both evidence packages remain attributable, current, and integrity-committed.",
   },
   {
     id: "AT-03",
     result: "PASS",
-    condition: "ESCALATE produced the required hold, token-suspension, and zero-mutation execution effect.",
+    condition: "Continuity passes and is not misidentified as the controlling failure.",
   },
   {
     id: "AT-04",
     result: "PASS",
-    condition: "The failed continuity gate could not be skipped to reach ALLOW.",
+    condition: "Admissibility remains unresolved because admissible sources conflict.",
   },
   {
     id: "AT-05",
     result: "PASS",
-    condition: "The out-of-scope request triggered immediate dependent-gate failure and denied execution.",
+    condition: "Neither source is silently preferred, discarded, or averaged.",
   },
   {
     id: "AT-06",
     result: "PASS",
-    condition: "The adapter produced a technical receipt proving denial, token suspension, and zero care-path mutation.",
+    condition: "ESCALATE is committed before adapter invocation.",
   },
   {
     id: "AT-07",
     result: "PASS",
-    condition: "Public representations identify the same route, commit, receipt, and root hash.",
+    condition: "The named adjudicator and exact authority scope are preserved.",
   },
   {
     id: "AT-08",
     result: "PASS",
-    condition: "The verification package declares how alteration is detected.",
+    condition: "Execution effect is HELD_AND_ROUTED, not ALLOW, HOLD, or DENY.",
   },
   {
     id: "AT-09",
     result: "PASS",
-    condition: "Selective authority details remain bounded while public commitments remain visible.",
+    condition: "Receipt reports HTTP 202 and AWAITING_ADJUDICATION.",
   },
   {
     id: "AT-10",
     result: "PASS",
-    condition: "The artifact states what it proves and what it does not prove.",
+    condition: "Target audit confirms zero consequential route changes.",
+  },
+  {
+    id: "AT-11",
+    result: "PASS",
+    condition: "A bypass attempt cannot release the instruction under the unresolved state.",
+  },
+  {
+    id: "AT-12",
+    result: "PASS",
+    condition: "Repair requires adjudication plus revalidation, not retroactive approval.",
+  },
+  {
+    id: "AT-13",
+    result: "PASS",
+    condition: "Public claims state what the artifact proves and does not prove.",
+  },
+  {
+    id: "AT-14",
+    result: "PASS",
+    condition: "Challenge and correction append without erasing the original event.",
+  },
+  {
+    id: "AT-15",
+    result: "PASS",
+    condition: "All downloadable components resolve to the same frozen record root.",
   },
 ];
 
-const packageRecord = {
-  schema: "ta14.execution-artifact.v2.1",
-  engineVersion: "2.1.0",
-  artifact: {
-    artifactId: ARTIFACT_ID,
-    title: ARTIFACT_TITLE,
-    sequence: 2,
-    totalInRelease: 12,
-    classification: "CANONICAL EXECUTION PROOF",
-    publicationState: "PUBLISHED",
-    determination: "ESCALATE",
-    verificationLevel: 6,
-    simulated: true,
+const packageComponents: PackageItem[] = [
+  {
+    number: "01",
+    component: "Public inspection page",
+    status: "READY",
+    detail: "Human-readable sixty-second view and progressive disclosure.",
   },
+  {
+    number: "02",
+    component: "Bounded-record PDF",
+    status: "READY",
+    detail: "Institutional export generated from the frozen record.",
+  },
+  {
+    number: "03",
+    component: "Canonical JSON",
+    status: "READY",
+    detail: "Machine-readable graph of the complete bounded event.",
+  },
+  {
+    number: "04",
+    component: "Scenario snapshot",
+    status: "READY",
+    detail: "Proposed action, consequence, subjects, assumptions, and limits.",
+  },
+  {
+    number: "05",
+    component: "Route snapshot",
+    status: "READY",
+    detail: "Frozen route version, conflict rule, gate order, and jurisdiction profile.",
+  },
+  {
+    number: "06",
+    component: "Evidence manifest",
+    status: "READY",
+    detail: "Source metadata, hashes, freshness, admissibility, and disclosure states.",
+  },
+  {
+    number: "07",
+    component: "Authority ledger",
+    status: "READY",
+    detail: "Named actors, sources, scopes, validity, and separation of duties.",
+  },
+  {
+    number: "08",
+    component: "Continuity record",
+    status: "READY",
+    detail: "Identity, provenance, time, custody, version, and dependency continuity.",
+  },
+  {
+    number: "09",
+    component: "Admissibility record",
+    status: "READY",
+    detail: "Individual admissibility findings and unresolved conflict conclusion.",
+  },
+  {
+    number: "10",
+    component: "24-gate ledger",
+    status: "READY",
+    detail: "Ordered runtime results, reason codes, and earliest controlling failure.",
+  },
+  {
+    number: "11",
+    component: "Commit record",
+    status: "READY",
+    detail: "ESCALATE determination, reasons, time, adjudicator, and permitted next action.",
+  },
+  {
+    number: "12",
+    component: "Execution receipt",
+    status: "READY",
+    detail: "HTTP 202, HELD_AND_ROUTED, queue state, and zero route changes.",
+  },
+  {
+    number: "13",
+    component: "Target audit",
+    status: "READY",
+    detail: "Independent system record confirming no consequential route change.",
+  },
+  {
+    number: "14",
+    component: "Outcome record",
+    status: "READY",
+    detail: "Held state, residual uncertainty, and required next action.",
+  },
+  {
+    number: "15",
+    component: "Integrity manifest",
+    status: "READY",
+    detail: "Record hash, package hash, component hashes, and verifier version.",
+  },
+  {
+    number: "16",
+    component: "Verification guide",
+    status: "READY",
+    detail: "Online and offline procedures with expected outputs.",
+  },
+  {
+    number: "17",
+    component: "Replay package",
+    status: "READY",
+    detail: "Permitted inputs sufficient to reproduce ESCALATE.",
+  },
+  {
+    number: "18",
+    component: "Acceptance report",
+    status: "READY",
+    detail: "Fifteen tests covering conflict, control effect, parity, and boundaries.",
+  },
+  {
+    number: "19",
+    component: "Challenge record",
+    status: "READY",
+    detail: "Append-only channel for disputes, responses, and corrections.",
+  },
+  {
+    number: "20",
+    component: "Claims-boundary statement",
+    status: "READY",
+    detail: "Exact statement of proof and non-proof.",
+  },
+];
+
+
+const institutionalReviewQuestions = [
+  {
+    id: "REVIEW-001",
+    domain: "REALITY",
+    question: "Institutional review question 001",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-002",
+    domain: "RECORD",
+    question: "Institutional review question 002",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-003",
+    domain: "CONTINUITY",
+    question: "Institutional review question 003",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-004",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 004",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-005",
+    domain: "BINDING",
+    question: "Institutional review question 005",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-006",
+    domain: "COMMIT",
+    question: "Institutional review question 006",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-007",
+    domain: "EXECUTION",
+    question: "Institutional review question 007",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-008",
+    domain: "OUTCOME",
+    question: "Institutional review question 008",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-009",
+    domain: "REALITY",
+    question: "Institutional review question 009",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-010",
+    domain: "RECORD",
+    question: "Institutional review question 010",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-011",
+    domain: "CONTINUITY",
+    question: "Institutional review question 011",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-012",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 012",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-013",
+    domain: "BINDING",
+    question: "Institutional review question 013",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-014",
+    domain: "COMMIT",
+    question: "Institutional review question 014",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-015",
+    domain: "EXECUTION",
+    question: "Institutional review question 015",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-016",
+    domain: "OUTCOME",
+    question: "Institutional review question 016",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-017",
+    domain: "REALITY",
+    question: "Institutional review question 017",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-018",
+    domain: "RECORD",
+    question: "Institutional review question 018",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-019",
+    domain: "CONTINUITY",
+    question: "Institutional review question 019",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-020",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 020",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-021",
+    domain: "BINDING",
+    question: "Institutional review question 021",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-022",
+    domain: "COMMIT",
+    question: "Institutional review question 022",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-023",
+    domain: "EXECUTION",
+    question: "Institutional review question 023",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-024",
+    domain: "OUTCOME",
+    question: "Institutional review question 024",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-025",
+    domain: "REALITY",
+    question: "Institutional review question 025",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-026",
+    domain: "RECORD",
+    question: "Institutional review question 026",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-027",
+    domain: "CONTINUITY",
+    question: "Institutional review question 027",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-028",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 028",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-029",
+    domain: "BINDING",
+    question: "Institutional review question 029",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-030",
+    domain: "COMMIT",
+    question: "Institutional review question 030",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-031",
+    domain: "EXECUTION",
+    question: "Institutional review question 031",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-032",
+    domain: "OUTCOME",
+    question: "Institutional review question 032",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-033",
+    domain: "REALITY",
+    question: "Institutional review question 033",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-034",
+    domain: "RECORD",
+    question: "Institutional review question 034",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-035",
+    domain: "CONTINUITY",
+    question: "Institutional review question 035",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-036",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 036",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-037",
+    domain: "BINDING",
+    question: "Institutional review question 037",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-038",
+    domain: "COMMIT",
+    question: "Institutional review question 038",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-039",
+    domain: "EXECUTION",
+    question: "Institutional review question 039",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-040",
+    domain: "OUTCOME",
+    question: "Institutional review question 040",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-041",
+    domain: "REALITY",
+    question: "Institutional review question 041",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-042",
+    domain: "RECORD",
+    question: "Institutional review question 042",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-043",
+    domain: "CONTINUITY",
+    question: "Institutional review question 043",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-044",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 044",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-045",
+    domain: "BINDING",
+    question: "Institutional review question 045",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-046",
+    domain: "COMMIT",
+    question: "Institutional review question 046",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-047",
+    domain: "EXECUTION",
+    question: "Institutional review question 047",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-048",
+    domain: "OUTCOME",
+    question: "Institutional review question 048",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-049",
+    domain: "REALITY",
+    question: "Institutional review question 049",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-050",
+    domain: "RECORD",
+    question: "Institutional review question 050",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-051",
+    domain: "CONTINUITY",
+    question: "Institutional review question 051",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-052",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 052",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-053",
+    domain: "BINDING",
+    question: "Institutional review question 053",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-054",
+    domain: "COMMIT",
+    question: "Institutional review question 054",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-055",
+    domain: "EXECUTION",
+    question: "Institutional review question 055",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-056",
+    domain: "OUTCOME",
+    question: "Institutional review question 056",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-057",
+    domain: "REALITY",
+    question: "Institutional review question 057",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-058",
+    domain: "RECORD",
+    question: "Institutional review question 058",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-059",
+    domain: "CONTINUITY",
+    question: "Institutional review question 059",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-060",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 060",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-061",
+    domain: "BINDING",
+    question: "Institutional review question 061",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-062",
+    domain: "COMMIT",
+    question: "Institutional review question 062",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-063",
+    domain: "EXECUTION",
+    question: "Institutional review question 063",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-064",
+    domain: "OUTCOME",
+    question: "Institutional review question 064",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-065",
+    domain: "REALITY",
+    question: "Institutional review question 065",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-066",
+    domain: "RECORD",
+    question: "Institutional review question 066",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-067",
+    domain: "CONTINUITY",
+    question: "Institutional review question 067",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-068",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 068",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-069",
+    domain: "BINDING",
+    question: "Institutional review question 069",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-070",
+    domain: "COMMIT",
+    question: "Institutional review question 070",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-071",
+    domain: "EXECUTION",
+    question: "Institutional review question 071",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-072",
+    domain: "OUTCOME",
+    question: "Institutional review question 072",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-073",
+    domain: "REALITY",
+    question: "Institutional review question 073",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-074",
+    domain: "RECORD",
+    question: "Institutional review question 074",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-075",
+    domain: "CONTINUITY",
+    question: "Institutional review question 075",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-076",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 076",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-077",
+    domain: "BINDING",
+    question: "Institutional review question 077",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-078",
+    domain: "COMMIT",
+    question: "Institutional review question 078",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-079",
+    domain: "EXECUTION",
+    question: "Institutional review question 079",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-080",
+    domain: "OUTCOME",
+    question: "Institutional review question 080",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-081",
+    domain: "REALITY",
+    question: "Institutional review question 081",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-082",
+    domain: "RECORD",
+    question: "Institutional review question 082",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-083",
+    domain: "CONTINUITY",
+    question: "Institutional review question 083",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-084",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 084",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-085",
+    domain: "BINDING",
+    question: "Institutional review question 085",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-086",
+    domain: "COMMIT",
+    question: "Institutional review question 086",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-087",
+    domain: "EXECUTION",
+    question: "Institutional review question 087",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-088",
+    domain: "OUTCOME",
+    question: "Institutional review question 088",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-089",
+    domain: "REALITY",
+    question: "Institutional review question 089",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-090",
+    domain: "RECORD",
+    question: "Institutional review question 090",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-091",
+    domain: "CONTINUITY",
+    question: "Institutional review question 091",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-092",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 092",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-093",
+    domain: "BINDING",
+    question: "Institutional review question 093",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-094",
+    domain: "COMMIT",
+    question: "Institutional review question 094",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-095",
+    domain: "EXECUTION",
+    question: "Institutional review question 095",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-096",
+    domain: "OUTCOME",
+    question: "Institutional review question 096",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-097",
+    domain: "REALITY",
+    question: "Institutional review question 097",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-098",
+    domain: "RECORD",
+    question: "Institutional review question 098",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-099",
+    domain: "CONTINUITY",
+    question: "Institutional review question 099",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-100",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 100",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-101",
+    domain: "BINDING",
+    question: "Institutional review question 101",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-102",
+    domain: "COMMIT",
+    question: "Institutional review question 102",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-103",
+    domain: "EXECUTION",
+    question: "Institutional review question 103",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-104",
+    domain: "OUTCOME",
+    question: "Institutional review question 104",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-105",
+    domain: "REALITY",
+    question: "Institutional review question 105",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-106",
+    domain: "RECORD",
+    question: "Institutional review question 106",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-107",
+    domain: "CONTINUITY",
+    question: "Institutional review question 107",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-108",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 108",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-109",
+    domain: "BINDING",
+    question: "Institutional review question 109",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-110",
+    domain: "COMMIT",
+    question: "Institutional review question 110",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-111",
+    domain: "EXECUTION",
+    question: "Institutional review question 111",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-112",
+    domain: "OUTCOME",
+    question: "Institutional review question 112",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-113",
+    domain: "REALITY",
+    question: "Institutional review question 113",
+    criterion: "Confirm that reality evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-114",
+    domain: "RECORD",
+    question: "Institutional review question 114",
+    criterion: "Confirm that record evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-115",
+    domain: "CONTINUITY",
+    question: "Institutional review question 115",
+    criterion: "Confirm that continuity evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-116",
+    domain: "ADMISSIBILITY",
+    question: "Institutional review question 116",
+    criterion: "Confirm that admissibility evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-117",
+    domain: "BINDING",
+    question: "Institutional review question 117",
+    criterion: "Confirm that binding evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-118",
+    domain: "COMMIT",
+    question: "Institutional review question 118",
+    criterion: "Confirm that commit evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-119",
+    domain: "EXECUTION",
+    question: "Institutional review question 119",
+    criterion: "Confirm that execution evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+  {
+    id: "REVIEW-120",
+    domain: "OUTCOME",
+    question: "Institutional review question 120",
+    criterion: "Confirm that outcome evidence, authority, limits, and claims remain consistent with the frozen conflict record and do not convert ESCALATE into approval.",
+  },
+] as const;
+
+const views: Array<{ id: View; label: string; code: string }> = [
+  { id: "inspection", label: "Inspection", code: "01" },
+  { id: "chain", label: "Eight anchors", code: "02" },
+  { id: "runtime", label: "24-link runtime", code: "03" },
+  { id: "evidence", label: "Evidence", code: "04" },
+  { id: "authority", label: "Authority", code: "05" },
+  { id: "conflict", label: "Conflict record", code: "06" },
+  { id: "control", label: "Control effect", code: "07" },
+  { id: "outcome", label: "Outcome", code: "08" },
+  { id: "integrity", label: "Integrity", code: "09" },
+  { id: "verify", label: "Verify", code: "10" },
+  { id: "challenge", label: "Challenge", code: "11" },
+];
+
+const canonicalRecord = {
+  artifactId: ARTIFACT_ID,
+  title: ARTIFACT_TITLE,
+  classification: "CANONICAL EXECUTION PROOF",
+  series: "TA-14 FOUNDING EXECUTION ARTIFACTS",
+  status: "PUBLISHED",
+  demonstration: true,
+  route: { routeId: ROUTE_ID, version: ROUTE_VERSION },
   scenario: {
-    proposedAction:
-      "Deploy one named model only to the authorized environment, with the exact approved routing scopes, version, time window, and reversal controls.",
-    scope: "production triage model v4.2.00",
-    consequenceAtStake:
-      "No care-routing instruction may bind while materially conflicting admissible evidence remains unresolved.",
-    affectedSubjects: [
-      "TA-14 controlled demonstration environment",
-      "named production environment",
-      "reference recommendation adapter",
-      "authorized financial reviewers",
-    ],
-    declaredLimits: [
-      "No production customer system is affected.",
-      "The record proves one bounded event only.",
-      "The record does not certify every future route, adapter, or execution.",
-    ],
+    proposedAction: "Release one consequential clinical routing instruction for a bounded patient episode.",
+    consequence: "A patient may be redirected to urgent specialist review or maintained under monitored observation.",
+    environment: "Controlled TA-14 clinical-routing demonstration environment",
+    declaredLimit: "No production patient-care system is affected by this demonstration record.",
   },
-  route: {
-    routeId: ROUTE_ID,
-    routeVersion: ROUTE_VERSION,
-    gateCount: 24,
-    earliestFailure: "ADMISSIBILITY",
-    earliestFailureGate: "07",
-    reasonCodes: [
-      "EVIDENCE_CONFLICT_PRESERVED",
-      "CONFLICT_UNRESOLVED",
-      "CONFLICT_REQUIRES_ADJUDICATION",
-    ],
-    requiredRepair: [
-      "Create a adjudication record that expressly covers the requested action.",
-      "Preserve the adjudicator identity, conflict resolution, supporting rationale, and effective time.",
-      "Rerun continuity, admissibility, binding, and commit gates.",
-      "Generate a new commit and execution receipt; do not amend the original event into ALLOW.",
-    ],
+  earliestControllingFailure: {
+    anchor: "ADMISSIBILITY",
+    runtimeLink: "14",
+    reasonCode: "ADMISSIBLE_EVIDENCE_CONFLICT",
+    explanation: "Two individually admissible evidence packages supported incompatible consequential outcomes.",
   },
-  commit: {
-    determination: "ESCALATE",
-    committedAt: "2026-07-31T19:16:02Z",
-    permittedNextAction: "REPAIR_AND_REVALIDATE",
-    prohibitedAction: "PRODUCTION_DEPLOYMENT",
+  determination: {
+    value: "ESCALATE",
+    committedAt: "2026-08-01T12:07:52Z",
+    reasonCodes: ["ADMISSIBLE_EVIDENCE_CONFLICT", "NAMED_ADJUDICATION_REQUIRED"],
+    permittedNextAction: "Route the preserved conflict to Clinical Adjudicator A-17; do not release a care-routing instruction.",
   },
-  execution: {
-    adapter: "TA-14 Reference Recommendation Adapter",
-    adapterVersion: "1.0.0",
-    command: "ESCALATE_AND_REVOKE",
-    technicalStatus: 202,
+  executionEffect: {
+    command: "HOLD_AND_ROUTE_TO_ADJUDICATION",
+    httpStatus: 202,
+    adapterState: "HELD_AND_ROUTED",
+    queueState: "AWAITING_ADJUDICATION",
+    consequentialRouteChanges: 0,
     receiptId: "EA-000004-EX-01",
     receiptHash: RECEIPT_HASH,
-    productionMutations: 0,
-    bypassDetected: false,
   },
   outcome: {
-    state: "DENIAL_PRESERVED",
-    productionEnvironmentChanged: false,
-    unauthorizedChangesApplied: false,
-    residualRisk: "Operational delay until a newly bounded authority is created and evaluated.",
-    verifiedAt: "2026-07-31T19:17:20Z",
+    state: "HELD_PENDING_ADJUDICATION",
+    careInstructionReleased: false,
+    targetSystemChanges: 0,
+    residualUncertainty: "The substantive evidence conflict remains unresolved until named adjudication and revalidation.",
   },
-  integrity: {
-    canonicalization: "ta14.c14n.v1",
-    recordHash: RECORD_HASH,
-    packageHash: PACKAGE_HASH,
-    verifierVersion: "ta14.verifier.reference.v1",
-    signingKey: "ta14://keys/demonstration/2026-01",
-  },
-  chain,
-  gates,
-  evidence,
-  conflictEvents,
-  verificationChecks,
-  acceptanceTests,
+  integrity: { recordHash: RECORD_HASH, packageHash: PACKAGE_HASH },
 };
 
-const integrityManifest = {
-  artifactId: ARTIFACT_ID,
-  routeId: ROUTE_ID,
-  routeVersion: ROUTE_VERSION,
-  determination: "ESCALATE",
-  recordHash: RECORD_HASH,
-  packageHash: PACKAGE_HASH,
-  components: {
-    canonicalRecord: "sha256:4c4f4f98...9bc2f",
-    routeSnapshot: "sha256:8f7e21c9...a985",
-    evidenceManifest: "sha256:3fa02c11...776a",
-    authorityLedger: "sha256:e02c9097...4cb8",
-    executionReceipt: RECEIPT_HASH,
-    outcomeRecord: "sha256:bd21dd3a...79e4",
-  },
-  verification: {
-    expectedResult: "VERIFIED",
-    maximumPublicLevel: 6,
-    canonicalization: "ta14.c14n.v1",
-    verifier: "ta14.verifier.reference.v1",
-  },
-};
-
-
-
-const conflictMatrix = [
-  { field: "Environment", authorized: "Staging", requested: "Production", result: "FAIL", rule: "Care destination may not expand after approval." },
-  { field: "Routing scopes", authorized: "Read-only diagnostics", requested: "Create, update, delete", result: "FAIL", rule: "Write capability requires separate authority." },
-  { field: "Model version", authorized: "v7.3", requested: "v7.4", result: "FAIL", rule: "Model identity is part of the committed scope." },
-  { field: "Change window", authorized: "02:00-02:30 UTC", requested: "Immediate", result: "FAIL", rule: "Execution outside the approved time window is prohibited." },
-  { field: "Reversal", authorized: "Required and tested", requested: "Not supplied", result: "FAIL", rule: "Production release requires an executable reversal path." },
-  { field: "Approver", authorized: "Release authority A-17", requested: "Same approver", result: "PASS", rule: "Identity remained valid but could not enlarge scope." },
-];
-
-const conflictingClaims = [
-  "Production direct-routing authority",
-  "Routing scope escalation",
-  "Unapproved model-version substitution",
-  "Execution outside the maintenance window",
-  "Release without tested reversal",
-  "Alternate-path recommendation after denial",
-];
-
-const resolutionRequirements = [
-  "Name the production environment and exact care destination resources.",
-  "Declare each permitted create, update, delete, and network capability.",
-  "Bind the authority to triage model v4.2 and its immutable package hash.",
-  "Define a new execution window and immediate pre-runtime revalidation.",
-  "Attach a tested reversal package and accountable reversal authority.",
-  "Run the complete route as a new event; never overwrite this denial.",
-];
-
-const styles = `
-  :root {
-    --bg: #02070d;
-    --bg-2: #06111c;
-    --panel: rgba(7, 20, 31, .82);
-    --panel-2: rgba(10, 28, 43, .92);
-    --line: rgba(142, 196, 230, .17);
-    --line-strong: rgba(142, 196, 230, .34);
-    --text: #edf7ff;
-    --muted: #8da7ba;
-    --cyan: #65dfff;
-    --blue: #78a8ff;
-    --green: #63f0bd;
-    --amber: #ffc56b;
-    --red: #ff7b8f;
-    --shadow: 0 28px 80px rgba(0, 0, 0, .42);
-  }
-
-  * { box-sizing: border-box; }
-  html { scroll-behavior: smooth; }
-  body { margin: 0; }
-  button, input, textarea { font: inherit; }
-  button { color: inherit; }
-
-  .artifact-page {
-    min-height: 100vh;
-    color: var(--text);
-    background:
-      radial-gradient(circle at 10% 0%, rgba(58, 157, 216, .17), transparent 34%),
-      radial-gradient(circle at 92% 14%, rgba(255, 176, 82, .1), transparent 30%),
-      linear-gradient(180deg, #02070d 0%, #06101a 48%, #02070d 100%);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .artifact-page::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    opacity: .22;
-    background-image:
-      linear-gradient(rgba(123, 190, 231, .07) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(123, 190, 231, .07) 1px, transparent 1px);
-    background-size: 44px 44px;
-    mask-image: linear-gradient(to bottom, black, transparent 78%);
-  }
-
-  .artifact-page::after {
-    content: "";
-    position: fixed;
-    width: 700px;
-    height: 700px;
-    right: -380px;
-    top: 140px;
-    border-radius: 50%;
-    border: 1px solid rgba(101, 223, 255, .16);
-    box-shadow:
-      0 0 0 80px rgba(101, 223, 255, .02),
-      0 0 0 180px rgba(101, 223, 255, .015);
-    pointer-events: none;
-  }
-
-  .artifact-shell {
-    width: min(1540px, calc(100% - 36px));
-    margin: 0 auto;
-    padding: 28px 0 70px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .artifact-topbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 18px;
-    margin-bottom: 24px;
-  }
-
-  .artifact-brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--text);
-    text-decoration: none;
-  }
-
-  .artifact-mark {
-    width: 42px;
-    height: 42px;
-    border: 1px solid var(--line-strong);
-    border-radius: 12px;
-    display: grid;
-    place-items: center;
-    font-weight: 900;
-    letter-spacing: -.04em;
-    background: linear-gradient(145deg, rgba(101,223,255,.14), rgba(120,168,255,.04));
-    box-shadow: inset 0 0 22px rgba(101,223,255,.08);
-  }
-
-  .artifact-brand-copy strong,
-  .artifact-brand-copy span { display: hold; }
-  .artifact-brand-copy strong { font-size: 13px; letter-spacing: .12em; }
-  .artifact-brand-copy span { color: var(--muted); font-size: 12px; margin-top: 2px; }
-
-  .artifact-top-actions {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-  }
-
-  .artifact-link,
-  .artifact-button {
-    min-height: 42px;
-    padding: 0 16px;
-    border-radius: 12px;
-    border: 1px solid var(--line);
-    background: rgba(9, 25, 38, .7);
-    color: var(--text);
-    text-decoration: none;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-    cursor: pointer;
-    transition: .2s ease;
-  }
-
-  .artifact-link:hover,
-  .artifact-button:hover {
-    transform: translateY(-1px);
-    border-color: rgba(101,223,255,.5);
-    background: rgba(12, 35, 52, .94);
-  }
-
-  .artifact-button.primary {
-    border-color: rgba(99, 240, 189, .42);
-    background: linear-gradient(135deg, rgba(99,240,189,.2), rgba(101,223,255,.1));
-  }
-
-  .artifact-button:disabled { opacity: .62; cursor: wait; transform: none; }
-
-  .artifact-hero {
-    position: relative;
-    border: 1px solid var(--line);
-    border-radius: 28px;
-    overflow: hidden;
-    background:
-      linear-gradient(135deg, rgba(10, 29, 43, .94), rgba(3, 12, 20, .94)),
-      var(--bg-2);
-    box-shadow: var(--shadow);
-    margin-bottom: 18px;
-  }
-
-  .artifact-hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(circle at 72% 22%, rgba(255,197,107,.16), transparent 25%),
-      linear-gradient(90deg, transparent 0 64%, rgba(101,223,255,.04) 64% 65%, transparent 65%);
-    pointer-events: none;
-  }
-
-  .artifact-hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.35fr) minmax(340px, .65fr);
-    min-height: 410px;
-    position: relative;
-  }
-
-  .artifact-hero-copy {
-    padding: clamp(28px, 4vw, 62px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-  }
-
-  .artifact-kicker {
-    color: var(--cyan);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: .18em;
-    font-weight: 800;
-  }
-
-  .artifact-hero h1 {
-    margin: 14px 0 16px;
-    font-size: clamp(46px, 6vw, 92px);
-    line-height: .92;
-    letter-spacing: -.065em;
-    max-width: 930px;
-  }
-
-  .artifact-hero h1 span { color: var(--amber); display: hold; }
-  .artifact-lede { max-width: 840px; color: #b8cbd8; font-size: clamp(16px, 1.5vw, 20px); line-height: 1.75; margin: 0; }
-
-  .artifact-hero-meta {
-    margin-top: 28px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-
-  .artifact-chip {
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,.025);
-    padding: 9px 12px;
-    border-radius: 999px;
-    color: #c9d9e4;
-    font-size: 12px;
-  }
-
-  .artifact-decision {
-    position: relative;
-    padding: 34px;
-    border-left: 1px solid var(--line);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: linear-gradient(180deg, rgba(255,197,107,.07), rgba(255,197,107,.015));
-  }
-
-  .artifact-decision::after {
-    content: "";
-    position: absolute;
-    inset: 18px;
-    border: 1px solid rgba(255,197,107,.12);
-    border-radius: 20px;
-    pointer-events: none;
-  }
-
-  .artifact-decision-label { color: var(--muted); text-transform: uppercase; letter-spacing: .18em; font-size: 11px; }
-  .artifact-decision-word { font-size: clamp(64px, 7vw, 104px); font-weight: 950; color: var(--amber); letter-spacing: -.07em; line-height: .9; position: relative; z-index: 1; }
-  .artifact-decision p { position: relative; z-index: 1; color: #c8d6df; line-height: 1.65; }
-
-  .artifact-decision-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
-    position: relative;
-    z-index: 1;
-  }
-
-  .artifact-decision-cell {
-    border: 1px solid rgba(255,197,107,.16);
-    border-radius: 13px;
-    padding: 13px;
-    background: rgba(0,0,0,.16);
-  }
-
-  .artifact-decision-cell span,
-  .artifact-stat span,
-  .artifact-row span,
-  .artifact-hash span { display: hold; color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
-  .artifact-decision-cell strong { display: hold; margin-top: 5px; font-size: 13px; }
-
-  .artifact-summary-grid {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 10px;
-    margin: 18px 0;
-  }
-
-  .artifact-stat {
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    padding: 18px;
-    background: rgba(7, 21, 32, .76);
-    box-shadow: inset 0 1px rgba(255,255,255,.025);
-  }
-
-  .artifact-stat strong { display: hold; margin-top: 7px; font-size: 20px; letter-spacing: -.03em; }
-
-  .artifact-tabs {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding: 10px;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: rgba(5, 16, 25, .88);
-    position: sticky;
-    top: 12px;
-    z-index: 20;
-    backdrop-filter: blur(16px);
-    margin-bottom: 18px;
-  }
-
-  .artifact-tab {
-    white-space: nowrap;
-    border: 1px solid transparent;
-    border-radius: 11px;
-    background: transparent;
-    color: var(--muted);
-    padding: 11px 14px;
-    cursor: pointer;
-  }
-
-  .artifact-tab.active {
-    color: var(--text);
-    border-color: rgba(101,223,255,.28);
-    background: linear-gradient(135deg, rgba(101,223,255,.13), rgba(120,168,255,.07));
-  }
-
-  .artifact-layout {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 330px;
-    gap: 18px;
-    align-items: start;
-  }
-
-  .artifact-main { min-width: 0; display: grid; gap: 18px; }
-  .artifact-aside { display: grid; gap: 14px; position: sticky; top: 86px; }
-
-  .artifact-panel,
-  .artifact-side-card {
-    border: 1px solid var(--line);
-    border-radius: 20px;
-    background: linear-gradient(145deg, rgba(8, 25, 38, .9), rgba(4, 14, 23, .92));
-    box-shadow: 0 18px 56px rgba(0,0,0,.24), inset 0 1px rgba(255,255,255,.025);
-  }
-
-  .artifact-panel { padding: clamp(22px, 3vw, 34px); }
-  .artifact-panel-head { display: flex; justify-content: space-between; gap: 20px; margin-bottom: 24px; }
-  .artifact-panel-head h2 { margin: 4px 0 0; font-size: clamp(26px, 3vw, 42px); letter-spacing: -.045em; }
-  .artifact-panel-head p { margin: 8px 0 0; color: var(--muted); max-width: 800px; line-height: 1.65; }
-  .artifact-overline { color: var(--cyan); font-size: 11px; text-transform: uppercase; letter-spacing: .17em; font-weight: 800; }
-
-  .artifact-proof-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-  .artifact-proof-card { border: 1px solid var(--line); border-radius: 17px; padding: 20px; background: rgba(255,255,255,.018); }
-  .artifact-proof-card h3 { margin: 8px 0 10px; font-size: 22px; }
-  .artifact-proof-card p { margin: 0; color: #a9bdca; line-height: 1.65; }
-  .artifact-proof-card.positive { border-color: rgba(99,240,189,.24); }
-  .artifact-proof-card.conflict { border-color: rgba(255,197,107,.24); }
-
-  .artifact-chain { display: grid; gap: 12px; }
-  .artifact-chain-row {
-    display: grid;
-    grid-template-columns: 54px 150px minmax(0, 1fr) 74px;
-    gap: 16px;
-    align-items: start;
-    padding: 18px;
-    border: 1px solid var(--line);
-    border-radius: 17px;
-    background: rgba(255,255,255,.016);
-  }
-  .artifact-chain-row.fail { border-color: rgba(255,123,143,.26); background: linear-gradient(90deg, rgba(255,123,143,.07), transparent); }
-  .artifact-number { width: 46px; height: 46px; border: 1px solid var(--line-strong); border-radius: 13px; display: grid; place-items: center; color: var(--cyan); font-weight: 800; }
-  .artifact-chain-link strong { display: hold; font-size: 18px; }
-  .artifact-chain-link span { display: hold; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.45; }
-  .artifact-chain-copy strong { display: hold; line-height: 1.55; }
-  .artifact-chain-copy p { margin: 8px 0 0; color: var(--muted); line-height: 1.55; }
-
-  .artifact-state { align-self: center; justify-self: end; font-size: 11px; font-weight: 900; letter-spacing: .12em; padding: 8px 10px; border-radius: 999px; border: 1px solid rgba(99,240,189,.28); color: var(--green); }
-  .artifact-state.fail { color: var(--red); border-color: rgba(255,123,143,.3); }
-
-  .artifact-gates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-  .artifact-gate { border: 1px solid var(--line); border-radius: 16px; padding: 17px; background: rgba(255,255,255,.016); min-height: 190px; }
-  .artifact-gate.fail { border-color: rgba(255,123,143,.28); background: linear-gradient(145deg, rgba(255,123,143,.07), rgba(255,255,255,.01)); }
-  .artifact-gate-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
-  .artifact-gate-no { color: var(--cyan); font-weight: 900; }
-  .artifact-gate h3 { margin: 14px 0 8px; font-size: 17px; }
-  .artifact-gate p { margin: 0; color: var(--muted); line-height: 1.55; }
-  .artifact-reason { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--line); color: #c9d9e4; font-size: 11px; word-break: break-word; }
-
-  .artifact-evidence-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
-  .artifact-evidence-card { border: 1px solid var(--line); border-radius: 17px; padding: 20px; background: rgba(255,255,255,.016); }
-  .artifact-evidence-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  .artifact-evidence-id { color: var(--cyan); font-size: 11px; letter-spacing: .09em; }
-  .artifact-badges { display: flex; gap: 6px; flex-wrap: wrap; justify-content: flex-end; }
-  .artifact-badge { border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px; font-size: 10px; color: #c6d6e1; }
-  .artifact-badge.good { color: var(--green); border-color: rgba(99,240,189,.28); }
-  .artifact-badge.warn { color: var(--amber); border-color: rgba(255,197,107,.28); }
-  .artifact-evidence-card h3 { margin: 13px 0 8px; font-size: 20px; }
-  .artifact-evidence-card > p { color: #a9bdca; line-height: 1.6; }
-  .artifact-evidence-meta { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 16px 0; }
-  .artifact-row { border: 1px solid var(--line); border-radius: 11px; padding: 11px; min-width: 0; }
-  .artifact-row strong { display: hold; margin-top: 5px; font-size: 12px; overflow-wrap: anywhere; }
-
-  .artifact-authority-stage { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 18px; }
-  .artifact-conflict-ledger { display: grid; gap: 12px; }
-  .artifact-authority-event { display: grid; grid-template-columns: 82px minmax(0, 1fr) 94px; gap: 14px; padding: 17px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.016); }
-  .artifact-authority-event.changed { border-color: rgba(255,123,143,.28); }
-  .artifact-authority-event time { color: var(--cyan); font-variant-numeric: tabular-nums; }
-  .artifact-authority-event strong { display: hold; }
-  .artifact-authority-event p { margin: 6px 0 0; color: var(--muted); line-height: 1.5; }
-  .artifact-authority-state { justify-self: end; align-self: start; border: 1px solid var(--line); border-radius: 999px; padding: 7px 9px; font-size: 10px; }
-  .artifact-requirement-list { display: grid; gap: 9px; margin: 18px 0; }
-  .artifact-requirement { display: grid; grid-template-columns: 34px minmax(0,1fr); gap: 10px; align-items: start; padding: 11px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.018); }
-  .artifact-requirement span { color: var(--cyan); font-size: 11px; letter-spacing: .12em; }
-  .artifact-requirement p { margin: 0; color: var(--muted); line-height: 1.5; }
-  .artifact-table td small { display: hold; margin-top: 5px; color: var(--muted); line-height: 1.35; }
-  .artifact-break-card { border: 1px solid rgba(255,123,143,.28); border-radius: 18px; padding: 22px; background: radial-gradient(circle at 50% 0%, rgba(255,123,143,.12), transparent 60%); }
-  .artifact-break-card h3 { font-size: 34px; margin: 10px 0; color: var(--red); letter-spacing: -.04em; }
-  .artifact-break-card p { color: #c0d0db; line-height: 1.65; }
-
-  .artifact-effect { display: grid; grid-template-columns: 1fr 70px 1fr; gap: 18px; align-items: stretch; }
-  .artifact-effect-box { border: 1px solid var(--line); border-radius: 18px; padding: 24px; background: rgba(255,255,255,.016); }
-  .artifact-effect-box.held { border-color: rgba(255,197,107,.3); background: linear-gradient(145deg, rgba(255,197,107,.09), rgba(255,255,255,.01)); }
-  .artifact-effect-box h3 { font-size: 32px; margin: 10px 0 12px; }
-  .artifact-effect-box p { color: var(--muted); line-height: 1.6; }
-  .artifact-effect-arrow { display: grid; place-items: center; font-size: 34px; color: var(--cyan); }
-  .artifact-receipt-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 18px; }
-
-  .artifact-timeline { position: relative; display: grid; gap: 12px; }
-  .artifact-timeline::before { content: ""; position: absolute; left: 19px; top: 18px; bottom: 18px; width: 1px; background: linear-gradient(var(--cyan), rgba(255,197,107,.3)); }
-  .artifact-event { position: relative; padding: 18px 18px 18px 56px; border: 1px solid var(--line); border-radius: 15px; background: rgba(255,255,255,.015); }
-  .artifact-event::before { content: ""; position: absolute; left: 13px; top: 22px; width: 13px; height: 13px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 18px rgba(101,223,255,.55); }
-  .artifact-event time { color: var(--cyan); font-size: 11px; letter-spacing: .08em; }
-  .artifact-event strong { display: hold; margin-top: 6px; font-size: 17px; }
-  .artifact-event p { margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
-
-  .artifact-integrity-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
-  .artifact-hash { border: 1px solid var(--line); border-radius: 15px; padding: 17px; background: rgba(255,255,255,.015); min-width: 0; }
-  .artifact-hash code { display: hold; margin-top: 8px; color: #c8eaff; overflow-wrap: anywhere; line-height: 1.5; }
-
-  .artifact-acceptance { display: grid; gap: 10px; margin-top: 22px; }
-  .artifact-acceptance-row { display: grid; grid-template-columns: 72px 70px minmax(0, 1fr); gap: 12px; align-items: center; padding: 13px; border: 1px solid var(--line); border-radius: 13px; }
-  .artifact-acceptance-row span { color: var(--cyan); font-size: 12px; }
-  .artifact-acceptance-row b { color: var(--green); font-size: 11px; }
-  .artifact-acceptance-row p { margin: 0; color: var(--muted); line-height: 1.5; }
-
-  .artifact-verify { display: grid; gap: 18px; }
-  .artifact-verify-head { display: flex; justify-content: space-between; align-items: center; gap: 18px; }
-  .artifact-verify-result { font-size: clamp(42px, 6vw, 78px); font-weight: 950; letter-spacing: -.055em; color: var(--green); }
-  .artifact-progress { height: 10px; border-radius: 999px; background: rgba(255,255,255,.05); overflow: hidden; }
-  .artifact-progress i { display: hold; height: 100%; background: linear-gradient(90deg, var(--cyan), var(--green)); transition: width .35s ease; }
-  .artifact-checks { display: grid; gap: 10px; }
-  .artifact-check { display: grid; grid-template-columns: 50px minmax(0, 1fr) 72px; gap: 14px; align-items: center; padding: 15px; border: 1px solid var(--line); border-radius: 14px; }
-  .artifact-check-level { color: var(--cyan); font-weight: 900; }
-  .artifact-check strong { display: hold; }
-  .artifact-check p { margin: 5px 0 0; color: var(--muted); line-height: 1.45; }
-  .artifact-check-state { justify-self: end; color: var(--green); font-size: 11px; font-weight: 900; }
-
-  .artifact-challenge-grid { display: grid; grid-template-columns: .8fr 1.2fr; gap: 16px; }
-  .artifact-challenge-card { border: 1px solid var(--line); border-radius: 17px; padding: 20px; background: rgba(255,255,255,.015); }
-  .artifact-challenge-card h3 { margin: 8px 0 10px; }
-  .artifact-challenge-card p, .artifact-challenge-card li { color: var(--muted); line-height: 1.6; }
-  .artifact-challenge-card textarea { width: 100%; min-height: 160px; resize: vertical; border: 1px solid var(--line); border-radius: 13px; background: rgba(0,0,0,.22); color: var(--text); padding: 14px; outline: none; }
-  .artifact-challenge-card textarea:focus { border-color: rgba(101,223,255,.5); }
-
-  .artifact-side-card { padding: 20px; }
-  .artifact-side-card h3 { margin: 8px 0 12px; font-size: 22px; }
-  .artifact-side-card p { color: var(--muted); line-height: 1.6; }
-  .artifact-side-list { display: grid; gap: 9px; }
-  .artifact-side-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; border-top: 1px solid var(--line); padding-top: 10px; }
-  .artifact-side-row span { color: var(--muted); font-size: 12px; }
-  .artifact-side-row strong { text-align: right; font-size: 12px; }
-  .artifact-downloads { display: grid; gap: 8px; }
-  .artifact-download { width: 100%; min-height: 44px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.02); color: var(--text); display: flex; align-items: center; justify-content: space-between; padding: 0 13px; cursor: pointer; text-align: left; }
-  .artifact-download:hover { border-color: rgba(101,223,255,.45); background: rgba(101,223,255,.06); }
-  .artifact-conflict { border-color: rgba(255,197,107,.24); }
-
-  .artifact-footer { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); display: flex; justify-content: space-between; gap: 18px; font-size: 12px; }
-
-  @media (max-width: 1180px) {
-    .artifact-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .artifact-layout { grid-template-columns: 1fr; }
-    .artifact-aside { position: static; grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .artifact-gates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  }
-
-  @media (max-width: 900px) {
-    .artifact-hero-grid { grid-template-columns: 1fr; }
-    .artifact-decision { border-left: 0; border-top: 1px solid var(--line); min-height: 310px; }
-    .artifact-proof-grid,
-    .artifact-evidence-grid,
-    .artifact-integrity-grid,
-    .artifact-authority-stage,
-    .artifact-challenge-grid { grid-template-columns: 1fr; }
-    .artifact-effect { grid-template-columns: 1fr; }
-    .artifact-effect-arrow { transform: rotate(90deg); min-height: 44px; }
-    .artifact-aside { grid-template-columns: 1fr; }
-  }
-
-  @media (max-width: 700px) {
-    .artifact-shell { width: min(100% - 20px, 1540px); padding-top: 12px; }
-    .artifact-topbar { align-items: flex-start; }
-    .artifact-top-actions { display: none; }
-    .artifact-summary-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    .artifact-gates { grid-template-columns: 1fr; }
-    .artifact-chain-row { grid-template-columns: 48px minmax(0, 1fr); }
-    .artifact-chain-copy, .artifact-state { grid-column: 2; }
-    .artifact-state { justify-self: start; }
-    .artifact-authority-event { grid-template-columns: 70px minmax(0, 1fr); }
-    .artifact-authority-state { grid-column: 2; justify-self: start; }
-    .artifact-panel-head, .artifact-verify-head, .artifact-footer { flex-direction: column; align-items: flex-start; }
-    .artifact-check { grid-template-columns: 42px minmax(0, 1fr); }
-    .artifact-check-state { grid-column: 2; justify-self: start; }
-  }
-`;
-
-function downloadText(name: string, value: unknown) {
-  const body = typeof value === "string" ? value : JSON.stringify(value, null, 2);
-  const blob = new Blob([body], { type: typeof value === "string" ? "text/plain" : "application/json" });
+function downloadJson(filename: string, value: unknown) {
+  const blob = new Blob([JSON.stringify(value, null, 2)], { type: "application/json" });
   const url = URL.createObjectURL(blob);
   const anchor = document.createElement("a");
   anchor.href = url;
-  anchor.download = name;
+  anchor.download = filename;
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
   URL.revokeObjectURL(url);
 }
 
-function Panel({
-  eyebrow,
-  title,
-  subtitle,
-  children,
-}: {
-  eyebrow: string;
-  title: string;
-  subtitle?: string;
-  children: ReactNode;
-}) {
+function tone(result: string) {
+  return result.toLowerCase().replaceAll("_", "-");
+}
+
+function Panel({ title, eyebrow, children, className = "" }: { title: string; eyebrow?: string; children: ReactNode; className?: string }) {
   return (
-    <section className="artifact-panel">
-      <div className="artifact-panel-head">
-        <div>
-          <div className="artifact-overline">{eyebrow}</div>
-          <h2>{title}</h2>
-          {subtitle ? <p>{subtitle}</p> : null}
-        </div>
+    <section className={`ea-panel ${className}`}>
+      <div className="ea-panel-head">
+        {eyebrow ? <span>{eyebrow}</span> : null}
+        <h2>{title}</h2>
       </div>
       {children}
     </section>
   );
 }
 
-export default function ExecutionArtifact000004Page() {
+function Pill({ children, variant = "neutral" }: { children: ReactNode; variant?: string }) {
+  return <span className={`ea-pill ${variant}`}>{children}</span>;
+}
+
+function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
+  return (
+    <article className="ea-metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <p>{detail}</p>
+    </article>
+  );
+}
+
+function Field({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="ea-field">
+      <span>{label}</span>
+      <strong>{value}</strong>
+    </div>
+  );
+}
+
+function CodeBlock({ value }: { value: string }) {
+  return <code className="ea-code-block">{value}</code>;
+}
+
+export default function Artifact000004Page() {
   const [view, setView] = useState<View>("inspection");
   const [verificationState, setVerificationState] = useState<VerificationState>("IDLE");
-  const [verifiedCount, setVerifiedCount] = useState(0);
+  const [verificationStep, setVerificationStep] = useState(0);
   const [challenge, setChallenge] = useState("");
   const [challengeSaved, setChallengeSaved] = useState(false);
+  const [expandedGate, setExpandedGate] = useState<string>("14");
+  const [expandedEvidence, setExpandedEvidence] = useState<string>("EV-002");
 
-  const failedGates = useMemo(() => gates.filter((gate) => gate.result === "FAIL"), []);
-  const passedGates = useMemo(() => gates.filter((gate) => gate.result === "PASS"), []);
-  const verificationPercent = Math.round((verifiedCount / verificationChecks.length) * 100);
+  const passCount = useMemo(() => runtime.filter((item) => item.result === "PASS").length, []);
+  const reviewQuestionCount = institutionalReviewQuestions.length;
+  const unresolvedCount = useMemo(() => runtime.filter((item) => item.result === "UNRESOLVED").length, []);
 
-  function selectView(next: View) {
+  const changeView = (next: View) => {
     setView(next);
-    window.setTimeout(() => {
-      document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
-    }, 20);
-  }
+    window.setTimeout(() => document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }), 20);
+  };
 
-  function runVerification() {
-    if (verificationState === "RUNNING") return;
+  const runVerification = () => {
     setVerificationState("RUNNING");
-    setVerifiedCount(0);
-
-    verificationChecks.forEach((_, index) => {
+    setVerificationStep(0);
+    verificationLevels.forEach((_, index) => {
       window.setTimeout(() => {
-        setVerifiedCount(index + 1);
-        if (index === verificationChecks.length - 1) {
-          setVerificationState("VERIFIED");
-        }
-      }, 380 * (index + 1));
+        setVerificationStep(index + 1);
+        if (index === verificationLevels.length - 1) setVerificationState("VERIFIED");
+      }, 260 * (index + 1));
     });
-  }
+  };
 
-  function saveChallenge() {
-    setChallengeSaved(Boolean(challenge.trim()));
-  }
-
-  const tabs: Array<{ id: View; label: string }> = [
-    { id: "inspection", label: "60-second inspection" },
-    { id: "chain", label: "Eight-anchor chain" },
-    { id: "runtime", label: "24-gate runtime" },
-    { id: "evidence", label: "Evidence manifest" },
-    { id: "conflict", label: "Evidence conflict" },
-    { id: "control", label: "Control receipt" },
-    { id: "outcome", label: "Outcome closure" },
-    { id: "integrity", label: "Integrity package" },
-    { id: "verify", label: "Verification center" },
-    { id: "challenge", label: "Challenge record" },
-  ];
+  const saveChallenge = () => {
+    if (!challenge.trim()) return;
+    localStorage.setItem(`${ARTIFACT_ID}.challenge`, JSON.stringify({ challenge: challenge.trim(), savedAt: new Date().toISOString() }));
+    setChallengeSaved(true);
+  };
 
   return (
-    <main className="artifact-page">
-      <style>{styles}</style>
-      <div className="artifact-shell">
-        <header className="artifact-topbar">
-          <Link className="artifact-brand" href="/artifacts">
-            <span className="artifact-mark">14</span>
-            <span className="artifact-brand-copy">
-              <strong>TA-14 AUTHORITY</strong>
-              <span>Execution Artifact Library</span>
-            </span>
+    <main className="ea-page">
+      <style jsx global>{`
+        :root {
+          --ea-bg: #03060c;
+          --ea-panel: rgba(8, 15, 27, 0.84);
+          --ea-panel-2: rgba(12, 22, 38, 0.9);
+          --ea-line: rgba(132, 210, 255, 0.16);
+          --ea-line-strong: rgba(132, 210, 255, 0.34);
+          --ea-text: #eff8ff;
+          --ea-muted: #8ca2b7;
+          --ea-cyan: #66dbff;
+          --ea-blue: #6f8cff;
+          --ea-violet: #b68cff;
+          --ea-amber: #ffbf69;
+          --ea-green: #76efbd;
+          --ea-red: #ff7f8f;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; background: var(--ea-bg); color: var(--ea-text); }
+        button, input, textarea { font: inherit; }
+        button { color: inherit; }
+        .ea-page {
+          min-height: 100vh;
+          position: relative;
+          overflow: hidden;
+          background:
+            radial-gradient(circle at 18% 8%, rgba(102, 219, 255, .12), transparent 26%),
+            radial-gradient(circle at 82% 18%, rgba(182, 140, 255, .12), transparent 24%),
+            linear-gradient(180deg, #050914 0%, #02050a 48%, #050812 100%);
+        }
+        .ea-page::before {
+          content: "";
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          opacity: .24;
+          background-image:
+            linear-gradient(rgba(103, 184, 255, .06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(103, 184, 255, .06) 1px, transparent 1px);
+          background-size: 54px 54px;
+          mask-image: linear-gradient(to bottom, black, transparent 82%);
+        }
+        .ea-shell { width: min(1540px, calc(100% - 36px)); margin: 0 auto; position: relative; z-index: 1; }
+        .ea-topbar {
+          min-height: 76px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+          border-bottom: 1px solid var(--ea-line);
+        }
+        .ea-brand { display: flex; align-items: center; gap: 13px; text-decoration: none; color: var(--ea-text); }
+        .ea-brand-mark {
+          width: 42px; height: 42px; display: grid; place-items: center; border-radius: 13px;
+          border: 1px solid var(--ea-line-strong); background: linear-gradient(145deg, rgba(102,219,255,.18), rgba(182,140,255,.12));
+          box-shadow: inset 0 0 24px rgba(102,219,255,.08), 0 16px 40px rgba(0,0,0,.28);
+          font-weight: 900; letter-spacing: -.04em;
+        }
+        .ea-brand-copy strong { display: block; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; }
+        .ea-brand-copy span { display: block; margin-top: 3px; color: var(--ea-muted); font-size: 11px; }
+        .ea-top-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+        .ea-link, .ea-button {
+          display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 40px; padding: 0 14px;
+          border-radius: 10px; border: 1px solid var(--ea-line); background: rgba(255,255,255,.025); color: var(--ea-text);
+          text-decoration: none; cursor: pointer; transition: .2s ease;
+        }
+        .ea-link:hover, .ea-button:hover { transform: translateY(-1px); border-color: var(--ea-line-strong); background: rgba(102,219,255,.07); }
+        .ea-button.primary { border-color: rgba(102,219,255,.45); background: linear-gradient(135deg, rgba(102,219,255,.18), rgba(111,140,255,.15)); }
+        .ea-hero { padding: 54px 0 30px; display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(330px, .8fr); gap: 24px; align-items: stretch; }
+        .ea-hero-copy, .ea-decision-core {
+          border: 1px solid var(--ea-line); border-radius: 24px; position: relative; overflow: hidden;
+          background: linear-gradient(145deg, rgba(10,19,33,.92), rgba(4,9,17,.9));
+          box-shadow: 0 34px 90px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.03);
+        }
+        .ea-hero-copy { padding: 38px; }
+        .ea-hero-copy::after, .ea-decision-core::after {
+          content: ""; position: absolute; inset: 0; pointer-events: none;
+          background: linear-gradient(120deg, transparent 30%, rgba(102,219,255,.05), transparent 72%);
+        }
+        .ea-kicker { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+        .ea-kicker span { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--ea-cyan); }
+        .ea-hero h1 { margin: 20px 0 14px; max-width: 820px; font-size: clamp(42px, 6vw, 84px); line-height: .95; letter-spacing: -.055em; }
+        .ea-hero h1 span { display: block; color: var(--ea-amber); }
+        .ea-hero-copy > p { max-width: 820px; margin: 0; color: #aebed0; font-size: 16px; line-height: 1.75; }
+        .ea-hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
+        .ea-decision-core { padding: 28px; display: flex; flex-direction: column; justify-content: space-between; }
+        .ea-decision-label { color: var(--ea-muted); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; }
+        .ea-decision-value { margin: 12px 0 5px; color: var(--ea-amber); font-size: clamp(46px, 7vw, 82px); line-height: 1; font-weight: 950; letter-spacing: -.06em; }
+        .ea-decision-core p { margin: 0; color: #b5c6d8; line-height: 1.6; }
+        .ea-decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 24px; }
+        .ea-field { border: 1px solid var(--ea-line); border-radius: 12px; padding: 13px; background: rgba(255,255,255,.02); }
+        .ea-field span { display: block; color: var(--ea-muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+        .ea-field strong { display: block; margin-top: 6px; font-size: 12px; line-height: 1.45; }
+        .ea-metrics { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 24px; }
+        .ea-metric { min-height: 138px; padding: 18px; border: 1px solid var(--ea-line); border-radius: 16px; background: var(--ea-panel); box-shadow: 0 18px 50px rgba(0,0,0,.2); }
+        .ea-metric span { color: var(--ea-muted); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+        .ea-metric strong { display: block; margin-top: 10px; font-size: 24px; letter-spacing: -.04em; }
+        .ea-metric p { margin: 7px 0 0; color: var(--ea-muted); font-size: 12px; line-height: 1.45; }
+        .ea-nav {
+          position: sticky; top: 0; z-index: 30; display: flex; gap: 8px; overflow-x: auto; padding: 12px;
+          border: 1px solid var(--ea-line); border-radius: 16px; background: rgba(4,9,17,.88); backdrop-filter: blur(18px);
+          box-shadow: 0 18px 55px rgba(0,0,0,.28); margin-bottom: 24px;
+        }
+        .ea-nav button { flex: 0 0 auto; border: 1px solid transparent; border-radius: 10px; background: transparent; padding: 10px 12px; color: var(--ea-muted); cursor: pointer; }
+        .ea-nav button strong { margin-right: 7px; font-size: 10px; color: #60758a; }
+        .ea-nav button.active { color: var(--ea-text); border-color: var(--ea-line-strong); background: rgba(102,219,255,.08); }
+        .ea-workspace { scroll-margin-top: 90px; min-height: 800px; padding-bottom: 48px; }
+        .ea-panel { border: 1px solid var(--ea-line); border-radius: 22px; padding: 24px; background: var(--ea-panel); box-shadow: 0 24px 70px rgba(0,0,0,.24); }
+        .ea-panel + .ea-panel { margin-top: 18px; }
+        .ea-panel-head { margin-bottom: 20px; }
+        .ea-panel-head span { color: var(--ea-cyan); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; }
+        .ea-panel-head h2 { margin: 7px 0 0; font-size: clamp(24px, 4vw, 40px); letter-spacing: -.04em; }
+        .ea-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .ea-grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+        .ea-grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .ea-card { border: 1px solid var(--ea-line); border-radius: 16px; padding: 18px; background: rgba(255,255,255,.022); }
+        .ea-card h3 { margin: 10px 0 8px; font-size: 17px; }
+        .ea-card p { margin: 0; color: var(--ea-muted); line-height: 1.6; font-size: 13px; }
+        .ea-pill { display: inline-flex; min-height: 24px; align-items: center; padding: 0 9px; border-radius: 999px; border: 1px solid var(--ea-line); color: var(--ea-muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+        .ea-pill.pass, .ea-pill.ready, .ea-pill.verified { color: var(--ea-green); border-color: rgba(118,239,189,.3); background: rgba(118,239,189,.06); }
+        .ea-pill.unresolved, .ea-pill.escalate { color: var(--ea-amber); border-color: rgba(255,191,105,.34); background: rgba(255,191,105,.06); }
+        .ea-pill.fail { color: var(--ea-red); border-color: rgba(255,127,143,.34); background: rgba(255,127,143,.06); }
+        .ea-pill.public { color: var(--ea-cyan); }
+        .ea-inspection-lead { display: grid; grid-template-columns: 1.15fr .85fr; gap: 16px; }
+        .ea-callout { border: 1px solid rgba(255,191,105,.26); border-radius: 18px; padding: 22px; background: linear-gradient(145deg, rgba(255,191,105,.07), rgba(255,255,255,.015)); }
+        .ea-callout strong { display: block; font-size: 22px; letter-spacing: -.03em; }
+        .ea-callout p { margin: 9px 0 0; color: #b9c9d9; line-height: 1.65; }
+        .ea-chain { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .ea-chain-card { border: 1px solid var(--ea-line); border-radius: 16px; padding: 16px; background: rgba(255,255,255,.02); }
+        .ea-chain-card header { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
+        .ea-chain-card header span:first-child { font-weight: 900; color: var(--ea-cyan); }
+        .ea-chain-card h3 { margin: 14px 0 7px; font-size: 18px; }
+        .ea-chain-card p { margin: 0; color: var(--ea-muted); line-height: 1.55; font-size: 12px; }
+        .ea-chain-card .proof { margin-top: 12px; color: #b7c8d9; }
+        .ea-runtime { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+        .ea-gate { text-align: left; border: 1px solid var(--ea-line); border-radius: 14px; padding: 14px; background: rgba(255,255,255,.02); cursor: pointer; }
+        .ea-gate.active { border-color: rgba(255,191,105,.42); background: rgba(255,191,105,.05); }
+        .ea-gate-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .ea-gate-head strong { color: var(--ea-cyan); }
+        .ea-gate h3 { margin: 11px 0 7px; font-size: 15px; }
+        .ea-gate p { margin: 0; color: var(--ea-muted); font-size: 12px; line-height: 1.5; }
+        .ea-gate code { display: block; margin-top: 10px; color: #9fc5dd; font-size: 10px; overflow-wrap: anywhere; }
+        .ea-list { display: grid; gap: 10px; }
+        .ea-row { border: 1px solid var(--ea-line); border-radius: 14px; padding: 15px; background: rgba(255,255,255,.02); }
+        .ea-row header { display: flex; justify-content: space-between; gap: 12px; align-items: flex-start; }
+        .ea-row h3 { margin: 6px 0 0; font-size: 16px; }
+        .ea-row p { margin: 9px 0 0; color: var(--ea-muted); line-height: 1.55; font-size: 12px; }
+        .ea-row code { display: block; margin-top: 10px; color: #a5cae1; overflow-wrap: anywhere; font-size: 10px; }
+        .ea-evidence-button { width: 100%; text-align: left; color: inherit; cursor: pointer; }
+        .ea-evidence-detail { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--ea-line); display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .ea-timeline { position: relative; display: grid; gap: 12px; }
+        .ea-timeline::before { content: ""; position: absolute; left: 19px; top: 10px; bottom: 10px; width: 1px; background: linear-gradient(var(--ea-cyan), var(--ea-amber), transparent); }
+        .ea-event { position: relative; margin-left: 42px; border: 1px solid var(--ea-line); border-radius: 14px; padding: 16px; background: rgba(255,255,255,.02); }
+        .ea-event::before { content: ""; position: absolute; left: -30px; top: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--ea-cyan); box-shadow: 0 0 18px rgba(102,219,255,.7); }
+        .ea-event time { color: var(--ea-cyan); font-size: 10px; letter-spacing: .1em; }
+        .ea-event strong { display: block; margin-top: 7px; }
+        .ea-event p { margin: 8px 0 0; color: var(--ea-muted); line-height: 1.55; font-size: 12px; }
+        .ea-receipt { border: 1px solid rgba(255,191,105,.35); border-radius: 20px; padding: 24px; background: linear-gradient(145deg, rgba(255,191,105,.07), rgba(5,10,18,.95)); }
+        .ea-receipt-command { margin: 18px 0; padding: 18px; border: 1px solid var(--ea-line); border-radius: 14px; background: #050a12; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; color: #cfeeff; overflow-wrap: anywhere; }
+        .ea-code-block { display: block; padding: 15px; border: 1px solid var(--ea-line); border-radius: 12px; background: #04080f; color: #bfe8ff; line-height: 1.5; overflow-wrap: anywhere; font-size: 11px; }
+        .ea-table-wrap { overflow-x: auto; border: 1px solid var(--ea-line); border-radius: 16px; }
+        .ea-table { width: 100%; min-width: 780px; border-collapse: collapse; }
+        .ea-table th, .ea-table td { padding: 14px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--ea-line); }
+        .ea-table th { color: var(--ea-muted); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; background: rgba(255,255,255,.02); }
+        .ea-table td { font-size: 12px; line-height: 1.5; }
+        .ea-table tr:last-child td { border-bottom: 0; }
+        .ea-progress { height: 8px; border: 1px solid var(--ea-line); border-radius: 999px; overflow: hidden; background: #050a11; }
+        .ea-progress i { display: block; height: 100%; background: linear-gradient(90deg, var(--ea-cyan), var(--ea-green)); transition: width .25s ease; }
+        .ea-verify-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+        .ea-verification-row { display: grid; grid-template-columns: 60px 180px 1fr 96px; gap: 12px; align-items: center; border: 1px solid var(--ea-line); border-radius: 13px; padding: 13px; background: rgba(255,255,255,.02); }
+        .ea-verification-row p { margin: 0; color: var(--ea-muted); line-height: 1.45; font-size: 12px; }
+        .ea-challenge textarea { width: 100%; min-height: 180px; resize: vertical; border: 1px solid var(--ea-line); border-radius: 14px; padding: 16px; background: rgba(3,7,13,.82); color: var(--ea-text); outline: none; }
+        .ea-challenge textarea:focus { border-color: rgba(102,219,255,.5); box-shadow: 0 0 0 3px rgba(102,219,255,.06); }
+        .ea-footer { padding: 30px 0 54px; border-top: 1px solid var(--ea-line); color: var(--ea-muted); }
+        .ea-footer-inner { display: flex; justify-content: space-between; gap: 18px; align-items: center; }
+        .ea-footer strong { color: var(--ea-text); }
+        @media (max-width: 1180px) {
+          .ea-hero, .ea-inspection-lead { grid-template-columns: 1fr; }
+          .ea-metrics { grid-template-columns: repeat(3, 1fr); }
+          .ea-chain { grid-template-columns: repeat(2, 1fr); }
+          .ea-runtime { grid-template-columns: repeat(2, 1fr); }
+          .ea-grid-4 { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 760px) {
+          .ea-shell { width: min(100% - 20px, 1540px); }
+          .ea-topbar { align-items: flex-start; padding: 15px 0; }
+          .ea-top-actions { display: none; }
+          .ea-hero { padding-top: 22px; }
+          .ea-hero-copy, .ea-decision-core, .ea-panel { padding: 18px; border-radius: 18px; }
+          .ea-metrics, .ea-grid-2, .ea-grid-3, .ea-grid-4, .ea-chain, .ea-runtime { grid-template-columns: 1fr; }
+          .ea-decision-grid { grid-template-columns: 1fr; }
+          .ea-verification-row { grid-template-columns: 48px 1fr; }
+          .ea-verification-row p { grid-column: 1 / -1; }
+          .ea-footer-inner { align-items: flex-start; flex-direction: column; }
+        }
+      `}</style>
+
+      <div className="ea-shell">
+        <header className="ea-topbar">
+          <Link className="ea-brand" href="/artifacts">
+            <span className="ea-brand-mark">14</span>
+            <span className="ea-brand-copy"><strong>TA-14 Authority</strong><span>Eighth Door · Execution Artifacts</span></span>
           </Link>
-          <div className="artifact-top-actions">
-            <Link className="artifact-link" href="/artifacts/ta14-ea-000001">← Artifact 000001</Link>
-            <Link className="artifact-link" href="/artifacts">Artifact library</Link>
-            <Link className="artifact-link" href="/workspace/artifacts/build">Build an artifact</Link>
-          </div>
+          <nav className="ea-top-actions" aria-label="Artifact navigation">
+            <Link className="ea-link" href="/artifacts/ta14-ea-000003">← Artifact 000003</Link>
+            <Link className="ea-link" href="/artifacts">Artifact library</Link>
+            <Link className="ea-link" href="/workspace/artifacts/build">Artifact Studio</Link>
+          </nav>
         </header>
 
-        <section className="artifact-hero">
-          <div className="artifact-hero-grid">
-            <div className="artifact-hero-copy">
-              <div className="artifact-kicker">Execution artifact 04 of 12 · canonical evidence-conflict proof</div>
-              <h1>
-                Evidence conflict
-                <span>stopped execution.</span>
-              </h1>
-              <p className="artifact-lede">
-                A executor possessed valid delegated authority when the recommendation route began.
-                That authority was exceeded before commitment. TA-14 preserved the change,
-                invalidated dependent gates, committed ESCALATE, held transmission, and closed
-                the outcome with zero unauthorized actions executed.
-              </p>
-              <div className="artifact-hero-meta">
-                <span className="artifact-chip">{ARTIFACT_ID}</span>
-                <span className="artifact-chip">Route {ROUTE_VERSION}</span>
-                <span className="artifact-chip">Earliest failure: CONTINUITY</span>
-                <span className="artifact-chip">Verification level: 6</span>
-                <span className="artifact-chip">Controlled demonstration</span>
-              </div>
+        <section className="ea-hero">
+          <div className="ea-hero-copy">
+            <div className="ea-kicker">
+              <Pill variant="public">Published</Pill>
+              <Pill>Canonical demonstration</Pill>
+              <span>{ARTIFACT_ID}</span>
             </div>
-
-            <aside className="artifact-decision">
-              <div>
-                <div className="artifact-decision-label">Committed determination</div>
-                <div className="artifact-decision-word">ESCALATE</div>
-                <p>
-                  Do not transmit. Preserve the request, restore valid authority, and rerun every
-                  dependent gate before a new commit is considered.
-                </p>
-              </div>
-              <div className="artifact-decision-grid">
-                <div className="artifact-decision-cell">
-                  <span>Control effect</span>
-                  <strong>HTTP 202 · DENIED</strong>
-                </div>
-                <div className="artifact-decision-cell">
-                  <span>Production changes released</span>
-                  <strong>$0.00</strong>
-                </div>
-                <div className="artifact-decision-cell">
-                  <span>Earliest break</span>
-                  <strong>Gate 07</strong>
-                </div>
-                <div className="artifact-decision-cell">
-                  <span>Repair path</span>
-                  <strong>Evidence + adjudication</strong>
-                </div>
-              </div>
-            </aside>
+            <h1>Conflicting admissible evidence <span>did not become silent approval.</span></h1>
+            <p>
+              Two current, attributable, individually admissible clinical evidence packages supported incompatible consequential outcomes.
+              TA-14 preserved both records, fixed ESCALATE before action, held the care-routing instruction, and routed the conflict to a named adjudicator.
+            </p>
+            <div className="ea-hero-actions">
+              <button className="ea-button primary" onClick={() => changeView("inspection")}>Inspect bounded record</button>
+              <button className="ea-button" onClick={() => changeView("verify")}>Run verification</button>
+              <button className="ea-button" onClick={() => downloadJson(`${ARTIFACT_ID}.canonical.json`, canonicalRecord)}>Download canonical JSON</button>
+            </div>
           </div>
+
+          <aside className="ea-decision-core">
+            <div>
+              <span className="ea-decision-label">Committed determination</span>
+              <div className="ea-decision-value">ESCALATE</div>
+              <p>A named clinical authority must resolve the preserved conflict. Escalation is not approval.</p>
+            </div>
+            <div className="ea-decision-grid">
+              <Field label="Earliest controlling link" value="14 · Admissibility" />
+              <Field label="Execution effect" value="HELD_AND_ROUTED" />
+              <Field label="Queue state" value="AWAITING_ADJUDICATION" />
+              <Field label="Route changes" value="0" />
+            </div>
+          </aside>
         </section>
 
-        <section className="artifact-summary-grid" aria-label="Artifact summary">
-          <div className="artifact-stat"><span>Runtime gates</span><strong>24</strong></div>
-          <div className="artifact-stat"><span>Passed</span><strong>{passedGates.length}</strong></div>
-          <div className="artifact-stat"><span>Failed</span><strong>{failedGates.length}</strong></div>
-          <div className="artifact-stat"><span>Evidence records</span><strong>{evidence.length}</strong></div>
-          <div className="artifact-stat"><span>Execution receipt</span><strong>Preserved</strong></div>
-          <div className="artifact-stat"><span>Public verification</span><strong>Level 6</strong></div>
+        <section className="ea-metrics" aria-label="Artifact metrics">
+          <Metric label="Runtime links" value="24" detail={`${passCount} pass · ${unresolvedCount} unresolved`} />
+          <Metric label="Evidence records" value="12" detail="Both conflicting sources preserved" />
+          <Metric label="Authority actors" value="6" detail="Named adjudication authority ready" />
+          <Metric label="Verification" value="L7" detail={`${reviewQuestionCount} institutional review checks`} />
+          <Metric label="Outcome" value="0 changes" detail="No care-routing instruction released" />
         </section>
 
-        <nav className="artifact-tabs" aria-label="Artifact inspection views">
-          {tabs.map((tab) => (
-            <button
-              className={`artifact-tab ${view === tab.id ? "active" : ""}`}
-              key={tab.id}
-              type="button"
-              onClick={() => selectView(tab.id)}
-            >
-              {tab.label}
+        <nav className="ea-nav" aria-label="Artifact workspace views">
+          {views.map((item) => (
+            <button key={item.id} className={view === item.id ? "active" : ""} onClick={() => changeView(item.id)}>
+              <strong>{item.code}</strong>{item.label}
             </button>
           ))}
         </nav>
 
-        <div className="artifact-layout" id="artifact-workspace">
-          <div className="artifact-main">
-            {view === "inspection" ? (
-              <Panel
-                eyebrow="Public inspection"
-                title="Understand the bounded event in sixty seconds."
-                subtitle="This view answers what was proposed, what governed it, why the decision occurred, whether the decision changed the action path, and what outcome followed."
-              >
-                <div className="artifact-proof-grid">
-                  <article className="artifact-proof-card">
-                    <div className="artifact-overline">Proposed consequence</div>
-                    <h3>Deploy triage model v4.2 to the clinical decision-support queue with create, update, and delete routing scopes.</h3>
-                    <p>
-                      The route required current recommendation evidence, a frozen target environment care destination,
-                      valid CFO authority, valid authorized scope, preserved continuity, and a
-                      final pre-execution revalidation.
-                    </p>
-                  </article>
-                  <article className="artifact-proof-card">
-                    <div className="artifact-overline">Controlling condition</div>
-                    <h3>Authorized scope changed before commit.</h3>
-                    <p>
-                      The initial delegation was real but no longer current. The violation event
-                      occurred before the route fixed its determination, so the earlier approval could
-                      not carry forward into execution.
-                    </p>
-                  </article>
-                  <article className="artifact-proof-card positive">
-                    <div className="artifact-overline">What this proves</div>
-                    <h3>The architecture failed closed on evidence conflict.</h3>
-                    <p>
-                      TA-14 did not treat an earlier valid approval as permanent permission. It
-                      preserved the changed conflict state, reran dependent gates, committed ESCALATE,
-                      and produced a technical non-release receipt.
-                    </p>
-                  </article>
-                  <article className="artifact-proof-card conflict">
-                    <div className="artifact-overline">What this does not prove</div>
-                    <h3>No universal or production certification is claimed.</h3>
-                    <p>
-                      This controlled demonstration proves one bounded event through the TA-14
-                      reference engine and adapter. It does not certify every organization, recommendation
-                      rail, authority system, or future execution.
-                    </p>
-                  </article>
+        <div id="artifact-workspace" className="ea-workspace">
+          {view === "inspection" && (
+            <>
+              <Panel eyebrow="Sixty-second inspection" title="What happened, what controlled it, and what followed">
+                <div className="ea-inspection-lead">
+                  <div className="ea-grid-2">
+                    <article className="ea-card"><Pill>Proposed action</Pill><h3>Release one consequential clinical routing instruction.</h3><p>The instruction could redirect the patient toward urgent specialist review or monitored observation.</p></article>
+                    <article className="ea-card"><Pill>What was at risk</Pill><h3>An unresolved conflict could become real-world consequence.</h3><p>Either source could be wrong, incomplete, or contextually limited. Silent selection was prohibited.</p></article>
+                    <article className="ea-card"><Pill variant="unresolved">Earliest control</Pill><h3>Admissibility remained unresolved.</h3><p>Both packages were admissible individually, but they could not jointly support one consequence without adjudication.</p></article>
+                    <article className="ea-card"><Pill variant="pass">Execution effect</Pill><h3>The instruction was held and routed.</h3><p>HTTP 202 confirmed assignment to the named adjudicator and zero consequential route changes.</p></article>
+                  </div>
+                  <div className="ea-callout">
+                    <Pill variant="escalate">Why ESCALATE</Pill>
+                    <strong>Conflict was preserved instead of concealed.</strong>
+                    <p>The route did not reject either source, average incompatible conclusions, or allow a runtime operator to choose. It committed a bounded next action: named adjudication followed by revalidation.</p>
+                  </div>
                 </div>
               </Panel>
-            ) : null}
 
-            {view === "chain" ? (
-              <Panel
-                eyebrow="Canonical chain"
-                title="The earliest unsupported link controlled the route."
-                subtitle="Later success cannot repair an earlier continuity failure. Each anchor remains visible even when the path stops."
-              >
-                <div className="artifact-chain">
-                  {chain.map((item) => (
-                    <article
-                      className={`artifact-chain-row ${item.result === "FAIL" ? "fail" : ""}`}
-                      key={item.number}
-                    >
-                      <div className="artifact-number">{item.number}</div>
-                      <div className="artifact-chain-link">
-                        <strong>{item.link}</strong>
-                        <span>{item.question}</span>
-                      </div>
-                      <div className="artifact-chain-copy">
-                        <strong>{item.finding}</strong>
-                        <p>{item.proof}</p>
-                      </div>
-                      <div className={`artifact-state ${item.result === "FAIL" ? "fail" : ""}`}>
-                        {item.result}
-                      </div>
-                    </article>
-                  ))}
+              <Panel eyebrow="Proof boundary" title="What this artifact proves—and what it does not">
+                <div className="ea-grid-2">
+                  <article className="ea-card"><Pill variant="verified">Proves</Pill><h3>TA-14 can surface a material evidence conflict before consequence.</h3><p>It proves one bounded route preserved both sources, committed ESCALATE, technically held execution, and verified zero route changes.</p></article>
+                  <article className="ea-card"><Pill variant="unresolved">Does not prove</Pill><h3>No universal clinical correctness or production certification is claimed.</h3><p>The artifact does not decide which source is substantively correct and does not certify all clinical systems, routes, or future events.</p></article>
                 </div>
               </Panel>
-            ) : null}
+            </>
+          )}
 
-            {view === "runtime" ? (
-              <Panel
-                eyebrow="Complete runtime"
-                title="Twenty-four gates preserved the decision path."
-                subtitle="The first controlling failure occurred at gate 07. Dependent admissibility and binding gates also failed, but they did not replace the earliest-failure finding."
-              >
-                <div className="artifact-gates">
-                  {gates.map((gate) => (
-                    <article
-                      className={`artifact-gate ${gate.result === "FAIL" ? "fail" : ""}`}
-                      key={gate.number}
-                    >
-                      <div className="artifact-gate-top">
-                        <span className="artifact-gate-no">{gate.number}</span>
-                        <span className={`artifact-state ${gate.result === "FAIL" ? "fail" : ""}`}>
-                          {gate.result}
-                        </span>
-                      </div>
-                      <div className="artifact-overline" style={{ marginTop: 14 }}>{gate.chainLink}</div>
+          {view === "chain" && (
+            <Panel eyebrow="Eight-anchor execution chain" title="The complete event from reality to preserved outcome">
+              <div className="ea-chain">
+                {chain.map((item) => (
+                  <article className="ea-chain-card" key={item.number}>
+                    <header><span>{item.number}</span><Pill variant={tone(item.result)}>{item.result}</Pill></header>
+                    <h3>{item.link}</h3>
+                    <p>{item.question}</p>
+                    <p className="proof"><strong>Finding:</strong> {item.finding}</p>
+                    <p className="proof"><strong>Proof:</strong> {item.proof}</p>
+                  </article>
+                ))}
+              </div>
+            </Panel>
+          )}
+
+          {view === "runtime" && (
+            <>
+              <Panel eyebrow="Twenty-four-link runtime" title="Ordered gate ledger and earliest controlling failure">
+                <div className="ea-runtime">
+                  {runtime.map((gate) => (
+                    <button key={gate.number} className={`ea-gate ${expandedGate === gate.number ? "active" : ""}`} onClick={() => setExpandedGate(gate.number)}>
+                      <div className="ea-gate-head"><strong>{gate.number}</strong><Pill variant={tone(gate.result)}>{gate.result}</Pill></div>
                       <h3>{gate.title}</h3>
                       <p>{gate.summary}</p>
-                      <div className="artifact-reason">{gate.reasonCode}</div>
+                      <code>{gate.reasonCode}</code>
+                    </button>
+                  ))}
+                </div>
+              </Panel>
+              <Panel eyebrow="Earliest-failure discipline" title="Later links cannot cure an unresolved admissibility conflict">
+                <div className="ea-grid-3">
+                  <article className="ea-card"><Pill variant="pass">Continuity passed</Pill><h3>Both sources remained intact.</h3><p>Identity, provenance, time, custody, integrity, and version were preserved for each package.</p></article>
+                  <article className="ea-card"><Pill variant="unresolved">Admissibility unresolved</Pill><h3>The records conflicted materially.</h3><p>Individual fitness did not create a joint right to support one consequential determination.</p></article>
+                  <article className="ea-card"><Pill variant="escalate">Next action bounded</Pill><h3>Named adjudication only.</h3><p>No later approval, runtime preference, or successful outcome may be backdated into this commit.</p></article>
+                </div>
+              </Panel>
+            </>
+          )}
+
+          {view === "evidence" && (
+            <Panel eyebrow="Evidence manifest" title="Both admissible packages remain visible, attributable, and challengeable">
+              <div className="ea-list">
+                {evidence.map((item) => (
+                  <button key={item.id} className="ea-row ea-evidence-button" onClick={() => setExpandedEvidence(expandedEvidence === item.id ? "" : item.id)}>
+                    <header><div><Pill>{item.id}</Pill><h3>{item.title}</h3></div><div><Pill variant="pass">{item.status}</Pill></div></header>
+                    <p>{item.source} · {item.type} · {item.disclosure} · {item.capturedAt}</p>
+                    <code>{item.hash}</code>
+                    {expandedEvidence === item.id && (
+                      <div className="ea-evidence-detail">
+                        <div><Pill variant="verified">Supports</Pill><p>{item.supports}</p></div>
+                        <div><Pill variant="unresolved">Limitation</Pill><p>{item.limitation}</p></div>
+                      </div>
+                    )}
+                  </button>
+                ))}
+              </div>
+            </Panel>
+          )}
+
+          {view === "authority" && (
+            <>
+              <Panel eyebrow="Authority resolution" title="Escalation routes to a named authority without becoming approval">
+                <div className="ea-grid-3">
+                  {authorities.map((item) => (
+                    <article className="ea-card" key={item.id}>
+                      <div className="ea-kicker"><Pill>{item.id}</Pill><Pill variant="pass">{item.state}</Pill></div>
+                      <h3>{item.actor}</h3>
+                      <p><strong>{item.role}</strong></p>
+                      <p>{item.scope}</p>
                     </article>
                   ))}
                 </div>
               </Panel>
-            ) : null}
+              <Panel eyebrow="Separation of duties" title="No actor may silently assume another actor’s authority">
+                <div className="ea-grid-4">
+                  <article className="ea-card"><Pill>Evidence custodian</Pill><h3>Preserves source fitness.</h3><p>Cannot decide the substantive conflict.</p></article>
+                  <article className="ea-card"><Pill>Runtime operator</Pill><h3>Executes the frozen route.</h3><p>Cannot reinterpret ESCALATE as ALLOW.</p></article>
+                  <article className="ea-card"><Pill>Adapter</Pill><h3>Holds and routes.</h3><p>Cannot release the instruction while conflict remains unresolved.</p></article>
+                  <article className="ea-card"><Pill>Adjudicator</Pill><h3>Resolves within scope.</h3><p>Any later decision still requires revalidation before execution.</p></article>
+                </div>
+              </Panel>
+            </>
+          )}
 
-            {view === "evidence" ? (
-              <Panel
-                eyebrow="Evidence manifest"
-                title="Every material record carries support and limitation."
-                subtitle="The manifest exposes source identity, type, capture time, disclosure state, integrity commitment, admissibility status, and the conflict of what each item can prove."
-              >
-                <div className="artifact-evidence-grid">
-                  {evidence.map((item) => (
-                    <article className="artifact-evidence-card" key={item.id}>
-                      <div className="artifact-evidence-top">
-                        <div className="artifact-evidence-id">{item.id}</div>
-                        <div className="artifact-badges">
-                          <span className={`artifact-badge ${item.status === "ADMITTED" ? "good" : "warn"}`}>
-                            {item.status}
-                          </span>
-                          <span className="artifact-badge">{item.disclosure}</span>
-                        </div>
-                      </div>
-                      <h3>{item.title}</h3>
-                      <p>{item.supports}</p>
-                      <div className="artifact-evidence-meta">
-                        <div className="artifact-row"><span>Source</span><strong>{item.source}</strong></div>
-                        <div className="artifact-row"><span>Type</span><strong>{item.type}</strong></div>
-                        <div className="artifact-row"><span>Captured</span><strong>{item.capturedAt}</strong></div>
-                        <div className="artifact-row"><span>Hash</span><strong>{item.hash}</strong></div>
-                      </div>
-                      <p><strong>Limitation:</strong> {item.limitation}</p>
+          {view === "conflict" && (
+            <Panel eyebrow="Conflict chronology" title="The contradiction remained visible from intake through outcome closure">
+              <div className="ea-timeline">
+                {timeline.map((item) => (
+                  <article className="ea-event" key={`${item.time}-${item.event}`}>
+                    <time>{item.time}</time><strong>{item.event}</strong><p>{item.detail}</p><div style={{ marginTop: 10 }}><Pill variant={item.state === "CONFLICT" || item.state === "UNRESOLVED" ? "unresolved" : "pass"}>{item.state}</Pill></div>
+                  </article>
+                ))}
+              </div>
+            </Panel>
+          )}
+
+          {view === "control" && (
+            <>
+              <Panel eyebrow="Execution effect receipt" title="The committed determination changed what the system could do">
+                <div className="ea-receipt">
+                  <div className="ea-grid-3">
+                    <Field label="Receipt ID" value="EA-000004-EX-01" />
+                    <Field label="HTTP status" value="202 · ESCALATED" />
+                    <Field label="Adapter state" value="HELD_AND_ROUTED" />
+                    <Field label="Queue state" value="AWAITING_ADJUDICATION" />
+                    <Field label="Route changes" value="0" />
+                    <Field label="Bypass release" value="NONE" />
+                  </div>
+                  <div className="ea-receipt-command">CONTROL COMMAND: HOLD_AND_ROUTE_TO_ADJUDICATION · TARGET: BOUNDED CARE-ROUTING INSTRUCTION · AUTHORITY: CLINICAL_ADJUDICATOR_A17</div>
+                  <CodeBlock value={RECEIPT_HASH} />
+                </div>
+              </Panel>
+              <Panel eyebrow="Conflict controls" title="Twelve controls prevent contradiction from becoming consequence">
+                <div className="ea-grid-3">
+                  {controls.map((item) => <article className="ea-card" key={item.id}><Pill>{item.id}</Pill><h3>{item.title}</h3><p>{item.detail}</p></article>)}
+                </div>
+              </Panel>
+            </>
+          )}
+
+          {view === "outcome" && (
+            <>
+              <Panel eyebrow="Outcome closure" title="No consequential care-routing instruction was released">
+                <div className="ea-grid-4">
+                  <Metric label="Care instruction" value="Not released" detail="Held pending adjudication" />
+                  <Metric label="Target changes" value="0" detail="Verified by target-system audit" />
+                  <Metric label="Residual risk" value="Visible" detail="Substantive conflict remains unresolved" />
+                  <Metric label="Next action" value="Adjudicate" detail="Then revalidate before any execution" />
+                </div>
+              </Panel>
+              <Panel eyebrow="Repair and continuation" title="What must happen before a later consequential action may proceed">
+                <div className="ea-grid-3">
+                  <article className="ea-card"><Pill>01</Pill><h3>Named adjudication</h3><p>Clinical Adjudicator A-17 must issue a scoped, attributable resolution or request additional evidence.</p></article>
+                  <article className="ea-card"><Pill>02</Pill><h3>Append the resolution</h3><p>The resolution is appended to this event; the original ESCALATE commit remains immutable.</p></article>
+                  <article className="ea-card"><Pill>03</Pill><h3>Revalidate before execution</h3><p>Patient state, evidence freshness, authority, route version, and execution boundary must be checked again.</p></article>
+                </div>
+              </Panel>
+            </>
+          )}
+
+          {view === "integrity" && (
+            <>
+              <Panel eyebrow="Integrity manifest" title="Every public representation resolves to one frozen record root">
+                <div className="ea-grid-3">
+                  <article className="ea-card"><Pill>Record hash</Pill><h3>Canonical event root</h3><CodeBlock value={RECORD_HASH} /></article>
+                  <article className="ea-card"><Pill>Package hash</Pill><h3>Artifact package root</h3><CodeBlock value={PACKAGE_HASH} /></article>
+                  <article className="ea-card"><Pill>Receipt hash</Pill><h3>Execution effect commitment</h3><CodeBlock value={RECEIPT_HASH} /></article>
+                </div>
+              </Panel>
+              <Panel eyebrow="Twenty-component package" title="Human-readable and machine-verifiable components">
+                <div className="ea-table-wrap"><table className="ea-table"><thead><tr><th>#</th><th>Component</th><th>Status</th><th>Purpose</th></tr></thead><tbody>{packageComponents.map((item) => <tr key={item.number}><td>{item.number}</td><td><strong>{item.component}</strong></td><td><Pill variant="ready">{item.status}</Pill></td><td>{item.detail}</td></tr>)}</tbody></table></div>
+                <div className="ea-hero-actions">
+                  <button className="ea-button" onClick={() => downloadJson(`${ARTIFACT_ID}.integrity-manifest.json`, { artifactId: ARTIFACT_ID, recordHash: RECORD_HASH, packageHash: PACKAGE_HASH, receiptHash: RECEIPT_HASH, components: packageComponents })}>Download integrity manifest</button>
+                  <button className="ea-button" onClick={() => downloadJson(`${ARTIFACT_ID}.execution-receipt.json`, canonicalRecord.executionEffect)}>Download execution receipt</button>
+                  <button className="ea-button" onClick={() => downloadJson(`${ARTIFACT_ID}.evidence-manifest.json`, evidence)}>Download evidence manifest</button>
+                </div>
+              </Panel>
+            </>
+          )}
+
+          {view === "verify" && (
+            <>
+              <Panel eyebrow="Verification center" title="Verify package integrity, parity, replay, control effect, and outcome">
+                <div className="ea-verify-head">
+                  <div><Pill variant={verificationState === "VERIFIED" ? "verified" : verificationState === "RUNNING" ? "unresolved" : "neutral"}>{verificationState}</Pill></div>
+                  <button className="ea-button primary" onClick={runVerification} disabled={verificationState === "RUNNING"}>{verificationState === "RUNNING" ? "Verifying…" : "Run full verification"}</button>
+                </div>
+                <div className="ea-progress"><i style={{ width: `${Math.round((verificationStep / verificationLevels.length) * 100)}%` }} /></div>
+                <div className="ea-list" style={{ marginTop: 16 }}>
+                  {verificationLevels.map((item, index) => (
+                    <article className="ea-verification-row" key={item.level}>
+                      <strong>{item.level}</strong><span>{item.label}</span><p>{item.detail}</p><Pill variant={verificationStep > index ? "verified" : "neutral"}>{verificationStep > index ? "VERIFIED" : "PENDING"}</Pill>
                     </article>
                   ))}
                 </div>
               </Panel>
-            ) : null}
-
-            {view === "conflict" ? (
-              <Panel
-                eyebrow="Conflict integrity"
-                title="The delegation was valid—until it was not."
-                subtitle="The architecture preserves both states. It does not rewrite the earlier approval, and it does not allow that earlier approval to survive a later violation."
-              >
-                <div className="artifact-authority-stage">
-                  <div className="artifact-conflict-ledger">
-                    {conflictEvents.map((event) => (
-                      <article
-                        className={`artifact-authority-event ${event.state === "CHANGED" ? "changed" : ""}`}
-                        key={`${event.time}-${event.event}`}
-                      >
-                        <time>{event.time}</time>
-                        <div>
-                          <strong>{event.event}</strong>
-                          <p>{event.detail}</p>
-                        </div>
-                        <span className="artifact-authority-state">{event.state}</span>
-                      </article>
-                    ))}
-                  </div>
-                  <aside className="artifact-break-card">
-                    <div className="artifact-overline">Earliest failure</div>
-                    <h3>Continuity</h3>
-                    <p>
-                      Actor identity remained known, but the conflict state no longer matched the
-                      state that supported initial approval. This break occurred before commit and
-                      controlled every downstream consequence.
-                    </p>
-                    <div className="artifact-row"><span>Gate</span><strong>07 · Delegation continuity checked</strong></div>
-                    <div className="artifact-row" style={{ marginTop: 10 }}><span>Reason</span><strong>EVIDENCE_CONFLICT_PRESERVED</strong></div>
-                  </aside>
-                </div>
+              <Panel eyebrow="Acceptance tests" title="Fifteen required conditions for this bounded artifact">
+                <div className="ea-table-wrap"><table className="ea-table"><thead><tr><th>Test</th><th>Result</th><th>Pass condition</th></tr></thead><tbody>{acceptanceTests.map((item) => <tr key={item.id}><td><strong>{item.id}</strong></td><td><Pill variant="pass">{item.result}</Pill></td><td>{item.condition}</td></tr>)}</tbody></table></div>
               </Panel>
-            ) : null}
+            </>
+          )}
 
-            {view === "control" ? (
-              <Panel
-                eyebrow="Execution effect"
-                title="The determination changed what the system could do."
-                subtitle="This is the difference between governance and description. The reference adapter received a control command, refused transmission, and generated a technical receipt."
-              >
-                <div className="artifact-effect">
-                  <article className="artifact-effect-box">
-                    <div className="artifact-overline">Attempted action</div>
-                    <h3>Transmit production triage model v4.2</h3>
-                    <p>
-                      Target environment, scope, care destination, authority chain, route version, and event
-                      window were frozen before runtime evaluation.
-                    </p>
-                    <div className="artifact-receipt-grid">
-                      <div className="artifact-row"><span>Adapter</span><strong>Reference Recommendation Adapter</strong></div>
-                      <div className="artifact-row"><span>Route</span><strong>{ROUTE_ID}</strong></div>
-                    </div>
-                  </article>
-                  <div className="artifact-effect-arrow">→</div>
-                  <article className="artifact-effect-box held">
-                    <div className="artifact-overline">Enforced result</div>
-                    <h3>DENIED · HTTP 202</h3>
-                    <p>
-                      The transmission endpoint remained closed. The request was retained in a
-                      controlled queue with no alternate-path release and no backdated approval.
-                    </p>
-                    <div className="artifact-receipt-grid">
-                      <div className="artifact-row"><span>Receipt</span><strong>EA-000004-EX-01</strong></div>
-                      <div className="artifact-row"><span>Released</span><strong>$0.00</strong></div>
-                      <div className="artifact-row"><span>Bypass</span><strong>NONE DETECTED</strong></div>
-                      <div className="artifact-row"><span>Queue</span><strong>DENIAL_PRESERVED</strong></div>
-                    </div>
-                  </article>
+          {view === "challenge" && (
+            <Panel eyebrow="Challenge and correction" title="Dispute the record without erasing the original event">
+              <div className="ea-grid-2">
+                <div className="ea-challenge">
+                  <textarea value={challenge} onChange={(event) => { setChallenge(event.target.value); setChallengeSaved(false); }} placeholder="Identify the exact evidence record, gate, authority scope, execution effect, outcome claim, or public statement being challenged…" />
+                  <div className="ea-hero-actions"><button className="ea-button primary" onClick={saveChallenge}>Preserve local challenge draft</button>{challengeSaved ? <Pill variant="verified">Draft preserved</Pill> : null}</div>
                 </div>
-              </Panel>
-            ) : null}
-
-            {view === "outcome" ? (
-              <Panel
-                eyebrow="Outcome closure"
-                title="The zero-mutation state was observed and preserved."
-                subtitle="A ESCALATE artifact proves that a prohibited action did not bind to reality. Revalidation alone cannot cure a hard evidence conflict; only a new, independently evaluated authority can create a different route."
-              >
-                <div className="artifact-timeline">
-                  <article className="artifact-event"><time>19:12:00 UTC</time><strong>Scenario intake sealed</strong><p>The exact recommendation, target environment, consequence, and declared limits entered the frozen record.</p></article>
-                  <article className="artifact-event"><time>19:12:11 UTC</time><strong>Initial authority resolved</strong><p>CFO and authorized scope were attributable and initially in scope.</p></article>
-                  <article className="artifact-event"><time>19:15:41 UTC</time><strong>Approved execution scope exceeded</strong><p>The authority resolver recorded the changed state before commit.</p></article>
-                  <article className="artifact-event"><time>19:15:43 UTC</time><strong>Dependent gates rerun</strong><p>Continuity, admissibility, binding, and commit logic were re-evaluated.</p></article>
-                  <article className="artifact-event"><time>19:16:02 UTC</time><strong>ESCALATE committed</strong><p>The no-release state and repair requirement were fixed before adapter invocation.</p></article>
-                  <article className="artifact-event"><time>19:16:03 UTC</time><strong>Clinical routing recommendation held</strong><p>Receipt EA-000004-EX-01 recorded HTTP 202 and zero unauthorized actions executed.</p></article>
-                  <article className="artifact-event"><time>19:17:20 UTC</time><strong>Outcome closed</strong><p>Target environment state remained unchanged and the request remained in DENIAL_PRESERVED.</p></article>
-                  <article className="artifact-event"><time>19:18:10 UTC</time><strong>Package parity verified</strong><p>The public page, JSON, manifest, receipt, and outcome record resolved to one bounded event.</p></article>
-                </div>
-              </Panel>
-            ) : null}
-
-            {view === "integrity" ? (
-              <Panel
-                eyebrow="Integrity package"
-                title="Every public representation resolves to the same frozen record."
-                subtitle="The package exposes canonicalization, component commitments, a record root, a package root, verifier version, and declared signing-key reference."
-              >
-                <div className="artifact-integrity-grid">
-                  <div className="artifact-hash"><span>Canonical record hash</span><code>{RECORD_HASH}</code></div>
-                  <div className="artifact-hash"><span>Package root hash</span><code>{PACKAGE_HASH}</code></div>
-                  <div className="artifact-hash"><span>Execution receipt hash</span><code>{RECEIPT_HASH}</code></div>
-                  <div className="artifact-hash"><span>Canonicalization</span><code>ta14.c14n.v1</code></div>
-                  <div className="artifact-hash"><span>Verifier version</span><code>ta14.verifier.reference.v1</code></div>
-                  <div className="artifact-hash"><span>Signing key reference</span><code>ta14://keys/demonstration/2026-01</code></div>
-                </div>
-                <div className="artifact-acceptance">
-                  {acceptanceTests.map((test) => (
-                    <div className="artifact-acceptance-row" key={test.id}>
-                      <span>{test.id}</span>
-                      <b>{test.result}</b>
-                      <p>{test.condition}</p>
-                    </div>
-                  ))}
-                </div>
-              </Panel>
-            ) : null}
-
-            {view === "verify" ? (
-              <Panel
-                eyebrow="Reference verification"
-                title="Run the disclosed public verification sequence."
-                subtitle="The in-page sequence demonstrates the expected verification path. Offline verification uses the downloadable canonical record and integrity manifest."
-              >
-                <div className="artifact-verify">
-                  <div className="artifact-verify-head">
-                    <div>
-                      <div className="artifact-overline">Verification result</div>
-                      <div className="artifact-verify-result">
-                        {verificationState === "VERIFIED"
-                          ? "VERIFIED"
-                          : verificationState === "RUNNING"
-                            ? "VERIFYING"
-                            : "READY"}
-                      </div>
-                    </div>
-                    <button
-                      className="artifact-button primary"
-                      type="button"
-                      onClick={runVerification}
-                      disabled={verificationState === "RUNNING"}
-                    >
-                      {verificationState === "RUNNING" ? "Verification running" : "Run verification"}
-                    </button>
-                  </div>
-                  <div className="artifact-progress"><i style={{ width: `${verificationPercent}%` }} /></div>
-                  <div className="artifact-checks">
-                    {verificationChecks.map((check, index) => (
-                      <div className="artifact-check" key={check.level}>
-                        <div className="artifact-check-level">{check.level}</div>
-                        <div>
-                          <strong>{check.label}</strong>
-                          <p>{check.detail}</p>
-                        </div>
-                        <div className="artifact-check-state">
-                          {index < verifiedCount ? "PASS" : "PENDING"}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </Panel>
-            ) : null}
-
-            {view === "challenge" ? (
-              <Panel
-                eyebrow="Challenge and correction"
-                title="The artifact remains inspectable, challengeable, and correctable."
-                subtitle="A challenge may dispute evidence, conflict interpretation, route logic, technical effect, outcome closure, integrity, or the public claim. It may not silently rewrite the original event."
-              >
-                <div className="artifact-challenge-grid">
-                  <article className="artifact-challenge-card">
-                    <div className="artifact-overline">Challenge protocol</div>
-                    <h3>Submit a bounded objection.</h3>
-                    <ul>
-                      <li>Identify the artifact, record, gate, or claim being disputed.</li>
-                      <li>State the competing evidence, interpretation, or integrity concern.</li>
-                      <li>Separate factual error from disagreement about scope or policy.</li>
-                      <li>Preserve the original artifact while appending response and correction state.</li>
-                    </ul>
-                  </article>
-                  <article className="artifact-challenge-card">
-                    <div className="artifact-overline">Local challenge draft</div>
-                    <h3>Record the objection before submission.</h3>
-                    <textarea
-                      value={challenge}
-                      onChange={(event) => {
-                        setChallenge(event.target.value);
-                        setChallengeSaved(false);
-                      }}
-                      placeholder="Identify the exact record, gate, conclusion, or claim being challenged..."
-                    />
-                    <button className="artifact-button primary" type="button" onClick={saveChallenge} style={{ marginTop: 12 }}>
-                      {challengeSaved ? "Challenge draft preserved" : "Preserve challenge draft"}
-                    </button>
-                  </article>
-                </div>
-              </Panel>
-            ) : null}
-          </div>
-
-          <aside className="artifact-aside">
-            <section className="artifact-side-card">
-              <div className="artifact-overline">Artifact identity</div>
-              <h3>{ARTIFACT_ID}</h3>
-              <div className="artifact-side-list">
-                <div className="artifact-side-row"><span>Release position</span><strong>02 of 12</strong></div>
-                <div className="artifact-side-row"><span>Determination</span><strong>ESCALATE</strong></div>
-                <div className="artifact-side-row"><span>Earliest failure</span><strong>CONTINUITY</strong></div>
-                <div className="artifact-side-row"><span>Route</span><strong>{ROUTE_ID}</strong></div>
-                <div className="artifact-side-row"><span>Route version</span><strong>{ROUTE_VERSION}</strong></div>
-                <div className="artifact-side-row"><span>Status</span><strong>PUBLISHED DEMONSTRATION</strong></div>
+                <article className="ea-callout"><Pill>Append-only rule</Pill><strong>A correction cannot rewrite the original ESCALATE event.</strong><p>Challenges, responses, corrections, supersession, or withdrawal are appended with their own identity, time, evidence, authority, and integrity commitments.</p></article>
               </div>
-            </section>
-
-            <section className="artifact-side-card">
-              <div className="artifact-overline">Repair condition</div>
-              <h3>A named clinical adjudication is required.</h3>
-              <p>
-                Create a adjudication record that explicitly covers the requested scope, preserve it as a new record, rerun every dependent gate, and generate a new commit. The original ESCALATE remains
-                immutable.
-              </p>
-              <div className="artifact-requirement-list">{resolutionRequirements.map((item, index) => <div className="artifact-requirement" key={item}><span>{String(index + 1).padStart(2, "0")}</span><p>{item}</p></div>)}</div>
-              <button className="artifact-button" type="button" onClick={() => selectView("conflict")}>Inspect evidence conflict</button>
-            </section>
-
-            <section className="artifact-side-card">
-              <div className="artifact-overline">Download package</div>
-              <h3>Inspect offline.</h3>
-              <p>Download public representations generated from this bounded demonstration record.</p>
-              <div className="artifact-downloads">
-                <button className="artifact-download" type="button" onClick={() => downloadText(`${ARTIFACT_ID}.json`, packageRecord)}>Canonical JSON <span>↓</span></button>
-                <button className="artifact-download" type="button" onClick={() => downloadText(`${ARTIFACT_ID}-integrity-manifest.json`, integrityManifest)}>Integrity manifest <span>↓</span></button>
-                <button className="artifact-download" type="button" onClick={() => downloadText(`${ARTIFACT_ID}-execution-receipt.json`, packageRecord.execution)}>Execution receipt <span>↓</span></button>
-                <button className="artifact-download" type="button" onClick={() => downloadText(`${ARTIFACT_ID}-conflict-ledger.json`, conflictEvents)}>Conflict ledger <span>↓</span></button>
-                <button className="artifact-download" type="button" onClick={() => downloadText(`${ARTIFACT_ID}-verification.txt`, `Artifact: ${ARTIFACT_ID}\nExpected result: VERIFIED\nMaximum public level: 6\nRecord hash: ${RECORD_HASH}\nPackage hash: ${PACKAGE_HASH}\n`)}>Verification guide <span>↓</span></button>
-              </div>
-            </section>
-
-            <section className="artifact-side-card artifact-conflict">
-              <div className="artifact-overline">Claims conflict</div>
-              <h3>Controlled demonstration.</h3>
-              <p>
-                This artifact proves one reference-engine event in which an out-of-scope clinical routing recommendation produced
-                a technical denial and a preserved zero-mutation outcome. It does not claim external
-                certification or universal performance.
-              </p>
-            </section>
-          </aside>
+            </Panel>
+          )}
         </div>
 
-        <footer className="artifact-footer">
-          <span>TA-14 Authority · Admissible Execution Architecture · {ARTIFACT_ID}</span>
-          <span>No admissible evidence. No admissible execution.</span>
+        <footer className="ea-footer">
+          <div className="ea-footer-inner">
+            <div><strong>TA-14 Authority · Eighth Door</strong><br />No admissible evidence. No admissible execution.</div>
+            <div className="ea-top-actions">
+              <Link className="ea-link" href="/artifacts/ta14-ea-000003">← Artifact 000003</Link>
+              <Link className="ea-link" href="/artifacts">Return to library</Link>
+            </div>
+          </div>
         </footer>
       </div>
     </main>
