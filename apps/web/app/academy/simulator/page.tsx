@@ -1511,7 +1511,7 @@ function evaluate(gates: GateState) {
 
 function GateToggle({ gate, checked, onChange }: { gate: (typeof gateLabels)[number]; checked: boolean; onChange: (value: boolean) => void }) {
   return (
-    <label className="group flex cursor-pointer gap-4 rounded-2xl border border-white/10 bg-white/[0.035] p-4 transition hover:border-cyan-300/30 hover:bg-white/[0.055]">
+    <label className="group flex cursor-pointer gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.018] p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-cyan-300/[0.055] hover:shadow-xl">
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-cyan-400" />
       <span>
         <span className="block font-semibold text-white">{gate.label}</span>
@@ -1550,7 +1550,6 @@ export default function SimulatorPage() {
   const [note, setNote] = useState("");
   const [history, setHistory] = useState<PreservedRun[]>([]);
   const [activeTab, setActiveTab] = useState<"run" | "architecture" | "history">("run");
-  const [mobileNav, setMobileNav] = useState(false);
 
   const selected = scenarios.find((scenario) => scenario.id === selectedId) ?? scenarios[0];
   const result = useMemo(() => evaluate(gates), [gates]);
@@ -1621,97 +1620,20 @@ export default function SimulatorPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#020711] text-slate-100">
-      <div className="pointer-events-none fixed inset-0 overflow-hidden">
-        <div className="absolute left-[5%] top-20 h-80 w-80 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute right-[4%] top-40 h-96 w-96 rounded-full bg-violet-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-1/3 h-96 w-96 rounded-full bg-blue-500/10 blur-3xl" />
-        <div className="absolute inset-0 opacity-25" style={{ backgroundImage: "radial-gradient(circle at 20% 20%, rgba(255,255,255,.6) 0 1px, transparent 1px), radial-gradient(circle at 75% 30%, rgba(255,255,255,.35) 0 1px, transparent 1px), radial-gradient(circle at 60% 80%, rgba(255,255,255,.3) 0 1px, transparent 1px)", backgroundSize: "160px 160px, 230px 230px, 290px 290px" }} />
+    <main className="simulation-center relative min-h-screen overflow-hidden text-slate-100">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="absolute -left-24 top-24 h-[30rem] w-[30rem] rounded-full bg-cyan-400/[0.08] blur-[110px]" />
+        <div className="absolute right-[-8rem] top-[22rem] h-[34rem] w-[34rem] rounded-full bg-indigo-500/[0.08] blur-[130px]" />
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
+        <div className="absolute inset-0 opacity-[0.045]" style={{ backgroundImage: "linear-gradient(rgba(125,211,252,.65) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,.65) 1px, transparent 1px)", backgroundSize: "52px 52px", maskImage: "linear-gradient(to bottom, black, transparent 78%)" }} />
       </div>
 
-      <button type="button" onClick={() => setMobileNav((value) => !value)} className="fixed left-4 top-4 z-50 rounded-xl border border-cyan-300/30 bg-slate-950/95 px-4 py-3 text-sm font-bold text-cyan-100 shadow-xl lg:hidden">
-        {mobileNav ? "Close Academy" : "Academy Actions"}
-      </button>
-
-      <div className="relative mx-auto flex max-w-[1680px]">
-        <aside className={`${mobileNav ? "translate-x-0" : "-translate-x-full"} fixed inset-y-0 left-0 z-40 w-[292px] border-r border-white/10 bg-[#050b16]/98 p-5 transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:overflow-y-auto`}>
-          <div className="pt-14 lg:pt-0">
-            <Link href="/academy" className="block rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
-              <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">TA-14 Academy</p>
-              <p className="mt-2 text-lg font-black text-white">Seventh major door</p>
-              <p className="mt-2 text-xs leading-5 text-slate-400">The educational operating system for admissible execution.</p>
-            </Link>
-
-            <div className="mt-5 rounded-2xl border border-amber-300/25 bg-amber-300/[0.06] p-4">
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-amber-200">Primary action</p>
-              <p className="mt-2 font-black text-white">Run a governed simulation</p>
-              <p className="mt-2 text-xs leading-5 text-slate-400">Select a scenario, test every gate, preserve the determination, and inspect the earliest failure.</p>
-              <button type="button" onClick={() => { setActiveTab("run"); setMobileNav(false); }} className="mt-4 w-full rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200">Start simulation →</button>
-            </div>
-
-            <nav className="mt-5 space-y-1">
-              <Link href="/academy" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">⌂</span>
-                <span>Academy Home</span>
-              </Link>
-              <Link href="/academy/start" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">→</span>
-                <span>Start Here</span>
-              </Link>
-              <Link href="/academy/mission-control" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">MC</span>
-                <span>Mission Control</span>
-              </Link>
-              <Link href="/academy/architecture-explorer" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">24</span>
-                <span>Architecture Explorer</span>
-              </Link>
-              <Link href="/academy/pathways" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">LP</span>
-                <span>Learning Pathways</span>
-              </Link>
-              <Link href="/academy/route-construction-lab" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">RC</span>
-                <span>Route Construction</span>
-              </Link>
-              <Link href="/academy/simulator" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-cyan-300/30 bg-cyan-300/[0.08] text-cyan-100">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">SC</span>
-                <span>Simulation Center</span>
-              </Link>
-              <Link href="/academy/review" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">RW</span>
-                <span>Review Workspace</span>
-              </Link>
-              <Link href="/academy/assessment" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">AC</span>
-                <span>Assessment Center</span>
-              </Link>
-              <Link href="/academy/credential-dashboard" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">CD</span>
-                <span>Credential Dashboard</span>
-              </Link>
-              <Link href="/academy/instructor-console" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">IC</span>
-                <span>Instructor Console</span>
-              </Link>
-              <Link href="/academy/accreditation-center" onClick={() => setMobileNav(false)} className="flex items-center gap-3 rounded-xl border px-3 py-3 text-sm font-semibold transition border-transparent text-slate-300 hover:border-white/10 hover:bg-white/[0.04] hover:text-white">
-                <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-white/10 bg-white/[0.04] text-[10px] font-black">AA</span>
-                <span>Accreditation Center</span>
-              </Link>
-            </nav>
-
-            <Link href="/" className="mt-5 flex items-center justify-between rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 transition hover:bg-white/[0.05] hover:text-white">
-              <span>Return to Exchange</span><span>↗</span>
-            </Link>
-          </div>
-        </aside>
-
-        <div className="min-w-0 flex-1 px-5 pb-20 pt-24 sm:px-8 lg:px-10 lg:pt-10 xl:px-12">
-          <header className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 shadow-2xl shadow-black/20 backdrop-blur sm:p-8 xl:p-10">
+      <div className="simulation-shell mx-auto w-full max-w-[1540px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 xl:px-10">
+          <header className="relative overflow-hidden rounded-[2.25rem] border border-cyan-200/15 bg-[linear-gradient(135deg,rgba(8,24,39,.96),rgba(4,11,22,.92)_55%,rgba(11,24,47,.92))] p-6 shadow-[0_30px_90px_rgba(0,0,0,.42)] ring-1 ring-white/[0.04] backdrop-blur-xl sm:p-8 xl:p-10">
             <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">TA-14 Academy · Governed practice environment</p>
-                <h1 className="mt-5 max-w-5xl text-4xl font-black tracking-[-0.04em] text-white sm:text-5xl xl:text-6xl">Simulation Center</h1>
+                <h1 className="mt-5 max-w-5xl bg-gradient-to-br from-white via-cyan-50 to-cyan-300 bg-clip-text text-4xl font-black tracking-[-0.055em] text-transparent sm:text-5xl xl:text-7xl">Simulation Center</h1>
                 <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 sm:text-lg">Test whether a consequential action has earned the right to proceed before consequence binds to reality. Change the conditions, locate the earliest failure, preserve the determination, and learn why completion is never permission.</p>
               </div>
               <div className="rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.06] px-5 py-4 text-sm leading-6 text-cyan-100 xl:max-w-sm">
@@ -1735,7 +1657,7 @@ export default function SimulatorPage() {
 
           {activeTab === "run" && (
             <div className="mt-6 space-y-6">
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 backdrop-blur sm:p-8">
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 backdrop-blur sm:p-8">
                 <SectionTitle eyebrow="Scenario library" title="Choose a consequence-bearing action" text="Every simulation begins with an exact action, a real consequence, a bounded authority, and conditions that may drift before execution." />
                 <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_220px_180px]">
                   <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search scenarios, domains, or consequences" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
@@ -1745,7 +1667,7 @@ export default function SimulatorPage() {
 
                 <div className="mt-6 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
                   {filtered.map((scenario) => (
-                    <button key={scenario.id} type="button" onClick={() => chooseScenario(scenario.id)} className={`rounded-2xl border p-5 text-left transition ${selectedId === scenario.id ? "border-cyan-300/40 bg-cyan-300/[0.08]" : "border-white/10 bg-white/[0.025] hover:border-white/20 hover:bg-white/[0.045]"}`}>
+                    <button key={scenario.id} type="button" onClick={() => chooseScenario(scenario.id)} className={`group relative overflow-hidden rounded-[1.35rem] border p-5 text-left shadow-lg transition duration-300 ${selectedId === scenario.id ? "border-cyan-300/50 bg-gradient-to-br from-cyan-300/[0.13] to-blue-500/[0.06] shadow-cyan-950/30 ring-1 ring-cyan-200/10" : "border-white/10 bg-gradient-to-br from-white/[0.045] to-white/[0.015] hover:-translate-y-1 hover:border-cyan-200/25 hover:bg-white/[0.06] hover:shadow-2xl"}`}>
                       <div className="flex items-center justify-between gap-3"><span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{scenario.domain}</span><span className="text-xs font-bold text-cyan-300">{scenario.difficulty}</span></div>
                       <h3 className="mt-4 text-lg font-black text-white">{scenario.title}</h3>
                       <p className="mt-3 text-sm leading-6 text-slate-400">{scenario.consequence}</p>
@@ -1757,7 +1679,7 @@ export default function SimulatorPage() {
 
               <section className="grid gap-6 2xl:grid-cols-[0.88fr_1.12fr]">
                 <div className="space-y-6">
-                  <article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                     <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Selected simulation</p>
                     <h2 className="mt-4 text-3xl font-black text-white">{selected.title}</h2>
                     <p className="mt-4 text-base leading-7 text-slate-300">{selected.consequence}</p>
@@ -1769,7 +1691,7 @@ export default function SimulatorPage() {
                     </dl>
                   </article>
 
-                  <article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                     <h3 className="text-xl font-black text-white">Learner observation</h3>
                     <p className="mt-2 text-sm leading-6 text-slate-400">Record why the action should be allowed, held, denied, or escalated. Notes are preserved locally with the run.</p>
                     <textarea value={note} onChange={(event) => setNote(event.target.value)} rows={8} placeholder="Identify the earliest failed condition, the evidence needed to cure it, and whether revalidation could change the determination." className="mt-5 w-full rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
@@ -1777,7 +1699,7 @@ export default function SimulatorPage() {
                 </div>
 
                 <div className="space-y-6">
-                  <article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionTitle eyebrow="Gate laboratory" title="Change the governing conditions" text="A checked condition is currently supported. An unchecked condition remains unresolved and must stay visible." /><button type="button" onClick={resetRun} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 hover:bg-white/[0.05]">Reset scenario</button></div>
                     <div className="mt-6 grid gap-3 md:grid-cols-2">{gateLabels.map((gate) => <GateToggle key={gate.key} gate={gate} checked={gates[gate.key]} onChange={(value) => updateGate(gate.key, value)} />)}</div>
                   </article>
@@ -1795,9 +1717,9 @@ export default function SimulatorPage() {
 
           {activeTab === "architecture" && (
             <div className="mt-6 space-y-6">
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8"><SectionTitle eyebrow="Architecture orientation" title="Eight visible anchors. One complete runtime chain." text="The public anchors orient the learner. The 24-link runtime architecture governs the full movement from purpose to preserved outcome." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">{anchors.map((anchor) => <article key={anchor.number} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><p className="text-sm font-black text-cyan-300">{anchor.number}</p><h3 className="mt-3 text-xl font-black text-white">{anchor.name}</h3><p className="mt-3 text-sm font-semibold leading-6 text-slate-300">{anchor.question}</p><p className="mt-3 text-sm leading-6 text-slate-500">{anchor.proof}</p></article>)}</div></section>
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8"><SectionTitle eyebrow="Complete chain" title="Twenty-four runtime links" text="A simulation may expose failure at any link. The earliest unresolved link controls the route; later completion cannot cure an earlier break." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{runtimeLinks.map((link) => <article key={link.number} className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">{String(link.number).padStart(2, "0")}</span><h3 className="font-black text-white">{link.name}</h3></div><p className="mt-4 text-sm leading-6 text-slate-300">{link.function}</p><p className="mt-3 text-sm leading-6 text-slate-500">{link.failure}</p></article>)}</div></section>
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Architecture orientation" title="Eight visible anchors. One complete runtime chain." text="The public anchors orient the learner. The 24-link runtime architecture governs the full movement from purpose to preserved outcome." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">{anchors.map((anchor) => <article key={anchor.number} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><p className="text-sm font-black text-cyan-300">{anchor.number}</p><h3 className="mt-3 text-xl font-black text-white">{anchor.name}</h3><p className="mt-3 text-sm font-semibold leading-6 text-slate-300">{anchor.question}</p><p className="mt-3 text-sm leading-6 text-slate-500">{anchor.proof}</p></article>)}</div></section>
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Complete chain" title="Twenty-four runtime links" text="A simulation may expose failure at any link. The earliest unresolved link controls the route; later completion cannot cure an earlier break." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{runtimeLinks.map((link) => <article key={link.number} className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">{String(link.number).padStart(2, "0")}</span><h3 className="font-black text-white">{link.name}</h3></div><p className="mt-4 text-sm leading-6 text-slate-300">{link.function}</p><p className="mt-3 text-sm leading-6 text-slate-500">{link.failure}</p></article>)}</div></section>
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                 <SectionTitle
                   eyebrow="Failure replay laboratory"
                   title="Inject one material change at a time"
@@ -1854,7 +1776,7 @@ export default function SimulatorPage() {
                 </div>
               </section>
 
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                 <SectionTitle
                   eyebrow="Structured debrief"
                   title="Explain what the run proved—and what it did not"
@@ -1890,7 +1812,7 @@ export default function SimulatorPage() {
                 </div>
               </section>
 
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                 <SectionTitle
                   eyebrow="Competency evidence"
                   title="Score demonstrated capability, not attendance"
@@ -1945,7 +1867,7 @@ export default function SimulatorPage() {
                 </div>
               </section>
 
-              <section className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
                 <SectionTitle
                   eyebrow="Operating constitution"
                   title="Twenty-four principles governing every simulation"
@@ -1976,26 +1898,46 @@ export default function SimulatorPage() {
                 </div>
               </section>
 
-              <section className="grid gap-6 xl:grid-cols-2"><article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8"><SectionTitle eyebrow="Trust distinction" title="Verified does not mean admissible" text="Zero Trust can validate actor, request, role, device, and access while the exact execution still lacks current evidence, valid authority, preserved continuity, or a bounded consequence." /><div className="mt-6 space-y-3">{["Identity answers who or what is acting.","Access answers what the actor may reach.","Admissibility answers whether this exact action may bind to reality now.","Revalidation answers whether that permission still holds immediately before execution."].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-slate-300">{item}</div>)}</div></article><article className="rounded-[2rem] border border-amber-300/20 bg-amber-300/[0.05] p-6 sm:p-8"><SectionTitle eyebrow="Constitutional rule" title="The earliest failure governs" text="A route does not average its way into permission. One unresolved condition is enough to hold, deny, or escalate the action before consequence occurs." /><div className="mt-6 rounded-2xl border border-amber-300/20 bg-black/10 p-5 text-sm leading-7 text-amber-100">Completion is not evidence. Confidence is not authority. Verification is not standing. A favorable outcome does not retroactively make an inadmissible execution permissible.</div></article></section>
+              <section className="grid gap-6 xl:grid-cols-2"><article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Trust distinction" title="Verified does not mean admissible" text="Zero Trust can validate actor, request, role, device, and access while the exact execution still lacks current evidence, valid authority, preserved continuity, or a bounded consequence." /><div className="mt-6 space-y-3">{["Identity answers who or what is acting.","Access answers what the actor may reach.","Admissibility answers whether this exact action may bind to reality now.","Revalidation answers whether that permission still holds immediately before execution."].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-slate-300">{item}</div>)}</div></article><article className="rounded-[2rem] border border-amber-300/20 bg-amber-300/[0.05] p-6 sm:p-8"><SectionTitle eyebrow="Constitutional rule" title="The earliest failure governs" text="A route does not average its way into permission. One unresolved condition is enough to hold, deny, or escalate the action before consequence occurs." /><div className="mt-6 rounded-2xl border border-amber-300/20 bg-black/10 p-5 text-sm leading-7 text-amber-100">Completion is not evidence. Confidence is not authority. Verification is not standing. A favorable outcome does not retroactively make an inadmissible execution permissible.</div></article></section>
             </div>
           )}
 
           {activeTab === "history" && (
-            <section className="mt-6 rounded-[2rem] border border-white/10 bg-slate-950/65 p-6 sm:p-8">
+            <section className="mt-6 rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionTitle eyebrow="Preserved learning record" title="Simulation history" text="Each preserved run captures the modeled conditions, determination, failed gates, learner note, and timestamp. These local records are learning artifacts, not production authorization." />{history.length > 0 && <button type="button" onClick={clearHistory} className="rounded-xl border border-rose-300/25 px-4 py-3 text-sm font-bold text-rose-200 hover:bg-rose-300/[0.06]">Clear local history</button>}</div>
               {history.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-white/15 p-10 text-center"><p className="text-lg font-black text-white">No preserved runs yet</p><p className="mt-3 text-sm text-slate-400">Complete a simulation and preserve the determination to create the first learning record.</p><button type="button" onClick={() => setActiveTab("run")} className="mt-5 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950">Run first simulation →</button></div> : <div className="mt-7 space-y-4">{history.map((run) => <article key={run.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{run.createdAt}</p><h3 className="mt-2 text-lg font-black text-white">{run.title}</h3></div><div className="flex items-center gap-3"><span className={`rounded-full border px-3 py-1.5 text-xs font-black ${decisionStyle[run.decision]}`}>{run.decision}</span><span className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-black text-slate-300">{run.score}%</span></div></div>{run.failed.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{run.failed.map((failure) => <span key={failure} className="rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs text-slate-400">{failure}</span>)}</div>}{run.note && <p className="mt-4 rounded-xl border border-white/10 bg-black/10 p-4 text-sm leading-6 text-slate-300">{run.note}</p>}<button type="button" onClick={() => chooseScenario(run.scenarioId)} className="mt-4 text-sm font-black text-cyan-300 hover:text-cyan-200">Reopen scenario →</button></article>)}</div>}
             </section>
           )}
 
           <section className="mt-6 grid gap-6 xl:grid-cols-3">
-            <article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Next governed practice</p><h3 className="mt-3 text-xl font-black text-white">Route Construction Lab</h3><p className="mt-3 text-sm leading-6 text-slate-400">Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction-lab" className="mt-5 inline-flex text-sm font-black text-cyan-300">Build a route →</Link></article>
-            <article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Challenge the result</p><h3 className="mt-3 text-xl font-black text-white">Review Workspace</h3><p className="mt-3 text-sm leading-6 text-slate-400">Preserve findings, objections, corrections, and version history without erasing uncertainty.</p><Link href="/academy/review" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open review →</Link></article>
-            <article className="rounded-[2rem] border border-white/10 bg-slate-950/65 p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Prove capability</p><h3 className="mt-3 text-xl font-black text-white">Assessment Center</h3><p className="mt-3 text-sm leading-6 text-slate-400">Separate attendance and completion from demonstrated, scope-bounded competency.</p><Link href="/academy/assessment" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open assessment →</Link></article>
+            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Next governed practice</p><h3 className="mt-3 text-xl font-black text-white">Route Construction Lab</h3><p className="mt-3 text-sm leading-6 text-slate-400">Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction-lab" className="mt-5 inline-flex text-sm font-black text-cyan-300">Build a route →</Link></article>
+            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Challenge the result</p><h3 className="mt-3 text-xl font-black text-white">Review Workspace</h3><p className="mt-3 text-sm leading-6 text-slate-400">Preserve findings, objections, corrections, and version history without erasing uncertainty.</p><Link href="/academy/review" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open review →</Link></article>
+            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Prove capability</p><h3 className="mt-3 text-xl font-black text-white">Assessment Center</h3><p className="mt-3 text-sm leading-6 text-slate-400">Separate attendance and completion from demonstrated, scope-bounded competency.</p><Link href="/academy/assessment" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open assessment →</Link></article>
           </section>
 
           <footer className="mt-10 border-t border-white/10 py-8 text-sm text-slate-500"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p>TA-14 Academy · Seventh major door of the TA-14 AI Governance Exchange</p><p>No admissible evidence. No admissible execution.</p></div></footer>
         </div>
-      </div>
+
+      <style jsx global>{`
+        .simulation-center { isolation: isolate; }
+        .simulation-center ::selection { background: rgba(103, 232, 249, .28); color: #fff; }
+        .simulation-center input,
+        .simulation-center select,
+        .simulation-center textarea { box-shadow: inset 0 1px 0 rgba(255,255,255,.035); }
+        .simulation-center button,
+        .simulation-center a { -webkit-tap-highlight-color: transparent; }
+        .simulation-center article,
+        .simulation-center section { transform: translateZ(0); }
+        @media (prefers-reduced-motion: no-preference) {
+          .simulation-shell > header { animation: simulation-rise .55s ease-out both; }
+          .simulation-shell > div,
+          .simulation-shell > section { animation: simulation-rise .65s .05s ease-out both; }
+        }
+        @keyframes simulation-rise {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </main>
   );
 }
