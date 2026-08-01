@@ -1481,18 +1481,17 @@ const operatingPrinciples: OperatingPrinciple[] = [
   },
 ];
 
-const decisionStyle: Record<Decision, string> = {
-  ALLOW: "border-emerald-300/40 bg-emerald-400/10 text-emerald-100",
-  HOLD: "border-amber-300/40 bg-amber-400/10 text-amber-100",
-  DENY: "border-rose-300/40 bg-rose-400/10 text-rose-100",
-  ESCALATE: "border-violet-300/40 bg-violet-400/10 text-violet-100",
+const decisionTone: Record<Decision, string> = {
+  ALLOW: "allow",
+  HOLD: "hold",
+  DENY: "deny",
+  ESCALATE: "escalate",
 };
 
 function evaluate(gates: GateState) {
   const failed = gateLabels.filter((gate) => !gates[gate.key]).map((gate) => gate.hold);
   let decision: Decision = "ALLOW";
   let reason = "All required conditions are currently satisfied and revalidated.";
-
   if (!gates.boundary) {
     decision = "DENY";
     reason = "Execution exceeds the approved boundary and may not proceed.";
@@ -1503,74 +1502,49 @@ function evaluate(gates: GateState) {
     decision = "HOLD";
     reason = "One or more admissibility conditions remain unresolved.";
   }
-
   const passed = gateLabels.length - failed.length;
   const score = Math.round((passed / gateLabels.length) * 100);
   return { decision, reason, failed, passed, score };
 }
 
-function GateToggle({ gate, checked, onChange }: { gate: (typeof gateLabels)[number]; checked: boolean; onChange: (value: boolean) => void }) {
+function DecisionPill({ value }: { value: Decision }) {
+  return <span className={`decisionPill ${decisionTone[value]}`}>{value}</span>;
+}
+
+function GateConsole({ gate, checked, index, onChange }: { gate: (typeof gateLabels)[number]; checked: boolean; index: number; onChange: (value: boolean) => void }) {
   return (
-    <label className="gate-module group flex cursor-pointer gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.018] p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-cyan-300/[0.055] hover:shadow-xl">
-      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-cyan-400" />
-      <span>
-        <span className="block font-semibold text-white">{gate.label}</span>
-        <span className="mt-1 block text-sm leading-6 text-slate-400">{gate.question}</span>
+    <button type="button" onClick={() => onChange(!checked)} className={`gateConsole ${checked ? "supported" : "unsupported"}`}>
+      <span className="gateNumber">{String(index + 1).padStart(2, "0")}</span>
+      <span className="gateCopy">
+        <span className="gateTop"><strong>{gate.label}</strong><i /></span>
+        <span className="gateQuestion">{gate.question}</span>
+        {!checked && <span className="gateFailure">{gate.hold}</span>}
       </span>
-    </label>
+    </button>
   );
 }
 
-function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <article className="metric-pod rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
-      <p className="mt-2 text-2xl font-black text-white">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-400">{detail}</p>
-    </article>
-  );
-}
-
-function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
-  return (
-    <div>
-      <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-300">{eyebrow}</p>
-      <h2 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl">{title}</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">{text}</p>
-    </div>
-  );
-}
-
-
-function OrbitalGovernanceMap({ score, decision }: { score: number; decision: Decision }) {
-  const nodes = [["Reality", "R"], ["Record", "RE"], ["Continuity", "C"], ["Admissibility", "A"], ["Binding", "B"], ["Commit", "CM"], ["Execution", "E"], ["Outcome", "O"]];
-  return (
-    <div className="governance-orbit relative mx-auto aspect-square w-full max-w-[430px]">
-      <div className="absolute inset-[8%] rounded-full border border-cyan-200/10" />
-      <div className="absolute inset-[20%] rounded-full border border-indigo-200/10" />
-      <div className="absolute inset-[32%] rounded-full border border-white/10" />
-      <div className="absolute inset-[39%] grid place-items-center rounded-full border border-cyan-200/25 bg-[radial-gradient(circle_at_35%_25%,rgba(103,232,249,.24),rgba(8,20,38,.96)_58%)] shadow-[0_0_65px_rgba(34,211,238,.16),inset_0_0_30px_rgba(255,255,255,.04)]">
-        <div className="text-center"><p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">Live determination</p><p className="mt-2 text-2xl font-black tracking-[-0.05em] text-white">{decision}</p><p className="mt-1 text-sm font-black text-cyan-200">{score}% ready</p></div>
-      </div>
-      {nodes.map(([label, short], index) => {
-        const angle = (index / nodes.length) * Math.PI * 2 - Math.PI / 2;
-        const x = 50 + Math.cos(angle) * 43;
-        const y = 50 + Math.sin(angle) * 43;
-        return <div key={label} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${x}%`, top: `${y}%` }}><div className="group relative grid h-14 w-14 place-items-center rounded-2xl border border-cyan-200/20 bg-[linear-gradient(145deg,rgba(15,38,61,.96),rgba(4,12,24,.95))] shadow-[0_12px_30px_rgba(0,0,0,.36),0_0_24px_rgba(34,211,238,.08)]"><span className="text-[11px] font-black text-cyan-100">{short}</span><span className="pointer-events-none absolute top-full mt-2 whitespace-nowrap rounded-lg border border-white/10 bg-slate-950/95 px-2 py-1 text-[9px] font-bold text-slate-300 opacity-0 shadow-xl transition group-hover:opacity-100">{label}</span></div></div>;
-      })}
-      <div className="orbit-scan absolute inset-[8%] rounded-full border-t border-cyan-200/50" />
-    </div>
-  );
-}
-
-function RuntimeRail({ gates }: { gates: GateState }) {
-  return <div className="runtime-rail control-spine overflow-hidden rounded-[1.6rem] border border-cyan-200/15 bg-black/20 p-4 shadow-inner"><div className="flex min-w-[760px] items-center gap-2">{gateLabels.map((gate, index) => { const active = gates[gate.key]; return <div key={gate.key} className="flex flex-1 items-center gap-2"><div className={`relative flex min-h-20 flex-1 flex-col justify-center rounded-xl border px-3 py-3 transition ${active ? "border-cyan-200/30 bg-cyan-300/[0.08]" : "border-rose-300/20 bg-rose-300/[0.05]"}`}><span className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? "bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,.9)]" : "bg-rose-300 shadow-[0_0_14px_rgba(253,164,175,.7)]"}`} /><span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">{String(index + 1).padStart(2, "0")}</span><span className="mt-1 text-xs font-black text-white">{gate.label}</span></div>{index < gateLabels.length - 1 && <span className={`h-px w-3 ${active ? "bg-cyan-300/50" : "bg-white/10"}`} />}</div>; })}</div></div>;
-}
-
-function DecisionBeacon({ score }: { score: number }) {
-  const circumference = 2 * Math.PI * 46;
+function ReadinessGauge({ score }: { score: number }) {
+  const circumference = 2 * Math.PI * 52;
   const offset = circumference - (score / 100) * circumference;
-  return <div className="relative grid place-items-center"><svg viewBox="0 0 112 112" className="h-36 w-36 -rotate-90 drop-shadow-[0_0_22px_rgba(34,211,238,.15)]" aria-hidden="true"><circle cx="56" cy="56" r="46" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="7" /><circle cx="56" cy="56" r="46" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} className="transition-all duration-700" /></svg><div className="absolute text-center"><p className="text-3xl font-black tracking-[-0.06em]">{score}%</p><p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] opacity-70">readiness</p></div></div>;
+  return (
+    <div className="readinessGauge">
+      <svg viewBox="0 0 128 128" aria-hidden="true">
+        <circle cx="64" cy="64" r="52" fill="none" stroke="rgba(255,255,255,.07)" strokeWidth="8" />
+        <circle cx="64" cy="64" r="52" fill="none" stroke="url(#simGauge)" strokeWidth="8" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} />
+        <defs><linearGradient id="simGauge"><stop stopColor="#65eaff"/><stop offset="1" stopColor="#8b7cff"/></linearGradient></defs>
+      </svg>
+      <div><strong>{score}%</strong><span>readiness</span></div>
+    </div>
+  );
+}
+
+function AnchorRail({ gates }: { gates: GateState }) {
+  const anchors = [
+    ["Reality", gates.reality], ["Record", gates.record], ["Continuity", gates.continuity], ["Admissibility", gates.evidence],
+    ["Binding", gates.boundary], ["Commit", gates.authority], ["Execution", gates.dependencies], ["Outcome", gates.revalidation],
+  ] as const;
+  return <div className="anchorRail">{anchors.map(([label, active], index) => <div key={label} className={active ? "active" : ""}><span>{String(index + 1).padStart(2, "0")}</span><strong>{label}</strong><i /></div>)}</div>;
 }
 
 export default function SimulatorPage() {
@@ -1587,10 +1561,8 @@ export default function SimulatorPage() {
   const result = useMemo(() => evaluate(gates), [gates]);
   const domains = useMemo(() => ["All domains", ...Array.from(new Set(scenarios.map((scenario) => scenario.domain)))], []);
   const filtered = useMemo(() => scenarios.filter((scenario) => {
-    const matchesQuery = `${scenario.title} ${scenario.domain} ${scenario.consequence}`.toLowerCase().includes(query.toLowerCase());
-    const matchesDomain = domain === "All domains" || scenario.domain === domain;
-    const matchesDifficulty = difficulty === "All levels" || scenario.difficulty === difficulty;
-    return matchesQuery && matchesDomain && matchesDifficulty;
+    const text = `${scenario.title} ${scenario.domain} ${scenario.consequence}`.toLowerCase();
+    return text.includes(query.toLowerCase()) && (domain === "All domains" || scenario.domain === domain) && (difficulty === "All levels" || scenario.difficulty === difficulty);
   }), [query, domain, difficulty]);
 
   useEffect(() => {
@@ -1602,430 +1574,94 @@ export default function SimulatorPage() {
       if (parsed.selectedId && scenarios.some((item) => item.id === parsed.selectedId)) setSelectedId(parsed.selectedId);
       if (parsed.gates) setGates(parsed.gates);
       if (typeof parsed.note === "string") setNote(parsed.note);
-    } catch {
-      // Local preservation must never block the Academy experience.
-    }
+    } catch {}
   }, []);
 
   useEffect(() => {
-    try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ history, selectedId, gates, note }));
-    } catch {
-      // The learner may continue without local persistence.
-    }
+    try { window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ history, selectedId, gates, note })); } catch {}
   }, [history, selectedId, gates, note]);
 
-  function chooseScenario(id: string) {
+  const chooseScenario = (id: string) => {
     const next = scenarios.find((scenario) => scenario.id === id) ?? scenarios[0];
-    setSelectedId(next.id);
-    setGates(next.gates);
-    setNote("");
-    setActiveTab("run");
-  }
-
-  function updateGate(key: GateKey, value: boolean) {
-    setGates((current) => ({ ...current, [key]: value }));
-  }
-
-  function preserveRun() {
-    const preserved: PreservedRun = {
-      id: `${Date.now()}-${selected.id}`,
-      scenarioId: selected.id,
-      title: selected.title,
-      decision: result.decision,
-      score: result.score,
-      failed: result.failed,
-      note,
-      createdAt: new Date().toLocaleString(),
-    };
-    setHistory((current) => [preserved, ...current].slice(0, 50));
-    setActiveTab("history");
-  }
-
-  function resetRun() {
-    setGates(selected.gates);
-    setNote("");
-  }
-
-  function clearHistory() {
-    setHistory([]);
-  }
+    setSelectedId(next.id); setGates(next.gates); setNote(""); setActiveTab("run");
+  };
+  const preserveRun = () => {
+    const item: PreservedRun = { id: `${Date.now()}-${selected.id}`, scenarioId: selected.id, title: selected.title, decision: result.decision, score: result.score, failed: result.failed, note, createdAt: new Date().toLocaleString() };
+    setHistory((current) => [item, ...current].slice(0, 50)); setActiveTab("history");
+  };
 
   return (
-    <main className="simulation-center command-deck relative min-h-screen overflow-hidden text-slate-100">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -left-24 top-24 h-[30rem] w-[30rem] rounded-full bg-cyan-400/[0.08] blur-[110px]" />
-        <div className="absolute right-[-8rem] top-[22rem] h-[34rem] w-[34rem] rounded-full bg-indigo-500/[0.08] blur-[130px]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
-        <div className="star-field absolute inset-0 opacity-80" />
-        <div className="cockpit-horizon absolute inset-x-[-8%] top-[28rem] h-[26rem] opacity-70" />
-        <div className="deck-grid absolute inset-x-[-10%] top-[36rem] h-[58rem] origin-top" />
-        <div className="scan-column absolute left-[8%] top-0 h-full w-px" />
-        <div className="scan-column absolute right-[8%] top-0 h-full w-px" />
-        <div className="absolute inset-0 opacity-[0.055]" style={{ backgroundImage: "linear-gradient(rgba(125,211,252,.65) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,.65) 1px, transparent 1px)", backgroundSize: "52px 52px", maskImage: "linear-gradient(to bottom, black, transparent 78%)" }} />
+    <main className="simPage">
+      <div className="ambient" aria-hidden="true"><div className="stars"/><div className="gridFloor"/><div className="aurora auroraOne"/><div className="aurora auroraTwo"/></div>
+      <div className="shell">
+        <header className="hero">
+          <div className="heroCopy">
+            <div className="liveLabel"><span/>TA-14 Academy · Live governed laboratory</div>
+            <h1>Simulation <em>Center</em></h1>
+            <p>Operate a consequence-bearing route, manipulate governing conditions, and watch the determination change before consequence binds to reality.</p>
+            <div className="heroActions"><button type="button" onClick={() => setActiveTab("run")} className="primaryButton">Enter live laboratory →</button><button type="button" onClick={() => setActiveTab("architecture")} className="secondaryButton">Inspect architecture</button></div>
+            <div className="governingRule"><span>Governing principle</span><strong>No admissible evidence. No admissible execution.</strong></div>
+          </div>
+          <div className={`commandCore ${decisionTone[result.decision]}`}>
+            <div className="coreHeader"><div><span>Live determination</span><h2>{result.decision}</h2></div><DecisionPill value={result.decision}/></div>
+            <p>{result.reason}</p>
+            <div className="coreBody"><ReadinessGauge score={result.score}/><div className="failureStack">{result.failed.slice(0,4).map((failure)=><div key={failure}>{failure}</div>)}{result.failed.length===0&&<div className="allClear">All modeled conditions are currently supported.</div>}</div></div>
+          </div>
+          <div className="heroRail"><AnchorRail gates={gates}/></div>
+        </header>
+
+        <section className="statDeck">
+          <article><span>Scenarios</span><strong>24</strong><small>Consequence-bearing environments</small></article>
+          <article><span>Runtime gates</span><strong>24</strong><small>Complete governing chain represented</small></article>
+          <article><span>Preserved runs</span><strong>{history.length}</strong><small>Local learner simulation records</small></article>
+          <article className="accent"><span>Current readiness</span><strong>{result.score}%</strong><small>{result.passed} of 8 active gates satisfied</small></article>
+        </section>
+
+        <nav className="modeTabs">{(["run","architecture","history"] as const).map((tab)=><button key={tab} type="button" onClick={()=>setActiveTab(tab)} className={activeTab===tab?"active":""}>{tab==="run"?"Live simulation":tab==="architecture"?"Runtime architecture":`Preserved runs · ${history.length}`}</button>)}</nav>
+
+        {activeTab === "run" && <section className="laboratory">
+          <aside className="scenarioDock">
+            <div className="sectionIntro"><span>Scenario library</span><h2>Choose the consequence</h2><p>Twenty-four distinct environments with different evidence, authority, boundary, and drift conditions.</p></div>
+            <div className="filters"><input value={query} onChange={(e)=>setQuery(e.target.value)} placeholder="Search scenarios"/><div><select value={domain} onChange={(e)=>setDomain(e.target.value)}>{domains.map((item)=><option key={item}>{item}</option>)}</select><select value={difficulty} onChange={(e)=>setDifficulty(e.target.value)}><option>All levels</option><option>Intermediate</option><option>Advanced</option><option>Expert</option></select></div></div>
+            <div className="scenarioList">{filtered.map((scenario)=><button key={scenario.id} type="button" onClick={()=>chooseScenario(scenario.id)} className={selected.id===scenario.id?"active":""}><span className="scenarioMeta"><b>{scenario.domain}</b><DecisionPill value={scenario.expected}/></span><strong>{scenario.title}</strong><small>{scenario.consequence}</small></button>)}</div>
+          </aside>
+
+          <div className="runtimeStage">
+            <article className="selectedScenario panel">
+              <div className="panelHeader"><div><span>Selected simulation</span><h2>{selected.title}</h2><p>{selected.consequence}</p></div><div className="statusPair"><b>{selected.difficulty}</b><DecisionPill value={selected.expected}/></div></div>
+              <div className="scenarioFacts"><Info label="Evidence required" value={selected.evidenceNeed}/><Info label="Authority required" value={selected.authorityNeed}/><Info label="Execution boundary" value={selected.boundary}/><Info label="Revalidation triggers" value={selected.drift}/></div>
+            </article>
+
+            <article className="gateLab panel">
+              <div className="panelHeader"><div><span>Gate laboratory</span><h2>Change the governing conditions</h2><p>Every switch changes the route. The earliest unsupported condition remains visible.</p></div><button type="button" onClick={()=>{setGates(selected.gates);setNote("");}} className="secondaryButton">Reset scenario</button></div>
+              <div className="gateGrid">{gateLabels.map((gate,index)=><GateConsole key={gate.key} gate={gate} checked={gates[gate.key]} index={index} onChange={(value)=>setGates((current)=>({...current,[gate.key]:value}))}/>)}</div>
+            </article>
+
+            <article className={`determinationStage ${decisionTone[result.decision]}`}>
+              <ReadinessGauge score={result.score}/><div><span>Current determination</span><div className="determinationTitle"><h2>{result.decision}</h2><DecisionPill value={result.decision}/></div><p>{result.reason}</p><div className="determinationFailures">{result.failed.map((failure)=><div key={failure}>{failure}</div>)}{result.failed.length===0&&<div className="allClear">All required conditions are supported.</div>}</div></div>
+            </article>
+
+            <article className="reasoning panel"><span>Learner observation</span><h2>Preserve your reasoning</h2><textarea value={note} onChange={(e)=>setNote(e.target.value)} rows={6} placeholder="Identify the earliest failed condition, the evidence needed to cure it, and whether revalidation could change the determination."/><div><button type="button" onClick={preserveRun} className="primaryButton">Preserve simulation run</button><Link href="/academy/review" className="secondaryButton">Open Review Workspace →</Link></div></article>
+          </div>
+        </section>}
+
+        {activeTab === "architecture" && <section className="architecture panel"><div className="sectionIntro"><span>Runtime architecture</span><h2>Twenty-four links behind eight anchor gates</h2><p>Each runtime link carries a defined function, failure condition, and place in the execution chain.</p></div><div className="architectureGrid">{runtimeLinks.map((link)=><article key={link.number}><span>Link {String(link.number).padStart(2,"0")}</span><h3>{link.name}</h3><p>{link.function}</p><small>Failure: {link.failure}</small></article>)}</div></section>}
+
+        {activeTab === "history" && <section className="history panel"><div className="panelHeader"><div><span>Preserved history</span><h2>Local simulation records</h2></div>{history.length>0&&<button type="button" onClick={()=>setHistory([])} className="secondaryButton">Clear history</button>}</div><div className="historyList">{history.length===0?<div className="emptyState">No preserved runs yet.</div>:history.map((run)=><article key={run.id}><div><h3>{run.title}</h3><small>{run.createdAt}</small></div><div className="runScore"><DecisionPill value={run.decision}/><strong>{run.score}%</strong></div>{run.note&&<p>{run.note}</p>}</article>)}</div></section>}
+
+        <section className="nextDeck"><Next href="/academy/route-construction-lab" eyebrow="Next governed practice" title="Route Construction Lab" text="Convert an uncertain request into a bounded, attributable, challengeable route."/><Next href="/academy/review" eyebrow="Challenge the result" title="Review Workspace" text="Preserve findings, objections, corrections, and version history."/><Next href="/academy/assessment" eyebrow="Prove capability" title="Assessment Center" text="Separate completion from demonstrated, scope-bounded competency."/></section>
       </div>
 
-      <div className="simulation-shell command-perspective mx-auto w-full max-w-[1580px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 xl:px-10">
-          <header className="hero-vault isometric-hero relative overflow-hidden rounded-[2.6rem] border border-cyan-200/15 bg-[linear-gradient(135deg,rgba(8,24,39,.96),rgba(4,11,22,.92)_55%,rgba(11,24,47,.92))] p-6 shadow-[0_30px_90px_rgba(0,0,0,.42)] ring-1 ring-white/[0.04] backdrop-blur-xl sm:p-8 xl:p-10">
-            <div className="hero-frame pointer-events-none absolute inset-3 rounded-[2.1rem]" aria-hidden="true" />
-            <div className="hero-corner hero-corner-a" aria-hidden="true" />
-            <div className="hero-corner hero-corner-b" aria-hidden="true" />
-            <div className="hero-corner hero-corner-c" aria-hidden="true" />
-            <div className="hero-corner hero-corner-d" aria-hidden="true" />
-            <div className="pointer-events-none absolute -right-24 -top-36 h-[34rem] w-[34rem] rounded-full border border-cyan-200/10" />
-            <div className="pointer-events-none absolute right-[-2rem] top-[-2rem] h-56 w-56 rounded-full bg-cyan-300/[0.08] blur-3xl" />
-            <div className="pointer-events-none absolute bottom-[-12rem] left-[25%] h-80 w-80 rounded-full bg-indigo-500/[0.10] blur-[100px]" />
-            <div className="relative z-10 grid gap-10 xl:grid-cols-[1.15fr_.85fr] xl:items-center">
-              <div>
-                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-200/20 bg-cyan-300/[0.055] px-4 py-2 shadow-[0_0_30px_rgba(34,211,238,.08)]"><span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,.9)]" /><p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200">TA-14 Academy · Governed practice environment</p></div>
-                <h1 className="mt-7 max-w-5xl bg-gradient-to-br from-white via-cyan-50 to-cyan-300 bg-clip-text text-5xl font-black tracking-[-0.065em] text-transparent sm:text-6xl xl:text-[5.35rem] xl:leading-[.93]">Simulation<br className="hidden sm:block" /> Center</h1>
-                <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">Test whether a consequential action has earned the right to proceed before consequence binds to reality. Manipulate evidence, authority, continuity, boundary, dependencies, and revalidation—then watch the determination change in real time.</p>
-                <div className="mt-7 flex flex-wrap gap-3"><button type="button" onClick={() => setActiveTab("run")} className="rounded-xl bg-gradient-to-r from-cyan-200 to-sky-300 px-5 py-3 text-sm font-black text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,.22)] transition hover:-translate-y-0.5">Enter live laboratory →</button><button type="button" onClick={() => setActiveTab("architecture")} className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-black text-white transition hover:border-cyan-200/30 hover:bg-white/[0.07]">Inspect runtime architecture</button></div>
-                <div className="mt-7 max-w-xl rounded-2xl border border-cyan-300/20 bg-[linear-gradient(90deg,rgba(34,211,238,.08),rgba(99,102,241,.04))] px-5 py-4 text-sm leading-6 text-cyan-50 shadow-inner"><span className="font-black text-cyan-200">Governing principle:</span> No admissible evidence. No admissible execution.</div>
-              </div>
-              <OrbitalGovernanceMap score={result.score} decision={result.decision} />
-            </div>
-
-            <div className="relative z-10 mt-9 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <Metric label="Scenarios" value={String(scenarios.length)} detail="Consequence-bearing practice environments" />
-              <Metric label="Runtime gates" value="24" detail="Complete governing chain represented" />
-              <Metric label="Preserved runs" value={String(history.length)} detail="Local learner simulation records" />
-              <Metric label="Current readiness" value={`${result.score}%`} detail={`${result.passed} of ${gateLabels.length} active gates satisfied`} />
-            </div>
-          </header>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {(["run", "architecture", "history"] as const).map((tab) => (
-              <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`rounded-xl border px-4 py-3 text-sm font-black capitalize transition ${activeTab === tab ? "border-cyan-300/40 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-white/[0.03] text-slate-400 hover:text-white"}`}>{tab === "run" ? "Simulation workspace" : tab === "architecture" ? "Architecture correspondence" : "Preserved history"}</button>
-            ))}
-          </div>
-
-          <div className="mt-4 overflow-x-auto pb-1"><RuntimeRail gates={gates} /></div>
-
-          {activeTab === "run" && (
-            <div className="mt-6 space-y-6">
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 backdrop-blur sm:p-8">
-                <SectionTitle eyebrow="Scenario library" title="Choose a consequence-bearing action" text="Every simulation begins with an exact action, a real consequence, a bounded authority, and conditions that may drift before execution." />
-                <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_220px_180px]">
-                  <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search scenarios, domains, or consequences" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
-                  <select value={domain} onChange={(event) => setDomain(event.target.value)} className="rounded-xl border border-white/10 bg-[#07101d] px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40">{domains.map((item) => <option key={item}>{item}</option>)}</select>
-                  <select value={difficulty} onChange={(event) => setDifficulty(event.target.value)} className="rounded-xl border border-white/10 bg-[#07101d] px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"><option>All levels</option><option>Intermediate</option><option>Advanced</option><option>Expert</option></select>
-                </div>
-
-                <div className="mt-6 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
-                  {filtered.map((scenario) => (
-                    <button key={scenario.id} type="button" onClick={() => chooseScenario(scenario.id)} className={`group relative overflow-hidden rounded-[1.35rem] border p-5 text-left shadow-lg transition duration-300 ${selectedId === scenario.id ? "border-cyan-300/50 bg-gradient-to-br from-cyan-300/[0.13] to-blue-500/[0.06] shadow-cyan-950/30 ring-1 ring-cyan-200/10" : "border-white/10 bg-gradient-to-br from-white/[0.045] to-white/[0.015] hover:-translate-y-1 hover:border-cyan-200/25 hover:bg-white/[0.06] hover:shadow-2xl"}`}>
-                      <div className="flex items-center justify-between gap-3"><span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{scenario.domain}</span><span className="text-xs font-bold text-cyan-300">{scenario.difficulty}</span></div>
-                      <h3 className="mt-4 text-lg font-black text-white">{scenario.title}</h3>
-                      <p className="mt-3 text-sm leading-6 text-slate-400">{scenario.consequence}</p>
-                      <div className="mt-4 flex items-center justify-between text-xs"><span className="text-slate-500">Expected teaching state</span><span className={`rounded-full border px-2.5 py-1 font-black ${decisionStyle[scenario.expected]}`}>{scenario.expected}</span></div>
-                    </button>
-                  ))}
-                </div>
-              </section>
-
-              <section className="grid gap-6 2xl:grid-cols-[0.88fr_1.12fr]">
-                <div className="space-y-6">
-                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Selected simulation</p>
-                    <h2 className="mt-4 text-3xl font-black text-white">{selected.title}</h2>
-                    <p className="mt-4 text-base leading-7 text-slate-300">{selected.consequence}</p>
-                    <dl className="mt-6 space-y-4">
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Evidence required</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.evidenceNeed}</dd></div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Authority required</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.authorityNeed}</dd></div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Execution boundary</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.boundary}</dd></div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Revalidation triggers</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.drift}</dd></div>
-                    </dl>
-                  </article>
-
-                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                    <h3 className="text-xl font-black text-white">Learner observation</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">Record why the action should be allowed, held, denied, or escalated. Notes are preserved locally with the run.</p>
-                    <textarea value={note} onChange={(event) => setNote(event.target.value)} rows={8} placeholder="Identify the earliest failed condition, the evidence needed to cure it, and whether revalidation could change the determination." className="mt-5 w-full rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
-                  </article>
-                </div>
-
-                <div className="space-y-6">
-                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionTitle eyebrow="Gate laboratory" title="Change the governing conditions" text="A checked condition is currently supported. An unchecked condition remains unresolved and must stay visible." /><button type="button" onClick={resetRun} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 hover:bg-white/[0.05]">Reset scenario</button></div>
-                    <div className="mt-6 grid gap-3 md:grid-cols-2">{gateLabels.map((gate) => <GateToggle key={gate.key} gate={gate} checked={gates[gate.key]} onChange={(value) => updateGate(gate.key, value)} />)}</div>
-                  </article>
-
-                  <article className={`decision-vault relative overflow-hidden rounded-[2.25rem] border p-6 shadow-[0_28px_80px_rgba(0,0,0,.34)] sm:p-8 ${decisionStyle[result.decision]}`}>
-                    <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full border border-current/10" />
-                    <div className="pointer-events-none absolute -bottom-28 left-10 h-60 w-60 rounded-full bg-current/[0.05] blur-3xl" />
-                    <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] opacity-70">Current determination</p><p className="mt-3 text-5xl font-black tracking-[-0.065em] sm:text-6xl">{result.decision}</p><p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] opacity-60">{result.passed} of {gateLabels.length} modeled conditions supported</p></div><DecisionBeacon score={result.score} /></div>
-                    <p className="mt-6 text-base font-semibold leading-7">{result.reason}</p>
-                    {result.failed.length > 0 ? <div className="mt-6 space-y-2">{result.failed.map((failure) => <div key={failure} className="rounded-xl border border-current/20 bg-black/10 px-4 py-3 text-sm">{failure}</div>)}</div> : <div className="mt-6 rounded-xl border border-current/20 bg-black/10 px-4 py-3 text-sm">All modeled conditions are supported. Preserve the run before treating the determination as a learning artifact.</div>}
-                    <div className="mt-6 flex flex-wrap gap-3"><button type="button" onClick={preserveRun} className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-slate-100">Preserve simulation run</button><Link href="/academy/review" className="rounded-xl border border-current/25 px-5 py-3 text-sm font-black hover:bg-black/10">Open Review Workspace →</Link></div>
-                  </article>
-                </div>
-              </section>
-            </div>
-          )}
-
-          {activeTab === "architecture" && (
-            <div className="mt-6 space-y-6">
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Architecture orientation" title="Eight visible anchors. One complete runtime chain." text="The public anchors orient the learner. The 24-link runtime architecture governs the full movement from purpose to preserved outcome." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">{anchors.map((anchor) => <article key={anchor.number} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><p className="text-sm font-black text-cyan-300">{anchor.number}</p><h3 className="mt-3 text-xl font-black text-white">{anchor.name}</h3><p className="mt-3 text-sm font-semibold leading-6 text-slate-300">{anchor.question}</p><p className="mt-3 text-sm leading-6 text-slate-500">{anchor.proof}</p></article>)}</div></section>
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Complete chain" title="Twenty-four runtime links" text="A simulation may expose failure at any link. The earliest unresolved link controls the route; later completion cannot cure an earlier break." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{runtimeLinks.map((link) => <article key={link.number} className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">{String(link.number).padStart(2, "0")}</span><h3 className="font-black text-white">{link.name}</h3></div><p className="mt-4 text-sm leading-6 text-slate-300">{link.function}</p><p className="mt-3 text-sm leading-6 text-slate-500">{link.failure}</p></article>)}</div></section>
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Failure replay laboratory"
-                  title="Inject one material change at a time"
-                  text="These drills teach the learner to stop at the earliest failed runtime link, identify the missing proof, and select the correct fail-closed response."
-                />
-                <div className="mt-7 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-                  {failureDrills.map((drill) => (
-                    <article
-                      key={drill.link}
-                      className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">
-                          {String(drill.link).padStart(2, "0")}
-                        </span>
-                        <span className={`rounded-full border px-3 py-1 text-[10px] font-black ${decisionStyle[drill.correctResponse]}`}>
-                          {drill.correctResponse}
-                        </span>
-                      </div>
-                      <h3 className="mt-4 text-lg font-black text-white">
-                        {drill.title}
-                      </h3>
-                      <div className="mt-4 space-y-3">
-                        <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                            Injected change
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            {drill.injectedChange}
-                          </p>
-                        </div>
-                        <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                            Learner task
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            {drill.learnerTask}
-                          </p>
-                        </div>
-                        <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                            Evidence to seek
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            {drill.evidenceToSeek}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="mt-4 text-sm leading-6 text-cyan-100">
-                        {drill.teachingPoint}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Structured debrief"
-                  title="Explain what the run proved—and what it did not"
-                  text="A learner must be able to distinguish an observed condition from an inference, a preserved record from a claim, and a supported determination from a preferred result."
-                />
-                <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {debriefPrompts.map((prompt) => (
-                    <article
-                      key={prompt.number}
-                      className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-black text-cyan-300">
-                          {String(prompt.number).padStart(2, "0")}
-                        </span>
-                        <h3 className="font-black text-white">
-                          {prompt.stage}
-                        </h3>
-                      </div>
-                      <div className="mt-4 space-y-3 text-sm leading-6">
-                        <p className="text-slate-300">
-                          {prompt.observation}
-                        </p>
-                        <p className="text-slate-400">
-                          {prompt.challenge}
-                        </p>
-                        <p className="text-slate-500">
-                          {prompt.preservation}
-                        </p>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Competency evidence"
-                  title="Score demonstrated capability, not attendance"
-                  text="The rubric makes progression inspectable. A learner advances by producing bounded evidence of capability, not by clicking through the simulation."
-                />
-                <div className="mt-7 overflow-x-auto rounded-2xl border border-white/10">
-                  <table className="min-w-[1100px] w-full border-collapse text-left">
-                    <thead className="bg-white/[0.05]">
-                      <tr>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Capability
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Developing
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Proficient
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Advanced
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Required evidence
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {competencyCriteria.map((criterion) => (
-                        <tr
-                          key={criterion.id}
-                          className="border-b border-white/10 last:border-b-0"
-                        >
-                          <td className="p-4 align-top text-sm font-black text-white">
-                            {criterion.capability}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-slate-500">
-                            {criterion.developing}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-slate-300">
-                            {criterion.proficient}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-cyan-100">
-                            {criterion.advanced}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-slate-400">
-                            {criterion.evidence}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Operating constitution"
-                  title="Twenty-four principles governing every simulation"
-                  text="These principles prevent the learning environment from rewarding completion, confidence, or favorable outcomes when the underlying execution has not earned standing."
-                />
-                <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {operatingPrinciples.map((principle) => (
-                    <article
-                      key={principle.number}
-                      className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">
-                          {String(principle.number).padStart(2, "0")}
-                        </span>
-                        <h3 className="font-black text-white">
-                          {principle.title}
-                        </h3>
-                      </div>
-                      <p className="mt-4 text-sm font-semibold leading-6 text-slate-300">
-                        {principle.rule}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-slate-500">
-                        {principle.practice}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              <section className="grid gap-6 xl:grid-cols-2"><article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Trust distinction" title="Verified does not mean admissible" text="Zero Trust can validate actor, request, role, device, and access while the exact execution still lacks current evidence, valid authority, preserved continuity, or a bounded consequence." /><div className="mt-6 space-y-3">{["Identity answers who or what is acting.","Access answers what the actor may reach.","Admissibility answers whether this exact action may bind to reality now.","Revalidation answers whether that permission still holds immediately before execution."].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-slate-300">{item}</div>)}</div></article><article className="rounded-[2rem] border border-amber-300/20 bg-amber-300/[0.05] p-6 sm:p-8"><SectionTitle eyebrow="Constitutional rule" title="The earliest failure governs" text="A route does not average its way into permission. One unresolved condition is enough to hold, deny, or escalate the action before consequence occurs." /><div className="mt-6 rounded-2xl border border-amber-300/20 bg-black/10 p-5 text-sm leading-7 text-amber-100">Completion is not evidence. Confidence is not authority. Verification is not standing. A favorable outcome does not retroactively make an inadmissible execution permissible.</div></article></section>
-            </div>
-          )}
-
-          {activeTab === "history" && (
-            <section className="mt-6 rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionTitle eyebrow="Preserved learning record" title="Simulation history" text="Each preserved run captures the modeled conditions, determination, failed gates, learner note, and timestamp. These local records are learning artifacts, not production authorization." />{history.length > 0 && <button type="button" onClick={clearHistory} className="rounded-xl border border-rose-300/25 px-4 py-3 text-sm font-bold text-rose-200 hover:bg-rose-300/[0.06]">Clear local history</button>}</div>
-              {history.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-white/15 p-10 text-center"><p className="text-lg font-black text-white">No preserved runs yet</p><p className="mt-3 text-sm text-slate-400">Complete a simulation and preserve the determination to create the first learning record.</p><button type="button" onClick={() => setActiveTab("run")} className="mt-5 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950">Run first simulation →</button></div> : <div className="mt-7 space-y-4">{history.map((run) => <article key={run.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{run.createdAt}</p><h3 className="mt-2 text-lg font-black text-white">{run.title}</h3></div><div className="flex items-center gap-3"><span className={`rounded-full border px-3 py-1.5 text-xs font-black ${decisionStyle[run.decision]}`}>{run.decision}</span><span className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-black text-slate-300">{run.score}%</span></div></div>{run.failed.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{run.failed.map((failure) => <span key={failure} className="rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs text-slate-400">{failure}</span>)}</div>}{run.note && <p className="mt-4 rounded-xl border border-white/10 bg-black/10 p-4 text-sm leading-6 text-slate-300">{run.note}</p>}<button type="button" onClick={() => chooseScenario(run.scenarioId)} className="mt-4 text-sm font-black text-cyan-300 hover:text-cyan-200">Reopen scenario →</button></article>)}</div>}
-            </section>
-          )}
-
-          <section className="mt-6 grid gap-6 xl:grid-cols-3">
-            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Next governed practice</p><h3 className="mt-3 text-xl font-black text-white">Route Construction Lab</h3><p className="mt-3 text-sm leading-6 text-slate-400">Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction-lab" className="mt-5 inline-flex text-sm font-black text-cyan-300">Build a route →</Link></article>
-            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Challenge the result</p><h3 className="mt-3 text-xl font-black text-white">Review Workspace</h3><p className="mt-3 text-sm leading-6 text-slate-400">Preserve findings, objections, corrections, and version history without erasing uncertainty.</p><Link href="/academy/review" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open review →</Link></article>
-            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Prove capability</p><h3 className="mt-3 text-xl font-black text-white">Assessment Center</h3><p className="mt-3 text-sm leading-6 text-slate-400">Separate attendance and completion from demonstrated, scope-bounded competency.</p><Link href="/academy/assessment" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open assessment →</Link></article>
-          </section>
-
-          <footer className="mt-10 border-t border-white/10 py-8 text-sm text-slate-500"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p>TA-14 Academy · Seventh major door of the TA-14 AI Governance Exchange</p><p>No admissible evidence. No admissible execution.</p></div></footer>
-        </div>
-
       <style jsx global>{`
-        .simulation-center { isolation: isolate; background: radial-gradient(circle at 50% -8%, rgba(34,211,238,.18), transparent 30%), radial-gradient(circle at 86% 24%, rgba(99,102,241,.16), transparent 28%), radial-gradient(circle at 12% 58%, rgba(14,165,233,.11), transparent 32%), linear-gradient(180deg,#020711 0%,#030914 38%,#02050c 100%); }
-        .command-deck::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0; background:linear-gradient(90deg,rgba(34,211,238,.035),transparent 17%,transparent 83%,rgba(99,102,241,.035)),linear-gradient(180deg,rgba(255,255,255,.018),transparent 14%); box-shadow:inset 0 0 180px rgba(0,0,0,.72); }
-        .command-perspective { position:relative; z-index:2; perspective:1800px; perspective-origin:50% 8%; }
-        .cockpit-horizon { background:radial-gradient(ellipse at center,rgba(34,211,238,.16),rgba(14,116,144,.05) 36%,transparent 68%); filter:blur(18px); transform:scaleX(1.2); }
-        .deck-grid { background-image:linear-gradient(rgba(34,211,238,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.13) 1px,transparent 1px); background-size:58px 58px; transform:perspective(650px) rotateX(64deg) scale(1.25); transform-origin:top; mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 72%); opacity:.28; }
-        .scan-column { background:linear-gradient(to bottom,transparent,rgba(103,232,249,.5),transparent); filter:drop-shadow(0 0 10px rgba(34,211,238,.4)); opacity:.35; }
-        .isometric-hero { transform-style:preserve-3d; transform:rotateX(.45deg); box-shadow:0 42px 120px rgba(0,0,0,.58),0 0 0 1px rgba(103,232,249,.05),inset 0 1px 0 rgba(255,255,255,.07),inset 0 -45px 80px rgba(0,0,0,.26); }
-        .hero-frame { border:1px solid rgba(103,232,249,.12); box-shadow:inset 0 0 55px rgba(34,211,238,.035); }
-        .hero-corner { position:absolute; z-index:3; width:42px; height:42px; pointer-events:none; border-color:rgba(103,232,249,.58); filter:drop-shadow(0 0 9px rgba(34,211,238,.35)); }
-        .hero-corner-a { left:18px; top:18px; border-left:2px solid; border-top:2px solid; border-radius:16px 0 0 0; }
-        .hero-corner-b { right:18px; top:18px; border-right:2px solid; border-top:2px solid; border-radius:0 16px 0 0; }
-        .hero-corner-c { left:18px; bottom:18px; border-left:2px solid; border-bottom:2px solid; border-radius:0 0 0 16px; }
-        .hero-corner-d { right:18px; bottom:18px; border-right:2px solid; border-bottom:2px solid; border-radius:0 0 16px 0; }
-        .metric-pod { position:relative; overflow:hidden; min-height:132px; background:linear-gradient(145deg,rgba(19,43,65,.78),rgba(4,12,24,.82)); box-shadow:0 18px 38px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.055),inset 0 -18px 30px rgba(0,0,0,.18); transform:translateZ(22px); transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease; }
-        .metric-pod::before { content:""; position:absolute; inset:0; background:linear-gradient(120deg,rgba(103,232,249,.08),transparent 34%,transparent 70%,rgba(99,102,241,.07)); pointer-events:none; }
-        .metric-pod::after { content:""; position:absolute; left:16px; right:16px; bottom:0; height:2px; background:linear-gradient(90deg,transparent,rgba(103,232,249,.7),transparent); box-shadow:0 0 16px rgba(34,211,238,.5); }
-        .metric-pod:hover { transform:translateY(-5px) translateZ(28px); border-color:rgba(103,232,249,.32); box-shadow:0 26px 58px rgba(0,0,0,.4),0 0 28px rgba(34,211,238,.08); }
-        .control-spine { box-shadow:0 22px 52px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.055),inset 0 0 48px rgba(34,211,238,.025); transform:translateZ(12px); }
-        .gate-module { position:relative; overflow:hidden; box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.045); }
-        .gate-module::after { content:""; position:absolute; inset:auto 12px 0; height:1px; background:linear-gradient(90deg,transparent,rgba(103,232,249,.55),transparent); opacity:.5; }
-        .gate-module:hover { transform:translateY(-4px) scale(1.01); box-shadow:0 22px 46px rgba(0,0,0,.35),0 0 22px rgba(34,211,238,.07); }
-        .simulation-center section, .simulation-center article { backface-visibility:hidden; }
-        .simulation-center section[class*="rounded-[2rem]"], .simulation-center article[class*="rounded-[2rem]"] { position:relative; box-shadow:0 28px 72px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.045); }
-        .simulation-center section[class*="rounded-[2rem]"]::before { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(130deg,rgba(103,232,249,.035),transparent 28%,transparent 70%,rgba(99,102,241,.035)); }
-        .simulation-center button[class*="rounded-[1.35rem]"] { transform-style:preserve-3d; box-shadow:0 18px 42px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05); }
-        .simulation-center button[class*="rounded-[1.35rem]"]:hover { transform:translateY(-7px) rotateX(1.2deg) rotateY(-.7deg); box-shadow:0 30px 65px rgba(0,0,0,.46),0 0 26px rgba(34,211,238,.09); }
-        .decision-vault { transform-style:preserve-3d; box-shadow:0 34px 95px rgba(0,0,0,.48),0 0 42px rgba(34,211,238,.07),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -35px 60px rgba(0,0,0,.22)!important; }
-        .decision-vault > * { transform:translateZ(18px); }
-        .governance-orbit { filter:drop-shadow(0 35px 38px rgba(0,0,0,.4)); transform:rotateX(5deg) rotateZ(-1deg); transform-style:preserve-3d; }
-        .governance-orbit > div { transform-style:preserve-3d; }
-        .star-field { background-image: radial-gradient(circle at 12% 18%, rgba(255,255,255,.55) 0 1px, transparent 1.5px), radial-gradient(circle at 68% 22%, rgba(103,232,249,.45) 0 1px, transparent 1.5px), radial-gradient(circle at 86% 58%, rgba(255,255,255,.35) 0 1px, transparent 1.5px), radial-gradient(circle at 34% 74%, rgba(129,140,248,.4) 0 1px, transparent 1.5px); background-size: 280px 280px,360px 360px,440px 440px,520px 520px; mask-image: linear-gradient(to bottom,black,transparent 82%); }
-        .hero-vault::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.035) 43%,transparent 61%); transform:translateX(-120%); animation:vault-sheen 9s ease-in-out infinite; }
-        .governance-orbit::before { content:""; position:absolute; inset:15%; border-radius:999px; background:conic-gradient(from 180deg,transparent,rgba(34,211,238,.16),transparent 36%,rgba(99,102,241,.13),transparent 70%); filter:blur(12px); animation:orbit-glow 12s linear infinite; }
-        .orbit-scan { animation:orbit-spin 9s linear infinite; box-shadow:0 -8px 28px rgba(34,211,238,.12); }
-        .runtime-rail { background-image:linear-gradient(90deg,rgba(34,211,238,.025) 1px,transparent 1px); background-size:34px 100%; }
-        .decision-vault::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(125deg,rgba(255,255,255,.05),transparent 30%,transparent 70%,rgba(255,255,255,.025)); }
-        @keyframes orbit-spin { to { transform:rotate(360deg) translateZ(0); } }
-        @keyframes orbit-glow { to { transform:rotate(-360deg); } }
-        @keyframes vault-sheen { 0%,70% { transform:translateX(-120%); } 88%,100% { transform:translateX(120%); } }
-        .simulation-center ::selection { background: rgba(103, 232, 249, .28); color: #fff; }
-        .simulation-center input,
-        .simulation-center select,
-        .simulation-center textarea { box-shadow: inset 0 1px 0 rgba(255,255,255,.035); }
-        .simulation-center button,
-        .simulation-center a { -webkit-tap-highlight-color: transparent; }
-        .simulation-center article,
-        .simulation-center section { transform: translateZ(0); }
-        @media (max-width: 900px) { .isometric-hero,.governance-orbit { transform:none; } .deck-grid { opacity:.16; } .metric-pod { transform:none; } }
-        @media (prefers-reduced-motion: no-preference) {
-          .simulation-shell > header { animation: simulation-rise .55s ease-out both; }
-          .simulation-shell > div,
-          .simulation-shell > section { animation: simulation-rise .65s .05s ease-out both; }
-        }
-        @keyframes simulation-rise {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+        .simPage{position:relative;min-height:100vh;overflow:hidden;color:#edf8ff;background:#020711;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.simPage *{box-sizing:border-box}.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}.stars{position:absolute;inset:0;background-image:radial-gradient(circle at 18% 22%,rgba(255,255,255,.8) 0 1px,transparent 1.4px),radial-gradient(circle at 68% 14%,rgba(111,231,255,.8) 0 1px,transparent 1.4px),radial-gradient(circle at 84% 44%,rgba(255,255,255,.55) 0 1px,transparent 1.4px);background-size:190px 190px,270px 270px,330px 330px;opacity:.22}.gridFloor{position:absolute;left:-20%;right:-20%;bottom:-34%;height:76%;transform:perspective(500px) rotateX(68deg);transform-origin:center top;background-image:linear-gradient(rgba(76,225,255,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(76,225,255,.13) 1px,transparent 1px);background-size:58px 58px;mask-image:linear-gradient(to bottom,transparent,#000 18%,#000 70%,transparent)}.aurora{position:absolute;border-radius:999px;filter:blur(130px);opacity:.18}.auroraOne{width:34rem;height:34rem;left:-12rem;top:6rem;background:#00c7e9}.auroraTwo{width:42rem;height:42rem;right:-16rem;top:28rem;background:#735cff}.shell{position:relative;z-index:1;width:min(100%,1680px);margin:0 auto;padding:24px 22px 90px}.hero,.panel,.scenarioDock,.statDeck article{border:1px solid rgba(126,205,232,.15);box-shadow:0 30px 90px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)}.hero{position:relative;display:grid;grid-template-columns:1.05fr .95fr;gap:28px;padding:42px;border-radius:34px;background:radial-gradient(circle at 12% 8%,rgba(30,211,238,.16),transparent 34%),linear-gradient(135deg,rgba(10,29,47,.97),rgba(4,11,22,.96) 58%,rgba(16,20,47,.94));overflow:hidden}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(118deg,rgba(255,255,255,.035),transparent 28%,transparent 74%,rgba(120,104,255,.05));pointer-events:none}.heroCopy,.commandCore,.heroRail{position:relative}.liveLabel{display:inline-flex;align-items:center;gap:10px;padding:9px 14px;border:1px solid rgba(91,232,255,.23);border-radius:999px;background:rgba(65,226,255,.06);color:#bff6ff;font-size:10px;font-weight:900;letter-spacing:.22em;text-transform:uppercase}.liveLabel span{width:8px;height:8px;border-radius:50%;background:#66ecff;box-shadow:0 0 18px rgba(102,236,255,.95)}.hero h1{margin:28px 0 0;font-size:clamp(3.6rem,7vw,6.4rem);line-height:.88;letter-spacing:-.075em}.hero h1 em{display:block;font-style:normal;color:transparent;background:linear-gradient(90deg,#b9f7ff,#6fe7ff 46%,#9b91ff);background-clip:text}.heroCopy>p{max-width:760px;margin:24px 0 0;color:#a7bdca;font-size:1.05rem;line-height:1.75}.heroActions{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}.primaryButton,.secondaryButton{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 17px;border-radius:13px;font-size:.78rem;font-weight:900;text-decoration:none;cursor:pointer;transition:.24s}.primaryButton{border:0;color:#04131b;background:linear-gradient(90deg,#b9f7ff,#72e8ff);box-shadow:0 14px 34px rgba(48,219,255,.18)}.secondaryButton{border:1px solid rgba(255,255,255,.12);color:#f3fbff;background:rgba(255,255,255,.035)}.primaryButton:hover,.secondaryButton:hover{transform:translateY(-2px)}.governingRule{margin-top:28px;padding-top:22px;border-top:1px solid rgba(255,255,255,.08)}.governingRule span{display:block;color:#66849a;font-size:.62rem;font-weight:900;letter-spacing:.16em;text-transform:uppercase}.governingRule strong{display:block;margin-top:7px;color:#9cf1ff;font-size:.92rem}.commandCore{align-self:stretch;padding:28px;border:1px solid rgba(255,255,255,.1);border-radius:26px;background:linear-gradient(145deg,rgba(8,24,40,.93),rgba(3,9,19,.9));box-shadow:0 26px 70px rgba(0,0,0,.35),inset 0 1px 0 rgba(255,255,255,.04)}.commandCore:after{content:"";position:absolute;inset:auto 24px 0;height:1px;background:linear-gradient(90deg,transparent,rgba(100,234,255,.5),transparent)}.coreHeader{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.coreHeader span,.panelHeader>div>span,.sectionIntro>span,.reasoning>span,.determinationStage>div>span{color:#62e8ff;font-size:.62rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase}.coreHeader h2{margin:8px 0 0;font-size:2.65rem;letter-spacing:-.05em}.commandCore>p{margin:14px 0 0;color:#91a9b8;font-size:.8rem;line-height:1.65}.coreBody{display:grid;grid-template-columns:180px 1fr;gap:20px;align-items:center;margin-top:18px}.readinessGauge{position:relative;display:grid;place-items:center;width:172px;height:172px}.readinessGauge svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}.readinessGauge svg circle:last-of-type{transition:stroke-dashoffset .6s ease}.readinessGauge div{text-align:center}.readinessGauge strong{display:block;font-size:2.7rem;letter-spacing:-.08em}.readinessGauge span{display:block;margin-top:4px;color:#76a1b6;font-size:.58rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase}.failureStack{display:grid;gap:8px}.failureStack>div,.determinationFailures>div{padding:10px 12px;border:1px solid rgba(255,121,146,.15);border-radius:11px;color:#d9a9b5;background:rgba(255,92,123,.045);font-size:.68rem;line-height:1.45}.allClear{color:#b8f8d4!important;border-color:rgba(70,236,151,.2)!important;background:rgba(70,236,151,.06)!important}.heroRail{grid-column:1/-1}.anchorRail{display:grid;grid-template-columns:repeat(8,1fr);gap:8px}.anchorRail div{padding:13px 8px;border:1px solid rgba(255,255,255,.07);border-radius:14px;text-align:center;background:rgba(255,255,255,.022)}.anchorRail div span{display:block;color:#536f83;font-size:.54rem;font-weight:900;letter-spacing:.14em}.anchorRail div strong{display:block;margin-top:6px;color:#7690a1;font-size:.66rem}.anchorRail div i{display:block;width:28px;height:3px;margin:10px auto 0;border-radius:999px;background:#263848}.anchorRail div.active{border-color:rgba(92,231,255,.25);background:rgba(62,222,255,.06)}.anchorRail div.active strong{color:#c6f8ff}.anchorRail div.active i{background:#66ebff;box-shadow:0 0 12px rgba(102,235,255,.75)}.statDeck{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-top:18px}.statDeck article{min-height:132px;padding:21px;border-radius:20px;background:linear-gradient(145deg,rgba(8,23,38,.88),rgba(3,10,20,.88))}.statDeck article span{color:#69869a;font-size:.6rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase}.statDeck article strong{display:block;margin-top:9px;font-size:2.25rem;letter-spacing:-.05em}.statDeck article small{display:block;margin-top:7px;color:#70899a;font-size:.67rem;line-height:1.45}.statDeck article.accent{border-color:rgba(100,232,255,.24);background:linear-gradient(145deg,rgba(8,37,51,.93),rgba(5,13,28,.92))}.modeTabs{display:flex;gap:8px;margin-top:18px;padding:6px;border:1px solid rgba(255,255,255,.08);border-radius:16px;background:rgba(3,11,21,.72);width:max-content;max-width:100%}.modeTabs button{padding:11px 15px;border:0;border-radius:11px;color:#6f899a;background:transparent;font-size:.72rem;font-weight:900;cursor:pointer}.modeTabs button.active{color:#d9fbff;background:rgba(76,225,255,.09);box-shadow:inset 0 0 0 1px rgba(98,232,255,.18)}.laboratory{display:grid;grid-template-columns:350px minmax(0,1fr);gap:16px;margin-top:16px;align-items:start}.scenarioDock{position:sticky;top:18px;height:calc(100vh - 36px);padding:22px;border-radius:25px;background:linear-gradient(145deg,rgba(8,24,40,.94),rgba(3,10,20,.93));overflow:hidden}.sectionIntro h2,.panelHeader h2,.reasoning h2{margin:8px 0 0;font-size:1.55rem;letter-spacing:-.035em}.sectionIntro p,.panelHeader p{margin:9px 0 0;color:#7992a2;font-size:.72rem;line-height:1.55}.filters{display:grid;gap:8px;margin-top:18px}.filters>div{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filters input,.filters select,.reasoning textarea{width:100%;border:1px solid rgba(255,255,255,.09);border-radius:12px;color:#dceaf2;background:rgba(1,7,15,.8);outline:none}.filters input,.filters select{height:42px;padding:0 11px;font-size:.68rem}.filters select option{background:#07111f}.scenarioList{height:calc(100vh - 285px);margin-top:12px;padding-right:3px;overflow:auto;scrollbar-width:thin;scrollbar-color:rgba(86,224,255,.25) transparent}.scenarioList>button{display:block;width:100%;margin-bottom:8px;padding:14px;border:1px solid rgba(255,255,255,.07);border-radius:15px;color:inherit;background:rgba(255,255,255,.02);text-align:left;cursor:pointer;transition:.22s}.scenarioList>button:hover,.scenarioList>button.active{transform:translateX(3px);border-color:rgba(96,231,255,.28);background:rgba(69,222,255,.06)}.scenarioMeta{display:flex;justify-content:space-between;gap:8px;align-items:center}.scenarioMeta b{color:#5f7d90;font-size:.53rem;letter-spacing:.11em;text-transform:uppercase}.scenarioList>button>strong{display:block;margin-top:9px;font-size:.78rem}.scenarioList>button>small{display:block;margin-top:6px;color:#748c9c;font-size:.62rem;line-height:1.45}.runtimeStage{display:grid;gap:16px}.panel{padding:27px;border-radius:25px;background:linear-gradient(145deg,rgba(8,24,40,.9),rgba(3,10,20,.9))}.panelHeader{display:flex;justify-content:space-between;align-items:flex-start;gap:18px}.panelHeader h2{font-size:1.9rem}.statusPair{display:flex;align-items:center;gap:8px}.statusPair>b{padding:7px 10px;border:1px solid rgba(255,255,255,.09);border-radius:999px;color:#afc0ca;background:rgba(255,255,255,.03);font-size:.61rem}.scenarioFacts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.infoCard{padding:16px;border:1px solid rgba(255,255,255,.07);border-radius:15px;background:rgba(255,255,255,.022)}.infoCard span{color:#5f7d90;font-size:.56rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.infoCard p{margin:8px 0 0;color:#b4c6d1;font-size:.72rem;line-height:1.55}.gateGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}.gateConsole{display:grid;grid-template-columns:44px 1fr;gap:13px;width:100%;padding:15px;border-radius:16px;text-align:left;cursor:pointer;transition:.22s}.gateConsole.supported{border:1px solid rgba(89,232,255,.26);background:linear-gradient(135deg,rgba(69,224,255,.075),rgba(3,12,22,.5))}.gateConsole.unsupported{border:1px solid rgba(255,112,140,.2);background:linear-gradient(135deg,rgba(255,82,118,.055),rgba(3,12,22,.5))}.gateConsole:hover{transform:translateY(-2px)}.gateNumber{display:grid;place-items:center;width:42px;height:42px;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#bfeef5;background:rgba(255,255,255,.035);font-size:.63rem;font-weight:900}.gateCopy{min-width:0}.gateTop{display:flex;justify-content:space-between;gap:10px}.gateTop strong{color:#eef9ff;font-size:.76rem}.gateTop i{width:10px;height:10px;border-radius:50%;background:#ff7f99;box-shadow:0 0 14px rgba(255,107,139,.65)}.supported .gateTop i{background:#66ebff;box-shadow:0 0 14px rgba(102,235,255,.8)}.gateQuestion{display:block;margin-top:7px;color:#7891a1;font-size:.65rem;line-height:1.5}.gateFailure{display:block;margin-top:8px;color:#d89aa8;font-size:.59rem;line-height:1.45}.determinationStage{display:grid;grid-template-columns:210px 1fr;gap:28px;align-items:center;padding:32px;border:1px solid rgba(103,229,255,.2);border-radius:28px;background:radial-gradient(circle at 15% 30%,rgba(49,222,255,.14),transparent 28%),linear-gradient(135deg,rgba(7,29,47,.96),rgba(4,11,23,.96) 56%,rgba(18,18,50,.92));box-shadow:0 34px 95px rgba(0,0,0,.43),inset 0 1px 0 rgba(255,255,255,.05)}.determinationTitle{display:flex;align-items:center;gap:12px;margin-top:8px}.determinationTitle h2{margin:0;font-size:3.7rem;letter-spacing:-.07em}.determinationStage p{margin:15px 0 0;color:#a4b8c5;font-size:.82rem;line-height:1.65}.determinationFailures{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:17px}.reasoning textarea{margin-top:17px;padding:15px;resize:vertical;font:inherit;font-size:.74rem;line-height:1.6}.reasoning>div{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.decisionPill{display:inline-flex;align-items:center;justify-content:center;padding:6px 9px;border-radius:999px;font-size:.52rem;font-weight:950;letter-spacing:.13em}.decisionPill.allow{color:#b9f8d2;border:1px solid rgba(74,234,145,.3);background:rgba(74,234,145,.08)}.decisionPill.hold{color:#ffd29d;border:1px solid rgba(255,179,77,.3);background:rgba(255,179,77,.08)}.decisionPill.deny{color:#ffb2c0;border:1px solid rgba(255,95,127,.3);background:rgba(255,95,127,.08)}.decisionPill.escalate{color:#d1c4ff;border:1px solid rgba(154,126,255,.3);background:rgba(154,126,255,.08)}.architecture,.history{margin-top:16px}.architectureGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:20px}.architectureGrid article{padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(255,255,255,.022)}.architectureGrid article>span{color:#58dff8;font-size:.55rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.architectureGrid h3{margin:9px 0 0;font-size:.95rem}.architectureGrid p{margin:9px 0 0;color:#7c94a4;font-size:.67rem;line-height:1.5}.architectureGrid small{display:block;margin-top:12px;padding-top:11px;border-top:1px solid rgba(255,255,255,.07);color:#c58f9b;font-size:.59rem;line-height:1.45}.historyList{display:grid;gap:9px;margin-top:20px}.historyList article{display:grid;grid-template-columns:1fr auto;gap:14px;padding:17px;border:1px solid rgba(255,255,255,.07);border-radius:15px;background:rgba(255,255,255,.022)}.historyList h3{margin:0;font-size:.82rem}.historyList small{display:block;margin-top:5px;color:#60798c;font-size:.58rem}.historyList p{grid-column:1/-1;margin:0;color:#859cac;font-size:.67rem;line-height:1.5}.runScore{display:flex;align-items:center;gap:9px}.runScore strong{color:#7eeaff;font-size:.78rem}.emptyState{padding:48px;border:1px dashed rgba(255,255,255,.12);border-radius:18px;color:#60798b;text-align:center}.nextDeck{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px}.nextCard{padding:22px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:linear-gradient(145deg,rgba(8,23,38,.84),rgba(3,10,20,.86))}.nextCard span{color:#55e2fa;font-size:.55rem;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.nextCard h3{margin:10px 0 0;font-size:1.08rem}.nextCard p{margin:9px 0 0;color:#758d9d;font-size:.67rem;line-height:1.5}.nextCard a{display:inline-flex;margin-top:14px;color:#78ebff;font-size:.68rem;font-weight:900;text-decoration:none}
+        @media(max-width:1180px){.hero{grid-template-columns:1fr}.laboratory{grid-template-columns:310px 1fr}.anchorRail{grid-template-columns:repeat(4,1fr)}.statDeck{grid-template-columns:1fr 1fr}.architectureGrid{grid-template-columns:1fr 1fr}}
+        @media(max-width:900px){.shell{padding:16px 14px 70px}.hero{padding:28px;border-radius:25px}.laboratory{grid-template-columns:1fr}.scenarioDock{position:relative;top:auto;height:auto}.scenarioList{height:430px}.gateGrid,.scenarioFacts,.determinationFailures{grid-template-columns:1fr}.determinationStage{grid-template-columns:1fr}.nextDeck{grid-template-columns:1fr}.commandCore{padding:22px}}
+        @media(max-width:640px){.hero h1{font-size:3.65rem}.coreBody{grid-template-columns:1fr}.readinessGauge{width:150px;height:150px;margin:auto}.anchorRail{grid-template-columns:1fr 1fr}.statDeck{grid-template-columns:1fr}.modeTabs{width:100%;overflow:auto}.modeTabs button{white-space:nowrap}.panel{padding:20px}.panelHeader{display:grid}.architectureGrid{grid-template-columns:1fr}.filters>div{grid-template-columns:1fr}.scenarioFacts{grid-template-columns:1fr}.determinationTitle h2{font-size:2.8rem}}
+        @media(prefers-reduced-motion:no-preference){.hero,.panel,.scenarioDock,.statDeck article{animation:rise .55s ease-out both}@keyframes rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}}
       `}</style>
     </main>
   );
 }
+
+function Info({ label, value }: { label: string; value: string }) { return <div className="infoCard"><span>{label}</span><p>{value}</p></div>; }
+function Next({ href, eyebrow, title, text }: { href: string; eyebrow: string; title: string; text: string }) { return <article className="nextCard"><span>{eyebrow}</span><h3>{title}</h3><p>{text}</p><Link href={href}>Open →</Link></article>; }
