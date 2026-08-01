@@ -1402,7 +1402,7 @@ function downloadText(name: string, value: unknown) {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.expireObjectURL(url);
+  URL.revokeObjectURL(url);
 }
 
 function Panel({
