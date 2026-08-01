@@ -1,1992 +1,1436 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 
-type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
-type Difficulty = "Intermediate" | "Advanced" | "Expert";
-type GateKey = "reality" | "record" | "evidence" | "authority" | "continuity" | "boundary" | "dependencies" | "revalidation";
+type RouteState = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
+type AnchorStatus = "supported" | "limited" | "failed";
 
-type GateState = {
-  reality: boolean;
-  record: boolean;
-  evidence: boolean;
-  authority: boolean;
-  continuity: boolean;
-  boundary: boolean;
-  dependencies: boolean;
-  revalidation: boolean;
-};
-
-type Scenario = {
+type RouteExample = {
   id: string;
   title: string;
   domain: string;
-  difficulty: Difficulty;
   consequence: string;
-  evidenceNeed: string;
-  authorityNeed: string;
-  boundary: string;
-  drift: string;
-  expected: Decision;
-  gates: GateState;
+  state: RouteState;
+  summary: string;
+  failure?: string;
+  repair: string;
+  lesson: string;
+  anchors: Array<{
+    label: string;
+    value: string;
+    status: AnchorStatus;
+  }>;
 };
 
-type PreservedRun = {
+type ReadingProtocolStep = {
   id: string;
-  scenarioId: string;
-  title: string;
-  decision: Decision;
-  score: number;
-  failed: string[];
-  note: string;
-  createdAt: string;
-};
-
-type Anchor = {
   number: string;
-  name: string;
+  title: string;
   question: string;
-  proof: string;
-};
-
-type RuntimeLink = {
-  number: number;
-  name: string;
-  function: string;
-  failure: string;
-};
-
-const STORAGE_KEY = "ta14-academy-simulation-center-v2";
-
-const defaultGates: GateState = {
-  reality: true,
-  record: true,
-  evidence: false,
-  authority: false,
-  continuity: true,
-  boundary: true,
-  dependencies: true,
-  revalidation: false,
-};
-
-const scenarios: Scenario[] = [
-  {
-    id: "vendor-payment",
-    title: "Vendor payment above $25,000",
-    domain: "Financial execution",
-    difficulty: "Advanced",
-    consequence: "Funds leave the governed organization.",
-    evidenceNeed: "Beneficiary identity, invoice, contract, approval record",
-    authorityNeed: "CFO plus authorized controller",
-    boundary: "Payment scope and amount ceiling",
-    drift: "Bank details or approval chain changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: false,
-      continuity: false,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "autonomous-building",
-    title: "Autonomous building control change",
-    domain: "Physical systems",
-    difficulty: "Expert",
-    consequence: "A building environment changes without direct human intervention.",
-    evidenceNeed: "Current sensor record, control intent, occupancy state",
-    authorityNeed: "Facilities authority within approved operating band",
-    boundary: "Setpoint, duration, zone, and safety constraints",
-    drift: "Sensor, occupancy, weather, or equipment state changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: false,
-      revalidation: false,
-    },
-  },
-  {
-    id: "regulated-record",
-    title: "Regulated record release",
-    domain: "Records governance",
-    difficulty: "Advanced",
-    consequence: "A regulated record becomes externally binding.",
-    evidenceNeed: "Verified record, disclosure basis, recipient identity",
-    authorityNeed: "Authorized privacy or records officer",
-    boundary: "Permitted fields, recipient, purpose, and duration",
-    drift: "Consent, classification, or legal hold changes",
-    expected: "ALLOW",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: true,
-    },
-  },
-  {
-    id: "clinical-triage",
-    title: "Clinical AI triage recommendation",
-    domain: "Healthcare",
-    difficulty: "Expert",
-    consequence: "A patient may receive delayed, accelerated, or redirected care.",
-    evidenceNeed: "Current observations, provenance, model limits, clinician context",
-    authorityNeed: "Licensed clinician with current scope",
-    boundary: "Recommendation only; no autonomous diagnosis or treatment",
-    drift: "Patient status, medication, or symptom changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "hiring-screen",
-    title: "Automated hiring-screen disposition",
-    domain: "Employment",
-    difficulty: "Advanced",
-    consequence: "A candidate may be advanced or excluded from employment consideration.",
-    evidenceNeed: "Validated criteria, candidate record, bias testing, accommodation status",
-    authorityNeed: "Authorized hiring decision owner",
-    boundary: "Screening support only within published job criteria",
-    drift: "Job requirements, candidate data, or legal constraints change",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: false,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "credit-limit",
-    title: "Consumer credit-limit increase",
-    domain: "Financial services",
-    difficulty: "Expert",
-    consequence: "A consumer receives altered access to credit and financial exposure.",
-    evidenceNeed: "Current income, repayment history, identity, policy version",
-    authorityNeed: "Delegated credit authority within threshold",
-    boundary: "Product, amount, jurisdiction, and risk limits",
-    drift: "Fraud signal, policy, income, or account condition changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: false,
-      boundary: true,
-      dependencies: false,
-      revalidation: false,
-    },
-  },
-  {
-    id: "robotic-maintenance",
-    title: "Industrial robot maintenance restart",
-    domain: "Industrial safety",
-    difficulty: "Expert",
-    consequence: "Machinery re-enters an operating state near people and equipment.",
-    evidenceNeed: "Lockout record, inspection, guarding, test cycle evidence",
-    authorityNeed: "Authorized maintenance and safety sign-off",
-    boundary: "Named cell, speed, payload, and operating window",
-    drift: "Guard, sensor, personnel, or maintenance state changes",
-    expected: "DENY",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: true,
-      continuity: true,
-      boundary: false,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "public-benefit",
-    title: "Public-benefit eligibility recommendation",
-    domain: "Public sector",
-    difficulty: "Advanced",
-    consequence: "A person may receive or lose access to a public benefit.",
-    evidenceNeed: "Application record, policy basis, identity, exception review",
-    authorityNeed: "Authorized caseworker or adjudicator",
-    boundary: "Recommendation bounded to current program and jurisdiction",
-    drift: "Policy, household, income, or appeal status changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "model-deploy",
-    title: "High-impact model production deployment",
-    domain: "AI operations",
-    difficulty: "Expert",
-    consequence: "A model begins shaping consequential decisions at production scale.",
-    evidenceNeed: "Evaluation results, data lineage, risk review, rollback proof",
-    authorityNeed: "Named deployment authority and system owner",
-    boundary: "Approved use case, users, regions, and decision rights",
-    drift: "Model, data, dependency, or threat state changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: false,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "data-export",
-    title: "Sensitive dataset cross-border export",
-    domain: "Data governance",
-    difficulty: "Expert",
-    consequence: "Sensitive data moves across systems and jurisdictions.",
-    evidenceNeed: "Classification, lawful basis, recipient controls, transfer assessment",
-    authorityNeed: "Data owner plus privacy authority",
-    boundary: "Approved fields, destination, purpose, and retention",
-    drift: "Jurisdiction, recipient, consent, or classification changes",
-    expected: "DENY",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: true,
-      continuity: true,
-      boundary: false,
-      dependencies: false,
-      revalidation: false,
-    },
-  },
-  {
-    id: "emergency-dispatch",
-    title: "AI-assisted emergency dispatch priority",
-    domain: "Public safety",
-    difficulty: "Expert",
-    consequence: "Emergency resources may be redirected under time pressure.",
-    evidenceNeed: "Caller record, location confidence, incident type, resource state",
-    authorityNeed: "Certified dispatcher within command policy",
-    boundary: "Priority recommendation only; dispatcher retains final authority",
-    drift: "Incident severity, location, or resource availability changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: false,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "insurance-claim",
-    title: "Automated insurance claim settlement",
-    domain: "Insurance",
-    difficulty: "Advanced",
-    consequence: "A claimant receives or is denied financial settlement.",
-    evidenceNeed: "Policy, loss evidence, valuation, fraud indicators",
-    authorityNeed: "Claims authority within settlement threshold",
-    boundary: "Named claim, coverage, amount, and exception limits",
-    drift: "New evidence, fraud signal, litigation, or policy interpretation",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "school-placement",
-    title: "Student placement recommendation",
-    domain: "Education",
-    difficulty: "Intermediate",
-    consequence: "A learner may be placed into a consequential educational track.",
-    evidenceNeed: "Current assessment, teacher input, accommodations, family record",
-    authorityNeed: "Authorized educator or placement team",
-    boundary: "Recommendation only within published placement policy",
-    drift: "Accommodation, assessment, enrollment, or appeal changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: false,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "grid-balancing",
-    title: "Autonomous electrical grid balancing action",
-    domain: "Critical infrastructure",
-    difficulty: "Expert",
-    consequence: "Electrical service and equipment stability may be affected.",
-    evidenceNeed: "Telemetry, forecast, reserve state, equipment constraints",
-    authorityNeed: "Grid operator authority within emergency protocol",
-    boundary: "Named assets, duration, ramp rate, and reserve floor",
-    drift: "Telemetry, weather, demand, or equipment status changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: false,
-      revalidation: false,
-    },
-  },
-  {
-    id: "content-removal",
-    title: "Platform content-removal decision",
-    domain: "Digital platforms",
-    difficulty: "Intermediate",
-    consequence: "Speech, access, or account standing may be affected.",
-    evidenceNeed: "Content record, policy basis, context, prior notices",
-    authorityNeed: "Authorized moderator or appeals authority",
-    boundary: "Specific content and policy; no account-wide expansion",
-    drift: "Context, policy, appeal, or threat state changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "procurement-award",
-    title: "Public procurement award recommendation",
-    domain: "Procurement",
-    difficulty: "Advanced",
-    consequence: "Public funds and supplier opportunity may be allocated.",
-    evidenceNeed: "Bid record, scoring rubric, conflicts, evaluation trail",
-    authorityNeed: "Authorized procurement board",
-    boundary: "Named solicitation, criteria, and award ceiling",
-    drift: "Conflict, bid protest, funding, or scoring changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: true,
-      continuity: false,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "air-quality",
-    title: "Automated indoor-air intervention",
-    domain: "Environmental systems",
-    difficulty: "Advanced",
-    consequence: "Equipment operation and occupant exposure conditions change.",
-    evidenceNeed: "Current sensor record, calibration, occupancy, equipment status",
-    authorityNeed: "Facilities authority within approved intervention band",
-    boundary: "Named zone, equipment, duration, and safe operating range",
-    drift: "Sensor validity, occupancy, weather, or equipment changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: false,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "identity-revoke",
-    title: "Privileged identity access revocation",
-    domain: "Cybersecurity",
-    difficulty: "Advanced",
-    consequence: "A person or service loses access to critical systems.",
-    evidenceNeed: "Identity proof, session record, risk signal, owner context",
-    authorityNeed: "IAM authority under incident policy",
-    boundary: "Named identity, systems, duration, and recovery path",
-    drift: "Incident, ownership, session, or business continuity changes",
-    expected: "ALLOW",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: false,
-      revalidation: true,
-    },
-  },
-  {
-    id: "autonomous-vehicle",
-    title: "Autonomous vehicle remote-route change",
-    domain: "Mobility",
-    difficulty: "Expert",
-    consequence: "A vehicle changes path while transporting people or goods.",
-    evidenceNeed: "Map, localization, traffic, vehicle health, mission record",
-    authorityNeed: "Fleet authority within operating design domain",
-    boundary: "Approved geography, weather, speed, and mission constraints",
-    drift: "Road, weather, sensor, passenger, or vehicle state changes",
-    expected: "DENY",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: true,
-      continuity: true,
-      boundary: false,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "legal-filing",
-    title: "AI-prepared legal filing submission",
-    domain: "Legal operations",
-    difficulty: "Expert",
-    consequence: "A representation becomes binding before a court or agency.",
-    evidenceNeed: "Source record, citations, client approval, jurisdiction rules",
-    authorityNeed: "Licensed counsel with filing authority",
-    boundary: "Named matter, jurisdiction, claims, and filing deadline",
-    drift: "Facts, law, client instruction, or docket status changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "supply-release",
-    title: "Critical pharmaceutical batch release",
-    domain: "Life sciences",
-    difficulty: "Expert",
-    consequence: "A manufactured batch enters distribution and patient use.",
-    evidenceNeed: "Test results, chain of custody, deviations, stability record",
-    authorityNeed: "Qualified person or release authority",
-    boundary: "Named batch, market, shelf life, and release conditions",
-    drift: "Deviation, test, storage, or regulatory status changes",
-    expected: "DENY",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: false,
-      continuity: false,
-      boundary: false,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "payroll-change",
-    title: "Enterprise payroll master-data change",
-    domain: "Enterprise operations",
-    difficulty: "Intermediate",
-    consequence: "Employee compensation and tax records may be altered.",
-    evidenceNeed: "Employee request, identity, supporting record, effective date",
-    authorityNeed: "Payroll authority within assigned organization",
-    boundary: "Named employee, fields, effective date, and audit window",
-    drift: "Employment, banking, tax, or approval state changes",
-    expected: "HOLD",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: false,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: false,
-      revalidation: false,
-    },
-  },
-  {
-    id: "research-release",
-    title: "Dual-use research publication release",
-    domain: "Research governance",
-    difficulty: "Expert",
-    consequence: "Sensitive capability information may become publicly available.",
-    evidenceNeed: "Manuscript, risk review, funding terms, mitigation record",
-    authorityNeed: "Research institution publication authority",
-    boundary: "Approved redactions, audience, timing, and distribution",
-    drift: "Threat, legal, sponsor, or classification status changes",
-    expected: "ESCALATE",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: true,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-  {
-    id: "water-treatment",
-    title: "Autonomous water-treatment dosing change",
-    domain: "Critical infrastructure",
-    difficulty: "Expert",
-    consequence: "Chemical dosing changes water quality and public exposure.",
-    evidenceNeed: "Current sensors, calibration, lab results, process state",
-    authorityNeed: "Licensed operator within approved dosing envelope",
-    boundary: "Named process, chemical, range, duration, and fallback",
-    drift: "Sensor, source water, equipment, or lab result changes",
-    expected: "DENY",
-    gates: {
-      reality: true,
-      record: true,
-      evidence: true,
-      authority: true,
-      continuity: true,
-      boundary: false,
-      dependencies: true,
-      revalidation: false,
-    },
-  },
-];
-
-const anchors: Anchor[] = [
-  {
-    number: "01",
-    name: "Reality",
-    question: "What is true now?",
-    proof: "Current observations and conditions.",
-  },
-  {
-    number: "02",
-    name: "Record",
-    question: "What has been captured?",
-    proof: "Attributable, timestamped, reviewable records.",
-  },
-  {
-    number: "03",
-    name: "Continuity",
-    question: "Has identity and state remained connected?",
-    proof: "Traceable custody, versions, and dependencies.",
-  },
-  {
-    number: "04",
-    name: "Admissibility",
-    question: "May the evidence support this action?",
-    proof: "Current, sufficient, relevant evidence.",
-  },
-  {
-    number: "05",
-    name: "Binding",
-    question: "What may become authoritative?",
-    proof: "Valid authority and bounded decision rights.",
-  },
-  {
-    number: "06",
-    name: "Commit",
-    question: "What exact determination is preserved?",
-    proof: "Versioned decision and conditions.",
-  },
-  {
-    number: "07",
-    name: "Execution",
-    question: "What is permitted to occur?",
-    proof: "Controlled action inside the approved boundary.",
-  },
-  {
-    number: "08",
-    name: "Outcome",
-    question: "What actually happened?",
-    proof: "Preserved result, variance, and learning evidence.",
-  },
-];
-
-const runtimeLinks: RuntimeLink[] = [
-  {
-    number: 1,
-    name: "Purpose",
-    function: "Tests the purpose condition before consequence may bind to reality.",
-    failure: "If purpose is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 2,
-    name: "Actor",
-    function: "Tests the actor condition before consequence may bind to reality.",
-    failure: "If actor is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 3,
-    name: "Consequence",
-    function: "Tests the consequence condition before consequence may bind to reality.",
-    failure: "If consequence is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 4,
-    name: "Boundary",
-    function: "Tests the boundary condition before consequence may bind to reality.",
-    failure: "If boundary is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 5,
-    name: "Reality",
-    function: "Tests the reality condition before consequence may bind to reality.",
-    failure: "If reality is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 6,
-    name: "Record",
-    function: "Tests the record condition before consequence may bind to reality.",
-    failure: "If record is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 7,
-    name: "Source",
-    function: "Tests the source condition before consequence may bind to reality.",
-    failure: "If source is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 8,
-    name: "Provenance",
-    function: "Tests the provenance condition before consequence may bind to reality.",
-    failure: "If provenance is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 9,
-    name: "Currency",
-    function: "Tests the currency condition before consequence may bind to reality.",
-    failure: "If currency is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 10,
-    name: "Completeness",
-    function: "Tests the completeness condition before consequence may bind to reality.",
-    failure: "If completeness is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 11,
-    name: "Relevance",
-    function: "Tests the relevance condition before consequence may bind to reality.",
-    failure: "If relevance is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 12,
-    name: "Conflict",
-    function: "Tests the conflict condition before consequence may bind to reality.",
-    failure: "If conflict is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 13,
-    name: "Authority",
-    function: "Tests the authority condition before consequence may bind to reality.",
-    failure: "If authority is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 14,
-    name: "Scope",
-    function: "Tests the scope condition before consequence may bind to reality.",
-    failure: "If scope is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 15,
-    name: "Delegation",
-    function: "Tests the delegation condition before consequence may bind to reality.",
-    failure: "If delegation is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 16,
-    name: "Continuity",
-    function: "Tests the continuity condition before consequence may bind to reality.",
-    failure: "If continuity is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 17,
-    name: "Dependency",
-    function: "Tests the dependency condition before consequence may bind to reality.",
-    failure: "If dependency is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 18,
-    name: "Drift",
-    function: "Tests the drift condition before consequence may bind to reality.",
-    failure: "If drift is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 19,
-    name: "Admissibility",
-    function: "Tests the admissibility condition before consequence may bind to reality.",
-    failure: "If admissibility is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 20,
-    name: "Determination",
-    function: "Tests the determination condition before consequence may bind to reality.",
-    failure: "If determination is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 21,
-    name: "Binding",
-    function: "Tests the binding condition before consequence may bind to reality.",
-    failure: "If binding is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 22,
-    name: "Commit",
-    function: "Tests the commit condition before consequence may bind to reality.",
-    failure: "If commit is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 23,
-    name: "Execution",
-    function: "Tests the execution condition before consequence may bind to reality.",
-    failure: "If execution is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-  {
-    number: 24,
-    name: "Outcome",
-    function: "Tests the outcome condition before consequence may bind to reality.",
-    failure: "If outcome is missing, stale, conflicted, or outside scope, execution cannot silently proceed.",
-  },
-];
-
-const gateLabels: Array<{ key: GateKey; label: string; question: string; hold: string }> = [
-  { key: "reality", label: "Reality established", question: "Are the relevant present conditions known?", hold: "Current reality has not been established." },
-  { key: "record", label: "Record preserved", question: "Is the source record attributable and inspectable?", hold: "The record is missing or not preservable." },
-  { key: "evidence", label: "Evidence admissible", question: "Is the evidence sufficient, current, and relevant?", hold: "Admissible evidence is incomplete." },
-  { key: "authority", label: "Authority valid", question: "Is authority valid for this exact action now?", hold: "Required authority is not established." },
-  { key: "continuity", label: "Continuity preserved", question: "Has identity, state, and custody remained connected?", hold: "Continuity has not been preserved." },
-  { key: "boundary", label: "Boundary respected", question: "Does the action remain within approved scope?", hold: "The action exceeds its approved boundary." },
-  { key: "dependencies", label: "Dependencies valid", question: "Are required systems and conditions still valid?", hold: "A required dependency changed or failed." },
-  { key: "revalidation", label: "Revalidation complete", question: "Were conditions rechecked immediately before execution?", hold: "Pre-execution revalidation is incomplete." },
-];
-
-
-type FailureDrill = {
-  link: number;
-  title: string;
-  injectedChange: string;
-  learnerTask: string;
-  evidenceToSeek: string;
-  correctResponse: Decision;
-  teachingPoint: string;
-};
-
-type DebriefPrompt = {
-  number: number;
-  stage: string;
-  observation: string;
-  challenge: string;
-  preservation: string;
-};
-
-type CompetencyCriterion = {
-  id: string;
-  capability: string;
-  developing: string;
-  proficient: string;
-  advanced: string;
   evidence: string;
+  stopCondition: string;
 };
 
-const failureDrills: FailureDrill[] = [
-  {
-    link: 1,
-    title: "Purpose failure injection",
-    injectedChange: "A material change is introduced at the purpose link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current purpose condition rather than relying on the prior state.",
-    correctResponse: "ESCALATE",
-    teachingPoint: "A completed route cannot silently carry an invalid purpose condition into execution.",
-  },
-  {
-    link: 2,
-    title: "Actor failure injection",
-    injectedChange: "A material change is introduced at the actor link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current actor condition rather than relying on the prior state.",
-    correctResponse: "DENY",
-    teachingPoint: "A completed route cannot silently carry an invalid actor condition into execution.",
-  },
-  {
-    link: 3,
-    title: "Consequence failure injection",
-    injectedChange: "A material change is introduced at the consequence link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current consequence condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid consequence condition into execution.",
-  },
-  {
-    link: 4,
-    title: "Boundary failure injection",
-    injectedChange: "A material change is introduced at the boundary link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current boundary condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid boundary condition into execution.",
-  },
-  {
-    link: 5,
-    title: "Reality failure injection",
-    injectedChange: "A material change is introduced at the reality link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current reality condition rather than relying on the prior state.",
-    correctResponse: "ESCALATE",
-    teachingPoint: "A completed route cannot silently carry an invalid reality condition into execution.",
-  },
-  {
-    link: 6,
-    title: "Record failure injection",
-    injectedChange: "A material change is introduced at the record link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current record condition rather than relying on the prior state.",
-    correctResponse: "DENY",
-    teachingPoint: "A completed route cannot silently carry an invalid record condition into execution.",
-  },
-  {
-    link: 7,
-    title: "Source failure injection",
-    injectedChange: "A material change is introduced at the source link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current source condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid source condition into execution.",
-  },
-  {
-    link: 8,
-    title: "Provenance failure injection",
-    injectedChange: "A material change is introduced at the provenance link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current provenance condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid provenance condition into execution.",
-  },
-  {
-    link: 9,
-    title: "Currency failure injection",
-    injectedChange: "A material change is introduced at the currency link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current currency condition rather than relying on the prior state.",
-    correctResponse: "ESCALATE",
-    teachingPoint: "A completed route cannot silently carry an invalid currency condition into execution.",
-  },
-  {
-    link: 10,
-    title: "Completeness failure injection",
-    injectedChange: "A material change is introduced at the completeness link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current completeness condition rather than relying on the prior state.",
-    correctResponse: "DENY",
-    teachingPoint: "A completed route cannot silently carry an invalid completeness condition into execution.",
-  },
-  {
-    link: 11,
-    title: "Relevance failure injection",
-    injectedChange: "A material change is introduced at the relevance link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current relevance condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid relevance condition into execution.",
-  },
-  {
-    link: 12,
-    title: "Conflict failure injection",
-    injectedChange: "A material change is introduced at the conflict link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current conflict condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid conflict condition into execution.",
-  },
-  {
-    link: 13,
-    title: "Authority failure injection",
-    injectedChange: "A material change is introduced at the authority link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current authority condition rather than relying on the prior state.",
-    correctResponse: "ESCALATE",
-    teachingPoint: "A completed route cannot silently carry an invalid authority condition into execution.",
-  },
-  {
-    link: 14,
-    title: "Scope failure injection",
-    injectedChange: "A material change is introduced at the scope link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current scope condition rather than relying on the prior state.",
-    correctResponse: "DENY",
-    teachingPoint: "A completed route cannot silently carry an invalid scope condition into execution.",
-  },
-  {
-    link: 15,
-    title: "Delegation failure injection",
-    injectedChange: "A material change is introduced at the delegation link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current delegation condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid delegation condition into execution.",
-  },
-  {
-    link: 16,
-    title: "Continuity failure injection",
-    injectedChange: "A material change is introduced at the continuity link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current continuity condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid continuity condition into execution.",
-  },
-  {
-    link: 17,
-    title: "Dependency failure injection",
-    injectedChange: "A material change is introduced at the dependency link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current dependency condition rather than relying on the prior state.",
-    correctResponse: "ESCALATE",
-    teachingPoint: "A completed route cannot silently carry an invalid dependency condition into execution.",
-  },
-  {
-    link: 18,
-    title: "Drift failure injection",
-    injectedChange: "A material change is introduced at the drift link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current drift condition rather than relying on the prior state.",
-    correctResponse: "DENY",
-    teachingPoint: "A completed route cannot silently carry an invalid drift condition into execution.",
-  },
-  {
-    link: 19,
-    title: "Admissibility failure injection",
-    injectedChange: "A material change is introduced at the admissibility link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current admissibility condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid admissibility condition into execution.",
-  },
-  {
-    link: 20,
-    title: "Determination failure injection",
-    injectedChange: "A material change is introduced at the determination link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current determination condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid determination condition into execution.",
-  },
-  {
-    link: 21,
-    title: "Binding failure injection",
-    injectedChange: "A material change is introduced at the binding link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current binding condition rather than relying on the prior state.",
-    correctResponse: "ESCALATE",
-    teachingPoint: "A completed route cannot silently carry an invalid binding condition into execution.",
-  },
-  {
-    link: 22,
-    title: "Commit failure injection",
-    injectedChange: "A material change is introduced at the commit link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current commit condition rather than relying on the prior state.",
-    correctResponse: "DENY",
-    teachingPoint: "A completed route cannot silently carry an invalid commit condition into execution.",
-  },
-  {
-    link: 23,
-    title: "Execution failure injection",
-    injectedChange: "A material change is introduced at the execution link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current execution condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid execution condition into execution.",
-  },
-  {
-    link: 24,
-    title: "Outcome failure injection",
-    injectedChange: "A material change is introduced at the outcome link immediately before execution.",
-    learnerTask: "Identify whether the change breaks standing, authority, continuity, boundary, or evidentiary sufficiency.",
-    evidenceToSeek: "Locate the attributable record that can prove the current outcome condition rather than relying on the prior state.",
-    correctResponse: "HOLD",
-    teachingPoint: "A completed route cannot silently carry an invalid outcome condition into execution.",
-  },
-];
-
-const debriefPrompts: DebriefPrompt[] = [
-  {
-    number: 1,
-    stage: "Purpose",
-    observation: "State what the simulation actually established about purpose, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the purpose link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the purpose determination.",
-  },
-  {
-    number: 2,
-    stage: "Actor",
-    observation: "State what the simulation actually established about actor, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the actor link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the actor determination.",
-  },
-  {
-    number: 3,
-    stage: "Consequence",
-    observation: "State what the simulation actually established about consequence, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the consequence link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the consequence determination.",
-  },
-  {
-    number: 4,
-    stage: "Boundary",
-    observation: "State what the simulation actually established about boundary, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the boundary link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the boundary determination.",
-  },
-  {
-    number: 5,
-    stage: "Reality",
-    observation: "State what the simulation actually established about reality, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the reality link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the reality determination.",
-  },
-  {
-    number: 6,
-    stage: "Record",
-    observation: "State what the simulation actually established about record, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the record link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the record determination.",
-  },
-  {
-    number: 7,
-    stage: "Source",
-    observation: "State what the simulation actually established about source, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the source link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the source determination.",
-  },
-  {
-    number: 8,
-    stage: "Provenance",
-    observation: "State what the simulation actually established about provenance, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the provenance link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the provenance determination.",
-  },
-  {
-    number: 9,
-    stage: "Currency",
-    observation: "State what the simulation actually established about currency, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the currency link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the currency determination.",
-  },
-  {
-    number: 10,
-    stage: "Completeness",
-    observation: "State what the simulation actually established about completeness, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the completeness link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the completeness determination.",
-  },
-  {
-    number: 11,
-    stage: "Relevance",
-    observation: "State what the simulation actually established about relevance, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the relevance link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the relevance determination.",
-  },
-  {
-    number: 12,
-    stage: "Conflict",
-    observation: "State what the simulation actually established about conflict, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the conflict link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the conflict determination.",
-  },
-  {
-    number: 13,
-    stage: "Authority",
-    observation: "State what the simulation actually established about authority, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the authority link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the authority determination.",
-  },
-  {
-    number: 14,
-    stage: "Scope",
-    observation: "State what the simulation actually established about scope, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the scope link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the scope determination.",
-  },
-  {
-    number: 15,
-    stage: "Delegation",
-    observation: "State what the simulation actually established about delegation, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the delegation link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the delegation determination.",
-  },
-  {
-    number: 16,
-    stage: "Continuity",
-    observation: "State what the simulation actually established about continuity, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the continuity link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the continuity determination.",
-  },
-  {
-    number: 17,
-    stage: "Dependency",
-    observation: "State what the simulation actually established about dependency, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the dependency link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the dependency determination.",
-  },
-  {
-    number: 18,
-    stage: "Drift",
-    observation: "State what the simulation actually established about drift, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the drift link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the drift determination.",
-  },
-  {
-    number: 19,
-    stage: "Admissibility",
-    observation: "State what the simulation actually established about admissibility, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the admissibility link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the admissibility determination.",
-  },
-  {
-    number: 20,
-    stage: "Determination",
-    observation: "State what the simulation actually established about determination, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the determination link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the determination determination.",
-  },
-  {
-    number: 21,
-    stage: "Binding",
-    observation: "State what the simulation actually established about binding, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the binding link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the binding determination.",
-  },
-  {
-    number: 22,
-    stage: "Commit",
-    observation: "State what the simulation actually established about commit, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the commit link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the commit determination.",
-  },
-  {
-    number: 23,
-    stage: "Execution",
-    observation: "State what the simulation actually established about execution, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the execution link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the execution determination.",
-  },
-  {
-    number: 24,
-    stage: "Outcome",
-    observation: "State what the simulation actually established about outcome, without adding assumptions.",
-    challenge: "Explain what a reviewer could reasonably dispute at the outcome link.",
-    preservation: "Name the record, timestamp, source, and version needed to preserve the outcome determination.",
-  },
-];
-
-const competencyCriteria: CompetencyCriterion[] = [
-  {
-    id: "boundary",
-    capability: "Boundary definition",
-    developing: "Names the action but leaves scope implicit.",
-    proficient: "Defines actors, consequence, scope, exclusions, and time window.",
-    advanced: "Detects boundary expansion and designs enforceable constraint checks.",
-    evidence: "A bounded action statement and explicit exclusions.",
-  },
-  {
-    id: "reality",
-    capability: "Reality establishment",
-    developing: "Relies on general context or prior conditions.",
-    proficient: "Uses current attributable observations relevant to the action.",
-    advanced: "Separates direct observation, inference, uncertainty, and contested reality.",
-    evidence: "Current reality record with source and timestamp.",
-  },
-  {
-    id: "record",
-    capability: "Record integrity",
-    developing: "Captures notes without provenance or version.",
-    proficient: "Preserves attributable, timestamped, reviewable source records.",
-    advanced: "Designs custody, version, correction, and challenge controls.",
-    evidence: "Record package with provenance and version history.",
-  },
-  {
-    id: "evidence",
-    capability: "Evidence admissibility",
-    developing: "Treats available information as sufficient evidence.",
-    proficient: "Tests currency, relevance, completeness, conflict, and sufficiency.",
-    advanced: "Explains why evidence has standing for this exact consequence.",
-    evidence: "Evidence matrix and unresolved-gap record.",
-  },
-  {
-    id: "authority",
-    capability: "Authority validation",
-    developing: "Identifies a role but not current delegated power.",
-    proficient: "Validates actor, role, scope, delegation, and present validity.",
-    advanced: "Detects authority drift, conflicts, and nondelegable decisions.",
-    evidence: "Authority record tied to action and boundary.",
-  },
-  {
-    id: "continuity",
-    capability: "Continuity preservation",
-    developing: "Assumes identity and state remain connected.",
-    proficient: "Traces identity, custody, versions, dependencies, and state changes.",
-    advanced: "Locates the exact break and prevents silent continuity repair.",
-    evidence: "Continuity map and break log.",
-  },
-  {
-    id: "drift",
-    capability: "Drift recognition",
-    developing: "Notices obvious changes after the fact.",
-    proficient: "Identifies conditions that require revalidation before execution.",
-    advanced: "Builds trigger logic for authority, evidence, dependency, and boundary drift.",
-    evidence: "Drift register and revalidation policy.",
-  },
-  {
-    id: "determination",
-    capability: "Determination discipline",
-    developing: "Chooses a favorable result from incomplete conditions.",
-    proficient: "Uses ALLOW, HOLD, DENY, or ESCALATE with explicit reasons.",
-    advanced: "Distinguishes curable holds, prohibited actions, and authority escalation.",
-    evidence: "Preserved determination with failed links.",
-  },
-  {
-    id: "execution",
-    capability: "Execution control",
-    developing: "Treats approval as unrestricted permission.",
-    proficient: "Binds execution to exact conditions, limits, and validity window.",
-    advanced: "Designs fail-closed enforcement and controlled exception handling.",
-    evidence: "Execution permit and enforcement record.",
-  },
-  {
-    id: "outcome",
-    capability: "Outcome correspondence",
-    developing: "Records whether the task completed.",
-    proficient: "Compares intended, permitted, actual, and observed outcome.",
-    advanced: "Identifies variance, unintended consequence, and learning obligations.",
-    evidence: "Outcome record with correspondence analysis.",
-  },
-  {
-    id: "challenge",
-    capability: "Challengeability",
-    developing: "Defends the route without preserving objections.",
-    proficient: "Records findings, objections, corrections, and unresolved disputes.",
-    advanced: "Maintains challenge without erasing lineage or uncertainty.",
-    evidence: "Review record and correction history.",
-  },
-  {
-    id: "communication",
-    capability: "Governance communication",
-    developing: "Uses abstract terminology without operational meaning.",
-    proficient: "Explains the failed condition and required next action plainly.",
-    advanced: "Communicates limits without overstating certainty or authority.",
-    evidence: "Plain-language learner debrief.",
-  },
-];
-
-type OperatingPrinciple = {
-  number: number;
+type FailurePattern = {
+  id: string;
+  chainLink: string;
   title: string;
-  rule: string;
-  practice: string;
+  signal: string;
+  consequence: string;
+  repair: string;
+  severity: "warning" | "blocking" | "critical";
 };
 
-const operatingPrinciples: OperatingPrinciple[] = [
+type GlossaryEntry = {
+  term: string;
+  definition: string;
+  readingUse: string;
+};
+
+type ReviewQuestion = {
+  id: string;
+  category: string;
+  question: string;
+  expectedReading: string;
+};
+
+type SavedProgress = {
+  version: "2.0";
+  completed: string[];
+  notes: Record<string, string>;
+  updatedAt: string;
+};
+
+const STORAGE_KEY = "ta14-academy-route-reading-center-v2";
+
+const routeExamples: RouteExample[] = [
   {
-    number: 1,
-    title: "Evidence before intervention",
-    rule: "Do not act merely because a workflow reached its final step.",
-    practice: "Require current, relevant, attributable proof before permission is considered.",
+    id: "allow",
+    title: "Bounded equipment restart",
+    domain: "Facilities operations",
+    consequence: "Restore one air-handling unit after a verified protective trip.",
+    state: "ALLOW",
+    summary:
+      "Current evidence, valid authority, preserved continuity, and a bounded execution plan support one controlled restart with post-action verification.",
+    repair: "No repair is required. The route must still preserve outcome evidence after the restart.",
+    lesson: "ALLOW is permission for the exact committed action only. It is never a general authorization.",
+    anchors: [
+      { label: "Reality", value: "Protective trip occurred; no active fault remains.", status: "supported" },
+      { label: "Record", value: "Timestamped controller history and technician measurements preserved.", status: "supported" },
+      { label: "Continuity", value: "No material condition changed after inspection.", status: "supported" },
+      { label: "Admissibility", value: "Evidence is current and sufficient for one restart decision.", status: "supported" },
+      { label: "Binding", value: "Authorized facilities supervisor approved the bounded action.", status: "supported" },
+      { label: "Commit", value: "Decision version and operating limits recorded before execution.", status: "supported" },
+      { label: "Execution", value: "One restart only; no parameter changes permitted.", status: "supported" },
+      { label: "Outcome", value: "Stable operation must be verified and preserved for 20 minutes.", status: "supported" },
+    ],
   },
   {
-    number: 2,
-    title: "Admissibility before execution",
-    rule: "Available information is not automatically admissible evidence.",
-    practice: "Test standing, sufficiency, conflict, currency, and scope.",
+    id: "hold",
+    title: "Automated account suspension",
+    domain: "Identity governance",
+    consequence: "Suspend a user account based on an anomaly alert.",
+    state: "HOLD",
+    summary:
+      "The alert is relevant, but the evidence is stale and the current authority boundary is incomplete. Execution must pause until the gaps are resolved.",
+    failure: "Continuity is the earliest failed condition: the present identity state was not revalidated.",
+    repair: "Refresh the identity state, establish current suspension authority, and rerun dependent gates.",
+    lesson: "HOLD preserves the route while repair remains possible. It is not a soft approval.",
+    anchors: [
+      { label: "Reality", value: "Anomaly alert indicates unusual access behavior.", status: "supported" },
+      { label: "Record", value: "Alert and source events are attributable.", status: "supported" },
+      { label: "Continuity", value: "Latest identity state was not revalidated.", status: "failed" },
+      { label: "Admissibility", value: "Evidence may no longer describe the present condition.", status: "limited" },
+      { label: "Binding", value: "System role permits review but not automatic suspension.", status: "failed" },
+      { label: "Commit", value: "No valid decision may be committed yet.", status: "limited" },
+      { label: "Execution", value: "Suspension is blocked pending revalidation.", status: "failed" },
+      { label: "Outcome", value: "No consequence is allowed to bind while held.", status: "supported" },
+    ],
   },
   {
-    number: 3,
-    title: "Boundary before authority",
-    rule: "Authority must attach to an exact action and consequence.",
-    practice: "Reject vague permission that silently expands during execution.",
+    id: "deny",
+    title: "Unsupported reimbursement approval",
+    domain: "Financial operations",
+    consequence: "Release a reimbursement without required source documentation.",
+    state: "DENY",
+    summary:
+      "The required evidence does not exist, and policy does not authorize a substitute. The requested execution is outside the admissible boundary.",
+    failure: "Record is the earliest failed condition: the mandatory source evidence is absent.",
+    repair: "A new request may be initiated only when the required source documentation exists and can be validated.",
+    lesson: "DENY means the present action is prohibited under the preserved state. Later evidence cannot rewrite the original decision.",
+    anchors: [
+      { label: "Reality", value: "A reimbursement request exists.", status: "supported" },
+      { label: "Record", value: "Required receipt and approval record are absent.", status: "failed" },
+      { label: "Continuity", value: "There is no preserved source chain to validate.", status: "failed" },
+      { label: "Admissibility", value: "The request cannot satisfy the evidence threshold.", status: "failed" },
+      { label: "Binding", value: "No authority exists to waive the mandatory record.", status: "failed" },
+      { label: "Commit", value: "A valid approval state cannot be created.", status: "failed" },
+      { label: "Execution", value: "Payment release is prohibited.", status: "failed" },
+      { label: "Outcome", value: "Denial and reason are preserved for challenge and correction.", status: "supported" },
+    ],
   },
   {
-    number: 4,
-    title: "Continuity before reliance",
-    rule: "A valid beginning does not prove an unbroken route.",
-    practice: "Preserve identity, custody, state, versions, and dependencies.",
-  },
-  {
-    number: 5,
-    title: "Revalidation before consequence",
-    rule: "Prior permission may expire when material conditions change.",
-    practice: "Recheck decisive conditions immediately before execution.",
-  },
-  {
-    number: 6,
-    title: "Failure must remain visible",
-    rule: "Uncertainty cannot be converted into a favorable answer by interface design.",
-    practice: "Preserve unknown, disputed, missing, and stale states.",
-  },
-  {
-    number: 7,
-    title: "The earliest break controls",
-    rule: "Later completion cannot cure an earlier architectural failure.",
-    practice: "Stop at the first failed runtime link and preserve why.",
-  },
-  {
-    number: 8,
-    title: "Authority cannot be invented",
-    rule: "A system may explain authority but may not manufacture it.",
-    practice: "Escalate when valid decision rights are absent or unclear.",
-  },
-  {
-    number: 9,
-    title: "Evidence cannot be fabricated",
-    rule: "A learning environment may provide examples, never false proof.",
-    practice: "Keep scenario assumptions distinct from production evidence.",
-  },
-  {
-    number: 10,
-    title: "Outcome does not cure process",
-    rule: "A favorable result does not retroactively authorize an inadmissible action.",
-    practice: "Compare intended, permitted, actual, and observed outcomes.",
-  },
-  {
-    number: 11,
-    title: "Challenge must remain possible",
-    rule: "Governance requires correction without erasing lineage.",
-    practice: "Preserve objections, findings, versions, and unresolved disputes.",
-  },
-  {
-    number: 12,
-    title: "Competency must be bounded",
-    rule: "Capability demonstrated in one scope is not universal standing.",
-    practice: "Attach evidence to task, domain, conditions, and validity period.",
-  },
-  {
-    number: 13,
-    title: "Completion is not competency",
-    rule: "Finishing content proves participation, not reliable performance.",
-    practice: "Require observable work products and reviewable determinations.",
-  },
-  {
-    number: 14,
-    title: "Confidence is not permission",
-    rule: "Model certainty cannot substitute for authority or evidence.",
-    practice: "Treat confidence as one signal inside a governed route.",
-  },
-  {
-    number: 15,
-    title: "Identity is not admissibility",
-    rule: "A verified actor may still attempt an inadmissible execution.",
-    practice: "Validate the exact action, evidence, authority, and conditions.",
-  },
-  {
-    number: 16,
-    title: "Access is not standing",
-    rule: "Permission to reach a system is not permission to bind reality.",
-    practice: "Separate access governance from execution governance.",
-  },
-  {
-    number: 17,
-    title: "Exceptions require governance",
-    rule: "Urgency does not erase architecture.",
-    practice: "Bound emergency authority, duration, evidence, and after-action review.",
-  },
-  {
-    number: 18,
-    title: "Dependencies carry risk",
-    rule: "A route inherits conditions from systems it depends upon.",
-    practice: "Track dependency validity, drift, failure, and replacement.",
-  },
-  {
-    number: 19,
-    title: "Records require provenance",
-    rule: "A record without source, time, identity, and version cannot carry full weight.",
-    practice: "Preserve who, what, when, where, and how.",
-  },
-  {
-    number: 20,
-    title: "Simulation must not impersonate production",
-    rule: "Practice artifacts are educational evidence, not execution authority.",
-    practice: "Label local runs and prevent transfer of standing by implication.",
-  },
-  {
-    number: 21,
-    title: "Determinations require reasons",
-    rule: "ALLOW, HOLD, DENY, and ESCALATE must remain explainable.",
-    practice: "Tie each outcome to specific passed and failed conditions.",
-  },
-  {
-    number: 22,
-    title: "Binding must be explicit",
-    rule: "A determination becomes operational only through controlled commitment.",
-    practice: "Preserve the exact decision, conditions, owner, and validity window.",
-  },
-  {
-    number: 23,
-    title: "Execution must correspond",
-    rule: "The action performed must match the action authorized.",
-    practice: "Detect variance in actor, scope, timing, target, and effect.",
-  },
-  {
-    number: 24,
-    title: "Learning must preserve truth",
-    rule: "Education may simplify explanation, never the governing facts.",
-    practice: "Teach complexity through calm sequence without deleting constraints.",
+    id: "escalate",
+    title: "Conflicting clinical routing evidence",
+    domain: "High-consequence workflow",
+    consequence: "Route a case where two authoritative records materially conflict.",
+    state: "ESCALATE",
+    summary:
+      "The system cannot resolve the conflict within its authorized scope. The case must move to a qualified decision authority without silently favoring either record.",
+    failure: "Binding is the decisive limit: the current reviewer lacks authority to resolve the conflict.",
+    repair: "Route the preserved conflict to a named qualified authority and require an attributable resolution.",
+    lesson: "ESCALATE transfers judgment. It does not convert uncertainty into permission.",
+    anchors: [
+      { label: "Reality", value: "A consequential routing decision is pending.", status: "supported" },
+      { label: "Record", value: "Two attributable records contain incompatible instructions.", status: "limited" },
+      { label: "Continuity", value: "Both records are current and preserved.", status: "supported" },
+      { label: "Admissibility", value: "Each record is relevant; neither can be silently displaced.", status: "limited" },
+      { label: "Binding", value: "Current reviewer lacks authority to resolve the conflict.", status: "failed" },
+      { label: "Commit", value: "Escalation state and conflict are preserved.", status: "supported" },
+      { label: "Execution", value: "No downstream action occurs before qualified review.", status: "supported" },
+      { label: "Outcome", value: "Resolution must return with attributable authority and rationale.", status: "supported" },
+    ],
   },
 ];
 
-const decisionStyle: Record<Decision, string> = {
-  ALLOW: "border-emerald-300/40 bg-emerald-400/10 text-emerald-100",
-  HOLD: "border-amber-300/40 bg-amber-400/10 text-amber-100",
-  DENY: "border-rose-300/40 bg-rose-400/10 text-rose-100",
-  ESCALATE: "border-violet-300/40 bg-violet-400/10 text-violet-100",
+const readingProtocol: ReadingProtocolStep[] = [
+  {
+    id: "PROTOCOL-01",
+    number: "01",
+    title: "Name the proposed consequence",
+    question: "What exact action may bind to reality?",
+    evidence: "A bounded action statement naming scope, destination, subject, quantity, and time.",
+    stopCondition: "Stop when the action is vague, compound, or broader than the stated authority.",
+  },
+  {
+    id: "PROTOCOL-02",
+    number: "02",
+    title: "Establish present reality",
+    question: "What condition actually exists now?",
+    evidence: "Current observations, measurements, declarations, and affected subjects.",
+    stopCondition: "Stop when the route relies on assumptions instead of present conditions.",
+  },
+  {
+    id: "PROTOCOL-03",
+    number: "03",
+    title: "Locate the source record",
+    question: "What was captured, by whom, when, and in what form?",
+    evidence: "Attributable records with timestamps, source identity, and preservation method.",
+    stopCondition: "Stop when the record cannot be inspected or tied to a source.",
+  },
+  {
+    id: "PROTOCOL-04",
+    number: "04",
+    title: "Test continuity",
+    question: "Did identity, state, version, custody, and context remain connected?",
+    evidence: "Version history, custody trail, freshness, and changed-condition checks.",
+    stopCondition: "Stop when the present state may no longer match the preserved record.",
+  },
+  {
+    id: "PROTOCOL-05",
+    number: "05",
+    title: "Determine admissibility",
+    question: "May this evidence support this consequence here and now?",
+    evidence: "Fitness by purpose, time, jurisdiction, reliability, and consequence.",
+    stopCondition: "Stop when relevant evidence is stale, unsupported, contradictory, or outside purpose.",
+  },
+  {
+    id: "PROTOCOL-06",
+    number: "06",
+    title: "Resolve authority",
+    question: "Who may bind this decision and within what scope?",
+    evidence: "Identity, role, delegation, expiry, revocation, and conflict state.",
+    stopCondition: "Stop when authority is missing, expired, conflicted, or too narrow.",
+  },
+  {
+    id: "PROTOCOL-07",
+    number: "07",
+    title: "Apply binding conditions",
+    question: "Which rules, thresholds, prohibitions, and obligations govern?",
+    evidence: "Route version, policy basis, limits, exceptions, and mandatory gates.",
+    stopCondition: "Stop when the route cannot identify what governs the consequence.",
+  },
+  {
+    id: "PROTOCOL-08",
+    number: "08",
+    title: "Find earliest failure",
+    question: "Which first unsupported link controls every downstream state?",
+    evidence: "Ordered gate results with one explicit earliest-failure marker.",
+    stopCondition: "Stop reading forward as though a later approval can cure the earlier break.",
+  },
+  {
+    id: "PROTOCOL-09",
+    number: "09",
+    title: "Read the commit",
+    question: "What determination was fixed before action?",
+    evidence: "ALLOW, HOLD, DENY, or ESCALATE with reason codes and permitted next action.",
+    stopCondition: "Stop when the decision is inferred after execution or can still be silently changed.",
+  },
+  {
+    id: "PROTOCOL-10",
+    number: "10",
+    title: "Inspect execution effect",
+    question: "Did the determination technically change what could happen?",
+    evidence: "Release, hold, refusal, reroute, termination, rollback, or human checkpoint receipt.",
+    stopCondition: "Stop when the artifact proves only monitoring, recommendation, or documentation.",
+  },
+  {
+    id: "PROTOCOL-11",
+    number: "11",
+    title: "Close the outcome",
+    question: "What actually happened after the committed determination?",
+    evidence: "Outcome evidence, residual risk, rollback, correction, and final state.",
+    stopCondition: "Stop when the route claims success without preserved consequence evidence.",
+  },
+  {
+    id: "PROTOCOL-12",
+    number: "12",
+    title: "State the proof boundary",
+    question: "What does this record prove, and what does it not prove?",
+    evidence: "A bounded claim tied to the route, event, evidence, execution effect, and outcome.",
+    stopCondition: "Stop when the claim expands beyond the preserved record.",
+  },
+];
+
+const failurePatterns: FailurePattern[] = [
+  {
+    id: "PATTERN-001",
+    chainLink: "REALITY",
+    title: "Primary: Proposed consequence is not bounded",
+    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
+    consequence: "The route cannot know what it is governing.",
+    repair: "Rewrite the action as one exact consequence-bearing event.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-002",
+    chainLink: "RECORD",
+    title: "Primary: Source record is not attributable",
+    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
+    consequence: "The route has no inspectable basis for reliance.",
+    repair: "Capture and preserve an attributable source record.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-003",
+    chainLink: "CONTINUITY",
+    title: "Primary: Present state was not revalidated",
+    signal: "Identity, version, custody, or environmental state may have changed.",
+    consequence: "The preserved evidence may no longer describe the execution moment.",
+    repair: "Revalidate all changed conditions and rerun dependent gates.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-004",
+    chainLink: "ADMISSIBILITY",
+    title: "Primary: Evidence is relevant but not fit",
+    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
+    consequence: "The route may not rely on the material for this consequence.",
+    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-005",
+    chainLink: "BINDING",
+    title: "Primary: Authority or rule boundary is unresolved",
+    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
+    consequence: "No valid consequence may be bound under the present authority state.",
+    repair: "Resolve authority and the exact binding conditions before commit.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-006",
+    chainLink: "COMMIT",
+    title: "Primary: Decision was not fixed before action",
+    signal: "The determination can still be edited, inferred, or backdated.",
+    consequence: "The record cannot prove pre-execution governance.",
+    repair: "Freeze the determination, reasons, scope, and permitted next action.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-007",
+    chainLink: "EXECUTION",
+    title: "Primary: No technical control receipt exists",
+    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
+    consequence: "The artifact proves policy evaluation, not execution governance.",
+    repair: "Capture a technical receipt showing the determination controlled the action path.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-008",
+    chainLink: "OUTCOME",
+    title: "Primary: Outcome is asserted without closure evidence",
+    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
+    consequence: "The route cannot prove what bound to reality.",
+    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-009",
+    chainLink: "REALITY",
+    title: "Changed-condition: Proposed consequence is not bounded",
+    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
+    consequence: "The route cannot know what it is governing.",
+    repair: "Rewrite the action as one exact consequence-bearing event.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-010",
+    chainLink: "RECORD",
+    title: "Changed-condition: Source record is not attributable",
+    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
+    consequence: "The route has no inspectable basis for reliance.",
+    repair: "Capture and preserve an attributable source record.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-011",
+    chainLink: "CONTINUITY",
+    title: "Changed-condition: Present state was not revalidated",
+    signal: "Identity, version, custody, or environmental state may have changed.",
+    consequence: "The preserved evidence may no longer describe the execution moment.",
+    repair: "Revalidate all changed conditions and rerun dependent gates.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-012",
+    chainLink: "ADMISSIBILITY",
+    title: "Changed-condition: Evidence is relevant but not fit",
+    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
+    consequence: "The route may not rely on the material for this consequence.",
+    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-013",
+    chainLink: "BINDING",
+    title: "Changed-condition: Authority or rule boundary is unresolved",
+    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
+    consequence: "No valid consequence may be bound under the present authority state.",
+    repair: "Resolve authority and the exact binding conditions before commit.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-014",
+    chainLink: "COMMIT",
+    title: "Changed-condition: Decision was not fixed before action",
+    signal: "The determination can still be edited, inferred, or backdated.",
+    consequence: "The record cannot prove pre-execution governance.",
+    repair: "Freeze the determination, reasons, scope, and permitted next action.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-015",
+    chainLink: "EXECUTION",
+    title: "Changed-condition: No technical control receipt exists",
+    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
+    consequence: "The artifact proves policy evaluation, not execution governance.",
+    repair: "Capture a technical receipt showing the determination controlled the action path.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-016",
+    chainLink: "OUTCOME",
+    title: "Changed-condition: Outcome is asserted without closure evidence",
+    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
+    consequence: "The route cannot prove what bound to reality.",
+    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-017",
+    chainLink: "REALITY",
+    title: "Authority-linked: Proposed consequence is not bounded",
+    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
+    consequence: "The route cannot know what it is governing.",
+    repair: "Rewrite the action as one exact consequence-bearing event.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-018",
+    chainLink: "RECORD",
+    title: "Authority-linked: Source record is not attributable",
+    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
+    consequence: "The route has no inspectable basis for reliance.",
+    repair: "Capture and preserve an attributable source record.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-019",
+    chainLink: "CONTINUITY",
+    title: "Authority-linked: Present state was not revalidated",
+    signal: "Identity, version, custody, or environmental state may have changed.",
+    consequence: "The preserved evidence may no longer describe the execution moment.",
+    repair: "Revalidate all changed conditions and rerun dependent gates.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-020",
+    chainLink: "ADMISSIBILITY",
+    title: "Authority-linked: Evidence is relevant but not fit",
+    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
+    consequence: "The route may not rely on the material for this consequence.",
+    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-021",
+    chainLink: "BINDING",
+    title: "Authority-linked: Authority or rule boundary is unresolved",
+    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
+    consequence: "No valid consequence may be bound under the present authority state.",
+    repair: "Resolve authority and the exact binding conditions before commit.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-022",
+    chainLink: "COMMIT",
+    title: "Authority-linked: Decision was not fixed before action",
+    signal: "The determination can still be edited, inferred, or backdated.",
+    consequence: "The record cannot prove pre-execution governance.",
+    repair: "Freeze the determination, reasons, scope, and permitted next action.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-023",
+    chainLink: "EXECUTION",
+    title: "Authority-linked: No technical control receipt exists",
+    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
+    consequence: "The artifact proves policy evaluation, not execution governance.",
+    repair: "Capture a technical receipt showing the determination controlled the action path.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-024",
+    chainLink: "OUTCOME",
+    title: "Authority-linked: Outcome is asserted without closure evidence",
+    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
+    consequence: "The route cannot prove what bound to reality.",
+    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-025",
+    chainLink: "REALITY",
+    title: "Cross-system: Proposed consequence is not bounded",
+    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
+    consequence: "The route cannot know what it is governing.",
+    repair: "Rewrite the action as one exact consequence-bearing event.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-026",
+    chainLink: "RECORD",
+    title: "Cross-system: Source record is not attributable",
+    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
+    consequence: "The route has no inspectable basis for reliance.",
+    repair: "Capture and preserve an attributable source record.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-027",
+    chainLink: "CONTINUITY",
+    title: "Cross-system: Present state was not revalidated",
+    signal: "Identity, version, custody, or environmental state may have changed.",
+    consequence: "The preserved evidence may no longer describe the execution moment.",
+    repair: "Revalidate all changed conditions and rerun dependent gates.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-028",
+    chainLink: "ADMISSIBILITY",
+    title: "Cross-system: Evidence is relevant but not fit",
+    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
+    consequence: "The route may not rely on the material for this consequence.",
+    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-029",
+    chainLink: "BINDING",
+    title: "Cross-system: Authority or rule boundary is unresolved",
+    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
+    consequence: "No valid consequence may be bound under the present authority state.",
+    repair: "Resolve authority and the exact binding conditions before commit.",
+    severity: "blocking",
+  },
+  {
+    id: "PATTERN-030",
+    chainLink: "COMMIT",
+    title: "Cross-system: Decision was not fixed before action",
+    signal: "The determination can still be edited, inferred, or backdated.",
+    consequence: "The record cannot prove pre-execution governance.",
+    repair: "Freeze the determination, reasons, scope, and permitted next action.",
+    severity: "critical",
+  },
+  {
+    id: "PATTERN-031",
+    chainLink: "EXECUTION",
+    title: "Cross-system: No technical control receipt exists",
+    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
+    consequence: "The artifact proves policy evaluation, not execution governance.",
+    repair: "Capture a technical receipt showing the determination controlled the action path.",
+    severity: "warning",
+  },
+  {
+    id: "PATTERN-032",
+    chainLink: "OUTCOME",
+    title: "Cross-system: Outcome is asserted without closure evidence",
+    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
+    consequence: "The route cannot prove what bound to reality.",
+    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
+    severity: "blocking",
+  },
+];
+
+const reviewQuestions: ReviewQuestion[] = [
+  {
+    id: "QUESTION-01",
+    category: "Scope",
+    question: "Can the proposed action be executed in more than one materially different way?",
+    expectedReading: "A readable route allows only the exact committed action.",
+  },
+  {
+    id: "QUESTION-02",
+    category: "Scope",
+    question: "Are subject, destination, amount, model, tool, and time window explicit?",
+    expectedReading: "Every consequence-bearing dimension is bounded.",
+  },
+  {
+    id: "QUESTION-03",
+    category: "Reality",
+    question: "Does the route distinguish observed conditions from assumptions?",
+    expectedReading: "Assumptions remain declared and cannot substitute for present reality.",
+  },
+  {
+    id: "QUESTION-04",
+    category: "Record",
+    question: "Can an outside reviewer identify who captured each material record?",
+    expectedReading: "Every relied-upon item is attributable.",
+  },
+  {
+    id: "QUESTION-05",
+    category: "Record",
+    question: "Does each source have a capture time and stable identity?",
+    expectedReading: "The route can establish timing and source parity.",
+  },
+  {
+    id: "QUESTION-06",
+    category: "Continuity",
+    question: "Could any relevant state have changed after evidence capture?",
+    expectedReading: "Changed-condition triggers are named and checked.",
+  },
+  {
+    id: "QUESTION-07",
+    category: "Continuity",
+    question: "Are route, model, tool, and destination versions preserved?",
+    expectedReading: "The execution moment resolves to one frozen configuration.",
+  },
+  {
+    id: "QUESTION-08",
+    category: "Admissibility",
+    question: "Is relevance being mistaken for sufficiency?",
+    expectedReading: "Relevant material must still be fit for purpose and consequence.",
+  },
+  {
+    id: "QUESTION-09",
+    category: "Admissibility",
+    question: "Are contradictions visible rather than silently averaged?",
+    expectedReading: "Material conflicts produce HOLD or ESCALATE unless the route authorizes resolution.",
+  },
+  {
+    id: "QUESTION-10",
+    category: "Authority",
+    question: "Is the approving actor authorized for this exact action now?",
+    expectedReading: "Authority includes scope, time, delegation, and conflict state.",
+  },
+  {
+    id: "QUESTION-11",
+    category: "Authority",
+    question: "Does human approval exceed the authority source?",
+    expectedReading: "Human involvement cannot cure an invalid authority boundary.",
+  },
+  {
+    id: "QUESTION-12",
+    category: "Binding",
+    question: "Can the reviewer identify the rule that controls each mandatory gate?",
+    expectedReading: "Every gate resolves to a preserved governing condition.",
+  },
+  {
+    id: "QUESTION-13",
+    category: "Binding",
+    question: "Are exceptions explicit and bounded?",
+    expectedReading: "No exception silently becomes general permission.",
+  },
+  {
+    id: "QUESTION-14",
+    category: "Commit",
+    question: "Was the determination fixed before execution?",
+    expectedReading: "The commit is timestamped, immutable, and attributable.",
+  },
+  {
+    id: "QUESTION-15",
+    category: "Commit",
+    question: "Does the commit state the only permitted next action?",
+    expectedReading: "ALLOW, HOLD, DENY, and ESCALATE each constrain the next step.",
+  },
+  {
+    id: "QUESTION-16",
+    category: "Execution",
+    question: "Is there a technical control effect rather than a narrative claim?",
+    expectedReading: "A receipt proves what was released, blocked, held, rerouted, or terminated.",
+  },
+  {
+    id: "QUESTION-17",
+    category: "Execution",
+    question: "Could an alternate path bypass the committed result?",
+    expectedReading: "Bypass attempts are prevented and preserved.",
+  },
+  {
+    id: "QUESTION-18",
+    category: "Outcome",
+    question: "Does outcome evidence show what actually bound to reality?",
+    expectedReading: "Closure is supported rather than inferred.",
+  },
+  {
+    id: "QUESTION-19",
+    category: "Outcome",
+    question: "Are residual risk and correction preserved append-only?",
+    expectedReading: "Later learning does not rewrite the original event.",
+  },
+  {
+    id: "QUESTION-20",
+    category: "Integrity",
+    question: "Do public page, PDF, JSON, and manifest resolve to the same record?",
+    expectedReading: "Every representation maintains parity.",
+  },
+  {
+    id: "QUESTION-21",
+    category: "Integrity",
+    question: "Can an altered component be detected offline?",
+    expectedReading: "Hashes and canonicalization rules reveal tampering.",
+  },
+  {
+    id: "QUESTION-22",
+    category: "Boundary",
+    question: "Does the artifact say what it does not prove?",
+    expectedReading: "The public claim remains no broader than the record.",
+  },
+  {
+    id: "QUESTION-23",
+    category: "Challenge",
+    question: "Can a reviewer dispute the record without erasing it?",
+    expectedReading: "Challenge, correction, supersession, and withdrawal are append-only.",
+  },
+  {
+    id: "QUESTION-24",
+    category: "Transfer",
+    question: "Would the same chain remain visible in another sector?",
+    expectedReading: "Terminology may change; the execution chain may not.",
+  },
+];
+
+const glossary: GlossaryEntry[] = [
+  {
+    term: "Admissibility",
+    definition: "Fitness of evidence and authority for a specific route, purpose, time, jurisdiction, and consequence.",
+    readingUse: "Ask whether the material may be relied upon here—not merely whether it exists.",
+  },
+  {
+    term: "Binding",
+    definition: "Application of governing rules, limits, thresholds, authority scopes, and prohibitions to the preserved facts.",
+    readingUse: "Identify what turns facts into a constrained decision.",
+  },
+  {
+    term: "Commit",
+    definition: "The fixed determination preserved before action.",
+    readingUse: "Verify that ALLOW, HOLD, DENY, or ESCALATE existed before execution.",
+  },
+  {
+    term: "Continuity",
+    definition: "Unbroken linkage of identity, state, version, custody, freshness, and context.",
+    readingUse: "Look for changed conditions that disconnect source from decision.",
+  },
+  {
+    term: "Determination",
+    definition: "The committed runtime state: ALLOW, HOLD, DENY, or ESCALATE.",
+    readingUse: "Read the state together with reasons and permitted next action.",
+  },
+  {
+    term: "Earliest failure",
+    definition: "The first unsupported chain link that controls every later result.",
+    readingUse: "Do not let a downstream success cure an upstream break.",
+  },
+  {
+    term: "Execution effect",
+    definition: "The technical event that releases, holds, blocks, reroutes, rolls back, or terminates an action.",
+    readingUse: "Demand a receipt, not a description.",
+  },
+  {
+    term: "Outcome closure",
+    definition: "Preserved evidence of what actually happened after the determination.",
+    readingUse: "Separate expected effect from actual consequence.",
+  },
+  {
+    term: "Route snapshot",
+    definition: "The frozen version of gate order, thresholds, policy basis, jurisdiction, model, tool, and destination.",
+    readingUse: "Check parity across every export.",
+  },
+  {
+    term: "Evidence manifest",
+    definition: "Inventory of sources, hashes, capture metadata, disclosure, freshness, and admissibility results.",
+    readingUse: "Trace every relied-upon claim to its evidence identity.",
+  },
+  {
+    term: "Authority scope",
+    definition: "The exact actions, subjects, amounts, systems, and time for which an actor may bind consequence.",
+    readingUse: "Approval outside scope is not authority.",
+  },
+  {
+    term: "Fail closed",
+    definition: "Default behavior that prevents execution when a mandatory condition is missing or unresolved.",
+    readingUse: "Look for explicit block or hold behavior.",
+  },
+  {
+    term: "Revalidation",
+    definition: "Required reevaluation after evidence, authority, state, route, model, tool, destination, or threshold changes.",
+    readingUse: "Ask what changed between approval and execution.",
+  },
+  {
+    term: "Repair condition",
+    definition: "The precise condition that must be cured before a held route may proceed.",
+    readingUse: "A valid HOLD names the cure.",
+  },
+  {
+    term: "Bypass resistance",
+    definition: "Prevention of alternate-path release under the same invalid state.",
+    readingUse: "Inspect retries, alternate tools, destinations, and credentials.",
+  },
+  {
+    term: "Record parity",
+    definition: "Agreement among public page, PDF, JSON, manifests, receipts, and route snapshot.",
+    readingUse: "One frozen record must underlie every representation.",
+  },
+  {
+    term: "Canonicalization",
+    definition: "Versioned rules that serialize structured records consistently for hashing.",
+    readingUse: "The same record should produce the same digest.",
+  },
+  {
+    term: "Challenge record",
+    definition: "Append-only dispute, response, decision, amendment, and status history.",
+    readingUse: "Correction must not erase the original event.",
+  },
+  {
+    term: "Demonstration artifact",
+    definition: "A bounded record from a controlled, clearly labeled simulated environment.",
+    readingUse: "Do not mistake demonstration proof for production proof.",
+  },
+  {
+    term: "Production artifact",
+    definition: "A bounded record from an authentic consequential workflow with real systems and authorized participants.",
+    readingUse: "Demand genuine execution effect and outcome evidence.",
+  },
+  {
+    term: "Disclosure boundary",
+    definition: "The rule governing what is public, selective, restricted, or withheld.",
+    readingUse: "Confidentiality may limit disclosure but not integrity commitments.",
+  },
+  {
+    term: "Residual risk",
+    definition: "Remaining uncertainty or exposure after execution or closure.",
+    readingUse: "A successful action can still preserve unresolved risk.",
+  },
+  {
+    term: "Scope-bounded competency",
+    definition: "Demonstrated capability for a defined route, consequence, and level of authority.",
+    readingUse: "Completion alone does not grant operational authority.",
+  },
+  {
+    term: "Proof boundary",
+    definition: "The explicit line between what the artifact establishes and what remains unproven.",
+    readingUse: "Reject claims broader than the preserved event.",
+  },
+];
+
+const DETERMINATION_ORDER: RouteState[] = ["ALLOW", "HOLD", "DENY", "ESCALATE"];
+const CHAIN_ORDER = ["REALITY", "RECORD", "CONTINUITY", "ADMISSIBILITY", "BINDING", "COMMIT", "EXECUTION", "OUTCOME"] as const;
+
+const stateVisual: Record<RouteState, { badge: string; glow: string; ring: string; label: string; index: string }> = {
+  ALLOW: {
+    badge: "border-emerald-300/35 bg-emerald-300/10 text-emerald-100",
+    glow: "from-emerald-400/20 via-emerald-400/5 to-transparent",
+    ring: "border-emerald-300/30",
+    label: "Authorized boundary",
+    index: "text-emerald-200",
+  },
+  HOLD: {
+    badge: "border-amber-300/35 bg-amber-300/10 text-amber-100",
+    glow: "from-amber-400/20 via-amber-400/5 to-transparent",
+    ring: "border-amber-300/30",
+    label: "Repair required",
+    index: "text-amber-200",
+  },
+  DENY: {
+    badge: "border-rose-300/35 bg-rose-300/10 text-rose-100",
+    glow: "from-rose-400/20 via-rose-400/5 to-transparent",
+    ring: "border-rose-300/30",
+    label: "Execution prohibited",
+    index: "text-rose-200",
+  },
+  ESCALATE: {
+    badge: "border-violet-300/35 bg-violet-300/10 text-violet-100",
+    glow: "from-violet-400/20 via-violet-400/5 to-transparent",
+    ring: "border-violet-300/30",
+    label: "Qualified judgment required",
+    index: "text-violet-200",
+  },
 };
 
-function evaluate(gates: GateState) {
-  const failed = gateLabels.filter((gate) => !gates[gate.key]).map((gate) => gate.hold);
-  let decision: Decision = "ALLOW";
-  let reason = "All required conditions are currently satisfied and revalidated.";
+const anchorVisual: Record<AnchorStatus, { card: string; dot: string; word: string }> = {
+  supported: {
+    card: "border-emerald-300/20 bg-emerald-300/[0.045] hover:border-emerald-300/35",
+    dot: "bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.55)]",
+    word: "text-emerald-200",
+  },
+  limited: {
+    card: "border-amber-300/20 bg-amber-300/[0.045] hover:border-amber-300/35",
+    dot: "bg-amber-300 shadow-[0_0_18px_rgba(252,211,77,0.55)]",
+    word: "text-amber-200",
+  },
+  failed: {
+    card: "border-rose-300/20 bg-rose-300/[0.045] hover:border-rose-300/35",
+    dot: "bg-rose-300 shadow-[0_0_18px_rgba(253,164,175,0.55)]",
+    word: "text-rose-200",
+  },
+};
 
-  if (!gates.boundary) {
-    decision = "DENY";
-    reason = "Execution exceeds the approved boundary and may not proceed.";
-  } else if (!gates.authority) {
-    decision = "ESCALATE";
-    reason = "A valid human or institutional authority must resolve the action.";
-  } else if (failed.length > 0) {
-    decision = "HOLD";
-    reason = "One or more admissibility conditions remain unresolved.";
-  }
-
-  const passed = gateLabels.length - failed.length;
-  const score = Math.round((passed / gateLabels.length) * 100);
-  return { decision, reason, failed, passed, score };
-}
-
-function GateToggle({ gate, checked, onChange }: { gate: (typeof gateLabels)[number]; checked: boolean; onChange: (value: boolean) => void }) {
+function MetricCard({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <label className="group flex cursor-pointer gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.018] p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-cyan-300/[0.055] hover:shadow-xl">
-      <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-cyan-400" />
-      <span>
-        <span className="block font-semibold text-white">{gate.label}</span>
-        <span className="mt-1 block text-sm leading-6 text-slate-400">{gate.question}</span>
-      </span>
-    </label>
-  );
-}
-
-function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <article className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
-      <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
-      <p className="mt-2 text-2xl font-black text-white">{value}</p>
-      <p className="mt-2 text-sm leading-6 text-slate-400">{detail}</p>
+    <article className="group relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.045] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300/25">
+      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/55 to-transparent opacity-70" />
+      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">{label}</p>
+      <p className="mt-3 text-3xl font-black tracking-tight text-white">{value}</p>
+      <p className="mt-2 text-xs leading-5 text-slate-400">{detail}</p>
     </article>
   );
 }
 
-function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string; text: string }) {
+function AcademyLink({ href, children }: { href: string; children: ReactNode }) {
   return (
-    <div>
-      <p className="text-xs font-bold uppercase tracking-[0.24em] text-cyan-300">{eyebrow}</p>
-      <h2 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl">{title}</h2>
-      <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">{text}</p>
+    <Link
+      href={href}
+      className="rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-bold text-slate-300 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.07] hover:text-white"
+    >
+      {children}
+    </Link>
+  );
+}
+
+function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
+  return (
+    <div className="max-w-4xl">
+      <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">{eyebrow}</p>
+      <h2 className="mt-3 text-3xl font-black tracking-[-0.035em] text-white sm:text-4xl">{title}</h2>
+      <p className="mt-4 text-sm leading-7 text-slate-400 sm:text-base">{copy}</p>
     </div>
   );
 }
 
-
-function OrbitalGovernanceMap({ score, decision }: { score: number; decision: Decision }) {
-  const nodes = [["Reality", "R"], ["Record", "RE"], ["Continuity", "C"], ["Admissibility", "A"], ["Binding", "B"], ["Commit", "CM"], ["Execution", "E"], ["Outcome", "O"]];
+function ProtocolCard({ step }: { step: ReadingProtocolStep }) {
   return (
-    <div className="governance-orbit relative mx-auto aspect-square w-full max-w-[430px]">
-      <div className="absolute inset-[8%] rounded-full border border-cyan-200/10" />
-      <div className="absolute inset-[20%] rounded-full border border-indigo-200/10" />
-      <div className="absolute inset-[32%] rounded-full border border-white/10" />
-      <div className="absolute inset-[39%] grid place-items-center rounded-full border border-cyan-200/25 bg-[radial-gradient(circle_at_35%_25%,rgba(103,232,249,.24),rgba(8,20,38,.96)_58%)] shadow-[0_0_65px_rgba(34,211,238,.16),inset_0_0_30px_rgba(255,255,255,.04)]">
-        <div className="text-center"><p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">Live determination</p><p className="mt-2 text-2xl font-black tracking-[-0.05em] text-white">{decision}</p><p className="mt-1 text-sm font-black text-cyan-200">{score}% ready</p></div>
+    <article className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.035] p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-white/[0.055]">
+      <div className="absolute right-4 top-3 text-6xl font-black text-white/[0.035]">{step.number}</div>
+      <div className="relative">
+        <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.08] text-xs font-black text-cyan-100">{step.number}</span>
+        <h3 className="mt-5 text-xl font-black text-white">{step.title}</h3>
+        <p className="mt-3 text-sm font-bold leading-6 text-cyan-100">{step.question}</p>
+        <div className="mt-5 rounded-2xl border border-white/8 bg-black/20 p-4">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Required reading evidence</p>
+          <p className="mt-2 text-sm leading-6 text-slate-300">{step.evidence}</p>
+        </div>
+        <div className="mt-3 rounded-2xl border border-rose-300/15 bg-rose-300/[0.04] p-4">
+          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-200">Stop condition</p>
+          <p className="mt-2 text-sm leading-6 text-slate-300">{step.stopCondition}</p>
+        </div>
       </div>
-      {nodes.map(([label, short], index) => {
-        const angle = (index / nodes.length) * Math.PI * 2 - Math.PI / 2;
-        const x = 50 + Math.cos(angle) * 43;
-        const y = 50 + Math.sin(angle) * 43;
-        return <div key={label} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${x}%`, top: `${y}%` }}><div className="group relative grid h-14 w-14 place-items-center rounded-2xl border border-cyan-200/20 bg-[linear-gradient(145deg,rgba(15,38,61,.96),rgba(4,12,24,.95))] shadow-[0_12px_30px_rgba(0,0,0,.36),0_0_24px_rgba(34,211,238,.08)]"><span className="text-[11px] font-black text-cyan-100">{short}</span><span className="pointer-events-none absolute top-full mt-2 whitespace-nowrap rounded-lg border border-white/10 bg-slate-950/95 px-2 py-1 text-[9px] font-bold text-slate-300 opacity-0 shadow-xl transition group-hover:opacity-100">{label}</span></div></div>;
-      })}
-      <div className="orbit-scan absolute inset-[8%] rounded-full border-t border-cyan-200/50" />
-    </div>
+    </article>
   );
 }
 
-function RuntimeRail({ gates }: { gates: GateState }) {
-  return <div className="runtime-rail overflow-hidden rounded-[1.6rem] border border-cyan-200/15 bg-black/20 p-4 shadow-inner"><div className="flex min-w-[760px] items-center gap-2">{gateLabels.map((gate, index) => { const active = gates[gate.key]; return <div key={gate.key} className="flex flex-1 items-center gap-2"><div className={`relative flex min-h-20 flex-1 flex-col justify-center rounded-xl border px-3 py-3 transition ${active ? "border-cyan-200/30 bg-cyan-300/[0.08]" : "border-rose-300/20 bg-rose-300/[0.05]"}`}><span className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? "bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,.9)]" : "bg-rose-300 shadow-[0_0_14px_rgba(253,164,175,.7)]"}`} /><span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">{String(index + 1).padStart(2, "0")}</span><span className="mt-1 text-xs font-black text-white">{gate.label}</span></div>{index < gateLabels.length - 1 && <span className={`h-px w-3 ${active ? "bg-cyan-300/50" : "bg-white/10"}`} />}</div>; })}</div></div>;
+function StateDoctrine({ state }: { state: RouteState }) {
+  const content: Record<RouteState, { title: string; rule: string; effect: string; misuse: string }> = {
+    ALLOW: {
+      title: "Exact permission—not general approval",
+      rule: "Every mandatory condition is satisfied for the exact committed scope.",
+      effect: "Release only the authorized action, destination, model, tool, amount, and time window.",
+      misuse: "Treating ALLOW as permission for adjacent, future, or broader actions.",
+    },
+    HOLD: {
+      title: "Repairable stop—not soft permission",
+      rule: "A required condition is missing, stale, changed, unresolved, or awaiting revalidation.",
+      effect: "Do not execute. Preserve the precise hold reason and repair condition.",
+      misuse: "Allowing execution while paperwork or evidence catches up later.",
+    },
+    DENY: {
+      title: "Prohibited present action",
+      rule: "A hard boundary, invalid authority, inadmissible evidence, or prohibited condition exists.",
+      effect: "Block or terminate the action and prevent alternate-path release under the same state.",
+      misuse: "Rewriting the original denial after later evidence appears.",
+    },
+    ESCALATE: {
+      title: "Transfer of judgment—not approval",
+      rule: "The route requires named human or institutional judgment beyond current authority.",
+      effect: "Route to the designated authority while preserving the unresolved conflict or exception.",
+      misuse: "Treating escalation as a favorable recommendation or implied approval.",
+    },
+  };
+  const item = content[state];
+  const visual = stateVisual[state];
+  return (
+    <article className={`relative overflow-hidden rounded-[28px] border ${visual.ring} bg-white/[0.035] p-6`}>
+      <div className={`absolute inset-0 bg-gradient-to-br ${visual.glow}`} />
+      <div className="relative">
+        <span className={`rounded-full border px-3 py-1.5 text-[10px] font-black tracking-[0.16em] ${visual.badge}`}>{state}</span>
+        <h3 className="mt-5 text-2xl font-black text-white">{item.title}</h3>
+        <div className="mt-5 space-y-4">
+          <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Decision rule</p><p className="mt-2 text-sm leading-6 text-slate-300">{item.rule}</p></div>
+          <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Required effect</p><p className="mt-2 text-sm leading-6 text-slate-300">{item.effect}</p></div>
+          <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-200">Common misuse</p><p className="mt-2 text-sm leading-6 text-slate-300">{item.misuse}</p></div>
+        </div>
+      </div>
+    </article>
+  );
 }
 
-function DecisionBeacon({ score }: { score: number }) {
-  const circumference = 2 * Math.PI * 46;
-  const offset = circumference - (score / 100) * circumference;
-  return <div className="relative grid place-items-center"><svg viewBox="0 0 112 112" className="h-36 w-36 -rotate-90 drop-shadow-[0_0_22px_rgba(34,211,238,.15)]" aria-hidden="true"><circle cx="56" cy="56" r="46" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="7" /><circle cx="56" cy="56" r="46" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} className="transition-all duration-700" /></svg><div className="absolute text-center"><p className="text-3xl font-black tracking-[-0.06em]">{score}%</p><p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] opacity-70">readiness</p></div></div>;
-}
-
-export default function SimulatorPage() {
-  const [selectedId, setSelectedId] = useState(scenarios[0].id);
-  const [gates, setGates] = useState<GateState>(scenarios[0].gates);
-  const [query, setQuery] = useState("");
-  const [domain, setDomain] = useState("All domains");
-  const [difficulty, setDifficulty] = useState("All levels");
-  const [note, setNote] = useState("");
-  const [history, setHistory] = useState<PreservedRun[]>([]);
-  const [activeTab, setActiveTab] = useState<"run" | "architecture" | "history">("run");
-
-  const selected = scenarios.find((scenario) => scenario.id === selectedId) ?? scenarios[0];
-  const result = useMemo(() => evaluate(gates), [gates]);
-  const domains = useMemo(() => ["All domains", ...Array.from(new Set(scenarios.map((scenario) => scenario.domain)))], []);
-  const filtered = useMemo(() => scenarios.filter((scenario) => {
-    const matchesQuery = `${scenario.title} ${scenario.domain} ${scenario.consequence}`.toLowerCase().includes(query.toLowerCase());
-    const matchesDomain = domain === "All domains" || scenario.domain === domain;
-    const matchesDifficulty = difficulty === "All levels" || scenario.difficulty === difficulty;
-    return matchesQuery && matchesDomain && matchesDifficulty;
-  }), [query, domain, difficulty]);
+export default function RouteReadingCenterPage() {
+  const [activeId, setActiveId] = useState(routeExamples[0].id);
+  const [completed, setCompleted] = useState<string[]>([]);
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [saveState, setSaveState] = useState<"idle" | "saved" | "error">("idle");
+  const [patternQuery, setPatternQuery] = useState("");
+  const [patternLink, setPatternLink] = useState("ALL");
+  const [glossaryQuery, setGlossaryQuery] = useState("");
 
   useEffect(() => {
     try {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      const parsed = JSON.parse(raw) as { history?: PreservedRun[]; selectedId?: string; gates?: GateState; note?: string };
-      if (parsed.history) setHistory(parsed.history);
-      if (parsed.selectedId && scenarios.some((item) => item.id === parsed.selectedId)) setSelectedId(parsed.selectedId);
-      if (parsed.gates) setGates(parsed.gates);
-      if (typeof parsed.note === "string") setNote(parsed.note);
+      const saved = JSON.parse(raw) as SavedProgress;
+      if (saved.version !== "2.0") return;
+      setCompleted(saved.completed ?? []);
+      setNotes(saved.notes ?? {});
     } catch {
-      // Local preservation must never block the Academy experience.
+      setSaveState("error");
     }
   }, []);
 
-  useEffect(() => {
+  const activeRoute = useMemo(
+    () => routeExamples.find((route) => route.id === activeId) ?? routeExamples[0],
+    [activeId],
+  );
+
+  const filteredPatterns = useMemo(() => {
+    const query = patternQuery.trim().toLowerCase();
+    return failurePatterns.filter((pattern) => {
+      const matchesLink = patternLink === "ALL" || pattern.chainLink === patternLink;
+      const matchesQuery = !query || [pattern.title, pattern.signal, pattern.consequence, pattern.repair, pattern.chainLink].join(" ").toLowerCase().includes(query);
+      return matchesLink && matchesQuery;
+    });
+  }, [patternLink, patternQuery]);
+
+  const filteredGlossary = useMemo(() => {
+    const query = glossaryQuery.trim().toLowerCase();
+    if (!query) return glossary;
+    return glossary.filter((entry) => [entry.term, entry.definition, entry.readingUse].join(" ").toLowerCase().includes(query));
+  }, [glossaryQuery]);
+
+  const progress = Math.round((completed.length / routeExamples.length) * 100);
+  const supportedCount = activeRoute.anchors.filter((anchor) => anchor.status === "supported").length;
+  const limitedCount = activeRoute.anchors.filter((anchor) => anchor.status === "limited").length;
+  const failedCount = activeRoute.anchors.filter((anchor) => anchor.status === "failed").length;
+  const activeVisual = stateVisual[activeRoute.state];
+
+  function toggleCompleted(id: string) {
+    setCompleted((current) =>
+      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
+    );
+    setSaveState("idle");
+  }
+
+  function saveProgress() {
     try {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify({ history, selectedId, gates, note }));
+      const payload: SavedProgress = {
+        version: "2.0",
+        completed,
+        notes,
+        updatedAt: new Date().toISOString(),
+      };
+      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+      setSaveState("saved");
     } catch {
-      // The learner may continue without local persistence.
+      setSaveState("error");
     }
-  }, [history, selectedId, gates, note]);
-
-  function chooseScenario(id: string) {
-    const next = scenarios.find((scenario) => scenario.id === id) ?? scenarios[0];
-    setSelectedId(next.id);
-    setGates(next.gates);
-    setNote("");
-    setActiveTab("run");
-  }
-
-  function updateGate(key: GateKey, value: boolean) {
-    setGates((current) => ({ ...current, [key]: value }));
-  }
-
-  function preserveRun() {
-    const preserved: PreservedRun = {
-      id: `${Date.now()}-${selected.id}`,
-      scenarioId: selected.id,
-      title: selected.title,
-      decision: result.decision,
-      score: result.score,
-      failed: result.failed,
-      note,
-      createdAt: new Date().toLocaleString(),
-    };
-    setHistory((current) => [preserved, ...current].slice(0, 50));
-    setActiveTab("history");
-  }
-
-  function resetRun() {
-    setGates(selected.gates);
-    setNote("");
-  }
-
-  function clearHistory() {
-    setHistory([]);
   }
 
   return (
-    <main className="simulation-center relative min-h-screen overflow-hidden text-slate-100">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
-        <div className="absolute -left-24 top-24 h-[30rem] w-[30rem] rounded-full bg-cyan-400/[0.08] blur-[110px]" />
-        <div className="absolute right-[-8rem] top-[22rem] h-[34rem] w-[34rem] rounded-full bg-indigo-500/[0.08] blur-[130px]" />
-        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
-        <div className="star-field absolute inset-0 opacity-70" />
-        <div className="absolute inset-0 opacity-[0.055]" style={{ backgroundImage: "linear-gradient(rgba(125,211,252,.65) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,.65) 1px, transparent 1px)", backgroundSize: "52px 52px", maskImage: "linear-gradient(to bottom, black, transparent 78%)" }} />
+    <main className="relative min-h-screen overflow-hidden bg-[#020711] text-slate-100">
+      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.022)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.022)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
+        <div className="absolute -left-28 top-8 h-[460px] w-[460px] rounded-full bg-cyan-500/12 blur-[130px]" />
+        <div className="absolute right-[-140px] top-[28%] h-[500px] w-[500px] rounded-full bg-violet-500/10 blur-[145px]" />
+        <div className="absolute bottom-[-140px] left-[35%] h-[430px] w-[430px] rounded-full bg-emerald-500/8 blur-[145px]" />
       </div>
 
-      <div className="simulation-shell mx-auto w-full max-w-[1540px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 xl:px-10">
-          <header className="hero-vault relative overflow-hidden rounded-[2.6rem] border border-cyan-200/15 bg-[linear-gradient(135deg,rgba(8,24,39,.96),rgba(4,11,22,.92)_55%,rgba(11,24,47,.92))] p-6 shadow-[0_30px_90px_rgba(0,0,0,.42)] ring-1 ring-white/[0.04] backdrop-blur-xl sm:p-8 xl:p-10">
-            <div className="pointer-events-none absolute -right-24 -top-36 h-[34rem] w-[34rem] rounded-full border border-cyan-200/10" />
-            <div className="pointer-events-none absolute right-[-2rem] top-[-2rem] h-56 w-56 rounded-full bg-cyan-300/[0.08] blur-3xl" />
-            <div className="pointer-events-none absolute bottom-[-12rem] left-[25%] h-80 w-80 rounded-full bg-indigo-500/[0.10] blur-[100px]" />
-            <div className="relative z-10 grid gap-10 xl:grid-cols-[1.15fr_.85fr] xl:items-center">
-              <div>
-                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-200/20 bg-cyan-300/[0.055] px-4 py-2 shadow-[0_0_30px_rgba(34,211,238,.08)]"><span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,.9)]" /><p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200">TA-14 Academy · Governed practice environment</p></div>
-                <h1 className="mt-7 max-w-5xl bg-gradient-to-br from-white via-cyan-50 to-cyan-300 bg-clip-text text-5xl font-black tracking-[-0.065em] text-transparent sm:text-6xl xl:text-[5.35rem] xl:leading-[.93]">Simulation<br className="hidden sm:block" /> Center</h1>
-                <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">Test whether a consequential action has earned the right to proceed before consequence binds to reality. Manipulate evidence, authority, continuity, boundary, dependencies, and revalidation—then watch the determination change in real time.</p>
-                <div className="mt-7 flex flex-wrap gap-3"><button type="button" onClick={() => setActiveTab("run")} className="rounded-xl bg-gradient-to-r from-cyan-200 to-sky-300 px-5 py-3 text-sm font-black text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,.22)] transition hover:-translate-y-0.5">Enter live laboratory →</button><button type="button" onClick={() => setActiveTab("architecture")} className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-black text-white transition hover:border-cyan-200/30 hover:bg-white/[0.07]">Inspect runtime architecture</button></div>
-                <div className="mt-7 max-w-xl rounded-2xl border border-cyan-300/20 bg-[linear-gradient(90deg,rgba(34,211,238,.08),rgba(99,102,241,.04))] px-5 py-4 text-sm leading-6 text-cyan-50 shadow-inner"><span className="font-black text-cyan-200">Governing principle:</span> No admissible evidence. No admissible execution.</div>
+      <div className="relative mx-auto max-w-[1480px] px-4 py-6 sm:px-7 lg:px-10 lg:py-9">
+        <header className="rounded-[28px] border border-white/10 bg-[#07111f]/75 px-5 py-4 shadow-[0_28px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:px-7">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="flex items-center gap-4">
+              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 text-sm font-black tracking-[0.12em] text-cyan-100 shadow-[0_0_30px_rgba(34,211,238,0.12)]">
+                T14
               </div>
-              <OrbitalGovernanceMap score={result.score} decision={result.decision} />
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">TA-14 Academy</p>
+                <p className="mt-1 text-sm font-bold text-white">Route Reading Center</p>
+              </div>
             </div>
 
-            <div className="relative z-10 mt-9 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-              <Metric label="Scenarios" value={String(scenarios.length)} detail="Consequence-bearing practice environments" />
-              <Metric label="Runtime gates" value="24" detail="Complete governing chain represented" />
-              <Metric label="Preserved runs" value={String(history.length)} detail="Local learner simulation records" />
-              <Metric label="Current readiness" value={`${result.score}%`} detail={`${result.passed} of ${gateLabels.length} active gates satisfied`} />
-            </div>
-          </header>
+            <nav className="flex flex-wrap gap-2" aria-label="Academy navigation">
+              <AcademyLink href="/academy/mission-control">Mission Control</AcademyLink>
+              <AcademyLink href="/academy/architecture-explorer">Architecture Explorer</AcademyLink>
+              <AcademyLink href="/academy/simulator">Simulation Center</AcademyLink>
+            </nav>
+          </div>
+        </header>
 
-          <div className="mt-6 flex flex-wrap gap-2">
-            {(["run", "architecture", "history"] as const).map((tab) => (
-              <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`rounded-xl border px-4 py-3 text-sm font-black capitalize transition ${activeTab === tab ? "border-cyan-300/40 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-white/[0.03] text-slate-400 hover:text-white"}`}>{tab === "run" ? "Simulation workspace" : tab === "architecture" ? "Architecture correspondence" : "Preserved history"}</button>
-            ))}
+        <section className="relative mt-6 overflow-hidden rounded-[36px] border border-white/10 bg-[#07111f]/78 px-6 py-10 shadow-[0_36px_110px_rgba(0,0,0,0.38)] backdrop-blur-2xl sm:px-9 lg:px-12 lg:py-14">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_0%,rgba(34,211,238,0.16),transparent_34%),radial-gradient(circle_at_88%_34%,rgba(139,92,246,0.13),transparent_32%)]" />
+          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
+
+          <div className="relative grid gap-10 xl:grid-cols-[1.25fr_0.75fr] xl:items-end">
+            <div>
+              <div className="inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-2">
+                <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.7)]" />
+                <span className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-100">Read before you build</span>
+              </div>
+              <h1 className="mt-6 max-w-5xl text-4xl font-black leading-[0.98] tracking-[-0.045em] text-white sm:text-5xl lg:text-7xl">
+                Learn to read the route before you trust the result.
+              </h1>
+              <p className="mt-6 max-w-4xl text-base leading-8 text-slate-300 sm:text-lg">
+                Inspect complete and defective routes across all four determination states. Follow the chain from reality to outcome, find the earliest unsupported condition, and distinguish permission from completion.
+              </p>
+            </div>
+
+            <aside className="rounded-[28px] border border-white/10 bg-black/20 p-6 shadow-inner shadow-black/20">
+              <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-500">Governing principle</p>
+              <blockquote className="mt-4 text-2xl font-black leading-tight text-white">
+                No admissible evidence.
+                <br />
+                <span className="text-cyan-200">No admissible execution.</span>
+              </blockquote>
+              <p className="mt-4 text-sm leading-6 text-slate-400">
+                The first unsupported link controls the route. Later confidence cannot repair an earlier failure.
+              </p>
+            </aside>
           </div>
 
-          <div className="mt-4 overflow-x-auto pb-1"><RuntimeRail gates={gates} /></div>
+          <div className="relative mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+            <MetricCard label="Examples reviewed" value={`${completed.length}/${routeExamples.length}`} detail="Four canonical decision states" />
+            <MetricCard label="Learning progress" value={`${progress}%`} detail="Preserved locally in this browser" />
+            <MetricCard label="Active route support" value={`${supportedCount}/8`} detail={`${limitedCount} limited · ${failedCount} failed`} />
+            <MetricCard label="Reading discipline" value="Earliest failure" detail="Read from reality forward" />
+          </div>
 
-          {activeTab === "run" && (
-            <div className="mt-6 space-y-6">
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 backdrop-blur sm:p-8">
-                <SectionTitle eyebrow="Scenario library" title="Choose a consequence-bearing action" text="Every simulation begins with an exact action, a real consequence, a bounded authority, and conditions that may drift before execution." />
-                <div className="mt-6 grid gap-3 lg:grid-cols-[1fr_220px_180px]">
-                  <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search scenarios, domains, or consequences" className="rounded-xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
-                  <select value={domain} onChange={(event) => setDomain(event.target.value)} className="rounded-xl border border-white/10 bg-[#07101d] px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40">{domains.map((item) => <option key={item}>{item}</option>)}</select>
-                  <select value={difficulty} onChange={(event) => setDifficulty(event.target.value)} className="rounded-xl border border-white/10 bg-[#07101d] px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/40"><option>All levels</option><option>Intermediate</option><option>Advanced</option><option>Expert</option></select>
-                </div>
+          <div className="relative mt-5 overflow-hidden rounded-full border border-white/10 bg-black/25 p-1">
+            <div className="h-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 transition-all duration-700" style={{ width: `${Math.max(progress, 2)}%` }} />
+          </div>
+        </section>
 
-                <div className="mt-6 grid gap-4 md:grid-cols-2 2xl:grid-cols-3">
-                  {filtered.map((scenario) => (
-                    <button key={scenario.id} type="button" onClick={() => chooseScenario(scenario.id)} className={`group relative overflow-hidden rounded-[1.35rem] border p-5 text-left shadow-lg transition duration-300 ${selectedId === scenario.id ? "border-cyan-300/50 bg-gradient-to-br from-cyan-300/[0.13] to-blue-500/[0.06] shadow-cyan-950/30 ring-1 ring-cyan-200/10" : "border-white/10 bg-gradient-to-br from-white/[0.045] to-white/[0.015] hover:-translate-y-1 hover:border-cyan-200/25 hover:bg-white/[0.06] hover:shadow-2xl"}`}>
-                      <div className="flex items-center justify-between gap-3"><span className="rounded-full border border-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">{scenario.domain}</span><span className="text-xs font-bold text-cyan-300">{scenario.difficulty}</span></div>
-                      <h3 className="mt-4 text-lg font-black text-white">{scenario.title}</h3>
-                      <p className="mt-3 text-sm leading-6 text-slate-400">{scenario.consequence}</p>
-                      <div className="mt-4 flex items-center justify-between text-xs"><span className="text-slate-500">Expected teaching state</span><span className={`rounded-full border px-2.5 py-1 font-black ${decisionStyle[scenario.expected]}`}>{scenario.expected}</span></div>
+        <section className="mt-6 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
+          <aside className="xl:sticky xl:top-6 xl:self-start">
+            <div className="rounded-[30px] border border-white/10 bg-[#07111f]/78 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl">
+              <div className="px-2 pb-4 pt-2">
+                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Demonstration routes</p>
+                <p className="mt-2 text-sm leading-6 text-slate-400">Compare the same execution chain across four final states.</p>
+              </div>
+
+              <div className="space-y-3">
+                {routeExamples.map((route, index) => {
+                  const isActive = route.id === activeRoute.id;
+                  const isComplete = completed.includes(route.id);
+                  const visual = stateVisual[route.state];
+
+                  return (
+                    <button
+                      key={route.id}
+                      type="button"
+                      onClick={() => setActiveId(route.id)}
+                      className={`group relative w-full overflow-hidden rounded-[24px] border p-4 text-left transition-all duration-300 ${
+                        isActive
+                          ? `${visual.ring} bg-white/[0.075] shadow-[0_20px_55px_rgba(0,0,0,0.24)]`
+                          : "border-white/8 bg-black/15 hover:-translate-y-0.5 hover:border-white/18 hover:bg-white/[0.045]"
+                      }`}
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-br ${visual.glow} transition-opacity group-hover:opacity-70 ${isActive ? "opacity-100" : "opacity-0"}`} />
+                      <div className="relative">
+                        <div className="flex items-center justify-between gap-3">
+                          <span className={`text-xs font-black tracking-[0.2em] ${visual.index}`}>{String(index + 1).padStart(2, "0")}</span>
+                          <span className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-[0.16em] ${visual.badge}`}>{route.state}</span>
+                        </div>
+                        <h2 className="mt-4 text-base font-black leading-snug text-white">{route.title}</h2>
+                        <p className="mt-1.5 text-xs leading-5 text-slate-400">{route.domain}</p>
+                        <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-3">
+                          <span className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">{visual.label}</span>
+                          {isComplete ? <span className="text-xs font-bold text-emerald-200">Reviewed ✓</span> : <span className="text-xs text-slate-600">Open →</span>}
+                        </div>
+                      </div>
                     </button>
-                  ))}
-                </div>
-              </section>
-
-              <section className="grid gap-6 2xl:grid-cols-[0.88fr_1.12fr]">
-                <div className="space-y-6">
-                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                    <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Selected simulation</p>
-                    <h2 className="mt-4 text-3xl font-black text-white">{selected.title}</h2>
-                    <p className="mt-4 text-base leading-7 text-slate-300">{selected.consequence}</p>
-                    <dl className="mt-6 space-y-4">
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Evidence required</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.evidenceNeed}</dd></div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Authority required</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.authorityNeed}</dd></div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Execution boundary</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.boundary}</dd></div>
-                      <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4"><dt className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Revalidation triggers</dt><dd className="mt-2 text-sm leading-6 text-slate-300">{selected.drift}</dd></div>
-                    </dl>
-                  </article>
-
-                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                    <h3 className="text-xl font-black text-white">Learner observation</h3>
-                    <p className="mt-2 text-sm leading-6 text-slate-400">Record why the action should be allowed, held, denied, or escalated. Notes are preserved locally with the run.</p>
-                    <textarea value={note} onChange={(event) => setNote(event.target.value)} rows={8} placeholder="Identify the earliest failed condition, the evidence needed to cure it, and whether revalidation could change the determination." className="mt-5 w-full rounded-2xl border border-white/10 bg-black/20 p-4 text-sm leading-6 text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
-                  </article>
-                </div>
-
-                <div className="space-y-6">
-                  <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionTitle eyebrow="Gate laboratory" title="Change the governing conditions" text="A checked condition is currently supported. An unchecked condition remains unresolved and must stay visible." /><button type="button" onClick={resetRun} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 hover:bg-white/[0.05]">Reset scenario</button></div>
-                    <div className="mt-6 grid gap-3 md:grid-cols-2">{gateLabels.map((gate) => <GateToggle key={gate.key} gate={gate} checked={gates[gate.key]} onChange={(value) => updateGate(gate.key, value)} />)}</div>
-                  </article>
-
-                  <article className={`decision-vault relative overflow-hidden rounded-[2.25rem] border p-6 shadow-[0_28px_80px_rgba(0,0,0,.34)] sm:p-8 ${decisionStyle[result.decision]}`}>
-                    <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full border border-current/10" />
-                    <div className="pointer-events-none absolute -bottom-28 left-10 h-60 w-60 rounded-full bg-current/[0.05] blur-3xl" />
-                    <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] opacity-70">Current determination</p><p className="mt-3 text-5xl font-black tracking-[-0.065em] sm:text-6xl">{result.decision}</p><p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] opacity-60">{result.passed} of {gateLabels.length} modeled conditions supported</p></div><DecisionBeacon score={result.score} /></div>
-                    <p className="mt-6 text-base font-semibold leading-7">{result.reason}</p>
-                    {result.failed.length > 0 ? <div className="mt-6 space-y-2">{result.failed.map((failure) => <div key={failure} className="rounded-xl border border-current/20 bg-black/10 px-4 py-3 text-sm">{failure}</div>)}</div> : <div className="mt-6 rounded-xl border border-current/20 bg-black/10 px-4 py-3 text-sm">All modeled conditions are supported. Preserve the run before treating the determination as a learning artifact.</div>}
-                    <div className="mt-6 flex flex-wrap gap-3"><button type="button" onClick={preserveRun} className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-slate-100">Preserve simulation run</button><Link href="/academy/review" className="rounded-xl border border-current/25 px-5 py-3 text-sm font-black hover:bg-black/10">Open Review Workspace →</Link></div>
-                  </article>
-                </div>
-              </section>
+                  );
+                })}
+              </div>
             </div>
-          )}
+          </aside>
 
-          {activeTab === "architecture" && (
-            <div className="mt-6 space-y-6">
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Architecture orientation" title="Eight visible anchors. One complete runtime chain." text="The public anchors orient the learner. The 24-link runtime architecture governs the full movement from purpose to preserved outcome." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-4">{anchors.map((anchor) => <article key={anchor.number} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><p className="text-sm font-black text-cyan-300">{anchor.number}</p><h3 className="mt-3 text-xl font-black text-white">{anchor.name}</h3><p className="mt-3 text-sm font-semibold leading-6 text-slate-300">{anchor.question}</p><p className="mt-3 text-sm leading-6 text-slate-500">{anchor.proof}</p></article>)}</div></section>
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Complete chain" title="Twenty-four runtime links" text="A simulation may expose failure at any link. The earliest unresolved link controls the route; later completion cannot cure an earlier break." /><div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">{runtimeLinks.map((link) => <article key={link.number} className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"><div className="flex items-center gap-3"><span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">{String(link.number).padStart(2, "0")}</span><h3 className="font-black text-white">{link.name}</h3></div><p className="mt-4 text-sm leading-6 text-slate-300">{link.function}</p><p className="mt-3 text-sm leading-6 text-slate-500">{link.failure}</p></article>)}</div></section>
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Failure replay laboratory"
-                  title="Inject one material change at a time"
-                  text="These drills teach the learner to stop at the earliest failed runtime link, identify the missing proof, and select the correct fail-closed response."
-                />
-                <div className="mt-7 grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
-                  {failureDrills.map((drill) => (
-                    <article
-                      key={drill.link}
-                      className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">
-                          {String(drill.link).padStart(2, "0")}
-                        </span>
-                        <span className={`rounded-full border px-3 py-1 text-[10px] font-black ${decisionStyle[drill.correctResponse]}`}>
-                          {drill.correctResponse}
-                        </span>
-                      </div>
-                      <h3 className="mt-4 text-lg font-black text-white">
-                        {drill.title}
-                      </h3>
-                      <div className="mt-4 space-y-3">
-                        <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                            Injected change
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            {drill.injectedChange}
-                          </p>
-                        </div>
-                        <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                            Learner task
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            {drill.learnerTask}
-                          </p>
-                        </div>
-                        <div className="rounded-xl border border-white/10 bg-black/10 p-4">
-                          <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">
-                            Evidence to seek
-                          </p>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">
-                            {drill.evidenceToSeek}
-                          </p>
-                        </div>
-                      </div>
-                      <p className="mt-4 text-sm leading-6 text-cyan-100">
-                        {drill.teachingPoint}
-                      </p>
-                    </article>
-                  ))}
+          <div className="min-w-0 space-y-6">
+            <article className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#07111f]/80 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <div className={`absolute inset-0 bg-gradient-to-br ${activeVisual.glow}`} />
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
+
+              <div className="relative">
+                <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{activeRoute.domain}</p>
+                    <h2 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">{activeRoute.title}</h2>
+                  </div>
+                  <div className="flex flex-col items-start gap-2 lg:items-end">
+                    <span className={`rounded-full border px-5 py-2.5 text-xs font-black tracking-[0.2em] ${activeVisual.badge}`}>{activeRoute.state}</span>
+                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{activeVisual.label}</span>
+                  </div>
                 </div>
-              </section>
 
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Structured debrief"
-                  title="Explain what the run proved—and what it did not"
-                  text="A learner must be able to distinguish an observed condition from an inference, a preserved record from a claim, and a supported determination from a preferred result."
-                />
-                <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {debriefPrompts.map((prompt) => (
-                    <article
-                      key={prompt.number}
-                      className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="text-sm font-black text-cyan-300">
-                          {String(prompt.number).padStart(2, "0")}
-                        </span>
-                        <h3 className="font-black text-white">
-                          {prompt.stage}
-                        </h3>
+                <div className="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+                  <section className="rounded-[25px] border border-white/10 bg-black/22 p-5 sm:p-6">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">Proposed consequence</p>
+                    <p className="mt-3 text-lg font-bold leading-8 text-white">{activeRoute.consequence}</p>
+                  </section>
+                  <section className="rounded-[25px] border border-white/10 bg-white/[0.04] p-5 sm:p-6">
+                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">Reading result</p>
+                    <p className="mt-3 text-sm leading-7 text-slate-300">{activeRoute.summary}</p>
+                  </section>
+                </div>
+
+                {activeRoute.failure ? (
+                  <div className="mt-5 rounded-[24px] border border-amber-300/20 bg-amber-300/[0.055] p-5">
+                    <div className="flex items-start gap-4">
+                      <div className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-amber-300/25 bg-amber-300/10 text-sm font-black text-amber-100">!</div>
+                      <div>
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-200">Earliest controlling condition</p>
+                        <p className="mt-2 text-sm leading-6 text-amber-50">{activeRoute.failure}</p>
                       </div>
-                      <div className="mt-4 space-y-3 text-sm leading-6">
-                        <p className="text-slate-300">
-                          {prompt.observation}
-                        </p>
-                        <p className="text-slate-400">
-                          {prompt.challenge}
-                        </p>
-                        <p className="text-slate-500">
-                          {prompt.preservation}
-                        </p>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-5 rounded-[24px] border border-emerald-300/20 bg-emerald-300/[0.055] p-5">
+                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-200">Route integrity</p>
+                    <p className="mt-2 text-sm leading-6 text-emerald-50">Every required link is supported for the exact bounded action.</p>
+                  </div>
+                )}
+              </div>
+            </article>
+
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/72 p-5 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-7 lg:p-9">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Architecture correspondence</p>
+                  <h2 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl">Read the eight-link chain in order.</h2>
+                </div>
+                <div className="flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-[0.14em]">
+                  <span className="rounded-full border border-emerald-300/20 bg-emerald-300/[0.06] px-3 py-1.5 text-emerald-200">{supportedCount} supported</span>
+                  <span className="rounded-full border border-amber-300/20 bg-amber-300/[0.06] px-3 py-1.5 text-amber-200">{limitedCount} limited</span>
+                  <span className="rounded-full border border-rose-300/20 bg-rose-300/[0.06] px-3 py-1.5 text-rose-200">{failedCount} failed</span>
+                </div>
+              </div>
+
+              <div className="relative mt-7 grid gap-4 md:grid-cols-2">
+                <div className="pointer-events-none absolute bottom-0 left-7 top-0 hidden w-px bg-gradient-to-b from-cyan-300/40 via-white/10 to-transparent md:block" />
+                {activeRoute.anchors.map((anchor, index) => {
+                  const visual = anchorVisual[anchor.status];
+                  return (
+                    <article key={anchor.label} className={`group relative rounded-[24px] border p-5 transition duration-300 hover:-translate-y-0.5 ${visual.card}`}>
+                      <div className="flex items-start gap-4">
+                        <div className="relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-[#07111f] text-xs font-black text-cyan-100 shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
+                          {String(index + 1).padStart(2, "0")}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-center justify-between gap-3">
+                            <h3 className="text-lg font-black text-white">{anchor.label}</h3>
+                            <span className={`inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] ${visual.word}`}>
+                              <span className={`h-2 w-2 rounded-full ${visual.dot}`} />
+                              {anchor.status}
+                            </span>
+                          </div>
+                          <p className="mt-2 text-sm leading-6 text-slate-300">{anchor.value}</p>
+                        </div>
                       </div>
                     </article>
-                  ))}
-                </div>
-              </section>
-
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Competency evidence"
-                  title="Score demonstrated capability, not attendance"
-                  text="The rubric makes progression inspectable. A learner advances by producing bounded evidence of capability, not by clicking through the simulation."
-                />
-                <div className="mt-7 overflow-x-auto rounded-2xl border border-white/10">
-                  <table className="min-w-[1100px] w-full border-collapse text-left">
-                    <thead className="bg-white/[0.05]">
-                      <tr>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Capability
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Developing
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Proficient
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Advanced
-                        </th>
-                        <th className="border-b border-white/10 p-4 text-xs font-black uppercase tracking-[0.16em] text-slate-400">
-                          Required evidence
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {competencyCriteria.map((criterion) => (
-                        <tr
-                          key={criterion.id}
-                          className="border-b border-white/10 last:border-b-0"
-                        >
-                          <td className="p-4 align-top text-sm font-black text-white">
-                            {criterion.capability}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-slate-500">
-                            {criterion.developing}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-slate-300">
-                            {criterion.proficient}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-cyan-100">
-                            {criterion.advanced}
-                          </td>
-                          <td className="p-4 align-top text-sm leading-6 text-slate-400">
-                            {criterion.evidence}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-
-              <section className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-                <SectionTitle
-                  eyebrow="Operating constitution"
-                  title="Twenty-four principles governing every simulation"
-                  text="These principles prevent the learning environment from rewarding completion, confidence, or favorable outcomes when the underlying execution has not earned standing."
-                />
-                <div className="mt-7 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                  {operatingPrinciples.map((principle) => (
-                    <article
-                      key={principle.number}
-                      className="rounded-2xl border border-white/10 bg-white/[0.025] p-5"
-                    >
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-cyan-300/20 bg-cyan-300/[0.06] text-xs font-black text-cyan-200">
-                          {String(principle.number).padStart(2, "0")}
-                        </span>
-                        <h3 className="font-black text-white">
-                          {principle.title}
-                        </h3>
-                      </div>
-                      <p className="mt-4 text-sm font-semibold leading-6 text-slate-300">
-                        {principle.rule}
-                      </p>
-                      <p className="mt-3 text-sm leading-6 text-slate-500">
-                        {principle.practice}
-                      </p>
-                    </article>
-                  ))}
-                </div>
-              </section>
-
-              <section className="grid gap-6 xl:grid-cols-2"><article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8"><SectionTitle eyebrow="Trust distinction" title="Verified does not mean admissible" text="Zero Trust can validate actor, request, role, device, and access while the exact execution still lacks current evidence, valid authority, preserved continuity, or a bounded consequence." /><div className="mt-6 space-y-3">{["Identity answers who or what is acting.","Access answers what the actor may reach.","Admissibility answers whether this exact action may bind to reality now.","Revalidation answers whether that permission still holds immediately before execution."].map((item) => <div key={item} className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-sm leading-6 text-slate-300">{item}</div>)}</div></article><article className="rounded-[2rem] border border-amber-300/20 bg-amber-300/[0.05] p-6 sm:p-8"><SectionTitle eyebrow="Constitutional rule" title="The earliest failure governs" text="A route does not average its way into permission. One unresolved condition is enough to hold, deny, or escalate the action before consequence occurs." /><div className="mt-6 rounded-2xl border border-amber-300/20 bg-black/10 p-5 text-sm leading-7 text-amber-100">Completion is not evidence. Confidence is not authority. Verification is not standing. A favorable outcome does not retroactively make an inadmissible execution permissible.</div></article></section>
-            </div>
-          )}
-
-          {activeTab === "history" && (
-            <section className="mt-6 rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6 sm:p-8">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between"><SectionTitle eyebrow="Preserved learning record" title="Simulation history" text="Each preserved run captures the modeled conditions, determination, failed gates, learner note, and timestamp. These local records are learning artifacts, not production authorization." />{history.length > 0 && <button type="button" onClick={clearHistory} className="rounded-xl border border-rose-300/25 px-4 py-3 text-sm font-bold text-rose-200 hover:bg-rose-300/[0.06]">Clear local history</button>}</div>
-              {history.length === 0 ? <div className="mt-8 rounded-2xl border border-dashed border-white/15 p-10 text-center"><p className="text-lg font-black text-white">No preserved runs yet</p><p className="mt-3 text-sm text-slate-400">Complete a simulation and preserve the determination to create the first learning record.</p><button type="button" onClick={() => setActiveTab("run")} className="mt-5 rounded-xl bg-cyan-300 px-5 py-3 text-sm font-black text-slate-950">Run first simulation →</button></div> : <div className="mt-7 space-y-4">{history.map((run) => <article key={run.id} className="rounded-2xl border border-white/10 bg-white/[0.03] p-5"><div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-bold uppercase tracking-[0.18em] text-slate-500">{run.createdAt}</p><h3 className="mt-2 text-lg font-black text-white">{run.title}</h3></div><div className="flex items-center gap-3"><span className={`rounded-full border px-3 py-1.5 text-xs font-black ${decisionStyle[run.decision]}`}>{run.decision}</span><span className="rounded-full border border-white/10 px-3 py-1.5 text-xs font-black text-slate-300">{run.score}%</span></div></div>{run.failed.length > 0 && <div className="mt-4 flex flex-wrap gap-2">{run.failed.map((failure) => <span key={failure} className="rounded-lg border border-white/10 bg-black/10 px-3 py-2 text-xs text-slate-400">{failure}</span>)}</div>}{run.note && <p className="mt-4 rounded-xl border border-white/10 bg-black/10 p-4 text-sm leading-6 text-slate-300">{run.note}</p>}<button type="button" onClick={() => chooseScenario(run.scenarioId)} className="mt-4 text-sm font-black text-cyan-300 hover:text-cyan-200">Reopen scenario →</button></article>)}</div>}
+                  );
+                })}
+              </div>
             </section>
-          )}
 
-          <section className="mt-6 grid gap-6 xl:grid-cols-3">
-            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Next governed practice</p><h3 className="mt-3 text-xl font-black text-white">Route Construction Lab</h3><p className="mt-3 text-sm leading-6 text-slate-400">Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction-lab" className="mt-5 inline-flex text-sm font-black text-cyan-300">Build a route →</Link></article>
-            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Challenge the result</p><h3 className="mt-3 text-xl font-black text-white">Review Workspace</h3><p className="mt-3 text-sm leading-6 text-slate-400">Preserve findings, objections, corrections, and version history without erasing uncertainty.</p><Link href="/academy/review" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open review →</Link></article>
-            <article className="rounded-[2rem] border border-white/[0.09] bg-[linear-gradient(145deg,rgba(8,20,34,.88),rgba(3,10,20,.78))] shadow-[0_20px_60px_rgba(0,0,0,.24)] ring-1 ring-white/[0.025] p-6"><p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Prove capability</p><h3 className="mt-3 text-xl font-black text-white">Assessment Center</h3><p className="mt-3 text-sm leading-6 text-slate-400">Separate attendance and completion from demonstrated, scope-bounded competency.</p><Link href="/academy/assessment" className="mt-5 inline-flex text-sm font-black text-cyan-300">Open assessment →</Link></article>
-          </section>
+            <section className="grid gap-6 lg:grid-cols-2">
+              <article className="rounded-[30px] border border-white/10 bg-[#07111f]/75 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-2xl sm:p-7">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-cyan-300">Repair condition</p>
+                <h2 className="mt-3 text-2xl font-black text-white">What must change?</h2>
+                <p className="mt-4 text-sm leading-7 text-slate-300">{activeRoute.repair}</p>
+              </article>
+              <article className="rounded-[30px] border border-white/10 bg-[#07111f]/75 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-2xl sm:p-7">
+                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-violet-300">Learning objective</p>
+                <h2 className="mt-3 text-2xl font-black text-white">What does this state teach?</h2>
+                <p className="mt-4 text-sm leading-7 text-slate-300">{activeRoute.lesson}</p>
+              </article>
+            </section>
 
-          <footer className="mt-10 border-t border-white/10 py-8 text-sm text-slate-500"><div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><p>TA-14 Academy · Seventh major door of the TA-14 AI Governance Exchange</p><p>No admissible evidence. No admissible execution.</p></div></footer>
-        </div>
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/80 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Learner analysis</p>
+                  <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">Preserve your reading of the route.</h2>
+                </div>
+                <span className="text-xs font-bold text-slate-500">Saved locally</span>
+              </div>
+              <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
+                Identify the earliest failed or limited condition, explain why the final state follows, and state what evidence or authority would be required to change it.
+              </p>
 
-      <style jsx global>{`
-        .simulation-center { isolation: isolate; background: radial-gradient(circle at 50% -10%, rgba(14,116,144,.12), transparent 36%), linear-gradient(180deg,rgba(2,8,18,.08),rgba(2,8,18,.34)); }
-        .star-field { background-image: radial-gradient(circle at 12% 18%, rgba(255,255,255,.55) 0 1px, transparent 1.5px), radial-gradient(circle at 68% 22%, rgba(103,232,249,.45) 0 1px, transparent 1.5px), radial-gradient(circle at 86% 58%, rgba(255,255,255,.35) 0 1px, transparent 1.5px), radial-gradient(circle at 34% 74%, rgba(129,140,248,.4) 0 1px, transparent 1.5px); background-size: 280px 280px,360px 360px,440px 440px,520px 520px; mask-image: linear-gradient(to bottom,black,transparent 82%); }
-        .hero-vault::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.035) 43%,transparent 61%); transform:translateX(-120%); animation:vault-sheen 9s ease-in-out infinite; }
-        .governance-orbit::before { content:""; position:absolute; inset:15%; border-radius:999px; background:conic-gradient(from 180deg,transparent,rgba(34,211,238,.16),transparent 36%,rgba(99,102,241,.13),transparent 70%); filter:blur(12px); animation:orbit-glow 12s linear infinite; }
-        .orbit-scan { animation:orbit-spin 9s linear infinite; box-shadow:0 -8px 28px rgba(34,211,238,.12); }
-        .runtime-rail { background-image:linear-gradient(90deg,rgba(34,211,238,.025) 1px,transparent 1px); background-size:34px 100%; }
-        .decision-vault::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(125deg,rgba(255,255,255,.05),transparent 30%,transparent 70%,rgba(255,255,255,.025)); }
-        @keyframes orbit-spin { to { transform:rotate(360deg); } }
-        @keyframes orbit-glow { to { transform:rotate(-360deg); } }
-        @keyframes vault-sheen { 0%,70% { transform:translateX(-120%); } 88%,100% { transform:translateX(120%); } }
-        .simulation-center ::selection { background: rgba(103, 232, 249, .28); color: #fff; }
-        .simulation-center input,
-        .simulation-center select,
-        .simulation-center textarea { box-shadow: inset 0 1px 0 rgba(255,255,255,.035); }
-        .simulation-center button,
-        .simulation-center a { -webkit-tap-highlight-color: transparent; }
-        .simulation-center article,
-        .simulation-center section { transform: translateZ(0); }
-        @media (prefers-reduced-motion: no-preference) {
-          .simulation-shell > header { animation: simulation-rise .55s ease-out both; }
-          .simulation-shell > div,
-          .simulation-shell > section { animation: simulation-rise .65s .05s ease-out both; }
-        }
-        @keyframes simulation-rise {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
+              <textarea
+                id="route-notes"
+                value={notes[activeRoute.id] ?? ""}
+                onChange={(event) => {
+                  setNotes((current) => ({ ...current, [activeRoute.id]: event.target.value }));
+                  setSaveState("idle");
+                }}
+                rows={8}
+                className="mt-6 w-full resize-y rounded-[24px] border border-white/10 bg-black/25 p-5 text-sm leading-7 text-white shadow-inner shadow-black/20 outline-none transition placeholder:text-slate-600 focus:border-cyan-300/40 focus:ring-4 focus:ring-cyan-300/[0.06]"
+                placeholder="Example: The route cannot proceed because continuity was not revalidated after the identity state changed. The repair condition is..."
+              />
+
+              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <button
+                  type="button"
+                  onClick={() => toggleCompleted(activeRoute.id)}
+                  className={`rounded-2xl border px-5 py-3 text-sm font-black transition ${
+                    completed.includes(activeRoute.id)
+                      ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-100"
+                      : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/35 hover:bg-cyan-300/[0.07]"
+                  }`}
+                >
+                  {completed.includes(activeRoute.id) ? "Reviewed ✓" : "Mark example reviewed"}
+                </button>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+                  {saveState === "saved" ? <span className="text-xs font-bold text-emerald-200">Progress preserved.</span> : null}
+                  {saveState === "error" ? <span className="text-xs font-bold text-rose-200">Progress could not be saved.</span> : null}
+                  <button
+                    type="button"
+                    onClick={saveProgress}
+                    className="rounded-2xl bg-gradient-to-r from-cyan-300 to-sky-300 px-6 py-3 text-sm font-black text-slate-950 shadow-[0_16px_45px_rgba(34,211,238,0.2)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_55px_rgba(34,211,238,0.28)]"
+                  >
+                    Save progress
+                  </button>
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/76 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <SectionHeading
+                eyebrow="Canonical reading protocol"
+                title="Twelve moves from proposed consequence to proof boundary."
+                copy="Use this sequence whenever you inspect a governed route. The order matters because a later success cannot repair an earlier unsupported condition."
+              />
+              <div className="mt-8 grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
+                {readingProtocol.map((step) => <ProtocolCard key={step.id} step={step} />)}
+              </div>
+            </section>
+
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/74 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <SectionHeading
+                eyebrow="Determination doctrine"
+                title="Read the state by its execution consequence."
+                copy="A determination is not a label. Each state constrains the next action and must produce a different technical effect."
+              />
+              <div className="mt-8 grid gap-5 xl:grid-cols-2">
+                {DETERMINATION_ORDER.map((state) => <StateDoctrine key={state} state={state} />)}
+              </div>
+            </section>
+
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/76 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                <SectionHeading
+                  eyebrow="Failure-pattern library"
+                  title="Recognize where routes break before consequence binds."
+                  copy="Search thirty-two institutional reading patterns across the complete execution chain. Each pattern names the visible signal, consequence, and repair discipline."
+                />
+                <div className="grid gap-3 sm:grid-cols-[220px_190px]">
+                  <input value={patternQuery} onChange={(event) => setPatternQuery(event.target.value)} placeholder="Search patterns" className="rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/35" />
+                  <select value={patternLink} onChange={(event) => setPatternLink(event.target.value)} className="rounded-2xl border border-white/10 bg-[#081321] px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/35">
+                    <option value="ALL">All chain links</option>
+                    {CHAIN_ORDER.map((link) => <option key={link} value={link}>{link}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="mt-5 flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
+                <p className="text-xs text-slate-400">Showing <strong className="text-white">{filteredPatterns.length}</strong> patterns</p>
+                <button type="button" onClick={() => { setPatternQuery(""); setPatternLink("ALL"); }} className="text-xs font-black text-cyan-200 hover:text-white">Reset filters</button>
+              </div>
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                {filteredPatterns.map((pattern) => (
+                  <details key={pattern.id} className="group rounded-[24px] border border-white/10 bg-white/[0.03] p-5 open:border-cyan-300/20 open:bg-white/[0.05]">
+                    <summary className="cursor-pointer list-none">
+                      <div className="flex items-start justify-between gap-4">
+                        <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-300">{pattern.chainLink} · {pattern.id}</p><h3 className="mt-2 text-lg font-black text-white">{pattern.title}</h3></div>
+                        <span className={`rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${pattern.severity === "critical" ? "border-rose-300/25 bg-rose-300/[0.07] text-rose-200" : pattern.severity === "blocking" ? "border-amber-300/25 bg-amber-300/[0.07] text-amber-200" : "border-cyan-300/25 bg-cyan-300/[0.07] text-cyan-200"}`}>{pattern.severity}</span>
+                      </div>
+                    </summary>
+                    <div className="mt-5 grid gap-4 border-t border-white/8 pt-5 md:grid-cols-3">
+                      <div><p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Visible signal</p><p className="mt-2 text-sm leading-6 text-slate-300">{pattern.signal}</p></div>
+                      <div><p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Consequence</p><p className="mt-2 text-sm leading-6 text-slate-300">{pattern.consequence}</p></div>
+                      <div><p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-200">Repair discipline</p><p className="mt-2 text-sm leading-6 text-slate-300">{pattern.repair}</p></div>
+                    </div>
+                  </details>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/74 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <SectionHeading
+                eyebrow="Reviewer question bank"
+                title="Twenty-four questions that expose route theater."
+                copy="Use these prompts during peer review, assessment, independent inspection, or before accepting a route as execution proof."
+              />
+              <div className="mt-8 overflow-hidden rounded-[26px] border border-white/10">
+                <div className="hidden grid-cols-[150px_1fr_1fr] gap-4 border-b border-white/10 bg-white/[0.04] px-5 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 md:grid">
+                  <span>Domain</span><span>Inspection question</span><span>Expected reading</span>
+                </div>
+                {reviewQuestions.map((item, index) => (
+                  <article key={item.id} className={`grid gap-4 px-5 py-5 md:grid-cols-[150px_1fr_1fr] ${index !== reviewQuestions.length - 1 ? "border-b border-white/8" : ""}`}>
+                    <div><span className="rounded-full border border-cyan-300/20 bg-cyan-300/[0.06] px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-cyan-200">{item.category}</span></div>
+                    <p className="text-sm font-bold leading-6 text-white">{item.question}</p>
+                    <p className="text-sm leading-6 text-slate-400">{item.expectedReading}</p>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/76 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
+              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
+                <SectionHeading
+                  eyebrow="Route-reading glossary"
+                  title="Use the institution's terms precisely."
+                  copy="Search the core vocabulary used throughout the Academy, Exchange, artifact engine, review lanes, and verification surfaces."
+                />
+                <input value={glossaryQuery} onChange={(event) => setGlossaryQuery(event.target.value)} placeholder="Search glossary" className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/35 xl:max-w-xs" />
+              </div>
+              <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+                {filteredGlossary.map((entry) => (
+                  <article key={entry.term} className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5 transition hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.05]">
+                    <h3 className="text-lg font-black text-white">{entry.term}</h3>
+                    <p className="mt-3 text-sm leading-6 text-slate-300">{entry.definition}</p>
+                    <div className="mt-4 border-t border-white/8 pt-4"><p className="text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">Reading use</p><p className="mt-2 text-sm leading-6 text-slate-400">{entry.readingUse}</p></div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="relative overflow-hidden rounded-[34px] border border-cyan-300/15 bg-gradient-to-br from-cyan-300/[0.08] via-[#07111f] to-violet-300/[0.07] p-7 shadow-[0_28px_90px_rgba(0,0,0,0.3)] sm:p-9">
+              <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-cyan-300/10 blur-3xl" />
+              <div className="relative grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center">
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Reading discipline</p>
+                  <h2 className="mt-3 text-3xl font-black tracking-tight text-white">Do not begin with the desired outcome.</h2>
+                  <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-300">
+                    Read from reality forward. A favorable objective cannot repair missing evidence, broken continuity, invalid authority, or execution beyond the committed boundary.
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
+                  <Link href="/academy/governance-thinking" className="rounded-2xl border border-white/12 bg-white/[0.05] px-5 py-3 text-center text-sm font-black text-white transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.07]">
+                    Return to Governance Thinking
+                  </Link>
+                  <Link href="/academy/simulator" className="rounded-2xl bg-white px-5 py-3 text-center text-sm font-black text-slate-950 transition hover:-translate-y-0.5">
+                    Continue to Simulation Center →
+                  </Link>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+
+        <footer className="mt-8 border-t border-white/10 py-7 text-center">
+          <p className="text-sm font-black text-white">No admissible evidence. No admissible execution.</p>
+          <p className="mt-2 text-xs leading-6 text-slate-500">Route completion reflects learner analysis and does not grant operational authority.</p>
+        </footer>
+      </div>
     </main>
   );
 }
