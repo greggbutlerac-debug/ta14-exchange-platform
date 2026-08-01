@@ -1248,7 +1248,7 @@ export default function ExecutionArtifact000004Page() {
   function selectView(next: View) {
     setView(next);
     window.setTimeout(() => {
-      document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", hold: "start" });
+      document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" });
     }, 20);
   }
 
