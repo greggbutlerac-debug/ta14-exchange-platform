@@ -1674,6 +1674,132 @@ export default function ArchitectureExplorerPage() {
 
   return (
     <main className="min-h-screen bg-[#020611] text-slate-100">
+      <style>{`
+        :root { color-scheme: dark; }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body { margin: 0; background: #020611; }
+        main { position: relative; isolation: isolate; min-height: 100vh; overflow: hidden; color: #e8f1ff; background:
+          radial-gradient(circle at 16% 8%, rgba(34,211,238,.13), transparent 30rem),
+          radial-gradient(circle at 86% 26%, rgba(139,92,246,.12), transparent 34rem),
+          radial-gradient(circle at 58% 88%, rgba(16,185,129,.08), transparent 32rem),
+          linear-gradient(180deg,#020611 0%,#04101c 48%,#020611 100%); }
+        main::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:-1; opacity:.34; background-image:
+          linear-gradient(rgba(125,211,252,.035) 1px,transparent 1px),
+          linear-gradient(90deg,rgba(125,211,252,.035) 1px,transparent 1px); background-size:42px 42px; mask-image:linear-gradient(to bottom,black,transparent 88%); }
+        main::after { content:""; position:fixed; inset:0; pointer-events:none; z-index:80; box-shadow:inset 0 0 140px rgba(0,0,0,.72); }
+        main > aside, main > button[class*="fixed"] { display:none !important; }
+        main > div[class*="lg:pl"] { padding-left:0 !important; }
+        a { color:inherit; text-decoration:none; }
+        button,input,textarea { font:inherit; }
+        button { cursor:pointer; }
+        input,textarea { color:#eef7ff; }
+      
+        [class~="relative"]{position:relative}[class~="absolute"]{position:absolute}[class~="fixed"]{position:fixed}
+        [class~="inset-0"]{inset:0}[class~="top-4"]{top:1rem}[class~="top-16"]{top:4rem}[class~="top-[28rem]"]{top:28rem}
+        [class~="left-4"]{left:1rem}[class~="-left-32"]{left:-8rem}[class~="left-[38%]"]{left:38%}[class~="right-[-10rem]"]{right:-10rem}[class~="bottom-[-16rem]"]{bottom:-16rem}
+        [class~="z-50"]{z-index:50}[class~="z-[100]"]{z-index:100}[class~="pointer-events-none"]{pointer-events:none}
+        [class~="block"]{display:block}[class~="inline-flex"]{display:inline-flex}[class~="flex"]{display:flex}[class~="grid"]{display:grid}
+        [class~="flex-col"]{flex-direction:column}[class~="flex-wrap"]{flex-wrap:wrap}[class~="flex-1"]{flex:1 1 0%}
+        [class~="items-center"]{align-items:center}[class~="items-end"]{align-items:flex-end}[class~="items-start"]{align-items:flex-start}
+        [class~="justify-between"]{justify-content:space-between}[class~="place-items-center"]{place-items:center}
+        [class~="shrink-0"]{flex-shrink:0}[class~="min-w-0"]{min-width:0}[class~="min-h-0"]{min-height:0}
+        [class~="w-full"]{width:100%}[class~="h-full"]{height:100%}[class~="min-h-screen"]{min-height:100vh}
+        [class~="w-9"]{width:2.25rem}[class~="h-9"]{height:2.25rem}[class~="w-12"]{width:3rem}[class~="h-12"]{height:3rem}
+        [class~="w-[32rem]"]{width:32rem}[class~="h-[32rem]"]{height:32rem}[class~="w-[34rem]"]{width:34rem}[class~="h-[34rem]"]{height:34rem}[class~="w-[38rem]"]{width:38rem}[class~="h-[38rem]"]{height:38rem}
+        [class~="max-w-[1500px]"]{max-width:1500px}[class~="max-w-5xl"]{max-width:64rem}[class~="max-w-4xl"]{max-width:56rem}[class~="max-w-2xl"]{max-width:42rem}
+        [class~="max-h-[780px]"]{max-height:780px}[class~="min-h-52"]{min-height:13rem}
+        [class~="mx-auto"]{margin-left:auto;margin-right:auto}
+        [class~="mt-1"]{margin-top:.25rem}[class~="mt-2"]{margin-top:.5rem}[class~="mt-3"]{margin-top:.75rem}[class~="mt-4"]{margin-top:1rem}[class~="mt-5"]{margin-top:1.25rem}[class~="mt-6"]{margin-top:1.5rem}[class~="mt-7"]{margin-top:1.75rem}[class~="mt-8"]{margin-top:2rem}[class~="mt-14"]{margin-top:3.5rem}[class~="mt-16"]{margin-top:4rem}
+        [class~="p-4"]{padding:1rem}[class~="p-5"]{padding:1.25rem}[class~="p-6"]{padding:1.5rem}[class~="p-7"]{padding:1.75rem}
+        [class~="px-2.5"]{padding-left:.625rem;padding-right:.625rem}[class~="px-3"]{padding-left:.75rem;padding-right:.75rem}[class~="px-4"]{padding-left:1rem;padding-right:1rem}[class~="px-5"]{padding-left:1.25rem;padding-right:1.25rem}
+        [class~="py-1"]{padding-top:.25rem;padding-bottom:.25rem}[class~="py-2"]{padding-top:.5rem;padding-bottom:.5rem}[class~="py-3"]{padding-top:.75rem;padding-bottom:.75rem}[class~="py-4"]{padding-top:1rem;padding-bottom:1rem}[class~="py-6"]{padding-top:1.5rem;padding-bottom:1.5rem}[class~="py-8"]{padding-top:2rem;padding-bottom:2rem}[class~="py-10"]{padding-top:2.5rem;padding-bottom:2.5rem}
+        [class~="pt-12"]{padding-top:3rem}[class~="pb-5"]{padding-bottom:1.25rem}[class~="pb-6"]{padding-bottom:1.5rem}[class~="pr-1"]{padding-right:.25rem}[class~="pl-0"]{padding-left:0}
+        [class~="gap-2"]{gap:.5rem}[class~="gap-3"]{gap:.75rem}[class~="gap-4"]{gap:1rem}[class~="gap-5"]{gap:1.25rem}[class~="gap-6"]{gap:1.5rem}[class~="gap-8"]{gap:2rem}
+        [class~="space-y-1"]>*+*{margin-top:.25rem}[class~="space-y-2"]>*+*{margin-top:.5rem}[class~="space-y-3"]>*+*{margin-top:.75rem}[class~="space-y-6"]>*+*{margin-top:1.5rem}
+        [class~="grid-cols-[.55fr_1fr_1fr]"]{grid-template-columns:.55fr 1fr 1fr}
+        [class~="rounded-lg"]{border-radius:.65rem}[class~="rounded-xl"]{border-radius:.9rem}[class~="rounded-2xl"]{border-radius:1.25rem}[class~="rounded-3xl"]{border-radius:1.75rem}[class~="rounded-full"]{border-radius:9999px}
+        [class~="border"]{border:1px solid rgba(148,163,184,.18)}[class~="border-2"]{border-width:2px}[class~="border-b"]{border-bottom:1px solid rgba(148,163,184,.16)}[class~="border-t"]{border-top:1px solid rgba(148,163,184,.16)}[class~="border-l"]{border-left:1px solid rgba(148,163,184,.16)}
+        [class~="border-white/10"]{border-color:rgba(255,255,255,.1)}[class~="border-transparent"]{border-color:transparent}
+        [class~="border-cyan-300/15"]{border-color:rgba(103,232,249,.15)}[class~="border-cyan-300/20"]{border-color:rgba(103,232,249,.2)}[class~="border-cyan-300/25"]{border-color:rgba(103,232,249,.25)}[class~="border-cyan-300/30"]{border-color:rgba(103,232,249,.3)}
+        [class~="border-violet-300/15"]{border-color:rgba(196,181,253,.15)}[class~="border-violet-300/20"]{border-color:rgba(196,181,253,.2)}[class~="border-violet-300/25"]{border-color:rgba(196,181,253,.25)}
+        [class~="border-amber-300/15"]{border-color:rgba(252,211,77,.15)}[class~="border-amber-300/20"]{border-color:rgba(252,211,77,.2)}[class~="border-rose-300/15"]{border-color:rgba(253,164,175,.15)}
+        [class~="border-t-cyan-300"]{border-top-color:#67e8f9}
+        [class~="bg-[#020611]"]{background:#020611}[class~="bg-[#020611]/85"]{background:rgba(2,6,17,.85)}[class~="bg-[#07111f]/95"]{background:rgba(7,17,31,.95)}
+        [class~="bg-white/10"]{background:rgba(255,255,255,.1)}[class~="bg-white/[0.03]"]{background:linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.018))}[class~="bg-white/[0.04]"]{background:rgba(255,255,255,.04)}[class~="bg-white/[0.05]"]{background:rgba(255,255,255,.05)}
+        [class~="bg-black/15"]{background:rgba(0,0,0,.15)}[class~="bg-black/20"]{background:rgba(0,0,0,.2)}[class~="bg-black/25"]{background:rgba(0,0,0,.25)}
+        [class~="bg-cyan-300"]{background:#67e8f9}[class~="bg-cyan-300/10"]{background:rgba(103,232,249,.1)}[class~="bg-cyan-300/[0.03]"]{background:rgba(103,232,249,.03)}[class~="bg-cyan-300/[0.05]"]{background:rgba(103,232,249,.05)}
+        [class~="bg-violet-300/10"]{background:rgba(196,181,253,.1)}[class~="bg-violet-300/[0.04]"]{background:rgba(196,181,253,.04)}[class~="bg-amber-300/10"]{background:rgba(252,211,77,.1)}[class~="bg-amber-300/[0.05]"]{background:rgba(252,211,77,.05)}[class~="bg-rose-300/[0.05]"]{background:rgba(253,164,175,.05)}[class~="bg-rose-300/[0.06]"]{background:rgba(253,164,175,.06)}
+        [class~="bg-cyan-500/10"]{background:rgba(6,182,212,.1)}[class~="bg-violet-500/10"]{background:rgba(139,92,246,.1)}[class~="bg-emerald-500/10"]{background:rgba(16,185,129,.1)}
+        [class~="bg-gradient-to-br"]{background-image:linear-gradient(135deg,rgba(103,232,249,.12),rgba(139,92,246,.07))}
+        [class~="from-cyan-300/10"],[class~="from-cyan-300/12"]{background-image:linear-gradient(135deg,rgba(103,232,249,.14),rgba(139,92,246,.07))}
+        [class~="from-violet-300/10"]{background-image:linear-gradient(135deg,rgba(196,181,253,.12),rgba(103,232,249,.06))}
+        [class~="text-white"]{color:#fff}[class~="text-slate-100"]{color:#f1f5f9}[class~="text-slate-200"]{color:#e2e8f0}[class~="text-slate-300"]{color:#cbd5e1}[class~="text-slate-400"]{color:#94a3b8}[class~="text-slate-500"]{color:#64748b}[class~="text-slate-600"]{color:#475569}
+        [class~="text-cyan-200"]{color:#a5f3fc}[class~="text-cyan-300"]{color:#67e8f9}[class~="text-violet-100"]{color:#ede9fe}[class~="text-violet-200"]{color:#ddd6fe}[class~="text-violet-300"]{color:#c4b5fd}[class~="text-amber-200"]{color:#fde68a}[class~="text-rose-200"]{color:#fecdd3}[class~="text-rose-300"]{color:#fda4af}[class~="text-emerald-300"]{color:#6ee7b7}[class~="text-[#03101a]"]{color:#03101a}
+        [class~="text-[9px]"]{font-size:9px}[class~="text-[10px]"]{font-size:10px}[class~="text-xs"]{font-size:.75rem}[class~="text-sm"]{font-size:.875rem}[class~="text-base"]{font-size:1rem}[class~="text-lg"]{font-size:1.125rem}[class~="text-xl"]{font-size:1.25rem}[class~="text-2xl"]{font-size:1.5rem}[class~="text-3xl"]{font-size:1.875rem}[class~="text-4xl"]{font-size:2.25rem}
+        [class~="font-bold"]{font-weight:700}[class~="font-black"]{font-weight:900}[class~="uppercase"]{text-transform:uppercase}[class~="text-center"]{text-align:center}[class~="text-left"]{text-align:left}
+        [class~="leading-tight"]{line-height:1.12}[class~="leading-5"]{line-height:1.25rem}[class~="leading-6"]{line-height:1.5rem}[class~="leading-7"]{line-height:1.75rem}[class~="leading-8"]{line-height:2rem}
+        [class~="tracking-tight"]{letter-spacing:-.025em}[class~="tracking-[0.1em]"]{letter-spacing:.1em}[class~="tracking-[0.12em]"]{letter-spacing:.12em}[class~="tracking-[0.14em]"]{letter-spacing:.14em}[class~="tracking-[0.15em]"]{letter-spacing:.15em}[class~="tracking-[0.16em]"]{letter-spacing:.16em}[class~="tracking-[0.18em]"]{letter-spacing:.18em}[class~="tracking-[0.2em]"]{letter-spacing:.2em}[class~="tracking-[0.22em]"]{letter-spacing:.22em}[class~="tracking-[0.24em]"]{letter-spacing:.24em}[class~="tracking-[0.28em]"]{letter-spacing:.28em}
+        [class~="overflow-hidden"]{overflow:hidden}[class~="overflow-y-auto"]{overflow-y:auto}[class~="truncate"]{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        [class~="outline-none"]{outline:none}[class~="backdrop-blur"],[class~="backdrop-blur-xl"]{backdrop-filter:blur(22px)}[class~="shadow-2xl"]{box-shadow:0 30px 90px rgba(0,0,0,.48),0 0 0 1px rgba(255,255,255,.025)}
+        [class~="blur-[130px]"]{filter:blur(130px)}[class~="blur-[140px]"]{filter:blur(140px)}[class~="blur-[150px]"]{filter:blur(150px)}
+        [class~="transition"],[class~="transition-all"]{transition:all .24s ease}
+        [class~="animate-spin"]{animation:ta14Spin 1s linear infinite}@keyframes ta14Spin{to{transform:rotate(360deg)}}
+        [class~="placeholder:text-slate-600"]::placeholder{color:#475569}
+        [class~="focus:border-cyan-300/35"]:focus,[class~="focus:border-cyan-300/40"]:focus{border-color:rgba(103,232,249,.48);box-shadow:0 0 0 4px rgba(34,211,238,.08)}
+        [class~="hover:border-cyan-300/30"]:hover{border-color:rgba(103,232,249,.42)}[class~="hover:text-white"]:hover{color:#fff}[class~="hover:bg-cyan-200"]:hover{background:#a5f3fc}
+        [class~="group"]:hover [class~="group-hover:text-cyan-300"]{color:#67e8f9}[class~="group"]:hover [class~="group-hover:text-slate-300"]{color:#cbd5e1}[class~="group"]:hover [class~="group-hover:translate-x-1"]{transform:translateX(.25rem)}
+      
+        main section > article, main section > div[class*="rounded"], main article[class*="rounded"] { position:relative; overflow:hidden; box-shadow:0 20px 70px rgba(0,0,0,.26), inset 0 1px 0 rgba(255,255,255,.035); }
+        main section > article::before, main article[class*="rounded"]::before { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(135deg,rgba(255,255,255,.035),transparent 34%); }
+        main article[class*="rounded"]:hover { transform:translateY(-2px); border-color:rgba(103,232,249,.22); box-shadow:0 28px 90px rgba(0,0,0,.34),0 0 34px rgba(34,211,238,.045),inset 0 1px 0 rgba(255,255,255,.05); }
+        main button[class*="rounded"], main a[class*="rounded"] { position:relative; overflow:hidden; box-shadow:inset 0 1px 0 rgba(255,255,255,.06); }
+        main button[class*="rounded"]:hover, main a[class*="rounded"]:hover { transform:translateY(-1px); }
+        textarea,input { width:100%; border:1px solid rgba(148,163,184,.16); background:rgba(0,0,0,.25); border-radius:1rem; padding:.9rem 1rem; outline:none; transition:.2s ease; }
+      
+        @media (min-width:640px){[class~="sm:flex-row"]{flex-direction:row}[class~="sm:grid-cols-2"]{grid-template-columns:repeat(2,minmax(0,1fr))}[class~="sm:items-start"]{align-items:flex-start}[class~="sm:justify-between"]{justify-content:space-between}[class~="sm:p-8"]{padding:2rem}[class~="sm:p-9"]{padding:2.25rem}[class~="sm:px-8"]{padding-left:2rem;padding-right:2rem}[class~="sm:text-lg"]{font-size:1.125rem}[class~="sm:text-3xl"]{font-size:1.875rem}[class~="sm:text-5xl"]{font-size:3rem}[class~="sm:text-6xl"]{font-size:3.75rem}}
+        @media (min-width:768px){[class~="md:flex-row"]{flex-direction:row}[class~="md:grid-cols-2"]{grid-template-columns:repeat(2,minmax(0,1fr))}[class~="md:grid-cols-3"]{grid-template-columns:repeat(3,minmax(0,1fr))}[class~="md:items-center"]{align-items:center}[class~="md:items-end"]{align-items:flex-end}[class~="md:justify-between"]{justify-content:space-between}}
+        @media (min-width:1024px){[class~="lg:grid-cols-2"]{grid-template-columns:repeat(2,minmax(0,1fr))}[class~="lg:px-10"]{padding-left:2.5rem;padding-right:2.5rem}[class~="lg:pt-0"]{padding-top:0}[class~="lg:hidden"]{display:none}}
+        @media (min-width:1280px){[class~="xl:flex-row"]{flex-direction:row}[class~="xl:grid-cols-3"]{grid-template-columns:repeat(3,minmax(0,1fr))}[class~="xl:grid-cols-4"]{grid-template-columns:repeat(4,minmax(0,1fr))}[class~="xl:grid-cols-5"]{grid-template-columns:repeat(5,minmax(0,1fr))}[class~="xl:grid-cols-[.72fr_1.28fr]"]{grid-template-columns:.72fr 1.28fr}[class~="xl:grid-cols-[.8fr_1.2fr]"]{grid-template-columns:.8fr 1.2fr}[class~="xl:grid-cols-[1.1fr_.9fr]"]{grid-template-columns:1.1fr .9fr}[class~="xl:grid-cols-[1.25fr_.75fr]"]{grid-template-columns:1.25fr .75fr}[class~="xl:items-center"]{align-items:center}[class~="xl:items-end"]{align-items:flex-end}[class~="xl:justify-between"]{justify-content:space-between}}
+        @media (max-width:767px){[class~="grid-cols-[.55fr_1fr_1fr]"]{grid-template-columns:1fr} [class~="grid-cols-[.55fr_1fr_1fr]"]>[class~="border-l"]{border-left:0;border-top:1px solid rgba(255,255,255,.1)} main{font-size:15px}}
+
+        /* TA-14 dimensional architecture environment */
+        .architecture-command-bar{position:sticky;top:0;z-index:35;background:linear-gradient(180deg,rgba(2,6,17,.96),rgba(3,11,23,.84));box-shadow:0 18px 55px rgba(0,0,0,.36),inset 0 -1px 0 rgba(103,232,249,.08)}
+        .architecture-command-bar::after{content:"";position:absolute;left:5%;right:5%;bottom:-1px;height:1px;background:linear-gradient(90deg,transparent,rgba(103,232,249,.8),rgba(196,181,253,.6),transparent);filter:drop-shadow(0 0 8px rgba(103,232,249,.8))}
+        .architecture-hero-stage{position:relative;min-height:600px;padding:clamp(1.5rem,4vw,4.5rem);border:1px solid rgba(103,232,249,.18);border-radius:2.4rem;background:linear-gradient(135deg,rgba(5,18,34,.96),rgba(4,10,24,.86) 48%,rgba(22,13,48,.76));box-shadow:0 42px 120px rgba(0,0,0,.52),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -70px 110px rgba(0,0,0,.28);overflow:hidden;isolation:isolate}
+        .architecture-hero-stage::before{content:"";position:absolute;inset:-2px;z-index:-2;background:conic-gradient(from 210deg at 50% 50%,rgba(103,232,249,.25),transparent 16%,rgba(139,92,246,.2) 34%,transparent 58%,rgba(16,185,129,.16) 74%,transparent);filter:blur(34px);opacity:.9}
+        .architecture-hero-stage::after{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(rgba(103,232,249,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(103,232,249,.045) 1px,transparent 1px);background-size:34px 34px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.95),transparent 92%);transform:perspective(900px) rotateX(58deg) scale(1.45) translateY(20%);transform-origin:bottom;opacity:.65}
+        .architecture-hero-copy{position:relative;z-index:3;align-self:center;text-shadow:0 8px 40px rgba(0,0,0,.65)}
+        .architecture-hero-copy h2{font-size:clamp(3rem,6vw,6.7rem)!important;line-height:.92!important;max-width:15ch!important;letter-spacing:-.055em!important;background:linear-gradient(180deg,#fff 0%,#d9f8ff 48%,#9eeafa 100%);-webkit-background-clip:text;background-clip:text;color:transparent!important;filter:drop-shadow(0 16px 36px rgba(0,0,0,.45))}
+        .architecture-principle-core{position:relative;z-index:4;align-self:center;min-height:310px;display:flex;flex-direction:column;justify-content:center;border-color:rgba(196,181,253,.28)!important;background:linear-gradient(145deg,rgba(20,30,58,.88),rgba(8,13,29,.78))!important;box-shadow:0 35px 90px rgba(0,0,0,.45),0 0 60px rgba(139,92,246,.12),inset 0 1px 0 rgba(255,255,255,.08)!important;transform:perspective(1200px) rotateY(-4deg) translateZ(20px)}
+        .architecture-principle-core::after{content:"AEA / 24";position:absolute;right:1.2rem;top:1rem;font-size:.65rem;font-weight:900;letter-spacing:.24em;color:rgba(196,181,253,.48)}
+        .architecture-principle-core p:nth-child(2){font-size:clamp(2rem,3.2vw,3.8rem)!important;line-height:.95!important}
+        .architecture-chain-horizon{grid-column:1/-1;position:relative;z-index:5;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:.75rem;margin-top:1.2rem;padding:1.35rem;border-radius:1.7rem;border:1px solid rgba(103,232,249,.15);background:rgba(1,8,19,.76);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 25px 70px rgba(0,0,0,.35);backdrop-filter:blur(20px)}
+        .architecture-chain-beam{position:absolute;left:5%;right:5%;top:50%;height:2px;background:linear-gradient(90deg,rgba(103,232,249,.12),#67e8f9 35%,#c4b5fd 68%,rgba(196,181,253,.12));box-shadow:0 0 18px rgba(103,232,249,.7);transform:translateY(-50%)}
+        .architecture-chain-node{position:relative;z-index:2;min-height:96px;border:1px solid rgba(255,255,255,.09);border-radius:1rem;background:linear-gradient(180deg,rgba(13,28,49,.95),rgba(5,12,25,.94));color:#dcecff;padding:.8rem .55rem;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.28rem;box-shadow:0 14px 28px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.04);transition:.3s cubic-bezier(.2,.8,.2,1)}
+        .architecture-chain-node::before{content:"";position:absolute;top:-7px;width:13px;height:13px;border-radius:50%;background:#071323;border:2px solid #67e8f9;box-shadow:0 0 0 5px rgba(103,232,249,.08),0 0 20px rgba(103,232,249,.65)}
+        .architecture-chain-node:hover,.architecture-chain-node.is-active{transform:translateY(-8px) scale(1.025);border-color:rgba(103,232,249,.48);background:linear-gradient(180deg,rgba(16,52,74,.96),rgba(8,19,36,.97));box-shadow:0 24px 46px rgba(0,0,0,.45),0 0 32px rgba(34,211,238,.15),inset 0 1px 0 rgba(255,255,255,.08)}
+        .architecture-chain-node span{font-size:.62rem;font-weight:900;letter-spacing:.18em;color:#67e8f9}.architecture-chain-node strong{font-size:.78rem}.architecture-chain-node small{font-size:.48rem;letter-spacing:.18em;color:#64748b}
+        .architecture-anchor-deck{position:relative;padding:clamp(1rem,2vw,2rem);border-radius:2rem;background:linear-gradient(180deg,rgba(5,16,29,.68),rgba(2,8,18,.35));border:1px solid rgba(255,255,255,.055);box-shadow:inset 0 1px 0 rgba(255,255,255,.025)}
+        .architecture-anchor-card{min-height:230px!important;position:relative;isolation:isolate;background:linear-gradient(155deg,rgba(14,31,52,.92),rgba(5,12,26,.96))!important;box-shadow:0 24px 55px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.05)!important;transform:perspective(1000px) translateZ(0);transition:.35s cubic-bezier(.2,.8,.2,1)!important}
+        .architecture-anchor-card::before{content:"";position:absolute;inset:0;z-index:-1;background:radial-gradient(circle at 15% 15%,rgba(103,232,249,.14),transparent 34%),linear-gradient(145deg,transparent 45%,rgba(196,181,253,.06));opacity:.75}
+        .architecture-anchor-card::after{content:"";position:absolute;left:1.25rem;right:1.25rem;bottom:.9rem;height:2px;background:linear-gradient(90deg,#67e8f9,rgba(196,181,253,.2),transparent);box-shadow:0 0 14px rgba(103,232,249,.5);transform:scaleX(.2);transform-origin:left;transition:.35s ease}
+        .architecture-anchor-card:hover{transform:perspective(1000px) rotateX(2deg) rotateY(-2deg) translateY(-10px) translateZ(22px)!important;box-shadow:0 38px 85px rgba(0,0,0,.5),0 0 45px rgba(34,211,238,.12),inset 0 1px 0 rgba(255,255,255,.08)!important}.architecture-anchor-card:hover::after{transform:scaleX(1)}
+        .architecture-anchor-card h4{font-size:1.55rem!important}.architecture-anchor-card p{font-size:.92rem!important}
+        .architecture-anchor-focus,.architecture-runtime-map{min-height:390px;display:flex;flex-direction:column;justify-content:center;background:linear-gradient(145deg,rgba(8,34,54,.92),rgba(5,12,27,.96))!important;box-shadow:0 34px 80px rgba(0,0,0,.44),0 0 45px rgba(34,211,238,.07),inset 0 1px 0 rgba(255,255,255,.06)!important}
+        .architecture-runtime-map{background:linear-gradient(145deg,rgba(16,17,43,.92),rgba(5,12,27,.97))!important}
+        .architecture-runtime-console{position:relative;padding:1rem;border-radius:2rem;background:linear-gradient(180deg,rgba(4,14,27,.72),rgba(2,8,18,.45));border:1px solid rgba(103,232,249,.08)}
+        .architecture-runtime-rail{position:sticky;top:118px;max-height:calc(100vh - 145px);background:linear-gradient(180deg,rgba(7,20,36,.97),rgba(4,10,22,.98))!important;box-shadow:0 32px 80px rgba(0,0,0,.48),inset 0 1px 0 rgba(255,255,255,.05)!important}
+        .architecture-runtime-core{position:relative;min-height:430px;background:radial-gradient(circle at 82% 18%,rgba(196,181,253,.14),transparent 31%),radial-gradient(circle at 14% 88%,rgba(103,232,249,.12),transparent 36%),linear-gradient(145deg,rgba(7,29,49,.96),rgba(9,10,31,.96))!important;box-shadow:0 42px 100px rgba(0,0,0,.52),0 0 70px rgba(34,211,238,.08),inset 0 1px 0 rgba(255,255,255,.07)!important}
+        .architecture-runtime-core::after{content:"LIVE RUNTIME";position:absolute;right:1.4rem;bottom:1.15rem;font-size:.55rem;font-weight:900;letter-spacing:.24em;color:rgba(103,232,249,.38)}
+        main article[class*="rounded"],main button[class*="rounded"]{will-change:transform}
+        @keyframes architecturePulse{0%,100%{opacity:.45;transform:scale(.98)}50%{opacity:.95;transform:scale(1.02)}}
+        .architecture-principle-core::before{content:"";position:absolute;right:1.2rem;bottom:1.2rem;width:74px;height:74px;border-radius:50%;border:1px solid rgba(196,181,253,.2);box-shadow:0 0 35px rgba(139,92,246,.18),inset 0 0 25px rgba(103,232,249,.08);animation:architecturePulse 4s ease-in-out infinite}
+        @media(max-width:1100px){.architecture-chain-horizon{grid-template-columns:repeat(4,minmax(0,1fr))}.architecture-chain-beam{display:none}.architecture-principle-core{transform:none}.architecture-runtime-rail{position:relative;top:auto;max-height:none}}
+        @media(max-width:680px){.architecture-hero-stage{min-height:auto;padding:1.2rem;border-radius:1.5rem}.architecture-hero-copy h2{font-size:2.8rem!important}.architecture-chain-horizon{grid-template-columns:repeat(2,minmax(0,1fr));padding:.8rem}.architecture-anchor-card{min-height:190px!important}.architecture-principle-core{min-height:260px}}
+
+      `}</style>
+      
       <div className="pointer-events-none fixed inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -left-32 top-16 h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-[130px]" />
         <div className="absolute right-[-10rem] top-[28rem] h-[38rem] w-[38rem] rounded-full bg-violet-500/10 blur-[150px]" />
@@ -1717,7 +1843,7 @@ export default function ArchitectureExplorerPage() {
       </aside>
 
       <div className="relative lg:pl-[310px]">
-        <header className="border-b border-white/10 bg-[#020611]/85 px-5 py-6 backdrop-blur-xl sm:px-8 lg:px-10">
+        <header className="architecture-command-bar border-b border-white/10 bg-[#020611]/85 px-5 py-6 backdrop-blur-xl sm:px-8 lg:px-10">
           <div className="mx-auto flex max-w-[1500px] flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
             <div className="pl-0 pt-12 lg:pt-0">
               <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">TA-14 Academy · Architecture Explorer</p>
@@ -1732,28 +1858,38 @@ export default function ArchitectureExplorerPage() {
         </header>
 
         <div className="mx-auto max-w-[1500px] px-5 py-10 sm:px-8 lg:px-10">
-          <section className="grid gap-8 xl:grid-cols-[1.25fr_.75fr] xl:items-end">
-            <div>
+          <section className="architecture-hero-stage grid gap-8 xl:grid-cols-[1.25fr_.75fr] xl:items-end">
+            <div className="architecture-hero-copy">
               <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-200">Architecture orientation</span>
               <h2 className="mt-6 max-w-5xl text-4xl font-black tracking-tight text-white sm:text-6xl">See how consequential execution earns the right to proceed.</h2>
               <p className="mt-6 max-w-4xl text-base leading-8 text-slate-300 sm:text-lg">The eight visible anchors provide public orientation. The verified complete 24-link runtime chain provides the operational depth required to test evidence, authority, continuity, boundary, correspondence, and outcome before consequence becomes real.</p>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-6">
+            <div className="architecture-principle-core rounded-3xl border border-white/10 bg-white/[0.04] p-6">
               <p className="text-xs font-black uppercase tracking-[0.22em] text-violet-300">Governing principle</p>
               <p className="mt-4 text-2xl font-black leading-tight text-white">No admissible evidence.<br />No admissible execution.</p>
               <p className="mt-4 text-sm leading-6 text-slate-400">The Academy may explain, guide, and challenge. It may never fabricate evidence, invent authority, erase uncertainty, or silently select a favorable determination.</p>
             </div>
+            <div className="architecture-chain-horizon">
+              <div className="architecture-chain-beam" />
+              {anchors.map((anchor, index) => (
+                <button key={`hero-${anchor.id}`} type="button" onClick={() => selectAnchor(anchor.id)} className={`architecture-chain-node ${selectedAnchor === anchor.id ? "is-active" : ""}`}>
+                  <span>{anchor.number}</span>
+                  <strong>{anchor.title}</strong>
+                  <small>{index === 0 ? "BEGIN" : index === anchors.length - 1 ? "CLOSE" : "VERIFY"}</small>
+                </button>
+              ))}
+            </div>
           </section>
 
           {viewMode === "anchors" && (
-            <section className="mt-14">
+            <section className="architecture-anchor-deck mt-14">
               <div className="flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-end md:justify-between">
                 <div><p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Public orientation</p><h3 className="mt-2 text-3xl font-black text-white">The eight visible anchors</h3></div>
                 <p className="max-w-2xl text-sm leading-6 text-slate-400">Select an anchor to inspect its purpose, corresponding runtime links, and the failure it prevents.</p>
               </div>
               <div className="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
                 {anchors.map((anchor) => (
-                  <button key={anchor.id} type="button" onClick={() => selectAnchor(anchor.id)} className={`rounded-2xl border p-5 text-left transition ${selectedAnchor === anchor.id ? "border-cyan-300/45 bg-cyan-300/10 shadow-[0_0_40px_rgba(34,211,238,0.08)]" : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"}`}>
+                  <button key={anchor.id} type="button" onClick={() => selectAnchor(anchor.id)} className={`architecture-anchor-card rounded-2xl border p-5 text-left transition ${selectedAnchor === anchor.id ? "border-cyan-300/45 bg-cyan-300/10 shadow-[0_0_40px_rgba(34,211,238,0.08)]" : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"}`}>
                     <div className="flex items-center justify-between"><span className="text-xs font-black tracking-[0.2em] text-cyan-300">{anchor.number}</span><span className="text-slate-600">→</span></div>
                     <h4 className="mt-8 text-xl font-black text-white">{anchor.title}</h4>
                     <p className="mt-3 text-sm leading-6 text-slate-400">{anchor.description}</p>
@@ -1761,13 +1897,13 @@ export default function ArchitectureExplorerPage() {
                 ))}
               </div>
               <div className="mt-6 grid gap-6 xl:grid-cols-[.8fr_1.2fr]">
-                <article className="rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 to-transparent p-7">
+                <article className="architecture-anchor-focus rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 to-transparent p-7">
                   <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Anchor {activeAnchor.number}</p>
                   <h3 className="mt-3 text-4xl font-black text-white">{activeAnchor.title}</h3>
                   <p className="mt-5 text-base leading-8 text-slate-300">{activeAnchor.detail}</p>
                   <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5"><p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Architectural question</p><p className="mt-3 text-lg font-bold text-white">What must be true here before the route may continue?</p></div>
                 </article>
-                <article className="rounded-3xl border border-white/10 bg-white/[0.03] p-7">
+                <article className="architecture-runtime-map rounded-3xl border border-white/10 bg-white/[0.03] p-7">
                   <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] text-violet-300">Runtime correspondence</p><h3 className="mt-2 text-2xl font-black text-white">Links governed by this anchor</h3></div><button type="button" onClick={() => setViewMode("runtime")} className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-slate-300 hover:border-cyan-300/30 hover:text-white">Open all 24 →</button></div>
                   <div className="mt-6 grid gap-3 md:grid-cols-2">
                     {runtimeLinks.filter((link) => anchorCorrespondence[selectedAnchor].includes(link.id)).map((link) => (
@@ -1782,9 +1918,9 @@ export default function ArchitectureExplorerPage() {
           )}
 
           {viewMode === "runtime" && (
-            <section className="mt-14">
+            <section className="architecture-runtime-console mt-14">
               <div className="grid gap-6 xl:grid-cols-[.72fr_1.28fr]">
-                <aside className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                <aside className="architecture-runtime-rail rounded-3xl border border-white/10 bg-white/[0.03] p-5">
                   <div className="flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Verified complete chain</p><h3 className="mt-2 text-2xl font-black text-white">24 runtime links</h3></div><strong className="text-sm text-cyan-200">{progress}%</strong></div>
                   <input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Search the architecture" className="mt-5 w-full rounded-xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/40" />
                   <div className="mt-4 max-h-[780px] space-y-2 overflow-y-auto pr-1">
@@ -1796,7 +1932,7 @@ export default function ArchitectureExplorerPage() {
                   </div>
                 </aside>
                 <div className="space-y-6">
-                  <article className="rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-white/[0.03] to-violet-300/5 p-7 sm:p-9">
+                  <article className="architecture-runtime-core rounded-3xl border border-cyan-300/20 bg-gradient-to-br from-cyan-300/10 via-white/[0.03] to-violet-300/5 p-7 sm:p-9">
                     <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.24em] text-cyan-300">Runtime link {activeLink.number}</p><h3 className="mt-3 text-4xl font-black text-white sm:text-5xl">{activeLink.title}</h3><p className="mt-3 text-sm font-bold uppercase tracking-[0.16em] text-violet-200">{activeLink.eyebrow}</p></div><button type="button" onClick={() => toggleLink(activeLink.id)} className={`rounded-xl border px-5 py-3 text-xs font-black uppercase tracking-[0.16em] ${completedLinks.includes(activeLink.id) ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-200" : "border-white/10 text-slate-300 hover:border-cyan-300/30 hover:text-white"}`}>{completedLinks.includes(activeLink.id) ? "Marked complete" : "Mark explored"}</button></div>
                     <p className="mt-8 max-w-4xl text-lg leading-8 text-slate-200">{activeLink.description}</p>
                     <div className="mt-8 grid gap-4 md:grid-cols-3">
