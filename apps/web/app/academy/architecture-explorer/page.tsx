@@ -1660,6 +1660,15 @@ export default function ArchitectureExplorerPage() {
     } catch { setSaveStatus("error"); }
   }
 
+  function navigateToView(mode: ViewMode, sectionId: string) {
+    setViewMode(mode);
+    window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(() => {
+        document.getElementById(sectionId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    });
+  }
+
   function toggleLink(id: string) {
     setCompletedLinks((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
     setSaveStatus("idle");
@@ -1669,7 +1678,7 @@ export default function ArchitectureExplorerPage() {
     setSelectedAnchor(id);
     const first = anchorCorrespondence[id][0];
     if (first) setSelectedLink(first);
-    setViewMode("anchors");
+    navigateToView("anchors", "architecture-workspace");
   }
 
   return (
@@ -1821,7 +1830,7 @@ export default function ArchitectureExplorerPage() {
             <p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-300">Primary action</p>
             <h2 className="mt-2 text-lg font-black text-white">Inspect the complete chain.</h2>
             <p className="mt-2 text-xs leading-5 text-slate-300">Move from the eight visible anchors into the verified complete 24-link runtime architecture.</p>
-            <button type="button" onClick={() => { setViewMode("runtime"); setMobileRailOpen(false); }} className="mt-4 w-full rounded-xl bg-cyan-300 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-[#03101a] transition hover:bg-cyan-200">Open 24-link runtime</button>
+            <button type="button" onClick={() => { navigateToView("runtime", "architecture-workspace"); setMobileRailOpen(false); }} className="mt-4 w-full rounded-xl bg-cyan-300 px-4 py-3 text-xs font-black uppercase tracking-[0.16em] text-[#03101a] transition hover:bg-cyan-200">Open 24-link runtime</button>
           </div>
 
           <nav className="mt-5 min-h-0 flex-1 space-y-1 overflow-y-auto pr-1" aria-label="Academy institutional navigation">
@@ -1851,13 +1860,13 @@ export default function ArchitectureExplorerPage() {
             </div>
             <div className="flex flex-wrap gap-2">
               {[ ["anchors","Eight anchors"], ["runtime","24-link runtime"], ["comparison","Zero Trust comparison"], ["scenarios","Failure scenarios"], ["glossary","Glossary"] ].map(([id,label]) => (
-                <button key={id} type="button" onClick={() => setViewMode(id as ViewMode)} className={`rounded-full border px-4 py-2 text-xs font-bold transition ${viewMode === id ? "border-cyan-300/40 bg-cyan-300/12 text-cyan-100" : "border-white/10 text-slate-400 hover:border-white/20 hover:text-white"}`}>{label}</button>
+                <button key={id} type="button" onClick={() => navigateToView(id as ViewMode, "architecture-workspace")} className={`rounded-full border px-4 py-2 text-xs font-bold transition ${viewMode === id ? "border-cyan-300/40 bg-cyan-300/12 text-cyan-100" : "border-white/10 text-slate-400 hover:border-white/20 hover:text-white"}`}>{label}</button>
               ))}
             </div>
           </div>
         </header>
 
-        <div className="mx-auto max-w-[1500px] px-5 py-10 sm:px-8 lg:px-10">
+        <div id="architecture-workspace" className="mx-auto max-w-[1500px] scroll-mt-8 px-5 py-10 sm:px-8 lg:px-10">
           <section className="architecture-hero-stage grid gap-8 xl:grid-cols-[1.25fr_.75fr] xl:items-end">
             <div className="architecture-hero-copy">
               <span className="inline-flex rounded-full border border-cyan-300/25 bg-cyan-300/10 px-4 py-2 text-xs font-black uppercase tracking-[0.2em] text-cyan-200">Architecture orientation</span>
@@ -1904,10 +1913,10 @@ export default function ArchitectureExplorerPage() {
                   <div className="mt-6 rounded-2xl border border-white/10 bg-black/20 p-5"><p className="text-xs font-black uppercase tracking-[0.18em] text-slate-500">Architectural question</p><p className="mt-3 text-lg font-bold text-white">What must be true here before the route may continue?</p></div>
                 </article>
                 <article className="architecture-runtime-map rounded-3xl border border-white/10 bg-white/[0.03] p-7">
-                  <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] text-violet-300">Runtime correspondence</p><h3 className="mt-2 text-2xl font-black text-white">Links governed by this anchor</h3></div><button type="button" onClick={() => setViewMode("runtime")} className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-slate-300 hover:border-cyan-300/30 hover:text-white">Open all 24 →</button></div>
+                  <div className="flex items-center justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] text-violet-300">Runtime correspondence</p><h3 className="mt-2 text-2xl font-black text-white">Links governed by this anchor</h3></div><button type="button" onClick={() => navigateToView("runtime", "architecture-workspace")} className="rounded-full border border-white/10 px-4 py-2 text-xs font-bold text-slate-300 hover:border-cyan-300/30 hover:text-white">Open all 24 →</button></div>
                   <div className="mt-6 grid gap-3 md:grid-cols-2">
                     {runtimeLinks.filter((link) => anchorCorrespondence[selectedAnchor].includes(link.id)).map((link) => (
-                      <button key={link.id} type="button" onClick={() => { setSelectedLink(link.id); setViewMode("runtime"); }} className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:border-cyan-300/30">
+                      <button key={link.id} type="button" onClick={() => { setSelectedLink(link.id); navigateToView("runtime", "architecture-workspace"); }} className="rounded-2xl border border-white/10 bg-black/20 p-4 text-left transition hover:border-cyan-300/30">
                         <span className="text-[10px] font-black tracking-[0.18em] text-cyan-300">{link.number}</span><strong className="mt-2 block text-sm text-white">{link.title}</strong><small className="mt-1 block text-xs leading-5 text-slate-500">{link.eyebrow}</small>
                       </button>
                     ))}
