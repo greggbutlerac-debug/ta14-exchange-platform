@@ -326,7 +326,7 @@ const gates: GateItem[] = [
     chainLink: "OUTCOME",
     result: "PASS",
     reasonCode: "ZERO_TRANSFER_CONFIRMED",
-    summary: "No production changes left the controlled account state.",
+    summary: "No production resources were created, updated, deleted, routed, or otherwise mutated.",
   },
   {
     number: "24",
@@ -420,8 +420,8 @@ const evidence: EvidenceItem[] = [
     status: "ADMITTED",
     capturedAt: "2026-07-31 19:16:03 UTC",
     hash: "58a1b51e...e52f",
-    supports: "The committed DENY prevented transmission and retained the request.",
-    limitation: "Proves control of the reference adapter, not every external deployment rail.",
+    supports: "The committed DENY prevented the unauthorized deployment command from reaching any production control surface and preserved the rejected request.",
+    limitation: "Proves control of the TA-14 reference deployment adapter for this bounded event; it does not establish control over unrelated external deployment systems.",
   },
   {
     id: "EA-000003-EV-08",
@@ -527,12 +527,12 @@ const acceptanceTests: AcceptanceTest[] = [
   {
     id: "AT-04",
     result: "PASS",
-    condition: "The failed continuity gate could not be skipped to reach ALLOW.",
+    condition: "The failed Binding and execution-boundary gate could not be skipped, overridden, or relabeled to reach ALLOW.",
   },
   {
     id: "AT-05",
     result: "PASS",
-    condition: "The out-of-scope request triggered immediate dependent-gate failure and denied execution.",
+    condition: "The out-of-scope production request triggered the mandatory boundary prohibition and produced DENY before adapter release.",
   },
   {
     id: "AT-06",
@@ -1527,7 +1527,7 @@ export default function ExecutionArtifact000003Page() {
             </span>
           </Link>
           <div className="artifact-top-actions">
-            <Link className="artifact-link" href="/artifacts/ta14-ea-000001">← Artifact 000001</Link>
+            <Link className="artifact-link" href="/artifacts/ta14-ea-000002">← Artifact 000002</Link>
             <Link className="artifact-link" href="/artifacts">Artifact library</Link>
             <Link className="artifact-link" href="/workspace/artifacts/build">Build an artifact</Link>
           </div>
@@ -1544,7 +1544,7 @@ export default function ExecutionArtifact000003Page() {
               <p className="artifact-lede">
                 A executor possessed valid delegated authority when the deployment route began.
                 That authority was exceeded before commitment. TA-14 preserved the change,
-                invalidated dependent gates, committed DENY, blocked transmission, and closed
+                invalidated dependent gates, committed DENY, blocked the unauthorized deployment command, and closed
                 the outcome with zero unauthorized actions executed.
               </p>
               <div className="artifact-hero-meta">
@@ -1568,7 +1568,7 @@ export default function ExecutionArtifact000003Page() {
               <div className="artifact-decision-grid">
                 <div className="artifact-decision-cell">
                   <span>Control effect</span>
-                  <strong>HTTP 403 · DENIED</strong>
+                  <strong>HTTP 403 · DEPLOYMENT DENIED</strong>
                 </div>
                 <div className="artifact-decision-cell">
                   <span>Production changes released</span>
@@ -1817,7 +1817,7 @@ export default function ExecutionArtifact000003Page() {
               <Panel
                 eyebrow="Execution effect"
                 title="The determination changed what the system could do."
-                subtitle="This is the difference between governance and description. The reference adapter received a control command, refused transmission, and generated a technical receipt."
+                subtitle="This is the difference between governance and description. The reference deployment adapter received a DENY command, rejected the unauthorized production mutation request, revoked the pending execution token, and generated a technical receipt."
               >
                 <div className="artifact-effect">
                   <article className="artifact-effect-box">
@@ -1837,7 +1837,7 @@ export default function ExecutionArtifact000003Page() {
                     <div className="artifact-overline">Enforced result</div>
                     <h3>DENIED · HTTP 403</h3>
                     <p>
-                      The transmission endpoint remained closed. The request was retained in a
+                      The production deployment endpoint remained closed to the unauthorized scope. The rejected request was retained in a
                       controlled queue with no alternate-path release and no backdated approval.
                     </p>
                     <div className="artifact-receipt-grid">
