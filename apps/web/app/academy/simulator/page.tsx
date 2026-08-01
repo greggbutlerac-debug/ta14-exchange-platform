@@ -1511,7 +1511,7 @@ function evaluate(gates: GateState) {
 
 function GateToggle({ gate, checked, onChange }: { gate: (typeof gateLabels)[number]; checked: boolean; onChange: (value: boolean) => void }) {
   return (
-    <label className="group flex cursor-pointer gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.018] p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-cyan-300/[0.055] hover:shadow-xl">
+    <label className="gate-module group flex cursor-pointer gap-4 rounded-2xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.018] p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-cyan-300/35 hover:bg-cyan-300/[0.055] hover:shadow-xl">
       <input type="checkbox" checked={checked} onChange={(event) => onChange(event.target.checked)} className="mt-1 h-5 w-5 shrink-0 accent-cyan-400" />
       <span>
         <span className="block font-semibold text-white">{gate.label}</span>
@@ -1523,7 +1523,7 @@ function GateToggle({ gate, checked, onChange }: { gate: (typeof gateLabels)[num
 
 function Metric({ label, value, detail }: { label: string; value: string; detail: string }) {
   return (
-    <article className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+    <article className="metric-pod rounded-2xl border border-white/10 bg-white/[0.035] p-4">
       <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p>
       <p className="mt-2 text-2xl font-black text-white">{value}</p>
       <p className="mt-2 text-sm leading-6 text-slate-400">{detail}</p>
@@ -1539,6 +1539,38 @@ function SectionTitle({ eyebrow, title, text }: { eyebrow: string; title: string
       <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">{text}</p>
     </div>
   );
+}
+
+
+function OrbitalGovernanceMap({ score, decision }: { score: number; decision: Decision }) {
+  const nodes = [["Reality", "R"], ["Record", "RE"], ["Continuity", "C"], ["Admissibility", "A"], ["Binding", "B"], ["Commit", "CM"], ["Execution", "E"], ["Outcome", "O"]];
+  return (
+    <div className="governance-orbit relative mx-auto aspect-square w-full max-w-[430px]">
+      <div className="absolute inset-[8%] rounded-full border border-cyan-200/10" />
+      <div className="absolute inset-[20%] rounded-full border border-indigo-200/10" />
+      <div className="absolute inset-[32%] rounded-full border border-white/10" />
+      <div className="absolute inset-[39%] grid place-items-center rounded-full border border-cyan-200/25 bg-[radial-gradient(circle_at_35%_25%,rgba(103,232,249,.24),rgba(8,20,38,.96)_58%)] shadow-[0_0_65px_rgba(34,211,238,.16),inset_0_0_30px_rgba(255,255,255,.04)]">
+        <div className="text-center"><p className="text-[10px] font-black uppercase tracking-[0.22em] text-cyan-200/70">Live determination</p><p className="mt-2 text-2xl font-black tracking-[-0.05em] text-white">{decision}</p><p className="mt-1 text-sm font-black text-cyan-200">{score}% ready</p></div>
+      </div>
+      {nodes.map(([label, short], index) => {
+        const angle = (index / nodes.length) * Math.PI * 2 - Math.PI / 2;
+        const x = 50 + Math.cos(angle) * 43;
+        const y = 50 + Math.sin(angle) * 43;
+        return <div key={label} className="absolute -translate-x-1/2 -translate-y-1/2" style={{ left: `${x}%`, top: `${y}%` }}><div className="group relative grid h-14 w-14 place-items-center rounded-2xl border border-cyan-200/20 bg-[linear-gradient(145deg,rgba(15,38,61,.96),rgba(4,12,24,.95))] shadow-[0_12px_30px_rgba(0,0,0,.36),0_0_24px_rgba(34,211,238,.08)]"><span className="text-[11px] font-black text-cyan-100">{short}</span><span className="pointer-events-none absolute top-full mt-2 whitespace-nowrap rounded-lg border border-white/10 bg-slate-950/95 px-2 py-1 text-[9px] font-bold text-slate-300 opacity-0 shadow-xl transition group-hover:opacity-100">{label}</span></div></div>;
+      })}
+      <div className="orbit-scan absolute inset-[8%] rounded-full border-t border-cyan-200/50" />
+    </div>
+  );
+}
+
+function RuntimeRail({ gates }: { gates: GateState }) {
+  return <div className="runtime-rail control-spine overflow-hidden rounded-[1.6rem] border border-cyan-200/15 bg-black/20 p-4 shadow-inner"><div className="flex min-w-[760px] items-center gap-2">{gateLabels.map((gate, index) => { const active = gates[gate.key]; return <div key={gate.key} className="flex flex-1 items-center gap-2"><div className={`relative flex min-h-20 flex-1 flex-col justify-center rounded-xl border px-3 py-3 transition ${active ? "border-cyan-200/30 bg-cyan-300/[0.08]" : "border-rose-300/20 bg-rose-300/[0.05]"}`}><span className={`absolute right-2 top-2 h-2 w-2 rounded-full ${active ? "bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,.9)]" : "bg-rose-300 shadow-[0_0_14px_rgba(253,164,175,.7)]"}`} /><span className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">{String(index + 1).padStart(2, "0")}</span><span className="mt-1 text-xs font-black text-white">{gate.label}</span></div>{index < gateLabels.length - 1 && <span className={`h-px w-3 ${active ? "bg-cyan-300/50" : "bg-white/10"}`} />}</div>; })}</div></div>;
+}
+
+function DecisionBeacon({ score }: { score: number }) {
+  const circumference = 2 * Math.PI * 46;
+  const offset = circumference - (score / 100) * circumference;
+  return <div className="relative grid place-items-center"><svg viewBox="0 0 112 112" className="h-36 w-36 -rotate-90 drop-shadow-[0_0_22px_rgba(34,211,238,.15)]" aria-hidden="true"><circle cx="56" cy="56" r="46" fill="none" stroke="rgba(255,255,255,.08)" strokeWidth="7" /><circle cx="56" cy="56" r="46" fill="none" stroke="currentColor" strokeWidth="7" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} className="transition-all duration-700" /></svg><div className="absolute text-center"><p className="text-3xl font-black tracking-[-0.06em]">{score}%</p><p className="mt-1 text-[9px] font-black uppercase tracking-[0.18em] opacity-70">readiness</p></div></div>;
 }
 
 export default function SimulatorPage() {
@@ -1620,28 +1652,41 @@ export default function SimulatorPage() {
   }
 
   return (
-    <main className="simulation-center relative min-h-screen overflow-hidden text-slate-100">
+    <main className="simulation-center command-deck relative min-h-screen overflow-hidden text-slate-100">
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="absolute -left-24 top-24 h-[30rem] w-[30rem] rounded-full bg-cyan-400/[0.08] blur-[110px]" />
         <div className="absolute right-[-8rem] top-[22rem] h-[34rem] w-[34rem] rounded-full bg-indigo-500/[0.08] blur-[130px]" />
         <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-200/40 to-transparent" />
-        <div className="absolute inset-0 opacity-[0.045]" style={{ backgroundImage: "linear-gradient(rgba(125,211,252,.65) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,.65) 1px, transparent 1px)", backgroundSize: "52px 52px", maskImage: "linear-gradient(to bottom, black, transparent 78%)" }} />
+        <div className="star-field absolute inset-0 opacity-80" />
+        <div className="cockpit-horizon absolute inset-x-[-8%] top-[28rem] h-[26rem] opacity-70" />
+        <div className="deck-grid absolute inset-x-[-10%] top-[36rem] h-[58rem] origin-top" />
+        <div className="scan-column absolute left-[8%] top-0 h-full w-px" />
+        <div className="scan-column absolute right-[8%] top-0 h-full w-px" />
+        <div className="absolute inset-0 opacity-[0.055]" style={{ backgroundImage: "linear-gradient(rgba(125,211,252,.65) 1px, transparent 1px), linear-gradient(90deg, rgba(125,211,252,.65) 1px, transparent 1px)", backgroundSize: "52px 52px", maskImage: "linear-gradient(to bottom, black, transparent 78%)" }} />
       </div>
 
-      <div className="simulation-shell mx-auto w-full max-w-[1540px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 xl:px-10">
-          <header className="relative overflow-hidden rounded-[2.25rem] border border-cyan-200/15 bg-[linear-gradient(135deg,rgba(8,24,39,.96),rgba(4,11,22,.92)_55%,rgba(11,24,47,.92))] p-6 shadow-[0_30px_90px_rgba(0,0,0,.42)] ring-1 ring-white/[0.04] backdrop-blur-xl sm:p-8 xl:p-10">
-            <div className="flex flex-col gap-8 xl:flex-row xl:items-end xl:justify-between">
+      <div className="simulation-shell command-perspective mx-auto w-full max-w-[1580px] px-4 pb-24 pt-6 sm:px-6 lg:px-8 xl:px-10">
+          <header className="hero-vault isometric-hero relative overflow-hidden rounded-[2.6rem] border border-cyan-200/15 bg-[linear-gradient(135deg,rgba(8,24,39,.96),rgba(4,11,22,.92)_55%,rgba(11,24,47,.92))] p-6 shadow-[0_30px_90px_rgba(0,0,0,.42)] ring-1 ring-white/[0.04] backdrop-blur-xl sm:p-8 xl:p-10">
+            <div className="hero-frame pointer-events-none absolute inset-3 rounded-[2.1rem]" aria-hidden="true" />
+            <div className="hero-corner hero-corner-a" aria-hidden="true" />
+            <div className="hero-corner hero-corner-b" aria-hidden="true" />
+            <div className="hero-corner hero-corner-c" aria-hidden="true" />
+            <div className="hero-corner hero-corner-d" aria-hidden="true" />
+            <div className="pointer-events-none absolute -right-24 -top-36 h-[34rem] w-[34rem] rounded-full border border-cyan-200/10" />
+            <div className="pointer-events-none absolute right-[-2rem] top-[-2rem] h-56 w-56 rounded-full bg-cyan-300/[0.08] blur-3xl" />
+            <div className="pointer-events-none absolute bottom-[-12rem] left-[25%] h-80 w-80 rounded-full bg-indigo-500/[0.10] blur-[100px]" />
+            <div className="relative z-10 grid gap-10 xl:grid-cols-[1.15fr_.85fr] xl:items-center">
               <div>
-                <p className="text-xs font-black uppercase tracking-[0.28em] text-cyan-300">TA-14 Academy · Governed practice environment</p>
-                <h1 className="mt-5 max-w-5xl bg-gradient-to-br from-white via-cyan-50 to-cyan-300 bg-clip-text text-4xl font-black tracking-[-0.055em] text-transparent sm:text-5xl xl:text-7xl">Simulation Center</h1>
-                <p className="mt-5 max-w-4xl text-base leading-8 text-slate-300 sm:text-lg">Test whether a consequential action has earned the right to proceed before consequence binds to reality. Change the conditions, locate the earliest failure, preserve the determination, and learn why completion is never permission.</p>
+                <div className="inline-flex items-center gap-3 rounded-full border border-cyan-200/20 bg-cyan-300/[0.055] px-4 py-2 shadow-[0_0_30px_rgba(34,211,238,.08)]"><span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_14px_rgba(103,232,249,.9)]" /><p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-200">TA-14 Academy · Governed practice environment</p></div>
+                <h1 className="mt-7 max-w-5xl bg-gradient-to-br from-white via-cyan-50 to-cyan-300 bg-clip-text text-5xl font-black tracking-[-0.065em] text-transparent sm:text-6xl xl:text-[5.35rem] xl:leading-[.93]">Simulation<br className="hidden sm:block" /> Center</h1>
+                <p className="mt-6 max-w-3xl text-base leading-8 text-slate-300 sm:text-lg">Test whether a consequential action has earned the right to proceed before consequence binds to reality. Manipulate evidence, authority, continuity, boundary, dependencies, and revalidation—then watch the determination change in real time.</p>
+                <div className="mt-7 flex flex-wrap gap-3"><button type="button" onClick={() => setActiveTab("run")} className="rounded-xl bg-gradient-to-r from-cyan-200 to-sky-300 px-5 py-3 text-sm font-black text-slate-950 shadow-[0_12px_35px_rgba(34,211,238,.22)] transition hover:-translate-y-0.5">Enter live laboratory →</button><button type="button" onClick={() => setActiveTab("architecture")} className="rounded-xl border border-white/15 bg-white/[0.04] px-5 py-3 text-sm font-black text-white transition hover:border-cyan-200/30 hover:bg-white/[0.07]">Inspect runtime architecture</button></div>
+                <div className="mt-7 max-w-xl rounded-2xl border border-cyan-300/20 bg-[linear-gradient(90deg,rgba(34,211,238,.08),rgba(99,102,241,.04))] px-5 py-4 text-sm leading-6 text-cyan-50 shadow-inner"><span className="font-black text-cyan-200">Governing principle:</span> No admissible evidence. No admissible execution.</div>
               </div>
-              <div className="rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.06] px-5 py-4 text-sm leading-6 text-cyan-100 xl:max-w-sm">
-                <span className="font-black">Governing principle:</span><br />No admissible evidence. No admissible execution.
-              </div>
+              <OrbitalGovernanceMap score={result.score} decision={result.decision} />
             </div>
 
-            <div className="mt-8 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="relative z-10 mt-9 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
               <Metric label="Scenarios" value={String(scenarios.length)} detail="Consequence-bearing practice environments" />
               <Metric label="Runtime gates" value="24" detail="Complete governing chain represented" />
               <Metric label="Preserved runs" value={String(history.length)} detail="Local learner simulation records" />
@@ -1654,6 +1699,8 @@ export default function SimulatorPage() {
               <button key={tab} type="button" onClick={() => setActiveTab(tab)} className={`rounded-xl border px-4 py-3 text-sm font-black capitalize transition ${activeTab === tab ? "border-cyan-300/40 bg-cyan-300/10 text-cyan-100" : "border-white/10 bg-white/[0.03] text-slate-400 hover:text-white"}`}>{tab === "run" ? "Simulation workspace" : tab === "architecture" ? "Architecture correspondence" : "Preserved history"}</button>
             ))}
           </div>
+
+          <div className="mt-4 overflow-x-auto pb-1"><RuntimeRail gates={gates} /></div>
 
           {activeTab === "run" && (
             <div className="mt-6 space-y-6">
@@ -1704,8 +1751,10 @@ export default function SimulatorPage() {
                     <div className="mt-6 grid gap-3 md:grid-cols-2">{gateLabels.map((gate) => <GateToggle key={gate.key} gate={gate} checked={gates[gate.key]} onChange={(value) => updateGate(gate.key, value)} />)}</div>
                   </article>
 
-                  <article className={`rounded-[2rem] border p-6 sm:p-8 ${decisionStyle[result.decision]}`}>
-                    <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] opacity-70">Current determination</p><p className="mt-3 text-5xl font-black tracking-tight">{result.decision}</p></div><div className="rounded-2xl border border-current/20 px-5 py-4 text-right"><p className="text-xs font-bold uppercase tracking-[0.18em] opacity-70">Readiness</p><p className="mt-1 text-3xl font-black">{result.score}%</p></div></div>
+                  <article className={`decision-vault relative overflow-hidden rounded-[2.25rem] border p-6 shadow-[0_28px_80px_rgba(0,0,0,.34)] sm:p-8 ${decisionStyle[result.decision]}`}>
+                    <div className="pointer-events-none absolute -right-20 -top-20 h-64 w-64 rounded-full border border-current/10" />
+                    <div className="pointer-events-none absolute -bottom-28 left-10 h-60 w-60 rounded-full bg-current/[0.05] blur-3xl" />
+                    <div className="relative z-10 flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between"><div><p className="text-xs font-black uppercase tracking-[0.22em] opacity-70">Current determination</p><p className="mt-3 text-5xl font-black tracking-[-0.065em] sm:text-6xl">{result.decision}</p><p className="mt-2 text-xs font-bold uppercase tracking-[0.16em] opacity-60">{result.passed} of {gateLabels.length} modeled conditions supported</p></div><DecisionBeacon score={result.score} /></div>
                     <p className="mt-6 text-base font-semibold leading-7">{result.reason}</p>
                     {result.failed.length > 0 ? <div className="mt-6 space-y-2">{result.failed.map((failure) => <div key={failure} className="rounded-xl border border-current/20 bg-black/10 px-4 py-3 text-sm">{failure}</div>)}</div> : <div className="mt-6 rounded-xl border border-current/20 bg-black/10 px-4 py-3 text-sm">All modeled conditions are supported. Preserve the run before treating the determination as a learning artifact.</div>}
                     <div className="mt-6 flex flex-wrap gap-3"><button type="button" onClick={preserveRun} className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950 transition hover:bg-slate-100">Preserve simulation run</button><Link href="/academy/review" className="rounded-xl border border-current/25 px-5 py-3 text-sm font-black hover:bg-black/10">Open Review Workspace →</Link></div>
@@ -1919,7 +1968,45 @@ export default function SimulatorPage() {
         </div>
 
       <style jsx global>{`
-        .simulation-center { isolation: isolate; }
+        .simulation-center { isolation: isolate; background: radial-gradient(circle at 50% -8%, rgba(34,211,238,.18), transparent 30%), radial-gradient(circle at 86% 24%, rgba(99,102,241,.16), transparent 28%), radial-gradient(circle at 12% 58%, rgba(14,165,233,.11), transparent 32%), linear-gradient(180deg,#020711 0%,#030914 38%,#02050c 100%); }
+        .command-deck::before { content:""; position:fixed; inset:0; pointer-events:none; z-index:0; background:linear-gradient(90deg,rgba(34,211,238,.035),transparent 17%,transparent 83%,rgba(99,102,241,.035)),linear-gradient(180deg,rgba(255,255,255,.018),transparent 14%); box-shadow:inset 0 0 180px rgba(0,0,0,.72); }
+        .command-perspective { position:relative; z-index:2; perspective:1800px; perspective-origin:50% 8%; }
+        .cockpit-horizon { background:radial-gradient(ellipse at center,rgba(34,211,238,.16),rgba(14,116,144,.05) 36%,transparent 68%); filter:blur(18px); transform:scaleX(1.2); }
+        .deck-grid { background-image:linear-gradient(rgba(34,211,238,.13) 1px,transparent 1px),linear-gradient(90deg,rgba(34,211,238,.13) 1px,transparent 1px); background-size:58px 58px; transform:perspective(650px) rotateX(64deg) scale(1.25); transform-origin:top; mask-image:linear-gradient(to bottom,rgba(0,0,0,.9),transparent 72%); opacity:.28; }
+        .scan-column { background:linear-gradient(to bottom,transparent,rgba(103,232,249,.5),transparent); filter:drop-shadow(0 0 10px rgba(34,211,238,.4)); opacity:.35; }
+        .isometric-hero { transform-style:preserve-3d; transform:rotateX(.45deg); box-shadow:0 42px 120px rgba(0,0,0,.58),0 0 0 1px rgba(103,232,249,.05),inset 0 1px 0 rgba(255,255,255,.07),inset 0 -45px 80px rgba(0,0,0,.26); }
+        .hero-frame { border:1px solid rgba(103,232,249,.12); box-shadow:inset 0 0 55px rgba(34,211,238,.035); }
+        .hero-corner { position:absolute; z-index:3; width:42px; height:42px; pointer-events:none; border-color:rgba(103,232,249,.58); filter:drop-shadow(0 0 9px rgba(34,211,238,.35)); }
+        .hero-corner-a { left:18px; top:18px; border-left:2px solid; border-top:2px solid; border-radius:16px 0 0 0; }
+        .hero-corner-b { right:18px; top:18px; border-right:2px solid; border-top:2px solid; border-radius:0 16px 0 0; }
+        .hero-corner-c { left:18px; bottom:18px; border-left:2px solid; border-bottom:2px solid; border-radius:0 0 0 16px; }
+        .hero-corner-d { right:18px; bottom:18px; border-right:2px solid; border-bottom:2px solid; border-radius:0 0 16px 0; }
+        .metric-pod { position:relative; overflow:hidden; min-height:132px; background:linear-gradient(145deg,rgba(19,43,65,.78),rgba(4,12,24,.82)); box-shadow:0 18px 38px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.055),inset 0 -18px 30px rgba(0,0,0,.18); transform:translateZ(22px); transition:transform .3s ease,border-color .3s ease,box-shadow .3s ease; }
+        .metric-pod::before { content:""; position:absolute; inset:0; background:linear-gradient(120deg,rgba(103,232,249,.08),transparent 34%,transparent 70%,rgba(99,102,241,.07)); pointer-events:none; }
+        .metric-pod::after { content:""; position:absolute; left:16px; right:16px; bottom:0; height:2px; background:linear-gradient(90deg,transparent,rgba(103,232,249,.7),transparent); box-shadow:0 0 16px rgba(34,211,238,.5); }
+        .metric-pod:hover { transform:translateY(-5px) translateZ(28px); border-color:rgba(103,232,249,.32); box-shadow:0 26px 58px rgba(0,0,0,.4),0 0 28px rgba(34,211,238,.08); }
+        .control-spine { box-shadow:0 22px 52px rgba(0,0,0,.38),inset 0 1px 0 rgba(255,255,255,.055),inset 0 0 48px rgba(34,211,238,.025); transform:translateZ(12px); }
+        .gate-module { position:relative; overflow:hidden; box-shadow:0 14px 30px rgba(0,0,0,.22),inset 0 1px 0 rgba(255,255,255,.045); }
+        .gate-module::after { content:""; position:absolute; inset:auto 12px 0; height:1px; background:linear-gradient(90deg,transparent,rgba(103,232,249,.55),transparent); opacity:.5; }
+        .gate-module:hover { transform:translateY(-4px) scale(1.01); box-shadow:0 22px 46px rgba(0,0,0,.35),0 0 22px rgba(34,211,238,.07); }
+        .simulation-center section, .simulation-center article { backface-visibility:hidden; }
+        .simulation-center section[class*="rounded-[2rem]"], .simulation-center article[class*="rounded-[2rem]"] { position:relative; box-shadow:0 28px 72px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.045); }
+        .simulation-center section[class*="rounded-[2rem]"]::before { content:""; position:absolute; inset:0; border-radius:inherit; pointer-events:none; background:linear-gradient(130deg,rgba(103,232,249,.035),transparent 28%,transparent 70%,rgba(99,102,241,.035)); }
+        .simulation-center button[class*="rounded-[1.35rem]"] { transform-style:preserve-3d; box-shadow:0 18px 42px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.05); }
+        .simulation-center button[class*="rounded-[1.35rem]"]:hover { transform:translateY(-7px) rotateX(1.2deg) rotateY(-.7deg); box-shadow:0 30px 65px rgba(0,0,0,.46),0 0 26px rgba(34,211,238,.09); }
+        .decision-vault { transform-style:preserve-3d; box-shadow:0 34px 95px rgba(0,0,0,.48),0 0 42px rgba(34,211,238,.07),inset 0 1px 0 rgba(255,255,255,.08),inset 0 -35px 60px rgba(0,0,0,.22)!important; }
+        .decision-vault > * { transform:translateZ(18px); }
+        .governance-orbit { filter:drop-shadow(0 35px 38px rgba(0,0,0,.4)); transform:rotateX(5deg) rotateZ(-1deg); transform-style:preserve-3d; }
+        .governance-orbit > div { transform-style:preserve-3d; }
+        .star-field { background-image: radial-gradient(circle at 12% 18%, rgba(255,255,255,.55) 0 1px, transparent 1.5px), radial-gradient(circle at 68% 22%, rgba(103,232,249,.45) 0 1px, transparent 1.5px), radial-gradient(circle at 86% 58%, rgba(255,255,255,.35) 0 1px, transparent 1.5px), radial-gradient(circle at 34% 74%, rgba(129,140,248,.4) 0 1px, transparent 1.5px); background-size: 280px 280px,360px 360px,440px 440px,520px 520px; mask-image: linear-gradient(to bottom,black,transparent 82%); }
+        .hero-vault::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(115deg,transparent 15%,rgba(255,255,255,.035) 43%,transparent 61%); transform:translateX(-120%); animation:vault-sheen 9s ease-in-out infinite; }
+        .governance-orbit::before { content:""; position:absolute; inset:15%; border-radius:999px; background:conic-gradient(from 180deg,transparent,rgba(34,211,238,.16),transparent 36%,rgba(99,102,241,.13),transparent 70%); filter:blur(12px); animation:orbit-glow 12s linear infinite; }
+        .orbit-scan { animation:orbit-spin 9s linear infinite; box-shadow:0 -8px 28px rgba(34,211,238,.12); }
+        .runtime-rail { background-image:linear-gradient(90deg,rgba(34,211,238,.025) 1px,transparent 1px); background-size:34px 100%; }
+        .decision-vault::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(125deg,rgba(255,255,255,.05),transparent 30%,transparent 70%,rgba(255,255,255,.025)); }
+        @keyframes orbit-spin { to { transform:rotate(360deg) translateZ(0); } }
+        @keyframes orbit-glow { to { transform:rotate(-360deg); } }
+        @keyframes vault-sheen { 0%,70% { transform:translateX(-120%); } 88%,100% { transform:translateX(120%); } }
         .simulation-center ::selection { background: rgba(103, 232, 249, .28); color: #fff; }
         .simulation-center input,
         .simulation-center select,
@@ -1928,6 +2015,7 @@ export default function SimulatorPage() {
         .simulation-center a { -webkit-tap-highlight-color: transparent; }
         .simulation-center article,
         .simulation-center section { transform: translateZ(0); }
+        @media (max-width: 900px) { .isometric-hero,.governance-orbit { transform:none; } .deck-grid { opacity:.16; } .metric-pod { transform:none; } }
         @media (prefers-reduced-motion: no-preference) {
           .simulation-shell > header { animation: simulation-rise .55s ease-out both; }
           .simulation-shell > div,
