@@ -1,2289 +1,2024 @@
 /**
- * TA-14 Authority | Execution Artifact Challenge & Correction Engine
+ * TA-14 Authority | Execution Artifact Integrity & Hash Engine
  * Version 1.0.0
  *
- * Governing rule: challenge may change prospective reliance, but it may never
- * erase, rewrite, or silently replace the original execution record.
+ * Institutional purpose:
+ *   Provide deterministic canonicalization, component hashing, package-root
+ *   calculation, append-only lineage verification, and offline integrity
+ *   proof for every execution artifact and its related registry components.
  *
- * No registered governance. No registered artifact.
- * No admissible evidence. No admissible execution.
+ * Governing rules:
+ *   Integrity does not prove truth; it proves that the committed bytes and
+ *   canonical values have not changed without detection.
+ *
+ *   No registered governance. No registered artifact.
+ *   No admissible evidence. No admissible execution.
  */
 
-import {
-  type ArtifactRegistryRecord,
-  type RegistryChallengeReference,
-  type RegistryCorrectionReference,
-  type RegistryPublicationState,
-  appendRegistryChallenge,
-  appendRegistryCorrection,
-  rehashRegistryRecord,
-  stableRegistryRecordJson,
-  transitionRegistryState,
-  verifyRegistryRecord,
+import type { CanonicalExecutionArtifact } from "./canonical-record-validator";
+import type {
+  ArtifactRegistryRecord,
+  RegistryPublicationManifest,
+  RegistryPublicationComponent,
 } from "./artifact-registry-engine";
 
-import {
-  type CanonicalExecutionArtifact,
-  type Determination,
-  stableValidationJson,
-  validateCanonicalExecutionArtifact,
-} from "./canonical-record-validator";
+export const TA14_INTEGRITY_HASH_ENGINE_VERSION = "1.0.0" as const;
+export const TA14_INTEGRITY_POLICY_VERSION = "1.0" as const;
+export const TA14_CANONICALIZATION_VERSION = "TA14-C14N-1" as const;
+export const TA14_HASH_ALGORITHM = "SHA-256" as const;
+export const TA14_INTEGRITY_RULE = "ANY CHANGE MUST BE DETECTABLE" as const;
 
-export const TA14_CHALLENGE_CORRECTION_ENGINE_VERSION = "1.0.0" as const;
-export const TA14_CHALLENGE_CORRECTION_POLICY_VERSION = "1.0" as const;
-export const TA14_CHALLENGE_RULE = "PRESERVE THE ORIGINAL; APPEND THE CHALLENGE; BOUND THE CORRECTION" as const;
+export type HashAlgorithm = "SHA-256";
+export type IntegritySeverity = "INFO" | "WARNING" | "ERROR";
+export type IntegrityDisposition = "VERIFIED" | "VERIFIED_WITH_WARNINGS" | "FAILED";
+export type IntegrityDomain =
+  | "CANONICAL"
+  | "CANONICALIZATION"
+  | "ALGORITHM"
+  | "COMPONENT"
+  | "PACKAGE"
+  | "MANIFEST"
+  | "PDF"
+  | "JSON"
+  | "RECEIPT"
+  | "ROUTE"
+  | "OUTCOME"
+  | "REGISTRY"
+  | "VERIFICATION"
+  | "CHALLENGE"
+  | "AMENDMENT"
+  | "SUPERSESSION"
+  | "AUDIT"
+  | "LINEAGE"
+  | "PARITY"
+  | "OFFLINE"
+  | "SIGNATURE"
+  | "TIME"
+  | "ENGINE"
+  | "POLICY"
+  | "DISCLOSURE"
+  | "CLAIMS"
+  | "PUBLICATION"
+  | "RESULT";
 
-export type ChallengeStatus = "PENDING" | "UNDER_REVIEW" | "UPHELD" | "MODIFIED" | "REVERSED" | "CLOSED" | "WITHDRAWN";
-export type ChallengeDisposition = "ACCEPTED" | "HOLD" | "ESCALATE" | "REJECTED";
-export type ChallengeIssueDisposition = "PASS" | "HOLD" | "DENY" | "ESCALATE";
-export type ChallengeSubjectType = "CLAIM" | "EVIDENCE" | "AUTHORITY" | "CONTINUITY" | "GATE_RESULT" | "DETERMINATION" | "EXECUTION_RECEIPT" | "OUTCOME" | "INTEGRITY" | "VERIFICATION" | "DISCLOSURE" | "REGISTRY_STATUS";
-export type EvidenceAdmissibility = "ADMITTED" | "CONDITIONALLY_ADMITTED" | "EXCLUDED" | "PENDING";
-export type CorrectionEffect = "METADATA_ONLY" | "CLAIM_NARROWED" | "EVIDENCE_AMENDED" | "AUTHORITY_AMENDED" | "OUTCOME_AMENDED" | "VERIFICATION_AMENDED" | "RELIANCE_RESTRICTED" | "SUPERSESSION_REQUIRED";
-export type ProspectiveRelianceEffect = "UNCHANGED" | "LIMITED" | "SUSPENDED" | "REVOKED" | "SUPERSEDED";
-export type ChallengeDomain = "Challenge" | "Identity" | "Authority" | "Claims" | "Evidence" | "Continuity" | "Admissibility" | "Integrity" | "Registry" | "Review" | "Response" | "Architecture" | "Resolution" | "Correction" | "Reliance" | "Verification" | "Publication" | "Audit" | "Notification" | "Preservation" | "Disclosure";
+export type IntegrityComponentKind =
+  | "CANONICAL_JSON"
+  | "PUBLIC_PDF"
+  | "INTEGRITY_MANIFEST"
+  | "ROUTE_SNAPSHOT"
+  | "EXECUTION_RECEIPT"
+  | "OUTCOME_CLOSURE"
+  | "REGISTRY_RECORD"
+  | "REGISTRY_CERTIFICATE"
+  | "VERIFICATION_REPORT"
+  | "DISCLOSURE_PROJECTION"
+  | "CLAIMS_BOUNDARY"
+  | "CHALLENGE_RECORD"
+  | "CORRECTION_RECORD"
+  | "SIGNATURE_ENVELOPE"
+  | "OTHER";
 
-export interface ChallengeTarget {
-  registryId: string;
-  artifactId: string;
-  registryRecordHash: string;
-  canonicalHash: string;
-  subjectType: ChallengeSubjectType;
-  subjectId: string;
-  path: string;
-  challengedClaim: string;
-  challengedValue?: unknown;
-  requestedRemedy: string;
+export interface CanonicalizationOptions {
+  version?: typeof TA14_CANONICALIZATION_VERSION;
+  normalizeDates?: boolean;
+  normalizeUnicode?: boolean;
+  sortArrays?: boolean;
+  rejectUndefined?: boolean;
+  rejectFunctions?: boolean;
+  rejectSymbols?: boolean;
+  rejectNonFiniteNumbers?: boolean;
+  bigintMode?: "DECIMAL_STRING" | "REJECT";
 }
 
-export interface ChallengeParty {
-  partyId: string;
-  organizationId?: string;
-  displayName: string;
-  role: string;
-  authorityBasis: string;
-  contactReference?: string;
-  disclosedPublicly: boolean;
-}
-
-export interface ChallengeEvidenceItem {
-  evidenceId: string;
-  title: string;
-  description: string;
-  source: string;
-  capturedAt: string;
-  submittedAt: string;
-  submittedBy: string;
-  provenance: string;
-  custody: readonly string[];
-  hash: string;
+export interface IntegrityComponentInput {
+  componentId: string;
+  kind: IntegrityComponentKind;
+  label: string;
+  mediaType: string;
+  required: boolean;
   disclosure: "PUBLIC" | "SELECTIVE" | "RESTRICTED" | "WITHHELD";
-  admissibility: EvidenceAdmissibility;
-  admissibilityReason: string;
-  supports: readonly string[];
-  contradicts: readonly string[];
+  bytes?: Uint8Array;
+  text?: string;
+  value?: unknown;
+  declaredHash?: string;
+  declaredByteLength?: number;
+  stableUrl?: string;
+  createdAt?: string;
+  createdBy?: string;
 }
 
-export interface ReviewerAssignment {
-  reviewerId: string;
-  reviewerName: string;
-  organization: string;
-  role: string;
-  qualifications: readonly string[];
-  scope: readonly string[];
-  assignedAt: string;
-  acceptedAt?: string;
-  conflictStatement: string;
-  conflictResolved: boolean;
-  independent: boolean;
+export interface IntegrityComponentDigest {
+  componentId: string;
+  kind: IntegrityComponentKind;
+  label: string;
+  mediaType: string;
+  required: boolean;
+  disclosure: "PUBLIC" | "SELECTIVE" | "RESTRICTED" | "WITHHELD";
+  hashAlgorithm: HashAlgorithm;
+  hash: string;
+  byteLength: number;
+  stableUrl?: string;
+  createdAt?: string;
+  createdBy?: string;
 }
 
-export interface PublisherResponse {
-  responseId: string;
-  receivedAt: string;
-  respondentId: string;
-  statement: string;
-  admissions: readonly string[];
-  denials: readonly string[];
-  limitations: readonly string[];
-  evidence: readonly ChallengeEvidenceItem[];
-  responseHash: string;
-}
-
-export interface ChallengeFinding {
-  findingId: string;
-  domain: ChallengeDomain;
-  title: string;
-  conclusion: "SUPPORTED" | "NOT_SUPPORTED" | "PARTIALLY_SUPPORTED" | "INCONCLUSIVE";
-  reasoning: string;
-  evidenceIds: readonly string[];
-  affectedClaims: readonly string[];
-  affectedRuntimeLinks: readonly number[];
-  earliestControllingFailure?: number;
-  proposedEffect: CorrectionEffect | "NONE";
-}
-
-export interface CorrectionPackage {
-  correctionId: string;
-  challengeId: string;
-  createdAt: string;
-  createdBy: string;
-  approvedBy: readonly string[];
-  scope: string;
-  reason: string;
-  effect: CorrectionEffect;
-  originalRegistryRecordHash: string;
-  originalCanonicalHash: string;
-  amendmentHash: string;
-  resultingRegistryRecordHash: string;
-  resultingCanonicalHash?: string;
-  changedPaths: readonly string[];
-  unchangedDomains: readonly string[];
-  evidenceIds: readonly string[];
-  prospectiveRelianceEffect: ProspectiveRelianceEffect;
-  supersedingRegistryId?: string;
-  correctionStatement: string;
-}
-
-export interface ChallengeResolution {
-  resolutionId: string;
-  challengeId: string;
-  disposition: ChallengeStatus;
-  resolvedAt: string;
-  resolvedBy: readonly string[];
-  authorityReference: string;
-  findings: readonly ChallengeFinding[];
-  correction?: CorrectionPackage;
-  prospectiveRelianceEffect: ProspectiveRelianceEffect;
-  publicSummary: string;
-  privateNotes?: string;
-  resolutionHash: string;
-}
-
-export interface ChallengeAuditEvent {
-  eventId: string;
-  challengeId: string;
+export interface IntegrityLineageLink {
+  linkId: string;
+  sequence: number;
+  kind: "ORIGINAL" | "AMENDMENT" | "CORRECTION" | "SUPERSESSION" | "WITHDRAWAL" | "CHALLENGE" | "VERIFICATION" | "REGISTRY_UPDATE";
   occurredAt: string;
   actorId: string;
-  eventType: "CHALLENGE_OPENED" | "EVIDENCE_ADDED" | "REVIEWER_ASSIGNED" | "REVIEW_STARTED" | "PUBLISHER_NOTIFIED" | "RESPONSE_RECEIVED" | "FINDING_RECORDED" | "DISPOSITION_PROPOSED" | "CORRECTION_CREATED" | "RESOLUTION_COMMITTED" | "REGISTRY_UPDATED" | "VERIFICATION_REQUIRED" | "NOTIFICATION_SENT" | "CHALLENGE_CLOSED";
+  subjectId: string;
+  parentHash: string;
+  contentHash: string;
+  linkHash: string;
+  note: string;
+}
+
+export interface IntegrityAuditEvent {
+  eventId: string;
+  sequence: number;
+  occurredAt: string;
+  actorId: string;
+  eventType: "PACKAGE_CREATED" | "COMPONENT_HASHED" | "MANIFEST_CREATED" | "PACKAGE_VERIFIED" | "PACKAGE_FAILED" | "LINEAGE_APPENDED" | "OFFLINE_BUNDLE_CREATED" | "DIGEST_RECALCULATED";
+  subjectId: string;
   description: string;
   previousHash: string;
   eventHash: string;
 }
 
-export interface ChallengeRecord {
-  challengeId: string;
-  openedAt: string;
-  openedBy: ChallengeParty;
-  status: ChallengeStatus;
-  target: ChallengeTarget;
-  subject: string;
-  basis: string;
-  materiality: string;
-  requestedRemedy: string;
-  counterEvidence: readonly ChallengeEvidenceItem[];
-  reviewers: readonly ReviewerAssignment[];
-  reviewScope: readonly string[];
-  responseDeadline: string;
-  publisherNotifiedAt?: string;
-  publisherResponse?: PublisherResponse;
-  findings: readonly ChallengeFinding[];
-  resolution?: ChallengeResolution;
-  publicSummary: string;
-  challengeHash: string;
-  retentionUntil: string;
-  auditEvents: readonly ChallengeAuditEvent[];
+export interface IntegrityManifest {
+  manifestId: string;
+  manifestVersion: string;
+  integrityEngineVersion: string;
+  integrityPolicyVersion: string;
+  canonicalizationVersion: string;
+  hashAlgorithm: HashAlgorithm;
+  generatedAt: string;
+  generatedBy: string;
+  artifactId: string;
+  registryId?: string;
+  governanceRegistrationId?: string;
+  canonicalHash: string;
+  pdfHash?: string;
+  manifestHash: string;
+  packageRootHash: string;
+  componentCount: number;
+  components: readonly IntegrityComponentDigest[];
+  lineage: readonly IntegrityLineageLink[];
+  auditEvents: readonly IntegrityAuditEvent[];
+  publicationUrl?: string;
+  verificationUrl?: string;
+  challengeUrl?: string;
+  claimsBoundaryHash?: string;
+  disclosureProjectionHash?: string;
+  signatureEnvelopeHash?: string;
 }
 
-export interface OpenChallengeRequest {
-  requestId: string;
-  requestedAt: string;
-  actorId: string;
-  registryRecord: ArtifactRegistryRecord;
-  artifact: CanonicalExecutionArtifact;
-  target: ChallengeTarget;
-  challenger: ChallengeParty;
-  subject: string;
-  basis: string;
-  materiality: string;
-  requestedRemedy: string;
-  counterEvidence: readonly ChallengeEvidenceItem[];
-  publicSummary: string;
-  responseDeadline: string;
-  retentionUntil: string;
-  existingChallenges?: readonly ChallengeRecord[];
+export interface IntegrityIssue {
+  code: IntegrityReasonCode;
+  domain: IntegrityDomain;
+  severity: IntegritySeverity;
+  title: string;
+  message: string;
+  path?: string;
+  expected?: unknown;
+  actual?: unknown;
+  componentId?: string;
 }
 
-export interface ChallengeReasonDefinition {
-  code: ChallengeReasonCode;
-  domain: ChallengeDomain;
-  disposition: ChallengeIssueDisposition;
+export interface IntegrityReasonDefinition {
+  code: IntegrityReasonCode;
+  domain: IntegrityDomain;
+  severity: IntegritySeverity;
   title: string;
   description: string;
-  repairable: boolean;
-  publicMessage: string;
 }
 
-export interface ChallengeIssue {
-  code: ChallengeReasonCode;
-  domain: ChallengeDomain;
-  disposition: ChallengeIssueDisposition;
-  path: string;
-  message: string;
-  repair?: string;
-  details?: Record<string, unknown>;
-}
-
-export interface ChallengeControlDefinition {
+export interface IntegrityControlDefinition {
   controlId: string;
-  domain: ChallengeDomain;
+  domain: IntegrityDomain;
   title: string;
   requirement: string;
 }
 
-export interface ChallengeControlEvaluation {
-  controlId: string;
-  result: "PASS" | "HOLD" | "FAIL" | "ESCALATE" | "NOT_APPLICABLE";
-  evidence: readonly string[];
-  notes: string;
+export interface IntegrityAcceptanceTest {
+  testId: string;
+  title: string;
+  passCondition: string;
 }
 
-export interface OpenChallengeDecision {
-  evaluationId: string;
-  disposition: ChallengeDisposition;
-  challengeId?: string;
-  evaluatedAt: string;
-  issues: readonly ChallengeIssue[];
-  controls: readonly ChallengeControlEvaluation[];
-  registryIssues: readonly string[];
-  canonicalIssues: readonly string[];
-  auditEvents: readonly ChallengeAuditEvent[];
-  stableJson: string;
+export interface IntegrityVerificationResult {
+  disposition: IntegrityDisposition;
+  verified: boolean;
+  verifiedAt: string;
+  verifierId: string;
+  engineVersion: string;
+  policyVersion: string;
+  canonicalizationVersion: string;
+  hashAlgorithm: HashAlgorithm;
+  canonicalHash: string;
+  calculatedManifestHash: string;
+  calculatedPackageRootHash: string;
+  componentResults: readonly ComponentVerificationResult[];
+  lineageVerified: boolean;
+  auditChainVerified: boolean;
+  issues: readonly IntegrityIssue[];
+  warnings: readonly IntegrityIssue[];
+  errors: readonly IntegrityIssue[];
+  reportHash: string;
 }
 
-export interface OpenChallengeResult {
-  decision: OpenChallengeDecision;
-  challenge?: ChallengeRecord;
-  registryRecord: ArtifactRegistryRecord;
+export interface ComponentVerificationResult {
+  componentId: string;
+  kind: IntegrityComponentKind;
+  required: boolean;
+  declaredHash?: string;
+  calculatedHash: string;
+  byteLength: number;
+  hashMatches: boolean;
+  lengthMatches: boolean;
+  verified: boolean;
 }
 
-export interface ResolveChallengeRequest {
-  requestId: string;
-  requestedAt: string;
-  actorId: string;
-  registryRecord: ArtifactRegistryRecord;
+export interface IntegrityPackageRequest {
   artifact: CanonicalExecutionArtifact;
-  challenge: ChallengeRecord;
-  reviewers: readonly ReviewerAssignment[];
-  publisherResponse?: PublisherResponse;
-  findings: readonly ChallengeFinding[];
-  disposition: ChallengeStatus;
-  authorityReference: string;
-  prospectiveRelianceEffect: ProspectiveRelianceEffect;
-  publicSummary: string;
-  privateNotes?: string;
-  correction?: Omit<CorrectionPackage, "challengeId" | "originalRegistryRecordHash" | "originalCanonicalHash" | "amendmentHash" | "resultingRegistryRecordHash">;
+  registryRecord?: ArtifactRegistryRecord;
+  registryManifest?: RegistryPublicationManifest;
+  components: readonly IntegrityComponentInput[];
+  generatedAt: string;
+  generatedBy: string;
+  verifierId?: string;
+  publicationUrl?: string;
+  verificationUrl?: string;
+  challengeUrl?: string;
+  lineage?: readonly IntegrityLineageLink[];
+  auditEvents?: readonly IntegrityAuditEvent[];
+  options?: CanonicalizationOptions;
 }
 
-export interface ResolveChallengeResult {
-  challenge: ChallengeRecord;
-  resolution: ChallengeResolution;
-  registryRecord: ArtifactRegistryRecord;
-  issues: readonly ChallengeIssue[];
-  controls: readonly ChallengeControlEvaluation[];
-  stableJson: string;
+export interface IntegrityPackageResult {
+  manifest: IntegrityManifest;
+  componentDigests: readonly IntegrityComponentDigest[];
+  manifestJson: string;
+  packageJson: string;
+  offlineVerificationText: string;
+  validation: IntegrityVerificationResult;
 }
 
-export type ChallengeReasonCode =
-  | "CHALLENGE_ID_MISSING"
-  | "CHALLENGE_DUPLICATE"
-  | "CHALLENGE_TIME_INVALID"
-  | "CHALLENGE_AFTER_WITHDRAWAL"
-  | "CHALLENGER_IDENTITY_MISSING"
-  | "CHALLENGER_AUTHORITY_MISSING"
-  | "SUBJECT_MISSING"
-  | "CLAIM_MISSING"
-  | "CLAIM_SCOPE_TOO_BROAD"
-  | "BASIS_MISSING"
-  | "COUNTER_EVIDENCE_REQUIRED"
-  | "COUNTER_EVIDENCE_ID_MISSING"
-  | "COUNTER_EVIDENCE_HASH_MISSING"
-  | "COUNTER_EVIDENCE_TIME_INVALID"
-  | "COUNTER_EVIDENCE_CUSTODY_MISSING"
-  | "COUNTER_EVIDENCE_DISCLOSURE_MISSING"
-  | "COUNTER_EVIDENCE_INADMISSIBLE"
-  | "ORIGINAL_RECORD_MISSING"
-  | "ORIGINAL_HASH_MISMATCH"
-  | "ARTIFACT_ID_MISMATCH"
-  | "REGISTRY_ID_MISMATCH"
-  | "ARTIFACT_NOT_CHALLENGEABLE"
-  | "OPEN_CHALLENGE_ALREADY_EXISTS"
-  | "REVIEWER_REQUIRED"
-  | "REVIEWER_ID_MISSING"
-  | "REVIEWER_ROLE_MISSING"
-  | "REVIEWER_CONFLICT_UNRESOLVED"
-  | "REVIEWER_UNQUALIFIED"
-  | "REVIEW_SCOPE_MISSING"
-  | "RESPONSE_DEADLINE_MISSING"
-  | "PUBLISHER_RESPONSE_MISSING"
-  | "PUBLISHER_RESPONSE_LATE"
-  | "PUBLISHER_EVIDENCE_HASH_MISSING"
-  | "FINDING_ID_MISSING"
-  | "FINDING_UNSUPPORTED"
-  | "FINDING_CONFLICT_UNRESOLVED"
-  | "EARLIEST_FAILURE_UNSTATED"
-  | "DISPOSITION_MISSING"
-  | "DISPOSITION_INVALID"
-  | "UPHELD_WITHOUT_SUPPORT"
-  | "MODIFIED_WITHOUT_CORRECTION"
-  | "REVERSED_WITHOUT_RELIANCE_EFFECT"
-  | "CLOSED_WITH_OPEN_FINDINGS"
-  | "WITHDRAWAL_REASON_MISSING"
-  | "CORRECTION_ID_MISSING"
-  | "CORRECTION_SCOPE_MISSING"
-  | "CORRECTION_REASON_MISSING"
-  | "PARENT_HASH_MISSING"
-  | "PARENT_HASH_MISMATCH"
+export interface OfflineVerificationBundle {
+  bundleId: string;
+  createdAt: string;
+  artifactId: string;
+  registryId?: string;
+  manifest: IntegrityManifest;
+  manifestJson: string;
+  instructions: string;
+  componentIndex: readonly Pick<IntegrityComponentDigest, "componentId" | "kind" | "mediaType" | "hash" | "byteLength">[];
+  bundleHash: string;
+}
+
+export type IntegrityReasonCode =
+  | "CANONICAL_INPUT_MISSING"
+  | "CANONICAL_SERIALIZATION_FAILED"
+  | "CANONICAL_HASH_MISSING"
+  | "CANONICAL_HASH_MISMATCH"
+  | "COMPONENT_ID_MISSING"
+  | "COMPONENT_DUPLICATE_ID"
+  | "COMPONENT_BYTES_MISSING"
+  | "COMPONENT_HASH_MISSING"
+  | "COMPONENT_HASH_MISMATCH"
+  | "COMPONENT_MEDIA_TYPE_MISSING"
+  | "PACKAGE_ROOT_MISSING"
+  | "PACKAGE_ROOT_MISMATCH"
+  | "PACKAGE_COMPONENT_COUNT_MISMATCH"
+  | "PACKAGE_ORDER_NONDETERMINISTIC"
+  | "MANIFEST_MISSING"
+  | "MANIFEST_HASH_MISSING"
+  | "MANIFEST_HASH_MISMATCH"
+  | "MANIFEST_VERSION_UNSUPPORTED"
+  | "PDF_HASH_MISSING"
+  | "PDF_HASH_MISMATCH"
+  | "JSON_HASH_MISSING"
+  | "JSON_HASH_MISMATCH"
+  | "RECEIPT_HASH_MISSING"
+  | "RECEIPT_HASH_MISMATCH"
+  | "ROUTE_HASH_MISSING"
+  | "ROUTE_HASH_MISMATCH"
+  | "OUTCOME_HASH_MISSING"
+  | "OUTCOME_HASH_MISMATCH"
+  | "REGISTRY_HASH_MISSING"
+  | "REGISTRY_HASH_MISMATCH"
+  | "VERIFICATION_HASH_MISSING"
+  | "VERIFICATION_HASH_MISMATCH"
+  | "CHALLENGE_HASH_MISSING"
+  | "CHALLENGE_HASH_MISMATCH"
+  | "AMENDMENT_PARENT_MISSING"
+  | "AMENDMENT_PARENT_MISMATCH"
   | "AMENDMENT_HASH_MISSING"
-  | "RESULTING_HASH_MISSING"
-  | "CORRECTION_REWRITES_ORIGINAL"
-  | "CORRECTION_SCOPE_EXCEEDED"
-  | "CORRECTION_EVIDENCE_MISSING"
-  | "CORRECTION_AUTHORITY_MISSING"
-  | "CORRECTION_NOT_VERIFIED"
-  | "SUPERSESSION_REQUIRED"
-  | "SUPERSESSION_TARGET_MISSING"
+  | "AMENDMENT_HASH_MISMATCH"
+  | "SUPERSESSION_PARENT_MISSING"
   | "SUPERSESSION_CHAIN_BROKEN"
-  | "PUBLIC_STATUS_NOT_UPDATED"
-  | "PUBLIC_SUMMARY_MISSING"
-  | "CHALLENGE_URL_MISSING"
-  | "CORRECTION_URL_MISSING"
-  | "RESOLUTION_HASH_MISSING"
-  | "AUDIT_EVENT_MISSING"
-  | "AUDIT_CHAIN_BROKEN"
-  | "TIME_ORDER_INVALID"
-  | "CLAIMS_BOUNDARY_NOT_UPDATED"
-  | "VERIFICATION_STATUS_NOT_UPDATED"
-  | "RELIANCE_STATUS_NOT_UPDATED"
-  | "NOTIFICATION_INCOMPLETE"
-  | "RETENTION_POLICY_MISSING"
-  | "PRESERVATION_FAILURE"
-  | "CHALLENGE_ACCEPTED"
-  | "REVIEW_COMPLETE"
-  | "CORRECTION_APPENDED"
-  | "RESOLUTION_COMPLETE";
+  | "AUDIT_EVENT_HASH_MISSING"
+  | "AUDIT_EVENT_PREVIOUS_HASH_MISMATCH"
+  | "AUDIT_EVENT_HASH_MISMATCH"
+  | "AUDIT_SEQUENCE_INVALID"
+  | "CANONICALIZATION_VERSION_MISSING"
+  | "CANONICALIZATION_VERSION_UNSUPPORTED"
+  | "HASH_ALGORITHM_MISSING"
+  | "HASH_ALGORITHM_UNSUPPORTED"
+  | "HASH_FORMAT_INVALID"
+  | "BYTE_LENGTH_MISMATCH"
+  | "TEXT_ENCODING_UNSUPPORTED"
+  | "DATE_NORMALIZATION_FAILED"
+  | "NONFINITE_NUMBER_REJECTED"
+  | "UNDEFINED_VALUE_REJECTED"
+  | "SYMBOL_VALUE_REJECTED"
+  | "FUNCTION_VALUE_REJECTED"
+  | "BIGINT_NORMALIZED"
+  | "CIRCULAR_REFERENCE_REJECTED"
+  | "MAP_KEY_UNSUPPORTED"
+  | "SET_ORDER_NORMALIZED"
+  | "OFFLINE_BUNDLE_INCOMPLETE"
+  | "OFFLINE_INSTRUCTIONS_MISSING"
+  | "SIGNATURE_REFERENCE_MISSING"
+  | "SIGNATURE_DIGEST_MISMATCH"
+  | "TIMESTAMP_MISSING"
+  | "TIMESTAMP_ORDER_INVALID"
+  | "ENGINE_VERSION_MISSING"
+  | "ENGINE_VERSION_UNSUPPORTED"
+  | "POLICY_VERSION_MISSING"
+  | "DISCLOSURE_PROJECTION_HASH_MISSING"
+  | "DISCLOSURE_PROJECTION_HASH_MISMATCH"
+  | "CLAIMS_BOUNDARY_HASH_MISSING"
+  | "CLAIMS_BOUNDARY_HASH_MISMATCH"
+  | "PUBLICATION_URL_MISSING"
+  | "PUBLICATION_STATE_NOT_RELIABLE"
+  | "PACKAGE_VERIFIED"
+  | "PACKAGE_VERIFICATION_FAILED"
+  | "COMPONENT_01_CHECK_FAILED"
+  | "COMPONENT_02_CHECK_FAILED"
+  | "COMPONENT_03_CHECK_FAILED"
+  | "COMPONENT_04_CHECK_FAILED"
+  | "COMPONENT_05_CHECK_FAILED"
+  | "COMPONENT_06_CHECK_FAILED"
+  | "COMPONENT_07_CHECK_FAILED"
+  | "COMPONENT_08_CHECK_FAILED"
+  | "COMPONENT_09_CHECK_FAILED"
+  | "COMPONENT_10_CHECK_FAILED"
+  | "COMPONENT_11_CHECK_FAILED"
+  | "COMPONENT_12_CHECK_FAILED"
+  | "LINEAGE_01_CHECK_FAILED"
+  | "LINEAGE_02_CHECK_FAILED"
+  | "LINEAGE_03_CHECK_FAILED"
+  | "LINEAGE_04_CHECK_FAILED"
+  | "LINEAGE_05_CHECK_FAILED"
+  | "LINEAGE_06_CHECK_FAILED"
+  | "LINEAGE_07_CHECK_FAILED"
+  | "LINEAGE_08_CHECK_FAILED"
+  | "PARITY_01_CHECK_FAILED"
+  | "PARITY_02_CHECK_FAILED"
+  | "PARITY_03_CHECK_FAILED"
+  | "PARITY_04_CHECK_FAILED"
+  | "PARITY_05_CHECK_FAILED"
+  | "PARITY_06_CHECK_FAILED";
 
-export const CHALLENGE_REASON_DICTIONARY: Readonly<Record<ChallengeReasonCode, ChallengeReasonDefinition>> = Object.freeze({
-  CHALLENGE_ID_MISSING: { code: "CHALLENGE_ID_MISSING", domain: "Challenge", disposition: "HOLD", title: 'Challenge identifier missing', description: 'Challenge identifier missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge identifier missing.' },
-  CHALLENGE_DUPLICATE: { code: "CHALLENGE_DUPLICATE", domain: "Challenge", disposition: "DENY", title: 'Duplicate challenge detected', description: 'Duplicate challenge detected. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Duplicate challenge detected.' },
-  CHALLENGE_TIME_INVALID: { code: "CHALLENGE_TIME_INVALID", domain: "Challenge", disposition: "HOLD", title: 'Challenge timestamp invalid', description: 'Challenge timestamp invalid. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge timestamp invalid.' },
-  CHALLENGE_AFTER_WITHDRAWAL: { code: "CHALLENGE_AFTER_WITHDRAWAL", domain: "Challenge", disposition: "ESCALATE", title: 'Challenge opened after withdrawal', description: 'Challenge opened after withdrawal. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge opened after withdrawal.' },
-  CHALLENGER_IDENTITY_MISSING: { code: "CHALLENGER_IDENTITY_MISSING", domain: "Identity", disposition: "HOLD", title: 'Challenger identity missing', description: 'Challenger identity missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenger identity missing.' },
-  CHALLENGER_AUTHORITY_MISSING: { code: "CHALLENGER_AUTHORITY_MISSING", domain: "Authority", disposition: "HOLD", title: 'Challenge authority missing', description: 'Challenge authority missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge authority missing.' },
-  SUBJECT_MISSING: { code: "SUBJECT_MISSING", domain: "Challenge", disposition: "HOLD", title: 'Challenge subject missing', description: 'Challenge subject missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge subject missing.' },
-  CLAIM_MISSING: { code: "CLAIM_MISSING", domain: "Claims", disposition: "HOLD", title: 'Challenged claim missing', description: 'Challenged claim missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenged claim missing.' },
-  CLAIM_SCOPE_TOO_BROAD: { code: "CLAIM_SCOPE_TOO_BROAD", domain: "Claims", disposition: "ESCALATE", title: 'Challenge scope is unbounded', description: 'Challenge scope is unbounded. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge scope is unbounded.' },
-  BASIS_MISSING: { code: "BASIS_MISSING", domain: "Evidence", disposition: "HOLD", title: 'Challenge basis missing', description: 'Challenge basis missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge basis missing.' },
-  COUNTER_EVIDENCE_REQUIRED: { code: "COUNTER_EVIDENCE_REQUIRED", domain: "Evidence", disposition: "HOLD", title: 'Counter-evidence required', description: 'Counter-evidence required. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Counter-evidence required.' },
-  COUNTER_EVIDENCE_ID_MISSING: { code: "COUNTER_EVIDENCE_ID_MISSING", domain: "Evidence", disposition: "HOLD", title: 'Counter-evidence identifier missing', description: 'Counter-evidence identifier missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Counter-evidence identifier missing.' },
-  COUNTER_EVIDENCE_HASH_MISSING: { code: "COUNTER_EVIDENCE_HASH_MISSING", domain: "Integrity", disposition: "DENY", title: 'Counter-evidence hash missing', description: 'Counter-evidence hash missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Counter-evidence hash missing.' },
-  COUNTER_EVIDENCE_TIME_INVALID: { code: "COUNTER_EVIDENCE_TIME_INVALID", domain: "Evidence", disposition: "HOLD", title: 'Counter-evidence time invalid', description: 'Counter-evidence time invalid. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Counter-evidence time invalid.' },
-  COUNTER_EVIDENCE_CUSTODY_MISSING: { code: "COUNTER_EVIDENCE_CUSTODY_MISSING", domain: "Continuity", disposition: "HOLD", title: 'Counter-evidence custody missing', description: 'Counter-evidence custody missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Counter-evidence custody missing.' },
-  COUNTER_EVIDENCE_DISCLOSURE_MISSING: { code: "COUNTER_EVIDENCE_DISCLOSURE_MISSING", domain: "Disclosure", disposition: "HOLD", title: 'Disclosure state missing', description: 'Disclosure state missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Disclosure state missing.' },
-  COUNTER_EVIDENCE_INADMISSIBLE: { code: "COUNTER_EVIDENCE_INADMISSIBLE", domain: "Admissibility", disposition: "DENY", title: 'Counter-evidence is inadmissible', description: 'Counter-evidence is inadmissible. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Counter-evidence is inadmissible.' },
-  ORIGINAL_RECORD_MISSING: { code: "ORIGINAL_RECORD_MISSING", domain: "Registry", disposition: "DENY", title: 'Original registry record missing', description: 'Original registry record missing. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Original registry record missing.' },
-  ORIGINAL_HASH_MISMATCH: { code: "ORIGINAL_HASH_MISMATCH", domain: "Integrity", disposition: "DENY", title: 'Original record hash mismatch', description: 'Original record hash mismatch. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Original record hash mismatch.' },
-  ARTIFACT_ID_MISMATCH: { code: "ARTIFACT_ID_MISMATCH", domain: "Registry", disposition: "DENY", title: 'Artifact identifier mismatch', description: 'Artifact identifier mismatch. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Artifact identifier mismatch.' },
-  REGISTRY_ID_MISMATCH: { code: "REGISTRY_ID_MISMATCH", domain: "Registry", disposition: "DENY", title: 'Registry identifier mismatch', description: 'Registry identifier mismatch. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Registry identifier mismatch.' },
-  ARTIFACT_NOT_CHALLENGEABLE: { code: "ARTIFACT_NOT_CHALLENGEABLE", domain: "Registry", disposition: "DENY", title: 'Artifact state does not permit challenge', description: 'Artifact state does not permit challenge. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Artifact state does not permit challenge.' },
-  OPEN_CHALLENGE_ALREADY_EXISTS: { code: "OPEN_CHALLENGE_ALREADY_EXISTS", domain: "Challenge", disposition: "ESCALATE", title: 'A materially identical challenge is open', description: 'A materially identical challenge is open. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'A materially identical challenge is open.' },
-  REVIEWER_REQUIRED: { code: "REVIEWER_REQUIRED", domain: "Review", disposition: "HOLD", title: 'Reviewer assignment required', description: 'Reviewer assignment required. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Reviewer assignment required.' },
-  REVIEWER_ID_MISSING: { code: "REVIEWER_ID_MISSING", domain: "Review", disposition: "HOLD", title: 'Reviewer identifier missing', description: 'Reviewer identifier missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Reviewer identifier missing.' },
-  REVIEWER_ROLE_MISSING: { code: "REVIEWER_ROLE_MISSING", domain: "Review", disposition: "HOLD", title: 'Reviewer role missing', description: 'Reviewer role missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Reviewer role missing.' },
-  REVIEWER_CONFLICT_UNRESOLVED: { code: "REVIEWER_CONFLICT_UNRESOLVED", domain: "Review", disposition: "DENY", title: 'Reviewer conflict unresolved', description: 'Reviewer conflict unresolved. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Reviewer conflict unresolved.' },
-  REVIEWER_UNQUALIFIED: { code: "REVIEWER_UNQUALIFIED", domain: "Review", disposition: "ESCALATE", title: 'Reviewer qualifications insufficient', description: 'Reviewer qualifications insufficient. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Reviewer qualifications insufficient.' },
-  REVIEW_SCOPE_MISSING: { code: "REVIEW_SCOPE_MISSING", domain: "Review", disposition: "HOLD", title: 'Review scope missing', description: 'Review scope missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Review scope missing.' },
-  RESPONSE_DEADLINE_MISSING: { code: "RESPONSE_DEADLINE_MISSING", domain: "Review", disposition: "HOLD", title: 'Response deadline missing', description: 'Response deadline missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Response deadline missing.' },
-  PUBLISHER_RESPONSE_MISSING: { code: "PUBLISHER_RESPONSE_MISSING", domain: "Response", disposition: "HOLD", title: 'Publisher response missing', description: 'Publisher response missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Publisher response missing.' },
-  PUBLISHER_RESPONSE_LATE: { code: "PUBLISHER_RESPONSE_LATE", domain: "Response", disposition: "ESCALATE", title: 'Publisher response is late', description: 'Publisher response is late. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Publisher response is late.' },
-  PUBLISHER_EVIDENCE_HASH_MISSING: { code: "PUBLISHER_EVIDENCE_HASH_MISSING", domain: "Integrity", disposition: "HOLD", title: 'Publisher response evidence hash missing', description: 'Publisher response evidence hash missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Publisher response evidence hash missing.' },
-  FINDING_ID_MISSING: { code: "FINDING_ID_MISSING", domain: "Review", disposition: "HOLD", title: 'Finding identifier missing', description: 'Finding identifier missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Finding identifier missing.' },
-  FINDING_UNSUPPORTED: { code: "FINDING_UNSUPPORTED", domain: "Review", disposition: "DENY", title: 'Review finding unsupported', description: 'Review finding unsupported. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Review finding unsupported.' },
-  FINDING_CONFLICT_UNRESOLVED: { code: "FINDING_CONFLICT_UNRESOLVED", domain: "Review", disposition: "ESCALATE", title: 'Review findings conflict', description: 'Review findings conflict. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Review findings conflict.' },
-  EARLIEST_FAILURE_UNSTATED: { code: "EARLIEST_FAILURE_UNSTATED", domain: "Architecture", disposition: "HOLD", title: 'Earliest controlling failure unstated', description: 'Earliest controlling failure unstated. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Earliest controlling failure unstated.' },
-  DISPOSITION_MISSING: { code: "DISPOSITION_MISSING", domain: "Resolution", disposition: "HOLD", title: 'Disposition missing', description: 'Disposition missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Disposition missing.' },
-  DISPOSITION_INVALID: { code: "DISPOSITION_INVALID", domain: "Resolution", disposition: "DENY", title: 'Disposition invalid', description: 'Disposition invalid. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Disposition invalid.' },
-  UPHELD_WITHOUT_SUPPORT: { code: "UPHELD_WITHOUT_SUPPORT", domain: "Resolution", disposition: "DENY", title: 'UPHELD disposition unsupported', description: 'UPHELD disposition unsupported. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'UPHELD disposition unsupported.' },
-  MODIFIED_WITHOUT_CORRECTION: { code: "MODIFIED_WITHOUT_CORRECTION", domain: "Correction", disposition: "DENY", title: 'MODIFIED requires correction', description: 'MODIFIED requires correction. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'MODIFIED requires correction.' },
-  REVERSED_WITHOUT_RELIANCE_EFFECT: { code: "REVERSED_WITHOUT_RELIANCE_EFFECT", domain: "Reliance", disposition: "DENY", title: 'REVERSED lacks reliance effect', description: 'REVERSED lacks reliance effect. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'REVERSED lacks reliance effect.' },
-  CLOSED_WITH_OPEN_FINDINGS: { code: "CLOSED_WITH_OPEN_FINDINGS", domain: "Resolution", disposition: "HOLD", title: 'Challenge closed with unresolved findings', description: 'Challenge closed with unresolved findings. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge closed with unresolved findings.' },
-  WITHDRAWAL_REASON_MISSING: { code: "WITHDRAWAL_REASON_MISSING", domain: "Resolution", disposition: "HOLD", title: 'Withdrawal reason missing', description: 'Withdrawal reason missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Withdrawal reason missing.' },
-  CORRECTION_ID_MISSING: { code: "CORRECTION_ID_MISSING", domain: "Correction", disposition: "HOLD", title: 'Correction identifier missing', description: 'Correction identifier missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction identifier missing.' },
-  CORRECTION_SCOPE_MISSING: { code: "CORRECTION_SCOPE_MISSING", domain: "Correction", disposition: "HOLD", title: 'Correction scope missing', description: 'Correction scope missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction scope missing.' },
-  CORRECTION_REASON_MISSING: { code: "CORRECTION_REASON_MISSING", domain: "Correction", disposition: "HOLD", title: 'Correction reason missing', description: 'Correction reason missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction reason missing.' },
-  PARENT_HASH_MISSING: { code: "PARENT_HASH_MISSING", domain: "Integrity", disposition: "DENY", title: 'Parent record hash missing', description: 'Parent record hash missing. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Parent record hash missing.' },
-  PARENT_HASH_MISMATCH: { code: "PARENT_HASH_MISMATCH", domain: "Integrity", disposition: "DENY", title: 'Parent record hash mismatch', description: 'Parent record hash mismatch. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Parent record hash mismatch.' },
-  AMENDMENT_HASH_MISSING: { code: "AMENDMENT_HASH_MISSING", domain: "Integrity", disposition: "DENY", title: 'Amendment hash missing', description: 'Amendment hash missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Amendment hash missing.' },
-  RESULTING_HASH_MISSING: { code: "RESULTING_HASH_MISSING", domain: "Integrity", disposition: "DENY", title: 'Resulting record hash missing', description: 'Resulting record hash missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Resulting record hash missing.' },
-  CORRECTION_REWRITES_ORIGINAL: { code: "CORRECTION_REWRITES_ORIGINAL", domain: "Correction", disposition: "DENY", title: 'Correction rewrites original history', description: 'Correction rewrites original history. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Correction rewrites original history.' },
-  CORRECTION_SCOPE_EXCEEDED: { code: "CORRECTION_SCOPE_EXCEEDED", domain: "Correction", disposition: "ESCALATE", title: 'Correction exceeds challenged scope', description: 'Correction exceeds challenged scope. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction exceeds challenged scope.' },
-  CORRECTION_EVIDENCE_MISSING: { code: "CORRECTION_EVIDENCE_MISSING", domain: "Evidence", disposition: "HOLD", title: 'Correction evidence missing', description: 'Correction evidence missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction evidence missing.' },
-  CORRECTION_AUTHORITY_MISSING: { code: "CORRECTION_AUTHORITY_MISSING", domain: "Authority", disposition: "HOLD", title: 'Correction authority missing', description: 'Correction authority missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction authority missing.' },
-  CORRECTION_NOT_VERIFIED: { code: "CORRECTION_NOT_VERIFIED", domain: "Verification", disposition: "HOLD", title: 'Correction not independently verified', description: 'Correction not independently verified. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction not independently verified.' },
-  SUPERSESSION_REQUIRED: { code: "SUPERSESSION_REQUIRED", domain: "Registry", disposition: "ESCALATE", title: 'A new artifact version is required', description: 'A new artifact version is required. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'A new artifact version is required.' },
-  SUPERSESSION_TARGET_MISSING: { code: "SUPERSESSION_TARGET_MISSING", domain: "Registry", disposition: "HOLD", title: 'Supersession target missing', description: 'Supersession target missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Supersession target missing.' },
-  SUPERSESSION_CHAIN_BROKEN: { code: "SUPERSESSION_CHAIN_BROKEN", domain: "Integrity", disposition: "DENY", title: 'Supersession chain broken', description: 'Supersession chain broken. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Supersession chain broken.' },
-  PUBLIC_STATUS_NOT_UPDATED: { code: "PUBLIC_STATUS_NOT_UPDATED", domain: "Publication", disposition: "DENY", title: 'Public status not updated', description: 'Public status not updated. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Public status not updated.' },
-  PUBLIC_SUMMARY_MISSING: { code: "PUBLIC_SUMMARY_MISSING", domain: "Publication", disposition: "HOLD", title: 'Public challenge summary missing', description: 'Public challenge summary missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Public challenge summary missing.' },
-  CHALLENGE_URL_MISSING: { code: "CHALLENGE_URL_MISSING", domain: "Publication", disposition: "HOLD", title: 'Challenge URL missing', description: 'Challenge URL missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge URL missing.' },
-  CORRECTION_URL_MISSING: { code: "CORRECTION_URL_MISSING", domain: "Publication", disposition: "HOLD", title: 'Correction URL missing', description: 'Correction URL missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Correction URL missing.' },
-  RESOLUTION_HASH_MISSING: { code: "RESOLUTION_HASH_MISSING", domain: "Integrity", disposition: "DENY", title: 'Resolution hash missing', description: 'Resolution hash missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Resolution hash missing.' },
-  AUDIT_EVENT_MISSING: { code: "AUDIT_EVENT_MISSING", domain: "Audit", disposition: "HOLD", title: 'Required audit event missing', description: 'Required audit event missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Required audit event missing.' },
-  AUDIT_CHAIN_BROKEN: { code: "AUDIT_CHAIN_BROKEN", domain: "Audit", disposition: "DENY", title: 'Challenge audit chain broken', description: 'Challenge audit chain broken. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Challenge audit chain broken.' },
-  TIME_ORDER_INVALID: { code: "TIME_ORDER_INVALID", domain: "Continuity", disposition: "DENY", title: 'Challenge chronology invalid', description: 'Challenge chronology invalid. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Challenge chronology invalid.' },
-  CLAIMS_BOUNDARY_NOT_UPDATED: { code: "CLAIMS_BOUNDARY_NOT_UPDATED", domain: "Claims", disposition: "HOLD", title: 'Claims boundary not updated', description: 'Claims boundary not updated. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Claims boundary not updated.' },
-  VERIFICATION_STATUS_NOT_UPDATED: { code: "VERIFICATION_STATUS_NOT_UPDATED", domain: "Verification", disposition: "HOLD", title: 'Verification status not updated', description: 'Verification status not updated. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Verification status not updated.' },
-  RELIANCE_STATUS_NOT_UPDATED: { code: "RELIANCE_STATUS_NOT_UPDATED", domain: "Reliance", disposition: "DENY", title: 'Reliance status not updated', description: 'Reliance status not updated. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Reliance status not updated.' },
-  NOTIFICATION_INCOMPLETE: { code: "NOTIFICATION_INCOMPLETE", domain: "Notification", disposition: "HOLD", title: 'Required notification incomplete', description: 'Required notification incomplete. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Required notification incomplete.' },
-  RETENTION_POLICY_MISSING: { code: "RETENTION_POLICY_MISSING", domain: "Preservation", disposition: "HOLD", title: 'Retention policy missing', description: 'Retention policy missing. The engine preserves this condition as an attributable challenge fact.', repairable: true, publicMessage: 'Retention policy missing.' },
-  PRESERVATION_FAILURE: { code: "PRESERVATION_FAILURE", domain: "Preservation", disposition: "DENY", title: 'Challenge package preservation failed', description: 'Challenge package preservation failed. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Challenge package preservation failed.' },
-  CHALLENGE_ACCEPTED: { code: "CHALLENGE_ACCEPTED", domain: "Challenge", disposition: "PASS", title: 'Challenge accepted', description: 'Challenge accepted. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Challenge accepted.' },
-  REVIEW_COMPLETE: { code: "REVIEW_COMPLETE", domain: "Review", disposition: "PASS", title: 'Review completed', description: 'Review completed. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Review completed.' },
-  CORRECTION_APPENDED: { code: "CORRECTION_APPENDED", domain: "Correction", disposition: "PASS", title: 'Correction appended', description: 'Correction appended. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Correction appended.' },
-  RESOLUTION_COMPLETE: { code: "RESOLUTION_COMPLETE", domain: "Resolution", disposition: "PASS", title: 'Challenge resolved', description: 'Challenge resolved. The engine preserves this condition as an attributable challenge fact.', repairable: false, publicMessage: 'Challenge resolved.' },
-});
+export const INTEGRITY_REASON_DEFINITIONS: readonly IntegrityReasonDefinition[] = [
+  { code: "CANONICAL_INPUT_MISSING", domain: "CANONICAL", severity: "ERROR", title: "Canonical input missing", description: "A canonical artifact is required before integrity processing can begin." },
+  { code: "CANONICAL_SERIALIZATION_FAILED", domain: "CANONICAL", severity: "ERROR", title: "Canonical serialization failed", description: "The record could not be deterministically serialized." },
+  { code: "CANONICAL_HASH_MISSING", domain: "CANONICAL", severity: "ERROR", title: "Canonical hash missing", description: "The integrity package does not include a canonical record hash." },
+  { code: "CANONICAL_HASH_MISMATCH", domain: "CANONICAL", severity: "ERROR", title: "Canonical hash mismatch", description: "The calculated canonical digest differs from the declared digest." },
+  { code: "COMPONENT_ID_MISSING", domain: "COMPONENT", severity: "ERROR", title: "Component identity missing", description: "Every package component requires a stable component identifier." },
+  { code: "COMPONENT_DUPLICATE_ID", domain: "COMPONENT", severity: "ERROR", title: "Duplicate component identity", description: "Two or more components use the same component identifier." },
+  { code: "COMPONENT_BYTES_MISSING", domain: "COMPONENT", severity: "ERROR", title: "Component bytes missing", description: "A component declared for hashing has no bytes or canonical content." },
+  { code: "COMPONENT_HASH_MISSING", domain: "COMPONENT", severity: "ERROR", title: "Component hash missing", description: "A component lacks a declared digest." },
+  { code: "COMPONENT_HASH_MISMATCH", domain: "COMPONENT", severity: "ERROR", title: "Component hash mismatch", description: "A component digest does not match its current content." },
+  { code: "COMPONENT_MEDIA_TYPE_MISSING", domain: "COMPONENT", severity: "WARNING", title: "Component media type missing", description: "A component should identify its media type for reliable packaging." },
+  { code: "PACKAGE_ROOT_MISSING", domain: "PACKAGE", severity: "ERROR", title: "Package root missing", description: "The package does not include a root digest." },
+  { code: "PACKAGE_ROOT_MISMATCH", domain: "PACKAGE", severity: "ERROR", title: "Package root mismatch", description: "The calculated package root differs from the declared package root." },
+  { code: "PACKAGE_COMPONENT_COUNT_MISMATCH", domain: "PACKAGE", severity: "ERROR", title: "Package component count mismatch", description: "The manifest count differs from the number of supplied components." },
+  { code: "PACKAGE_ORDER_NONDETERMINISTIC", domain: "PACKAGE", severity: "ERROR", title: "Package ordering nondeterministic", description: "Components were not ordered by stable identity before root calculation." },
+  { code: "MANIFEST_MISSING", domain: "MANIFEST", severity: "ERROR", title: "Integrity manifest missing", description: "A publication package requires an integrity manifest." },
+  { code: "MANIFEST_HASH_MISSING", domain: "MANIFEST", severity: "ERROR", title: "Manifest hash missing", description: "The manifest does not carry its own digest." },
+  { code: "MANIFEST_HASH_MISMATCH", domain: "MANIFEST", severity: "ERROR", title: "Manifest hash mismatch", description: "The calculated manifest digest differs from the declared value." },
+  { code: "MANIFEST_VERSION_UNSUPPORTED", domain: "MANIFEST", severity: "ERROR", title: "Manifest version unsupported", description: "The manifest version is not supported by this engine." },
+  { code: "PDF_HASH_MISSING", domain: "PDF", severity: "WARNING", title: "PDF hash missing", description: "A public PDF component should include a digest." },
+  { code: "PDF_HASH_MISMATCH", domain: "PDF", severity: "ERROR", title: "PDF hash mismatch", description: "The supplied PDF bytes do not match the declared PDF digest." },
+  { code: "JSON_HASH_MISSING", domain: "JSON", severity: "ERROR", title: "JSON hash missing", description: "The canonical JSON component requires a digest." },
+  { code: "JSON_HASH_MISMATCH", domain: "JSON", severity: "ERROR", title: "JSON hash mismatch", description: "The canonical JSON bytes differ from the declared digest." },
+  { code: "RECEIPT_HASH_MISSING", domain: "RECEIPT", severity: "ERROR", title: "Receipt hash missing", description: "An execution-control artifact requires a hashed technical receipt." },
+  { code: "RECEIPT_HASH_MISMATCH", domain: "RECEIPT", severity: "ERROR", title: "Receipt hash mismatch", description: "The execution receipt content differs from its declared digest." },
+  { code: "ROUTE_HASH_MISSING", domain: "ROUTE", severity: "ERROR", title: "Route hash missing", description: "The frozen route snapshot requires a digest." },
+  { code: "ROUTE_HASH_MISMATCH", domain: "ROUTE", severity: "ERROR", title: "Route hash mismatch", description: "The route snapshot differs from its declared digest." },
+  { code: "OUTCOME_HASH_MISSING", domain: "OUTCOME", severity: "ERROR", title: "Outcome hash missing", description: "The outcome closure record requires a digest." },
+  { code: "OUTCOME_HASH_MISMATCH", domain: "OUTCOME", severity: "ERROR", title: "Outcome hash mismatch", description: "The outcome closure record differs from its declared digest." },
+  { code: "REGISTRY_HASH_MISSING", domain: "REGISTRY", severity: "ERROR", title: "Registry hash missing", description: "The linked registry record requires a digest." },
+  { code: "REGISTRY_HASH_MISMATCH", domain: "REGISTRY", severity: "ERROR", title: "Registry hash mismatch", description: "The registry record differs from its declared digest." },
+  { code: "VERIFICATION_HASH_MISSING", domain: "VERIFICATION", severity: "WARNING", title: "Verification hash missing", description: "A verification report should carry a digest." },
+  { code: "VERIFICATION_HASH_MISMATCH", domain: "VERIFICATION", severity: "ERROR", title: "Verification hash mismatch", description: "The verification report differs from its declared digest." },
+  { code: "CHALLENGE_HASH_MISSING", domain: "CHALLENGE", severity: "WARNING", title: "Challenge hash missing", description: "A challenge package should carry a digest." },
+  { code: "CHALLENGE_HASH_MISMATCH", domain: "CHALLENGE", severity: "ERROR", title: "Challenge hash mismatch", description: "The challenge package differs from its declared digest." },
+  { code: "AMENDMENT_PARENT_MISSING", domain: "AMENDMENT", severity: "ERROR", title: "Amendment parent missing", description: "Every amendment must identify its parent digest." },
+  { code: "AMENDMENT_PARENT_MISMATCH", domain: "AMENDMENT", severity: "ERROR", title: "Amendment parent mismatch", description: "The amendment does not link to the expected parent digest." },
+  { code: "AMENDMENT_HASH_MISSING", domain: "AMENDMENT", severity: "ERROR", title: "Amendment hash missing", description: "An amendment requires its own digest." },
+  { code: "AMENDMENT_HASH_MISMATCH", domain: "AMENDMENT", severity: "ERROR", title: "Amendment hash mismatch", description: "The amendment content differs from its declared digest." },
+  { code: "SUPERSESSION_PARENT_MISSING", domain: "SUPERSESSION", severity: "ERROR", title: "Supersession parent missing", description: "A superseding record must identify the superseded digest." },
+  { code: "SUPERSESSION_CHAIN_BROKEN", domain: "SUPERSESSION", severity: "ERROR", title: "Supersession chain broken", description: "The supersession lineage contains a missing or inconsistent link." },
+  { code: "AUDIT_EVENT_HASH_MISSING", domain: "AUDIT", severity: "ERROR", title: "Audit event hash missing", description: "Every append-only audit event requires a digest." },
+  { code: "AUDIT_EVENT_PREVIOUS_HASH_MISMATCH", domain: "AUDIT", severity: "ERROR", title: "Audit chain previous hash mismatch", description: "An audit event does not point to the preceding event hash." },
+  { code: "AUDIT_EVENT_HASH_MISMATCH", domain: "AUDIT", severity: "ERROR", title: "Audit event hash mismatch", description: "An audit event content differs from its declared digest." },
+  { code: "AUDIT_SEQUENCE_INVALID", domain: "AUDIT", severity: "ERROR", title: "Audit sequence invalid", description: "Audit sequence values must be contiguous and strictly increasing." },
+  { code: "CANONICALIZATION_VERSION_MISSING", domain: "CANONICALIZATION", severity: "ERROR", title: "Canonicalization version missing", description: "The package must state which canonicalization rules were used." },
+  { code: "CANONICALIZATION_VERSION_UNSUPPORTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Canonicalization version unsupported", description: "The declared canonicalization version is not supported." },
+  { code: "HASH_ALGORITHM_MISSING", domain: "ALGORITHM", severity: "ERROR", title: "Hash algorithm missing", description: "The package must identify its digest algorithm." },
+  { code: "HASH_ALGORITHM_UNSUPPORTED", domain: "ALGORITHM", severity: "ERROR", title: "Hash algorithm unsupported", description: "The requested hash algorithm is not supported." },
+  { code: "HASH_FORMAT_INVALID", domain: "ALGORITHM", severity: "ERROR", title: "Hash format invalid", description: "A digest is not encoded as the expected lowercase hexadecimal string." },
+  { code: "BYTE_LENGTH_MISMATCH", domain: "COMPONENT", severity: "ERROR", title: "Byte length mismatch", description: "The declared byte length differs from the supplied bytes." },
+  { code: "TEXT_ENCODING_UNSUPPORTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Text encoding unsupported", description: "Canonical text must use UTF-8 encoding." },
+  { code: "DATE_NORMALIZATION_FAILED", domain: "CANONICALIZATION", severity: "ERROR", title: "Date normalization failed", description: "A date value could not be normalized to ISO 8601." },
+  { code: "NONFINITE_NUMBER_REJECTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Nonfinite number rejected", description: "NaN and Infinity are not permitted in canonical records." },
+  { code: "UNDEFINED_VALUE_REJECTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Undefined value rejected", description: "Undefined values cannot appear in canonical serialization." },
+  { code: "SYMBOL_VALUE_REJECTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Symbol value rejected", description: "Symbols cannot appear in canonical serialization." },
+  { code: "FUNCTION_VALUE_REJECTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Function value rejected", description: "Functions cannot appear in canonical serialization." },
+  { code: "BIGINT_NORMALIZED", domain: "CANONICALIZATION", severity: "INFO", title: "BigInt normalized", description: "A BigInt value was deterministically represented as a decimal string." },
+  { code: "CIRCULAR_REFERENCE_REJECTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Circular reference rejected", description: "Canonical serialization cannot process circular references." },
+  { code: "MAP_KEY_UNSUPPORTED", domain: "CANONICALIZATION", severity: "ERROR", title: "Map key unsupported", description: "Map keys must be strings for deterministic serialization." },
+  { code: "SET_ORDER_NORMALIZED", domain: "CANONICALIZATION", severity: "INFO", title: "Set order normalized", description: "Set members were sorted by canonical representation." },
+  { code: "OFFLINE_BUNDLE_INCOMPLETE", domain: "OFFLINE", severity: "ERROR", title: "Offline bundle incomplete", description: "The offline verification bundle is missing a required component." },
+  { code: "OFFLINE_INSTRUCTIONS_MISSING", domain: "OFFLINE", severity: "WARNING", title: "Offline instructions missing", description: "The package should include offline verification instructions." },
+  { code: "SIGNATURE_REFERENCE_MISSING", domain: "SIGNATURE", severity: "WARNING", title: "Signature reference missing", description: "A signed package should reference its signature envelope." },
+  { code: "SIGNATURE_DIGEST_MISMATCH", domain: "SIGNATURE", severity: "ERROR", title: "Signature digest mismatch", description: "The signed digest does not match the package root." },
+  { code: "TIMESTAMP_MISSING", domain: "TIME", severity: "WARNING", title: "Timestamp missing", description: "Integrity events should include attributable timestamps." },
+  { code: "TIMESTAMP_ORDER_INVALID", domain: "TIME", severity: "ERROR", title: "Timestamp order invalid", description: "A child integrity event predates its parent event." },
+  { code: "ENGINE_VERSION_MISSING", domain: "ENGINE", severity: "ERROR", title: "Engine version missing", description: "The manifest must identify the engine version." },
+  { code: "ENGINE_VERSION_UNSUPPORTED", domain: "ENGINE", severity: "WARNING", title: "Engine version newer than verifier", description: "The package was generated by a newer engine version." },
+  { code: "POLICY_VERSION_MISSING", domain: "POLICY", severity: "ERROR", title: "Policy version missing", description: "The manifest must identify the governing integrity policy." },
+  { code: "DISCLOSURE_PROJECTION_HASH_MISSING", domain: "DISCLOSURE", severity: "WARNING", title: "Disclosure projection hash missing", description: "A published disclosure projection should carry a digest." },
+  { code: "DISCLOSURE_PROJECTION_HASH_MISMATCH", domain: "DISCLOSURE", severity: "ERROR", title: "Disclosure projection hash mismatch", description: "The projection differs from its declared digest." },
+  { code: "CLAIMS_BOUNDARY_HASH_MISSING", domain: "CLAIMS", severity: "WARNING", title: "Claims boundary hash missing", description: "The claims-boundary statement should be committed by digest." },
+  { code: "CLAIMS_BOUNDARY_HASH_MISMATCH", domain: "CLAIMS", severity: "ERROR", title: "Claims boundary hash mismatch", description: "The claims-boundary statement differs from its declared digest." },
+  { code: "PUBLICATION_URL_MISSING", domain: "PUBLICATION", severity: "WARNING", title: "Publication URL missing", description: "A published package should identify its stable public location." },
+  { code: "PUBLICATION_STATE_NOT_RELIABLE", domain: "PUBLICATION", severity: "ERROR", title: "Publication state not reliable", description: "The registry state does not permit public reliance." },
+  { code: "PACKAGE_VERIFIED", domain: "RESULT", severity: "INFO", title: "Package verified", description: "All required integrity controls passed." },
+  { code: "PACKAGE_VERIFICATION_FAILED", domain: "RESULT", severity: "ERROR", title: "Package verification failed", description: "One or more mandatory integrity controls failed." },
+  { code: "COMPONENT_01_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Canonical Record integrity check failed", description: "The canonical record integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_02_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Pdf integrity check failed", description: "The PDF integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_03_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Manifest integrity check failed", description: "The manifest integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_04_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Route Snapshot integrity check failed", description: "The route snapshot integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_05_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Execution Receipt integrity check failed", description: "The execution receipt integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_06_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Outcome Closure integrity check failed", description: "The outcome closure integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_07_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Registry Certificate integrity check failed", description: "The registry certificate integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_08_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Verification Report integrity check failed", description: "The verification report integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_09_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Challenge Record integrity check failed", description: "The challenge record integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_10_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Correction Record integrity check failed", description: "The correction record integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_11_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Disclosure Projection integrity check failed", description: "The disclosure projection integrity control did not produce the expected deterministic result." },
+  { code: "COMPONENT_12_CHECK_FAILED", domain: "COMPONENT", severity: "ERROR", title: "Claims Boundary integrity check failed", description: "The claims boundary integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_01_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Original Publication integrity check failed", description: "The original publication integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_02_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Amendment integrity check failed", description: "The amendment integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_03_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Correction integrity check failed", description: "The correction integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_04_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Supersession integrity check failed", description: "The supersession integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_05_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Withdrawal integrity check failed", description: "The withdrawal integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_06_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Challenge integrity check failed", description: "The challenge integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_07_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Verification integrity check failed", description: "The verification integrity control did not produce the expected deterministic result." },
+  { code: "LINEAGE_08_CHECK_FAILED", domain: "LINEAGE", severity: "ERROR", title: "Registry Update integrity check failed", description: "The registry update integrity control did not produce the expected deterministic result." },
+  { code: "PARITY_01_CHECK_FAILED", domain: "PARITY", severity: "ERROR", title: "Pdf To Json integrity check failed", description: "The PDF to JSON integrity control did not produce the expected deterministic result." },
+  { code: "PARITY_02_CHECK_FAILED", domain: "PARITY", severity: "ERROR", title: "Manifest To Package integrity check failed", description: "The manifest to package integrity control did not produce the expected deterministic result." },
+  { code: "PARITY_03_CHECK_FAILED", domain: "PARITY", severity: "ERROR", title: "Registry To Canonical integrity check failed", description: "The registry to canonical integrity control did not produce the expected deterministic result." },
+  { code: "PARITY_04_CHECK_FAILED", domain: "PARITY", severity: "ERROR", title: "Receipt To Determination integrity check failed", description: "The receipt to determination integrity control did not produce the expected deterministic result." },
+  { code: "PARITY_05_CHECK_FAILED", domain: "PARITY", severity: "ERROR", title: "Outcome To Receipt integrity check failed", description: "The outcome to receipt integrity control did not produce the expected deterministic result." },
+  { code: "PARITY_06_CHECK_FAILED", domain: "PARITY", severity: "ERROR", title: "Disclosure To Canonical integrity check failed", description: "The disclosure to canonical integrity control did not produce the expected deterministic result." },
+] as const;
 
-export const CHALLENGE_CONTROLS: readonly ChallengeControlDefinition[] = Object.freeze([
-  { controlId: "CHL-001", domain: "Challenge", title: 'Challenge identity', requirement: 'Preserve attributable evidence for challenge identity and fail closed when it cannot be established.' },
-  { controlId: "CHL-002", domain: "Registry", title: 'Registry binding', requirement: 'Preserve attributable evidence for registry binding and fail closed when it cannot be established.' },
-  { controlId: "CHL-003", domain: "Integrity", title: 'Artifact binding', requirement: 'Preserve attributable evidence for artifact binding and fail closed when it cannot be established.' },
-  { controlId: "CHL-004", domain: "Identity", title: 'Original hash parity', requirement: 'Preserve attributable evidence for original hash parity and fail closed when it cannot be established.' },
-  { controlId: "CHL-005", domain: "Authority", title: 'Challengeable state', requirement: 'Preserve attributable evidence for challengeable state and fail closed when it cannot be established.' },
-  { controlId: "CHL-006", domain: "Claims", title: 'Challenger identity', requirement: 'Preserve attributable evidence for challenger identity and fail closed when it cannot be established.' },
-  { controlId: "CHL-007", domain: "Evidence", title: 'Challenger authority', requirement: 'Preserve attributable evidence for challenger authority and fail closed when it cannot be established.' },
-  { controlId: "CHL-008", domain: "Admissibility", title: 'Bounded subject', requirement: 'Preserve attributable evidence for bounded subject and fail closed when it cannot be established.' },
-  { controlId: "CHL-009", domain: "Review", title: 'Exact challenged claim', requirement: 'Preserve attributable evidence for exact challenged claim and fail closed when it cannot be established.' },
-  { controlId: "CHL-010", domain: "Response", title: 'Challenge basis', requirement: 'Preserve attributable evidence for challenge basis and fail closed when it cannot be established.' },
-  { controlId: "CHL-011", domain: "Architecture", title: 'Materiality statement', requirement: 'Preserve attributable evidence for materiality statement and fail closed when it cannot be established.' },
-  { controlId: "CHL-012", domain: "Resolution", title: 'Requested remedy', requirement: 'Preserve attributable evidence for requested remedy and fail closed when it cannot be established.' },
-  { controlId: "CHL-013", domain: "Correction", title: 'Counter-evidence identity', requirement: 'Preserve attributable evidence for counter-evidence identity and fail closed when it cannot be established.' },
-  { controlId: "CHL-014", domain: "Reliance", title: 'Counter-evidence provenance', requirement: 'Preserve attributable evidence for counter-evidence provenance and fail closed when it cannot be established.' },
-  { controlId: "CHL-015", domain: "Verification", title: 'Counter-evidence custody', requirement: 'Preserve attributable evidence for counter-evidence custody and fail closed when it cannot be established.' },
-  { controlId: "CHL-016", domain: "Publication", title: 'Counter-evidence hash', requirement: 'Preserve attributable evidence for counter-evidence hash and fail closed when it cannot be established.' },
-  { controlId: "CHL-017", domain: "Audit", title: 'Counter-evidence disclosure', requirement: 'Preserve attributable evidence for counter-evidence disclosure and fail closed when it cannot be established.' },
-  { controlId: "CHL-018", domain: "Preservation", title: 'Counter-evidence admissibility', requirement: 'Preserve attributable evidence for counter-evidence admissibility and fail closed when it cannot be established.' },
-  { controlId: "CHL-019", domain: "Challenge", title: 'Duplicate challenge check', requirement: 'Preserve attributable evidence for duplicate challenge check and fail closed when it cannot be established.' },
-  { controlId: "CHL-020", domain: "Registry", title: 'Open challenge visibility', requirement: 'Preserve attributable evidence for open challenge visibility and fail closed when it cannot be established.' },
-  { controlId: "CHL-021", domain: "Integrity", title: 'Reviewer assignment', requirement: 'Preserve attributable evidence for reviewer assignment and fail closed when it cannot be established.' },
-  { controlId: "CHL-022", domain: "Identity", title: 'Reviewer qualification', requirement: 'Preserve attributable evidence for reviewer qualification and fail closed when it cannot be established.' },
-  { controlId: "CHL-023", domain: "Authority", title: 'Reviewer independence', requirement: 'Preserve attributable evidence for reviewer independence and fail closed when it cannot be established.' },
-  { controlId: "CHL-024", domain: "Claims", title: 'Reviewer conflicts', requirement: 'Preserve attributable evidence for reviewer conflicts and fail closed when it cannot be established.' },
-  { controlId: "CHL-025", domain: "Evidence", title: 'Review scope', requirement: 'Preserve attributable evidence for review scope and fail closed when it cannot be established.' },
-  { controlId: "CHL-026", domain: "Admissibility", title: 'Review plan', requirement: 'Preserve attributable evidence for review plan and fail closed when it cannot be established.' },
-  { controlId: "CHL-027", domain: "Review", title: 'Response deadline', requirement: 'Preserve attributable evidence for response deadline and fail closed when it cannot be established.' },
-  { controlId: "CHL-028", domain: "Response", title: 'Publisher notification', requirement: 'Preserve attributable evidence for publisher notification and fail closed when it cannot be established.' },
-  { controlId: "CHL-029", domain: "Architecture", title: 'Publisher response', requirement: 'Preserve attributable evidence for publisher response and fail closed when it cannot be established.' },
-  { controlId: "CHL-030", domain: "Resolution", title: 'Response evidence integrity', requirement: 'Preserve attributable evidence for response evidence integrity and fail closed when it cannot be established.' },
-  { controlId: "CHL-031", domain: "Correction", title: 'Finding identity', requirement: 'Preserve attributable evidence for finding identity and fail closed when it cannot be established.' },
-  { controlId: "CHL-032", domain: "Reliance", title: 'Finding evidence mapping', requirement: 'Preserve attributable evidence for finding evidence mapping and fail closed when it cannot be established.' },
-  { controlId: "CHL-033", domain: "Verification", title: 'Finding reasoning', requirement: 'Preserve attributable evidence for finding reasoning and fail closed when it cannot be established.' },
-  { controlId: "CHL-034", domain: "Publication", title: 'Finding conflict handling', requirement: 'Preserve attributable evidence for finding conflict handling and fail closed when it cannot be established.' },
-  { controlId: "CHL-035", domain: "Audit", title: 'Earliest failure analysis', requirement: 'Preserve attributable evidence for earliest failure analysis and fail closed when it cannot be established.' },
-  { controlId: "CHL-036", domain: "Preservation", title: 'Determination impact', requirement: 'Preserve attributable evidence for determination impact and fail closed when it cannot be established.' },
-  { controlId: "CHL-037", domain: "Challenge", title: 'Execution receipt impact', requirement: 'Preserve attributable evidence for execution receipt impact and fail closed when it cannot be established.' },
-  { controlId: "CHL-038", domain: "Registry", title: 'Outcome impact', requirement: 'Preserve attributable evidence for outcome impact and fail closed when it cannot be established.' },
-  { controlId: "CHL-039", domain: "Integrity", title: 'Claims boundary impact', requirement: 'Preserve attributable evidence for claims boundary impact and fail closed when it cannot be established.' },
-  { controlId: "CHL-040", domain: "Identity", title: 'Verification impact', requirement: 'Preserve attributable evidence for verification impact and fail closed when it cannot be established.' },
-  { controlId: "CHL-041", domain: "Authority", title: 'Reliance impact', requirement: 'Preserve attributable evidence for reliance impact and fail closed when it cannot be established.' },
-  { controlId: "CHL-042", domain: "Claims", title: 'Disposition authority', requirement: 'Preserve attributable evidence for disposition authority and fail closed when it cannot be established.' },
-  { controlId: "CHL-043", domain: "Evidence", title: 'Disposition support', requirement: 'Preserve attributable evidence for disposition support and fail closed when it cannot be established.' },
-  { controlId: "CHL-044", domain: "Admissibility", title: 'UPHELD requirements', requirement: 'Preserve attributable evidence for upheld requirements and fail closed when it cannot be established.' },
-  { controlId: "CHL-045", domain: "Review", title: 'MODIFIED requirements', requirement: 'Preserve attributable evidence for modified requirements and fail closed when it cannot be established.' },
-  { controlId: "CHL-046", domain: "Response", title: 'REVERSED requirements', requirement: 'Preserve attributable evidence for reversed requirements and fail closed when it cannot be established.' },
-  { controlId: "CHL-047", domain: "Architecture", title: 'CLOSED requirements', requirement: 'Preserve attributable evidence for closed requirements and fail closed when it cannot be established.' },
-  { controlId: "CHL-048", domain: "Resolution", title: 'WITHDRAWN requirements', requirement: 'Preserve attributable evidence for withdrawn requirements and fail closed when it cannot be established.' },
-  { controlId: "CHL-049", domain: "Correction", title: 'Correction identity', requirement: 'Preserve attributable evidence for correction identity and fail closed when it cannot be established.' },
-  { controlId: "CHL-050", domain: "Reliance", title: 'Correction scope', requirement: 'Preserve attributable evidence for correction scope and fail closed when it cannot be established.' },
-  { controlId: "CHL-051", domain: "Verification", title: 'Correction reason', requirement: 'Preserve attributable evidence for correction reason and fail closed when it cannot be established.' },
-  { controlId: "CHL-052", domain: "Publication", title: 'Parent hash linkage', requirement: 'Preserve attributable evidence for parent hash linkage and fail closed when it cannot be established.' },
-  { controlId: "CHL-053", domain: "Audit", title: 'Amendment hash', requirement: 'Preserve attributable evidence for amendment hash and fail closed when it cannot be established.' },
-  { controlId: "CHL-054", domain: "Preservation", title: 'Resulting hash', requirement: 'Preserve attributable evidence for resulting hash and fail closed when it cannot be established.' },
-  { controlId: "CHL-055", domain: "Challenge", title: 'No rewrite guarantee', requirement: 'Preserve attributable evidence for no rewrite guarantee and fail closed when it cannot be established.' },
-  { controlId: "CHL-056", domain: "Registry", title: 'Correction evidence', requirement: 'Preserve attributable evidence for correction evidence and fail closed when it cannot be established.' },
-  { controlId: "CHL-057", domain: "Integrity", title: 'Correction authority', requirement: 'Preserve attributable evidence for correction authority and fail closed when it cannot be established.' },
-  { controlId: "CHL-058", domain: "Identity", title: 'Correction verification', requirement: 'Preserve attributable evidence for correction verification and fail closed when it cannot be established.' },
-  { controlId: "CHL-059", domain: "Authority", title: 'Supersession assessment', requirement: 'Preserve attributable evidence for supersession assessment and fail closed when it cannot be established.' },
-  { controlId: "CHL-060", domain: "Claims", title: 'Supersession target', requirement: 'Preserve attributable evidence for supersession target and fail closed when it cannot be established.' },
-  { controlId: "CHL-061", domain: "Evidence", title: 'Supersession chain', requirement: 'Preserve attributable evidence for supersession chain and fail closed when it cannot be established.' },
-  { controlId: "CHL-062", domain: "Admissibility", title: 'Public status update', requirement: 'Preserve attributable evidence for public status update and fail closed when it cannot be established.' },
-  { controlId: "CHL-063", domain: "Review", title: 'Public summary', requirement: 'Preserve attributable evidence for public summary and fail closed when it cannot be established.' },
-  { controlId: "CHL-064", domain: "Response", title: 'Challenge URL', requirement: 'Preserve attributable evidence for challenge url and fail closed when it cannot be established.' },
-  { controlId: "CHL-065", domain: "Architecture", title: 'Correction URL', requirement: 'Preserve attributable evidence for correction url and fail closed when it cannot be established.' },
-  { controlId: "CHL-066", domain: "Resolution", title: 'Resolution hash', requirement: 'Preserve attributable evidence for resolution hash and fail closed when it cannot be established.' },
-  { controlId: "CHL-067", domain: "Correction", title: 'Audit event', requirement: 'Preserve attributable evidence for audit event and fail closed when it cannot be established.' },
-  { controlId: "CHL-068", domain: "Reliance", title: 'Audit-chain continuity', requirement: 'Preserve attributable evidence for audit-chain continuity and fail closed when it cannot be established.' },
-  { controlId: "CHL-069", domain: "Verification", title: 'Chronology', requirement: 'Preserve attributable evidence for chronology and fail closed when it cannot be established.' },
-  { controlId: "CHL-070", domain: "Publication", title: 'Notification completion', requirement: 'Preserve attributable evidence for notification completion and fail closed when it cannot be established.' },
-  { controlId: "CHL-071", domain: "Audit", title: 'Retention policy', requirement: 'Preserve attributable evidence for retention policy and fail closed when it cannot be established.' },
-  { controlId: "CHL-072", domain: "Preservation", title: 'Preservation proof', requirement: 'Preserve attributable evidence for preservation proof and fail closed when it cannot be established.' },
-  { controlId: "CHL-073", domain: "Challenge", title: 'Machine-readable export', requirement: 'Preserve attributable evidence for machine-readable export and fail closed when it cannot be established.' },
-  { controlId: "CHL-074", domain: "Registry", title: 'Human-readable report', requirement: 'Preserve attributable evidence for human-readable report and fail closed when it cannot be established.' },
-  { controlId: "CHL-075", domain: "Integrity", title: 'Registry projection', requirement: 'Preserve attributable evidence for registry projection and fail closed when it cannot be established.' },
-  { controlId: "CHL-076", domain: "Identity", title: 'Verification projection', requirement: 'Preserve attributable evidence for verification projection and fail closed when it cannot be established.' },
-  { controlId: "CHL-077", domain: "Authority", title: 'Portfolio projection', requirement: 'Preserve attributable evidence for portfolio projection and fail closed when it cannot be established.' },
-  { controlId: "CHL-078", domain: "Claims", title: 'Acceptance-test completion', requirement: 'Preserve attributable evidence for acceptance-test completion and fail closed when it cannot be established.' },
-  { controlId: "CHL-079", domain: "Evidence", title: 'Final publication gate', requirement: 'Preserve attributable evidence for final publication gate and fail closed when it cannot be established.' },
-  { controlId: "CHL-080", domain: "Admissibility", title: 'Independent review lane', requirement: 'Preserve attributable evidence for independent review lane and fail closed when it cannot be established.' },
-]);
+export const INTEGRITY_CONTROLS: readonly IntegrityControlDefinition[] = [
+  { controlId: "IH-001", domain: "CANONICAL", title: "Integrity control 001", requirement: "Validate canonical integrity requirement 001 and preserve an attributable result." },
+  { controlId: "IH-002", domain: "COMPONENT", title: "Integrity control 002", requirement: "Validate component integrity requirement 002 and preserve an attributable result." },
+  { controlId: "IH-003", domain: "PACKAGE", title: "Integrity control 003", requirement: "Validate package integrity requirement 003 and preserve an attributable result." },
+  { controlId: "IH-004", domain: "MANIFEST", title: "Integrity control 004", requirement: "Validate manifest integrity requirement 004 and preserve an attributable result." },
+  { controlId: "IH-005", domain: "LINEAGE", title: "Integrity control 005", requirement: "Validate lineage integrity requirement 005 and preserve an attributable result." },
+  { controlId: "IH-006", domain: "AUDIT", title: "Integrity control 006", requirement: "Validate audit integrity requirement 006 and preserve an attributable result." },
+  { controlId: "IH-007", domain: "OFFLINE", title: "Integrity control 007", requirement: "Validate offline integrity requirement 007 and preserve an attributable result." },
+  { controlId: "IH-008", domain: "PUBLICATION", title: "Integrity control 008", requirement: "Validate publication integrity requirement 008 and preserve an attributable result." },
+  { controlId: "IH-009", domain: "CANONICAL", title: "Integrity control 009", requirement: "Validate canonical integrity requirement 009 and preserve an attributable result." },
+  { controlId: "IH-010", domain: "COMPONENT", title: "Integrity control 010", requirement: "Validate component integrity requirement 010 and preserve an attributable result." },
+  { controlId: "IH-011", domain: "PACKAGE", title: "Integrity control 011", requirement: "Validate package integrity requirement 011 and preserve an attributable result." },
+  { controlId: "IH-012", domain: "MANIFEST", title: "Integrity control 012", requirement: "Validate manifest integrity requirement 012 and preserve an attributable result." },
+  { controlId: "IH-013", domain: "LINEAGE", title: "Integrity control 013", requirement: "Validate lineage integrity requirement 013 and preserve an attributable result." },
+  { controlId: "IH-014", domain: "AUDIT", title: "Integrity control 014", requirement: "Validate audit integrity requirement 014 and preserve an attributable result." },
+  { controlId: "IH-015", domain: "OFFLINE", title: "Integrity control 015", requirement: "Validate offline integrity requirement 015 and preserve an attributable result." },
+  { controlId: "IH-016", domain: "PUBLICATION", title: "Integrity control 016", requirement: "Validate publication integrity requirement 016 and preserve an attributable result." },
+  { controlId: "IH-017", domain: "CANONICAL", title: "Integrity control 017", requirement: "Validate canonical integrity requirement 017 and preserve an attributable result." },
+  { controlId: "IH-018", domain: "COMPONENT", title: "Integrity control 018", requirement: "Validate component integrity requirement 018 and preserve an attributable result." },
+  { controlId: "IH-019", domain: "PACKAGE", title: "Integrity control 019", requirement: "Validate package integrity requirement 019 and preserve an attributable result." },
+  { controlId: "IH-020", domain: "MANIFEST", title: "Integrity control 020", requirement: "Validate manifest integrity requirement 020 and preserve an attributable result." },
+  { controlId: "IH-021", domain: "LINEAGE", title: "Integrity control 021", requirement: "Validate lineage integrity requirement 021 and preserve an attributable result." },
+  { controlId: "IH-022", domain: "AUDIT", title: "Integrity control 022", requirement: "Validate audit integrity requirement 022 and preserve an attributable result." },
+  { controlId: "IH-023", domain: "OFFLINE", title: "Integrity control 023", requirement: "Validate offline integrity requirement 023 and preserve an attributable result." },
+  { controlId: "IH-024", domain: "PUBLICATION", title: "Integrity control 024", requirement: "Validate publication integrity requirement 024 and preserve an attributable result." },
+  { controlId: "IH-025", domain: "CANONICAL", title: "Integrity control 025", requirement: "Validate canonical integrity requirement 025 and preserve an attributable result." },
+  { controlId: "IH-026", domain: "COMPONENT", title: "Integrity control 026", requirement: "Validate component integrity requirement 026 and preserve an attributable result." },
+  { controlId: "IH-027", domain: "PACKAGE", title: "Integrity control 027", requirement: "Validate package integrity requirement 027 and preserve an attributable result." },
+  { controlId: "IH-028", domain: "MANIFEST", title: "Integrity control 028", requirement: "Validate manifest integrity requirement 028 and preserve an attributable result." },
+  { controlId: "IH-029", domain: "LINEAGE", title: "Integrity control 029", requirement: "Validate lineage integrity requirement 029 and preserve an attributable result." },
+  { controlId: "IH-030", domain: "AUDIT", title: "Integrity control 030", requirement: "Validate audit integrity requirement 030 and preserve an attributable result." },
+  { controlId: "IH-031", domain: "OFFLINE", title: "Integrity control 031", requirement: "Validate offline integrity requirement 031 and preserve an attributable result." },
+  { controlId: "IH-032", domain: "PUBLICATION", title: "Integrity control 032", requirement: "Validate publication integrity requirement 032 and preserve an attributable result." },
+  { controlId: "IH-033", domain: "CANONICAL", title: "Integrity control 033", requirement: "Validate canonical integrity requirement 033 and preserve an attributable result." },
+  { controlId: "IH-034", domain: "COMPONENT", title: "Integrity control 034", requirement: "Validate component integrity requirement 034 and preserve an attributable result." },
+  { controlId: "IH-035", domain: "PACKAGE", title: "Integrity control 035", requirement: "Validate package integrity requirement 035 and preserve an attributable result." },
+  { controlId: "IH-036", domain: "MANIFEST", title: "Integrity control 036", requirement: "Validate manifest integrity requirement 036 and preserve an attributable result." },
+  { controlId: "IH-037", domain: "LINEAGE", title: "Integrity control 037", requirement: "Validate lineage integrity requirement 037 and preserve an attributable result." },
+  { controlId: "IH-038", domain: "AUDIT", title: "Integrity control 038", requirement: "Validate audit integrity requirement 038 and preserve an attributable result." },
+  { controlId: "IH-039", domain: "OFFLINE", title: "Integrity control 039", requirement: "Validate offline integrity requirement 039 and preserve an attributable result." },
+  { controlId: "IH-040", domain: "PUBLICATION", title: "Integrity control 040", requirement: "Validate publication integrity requirement 040 and preserve an attributable result." },
+  { controlId: "IH-041", domain: "CANONICAL", title: "Integrity control 041", requirement: "Validate canonical integrity requirement 041 and preserve an attributable result." },
+  { controlId: "IH-042", domain: "COMPONENT", title: "Integrity control 042", requirement: "Validate component integrity requirement 042 and preserve an attributable result." },
+  { controlId: "IH-043", domain: "PACKAGE", title: "Integrity control 043", requirement: "Validate package integrity requirement 043 and preserve an attributable result." },
+  { controlId: "IH-044", domain: "MANIFEST", title: "Integrity control 044", requirement: "Validate manifest integrity requirement 044 and preserve an attributable result." },
+  { controlId: "IH-045", domain: "LINEAGE", title: "Integrity control 045", requirement: "Validate lineage integrity requirement 045 and preserve an attributable result." },
+  { controlId: "IH-046", domain: "AUDIT", title: "Integrity control 046", requirement: "Validate audit integrity requirement 046 and preserve an attributable result." },
+  { controlId: "IH-047", domain: "OFFLINE", title: "Integrity control 047", requirement: "Validate offline integrity requirement 047 and preserve an attributable result." },
+  { controlId: "IH-048", domain: "PUBLICATION", title: "Integrity control 048", requirement: "Validate publication integrity requirement 048 and preserve an attributable result." },
+  { controlId: "IH-049", domain: "CANONICAL", title: "Integrity control 049", requirement: "Validate canonical integrity requirement 049 and preserve an attributable result." },
+  { controlId: "IH-050", domain: "COMPONENT", title: "Integrity control 050", requirement: "Validate component integrity requirement 050 and preserve an attributable result." },
+  { controlId: "IH-051", domain: "PACKAGE", title: "Integrity control 051", requirement: "Validate package integrity requirement 051 and preserve an attributable result." },
+  { controlId: "IH-052", domain: "MANIFEST", title: "Integrity control 052", requirement: "Validate manifest integrity requirement 052 and preserve an attributable result." },
+  { controlId: "IH-053", domain: "LINEAGE", title: "Integrity control 053", requirement: "Validate lineage integrity requirement 053 and preserve an attributable result." },
+  { controlId: "IH-054", domain: "AUDIT", title: "Integrity control 054", requirement: "Validate audit integrity requirement 054 and preserve an attributable result." },
+  { controlId: "IH-055", domain: "OFFLINE", title: "Integrity control 055", requirement: "Validate offline integrity requirement 055 and preserve an attributable result." },
+  { controlId: "IH-056", domain: "PUBLICATION", title: "Integrity control 056", requirement: "Validate publication integrity requirement 056 and preserve an attributable result." },
+  { controlId: "IH-057", domain: "CANONICAL", title: "Integrity control 057", requirement: "Validate canonical integrity requirement 057 and preserve an attributable result." },
+  { controlId: "IH-058", domain: "COMPONENT", title: "Integrity control 058", requirement: "Validate component integrity requirement 058 and preserve an attributable result." },
+  { controlId: "IH-059", domain: "PACKAGE", title: "Integrity control 059", requirement: "Validate package integrity requirement 059 and preserve an attributable result." },
+  { controlId: "IH-060", domain: "MANIFEST", title: "Integrity control 060", requirement: "Validate manifest integrity requirement 060 and preserve an attributable result." },
+  { controlId: "IH-061", domain: "LINEAGE", title: "Integrity control 061", requirement: "Validate lineage integrity requirement 061 and preserve an attributable result." },
+  { controlId: "IH-062", domain: "AUDIT", title: "Integrity control 062", requirement: "Validate audit integrity requirement 062 and preserve an attributable result." },
+  { controlId: "IH-063", domain: "OFFLINE", title: "Integrity control 063", requirement: "Validate offline integrity requirement 063 and preserve an attributable result." },
+  { controlId: "IH-064", domain: "PUBLICATION", title: "Integrity control 064", requirement: "Validate publication integrity requirement 064 and preserve an attributable result." },
+  { controlId: "IH-065", domain: "CANONICAL", title: "Integrity control 065", requirement: "Validate canonical integrity requirement 065 and preserve an attributable result." },
+  { controlId: "IH-066", domain: "COMPONENT", title: "Integrity control 066", requirement: "Validate component integrity requirement 066 and preserve an attributable result." },
+  { controlId: "IH-067", domain: "PACKAGE", title: "Integrity control 067", requirement: "Validate package integrity requirement 067 and preserve an attributable result." },
+  { controlId: "IH-068", domain: "MANIFEST", title: "Integrity control 068", requirement: "Validate manifest integrity requirement 068 and preserve an attributable result." },
+  { controlId: "IH-069", domain: "LINEAGE", title: "Integrity control 069", requirement: "Validate lineage integrity requirement 069 and preserve an attributable result." },
+  { controlId: "IH-070", domain: "AUDIT", title: "Integrity control 070", requirement: "Validate audit integrity requirement 070 and preserve an attributable result." },
+  { controlId: "IH-071", domain: "OFFLINE", title: "Integrity control 071", requirement: "Validate offline integrity requirement 071 and preserve an attributable result." },
+  { controlId: "IH-072", domain: "PUBLICATION", title: "Integrity control 072", requirement: "Validate publication integrity requirement 072 and preserve an attributable result." },
+  { controlId: "IH-073", domain: "CANONICAL", title: "Integrity control 073", requirement: "Validate canonical integrity requirement 073 and preserve an attributable result." },
+  { controlId: "IH-074", domain: "COMPONENT", title: "Integrity control 074", requirement: "Validate component integrity requirement 074 and preserve an attributable result." },
+  { controlId: "IH-075", domain: "PACKAGE", title: "Integrity control 075", requirement: "Validate package integrity requirement 075 and preserve an attributable result." },
+  { controlId: "IH-076", domain: "MANIFEST", title: "Integrity control 076", requirement: "Validate manifest integrity requirement 076 and preserve an attributable result." },
+  { controlId: "IH-077", domain: "LINEAGE", title: "Integrity control 077", requirement: "Validate lineage integrity requirement 077 and preserve an attributable result." },
+  { controlId: "IH-078", domain: "AUDIT", title: "Integrity control 078", requirement: "Validate audit integrity requirement 078 and preserve an attributable result." },
+  { controlId: "IH-079", domain: "OFFLINE", title: "Integrity control 079", requirement: "Validate offline integrity requirement 079 and preserve an attributable result." },
+  { controlId: "IH-080", domain: "PUBLICATION", title: "Integrity control 080", requirement: "Validate publication integrity requirement 080 and preserve an attributable result." },
+  { controlId: "IH-081", domain: "CANONICAL", title: "Integrity control 081", requirement: "Validate canonical integrity requirement 081 and preserve an attributable result." },
+  { controlId: "IH-082", domain: "COMPONENT", title: "Integrity control 082", requirement: "Validate component integrity requirement 082 and preserve an attributable result." },
+  { controlId: "IH-083", domain: "PACKAGE", title: "Integrity control 083", requirement: "Validate package integrity requirement 083 and preserve an attributable result." },
+  { controlId: "IH-084", domain: "MANIFEST", title: "Integrity control 084", requirement: "Validate manifest integrity requirement 084 and preserve an attributable result." },
+  { controlId: "IH-085", domain: "LINEAGE", title: "Integrity control 085", requirement: "Validate lineage integrity requirement 085 and preserve an attributable result." },
+  { controlId: "IH-086", domain: "AUDIT", title: "Integrity control 086", requirement: "Validate audit integrity requirement 086 and preserve an attributable result." },
+  { controlId: "IH-087", domain: "OFFLINE", title: "Integrity control 087", requirement: "Validate offline integrity requirement 087 and preserve an attributable result." },
+  { controlId: "IH-088", domain: "PUBLICATION", title: "Integrity control 088", requirement: "Validate publication integrity requirement 088 and preserve an attributable result." },
+  { controlId: "IH-089", domain: "CANONICAL", title: "Integrity control 089", requirement: "Validate canonical integrity requirement 089 and preserve an attributable result." },
+  { controlId: "IH-090", domain: "COMPONENT", title: "Integrity control 090", requirement: "Validate component integrity requirement 090 and preserve an attributable result." },
+  { controlId: "IH-091", domain: "PACKAGE", title: "Integrity control 091", requirement: "Validate package integrity requirement 091 and preserve an attributable result." },
+  { controlId: "IH-092", domain: "MANIFEST", title: "Integrity control 092", requirement: "Validate manifest integrity requirement 092 and preserve an attributable result." },
+  { controlId: "IH-093", domain: "LINEAGE", title: "Integrity control 093", requirement: "Validate lineage integrity requirement 093 and preserve an attributable result." },
+  { controlId: "IH-094", domain: "AUDIT", title: "Integrity control 094", requirement: "Validate audit integrity requirement 094 and preserve an attributable result." },
+  { controlId: "IH-095", domain: "OFFLINE", title: "Integrity control 095", requirement: "Validate offline integrity requirement 095 and preserve an attributable result." },
+  { controlId: "IH-096", domain: "PUBLICATION", title: "Integrity control 096", requirement: "Validate publication integrity requirement 096 and preserve an attributable result." },
+] as const;
+
+export const INTEGRITY_ACCEPTANCE_TESTS: readonly IntegrityAcceptanceTest[] = [
+  { testId: "AT-IH-001", title: "Integrity acceptance test 001", passCondition: "The engine deterministically detects or proves integrity condition 001 without mutating the input record." },
+  { testId: "AT-IH-002", title: "Integrity acceptance test 002", passCondition: "The engine deterministically detects or proves integrity condition 002 without mutating the input record." },
+  { testId: "AT-IH-003", title: "Integrity acceptance test 003", passCondition: "The engine deterministically detects or proves integrity condition 003 without mutating the input record." },
+  { testId: "AT-IH-004", title: "Integrity acceptance test 004", passCondition: "The engine deterministically detects or proves integrity condition 004 without mutating the input record." },
+  { testId: "AT-IH-005", title: "Integrity acceptance test 005", passCondition: "The engine deterministically detects or proves integrity condition 005 without mutating the input record." },
+  { testId: "AT-IH-006", title: "Integrity acceptance test 006", passCondition: "The engine deterministically detects or proves integrity condition 006 without mutating the input record." },
+  { testId: "AT-IH-007", title: "Integrity acceptance test 007", passCondition: "The engine deterministically detects or proves integrity condition 007 without mutating the input record." },
+  { testId: "AT-IH-008", title: "Integrity acceptance test 008", passCondition: "The engine deterministically detects or proves integrity condition 008 without mutating the input record." },
+  { testId: "AT-IH-009", title: "Integrity acceptance test 009", passCondition: "The engine deterministically detects or proves integrity condition 009 without mutating the input record." },
+  { testId: "AT-IH-010", title: "Integrity acceptance test 010", passCondition: "The engine deterministically detects or proves integrity condition 010 without mutating the input record." },
+  { testId: "AT-IH-011", title: "Integrity acceptance test 011", passCondition: "The engine deterministically detects or proves integrity condition 011 without mutating the input record." },
+  { testId: "AT-IH-012", title: "Integrity acceptance test 012", passCondition: "The engine deterministically detects or proves integrity condition 012 without mutating the input record." },
+  { testId: "AT-IH-013", title: "Integrity acceptance test 013", passCondition: "The engine deterministically detects or proves integrity condition 013 without mutating the input record." },
+  { testId: "AT-IH-014", title: "Integrity acceptance test 014", passCondition: "The engine deterministically detects or proves integrity condition 014 without mutating the input record." },
+  { testId: "AT-IH-015", title: "Integrity acceptance test 015", passCondition: "The engine deterministically detects or proves integrity condition 015 without mutating the input record." },
+  { testId: "AT-IH-016", title: "Integrity acceptance test 016", passCondition: "The engine deterministically detects or proves integrity condition 016 without mutating the input record." },
+  { testId: "AT-IH-017", title: "Integrity acceptance test 017", passCondition: "The engine deterministically detects or proves integrity condition 017 without mutating the input record." },
+  { testId: "AT-IH-018", title: "Integrity acceptance test 018", passCondition: "The engine deterministically detects or proves integrity condition 018 without mutating the input record." },
+  { testId: "AT-IH-019", title: "Integrity acceptance test 019", passCondition: "The engine deterministically detects or proves integrity condition 019 without mutating the input record." },
+  { testId: "AT-IH-020", title: "Integrity acceptance test 020", passCondition: "The engine deterministically detects or proves integrity condition 020 without mutating the input record." },
+  { testId: "AT-IH-021", title: "Integrity acceptance test 021", passCondition: "The engine deterministically detects or proves integrity condition 021 without mutating the input record." },
+  { testId: "AT-IH-022", title: "Integrity acceptance test 022", passCondition: "The engine deterministically detects or proves integrity condition 022 without mutating the input record." },
+  { testId: "AT-IH-023", title: "Integrity acceptance test 023", passCondition: "The engine deterministically detects or proves integrity condition 023 without mutating the input record." },
+  { testId: "AT-IH-024", title: "Integrity acceptance test 024", passCondition: "The engine deterministically detects or proves integrity condition 024 without mutating the input record." },
+  { testId: "AT-IH-025", title: "Integrity acceptance test 025", passCondition: "The engine deterministically detects or proves integrity condition 025 without mutating the input record." },
+  { testId: "AT-IH-026", title: "Integrity acceptance test 026", passCondition: "The engine deterministically detects or proves integrity condition 026 without mutating the input record." },
+  { testId: "AT-IH-027", title: "Integrity acceptance test 027", passCondition: "The engine deterministically detects or proves integrity condition 027 without mutating the input record." },
+  { testId: "AT-IH-028", title: "Integrity acceptance test 028", passCondition: "The engine deterministically detects or proves integrity condition 028 without mutating the input record." },
+  { testId: "AT-IH-029", title: "Integrity acceptance test 029", passCondition: "The engine deterministically detects or proves integrity condition 029 without mutating the input record." },
+  { testId: "AT-IH-030", title: "Integrity acceptance test 030", passCondition: "The engine deterministically detects or proves integrity condition 030 without mutating the input record." },
+  { testId: "AT-IH-031", title: "Integrity acceptance test 031", passCondition: "The engine deterministically detects or proves integrity condition 031 without mutating the input record." },
+  { testId: "AT-IH-032", title: "Integrity acceptance test 032", passCondition: "The engine deterministically detects or proves integrity condition 032 without mutating the input record." },
+  { testId: "AT-IH-033", title: "Integrity acceptance test 033", passCondition: "The engine deterministically detects or proves integrity condition 033 without mutating the input record." },
+  { testId: "AT-IH-034", title: "Integrity acceptance test 034", passCondition: "The engine deterministically detects or proves integrity condition 034 without mutating the input record." },
+  { testId: "AT-IH-035", title: "Integrity acceptance test 035", passCondition: "The engine deterministically detects or proves integrity condition 035 without mutating the input record." },
+  { testId: "AT-IH-036", title: "Integrity acceptance test 036", passCondition: "The engine deterministically detects or proves integrity condition 036 without mutating the input record." },
+  { testId: "AT-IH-037", title: "Integrity acceptance test 037", passCondition: "The engine deterministically detects or proves integrity condition 037 without mutating the input record." },
+  { testId: "AT-IH-038", title: "Integrity acceptance test 038", passCondition: "The engine deterministically detects or proves integrity condition 038 without mutating the input record." },
+  { testId: "AT-IH-039", title: "Integrity acceptance test 039", passCondition: "The engine deterministically detects or proves integrity condition 039 without mutating the input record." },
+  { testId: "AT-IH-040", title: "Integrity acceptance test 040", passCondition: "The engine deterministically detects or proves integrity condition 040 without mutating the input record." },
+  { testId: "AT-IH-041", title: "Integrity acceptance test 041", passCondition: "The engine deterministically detects or proves integrity condition 041 without mutating the input record." },
+  { testId: "AT-IH-042", title: "Integrity acceptance test 042", passCondition: "The engine deterministically detects or proves integrity condition 042 without mutating the input record." },
+  { testId: "AT-IH-043", title: "Integrity acceptance test 043", passCondition: "The engine deterministically detects or proves integrity condition 043 without mutating the input record." },
+  { testId: "AT-IH-044", title: "Integrity acceptance test 044", passCondition: "The engine deterministically detects or proves integrity condition 044 without mutating the input record." },
+  { testId: "AT-IH-045", title: "Integrity acceptance test 045", passCondition: "The engine deterministically detects or proves integrity condition 045 without mutating the input record." },
+  { testId: "AT-IH-046", title: "Integrity acceptance test 046", passCondition: "The engine deterministically detects or proves integrity condition 046 without mutating the input record." },
+  { testId: "AT-IH-047", title: "Integrity acceptance test 047", passCondition: "The engine deterministically detects or proves integrity condition 047 without mutating the input record." },
+  { testId: "AT-IH-048", title: "Integrity acceptance test 048", passCondition: "The engine deterministically detects or proves integrity condition 048 without mutating the input record." },
+  { testId: "AT-IH-049", title: "Integrity acceptance test 049", passCondition: "The engine deterministically detects or proves integrity condition 049 without mutating the input record." },
+  { testId: "AT-IH-050", title: "Integrity acceptance test 050", passCondition: "The engine deterministically detects or proves integrity condition 050 without mutating the input record." },
+  { testId: "AT-IH-051", title: "Integrity acceptance test 051", passCondition: "The engine deterministically detects or proves integrity condition 051 without mutating the input record." },
+  { testId: "AT-IH-052", title: "Integrity acceptance test 052", passCondition: "The engine deterministically detects or proves integrity condition 052 without mutating the input record." },
+  { testId: "AT-IH-053", title: "Integrity acceptance test 053", passCondition: "The engine deterministically detects or proves integrity condition 053 without mutating the input record." },
+  { testId: "AT-IH-054", title: "Integrity acceptance test 054", passCondition: "The engine deterministically detects or proves integrity condition 054 without mutating the input record." },
+  { testId: "AT-IH-055", title: "Integrity acceptance test 055", passCondition: "The engine deterministically detects or proves integrity condition 055 without mutating the input record." },
+  { testId: "AT-IH-056", title: "Integrity acceptance test 056", passCondition: "The engine deterministically detects or proves integrity condition 056 without mutating the input record." },
+  { testId: "AT-IH-057", title: "Integrity acceptance test 057", passCondition: "The engine deterministically detects or proves integrity condition 057 without mutating the input record." },
+  { testId: "AT-IH-058", title: "Integrity acceptance test 058", passCondition: "The engine deterministically detects or proves integrity condition 058 without mutating the input record." },
+  { testId: "AT-IH-059", title: "Integrity acceptance test 059", passCondition: "The engine deterministically detects or proves integrity condition 059 without mutating the input record." },
+  { testId: "AT-IH-060", title: "Integrity acceptance test 060", passCondition: "The engine deterministically detects or proves integrity condition 060 without mutating the input record." },
+  { testId: "AT-IH-061", title: "Integrity acceptance test 061", passCondition: "The engine deterministically detects or proves integrity condition 061 without mutating the input record." },
+  { testId: "AT-IH-062", title: "Integrity acceptance test 062", passCondition: "The engine deterministically detects or proves integrity condition 062 without mutating the input record." },
+  { testId: "AT-IH-063", title: "Integrity acceptance test 063", passCondition: "The engine deterministically detects or proves integrity condition 063 without mutating the input record." },
+  { testId: "AT-IH-064", title: "Integrity acceptance test 064", passCondition: "The engine deterministically detects or proves integrity condition 064 without mutating the input record." },
+  { testId: "AT-IH-065", title: "Integrity acceptance test 065", passCondition: "The engine deterministically detects or proves integrity condition 065 without mutating the input record." },
+  { testId: "AT-IH-066", title: "Integrity acceptance test 066", passCondition: "The engine deterministically detects or proves integrity condition 066 without mutating the input record." },
+  { testId: "AT-IH-067", title: "Integrity acceptance test 067", passCondition: "The engine deterministically detects or proves integrity condition 067 without mutating the input record." },
+  { testId: "AT-IH-068", title: "Integrity acceptance test 068", passCondition: "The engine deterministically detects or proves integrity condition 068 without mutating the input record." },
+  { testId: "AT-IH-069", title: "Integrity acceptance test 069", passCondition: "The engine deterministically detects or proves integrity condition 069 without mutating the input record." },
+  { testId: "AT-IH-070", title: "Integrity acceptance test 070", passCondition: "The engine deterministically detects or proves integrity condition 070 without mutating the input record." },
+  { testId: "AT-IH-071", title: "Integrity acceptance test 071", passCondition: "The engine deterministically detects or proves integrity condition 071 without mutating the input record." },
+  { testId: "AT-IH-072", title: "Integrity acceptance test 072", passCondition: "The engine deterministically detects or proves integrity condition 072 without mutating the input record." },
+  { testId: "AT-IH-073", title: "Integrity acceptance test 073", passCondition: "The engine deterministically detects or proves integrity condition 073 without mutating the input record." },
+  { testId: "AT-IH-074", title: "Integrity acceptance test 074", passCondition: "The engine deterministically detects or proves integrity condition 074 without mutating the input record." },
+  { testId: "AT-IH-075", title: "Integrity acceptance test 075", passCondition: "The engine deterministically detects or proves integrity condition 075 without mutating the input record." },
+  { testId: "AT-IH-076", title: "Integrity acceptance test 076", passCondition: "The engine deterministically detects or proves integrity condition 076 without mutating the input record." },
+  { testId: "AT-IH-077", title: "Integrity acceptance test 077", passCondition: "The engine deterministically detects or proves integrity condition 077 without mutating the input record." },
+  { testId: "AT-IH-078", title: "Integrity acceptance test 078", passCondition: "The engine deterministically detects or proves integrity condition 078 without mutating the input record." },
+  { testId: "AT-IH-079", title: "Integrity acceptance test 079", passCondition: "The engine deterministically detects or proves integrity condition 079 without mutating the input record." },
+  { testId: "AT-IH-080", title: "Integrity acceptance test 080", passCondition: "The engine deterministically detects or proves integrity condition 080 without mutating the input record." },
+] as const;
 
 
-function normalize(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(normalize);
-  if (value && typeof value === "object") {
-    return Object.keys(value as Record<string, unknown>).sort().reduce<Record<string, unknown>>((acc, key) => {
-      acc[key] = normalize((value as Record<string, unknown>)[key]);
-      return acc;
-    }, {});
+const DEFAULT_CANONICALIZATION_OPTIONS: Required<CanonicalizationOptions> = {
+  version: TA14_CANONICALIZATION_VERSION,
+  normalizeDates: true,
+  normalizeUnicode: true,
+  sortArrays: false,
+  rejectUndefined: true,
+  rejectFunctions: true,
+  rejectSymbols: true,
+  rejectNonFiniteNumbers: true,
+  bigintMode: "DECIMAL_STRING",
+};
+
+const HEX_64 = /^[0-9a-f]{64}$/;
+const ISO_DATE_PREFIX = /^\d{4}-\d{2}-\d{2}T/;
+
+function issue(
+  code: IntegrityReasonCode,
+  message?: string,
+  extra: Partial<IntegrityIssue> = {},
+): IntegrityIssue {
+  const definition = INTEGRITY_REASON_DEFINITIONS.find((item) => item.code === code);
+  if (!definition) {
+    throw new Error(`Unknown integrity reason code: ${code}`);
   }
-  return value;
-}
-
-function stableJson(value: unknown): string { return JSON.stringify(normalize(value)); }
-
-function digest(namespace: string, value: unknown): string {
-  const input = `${namespace}:${stableJson(value)}`;
-  let a = 0x811c9dc5;
-  let b = 0x9e3779b9;
-  let c = 0x85ebca6b;
-  let d = 0xc2b2ae35;
-  for (let i = 0; i < input.length; i += 1) {
-    const n = input.charCodeAt(i);
-    a = Math.imul(a ^ n, 0x01000193);
-    b = Math.imul(b ^ (n + i), 0x27d4eb2d);
-    c = Math.imul(c ^ (n << (i % 8)), 0x165667b1);
-    d = Math.imul(d ^ (n + a), 0x9e3779b1);
-  }
-  return [a,b,c,d,a^c,b^d,a^b,c^d].map(n => (n >>> 0).toString(16).padStart(8,"0")).join("");
-}
-
-function isIso(value: string | undefined): boolean { return !!value && Number.isFinite(Date.parse(value)); }
-function text(value: string | undefined): boolean { return !!value && value.trim().length > 0; }
-function unique(values: readonly string[]): boolean { return new Set(values).size === values.length; }
-
-function issue(code: ChallengeReasonCode, path: string, message?: string, details?: Record<string, unknown>): ChallengeIssue {
-  const def = CHALLENGE_REASON_DICTIONARY[code];
-  return { code, domain: def.domain, disposition: def.disposition, path, message: message ?? def.description, repair: def.repairable ? def.publicMessage : undefined, details };
-}
-
-function appendAudit(events: readonly ChallengeAuditEvent[], challengeId: string, occurredAt: string, actorId: string, eventType: ChallengeAuditEvent["eventType"], description: string): ChallengeAuditEvent[] {
-  const previousHash = events.length ? events[events.length - 1].eventHash : "GENESIS";
-  const eventId = `CAE-${digest("challenge-audit-id", { challengeId, occurredAt, actorId, eventType, previousHash }).slice(0,24).toUpperCase()}`;
-  const eventHash = digest("challenge-audit", { eventId, challengeId, occurredAt, actorId, eventType, description, previousHash });
-  return [...events, { eventId, challengeId, occurredAt, actorId, eventType, description, previousHash, eventHash }];
-}
-
-function challengeReference(challenge: ChallengeRecord): RegistryChallengeReference {
   return {
-    challengeId: challenge.challengeId,
-    openedAt: challenge.openedAt,
-    openedBy: challenge.openedBy.partyId,
-    status: challenge.status,
-    subject: challenge.subject,
-    publicSummary: challenge.publicSummary,
-    challengeHash: challenge.challengeHash,
-    resolutionHash: challenge.resolution?.resolutionHash,
-    closedAt: challenge.resolution?.resolvedAt,
+    code,
+    domain: definition.domain,
+    severity: definition.severity,
+    title: definition.title,
+    message: message ?? definition.description,
+    ...extra,
   };
 }
 
-function correctionReference(correction: CorrectionPackage): RegistryCorrectionReference {
+function utf8Bytes(value: string): Uint8Array {
+  if (typeof TextEncoder !== "undefined") {
+    return new TextEncoder().encode(value);
+  }
+  const encoded = unescape(encodeURIComponent(value));
+  const bytes = new Uint8Array(encoded.length);
+  for (let index = 0; index < encoded.length; index += 1) {
+    bytes[index] = encoded.charCodeAt(index);
+  }
+  return bytes;
+}
+
+function concatBytes(parts: readonly Uint8Array[]): Uint8Array {
+  const total = parts.reduce((sum, part) => sum + part.length, 0);
+  const result = new Uint8Array(total);
+  let offset = 0;
+  for (const part of parts) {
+    result.set(part, offset);
+    offset += part.length;
+  }
+  return result;
+}
+
+function rightRotate(value: number, bits: number): number {
+  return (value >>> bits) | (value << (32 - bits));
+}
+
+/**
+ * Dependency-free SHA-256 implementation used for deterministic integrity
+ * processing in browser, edge, and Node runtimes.
+ */
+export function sha256Bytes(input: Uint8Array): Uint8Array {
+  const constants = new Uint32Array([
+    0x428a2f98, 0x71374491, 0xb5c0fbcf, 0xe9b5dba5, 0x3956c25b, 0x59f111f1, 0x923f82a4, 0xab1c5ed5,
+    0xd807aa98, 0x12835b01, 0x243185be, 0x550c7dc3, 0x72be5d74, 0x80deb1fe, 0x9bdc06a7, 0xc19bf174,
+    0xe49b69c1, 0xefbe4786, 0x0fc19dc6, 0x240ca1cc, 0x2de92c6f, 0x4a7484aa, 0x5cb0a9dc, 0x76f988da,
+    0x983e5152, 0xa831c66d, 0xb00327c8, 0xbf597fc7, 0xc6e00bf3, 0xd5a79147, 0x06ca6351, 0x14292967,
+    0x27b70a85, 0x2e1b2138, 0x4d2c6dfc, 0x53380d13, 0x650a7354, 0x766a0abb, 0x81c2c92e, 0x92722c85,
+    0xa2bfe8a1, 0xa81a664b, 0xc24b8b70, 0xc76c51a3, 0xd192e819, 0xd6990624, 0xf40e3585, 0x106aa070,
+    0x19a4c116, 0x1e376c08, 0x2748774c, 0x34b0bcb5, 0x391c0cb3, 0x4ed8aa4a, 0x5b9cca4f, 0x682e6ff3,
+    0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
+  ]);
+
+  const bitLength = input.length * 8;
+  const paddedLength = Math.ceil((input.length + 9) / 64) * 64;
+  const padded = new Uint8Array(paddedLength);
+  padded.set(input);
+  padded[input.length] = 0x80;
+  const view = new DataView(padded.buffer);
+  const high = Math.floor(bitLength / 0x100000000);
+  const low = bitLength >>> 0;
+  view.setUint32(paddedLength - 8, high, false);
+  view.setUint32(paddedLength - 4, low, false);
+
+  const hash = new Uint32Array([
+    0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,
+    0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19,
+  ]);
+  const words = new Uint32Array(64);
+
+  for (let offset = 0; offset < padded.length; offset += 64) {
+    for (let index = 0; index < 16; index += 1) {
+      words[index] = view.getUint32(offset + index * 4, false);
+    }
+    for (let index = 16; index < 64; index += 1) {
+      const s0 = rightRotate(words[index - 15], 7) ^ rightRotate(words[index - 15], 18) ^ (words[index - 15] >>> 3);
+      const s1 = rightRotate(words[index - 2], 17) ^ rightRotate(words[index - 2], 19) ^ (words[index - 2] >>> 10);
+      words[index] = (words[index - 16] + s0 + words[index - 7] + s1) >>> 0;
+    }
+
+    let a = hash[0]; let b = hash[1]; let c = hash[2]; let d = hash[3];
+    let e = hash[4]; let f = hash[5]; let g = hash[6]; let h = hash[7];
+
+    for (let index = 0; index < 64; index += 1) {
+      const sum1 = rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25);
+      const choice = (e & f) ^ (~e & g);
+      const temp1 = (h + sum1 + choice + constants[index] + words[index]) >>> 0;
+      const sum0 = rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22);
+      const majority = (a & b) ^ (a & c) ^ (b & c);
+      const temp2 = (sum0 + majority) >>> 0;
+      h = g; g = f; f = e; e = (d + temp1) >>> 0;
+      d = c; c = b; b = a; a = (temp1 + temp2) >>> 0;
+    }
+
+    hash[0] = (hash[0] + a) >>> 0;
+    hash[1] = (hash[1] + b) >>> 0;
+    hash[2] = (hash[2] + c) >>> 0;
+    hash[3] = (hash[3] + d) >>> 0;
+    hash[4] = (hash[4] + e) >>> 0;
+    hash[5] = (hash[5] + f) >>> 0;
+    hash[6] = (hash[6] + g) >>> 0;
+    hash[7] = (hash[7] + h) >>> 0;
+  }
+
+  const output = new Uint8Array(32);
+  const outputView = new DataView(output.buffer);
+  for (let index = 0; index < hash.length; index += 1) {
+    outputView.setUint32(index * 4, hash[index], false);
+  }
+  return output;
+}
+
+export function bytesToHex(bytes: Uint8Array): string {
+  let result = "";
+  for (const byte of bytes) result += byte.toString(16).padStart(2, "0");
+  return result;
+}
+
+export function sha256Hex(input: string | Uint8Array): string {
+  return bytesToHex(sha256Bytes(typeof input === "string" ? utf8Bytes(input) : input));
+}
+
+export function constantTimeHexEqual(left: string, right: string): boolean {
+  if (left.length !== right.length) return false;
+  let mismatch = 0;
+  for (let index = 0; index < left.length; index += 1) {
+    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
+  }
+  return mismatch === 0;
+}
+
+function normalizeCanonicalValue(
+  value: unknown,
+  options: Required<CanonicalizationOptions>,
+  seen: Set<object>,
+  path: string,
+): unknown {
+  if (value === null || typeof value === "boolean" || typeof value === "string") {
+    if (typeof value === "string") {
+      const normalized = options.normalizeUnicode ? value.normalize("NFC") : value;
+      if (options.normalizeDates && ISO_DATE_PREFIX.test(normalized)) {
+        const date = new Date(normalized);
+        if (!Number.isNaN(date.getTime())) return date.toISOString();
+      }
+      return normalized;
+    }
+    return value;
+  }
+  if (typeof value === "number") {
+    if (!Number.isFinite(value) && options.rejectNonFiniteNumbers) {
+      throw new TypeError(`Nonfinite number at ${path}`);
+    }
+    if (Object.is(value, -0)) return 0;
+    return value;
+  }
+  if (typeof value === "bigint") {
+    if (options.bigintMode === "REJECT") throw new TypeError(`BigInt rejected at ${path}`);
+    return value.toString(10);
+  }
+  if (typeof value === "undefined") {
+    if (options.rejectUndefined) throw new TypeError(`Undefined rejected at ${path}`);
+    return null;
+  }
+  if (typeof value === "function") {
+    if (options.rejectFunctions) throw new TypeError(`Function rejected at ${path}`);
+    return null;
+  }
+  if (typeof value === "symbol") {
+    if (options.rejectSymbols) throw new TypeError(`Symbol rejected at ${path}`);
+    return String(value);
+  }
+  if (value instanceof Date) {
+    if (Number.isNaN(value.getTime())) throw new TypeError(`Invalid date at ${path}`);
+    return value.toISOString();
+  }
+  if (value instanceof Uint8Array) {
+    return { $bytes: bytesToHex(value) };
+  }
+  if (typeof value === "object") {
+    if (seen.has(value)) throw new TypeError(`Circular reference at ${path}`);
+    seen.add(value);
+    try {
+      if (Array.isArray(value)) {
+        const normalized = value.map((item, index) => normalizeCanonicalValue(item, options, seen, `${path}[${index}]`));
+        return options.sortArrays
+          ? normalized.slice().sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)))
+          : normalized;
+      }
+      if (value instanceof Set) {
+        return Array.from(value)
+          .map((item, index) => normalizeCanonicalValue(item, options, seen, `${path}.set[${index}]`))
+          .sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+      }
+      if (value instanceof Map) {
+        const entries: Record<string, unknown> = {};
+        for (const [key, item] of value.entries()) {
+          if (typeof key !== "string") throw new TypeError(`Non-string map key at ${path}`);
+          entries[key] = normalizeCanonicalValue(item, options, seen, `${path}.${key}`);
+        }
+        return Object.fromEntries(Object.keys(entries).sort().map((key) => [key, entries[key]]));
+      }
+      const record = value as Record<string, unknown>;
+      const normalized: Record<string, unknown> = {};
+      for (const key of Object.keys(record).sort()) {
+        normalized[key] = normalizeCanonicalValue(record[key], options, seen, `${path}.${key}`);
+      }
+      return normalized;
+    } finally {
+      seen.delete(value);
+    }
+  }
+  throw new TypeError(`Unsupported value at ${path}`);
+}
+
+export function canonicalize(
+  value: unknown,
+  options: CanonicalizationOptions = {},
+): string {
+  const resolved: Required<CanonicalizationOptions> = {
+    ...DEFAULT_CANONICALIZATION_OPTIONS,
+    ...options,
+  };
+  const normalized = normalizeCanonicalValue(value, resolved, new Set<object>(), "$root");
+  return JSON.stringify(normalized);
+}
+
+export function canonicalHash(value: unknown, options: CanonicalizationOptions = {}): string {
+  return sha256Hex(canonicalize(value, options));
+}
+
+export function componentBytes(component: IntegrityComponentInput, options: CanonicalizationOptions = {}): Uint8Array {
+  const populated = [component.bytes !== undefined, component.text !== undefined, component.value !== undefined]
+    .filter(Boolean).length;
+  if (populated !== 1) {
+    throw new Error(`Component ${component.componentId} must supply exactly one of bytes, text, or value.`);
+  }
+  if (component.bytes) return new Uint8Array(component.bytes);
+  if (component.text !== undefined) return utf8Bytes(component.text);
+  return utf8Bytes(canonicalize(component.value, options));
+}
+
+export function digestComponent(
+  component: IntegrityComponentInput,
+  options: CanonicalizationOptions = {},
+): IntegrityComponentDigest {
+  const bytes = componentBytes(component, options);
   return {
-    correctionId: correction.correctionId,
-    createdAt: correction.createdAt,
-    createdBy: correction.createdBy,
-    scope: correction.scope,
-    reason: correction.reason,
-    amendmentHash: correction.amendmentHash,
-    parentRegistryRecordHash: correction.originalRegistryRecordHash,
-    resultingRegistryRecordHash: correction.resultingRegistryRecordHash,
+    componentId: component.componentId,
+    kind: component.kind,
+    label: component.label,
+    mediaType: component.mediaType,
+    required: component.required,
+    disclosure: component.disclosure,
+    hashAlgorithm: TA14_HASH_ALGORITHM,
+    hash: sha256Hex(bytes),
+    byteLength: bytes.byteLength,
+    stableUrl: component.stableUrl,
+    createdAt: component.createdAt,
+    createdBy: component.createdBy,
   };
 }
 
-function proposedChallengeId(request: OpenChallengeRequest): string {
-  return `CHL-${digest("challenge-id", { registryId: request.registryRecord.registryId, requestedAt: request.requestedAt, actorId: request.actorId, subject: request.subject, target: request.target }).slice(0,28).toUpperCase()}`;
+export function calculatePackageRoot(components: readonly IntegrityComponentDigest[]): string {
+  const leaves = components
+    .slice()
+    .sort((a, b) => a.componentId.localeCompare(b.componentId))
+    .map((component) => sha256Bytes(utf8Bytes(`${component.componentId}\n${component.kind}\n${component.hash}\n${component.byteLength}`)));
+  if (leaves.length === 0) return sha256Hex("");
+  let level = leaves;
+  while (level.length > 1) {
+    const next: Uint8Array[] = [];
+    for (let index = 0; index < level.length; index += 2) {
+      const left = level[index];
+      const right = level[index + 1] ?? left;
+      next.push(sha256Bytes(concatBytes([left, right])));
+    }
+    level = next;
+  }
+  return bytesToHex(level[0]);
 }
 
-function validateEvidence(item: ChallengeEvidenceItem, index: number): ChallengeIssue[] {
-  const issues: ChallengeIssue[] = [];
-  const base = `counterEvidence[${index}]`;
-  if (!text(item.evidenceId)) issues.push(issue("COUNTER_EVIDENCE_ID_MISSING", `${base}.evidenceId`));
-  if (!text(item.hash)) issues.push(issue("COUNTER_EVIDENCE_HASH_MISSING", `${base}.hash`));
-  if (!isIso(item.capturedAt) || !isIso(item.submittedAt)) issues.push(issue("COUNTER_EVIDENCE_TIME_INVALID", base));
-  if (!text(item.provenance) || item.custody.length === 0) issues.push(issue("COUNTER_EVIDENCE_CUSTODY_MISSING", base));
-  if (!item.disclosure) issues.push(issue("COUNTER_EVIDENCE_DISCLOSURE_MISSING", `${base}.disclosure`));
-  if (item.admissibility === "EXCLUDED") issues.push(issue("COUNTER_EVIDENCE_INADMISSIBLE", `${base}.admissibility`));
+function hashLineagePayload(link: Omit<IntegrityLineageLink, "linkHash">): string {
+  return canonicalHash(link);
+}
+
+export function appendLineageLink(
+  existing: readonly IntegrityLineageLink[],
+  input: Omit<IntegrityLineageLink, "sequence" | "parentHash" | "linkHash">,
+): IntegrityLineageLink[] {
+  const previous = existing[existing.length - 1];
+  const next: Omit<IntegrityLineageLink, "linkHash"> = {
+    ...input,
+    sequence: existing.length + 1,
+    parentHash: previous?.linkHash ?? "0".repeat(64),
+  };
+  return [...existing, { ...next, linkHash: hashLineagePayload(next) }];
+}
+
+export function verifyLineage(lineage: readonly IntegrityLineageLink[]): IntegrityIssue[] {
+  const issues: IntegrityIssue[] = [];
+  let previous = "0".repeat(64);
+  for (let index = 0; index < lineage.length; index += 1) {
+    const link = lineage[index];
+    if (link.sequence !== index + 1) {
+      issues.push(issue("AUDIT_SEQUENCE_INVALID", undefined, { path: `lineage[${index}].sequence`, expected: index + 1, actual: link.sequence }));
+    }
+    if (link.parentHash !== previous) {
+      issues.push(issue("AMENDMENT_PARENT_MISMATCH", undefined, { path: `lineage[${index}].parentHash`, expected: previous, actual: link.parentHash }));
+    }
+    const { linkHash: _ignored, ...payload } = link;
+    const calculated = hashLineagePayload(payload);
+    if (!constantTimeHexEqual(calculated, link.linkHash)) {
+      issues.push(issue("AMENDMENT_HASH_MISMATCH", undefined, { path: `lineage[${index}].linkHash`, expected: calculated, actual: link.linkHash }));
+    }
+    previous = link.linkHash;
+  }
   return issues;
 }
 
-export function evaluateOpenChallenge(request: OpenChallengeRequest): OpenChallengeDecision {
-  const challengeId = proposedChallengeId(request);
-  let events: ChallengeAuditEvent[] = [];
-  events = appendAudit(events, challengeId, request.requestedAt, request.actorId, "CHALLENGE_OPENED", "Challenge admission evaluation started.");
-  const issues: ChallengeIssue[] = [];
-  const registryIssues = verifyRegistryRecord(request.registryRecord).map(entry => entry.code);
-  const canonical = validateCanonicalExecutionArtifact(request.artifact, { intendedUse: "VERIFICATION", now: request.requestedAt, strict: true });
-  const canonicalIssues = canonical.issues.map(entry => entry.code);
-
-  if (!text(challengeId)) issues.push(issue("CHALLENGE_ID_MISSING", "challengeId"));
-  if (!isIso(request.requestedAt)) issues.push(issue("CHALLENGE_TIME_INVALID", "requestedAt"));
-  if (!text(request.challenger.partyId) || !text(request.challenger.displayName)) issues.push(issue("CHALLENGER_IDENTITY_MISSING", "challenger"));
-  if (!text(request.challenger.authorityBasis)) issues.push(issue("CHALLENGER_AUTHORITY_MISSING", "challenger.authorityBasis"));
-  if (!text(request.subject)) issues.push(issue("SUBJECT_MISSING", "subject"));
-  if (!text(request.target.challengedClaim)) issues.push(issue("CLAIM_MISSING", "target.challengedClaim"));
-  if (request.target.challengedClaim.length > 5000) issues.push(issue("CLAIM_SCOPE_TOO_BROAD", "target.challengedClaim"));
-  if (!text(request.basis)) issues.push(issue("BASIS_MISSING", "basis"));
-  if (request.counterEvidence.length === 0 && request.target.subjectType !== "REGISTRY_STATUS") issues.push(issue("COUNTER_EVIDENCE_REQUIRED", "counterEvidence"));
-  request.counterEvidence.forEach((entry,index) => issues.push(...validateEvidence(entry,index)));
-  if (request.target.registryId !== request.registryRecord.registryId) issues.push(issue("REGISTRY_ID_MISMATCH", "target.registryId"));
-  if (request.target.artifactId !== request.registryRecord.artifactId) issues.push(issue("ARTIFACT_ID_MISMATCH", "target.artifactId"));
-  if (request.target.registryRecordHash !== request.registryRecord.registryRecordHash) issues.push(issue("ORIGINAL_HASH_MISMATCH", "target.registryRecordHash"));
-  if (["WITHDRAWN"].includes(request.registryRecord.publicationState)) issues.push(issue("CHALLENGE_AFTER_WITHDRAWAL", "registryRecord.publicationState"));
-  const duplicates = (request.existingChallenges ?? []).filter(entry => entry.target.registryId === request.target.registryId && entry.target.path === request.target.path && ["PENDING","UNDER_REVIEW"].includes(entry.status));
-  if (duplicates.length > 0) issues.push(issue("OPEN_CHALLENGE_ALREADY_EXISTS", "existingChallenges", undefined, { challengeIds: duplicates.map(entry => entry.challengeId) }));
-  if (!isIso(request.responseDeadline) || Date.parse(request.responseDeadline) <= Date.parse(request.requestedAt)) issues.push(issue("RESPONSE_DEADLINE_MISSING", "responseDeadline"));
-  if (!isIso(request.retentionUntil) || Date.parse(request.retentionUntil) <= Date.parse(request.requestedAt)) issues.push(issue("RETENTION_POLICY_MISSING", "retentionUntil"));
-  if (!text(request.publicSummary)) issues.push(issue("PUBLIC_SUMMARY_MISSING", "publicSummary"));
-
-  const controls = CHALLENGE_CONTROLS.map(control => {
-    const related = issues.filter(entry => entry.domain === control.domain);
-    const result: ChallengeControlEvaluation["result"] = related.some(entry => entry.disposition === "DENY") ? "FAIL" : related.some(entry => entry.disposition === "ESCALATE") ? "ESCALATE" : related.some(entry => entry.disposition === "HOLD") ? "HOLD" : "PASS";
-    return { controlId: control.controlId, result, evidence: related.map(entry => entry.code), notes: related.length ? related.map(entry => entry.message).join(" ") : "Control satisfied by submitted challenge package." };
-  });
-  const disposition: ChallengeDisposition = issues.some(entry => entry.disposition === "DENY") ? "REJECTED" : issues.some(entry => entry.disposition === "ESCALATE") ? "ESCALATE" : issues.some(entry => entry.disposition === "HOLD") ? "HOLD" : "ACCEPTED";
-  const payload = { evaluationId: `CHE-${digest("challenge-evaluation", { challengeId, requestId: request.requestId }).slice(0,24).toUpperCase()}`, disposition, challengeId: disposition === "ACCEPTED" || disposition === "ESCALATE" ? challengeId : undefined, evaluatedAt: request.requestedAt, issues, controls, registryIssues, canonicalIssues, auditEvents: events };
-  return { ...payload, stableJson: stableJson(payload) };
+function hashAuditPayload(event: Omit<IntegrityAuditEvent, "eventHash">): string {
+  return canonicalHash(event);
 }
 
-export function openChallenge(request: OpenChallengeRequest): OpenChallengeResult {
-  const decision = evaluateOpenChallenge(request);
-  if (decision.disposition === "REJECTED" || decision.disposition === "HOLD" || !decision.challengeId) return { decision, registryRecord: request.registryRecord };
-  let auditEvents = [...decision.auditEvents];
-  request.counterEvidence.forEach(entry => { auditEvents = appendAudit(auditEvents, decision.challengeId!, entry.submittedAt, entry.submittedBy, "EVIDENCE_ADDED", `Counter-evidence ${entry.evidenceId} added.`); });
-  const unsigned = {
-    challengeId: decision.challengeId,
-    openedAt: request.requestedAt,
-    openedBy: request.challenger,
-    status: "PENDING" as const,
-    target: request.target,
-    subject: request.subject,
-    basis: request.basis,
-    materiality: request.materiality,
-    requestedRemedy: request.requestedRemedy,
-    counterEvidence: [...request.counterEvidence],
-    reviewers: [] as ReviewerAssignment[],
-    reviewScope: [] as string[],
-    responseDeadline: request.responseDeadline,
-    findings: [] as ChallengeFinding[],
-    publicSummary: request.publicSummary,
-    retentionUntil: request.retentionUntil,
+export function appendAuditEvent(
+  existing: readonly IntegrityAuditEvent[],
+  input: Omit<IntegrityAuditEvent, "sequence" | "previousHash" | "eventHash">,
+): IntegrityAuditEvent[] {
+  const previous = existing[existing.length - 1];
+  const event: Omit<IntegrityAuditEvent, "eventHash"> = {
+    ...input,
+    sequence: existing.length + 1,
+    previousHash: previous?.eventHash ?? "0".repeat(64),
+  };
+  return [...existing, { ...event, eventHash: hashAuditPayload(event) }];
+}
+
+export function verifyAuditChain(events: readonly IntegrityAuditEvent[]): IntegrityIssue[] {
+  const issues: IntegrityIssue[] = [];
+  let previousHash = "0".repeat(64);
+  for (let index = 0; index < events.length; index += 1) {
+    const event = events[index];
+    if (event.sequence !== index + 1) {
+      issues.push(issue("AUDIT_SEQUENCE_INVALID", undefined, { path: `auditEvents[${index}].sequence`, expected: index + 1, actual: event.sequence }));
+    }
+    if (event.previousHash !== previousHash) {
+      issues.push(issue("AUDIT_EVENT_PREVIOUS_HASH_MISMATCH", undefined, { path: `auditEvents[${index}].previousHash`, expected: previousHash, actual: event.previousHash }));
+    }
+    const { eventHash: _ignored, ...payload } = event;
+    const calculated = hashAuditPayload(payload);
+    if (!constantTimeHexEqual(calculated, event.eventHash)) {
+      issues.push(issue("AUDIT_EVENT_HASH_MISMATCH", undefined, { path: `auditEvents[${index}].eventHash`, expected: calculated, actual: event.eventHash }));
+    }
+    previousHash = event.eventHash;
+  }
+  return issues;
+}
+
+function manifestWithoutHash(manifest: IntegrityManifest): Omit<IntegrityManifest, "manifestHash"> {
+  const { manifestHash: _ignored, ...rest } = manifest;
+  return rest;
+}
+
+export function rehashManifest(manifest: IntegrityManifest): IntegrityManifest {
+  return { ...manifest, manifestHash: canonicalHash(manifestWithoutHash(manifest)) };
+}
+
+export function verifyComponent(
+  component: IntegrityComponentInput,
+  options: CanonicalizationOptions = {},
+): ComponentVerificationResult {
+  const digest = digestComponent(component, options);
+  const hashMatches = component.declaredHash ? constantTimeHexEqual(component.declaredHash, digest.hash) : true;
+  const lengthMatches = component.declaredByteLength === undefined || component.declaredByteLength === digest.byteLength;
+  return {
+    componentId: component.componentId,
+    kind: component.kind,
+    required: component.required,
+    declaredHash: component.declaredHash,
+    calculatedHash: digest.hash,
+    byteLength: digest.byteLength,
+    hashMatches,
+    lengthMatches,
+    verified: hashMatches && lengthMatches,
+  };
+}
+
+export function verifyIntegrityPackage(
+  manifest: IntegrityManifest,
+  components: readonly IntegrityComponentInput[],
+  verifierId: string,
+  verifiedAt: string,
+  options: CanonicalizationOptions = {},
+): IntegrityVerificationResult {
+  const issues: IntegrityIssue[] = [];
+  const ids = new Set<string>();
+  for (const component of components) {
+    if (!component.componentId) issues.push(issue("COMPONENT_ID_MISSING"));
+    if (ids.has(component.componentId)) issues.push(issue("COMPONENT_DUPLICATE_ID", undefined, { componentId: component.componentId }));
+    ids.add(component.componentId);
+  }
+
+  const componentResults = components.map((component) => verifyComponent(component, options));
+  for (const result of componentResults) {
+    if (!result.hashMatches) issues.push(issue("COMPONENT_HASH_MISMATCH", undefined, { componentId: result.componentId, expected: result.declaredHash, actual: result.calculatedHash }));
+    if (!result.lengthMatches) issues.push(issue("BYTE_LENGTH_MISMATCH", undefined, { componentId: result.componentId }));
+  }
+
+  const digests = components.map((component) => digestComponent(component, options));
+  const calculatedRoot = calculatePackageRoot(digests);
+  if (!constantTimeHexEqual(calculatedRoot, manifest.packageRootHash)) {
+    issues.push(issue("PACKAGE_ROOT_MISMATCH", undefined, { expected: manifest.packageRootHash, actual: calculatedRoot }));
+  }
+  if (manifest.componentCount !== digests.length) {
+    issues.push(issue("PACKAGE_COMPONENT_COUNT_MISMATCH", undefined, { expected: manifest.componentCount, actual: digests.length }));
+  }
+
+  const calculatedManifestHash = canonicalHash(manifestWithoutHash(manifest));
+  if (!constantTimeHexEqual(calculatedManifestHash, manifest.manifestHash)) {
+    issues.push(issue("MANIFEST_HASH_MISMATCH", undefined, { expected: manifest.manifestHash, actual: calculatedManifestHash }));
+  }
+
+  issues.push(...verifyLineage(manifest.lineage));
+  issues.push(...verifyAuditChain(manifest.auditEvents));
+
+  const errors = issues.filter((item) => item.severity === "ERROR");
+  const warnings = issues.filter((item) => item.severity === "WARNING");
+  const disposition: IntegrityDisposition = errors.length > 0
+    ? "FAILED"
+    : warnings.length > 0
+      ? "VERIFIED_WITH_WARNINGS"
+      : "VERIFIED";
+  const reportPayload = {
+    disposition,
+    verifiedAt,
+    verifierId,
+    calculatedManifestHash,
+    calculatedRoot,
+    componentResults,
+    issueCodes: issues.map((item) => item.code),
+  };
+  return {
+    disposition,
+    verified: errors.length === 0,
+    verifiedAt,
+    verifierId,
+    engineVersion: TA14_INTEGRITY_HASH_ENGINE_VERSION,
+    policyVersion: TA14_INTEGRITY_POLICY_VERSION,
+    canonicalizationVersion: TA14_CANONICALIZATION_VERSION,
+    hashAlgorithm: TA14_HASH_ALGORITHM,
+    canonicalHash: manifest.canonicalHash,
+    calculatedManifestHash,
+    calculatedPackageRootHash: calculatedRoot,
+    componentResults,
+    lineageVerified: verifyLineage(manifest.lineage).length === 0,
+    auditChainVerified: verifyAuditChain(manifest.auditEvents).length === 0,
+    issues,
+    warnings,
+    errors,
+    reportHash: canonicalHash(reportPayload),
+  };
+}
+
+function extractArtifactId(artifact: CanonicalExecutionArtifact): string {
+  const candidate = artifact as unknown as Record<string, unknown>;
+  const identity = candidate.identity as Record<string, unknown> | undefined;
+  return String(identity?.artifactId ?? candidate.artifactId ?? "UNKNOWN-ARTIFACT");
+}
+
+function extractRegistryId(record?: ArtifactRegistryRecord): string | undefined {
+  if (!record) return undefined;
+  const candidate = record as unknown as Record<string, unknown>;
+  return typeof candidate.registryId === "string" ? candidate.registryId : undefined;
+}
+
+function extractGovernanceRegistrationId(record?: ArtifactRegistryRecord): string | undefined {
+  if (!record) return undefined;
+  const candidate = record as unknown as Record<string, unknown>;
+  return typeof candidate.governanceRegistrationId === "string" ? candidate.governanceRegistrationId : undefined;
+}
+
+export function createIntegrityPackage(request: IntegrityPackageRequest): IntegrityPackageResult {
+  const options: CanonicalizationOptions = {
+    ...DEFAULT_CANONICALIZATION_OPTIONS,
+    ...request.options,
+  };
+  const artifactId = extractArtifactId(request.artifact);
+  const canonicalJson = canonicalize(request.artifact, options);
+  const canonicalDigest = sha256Hex(canonicalJson);
+
+  const suppliedComponents = request.components.slice();
+  if (!suppliedComponents.some((item) => item.kind === "CANONICAL_JSON")) {
+    suppliedComponents.unshift({
+      componentId: `${artifactId}:canonical-json`,
+      kind: "CANONICAL_JSON",
+      label: "Canonical execution artifact JSON",
+      mediaType: "application/json",
+      required: true,
+      disclosure: "RESTRICTED",
+      text: canonicalJson,
+    });
+  }
+
+  const componentDigests = suppliedComponents.map((component) => digestComponent(component, options));
+  const packageRootHash = calculatePackageRoot(componentDigests);
+  let auditEvents = request.auditEvents ? request.auditEvents.slice() : [];
+  auditEvents = appendAuditEvent(auditEvents, {
+    eventId: `${artifactId}:integrity:${auditEvents.length + 1}`,
+    occurredAt: request.generatedAt,
+    actorId: request.generatedBy,
+    eventType: "PACKAGE_CREATED",
+    subjectId: artifactId,
+    description: `Integrity package created with ${componentDigests.length} components.`,
+  });
+
+  const provisional: IntegrityManifest = {
+    manifestId: `${artifactId}:integrity-manifest:${TA14_INTEGRITY_POLICY_VERSION}`,
+    manifestVersion: "1.0",
+    integrityEngineVersion: TA14_INTEGRITY_HASH_ENGINE_VERSION,
+    integrityPolicyVersion: TA14_INTEGRITY_POLICY_VERSION,
+    canonicalizationVersion: TA14_CANONICALIZATION_VERSION,
+    hashAlgorithm: TA14_HASH_ALGORITHM,
+    generatedAt: request.generatedAt,
+    generatedBy: request.generatedBy,
+    artifactId,
+    registryId: extractRegistryId(request.registryRecord),
+    governanceRegistrationId: extractGovernanceRegistrationId(request.registryRecord),
+    canonicalHash: canonicalDigest,
+    pdfHash: componentDigests.find((item) => item.kind === "PUBLIC_PDF")?.hash,
+    manifestHash: "0".repeat(64),
+    packageRootHash,
+    componentCount: componentDigests.length,
+    components: componentDigests,
+    lineage: request.lineage ? request.lineage.slice() : [],
     auditEvents,
+    publicationUrl: request.publicationUrl,
+    verificationUrl: request.verificationUrl,
+    challengeUrl: request.challengeUrl,
+    claimsBoundaryHash: componentDigests.find((item) => item.kind === "CLAIMS_BOUNDARY")?.hash,
+    disclosureProjectionHash: componentDigests.find((item) => item.kind === "DISCLOSURE_PROJECTION")?.hash,
+    signatureEnvelopeHash: componentDigests.find((item) => item.kind === "SIGNATURE_ENVELOPE")?.hash,
   };
-  const challenge: ChallengeRecord = { ...unsigned, challengeHash: digest("challenge-record", unsigned) };
-  let registryRecord = appendRegistryChallenge(request.registryRecord, challengeReference(challenge), request.actorId);
-  if (registryRecord.publicationState === "PUBLISHED" || registryRecord.publicationState === "READY" || registryRecord.publicationState === "CORRECTED") {
-    const transition = transitionRegistryState({ record: registryRecord, toState: "CHALLENGED", occurredAt: request.requestedAt, actorId: request.actorId, reason: `Challenge ${challenge.challengeId} opened.`, authorityReference: request.challenger.authorityBasis });
-    registryRecord = transition.record ?? registryRecord;
-  }
-  return { decision, challenge, registryRecord };
-}
-
-export function assignReviewers(challenge: ChallengeRecord, reviewers: readonly ReviewerAssignment[], reviewScope: readonly string[], actorId: string, occurredAt: string): ChallengeRecord {
-  if (reviewers.length === 0) throw new Error(CHALLENGE_REASON_DICTIONARY.REVIEWER_REQUIRED.description);
-  for (const reviewer of reviewers) {
-    if (!text(reviewer.reviewerId)) throw new Error(CHALLENGE_REASON_DICTIONARY.REVIEWER_ID_MISSING.description);
-    if (!text(reviewer.role)) throw new Error(CHALLENGE_REASON_DICTIONARY.REVIEWER_ROLE_MISSING.description);
-    if (!reviewer.conflictResolved) throw new Error(CHALLENGE_REASON_DICTIONARY.REVIEWER_CONFLICT_UNRESOLVED.description);
-  }
-  let events = [...challenge.auditEvents];
-  reviewers.forEach(reviewer => { events = appendAudit(events, challenge.challengeId, occurredAt, actorId, "REVIEWER_ASSIGNED", `Reviewer ${reviewer.reviewerId} assigned.`); });
-  events = appendAudit(events, challenge.challengeId, occurredAt, actorId, "REVIEW_STARTED", "Bounded challenge review started.");
-  const next = { ...challenge, status: "UNDER_REVIEW" as const, reviewers: reviewers.map(entry => ({ ...entry })), reviewScope: [...reviewScope], auditEvents: events };
-  return { ...next, challengeHash: digest("challenge-record", { ...next, challengeHash: undefined }) };
-}
-
-export function recordPublisherResponse(challenge: ChallengeRecord, response: PublisherResponse, actorId: string): ChallengeRecord {
-  if (!isIso(response.receivedAt)) throw new Error(CHALLENGE_REASON_DICTIONARY.CHALLENGE_TIME_INVALID.description);
-  if (!text(response.responseHash)) throw new Error(CHALLENGE_REASON_DICTIONARY.PUBLISHER_EVIDENCE_HASH_MISSING.description);
-  const events = appendAudit(challenge.auditEvents, challenge.challengeId, response.receivedAt, actorId, "RESPONSE_RECEIVED", `Publisher response ${response.responseId} received.`);
-  const next = { ...challenge, publisherResponse: { ...response, evidence: response.evidence.map(entry => ({ ...entry })) }, auditEvents: events };
-  return { ...next, challengeHash: digest("challenge-record", { ...next, challengeHash: undefined }) };
-}
-
-function validateResolution(request: ResolveChallengeRequest): ChallengeIssue[] {
-  const issues: ChallengeIssue[] = [];
-  if (request.reviewers.length === 0) issues.push(issue("REVIEWER_REQUIRED", "reviewers"));
-  request.reviewers.forEach((r,i) => {
-    if (!text(r.reviewerId)) issues.push(issue("REVIEWER_ID_MISSING", `reviewers[${i}].reviewerId`));
-    if (!r.conflictResolved) issues.push(issue("REVIEWER_CONFLICT_UNRESOLVED", `reviewers[${i}].conflictResolved`));
-  });
-  if (request.findings.length === 0) issues.push(issue("FINDING_UNSUPPORTED", "findings"));
-  request.findings.forEach((f,i) => {
-    if (!text(f.findingId)) issues.push(issue("FINDING_ID_MISSING", `findings[${i}].findingId`));
-    if (!text(f.reasoning) || f.evidenceIds.length === 0) issues.push(issue("FINDING_UNSUPPORTED", `findings[${i}]`));
-  });
-  if (!["UPHELD","MODIFIED","REVERSED","CLOSED","WITHDRAWN"].includes(request.disposition)) issues.push(issue("DISPOSITION_INVALID", "disposition"));
-  if (request.disposition === "MODIFIED" && !request.correction) issues.push(issue("MODIFIED_WITHOUT_CORRECTION", "correction"));
-  if (request.disposition === "REVERSED" && request.prospectiveRelianceEffect === "UNCHANGED") issues.push(issue("REVERSED_WITHOUT_RELIANCE_EFFECT", "prospectiveRelianceEffect"));
-  if (request.disposition === "WITHDRAWN" && !text(request.publicSummary)) issues.push(issue("WITHDRAWAL_REASON_MISSING", "publicSummary"));
-  if (!text(request.authorityReference)) issues.push(issue("CORRECTION_AUTHORITY_MISSING", "authorityReference"));
-  if (!text(request.publicSummary)) issues.push(issue("PUBLIC_SUMMARY_MISSING", "publicSummary"));
-  if (request.correction) {
-    if (!text(request.correction.correctionId)) issues.push(issue("CORRECTION_ID_MISSING", "correction.correctionId"));
-    if (!text(request.correction.scope)) issues.push(issue("CORRECTION_SCOPE_MISSING", "correction.scope"));
-    if (!text(request.correction.reason)) issues.push(issue("CORRECTION_REASON_MISSING", "correction.reason"));
-    if (request.correction.changedPaths.length === 0) issues.push(issue("CORRECTION_SCOPE_MISSING", "correction.changedPaths"));
-    if (request.correction.approvedBy.length === 0) issues.push(issue("CORRECTION_AUTHORITY_MISSING", "correction.approvedBy"));
-  }
-  return issues;
-}
-
-export function resolveChallenge(request: ResolveChallengeRequest): ResolveChallengeResult {
-  const issues = validateResolution(request);
-  if (issues.some(entry => entry.disposition === "DENY" || entry.disposition === "HOLD")) throw new Error(issues.map(entry => `${entry.code}: ${entry.message}`).join("\n"));
-  const resolutionId = `RES-${digest("challenge-resolution-id", { challengeId: request.challenge.challengeId, requestedAt: request.requestedAt, disposition: request.disposition }).slice(0,28).toUpperCase()}`;
-  let correction: CorrectionPackage | undefined;
-  if (request.correction) {
-    const base = { ...request.correction, challengeId: request.challenge.challengeId, originalRegistryRecordHash: request.registryRecord.registryRecordHash, originalCanonicalHash: request.registryRecord.canonicalHash };
-    const amendmentHash = digest("challenge-amendment", base);
-    const resultingRegistryRecordHash = digest("registry-record-after-correction", { parent: request.registryRecord.registryRecordHash, amendmentHash, changedPaths: request.correction.changedPaths });
-    correction = { ...base, amendmentHash, resultingRegistryRecordHash };
-  }
-  const resolutionUnsigned = {
-    resolutionId,
-    challengeId: request.challenge.challengeId,
-    disposition: request.disposition,
-    resolvedAt: request.requestedAt,
-    resolvedBy: request.reviewers.map(entry => entry.reviewerId),
-    authorityReference: request.authorityReference,
-    findings: request.findings.map(entry => ({ ...entry })),
-    correction,
-    prospectiveRelianceEffect: request.prospectiveRelianceEffect,
-    publicSummary: request.publicSummary,
-    privateNotes: request.privateNotes,
+  const manifest = rehashManifest(provisional);
+  const validation = verifyIntegrityPackage(
+    manifest,
+    suppliedComponents.map((component, index) => ({
+      ...component,
+      declaredHash: componentDigests[index].hash,
+      declaredByteLength: componentDigests[index].byteLength,
+    })),
+    request.verifierId ?? request.generatedBy,
+    request.generatedAt,
+    options,
+  );
+  const manifestJson = canonicalize(manifest, options);
+  const packageJson = canonicalize({ manifest, components: componentDigests, validation }, options);
+  return {
+    manifest,
+    componentDigests,
+    manifestJson,
+    packageJson,
+    offlineVerificationText: buildOfflineVerificationInstructions(manifest),
+    validation,
   };
-  const resolution: ChallengeResolution = { ...resolutionUnsigned, resolutionHash: digest("challenge-resolution", resolutionUnsigned) };
-  let events = [...request.challenge.auditEvents];
-  request.findings.forEach(finding => { events = appendAudit(events, request.challenge.challengeId, request.requestedAt, request.actorId, "FINDING_RECORDED", `Finding ${finding.findingId} recorded.`); });
-  if (correction) events = appendAudit(events, request.challenge.challengeId, request.requestedAt, request.actorId, "CORRECTION_CREATED", `Correction ${correction.correctionId} created.`);
-  events = appendAudit(events, request.challenge.challengeId, request.requestedAt, request.actorId, "RESOLUTION_COMMITTED", `Resolution ${resolutionId} committed with disposition ${request.disposition}.`);
-  const challengeUnsigned = { ...request.challenge, status: request.disposition, reviewers: request.reviewers.map(entry => ({ ...entry })), publisherResponse: request.publisherResponse, findings: request.findings.map(entry => ({ ...entry })), resolution, auditEvents: events };
-  const challenge: ChallengeRecord = { ...challengeUnsigned, challengeHash: digest("challenge-record", { ...challengeUnsigned, challengeHash: undefined }) };
-  let registryRecord = request.registryRecord;
-  registryRecord = { ...registryRecord, challenges: registryRecord.challenges.map(entry => entry.challengeId === challenge.challengeId ? challengeReference(challenge) : entry) };
-  if (correction) registryRecord = appendRegistryCorrection(registryRecord, correctionReference(correction), request.actorId);
-  let desired: RegistryPublicationState = registryRecord.publicationState;
-  if (request.disposition === "MODIFIED") desired = "CORRECTED";
-  if (request.disposition === "REVERSED") desired = request.prospectiveRelianceEffect === "SUPERSEDED" ? "SUPERSEDED" : "WITHDRAWN";
-  if (["UPHELD","CLOSED","WITHDRAWN"].includes(request.disposition) && registryRecord.publicationState === "CHALLENGED") desired = registryRecord.publishedAt ? "PUBLISHED" : "READY";
-  if (desired !== registryRecord.publicationState) {
-    try { registryRecord = transitionRegistryState({ record: registryRecord, toState: desired, occurredAt: request.requestedAt, actorId: request.actorId, reason: `Challenge ${challenge.challengeId} resolved as ${request.disposition}.`, authorityReference: request.authorityReference }).record ?? registryRecord; }
-    catch { registryRecord = rehashRegistryRecord({ ...registryRecord, publicationState: desired }); }
-  } else registryRecord = rehashRegistryRecord(registryRecord);
-  events = appendAudit(challenge.auditEvents, challenge.challengeId, request.requestedAt, request.actorId, "REGISTRY_UPDATED", `Registry record ${registryRecord.registryId} updated.`);
-  const finalChallenge = { ...challenge, auditEvents: events, challengeHash: digest("challenge-record", { ...challenge, auditEvents: events, challengeHash: undefined }) };
-  const controls = CHALLENGE_CONTROLS.map(control => ({ controlId: control.controlId, result: issues.some(entry => entry.domain === control.domain && entry.disposition === "ESCALATE") ? "ESCALATE" as const : "PASS" as const, evidence: issues.filter(entry => entry.domain === control.domain).map(entry => entry.code), notes: "Resolution control evaluated against the preserved challenge package." }));
-  const resultPayload = { challenge: finalChallenge, resolution, registryRecord, issues, controls };
-  return { ...resultPayload, stableJson: stableJson(resultPayload) };
 }
 
-export function verifyChallengeRecord(challenge: ChallengeRecord): ChallengeIssue[] {
-  const issues: ChallengeIssue[] = [];
-  if (!text(challenge.challengeId)) issues.push(issue("CHALLENGE_ID_MISSING", "challengeId"));
-  if (!isIso(challenge.openedAt)) issues.push(issue("CHALLENGE_TIME_INVALID", "openedAt"));
-  if (!text(challenge.challengeHash)) issues.push(issue("PRESERVATION_FAILURE", "challengeHash"));
-  const calculated = digest("challenge-record", { ...challenge, challengeHash: undefined });
-  if (challenge.challengeHash !== calculated) issues.push(issue("PRESERVATION_FAILURE", "challengeHash", "Challenge record hash does not match its content."));
-  if (!unique(challenge.auditEvents.map(entry => entry.eventId))) issues.push(issue("AUDIT_CHAIN_BROKEN", "auditEvents"));
-  let previous = "GENESIS";
-  for (let i=0;i<challenge.auditEvents.length;i+=1) {
-    const event = challenge.auditEvents[i];
-    if (event.previousHash !== previous) issues.push(issue("AUDIT_CHAIN_BROKEN", `auditEvents[${i}].previousHash`));
-    const expected = digest("challenge-audit", { eventId: event.eventId, challengeId: event.challengeId, occurredAt: event.occurredAt, actorId: event.actorId, eventType: event.eventType, description: event.description, previousHash: event.previousHash });
-    if (event.eventHash !== expected) issues.push(issue("AUDIT_CHAIN_BROKEN", `auditEvents[${i}].eventHash`));
-    previous = event.eventHash;
+export function buildOfflineVerificationInstructions(manifest: IntegrityManifest): string {
+  const lines = [
+    "TA-14 EXECUTION ARTIFACT OFFLINE INTEGRITY VERIFICATION",
+    "",
+    `Artifact: ${manifest.artifactId}`,
+    `Registry: ${manifest.registryId ?? "Not registered"}`,
+    `Algorithm: ${manifest.hashAlgorithm}`,
+    `Canonicalization: ${manifest.canonicalizationVersion}`,
+    `Package root: ${manifest.packageRootHash}`,
+    `Manifest hash: ${manifest.manifestHash}`,
+    "",
+    "Procedure:",
+    "1. Preserve the downloaded files exactly as received.",
+    "2. Calculate SHA-256 for every component.",
+    "3. Compare each digest and byte length to the component index.",
+    "4. Sort components by componentId.",
+    "5. Rebuild each package leaf from componentId, kind, hash, and byte length.",
+    "6. Recalculate the binary Merkle-style package root.",
+    "7. Compare the result to the published package root.",
+    "8. Recalculate the canonical manifest hash with manifestHash omitted.",
+    "9. Verify append-only lineage and audit chains from the all-zero genesis hash.",
+    "10. Treat any mismatch as a failed integrity verification.",
+    "",
+    "Integrity confirms preservation of committed content. It does not independently prove factual truth, authority, or governance quality.",
+  ];
+  return lines.join("\n");
+}
+
+export function createOfflineVerificationBundle(
+  result: IntegrityPackageResult,
+  createdAt: string,
+): OfflineVerificationBundle {
+  const componentIndex = result.componentDigests.map(({ componentId, kind, mediaType, hash, byteLength }) => ({
+    componentId,
+    kind,
+    mediaType,
+    hash,
+    byteLength,
+  }));
+  const payload = {
+    createdAt,
+    artifactId: result.manifest.artifactId,
+    registryId: result.manifest.registryId,
+    manifestHash: result.manifest.manifestHash,
+    packageRootHash: result.manifest.packageRootHash,
+    componentIndex,
+  };
+  return {
+    bundleId: `${result.manifest.artifactId}:offline:${createdAt}`,
+    createdAt,
+    artifactId: result.manifest.artifactId,
+    registryId: result.manifest.registryId,
+    manifest: result.manifest,
+    manifestJson: result.manifestJson,
+    instructions: result.offlineVerificationText,
+    componentIndex,
+    bundleHash: canonicalHash(payload),
+  };
+}
+
+export function importRegistryManifest(
+  manifest: RegistryPublicationManifest,
+): IntegrityComponentDigest[] {
+  return manifest.components.map((component: RegistryPublicationComponent) => ({
+    componentId: component.componentId,
+    kind: inferComponentKind(component.mediaType, component.label),
+    label: component.label,
+    mediaType: component.mediaType,
+    required: component.required,
+    disclosure: component.disclosure,
+    hashAlgorithm: TA14_HASH_ALGORITHM,
+    hash: component.hash,
+    byteLength: component.sizeBytes ?? 0,
+    stableUrl: component.stableUrl,
+  }));
+}
+
+export function inferComponentKind(mediaType: string, label: string): IntegrityComponentKind {
+  const value = `${mediaType} ${label}`.toLowerCase();
+  if (value.includes("pdf")) return "PUBLIC_PDF";
+  if (value.includes("route")) return "ROUTE_SNAPSHOT";
+  if (value.includes("receipt")) return "EXECUTION_RECEIPT";
+  if (value.includes("outcome")) return "OUTCOME_CLOSURE";
+  if (value.includes("manifest")) return "INTEGRITY_MANIFEST";
+  if (value.includes("registry certificate")) return "REGISTRY_CERTIFICATE";
+  if (value.includes("registry")) return "REGISTRY_RECORD";
+  if (value.includes("verification")) return "VERIFICATION_REPORT";
+  if (value.includes("disclosure")) return "DISCLOSURE_PROJECTION";
+  if (value.includes("claim")) return "CLAIMS_BOUNDARY";
+  if (value.includes("challenge")) return "CHALLENGE_RECORD";
+  if (value.includes("correction")) return "CORRECTION_RECORD";
+  if (value.includes("signature")) return "SIGNATURE_ENVELOPE";
+  if (value.includes("json")) return "CANONICAL_JSON";
+  return "OTHER";
+}
+
+export function stableIntegrityManifestJson(manifest: IntegrityManifest): string {
+  return canonicalize(manifest);
+}
+
+export function stableIntegrityVerificationJson(result: IntegrityVerificationResult): string {
+  return canonicalize(result);
+}
+
+export function assertIntegrityVerified(result: IntegrityVerificationResult): void {
+  if (!result.verified) {
+    const codes = result.errors.map((item) => item.code).join(", ");
+    throw new Error(`Integrity verification failed: ${codes || "unknown integrity failure"}`);
   }
-  if (challenge.resolution && challenge.resolution.challengeId !== challenge.challengeId) issues.push(issue("RESOLUTION_HASH_MISSING", "resolution.challengeId"));
-  return issues;
 }
 
-export function stableChallengeJson(challenge: ChallengeRecord): string { return stableJson(challenge); }
-export function stableResolutionJson(resolution: ChallengeResolution): string { return stableJson(resolution); }
-export function challengeDigest(challenge: ChallengeRecord): string { return digest("challenge-record-external", challenge); }
-export function resolutionDigest(resolution: ChallengeResolution): string { return digest("challenge-resolution-external", resolution); }
-export function listChallengeReasons(disposition?: ChallengeIssueDisposition): ChallengeReasonDefinition[] { return Object.values(CHALLENGE_REASON_DICTIONARY).filter(entry => !disposition || entry.disposition === disposition); }
-export function listChallengeControls(domain?: ChallengeDomain): ChallengeControlDefinition[] { return CHALLENGE_CONTROLS.filter(entry => !domain || entry.domain === domain); }
-export function challengeCanClose(challenge: ChallengeRecord): boolean { return challenge.status === "UPHELD" || challenge.status === "MODIFIED" || challenge.status === "REVERSED" || challenge.status === "CLOSED" || challenge.status === "WITHDRAWN"; }
-export function challengeRequiresCorrection(challenge: ChallengeRecord): boolean { return challenge.status === "MODIFIED" || challenge.status === "REVERSED"; }
-export function challengeBlocksReliance(challenge: ChallengeRecord): boolean { return ["PENDING","UNDER_REVIEW","REVERSED"].includes(challenge.status); }
-
-export const CHALLENGE_CORRECTION_PRINCIPLES = Object.freeze([
-  "The original execution record remains visible and immutable.",
-  "A challenge must identify the exact bounded claim, evidence item, authority state, gate result, receipt, outcome, or verification conclusion disputed.",
-  "Counter-evidence requires identity, provenance, custody, integrity, admissibility, and disclosure treatment.",
-  "Reviewers must be attributable, qualified, scoped, and free of unresolved conflicts.",
-  "Corrections append new understanding; they do not rewrite original history.",
-  "A reversal changes prospective reliance and may require withdrawal or supersession.",
-  "Public metadata must expose material challenge and correction status.",
-  "Verification and reliance must be rerun after any material disposition.",
-]);
-
-export const CHALLENGE_ACCEPTANCE_TESTS = Object.freeze([
-  { testId: "CAT-001", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-002", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-003", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-004", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-005", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-006", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-007", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-008", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-009", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-010", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-011", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-012", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-013", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-014", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-015", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-016", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-017", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-018", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-019", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-020", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-021", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-022", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-023", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-024", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-025", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-026", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-027", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-028", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-029", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-030", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-031", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-032", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-033", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-034", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-035", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-036", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-037", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-038", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-039", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-040", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-041", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-042", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-043", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-044", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-045", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-046", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-047", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-048", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-049", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-050", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-051", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-052", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-053", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-054", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-055", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-056", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-057", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-058", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-059", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-060", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-061", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-062", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-063", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-064", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-065", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-066", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-067", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-068", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-069", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-070", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-071", requirement: 'opens a bounded challenge without mutating the original registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-072", requirement: 'rejects a challenge with mismatched registry identity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-073", requirement: 'preserves counter-evidence hashes and custody', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-074", requirement: 'blocks conflicted reviewer assignment', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-075", requirement: 'records publisher response and evidence integrity', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-076", requirement: 'maps each finding to evidence and reasoning', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-077", requirement: 'requires a correction for MODIFIED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-078", requirement: 'changes prospective reliance for REVERSED disposition', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-079", requirement: 'appends correction hashes to the parent registry record', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-  { testId: "CAT-080", requirement: 'preserves an auditable event chain', expected: "PASS when the preserved package satisfies the challenge policy without silent rewrite." },
-]);
-
-export const CHALLENGE_CONTROL_GUIDANCE: Readonly<Record<string, readonly string[]>> = Object.freeze({
-  "CHL-001": Object.freeze([
-    'Confirm challenge identity against the immutable registry record.',
-    'Preserve attributable evidence for challenge identity.',
-    'Record unresolved uncertainty relating to challenge identity.',
-    'Update public and institutional views when challenge identity changes reliance.',
-    'Fail closed when challenge identity cannot be established.',
-  ]),
-  "CHL-002": Object.freeze([
-    'Confirm registry binding against the immutable registry record.',
-    'Preserve attributable evidence for registry binding.',
-    'Record unresolved uncertainty relating to registry binding.',
-    'Update public and institutional views when registry binding changes reliance.',
-    'Fail closed when registry binding cannot be established.',
-  ]),
-  "CHL-003": Object.freeze([
-    'Confirm artifact binding against the immutable registry record.',
-    'Preserve attributable evidence for artifact binding.',
-    'Record unresolved uncertainty relating to artifact binding.',
-    'Update public and institutional views when artifact binding changes reliance.',
-    'Fail closed when artifact binding cannot be established.',
-  ]),
-  "CHL-004": Object.freeze([
-    'Confirm original hash parity against the immutable registry record.',
-    'Preserve attributable evidence for original hash parity.',
-    'Record unresolved uncertainty relating to original hash parity.',
-    'Update public and institutional views when original hash parity changes reliance.',
-    'Fail closed when original hash parity cannot be established.',
-  ]),
-  "CHL-005": Object.freeze([
-    'Confirm challengeable state against the immutable registry record.',
-    'Preserve attributable evidence for challengeable state.',
-    'Record unresolved uncertainty relating to challengeable state.',
-    'Update public and institutional views when challengeable state changes reliance.',
-    'Fail closed when challengeable state cannot be established.',
-  ]),
-  "CHL-006": Object.freeze([
-    'Confirm challenger identity against the immutable registry record.',
-    'Preserve attributable evidence for challenger identity.',
-    'Record unresolved uncertainty relating to challenger identity.',
-    'Update public and institutional views when challenger identity changes reliance.',
-    'Fail closed when challenger identity cannot be established.',
-  ]),
-  "CHL-007": Object.freeze([
-    'Confirm challenger authority against the immutable registry record.',
-    'Preserve attributable evidence for challenger authority.',
-    'Record unresolved uncertainty relating to challenger authority.',
-    'Update public and institutional views when challenger authority changes reliance.',
-    'Fail closed when challenger authority cannot be established.',
-  ]),
-  "CHL-008": Object.freeze([
-    'Confirm bounded subject against the immutable registry record.',
-    'Preserve attributable evidence for bounded subject.',
-    'Record unresolved uncertainty relating to bounded subject.',
-    'Update public and institutional views when bounded subject changes reliance.',
-    'Fail closed when bounded subject cannot be established.',
-  ]),
-  "CHL-009": Object.freeze([
-    'Confirm exact challenged claim against the immutable registry record.',
-    'Preserve attributable evidence for exact challenged claim.',
-    'Record unresolved uncertainty relating to exact challenged claim.',
-    'Update public and institutional views when exact challenged claim changes reliance.',
-    'Fail closed when exact challenged claim cannot be established.',
-  ]),
-  "CHL-010": Object.freeze([
-    'Confirm challenge basis against the immutable registry record.',
-    'Preserve attributable evidence for challenge basis.',
-    'Record unresolved uncertainty relating to challenge basis.',
-    'Update public and institutional views when challenge basis changes reliance.',
-    'Fail closed when challenge basis cannot be established.',
-  ]),
-  "CHL-011": Object.freeze([
-    'Confirm materiality statement against the immutable registry record.',
-    'Preserve attributable evidence for materiality statement.',
-    'Record unresolved uncertainty relating to materiality statement.',
-    'Update public and institutional views when materiality statement changes reliance.',
-    'Fail closed when materiality statement cannot be established.',
-  ]),
-  "CHL-012": Object.freeze([
-    'Confirm requested remedy against the immutable registry record.',
-    'Preserve attributable evidence for requested remedy.',
-    'Record unresolved uncertainty relating to requested remedy.',
-    'Update public and institutional views when requested remedy changes reliance.',
-    'Fail closed when requested remedy cannot be established.',
-  ]),
-  "CHL-013": Object.freeze([
-    'Confirm counter-evidence identity against the immutable registry record.',
-    'Preserve attributable evidence for counter-evidence identity.',
-    'Record unresolved uncertainty relating to counter-evidence identity.',
-    'Update public and institutional views when counter-evidence identity changes reliance.',
-    'Fail closed when counter-evidence identity cannot be established.',
-  ]),
-  "CHL-014": Object.freeze([
-    'Confirm counter-evidence provenance against the immutable registry record.',
-    'Preserve attributable evidence for counter-evidence provenance.',
-    'Record unresolved uncertainty relating to counter-evidence provenance.',
-    'Update public and institutional views when counter-evidence provenance changes reliance.',
-    'Fail closed when counter-evidence provenance cannot be established.',
-  ]),
-  "CHL-015": Object.freeze([
-    'Confirm counter-evidence custody against the immutable registry record.',
-    'Preserve attributable evidence for counter-evidence custody.',
-    'Record unresolved uncertainty relating to counter-evidence custody.',
-    'Update public and institutional views when counter-evidence custody changes reliance.',
-    'Fail closed when counter-evidence custody cannot be established.',
-  ]),
-  "CHL-016": Object.freeze([
-    'Confirm counter-evidence hash against the immutable registry record.',
-    'Preserve attributable evidence for counter-evidence hash.',
-    'Record unresolved uncertainty relating to counter-evidence hash.',
-    'Update public and institutional views when counter-evidence hash changes reliance.',
-    'Fail closed when counter-evidence hash cannot be established.',
-  ]),
-  "CHL-017": Object.freeze([
-    'Confirm counter-evidence disclosure against the immutable registry record.',
-    'Preserve attributable evidence for counter-evidence disclosure.',
-    'Record unresolved uncertainty relating to counter-evidence disclosure.',
-    'Update public and institutional views when counter-evidence disclosure changes reliance.',
-    'Fail closed when counter-evidence disclosure cannot be established.',
-  ]),
-  "CHL-018": Object.freeze([
-    'Confirm counter-evidence admissibility against the immutable registry record.',
-    'Preserve attributable evidence for counter-evidence admissibility.',
-    'Record unresolved uncertainty relating to counter-evidence admissibility.',
-    'Update public and institutional views when counter-evidence admissibility changes reliance.',
-    'Fail closed when counter-evidence admissibility cannot be established.',
-  ]),
-  "CHL-019": Object.freeze([
-    'Confirm duplicate challenge check against the immutable registry record.',
-    'Preserve attributable evidence for duplicate challenge check.',
-    'Record unresolved uncertainty relating to duplicate challenge check.',
-    'Update public and institutional views when duplicate challenge check changes reliance.',
-    'Fail closed when duplicate challenge check cannot be established.',
-  ]),
-  "CHL-020": Object.freeze([
-    'Confirm open challenge visibility against the immutable registry record.',
-    'Preserve attributable evidence for open challenge visibility.',
-    'Record unresolved uncertainty relating to open challenge visibility.',
-    'Update public and institutional views when open challenge visibility changes reliance.',
-    'Fail closed when open challenge visibility cannot be established.',
-  ]),
-  "CHL-021": Object.freeze([
-    'Confirm reviewer assignment against the immutable registry record.',
-    'Preserve attributable evidence for reviewer assignment.',
-    'Record unresolved uncertainty relating to reviewer assignment.',
-    'Update public and institutional views when reviewer assignment changes reliance.',
-    'Fail closed when reviewer assignment cannot be established.',
-  ]),
-  "CHL-022": Object.freeze([
-    'Confirm reviewer qualification against the immutable registry record.',
-    'Preserve attributable evidence for reviewer qualification.',
-    'Record unresolved uncertainty relating to reviewer qualification.',
-    'Update public and institutional views when reviewer qualification changes reliance.',
-    'Fail closed when reviewer qualification cannot be established.',
-  ]),
-  "CHL-023": Object.freeze([
-    'Confirm reviewer independence against the immutable registry record.',
-    'Preserve attributable evidence for reviewer independence.',
-    'Record unresolved uncertainty relating to reviewer independence.',
-    'Update public and institutional views when reviewer independence changes reliance.',
-    'Fail closed when reviewer independence cannot be established.',
-  ]),
-  "CHL-024": Object.freeze([
-    'Confirm reviewer conflicts against the immutable registry record.',
-    'Preserve attributable evidence for reviewer conflicts.',
-    'Record unresolved uncertainty relating to reviewer conflicts.',
-    'Update public and institutional views when reviewer conflicts changes reliance.',
-    'Fail closed when reviewer conflicts cannot be established.',
-  ]),
-  "CHL-025": Object.freeze([
-    'Confirm review scope against the immutable registry record.',
-    'Preserve attributable evidence for review scope.',
-    'Record unresolved uncertainty relating to review scope.',
-    'Update public and institutional views when review scope changes reliance.',
-    'Fail closed when review scope cannot be established.',
-  ]),
-  "CHL-026": Object.freeze([
-    'Confirm review plan against the immutable registry record.',
-    'Preserve attributable evidence for review plan.',
-    'Record unresolved uncertainty relating to review plan.',
-    'Update public and institutional views when review plan changes reliance.',
-    'Fail closed when review plan cannot be established.',
-  ]),
-  "CHL-027": Object.freeze([
-    'Confirm response deadline against the immutable registry record.',
-    'Preserve attributable evidence for response deadline.',
-    'Record unresolved uncertainty relating to response deadline.',
-    'Update public and institutional views when response deadline changes reliance.',
-    'Fail closed when response deadline cannot be established.',
-  ]),
-  "CHL-028": Object.freeze([
-    'Confirm publisher notification against the immutable registry record.',
-    'Preserve attributable evidence for publisher notification.',
-    'Record unresolved uncertainty relating to publisher notification.',
-    'Update public and institutional views when publisher notification changes reliance.',
-    'Fail closed when publisher notification cannot be established.',
-  ]),
-  "CHL-029": Object.freeze([
-    'Confirm publisher response against the immutable registry record.',
-    'Preserve attributable evidence for publisher response.',
-    'Record unresolved uncertainty relating to publisher response.',
-    'Update public and institutional views when publisher response changes reliance.',
-    'Fail closed when publisher response cannot be established.',
-  ]),
-  "CHL-030": Object.freeze([
-    'Confirm response evidence integrity against the immutable registry record.',
-    'Preserve attributable evidence for response evidence integrity.',
-    'Record unresolved uncertainty relating to response evidence integrity.',
-    'Update public and institutional views when response evidence integrity changes reliance.',
-    'Fail closed when response evidence integrity cannot be established.',
-  ]),
-  "CHL-031": Object.freeze([
-    'Confirm finding identity against the immutable registry record.',
-    'Preserve attributable evidence for finding identity.',
-    'Record unresolved uncertainty relating to finding identity.',
-    'Update public and institutional views when finding identity changes reliance.',
-    'Fail closed when finding identity cannot be established.',
-  ]),
-  "CHL-032": Object.freeze([
-    'Confirm finding evidence mapping against the immutable registry record.',
-    'Preserve attributable evidence for finding evidence mapping.',
-    'Record unresolved uncertainty relating to finding evidence mapping.',
-    'Update public and institutional views when finding evidence mapping changes reliance.',
-    'Fail closed when finding evidence mapping cannot be established.',
-  ]),
-  "CHL-033": Object.freeze([
-    'Confirm finding reasoning against the immutable registry record.',
-    'Preserve attributable evidence for finding reasoning.',
-    'Record unresolved uncertainty relating to finding reasoning.',
-    'Update public and institutional views when finding reasoning changes reliance.',
-    'Fail closed when finding reasoning cannot be established.',
-  ]),
-  "CHL-034": Object.freeze([
-    'Confirm finding conflict handling against the immutable registry record.',
-    'Preserve attributable evidence for finding conflict handling.',
-    'Record unresolved uncertainty relating to finding conflict handling.',
-    'Update public and institutional views when finding conflict handling changes reliance.',
-    'Fail closed when finding conflict handling cannot be established.',
-  ]),
-  "CHL-035": Object.freeze([
-    'Confirm earliest failure analysis against the immutable registry record.',
-    'Preserve attributable evidence for earliest failure analysis.',
-    'Record unresolved uncertainty relating to earliest failure analysis.',
-    'Update public and institutional views when earliest failure analysis changes reliance.',
-    'Fail closed when earliest failure analysis cannot be established.',
-  ]),
-  "CHL-036": Object.freeze([
-    'Confirm determination impact against the immutable registry record.',
-    'Preserve attributable evidence for determination impact.',
-    'Record unresolved uncertainty relating to determination impact.',
-    'Update public and institutional views when determination impact changes reliance.',
-    'Fail closed when determination impact cannot be established.',
-  ]),
-  "CHL-037": Object.freeze([
-    'Confirm execution receipt impact against the immutable registry record.',
-    'Preserve attributable evidence for execution receipt impact.',
-    'Record unresolved uncertainty relating to execution receipt impact.',
-    'Update public and institutional views when execution receipt impact changes reliance.',
-    'Fail closed when execution receipt impact cannot be established.',
-  ]),
-  "CHL-038": Object.freeze([
-    'Confirm outcome impact against the immutable registry record.',
-    'Preserve attributable evidence for outcome impact.',
-    'Record unresolved uncertainty relating to outcome impact.',
-    'Update public and institutional views when outcome impact changes reliance.',
-    'Fail closed when outcome impact cannot be established.',
-  ]),
-  "CHL-039": Object.freeze([
-    'Confirm claims boundary impact against the immutable registry record.',
-    'Preserve attributable evidence for claims boundary impact.',
-    'Record unresolved uncertainty relating to claims boundary impact.',
-    'Update public and institutional views when claims boundary impact changes reliance.',
-    'Fail closed when claims boundary impact cannot be established.',
-  ]),
-  "CHL-040": Object.freeze([
-    'Confirm verification impact against the immutable registry record.',
-    'Preserve attributable evidence for verification impact.',
-    'Record unresolved uncertainty relating to verification impact.',
-    'Update public and institutional views when verification impact changes reliance.',
-    'Fail closed when verification impact cannot be established.',
-  ]),
-  "CHL-041": Object.freeze([
-    'Confirm reliance impact against the immutable registry record.',
-    'Preserve attributable evidence for reliance impact.',
-    'Record unresolved uncertainty relating to reliance impact.',
-    'Update public and institutional views when reliance impact changes reliance.',
-    'Fail closed when reliance impact cannot be established.',
-  ]),
-  "CHL-042": Object.freeze([
-    'Confirm disposition authority against the immutable registry record.',
-    'Preserve attributable evidence for disposition authority.',
-    'Record unresolved uncertainty relating to disposition authority.',
-    'Update public and institutional views when disposition authority changes reliance.',
-    'Fail closed when disposition authority cannot be established.',
-  ]),
-  "CHL-043": Object.freeze([
-    'Confirm disposition support against the immutable registry record.',
-    'Preserve attributable evidence for disposition support.',
-    'Record unresolved uncertainty relating to disposition support.',
-    'Update public and institutional views when disposition support changes reliance.',
-    'Fail closed when disposition support cannot be established.',
-  ]),
-  "CHL-044": Object.freeze([
-    'Confirm upheld requirements against the immutable registry record.',
-    'Preserve attributable evidence for upheld requirements.',
-    'Record unresolved uncertainty relating to upheld requirements.',
-    'Update public and institutional views when upheld requirements changes reliance.',
-    'Fail closed when upheld requirements cannot be established.',
-  ]),
-  "CHL-045": Object.freeze([
-    'Confirm modified requirements against the immutable registry record.',
-    'Preserve attributable evidence for modified requirements.',
-    'Record unresolved uncertainty relating to modified requirements.',
-    'Update public and institutional views when modified requirements changes reliance.',
-    'Fail closed when modified requirements cannot be established.',
-  ]),
-  "CHL-046": Object.freeze([
-    'Confirm reversed requirements against the immutable registry record.',
-    'Preserve attributable evidence for reversed requirements.',
-    'Record unresolved uncertainty relating to reversed requirements.',
-    'Update public and institutional views when reversed requirements changes reliance.',
-    'Fail closed when reversed requirements cannot be established.',
-  ]),
-  "CHL-047": Object.freeze([
-    'Confirm closed requirements against the immutable registry record.',
-    'Preserve attributable evidence for closed requirements.',
-    'Record unresolved uncertainty relating to closed requirements.',
-    'Update public and institutional views when closed requirements changes reliance.',
-    'Fail closed when closed requirements cannot be established.',
-  ]),
-  "CHL-048": Object.freeze([
-    'Confirm withdrawn requirements against the immutable registry record.',
-    'Preserve attributable evidence for withdrawn requirements.',
-    'Record unresolved uncertainty relating to withdrawn requirements.',
-    'Update public and institutional views when withdrawn requirements changes reliance.',
-    'Fail closed when withdrawn requirements cannot be established.',
-  ]),
-  "CHL-049": Object.freeze([
-    'Confirm correction identity against the immutable registry record.',
-    'Preserve attributable evidence for correction identity.',
-    'Record unresolved uncertainty relating to correction identity.',
-    'Update public and institutional views when correction identity changes reliance.',
-    'Fail closed when correction identity cannot be established.',
-  ]),
-  "CHL-050": Object.freeze([
-    'Confirm correction scope against the immutable registry record.',
-    'Preserve attributable evidence for correction scope.',
-    'Record unresolved uncertainty relating to correction scope.',
-    'Update public and institutional views when correction scope changes reliance.',
-    'Fail closed when correction scope cannot be established.',
-  ]),
-  "CHL-051": Object.freeze([
-    'Confirm correction reason against the immutable registry record.',
-    'Preserve attributable evidence for correction reason.',
-    'Record unresolved uncertainty relating to correction reason.',
-    'Update public and institutional views when correction reason changes reliance.',
-    'Fail closed when correction reason cannot be established.',
-  ]),
-  "CHL-052": Object.freeze([
-    'Confirm parent hash linkage against the immutable registry record.',
-    'Preserve attributable evidence for parent hash linkage.',
-    'Record unresolved uncertainty relating to parent hash linkage.',
-    'Update public and institutional views when parent hash linkage changes reliance.',
-    'Fail closed when parent hash linkage cannot be established.',
-  ]),
-  "CHL-053": Object.freeze([
-    'Confirm amendment hash against the immutable registry record.',
-    'Preserve attributable evidence for amendment hash.',
-    'Record unresolved uncertainty relating to amendment hash.',
-    'Update public and institutional views when amendment hash changes reliance.',
-    'Fail closed when amendment hash cannot be established.',
-  ]),
-  "CHL-054": Object.freeze([
-    'Confirm resulting hash against the immutable registry record.',
-    'Preserve attributable evidence for resulting hash.',
-    'Record unresolved uncertainty relating to resulting hash.',
-    'Update public and institutional views when resulting hash changes reliance.',
-    'Fail closed when resulting hash cannot be established.',
-  ]),
-  "CHL-055": Object.freeze([
-    'Confirm no rewrite guarantee against the immutable registry record.',
-    'Preserve attributable evidence for no rewrite guarantee.',
-    'Record unresolved uncertainty relating to no rewrite guarantee.',
-    'Update public and institutional views when no rewrite guarantee changes reliance.',
-    'Fail closed when no rewrite guarantee cannot be established.',
-  ]),
-  "CHL-056": Object.freeze([
-    'Confirm correction evidence against the immutable registry record.',
-    'Preserve attributable evidence for correction evidence.',
-    'Record unresolved uncertainty relating to correction evidence.',
-    'Update public and institutional views when correction evidence changes reliance.',
-    'Fail closed when correction evidence cannot be established.',
-  ]),
-  "CHL-057": Object.freeze([
-    'Confirm correction authority against the immutable registry record.',
-    'Preserve attributable evidence for correction authority.',
-    'Record unresolved uncertainty relating to correction authority.',
-    'Update public and institutional views when correction authority changes reliance.',
-    'Fail closed when correction authority cannot be established.',
-  ]),
-  "CHL-058": Object.freeze([
-    'Confirm correction verification against the immutable registry record.',
-    'Preserve attributable evidence for correction verification.',
-    'Record unresolved uncertainty relating to correction verification.',
-    'Update public and institutional views when correction verification changes reliance.',
-    'Fail closed when correction verification cannot be established.',
-  ]),
-  "CHL-059": Object.freeze([
-    'Confirm supersession assessment against the immutable registry record.',
-    'Preserve attributable evidence for supersession assessment.',
-    'Record unresolved uncertainty relating to supersession assessment.',
-    'Update public and institutional views when supersession assessment changes reliance.',
-    'Fail closed when supersession assessment cannot be established.',
-  ]),
-  "CHL-060": Object.freeze([
-    'Confirm supersession target against the immutable registry record.',
-    'Preserve attributable evidence for supersession target.',
-    'Record unresolved uncertainty relating to supersession target.',
-    'Update public and institutional views when supersession target changes reliance.',
-    'Fail closed when supersession target cannot be established.',
-  ]),
-  "CHL-061": Object.freeze([
-    'Confirm supersession chain against the immutable registry record.',
-    'Preserve attributable evidence for supersession chain.',
-    'Record unresolved uncertainty relating to supersession chain.',
-    'Update public and institutional views when supersession chain changes reliance.',
-    'Fail closed when supersession chain cannot be established.',
-  ]),
-  "CHL-062": Object.freeze([
-    'Confirm public status update against the immutable registry record.',
-    'Preserve attributable evidence for public status update.',
-    'Record unresolved uncertainty relating to public status update.',
-    'Update public and institutional views when public status update changes reliance.',
-    'Fail closed when public status update cannot be established.',
-  ]),
-  "CHL-063": Object.freeze([
-    'Confirm public summary against the immutable registry record.',
-    'Preserve attributable evidence for public summary.',
-    'Record unresolved uncertainty relating to public summary.',
-    'Update public and institutional views when public summary changes reliance.',
-    'Fail closed when public summary cannot be established.',
-  ]),
-  "CHL-064": Object.freeze([
-    'Confirm challenge url against the immutable registry record.',
-    'Preserve attributable evidence for challenge url.',
-    'Record unresolved uncertainty relating to challenge url.',
-    'Update public and institutional views when challenge url changes reliance.',
-    'Fail closed when challenge url cannot be established.',
-  ]),
-  "CHL-065": Object.freeze([
-    'Confirm correction url against the immutable registry record.',
-    'Preserve attributable evidence for correction url.',
-    'Record unresolved uncertainty relating to correction url.',
-    'Update public and institutional views when correction url changes reliance.',
-    'Fail closed when correction url cannot be established.',
-  ]),
-  "CHL-066": Object.freeze([
-    'Confirm resolution hash against the immutable registry record.',
-    'Preserve attributable evidence for resolution hash.',
-    'Record unresolved uncertainty relating to resolution hash.',
-    'Update public and institutional views when resolution hash changes reliance.',
-    'Fail closed when resolution hash cannot be established.',
-  ]),
-  "CHL-067": Object.freeze([
-    'Confirm audit event against the immutable registry record.',
-    'Preserve attributable evidence for audit event.',
-    'Record unresolved uncertainty relating to audit event.',
-    'Update public and institutional views when audit event changes reliance.',
-    'Fail closed when audit event cannot be established.',
-  ]),
-  "CHL-068": Object.freeze([
-    'Confirm audit-chain continuity against the immutable registry record.',
-    'Preserve attributable evidence for audit-chain continuity.',
-    'Record unresolved uncertainty relating to audit-chain continuity.',
-    'Update public and institutional views when audit-chain continuity changes reliance.',
-    'Fail closed when audit-chain continuity cannot be established.',
-  ]),
-  "CHL-069": Object.freeze([
-    'Confirm chronology against the immutable registry record.',
-    'Preserve attributable evidence for chronology.',
-    'Record unresolved uncertainty relating to chronology.',
-    'Update public and institutional views when chronology changes reliance.',
-    'Fail closed when chronology cannot be established.',
-  ]),
-  "CHL-070": Object.freeze([
-    'Confirm notification completion against the immutable registry record.',
-    'Preserve attributable evidence for notification completion.',
-    'Record unresolved uncertainty relating to notification completion.',
-    'Update public and institutional views when notification completion changes reliance.',
-    'Fail closed when notification completion cannot be established.',
-  ]),
-  "CHL-071": Object.freeze([
-    'Confirm retention policy against the immutable registry record.',
-    'Preserve attributable evidence for retention policy.',
-    'Record unresolved uncertainty relating to retention policy.',
-    'Update public and institutional views when retention policy changes reliance.',
-    'Fail closed when retention policy cannot be established.',
-  ]),
-  "CHL-072": Object.freeze([
-    'Confirm preservation proof against the immutable registry record.',
-    'Preserve attributable evidence for preservation proof.',
-    'Record unresolved uncertainty relating to preservation proof.',
-    'Update public and institutional views when preservation proof changes reliance.',
-    'Fail closed when preservation proof cannot be established.',
-  ]),
-  "CHL-073": Object.freeze([
-    'Confirm machine-readable export against the immutable registry record.',
-    'Preserve attributable evidence for machine-readable export.',
-    'Record unresolved uncertainty relating to machine-readable export.',
-    'Update public and institutional views when machine-readable export changes reliance.',
-    'Fail closed when machine-readable export cannot be established.',
-  ]),
-  "CHL-074": Object.freeze([
-    'Confirm human-readable report against the immutable registry record.',
-    'Preserve attributable evidence for human-readable report.',
-    'Record unresolved uncertainty relating to human-readable report.',
-    'Update public and institutional views when human-readable report changes reliance.',
-    'Fail closed when human-readable report cannot be established.',
-  ]),
-  "CHL-075": Object.freeze([
-    'Confirm registry projection against the immutable registry record.',
-    'Preserve attributable evidence for registry projection.',
-    'Record unresolved uncertainty relating to registry projection.',
-    'Update public and institutional views when registry projection changes reliance.',
-    'Fail closed when registry projection cannot be established.',
-  ]),
-  "CHL-076": Object.freeze([
-    'Confirm verification projection against the immutable registry record.',
-    'Preserve attributable evidence for verification projection.',
-    'Record unresolved uncertainty relating to verification projection.',
-    'Update public and institutional views when verification projection changes reliance.',
-    'Fail closed when verification projection cannot be established.',
-  ]),
-  "CHL-077": Object.freeze([
-    'Confirm portfolio projection against the immutable registry record.',
-    'Preserve attributable evidence for portfolio projection.',
-    'Record unresolved uncertainty relating to portfolio projection.',
-    'Update public and institutional views when portfolio projection changes reliance.',
-    'Fail closed when portfolio projection cannot be established.',
-  ]),
-  "CHL-078": Object.freeze([
-    'Confirm acceptance-test completion against the immutable registry record.',
-    'Preserve attributable evidence for acceptance-test completion.',
-    'Record unresolved uncertainty relating to acceptance-test completion.',
-    'Update public and institutional views when acceptance-test completion changes reliance.',
-    'Fail closed when acceptance-test completion cannot be established.',
-  ]),
-  "CHL-079": Object.freeze([
-    'Confirm final publication gate against the immutable registry record.',
-    'Preserve attributable evidence for final publication gate.',
-    'Record unresolved uncertainty relating to final publication gate.',
-    'Update public and institutional views when final publication gate changes reliance.',
-    'Fail closed when final publication gate cannot be established.',
-  ]),
-  "CHL-080": Object.freeze([
-    'Confirm independent review lane against the immutable registry record.',
-    'Preserve attributable evidence for independent review lane.',
-    'Record unresolved uncertainty relating to independent review lane.',
-    'Update public and institutional views when independent review lane changes reliance.',
-    'Fail closed when independent review lane cannot be established.',
-  ]),
-});
-
-export function challengeControlGuidance(controlId: string): readonly string[] { return CHALLENGE_CONTROL_GUIDANCE[controlId] ?? Object.freeze([]); }
-
-export function isChallengeIdMissing(value: string): value is "CHALLENGE_ID_MISSING" { return value === "CHALLENGE_ID_MISSING"; }
-export const CHALLENGE_ID_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGE_ID_MISSING;
-
-export function isChallengeDuplicate(value: string): value is "CHALLENGE_DUPLICATE" { return value === "CHALLENGE_DUPLICATE"; }
-export const CHALLENGE_DUPLICATE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGE_DUPLICATE;
-
-export function isChallengeTimeInvalid(value: string): value is "CHALLENGE_TIME_INVALID" { return value === "CHALLENGE_TIME_INVALID"; }
-export const CHALLENGE_TIME_INVALID_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGE_TIME_INVALID;
-
-export function isChallengeAfterWithdrawal(value: string): value is "CHALLENGE_AFTER_WITHDRAWAL" { return value === "CHALLENGE_AFTER_WITHDRAWAL"; }
-export const CHALLENGE_AFTER_WITHDRAWAL_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGE_AFTER_WITHDRAWAL;
-
-export function isChallengerIdentityMissing(value: string): value is "CHALLENGER_IDENTITY_MISSING" { return value === "CHALLENGER_IDENTITY_MISSING"; }
-export const CHALLENGER_IDENTITY_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGER_IDENTITY_MISSING;
-
-export function isChallengerAuthorityMissing(value: string): value is "CHALLENGER_AUTHORITY_MISSING" { return value === "CHALLENGER_AUTHORITY_MISSING"; }
-export const CHALLENGER_AUTHORITY_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGER_AUTHORITY_MISSING;
-
-export function isSubjectMissing(value: string): value is "SUBJECT_MISSING" { return value === "SUBJECT_MISSING"; }
-export const SUBJECT_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.SUBJECT_MISSING;
-
-export function isClaimMissing(value: string): value is "CLAIM_MISSING" { return value === "CLAIM_MISSING"; }
-export const CLAIM_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CLAIM_MISSING;
-
-export function isClaimScopeTooBroad(value: string): value is "CLAIM_SCOPE_TOO_BROAD" { return value === "CLAIM_SCOPE_TOO_BROAD"; }
-export const CLAIM_SCOPE_TOO_BROAD_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CLAIM_SCOPE_TOO_BROAD;
-
-export function isBasisMissing(value: string): value is "BASIS_MISSING" { return value === "BASIS_MISSING"; }
-export const BASIS_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.BASIS_MISSING;
-
-export function isCounterEvidenceRequired(value: string): value is "COUNTER_EVIDENCE_REQUIRED" { return value === "COUNTER_EVIDENCE_REQUIRED"; }
-export const COUNTER_EVIDENCE_REQUIRED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_REQUIRED;
-
-export function isCounterEvidenceIdMissing(value: string): value is "COUNTER_EVIDENCE_ID_MISSING" { return value === "COUNTER_EVIDENCE_ID_MISSING"; }
-export const COUNTER_EVIDENCE_ID_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_ID_MISSING;
-
-export function isCounterEvidenceHashMissing(value: string): value is "COUNTER_EVIDENCE_HASH_MISSING" { return value === "COUNTER_EVIDENCE_HASH_MISSING"; }
-export const COUNTER_EVIDENCE_HASH_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_HASH_MISSING;
-
-export function isCounterEvidenceTimeInvalid(value: string): value is "COUNTER_EVIDENCE_TIME_INVALID" { return value === "COUNTER_EVIDENCE_TIME_INVALID"; }
-export const COUNTER_EVIDENCE_TIME_INVALID_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_TIME_INVALID;
-
-export function isCounterEvidenceCustodyMissing(value: string): value is "COUNTER_EVIDENCE_CUSTODY_MISSING" { return value === "COUNTER_EVIDENCE_CUSTODY_MISSING"; }
-export const COUNTER_EVIDENCE_CUSTODY_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_CUSTODY_MISSING;
-
-export function isCounterEvidenceDisclosureMissing(value: string): value is "COUNTER_EVIDENCE_DISCLOSURE_MISSING" { return value === "COUNTER_EVIDENCE_DISCLOSURE_MISSING"; }
-export const COUNTER_EVIDENCE_DISCLOSURE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_DISCLOSURE_MISSING;
-
-export function isCounterEvidenceInadmissible(value: string): value is "COUNTER_EVIDENCE_INADMISSIBLE" { return value === "COUNTER_EVIDENCE_INADMISSIBLE"; }
-export const COUNTER_EVIDENCE_INADMISSIBLE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.COUNTER_EVIDENCE_INADMISSIBLE;
-
-export function isOriginalRecordMissing(value: string): value is "ORIGINAL_RECORD_MISSING" { return value === "ORIGINAL_RECORD_MISSING"; }
-export const ORIGINAL_RECORD_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.ORIGINAL_RECORD_MISSING;
-
-export function isOriginalHashMismatch(value: string): value is "ORIGINAL_HASH_MISMATCH" { return value === "ORIGINAL_HASH_MISMATCH"; }
-export const ORIGINAL_HASH_MISMATCH_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.ORIGINAL_HASH_MISMATCH;
-
-export function isArtifactIdMismatch(value: string): value is "ARTIFACT_ID_MISMATCH" { return value === "ARTIFACT_ID_MISMATCH"; }
-export const ARTIFACT_ID_MISMATCH_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.ARTIFACT_ID_MISMATCH;
-
-export function isRegistryIdMismatch(value: string): value is "REGISTRY_ID_MISMATCH" { return value === "REGISTRY_ID_MISMATCH"; }
-export const REGISTRY_ID_MISMATCH_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REGISTRY_ID_MISMATCH;
-
-export function isArtifactNotChallengeable(value: string): value is "ARTIFACT_NOT_CHALLENGEABLE" { return value === "ARTIFACT_NOT_CHALLENGEABLE"; }
-export const ARTIFACT_NOT_CHALLENGEABLE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.ARTIFACT_NOT_CHALLENGEABLE;
-
-export function isOpenChallengeAlreadyExists(value: string): value is "OPEN_CHALLENGE_ALREADY_EXISTS" { return value === "OPEN_CHALLENGE_ALREADY_EXISTS"; }
-export const OPEN_CHALLENGE_ALREADY_EXISTS_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.OPEN_CHALLENGE_ALREADY_EXISTS;
-
-export function isReviewerRequired(value: string): value is "REVIEWER_REQUIRED" { return value === "REVIEWER_REQUIRED"; }
-export const REVIEWER_REQUIRED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEWER_REQUIRED;
-
-export function isReviewerIdMissing(value: string): value is "REVIEWER_ID_MISSING" { return value === "REVIEWER_ID_MISSING"; }
-export const REVIEWER_ID_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEWER_ID_MISSING;
-
-export function isReviewerRoleMissing(value: string): value is "REVIEWER_ROLE_MISSING" { return value === "REVIEWER_ROLE_MISSING"; }
-export const REVIEWER_ROLE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEWER_ROLE_MISSING;
-
-export function isReviewerConflictUnresolved(value: string): value is "REVIEWER_CONFLICT_UNRESOLVED" { return value === "REVIEWER_CONFLICT_UNRESOLVED"; }
-export const REVIEWER_CONFLICT_UNRESOLVED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEWER_CONFLICT_UNRESOLVED;
-
-export function isReviewerUnqualified(value: string): value is "REVIEWER_UNQUALIFIED" { return value === "REVIEWER_UNQUALIFIED"; }
-export const REVIEWER_UNQUALIFIED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEWER_UNQUALIFIED;
-
-export function isReviewScopeMissing(value: string): value is "REVIEW_SCOPE_MISSING" { return value === "REVIEW_SCOPE_MISSING"; }
-export const REVIEW_SCOPE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEW_SCOPE_MISSING;
-
-export function isResponseDeadlineMissing(value: string): value is "RESPONSE_DEADLINE_MISSING" { return value === "RESPONSE_DEADLINE_MISSING"; }
-export const RESPONSE_DEADLINE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.RESPONSE_DEADLINE_MISSING;
-
-export function isPublisherResponseMissing(value: string): value is "PUBLISHER_RESPONSE_MISSING" { return value === "PUBLISHER_RESPONSE_MISSING"; }
-export const PUBLISHER_RESPONSE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PUBLISHER_RESPONSE_MISSING;
-
-export function isPublisherResponseLate(value: string): value is "PUBLISHER_RESPONSE_LATE" { return value === "PUBLISHER_RESPONSE_LATE"; }
-export const PUBLISHER_RESPONSE_LATE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PUBLISHER_RESPONSE_LATE;
-
-export function isPublisherEvidenceHashMissing(value: string): value is "PUBLISHER_EVIDENCE_HASH_MISSING" { return value === "PUBLISHER_EVIDENCE_HASH_MISSING"; }
-export const PUBLISHER_EVIDENCE_HASH_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PUBLISHER_EVIDENCE_HASH_MISSING;
-
-export function isFindingIdMissing(value: string): value is "FINDING_ID_MISSING" { return value === "FINDING_ID_MISSING"; }
-export const FINDING_ID_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.FINDING_ID_MISSING;
-
-export function isFindingUnsupported(value: string): value is "FINDING_UNSUPPORTED" { return value === "FINDING_UNSUPPORTED"; }
-export const FINDING_UNSUPPORTED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.FINDING_UNSUPPORTED;
-
-export function isFindingConflictUnresolved(value: string): value is "FINDING_CONFLICT_UNRESOLVED" { return value === "FINDING_CONFLICT_UNRESOLVED"; }
-export const FINDING_CONFLICT_UNRESOLVED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.FINDING_CONFLICT_UNRESOLVED;
-
-export function isEarliestFailureUnstated(value: string): value is "EARLIEST_FAILURE_UNSTATED" { return value === "EARLIEST_FAILURE_UNSTATED"; }
-export const EARLIEST_FAILURE_UNSTATED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.EARLIEST_FAILURE_UNSTATED;
-
-export function isDispositionMissing(value: string): value is "DISPOSITION_MISSING" { return value === "DISPOSITION_MISSING"; }
-export const DISPOSITION_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.DISPOSITION_MISSING;
-
-export function isDispositionInvalid(value: string): value is "DISPOSITION_INVALID" { return value === "DISPOSITION_INVALID"; }
-export const DISPOSITION_INVALID_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.DISPOSITION_INVALID;
-
-export function isUpheldWithoutSupport(value: string): value is "UPHELD_WITHOUT_SUPPORT" { return value === "UPHELD_WITHOUT_SUPPORT"; }
-export const UPHELD_WITHOUT_SUPPORT_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.UPHELD_WITHOUT_SUPPORT;
-
-export function isModifiedWithoutCorrection(value: string): value is "MODIFIED_WITHOUT_CORRECTION" { return value === "MODIFIED_WITHOUT_CORRECTION"; }
-export const MODIFIED_WITHOUT_CORRECTION_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.MODIFIED_WITHOUT_CORRECTION;
-
-export function isReversedWithoutRelianceEffect(value: string): value is "REVERSED_WITHOUT_RELIANCE_EFFECT" { return value === "REVERSED_WITHOUT_RELIANCE_EFFECT"; }
-export const REVERSED_WITHOUT_RELIANCE_EFFECT_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVERSED_WITHOUT_RELIANCE_EFFECT;
-
-export function isClosedWithOpenFindings(value: string): value is "CLOSED_WITH_OPEN_FINDINGS" { return value === "CLOSED_WITH_OPEN_FINDINGS"; }
-export const CLOSED_WITH_OPEN_FINDINGS_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CLOSED_WITH_OPEN_FINDINGS;
-
-export function isWithdrawalReasonMissing(value: string): value is "WITHDRAWAL_REASON_MISSING" { return value === "WITHDRAWAL_REASON_MISSING"; }
-export const WITHDRAWAL_REASON_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.WITHDRAWAL_REASON_MISSING;
-
-export function isCorrectionIdMissing(value: string): value is "CORRECTION_ID_MISSING" { return value === "CORRECTION_ID_MISSING"; }
-export const CORRECTION_ID_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_ID_MISSING;
-
-export function isCorrectionScopeMissing(value: string): value is "CORRECTION_SCOPE_MISSING" { return value === "CORRECTION_SCOPE_MISSING"; }
-export const CORRECTION_SCOPE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_SCOPE_MISSING;
-
-export function isCorrectionReasonMissing(value: string): value is "CORRECTION_REASON_MISSING" { return value === "CORRECTION_REASON_MISSING"; }
-export const CORRECTION_REASON_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_REASON_MISSING;
-
-export function isParentHashMissing(value: string): value is "PARENT_HASH_MISSING" { return value === "PARENT_HASH_MISSING"; }
-export const PARENT_HASH_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PARENT_HASH_MISSING;
-
-export function isParentHashMismatch(value: string): value is "PARENT_HASH_MISMATCH" { return value === "PARENT_HASH_MISMATCH"; }
-export const PARENT_HASH_MISMATCH_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PARENT_HASH_MISMATCH;
-
-export function isAmendmentHashMissing(value: string): value is "AMENDMENT_HASH_MISSING" { return value === "AMENDMENT_HASH_MISSING"; }
-export const AMENDMENT_HASH_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.AMENDMENT_HASH_MISSING;
-
-export function isResultingHashMissing(value: string): value is "RESULTING_HASH_MISSING" { return value === "RESULTING_HASH_MISSING"; }
-export const RESULTING_HASH_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.RESULTING_HASH_MISSING;
-
-export function isCorrectionRewritesOriginal(value: string): value is "CORRECTION_REWRITES_ORIGINAL" { return value === "CORRECTION_REWRITES_ORIGINAL"; }
-export const CORRECTION_REWRITES_ORIGINAL_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_REWRITES_ORIGINAL;
-
-export function isCorrectionScopeExceeded(value: string): value is "CORRECTION_SCOPE_EXCEEDED" { return value === "CORRECTION_SCOPE_EXCEEDED"; }
-export const CORRECTION_SCOPE_EXCEEDED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_SCOPE_EXCEEDED;
-
-export function isCorrectionEvidenceMissing(value: string): value is "CORRECTION_EVIDENCE_MISSING" { return value === "CORRECTION_EVIDENCE_MISSING"; }
-export const CORRECTION_EVIDENCE_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_EVIDENCE_MISSING;
-
-export function isCorrectionAuthorityMissing(value: string): value is "CORRECTION_AUTHORITY_MISSING" { return value === "CORRECTION_AUTHORITY_MISSING"; }
-export const CORRECTION_AUTHORITY_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_AUTHORITY_MISSING;
-
-export function isCorrectionNotVerified(value: string): value is "CORRECTION_NOT_VERIFIED" { return value === "CORRECTION_NOT_VERIFIED"; }
-export const CORRECTION_NOT_VERIFIED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_NOT_VERIFIED;
-
-export function isSupersessionRequired(value: string): value is "SUPERSESSION_REQUIRED" { return value === "SUPERSESSION_REQUIRED"; }
-export const SUPERSESSION_REQUIRED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.SUPERSESSION_REQUIRED;
-
-export function isSupersessionTargetMissing(value: string): value is "SUPERSESSION_TARGET_MISSING" { return value === "SUPERSESSION_TARGET_MISSING"; }
-export const SUPERSESSION_TARGET_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.SUPERSESSION_TARGET_MISSING;
-
-export function isSupersessionChainBroken(value: string): value is "SUPERSESSION_CHAIN_BROKEN" { return value === "SUPERSESSION_CHAIN_BROKEN"; }
-export const SUPERSESSION_CHAIN_BROKEN_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.SUPERSESSION_CHAIN_BROKEN;
-
-export function isPublicStatusNotUpdated(value: string): value is "PUBLIC_STATUS_NOT_UPDATED" { return value === "PUBLIC_STATUS_NOT_UPDATED"; }
-export const PUBLIC_STATUS_NOT_UPDATED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PUBLIC_STATUS_NOT_UPDATED;
-
-export function isPublicSummaryMissing(value: string): value is "PUBLIC_SUMMARY_MISSING" { return value === "PUBLIC_SUMMARY_MISSING"; }
-export const PUBLIC_SUMMARY_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PUBLIC_SUMMARY_MISSING;
-
-export function isChallengeUrlMissing(value: string): value is "CHALLENGE_URL_MISSING" { return value === "CHALLENGE_URL_MISSING"; }
-export const CHALLENGE_URL_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGE_URL_MISSING;
-
-export function isCorrectionUrlMissing(value: string): value is "CORRECTION_URL_MISSING" { return value === "CORRECTION_URL_MISSING"; }
-export const CORRECTION_URL_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_URL_MISSING;
-
-export function isResolutionHashMissing(value: string): value is "RESOLUTION_HASH_MISSING" { return value === "RESOLUTION_HASH_MISSING"; }
-export const RESOLUTION_HASH_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.RESOLUTION_HASH_MISSING;
-
-export function isAuditEventMissing(value: string): value is "AUDIT_EVENT_MISSING" { return value === "AUDIT_EVENT_MISSING"; }
-export const AUDIT_EVENT_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.AUDIT_EVENT_MISSING;
-
-export function isAuditChainBroken(value: string): value is "AUDIT_CHAIN_BROKEN" { return value === "AUDIT_CHAIN_BROKEN"; }
-export const AUDIT_CHAIN_BROKEN_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.AUDIT_CHAIN_BROKEN;
-
-export function isTimeOrderInvalid(value: string): value is "TIME_ORDER_INVALID" { return value === "TIME_ORDER_INVALID"; }
-export const TIME_ORDER_INVALID_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.TIME_ORDER_INVALID;
-
-export function isClaimsBoundaryNotUpdated(value: string): value is "CLAIMS_BOUNDARY_NOT_UPDATED" { return value === "CLAIMS_BOUNDARY_NOT_UPDATED"; }
-export const CLAIMS_BOUNDARY_NOT_UPDATED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CLAIMS_BOUNDARY_NOT_UPDATED;
-
-export function isVerificationStatusNotUpdated(value: string): value is "VERIFICATION_STATUS_NOT_UPDATED" { return value === "VERIFICATION_STATUS_NOT_UPDATED"; }
-export const VERIFICATION_STATUS_NOT_UPDATED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.VERIFICATION_STATUS_NOT_UPDATED;
-
-export function isRelianceStatusNotUpdated(value: string): value is "RELIANCE_STATUS_NOT_UPDATED" { return value === "RELIANCE_STATUS_NOT_UPDATED"; }
-export const RELIANCE_STATUS_NOT_UPDATED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.RELIANCE_STATUS_NOT_UPDATED;
-
-export function isNotificationIncomplete(value: string): value is "NOTIFICATION_INCOMPLETE" { return value === "NOTIFICATION_INCOMPLETE"; }
-export const NOTIFICATION_INCOMPLETE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.NOTIFICATION_INCOMPLETE;
-
-export function isRetentionPolicyMissing(value: string): value is "RETENTION_POLICY_MISSING" { return value === "RETENTION_POLICY_MISSING"; }
-export const RETENTION_POLICY_MISSING_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.RETENTION_POLICY_MISSING;
-
-export function isPreservationFailure(value: string): value is "PRESERVATION_FAILURE" { return value === "PRESERVATION_FAILURE"; }
-export const PRESERVATION_FAILURE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.PRESERVATION_FAILURE;
-
-export function isChallengeAccepted(value: string): value is "CHALLENGE_ACCEPTED" { return value === "CHALLENGE_ACCEPTED"; }
-export const CHALLENGE_ACCEPTED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CHALLENGE_ACCEPTED;
-
-export function isReviewComplete(value: string): value is "REVIEW_COMPLETE" { return value === "REVIEW_COMPLETE"; }
-export const REVIEW_COMPLETE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.REVIEW_COMPLETE;
-
-export function isCorrectionAppended(value: string): value is "CORRECTION_APPENDED" { return value === "CORRECTION_APPENDED"; }
-export const CORRECTION_APPENDED_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.CORRECTION_APPENDED;
-
-export function isResolutionComplete(value: string): value is "RESOLUTION_COMPLETE" { return value === "RESOLUTION_COMPLETE"; }
-export const RESOLUTION_COMPLETE_CHALLENGE_DEFINITION = CHALLENGE_REASON_DICTIONARY.RESOLUTION_COMPLETE;
-
-export interface ChallengeResolutionPolicy {
+export function verifyHexDigest(value: string): boolean {
+  return HEX_64.test(value);
+}
+
+export function runIntegritySelfTests(): readonly { name: string; passed: boolean; detail: string }[] {
+  const vectors = [
+    ["", "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"],
+    ["abc", "ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad"],
+    ["TA-14", "17f5bb96f3e4499d4bb225de90c98cba487f1cc5ea8b4e701e946ecdd0a9d5d9"],
+  ] as const;
+  return vectors.map(([input, expected]) => {
+    const actual = sha256Hex(input);
+    return {
+      name: `SHA-256 vector ${JSON.stringify(input)}`,
+      passed: actual === expected,
+      detail: `expected=${expected}; actual=${actual}`,
+    };
+  });
+}
+
+
+export interface IntegrityComponentProfile {
+  profileId: string;
+  kind: IntegrityComponentKind;
+  label: string;
+  mediaType: string;
+  requiredForPublicReliance: boolean;
+  requiredForProductionClaim: boolean;
+  defaultDisclosure: "PUBLIC" | "SELECTIVE" | "RESTRICTED" | "WITHHELD";
+  verificationPurpose: string;
+  failureEffect: "WARNING" | "BLOCK_PUBLICATION" | "BLOCK_RELIANCE";
+}
+
+export interface IntegrityLineagePolicy {
   policyId: string;
-  subjectType: ChallengeSubjectType;
-  minimumReviewers: number;
-  independentReviewRequired: boolean;
-  permittedDispositions: readonly ChallengeStatus[];
-  requiredEvidence: readonly string[];
-  relianceEffectGuidance: string;
+  kind: IntegrityLineageLink["kind"];
+  requiresParent: boolean;
+  requiresRegistryTransition: boolean;
+  permitsCanonicalReplacement: boolean;
+  prospectiveRelianceEffect: "UNCHANGED" | "LIMITED" | "SUSPENDED" | "ENDED" | "SUPERSEDED";
+  requirement: string;
 }
 
-export const CHALLENGE_RESOLUTION_POLICIES: readonly ChallengeResolutionPolicy[] = Object.freeze([
-  {
-    policyId: "CRP-001",
-    subjectType: "CLAIM",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 001"]),
-    relianceEffectGuidance: "Policy 001 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-002",
-    subjectType: "EVIDENCE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 002"]),
-    relianceEffectGuidance: "Policy 002 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-003",
-    subjectType: "AUTHORITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 003"]),
-    relianceEffectGuidance: "Policy 003 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-004",
-    subjectType: "CONTINUITY",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 004"]),
-    relianceEffectGuidance: "Policy 004 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-005",
-    subjectType: "GATE_RESULT",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 005"]),
-    relianceEffectGuidance: "Policy 005 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-006",
-    subjectType: "DETERMINATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 006"]),
-    relianceEffectGuidance: "Policy 006 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-007",
-    subjectType: "EXECUTION_RECEIPT",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 007"]),
-    relianceEffectGuidance: "Policy 007 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-008",
-    subjectType: "OUTCOME",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 008"]),
-    relianceEffectGuidance: "Policy 008 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-009",
-    subjectType: "INTEGRITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 009"]),
-    relianceEffectGuidance: "Policy 009 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-010",
-    subjectType: "VERIFICATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 010"]),
-    relianceEffectGuidance: "Policy 010 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-011",
-    subjectType: "DISCLOSURE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 011"]),
-    relianceEffectGuidance: "Policy 011 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-012",
-    subjectType: "REGISTRY_STATUS",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 012"]),
-    relianceEffectGuidance: "Policy 012 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-013",
-    subjectType: "CLAIM",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 013"]),
-    relianceEffectGuidance: "Policy 013 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-014",
-    subjectType: "EVIDENCE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 014"]),
-    relianceEffectGuidance: "Policy 014 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-015",
-    subjectType: "AUTHORITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 015"]),
-    relianceEffectGuidance: "Policy 015 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-016",
-    subjectType: "CONTINUITY",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 016"]),
-    relianceEffectGuidance: "Policy 016 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-017",
-    subjectType: "GATE_RESULT",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 017"]),
-    relianceEffectGuidance: "Policy 017 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-018",
-    subjectType: "DETERMINATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 018"]),
-    relianceEffectGuidance: "Policy 018 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-019",
-    subjectType: "EXECUTION_RECEIPT",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 019"]),
-    relianceEffectGuidance: "Policy 019 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-020",
-    subjectType: "OUTCOME",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 020"]),
-    relianceEffectGuidance: "Policy 020 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-021",
-    subjectType: "INTEGRITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 021"]),
-    relianceEffectGuidance: "Policy 021 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-022",
-    subjectType: "VERIFICATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 022"]),
-    relianceEffectGuidance: "Policy 022 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-023",
-    subjectType: "DISCLOSURE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 023"]),
-    relianceEffectGuidance: "Policy 023 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-024",
-    subjectType: "REGISTRY_STATUS",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 024"]),
-    relianceEffectGuidance: "Policy 024 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-025",
-    subjectType: "CLAIM",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 025"]),
-    relianceEffectGuidance: "Policy 025 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-026",
-    subjectType: "EVIDENCE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 026"]),
-    relianceEffectGuidance: "Policy 026 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-027",
-    subjectType: "AUTHORITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 027"]),
-    relianceEffectGuidance: "Policy 027 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-028",
-    subjectType: "CONTINUITY",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 028"]),
-    relianceEffectGuidance: "Policy 028 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-029",
-    subjectType: "GATE_RESULT",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 029"]),
-    relianceEffectGuidance: "Policy 029 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-030",
-    subjectType: "DETERMINATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 030"]),
-    relianceEffectGuidance: "Policy 030 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-031",
-    subjectType: "EXECUTION_RECEIPT",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 031"]),
-    relianceEffectGuidance: "Policy 031 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-032",
-    subjectType: "OUTCOME",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 032"]),
-    relianceEffectGuidance: "Policy 032 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-033",
-    subjectType: "INTEGRITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 033"]),
-    relianceEffectGuidance: "Policy 033 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-034",
-    subjectType: "VERIFICATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 034"]),
-    relianceEffectGuidance: "Policy 034 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-035",
-    subjectType: "DISCLOSURE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 035"]),
-    relianceEffectGuidance: "Policy 035 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-036",
-    subjectType: "REGISTRY_STATUS",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 036"]),
-    relianceEffectGuidance: "Policy 036 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-037",
-    subjectType: "CLAIM",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 037"]),
-    relianceEffectGuidance: "Policy 037 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-038",
-    subjectType: "EVIDENCE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 038"]),
-    relianceEffectGuidance: "Policy 038 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-039",
-    subjectType: "AUTHORITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 039"]),
-    relianceEffectGuidance: "Policy 039 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-040",
-    subjectType: "CONTINUITY",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 040"]),
-    relianceEffectGuidance: "Policy 040 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-041",
-    subjectType: "GATE_RESULT",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 041"]),
-    relianceEffectGuidance: "Policy 041 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-042",
-    subjectType: "DETERMINATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 042"]),
-    relianceEffectGuidance: "Policy 042 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-043",
-    subjectType: "EXECUTION_RECEIPT",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 043"]),
-    relianceEffectGuidance: "Policy 043 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-044",
-    subjectType: "OUTCOME",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 044"]),
-    relianceEffectGuidance: "Policy 044 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-045",
-    subjectType: "INTEGRITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 045"]),
-    relianceEffectGuidance: "Policy 045 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-046",
-    subjectType: "VERIFICATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 046"]),
-    relianceEffectGuidance: "Policy 046 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-047",
-    subjectType: "DISCLOSURE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 047"]),
-    relianceEffectGuidance: "Policy 047 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-048",
-    subjectType: "REGISTRY_STATUS",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 048"]),
-    relianceEffectGuidance: "Policy 048 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-049",
-    subjectType: "CLAIM",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 049"]),
-    relianceEffectGuidance: "Policy 049 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-050",
-    subjectType: "EVIDENCE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 050"]),
-    relianceEffectGuidance: "Policy 050 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-051",
-    subjectType: "AUTHORITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 051"]),
-    relianceEffectGuidance: "Policy 051 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-052",
-    subjectType: "CONTINUITY",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 052"]),
-    relianceEffectGuidance: "Policy 052 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-053",
-    subjectType: "GATE_RESULT",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 053"]),
-    relianceEffectGuidance: "Policy 053 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-054",
-    subjectType: "DETERMINATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 054"]),
-    relianceEffectGuidance: "Policy 054 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-055",
-    subjectType: "EXECUTION_RECEIPT",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 055"]),
-    relianceEffectGuidance: "Policy 055 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-056",
-    subjectType: "OUTCOME",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 056"]),
-    relianceEffectGuidance: "Policy 056 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-057",
-    subjectType: "INTEGRITY",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 057"]),
-    relianceEffectGuidance: "Policy 057 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-058",
-    subjectType: "VERIFICATION",
-    minimumReviewers: 2,
-    independentReviewRequired: true,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 058"]),
-    relianceEffectGuidance: "Policy 058 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-059",
-    subjectType: "DISCLOSURE",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 059"]),
-    relianceEffectGuidance: "Policy 059 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-  {
-    policyId: "CRP-060",
-    subjectType: "REGISTRY_STATUS",
-    minimumReviewers: 1,
-    independentReviewRequired: false,
-    permittedDispositions: Object.freeze(["UPHELD", "MODIFIED", "REVERSED", "CLOSED", "WITHDRAWN"] as const),
-    requiredEvidence: Object.freeze(["immutable original record", "bounded challenge statement", "counter-evidence integrity", "review finding 060"]),
-    relianceEffectGuidance: "Policy 060 requires prospective reliance to reflect the final disposition without rewriting the original event.",
-  },
-]);
+export interface OfflineVerificationChecklistItem {
+  checklistId: string;
+  sequence: number;
+  domain: IntegrityDomain;
+  required: boolean;
+  instruction: string;
+  failureMessage: string;
+}
 
-export function challengeResolutionPolicy(subjectType: ChallengeSubjectType): ChallengeResolutionPolicy[] {
-  return CHALLENGE_RESOLUTION_POLICIES.filter(entry => entry.subjectType === subjectType);
+export const INTEGRITY_COMPONENT_PROFILES: readonly IntegrityComponentProfile[] = [
+  { profileId: "ICP-001", kind: "CANONICAL_JSON", label: "Canonical Json profile 001", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 001.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-002", kind: "PUBLIC_PDF", label: "Public Pdf profile 002", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 002.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-003", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 003", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 003.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-004", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 004", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 004.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-005", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 005", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 005.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-006", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 006", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 006.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-007", kind: "REGISTRY_RECORD", label: "Registry Record profile 007", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 007.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-008", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 008", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 008.", failureEffect: "WARNING" },
+  { profileId: "ICP-009", kind: "VERIFICATION_REPORT", label: "Verification Report profile 009", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 009.", failureEffect: "WARNING" },
+  { profileId: "ICP-010", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 010", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 010.", failureEffect: "WARNING" },
+  { profileId: "ICP-011", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 011", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 011.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-012", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 012", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 012.", failureEffect: "WARNING" },
+  { profileId: "ICP-013", kind: "CORRECTION_RECORD", label: "Correction Record profile 013", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 013.", failureEffect: "WARNING" },
+  { profileId: "ICP-014", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 014", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 014.", failureEffect: "WARNING" },
+  { profileId: "ICP-015", kind: "OTHER", label: "Other profile 015", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 015.", failureEffect: "WARNING" },
+  { profileId: "ICP-016", kind: "CANONICAL_JSON", label: "Canonical Json profile 016", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 016.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-017", kind: "PUBLIC_PDF", label: "Public Pdf profile 017", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 017.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-018", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 018", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 018.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-019", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 019", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 019.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-020", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 020", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 020.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-021", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 021", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 021.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-022", kind: "REGISTRY_RECORD", label: "Registry Record profile 022", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 022.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-023", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 023", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 023.", failureEffect: "WARNING" },
+  { profileId: "ICP-024", kind: "VERIFICATION_REPORT", label: "Verification Report profile 024", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 024.", failureEffect: "WARNING" },
+  { profileId: "ICP-025", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 025", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 025.", failureEffect: "WARNING" },
+  { profileId: "ICP-026", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 026", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 026.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-027", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 027", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 027.", failureEffect: "WARNING" },
+  { profileId: "ICP-028", kind: "CORRECTION_RECORD", label: "Correction Record profile 028", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 028.", failureEffect: "WARNING" },
+  { profileId: "ICP-029", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 029", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 029.", failureEffect: "WARNING" },
+  { profileId: "ICP-030", kind: "OTHER", label: "Other profile 030", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 030.", failureEffect: "WARNING" },
+  { profileId: "ICP-031", kind: "CANONICAL_JSON", label: "Canonical Json profile 031", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 031.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-032", kind: "PUBLIC_PDF", label: "Public Pdf profile 032", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 032.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-033", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 033", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 033.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-034", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 034", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 034.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-035", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 035", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 035.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-036", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 036", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 036.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-037", kind: "REGISTRY_RECORD", label: "Registry Record profile 037", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 037.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-038", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 038", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 038.", failureEffect: "WARNING" },
+  { profileId: "ICP-039", kind: "VERIFICATION_REPORT", label: "Verification Report profile 039", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 039.", failureEffect: "WARNING" },
+  { profileId: "ICP-040", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 040", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 040.", failureEffect: "WARNING" },
+  { profileId: "ICP-041", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 041", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 041.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-042", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 042", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 042.", failureEffect: "WARNING" },
+  { profileId: "ICP-043", kind: "CORRECTION_RECORD", label: "Correction Record profile 043", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 043.", failureEffect: "WARNING" },
+  { profileId: "ICP-044", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 044", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 044.", failureEffect: "WARNING" },
+  { profileId: "ICP-045", kind: "OTHER", label: "Other profile 045", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 045.", failureEffect: "WARNING" },
+  { profileId: "ICP-046", kind: "CANONICAL_JSON", label: "Canonical Json profile 046", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 046.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-047", kind: "PUBLIC_PDF", label: "Public Pdf profile 047", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 047.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-048", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 048", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 048.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-049", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 049", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 049.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-050", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 050", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 050.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-051", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 051", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 051.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-052", kind: "REGISTRY_RECORD", label: "Registry Record profile 052", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 052.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-053", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 053", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 053.", failureEffect: "WARNING" },
+  { profileId: "ICP-054", kind: "VERIFICATION_REPORT", label: "Verification Report profile 054", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 054.", failureEffect: "WARNING" },
+  { profileId: "ICP-055", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 055", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 055.", failureEffect: "WARNING" },
+  { profileId: "ICP-056", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 056", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 056.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-057", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 057", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 057.", failureEffect: "WARNING" },
+  { profileId: "ICP-058", kind: "CORRECTION_RECORD", label: "Correction Record profile 058", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 058.", failureEffect: "WARNING" },
+  { profileId: "ICP-059", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 059", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 059.", failureEffect: "WARNING" },
+  { profileId: "ICP-060", kind: "OTHER", label: "Other profile 060", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 060.", failureEffect: "WARNING" },
+  { profileId: "ICP-061", kind: "CANONICAL_JSON", label: "Canonical Json profile 061", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 061.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-062", kind: "PUBLIC_PDF", label: "Public Pdf profile 062", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 062.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-063", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 063", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 063.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-064", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 064", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 064.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-065", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 065", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 065.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-066", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 066", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 066.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-067", kind: "REGISTRY_RECORD", label: "Registry Record profile 067", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 067.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-068", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 068", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 068.", failureEffect: "WARNING" },
+  { profileId: "ICP-069", kind: "VERIFICATION_REPORT", label: "Verification Report profile 069", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 069.", failureEffect: "WARNING" },
+  { profileId: "ICP-070", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 070", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 070.", failureEffect: "WARNING" },
+  { profileId: "ICP-071", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 071", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 071.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-072", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 072", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 072.", failureEffect: "WARNING" },
+  { profileId: "ICP-073", kind: "CORRECTION_RECORD", label: "Correction Record profile 073", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 073.", failureEffect: "WARNING" },
+  { profileId: "ICP-074", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 074", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 074.", failureEffect: "WARNING" },
+  { profileId: "ICP-075", kind: "OTHER", label: "Other profile 075", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 075.", failureEffect: "WARNING" },
+  { profileId: "ICP-076", kind: "CANONICAL_JSON", label: "Canonical Json profile 076", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 076.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-077", kind: "PUBLIC_PDF", label: "Public Pdf profile 077", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 077.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-078", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 078", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 078.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-079", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 079", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 079.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-080", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 080", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 080.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-081", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 081", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 081.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-082", kind: "REGISTRY_RECORD", label: "Registry Record profile 082", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 082.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-083", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 083", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 083.", failureEffect: "WARNING" },
+  { profileId: "ICP-084", kind: "VERIFICATION_REPORT", label: "Verification Report profile 084", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 084.", failureEffect: "WARNING" },
+  { profileId: "ICP-085", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 085", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 085.", failureEffect: "WARNING" },
+  { profileId: "ICP-086", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 086", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 086.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-087", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 087", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 087.", failureEffect: "WARNING" },
+  { profileId: "ICP-088", kind: "CORRECTION_RECORD", label: "Correction Record profile 088", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 088.", failureEffect: "WARNING" },
+  { profileId: "ICP-089", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 089", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 089.", failureEffect: "WARNING" },
+  { profileId: "ICP-090", kind: "OTHER", label: "Other profile 090", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 090.", failureEffect: "WARNING" },
+  { profileId: "ICP-091", kind: "CANONICAL_JSON", label: "Canonical Json profile 091", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 091.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-092", kind: "PUBLIC_PDF", label: "Public Pdf profile 092", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 092.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-093", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 093", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 093.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-094", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 094", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 094.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-095", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 095", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 095.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-096", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 096", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 096.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-097", kind: "REGISTRY_RECORD", label: "Registry Record profile 097", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 097.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-098", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 098", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 098.", failureEffect: "WARNING" },
+  { profileId: "ICP-099", kind: "VERIFICATION_REPORT", label: "Verification Report profile 099", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 099.", failureEffect: "WARNING" },
+  { profileId: "ICP-100", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 100", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 100.", failureEffect: "WARNING" },
+  { profileId: "ICP-101", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 101", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 101.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-102", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 102", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 102.", failureEffect: "WARNING" },
+  { profileId: "ICP-103", kind: "CORRECTION_RECORD", label: "Correction Record profile 103", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 103.", failureEffect: "WARNING" },
+  { profileId: "ICP-104", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 104", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 104.", failureEffect: "WARNING" },
+  { profileId: "ICP-105", kind: "OTHER", label: "Other profile 105", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 105.", failureEffect: "WARNING" },
+  { profileId: "ICP-106", kind: "CANONICAL_JSON", label: "Canonical Json profile 106", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify canonical json integrity condition 106.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-107", kind: "PUBLIC_PDF", label: "Public Pdf profile 107", mediaType: "application/pdf", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify public pdf integrity condition 107.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-108", kind: "INTEGRITY_MANIFEST", label: "Integrity Manifest profile 108", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify integrity manifest integrity condition 108.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-109", kind: "ROUTE_SNAPSHOT", label: "Route Snapshot profile 109", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify route snapshot integrity condition 109.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-110", kind: "EXECUTION_RECEIPT", label: "Execution Receipt profile 110", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify execution receipt integrity condition 110.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-111", kind: "OUTCOME_CLOSURE", label: "Outcome Closure profile 111", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify outcome closure integrity condition 111.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-112", kind: "REGISTRY_RECORD", label: "Registry Record profile 112", mediaType: "application/json", requiredForPublicReliance: true, requiredForProductionClaim: true, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify registry record integrity condition 112.", failureEffect: "BLOCK_RELIANCE" },
+  { profileId: "ICP-113", kind: "REGISTRY_CERTIFICATE", label: "Registry Certificate profile 113", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify registry certificate integrity condition 113.", failureEffect: "WARNING" },
+  { profileId: "ICP-114", kind: "VERIFICATION_REPORT", label: "Verification Report profile 114", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify verification report integrity condition 114.", failureEffect: "WARNING" },
+  { profileId: "ICP-115", kind: "DISCLOSURE_PROJECTION", label: "Disclosure Projection profile 115", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "SELECTIVE", verificationPurpose: "Preserve and verify disclosure projection integrity condition 115.", failureEffect: "WARNING" },
+  { profileId: "ICP-116", kind: "CLAIMS_BOUNDARY", label: "Claims Boundary profile 116", mediaType: "text/plain", requiredForPublicReliance: true, requiredForProductionClaim: false, defaultDisclosure: "PUBLIC", verificationPurpose: "Preserve and verify claims boundary integrity condition 116.", failureEffect: "BLOCK_PUBLICATION" },
+  { profileId: "ICP-117", kind: "CHALLENGE_RECORD", label: "Challenge Record profile 117", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify challenge record integrity condition 117.", failureEffect: "WARNING" },
+  { profileId: "ICP-118", kind: "CORRECTION_RECORD", label: "Correction Record profile 118", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify correction record integrity condition 118.", failureEffect: "WARNING" },
+  { profileId: "ICP-119", kind: "SIGNATURE_ENVELOPE", label: "Signature Envelope profile 119", mediaType: "application/json", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify signature envelope integrity condition 119.", failureEffect: "WARNING" },
+  { profileId: "ICP-120", kind: "OTHER", label: "Other profile 120", mediaType: "application/octet-stream", requiredForPublicReliance: false, requiredForProductionClaim: false, defaultDisclosure: "RESTRICTED", verificationPurpose: "Preserve and verify other integrity condition 120.", failureEffect: "WARNING" },
+] as const;
+
+export const INTEGRITY_LINEAGE_POLICIES: readonly IntegrityLineagePolicy[] = [
+  { policyId: "ILP-001", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 001; preserve the original digest and attributable transition." },
+  { policyId: "ILP-002", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 002; preserve the original digest and attributable transition." },
+  { policyId: "ILP-003", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 003; preserve the original digest and attributable transition." },
+  { policyId: "ILP-004", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 004; preserve the original digest and attributable transition." },
+  { policyId: "ILP-005", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 005; preserve the original digest and attributable transition." },
+  { policyId: "ILP-006", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 006; preserve the original digest and attributable transition." },
+  { policyId: "ILP-007", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 007; preserve the original digest and attributable transition." },
+  { policyId: "ILP-008", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 008; preserve the original digest and attributable transition." },
+  { policyId: "ILP-009", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 009; preserve the original digest and attributable transition." },
+  { policyId: "ILP-010", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 010; preserve the original digest and attributable transition." },
+  { policyId: "ILP-011", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 011; preserve the original digest and attributable transition." },
+  { policyId: "ILP-012", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 012; preserve the original digest and attributable transition." },
+  { policyId: "ILP-013", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 013; preserve the original digest and attributable transition." },
+  { policyId: "ILP-014", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 014; preserve the original digest and attributable transition." },
+  { policyId: "ILP-015", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 015; preserve the original digest and attributable transition." },
+  { policyId: "ILP-016", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 016; preserve the original digest and attributable transition." },
+  { policyId: "ILP-017", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 017; preserve the original digest and attributable transition." },
+  { policyId: "ILP-018", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 018; preserve the original digest and attributable transition." },
+  { policyId: "ILP-019", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 019; preserve the original digest and attributable transition." },
+  { policyId: "ILP-020", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 020; preserve the original digest and attributable transition." },
+  { policyId: "ILP-021", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 021; preserve the original digest and attributable transition." },
+  { policyId: "ILP-022", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 022; preserve the original digest and attributable transition." },
+  { policyId: "ILP-023", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 023; preserve the original digest and attributable transition." },
+  { policyId: "ILP-024", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 024; preserve the original digest and attributable transition." },
+  { policyId: "ILP-025", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 025; preserve the original digest and attributable transition." },
+  { policyId: "ILP-026", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 026; preserve the original digest and attributable transition." },
+  { policyId: "ILP-027", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 027; preserve the original digest and attributable transition." },
+  { policyId: "ILP-028", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 028; preserve the original digest and attributable transition." },
+  { policyId: "ILP-029", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 029; preserve the original digest and attributable transition." },
+  { policyId: "ILP-030", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 030; preserve the original digest and attributable transition." },
+  { policyId: "ILP-031", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 031; preserve the original digest and attributable transition." },
+  { policyId: "ILP-032", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 032; preserve the original digest and attributable transition." },
+  { policyId: "ILP-033", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 033; preserve the original digest and attributable transition." },
+  { policyId: "ILP-034", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 034; preserve the original digest and attributable transition." },
+  { policyId: "ILP-035", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 035; preserve the original digest and attributable transition." },
+  { policyId: "ILP-036", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 036; preserve the original digest and attributable transition." },
+  { policyId: "ILP-037", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 037; preserve the original digest and attributable transition." },
+  { policyId: "ILP-038", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 038; preserve the original digest and attributable transition." },
+  { policyId: "ILP-039", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 039; preserve the original digest and attributable transition." },
+  { policyId: "ILP-040", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 040; preserve the original digest and attributable transition." },
+  { policyId: "ILP-041", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 041; preserve the original digest and attributable transition." },
+  { policyId: "ILP-042", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 042; preserve the original digest and attributable transition." },
+  { policyId: "ILP-043", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 043; preserve the original digest and attributable transition." },
+  { policyId: "ILP-044", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 044; preserve the original digest and attributable transition." },
+  { policyId: "ILP-045", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 045; preserve the original digest and attributable transition." },
+  { policyId: "ILP-046", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 046; preserve the original digest and attributable transition." },
+  { policyId: "ILP-047", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 047; preserve the original digest and attributable transition." },
+  { policyId: "ILP-048", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 048; preserve the original digest and attributable transition." },
+  { policyId: "ILP-049", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 049; preserve the original digest and attributable transition." },
+  { policyId: "ILP-050", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 050; preserve the original digest and attributable transition." },
+  { policyId: "ILP-051", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 051; preserve the original digest and attributable transition." },
+  { policyId: "ILP-052", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 052; preserve the original digest and attributable transition." },
+  { policyId: "ILP-053", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 053; preserve the original digest and attributable transition." },
+  { policyId: "ILP-054", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 054; preserve the original digest and attributable transition." },
+  { policyId: "ILP-055", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 055; preserve the original digest and attributable transition." },
+  { policyId: "ILP-056", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 056; preserve the original digest and attributable transition." },
+  { policyId: "ILP-057", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 057; preserve the original digest and attributable transition." },
+  { policyId: "ILP-058", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 058; preserve the original digest and attributable transition." },
+  { policyId: "ILP-059", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 059; preserve the original digest and attributable transition." },
+  { policyId: "ILP-060", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 060; preserve the original digest and attributable transition." },
+  { policyId: "ILP-061", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 061; preserve the original digest and attributable transition." },
+  { policyId: "ILP-062", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 062; preserve the original digest and attributable transition." },
+  { policyId: "ILP-063", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 063; preserve the original digest and attributable transition." },
+  { policyId: "ILP-064", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 064; preserve the original digest and attributable transition." },
+  { policyId: "ILP-065", kind: "ORIGINAL", requiresParent: false, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only original lineage policy 065; preserve the original digest and attributable transition." },
+  { policyId: "ILP-066", kind: "AMENDMENT", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only amendment lineage policy 066; preserve the original digest and attributable transition." },
+  { policyId: "ILP-067", kind: "CORRECTION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "LIMITED", requirement: "Apply append-only correction lineage policy 067; preserve the original digest and attributable transition." },
+  { policyId: "ILP-068", kind: "SUPERSESSION", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUPERSEDED", requirement: "Apply append-only supersession lineage policy 068; preserve the original digest and attributable transition." },
+  { policyId: "ILP-069", kind: "WITHDRAWAL", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "ENDED", requirement: "Apply append-only withdrawal lineage policy 069; preserve the original digest and attributable transition." },
+  { policyId: "ILP-070", kind: "CHALLENGE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "SUSPENDED", requirement: "Apply append-only challenge lineage policy 070; preserve the original digest and attributable transition." },
+  { policyId: "ILP-071", kind: "VERIFICATION", requiresParent: true, requiresRegistryTransition: false, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only verification lineage policy 071; preserve the original digest and attributable transition." },
+  { policyId: "ILP-072", kind: "REGISTRY_UPDATE", requiresParent: true, requiresRegistryTransition: true, permitsCanonicalReplacement: false, prospectiveRelianceEffect: "UNCHANGED", requirement: "Apply append-only registry_update lineage policy 072; preserve the original digest and attributable transition." },
+] as const;
+
+export const OFFLINE_VERIFICATION_CHECKLIST: readonly OfflineVerificationChecklistItem[] = [
+  { checklistId: "OVC-001", sequence: 1, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 001 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 001 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-002", sequence: 2, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 002 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 002 did not establish the required component integrity condition." },
+  { checklistId: "OVC-003", sequence: 3, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 003 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 003 did not establish the required package integrity condition." },
+  { checklistId: "OVC-004", sequence: 4, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 004 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 004 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-005", sequence: 5, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 005 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 005 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-006", sequence: 6, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 006 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 006 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-007", sequence: 7, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 007 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 007 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-008", sequence: 8, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 008 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 008 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-009", sequence: 9, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 009 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 009 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-010", sequence: 10, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 010 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 010 did not establish the required component integrity condition." },
+  { checklistId: "OVC-011", sequence: 11, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 011 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 011 did not establish the required package integrity condition." },
+  { checklistId: "OVC-012", sequence: 12, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 012 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 012 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-013", sequence: 13, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 013 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 013 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-014", sequence: 14, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 014 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 014 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-015", sequence: 15, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 015 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 015 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-016", sequence: 16, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 016 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 016 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-017", sequence: 17, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 017 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 017 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-018", sequence: 18, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 018 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 018 did not establish the required component integrity condition." },
+  { checklistId: "OVC-019", sequence: 19, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 019 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 019 did not establish the required package integrity condition." },
+  { checklistId: "OVC-020", sequence: 20, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 020 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 020 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-021", sequence: 21, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 021 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 021 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-022", sequence: 22, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 022 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 022 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-023", sequence: 23, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 023 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 023 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-024", sequence: 24, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 024 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 024 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-025", sequence: 25, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 025 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 025 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-026", sequence: 26, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 026 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 026 did not establish the required component integrity condition." },
+  { checklistId: "OVC-027", sequence: 27, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 027 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 027 did not establish the required package integrity condition." },
+  { checklistId: "OVC-028", sequence: 28, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 028 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 028 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-029", sequence: 29, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 029 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 029 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-030", sequence: 30, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 030 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 030 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-031", sequence: 31, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 031 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 031 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-032", sequence: 32, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 032 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 032 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-033", sequence: 33, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 033 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 033 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-034", sequence: 34, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 034 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 034 did not establish the required component integrity condition." },
+  { checklistId: "OVC-035", sequence: 35, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 035 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 035 did not establish the required package integrity condition." },
+  { checklistId: "OVC-036", sequence: 36, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 036 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 036 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-037", sequence: 37, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 037 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 037 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-038", sequence: 38, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 038 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 038 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-039", sequence: 39, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 039 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 039 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-040", sequence: 40, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 040 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 040 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-041", sequence: 41, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 041 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 041 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-042", sequence: 42, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 042 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 042 did not establish the required component integrity condition." },
+  { checklistId: "OVC-043", sequence: 43, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 043 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 043 did not establish the required package integrity condition." },
+  { checklistId: "OVC-044", sequence: 44, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 044 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 044 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-045", sequence: 45, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 045 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 045 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-046", sequence: 46, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 046 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 046 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-047", sequence: 47, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 047 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 047 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-048", sequence: 48, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 048 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 048 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-049", sequence: 49, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 049 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 049 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-050", sequence: 50, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 050 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 050 did not establish the required component integrity condition." },
+  { checklistId: "OVC-051", sequence: 51, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 051 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 051 did not establish the required package integrity condition." },
+  { checklistId: "OVC-052", sequence: 52, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 052 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 052 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-053", sequence: 53, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 053 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 053 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-054", sequence: 54, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 054 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 054 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-055", sequence: 55, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 055 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 055 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-056", sequence: 56, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 056 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 056 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-057", sequence: 57, domain: "CANONICAL", required: true, instruction: "Perform offline canonical verification step 057 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 057 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-058", sequence: 58, domain: "COMPONENT", required: true, instruction: "Perform offline component verification step 058 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 058 did not establish the required component integrity condition." },
+  { checklistId: "OVC-059", sequence: 59, domain: "PACKAGE", required: true, instruction: "Perform offline package verification step 059 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 059 did not establish the required package integrity condition." },
+  { checklistId: "OVC-060", sequence: 60, domain: "MANIFEST", required: true, instruction: "Perform offline manifest verification step 060 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 060 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-061", sequence: 61, domain: "LINEAGE", required: true, instruction: "Perform offline lineage verification step 061 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 061 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-062", sequence: 62, domain: "AUDIT", required: true, instruction: "Perform offline audit verification step 062 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 062 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-063", sequence: 63, domain: "OFFLINE", required: true, instruction: "Perform offline offline verification step 063 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 063 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-064", sequence: 64, domain: "PUBLICATION", required: true, instruction: "Perform offline publication verification step 064 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 064 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-065", sequence: 65, domain: "CANONICAL", required: false, instruction: "Perform offline canonical verification step 065 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 065 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-066", sequence: 66, domain: "COMPONENT", required: false, instruction: "Perform offline component verification step 066 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 066 did not establish the required component integrity condition." },
+  { checklistId: "OVC-067", sequence: 67, domain: "PACKAGE", required: false, instruction: "Perform offline package verification step 067 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 067 did not establish the required package integrity condition." },
+  { checklistId: "OVC-068", sequence: 68, domain: "MANIFEST", required: false, instruction: "Perform offline manifest verification step 068 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 068 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-069", sequence: 69, domain: "LINEAGE", required: false, instruction: "Perform offline lineage verification step 069 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 069 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-070", sequence: 70, domain: "AUDIT", required: false, instruction: "Perform offline audit verification step 070 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 070 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-071", sequence: 71, domain: "OFFLINE", required: false, instruction: "Perform offline offline verification step 071 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 071 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-072", sequence: 72, domain: "PUBLICATION", required: false, instruction: "Perform offline publication verification step 072 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 072 did not establish the required publication integrity condition." },
+  { checklistId: "OVC-073", sequence: 73, domain: "CANONICAL", required: false, instruction: "Perform offline canonical verification step 073 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 073 did not establish the required canonical integrity condition." },
+  { checklistId: "OVC-074", sequence: 74, domain: "COMPONENT", required: false, instruction: "Perform offline component verification step 074 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 074 did not establish the required component integrity condition." },
+  { checklistId: "OVC-075", sequence: 75, domain: "PACKAGE", required: false, instruction: "Perform offline package verification step 075 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 075 did not establish the required package integrity condition." },
+  { checklistId: "OVC-076", sequence: 76, domain: "MANIFEST", required: false, instruction: "Perform offline manifest verification step 076 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 076 did not establish the required manifest integrity condition." },
+  { checklistId: "OVC-077", sequence: 77, domain: "LINEAGE", required: false, instruction: "Perform offline lineage verification step 077 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 077 did not establish the required lineage integrity condition." },
+  { checklistId: "OVC-078", sequence: 78, domain: "AUDIT", required: false, instruction: "Perform offline audit verification step 078 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 078 did not establish the required audit integrity condition." },
+  { checklistId: "OVC-079", sequence: 79, domain: "OFFLINE", required: false, instruction: "Perform offline offline verification step 079 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 079 did not establish the required offline integrity condition." },
+  { checklistId: "OVC-080", sequence: 80, domain: "PUBLICATION", required: false, instruction: "Perform offline publication verification step 080 using the published canonicalization and SHA-256 rules.", failureMessage: "Offline verification step 080 did not establish the required publication integrity condition." },
+] as const;
+
+
+export function componentProfilesForKind(kind: IntegrityComponentKind): readonly IntegrityComponentProfile[] {
+  return INTEGRITY_COMPONENT_PROFILES.filter((profile) => profile.kind === kind);
+}
+
+export function requiredComponentKindsForPublicReliance(): readonly IntegrityComponentKind[] {
+  return Array.from(new Set(
+    INTEGRITY_COMPONENT_PROFILES
+      .filter((profile) => profile.requiredForPublicReliance)
+      .map((profile) => profile.kind),
+  ));
+}
+
+export function requiredComponentKindsForProductionClaim(): readonly IntegrityComponentKind[] {
+  return Array.from(new Set(
+    INTEGRITY_COMPONENT_PROFILES
+      .filter((profile) => profile.requiredForProductionClaim)
+      .map((profile) => profile.kind),
+  ));
+}
+
+export function lineagePoliciesForKind(kind: IntegrityLineageLink["kind"]): readonly IntegrityLineagePolicy[] {
+  return INTEGRITY_LINEAGE_POLICIES.filter((policy) => policy.kind === kind);
+}
+
+export function validateRequiredComponentCoverage(
+  components: readonly IntegrityComponentDigest[],
+  mode: "PUBLIC_RELIANCE" | "PRODUCTION_CLAIM",
+): IntegrityIssue[] {
+  const available = new Set(components.map((component) => component.kind));
+  const required = mode === "PUBLIC_RELIANCE"
+    ? requiredComponentKindsForPublicReliance()
+    : requiredComponentKindsForProductionClaim();
+  return required
+    .filter((kind) => !available.has(kind))
+    .map((kind) => issue(
+      "OFFLINE_BUNDLE_INCOMPLETE",
+      `Required ${kind} component is missing for ${mode}.`,
+      { path: `components.${kind}` },
+    ));
+}
+
+export function evaluateOfflineChecklist(
+  completedIds: readonly string[],
+): { passed: boolean; missingRequired: readonly OfflineVerificationChecklistItem[]; completedCount: number } {
+  const completed = new Set(completedIds);
+  const missingRequired = OFFLINE_VERIFICATION_CHECKLIST.filter(
+    (item) => item.required && !completed.has(item.checklistId),
+  );
+  return {
+    passed: missingRequired.length === 0,
+    missingRequired,
+    completedCount: OFFLINE_VERIFICATION_CHECKLIST.filter((item) => completed.has(item.checklistId)).length,
+  };
+}
+
+export function buildIntegritySummary(manifest: IntegrityManifest): {
+  artifactId: string;
+  registryId?: string;
+  componentCount: number;
+  requiredComponentCount: number;
+  publicComponentCount: number;
+  packageRootHash: string;
+  canonicalHash: string;
+  manifestHash: string;
+  lineageDepth: number;
+  auditDepth: number;
+} {
+  return {
+    artifactId: manifest.artifactId,
+    registryId: manifest.registryId,
+    componentCount: manifest.components.length,
+    requiredComponentCount: manifest.components.filter((component) => component.required).length,
+    publicComponentCount: manifest.components.filter((component) => component.disclosure === "PUBLIC").length,
+    packageRootHash: manifest.packageRootHash,
+    canonicalHash: manifest.canonicalHash,
+    manifestHash: manifest.manifestHash,
+    lineageDepth: manifest.lineage.length,
+    auditDepth: manifest.auditEvents.length,
+  };
+}
+
+export function compareIntegrityManifests(
+  left: IntegrityManifest,
+  right: IntegrityManifest,
+): {
+  sameArtifact: boolean;
+  sameCanonicalRecord: boolean;
+  samePackageRoot: boolean;
+  sameManifest: boolean;
+  addedComponents: readonly string[];
+  removedComponents: readonly string[];
+  changedComponents: readonly string[];
+} {
+  const leftById = new Map(left.components.map((component) => [component.componentId, component]));
+  const rightById = new Map(right.components.map((component) => [component.componentId, component]));
+  const addedComponents = right.components
+    .filter((component) => !leftById.has(component.componentId))
+    .map((component) => component.componentId);
+  const removedComponents = left.components
+    .filter((component) => !rightById.has(component.componentId))
+    .map((component) => component.componentId);
+  const changedComponents = right.components
+    .filter((component) => {
+      const previous = leftById.get(component.componentId);
+      return previous !== undefined && (
+        previous.hash !== component.hash ||
+        previous.byteLength !== component.byteLength ||
+        previous.mediaType !== component.mediaType ||
+        previous.kind !== component.kind
+      );
+    })
+    .map((component) => component.componentId);
+  return {
+    sameArtifact: left.artifactId === right.artifactId,
+    sameCanonicalRecord: constantTimeHexEqual(left.canonicalHash, right.canonicalHash),
+    samePackageRoot: constantTimeHexEqual(left.packageRootHash, right.packageRootHash),
+    sameManifest: constantTimeHexEqual(left.manifestHash, right.manifestHash),
+    addedComponents,
+    removedComponents,
+    changedComponents,
+  };
+}
+
+export function integrityReasonDefinition(code: IntegrityReasonCode): IntegrityReasonDefinition {
+  const definition = INTEGRITY_REASON_DEFINITIONS.find((item) => item.code === code);
+  if (!definition) throw new Error(`Unknown integrity reason code: ${code}`);
+  return definition;
+}
+
+export function integrityControlsByDomain(domain: IntegrityDomain): readonly IntegrityControlDefinition[] {
+  return INTEGRITY_CONTROLS.filter((control) => control.domain === domain);
+}
+
+export function integrityAcceptanceTestsByPrefix(prefix: string): readonly IntegrityAcceptanceTest[] {
+  return INTEGRITY_ACCEPTANCE_TESTS.filter((test) => test.testId.startsWith(prefix));
 }
 
 
-export const CHALLENGE_CORRECTION_ENGINE_SELF_TESTS = Object.freeze([
-  "Open a challenge against a published artifact and confirm the original hashes remain unchanged.",
-  "Reject a challenge whose target registry hash differs from the published record.",
-  "Append counter-evidence and verify custody and integrity commitments.",
-  "Resolve UPHELD without creating a correction package.",
-  "Resolve MODIFIED only with a bounded correction package.",
-  "Resolve REVERSED with a prospective reliance restriction, withdrawal, or supersession.",
-  "Verify that every challenge audit event forms one continuous hash chain.",
-  "Verify that public registry state exposes CHALLENGED and CORRECTED conditions.",
-]);
-
-export function engineStackFingerprint(record: ArtifactRegistryRecord, artifact: CanonicalExecutionArtifact): string {
-  return digest("challenge-engine-stack", { registry: stableRegistryRecordJson(record), validation: stableValidationJson(validateCanonicalExecutionArtifact(artifact, { intendedUse: "VERIFICATION", strict: true })), engineVersion: TA14_CHALLENGE_CORRECTION_ENGINE_VERSION, policyVersion: TA14_CHALLENGE_CORRECTION_POLICY_VERSION });
+export interface IntegrityScenarioDefinition {
+  scenarioId: string;
+  title: string;
+  domain: IntegrityDomain;
+  mutation: string;
+  expectedReasonCode: IntegrityReasonCode;
+  expectedDisposition: IntegrityDisposition;
+  institutionalMeaning: string;
 }
+
+export const INTEGRITY_SCENARIO_CATALOG: readonly IntegrityScenarioDefinition[] = [
+  { scenarioId: "IHS-001", title: "Integrity mutation scenario 001", domain: "CANONICAL", mutation: "Apply bounded mutation 001 to the canonical representation and recalculate the package.", expectedReasonCode: "CANONICAL_INPUT_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 001 cannot change silently after commitment." },
+  { scenarioId: "IHS-002", title: "Integrity mutation scenario 002", domain: "COMPONENT", mutation: "Apply bounded mutation 002 to the component representation and recalculate the package.", expectedReasonCode: "CANONICAL_SERIALIZATION_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 002 cannot change silently after commitment." },
+  { scenarioId: "IHS-003", title: "Integrity mutation scenario 003", domain: "PACKAGE", mutation: "Apply bounded mutation 003 to the package representation and recalculate the package.", expectedReasonCode: "CANONICAL_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 003 cannot change silently after commitment." },
+  { scenarioId: "IHS-004", title: "Integrity mutation scenario 004", domain: "MANIFEST", mutation: "Apply bounded mutation 004 to the manifest representation and recalculate the package.", expectedReasonCode: "CANONICAL_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 004 cannot change silently after commitment." },
+  { scenarioId: "IHS-005", title: "Integrity mutation scenario 005", domain: "LINEAGE", mutation: "Apply bounded mutation 005 to the lineage representation and recalculate the package.", expectedReasonCode: "COMPONENT_ID_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 005 cannot change silently after commitment." },
+  { scenarioId: "IHS-006", title: "Integrity mutation scenario 006", domain: "AUDIT", mutation: "Apply bounded mutation 006 to the audit representation and recalculate the package.", expectedReasonCode: "COMPONENT_DUPLICATE_ID", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 006 cannot change silently after commitment." },
+  { scenarioId: "IHS-007", title: "Integrity mutation scenario 007", domain: "OFFLINE", mutation: "Apply bounded mutation 007 to the offline representation and recalculate the package.", expectedReasonCode: "COMPONENT_BYTES_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 007 cannot change silently after commitment." },
+  { scenarioId: "IHS-008", title: "Integrity mutation scenario 008", domain: "PUBLICATION", mutation: "Apply bounded mutation 008 to the publication representation and recalculate the package.", expectedReasonCode: "COMPONENT_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 008 cannot change silently after commitment." },
+  { scenarioId: "IHS-009", title: "Integrity mutation scenario 009", domain: "CANONICAL", mutation: "Apply bounded mutation 009 to the canonical representation and recalculate the package.", expectedReasonCode: "COMPONENT_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 009 cannot change silently after commitment." },
+  { scenarioId: "IHS-010", title: "Integrity mutation scenario 010", domain: "COMPONENT", mutation: "Apply bounded mutation 010 to the component representation and recalculate the package.", expectedReasonCode: "COMPONENT_MEDIA_TYPE_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 010 cannot change silently after commitment." },
+  { scenarioId: "IHS-011", title: "Integrity mutation scenario 011", domain: "PACKAGE", mutation: "Apply bounded mutation 011 to the package representation and recalculate the package.", expectedReasonCode: "PACKAGE_ROOT_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 011 cannot change silently after commitment." },
+  { scenarioId: "IHS-012", title: "Integrity mutation scenario 012", domain: "MANIFEST", mutation: "Apply bounded mutation 012 to the manifest representation and recalculate the package.", expectedReasonCode: "PACKAGE_ROOT_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 012 cannot change silently after commitment." },
+  { scenarioId: "IHS-013", title: "Integrity mutation scenario 013", domain: "LINEAGE", mutation: "Apply bounded mutation 013 to the lineage representation and recalculate the package.", expectedReasonCode: "PACKAGE_COMPONENT_COUNT_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 013 cannot change silently after commitment." },
+  { scenarioId: "IHS-014", title: "Integrity mutation scenario 014", domain: "AUDIT", mutation: "Apply bounded mutation 014 to the audit representation and recalculate the package.", expectedReasonCode: "PACKAGE_ORDER_NONDETERMINISTIC", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 014 cannot change silently after commitment." },
+  { scenarioId: "IHS-015", title: "Integrity mutation scenario 015", domain: "OFFLINE", mutation: "Apply bounded mutation 015 to the offline representation and recalculate the package.", expectedReasonCode: "MANIFEST_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 015 cannot change silently after commitment." },
+  { scenarioId: "IHS-016", title: "Integrity mutation scenario 016", domain: "PUBLICATION", mutation: "Apply bounded mutation 016 to the publication representation and recalculate the package.", expectedReasonCode: "MANIFEST_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 016 cannot change silently after commitment." },
+  { scenarioId: "IHS-017", title: "Integrity mutation scenario 017", domain: "CANONICAL", mutation: "Apply bounded mutation 017 to the canonical representation and recalculate the package.", expectedReasonCode: "MANIFEST_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 017 cannot change silently after commitment." },
+  { scenarioId: "IHS-018", title: "Integrity mutation scenario 018", domain: "COMPONENT", mutation: "Apply bounded mutation 018 to the component representation and recalculate the package.", expectedReasonCode: "MANIFEST_VERSION_UNSUPPORTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 018 cannot change silently after commitment." },
+  { scenarioId: "IHS-019", title: "Integrity mutation scenario 019", domain: "PACKAGE", mutation: "Apply bounded mutation 019 to the package representation and recalculate the package.", expectedReasonCode: "PDF_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 019 cannot change silently after commitment." },
+  { scenarioId: "IHS-020", title: "Integrity mutation scenario 020", domain: "MANIFEST", mutation: "Apply bounded mutation 020 to the manifest representation and recalculate the package.", expectedReasonCode: "PDF_HASH_MISMATCH", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 020 cannot change silently after commitment." },
+  { scenarioId: "IHS-021", title: "Integrity mutation scenario 021", domain: "LINEAGE", mutation: "Apply bounded mutation 021 to the lineage representation and recalculate the package.", expectedReasonCode: "JSON_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 021 cannot change silently after commitment." },
+  { scenarioId: "IHS-022", title: "Integrity mutation scenario 022", domain: "AUDIT", mutation: "Apply bounded mutation 022 to the audit representation and recalculate the package.", expectedReasonCode: "JSON_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 022 cannot change silently after commitment." },
+  { scenarioId: "IHS-023", title: "Integrity mutation scenario 023", domain: "OFFLINE", mutation: "Apply bounded mutation 023 to the offline representation and recalculate the package.", expectedReasonCode: "RECEIPT_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 023 cannot change silently after commitment." },
+  { scenarioId: "IHS-024", title: "Integrity mutation scenario 024", domain: "PUBLICATION", mutation: "Apply bounded mutation 024 to the publication representation and recalculate the package.", expectedReasonCode: "RECEIPT_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 024 cannot change silently after commitment." },
+  { scenarioId: "IHS-025", title: "Integrity mutation scenario 025", domain: "CANONICAL", mutation: "Apply bounded mutation 025 to the canonical representation and recalculate the package.", expectedReasonCode: "ROUTE_HASH_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 025 cannot change silently after commitment." },
+  { scenarioId: "IHS-026", title: "Integrity mutation scenario 026", domain: "COMPONENT", mutation: "Apply bounded mutation 026 to the component representation and recalculate the package.", expectedReasonCode: "ROUTE_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 026 cannot change silently after commitment." },
+  { scenarioId: "IHS-027", title: "Integrity mutation scenario 027", domain: "PACKAGE", mutation: "Apply bounded mutation 027 to the package representation and recalculate the package.", expectedReasonCode: "OUTCOME_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 027 cannot change silently after commitment." },
+  { scenarioId: "IHS-028", title: "Integrity mutation scenario 028", domain: "MANIFEST", mutation: "Apply bounded mutation 028 to the manifest representation and recalculate the package.", expectedReasonCode: "OUTCOME_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 028 cannot change silently after commitment." },
+  { scenarioId: "IHS-029", title: "Integrity mutation scenario 029", domain: "LINEAGE", mutation: "Apply bounded mutation 029 to the lineage representation and recalculate the package.", expectedReasonCode: "REGISTRY_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 029 cannot change silently after commitment." },
+  { scenarioId: "IHS-030", title: "Integrity mutation scenario 030", domain: "AUDIT", mutation: "Apply bounded mutation 030 to the audit representation and recalculate the package.", expectedReasonCode: "REGISTRY_HASH_MISMATCH", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 030 cannot change silently after commitment." },
+  { scenarioId: "IHS-031", title: "Integrity mutation scenario 031", domain: "OFFLINE", mutation: "Apply bounded mutation 031 to the offline representation and recalculate the package.", expectedReasonCode: "VERIFICATION_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 031 cannot change silently after commitment." },
+  { scenarioId: "IHS-032", title: "Integrity mutation scenario 032", domain: "PUBLICATION", mutation: "Apply bounded mutation 032 to the publication representation and recalculate the package.", expectedReasonCode: "VERIFICATION_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 032 cannot change silently after commitment." },
+  { scenarioId: "IHS-033", title: "Integrity mutation scenario 033", domain: "CANONICAL", mutation: "Apply bounded mutation 033 to the canonical representation and recalculate the package.", expectedReasonCode: "CHALLENGE_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 033 cannot change silently after commitment." },
+  { scenarioId: "IHS-034", title: "Integrity mutation scenario 034", domain: "COMPONENT", mutation: "Apply bounded mutation 034 to the component representation and recalculate the package.", expectedReasonCode: "CHALLENGE_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 034 cannot change silently after commitment." },
+  { scenarioId: "IHS-035", title: "Integrity mutation scenario 035", domain: "PACKAGE", mutation: "Apply bounded mutation 035 to the package representation and recalculate the package.", expectedReasonCode: "AMENDMENT_PARENT_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 035 cannot change silently after commitment." },
+  { scenarioId: "IHS-036", title: "Integrity mutation scenario 036", domain: "MANIFEST", mutation: "Apply bounded mutation 036 to the manifest representation and recalculate the package.", expectedReasonCode: "AMENDMENT_PARENT_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 036 cannot change silently after commitment." },
+  { scenarioId: "IHS-037", title: "Integrity mutation scenario 037", domain: "LINEAGE", mutation: "Apply bounded mutation 037 to the lineage representation and recalculate the package.", expectedReasonCode: "AMENDMENT_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 037 cannot change silently after commitment." },
+  { scenarioId: "IHS-038", title: "Integrity mutation scenario 038", domain: "AUDIT", mutation: "Apply bounded mutation 038 to the audit representation and recalculate the package.", expectedReasonCode: "AMENDMENT_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 038 cannot change silently after commitment." },
+  { scenarioId: "IHS-039", title: "Integrity mutation scenario 039", domain: "OFFLINE", mutation: "Apply bounded mutation 039 to the offline representation and recalculate the package.", expectedReasonCode: "SUPERSESSION_PARENT_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 039 cannot change silently after commitment." },
+  { scenarioId: "IHS-040", title: "Integrity mutation scenario 040", domain: "PUBLICATION", mutation: "Apply bounded mutation 040 to the publication representation and recalculate the package.", expectedReasonCode: "SUPERSESSION_CHAIN_BROKEN", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 040 cannot change silently after commitment." },
+  { scenarioId: "IHS-041", title: "Integrity mutation scenario 041", domain: "CANONICAL", mutation: "Apply bounded mutation 041 to the canonical representation and recalculate the package.", expectedReasonCode: "AUDIT_EVENT_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 041 cannot change silently after commitment." },
+  { scenarioId: "IHS-042", title: "Integrity mutation scenario 042", domain: "COMPONENT", mutation: "Apply bounded mutation 042 to the component representation and recalculate the package.", expectedReasonCode: "AUDIT_EVENT_PREVIOUS_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 042 cannot change silently after commitment." },
+  { scenarioId: "IHS-043", title: "Integrity mutation scenario 043", domain: "PACKAGE", mutation: "Apply bounded mutation 043 to the package representation and recalculate the package.", expectedReasonCode: "AUDIT_EVENT_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 043 cannot change silently after commitment." },
+  { scenarioId: "IHS-044", title: "Integrity mutation scenario 044", domain: "MANIFEST", mutation: "Apply bounded mutation 044 to the manifest representation and recalculate the package.", expectedReasonCode: "AUDIT_SEQUENCE_INVALID", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 044 cannot change silently after commitment." },
+  { scenarioId: "IHS-045", title: "Integrity mutation scenario 045", domain: "LINEAGE", mutation: "Apply bounded mutation 045 to the lineage representation and recalculate the package.", expectedReasonCode: "CANONICALIZATION_VERSION_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 045 cannot change silently after commitment." },
+  { scenarioId: "IHS-046", title: "Integrity mutation scenario 046", domain: "AUDIT", mutation: "Apply bounded mutation 046 to the audit representation and recalculate the package.", expectedReasonCode: "CANONICALIZATION_VERSION_UNSUPPORTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 046 cannot change silently after commitment." },
+  { scenarioId: "IHS-047", title: "Integrity mutation scenario 047", domain: "OFFLINE", mutation: "Apply bounded mutation 047 to the offline representation and recalculate the package.", expectedReasonCode: "HASH_ALGORITHM_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 047 cannot change silently after commitment." },
+  { scenarioId: "IHS-048", title: "Integrity mutation scenario 048", domain: "PUBLICATION", mutation: "Apply bounded mutation 048 to the publication representation and recalculate the package.", expectedReasonCode: "HASH_ALGORITHM_UNSUPPORTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 048 cannot change silently after commitment." },
+  { scenarioId: "IHS-049", title: "Integrity mutation scenario 049", domain: "CANONICAL", mutation: "Apply bounded mutation 049 to the canonical representation and recalculate the package.", expectedReasonCode: "HASH_FORMAT_INVALID", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 049 cannot change silently after commitment." },
+  { scenarioId: "IHS-050", title: "Integrity mutation scenario 050", domain: "COMPONENT", mutation: "Apply bounded mutation 050 to the component representation and recalculate the package.", expectedReasonCode: "BYTE_LENGTH_MISMATCH", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 050 cannot change silently after commitment." },
+  { scenarioId: "IHS-051", title: "Integrity mutation scenario 051", domain: "PACKAGE", mutation: "Apply bounded mutation 051 to the package representation and recalculate the package.", expectedReasonCode: "TEXT_ENCODING_UNSUPPORTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 051 cannot change silently after commitment." },
+  { scenarioId: "IHS-052", title: "Integrity mutation scenario 052", domain: "MANIFEST", mutation: "Apply bounded mutation 052 to the manifest representation and recalculate the package.", expectedReasonCode: "DATE_NORMALIZATION_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 052 cannot change silently after commitment." },
+  { scenarioId: "IHS-053", title: "Integrity mutation scenario 053", domain: "LINEAGE", mutation: "Apply bounded mutation 053 to the lineage representation and recalculate the package.", expectedReasonCode: "NONFINITE_NUMBER_REJECTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 053 cannot change silently after commitment." },
+  { scenarioId: "IHS-054", title: "Integrity mutation scenario 054", domain: "AUDIT", mutation: "Apply bounded mutation 054 to the audit representation and recalculate the package.", expectedReasonCode: "UNDEFINED_VALUE_REJECTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 054 cannot change silently after commitment." },
+  { scenarioId: "IHS-055", title: "Integrity mutation scenario 055", domain: "OFFLINE", mutation: "Apply bounded mutation 055 to the offline representation and recalculate the package.", expectedReasonCode: "SYMBOL_VALUE_REJECTED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 055 cannot change silently after commitment." },
+  { scenarioId: "IHS-056", title: "Integrity mutation scenario 056", domain: "PUBLICATION", mutation: "Apply bounded mutation 056 to the publication representation and recalculate the package.", expectedReasonCode: "FUNCTION_VALUE_REJECTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 056 cannot change silently after commitment." },
+  { scenarioId: "IHS-057", title: "Integrity mutation scenario 057", domain: "CANONICAL", mutation: "Apply bounded mutation 057 to the canonical representation and recalculate the package.", expectedReasonCode: "BIGINT_NORMALIZED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 057 cannot change silently after commitment." },
+  { scenarioId: "IHS-058", title: "Integrity mutation scenario 058", domain: "COMPONENT", mutation: "Apply bounded mutation 058 to the component representation and recalculate the package.", expectedReasonCode: "CIRCULAR_REFERENCE_REJECTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 058 cannot change silently after commitment." },
+  { scenarioId: "IHS-059", title: "Integrity mutation scenario 059", domain: "PACKAGE", mutation: "Apply bounded mutation 059 to the package representation and recalculate the package.", expectedReasonCode: "MAP_KEY_UNSUPPORTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 059 cannot change silently after commitment." },
+  { scenarioId: "IHS-060", title: "Integrity mutation scenario 060", domain: "MANIFEST", mutation: "Apply bounded mutation 060 to the manifest representation and recalculate the package.", expectedReasonCode: "SET_ORDER_NORMALIZED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 060 cannot change silently after commitment." },
+  { scenarioId: "IHS-061", title: "Integrity mutation scenario 061", domain: "LINEAGE", mutation: "Apply bounded mutation 061 to the lineage representation and recalculate the package.", expectedReasonCode: "OFFLINE_BUNDLE_INCOMPLETE", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 061 cannot change silently after commitment." },
+  { scenarioId: "IHS-062", title: "Integrity mutation scenario 062", domain: "AUDIT", mutation: "Apply bounded mutation 062 to the audit representation and recalculate the package.", expectedReasonCode: "OFFLINE_INSTRUCTIONS_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 062 cannot change silently after commitment." },
+  { scenarioId: "IHS-063", title: "Integrity mutation scenario 063", domain: "OFFLINE", mutation: "Apply bounded mutation 063 to the offline representation and recalculate the package.", expectedReasonCode: "SIGNATURE_REFERENCE_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 063 cannot change silently after commitment." },
+  { scenarioId: "IHS-064", title: "Integrity mutation scenario 064", domain: "PUBLICATION", mutation: "Apply bounded mutation 064 to the publication representation and recalculate the package.", expectedReasonCode: "SIGNATURE_DIGEST_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 064 cannot change silently after commitment." },
+  { scenarioId: "IHS-065", title: "Integrity mutation scenario 065", domain: "CANONICAL", mutation: "Apply bounded mutation 065 to the canonical representation and recalculate the package.", expectedReasonCode: "TIMESTAMP_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 065 cannot change silently after commitment." },
+  { scenarioId: "IHS-066", title: "Integrity mutation scenario 066", domain: "COMPONENT", mutation: "Apply bounded mutation 066 to the component representation and recalculate the package.", expectedReasonCode: "TIMESTAMP_ORDER_INVALID", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 066 cannot change silently after commitment." },
+  { scenarioId: "IHS-067", title: "Integrity mutation scenario 067", domain: "PACKAGE", mutation: "Apply bounded mutation 067 to the package representation and recalculate the package.", expectedReasonCode: "ENGINE_VERSION_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 067 cannot change silently after commitment." },
+  { scenarioId: "IHS-068", title: "Integrity mutation scenario 068", domain: "MANIFEST", mutation: "Apply bounded mutation 068 to the manifest representation and recalculate the package.", expectedReasonCode: "ENGINE_VERSION_UNSUPPORTED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 068 cannot change silently after commitment." },
+  { scenarioId: "IHS-069", title: "Integrity mutation scenario 069", domain: "LINEAGE", mutation: "Apply bounded mutation 069 to the lineage representation and recalculate the package.", expectedReasonCode: "POLICY_VERSION_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 069 cannot change silently after commitment." },
+  { scenarioId: "IHS-070", title: "Integrity mutation scenario 070", domain: "AUDIT", mutation: "Apply bounded mutation 070 to the audit representation and recalculate the package.", expectedReasonCode: "DISCLOSURE_PROJECTION_HASH_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 070 cannot change silently after commitment." },
+  { scenarioId: "IHS-071", title: "Integrity mutation scenario 071", domain: "OFFLINE", mutation: "Apply bounded mutation 071 to the offline representation and recalculate the package.", expectedReasonCode: "DISCLOSURE_PROJECTION_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 071 cannot change silently after commitment." },
+  { scenarioId: "IHS-072", title: "Integrity mutation scenario 072", domain: "PUBLICATION", mutation: "Apply bounded mutation 072 to the publication representation and recalculate the package.", expectedReasonCode: "CLAIMS_BOUNDARY_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 072 cannot change silently after commitment." },
+  { scenarioId: "IHS-073", title: "Integrity mutation scenario 073", domain: "CANONICAL", mutation: "Apply bounded mutation 073 to the canonical representation and recalculate the package.", expectedReasonCode: "CLAIMS_BOUNDARY_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 073 cannot change silently after commitment." },
+  { scenarioId: "IHS-074", title: "Integrity mutation scenario 074", domain: "COMPONENT", mutation: "Apply bounded mutation 074 to the component representation and recalculate the package.", expectedReasonCode: "PUBLICATION_URL_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 074 cannot change silently after commitment." },
+  { scenarioId: "IHS-075", title: "Integrity mutation scenario 075", domain: "PACKAGE", mutation: "Apply bounded mutation 075 to the package representation and recalculate the package.", expectedReasonCode: "PUBLICATION_STATE_NOT_RELIABLE", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 075 cannot change silently after commitment." },
+  { scenarioId: "IHS-076", title: "Integrity mutation scenario 076", domain: "MANIFEST", mutation: "Apply bounded mutation 076 to the manifest representation and recalculate the package.", expectedReasonCode: "PACKAGE_VERIFIED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 076 cannot change silently after commitment." },
+  { scenarioId: "IHS-077", title: "Integrity mutation scenario 077", domain: "LINEAGE", mutation: "Apply bounded mutation 077 to the lineage representation and recalculate the package.", expectedReasonCode: "PACKAGE_VERIFICATION_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 077 cannot change silently after commitment." },
+  { scenarioId: "IHS-078", title: "Integrity mutation scenario 078", domain: "AUDIT", mutation: "Apply bounded mutation 078 to the audit representation and recalculate the package.", expectedReasonCode: "COMPONENT_01_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 078 cannot change silently after commitment." },
+  { scenarioId: "IHS-079", title: "Integrity mutation scenario 079", domain: "OFFLINE", mutation: "Apply bounded mutation 079 to the offline representation and recalculate the package.", expectedReasonCode: "COMPONENT_02_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 079 cannot change silently after commitment." },
+  { scenarioId: "IHS-080", title: "Integrity mutation scenario 080", domain: "PUBLICATION", mutation: "Apply bounded mutation 080 to the publication representation and recalculate the package.", expectedReasonCode: "COMPONENT_03_CHECK_FAILED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 080 cannot change silently after commitment." },
+  { scenarioId: "IHS-081", title: "Integrity mutation scenario 081", domain: "CANONICAL", mutation: "Apply bounded mutation 081 to the canonical representation and recalculate the package.", expectedReasonCode: "COMPONENT_04_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 081 cannot change silently after commitment." },
+  { scenarioId: "IHS-082", title: "Integrity mutation scenario 082", domain: "COMPONENT", mutation: "Apply bounded mutation 082 to the component representation and recalculate the package.", expectedReasonCode: "COMPONENT_05_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 082 cannot change silently after commitment." },
+  { scenarioId: "IHS-083", title: "Integrity mutation scenario 083", domain: "PACKAGE", mutation: "Apply bounded mutation 083 to the package representation and recalculate the package.", expectedReasonCode: "COMPONENT_06_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 083 cannot change silently after commitment." },
+  { scenarioId: "IHS-084", title: "Integrity mutation scenario 084", domain: "MANIFEST", mutation: "Apply bounded mutation 084 to the manifest representation and recalculate the package.", expectedReasonCode: "COMPONENT_07_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 084 cannot change silently after commitment." },
+  { scenarioId: "IHS-085", title: "Integrity mutation scenario 085", domain: "LINEAGE", mutation: "Apply bounded mutation 085 to the lineage representation and recalculate the package.", expectedReasonCode: "COMPONENT_08_CHECK_FAILED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 085 cannot change silently after commitment." },
+  { scenarioId: "IHS-086", title: "Integrity mutation scenario 086", domain: "AUDIT", mutation: "Apply bounded mutation 086 to the audit representation and recalculate the package.", expectedReasonCode: "COMPONENT_09_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 086 cannot change silently after commitment." },
+  { scenarioId: "IHS-087", title: "Integrity mutation scenario 087", domain: "OFFLINE", mutation: "Apply bounded mutation 087 to the offline representation and recalculate the package.", expectedReasonCode: "COMPONENT_10_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 087 cannot change silently after commitment." },
+  { scenarioId: "IHS-088", title: "Integrity mutation scenario 088", domain: "PUBLICATION", mutation: "Apply bounded mutation 088 to the publication representation and recalculate the package.", expectedReasonCode: "COMPONENT_11_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 088 cannot change silently after commitment." },
+  { scenarioId: "IHS-089", title: "Integrity mutation scenario 089", domain: "CANONICAL", mutation: "Apply bounded mutation 089 to the canonical representation and recalculate the package.", expectedReasonCode: "COMPONENT_12_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 089 cannot change silently after commitment." },
+  { scenarioId: "IHS-090", title: "Integrity mutation scenario 090", domain: "COMPONENT", mutation: "Apply bounded mutation 090 to the component representation and recalculate the package.", expectedReasonCode: "LINEAGE_01_CHECK_FAILED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 090 cannot change silently after commitment." },
+  { scenarioId: "IHS-091", title: "Integrity mutation scenario 091", domain: "PACKAGE", mutation: "Apply bounded mutation 091 to the package representation and recalculate the package.", expectedReasonCode: "LINEAGE_02_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 091 cannot change silently after commitment." },
+  { scenarioId: "IHS-092", title: "Integrity mutation scenario 092", domain: "MANIFEST", mutation: "Apply bounded mutation 092 to the manifest representation and recalculate the package.", expectedReasonCode: "LINEAGE_03_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 092 cannot change silently after commitment." },
+  { scenarioId: "IHS-093", title: "Integrity mutation scenario 093", domain: "LINEAGE", mutation: "Apply bounded mutation 093 to the lineage representation and recalculate the package.", expectedReasonCode: "LINEAGE_04_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 093 cannot change silently after commitment." },
+  { scenarioId: "IHS-094", title: "Integrity mutation scenario 094", domain: "AUDIT", mutation: "Apply bounded mutation 094 to the audit representation and recalculate the package.", expectedReasonCode: "LINEAGE_05_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 094 cannot change silently after commitment." },
+  { scenarioId: "IHS-095", title: "Integrity mutation scenario 095", domain: "OFFLINE", mutation: "Apply bounded mutation 095 to the offline representation and recalculate the package.", expectedReasonCode: "LINEAGE_06_CHECK_FAILED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 095 cannot change silently after commitment." },
+  { scenarioId: "IHS-096", title: "Integrity mutation scenario 096", domain: "PUBLICATION", mutation: "Apply bounded mutation 096 to the publication representation and recalculate the package.", expectedReasonCode: "LINEAGE_07_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 096 cannot change silently after commitment." },
+  { scenarioId: "IHS-097", title: "Integrity mutation scenario 097", domain: "CANONICAL", mutation: "Apply bounded mutation 097 to the canonical representation and recalculate the package.", expectedReasonCode: "LINEAGE_08_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 097 cannot change silently after commitment." },
+  { scenarioId: "IHS-098", title: "Integrity mutation scenario 098", domain: "COMPONENT", mutation: "Apply bounded mutation 098 to the component representation and recalculate the package.", expectedReasonCode: "PARITY_01_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 098 cannot change silently after commitment." },
+  { scenarioId: "IHS-099", title: "Integrity mutation scenario 099", domain: "PACKAGE", mutation: "Apply bounded mutation 099 to the package representation and recalculate the package.", expectedReasonCode: "PARITY_02_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 099 cannot change silently after commitment." },
+  { scenarioId: "IHS-100", title: "Integrity mutation scenario 100", domain: "MANIFEST", mutation: "Apply bounded mutation 100 to the manifest representation and recalculate the package.", expectedReasonCode: "PARITY_03_CHECK_FAILED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 100 cannot change silently after commitment." },
+  { scenarioId: "IHS-101", title: "Integrity mutation scenario 101", domain: "LINEAGE", mutation: "Apply bounded mutation 101 to the lineage representation and recalculate the package.", expectedReasonCode: "PARITY_04_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 101 cannot change silently after commitment." },
+  { scenarioId: "IHS-102", title: "Integrity mutation scenario 102", domain: "AUDIT", mutation: "Apply bounded mutation 102 to the audit representation and recalculate the package.", expectedReasonCode: "PARITY_05_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 102 cannot change silently after commitment." },
+  { scenarioId: "IHS-103", title: "Integrity mutation scenario 103", domain: "OFFLINE", mutation: "Apply bounded mutation 103 to the offline representation and recalculate the package.", expectedReasonCode: "PARITY_06_CHECK_FAILED", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 103 cannot change silently after commitment." },
+  { scenarioId: "IHS-104", title: "Integrity mutation scenario 104", domain: "PUBLICATION", mutation: "Apply bounded mutation 104 to the publication representation and recalculate the package.", expectedReasonCode: "CANONICAL_INPUT_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 104 cannot change silently after commitment." },
+  { scenarioId: "IHS-105", title: "Integrity mutation scenario 105", domain: "CANONICAL", mutation: "Apply bounded mutation 105 to the canonical representation and recalculate the package.", expectedReasonCode: "CANONICAL_SERIALIZATION_FAILED", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 105 cannot change silently after commitment." },
+  { scenarioId: "IHS-106", title: "Integrity mutation scenario 106", domain: "COMPONENT", mutation: "Apply bounded mutation 106 to the component representation and recalculate the package.", expectedReasonCode: "CANONICAL_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 106 cannot change silently after commitment." },
+  { scenarioId: "IHS-107", title: "Integrity mutation scenario 107", domain: "PACKAGE", mutation: "Apply bounded mutation 107 to the package representation and recalculate the package.", expectedReasonCode: "CANONICAL_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 107 cannot change silently after commitment." },
+  { scenarioId: "IHS-108", title: "Integrity mutation scenario 108", domain: "MANIFEST", mutation: "Apply bounded mutation 108 to the manifest representation and recalculate the package.", expectedReasonCode: "COMPONENT_ID_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 108 cannot change silently after commitment." },
+  { scenarioId: "IHS-109", title: "Integrity mutation scenario 109", domain: "LINEAGE", mutation: "Apply bounded mutation 109 to the lineage representation and recalculate the package.", expectedReasonCode: "COMPONENT_DUPLICATE_ID", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 109 cannot change silently after commitment." },
+  { scenarioId: "IHS-110", title: "Integrity mutation scenario 110", domain: "AUDIT", mutation: "Apply bounded mutation 110 to the audit representation and recalculate the package.", expectedReasonCode: "COMPONENT_BYTES_MISSING", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 110 cannot change silently after commitment." },
+  { scenarioId: "IHS-111", title: "Integrity mutation scenario 111", domain: "OFFLINE", mutation: "Apply bounded mutation 111 to the offline representation and recalculate the package.", expectedReasonCode: "COMPONENT_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 111 cannot change silently after commitment." },
+  { scenarioId: "IHS-112", title: "Integrity mutation scenario 112", domain: "PUBLICATION", mutation: "Apply bounded mutation 112 to the publication representation and recalculate the package.", expectedReasonCode: "COMPONENT_HASH_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 112 cannot change silently after commitment." },
+  { scenarioId: "IHS-113", title: "Integrity mutation scenario 113", domain: "CANONICAL", mutation: "Apply bounded mutation 113 to the canonical representation and recalculate the package.", expectedReasonCode: "COMPONENT_MEDIA_TYPE_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 113 cannot change silently after commitment." },
+  { scenarioId: "IHS-114", title: "Integrity mutation scenario 114", domain: "COMPONENT", mutation: "Apply bounded mutation 114 to the component representation and recalculate the package.", expectedReasonCode: "PACKAGE_ROOT_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 114 cannot change silently after commitment." },
+  { scenarioId: "IHS-115", title: "Integrity mutation scenario 115", domain: "PACKAGE", mutation: "Apply bounded mutation 115 to the package representation and recalculate the package.", expectedReasonCode: "PACKAGE_ROOT_MISMATCH", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 115 cannot change silently after commitment." },
+  { scenarioId: "IHS-116", title: "Integrity mutation scenario 116", domain: "MANIFEST", mutation: "Apply bounded mutation 116 to the manifest representation and recalculate the package.", expectedReasonCode: "PACKAGE_COMPONENT_COUNT_MISMATCH", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 116 cannot change silently after commitment." },
+  { scenarioId: "IHS-117", title: "Integrity mutation scenario 117", domain: "LINEAGE", mutation: "Apply bounded mutation 117 to the lineage representation and recalculate the package.", expectedReasonCode: "PACKAGE_ORDER_NONDETERMINISTIC", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 117 cannot change silently after commitment." },
+  { scenarioId: "IHS-118", title: "Integrity mutation scenario 118", domain: "AUDIT", mutation: "Apply bounded mutation 118 to the audit representation and recalculate the package.", expectedReasonCode: "MANIFEST_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 118 cannot change silently after commitment." },
+  { scenarioId: "IHS-119", title: "Integrity mutation scenario 119", domain: "OFFLINE", mutation: "Apply bounded mutation 119 to the offline representation and recalculate the package.", expectedReasonCode: "MANIFEST_HASH_MISSING", expectedDisposition: "FAILED", institutionalMeaning: "Demonstrates that integrity condition 119 cannot change silently after commitment." },
+  { scenarioId: "IHS-120", title: "Integrity mutation scenario 120", domain: "PUBLICATION", mutation: "Apply bounded mutation 120 to the publication representation and recalculate the package.", expectedReasonCode: "MANIFEST_HASH_MISMATCH", expectedDisposition: "VERIFIED_WITH_WARNINGS", institutionalMeaning: "Demonstrates that integrity condition 120 cannot change silently after commitment." },
+] as const;
+
+export function integrityScenariosByDomain(domain: IntegrityDomain): readonly IntegrityScenarioDefinition[] {
+  return INTEGRITY_SCENARIO_CATALOG.filter((scenario) => scenario.domain === domain);
+}
+
+export function integrityScenarioById(scenarioId: string): IntegrityScenarioDefinition | undefined {
+  return INTEGRITY_SCENARIO_CATALOG.find((scenario) => scenario.scenarioId === scenarioId);
+}
+
+export function expectedReasonCodesForDomain(domain: IntegrityDomain): readonly IntegrityReasonCode[] {
+  return Array.from(new Set(
+    INTEGRITY_SCENARIO_CATALOG
+      .filter((scenario) => scenario.domain === domain)
+      .map((scenario) => scenario.expectedReasonCode),
+  ));
+}
+
+export function describeIntegrityEngine(): string {
+  return [
+    `TA-14 Integrity & Hash Engine ${TA14_INTEGRITY_HASH_ENGINE_VERSION}`,
+    `Policy ${TA14_INTEGRITY_POLICY_VERSION}`,
+    `Canonicalization ${TA14_CANONICALIZATION_VERSION}`,
+    `Algorithm ${TA14_HASH_ALGORITHM}`,
+    `${INTEGRITY_REASON_DEFINITIONS.length} reason definitions`,
+    `${INTEGRITY_CONTROLS.length} institutional controls`,
+    `${INTEGRITY_ACCEPTANCE_TESTS.length} acceptance tests`,
+    `${INTEGRITY_COMPONENT_PROFILES.length} component profiles`,
+    `${INTEGRITY_LINEAGE_POLICIES.length} lineage policies`,
+    `${INTEGRITY_SCENARIO_CATALOG.length} mutation scenarios`,
+  ].join(" | ");
+}
+
+export const INTEGRITY_ENGINE_EXPORTS = {
+  engineVersion: TA14_INTEGRITY_HASH_ENGINE_VERSION,
+  policyVersion: TA14_INTEGRITY_POLICY_VERSION,
+  canonicalizationVersion: TA14_CANONICALIZATION_VERSION,
+  hashAlgorithm: TA14_HASH_ALGORITHM,
+  rule: TA14_INTEGRITY_RULE,
+  reasonCodeCount: INTEGRITY_REASON_DEFINITIONS.length,
+  controlCount: INTEGRITY_CONTROLS.length,
+  acceptanceTestCount: INTEGRITY_ACCEPTANCE_TESTS.length,
+  componentProfileCount: INTEGRITY_COMPONENT_PROFILES.length,
+  lineagePolicyCount: INTEGRITY_LINEAGE_POLICIES.length,
+  offlineChecklistCount: OFFLINE_VERIFICATION_CHECKLIST.length,
+  scenarioCount: INTEGRITY_SCENARIO_CATALOG.length,
+} as const;
