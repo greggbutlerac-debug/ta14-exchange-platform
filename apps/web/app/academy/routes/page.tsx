@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type RouteState = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 type AnchorStatus = "supported" | "limited" | "failed";
@@ -16,43 +16,7 @@ type RouteExample = {
   failure?: string;
   repair: string;
   lesson: string;
-  anchors: Array<{
-    label: string;
-    value: string;
-    status: AnchorStatus;
-  }>;
-};
-
-type ReadingProtocolStep = {
-  id: string;
-  number: string;
-  title: string;
-  question: string;
-  evidence: string;
-  stopCondition: string;
-};
-
-type FailurePattern = {
-  id: string;
-  chainLink: string;
-  title: string;
-  signal: string;
-  consequence: string;
-  repair: string;
-  severity: "warning" | "blocking" | "critical";
-};
-
-type GlossaryEntry = {
-  term: string;
-  definition: string;
-  readingUse: string;
-};
-
-type ReviewQuestion = {
-  id: string;
-  category: string;
-  question: string;
-  expectedReading: string;
+  anchors: Array<{ label: string; value: string; status: AnchorStatus }>;
 };
 
 type SavedProgress = {
@@ -71,8 +35,7 @@ const routeExamples: RouteExample[] = [
     domain: "Facilities operations",
     consequence: "Restore one air-handling unit after a verified protective trip.",
     state: "ALLOW",
-    summary:
-      "Current evidence, valid authority, preserved continuity, and a bounded execution plan support one controlled restart with post-action verification.",
+    summary: "Current evidence, valid authority, preserved continuity, and a bounded execution plan support one controlled restart with post-action verification.",
     repair: "No repair is required. The route must still preserve outcome evidence after the restart.",
     lesson: "ALLOW is permission for the exact committed action only. It is never a general authorization.",
     anchors: [
@@ -92,8 +55,7 @@ const routeExamples: RouteExample[] = [
     domain: "Identity governance",
     consequence: "Suspend a user account based on an anomaly alert.",
     state: "HOLD",
-    summary:
-      "The alert is relevant, but the evidence is stale and the current authority boundary is incomplete. Execution must pause until the gaps are resolved.",
+    summary: "The alert is relevant, but the evidence is stale and the current authority boundary is incomplete. Execution must pause until the gaps are resolved.",
     failure: "Continuity is the earliest failed condition: the present identity state was not revalidated.",
     repair: "Refresh the identity state, establish current suspension authority, and rerun dependent gates.",
     lesson: "HOLD preserves the route while repair remains possible. It is not a soft approval.",
@@ -114,8 +76,7 @@ const routeExamples: RouteExample[] = [
     domain: "Financial operations",
     consequence: "Release a reimbursement without required source documentation.",
     state: "DENY",
-    summary:
-      "The required evidence does not exist, and policy does not authorize a substitute. The requested execution is outside the admissible boundary.",
+    summary: "The required evidence does not exist, and policy does not authorize a substitute. The requested execution is outside the admissible boundary.",
     failure: "Record is the earliest failed condition: the mandatory source evidence is absent.",
     repair: "A new request may be initiated only when the required source documentation exists and can be validated.",
     lesson: "DENY means the present action is prohibited under the preserved state. Later evidence cannot rewrite the original decision.",
@@ -136,8 +97,7 @@ const routeExamples: RouteExample[] = [
     domain: "High-consequence workflow",
     consequence: "Route a case where two authoritative records materially conflict.",
     state: "ESCALATE",
-    summary:
-      "The system cannot resolve the conflict within its authorized scope. The case must move to a qualified decision authority without silently favoring either record.",
+    summary: "The system cannot resolve the conflict within its authorized scope. The case must move to a qualified decision authority without silently favoring either record.",
     failure: "Binding is the decisive limit: the current reviewer lacks authority to resolve the conflict.",
     repair: "Route the preserved conflict to a named qualified authority and require an attributable resolution.",
     lesson: "ESCALATE transfers judgment. It does not convert uncertainty into permission.",
@@ -154,814 +114,15 @@ const routeExamples: RouteExample[] = [
   },
 ];
 
-const readingProtocol: ReadingProtocolStep[] = [
-  {
-    id: "PROTOCOL-01",
-    number: "01",
-    title: "Name the proposed consequence",
-    question: "What exact action may bind to reality?",
-    evidence: "A bounded action statement naming scope, destination, subject, quantity, and time.",
-    stopCondition: "Stop when the action is vague, compound, or broader than the stated authority.",
-  },
-  {
-    id: "PROTOCOL-02",
-    number: "02",
-    title: "Establish present reality",
-    question: "What condition actually exists now?",
-    evidence: "Current observations, measurements, declarations, and affected subjects.",
-    stopCondition: "Stop when the route relies on assumptions instead of present conditions.",
-  },
-  {
-    id: "PROTOCOL-03",
-    number: "03",
-    title: "Locate the source record",
-    question: "What was captured, by whom, when, and in what form?",
-    evidence: "Attributable records with timestamps, source identity, and preservation method.",
-    stopCondition: "Stop when the record cannot be inspected or tied to a source.",
-  },
-  {
-    id: "PROTOCOL-04",
-    number: "04",
-    title: "Test continuity",
-    question: "Did identity, state, version, custody, and context remain connected?",
-    evidence: "Version history, custody trail, freshness, and changed-condition checks.",
-    stopCondition: "Stop when the present state may no longer match the preserved record.",
-  },
-  {
-    id: "PROTOCOL-05",
-    number: "05",
-    title: "Determine admissibility",
-    question: "May this evidence support this consequence here and now?",
-    evidence: "Fitness by purpose, time, jurisdiction, reliability, and consequence.",
-    stopCondition: "Stop when relevant evidence is stale, unsupported, contradictory, or outside purpose.",
-  },
-  {
-    id: "PROTOCOL-06",
-    number: "06",
-    title: "Resolve authority",
-    question: "Who may bind this decision and within what scope?",
-    evidence: "Identity, role, delegation, expiry, revocation, and conflict state.",
-    stopCondition: "Stop when authority is missing, expired, conflicted, or too narrow.",
-  },
-  {
-    id: "PROTOCOL-07",
-    number: "07",
-    title: "Apply binding conditions",
-    question: "Which rules, thresholds, prohibitions, and obligations govern?",
-    evidence: "Route version, policy basis, limits, exceptions, and mandatory gates.",
-    stopCondition: "Stop when the route cannot identify what governs the consequence.",
-  },
-  {
-    id: "PROTOCOL-08",
-    number: "08",
-    title: "Find earliest failure",
-    question: "Which first unsupported link controls every downstream state?",
-    evidence: "Ordered gate results with one explicit earliest-failure marker.",
-    stopCondition: "Stop reading forward as though a later approval can cure the earlier break.",
-  },
-  {
-    id: "PROTOCOL-09",
-    number: "09",
-    title: "Read the commit",
-    question: "What determination was fixed before action?",
-    evidence: "ALLOW, HOLD, DENY, or ESCALATE with reason codes and permitted next action.",
-    stopCondition: "Stop when the decision is inferred after execution or can still be silently changed.",
-  },
-  {
-    id: "PROTOCOL-10",
-    number: "10",
-    title: "Inspect execution effect",
-    question: "Did the determination technically change what could happen?",
-    evidence: "Release, hold, refusal, reroute, termination, rollback, or human checkpoint receipt.",
-    stopCondition: "Stop when the artifact proves only monitoring, recommendation, or documentation.",
-  },
-  {
-    id: "PROTOCOL-11",
-    number: "11",
-    title: "Close the outcome",
-    question: "What actually happened after the committed determination?",
-    evidence: "Outcome evidence, residual risk, rollback, correction, and final state.",
-    stopCondition: "Stop when the route claims success without preserved consequence evidence.",
-  },
-  {
-    id: "PROTOCOL-12",
-    number: "12",
-    title: "State the proof boundary",
-    question: "What does this record prove, and what does it not prove?",
-    evidence: "A bounded claim tied to the route, event, evidence, execution effect, and outcome.",
-    stopCondition: "Stop when the claim expands beyond the preserved record.",
-  },
-];
+const stateTone: Record<RouteState, string> = { ALLOW: "allow", HOLD: "hold", DENY: "deny", ESCALATE: "escalate" };
 
-const failurePatterns: FailurePattern[] = [
-  {
-    id: "PATTERN-001",
-    chainLink: "REALITY",
-    title: "Primary: Proposed consequence is not bounded",
-    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
-    consequence: "The route cannot know what it is governing.",
-    repair: "Rewrite the action as one exact consequence-bearing event.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-002",
-    chainLink: "RECORD",
-    title: "Primary: Source record is not attributable",
-    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
-    consequence: "The route has no inspectable basis for reliance.",
-    repair: "Capture and preserve an attributable source record.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-003",
-    chainLink: "CONTINUITY",
-    title: "Primary: Present state was not revalidated",
-    signal: "Identity, version, custody, or environmental state may have changed.",
-    consequence: "The preserved evidence may no longer describe the execution moment.",
-    repair: "Revalidate all changed conditions and rerun dependent gates.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-004",
-    chainLink: "ADMISSIBILITY",
-    title: "Primary: Evidence is relevant but not fit",
-    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
-    consequence: "The route may not rely on the material for this consequence.",
-    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-005",
-    chainLink: "BINDING",
-    title: "Primary: Authority or rule boundary is unresolved",
-    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
-    consequence: "No valid consequence may be bound under the present authority state.",
-    repair: "Resolve authority and the exact binding conditions before commit.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-006",
-    chainLink: "COMMIT",
-    title: "Primary: Decision was not fixed before action",
-    signal: "The determination can still be edited, inferred, or backdated.",
-    consequence: "The record cannot prove pre-execution governance.",
-    repair: "Freeze the determination, reasons, scope, and permitted next action.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-007",
-    chainLink: "EXECUTION",
-    title: "Primary: No technical control receipt exists",
-    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
-    consequence: "The artifact proves policy evaluation, not execution governance.",
-    repair: "Capture a technical receipt showing the determination controlled the action path.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-008",
-    chainLink: "OUTCOME",
-    title: "Primary: Outcome is asserted without closure evidence",
-    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
-    consequence: "The route cannot prove what bound to reality.",
-    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-009",
-    chainLink: "REALITY",
-    title: "Changed-condition: Proposed consequence is not bounded",
-    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
-    consequence: "The route cannot know what it is governing.",
-    repair: "Rewrite the action as one exact consequence-bearing event.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-010",
-    chainLink: "RECORD",
-    title: "Changed-condition: Source record is not attributable",
-    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
-    consequence: "The route has no inspectable basis for reliance.",
-    repair: "Capture and preserve an attributable source record.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-011",
-    chainLink: "CONTINUITY",
-    title: "Changed-condition: Present state was not revalidated",
-    signal: "Identity, version, custody, or environmental state may have changed.",
-    consequence: "The preserved evidence may no longer describe the execution moment.",
-    repair: "Revalidate all changed conditions and rerun dependent gates.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-012",
-    chainLink: "ADMISSIBILITY",
-    title: "Changed-condition: Evidence is relevant but not fit",
-    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
-    consequence: "The route may not rely on the material for this consequence.",
-    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-013",
-    chainLink: "BINDING",
-    title: "Changed-condition: Authority or rule boundary is unresolved",
-    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
-    consequence: "No valid consequence may be bound under the present authority state.",
-    repair: "Resolve authority and the exact binding conditions before commit.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-014",
-    chainLink: "COMMIT",
-    title: "Changed-condition: Decision was not fixed before action",
-    signal: "The determination can still be edited, inferred, or backdated.",
-    consequence: "The record cannot prove pre-execution governance.",
-    repair: "Freeze the determination, reasons, scope, and permitted next action.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-015",
-    chainLink: "EXECUTION",
-    title: "Changed-condition: No technical control receipt exists",
-    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
-    consequence: "The artifact proves policy evaluation, not execution governance.",
-    repair: "Capture a technical receipt showing the determination controlled the action path.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-016",
-    chainLink: "OUTCOME",
-    title: "Changed-condition: Outcome is asserted without closure evidence",
-    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
-    consequence: "The route cannot prove what bound to reality.",
-    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-017",
-    chainLink: "REALITY",
-    title: "Authority-linked: Proposed consequence is not bounded",
-    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
-    consequence: "The route cannot know what it is governing.",
-    repair: "Rewrite the action as one exact consequence-bearing event.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-018",
-    chainLink: "RECORD",
-    title: "Authority-linked: Source record is not attributable",
-    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
-    consequence: "The route has no inspectable basis for reliance.",
-    repair: "Capture and preserve an attributable source record.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-019",
-    chainLink: "CONTINUITY",
-    title: "Authority-linked: Present state was not revalidated",
-    signal: "Identity, version, custody, or environmental state may have changed.",
-    consequence: "The preserved evidence may no longer describe the execution moment.",
-    repair: "Revalidate all changed conditions and rerun dependent gates.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-020",
-    chainLink: "ADMISSIBILITY",
-    title: "Authority-linked: Evidence is relevant but not fit",
-    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
-    consequence: "The route may not rely on the material for this consequence.",
-    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-021",
-    chainLink: "BINDING",
-    title: "Authority-linked: Authority or rule boundary is unresolved",
-    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
-    consequence: "No valid consequence may be bound under the present authority state.",
-    repair: "Resolve authority and the exact binding conditions before commit.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-022",
-    chainLink: "COMMIT",
-    title: "Authority-linked: Decision was not fixed before action",
-    signal: "The determination can still be edited, inferred, or backdated.",
-    consequence: "The record cannot prove pre-execution governance.",
-    repair: "Freeze the determination, reasons, scope, and permitted next action.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-023",
-    chainLink: "EXECUTION",
-    title: "Authority-linked: No technical control receipt exists",
-    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
-    consequence: "The artifact proves policy evaluation, not execution governance.",
-    repair: "Capture a technical receipt showing the determination controlled the action path.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-024",
-    chainLink: "OUTCOME",
-    title: "Authority-linked: Outcome is asserted without closure evidence",
-    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
-    consequence: "The route cannot prove what bound to reality.",
-    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-025",
-    chainLink: "REALITY",
-    title: "Cross-system: Proposed consequence is not bounded",
-    signal: "The requested action lacks an exact subject, destination, amount, tool, or time window.",
-    consequence: "The route cannot know what it is governing.",
-    repair: "Rewrite the action as one exact consequence-bearing event.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-026",
-    chainLink: "RECORD",
-    title: "Cross-system: Source record is not attributable",
-    signal: "The evidence cannot be tied to a named source, capture time, or preserved form.",
-    consequence: "The route has no inspectable basis for reliance.",
-    repair: "Capture and preserve an attributable source record.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-027",
-    chainLink: "CONTINUITY",
-    title: "Cross-system: Present state was not revalidated",
-    signal: "Identity, version, custody, or environmental state may have changed.",
-    consequence: "The preserved evidence may no longer describe the execution moment.",
-    repair: "Revalidate all changed conditions and rerun dependent gates.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-028",
-    chainLink: "ADMISSIBILITY",
-    title: "Cross-system: Evidence is relevant but not fit",
-    signal: "The material is stale, unsupported, contradictory, incomplete, or outside purpose.",
-    consequence: "The route may not rely on the material for this consequence.",
-    repair: "Cure the evidence defect or preserve a HOLD, DENY, or ESCALATE state.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-029",
-    chainLink: "BINDING",
-    title: "Cross-system: Authority or rule boundary is unresolved",
-    signal: "The actor lacks scope, delegation, conflict clearance, or governing rule support.",
-    consequence: "No valid consequence may be bound under the present authority state.",
-    repair: "Resolve authority and the exact binding conditions before commit.",
-    severity: "blocking",
-  },
-  {
-    id: "PATTERN-030",
-    chainLink: "COMMIT",
-    title: "Cross-system: Decision was not fixed before action",
-    signal: "The determination can still be edited, inferred, or backdated.",
-    consequence: "The record cannot prove pre-execution governance.",
-    repair: "Freeze the determination, reasons, scope, and permitted next action.",
-    severity: "critical",
-  },
-  {
-    id: "PATTERN-031",
-    chainLink: "EXECUTION",
-    title: "Cross-system: No technical control receipt exists",
-    signal: "The route records a decision but does not prove release, block, hold, reroute, or termination.",
-    consequence: "The artifact proves policy evaluation, not execution governance.",
-    repair: "Capture a technical receipt showing the determination controlled the action path.",
-    severity: "warning",
-  },
-  {
-    id: "PATTERN-032",
-    chainLink: "OUTCOME",
-    title: "Cross-system: Outcome is asserted without closure evidence",
-    signal: "The final consequence state, residual risk, and follow-up were not preserved.",
-    consequence: "The route cannot prove what bound to reality.",
-    repair: "Capture closure evidence and append residual risk without rewriting the original event.",
-    severity: "blocking",
-  },
-];
-
-const reviewQuestions: ReviewQuestion[] = [
-  {
-    id: "QUESTION-01",
-    category: "Scope",
-    question: "Can the proposed action be executed in more than one materially different way?",
-    expectedReading: "A readable route allows only the exact committed action.",
-  },
-  {
-    id: "QUESTION-02",
-    category: "Scope",
-    question: "Are subject, destination, amount, model, tool, and time window explicit?",
-    expectedReading: "Every consequence-bearing dimension is bounded.",
-  },
-  {
-    id: "QUESTION-03",
-    category: "Reality",
-    question: "Does the route distinguish observed conditions from assumptions?",
-    expectedReading: "Assumptions remain declared and cannot substitute for present reality.",
-  },
-  {
-    id: "QUESTION-04",
-    category: "Record",
-    question: "Can an outside reviewer identify who captured each material record?",
-    expectedReading: "Every relied-upon item is attributable.",
-  },
-  {
-    id: "QUESTION-05",
-    category: "Record",
-    question: "Does each source have a capture time and stable identity?",
-    expectedReading: "The route can establish timing and source parity.",
-  },
-  {
-    id: "QUESTION-06",
-    category: "Continuity",
-    question: "Could any relevant state have changed after evidence capture?",
-    expectedReading: "Changed-condition triggers are named and checked.",
-  },
-  {
-    id: "QUESTION-07",
-    category: "Continuity",
-    question: "Are route, model, tool, and destination versions preserved?",
-    expectedReading: "The execution moment resolves to one frozen configuration.",
-  },
-  {
-    id: "QUESTION-08",
-    category: "Admissibility",
-    question: "Is relevance being mistaken for sufficiency?",
-    expectedReading: "Relevant material must still be fit for purpose and consequence.",
-  },
-  {
-    id: "QUESTION-09",
-    category: "Admissibility",
-    question: "Are contradictions visible rather than silently averaged?",
-    expectedReading: "Material conflicts produce HOLD or ESCALATE unless the route authorizes resolution.",
-  },
-  {
-    id: "QUESTION-10",
-    category: "Authority",
-    question: "Is the approving actor authorized for this exact action now?",
-    expectedReading: "Authority includes scope, time, delegation, and conflict state.",
-  },
-  {
-    id: "QUESTION-11",
-    category: "Authority",
-    question: "Does human approval exceed the authority source?",
-    expectedReading: "Human involvement cannot cure an invalid authority boundary.",
-  },
-  {
-    id: "QUESTION-12",
-    category: "Binding",
-    question: "Can the reviewer identify the rule that controls each mandatory gate?",
-    expectedReading: "Every gate resolves to a preserved governing condition.",
-  },
-  {
-    id: "QUESTION-13",
-    category: "Binding",
-    question: "Are exceptions explicit and bounded?",
-    expectedReading: "No exception silently becomes general permission.",
-  },
-  {
-    id: "QUESTION-14",
-    category: "Commit",
-    question: "Was the determination fixed before execution?",
-    expectedReading: "The commit is timestamped, immutable, and attributable.",
-  },
-  {
-    id: "QUESTION-15",
-    category: "Commit",
-    question: "Does the commit state the only permitted next action?",
-    expectedReading: "ALLOW, HOLD, DENY, and ESCALATE each constrain the next step.",
-  },
-  {
-    id: "QUESTION-16",
-    category: "Execution",
-    question: "Is there a technical control effect rather than a narrative claim?",
-    expectedReading: "A receipt proves what was released, blocked, held, rerouted, or terminated.",
-  },
-  {
-    id: "QUESTION-17",
-    category: "Execution",
-    question: "Could an alternate path bypass the committed result?",
-    expectedReading: "Bypass attempts are prevented and preserved.",
-  },
-  {
-    id: "QUESTION-18",
-    category: "Outcome",
-    question: "Does outcome evidence show what actually bound to reality?",
-    expectedReading: "Closure is supported rather than inferred.",
-  },
-  {
-    id: "QUESTION-19",
-    category: "Outcome",
-    question: "Are residual risk and correction preserved append-only?",
-    expectedReading: "Later learning does not rewrite the original event.",
-  },
-  {
-    id: "QUESTION-20",
-    category: "Integrity",
-    question: "Do public page, PDF, JSON, and manifest resolve to the same record?",
-    expectedReading: "Every representation maintains parity.",
-  },
-  {
-    id: "QUESTION-21",
-    category: "Integrity",
-    question: "Can an altered component be detected offline?",
-    expectedReading: "Hashes and canonicalization rules reveal tampering.",
-  },
-  {
-    id: "QUESTION-22",
-    category: "Boundary",
-    question: "Does the artifact say what it does not prove?",
-    expectedReading: "The public claim remains no broader than the record.",
-  },
-  {
-    id: "QUESTION-23",
-    category: "Challenge",
-    question: "Can a reviewer dispute the record without erasing it?",
-    expectedReading: "Challenge, correction, supersession, and withdrawal are append-only.",
-  },
-  {
-    id: "QUESTION-24",
-    category: "Transfer",
-    question: "Would the same chain remain visible in another sector?",
-    expectedReading: "Terminology may change; the execution chain may not.",
-  },
-];
-
-const glossary: GlossaryEntry[] = [
-  {
-    term: "Admissibility",
-    definition: "Fitness of evidence and authority for a specific route, purpose, time, jurisdiction, and consequence.",
-    readingUse: "Ask whether the material may be relied upon here—not merely whether it exists.",
-  },
-  {
-    term: "Binding",
-    definition: "Application of governing rules, limits, thresholds, authority scopes, and prohibitions to the preserved facts.",
-    readingUse: "Identify what turns facts into a constrained decision.",
-  },
-  {
-    term: "Commit",
-    definition: "The fixed determination preserved before action.",
-    readingUse: "Verify that ALLOW, HOLD, DENY, or ESCALATE existed before execution.",
-  },
-  {
-    term: "Continuity",
-    definition: "Unbroken linkage of identity, state, version, custody, freshness, and context.",
-    readingUse: "Look for changed conditions that disconnect source from decision.",
-  },
-  {
-    term: "Determination",
-    definition: "The committed runtime state: ALLOW, HOLD, DENY, or ESCALATE.",
-    readingUse: "Read the state together with reasons and permitted next action.",
-  },
-  {
-    term: "Earliest failure",
-    definition: "The first unsupported chain link that controls every later result.",
-    readingUse: "Do not let a downstream success cure an upstream break.",
-  },
-  {
-    term: "Execution effect",
-    definition: "The technical event that releases, holds, blocks, reroutes, rolls back, or terminates an action.",
-    readingUse: "Demand a receipt, not a description.",
-  },
-  {
-    term: "Outcome closure",
-    definition: "Preserved evidence of what actually happened after the determination.",
-    readingUse: "Separate expected effect from actual consequence.",
-  },
-  {
-    term: "Route snapshot",
-    definition: "The frozen version of gate order, thresholds, policy basis, jurisdiction, model, tool, and destination.",
-    readingUse: "Check parity across every export.",
-  },
-  {
-    term: "Evidence manifest",
-    definition: "Inventory of sources, hashes, capture metadata, disclosure, freshness, and admissibility results.",
-    readingUse: "Trace every relied-upon claim to its evidence identity.",
-  },
-  {
-    term: "Authority scope",
-    definition: "The exact actions, subjects, amounts, systems, and time for which an actor may bind consequence.",
-    readingUse: "Approval outside scope is not authority.",
-  },
-  {
-    term: "Fail closed",
-    definition: "Default behavior that prevents execution when a mandatory condition is missing or unresolved.",
-    readingUse: "Look for explicit block or hold behavior.",
-  },
-  {
-    term: "Revalidation",
-    definition: "Required reevaluation after evidence, authority, state, route, model, tool, destination, or threshold changes.",
-    readingUse: "Ask what changed between approval and execution.",
-  },
-  {
-    term: "Repair condition",
-    definition: "The precise condition that must be cured before a held route may proceed.",
-    readingUse: "A valid HOLD names the cure.",
-  },
-  {
-    term: "Bypass resistance",
-    definition: "Prevention of alternate-path release under the same invalid state.",
-    readingUse: "Inspect retries, alternate tools, destinations, and credentials.",
-  },
-  {
-    term: "Record parity",
-    definition: "Agreement among public page, PDF, JSON, manifests, receipts, and route snapshot.",
-    readingUse: "One frozen record must underlie every representation.",
-  },
-  {
-    term: "Canonicalization",
-    definition: "Versioned rules that serialize structured records consistently for hashing.",
-    readingUse: "The same record should produce the same digest.",
-  },
-  {
-    term: "Challenge record",
-    definition: "Append-only dispute, response, decision, amendment, and status history.",
-    readingUse: "Correction must not erase the original event.",
-  },
-  {
-    term: "Demonstration artifact",
-    definition: "A bounded record from a controlled, clearly labeled simulated environment.",
-    readingUse: "Do not mistake demonstration proof for production proof.",
-  },
-  {
-    term: "Production artifact",
-    definition: "A bounded record from an authentic consequential workflow with real systems and authorized participants.",
-    readingUse: "Demand genuine execution effect and outcome evidence.",
-  },
-  {
-    term: "Disclosure boundary",
-    definition: "The rule governing what is public, selective, restricted, or withheld.",
-    readingUse: "Confidentiality may limit disclosure but not integrity commitments.",
-  },
-  {
-    term: "Residual risk",
-    definition: "Remaining uncertainty or exposure after execution or closure.",
-    readingUse: "A successful action can still preserve unresolved risk.",
-  },
-  {
-    term: "Scope-bounded competency",
-    definition: "Demonstrated capability for a defined route, consequence, and level of authority.",
-    readingUse: "Completion alone does not grant operational authority.",
-  },
-  {
-    term: "Proof boundary",
-    definition: "The explicit line between what the artifact establishes and what remains unproven.",
-    readingUse: "Reject claims broader than the preserved event.",
-  },
-];
-
-const DETERMINATION_ORDER: RouteState[] = ["ALLOW", "HOLD", "DENY", "ESCALATE"];
-const CHAIN_ORDER = ["REALITY", "RECORD", "CONTINUITY", "ADMISSIBILITY", "BINDING", "COMMIT", "EXECUTION", "OUTCOME"] as const;
-
-const stateVisual: Record<RouteState, { badge: string; glow: string; ring: string; label: string; index: string }> = {
-  ALLOW: {
-    badge: "border-emerald-300/35 bg-emerald-300/10 text-emerald-100",
-    glow: "from-emerald-400/20 via-emerald-400/5 to-transparent",
-    ring: "border-emerald-300/30",
-    label: "Authorized boundary",
-    index: "text-emerald-200",
-  },
-  HOLD: {
-    badge: "border-amber-300/35 bg-amber-300/10 text-amber-100",
-    glow: "from-amber-400/20 via-amber-400/5 to-transparent",
-    ring: "border-amber-300/30",
-    label: "Repair required",
-    index: "text-amber-200",
-  },
-  DENY: {
-    badge: "border-rose-300/35 bg-rose-300/10 text-rose-100",
-    glow: "from-rose-400/20 via-rose-400/5 to-transparent",
-    ring: "border-rose-300/30",
-    label: "Execution prohibited",
-    index: "text-rose-200",
-  },
-  ESCALATE: {
-    badge: "border-violet-300/35 bg-violet-300/10 text-violet-100",
-    glow: "from-violet-400/20 via-violet-400/5 to-transparent",
-    ring: "border-violet-300/30",
-    label: "Qualified judgment required",
-    index: "text-violet-200",
-  },
-};
-
-const anchorVisual: Record<AnchorStatus, { card: string; dot: string; word: string }> = {
-  supported: {
-    card: "border-emerald-300/20 bg-emerald-300/[0.045] hover:border-emerald-300/35",
-    dot: "bg-emerald-300 shadow-[0_0_18px_rgba(110,231,183,0.55)]",
-    word: "text-emerald-200",
-  },
-  limited: {
-    card: "border-amber-300/20 bg-amber-300/[0.045] hover:border-amber-300/35",
-    dot: "bg-amber-300 shadow-[0_0_18px_rgba(252,211,77,0.55)]",
-    word: "text-amber-200",
-  },
-  failed: {
-    card: "border-rose-300/20 bg-rose-300/[0.045] hover:border-rose-300/35",
-    dot: "bg-rose-300 shadow-[0_0_18px_rgba(253,164,175,0.55)]",
-    word: "text-rose-200",
-  },
-};
-
-function MetricCard({ label, value, detail }: { label: string; value: string; detail: string }) {
-  return (
-    <article className="group relative overflow-hidden rounded-[26px] border border-white/10 bg-white/[0.045] p-5 shadow-[0_22px_60px_rgba(0,0,0,0.24)] backdrop-blur-xl transition hover:-translate-y-0.5 hover:border-cyan-300/25">
-      <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/55 to-transparent opacity-70" />
-      <p className="text-[10px] font-black uppercase tracking-[0.24em] text-slate-500">{label}</p>
-      <p className="mt-3 text-3xl font-black tracking-tight text-white">{value}</p>
-      <p className="mt-2 text-xs leading-5 text-slate-400">{detail}</p>
-    </article>
-  );
+function StatePill({ state }: { state: RouteState }) {
+  return <span className={`statePill ${stateTone[state]}`}>{state}</span>;
 }
 
-function AcademyLink({ href, children }: { href: string; children: ReactNode }) {
-  return (
-    <Link
-      href={href}
-      className="rounded-full border border-white/10 bg-white/[0.035] px-4 py-2 text-xs font-bold text-slate-300 transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.07] hover:text-white"
-    >
-      {children}
-    </Link>
-  );
-}
-
-function SectionHeading({ eyebrow, title, copy }: { eyebrow: string; title: string; copy: string }) {
-  return (
-    <div className="max-w-4xl">
-      <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">{eyebrow}</p>
-      <h2 className="mt-3 text-3xl font-black tracking-[-0.035em] text-white sm:text-4xl">{title}</h2>
-      <p className="mt-4 text-sm leading-7 text-slate-400 sm:text-base">{copy}</p>
-    </div>
-  );
-}
-
-function ProtocolCard({ step }: { step: ReadingProtocolStep }) {
-  return (
-    <article className="group relative overflow-hidden rounded-[28px] border border-white/10 bg-white/[0.035] p-6 transition duration-300 hover:-translate-y-1 hover:border-cyan-300/25 hover:bg-white/[0.055]">
-      <div className="absolute right-4 top-3 text-6xl font-black text-white/[0.035]">{step.number}</div>
-      <div className="relative">
-        <span className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-cyan-300/25 bg-cyan-300/[0.08] text-xs font-black text-cyan-100">{step.number}</span>
-        <h3 className="mt-5 text-xl font-black text-white">{step.title}</h3>
-        <p className="mt-3 text-sm font-bold leading-6 text-cyan-100">{step.question}</p>
-        <div className="mt-5 rounded-2xl border border-white/8 bg-black/20 p-4">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Required reading evidence</p>
-          <p className="mt-2 text-sm leading-6 text-slate-300">{step.evidence}</p>
-        </div>
-        <div className="mt-3 rounded-2xl border border-rose-300/15 bg-rose-300/[0.04] p-4">
-          <p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-200">Stop condition</p>
-          <p className="mt-2 text-sm leading-6 text-slate-300">{step.stopCondition}</p>
-        </div>
-      </div>
-    </article>
-  );
-}
-
-function StateDoctrine({ state }: { state: RouteState }) {
-  const content: Record<RouteState, { title: string; rule: string; effect: string; misuse: string }> = {
-    ALLOW: {
-      title: "Exact permission—not general approval",
-      rule: "Every mandatory condition is satisfied for the exact committed scope.",
-      effect: "Release only the authorized action, destination, model, tool, amount, and time window.",
-      misuse: "Treating ALLOW as permission for adjacent, future, or broader actions.",
-    },
-    HOLD: {
-      title: "Repairable stop—not soft permission",
-      rule: "A required condition is missing, stale, changed, unresolved, or awaiting revalidation.",
-      effect: "Do not execute. Preserve the precise hold reason and repair condition.",
-      misuse: "Allowing execution while paperwork or evidence catches up later.",
-    },
-    DENY: {
-      title: "Prohibited present action",
-      rule: "A hard boundary, invalid authority, inadmissible evidence, or prohibited condition exists.",
-      effect: "Block or terminate the action and prevent alternate-path release under the same state.",
-      misuse: "Rewriting the original denial after later evidence appears.",
-    },
-    ESCALATE: {
-      title: "Transfer of judgment—not approval",
-      rule: "The route requires named human or institutional judgment beyond current authority.",
-      effect: "Route to the designated authority while preserving the unresolved conflict or exception.",
-      misuse: "Treating escalation as a favorable recommendation or implied approval.",
-    },
-  };
-  const item = content[state];
-  const visual = stateVisual[state];
-  return (
-    <article className={`relative overflow-hidden rounded-[28px] border ${visual.ring} bg-white/[0.035] p-6`}>
-      <div className={`absolute inset-0 bg-gradient-to-br ${visual.glow}`} />
-      <div className="relative">
-        <span className={`rounded-full border px-3 py-1.5 text-[10px] font-black tracking-[0.16em] ${visual.badge}`}>{state}</span>
-        <h3 className="mt-5 text-2xl font-black text-white">{item.title}</h3>
-        <div className="mt-5 space-y-4">
-          <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Decision rule</p><p className="mt-2 text-sm leading-6 text-slate-300">{item.rule}</p></div>
-          <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-slate-500">Required effect</p><p className="mt-2 text-sm leading-6 text-slate-300">{item.effect}</p></div>
-          <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-rose-200">Common misuse</p><p className="mt-2 text-sm leading-6 text-slate-300">{item.misuse}</p></div>
-        </div>
-      </div>
-    </article>
-  );
+function scoreRoute(route: RouteExample) {
+  const supported = route.anchors.filter((item) => item.status === "supported").length;
+  return Math.round((supported / route.anchors.length) * 100);
 }
 
 export default function RouteReadingCenterPage() {
@@ -969,9 +130,7 @@ export default function RouteReadingCenterPage() {
   const [completed, setCompleted] = useState<string[]>([]);
   const [notes, setNotes] = useState<Record<string, string>>({});
   const [saveState, setSaveState] = useState<"idle" | "saved" | "error">("idle");
-  const [patternQuery, setPatternQuery] = useState("");
-  const [patternLink, setPatternLink] = useState("ALL");
-  const [glossaryQuery, setGlossaryQuery] = useState("");
+  const [mode, setMode] = useState<"reader" | "protocol" | "comparison">("reader");
 
   useEffect(() => {
     try {
@@ -979,54 +138,26 @@ export default function RouteReadingCenterPage() {
       if (!raw) return;
       const saved = JSON.parse(raw) as SavedProgress;
       if (saved.version !== "2.0") return;
-      setCompleted(saved.completed ?? []);
-      setNotes(saved.notes ?? {});
+      setCompleted(saved.completed || []);
+      setNotes(saved.notes || {});
     } catch {
       setSaveState("error");
     }
   }, []);
 
-  const activeRoute = useMemo(
-    () => routeExamples.find((route) => route.id === activeId) ?? routeExamples[0],
-    [activeId],
-  );
-
-  const filteredPatterns = useMemo(() => {
-    const query = patternQuery.trim().toLowerCase();
-    return failurePatterns.filter((pattern) => {
-      const matchesLink = patternLink === "ALL" || pattern.chainLink === patternLink;
-      const matchesQuery = !query || [pattern.title, pattern.signal, pattern.consequence, pattern.repair, pattern.chainLink].join(" ").toLowerCase().includes(query);
-      return matchesLink && matchesQuery;
-    });
-  }, [patternLink, patternQuery]);
-
-  const filteredGlossary = useMemo(() => {
-    const query = glossaryQuery.trim().toLowerCase();
-    if (!query) return glossary;
-    return glossary.filter((entry) => [entry.term, entry.definition, entry.readingUse].join(" ").toLowerCase().includes(query));
-  }, [glossaryQuery]);
-
+  const activeRoute = useMemo(() => routeExamples.find((route) => route.id === activeId) ?? routeExamples[0], [activeId]);
   const progress = Math.round((completed.length / routeExamples.length) * 100);
-  const supportedCount = activeRoute.anchors.filter((anchor) => anchor.status === "supported").length;
-  const limitedCount = activeRoute.anchors.filter((anchor) => anchor.status === "limited").length;
-  const failedCount = activeRoute.anchors.filter((anchor) => anchor.status === "failed").length;
-  const activeVisual = stateVisual[activeRoute.state];
+  const activeScore = scoreRoute(activeRoute);
+  const firstFailure = activeRoute.anchors.find((item) => item.status === "failed");
 
   function toggleCompleted(id: string) {
-    setCompleted((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    );
+    setCompleted((current) => current.includes(id) ? current.filter((item) => item !== id) : [...current, id]);
     setSaveState("idle");
   }
 
   function saveProgress() {
     try {
-      const payload: SavedProgress = {
-        version: "2.0",
-        completed,
-        notes,
-        updatedAt: new Date().toISOString(),
-      };
+      const payload: SavedProgress = { version: "2.0", completed, notes, updatedAt: new Date().toISOString() };
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
       setSaveState("saved");
     } catch {
@@ -1035,402 +166,95 @@ export default function RouteReadingCenterPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#020711] text-slate-100">
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.022)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.022)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(to_bottom,black,transparent_82%)]" />
-        <div className="absolute -left-28 top-8 h-[460px] w-[460px] rounded-full bg-cyan-500/12 blur-[130px]" />
-        <div className="absolute right-[-140px] top-[28%] h-[500px] w-[500px] rounded-full bg-violet-500/10 blur-[145px]" />
-        <div className="absolute bottom-[-140px] left-[35%] h-[430px] w-[430px] rounded-full bg-emerald-500/8 blur-[145px]" />
-      </div>
-
-      <div className="relative mx-auto max-w-[1480px] px-4 py-6 sm:px-7 lg:px-10 lg:py-9">
-        <header className="rounded-[28px] border border-white/10 bg-[#07111f]/75 px-5 py-4 shadow-[0_28px_100px_rgba(0,0,0,0.35)] backdrop-blur-2xl sm:px-7">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex items-center gap-4">
-              <div className="grid h-12 w-12 place-items-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 text-sm font-black tracking-[0.12em] text-cyan-100 shadow-[0_0_30px_rgba(34,211,238,0.12)]">
-                T14
-              </div>
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">TA-14 Academy</p>
-                <p className="mt-1 text-sm font-bold text-white">Route Reading Center</p>
-              </div>
-            </div>
-
-            <nav className="flex flex-wrap gap-2" aria-label="Academy navigation">
-              <AcademyLink href="/academy/mission-control">Mission Control</AcademyLink>
-              <AcademyLink href="/academy/architecture-explorer">Architecture Explorer</AcademyLink>
-              <AcademyLink href="/academy/simulator">Simulation Center</AcademyLink>
-            </nav>
+    <main className="routePage">
+      <div className="ambient" aria-hidden="true"><div className="stars"/><div className="gridFloor"/><div className="aurora one"/><div className="aurora two"/></div>
+      <div className="shell">
+        <header className="hero">
+          <div className="heroCopy">
+            <div className="liveLabel"><span/>TA-14 Academy · Route intelligence environment</div>
+            <h1>Route Reading <em>Center</em></h1>
+            <p>Learn to read a governed route from reality forward. Locate the first unsupported condition, understand why it controls every downstream state, and preserve a bounded analysis before building your own route.</p>
+            <div className="heroActions"><button type="button" onClick={() => setMode("reader")} className="primaryButton">Enter route reader →</button><button type="button" onClick={() => setMode("comparison")} className="secondaryButton">Compare determinations</button></div>
+            <div className="governingRule"><span>Reading discipline</span><strong>Do not begin with the desired outcome.</strong></div>
           </div>
+          <div className={`commandCore ${stateTone[activeRoute.state]}`}>
+            <div className="coreHeader"><div><span>Active determination</span><h2>{activeRoute.state}</h2></div><StatePill state={activeRoute.state}/></div>
+            <p>{activeRoute.summary}</p>
+            <div className="coreMetrics"><div><strong>{activeScore}%</strong><span>supported chain</span></div><div><strong>{firstFailure?.label ?? "None"}</strong><span>earliest failure</span></div></div>
+          </div>
+          <div className="heroRail">{activeRoute.anchors.map((anchor,index)=><div key={anchor.label} className={anchor.status}><span>{String(index+1).padStart(2,"0")}</span><strong>{anchor.label}</strong><i/></div>)}</div>
         </header>
 
-        <section className="relative mt-6 overflow-hidden rounded-[36px] border border-white/10 bg-[#07111f]/78 px-6 py-10 shadow-[0_36px_110px_rgba(0,0,0,0.38)] backdrop-blur-2xl sm:px-9 lg:px-12 lg:py-14">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_0%,rgba(34,211,238,0.16),transparent_34%),radial-gradient(circle_at_88%_34%,rgba(139,92,246,0.13),transparent_32%)]" />
-          <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-cyan-300/70 to-transparent" />
-
-          <div className="relative grid gap-10 xl:grid-cols-[1.25fr_0.75fr] xl:items-end">
-            <div>
-              <div className="inline-flex items-center gap-3 rounded-full border border-cyan-300/20 bg-cyan-300/[0.07] px-4 py-2">
-                <span className="h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_16px_rgba(103,232,249,0.7)]" />
-                <span className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-100">Read before you build</span>
-              </div>
-              <h1 className="mt-6 max-w-5xl text-4xl font-black leading-[0.98] tracking-[-0.045em] text-white sm:text-5xl lg:text-7xl">
-                Learn to read the route before you trust the result.
-              </h1>
-              <p className="mt-6 max-w-4xl text-base leading-8 text-slate-300 sm:text-lg">
-                Inspect complete and defective routes across all four determination states. Follow the chain from reality to outcome, find the earliest unsupported condition, and distinguish permission from completion.
-              </p>
-            </div>
-
-            <aside className="rounded-[28px] border border-white/10 bg-black/20 p-6 shadow-inner shadow-black/20">
-              <p className="text-[10px] font-black uppercase tracking-[0.26em] text-slate-500">Governing principle</p>
-              <blockquote className="mt-4 text-2xl font-black leading-tight text-white">
-                No admissible evidence.
-                <br />
-                <span className="text-cyan-200">No admissible execution.</span>
-              </blockquote>
-              <p className="mt-4 text-sm leading-6 text-slate-400">
-                The first unsupported link controls the route. Later confidence cannot repair an earlier failure.
-              </p>
-            </aside>
-          </div>
-
-          <div className="relative mt-9 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-            <MetricCard label="Examples reviewed" value={`${completed.length}/${routeExamples.length}`} detail="Four canonical decision states" />
-            <MetricCard label="Learning progress" value={`${progress}%`} detail="Preserved locally in this browser" />
-            <MetricCard label="Active route support" value={`${supportedCount}/8`} detail={`${limitedCount} limited · ${failedCount} failed`} />
-            <MetricCard label="Reading discipline" value="Earliest failure" detail="Read from reality forward" />
-          </div>
-
-          <div className="relative mt-5 overflow-hidden rounded-full border border-white/10 bg-black/25 p-1">
-            <div className="h-2 rounded-full bg-gradient-to-r from-cyan-300 via-sky-300 to-violet-300 transition-all duration-700" style={{ width: `${Math.max(progress, 2)}%` }} />
-          </div>
+        <section className="statDeck">
+          <article><span>Examples reviewed</span><strong>{completed.length}/4</strong><small>Four decision states represented</small></article>
+          <article><span>Learning progress</span><strong>{progress}%</strong><small>Locally preserved learner progress</small></article>
+          <article><span>Anchor links</span><strong>8</strong><small>Reality through outcome</small></article>
+          <article className="accent"><span>Current route</span><strong>{activeRoute.state}</strong><small>{activeRoute.domain}</small></article>
         </section>
 
-        <section className="mt-6 grid gap-6 xl:grid-cols-[360px_minmax(0,1fr)]">
-          <aside className="xl:sticky xl:top-6 xl:self-start">
-            <div className="rounded-[30px] border border-white/10 bg-[#07111f]/78 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl">
-              <div className="px-2 pb-4 pt-2">
-                <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Demonstration routes</p>
-                <p className="mt-2 text-sm leading-6 text-slate-400">Compare the same execution chain across four final states.</p>
-              </div>
+        <nav className="modeTabs">
+          <button type="button" className={mode==="reader"?"active":""} onClick={()=>setMode("reader")}>Route reader</button>
+          <button type="button" className={mode==="protocol"?"active":""} onClick={()=>setMode("protocol")}>Reading protocol</button>
+          <button type="button" className={mode==="comparison"?"active":""} onClick={()=>setMode("comparison")}>Decision comparison</button>
+        </nav>
 
-              <div className="space-y-3">
-                {routeExamples.map((route, index) => {
-                  const isActive = route.id === activeRoute.id;
-                  const isComplete = completed.includes(route.id);
-                  const visual = stateVisual[route.state];
-
-                  return (
-                    <button
-                      key={route.id}
-                      type="button"
-                      onClick={() => setActiveId(route.id)}
-                      className={`group relative w-full overflow-hidden rounded-[24px] border p-4 text-left transition-all duration-300 ${
-                        isActive
-                          ? `${visual.ring} bg-white/[0.075] shadow-[0_20px_55px_rgba(0,0,0,0.24)]`
-                          : "border-white/8 bg-black/15 hover:-translate-y-0.5 hover:border-white/18 hover:bg-white/[0.045]"
-                      }`}
-                    >
-                      <div className={`absolute inset-0 bg-gradient-to-br ${visual.glow} transition-opacity group-hover:opacity-70 ${isActive ? "opacity-100" : "opacity-0"}`} />
-                      <div className="relative">
-                        <div className="flex items-center justify-between gap-3">
-                          <span className={`text-xs font-black tracking-[0.2em] ${visual.index}`}>{String(index + 1).padStart(2, "0")}</span>
-                          <span className={`rounded-full border px-2.5 py-1 text-[9px] font-black tracking-[0.16em] ${visual.badge}`}>{route.state}</span>
-                        </div>
-                        <h2 className="mt-4 text-base font-black leading-snug text-white">{route.title}</h2>
-                        <p className="mt-1.5 text-xs leading-5 text-slate-400">{route.domain}</p>
-                        <div className="mt-4 flex items-center justify-between border-t border-white/8 pt-3">
-                          <span className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-500">{visual.label}</span>
-                          {isComplete ? <span className="text-xs font-bold text-emerald-200">Reviewed ✓</span> : <span className="text-xs text-slate-600">Open →</span>}
-                        </div>
-                      </div>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+        {mode === "reader" && <section className="readerGrid">
+          <aside className="routeDock">
+            <div className="sectionIntro"><span>Demonstration routes</span><h2>Choose a route to inspect</h2><p>Each route carries a different decision state, failure pattern, and execution consequence.</p></div>
+            <div className="routeList">{routeExamples.map((route,index)=><button key={route.id} type="button" onClick={()=>setActiveId(route.id)} className={activeId===route.id?"active":""}><span className="routeIndex">{String(index+1).padStart(2,"0")}</span><span className="routeCopy"><b>{route.domain}</b><strong>{route.title}</strong><small>{route.consequence}</small></span><StatePill state={route.state}/></button>)}</div>
           </aside>
 
-          <div className="min-w-0 space-y-6">
-            <article className="relative overflow-hidden rounded-[34px] border border-white/10 bg-[#07111f]/80 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <div className={`absolute inset-0 bg-gradient-to-br ${activeVisual.glow}`} />
-              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
-
-              <div className="relative">
-                <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-                  <div>
-                    <p className="text-[10px] font-black uppercase tracking-[0.28em] text-cyan-300">{activeRoute.domain}</p>
-                    <h2 className="mt-4 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-5xl">{activeRoute.title}</h2>
-                  </div>
-                  <div className="flex flex-col items-start gap-2 lg:items-end">
-                    <span className={`rounded-full border px-5 py-2.5 text-xs font-black tracking-[0.2em] ${activeVisual.badge}`}>{activeRoute.state}</span>
-                    <span className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-500">{activeVisual.label}</span>
-                  </div>
-                </div>
-
-                <div className="mt-8 grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
-                  <section className="rounded-[25px] border border-white/10 bg-black/22 p-5 sm:p-6">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">Proposed consequence</p>
-                    <p className="mt-3 text-lg font-bold leading-8 text-white">{activeRoute.consequence}</p>
-                  </section>
-                  <section className="rounded-[25px] border border-white/10 bg-white/[0.04] p-5 sm:p-6">
-                    <p className="text-[10px] font-black uppercase tracking-[0.22em] text-slate-500">Reading result</p>
-                    <p className="mt-3 text-sm leading-7 text-slate-300">{activeRoute.summary}</p>
-                  </section>
-                </div>
-
-                {activeRoute.failure ? (
-                  <div className="mt-5 rounded-[24px] border border-amber-300/20 bg-amber-300/[0.055] p-5">
-                    <div className="flex items-start gap-4">
-                      <div className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-amber-300/25 bg-amber-300/10 text-sm font-black text-amber-100">!</div>
-                      <div>
-                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-200">Earliest controlling condition</p>
-                        <p className="mt-2 text-sm leading-6 text-amber-50">{activeRoute.failure}</p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-5 rounded-[24px] border border-emerald-300/20 bg-emerald-300/[0.055] p-5">
-                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-200">Route integrity</p>
-                    <p className="mt-2 text-sm leading-6 text-emerald-50">Every required link is supported for the exact bounded action.</p>
-                  </div>
-                )}
-              </div>
+          <div className="readingStage">
+            <article className="routeOverview panel">
+              <div className="panelHeader"><div><span>Selected route</span><h2>{activeRoute.title}</h2><p>{activeRoute.consequence}</p></div><StatePill state={activeRoute.state}/></div>
+              <div className="overviewGrid"><div><span>Route summary</span><p>{activeRoute.summary}</p></div><div><span>Reading lesson</span><p>{activeRoute.lesson}</p></div></div>
             </article>
 
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/72 p-5 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-7 lg:p-9">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Architecture correspondence</p>
-                  <h2 className="mt-3 text-2xl font-black tracking-tight text-white sm:text-3xl">Read the eight-link chain in order.</h2>
-                </div>
-                <div className="flex flex-wrap gap-2 text-[10px] font-black uppercase tracking-[0.14em]">
-                  <span className="rounded-full border border-emerald-300/20 bg-emerald-300/[0.06] px-3 py-1.5 text-emerald-200">{supportedCount} supported</span>
-                  <span className="rounded-full border border-amber-300/20 bg-amber-300/[0.06] px-3 py-1.5 text-amber-200">{limitedCount} limited</span>
-                  <span className="rounded-full border border-rose-300/20 bg-rose-300/[0.06] px-3 py-1.5 text-rose-200">{failedCount} failed</span>
-                </div>
-              </div>
+            <article className="chainPanel panel">
+              <div className="panelHeader"><div><span>Execution chain</span><h2>Read from reality forward</h2><p>The first failed link controls the route. Later support cannot cure an earlier break.</p></div><div className="chainScore"><strong>{activeScore}%</strong><span>supported</span></div></div>
+              <div className="anchorGrid">{activeRoute.anchors.map((anchor,index)=><article key={anchor.label} className={`anchorCard ${anchor.status}`}><div className="anchorTop"><span>{String(index+1).padStart(2,"0")}</span><b>{anchor.status}</b></div><h3>{anchor.label}</h3><p>{anchor.value}</p><i/></article>)}</div>
+            </article>
 
-              <div className="relative mt-7 grid gap-4 md:grid-cols-2">
-                <div className="pointer-events-none absolute bottom-0 left-7 top-0 hidden w-px bg-gradient-to-b from-cyan-300/40 via-white/10 to-transparent md:block" />
-                {activeRoute.anchors.map((anchor, index) => {
-                  const visual = anchorVisual[anchor.status];
-                  return (
-                    <article key={anchor.label} className={`group relative rounded-[24px] border p-5 transition duration-300 hover:-translate-y-0.5 ${visual.card}`}>
-                      <div className="flex items-start gap-4">
-                        <div className="relative z-10 grid h-11 w-11 shrink-0 place-items-center rounded-2xl border border-white/10 bg-[#07111f] text-xs font-black text-cyan-100 shadow-[0_12px_30px_rgba(0,0,0,0.24)]">
-                          {String(index + 1).padStart(2, "0")}
-                        </div>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex flex-wrap items-center justify-between gap-3">
-                            <h3 className="text-lg font-black text-white">{anchor.label}</h3>
-                            <span className={`inline-flex items-center gap-2 text-[9px] font-black uppercase tracking-[0.16em] ${visual.word}`}>
-                              <span className={`h-2 w-2 rounded-full ${visual.dot}`} />
-                              {anchor.status}
-                            </span>
-                          </div>
-                          <p className="mt-2 text-sm leading-6 text-slate-300">{anchor.value}</p>
-                        </div>
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            </section>
+            <article className={`decisionVault ${stateTone[activeRoute.state]}`}>
+              <div className="vaultLabel">Bounded route determination</div>
+              <div className="vaultMain"><div><h2>{activeRoute.state}</h2><p>{activeRoute.failure ?? "No unsupported upstream condition is present in the preserved route."}</p></div><StatePill state={activeRoute.state}/></div>
+              <div className="vaultGrid"><div><span>Earliest controlling condition</span><strong>{firstFailure?.label ?? "No failure"}</strong></div><div><span>Repair discipline</span><p>{activeRoute.repair}</p></div></div>
+            </article>
 
-            <section className="grid gap-6 lg:grid-cols-2">
-              <article className="rounded-[30px] border border-white/10 bg-[#07111f]/75 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-2xl sm:p-7">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-cyan-300">Repair condition</p>
-                <h2 className="mt-3 text-2xl font-black text-white">What must change?</h2>
-                <p className="mt-4 text-sm leading-7 text-slate-300">{activeRoute.repair}</p>
-              </article>
-              <article className="rounded-[30px] border border-white/10 bg-[#07111f]/75 p-6 shadow-[0_24px_70px_rgba(0,0,0,0.25)] backdrop-blur-2xl sm:p-7">
-                <p className="text-[10px] font-black uppercase tracking-[0.24em] text-violet-300">Learning objective</p>
-                <h2 className="mt-3 text-2xl font-black text-white">What does this state teach?</h2>
-                <p className="mt-4 text-sm leading-7 text-slate-300">{activeRoute.lesson}</p>
-              </article>
-            </section>
-
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/80 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Learner analysis</p>
-                  <h2 className="mt-3 text-2xl font-black text-white sm:text-3xl">Preserve your reading of the route.</h2>
-                </div>
-                <span className="text-xs font-bold text-slate-500">Saved locally</span>
-              </div>
-              <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
-                Identify the earliest failed or limited condition, explain why the final state follows, and state what evidence or authority would be required to change it.
-              </p>
-
-              <textarea
-                id="route-notes"
-                value={notes[activeRoute.id] ?? ""}
-                onChange={(event) => {
-                  setNotes((current) => ({ ...current, [activeRoute.id]: event.target.value }));
-                  setSaveState("idle");
-                }}
-                rows={8}
-                className="mt-6 w-full resize-y rounded-[24px] border border-white/10 bg-black/25 p-5 text-sm leading-7 text-white shadow-inner shadow-black/20 outline-none transition placeholder:text-slate-600 focus:border-cyan-300/40 focus:ring-4 focus:ring-cyan-300/[0.06]"
-                placeholder="Example: The route cannot proceed because continuity was not revalidated after the identity state changed. The repair condition is..."
-              />
-
-              <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <button
-                  type="button"
-                  onClick={() => toggleCompleted(activeRoute.id)}
-                  className={`rounded-2xl border px-5 py-3 text-sm font-black transition ${
-                    completed.includes(activeRoute.id)
-                      ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-100"
-                      : "border-white/10 bg-white/[0.04] text-white hover:border-cyan-300/35 hover:bg-cyan-300/[0.07]"
-                  }`}
-                >
-                  {completed.includes(activeRoute.id) ? "Reviewed ✓" : "Mark example reviewed"}
-                </button>
-
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                  {saveState === "saved" ? <span className="text-xs font-bold text-emerald-200">Progress preserved.</span> : null}
-                  {saveState === "error" ? <span className="text-xs font-bold text-rose-200">Progress could not be saved.</span> : null}
-                  <button
-                    type="button"
-                    onClick={saveProgress}
-                    className="rounded-2xl bg-gradient-to-r from-cyan-300 to-sky-300 px-6 py-3 text-sm font-black text-slate-950 shadow-[0_16px_45px_rgba(34,211,238,0.2)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_55px_rgba(34,211,238,0.28)]"
-                  >
-                    Save progress
-                  </button>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/76 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <SectionHeading
-                eyebrow="Canonical reading protocol"
-                title="Twelve moves from proposed consequence to proof boundary."
-                copy="Use this sequence whenever you inspect a governed route. The order matters because a later success cannot repair an earlier unsupported condition."
-              />
-              <div className="mt-8 grid gap-5 lg:grid-cols-2 2xl:grid-cols-3">
-                {readingProtocol.map((step) => <ProtocolCard key={step.id} step={step} />)}
-              </div>
-            </section>
-
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/74 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <SectionHeading
-                eyebrow="Determination doctrine"
-                title="Read the state by its execution consequence."
-                copy="A determination is not a label. Each state constrains the next action and must produce a different technical effect."
-              />
-              <div className="mt-8 grid gap-5 xl:grid-cols-2">
-                {DETERMINATION_ORDER.map((state) => <StateDoctrine key={state} state={state} />)}
-              </div>
-            </section>
-
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/76 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-                <SectionHeading
-                  eyebrow="Failure-pattern library"
-                  title="Recognize where routes break before consequence binds."
-                  copy="Search thirty-two institutional reading patterns across the complete execution chain. Each pattern names the visible signal, consequence, and repair discipline."
-                />
-                <div className="grid gap-3 sm:grid-cols-[220px_190px]">
-                  <input value={patternQuery} onChange={(event) => setPatternQuery(event.target.value)} placeholder="Search patterns" className="rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/35" />
-                  <select value={patternLink} onChange={(event) => setPatternLink(event.target.value)} className="rounded-2xl border border-white/10 bg-[#081321] px-4 py-3 text-sm text-white outline-none focus:border-cyan-300/35">
-                    <option value="ALL">All chain links</option>
-                    {CHAIN_ORDER.map((link) => <option key={link} value={link}>{link}</option>)}
-                  </select>
-                </div>
-              </div>
-              <div className="mt-5 flex items-center justify-between rounded-2xl border border-white/8 bg-black/20 px-4 py-3">
-                <p className="text-xs text-slate-400">Showing <strong className="text-white">{filteredPatterns.length}</strong> patterns</p>
-                <button type="button" onClick={() => { setPatternQuery(""); setPatternLink("ALL"); }} className="text-xs font-black text-cyan-200 hover:text-white">Reset filters</button>
-              </div>
-              <div className="mt-6 grid gap-4 lg:grid-cols-2">
-                {filteredPatterns.map((pattern) => (
-                  <details key={pattern.id} className="group rounded-[24px] border border-white/10 bg-white/[0.03] p-5 open:border-cyan-300/20 open:bg-white/[0.05]">
-                    <summary className="cursor-pointer list-none">
-                      <div className="flex items-start justify-between gap-4">
-                        <div><p className="text-[9px] font-black uppercase tracking-[0.2em] text-cyan-300">{pattern.chainLink} · {pattern.id}</p><h3 className="mt-2 text-lg font-black text-white">{pattern.title}</h3></div>
-                        <span className={`rounded-full border px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.14em] ${pattern.severity === "critical" ? "border-rose-300/25 bg-rose-300/[0.07] text-rose-200" : pattern.severity === "blocking" ? "border-amber-300/25 bg-amber-300/[0.07] text-amber-200" : "border-cyan-300/25 bg-cyan-300/[0.07] text-cyan-200"}`}>{pattern.severity}</span>
-                      </div>
-                    </summary>
-                    <div className="mt-5 grid gap-4 border-t border-white/8 pt-5 md:grid-cols-3">
-                      <div><p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Visible signal</p><p className="mt-2 text-sm leading-6 text-slate-300">{pattern.signal}</p></div>
-                      <div><p className="text-[9px] font-black uppercase tracking-[0.18em] text-slate-500">Consequence</p><p className="mt-2 text-sm leading-6 text-slate-300">{pattern.consequence}</p></div>
-                      <div><p className="text-[9px] font-black uppercase tracking-[0.18em] text-emerald-200">Repair discipline</p><p className="mt-2 text-sm leading-6 text-slate-300">{pattern.repair}</p></div>
-                    </div>
-                  </details>
-                ))}
-              </div>
-            </section>
-
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/74 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.28)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <SectionHeading
-                eyebrow="Reviewer question bank"
-                title="Twenty-four questions that expose route theater."
-                copy="Use these prompts during peer review, assessment, independent inspection, or before accepting a route as execution proof."
-              />
-              <div className="mt-8 overflow-hidden rounded-[26px] border border-white/10">
-                <div className="hidden grid-cols-[150px_1fr_1fr] gap-4 border-b border-white/10 bg-white/[0.04] px-5 py-4 text-[9px] font-black uppercase tracking-[0.2em] text-slate-500 md:grid">
-                  <span>Domain</span><span>Inspection question</span><span>Expected reading</span>
-                </div>
-                {reviewQuestions.map((item, index) => (
-                  <article key={item.id} className={`grid gap-4 px-5 py-5 md:grid-cols-[150px_1fr_1fr] ${index !== reviewQuestions.length - 1 ? "border-b border-white/8" : ""}`}>
-                    <div><span className="rounded-full border border-cyan-300/20 bg-cyan-300/[0.06] px-3 py-1.5 text-[9px] font-black uppercase tracking-[0.16em] text-cyan-200">{item.category}</span></div>
-                    <p className="text-sm font-bold leading-6 text-white">{item.question}</p>
-                    <p className="text-sm leading-6 text-slate-400">{item.expectedReading}</p>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="rounded-[34px] border border-white/10 bg-[#07111f]/76 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur-2xl sm:p-8 lg:p-10">
-              <div className="flex flex-col gap-6 xl:flex-row xl:items-end xl:justify-between">
-                <SectionHeading
-                  eyebrow="Route-reading glossary"
-                  title="Use the institution's terms precisely."
-                  copy="Search the core vocabulary used throughout the Academy, Exchange, artifact engine, review lanes, and verification surfaces."
-                />
-                <input value={glossaryQuery} onChange={(event) => setGlossaryQuery(event.target.value)} placeholder="Search glossary" className="w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm text-white outline-none placeholder:text-slate-600 focus:border-cyan-300/35 xl:max-w-xs" />
-              </div>
-              <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-                {filteredGlossary.map((entry) => (
-                  <article key={entry.term} className="rounded-[24px] border border-white/10 bg-white/[0.03] p-5 transition hover:-translate-y-0.5 hover:border-cyan-300/20 hover:bg-white/[0.05]">
-                    <h3 className="text-lg font-black text-white">{entry.term}</h3>
-                    <p className="mt-3 text-sm leading-6 text-slate-300">{entry.definition}</p>
-                    <div className="mt-4 border-t border-white/8 pt-4"><p className="text-[9px] font-black uppercase tracking-[0.18em] text-cyan-300">Reading use</p><p className="mt-2 text-sm leading-6 text-slate-400">{entry.readingUse}</p></div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="relative overflow-hidden rounded-[34px] border border-cyan-300/15 bg-gradient-to-br from-cyan-300/[0.08] via-[#07111f] to-violet-300/[0.07] p-7 shadow-[0_28px_90px_rgba(0,0,0,0.3)] sm:p-9">
-              <div className="absolute right-0 top-0 h-44 w-44 rounded-full bg-cyan-300/10 blur-3xl" />
-              <div className="relative grid gap-7 lg:grid-cols-[1fr_auto] lg:items-center">
-                <div>
-                  <p className="text-[10px] font-black uppercase tracking-[0.26em] text-cyan-300">Reading discipline</p>
-                  <h2 className="mt-3 text-3xl font-black tracking-tight text-white">Do not begin with the desired outcome.</h2>
-                  <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-300">
-                    Read from reality forward. A favorable objective cannot repair missing evidence, broken continuity, invalid authority, or execution beyond the committed boundary.
-                  </p>
-                </div>
-                <div className="flex flex-col gap-3 sm:flex-row lg:flex-col">
-                  <Link href="/academy/governance-thinking" className="rounded-2xl border border-white/12 bg-white/[0.05] px-5 py-3 text-center text-sm font-black text-white transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.07]">
-                    Return to Governance Thinking
-                  </Link>
-                  <Link href="/academy/simulator" className="rounded-2xl bg-white px-5 py-3 text-center text-sm font-black text-slate-950 transition hover:-translate-y-0.5">
-                    Continue to Simulation Center →
-                  </Link>
-                </div>
-              </div>
-            </section>
+            <article className="analysisPanel panel">
+              <div className="panelHeader"><div><span>Learner analysis</span><h2>Preserve your reading</h2><p>State the earliest failed or limited condition, explain the final state, and identify what would be required to change it.</p></div></div>
+              <textarea value={notes[activeRoute.id] ?? ""} onChange={(event)=>{setNotes((current)=>({...current,[activeRoute.id]:event.target.value}));setSaveState("idle");}} rows={7} placeholder="Example: The route cannot proceed because continuity was not revalidated after the identity state changed..."/>
+              <div className="analysisActions"><button type="button" className={`completeButton ${completed.includes(activeRoute.id)?"done":""}`} onClick={()=>toggleCompleted(activeRoute.id)}>{completed.includes(activeRoute.id)?"✓ Example reviewed":"Mark example reviewed"}</button><button type="button" className="primaryButton" onClick={saveProgress}>Save progress</button><span className={`saveState ${saveState}`}>{saveState==="saved"?"Progress preserved locally":saveState==="error"?"Unable to save locally":"Unsaved changes remain visible"}</span></div>
+            </article>
           </div>
+        </section>}
+
+        {mode === "protocol" && <section className="protocolView">
+          <div className="sectionIntro wide"><span>Institutional reading protocol</span><h2>Ten moves before interpretation becomes reliance.</h2><p>Use the same sequence every time. Route reading is not impressionistic; it is a disciplined inspection of consequence, evidence, authority, continuity, binding conditions, commitment, execution, and outcome.</p></div>
+          <div className="protocolGrid">{[
+            ["01","Name the consequence","What exact action may bind to reality?"],["02","Establish present reality","What condition actually exists now?"],["03","Locate the record","What was captured, by whom, and when?"],["04","Test continuity","Did identity, state, version, and custody remain connected?"],["05","Determine admissibility","May this evidence support this consequence here and now?"],["06","Resolve authority","Who may bind the decision, and within what scope?"],["07","Apply binding conditions","Which limits, thresholds, and prohibitions govern?"],["08","Find earliest failure","Which first unsupported link controls the route?"],["09","Inspect commitment","Was the decision fixed before action?"],["10","Verify execution and outcome","Did the determination control the action, and what followed?"]
+          ].map(([number,title,question])=><article key={number}><span>{number}</span><h3>{title}</h3><p>{question}</p></article>)}</div>
+        </section>}
+
+        {mode === "comparison" && <section className="comparisonView">
+          <div className="sectionIntro wide"><span>Decision comparison</span><h2>Four states. Four different operational meanings.</h2><p>Determinations are not labels. Each one changes what the system may do next.</p></div>
+          <div className="comparisonGrid">{routeExamples.map((route)=><article key={route.id} className={stateTone[route.state]}><StatePill state={route.state}/><h3>{route.title}</h3><p>{route.summary}</p><div><span>Execution effect</span><strong>{route.state==="ALLOW"?"Release exact committed action":route.state==="HOLD"?"Pause and preserve repair condition":route.state==="DENY"?"Block the action path":"Transfer to named authority"}</strong></div><button type="button" onClick={()=>{setActiveId(route.id);setMode("reader");}}>Inspect route →</button></article>)}</div>
+        </section>}
+
+        <section className="nextDeck">
+          <article><span>Next governed practice</span><h3>Route Construction Lab</h3><p>Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction">Build a route →</Link></article>
+          <article><span>Challenge the result</span><h3>Review Workspace</h3><p>Preserve findings, objections, corrections, and version history without erasing uncertainty.</p><Link href="/academy/review">Open review →</Link></article>
+          <article><span>Prove capability</span><h3>Assessment Center</h3><p>Separate attendance and completion from demonstrated, scope-bounded competency.</p><Link href="/academy/assessment">Open assessment →</Link></article>
         </section>
 
-        <footer className="mt-8 border-t border-white/10 py-7 text-center">
-          <p className="text-sm font-black text-white">No admissible evidence. No admissible execution.</p>
-          <p className="mt-2 text-xs leading-6 text-slate-500">Route completion reflects learner analysis and does not grant operational authority.</p>
-        </footer>
+        <footer><strong>No admissible evidence. No admissible execution.</strong><span>Route completion reflects learner analysis and does not grant operational authority.</span></footer>
       </div>
+
+      <style jsx global>{`
+        *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#02060d;color:#eef6ff}.routePage{min-height:100vh;position:relative;overflow:hidden;background:radial-gradient(circle at 18% 10%,rgba(0,220,255,.09),transparent 28%),radial-gradient(circle at 88% 16%,rgba(139,124,255,.12),transparent 30%),linear-gradient(180deg,#030812 0%,#02060d 54%,#050914 100%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.ambient{position:absolute;inset:0;pointer-events:none;overflow:hidden}.stars{position:absolute;inset:0;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.9) 0 1px,transparent 1.5px),radial-gradient(circle at 70% 16%,rgba(101,234,255,.8) 0 1px,transparent 1.5px),radial-gradient(circle at 84% 62%,rgba(139,124,255,.8) 0 1px,transparent 1.5px);background-size:170px 170px,240px 240px,310px 310px;opacity:.2}.gridFloor{position:absolute;left:-20%;right:-20%;bottom:-180px;height:560px;background-image:linear-gradient(rgba(101,234,255,.07) 1px,transparent 1px),linear-gradient(90deg,rgba(101,234,255,.07) 1px,transparent 1px);background-size:62px 62px;transform:perspective(520px) rotateX(64deg);transform-origin:center bottom;mask-image:linear-gradient(to top,#000,transparent 88%)}.aurora{position:absolute;width:42vw;height:42vw;border-radius:50%;filter:blur(90px);opacity:.12}.aurora.one{background:#00d9ff;left:-18vw;top:8vh}.aurora.two{background:#7d63ff;right:-18vw;top:22vh}.shell{position:relative;z-index:1;width:min(1460px,calc(100% - 32px));margin:0 auto;padding:28px 0 64px}.hero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(360px,.85fr);gap:24px;padding:34px;border:1px solid rgba(255,255,255,.09);border-radius:34px;background:linear-gradient(135deg,rgba(9,21,39,.92),rgba(4,11,23,.84));box-shadow:0 35px 110px rgba(0,0,0,.5),inset 0 1px rgba(255,255,255,.06);backdrop-filter:blur(24px);position:relative;overflow:hidden}.hero:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(101,234,255,.04),transparent);transform:translateX(-100%);animation:scan 9s linear infinite}.liveLabel,.sectionIntro>span,.panelHeader span,.vaultLabel{font-size:11px;font-weight:900;letter-spacing:.22em;text-transform:uppercase;color:#66eaff}.liveLabel{display:flex;align-items:center;gap:10px}.liveLabel span{width:8px;height:8px;border-radius:50%;background:#57f1c9;box-shadow:0 0 18px #57f1c9}.hero h1{margin:18px 0 12px;font-size:clamp(48px,6.4vw,92px);line-height:.88;letter-spacing:-.07em}.hero h1 em{font-style:normal;color:#7deeff;text-shadow:0 0 34px rgba(101,234,255,.25)}.heroCopy>p{max-width:780px;color:#aab8cb;font-size:18px;line-height:1.75}.heroActions,.analysisActions{display:flex;gap:12px;flex-wrap:wrap;margin-top:24px}.primaryButton,.secondaryButton,.completeButton{appearance:none;border:0;border-radius:14px;padding:13px 18px;font-weight:900;font-size:14px;cursor:pointer;text-decoration:none;transition:.25s ease}.primaryButton{background:linear-gradient(135deg,#eafdff,#87f3ff);color:#03111c;box-shadow:0 16px 36px rgba(70,220,255,.18)}.primaryButton:hover{transform:translateY(-2px);box-shadow:0 22px 46px rgba(70,220,255,.28)}.secondaryButton,.completeButton{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.1);color:#eaf4ff}.secondaryButton:hover,.completeButton:hover{border-color:rgba(101,234,255,.4);background:rgba(101,234,255,.08)}.completeButton.done{background:rgba(81,239,190,.12);border-color:rgba(81,239,190,.32);color:#82f3d2}.governingRule{margin-top:26px;padding-top:20px;border-top:1px solid rgba(255,255,255,.08);display:flex;gap:10px;flex-direction:column}.governingRule span{font-size:10px;text-transform:uppercase;letter-spacing:.2em;color:#75869d}.governingRule strong{font-size:17px}.commandCore{position:relative;border:1px solid rgba(255,255,255,.1);border-radius:28px;padding:26px;background:radial-gradient(circle at 80% 0%,rgba(101,234,255,.12),transparent 34%),rgba(2,8,18,.74);box-shadow:inset 0 1px rgba(255,255,255,.05),0 20px 60px rgba(0,0,0,.36)}.commandCore.allow{box-shadow:inset 0 0 70px rgba(81,239,190,.06),0 20px 60px rgba(0,0,0,.36)}.commandCore.hold{box-shadow:inset 0 0 70px rgba(255,194,92,.06),0 20px 60px rgba(0,0,0,.36)}.commandCore.deny{box-shadow:inset 0 0 70px rgba(255,102,129,.06),0 20px 60px rgba(0,0,0,.36)}.commandCore.escalate{box-shadow:inset 0 0 70px rgba(155,132,255,.08),0 20px 60px rgba(0,0,0,.36)}.coreHeader,.panelHeader,.vaultMain{display:flex;justify-content:space-between;gap:18px;align-items:flex-start}.coreHeader span{font-size:10px;letter-spacing:.19em;text-transform:uppercase;color:#7d8ca0}.coreHeader h2{font-size:42px;margin:6px 0 0;letter-spacing:-.05em}.commandCore>p{color:#a7b5c7;line-height:1.7}.coreMetrics{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px}.coreMetrics div{padding:16px;border-radius:18px;background:rgba(255,255,255,.035);border:1px solid rgba(255,255,255,.07)}.coreMetrics strong{display:block;font-size:22px}.coreMetrics span{display:block;margin-top:6px;color:#7f8fa5;font-size:11px;text-transform:uppercase;letter-spacing:.12em}.statePill{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:7px 10px;font-size:10px;font-weight:950;letter-spacing:.14em;border:1px solid}.statePill.allow{color:#83f4d4;background:rgba(81,239,190,.1);border-color:rgba(81,239,190,.28)}.statePill.hold{color:#ffd38b;background:rgba(255,194,92,.1);border-color:rgba(255,194,92,.28)}.statePill.deny{color:#ff91a8;background:rgba(255,102,129,.1);border-color:rgba(255,102,129,.28)}.statePill.escalate{color:#c0afff;background:rgba(155,132,255,.1);border-color:rgba(155,132,255,.28)}.heroRail{grid-column:1/-1;display:grid;grid-template-columns:repeat(8,1fr);gap:8px;margin-top:4px}.heroRail>div{position:relative;padding:12px;border-radius:13px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}.heroRail span{display:block;color:#61728a;font-size:9px}.heroRail strong{display:block;margin-top:4px;font-size:11px}.heroRail i{display:block;height:2px;margin-top:10px;background:#39485c}.heroRail .supported i{background:#51efbe}.heroRail .limited i{background:#ffc25c}.heroRail .failed i{background:#ff6681}.statDeck{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}.statDeck article{padding:20px;border-radius:22px;background:rgba(7,17,31,.78);border:1px solid rgba(255,255,255,.075);box-shadow:0 16px 42px rgba(0,0,0,.24)}.statDeck span{font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:#6f8098}.statDeck strong{display:block;font-size:30px;margin-top:8px}.statDeck small{display:block;color:#788aa2;margin-top:5px}.statDeck .accent{background:linear-gradient(135deg,rgba(101,234,255,.08),rgba(125,99,255,.08))}.modeTabs{display:flex;gap:6px;padding:6px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(3,9,19,.72);width:max-content;max-width:100%;margin-bottom:18px}.modeTabs button{border:0;background:transparent;color:#75869d;padding:11px 16px;border-radius:11px;font-weight:850;cursor:pointer}.modeTabs button.active{color:#041018;background:linear-gradient(135deg,#eaffff,#8ff5ff)}.readerGrid{display:grid;grid-template-columns:390px minmax(0,1fr);gap:18px}.routeDock,.panel,.protocolView,.comparisonView{border:1px solid rgba(255,255,255,.08);background:rgba(6,15,28,.82);border-radius:28px;box-shadow:0 24px 70px rgba(0,0,0,.34);backdrop-filter:blur(20px)}.routeDock{padding:24px;align-self:start;position:sticky;top:20px}.sectionIntro h2{font-size:28px;line-height:1.05;margin:8px 0 10px;letter-spacing:-.03em}.sectionIntro p{color:#8495ab;line-height:1.65;margin:0}.sectionIntro.wide{max-width:840px}.routeList{display:grid;gap:10px;margin-top:20px}.routeList button{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:12px;align-items:start;text-align:left;padding:15px;border-radius:17px;border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.025);color:#eff7ff;cursor:pointer;transition:.22s}.routeList button:hover,.routeList button.active{transform:translateX(4px);border-color:rgba(101,234,255,.34);background:rgba(101,234,255,.055)}.routeIndex{font-size:11px;color:#65748a;margin-top:3px}.routeCopy b{display:block;color:#6deaff;font-size:9px;text-transform:uppercase;letter-spacing:.13em}.routeCopy strong{display:block;margin-top:5px;font-size:15px}.routeCopy small{display:block;margin-top:6px;color:#77889e;line-height:1.45}.readingStage{display:grid;gap:18px}.panel{padding:26px}.panelHeader h2{font-size:30px;margin:7px 0 8px;letter-spacing:-.04em}.panelHeader p{margin:0;color:#8192a8;line-height:1.6}.overviewGrid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}.overviewGrid>div{padding:18px;border-radius:18px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}.overviewGrid span,.vaultGrid span{font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:.17em;color:#67eaff}.overviewGrid p,.vaultGrid p{color:#a9b6c6;line-height:1.65}.chainScore{text-align:right}.chainScore strong{display:block;font-size:27px}.chainScore span{font-size:10px;color:#75869d;text-transform:uppercase;letter-spacing:.15em}.anchorGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:22px}.anchorCard{position:relative;padding:18px;border-radius:19px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);overflow:hidden;min-height:178px}.anchorCard.supported{border-color:rgba(81,239,190,.18)}.anchorCard.limited{border-color:rgba(255,194,92,.23)}.anchorCard.failed{border-color:rgba(255,102,129,.25)}.anchorTop{display:flex;justify-content:space-between;color:#68798f;font-size:9px;text-transform:uppercase;letter-spacing:.12em}.anchorCard h3{font-size:20px;margin:13px 0 8px}.anchorCard p{color:#8394aa;line-height:1.55;font-size:13px}.anchorCard i{position:absolute;left:0;right:0;bottom:0;height:3px;background:#3f4e62}.anchorCard.supported i{background:#51efbe}.anchorCard.limited i{background:#ffc25c}.anchorCard.failed i{background:#ff6681}.decisionVault{padding:28px;border-radius:28px;border:1px solid rgba(255,255,255,.1);background:linear-gradient(135deg,rgba(8,20,37,.96),rgba(4,10,20,.9));box-shadow:0 28px 90px rgba(0,0,0,.42)}.decisionVault.allow{box-shadow:inset 0 0 100px rgba(81,239,190,.05),0 28px 90px rgba(0,0,0,.42)}.decisionVault.hold{box-shadow:inset 0 0 100px rgba(255,194,92,.05),0 28px 90px rgba(0,0,0,.42)}.decisionVault.deny{box-shadow:inset 0 0 100px rgba(255,102,129,.06),0 28px 90px rgba(0,0,0,.42)}.decisionVault.escalate{box-shadow:inset 0 0 100px rgba(155,132,255,.07),0 28px 90px rgba(0,0,0,.42)}.vaultMain{margin-top:10px;align-items:center}.vaultMain h2{font-size:58px;margin:0;letter-spacing:-.06em}.vaultMain p{max-width:760px;color:#a6b4c5;line-height:1.65}.vaultGrid{display:grid;grid-template-columns:.7fr 1.3fr;gap:14px;margin-top:20px}.vaultGrid>div{padding:17px;border-radius:17px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06)}.vaultGrid strong{display:block;margin-top:8px}.analysisPanel textarea{width:100%;margin-top:18px;border-radius:18px;border:1px solid rgba(255,255,255,.08);background:rgba(0,0,0,.22);color:#eaf4ff;padding:18px;resize:vertical;outline:none;font:inherit;line-height:1.65}.analysisPanel textarea:focus{border-color:rgba(101,234,255,.4);box-shadow:0 0 0 4px rgba(101,234,255,.05)}.saveState{align-self:center;color:#6f8096;font-size:12px}.saveState.saved{color:#65eac3}.saveState.error{color:#ff8ca3}.protocolView,.comparisonView{padding:30px}.protocolGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:13px;margin-top:24px}.protocolGrid article{padding:21px;border-radius:20px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07)}.protocolGrid span{color:#67eaff;font-size:11px;font-weight:900}.protocolGrid h3{font-size:19px;margin:10px 0 8px}.protocolGrid p{color:#8495aa;line-height:1.6;margin:0}.comparisonGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:24px}.comparisonGrid article{padding:22px;border-radius:22px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07)}.comparisonGrid article.allow{border-color:rgba(81,239,190,.2)}.comparisonGrid article.hold{border-color:rgba(255,194,92,.2)}.comparisonGrid article.deny{border-color:rgba(255,102,129,.2)}.comparisonGrid article.escalate{border-color:rgba(155,132,255,.22)}.comparisonGrid h3{font-size:21px;margin:18px 0 10px}.comparisonGrid p{color:#8596ab;line-height:1.6}.comparisonGrid article>div{padding-top:15px;margin-top:15px;border-top:1px solid rgba(255,255,255,.07)}.comparisonGrid article>div span{display:block;color:#6e8097;font-size:9px;text-transform:uppercase;letter-spacing:.15em}.comparisonGrid article>div strong{display:block;margin-top:7px}.comparisonGrid button{margin-top:18px;border:0;background:none;color:#72eaff;font-weight:900;cursor:pointer;padding:0}.nextDeck{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:18px}.nextDeck article{padding:24px;border-radius:24px;background:rgba(7,17,31,.78);border:1px solid rgba(255,255,255,.075)}.nextDeck span{font-size:9px;text-transform:uppercase;letter-spacing:.17em;color:#67eaff}.nextDeck h3{font-size:22px;margin:9px 0}.nextDeck p{color:#8294a9;line-height:1.6}.nextDeck a{color:#e9fbff;text-decoration:none;font-weight:900}.nextDeck a:hover{color:#67eaff}footer{display:flex;justify-content:space-between;gap:20px;padding:26px 4px 0;color:#718198}footer strong{color:#eef7ff}@keyframes scan{to{transform:translateX(100%)}}
+        @media(max-width:1100px){.hero{grid-template-columns:1fr}.readerGrid{grid-template-columns:1fr}.routeDock{position:relative;top:auto}.anchorGrid,.comparisonGrid{grid-template-columns:repeat(2,1fr)}.statDeck{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:720px){.shell{width:min(100% - 18px,1460px);padding-top:10px}.hero{padding:22px;border-radius:24px}.hero h1{font-size:52px}.heroCopy>p{font-size:15px}.heroRail{grid-template-columns:repeat(4,1fr)}.statDeck,.overviewGrid,.vaultGrid,.protocolGrid,.comparisonGrid,.nextDeck,.anchorGrid{grid-template-columns:1fr}.modeTabs{width:100%;overflow:auto}.modeTabs button{white-space:nowrap}.routeDock,.panel,.protocolView,.comparisonView{padding:20px;border-radius:22px}.vaultMain,.panelHeader,.coreHeader{flex-direction:column}.vaultMain h2{font-size:46px}footer{flex-direction:column}.coreMetrics{grid-template-columns:1fr}}
+      `}</style>
     </main>
   );
 }
