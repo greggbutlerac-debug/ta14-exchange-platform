@@ -9,6 +9,7 @@ type View =
   | "runtime"
   | "evidence"
   | "version"
+  | "bypass"
   | "control"
   | "outcome"
   | "integrity"
