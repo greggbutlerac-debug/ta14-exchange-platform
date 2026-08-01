@@ -909,14 +909,17 @@ export function createSignatureSubject(
       throw new Error("Signature subject requires bytes, value, or digest");
     }
   }
-  if (!/^[0-9a-f]{64}$/i.test(digest)) throw new Error("Signature subject digest must be SHA-256 hex");
+  const resolvedDigest = digest;
+  if (!resolvedDigest || !/^[0-9a-f]{64}$/i.test(resolvedDigest)) {
+    throw new Error("Signature subject digest must be SHA-256 hex");
+  }
   return {
     subjectId: input.subjectId,
     kind: input.kind,
     mediaType: input.mediaType,
     canonicalizationVersion: TA14_CANONICALIZATION_VERSION,
     hashAlgorithm: TA14_HASH_ALGORITHM,
-    digest: digest.toLowerCase(),
+    digest: resolvedDigest.toLowerCase(),
     byteLength,
     version: input.version,
     stableUrl: input.stableUrl,
