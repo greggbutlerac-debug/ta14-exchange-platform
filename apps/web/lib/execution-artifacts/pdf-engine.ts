@@ -1852,7 +1852,9 @@ export function generateExecutionArtifactPdf(
   const generatedAt = partialOptions?.generatedAt ?? new Date().toISOString();
   const result = generateExecutionArtifactPdfBytes(artifact, { ...partialOptions, generatedAt });
   const filename = createArtifactPdfFilename(artifact, result.options);
-  const blob = new Blob([result.bytes], { type: "application/pdf" });
+  const blobBytes = new Uint8Array(result.bytes.byteLength);
+  blobBytes.set(result.bytes);
+  const blob = new Blob([blobBytes.buffer], { type: "application/pdf" });
   return {
     bytes: result.bytes,
     blob,
