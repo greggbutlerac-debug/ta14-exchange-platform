@@ -68,10 +68,35 @@ type AcceptanceTest = {
   condition: string;
 };
 
+type AuthorityControl = {
+  id: string;
+  control: string;
+  requiredState: string;
+  observedState: string;
+  result: GateResult;
+  consequence: string;
+};
+
+type RepairStep = {
+  sequence: string;
+  title: string;
+  owner: string;
+  requiredEvidence: string;
+  completionRule: string;
+};
+
+type PackageComponent = {
+  id: string;
+  name: string;
+  format: string;
+  status: string;
+  purpose: string;
+};
+
 const ARTIFACT_ID = "TA14-EA-000002";
 const ARTIFACT_TITLE = "Authority Drift Before Execution";
 const ROUTE_ID = "TA14-ROUTE-AUTHORITY-DRIFT-HOLD-002";
-const ROUTE_VERSION = "1.0.0";
+const ROUTE_VERSION = "2.0.0";
 const RECORD_HASH = "sha256:4c4f4f98ec77c9c61526af0a704a31adfcd1d647e6883f88a061c4a99d59bc2f";
 const PACKAGE_HASH = "sha256:ed4f35ff5117bb0895185d360be3132fab44c9321ee8a09714422f736ff3ce97";
 const RECEIPT_HASH = "sha256:58a1b51e87cdd2f2ae403c548db7df76b21c971686ff4d72744af3c3466fe52f";
@@ -559,6 +584,187 @@ const acceptanceTests: AcceptanceTest[] = [
     result: "PASS",
     condition: "The artifact states what it proves and what it does not prove.",
   },
+];
+
+const authorityControls: AuthorityControl[] = [
+  {
+    id: "AC-01",
+    control: "Initiating actor identity",
+    requiredState: "Resolved and attributable",
+    observedState: "CFO identity verified against the institutional directory",
+    result: "PASS",
+    consequence: "The request remained attributable to a known initiating authority.",
+  },
+  {
+    id: "AC-02",
+    control: "CFO role assignment",
+    requiredState: "Active at commit",
+    observedState: "Active throughout intake, evaluation, and commit",
+    result: "PASS",
+    consequence: "The first required approval remained valid.",
+  },
+  {
+    id: "AC-03",
+    control: "Controller identity",
+    requiredState: "Resolved and attributable",
+    observedState: "Controller identity remained known after revocation",
+    result: "PASS",
+    consequence: "Identity continuity survived even though authority continuity did not.",
+  },
+  {
+    id: "AC-04",
+    control: "Controller delegation",
+    requiredState: "Active at commit",
+    observedState: "Revoked at 19:15:41 UTC before commit",
+    result: "FAIL",
+    consequence: "The route lost one mandatory authority condition.",
+  },
+  {
+    id: "AC-05",
+    control: "Delegation scope",
+    requiredState: "Vendor payments up to $50,000",
+    observedState: "Historical scope matched the proposed amount",
+    result: "PASS",
+    consequence: "Scope was not the controlling failure; current validity was.",
+  },
+  {
+    id: "AC-06",
+    control: "Delegation source",
+    requiredState: "Linked to an institutional authority record",
+    observedState: "Source record AUTH-CTRL-2026-044 preserved",
+    result: "PASS",
+    consequence: "The original authority and later revocation are both reconstructable.",
+  },
+  {
+    id: "AC-07",
+    control: "Revocation visibility",
+    requiredState: "Visible before determination",
+    observedState: "Authority event stream delivered revocation before commit",
+    result: "PASS",
+    consequence: "The route had an opportunity and obligation to fail closed.",
+  },
+  {
+    id: "AC-08",
+    control: "Dual approval rule",
+    requiredState: "CFO plus active controller",
+    observedState: "CFO active; controller revoked",
+    result: "FAIL",
+    consequence: "Mandatory dual approval was not satisfied.",
+  },
+  {
+    id: "AC-09",
+    control: "Separation of duties",
+    requiredState: "Initiator cannot replace missing approver",
+    observedState: "No substitution or self-approval permitted",
+    result: "PASS",
+    consequence: "The architecture prevented authority collapse into one actor.",
+  },
+  {
+    id: "AC-10",
+    control: "Backdating prohibition",
+    requiredState: "No later approval may rewrite the original event",
+    observedState: "Original HOLD remains immutable",
+    result: "PASS",
+    consequence: "Any repaired execution must create a new commit and receipt.",
+  },
+  {
+    id: "AC-11",
+    control: "Execution token state",
+    requiredState: "Token issued only after valid commit",
+    observedState: "No releasable token issued",
+    result: "PASS",
+    consequence: "The adapter could not transmit despite the preserved request.",
+  },
+  {
+    id: "AC-12",
+    control: "Revalidation requirement",
+    requiredState: "All dependent gates rerun after repair",
+    observedState: "Repair pending; no revalidation completed",
+    result: "FAIL",
+    consequence: "The route remains held until a new authority state survives review.",
+  },
+];
+
+const repairSteps: RepairStep[] = [
+  {
+    sequence: "01",
+    title: "Issue or identify a valid controller delegation",
+    owner: "Institutional authority administrator",
+    requiredEvidence: "New delegation record with actor, role, scope, issuer, effective time, and integrity commitment",
+    completionRule: "The delegation must be active for this exact payment route and amount ceiling.",
+  },
+  {
+    sequence: "02",
+    title: "Preserve the repaired authority state",
+    owner: "Authority resolver",
+    requiredEvidence: "Authority snapshot linked to the original held request without overwriting the original event",
+    completionRule: "The repaired state must receive a new stable identifier and timestamp.",
+  },
+  {
+    sequence: "03",
+    title: "Recheck identity and scope",
+    owner: "Route operator",
+    requiredEvidence: "Identity resolution and scope comparison for the CFO and controller",
+    completionRule: "Both actors must remain distinct, attributable, active, and in scope.",
+  },
+  {
+    sequence: "04",
+    title: "Revalidate payment evidence",
+    owner: "Evidence custodian",
+    requiredEvidence: "Fresh beneficiary, invoice, contract, and destination records",
+    completionRule: "No material payment condition may have drifted while the request was held.",
+  },
+  {
+    sequence: "05",
+    title: "Rerun dependent continuity gates",
+    owner: "TA-14 runtime",
+    requiredEvidence: "New continuity ledger covering identity, authority, route, destination, and custody",
+    completionRule: "Every mandatory continuity condition must pass in the repaired state.",
+  },
+  {
+    sequence: "06",
+    title: "Rerun admissibility and binding gates",
+    owner: "TA-14 runtime",
+    requiredEvidence: "New admissibility and binding records referencing the repaired authority snapshot",
+    completionRule: "The route must establish current authority and the dual approval obligation.",
+  },
+  {
+    sequence: "07",
+    title: "Create a new determination commit",
+    owner: "Authorized runtime operator",
+    requiredEvidence: "New commit record with route version, admitted evidence, authority snapshot, and reason codes",
+    completionRule: "The new commit may not alter, replace, or backdate the original HOLD.",
+  },
+  {
+    sequence: "08",
+    title: "Invoke the adapter only from the new commit",
+    owner: "Reference payment adapter",
+    requiredEvidence: "New execution token and technical receipt",
+    completionRule: "The adapter must reject any token derived from the original held commit.",
+  },
+];
+
+const packageComponents: PackageComponent[] = [
+  { id: "PKG-01", name: "Public inspection record", format: "HTML", status: "PUBLISHED", purpose: "Sixty-second review of the bounded event and claim limits." },
+  { id: "PKG-02", name: "Canonical bounded record", format: "JSON", status: "AVAILABLE", purpose: "Machine-readable root record for the artifact." },
+  { id: "PKG-03", name: "Human-readable bounded record", format: "PDF", status: "GENERATABLE", purpose: "Institutional export derived from the frozen record." },
+  { id: "PKG-04", name: "Scenario snapshot", format: "JSON", status: "AVAILABLE", purpose: "Proposed action, consequence, subjects, environment, and limits." },
+  { id: "PKG-05", name: "Route snapshot", format: "JSON", status: "AVAILABLE", purpose: "Frozen route version, gate order, rules, thresholds, and revalidation triggers." },
+  { id: "PKG-06", name: "Evidence manifest", format: "JSON", status: "AVAILABLE", purpose: "Evidence identity, provenance, disclosure, integrity, and admissibility state." },
+  { id: "PKG-07", name: "Authority ledger", format: "JSON", status: "AVAILABLE", purpose: "Original delegation, revocation event, current state, and repair boundary." },
+  { id: "PKG-08", name: "Continuity record", format: "JSON", status: "AVAILABLE", purpose: "Identity, authority, route, custody, and state-change continuity findings." },
+  { id: "PKG-09", name: "Admissibility record", format: "JSON", status: "AVAILABLE", purpose: "Item-by-item reliance findings for evidence and authority." },
+  { id: "PKG-10", name: "Binding record", format: "JSON", status: "AVAILABLE", purpose: "Dual approval rule, amount ceiling, destination, and fail-closed obligation." },
+  { id: "PKG-11", name: "Gate ledger", format: "JSON", status: "AVAILABLE", purpose: "All twenty-four runtime results and earliest-failure finding." },
+  { id: "PKG-12", name: "Commit record", format: "JSON", status: "AVAILABLE", purpose: "Immutable HOLD determination, reason codes, and permitted next action." },
+  { id: "PKG-13", name: "Execution receipt", format: "JSON", status: "AVAILABLE", purpose: "HTTP 423 refusal, held queue state, zero transfer, and bypass result." },
+  { id: "PKG-14", name: "Outcome closure", format: "JSON", status: "AVAILABLE", purpose: "Observed no-transfer result, residual risk, and follow-up requirement." },
+  { id: "PKG-15", name: "Integrity manifest", format: "JSON", status: "AVAILABLE", purpose: "Canonical hash, package hash, component hashes, and verifier metadata." },
+  { id: "PKG-16", name: "Verification instructions", format: "TXT", status: "AVAILABLE", purpose: "Online and offline steps with expected verification outputs." },
+  { id: "PKG-17", name: "Replay input", format: "JSON", status: "AVAILABLE", purpose: "Disclosed inputs sufficient to reproduce the HOLD determination." },
+  { id: "PKG-18", name: "Acceptance-test report", format: "JSON", status: "AVAILABLE", purpose: "Pass results for schema, control, parity, integrity, and claims boundaries." },
+  { id: "PKG-19", name: "Challenge record", format: "JSON", status: "OPEN", purpose: "Append-only pathway for bounded disputes and corrections." },
+  { id: "PKG-20", name: "Repair protocol", format: "JSON", status: "AVAILABLE", purpose: "Exact conditions required before a new commit may be considered." },
 ];
 
 const packageRecord = {
@@ -1125,11 +1331,32 @@ const styles = `
 
   .artifact-footer { margin-top: 22px; border-top: 1px solid var(--line); padding-top: 18px; color: var(--muted); display: flex; justify-content: space-between; gap: 18px; font-size: 12px; }
 
+  .artifact-control-matrix { display: grid; gap: 10px; margin-top: 22px; }
+  .artifact-control-row { display: grid; grid-template-columns: 74px 1.1fr 1fr 1fr 84px; gap: 12px; align-items: start; border: 1px solid var(--line); border-radius: 14px; padding: 15px; background: rgba(255,255,255,.014); }
+  .artifact-control-row.fail { border-color: rgba(255,123,143,.28); background: linear-gradient(90deg, rgba(255,123,143,.065), transparent); }
+  .artifact-control-row span { color: var(--muted); font-size: 12px; line-height: 1.5; }
+  .artifact-control-row strong { font-size: 13px; line-height: 1.45; }
+  .artifact-control-result { justify-self: end; border: 1px solid rgba(99,240,189,.28); color: var(--green); border-radius: 999px; padding: 7px 9px; font-size: 10px; font-weight: 900; }
+  .artifact-control-row.fail .artifact-control-result { border-color: rgba(255,123,143,.3); color: var(--red); }
+  .artifact-repair-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 20px; }
+  .artifact-repair-card { border: 1px solid var(--line); border-radius: 16px; padding: 18px; background: rgba(255,255,255,.015); }
+  .artifact-repair-card h3 { margin: 8px 0 12px; font-size: 19px; }
+  .artifact-repair-card p { margin: 7px 0 0; color: var(--muted); line-height: 1.55; }
+  .artifact-repair-number { width: 38px; height: 38px; display: grid; place-items: center; border: 1px solid rgba(101,223,255,.32); border-radius: 11px; color: var(--cyan); font-weight: 900; }
+  .artifact-package-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 20px; }
+  .artifact-package-item { border: 1px solid var(--line); border-radius: 14px; padding: 15px; background: rgba(255,255,255,.014); }
+  .artifact-package-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .artifact-package-item h3 { margin: 10px 0 7px; font-size: 16px; }
+  .artifact-package-item p { margin: 0; color: var(--muted); line-height: 1.5; font-size: 12px; }
+  .artifact-package-status { border: 1px solid var(--line); border-radius: 999px; padding: 6px 8px; font-size: 9px; color: var(--green); }
+
   @media (max-width: 1180px) {
     .artifact-summary-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .artifact-layout { grid-template-columns: 1fr; }
     .artifact-aside { position: static; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .artifact-gates { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .artifact-control-row { grid-template-columns: 60px 1fr 1fr; }
+    .artifact-control-row span:nth-of-type(3), .artifact-control-result { grid-column: 2 / -1; justify-self: start; }
   }
 
   @media (max-width: 900px) {
@@ -1137,6 +1364,8 @@ const styles = `
     .artifact-decision { border-left: 0; border-top: 1px solid var(--line); min-height: 310px; }
     .artifact-proof-grid,
     .artifact-evidence-grid,
+    .artifact-repair-grid,
+    .artifact-package-grid,
     .artifact-integrity-grid,
     .artifact-authority-stage,
     .artifact-challenge-grid { grid-template-columns: 1fr; }
@@ -1519,6 +1748,17 @@ export default function ExecutionArtifact000002Page() {
                     <div className="artifact-row" style={{ marginTop: 10 }}><span>Reason</span><strong>AUTHORITY_STATE_CHANGED</strong></div>
                   </aside>
                 </div>
+                <div className="artifact-control-matrix">
+                  {authorityControls.map((control) => (
+                    <article className={`artifact-control-row ${control.result === "FAIL" ? "fail" : ""}`} key={control.id}>
+                      <strong>{control.id}</strong>
+                      <div><span>Control</span><strong>{control.control}</strong></div>
+                      <div><span>Required state</span><strong>{control.requiredState}</strong></div>
+                      <div><span>Observed state</span><strong>{control.observedState}</strong><span>{control.consequence}</span></div>
+                      <div className="artifact-control-result">{control.result}</div>
+                    </article>
+                  ))}
+                </div>
               </Panel>
             ) : null}
 
@@ -1576,6 +1816,17 @@ export default function ExecutionArtifact000002Page() {
                   <article className="artifact-event"><time>19:17:20 UTC</time><strong>Outcome closed</strong><p>Beneficiary state remained unchanged and the request remained in HOLD_PRESERVED.</p></article>
                   <article className="artifact-event"><time>19:18:10 UTC</time><strong>Package parity verified</strong><p>The public page, JSON, manifest, receipt, and outcome record resolved to one bounded event.</p></article>
                 </div>
+                <div className="artifact-repair-grid">
+                  {repairSteps.map((step) => (
+                    <article className="artifact-repair-card" key={step.sequence}>
+                      <div className="artifact-repair-number">{step.sequence}</div>
+                      <h3>{step.title}</h3>
+                      <p><strong>Owner:</strong> {step.owner}</p>
+                      <p><strong>Required evidence:</strong> {step.requiredEvidence}</p>
+                      <p><strong>Completion rule:</strong> {step.completionRule}</p>
+                    </article>
+                  ))}
+                </div>
               </Panel>
             ) : null}
 
@@ -1592,6 +1843,18 @@ export default function ExecutionArtifact000002Page() {
                   <div className="artifact-hash"><span>Canonicalization</span><code>ta14.c14n.v1</code></div>
                   <div className="artifact-hash"><span>Verifier version</span><code>ta14.verifier.reference.v1</code></div>
                   <div className="artifact-hash"><span>Signing key reference</span><code>ta14://keys/demonstration/2026-01</code></div>
+                </div>
+                <div className="artifact-package-grid">
+                  {packageComponents.map((component) => (
+                    <article className="artifact-package-item" key={component.id}>
+                      <div className="artifact-package-top">
+                        <span className="artifact-evidence-id">{component.id} · {component.format}</span>
+                        <span className="artifact-package-status">{component.status}</span>
+                      </div>
+                      <h3>{component.name}</h3>
+                      <p>{component.purpose}</p>
+                    </article>
+                  ))}
                 </div>
                 <div className="artifact-acceptance">
                   {acceptanceTests.map((test) => (
