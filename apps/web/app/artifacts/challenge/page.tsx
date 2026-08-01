@@ -6,7 +6,7 @@ import { useMemo, useRef, useState } from "react";
 type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 type ChallengeState = "DRAFT" | "SUBMITTED" | "UNDER_REVIEW" | "UPHELD" | "MODIFIED" | "REVERSED" | "CLOSED";
 type View = "command" | "builder" | "comparison" | "custody" | "review" | "resolution" | "history";
-type ArtifactRef = { id: string; title: string; determination: Determination; route: string; receipt: string; rootHash: string; };
+type ArtifactRef = { sequence: number; id: string; title: string; determination: Determination; route: string; receipt: string; rootHash: string; };
 type ChallengeRecord = { id: string; artifactId: string; title: string; state: ChallengeState; submittedBy: string; submittedAt: string; basis: string; requestedRelief: string; evidenceCount: number; assignedReviewer: string; dueAt: string; };
 type EvidenceItem = { id: string; title: string; source: string; capturedAt: string; disclosure: "PUBLIC" | "RESTRICTED" | "WITHHELD"; admissibility: "PENDING" | "ADMITTED" | "REJECTED"; hash: string; notes: string; };
 type CustodyEvent = { sequence: number; time: string; actor: string; action: string; object: string; result: string; hash: string; };
@@ -14,6 +14,7 @@ type ReviewQuestion = { id: string; domain: string; question: string; passCondit
 
 const ARTIFACTS: ArtifactRef[] = [
   {
+    sequence: 1,
     id: "TA14-EA-000001",
     title: "Authorized release with verified outcome",
     determination: "ALLOW",
@@ -22,6 +23,7 @@ const ARTIFACTS: ArtifactRef[] = [
     rootHash: "01".repeat(32),
   },
   {
+    sequence: 2,
     id: "TA14-EA-000002",
     title: "Authority drift before execution",
     determination: "HOLD",
@@ -30,6 +32,7 @@ const ARTIFACTS: ArtifactRef[] = [
     rootHash: "02".repeat(32),
   },
   {
+    sequence: 3,
     id: "TA14-EA-000003",
     title: "Execution boundary violation prevented",
     determination: "DENY",
@@ -38,6 +41,7 @@ const ARTIFACTS: ArtifactRef[] = [
     rootHash: "03".repeat(32),
   },
   {
+    sequence: 4,
     id: "TA14-EA-000004",
     title: "Conflicting admissible evidence escalated",
     determination: "ESCALATE",
@@ -46,66 +50,74 @@ const ARTIFACTS: ArtifactRef[] = [
     rootHash: "04".repeat(32),
   },
   {
+    sequence: 5,
     id: "TA14-EA-000005",
     title: "Evidence freshness expired before commit",
-    determination: "ALLOW",
-    route: "TA14-ROUTE-ALLOW-000005",
-    receipt: "HTTP 202 · TA14-RECEIPT-000005",
+    determination: "HOLD",
+    route: "TA14-ROUTE-HOLD-000005",
+    receipt: "HTTP 423 · TA14-RECEIPT-000005",
     rootHash: "05".repeat(32),
   },
   {
+    sequence: 6,
     id: "TA14-EA-000006",
     title: "Unauthorized runtime version denied",
-    determination: "HOLD",
-    route: "TA14-ROUTE-HOLD-000006",
-    receipt: "HTTP 423 · TA14-RECEIPT-000006",
+    determination: "DENY",
+    route: "TA14-ROUTE-DENY-000006",
+    receipt: "HTTP 403 · TA14-RECEIPT-000006",
     rootHash: "06".repeat(32),
   },
   {
+    sequence: 7,
     id: "TA14-EA-000007",
     title: "Authorized threshold exceeded",
-    determination: "DENY",
-    route: "TA14-ROUTE-DENY-000007",
-    receipt: "HTTP 403 · TA14-RECEIPT-000007",
+    determination: "ESCALATE",
+    route: "TA14-ROUTE-ESCALATE-000007",
+    receipt: "HTTP 202 · TA14-RECEIPT-000007",
     rootHash: "07".repeat(32),
   },
   {
+    sequence: 8,
     id: "TA14-EA-000008",
     title: "Material condition changed after approval",
-    determination: "ESCALATE",
-    route: "TA14-ROUTE-ESCALATE-000008",
-    receipt: "HTTP 202 · TA14-RECEIPT-000008",
+    determination: "HOLD",
+    route: "TA14-ROUTE-HOLD-000008",
+    receipt: "HTTP 423 · TA14-RECEIPT-000008",
     rootHash: "08".repeat(32),
   },
   {
+    sequence: 9,
     id: "TA14-EA-000009",
     title: "Mandatory gate bypass attempt prevented",
-    determination: "ALLOW",
-    route: "TA14-ROUTE-ALLOW-000009",
-    receipt: "HTTP 202 · TA14-RECEIPT-000009",
+    determination: "DENY",
+    route: "TA14-ROUTE-DENY-000009",
+    receipt: "HTTP 403 · TA14-RECEIPT-000009",
     rootHash: "09".repeat(32),
   },
   {
+    sequence: 10,
     id: "TA14-EA-000010",
     title: "Dual-authority privileged access restoration",
-    determination: "HOLD",
-    route: "TA14-ROUTE-HOLD-000010",
-    receipt: "HTTP 423 · TA14-RECEIPT-000010",
+    determination: "ALLOW",
+    route: "TA14-ROUTE-ALLOW-000010",
+    receipt: "HTTP 202 · TA14-RECEIPT-000010",
     rootHash: "0a".repeat(32),
   },
   {
+    sequence: 11,
     id: "TA14-EA-000011",
     title: "Confidential evidence verified without disclosure",
-    determination: "DENY",
-    route: "TA14-ROUTE-DENY-000011",
-    receipt: "HTTP 403 · TA14-RECEIPT-000011",
+    determination: "ALLOW",
+    route: "TA14-ROUTE-ALLOW-000011",
+    receipt: "HTTP 202 · TA14-RECEIPT-000011",
     rootHash: "0b".repeat(32),
   },
   {
+    sequence: 12,
     id: "TA14-EA-000012",
     title: "Preserved chain-of-custody closure certificate",
-    determination: "ESCALATE",
-    route: "TA14-ROUTE-ESCALATE-000012",
+    determination: "ALLOW",
+    route: "TA14-ROUTE-ALLOW-000012",
     receipt: "HTTP 202 · TA14-RECEIPT-000012",
     rootHash: "0c".repeat(32),
   },
