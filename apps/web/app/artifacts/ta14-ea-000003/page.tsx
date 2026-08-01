@@ -166,7 +166,7 @@ const gates: GateItem[] = [
     chainLink: "RECORD",
     result: "PASS",
     reasonCode: "SOURCE_CAPTURED",
-    summary: "Deployment request and request were preserved before reliance.",
+    summary: "Deployment request, target environment, requested privileges, model identity, and execution window were preserved before reliance.",
   },
   {
     number: "04",
@@ -195,9 +195,9 @@ const gates: GateItem[] = [
   {
     number: "07",
     title: "Delegation continuity checked",
-    chainLink: "CONTINUITY",
+    chainLink: "BINDING",
     result: "FAIL",
-    reasonCode: "AUTHORITY_STATE_CHANGED",
+    reasonCode: "EXECUTION_BOUNDARY_EXCEEDED",
     summary: "Approved execution scope was exceeded before commit.",
   },
   {
@@ -246,7 +246,7 @@ const gates: GateItem[] = [
     chainLink: "BINDING",
     result: "FAIL",
     reasonCode: "DUAL_AUTHORITY_UNSATISFIED",
-    summary: "The route requires active CFO plus authorized scope.",
+    summary: "The route requires a valid release authority whose delegation expressly covers the exact production environment, model version, privileges, execution window, and rollback package.",
   },
   {
     number: "14",
@@ -277,7 +277,7 @@ const gates: GateItem[] = [
     title: "Earliest failure fixed",
     chainLink: "COMMIT",
     result: "PASS",
-    reasonCode: "EARLIEST_FAILURE_CONTINUITY",
+    reasonCode: "EXECUTION_BOUNDARY_EXCEEDED",
     summary: "Continuity was fixed as the controlling break.",
   },
   {
@@ -349,7 +349,7 @@ const evidence: EvidenceItem[] = [
     capturedAt: "2026-07-31 19:12:00 UTC",
     hash: "1aa79af3...d4c2",
     supports: "Exact target environment, scope, deployment request, destination, and deployment boundary.",
-    limitation: "Controlled demonstration record; no production production changes were used.",
+    limitation: "Controlled demonstration record; no production systems were changed.",
   },
   {
     id: "EA-000003-EV-02",
@@ -441,13 +441,13 @@ const boundaryEvents: BoundaryEvent[] = [
   {
     time: "19:12:11",
     event: "AUTHORITY RESOLVED",
-    detail: "Approved execution scope was valid for production deployments up to $50,000.",
+    detail: "The approved execution scope was limited to staging diagnostics using model v7.3 with read-only privileges.",
     state: "VALID",
   },
   {
     time: "19:13:02",
-    event: "CFO APPROVAL PRESERVED",
-    detail: "CFO approval was attributable, in scope, and current.",
+    event: "RELEASE AUTHORITY PRESERVED",
+    detail: "Release authority A-17 remained attributable, current, and valid only for the original staging scope.",
     state: "VALID",
   },
   {
@@ -597,10 +597,10 @@ const packageRecord = {
     routeId: ROUTE_ID,
     routeVersion: ROUTE_VERSION,
     gateCount: 24,
-    earliestFailure: "CONTINUITY",
+    earliestFailure: "BINDING",
     earliestFailureGate: "07",
     reasonCodes: [
-      "AUTHORITY_STATE_CHANGED",
+      "EXECUTION_BOUNDARY_EXCEEDED",
       "AUTHORITY_INADMISSIBLE",
       "DUAL_AUTHORITY_UNSATISFIED",
     ],
@@ -699,6 +699,101 @@ const newAuthorizationRequirements = [
   "Define a new execution window and immediate pre-runtime revalidation.",
   "Attach a tested rollback package and accountable rollback authority.",
   "Run the complete route as a new event; never overwrite this denial.",
+];
+
+const boundaryRules = [
+  {
+    id: "BR-01",
+    title: "Destination specificity",
+    requirement: "The committed authorization must name the exact environment and destination resources.",
+    observed: "The preserved authorization named staging. The request targeted production.",
+    consequence: "The destination expansion is prohibited and cannot be inferred from general access.",
+  },
+  {
+    id: "BR-02",
+    title: "Privilege specificity",
+    requirement: "Every consequential capability must be expressly enumerated before commit.",
+    observed: "Read-only diagnostics were authorized; create, update, and delete privileges were requested.",
+    consequence: "Write capability remained outside the execution boundary.",
+  },
+  {
+    id: "BR-03",
+    title: "Model identity continuity",
+    requirement: "The model package, version, and digest must match the authorized object.",
+    observed: "Authorization covered v7.3; the request substituted v7.4.",
+    consequence: "A different model cannot inherit another model's authorization.",
+  },
+  {
+    id: "BR-04",
+    title: "Temporal boundary",
+    requirement: "Execution must occur inside the authorized change window.",
+    observed: "The request demanded immediate release outside 02:00-02:30 UTC.",
+    consequence: "Urgency did not create a new execution window.",
+  },
+  {
+    id: "BR-05",
+    title: "Rollback readiness",
+    requirement: "A tested rollback package and accountable rollback authority must exist before production release.",
+    observed: "No tested rollback package accompanied the request.",
+    consequence: "The production route could not bind without recoverability evidence.",
+  },
+  {
+    id: "BR-06",
+    title: "No scope inheritance",
+    requirement: "Identity, expertise, prior approval, and platform access do not enlarge authority.",
+    observed: "The same actor submitted both the valid staging request and the invalid production request.",
+    consequence: "Known identity strengthened attribution but did not cure the scope violation.",
+  },
+  {
+    id: "BR-07",
+    title: "No alternate-path release",
+    requirement: "A denied request may not be resubmitted through a less-governed adapter under the same state.",
+    observed: "The adapter revoked the execution token and recorded the attempted fallback path.",
+    consequence: "The same invalid state remained denied across all governed paths.",
+  },
+  {
+    id: "BR-08",
+    title: "New event for new authority",
+    requirement: "A materially broader authorization must create a new route event.",
+    observed: "No production authorization existed in the frozen record.",
+    consequence: "Repair requires a new authorization and a complete rerun, not an amendment that rewrites this denial.",
+  },
+];
+
+const denialInvariants = [
+  "The denied request never received a production execution token.",
+  "No create, update, delete, migration, or network-change command reached the target environment.",
+  "The original staging authorization remains visible and is not falsely labeled invalid.",
+  "The broader production request remains attributable to the requesting actor.",
+  "The DENY commit precedes adapter invocation and cannot be backdated.",
+  "The execution receipt, outcome record, public page, and manifest resolve to one event.",
+  "Revalidation of unchanged facts cannot cure a hard scope violation.",
+  "Only a new bounded authorization can support a new production route.",
+  "The denial does not certify the model as unsafe; it proves the request was unauthorized.",
+  "The zero-mutation outcome is verified independently from the determination record.",
+];
+
+const packageComponents = [
+  { id: "PKG-01", name: "Canonical bounded record", format: "JSON", status: "INCLUDED", purpose: "Machine-readable root event" },
+  { id: "PKG-02", name: "Human-readable inspection record", format: "HTML/PDF", status: "INCLUDED", purpose: "Public inspection and review" },
+  { id: "PKG-03", name: "Frozen scenario snapshot", format: "JSON", status: "INCLUDED", purpose: "Exact proposed consequence" },
+  { id: "PKG-04", name: "Route snapshot", format: "JSON", status: "INCLUDED", purpose: "Versioned gates and thresholds" },
+  { id: "PKG-05", name: "Evidence manifest", format: "JSON", status: "INCLUDED", purpose: "Source, freshness, custody, hashes" },
+  { id: "PKG-06", name: "Authority ledger", format: "JSON", status: "INCLUDED", purpose: "Identity, delegation, scope, expiry" },
+  { id: "PKG-07", name: "Boundary comparison matrix", format: "JSON", status: "INCLUDED", purpose: "Authorized versus requested scope" },
+  { id: "PKG-08", name: "24-link runtime ledger", format: "JSON", status: "INCLUDED", purpose: "Ordered gate results" },
+  { id: "PKG-09", name: "Determination commit", format: "JSON", status: "INCLUDED", purpose: "Fixed DENY before action" },
+  { id: "PKG-10", name: "Execution denial receipt", format: "JSON", status: "INCLUDED", purpose: "HTTP 403 and token revocation" },
+  { id: "PKG-11", name: "Bypass-attempt record", format: "JSON", status: "INCLUDED", purpose: "Alternate-path prevention" },
+  { id: "PKG-12", name: "Outcome closure", format: "JSON", status: "INCLUDED", purpose: "Verified zero production mutations" },
+  { id: "PKG-13", name: "Integrity manifest", format: "JSON", status: "INCLUDED", purpose: "Component and package hashes" },
+  { id: "PKG-14", name: "Verification instructions", format: "TXT", status: "INCLUDED", purpose: "Online and offline verification" },
+  { id: "PKG-15", name: "Challenge record template", format: "JSON", status: "INCLUDED", purpose: "Bounded objection pathway" },
+  { id: "PKG-16", name: "Claims-boundary statement", format: "TXT", status: "INCLUDED", purpose: "What the artifact does and does not prove" },
+  { id: "PKG-17", name: "Acceptance-test report", format: "JSON", status: "INCLUDED", purpose: "Required invariant checks" },
+  { id: "PKG-18", name: "Public verifier result", format: "JSON", status: "INCLUDED", purpose: "Package parity and outcome closure" },
+  { id: "PKG-19", name: "Correction and supersession ledger", format: "JSON", status: "INCLUDED", purpose: "Append-only lifecycle" },
+  { id: "PKG-20", name: "Reviewer briefing", format: "TXT", status: "INCLUDED", purpose: "Independent inspection scope" },
 ];
 
 const styles = `
@@ -1194,6 +1289,141 @@ const styles = `
     .artifact-check { grid-template-columns: 42px minmax(0, 1fr); }
     .artifact-check-state { grid-column: 2; justify-self: start; }
   }
+
+  .artifact-rule-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin-top: 22px;
+  }
+
+  .artifact-rule-card {
+    position: relative;
+    overflow: hidden;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    background: linear-gradient(145deg, rgba(13, 35, 52, .88), rgba(5, 15, 24, .9));
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.035);
+  }
+
+  .artifact-rule-card::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 3px;
+    background: linear-gradient(180deg, var(--red), var(--amber));
+  }
+
+  .artifact-rule-card header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .artifact-rule-card header span {
+    color: var(--red);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .14em;
+  }
+
+  .artifact-rule-card h4 {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  .artifact-rule-block {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(142,196,230,.12);
+  }
+
+  .artifact-rule-block small {
+    display: block;
+    color: var(--muted);
+    font-weight: 800;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .artifact-rule-block p {
+    margin: 0;
+    color: #dbeaf5;
+    line-height: 1.6;
+  }
+
+  .artifact-invariant-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 18px;
+  }
+
+  .artifact-invariant {
+    display: grid;
+    grid-template-columns: 32px 1fr;
+    align-items: start;
+    gap: 10px;
+    padding: 13px;
+    border: 1px solid rgba(99,240,189,.15);
+    border-radius: 14px;
+    background: rgba(7,25,33,.62);
+  }
+
+  .artifact-invariant b {
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    color: var(--green);
+    border: 1px solid rgba(99,240,189,.28);
+    background: rgba(99,240,189,.08);
+    font-size: 11px;
+  }
+
+  .artifact-invariant p {
+    margin: 3px 0 0;
+    color: #d9e9f4;
+    line-height: 1.55;
+  }
+
+  .artifact-package-table {
+    margin-top: 22px;
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .artifact-package-row {
+    display: grid;
+    grid-template-columns: 82px 1.3fr 100px 120px 1.4fr;
+    gap: 12px;
+    align-items: center;
+    padding: 13px 15px;
+    border-top: 1px solid rgba(142,196,230,.1);
+    background: rgba(5,17,27,.72);
+  }
+
+  .artifact-package-row:first-child { border-top: 0; }
+  .artifact-package-row:hover { background: rgba(12,34,50,.86); }
+  .artifact-package-row span { color: var(--muted); font-size: 12px; }
+  .artifact-package-row strong { font-size: 13px; }
+  .artifact-package-row code { color: var(--cyan); font-size: 11px; }
+  .artifact-package-row em { color: var(--green); font-style: normal; font-size: 11px; font-weight: 900; }
+  .artifact-package-row p { margin: 0; color: #c6d8e5; font-size: 12px; line-height: 1.45; }
+
+  @media (max-width: 900px) {
+    .artifact-rule-grid,
+    .artifact-invariant-grid { grid-template-columns: 1fr; }
+    .artifact-package-row { grid-template-columns: 70px 1fr 86px; }
+    .artifact-package-row p { grid-column: 2 / -1; }
+    .artifact-package-row em { text-align: right; }
+  }
 `;
 
 function downloadText(name: string, value: unknown) {
@@ -1320,7 +1550,7 @@ export default function ExecutionArtifact000003Page() {
               <div className="artifact-hero-meta">
                 <span className="artifact-chip">{ARTIFACT_ID}</span>
                 <span className="artifact-chip">Route {ROUTE_VERSION}</span>
-                <span className="artifact-chip">Earliest failure: CONTINUITY</span>
+                <span className="artifact-chip">Earliest failure: BINDING / EXECUTION BOUNDARY</span>
                 <span className="artifact-chip">Verification level: 6</span>
                 <span className="artifact-chip">Controlled demonstration</span>
               </div>
@@ -1393,7 +1623,7 @@ export default function ExecutionArtifact000003Page() {
                     <h3>Deploy model v7.4 to the production decision environment with create, update, and delete privileges.</h3>
                     <p>
                       The route required current deployment evidence, a frozen target environment destination,
-                      valid CFO authority, valid authorized scope, preserved continuity, and a
+                      valid release authority, preserved continuity, an explicit execution boundary, and a
                       final pre-execution revalidation.
                     </p>
                   </article>
@@ -1522,8 +1752,8 @@ export default function ExecutionArtifact000003Page() {
             {view === "boundary" ? (
               <Panel
                 eyebrow="Boundary integrity"
-                title="The delegation was valid—until it was not."
-                subtitle="The architecture preserves both states. It does not rewrite the earlier approval, and it does not allow that earlier approval to survive a later violation."
+                title="The identity was valid. The requested consequence was not within its boundary."
+                subtitle="The architecture preserves the valid underlying identity and the narrower authorization while refusing to transform either into authority for a broader production consequence."
               >
                 <div className="artifact-authority-stage">
                   <div className="artifact-boundary-ledger">
@@ -1543,15 +1773,42 @@ export default function ExecutionArtifact000003Page() {
                   </div>
                   <aside className="artifact-break-card">
                     <div className="artifact-overline">Earliest failure</div>
-                    <h3>Continuity</h3>
+                    <h3>Binding / execution boundary</h3>
                     <p>
-                      Actor identity remained known, but the boundary state no longer matched the
-                      state that supported initial approval. This break occurred before commit and
-                      controlled every downstream consequence.
+                      Identity, provenance, and continuity remained intact. The controlling failure occurred because the requested production action exceeded the authority and execution boundary preserved by the route. That hard scope violation controlled every downstream consequence.
                     </p>
-                    <div className="artifact-row"><span>Gate</span><strong>07 · Delegation continuity checked</strong></div>
-                    <div className="artifact-row" style={{ marginTop: 10 }}><span>Reason</span><strong>AUTHORITY_STATE_CHANGED</strong></div>
+                    <div className="artifact-row"><span>Gate</span><strong>17 · Binding boundary enforced</strong></div>
+                    <div className="artifact-row" style={{ marginTop: 10 }}><span>Reason</span><strong>EXECUTION_BOUNDARY_EXCEEDED</strong></div>
                   </aside>
+                </div>
+                <div className="artifact-section-heading" style={{ marginTop: 28 }}>
+                  <div>
+                    <div className="artifact-overline">Boundary rulebook</div>
+                    <h3>Eight independent controls prevented scope inheritance.</h3>
+                  </div>
+                </div>
+                <div className="artifact-rule-grid">
+                  {boundaryRules.map((rule) => (
+                    <article className="artifact-rule-card" key={rule.id}>
+                      <header><span>{rule.id}</span><h4>{rule.title}</h4></header>
+                      <div className="artifact-rule-block"><small>Requirement</small><p>{rule.requirement}</p></div>
+                      <div className="artifact-rule-block"><small>Observed state</small><p>{rule.observed}</p></div>
+                      <div className="artifact-rule-block"><small>Governed consequence</small><p>{rule.consequence}</p></div>
+                    </article>
+                  ))}
+                </div>
+                <div className="artifact-section-heading" style={{ marginTop: 28 }}>
+                  <div>
+                    <div className="artifact-overline">Denial invariants</div>
+                    <h3>What remained true throughout the governed stop.</h3>
+                  </div>
+                </div>
+                <div className="artifact-invariant-grid">
+                  {denialInvariants.map((item, index) => (
+                    <article className="artifact-invariant" key={item}>
+                      <b>{String(index + 1).padStart(2, "0")}</b><p>{item}</p>
+                    </article>
+                  ))}
                 </div>
               </Panel>
             ) : null}
@@ -1585,7 +1842,7 @@ export default function ExecutionArtifact000003Page() {
                     </p>
                     <div className="artifact-receipt-grid">
                       <div className="artifact-row"><span>Receipt</span><strong>EA-000003-EX-01</strong></div>
-                      <div className="artifact-row"><span>Released</span><strong>$0.00</strong></div>
+                      <div className="artifact-row"><span>Production mutations</span><strong>0</strong></div>
                       <div className="artifact-row"><span>Bypass</span><strong>NONE DETECTED</strong></div>
                       <div className="artifact-row"><span>Queue</span><strong>DENIAL_PRESERVED</strong></div>
                     </div>
@@ -1602,9 +1859,9 @@ export default function ExecutionArtifact000003Page() {
               >
                 <div className="artifact-timeline">
                   <article className="artifact-event"><time>19:12:00 UTC</time><strong>Scenario intake sealed</strong><p>The exact deployment, target environment, consequence, and declared limits entered the frozen record.</p></article>
-                  <article className="artifact-event"><time>19:12:11 UTC</time><strong>Initial authority resolved</strong><p>CFO and authorized scope were attributable and initially in scope.</p></article>
-                  <article className="artifact-event"><time>19:15:41 UTC</time><strong>Approved execution scope exceeded</strong><p>The authority resolver recorded the changed state before commit.</p></article>
-                  <article className="artifact-event"><time>19:15:43 UTC</time><strong>Dependent gates rerun</strong><p>Continuity, admissibility, binding, and commit logic were re-evaluated.</p></article>
+                  <article className="artifact-event"><time>19:12:11 UTC</time><strong>Initial authority resolved</strong><p>Release authority A-17 and the original staging-only scope were attributable, current, and internally consistent.</p></article>
+                  <article className="artifact-event"><time>19:15:41 UTC</time><strong>Approved execution scope exceeded</strong><p>The boundary evaluator detected that the requested production environment, write privileges, model version, timing, and rollback posture exceeded the approved scope.</p></article>
+                  <article className="artifact-event"><time>19:15:43 UTC</time><strong>Dependent gates rerun</strong><p>Admissibility, authority scope, binding, and commit logic were evaluated against the frozen request.</p></article>
                   <article className="artifact-event"><time>19:16:02 UTC</time><strong>DENY committed</strong><p>The no-release state and repair requirement were fixed before adapter invocation.</p></article>
                   <article className="artifact-event"><time>19:16:03 UTC</time><strong>Production deployment blocked</strong><p>Receipt EA-000003-EX-01 recorded HTTP 403 and zero unauthorized actions executed.</p></article>
                   <article className="artifact-event"><time>19:17:20 UTC</time><strong>Outcome closed</strong><p>Target environment state remained unchanged and the request remained in DENIAL_PRESERVED.</p></article>
@@ -1626,6 +1883,23 @@ export default function ExecutionArtifact000003Page() {
                   <div className="artifact-hash"><span>Canonicalization</span><code>ta14.c14n.v1</code></div>
                   <div className="artifact-hash"><span>Verifier version</span><code>ta14.verifier.reference.v1</code></div>
                   <div className="artifact-hash"><span>Signing key reference</span><code>ta14://keys/demonstration/2026-01</code></div>
+                </div>
+                <div className="artifact-section-heading" style={{ marginTop: 28 }}>
+                  <div>
+                    <div className="artifact-overline">Package inventory</div>
+                    <h3>Twenty components preserve one bounded denial event.</h3>
+                  </div>
+                </div>
+                <div className="artifact-package-table">
+                  {packageComponents.map((component) => (
+                    <div className="artifact-package-row" key={component.id}>
+                      <code>{component.id}</code>
+                      <strong>{component.name}</strong>
+                      <span>{component.format}</span>
+                      <em>{component.status}</em>
+                      <p>{component.purpose}</p>
+                    </div>
+                  ))}
                 </div>
                 <div className="artifact-acceptance">
                   {acceptanceTests.map((test) => (
@@ -1729,7 +2003,7 @@ export default function ExecutionArtifact000003Page() {
               <div className="artifact-side-list">
                 <div className="artifact-side-row"><span>Release position</span><strong>02 of 12</strong></div>
                 <div className="artifact-side-row"><span>Determination</span><strong>DENY</strong></div>
-                <div className="artifact-side-row"><span>Earliest failure</span><strong>CONTINUITY</strong></div>
+                <div className="artifact-side-row"><span>Earliest failure</span><strong>BINDING / BOUNDARY</strong></div>
                 <div className="artifact-side-row"><span>Route</span><strong>{ROUTE_ID}</strong></div>
                 <div className="artifact-side-row"><span>Route version</span><strong>{ROUTE_VERSION}</strong></div>
                 <div className="artifact-side-row"><span>Status</span><strong>PUBLISHED DEMONSTRATION</strong></div>
