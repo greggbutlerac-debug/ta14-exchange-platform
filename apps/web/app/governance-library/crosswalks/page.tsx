@@ -291,6 +291,111 @@ const crosswalkRows: CrosswalkRow[] = [
   },
 ];
 
+
+
+type InstitutionalCrosswalk = {
+  id: string;
+  domain: string;
+  law: string;
+  regulation: string;
+  standard: string;
+  academy: string;
+  evidence: string;
+  ta14Upgrade: string;
+  destination: string;
+};
+
+const institutionalCrosswalks: InstitutionalCrosswalk[] = [
+  {
+    id: "clean-air",
+    domain: "Air & Atmospheric Integrity",
+    law: "Clean Air Act",
+    regulation: "40 CFR air programs, NAAQS implementation, monitoring, permitting, and source controls",
+    standard: "ASHRAE 62.1, 62.2, 52.2, 241; EPA ambient-air methods; ISO atmospheric standards",
+    academy: "Clean Air Act Academy + Atmospheric Integrity Records Academy",
+    evidence: "Source identity, monitor location, calibration, custody, continuity, authority, threshold, intervention, and verified outcome",
+    ta14Upgrade: "Atmospheric Integrity Act and governed exterior-to-interior protection records",
+    destination: "/governance-library/laws",
+  },
+  {
+    id: "clean-water",
+    domain: "Water & Outcome Integrity",
+    law: "Clean Water Act",
+    regulation: "NPDES, effluent limitations, pretreatment, wetlands, spill response, and approved analytical methods",
+    standard: "EPA Clean Water Act methods, laboratory competence, sampling, custody, and quality-control standards",
+    academy: "Clean Water Act Academy + Environmental Evidence Academy",
+    evidence: "Sampling plan, location, method, laboratory identity, custody, permit condition, discharge event, remediation, and outcome",
+    ta14Upgrade: "Water Integrity and Outcome Act with preserved route-to-restoration evidence",
+    destination: "/governance-library/laws",
+  },
+  {
+    id: "drinking-water",
+    domain: "Drinking Water & Public Health",
+    law: "Safe Drinking Water Act",
+    regulation: "National primary drinking-water regulations, monitoring, treatment, reporting, and public notification",
+    standard: "EPA analytical methods, ISO/IEC 17025 laboratory competence, sensor calibration, and chain-of-custody controls",
+    academy: "Safe Drinking Water Academy",
+    evidence: "Source-water identity, treatment state, sample custody, method, threshold, notification, corrective action, and verified restoration",
+    ta14Upgrade: "Continuous drinking-water integrity records tied to authority and public-protection outcomes",
+    destination: "/governance-library/regulations",
+  },
+  {
+    id: "hazardous-waste",
+    domain: "Waste, Chemicals & Contamination",
+    law: "RCRA, CERCLA, TSCA, EPCRA, and Pollution Prevention Act",
+    regulation: "Hazardous-waste generation, transport, treatment, cleanup, chemical controls, release reporting, and community disclosure",
+    standard: "EPA SW-846 methods, laboratory quality systems, remediation sampling, and custody standards",
+    academy: "Hazardous Materials and Contamination Academy",
+    evidence: "Material identity, generator, manifest, release chronology, sampling, custody, authority, corrective action, and residual condition",
+    ta14Upgrade: "Admissible contamination, remediation, and future-reliance records",
+    destination: "/governance-library/regulations",
+  },
+  {
+    id: "buildings-hvac",
+    domain: "Buildings, HVAC & Indoor Environments",
+    law: "Building, occupational, public-health, energy, and environmental authority as adopted by jurisdiction",
+    regulation: "Mechanical, energy, refrigerant, workplace, health-care, and facility-specific implementation requirements",
+    standard: "ASHRAE 15, 34, 52.2, 55, 62.1, 62.2, 90.1, 100, 111, 180, 241; IMC; NFPA 70",
+    academy: "HVAC Academy + Building Environmental Integrity Academy",
+    evidence: "Equipment identity, technician authority, measurements, diagnostics, intervention, commissioning, occupancy, and post-work outcome",
+    ta14Upgrade: "Governed HVAC Diagnostic, Electrical Integrity, Refrigerant Governance, and Building Protection standards",
+    destination: "/governance-library/standards",
+  },
+  {
+    id: "ai-execution",
+    domain: "AI Governance & Consequential Execution",
+    law: "EU AI Act and other applicable AI, privacy, civil-rights, consumer, and sector laws",
+    regulation: "Provider, deployer, transparency, risk, monitoring, incident, documentation, and market-surveillance requirements",
+    standard: "ISO/IEC 42001, 23894, 22989, 23053, 5338; NIST AI RMF; IEEE governance standards",
+    academy: "AI Governance Academy + Entity Review Academy",
+    evidence: "Entity identity, system version, claim, authority, evidence, admissibility, binding, commit, execution, and outcome artifact",
+    ta14Upgrade: "Admissible Execution Architecture and mandatory execution-artifact preservation",
+    destination: "/workspace/ai-governance",
+  },
+  {
+    id: "international-health",
+    domain: "International Environmental Health",
+    law: "Multilateral environmental agreements and national implementing law",
+    regulation: "Country and regional implementation of air, climate, chemicals, waste, mercury, ozone, and health-protection obligations",
+    standard: "WHO health guidance, ISO environmental standards, monitoring methods, and national technical specifications",
+    academy: "World Environmental Law and Public Health Academy",
+    evidence: "Jurisdiction, ratification or adoption, implementing authority, population context, measurement, intervention, and public outcome",
+    ta14Upgrade: "Model world laws that convert guidance and treaty objectives into inspectable evidence and outcome duties",
+    destination: "/law-standards-public-policy",
+  },
+  {
+    id: "entity-review",
+    domain: "Entity Review & Institutional Proof",
+    law: "Applicable laws and duties declared by the entity",
+    regulation: "Implementing obligations, permits, licenses, approvals, and sector controls",
+    standard: "Claimed standards, certifications, methods, codes, and internal controls",
+    academy: "Entity Review Academy",
+    evidence: "Bounded claim, scope, non-claims, authority, versions, evidence, confidentiality, execution route, and publication permissions",
+    ta14Upgrade: "Guided Learn → Build → Validate → Submit → Review → Findings pathway",
+    destination: "/workspace/entity-review",
+  },
+];
+
 const sourceOptions = [
   { id: "eu", label: "EU AI Act" },
   { id: "nist", label: "NIST AI RMF" },
@@ -411,19 +516,16 @@ export default function CrosswalksPage() {
           </div>
 
           <p className="eyebrow">
-            TA-14 AI GOVERNANCE LIBRARY
+            TA-14 AUTHORITY GOVERNANCE INSTITUTION
           </p>
 
           <h1>
-            AI Governance
+            Law · Standards · Regulation
             <span> Crosswalk Engine</span>
           </h1>
 
           <p className="lead">
-            Compare governance concepts across major authorities,
-            identify meaningful overlap and divergence, preserve
-            interpretation boundaries, and translate source
-            relationships into TA-14 admissible execution routes.
+            Compare laws, implementing regulations, standards, guidance, Academy pathways, evidence duties, and TA-14 proposed upgrades without collapsing their distinct authority. Translate each relationship into a governed route from source to outcome.
           </p>
 
           <div className="heroMeta">
@@ -756,6 +858,57 @@ export default function CrosswalksPage() {
                 source-level and contextual review.
               </p>
             </article>
+          </div>
+        </section>
+
+
+
+        <section className="institutionalSection">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">INSTITUTIONAL AUTHORITY CROSSWALKS</p>
+              <h2>Law, regulation, standard, evidence, Academy, and proposed upgrade—kept distinct and connected.</h2>
+            </div>
+            <p>
+              These crosswalks show how the four TA-14 institutional doors connect. They do not convert guidance into law, a standard into a permit, or a proposal into enacted authority.
+            </p>
+          </div>
+
+          <div className="institutionalGrid">
+            {institutionalCrosswalks.map((item, index) => (
+              <article key={item.id}>
+                <div className="institutionalHeader">
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <div>
+                    <small>GOVERNED DOMAIN</small>
+                    <h3>{item.domain}</h3>
+                  </div>
+                </div>
+                <div className="authorityRoute">
+                  <div><span>LAW</span><p>{item.law}</p></div>
+                  <i>→</i>
+                  <div><span>REGULATION</span><p>{item.regulation}</p></div>
+                  <i>→</i>
+                  <div><span>STANDARD / METHOD</span><p>{item.standard}</p></div>
+                  <i>→</i>
+                  <div><span>EVIDENCE ROUTE</span><p>{item.evidence}</p></div>
+                </div>
+                <div className="institutionalFooter">
+                  <div><span>ACADEMY</span><strong>{item.academy}</strong></div>
+                  <div><span>TA-14 PROPOSED UPGRADE</span><strong>{item.ta14Upgrade}</strong></div>
+                  <Link href={item.destination}>Open governed destination →</Link>
+                </div>
+              </article>
+            ))}
+          </div>
+
+          <div className="crosswalkDoctrine">
+            <div><span>01</span><strong>Identify the controlling source</strong><p>Preserve title, issuer, jurisdiction, edition, status, adoption, and applicability.</p></div>
+            <div><span>02</span><strong>Separate instrument types</strong><p>Do not treat statutes, regulations, standards, methods, guidance, contracts, and proposals as interchangeable.</p></div>
+            <div><span>03</span><strong>Map the evidence duty</strong><p>Determine what record, measurement, custody, authority, decision, intervention, and outcome each source actually requires.</p></div>
+            <div><span>04</span><strong>Expose the gap</strong><p>Show what the current instrument leaves unresolved, unenforced, unmeasured, or unpreserved.</p></div>
+            <div><span>05</span><strong>Teach the difference</strong><p>Use the TA-14 Academy to compare the current instrument with the proposed upgrade.</p></div>
+            <div><span>06</span><strong>Govern the route</strong><p>Bind the applicable authority and admitted evidence before execution or environmental intervention.</p></div>
           </div>
         </section>
 
@@ -1514,6 +1667,156 @@ export default function CrosswalksPage() {
           color: #91a6b0;
           font-size: 13px;
           line-height: 1.6;
+        }
+
+
+
+        .institutionalSection {
+          padding-top: 88px;
+        }
+
+        .institutionalGrid {
+          display: grid;
+          gap: 16px;
+        }
+
+        .institutionalGrid > article {
+          padding: 24px;
+          border: 1px solid rgba(255, 197, 82, 0.17);
+          border-radius: 22px;
+          background: linear-gradient(145deg, rgba(13, 34, 48, 0.94), rgba(4, 16, 25, 0.98));
+          box-shadow: 0 22px 54px rgba(0, 0, 0, 0.22);
+        }
+
+        .institutionalHeader {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+          padding-bottom: 18px;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .institutionalHeader > span {
+          width: 48px;
+          height: 48px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(255, 198, 82, 0.28);
+          border-radius: 50%;
+          color: #f1c96f;
+          font: 700 14px Georgia, serif;
+        }
+
+        .institutionalHeader small,
+        .authorityRoute span,
+        .institutionalFooter span {
+          color: #70ddec;
+          font-size: 7px;
+          font-weight: 900;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+        }
+
+        .institutionalHeader h3 {
+          margin: 4px 0 0;
+          font-size: 29px;
+        }
+
+        .authorityRoute {
+          margin-top: 18px;
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 10px;
+          align-items: stretch;
+        }
+
+        .authorityRoute > div {
+          min-height: 142px;
+          padding: 15px;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 14px;
+          background: rgba(0, 0, 0, 0.16);
+        }
+
+        .authorityRoute p {
+          margin: 10px 0 0;
+          color: #a6b9c1;
+          font-size: 10px;
+          line-height: 1.55;
+        }
+
+        .authorityRoute > i {
+          display: none;
+        }
+
+        .institutionalFooter {
+          margin-top: 12px;
+          display: grid;
+          grid-template-columns: 1fr 1.2fr auto;
+          gap: 10px;
+          align-items: stretch;
+        }
+
+        .institutionalFooter > div,
+        .institutionalFooter > a {
+          padding: 14px;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 13px;
+          background: rgba(255, 255, 255, 0.025);
+        }
+
+        .institutionalFooter strong {
+          display: block;
+          margin-top: 7px;
+          color: #d7e3e7;
+          font-size: 10px;
+          line-height: 1.45;
+        }
+
+        .institutionalFooter > a {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #05202a;
+          background: linear-gradient(135deg, #d9fbff, #75dfef 64%, #39adca);
+          text-decoration: none;
+          font-size: 9px;
+          font-weight: 900;
+          text-transform: uppercase;
+        }
+
+        .crosswalkDoctrine {
+          margin-top: 18px;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 11px;
+        }
+
+        .crosswalkDoctrine > div {
+          min-height: 170px;
+          padding: 19px;
+          border: 1px solid rgba(99, 230, 255, 0.11);
+          border-radius: 17px;
+          background: rgba(8, 28, 41, 0.72);
+        }
+
+        .crosswalkDoctrine span {
+          color: #efc66f;
+          font-size: 9px;
+          font-weight: 900;
+        }
+
+        .crosswalkDoctrine strong {
+          display: block;
+          margin-top: 18px;
+          font: 700 18px Georgia, serif;
+        }
+
+        .crosswalkDoctrine p {
+          margin: 9px 0 0;
+          color: #839aa4;
+          font-size: 10px;
+          line-height: 1.55;
         }
 
         .boundarySection {
