@@ -34,40 +34,634 @@ type LawRecord = {
 
 const lawRecords: LawRecord[] = [
   {
+    id: "clean-air-act",
+    shortName: "Clean Air Act",
+    title: "United States Clean Air Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal environmental statute",
+    summary: "The principal United States federal statute for controlling air pollution from stationary and mobile sources, establishing national ambient air quality programs, hazardous-air-pollutant controls, operating permits, enforcement authorities, and state implementation responsibilities.",
+    applicability: [
+      "Facilities, sources, vehicles, fuels, states, tribes, and regulated entities within applicable Clean Air Act programs",
+      "Activities subject to National Ambient Air Quality Standards, hazardous air pollutant controls, New Source Review, Title V, mobile-source, acid-rain, or ozone-protection requirements",
+      "Owners and operators whose permits, emissions, monitoring, reporting, or control obligations are triggered by statute or implementing regulation",
+    ],
+    obligations: [
+      "Determine the controlling Clean Air Act title, section, permit, state implementation plan, and implementing regulation",
+      "Preserve emissions, monitoring, calibration, operating-condition, deviation, and reporting records",
+      "Maintain required pollution controls and comply with emission limits, work-practice standards, permits, and enforcement orders",
+      "Reassess applicability when equipment, process, fuel, throughput, location, rule, permit, or operating condition changes",
+    ],
+    evidence: [
+      "Source and facility identity",
+      "Applicable permit and regulatory citation",
+      "Emissions inventory and test results",
+      "Continuous monitoring and calibration records",
+      "Control-device operating evidence",
+      "Deviation, notice, reporting, and corrective-action records",
+    ],
+    executionBoundary: "A permit, model, annual average, or compliance report does not by itself prove that a specific occupied environment, exposure event, release, or intervention was environmentally valid at the time consequence occurred.",
+    sourceNotice: "Consult the United States Code, EPA Clean Air Act materials, applicable 40 CFR parts, state implementation plans, permits, Federal Register actions, and current judicial decisions.",
+  },
+  {
+    id: "clean-water-act",
+    shortName: "Clean Water Act",
+    title: "Federal Water Pollution Control Act, commonly called the Clean Water Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal environmental statute",
+    summary: "The foundational United States statute governing pollutant discharges to waters, water-quality standards, permits, pretreatment, wetlands and dredge-or-fill activities, spill response, enforcement, and state, tribal, and federal implementation.",
+    applicability: [
+      "Point-source dischargers and entities requiring National Pollutant Discharge Elimination System permits",
+      "States, territories, and authorized tribes developing water-quality standards, impaired-waters lists, and total maximum daily loads",
+      "Projects involving dredged or fill material, stormwater, industrial wastewater, municipal systems, pretreatment, or regulated spills",
+    ],
+    obligations: [
+      "Identify the covered water, discharge, pollutant, point source, permit pathway, designated use, criterion, and responsible authority",
+      "Preserve sampling, flow, laboratory, chain-of-custody, discharge-monitoring, bypass, upset, and corrective-action records",
+      "Comply with technology-based and water-quality-based limits, permit conditions, reporting duties, and enforcement requirements",
+      "Verify whether intervention restored the chemical, physical, and biological condition relevant to the governed claim",
+    ],
+    evidence: [
+      "Permit and outfall record",
+      "Sampling plan and chain of custody",
+      "Laboratory analytical package",
+      "Discharge monitoring report",
+      "Water-quality standard and designated-use map",
+      "Violation, spill, bypass, remediation, and outcome records",
+    ],
+    executionBoundary: "A permit limit or isolated sample does not establish the complete condition of a waterbody, the validity of every exposure, or the success of remediation without continuity, context, authority, and outcome evidence.",
+    sourceNotice: "Consult the official statute, EPA Clean Water Act program materials, applicable 40 CFR provisions, permits, state or tribal standards, and current jurisdictional decisions.",
+  },
+  {
+    id: "safe-drinking-water-act",
+    shortName: "Safe Drinking Water Act",
+    title: "United States Safe Drinking Water Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal public-health and environmental statute",
+    summary: "The principal federal law protecting public drinking-water supplies through national primary drinking-water regulations, public-water-system oversight, underground-injection controls, source-water protections, monitoring, notification, and enforcement.",
+    applicability: [
+      "Public water systems and responsible owners or operators",
+      "States, tribes, laboratories, and primacy agencies administering drinking-water programs",
+      "Underground injection activities and other regulated pathways capable of affecting drinking-water sources",
+    ],
+    obligations: [
+      "Determine system type, contaminant, monitoring schedule, treatment technique, maximum contaminant level, and responsible authority",
+      "Maintain sampling-site, laboratory, method, quality-control, treatment, distribution, violation, and public-notice records",
+      "Provide required notices and corrective actions when standards, monitoring, or treatment duties are not met",
+      "Preserve post-correction evidence showing whether the affected water system returned to a supportable condition",
+    ],
+    evidence: [
+      "System inventory and source record",
+      "Sampling plan and laboratory results",
+      "Method and quality-control record",
+      "Treatment and distribution operating data",
+      "Public notice and consumer confidence report",
+      "Corrective action and return-to-service evidence",
+    ],
+    executionBoundary: "A compliant annual report or a sample below a limit does not prove continuous safety at every tap, time, building, or vulnerable-use condition.",
+    sourceNotice: "Consult the official statute, EPA drinking-water regulations and guidance, state primacy requirements, public-water-system records, and current health advisories.",
+  },
+  {
+    id: "rcra",
+    shortName: "RCRA",
+    title: "Resource Conservation and Recovery Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal waste-management statute",
+    summary: "The federal cradle-to-grave framework for hazardous waste and a principal framework for solid waste, treatment, storage, disposal, corrective action, underground storage tanks, permitting, tracking, and enforcement.",
+    applicability: [
+      "Generators, transporters, treatment, storage, and disposal facilities",
+      "Owners and operators of regulated waste units and underground storage tanks",
+      "States and authorized programs implementing hazardous and solid-waste requirements",
+    ],
+    obligations: [
+      "Classify wastes and generator status correctly",
+      "Preserve manifests, profiles, accumulation, inspection, training, contingency, shipment, receipt, and disposal records",
+      "Operate permitted or conditionally exempt pathways within applicable limits",
+      "Investigate releases, conduct corrective action, and verify closure or remediation outcomes",
+    ],
+    evidence: [
+      "Waste determination",
+      "Generator and facility identification",
+      "Manifest and chain-of-custody record",
+      "Inspection and training record",
+      "Permit and operating record",
+      "Release, corrective-action, closure, and post-closure evidence",
+    ],
+    executionBoundary: "A signed manifest establishes a custody transaction, not the environmental validity of handling, treatment, disposal, closure, or resulting site condition.",
+    sourceNotice: "Consult the official statute, EPA RCRA materials, applicable 40 CFR parts, authorized state rules, permits, and current waste determinations.",
+  },
+  {
+    id: "cercla",
+    shortName: "CERCLA / Superfund",
+    title: "Comprehensive Environmental Response, Compensation, and Liability Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal cleanup and liability statute",
+    summary: "The federal framework for responding to releases or threatened releases of hazardous substances, assigning liability, conducting removal and remedial actions, recovering costs, and preserving long-term cleanup records.",
+    applicability: [
+      "Potentially responsible parties, owners, operators, arrangers, and transporters within statutory boundaries",
+      "Federal, state, tribal, and local response authorities",
+      "Sites evaluated, listed, investigated, removed, remediated, monitored, or deleted under Superfund pathways",
+    ],
+    obligations: [
+      "Identify the release, hazardous substance, site, responsible parties, response authority, and applicable or relevant requirements",
+      "Preserve sampling, risk, remedy-selection, community, cost, implementation, and monitoring records",
+      "Implement authorized removal or remedial actions and institutional controls",
+      "Verify remedy performance and preserve unresolved contamination, restrictions, and future-reliance limits",
+    ],
+    evidence: [
+      "Preliminary assessment and site inspection",
+      "Remedial investigation and feasibility study",
+      "Record of decision",
+      "Sampling and laboratory package",
+      "Removal or remedial action record",
+      "Five-year review and long-term monitoring evidence",
+    ],
+    executionBoundary: "Remedy completion, construction completion, or site deletion does not automatically establish that every pathway, exposure, building, parcel, or future use is safe.",
+    sourceNotice: "Consult the official statute, National Contingency Plan, EPA Superfund records, records of decision, consent instruments, site files, and current judicial authority.",
+  },
+  {
+    id: "tsca",
+    shortName: "TSCA",
+    title: "Toxic Substances Control Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal chemical-control statute",
+    summary: "The federal law governing chemical reporting, review, testing, risk evaluation, risk management, restrictions, records, and selected substances and products, as amended by the Frank R. Lautenberg Chemical Safety for the 21st Century Act.",
+    applicability: [
+      "Manufacturers, importers, processors, distributors, users, and disposers within applicable chemical rules",
+      "Entities subject to reporting, testing, significant-new-use, risk-management, PCB, asbestos, lead, or other TSCA programs",
+      "Chemical substances and mixtures within statutory and regulatory scope",
+    ],
+    obligations: [
+      "Identify substance identity, activity, exemption, rule, use condition, and responsible role",
+      "Maintain manufacturing, import, processing, exposure, release, testing, and downstream communication records",
+      "Comply with restrictions, prohibitions, reporting, recordkeeping, certification, and disposal conditions",
+      "Reassess when substance, use, process, supplier, formulation, rule, or risk-management condition changes",
+    ],
+    evidence: [
+      "Chemical identity and inventory status",
+      "Safety and exposure information",
+      "Test and risk-evaluation evidence",
+      "Significant-new-use determination",
+      "Restriction and compliance record",
+      "Downstream communication and disposal evidence",
+    ],
+    executionBoundary: "Presence on an inventory or compliance with a narrow chemical rule does not establish that a product, building, exposure, or disposal pathway is environmentally acceptable for every use.",
+    sourceNotice: "Consult the official statute, EPA chemical-specific rules, risk evaluations, risk-management actions, reporting rules, and current court decisions.",
+  },
+  {
+    id: "fifra",
+    shortName: "FIFRA",
+    title: "Federal Insecticide, Fungicide, and Rodenticide Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal pesticide statute",
+    summary: "The principal federal law governing pesticide registration, labeling, distribution, sale, use, production, records, worker protection, applicator requirements, enforcement, and associated environmental controls.",
+    applicability: [
+      "Pesticide registrants, producers, sellers, distributors, applicators, employers, and users",
+      "Products, devices, establishments, applications, and uses within FIFRA and related rules",
+      "State and tribal agencies implementing or enforcing delegated pesticide programs",
+    ],
+    obligations: [
+      "Use registered products consistently with labeling and applicable restrictions",
+      "Preserve product, lot, establishment, applicator, location, weather, rate, target, notice, and application records",
+      "Protect workers, handlers, bystanders, water, sensitive species, and restricted areas as required",
+      "Investigate misuse, drift, exposure, release, and adverse effects and preserve corrective actions",
+    ],
+    evidence: [
+      "Registration and label version",
+      "Applicator credential",
+      "Application and weather record",
+      "Worker-protection evidence",
+      "Drift, exposure, complaint, or incident record",
+      "Corrective action and environmental outcome evidence",
+    ],
+    executionBoundary: "Registration authorizes labeled uses under defined conditions; it does not prove that a particular application was correctly executed or caused no environmental or human consequence.",
+    sourceNotice: "Consult the official statute, EPA pesticide regulations, current label, registration decisions, state or tribal requirements, and applicable worker-protection rules.",
+  },
+  {
+    id: "epcra",
+    shortName: "EPCRA",
+    title: "Emergency Planning and Community Right-to-Know Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal emergency-planning and disclosure statute",
+    summary: "A federal statute supporting emergency planning and public access to information about hazardous and toxic chemicals through release notification, inventory reporting, toxic-release reporting, and local planning structures.",
+    applicability: [
+      "Facilities possessing or releasing covered chemicals above applicable thresholds",
+      "State emergency response commissions, local emergency planning committees, fire departments, and response authorities",
+      "Owners and operators subject to emergency-release, inventory, safety-data, or toxic-release reporting",
+    ],
+    obligations: [
+      "Determine chemical, threshold, reporting section, facility, release, and recipient requirements",
+      "Submit accurate and timely emergency notices, inventories, forms, and updates",
+      "Coordinate with emergency planners and preserve facility and community response information",
+      "Correct inaccurate records and maintain version, submission, and receipt evidence",
+    ],
+    evidence: [
+      "Chemical inventory and threshold calculation",
+      "Safety data and facility map",
+      "Emergency release notification",
+      "Tier reporting record",
+      "Toxic Release Inventory submission",
+      "Correction, response, and community-access record",
+    ],
+    executionBoundary: "Disclosure of a chemical quantity or annual release does not prove that a facility prevented exposure, maintained control, or achieved an acceptable environmental outcome.",
+    sourceNotice: "Consult the official statute, EPA EPCRA and TRI materials, current reporting instructions, thresholds, exemptions, and state or local requirements.",
+  },
+  {
+    id: "pollution-prevention-act",
+    shortName: "Pollution Prevention Act",
+    title: "United States Pollution Prevention Act of 1990",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal pollution-prevention policy statute",
+    summary: "A federal statute establishing pollution prevention at the source as a national policy priority ahead of recycling, treatment, and disposal and supporting data collection and technical assistance.",
+    applicability: [
+      "Industrial and other entities evaluating source reduction and waste-generation pathways",
+      "Facilities with related toxic chemical and source-reduction reporting duties",
+      "Agencies and programs prioritizing prevention before downstream control",
+    ],
+    obligations: [
+      "Identify opportunities to prevent or reduce pollution before it is created",
+      "Preserve baselines, process changes, material substitutions, production-normalized quantities, releases, transfers, and outcomes",
+      "Avoid claiming prevention based only on shifting pollution between media, locations, contractors, or accounting categories",
+      "Verify whether source reduction persisted and whether new hazards or burdens were introduced",
+    ],
+    evidence: [
+      "Material and process baseline",
+      "Source-reduction plan",
+      "Production-normalized quantity record",
+      "Release and transfer comparison",
+      "Substitution and hazard review",
+      "Post-change environmental outcome evidence",
+    ],
+    executionBoundary: "A reduction in reported waste volume does not establish pollution prevention if toxicity, exposure, energy, water, location, or another environmental burden increased.",
+    sourceNotice: "Consult the official statute, EPA pollution-prevention resources, TRI source-reduction reporting, sector guidance, and applicable program requirements.",
+  },
+  {
+    id: "nepa",
+    shortName: "NEPA",
+    title: "National Environmental Policy Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal environmental review statute",
+    summary: "The United States procedural environmental-review statute requiring federal agencies to evaluate environmental effects of major federal actions within applicable statutory and regulatory boundaries and to preserve a reviewable decision process.",
+    applicability: [
+      "Federal agencies proposing or authorizing covered actions",
+      "Applicants, contractors, cooperating agencies, tribes, states, communities, and affected parties participating in review",
+      "Actions requiring categorical exclusion review, environmental assessment, or environmental impact statement pathways",
+    ],
+    obligations: [
+      "Define the proposed action, purpose, need, alternatives, affected environment, effects, mitigation, authority, and review pathway",
+      "Use current, attributable information and disclose assumptions, uncertainty, missing information, and relevant cumulative or connected conditions as required",
+      "Preserve public participation, consultation, findings, decisions, mitigation commitments, and monitoring",
+      "Reevaluate when the action, evidence, environment, authority, or anticipated effect materially changes",
+    ],
+    evidence: [
+      "Categorical exclusion record",
+      "Environmental assessment or impact statement",
+      "Alternatives and effects analysis",
+      "Consultation and public-comment record",
+      "Finding or record of decision",
+      "Mitigation monitoring and supplemental-review evidence",
+    ],
+    executionBoundary: "Completion of an environmental-review document is not proof that the selected action caused the predicted outcome or that mitigation was implemented and effective.",
+    sourceNotice: "Consult the official statute, current Council on Environmental Quality regulations, agency procedures, project records, and controlling judicial authority.",
+  },
+  {
+    id: "ocean-dumping-act",
+    shortName: "MPRSA / Ocean Dumping Act",
+    title: "Marine Protection, Research, and Sanctuaries Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal marine-protection statute",
+    summary: "A federal statute governing transportation and dumping of material into ocean waters, research, monitoring, permitting, designated sites, enforcement, and marine sanctuaries through multiple federal authorities.",
+    applicability: [
+      "Persons transporting material for ocean dumping and permit applicants",
+      "Federal agencies responsible for ocean-dumping and sanctuary pathways",
+      "Projects involving dredged material, dumping sites, monitoring, research, or marine protection",
+    ],
+    obligations: [
+      "Identify the material, source, transport, disposal site, permit authority, testing, alternatives, and environmental criteria",
+      "Preserve sampling, characterization, chain of custody, permit, vessel, location, quantity, and monitoring records",
+      "Operate only within authorized material, site, timing, method, and reporting conditions",
+      "Verify seabed, water-column, ecological, and site-management outcomes",
+    ],
+    evidence: [
+      "Material characterization",
+      "Permit and alternatives analysis",
+      "Vessel and load record",
+      "Disposal coordinates and quantity",
+      "Site monitoring data",
+      "Violation, response, and environmental outcome record",
+    ],
+    executionBoundary: "A disposal permit does not establish that every load met its characterization, placement, timing, operational, and environmental conditions.",
+    sourceNotice: "Consult the official statute, EPA and U.S. Army Corps materials, applicable regulations, permits, site-management plans, and sanctuary authorities.",
+  },
+  {
+    id: "oil-pollution-act",
+    shortName: "Oil Pollution Act",
+    title: "United States Oil Pollution Act of 1990",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal oil-spill prevention, response, liability, and compensation statute",
+    summary: "A federal framework strengthening oil-spill prevention, preparedness, response, liability, financial responsibility, and restoration following discharges to navigable waters and adjoining shorelines.",
+    applicability: [
+      "Vessels, facilities, owners, operators, responsible parties, and response organizations within statutory scope",
+      "Entities subject to spill-prevention, response-plan, financial-responsibility, reporting, removal, or damages requirements",
+      "Federal, state, tribal, local, and natural-resource trustee authorities",
+    ],
+    obligations: [
+      "Maintain applicable prevention and response plans, equipment, training, drills, inspection, and financial-responsibility evidence",
+      "Report discharges and preserve time, source, quantity, pathway, response, recovery, waste, and restoration records",
+      "Coordinate authorized response and natural-resource-damage assessment",
+      "Verify cleanup endpoints, residual contamination, restoration, restrictions, and long-term outcomes",
+    ],
+    evidence: [
+      "Prevention and response plan",
+      "Inspection, training, and drill record",
+      "Discharge notification and trajectory evidence",
+      "Response and recovered-material record",
+      "Natural-resource damage assessment",
+      "Restoration and long-term monitoring evidence",
+    ],
+    executionBoundary: "Removal of visible oil or completion of response operations does not prove that ecological, shoreline, sediment, building, worker, or community consequences were resolved.",
+    sourceNotice: "Consult the official statute, Coast Guard and EPA regulations, area and facility plans, response records, consent instruments, and trustee restoration records.",
+  },
+  {
+    id: "endangered-species-act",
+    shortName: "Endangered Species Act",
+    title: "United States Endangered Species Act",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal species-conservation statute",
+    summary: "A federal law protecting listed species and designated critical habitat through listing, consultation, take prohibitions, permits, recovery planning, interagency duties, and enforcement.",
+    applicability: [
+      "Federal agencies whose actions may affect listed species or critical habitat",
+      "Applicants and entities conducting activities potentially involving prohibited take",
+      "Land, water, infrastructure, pollution, pesticide, energy, and development activities intersecting protected species or habitat",
+    ],
+    obligations: [
+      "Identify species, habitat, action area, effects, consultation pathway, permit, and responsible authority",
+      "Preserve surveys, methods, seasonal conditions, assumptions, consultation, biological opinions, terms, and monitoring",
+      "Operate within incidental-take, reasonable-and-prudent, conservation, reporting, and permit conditions",
+      "Verify actual effects and reinitiate review when triggers, evidence, action, or conditions change",
+    ],
+    evidence: [
+      "Species and habitat determination",
+      "Survey and methodology record",
+      "Consultation package",
+      "Biological assessment or opinion",
+      "Permit and take record",
+      "Monitoring, reinitiation, and recovery evidence",
+    ],
+    executionBoundary: "Completion of consultation or possession of a permit does not prove that actual take, habitat effects, mitigation, or recovery outcomes remained within the authorized boundary.",
+    sourceNotice: "Consult the official statute, U.S. Fish and Wildlife Service and NOAA Fisheries regulations and records, permits, consultations, recovery plans, and current judicial authority.",
+  },
+  {
+    id: "aim-act",
+    shortName: "AIM Act",
+    title: "American Innovation and Manufacturing Act of 2020",
+    jurisdiction: "United States",
+    status: "In force",
+    authorityType: "Federal climate and refrigerant statute",
+    summary: "A federal statute authorizing phasedown, management, and technology-transition programs for hydrofluorocarbons, including allowance, reclamation, servicing, leak-management, reporting, and sector-transition requirements implemented by EPA.",
+    applicability: [
+      "Producers, importers, exporters, reclaimers, distributors, equipment owners, service providers, and regulated sectors",
+      "Hydrofluorocarbons and products or equipment within allowance, management, or transition programs",
+      "Activities subject to refrigerant handling, reporting, labeling, leak, reclamation, or technology restrictions",
+    ],
+    obligations: [
+      "Determine substance, equipment, sector, date, allowance, servicing, leak, reclamation, and reporting requirements",
+      "Preserve cylinder, quantity, identity, transfer, recovery, reclamation, charging, leak, repair, disposal, and technician records",
+      "Use compliant substances and equipment within transition and management boundaries",
+      "Verify actual refrigerant containment, recovery, repair, and environmental outcome rather than relying on paperwork alone",
+    ],
+    evidence: [
+      "Refrigerant identity and cylinder record",
+      "Allowance or transaction evidence",
+      "Technician and equipment identity",
+      "Leak inspection and repair record",
+      "Recovery and reclamation record",
+      "Disposal and post-intervention verification",
+    ],
+    executionBoundary: "Compliance with an allowance or product transition does not prove that field charging, recovery, leak repair, disposal, or atmospheric release was correctly executed.",
+    sourceNotice: "Consult the official statute, EPA HFC regulations, current sector restrictions, refrigerant-management requirements, reporting instructions, and enforcement materials.",
+  },
+  {
+    id: "montreal-protocol",
+    shortName: "Montreal Protocol",
+    title: "Montreal Protocol on Substances that Deplete the Ozone Layer",
+    jurisdiction: "International",
+    status: "In force",
+    authorityType: "Multilateral environmental agreement",
+    summary: "A global treaty controlling production and consumption of ozone-depleting substances, strengthened through adjustments and amendments and linked to national licensing, reporting, trade, recovery, servicing, and phaseout systems.",
+    applicability: [
+      "Parties and national authorities implementing treaty controls",
+      "Producers, importers, exporters, distributors, equipment owners, and service sectors covered by national implementation",
+      "Controlled substances, products, equipment, banks, recovery, reclamation, destruction, and trade pathways",
+    ],
+    obligations: [
+      "Identify the controlling treaty amendment, national law, substance, schedule, exemption, licensing, and reporting pathway",
+      "Preserve production, import, export, transfer, servicing, recovery, reclamation, destruction, and stock records",
+      "Prevent unauthorized production, trade, release, or use and verify national implementation",
+      "Distinguish treaty obligations from the domestic legal instrument that directly binds an entity",
+    ],
+    evidence: [
+      "Substance and schedule record",
+      "License and customs record",
+      "Production and consumption data",
+      "Servicing and recovery evidence",
+      "Reclamation or destruction record",
+      "National implementation and compliance evidence",
+    ],
+    executionBoundary: "Treaty success at global production or consumption levels does not prove that a particular cylinder, installation, service event, or release was governed correctly.",
+    sourceNotice: "Consult the official treaty text, adjustments and amendments, Ozone Secretariat decisions, national implementing law, schedules, exemptions, and current reporting rules.",
+  },
+  {
+    id: "paris-agreement",
+    shortName: "Paris Agreement",
+    title: "Paris Agreement under the United Nations Framework Convention on Climate Change",
+    jurisdiction: "International",
+    status: "In force",
+    authorityType: "Multilateral climate agreement",
+    summary: "A global climate agreement establishing mitigation, adaptation, finance, transparency, nationally determined contribution, stocktake, and cooperative-framework duties for Parties, implemented through national and regional legal systems.",
+    applicability: [
+      "State Parties and institutions responsible for national implementation",
+      "Programs, sectors, markets, projects, and entities affected through domestic climate law, permits, procurement, finance, disclosure, or cooperative mechanisms",
+      "Mitigation, adaptation, inventory, reporting, finance, and transition pathways",
+    ],
+    obligations: [
+      "Distinguish international Party obligations from directly applicable domestic duties",
+      "Preserve inventory methods, baselines, assumptions, targets, measures, progress, corrections, and outcomes",
+      "Avoid converting scenarios, pledges, offsets, or estimates into unsupported claims of achieved environmental consequence",
+      "Trace each entity-level duty to current national or regional authority",
+    ],
+    evidence: [
+      "Nationally determined contribution",
+      "Greenhouse-gas inventory",
+      "Method and baseline record",
+      "Policy and measure record",
+      "Transparency and review submission",
+      "Verified mitigation or adaptation outcome evidence",
+    ],
+    executionBoundary: "A national target, modeled pathway, credit, or disclosure does not by itself prove that a specific intervention produced additional, durable, non-shifted climate benefit.",
+    sourceNotice: "Consult the official agreement, decisions of the Parties, UNFCCC reporting rules, national implementation, registries, methods, and current market or sector law.",
+  },
+  {
+    id: "basel-convention",
+    shortName: "Basel Convention",
+    title: "Basel Convention on the Control of Transboundary Movements of Hazardous Wastes and Their Disposal",
+    jurisdiction: "International",
+    status: "In force",
+    authorityType: "Multilateral waste agreement",
+    summary: "A global treaty governing transboundary movement and environmentally sound management of hazardous and other covered wastes through classification, prior informed consent, tracking, trade controls, return duties, and national implementation.",
+    applicability: [
+      "State Parties and competent authorities",
+      "Generators, exporters, importers, carriers, disposers, brokers, recyclers, and facilities affected by national implementation",
+      "Hazardous and other covered waste movements, including applicable plastic-waste and electronic-waste pathways",
+    ],
+    obligations: [
+      "Classify the waste, countries, parties, movement, consent, contract, carrier, facility, disposal operation, and national requirements",
+      "Preserve notification, consent, movement, customs, chain-of-custody, receipt, disposal, recycling, and return records",
+      "Prevent illegal traffic and verify environmentally sound management at the receiving facility",
+      "Distinguish treaty classifications from stricter national definitions and controls",
+    ],
+    evidence: [
+      "Waste classification",
+      "Notification and consent",
+      "Movement document",
+      "Carrier and customs record",
+      "Facility receipt and disposal certificate",
+      "Illegal-traffic, return, and environmental outcome evidence",
+    ],
+    executionBoundary: "A completed movement document does not prove that the waste was correctly classified, lawfully accepted, environmentally managed, or prevented from causing downstream harm.",
+    sourceNotice: "Consult the official convention, amendments, Conference of the Parties decisions, technical guidelines, Party status, and national implementing laws.",
+  },
+  {
+    id: "stockholm-convention",
+    shortName: "Stockholm Convention",
+    title: "Stockholm Convention on Persistent Organic Pollutants",
+    jurisdiction: "International",
+    status: "In force",
+    authorityType: "Multilateral chemicals agreement",
+    summary: "A global treaty requiring elimination, restriction, reduction, inventory, management, and disposal measures for listed persistent organic pollutants, with national implementation and periodic listing updates.",
+    applicability: [
+      "State Parties and national authorities",
+      "Manufacturers, users, holders, waste managers, sites, products, equipment, and sectors affected through national implementation",
+      "Listed chemicals, unintentional releases, stockpiles, articles, contaminated sites, and wastes",
+    ],
+    obligations: [
+      "Identify the chemical, annex, exemption, use, stockpile, release source, waste, site, and national implementing requirement",
+      "Preserve inventories, analytical methods, production, use, release, transfer, destruction, disposal, and remediation records",
+      "Prevent recycling or recirculation that conflicts with destruction or irreversible-transformation duties",
+      "Verify actual reduction, elimination, containment, destruction, and site outcome",
+    ],
+    evidence: [
+      "Chemical and annex determination",
+      "Inventory and analytical record",
+      "Exemption or acceptable-purpose record",
+      "Release and transfer inventory",
+      "Destruction or disposal evidence",
+      "Contaminated-site and outcome record",
+    ],
+    executionBoundary: "Listing or national reporting does not prove that a particular stockpile, article, emission source, waste stream, or contaminated site was controlled effectively.",
+    sourceNotice: "Consult the official convention, annex updates, Conference decisions, technical guidance, national implementation plans, and domestic chemical and waste law.",
+  },
+  {
+    id: "minamata-convention",
+    shortName: "Minamata Convention",
+    title: "Minamata Convention on Mercury",
+    jurisdiction: "International",
+    status: "In force",
+    authorityType: "Multilateral chemicals and pollution agreement",
+    summary: "A global treaty addressing mercury supply, trade, products, processes, artisanal and small-scale gold mining, emissions, releases, storage, waste, contaminated sites, health, information, and national implementation.",
+    applicability: [
+      "State Parties and national authorities",
+      "Mercury producers, traders, product and process sectors, mining, facilities, waste handlers, laboratories, and affected communities within domestic implementation",
+      "Mercury and mercury compounds across supply, use, emissions, releases, waste, storage, and site pathways",
+    ],
+    obligations: [
+      "Identify the mercury pathway, source, product, process, trade, exemption, emissions or releases control, waste, storage, and national authority",
+      "Preserve mass balance, analytical, trade, production, use, emissions, releases, waste, storage, exposure, and remediation records",
+      "Implement control measures and avoid transferring mercury burden between air, water, land, products, workers, and communities",
+      "Verify reductions and environmental or exposure outcomes",
+    ],
+    evidence: [
+      "Mercury identity and mass balance",
+      "Trade and consent record",
+      "Product or process record",
+      "Emissions and releases data",
+      "Waste and storage record",
+      "Site, exposure, remediation, and outcome evidence",
+    ],
+    executionBoundary: "A national inventory or facility report does not establish that mercury was contained, exposures prevented, waste stabilized, or environmental conditions restored.",
+    sourceNotice: "Consult the official convention, annexes, Conference decisions, technical guidance, Party status, and national implementing law.",
+  },
+  {
+    id: "who-air-quality-guidelines",
+    shortName: "WHO Air Quality Guidelines",
+    title: "WHO Global Air Quality Guidelines for PM2.5, PM10, ozone, nitrogen dioxide, sulfur dioxide, and carbon monoxide",
+    jurisdiction: "International",
+    status: "In force",
+    authorityType: "Non-binding global health guidance",
+    summary: "World Health Organization health-based air-quality guideline levels and interim targets intended to inform legislation and policy. They are evidence-informed guidance, not enacted law or automatically enforceable standards.",
+    applicability: [
+      "Governments and authorities developing air-quality law, standards, policy, monitoring, and health protection",
+      "Institutions comparing legal limits with health-based evidence",
+      "Researchers, public-health bodies, communities, building operators, and environmental governance systems using the guidance within declared boundaries",
+    ],
+    obligations: [
+      "Preserve the distinction between health guidance, legal limits, occupational limits, indoor standards, and enforceable permit conditions",
+      "Identify pollutant, averaging time, method, population, location, uncertainty, and comparison basis",
+      "Avoid declaring legal compliance, causation, diagnosis, or safety solely from a WHO guideline comparison",
+      "Use guideline evidence transparently when proposing stronger law, policy, monitoring, or intervention",
+    ],
+    evidence: [
+      "Pollutant and averaging-time record",
+      "Method and quality-control evidence",
+      "Location and population context",
+      "Legal-limit and guideline comparison",
+      "Uncertainty and limitation declaration",
+      "Intervention and outcome comparison",
+    ],
+    executionBoundary: "A concentration below a guideline does not prove zero risk, universal safety, legal compliance, or validity for every person, indoor environment, activity, and duration.",
+    sourceNotice: "Consult the official WHO publication, pollutant-specific guidance, interim targets, updates, methods, and the applicable national or local law.",
+  },
+  {
     id: "eu-ai-act",
     shortName: "EU AI Act",
     title: "European Union Artificial Intelligence Act",
     jurisdiction: "European Union",
     status: "Phased implementation",
     authorityType: "Binding regional legislation",
-    summary:
-      "A risk-based legal framework governing prohibited AI practices, high-risk AI systems, transparency duties, general-purpose AI models, governance, enforcement, and market oversight.",
+    summary: "A risk-based legal framework governing prohibited AI practices, high-risk AI systems, transparency duties, general-purpose AI models, governance, enforcement, and market oversight.",
     applicability: [
-      "Providers placing AI systems or models on the EU market",
-      "Deployers using AI systems within the European Union",
-      "Importers, distributors, product manufacturers, and authorized representatives",
-      "Certain providers and deployers outside the European Union when system outputs are used within the Union",
+      "Providers, deployers, importers, distributors, product manufacturers, and authorized representatives within territorial and role boundaries",
+      "Certain providers and deployers outside the European Union when regulated outputs or systems affect the Union",
+      "AI systems and general-purpose AI models within applicable classifications and effective dates",
     ],
     obligations: [
-      "Determine the regulated role and system classification",
-      "Identify prohibited, high-risk, transparency, or general-purpose AI duties",
-      "Maintain required technical documentation and records",
-      "Establish risk management, data governance, human oversight, and monitoring controls",
-      "Support incident reporting, corrective action, and regulatory cooperation",
+      "Determine role, system classification, prohibited-practice, high-risk, transparency, or general-purpose AI duties",
+      "Maintain required risk management, data governance, technical documentation, records, human oversight, testing, monitoring, incident, and corrective-action evidence",
+      "Trace harmonized standards, common specifications, guidance, and competent authority requirements without treating them as interchangeable",
+      "Revalidate applicability when system, model, provider, deployer, purpose, data, version, territory, or effective date changes",
     ],
     evidence: [
-      "System classification record",
-      "Role and entity determination",
+      "Classification and role record",
       "Risk-management file",
       "Technical documentation",
       "Validation and testing results",
       "Human-oversight record",
-      "Post-market monitoring record",
+      "Post-market monitoring and incident evidence",
     ],
-    executionBoundary:
-      "A classification or conformity record may support a governance determination, but the executing entity must still establish that the exact system, use, authority, evidence, and runtime conditions remain valid.",
-    sourceNotice:
-      "Consult the official consolidated regulation, implementation dates, delegated acts, standards, guidance, and competent authority materials.",
+    executionBoundary: "Conformity or classification does not prove that a specific runtime action had current authority, admissible evidence, bounded commitment, controlled execution, and verified outcome.",
+    sourceNotice: "Consult the official regulation, corrigenda, implementation dates, delegated and implementing acts, standards, guidance, and competent authority materials.",
   },
   {
     id: "colorado-ai-act",
@@ -75,263 +669,179 @@ const lawRecords: LawRecord[] = [
     title: "Colorado Artificial Intelligence Act",
     jurisdiction: "United States",
     status: "Enacted",
-    authorityType: "State legislation",
-    summary:
-      "A state-level framework addressing developers and deployers of certain high-risk artificial intelligence systems and the prevention of algorithmic discrimination in consequential decisions.",
+    authorityType: "State artificial-intelligence statute",
+    summary: "A state framework addressing developers and deployers of covered high-risk artificial intelligence systems and duties intended to reduce algorithmic discrimination in consequential decisions.",
     applicability: [
-      "Developers of covered high-risk artificial intelligence systems",
-      "Deployers using covered systems for consequential decisions",
-      "Organizations operating within the statute’s jurisdictional and threshold boundaries",
+      "Developers and deployers of covered high-risk AI systems within jurisdictional, role, and exemption boundaries",
+      "Covered consequential decisions and consumer interactions",
+      "Organizations preparing for the current effective date, amendments, attorney-general rules, and enforcement framework",
     ],
     obligations: [
-      "Use reasonable care to protect consumers from known or reasonably foreseeable algorithmic discrimination",
-      "Provide required documentation and disclosures",
-      "Complete impact assessments where required",
-      "Maintain risk-management and governance processes",
-      "Support consumer notice, correction, appeal, or human-review mechanisms where applicable",
+      "Determine covered role, system, consequential decision, consumer, exemption, and effective requirement",
+      "Maintain documentation, disclosures, impact assessments, risk management, monitoring, notices, correction, appeal, and human-review records as applicable",
+      "Avoid treating developer documentation as proof of deployer execution",
+      "Revalidate when system, use, model, data, decision, role, consumer population, or law changes",
     ],
     evidence: [
       "Covered-system determination",
       "Developer documentation",
       "Impact assessment",
-      "Risk-management policy",
-      "Consumer notice",
-      "Appeal or human-review record",
+      "Risk-management record",
+      "Consumer notice and appeal evidence",
       "Monitoring and corrective-action record",
     ],
-    executionBoundary:
-      "A general policy or developer statement does not prove that a particular consequential decision was properly authorized, evidence-supported, reviewed, and preserved.",
-    sourceNotice:
-      "Consult the enacted statutory text, amendments, attorney-general materials, rulemaking, effective dates, and applicable exemptions.",
+    executionBoundary: "A general policy, impact assessment, or vendor assurance does not prove that a particular consequential decision was authorized, evidence-supported, reviewed, and preserved.",
+    sourceNotice: "Consult the enacted statutory text, amendments, attorney-general materials, rulemaking, effective dates, exemptions, and current judicial authority.",
   },
   {
     id: "nyc-local-law-144",
     shortName: "NYC Local Law 144",
-    title:
-      "New York City Automated Employment Decision Tool Requirements",
+    title: "New York City Automated Employment Decision Tool Requirements",
     jurisdiction: "United States",
     status: "In force",
-    authorityType: "Municipal legislation",
-    summary:
-      "Requirements governing certain automated employment decision tools used in hiring and promotion, including bias-audit and notice obligations.",
+    authorityType: "Municipal employment and automated-decision law",
+    summary: "Requirements governing certain automated employment decision tools used in hiring and promotion, including bias-audit, publication, and notice obligations.",
     applicability: [
       "Employers and employment agencies using a covered automated employment decision tool",
       "Covered hiring or promotion decisions involving candidates or employees in New York City",
+      "Tool versions and uses satisfying the governing definitions",
     ],
     obligations: [
-      "Determine whether the tool falls within the covered definition",
-      "Obtain the required independent bias audit",
-      "Make required audit information publicly available",
-      "Provide required notices before tool use",
-      "Preserve records supporting the determination and disclosures",
+      "Determine whether the tool and use are covered",
+      "Obtain the required independent bias audit and make required information publicly available",
+      "Provide required notices before use and preserve the version, date, population, process, and decision pathway",
+      "Reassess after material tool or use changes",
     ],
     evidence: [
       "Tool-scope determination",
       "Independent bias audit",
       "Published audit summary",
       "Candidate or employee notice",
-      "Tool-use record",
-      "Version and change history",
+      "Tool version and use record",
+      "Change and corrective-action history",
     ],
-    executionBoundary:
-      "A published audit does not establish that every later employment decision used the same tool version, data conditions, process, authority, or human-review controls.",
-    sourceNotice:
-      "Consult the official city law, enforcement rules, definitions, frequently asked questions, and current enforcement guidance.",
-  },
-  {
-    id: "illinois-aiv-interview-act",
-    shortName: "Illinois AI Video Interview Act",
-    title: "Illinois Artificial Intelligence Video Interview Act",
-    jurisdiction: "United States",
-    status: "In force",
-    authorityType: "State legislation",
-    summary:
-      "Requirements applying to certain uses of artificial intelligence to analyze applicant-submitted video interviews for positions based in Illinois.",
-    applicability: [
-      "Employers requesting applicant video interviews for Illinois-based positions",
-      "Covered uses of artificial intelligence to analyze submitted interview videos",
-    ],
-    obligations: [
-      "Notify applicants that artificial intelligence may be used",
-      "Explain generally how the system works and what characteristics it evaluates",
-      "Obtain required consent",
-      "Limit sharing of submitted videos",
-      "Address deletion requests within the applicable requirements",
-    ],
-    evidence: [
-      "Applicant notice",
-      "System explanation",
-      "Consent record",
-      "Video-access record",
-      "Deletion request",
-      "Deletion completion record",
-    ],
-    executionBoundary:
-      "Consent to an AI-assisted interview process does not authorize unrelated processing, expanded sharing, or decisions beyond the declared employment purpose.",
-    sourceNotice:
-      "Consult the official statute, amendments, reporting duties, definitions, and relevant state guidance.",
-  },
-  {
-    id: "executive-order-14110",
-    shortName: "Executive Order 14110",
-    title:
-      "United States Executive Order on Safe, Secure, and Trustworthy Artificial Intelligence",
-    jurisdiction: "United States",
-    status: "Enacted",
-    authorityType: "Federal executive action",
-    summary:
-      "A federal executive directive assigning artificial-intelligence-related actions, standards work, reporting, evaluation, procurement, security, civil-rights, workforce, and innovation responsibilities across agencies.",
-    applicability: [
-      "Federal departments and agencies assigned duties by the order",
-      "Organizations affected through federal procurement, reporting, standards, or program requirements",
-      "Developers or operators falling within specifically defined reporting or government-use conditions",
-    ],
-    obligations: [
-      "Identify the controlling agency action rather than relying on the executive order alone",
-      "Determine whether subsequent guidance, standards, rules, or procurement terms apply",
-      "Preserve required safety, security, testing, or reporting records",
-      "Track changes in agency implementation and legal authority",
-    ],
-    evidence: [
-      "Agency applicability determination",
-      "Procurement requirement",
-      "Testing or evaluation result",
-      "Reporting record",
-      "Security documentation",
-      "Implementation guidance",
-    ],
-    executionBoundary:
-      "An executive directive may cause downstream agency obligations, but the operative requirement must be traced to the responsible authority, instrument, scope, and current implementation state.",
-    sourceNotice:
-      "Consult the official order and current agency actions. Executive actions and their implementation status can change.",
-  },
-  {
-    id: "canada-aida",
-    shortName: "AIDA",
-    title: "Artificial Intelligence and Data Act Proposal",
-    jurisdiction: "Canada",
-    status: "Proposed",
-    authorityType: "Legislative proposal",
-    summary:
-      "A proposed Canadian framework intended to govern certain artificial intelligence systems through risk-management, transparency, oversight, and enforcement requirements.",
-    applicability: [
-      "Potentially covered organizations designing, developing, making available, or managing regulated AI systems",
-      "Activities falling within the final enacted scope, should legislation be adopted",
-    ],
-    obligations: [
-      "Do not represent a proposal as binding enacted law",
-      "Track the bill’s legislative status and revisions",
-      "Separate anticipated duties from current legal requirements",
-      "Preserve the date and source of any proposal-based assessment",
-    ],
-    evidence: [
-      "Legislative-status record",
-      "Bill-version record",
-      "Preliminary applicability analysis",
-      "Gap assessment",
-      "Readiness plan",
-    ],
-    executionBoundary:
-      "Readiness work may be valuable, but proposed obligations cannot be treated as final controlling law unless and until they are enacted and effective.",
-    sourceNotice:
-      "Consult the current parliamentary record and official government materials before relying on any proposed requirement.",
-  },
-  {
-    id: "uk-ai-framework",
-    shortName: "UK AI Framework",
-    title:
-      "United Kingdom Pro-Innovation Approach to AI Regulation",
-    jurisdiction: "United Kingdom",
-    status: "Phased implementation",
-    authorityType: "Cross-regulator policy framework",
-    summary:
-      "A principles-based approach relying substantially on existing regulators applying cross-sector artificial-intelligence principles within their legal remits.",
-    applicability: [
-      "Organizations subject to UK sector regulators and existing legal duties",
-      "AI uses falling within data protection, consumer, competition, employment, safety, financial, or other regulated domains",
-    ],
-    obligations: [
-      "Identify the competent regulator and existing legal authority",
-      "Determine which cross-sector principles and sector rules apply",
-      "Avoid treating nonbinding policy language as an independent statutory command",
-      "Preserve regulator-specific evidence and determinations",
-    ],
-    evidence: [
-      "Regulator mapping",
-      "Sector-law applicability record",
-      "Risk assessment",
-      "Transparency record",
-      "Accountability assignment",
-      "Monitoring record",
-    ],
-    executionBoundary:
-      "A broad national principle does not replace the specific statutory power, regulatory rule, sector duty, or contractual authority controlling the actual use.",
-    sourceNotice:
-      "Consult current UK government policy, regulator guidance, sector law, and any subsequent legislation.",
-  },
-  {
-    id: "china-interim-generative-ai-measures",
-    shortName: "Generative AI Measures",
-    title:
-      "China Interim Measures for the Management of Generative Artificial Intelligence Services",
-    jurisdiction: "China",
-    status: "In force",
-    authorityType: "National administrative measures",
-    summary:
-      "Administrative requirements addressing certain generative artificial intelligence services offered to the public within the relevant territorial and service scope.",
-    applicability: [
-      "Providers offering covered generative artificial intelligence services to the public",
-      "Activities and services falling within the territorial and definitional scope of the measures",
-    ],
-    obligations: [
-      "Determine whether the service and provider are covered",
-      "Address content, data, security, user-protection, and service-management duties",
-      "Complete applicable filings, assessments, or algorithm-related procedures",
-      "Maintain complaint, correction, and operational records",
-    ],
-    evidence: [
-      "Service-scope determination",
-      "Provider record",
-      "Data and training documentation",
-      "Security assessment",
-      "Algorithm filing or registration record",
-      "User complaint and correction record",
-    ],
-    executionBoundary:
-      "A provider-level filing or assessment does not automatically authorize every downstream use, output, transfer, or consequential decision.",
-    sourceNotice:
-      "Consult the official Chinese-language measures, related algorithm rules, data and cybersecurity laws, filing requirements, and regulator materials.",
+    executionBoundary: "A published audit does not establish that every later employment decision used the same version, data, conditions, authority, or human-review controls.",
+    sourceNotice: "Consult the official city law, enforcement rules, definitions, frequently asked questions, current enforcement guidance, and applicable employment law.",
   },
   {
     id: "oecd-ai-principles",
     shortName: "OECD AI Principles",
-    title:
-      "Organisation for Economic Co-operation and Development AI Principles",
+    title: "OECD Recommendation of the Council on Artificial Intelligence",
     jurisdiction: "International",
     status: "In force",
-    authorityType: "Intergovernmental policy principles",
-    summary:
-      "International principles promoting inclusive growth, human-centered values, transparency, robustness, security, safety, and accountability in artificial intelligence.",
+    authorityType: "Non-binding intergovernmental recommendation",
+    summary: "International principles promoting innovative and trustworthy AI, human-centered values, transparency, robustness, accountability, and policy cooperation. They are not independently binding law.",
     applicability: [
-      "Governments, organizations, and institutions adopting or referencing the principles",
-      "Policy, procurement, assurance, and governance programs using the principles as a normative source",
+      "Governments adopting or implementing the recommendation",
+      "Organizations using the principles as a governance benchmark",
+      "Policy, procurement, assurance, or standards programs that incorporate the principles",
     ],
     obligations: [
-      "Distinguish policy principles from directly binding legislation",
-      "Identify any law, contract, standard, or internal control implementing the principle",
-      "Translate broad principles into measurable evidence and accountable controls",
+      "Identify when the principles are voluntary guidance and when another instrument makes them mandatory",
+      "Translate general principles into bounded roles, controls, evidence, decisions, and review pathways",
+      "Preserve the source, version, interpretation, and implementation context",
+      "Avoid claiming legal compliance solely from alignment with principles",
     ],
     evidence: [
-      "Principle adoption record",
-      "Control mapping",
-      "Policy implementation record",
-      "Risk assessment",
-      "Monitoring and outcome record",
+      "Principles mapping",
+      "Policy and control record",
+      "Risk and impact assessment",
+      "Transparency record",
+      "Accountability assignment",
+      "Monitoring and improvement evidence",
     ],
-    executionBoundary:
-      "A voluntary or policy-level principle can guide governance but does not independently create the authority needed to release a consequential action.",
-    sourceNotice:
-      "Consult the official OECD text, updates, national implementations, and any binding instruments that incorporate the principles.",
+    executionBoundary: "A voluntary principle can guide governance but does not independently create the authority needed to release a consequential action.",
+    sourceNotice: "Consult the official OECD text, updates, national implementations, and any binding instrument that incorporates the principles.",
+  },
+  {
+    id: "ta14-clean-air-act-upgrade",
+    shortName: "TA-14 Clean Air Act Upgrade",
+    title: "TA-14 Proposed Clean Air and Atmospheric Integrity Act",
+    jurisdiction: "International",
+    status: "Proposed",
+    authorityType: "TA-14 model law proposal",
+    summary: "A proposed model legislative upgrade intended to connect ambient air, indoor environments, buildings, personal atmospheric records, instruments, continuity, admissibility, intervention, enforcement, and verified outcomes instead of governing emissions and compliance records as disconnected domains.",
+    applicability: [
+      "Legislatures, regulators, public-health bodies, building authorities, environmental agencies, institutions, and communities evaluating model-law modernization",
+      "Air-quality, indoor-environment, building-protection, pollution-control, sensor, exposure, and intervention pathways",
+      "Future jurisdiction-specific proposals adapted through public consultation and lawful legislative processes",
+    ],
+    obligations: [
+      "Require attributable atmospheric records with instrument, calibration, location, chronology, activity, and limitation evidence",
+      "Create exterior-to-interior, building-protection, and personal atmospheric integrity pathways without converting evidence into unsupported diagnosis",
+      "Bind intervention authority, determination state, technical execution, public notice, correction, and outcome verification",
+      "Preserve public challenge, supersession, registry, and future-reliance records",
+    ],
+    evidence: [
+      "Atmospheric Integrity Record",
+      "Personal Atmospheric Integrity Record",
+      "Building protection comparison",
+      "Authority and admissibility determination",
+      "Intervention execution record",
+      "Post-intervention environmental outcome package",
+    ],
+    executionBoundary: "This is a TA-14 proposal and is not enacted law. It must remain clearly labeled, publicly inspectable, challengeable, jurisdiction-specific, and subject to legislative authority.",
+    sourceNotice: "Use TA-14 proposal text, revision history, public consultation records, legal review, scientific evidence, and the official enacted law of the relevant jurisdiction.",
+  },
+  {
+    id: "ta14-clean-water-upgrade",
+    shortName: "TA-14 Clean Water Upgrade",
+    title: "TA-14 Proposed Water Integrity and Outcome Act",
+    jurisdiction: "International",
+    status: "Proposed",
+    authorityType: "TA-14 model law proposal",
+    summary: "A proposed model-law modernization intended to preserve water reality from source and sampling through laboratory continuity, legal authority, intervention, distribution, exposure context, remediation, and verified outcome.",
+    applicability: [
+      "Legislatures, water authorities, utilities, public-health bodies, environmental agencies, laboratories, facilities, and communities evaluating model-law modernization",
+      "Source water, drinking water, wastewater, receiving waters, buildings, distribution, contamination, remediation, and restoration pathways",
+      "Future jurisdiction-specific proposals adapted through public consultation and lawful legislative processes",
+    ],
+    obligations: [
+      "Require governed sampling plans, chain of custody, laboratory continuity, location, chronology, method, uncertainty, and correction",
+      "Separate legal limit, health guidance, operational target, building condition, and individual exposure proposition",
+      "Bind notice, restriction, treatment, intervention, reopening, restoration, and outcome verification",
+      "Preserve unresolved contamination, vulnerable-use conditions, public challenge, and future reliance",
+    ],
+    evidence: [
+      "Water Integrity Record",
+      "Sampling and laboratory continuity package",
+      "Authority and threshold map",
+      "Notice and protective-action record",
+      "Treatment or remediation execution record",
+      "Distribution, reopening, and environmental outcome verification",
+    ],
+    executionBoundary: "This is a TA-14 proposal and is not enacted law. It cannot be represented as a current statutory duty or official health determination.",
+    sourceNotice: "Use TA-14 proposal text, revision history, public consultation, legal and scientific review, and official jurisdictional water law.",
+  },
+  {
+    id: "ta14-admissible-environmental-execution-act",
+    shortName: "TA-14 Environmental Execution Act",
+    title: "TA-14 Proposed Admissible Environmental Execution and Outcome Act",
+    jurisdiction: "International",
+    status: "Proposed",
+    authorityType: "TA-14 model governance law proposal",
+    summary: "A proposed cross-domain law requiring consequential environmental interventions to preserve the route from reality and evidence through authority, admissibility, commitment, execution, outcome, challenge, correction, and future reliance.",
+    applicability: [
+      "Public agencies, regulated entities, contractors, laboratories, building operators, technology providers, and responsible decision-makers conducting consequential environmental interventions",
+      "Environmental closure, restriction, remediation, restoration, reopening, permit, enforcement, emergency, and public-protection decisions",
+      "Future jurisdiction-specific enactments and sector implementations",
+    ],
+    obligations: [
+      "Require a bounded proposed action, admitted evidence set, current authority, continuity finding, limitations, and determination before execution",
+      "Use ALLOW, HOLD, DENY, or ESCALATE states at the consequence boundary",
+      "Preserve technical execution effect and compare the resulting environmental reality with the committed determination",
+      "Require challenge, correction, supersession, registry, and reassessment when evidence or conditions change",
+    ],
+    evidence: [
+      "Proposed environmental action",
+      "Admitted evidence manifest",
+      "Authority and continuity record",
+      "Committed determination",
+      "Technical execution evidence",
+      "Outcome, integrity, verification, and challenge package",
+    ],
+    executionBoundary: "This proposal is not certification, legal advice, or enacted law. It is a model governance instrument requiring jurisdiction-specific legislative, scientific, administrative, and public review.",
+    sourceNotice: "Use the current TA-14 proposal, architecture record, revision history, consultations, legal review, and the controlling law of the adopting jurisdiction.",
   },
 ];
 
@@ -477,20 +987,16 @@ export default function LawsPage() {
           </div>
 
           <p className="eyebrow">
-            TA-14 AI GOVERNANCE LIBRARY
+            TA-14 AUTHORITY GOVERNANCE INSTITUTION
           </p>
 
           <h1>
-            AI Governance
+            Current & Proposed
             <span> Laws & Authorities</span>
           </h1>
 
           <p className="lead">
-            Navigate selected artificial-intelligence laws,
-            regulatory instruments, policy frameworks, and
-            jurisdictional authorities. Each record separates general
-            governance relevance from applicability, evidence, legal
-            status, and TA-14 execution boundaries.
+            Navigate major environmental, public-health, pollution-control, climate, chemical, water, air, and artificial-intelligence authorities alongside clearly labeled TA-14 proposed upgrades. Each record preserves legal status, jurisdiction, applicability, evidence duties, execution boundaries, and the official-source requirement.
           </p>
 
           <div className="heroMetrics">
@@ -550,7 +1056,7 @@ export default function LawsPage() {
                 onChange={(event) =>
                   setQuery(event.target.value)
                 }
-                placeholder="Search EU AI Act, high-risk, deployer, employment..."
+                placeholder="Search Clean Air Act, EPA, water, pollution, WHO, AI, proposed law..."
               />
             </label>
 
@@ -816,13 +1322,24 @@ export default function LawsPage() {
                 </Link>
 
                 <Link
-                  href="/workspace/ai-governance"
+                  href="/environmental-integrity-governance"
                   className="primaryAction"
                 >
-                  Build Governed Route →
+                  Enter Governing Division →
                 </Link>
               </div>
             </section>
+          </div>
+        </section>
+
+        <section className="institutionalNotice">
+          <div>
+            <p className="eyebrow">CURRENT LAW · GLOBAL INSTRUMENTS · TA-14 PROPOSED UPGRADES</p>
+            <h2>Preserve what is legally binding. Identify what remains guidance. Label every TA-14 proposal honestly.</h2>
+            <p>This library does not convert standards, WHO guidance, treaties, regulations, statutes, permits, and TA-14 proposals into the same kind of authority. Each instrument must be traced to the jurisdiction, adopting mechanism, current version, responsible authority, and exact proposition it can support.</p>
+          </div>
+          <div className="noticeRoute">
+            <span>Existing authority</span><i>→</i><span>Evidence gap</span><i>→</i><span>TA-14 analysis</span><i>→</i><span>Proposed upgrade</span><i>→</i><span>Public challenge and revision</span>
           </div>
         </section>
 
@@ -834,7 +1351,7 @@ export default function LawsPage() {
               </p>
 
               <h2>
-                Law must be translated into governed execution.
+                Law must be translated into governed authority, execution, and outcome.
               </h2>
             </div>
 
@@ -1967,6 +2484,56 @@ export default function LawsPage() {
           gap: 10px;
         }
 
+
+        .institutionalNotice {
+          margin: 22px 0 0;
+          padding: 34px;
+          border: 1px solid rgba(91, 218, 206, 0.18);
+          border-radius: 24px;
+          background: linear-gradient(145deg, rgba(8, 35, 43, 0.88), rgba(4, 17, 25, 0.94));
+          box-shadow: 0 24px 70px rgba(0, 0, 0, 0.24);
+        }
+
+        .institutionalNotice h2 {
+          max-width: 1100px;
+          margin: 12px 0 14px;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: clamp(30px, 4vw, 58px);
+          line-height: 1.02;
+          letter-spacing: -0.045em;
+        }
+
+        .institutionalNotice p:last-child {
+          max-width: 1120px;
+          color: #9db7bd;
+          font-size: 15px;
+          line-height: 1.7;
+        }
+
+        .noticeRoute {
+          margin-top: 24px;
+          display: flex;
+          flex-wrap: wrap;
+          align-items: center;
+          gap: 9px;
+        }
+
+        .noticeRoute span {
+          padding: 10px 13px;
+          border: 1px solid rgba(255, 209, 92, 0.2);
+          border-radius: 999px;
+          background: rgba(255, 209, 92, 0.045);
+          color: #e8d8a5;
+          font-size: 10px;
+          font-weight: 900;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+        }
+
+        .noticeRoute i {
+          color: #65dfd0;
+          font-style: normal;
+        }
         @media (max-width: 1180px) {
           .heroMetrics {
             grid-template-columns: repeat(3, minmax(0, 1fr));
