@@ -37,6 +37,228 @@ type AuthorityResult = {
   href: string;
 };
 
+
+type GuidedStage = {
+  code: string;
+  title: string;
+  question: string;
+  purpose: string;
+  evidence: string[];
+  holdConditions: string[];
+};
+
+type FailureMode = {
+  code: string;
+  title: string;
+  description: string;
+  response: string;
+};
+
+const guidedStages: GuidedStage[] = [
+  {
+    code: "01",
+    title: "Identify the governed subject",
+    question: "What entity, facility, system, product, activity, instrument, place, or person is being evaluated?",
+    purpose: "Applicability cannot be resolved against a vague organization-wide description. The subject must be bounded before authority can attach.",
+    evidence: [
+      "Legal and operating identity",
+      "Facility, system, product, or activity description",
+      "Responsible owner and accountable role",
+      "Location, market, and operational boundary",
+    ],
+    holdConditions: [
+      "Identity is incomplete or disputed",
+      "The actual operating subject is not the submitted subject",
+      "Ownership or responsible role cannot be established",
+    ],
+  },
+  {
+    code: "02",
+    title: "Classify the activity",
+    question: "What is actually happening, and which legal, technical, environmental, or AI category best describes it?",
+    purpose: "Names used in marketing or internal systems do not control applicability. The real activity, source, discharge, model use, building condition, or intervention controls.",
+    evidence: [
+      "Process and workflow map",
+      "System architecture or facility process description",
+      "Inputs, outputs, releases, decisions, and affected parties",
+      "Declared use and actual use comparison",
+    ],
+    holdConditions: [
+      "The activity is described only through marketing language",
+      "Declared use conflicts with observed use",
+      "Multiple activities are collapsed into one unbounded submission",
+    ],
+  },
+  {
+    code: "03",
+    title: "Resolve jurisdiction",
+    question: "Which geographic, sectoral, contractual, code, permit, or market authority governs the subject?",
+    purpose: "A rule may apply differently across federal, state, tribal, territorial, local, international, contractual, and adopted-code boundaries.",
+    evidence: [
+      "Physical and legal location",
+      "Market and affected-person location",
+      "Permit, license, contract, and code-adoption records",
+      "Delegation, primacy, and competent-authority records",
+    ],
+    holdConditions: [
+      "Location or market is unresolved",
+      "Delegated authority is unclear",
+      "The controlling local adoption cannot be identified",
+    ],
+  },
+  {
+    code: "04",
+    title: "Resolve role and duty",
+    question: "Is the participant a provider, deployer, owner, operator, employer, manufacturer, generator, discharger, public authority, reviewer, laboratory, or another accountable role?",
+    purpose: "The same instrument can impose different duties on different actors. Applicability must bind the actual role to the actual obligation.",
+    evidence: [
+      "Organizational role and responsibility record",
+      "Contracts and delegation records",
+      "Operational control and decision authority",
+      "Responsible official and signatory authority",
+    ],
+    holdConditions: [
+      "The actor's role changes across the workflow",
+      "Responsibility is delegated without preserved authority",
+      "The submitted role does not match the operational role",
+    ],
+  },
+  {
+    code: "05",
+    title: "Resolve the controlling version",
+    question: "Which edition, amendment, effective date, adopted code, permit condition, contract term, or regulatory text controls?",
+    purpose: "The latest publication is not always the legally controlling publication. Adopted, incorporated, permitted, or contracted versions may differ.",
+    evidence: [
+      "Official source and publication date",
+      "Effective and compliance dates",
+      "Adoption or incorporation record",
+      "Amendment, supersession, and transition history",
+    ],
+    holdConditions: [
+      "The version is unknown",
+      "A superseded edition is being relied upon",
+      "The adopted edition differs from the edition evaluated",
+    ],
+  },
+  {
+    code: "06",
+    title: "Test thresholds and exclusions",
+    question: "Do source size, pollutant, system class, risk category, sector, quantity, duration, affected population, or other thresholds bring the subject into scope?",
+    purpose: "Applicability often turns on defined thresholds, exclusions, exemptions, classifications, and conditional triggers rather than broad subject similarity.",
+    evidence: [
+      "Threshold calculations and classifications",
+      "Source, discharge, quantity, or risk records",
+      "Exemption and exclusion evidence",
+      "Historical and current operational data",
+    ],
+    holdConditions: [
+      "Threshold data is incomplete",
+      "An exemption is asserted without evidence",
+      "Material changes may have altered classification",
+    ],
+  },
+  {
+    code: "07",
+    title: "Map required evidence",
+    question: "What records, measurements, methods, monitoring, testing, notices, approvals, or governance artifacts must exist?",
+    purpose: "A conclusion without the evidence required by the controlling instrument cannot become an admissible applicability determination.",
+    evidence: [
+      "Required monitoring and recordkeeping map",
+      "Approved method and instrument records",
+      "Chain of custody and quality assurance",
+      "Notices, certifications, approvals, and review records",
+    ],
+    holdConditions: [
+      "Required evidence is missing or stale",
+      "The method is not approved for the proposition",
+      "Continuity or custody cannot be reconstructed",
+    ],
+  },
+  {
+    code: "08",
+    title: "Commit and revalidate",
+    question: "What bounded determination can be committed, and what events require the determination to be reopened?",
+    purpose: "Applicability must be preserved as a dated, attributable, reviewable finding with explicit limits and revalidation triggers.",
+    evidence: [
+      "Determination record and reviewer identity",
+      "Scope, non-scope, assumptions, and unresolved facts",
+      "Material-change and revalidation triggers",
+      "Review, challenge, correction, and supersession pathway",
+    ],
+    holdConditions: [
+      "The finding overstates certainty",
+      "Unresolved facts are hidden",
+      "No revalidation trigger or review path is preserved",
+    ],
+  },
+];
+
+const failureModes: FailureMode[] = [
+  {
+    code: "FM-01",
+    title: "Keyword applicability",
+    description: "A system declares an instrument applicable because a matching word appears in the profile.",
+    response: "Require subject, role, jurisdiction, version, threshold, and evidence resolution before any determination.",
+  },
+  {
+    code: "FM-02",
+    title: "Latest-edition substitution",
+    description: "The newest standard or code is treated as controlling even though another edition was adopted or incorporated.",
+    response: "Preserve the adopted edition, effective date, local modification, and supersession path.",
+  },
+  {
+    code: "FM-03",
+    title: "Authority collapse",
+    description: "Guidance, voluntary standards, contracts, regulations, and statutes are treated as if they carry identical force.",
+    response: "Classify the instrument and preserve the actual authority pathway that makes it applicable.",
+  },
+  {
+    code: "FM-04",
+    title: "Role mismatch",
+    description: "A duty assigned to one actor is incorrectly imposed on or removed from another actor.",
+    response: "Bind each obligation to the actual provider, deployer, owner, operator, discharger, generator, or other accountable role.",
+  },
+  {
+    code: "FM-05",
+    title: "Unsupported exemption",
+    description: "An exclusion or exemption is asserted without preserving the facts and evidence necessary to support it.",
+    response: "Treat the route as HOLD until the exemption conditions are proved and versioned.",
+  },
+  {
+    code: "FM-06",
+    title: "Jurisdiction drift",
+    description: "A system, facility, product, or affected population moves into a new jurisdiction while the old determination remains active.",
+    response: "Trigger mandatory revalidation after location, market, permit, authority, or affected-person change.",
+  },
+  {
+    code: "FM-07",
+    title: "Evidence substitution",
+    description: "General organizational evidence is used in place of the source-specific, system-specific, or activity-specific evidence required.",
+    response: "Reject substituted evidence unless the controlling instrument expressly permits it for the bounded proposition.",
+  },
+  {
+    code: "FM-08",
+    title: "Applicability treated as permission",
+    description: "A finding that an instrument applies is mistaken for authorization to execute the underlying action.",
+    response: "Separate applicability from approval, permit, certification, admissibility, commitment, execution, and outcome verification.",
+  },
+];
+
+const packageContents = [
+  "Governed subject identity and operational boundary",
+  "Jurisdiction, competent authority, and adoption path",
+  "Role, responsibility, and delegated authority map",
+  "Instrument type, official source, version, and effective date",
+  "Threshold, classification, exclusion, and exemption analysis",
+  "Required evidence, monitoring, methods, records, and notices",
+  "Ranked applicability results with reasoning and confidence",
+  "Unresolved facts, HOLD conditions, and escalation requirements",
+  "Determination scope, non-scope, assumptions, and limitations",
+  "Material-change triggers, revalidation schedule, and review path",
+  "Academy learning record and readiness assessment",
+  "Entity Review handoff and preserved submission package",
+] as const;
+
 const initialProfile: DeterminationProfile = {
   domain: "Environmental Integrity",
   jurisdiction: "United States",
@@ -674,6 +896,166 @@ export default function ApplicabilityPage() {
           </div>
         </section>
 
+
+        <section className="guidedInstitution">
+          <div className="institutionHeading">
+            <div>
+              <p className="eyebrow">GUIDED APPLICABILITY INSTITUTION</p>
+              <h2>Learn the question, build the evidence, expose the uncertainty, and submit a review-ready determination package.</h2>
+            </div>
+            <p>
+              The applicability workspace is designed as a guided institutional pathway rather than a one-screen answer generator. Each stage teaches why the question matters, what evidence supports it, and what conditions require HOLD or escalation.
+            </p>
+          </div>
+
+          <div className="guidedStageGrid">
+            {guidedStages.map((stage) => (
+              <article key={stage.code}>
+                <div className="stageHeader">
+                  <span>{stage.code}</span>
+                  <div>
+                    <small>GUIDED DETERMINATION STAGE</small>
+                    <h3>{stage.title}</h3>
+                  </div>
+                </div>
+                <p className="stageQuestion">{stage.question}</p>
+                <p className="stagePurpose">{stage.purpose}</p>
+                <div className="stageColumns">
+                  <section>
+                    <strong>EVIDENCE TO ASSEMBLE</strong>
+                    {stage.evidence.map((item) => (
+                      <p key={item}><i>✦</i>{item}</p>
+                    ))}
+                  </section>
+                  <section className="holdColumn">
+                    <strong>HOLD CONDITIONS</strong>
+                    {stage.holdConditions.map((item) => (
+                      <p key={item}><i>◆</i>{item}</p>
+                    ))}
+                  </section>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="readinessInstitution">
+          <div className="readinessCopy">
+            <p className="eyebrow">READINESS, PACKAGE, AND HANDOFF</p>
+            <h2>The participant leaves with more than a result.</h2>
+            <p>
+              A completed route should produce a structured package that can be inspected by counsel, regulators, qualified technical reviewers, code officials, accreditation bodies, TA-14 Entity Review, or another competent authority without forcing that reviewer to reconstruct the entire question from scattered documents.
+            </p>
+            <div className="readinessStates">
+              <article>
+                <span>01</span>
+                <strong>NOT READY</strong>
+                <p>Identity, jurisdiction, role, version, or threshold facts remain too incomplete to begin a defensible determination.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <strong>BUILDING</strong>
+                <p>The subject and instrument are bounded, but required evidence, authority, or exclusions remain incomplete.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <strong>REVIEW READY</strong>
+                <p>The package is organized, limitations are declared, and unresolved questions are visible to a competent reviewer.</p>
+              </article>
+              <article>
+                <span>04</span>
+                <strong>DETERMINED</strong>
+                <p>A bounded finding has been committed with reviewer identity, evidence, scope, limitations, and revalidation triggers.</p>
+              </article>
+            </div>
+          </div>
+
+          <aside className="packagePreview">
+            <div className="packageHeader">
+              <span>APPLICABILITY PACKAGE</span>
+              <b>12 REQUIRED COMPONENTS</b>
+            </div>
+            <div className="packageList">
+              {packageContents.map((item, index) => (
+                <div key={item}>
+                  <span>{String(index + 1).padStart(2, "0")}</span>
+                  <strong>{item}</strong>
+                  <i>{index < 4 ? "IDENTITY" : index < 8 ? "ANALYSIS" : "REVIEW"}</i>
+                </div>
+              ))}
+            </div>
+            <div className="packageActions">
+              <Link href="/workspace/entity-review">Submit through Entity Review →</Link>
+              <Link href="/academy">Open Applicability Academy →</Link>
+            </div>
+          </aside>
+        </section>
+
+        <section className="failureInstitution">
+          <div className="institutionHeading">
+            <div>
+              <p className="eyebrow">APPLICABILITY FAILURE MODES</p>
+              <h2>The institution must preserve how a conclusion can fail.</h2>
+            </div>
+            <p>
+              Most dangerous applicability errors are not caused by an absent instrument. They occur when the wrong version, authority, role, jurisdiction, threshold, or evidence is silently substituted for the controlling one.
+            </p>
+          </div>
+          <div className="failureGrid">
+            {failureModes.map((mode) => (
+              <article key={mode.code}>
+                <span>{mode.code}</span>
+                <h3>{mode.title}</h3>
+                <p>{mode.description}</p>
+                <div>
+                  <strong>TA-14 RESPONSE</strong>
+                  <p>{mode.response}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="academyInstitution">
+          <div className="academySeal">
+            <small>TA-14</small>
+            <strong>ACADEMY</strong>
+            <span>APPLICABILITY DETERMINATION</span>
+          </div>
+          <div className="academyCopy">
+            <p className="eyebrow">THE ACADEMY INSIDE APPLICABILITY</p>
+            <h2>Understand why an instrument applies before relying on the result.</h2>
+            <p>
+              The Academy teaches the difference between law, regulation, standard, code, framework, guidance, contract, and institutional architecture. It also teaches how jurisdiction, adoption, version, role, thresholds, exemptions, evidence, and material change affect the determination.
+            </p>
+            <div className="academyModules">
+              {[
+                ["A1", "Instrument classification", "Distinguish statutes, regulations, standards, codes, guidance, frameworks, contracts, and proposals."],
+                ["A2", "Authority resolution", "Identify who issued, adopted, enforces, interprets, certifies, or relies upon the instrument."],
+                ["A3", "Jurisdiction mapping", "Resolve federal, state, tribal, territorial, local, international, sectoral, and contractual scope."],
+                ["A4", "Version control", "Preserve the edition, amendment, effective date, transition rule, and adopted local modification."],
+                ["A5", "Threshold analysis", "Test classifications, quantities, source categories, risk levels, affected populations, and exemptions."],
+                ["A6", "Evidence sufficiency", "Map the required records, methods, monitoring, quality assurance, notices, and reviewer evidence."],
+                ["A7", "Determination writing", "Create a bounded finding with scope, non-scope, assumptions, confidence, and unresolved questions."],
+                ["A8", "Revalidation", "Recognize material changes that require the prior applicability finding to be reopened."],
+              ].map(([code, title, text]) => (
+                <article key={code}>
+                  <span>{code}</span>
+                  <div>
+                    <strong>{title}</strong>
+                    <p>{text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <div className="academyActions">
+              <Link href="/academy">Enter TA-14 Academy →</Link>
+              <Link href="/governance-library/authorities">Study Governing Authorities →</Link>
+              <Link href="/governance-library/crosswalks">Open Authority Crosswalks →</Link>
+            </div>
+          </div>
+        </section>
+
         <section className="boundary">
           <div className="seal small"><span>AB</span><small>Boundary</small></div>
           <p className="eyebrow gold">INSTITUTIONAL APPLICABILITY BOUNDARY</p>
@@ -688,8 +1070,1358 @@ export default function ApplicabilityPage() {
       </div>
 
       <style jsx>{`
-        :global(*){box-sizing:border-box}:global(html){background:#020812;scroll-behavior:smooth}:global(body){margin:0;background:#020812;color:#f5fbff;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}:global(a){color:inherit}.page{min-height:100vh;position:relative;overflow:hidden;background:radial-gradient(circle at 50% -10%,rgba(49,157,208,.16),transparent 32%),linear-gradient(180deg,#04111d,#020812 52%,#01050a)}.background{position:fixed;inset:0;pointer-events:none;opacity:.18;background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);background-size:52px 52px}.background i{position:absolute;width:520px;height:520px;border-radius:50%;filter:blur(100px);background:#0a8ea9;opacity:.12}.background i:nth-child(1){left:-240px;top:10%}.background i:nth-child(2){right:-250px;top:30%;background:#b97b1d}.background i:nth-child(3){left:35%;top:65%;background:#3d5ed2}.background i:nth-child(4){right:18%;top:85%;background:#5cae74}.shell{width:min(1500px,calc(100% - 36px));margin:auto;position:relative;z-index:2;padding-bottom:90px}.topbar{min-height:72px;padding:11px 14px;display:grid;grid-template-columns:1fr auto 1fr;gap:20px;align-items:center;border-bottom:1px solid rgba(120,220,239,.16)}.topbar a{font-size:10px;font-weight:900;text-decoration:none;color:#b8ccd5}.topbar a:last-child{text-align:right}.topbar span{color:#6f9dab;font-size:9px;font-weight:950;letter-spacing:.14em;text-transform:uppercase}.hero{max-width:1150px;margin:auto;padding:85px 0 75px;text-align:center}.seal{width:108px;height:108px;margin:0 auto 24px;display:grid;place-items:center;align-content:center;border-radius:50%;border:1px solid rgba(255,205,100,.42);background:radial-gradient(circle,rgba(255,208,98,.14),rgba(4,20,32,.96));box-shadow:0 0 60px rgba(255,185,55,.1)}.seal span{font:900 31px Georgia,serif;color:#ffe49f}.seal small{color:#718995;font-size:8px;letter-spacing:.16em}.seal.small{width:82px;height:82px}.eyebrow{margin:0;color:#6fe4f5;font-size:10px;font-weight:950;letter-spacing:.22em;text-transform:uppercase}.eyebrow.gold{color:#e9ba5f}.hero h1,.profilePanel h2,.resultsHeading h2,.sequence h2,.boundary h2{font-family:Georgia,"Times New Roman",serif;letter-spacing:-.045em}.hero h1{margin:15px 0 0;font-size:clamp(52px,6.4vw,92px);line-height:.95}.hero h1 em{display:block;color:#ffc94f;font-weight:500}.lead{max-width:970px;margin:26px auto 0;color:#afc2ca;font-size:18px;line-height:1.75}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px}.metrics article{padding:18px;border:1px solid rgba(255,255,255,.07);border-radius:16px;background:rgba(8,25,38,.66)}.metrics strong{display:block;color:#efd28e;font:700 28px Georgia,serif}.metrics span{display:block;margin-top:5px;color:#728b96;font-size:8px;font-weight:900;text-transform:uppercase}.workspace{display:grid;grid-template-columns:390px 1fr;gap:18px;align-items:start}.profilePanel,.resultsPanel{border:1px solid rgba(105,218,237,.14);border-radius:25px;background:linear-gradient(145deg,rgba(8,31,44,.96),rgba(3,14,23,.98));box-shadow:0 26px 70px rgba(0,0,0,.25)}.profilePanel{position:sticky;top:18px;padding:24px}.profilePanel h2{margin:11px 0 13px;font-size:34px}.profilePanel>p:not(.eyebrow){color:#8fa8b2;font-size:12px;line-height:1.62}.profilePanel label{display:grid;gap:7px;margin-top:13px;color:#6f98a7;font-size:8px;font-weight:900;text-transform:uppercase}.profilePanel select{width:100%;min-height:45px;padding:0 12px;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#e9f5f8;background:#071722}.profileSummary{margin-top:20px;padding:16px;border:1px solid rgba(255,202,82,.18);border-radius:14px;background:rgba(255,197,74,.04)}.profileSummary span{color:#d8a94e;font-size:8px;font-weight:950}.profileSummary strong{display:block;margin-top:7px;font:700 19px Georgia,serif}.profileSummary p{margin:6px 0 0;color:#8ea5ae;font-size:10px;line-height:1.5}.resultsPanel{padding:22px}.resultsHeading{display:flex;align-items:end;justify-content:space-between;gap:20px;padding:4px 3px 20px}.resultsHeading h2{max-width:760px;margin:10px 0 0;font-size:43px;line-height:1}.resultsHeading>span{padding:9px 12px;border-radius:999px;background:rgba(104,225,244,.08);color:#6dd8ea;font-size:9px;font-weight:900}.resultLayout{display:grid;grid-template-columns:340px 1fr;gap:14px}.resultIndex{display:grid;gap:8px;align-content:start}.resultIndex button{width:100%;padding:13px;display:grid;grid-template-columns:38px 1fr;gap:10px;border:1px solid rgba(255,255,255,.06);border-radius:13px;color:inherit;background:rgba(0,0,0,.16);text-align:left;cursor:pointer}.resultIndex button:hover,.resultIndex button.active{border-color:rgba(105,226,244,.32);background:rgba(105,226,244,.05)}.resultIndex button>span{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(105,226,244,.15);border-radius:9px;color:#67d6e8;font-size:8px}.resultIndex small,.resultIndex strong,.resultIndex em{display:block}.resultIndex small{color:#6f8791;font-size:7px;text-transform:uppercase}.resultIndex strong{margin-top:4px;font-size:11px}.resultIndex em{margin-top:4px;color:#617983;font-size:8px;font-style:normal}.resultIndex i{grid-column:1/3;width:max-content;padding:5px 8px;border-radius:999px;font-size:7px;font-style:normal;font-weight:900;text-transform:uppercase}.likely-applicable{color:#7df0bb;background:rgba(74,223,158,.1)}.review-required{color:#ffd26c;background:rgba(255,197,72,.1)}.supporting-authority{color:#75dff1;background:rgba(92,205,235,.1)}.outside-current-scope{color:#7c8b92;background:rgba(255,255,255,.04)}.resultDetail{padding:24px;border:1px solid rgba(255,255,255,.07);border-radius:20px;background:rgba(0,0,0,.14)}.detailHeader{display:flex;justify-content:space-between;gap:18px}.detailHeader p{margin:0;color:#68d9ea;font-size:8px;font-weight:900;text-transform:uppercase}.detailHeader h3{margin:7px 0 0;font:700 42px/1 Georgia,serif}.detailHeader>span{height:max-content;padding:8px 11px;border-radius:999px;font-size:8px;font-weight:900;text-transform:uppercase}.authorityStrip{display:grid;grid-template-columns:1fr 1.5fr .6fr;gap:9px;margin-top:21px}.authorityStrip div,.whyCard,.detailGrid section,.limitCard{padding:16px;border:1px solid rgba(255,255,255,.07);border-radius:14px;background:rgba(255,255,255,.02)}.authorityStrip span,.whyCard span,.detailGrid section>span,.limitCard span{color:#64d8ea;font-size:7px;font-weight:900;text-transform:uppercase}.authorityStrip strong{display:block;margin-top:6px;font-size:10px}.whyCard,.limitCard{margin-top:12px}.whyCard p,.limitCard p{margin:8px 0 0;color:#a9bbc3;font-size:12px;line-height:1.65}.detailGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px}.detailGrid section>div{display:grid;grid-template-columns:30px 1fr;gap:9px;margin-top:10px}.detailGrid b{width:30px;height:30px;display:grid;place-items:center;border:1px solid rgba(105,225,242,.12);border-radius:8px;color:#64d7e8;font-size:7px}.detailGrid p{margin:5px 0 0;color:#97aeb7;font-size:10px;line-height:1.45}.limitCard{border-color:rgba(255,200,76,.18)}.limitCard span{color:#e8b756}.actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:8px;margin-top:14px}.actions a{min-height:42px;padding:0 13px;display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.1);border-radius:10px;text-decoration:none;color:#bdced5;background:rgba(0,0,0,.17);font-size:8px;font-weight:900;text-transform:uppercase}.actions .primary{color:#04181d;border-color:#9eecf7;background:linear-gradient(135deg,#d6fbff,#72dcec 65%,#39aac1)}.sequence{padding:100px 0}.sequence>div:first-child{max-width:930px}.sequence h2,.boundary h2{margin:12px 0 0;font-size:clamp(40px,4.8vw,68px);line-height:1}.sequenceGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:32px}.sequenceGrid article{min-height:190px;padding:19px;border:1px solid rgba(105,223,240,.1);border-radius:17px;background:rgba(8,28,40,.72)}.sequenceGrid span{width:38px;height:38px;display:grid;place-items:center;border:1px solid rgba(255,201,83,.2);border-radius:50%;color:#ebc66e;font-size:8px}.sequenceGrid strong{display:block;margin-top:21px;font:700 19px Georgia,serif}.sequenceGrid p{margin:9px 0 0;color:#8099a4;font-size:10px;line-height:1.58}.boundary{padding:58px 34px;border:1px solid rgba(255,200,76,.22);border-radius:30px;background:rgba(8,21,32,.97);text-align:center}.boundary>p:not(.eyebrow){max-width:970px;margin:21px auto 0;color:#a4b6bd;font-size:15px;line-height:1.76}.boundaryGrid{max-width:1100px;margin:29px auto 0;display:grid;grid-template-columns:repeat(3,1fr);gap:11px}.boundaryGrid article{padding:20px;border:1px solid rgba(255,255,255,.07);border-radius:15px}.boundaryGrid span{color:#ddb257;font-size:8px;font-weight:900}.boundaryGrid strong{display:block;margin-top:9px;font-size:12px;line-height:1.45}@media(max-width:1120px){.workspace{grid-template-columns:1fr}.profilePanel{position:static}.resultLayout{grid-template-columns:1fr}.resultIndex{grid-template-columns:1fr 1fr}.sequenceGrid{grid-template-columns:1fr 1fr}}@media(max-width:760px){.shell{width:calc(100% - 22px)}.topbar{grid-template-columns:1fr 1fr}.topbar span{display:none}.hero{padding:64px 0}.hero h1{font-size:50px}.lead{font-size:15px}.metrics,.resultIndex,.authorityStrip,.detailGrid,.sequenceGrid,.boundaryGrid{grid-template-columns:1fr}.resultsHeading,.detailHeader{align-items:flex-start;flex-direction:column}.resultDetail{padding:18px}.detailHeader h3{font-size:34px}.actions{flex-direction:column}.actions a{width:100%;justify-content:center}.boundary{padding:42px 19px}}
-      `}</style>
+        :global(*){
+box-sizing:border-box
+}
+:global(html){
+background:#020812;
+scroll-behavior:smooth
+}
+:global(body){
+margin:0;
+background:#020812;
+color:#f5fbff;
+font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+:global(a){
+color:inherit
+}
+.page{
+min-height:100vh;
+position:relative;
+overflow:hidden;
+background:radial-gradient(circle at 50% -10%,rgba(49,157,208,.16),transparent 32%),linear-gradient(180deg,#04111d,#020812 52%,#01050a)
+}
+.background{
+position:fixed;
+inset:0;
+pointer-events:none;
+opacity:.18;
+background-image:linear-gradient(rgba(255,255,255,.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.02) 1px,transparent 1px);
+background-size:52px 52px
+}
+.background i{
+position:absolute;
+width:520px;
+height:520px;
+border-radius:50%;
+filter:blur(100px);
+background:#0a8ea9;
+opacity:.12
+}
+.background i:nth-child(1){
+left:-240px;
+top:10%
+}
+.background i:nth-child(2){
+right:-250px;
+top:30%;
+background:#b97b1d
+}
+.background i:nth-child(3){
+left:35%;
+top:65%;
+background:#3d5ed2
+}
+.background i:nth-child(4){
+right:18%;
+top:85%;
+background:#5cae74
+}
+.shell{
+width:min(1500px,calc(100% - 36px));
+margin:auto;
+position:relative;
+z-index:2;
+padding-bottom:90px
+}
+.topbar{
+min-height:72px;
+padding:11px 14px;
+display:grid;
+grid-template-columns:1fr auto 1fr;
+gap:20px;
+align-items:center;
+border-bottom:1px solid rgba(120,220,239,.16)
+}
+.topbar a{
+font-size:10px;
+font-weight:900;
+text-decoration:none;
+color:#b8ccd5
+}
+.topbar a:last-child{
+text-align:right
+}
+.topbar span{
+color:#6f9dab;
+font-size:9px;
+font-weight:950;
+letter-spacing:.14em;
+text-transform:uppercase
+}
+.hero{
+max-width:1150px;
+margin:auto;
+padding:85px 0 75px;
+text-align:center
+}
+.seal{
+width:108px;
+height:108px;
+margin:0 auto 24px;
+display:grid;
+place-items:center;
+align-content:center;
+border-radius:50%;
+border:1px solid rgba(255,205,100,.42);
+background:radial-gradient(circle,rgba(255,208,98,.14),rgba(4,20,32,.96));
+box-shadow:0 0 60px rgba(255,185,55,.1)
+}
+.seal span{
+font:900 31px Georgia,serif;
+color:#ffe49f
+}
+.seal small{
+color:#718995;
+font-size:8px;
+letter-spacing:.16em
+}
+.seal.small{
+width:82px;
+height:82px
+}
+.eyebrow{
+margin:0;
+color:#6fe4f5;
+font-size:10px;
+font-weight:950;
+letter-spacing:.22em;
+text-transform:uppercase
+}
+.eyebrow.gold{
+color:#e9ba5f
+}
+.hero h1,.profilePanel h2,.resultsHeading h2,.sequence h2,.boundary h2{
+font-family:Georgia,"Times New Roman",serif;
+letter-spacing:-.045em
+}
+.hero h1{
+margin:15px 0 0;
+font-size:clamp(52px,6.4vw,92px);
+line-height:.95
+}
+.hero h1 em{
+display:block;
+color:#ffc94f;
+font-weight:500
+}
+.lead{
+max-width:970px;
+margin:26px auto 0;
+color:#afc2ca;
+font-size:18px;
+line-height:1.75
+}
+.metrics{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+margin-top:34px
+}
+.metrics article{
+padding:18px;
+border:1px solid rgba(255,255,255,.07);
+border-radius:16px;
+background:rgba(8,25,38,.66)
+}
+.metrics strong{
+display:block;
+color:#efd28e;
+font:700 28px Georgia,serif
+}
+.metrics span{
+display:block;
+margin-top:5px;
+color:#728b96;
+font-size:8px;
+font-weight:900;
+text-transform:uppercase
+}
+.workspace{
+display:grid;
+grid-template-columns:390px 1fr;
+gap:18px;
+align-items:start
+}
+.profilePanel,.resultsPanel{
+border:1px solid rgba(105,218,237,.14);
+border-radius:25px;
+background:linear-gradient(145deg,rgba(8,31,44,.96),rgba(3,14,23,.98));
+box-shadow:0 26px 70px rgba(0,0,0,.25)
+}
+.profilePanel{
+position:sticky;
+top:18px;
+padding:24px
+}
+.profilePanel h2{
+margin:11px 0 13px;
+font-size:34px
+}
+.profilePanel>p:not(.eyebrow){
+color:#8fa8b2;
+font-size:12px;
+line-height:1.62
+}
+.profilePanel label{
+display:grid;
+gap:7px;
+margin-top:13px;
+color:#6f98a7;
+font-size:8px;
+font-weight:900;
+text-transform:uppercase
+}
+.profilePanel select{
+width:100%;
+min-height:45px;
+padding:0 12px;
+border:1px solid rgba(255,255,255,.1);
+border-radius:10px;
+color:#e9f5f8;
+background:#071722
+}
+.profileSummary{
+margin-top:20px;
+padding:16px;
+border:1px solid rgba(255,202,82,.18);
+border-radius:14px;
+background:rgba(255,197,74,.04)
+}
+.profileSummary span{
+color:#d8a94e;
+font-size:8px;
+font-weight:950
+}
+.profileSummary strong{
+display:block;
+margin-top:7px;
+font:700 19px Georgia,serif
+}
+.profileSummary p{
+margin:6px 0 0;
+color:#8ea5ae;
+font-size:10px;
+line-height:1.5
+}
+.resultsPanel{
+padding:22px
+}
+.resultsHeading{
+display:flex;
+align-items:end;
+justify-content:space-between;
+gap:20px;
+padding:4px 3px 20px
+}
+.resultsHeading h2{
+max-width:760px;
+margin:10px 0 0;
+font-size:43px;
+line-height:1
+}
+.resultsHeading>span{
+padding:9px 12px;
+border-radius:999px;
+background:rgba(104,225,244,.08);
+color:#6dd8ea;
+font-size:9px;
+font-weight:900
+}
+.resultLayout{
+display:grid;
+grid-template-columns:340px 1fr;
+gap:14px
+}
+.resultIndex{
+display:grid;
+gap:8px;
+align-content:start
+}
+.resultIndex button{
+width:100%;
+padding:13px;
+display:grid;
+grid-template-columns:38px 1fr;
+gap:10px;
+border:1px solid rgba(255,255,255,.06);
+border-radius:13px;
+color:inherit;
+background:rgba(0,0,0,.16);
+text-align:left;
+cursor:pointer
+}
+.resultIndex button:hover,.resultIndex button.active{
+border-color:rgba(105,226,244,.32);
+background:rgba(105,226,244,.05)
+}
+.resultIndex button>span{
+width:38px;
+height:38px;
+display:grid;
+place-items:center;
+border:1px solid rgba(105,226,244,.15);
+border-radius:9px;
+color:#67d6e8;
+font-size:8px
+}
+.resultIndex small,.resultIndex strong,.resultIndex em{
+display:block
+}
+.resultIndex small{
+color:#6f8791;
+font-size:7px;
+text-transform:uppercase
+}
+.resultIndex strong{
+margin-top:4px;
+font-size:11px
+}
+.resultIndex em{
+margin-top:4px;
+color:#617983;
+font-size:8px;
+font-style:normal
+}
+.resultIndex i{
+grid-column:1/3;
+width:max-content;
+padding:5px 8px;
+border-radius:999px;
+font-size:7px;
+font-style:normal;
+font-weight:900;
+text-transform:uppercase
+}
+.likely-applicable{
+color:#7df0bb;
+background:rgba(74,223,158,.1)
+}
+.review-required{
+color:#ffd26c;
+background:rgba(255,197,72,.1)
+}
+.supporting-authority{
+color:#75dff1;
+background:rgba(92,205,235,.1)
+}
+.outside-current-scope{
+color:#7c8b92;
+background:rgba(255,255,255,.04)
+}
+.resultDetail{
+padding:24px;
+border:1px solid rgba(255,255,255,.07);
+border-radius:20px;
+background:rgba(0,0,0,.14)
+}
+.detailHeader{
+display:flex;
+justify-content:space-between;
+gap:18px
+}
+.detailHeader p{
+margin:0;
+color:#68d9ea;
+font-size:8px;
+font-weight:900;
+text-transform:uppercase
+}
+.detailHeader h3{
+margin:7px 0 0;
+font:700 42px/1 Georgia,serif
+}
+.detailHeader>span{
+height:max-content;
+padding:8px 11px;
+border-radius:999px;
+font-size:8px;
+font-weight:900;
+text-transform:uppercase
+}
+.authorityStrip{
+display:grid;
+grid-template-columns:1fr 1.5fr .6fr;
+gap:9px;
+margin-top:21px
+}
+.authorityStrip div,.whyCard,.detailGrid section,.limitCard{
+padding:16px;
+border:1px solid rgba(255,255,255,.07);
+border-radius:14px;
+background:rgba(255,255,255,.02)
+}
+.authorityStrip span,.whyCard span,.detailGrid section>span,.limitCard span{
+color:#64d8ea;
+font-size:7px;
+font-weight:900;
+text-transform:uppercase
+}
+.authorityStrip strong{
+display:block;
+margin-top:6px;
+font-size:10px
+}
+.whyCard,.limitCard{
+margin-top:12px
+}
+.whyCard p,.limitCard p{
+margin:8px 0 0;
+color:#a9bbc3;
+font-size:12px;
+line-height:1.65
+}
+.detailGrid{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px;
+margin-top:12px
+}
+.detailGrid section>div{
+display:grid;
+grid-template-columns:30px 1fr;
+gap:9px;
+margin-top:10px
+}
+.detailGrid b{
+width:30px;
+height:30px;
+display:grid;
+place-items:center;
+border:1px solid rgba(105,225,242,.12);
+border-radius:8px;
+color:#64d7e8;
+font-size:7px
+}
+.detailGrid p{
+margin:5px 0 0;
+color:#97aeb7;
+font-size:10px;
+line-height:1.45
+}
+.limitCard{
+border-color:rgba(255,200,76,.18)
+}
+.limitCard span{
+color:#e8b756
+}
+.actions{
+display:flex;
+flex-wrap:wrap;
+justify-content:flex-end;
+gap:8px;
+margin-top:14px
+}
+.actions a{
+min-height:42px;
+padding:0 13px;
+display:inline-flex;
+align-items:center;
+border:1px solid rgba(255,255,255,.1);
+border-radius:10px;
+text-decoration:none;
+color:#bdced5;
+background:rgba(0,0,0,.17);
+font-size:8px;
+font-weight:900;
+text-transform:uppercase
+}
+.actions .primary{
+color:#04181d;
+border-color:#9eecf7;
+background:linear-gradient(135deg,#d6fbff,#72dcec 65%,#39aac1)
+}
+.sequence{
+padding:100px 0
+}
+.sequence>div:first-child{
+max-width:930px
+}
+.sequence h2,.boundary h2{
+margin:12px 0 0;
+font-size:clamp(40px,4.8vw,68px);
+line-height:1
+}
+.sequenceGrid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:11px;
+margin-top:32px
+}
+.sequenceGrid article{
+min-height:190px;
+padding:19px;
+border:1px solid rgba(105,223,240,.1);
+border-radius:17px;
+background:rgba(8,28,40,.72)
+}
+.sequenceGrid span{
+width:38px;
+height:38px;
+display:grid;
+place-items:center;
+border:1px solid rgba(255,201,83,.2);
+border-radius:50%;
+color:#ebc66e;
+font-size:8px
+}
+.sequenceGrid strong{
+display:block;
+margin-top:21px;
+font:700 19px Georgia,serif
+}
+.sequenceGrid p{
+margin:9px 0 0;
+color:#8099a4;
+font-size:10px;
+line-height:1.58
+}
+.boundary{
+padding:58px 34px;
+border:1px solid rgba(255,200,76,.22);
+border-radius:30px;
+background:rgba(8,21,32,.97);
+text-align:center
+}
+.boundary>p:not(.eyebrow){
+max-width:970px;
+margin:21px auto 0;
+color:#a4b6bd;
+font-size:15px;
+line-height:1.76
+}
+.boundaryGrid{
+max-width:1100px;
+margin:29px auto 0;
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:11px
+}
+.boundaryGrid article{
+padding:20px;
+border:1px solid rgba(255,255,255,.07);
+border-radius:15px
+}
+.boundaryGrid span{
+color:#ddb257;
+font-size:8px;
+font-weight:900
+}
+.boundaryGrid strong{
+display:block;
+margin-top:9px;
+font-size:12px;
+line-height:1.45
+}
+@media(max-width:1120px){
+.workspace{
+grid-template-columns:1fr
+}
+.profilePanel{
+position:static
+}
+.resultLayout{
+grid-template-columns:1fr
+}
+.resultIndex{
+grid-template-columns:1fr 1fr
+}
+.sequenceGrid{
+grid-template-columns:1fr 1fr
+}
+
+}
+@media(max-width:760px){
+.shell{
+width:calc(100% - 22px)
+}
+.topbar{
+grid-template-columns:1fr 1fr
+}
+.topbar span{
+display:none
+}
+.hero{
+padding:64px 0
+}
+.hero h1{
+font-size:50px
+}
+.lead{
+font-size:15px
+}
+.metrics,.resultIndex,.authorityStrip,.detailGrid,.sequenceGrid,.boundaryGrid{
+grid-template-columns:1fr
+}
+.resultsHeading,.detailHeader{
+align-items:flex-start;
+flex-direction:column
+}
+.resultDetail{
+padding:18px
+}
+.detailHeader h3{
+font-size:34px
+}
+.actions{
+flex-direction:column
+}
+.actions a{
+width:100%;
+justify-content:center
+}
+.boundary{
+padding:42px 19px
+}
+
+}
+
+        .guidedInstitution,
+        .readinessInstitution,
+        .failureInstitution,
+        .academyInstitution {
+
+          padding: 100px 0;
+
+}
+
+        .institutionHeading {
+
+          display: grid;
+
+          grid-template-columns: 1.15fr 0.85fr;
+
+          gap: 42px;
+
+          align-items: end;
+
+          margin-bottom: 34px;
+
+}
+
+        .institutionHeading h2,
+        .readinessCopy h2,
+        .academyCopy h2 {
+
+          margin: 12px 0 0;
+
+          font-family: Georgia, "Times New Roman", serif;
+
+          font-size: clamp(40px, 4.8vw, 70px);
+
+          line-height: 1;
+
+          letter-spacing: -0.048em;
+
+}
+
+        .institutionHeading > p,
+        .readinessCopy > p,
+        .academyCopy > p {
+
+          margin: 0;
+
+          color: #9eb4bd;
+
+          font-size: 15px;
+
+          line-height: 1.75;
+
+}
+
+        .guidedStageGrid {
+
+          display: grid;
+
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+
+          gap: 14px;
+
+}
+
+        .guidedStageGrid > article {
+
+          min-height: 520px;
+
+          padding: 25px;
+
+          border: 1px solid rgba(102, 222, 240, 0.13);
+
+          border-radius: 21px;
+
+          background: linear-gradient(145deg, rgba(9, 31, 44, 0.9), rgba(3, 14, 23, 0.96));
+
+          box-shadow: 0 22px 55px rgba(0, 0, 0, 0.2);
+
+}
+
+        .stageHeader {
+
+          display: grid;
+
+          grid-template-columns: 58px 1fr;
+
+          gap: 14px;
+
+          align-items: center;
+
+}
+
+        .stageHeader > span {
+
+          width: 58px;
+
+          height: 58px;
+
+          display: grid;
+
+          place-items: center;
+
+          border: 1px solid rgba(255, 204, 92, 0.32);
+
+          border-radius: 50%;
+
+          color: #f0cb78;
+
+          font: 700 16px Georgia, serif;
+
+}
+
+        .stageHeader small {
+
+          color: #6bd9ea;
+
+          font-size: 8px;
+
+          font-weight: 950;
+
+          letter-spacing: 0.13em;
+
+}
+
+        .stageHeader h3 {
+
+          margin: 6px 0 0;
+
+          font: 700 27px/1 Georgia, serif;
+
+}
+
+        .stageQuestion {
+
+          margin: 22px 0 0;
+
+          color: #f3e1ae;
+
+          font: 700 18px/1.45 Georgia, serif;
+
+}
+
+        .stagePurpose {
+
+          margin: 13px 0 0;
+
+          color: #97adb6;
+
+          font-size: 12px;
+
+          line-height: 1.65;
+
+}
+
+        .stageColumns {
+
+          display: grid;
+
+          grid-template-columns: 1fr 1fr;
+
+          gap: 11px;
+
+          margin-top: 21px;
+
+}
+
+        .stageColumns section {
+
+          padding: 15px;
+
+          border: 1px solid rgba(255, 255, 255, 0.07);
+
+          border-radius: 13px;
+
+          background: rgba(255, 255, 255, 0.018);
+
+}
+
+        .stageColumns section > strong {
+
+          color: #67d9ea;
+
+          font-size: 7px;
+
+          letter-spacing: 0.12em;
+
+}
+
+        .stageColumns section p {
+
+          display: flex;
+
+          gap: 8px;
+
+          margin: 10px 0 0;
+
+          color: #9db2ba;
+
+          font-size: 9px;
+
+          line-height: 1.45;
+
+}
+
+        .stageColumns section p i {
+
+          color: #6de1ef;
+
+          font-style: normal;
+
+}
+
+        .stageColumns .holdColumn {
+
+          border-color: rgba(255, 202, 82, 0.14);
+
+}
+
+        .stageColumns .holdColumn > strong,
+        .stageColumns .holdColumn p i {
+
+          color: #efc56c;
+
+}
+
+        .readinessInstitution {
+
+          display: grid;
+
+          grid-template-columns: 1.02fr 0.98fr;
+
+          gap: 24px;
+
+          align-items: start;
+
+}
+
+        .readinessStates {
+
+          display: grid;
+
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+
+          gap: 11px;
+
+          margin-top: 28px;
+
+}
+
+        .readinessStates article {
+
+          min-height: 180px;
+
+          padding: 18px;
+
+          border: 1px solid rgba(101, 222, 239, 0.12);
+
+          border-radius: 16px;
+
+          background: rgba(8, 28, 40, 0.75);
+
+}
+
+        .readinessStates span {
+
+          color: #e8bd63;
+
+          font-size: 8px;
+
+          font-weight: 950;
+
+}
+
+        .readinessStates strong {
+
+          display: block;
+
+          margin-top: 20px;
+
+          font: 700 20px Georgia, serif;
+
+}
+
+        .readinessStates p {
+
+          margin: 10px 0 0;
+
+          color: #859ca6;
+
+          font-size: 10px;
+
+          line-height: 1.55;
+
+}
+
+        .packagePreview {
+
+          padding: 22px;
+
+          border: 1px solid rgba(255, 202, 82, 0.22);
+
+          border-radius: 24px;
+
+          background: linear-gradient(145deg, rgba(43, 33, 12, 0.42), rgba(4, 19, 29, 0.96));
+
+          box-shadow: 0 28px 75px rgba(0, 0, 0, 0.25);
+
+}
+
+        .packageHeader {
+
+          display: flex;
+
+          justify-content: space-between;
+
+          gap: 16px;
+
+          padding-bottom: 15px;
+
+          border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+
+          color: #f0c568;
+
+          font-size: 8px;
+
+          font-weight: 950;
+
+          letter-spacing: 0.12em;
+
+}
+
+        .packageHeader b {
+
+          color: #68dbea;
+
+}
+
+        .packageList {
+
+          display: grid;
+
+          gap: 8px;
+
+          margin-top: 16px;
+
+}
+
+        .packageList div {
+
+          min-height: 52px;
+
+          padding: 12px;
+
+          display: grid;
+
+          grid-template-columns: 34px 1fr 68px;
+
+          gap: 10px;
+
+          align-items: center;
+
+          border: 1px solid rgba(255, 255, 255, 0.07);
+
+          border-radius: 10px;
+
+          background: rgba(255, 255, 255, 0.02);
+
+}
+
+        .packageList span {
+
+          color: #63838d;
+
+          font-size: 8px;
+
+}
+
+        .packageList strong {
+
+          font-size: 10px;
+
+          line-height: 1.35;
+
+}
+
+        .packageList i {
+
+          color: #d7ae55;
+
+          font-size: 7px;
+
+          font-style: normal;
+
+          font-weight: 950;
+
+          text-align: right;
+
+}
+
+        .packageActions,
+        .academyActions {
+
+          display: flex;
+
+          flex-wrap: wrap;
+
+          gap: 9px;
+
+          margin-top: 18px;
+
+}
+
+        .packageActions a,
+        .academyActions a {
+
+          min-height: 43px;
+
+          padding: 0 14px;
+
+          display: inline-flex;
+
+          align-items: center;
+
+          border: 1px solid rgba(105, 224, 241, 0.18);
+
+          border-radius: 10px;
+
+          color: #c7d9df;
+
+          background: rgba(0, 0, 0, 0.18);
+
+          text-decoration: none;
+
+          font-size: 8px;
+
+          font-weight: 900;
+
+          text-transform: uppercase;
+
+}
+
+        .failureGrid {
+
+          display: grid;
+
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+
+          gap: 11px;
+
+}
+
+        .failureGrid article {
+
+          min-height: 300px;
+
+          padding: 20px;
+
+          border: 1px solid rgba(255, 194, 86, 0.14);
+
+          border-radius: 17px;
+
+          background: linear-gradient(145deg, rgba(35, 27, 12, 0.38), rgba(4, 18, 27, 0.94));
+
+}
+
+        .failureGrid > article > span {
+
+          color: #e6b95e;
+
+          font-size: 8px;
+
+          font-weight: 950;
+
+}
+
+        .failureGrid h3 {
+
+          margin: 24px 0 11px;
+
+          font: 700 23px/1 Georgia, serif;
+
+}
+
+        .failureGrid > article > p {
+
+          color: #95aab2;
+
+          font-size: 11px;
+
+          line-height: 1.58;
+
+}
+
+        .failureGrid article > div {
+
+          margin-top: 19px;
+
+          padding: 14px;
+
+          border-left: 3px solid #e5b85d;
+
+          background: rgba(255, 196, 76, 0.04);
+
+}
+
+        .failureGrid article > div strong {
+
+          color: #e4b75b;
+
+          font-size: 7px;
+
+          letter-spacing: 0.11em;
+
+}
+
+        .failureGrid article > div p {
+
+          margin: 8px 0 0;
+
+          color: #c0cdd2;
+
+          font-size: 9px;
+
+          line-height: 1.5;
+
+}
+
+        .academyInstitution {
+
+          display: grid;
+
+          grid-template-columns: 330px 1fr;
+
+          gap: 46px;
+
+          align-items: center;
+
+          border-top: 1px solid rgba(104, 223, 239, 0.12);
+
+          border-bottom: 1px solid rgba(104, 223, 239, 0.12);
+
+}
+
+        .academySeal {
+
+          width: 270px;
+
+          height: 270px;
+
+          margin: auto;
+
+          display: flex;
+
+          flex-direction: column;
+
+          align-items: center;
+
+          justify-content: center;
+
+          border: 2px solid #66e7b2;
+
+          border-radius: 50%;
+
+          background: radial-gradient(circle, rgba(88, 231, 174, 0.15), rgba(3, 24, 28, 0.96));
+
+          box-shadow: 0 0 75px rgba(74, 220, 171, 0.18);
+
+}
+
+        .academySeal small {
+
+          color: #72bda4;
+
+          font-size: 9px;
+
+          font-weight: 950;
+
+          letter-spacing: 0.15em;
+
+}
+
+        .academySeal strong {
+
+          color: #b9ffdc;
+
+          font: 700 44px Georgia, serif;
+
+}
+
+        .academySeal span {
+
+          margin-top: 8px;
+
+          color: #66dbae;
+
+          font-size: 8px;
+
+          font-weight: 950;
+
+          letter-spacing: 0.12em;
+
+}
+
+        .academyModules {
+
+          display: grid;
+
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+
+          gap: 9px;
+
+          margin-top: 25px;
+
+}
+
+        .academyModules article {
+
+          min-height: 105px;
+
+          padding: 14px;
+
+          display: grid;
+
+          grid-template-columns: 44px 1fr;
+
+          gap: 11px;
+
+          border: 1px solid rgba(102, 229, 180, 0.14);
+
+          border-radius: 13px;
+
+          background: rgba(255, 255, 255, 0.02);
+
+}
+
+        .academyModules article > span {
+
+          width: 42px;
+
+          height: 42px;
+
+          display: grid;
+
+          place-items: center;
+
+          border: 1px solid #61e7b0;
+
+          border-radius: 10px;
+
+          color: #7ff0bf;
+
+          font-size: 8px;
+
+          font-weight: 950;
+
+}
+
+        .academyModules strong {
+
+          font-size: 10px;
+
+}
+
+        .academyModules p {
+
+          margin: 6px 0 0;
+
+          color: #7f9993;
+
+          font-size: 8px;
+
+          line-height: 1.45;
+
+}
+
+        @media (max-width: 1120px) {
+
+          .institutionHeading,
+          .readinessInstitution,
+          .academyInstitution {
+
+            grid-template-columns: 1fr;
+
+}
+
+          .failureGrid {
+
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+
+}
+
+}
+
+        @media (max-width: 760px) {
+
+          .guidedStageGrid,
+          .stageColumns,
+          .readinessStates,
+          .failureGrid,
+          .academyModules {
+
+            grid-template-columns: 1fr;
+
+}
+
+          .guidedStageGrid > article {
+
+            min-height: auto;
+
+}
+
+          .packageList div {
+
+            grid-template-columns: 30px 1fr;
+
+}
+
+          .packageList i {
+
+            grid-column: 2;
+
+            text-align: left;
+
+}
+
+          .academySeal {
+
+            width: 220px;
+
+            height: 220px;
+
+}
+
+}
+
+`}</style>
     </main>
   );
 }
