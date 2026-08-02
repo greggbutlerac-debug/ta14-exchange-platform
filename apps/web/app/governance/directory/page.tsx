@@ -7,6 +7,7 @@ type DirectoryView = "directory" | "profile" | "evidence" | "method";
 type RegistrationStatus = "PUBLISHED" | "IN_REVIEW" | "CORRECTED" | "CHALLENGED";
 type AssuranceStatus = "VERIFIED" | "REVIEWED" | "DECLARED";
 type SortMode = "evidence" | "artifacts" | "verification" | "name";
+type RecordKind = "INSTITUTIONAL" | "DEMONSTRATION";
 
 type GovernanceRecord = {
   id: string;
@@ -26,6 +27,7 @@ type GovernanceRecord = {
   accountableOwner: string;
   claim: string;
   limitation: string;
+  recordKind: RecordKind;
 };
 
 type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
@@ -41,6 +43,7 @@ type BadgeTone = "gold" | "cyan" | "green" | "amber" | "red" | "violet" | "slate
 const GOVERNANCES: GovernanceRecord[] = [
   {
     id: "GOV-TA14-0001",
+    recordKind: "INSTITUTIONAL",
     organization: "TA-14 Authority",
     architecture: "TA-14 Admissible Execution Architecture",
     version: "2.0",
@@ -60,6 +63,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0002",
+    recordKind: "DEMONSTRATION",
     organization: "Northstar Model Governance Lab",
     architecture: "Northstar Control Fabric",
     version: "1.8",
@@ -79,6 +83,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0003",
+    recordKind: "DEMONSTRATION",
     organization: "CivicRoute Public Systems",
     architecture: "CivicRoute Decision Governance",
     version: "3.1",
@@ -98,6 +103,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0004",
+    recordKind: "DEMONSTRATION",
     organization: "Aegis Clinical Governance",
     architecture: "Aegis Clinical Admissibility Framework",
     version: "2.4",
@@ -117,6 +123,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0005",
+    recordKind: "DEMONSTRATION",
     organization: "ClearLedger Execution Controls",
     architecture: "ClearLedger Bounded Finance Architecture",
     version: "1.6",
@@ -136,6 +143,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0006",
+    recordKind: "DEMONSTRATION",
     organization: "Sentinel Infrastructure Council",
     architecture: "Sentinel Consequence Control System",
     version: "4.0",
@@ -155,6 +163,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0007",
+    recordKind: "DEMONSTRATION",
     organization: "Harbor Data Stewardship",
     architecture: "Harbor Evidence Boundary Model",
     version: "2.2",
@@ -174,6 +183,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0008",
+    recordKind: "DEMONSTRATION",
     organization: "Orion Autonomous Systems",
     architecture: "Orion Runtime Assurance Architecture",
     version: "1.9",
@@ -193,6 +203,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0009",
+    recordKind: "DEMONSTRATION",
     organization: "Meridian Workforce Governance",
     architecture: "Meridian Employment Decision Controls",
     version: "2.7",
@@ -212,6 +223,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0010",
+    recordKind: "DEMONSTRATION",
     organization: "Atlas Learning Integrity",
     architecture: "Atlas Educational Placement Governance",
     version: "1.5",
@@ -231,6 +243,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0011",
+    recordKind: "DEMONSTRATION",
     organization: "Verity Claims Governance",
     architecture: "Verity Insurance Decision Architecture",
     version: "3.0",
@@ -250,6 +263,7 @@ const GOVERNANCES: GovernanceRecord[] = [
   },
   {
     id: "GOV-DEMO-0012",
+    recordKind: "DEMONSTRATION",
     organization: "Palisade Research Controls",
     architecture: "Palisade Dual-Use Release Framework",
     version: "2.1",
@@ -276,11 +290,14 @@ const DETERMINATION_PALETTE: Record<Determination, { tone: BadgeTone; descriptio
   ESCALATE: { tone: "violet", description: "Named institutional judgment was required before consequence." },
 };
 
+const INSTITUTIONAL_RECORDS = GOVERNANCES.filter((record) => record.recordKind === "INSTITUTIONAL");
+const DEMONSTRATION_RECORDS = GOVERNANCES.filter((record) => record.recordKind === "DEMONSTRATION");
+
 const EVIDENCE_METRICS: EvidenceMetric[] = [
-  { label: "Registered governances", value: 12, note: "Attributable public profiles in this launch directory." },
-  { label: "Published artifacts", value: 197, note: "Bounded records linked to registered governance profiles." },
-  { label: "Governed routes", value: 122, note: "Versioned route definitions represented across profiles." },
-  { label: "Open challenges", value: 16, note: "Material disputes preserved without deleting original records." },
+  { label: "Institutional registrations", value: INSTITUTIONAL_RECORDS.length, note: "Current attributable governance registrations represented as institutional records." },
+  { label: "Demonstration profiles", value: DEMONSTRATION_RECORDS.length, note: "Synthetic examples used to demonstrate directory behavior, filtering, and evidence states." },
+  { label: "Institutional artifacts", value: INSTITUTIONAL_RECORDS.reduce((sum, record) => sum + record.artifacts, 0), note: "Artifacts attributed to institutional records only; simulated portfolio counts are excluded." },
+  { label: "Institutional routes", value: INSTITUTIONAL_RECORDS.reduce((sum, record) => sum + record.routes, 0), note: "Governed routes attributed to institutional records only; simulated route counts are excluded." },
 ];
 
 const VERIFICATION_LEVELS = [
@@ -1764,6 +1781,11 @@ function cx(...values: Array<string | false | null | undefined>) {
   return values.filter(Boolean).join(" ");
 }
 
+
+function isDemonstration(record: GovernanceRecord) {
+  return record.recordKind === "DEMONSTRATION";
+}
+
 function toneForRegistration(status: RegistrationStatus): BadgeTone {
   if (status === "PUBLISHED") return "green";
   if (status === "IN_REVIEW") return "amber";
@@ -1808,8 +1830,9 @@ function GovernanceCard({ record, selected, onSelect }: { record: GovernanceReco
     <button className={cx("governance-card", selected && "selected")} onClick={onSelect} type="button">
       <div className="card-topline">
         <span className="registry-id">{record.id}</span>
-        <Badge tone={toneForRegistration(record.registrationStatus)}>{record.registrationStatus.replaceAll("_", " ")}</Badge>
+        <Badge tone={isDemonstration(record) ? "amber" : toneForRegistration(record.registrationStatus)}>{isDemonstration(record) ? "DEMONSTRATION" : record.registrationStatus.replaceAll("_", " ")}</Badge>
       </div>
+      {isDemonstration(record) && <div className="demo-banner">Synthetic example · not a registered entity</div>}
       <div className="card-emblem" aria-hidden="true">{record.organization.split(" ").map((word) => word[0]).slice(0, 2).join("")}</div>
       <h3>{record.organization}</h3>
       <p className="architecture-name">{record.architecture} · v{record.version}</p>
@@ -1821,7 +1844,7 @@ function GovernanceCard({ record, selected, onSelect }: { record: GovernanceReco
       </div>
       <VerificationRail level={record.verificationLevel} />
       <div className="card-footer">
-        <Badge tone={toneForAssurance(record.assurance)}>{record.assurance}</Badge>
+        <Badge tone={isDemonstration(record) ? "slate" : toneForAssurance(record.assurance)}>{isDemonstration(record) ? `SIMULATED ${record.assurance}` : record.assurance}</Badge>
         <span>{record.jurisdiction}</span>
       </div>
     </button>
@@ -1841,7 +1864,7 @@ function ProfilePanel({ record }: { record: GovernanceRecord }) {
       <div className="profile-glow" aria-hidden="true" />
       <div className="profile-heading">
         <div>
-          <span className="eyebrow">Registered governance profile</span>
+          <span className="eyebrow">{isDemonstration(record) ? "Demonstration governance profile" : "Registered governance profile"}</span>
           <h2>{record.organization}</h2>
           <p>{record.architecture} · Version {record.version}</p>
         </div>
@@ -1849,10 +1872,18 @@ function ProfilePanel({ record }: { record: GovernanceRecord }) {
       </div>
 
       <div className="profile-status-row">
-        <Badge tone={toneForRegistration(record.registrationStatus)}>{record.registrationStatus.replaceAll("_", " ")}</Badge>
-        <Badge tone={toneForAssurance(record.assurance)}>{record.assurance}</Badge>
+        {isDemonstration(record) && <Badge tone="amber">DEMONSTRATION · NOT A REGISTERED ENTITY</Badge>}
+        <Badge tone={isDemonstration(record) ? "slate" : toneForRegistration(record.registrationStatus)}>{isDemonstration(record) ? `SIMULATED ${record.registrationStatus.replaceAll("_", " ")}` : record.registrationStatus.replaceAll("_", " ")}</Badge>
+        <Badge tone={isDemonstration(record) ? "slate" : toneForAssurance(record.assurance)}>{isDemonstration(record) ? `SIMULATED ${record.assurance}` : record.assurance}</Badge>
         <Badge tone="gold">{record.id}</Badge>
       </div>
+
+      {isDemonstration(record) && (
+        <section className="demo-disclosure">
+          <strong>Demonstration disclosure</strong>
+          <p>This is a synthetic profile created to demonstrate directory behavior, evidence states, verification levels, and challenge history. It does not identify a real registered organization, real architecture owner, or real portfolio of routes and artifacts.</p>
+        </section>
+      )}
 
       <section className="profile-section">
         <span className="section-label">Public claim</span>
@@ -1874,7 +1905,7 @@ function ProfilePanel({ record }: { record: GovernanceRecord }) {
       <section className="profile-section">
         <div className="section-heading-row"><span className="section-label">Verification ladder</span><strong>Level {record.verificationLevel} of 7</strong></div>
         <VerificationRail level={record.verificationLevel} />
-        <p className="microcopy">{VERIFICATION_LEVELS[record.verificationLevel]} is the highest represented verification state for this demonstration profile.</p>
+        <p className="microcopy">{isDemonstration(record) ? `Simulated ${VERIFICATION_LEVELS[record.verificationLevel].toLowerCase()} is the highest example state represented for this synthetic profile.` : `${VERIFICATION_LEVELS[record.verificationLevel]} is the highest represented verification state for this institutional profile.`}</p>
       </section>
 
       <section className="profile-section">
@@ -1995,10 +2026,10 @@ export default function GovernanceDirectoryPage() {
         <div className="hero-layout">
           <section className="hero-copy">
             <span className="eyebrow">Public institutional directory</span>
-            <h1>Registered AI governance, connected to evidence.</h1>
-            <p className="hero-lead">Discover attributable governance architectures, inspect their declared scope and limitations, and follow the evidence into governed routes, registered execution artifacts, verification records, and challenge history.</p>
+            <h1>Registered governance and clearly labeled demonstrations, connected to evidence.</h1>
+            <p className="hero-lead">Inspect the current institutional registration separately from synthetic demonstration profiles. Follow each record into its declared scope, limitations, governed routes, execution artifacts, verification states, and challenge history without confusing examples with real registrations.</p>
             <div className="hero-actions">
-              <a className="button primary" href="#directory">Explore registered governance</a>
+              <a className="button primary" href="#directory">Explore governance records</a>
               <Link className="button secondary" href="/governance/register">Register your governance</Link>
             </div>
             <div className="governing-rule"><span>No registered governance.</span><strong>No registered artifact.</strong></div>
@@ -2027,7 +2058,7 @@ export default function GovernanceDirectoryPage() {
           ))}
         </div>
         <div className="command-actions">
-          <span>{filtered.length} profiles visible</span>
+          <span>{filtered.length} profiles visible · {filtered.filter((record) => !isDemonstration(record)).length} institutional</span>
           <span>{bookmarks.length} bookmarked</span>
         </div>
       </section>
@@ -2036,7 +2067,12 @@ export default function GovernanceDirectoryPage() {
         <div className="directory-main">
           <div className="section-intro">
             <div><span className="eyebrow">Governance directory</span><h2>Inspect the organization, then inspect the evidence.</h2></div>
-            <p>Profiles describe identity, architecture, scope, ownership, claims, and limitations. Execution artifacts—not registration alone—support evidence-based reliance.</p>
+            <p>Institutional records and synthetic demonstrations are separated visibly. Profiles describe identity, architecture, scope, ownership, claims, and limitations; execution artifacts—not registration alone—support evidence-based reliance.</p>
+          </div>
+
+          <div className="directory-disclosure">
+            <strong>Directory status disclosure</strong>
+            <p>This launch directory contains {INSTITUTIONAL_RECORDS.length} institutional registration and {DEMONSTRATION_RECORDS.length} synthetic demonstration profiles. Demonstration records are not registered legal entities, do not represent outside organizations, and do not establish real artifact or route totals.</p>
           </div>
 
           <div className="filter-console">
@@ -2052,7 +2088,7 @@ export default function GovernanceDirectoryPage() {
             <div className="evidence-board">
               {GOVERNANCES.map((record) => (
                 <article className="evidence-row" key={record.id}>
-                  <div><strong>{record.organization}</strong><span>{record.id}</span></div>
+                  <div><strong>{record.organization}</strong><span>{record.id}</span>{isDemonstration(record) && <Badge tone="amber">DEMONSTRATION</Badge>}</div>
                   <VerificationRail level={record.verificationLevel} />
                   <div className="evidence-counts"><span>{record.routes} routes</span><span>{record.artifacts} artifacts</span><span>{record.challenges} challenges</span></div>
                   <button type="button" onClick={() => choose(record)}>Inspect</button>
@@ -2205,6 +2241,13 @@ export default function GovernanceDirectoryPage() {
         .proof-path { max-width: 1510px; margin: 0 auto; padding: 5rem clamp(1rem, 4vw, 3rem); }.section-intro.light h2 { color: #fff; }.path-grid { display: grid; grid-template-columns: repeat(5, minmax(0,1fr)); gap: .65rem; }.path-card { min-height: 260px; padding: 1rem; border: 1px solid rgba(255,255,255,.1); border-radius: .9rem; background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018)); transition: transform .2s ease, border-color .2s ease; }.path-card:hover { transform: translateY(-4px); border-color: rgba(89,218,242,.42); }.path-card > span { color: #d9b85f; font-family: ui-monospace, monospace; }.path-card h3 { margin: 3rem 0 .7rem; }.path-card p { color: #8fa0b5; line-height: 1.55; font-size: .85rem; }.path-card strong { display: block; margin-top: 1rem; color: #77e2f5; }
         .institutional-callout { max-width: 1450px; margin: 0 auto 5rem; padding: clamp(1.5rem, 4vw, 3rem); display: grid; grid-template-columns: 1fr auto; gap: 2rem; align-items: center; border: 1px solid rgba(219,181,79,.3); border-radius: 1.2rem; background: radial-gradient(circle at 90% 20%, rgba(219,181,79,.12), transparent 22rem), linear-gradient(135deg, rgba(21,34,52,.95), rgba(8,15,28,.98)); }.institutional-callout h2 { font-size: clamp(2rem, 4vw, 4rem); line-height: 1; letter-spacing: -.05em; max-width: 17ch; margin: .7rem 0 1rem; }.institutional-callout p { max-width: 800px; color: #a3b2c4; line-height: 1.7; }.callout-actions { min-width: 260px; flex-direction: column; }
         .directory-footer { border-top: 1px solid rgba(255,255,255,.08); padding: 2rem clamp(1rem, 4vw, 4rem); max-width: 1600px; margin: 0 auto; display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; color: #7f90a5; }.directory-footer strong, .directory-footer span { display: block; }.directory-footer strong { color: #d9e2ed; }.directory-footer div:nth-child(2) { display: flex; gap: 1rem; flex-wrap: wrap; font-size: .78rem; }.directory-footer p { grid-column: 1/-1; margin: .7rem 0 0; color: #c8a950; font-weight: 800; }
+
+        .demo-banner { margin: .75rem 0 -.25rem; padding: .55rem .7rem; border-radius: .65rem; border: 1px solid rgba(235,176,58,.32); background: rgba(235,176,58,.08); color: #ffd37a; font-size: .68rem; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+        .demo-disclosure, .directory-disclosure { padding: 1rem; border-radius: .85rem; border: 1px solid rgba(235,176,58,.28); background: rgba(235,176,58,.07); }
+        .demo-disclosure { margin: 1rem 0 0; }
+        .demo-disclosure strong, .directory-disclosure strong { color: #ffd37a; }
+        .demo-disclosure p, .directory-disclosure p { margin: .45rem 0 0; color: #d6c79f; line-height: 1.55; }
+        .directory-disclosure { margin-bottom: 1rem; }
         @media (max-width: 1200px) { .directory-workspace { grid-template-columns: 1fr; }.profile-panel { position: relative; top: 0; margin-top: 0; }.filter-console { grid-template-columns: repeat(3, 1fr); }.search-field { grid-column: 1/-1; }.path-grid { grid-template-columns: repeat(3, 1fr); }.hero-layout { grid-template-columns: 1fr 420px; }.governance-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 860px) { .top-links { display: none; }.hero-layout { grid-template-columns: 1fr; }.hero-core { min-height: 390px; }.metrics-grid { grid-template-columns: repeat(2, 1fr); }.command-bar { align-items: flex-start; flex-direction: column; }.filter-console { grid-template-columns: 1fr 1fr; }.governance-grid, .method-grid { grid-template-columns: 1fr; }.path-grid { grid-template-columns: 1fr 1fr; }.institutional-callout { grid-template-columns: 1fr; }.evidence-row { grid-template-columns: 1fr; }.evidence-counts { flex-wrap: wrap; }.directory-footer { grid-template-columns: 1fr; }.directory-footer div:nth-child(2) { justify-content: flex-start; } }
         @media (max-width: 560px) { .field-grid { grid-template-columns: 1fr; } .hero { padding-inline: 1rem; }.hero h1 { font-size: 3.25rem; }.hero-core { min-height: 330px; transform: scale(.82); margin-inline: -2rem; }.metrics-grid, .filter-console, .profile-facts, .determination-grid, .path-grid { grid-template-columns: 1fr; }.directory-workspace { padding-inline: 1rem; }.section-intro { display: block; }.section-intro > p { margin-top: 1rem; }.card-stat-grid { grid-template-columns: 1fr; }.profile-heading { display: block; }.profile-seal { margin-top: 1rem; }.command-actions { flex-wrap: wrap; }.top-nav { padding-bottom: 1.4rem; } }
