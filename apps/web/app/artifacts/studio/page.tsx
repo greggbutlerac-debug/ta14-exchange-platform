@@ -85,6 +85,58 @@ type RouteForm = {
   revalidationTriggers: string;
 };
 
+type RegisteredGovernanceHandoff = {
+  registrationId: string;
+  organizationName: string;
+  architectureName: string;
+  version: string;
+  status: "REGISTERED" | "REVIEW_REQUIRED" | "SUSPENDED";
+  sectors: string[];
+  jurisdictions: string[];
+  supportedDeterminations: Determination[];
+  routeCount: number;
+  artifactCount: number;
+  verificationLevel: number;
+};
+
+type RouteStudioHandoff = {
+  handoffVersion: "2.0";
+  createdAt: string;
+  governance: RegisteredGovernanceHandoff;
+  route: {
+    rid: string | null;
+    name: string;
+    domain: string;
+    owner: string;
+    version: number;
+    selectedStage: string;
+    stageDeclarations: Record<string, string | undefined>;
+    decision: Determination | null;
+    receiptId: string | null;
+    correlationId: string | null;
+  };
+  scope: {
+    sector: string;
+    jurisdiction: string;
+    classification: "DEMONSTRATION" | "PRODUCTION_CANDIDATE";
+  };
+};
+
+type GovernanceBinding = {
+  registrationId: string;
+  organizationName: string;
+  architectureName: string;
+  architectureVersion: string;
+  registrationStatus: RegisteredGovernanceHandoff["status"] | "UNBOUND";
+  verificationLevel: number;
+  sourceHandoffAt: string;
+  routeOwner: string;
+  routeDomain: string;
+  selectedStage: string;
+  sourceRouteReceiptId: string;
+  correlationId: string;
+};
+
 type EvidenceDraft = {
   id: string;
   title: string;
@@ -156,6 +208,7 @@ type OutcomeDraft = {
 };
 
 type StudioSnapshot = {
+  governance: GovernanceBinding;
   scenario: ScenarioForm;
   route: RouteForm;
   evidence: EvidenceDraft[];
@@ -203,9 +256,25 @@ type RouteTemplate = {
 };
 
 const STORAGE_KEY = "ta14.execution-artifact-studio.v2";
+const ROUTE_STUDIO_HANDOFF_KEY = "ta14:registered-governance-route-handoff:v2";
 const AUTOSAVE_DELAY = 650;
 const nowLocal = () => new Date().toISOString().slice(0, 16);
 const makeId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`.toUpperCase();
+
+const defaultGovernanceBinding: GovernanceBinding = {
+  registrationId: "UNBOUND",
+  organizationName: "No registered governance selected",
+  architectureName: "Unbound governance architecture",
+  architectureVersion: "",
+  registrationStatus: "UNBOUND",
+  verificationLevel: 0,
+  sourceHandoffAt: "",
+  routeOwner: "",
+  routeDomain: "",
+  selectedStage: "",
+  sourceRouteReceiptId: "",
+  correlationId: "",
+};
 
 const defaultScenario: ScenarioForm = {
   title: "Authorized release with verified outcome",
@@ -331,6 +400,7 @@ const defaultOutcome: OutcomeDraft = {
 };
 
 const initialSnapshot: StudioSnapshot = {
+  governance: defaultGovernanceBinding,
   scenario: defaultScenario,
   route: defaultRoute,
   evidence: defaultEvidence,
@@ -345,6 +415,94 @@ const initialSnapshot: StudioSnapshot = {
   doesNotProve: "It will not prove universal performance, regulatory certification, or behavior outside the preserved route and event.",
   updatedAt: new Date().toISOString(),
 };
+
+function isRouteStudioHandoff(value: unknown): value is RouteStudioHandoff {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<RouteStudioHandoff>;
+  return candidate.handoffVersion === "2.0"
+    && typeof candidate.createdAt === "string"
+    && Boolean(candidate.governance?.registrationId)
+    && Boolean(candidate.governance?.organizationName)
+    && Boolean(candidate.route?.name)
+    && Boolean(candidate.scope?.sector)
+    && Boolean(candidate.scope?.jurisdiction);
+}
+
+function applyRouteStudioHandoff(base: StudioSnapshot, handoff: RouteStudioHandoff): StudioSnapshot {
+  const stageDeclarations = Object.entries(handoff.route.stageDeclarations)
+    .filter(([, value]) => typeof value === "string" && value.trim().length > 0)
+    .map(([stage, value]) => `${stage.toUpperCase()}: ${value!.trim()}`)
+    .join("\n");
+  const routeId = handoff.route.rid?.trim() || `PENDING-${handoff.governance.registrationId}-${handoff.route.version}`;
+  const decision = handoff.route.decision ?? base.determination;
+  const simulated = handoff.scope.classification === "DEMONSTRATION";
+
+  return {
+    ...base,
+    governance: {
+      registrationId: handoff.governance.registrationId,
+      organizationName: handoff.governance.organizationName,
+      architectureName: handoff.governance.architectureName,
+      architectureVersion: handoff.governance.version,
+      registrationStatus: handoff.governance.status,
+      verificationLevel: handoff.governance.verificationLevel,
+      sourceHandoffAt: handoff.createdAt,
+      routeOwner: handoff.route.owner,
+      routeDomain: handoff.route.domain,
+      selectedStage: handoff.route.selectedStage,
+      sourceRouteReceiptId: handoff.route.receiptId ?? "",
+      correlationId: handoff.route.correlationId ?? "",
+    },
+    scenario: {
+      ...base.scenario,
+      title: `${handoff.route.name} execution artifact`,
+      classification: handoff.scope.classification === "DEMONSTRATION"
+        ? "REGISTERED GOVERNANCE DEMONSTRATION"
+        : "REGISTERED GOVERNANCE PRODUCTION CANDIDATE",
+      primaryGovernance: `${handoff.governance.organizationName} — ${handoff.governance.architectureName} v${handoff.governance.version}`,
+      sector: handoff.scope.sector,
+      jurisdiction: handoff.scope.jurisdiction,
+      proposedAction: handoff.route.stageDeclarations.execution?.trim()
+        || handoff.route.stageDeclarations.reality?.trim()
+        || base.scenario.proposedAction,
+      consequenceAtStake: handoff.route.stageDeclarations.outcome?.trim()
+        || base.scenario.consequenceAtStake,
+      assumptions: [
+        base.scenario.assumptions,
+        `Registered governance: ${handoff.governance.registrationId}.`,
+        `Architecture: ${handoff.governance.architectureName} v${handoff.governance.version}.`,
+        `Route classification: ${handoff.scope.classification}.`,
+      ].filter(Boolean).join("\n"),
+      simulated,
+    },
+    route: {
+      ...base.route,
+      routeId,
+      routeTitle: handoff.route.name,
+      routeVersion: String(handoff.route.version),
+      jurisdictionProfile: `${handoff.scope.jurisdiction} / ${handoff.scope.sector}`,
+      policyBasis: stageDeclarations || base.route.policyBasis,
+      revalidationTriggers: handoff.route.stageDeclarations.continuity?.trim()
+        || base.route.revalidationTriggers,
+    },
+    determination: decision,
+    commitReason: handoff.route.decision
+      ? `Imported route determination ${handoff.route.decision}. The Artifact Studio must independently validate every mandatory gate before artifact commitment or execution.`
+      : "Imported route context has no final determination. The Artifact Studio must evaluate and commit the bounded record before action.",
+    execution: {
+      ...base.execution,
+      requestedAction: handoff.route.stageDeclarations.execution?.trim()
+        || base.execution.requestedAction,
+      expectedEffect: expectedEffect(decision),
+      technicalMessage: handoff.route.receiptId
+        ? `Source route receipt ${handoff.route.receiptId} imported as route evidence. It is not an artifact execution receipt.`
+        : "Registered governance route context imported. Artifact execution has not been invoked.",
+    },
+    proves: `When completed, this artifact will prove how registered governance ${handoff.governance.registrationId} governed the bounded route ${routeId}.`,
+    doesNotProve: "Route import does not itself prove admissibility, execution control, outcome closure, certification, or universal governance performance.",
+    updatedAt: new Date().toISOString(),
+  };
+}
 
 const controlPatterns: ControlPattern[] = [
   {
@@ -3862,16 +4020,45 @@ function StudioPage() {
 
   useEffect(() => {
     try {
+      let recovered: StudioSnapshot = initialSnapshot;
+      let recoveredDraft = false;
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
-        const parsed = JSON.parse(raw) as StudioSnapshot;
+        const parsed = JSON.parse(raw) as Partial<StudioSnapshot>;
         if (parsed?.scenario && parsed?.route && Array.isArray(parsed?.gates)) {
-          setSnapshot(parsed);
-          setNotice("Recovered the last local Artifact Studio draft.");
+          recovered = {
+            ...initialSnapshot,
+            ...parsed,
+            governance: parsed.governance ?? initialSnapshot.governance,
+            scenario: { ...initialSnapshot.scenario, ...parsed.scenario },
+            route: { ...initialSnapshot.route, ...parsed.route },
+            execution: { ...initialSnapshot.execution, ...parsed.execution },
+            outcome: { ...initialSnapshot.outcome, ...parsed.outcome },
+          } as StudioSnapshot;
+          recoveredDraft = true;
         }
       }
+
+      const handoffRaw = localStorage.getItem(ROUTE_STUDIO_HANDOFF_KEY);
+      if (handoffRaw) {
+        const handoffCandidate: unknown = JSON.parse(handoffRaw);
+        if (isRouteStudioHandoff(handoffCandidate)) {
+          recovered = applyRouteStudioHandoff(recovered, handoffCandidate);
+          localStorage.removeItem(ROUTE_STUDIO_HANDOFF_KEY);
+          setSnapshot(recovered);
+          setNotice(`Imported registered governance ${handoffCandidate.governance.registrationId} and route ${handoffCandidate.route.rid ?? handoffCandidate.route.name}. Source route receipts remain evidence only until the Studio creates an execution receipt.`);
+          return;
+        }
+        localStorage.removeItem(ROUTE_STUDIO_HANDOFF_KEY);
+        setNotice("The registered-governance route handoff was invalid and was not imported.");
+      }
+
+      if (recoveredDraft) {
+        setSnapshot(recovered);
+        setNotice("Recovered the last local Artifact Studio draft.");
+      }
     } catch {
-      setNotice("A stored draft could not be recovered. A clean workspace was loaded.");
+      setNotice("A stored draft or route handoff could not be recovered. A clean workspace was loaded.");
     }
   }, []);
 
@@ -4170,6 +4357,27 @@ function StudioPage() {
     return (
       <section>
         <SectionTitle eyebrow="Institutional command" title="Artifact production command center" description="Build the record, run the route, prove the control effect, close the outcome, and package the exact event for independent inspection." actions={<><button onClick={evaluateAllGates}>Run all gates</button><button className="primary" onClick={commitDetermination}>Commit determination</button></>} />
+        <div className="three-col">
+          <article className="panel">
+            <h3>Registered governance binding</h3>
+            <p><strong>{snapshot.governance.organizationName}</strong></p>
+            <p>{snapshot.governance.architectureName}{snapshot.governance.architectureVersion ? ` v${snapshot.governance.architectureVersion}` : ""}</p>
+            <div className="tag-row"><Badge tone={snapshot.governance.registrationStatus === "REGISTERED" ? "pass" : "hold"}>{snapshot.governance.registrationStatus}</Badge><code>{snapshot.governance.registrationId}</code></div>
+          </article>
+          <article className="panel">
+            <h3>Imported route identity</h3>
+            <p><strong>{snapshot.route.routeId}</strong></p>
+            <p>{snapshot.route.routeTitle} · v{snapshot.route.routeVersion}</p>
+            <small>{snapshot.governance.routeDomain || "Route domain not declared"} · {snapshot.governance.routeOwner || "Route owner not declared"}</small>
+          </article>
+          <article className="panel">
+            <h3>Handoff provenance</h3>
+            <p>Correlation: <code>{snapshot.governance.correlationId || "NOT PROVIDED"}</code></p>
+            <p>Route receipt: <code>{snapshot.governance.sourceRouteReceiptId || "NOT PROVIDED"}</code></p>
+            <small>The route receipt is preserved as source evidence and never substituted for an artifact execution receipt.</small>
+          </article>
+        </div>
+
         <div className="metrics">
           <Metric label="Readiness" value={`${score}%`} note="Required workspace domains populated" tone={score >= 90 ? "green" : "cyan"} />
           <Metric label="Determination" value={snapshot.determination} note={`Expected effect: ${expectedEffect(snapshot.determination)}`} tone={snapshot.determination.toLowerCase()} />
@@ -4241,7 +4449,7 @@ function StudioPage() {
         <Field label="Series ID"><input value={snapshot.scenario.seriesId} onChange={(e) => updateScenario("seriesId", e.target.value)} /></Field>
         <Field label="Sequence"><input type="number" min={1} value={snapshot.scenario.sequence} onChange={(e) => updateScenario("sequence", Math.max(1, Number(e.target.value) || 1))} /></Field>
         <Field label="Classification"><input value={snapshot.scenario.classification} onChange={(e) => updateScenario("classification", e.target.value)} /></Field>
-        <Field label="Primary governance"><select value={snapshot.scenario.primaryGovernance} onChange={(e) => updateScenario("primaryGovernance", e.target.value)}>{GOVERNANCE_ARTIFACT_PROFILES.map((p) => <option key={p.profileId}>{p.title}</option>)}</select></Field>
+        <Field label="Primary governance"><select value={snapshot.scenario.primaryGovernance} onChange={(e) => updateScenario("primaryGovernance", e.target.value)}><option value={snapshot.scenario.primaryGovernance}>{snapshot.scenario.primaryGovernance}</option>{GOVERNANCE_ARTIFACT_PROFILES.filter((p) => p.title !== snapshot.scenario.primaryGovernance).map((p) => <option key={p.profileId}>{p.title}</option>)}</select></Field>
         <Field label="Sector"><input value={snapshot.scenario.sector} onChange={(e) => updateScenario("sector", e.target.value)} /></Field>
         <Field label="Jurisdiction" wide><input value={snapshot.scenario.jurisdiction} onChange={(e) => updateScenario("jurisdiction", e.target.value)} /></Field>
         <Field label="Proposed action" wide><textarea rows={5} value={snapshot.scenario.proposedAction} onChange={(e) => updateScenario("proposedAction", e.target.value)} /></Field>
