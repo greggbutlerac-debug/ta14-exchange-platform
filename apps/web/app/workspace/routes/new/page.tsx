@@ -519,7 +519,7 @@ export default function NewRoutePage() {
       ? Object.fromEntries(
           chain.map((stage) => [
             stage.key,
-            draft.stages[stage.key]?.trim() || "UNDECLARED",
+            draft.chain[stage.key]?.trim() || "UNDECLARED",
           ]),
         )
       : {
@@ -547,7 +547,7 @@ export default function NewRoutePage() {
         stageDeclarations,
         decision: result?.decision ?? null,
         receiptId: result?.receipt.receiptId ?? null,
-        correlationId: result?.correlationId ?? correlationId || null,
+        correlationId: result?.correlationId ?? (correlationId || null),
       },
       scope: {
         sector: selectedSector,
