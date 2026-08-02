@@ -130,111 +130,21 @@ function SiteActivityCounter() {
 
 const workspaces = [
   {
-    id: "library",
-    code: "GL",
-    title: "Governance Library",
-    href: "/governance-library",
-    kicker: "EXPLORE THE ARCHITECTURES BEFORE BUILDING",
-    description:
-      "Browse the TA-14 governance architecture library and enter the runtime, model, data, agent, human oversight, policy, compliance, decision, risk, and general governance lanes.",
-    color: "#6fe8ff",
-    glow: "rgba(72, 216, 255, .55)",
-    world: "aiWorld",
-    features: [
-      "Runtime execution and outcome assurance",
-      "Model evaluation and data provenance",
-      "Agent, tool, policy, and human oversight governance",
-      "Decision, risk, compliance, and general governance lanes",
-    ],
-  },
-  {
     id: "ai",
     code: "AI",
-    title: "AI Governance",
+    title: "TA-14 AI Governance Exchange",
     href: "/workspace/ai-governance",
-    kicker: "GOVERN CONSEQUENTIAL AI EXECUTION",
+    kicker: "GOVERN CONSEQUENTIAL AI BEFORE REALITY IS BOUND",
     description:
-      "Build, test, challenge, correct, preserve, and verify AI governance routes before consequential execution is permitted to proceed.",
+      "Build, test, review, preserve, and verify AI governance routes across models, agents, tools, identities, authorities, evidence, commitments, executions, and outcomes.",
     color: "#62afff",
     glow: "rgba(63, 154, 255, .56)",
     world: "aiWorld",
     features: [
-      "Agents, models, tools, APIs, and automated decisions",
-      "Authority, evidence, admissibility, and commit gates",
-      "ALLOW, HOLD, DENY, and ESCALATE route decisions",
-      "Runtime records tied to verified outcomes",
-    ],
-  },
-  {
-    id: "records",
-    code: "GR",
-    title: "Governed & Environmental Records",
-    href: "/workspace/governed-records",
-    kicker: "PRESERVE REALITY BEFORE INTERPRETATION",
-    description:
-      "Create, upload, preserve, and interpret governed records across environmental, atmospheric, building, hospital, HVAC, land, water, and air domains.",
-    color: "#78e6b0",
-    glow: "rgba(92, 224, 167, .52)",
-    world: "recordsWorld",
-    features: [
-      "Governed, environmental, and atmospheric records",
-      "Bounded interpretation with explicit limitations",
-      "Separate record, determination, intervention, and outcome",
-      "Attributable chronology, ownership, lineage, and exports",
-    ],
-  },
-  {
-    id: "entity",
-    code: "ER",
-    title: "Entity Review",
-    href: "/workspace/entity-review",
-    kicker: "REVIEW THE WHOLE GOVERNANCE ENTITY",
-    description:
-      "Submit an organization, AI system, governance architecture, program, product, implementation, or route for independent governed review.",
-    color: "#dd83ff",
-    glow: "rgba(199, 91, 255, .55)",
-    world: "entityWorld",
-    features: [
-      "Organizations, systems, architectures, and programs",
-      "Declared claims, non-claims, evidence, and boundaries",
-      "Independent findings, objections, and corrections",
-      "Visible review status and preserved outcomes",
-    ],
-  },
-  {
-    id: "eu",
-    code: "EU",
-    title: "European Union Artificial Intelligence Act",
-    href: "/workspace/ai-governance/eu-ai-act",
-    kicker: "TURN LEGAL DUTIES INTO INSPECTABLE ROUTES",
-    description:
-      "Translate EU AI Act roles, classifications, duties, evidence dependencies, transparency requirements, and unresolved questions into governed implementation pathways.",
-    color: "#ffd15c",
-    glow: "rgba(255, 196, 65, .52)",
-    world: "euWorld",
-    features: [
-      "Actor roles, system classification, and applicability",
-      "High-risk duties and Article 50 transparency",
-      "Evidence routes, records, testing, and documentation",
-      "Implementation boundaries without checklist theater",
-    ],
-  },
-  {
-    id: "registry",
-    code: "RG",
-    title: "AI Governance Registry",
-    href: "/registry",
-    kicker: "ESTABLISH A DATED AND ATTRIBUTABLE RECORD",
-    description:
-      "Register governance architectures as searchable, versioned records with preserved identity, stewardship, claims, non-claims, evidence, lineage, and status.",
-    color: "#f2b95f",
-    glow: "rgba(236, 164, 57, .52)",
-    world: "registryWorld",
-    features: [
-      "Governance identity and registry identifier",
-      "Claims, non-claims, scope, and limitations",
-      "Evidence, publications, repositories, and demonstrations",
-      "Version history, lineage, ownership, and status",
+      "Governed route construction and runtime verification",
+      "AI entity review and founding demonstrations",
+      "Execution artifacts, registries, and preserved findings",
+      "Partner Review Network and governance marketplace",
     ],
   },
   {
@@ -242,35 +152,125 @@ const workspaces = [
     code: "AC",
     title: "TA-14 Academy",
     href: "/academy",
-    kicker: "LEARN GOVERNANCE BEFORE AUTOMATION",
+    kicker: "THE EDUCATIONAL BACKBONE OF THE WHOLE INSTITUTION",
     description:
-      "Enter the Exchange's unified educational operating system to understand governed routes, inspect admissible execution architecture, practice bounded construction, and progress toward scope-controlled competency.",
+      "Enter a central learning institution that branches into AI governance, environmental integrity, atmospheric records, HVAC, entity review, public research, law, standards, and every future TA-14 domain.",
     color: "#39f2a1",
     glow: "rgba(57, 242, 161, .52)",
     world: "academyWorld",
     features: [
-      "Start Here orientation before consequential tools",
-      "Governance thinking and eight-anchor architecture",
-      "Guided route construction, simulation, and review",
-      "Competency evidence without implied credential authority",
+      "Domain-specific learning halls across every institution",
+      "Architecture explorers, simulations, labs, and assessments",
+      "Entity Review Academy and guided readiness pathways",
+      "Credentials, instructor pathways, and accreditation systems",
     ],
   },
   {
-    id: "artifacts",
-    code: "EA",
-    title: "Execution Artifacts",
-    href: "/artifacts",
-    kicker: "INSPECT PROOF THAT GOVERNANCE CONTROLLED EXECUTION",
+    id: "environment",
+    code: "EI",
+    title: "Environmental Integrity Governance",
+    href: "/workspace/governed-records/environmental",
+    kicker: "GOVERN ENVIRONMENTAL REALITY FROM RECORD TO OUTCOME",
     description:
-      "Enter Door Eight to inspect completed bounded execution records, verify their governing routes and technical control effects, download preserved proof packages, and challenge or correct the public record without erasing the original event.",
+      "Preserve environmental evidence, define authority, govern intervention, and verify whether air, water, land, buildings, and systems actually protected people and the environment.",
+    color: "#78e6b0",
+    glow: "rgba(92, 224, 167, .52)",
+    world: "recordsWorld",
+    features: [
+      "Air, water, land, pollution, building, and sensor records",
+      "Environmental entity review and governed intervention",
+      "Separate measurement, interpretation, determination, and outcome",
+      "Academy pathways for every environmental governance domain",
+    ],
+  },
+  {
+    id: "atmospheric",
+    code: "AIR",
+    title: "Atmospheric Integrity Records",
+    href: "/workspace/governed-records/environmental",
+    kicker: "MAKE THE ATMOSPHERE ATTRIBUTABLE, COMPARABLE, AND RELIABLE",
+    description:
+      "Create atmospheric and personal atmospheric integrity records that preserve where, when, how, and under what conditions air was measured—and what protection a building or system actually provided.",
+    color: "#6fe8ff",
+    glow: "rgba(72, 216, 255, .55)",
+    world: "aiWorld",
+    features: [
+      "Exterior-to-interior atmospheric comparison",
+      "Instrument, location, chronology, and continuity preservation",
+      "Building, hospital, laboratory, and personal record pathways",
+      "Dedicated Atmospheric Integrity Academy",
+    ],
+  },
+  {
+    id: "hvac",
+    code: "HV",
+    title: "HVAC Governance & Academy",
+    href: "/workspace/governed-records/environmental",
+    kicker: "TURN FIELD WORK INTO GOVERNED TECHNICAL EVIDENCE",
+    description:
+      "Connect diagnostics, electrical integrity, refrigerant governance, facility sensing, technician evidence, interventions, and verified outcomes through governed HVAC pathways.",
+    color: "#ffd15c",
+    glow: "rgba(255, 196, 65, .52)",
+    world: "recordsWorld",
+    features: [
+      "HVAC diagnostic and electrical integrity records",
+      "Refrigerant, pressure, airflow, moisture, and sensor governance",
+      "Technician learning, simulations, and competency evidence",
+      "Intervention and post-intervention performance review",
+    ],
+  },
+  {
+    id: "research",
+    code: "PR",
+    title: "Public Research & Public Record",
+    href: "/foundation",
+    kicker: "PRESERVE WHAT WAS BUILT, CLAIMED, PUBLISHED, AND CHALLENGED",
+    description:
+      "Enter the institution's public chronology, publications, repositories, technical records, research programs, evidence packages, declared claims, limitations, and correction pathways.",
+    color: "#dd83ff",
+    glow: "rgba(199, 91, 255, .55)",
+    world: "entityWorld",
+    features: [
+      "Books, articles, repositories, records, and institutional chronology",
+      "Public research programs and inspectable evidence packages",
+      "Claims, non-claims, limitations, disputes, and corrections",
+      "Public Research Academy and research-literacy pathways",
+    ],
+  },
+  {
+    id: "law",
+    code: "LW",
+    title: "Current & Proposed Law",
+    href: "/governance-library/laws",
+    kicker: "UNDERSTAND THE LAW, EXPOSE THE GAP, PROPOSE THE UPGRADE",
+    description:
+      "Study current statutes and regulations alongside clearly labeled TA-14 proposed laws, model acts, and legislative upgrades designed to close evidence, authority, enforcement, execution, and outcome gaps.",
+    color: "#f2b95f",
+    glow: "rgba(236, 164, 57, .52)",
+    world: "euWorld",
+    features: [
+      "Current acts, regulations, authority, applicability, and enforcement",
+      "Gap analysis showing what existing law leaves unresolved",
+      "TA-14 proposed acts, model language, and modernization pathways",
+      "Law Academy comparisons, scenarios, and assessments",
+    ],
+  },
+  {
+    id: "standards",
+    code: "ST",
+    title: "Standards, Codes & Technical Modernization",
+    href: "/governance-library/standards",
+    kicker: "DISTINGUISH VOLUNTARY GUIDANCE FROM ENFORCEABLE AUTHORITY",
+    description:
+      "Review ASHRAE, ANSI-accredited, environmental, building, HVAC, measurement, governance, and technical standards—then inspect TA-14 proposals for stronger evidence and execution integrity.",
     color: "#ff9f68",
     glow: "rgba(255, 126, 77, .58)",
-    world: "artifactWorld",
+    world: "registryWorld",
     features: [
-      "Twelve founding artifacts across ALLOW, HOLD, DENY, and ESCALATE",
-      "Execution receipts, outcome closure, hashes, and package integrity",
-      "Public verification, downloads, replay boundaries, and inspection",
-      "Append-only challenge, correction, supersession, and withdrawal",
+      "Standards, guidelines, codes, specifications, and actual legal status",
+      "Adoption, incorporation, contract, and enforcement pathways",
+      "Current-versus-upgraded technical comparisons",
+      "Standards Academy and TA-14 modernization proposals",
     ],
   },
 ];
@@ -286,34 +286,43 @@ const chain = [
   ["Outcome", "♛"],
 ];
 
-const exchangeCapabilities = [
-  ["01", "Build governance routes", "Translate consequential decisions into inspectable inputs, authorities, evidence gates, failure states, and governed outcomes."],
-  ["02", "Preserve governed records", "Keep the source record separate from interpretation, determination, intervention, and outcome so the evidence remains admissible."],
-  ["03", "Request independent review", "Bring organizations, systems, architectures, records, or routes into a bounded review process with visible findings and limitations."],
-  ["04", "Verify execution", "Test whether the preserved route still corresponds to the implementation, authority, evidence, execution, and claimed result."],
+const academyDomains = [
+  ["AI", "AI Governance Academy", "Architecture, routes, agents, models, identity, evidence, authority, execution, artifacts, and verification.", "/academy"],
+  ["EI", "Environmental Integrity Academy", "Air, water, land, pollution, environmental records, intervention, enforcement, and outcome integrity.", "/academy"],
+  ["HV", "HVAC Academy", "Diagnostics, electrical integrity, refrigerant governance, sensing, field evidence, and technician competency.", "/academy"],
+  ["ER", "Entity Review Academy", "Learn the review, build the package, validate readiness, submit evidence, and understand bounded findings.", "/workspace/entity-review"],
+  ["PR", "Public Research Academy", "Research literacy, public evidence, publication boundaries, repositories, challenge, and correction.", "/academy"],
+  ["LW", "Law Academy", "Current law, primitive gaps, proposed upgrades, practical differences, scenarios, and legislative reasoning.", "/governance-library/laws"],
+  ["ST", "Standards Academy", "Standards status, applicability, incorporation, technical gaps, proposed upgrades, and execution effects.", "/governance-library/standards"],
+  ["AIR", "Atmospheric Integrity Academy", "Atmospheric evidence, instruments, continuity, building protection, personal records, and future reliance.", "/academy"],
 ];
 
-const marketplaceItems = [
-  ["Post a governance need", "Describe the system, record, route, evidence gap, or review scope you need help with.", "/marketplace/post"],
-  ["Find governance work", "Discover bounded opportunities for evidence mapping, route review, implementation, and verification.", "/marketplace"],
-  ["Discover reviewers", "Find professionals through declared expertise, visible artifacts, evidence signals, and stated limitations.", "/marketplace"],
-  ["Build review reputation", "Preserve completed scopes, findings, outcomes, and review history instead of relying on unsupported claims.", "/marketplace"],
+const entityJourney = [
+  ["01", "Learn the review", "See what TA-14 examines, how findings work, and why bounded claims are more credible than universal promises."],
+  ["02", "Define the entity", "Preserve identity, ownership, stewardship, jurisdiction, responsible contacts, systems, versions, and declared roles."],
+  ["03", "Build the claim", "Turn broad marketing language into one precise capability, use case, control, architecture, or reviewable proposition."],
+  ["04", "Set boundaries", "Declare scope, non-claims, exclusions, confidentiality, intellectual-property limits, publication permissions, and conditions."],
+  ["05", "Assemble evidence", "Upload records, policies, technical outputs, demonstrations, signatures, repositories, authorities, and supporting material."],
+  ["06", "Validate readiness", "Identify missing fields, contradictions, unsupported claims, weak authority, stale versions, and unresolved evidence gaps."],
+  ["07", "Submit the package", "Create a structured review-ready package instead of handing TA-14 an unorganized collection of documents."],
+  ["08", "Receive findings", "Obtain bounded findings, limitations, corrective actions, artifact options, publication pathways, and reassessment steps."],
 ];
 
-const registryFields = [
-  "Governance identity and registry identifier",
-  "Founder, author, steward, or organization",
-  "Establishment date and registration timestamp",
-  "Claims, non-claims, limitations, and scope",
-  "Version history, status, ownership, and licensing",
-  "Evidence, publications, repositories, demonstrations, and supporting documents",
-];
-
-const networkSteps = [
-  ["Declare", "State the reviewer, scope, expertise, boundaries, conflicts, and evidence requirements."],
-  ["Review", "Inspect the route, architecture, record, implementation, or entity without silently expanding the scope."],
-  ["Preserve", "Retain findings, objections, corrections, limitations, and superseded versions."],
-  ["Verify", "Test whether the reviewed implementation still corresponds to the evidence and claimed outcome."],
+const modernizationTracks = [
+  {
+    code: "LAW",
+    title: "Law & Legislative Modernization",
+    href: "/governance-library/laws",
+    text: "Preserve enacted law as it exists, identify where it is primitive or incomplete, teach the consequences of the gap, and publish clearly labeled TA-14 proposed upgrades.",
+    items: ["Clean Air Act and air-pollution law", "Clean Water Act and water-protection law", "EPA regulations and enforcement pathways", "Environmental, public-health, building, and anti-pollution legislation"],
+  },
+  {
+    code: "STD",
+    title: "Standards, Codes & Technical Modernization",
+    href: "/governance-library/standards",
+    text: "Distinguish standards from statutes, preserve their real authority, show how adoption makes them enforceable, and propose stronger evidence and execution requirements.",
+    items: ["ASHRAE standards and guidelines", "ANSI-accredited standards", "Building, mechanical, HVAC, and environmental codes", "Measurement, sensor, AI governance, and verification standards"],
+  },
 ];
 
 function Arrow() {
@@ -377,7 +386,7 @@ export default function HomePage() {
 
       <section className="institution shell">
         <p>TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
-        <div className="institutionRule"><i/><span>THE PUBLIC ENTRANCE TO ADMISSIBLE EXECUTION</span><i/></div>
+        <div className="institutionRule"><i/><span>ONE INSTITUTION · MANY GOVERNED WORLDS · ONE PRESERVED ROUTE TO RELIANCE</span><i/></div>
       </section>
 
       <section className="hero shell">
@@ -385,54 +394,53 @@ export default function HomePage() {
           <span>TA-14</span>
           <i/><i/><i/>
         </div>
-        <p className="eyebrow">THE GRAND EXCHANGE HALL</p>
+        <p className="eyebrow">THE GRAND INSTITUTIONAL FRONT DOOR</p>
         <h1>
-          AI governance should not end with a policy. It should become an
-          <em> inspectable route to execution.</em>
+          Governance for consequential systems, environmental reality, public evidence, and
+          <em> the laws and standards the future will require.</em>
         </h1>
         <p className="heroLead">
-          The TA-14 AI Governance Exchange is a free governance playground and institutional workspace for building, testing, preserving, reviewing, and verifying consequential AI routes. It separates the law, the claim, the evidence, the determination, the commitment, the execution, and the outcome so one layer cannot silently corrupt another.
+          TA-14 Authority Governance Institution brings AI governance, environmental integrity, atmospheric records, HVAC, public research, entity review, education, law, standards, execution artifacts, and future institutional initiatives under one governed roof. Every division remains distinct. Every pathway preserves its authority, evidence, limitations, execution, and outcome.
         </p>
         <div className="heroActions">
-          <Link className="grandButton primary" href="/workspace">Open the Exchange <Arrow /></Link>
-          <Link className="grandButton artifactButton" href="/artifacts">Enter Door Eight: Execution Artifacts <Arrow /></Link>
-          <Link className="grandButton gold" href="/foundation">Explore the TA-14 Foundation <Arrow /></Link>
-          <Link className="grandButton glass" href="#eight-doors">Choose One of Eight Governed Doors <span>↓</span></Link>
-          <Link className="grandButton glass" href="/workspace/ai-governance/eu-ai-act">Explore the EU AI Act <Arrow /></Link>
-          <Link className="grandButton glass" href="/marketplace">Enter the Marketplace <Arrow /></Link>
+          <Link className="grandButton primary" href="#institutional-doors">Enter the Grand Institutional Hall <span>↓</span></Link>
+          <Link className="grandButton gold" href="/workspace/ai-governance">Enter the AI Governance Exchange <Arrow /></Link>
+          <Link className="grandButton academyButton" href="/academy">Enter TA-14 Academy <Arrow /></Link>
+          <Link className="grandButton glass" href="/workspace/entity-review">Begin Guided Entity Review <Arrow /></Link>
+          <Link className="grandButton glass" href="/foundation">Open the Public Record <Arrow /></Link>
         </div>
         <div className="heroDefinition">
-          <article><span>WHAT IT IS</span><strong>A governed execution exchange</strong><p>Build and inspect the route from evidence to execution instead of trusting an unsupported conclusion.</p></article>
-          <article><span>WHO IT SERVES</span><strong>Builders, deployers, reviewers, and institutions</strong><p>Use it for AI systems, governance architectures, records, organizations, environmental evidence, and regulated pathways.</p></article>
-          <article><span>WHAT IT PRESERVES</span><strong>Attributable evidence and boundaries</strong><p>Keep ownership, chronology, versions, limitations, objections, decisions, and outcomes visible under scrutiny.</p></article>
+          <article><span>THE INSTITUTION</span><strong>One governed umbrella</strong><p>Separate divisions for AI, environment, atmosphere, HVAC, research, law, standards, education, review, and future reliance.</p></article>
+          <article><span>THE ACADEMY</span><strong>Present inside every division</strong><p>Learn each institution, inspect examples, run simulations, build readiness, and understand why every required element matters.</p></article>
+          <article><span>THE GOVERNING RULE</span><strong>No admissible evidence. No admissible execution.</strong><p>Claims become routes, routes become determinations, and determinations must survive execution and outcome verification.</p></article>
         </div>
       </section>
 
-      <section className="hall shell" id="eight-doors">
+      <section className="hall shell" id="institutional-doors">
         <div className="hallArchitecture" aria-hidden="true"><i/><i/><i/><i/><i/></div>
         <div className="hallGlow" aria-hidden="true" />
         <div className="sectionIntro centeredIntro">
-          <p className="eyebrow">EIGHT PRIMARY GOVERNANCE DESTINATIONS</p>
-          <h2>Choose the institution that governs what you need to build, preserve, review, interpret, or establish.</h2>
-          <p>Each doorway opens into a distinct governed institution. Their routes connect across the Exchange, but their evidence boundaries, authorities, records, and review purposes remain explicit.</p>
+          <p className="eyebrow">EIGHT GRAND INSTITUTIONAL ENTRANCES</p>
+          <h2>Choose the world you need. The Academy, evidence, review, and governing chain travel with you.</h2>
+          <p>These are not eight copies of the same software. Each door opens into a different institutional environment with its own evidence, authorities, learning pathways, review processes, records, and public responsibilities.</p>
         </div>
 
-        <div className="doors">
+        <div className="doors institutionalDoors">
           {workspaces.map((workspace) => (
             <Link
               href={workspace.href}
-              className={`workspace ${workspace.id === "artifacts" ? "artifactDoor" : ""}`}
+              className={`workspace institutionDoor ${workspace.id === "academy" ? "academyDoor" : ""}`}
               key={workspace.id}
               style={{ "--accent": workspace.color, "--accentGlow": workspace.glow } as CSSProperties}
             >
               <div className="doorStage">
                 <div className="portalHalo" />
                 <div className="sparkField">
-                  {Array.from({ length: 14 }).map((_, index) => <i key={index} style={{ "--n": index } as CSSProperties} />)}
+                  {Array.from({ length: 18 }).map((_, index) => <i key={index} style={{ "--n": index } as CSSProperties} />)}
                 </div>
                 <div className="columns leftColumn"><i/><i/><i/></div>
                 <div className="columns rightColumn"><i/><i/><i/></div>
-                <div className="archFrame">
+                <div className="archFrame grandArch">
                   <div className="archCrown"><i className="crownLine one"/><i className="crownLine two"/><i className="crownLine three"/><span className="crownGem"/></div>
                   <div className="doorOpening">
                     <div className={`portalWorld ${workspace.world}`}>
@@ -440,15 +448,16 @@ export default function HomePage() {
                       <span className="worldLine worldLineOne"/><span className="worldLine worldLineTwo"/><span className="worldLine worldLineThree"/>
                       <span className="worldParticle p1"/><span className="worldParticle p2"/><span className="worldParticle p3"/><span className="worldParticle p4"/><span className="worldParticle p5"/>
                     </div>
+                    <div className="interiorVista"><span/><span/><span/></div>
                     <div className="lightWithin" />
                     <div className="thresholdMessage">
                       <span>{workspace.code}</span>
                       <strong>{workspace.title}</strong>
-                      <small>ENTER GOVERNED WORKSPACE</small>
+                      <small>ENTER INSTITUTIONAL WORLD</small>
                     </div>
-                    <div className="doorLeaf singleDoor">
+                    <div className="doorLeaf singleDoor grandDoorLeaf">
                       <div className="doorEmblem"><span>{workspace.code}</span></div>
-                      <div className="doorPanels"><i/><i/><i/><i/><i/><i/></div>
+                      <div className="doorPanels carvedPanels"><i/><i/><i/><i/><i/><i/></div>
                       <span className="hinge h1"/><span className="hinge h2"/><span className="hinge h3"/>
                       <span className="doorHandle" />
                       <span className="doorKeyPlate" />
@@ -456,12 +465,12 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="steps"><i/><i/><i/></div>
-                <div className="lightSpill" />
+                <div className="lightSpill grandLightSpill" />
+                <div className="dustInLight">{Array.from({length:12}).map((_,index)=><i key={index} style={{"--d":index} as CSSProperties}/>)}</div>
                 <div className="floorReflection" />
               </div>
 
-              <div className="workspaceCard">
-                {workspace.id === "artifacts" ? <span className="doorLaunchFlag">NEW · EIGHTH DOOR</span> : null}
+              <div className="workspaceCard institutionalCard">
                 <span className="miniCode">{workspace.code}</span>
                 <p className="workspaceKicker">{workspace.kicker}</p>
                 <h3>{workspace.title}</h3>
@@ -472,199 +481,118 @@ export default function HomePage() {
             </Link>
           ))}
         </div>
-
-        <section className="artifactLaunchDeck" aria-label="Execution Artifacts launch deck">
-          <div className="artifactLaunchSignal" aria-hidden="true">
-            <span className="signalCore">EA</span>
-            <i className="signalRing ringOne" />
-            <i className="signalRing ringTwo" />
-            <i className="signalRing ringThree" />
-            <b className="signalBeam beamOne" />
-            <b className="signalBeam beamTwo" />
-          </div>
-          <div className="artifactLaunchCopy">
-            <p className="eyebrow">DOOR EIGHT · TA-14 EXECUTION ARTIFACTS</p>
-            <h2>TA-14 produced the proof it asks the market to produce.</h2>
-            <p>
-              Inspect twelve materially different bounded execution records. Each artifact preserves the proposed consequence, governing route, admitted evidence, authority, continuity, determination, technical execution effect, outcome, integrity package, verification path, and explicit proof boundary.
-            </p>
-            <div className="artifactLaunchMetrics">
-              <article><strong>12</strong><span>Founding artifacts</span></article>
-              <article><strong>4</strong><span>Determination states</span></article>
-              <article><strong>24</strong><span>Runtime links represented</span></article>
-              <article><strong>8</strong><span>Visible anchor links</span></article>
-            </div>
-            <div className="artifactLaunchActions">
-              <Link className="grandButton artifactButton" href="/artifacts">Inspect completed artifacts <Arrow /></Link>
-              <Link className="grandButton glass" href="/artifacts/verify">Open Verification Center <Arrow /></Link>
-              <Link className="grandButton glass" href="/artifacts/challenge">Challenge or correct a record <Arrow /></Link>
-            </div>
-          </div>
-        </section>
-
         <div className="obsidianFloor" aria-hidden="true" />
+      </section>
+
+      <section className="academySpine shell">
+        <div className="academySpineVisual" aria-hidden="true">
+          <div className="academyCentralSeal"><small>TA-14</small><strong>ACADEMY</strong><span>LEARN · BUILD · SIMULATE · VERIFY</span></div>
+          <i className="academyOrbit orbitOne"/><i className="academyOrbit orbitTwo"/><i className="academyOrbit orbitThree"/>
+          {academyDomains.map(([code],index)=><b key={code} style={{"--i":index} as CSSProperties}>{code}</b>)}
+        </div>
+        <div className="academySpineCopy">
+          <p className="eyebrow">THE ACADEMY IS INSIDE EVERYTHING</p>
+          <h2>One central Academy. A dedicated learning institution inside every TA-14 world.</h2>
+          <p>Enter through the Academy and choose a discipline—or enter any institutional division and open its embedded Academy pathway. The Academy teaches what the system is, why each requirement exists, how to build it correctly, how to inspect failure, and how to demonstrate readiness before consequence is allowed.</p>
+          <div className="academyDomainGrid">
+            {academyDomains.map(([code,title,text,href])=><Link href={href} key={title}><span>{code}</span><div><strong>{title}</strong><p>{text}</p></div><b>↗</b></Link>)}
+          </div>
+          <div className="featureActions"><Link className="grandButton academyButton" href="/academy">Enter the Central Academy <Arrow /></Link><Link className="grandButton glass" href="/academy/simulation-center">Open Simulation Center <Arrow /></Link></div>
+        </div>
+      </section>
+
+      <section className="entityReviewGateway shell">
+        <div className="sectionIntro">
+          <p className="eyebrow">ENTITY REVIEW · GUIDED LIKE TURBOTAX, GOVERNED LIKE TA-14</p>
+          <h2>We do not ask an entity to guess what a review requires. We teach it, build it, validate it, and receive it ready for review.</h2>
+          <p>The Entity Review Academy and live review workflow are one connected system. A participant learns why each element matters while constructing a complete package. At the end, the entity submits an organized, bounded, evidence-aware record that TA-14 can govern and return with findings.</p>
+        </div>
+        <div className="reviewJourney">
+          {entityJourney.map(([number,title,text],index)=><article key={number}><span>{number}</span><div><small>STEP {index+1} OF {entityJourney.length}</small><h3>{title}</h3><p>{text}</p></div></article>)}
+        </div>
+        <div className="reviewReadinessPanel">
+          <div><p className="eyebrow">WHAT THE PARTICIPANT BUILDS</p><h3>A complete, review-ready governance package</h3><ul><li>Entity identity, ownership, roles, systems, and versions</li><li>Bounded capability claim, scope, non-claims, and exclusions</li><li>Evidence, authority, continuity, confidentiality, and publication boundaries</li><li>Execution pathway, expected outcome, limitations, and unresolved questions</li></ul></div>
+          <div><p className="eyebrow">WHAT TA-14 RETURNS</p><h3>Bounded findings that distinguish proof from assertion</h3><ul><li>Supported, conditional, held, denied, escalated, or outside-scope findings</li><li>Corrective actions, evidence gaps, and reassessment requirements</li><li>Execution artifact, registry, case-study, and publication options</li><li>A preserved record of what was reviewed and what was not</li></ul></div>
+        </div>
+        <div className="featureActions centeredActions"><Link className="grandButton primary" href="/workspace/entity-review">Enter Guided Entity Review <Arrow /></Link><Link className="grandButton glass" href="/academy">Learn Entity Review First <Arrow /></Link></div>
       </section>
 
       <section className="exchangeExplanation shell">
         <div className="sectionIntro">
-          <p className="eyebrow">WHAT THE EXCHANGE ACTUALLY DOES</p>
-          <h2>It converts consequential claims into routes that can be inspected.</h2>
-          <p>The Exchange is not another dashboard that declares governance complete. It is the place where governance is built as a visible chain of evidence, authority, review, commitment, execution, and outcome.</p>
-        </div>
-        <div className="capabilityGrid">
-          {exchangeCapabilities.map(([number,title,text]) => <article key={number}><span>{number}</span><h3>{title}</h3><p>{text}</p></article>)}
+          <p className="eyebrow">THE GOVERNING CHAIN BENEATH EVERY DIVISION</p>
+          <h2>Different institutions. One requirement: preserve the route from reality to outcome.</h2>
+          <p>AI, environment, atmosphere, HVAC, research, law, standards, and entity review have different authorities and evidence. They share one discipline: no layer is allowed to disappear into the next.</p>
         </div>
         <div className="chainVault">
           <p className="bandEyebrow">THE TA-14 GOVERNING CHAIN</p>
           <div className="chain">
             {chain.map(([label, icon], index) => <div className="chainNode" key={label}><span className="chainIcon">{icon}</span><strong>{label}</strong>{index < chain.length - 1 && <i>→</i>}</div>)}
           </div>
-          <p>Each link may depend on the prior link, but no link is allowed to disappear into the next. That separation is what keeps the route open to scrutiny.</p>
+          <p>Reality becomes a record. The record must retain continuity. Evidence must become admissible. Authority and consequence must bind before commitment. Execution must correspond to the determination. Outcome must return to the record.</p>
+        </div>
+      </section>
+
+      <section className="modernizationSection shell">
+        <div className="sectionIntro centeredIntro">
+          <p className="eyebrow">CURRENT INSTRUMENTS · TA-14 PROPOSED UPGRADES</p>
+          <h2>We will not confuse laws with standards—or preserve either one as untouchable merely because it already exists.</h2>
+          <p>TA-14 will teach what each instrument is, preserve its real authority, identify what it leaves out, explain why the gap matters, and publish a clearly labeled proposed upgrade that can be inspected, challenged, improved, and eventually adopted.</p>
+        </div>
+        <div className="modernizationGrid">
+          {modernizationTracks.map((track)=><article key={track.code}><span className="modernCode">{track.code}</span><h3>{track.title}</h3><p>{track.text}</p><ul>{track.items.map(item=><li key={item}>✦ {item}</li>)}</ul><Link className="polishedAction" href={track.href}>Enter {track.title} <Arrow /></Link></article>)}
+        </div>
+        <div className="comparisonRoute">
+          <span>WHAT EXISTS</span><i>→</i><span>WHAT IT LEAVES OUT</span><i>→</i><span>WHY THE GAP MATTERS</span><i>→</i><span>WHAT TA-14 PROPOSES</span><i>→</i><span>WHAT CHANGES IN PRACTICE</span>
         </div>
       </section>
 
       <section className="credentialsSection shell" id="credentials">
         <div className="credentialsVisual" aria-hidden="true">
           <div className="credentialsHalo" />
-          <div className="credentialsSeal">
-            <small>TA-14</small>
-            <strong>CREDENTIALS</strong>
-            <span>IDENTITY • CLAIMS • EVIDENCE • PUBLIC RECORD</span>
-          </div>
-          <i className="credentialOrbit one" />
-          <i className="credentialOrbit two" />
+          <div className="credentialsSeal"><small>TA-14</small><strong>PUBLIC RECORD</strong><span>IDENTITY • CLAIMS • EVIDENCE • CHRONOLOGY</span></div>
+          <i className="credentialOrbit one" /><i className="credentialOrbit two" />
         </div>
-
         <div className="credentialsCopy">
-          <span className="statusFlag">PUBLIC CREDENTIAL RECORD AVAILABLE</span>
-          <p className="eyebrow">WHO WE ARE • WHAT WE CLAIM • WHAT WE CAN SHOW</p>
-          <h2>Do not take our word for it. Open the record.</h2>
-          <p>
-            The TA-14 credentials record brings the institution, founder and
-            stewardship identity, founding architecture, declared claims and
-            boundaries, public chronology, books, articles, Zenodo records,
-            GitHub repositories, filings, reference implementations, and
-            challenge routes into one public entrance.
-          </p>
-
+          <span className="statusFlag">PUBLIC RESEARCH AND INSTITUTIONAL RECORD</span>
+          <p className="eyebrow">WHAT WE BUILT · WHAT WE CLAIM · WHAT THE RECORD SUPPORTS</p>
+          <h2>The institution must be able to show its own work before asking anyone else to show theirs.</h2>
+          <p>The public record brings TA-14 identity, architecture, chronology, publications, repositories, filings, reference implementations, records, demonstrations, limitations, disputes, corrections, and challenge pathways into one inspectable entrance.</p>
           <div className="credentialsGrid">
-            {[
-              ["Identity", "Institution, founder, authorship, stewardship, and declared ownership."],
-              ["Architecture", "Founding architecture, standards family, governing chain, and claimed scope."],
-              ["Chronology", "Dated declarations, releases, publications, versions, and public milestones."],
-              ["Publications", "Books, articles, public records, Zenodo deposits, and supporting materials."],
-              ["Technical Work", "GitHub repositories, platform implementations, demonstrations, and reference systems."],
-              ["Claims & Boundaries", "What TA-14 claims, what it does not claim, limitations, disputes, and correction routes."],
-            ].map(([title, text], index) => (
-              <article key={title}>
-                <span>{String(index + 1).padStart(2, "0")}</span>
-                <div>
-                  <strong>{title}</strong>
-                  <p>{text}</p>
-                </div>
-              </article>
-            ))}
+            {[["Identity","Institution, founder, authorship, stewardship, and declared ownership."],["Architecture","Governing chain, architecture families, standards, methods, and scope."],["Chronology","Dated declarations, releases, publications, versions, and milestones."],["Research","Public studies, technical work, records, repositories, and evidence packages."],["Claims","What TA-14 claims, what it does not claim, and what remains conditional."],["Correction","Challenges, objections, corrections, supersession, and preserved history."]].map(([title,text],index)=><article key={title}><span>{String(index+1).padStart(2,"0")}</span><div><strong>{title}</strong><p>{text}</p></div></article>)}
           </div>
-
-          <div className="credentialsBoundary">
-            <strong>The credentials record preserves proof of public work and declared claims.</strong>
-            <p>
-              It does not turn publication, registration, authorship, or a
-              filing into independent certification, regulatory approval, legal
-              priority, or proof that every implementation performs as claimed.
-            </p>
-          </div>
-
-          <div className="featureActions">
-            <Link className="grandButton gold credentialsPrimary" href="/foundation">
-              Open TA-14 Credentials &amp; Public Record <Arrow />
-            </Link>
-            <Link className="grandButton glass" href="/workspace/ai-governance/registry">
-              Inspect the Architectural Registry <Arrow />
-            </Link>
-          </div>
+          <div className="featureActions"><Link className="grandButton gold credentialsPrimary" href="/foundation">Open Public Research & Public Record <Arrow /></Link><Link className="grandButton glass" href="/registry">Open Registry <Arrow /></Link></div>
         </div>
       </section>
 
-      <section className="featureSection euSection shell">
-        <div className="featureCopy">
-          <p className="eyebrow">EU AI ACT GOVERNANCE WORKSPACE</p>
-          <h2>Turn legal obligations into inspectable applicability and evidence routes.</h2>
-          <p>Explore actor roles, system classification, high-risk duties, Article 50 transparency, evidence dependencies, unresolved questions, review pathways, records, and implementation boundaries without confusing a checklist with proof.</p>
-          <div className="statStrip"><span><b>2 AUG 2026</b>Article 50 transparency obligations apply</span><span><b>PROVIDERS</b>Systems, models, marking, disclosure, and evidence</span><span><b>DEPLOYERS</b>Use context, notice, deepfakes, and public-interest text</span></div>
-          <div className="featureActions">
-            <Link className="grandButton primary" href="/workspace/ai-governance/eu-ai-act">Open EU AI Act Workspace <Arrow /></Link>
-            <Link className="grandButton glass" href="/workspace/ai-governance">Open AI Governance <Arrow /></Link>
-          </div>
-        </div>
-        <div className="euUniverse" aria-hidden="true">
-          <div className="euPlanet"><span>EU</span>{Array.from({length:12}).map((_,i)=><i key={i} style={{"--i":i} as CSSProperties}/>)}</div>
-          <div className="euOrbit one"/><div className="euOrbit two"/><div className="euOrbit three"/>
-          <div className="articleMarkers"><span>50(1)</span><span>50(2)</span><span>50(3)</span><span>50(4)</span></div>
+      <section className="artifactLaunchDeck shell" aria-label="Execution Artifacts institution">
+        <div className="artifactLaunchSignal" aria-hidden="true"><span className="signalCore">EA</span><i className="signalRing ringOne"/><i className="signalRing ringTwo"/><i className="signalRing ringThree"/><b className="signalBeam beamOne"/><b className="signalBeam beamTwo"/></div>
+        <div className="artifactLaunchCopy">
+          <p className="eyebrow">EXECUTION ARTIFACTS · REGISTRIES · VERIFICATION</p>
+          <h2>Governance becomes institutional when the route leaves behind proof.</h2>
+          <p>Inspect bounded execution records that preserve the proposed consequence, governing route, admitted evidence, authority, continuity, determination, technical execution effect, outcome, integrity package, verification path, and explicit proof boundary.</p>
+          <div className="artifactLaunchMetrics"><article><strong>12</strong><span>Founding artifacts</span></article><article><strong>4</strong><span>Determination states</span></article><article><strong>24</strong><span>Runtime links represented</span></article><article><strong>8</strong><span>Visible anchor links</span></article></div>
+          <div className="artifactLaunchActions"><Link className="grandButton artifactButton" href="/artifacts">Inspect Execution Artifacts <Arrow /></Link><Link className="grandButton glass" href="/artifacts/verify">Open Verification Center <Arrow /></Link><Link className="grandButton glass" href="/registry">Open Registry <Arrow /></Link></div>
         </div>
       </section>
 
       <section className="marketplaceSection shell">
-        <div className="marketplaceHeader">
-          <div>
-            <p className="eyebrow">THE GOVERNANCE MARKETPLACE</p>
-            <h2>Find work, post needs, discover reviewers, and build visible governance reputation.</h2>
-          </div>
-          <Link className="grandButton gold" href="/marketplace">Open Marketplace <Arrow /></Link>
-        </div>
+        <div className="marketplaceHeader"><div><p className="eyebrow">THE INSTITUTION IN MOTION</p><h2>Bring us your governance, evidence, environmental record, standard, proposed law, research, or bounded claim.</h2><p>TA-14 is building the pathways through which outside entities can learn the process, assemble what is necessary, enter the correct institutional division, and receive a preserved result.</p></div><Link className="grandButton gold" href="/marketplace/post">Post a Governed Need <Arrow /></Link></div>
         <div className="marketGrid">
-          {marketplaceItems.map(([title,text,href],index)=><Link href={href} key={title}><span>{String(index+1).padStart(2,"0")}</span><div className="marketOrb"/><h3>{title}</h3><p>{text}</p><b>Open pathway <Arrow /></b></Link>)}
-        </div>
-      </section>
-
-      <section className="featureSection networkSection shell">
-        <div className="networkVisual" aria-hidden="true">
-          <div className="networkCore">PRN</div>
-          {Array.from({length:8}).map((_,i)=><span key={i} style={{"--i":i} as CSSProperties}/>) }
-          <i className="networkRing one"/><i className="networkRing two"/><i className="networkRing three"/>
-        </div>
-        <div className="featureCopy">
-          <p className="eyebrow">TA-14 PARTNER REVIEW NETWORK</p>
-          <h2>Independent architectures remain independent. Review becomes connected.</h2>
-          <p>The Partner Review Network creates bounded review lanes for specialized governance systems and professionals. It preserves each partner's identity, scope, expertise, limitations, findings, and review history while adding a second TA-14 review layer where appropriate.</p>
-          <div className="networkSteps">{networkSteps.map(([title,text],i)=><article key={title}><span>{i+1}</span><div><strong>{title}</strong><p>{text}</p></div></article>)}</div>
-          <div className="featureActions"><Link className="grandButton primary" href="/marketplace">Discover Review Pathways <Arrow /></Link><Link className="grandButton glass" href="/marketplace/post">Post a Review Need <Arrow /></Link></div>
-        </div>
-      </section>
-
-      <section className="recordsConstellation shell">
-        <div className="sectionIntro centeredIntro">
-          <p className="eyebrow">RECORDS ARE NOT CONCLUSIONS</p>
-          <h2>Preserve the record. Bound the interpretation. Separate the determination.</h2>
-          <p>Environmental records now live inside the broader Governed Records institution. The source record remains separate from interpretation, diagnosis, determination, intervention, optimization, and outcome so the evidence can survive scrutiny.</p>
-        </div>
-        <div className="recordsPair">
-          <article className="recordWorld green"><div className="recordVisual"><i/><i/><i/><span>GR</span></div><h3>Governed Records</h3><p>Create, upload, preserve, interpret, review, version, and export records with explicit proof boundaries.</p><Link className="polishedAction" href="/workspace/governed-records">Open Governed Records <Arrow /></Link></article>
-          <article className="recordWorld blue"><div className="recordVisual atmosphere"><i/><i/><i/><span>ER</span></div><h3>Environmental Records</h3><p>Enter the environmental domain within Governed Records for atmospheric, building, hospital, HVAC, sensor, land, water, and air evidence.</p><Link className="polishedAction" href="/workspace/governed-records/environmental">Open Environmental Records <Arrow /></Link></article>
-        </div>
-      </section>
-
-      <section className="verificationSection shell">
-        <div className="verificationBeam" aria-hidden="true"><span/><span/><span/></div>
-        <div className="featureCopy">
-          <p className="eyebrow">RUNTIME VERIFICATION</p>
-          <h2>Approval is not the end of governance. The route must remain admissible through execution.</h2>
-          <p>Verification asks whether the identity, authority, evidence, continuity, binding, commit, execution, and outcome still correspond to the preserved route. When they do not, the system should HOLD, DENY, or ESCALATE instead of pretending the earlier approval still applies.</p>
-          <div className="featureActions"><Link className="grandButton primary" href="/workspace/verification">Open Verification <Arrow /></Link><Link className="grandButton glass" href="/workspace">Open Workspace <Arrow /></Link></div>
+          {[["Enter AI Governance","Build or review a consequential AI route, capability, architecture, artifact, or implementation.","/workspace/ai-governance"],["Enter Environmental Integrity","Preserve environmental reality and govern records, interventions, and outcomes.","/workspace/governed-records/environmental"],["Begin Entity Review","Use the guided Academy and readiness builder to create a review-ready package.","/workspace/entity-review"],["Join the Institutional Record","Publish, register, preserve, challenge, correct, and build inspectable reputation.","/registry"]].map(([title,text,href],index)=><Link href={href} key={title}><span>{String(index+1).padStart(2,"0")}</span><div className="marketOrb"/><h3>{title}</h3><p>{text}</p><b>Open pathway <Arrow /></b></Link>)}
         </div>
       </section>
 
       <section className="closingTemple shell">
         <div className="closingBurst" aria-hidden="true"/>
         <p className="eyebrow">TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
-        <h2>Choose the correct door. Preserve the evidence. Govern the route. Verify the outcome.</h2>
-        <p>The TA-14 AI Governance Exchange is open as a playground for builders, institutions, reviewers, founders, deployers, and anyone prepared to make consequential governance inspectable.</p>
-        <div className="heroActions centeredActions"><Link className="grandButton primary" href="/workspace">Enter the Exchange <Arrow /></Link><Link className="grandButton gold" href="/marketplace/post">Post a Governance Need <Arrow /></Link></div>
+        <h2>Enter the right world. Learn the architecture. Preserve the evidence. Govern the route. Verify the outcome.</h2>
+        <p>This is the public front door to an institution designed to govern AI, environmental reality, atmosphere, HVAC, entities, research, law, standards, execution, and future reliance without allowing one domain to erase the boundaries of another.</p>
+        <div className="heroActions centeredActions"><Link className="grandButton primary" href="#institutional-doors">Choose an Institutional Door <span>↑</span></Link><Link className="grandButton academyButton" href="/academy">Enter TA-14 Academy <Arrow /></Link><Link className="grandButton gold" href="/workspace/entity-review">Bring Us Your Governance <Arrow /></Link></div>
         <div className="sealChain">{chain.map(([label],index)=><span key={label}>{label}{index<chain.length-1&&<i>→</i>}</span>)}</div>
         <strong>No admissible evidence. No admissible execution.</strong>
       </section>
 
-      <footer className="shell"><span>TA-14 AI Governance Exchange</span><span>Architectural legibility without architectural assimilation.</span></footer>
+      <footer className="shell"><span>TA-14 Authority Governance Institution</span><span>One institution. Distinct authorities. Preserved evidence. Governed outcomes.</span></footer>
 
       <style jsx>{`
         :global(*) {
@@ -3181,7 +3109,230 @@ export default function HomePage() {
         }
 
 
-                @keyframes artifactHexPulse {
+        
+        .grandButton.academyButton {
+          color:#041a10;
+          background:linear-gradient(135deg,#d9ffeb,#64f2ad 56%,#1fbd78);
+          border-color:#9dffd0;
+          box-shadow:0 16px 34px rgba(50,219,142,.22),inset 0 1px rgba(255,255,255,.72)
+        }
+        .institutionalDoors {
+          grid-template-columns:repeat(4,minmax(0,1fr));
+          gap:20px
+        }
+        .institutionDoor {
+          position:relative
+        }
+        .institutionDoor .doorStage {
+          height:535px
+        }
+        .grandArch {
+          width:236px;
+          height:370px;
+          border-width:14px;
+          border-radius:145px 145px 18px 18px;
+          background:linear-gradient(90deg,#4b2d12,#d7b270 14%,#7b4b1a 29%,#f0d59b 48%,#7d4b18 68%,#d1a85f 84%,#43270e),repeating-linear-gradient(92deg,rgba(255,255,255,.07) 0 2px,transparent 2px 9px)
+        }
+        .grandDoorLeaf {
+          background:linear-gradient(100deg,rgba(255,255,255,.14),transparent 20%,transparent 76%,rgba(0,0,0,.33)),repeating-linear-gradient(96deg,rgba(255,255,255,.035) 0 2px,transparent 2px 8px),linear-gradient(90deg,#5c3514,#ad7938 34%,#d0a45f 51%,#9a6429 68%,#4f2d10)
+        }
+        .carvedPanels i {
+          border-color:rgba(69,38,13,.7);
+          border-radius:14px 14px 5px 5px;
+          box-shadow:inset 0 0 0 2px rgba(255,230,179,.09),inset 0 0 18px rgba(47,24,5,.34)
+        }
+        .interiorVista {
+          position:absolute;
+          inset:0;
+          z-index:1;
+          opacity:.74;
+          background:linear-gradient(180deg,rgba(255,244,205,.22),transparent 22%),radial-gradient(ellipse at 50% 90%,var(--accentGlow),transparent 52%)
+        }
+        .interiorVista span {
+          position:absolute;
+          left:50%;
+          bottom:18%;
+          width:46px;
+          height:170px;
+          transform:translateX(-50%);
+          border-radius:24px 24px 0 0;
+          border:1px solid color-mix(in srgb,var(--accent) 46%,white);
+          background:linear-gradient(180deg,color-mix(in srgb,var(--accent) 18%,transparent),rgba(2,9,15,.38));
+          box-shadow:0 0 30px var(--accentGlow)
+        }
+        .interiorVista span:nth-child(2) {transform:translateX(-120px) scale(.72);opacity:.5}
+        .interiorVista span:nth-child(3) {transform:translateX(74px) scale(.72);opacity:.5}
+        .institutionDoor:hover .singleDoor,.institutionDoor:focus-visible .singleDoor {
+          transform:translateZ(36px) rotateY(-34deg) translateX(-8px);
+          filter:saturate(1.16) brightness(1.08);
+          box-shadow:inset 0 0 0 3px rgba(58,32,10,.45),inset 0 0 30px rgba(255,228,170,.18),34px 24px 56px rgba(0,0,0,.62)
+        }
+        .grandLightSpill {
+          width:118px;
+          height:245px;
+          background:linear-gradient(180deg,rgba(255,251,221,1),color-mix(in srgb,var(--accent) 55%,#ffd16f) 38%,transparent 92%)
+        }
+        .institutionDoor:hover .grandLightSpill,.institutionDoor:focus-visible .grandLightSpill {
+          transform:translateX(-50%) scaleX(6.8);
+          opacity:.95
+        }
+        .dustInLight {
+          position:absolute;
+          left:50%;
+          bottom:5px;
+          width:310px;
+          height:220px;
+          transform:translateX(-50%);
+          opacity:0;
+          z-index:6;
+          pointer-events:none;
+          transition:opacity .5s
+        }
+        .dustInLight i {
+          position:absolute;
+          left:calc((var(--d) * 23%) % 96%);
+          bottom:calc((var(--d) * 13%) % 45%);
+          width:4px;
+          height:4px;
+          border-radius:50%;
+          background:#fff4c8;
+          box-shadow:0 0 10px #ffe298;
+          animation:dustRise calc(3.8s + var(--d) * .12s) linear infinite;
+          animation-delay:calc(var(--d) * -.31s)
+        }
+        .institutionDoor:hover .dustInLight,.institutionDoor:focus-visible .dustInLight {opacity:.9}
+        .institutionalCard {
+          min-height:404px;
+          background:linear-gradient(180deg,rgba(34,27,18,.97),rgba(9,13,17,.99))
+        }
+        .academyDoor .archFrame {
+          box-shadow:0 0 0 3px rgba(190,255,218,.45),0 0 52px rgba(57,242,161,.34),inset 0 0 24px rgba(200,255,223,.16)
+        }
+        .academySpine {
+          margin-top:120px;
+          min-height:760px;
+          padding:56px;
+          display:grid;
+          grid-template-columns:.86fr 1.34fr;
+          gap:68px;
+          align-items:center;
+          border:1px solid rgba(74,240,163,.24);
+          border-radius:34px;
+          background:radial-gradient(circle at 15% 45%,rgba(57,242,161,.15),transparent 36%),radial-gradient(circle at 92% 10%,rgba(78,190,255,.1),transparent 34%),linear-gradient(145deg,rgba(7,34,27,.94),rgba(4,15,25,.98));
+          box-shadow:0 32px 90px rgba(0,0,0,.3)
+        }
+        .academySpineVisual {
+          min-height:520px;
+          position:relative;
+          display:grid;
+          place-items:center
+        }
+        .academyCentralSeal {
+          width:220px;
+          height:220px;
+          position:relative;
+          z-index:5;
+          display:flex;
+          flex-direction:column;
+          align-items:center;
+          justify-content:center;
+          border-radius:50%;
+          border:2px solid #8dffd0;
+          background:radial-gradient(circle at 34% 28%,rgba(191,255,222,.3),rgba(9,61,40,.96) 48%,rgba(3,19,15,.99));
+          box-shadow:0 0 72px rgba(57,242,161,.32),inset 0 0 40px rgba(130,255,196,.15)
+        }
+        .academyCentralSeal small {color:#baffda;font-weight:950;letter-spacing:.25em}
+        .academyCentralSeal strong {margin:10px 0;color:#ecfff5;font-family:Georgia,serif;font-size:31px}
+        .academyCentralSeal span {max-width:150px;color:#9fd8bd;font-size:9px;font-weight:900;line-height:1.5;letter-spacing:.13em;text-align:center}
+        .academyOrbit {
+          position:absolute;
+          border-radius:50%;
+          border:1px solid rgba(98,246,178,.3);
+          animation:orbitSpin 22s linear infinite
+        }
+        .academyOrbit.orbitOne {width:360px;height:360px}
+        .academyOrbit.orbitTwo {width:470px;height:220px;transform:rotate(34deg);animation-direction:reverse;animation-duration:28s}
+        .academyOrbit.orbitThree {width:520px;height:260px;transform:rotate(-42deg);border-color:rgba(88,193,255,.24);animation-duration:34s}
+        .academySpineVisual>b {
+          position:absolute;
+          left:50%;
+          top:50%;
+          width:58px;
+          height:58px;
+          display:grid;
+          place-items:center;
+          border-radius:50%;
+          border:1px solid rgba(171,255,214,.46);
+          color:#dffff0;
+          background:radial-gradient(circle,#2f9e70,#0d3e2d 68%,#03130e);
+          box-shadow:0 0 24px rgba(57,242,161,.28);
+          transform:rotate(calc(var(--i)*45deg)) translateY(-205px) rotate(calc(var(--i)*-45deg));
+          font-size:10px
+        }
+        .academySpineCopy h2,.entityReviewGateway h2,.modernizationSection h2 {
+          margin:12px 0 16px;
+          font-family:Georgia,"Times New Roman",serif;
+          font-size:clamp(38px,4.8vw,72px);
+          line-height:.99;
+          letter-spacing:-.045em
+        }
+        .academySpineCopy>p:not(.eyebrow),.entityReviewGateway .sectionIntro>p:last-child,.modernizationSection .sectionIntro>p:last-child {color:#afc4bd;font-size:16px;line-height:1.72}
+        .academyDomainGrid {display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:25px}
+        .academyDomainGrid a {
+          min-height:126px;
+          padding:15px;
+          display:grid;
+          grid-template-columns:46px 1fr 18px;
+          gap:12px;
+          align-items:start;
+          border:1px solid rgba(78,232,160,.16);
+          border-radius:15px;
+          color:inherit;
+          text-decoration:none;
+          background:rgba(255,255,255,.024);
+          transition:.25s
+        }
+        .academyDomainGrid a:hover {transform:translateY(-4px);border-color:rgba(106,255,188,.52);box-shadow:0 18px 40px rgba(0,0,0,.22)}
+        .academyDomainGrid a>span {width:42px;height:42px;display:grid;place-items:center;border-radius:50%;border:1px solid #69eeb2;color:#baffd8;background:rgba(57,242,161,.08);font-size:10px;font-weight:950}
+        .academyDomainGrid strong {font-size:13px}
+        .academyDomainGrid p {margin:5px 0 0;color:#94aaa0;font-size:11px;line-height:1.5}
+        .academyDomainGrid a>b {color:#6ef2b0}
+        .entityReviewGateway {
+          margin-top:120px;
+          padding:62px 48px;
+          border:1px solid rgba(213,131,255,.22);
+          border-radius:34px;
+          background:radial-gradient(circle at 100% 0,rgba(205,104,255,.12),transparent 36%),linear-gradient(145deg,rgba(28,13,40,.94),rgba(5,16,26,.98));
+          box-shadow:0 32px 90px rgba(0,0,0,.3)
+        }
+        .reviewJourney {display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:34px}
+        .reviewJourney article {min-height:220px;padding:20px;border:1px solid rgba(214,139,255,.16);border-radius:18px;background:linear-gradient(145deg,rgba(49,24,66,.5),rgba(8,20,31,.9));transition:.25s}
+        .reviewJourney article:hover {transform:translateY(-6px);border-color:rgba(222,157,255,.46);box-shadow:0 22px 50px rgba(0,0,0,.28)}
+        .reviewJourney article>span {width:44px;height:44px;display:grid;place-items:center;border-radius:50%;border:1px solid rgba(221,151,255,.5);color:#efc9ff;background:rgba(199,91,255,.08);font-size:11px;font-weight:950}
+        .reviewJourney small {display:block;margin-top:18px;color:#9a77a8;font-size:9px;font-weight:900;letter-spacing:.1em}
+        .reviewJourney h3 {margin:8px 0;font-size:18px}
+        .reviewJourney p {margin:0;color:#a7aeb7;font-size:12px;line-height:1.55}
+        .reviewReadinessPanel {display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:22px}
+        .reviewReadinessPanel>div {padding:24px;border:1px solid rgba(114,216,239,.16);border-radius:19px;background:rgba(255,255,255,.025)}
+        .reviewReadinessPanel h3 {margin:10px 0 14px;font-family:Georgia,serif;font-size:25px}
+        .reviewReadinessPanel ul {display:grid;gap:10px;margin:0;padding-left:18px;color:#aebdc5;font-size:12px;line-height:1.5}
+        .modernizationSection {margin-top:120px;padding:64px 48px;border:1px solid rgba(255,190,67,.22);border-radius:34px;background:radial-gradient(circle at 50% 0,rgba(255,186,51,.11),transparent 40%),linear-gradient(145deg,rgba(31,24,15,.95),rgba(5,15,25,.98));box-shadow:0 32px 90px rgba(0,0,0,.3)}
+        .modernizationGrid {display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:36px}
+        .modernizationGrid article {min-height:470px;padding:32px;border:1px solid rgba(255,198,78,.18);border-radius:24px;background:linear-gradient(145deg,rgba(52,37,18,.7),rgba(8,19,30,.94));box-shadow:0 22px 60px rgba(0,0,0,.24)}
+        .modernCode {width:62px;height:62px;display:grid;place-items:center;border-radius:50%;border:1px solid #ffd16c;color:#ffe3a3;background:rgba(255,191,59,.08);box-shadow:0 0 28px rgba(255,186,51,.16);font-size:12px;font-weight:950}
+        .modernizationGrid h3 {margin:24px 0 12px;font-family:Georgia,serif;font-size:34px}
+        .modernizationGrid p {color:#b6b4ad;line-height:1.68}
+        .modernizationGrid ul {display:grid;gap:11px;margin:20px 0 26px;padding:0;list-style:none;color:#d3c6a7;font-size:13px}
+        .modernizationGrid .polishedAction {min-height:48px;padding:0 17px;display:inline-flex;align-items:center;gap:12px;border-radius:11px;border:1px solid rgba(255,202,95,.35);color:#ffe3a5;background:rgba(255,184,43,.07);text-decoration:none;font-size:12px;font-weight:950}
+        .comparisonRoute {margin-top:24px;padding:18px;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 16px;border:1px solid rgba(255,202,95,.17);border-radius:17px;background:rgba(255,255,255,.02);color:#e8d4a5;font-size:10px;font-weight:950;letter-spacing:.09em}
+        .comparisonRoute i {color:#d49423;font-style:normal}
+        @keyframes dustRise {
+          from {transform:translateY(18px) translateX(-8px) scale(.6);opacity:0}
+          20% {opacity:.8}
+          80% {opacity:.55}
+          to {transform:translateY(-190px) translateX(18px) scale(1.2);opacity:0}
+        }
+        @keyframes artifactHexPulse {
           from {
             transform:scale(.92) rotate(-3deg);
               opacity:.42
@@ -3620,7 +3771,25 @@ export default function HomePage() {
 
         }
 
-                @media(prefers-reduced-motion:reduce) {
+        
+        @media(max-width:1280px) {
+          .institutionalDoors {grid-template-columns:repeat(3,1fr)}
+          .academySpine {grid-template-columns:1fr}
+          .reviewJourney {grid-template-columns:repeat(2,1fr)}
+        }
+        @media(max-width:980px) {
+          .institutionalDoors {grid-template-columns:repeat(2,1fr)}
+          .academyDomainGrid {grid-template-columns:1fr}
+          .modernizationGrid {grid-template-columns:1fr}
+        }
+        @media(max-width:760px) {
+          .institutionalDoors,.reviewJourney,.reviewReadinessPanel {grid-template-columns:1fr}
+          .academySpine,.entityReviewGateway,.modernizationSection {padding:34px 20px;margin-top:80px}
+          .academySpineVisual {min-height:390px;transform:scale(.76)}
+          .institutionDoor .doorStage {height:500px}
+          .institutionRule span {max-width:260px}
+        }
+        @media(prefers-reduced-motion:reduce) {
           *,*::before,*::after {
             animation-duration:1ms!important;
               animation-iteration-count:1!important;
