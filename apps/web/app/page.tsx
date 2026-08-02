@@ -169,7 +169,7 @@ const workspaces = [
     id: "environment",
     code: "EI",
     title: "Environmental Integrity Governance",
-    href: "/workspace/governed-records/environmental",
+    href: "/environmental-integrity-governance",
     kicker: "GOVERN ENVIRONMENTAL REALITY FROM RECORD TO OUTCOME",
     description:
       "Govern air, water, land, pollution, buildings, HVAC systems, atmospheric evidence, environmental intervention, and verified outcomes through one environmental institution.",
@@ -420,9 +420,9 @@ export default function HomePage() {
         </div>
         <div className="environmentalWorldGrid">
           {[
-            ["AIR", "Atmospheric Integrity Records", "Preserve exterior, interior, building, hospital, laboratory, and environmental atmospheric evidence with instrument, location, chronology, and continuity intact.", "/workspace/governed-records/environmental"],
-            ["PAIR", "Personal Atmospheric Integrity Records", "Create bounded personal exposure records that distinguish measured conditions, context, interpretation, intervention, and outcome.", "/workspace/governed-records/environmental"],
-            ["HVAC", "HVAC Governance", "Govern diagnostics, electrical integrity, refrigerant work, airflow, pressure, moisture, sensing, intervention, and post-intervention performance.", "/workspace/governed-records/environmental"],
+            ["AIR", "Atmospheric Integrity Records", "Preserve exterior, interior, building, hospital, laboratory, and environmental atmospheric evidence with instrument, location, chronology, and continuity intact.", "/environmental-integrity-governance"],
+            ["PAIR", "Personal Atmospheric Integrity Records", "Create bounded personal exposure records that distinguish measured conditions, context, interpretation, intervention, and outcome.", "/environmental-integrity-governance"],
+            ["HVAC", "HVAC Governance", "Govern diagnostics, electrical integrity, refrigerant work, airflow, pressure, moisture, sensing, intervention, and post-intervention performance.", "/environmental-integrity-governance"],
             ["ER", "Environmental Entity Review", "Guide environmental, building, HVAC, sensor, and atmospheric entities through scoped evidence preparation and governed review.", "/workspace/entity-review"],
           ].map(([code,title,text,href]) => (
             <Link href={href} key={title}>
@@ -529,7 +529,7 @@ export default function HomePage() {
       <section className="marketplaceSection shell">
         <div className="marketplaceHeader"><div><p className="eyebrow">THE INSTITUTION IN MOTION</p><h2>Bring us your governance, evidence, environmental record, standard, proposed law, research, or bounded claim.</h2><p>TA-14 is building the pathways through which outside entities can learn the process, assemble what is necessary, enter the correct institutional division, and receive a preserved result.</p></div><Link className="grandButton gold" href="/marketplace/post">Post a Governed Need <Arrow /></Link></div>
         <div className="marketGrid">
-          {[["Enter AI Governance","Build or review a consequential AI route, capability, architecture, artifact, or implementation.","/workspace/ai-governance"],["Enter Environmental Integrity","Preserve environmental reality and govern records, interventions, and outcomes.","/workspace/governed-records/environmental"],["Begin Entity Review","Use the guided Academy and readiness builder to create a review-ready package.","/workspace/entity-review"],["Join the Institutional Record","Publish, register, preserve, challenge, correct, and build inspectable reputation.","/registry"]].map(([title,text,href],index)=><Link href={href} key={title}><span>{String(index+1).padStart(2,"0")}</span><div className="marketOrb"/><h3>{title}</h3><p>{text}</p><b>Open pathway <Arrow /></b></Link>)}
+          {[["Enter AI Governance","Build or review a consequential AI route, capability, architecture, artifact, or implementation.","/workspace/ai-governance"],["Enter Environmental Integrity","Preserve environmental reality and govern records, interventions, and outcomes.","/environmental-integrity-governance"],["Begin Entity Review","Use the guided Academy and readiness builder to create a review-ready package.","/workspace/entity-review"],["Join the Institutional Record","Publish, register, preserve, challenge, correct, and build inspectable reputation.","/registry"]].map(([title,text,href],index)=><Link href={href} key={title}><span>{String(index+1).padStart(2,"0")}</span><div className="marketOrb"/><h3>{title}</h3><p>{text}</p><b>Open pathway <Arrow /></b></Link>)}
         </div>
       </section>
 
