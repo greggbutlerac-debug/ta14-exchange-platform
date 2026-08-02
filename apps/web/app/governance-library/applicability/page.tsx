@@ -532,6 +532,13 @@ function statusClass(status: ApplicabilityStatus) {
   return status.toLowerCase().replace(/\s+/g, "-");
 }
 
+function resolveApplicabilityStatus(score: number, index: number): ApplicabilityStatus {
+  if (score >= 15) return "Likely Applicable";
+  if (score >= 9) return "Review Required";
+  if (index < 6) return "Supporting Authority";
+  return "Outside Current Scope";
+}
+
 export default function ApplicabilityPage() {
   const [profile, setProfile] = useState<DeterminationProfile>(initialProfile);
   const [selectedId, setSelectedId] = useState("clean-air-act");
@@ -542,14 +549,7 @@ export default function ApplicabilityPage() {
       .sort((a, b) => b.score - a.score)
       .map(({ authority, score }, index) => ({
         ...authority,
-        computedStatus:
-          score >= 15
-            ? "Likely Applicable"
-            : score >= 9
-              ? "Review Required"
-              : index < 6
-                ? "Supporting Authority"
-                : "Outside Current Scope",
+        computedStatus: resolveApplicabilityStatus(score, index),
         score,
       }));
   }, [profile]);
