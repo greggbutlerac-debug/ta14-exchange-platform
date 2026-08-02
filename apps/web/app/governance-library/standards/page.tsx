@@ -6,7 +6,8 @@ import { useMemo, useState } from "react";
 type StandardStatus =
   | "Published"
   | "Under development"
-  | "Guidance";
+  | "Guidance"
+  | "Proposed by TA-14";
 
 type StandardRecord = {
   id: string;
@@ -29,16 +30,13 @@ const standards: StandardRecord[] = [
   {
     id: "iso-42001",
     name: "ISO/IEC 42001",
-    title:
-      "Artificial intelligence — Management system",
+    title: "Artificial intelligence — Management system",
     organization: "ISO/IEC",
     type: "AI Management System",
     status: "Published",
     year: "2023",
-    summary:
-      "Requirements for establishing, implementing, maintaining, and continually improving an artificial intelligence management system.",
-    purpose:
-      "Provides an organizational management structure for governing the responsible development, provision, and use of artificial intelligence.",
+    summary: "Requirements for establishing, implementing, maintaining, and continually improving an artificial intelligence management system.",
+    purpose: "Provides an organizational management structure for governing responsible development, provision, and use of AI.",
     coreAreas: [
       "Organizational context",
       "Leadership and accountability",
@@ -64,23 +62,19 @@ const standards: StandardRecord[] = [
       "NIST AI RMF",
       "EU AI Act",
     ],
-    boundary:
-      "Management-system conformity may support organizational assurance, but it does not independently prove that a specific AI action was authorized, evidence-supported, admissible, and properly executed.",
+    boundary: "Management-system conformity may support organizational assurance, but it does not independently prove that a specific AI action was authorized, evidence-supported, admissible, and properly executed.",
     href: "/governance-library/iso-iec-42001-2023",
   },
   {
     id: "iso-23894",
     name: "ISO/IEC 23894",
-    title:
-      "Artificial intelligence — Guidance on risk management",
+    title: "Artificial intelligence — Guidance on risk management",
     organization: "ISO/IEC",
     type: "AI Risk Management",
     status: "Guidance",
     year: "2023",
-    summary:
-      "Guidance for integrating artificial-intelligence risk management into organizational activities and functions.",
-    purpose:
-      "Supports the identification, analysis, evaluation, treatment, monitoring, review, recording, and communication of AI risk.",
+    summary: "Guidance for integrating AI risk management into organizational activities and functions.",
+    purpose: "Supports identification, analysis, evaluation, treatment, monitoring, review, recording, and communication of AI risk.",
     coreAreas: [
       "Risk context",
       "Risk identification",
@@ -105,244 +99,876 @@ const standards: StandardRecord[] = [
       "NIST AI RMF",
       "ISO 31000",
     ],
-    boundary:
-      "A risk-management record may support a governance decision, but risk assessment alone does not establish authority or permission for consequential execution.",
+    boundary: "Risk assessment alone does not establish current authority or permission for consequential execution.",
   },
   {
-    id: "iso-22989",
-    name: "ISO/IEC 22989",
-    title:
-      "Artificial intelligence — Concepts and terminology",
-    organization: "ISO/IEC",
-    type: "Terminology Standard",
-    status: "Published",
-    year: "2022",
-    summary:
-      "Defines concepts and terminology used across artificial-intelligence systems and governance activities.",
-    purpose:
-      "Provides a common vocabulary to improve consistency across standards, policies, technical documentation, and governance records.",
+    id: "nist-ai-rmf",
+    name: "NIST AI RMF 1.0",
+    title: "Artificial Intelligence Risk Management Framework",
+    organization: "NIST",
+    type: "AI Governance Framework",
+    status: "Guidance",
+    year: "2023",
+    summary: "A voluntary framework organized around Govern, Map, Measure, and Manage functions.",
+    purpose: "Supports organizations in managing risks to individuals, organizations, and society across the AI lifecycle.",
     coreAreas: [
-      "AI concepts",
-      "Machine learning",
-      "System lifecycle",
-      "Actors and roles",
-      "Data concepts",
-      "System characteristics",
-      "Trustworthiness terminology",
+      "Govern",
+      "Map",
+      "Measure",
+      "Manage",
+      "Trustworthiness characteristics",
+      "Lifecycle risk",
+      "Stakeholder impacts",
+      "Continuous improvement",
     ],
     evidence: [
-      "Terminology mapping",
-      "Definition source",
-      "Version record",
-      "System classification",
-      "Role classification",
-      "Documentation reference",
+      "Governance profile",
+      "Context map",
+      "Measurement plan",
+      "Risk register",
+      "Impact record",
+      "Management decision",
+      "Monitoring evidence",
     ],
     relationships: [
-      "ISO/IEC 23053",
       "ISO/IEC 42001",
       "ISO/IEC 23894",
+      "NIST AI RMF Playbook",
     ],
-    boundary:
-      "Shared terminology improves interpretation, but a definition does not prove legal applicability, system performance, evidence sufficiency, or execution authority.",
+    boundary: "A framework profile can organize governance work, but it does not itself create legal authority or prove that a particular execution crossed an admissible boundary.",
   },
   {
-    id: "iso-23053",
-    name: "ISO/IEC 23053",
-    title:
-      "Framework for artificial intelligence systems using machine learning",
-    organization: "ISO/IEC",
-    type: "Technical Framework",
+    id: "ashrae-62-1",
+    name: "ANSI/ASHRAE 62.1-2025",
+    title: "Ventilation and Acceptable Indoor Air Quality",
+    organization: "ASHRAE",
+    type: "Indoor Air Quality Standard",
     status: "Published",
-    year: "2022",
-    summary:
-      "A framework describing artificial-intelligence systems that use machine-learning technology.",
-    purpose:
-      "Supports consistent technical descriptions of machine-learning systems, components, functions, and lifecycle relationships.",
+    year: "2025",
+    summary: "Minimum ventilation and other requirements for acceptable indoor air quality in nonresidential and applicable residential spaces.",
+    purpose: "Supports ventilation design, filtration, controls, air cleaning, operations, and maintenance for occupied buildings.",
     coreAreas: [
-      "Machine-learning system structure",
-      "Training",
-      "Inference",
-      "Data flow",
-      "Model lifecycle",
-      "System components",
-      "Functional relationships",
+      "Outdoor air",
+      "Ventilation rate procedure",
+      "IAQ procedure",
+      "Filtration",
+      "Humidity control",
+      "Exhaust",
+      "Operations and maintenance",
+      "Emergency controls",
     ],
     evidence: [
-      "System architecture",
-      "Model description",
-      "Training record",
-      "Inference record",
-      "Data-flow map",
-      "Lifecycle record",
-      "Component traceability",
+      "Design calculations",
+      "Occupancy assumptions",
+      "Outdoor-air measurement",
+      "Filter selection",
+      "Control sequences",
+      "Commissioning record",
+      "Maintenance record",
+      "Operational verification",
     ],
     relationships: [
-      "ISO/IEC 22989",
-      "ISO/IEC 5338",
-      "ISO/IEC 42001",
+      "ASHRAE 62.2",
+      "ASHRAE 55",
+      "ASHRAE 241",
+      "Building codes",
     ],
-    boundary:
-      "A technical framework can describe how a system operates, but description alone does not establish that its data, model, output, or action is admissible.",
+    boundary: "A design or calculation claiming conformance does not prove that the occupied building continuously delivered the required environmental condition or protected each activity at the time of reliance.",
   },
   {
-    id: "iso-5338",
-    name: "ISO/IEC 5338",
-    title:
-      "Artificial intelligence system life cycle processes",
-    organization: "ISO/IEC",
-    type: "Lifecycle Standard",
+    id: "ashrae-62-2",
+    name: "ANSI/ASHRAE 62.2-2025",
+    title: "Ventilation and Acceptable Indoor Air Quality in Residential Buildings",
+    organization: "ASHRAE",
+    type: "Residential IAQ Standard",
+    status: "Published",
+    year: "2025",
+    summary: "Minimum dwelling-unit ventilation, local exhaust, filtration, and source-control requirements for residential occupancies.",
+    purpose: "Provides a consensus baseline for residential ventilation and indoor-air-quality design and operation.",
+    coreAreas: [
+      "Dwelling ventilation",
+      "Local exhaust",
+      "Source control",
+      "Filtration",
+      "Air-cleaning devices",
+      "Duct design",
+      "Ground moisture control",
+      "Operations",
+    ],
+    evidence: [
+      "Floor area",
+      "Occupancy basis",
+      "Fan airflow test",
+      "Exhaust verification",
+      "Filter record",
+      "Installation record",
+      "Owner information",
+      "Maintenance evidence",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "ASHRAE 241",
+      "Residential codes",
+    ],
+    boundary: "Prescriptive ventilation compliance does not establish that an individual dwelling remained environmentally valid under changing occupancy, outdoor air, moisture, wildfire, or equipment conditions.",
+  },
+  {
+    id: "ashrae-52-2",
+    name: "ANSI/ASHRAE 52.2-2025",
+    title: "Method of Testing General Ventilation Air-Cleaning Devices for Removal Efficiency by Particle Size",
+    organization: "ASHRAE",
+    type: "Air-Cleaner Test Standard",
+    status: "Published",
+    year: "2025",
+    summary: "Laboratory test method for particle-size removal efficiency and resistance of general ventilation air-cleaning devices.",
+    purpose: "Supports comparable testing and reporting of filters used in ventilation systems.",
+    coreAreas: [
+      "Particle-size efficiency",
+      "MERV classification",
+      "Pressure drop",
+      "Dust loading",
+      "Conditioning",
+      "Test aerosol",
+      "Reporting",
+      "Laboratory controls",
+    ],
+    evidence: [
+      "Test report",
+      "Device identity",
+      "Lot and model",
+      "Test conditions",
+      "Efficiency curve",
+      "Pressure-drop curve",
+      "Laboratory record",
+      "Version record",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "ASHRAE 62.2",
+      "ASHRAE 241",
+    ],
+    boundary: "A filter rating is not proof of installed-system performance; bypass, loading, airflow, fit, maintenance, and real operating conditions must be preserved.",
+  },
+  {
+    id: "ashrae-55",
+    name: "ANSI/ASHRAE 55-2023",
+    title: "Thermal Environmental Conditions for Human Occupancy",
+    organization: "ASHRAE",
+    type: "Thermal Comfort Standard",
     status: "Published",
     year: "2023",
-    summary:
-      "Defines lifecycle processes for artificial-intelligence systems.",
-    purpose:
-      "Supports structured planning, development, operation, maintenance, governance, and retirement across the AI system lifecycle.",
+    summary: "Methods and criteria for evaluating thermal environmental conditions for human occupancy.",
+    purpose: "Supports assessment of thermal comfort using environmental and personal factors.",
     coreAreas: [
-      "Lifecycle planning",
-      "Development",
+      "Air temperature",
+      "Radiant temperature",
+      "Humidity",
+      "Air speed",
+      "Metabolic rate",
+      "Clothing insulation",
+      "Local discomfort",
+      "Adaptive comfort",
+    ],
+    evidence: [
+      "Instrument record",
+      "Measurement location",
+      "Occupancy context",
+      "Clothing and activity assumptions",
+      "Calculation record",
+      "Survey evidence",
+      "Exception record",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "ISO 7730",
+      "Building operations",
+    ],
+    boundary: "A comfort calculation does not prove environmental safety, health protection, or activity validity, and it must not be substituted for evidence of ventilation or contaminant control.",
+  },
+  {
+    id: "ashrae-90-1",
+    name: "ANSI/ASHRAE/IES 90.1-2025",
+    title: "Energy Standard for Buildings Except Low-Rise Residential Buildings",
+    organization: "ASHRAE/IES",
+    type: "Building Energy Standard",
+    status: "Published",
+    year: "2025",
+    summary: "Minimum energy-efficiency requirements for design and construction of most buildings other than low-rise residential buildings.",
+    purpose: "Provides a model basis for energy codes and performance requirements.",
+    coreAreas: [
+      "Building envelope",
+      "HVAC efficiency",
+      "Controls",
+      "Lighting",
+      "Power",
+      "Energy modeling",
+      "Commissioning",
+      "Documentation",
+    ],
+    evidence: [
+      "Compliance path",
+      "Equipment schedules",
+      "Control sequences",
+      "Energy model",
+      "Commissioning record",
+      "Inspection record",
+      "Exception basis",
+    ],
+    relationships: [
+      "IECC",
+      "ASHRAE 100",
+      "ASHRAE 90.4",
+    ],
+    boundary: "Energy compliance does not prove indoor environmental integrity; efficiency measures must remain bounded by ventilation, humidity, pressure, health, and activity requirements.",
+  },
+  {
+    id: "ashrae-170",
+    name: "ANSI/ASHRAE/ASHE 170",
+    title: "Ventilation of Health Care Facilities",
+    organization: "ASHRAE/ASHE",
+    type: "Health-Care Ventilation Standard",
+    status: "Published",
+    year: "Current edition",
+    summary: "Minimum ventilation requirements for health-care facilities and spaces, intended for adoption and use by code authorities.",
+    purpose: "Supports air-change, pressure, filtration, temperature, humidity, exhaust, and system requirements for clinical spaces.",
+    coreAreas: [
+      "Space classification",
+      "Air changes",
+      "Pressure relationships",
+      "Filtration",
+      "Temperature and humidity",
+      "Exhaust",
+      "Outdoor air",
+      "System operation",
+    ],
+    evidence: [
+      "Room schedule",
+      "Pressure verification",
+      "Airflow testing",
+      "Filter record",
+      "Commissioning",
+      "Alarm history",
+      "Maintenance record",
+      "Operational exception",
+    ],
+    relationships: [
+      "FGI Guidelines",
+      "ASHRAE 62.1",
+      "ASHRAE Guideline 43",
+    ],
+    boundary: "A design table is not proof that a clinical room maintained the required pressure, filtration, airflow, and activity validity during actual care.",
+  },
+  {
+    id: "ashrae-188",
+    name: "ANSI/ASHRAE 188",
+    title: "Legionellosis: Risk Management for Building Water Systems",
+    organization: "ASHRAE",
+    type: "Building Water Risk Standard",
+    status: "Published",
+    year: "Current edition",
+    summary: "Minimum legionellosis risk-management requirements for certain building water systems.",
+    purpose: "Establishes program, team, analysis, control, verification, validation, and documentation expectations.",
+    coreAreas: [
+      "Program team",
+      "System analysis",
+      "Control locations",
+      "Control limits",
+      "Monitoring",
+      "Corrective action",
       "Verification",
       "Validation",
-      "Deployment",
-      "Operation",
-      "Maintenance",
-      "Retirement",
     ],
     evidence: [
-      "Lifecycle plan",
-      "Requirements record",
-      "Verification result",
+      "Water-management plan",
+      "System diagram",
+      "Control data",
+      "Corrective-action record",
       "Validation result",
-      "Deployment approval",
-      "Operational record",
-      "Change record",
-      "Retirement record",
+      "Team review",
+      "Maintenance history",
     ],
     relationships: [
-      "ISO/IEC 42001",
-      "ISO/IEC 23053",
-      "ISO/IEC 23894",
+      "ASHRAE Guideline 12",
+      "CDC guidance",
+      "Building codes",
     ],
-    boundary:
-      "Lifecycle discipline can preserve process integrity, but each consequential execution still requires current authority, evidence, binding, and outcome preservation.",
+    boundary: "A written water-management plan does not prove controls were continuously effective or that a specific exposure was prevented; operational records and outcomes remain necessary.",
   },
   {
-    id: "iso-24027",
-    name: "ISO/IEC TR 24027",
-    title:
-      "Bias in AI systems and AI-aided decision making",
-    organization: "ISO/IEC",
-    type: "Technical Report",
-    status: "Guidance",
-    year: "2021",
-    summary:
-      "Guidance addressing bias in artificial-intelligence systems and AI-supported decision-making.",
-    purpose:
-      "Supports identification, understanding, assessment, and treatment of bias sources across AI systems and lifecycle activities.",
-    coreAreas: [
-      "Bias sources",
-      "Data bias",
-      "Model bias",
-      "Human bias",
-      "Evaluation",
-      "Mitigation",
-      "Monitoring",
-    ],
-    evidence: [
-      "Bias assessment",
-      "Dataset analysis",
-      "Evaluation result",
-      "Mitigation record",
-      "Stakeholder review",
-      "Monitoring record",
-      "Outcome analysis",
-    ],
-    relationships: [
-      "ISO/IEC 24028",
-      "ISO/IEC 23894",
-      "NIST AI RMF",
-    ],
-    boundary:
-      "Bias assessment supports governance, but it must be tied to the actual system version, affected population, use context, decision, and preserved outcome.",
-  },
-  {
-    id: "iso-24028",
-    name: "ISO/IEC TR 24028",
-    title:
-      "Overview of trustworthiness in artificial intelligence",
-    organization: "ISO/IEC",
-    type: "Technical Report",
-    status: "Guidance",
-    year: "2020",
-    summary:
-      "An overview of trustworthiness characteristics and considerations for artificial-intelligence systems.",
-    purpose:
-      "Provides a structured view of characteristics such as reliability, robustness, safety, security, privacy, transparency, and accountability.",
-    coreAreas: [
-      "Reliability",
-      "Robustness",
-      "Safety",
-      "Security",
-      "Privacy",
-      "Transparency",
-      "Accountability",
-      "Resilience",
-    ],
-    evidence: [
-      "Trustworthiness criteria",
-      "Test result",
-      "Security assessment",
-      "Safety record",
-      "Reliability analysis",
-      "Transparency record",
-      "Accountability assignment",
-    ],
-    relationships: [
-      "ISO/IEC 42001",
-      "ISO/IEC 23894",
-      "ISO/IEC 24027",
-    ],
-    boundary:
-      "Trustworthiness characteristics guide evaluation, but a general trust claim cannot substitute for admissible evidence tied to a particular decision and execution.",
-  },
-  {
-    id: "ieee-7000",
-    name: "IEEE 7000",
-    title:
-      "Model process for addressing ethical concerns during system design",
-    organization: "IEEE",
-    type: "Ethical Design Standard",
+    id: "ashrae-241",
+    name: "ANSI/ASHRAE 241",
+    title: "Control of Infectious Aerosols",
+    organization: "ASHRAE",
+    type: "Infectious Aerosol Standard",
     status: "Published",
-    year: "2021",
-    summary:
-      "A process for identifying stakeholder values and translating ethical concerns into system requirements.",
-    purpose:
-      "Supports traceable incorporation of ethical values, stakeholder concerns, and value-based requirements into system design.",
+    year: "Current edition",
+    summary: "Minimum requirements for reducing exposure to infectious aerosols in new and existing buildings.",
+    purpose: "Addresses equivalent clean airflow, infection-risk management mode, planning, design, installation, commissioning, operation, and maintenance.",
     coreAreas: [
-      "Stakeholder identification",
-      "Value elicitation",
-      "Ethical risk",
-      "Requirement translation",
-      "Traceability",
-      "Verification",
-      "Lifecycle review",
+      "Equivalent clean airflow",
+      "Infection risk management mode",
+      "Outdoor air",
+      "Filtration",
+      "Air cleaning",
+      "Planning",
+      "Commissioning",
+      "Operations",
     ],
     evidence: [
-      "Stakeholder record",
-      "Value analysis",
-      "Ethical-risk record",
-      "Requirement trace",
-      "Design decision",
-      "Verification result",
-      "Review record",
+      "Building readiness plan",
+      "Clean-air calculations",
+      "Filter and air-cleaner data",
+      "Control sequence",
+      "Commissioning record",
+      "Operational mode record",
+      "Maintenance evidence",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "ASHRAE 62.2",
+      "ASHRAE 170",
+    ],
+    boundary: "A building plan or calculated clean-air target does not prove that the required mode was activated, maintained, and effective during a specific infectious-risk event.",
+  },
+  {
+    id: "ashrae-15",
+    name: "ASHRAE 15-2024",
+    title: "Safety Standard for Refrigeration Systems",
+    organization: "ASHRAE",
+    type: "Refrigeration Safety Standard",
+    status: "Published",
+    year: "2024",
+    summary: "Safety requirements for design, construction, installation, operation, inspection, and emergency response for refrigeration systems.",
+    purpose: "Supports risk controls for refrigerants, machinery rooms, detection, ventilation, pressure relief, and occupancy.",
+    coreAreas: [
+      "Refrigerant quantity",
+      "Occupancy classification",
+      "Machinery rooms",
+      "Detection",
+      "Ventilation",
+      "Pressure relief",
+      "Emergency controls",
+      "Installation",
+    ],
+    evidence: [
+      "System inventory",
+      "Charge calculation",
+      "Relief design",
+      "Detector test",
+      "Ventilation test",
+      "Inspection record",
+      "Emergency procedure",
+      "Change record",
+    ],
+    relationships: [
+      "ASHRAE 34",
+      "Mechanical codes",
+      "EPA refrigerant rules",
+    ],
+    boundary: "Code or design compliance does not prove that the actual refrigerant circuit, charge, leak state, detector, ventilation, and intervention remained within the governed boundary.",
+  },
+  {
+    id: "ashrae-34",
+    name: "ASHRAE 34-2024",
+    title: "Designation and Safety Classification of Refrigerants",
+    organization: "ASHRAE",
+    type: "Refrigerant Classification Standard",
+    status: "Published",
+    year: "2024",
+    summary: "Designation system and safety classifications for refrigerants based on toxicity and flammability.",
+    purpose: "Provides consistent refrigerant identifiers and classification inputs for safety standards and codes.",
+    coreAreas: [
+      "Designation",
+      "Toxicity class",
+      "Flammability class",
+      "Concentration limits",
+      "Data review",
+      "Classification change",
+      "Publication",
+    ],
+    evidence: [
+      "Refrigerant identity",
+      "Safety classification",
+      "SDS",
+      "Equipment listing",
+      "Charge record",
+      "Version record",
+    ],
+    relationships: [
+      "ASHRAE 15",
+      "EPA SNAP",
+      "Mechanical codes",
+    ],
+    boundary: "Classification is an input, not permission to charge, recover, release, substitute, or operate a refrigerant in a specific system.",
+  },
+  {
+    id: "ashrae-111",
+    name: "ANSI/ASHRAE 111-2024",
+    title: "Testing, Adjusting, and Balancing of Building HVAC Systems",
+    organization: "ASHRAE",
+    type: "HVAC Field Test Standard",
+    status: "Published",
+    year: "2024",
+    summary: "Procedures and instrumentation practices for testing, adjusting, and balancing HVAC systems.",
+    purpose: "Supports repeatable field measurement of airflow, hydronic flow, pressure, temperature, and system performance.",
+    coreAreas: [
+      "Instrument requirements",
+      "Air systems",
+      "Hydronic systems",
+      "Pressure",
+      "Temperature",
+      "Balancing",
+      "Reporting",
+      "Uncertainty",
+    ],
+    evidence: [
+      "Instrument identity",
+      "Calibration",
+      "Test conditions",
+      "Measurement points",
+      "Raw readings",
+      "Adjustment history",
+      "Final report",
+      "Exception record",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "NEBB procedures",
+      "AABC standards",
+    ],
+    boundary: "A final TAB report must not erase pre-adjustment reality, instrument limitations, inaccessible points, control state, or post-occupancy drift.",
+  },
+  {
+    id: "ashrae-180",
+    name: "ANSI/ASHRAE/ACCA 180",
+    title: "Standard Practice for Inspection and Maintenance of Commercial Building HVAC Systems",
+    organization: "ASHRAE/ACCA",
+    type: "HVAC Maintenance Standard",
+    status: "Published",
+    year: "Current edition",
+    summary: "Minimum inspection and maintenance practices for commercial building HVAC systems.",
+    purpose: "Supports maintenance planning, task intervals, condition assessment, and documentation.",
+    coreAreas: [
+      "Program development",
+      "Inventory",
+      "Inspection tasks",
+      "Maintenance tasks",
+      "Intervals",
+      "Condition response",
+      "Documentation",
+      "Program review",
+    ],
+    evidence: [
+      "Asset inventory",
+      "Task schedule",
+      "Inspection record",
+      "Deficiency record",
+      "Corrective action",
+      "Maintenance history",
+      "Program review",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "ASHRAE 90.1",
+      "Manufacturer instructions",
+    ],
+    boundary: "Completion of scheduled tasks does not prove environmental performance; maintenance evidence must connect to actual system state and verified outcome.",
+  },
+  {
+    id: "iso-14001",
+    name: "ISO 14001:2026",
+    title: "Environmental management systems — Requirements with guidance for use",
+    organization: "ISO",
+    type: "Environmental Management System",
+    status: "Published",
+    year: "2026",
+    summary: "Requirements for an environmental management system designed to improve environmental performance and fulfill compliance obligations.",
+    purpose: "Provides a management-system structure for policy, aspects, risks, operational control, evaluation, and improvement.",
+    coreAreas: [
+      "Context",
+      "Leadership",
+      "Environmental aspects",
+      "Compliance obligations",
+      "Objectives",
+      "Operational control",
+      "Performance evaluation",
+      "Improvement",
+    ],
+    evidence: [
+      "EMS scope",
+      "Aspect register",
+      "Compliance register",
+      "Objectives",
+      "Operational controls",
+      "Monitoring data",
+      "Audit",
+      "Management review",
+    ],
+    relationships: [
+      "ISO 14004",
+      "ISO 19011",
+      "Environmental law",
+    ],
+    boundary: "Certification to an EMS does not prove that a particular emission, discharge, exposure, intervention, or claimed environmental outcome was admissible and correct.",
+  },
+  {
+    id: "iso-17025",
+    name: "ISO/IEC 17025",
+    title: "General requirements for the competence of testing and calibration laboratories",
+    organization: "ISO/IEC",
+    type: "Laboratory Competence Standard",
+    status: "Published",
+    year: "2017",
+    summary: "Competence, impartiality, and consistent-operation requirements for testing and calibration laboratories.",
+    purpose: "Supports valid methods, equipment control, metrological traceability, sampling, records, uncertainty, and reporting.",
+    coreAreas: [
+      "Impartiality",
+      "Personnel competence",
+      "Facilities",
+      "Equipment",
+      "Metrological traceability",
+      "Methods",
+      "Sampling",
+      "Reporting",
+    ],
+    evidence: [
+      "Scope of accreditation",
+      "Method validation",
+      "Calibration record",
+      "Quality-control result",
+      "Uncertainty budget",
+      "Sample custody",
+      "Test report",
+      "Nonconformance record",
+    ],
+    relationships: [
+      "ISO 17034",
+      "ISO 17043",
+      "EPA methods",
+    ],
+    boundary: "Accreditation supports laboratory competence within scope; it does not establish that a particular sample was representative, legally sufficient, or properly interpreted for a proposed action.",
+  },
+  {
+    id: "epa-air-qa",
+    name: "EPA Ambient Air Monitoring QA Requirements",
+    title: "40 CFR Parts 50, 53, and 58 and associated QA guidance",
+    organization: "U.S. EPA",
+    type: "Regulatory Measurement System",
+    status: "Published",
+    year: "Current",
+    summary: "Federal quality-assurance, method, network, siting, certification, and validation requirements for ambient-air monitoring.",
+    purpose: "Supports defensible monitoring of criteria pollutants through reference/equivalent methods and independent assessment.",
+    coreAreas: [
+      "Reference methods",
+      "Equivalent methods",
+      "Network design",
+      "Probe siting",
+      "Calibration",
+      "Audits",
+      "Data validation",
+      "Certification",
+    ],
+    evidence: [
+      "QAPP",
+      "SOP",
+      "Site record",
+      "Calibration",
+      "Audit result",
+      "Collocation data",
+      "Validation flags",
+      "Annual certification",
+    ],
+    relationships: [
+      "Clean Air Act",
+      "NAAQS",
+      "EPA AMTIC",
+    ],
+    boundary: "Regulatory monitoring data remains bounded by network purpose, siting, averaging period, method, validation, and pollutant scope; it should not be generalized into unsupported indoor or personal exposure claims.",
+  },
+  {
+    id: "epa-sw846",
+    name: "EPA SW-846",
+    title: "Test Methods for Evaluating Solid Waste, Physical/Chemical Methods",
+    organization: "U.S. EPA",
+    type: "Environmental Test Method Compendium",
+    status: "Guidance",
+    year: "Current",
+    summary: "A compendium of sampling and analytical methods for hazardous-waste and related environmental programs.",
+    purpose: "Provides method options and performance guidance for air, water, soil, sediment, waste, and chemical analyses.",
+    coreAreas: [
+      "Sampling",
+      "Sample preparation",
+      "Organic analysis",
+      "Inorganic analysis",
+      "Air and stack methods",
+      "Screening",
+      "Quality control",
+      "Method performance",
+    ],
+    evidence: [
+      "Sampling plan",
+      "Method selection",
+      "Custody record",
+      "Preparation record",
+      "Calibration",
+      "QC result",
+      "Raw data",
+      "Analytical report",
+    ],
+    relationships: [
+      "RCRA",
+      "CERCLA",
+      "EPA quality system",
+    ],
+    boundary: "SW-846 methods are not universally mandatory and method use alone does not establish representativeness, regulatory applicability, or admissible interpretation.",
+  },
+  {
+    id: "epa-water-methods",
+    name: "EPA Clean Water Act Analytical Methods",
+    title: "Approved methods for analysis of pollutants under the Clean Water Act",
+    organization: "U.S. EPA",
+    type: "Water Analytical Methods",
+    status: "Published",
+    year: "Current",
+    summary: "Approved analytical methods used for monitoring pollutants under Clean Water Act programs.",
+    purpose: "Supports permit monitoring and regulatory reporting with specified procedures, quality control, and detection capability.",
+    coreAreas: [
+      "Sampling",
+      "Preservation",
+      "Holding times",
+      "Calibration",
+      "Detection limits",
+      "Quality control",
+      "Method-specific analysis",
+      "Reporting",
+    ],
+    evidence: [
+      "Permit requirement",
+      "Sampling record",
+      "Custody",
+      "Preservation record",
+      "Calibration",
+      "QC package",
+      "Result report",
+      "Data qualification",
+    ],
+    relationships: [
+      "Clean Water Act",
+      "40 CFR Part 136",
+      "NPDES",
+    ],
+    boundary: "An approved method does not prove the sampling location, timing, preservation, matrix, or interpretation was appropriate for every claimed environmental conclusion.",
+  },
+  {
+    id: "astm-d1356",
+    name: "ASTM D1356",
+    title: "Standard Terminology Relating to Sampling and Analysis of Atmospheres",
+    organization: "ASTM International",
+    type: "Atmospheric Terminology Standard",
+    status: "Published",
+    year: "Current",
+    summary: "Terminology supporting consistent communication in atmospheric sampling and analysis.",
+    purpose: "Reduces ambiguity in methods, reports, records, and interpretation.",
+    coreAreas: [
+      "Atmospheric terms",
+      "Sampling terms",
+      "Analytical terms",
+      "Instrument terms",
+      "Data-quality terms",
+      "Definitions",
+    ],
+    evidence: [
+      "Terminology map",
+      "Method reference",
+      "Report definitions",
+      "Version record",
+    ],
+    relationships: [
+      "EPA air methods",
+      "ISO air-quality standards",
+      "ASHRAE",
+    ],
+    boundary: "Terminology improves consistency but does not prove measurement validity, continuity, authority, or outcome.",
+  },
+  {
+    id: "nfpa-70",
+    name: "NFPA 70",
+    title: "National Electrical Code",
+    organization: "NFPA",
+    type: "Model Electrical Code",
+    status: "Published",
+    year: "Current adopted edition varies",
+    summary: "Model code for safe electrical design, installation, and inspection.",
+    purpose: "Provides electrical safety rules frequently adopted by jurisdictions.",
+    coreAreas: [
+      "Wiring",
+      "Overcurrent protection",
+      "Grounding",
+      "Equipment",
+      "Hazardous locations",
+      "Inspection",
+      "Special occupancies",
+    ],
+    evidence: [
+      "Adopted edition",
+      "Permit",
+      "Inspection",
+      "Test record",
+      "Equipment listing",
+      "Correction record",
+    ],
+    relationships: [
+      "State and local codes",
+      "NFPA 70E",
+      "UL standards",
+    ],
+    boundary: "The controlling edition is the one adopted by the applicable authority; the newest published edition is not automatically enforceable.",
+  },
+  {
+    id: "icc-imc",
+    name: "International Mechanical Code",
+    title: "Model mechanical code",
+    organization: "International Code Council",
+    type: "Model Mechanical Code",
+    status: "Published",
+    year: "Current adopted edition varies",
+    summary: "Model code governing mechanical systems, ventilation, exhaust, combustion air, refrigeration, and related installations.",
+    purpose: "Provides a model regulatory baseline for adoption by jurisdictions.",
+    coreAreas: [
+      "Mechanical permits",
+      "Ventilation",
+      "Exhaust",
+      "Ducts",
+      "Combustion air",
+      "Refrigeration",
+      "Inspection",
+      "Alterations",
+    ],
+    evidence: [
+      "Adoption record",
+      "Permit",
+      "Plans",
+      "Inspection",
+      "Test report",
+      "Correction record",
+      "Certificate",
+    ],
+    relationships: [
+      "ASHRAE 15",
+      "ASHRAE 62.1",
+      "Local amendments",
+    ],
+    boundary: "Model-code text is not itself the controlling law until adopted; edition, amendments, jurisdiction, permit scope, and enforcement record must be preserved.",
+  },
+  {
+    id: "ta14-air",
+    name: "TA-14 Atmospheric Integrity Record Standard",
+    title: "Proposed standard for attributable atmospheric evidence and future reliance",
+    organization: "TA-14 Authority",
+    type: "TA-14 Proposed Standard",
+    status: "Proposed by TA-14",
+    year: "Proposed",
+    summary: "A proposed standard for preserving instrument, place, activity, chronology, environmental context, continuity, interpretation boundaries, and outcome.",
+    purpose: "Creates a common governed record for atmospheric evidence without converting measurements into unsupported health, safety, or compliance claims.",
+    coreAreas: [
+      "Reality declaration",
+      "Instrument identity",
+      "Location and activity",
+      "Chronology",
+      "Continuity",
+      "Admissibility",
+      "Interpretation boundary",
+      "Outcome comparison",
+    ],
+    evidence: [
+      "Raw measurements",
+      "Calibration",
+      "Media",
+      "Custody",
+      "Environmental context",
+      "Determination",
+      "Intervention",
+      "Outcome record",
+    ],
+    relationships: [
+      "ASHRAE 62.1",
+      "EPA air QA",
+      "ISO/IEC 17025",
+    ],
+    boundary: "TA-14 proposal only. It is not an ANSI-approved standard, law, code, certification, or substitute for controlling authority.",
+  },
+  {
+    id: "ta14-hvac",
+    name: "TA-14 Governed HVAC Diagnostic Record Standard",
+    title: "Proposed standard for complete HVAC diagnostic, intervention, and outcome evidence",
+    organization: "TA-14 Authority",
+    type: "TA-14 Proposed Standard",
+    status: "Proposed by TA-14",
+    year: "Proposed",
+    summary: "A proposed record standard connecting electrical, refrigerant, airflow, psychrometric, pressure, control, technician, intervention, and outcome evidence.",
+    purpose: "Prevents a service conclusion from erasing the measurements, authority, changes, and post-intervention reality supporting it.",
+    coreAreas: [
+      "System identity",
+      "Technician role",
+      "Instrument continuity",
+      "Electrical evidence",
+      "Refrigerant evidence",
+      "Airflow and pressure",
+      "Committed intervention",
+      "Post-intervention outcome",
+    ],
+    evidence: [
+      "Diagnostic record",
+      "Electrical record",
+      "Refrigerant record",
+      "Photos and video",
+      "Authority record",
+      "Change log",
+      "Performance verification",
+    ],
+    relationships: [
+      "ASHRAE 111",
+      "ASHRAE 180",
+      "Mechanical codes",
+    ],
+    boundary: "TA-14 proposal only. It does not grant trade authority, replace licensing, override manufacturer instructions, or establish code compliance.",
+  },
+  {
+    id: "ta14-execution",
+    name: "TA-14 Admissible Execution Evidence Standard",
+    title: "Proposed cross-domain standard for evidence, authority, commitment, execution, and outcome preservation",
+    organization: "TA-14 Authority",
+    type: "TA-14 Proposed Standard",
+    status: "Proposed by TA-14",
+    year: "Proposed",
+    summary: "A proposed standard for preserving the route from reality and evidence to a bounded determination, technical execution effect, and verified outcome.",
+    purpose: "Creates artifact-level proof boundaries across AI, environmental, building, and other consequential systems.",
+    coreAreas: [
+      "Reality",
+      "Record",
+      "Continuity",
+      "Admissibility",
+      "Binding",
+      "Commit",
+      "Execution",
+      "Outcome",
+    ],
+    evidence: [
+      "Proposed action",
+      "Admitted evidence",
+      "Authority",
+      "Determination",
+      "Execution record",
+      "Outcome evidence",
+      "Integrity package",
+      "Verification path",
     ],
     relationships: [
       "ISO/IEC 42001",
-      "UNESCO AI Ethics",
-      "NIST AI RMF",
+      "ISO 14001",
+      "Environmental and technical codes",
     ],
-    boundary:
-      "Ethically informed design strengthens governance, but it does not independently prove runtime authority, evidence continuity, or admissible execution.",
+    boundary: "TA-14 proposal only. Registration, review, or artifact creation does not automatically constitute certification, legal compliance, endorsement, or universal proof.",
   },
 ];
 
@@ -360,6 +986,7 @@ const statuses: Array<
   "Published",
   "Under development",
   "Guidance",
+  "Proposed by TA-14",
 ];
 
 function statusClass(status: StandardStatus) {
@@ -472,10 +1099,10 @@ export default function StandardsPage() {
           </div>
 
           <Link
-            href="/governance-library/crosswalks"
+            href="/law-standards-public-policy"
             className="topbarAction"
           >
-            Open Crosswalks →
+            Open Law & Standards →
           </Link>
         </div>
 
@@ -486,20 +1113,16 @@ export default function StandardsPage() {
           </div>
 
           <p className="eyebrow">
-            TA-14 AI GOVERNANCE LIBRARY
+            TA-14 AUTHORITY GOVERNANCE INSTITUTION
           </p>
 
           <h1>
-            AI Governance
-            <span> Standards</span>
+            Standards, Codes
+            <span> & Technical Modernization</span>
           </h1>
 
           <p className="lead">
-            Navigate selected international standards,
-            technical reports, lifecycle specifications,
-            management systems, and ethical design processes
-            supporting responsible artificial-intelligence
-            governance.
+            Navigate AI, environmental, building, HVAC, refrigeration, indoor-air, laboratory, measurement, code, and regulatory standards while preserving their actual authority, edition, adoption path, evidence requirements, and execution boundary.
           </p>
 
           <div className="heroMetrics">
@@ -560,7 +1183,7 @@ export default function StandardsPage() {
                 onChange={(event) =>
                   setQuery(event.target.value)
                 }
-                placeholder="Search ISO, IEEE, lifecycle, bias, risk..."
+                placeholder="Search ASHRAE, ANSI, ISO, EPA, HVAC, air, water, AI..."
               />
             </label>
 
@@ -828,17 +1451,17 @@ export default function StandardsPage() {
                 ) : null}
 
                 <Link
-                  href="/governance-library/crosswalks"
+                  href="/law-standards-public-policy"
                   className="secondaryAction"
                 >
                   Open Crosswalk
                 </Link>
 
                 <Link
-                  href="/workspace/ai-governance"
+                  href="/law-standards-public-policy"
                   className="primaryAction"
                 >
-                  Build Governed Route →
+                  Enter Institutional Division →
                 </Link>
               </div>
             </section>
@@ -928,7 +1551,7 @@ export default function StandardsPage() {
           </p>
 
           <h2>
-            A standard is not self-executing authority.
+            A standard is not a law, and a published edition is not automatically the controlling edition.
           </h2>
 
           <p>
@@ -980,17 +1603,17 @@ export default function StandardsPage() {
             </Link>
 
             <Link
-              href="/governance-library/crosswalks"
+              href="/law-standards-public-policy"
               className="secondaryAction"
             >
               Open Crosswalks
             </Link>
 
             <Link
-              href="/workspace/ai-governance"
+              href="/law-standards-public-policy"
               className="primaryAction"
             >
-              Build TA-14 Route →
+              Enter Law, Standards & Public Policy →
             </Link>
           </div>
         </section>
@@ -1492,6 +2115,10 @@ export default function StandardsPage() {
 
         .statusDot.guidance {
           background: #71d7ef;
+        }
+
+        .statusDot.proposed-by-ta-14 {
+          background: #b697ff;
         }
 
         .statusDot.under-development {
