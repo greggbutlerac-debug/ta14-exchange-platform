@@ -351,25 +351,6 @@ export default function NewRoutePage() {
   ]);
 
 
-  const routeConditions = useMemo(() => {
-    const identityReady = Boolean(selectedGovernance.registrationId && selectedGovernance.organizationName);
-    const architectureReady = Boolean(selectedGovernance.architectureName && selectedGovernance.version);
-    const scopeReady = Boolean(selectedSector && selectedJurisdiction);
-    const routeDeclared = Boolean(draft ? chain.every((stage) => Boolean(draft.chain[stage.key]?.trim())) : form.organizationName.trim() && form.systemName.trim());
-    const adapterReady = hasRegisteredAdapter;
-    const frozen = Boolean(result?.rid && result?.receipt?.receiptId);
-    return [
-      { label: "Governance identity", state: identityReady ? "PASS" : "BLOCKED", detail: identityReady ? selectedGovernance.registrationId : "Select an attributable governance." },
-      { label: "Architecture version", state: architectureReady ? "PASS" : "BLOCKED", detail: architectureReady ? `${selectedGovernance.architectureName} v${selectedGovernance.version}` : "Architecture identity is unresolved." },
-      { label: "Declared scope", state: scopeReady ? "PASS" : "BLOCKED", detail: scopeReady ? `${selectedSector} · ${selectedJurisdiction}` : "Sector and jurisdiction are required." },
-      { label: "Route declaration", state: routeDeclared ? "PASS" : "REVIEW", detail: routeDeclared ? "The route has enough declared context to continue." : "Complete the route or manifest declarations." },
-      { label: "Compatible adapter", state: adapterReady ? "PASS" : "REVIEW", detail: adapterReady ? (aiGovernanceCompatible ? "AI governance adapter connected." : "Vendor-payment adapter connected.") : "A domain adapter must be connected before live evaluation." },
-      { label: "Frozen receipt", state: frozen ? "PASS" : "PENDING", detail: frozen ? `RID ${result?.rid}` : "Created only after a successful route submission." },
-    ] as const;
-  }, [selectedGovernance, selectedSector, selectedJurisdiction, draft, form.organizationName, form.systemName, hasRegisteredAdapter, aiGovernanceCompatible, result]);
-
-  const routeReadyForStudio = governanceEligible && Boolean(selectedSector) && Boolean(selectedJurisdiction) && hasRegisteredAdapter;
-  const stageGuidance = STAGE_GUIDANCE[selectedStage];
 
   useEffect(() => {
     setSelectedSector(selectedGovernance.sectors[0] ?? "AI governance");
@@ -408,6 +389,25 @@ export default function NewRoutePage() {
 
   const hasRegisteredAdapter =
     vendorPaymentCompatible || aiGovernanceCompatible;
+  const routeConditions = useMemo(() => {
+    const identityReady = Boolean(selectedGovernance.registrationId && selectedGovernance.organizationName);
+    const architectureReady = Boolean(selectedGovernance.architectureName && selectedGovernance.version);
+    const scopeReady = Boolean(selectedSector && selectedJurisdiction);
+    const routeDeclared = Boolean(draft ? chain.every((stage) => Boolean(draft.chain[stage.key]?.trim())) : form.organizationName.trim() && form.systemName.trim());
+    const adapterReady = hasRegisteredAdapter;
+    const frozen = Boolean(result?.rid && result?.receipt?.receiptId);
+    return [
+      { label: "Governance identity", state: identityReady ? "PASS" : "BLOCKED", detail: identityReady ? selectedGovernance.registrationId : "Select an attributable governance." },
+      { label: "Architecture version", state: architectureReady ? "PASS" : "BLOCKED", detail: architectureReady ? `${selectedGovernance.architectureName} v${selectedGovernance.version}` : "Architecture identity is unresolved." },
+      { label: "Declared scope", state: scopeReady ? "PASS" : "BLOCKED", detail: scopeReady ? `${selectedSector} · ${selectedJurisdiction}` : "Sector and jurisdiction are required." },
+      { label: "Route declaration", state: routeDeclared ? "PASS" : "REVIEW", detail: routeDeclared ? "The route has enough declared context to continue." : "Complete the route or manifest declarations." },
+      { label: "Compatible adapter", state: adapterReady ? "PASS" : "REVIEW", detail: adapterReady ? (aiGovernanceCompatible ? "AI governance adapter connected." : "Vendor-payment adapter connected.") : "A domain adapter must be connected before live evaluation." },
+      { label: "Frozen receipt", state: frozen ? "PASS" : "PENDING", detail: frozen ? `RID ${result?.rid}` : "Created only after a successful route submission." },
+    ] as const;
+  }, [selectedGovernance, selectedSector, selectedJurisdiction, draft, form.organizationName, form.systemName, hasRegisteredAdapter, aiGovernanceCompatible, result]);
+
+  const routeReadyForStudio = governanceEligible && Boolean(selectedSector) && Boolean(selectedJurisdiction) && hasRegisteredAdapter;
+  const stageGuidance = STAGE_GUIDANCE[selectedStage];
 
   const formattedAmount = useMemo(() => {
     const value = Number(form.amountUsd);
