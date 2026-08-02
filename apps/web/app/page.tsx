@@ -142,9 +142,9 @@ const workspaces = [
     world: "aiWorld",
     features: [
       "Governed route construction and runtime verification",
-      "AI entity review and founding demonstrations",
-      "Execution artifacts, registries, and preserved findings",
-      "Partner Review Network and governance marketplace",
+      "AI entity review and guided review intake",
+      "Execution artifacts, registries, verification, and preserved findings",
+      "EU AI Act review, Partner Review Network, and marketplace",
     ],
   },
   {
@@ -154,7 +154,7 @@ const workspaces = [
     href: "/academy",
     kicker: "THE EDUCATIONAL BACKBONE OF THE WHOLE INSTITUTION",
     description:
-      "Enter a central learning institution that branches into AI governance, environmental integrity, atmospheric records, HVAC, entity review, public research, law, standards, and every future TA-14 domain.",
+      "Enter the central learning institution, then choose AI governance, environmental integrity, HVAC, Atmospheric Integrity Records, entity review, law, standards, public research, or any future TA-14 discipline.",
     color: "#39f2a1",
     glow: "rgba(57, 242, 161, .52)",
     world: "academyWorld",
@@ -172,105 +172,33 @@ const workspaces = [
     href: "/workspace/governed-records/environmental",
     kicker: "GOVERN ENVIRONMENTAL REALITY FROM RECORD TO OUTCOME",
     description:
-      "Preserve environmental evidence, define authority, govern intervention, and verify whether air, water, land, buildings, and systems actually protected people and the environment.",
+      "Govern air, water, land, pollution, buildings, HVAC systems, atmospheric evidence, environmental intervention, and verified outcomes through one environmental institution.",
     color: "#78e6b0",
     glow: "rgba(92, 224, 167, .52)",
     world: "recordsWorld",
     features: [
-      "Air, water, land, pollution, building, and sensor records",
-      "Environmental entity review and governed intervention",
-      "Separate measurement, interpretation, determination, and outcome",
-      "Academy pathways for every environmental governance domain",
-    ],
-  },
-  {
-    id: "atmospheric",
-    code: "AIR",
-    title: "Atmospheric Integrity Records",
-    href: "/workspace/governed-records/environmental",
-    kicker: "MAKE THE ATMOSPHERE ATTRIBUTABLE, COMPARABLE, AND RELIABLE",
-    description:
-      "Create atmospheric and personal atmospheric integrity records that preserve where, when, how, and under what conditions air was measured—and what protection a building or system actually provided.",
-    color: "#6fe8ff",
-    glow: "rgba(72, 216, 255, .55)",
-    world: "aiWorld",
-    features: [
-      "Exterior-to-interior atmospheric comparison",
-      "Instrument, location, chronology, and continuity preservation",
-      "Building, hospital, laboratory, and personal record pathways",
-      "Dedicated Atmospheric Integrity Academy",
-    ],
-  },
-  {
-    id: "hvac",
-    code: "HV",
-    title: "HVAC Governance & Academy",
-    href: "/workspace/governed-records/environmental",
-    kicker: "TURN FIELD WORK INTO GOVERNED TECHNICAL EVIDENCE",
-    description:
-      "Connect diagnostics, electrical integrity, refrigerant governance, facility sensing, technician evidence, interventions, and verified outcomes through governed HVAC pathways.",
-    color: "#ffd15c",
-    glow: "rgba(255, 196, 65, .52)",
-    world: "recordsWorld",
-    features: [
-      "HVAC diagnostic and electrical integrity records",
-      "Refrigerant, pressure, airflow, moisture, and sensor governance",
-      "Technician learning, simulations, and competency evidence",
-      "Intervention and post-intervention performance review",
-    ],
-  },
-  {
-    id: "research",
-    code: "PR",
-    title: "Public Research & Public Record",
-    href: "/foundation",
-    kicker: "PRESERVE WHAT WAS BUILT, CLAIMED, PUBLISHED, AND CHALLENGED",
-    description:
-      "Enter the institution's public chronology, publications, repositories, technical records, research programs, evidence packages, declared claims, limitations, and correction pathways.",
-    color: "#dd83ff",
-    glow: "rgba(199, 91, 255, .55)",
-    world: "entityWorld",
-    features: [
-      "Books, articles, repositories, records, and institutional chronology",
-      "Public research programs and inspectable evidence packages",
-      "Claims, non-claims, limitations, disputes, and corrections",
-      "Public Research Academy and research-literacy pathways",
+      "Atmospheric Integrity Records and Personal Atmospheric Integrity Records",
+      "HVAC, building, hospital, laboratory, sensor, air, and water pathways",
+      "Environmental entity review, intervention, and outcome verification",
+      "Embedded Environmental, HVAC, and Atmospheric Integrity Academies",
     ],
   },
   {
     id: "law",
-    code: "LW",
-    title: "Current & Proposed Law",
+    code: "LAW",
+    title: "Law, Standards & Public Policy",
     href: "/governance-library/laws",
-    kicker: "UNDERSTAND THE LAW, EXPOSE THE GAP, PROPOSE THE UPGRADE",
+    kicker: "PRESERVE WHAT EXISTS · EXPOSE THE GAP · PROPOSE THE UPGRADE",
     description:
-      "Study current statutes and regulations alongside clearly labeled TA-14 proposed laws, model acts, and legislative upgrades designed to close evidence, authority, enforcement, execution, and outcome gaps.",
+      "Study current law, regulations, standards, and codes beside clearly labeled TA-14 proposed acts, model language, upgraded standards, and public-policy pathways.",
     color: "#f2b95f",
     glow: "rgba(236, 164, 57, .52)",
     world: "euWorld",
     features: [
-      "Current acts, regulations, authority, applicability, and enforcement",
-      "Gap analysis showing what existing law leaves unresolved",
-      "TA-14 proposed acts, model language, and modernization pathways",
-      "Law Academy comparisons, scenarios, and assessments",
-    ],
-  },
-  {
-    id: "standards",
-    code: "ST",
-    title: "Standards, Codes & Technical Modernization",
-    href: "/governance-library/standards",
-    kicker: "DISTINGUISH VOLUNTARY GUIDANCE FROM ENFORCEABLE AUTHORITY",
-    description:
-      "Review ASHRAE, ANSI-accredited, environmental, building, HVAC, measurement, governance, and technical standards—then inspect TA-14 proposals for stronger evidence and execution integrity.",
-    color: "#ff9f68",
-    glow: "rgba(255, 126, 77, .58)",
-    world: "registryWorld",
-    features: [
-      "Standards, guidelines, codes, specifications, and actual legal status",
-      "Adoption, incorporation, contract, and enforcement pathways",
-      "Current-versus-upgraded technical comparisons",
-      "Standards Academy and TA-14 modernization proposals",
+      "Current and proposed statutes, acts, regulations, and model law",
+      "ASHRAE, ANSI-accredited, building, mechanical, and technical standards",
+      "Gap analysis, authority mapping, enforcement, evidence, and execution comparison",
+      "Law Academy, Standards Academy, scenarios, and public-policy education",
     ],
   },
 ];
@@ -386,7 +314,7 @@ export default function HomePage() {
 
       <section className="institution shell">
         <p>TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
-        <div className="institutionRule"><i/><span>ONE INSTITUTION · MANY GOVERNED WORLDS · ONE PRESERVED ROUTE TO RELIANCE</span><i/></div>
+        <div className="institutionRule"><i/><span>ONE INSTITUTION · FOUR GOVERNED WORLDS · ONE PRESERVED ROUTE TO RELIANCE</span><i/></div>
       </section>
 
       <section className="hero shell">
@@ -396,21 +324,21 @@ export default function HomePage() {
         </div>
         <p className="eyebrow">THE GRAND INSTITUTIONAL FRONT DOOR</p>
         <h1>
-          Governance for consequential systems, environmental reality, public evidence, and
-          <em> the laws and standards the future will require.</em>
+          Governance for consequential AI, environmental reality, institutional learning, and
+          <em> the laws, standards, and public policy the future will require.</em>
         </h1>
         <p className="heroLead">
-          TA-14 Authority Governance Institution brings AI governance, environmental integrity, atmospheric records, HVAC, public research, entity review, education, law, standards, execution artifacts, and future institutional initiatives under one governed roof. Every division remains distinct. Every pathway preserves its authority, evidence, limitations, execution, and outcome.
+          TA-14Authority.org is the public front door to four governed institutional worlds: the TA-14 AI Governance Exchange, TA-14 Academy, Environmental Integrity Governance, and Law, Standards & Public Policy. Everything else belongs behind the correct door as a governed pathway, shared institutional utility, record, registry, Academy discipline, or review process.
         </p>
         <div className="heroActions">
           <Link className="grandButton primary" href="#institutional-doors">Enter the Grand Institutional Hall <span>↓</span></Link>
           <Link className="grandButton gold" href="/workspace/ai-governance">Enter the AI Governance Exchange <Arrow /></Link>
           <Link className="grandButton academyButton" href="/academy">Enter TA-14 Academy <Arrow /></Link>
           <Link className="grandButton glass" href="/workspace/entity-review">Begin Guided Entity Review <Arrow /></Link>
-          <Link className="grandButton glass" href="/foundation">Open the Public Record <Arrow /></Link>
+          <Link className="grandButton glass" href="/governance-library/laws">Enter Law, Standards & Public Policy <Arrow /></Link>
         </div>
         <div className="heroDefinition">
-          <article><span>THE INSTITUTION</span><strong>One governed umbrella</strong><p>Separate divisions for AI, environment, atmosphere, HVAC, research, law, standards, education, review, and future reliance.</p></article>
+          <article><span>THE INSTITUTION</span><strong>One governed umbrella</strong><p>Four primary divisions: AI Governance, TA-14 Academy, Environmental Integrity Governance, and Law, Standards & Public Policy. Registries, research, records, verification, entity review, HVAC, and atmospheric pathways live behind the correct door.</p></article>
           <article><span>THE ACADEMY</span><strong>Present inside every division</strong><p>Learn each institution, inspect examples, run simulations, build readiness, and understand why every required element matters.</p></article>
           <article><span>THE GOVERNING RULE</span><strong>No admissible evidence. No admissible execution.</strong><p>Claims become routes, routes become determinations, and determinations must survive execution and outcome verification.</p></article>
         </div>
@@ -420,9 +348,9 @@ export default function HomePage() {
         <div className="hallArchitecture" aria-hidden="true"><i/><i/><i/><i/><i/></div>
         <div className="hallGlow" aria-hidden="true" />
         <div className="sectionIntro centeredIntro">
-          <p className="eyebrow">EIGHT GRAND INSTITUTIONAL ENTRANCES</p>
+          <p className="eyebrow">FOUR GRAND INSTITUTIONAL ENTRANCES</p>
           <h2>Choose the world you need. The Academy, evidence, review, and governing chain travel with you.</h2>
-          <p>These are not eight copies of the same software. Each door opens into a different institutional environment with its own evidence, authorities, learning pathways, review processes, records, and public responsibilities.</p>
+          <p>Four doors are enough. Each opens into a complete institutional world with its own authority, evidence, Academy pathways, review processes, records, registries, and public responsibilities.</p>
         </div>
 
         <div className="doors institutionalDoors">
@@ -484,6 +412,29 @@ export default function HomePage() {
         <div className="obsidianFloor" aria-hidden="true" />
       </section>
 
+      <section className="environmentalWorlds shell" aria-labelledby="environmental-worlds-title">
+        <div className="environmentalWorldsIntro">
+          <p className="eyebrow">INSIDE ENVIRONMENTAL INTEGRITY GOVERNANCE</p>
+          <h2 id="environmental-worlds-title">One environmental door. Multiple governed pathways.</h2>
+          <p>Atmospheric Integrity Records and HVAC do not stand outside Environmental Integrity Governance. They operate inside it with their own records, Academy pathways, review routes, evidence boundaries, and calls to action.</p>
+        </div>
+        <div className="environmentalWorldGrid">
+          {[
+            ["AIR", "Atmospheric Integrity Records", "Preserve exterior, interior, building, hospital, laboratory, and environmental atmospheric evidence with instrument, location, chronology, and continuity intact.", "/workspace/governed-records/environmental"],
+            ["PAIR", "Personal Atmospheric Integrity Records", "Create bounded personal exposure records that distinguish measured conditions, context, interpretation, intervention, and outcome.", "/workspace/governed-records/environmental"],
+            ["HVAC", "HVAC Governance", "Govern diagnostics, electrical integrity, refrigerant work, airflow, pressure, moisture, sensing, intervention, and post-intervention performance.", "/workspace/governed-records/environmental"],
+            ["ER", "Environmental Entity Review", "Guide environmental, building, HVAC, sensor, and atmospheric entities through scoped evidence preparation and governed review.", "/workspace/entity-review"],
+          ].map(([code,title,text,href]) => (
+            <Link href={href} key={title}>
+              <span>{code}</span>
+              <h3>{title}</h3>
+              <p>{text}</p>
+              <b>Open governed pathway <Arrow /></b>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       <section className="academySpine shell">
         <div className="academySpineVisual" aria-hidden="true">
           <div className="academyCentralSeal"><small>TA-14</small><strong>ACADEMY</strong><span>LEARN · BUILD · SIMULATE · VERIFY</span></div>
@@ -521,7 +472,7 @@ export default function HomePage() {
         <div className="sectionIntro">
           <p className="eyebrow">THE GOVERNING CHAIN BENEATH EVERY DIVISION</p>
           <h2>Different institutions. One requirement: preserve the route from reality to outcome.</h2>
-          <p>AI, environment, atmosphere, HVAC, research, law, standards, and entity review have different authorities and evidence. They share one discipline: no layer is allowed to disappear into the next.</p>
+          <p>AI governance, environmental integrity, public research, law, standards, Academy, and entity review have different authorities and evidence. They share one discipline: no layer is allowed to disappear into the next.</p>
         </div>
         <div className="chainVault">
           <p className="bandEyebrow">THE TA-14 GOVERNING CHAIN</p>
@@ -586,13 +537,13 @@ export default function HomePage() {
         <div className="closingBurst" aria-hidden="true"/>
         <p className="eyebrow">TA-14 AUTHORITY GOVERNANCE INSTITUTION</p>
         <h2>Enter the right world. Learn the architecture. Preserve the evidence. Govern the route. Verify the outcome.</h2>
-        <p>This is the public front door to an institution designed to govern AI, environmental reality, atmosphere, HVAC, entities, research, law, standards, execution, and future reliance without allowing one domain to erase the boundaries of another.</p>
+        <p>This is the public front door to an institution designed to govern AI, environmental reality, entities, research, law, standards, execution, and future reliance—while keeping Atmospheric Integrity Records, Personal Atmospheric Integrity Records, HVAC, building evidence, and sensor governance inside Environmental Integrity Governance and the TA-14 Academy.</p>
         <div className="heroActions centeredActions"><Link className="grandButton primary" href="#institutional-doors">Choose an Institutional Door <span>↑</span></Link><Link className="grandButton academyButton" href="/academy">Enter TA-14 Academy <Arrow /></Link><Link className="grandButton gold" href="/workspace/entity-review">Bring Us Your Governance <Arrow /></Link></div>
         <div className="sealChain">{chain.map(([label],index)=><span key={label}>{label}{index<chain.length-1&&<i>→</i>}</span>)}</div>
         <strong>No admissible evidence. No admissible execution.</strong>
       </section>
 
-      <footer className="shell"><span>TA-14 Authority Governance Institution</span><span>One institution. Distinct authorities. Preserved evidence. Governed outcomes.</span></footer>
+      <footer className="shell"><span>TA-14 Authority Governance Institution</span><span>TA14Authority.org · Four doors. Distinct authorities. Preserved evidence. Governed outcomes.</span></footer>
 
       <style jsx>{`
         :global(*) {
@@ -1357,7 +1308,7 @@ export default function HomePage() {
         }
         .doors {
           display:grid;
-            grid-template-columns:repeat(3,minmax(0,1fr));
+            grid-template-columns:repeat(2,minmax(0,1fr));
             gap:18px;
             margin-top:44px;
             position:relative;
@@ -3208,6 +3159,74 @@ export default function HomePage() {
         .academyDoor .archFrame {
           box-shadow:0 0 0 3px rgba(190,255,218,.45),0 0 52px rgba(57,242,161,.34),inset 0 0 24px rgba(200,255,223,.16)
         }
+        .environmentalWorlds {
+          margin-top:96px;
+          padding:46px;
+          border:1px solid rgba(120,230,176,.22);
+          border-radius:30px;
+          background:radial-gradient(circle at 10% 0%,rgba(77,225,166,.12),transparent 38%),radial-gradient(circle at 100% 100%,rgba(75,202,238,.1),transparent 40%),linear-gradient(145deg,rgba(8,31,34,.94),rgba(4,16,27,.98));
+          box-shadow:0 28px 76px rgba(0,0,0,.26)
+        }
+        .environmentalWorldsIntro {max-width:1080px}
+        .environmentalWorldsIntro h2 {
+          margin:12px 0 16px;
+          font-family:Georgia,"Times New Roman",serif;
+          font-size:clamp(38px,4.7vw,70px);
+          line-height:.99;
+          letter-spacing:-.045em
+        }
+        .environmentalWorldsIntro>p:last-child {color:#afc7c2;font-size:16px;line-height:1.7}
+        .environmentalWorldGrid {display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:30px}
+        .environmentalWorldGrid a {
+          min-height:285px;padding:24px;display:flex;flex-direction:column;
+          border:1px solid rgba(118,228,181,.18);border-radius:20px;color:inherit;text-decoration:none;
+          background:linear-gradient(145deg,rgba(18,55,53,.72),rgba(6,23,31,.94));
+          box-shadow:inset 0 1px rgba(255,255,255,.03);
+          transition:transform .26s,border-color .26s,box-shadow .26s
+        }
+        .environmentalWorldGrid a:hover {transform:translateY(-8px);border-color:rgba(120,230,176,.58);box-shadow:0 24px 56px rgba(0,0,0,.3),0 0 30px rgba(87,223,174,.12)}
+        .environmentalWorldGrid a>span {width:max-content;min-width:46px;height:38px;padding:0 10px;display:grid;place-items:center;border-radius:10px;border:1px solid rgba(120,230,176,.45);color:#aef7d1;background:rgba(76,206,155,.08);font-size:11px;font-weight:950;letter-spacing:.08em}
+        .environmentalWorldGrid h3 {margin:24px 0 10px;font-family:Georgia,"Times New Roman",serif;font-size:25px}
+        .environmentalWorldGrid p {margin:0;color:#a7bdb8;font-size:13px;line-height:1.62}
+        .environmentalWorldGrid b {margin-top:auto;padding-top:20px;display:inline-flex;align-items:center;gap:9px;color:#8de8c1;font-size:11px}
+
+
+        .institutionUtilityRail {
+          margin-top:22px;
+          padding:18px 22px;
+          display:flex;
+          flex-wrap:wrap;
+          align-items:center;
+          justify-content:center;
+          gap:12px;
+          border:1px solid rgba(112,216,239,.18);
+          border-radius:18px;
+          background:linear-gradient(145deg,rgba(8,27,42,.82),rgba(5,15,26,.88));
+          box-shadow:0 18px 42px rgba(0,0,0,.18),inset 0 1px rgba(255,255,255,.04)
+        }
+        .institutionUtilityRail>span {
+          margin-right:8px;
+          color:#7698a7;
+          font-size:9px;
+          font-weight:950;
+          letter-spacing:.16em
+        }
+        .institutionUtilityRail a {
+          padding:9px 12px;
+          border:1px solid rgba(255,255,255,.08);
+          border-radius:10px;
+          color:#dff9ff;
+          background:rgba(255,255,255,.025);
+          text-decoration:none;
+          font-size:11px;
+          font-weight:900;
+          transition:.25s
+        }
+        .institutionUtilityRail a:hover {
+          border-color:rgba(112,216,239,.5);
+          transform:translateY(-2px)
+        }
+
         .academySpine {
           margin-top:120px;
           min-height:760px;
@@ -3682,6 +3701,9 @@ export default function HomePage() {
 
         }
         @media(max-width:760px) {
+          .institutionUtilityRail {align-items:stretch}
+          .institutionUtilityRail>span {width:100%;text-align:center;margin:0 0 4px}
+          .institutionUtilityRail a {flex:1 1 42%;text-align:center}
           .siteActivityDock {
             justify-content:center;
               padding-top:12px
@@ -3773,7 +3795,7 @@ export default function HomePage() {
 
         
         @media(max-width:1280px) {
-          .institutionalDoors {grid-template-columns:repeat(3,1fr)}
+          .institutionalDoors {grid-template-columns:repeat(2,1fr)}
           .academySpine {grid-template-columns:1fr}
           .reviewJourney {grid-template-columns:repeat(2,1fr)}
         }
@@ -3784,7 +3806,7 @@ export default function HomePage() {
         }
         @media(max-width:760px) {
           .institutionalDoors,.reviewJourney,.reviewReadinessPanel {grid-template-columns:1fr}
-          .academySpine,.entityReviewGateway,.modernizationSection {padding:34px 20px;margin-top:80px}
+          .academySpine,.entityReviewGateway,.modernizationSection,.environmentalWorlds {padding:34px 20px;margin-top:80px}
           .academySpineVisual {min-height:390px;transform:scale(.76)}
           .institutionDoor .doorStage {height:500px}
           .institutionRule span {max-width:260px}
