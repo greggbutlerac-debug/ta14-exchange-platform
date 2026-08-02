@@ -146,6 +146,29 @@ const registeredGovernances: RegisteredGovernance[] = [
 const ROUTE_STUDIO_HANDOFF_KEY = "ta14:registered-governance-route-handoff:v2";
 
 
+const INSTITUTIONAL_LIFECYCLE = [
+  { label: "Credentials", href: "/foundation", state: "complete" },
+  { label: "Architecture", href: "/workspace/ai-governance/registry", state: "complete" },
+  { label: "Registration", href: "/governance/register", state: "complete" },
+  { label: "Workspace", href: "/governance/workspace", state: "complete" },
+  { label: "Route Builder", href: "/workspace/routes/new", state: "current" },
+  { label: "Artifact Studio", href: "/artifacts/studio", state: "next" },
+  { label: "Artifact Registry", href: "/artifacts/registry", state: "future" },
+  { label: "Verification", href: "/artifacts/verify", state: "future" },
+] as const;
+
+const STAGE_GUIDANCE: Record<TransferStageKey, { why: string; asks: string }> = {
+  reality: { why: "Defines the real-world condition or proposed consequence that gives the route a reason to exist.", asks: "What condition exists, who is affected, and what consequence is proposed?" },
+  record: { why: "Creates the attributable record that later evidence, authority, and receipts must resolve back to.", asks: "Which identities, systems, objects, and source records are being governed?" },
+  continuity: { why: "Prevents a valid beginning from silently becoming a different request before execution.", asks: "What must remain connected, current, and unchanged through the full route?" },
+  admissibility: { why: "Determines whether the available evidence is fit to govern consequence rather than merely present.", asks: "Is the evidence attributable, current, relevant, sufficient, and conflict-aware?" },
+  binding: { why: "Limits the route to the exact scope, destination, privilege, amount, model, tool, and jurisdiction actually authorized.", asks: "What may this route bind—and what is explicitly outside its authority?" },
+  commit: { why: "Freezes the route, reasons, actor, dependencies, and determination before technical execution begins.", asks: "What exact version and decision must be preserved before release?" },
+  execution: { why: "Connects the governance decision to a technical effect that releases, holds, blocks, or reroutes action.", asks: "Which adapter enforces the decision, and what exact effect is permitted?" },
+  outcome: { why: "Preserves what actually happened, residual risk, follow-up obligations, and the evidence required for closure.", asks: "What result must be observed and verified before the route can close?" },
+};
+
+
 const initialForm: RouteForm = {
   organizationName: "TA-14 Demonstration Organization",
   systemName: "Governed Vendor Payment Engine",
@@ -326,6 +349,27 @@ export default function NewRoutePage() {
     selectedSector,
     selectedJurisdiction,
   ]);
+
+
+  const routeConditions = useMemo(() => {
+    const identityReady = Boolean(selectedGovernance.registrationId && selectedGovernance.organizationName);
+    const architectureReady = Boolean(selectedGovernance.architectureName && selectedGovernance.version);
+    const scopeReady = Boolean(selectedSector && selectedJurisdiction);
+    const routeDeclared = Boolean(draft ? chain.every((stage) => Boolean(draft.chain[stage.key]?.trim())) : form.organizationName.trim() && form.systemName.trim());
+    const adapterReady = hasRegisteredAdapter;
+    const frozen = Boolean(result?.rid && result?.receipt?.receiptId);
+    return [
+      { label: "Governance identity", state: identityReady ? "PASS" : "BLOCKED", detail: identityReady ? selectedGovernance.registrationId : "Select an attributable governance." },
+      { label: "Architecture version", state: architectureReady ? "PASS" : "BLOCKED", detail: architectureReady ? `${selectedGovernance.architectureName} v${selectedGovernance.version}` : "Architecture identity is unresolved." },
+      { label: "Declared scope", state: scopeReady ? "PASS" : "BLOCKED", detail: scopeReady ? `${selectedSector} · ${selectedJurisdiction}` : "Sector and jurisdiction are required." },
+      { label: "Route declaration", state: routeDeclared ? "PASS" : "REVIEW", detail: routeDeclared ? "The route has enough declared context to continue." : "Complete the route or manifest declarations." },
+      { label: "Compatible adapter", state: adapterReady ? "PASS" : "REVIEW", detail: adapterReady ? (aiGovernanceCompatible ? "AI governance adapter connected." : "Vendor-payment adapter connected.") : "A domain adapter must be connected before live evaluation." },
+      { label: "Frozen receipt", state: frozen ? "PASS" : "PENDING", detail: frozen ? `RID ${result?.rid}` : "Created only after a successful route submission." },
+    ] as const;
+  }, [selectedGovernance, selectedSector, selectedJurisdiction, draft, form.organizationName, form.systemName, hasRegisteredAdapter, aiGovernanceCompatible, result]);
+
+  const routeReadyForStudio = governanceEligible && Boolean(selectedSector) && Boolean(selectedJurisdiction) && hasRegisteredAdapter;
+  const stageGuidance = STAGE_GUIDANCE[selectedStage];
 
   useEffect(() => {
     setSelectedSector(selectedGovernance.sectors[0] ?? "AI governance");
@@ -651,6 +695,29 @@ export default function NewRoutePage() {
         <span>Evaluation</span>
       </div>
 
+      <section style={styles.lifecycle} aria-label="TA-14 institutional lifecycle">
+        <div style={styles.lifecycleInner}>
+          {INSTITUTIONAL_LIFECYCLE.map((item, index) => (
+            <div key={item.label} style={styles.lifecycleItemWrap}>
+              <Link
+                href={item.href}
+                style={{
+                  ...styles.lifecycleItem,
+                  ...(item.state === "current" ? styles.lifecycleCurrent : {}),
+                  ...(item.state === "complete" ? styles.lifecycleComplete : {}),
+                  ...(item.state === "next" ? styles.lifecycleNext : {}),
+                }}
+              >
+                <span style={styles.lifecycleNumber}>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{item.label}</strong>
+                <small>{item.state === "current" ? "YOU ARE HERE" : item.state === "complete" ? "ESTABLISHED" : item.state === "next" ? "NEXT" : "LATER"}</small>
+              </Link>
+              {index < INSTITUTIONAL_LIFECYCLE.length - 1 ? <span style={styles.lifecycleArrow}>→</span> : null}
+            </div>
+          ))}
+        </div>
+      </section>
+
       <main>
         <section style={styles.hero}>
           <div>
@@ -720,6 +787,24 @@ export default function NewRoutePage() {
               />
             </div>
           </aside>
+        </section>
+
+        <section style={styles.orientationGrid}>
+          <article style={styles.orientationCard}>
+            <span style={styles.sectionLabel}>WHAT YOU ARE BUILDING</span>
+            <h2 style={styles.orientationTitle}>A governed path from declared condition to verifiable outcome.</h2>
+            <p style={styles.orientationText}>The route does not authorize a general capability. It binds one named governance, one architecture version, one scope, one chain of declarations, and one technical effect.</p>
+          </article>
+          <article style={styles.orientationCard}>
+            <span style={styles.sectionLabel}>WHAT HAPPENS NEXT</span>
+            <h2 style={styles.orientationTitle}>Freeze the route, then produce the execution artifact.</h2>
+            <p style={styles.orientationText}>A successful route handoff carries governance identity, scope, declarations, determination, receipt identifiers, and correlation data into the Artifact Studio.</p>
+          </article>
+          <article style={styles.orientationCard}>
+            <span style={styles.sectionLabel}>WHAT THIS DOES NOT DO</span>
+            <h2 style={styles.orientationTitle}>A route declaration is not evidence that execution occurred.</h2>
+            <p style={styles.orientationText}>The later artifact must independently preserve admissible evidence, the committed decision, the technical effect, outcome evidence, integrity commitments, and the claims boundary.</p>
+          </article>
         </section>
 
         <section style={styles.governanceDeck}>
@@ -872,6 +957,31 @@ export default function NewRoutePage() {
           </div>
         </section>
 
+        <section style={styles.readinessSection}>
+          <div style={styles.readinessHeader}>
+            <div>
+              <span style={styles.sectionLabel}>CONDITION-BASED READINESS</span>
+              <h2 style={styles.readinessTitle}>The route advances only when its required conditions are explicit.</h2>
+              <p style={styles.readinessText}>This ledger replaces a vague percentage with the exact institutional conditions that pass, remain pending, or block handoff.</p>
+            </div>
+            <span style={{...styles.routeStatePill, ...(routeReadyForStudio ? styles.routeStateReady : styles.routeStateReview)}}>
+              {routeReadyForStudio ? "READY FOR HANDOFF" : "REVIEW REQUIRED"}
+            </span>
+          </div>
+          <div style={styles.readinessGrid}>
+            {routeConditions.map((condition, index) => (
+              <article key={condition.label} style={styles.readinessCard}>
+                <div style={styles.readinessCardTop}>
+                  <span style={styles.readinessIndex}>{String(index + 1).padStart(2, "0")}</span>
+                  <span style={{...styles.conditionBadge, ...(condition.state === "PASS" ? styles.conditionPass : condition.state === "BLOCKED" ? styles.conditionBlocked : condition.state === "PENDING" ? styles.conditionPending : styles.conditionReview)}}>{condition.state}</span>
+                </div>
+                <strong style={styles.readinessCardTitle}>{condition.label}</strong>
+                <p style={styles.readinessCardText}>{condition.detail}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
         <RouteChainVisualizer
           stages={chain}
           draft={draft}
@@ -950,6 +1060,17 @@ export default function NewRoutePage() {
                   <span style={styles.declaredBadge}>
                     DECLARED
                   </span>
+                </div>
+
+                <div style={styles.stageGuidance}>
+                  <div>
+                    <span style={styles.stageGuidanceLabel}>WHY THIS STAGE MATTERS</span>
+                    <p style={styles.stageGuidanceText}>{stageGuidance.why}</p>
+                  </div>
+                  <div>
+                    <span style={styles.stageGuidanceLabel}>THE QUESTION TO ANSWER</span>
+                    <p style={styles.stageGuidanceText}>{stageGuidance.asks}</p>
+                  </div>
                 </div>
 
                 <p style={styles.stageValue}>
@@ -1061,6 +1182,45 @@ export default function NewRoutePage() {
             </div>
           </section>
         ) : null}
+
+        <section style={styles.consequenceSection}>
+          <div style={styles.consequenceHeader}>
+            <div>
+              <span style={styles.sectionLabel}>ROUTE CONSEQUENCE SUMMARY</span>
+              <h2 style={styles.consequenceTitle}>Know exactly what this route can—and cannot—authorize.</h2>
+            </div>
+            <span style={styles.classificationPill}>{routeClassification.replaceAll("_", " ")}</span>
+          </div>
+          <div style={styles.consequenceGrid}>
+            <article style={styles.consequenceAllow}>
+              <span style={styles.consequenceLabel}>THIS ROUTE MAY AUTHORIZE</span>
+              <strong style={styles.consequenceStrong}>Only the exact action preserved by the selected governance, sector, jurisdiction, route version, determination, and technical adapter.</strong>
+              <ul style={styles.consequenceList}>
+                <li>{selectedGovernance.organizationName} · {selectedGovernance.registrationId}</li>
+                <li>{selectedSector} · {selectedJurisdiction}</li>
+                <li>{aiGovernanceCompatible ? "AI governance evaluation" : vendorPaymentCompatible ? `${formattedAmount} vendor-payment evaluation` : "A future compatible domain evaluation"}</li>
+              </ul>
+            </article>
+            <article style={styles.consequenceDeny}>
+              <span style={styles.consequenceLabel}>THIS ROUTE DOES NOT AUTHORIZE</span>
+              <strong style={styles.consequenceStrong}>Any undeclared destination, privilege, amount, actor, runtime, jurisdiction, or action outside the frozen scope.</strong>
+              <ul style={styles.consequenceList}>
+                <li>Registration does not equal certification or legal approval.</li>
+                <li>A declared route does not prove evidence admissibility or outcome closure.</li>
+                <li>No execution may silently expand beyond the committed route.</li>
+              </ul>
+            </article>
+            <article style={styles.consequenceEvidence}>
+              <span style={styles.consequenceLabel}>EVIDENCE STILL REQUIRED</span>
+              <strong style={styles.consequenceStrong}>The artifact must later preserve the evidence and receipts needed to justify reliance.</strong>
+              <ul style={styles.consequenceList}>
+                <li>Attributable evidence and authority sources</li>
+                <li>Frozen determination and commit record</li>
+                <li>Technical execution receipt and outcome evidence</li>
+              </ul>
+            </article>
+          </div>
+        </section>
 
         {(!draft || vendorPaymentCompatible) && (
           <section style={styles.workspaceGrid}>
@@ -1373,7 +1533,22 @@ export default function NewRoutePage() {
                     </div>
                   ) : null}
 
+                  <div style={styles.nextDestination}>
+                    <span style={styles.sectionLabel}>NEXT DESTINATION</span>
+                    <div style={styles.nextDestinationFlow}>
+                      <span style={styles.nextDone}>✓ Route frozen</span>
+                      <b>→</b>
+                      <span style={styles.nextActive}>Artifact Studio</span>
+                      <b>→</b>
+                      <span>Artifact Registry</span>
+                      <b>→</b>
+                      <span>Verification</span>
+                    </div>
+                    <p style={styles.nextDestinationText}>The route receipt is not the execution artifact. Continue to the Artifact Studio to preserve execution evidence, outcome closure, integrity commitments, and the public claims boundary.</p>
+                  </div>
+
                   <div style={styles.resultActions}>
+                    <button type="button" onClick={openArtifactStudio} style={styles.primaryButton}>Open Artifact Studio →</button>
                     <Link
                       href="/workspace/routes"
                       style={styles.primaryLink}
@@ -1401,6 +1576,26 @@ export default function NewRoutePage() {
             <PrincipleCard />
           </section>
         ) : null}
+
+        <section style={styles.helpSection}>
+          <div style={styles.helpHeader}>
+            <div>
+              <span style={styles.sectionLabel}>INSTITUTIONAL HELP</span>
+              <h2 style={styles.helpTitle}>The eight-stage language, in plain operational terms.</h2>
+              <p style={styles.helpText}>Use this reference when a stage name is familiar but its role in governed execution is not yet clear.</p>
+            </div>
+            <Link href="/artifacts" style={styles.secondaryLink}>Inspect completed artifacts</Link>
+          </div>
+          <div style={styles.helpGrid}>
+            {chain.map((stage) => (
+              <article key={stage.key} style={styles.helpCard}>
+                <span style={styles.helpNumber}>{stage.number}</span>
+                <strong style={styles.helpCardTitle}>{stage.label}</strong>
+                <p style={styles.helpCardText}>{STAGE_GUIDANCE[stage.key].why}</p>
+              </article>
+            ))}
+          </div>
+        </section>
       </main>
     </div>
   );
@@ -2429,6 +2624,78 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 12,
     fontWeight: 800,
   },
+  lifecycle: {
+    position: "sticky",
+    top: 77,
+    zIndex: 35,
+    overflowX: "auto",
+    borderBottom: "1px solid #d9dde4",
+    background: "rgba(255,255,255,0.96)",
+    backdropFilter: "blur(16px)",
+  },
+  lifecycleInner: {
+    display: "flex",
+    alignItems: "stretch",
+    minWidth: 1120,
+    padding: "10px clamp(20px, 5vw, 72px)",
+  },
+  lifecycleItemWrap: { display: "flex", alignItems: "center", flex: 1 },
+  lifecycleNumber: { gridRow: "1 / 3", color: "#9ca3af", fontSize: 10, fontWeight: 900 },
+  lifecycleItem: { display: "grid", gridTemplateColumns: "30px 1fr", gap: "2px 8px", minWidth: 125, padding: "9px 10px", border: "1px solid transparent", borderRadius: 10, color: "#6b7280", textDecoration: "none" },
+  lifecycleArrow: { margin: "0 4px", color: "#aab2be" },
+  lifecycleComplete: { color: "#075f47", background: "#f0fdf7" },
+  lifecycleCurrent: { color: "#ffffff", borderColor: "#111827", background: "#111827", boxShadow: "0 8px 22px rgba(17,24,39,.18)" },
+  lifecycleNext: { color: "#075f47", borderColor: "#8fd9bf", background: "#ecfdf5" },
+  orientationGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 14, margin: "0 clamp(20px, 6vw, 92px) 34px" },
+  orientationCard: { padding: 24, border: "1px solid #d9dde4", borderRadius: 15, background: "#ffffff", boxShadow: "0 14px 40px rgba(15,23,42,.04)" },
+  orientationTitle: { margin: "10px 0", fontSize: 22, lineHeight: 1.2, letterSpacing: "-.03em" },
+  orientationText: { margin: 0, color: "#667085", fontSize: 13, lineHeight: 1.7 },
+  readinessSection: { margin: "0 clamp(20px, 6vw, 92px) 34px", padding: "clamp(24px, 4vw, 40px)", border: "1px solid #d9dde4", borderRadius: 20, background: "#ffffff" },
+  readinessHeader: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 22, alignItems: "flex-start" },
+  readinessTitle: { maxWidth: 820, margin: "10px 0", fontSize: "clamp(26px,3.6vw,44px)", lineHeight: 1.06, letterSpacing: "-.045em" },
+  readinessText: { maxWidth: 820, margin: 0, color: "#667085", lineHeight: 1.7 },
+  routeStatePill: { padding: "8px 12px", borderRadius: 999, fontSize: 10, fontWeight: 900, letterSpacing: ".1em" },
+  routeStateReady: { background: "#d1fae5", color: "#065f46" },
+  routeStateReview: { background: "#fef3c7", color: "#92400e" },
+  readinessGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12, marginTop: 26 },
+  readinessCard: { minHeight: 150, padding: 18, border: "1px solid #e1e5ea", borderRadius: 13, background: "#f9fafb" },
+  readinessCardTop: { display: "flex", justifyContent: "space-between", gap: 12 },
+  readinessIndex: { color: "#067a58", fontSize: 10, fontWeight: 900 },
+  conditionBadge: { padding: "5px 8px", borderRadius: 999, fontSize: 9, fontWeight: 900 },
+  conditionPass: { background: "#d1fae5", color: "#065f46" },
+  conditionBlocked: { background: "#fee2e2", color: "#991b1b" },
+  conditionPending: { background: "#e5e7eb", color: "#4b5563" },
+  conditionReview: { background: "#fef3c7", color: "#92400e" },
+  readinessCardTitle: { display: "block", marginTop: 18, fontSize: 16 },
+  readinessCardText: { margin: "8px 0 0", color: "#667085", fontSize: 12, lineHeight: 1.55 },
+  stageGuidance: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12, marginTop: 24 },
+  stageGuidanceLabel: { display: "block", color: "#067a58", fontSize: 9, fontWeight: 900, letterSpacing: ".12em" },
+  stageGuidanceText: { margin: "8px 0 0", color: "#52606d", fontSize: 13, lineHeight: 1.6 },
+  consequenceSection: { margin: "0 clamp(20px, 6vw, 92px) 34px", padding: "clamp(24px,4vw,42px)", borderRadius: 22, background: "#0b1020", color: "#ffffff", boxShadow: "0 26px 70px rgba(11,16,32,.22)" },
+  consequenceHeader: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 18, alignItems: "flex-start" },
+  consequenceTitle: { maxWidth: 850, margin: "10px 0 0", fontSize: "clamp(28px,4vw,48px)", lineHeight: 1.04, letterSpacing: "-.045em" },
+  classificationPill: { padding: "8px 11px", borderRadius: 999, background: "rgba(105,240,193,.12)", color: "#69f0c1", fontSize: 9, fontWeight: 900 },
+  consequenceGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 14, marginTop: 28 },
+  consequenceAllow: { padding: 22, border: "1px solid rgba(105,240,193,.28)", borderRadius: 15, background: "rgba(105,240,193,.06)" },
+  consequenceDeny: { padding: 22, border: "1px solid rgba(248,113,113,.28)", borderRadius: 15, background: "rgba(248,113,113,.06)" },
+  consequenceEvidence: { padding: 22, border: "1px solid rgba(147,197,253,.28)", borderRadius: 15, background: "rgba(147,197,253,.06)" },
+  consequenceLabel: { color: "#9fb0c7", fontSize: 9, fontWeight: 900, letterSpacing: ".14em" },
+  consequenceStrong: { display: "block", margin: "13px 0", fontSize: 16, lineHeight: 1.5 },
+  consequenceList: { margin: 0, paddingLeft: 18, color: "#b7c4d6", fontSize: 12, lineHeight: 1.75 },
+  nextDestination: { marginTop: 20, padding: 18, border: "1px solid #a7dbc8", borderRadius: 11, background: "#ecfdf5" },
+  nextDestinationFlow: { display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center", marginTop: 12, color: "#6b7280", fontSize: 12, fontWeight: 800 },
+  nextDone: { color: "#065f46" },
+  nextActive: { padding: "6px 8px", borderRadius: 8, background: "#111827", color: "#ffffff" },
+  nextDestinationText: { margin: "12px 0 0", color: "#52675f", fontSize: 12, lineHeight: 1.6 },
+  helpSection: { margin: "0 clamp(20px, 6vw, 92px) clamp(50px,7vw,92px)", padding: "clamp(24px,4vw,42px)", border: "1px solid #d9dde4", borderRadius: 22, background: "#ffffff" },
+  helpHeader: { display: "flex", flexWrap: "wrap", justifyContent: "space-between", gap: 20, alignItems: "flex-start" },
+  helpTitle: { maxWidth: 800, margin: "10px 0", fontSize: "clamp(28px,4vw,46px)", lineHeight: 1.05, letterSpacing: "-.045em" },
+  helpText: { maxWidth: 820, margin: 0, color: "#667085", lineHeight: 1.7 },
+  helpGrid: { display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(230px,1fr))", gap: 12, marginTop: 26 },
+  helpCard: { minHeight: 190, padding: 19, border: "1px solid #e1e5ea", borderRadius: 13, background: "#f9fafb" },
+  helpNumber: { color: "#067a58", fontSize: 10, fontWeight: 900 },
+  helpCardTitle: { display: "block", marginTop: 16, fontSize: 18 },
+  helpCardText: { margin: "10px 0 0", color: "#667085", fontSize: 12, lineHeight: 1.65 },
   principleSection: {
     padding:
       "0 clamp(20px, 6vw, 92px) clamp(40px, 7vw, 90px)",
