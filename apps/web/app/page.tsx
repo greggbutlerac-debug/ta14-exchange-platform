@@ -187,7 +187,7 @@ const workspaces = [
     id: "law",
     code: "LAW",
     title: "Law, Standards & Public Policy",
-    href: "/governance-library/laws",
+    href: "/law-standards-public-policy",
     kicker: "PRESERVE WHAT EXISTS · EXPOSE THE GAP · PROPOSE THE UPGRADE",
     description:
       "Study current law, regulations, standards, and codes beside clearly labeled TA-14 proposed acts, model language, upgraded standards, and public-policy pathways.",
@@ -335,7 +335,7 @@ export default function HomePage() {
           <Link className="grandButton gold" href="/workspace/ai-governance">Enter the AI Governance Exchange <Arrow /></Link>
           <Link className="grandButton academyButton" href="/academy">Enter TA-14 Academy <Arrow /></Link>
           <Link className="grandButton glass" href="/workspace/entity-review">Begin Guided Entity Review <Arrow /></Link>
-          <Link className="grandButton glass" href="/governance-library/laws">Enter Law, Standards & Public Policy <Arrow /></Link>
+          <Link className="grandButton glass" href="/law-standards-public-policy">Enter Law, Standards & Public Policy <Arrow /></Link>
         </div>
         <div className="heroDefinition">
           <article><span>THE INSTITUTION</span><strong>One governed umbrella</strong><p>Four primary divisions: AI Governance, TA-14 Academy, Environmental Integrity Governance, and Law, Standards & Public Policy. Registries, research, records, verification, entity review, HVAC, and atmospheric pathways live behind the correct door.</p></article>
