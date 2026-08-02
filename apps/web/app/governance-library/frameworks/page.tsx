@@ -365,6 +365,85 @@ const frameworks: FrameworkRecord[] = [
     ta14Boundary:
       "Voluntary commitments can support a governance route, but they do not create execution authority or prove that a particular action was admissible.",
   },
+
+  {
+    id: "epa-air-quality-system",
+    name: "United States Air Quality Governance System",
+    shortName: "EPA Air Quality System",
+    type: "Regulation",
+    status: "Binding",
+    jurisdiction: "United States",
+    organization: "U.S. Environmental Protection Agency",
+    focus: "Implementation of Clean Air Act duties through ambient standards, source controls, monitoring, permitting, enforcement, and state implementation plans.",
+    purpose: "Connects statutory air-protection authority to regulatory programs, approved methods, monitoring networks, permits, records, enforcement, and outcome review.",
+    coreAreas: ["National Ambient Air Quality Standards", "State implementation plans", "Stationary-source permitting", "Mobile-source controls", "Hazardous air pollutants", "Monitoring and quality assurance", "Enforcement", "Public reporting"],
+    evidence: ["Applicable statutory provision", "Regulatory citation", "Monitoring method", "Instrument and calibration record", "Permit or implementation-plan record", "Emission or ambient result", "Enforcement record", "Outcome comparison"],
+    relatedRecords: ["Clean Air Act", "40 CFR Parts 50, 53, and 58", "WHO Global Air Quality Guidelines"],
+    ta14Boundary: "Regulatory compliance evidence does not by itself prove that a particular building, person, intervention, or claimed protection remained environmentally valid. TA-14 binds the applicable authority to the actual evidence, action, and verified outcome.",
+    featured: true,
+  },
+  {
+    id: "epa-water-governance-system",
+    name: "United States Water Quality Governance System",
+    shortName: "EPA Water Governance",
+    type: "Regulation",
+    status: "Binding",
+    jurisdiction: "United States",
+    organization: "U.S. Environmental Protection Agency",
+    focus: "Clean Water Act and Safe Drinking Water Act implementation through permits, standards, treatment duties, approved analytical methods, monitoring, reporting, and enforcement.",
+    purpose: "Provides the regulatory and evidentiary structure through which discharges, receiving waters, drinking-water systems, treatment, sampling, and public protection are governed.",
+    coreAreas: ["NPDES permitting", "Water-quality standards", "Effluent limitations", "Pretreatment", "Drinking-water standards", "Sampling and analytical methods", "Public notification", "Enforcement"],
+    evidence: ["Permit or system classification", "Sampling plan", "Chain-of-custody record", "Approved method", "Laboratory result", "Treatment record", "Violation or notification record", "Outcome verification"],
+    relatedRecords: ["Clean Water Act", "Safe Drinking Water Act", "EPA analytical methods"],
+    ta14Boundary: "A compliant sample or permit record is bounded to its method, place, time, analyte, system, and legal purpose. It cannot be generalized into an unsupported universal safety or restoration claim.",
+    featured: true,
+  },
+  {
+    id: "who-air-quality-guidelines",
+    name: "WHO Global Air Quality Guidelines",
+    shortName: "WHO AQG",
+    type: "Guidance",
+    status: "Implementation guidance",
+    jurisdiction: "International",
+    organization: "World Health Organization",
+    focus: "Health-based guidance for major air pollutants and interim targets used to inform policy, standards, and public-health protection.",
+    purpose: "Provides evidence-informed concentration levels and interim targets that governments and institutions may use when developing air-quality law, policy, standards, and interventions.",
+    coreAreas: ["Particulate matter", "Ozone", "Nitrogen dioxide", "Sulfur dioxide", "Carbon monoxide", "Interim targets", "Health evidence", "Policy translation"],
+    evidence: ["Guideline edition", "Pollutant and averaging period", "Measurement method", "Population and exposure context", "Comparison record", "Uncertainty statement", "Policy adoption record"],
+    relatedRecords: ["Clean Air Act", "Ambient air standards", "Atmospheric Integrity Records"],
+    ta14Boundary: "WHO guideline values are not automatically binding law. Their governance effect depends on adoption, jurisdiction, measurement validity, context, and the bounded proposition being evaluated.",
+  },
+  {
+    id: "iso-14001",
+    name: "ISO 14001 Environmental Management Systems",
+    shortName: "ISO 14001",
+    type: "Management System",
+    status: "Voluntary",
+    jurisdiction: "International",
+    organization: "International Organization for Standardization",
+    focus: "Organizational environmental management, compliance obligations, operational controls, performance evaluation, and continual improvement.",
+    purpose: "Provides a management-system structure for identifying environmental aspects, obligations, risks, controls, objectives, monitoring, audits, and corrective action.",
+    coreAreas: ["Environmental aspects", "Compliance obligations", "Objectives", "Operational controls", "Emergency preparedness", "Monitoring", "Internal audit", "Continual improvement"],
+    evidence: ["Management-system scope", "Aspect and impact register", "Compliance-obligation register", "Operational-control record", "Monitoring result", "Audit record", "Corrective action", "Management review"],
+    relatedRecords: ["ISO 14004", "Environmental regulation", "TA-14 Environmental Integrity Governance"],
+    ta14Boundary: "Management-system conformity supports institutional discipline but does not independently prove the validity of a particular environmental measurement, intervention, or claimed outcome.",
+  },
+  {
+    id: "ta14-environmental-integrity-framework",
+    name: "TA-14 Environmental Integrity Governance Framework",
+    shortName: "TA-14 EIG",
+    type: "Risk Framework",
+    status: "Voluntary",
+    jurisdiction: "Institutional / Proposed",
+    organization: "TA-14 Authority Governance Institution",
+    focus: "Governed environmental reality from record and continuity through admissibility, intervention, and verified outcome.",
+    purpose: "Provides a cross-domain architecture for atmospheric records, PAIR, buildings, HVAC, air, water, land, pollution, environmental entity review, and future reliance.",
+    coreAreas: ["Reality declaration", "Environmental record", "Continuity", "Admissibility", "Authority binding", "Committed determination", "Governed intervention", "Outcome verification"],
+    evidence: ["Instrument and method record", "Location and activity context", "Continuity package", "Authority and threshold map", "Committed determination", "Intervention record", "Outcome record", "Limitations and non-claims"],
+    relatedRecords: ["Atmospheric Integrity Records", "TA-14 Academy", "Law, Standards & Public Policy"],
+    ta14Boundary: "This is a TA-14 institutional framework and proposed governance architecture. It does not replace enacted law, official standards, licensed professional judgment, or jurisdiction-specific authority.",
+    featured: true,
+  },
 ];
 
 const frameworkTypes: Array<
@@ -514,11 +593,11 @@ export default function FrameworksPage() {
           </div>
 
           <p className="eyebrow">
-            TA-14 AI GOVERNANCE LIBRARY
+            TA-14 AUTHORITY GOVERNANCE LIBRARY
           </p>
 
           <h1>
-            AI Governance
+            Institutional Governance
             <span> Frameworks</span>
           </h1>
 
@@ -888,10 +967,10 @@ export default function FrameworksPage() {
                 </Link>
 
                 <Link
-                  href="/workspace/ai-governance"
+                  href="/law-standards-public-policy"
                   className="primaryAction"
                 >
-                  Build Governed Route →
+                  Enter Governed Pathway →
                 </Link>
               </div>
             </section>
@@ -1098,7 +1177,7 @@ export default function FrameworksPage() {
             </Link>
 
             <Link
-              href="/workspace/ai-governance"
+              href="/law-standards-public-policy"
               className="primaryAction"
             >
               Build TA-14 Route →
