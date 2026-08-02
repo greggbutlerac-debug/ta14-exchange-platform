@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
-type View = "library" | "inspector" | "verification" | "method";
+type View = "library" | "inspector" | "verification" | "method" | "guide";
 type SortMode = "sequence" | "determination" | "sector" | "verification";
 type ArtifactRecord = {
   artifactId: string;
@@ -687,6 +687,72 @@ const determinationMeaning: Record<Determination, string> = {
   ESCALATE: "Named human or institutional judgment is required; escalation is not approval.",
 };
 
+
+const FOUNDING_PRODUCER = {
+  name: "TA-14 Authority",
+  governance: "TA-14 Admissible Execution Architecture",
+  governanceId: "TA14-GOV-FOUNDING-000001",
+};
+
+const FOUNDING_VERIFIER = {
+  name: "TA-14 Authority",
+  authorityId: "TA14-VERIFY-AUTHORITY-000001",
+};
+
+const REGISTRY_STEPS = [
+  {
+    step: "01",
+    eyebrow: "Register governance",
+    title: "Establish an attributable governance identity.",
+    description: "Register the organization, accountable owner, architecture name, version, sectors, jurisdictions, supported determinations, claims, and explicit limits.",
+    href: "/governance/register",
+    action: "Register governance",
+  },
+  {
+    step: "02",
+    eyebrow: "Build the route",
+    title: "Convert the proposed consequence into a frozen governed route.",
+    description: "Bind the registered governance version, sector, jurisdiction, evidence requirements, authority conditions, boundaries, runtime gates, and revalidation triggers.",
+    href: "/workspace/routes/new",
+    action: "Build a route",
+  },
+  {
+    step: "03",
+    eyebrow: "Produce the artifact",
+    title: "Run the route and preserve the bounded execution record.",
+    description: "Admit evidence, resolve authority, preserve continuity, commit before action, capture the technical effect, and close the real-world outcome.",
+    href: "/artifacts/studio",
+    action: "Open Artifact Studio",
+  },
+  {
+    step: "04",
+    eyebrow: "Verify the package",
+    title: "Test integrity, parity, execution effect, and outcome closure.",
+    description: "Confirm that the public page, canonical record, manifests, route snapshot, receipts, hashes, and disclosed evidence resolve to one event.",
+    href: "/artifacts/verify",
+    action: "Open Verification",
+  },
+  {
+    step: "05",
+    eyebrow: "Register the artifact",
+    title: "Publish the artifact beneath the governance that produced it.",
+    description: "The registry assigns a permanent identity, records attribution, preserves the verification state, and opens the artifact to inspection and challenge.",
+    href: "/artifacts/register",
+    action: "Register an artifact",
+  },
+] as const;
+
+const TRUST_MARKS = [
+  { label: "Artifact class", value: "Founding Artifact" },
+  { label: "Produced by", value: FOUNDING_PRODUCER.name },
+  { label: "Governance", value: FOUNDING_PRODUCER.governance },
+  { label: "Verified by", value: FOUNDING_VERIFIER.name },
+] as const;
+
+function registryIdFor(sequence: number) {
+  return `TA14-REG-EA-${String(sequence).padStart(6, "0")}`;
+}
+
 function downloadJson(name: string, payload: unknown) {
   const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json;charset=utf-8" });
   const url = URL.createObjectURL(blob);
@@ -782,7 +848,9 @@ export default function ExecutionArtifactsLibraryPage() {
           <button className={view === "library" ? "active" : ""} onClick={() => setView("library")}>Artifact Library</button>
           <button className={view === "verification" ? "active" : ""} onClick={() => setView("verification")}>Verification</button>
           <button className={view === "method" ? "active" : ""} onClick={() => setView("method")}>Proof Method</button>
-          <Link href="/workspace/artifacts/build" className="build-link">Build an artifact</Link>
+          <button className={view === "guide" ? "active" : ""} onClick={() => setView("guide")}>How it works</button>
+          <Link href="/governance/directory">Governance Directory</Link>
+          <Link href="/artifacts/studio" className="build-link">Build an artifact</Link>
         </nav>
       </header>
 
@@ -794,6 +862,7 @@ export default function ExecutionArtifactsLibraryPage() {
           <div className="hero-actions">
             <button onClick={() => { setView("library"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth" }); }}>Inspect the first twelve</button>
             <button className="secondary" onClick={() => setView("verification")}>Verify a record</button>
+            <button className="secondary" onClick={() => { setView("guide"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth" }); }}>See the five-step path</button>
           </div>
           <div className="governing-rule"><small>Governing rule</small><strong>No admissible evidence. No admissible execution.</strong></div>
         </div>
@@ -820,14 +889,38 @@ export default function ExecutionArtifactsLibraryPage() {
         <article className="escalate"><b>ESCALATE</b><strong>{counts.escalate}</strong><span>Named judgment required</span></article>
       </section>
 
+      <section className="institutional-ribbon" aria-label="Artifact attribution standard">
+        <div className="ribbon-rule">
+          <span>Registry rule</span>
+          <strong>No registered governance. No registered artifact.</strong>
+        </div>
+        <div className="ribbon-marks">
+          {TRUST_MARKS.map((mark) => (
+            <span key={mark.label}><small>{mark.label}</small><b>{mark.value}</b></span>
+          ))}
+        </div>
+        <button onClick={() => { setView("guide"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Follow the path →</button>
+      </section>
+
       <section id="artifact-workspace" className="workspace">
         <div className="workspace-head">
-          <div><small>Public proof corpus</small><h2>{view === "library" ? "Inspect completed execution artifacts" : view === "inspector" ? selected.artifactId : view === "verification" ? "Verification center" : "Canonical proof method"}</h2></div>
-          <p>{view === "library" ? "Filter the founding set by determination, controlling chain link, sector, or verification level." : view === "inspector" ? selected.title : view === "verification" ? "Resolve an artifact, receipt, or route identifier against the published founding set." : "The method every public artifact must preserve before TA-14 treats it as execution proof."}</p>
+          <div><small>Public proof corpus</small><h2>{view === "library" ? "Inspect completed execution artifacts" : view === "inspector" ? selected.artifactId : view === "verification" ? "Verification center" : view === "guide" ? "From governance registration to public proof" : "Canonical proof method"}</h2></div>
+          <p>{view === "library" ? "Filter the founding set by determination, controlling chain link, sector, or verification level." : view === "inspector" ? selected.title : view === "verification" ? "Resolve an artifact, receipt, or route identifier against the published founding set." : view === "guide" ? "Five governed steps take an organization from attributable registration to a registered, inspectable execution artifact." : "The method every public artifact must preserve before TA-14 treats it as execution proof."}</p>
         </div>
 
         {view === "library" && (
           <>
+            <div className="library-onboarding">
+              <div>
+                <small>First time here?</small>
+                <h3>Inspect the founding set—or follow the same governed path to produce your own.</h3>
+                <p>Every artifact is attributable to a registered governance, bound to a frozen route, verified against a preserved package, and open to challenge without rewriting the original event.</p>
+              </div>
+              <div className="onboarding-actions">
+                <button onClick={() => setView("guide")}>Show me the five steps</button>
+                <Link href="/governance/register">Register AI governance</Link>
+              </div>
+            </div>
             <div className="filter-console">
               <label className="search-field"><span>Search the corpus</span><input value={search} onChange={(event) => setSearch(event.target.value)} placeholder="Artifact ID, title, sector, condition, effect..." /></label>
               <label><span>Determination</span><select value={determination} onChange={(event) => setDetermination(event.target.value as "ALL" | Determination)}><option value="ALL">All determinations</option><option value="ALLOW">ALLOW</option><option value="HOLD">HOLD</option><option value="DENY">DENY</option><option value="ESCALATE">ESCALATE</option></select></label>
@@ -839,10 +932,22 @@ export default function ExecutionArtifactsLibraryPage() {
             <div className="artifact-grid">
               {filtered.map((item) => (
                 <article className={`artifact-card ${determinationClass(item.determination)}`} key={item.artifactId} style={{ "--tone": item.color } as React.CSSProperties}>
-                  <div className="card-top"><span>{String(item.sequence).padStart(2, "0")}</span><b>{item.publicationState}</b></div>
+                  <div className="card-top">
+                    <div className="artifact-identity">
+                      <span>{String(item.sequence).padStart(2, "0")}</span>
+                      <div><small>Permanent artifact ID</small><b>{item.artifactId}</b></div>
+                    </div>
+                    <div className="publication-stack"><b>{item.publicationState}</b><em>FOUNDING ARTIFACT</em></div>
+                  </div>
                   <div className="card-determination">{item.determination}</div>
                   <h3>{item.title}</h3>
                   <p>{item.summary}</p>
+                  <div className="artifact-attribution">
+                    <span><small>Produced by</small>{FOUNDING_PRODUCER.name}</span>
+                    <span><small>Governance</small>{FOUNDING_PRODUCER.governance}</span>
+                    <span><small>Verified by</small>{FOUNDING_VERIFIER.name}</span>
+                    <span><small>Registry ID</small>{registryIdFor(item.sequence)}</span>
+                  </div>
                   <div className="card-facts">
                     <span><small>Controlling anchor</small>{item.anchor}</span>
                     <span><small>Execution effect</small>{item.executionEffect}</span>
@@ -871,6 +976,14 @@ export default function ExecutionArtifactsLibraryPage() {
               </div>
               <div className={`decision-core ${determinationClass(selected.determination)}`}><small>Committed determination</small><strong>{selected.determination}</strong><span>L{selected.verificationLevel} VERIFIED</span></div>
             </div>
+            <div className="identity-ledger">
+              <span><small>Permanent artifact ID</small><b>{selected.artifactId}</b></span>
+              <span><small>Registry ID</small><b>{registryIdFor(selected.sequence)}</b></span>
+              <span><small>Classification</small><b>Founding Artifact</b></span>
+              <span><small>Produced by</small><b>{FOUNDING_PRODUCER.name}</b></span>
+              <span><small>Governance ID</small><b>{FOUNDING_PRODUCER.governanceId}</b></span>
+              <span><small>Verified by</small><b>{FOUNDING_VERIFIER.name}</b></span>
+            </div>
             <div className="inspector-grid">
               <article className="panel wide"><small>Earliest controlling condition</small><h3>{selected.earliestFailure}</h3><p>{determinationMeaning[selected.determination]}</p></article>
               <article className="panel"><small>Route identity</small><button className="copy-value" onClick={() => copyText(selected.routeId, "Route ID")}>{selected.routeId}<i>{copied === "Route ID" ? "Copied" : "Copy"}</i></button><button className="copy-value" onClick={() => copyText(selected.receiptId, "Receipt ID")}>{selected.receiptId}<i>{copied === "Receipt ID" ? "Copied" : "Copy"}</i></button></article>
@@ -890,9 +1003,70 @@ export default function ExecutionArtifactsLibraryPage() {
           <div className="verification-center">
             <div className="verification-hero"><div><small>Public verification center</small><h2>Resolve the record.<br/><em>Inspect the boundary.</em></h2><p>Enter a published artifact ID, route ID, or receipt ID. This founding verifier resolves identifiers against the twelve completed Door Eight records and exposes their bounded verification state.</p></div><div className="verify-orb"><span>✓</span><i/><i/><i/></div></div>
             <div className="verify-console"><label><span>Artifact, route, or receipt identifier</span><div><input value={verificationQuery} onChange={(event) => setVerificationQuery(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") verify(); }} placeholder="TA14-EA-000001"/><button onClick={verify}>Verify record</button></div></label><div className="quick-ids">{ARTIFACTS.slice(0, 6).map((item) => <button key={item.artifactId} onClick={() => { setVerificationQuery(item.artifactId); setVerificationResult(item); }}>{item.artifactId}</button>)}</div></div>
-            {verificationQuery && verificationResult && <div className="verification-result success" style={{ "--tone": verificationResult.color } as React.CSSProperties}><div><small>Resolved public record</small><h3>{verificationResult.artifactId}</h3><p>{verificationResult.title}</p></div><div className="verify-facts"><span><small>Determination</small>{verificationResult.determination}</span><span><small>Effect</small>{verificationResult.executionEffect}</span><span><small>Verification</small>LEVEL {verificationResult.verificationLevel}</span><span><small>Status</small>{verificationResult.publicationState}</span></div><button onClick={() => openArtifact(verificationResult)}>Inspect bounded record</button></div>}
+            {verificationQuery && verificationResult && <div className="verification-result success" style={{ "--tone": verificationResult.color } as React.CSSProperties}><div><small>Resolved public record</small><h3>{verificationResult.artifactId}</h3><p>{verificationResult.title}</p></div><div className="verify-facts"><span><small>Determination</small>{verificationResult.determination}</span><span><small>Effect</small>{verificationResult.executionEffect}</span><span><small>Verification</small>LEVEL {verificationResult.verificationLevel}</span><span><small>Status</small>{verificationResult.publicationState}</span><span><small>Produced by</small>{FOUNDING_PRODUCER.name}</span><span><small>Verified by</small>{FOUNDING_VERIFIER.name}</span></div><button onClick={() => openArtifact(verificationResult)}>Inspect bounded record</button></div>}
             {verificationQuery && !verificationResult && <div className="verification-result failed"><small>NO FOUNDING RECORD RESOLVED</small><h3>Identifier not found</h3><p>Check the identifier or inspect the public library. This verifier currently resolves the first twelve TA-14 execution artifacts.</p></div>}
             <div className="verification-levels">{VERIFICATION_LEVELS.map((item, index) => <article className={index <= 6 ? "active" : ""} key={item.code}><b>{item.code}</b><span>{item.title}</span><p>{item.description}</p></article>)}</div>
+          </div>
+        )}
+
+        {view === "guide" && (
+          <div className="guide">
+            <div className="guide-hero">
+              <div>
+                <small>Institutional participation path</small>
+                <h2>Do not merely describe governance.<br/><em>Register it. Run it. Prove it.</em></h2>
+                <p>The Exchange is designed so an organization can establish an attributable governance identity, build a governed route, preserve a consequential run, verify the resulting package, and register the artifact for public inspection.</p>
+              </div>
+              <div className="guide-rule">
+                <span>Hard admission rule</span>
+                <strong>No registered governance.<br/>No registered artifact.</strong>
+                <p>Registration is not certification. It establishes who is responsible for the governance, which version produced the artifact, and the limits of the public claim.</p>
+              </div>
+            </div>
+
+            <div className="journey-map">
+              {REGISTRY_STEPS.map((step, index) => (
+                <article key={step.step}>
+                  <div className="journey-number">{step.step}</div>
+                  <div className="journey-copy">
+                    <small>{step.eyebrow}</small>
+                    <h3>{step.title}</h3>
+                    <p>{step.description}</p>
+                    <Link href={step.href}>{step.action} →</Link>
+                  </div>
+                  {index < REGISTRY_STEPS.length - 1 && <div className="journey-connector" aria-hidden="true"><span/></div>}
+                </article>
+              ))}
+            </div>
+
+            <div className="guide-proof-grid">
+              <article>
+                <small>What the registry preserves</small>
+                <h3>Attribution</h3>
+                <p>Organization, accountable owner, governance architecture, version, route, publisher, verifier, and permanent artifact identifiers.</p>
+              </article>
+              <article>
+                <small>What verification establishes</small>
+                <h3>Bounded reliance</h3>
+                <p>Exactly what was checked—integrity, parity, replay, execution effect, outcome closure, or independent review—and what remains outside the claim.</p>
+              </article>
+              <article>
+                <small>What challenge protects</small>
+                <h3>Correctable history</h3>
+                <p>The original event remains visible while challenges, responses, corrections, supersessions, and changes to prospective reliance are appended.</p>
+              </article>
+            </div>
+
+            <div className="guide-cta">
+              <div>
+                <small>Ready to produce evidence?</small>
+                <h3>Start with governance registration, then build the route that will govern the artifact.</h3>
+              </div>
+              <div>
+                <Link href="/governance/register">Register governance</Link>
+                <Link href="/workspace/routes/new" className="secondary-link">Build a route</Link>
+              </div>
+            </div>
           </div>
         )}
 
@@ -910,7 +1084,7 @@ export default function ExecutionArtifactsLibraryPage() {
       <footer>
         <div><b>TA-14 Authority</b><span>Governance Institution for Admissible Execution Architecture</span></div>
         <strong>No admissible evidence. No admissible execution.</strong>
-        <div><Link href="/">Exchange</Link><Link href="/workspace/artifacts/build">Artifact Studio</Link><button onClick={() => setView("verification")}>Verification</button></div>
+        <div><Link href="/">Exchange</Link><Link href="/artifacts/studio">Artifact Studio</Link><Link href="/governance/register">Register governance</Link><button onClick={() => setView("verification")}>Verification</button></div>
       </footer>
 
       <style jsx>{`
@@ -2146,6 +2320,256 @@ export default function ExecutionArtifactsLibraryPage() {
           font-size:8px;
           cursor:pointer
         }
+
+        .institutional-ribbon {
+          position:relative;
+          z-index:3;
+          max-width:1420px;
+          margin:14px auto 0;
+          padding:18px 22px;
+          display:grid;
+          grid-template-columns:1.05fr 2fr auto;
+          gap:24px;
+          align-items:center;
+          border:1px solid rgba(126,157,216,.16);
+          border-radius:16px;
+          background:linear-gradient(135deg,rgba(10,20,40,.92),rgba(5,11,24,.92));
+          box-shadow:0 22px 60px rgba(0,0,0,.2)
+        }
+        .ribbon-rule span,.ribbon-rule strong {display:block}
+        .ribbon-rule span {
+          color:#6680aa;
+          font-size:7px;
+          letter-spacing:.16em;
+          text-transform:uppercase
+        }
+        .ribbon-rule strong {margin-top:7px;font-size:13px}
+        .ribbon-marks {
+          display:grid;
+          grid-template-columns:repeat(4,1fr);
+          gap:8px
+        }
+        .ribbon-marks span {
+          min-height:58px;
+          padding:10px 12px;
+          border-radius:9px;
+          background:rgba(255,255,255,.025)
+        }
+        .ribbon-marks small,.ribbon-marks b {display:block}
+        .ribbon-marks small {
+          color:#5f7396;
+          font-size:6px;
+          letter-spacing:.12em;
+          text-transform:uppercase
+        }
+        .ribbon-marks b {margin-top:7px;color:#aebed6;font-size:8px}
+        .institutional-ribbon>button {
+          border:0;
+          border-radius:9px;
+          padding:12px 15px;
+          background:linear-gradient(135deg,#9fc4ff,#7197ed);
+          color:#06101f;
+          font-size:8px;
+          font-weight:900;
+          cursor:pointer
+        }
+        .library-onboarding {
+          margin-bottom:12px;
+          padding:24px;
+          display:grid;
+          grid-template-columns:1fr auto;
+          gap:24px;
+          align-items:center;
+          border:1px solid rgba(126,157,216,.14);
+          border-radius:16px;
+          background:radial-gradient(circle at 90% 10%,rgba(83,129,222,.1),transparent 30%),rgba(7,14,29,.82)
+        }
+        .library-onboarding small {
+          color:#6b82a8;
+          font-size:7px;
+          letter-spacing:.16em;
+          text-transform:uppercase
+        }
+        .library-onboarding h3 {margin:10px 0 8px;font-size:22px;letter-spacing:-.025em}
+        .library-onboarding p {margin:0;max-width:900px;color:#8190aa;line-height:1.65;font-size:10px}
+        .onboarding-actions {display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+        .onboarding-actions button,.onboarding-actions a {
+          padding:11px 13px;
+          border-radius:9px;
+          font-size:8px;
+          font-weight:900;
+          text-decoration:none;
+          cursor:pointer
+        }
+        .onboarding-actions button {border:0;background:#8eb6ff;color:#06101f}
+        .onboarding-actions a {border:1px solid rgba(126,157,216,.2);color:#a8bee2}
+        .artifact-card {min-height:680px}
+        .artifact-identity {display:flex;align-items:center;gap:12px;min-width:0}
+        .artifact-identity>span {flex:0 0 auto}
+        .artifact-identity div {min-width:0}
+        .artifact-identity small,.artifact-identity b {display:block}
+        .artifact-identity small {
+          color:#5e7294;
+          font-size:6px;
+          letter-spacing:.12em;
+          text-transform:uppercase
+        }
+        .artifact-identity b {
+          margin-top:5px;
+          color:#b4c7e5;
+          font-size:8px;
+          letter-spacing:.06em;
+          overflow-wrap:anywhere
+        }
+        .publication-stack {display:grid;gap:6px;justify-items:end}
+        .publication-stack b,.publication-stack em {
+          padding:6px 8px;
+          border-radius:999px;
+          font-size:6px;
+          letter-spacing:.13em;
+          font-style:normal
+        }
+        .publication-stack b {color:#7184a5;background:rgba(255,255,255,.025)}
+        .publication-stack em {color:#e2bd64;border:1px solid rgba(226,189,100,.22);background:rgba(226,189,100,.05)}
+        .artifact-attribution {
+          display:grid;
+          grid-template-columns:1fr 1fr;
+          gap:7px;
+          margin:13px 0
+        }
+        .artifact-attribution span {
+          min-height:50px;
+          padding:9px 10px;
+          border-radius:9px;
+          border:1px solid rgba(126,157,216,.08);
+          background:rgba(255,255,255,.018);
+          color:#a9b9d0;
+          font-size:7px;
+          line-height:1.35;
+          overflow-wrap:anywhere
+        }
+        .artifact-attribution small {
+          display:block;
+          color:#5e7190;
+          font-size:6px;
+          letter-spacing:.1em;
+          text-transform:uppercase;
+          margin-bottom:5px
+        }
+        .identity-ledger {
+          margin-top:12px;
+          padding:14px;
+          display:grid;
+          grid-template-columns:repeat(3,1fr);
+          gap:8px;
+          border:1px solid var(--line);
+          border-radius:14px;
+          background:rgba(7,14,29,.82)
+        }
+        .identity-ledger span {padding:12px;border-radius:9px;background:rgba(255,255,255,.022)}
+        .identity-ledger small,.identity-ledger b {display:block}
+        .identity-ledger small {color:#61769a;font-size:6px;letter-spacing:.12em;text-transform:uppercase}
+        .identity-ledger b {margin-top:7px;color:#afc0d8;font-size:8px;overflow-wrap:anywhere}
+        .guide-hero {
+          min-height:430px;
+          display:grid;
+          grid-template-columns:1.15fr .85fr;
+          gap:70px;
+          align-items:center
+        }
+        .guide-hero small {
+          color:#6c84aa;
+          font-size:8px;
+          letter-spacing:.17em;
+          text-transform:uppercase
+        }
+        .guide-hero h2 {
+          font-size:clamp(54px,6.5vw,92px);
+          line-height:.88;
+          letter-spacing:-.065em;
+          margin:26px 0
+        }
+        .guide-hero h2 em {
+          font-style:normal;
+          color:transparent;
+          -webkit-text-stroke:1px #89aff3
+        }
+        .guide-hero p {color:#8796af;line-height:1.75}
+        .guide-rule {
+          padding:30px;
+          border:1px solid rgba(226,189,100,.18);
+          border-radius:18px;
+          background:radial-gradient(circle at 80% 0,rgba(226,189,100,.09),transparent 34%),rgba(7,14,29,.82)
+        }
+        .guide-rule span {color:#c7a653;font-size:7px;letter-spacing:.16em;text-transform:uppercase}
+        .guide-rule strong {display:block;margin:17px 0;font-size:28px;line-height:1.12}
+        .guide-rule p {font-size:10px;margin:0}
+        .journey-map {display:grid;gap:10px;margin:20px 0 70px}
+        .journey-map article {
+          position:relative;
+          display:grid;
+          grid-template-columns:86px 1fr;
+          gap:22px;
+          min-height:190px;
+          padding:28px;
+          border:1px solid var(--line);
+          border-radius:16px;
+          background:linear-gradient(145deg,rgba(13,23,45,.9),rgba(5,10,22,.9))
+        }
+        .journey-number {
+          width:70px;
+          height:70px;
+          border-radius:50%;
+          display:grid;
+          place-items:center;
+          border:1px solid rgba(125,170,255,.28);
+          color:#9abaff;
+          font-size:22px;
+          font-weight:1000;
+          box-shadow:0 0 40px rgba(75,126,225,.1)
+        }
+        .journey-copy small {color:#6680aa;font-size:7px;letter-spacing:.16em;text-transform:uppercase}
+        .journey-copy h3 {font-size:26px;letter-spacing:-.03em;margin:12px 0 9px}
+        .journey-copy p {color:#8190aa;line-height:1.65;max-width:970px;font-size:10px}
+        .journey-copy a {display:inline-block;margin-top:12px;color:#8eb6ff;text-decoration:none;font-size:8px;font-weight:900}
+        .journey-connector {
+          position:absolute;
+          left:62px;
+          bottom:-18px;
+          width:1px;
+          height:26px;
+          background:rgba(126,157,216,.24)
+        }
+        .journey-connector span {
+          position:absolute;
+          bottom:0;
+          left:-3px;
+          width:7px;
+          height:7px;
+          border-radius:50%;
+          background:#7ca8fa
+        }
+        .guide-proof-grid {display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-bottom:70px}
+        .guide-proof-grid article {padding:28px;border:1px solid var(--line);border-radius:15px;background:rgba(7,14,29,.82)}
+        .guide-proof-grid small {color:#667da4;font-size:7px;letter-spacing:.15em;text-transform:uppercase}
+        .guide-proof-grid h3 {font-size:27px;margin:14px 0}
+        .guide-proof-grid p {color:#8190aa;line-height:1.65;font-size:10px}
+        .guide-cta {
+          padding:40px;
+          display:grid;
+          grid-template-columns:1fr auto;
+          gap:30px;
+          align-items:center;
+          border:1px solid rgba(104,153,246,.2);
+          border-radius:19px;
+          background:radial-gradient(circle at 85% 50%,rgba(67,112,219,.13),transparent 34%),rgba(7,14,29,.82)
+        }
+        .guide-cta small {color:#6981a9;font-size:7px;letter-spacing:.16em;text-transform:uppercase}
+        .guide-cta h3 {font-size:29px;max-width:850px;margin:10px 0 0;letter-spacing:-.035em}
+        .guide-cta>div:last-child {display:flex;gap:8px}
+        .guide-cta a {padding:13px 16px;border-radius:9px;background:#8eb6ff;color:#06101f;text-decoration:none;font-size:8px;font-weight:900}
+        .guide-cta a.secondary-link {background:transparent;color:#a7bee3;border:1px solid rgba(126,157,216,.2)}
+
         @keyframes spin {
           to {
             transform:rotate(360deg)
@@ -2182,7 +2606,26 @@ export default function ExecutionArtifactsLibraryPage() {
             grid-template-columns:repeat(3,1fr)
           }
         }
+
+        @media(max-width:1160px) {
+          .institutional-ribbon {grid-template-columns:1fr}
+          .ribbon-marks {grid-template-columns:1fr 1fr}
+          .identity-ledger {grid-template-columns:1fr 1fr}
+          .guide-hero {grid-template-columns:1fr}
+        }
+
         @media(max-width:760px) {
+          .institutional-ribbon {margin:14px 18px 0;padding:16px}
+          .ribbon-marks {grid-template-columns:1fr}
+          .library-onboarding {grid-template-columns:1fr}
+          .onboarding-actions {justify-content:flex-start}
+          .artifact-card {min-height:720px}
+          .identity-ledger {grid-template-columns:1fr}
+          .guide-proof-grid {grid-template-columns:1fr}
+          .guide-cta {grid-template-columns:1fr}
+          .guide-cta>div:last-child {flex-wrap:wrap}
+          .journey-map article {grid-template-columns:1fr}
+          .journey-connector {display:none}
           .topbar {
             padding:15px 18px
           }
