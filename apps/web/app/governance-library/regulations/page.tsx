@@ -222,6 +222,341 @@ const regulationRecords: RegulationRecord[] = [
     crosswalkHref: "/governance-library/crosswalks",
     applicabilityHref: "/governance-library/applicability",
   },
+
+  {
+    id: "epa-clean-air-regulatory-system",
+    title: "EPA Clean Air Act Regulatory System",
+    shortTitle: "Clean Air Act Regulations",
+    description:
+      "National ambient-air standards, state implementation plans, stationary-source permitting, hazardous-air-pollutant controls, mobile-source requirements, monitoring, reporting, and enforcement under the Clean Air Act.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency",
+    sectors: [
+      "Air Quality",
+      "Industrial Facilities",
+      "Transportation",
+      "Energy",
+      "Buildings",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 92,
+    relatedSources: [
+      "Clean Air Act",
+      "40 CFR Parts 50–99",
+      "National Ambient Air Quality Standards",
+      "State Implementation Plans",
+      "Title V Operating Permits",
+    ],
+    relatedRecords: 24,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "epa-clean-water-regulatory-system",
+    title: "EPA Clean Water Act Regulatory System",
+    shortTitle: "Clean Water Act Regulations",
+    description:
+      "Effluent limitations, discharge permits, water-quality standards, pretreatment, stormwater, wetlands, spill controls, monitoring, laboratory methods, reporting, and enforcement under the Clean Water Act.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency and authorized states",
+    sectors: [
+      "Water Quality",
+      "Wastewater",
+      "Industrial Facilities",
+      "Municipal Systems",
+      "Construction",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 91,
+    relatedSources: [
+      "Clean Water Act",
+      "NPDES",
+      "40 CFR Parts 100–149",
+      "Water Quality Standards",
+      "EPA Analytical Methods",
+    ],
+    relatedRecords: 22,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "safe-drinking-water-regulations",
+    title: "Safe Drinking Water Act Regulatory System",
+    shortTitle: "Drinking Water Regulations",
+    description:
+      "National primary drinking-water regulations, contaminant limits, treatment techniques, monitoring, public notification, underground injection controls, operator duties, and source-water protections.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency and primacy agencies",
+    sectors: [
+      "Drinking Water",
+      "Public Utilities",
+      "Healthcare",
+      "Schools",
+      "Public Buildings",
+    ],
+    status: "Active",
+    applicability: "High",
+    crosswalkCoverage: 88,
+    relatedSources: [
+      "Safe Drinking Water Act",
+      "40 CFR Parts 141–149",
+      "National Primary Drinking Water Regulations",
+      "Public Notification Rule",
+    ],
+    relatedRecords: 18,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "rcra-hazardous-waste-regulations",
+    title: "RCRA Hazardous and Solid Waste Regulatory System",
+    shortTitle: "RCRA Regulations",
+    description:
+      "Cradle-to-grave hazardous-waste identification, generator duties, transport, treatment, storage, disposal, corrective action, underground tanks, permitting, manifests, records, and enforcement.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency and authorized states",
+    sectors: [
+      "Hazardous Waste",
+      "Industrial Facilities",
+      "Healthcare",
+      "Laboratories",
+      "Waste Management",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 90,
+    relatedSources: [
+      "Resource Conservation and Recovery Act",
+      "40 CFR Parts 239–282",
+      "Hazardous Waste Manifest System",
+      "Corrective Action Program",
+    ],
+    relatedRecords: 21,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "cercla-superfund-regulations",
+    title: "CERCLA and Superfund Regulatory System",
+    shortTitle: "Superfund Regulations",
+    description:
+      "Release reporting, site investigation, responsible-party liability, removal and remedial action, cleanup selection, cost recovery, natural-resource damages, records, and long-term environmental outcome duties.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency and partner agencies",
+    sectors: [
+      "Contaminated Sites",
+      "Industrial Facilities",
+      "Land",
+      "Waste Management",
+      "Emergency Response",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 87,
+    relatedSources: [
+      "CERCLA",
+      "National Contingency Plan",
+      "40 CFR Part 300",
+      "Emergency Release Reporting",
+    ],
+    relatedRecords: 19,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "tsca-chemical-control-regulations",
+    title: "Toxic Substances Control Act Regulatory System",
+    shortTitle: "TSCA Regulations",
+    description:
+      "Chemical reporting, premanufacture review, risk evaluation, risk management, testing, recordkeeping, import certification, restrictions, and controls for substances including asbestos, lead, and PCBs.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency",
+    sectors: [
+      "Chemicals",
+      "Manufacturing",
+      "Buildings",
+      "Consumer Products",
+      "Industrial Facilities",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 86,
+    relatedSources: [
+      "Toxic Substances Control Act",
+      "40 CFR Parts 700–799",
+      "Chemical Data Reporting",
+      "Risk Evaluation Rules",
+    ],
+    relatedRecords: 17,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "fifra-pesticide-regulations",
+    title: "FIFRA Pesticide Regulatory System",
+    shortTitle: "Pesticide Regulations",
+    description:
+      "Registration, labeling, use restrictions, applicator certification, worker protections, adverse-effect reporting, residue coordination, records, inspections, and enforcement for pesticide products and uses.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency and state lead agencies",
+    sectors: [
+      "Agriculture",
+      "Pesticides",
+      "Public Health",
+      "Buildings",
+      "Environmental Protection",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 83,
+    relatedSources: [
+      "FIFRA",
+      "40 CFR Parts 150–189",
+      "Worker Protection Standard",
+      "Pesticide Registration",
+    ],
+    relatedRecords: 15,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "epcra-community-right-to-know",
+    title: "Emergency Planning and Community Right-to-Know Regulations",
+    shortTitle: "EPCRA Regulations",
+    description:
+      "Emergency planning, hazardous-chemical inventories, release notifications, toxic-release reporting, facility records, public access, and community information duties.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency, states, and local emergency planning bodies",
+    sectors: [
+      "Emergency Planning",
+      "Industrial Facilities",
+      "Chemicals",
+      "Community Protection",
+      "Public Records",
+    ],
+    status: "Active",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 85,
+    relatedSources: [
+      "EPCRA",
+      "40 CFR Parts 350–372",
+      "Toxics Release Inventory",
+      "Tier II Reporting",
+    ],
+    relatedRecords: 14,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "epa-greenhouse-gas-regulations",
+    title: "EPA Greenhouse Gas and Climate Regulatory Programs",
+    shortTitle: "Greenhouse Gas Regulations",
+    description:
+      "Greenhouse-gas reporting, mobile-source standards, power-sector and industrial controls, methane requirements, refrigerant transition programs, permitting interactions, and climate-related records.",
+    jurisdiction: "United States",
+    region: "North America",
+    authority: "U.S. Environmental Protection Agency",
+    sectors: [
+      "Climate",
+      "Energy",
+      "Transportation",
+      "Industrial Facilities",
+      "Refrigeration",
+    ],
+    status: "Developing",
+    applicability: "Context-dependent",
+    crosswalkCoverage: 80,
+    relatedSources: [
+      "Clean Air Act",
+      "Greenhouse Gas Reporting Program",
+      "American Innovation and Manufacturing Act",
+      "Methane Regulations",
+    ],
+    relatedRecords: 16,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "indoor-environment-regulatory-gap",
+    title: "Indoor Environmental Quality Regulatory Gap",
+    shortTitle: "Indoor Environment Gap",
+    description:
+      "A cross-jurisdictional regulatory gap covering indoor-air quality, ventilation performance, building environmental records, occupant exposure, HVAC evidence, and verified post-intervention outcomes.",
+    jurisdiction: "Multi-jurisdictional",
+    region: "Global",
+    authority: "Public-health, building, occupational, environmental, and local authorities",
+    sectors: [
+      "Indoor Air Quality",
+      "Buildings",
+      "Healthcare",
+      "Schools",
+      "HVAC",
+    ],
+    status: "Monitoring",
+    applicability: "Jurisdiction-dependent",
+    crosswalkCoverage: 58,
+    relatedSources: [
+      "ASHRAE 62.1",
+      "ASHRAE 241",
+      "WHO Air Quality Guidelines",
+      "Building Codes",
+      "Occupational Safety Rules",
+    ],
+    relatedRecords: 12,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
+  {
+    id: "international-environmental-regulation",
+    title: "International Environmental Agreement Implementation",
+    shortTitle: "Global Environmental Implementation",
+    description:
+      "National and regional implementation of international agreements addressing ozone, climate, hazardous waste, persistent pollutants, mercury, biodiversity, environmental health, and transboundary impacts.",
+    jurisdiction: "Multi-jurisdictional",
+    region: "Global",
+    authority: "National governments, treaty bodies, and regional institutions",
+    sectors: [
+      "Climate",
+      "Air Quality",
+      "Hazardous Waste",
+      "Chemicals",
+      "Public Health",
+    ],
+    status: "Active",
+    applicability: "Jurisdiction-dependent",
+    crosswalkCoverage: 74,
+    relatedSources: [
+      "Montreal Protocol",
+      "Paris Agreement",
+      "Basel Convention",
+      "Stockholm Convention",
+      "Minamata Convention",
+    ],
+    relatedRecords: 20,
+    lawsHref: "/governance-library/laws",
+    crosswalkHref: "/governance-library/crosswalks",
+    applicabilityHref: "/governance-library/applicability",
+  },
 ];
 
 const coverageRecords: CoverageRecord[] = [
@@ -285,7 +620,7 @@ const activityRecords = [
   {
     title: "Route relationship established",
     detail:
-      "Regulatory sources may now be carried into governed route analysis with declared limitations.",
+      "Regulatory sources may now be carried into AI and Environmental Integrity Governance routes with declared limitations.",
     type: "Route Builder",
   },
 ];
@@ -462,21 +797,16 @@ export default function GovernanceLibraryRegulationsPage() {
           </div>
 
           <p className="eyebrow">
-            TA-14 AI GOVERNANCE LIBRARY
+            TA-14 AUTHORITY GOVERNANCE INSTITUTION
           </p>
 
           <h1>
-            AI Regulations
-            <span> Intelligence Center</span>
+            Regulations
+            <span> & Implementation Center</span>
           </h1>
 
           <p className="lead">
-            Explore binding requirements, regulatory
-            obligations, jurisdictional conditions,
-            sector-specific rules, source relationships,
-            and applicability boundaries affecting
-            artificial intelligence governance and
-            execution.
+            Explore binding requirements, implementing regulations, jurisdictional conditions, environmental programs, sector rules, source relationships, and applicability boundaries across AI governance, air, water, waste, chemicals, buildings, public health, climate, and consequential execution.
           </p>
 
           <div className="heroMetrics">
@@ -515,8 +845,7 @@ export default function GovernanceLibraryRegulationsPage() {
               </p>
 
               <h2>
-                Find the regulatory sources that may
-                govern an intended action.
+                Find the regulatory sources that may govern an intended action, environmental condition, facility, system, or intervention.
               </h2>
             </div>
 
