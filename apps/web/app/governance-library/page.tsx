@@ -19,7 +19,7 @@ const gateways: Gateway[] = [
     code: "01",
     title: "Learn",
     description:
-      "Understand the laws, regulations, standards, frameworks, principles, and recommendations that shape artificial-intelligence governance.",
+      "Understand the laws, regulations, standards, codes, frameworks, principles, and recommendations that shape AI governance, environmental integrity, public policy, and consequential execution.",
     accent: "#63e6ff",
     links: [
       {
@@ -196,6 +196,53 @@ const sourceClasses = [
   },
 ];
 
+
+const institutionalDepartments = [
+  {
+    code: "LAW",
+    title: "Current & Proposed Law",
+    description: "Inspect enacted statutes, international instruments, model laws, and clearly labeled TA-14 legislative upgrades.",
+    href: "/governance-library/laws",
+    detail: "Clean Air Act · Clean Water Act · Safe Drinking Water Act · RCRA · CERCLA · TSCA · AI law · proposed upgrades",
+    accent: "#f2bf62",
+  },
+  {
+    code: "REG",
+    title: "Regulations & Implementation",
+    description: "Follow how statutes become enforceable duties through agency rules, permits, methods, reporting, inspection, and enforcement.",
+    href: "/governance-library/regulations",
+    detail: "EPA programs · 40 CFR pathways · implementation systems · regulated duties · enforcement records",
+    accent: "#69dff2",
+  },
+  {
+    code: "STD",
+    title: "Standards, Codes & Technical Modernization",
+    description: "Distinguish voluntary standards, accredited standards, model codes, incorporated editions, technical methods, and TA-14 upgrades.",
+    href: "/governance-library/standards",
+    detail: "ASHRAE · ANSI · ISO · EPA methods · building codes · HVAC · environmental measurement · AI governance",
+    accent: "#74e2b4",
+  },
+  {
+    code: "AC",
+    title: "Law & Standards Academy",
+    description: "Learn what each instrument is, what it requires, what it leaves out, why the gap matters, and what TA-14 proposes to change.",
+    href: "/academy",
+    detail: "Existing instrument → gap → consequence → proposed upgrade → practical difference",
+    accent: "#be96ff",
+  },
+] as const;
+
+const featuredAuthorities = [
+  ["CAA", "Clean Air Act", "United States", "Air pollution control, national ambient standards, hazardous pollutants, mobile and stationary sources."],
+  ["CWA", "Clean Water Act", "United States", "Discharge controls, water-quality programs, permits, monitoring, enforcement, and restoration."],
+  ["SDWA", "Safe Drinking Water Act", "United States", "Public drinking-water protection, contaminant standards, monitoring, reporting, and underground injection control."],
+  ["RCRA", "Resource Conservation and Recovery Act", "United States", "Solid and hazardous waste management from generation through treatment, storage, and disposal."],
+  ["CERCLA", "CERCLA / Superfund", "United States", "Hazardous-release response, contaminated-site cleanup, liability, cost recovery, and long-term remediation."],
+  ["TSCA", "Toxic Substances Control Act", "United States", "Chemical information, review, risk evaluation, restrictions, reporting, and recordkeeping."],
+  ["MP", "Montreal Protocol", "International", "Global controls on ozone-depleting substances and related implementation duties."],
+  ["WHO", "WHO Air Quality Guidelines", "Global guidance", "Evidence-informed health guidance for particulate matter, ozone, nitrogen dioxide, sulfur dioxide, and carbon monoxide."],
+] as const;
+
 const journey = [
   "Learn",
   "Determine",
@@ -244,7 +291,7 @@ export default function GovernanceLibraryPage() {
       <section className="shell">
         <div className="topbar">
           <Link href="/" className="button quiet">
-            ← Return to Exchange
+            ← Return to TA14Authority.org
           </Link>
 
           <div className="topbarCenter">
@@ -253,10 +300,10 @@ export default function GovernanceLibraryPage() {
           </div>
 
           <Link
-            href="/workspace/ai-governance"
+            href="/law-standards-public-policy"
             className="button primary"
           >
-            Enter AI Governance →
+            Enter Institutional Home →
           </Link>
         </div>
 
@@ -272,7 +319,7 @@ export default function GovernanceLibraryPage() {
           </div>
 
           <p className="eyebrow">
-            TA-14 AI GOVERNANCE LIBRARY
+            TA-14 AUTHORITY GOVERNANCE LIBRARY
           </p>
 
           <h1>
@@ -281,22 +328,18 @@ export default function GovernanceLibraryPage() {
           </h1>
 
           <p className="lead">
-            Explore laws, regulations, standards, frameworks,
-            principles, recommendations, testing systems, and sector
-            overlays. Every source remains connected to its issuer,
-            class, authority, version, applicability, evidence
-            expectations, and TA-14 execution pathway.
+            Explore current law, proposed law, implementing regulations, standards, codes, frameworks, principles, recommendations, testing systems, and sector overlays across AI governance and Environmental Integrity Governance. Every source remains connected to its issuer, instrument class, jurisdiction, authority, version, applicability, evidence expectations, Academy explanation, and TA-14 execution pathway.
           </p>
 
           <div className="heroMeta">
             <div>
-              <span>30+</span>
-              <small>Institutional Library Departments</small>
+              <span>4</span>
+              <small>Primary authority systems</small>
             </div>
 
             <div>
-              <span>1000+</span>
-              <small>Governance Records Ready</small>
+              <span>Global</span>
+              <small>Law and standards scope</small>
             </div>
 
             <div>
@@ -307,10 +350,10 @@ export default function GovernanceLibraryPage() {
 
           <div className="heroActions">
             <Link
-              href="/governance-library/dashboard"
+              href="/law-standards-public-policy"
               className="button primary"
             >
-              Browse the Library →
+              Enter Law, Standards & Public Policy →
             </Link>
 
             <Link
@@ -321,10 +364,10 @@ export default function GovernanceLibraryPage() {
             </Link>
 
             <Link
-              href="/workspace/ai-governance"
+              href="/governance-library/laws"
               className="button goldButton"
             >
-              Build a Route →
+              Compare Current & Proposed Law →
             </Link>
 
             <Link
@@ -335,6 +378,60 @@ export default function GovernanceLibraryPage() {
             </Link>
           </div>
         </header>
+
+
+        <section className="departmentSection">
+          <div className="heading">
+            <div>
+              <p className="eyebrow gold">INSTITUTIONAL AUTHORITY SYSTEMS</p>
+              <h2>One library. Four distinct ways authority enters reality.</h2>
+            </div>
+            <p>Law, regulation, standards, and Academy interpretation must remain connected without being collapsed into one another. Each department preserves its own force, issuer, version, applicability, adoption pathway, evidence burden, and limits.</p>
+          </div>
+
+          <div className="departmentGrid">
+            {institutionalDepartments.map((department) => (
+              <Link
+                href={department.href}
+                className="departmentCard"
+                key={department.code}
+                style={{ "--departmentAccent": department.accent } as CSSProperties}
+              >
+                <span className="departmentCode">{department.code}</span>
+                <h3>{department.title}</h3>
+                <p>{department.description}</p>
+                <small>{department.detail}</small>
+                <strong>Enter department <i>→</i></strong>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <section className="featuredAuthoritySection">
+          <div className="heading">
+            <div>
+              <p className="eyebrow">FEATURED ENVIRONMENTAL AUTHORITY</p>
+              <h2>The environmental legal body now sits beside AI governance—not outside it.</h2>
+            </div>
+            <p>The Library begins with major United States environmental statutes and global instruments, then expands through regulations, standards, methods, Academy comparisons, and clearly labeled TA-14 modernization proposals.</p>
+          </div>
+
+          <div className="featuredAuthorityGrid">
+            {featuredAuthorities.map(([code, title, jurisdiction, summary], index) => (
+              <Link href="/governance-library/laws" className="featuredAuthorityCard" key={title}>
+                <div><span>{String(index + 1).padStart(2, "0")}</span><b>{code}</b></div>
+                <small>{jurisdiction}</small>
+                <h3>{title}</h3>
+                <p>{summary}</p>
+                <strong>Inspect authority <i>↗</i></strong>
+              </Link>
+            ))}
+          </div>
+
+          <div className="comparisonDoctrine">
+            <span>WHAT EXISTS</span><i>→</i><span>WHAT IT REQUIRES</span><i>→</i><span>WHAT IT LEAVES OUT</span><i>→</i><span>WHY THE GAP MATTERS</span><i>→</i><span>WHAT TA-14 PROPOSES</span>
+          </div>
+        </section>
 
         <section className="journeyPanel">
           <div className="journeyIntro">
@@ -1585,7 +1682,9 @@ export default function GovernanceLibraryPage() {
           .categoryGrid,
           .intelligenceGrid,
           .journey,
-          .gatewayLinks {
+          .gatewayLinks,
+          .departmentGrid,
+          .featuredAuthorityGrid {
             grid-template-columns: 1fr;
           }
 
