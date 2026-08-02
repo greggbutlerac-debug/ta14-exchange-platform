@@ -544,6 +544,158 @@ export default function GovernanceJurisdictionsPage() {
           </div>
         </section>
 
+
+        <section className="jurisdictionIntelligence">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">INSTITUTIONAL JURISDICTION INTELLIGENCE</p>
+              <h2>Jurisdiction is not one location. It is a layered authority problem.</h2>
+            </div>
+            <p>
+              TA-14 resolves territorial reach, subject location, organizational role,
+              instrument status, adoption pathway, sector authority, contractual duty,
+              and consequence before any source is treated as governing authority.
+            </p>
+          </div>
+
+          <div className="authorityLayerGrid">
+            {[
+              ["01", "Territorial authority", "Country, state, province, municipality, tribal territory, special district, facility, and physical place."],
+              ["02", "Subject authority", "The location and legal status of the provider, deployer, operator, owner, processor, employer, facility, or affected person."],
+              ["03", "Activity authority", "The place where development, measurement, deployment, discharge, treatment, intervention, contracting, or execution occurs."],
+              ["04", "Sector authority", "Environmental, health, building, employment, finance, education, critical infrastructure, product, or public-sector oversight."],
+              ["05", "Instrument authority", "Whether the source is enacted law, implementing regulation, adopted code, incorporated standard, permit, order, contract, or guidance."],
+              ["06", "Cross-border reach", "Extraterritorial rules, market access, imported products, remote systems, international transfers, shared watersheds, and transboundary pollution."],
+              ["07", "Delegated authority", "Authority passed from legislature to agency, agency to permit, owner to operator, institution to reviewer, or contract to responsible party."],
+              ["08", "Temporal authority", "Effective dates, transition periods, amendments, sunset provisions, supersession, emergency orders, revoked permissions, and stale editions."],
+            ].map(([number, title, description]) => (
+              <article key={title}>
+                <span>{number}</span>
+                <strong>{title}</strong>
+                <p>{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="jurisdictionScenarios">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">CROSS-BORDER AND MULTI-AUTHORITY SCENARIOS</p>
+              <h2>One governed event may activate several jurisdictions at once.</h2>
+            </div>
+            <p>
+              The correct result may be concurrent authority, supporting authority,
+              contractual authority, unresolved authority, or no authority at all.
+              TA-14 preserves the conflict instead of silently selecting one source.
+            </p>
+          </div>
+
+          <div className="scenarioGrid">
+            {[
+              {
+                code: "AIR",
+                title: "Atmospheric release across boundaries",
+                facts: "A facility emission affects workers, neighboring property, a municipality, and an interstate airshed.",
+                authorities: ["Facility permit", "State implementation plan", "Clean Air Act authority", "Local emergency authority"],
+                hold: "HOLD when plume location, source attribution, permit version, monitoring method, or responsible authority is unresolved.",
+              },
+              {
+                code: "WTR",
+                title: "Water discharge and downstream consequence",
+                facts: "A regulated discharge enters a water body that crosses local, state, tribal, or national boundaries.",
+                authorities: ["Discharge permit", "Clean Water Act program", "State or tribal water authority", "Treaty or basin authority"],
+                hold: "HOLD when receiving-water classification, permit coverage, sampling custody, or downstream jurisdiction is uncertain.",
+              },
+              {
+                code: "BLDG",
+                title: "Building code and environmental health overlap",
+                facts: "A facility uses a newer standard while the adopted code references an older edition and the contract requires another edition.",
+                authorities: ["Adopted building code", "Mechanical code", "Contract specification", "Public-health order"],
+                hold: "HOLD when the adopted edition, local amendment, occupancy classification, or enforcement official has not been verified.",
+              },
+              {
+                code: "AI",
+                title: "Remote AI service with affected persons elsewhere",
+                facts: "A provider, deployer, cloud system, decision-maker, and affected person are located in different jurisdictions.",
+                authorities: ["Provider jurisdiction", "Deployer jurisdiction", "Market-access law", "Sector and contractual authority"],
+                hold: "HOLD when role allocation, affected-person location, prohibited use, effective date, or value-chain responsibility remains disputed.",
+              },
+              {
+                code: "STD",
+                title: "Voluntary standard made mandatory",
+                facts: "A standard is voluntary at publication but becomes binding through regulation, code adoption, permit, accreditation, or contract.",
+                authorities: ["Publishing body", "Adopting authority", "Referenced edition", "Inspection or certification body"],
+                hold: "HOLD when the official adoption text, incorporated edition, amendment, exception, or responsible verifier is missing.",
+              },
+              {
+                code: "ORG",
+                title: "Internal policy and delegated permission",
+                facts: "An organization imposes a stricter internal rule than law and delegates approval to a named role or committee.",
+                authorities: ["Board or executive authority", "Policy owner", "Delegated approver", "Contractual obligation"],
+                hold: "HOLD when delegation is expired, revoked, outside scope, inconsistent with law, or unsupported by the current policy version.",
+              },
+            ].map((scenario) => (
+              <article key={scenario.code}>
+                <div className="scenarioHeader">
+                  <span>{scenario.code}</span>
+                  <h3>{scenario.title}</h3>
+                </div>
+                <p>{scenario.facts}</p>
+                <div className="scenarioAuthorities">
+                  {scenario.authorities.map((authority) => (
+                    <span key={authority}>{authority}</span>
+                  ))}
+                </div>
+                <strong>{scenario.hold}</strong>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="jurisdictionAcademy">
+          <div className="academySealLarge">
+            <small>TA-14</small>
+            <strong>ACADEMY</strong>
+            <span>JURISDICTION RESOLUTION</span>
+          </div>
+
+          <div className="academyContent">
+            <p className="eyebrow">THE ACADEMY INSIDE JURISDICTION REVIEW</p>
+            <h2>Learn why a relevant source may still lack authority over the actual event.</h2>
+            <p>
+              The Academy teaches participants to separate geography from authority,
+              publication from adoption, relevance from applicability, and organizational
+              permission from legal power. Learners inspect examples, resolve conflicts,
+              document missing facts, and practice HOLD before entering live applicability review.
+            </p>
+
+            <div className="academyModuleGrid">
+              {[
+                ["01", "Map the event", "Identify every person, organization, system, facility, instrument, action, and affected location."],
+                ["02", "Classify each source", "Distinguish law, regulation, permit, order, code, standard, guidance, policy, and contract."],
+                ["03", "Verify adoption", "Find the official text that makes a standard, code, edition, or method applicable."],
+                ["04", "Resolve role and scope", "Determine which duties attach to provider, deployer, owner, operator, employer, laboratory, or reviewer."],
+                ["05", "Inspect conflicts", "Preserve overlapping, inconsistent, uncertain, or competing authority instead of hiding it."],
+                ["06", "Issue a bounded finding", "Return applicable, supporting, unresolved, outside scope, or superseded with reasons and evidence."],
+              ].map(([number, title, description]) => (
+                <article key={title}>
+                  <span>{number}</span>
+                  <div>
+                    <strong>{title}</strong>
+                    <p>{description}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <div className="academyActions">
+              <Link href="/academy" className="secondaryAction">Enter TA-14 Academy</Link>
+              <Link href="/governance-library/applicability" className="primaryAction">Begin Applicability Review →</Link>
+            </div>
+          </div>
+        </section>
+
         <section className="jurisdictionBoundary">
           <div className="boundarySeal">
             <span>JB</span>
@@ -1493,9 +1645,266 @@ export default function GovernanceJurisdictionsPage() {
           gap: 10px;
         }
 
+
+        .jurisdictionIntelligence,
+        .jurisdictionScenarios,
+        .jurisdictionAcademy {
+          margin-top: 88px;
+        }
+
+        .authorityLayerGrid {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .authorityLayerGrid article {
+          min-height: 235px;
+          padding: 21px;
+          border: 1px solid rgba(99, 230, 255, 0.11);
+          border-radius: 18px;
+          background: linear-gradient(
+            145deg,
+            rgba(9, 29, 44, 0.88),
+            rgba(3, 13, 22, 0.94)
+          );
+        }
+
+        .authorityLayerGrid article > span {
+          width: 40px;
+          height: 40px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(255, 198, 82, 0.25);
+          border-radius: 50%;
+          color: #f0c76e;
+          font-size: 8px;
+          font-weight: 900;
+        }
+
+        .authorityLayerGrid strong {
+          display: block;
+          margin-top: 27px;
+          color: #e8f2f5;
+          font: 700 20px Georgia, serif;
+        }
+
+        .authorityLayerGrid p {
+          margin: 12px 0 0;
+          color: #879ca6;
+          font-size: 11px;
+          line-height: 1.65;
+        }
+
+        .scenarioGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 14px;
+        }
+
+        .scenarioGrid > article {
+          padding: 25px;
+          border: 1px solid rgba(255, 198, 82, 0.16);
+          border-radius: 20px;
+          background: linear-gradient(
+            145deg,
+            rgba(28, 26, 17, 0.64),
+            rgba(4, 17, 25, 0.96)
+          );
+        }
+
+        .scenarioHeader {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+        }
+
+        .scenarioHeader span {
+          width: 52px;
+          height: 52px;
+          flex: 0 0 52px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(99, 230, 255, 0.22);
+          border-radius: 14px;
+          color: #71dff1;
+          font-size: 10px;
+          font-weight: 950;
+        }
+
+        .scenarioHeader h3 {
+          margin: 0;
+          color: #f4f8fa;
+          font-size: 24px;
+          line-height: 1.05;
+        }
+
+        .scenarioGrid article > p {
+          margin: 18px 0 0;
+          color: #9eb1ba;
+          font-size: 12px;
+          line-height: 1.65;
+        }
+
+        .scenarioAuthorities {
+          margin-top: 17px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 7px;
+        }
+
+        .scenarioAuthorities span {
+          padding: 7px 9px;
+          border: 1px solid rgba(99, 230, 255, 0.12);
+          border-radius: 999px;
+          color: #9fc2cb;
+          background: rgba(99, 230, 255, 0.035);
+          font-size: 8px;
+          font-weight: 850;
+        }
+
+        .scenarioGrid article > strong {
+          display: block;
+          margin-top: 18px;
+          padding: 14px;
+          border-left: 3px solid #efbd59;
+          color: #f2d691;
+          background: rgba(239, 189, 89, 0.055);
+          font-size: 10px;
+          line-height: 1.55;
+        }
+
+        .jurisdictionAcademy {
+          padding: 46px;
+          display: grid;
+          grid-template-columns: 330px minmax(0, 1fr);
+          gap: 48px;
+          align-items: center;
+          border: 1px solid rgba(100, 238, 183, 0.18);
+          border-radius: 30px;
+          background: radial-gradient(
+              circle at 14% 50%,
+              rgba(80, 231, 169, 0.13),
+              transparent 28%
+            ),
+            linear-gradient(
+              145deg,
+              rgba(8, 33, 34, 0.94),
+              rgba(3, 15, 22, 0.98)
+            );
+        }
+
+        .academySealLarge {
+          width: 280px;
+          height: 280px;
+          margin: auto;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          border: 2px solid rgba(100, 238, 183, 0.55);
+          border-radius: 50%;
+          background: radial-gradient(
+            circle,
+            rgba(100, 238, 183, 0.13),
+            rgba(3, 24, 27, 0.96) 67%
+          );
+          box-shadow: 0 0 70px rgba(66, 220, 160, 0.14);
+        }
+
+        .academySealLarge small {
+          color: #77aa9a;
+          font-size: 10px;
+          font-weight: 950;
+          letter-spacing: 0.18em;
+        }
+
+        .academySealLarge strong {
+          color: #baffd8;
+          font: 900 42px Georgia, serif;
+        }
+
+        .academySealLarge span {
+          margin-top: 8px;
+          color: #6bd8ae;
+          font-size: 8px;
+          font-weight: 950;
+          letter-spacing: 0.14em;
+        }
+
+        .academyContent h2 {
+          margin: 12px 0 17px;
+          font-size: clamp(38px, 4vw, 61px);
+          line-height: 0.99;
+          letter-spacing: -0.045em;
+        }
+
+        .academyContent > p:not(.eyebrow) {
+          margin: 0;
+          color: #9fb6b2;
+          font-size: 15px;
+          line-height: 1.75;
+        }
+
+        .academyModuleGrid {
+          margin-top: 24px;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+        }
+
+        .academyModuleGrid article {
+          padding: 15px;
+          display: grid;
+          grid-template-columns: 42px minmax(0, 1fr);
+          gap: 12px;
+          border: 1px solid rgba(100, 238, 183, 0.12);
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.025);
+        }
+
+        .academyModuleGrid article > span {
+          width: 40px;
+          height: 40px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(100, 238, 183, 0.24);
+          border-radius: 11px;
+          color: #76eab9;
+          font-size: 8px;
+          font-weight: 950;
+        }
+
+        .academyModuleGrid strong {
+          color: #d9eee7;
+          font-size: 11px;
+        }
+
+        .academyModuleGrid p {
+          margin: 5px 0 0;
+          color: #78968e;
+          font-size: 9px;
+          line-height: 1.5;
+        }
+
+        .academyActions {
+          margin-top: 23px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+
         @media (max-width: 1180px) {
           .jurisdictionsGrid {
             grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .authorityLayerGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .jurisdictionAcademy {
+            grid-template-columns: 1fr;
           }
 
           .heroMetrics {
@@ -1525,6 +1934,11 @@ export default function GovernanceJurisdictionsPage() {
             grid-template-columns: repeat(2, 1fr);
           }
 
+          .scenarioGrid,
+          .academyModuleGrid {
+            grid-template-columns: 1fr;
+          }
+
           .resultBar {
             flex-wrap: wrap;
           }
@@ -1539,8 +1953,18 @@ export default function GovernanceJurisdictionsPage() {
           .heroMetrics,
           .jurisdictionsGrid,
           .sequenceGrid,
-          .boundaryGrid {
+          .boundaryGrid,
+          .authorityLayerGrid {
             grid-template-columns: 1fr;
+          }
+
+          .jurisdictionAcademy {
+            padding: 30px 20px;
+          }
+
+          .academySealLarge {
+            width: 230px;
+            height: 230px;
           }
 
           .topbarLink,
