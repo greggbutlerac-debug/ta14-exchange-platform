@@ -11,6 +11,7 @@ type ChallengeState = "PENDING" | "UNDER_REVIEW" | "UPHELD" | "MODIFIED" | "REVE
 type MemberStatus = "ACTIVE" | "INVITED" | "SUSPENDED";
 type ExportState = "DRAFT" | "READY" | "GENERATING" | "FAILED";
 type ControlStatus = "PASS" | "REVIEW" | "PENDING" | "FAIL";
+type LifecycleStage = "Credentials" | "Architecture" | "Registration" | "Workspace" | "Route Builder" | "Artifact Studio" | "Registry" | "Verification";
 
 type RouteRecord = { id:string; title:string; sector:string; version:string; status:RouteStatus; runs:number; owner:string; updated:string };
 type ArtifactRecord = { id:string; title:string; determination:Determination; verification:number; status:ArtifactStatus; route:string; updated:string; challenges:number };
@@ -1216,6 +1217,33 @@ const NAV: {id:View; label:string; eyebrow:string; icon:string}[] = [
 
 const palette:Record<Determination,string>={ALLOW:"#36d399",HOLD:"#f6c85f",DENY:"#ff6b7a",ESCALATE:"#8ab4ff"};
 
+const LIFECYCLE: Array<{label:LifecycleStage; href:string}> = [
+  {label:"Credentials", href:"/foundation"},
+  {label:"Architecture", href:"/workspace/ai-governance/registry"},
+  {label:"Registration", href:"/governance/register"},
+  {label:"Workspace", href:"/governance/workspace"},
+  {label:"Route Builder", href:"/workspace/routes/new"},
+  {label:"Artifact Studio", href:"/artifacts/studio"},
+  {label:"Registry", href:"/artifacts/registry"},
+  {label:"Verification", href:"/artifacts/verify"},
+];
+
+const ACTIVITY = [
+  {time:"08:42", type:"ROUTE", title:"Model deployment boundary v4.2 marked READY", detail:"Route parity and ownership checks completed.", tone:"cyan"},
+  {time:"08:17", type:"ARTIFACT", title:"TA14-EA-000012 published", detail:"Outcome closure package registered at verification level L5.", tone:"allow"},
+  {time:"07:58", type:"CHALLENGE", title:"CH-0004 entered review", detail:"Evidence-sufficiency challenge assigned to Challenge Officer 1.", tone:"hold"},
+  {time:"07:36", type:"VERIFY", title:"TA14-EA-000009 advanced to L7", detail:"Independent review opinion preserved and linked.", tone:"escalate"},
+  {time:"Yesterday", type:"MEMBER", title:"Registry Publisher role updated", detail:"Publication authority narrowed to approved portfolio classes.", tone:"neutral"},
+];
+
+const TIMELINE = [
+  {date:"2026-08-02", title:"Governance workspace activated", detail:"Registered governance became operationally eligible."},
+  {date:"2026-08-08", title:"First route frozen", detail:"Bounded vendor payment route entered governed execution."},
+  {date:"2026-08-12", title:"First artifact published", detail:"Execution evidence entered the public registry."},
+  {date:"2026-08-18", title:"Independent verification added", detail:"Portfolio reached outcome-level reliance."},
+  {date:"2026-08-25", title:"Challenge process exercised", detail:"Correction pathway preserved without rewriting history."},
+];
+
 function Badge({children,tone="neutral"}:{children:ReactNode;tone?:string}){return <span className={`badge ${tone}`}>{children}</span>}
 function Meter({value,label}:{value:number;label:string}){return <div className="meter"><div className="meter-head"><span>{label}</span><strong>{value}%</strong></div><div className="meter-track"><span style={{width:`${value}%`}} /></div></div>}
 function Card({children,className=""}:{children:ReactNode;className?:string}){return <section className={`card ${className}`}>{children}</section>}
@@ -1226,6 +1254,9 @@ export default function RegisteredGovernanceWorkspacePage() {
   const [query,setQuery]=useState("");
   const [determination,setDetermination]=useState<"ALL"|Determination>("ALL");
   const [savedAt,setSavedAt]=useState<string>("");
+  const [globalQuery,setGlobalQuery]=useState("");
+  const [paletteOpen,setPaletteOpen]=useState(false);
+  const [activityExpanded,setActivityExpanded]=useState(false);
   const [profile,setProfile]=useState({
     organization:"TA-14 Authority",
     architecture:"TA-14 Admissible Execution Architecture",
@@ -1248,6 +1279,15 @@ export default function RegisteredGovernanceWorkspacePage() {
     setSavedAt(new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"}));
   },[view,profile]);
 
+  useEffect(()=>{
+    const onKey=(event:KeyboardEvent)=>{
+      if((event.metaKey||event.ctrlKey)&&event.key.toLowerCase()==="k"){event.preventDefault();setPaletteOpen(value=>!value)}
+      if(event.key==="Escape")setPaletteOpen(false);
+    };
+    window.addEventListener("keydown",onKey);
+    return()=>window.removeEventListener("keydown",onKey);
+  },[]);
+
   const filteredArtifacts=useMemo(()=>ARTIFACTS.filter(a=>{
     const matchesDetermination=determination==="ALL"||a.determination===determination;
     const hay=`${a.id} ${a.title} ${a.route} ${a.status}`.toLowerCase();
@@ -1258,6 +1298,16 @@ export default function RegisteredGovernanceWorkspacePage() {
   const published=ARTIFACTS.filter(a=>a.status==="PUBLISHED").length;
   const openChallenges=CHALLENGES.filter(c=>c.state==="PENDING"||c.state==="UNDER_REVIEW").length;
   const avgVerification=(ARTIFACTS.reduce((n,a)=>n+a.verification,0)/ARTIFACTS.length).toFixed(1);
+  const globalResults=useMemo(()=>{
+    const q=globalQuery.trim().toLowerCase();
+    if(!q)return [];
+    const results:Array<{kind:string;id:string;title:string;meta:string;action:()=>void}> = [];
+    ROUTES.filter(item=>`${item.id} ${item.title} ${item.sector}`.toLowerCase().includes(q)).slice(0,4).forEach(item=>results.push({kind:"ROUTE",id:item.id,title:item.title,meta:`${item.status} · ${item.version}`,action:()=>setView("routes")}));
+    ARTIFACTS.filter(item=>`${item.id} ${item.title} ${item.route}`.toLowerCase().includes(q)).slice(0,4).forEach(item=>results.push({kind:"ARTIFACT",id:item.id,title:item.title,meta:`${item.determination} · L${item.verification}`,action:()=>{setQuery(item.id);setView("artifacts")}}));
+    CHALLENGES.filter(item=>`${item.id} ${item.artifact} ${item.issue}`.toLowerCase().includes(q)).slice(0,3).forEach(item=>results.push({kind:"CHALLENGE",id:item.id,title:item.issue,meta:`${item.state} · ${item.artifact}`,action:()=>setView("challenges")}));
+    MEMBERS.filter(item=>`${item.name} ${item.role}`.toLowerCase().includes(q)).slice(0,3).forEach(item=>results.push({kind:"MEMBER",id:item.id,title:item.name,meta:item.role,action:()=>setView("members")}));
+    return results.slice(0,10);
+  },[globalQuery]);
 
   const downloadWorkspace=()=>{
     const payload={generatedAt:new Date().toISOString(),profile,routes:ROUTES,artifacts:ARTIFACTS,challenges:CHALLENGES,exports:EXPORTS,controls:CONTROLS};
@@ -1267,10 +1317,26 @@ export default function RegisteredGovernanceWorkspacePage() {
 
   return <main className="workspace-shell">
     <div className="ambient ambient-a"/><div className="ambient ambient-b"/><div className="grid-floor"/>
+    <div className="lifecycle-bar" aria-label="TA-14 institutional lifecycle">
+      <span className="lifecycle-title">Institutional lifecycle</span>
+      <div className="lifecycle-track">{LIFECYCLE.map((item,index)=><span className="lifecycle-step" key={item.label}><Link href={item.href} className={item.label==="Workspace"?"current":""}>{item.label}</Link>{index<LIFECYCLE.length-1?<b>→</b>:null}</span>)}</div>
+    </div>
     <header className="topbar">
       <Link href="/" className="brand"><span className="brand-mark">TA</span><span><strong>TA-14</strong><small>Registered Governance Workspace</small></span></Link>
-      <div className="top-actions"><span className="save-state">Saved {savedAt||"locally"}</span><Link href="/artifacts/studio" className="button primary">Open Artifact Studio</Link><button className="button" onClick={downloadWorkspace}>Export workspace</button></div>
+      <div className="global-search">
+        <span>⌕</span><input aria-label="Search workspace" placeholder="Search routes, artifacts, controls, people…" value={globalQuery} onChange={event=>setGlobalQuery(event.target.value)} onFocus={()=>setPaletteOpen(true)}/><kbd>⌘K</kbd>
+      </div>
+      <div className="top-actions"><span className="save-state">Saved {savedAt||"locally"}</span><button className="button" onClick={()=>setPaletteOpen(true)}>Command palette</button><Link href="/artifacts/studio" className="button primary">Open Artifact Studio</Link><button className="button" onClick={downloadWorkspace}>Export workspace</button></div>
     </header>
+    {paletteOpen?<div className="palette-backdrop" onMouseDown={()=>setPaletteOpen(false)}><section className="command-palette" onMouseDown={event=>event.stopPropagation()}>
+      <div className="palette-input"><span>⌕</span><input autoFocus placeholder="Type a command or search the workspace" value={globalQuery} onChange={event=>setGlobalQuery(event.target.value)}/><kbd>ESC</kbd></div>
+      {!globalQuery?<div className="palette-actions">
+        <button onClick={()=>{setView("routes");setPaletteOpen(false)}}><b>Build a route</b><small>Open governed route library and creation pathway</small></button>
+        <Link href="/artifacts/studio" onClick={()=>setPaletteOpen(false)}><b>Create execution artifact</b><small>Launch the Artifact Studio</small></Link>
+        <button onClick={()=>{setView("verification");setPaletteOpen(false)}}><b>Verify a package</b><small>Inspect reliance and verification status</small></button>
+        <button onClick={()=>{setView("members");setPaletteOpen(false)}}><b>Invite a member</b><small>Manage people, roles, and delegations</small></button>
+      </div>:<div className="palette-results">{globalResults.length?globalResults.map(result=><button key={`${result.kind}-${result.id}`} onClick={()=>{result.action();setPaletteOpen(false);setGlobalQuery("")}}><span>{result.kind}</span><div><b>{result.title}</b><small>{result.id} · {result.meta}</small></div><strong>↗</strong></button>):<p>No workspace records match this search.</p>}</div>}
+    </section></div>:null}
 
     <div className="workspace-frame">
       <aside className="sidebar">
@@ -1285,7 +1351,7 @@ export default function RegisteredGovernanceWorkspacePage() {
           <div className="hero-seal"><span>REGISTERED</span><strong>{profile.version}</strong><small>Architecture version</small></div>
         </div>
 
-        {view==="command"&&<CommandView readiness={readiness} published={published} openChallenges={openChallenges} avgVerification={avgVerification} setView={setView}/>}
+        {view==="command"&&<CommandView readiness={readiness} published={published} openChallenges={openChallenges} avgVerification={avgVerification} setView={setView} activityExpanded={activityExpanded} setActivityExpanded={setActivityExpanded}/>}
         {view==="profile"&&<ProfileView profile={profile} setProfile={setProfile}/>}
         {view==="routes"&&<RoutesView/>}
         {view==="artifacts"&&<ArtifactsView query={query} setQuery={setQuery} determination={determination} setDetermination={setDetermination} artifacts={filteredArtifacts}/>}
@@ -1301,14 +1367,21 @@ export default function RegisteredGovernanceWorkspacePage() {
   </main>;
 }
 
-function CommandView({readiness,published,openChallenges,avgVerification,setView}:{readiness:number;published:number;openChallenges:number;avgVerification:string;setView:(v:View)=>void}){
+function CommandView({readiness,published,openChallenges,avgVerification,setView,activityExpanded,setActivityExpanded}:{readiness:number;published:number;openChallenges:number;avgVerification:string;setView:(v:View)=>void;activityExpanded:boolean;setActivityExpanded:(v:boolean)=>void}){
+ const health=[
+  {label:"Identity",value:100,state:"PASS"},{label:"Authority",value:92,state:"PASS"},{label:"Routes",value:88,state:"REVIEW"},{label:"Evidence",value:84,state:"REVIEW"},
+  {label:"Verification",value:89,state:"PASS"},{label:"Publication",value:96,state:"PASS"},{label:"Challenges",value:78,state:"ATTENTION"},{label:"Operational health",value:readiness,state:readiness>=80?"OPERATIONAL":"REVIEW"},
+ ];
  return <div className="stack">
+  <Card className="briefing-card"><div className="briefing-top"><div><span className="kicker">Live operational briefing</span><h2>Good morning. Your governance is operational—with four items requiring attention.</h2><p>Registration remains active. Route, artifact, verification, challenge, and publication systems are connected and preserving attributable state.</p></div><Badge tone="allow">OPERATIONAL</Badge></div><div className="briefing-grid"><Stat label="Governance status" value="ACTIVE" detail="GOV-TA14-000001"/><Stat label="Artifact pipeline" value="3" detail="2 drafting · 1 review"/><Stat label="Routes awaiting review" value="3" detail="Freeze before execution"/><Stat label="Last activity" value="08:42" detail="Route advanced to READY"/></div></Card>
   <div className="stat-grid"><Stat label="Control readiness" value={`${readiness}%`} detail="Institutional controls passing"/><Stat label="Published artifacts" value={String(published)} detail="Registered evidence records"/><Stat label="Open challenges" value={String(openChallenges)} detail="Pending or under review"/><Stat label="Average verification" value={`L${avgVerification}`} detail="Across published artifacts"/></div>
+  <div className="health-grid">{health.map(item=><article key={item.label}><div><span>{item.label}</span><b>{item.state}</b></div><strong>{item.value}%</strong><div className="health-track"><i style={{width:`${item.value}%`}}/></div></article>)}</div>
   <div className="command-grid">
-   <Card className="command-core"><div className="section-head"><div><span className="kicker">Operating posture</span><h2>Execution evidence command core</h2></div><Badge tone="allow">OPERATIONAL</Badge></div><div className="orbit"><div className="orbit-center"><strong>{readiness}%</strong><span>ready</span></div>{["Reality","Record","Continuity","Admissibility","Binding","Commit","Execution","Outcome"].map((x,i)=><div key={x} className={`orbit-node node-${i+1}`}><b>{String(i+1).padStart(2,"0")}</b><span>{x}</span></div>)}</div><div className="quick-actions"><button onClick={()=>setView("routes")}>Build a route</button><Link href="/artifacts/studio">Create artifact</Link><button onClick={()=>setView("verification")}>Verify package</button><button onClick={()=>setView("portfolio")}>Generate portfolio</button></div></Card>
-   <Card><div className="section-head"><div><span className="kicker">Attention queue</span><h2>What needs action</h2></div></div><div className="attention-list">{[{n:"03",t:"Routes awaiting review",d:"Freeze route versions before additional execution."},{n:"02",t:"Challenges under review",d:"Preserve response and counter-evidence deadlines."},{n:"07",t:"Controls pending",d:"Complete publication and reviewer controls."},{n:"01",t:"Portfolio draft",d:"Board evidence portfolio requires signature."}].map(x=><button key={x.t}><span>{x.n}</span><div><strong>{x.t}</strong><p>{x.d}</p></div><b>→</b></button>)}</div></Card>
+   <Card className="command-core"><div className="section-head"><div><span className="kicker">Operating posture</span><h2>Execution evidence command core</h2></div><Badge tone="allow">CONNECTED</Badge></div><div className="institution-graph"><div className="graph-node governance"><span>GOV</span><strong>Registered governance</strong><small>Identity · scope · accountability</small></div><div className="graph-link">→</div><div className="graph-node"><span>08</span><strong>Governed routes</strong><small>4 ready · 2 published</small></div><div className="graph-link">→</div><div className="graph-node"><span>12</span><strong>Artifacts</strong><small>Bounded execution proof</small></div><div className="graph-link">→</div><div className="graph-node"><span>L5.0</span><strong>Verification</strong><small>Average reliance level</small></div><div className="graph-link">→</div><div className="graph-node"><span>04</span><strong>Open challenges</strong><small>Append-only correction path</small></div></div><div className="quick-actions"><button onClick={()=>setView("routes")}>Build a route</button><Link href="/artifacts/studio">Create artifact</Link><button onClick={()=>setView("verification")}>Verify package</button><button onClick={()=>setView("portfolio")}>Generate portfolio</button></div></Card>
+   <Card><div className="section-head"><div><span className="kicker">Attention queue</span><h2>What needs action</h2></div><Badge tone="hold">4 ITEMS</Badge></div><div className="attention-list">{[{n:"03",t:"Routes awaiting review",d:"Freeze route versions before additional execution.",v:"routes" as View},{n:"02",t:"Challenges under review",d:"Preserve response and counter-evidence deadlines.",v:"challenges" as View},{n:"07",t:"Controls pending",d:"Complete publication and reviewer controls.",v:"controls" as View},{n:"01",t:"Portfolio draft",d:"Board evidence portfolio requires signature.",v:"portfolio" as View}].map(x=><button key={x.t} onClick={()=>setView(x.v)}><span>{x.n}</span><div><strong>{x.t}</strong><p>{x.d}</p></div><b>→</b></button>)}</div></Card>
   </div>
-  <div className="two-col"><Card><div className="section-head"><div><span className="kicker">Recent artifacts</span><h2>Evidence history</h2></div><button className="text-button" onClick={()=>setView("artifacts")}>View all →</button></div><div className="artifact-mini-list">{ARTIFACTS.slice(0,6).map(a=><Link key={a.id} href={`/artifacts/${a.id.toLowerCase()}`}><span style={{background:palette[a.determination]}}/><div><strong>{a.id}</strong><p>{a.title}</p></div><Badge tone={a.determination.toLowerCase()}>{a.determination}</Badge></Link>)}</div></Card><Card><div className="section-head"><div><span className="kicker">Architecture health</span><h2>Institutional readiness</h2></div></div><Meter value={readiness} label="Control coverage"/><Meter value={92} label="Route parity"/><Meter value={88} label="Artifact verification"/><Meter value={81} label="Independent review"/><div className="health-note"><strong>Registration remains active.</strong><p>Registration establishes attributable identity and scope. Every artifact must still earn its own verification and reliance level.</p></div></Card></div>
+  <div className="two-col"><Card><div className="section-head"><div><span className="kicker">What changed</span><h2>Cross-system activity</h2></div><button className="text-button" onClick={()=>setActivityExpanded(!activityExpanded)}>{activityExpanded?"Show less":"View full feed"}</button></div><div className="activity-feed">{ACTIVITY.slice(0,activityExpanded?ACTIVITY.length:4).map(item=><article key={`${item.time}-${item.title}`}><span className={`activity-dot ${item.tone}`}/><time>{item.time}</time><div><small>{item.type}</small><strong>{item.title}</strong><p>{item.detail}</p></div></article>)}</div></Card><Card><div className="section-head"><div><span className="kicker">Milestone history</span><h2>Governance timeline</h2></div></div><div className="timeline">{TIMELINE.map((item,index)=><article key={item.date}><span>{String(index+1).padStart(2,"0")}</span><div><time>{item.date}</time><strong>{item.title}</strong><p>{item.detail}</p></div></article>)}</div></Card></div>
+  <div className="two-col"><Card><div className="section-head"><div><span className="kicker">Recent artifacts</span><h2>Evidence history</h2></div><button className="text-button" onClick={()=>setView("artifacts")}>View all →</button></div><div className="artifact-mini-list">{ARTIFACTS.slice(0,6).map(a=><Link key={a.id} href={`/artifacts/${a.id.toLowerCase()}`}><span style={{background:palette[a.determination]}}/><div><strong>{a.id}</strong><p>{a.title}</p></div><Badge tone={a.determination.toLowerCase()}>{a.determination}</Badge></Link>)}</div></Card><Card><div className="section-head"><div><span className="kicker">Return-to-work briefing</span><h2>Since your last session</h2></div></div><div className="change-list"><article><strong>2</strong><span>route states changed</span></article><article><strong>1</strong><span>artifact was published</span></article><article><strong>3</strong><span>verification checks completed</span></article><article><strong>1</strong><span>challenge response is due</span></article></div><div className="health-note"><strong>Recommended next action</strong><p>Review the three routes awaiting freeze before opening new artifact runs.</p><button className="wide-button" onClick={()=>setView("routes")}>Open route review queue</button></div></Card></div>
  </div>
 }
 
@@ -1415,6 +1488,7 @@ a
   background-size:48px 48px;
   mask-image:linear-gradient(to bottom,black,transparent 85%)
 }
+.lifecycle-bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:18px;min-height:40px;padding:7px 22px;border-bottom:1px solid rgba(240,199,117,.18);background:rgba(3,7,15,.96);backdrop-filter:blur(20px)}.lifecycle-title{color:var(--gold);font-size:9px;font-weight:900;letter-spacing:.15em;text-transform:uppercase;white-space:nowrap}.lifecycle-track{display:flex;align-items:center;gap:7px;overflow:auto;scrollbar-width:none}.lifecycle-step{display:flex;align-items:center;gap:7px;white-space:nowrap}.lifecycle-step a{padding:6px 8px;border-radius:7px;color:#73819c;font-size:10px;font-weight:800}.lifecycle-step a.current{color:#06101d;background:linear-gradient(135deg,#f5d995,#d9ad54)}.lifecycle-step b{color:#44506a;font-size:9px}.global-search{flex:1;max-width:520px;height:42px;display:flex;align-items:center;gap:9px;padding:0 11px;border:1px solid var(--line);border-radius:11px;background:#071020}.global-search input{border:0;background:transparent;padding:0;box-shadow:none}.global-search kbd,.palette-input kbd{padding:4px 7px;border:1px solid var(--line);border-radius:6px;color:var(--muted);background:rgba(255,255,255,.03);font-size:10px}.palette-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:start center;padding-top:12vh;background:rgba(0,3,10,.72);backdrop-filter:blur(12px)}.command-palette{width:min(760px,calc(100% - 28px));overflow:hidden;border:1px solid rgba(114,217,255,.35);border-radius:20px;background:#071020;box-shadow:0 40px 120px rgba(0,0,0,.65)}.palette-input{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:17px;border-bottom:1px solid var(--line)}.palette-input input{font-size:16px;border:0;background:transparent}.palette-actions,.palette-results{display:grid;padding:10px;max-height:460px;overflow:auto}.palette-actions button,.palette-actions a,.palette-results button{display:grid;grid-template-columns:1fr auto;gap:5px 14px;padding:14px;border:1px solid transparent;border-radius:12px;background:transparent;color:inherit;text-align:left;cursor:pointer}.palette-actions button:hover,.palette-actions a:hover,.palette-results button:hover{border-color:var(--line);background:rgba(114,217,255,.06)}.palette-actions small,.palette-results small{color:var(--muted)}.palette-results button{grid-template-columns:85px 1fr auto;align-items:center}.palette-results button>span{color:var(--cyan);font-size:9px;font-weight:900}.briefing-card{padding:26px;background:radial-gradient(circle at 90% 10%,rgba(54,211,153,.11),transparent 28%),linear-gradient(145deg,rgba(17,34,55,.96),rgba(8,15,29,.94))}.briefing-top{display:flex;justify-content:space-between;gap:24px}.briefing-top h2{font-size:30px;max-width:980px}.briefing-top p{max-width:980px}.briefing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.health-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.health-grid article{padding:15px;border:1px solid var(--line);border-radius:14px;background:rgba(10,18,34,.74)}.health-grid article>div:first-child{display:flex;justify-content:space-between;gap:8px}.health-grid span{color:var(--muted);font-size:11px}.health-grid b{color:var(--cyan);font-size:9px}.health-grid strong{display:block;margin:10px 0;font-size:27px}.health-track{height:6px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}.health-track i{display:block;height:100%;background:linear-gradient(90deg,#2f85bb,#72d9ff)}.institution-graph{display:grid;grid-template-columns:1.25fr auto 1fr auto 1fr auto 1fr auto 1fr;align-items:stretch;gap:8px;margin:34px 0}.graph-node{min-height:145px;display:grid;align-content:center;padding:14px;border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025)}.graph-node.governance{border-color:rgba(240,199,117,.35);background:rgba(240,199,117,.06)}.graph-node span{color:var(--gold);font-size:20px;font-weight:900}.graph-node strong{margin:8px 0}.graph-node small{color:var(--muted);line-height:1.4}.graph-link{display:grid;place-items:center;color:#53607b}.activity-feed{display:grid}.activity-feed article{display:grid;grid-template-columns:10px 60px 1fr;gap:10px;padding:13px 0;border-bottom:1px solid var(--line)}.activity-dot{width:8px;height:8px;margin-top:5px;border-radius:50%;background:#71809d}.activity-dot.allow{background:var(--allow);box-shadow:0 0 12px var(--allow)}.activity-dot.cyan{background:var(--cyan)}.activity-dot.hold{background:var(--hold)}.activity-dot.escalate{background:var(--escalate)}.activity-feed time,.timeline time{color:var(--muted);font-size:10px}.activity-feed small{color:var(--cyan);font-size:8px;font-weight:900}.activity-feed strong{display:block;margin:3px 0}.activity-feed p{margin:0;font-size:12px}.timeline article{display:grid;grid-template-columns:40px 1fr;gap:12px;padding:12px 0;position:relative}.timeline article>span{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(240,199,117,.35);border-radius:50%;color:var(--gold);font-size:10px}.timeline strong{display:block;margin:3px 0}.timeline p{margin:0;font-size:12px}.change-list{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}.change-list article{padding:15px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.02)}.change-list strong{font-size:27px;color:var(--gold)}.change-list span{display:block;color:var(--muted);font-size:11px;margin-top:5px}
 .topbar
 {
   height:82px;
@@ -2341,6 +2415,7 @@ textarea
   border-color:rgba(255,107,122,.25);
   color:var(--deny)
 }
+@media(max-width:1400px){.institution-graph{grid-template-columns:1fr 1fr}.graph-link{display:none}.briefing-grid,.health-grid{grid-template-columns:repeat(2,1fr)}.global-search{max-width:360px}}
 @media(max-width:1250px)
 {
   .workspace-frame
@@ -2370,6 +2445,7 @@ textarea
 }
 @media(max-width:850px)
 {
+  .lifecycle-bar{align-items:flex-start;flex-direction:column;gap:5px}.global-search{display:none}.briefing-grid,.health-grid{grid-template-columns:1fr}.institution-graph{grid-template-columns:1fr}.briefing-top{display:grid}
   .topbar
   {
     height:auto;
