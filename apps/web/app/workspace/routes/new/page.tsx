@@ -49,10 +49,102 @@ type CreatedRoute = {
   receipt: RouteReceipt;
 };
 
+
+
+type RegisteredGovernance = {
+  registrationId: string;
+  organizationName: string;
+  architectureName: string;
+  version: string;
+  status: "REGISTERED" | "REVIEW_REQUIRED" | "SUSPENDED";
+  sectors: string[];
+  jurisdictions: string[];
+  supportedDeterminations: Decision[];
+  routeCount: number;
+  artifactCount: number;
+  verificationLevel: number;
+};
+
+type RouteStudioHandoff = {
+  handoffVersion: "2.0";
+  createdAt: string;
+  governance: RegisteredGovernance;
+  route: {
+    rid: string | null;
+    name: string;
+    domain: string;
+    owner: string;
+    version: number;
+    selectedStage: TransferStageKey;
+    stageDeclarations: Partial<Record<TransferStageKey, string>>;
+    decision: Decision | null;
+    receiptId: string | null;
+    correlationId: string | null;
+  };
+  scope: {
+    sector: string;
+    jurisdiction: string;
+    classification: "DEMONSTRATION" | "PRODUCTION_CANDIDATE";
+  };
+};
+
+
 type ApiError = {
   error?: string;
   correlationId?: string;
 };
+
+
+
+const registeredGovernances: RegisteredGovernance[] = [
+  {
+    registrationId: "TA14-GOV-000001",
+    organizationName: "TA-14 Authority",
+    architectureName: "TA-14 Admissible Execution Architecture",
+    version: "2.0",
+    status: "REGISTERED",
+    sectors: [
+      "AI governance",
+      "Financial execution",
+      "Built environment",
+      "Public administration",
+    ],
+    jurisdictions: ["United States", "Global demonstration"],
+    supportedDeterminations: ["ALLOW", "HOLD", "DENY", "ESCALATE"],
+    routeCount: 24,
+    artifactCount: 12,
+    verificationLevel: 6,
+  },
+  {
+    registrationId: "TA14-GOV-DEMO-002",
+    organizationName: "Northstar Governance Laboratory",
+    architectureName: "Bounded Agent Control Framework",
+    version: "1.4",
+    status: "REGISTERED",
+    sectors: ["AI governance", "Healthcare", "Enterprise operations"],
+    jurisdictions: ["United States", "European Union"],
+    supportedDeterminations: ["ALLOW", "HOLD", "DENY", "ESCALATE"],
+    routeCount: 8,
+    artifactCount: 3,
+    verificationLevel: 4,
+  },
+  {
+    registrationId: "TA14-GOV-DEMO-003",
+    organizationName: "Civic Systems Assurance Group",
+    architectureName: "Public Consequence Governance Model",
+    version: "0.9",
+    status: "REVIEW_REQUIRED",
+    sectors: ["Public administration", "Procurement"],
+    jurisdictions: ["United States"],
+    supportedDeterminations: ["HOLD", "DENY", "ESCALATE"],
+    routeCount: 2,
+    artifactCount: 0,
+    verificationLevel: 1,
+  },
+];
+
+const ROUTE_STUDIO_HANDOFF_KEY = "ta14:registered-governance-route-handoff:v2";
+
 
 const initialForm: RouteForm = {
   organizationName: "TA-14 Demonstration Organization",
@@ -192,6 +284,55 @@ export default function NewRoutePage() {
   const [error, setError] = useState("");
   const [correlationId, setCorrelationId] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [selectedGovernanceId, setSelectedGovernanceId] = useState(
+    registeredGovernances[0].registrationId,
+  );
+  const [selectedSector, setSelectedSector] = useState(
+    registeredGovernances[0].sectors[0],
+  );
+  const [selectedJurisdiction, setSelectedJurisdiction] = useState(
+    registeredGovernances[0].jurisdictions[0],
+  );
+  const [routeClassification, setRouteClassification] = useState<
+    "DEMONSTRATION" | "PRODUCTION_CANDIDATE"
+  >("DEMONSTRATION");
+  const [handoffMessage, setHandoffMessage] = useState("");
+
+  const selectedGovernance = useMemo(
+    () =>
+      registeredGovernances.find(
+        (governance) => governance.registrationId === selectedGovernanceId,
+      ) ?? registeredGovernances[0],
+    [selectedGovernanceId],
+  );
+
+  const governanceEligible = selectedGovernance.status === "REGISTERED";
+
+  const governanceReadiness = useMemo(() => {
+    const checks = [
+      governanceEligible,
+      selectedGovernance.verificationLevel >= 3,
+      selectedGovernance.sectors.includes(selectedSector),
+      selectedGovernance.jurisdictions.includes(selectedJurisdiction),
+      selectedGovernance.supportedDeterminations.length >= 4,
+    ];
+
+    return Math.round(
+      (checks.filter(Boolean).length / checks.length) * 100,
+    );
+  }, [
+    governanceEligible,
+    selectedGovernance,
+    selectedSector,
+    selectedJurisdiction,
+  ]);
+
+  useEffect(() => {
+    setSelectedSector(selectedGovernance.sectors[0] ?? "AI governance");
+    setSelectedJurisdiction(
+      selectedGovernance.jurisdictions[0] ?? "United States",
+    );
+  }, [selectedGovernance]);
 
   useEffect(() => {
     const transferredDraft = readPendingRouteDraft();
@@ -366,6 +507,73 @@ export default function NewRoutePage() {
     }
   }
 
+  function openArtifactStudio(): void {
+    if (!governanceEligible) {
+      setHandoffMessage(
+        "This governance registration must be active before a route can enter the Execution Artifact Studio.",
+      );
+      return;
+    }
+
+    const stageDeclarations = draft
+      ? Object.fromEntries(
+          chain.map((stage) => [
+            stage.key,
+            draft.stages[stage.key]?.trim() || "UNDECLARED",
+          ]),
+        )
+      : {
+          reality: `Organization ${form.organizationName} proposes a consequential action through ${form.systemName}.`,
+          record: `Actor ${form.actorId}; supplier ${form.supplierId}; invoice ${form.invoiceId}; beneficiary ${form.beneficiaryId}.`,
+          continuity: "Identity, source records, route version, and authority must remain connected through execution.",
+          admissibility: "Evidence must be current, attributable, relevant, sufficient, and conflict-aware.",
+          binding: `The route is bounded to ${selectedSector} in ${selectedJurisdiction}.`,
+          commit: "No action may execute until the route version and determination are frozen.",
+          execution: "The execution adapter may release only the exact committed action.",
+          outcome: "The resulting condition and residual risk must be preserved and verified.",
+        };
+
+    const handoff: RouteStudioHandoff = {
+      handoffVersion: "2.0",
+      createdAt: new Date().toISOString(),
+      governance: selectedGovernance,
+      route: {
+        rid: result?.rid ?? null,
+        name: routeTitle,
+        domain: routeDomain,
+        owner: routeOwner,
+        version: result?.version ?? 1,
+        selectedStage,
+        stageDeclarations,
+        decision: result?.decision ?? null,
+        receiptId: result?.receipt.receiptId ?? null,
+        correlationId: result?.correlationId ?? correlationId || null,
+      },
+      scope: {
+        sector: selectedSector,
+        jurisdiction: selectedJurisdiction,
+        classification: routeClassification,
+      },
+    };
+
+    try {
+      window.localStorage.setItem(
+        ROUTE_STUDIO_HANDOFF_KEY,
+        JSON.stringify(handoff),
+      );
+      setHandoffMessage(
+        "Governance identity and frozen route context were preserved for the Execution Artifact Studio.",
+      );
+      window.location.assign("/artifacts/studio");
+    } catch (storageError) {
+      setHandoffMessage(
+        storageError instanceof Error
+          ? storageError.message
+          : "The route handoff could not be preserved.",
+      );
+    }
+  }
+
   const routeTitle =
     draft?.metadata.name ?? "Vendor payment route";
 
@@ -388,7 +596,7 @@ export default function NewRoutePage() {
             </strong>
 
             <span style={styles.brandSub}>
-              Route Construction Workspace
+              Registered Governance Route Builder 2.0
             </span>
           </span>
         </Link>
@@ -453,7 +661,7 @@ export default function NewRoutePage() {
             </span>
 
             <h1 style={styles.heroTitle}>
-              Review the route before consequence occurs.
+              Bind the route to a registered governance before consequence occurs.
             </h1>
 
             <p style={styles.heroText}>
@@ -484,6 +692,16 @@ export default function NewRoutePage() {
               />
 
               <PreviewDetail
+                label="Governance"
+                value={selectedGovernance.registrationId}
+              />
+
+              <PreviewDetail
+                label="Architecture"
+                value={`${selectedGovernance.architectureName} v${selectedGovernance.version}`}
+              />
+
+              <PreviewDetail
                 label="State"
                 value={
                   draft?.status ?? "NEW_ROUTE"
@@ -502,6 +720,156 @@ export default function NewRoutePage() {
               />
             </div>
           </aside>
+        </section>
+
+        <section style={styles.governanceDeck}>
+          <div style={styles.governanceDeckHeader}>
+            <div>
+              <span style={styles.sectionLabel}>
+                REGISTERED GOVERNANCE CONTEXT
+              </span>
+              <h2 style={styles.governanceDeckTitle}>
+                A route cannot enter the artifact registry without an attributable governance identity.
+              </h2>
+              <p style={styles.governanceDeckText}>
+                Select the registered governance, architecture version, sector, jurisdiction, and record classification that own this route. This context travels with the frozen route into the Execution Artifact Studio.
+              </p>
+            </div>
+            <div style={styles.governanceReadinessCard}>
+              <span style={styles.governanceReadinessLabel}>ROUTE READINESS</span>
+              <strong style={styles.governanceReadinessValue}>{governanceReadiness}%</strong>
+              <span
+                style={{
+                  ...styles.governanceStatusBadge,
+                  ...(governanceEligible
+                    ? styles.governanceStatusRegistered
+                    : styles.governanceStatusReview),
+                }}
+              >
+                {selectedGovernance.status.replaceAll("_", " ")}
+              </span>
+            </div>
+          </div>
+
+          <div style={styles.governanceControlGrid}>
+            <label style={styles.governanceField}>
+              <span style={styles.governanceFieldLabel}>Registered governance</span>
+              <select
+                value={selectedGovernanceId}
+                onChange={(event) => setSelectedGovernanceId(event.target.value)}
+                style={styles.governanceSelect}
+              >
+                {registeredGovernances.map((governance) => (
+                  <option
+                    key={governance.registrationId}
+                    value={governance.registrationId}
+                  >
+                    {governance.organizationName} · {governance.registrationId}
+                  </option>
+                ))}
+              </select>
+            </label>
+
+            <label style={styles.governanceField}>
+              <span style={styles.governanceFieldLabel}>Sector</span>
+              <select
+                value={selectedSector}
+                onChange={(event) => setSelectedSector(event.target.value)}
+                style={styles.governanceSelect}
+              >
+                {selectedGovernance.sectors.map((sector) => (
+                  <option key={sector} value={sector}>{sector}</option>
+                ))}
+              </select>
+            </label>
+
+            <label style={styles.governanceField}>
+              <span style={styles.governanceFieldLabel}>Jurisdiction</span>
+              <select
+                value={selectedJurisdiction}
+                onChange={(event) => setSelectedJurisdiction(event.target.value)}
+                style={styles.governanceSelect}
+              >
+                {selectedGovernance.jurisdictions.map((jurisdiction) => (
+                  <option key={jurisdiction} value={jurisdiction}>{jurisdiction}</option>
+                ))}
+              </select>
+            </label>
+
+            <label style={styles.governanceField}>
+              <span style={styles.governanceFieldLabel}>Record classification</span>
+              <select
+                value={routeClassification}
+                onChange={(event) =>
+                  setRouteClassification(
+                    event.target.value as "DEMONSTRATION" | "PRODUCTION_CANDIDATE",
+                  )
+                }
+                style={styles.governanceSelect}
+              >
+                <option value="DEMONSTRATION">Controlled demonstration</option>
+                <option value="PRODUCTION_CANDIDATE">Production candidate</option>
+              </select>
+            </label>
+          </div>
+
+          <div style={styles.governanceIdentityGrid}>
+            <div style={styles.governanceIdentityCard}>
+              <span style={styles.governanceIdentityLabel}>ARCHITECTURE</span>
+              <strong style={styles.governanceIdentityValue}>
+                {selectedGovernance.architectureName}
+              </strong>
+              <span style={styles.governanceIdentityMeta}>
+                Version {selectedGovernance.version} · Verification L{selectedGovernance.verificationLevel}
+              </span>
+            </div>
+            <div style={styles.governanceIdentityCard}>
+              <span style={styles.governanceIdentityLabel}>PORTFOLIO</span>
+              <strong style={styles.governanceIdentityValue}>
+                {selectedGovernance.routeCount} routes · {selectedGovernance.artifactCount} artifacts
+              </strong>
+              <span style={styles.governanceIdentityMeta}>
+                {selectedGovernance.supportedDeterminations.join(" · ")}
+              </span>
+            </div>
+            <div style={styles.governanceIdentityCard}>
+              <span style={styles.governanceIdentityLabel}>REGISTRY RULE</span>
+              <strong style={styles.governanceIdentityValue}>
+                No registered governance. No registered artifact.
+              </strong>
+              <span style={styles.governanceIdentityMeta}>
+                Governance identity remains bound to every route and artifact version.
+              </span>
+            </div>
+          </div>
+
+          <div style={styles.governanceActionBar}>
+            <div>
+              <strong style={styles.governanceActionTitle}>Freeze the route into the artifact workflow.</strong>
+              <p style={styles.governanceActionText}>
+                The handoff preserves the governance registration, architecture version, route declarations, scope, current determination, and receipt identifiers.
+              </p>
+              {handoffMessage ? (
+                <p style={styles.handoffMessage}>{handoffMessage}</p>
+              ) : null}
+            </div>
+            <div style={styles.governanceActionButtons}>
+              <Link href="/governance/workspace" style={styles.secondaryLink}>
+                Open governance workspace
+              </Link>
+              <button
+                type="button"
+                onClick={openArtifactStudio}
+                disabled={!governanceEligible}
+                style={{
+                  ...styles.primaryButton,
+                  ...(!governanceEligible ? styles.disabledButton : {}),
+                }}
+              >
+                Freeze route and open Artifact Studio →
+              </button>
+            </div>
+          </div>
         </section>
 
         <RouteChainVisualizer
@@ -1898,6 +2266,168 @@ const styles: Record<string, CSSProperties> = {
     fontSize: 13,
     fontWeight: 850,
     textDecoration: "none",
+  },
+  governanceDeck: {
+    margin: "0 clamp(20px, 6vw, 92px) 34px",
+    padding: "clamp(24px, 4vw, 44px)",
+    border: "1px solid rgba(105,240,193,0.28)",
+    borderRadius: 22,
+    background:
+      "radial-gradient(circle at 88% 8%, rgba(105,240,193,0.14), transparent 28%), linear-gradient(145deg, #07101f 0%, #0b1730 55%, #0b1020 100%)",
+    boxShadow: "0 30px 90px rgba(4,12,26,0.24)",
+    color: "#ffffff",
+  },
+  governanceDeckHeader: {
+    display: "flex",
+    flexWrap: "wrap",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    gap: 28,
+  },
+  governanceDeckTitle: {
+    maxWidth: 850,
+    margin: "10px 0 12px",
+    fontSize: "clamp(25px, 3.6vw, 46px)",
+    lineHeight: 1.05,
+    letterSpacing: "-0.045em",
+  },
+  governanceDeckText: {
+    maxWidth: 840,
+    margin: 0,
+    color: "#a9b8cc",
+    fontSize: 15,
+    lineHeight: 1.75,
+  },
+  governanceReadinessCard: {
+    display: "grid",
+    minWidth: 190,
+    gap: 8,
+    padding: 20,
+    border: "1px solid rgba(255,255,255,0.12)",
+    borderRadius: 16,
+    background: "rgba(255,255,255,0.055)",
+    textAlign: "right",
+  },
+  governanceReadinessLabel: {
+    color: "#8fa2bc",
+    fontSize: 9,
+    fontWeight: 900,
+    letterSpacing: "0.16em",
+  },
+  governanceReadinessValue: {
+    color: "#69f0c1",
+    fontSize: 38,
+    lineHeight: 1,
+    letterSpacing: "-0.05em",
+  },
+  governanceStatusBadge: {
+    justifySelf: "end",
+    padding: "6px 9px",
+    borderRadius: 999,
+    fontSize: 9,
+    fontWeight: 900,
+    letterSpacing: "0.1em",
+  },
+  governanceStatusRegistered: {
+    background: "rgba(105,240,193,0.15)",
+    color: "#69f0c1",
+  },
+  governanceStatusReview: {
+    background: "rgba(251,191,36,0.15)",
+    color: "#fbbf24",
+  },
+  governanceControlGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+    gap: 14,
+    marginTop: 30,
+  },
+  governanceField: {
+    display: "grid",
+    gap: 8,
+  },
+  governanceFieldLabel: {
+    color: "#93a4bc",
+    fontSize: 10,
+    fontWeight: 900,
+    letterSpacing: "0.12em",
+    textTransform: "uppercase",
+  },
+  governanceSelect: {
+    width: "100%",
+    padding: "13px 14px",
+    border: "1px solid rgba(255,255,255,0.13)",
+    borderRadius: 10,
+    background: "#111d32",
+    color: "#ffffff",
+    fontSize: 13,
+    fontWeight: 750,
+    outline: "none",
+  },
+  governanceIdentityGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))",
+    gap: 14,
+    marginTop: 18,
+  },
+  governanceIdentityCard: {
+    display: "grid",
+    gap: 8,
+    minHeight: 132,
+    padding: 18,
+    border: "1px solid rgba(255,255,255,0.1)",
+    borderRadius: 14,
+    background: "rgba(4,12,26,0.56)",
+  },
+  governanceIdentityLabel: {
+    color: "#69f0c1",
+    fontSize: 9,
+    fontWeight: 900,
+    letterSpacing: "0.16em",
+  },
+  governanceIdentityValue: {
+    color: "#ffffff",
+    fontSize: 16,
+    lineHeight: 1.35,
+  },
+  governanceIdentityMeta: {
+    alignSelf: "end",
+    color: "#8fa2bc",
+    fontSize: 12,
+    lineHeight: 1.55,
+  },
+  governanceActionBar: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    alignItems: "center",
+    gap: 22,
+    marginTop: 22,
+    paddingTop: 22,
+    borderTop: "1px solid rgba(255,255,255,0.1)",
+  },
+  governanceActionTitle: {
+    display: "block",
+    color: "#ffffff",
+    fontSize: 17,
+  },
+  governanceActionText: {
+    maxWidth: 780,
+    margin: "7px 0 0",
+    color: "#93a4bc",
+    fontSize: 12,
+    lineHeight: 1.6,
+  },
+  governanceActionButtons: {
+    display: "flex",
+    flexWrap: "wrap",
+    gap: 10,
+  },
+  handoffMessage: {
+    margin: "10px 0 0",
+    color: "#69f0c1",
+    fontSize: 12,
+    fontWeight: 800,
   },
   principleSection: {
     padding:
