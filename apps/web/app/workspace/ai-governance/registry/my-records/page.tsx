@@ -36,8 +36,10 @@ type FilterValue =
   | 'all'
   | 'draft'
   | 'submitted'
+  | 'review'
   | 'accepted'
   | 'registered'
+  | 'attention'
   | 'other';
 
 function formatDate(value: string | null) {
@@ -64,11 +66,28 @@ function statusGroup(status: string): FilterValue {
   const normalized = status.trim().toLowerCase();
 
   if (normalized === 'draft') return 'draft';
-  if (normalized === 'submitted' || normalized === 'under_review') {
-    return 'submitted';
+  if (normalized === 'submitted') return 'submitted';
+  if (
+    normalized === 'under_review' ||
+    normalized === 'administrative_review' ||
+    normalized === 'independent_review'
+  ) {
+    return 'review';
   }
   if (normalized === 'accepted') return 'accepted';
-  if (normalized === 'registered') return 'registered';
+  if (normalized === 'registered' || normalized === 'published') {
+    return 'registered';
+  }
+  if (
+    normalized === 'held' ||
+    normalized === 'returned' ||
+    normalized === 'returned_for_correction' ||
+    normalized === 'disputed' ||
+    normalized === 'rejected' ||
+    normalized === 'withdrawn'
+  ) {
+    return 'attention';
+  }
 
   return 'other';
 }
@@ -170,8 +189,10 @@ export default function MyRegistryRecordsPage() {
         all: 0,
         draft: 0,
         submitted: 0,
+        review: 0,
         accepted: 0,
         registered: 0,
+        attention: 0,
         other: 0,
       } satisfies Record<FilterValue, number>,
     );
@@ -274,8 +295,10 @@ export default function MyRegistryRecordsPage() {
               ['all', 'All'],
               ['draft', 'Drafts'],
               ['submitted', 'Submitted'],
+              ['review', 'In Review'],
               ['accepted', 'Accepted'],
               ['registered', 'Registered'],
+              ['attention', 'Needs Attention'],
               ['other', 'Other'],
             ] as Array<[FilterValue, string]>
           ).map(([value, text]) => (
@@ -378,6 +401,7 @@ export default function MyRegistryRecordsPage() {
             const isRegistered =
               group === 'registered' && Boolean(record.registryIdentifier);
             const isEditable = group === 'draft';
+            const needsAttention = group === 'attention';
 
             return (
               <article className="recordCard" key={record.id}>
@@ -415,6 +439,10 @@ export default function MyRegistryRecordsPage() {
                     <dd>{formatDate(record.submittedAt)}</dd>
                   </div>
                   <div>
+                    <dt>Reviewed</dt>
+                    <dd>{formatDate(record.reviewedAt)}</dd>
+                  </div>
+                  <div>
                     <dt>Accepted</dt>
                     <dd>{formatDate(record.acceptedAt)}</dd>
                   </div>
@@ -448,7 +476,11 @@ export default function MyRegistryRecordsPage() {
                       )}`}
                       className="primaryButton"
                     >
-                      {isEditable ? 'Continue Draft' : 'Open Record'}
+                      {isEditable
+                        ? 'Continue Draft'
+                        : needsAttention
+                          ? 'Open and Respond'
+                          : 'Open Submission'}
                     </Link>
                   )}
                 </div>
