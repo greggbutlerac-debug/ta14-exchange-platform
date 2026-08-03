@@ -299,6 +299,106 @@ export default function BuiltEnvironmentPage() {
           margin: 0 auto;
         }
 
+        .institution-rail {
+          position: relative;
+          z-index: 12;
+          border-bottom: 1px solid rgba(112, 174, 229, 0.14);
+          background: rgba(2, 7, 13, 0.92);
+          backdrop-filter: blur(18px);
+        }
+
+        .institution-rail-inner {
+          min-height: 48px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+        }
+
+        .back-link,
+        .institution-rail-links a {
+          color: var(--muted);
+          text-decoration: none;
+          font-size: 11px;
+          font-weight: 800;
+          letter-spacing: 0.04em;
+          transition: color 160ms ease, transform 160ms ease;
+        }
+
+        .back-link {
+          display: inline-flex;
+          align-items: center;
+          gap: 9px;
+          color: #dcecff;
+        }
+
+        .back-link span {
+          color: var(--cyan);
+          font-size: 16px;
+        }
+
+        .institution-rail-links {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 18px;
+        }
+
+        .back-link:hover,
+        .institution-rail-links a:hover {
+          color: #ffffff;
+          transform: translateY(-1px);
+        }
+
+        .button.disabled {
+          color: #6f8294;
+          border-color: rgba(112, 174, 229, 0.12);
+          background: rgba(8, 15, 24, 0.62);
+          cursor: not-allowed;
+          pointer-events: none;
+          box-shadow: none;
+        }
+
+        .return-section {
+          margin-top: 20px;
+          margin-bottom: 44px;
+          padding: 24px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+          border: 1px solid var(--line);
+          border-radius: 20px;
+          background: linear-gradient(135deg, rgba(8, 22, 35, 0.9), rgba(4, 11, 19, 0.92));
+        }
+
+        .return-section > div:first-child {
+          max-width: 620px;
+        }
+
+        .return-section span {
+          display: block;
+          color: var(--cyan);
+          font-size: 9px;
+          font-weight: 900;
+          letter-spacing: 0.16em;
+        }
+
+        .return-section strong {
+          display: block;
+          margin-top: 8px;
+          font-family: Georgia, "Times New Roman", serif;
+          font-size: 20px;
+          line-height: 1.35;
+        }
+
+        .return-actions {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: flex-end;
+          gap: 9px;
+        }
+
         .topbar {
           position: sticky;
           top: 0;
@@ -988,6 +1088,35 @@ export default function BuiltEnvironmentPage() {
           }
         }
 
+        @media (max-width: 760px) {
+          .institution-rail-inner,
+          .return-section {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .institution-rail-inner {
+            padding-top: 11px;
+            padding-bottom: 11px;
+          }
+
+          .institution-rail-links {
+            width: 100%;
+            justify-content: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+          }
+
+          .return-actions {
+            width: 100%;
+            justify-content: flex-start;
+          }
+
+          .return-actions .button {
+            width: 100%;
+          }
+        }
+
         @media (prefers-reduced-motion: reduce) {
           .orb,
           .building::before,
@@ -1009,9 +1138,23 @@ export default function BuiltEnvironmentPage() {
           <div className="grid" />
         </div>
 
+        <div className="institution-rail" aria-label="Institution navigation">
+          <div className="container institution-rail-inner">
+            <a className="back-link" href="/environmental-integrity-governance">
+              <span aria-hidden="true">←</span>
+              Environmental Integrity Governance
+            </a>
+            <div className="institution-rail-links">
+              <a href="/">TA-14 Authority Home</a>
+              <a href="/academy">TA-14 Academy</a>
+              <a href="/environmental-records">Environmental Records</a>
+            </div>
+          </div>
+        </div>
+
         <header className="topbar">
           <div className="container topbar-inner">
-            <a className="brand" href="/">
+            <a className="brand" href="/environmental-integrity-governance">
               <span className="brand-mark">TA-14</span>
               <span>BUILT ENVIRONMENT EXCHANGE</span>
             </a>
@@ -1021,7 +1164,7 @@ export default function BuiltEnvironmentPage() {
               <a href="#architecture">Architecture</a>
               <a href="#atmospheric-integrity">Atmospheric Integrity</a>
               <a href="#actions">Actions</a>
-              <a className="button primary" href="/built-environment/routes/new">
+              <a className="button primary" href="/workspace/routes/new?domain=built-environment">
                 Build Route
               </a>
             </nav>
@@ -1152,17 +1295,23 @@ export default function BuiltEnvironmentPage() {
                 </div>
 
                 <div className="hero-actions">
-                  <a
-                    className="button primary"
-                    href={`/built-environment/${selected.slug}`}
-                  >
-                    Open Workspace
-                  </a>
+                  {selected.status === 'DEMONSTRATION' ? (
+                    <a
+                      className="button primary"
+                      href={`/built-environment/routes/override-demo?environment=${selected.slug}`}
+                    >
+                      Open Demonstration
+                    </a>
+                  ) : (
+                    <span className="button disabled" aria-disabled="true">
+                      Workspace Planned
+                    </span>
+                  )}
                   <a
                     className="button"
-                    href={`/built-environment/routes/new?environment=${selected.slug}`}
+                    href={`/workspace/routes/new?domain=built-environment&environment=${selected.slug}`}
                   >
-                    Create Route
+                    Create Governed Route
                   </a>
                 </div>
 
@@ -1266,7 +1415,7 @@ export default function BuiltEnvironmentPage() {
             </div>
 
             <div className="action-grid">
-              <a className="action-card" href="/built-environment/routes/new">
+              <a className="action-card" href="/workspace/routes/new?domain=built-environment">
                 <span>LIVE PATH</span>
                 <h3>Create Governed Route</h3>
                 <p>
@@ -1287,8 +1436,8 @@ export default function BuiltEnvironmentPage() {
                 </p>
               </a>
 
-              <a className="action-card" href="/built-environment/records">
-                <span>PLANNED</span>
+              <a className="action-card" href="/environmental-records">
+                <span>LIVE PATH</span>
                 <h3>Inspect Governed Records</h3>
                 <p>
                   Review decision, evidence, authority, execution, outcome, and
@@ -1296,8 +1445,8 @@ export default function BuiltEnvironmentPage() {
                 </p>
               </a>
 
-              <a className="action-card" href="/built-environment/verify">
-                <span>PLANNED</span>
+              <a className="action-card" href="/workspace/records/verify">
+                <span>LIVE PATH</span>
                 <h3>Verify Record Package</h3>
                 <p>
                   Check hashes, signatures, continuity, dependencies, replay
@@ -1345,6 +1494,19 @@ export default function BuiltEnvironmentPage() {
             </div>
           </section>
         </main>
+
+        <section className="container return-section" aria-label="Return navigation">
+          <div>
+            <span>ENVIRONMENTAL INTEGRITY GOVERNANCE</span>
+            <strong>Return to the governing division or continue into its shared institutional systems.</strong>
+          </div>
+          <div className="return-actions">
+            <a className="button primary" href="/environmental-integrity-governance">← Environmental Integrity Governance</a>
+            <a className="button" href="/environmental-records">Environmental Records</a>
+            <a className="button" href="/academy">TA-14 Academy</a>
+            <a className="button" href="/">TA-14 Authority Home</a>
+          </div>
+        </section>
 
         <footer className="footer">
           <div className="container">
