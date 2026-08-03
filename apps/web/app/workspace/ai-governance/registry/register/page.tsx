@@ -386,6 +386,8 @@ export default function RegisterGovernancePage() {
   const [activeStep, setActiveStep] = useState(0);
   const [previewOpen, setPreviewOpen] = useState(true);
   const [receiptGenerated, setReceiptGenerated] = useState(false);
+  const [submitBusy, setSubmitBusy] = useState(false);
+  const [submittedRecord, setSubmittedRecord] = useState<{ id: string; status: string; submitted_at: string | null } | null>(null);
 
   const totalSize = useMemo(
     () => files.reduce((total, item) => total + item.file.size, 0),
@@ -567,6 +569,37 @@ export default function RegisterGovernancePage() {
     } finally {
       setEvidenceBusyId(null);
     }
+  }
+
+  async function preserveEvidenceForSubmission(item: EvidenceFile, submissionId: string) {
+    if (!item.description.trim()) {
+      throw new Error(`${item.file.name}: describe what this file supports before preserving it.`);
+    }
+
+    const body = new FormData();
+    body.append('file', item.file);
+    body.append('submissionId', submissionId);
+    body.append('evidenceRelationship', item.relationship);
+    body.append('evidenceClassification', item.category);
+    body.append('description', item.description.trim());
+    body.append(
+      'visibility',
+      item.visibility === 'PUBLIC'
+        ? 'public'
+        : item.visibility === 'CONTROLLED'
+          ? 'selective'
+          : 'private',
+    );
+
+    const response = await fetch('/api/ai-governance/registry/evidence', {
+      method: 'POST',
+      body,
+    });
+    const payload = await response.json();
+    if (!response.ok) {
+      throw new Error(payload.error ?? `Unable to preserve ${item.file.name}.`);
+    }
+    return payload.evidence as PreservedEvidence;
   }
 
   async function deletePreservedEvidence(id: string) {
@@ -796,13 +829,13 @@ export default function RegisterGovernancePage() {
     };
   }, []);
 
-  async function saveDraft() {
+  async function saveDraft(): Promise<string | null> {
     setDraftBusy(true);
     setErrors([]);
 
     const recoveryPayload = {
       savedAt: new Date().toISOString(),
-      form,
+      form: { ...form, stewardName: form.stewardName.trim() || form.claimantName.trim() },
       publications,
       repositories,
       zenodoRecords,
@@ -816,7 +849,7 @@ export default function RegisterGovernancePage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: draftId ?? undefined,
-          form,
+          form: { ...form, stewardName: form.stewardName.trim() || form.claimantName.trim() },
           publications,
           repositories,
           zenodoRecords,
@@ -832,11 +865,68 @@ export default function RegisterGovernancePage() {
       setDraftId(payload.draftId);
       await loadPreservedEvidence(payload.draftId);
       setMessage('Private draft saved to your signed-in Registry account. Evidence files may now be preserved and bound to this draft.');
+      return payload.draftId as string;
     } catch (error) {
       setErrors([error instanceof Error ? error.message : 'Unable to save the Registry draft.']);
       setMessage('A browser recovery copy was preserved, but the account-backed draft was not saved.');
+      return null;
     } finally {
       setDraftBusy(false);
+    }
+  }
+
+  async function submitForReview() {
+    if (!validate()) {
+      setMessage('The intake is not ready for submission. Resolve the required items first.');
+      return;
+    }
+
+    setSubmitBusy(true);
+    setErrors([]);
+    setMessage('');
+
+    try {
+      const submissionId = draftId ?? (await saveDraft());
+      if (!submissionId) {
+        throw new Error('The account-backed Registry draft could not be created.');
+      }
+
+      let preserved = [...preservedEvidence];
+      if (files.length > 0) {
+        const uploaded: PreservedEvidence[] = [];
+        for (const item of files) {
+          setEvidenceBusyId(item.id);
+          uploaded.push(await preserveEvidenceForSubmission(item, submissionId));
+        }
+        preserved = [...preserved, ...uploaded];
+        setPreservedEvidence(preserved);
+        setFiles([]);
+        setEvidenceBusyId(null);
+      }
+
+      if (preserved.length < 1) {
+        throw new Error('Preserve at least one evidence item before submitting for review.');
+      }
+
+      const response = await fetch('/api/ai-governance/registry/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId }),
+      });
+      const payload = await response.json();
+      if (!response.ok) {
+        const details = Array.isArray(payload.details) ? ` ${payload.details.join(' ')}` : '';
+        throw new Error(`${payload.error ?? 'Unable to submit the Registry intake.'}${details}`);
+      }
+
+      window.localStorage.removeItem(DRAFT_KEY);
+      setSubmittedRecord(payload.submission);
+      setMessage(payload.notice ?? 'Registry intake submitted for review.');
+    } catch (error) {
+      setErrors([error instanceof Error ? error.message : 'Unable to submit the Registry intake for review.']);
+    } finally {
+      setEvidenceBusyId(null);
+      setSubmitBusy(false);
     }
   }
 
@@ -924,17 +1014,36 @@ export default function RegisterGovernancePage() {
       repositories,
       zenodoRecords,
       patentRecords,
-      evidenceManifest: files.map((item) => ({
-        filename: item.file.name,
-        mediaType: item.file.type || 'application/octet-stream',
-        sizeBytes: item.file.size,
-        lastModified: new Date(item.file.lastModified).toISOString(),
-        category: item.category,
-        relationship: item.relationship,
-        description: item.description,
-        visibility: item.visibility,
-        sha256: item.sha256,
-      })),
+      draftId,
+      submissionState: submittedRecord?.status ?? (draftId ? 'DRAFT_ACCOUNT_BACKED' : 'BROWSER_RECOVERY_DRAFT'),
+      evidenceManifest: [
+        ...preservedEvidence.map((item) => ({
+          evidenceId: item.id,
+          filename: item.original_filename,
+          mediaType: item.mime_type,
+          sizeBytes: item.size_bytes,
+          category: item.evidence_classification,
+          relationship: item.evidence_relationship,
+          description: item.description,
+          visibility: item.visibility,
+          sha256: item.sha256_hex,
+          preserved: true,
+          storageBucket: item.storage_bucket,
+          storagePath: item.storage_path,
+        })),
+        ...files.map((item) => ({
+          filename: item.file.name,
+          mediaType: item.file.type || 'application/octet-stream',
+          sizeBytes: item.file.size,
+          lastModified: new Date(item.file.lastModified).toISOString(),
+          category: item.category,
+          relationship: item.relationship,
+          description: item.description,
+          visibility: item.visibility,
+          sha256: item.sha256,
+          preserved: false,
+        })),
+      ],
     };
   }
 
@@ -962,13 +1071,7 @@ export default function RegisterGovernancePage() {
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!validate()) {
-      setMessage('The intake package is not ready for review. Resolve the items below.');
-      return;
-    }
-    setMessage(
-      'The intake package is review-ready. Registry submission storage is not connected on this page yet; generate the manifest to preserve the completed intake now.',
-    );
+    void submitForReview();
   }
 
 
@@ -1658,11 +1761,33 @@ export default function RegisterGovernancePage() {
               </div>
 
               <div className="final-boundary">
-                <strong>No public Registry record exists yet.</strong>
-                <p>
-                  This intake is review-ready only. Formal submission, acceptance, identifier assignment,
-                  and publication require the connected Registry submission workflow.
-                </p>
+                {submittedRecord ? (
+                  <>
+                    <strong>Submitted for Registry review.</strong>
+                    <p>
+                      Submission {submittedRecord.id} is locked in status {submittedRecord.status}.
+                      Registration, identifier assignment, and public publication occur only after bounded review and acceptance.
+                    </p>
+                    <div className="receipt-actions">
+                      <Link className="primary-button" href={`/workspace/ai-governance/registry/register/${submittedRecord.id}`}>Open submitted record →</Link>
+                      <Link className="secondary-button" href="/workspace/ai-governance/registry/my-records">Open My Registry Records</Link>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <strong>Ready for formal submission.</strong>
+                    <p>
+                      Submission creates an account-backed Registry record, preserves any remaining local evidence,
+                      locks the intake, appends the submission event, and places the record in the review lifecycle.
+                      Submission is not registration, certification, endorsement, or identifier assignment.
+                    </p>
+                    <div className="receipt-actions">
+                      <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || draftBusy}>
+                        {submitBusy ? 'Submitting Registry Intake…' : 'Submit for Registry Review →'}
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             </section>
           )}
@@ -1680,7 +1805,9 @@ export default function RegisterGovernancePage() {
             {activeStep < wizardSteps.length - 1 ? (
               <button type="button" className="primary-button" onClick={() => goToStep(activeStep + 1)}>Save & Continue →</button>
             ) : (
-              <button type="button" className="primary-button" onClick={generateReceipt}>Generate Receipt ✓</button>
+              <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || Boolean(submittedRecord)}>
+                {submittedRecord ? 'Submitted ✓' : submitBusy ? 'Submitting…' : 'Submit for Review →'}
+              </button>
             )}
           </div>
         </div>
