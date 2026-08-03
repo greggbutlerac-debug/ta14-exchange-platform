@@ -4,6 +4,7 @@ import { cookies } from 'next/headers';
 import { notFound, redirect } from 'next/navigation';
 
 import FinalizeRegistrationPanel from './FinalizeRegistrationPanel';
+import ReviewDecisionPanel from './ReviewDecisionPanel';
 
 type PageProps = {
   params: Promise<{ submissionId: string }>;
@@ -561,6 +562,13 @@ export default async function RegistrySubmissionReviewPage({
           ]}
         />
       </section>
+
+      <ReviewDecisionPanel
+        submissionId={submission.id}
+        status={submission.status}
+        currentDecision={submission.review_decision}
+        currentRationale={submission.review_rationale}
+      />
 
       <section className="sectionCard">
         <div className="sectionHeading">
