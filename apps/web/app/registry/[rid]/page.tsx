@@ -64,6 +64,21 @@ export default function PublicRegistryRecordPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [notFound, setNotFound] = useState(false);
+  const [citationCopied, setCitationCopied] = useState(false);
+
+  async function copyCitation() {
+    if (!record) return;
+
+    const citation = `${record.governanceName}${record.version ? `, version ${record.version}` : ''}. TA-14 AI Governance Registry, ${record.registryIdentifier}. Registered ${formatDate(record.registeredAt)}. ${typeof window !== 'undefined' ? window.location.href : ''}`;
+
+    try {
+      await navigator.clipboard.writeText(citation);
+      setCitationCopied(true);
+      window.setTimeout(() => setCitationCopied(false), 2400);
+    } catch {
+      setCitationCopied(false);
+    }
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -228,14 +243,13 @@ export default function PublicRegistryRecordPage() {
               </div>
 
               <div className="heroActions">
-                <Link
-                  href={`/ai-governance-registry/records/${encodeURIComponent(
-                    record.registryIdentifier,
-                  )}/citation`}
+                <button
+                  type="button"
                   className="primaryButton"
+                  onClick={() => void copyCitation()}
                 >
-                  Cite This Record
-                </Link>
+                  {citationCopied ? 'Citation Copied' : 'Copy Citation'}
+                </button>
 
                 <Link
                   href="/registry"
@@ -244,6 +258,12 @@ export default function PublicRegistryRecordPage() {
                   Browse Registry Directory
                 </Link>
               </div>
+
+              {citationCopied ? (
+                <p className="actionNotice" role="status">
+                  Citation copied to your clipboard.
+                </p>
+              ) : null}
             </div>
 
             <aside className="recordSeal">
@@ -373,7 +393,7 @@ export default function PublicRegistryRecordPage() {
               <div className="lineageBox">
                 <p>This registration supersedes:</p>
                 <Link
-                  href={`/ai-governance-registry/records/${encodeURIComponent(
+                  href={`/registry/${encodeURIComponent(
                     record.supersedesRegistryIdentifier,
                   )}`}
                   className="lineageLink"
@@ -645,6 +665,13 @@ const styles = `
     display: flex;
     flex-wrap: wrap;
     gap: 11px;
+  }
+
+  .actionNotice {
+    margin: 12px 0 0;
+    color: #c8f6e7;
+    font-size: 0.88rem;
+    font-weight: 800;
   }
 
   .heroBadges span,
