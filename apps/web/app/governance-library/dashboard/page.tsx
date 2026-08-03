@@ -765,7 +765,688 @@ export default function GovernanceLibraryDashboardPage() {
         </section>
       </div>
 
+        <section className="institutionalReadinessSection">
+          <div className="sectionHeading readinessHeading">
+            <div>
+              <p className="eyebrow gold">INSTITUTIONAL READINESS DESK</p>
+              <h2>
+                A library becomes operational when its authority, evidence,
+                applicability, and execution pathways can be inspected together.
+              </h2>
+            </div>
+
+            <p>
+              This desk converts the library from a catalog into a governed
+              institutional surface. It identifies what is known, what remains
+              unresolved, which authority questions must be answered, and where
+              the next governed action should occur.
+            </p>
+          </div>
+
+          <div className="readinessGrid">
+            <article className="readinessCard">
+              <div className="readinessCardHeader">
+                <span>01</span>
+                <strong>Authority integrity</strong>
+              </div>
+
+              <h3>Confirm that the cited source can actually govern the declared matter.</h3>
+
+              <p>
+                Publisher identity, instrument type, jurisdiction, edition,
+                adoption status, effective date, and supersession must be
+                resolved before a record is treated as controlling authority.
+              </p>
+
+              <div className="readinessQuestions">
+                <span>Is the source official?</span>
+                <span>Is the edition current?</span>
+                <span>Was it adopted?</span>
+                <span>Has it been superseded?</span>
+              </div>
+
+              <Link href="/governance-library/authorities" className="deskLink">
+                Resolve authority →
+              </Link>
+            </article>
+
+            <article className="readinessCard">
+              <div className="readinessCardHeader">
+                <span>02</span>
+                <strong>Applicability integrity</strong>
+              </div>
+
+              <h3>Determine whether the authority reaches the entity, role, system, and event.</h3>
+
+              <p>
+                A valid authority may still be inapplicable. The determination
+                must preserve territorial scope, regulated role, sector,
+                system classification, timing, exclusions, and transition rules.
+              </p>
+
+              <div className="readinessQuestions">
+                <span>Which entity is governed?</span>
+                <span>What role is held?</span>
+                <span>Which jurisdiction applies?</span>
+                <span>What exclusions remain?</span>
+              </div>
+
+              <Link href="/governance-library/applicability" className="deskLink">
+                Run applicability →
+              </Link>
+            </article>
+
+            <article className="readinessCard">
+              <div className="readinessCardHeader">
+                <span>03</span>
+                <strong>Evidence integrity</strong>
+              </div>
+
+              <h3>Identify the records needed to support a bounded governance claim.</h3>
+
+              <p>
+                Policies, assessments, tests, approvals, source records,
+                execution receipts, and outcome evidence must remain attributable,
+                continuous, current, and proportionate to the consequence.
+              </p>
+
+              <div className="readinessQuestions">
+                <span>What evidence is required?</span>
+                <span>Who produced it?</span>
+                <span>Is continuity preserved?</span>
+                <span>What is still missing?</span>
+              </div>
+
+              <Link href="/governance-library/governed-records" className="deskLink">
+                Inspect records →
+              </Link>
+            </article>
+
+            <article className="readinessCard">
+              <div className="readinessCardHeader">
+                <span>04</span>
+                <strong>Execution integrity</strong>
+              </div>
+
+              <h3>Separate organizational governance from permission to execute a specific action.</h3>
+
+              <p>
+                A policy, framework, certification, or risk program can support
+                governance without proving that one consequential execution was
+                admissible at the commit boundary.
+              </p>
+
+              <div className="readinessQuestions">
+                <span>What action is proposed?</span>
+                <span>Which evidence is admitted?</span>
+                <span>Who has authority?</span>
+                <span>What determination applies?</span>
+              </div>
+
+              <Link href="/workspace/ai-governance" className="deskLink">
+                Build governed route →
+              </Link>
+            </article>
+          </div>
+        </section>
+
+        <section className="resolutionMatrixSection">
+          <div className="resolutionHeader">
+            <div className="resolutionSeal">
+              <span>RM</span>
+              <small>Resolution matrix</small>
+            </div>
+
+            <div>
+              <p className="eyebrow gold">GOVERNANCE RESOLUTION MATRIX</p>
+              <h2>Resolve the record before relying on the claim.</h2>
+              <p>
+                The matrix below preserves the distinction between finding a
+                source, understanding it, determining that it applies, testing
+                its requirements, and governing an execution under it.
+              </p>
+            </div>
+          </div>
+
+          <div className="resolutionTable" role="table" aria-label="Governance resolution matrix">
+            <div className="resolutionRow resolutionRowHeader" role="row">
+              <span role="columnheader">Resolution layer</span>
+              <span role="columnheader">Primary question</span>
+              <span role="columnheader">Required record</span>
+              <span role="columnheader">Failure response</span>
+            </div>
+
+            {[
+              [
+                "Source",
+                "Is this the official and attributable instrument?",
+                "Source identity and provenance record",
+                "HOLD reliance until verified",
+              ],
+              [
+                "Status",
+                "Is it published, effective, adopted, current, or superseded?",
+                "Status and version determination",
+                "HOLD unresolved status",
+              ],
+              [
+                "Authority",
+                "What gives this instrument governing force or institutional relevance?",
+                "Authority resolution record",
+                "DENY unsupported authority claim",
+              ],
+              [
+                "Applicability",
+                "Does it reach this entity, role, jurisdiction, system, and event?",
+                "Applicability determination",
+                "ESCALATE material ambiguity",
+              ],
+              [
+                "Requirement",
+                "What duty, control, prohibition, or evidence obligation is created?",
+                "Requirement interpretation record",
+                "HOLD incomplete interpretation",
+              ],
+              [
+                "Testing",
+                "What observable evidence would support or defeat the claim?",
+                "Test plan and findings record",
+                "DENY unsupported conclusion",
+              ],
+              [
+                "Execution",
+                "May the bounded consequential action proceed now?",
+                "Admissibility determination and binding record",
+                "ALLOW, HOLD, DENY, or ESCALATE",
+              ],
+              [
+                "Outcome",
+                "What actually occurred and what remains unproven?",
+                "Outcome and limitation record",
+                "Preserve discrepancy and review",
+              ],
+            ].map(([layer, question, record, response]) => (
+              <div className="resolutionRow" role="row" key={layer}>
+                <strong role="cell">{layer}</strong>
+                <span role="cell">{question}</span>
+                <span role="cell">{record}</span>
+                <span role="cell">{response}</span>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="commandRoutesSection">
+          <div className="commandRoutesIntro">
+            <p className="eyebrow">COMMAND ROUTES</p>
+            <h2>Move from institutional knowledge to governed work.</h2>
+            <p>
+              Each route preserves a different institutional purpose. No single
+              route substitutes for the others, and no dashboard metric alone
+              establishes compliance, conformity, certification, or admissibility.
+            </p>
+          </div>
+
+          <div className="commandRoutesGrid">
+            {[
+              {
+                code: "LIB",
+                title: "Research an authority",
+                description:
+                  "Locate governing instruments, official sources, publishers, status, and related records.",
+                href: "/governance-library/sources",
+                action: "Open source index",
+              },
+              {
+                code: "CMP",
+                title: "Compare governance systems",
+                description:
+                  "Inspect alignment, overlap, difference, and non-equivalence across laws, standards, and frameworks.",
+                href: "/governance-library/crosswalks",
+                action: "Open crosswalks",
+              },
+              {
+                code: "TST",
+                title: "Test a governance claim",
+                description:
+                  "Translate a claim into evidence requirements, procedures, thresholds, findings, and limitations.",
+                href: "/governance-library/testing",
+                action: "Open testing",
+              },
+              {
+                code: "REV",
+                title: "Review an entity",
+                description:
+                  "Move through a guided institutional review from learning and validation to findings.",
+                href: "/entity-review",
+                action: "Start entity review",
+              },
+              {
+                code: "ACA",
+                title: "Build governance literacy",
+                description:
+                  "Learn how authority, applicability, evidence, execution, and outcomes differ and connect.",
+                href: "/academy",
+                action: "Open Academy",
+              },
+              {
+                code: "EXE",
+                title: "Build a governed route",
+                description:
+                  "Bind evidence, authority, conditions, determination, execution, and outcome into one route.",
+                href: "/workspace/ai-governance",
+                action: "Build route",
+              },
+            ].map((route) => (
+              <article key={route.code} className="commandRouteCard">
+                <div className="commandRouteCode">{route.code}</div>
+                <h3>{route.title}</h3>
+                <p>{route.description}</p>
+                <Link href={route.href}>{route.action} →</Link>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="dashboardBoundarySection">
+          <div className="dashboardBoundarySeal">PB</div>
+          <p className="eyebrow gold">DASHBOARD PROOF BOUNDARY</p>
+          <h2>Visibility is not proof. Indexing is not authority. Coverage is not compliance.</h2>
+          <p>
+            This command center summarizes records contained in the TA-14
+            Governance Library. Its metrics do not independently establish that
+            an authority applies, that a management system conforms, that an
+            organization is certified, that a control operated effectively, or
+            that a consequential execution was admissible. Those claims require
+            their own governed evidence and determination records.
+          </p>
+
+          <div className="dashboardBoundaryActions">
+            <Link href="/governance-library/coverage" className="primaryAction">
+              Inspect coverage →
+            </Link>
+            <Link href="/governance-library/assurance" className="secondaryAction">
+              Review assurance
+            </Link>
+            <Link href="/governance-library/governed-records" className="secondaryAction">
+              Inspect governed records
+            </Link>
+          </div>
+        </section>
+
       <style jsx>{`
+
+        .institutionalReadinessSection,
+        .resolutionMatrixSection,
+        .commandRoutesSection,
+        .dashboardBoundarySection {
+          margin-top: 88px;
+        }
+
+        .readinessHeading {
+          margin-bottom: 30px;
+        }
+
+        .readinessGrid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .readinessCard {
+          min-width: 0;
+          padding: 25px;
+          border: 1px solid rgba(99, 230, 255, 0.11);
+          border-radius: 22px;
+          background:
+            radial-gradient(circle at 0 0, rgba(99, 230, 255, 0.055), transparent 31%),
+            linear-gradient(145deg, rgba(8, 27, 42, 0.94), rgba(3, 13, 22, 0.98));
+          box-shadow: 0 24px 64px rgba(0, 0, 0, 0.25);
+        }
+
+        .readinessCardHeader {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 18px;
+        }
+
+        .readinessCardHeader span {
+          width: 42px;
+          height: 42px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(239, 189, 89, 0.28);
+          border-radius: 50%;
+          color: #efc66f;
+          background: rgba(239, 189, 89, 0.045);
+          font: 700 13px Georgia, serif;
+        }
+
+        .readinessCardHeader strong {
+          color: #6fe8ff;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.11em;
+          text-transform: uppercase;
+        }
+
+        .readinessCard h3,
+        .commandRouteCard h3 {
+          margin: 18px 0 0;
+          color: #e6f0f3;
+          font: 700 25px/1.13 Georgia, serif;
+          letter-spacing: -0.025em;
+        }
+
+        .readinessCard > p,
+        .commandRouteCard > p {
+          margin: 13px 0 0;
+          color: #91a7b1;
+          font-size: 12px;
+          line-height: 1.67;
+        }
+
+        .readinessQuestions {
+          margin-top: 18px;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+
+        .readinessQuestions span {
+          padding: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.06);
+          border-radius: 10px;
+          color: #9eb3bd;
+          background: rgba(0, 0, 0, 0.15);
+          font-size: 8px;
+          font-weight: 800;
+          line-height: 1.4;
+        }
+
+        .deskLink,
+        .commandRouteCard a {
+          margin-top: 18px;
+          min-height: 42px;
+          padding: 0 13px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid rgba(99, 230, 255, 0.16);
+          border-radius: 10px;
+          color: #8ce7f2;
+          background: rgba(99, 230, 255, 0.035);
+          text-decoration: none;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.07em;
+          text-transform: uppercase;
+        }
+
+        .resolutionMatrixSection {
+          padding: 34px;
+          border: 1px solid rgba(239, 189, 89, 0.18);
+          border-radius: 28px;
+          background:
+            radial-gradient(circle at 0 0, rgba(239, 189, 89, 0.07), transparent 31%),
+            rgba(4, 16, 27, 0.88);
+        }
+
+        .resolutionHeader {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          align-items: center;
+          gap: 25px;
+        }
+
+        .resolutionSeal {
+          width: 84px;
+          height: 84px;
+          display: grid;
+          place-items: center;
+          align-content: center;
+          border: 1px solid rgba(239, 189, 89, 0.3);
+          border-radius: 50%;
+          background: rgba(239, 189, 89, 0.04);
+        }
+
+        .resolutionSeal span {
+          color: #efd18d;
+          font: 700 23px Georgia, serif;
+        }
+
+        .resolutionSeal small {
+          margin-top: 3px;
+          color: #81775e;
+          font-size: 6px;
+          font-weight: 900;
+          letter-spacing: 0.11em;
+          text-transform: uppercase;
+        }
+
+        .resolutionHeader h2,
+        .commandRoutesIntro h2,
+        .dashboardBoundarySection h2 {
+          margin: 10px 0 0;
+          font: 700 clamp(36px, 4vw, 59px)/1 Georgia, serif;
+          letter-spacing: -0.045em;
+        }
+
+        .resolutionHeader p:not(.eyebrow),
+        .commandRoutesIntro > p,
+        .dashboardBoundarySection > p:not(.eyebrow) {
+          max-width: 980px;
+          margin: 15px 0 0;
+          color: #9eb0b8;
+          font-size: 14px;
+          line-height: 1.72;
+        }
+
+        .resolutionTable {
+          margin-top: 29px;
+          overflow: hidden;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 17px;
+        }
+
+        .resolutionRow {
+          display: grid;
+          grid-template-columns: 0.55fr 1.25fr 1fr 0.9fr;
+          border-top: 1px solid rgba(255, 255, 255, 0.055);
+          background: rgba(0, 0, 0, 0.12);
+        }
+
+        .resolutionRow:first-child {
+          border-top: 0;
+        }
+
+        .resolutionRow > * {
+          min-width: 0;
+          padding: 14px;
+          border-left: 1px solid rgba(255, 255, 255, 0.05);
+          color: #9cafb8;
+          font-size: 9px;
+          line-height: 1.5;
+        }
+
+        .resolutionRow > *:first-child {
+          border-left: 0;
+        }
+
+        .resolutionRow strong {
+          color: #e8c77f;
+          font-size: 9px;
+          text-transform: uppercase;
+        }
+
+        .resolutionRowHeader {
+          background: rgba(99, 230, 255, 0.04);
+        }
+
+        .resolutionRowHeader span {
+          color: #71dcea;
+          font-size: 7px;
+          font-weight: 900;
+          letter-spacing: 0.08em;
+          text-transform: uppercase;
+        }
+
+        .commandRoutesIntro {
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          align-items: end;
+          gap: 35px;
+        }
+
+        .commandRoutesIntro .eyebrow,
+        .commandRoutesIntro h2 {
+          grid-column: 1;
+        }
+
+        .commandRoutesIntro > p {
+          grid-column: 2;
+          grid-row: 1 / span 2;
+          margin: 0;
+        }
+
+        .commandRoutesGrid {
+          margin-top: 29px;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 13px;
+        }
+
+        .commandRouteCard {
+          min-width: 0;
+          padding: 22px;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 18px;
+          background: linear-gradient(145deg, rgba(7, 23, 36, 0.93), rgba(2, 11, 19, 0.98));
+        }
+
+        .commandRouteCode {
+          width: 46px;
+          height: 46px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(239, 189, 89, 0.25);
+          border-radius: 50%;
+          color: #efc66f;
+          font: 700 11px Georgia, serif;
+        }
+
+        .commandRouteCard h3 {
+          font-size: 22px;
+        }
+
+        .dashboardBoundarySection {
+          padding: 54px 34px;
+          border: 1px solid rgba(239, 189, 89, 0.24);
+          border-radius: 30px;
+          background:
+            radial-gradient(circle at 50% 0, rgba(239, 189, 89, 0.11), transparent 43%),
+            linear-gradient(180deg, rgba(8, 20, 33, 0.98), rgba(3, 10, 18, 0.99));
+          text-align: center;
+        }
+
+        .dashboardBoundarySeal {
+          width: 80px;
+          height: 80px;
+          margin: 0 auto 20px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(239, 189, 89, 0.31);
+          border-radius: 50%;
+          color: #efd18d;
+          background: rgba(239, 189, 89, 0.045);
+          font: 700 22px Georgia, serif;
+        }
+
+        .dashboardBoundarySection h2,
+        .dashboardBoundarySection > p:not(.eyebrow) {
+          max-width: 1080px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .dashboardBoundaryActions {
+          margin-top: 28px;
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 10px;
+        }
+
+        @media (max-width: 980px) {
+          .commandRoutesGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .resolutionRow {
+            grid-template-columns: 0.55fr 1.45fr 1fr;
+          }
+
+          .resolutionRow > *:last-child {
+            grid-column: 1 / -1;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 0;
+          }
+        }
+
+        @media (max-width: 760px) {
+          .readinessGrid,
+          .commandRoutesGrid,
+          .commandRoutesIntro,
+          .resolutionHeader {
+            grid-template-columns: 1fr;
+          }
+
+          .commandRoutesIntro .eyebrow,
+          .commandRoutesIntro h2,
+          .commandRoutesIntro > p {
+            grid-column: 1;
+            grid-row: auto;
+          }
+
+          .resolutionSeal {
+            margin: auto;
+          }
+
+          .resolutionHeader {
+            text-align: center;
+          }
+
+          .resolutionRow,
+          .resolutionRowHeader {
+            grid-template-columns: 1fr;
+          }
+
+          .resolutionRow > *,
+          .resolutionRow > *:last-child {
+            grid-column: auto;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 0;
+          }
+
+          .resolutionRowHeader {
+            display: none;
+          }
+
+          .readinessQuestions {
+            grid-template-columns: 1fr;
+          }
+
+          .dashboardBoundaryActions {
+            align-items: stretch;
+            flex-direction: column;
+          }
+
+          .dashboardBoundaryActions .primaryAction,
+          .dashboardBoundaryActions .secondaryAction {
+            width: 100%;
+          }
+        }
         .dashboardPage {
           position: relative;
           min-height: 100vh;
