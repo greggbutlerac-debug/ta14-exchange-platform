@@ -49,7 +49,6 @@ type RegistrySubmission = Record<string, unknown> & {
   reviewed_at?: string | null;
   reviewed_by_user_id?: string | null;
   submitted_at: string | null;
-  intake_locked_at: string | null;
   accepted_at?: string | null;
   registry_identifier: string | null;
   created_at: string | null;
@@ -271,7 +270,7 @@ export default async function RegistrySubmissionReviewPage({
       .from('ai_governance_registry_disputes')
       .select('*')
       .eq('submission_id', submissionId)
-      .order('created_at', { ascending: true }),
+      .order('filed_at', { ascending: true }),
   ]);
 
   if (submissionResult.error || !submissionResult.data) {
@@ -437,7 +436,7 @@ export default async function RegistrySubmissionReviewPage({
           <div><dt>Review requests</dt><dd>{submission.allow_review_requests ? 'Allowed' : 'Not allowed'}</dd></div>
           <div><dt>Collaboration inquiries</dt><dd>{submission.allow_collaboration_inquiries ? 'Allowed' : 'Not allowed'}</dd></div>
           <div><dt>Dispute notices</dt><dd>{submission.allow_dispute_notices ? 'Allowed' : 'Not allowed'}</dd></div>
-          <div><dt>Intake locked</dt><dd>{formatDate(submission.intake_locked_at)}</dd></div>
+          <div><dt>Lifecycle lock</dt><dd>{submission.status === 'draft' ? 'Editable draft' : 'Locked by lifecycle status'}</dd></div>
         </dl>
       </section>
 
@@ -480,7 +479,7 @@ export default async function RegistrySubmissionReviewPage({
           fields={[
             { key: 'title', label: 'Title' },
             { key: 'publication_type', label: 'Type' },
-            { key: 'publisher', label: 'Publisher' },
+            { key: 'publisher_or_platform', label: 'Publisher' },
             { key: 'publication_date', label: 'Publication date' },
             { key: 'url', label: 'URL' },
           ]}
@@ -495,9 +494,9 @@ export default async function RegistrySubmissionReviewPage({
           fields={[
             { key: 'repository_name', label: 'Repository' },
             { key: 'repository_url', label: 'URL' },
-            { key: 'repository_provider', label: 'Provider' },
+            { key: 'provider', label: 'Provider' },
             { key: 'default_branch', label: 'Default branch' },
-            { key: 'commit_reference', label: 'Commit reference' },
+            { key: 'commit_sha', label: 'Commit SHA' },
           ]}
         />
       </section>
@@ -527,7 +526,7 @@ export default async function RegistrySubmissionReviewPage({
             { key: 'jurisdiction', label: 'Jurisdiction' },
             { key: 'application_number', label: 'Application number' },
             { key: 'filing_date', label: 'Filing date' },
-            { key: 'patent_status', label: 'Status' },
+            { key: 'application_status', label: 'Status' },
           ]}
         />
       </section>
@@ -540,8 +539,8 @@ export default async function RegistrySubmissionReviewPage({
           fields={[
             { key: 'dispute_type', label: 'Type' },
             { key: 'status', label: 'Status' },
-            { key: 'summary', label: 'Summary' },
-            { key: 'created_at', label: 'Opened' },
+            { key: 'public_summary', label: 'Public summary' },
+            { key: 'filed_at', label: 'Filed' },
             { key: 'resolved_at', label: 'Resolved' },
           ]}
         />
