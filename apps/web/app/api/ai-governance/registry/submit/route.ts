@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
@@ -18,6 +19,27 @@ const REQUIRED_TEXT_FIELDS = [
   'requested_review_pathway',
 ] as const;
 
+type RegistrySubmission = Record<string, unknown> & {
+  id: string;
+  owner_user_id: string;
+  governance_name: string;
+  current_version: string;
+  status: string;
+  registry_identifier: string | null;
+  record_visibility: string | null;
+  public_website: string | null;
+  requested_review_pathway: string | null;
+  authority_declaration_accepted: boolean;
+  accuracy_declaration_accepted: boolean;
+  registry_boundary_accepted: boolean;
+  submitted_at: string | null;
+  updated_at: string | null;
+};
+
+type RegistryEventRow = {
+  event_hash: string;
+};
+
 function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -37,7 +59,7 @@ function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) 
             cookieStore.set(name, value, options);
           });
         } catch {
-          // Existing authenticated cookies remain readable.
+          // Existing authenticated cookies remain readable in read-only contexts.
         }
       },
     },
@@ -53,6 +75,28 @@ function errorResponse(message: string, status = 400, details?: unknown) {
 
 function hasValue(value: unknown): boolean {
   return typeof value === 'string' && value.trim().length > 0;
+}
+
+function eventHash(input: {
+  submissionId: string;
+  actorUserId: string;
+  eventType: string;
+  occurredAt: string;
+  previousEventHash: string | null;
+  payload: Record<string, unknown>;
+}) {
+  return createHash('sha256')
+    .update(
+      [
+        input.submissionId,
+        input.actorUserId,
+        input.eventType,
+        input.occurredAt,
+        input.previousEventHash ?? '',
+        JSON.stringify(input.payload),
+      ].join('|'),
+    )
+    .digest('hex');
 }
 
 export async function POST(request: NextRequest) {
@@ -76,12 +120,14 @@ export async function POST(request: NextRequest) {
       return errorResponse('Authentication required.', 401);
     }
 
-    const { data: submission, error: submissionError } = await supabase
+    const { data: submissionData, error: submissionError } = await supabase
       .from('ai_governance_registry_submissions')
       .select('*')
       .eq('id', submissionId)
       .eq('owner_user_id', user.id)
       .single();
+
+    const submission = submissionData as RegistrySubmission | null;
 
     if (submissionError || !submission) {
       return errorResponse('Registry draft was not found.', 404);
@@ -115,7 +161,7 @@ export async function POST(request: NextRequest) {
       !submission.registry_boundary_accepted
         ? 'Registry boundary declaration'
         : null,
-    ].filter(Boolean);
+    ].filter((value): value is string => Boolean(value));
 
     const { count: evidenceCount, error: evidenceCountError } = await supabase
       .from('ai_governance_registry_evidence')
@@ -125,7 +171,7 @@ export async function POST(request: NextRequest) {
       .eq('evidence_state', 'current');
 
     if (evidenceCountError) {
-      return errorResponse(evidenceCountError.message);
+      return errorResponse(evidenceCountError.message, 500);
     }
 
     const validationErrors: string[] = [];
@@ -148,7 +194,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (submission.record_visibility === 'public' && !submission.public_website) {
+    if (submission.record_visibility === 'public' && !hasValue(submission.public_website)) {
       validationErrors.push(
         'A public Registry record must include a public website or public evidence route.',
       );
@@ -163,26 +209,60 @@ export async function POST(request: NextRequest) {
     }
 
     const submittedAt = new Date().toISOString();
+    const eventPayload = {
+      requested_review_pathway: submission.requested_review_pathway,
+      evidence_count: evidenceCount,
+      declarations_accepted: true,
+      intake_locked: true,
+      registration_is_certification: false,
+    };
 
-    const { data: updatedSubmission, error: updateError } = await supabase
+    const { data: previousEventData, error: previousEventError } = await supabase
+      .from('ai_governance_registry_events')
+      .select('event_hash')
+      .eq('submission_id', submissionId)
+      .order('occurred_at', { ascending: false })
+      .order('id', { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (previousEventError) {
+      return errorResponse(
+        `Unable to resolve the Registry event chain: ${previousEventError.message}`,
+        500,
+      );
+    }
+
+    const previousEvent = previousEventData as RegistryEventRow | null;
+    const previousEventHash = previousEvent?.event_hash ?? null;
+    const submittedEventHash = eventHash({
+      submissionId,
+      actorUserId: user.id,
+      eventType: 'submitted_for_review',
+      occurredAt: submittedAt,
+      previousEventHash,
+      payload: eventPayload,
+    });
+
+    const { data: updatedSubmissionData, error: updateError } = await supabase
       .from('ai_governance_registry_submissions')
       .update({
         status: 'submitted',
         submitted_at: submittedAt,
-        intake_locked_at: submittedAt,
         updated_at: submittedAt,
       })
       .eq('id', submissionId)
       .eq('owner_user_id', user.id)
       .eq('status', 'draft')
       .select(
-        'id, status, submitted_at, intake_locked_at, requested_review_pathway',
+        'id, governance_name, current_version, status, submitted_at, requested_review_pathway, registry_identifier, updated_at',
       )
       .single();
 
-    if (updateError || !updatedSubmission) {
+    if (updateError || !updatedSubmissionData) {
       return errorResponse(
         updateError?.message || 'Unable to submit the Registry intake.',
+        500,
       );
     }
 
@@ -191,18 +271,15 @@ export async function POST(request: NextRequest) {
       .insert({
         submission_id: submissionId,
         actor_user_id: user.id,
+        actor_label: user.email ?? submission.claimant_name ?? 'Authenticated registrant',
+        actor_role: 'registry_registrant',
         event_type: 'submitted_for_review',
-        from_status: 'draft',
-        to_status: 'submitted',
         event_summary:
           'Registrant submitted the intake for TA-14 AI Governance Registry review.',
-        event_payload: {
-          requested_review_pathway:
-            updatedSubmission.requested_review_pathway,
-          evidence_count: evidenceCount,
-          declarations_accepted: true,
-          intake_locked: true,
-        },
+        event_payload: eventPayload,
+        previous_event_hash: previousEventHash,
+        event_hash: submittedEventHash,
+        occurred_at: submittedAt,
       });
 
     if (eventError) {
@@ -211,7 +288,6 @@ export async function POST(request: NextRequest) {
         .update({
           status: 'draft',
           submitted_at: null,
-          intake_locked_at: null,
           updated_at: new Date().toISOString(),
         })
         .eq('id', submissionId)
@@ -220,14 +296,21 @@ export async function POST(request: NextRequest) {
 
       return errorResponse(
         `The intake was not submitted because the immutable event could not be recorded: ${eventError.message}`,
+        500,
       );
     }
 
     return NextResponse.json({
       ok: true,
-      submission: updatedSubmission,
+      submission: updatedSubmissionData,
+      event: {
+        eventType: 'submitted_for_review',
+        eventHash: submittedEventHash,
+        previousEventHash,
+        occurredAt: submittedAt,
+      },
       notice:
-        'The Registry intake has been submitted for review and is now locked. Submission does not mean acceptance, certification, endorsement, or public registration.',
+        'The Registry intake has been submitted for review and is now locked by lifecycle status. Submission does not mean acceptance, certification, endorsement, or public registration.',
     });
   } catch (error) {
     return errorResponse(
@@ -261,7 +344,9 @@ export async function GET(request: NextRequest) {
 
     const { data: submissionData, error } = await supabase
       .from('ai_governance_registry_submissions')
-      .select('*')
+      .select(
+        'id, governance_name, current_version, status, submitted_at, requested_review_pathway, registry_identifier, updated_at',
+      )
       .eq('id', submissionId)
       .eq('owner_user_id', user.id)
       .single();
@@ -272,24 +357,17 @@ export async function GET(request: NextRequest) {
 
     const submission = submissionData as {
       id: string;
+      governance_name: string;
+      current_version: string;
       status: string;
       submitted_at: string | null;
-      intake_locked_at: string | null;
       requested_review_pathway: string | null;
       registry_identifier: string | null;
       updated_at: string | null;
     };
 
     return NextResponse.json({
-      submission: {
-        id: submission.id,
-        status: submission.status,
-        submitted_at: submission.submitted_at,
-        intake_locked_at: submission.intake_locked_at,
-        requested_review_pathway: submission.requested_review_pathway,
-        registry_identifier: submission.registry_identifier,
-        updated_at: submission.updated_at,
-      },
+      submission,
       editable:
         submission.status === 'draft' && !submission.registry_identifier,
       locked:
