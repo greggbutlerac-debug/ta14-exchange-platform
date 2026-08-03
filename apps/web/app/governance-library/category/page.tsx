@@ -12,6 +12,175 @@ function slugify(value: string) {
     .replace(/^-|-$/g, "");
 }
 
+
+const institutionalDomains = [
+  {
+    code: "AI",
+    title: "AI Governance & Admissible Execution",
+    description:
+      "Govern models, agents, systems, identities, evidence, authority, commitments, executions, outcomes, artifacts, and review pathways.",
+    href: "/workspace/ai-governance",
+    categories: [
+      "AI governance",
+      "Risk management",
+      "Lifecycle governance",
+      "Model and agent governance",
+      "Identity and authority",
+      "Admissible execution",
+      "Execution artifacts",
+      "Assurance and testing",
+    ],
+  },
+  {
+    code: "EI",
+    title: "Environmental Integrity Governance",
+    description:
+      "Govern atmospheric, personal, building, HVAC, water, land, pollution, sampling, intervention, restoration, and outcome evidence.",
+    href: "/environmental-integrity-governance",
+    categories: [
+      "Atmospheric integrity records",
+      "Personal atmospheric integrity records",
+      "Buildings and facilities",
+      "HVAC governance",
+      "Air and pollution",
+      "Water and drinking water",
+      "Waste, chemicals, and contamination",
+      "Environmental outcome verification",
+    ],
+  },
+  {
+    code: "LS",
+    title: "Law, Standards & Public Policy",
+    description:
+      "Preserve enacted authority, implementing regulations, adopted standards, model codes, guidance, and clearly labeled TA-14 proposals.",
+    href: "/law-standards-public-policy",
+    categories: [
+      "Current law",
+      "Proposed law",
+      "Regulations and implementation",
+      "Standards and codes",
+      "Public policy",
+      "International instruments",
+      "Authority and jurisdiction",
+      "Adoption and incorporation",
+    ],
+  },
+  {
+    code: "AC",
+    title: "TA-14 Academy",
+    description:
+      "Teach each governance category, its source, scope, evidence, failure modes, simulations, readiness requirements, and live institutional pathway.",
+    href: "/academy",
+    categories: [
+      "Architecture learning",
+      "Law Academy",
+      "Standards Academy",
+      "Environmental Academy",
+      "Entity Review Academy",
+      "Simulation and assessment",
+      "Credentials",
+      "Accreditation",
+    ],
+  },
+] as const;
+
+const categoryDimensions = [
+  {
+    code: "01",
+    title: "Instrument type",
+    explanation:
+      "Distinguish statutes, regulations, standards, codes, guidance, frameworks, principles, methods, policies, contracts, and TA-14 proposals.",
+    questions: [
+      "What kind of instrument is this?",
+      "Who issued it?",
+      "Does it create obligations or only guidance?",
+      "Which official edition controls?",
+    ],
+  },
+  {
+    code: "02",
+    title: "Institutional domain",
+    explanation:
+      "Place the record inside AI Governance, Environmental Integrity Governance, Law and Standards, Academy, or a cross-institution pathway.",
+    questions: [
+      "Which TA-14 door owns the operational pathway?",
+      "Which divisions need cross-links?",
+      "Where should the Academy explanation live?",
+      "Which registry or workspace receives the output?",
+    ],
+  },
+  {
+    code: "03",
+    title: "Authority class",
+    explanation:
+      "Separate legislative, regulatory, judicial, standards-development, code-adoption, contractual, organizational, evidentiary, and institutional authority.",
+    questions: [
+      "Who may issue the instrument?",
+      "Who may adopt or enforce it?",
+      "Who may interpret or review it?",
+      "What authority does TA-14 not possess?",
+    ],
+  },
+  {
+    code: "04",
+    title: "Jurisdiction and scope",
+    explanation:
+      "Preserve territory, subject, activity, role, sector, version, temporal effect, exclusions, and cross-border relationships.",
+    questions: [
+      "Where does it apply?",
+      "To whom and to what activity?",
+      "Which edition and effective date control?",
+      "What exclusions or exemptions remain?",
+    ],
+  },
+  {
+    code: "05",
+    title: "Evidence function",
+    explanation:
+      "Classify the records required to establish identity, continuity, applicability, conformity, authority, execution, and outcome.",
+    questions: [
+      "What evidence is required?",
+      "What chain of custody or version history matters?",
+      "What evidence remains insufficient?",
+      "What must be preserved for later review?",
+    ],
+  },
+  {
+    code: "06",
+    title: "Execution effect",
+    explanation:
+      "Identify whether the category informs, recommends, requires, restricts, permits, holds, denies, escalates, or verifies consequential action.",
+    questions: [
+      "Does the source authorize action?",
+      "What determination can it support?",
+      "What technical control enforces the boundary?",
+      "What outcome must return to the record?",
+    ],
+  },
+] as const;
+
+const categoryRoute = [
+  ["Discover", "Find the category that best describes the governance problem or authority source."],
+  ["Classify", "Identify the instrument, institutional domain, authority class, jurisdiction, and evidence function."],
+  ["Inspect", "Open the underlying records rather than relying on the category label alone."],
+  ["Resolve", "Determine applicability, authority, version, scope, conflicts, and unresolved facts."],
+  ["Learn", "Enter the Academy pathway to understand requirements, gaps, examples, and failure modes."],
+  ["Build", "Construct the governed record, route, review package, or proposed upgrade."],
+  ["Determine", "Issue a bounded ALLOW, HOLD, DENY, ESCALATE, supported, conditional, or outside-scope finding."],
+  ["Preserve", "Retain the evidence, authority, decision, execution effect, outcome, and correction history."],
+] as const;
+
+const classificationWarnings = [
+  "A category is not a legal conclusion.",
+  "A standard is not automatically law.",
+  "Guidance is not automatically enforceable authority.",
+  "A framework does not prove implementation.",
+  "A certification does not prove a specific execution was admissible.",
+  "A record may belong to more than one category without losing its controlling source type.",
+  "The latest published edition may differ from the edition adopted into regulation, code, or contract.",
+  "TA-14 proposals must remain clearly separated from enacted or adopted instruments.",
+] as const;
+
 export default function GovernanceCategoriesPage() {
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -244,6 +413,157 @@ export default function GovernanceCategoriesPage() {
               </button>
             </div>
           )}
+        </section>
+
+
+        <section className="institutionalMapSection">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">INSTITUTIONAL CATEGORY MAP</p>
+              <h2>Every category belongs somewhere. Not everything deserves its own door.</h2>
+            </div>
+            <p>
+              The category system organizes the full body of TA-14 work beneath four institutional entrances. Categories may cross-link across divisions, but their operational ownership and authority boundaries remain visible.
+            </p>
+          </div>
+
+          <div className="domainGrid">
+            {institutionalDomains.map((domain) => (
+              <article key={domain.code}>
+                <div className="domainHeader">
+                  <span>{domain.code}</span>
+                  <div>
+                    <small>INSTITUTIONAL DOMAIN</small>
+                    <h3>{domain.title}</h3>
+                  </div>
+                </div>
+                <p>{domain.description}</p>
+                <div className="domainCategories">
+                  {domain.categories.map((category) => (
+                    <span key={category}>{category}</span>
+                  ))}
+                </div>
+                <Link href={domain.href}>Enter {domain.title} →</Link>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="dimensionSection">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">CATEGORY CLASSIFICATION DIMENSIONS</p>
+              <h2>A useful category preserves distinctions instead of flattening them.</h2>
+            </div>
+            <p>
+              Every category should help a visitor reach the right source, authority, evidence, Academy pathway, and governed destination without implying more legal or technical force than the underlying record carries.
+            </p>
+          </div>
+
+          <div className="dimensionGrid">
+            {categoryDimensions.map((dimension) => (
+              <article key={dimension.code}>
+                <div className="dimensionNumber">{dimension.code}</div>
+                <div className="dimensionBody">
+                  <h3>{dimension.title}</h3>
+                  <p>{dimension.explanation}</p>
+                  <ul>
+                    {dimension.questions.map((question) => (
+                      <li key={question}>{question}</li>
+                    ))}
+                  </ul>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="routeSection">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">CATEGORY-TO-GOVERNANCE ROUTE</p>
+              <h2>Navigation becomes governance only when it reaches a bounded determination.</h2>
+            </div>
+            <p>
+              Categories are the entrance to a preserved institutional route. They do not replace source inspection, applicability analysis, authority resolution, evidence review, or outcome verification.
+            </p>
+          </div>
+
+          <div className="routeGrid">
+            {categoryRoute.map(([title, description], index) => (
+              <article key={title}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <strong>{title}</strong>
+                <p>{description}</p>
+                {index < categoryRoute.length - 1 ? <i>→</i> : null}
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="warningSection">
+          <div className="warningHeading">
+            <div className="warningSeal">CB</div>
+            <div>
+              <p className="eyebrow gold">CATEGORY BOUNDARY CONTROLS</p>
+              <h2>Classification must never manufacture authority.</h2>
+            </div>
+          </div>
+          <div className="warningGrid">
+            {classificationWarnings.map((warning, index) => (
+              <article key={warning}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <p>{warning}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="academySection">
+          <div className="academyVisual" aria-hidden="true">
+            <div className="academySeal">
+              <small>TA-14</small>
+              <strong>ACADEMY</strong>
+              <span>CATEGORY LITERACY</span>
+            </div>
+            <i className="academyOrbit one" />
+            <i className="academyOrbit two" />
+            <i className="academyOrbit three" />
+          </div>
+          <div className="academyCopy">
+            <p className="eyebrow">THE ACADEMY INSIDE THE CATEGORY SYSTEM</p>
+            <h2>Learn why two records that look similar may carry completely different authority.</h2>
+            <p>
+              The Category Academy teaches how laws differ from regulations, standards from codes, guidance from enforceable obligations, frameworks from runtime controls, and TA-14 proposals from enacted instruments.
+            </p>
+            <div className="academyLessons">
+              <article>
+                <span>01</span>
+                <strong>Source literacy</strong>
+                <p>Identify official publishers, controlling editions, source records, and licensing or access boundaries.</p>
+              </article>
+              <article>
+                <span>02</span>
+                <strong>Authority literacy</strong>
+                <p>Understand issuance, adoption, enforcement, interpretation, accreditation, certification, and contractual authority.</p>
+              </article>
+              <article>
+                <span>03</span>
+                <strong>Evidence literacy</strong>
+                <p>Separate a category assignment from proof of applicability, conformity, authority, execution, or outcome.</p>
+              </article>
+              <article>
+                <span>04</span>
+                <strong>Execution literacy</strong>
+                <p>Trace how an instrument becomes a governed determination and how that determination binds technical action.</p>
+              </article>
+            </div>
+            <div className="academyActions">
+              <Link href="/academy" className="primaryAction">Enter TA-14 Academy →</Link>
+              <Link href="/governance-library/applicability" className="secondaryAction">Resolve Applicability</Link>
+              <Link href="/governance-library/authorities" className="secondaryAction">Inspect Authorities</Link>
+            </div>
+          </div>
         </section>
 
         <section className="categoryBoundary">
