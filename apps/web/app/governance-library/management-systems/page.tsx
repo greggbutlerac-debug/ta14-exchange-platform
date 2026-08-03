@@ -261,6 +261,327 @@ const systems: ManagementSystem[] = [
     crosswalk: "/governance-library/crosswalks",
     accent: "EG",
   },
+  {
+    title: "ISO 9001 Quality Management System",
+    shortName: "ISO 9001 QMS",
+    category: "International Management System Standard",
+    status: "Published",
+    authority: "International Organization for Standardization",
+    description:
+      "A quality management system model for controlling processes, responsibilities, documented information, performance evaluation, corrective action, and continual improvement.",
+    purpose:
+      "Provide a disciplined organizational structure for consistently meeting requirements, controlling process variation, addressing nonconformity, and improving performance.",
+    operatingModel: [
+      "Define organizational context and quality-system scope",
+      "Assign leadership responsibilities and quality objectives",
+      "Control operational processes and documented information",
+      "Evaluate suppliers, resources, competence, and performance",
+      "Audit the system and conduct management review",
+      "Correct nonconformity and improve process effectiveness",
+    ],
+    evidence: [
+      "Quality Management System Scope",
+      "Process Map",
+      "Quality Objectives",
+      "Competence Record",
+      "Internal Audit Record",
+      "Corrective Action Record",
+    ],
+    lifecycleCoverage: [
+      "Context",
+      "Planning",
+      "Operation",
+      "Evaluation",
+      "Correction",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "A controlled quality system capable of demonstrating process ownership, conformity, correction, and improvement.",
+    record: "/governance-library/standards",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "Q9",
+  },
+  {
+    title: "ISO 14001 Environmental Management System",
+    shortName: "ISO 14001 EMS",
+    category: "Environmental Management System Standard",
+    status: "Published",
+    authority: "International Organization for Standardization",
+    description:
+      "An environmental management system standard for identifying environmental aspects, obligations, risks, controls, objectives, performance, and improvement.",
+    purpose:
+      "Organize environmental responsibility so that impacts, compliance obligations, operational controls, emergency conditions, performance, and corrective action are governed as one system.",
+    operatingModel: [
+      "Identify environmental aspects and significant impacts",
+      "Determine compliance obligations and interested parties",
+      "Establish objectives, controls, and operational criteria",
+      "Prepare for emergencies and abnormal operating conditions",
+      "Monitor environmental performance and compliance status",
+      "Correct failures and improve environmental outcomes",
+    ],
+    evidence: [
+      "Environmental Aspects Register",
+      "Compliance Obligations Register",
+      "Operational Control Record",
+      "Emergency Preparedness Record",
+      "Environmental Monitoring Record",
+      "Corrective Action Record",
+    ],
+    lifecycleCoverage: [
+      "Aspects",
+      "Obligations",
+      "Controls",
+      "Monitoring",
+      "Review",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "A repeatable environmental governance system that connects obligations, operating controls, measured conditions, and improvement.",
+    record: "/governance-library/standards",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "E14",
+  },
+  {
+    title: "ISO 45001 Occupational Health and Safety Management System",
+    shortName: "ISO 45001 OH&S",
+    category: "Safety Management System Standard",
+    status: "Published",
+    authority: "International Organization for Standardization",
+    description:
+      "A management system for occupational health and safety hazards, worker participation, operational controls, incident response, performance evaluation, and improvement.",
+    purpose:
+      "Provide an accountable system for identifying hazards, reducing occupational risk, consulting workers, controlling operations, investigating incidents, and improving safety performance.",
+    operatingModel: [
+      "Determine OH&S context, scope, and worker needs",
+      "Identify hazards and assess occupational risks",
+      "Establish controls, competence, and participation",
+      "Prepare for incidents and emergency conditions",
+      "Evaluate performance, compliance, and effectiveness",
+      "Investigate incidents and implement corrective action",
+    ],
+    evidence: [
+      "Hazard Register",
+      "Risk Assessment",
+      "Worker Consultation Record",
+      "Operational Control Procedure",
+      "Incident Investigation",
+      "Management Review Record",
+    ],
+    lifecycleCoverage: [
+      "Hazard Identification",
+      "Risk Assessment",
+      "Control",
+      "Incident Response",
+      "Evaluation",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "A governed health-and-safety system with traceable hazards, controls, participation, incidents, and corrective action.",
+    record: "/governance-library/standards",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "S45",
+  },
+  {
+    title: "ISO/IEC 27001 Information Security Management System",
+    shortName: "ISO/IEC 27001 ISMS",
+    category: "Information Security Management System Standard",
+    status: "Published",
+    authority: "ISO and IEC",
+    description:
+      "An information security management system for governing confidentiality, integrity, availability, risk treatment, control selection, monitoring, and continual improvement.",
+    purpose:
+      "Establish a risk-based organizational system for protecting information assets, assigning security responsibilities, selecting controls, preserving evidence, and improving resilience.",
+    operatingModel: [
+      "Define information-security context and scope",
+      "Assess information-security risks and opportunities",
+      "Select controls and preserve applicability decisions",
+      "Operate access, asset, supplier, and incident controls",
+      "Monitor effectiveness and conduct internal audits",
+      "Correct nonconformity and improve the ISMS",
+    ],
+    evidence: [
+      "ISMS Scope",
+      "Risk Assessment",
+      "Risk Treatment Plan",
+      "Statement of Applicability",
+      "Security Incident Record",
+      "Internal Audit Record",
+    ],
+    lifecycleCoverage: [
+      "Scope",
+      "Risk",
+      "Treatment",
+      "Operation",
+      "Audit",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "A risk-based information-security system with documented control selection, operation, monitoring, and correction.",
+    record: "/governance-library/standards",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "27",
+  },
+  {
+    title: "ISO 22301 Business Continuity Management System",
+    shortName: "ISO 22301 BCMS",
+    category: "Business Continuity Management System Standard",
+    status: "Published",
+    authority: "International Organization for Standardization",
+    description:
+      "A management system for business-impact analysis, continuity strategy, incident response, recovery capability, exercises, review, and improvement.",
+    purpose:
+      "Govern organizational resilience by identifying critical activities, acceptable disruption, dependencies, recovery strategies, response structures, and tested continuity capability.",
+    operatingModel: [
+      "Identify critical products, services, and dependencies",
+      "Conduct business-impact and continuity-risk analysis",
+      "Define continuity and recovery strategies",
+      "Establish incident command and communication",
+      "Exercise, test, evaluate, and maintain capability",
+      "Review disruption outcomes and improve resilience",
+    ],
+    evidence: [
+      "Business Impact Analysis",
+      "Continuity Risk Assessment",
+      "Recovery Strategy",
+      "Continuity Plan",
+      "Exercise Record",
+      "After-Action Review",
+    ],
+    lifecycleCoverage: [
+      "Impact Analysis",
+      "Strategy",
+      "Planning",
+      "Response",
+      "Exercise",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "A tested continuity system capable of preserving critical operations and recording recovery performance.",
+    record: "/governance-library/standards",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "BC",
+  },
+  {
+    title: "ISO 31000 Enterprise Risk Management Guidance",
+    shortName: "ISO 31000 Risk System",
+    category: "Risk Management Guidance",
+    status: "Published Guidance",
+    authority: "International Organization for Standardization",
+    description:
+      "A principles-and-process model for integrating risk management into governance, strategy, planning, operations, reporting, values, and culture.",
+    purpose:
+      "Create a consistent organizational method for establishing context, identifying risk, analyzing consequences and likelihood, evaluating treatment options, and monitoring change.",
+    operatingModel: [
+      "Integrate risk management into governance and decisions",
+      "Establish scope, context, and risk criteria",
+      "Identify, analyze, and evaluate risk",
+      "Select and implement risk treatment",
+      "Communicate, consult, monitor, and review",
+      "Record learning and improve the framework",
+    ],
+    evidence: [
+      "Risk Framework",
+      "Risk Criteria",
+      "Risk Register",
+      "Risk Treatment Plan",
+      "Monitoring Record",
+      "Risk Review Record",
+    ],
+    lifecycleCoverage: [
+      "Integration",
+      "Context",
+      "Assessment",
+      "Treatment",
+      "Monitoring",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "A common risk language and process capable of supporting consistent organizational decisions without substituting for legal authority or execution proof.",
+    record: "/governance-library/risk-management",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "31",
+  },
+  {
+    title: "TA-14 Environmental Integrity Governance Management System",
+    shortName: "Environmental Integrity Governance",
+    category: "Environmental Governance Architecture",
+    status: "Operational Architecture",
+    authority: "TA-14 Authority",
+    description:
+      "An institutional governance architecture for converting environmental reality into bounded records, continuity, admissibility, governed intervention, execution, outcome, and future reliance.",
+    purpose:
+      "Connect physical conditions, qualified observation, professional authority, environmental records, intervention boundaries, outcome windows, and proof limitations within one governed system.",
+    operatingModel: [
+      "Declare place, activity, purpose, and consequence",
+      "Qualify environmental and atmospheric evidence",
+      "Preserve record continuity and method limitations",
+      "Resolve authority, applicability, and intervention boundary",
+      "Govern execution and professional handoff",
+      "Preserve outcome and future-reliance boundaries",
+    ],
+    evidence: [
+      "Atmospheric Integrity Record",
+      "Environmental Reality Record",
+      "Continuity Package",
+      "Authority Resolution",
+      "Intervention Record",
+      "Outcome Record",
+    ],
+    lifecycleCoverage: [
+      "Reality",
+      "Record",
+      "Continuity",
+      "Admissibility",
+      "Execution",
+      "Outcome",
+    ],
+    governanceOutcome:
+      "A bounded environmental governance system that preserves what was observed, authorized, changed, achieved, and left unresolved.",
+    record: "/environmental-integrity-governance",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "EI",
+  },
+  {
+    title: "TA-14 Integrated Management and Execution Governance System",
+    shortName: "Integrated Management + Execution",
+    category: "Integrated Governance Architecture",
+    status: "Institutional Model",
+    authority: "TA-14 Authority",
+    description:
+      "A cross-system governance model that connects organizational management systems to event-level admissible execution without collapsing one into the other.",
+    purpose:
+      "Preserve the distinction between organizational assurance and consequential execution while enabling policies, controls, audits, authority, evidence, determinations, receipts, and outcomes to interoperate.",
+    operatingModel: [
+      "Map management-system obligations to operating controls",
+      "Resolve applicable authority and current editions",
+      "Bind organizational controls to event-level evidence",
+      "Issue ALLOW, HOLD, DENY, or ESCALATE determinations",
+      "Preserve execution and outcome artifacts",
+      "Return failures and outcomes into corrective action",
+    ],
+    evidence: [
+      "Integrated Scope Map",
+      "Authority Crosswalk",
+      "Control-to-Evidence Map",
+      "Execution Determination",
+      "Outcome Package",
+      "Corrective Action Link",
+    ],
+    lifecycleCoverage: [
+      "Management System",
+      "Authority",
+      "Evidence",
+      "Determination",
+      "Execution",
+      "Improvement",
+    ],
+    governanceOutcome:
+      "An integrated governance route in which organizational systems support execution decisions and execution outcomes strengthen organizational controls.",
+    record: "/governance-library/crosswalks",
+    crosswalk: "/governance-library/crosswalks",
+    accent: "IX",
+  },
+
 ];
 
 const categories = [
@@ -755,6 +1076,115 @@ export default function ManagementSystemsPage() {
             >
               Governed Records
             </Link>
+          </div>
+        </section>
+
+        <section className="resolutionSection">
+          <div className="sectionHeading">
+            <div>
+              <p className="eyebrow">INSTITUTIONAL RESOLUTION DESK</p>
+              <h2>Management-system authority must be resolved before it is relied upon.</h2>
+            </div>
+            <p>
+              Publication alone does not establish applicability. Each system must be inspected for edition,
+              adoption, contractual incorporation, jurisdiction, organizational scope, certification status,
+              supersession, transition, and the precise decision for which it is being invoked.
+            </p>
+          </div>
+
+          <div className="resolutionGrid">
+            {[
+              ["01", "Identity", "Confirm the exact system, publisher, edition, amendment state, and official source."],
+              ["02", "Authority", "Distinguish law, regulation, standard, guidance, contract, certification criteria, and internal policy."],
+              ["03", "Applicability", "Resolve jurisdiction, role, sector, activity, system boundary, and triggering facts."],
+              ["04", "Adoption", "Determine whether the system is voluntary, contractually required, incorporated, certified, or otherwise binding."],
+              ["05", "Evidence", "Identify the records necessary to demonstrate operation rather than policy existence alone."],
+              ["06", "Decision", "State what the management system supports, what remains unresolved, and what cannot proceed."],
+              ["07", "Execution", "Connect applicable organizational controls to the bounded action under review."],
+              ["08", "Outcome", "Return incidents, failures, audit findings, and measured outcomes into review and improvement."],
+            ].map(([number, title, description]) => (
+              <article key={title}>
+                <span>{number}</span>
+                <strong>{title}</strong>
+                <p>{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="boundarySection">
+          <div className="boundaryIntro">
+            <div className="definitionSeal">
+              <span>BD</span>
+              <small>System boundary</small>
+            </div>
+            <div>
+              <p className="eyebrow gold">ORGANIZATIONAL ASSURANCE ≠ EVENT-LEVEL EXECUTION PROOF</p>
+              <h2>A mature management system can govern the organization without proving that a specific consequential action was admissible.</h2>
+            </div>
+          </div>
+
+          <div className="boundaryGrid">
+            <article>
+              <span>MANAGEMENT-SYSTEM EVIDENCE</span>
+              <strong>Scope, policy, process ownership, risk treatment, competence, audits, management review, and corrective action.</strong>
+              <p>Demonstrates that an organizational governance system was established and operated within a declared boundary.</p>
+            </article>
+            <article>
+              <span>EXECUTION EVIDENCE</span>
+              <strong>Proposed action, admitted evidence, current authority, determination, binding, commit state, execution receipt, and outcome.</strong>
+              <p>Demonstrates what governed a particular action at the moment consequence was permitted to bind to reality.</p>
+            </article>
+            <article>
+              <span>CERTIFICATION BOUNDARY</span>
+              <strong>Certification may attest conformity to a management-system standard within a defined scope and period.</strong>
+              <p>It does not automatically certify every AI model, decision, environmental condition, operational action, or future outcome.</p>
+            </article>
+            <article>
+              <span>PROFESSIONAL BOUNDARY</span>
+              <strong>Management systems do not replace licensed authority, clinical judgment, engineering responsibility, commissioning, or code enforcement.</strong>
+              <p>Those authorities remain separately attributable and must be preserved within the governed route.</p>
+            </article>
+          </div>
+        </section>
+
+        <section className="failureSection">
+          <p className="eyebrow gold">MANAGEMENT-SYSTEM FAILURE MODES</p>
+          <h2>Common conditions that require HOLD, correction, or escalation.</h2>
+          <div className="failureGrid">
+            {[
+              ["Scope mismatch", "The cited system or certificate does not cover the entity, facility, process, product, model, or action under review."],
+              ["Edition drift", "A newer publication is assumed to control even though adoption, transition, contract, or regulatory incorporation is unresolved."],
+              ["Paper compliance", "Policies and procedures exist, but operating evidence does not demonstrate that controls were performed."],
+              ["Authority substitution", "A voluntary framework or internal policy is presented as though it were enacted legal authority."],
+              ["Certification overclaim", "A scoped management-system certificate is treated as proof that a specific system or execution is safe, lawful, or correct."],
+              ["Audit discontinuity", "Findings, corrective actions, exceptions, or management-review decisions cannot be traced through closure."],
+              ["Control-to-event gap", "Organizational controls are documented but were not bound to the consequential action at commit time."],
+              ["Outcome blindness", "The organization records approval or deployment but does not preserve whether the intervention achieved the declared outcome."],
+            ].map(([title, description]) => (
+              <article key={title}>
+                <span>HOLD</span>
+                <strong>{title}</strong>
+                <p>{description}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="academySection">
+          <div>
+            <p className="eyebrow">TA-14 ACADEMY · MANAGEMENT-SYSTEM LITERACY</p>
+            <h2>Learn how to distinguish organizational governance, legal authority, certification, assurance, and admissible execution.</h2>
+            <p>
+              The Academy route teaches readers how to inspect scope, editions, adoption, evidence, auditability,
+              control operation, event-level binding, outcomes, limitations, and defensible claims.
+            </p>
+          </div>
+          <div className="academyActions">
+            <Link href="/academy" className="primaryAction">Open TA-14 Academy →</Link>
+            <Link href="/governance-library/applicability" className="secondaryAction">Resolve Applicability</Link>
+            <Link href="/governance-library/authorities" className="secondaryAction">Inspect Authorities</Link>
+            <Link href="/governance-library/governed-records" className="secondaryAction">Governed Records</Link>
           </div>
         </section>
       </div>
@@ -1662,6 +2092,117 @@ export default function ManagementSystemsPage() {
           gap: 10px;
         }
 
+
+        .resolutionSection,
+        .boundarySection,
+        .failureSection,
+        .academySection {
+          margin-top: 88px;
+          padding: 48px 34px;
+          border: 1px solid rgba(99, 230, 255, 0.12);
+          border-radius: 28px;
+          background: linear-gradient(145deg, rgba(8, 27, 42, 0.92), rgba(3, 12, 21, 0.98));
+          box-shadow: 0 26px 70px rgba(0, 0, 0, 0.3);
+        }
+
+        .resolutionGrid,
+        .failureGrid {
+          margin-top: 30px;
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .resolutionGrid article,
+        .failureGrid article,
+        .boundaryGrid article {
+          padding: 18px;
+          border: 1px solid rgba(255, 255, 255, 0.07);
+          border-radius: 15px;
+          background: rgba(0, 0, 0, 0.16);
+        }
+
+        .resolutionGrid span,
+        .failureGrid span,
+        .boundaryGrid span {
+          color: #efbd59;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.11em;
+          text-transform: uppercase;
+        }
+
+        .resolutionGrid strong,
+        .failureGrid strong,
+        .boundaryGrid strong {
+          display: block;
+          margin-top: 8px;
+          color: #e0eaee;
+          font: 700 17px/1.3 Georgia, serif;
+        }
+
+        .resolutionGrid p,
+        .failureGrid p,
+        .boundaryGrid p {
+          margin: 9px 0 0;
+          color: #8299a4;
+          font-size: 10px;
+          line-height: 1.58;
+        }
+
+        .boundaryIntro {
+          display: grid;
+          grid-template-columns: auto 1fr;
+          align-items: center;
+          gap: 28px;
+        }
+
+        .boundaryIntro .definitionSeal {
+          margin: 0;
+        }
+
+        .boundaryIntro h2,
+        .failureSection h2,
+        .academySection h2 {
+          margin: 11px 0 0;
+          font-size: clamp(36px, 4vw, 59px);
+          line-height: 1;
+          letter-spacing: -0.045em;
+        }
+
+        .boundaryGrid {
+          margin-top: 30px;
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .academySection {
+          display: grid;
+          grid-template-columns: 1.2fr 0.8fr;
+          align-items: center;
+          gap: 38px;
+          border-color: rgba(255, 198, 82, 0.21);
+          background: radial-gradient(circle at 0 50%, rgba(255, 190, 59, 0.08), transparent 34%), rgba(5, 18, 30, 0.92);
+        }
+
+        .academySection > div > p:not(.eyebrow) {
+          margin: 20px 0 0;
+          color: #9cb0ba;
+          font-size: 14px;
+          line-height: 1.72;
+        }
+
+        .academyActions {
+          display: grid;
+          gap: 10px;
+        }
+
+        .academyActions .primaryAction,
+        .academyActions .secondaryAction {
+          justify-self: stretch;
+        }
+
         @media (max-width: 1180px) {
           .heroMetrics {
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -1701,6 +2242,42 @@ export default function ManagementSystemsPage() {
 
           .sequenceTrack {
             grid-template-columns: repeat(2, 1fr);
+          }
+        }
+
+
+        @media (max-width: 1080px) {
+          .resolutionGrid,
+          .failureGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
+          .academySection {
+            grid-template-columns: 1fr;
+          }
+        }
+
+        @media (max-width: 760px) {
+          .resolutionGrid,
+          .failureGrid,
+          .boundaryGrid,
+          .boundaryIntro {
+            grid-template-columns: 1fr;
+          }
+
+          .boundaryIntro {
+            text-align: center;
+          }
+
+          .boundaryIntro .definitionSeal {
+            margin: auto;
+          }
+
+          .resolutionSection,
+          .boundarySection,
+          .failureSection,
+          .academySection {
+            padding: 30px 20px;
           }
         }
 
