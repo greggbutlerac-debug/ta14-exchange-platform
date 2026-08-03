@@ -16,7 +16,7 @@ type ReviewDecisionRequestBody = {
   notes?: string;
 };
 
-type ReviewDecisionRow = {
+type ReviewDecisionResult = {
   submission_id: string;
   status: string;
   review_decision: string;
@@ -81,6 +81,20 @@ function errorStatusFromSupabase(status: number, payload: unknown) {
   if (status === 404) return 503;
 
   return 500;
+}
+
+function isReviewDecisionResult(value: unknown): value is ReviewDecisionResult {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const row = value as Partial<ReviewDecisionResult>;
+
+  return (
+    typeof row.submission_id === 'string' &&
+    typeof row.status === 'string' &&
+    typeof row.review_decision === 'string' &&
+    typeof row.reviewed_at === 'string' &&
+    (row.accepted_at === null || typeof row.accepted_at === 'string')
+  );
 }
 
 export async function POST(request: NextRequest) {
@@ -189,7 +203,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const response = await fetch(
-      `${environment.supabaseUrl}/rest/v1/rpc/ta14_registry_record_review_decision_v1`,
+      `${environment.supabaseUrl}/rest/v1/rpc/ta14_registry_record_review_decision_v2`,
       {
         method: 'POST',
         cache: 'no-store',
@@ -200,10 +214,12 @@ export async function POST(request: NextRequest) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          requested_submission_id: submissionId,
-          requested_decision: body.decision,
-          requested_rationale: rationale,
-          requested_notes: notes || null,
+          request: {
+            submission_id: submissionId,
+            decision: body.decision,
+            rationale,
+            notes: notes || null,
+          },
         }),
       },
     );
@@ -250,7 +266,7 @@ export async function POST(request: NextRequest) {
                     : status === 409
                       ? 'The Registry submission is not eligible for this review decision.'
                       : status === 503
-                        ? 'The controlled Registry review decision function has not been installed.'
+                        ? 'The controlled Registry review decision function is unavailable.'
                         : 'The Registry review decision could not be recorded.',
           detail: payload,
         },
@@ -263,7 +279,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!Array.isArray(payload) || payload.length !== 1) {
+    if (!isReviewDecisionResult(payload)) {
       return NextResponse.json(
         {
           error: 'REGISTRY_REVIEW_RESPONSE_INVALID',
@@ -279,42 +295,15 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const row = payload[0] as Partial<ReviewDecisionRow>;
-
-    if (
-      typeof row.submission_id !== 'string' ||
-      typeof row.status !== 'string' ||
-      typeof row.review_decision !== 'string' ||
-      typeof row.reviewed_at !== 'string' ||
-      !(
-        row.accepted_at === null ||
-        typeof row.accepted_at === 'string'
-      )
-    ) {
-      return NextResponse.json(
-        {
-          error: 'REGISTRY_REVIEW_RESPONSE_INVALID',
-          message: 'The Registry review response is missing required fields.',
-          detail: payload,
-        },
-        {
-          status: 500,
-          headers: {
-            'Cache-Control': 'no-store, max-age=0',
-          },
-        },
-      );
-    }
-
     return NextResponse.json(
       {
-        submissionId: row.submission_id,
-        status: row.status,
-        decision: row.review_decision,
-        reviewedAt: row.reviewed_at,
-        acceptedAt: row.accepted_at,
+        submissionId: payload.submission_id,
+        status: payload.status,
+        decision: payload.review_decision,
+        reviewedAt: payload.reviewed_at,
+        acceptedAt: payload.accepted_at,
         message:
-          body.decision === 'accept_for_registration'
+          payload.review_decision === 'accept_for_registration'
             ? 'The submission has been accepted for Registry finalization.'
             : 'The bounded Registry review decision has been preserved.',
         boundary: 'Review is not certification.',
