@@ -91,16 +91,14 @@ type RegistrySubmission = {
   plain_language_description: string | null;
   formal_claims: string | null;
   explicit_non_claims: string | null;
-  limitations: string | null;
+  known_limitations: string | null;
   status: string;
   record_visibility: string | null;
   registry_identifier: string | null;
   submitted_at: string | null;
   reviewed_at: string | null;
   accepted_at: string | null;
-  finalized_at?: string | null;
-  published_at?: string | null;
-  review_pathway?: string | null;
+  requested_review_pathway?: string | null;
   claimant_name?: string | null;
   current_steward?: string | null;
   organization_name?: string | null;
@@ -198,16 +196,14 @@ export default function RegistrySubmissionWorkspacePage() {
               'plain_language_description',
               'formal_claims',
               'explicit_non_claims',
-              'limitations',
+              'known_limitations',
               'status',
               'record_visibility',
               'registry_identifier',
               'submitted_at',
               'reviewed_at',
               'accepted_at',
-              'finalized_at',
-              'published_at',
-              'review_pathway',
+              'requested_review_pathway',
               'claimant_name',
               'current_steward',
               'organization_name',
@@ -369,7 +365,7 @@ export default function RegistrySubmissionWorkspacePage() {
         record.authority_basis,
       ]),
       claims: ratio([record.formal_claims]),
-      nonClaims: ratio([record.explicit_non_claims, record.limitations || true]),
+      nonClaims: ratio([record.explicit_non_claims, record.known_limitations || true]),
       evidence: Math.min(100, evidence.length * 20),
       versioning: ratio([
         record.current_version,
@@ -668,7 +664,7 @@ export default function RegistrySubmissionWorkspacePage() {
               </article>
               <article>
                 <h3>Limitations</h3>
-                <p>{record.limitations || 'No limitations recorded.'}</p>
+                <p>{record.known_limitations || 'No limitations recorded.'}</p>
               </article>
             </div>
           </section>
@@ -702,11 +698,11 @@ export default function RegistrySubmissionWorkspacePage() {
               </div>
               <div>
                 <dt>Finalized</dt>
-                <dd>{formatDate(record.finalized_at ?? null)}</dd>
+                <dd>{'Not recorded'}</dd>
               </div>
               <div>
                 <dt>Published</dt>
-                <dd>{formatDate(record.published_at ?? null)}</dd>
+                <dd>{'Not recorded'}</dd>
               </div>
             </dl>
           </section>
