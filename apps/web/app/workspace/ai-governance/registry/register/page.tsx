@@ -1295,7 +1295,7 @@ export default function RegisterGovernancePage() {
         <nav aria-label="Registry navigation">
           <Link href="/foundation" className="nav-button">Credentials</Link>
           <Link href="/workspace/ai-governance/registry" className="nav-button">Registry Method</Link>
-          <Link href="/workspace/ai-governance/registry/records" className="nav-button">Search Registry</Link>
+          <Link href="/workspace/ai-governance/registry/directory" className="nav-button">Search Registry</Link>
         </nav>
       </header>
 
