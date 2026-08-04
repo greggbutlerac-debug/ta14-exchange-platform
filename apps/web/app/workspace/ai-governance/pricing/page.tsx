@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type PathwayId =
   | "registry"
@@ -24,6 +24,44 @@ type EvidenceId = "organized" | "partial" | "technical" | "runtime" | "unorganiz
 type VisibilityId = "private" | "controlled" | "public";
 type PartnerId = "none" | "single" | "dual" | "panel";
 type BillingMode = "monthly" | "annual";
+
+type PayPalProductId =
+  | "preserved-governed-run"
+  | "independent-partner-review"
+  | "dual-partner-review"
+  | "architecture-demonstration"
+  | "multidisciplinary-review-panel"
+  | "exchange-pro-monthly"
+  | "exchange-pro-annual"
+  | "organization-monthly"
+  | "organization-annual"
+  | "verified-network-partner-annual"
+  | "governance-entity-partner-annual"
+  | "institutional-partner-annual";
+
+type CheckoutProduct = {
+  id: PayPalProductId;
+  name: string;
+  price: number;
+  billing: string;
+};
+
+type PayPalButtonsInstance = {
+  render: (target: HTMLElement) => Promise<void>;
+  isEligible?: () => boolean;
+};
+
+type PayPalMessagesInstance = { render: (target: HTMLElement) => Promise<void> };
+
+type PayPalNamespace = {
+  Buttons: (options: Record<string, unknown>) => PayPalButtonsInstance;
+  Messages?: (options: Record<string, unknown>) => PayPalMessagesInstance;
+};
+
+declare global {
+  interface Window { paypal?: PayPalNamespace }
+}
+
 
 type Pathway = {
   id: PathwayId;
@@ -224,6 +262,7 @@ const visibilityModifiers: Record<VisibilityId, number> = {
 const partnerMemberships = [
   {
     title: "Founding Review Partner",
+    productId: null as PayPalProductId | null,
     price: "Invitation only · $0 during founding period",
     description:
       "For selected early contributors helping establish the governed review network and its first public demonstrations.",
@@ -236,6 +275,7 @@ const partnerMemberships = [
   },
   {
     title: "Verified Network Partner",
+    productId: "verified-network-partner-annual" as PayPalProductId,
     price: "$795 / year",
     description:
       "For independent reviewers, architects, consultants, academics, and domain specialists.",
@@ -248,6 +288,7 @@ const partnerMemberships = [
   },
   {
     title: "Governance Entity Partner",
+    productId: "governance-entity-partner-annual" as PayPalProductId,
     price: "$1,995 / year",
     description:
       "For governance firms, architecture owners, technical-control providers, and specialist organizations.",
@@ -260,6 +301,7 @@ const partnerMemberships = [
   },
   {
     title: "Institutional Partner",
+    productId: "institutional-partner-annual" as PayPalProductId,
     price: "$3,995 / year",
     description:
       "For universities, research groups, professional bodies, and larger governance institutions.",
@@ -275,6 +317,8 @@ const partnerMemberships = [
 const workspacePlans = [
   {
     title: "Free Playground",
+    monthlyProductId: null as PayPalProductId | null,
+    annualProductId: null as PayPalProductId | null,
     monthly: 0,
     annual: 0,
     suffix: "",
@@ -285,6 +329,8 @@ const workspacePlans = [
   },
   {
     title: "Preserved Governed Run",
+    monthlyProductId: "preserved-governed-run" as PayPalProductId,
+    annualProductId: "preserved-governed-run" as PayPalProductId,
     monthly: 9,
     annual: 9,
     suffix: "per run",
@@ -295,6 +341,8 @@ const workspacePlans = [
   },
   {
     title: "Exchange Pro",
+    monthlyProductId: "exchange-pro-monthly" as PayPalProductId,
+    annualProductId: "exchange-pro-annual" as PayPalProductId,
     monthly: 99,
     annual: 990,
     suffix: "",
@@ -305,6 +353,8 @@ const workspacePlans = [
   },
   {
     title: "Organization",
+    monthlyProductId: "organization-monthly" as PayPalProductId,
+    annualProductId: "organization-annual" as PayPalProductId,
     monthly: 499,
     annual: 4990,
     suffix: "",
@@ -314,6 +364,21 @@ const workspacePlans = [
     items: ["Role-based workspaces", "Governed record libraries", "Review assignments", "Implementation planning"],
   },
 ];
+
+const checkoutCatalog: Record<PayPalProductId, CheckoutProduct> = {
+  "preserved-governed-run": { id: "preserved-governed-run", name: "Preserved Governed Run", price: 9, billing: "one-time" },
+  "independent-partner-review": { id: "independent-partner-review", name: "Independent Partner Review", price: 995, billing: "one-time" },
+  "dual-partner-review": { id: "dual-partner-review", name: "Dual-Partner Review", price: 1995, billing: "one-time" },
+  "architecture-demonstration": { id: "architecture-demonstration", name: "Architecture-to-Architecture Demonstration", price: 2495, billing: "one-time" },
+  "multidisciplinary-review-panel": { id: "multidisciplinary-review-panel", name: "Multidisciplinary Review Panel", price: 3995, billing: "one-time" },
+  "exchange-pro-monthly": { id: "exchange-pro-monthly", name: "TA-14 Exchange Pro — Monthly", price: 99, billing: "monthly access purchase" },
+  "exchange-pro-annual": { id: "exchange-pro-annual", name: "TA-14 Exchange Pro — Annual", price: 990, billing: "annual access purchase" },
+  "organization-monthly": { id: "organization-monthly", name: "TA-14 Organization Workspace — Monthly", price: 499, billing: "monthly access purchase" },
+  "organization-annual": { id: "organization-annual", name: "TA-14 Organization Workspace — Annual", price: 4990, billing: "annual access purchase" },
+  "verified-network-partner-annual": { id: "verified-network-partner-annual", name: "Verified Network Partner — Annual", price: 795, billing: "annual" },
+  "governance-entity-partner-annual": { id: "governance-entity-partner-annual", name: "Governance Entity Partner — Annual", price: 1995, billing: "annual" },
+  "institutional-partner-annual": { id: "institutional-partner-annual", name: "Institutional Partner — Annual", price: 3995, billing: "annual" },
+};
 
 function money(value: number) {
   return new Intl.NumberFormat("en-US", {
@@ -331,6 +396,13 @@ export default function AiGovernancePricingPage() {
   const [partnerId, setPartnerId] = useState<PartnerId>("none");
   const [step, setStep] = useState(1);
   const [billingMode, setBillingMode] = useState<BillingMode>("monthly");
+  const [checkoutProduct, setCheckoutProduct] = useState<CheckoutProduct | null>(null);
+  const [paypalReady, setPayPalReady] = useState(false);
+  const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "creating" | "capturing" | "success" | "cancelled" | "error">("idle");
+  const [checkoutMessage, setCheckoutMessage] = useState("");
+  const paypalButtonsRef = useRef<HTMLDivElement | null>(null);
+  const paypalMessageRef = useRef<HTMLDivElement | null>(null);
+  const renderedProductRef = useRef<string | null>(null);
 
   const pathway = pathways.find((item) => item.id === pathwayId) ?? pathways[0];
   const partner = partnerOptions.find((item) => item.id === partnerId) ?? partnerOptions[0];
@@ -368,6 +440,130 @@ export default function AiGovernancePricingPage() {
     if (evidence === "unorganized") items.push("Evidence organization and intake support");
     return Array.from(new Set(items));
   }, [pathway, partner, partnerId, visibility, evidence]);
+
+  const openCheckout = (productId: PayPalProductId) => {
+    setCheckoutProduct(checkoutCatalog[productId]);
+    setCheckoutStatus("idle");
+    setCheckoutMessage("");
+    renderedProductRef.current = null;
+  };
+
+  useEffect(() => {
+    if (!checkoutProduct) return;
+
+    const clientId = process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID;
+    if (!clientId) {
+      setCheckoutStatus("error");
+      setCheckoutMessage("PayPal checkout is not configured for this deployment.");
+      return;
+    }
+
+    if (window.paypal) {
+      setPayPalReady(true);
+      return;
+    }
+
+    const existing = document.getElementById("ta14-paypal-sdk") as HTMLScriptElement | null;
+    const handleLoad = () => setPayPalReady(true);
+    const handleError = () => {
+      setCheckoutStatus("error");
+      setCheckoutMessage("PayPal could not be loaded. Please refresh and try again.");
+    };
+
+    if (existing) {
+      existing.addEventListener("load", handleLoad, { once: true });
+      existing.addEventListener("error", handleError, { once: true });
+      return () => {
+        existing.removeEventListener("load", handleLoad);
+        existing.removeEventListener("error", handleError);
+      };
+    }
+
+    const script = document.createElement("script");
+    script.id = "ta14-paypal-sdk";
+    script.src = `https://www.paypal.com/sdk/js?client-id=${encodeURIComponent(clientId)}&currency=USD&intent=capture&commit=true&components=buttons,messages&enable-funding=paylater`;
+    script.async = true;
+    script.addEventListener("load", handleLoad, { once: true });
+    script.addEventListener("error", handleError, { once: true });
+    document.head.appendChild(script);
+
+    return () => {
+      script.removeEventListener("load", handleLoad);
+      script.removeEventListener("error", handleError);
+    };
+  }, [checkoutProduct]);
+
+  useEffect(() => {
+    if (!checkoutProduct || !paypalReady || !window.paypal || !paypalButtonsRef.current) return;
+    if (renderedProductRef.current === checkoutProduct.id) return;
+
+    renderedProductRef.current = checkoutProduct.id;
+    paypalButtonsRef.current.innerHTML = "";
+    if (paypalMessageRef.current) paypalMessageRef.current.innerHTML = "";
+
+    if (window.paypal.Messages && paypalMessageRef.current) {
+      void window.paypal.Messages({
+        amount: checkoutProduct.price,
+        pageType: "checkout",
+        style: { layout: "text", logo: { type: "inline" }, text: { color: "white", size: 13 } },
+      }).render(paypalMessageRef.current).catch(() => undefined);
+    }
+
+    const buttons = window.paypal.Buttons({
+      style: { layout: "vertical", shape: "rect", label: "paypal", height: 48 },
+      createOrder: async () => {
+        setCheckoutStatus("creating");
+        setCheckoutMessage("Creating your governed PayPal order…");
+        const response = await fetch("/api/paypal/create-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            productId: checkoutProduct.id,
+            customerReference: `pricing-${pathwayId}-${Date.now()}`,
+          }),
+        });
+        const payload = await response.json();
+        if (!response.ok || typeof payload.orderId !== "string") {
+          throw new Error(payload.message || "PayPal could not create the order.");
+        }
+        return payload.orderId;
+      },
+      onApprove: async (data: { orderID?: string }) => {
+        if (!data.orderID) throw new Error("PayPal did not return an order ID.");
+        setCheckoutStatus("capturing");
+        setCheckoutMessage("Capturing and confirming your payment…");
+        const response = await fetch("/api/paypal/capture-order", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ orderId: data.orderID }),
+        });
+        const payload = await response.json();
+        if (!response.ok || payload.captureStatus !== "COMPLETED") {
+          throw new Error(payload.message || "The payment could not be captured.");
+        }
+        setCheckoutStatus("success");
+        setCheckoutMessage(`Payment completed. Capture ${payload.captureId}. TA-14 will begin the governed intake for ${checkoutProduct.name}.`);
+      },
+      onCancel: () => {
+        setCheckoutStatus("cancelled");
+        setCheckoutMessage("Checkout was cancelled. No payment was captured.");
+      },
+      onError: (error: unknown) => {
+        setCheckoutStatus("error");
+        setCheckoutMessage(error instanceof Error ? error.message : "PayPal checkout encountered an error.");
+      },
+    });
+
+    if (!buttons.isEligible || buttons.isEligible()) {
+      void buttons.render(paypalButtonsRef.current).catch((error: unknown) => {
+        setCheckoutStatus("error");
+        setCheckoutMessage(error instanceof Error ? error.message : "PayPal buttons could not be rendered.");
+      });
+    } else {
+      setCheckoutStatus("error");
+      setCheckoutMessage("PayPal is not available for this browser or transaction.");
+    }
+  }, [checkoutProduct, paypalReady, pathwayId]);
 
   return (
     <main>
@@ -617,10 +813,20 @@ export default function AiGovernancePricingPage() {
               <ul>{summaryItems.map((item) => <li key={item}>{item}</li>)}</ul>
             </div>
 
-            <Link className="checkoutButton" href="/workspace/entity-review">
-              Request Institutional Scope Review <span>→</span>
-            </Link>
-            <small className="checkoutNote">PayPal checkout activates after scope confirmation and preservation of the governed order record.</small>
+            {pathwayId === "review" && consequence === "informational" && evidence === "organized" && visibility === "private" && partnerId === "none" ? (
+              <button className="checkoutButton" type="button" onClick={() => openCheckout("independent-partner-review")}>
+                Pay securely with PayPal <span>→</span>
+              </button>
+            ) : pathwayId === "demonstration" && consequence === "informational" && evidence === "organized" && visibility === "private" && partnerId === "none" ? (
+              <button className="checkoutButton" type="button" onClick={() => openCheckout("architecture-demonstration")}>
+                Pay securely with PayPal <span>→</span>
+              </button>
+            ) : (
+              <Link className="checkoutButton" href="/workspace/entity-review">
+                Preserve Scope Before Payment <span>→</span>
+              </Link>
+            )}
+            <small className="checkoutNote">Fixed-price catalog services can be purchased immediately. Configured or consequential pathways first receive a written institutional scope so the payment remains bound to defined work.</small>
           </aside>
         </div>
       </section>
@@ -683,6 +889,7 @@ export default function AiGovernancePricingPage() {
               <h3>{item.title}</h3>
               <p>{item.description}</p>
               <small>Market reference: {money(item.marketLow)}–{money(item.marketHigh)}</small>
+              <button type="button" className="cardCheckout" onClick={() => openCheckout(item.id === "single" ? "independent-partner-review" : item.id === "dual" ? "dual-partner-review" : "multidisciplinary-review-panel")}>Pay with PayPal</button>
             </article>
           ))}
           <article>
@@ -711,7 +918,11 @@ export default function AiGovernancePricingPage() {
               <h3>{item.title}</h3>
               <p>{item.description}</p>
               <ul>{item.included.map((included) => <li key={included}>{included}</li>)}</ul>
-              <Link href="/workspace/ai-governance/partner-review-network">Explore participation <b>→</b></Link>
+              {item.productId ? (
+                <button type="button" className="cardCheckout" onClick={() => openCheckout(item.productId)}>Join with PayPal</button>
+              ) : (
+                <Link href="/workspace/ai-governance/partner-review-network">Explore participation <b>→</b></Link>
+              )}
             </article>
           ))}
         </div>
@@ -737,7 +948,11 @@ export default function AiGovernancePricingPage() {
                 <div className="workspacePrice"><strong>{money(value)}</strong><span>{plan.suffix || (value === 0 ? "" : billingMode === "annual" ? "/ year" : "/ month")}</span></div>
                 <p>{plan.description}</p>
                 <ul>{plan.items.map((item) => <li key={item}>{item}</li>)}</ul>
-                <Link href={plan.href}>{plan.cta} <span>→</span></Link>
+                {(billingMode === "annual" ? plan.annualProductId : plan.monthlyProductId) ? (
+                  <button type="button" className="cardCheckout" onClick={() => openCheckout((billingMode === "annual" ? plan.annualProductId : plan.monthlyProductId) as PayPalProductId)}>{plan.cta} with PayPal</button>
+                ) : (
+                  <Link href={plan.href}>{plan.cta} <span>→</span></Link>
+                )}
               </article>
             );
           })}
@@ -772,6 +987,24 @@ export default function AiGovernancePricingPage() {
           <Link className="secondaryButton" href="/workspace/entity-review">Request Scope Review</Link>
         </div>
       </section>
+
+
+      {checkoutProduct && (
+        <div className="checkoutOverlay" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setCheckoutProduct(null); }}>
+          <section className="checkoutModal" role="dialog" aria-modal="true" aria-labelledby="paypal-checkout-title">
+            <button className="closeCheckout" type="button" aria-label="Close checkout" onClick={() => setCheckoutProduct(null)}>×</button>
+            <p className="eyebrow">SECURE GOVERNED CHECKOUT</p>
+            <h2 id="paypal-checkout-title">{checkoutProduct.name}</h2>
+            <div className="checkoutAmount"><strong>{money(checkoutProduct.price)}</strong><span>{checkoutProduct.billing}</span></div>
+            <p className="checkoutCopy">PayPal will process the payment securely. Eligible buyers may see Pay Later financing options determined and administered by PayPal.</p>
+            <div ref={paypalMessageRef} className="paypalMessage" aria-label="PayPal Pay Later financing message" />
+            <div ref={paypalButtonsRef} className="paypalButtons" />
+            {!paypalReady && checkoutStatus !== "error" && <div className="checkoutLoading">Loading secure PayPal checkout…</div>}
+            {checkoutMessage && <div className={`checkoutFeedback ${checkoutStatus}`} aria-live="polite">{checkoutMessage}</div>}
+            <div className="checkoutBoundary"><strong>Payment is not approval.</strong><span>Payment purchases only the stated service pathway. It does not create certification, admissibility, endorsement, or a favorable governance determination.</span></div>
+          </section>
+        </div>
+      )}
 
       <footer className="shell">
         <span>TA-14 Authority Governance Institution</span>
@@ -873,6 +1106,18 @@ export default function AiGovernancePricingPage() {
         .checkoutArchitecture { display: grid; grid-template-columns: 1.05fr .95fr; gap: 38px; align-items: center; }.checkoutSteps { display: grid; gap: 10px; }.checkoutSteps div { min-height: 58px; display: flex; align-items: center; gap: 14px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(121,156,191,.14); background: rgba(255,255,255,.02); }.checkoutSteps span { width: 31px; height: 31px; display: grid; place-items: center; border-radius: 50%; color: #06111c; background: #71bdff; font-weight: 950; }
         .finalCta { margin-top: 78px; padding: 56px 48px; display: flex; justify-content: space-between; align-items: center; gap: 30px; }.finalCta > div:first-child { max-width: 760px; }.finalActions { margin-top: 0; justify-content: flex-end; }
         footer { min-height: 130px; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #74869a; font-size: 12px; }
+        .checkoutButton { border: 0; width: 100%; cursor: pointer; font: inherit; }
+        .cardCheckout { width: 100%; min-height: 44px; margin-top: 16px; border: 1px solid rgba(97,178,255,.28); border-radius: 12px; color: #dff3ff; background: rgba(68,146,229,.1); cursor: pointer; font-weight: 900; }
+        .cardCheckout:hover { background: rgba(68,146,229,.18); }
+        .checkoutOverlay { position: fixed; inset: 0; z-index: 1000; display: grid; place-items: center; padding: 20px; background: rgba(1,5,12,.82); backdrop-filter: blur(14px); overflow-y: auto; }
+        .checkoutModal { width: min(620px,100%); position: relative; padding: 34px; border-radius: 26px; border: 1px solid rgba(105,183,255,.35); background: linear-gradient(180deg,#0b1628,#050b15); box-shadow: 0 30px 100px rgba(0,0,0,.55); }
+        .checkoutModal h2 { margin: 12px 44px 10px 0; font-size: clamp(30px,5vw,48px); letter-spacing: -.045em; }
+        .closeCheckout { position: absolute; right: 18px; top: 16px; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(150,176,202,.22); color: #dcecff; background: rgba(255,255,255,.04); cursor: pointer; font-size: 25px; }
+        .checkoutAmount { display: flex; align-items: baseline; gap: 10px; margin: 16px 0; }.checkoutAmount strong { font-size: 46px; letter-spacing: -.06em; }.checkoutAmount span { color: #89a0b7; text-transform: capitalize; }
+        .checkoutCopy { color: #9fb1c4; line-height: 1.6; }.paypalMessage { min-height: 28px; margin: 14px 0; }.paypalButtons { min-height: 110px; margin-top: 12px; }.checkoutLoading { padding: 16px; text-align: center; color: #8fb4d3; }
+        .checkoutFeedback { margin-top: 14px; padding: 14px 16px; border-radius: 14px; color: #dbeaff; background: rgba(70,139,206,.1); border: 1px solid rgba(83,166,244,.2); line-height: 1.5; }.checkoutFeedback.success { color: #bff0d2; border-color: rgba(77,207,137,.28); background: rgba(53,171,108,.08); }.checkoutFeedback.error { color: #ffd0d0; border-color: rgba(255,113,113,.25); background: rgba(207,67,67,.08); }.checkoutFeedback.cancelled { color: #f3d6a8; border-color: rgba(236,179,88,.24); background: rgba(204,141,46,.08); }
+        .checkoutBoundary { display: grid; gap: 5px; margin-top: 16px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,195,99,.18); background: rgba(196,130,35,.05); }.checkoutBoundary strong { color: #ffd18b; }.checkoutBoundary span { color: #b4a78e; font-size: 13px; line-height: 1.5; }
+
         @keyframes starDrift { from{transform:translate3d(0,0,0)} to{transform:translate3d(90px,140px,0)} } @keyframes glowMove { from{transform:translate3d(0,0,0) scale(1)} to{transform:translate3d(55px,35px,0) scale(1.1)} }
         @media(max-width:1080px){ nav{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
         @media(max-width:720px){ .shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
