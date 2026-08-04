@@ -712,7 +712,7 @@ export default function AiGovernancePricingPage() {
           </div>
           <div className="heroActions">
             <Link className="primaryButton" href="/workspace/ai-governance/registry/register">Register Governance Free <span>→</span></Link>
-            <a className="secondaryButton" href="#builder">Build a Governed Service Pathway</a>
+            <a className="secondaryButton" href="#builder">Begin a Governed Engagement</a>
             <a className="secondaryButton" href="#market">Compare the Market</a>
           </div>
         </div>
@@ -780,35 +780,89 @@ export default function AiGovernancePricingPage() {
 
 
 
-      <section className="freeRegistration shell" aria-labelledby="free-registration-title">
-        <div className="freeRegistrationCopy">
-          <p className="eyebrow">FREE GOVERNANCE ENTITY REGISTRATION</p>
-          <h2 id="free-registration-title">Put your governance architecture on the institutional record without paying TA-14.</h2>
+      <section className="institutionalEntry shell" aria-labelledby="institutional-entry-title">
+        <div className="entryHeading">
+          <p className="eyebrow">CHOOSE HOW YOU ENTER TA-14 AUTHORITY</p>
+          <h2 id="institutional-entry-title">Join the institutional record first. Engage governed services when the work requires them.</h2>
           <p>
-            Registration is the open front door to the TA-14 AI Governance Exchange. An entity may identify its owners and
-            stewards, describe its governance system, declare bounded capabilities and non-claims, identify versions and
-            authority, and connect its supporting public record—including DOIs, Zenodo deposits, patents, publications,
-            repositories, standards work, demonstrations, and other attributable evidence references.
+            TA-14 separates participation from paid institutional work. Every governance entity may register itself at no cost.
+            Evidence preparation, review, demonstrations, artifacts, regulatory readiness, and continuing governance remain
+            optional governed engagements with preserved scope and transparent pricing.
           </p>
-          <div className="freeRegistrationActions">
-            <Link className="primaryButton" href="/workspace/ai-governance/registry/register">Start Free Registration <span>→</span></Link>
-            <Link className="secondaryButton" href="/workspace/ai-governance/registry/directory">Explore Registered Entities</Link>
-          </div>
         </div>
-        <div className="registrationBoundary">
-          <div className="freeBadge">$0</div>
-          <h3>What free registration establishes</h3>
-          <ul>
-            <li>Attributable governance entity identity and stewardship</li>
-            <li>Declared architecture, capabilities, claims, non-claims, and boundaries</li>
-            <li>DOI, Zenodo, patent, publication, repository, and standards references</li>
-            <li>Version, ownership, rights, public-contact, and lifecycle information</li>
-            <li>A TA-14 governance entity registration record and identifier</li>
-          </ul>
-          <div className="notReviewBoundary">
-            <strong>Registration is not review.</strong>
-            <span>It does not mean TA-14 has verified, endorsed, certified, demonstrated, or approved the entity or any declared claim.</span>
-          </div>
+
+        <div className="entryDoors">
+          <article className="entryDoor freeDoor">
+            <div className="doorTopline">
+              <span className="doorNumber">DOOR 01</span>
+              <span className="doorPrice">$0</span>
+            </div>
+            <p className="doorEyebrow">REGISTER YOUR GOVERNANCE ENTITY</p>
+            <h3>Become part of the institutional record.</h3>
+            <p>
+              Establish an attributable, versioned governance identity and connect the public record supporting your architecture.
+            </p>
+            <ul>
+              <li>Identity, ownership, stewardship, and public-contact boundary</li>
+              <li>Declared architecture, capabilities, claims, non-claims, and limits</li>
+              <li>DOIs, Zenodo deposits, patents, publications, repositories, and standards work</li>
+              <li>Versions, rights, authority statements, and lifecycle history</li>
+              <li>TA-14 governance entity registration record and identifier</li>
+            </ul>
+            <Link className="doorAction freeAction" href="/workspace/ai-governance/registry/register">
+              Register Governance Free <span>→</span>
+            </Link>
+            <Link className="doorTextLink" href="/workspace/ai-governance/registry/directory">Explore registered entities</Link>
+            <div className="doorBoundary">
+              <strong>Registration is not review.</strong>
+              <span>It does not mean TA-14 has verified, endorsed, certified, demonstrated, or approved the entity or any declared claim.</span>
+            </div>
+          </article>
+
+          <article className="entryDoor governedDoor">
+            <div className="doorTopline">
+              <span className="doorNumber">DOOR 02</span>
+              <span className="doorPrice">From $800</span>
+            </div>
+            <p className="doorEyebrow">ENGAGE TA-14 AUTHORITY</p>
+            <h3>Request governed institutional work.</h3>
+            <p>
+              Move from self-declaration into bounded evidence handling, review, demonstration, artifact creation, and continuing institutional governance.
+            </p>
+            <ul>
+              <li>Evidence preparation, admission, integrity, and authority analysis</li>
+              <li>Bounded TA-14 or independent Partner Review Network review</li>
+              <li>Governed demonstrations and execution artifacts</li>
+              <li>Regulatory readiness and institutional governance programs</li>
+              <li>Enhanced Registry projections, publication, challenge, and continuity</li>
+            </ul>
+            <a className="doorAction governedAction" href="#builder">
+              Begin a Governed Engagement <span>→</span>
+            </a>
+            <Link className="doorTextLink" href="/workspace/entity-review">Request written scope</Link>
+            <div className="doorBoundary">
+              <strong>Payment is not approval.</strong>
+              <span>Fees fund the stated work and preserved outputs. They never purchase admissibility, certification, authority, endorsement, or a favorable determination.</span>
+            </div>
+          </article>
+        </div>
+
+        <div className="entryLifecycle" aria-label="TA-14 institutional entry lifecycle">
+          {[
+            ["01", "Free registration"],
+            ["02", "Entity record established"],
+            ["03", "Optional governed services"],
+            ["04", "Review"],
+            ["05", "Artifact"],
+            ["06", "Registry"],
+            ["07", "Continuity"],
+          ].map(([number, label], index, items) => (
+            <div key={label}>
+              <span>{number}</span>
+              <strong>{label}</strong>
+              {index < items.length - 1 && <i aria-hidden="true">→</i>}
+            </div>
+          ))}
         </div>
       </section>
 
@@ -1345,7 +1399,7 @@ export default function AiGovernancePricingPage() {
         </div>
         <div className="finalActions">
           <Link className="primaryButton" href="/workspace/ai-governance/registry/register">Register Governance Free <span>→</span></Link>
-          <a className="secondaryButton" href="#builder">Build a Paid Pathway</a>
+          <a className="secondaryButton" href="#builder">Begin a Governed Engagement</a>
           <Link className="secondaryButton" href="/workspace/entity-review">Request Scope Review</Link>
         </div>
       </section>
@@ -1424,7 +1478,7 @@ export default function AiGovernancePricingPage() {
         .ringTwo { width: 500px; height: 500px; }
         .chainNode { position: absolute; min-width: 92px; padding: 8px 10px; border-radius: 999px; color: #dceeff; border: 1px solid rgba(96,179,255,.24); background: rgba(6,15,29,.92); text-align: center; font-size: 11px; font-weight: 900; z-index: 4; box-shadow: 0 10px 32px rgba(0,0,0,.2); }
         .node1 { top: 18px; left: 50%; transform: translateX(-50%); }.node2 { top: 95px; right: 34px; }.node3 { top: 50%; right: -2px; transform: translateY(-50%); }.node4 { bottom: 95px; right: 34px; }.node5 { bottom: 18px; left: 50%; transform: translateX(-50%); }.node6 { bottom: 95px; left: 34px; }.node7 { top: 50%; left: -2px; transform: translateY(-50%); }.node8 { top: 95px; left: 34px; }
-        .categoryStatement, .freeRegistration, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture, .finalCta { border: 1px solid rgba(131,155,189,.16); background: linear-gradient(180deg, rgba(12,21,36,.91), rgba(7,13,24,.95)); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,.24); }
+        .categoryStatement, .institutionalEntry, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture, .finalCta { border: 1px solid rgba(131,155,189,.16); background: linear-gradient(180deg, rgba(12,21,36,.91), rgba(7,13,24,.95)); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,.24); }
         .categoryStatement { padding: 54px; }
         .categoryStatement h2, .builderIntro h2, .sectionIntro h2, .partnerHero h2, .workspaceHeader h2, .checkoutArchitecture h2, .finalCta h2 { margin: 14px 0 16px; font-size: clamp(34px, 5vw, 60px); line-height: 1.03; letter-spacing: -.05em; }
         .categoryGrid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-top: 32px; }
@@ -1433,16 +1487,37 @@ export default function AiGovernancePricingPage() {
         .categoryGrid span { color: #69b5ff; font-size: 11px; font-weight: 950; letter-spacing: .15em; }
         .categoryGrid h3 { margin: 15px 0 10px; font-size: 24px; }
         .categoryGrid p, .builderIntro p, .sectionIntro p, .partnerHero p, .checkoutArchitecture p, .finalCta p { color: #9fafc2; line-height: 1.68; }
-        .freeRegistration, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture { margin-top: 24px; padding: 44px; }
-        .freeRegistration { display:grid; grid-template-columns:1.15fr .85fr; gap:28px; align-items:center; }
-        .freeRegistration h2 { margin:14px 0 16px; font-size:clamp(36px,5vw,64px); line-height:1.02; letter-spacing:-.055em; }
-        .freeRegistrationCopy > p:last-of-type { color:#9fafc2; font-size:17px; line-height:1.7; }
-        .freeRegistrationActions { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
-        .registrationBoundary { padding:26px; border-radius:22px; border:1px solid rgba(103,205,160,.32); background:linear-gradient(180deg,rgba(55,172,119,.1),rgba(5,14,25,.82)); }
-        .freeBadge { width:72px; height:72px; display:grid; place-items:center; border-radius:50%; color:#06120d; background:linear-gradient(135deg,#6ee0ad,#d7ffeb); font-size:25px; font-weight:950; box-shadow:0 0 34px rgba(95,218,164,.2); }
-        .registrationBoundary h3 { margin:20px 0 12px; font-size:25px; }
-        .registrationBoundary ul { margin:0; padding-left:20px; color:#bdd2c8; }
-        .registrationBoundary li { margin:9px 0; line-height:1.5; }
+        .institutionalEntry, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture { margin-top: 24px; padding: 44px; }
+        .entryHeading { max-width:980px; }
+        .entryHeading h2 { margin:14px 0 16px; font-size:clamp(38px,5vw,68px); line-height:1.01; letter-spacing:-.058em; }
+        .entryHeading > p:last-child { color:#9fafc2; font-size:17px; line-height:1.7; }
+        .entryDoors { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; margin-top:30px; }
+        .entryDoor { min-height:610px; display:flex; flex-direction:column; padding:28px; border-radius:24px; border:1px solid rgba(121,156,191,.18); background:rgba(4,11,22,.74); }
+        .freeDoor { border-color:rgba(103,205,160,.34); background:linear-gradient(180deg,rgba(55,172,119,.11),rgba(5,14,25,.88)); }
+        .governedDoor { border-color:rgba(103,185,255,.38); background:linear-gradient(180deg,rgba(66,142,224,.13),rgba(5,14,25,.88)); }
+        .doorTopline { display:flex; align-items:center; justify-content:space-between; gap:16px; }
+        .doorNumber { color:#8198ae; font-size:10px; font-weight:950; letter-spacing:.14em; }
+        .doorPrice { padding:8px 11px; border-radius:999px; color:#07120e; background:linear-gradient(135deg,#74e2b4,#dcffed); font-size:12px; font-weight:950; }
+        .governedDoor .doorPrice { color:#04111d; background:linear-gradient(135deg,#68b7ff,#d7f4ff); }
+        .doorEyebrow { margin:30px 0 0; color:#78cfaa; font-size:10px; font-weight:950; letter-spacing:.14em; }
+        .governedDoor .doorEyebrow { color:#72bbff; }
+        .entryDoor h3 { margin:12px 0 12px; font-size:clamp(30px,3.5vw,48px); line-height:1.04; letter-spacing:-.05em; }
+        .entryDoor > p:not(.doorEyebrow) { margin:0; color:#9fafc2; line-height:1.65; }
+        .entryDoor ul { margin:24px 0; padding-left:20px; color:#c0d1df; }
+        .entryDoor li { margin:10px 0; line-height:1.5; }
+        .doorAction { min-height:54px; margin-top:auto; display:flex; align-items:center; justify-content:space-between; gap:18px; padding:0 17px; border-radius:14px; text-decoration:none; font-weight:950; }
+        .freeAction { color:#06120d; background:linear-gradient(135deg,#6ee0ad,#d7ffeb); }
+        .governedAction { color:#04111d; background:linear-gradient(135deg,#5caeff,#d3f4ff); }
+        .doorTextLink { margin-top:13px; color:#a8bfd2; text-align:center; text-decoration:none; font-size:12px; font-weight:850; }
+        .doorBoundary { display:grid; gap:5px; margin-top:20px; padding:15px; border-radius:14px; border:1px solid rgba(130,164,193,.16); background:rgba(255,255,255,.025); }
+        .freeDoor .doorBoundary strong { color:#b9efd3; }
+        .governedDoor .doorBoundary strong { color:#d8efff; }
+        .doorBoundary span { color:#8196aa; font-size:11px; line-height:1.5; }
+        .entryLifecycle { display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:8px; margin-top:18px; padding:18px; border-radius:18px; border:1px solid rgba(116,155,190,.16); background:rgba(4,11,22,.66); }
+        .entryLifecycle > div { min-height:76px; position:relative; display:flex; flex-direction:column; justify-content:center; gap:7px; padding:10px; border-radius:12px; background:rgba(255,255,255,.018); }
+        .entryLifecycle span { color:#68b7ff; font-size:9px; font-weight:950; letter-spacing:.12em; }
+        .entryLifecycle strong { color:#c6d7e6; font-size:11px; line-height:1.35; }
+        .entryLifecycle i { position:absolute; right:-10px; top:50%; z-index:2; color:#6ab9ff; font-style:normal; transform:translateY(-50%); }
         .notReviewBoundary { display:grid; gap:5px; margin-top:20px; padding:15px; border-radius:14px; border:1px solid rgba(255,196,103,.22); background:rgba(217,151,46,.06); }
         .notReviewBoundary strong { color:#ffd18b; }
         .notReviewBoundary span { color:#b9aa90; font-size:12px; line-height:1.5; }
@@ -1590,8 +1665,8 @@ export default function AiGovernancePricingPage() {
         .recordFooter span { color:#8ea3b7; font-size:12px; line-height:1.55; }
 
         @keyframes starDrift { from{transform:translate3d(0,0,0)} to{transform:translate3d(90px,140px,0)} } @keyframes glowMove { from{transform:translate3d(0,0,0) scale(1)} to{transform:translate3d(55px,35px,0) scale(1.1)} }
-        @media(max-width:1080px){ nav{display:none}.freeRegistration{grid-template-columns:1fr}.routeRail{grid-template-columns:repeat(4,minmax(0,1fr))}.routeRail article:nth-child(4) i{display:none}.documentGrid,.costArchitecture{grid-template-columns:1fr}.documentCommercial{border-left:0;border-top:1px solid rgba(121,156,191,.16)}.preservationGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.costComparison{max-width:800px}.recordRow{grid-template-columns:42px 130px 1fr}.recordRow em{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
-        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.freeRegistration,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.profileOptions,.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
+        @media(max-width:1080px){ nav{display:none}.entryDoors{grid-template-columns:1fr}.entryLifecycle{grid-template-columns:repeat(4,minmax(0,1fr))}.entryLifecycle>div:nth-child(4) i{display:none}.routeRail{grid-template-columns:repeat(4,minmax(0,1fr))}.routeRail article:nth-child(4) i{display:none}.documentGrid,.costArchitecture{grid-template-columns:1fr}.documentCommercial{border-left:0;border-top:1px solid rgba(121,156,191,.16)}.preservationGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.costComparison{max-width:800px}.recordRow{grid-template-columns:42px 130px 1fr}.recordRow em{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
+        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.institutionalEntry,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.entryLifecycle,.profileOptions,.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}.entryDoor{min-height:auto}.entryLifecycle>div i{display:none}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
       `}</style>
     </main>
   );
