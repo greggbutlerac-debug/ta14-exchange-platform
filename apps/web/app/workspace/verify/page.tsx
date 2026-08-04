@@ -4,13 +4,26 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 const WORKSPACE_ROUTES = {
+  exchange: "/workspace/ai-governance",
+  missionControl: "/workspace/mission-control",
+  registry: "/workspace/registry",
   build: "/workspace/build",
-  corrections: "/workspace/corrections",
+  governedRecords: "/workspace/governed-records",
   demonstrations: "/workspace/demonstrations",
+  corrections: "/workspace/corrections",
   receipts: "/workspace/receipts",
   replay: "/workspace/replay",
   scanner: "/workspace/scanner",
 } as const;
+
+const EXCHANGE_NAV = [
+  ["Exchange Home", WORKSPACE_ROUTES.exchange],
+  ["Registry", WORKSPACE_ROUTES.registry],
+  ["Build a Route", WORKSPACE_ROUTES.build],
+  ["Governed Records", WORKSPACE_ROUTES.governedRecords],
+  ["Demonstrations", WORKSPACE_ROUTES.demonstrations],
+  ["Replay Verification", "/workspace/verify"],
+] as const;
 
 type VerificationState = "VERIFIED" | "DIVERGENT" | "INCOMPLETE" | "DISPUTED";
 type CheckState = "PASS" | "FAIL" | "UNKNOWN";
@@ -395,6 +408,51 @@ export default function ReplayVerificationPage() {
         <span className="scanLine scanLineTwo" />
       </div>
 
+      <header className="institutionHeader">
+        <div className="shell institutionHeaderInner">
+          <Link className="institutionBrand" href={WORKSPACE_ROUTES.exchange}>
+            <span className="brandSeal" aria-hidden="true">TA</span>
+            <span>
+              <strong>TA-14 AUTHORITY</strong>
+              <small>AI Governance Exchange</small>
+            </span>
+          </Link>
+
+          <div className="institutionActions">
+            <Link className="returnLink" href={WORKSPACE_ROUTES.exchange}>
+              <span aria-hidden="true">←</span>
+              Return to Exchange
+            </Link>
+            <Link className="missionLink" href={WORKSPACE_ROUTES.missionControl}>
+              Mission Control
+              <ArrowIcon />
+            </Link>
+          </div>
+        </div>
+
+        <div className="shell breadcrumbRow" aria-label="Breadcrumb">
+          <Link href={WORKSPACE_ROUTES.exchange}>AI Governance Exchange</Link>
+          <span>/</span>
+          <span>Verification Services</span>
+          <span>/</span>
+          <strong>Independent Replay Verification</strong>
+        </div>
+
+        <nav className="exchangeNav" aria-label="Exchange navigation">
+          <div className="shell exchangeNavInner">
+            {EXCHANGE_NAV.map(([label, href]) => (
+              <Link
+                className={href === "/workspace/verify" ? "activeNavItem" : ""}
+                href={href}
+                key={href}
+              >
+                {label}
+              </Link>
+            ))}
+          </div>
+        </nav>
+      </header>
+
       <section className="hero">
         <div className="shell">
           <div className="eyebrowRow">
@@ -714,6 +772,67 @@ export default function ReplayVerificationPage() {
         </div>
       </section>
 
+      <section className="continueSection">
+        <div className="shell">
+          <div className="continueHeading">
+            <div>
+              <span>CONTINUE THROUGH THE EXCHANGE</span>
+              <h2>Verification is a gateway, not a dead end.</h2>
+            </div>
+            <p>
+              Carry the preserved result into correction, route construction,
+              institutional registration, evidence custody, or independent review.
+              Every next action remains linked to the original package rather than
+              replacing its history.
+            </p>
+          </div>
+
+          <div className="journeyGrid">
+            <Link className="journeyCard featuredJourney" href={WORKSPACE_ROUTES.corrections}>
+              <span>01 · CORRECT</span>
+              <h3>Open Correction Studio</h3>
+              <p>Create a new governed route version while preserving the divergent package.</p>
+              <strong>Begin governed correction <ArrowIcon /></strong>
+            </Link>
+
+            <Link className="journeyCard" href={WORKSPACE_ROUTES.registry}>
+              <span>02 · REGISTER</span>
+              <h3>Enter the Registry</h3>
+              <p>Preserve the responsible governance entity, architecture, version, and claim boundary.</p>
+              <strong>Open Registry <ArrowIcon /></strong>
+            </Link>
+
+            <Link className="journeyCard" href={WORKSPACE_ROUTES.build}>
+              <span>03 · REBUILD</span>
+              <h3>Build a New Route</h3>
+              <p>Construct a bounded route with current evidence, authority, and execution conditions.</p>
+              <strong>Build route <ArrowIcon /></strong>
+            </Link>
+
+            <Link className="journeyCard" href={WORKSPACE_ROUTES.receipts}>
+              <span>04 · PRESERVE</span>
+              <h3>Open Receipt Vault</h3>
+              <p>Inspect dependency continuity, receipt identity, custody, and preserved correspondence.</p>
+              <strong>Inspect receipts <ArrowIcon /></strong>
+            </Link>
+
+            <Link className="journeyCard" href={WORKSPACE_ROUTES.demonstrations}>
+              <span>05 · DEMONSTRATE</span>
+              <h3>Founding Demonstrations</h3>
+              <p>Move a bounded capability into a governed demonstration and execution artifact.</p>
+              <strong>Explore demonstrations <ArrowIcon /></strong>
+            </Link>
+
+            <Link className="journeyCard" href={WORKSPACE_ROUTES.exchange}>
+              <span>06 · RETURN</span>
+              <h3>Exchange Home</h3>
+              <p>Return to the full institutional environment and choose another governance pathway.</p>
+              <strong>Return to Exchange <ArrowIcon /></strong>
+            </Link>
+          </div>
+        </div>
+      </section>
+
       <section className="certificateSection">
         <div className="shell certificate">
           <div>
@@ -755,6 +874,30 @@ export default function ReplayVerificationPage() {
           </div>
         </div>
       </section>
+
+      <footer className="exchangeFooter">
+        <div className="shell exchangeFooterGrid">
+          <div className="footerIdentity">
+            <span className="brandSeal footerSeal" aria-hidden="true">TA</span>
+            <div>
+              <strong>TA-14 Authority Governance Institution</strong>
+              <p>Institutional infrastructure for governed, inspectable, consequence-bearing execution.</p>
+            </div>
+          </div>
+
+          <div className="footerLinks">
+            <Link href={WORKSPACE_ROUTES.exchange}>AI Governance Exchange</Link>
+            <Link href={WORKSPACE_ROUTES.registry}>Governance Registry</Link>
+            <Link href={WORKSPACE_ROUTES.demonstrations}>Demonstrations</Link>
+            <Link href={WORKSPACE_ROUTES.missionControl}>Mission Control</Link>
+          </div>
+
+          <div className="footerPrinciple">
+            <span>GOVERNING PRINCIPLE</span>
+            <strong>No admissible evidence. No admissible execution.</strong>
+          </div>
+        </div>
+      </footer>
 
       <style>{`
         :root {
@@ -895,6 +1038,153 @@ export default function ReplayVerificationPage() {
           z-index: 2;
           width: min(1240px, calc(100% - 40px));
           margin: 0 auto;
+        }
+
+        .institutionHeader {
+          position: relative;
+          z-index: 20;
+          border-bottom: 1px solid rgba(116, 223, 222, 0.12);
+          background: rgba(2, 8, 13, 0.88);
+          backdrop-filter: blur(22px);
+        }
+
+        .institutionHeaderInner {
+          min-height: 86px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 24px;
+        }
+
+        .institutionBrand {
+          display: inline-flex;
+          align-items: center;
+          gap: 14px;
+          color: var(--text);
+          text-decoration: none;
+        }
+
+        .brandSeal {
+          width: 46px;
+          height: 46px;
+          display: inline-grid;
+          place-items: center;
+          border: 1px solid rgba(255, 217, 121, 0.55);
+          border-radius: 12px;
+          color: var(--gold);
+          font-weight: 900;
+          letter-spacing: -0.08em;
+          background:
+            linear-gradient(145deg, rgba(255, 217, 121, 0.13), transparent 52%),
+            rgba(8, 26, 35, 0.85);
+          box-shadow: inset 0 0 0 1px rgba(255,255,255,.035), 0 12px 32px rgba(0,0,0,.22);
+        }
+
+        .institutionBrand strong {
+          display: block;
+          font-size: 0.88rem;
+          letter-spacing: 0.16em;
+        }
+
+        .institutionBrand small {
+          display: block;
+          margin-top: 4px;
+          color: var(--muted);
+          font-size: 0.78rem;
+          letter-spacing: 0.08em;
+        }
+
+        .institutionActions {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+        }
+
+        .returnLink,
+        .missionLink {
+          min-height: 42px;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 9px;
+          padding: 0 15px;
+          border-radius: 10px;
+          text-decoration: none;
+          font-size: 0.82rem;
+          font-weight: 750;
+        }
+
+        .returnLink {
+          color: var(--teal);
+          border: 1px solid rgba(114, 231, 228, 0.28);
+          background: rgba(114, 231, 228, 0.06);
+        }
+
+        .missionLink {
+          color: #031014;
+          background: linear-gradient(135deg, var(--gold), #fff0b4);
+          box-shadow: 0 10px 30px rgba(255, 217, 121, 0.14);
+        }
+
+        .breadcrumbRow {
+          min-height: 42px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          color: #77939b;
+          font-size: 0.73rem;
+          letter-spacing: 0.04em;
+        }
+
+        .breadcrumbRow a {
+          color: var(--teal);
+          text-decoration: none;
+        }
+
+        .breadcrumbRow strong {
+          color: #c8d8dc;
+          font-weight: 650;
+        }
+
+        .exchangeNav {
+          border-top: 1px solid rgba(116, 223, 222, 0.08);
+          background: rgba(5, 19, 27, 0.72);
+          overflow-x: auto;
+        }
+
+        .exchangeNavInner {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          min-width: max-content;
+        }
+
+        .exchangeNav a {
+          position: relative;
+          padding: 15px 14px;
+          color: #8fa9b0;
+          text-decoration: none;
+          font-size: 0.76rem;
+          font-weight: 700;
+          letter-spacing: 0.025em;
+        }
+
+        .exchangeNav a:hover,
+        .exchangeNav a.activeNavItem {
+          color: var(--text);
+          background: rgba(114, 231, 228, 0.05);
+        }
+
+        .exchangeNav a.activeNavItem::after {
+          content: "";
+          position: absolute;
+          left: 12px;
+          right: 12px;
+          bottom: 0;
+          height: 2px;
+          border-radius: 999px;
+          background: linear-gradient(90deg, var(--teal), var(--blue));
+          box-shadow: 0 0 18px rgba(114, 231, 228, 0.6);
         }
 
         .hero {
@@ -1530,6 +1820,172 @@ export default function ReplayVerificationPage() {
           font-size: .82rem;
         }
 
+        .continueSection {
+          position: relative;
+          z-index: 2;
+          padding: 96px 0;
+          border-top: 1px solid rgba(116, 223, 222, 0.1);
+          background:
+            radial-gradient(circle at 14% 12%, rgba(114, 231, 228, 0.09), transparent 32%),
+            linear-gradient(180deg, rgba(2, 8, 13, 0.2), rgba(5, 18, 26, 0.86));
+        }
+
+        .continueHeading {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(320px, 0.78fr);
+          gap: 56px;
+          align-items: end;
+          margin-bottom: 34px;
+        }
+
+        .continueHeading span,
+        .journeyCard > span,
+        .footerPrinciple span {
+          color: var(--teal);
+          font-size: 0.7rem;
+          font-weight: 800;
+          letter-spacing: 0.18em;
+        }
+
+        .continueHeading h2 {
+          margin: 11px 0 0;
+          font-size: clamp(2rem, 4vw, 3.6rem);
+          line-height: 1.02;
+          letter-spacing: -0.045em;
+        }
+
+        .continueHeading p {
+          margin: 0;
+          color: var(--muted);
+          line-height: 1.75;
+        }
+
+        .journeyGrid {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .journeyCard {
+          min-height: 250px;
+          display: flex;
+          flex-direction: column;
+          padding: 25px;
+          border: 1px solid var(--border);
+          border-radius: 18px;
+          color: var(--text);
+          text-decoration: none;
+          background: linear-gradient(145deg, rgba(10, 31, 41, 0.88), rgba(4, 15, 22, 0.96));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.025), 0 20px 60px rgba(0,0,0,.14);
+          transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease;
+        }
+
+        .journeyCard:hover {
+          transform: translateY(-4px);
+          border-color: var(--border-strong);
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.04), 0 28px 80px rgba(0,0,0,.24);
+        }
+
+        .featuredJourney {
+          border-color: rgba(255, 217, 121, 0.32);
+          background:
+            radial-gradient(circle at 88% 10%, rgba(255, 217, 121, 0.13), transparent 34%),
+            linear-gradient(145deg, rgba(22, 35, 39, 0.94), rgba(6, 17, 23, 0.98));
+        }
+
+        .journeyCard h3 {
+          margin: 20px 0 10px;
+          font-size: 1.18rem;
+        }
+
+        .journeyCard p {
+          margin: 0;
+          color: var(--muted);
+          line-height: 1.65;
+          font-size: 0.9rem;
+        }
+
+        .journeyCard strong {
+          margin-top: auto;
+          padding-top: 24px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: var(--teal);
+          font-size: 0.78rem;
+        }
+
+        .exchangeFooter {
+          position: relative;
+          z-index: 2;
+          padding: 40px 0;
+          border-top: 1px solid rgba(116, 223, 222, 0.13);
+          background: #02070b;
+        }
+
+        .exchangeFooterGrid {
+          display: grid;
+          grid-template-columns: 1.3fr 0.8fr 1fr;
+          gap: 36px;
+          align-items: center;
+        }
+
+        .footerIdentity {
+          display: flex;
+          align-items: center;
+          gap: 15px;
+        }
+
+        .footerSeal {
+          flex: 0 0 auto;
+        }
+
+        .footerIdentity strong {
+          display: block;
+          font-size: 0.9rem;
+        }
+
+        .footerIdentity p {
+          margin: 5px 0 0;
+          color: var(--muted);
+          font-size: 0.76rem;
+          line-height: 1.5;
+        }
+
+        .footerLinks {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px 16px;
+        }
+
+        .footerLinks a {
+          color: #a8bec4;
+          text-decoration: none;
+          font-size: 0.76rem;
+        }
+
+        .footerLinks a:hover {
+          color: var(--teal);
+        }
+
+        .footerPrinciple {
+          padding: 18px;
+          border: 1px solid rgba(255, 217, 121, 0.18);
+          border-radius: 14px;
+          background: rgba(255, 217, 121, 0.035);
+        }
+
+        .footerPrinciple span {
+          color: var(--gold);
+        }
+
+        .footerPrinciple strong {
+          display: block;
+          margin-top: 8px;
+          font-size: 0.86rem;
+          line-height: 1.45;
+        }
+
         .certificateSection {
           padding: 0 0 86px;
         }
@@ -1604,6 +2060,15 @@ export default function ReplayVerificationPage() {
         }
 
         @media (max-width: 1100px) {
+          .continueHeading,
+          .exchangeFooterGrid {
+            grid-template-columns: 1fr;
+          }
+
+          .journeyGrid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+
           .scoreboard {
             grid-template-columns: repeat(2, minmax(0,1fr));
           }
@@ -1620,6 +2085,32 @@ export default function ReplayVerificationPage() {
         }
 
         @media (max-width: 760px) {
+          .institutionHeaderInner {
+            min-height: auto;
+            padding: 18px 0;
+            align-items: flex-start;
+            flex-direction: column;
+          }
+
+          .institutionActions {
+            width: 100%;
+          }
+
+          .returnLink,
+          .missionLink {
+            flex: 1;
+          }
+
+          .breadcrumbRow {
+            flex-wrap: wrap;
+            padding: 10px 0;
+          }
+
+          .continueHeading {
+            gap: 22px;
+            align-items: start;
+          }
+
           .shell {
             width: min(100% - 24px, 1240px);
           }
@@ -1650,6 +2141,20 @@ export default function ReplayVerificationPage() {
         }
 
         @media (max-width: 560px) {
+          .institutionActions {
+            flex-direction: column;
+          }
+
+          .returnLink,
+          .missionLink {
+            width: 100%;
+          }
+
+          .journeyGrid,
+          .footerLinks {
+            grid-template-columns: 1fr;
+          }
+
           h1 {
             font-size: clamp(2.8rem, 16vw, 4.5rem);
           }
