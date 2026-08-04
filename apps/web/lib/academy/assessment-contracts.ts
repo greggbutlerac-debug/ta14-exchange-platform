@@ -24,8 +24,6 @@ import type {
   ISODateTimeString,
   JsonValue,
   LessonIdentifier,
-  ValidationIssue,
-  ValidationResult,
 } from "./lesson-contracts";
 
 import {
@@ -1288,8 +1286,19 @@ export type AssessmentValidationCode =
   | "invalid_attempt_state"
   | "invalid_integrity_state";
 
-export interface AssessmentValidationIssue extends ValidationIssue {
+export interface AssessmentValidationIssue {
+  readonly path: string;
   readonly code: AssessmentValidationCode;
+  readonly message: string;
+  readonly severity: "error" | "warning";
+  readonly received?: unknown;
+  readonly expected?: string;
+}
+
+export interface AssessmentValidationResult<T> {
+  readonly ok: boolean;
+  readonly value?: T;
+  readonly issues: readonly AssessmentValidationIssue[];
 }
 
 export class AssessmentContractValidationError extends Error {
@@ -1303,7 +1312,7 @@ export class AssessmentContractValidationError extends Error {
 
 export function validateAssessmentDefinition(
   input: unknown,
-): ValidationResult<AssessmentDefinition> {
+): AssessmentValidationResult<AssessmentDefinition> {
   const issues: AssessmentValidationIssue[] = [];
   if (!isObject(input)) {
     return {
@@ -1378,7 +1387,7 @@ export function validateAssessmentDefinition(
 
 export function validateAssessmentAttempt(
   input: unknown,
-): ValidationResult<AssessmentAttempt> {
+): AssessmentValidationResult<AssessmentAttempt> {
   const issues: AssessmentValidationIssue[] = [];
   if (!isObject(input)) {
     return {
