@@ -1,6 +1,6 @@
 /**
  * TA-14 Authority Governance Institution
- * Commercial Experience V2 - Institutional Full Replacement
+ * Commercial Experience V3 - Accessible 50%-Below-Market Pricing
  * Repository path: apps/web/app/workspace/ai-governance/pricing/page.tsx
  *
  * This source preserves the production PayPal create-order and capture-order
@@ -37,6 +37,7 @@ type VisibilityId = "private" | "controlled" | "public";
 type PartnerId = "none" | "single" | "dual" | "panel";
 type BillingMode = "monthly" | "annual";
 type FinancingTerm = 6 | 12 | 24;
+type EngagementProfileId = "independent" | "organization" | "institutional";
 
 type PayPalProductId =
   | "preserved-governed-run"
@@ -103,9 +104,9 @@ const pathways: Pathway[] = [
     title: "Governance Entity Registration",
     description:
       "Create an attributable, versioned institutional record of the governance entity, its authority, claims, boundaries, evidence, rights, and lifecycle state.",
-    ta14Price: 295,
-    marketLow: 1200,
-    marketHigh: 5000,
+    ta14Price: 1000,
+    marketLow: 2500,
+    marketHigh: 10000,
     deliverables: [
       "Guided governance intake",
       "Claims and non-claims record",
@@ -122,9 +123,9 @@ const pathways: Pathway[] = [
     title: "Bounded Governance Review",
     description:
       "Review one declared governance question against an admitted evidence set, explicit authority boundary, recorded rationale, and preserved determination.",
-    ta14Price: 995,
-    marketLow: 4000,
-    marketHigh: 15000,
+    ta14Price: 3000,
+    marketLow: 7500,
+    marketHigh: 25000,
     deliverables: [
       "Declared review question",
       "Evidence admission boundary",
@@ -141,9 +142,9 @@ const pathways: Pathway[] = [
     title: "Governed Demonstration",
     description:
       "Construct and preserve a bounded demonstration showing what a governance architecture does, what evidence supports it, and where its claims stop.",
-    ta14Price: 2495,
-    marketLow: 10000,
-    marketHigh: 40000,
+    ta14Price: 8000,
+    marketLow: 20000,
+    marketHigh: 75000,
     deliverables: [
       "Demonstration scope construction",
       "Governance entity registration",
@@ -160,9 +161,9 @@ const pathways: Pathway[] = [
     title: "Execution Artifact",
     description:
       "Create an inspectable execution artifact preserving the proposed action, evidence, authority, route, determination, execution effect, and outcome boundary.",
-    ta14Price: 495,
-    marketLow: 2000,
-    marketHigh: 8000,
+    ta14Price: 2000,
+    marketLow: 5000,
+    marketHigh: 15000,
     deliverables: [
       "Bounded consequential route",
       "Admitted evidence references",
@@ -179,9 +180,9 @@ const pathways: Pathway[] = [
     title: "Regulatory Readiness Review",
     description:
       "Map a defined system, use case, or governance program against the EU AI Act, NIST AI RMF, ISO/IEC 42001, or a selected institutional framework.",
-    ta14Price: 3995,
-    marketLow: 15000,
-    marketHigh: 60000,
+    ta14Price: 12000,
+    marketLow: 30000,
+    marketHigh: 100000,
     deliverables: [
       "System and role scoping",
       "Applicable obligation mapping",
@@ -198,9 +199,9 @@ const pathways: Pathway[] = [
     title: "Institutional Governance Program",
     description:
       "Establish a multi-system governance program spanning registration, evidence, review, route construction, execution artifacts, outcomes, and continuing institutional oversight.",
-    ta14Price: 12500,
-    marketLow: 50000,
-    marketHigh: 250000,
+    ta14Price: 40000,
+    marketLow: 100000,
+    marketHigh: 350000,
     deliverables: [
       "Institutional governance architecture",
       "Governance entity and system Registry",
@@ -225,7 +226,7 @@ const partnerOptions: PartnerOption[] = [
   {
     id: "single",
     title: "One Independent Specialist",
-    price: 995,
+    price: 2000,
     marketLow: 4000,
     marketHigh: 9000,
     description: "One qualified PRN reviewer adds an attributable, independently bounded finding.",
@@ -233,7 +234,7 @@ const partnerOptions: PartnerOption[] = [
   {
     id: "dual",
     title: "Dual Independent Review",
-    price: 1995,
+    price: 4000,
     marketLow: 8000,
     marketHigh: 20000,
     description: "Two reviewers preserve separate findings, agreement, disagreement, and stated limitations.",
@@ -241,7 +242,7 @@ const partnerOptions: PartnerOption[] = [
   {
     id: "panel",
     title: "Multidisciplinary Panel",
-    price: 3995,
+    price: 8000,
     marketLow: 16000,
     marketHigh: 40000,
     description: "Three to five reviewers examine a consequential matter across distinct competence domains.",
@@ -250,27 +251,56 @@ const partnerOptions: PartnerOption[] = [
 
 const consequenceModifiers: Record<ConsequenceId, number> = {
   informational: 0,
-  operational: 250,
-  financial: 750,
-  employment: 750,
-  healthcare: 1500,
-  "public-sector": 1500,
-  "safety-critical": 2500,
+  operational: 500,
+  financial: 1500,
+  employment: 1500,
+  healthcare: 3000,
+  "public-sector": 3000,
+  "safety-critical": 5000,
 };
 
 const evidenceModifiers: Record<EvidenceId, number> = {
   organized: 0,
-  partial: 250,
-  technical: 500,
-  runtime: 750,
-  unorganized: 995,
+  partial: 500,
+  technical: 1000,
+  runtime: 1500,
+  unorganized: 2000,
 };
 
 const visibilityModifiers: Record<VisibilityId, number> = {
   private: 0,
-  controlled: 150,
-  public: 295,
+  controlled: 250,
+  public: 500,
 };
+
+const engagementProfiles = [
+  {
+    id: "independent" as EngagementProfileId,
+    title: "Independent Builder",
+    multiplier: 0.8,
+    description: "Accessible founder pricing for independent architects, researchers, and emerging governance entities.",
+  },
+  {
+    id: "organization" as EngagementProfileId,
+    title: "Organization",
+    multiplier: 1,
+    description: "Standard pricing for companies, governance firms, technical providers, and established operating teams.",
+  },
+  {
+    id: "institutional" as EngagementProfileId,
+    title: "Institution",
+    multiplier: 1.2,
+    description: "Expanded institutional pricing for universities, public bodies, professional organizations, and complex enterprises.",
+  },
+];
+
+function profilePrice(value: number, multiplier: number) {
+  return Math.round((value * multiplier) / 50) * 50;
+}
+
+function startingPrice(pathway: Pathway) {
+  return profilePrice(pathway.ta14Price, engagementProfiles[0].multiplier);
+}
 
 const partnerMemberships = [
   {
@@ -289,7 +319,7 @@ const partnerMemberships = [
   {
     title: "Verified Network Partner",
     productId: "verified-network-partner-annual" as PayPalProductId,
-    price: "$795 / year",
+    price: "$995 / year",
     description:
       "For independent reviewers, architects, consultants, academics, and domain specialists.",
     included: [
@@ -302,25 +332,25 @@ const partnerMemberships = [
   {
     title: "Governance Entity Partner",
     productId: "governance-entity-partner-annual" as PayPalProductId,
-    price: "$1,995 / year",
+    price: "$2,995 / year",
     description:
       "For governance firms, architecture owners, technical-control providers, and specialist organizations.",
     included: [
       "Organizational partner profile",
       "Up to three participants",
-      "One bounded demonstration annually",
+      "$2,000 annual governed-service credit",
       "20% service discount",
     ],
   },
   {
     title: "Institutional Partner",
     productId: "institutional-partner-annual" as PayPalProductId,
-    price: "$3,995 / year",
+    price: "$6,995 / year",
     description:
       "For universities, research groups, professional bodies, and larger governance institutions.",
     included: [
       "Up to ten participants",
-      "Annual governed demonstration",
+      "$5,000 annual governed-service credit",
       "Co-developed Academy session",
       "Institutional publication pathway",
     ],
@@ -380,17 +410,17 @@ const workspacePlans = [
 
 const checkoutCatalog: Record<PayPalProductId, CheckoutProduct> = {
   "preserved-governed-run": { id: "preserved-governed-run", name: "Preserved Governed Run", price: 9, billing: "one-time" },
-  "independent-partner-review": { id: "independent-partner-review", name: "Independent Partner Review", price: 995, billing: "one-time" },
-  "dual-partner-review": { id: "dual-partner-review", name: "Dual-Partner Review", price: 1995, billing: "one-time" },
-  "architecture-demonstration": { id: "architecture-demonstration", name: "Architecture-to-Architecture Demonstration", price: 2495, billing: "one-time" },
-  "multidisciplinary-review-panel": { id: "multidisciplinary-review-panel", name: "Multidisciplinary Review Panel", price: 3995, billing: "one-time" },
+  "independent-partner-review": { id: "independent-partner-review", name: "Independent Partner Review", price: 2000, billing: "one-time" },
+  "dual-partner-review": { id: "dual-partner-review", name: "Dual-Partner Review", price: 4000, billing: "one-time" },
+  "architecture-demonstration": { id: "architecture-demonstration", name: "Architecture-to-Architecture Demonstration", price: 8000, billing: "one-time" },
+  "multidisciplinary-review-panel": { id: "multidisciplinary-review-panel", name: "Multidisciplinary Review Panel", price: 8000, billing: "one-time" },
   "exchange-pro-monthly": { id: "exchange-pro-monthly", name: "TA-14 Exchange Pro — Monthly", price: 99, billing: "monthly access purchase" },
   "exchange-pro-annual": { id: "exchange-pro-annual", name: "TA-14 Exchange Pro — Annual", price: 990, billing: "annual access purchase" },
   "organization-monthly": { id: "organization-monthly", name: "TA-14 Organization Workspace — Monthly", price: 499, billing: "monthly access purchase" },
   "organization-annual": { id: "organization-annual", name: "TA-14 Organization Workspace — Annual", price: 4990, billing: "annual access purchase" },
-  "verified-network-partner-annual": { id: "verified-network-partner-annual", name: "Verified Network Partner — Annual", price: 795, billing: "annual" },
-  "governance-entity-partner-annual": { id: "governance-entity-partner-annual", name: "Governance Entity Partner — Annual", price: 1995, billing: "annual" },
-  "institutional-partner-annual": { id: "institutional-partner-annual", name: "Institutional Partner — Annual", price: 3995, billing: "annual" },
+  "verified-network-partner-annual": { id: "verified-network-partner-annual", name: "Verified Network Partner — Annual", price: 995, billing: "annual" },
+  "governance-entity-partner-annual": { id: "governance-entity-partner-annual", name: "Governance Entity Partner — Annual", price: 2995, billing: "annual" },
+  "institutional-partner-annual": { id: "institutional-partner-annual", name: "Institutional Partner — Annual", price: 6995, billing: "annual" },
 };
 
 function money(value: number) {
@@ -403,6 +433,7 @@ function money(value: number) {
 
 export default function AiGovernancePricingPage() {
   const [pathwayId, setPathwayId] = useState<PathwayId>("registry");
+  const [profileId, setProfileId] = useState<EngagementProfileId>("independent");
   const [consequence, setConsequence] = useState<ConsequenceId>("operational");
   const [evidence, setEvidence] = useState<EvidenceId>("partial");
   const [visibility, setVisibility] = useState<VisibilityId>("public");
@@ -420,46 +451,50 @@ export default function AiGovernancePricingPage() {
 
   const pathway = pathways.find((item) => item.id === pathwayId) ?? pathways[0];
   const partner = partnerOptions.find((item) => item.id === partnerId) ?? partnerOptions[0];
+  const engagementProfile = engagementProfiles.find((item) => item.id === profileId) ?? engagementProfiles[0];
 
   const configured = useMemo(() => {
-    const ta14 =
-      pathway.ta14Price +
-      consequenceModifiers[consequence] +
-      evidenceModifiers[evidence] +
-      visibilityModifiers[visibility] +
-      partner.price;
+    const baseScope = profilePrice(pathway.ta14Price, engagementProfile.multiplier);
+    const consequenceAdjustment = profilePrice(consequenceModifiers[consequence], engagementProfile.multiplier);
+    const evidenceAdjustment = profilePrice(evidenceModifiers[evidence], engagementProfile.multiplier);
+    const visibilityAdjustment = profilePrice(visibilityModifiers[visibility], engagementProfile.multiplier);
+
+    const ta14 = baseScope + consequenceAdjustment + evidenceAdjustment + visibilityAdjustment + partner.price;
 
     const marketLow =
       pathway.marketLow +
-      Math.round(consequenceModifiers[consequence] * 4) +
-      Math.round(evidenceModifiers[evidence] * 4) +
+      Math.round(consequenceModifiers[consequence] * 2.5) +
+      Math.round(evidenceModifiers[evidence] * 2.5) +
+      Math.round(visibilityModifiers[visibility] * 2.5) +
       partner.marketLow;
 
     const marketHigh =
       pathway.marketHigh +
-      Math.round(consequenceModifiers[consequence] * 6) +
-      Math.round(evidenceModifiers[evidence] * 6) +
+      Math.round(consequenceModifiers[consequence] * 4) +
+      Math.round(evidenceModifiers[evidence] * 4) +
+      Math.round(visibilityModifiers[visibility] * 4) +
       partner.marketHigh;
 
     const percentage = marketLow > 0 ? Math.round((ta14 / marketLow) * 100) : 0;
+    const savingsPercentage = marketLow > 0 ? Math.max(0, 100 - percentage) : 0;
 
     const breakdown = [
-      { label: `${pathway.title} base scope`, value: pathway.ta14Price },
-      { label: `${consequence.replace("-", " ")} consequence adjustment`, value: consequenceModifiers[consequence] },
-      { label: `${evidence} evidence preparation`, value: evidenceModifiers[evidence] },
-      { label: `${visibility} visibility boundary`, value: visibilityModifiers[visibility] },
+      { label: `${pathway.title} - ${engagementProfile.title}`, value: baseScope },
+      { label: `${consequence.replace("-", " ")} consequence adjustment`, value: consequenceAdjustment },
+      { label: `${evidence} evidence preparation`, value: evidenceAdjustment },
+      { label: `${visibility} visibility boundary`, value: visibilityAdjustment },
       { label: partner.title, value: partner.price },
     ].filter((item) => item.value > 0);
 
-    return { ta14, marketLow, marketHigh, percentage, breakdown };
-  }, [pathway, consequence, evidence, visibility, partner]);
+    return { ta14, marketLow, marketHigh, percentage, savingsPercentage, breakdown };
+  }, [pathway, engagementProfile, consequence, evidence, visibility, partner]);
 
   const scopeReference = useMemo(() => {
-    const compact = [pathwayId, consequence, evidence, visibility, partnerId]
+    const compact = [pathwayId, profileId, consequence, evidence, visibility, partnerId]
       .map((value) => value.replace(/[^a-z0-9]/gi, "").slice(0, 4).toUpperCase())
       .join("-");
     return `TA14-SCOPE-${compact}`;
-  }, [pathwayId, consequence, evidence, visibility, partnerId]);
+  }, [pathwayId, profileId, consequence, evidence, visibility, partnerId]);
 
   const financingEstimate = useMemo(() => Math.ceil(configured.ta14 / financingTerm), [configured.ta14, financingTerm]);
 
@@ -486,6 +521,7 @@ export default function AiGovernancePricingPage() {
   const engagementSummary = useMemo(() => ({
     institution: "TA-14 Authority Governance Institution",
     engagement: pathway.title,
+    profile: engagementProfile.title,
     scopeReference,
     consequence: consequence.replace("-", " "),
     evidence,
@@ -498,7 +534,7 @@ export default function AiGovernancePricingPage() {
       "No certification or regulatory approval is implied",
       "Execution authority remains separately governed",
     ],
-  }), [pathway.title, scopeReference, consequence, evidence, visibility, partner.title, configured]);
+  }), [pathway.title, engagementProfile.title, scopeReference, consequence, evidence, visibility, partner.title, configured]);
 
   const recordPreview = useMemo(() => ({
     recordId: scopeReference.replace("SCOPE", "ENGAGEMENT"),
@@ -660,7 +696,7 @@ export default function AiGovernancePricingPage() {
       <section className="hero shell">
         <div className="heroCopy">
           <p className="eyebrow">GOVERNANCE OF GOVERNANCE</p>
-          <h1>One-quarter of the conventional cost. The full institutional chain.</h1>
+          <h1>Approximately half the conventional cost. The full institutional chain.</h1>
           <p className="lead">
             TA-14 is not another AI governance consultancy. It is the institution that registers governance entities,
             governs their claims, preserves their evidence, records bounded review, demonstrates capability, creates
@@ -670,7 +706,7 @@ export default function AiGovernancePricingPage() {
             <span>More governance</span>
             <span>More evidence</span>
             <span>More permanence</span>
-            <span>Lower cost</span>
+            <span>Typically 50%+ below market</span>
           </div>
           <div className="heroActions">
             <a className="primaryButton" href="#builder">Build Your Pathway <span>→</span></a>
@@ -749,6 +785,27 @@ export default function AiGovernancePricingPage() {
           </p>
         </div>
 
+        <div className="profileSelector" aria-label="Engagement profile">
+          <div className="profileSelectorIntro">
+            <small>ENGAGEMENT PROFILE</small>
+            <strong>Accessible for independent builders. Scaled for institutions.</strong>
+          </div>
+          <div className="profileOptions">
+            {engagementProfiles.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className={profileId === item.id ? "active" : ""}
+                onClick={() => setProfileId(item.id)}
+              >
+                <strong>{item.title}</strong>
+                <span>{item.description}</span>
+              </button>
+            ))}
+          </div>
+          <p>Every profile remains materially below the lower end of the matched enterprise market range. Institutional pricing reflects greater stakeholder, custody, review, and continuity obligations.</p>
+        </div>
+
         <div className="builderLayout">
           <div className="builderPanel">
             <div className="progressRail" aria-label="Configurator progress">
@@ -780,7 +837,7 @@ export default function AiGovernancePricingPage() {
                       <small>{item.eyebrow}</small>
                       <strong>{item.title}</strong>
                       <span>{item.description}</span>
-                      <em>From {money(item.ta14Price)}</em>
+                      <em>Starting at {money(startingPrice(item))}</em>
                     </button>
                   ))}
                 </div>
@@ -894,7 +951,7 @@ export default function AiGovernancePricingPage() {
 
             <div className="quarterBar">
               <div><span style={{ width: `${Math.min(100, configured.percentage)}%` }} /></div>
-              <p>Approximately one-third of the lower end of the comparable market range ({configured.percentage}%).</p>
+              <p>TA-14 is {configured.percentage}% of the lower matched market reference - approximately {configured.savingsPercentage}% below it.</p>
             </div>
 
             <div className="scopeLedger">
@@ -916,6 +973,7 @@ export default function AiGovernancePricingPage() {
             </div>
 
             <div className="summaryDetails">
+              <div><small>Engagement profile</small><strong>{engagementProfile.title}</strong></div>
               <div><small>Consequence</small><strong>{consequence.replace("-", " ")}</strong></div>
               <div><small>Evidence</small><strong>{evidence}</strong></div>
               <div><small>Visibility</small><strong>{visibility}</strong></div>
@@ -927,11 +985,11 @@ export default function AiGovernancePricingPage() {
               <ul>{summaryItems.map((item) => <li key={item}>{item}</li>)}</ul>
             </div>
 
-            {pathwayId === "review" && consequence === "informational" && evidence === "organized" && visibility === "private" && partnerId === "none" ? (
+            {pathwayId === "review" && profileId === "organization" && consequence === "informational" && evidence === "organized" && visibility === "private" && partnerId === "none" ? (
               <button className="checkoutButton" type="button" onClick={() => openCheckout("independent-partner-review")}>
                 Pay securely with PayPal <span>→</span>
               </button>
-            ) : pathwayId === "demonstration" && consequence === "informational" && evidence === "organized" && visibility === "private" && partnerId === "none" ? (
+            ) : pathwayId === "demonstration" && profileId === "organization" && consequence === "informational" && evidence === "organized" && visibility === "private" && partnerId === "none" ? (
               <button className="checkoutButton" type="button" onClick={() => openCheckout("architecture-demonstration")}>
                 Pay securely with PayPal <span>→</span>
               </button>
@@ -971,6 +1029,7 @@ export default function AiGovernancePricingPage() {
               <p className="documentLabel">DECLARED PURPOSE</p>
               <h3>{pathway.description}</h3>
               <div className="documentConditions">
+                <div><span>Engagement profile</span><strong>{engagementSummary.profile}</strong></div>
                 <div><span>Consequence</span><strong>{engagementSummary.consequence}</strong></div>
                 <div><span>Evidence condition</span><strong>{engagementSummary.evidence}</strong></div>
                 <div><span>Visibility</span><strong>{engagementSummary.visibility}</strong></div>
@@ -1034,21 +1093,20 @@ export default function AiGovernancePricingPage() {
         </div>
 
         <div className="marketTable">
-          <div className="marketHead"><span>Governance need</span><span>Published / typical reference</span><span>TA-14 pathway</span><span>What remains governed</span></div>
+          <div className="marketHead"><span>Governance need</span><span>Comparable enterprise engagement</span><span>TA-14 pathway</span><span>What remains governed</span></div>
           {[
-            ["Governance entity registration", "$1,200–$5,000+", "$295", "Identity, authority, claims, evidence, review, identifier, lifecycle"],
-            ["Bounded specialist review", "$4,000–$15,000", "$995", "Question, admitted evidence, reviewer rationale, determination, limitations"],
-            ["Governed demonstration", "$10,000–$40,000", "$2,495", "Scope, route, evidence, observation, artifact, case-study boundary"],
-            ["Execution artifact", "$2,000–$8,000", "$495", "Action, evidence, authority, determination, execution, outcome, integrity"],
-            ["Regulatory readiness", "$15,000–$60,000", "$3,995", "Role, obligation, evidence status, gaps, corrective route, preserved record"],
-            ["Institutional program", "$50,000–$250,000+", "From $12,500", "Registry, reviews, routes, artifacts, outcomes, PRN, lifecycle governance"],
+            ["Governance entity registration", "$2,500–$10,000+", "Starting at $800", "Identity, authority, claims, evidence, review, identifier, lifecycle"],
+            ["Bounded specialist review", "$7,500–$25,000", "Starting at $2,400", "Question, admitted evidence, reviewer rationale, determination, limitations"],
+            ["Governed demonstration", "$20,000–$75,000", "Starting at $6,400", "Scope, route, evidence, observation, artifact, case-study boundary"],
+            ["Execution artifact", "$5,000–$15,000", "Starting at $1,600", "Action, evidence, authority, determination, execution, outcome, integrity"],
+            ["Regulatory readiness", "$30,000–$100,000", "Starting at $9,600", "Role, obligation, evidence status, gaps, corrective route, preserved record"],
+            ["Institutional program", "$100,000–$350,000+", "Starting at $32,000", "Registry, reviews, routes, artifacts, outcomes, PRN, lifecycle governance"],
           ].map((row) => (
             <div className="marketRow" key={row[0]}>{row.map((cell, index) => index === 0 ? <strong key={cell}>{cell}</strong> : <span key={cell}>{cell}</span>)}</div>
           ))}
         </div>
         <div className="sourceNote">
-          <strong>Reference discipline:</strong> ranges are positioning estimates assembled from published software pricing,
-          published ISO/IEC 42001 cost breakdowns, and market-facing governance offerings. Final comparison depends on matched scope.
+          <strong>Reference discipline:</strong> ranges are positioning estimates assembled from published governance-platform pricing, AI-readiness engagements, ISO/IEC 42001 implementation and certification references, and market-facing governance offerings. TA-14 profile pricing is designed to remain approximately 50% or more below the lower matched enterprise reference; final comparison depends on equivalent scope.
         </div>
       </section>
 
@@ -1084,7 +1142,7 @@ export default function AiGovernancePricingPage() {
             </article>
           ))}
           <article>
-            <span>From $7,500</span>
+            <span>Starting at $15,000</span>
             <h3>Institutional Review Program</h3>
             <p>Recurring reviews, multiple systems, multiple departments, or continuing multi-party governance oversight.</p>
             <small>Custom written scope and partner compensation schedule</small>
@@ -1165,7 +1223,7 @@ export default function AiGovernancePricingPage() {
           <p className="eyebrow">WHY THE COST CAN BE LOWER</p>
           <h2 id="cost-title">TA-14 integrates the chain instead of rebilling the chain.</h2>
           <p>Conventional engagements often fragment discovery, assessment, legal interpretation, technical review, evidence organization, reporting, artifact creation, and continuing monitoring across separate vendors and disconnected deliverables.</p>
-          <p>TA-14 lowers the entry cost by keeping those activities inside one governed institutional architecture, one preserved scope, one record model, and one continuity pathway. The lower price does not remove evidence, review, attribution, or history.</p>
+          <p>TA-14 lowers the entry cost by keeping those activities inside one governed institutional architecture, one preserved scope, one record model, and one continuity pathway. Independent builders receive accessible founder-level pricing; organizations and institutions scale upward with stakeholder, custody, review, and continuity complexity. The lower price does not remove evidence, review, attribution, or history.</p>
         </div>
         <div className="costComparison">
           <div className="fragmentedChain">
@@ -1226,7 +1284,7 @@ export default function AiGovernancePricingPage() {
       <section className="checkoutArchitecture shell">
         <div>
           <p className="eyebrow">GOVERNED CHECKOUT</p>
-          <h2>The payment will remain bound to a defined institutional scope.</h2>
+          <h2>Every payment remains bound to a defined institutional scope.</h2>
           <p>
             Before PayPal opens, TA-14 will preserve the selected pathway, deliverables, exclusions, price version,
             visibility boundary, Partner Review Network involvement, and customer authorization. Payment will fund the
@@ -1337,7 +1395,17 @@ export default function AiGovernancePricingPage() {
         .categoryGrid p, .builderIntro p, .sectionIntro p, .partnerHero p, .checkoutArchitecture p, .finalCta p { color: #9fafc2; line-height: 1.68; }
         .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture { margin-top: 24px; padding: 44px; }
         .builderIntro { max-width: 960px; }
-        .builderLayout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(340px,.65fr); gap: 18px; margin-top: 32px; align-items: start; }
+        .profileSelector { margin-top: 28px; padding: 20px; border-radius: 20px; border: 1px solid rgba(102,185,255,.22); background: linear-gradient(180deg,rgba(66,142,224,.08),rgba(4,11,22,.72)); }
+        .profileSelectorIntro { display: grid; gap: 6px; }
+        .profileSelectorIntro small { color: #6fb8ff; font-size: 9px; font-weight: 950; letter-spacing: .13em; }
+        .profileSelectorIntro strong { font-size: 18px; }
+        .profileOptions { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin-top: 15px; }
+        .profileOptions button { min-height: 112px; display: flex; flex-direction: column; align-items: flex-start; gap: 7px; padding: 15px; border-radius: 14px; border: 1px solid rgba(121,156,191,.16); color: #eaf5ff; background: rgba(255,255,255,.02); text-align: left; cursor: pointer; }
+        .profileOptions button.active { border-color: rgba(103,185,255,.7); background: rgba(66,142,224,.14); box-shadow: 0 10px 30px rgba(31,100,177,.12); }
+        .profileOptions button strong { font-size: 15px; }
+        .profileOptions button span { color: #93a7ba; font-size: 11px; line-height: 1.5; }
+        .profileSelector > p { margin: 13px 0 0; color: #8095aa; font-size: 11px; line-height: 1.55; }
+        .builderLayout { display: grid; grid-template-columns: minmax(0,1.35fr) minmax(340px,.65fr); gap: 18px; margin-top: 18px; align-items: start; }
         .builderPanel, .liveSummary { border-radius: 22px; border: 1px solid rgba(121,156,191,.16); background: rgba(4,11,22,.78); }
         .builderPanel { padding: 22px; }
         .progressRail { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 8px; padding-bottom: 22px; border-bottom: 1px solid rgba(126,156,191,.13); }
@@ -1415,7 +1483,7 @@ export default function AiGovernancePricingPage() {
         .documentGrid { display:grid; grid-template-columns:1.3fr .7fr; }
         .documentMain { padding:28px; }
         .documentMain > h3 { margin:11px 0 22px; font-size:27px; line-height:1.3; letter-spacing:-.025em; }
-        .documentConditions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:28px; }
+        .documentConditions { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; margin-bottom:28px; }
         .documentConditions div { padding:13px; border-radius:13px; border:1px solid rgba(121,156,191,.14); background:rgba(255,255,255,.02); }
         .documentConditions span { display:block; color:#6f8499; font-size:9px; text-transform:uppercase; letter-spacing:.08em; }
         .documentConditions strong { display:block; margin-top:6px; color:#dce9f5; font-size:12px; text-transform:capitalize; }
@@ -1471,7 +1539,7 @@ export default function AiGovernancePricingPage() {
 
         @keyframes starDrift { from{transform:translate3d(0,0,0)} to{transform:translate3d(90px,140px,0)} } @keyframes glowMove { from{transform:translate3d(0,0,0) scale(1)} to{transform:translate3d(55px,35px,0) scale(1.1)} }
         @media(max-width:1080px){ nav{display:none}.routeRail{grid-template-columns:repeat(4,minmax(0,1fr))}.routeRail article:nth-child(4) i{display:none}.documentGrid,.costArchitecture{grid-template-columns:1fr}.documentCommercial{border-left:0;border-top:1px solid rgba(121,156,191,.16)}.preservationGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.costComparison{max-width:800px}.recordRow{grid-template-columns:42px 130px 1fr}.recordRow em{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
-        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
+        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.profileOptions,.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
       `}</style>
     </main>
   );
