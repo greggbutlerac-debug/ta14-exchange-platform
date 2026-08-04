@@ -46,8 +46,6 @@ import {
 } from "./lesson-contracts";
 
 import type { AcademyEventService } from "./academy-events";
-import type { ContinuityRecord } from "./continuity-contracts";
-import type { OutcomeRecord } from "./outcome-contracts";
 
 /* ========================================================================== *
  * Engine identity
@@ -1231,7 +1229,6 @@ export function screenRevalidationTrigger(
 
   const immediateHoldRequired =
     critical ||
-    input.trigger.triggerType === "authority_revocation" ||
     input.trigger.triggerType === "evidence_expiry";
 
   const immediateEscalationRequired =
@@ -2497,14 +2494,8 @@ RevalidationDefinition = deepFreeze({
     "finding",
     "determination",
     "review",
-    "registry_entry",
-    "execution_artifact",
-    "execution",
+    "demonstration",
     "outcome",
-    "continuity",
-    "authority_grant",
-    "assignment",
-    "credential",
     "evidence_package",
     "governed_record",
   ],
