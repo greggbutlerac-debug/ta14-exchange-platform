@@ -1,13 +1,13 @@
 /**
  * TA-14 Authority Governance Institution
- * Commercial Experience - Full Replacement
+ * Commercial Experience - Upgraded Full Replacement
  * Repository path: apps/web/app/workspace/ai-governance/pricing/page.tsx
  *
  * This source preserves the production PayPal create-order and capture-order
  * integration already present in the repository while presenting registration,
  * review, demonstrations, artifacts, regulatory readiness, institutional programs,
  * Partner Review Network participation, workspace plans, governed checkout, and
- * Pay Later messaging as one institutional engagement experience.
+ * Pay Later messaging, transparent scope-ledger pricing, and financing planning as one institutional engagement experience.
  */
 
 "use client";
@@ -36,6 +36,7 @@ type EvidenceId = "organized" | "partial" | "technical" | "runtime" | "unorganiz
 type VisibilityId = "private" | "controlled" | "public";
 type PartnerId = "none" | "single" | "dual" | "panel";
 type BillingMode = "monthly" | "annual";
+type FinancingTerm = 6 | 12 | 24;
 
 type PayPalProductId =
   | "preserved-governed-run"
@@ -408,6 +409,7 @@ export default function AiGovernancePricingPage() {
   const [partnerId, setPartnerId] = useState<PartnerId>("none");
   const [step, setStep] = useState(1);
   const [billingMode, setBillingMode] = useState<BillingMode>("monthly");
+  const [financingTerm, setFinancingTerm] = useState<FinancingTerm>(12);
   const [checkoutProduct, setCheckoutProduct] = useState<CheckoutProduct | null>(null);
   const [paypalReady, setPayPalReady] = useState(false);
   const [checkoutStatus, setCheckoutStatus] = useState<"idle" | "creating" | "capturing" | "success" | "cancelled" | "error">("idle");
@@ -441,8 +443,25 @@ export default function AiGovernancePricingPage() {
 
     const percentage = marketLow > 0 ? Math.round((ta14 / marketLow) * 100) : 0;
 
-    return { ta14, marketLow, marketHigh, percentage };
+    const breakdown = [
+      { label: `${pathway.title} base scope`, value: pathway.ta14Price },
+      { label: `${consequence.replace("-", " ")} consequence adjustment`, value: consequenceModifiers[consequence] },
+      { label: `${evidence} evidence preparation`, value: evidenceModifiers[evidence] },
+      { label: `${visibility} visibility boundary`, value: visibilityModifiers[visibility] },
+      { label: partner.title, value: partner.price },
+    ].filter((item) => item.value > 0);
+
+    return { ta14, marketLow, marketHigh, percentage, breakdown };
   }, [pathway, consequence, evidence, visibility, partner]);
+
+  const scopeReference = useMemo(() => {
+    const compact = [pathwayId, consequence, evidence, visibility, partnerId]
+      .map((value) => value.replace(/[^a-z0-9]/gi, "").slice(0, 4).toUpperCase())
+      .join("-");
+    return `TA14-SCOPE-${compact}`;
+  }, [pathwayId, consequence, evidence, visibility, partnerId]);
+
+  const financingEstimate = useMemo(() => Math.ceil(configured.ta14 / financingTerm), [configured.ta14, financingTerm]);
 
   const summaryItems = useMemo(() => {
     const items = [...pathway.deliverables];
@@ -810,7 +829,25 @@ export default function AiGovernancePricingPage() {
 
             <div className="quarterBar">
               <div><span style={{ width: `${Math.min(100, configured.percentage)}%` }} /></div>
-              <p>Approximately {configured.percentage}% of the lower published-market reference range for comparable work.</p>
+              <p>Approximately one-third of the lower end of the comparable market range ({configured.percentage}%).</p>
+            </div>
+
+            <div className="scopeLedger">
+              <div className="scopeLedgerHead"><div><small>CONFIGURED SCOPE LEDGER</small><strong>{scopeReference}</strong></div><span>LIVE</span></div>
+              <div className="scopeLedgerRows">
+                {configured.breakdown.map((item) => <div key={item.label}><span>{item.label}</span><strong>{money(item.value)}</strong></div>)}
+                <div className="scopeLedgerTotal"><span>Configured institutional total</span><strong>{money(configured.ta14)}</strong></div>
+              </div>
+              <p>Every adjustment remains visible before scope preservation or payment. No hidden implementation multiplier is added at checkout.</p>
+            </div>
+
+            <div className="financingPlanner">
+              <div><small>FINANCING PLANNER</small><strong>Illustrative payment planning</strong></div>
+              <div className="termButtons" aria-label="Illustrative financing term">
+                {([6, 12, 24] as FinancingTerm[]).map((term) => <button key={term} type="button" className={financingTerm === term ? "active" : ""} onClick={() => setFinancingTerm(term)}>{term} mo</button>)}
+              </div>
+              <div className="financeEstimate"><span>Planning estimate</span><strong>{money(financingEstimate)}<small>/month</small></strong></div>
+              <p>This is an arithmetic planning estimate, not a credit offer. PayPal determines whether Pay Later is available and provides the actual terms, eligibility decision, fees, and disclosures.</p>
             </div>
 
             <div className="summaryDetails">
@@ -1118,6 +1155,10 @@ export default function AiGovernancePricingPage() {
         .priceComparison { display: grid; gap: 10px; margin-top: 22px; }.priceComparison > div { padding: 15px; border-radius: 14px; border: 1px solid rgba(121,156,191,.15); background: rgba(255,255,255,.02); }.priceComparison small { display: block; color: #8498ad; margin-bottom: 7px; }.priceComparison strong { font-size: 24px; letter-spacing: -.04em; }.priceComparison .ta14Price { border-color: rgba(103,185,255,.5); background: rgba(66,142,224,.1); }.priceComparison .ta14Price strong { color: #dff4ff; font-size: 38px; }
         .quarterBar { margin-top: 16px; }.quarterBar > div { height: 10px; overflow: hidden; border-radius: 999px; background: rgba(255,255,255,.06); }.quarterBar span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#5caeff,#bfeaff); }.quarterBar p { margin: 8px 0 0; color: #8094a9; font-size: 11px; line-height: 1.45; }
         .summaryDetails { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin-top: 18px; }.summaryDetails div { padding: 11px; border-radius: 12px; background: rgba(255,255,255,.02); border: 1px solid rgba(121,156,191,.11); }.summaryDetails small { display: block; color: #778ba0; text-transform: uppercase; font-size: 8px; letter-spacing: .1em; }.summaryDetails strong { display: block; margin-top: 5px; font-size: 12px; text-transform: capitalize; }
+        .scopeLedger { margin:20px 0; border:1px solid rgba(102,177,255,.22); background:rgba(7,17,34,.72); border-radius:18px; padding:18px; }
+        .scopeLedgerHead { display:flex; justify-content:space-between; gap:16px; align-items:flex-start; padding-bottom:14px; border-bottom:1px solid rgba(133,160,198,.15); }.scopeLedgerHead div { display:grid; gap:5px; }.scopeLedgerHead small,.financingPlanner small { color:#75baff; font-size:9px; font-weight:950; letter-spacing:.13em; }.scopeLedgerHead strong { font-size:12px; letter-spacing:.05em; }.scopeLedgerHead>span { color:#06101f; background:#77e1ba; border-radius:999px; padding:5px 8px; font-size:8px; font-weight:950; letter-spacing:.12em; }
+        .scopeLedgerRows { display:grid; margin-top:8px; }.scopeLedgerRows>div { display:flex; justify-content:space-between; gap:14px; align-items:center; padding:10px 0; border-bottom:1px solid rgba(133,160,198,.1); }.scopeLedgerRows span { color:#b8c7dc; font-size:12px; text-transform:capitalize; }.scopeLedgerRows strong { font-size:13px; }.scopeLedgerRows .scopeLedgerTotal { padding-top:14px; border-bottom:0; }.scopeLedgerRows .scopeLedgerTotal span { color:#fff; font-weight:900; }.scopeLedgerRows .scopeLedgerTotal strong { color:#7ce7bc; font-size:18px; }.scopeLedger>p,.financingPlanner>p { margin:10px 0 0; color:#8496af; font-size:10px; line-height:1.55; }
+        .financingPlanner { margin:20px 0; padding:18px; border:1px solid rgba(134,113,255,.24); border-radius:18px; background:linear-gradient(135deg,rgba(40,34,96,.28),rgba(6,15,31,.8)); }.financingPlanner>div:first-child { display:grid; gap:5px; }.financingPlanner>div:first-child strong { font-size:14px; }.termButtons { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin:14px 0; }.termButtons button { border:1px solid rgba(143,160,201,.22); background:rgba(255,255,255,.03); color:#b9c7dc; border-radius:10px; padding:9px 8px; font:inherit; font-size:11px; font-weight:900; cursor:pointer; }.termButtons button.active { color:#07111f; background:#8ea8ff; border-color:#8ea8ff; }.financeEstimate { display:flex; justify-content:space-between; align-items:end; gap:16px; padding-top:12px; border-top:1px solid rgba(145,158,206,.15); }.financeEstimate span { color:#aebed4; font-size:11px; }.financeEstimate strong { font-size:24px; letter-spacing:-.04em; }.financeEstimate strong small { font-size:10px; color:#93a3ba; margin-left:3px; letter-spacing:0; }
         .deliverableList { margin-top: 20px; padding-top: 18px; border-top: 1px solid rgba(126,156,191,.13); }.deliverableList > span { color: #6fb8ff; font-size: 9px; font-weight: 950; letter-spacing: .13em; }.deliverableList ul { margin: 12px 0 0; padding-left: 20px; color: #b6c4d4; }.deliverableList li { margin-bottom: 8px; line-height: 1.45; font-size: 13px; }
         .checkoutButton { min-height: 52px; margin-top: 20px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 16px; border-radius: 13px; color: #04111d; background: linear-gradient(135deg,#5caeff,#d3f4ff); text-decoration: none; font-weight: 950; }.checkoutNote { display: block; margin-top: 10px; color: #71859a; line-height: 1.45; }
         .market .sectionIntro, .membership .sectionIntro { max-width: 980px; }.marketTable { margin-top: 28px; overflow: hidden; border-radius: 18px; border: 1px solid rgba(128,155,188,.16); }.marketHead,.marketRow { display: grid; grid-template-columns: .8fr .75fr .55fr 1.35fr; gap: 16px; padding: 18px 20px; }.marketHead { color: #75bcff; background: rgba(68,143,223,.08); font-size: 10px; font-weight: 950; letter-spacing: .1em; text-transform: uppercase; }.marketRow { border-top: 1px solid rgba(128,155,188,.12); color: #aebed0; }.marketRow strong { color: #e4eef8; }.sourceNote { margin-top: 16px; padding: 15px 17px; border-radius: 14px; border: 1px solid rgba(121,156,191,.14); color: #879aad; line-height: 1.55; font-size: 12px; }.sourceNote strong { color: #bed1e4; }
