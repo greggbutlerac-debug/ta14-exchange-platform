@@ -1,10 +1,11 @@
 /**
  * TA-14 Authority Governance Institution
- * Commercial Experience V3 - Accessible 50%-Below-Market Pricing
+ * Commercial Experience V4 - Free Registration and Governed Paid Pathways
  * Repository path: apps/web/app/workspace/ai-governance/pricing/page.tsx
  *
  * This source preserves the production PayPal create-order and capture-order
- * integration already present in the repository while presenting registration,
+ * integration already present in the repository while separating free self-service
+ * governance entity registration from paid evidence preparation, institutional
  * review, demonstrations, artifacts, regulatory readiness, institutional programs,
  * Partner Review Network participation, workspace plans, governed checkout, and
  * Pay Later messaging, transparent scope-ledger pricing, financing planning, a live institutional route, an engagement-letter preview, deliverable records, and a preserved institutional record preview as one institutional engagement experience.
@@ -100,21 +101,21 @@ type PartnerOption = {
 const pathways: Pathway[] = [
   {
     id: "registry",
-    eyebrow: "ESTABLISH THE ENTITY",
-    title: "Governance Entity Registration",
+    eyebrow: "PREPARE AND REVIEW THE REGISTERED ENTITY",
+    title: "Registered Entity Evidence & Institutional Review",
     description:
-      "Create an attributable, versioned institutional record of the governance entity, its authority, claims, boundaries, evidence, rights, and lifecycle state.",
+      "After free governance entity registration, TA-14 organizes the entity's declared claims, public and controlled evidence, authority boundaries, DOI, patent, Zenodo, publication, repository, and standards references for bounded institutional review and an enhanced Registry projection.",
     ta14Price: 1000,
     marketLow: 2500,
     marketHigh: 10000,
     deliverables: [
-      "Guided governance intake",
-      "Claims and non-claims record",
-      "Authority and attribution record",
-      "Evidence and integrity metadata",
-      "Bounded institutional review",
-      "Permanent TA-14 Registry identifier",
-      "Public or controlled Registry projection",
+      "Guided post-registration evidence intake",
+      "Claims and non-claims review record",
+      "Authority and attribution analysis",
+      "DOI, patent, Zenodo, publication, repository, and standards evidence map",
+      "Evidence admission and integrity metadata",
+      "Bounded TA-14 institutional review",
+      "Enhanced public or controlled Registry projection",
     ],
   },
   {
@@ -147,7 +148,7 @@ const pathways: Pathway[] = [
     marketHigh: 75000,
     deliverables: [
       "Demonstration scope construction",
-      "Governance entity registration",
+      "Free governance entity registration prerequisite confirmed",
       "Evidence and confidentiality boundaries",
       "Governed route construction",
       "Observed determination and findings",
@@ -696,11 +697,12 @@ export default function AiGovernancePricingPage() {
       <section className="hero shell">
         <div className="heroCopy">
           <p className="eyebrow">GOVERNANCE OF GOVERNANCE</p>
-          <h1>Approximately half the conventional cost. The full institutional chain.</h1>
+          <h1>Register your governance free. Engage the institution when governed work begins.</h1>
           <p className="lead">
-            TA-14 is not another AI governance consultancy. It is the institution that registers governance entities,
-            governs their claims, preserves their evidence, records bounded review, demonstrates capability, creates
-            execution artifacts, and maintains permanent institutional history.
+            Every AI governance entity may create a free, attributable, versioned registration containing its identity,
+            declared architecture, claims, boundaries, and public evidence references. Paid TA-14 pathways begin only
+            when the entity requests evidence preparation, bounded review, a governed demonstration, an execution
+            artifact, regulatory readiness work, or continuing institutional oversight.
           </p>
           <div className="heroStatements">
             <span>More governance</span>
@@ -709,7 +711,8 @@ export default function AiGovernancePricingPage() {
             <span>Typically 50%+ below market</span>
           </div>
           <div className="heroActions">
-            <a className="primaryButton" href="#builder">Build Your Pathway <span>→</span></a>
+            <Link className="primaryButton" href="/workspace/ai-governance/registry/register">Register Governance Free <span>→</span></Link>
+            <a className="secondaryButton" href="#builder">Build a Governed Service Pathway</a>
             <a className="secondaryButton" href="#market">Compare the Market</a>
           </div>
         </div>
@@ -764,7 +767,7 @@ export default function AiGovernancePricingPage() {
           {[
             ["Typical consultancy", "Assessment, policy package, maturity score, or advisory report."],
             ["Typical platform", "Inventory, workflow, dashboard, control mapping, and monitoring."],
-            ["TA-14 Authority", "Registration, evidence, review, demonstration, artifact, execution, outcome, and permanent institutional history."],
+            ["TA-14 Authority", "Free entity registration, followed by optional paid evidence, review, demonstration, artifact, execution, outcome, and continuity pathways."],
           ].map(([title, copy], index) => (
             <article className={index === 2 ? "categoryFeatured" : ""} key={title}>
               <span>0{index + 1}</span>
@@ -775,13 +778,49 @@ export default function AiGovernancePricingPage() {
         </div>
       </section>
 
+
+
+      <section className="freeRegistration shell" aria-labelledby="free-registration-title">
+        <div className="freeRegistrationCopy">
+          <p className="eyebrow">FREE GOVERNANCE ENTITY REGISTRATION</p>
+          <h2 id="free-registration-title">Put your governance architecture on the institutional record without paying TA-14.</h2>
+          <p>
+            Registration is the open front door to the TA-14 AI Governance Exchange. An entity may identify its owners and
+            stewards, describe its governance system, declare bounded capabilities and non-claims, identify versions and
+            authority, and connect its supporting public record—including DOIs, Zenodo deposits, patents, publications,
+            repositories, standards work, demonstrations, and other attributable evidence references.
+          </p>
+          <div className="freeRegistrationActions">
+            <Link className="primaryButton" href="/workspace/ai-governance/registry/register">Start Free Registration <span>→</span></Link>
+            <Link className="secondaryButton" href="/workspace/ai-governance/registry/directory">Explore Registered Entities</Link>
+          </div>
+        </div>
+        <div className="registrationBoundary">
+          <div className="freeBadge">$0</div>
+          <h3>What free registration establishes</h3>
+          <ul>
+            <li>Attributable governance entity identity and stewardship</li>
+            <li>Declared architecture, capabilities, claims, non-claims, and boundaries</li>
+            <li>DOI, Zenodo, patent, publication, repository, and standards references</li>
+            <li>Version, ownership, rights, public-contact, and lifecycle information</li>
+            <li>A TA-14 governance entity registration record and identifier</li>
+          </ul>
+          <div className="notReviewBoundary">
+            <strong>Registration is not review.</strong>
+            <span>It does not mean TA-14 has verified, endorsed, certified, demonstrated, or approved the entity or any declared claim.</span>
+          </div>
+        </div>
+      </section>
+
       <section className="builder shell" id="builder">
         <div className="builderIntro">
           <p className="eyebrow">GUIDED GOVERNANCE CONFIGURATOR</p>
           <h2>Tell us what must be governed.</h2>
           <p>
-            Choose the pathway, consequence level, evidence condition, publication boundary, and independent review
-            level. Your institutional scope and price update immediately.
+            Free entity registration is separate and available above. Use this configurator only when TA-14 is being asked
+            to perform paid institutional work: evidence preparation, bounded review, demonstration, artifact creation,
+            regulatory readiness, independent specialist participation, or continuing governance. Your scope and price
+            update immediately.
           </p>
         </div>
 
@@ -825,7 +864,7 @@ export default function AiGovernancePricingPage() {
             {step === 1 && (
               <div className="questionBlock">
                 <p className="questionNumber">QUESTION 1 OF 5</p>
-                <h3>What are you trying to accomplish?</h3>
+                <h3>What paid institutional work should follow registration?</h3>
                 <div className="choiceGrid pathwayChoices">
                   {pathways.map((item) => (
                     <button
@@ -837,7 +876,7 @@ export default function AiGovernancePricingPage() {
                       <small>{item.eyebrow}</small>
                       <strong>{item.title}</strong>
                       <span>{item.description}</span>
-                      <em>Starting at {money(startingPrice(item))}</em>
+                      <em>{item.id === "registry" ? "Free registration required first · Paid service starts at " : "Starting at "}{money(startingPrice(item))}</em>
                     </button>
                   ))}
                 </div>
@@ -932,7 +971,7 @@ export default function AiGovernancePricingPage() {
 
           <aside className="liveSummary">
             <div className="summaryTopline">
-              <span>YOUR GOVERNANCE PATHWAY</span>
+              <span>YOUR PAID GOVERNANCE PATHWAY</span>
               <i>LIVE</i>
             </div>
             <h3>{pathway.title}</h3>
@@ -1095,7 +1134,7 @@ export default function AiGovernancePricingPage() {
         <div className="marketTable">
           <div className="marketHead"><span>Governance need</span><span>Comparable enterprise engagement</span><span>TA-14 pathway</span><span>What remains governed</span></div>
           {[
-            ["Governance entity registration", "$2,500–$10,000+", "Starting at $800", "Identity, authority, claims, evidence, review, identifier, lifecycle"],
+            ["Registered entity evidence + institutional review", "$2,500–$10,000+", "Starting at $800", "Evidence organization, authority analysis, bounded review, enhanced projection, continuity"],
             ["Bounded specialist review", "$7,500–$25,000", "Starting at $2,400", "Question, admitted evidence, reviewer rationale, determination, limitations"],
             ["Governed demonstration", "$20,000–$75,000", "Starting at $6,400", "Scope, route, evidence, observation, artifact, case-study boundary"],
             ["Execution artifact", "$5,000–$15,000", "Starting at $1,600", "Action, evidence, authority, determination, execution, outcome, integrity"],
@@ -1302,10 +1341,11 @@ export default function AiGovernancePricingPage() {
         <div>
           <p className="eyebrow">THE FULL INSTITUTIONAL CHAIN</p>
           <h2>Do not buy another governance promise. Build a record that can be inspected.</h2>
-          <p>Register the entity. Bound the claim. Preserve the evidence. Govern the review. Demonstrate the capability. Record the execution and outcome.</p>
+          <p>Register the entity for free. Then, when governed work is required, bound the claim, preserve the evidence, conduct the review, demonstrate the capability, and record execution and outcome.</p>
         </div>
         <div className="finalActions">
-          <a className="primaryButton" href="#builder">Build Your Pathway <span>→</span></a>
+          <Link className="primaryButton" href="/workspace/ai-governance/registry/register">Register Governance Free <span>→</span></Link>
+          <a className="secondaryButton" href="#builder">Build a Paid Pathway</a>
           <Link className="secondaryButton" href="/workspace/entity-review">Request Scope Review</Link>
         </div>
       </section>
@@ -1384,7 +1424,7 @@ export default function AiGovernancePricingPage() {
         .ringTwo { width: 500px; height: 500px; }
         .chainNode { position: absolute; min-width: 92px; padding: 8px 10px; border-radius: 999px; color: #dceeff; border: 1px solid rgba(96,179,255,.24); background: rgba(6,15,29,.92); text-align: center; font-size: 11px; font-weight: 900; z-index: 4; box-shadow: 0 10px 32px rgba(0,0,0,.2); }
         .node1 { top: 18px; left: 50%; transform: translateX(-50%); }.node2 { top: 95px; right: 34px; }.node3 { top: 50%; right: -2px; transform: translateY(-50%); }.node4 { bottom: 95px; right: 34px; }.node5 { bottom: 18px; left: 50%; transform: translateX(-50%); }.node6 { bottom: 95px; left: 34px; }.node7 { top: 50%; left: -2px; transform: translateY(-50%); }.node8 { top: 95px; left: 34px; }
-        .categoryStatement, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture, .finalCta { border: 1px solid rgba(131,155,189,.16); background: linear-gradient(180deg, rgba(12,21,36,.91), rgba(7,13,24,.95)); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,.24); }
+        .categoryStatement, .freeRegistration, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture, .finalCta { border: 1px solid rgba(131,155,189,.16); background: linear-gradient(180deg, rgba(12,21,36,.91), rgba(7,13,24,.95)); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,.24); }
         .categoryStatement { padding: 54px; }
         .categoryStatement h2, .builderIntro h2, .sectionIntro h2, .partnerHero h2, .workspaceHeader h2, .checkoutArchitecture h2, .finalCta h2 { margin: 14px 0 16px; font-size: clamp(34px, 5vw, 60px); line-height: 1.03; letter-spacing: -.05em; }
         .categoryGrid { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; margin-top: 32px; }
@@ -1393,7 +1433,19 @@ export default function AiGovernancePricingPage() {
         .categoryGrid span { color: #69b5ff; font-size: 11px; font-weight: 950; letter-spacing: .15em; }
         .categoryGrid h3 { margin: 15px 0 10px; font-size: 24px; }
         .categoryGrid p, .builderIntro p, .sectionIntro p, .partnerHero p, .checkoutArchitecture p, .finalCta p { color: #9fafc2; line-height: 1.68; }
-        .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture { margin-top: 24px; padding: 44px; }
+        .freeRegistration, .builder, .market, .partnerNetwork, .membership, .workspace, .checkoutArchitecture { margin-top: 24px; padding: 44px; }
+        .freeRegistration { display:grid; grid-template-columns:1.15fr .85fr; gap:28px; align-items:center; }
+        .freeRegistration h2 { margin:14px 0 16px; font-size:clamp(36px,5vw,64px); line-height:1.02; letter-spacing:-.055em; }
+        .freeRegistrationCopy > p:last-of-type { color:#9fafc2; font-size:17px; line-height:1.7; }
+        .freeRegistrationActions { display:flex; flex-wrap:wrap; gap:12px; margin-top:26px; }
+        .registrationBoundary { padding:26px; border-radius:22px; border:1px solid rgba(103,205,160,.32); background:linear-gradient(180deg,rgba(55,172,119,.1),rgba(5,14,25,.82)); }
+        .freeBadge { width:72px; height:72px; display:grid; place-items:center; border-radius:50%; color:#06120d; background:linear-gradient(135deg,#6ee0ad,#d7ffeb); font-size:25px; font-weight:950; box-shadow:0 0 34px rgba(95,218,164,.2); }
+        .registrationBoundary h3 { margin:20px 0 12px; font-size:25px; }
+        .registrationBoundary ul { margin:0; padding-left:20px; color:#bdd2c8; }
+        .registrationBoundary li { margin:9px 0; line-height:1.5; }
+        .notReviewBoundary { display:grid; gap:5px; margin-top:20px; padding:15px; border-radius:14px; border:1px solid rgba(255,196,103,.22); background:rgba(217,151,46,.06); }
+        .notReviewBoundary strong { color:#ffd18b; }
+        .notReviewBoundary span { color:#b9aa90; font-size:12px; line-height:1.5; }
         .builderIntro { max-width: 960px; }
         .profileSelector { margin-top: 28px; padding: 20px; border-radius: 20px; border: 1px solid rgba(102,185,255,.22); background: linear-gradient(180deg,rgba(66,142,224,.08),rgba(4,11,22,.72)); }
         .profileSelectorIntro { display: grid; gap: 6px; }
@@ -1538,8 +1590,8 @@ export default function AiGovernancePricingPage() {
         .recordFooter span { color:#8ea3b7; font-size:12px; line-height:1.55; }
 
         @keyframes starDrift { from{transform:translate3d(0,0,0)} to{transform:translate3d(90px,140px,0)} } @keyframes glowMove { from{transform:translate3d(0,0,0) scale(1)} to{transform:translate3d(55px,35px,0) scale(1.1)} }
-        @media(max-width:1080px){ nav{display:none}.routeRail{grid-template-columns:repeat(4,minmax(0,1fr))}.routeRail article:nth-child(4) i{display:none}.documentGrid,.costArchitecture{grid-template-columns:1fr}.documentCommercial{border-left:0;border-top:1px solid rgba(121,156,191,.16)}.preservationGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.costComparison{max-width:800px}.recordRow{grid-template-columns:42px 130px 1fr}.recordRow em{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
-        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.profileOptions,.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
+        @media(max-width:1080px){ nav{display:none}.freeRegistration{grid-template-columns:1fr}.routeRail{grid-template-columns:repeat(4,minmax(0,1fr))}.routeRail article:nth-child(4) i{display:none}.documentGrid,.costArchitecture{grid-template-columns:1fr}.documentCommercial{border-left:0;border-top:1px solid rgba(121,156,191,.16)}.preservationGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.costComparison{max-width:800px}.recordRow{grid-template-columns:42px 130px 1fr}.recordRow em{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
+        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.freeRegistration,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.profileOptions,.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
       `}</style>
     </main>
   );
