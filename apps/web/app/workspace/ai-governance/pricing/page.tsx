@@ -912,19 +912,29 @@ export default function AiGovernancePricingPage() {
           <h2>Join the institution as a reviewer, governance entity, or institutional partner.</h2>
         </div>
         <div className="membershipGrid">
-          {partnerMemberships.map((item) => (
-            <article key={item.title}>
-              <span>{item.price}</span>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-              <ul>{item.included.map((included) => <li key={included}>{included}</li>)}</ul>
-              {item.productId ? (
-                <button type="button" className="cardCheckout" onClick={() => openCheckout(item.productId)}>Join with PayPal</button>
-              ) : (
-                <Link href="/workspace/ai-governance/partner-review-network">Explore participation <b>→</b></Link>
-              )}
-            </article>
-          ))}
+          {partnerMemberships.map((item) => {
+            const productId = item.productId;
+
+            return (
+              <article key={item.title}>
+                <span>{item.price}</span>
+                <h3>{item.title}</h3>
+                <p>{item.description}</p>
+                <ul>{item.included.map((included) => <li key={included}>{included}</li>)}</ul>
+                {productId ? (
+                  <button
+                    type="button"
+                    className="cardCheckout"
+                    onClick={() => openCheckout(productId)}
+                  >
+                    Join with PayPal
+                  </button>
+                ) : (
+                  <Link href="/workspace/ai-governance/partner-review-network">Explore participation <b>→</b></Link>
+                )}
+              </article>
+            );
+          })}
         </div>
       </section>
 
