@@ -17,36 +17,36 @@ const jurisdictions = [
     subtitle: "Federal and state governance",
     description:
       "Track executive, agency, sector, procurement, civil-rights, consumer-protection, and state-level AI governance sources without collapsing them into one national rule.",
-    href: "/workspace/ai-governance/library/laws/united-states",
+    href: "/governance-library/jurisdiction/united-states",
     action: "Explore United States",
-    status: "Module planned",
+    status: "Available",
   },
   {
     title: "Canada",
     subtitle: "Federal and provincial governance",
     description:
       "Review Canadian legislation, policy instruments, privacy obligations, automated-decision requirements, and evolving AI accountability structures.",
-    href: "/workspace/ai-governance/library/laws/canada",
+    href: "/governance-library/jurisdiction/canada",
     action: "Explore Canada",
-    status: "Module planned",
+    status: "Available",
   },
   {
     title: "United Kingdom",
     subtitle: "Principles-led regulatory approach",
     description:
       "Examine regulator-led AI governance, sector obligations, safety expectations, assurance activity, and the relationship between guidance and enforceable duties.",
-    href: "/workspace/ai-governance/library/laws/united-kingdom",
+    href: "/governance-library/jurisdiction/united-kingdom",
     action: "Explore United Kingdom",
-    status: "Module planned",
+    status: "Available",
   },
   {
     title: "Other Jurisdictions",
     subtitle: "Global legal map",
     description:
       "Navigate country and regional AI laws while preserving jurisdiction, effective date, legal force, regulated role, sector, and version boundaries.",
-    href: "/workspace/ai-governance/library/laws/global",
+    href: "/governance-library/jurisdiction",
     action: "Open global map",
-    status: "Module planned",
+    status: "Available",
   },
 ];
 
@@ -157,23 +157,10 @@ export default function LawsAndRegulationsPage() {
               <p className="subtitle">{item.subtitle}</p>
               <h3>{item.title}</h3>
               <p>{item.description}</p>
-              {item.status === "Available" ? (
-                <Link href={item.href}>
-                  {item.action}
-                  <span>→</span>
-                </Link>
-              ) : (
-                <button
-                  type="button"
-                  className="plannedButton"
-                  disabled
-                  aria-disabled="true"
-                  title="This jurisdiction module is currently under development."
-                >
-                  Coming Soon
-                  <span>→</span>
-                </button>
-              )}
+              <Link href={item.href}>
+                {item.action}
+                <span>→</span>
+              </Link>
             </article>
           ))}
         </div>
@@ -301,19 +288,7 @@ export default function LawsAndRegulationsPage() {
         .jurisdictionGrid article:hover { transform: translateY(-5px); border-color: rgba(95,221,205,.46); }
         .cardTop { display: flex; justify-content: space-between; gap: 16px; align-items: center; }
         .number { color: #61dccb; font-size: 12px; font-weight: 900; letter-spacing: .16em; }
-        .plannedButton {
-        display:inline-flex;
-        align-items:center;
-        gap:.45rem;
-        padding:.8rem 1rem;
-        border-radius:999px;
-        border:1px solid rgba(255,255,255,.14);
-        background:rgba(255,255,255,.05);
-        color:rgba(255,255,255,.65);
-        cursor:not-allowed;
-      }
-
-      .status { padding: 6px 9px; border-radius: 999px; border: 1px solid rgba(113,224,210,.16); color: #9fcfc8; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
+        .status { padding: 6px 9px; border-radius: 999px; border: 1px solid rgba(113,224,210,.16); color: #9fcfc8; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: .1em; }
         .subtitle { margin: 24px 0 0; color: #e1bd75 !important; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .13em; }
         .jurisdictionGrid h3 { margin: 10px 0 12px; font-size: 30px; letter-spacing: -.03em; }
         .jurisdictionGrid article > p:not(.subtitle) { color: #9eafc2; line-height: 1.65; }
