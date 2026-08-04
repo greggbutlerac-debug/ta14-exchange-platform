@@ -50,8 +50,6 @@ import type {
   OperationalHandoffState,
   ProjectionClass,
   SimulationState,
-  ValidationIssue,
-  ValidationResult,
 } from "./lesson-contracts";
 
 import {
@@ -761,9 +759,19 @@ export type AcademyEventValidationCode =
   | "boundary_mismatch"
   | "engine_version_mismatch";
 
-export interface AcademyEventValidationIssue
-  extends ValidationIssue {
+export interface AcademyEventValidationIssue {
+  readonly path: string;
   readonly code: AcademyEventValidationCode;
+  readonly message: string;
+  readonly severity: "error" | "warning";
+  readonly received?: unknown;
+  readonly expected?: string;
+}
+
+export interface AcademyEventValidationResult<T> {
+  readonly ok: boolean;
+  readonly value?: T;
+  readonly issues: readonly AcademyEventValidationIssue[];
 }
 
 export class AcademyEventValidationError extends Error {
@@ -781,7 +789,7 @@ export class AcademyEventValidationError extends Error {
 
 export function validateAcademyEvent(
   input: unknown,
-): ValidationResult<AcademyEvent> {
+): AcademyEventValidationResult<AcademyEvent> {
   const issues: AcademyEventValidationIssue[] = [];
 
   if (!isPlainObject(input)) {
