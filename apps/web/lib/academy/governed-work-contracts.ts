@@ -2617,7 +2617,7 @@ export const governanceReviewWorkDefinition:
       "authorized_reviewer",
       "academy_standards_reviewer",
       "institutional_administrator",
-      "evidence_steward",
+      "artifact_steward",
     ],
 
     allowedRecordTypes: [
