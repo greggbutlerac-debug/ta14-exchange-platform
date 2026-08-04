@@ -1,34 +1,67 @@
+import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
+export const runtime = 'nodejs';
 
-type ReviewDecision =
-  | 'return_for_correction'
-  | 'hold'
-  | 'escalate'
-  | 'accept_for_registration';
+type PayPalEnvironment = 'sandbox' | 'live';
 
-type ReviewDecisionRequestBody = {
-  submissionId?: string;
-  decision?: ReviewDecision;
-  rationale?: string;
-  notes?: string;
+type ProductId =
+  | 'preserved-governed-run'
+  | 'independent-partner-review'
+  | 'dual-partner-review'
+  | 'architecture-demonstration'
+  | 'multidisciplinary-review-panel'
+  | 'exchange-pro-monthly'
+  | 'exchange-pro-annual'
+  | 'organization-monthly'
+  | 'organization-annual'
+  | 'verified-network-partner-annual'
+  | 'governance-entity-partner-annual'
+  | 'institutional-partner-annual';
+
+type CatalogProduct = {
+  id: ProductId;
+  name: string;
+  description: string;
+  price: string;
+  currency: 'USD';
+  category: 'preservation' | 'review' | 'demonstration' | 'workspace' | 'partner-network';
+  billing: 'one-time' | 'monthly' | 'annual';
 };
 
-type ReviewDecisionResult = {
-  submission_id: string;
-  status: string;
-  review_decision: string;
-  reviewed_at: string;
-  accepted_at: string | null;
+type CreateOrderRequestBody = {
+  productId?: string;
+  customerReference?: string;
 };
 
-type SupabaseErrorPayload = {
-  code?: string;
+type PayPalAccessTokenResponse = {
+  access_token?: string;
+  token_type?: string;
+  expires_in?: number;
+};
+
+type PayPalOrderResponse = {
+  id?: string;
+  status?: string;
+  links?: Array<{
+    href?: string;
+    rel?: string;
+    method?: string;
+  }>;
+};
+
+type PayPalErrorResponse = {
+  name?: string;
   message?: string;
-  details?: string | null;
-  hint?: string | null;
+  debug_id?: string;
+  details?: Array<{
+    issue?: string;
+    description?: string;
+    field?: string;
+    value?: string;
+  }>;
 };
 
 const NO_STORE_HEADERS = {
@@ -36,326 +69,409 @@ const NO_STORE_HEADERS = {
   'X-Content-Type-Options': 'nosniff',
 };
 
+const PRODUCT_CATALOG: Record<ProductId, CatalogProduct> = {
+  'preserved-governed-run': {
+    id: 'preserved-governed-run',
+    name: 'Preserved Governed Run',
+    description:
+      'One attributable, replayable governed route record with preserved evidence references and decision history.',
+    price: '9.00',
+    currency: 'USD',
+    category: 'preservation',
+    billing: 'one-time',
+  },
+  'independent-partner-review': {
+    id: 'independent-partner-review',
+    name: 'Independent Partner Review',
+    description:
+      'One bounded independent review through the TA-14 Partner Review Network.',
+    price: '995.00',
+    currency: 'USD',
+    category: 'review',
+    billing: 'one-time',
+  },
+  'dual-partner-review': {
+    id: 'dual-partner-review',
+    name: 'Dual-Partner Review',
+    description:
+      'Two independent bounded reviews with preserved agreement, disagreement, and TA-14 synthesis.',
+    price: '1995.00',
+    currency: 'USD',
+    category: 'review',
+    billing: 'one-time',
+  },
+  'architecture-demonstration': {
+    id: 'architecture-demonstration',
+    name: 'Architecture-to-Architecture Demonstration',
+    description:
+      'A governed demonstration of one bounded capability through the TA-14 AI Governance Exchange.',
+    price: '2495.00',
+    currency: 'USD',
+    category: 'demonstration',
+    billing: 'one-time',
+  },
+  'multidisciplinary-review-panel': {
+    id: 'multidisciplinary-review-panel',
+    name: 'Multidisciplinary Review Panel',
+    description:
+      'A governed review panel involving multiple independent domain perspectives.',
+    price: '3995.00',
+    currency: 'USD',
+    category: 'review',
+    billing: 'one-time',
+  },
+  'exchange-pro-monthly': {
+    id: 'exchange-pro-monthly',
+    name: 'TA-14 Exchange Pro — Monthly',
+    description:
+      'Professional workspace access for building, preserving, comparing, and improving governed routes.',
+    price: '99.00',
+    currency: 'USD',
+    category: 'workspace',
+    billing: 'monthly',
+  },
+  'exchange-pro-annual': {
+    id: 'exchange-pro-annual',
+    name: 'TA-14 Exchange Pro — Annual',
+    description:
+      'Annual professional workspace access for governed route construction and preservation.',
+    price: '990.00',
+    currency: 'USD',
+    category: 'workspace',
+    billing: 'annual',
+  },
+  'organization-monthly': {
+    id: 'organization-monthly',
+    name: 'TA-14 Organization Workspace — Monthly',
+    description:
+      'Organization-level governance workspace access for teams, systems, records, and review workflows.',
+    price: '499.00',
+    currency: 'USD',
+    category: 'workspace',
+    billing: 'monthly',
+  },
+  'organization-annual': {
+    id: 'organization-annual',
+    name: 'TA-14 Organization Workspace — Annual',
+    description:
+      'Annual organization-level governance workspace access for teams and controlled review workflows.',
+    price: '4990.00',
+    currency: 'USD',
+    category: 'workspace',
+    billing: 'annual',
+  },
+  'verified-network-partner-annual': {
+    id: 'verified-network-partner-annual',
+    name: 'Verified Network Partner — Annual',
+    description:
+      'Annual Partner Review Network participation for an independently verified reviewer or specialist.',
+    price: '795.00',
+    currency: 'USD',
+    category: 'partner-network',
+    billing: 'annual',
+  },
+  'governance-entity-partner-annual': {
+    id: 'governance-entity-partner-annual',
+    name: 'Governance Entity Partner — Annual',
+    description:
+      'Annual Partner Review Network participation for an AI governance entity or architecture owner.',
+    price: '1995.00',
+    currency: 'USD',
+    category: 'partner-network',
+    billing: 'annual',
+  },
+  'institutional-partner-annual': {
+    id: 'institutional-partner-annual',
+    name: 'Institutional Partner — Annual',
+    description:
+      'Annual Partner Review Network participation for a university, research group, standards body, or institution.',
+    price: '3995.00',
+    currency: 'USD',
+    category: 'partner-network',
+    billing: 'annual',
+  },
+};
+
+function jsonResponse(body: Record<string, unknown>, status: number) {
+  return NextResponse.json(body, {
+    status,
+    headers: NO_STORE_HEADERS,
+  });
+}
+
 function requiredEnvironment() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, '');
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const clientId = process.env.PAYPAL_CLIENT_ID?.trim();
+  const clientSecret = process.env.PAYPAL_CLIENT_SECRET?.trim();
+  const environmentValue = process.env.PAYPAL_ENVIRONMENT?.trim().toLowerCase();
 
-  if (!supabaseUrl || !supabaseAnonKey) {
+  const environment: PayPalEnvironment =
+    environmentValue === 'sandbox' ? 'sandbox' : 'live';
+
+  if (!clientId || !clientSecret) {
     return null;
   }
 
-  return { supabaseUrl, supabaseAnonKey };
-}
-
-function bearerToken(request: NextRequest) {
-  const authorization = request.headers.get('authorization');
-
-  if (!authorization?.toLowerCase().startsWith('bearer ')) {
-    return null;
-  }
-
-  const token = authorization.slice(7).trim();
-  return token || null;
-}
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
-    value,
-  );
-}
-
-function isReviewDecision(value: unknown): value is ReviewDecision {
-  return (
-    value === 'return_for_correction' ||
-    value === 'hold' ||
-    value === 'escalate' ||
-    value === 'accept_for_registration'
-  );
-}
-
-function isSupabaseErrorPayload(value: unknown): value is SupabaseErrorPayload {
-  return typeof value === 'object' && value !== null;
-}
-
-function supabaseCode(payload: unknown) {
-  if (!isSupabaseErrorPayload(payload)) return null;
-  return typeof payload.code === 'string' ? payload.code : null;
-}
-
-function errorStatusFromSupabase(status: number, payload: unknown) {
-  const code = supabaseCode(payload);
-
-  if (code === '42501') return 403;
-  if (code === 'P0002') return 404;
-  if (code === '23514') return 409;
-  if (code === '22023') return 400;
-  if (code === 'PGRST202') return 503;
-
-  if (status === 400) return 400;
-  if (status === 401) return 401;
-  if (status === 403) return 403;
-  if (status === 404) return 404;
-
-  return 500;
-}
-
-function publicError(status: number) {
-  if (status === 400) {
-    return {
-      error: 'INVALID_REVIEW_DECISION',
-      message: 'The requested Registry review decision is invalid.',
-    };
-  }
-
-  if (status === 401) {
-    return {
-      error: 'AUTHENTICATION_REQUIRED',
-      message: 'The reviewer session is missing or expired.',
-    };
-  }
-
-  if (status === 403) {
-    return {
-      error: 'REVIEWER_AUTHORITY_REQUIRED',
-      message: 'Only an authorized TA-14 Registry reviewer may issue this decision.',
-    };
-  }
-
-  if (status === 404) {
-    return {
-      error: 'REGISTRY_SUBMISSION_NOT_FOUND',
-      message: 'The requested Registry submission was not found.',
-    };
-  }
-
-  if (status === 409) {
-    return {
-      error: 'REGISTRY_REVIEW_DECISION_BLOCKED',
-      message: 'The Registry submission is not eligible for this review decision.',
-    };
-  }
-
-  if (status === 503) {
-    return {
-      error: 'REGISTRY_REVIEW_FUNCTION_NOT_INSTALLED',
-      message: 'The controlled Registry review decision function is unavailable.',
-    };
-  }
+  const apiBase =
+    environment === 'sandbox'
+      ? 'https://api-m.sandbox.paypal.com'
+      : 'https://api-m.paypal.com';
 
   return {
-    error: 'REGISTRY_REVIEW_DECISION_FAILED',
-    message: 'The Registry review decision could not be recorded.',
+    clientId,
+    clientSecret,
+    environment,
+    apiBase,
   };
 }
 
-function isReviewDecisionResult(value: unknown): value is ReviewDecisionResult {
-  if (typeof value !== 'object' || value === null) return false;
+function isProductId(value: string): value is ProductId {
+  return Object.prototype.hasOwnProperty.call(PRODUCT_CATALOG, value);
+}
 
-  const row = value as Partial<ReviewDecisionResult>;
+function normalizeCustomerReference(value: unknown) {
+  if (typeof value !== 'string') return null;
 
-  return (
-    typeof row.submission_id === 'string' &&
-    typeof row.status === 'string' &&
-    typeof row.review_decision === 'string' &&
-    typeof row.reviewed_at === 'string' &&
-    (row.accepted_at === null || typeof row.accepted_at === 'string')
-  );
+  const normalized = value.trim().replace(/[^a-zA-Z0-9._:@+-]/g, '-').slice(0, 80);
+  return normalized || null;
+}
+
+function basicAuthorization(clientId: string, clientSecret: string) {
+  return Buffer.from(`${clientId}:${clientSecret}`, 'utf8').toString('base64');
+}
+
+async function parseResponseBody(response: Response) {
+  const rawBody = await response.text();
+
+  if (!rawBody) return null;
+
+  try {
+    return JSON.parse(rawBody) as unknown;
+  } catch {
+    return rawBody;
+  }
+}
+
+function isPayPalErrorResponse(value: unknown): value is PayPalErrorResponse {
+  return typeof value === 'object' && value !== null;
+}
+
+async function getPayPalAccessToken(
+  environment: NonNullable<ReturnType<typeof requiredEnvironment>>,
+) {
+  const response = await fetch(`${environment.apiBase}/v1/oauth2/token`, {
+    method: 'POST',
+    cache: 'no-store',
+    headers: {
+      Authorization: `Basic ${basicAuthorization(
+        environment.clientId,
+        environment.clientSecret,
+      )}`,
+      Accept: 'application/json',
+      'Accept-Language': 'en_US',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: 'grant_type=client_credentials',
+  });
+
+  const payload = await parseResponseBody(response);
+
+  if (!response.ok) {
+    console.error('TA14_PAYPAL_ACCESS_TOKEN_ERROR', {
+      upstreamStatus: response.status,
+      environment: environment.environment,
+      payload,
+    });
+
+    throw new Error('PayPal access token request failed.');
+  }
+
+  const tokenPayload = payload as PayPalAccessTokenResponse;
+
+  if (typeof tokenPayload.access_token !== 'string' || !tokenPayload.access_token) {
+    console.error('TA14_PAYPAL_ACCESS_TOKEN_INVALID_RESPONSE', {
+      environment: environment.environment,
+      payload,
+    });
+
+    throw new Error('PayPal returned an invalid access token response.');
+  }
+
+  return tokenPayload.access_token;
 }
 
 export async function POST(request: NextRequest) {
   const environment = requiredEnvironment();
 
   if (!environment) {
-    return NextResponse.json(
+    return jsonResponse(
       {
-        error: 'REGISTRY_CONFIGURATION_MISSING',
+        error: 'PAYPAL_CONFIGURATION_MISSING',
         message:
-          'NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required for Registry review decisions.',
+          'PAYPAL_CLIENT_ID and PAYPAL_CLIENT_SECRET are required to create PayPal orders.',
       },
-      {
-        status: 503,
-        headers: NO_STORE_HEADERS,
-      },
+      503,
     );
   }
 
-  const accessToken = bearerToken(request);
-
-  if (!accessToken) {
-    return NextResponse.json(
-      {
-        error: 'AUTHENTICATION_REQUIRED',
-        message: 'A signed-in Registry reviewer session is required.',
-      },
-      {
-        status: 401,
-        headers: NO_STORE_HEADERS,
-      },
-    );
-  }
-
-  let body: ReviewDecisionRequestBody;
+  let body: CreateOrderRequestBody;
 
   try {
-    body = (await request.json()) as ReviewDecisionRequestBody;
+    body = (await request.json()) as CreateOrderRequestBody;
   } catch {
-    return NextResponse.json(
+    return jsonResponse(
       {
         error: 'INVALID_REQUEST_BODY',
         message: 'The request body must be valid JSON.',
       },
-      {
-        status: 400,
-        headers: NO_STORE_HEADERS,
-      },
+      400,
     );
   }
 
-  const submissionId = body.submissionId?.trim() ?? '';
-  const rationale = body.rationale?.trim() ?? '';
-  const notes = body.notes?.trim() ?? '';
+  const requestedProductId = body.productId?.trim() ?? '';
 
-  if (!isUuid(submissionId)) {
-    return NextResponse.json(
+  if (!isProductId(requestedProductId)) {
+    return jsonResponse(
       {
-        error: 'INVALID_SUBMISSION_ID',
-        message: 'A valid Registry submission UUID is required.',
+        error: 'INVALID_PAYPAL_PRODUCT',
+        message: 'Select a supported TA-14 product or governed service pathway.',
+        supportedProductIds: Object.keys(PRODUCT_CATALOG),
       },
-      {
-        status: 400,
-        headers: NO_STORE_HEADERS,
-      },
+      400,
     );
   }
 
-  if (!isReviewDecision(body.decision)) {
-    return NextResponse.json(
-      {
-        error: 'INVALID_REVIEW_DECISION',
-        message: 'Select a supported Registry review decision.',
-      },
-      {
-        status: 400,
-        headers: NO_STORE_HEADERS,
-      },
-    );
-  }
-
-  if (rationale.length < 20) {
-    return NextResponse.json(
-      {
-        error: 'RATIONALE_REQUIRED',
-        message: 'Reviewer rationale must contain at least 20 characters.',
-      },
-      {
-        status: 400,
-        headers: NO_STORE_HEADERS,
-      },
-    );
-  }
+  const product = PRODUCT_CATALOG[requestedProductId];
+  const customerReference = normalizeCustomerReference(body.customerReference);
+  const orderReference = `TA14-${randomUUID()}`;
+  const invoiceId = `TA14-${Date.now()}-${randomUUID().slice(0, 8)}`;
 
   try {
-    const response = await fetch(
-      `${environment.supabaseUrl}/rest/v1/rpc/ta14_registry_record_review_decision_v2`,
-      {
-        method: 'POST',
-        cache: 'no-store',
-        headers: {
-          apikey: environment.supabaseAnonKey,
-          Authorization: `Bearer ${accessToken}`,
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          request: {
-            submission_id: submissionId,
-            decision: body.decision,
-            rationale,
-            notes: notes || null,
-          },
-        }),
+    const accessToken = await getPayPalAccessToken(environment);
+
+    const response = await fetch(`${environment.apiBase}/v2/checkout/orders`, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        'PayPal-Request-Id': orderReference,
+        Prefer: 'return=representation',
       },
-    );
+      body: JSON.stringify({
+        intent: 'CAPTURE',
+        purchase_units: [
+          {
+            reference_id: product.id,
+            custom_id: customerReference
+              ? `${product.id}:${customerReference}`
+              : product.id,
+            invoice_id: invoiceId,
+            description: product.name,
+            amount: {
+              currency_code: product.currency,
+              value: product.price,
+              breakdown: {
+                item_total: {
+                  currency_code: product.currency,
+                  value: product.price,
+                },
+              },
+            },
+            items: [
+              {
+                name: product.name,
+                description: product.description,
+                unit_amount: {
+                  currency_code: product.currency,
+                  value: product.price,
+                },
+                quantity: '1',
+                category: 'DIGITAL_GOODS',
+              },
+            ],
+          },
+        ],
+        application_context: {
+          brand_name: 'TA-14 Authority',
+          landing_page: 'NO_PREFERENCE',
+          user_action: 'PAY_NOW',
+          shipping_preference: 'NO_SHIPPING',
+        },
+      }),
+    });
 
-    const rawBody = await response.text();
-    let payload: unknown = null;
-
-    if (rawBody) {
-      try {
-        payload = JSON.parse(rawBody);
-      } catch {
-        payload = rawBody;
-      }
-    }
+    const payload = await parseResponseBody(response);
 
     if (!response.ok) {
-      const status = errorStatusFromSupabase(response.status, payload);
-      const mapped = publicError(status);
-
-      console.error('TA14_REGISTRY_REVIEW_RPC_ERROR', {
+      console.error('TA14_PAYPAL_CREATE_ORDER_ERROR', {
+        productId: product.id,
+        environment: environment.environment,
         upstreamStatus: response.status,
-        mappedStatus: status,
-        rpc: 'ta14_registry_record_review_decision_v2',
-        submissionId,
-        decision: body.decision,
         payload,
       });
 
-      return NextResponse.json(
+      return jsonResponse(
         {
-          ...mapped,
+          error: 'PAYPAL_ORDER_CREATION_FAILED',
+          message: 'PayPal could not create the payment order.',
           detail: payload,
           diagnostic: {
+            productId: product.id,
             upstreamStatus: response.status,
-            mappedStatus: status,
-            rpc: 'ta14_registry_record_review_decision_v2',
+            paypalDebugId: isPayPalErrorResponse(payload)
+              ? payload.debug_id ?? null
+              : null,
           },
         },
-        {
-          status,
-          headers: NO_STORE_HEADERS,
-        },
+        response.status >= 500 ? 503 : 502,
       );
     }
 
-    if (!isReviewDecisionResult(payload)) {
-      console.error('TA14_REGISTRY_REVIEW_RPC_INVALID_RESPONSE', {
-        rpc: 'ta14_registry_record_review_decision_v2',
-        submissionId,
-        decision: body.decision,
+    const order = payload as PayPalOrderResponse;
+
+    if (typeof order.id !== 'string' || !order.id) {
+      console.error('TA14_PAYPAL_CREATE_ORDER_INVALID_RESPONSE', {
+        productId: product.id,
+        environment: environment.environment,
         payload,
       });
 
-      return NextResponse.json(
+      return jsonResponse(
         {
-          error: 'REGISTRY_REVIEW_RESPONSE_INVALID',
-          message: 'The Registry review function returned an invalid response.',
+          error: 'PAYPAL_ORDER_RESPONSE_INVALID',
+          message: 'PayPal returned an invalid order response.',
           detail: payload,
         },
-        {
-          status: 500,
-          headers: NO_STORE_HEADERS,
-        },
+        502,
       );
     }
 
-    return NextResponse.json(
+    const approvalUrl =
+      order.links?.find((link) => link.rel === 'approve')?.href ?? null;
+
+    return jsonResponse(
       {
-        submissionId: payload.submission_id,
-        status: payload.status,
-        decision: payload.review_decision,
-        reviewedAt: payload.reviewed_at,
-        acceptedAt: payload.accepted_at,
-        message:
-          payload.review_decision === 'accept_for_registration'
-            ? 'The submission has been accepted for Registry finalization.'
-            : 'The bounded Registry review decision has been preserved.',
-        boundary: 'Review is not certification.',
+        orderId: order.id,
+        orderStatus: order.status ?? 'CREATED',
+        approvalUrl,
+        product: {
+          id: product.id,
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          currency: product.currency,
+          category: product.category,
+          billing: product.billing,
+        },
+        invoiceId,
+        customerReference,
+        environment: environment.environment,
+        message: 'The PayPal order was created successfully.',
+        boundary:
+          'Payment purchases only the stated service pathway. It does not purchase certification, approval, admissibility, endorsement, or a favorable governance determination.',
       },
-      {
-        status: 200,
-        headers: NO_STORE_HEADERS,
-      },
+      201,
     );
   } catch (error) {
     const detail =
@@ -366,26 +482,22 @@ export async function POST(request: NextRequest) {
             stack: error.stack ?? null,
           }
         : {
-            message: 'Unknown Registry review service error.',
+            message: 'Unknown PayPal order service error.',
           };
 
-    console.error('TA14_REGISTRY_REVIEW_ROUTE_EXCEPTION', {
-      rpc: 'ta14_registry_record_review_decision_v2',
-      submissionId,
-      decision: body.decision,
+    console.error('TA14_PAYPAL_CREATE_ORDER_ROUTE_EXCEPTION', {
+      productId: product.id,
+      environment: environment.environment,
       detail,
     });
 
-    return NextResponse.json(
+    return jsonResponse(
       {
-        error: 'REGISTRY_REVIEW_DECISION_UNAVAILABLE',
-        message: 'The Registry review decision service is temporarily unavailable.',
+        error: 'PAYPAL_ORDER_SERVICE_UNAVAILABLE',
+        message: 'The PayPal order service is temporarily unavailable.',
         detail,
       },
-      {
-        status: 503,
-        headers: NO_STORE_HEADERS,
-      },
+      503,
     );
   }
 }
