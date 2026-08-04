@@ -1706,8 +1706,11 @@ function validateReturnContextPolicy(
     Array.isArray(value.allowedQueryKeys) &&
     Array.isArray(value.blockedQueryKeys)
   ) {
-    const overlap = value.allowedQueryKeys.filter((key) =>
-      value.blockedQueryKeys.includes(key),
+    const allowedQueryKeys = value.allowedQueryKeys;
+    const blockedQueryKeys = value.blockedQueryKeys;
+
+    const overlap = allowedQueryKeys.filter((key) =>
+      blockedQueryKeys.includes(key),
     );
 
     if (overlap.length > 0) {
