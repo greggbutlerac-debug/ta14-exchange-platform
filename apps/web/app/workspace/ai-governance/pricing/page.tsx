@@ -1,13 +1,13 @@
 /**
  * TA-14 Authority Governance Institution
- * Commercial Experience - Upgraded Full Replacement
+ * Commercial Experience V2 - Institutional Full Replacement
  * Repository path: apps/web/app/workspace/ai-governance/pricing/page.tsx
  *
  * This source preserves the production PayPal create-order and capture-order
  * integration already present in the repository while presenting registration,
  * review, demonstrations, artifacts, regulatory readiness, institutional programs,
  * Partner Review Network participation, workspace plans, governed checkout, and
- * Pay Later messaging, transparent scope-ledger pricing, and financing planning as one institutional engagement experience.
+ * Pay Later messaging, transparent scope-ledger pricing, financing planning, a live institutional route, an engagement-letter preview, deliverable records, and a preserved institutional record preview as one institutional engagement experience.
  */
 
 "use client";
@@ -472,6 +472,44 @@ export default function AiGovernancePricingPage() {
     return Array.from(new Set(items));
   }, [pathway, partner, partnerId, visibility, evidence]);
 
+  const institutionalRoute = useMemo(() => [
+    { stage: "Inquiry", state: "Defined", detail: pathway.title },
+    { stage: "Scope", state: "Live", detail: scopeReference },
+    { stage: "Evidence", state: evidence === "organized" ? "Ready" : "Prepare", detail: `${evidence} evidence condition` },
+    { stage: "Review", state: partnerId === "none" ? "TA-14" : "Independent", detail: partner.title },
+    { stage: "Determination", state: "Bounded", detail: "ALLOW / HOLD / DENY / ESCALATE" },
+    { stage: "Artifact", state: pathwayId === "artifact" || pathwayId === "demonstration" ? "Included" : "Available", detail: "Inspectable governed record" },
+    { stage: "Registry", state: visibility === "private" ? "Private" : visibility === "controlled" ? "Controlled" : "Public", detail: "Versioned institutional history" },
+    { stage: "Continuity", state: "Preserved", detail: "Challenge, correction, and supersession" },
+  ], [pathway.title, scopeReference, evidence, partnerId, partner.title, pathwayId, visibility]);
+
+  const engagementSummary = useMemo(() => ({
+    institution: "TA-14 Authority Governance Institution",
+    engagement: pathway.title,
+    scopeReference,
+    consequence: consequence.replace("-", " "),
+    evidence,
+    visibility,
+    review: partner.title,
+    configuredPrice: configured.ta14,
+    marketReference: `${money(configured.marketLow)}-${money(configured.marketHigh)}`,
+    exclusions: [
+      "No favorable determination is purchased",
+      "No certification or regulatory approval is implied",
+      "Execution authority remains separately governed",
+    ],
+  }), [pathway.title, scopeReference, consequence, evidence, visibility, partner.title, configured]);
+
+  const recordPreview = useMemo(() => ({
+    recordId: scopeReference.replace("SCOPE", "ENGAGEMENT"),
+    entityState: pathwayId === "registry" ? "Registration pathway selected" : "Entity registration prerequisite checked",
+    claimBoundary: pathway.description,
+    evidenceState: `${evidence} evidence - ${evidence === "organized" ? "intake ready" : "preparation required"}`,
+    authorityState: partnerId === "none" ? "TA-14 institutional review authority" : `${partner.title} with bounded competence record`,
+    publicationState: `${visibility} projection`,
+    historyState: "Versioned, challengeable, and supersession-aware",
+  }), [scopeReference, pathwayId, pathway.description, evidence, partnerId, partner.title, visibility]);
+
   const openCheckout = (productId: PayPalProductId) => {
     setCheckoutProduct(checkoutCatalog[productId]);
     setCheckoutStatus("idle");
@@ -651,6 +689,33 @@ export default function AiGovernancePricingPage() {
           ))}
           <div className="ring ringOne" />
           <div className="ring ringTwo" />
+        </div>
+      </section>
+
+      <section className="institutionalRoute shell" aria-labelledby="institutional-route-title">
+        <div className="routeHeading">
+          <div>
+            <p className="eyebrow">YOUR INSTITUTIONAL ROUTE</p>
+            <h2 id="institutional-route-title">From inquiry to permanent institutional history.</h2>
+          </div>
+          <div className="routeLive"><span />Live configuration</div>
+        </div>
+        <div className="routeRail">
+          {institutionalRoute.map((item, index) => (
+            <article key={item.stage} className={index < 2 ? "routeActive" : ""}>
+              <div className="routeIndex">{String(index + 1).padStart(2, "0")}</div>
+              <div>
+                <small>{item.state}</small>
+                <h3>{item.stage}</h3>
+                <p>{item.detail}</p>
+              </div>
+              {index < institutionalRoute.length - 1 && <i aria-hidden="true">→</i>}
+            </article>
+          ))}
+        </div>
+        <div className="routeBoundary">
+          <strong>The route is not decorative.</strong>
+          <span>Each stage identifies a record, authority condition, evidence state, decision boundary, or continuity obligation that can be inspected later.</span>
         </div>
       </section>
 
@@ -880,6 +945,83 @@ export default function AiGovernancePricingPage() {
         </div>
       </section>
 
+      <section className="engagementWorkspace shell" aria-labelledby="engagement-summary-title">
+        <div className="engagementHeader">
+          <div>
+            <p className="eyebrow">LIVE INSTITUTIONAL ENGAGEMENT SUMMARY</p>
+            <h2 id="engagement-summary-title">Your scope is becoming an engagement record.</h2>
+            <p>As the configurator changes, this summary updates the institutional question, authority boundary, evidence condition, deliverables, exclusions, and commercial terms that would be preserved before payment.</p>
+          </div>
+          <div className="engagementSeal">
+            <span>TA-14</span>
+            <strong>Scope Draft</strong>
+            <small>{scopeReference}</small>
+          </div>
+        </div>
+
+        <div className="engagementDocument">
+          <div className="documentMeta">
+            <div><small>INSTITUTION</small><strong>{engagementSummary.institution}</strong></div>
+            <div><small>ENGAGEMENT</small><strong>{engagementSummary.engagement}</strong></div>
+            <div><small>REFERENCE</small><strong>{engagementSummary.scopeReference}</strong></div>
+            <div><small>STATUS</small><strong>Configuration draft</strong></div>
+          </div>
+          <div className="documentGrid">
+            <div className="documentMain">
+              <p className="documentLabel">DECLARED PURPOSE</p>
+              <h3>{pathway.description}</h3>
+              <div className="documentConditions">
+                <div><span>Consequence</span><strong>{engagementSummary.consequence}</strong></div>
+                <div><span>Evidence condition</span><strong>{engagementSummary.evidence}</strong></div>
+                <div><span>Visibility</span><strong>{engagementSummary.visibility}</strong></div>
+                <div><span>Review authority</span><strong>{engagementSummary.review}</strong></div>
+              </div>
+              <p className="documentLabel">INCLUDED RECORDS AND DELIVERABLES</p>
+              <div className="deliverableCards">
+                {summaryItems.slice(0, 8).map((item, index) => (
+                  <article key={item}>
+                    <span>{String(index + 1).padStart(2, "0")}</span>
+                    <strong>{item}</strong>
+                  </article>
+                ))}
+              </div>
+            </div>
+            <aside className="documentCommercial">
+              <p className="documentLabel">COMMERCIAL TERMS</p>
+              <div className="commercialAmount"><small>Configured institutional total</small><strong>{money(engagementSummary.configuredPrice)}</strong></div>
+              <div className="commercialReference"><span>Comparable market reference</span><strong>{engagementSummary.marketReference}</strong></div>
+              <ul>{engagementSummary.exclusions.map((item) => <li key={item}>{item}</li>)}</ul>
+              <a href="#builder" className="documentAction">Revise configuration <span>↑</span></a>
+              <Link href="/workspace/entity-review" className="documentAction secondary">Request written scope <span>→</span></Link>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section className="deliverablesInstitution shell" aria-labelledby="deliverables-title">
+        <div className="sectionIntro">
+          <p className="eyebrow">WHAT THE INSTITUTION PRESERVES</p>
+          <h2 id="deliverables-title">The deliverable is not a paragraph. It is a governed record system.</h2>
+          <p>Every pathway is designed to leave behind inspectable institutional material: what was claimed, what evidence was admitted, who had authority, what was determined, what was excluded, and how the record can be challenged or superseded.</p>
+        </div>
+        <div className="preservationGrid">
+          {[
+            ["01", "Governed scope", "The declared question, entity, system, use case, consequence, exclusions, and boundaries."],
+            ["02", "Evidence record", "Admitted sources, versions, custody, timestamps, integrity metadata, and unsupported gaps."],
+            ["03", "Authority record", "Who submitted, reviewed, decided, changed, approved, or remained outside authority."],
+            ["04", "Determination", "A bounded ALLOW, HOLD, DENY, or ESCALATE state with attributable rationale."],
+            ["05", "Execution artifact", "Where applicable, the action, route, technical effect, outcome, and integrity package."],
+            ["06", "Registry history", "A dated, attributable, searchable, challengeable, versioned institutional record."],
+          ].map(([number, title, copy]) => (
+            <article key={number}>
+              <span>{number}</span>
+              <h3>{title}</h3>
+              <p>{copy}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+
       <section className="market shell" id="market">
         <div className="sectionIntro">
           <p className="eyebrow">MARKET POSITION</p>
@@ -1015,6 +1157,69 @@ export default function AiGovernancePricingPage() {
               </article>
             );
           })}
+        </div>
+      </section>
+
+      <section className="costArchitecture shell" aria-labelledby="cost-title">
+        <div className="costCopy">
+          <p className="eyebrow">WHY THE COST CAN BE LOWER</p>
+          <h2 id="cost-title">TA-14 integrates the chain instead of rebilling the chain.</h2>
+          <p>Conventional engagements often fragment discovery, assessment, legal interpretation, technical review, evidence organization, reporting, artifact creation, and continuing monitoring across separate vendors and disconnected deliverables.</p>
+          <p>TA-14 lowers the entry cost by keeping those activities inside one governed institutional architecture, one preserved scope, one record model, and one continuity pathway. The lower price does not remove evidence, review, attribution, or history.</p>
+        </div>
+        <div className="costComparison">
+          <div className="fragmentedChain">
+            <small>FRAGMENTED MARKET MODEL</small>
+            {["Discovery vendor", "Advisory report", "Legal mapping", "Technical reviewer", "Evidence repository", "Monitoring tool"].map((item, index) => (
+              <div key={item}><span>{index + 1}</span><strong>{item}</strong><em>Separate scope + margin</em></div>
+            ))}
+          </div>
+          <div className="integratedChain">
+            <small>TA-14 INSTITUTIONAL MODEL</small>
+            <div className="integratedCore"><span>TA-14</span><strong>One governed chain</strong><em>One scope · one history · one continuity model</em></div>
+            <div className="integratedOutcomes">
+              <span>Registration</span><span>Evidence</span><span>Review</span><span>Artifact</span><span>Registry</span><span>Continuity</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="recordPreview shell" aria-labelledby="record-preview-title">
+        <div className="recordPreviewIntro">
+          <div>
+            <p className="eyebrow">INSTITUTIONAL RECORD PREVIEW</p>
+            <h2 id="record-preview-title">See what a preserved engagement begins to look like.</h2>
+            <p>This preview is illustrative. It shows the structure of the institutional record produced by the current configuration; it is not a completed review, determination, certification, or registered artifact.</p>
+          </div>
+          <div className="recordStatus"><span />DRAFT - NOT YET PRESERVED</div>
+        </div>
+        <div className="recordSheet">
+          <div className="recordTopline">
+            <div><small>RECORD IDENTIFIER</small><strong>{recordPreview.recordId}</strong></div>
+            <div><small>INSTITUTIONAL STATE</small><strong>Pre-engagement configuration</strong></div>
+            <div><small>VERSION</small><strong>v0.1 draft</strong></div>
+          </div>
+          <div className="recordRows">
+            {[
+              ["Entity state", recordPreview.entityState],
+              ["Claim boundary", recordPreview.claimBoundary],
+              ["Evidence state", recordPreview.evidenceState],
+              ["Authority state", recordPreview.authorityState],
+              ["Publication state", recordPreview.publicationState],
+              ["History state", recordPreview.historyState],
+            ].map(([label, value], index) => (
+              <div className="recordRow" key={label}>
+                <span>{String(index + 1).padStart(2, "0")}</span>
+                <small>{label}</small>
+                <strong>{value}</strong>
+                <em>{index < 2 ? "Configured" : "Pending intake"}</em>
+              </div>
+            ))}
+          </div>
+          <div className="recordFooter">
+            <strong>No admissible evidence. No admissible execution.</strong>
+            <span>This draft becomes authoritative only after scope confirmation, attribution, evidence intake, authorization, and preservation through the applicable TA-14 pathway.</span>
+          </div>
         </div>
       </section>
 
@@ -1181,1761 +1386,93 @@ export default function AiGovernancePricingPage() {
         .checkoutFeedback { margin-top: 14px; padding: 14px 16px; border-radius: 14px; color: #dbeaff; background: rgba(70,139,206,.1); border: 1px solid rgba(83,166,244,.2); line-height: 1.5; }.checkoutFeedback.success { color: #bff0d2; border-color: rgba(77,207,137,.28); background: rgba(53,171,108,.08); }.checkoutFeedback.error { color: #ffd0d0; border-color: rgba(255,113,113,.25); background: rgba(207,67,67,.08); }.checkoutFeedback.cancelled { color: #f3d6a8; border-color: rgba(236,179,88,.24); background: rgba(204,141,46,.08); }
         .checkoutBoundary { display: grid; gap: 5px; margin-top: 16px; padding: 14px; border-radius: 14px; border: 1px solid rgba(255,195,99,.18); background: rgba(196,130,35,.05); }.checkoutBoundary strong { color: #ffd18b; }.checkoutBoundary span { color: #b4a78e; font-size: 13px; line-height: 1.5; }
 
+        .institutionalRoute, .engagementWorkspace, .deliverablesInstitution, .costArchitecture, .recordPreview { margin-top: 24px; padding: 44px; border: 1px solid rgba(131,155,189,.16); background: linear-gradient(180deg, rgba(12,21,36,.91), rgba(7,13,24,.95)); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,.24); }
+        .routeHeading, .engagementHeader, .recordPreviewIntro { display:flex; align-items:flex-end; justify-content:space-between; gap:28px; }
+        .routeHeading h2, .engagementHeader h2, .deliverablesInstitution h2, .costArchitecture h2, .recordPreview h2 { margin:14px 0 0; font-size:clamp(34px,5vw,60px); line-height:1.03; letter-spacing:-.05em; }
+        .routeLive, .recordStatus { display:flex; align-items:center; gap:9px; padding:10px 13px; border-radius:999px; border:1px solid rgba(92,194,151,.24); color:#b8efd5; background:rgba(61,169,120,.07); font-size:11px; font-weight:900; letter-spacing:.08em; white-space:nowrap; }
+        .routeLive span, .recordStatus span { width:8px; height:8px; border-radius:50%; background:#65d49b; box-shadow:0 0 18px rgba(101,212,155,.7); }
+        .routeRail { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:8px; margin-top:32px; }
+        .routeRail article { min-height:190px; position:relative; padding:16px 14px; border-radius:18px; border:1px solid rgba(126,157,193,.15); background:rgba(4,11,22,.7); }
+        .routeRail article.routeActive { border-color:rgba(102,185,255,.42); background:linear-gradient(180deg,rgba(70,150,238,.13),rgba(4,11,22,.82)); }
+        .routeRail article > i { position:absolute; right:-11px; top:50%; z-index:2; color:#68b8ff; font-style:normal; transform:translateY(-50%); }
+        .routeIndex { color:#5dafff; font-size:11px; font-weight:950; letter-spacing:.12em; }
+        .routeRail small { display:block; margin-top:24px; color:#6ec6a0; font-size:9px; font-weight:950; letter-spacing:.12em; text-transform:uppercase; }
+        .routeRail h3 { margin:8px 0 8px; font-size:18px; }
+        .routeRail p { margin:0; color:#8397ab; font-size:11px; line-height:1.48; }
+        .routeBoundary { display:flex; gap:12px; margin-top:16px; padding:16px 18px; border-radius:15px; border:1px solid rgba(102,185,255,.16); background:rgba(65,144,224,.05); color:#92a8bd; line-height:1.55; }
+        .routeBoundary strong { color:#dceeff; white-space:nowrap; }
+        .engagementHeader > div:first-child { max-width:900px; }
+        .engagementHeader > div:first-child > p:last-child, .deliverablesInstitution .sectionIntro > p:last-child, .costCopy p, .recordPreviewIntro p { color:#9fafc2; line-height:1.68; }
+        .engagementSeal { width:170px; min-width:170px; height:170px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border-radius:50%; border:1px solid rgba(103,185,255,.42); background:radial-gradient(circle,rgba(70,150,238,.14),rgba(4,11,22,.9) 72%); box-shadow:inset 0 0 32px rgba(84,167,255,.09),0 0 36px rgba(73,154,238,.12); }
+        .engagementSeal span { color:#65b6ff; font-size:30px; font-weight:950; letter-spacing:-.04em; }
+        .engagementSeal strong { margin-top:4px; font-size:12px; }
+        .engagementSeal small { max-width:120px; margin-top:7px; color:#71899f; font-size:8px; overflow-wrap:anywhere; }
+        .engagementDocument { margin-top:30px; overflow:hidden; border-radius:22px; border:1px solid rgba(119,158,194,.2); background:#07111f; }
+        .documentMeta { display:grid; grid-template-columns:1.1fr 1fr 1fr .7fr; gap:1px; background:rgba(113,158,199,.14); }
+        .documentMeta div { min-height:84px; padding:16px; background:#0a1626; }
+        .documentMeta small, .documentLabel, .recordTopline small { display:block; color:#6e8aa4; font-size:9px; font-weight:950; letter-spacing:.13em; }
+        .documentMeta strong { display:block; margin-top:8px; color:#e7f1fb; font-size:13px; line-height:1.4; }
+        .documentGrid { display:grid; grid-template-columns:1.3fr .7fr; }
+        .documentMain { padding:28px; }
+        .documentMain > h3 { margin:11px 0 22px; font-size:27px; line-height:1.3; letter-spacing:-.025em; }
+        .documentConditions { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px; margin-bottom:28px; }
+        .documentConditions div { padding:13px; border-radius:13px; border:1px solid rgba(121,156,191,.14); background:rgba(255,255,255,.02); }
+        .documentConditions span { display:block; color:#6f8499; font-size:9px; text-transform:uppercase; letter-spacing:.08em; }
+        .documentConditions strong { display:block; margin-top:6px; color:#dce9f5; font-size:12px; text-transform:capitalize; }
+        .deliverableCards { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:9px; margin-top:13px; }
+        .deliverableCards article { min-height:66px; display:flex; gap:11px; align-items:flex-start; padding:13px; border-radius:13px; border:1px solid rgba(121,156,191,.13); background:rgba(255,255,255,.018); }
+        .deliverableCards span { color:#63b3fb; font-size:10px; font-weight:950; }
+        .deliverableCards strong { color:#c6d4e2; font-size:12px; line-height:1.42; }
+        .documentCommercial { padding:28px; border-left:1px solid rgba(121,156,191,.16); background:linear-gradient(180deg,rgba(67,143,224,.08),rgba(4,11,22,.45)); }
+        .commercialAmount { margin-top:14px; padding:20px; border-radius:17px; border:1px solid rgba(101,183,255,.28); background:rgba(68,146,229,.08); }
+        .commercialAmount small { display:block; color:#8ca4bb; }
+        .commercialAmount strong { display:block; margin-top:7px; font-size:44px; letter-spacing:-.06em; }
+        .commercialReference { display:flex; justify-content:space-between; gap:14px; margin:14px 0; color:#8397aa; font-size:11px; }
+        .commercialReference strong { color:#c9d8e6; }
+        .documentCommercial ul { margin:18px 0; padding-left:18px; color:#aebdcb; font-size:12px; line-height:1.55; }
+        .documentAction { min-height:48px; margin-top:9px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; border-radius:12px; color:#04111d; background:linear-gradient(135deg,#5caeff,#d3f4ff); text-decoration:none; font-weight:900; }
+        .documentAction.secondary { color:#dcecff; border:1px solid rgba(103,183,255,.22); background:rgba(66,142,224,.08); }
+        .preservationGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:13px; margin-top:28px; }
+        .preservationGrid article { min-height:210px; padding:22px; border-radius:18px; border:1px solid rgba(121,156,191,.15); background:rgba(5,13,25,.72); }
+        .preservationGrid span { color:#61b2fb; font-size:11px; font-weight:950; letter-spacing:.13em; }
+        .preservationGrid h3 { margin:28px 0 10px; font-size:25px; letter-spacing:-.035em; }
+        .preservationGrid p { margin:0; color:#95a8ba; line-height:1.58; }
+        .costArchitecture { display:grid; grid-template-columns:.9fr 1.1fr; gap:36px; align-items:center; }
+        .costCopy p { max-width:680px; }
+        .costComparison { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+        .fragmentedChain, .integratedChain { padding:20px; border-radius:20px; border:1px solid rgba(121,156,191,.16); background:rgba(4,11,22,.7); }
+        .fragmentedChain > small, .integratedChain > small { color:#6d88a2; font-size:9px; font-weight:950; letter-spacing:.12em; }
+        .fragmentedChain div { display:grid; grid-template-columns:28px 1fr; gap:5px 10px; margin-top:10px; padding:11px; border-radius:12px; background:rgba(255,255,255,.025); }
+        .fragmentedChain span { grid-row:1/3; width:26px; height:26px; display:grid; place-items:center; border-radius:50%; color:#d8e7f5; border:1px solid rgba(135,159,185,.2); font-size:10px; }
+        .fragmentedChain strong { font-size:12px; }
+        .fragmentedChain em { color:#75899e; font-size:10px; font-style:normal; }
+        .integratedChain { border-color:rgba(100,183,255,.34); background:linear-gradient(180deg,rgba(69,149,235,.1),rgba(4,11,22,.82)); }
+        .integratedCore { min-height:210px; margin-top:12px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; border-radius:18px; border:1px solid rgba(101,183,255,.24); background:radial-gradient(circle,rgba(76,158,246,.16),transparent 70%); }
+        .integratedCore span { color:#6fbdff; font-size:42px; font-weight:950; letter-spacing:-.05em; }
+        .integratedCore strong { margin-top:8px; font-size:18px; }
+        .integratedCore em { max-width:190px; margin-top:7px; color:#8097ad; font-size:11px; line-height:1.4; font-style:normal; }
+        .integratedOutcomes { display:flex; flex-wrap:wrap; gap:7px; margin-top:12px; }
+        .integratedOutcomes span { padding:7px 9px; border-radius:999px; color:#bfe5ff; border:1px solid rgba(101,183,255,.2); background:rgba(67,145,226,.07); font-size:9px; font-weight:850; }
+        .recordPreviewIntro > div:first-child { max-width:900px; }
+        .recordSheet { margin-top:28px; overflow:hidden; border-radius:22px; border:1px solid rgba(121,156,191,.2); background:#07111f; }
+        .recordTopline { display:grid; grid-template-columns:1.2fr 1fr .45fr; gap:1px; background:rgba(112,159,201,.16); }
+        .recordTopline div { padding:18px; background:#0a1626; }
+        .recordTopline strong { display:block; margin-top:8px; color:#e5eff8; font-size:13px; }
+        .recordRows { padding:12px; }
+        .recordRow { display:grid; grid-template-columns:42px 150px 1fr 110px; gap:14px; align-items:center; min-height:66px; padding:12px 14px; border-bottom:1px solid rgba(121,156,191,.1); }
+        .recordRow:last-child { border-bottom:0; }
+        .recordRow > span { color:#63b3fb; font-size:10px; font-weight:950; }
+        .recordRow small { color:#778da2; text-transform:uppercase; letter-spacing:.08em; }
+        .recordRow strong { color:#c8d7e5; font-size:12px; line-height:1.45; }
+        .recordRow em { color:#89a4ba; font-size:10px; font-style:normal; text-align:right; }
+        .recordFooter { display:grid; grid-template-columns:.7fr 1.3fr; gap:18px; padding:20px; border-top:1px solid rgba(121,156,191,.15); background:rgba(68,146,229,.05); }
+        .recordFooter strong { color:#dff2ff; }
+        .recordFooter span { color:#8ea3b7; font-size:12px; line-height:1.55; }
+
         @keyframes starDrift { from{transform:translate3d(0,0,0)} to{transform:translate3d(90px,140px,0)} } @keyframes glowMove { from{transform:translate3d(0,0,0) scale(1)} to{transform:translate3d(55px,35px,0) scale(1.1)} }
-        @media(max-width:1080px){ nav{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
-        @media(max-width:720px){ .shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
+        @media(max-width:1080px){ nav{display:none}.routeRail{grid-template-columns:repeat(4,minmax(0,1fr))}.routeRail article:nth-child(4) i{display:none}.documentGrid,.costArchitecture{grid-template-columns:1fr}.documentCommercial{border-left:0;border-top:1px solid rgba(121,156,191,.16)}.preservationGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.costComparison{max-width:800px}.recordRow{grid-template-columns:42px 130px 1fr}.recordRow em{display:none}.hero,.partnerHero,.checkoutArchitecture{grid-template-columns:1fr}.chainVisual{min-height:520px}.builderLayout{grid-template-columns:1fr}.liveSummary{position:relative;top:auto}.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:repeat(2,minmax(0,1fr))}.marketHead,.marketRow{grid-template-columns:1fr 1fr}.marketHead span:nth-child(n+3){display:none}.categoryGrid{grid-template-columns:1fr}.finalCta{flex-direction:column;align-items:flex-start}.finalActions{justify-content:flex-start}}
+        @media(max-width:720px){ .routeHeading,.engagementHeader,.recordPreviewIntro{align-items:flex-start;flex-direction:column}.routeRail{grid-template-columns:1fr}.routeRail article{min-height:auto}.routeRail article>i{display:none}.routeBoundary{flex-direction:column}.engagementSeal{width:130px;min-width:130px;height:130px}.documentMeta,.documentConditions,.deliverableCards,.preservationGrid,.costComparison,.recordTopline{grid-template-columns:1fr}.documentMain,.documentCommercial{padding:20px}.recordRow{grid-template-columns:32px 1fr}.recordRow small{grid-column:2}.recordRow strong{grid-column:2}.recordFooter{grid-template-columns:1fr}.shell{width:min(100% - 20px,1320px)}.hero{min-height:auto;padding:58px 0}.chainVisual{transform:scale(.78);margin:-52px 0}.categoryStatement,.builder,.market,.partnerNetwork,.membership,.workspace,.checkoutArchitecture,.finalCta{padding:28px 22px}.progressRail small{display:none}.pathwayChoices,.compactChoices,.threeChoices,.partnerServices,.membershipGrid,.workspaceGrid{grid-template-columns:1fr}.questionBlock{min-height:auto}.marketHead{display:none}.marketRow{grid-template-columns:1fr}.workspaceHeader{flex-direction:column;align-items:flex-start}.billingToggle{width:100%}.summaryDetails{grid-template-columns:1fr}.finalCta{margin-top:48px}footer{flex-direction:column;justify-content:center;align-items:flex-start}footer div{flex-wrap:wrap}}
       `}</style>
     </main>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
