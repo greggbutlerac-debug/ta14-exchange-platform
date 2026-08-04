@@ -192,6 +192,7 @@ export type AuthorityScopeDimension =
   (typeof AUTHORITY_SCOPE_DIMENSIONS)[number];
 
 export const AUTHORITY_RESTRICTION_TYPES = [
+  "scope",
   "supervision_required",
   "dual_review_required",
   "panel_required",
