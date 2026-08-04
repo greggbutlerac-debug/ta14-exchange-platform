@@ -9,8 +9,10 @@ type NavigationItem = {
   glyph: string;
   matchPrefixes?: string[];
   partner?: boolean;
+  institutional?: boolean;
 };
 
+const missionControlHref = '/workspace/mission-control';
 const aiGovernanceHomeHref = '/workspace/ai-governance';
 const playgroundHref = '/workspace/ai-governance/playground';
 const demonstrationsHref = '/workspace/ai-governance/demonstrations';
@@ -23,8 +25,15 @@ const pricingHref = '/workspace/ai-governance/pricing';
 
 const workspaceNavigation: NavigationItem[] = [
   {
+    href: missionControlHref,
+    label: 'Mission Control',
+    glyph: 'MC',
+    matchPrefixes: [missionControlHref],
+    institutional: true,
+  },
+  {
     href: aiGovernanceHomeHref,
-    label: 'Workspace Home',
+    label: 'AI Governance Home',
     glyph: '⌂',
     matchPrefixes: [aiGovernanceHomeHref],
   },
@@ -88,7 +97,7 @@ const workspaceNavigation: NavigationItem[] = [
 const mobileNavigation: NavigationItem[] = [
   workspaceNavigation[0],
   workspaceNavigation[1],
-  workspaceNavigation[6],
+  workspaceNavigation[2],
   workspaceNavigation[7],
   workspaceNavigation[8],
 ];
@@ -120,10 +129,10 @@ export function AiGovernanceNavigation() {
     <>
       <aside
         className="ta14-sidebar"
-        aria-label="AI Governance workspace navigation"
+        aria-label="TA-14 institutional and AI Governance workspace navigation"
       >
         <section>
-          <span className="ta14-nav-label">AI Governance</span>
+          <span className="ta14-nav-label">Institution</span>
 
           <nav className="ta14-nav-list">
             {workspaceNavigation.map((item) => {
@@ -134,7 +143,7 @@ export function AiGovernanceNavigation() {
                   aria-current={active ? 'page' : undefined}
                   className={`ta14-nav-item${active ? ' active' : ''}${
                     item.partner ? ' partner' : ''
-                  }`}
+                  }${item.institutional ? ' institutional' : ''}`}
                   href={item.href}
                   key={item.href}
                 >
@@ -149,6 +158,17 @@ export function AiGovernanceNavigation() {
         </section>
 
         <article className="ta14-sidebar-note">
+          <small>TA-14 Institutional Mission Control</small>
+          <strong>Identity. Action. Records. Continuity.</strong>
+          <p>
+            See active work, required actions, registered entities, reviews,
+            artifacts, credentials, commercial scopes, and institutional
+            history in one operating view.
+          </p>
+          <Link href={missionControlHref}>Open Mission Control →</Link>
+        </article>
+
+        <article className="ta14-sidebar-note">
           <small>TA-14 Partner Review Network</small>
           <strong>Independent architectures. Written boundaries.</strong>
           <p>
@@ -161,7 +181,7 @@ export function AiGovernanceNavigation() {
 
       <nav
         className="ta14-mobile-nav"
-        aria-label="Mobile AI Governance navigation"
+        aria-label="Mobile institutional and AI Governance navigation"
       >
         {mobileNavigation.map((item) => {
           const active = isItemActive(pathname, item);
@@ -171,7 +191,7 @@ export function AiGovernanceNavigation() {
               aria-current={active ? 'page' : undefined}
               className={`ta14-mobile-link${active ? ' active' : ''}${
                 item.partner ? ' partner' : ''
-              }`}
+              }${item.institutional ? ' institutional' : ''}`}
               href={item.href}
               key={item.href}
             >
