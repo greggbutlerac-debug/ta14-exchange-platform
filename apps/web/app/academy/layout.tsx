@@ -81,11 +81,7 @@ const lessons: AcademyLesson[] = [
 ];
 
 const academyNavigation: AcademyNavigationItem[] = [
-  {
-    label: 'Academy Home',
-    href: '/academy',
-    glyph: 'AC',
-  },
+  { label: 'Academy Home', href: '/academy', glyph: 'AC' },
   {
     label: 'Start Here',
     href: '/academy/start',
@@ -93,21 +89,9 @@ const academyNavigation: AcademyNavigationItem[] = [
     match: ['/academy/start', '/academy/what-is-a-route'],
     accent: 'green',
   },
-  {
-    label: 'Mission Control',
-    href: '/academy/dashboard',
-    glyph: 'MC',
-  },
-  {
-    label: 'Architecture Explorer',
-    href: '/academy/architecture-explorer',
-    glyph: 'AR',
-  },
-  {
-    label: 'Learning Routes',
-    href: '/academy/routes',
-    glyph: 'RT',
-  },
+  { label: 'Mission Control', href: '/academy/dashboard', glyph: 'MC' },
+  { label: 'Architecture Explorer', href: '/academy/architecture-explorer', glyph: 'AR' },
+  { label: 'Learning Routes', href: '/academy/routes', glyph: 'RT' },
   {
     label: 'Simulation Center',
     href: '/academy/simulator',
@@ -124,26 +108,29 @@ const academyNavigation: AcademyNavigationItem[] = [
       '/academy/governed-execution-studio',
     ],
   },
+  { label: 'Review Workspace', href: '/academy/review', glyph: 'RV' },
+  { label: 'Assessment Center', href: '/academy/assessment', glyph: 'AS' },
   {
-    label: 'Review Workspace',
-    href: '/academy/review',
-    glyph: 'RV',
-  },
-  {
-    label: 'Assessment Center',
-    href: '/academy/assessment',
-    glyph: 'AS',
-  },
-  {
-    label: 'Credentials',
+    label: 'Credential Dashboard',
     href: '/academy/credential-dashboard',
     glyph: 'CR',
-    match: [
-      '/academy/credential-dashboard',
-      '/academy/credential-registry',
-      '/academy/certification-engine',
-    ],
     accent: 'gold',
+  },
+  {
+    label: 'Credential Registry',
+    href: '/academy/credential-registry',
+    glyph: 'RG',
+    accent: 'gold',
+  },
+  {
+    label: 'Instructor Console',
+    href: '/academy/instructor-console',
+    glyph: 'IN',
+  },
+  {
+    label: 'Accreditation Center',
+    href: '/academy/accreditation-center',
+    glyph: 'AD',
   },
 ];
 
@@ -501,6 +488,58 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           text-decoration: none;
           font-size: .68rem;
           font-weight: 800;
+        }
+
+        .academy-cta-quick-label {
+          display: block;
+          margin: 14px 0 8px;
+          color: #6f8799;
+          font-size: .56rem;
+          font-weight: 950;
+          letter-spacing: .13em;
+          text-transform: uppercase;
+        }
+
+        .academy-cta-quick-grid {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 7px;
+        }
+
+        .academy-cta-quick-link {
+          min-height: 34px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 6px 7px;
+          border: 1px solid rgba(126, 174, 211, .14);
+          border-radius: 10px;
+          color: #a9c5d5;
+          background: rgba(255,255,255,.022);
+          text-align: center;
+          text-decoration: none;
+          font-size: .59rem;
+          font-weight: 850;
+          line-height: 1.2;
+          transition: 150ms ease;
+        }
+
+        .academy-cta-quick-link:hover,
+        .academy-cta-quick-link:focus-visible {
+          color: #fff;
+          border-color: rgba(84, 232, 255, .30);
+          background: rgba(84, 232, 255, .065);
+          outline: none;
+          transform: translateY(-1px);
+        }
+
+        .academy-cta-boundary {
+          margin-top: 12px;
+          padding-top: 10px;
+          border-top: 1px solid rgba(126, 174, 211, .12);
+          color: #6f8799;
+          font-size: .57rem;
+          line-height: 1.45;
         }
 
         .academy-content {
@@ -928,6 +967,33 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           <Link className="academy-cta-secondary" href="/academy/dashboard">
             Open Mission Control
           </Link>
+
+          <span className="academy-cta-quick-label">Direct Academy actions</span>
+          <div className="academy-cta-quick-grid">
+            <Link className="academy-cta-quick-link" href="/academy/architecture-explorer">
+              Explore Architecture
+            </Link>
+            <Link className="academy-cta-quick-link" href="/academy/routes">
+              Choose a Route
+            </Link>
+            <Link className="academy-cta-quick-link" href="/academy/simulator">
+              Run a Simulation
+            </Link>
+            <Link className="academy-cta-quick-link" href="/academy/review">
+              Open Review
+            </Link>
+            <Link className="academy-cta-quick-link" href="/academy/assessment">
+              Enter Assessment
+            </Link>
+            <Link className="academy-cta-quick-link" href="/academy/credential-registry">
+              Verify Credentials
+            </Link>
+          </div>
+
+          <div className="academy-cta-boundary">
+            Learning is open by pathway. Formal credentials, instruction, accreditation,
+            and institutional representation remain governed by TA-14 authorization.
+          </div>
         </article>
       </aside>
 
