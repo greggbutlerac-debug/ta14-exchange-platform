@@ -1385,7 +1385,7 @@ readonly InstitutionalStageDefinition[] = Object.freeze([
       contractFile,
       contractCode,
       moduleKey,
-    ] = value as readonly [
+    ] = value as unknown as readonly [
       InstitutionalStageId,
       number,
       string,
