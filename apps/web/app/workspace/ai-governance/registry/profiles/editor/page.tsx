@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { createBrowserClient } from '@supabase/ssr';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -80,6 +81,7 @@ function normalizedStatus(value: string | null | undefined) {
 }
 
 export default function GovernanceProfileEditorPage() {
+  const router = useRouter();
   const [registryRecords, setRegistryRecords] = useState<RegistryPublicRecord[]>([]);
   const [profiles, setProfiles] = useState<GovernanceProfileRow[]>([]);
   const [filter, setFilter] = useState<WorkspaceFilter>('all');
@@ -328,6 +330,13 @@ export default function GovernanceProfileEditorPage() {
           ? `Profile ${profileNumber(created.profile_number)} draft created for ${record.governance_name}.`
           : `Governance Profile draft created for ${record.governance_name}.`,
       );
+
+      if (created?.id) {
+        router.push(
+          `/workspace/ai-governance/registry/profiles/editor/${encodeURIComponent(created.id)}`,
+        );
+        return;
+      }
 
       await loadWorkspace('refresh');
     } catch (caught) {
@@ -624,6 +633,12 @@ export default function GovernanceProfileEditorPage() {
                         : 'This profile remains unpublished TA-14 editorial work and is not visible through the public profile directory.'}
                     </p>
                     <div className="cardActions">
+                      <Link
+                        href={`/workspace/ai-governance/registry/profiles/editor/${encodeURIComponent(profile.id)}`}
+                        className="primaryButton"
+                      >
+                        Edit Profile
+                      </Link>
                       {published ? (
                         <Link
                           href={`/workspace/ai-governance/registry/profiles/${encodeURIComponent(profile.slug)}`}
