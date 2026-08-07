@@ -26,6 +26,7 @@ type RegistrySubmission = Record<string, unknown> & {
   registry_identifier: string | null;
   record_visibility: string | null;
   public_website: string | null;
+  public_evidence_route: string | null;
   requested_review_pathway: string | null;
   authority_declaration_accepted: boolean;
   accuracy_declaration_accepted: boolean;
@@ -338,6 +339,68 @@ export async function POST(
       );
     }
 
+    /*
+     * A public Registry record may satisfy its public route
+     * through either:
+     *
+     * - submission.public_website
+     * - submission.public_evidence_route
+     * - a current public evidence item with a non-empty source_url
+     *
+     * The authoritative database readiness function applies the
+     * same three-path rule.
+     */
+    const {
+      data:
+        publicEvidenceRouteData,
+
+      error:
+        publicEvidenceRouteError,
+    } =
+      await supabase
+        .from(
+          'ai_governance_registry_evidence',
+        )
+        .select(
+          'source_url',
+        )
+        .eq(
+          'submission_id',
+          submissionId,
+        )
+        .eq(
+          'owner_user_id',
+          user.id,
+        )
+        .eq(
+          'evidence_state',
+          'current',
+        )
+        .eq(
+          'visibility',
+          'public',
+        );
+
+    if (
+      publicEvidenceRouteError
+    ) {
+      return errorResponse(
+        publicEvidenceRouteError.message,
+        500,
+      );
+    }
+
+    const hasCurrentPublicEvidenceRoute =
+      (
+        publicEvidenceRouteData ??
+        []
+      ).some(
+        (item) =>
+          hasValue(
+            item.source_url,
+          ),
+      );
+
     const validationErrors: string[] =
       [];
 
@@ -373,7 +436,11 @@ export async function POST(
         'public' &&
       !hasValue(
         submission.public_website,
-      )
+      ) &&
+      !hasValue(
+        submission.public_evidence_route,
+      ) &&
+      !hasCurrentPublicEvidenceRoute
     ) {
       validationErrors.push(
         'A public Registry record must include a public website or public evidence route.',
