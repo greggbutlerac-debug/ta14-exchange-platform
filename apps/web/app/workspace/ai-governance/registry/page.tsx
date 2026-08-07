@@ -172,6 +172,7 @@ export default function AiGovernanceRegistryPage() {
           <a href="#integrity">Integrity Controls</a>
           <a href="#status">Status Model</a>
           <a href="#method">Method</a>
+          <a href="#profiles">Governance Profiles</a>
         </nav>
         <PolishedLink href="/workspace/ai-governance/registry/directory" variant="secondary">
           Browse Registry
@@ -209,6 +210,9 @@ export default function AiGovernanceRegistryPage() {
             </PolishedLink>
             <PolishedLink href="/workspace/ai-governance/registry/directory" variant="bronze">
               Browse Registered Governances
+            </PolishedLink>
+            <PolishedLink href="/workspace/ai-governance/registry/profiles" variant="secondary">
+              Explore Governance Profiles
             </PolishedLink>
           </div>
           <div className="trust-strip" aria-label="Registry principles">
@@ -350,6 +354,115 @@ export default function AiGovernanceRegistryPage() {
         </div>
       </section>
 
+
+      <section id="profiles" className="section-shell profiles-section">
+        <SectionTitle
+          eyebrow="TA-14 GOVERNANCE PROFILES"
+          title="The Registry establishes the record. Governance Profiles help the world understand what entered it."
+          text="A Governance Profile is a separate TA-14 Authority publication layer built on top of a registered entity's attributable Registry baseline. It may introduce the steward, explain the architecture in plain language, identify why the work is institutionally significant, and connect later demonstrations, reviews, or public records without altering the underlying Registry declaration."
+        />
+
+        <div className="profiles-stage">
+          <article className="profile-principle profile-principle-registry">
+            <div className="profile-number">01</div>
+            <div>
+              <p className="profile-label">REGISTRY RECORD</p>
+              <h3>What the registrant formally declared.</h3>
+              <p>
+                Identity, version, category, steward, scope, claims, non-claims,
+                evidence, provenance, rights, visibility, lifecycle state, and
+                the permanent Registry identifier remain the authoritative
+                registration baseline.
+              </p>
+            </div>
+          </article>
+
+          <div className="profile-flow-arrow" aria-hidden="true">→</div>
+
+          <article className="profile-principle profile-principle-authority">
+            <div className="profile-number">02</div>
+            <div>
+              <p className="profile-label">TA-14 AUTHORITY PROFILE</p>
+              <h3>Why the registered architecture matters.</h3>
+              <p>
+                TA-14 may publish institutional commentary describing the
+                architecture, its steward, its declared contribution, and the
+                governed work that may follow. The profile does not rewrite the
+                Registry record or convert registration into endorsement.
+              </p>
+            </div>
+          </article>
+        </div>
+
+        <div className="profile-boundary-card">
+          <div>
+            <p className="eyebrow">CURATED PUBLICATION LAYER</p>
+            <h3>Independent identity remains intact.</h3>
+            <p>
+              A governance architecture does not need to become TA-14 to be
+              profiled by TA-14. The point of the profile is to preserve the
+              entity's own identity while making serious registered work easier
+              for the public, institutions, researchers, potential partners,
+              and future reviewers to understand.
+            </p>
+          </div>
+
+          <div className="profile-boundary-actions">
+            <PolishedLink href="/workspace/ai-governance/registry/profiles" variant="primary">
+              Open Governance Profiles
+            </PolishedLink>
+            <PolishedLink href="/workspace/ai-governance/registry/directory" variant="secondary">
+              Compare With Registry Directory
+            </PolishedLink>
+          </div>
+        </div>
+
+        <div className="profile-feature-card">
+          <div className="profile-feature-mark">
+            <span>PROFILE</span>
+            <strong>001</strong>
+          </div>
+
+          <div className="profile-feature-copy">
+            <p className="profile-label">FOUNDING EXTERNAL GOVERNANCE PROFILE</p>
+            <h3>Harmonic Constitutional Runtime</h3>
+            <p>
+              Harmonic Constitutional Runtime entered the TA-14 AI Governance
+              Registry as TA-14-AIGR-000008 under the stewardship of Timothy E.
+              Zlomke. Its Governance Profile provides the public-facing
+              institutional layer for understanding what Harmonic declares,
+              why TA-14 is paying attention, and how later governed work remains
+              distinct from the original registration baseline.
+            </p>
+
+            <div className="profile-feature-actions">
+              <PolishedLink
+                href="/workspace/ai-governance/registry/profiles/harmonic-constitutional-runtime"
+                variant="bronze"
+              >
+                Read Harmonic Profile 001
+              </PolishedLink>
+
+              <PolishedLink
+                href="/workspace/ai-governance/registry/records/TA-14-AIGR-000008"
+                variant="secondary"
+              >
+                Open Harmonic Registry Record
+              </PolishedLink>
+            </div>
+          </div>
+        </div>
+
+        <div className="profiles-nonclaim">
+          <strong>Governance Profiles are curated institutional publications.</strong>
+          <span>
+            Selection for a profile does not certify effectiveness, establish
+            legal priority, validate ownership, prove technical performance, or
+            imply that TA-14 adopts the profiled architecture as its own.
+          </span>
+        </div>
+      </section>
+
       <section className="section-shell launch-section">
         <div className="launch-card">
           <div>
@@ -371,6 +484,9 @@ export default function AiGovernanceRegistryPage() {
             </PolishedLink>
             <PolishedLink href="/workspace/ai-governance/registry/my-records" variant="bronze">
               Open My Registry Records
+            </PolishedLink>
+            <PolishedLink href="/workspace/ai-governance/registry/profiles" variant="secondary">
+              Open Governance Profiles
             </PolishedLink>
             <PolishedLink href="/workspace/ai-governance/registry/review" variant="secondary">
               Open Reviewer Queue
@@ -551,6 +667,34 @@ export default function AiGovernanceRegistryPage() {
         .method-boundaries ul { margin: 0; padding-left: 20px; color: #afc0cf; }
         .method-boundaries li { margin: 10px 0; line-height: 1.55; font-size: 13px; }
 
+
+        .profiles-section { padding-top: 60px; }
+        .profiles-stage { display: grid; grid-template-columns: 1fr auto 1fr; gap: 18px; align-items: stretch; }
+        .profile-principle { min-height: 280px; padding: 30px; border-radius: 22px; border: 1px solid rgba(126,191,240,.17); background: linear-gradient(155deg, rgba(12,35,54,.88), rgba(4,15,26,.94)); box-shadow: var(--shadow); display: grid; grid-template-columns: 54px 1fr; gap: 18px; position: relative; overflow: hidden; }
+        .profile-principle::after { content:''; position:absolute; width:190px; height:190px; border-radius:50%; right:-95px; bottom:-95px; border:1px solid rgba(110,216,255,.12); box-shadow:0 0 80px rgba(70,160,230,.07); }
+        .profile-principle-authority { border-color: rgba(255,205,120,.22); background: linear-gradient(155deg, rgba(58,38,15,.55), rgba(5,18,31,.96)); }
+        .profile-principle-authority::after { border-color: rgba(255,205,120,.16); box-shadow:0 0 80px rgba(213,154,69,.08); }
+        .profile-number { color: var(--gold); font-family: Georgia, serif; font-size: 18px; letter-spacing: .12em; padding-top: 3px; }
+        .profile-label { margin: 0 0 10px; color: var(--blue); font-size: 9px; font-weight: 900; letter-spacing: .18em; }
+        .profile-principle-authority .profile-label { color: var(--gold); }
+        .profile-principle h3 { margin: 0 0 15px; font-family: Georgia, serif; font-size: 27px; font-weight: 500; line-height: 1.16; }
+        .profile-principle p:last-child { margin: 0; color: #aebfce; font-size: 13px; line-height: 1.72; }
+        .profile-flow-arrow { display: grid; place-items: center; color: var(--bronze); font-size: 28px; font-family: Georgia, serif; text-shadow: 0 0 20px rgba(213,154,69,.3); }
+        .profile-boundary-card { margin-top: 18px; padding: 32px; border-radius: 22px; border: 1px solid rgba(126,191,240,.16); background: radial-gradient(circle at 12% 0%, rgba(50,135,203,.18), transparent 35%), linear-gradient(135deg, rgba(6,24,40,.92), rgba(4,15,26,.96)); display: grid; grid-template-columns: 1fr auto; gap: 36px; align-items: center; box-shadow: var(--shadow); }
+        .profile-boundary-card h3 { margin: 0 0 13px; font-family: Georgia, serif; font-size: 31px; font-weight: 500; }
+        .profile-boundary-card p:last-child { margin: 0; max-width: 820px; color: #aebfce; line-height: 1.75; font-size: 14px; }
+        .profile-boundary-actions { display: grid; gap: 10px; min-width: 290px; }
+        .profile-feature-card { margin-top: 18px; padding: 34px; border-radius: 24px; border: 1px solid rgba(255,205,120,.24); background: radial-gradient(circle at 85% 0%, rgba(213,154,69,.16), transparent 34%), radial-gradient(circle at 5% 90%, rgba(69,160,230,.16), transparent 32%), rgba(5,18,31,.94); display: grid; grid-template-columns: 150px 1fr; gap: 34px; align-items: center; box-shadow: var(--shadow); overflow: hidden; position: relative; }
+        .profile-feature-mark { width: 140px; aspect-ratio: 1; border-radius: 50%; border: 1px solid rgba(255,213,135,.48); display: grid; place-items: center; align-content: center; gap: 4px; background: radial-gradient(circle at 40% 30%, rgba(51,127,184,.62), rgba(5,20,34,.96) 65%); box-shadow: inset 0 0 45px rgba(99,203,255,.12), 0 0 60px rgba(39,141,219,.15); }
+        .profile-feature-mark span { color: #9eb2c5; font-size: 8px; font-weight: 900; letter-spacing: .16em; }
+        .profile-feature-mark strong { color: var(--gold); font-family: Georgia, serif; font-size: 35px; font-weight: 500; letter-spacing: .04em; }
+        .profile-feature-copy h3 { margin: 0 0 13px; font-family: Georgia, serif; font-size: clamp(29px, 4vw, 45px); font-weight: 500; }
+        .profile-feature-copy > p:not(.profile-label) { margin: 0; max-width: 900px; color: #b1c0cd; line-height: 1.78; font-size: 14px; }
+        .profile-feature-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 24px; }
+        .profiles-nonclaim { margin-top: 18px; padding: 18px 20px; border-radius: 16px; border: 1px solid rgba(255,199,108,.2); background: linear-gradient(90deg, rgba(96,58,18,.18), rgba(8,24,38,.72)); display: grid; gap: 5px; }
+        .profiles-nonclaim strong { color: #ffe1a8; font-family: Georgia, serif; font-size: 15px; font-weight: 500; }
+        .profiles-nonclaim span { color: #aebfce; font-size: 12px; line-height: 1.65; }
+
         .launch-section { padding-top: 60px; }
         .launch-card { display: grid; grid-template-columns: 1fr auto; gap: 60px; align-items: center; padding: 42px; border-radius: 26px; border: 1px solid rgba(255,205,120,.23); background: radial-gradient(circle at 20% 0%, rgba(60,142,204,.24), transparent 45%), linear-gradient(135deg, rgba(47,30,12,.75), rgba(5,20,34,.96) 55%); box-shadow: var(--shadow); }
         .launch-card h2 { margin: 0 0 14px; font-family: Georgia, serif; font-weight: 500; font-size: clamp(30px, 4vw, 48px); }
@@ -572,6 +716,10 @@ export default function AiGovernanceRegistryPage() {
           .hero { grid-template-columns: 210px 1fr; gap: 38px; }
           .hero-seal { width: 200px; }
           .record-grid, .reference-grid { grid-template-columns: repeat(2, 1fr); }
+          .profiles-stage { grid-template-columns: 1fr; }
+          .profile-flow-arrow { transform: rotate(90deg); min-height: 24px; }
+          .profile-boundary-card { grid-template-columns: 1fr; gap: 24px; }
+          .profile-boundary-actions { display: flex; flex-wrap: wrap; min-width: 0; }
           .launch-card { grid-template-columns: 1fr; gap: 28px; }
           .launch-actions { display: flex; flex-wrap: wrap; }
         }
@@ -595,6 +743,13 @@ export default function AiGovernanceRegistryPage() {
           .chain-item { flex: 1 1 100%; }
           .chain-item span { flex: 1; }
           .chain-item b { transform: rotate(90deg); }
+          .profile-principle { grid-template-columns: 42px 1fr; padding: 24px 20px; }
+          .profile-boundary-card { padding: 26px 22px; }
+          .profile-boundary-actions { display: grid; }
+          .profile-feature-card { grid-template-columns: 1fr; padding: 28px 22px; }
+          .profile-feature-mark { width: 116px; margin: 0 auto; }
+          .profile-feature-copy { text-align: center; }
+          .profile-feature-actions { justify-content: center; }
           .launch-card { padding: 28px 22px; }
           .launch-actions { display: grid; min-width: 0; }
           footer { width: min(100% - 28px, 1200px); flex-direction: column; }
