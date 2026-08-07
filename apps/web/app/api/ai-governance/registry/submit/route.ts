@@ -31,6 +31,7 @@ type RegistrySubmission = Record<string, unknown> & {
   accuracy_declaration_accepted: boolean;
   registry_boundary_accepted: boolean;
   submitted_at: string | null;
+  accepted_at?: string | null;
   updated_at: string | null;
 };
 
@@ -40,6 +41,21 @@ type AutoFinalizeResult = {
   registered_at: string;
   public_record_id: string | null;
   is_publicly_published: boolean;
+};
+
+type RegistrationException = {
+  id: string;
+  submission_id: string;
+  exception_status: string;
+  exception_type: string;
+  exception_code: string | null;
+  exception_summary: string;
+  exception_details: string[];
+  readiness_failures: string[];
+  resolution_summary: string | null;
+  opened_at: string;
+  resolved_at: string | null;
+  updated_at: string;
 };
 
 function createSupabaseClient(
@@ -62,19 +78,9 @@ function createSupabaseClient(
 
       setAll(values) {
         try {
-          values.forEach(
-            ({
-              name,
-              value,
-              options,
-            }) => {
-              cookieStore.set(
-                name,
-                value,
-                options,
-              );
-            },
-          );
+          values.forEach(({ name, value, options }) => {
+            cookieStore.set(name, value, options);
+          });
         } catch {
           // Existing authenticated cookies remain readable
           // in read-only server contexts.
@@ -91,158 +97,102 @@ function errorResponse(
 ) {
   return NextResponse.json(
     details === undefined
-      ? {
-          error: message,
-        }
-      : {
-          error: message,
-          details,
-        },
-    {
-      status,
-    },
+      ? { error: message }
+      : { error: message, details },
+    { status },
   );
 }
 
-function hasValue(
-  value: unknown,
-): boolean {
-  return (
-    typeof value === 'string' &&
-    value.trim().length > 0
-  );
+function hasValue(value: unknown): boolean {
+  return typeof value === 'string' && value.trim().length > 0;
 }
 
-export async function POST(
-  request: NextRequest,
-) {
+function readinessFailuresFromDetail(
+  detail: string | null,
+): string[] {
+  if (!detail) {
+    return [];
+  }
+
+  return detail
+    .split('|')
+    .map((value) => value.trim())
+    .filter(Boolean);
+}
+
+export async function POST(request: NextRequest) {
   try {
-    const body =
-      (await request.json()) as {
-        submissionId?: string;
-      };
+    const body = (await request.json()) as {
+      submissionId?: string;
+    };
 
-    const submissionId =
-      body.submissionId?.trim();
+    const submissionId = body.submissionId?.trim();
 
     if (!submissionId) {
-      return errorResponse(
-        'Submission ID is required.',
-      );
+      return errorResponse('Submission ID is required.');
     }
 
-    const cookieStore =
-      await cookies();
+    const cookieStore = await cookies();
+    const supabase = createSupabaseClient(cookieStore);
 
-    const supabase =
-      createSupabaseClient(
-        cookieStore,
-      );
-
-    /*
-     * Registration must occur under the authenticated
-     * Exchange user who owns the Registry submission.
-     */
     const {
-      data: {
-        user,
-      },
+      data: { user },
       error: userError,
-    } =
-      await supabase.auth.getUser();
+    } = await supabase.auth.getUser();
 
-    if (
-      userError ||
-      !user
-    ) {
-      return errorResponse(
-        'Authentication required.',
-        401,
-      );
+    if (userError || !user) {
+      return errorResponse('Authentication required.', 401);
     }
 
-    /*
-     * Load only the authenticated registrant's own record.
-     */
     const {
       data: submissionData,
       error: submissionError,
-    } =
-      await supabase
-        .from(
-          'ai_governance_registry_submissions',
-        )
-        .select('*')
-        .eq(
-          'id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .single();
+    } = await supabase
+      .from('ai_governance_registry_submissions')
+      .select('*')
+      .eq('id', submissionId)
+      .eq('owner_user_id', user.id)
+      .single();
 
     const submission =
-      submissionData as RegistrySubmission | null;
+      submissionData as unknown as RegistrySubmission | null;
 
-    if (
-      submissionError ||
-      !submission
-    ) {
-      return errorResponse(
-        'Registry draft was not found.',
-        404,
-      );
+    if (submissionError || !submission) {
+      return errorResponse('Registry draft was not found.', 404);
     }
 
     /*
-     * Idempotent behavior:
-     * already-registered entities receive their existing
-     * permanent identifier instead of being registered again.
+     * Idempotent registration:
+     * a record with a permanent Registry Identifier is returned,
+     * never registered twice.
      */
     if (
-      submission.status ===
-        'registered' &&
+      submission.status === 'registered' &&
       submission.registry_identifier
     ) {
       return NextResponse.json({
         ok: true,
-        alreadyRegistered:
-          true,
-
+        alreadyRegistered: true,
         registration: {
-          submissionId:
-            submission.id,
-
-          governanceName:
-            submission.governance_name,
-
-          currentVersion:
-            submission.current_version,
-
-          registryIdentifier:
-            submission.registry_identifier,
+          submissionId: submission.id,
+          governanceName: submission.governance_name,
+          currentVersion: submission.current_version,
+          registryIdentifier: submission.registry_identifier,
+          registeredAt: submission.accepted_at ?? null,
         },
-
         notice:
           'This governance entity is already registered. Registration is an administrative governance record and is not certification, endorsement, legal validation, regulatory approval, ownership adjudication, or proof of technical performance.',
       });
     }
 
-    if (
-      submission.status !==
-      'draft'
-    ) {
+    if (submission.status !== 'draft') {
       return errorResponse(
         `Only a private draft may begin automatic registration. Current status: ${submission.status}.`,
         409,
       );
     }
 
-    if (
-      submission.registry_identifier
-    ) {
+    if (submission.registry_identifier) {
       return errorResponse(
         'This Registry record already has a formal identifier and cannot be submitted as a draft.',
         409,
@@ -250,125 +200,74 @@ export async function POST(
     }
 
     /*
-     * User-facing validation.
+     * User-facing intake validation.
      *
-     * These checks provide immediate feedback before the
-     * authoritative database readiness evaluation runs.
+     * The database automatic-readiness function remains the
+     * authoritative registration determination.
      */
-    const missingFields =
-      REQUIRED_TEXT_FIELDS.filter(
-        (field) =>
-          !hasValue(
-            submission[field],
-          ),
-      );
+    const missingFields = REQUIRED_TEXT_FIELDS.filter(
+      (field) => !hasValue(submission[field]),
+    );
 
-    const missingDeclarations =
-      [
-        !submission.authority_declaration_accepted
-          ? 'authority declaration'
-          : null,
-
-        !submission.accuracy_declaration_accepted
-          ? 'accuracy declaration'
-          : null,
-
-        !submission.registry_boundary_accepted
-          ? 'Registry boundary declaration'
-          : null,
-      ].filter(
-        (
-          value,
-        ): value is string =>
-          Boolean(value),
-      );
+    const missingDeclarations = [
+      !submission.authority_declaration_accepted
+        ? 'authority declaration'
+        : null,
+      !submission.accuracy_declaration_accepted
+        ? 'accuracy declaration'
+        : null,
+      !submission.registry_boundary_accepted
+        ? 'Registry boundary declaration'
+        : null,
+    ].filter((value): value is string => Boolean(value));
 
     const {
-      count:
-        evidenceCount,
+      count: evidenceCount,
+      error: evidenceCountError,
+    } = await supabase
+      .from('ai_governance_registry_evidence')
+      .select('id', {
+        count: 'exact',
+        head: true,
+      })
+      .eq('submission_id', submissionId)
+      .eq('owner_user_id', user.id)
+      .eq('evidence_state', 'current');
 
-      error:
-        evidenceCountError,
-    } =
-      await supabase
-        .from(
-          'ai_governance_registry_evidence',
-        )
-        .select(
-          'id',
-          {
-            count: 'exact',
-            head: true,
-          },
-        )
-        .eq(
-          'submission_id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .eq(
-          'evidence_state',
-          'current',
-        );
-
-    if (
-      evidenceCountError
-    ) {
-      return errorResponse(
-        evidenceCountError.message,
-        500,
-      );
+    if (evidenceCountError) {
+      return errorResponse(evidenceCountError.message, 500);
     }
 
-    const validationErrors: string[] =
-      [];
+    const validationErrors: string[] = [];
 
-    if (
-      missingFields.length >
-      0
-    ) {
+    if (missingFields.length > 0) {
       validationErrors.push(
         `Complete required fields: ${missingFields.join(', ')}.`,
       );
     }
 
-    if (
-      missingDeclarations.length >
-      0
-    ) {
+    if (missingDeclarations.length > 0) {
       validationErrors.push(
         `Accept required declarations: ${missingDeclarations.join(', ')}.`,
       );
     }
 
-    if (
-      !evidenceCount ||
-      evidenceCount < 1
-    ) {
+    if (!evidenceCount || evidenceCount < 1) {
       validationErrors.push(
         'Preserve at least one current evidence item before registration.',
       );
     }
 
     if (
-      submission.record_visibility ===
-        'public' &&
-      !hasValue(
-        submission.public_website,
-      )
+      submission.record_visibility === 'public' &&
+      !hasValue(submission.public_website)
     ) {
       validationErrors.push(
         'A public Registry record must include a public website or public evidence route.',
       );
     }
 
-    if (
-      validationErrors.length >
-      0
-    ) {
+    if (validationErrors.length > 0) {
       return errorResponse(
         'The Governance Entity Registration is not ready.',
         422,
@@ -377,62 +276,38 @@ export async function POST(
     }
 
     /*
-     * Stage the validated draft as submitted.
-     *
-     * "submitted" is the governed handoff point between
-     * editable intake and automatic Registry determination.
+     * Move the completed draft into the governed submitted state.
      */
-    const submittedAt =
-      new Date().toISOString();
+    const submittedAt = new Date().toISOString();
 
     const {
       data: submittedData,
       error: submitError,
-    } =
-      await supabase
-        .from(
-          'ai_governance_registry_submissions',
-        )
-        .update({
-          status:
-            'submitted',
-
-          submitted_at:
-            submittedAt,
-
-          updated_at:
-            submittedAt,
-        })
-        .eq(
+    } = await supabase
+      .from('ai_governance_registry_submissions')
+      .update({
+        status: 'submitted',
+        submitted_at: submittedAt,
+        updated_at: submittedAt,
+      })
+      .eq('id', submissionId)
+      .eq('owner_user_id', user.id)
+      .eq('status', 'draft')
+      .select(
+        [
           'id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .eq(
+          'governance_name',
+          'current_version',
           'status',
-          'draft',
-        )
-        .select(
-          [
-            'id',
-            'governance_name',
-            'current_version',
-            'status',
-            'submitted_at',
-            'requested_review_pathway',
-            'registry_identifier',
-            'updated_at',
-          ].join(', '),
-        )
-        .single();
+          'submitted_at',
+          'requested_review_pathway',
+          'registry_identifier',
+          'updated_at',
+        ].join(', '),
+      )
+      .single();
 
-    if (
-      submitError ||
-      !submittedData
-    ) {
+    if (submitError || !submittedData) {
       return errorResponse(
         submitError?.message ||
           'Unable to begin Governance Entity Registration.',
@@ -443,126 +318,68 @@ export async function POST(
     /*
      * Governed automatic registration.
      *
-     * The database finalizer:
-     *
-     * - verifies authenticated ownership
-     * - evaluates readiness
-     * - detects governed exceptions
-     * - issues TA-14-AIGR identifier
-     * - creates the permanent Registry projection
-     * - creates the integrity digest
-     * - appends the immutable lifecycle event
-     *
-     * No human reviewer acceptance is represented.
+     * The database finalizer verifies ownership, evaluates readiness,
+     * issues the permanent identifier, creates the Registry projection,
+     * creates the integrity digest, and appends the immutable event.
      */
     const {
-      data:
-        finalizeData,
+      data: finalizeData,
+      error: finalizeError,
+    } = await supabase.rpc(
+      'ta14_registry_auto_finalize_submission_v1',
+      {
+        requested_submission_id: submissionId,
+      },
+    );
 
-      error:
-        finalizeError,
-    } =
-      await supabase.rpc(
-        'ta14_registry_auto_finalize_submission_v1',
-        {
-          requested_submission_id:
-            submissionId,
-        },
-      );
-
-    if (
-      finalizeError
-    ) {
+    if (finalizeError) {
       /*
-       * PostgreSQL 23514 is used for a governed readiness
-       * or exception condition.
+       * 23514 is the governed exception path.
        *
-       * The registration remains preserved as submitted.
-       * We now also create a permanent exception record.
+       * The submission remains preserved as submitted and an exception
+       * record is created so the registrant and TA-14 can see exactly
+       * why automatic registration did not complete.
        */
-      if (
-        finalizeError.code ===
-        '23514'
-      ) {
+      if (finalizeError.code === '23514') {
         const failureDetail =
-          finalizeError.details ??
-          finalizeError.hint ??
-          null;
+          finalizeError.details ?? finalizeError.hint ?? null;
 
         const readinessFailures =
-          failureDetail
-            ? failureDetail
-                .split('|')
-                .map(
-                  (value) =>
-                    value.trim(),
-                )
-                .filter(Boolean)
-            : [];
+          readinessFailuresFromDetail(failureDetail);
 
         const {
-          data:
-            exceptionId,
-
-          error:
-            exceptionError,
-        } =
-          await supabase.rpc(
-            'ta14_registry_record_registration_exception_v1',
-            {
-              requested_submission_id:
-                submissionId,
-
-              requested_exception_code:
-                finalizeError.code ??
-                '23514',
-
-              requested_summary:
-                'Automatic Governance Entity Registration requires attention.',
-
-              requested_details:
-                [
-                  finalizeError.message,
-                ],
-
-              requested_readiness_failures:
-                readinessFailures,
-            },
-          );
+          data: exceptionId,
+          error: exceptionError,
+        } = await supabase.rpc(
+          'ta14_registry_record_registration_exception_v1',
+          {
+            requested_submission_id: submissionId,
+            requested_exception_code:
+              finalizeError.code ?? '23514',
+            requested_summary:
+              'Automatic Governance Entity Registration requires attention.',
+            requested_details: [finalizeError.message],
+            requested_readiness_failures: readinessFailures,
+          },
+        );
 
         return NextResponse.json(
           {
             ok: false,
-
-            requiresExceptionReview:
-              true,
-
-            submission:
-              submittedData,
+            requiresExceptionReview: true,
+            submission: submittedData,
 
             exception: {
-              id:
-                exceptionError
-                  ? null
-                  : exceptionId,
-
-              recorded:
-                !exceptionError,
-
-              recordingError:
-                exceptionError?.message ??
-                null,
+              id: exceptionError ? null : exceptionId,
+              recorded: !exceptionError,
+              recordingError: exceptionError?.message ?? null,
             },
 
             error:
               'The registration was preserved but could not be automatically registered.',
 
-            reason:
-              finalizeError.message,
-
-            details:
-              failureDetail,
-
+            reason: finalizeError.message,
+            details: failureDetail,
             readinessFailures,
 
             boundary:
@@ -575,126 +392,84 @@ export async function POST(
       }
 
       /*
-       * Unexpected infrastructure failure.
-       *
-       * Restore the submission to draft because the failure
-       * was not a governed Registry readiness determination.
+       * Unexpected infrastructure failures are not Registry findings.
+       * Restore the record to draft so the registrant is not locked
+       * because of a system failure.
        */
       await supabase
-        .from(
-          'ai_governance_registry_submissions',
-        )
+        .from('ai_governance_registry_submissions')
         .update({
-          status:
-            'draft',
-
-          submitted_at:
-            null,
-
-          updated_at:
-            new Date().toISOString(),
+          status: 'draft',
+          submitted_at: null,
+          updated_at: new Date().toISOString(),
         })
-        .eq(
-          'id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .eq(
-          'status',
-          'submitted',
-        )
-        .is(
-          'registry_identifier',
-          null,
-        );
+        .eq('id', submissionId)
+        .eq('owner_user_id', user.id)
+        .eq('status', 'submitted')
+        .is('registry_identifier', null);
 
       return errorResponse(
         `Automatic registration could not be completed: ${finalizeError.message}`,
         500,
         {
-          code:
-            finalizeError.code ??
-            null,
-
-          details:
-            finalizeError.details ??
-            null,
-
-          hint:
-            finalizeError.hint ??
-            null,
+          code: finalizeError.code ?? null,
+          details: finalizeError.details ?? null,
+          hint: finalizeError.hint ?? null,
         },
       );
     }
 
-    const result =
-      Array.isArray(
-        finalizeData,
-      )
-        ? (finalizeData[0] as
-            | AutoFinalizeResult
-            | undefined)
-        : undefined;
+    const result = Array.isArray(finalizeData)
+      ? (finalizeData[0] as AutoFinalizeResult | undefined)
+      : undefined;
 
-    if (
-      !result?.registry_identifier
-    ) {
+    if (!result?.registry_identifier) {
       /*
-       * Defensive recovery:
-       * verify whether the database successfully registered
-       * the record even if the RPC response was incomplete.
+       * Defensive recovery in case the RPC succeeded but did not return
+       * the expected row shape.
        */
       const {
-        data:
-          refreshedSubmission,
-      } =
-        await supabase
-          .from(
-            'ai_governance_registry_submissions',
-          )
-          .select(
-            'id, governance_name, current_version, status, registry_identifier, accepted_at, updated_at',
-          )
-          .eq(
-            'id',
-            submissionId,
-          )
-          .eq(
-            'owner_user_id',
-            user.id,
-          )
-          .single();
+        data: refreshedSubmission,
+      } = await supabase
+        .from('ai_governance_registry_submissions')
+        .select(
+          'id, governance_name, current_version, status, registry_identifier, accepted_at, updated_at',
+        )
+        .eq('id', submissionId)
+        .eq('owner_user_id', user.id)
+        .single();
+
+      const refreshed =
+        refreshedSubmission as unknown as
+          | {
+              id: string;
+              governance_name: string;
+              current_version: string;
+              status: string;
+              registry_identifier: string | null;
+              accepted_at: string | null;
+              updated_at: string | null;
+            }
+          | null;
 
       if (
-        refreshedSubmission?.status ===
-          'registered' &&
-        refreshedSubmission?.registry_identifier
+        refreshed?.status === 'registered' &&
+        refreshed.registry_identifier
       ) {
         return NextResponse.json({
           ok: true,
+          alreadyRegistered: false,
 
           registration: {
-            submissionId:
-              refreshedSubmission.id,
-
-            governanceName:
-              refreshedSubmission.governance_name,
-
-            currentVersion:
-              refreshedSubmission.current_version,
-
-            registryIdentifier:
-              refreshedSubmission.registry_identifier,
-
-            registeredAt:
-              refreshedSubmission.accepted_at,
+            submissionId: refreshed.id,
+            governanceName: refreshed.governance_name,
+            currentVersion: refreshed.current_version,
+            registryIdentifier: refreshed.registry_identifier,
+            registeredAt: refreshed.accepted_at,
           },
 
           notice:
-            'Governance Entity Registration completed successfully. Registration records an attributable governance identity and declared information. It is not certification, endorsement, legal validation, regulatory approval, ownership adjudication, or proof of technical performance.',
+            'Governance Entity Registration completed successfully. The permanent Registry Identifier has been issued. Registration records an attributable governance identity and declared information. It is not certification, endorsement, legal validation, regulatory approval, ownership adjudication, or proof of technical performance.',
         });
       }
 
@@ -704,44 +479,24 @@ export async function POST(
       );
     }
 
-    /*
-     * Successful automatic registration.
-     */
     return NextResponse.json({
       ok: true,
-
-      alreadyRegistered:
-        false,
+      alreadyRegistered: false,
 
       registration: {
-        submissionId:
-          result.submission_id,
-
-        governanceName:
-          submission.governance_name,
-
-        currentVersion:
-          submission.current_version,
-
-        registryIdentifier:
-          result.registry_identifier,
-
-        registeredAt:
-          result.registered_at,
-
-        publicRecordId:
-          result.public_record_id,
-
-        publiclyPublished:
-          result.is_publicly_published,
+        submissionId: result.submission_id,
+        governanceName: submission.governance_name,
+        currentVersion: submission.current_version,
+        registryIdentifier: result.registry_identifier,
+        registeredAt: result.registered_at,
+        publicRecordId: result.public_record_id,
+        publiclyPublished: result.is_publicly_published,
       },
 
       notice:
         'Governance Entity Registration completed successfully. The permanent Registry Identifier has been issued. Registration records an attributable governance identity and declared information. It is not certification, endorsement, legal validation, regulatory approval, ownership adjudication, or proof of technical performance.',
     });
-  } catch (
-    error
-  ) {
+  } catch (error) {
     return errorResponse(
       error instanceof Error
         ? error.message
@@ -751,88 +506,53 @@ export async function POST(
   }
 }
 
-export async function GET(
-  request: NextRequest,
-) {
+export async function GET(request: NextRequest) {
   try {
     const submissionId =
-      request.nextUrl.searchParams.get(
-        'submissionId',
-      );
+      request.nextUrl.searchParams.get('submissionId');
 
-    if (
-      !submissionId
-    ) {
-      return errorResponse(
-        'Submission ID is required.',
-      );
+    if (!submissionId) {
+      return errorResponse('Submission ID is required.');
     }
 
-    const cookieStore =
-      await cookies();
-
-    const supabase =
-      createSupabaseClient(
-        cookieStore,
-      );
+    const cookieStore = await cookies();
+    const supabase = createSupabaseClient(cookieStore);
 
     const {
-      data: {
-        user,
-      },
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
 
-      error:
-        userError,
-    } =
-      await supabase.auth.getUser();
-
-    if (
-      userError ||
-      !user
-    ) {
-      return errorResponse(
-        'Authentication required.',
-        401,
-      );
+    if (userError || !user) {
+      return errorResponse('Authentication required.', 401);
     }
 
+    /*
+     * Load the account-scoped Registry record.
+     */
     const {
-      data:
-        submissionData,
-
-      error,
-    } =
-      await supabase
-        .from(
-          'ai_governance_registry_submissions',
-        )
-        .select(
-          [
-            'id',
-            'governance_name',
-            'current_version',
-            'status',
-            'submitted_at',
-            'accepted_at',
-            'requested_review_pathway',
-            'registry_identifier',
-            'updated_at',
-          ].join(', '),
-        )
-        .eq(
+      data: submissionData,
+      error: submissionError,
+    } = await supabase
+      .from('ai_governance_registry_submissions')
+      .select(
+        [
           'id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .single();
+          'governance_name',
+          'current_version',
+          'status',
+          'submitted_at',
+          'accepted_at',
+          'requested_review_pathway',
+          'registry_identifier',
+          'updated_at',
+        ].join(', '),
+      )
+      .eq('id', submissionId)
+      .eq('owner_user_id', user.id)
+      .single();
 
-    if (
-      error ||
-      !submissionData
-    ) {
+    if (submissionError || !submissionData) {
       return errorResponse(
         'Registry submission was not found.',
         404,
@@ -842,60 +562,107 @@ export async function GET(
     const submission =
       submissionData as unknown as {
         id: string;
-
-        governance_name:
-          string;
-
-        current_version:
-          string;
-
-        status:
-          string;
-
-        submitted_at:
-          string | null;
-
-        accepted_at:
-          string | null;
-
-        requested_review_pathway:
-          string | null;
-
-        registry_identifier:
-          string | null;
-
-        updated_at:
-          string | null;
+        governance_name: string;
+        current_version: string;
+        status: string;
+        submitted_at: string | null;
+        accepted_at: string | null;
+        requested_review_pathway: string | null;
+        registry_identifier: string | null;
+        updated_at: string | null;
       };
+
+    /*
+     * NEW:
+     * Return the latest unresolved automatic-registration exception
+     * with the submission status.
+     *
+     * This lets the Registry UI show a real "Needs Attention" state
+     * with the exact preserved readiness failures instead of leaving
+     * a registrant with a generic submitted status.
+     */
+    const {
+      data: exceptionData,
+      error: exceptionError,
+    } = await supabase
+      .from('ta14_registry_registration_exceptions')
+      .select(
+        [
+          'id',
+          'submission_id',
+          'exception_status',
+          'exception_type',
+          'exception_code',
+          'exception_summary',
+          'exception_details',
+          'readiness_failures',
+          'resolution_summary',
+          'opened_at',
+          'resolved_at',
+          'updated_at',
+        ].join(', '),
+      )
+      .eq('submission_id', submissionId)
+      .eq('owner_user_id', user.id)
+      .in('exception_status', [
+        'open',
+        'correction_required',
+        'under_review',
+      ])
+      .order('opened_at', {
+        ascending: false,
+      })
+      .limit(1)
+      .maybeSingle();
+
+    if (exceptionError) {
+      return errorResponse(
+        `Unable to load Registry exception status: ${exceptionError.message}`,
+        500,
+      );
+    }
+
+    const latestException =
+      exceptionData as unknown as RegistrationException | null;
+
+    const registered =
+      submission.status === 'registered' &&
+      Boolean(submission.registry_identifier);
+
+    const editable =
+      submission.status === 'draft' &&
+      !submission.registry_identifier;
+
+    const needsAttention =
+      !registered &&
+      Boolean(latestException);
 
     return NextResponse.json({
       submission,
 
-      registered:
-        submission.status ===
-          'registered' &&
-        Boolean(
-          submission.registry_identifier,
-        ),
+      registered,
 
-      editable:
-        submission.status ===
-          'draft' &&
-        !submission.registry_identifier,
+      editable,
 
       locked:
-        submission.status !==
-          'draft' ||
-        Boolean(
-          submission.registry_identifier,
-        ),
+        submission.status !== 'draft' ||
+        Boolean(submission.registry_identifier),
+
+      needsAttention,
+
+      latestException,
+
+      registrationState:
+        registered
+          ? 'registered'
+          : needsAttention
+            ? 'needs_attention'
+            : submission.status,
 
       registryBoundary:
         'Registration establishes an attributable governance record. It is not certification, endorsement, legal validation, regulatory approval, ownership adjudication, or proof of technical performance.',
     });
-  } catch (
-    error
-  ) {
+  } catch (error) {
     return errorResponse(
       error instanceof Error
         ? error.message
