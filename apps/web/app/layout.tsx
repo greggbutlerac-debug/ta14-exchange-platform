@@ -1,21 +1,22 @@
 import type { Metadata, Viewport } from 'next';
+import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 
 import { SiteActivityCounter } from '../components/site-activity-counter';
 
 import './globals.css';
 
+const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
+
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    'https://ta14-exchange-platform-x2g7.vercel.app',
-  ),
+  metadataBase: new URL('https://ta14authority.org'),
   title: {
-    default: 'TA-14 Exchange Platform',
-    template: '%s | TA-14 Exchange Platform',
+    default: 'TA-14 Authority Governance Institution',
+    template: '%s | TA-14 Authority Governance Institution',
   },
   description:
     'Build, test, correct, preserve, and verify consequential execution routes through TA-14 admissible execution records.',
-  applicationName: 'TA-14 Exchange Platform',
+  applicationName: 'TA-14 Authority Governance Institution',
   authors: [
     {
       name: 'Greggory Don Butler',
@@ -45,8 +46,8 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_US',
     url: '/',
-    siteName: 'TA-14 Exchange Platform',
-    title: 'TA-14 Exchange Platform',
+    siteName: 'TA-14 Authority Governance Institution',
+    title: 'TA-14 Authority Governance Institution',
     description:
       'Every consequence has a route. TA-14 proves whether it should exist.',
     images: [
@@ -60,7 +61,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'TA-14 Exchange Platform',
+    title: 'TA-14 Authority Governance Institution',
     description:
       'Every consequence has a route. TA-14 proves whether it should exist.',
     images: ['/ta14-social-preview.png'],
@@ -118,6 +119,24 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        {/* Google Analytics */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', '${GA_MEASUREMENT_ID}', {
+              send_page_view: true
+            });
+          `}
+        </Script>
+
         {children}
 
         <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
