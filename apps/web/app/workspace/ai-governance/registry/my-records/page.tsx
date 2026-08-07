@@ -18,6 +18,18 @@ type RegistryRecord = {
   acceptedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
+  needsAttention?: boolean;
+  registrationState?: string | null;
+  latestException?: {
+    id: string;
+    exceptionStatus: string;
+    exceptionType: string;
+    exceptionCode: string | null;
+    exceptionSummary: string;
+    exceptionDetails: string[];
+    readinessFailures: string[];
+    openedAt: string | null;
+  } | null;
 };
 
 type ApiSuccess = {
@@ -62,8 +74,16 @@ function label(value: string | null | undefined, fallback = 'Not declared') {
     .replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function statusGroup(status: string): FilterValue {
-  const normalized = status.trim().toLowerCase();
+function statusGroup(
+  status: string,
+  needsAttention = false,
+  registrationState?: string | null,
+): FilterValue {
+  if (needsAttention) return 'attention';
+
+  const normalized = (registrationState || status).trim().toLowerCase();
+
+  if (normalized === 'needs_attention') return 'attention';
 
   if (normalized === 'draft') return 'draft';
   if (normalized === 'submitted') return 'submitted';
@@ -180,7 +200,7 @@ export default function MyRegistryRecordsPage() {
   const counts = useMemo(() => {
     return records.reduce(
       (accumulator, record) => {
-        const group = statusGroup(record.status);
+        const group = statusGroup(record.status, record.needsAttention, record.registrationState);
         accumulator[group] += 1;
         accumulator.all += 1;
         return accumulator;
@@ -397,7 +417,7 @@ export default function MyRegistryRecordsPage() {
       {!loading && !error && visibleRecords.length > 0 ? (
         <section className="recordsGrid">
           {visibleRecords.map((record) => {
-            const group = statusGroup(record.status);
+            const group = statusGroup(record.status, record.needsAttention, record.registrationState);
             const isRegistered =
               group === 'registered' && Boolean(record.registryIdentifier);
             const isEditable = group === 'draft';
@@ -424,6 +444,43 @@ export default function MyRegistryRecordsPage() {
                     {record.category} · Version {record.currentVersion}
                   </p>
                 </div>
+
+                {needsAttention && record.latestException ? (
+                  <section className="attentionPanel">
+                    <div className="attentionHeader">
+                      <div>
+                        <p className="attentionEyebrow">REGISTRY ACTION REQUIRED</p>
+                        <h3>{record.latestException.exceptionSummary}</h3>
+                      </div>
+                      <span className="attentionState">
+                        {label(record.latestException.exceptionStatus)}
+                      </span>
+                    </div>
+
+                    {record.latestException.readinessFailures.length > 0 ? (
+                      <div className="readinessBlock">
+                        <strong>What needs attention</strong>
+                        <ul>
+                          {record.latestException.readinessFailures.map((failure) => (
+                            <li key={failure}>{failure}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ) : null}
+
+                    {record.latestException.exceptionDetails.length > 0 ? (
+                      <p className="attentionDetail">
+                        {record.latestException.exceptionDetails.join(' ')}
+                      </p>
+                    ) : null}
+
+                    <p className="attentionBoundary">
+                      This is a Registry readiness condition, not a certification,
+                      endorsement, technical finding, legal determination, or
+                      judgment about the merits of the governance architecture.
+                    </p>
+                  </section>
+                ) : null}
 
                 <dl className="dateGrid">
                   <div>
@@ -834,6 +891,93 @@ const styles = `
     margin-bottom: 0;
     color: #9cadc8;
     line-height: 1.6;
+  }
+
+  .attentionPanel {
+    padding: 18px;
+    display: grid;
+    gap: 14px;
+    border: 1px solid rgba(255, 210, 127, 0.28);
+    border-left: 4px solid #ffd27f;
+    border-radius: 16px;
+    background:
+      radial-gradient(circle at 100% 0%, rgba(255, 210, 127, 0.08), transparent 16rem),
+      rgba(78, 48, 12, 0.22);
+  }
+
+  .attentionHeader {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .attentionHeader h3 {
+    margin: 0;
+    color: #fff1cc;
+    font-size: 1.08rem;
+    line-height: 1.45;
+  }
+
+  .attentionEyebrow {
+    margin: 0 0 6px;
+    color: #ffd27f;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+  }
+
+  .attentionState {
+    flex: 0 0 auto;
+    padding: 6px 9px;
+    border: 1px solid rgba(255, 210, 127, 0.3);
+    border-radius: 999px;
+    background: rgba(112, 75, 24, 0.38);
+    color: #ffe0a8;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .readinessBlock {
+    color: #dce6f5;
+    line-height: 1.6;
+  }
+
+  .readinessBlock strong {
+    display: block;
+    margin-bottom: 6px;
+    color: #ffe4a6;
+  }
+
+  .readinessBlock ul {
+    margin: 0;
+    padding-left: 20px;
+  }
+
+  .readinessBlock li + li {
+    margin-top: 5px;
+  }
+
+  .attentionDetail,
+  .attentionBoundary {
+    margin: 0;
+    color: #b9c7df;
+    line-height: 1.65;
+  }
+
+  .attentionBoundary {
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 210, 127, 0.14);
+    color: #91a2be;
+    font-size: 0.82rem;
+  }
+
+  .status-attention {
+    border-color: rgba(255, 210, 127, 0.32);
+    background: rgba(112, 75, 24, 0.4);
+    color: #ffe0a8;
   }
 
   .dateGrid {
