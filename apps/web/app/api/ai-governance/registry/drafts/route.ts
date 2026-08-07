@@ -124,6 +124,7 @@ function buildSubmissionRow(form: JsonRecord, ownerUserId: string) {
     contact_email: text(form.contactEmail),
     public_contact_mode: mapContactMode(form.contactVisibility),
     public_website: nullable(form.website),
+    public_evidence_route: nullable(form.publicEvidenceRoute),
 
     geographic_scope: nullable(form.jurisdiction),
     regulatory_scope: nullable(form.regulatoryScope),
