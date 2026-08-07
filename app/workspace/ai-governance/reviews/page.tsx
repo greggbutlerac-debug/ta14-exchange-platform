@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/server";
+import { createClient } from "@/apps/web/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -104,10 +104,7 @@ type VersionLineage = {
 };
 
 const RECORD_FILTERS = [
-  {
-    value: "ALL",
-    label: "All",
-  },
+  { value: "ALL", label: "All" },
   {
     value: "PARTICIPANT_REVIEW",
     label: "Participant Reviews",
@@ -681,23 +678,15 @@ export default async function ReviewsPage({
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white">
-      {/* =====================================================
-          HERO
-      ===================================================== */}
-
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 pointer-events-none">
+        <div className="pointer-events-none absolute inset-0">
           <div className="absolute left-[-10rem] top-[-10rem] h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-[120px]" />
-
           <div className="absolute right-[-8rem] top-[-6rem] h-[28rem] w-[28rem] rounded-full bg-violet-500/10 blur-[120px]" />
-
           <div className="absolute bottom-[-14rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-blue-600/10 blur-[140px]" />
 
           <div className="absolute left-[12%] top-[34%] h-2 w-2 animate-pulse rounded-full bg-cyan-200/70" />
-
           <div className="absolute right-[18%] top-[26%] h-1.5 w-1.5 animate-pulse rounded-full bg-violet-200/70" />
-
-          <div className="absolute right-[32%] bottom-[24%] h-1 w-1 rounded-full bg-white/60" />
+          <div className="absolute bottom-[24%] right-[32%] h-1 w-1 rounded-full bg-white/60" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
@@ -731,14 +720,13 @@ export default async function ReviewsPage({
             </p>
 
             <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-400 lg:text-base">
-              The TA-14 Reviews & Responses record
-              preserves participant reviews, responses,
-              independent reviews, evidence challenges,
-              factual corrections, technical comments,
-              external publications, replication requests,
-              demonstration requests, and governed
-              communications without collapsing those
-              voices into one institutional narrative.
+              The TA-14 Reviews & Responses record preserves
+              participant reviews, responses, independent reviews,
+              evidence challenges, factual corrections, technical
+              comments, external publications, replication
+              requests, demonstration requests, and governed
+              communications without collapsing those voices into
+              one institutional narrative.
             </p>
           </div>
 
@@ -766,10 +754,6 @@ export default async function ReviewsPage({
           </div>
         </div>
       </section>
-
-      {/* =====================================================
-          STATS
-      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
@@ -827,10 +811,6 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =====================================================
-          GOVERNING PRINCIPLE
-      ===================================================== */}
-
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
@@ -840,23 +820,21 @@ export default async function ReviewsPage({
               </div>
 
               <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white">
-                Preserve separate voices without losing the
-                record.
+                Preserve separate voices without losing the record.
               </h2>
 
               <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-300">
-                TA-14 findings remain TA-14 findings.
-                Participant reviews remain participant reviews.
-                Independent reviews remain attributable to their
-                authors. Challenges remain challenges.
-                Corrections remain versioned corrections.
+                TA-14 findings remain TA-14 findings. Participant
+                reviews remain participant reviews. Independent
+                reviews remain attributable to their authors.
+                Challenges remain challenges. Corrections remain
+                versioned corrections.
               </p>
 
               <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
                 The objective is not consensus. The objective is
                 an inspectable governance history in which later
-                interpretation cannot silently erase earlier
-                state.
+                interpretation cannot silently erase earlier state.
               </p>
             </div>
 
@@ -897,10 +875,6 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =====================================================
-          FOUNDING CASE
-      ===================================================== */}
-
       {foundingCase ? (
         <section className="border-b border-white/10">
           <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -929,22 +903,20 @@ export default async function ReviewsPage({
                     Authority Revoked Before Consequential
                     Execution became the first completed
                     independent external TA-14 governed
-                    demonstration to generate a Participant
-                    Review and linked independent External
-                    Publication.
+                    demonstration to generate a Participant Review
+                    and linked independent External Publication.
                   </p>
 
                   <div className="mt-6 rounded-2xl border border-white/10 bg-black/15 p-5">
                     <div className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100">
-                      PARTIALLY DEMONSTRATED —
-                      EVIDENCE-BOUNDED
+                      PARTIALLY DEMONSTRATED — EVIDENCE-BOUNDED
                     </div>
 
                     <p className="mt-3 text-base leading-7 text-white">
                       Runtime behavior demonstrated.
                       <br />
-                      Full surrounding chronology not
-                      independently demonstrated.
+                      Full surrounding chronology not independently
+                      demonstrated.
                     </p>
                   </div>
 
@@ -1020,10 +992,6 @@ export default async function ReviewsPage({
         </section>
       ) : null}
 
-      {/* =====================================================
-          PUBLIC RECORD
-      ===================================================== */}
-
       <section
         id="public-record"
         className="scroll-mt-24 border-b border-white/10"
@@ -1036,15 +1004,14 @@ export default async function ReviewsPage({
               </div>
 
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-                Inspect the governed voices attached to the
-                record.
+                Inspect the governed voices attached to the record.
               </h2>
 
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">
                 Publication here preserves authorship and
                 chronology. It does not collapse participant,
-                reviewer, challenger, or TA-14 authority into
-                one voice.
+                reviewer, challenger, or TA-14 authority into one
+                voice.
               </p>
             </div>
 
@@ -1104,10 +1071,6 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =====================================================
-          RECORD CLASSES
-      ===================================================== */}
-
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
           <div>
@@ -1116,8 +1079,8 @@ export default async function ReviewsPage({
             </div>
 
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              Different submissions carry different
-              institutional meaning.
+              Different submissions carry different institutional
+              meaning.
             </h2>
           </div>
 
@@ -1171,10 +1134,6 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =====================================================
-          VERSION LINEAGE
-      ===================================================== */}
-
       {lineage.length > 0 ? (
         <section className="border-b border-white/10">
           <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -1189,10 +1148,10 @@ export default async function ReviewsPage({
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
-                Version lineage preserves the distinction
-                between the implementation that entered review
-                and subsequent engineering that emerged from
-                evidence, challenge, or learning.
+                Version lineage preserves the distinction between
+                the implementation that entered review and
+                subsequent engineering that emerged from evidence,
+                challenge, or learning.
               </p>
             </div>
 
@@ -1222,18 +1181,9 @@ export default async function ReviewsPage({
 
                   <div className="mt-5 grid grid-cols-3 gap-2">
                     {[
-                      [
-                        "Registered",
-                        item.registered,
-                      ],
-                      [
-                        "Frozen",
-                        item.frozen,
-                      ],
-                      [
-                        "Demonstrated",
-                        item.demonstrated,
-                      ],
+                      ["Registered", item.registered],
+                      ["Frozen", item.frozen],
+                      ["Demonstrated", item.demonstrated],
                     ].map(([label, value]) => (
                       <div
                         key={String(label)}
@@ -1290,10 +1240,6 @@ export default async function ReviewsPage({
           </div>
         </section>
       ) : null}
-
-      {/* =====================================================
-          SUBMISSION PATHWAYS
-      ===================================================== */}
 
       <section
         id="submission-pathways"
@@ -1399,10 +1345,6 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =====================================================
-          GOVERNED MESSAGING
-      ===================================================== */}
-
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
           <div className="grid gap-8 lg:grid-cols-2">
@@ -1416,11 +1358,10 @@ export default async function ReviewsPage({
               </h3>
 
               <p className="mt-4 text-sm leading-7 text-slate-400">
-                A message about a Registry entity, case,
-                finding, artifact, or review should remain bound
-                to that record. The sender should not have to
-                reconstruct identifiers already known by the
-                Exchange.
+                A message about a Registry entity, case, finding,
+                artifact, or review should remain bound to that
+                record. The sender should not have to reconstruct
+                identifiers already known by the Exchange.
               </p>
 
               <div className="mt-5 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm leading-7 text-slate-300">
@@ -1448,12 +1389,11 @@ export default async function ReviewsPage({
               </h3>
 
               <p className="mt-4 text-sm leading-7 text-slate-400">
-                A message does not become evidence merely
-                because TA-14 received it. A review does not
-                become a finding merely because it was
-                published. A technical comment does not acquire
-                institutional authority merely by appearing in
-                the Exchange.
+                A message does not become evidence merely because
+                TA-14 received it. A review does not become a
+                finding merely because it was published. A
+                technical comment does not acquire institutional
+                authority merely by appearing in the Exchange.
               </p>
 
               <div className="mt-5 rounded-2xl border border-amber-300/15 bg-amber-300/[0.045] p-4 text-sm leading-7 text-slate-300">
@@ -1465,10 +1405,6 @@ export default async function ReviewsPage({
           </div>
         </div>
       </section>
-
-      {/* =====================================================
-          INSTITUTIONAL BOUNDARY
-      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -1503,10 +1439,6 @@ export default async function ReviewsPage({
           </div>
         </div>
       </section>
-
-      {/* =====================================================
-          CLOSING
-      ===================================================== */}
 
       <section>
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
