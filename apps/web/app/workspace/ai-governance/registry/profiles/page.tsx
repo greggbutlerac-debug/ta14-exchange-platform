@@ -101,6 +101,10 @@ export default async function GovernanceProfilesPage() {
     createSupabaseClient(cookieStore);
 
   const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const {
     data,
     error,
   } = await supabase
@@ -205,6 +209,41 @@ export default async function GovernanceProfilesPage() {
             >
               Governance Profiles
             </span>
+
+            {user ? (
+              <>
+                <span
+                  style={{
+                    color:
+                      'rgba(255,255,255,0.28)',
+                  }}
+                >
+                  /
+                </span>
+
+                <Link
+                  href="/workspace/ai-governance/registry/profiles/editor"
+                  style={{
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    minHeight: 34,
+                    padding: '0 12px',
+                    border:
+                      '1px solid rgba(213, 167, 75, 0.34)',
+                    borderRadius: 10,
+                    background:
+                      'rgba(213, 167, 75, 0.08)',
+                    color: '#edc574',
+                    textDecoration: 'none',
+                    fontSize: 13,
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                  }}
+                >
+                  Governance Profile Editor →
+                </Link>
+              </>
+            ) : null}
           </nav>
 
           <div
