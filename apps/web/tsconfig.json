@@ -19,6 +19,9 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
+      "@/*": [
+        "./*"
+      ],
       "@vercel/blob": [
         "./node_modules/@vercel/blob"
       ],
