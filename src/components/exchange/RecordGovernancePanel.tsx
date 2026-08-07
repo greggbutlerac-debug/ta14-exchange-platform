@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import ChallengeThisRecord from "@/components/exchange/ChallengeThisRecord";
-import { createClient } from "@/lib/supabase/client";
+import ChallengeThisRecord from "./ChallengeThisRecord";
+import { createClient } from "../../lib/supabase/client";
 
 type RecordGovernancePanelProps = {
   recordType: string;
