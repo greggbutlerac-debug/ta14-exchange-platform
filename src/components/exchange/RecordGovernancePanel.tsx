@@ -47,9 +47,7 @@ export default function RecordGovernancePanel({
 }: RecordGovernancePanelProps) {
   const supabase = useMemo(() => createClient(), []);
 
-  const [currentState, setCurrentState] = useState<CurrentState | null>(
-    null
-  );
+  const [currentState, setCurrentState] = useState<CurrentState | null>(null);
   const [lineage, setLineage] = useState<LineageEvent[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState("");
@@ -112,8 +110,9 @@ export default function RecordGovernancePanel({
         setCurrentState(
           (stateResult.data as CurrentState | null) ?? null
         );
+
         setLineage(
-          (lineageResult.data as LineageEvent[] | null) ?? []
+          (lineageResult.data as unknown as LineageEvent[] | null) ?? []
         );
       }
 
@@ -175,10 +174,12 @@ export default function RecordGovernancePanel({
               label="Current record"
               value={effectiveState.current_record_key}
             />
+
             <InfoCard
               label="Record type"
               value={effectiveState.current_record_type}
             />
+
             <InfoCard
               label="Version"
               value={
@@ -186,6 +187,7 @@ export default function RecordGovernancePanel({
                 "Not declared"
               }
             />
+
             <InfoCard
               label="Authority"
               value={effectiveState.authority_name}
@@ -197,6 +199,7 @@ export default function RecordGovernancePanel({
           <div className="text-xs font-semibold uppercase tracking-[0.16em] text-white/40">
             Authority basis
           </div>
+
           <p className="mt-2 text-sm leading-6 text-white/70">
             {effectiveState.authority_basis}
           </p>
@@ -231,6 +234,7 @@ export default function RecordGovernancePanel({
               No challenge or supersession lineage has been recorded
               yet.
             </p>
+
             <p className="mt-2 text-sm leading-6 text-white/45">
               This baseline remains the current record unless a
               governed challenge, reconsideration, or superseding
@@ -261,12 +265,14 @@ export default function RecordGovernancePanel({
 
                       <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs text-white/40">
                         <span>{event.lineage_id}</span>
+
                         <span>
                           {event.record_key}
                           {event.record_version
                             ? ` · ${event.record_version}`
                             : ""}
                         </span>
+
                         {event.authority_name && (
                           <span>{event.authority_name}</span>
                         )}
@@ -289,6 +295,7 @@ export default function RecordGovernancePanel({
             Reconsideration → Authorized Change → Superseding State →
             Preserved Lineage
           </p>
+
           <p className="mt-2 text-xs leading-5 text-white/40">
             No correction by overwrite. A later state may supersede a
             prior state, but it does not erase it.
@@ -318,6 +325,7 @@ function InfoCard({
       <div className="text-xs uppercase tracking-[0.14em] text-white/35">
         {label}
       </div>
+
       <div className="mt-2 break-words text-sm font-semibold text-white/85">
         {value}
       </div>
@@ -362,4 +370,3 @@ function formatTimestamp(value: string) {
     minute: "2-digit",
   }).format(date);
 }
-
