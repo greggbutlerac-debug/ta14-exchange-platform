@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createClient } from "@/utils/supabase/server";
+import { createClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -53,7 +53,7 @@ type ReviewRecord = {
 type PublicCount = {
   record_type: string;
   record_type_label: string;
-  record_count: number;
+  record_count: number | string;
 };
 
 type CaseSummary = {
@@ -63,16 +63,16 @@ type CaseSummary = {
   demonstration_identifier: string | null;
   case_identifier: string | null;
 
-  total_public_records: number;
-  participant_reviews: number;
-  participant_responses: number;
-  independent_reviews: number;
-  evidence_challenges: number;
-  factual_corrections: number;
-  technical_comments: number;
-  replication_requests: number;
-  demonstration_requests: number;
-  external_publications: number;
+  total_public_records: number | string;
+  participant_reviews: number | string;
+  participant_responses: number | string;
+  independent_reviews: number | string;
+  evidence_challenges: number | string;
+  factual_corrections: number | string;
+  technical_comments: number | string;
+  replication_requests: number | string;
+  demonstration_requests: number | string;
+  external_publications: number | string;
 
   latest_public_record_at: string | null;
 };
@@ -104,14 +104,38 @@ type VersionLineage = {
 };
 
 const RECORD_FILTERS = [
-  { value: "ALL", label: "All" },
-  { value: "PARTICIPANT_REVIEW", label: "Participant Reviews" },
-  { value: "PARTICIPANT_RESPONSE", label: "Participant Responses" },
-  { value: "INDEPENDENT_REVIEW", label: "Independent Reviews" },
-  { value: "EVIDENCE_CHALLENGE", label: "Evidence Challenges" },
-  { value: "FACTUAL_CORRECTION", label: "Factual Corrections" },
-  { value: "TECHNICAL_COMMENT", label: "Technical Comments" },
-  { value: "EXTERNAL_PUBLICATION", label: "External Publications" },
+  {
+    value: "ALL",
+    label: "All",
+  },
+  {
+    value: "PARTICIPANT_REVIEW",
+    label: "Participant Reviews",
+  },
+  {
+    value: "PARTICIPANT_RESPONSE",
+    label: "Participant Responses",
+  },
+  {
+    value: "INDEPENDENT_REVIEW",
+    label: "Independent Reviews",
+  },
+  {
+    value: "EVIDENCE_CHALLENGE",
+    label: "Evidence Challenges",
+  },
+  {
+    value: "FACTUAL_CORRECTION",
+    label: "Factual Corrections",
+  },
+  {
+    value: "TECHNICAL_COMMENT",
+    label: "Technical Comments",
+  },
+  {
+    value: "EXTERNAL_PUBLICATION",
+    label: "External Publications",
+  },
 ];
 
 const RECORD_ORDER = [
@@ -160,7 +184,9 @@ const RECORD_DESCRIPTIONS: Record<string, string> = {
 };
 
 function formatDate(value?: string | null) {
-  if (!value) return "Not recorded";
+  if (!value) {
+    return "Not recorded";
+  }
 
   try {
     return new Intl.DateTimeFormat("en-US", {
@@ -174,11 +200,16 @@ function formatDate(value?: string | null) {
 }
 
 function normalizeCount(value: unknown) {
-  if (typeof value === "number") return value;
+  if (typeof value === "number") {
+    return value;
+  }
+
   if (typeof value === "string") {
     const parsed = Number(value);
+
     return Number.isFinite(parsed) ? parsed : 0;
   }
+
   return 0;
 }
 
@@ -256,18 +287,28 @@ function StatCard({
         {value}
       </div>
 
-      <div className="mt-2 text-sm font-semibold text-slate-100">{label}</div>
+      <div className="mt-2 text-sm font-semibold text-slate-100">
+        {label}
+      </div>
 
-      <p className="mt-2 text-xs leading-5 text-slate-400">{description}</p>
+      <p className="mt-2 text-xs leading-5 text-slate-400">
+        {description}
+      </p>
     </div>
   );
 }
 
-function RecordCard({ record }: { record: ReviewRecord }) {
+function RecordCard({
+  record,
+}: {
+  record: ReviewRecord;
+}) {
   const metadata = record.metadata ?? {};
 
   const caseTitle =
-    typeof metadata.case_title === "string" ? metadata.case_title : null;
+    typeof metadata.case_title === "string"
+      ? metadata.case_title
+      : null;
 
   const findingClass =
     typeof metadata.ta14_finding_class === "string"
@@ -284,7 +325,7 @@ function RecordCard({ record }: { record: ReviewRecord }) {
       <div className="flex flex-wrap items-center gap-2">
         <span
           className={`rounded-full border px-3 py-1 text-[11px] font-bold uppercase tracking-[0.18em] ${recordBadgeClass(
-            record.record_type
+            record.record_type,
           )}`}
         >
           {record.record_type_label}
@@ -292,7 +333,7 @@ function RecordCard({ record }: { record: ReviewRecord }) {
 
         <span
           className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] ${statusBadgeClass(
-            record.status
+            record.status,
           )}`}
         >
           {record.status.replaceAll("_", " ")}
@@ -322,7 +363,7 @@ function RecordCard({ record }: { record: ReviewRecord }) {
       </div>
 
       <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-        <div className="rounded-2xl border border-white/8 bg-black/10 p-3">
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
             Author
           </div>
@@ -331,16 +372,16 @@ function RecordCard({ record }: { record: ReviewRecord }) {
             {record.author_name}
           </div>
 
-          {(record.author_role || record.author_organization) && (
+          {record.author_role || record.author_organization ? (
             <div className="mt-1 text-xs leading-5 text-slate-400">
               {[record.author_role, record.author_organization]
                 .filter(Boolean)
                 .join(" · ")}
             </div>
-          )}
+          ) : null}
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-black/10 p-3">
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
             Governance
           </div>
@@ -356,7 +397,7 @@ function RecordCard({ record }: { record: ReviewRecord }) {
           ) : null}
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-black/10 p-3">
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
             Demonstration
           </div>
@@ -370,13 +411,15 @@ function RecordCard({ record }: { record: ReviewRecord }) {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-white/8 bg-black/10 p-3">
+        <div className="rounded-2xl border border-white/10 bg-black/10 p-3">
           <div className="text-[10px] font-semibold uppercase tracking-[0.15em] text-slate-500">
             Published
           </div>
 
           <div className="mt-1 text-sm font-medium text-slate-100">
-            {formatDate(record.publication_date ?? record.published_at)}
+            {formatDate(
+              record.publication_date ?? record.published_at,
+            )}
           </div>
 
           {record.disposition ? (
@@ -445,12 +488,12 @@ function RecordCard({ record }: { record: ReviewRecord }) {
         ) : null}
       </div>
 
-      <div className="mt-6 border-t border-white/8 pt-4">
+      <div className="mt-6 border-t border-white/10 pt-4">
         <p className="text-xs leading-5 text-slate-500">
-          This record retains its own authorship and institutional classification.
-          Publication in Reviews & Responses does not automatically constitute
-          TA-14 adoption, endorsement, validation, certification, or modification
-          of another governed record.
+          This record retains its own authorship and institutional
+          classification. Publication in Reviews & Responses does not
+          automatically constitute TA-14 adoption, endorsement, validation,
+          certification, or modification of another governed record.
         </p>
       </div>
     </article>
@@ -464,30 +507,43 @@ export default async function ReviewsPage({
 }) {
   const params = await searchParams;
 
-  const selectedType = params.type?.toUpperCase() ?? "ALL";
-  const selectedRegistry = params.registry ?? null;
-  const selectedCase = params.case ?? null;
+  const selectedType =
+    params.type?.toUpperCase() ?? "ALL";
+
+  const selectedRegistry =
+    params.registry ?? null;
+
+  const selectedCase =
+    params.case ?? null;
 
   const supabase = await createClient();
 
   let recordsQuery = supabase
     .from("ta14_reviews_responses_public_index")
     .select("*")
-    .order("published_at", { ascending: false });
+    .order("published_at", {
+      ascending: false,
+    });
 
   if (selectedType !== "ALL") {
-    recordsQuery = recordsQuery.eq("record_type", selectedType);
+    recordsQuery = recordsQuery.eq(
+      "record_type",
+      selectedType,
+    );
   }
 
   if (selectedRegistry) {
     recordsQuery = recordsQuery.eq(
       "registry_identifier",
-      selectedRegistry
+      selectedRegistry,
     );
   }
 
   if (selectedCase) {
-    recordsQuery = recordsQuery.eq("case_identifier", selectedCase);
+    recordsQuery = recordsQuery.eq(
+      "case_identifier",
+      selectedCase,
+    );
   }
 
   const [
@@ -505,31 +561,74 @@ export default async function ReviewsPage({
     supabase
       .from("ta14_reviews_responses_case_summary")
       .select("*")
-      .order("latest_public_record_at", { ascending: false }),
+      .order("latest_public_record_at", {
+        ascending: false,
+      }),
 
     supabase
       .from("ta14_public_governance_version_lineage")
       .select("*")
-      .eq("registry_identifier", "TA-14-AIGR-000008")
-      .order("version", { ascending: true }),
+      .eq(
+        "registry_identifier",
+        "TA-14-AIGR-000008",
+      )
+      .order("version", {
+        ascending: true,
+      }),
   ]);
 
-  const records = (recordsResult.data ?? []) as ReviewRecord[];
-  const counts = (countsResult.data ?? []) as PublicCount[];
-  const caseSummaries = (caseSummaryResult.data ?? []) as CaseSummary[];
-  const lineage = (lineageResult.data ?? []) as VersionLineage[];
+  if (recordsResult.error) {
+    console.error(
+      "TA-14 Reviews records query failed:",
+      recordsResult.error,
+    );
+  }
+
+  if (countsResult.error) {
+    console.error(
+      "TA-14 Reviews counts query failed:",
+      countsResult.error,
+    );
+  }
+
+  if (caseSummaryResult.error) {
+    console.error(
+      "TA-14 Reviews case summary query failed:",
+      caseSummaryResult.error,
+    );
+  }
+
+  if (lineageResult.error) {
+    console.error(
+      "TA-14 Reviews lineage query failed:",
+      lineageResult.error,
+    );
+  }
+
+  const records =
+    (recordsResult.data ?? []) as ReviewRecord[];
+
+  const counts =
+    (countsResult.data ?? []) as PublicCount[];
+
+  const caseSummaries =
+    (caseSummaryResult.data ?? []) as CaseSummary[];
+
+  const lineage =
+    (lineageResult.data ?? []) as VersionLineage[];
 
   const countMap = new Map(
     counts.map((item) => [
       item.record_type,
       normalizeCount(item.record_count),
-    ])
+    ]),
   );
 
-  const totalPublicRecords = Array.from(countMap.values()).reduce(
-    (sum, value) => sum + value,
-    0
-  );
+  const totalPublicRecords =
+    Array.from(countMap.values()).reduce(
+      (sum, value) => sum + value,
+      0,
+    );
 
   const participantReviews =
     countMap.get("PARTICIPANT_REVIEW") ?? 0;
@@ -552,36 +651,53 @@ export default async function ReviewsPage({
   const externalPublications =
     countMap.get("EXTERNAL_PUBLICATION") ?? 0;
 
-  const foundingCase = caseSummaries.find(
-    (item) =>
-      item.registry_identifier === "TA-14-AIGR-000008" &&
-      item.demonstration_identifier === "FD-2026-0002" &&
-      item.case_identifier === "CASE-001"
+  const foundingCase =
+    caseSummaries.find(
+      (item) =>
+        item.registry_identifier ===
+          "TA-14-AIGR-000008" &&
+        item.demonstration_identifier ===
+          "FD-2026-0002" &&
+        item.case_identifier ===
+          "CASE-001",
+    ) ?? null;
+
+  const sortedCounts = [...counts].sort(
+    (a, b) => {
+      const aIndex = RECORD_ORDER.indexOf(
+        a.record_type,
+      );
+
+      const bIndex = RECORD_ORDER.indexOf(
+        b.record_type,
+      );
+
+      return (
+        (aIndex === -1 ? 999 : aIndex) -
+        (bIndex === -1 ? 999 : bIndex)
+      );
+    },
   );
-
-  const sortedCounts = [...counts].sort((a, b) => {
-    const aIndex = RECORD_ORDER.indexOf(a.record_type);
-    const bIndex = RECORD_ORDER.indexOf(b.record_type);
-
-    return (
-      (aIndex === -1 ? 999 : aIndex) -
-      (bIndex === -1 ? 999 : bIndex)
-    );
-  });
 
   return (
     <main className="min-h-screen bg-[#07111f] text-white">
-      {/* =======================================================
+      {/* =====================================================
           HERO
-      ======================================================= */}
+      ===================================================== */}
 
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0">
+        <div className="absolute inset-0 pointer-events-none">
           <div className="absolute left-[-10rem] top-[-10rem] h-[32rem] w-[32rem] rounded-full bg-cyan-500/10 blur-[120px]" />
 
           <div className="absolute right-[-8rem] top-[-6rem] h-[28rem] w-[28rem] rounded-full bg-violet-500/10 blur-[120px]" />
 
           <div className="absolute bottom-[-14rem] left-1/3 h-[32rem] w-[32rem] rounded-full bg-blue-600/10 blur-[140px]" />
+
+          <div className="absolute left-[12%] top-[34%] h-2 w-2 animate-pulse rounded-full bg-cyan-200/70" />
+
+          <div className="absolute right-[18%] top-[26%] h-1.5 w-1.5 animate-pulse rounded-full bg-violet-200/70" />
+
+          <div className="absolute right-[32%] bottom-[24%] h-1 w-1 rounded-full bg-white/60" />
         </div>
 
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-24">
@@ -595,7 +711,9 @@ export default async function ReviewsPage({
 
             <span>/</span>
 
-            <span className="text-cyan-200">Reviews & Responses</span>
+            <span className="text-cyan-200">
+              Reviews & Responses
+            </span>
           </div>
 
           <div className="mt-8 max-w-5xl">
@@ -608,15 +726,19 @@ export default async function ReviewsPage({
             </h1>
 
             <p className="mt-5 max-w-3xl text-lg leading-8 text-slate-300 lg:text-xl">
-              Independent voices. Preserved chronology. Governed scrutiny.
+              Independent voices. Preserved chronology.
+              Governed scrutiny.
             </p>
 
             <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-400 lg:text-base">
-              The TA-14 Reviews & Responses record preserves participant reviews,
-              responses, independent reviews, evidence challenges, factual
-              corrections, technical comments, external publications, replication
-              requests, demonstration requests, and governed communications without
-              collapsing those voices into one institutional narrative.
+              The TA-14 Reviews & Responses record
+              preserves participant reviews, responses,
+              independent reviews, evidence challenges,
+              factual corrections, technical comments,
+              external publications, replication requests,
+              demonstration requests, and governed
+              communications without collapsing those
+              voices into one institutional narrative.
             </p>
           </div>
 
@@ -645,9 +767,9 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =======================================================
+      {/* =====================================================
           STATS
-      ======================================================= */}
+      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-10 lg:px-8">
@@ -705,9 +827,9 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =======================================================
+      {/* =====================================================
           GOVERNING PRINCIPLE
-      ======================================================= */}
+      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -718,20 +840,23 @@ export default async function ReviewsPage({
               </div>
 
               <h2 className="mt-4 text-3xl font-semibold tracking-tight text-white">
-                Preserve separate voices without losing the record.
+                Preserve separate voices without losing the
+                record.
               </h2>
 
               <p className="mt-5 max-w-3xl text-sm leading-7 text-slate-300">
-                TA-14 findings remain TA-14 findings. Participant reviews remain
-                participant reviews. Independent reviews remain attributable to
-                their authors. Challenges remain challenges. Corrections remain
-                versioned corrections.
+                TA-14 findings remain TA-14 findings.
+                Participant reviews remain participant reviews.
+                Independent reviews remain attributable to their
+                authors. Challenges remain challenges.
+                Corrections remain versioned corrections.
               </p>
 
               <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
-                The objective is not consensus. The objective is an inspectable
-                governance history in which later interpretation cannot silently
-                erase earlier state.
+                The objective is not consensus. The objective is
+                an inspectable governance history in which later
+                interpretation cannot silently erase earlier
+                state.
               </p>
             </div>
 
@@ -755,12 +880,14 @@ export default async function ReviewsPage({
                   "New Version",
                 ].map((item, index, array) => (
                   <div key={item}>
-                    <div className="rounded-xl border border-white/8 bg-black/10 px-4 py-3">
+                    <div className="rounded-xl border border-white/10 bg-black/10 px-4 py-3">
                       {item}
                     </div>
 
                     {index !== array.length - 1 ? (
-                      <div className="py-1 text-center text-slate-600">↓</div>
+                      <div className="py-1 text-center text-slate-600">
+                        ↓
+                      </div>
                     ) : null}
                   </div>
                 ))}
@@ -770,9 +897,9 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =======================================================
+      {/* =====================================================
           FOUNDING CASE
-      ======================================================= */}
+      ===================================================== */}
 
       {foundingCase ? (
         <section className="border-b border-white/10">
@@ -799,21 +926,25 @@ export default async function ReviewsPage({
                   </p>
 
                   <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-300">
-                    Authority Revoked Before Consequential Execution became the
-                    first completed independent external TA-14 governed
-                    demonstration to generate a Participant Review and linked
-                    independent External Publication.
+                    Authority Revoked Before Consequential
+                    Execution became the first completed
+                    independent external TA-14 governed
+                    demonstration to generate a Participant
+                    Review and linked independent External
+                    Publication.
                   </p>
 
                   <div className="mt-6 rounded-2xl border border-white/10 bg-black/15 p-5">
                     <div className="text-xs font-bold uppercase tracking-[0.18em] text-cyan-100">
-                      PARTIALLY DEMONSTRATED — EVIDENCE-BOUNDED
+                      PARTIALLY DEMONSTRATED —
+                      EVIDENCE-BOUNDED
                     </div>
 
                     <p className="mt-3 text-base leading-7 text-white">
                       Runtime behavior demonstrated.
                       <br />
-                      Full surrounding chronology not independently demonstrated.
+                      Full surrounding chronology not
+                      independently demonstrated.
                     </p>
                   </div>
 
@@ -837,8 +968,11 @@ export default async function ReviewsPage({
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
                   <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
                     <div className="text-2xl font-semibold text-white">
-                      {normalizeCount(foundingCase.participant_reviews)}
+                      {normalizeCount(
+                        foundingCase.participant_reviews,
+                      )}
                     </div>
+
                     <div className="mt-1 text-sm text-slate-300">
                       Participant Review
                     </div>
@@ -846,8 +980,11 @@ export default async function ReviewsPage({
 
                   <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
                     <div className="text-2xl font-semibold text-white">
-                      {normalizeCount(foundingCase.external_publications)}
+                      {normalizeCount(
+                        foundingCase.external_publications,
+                      )}
                     </div>
+
                     <div className="mt-1 text-sm text-slate-300">
                       External Publication
                     </div>
@@ -855,8 +992,11 @@ export default async function ReviewsPage({
 
                   <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
                     <div className="text-2xl font-semibold text-white">
-                      {normalizeCount(foundingCase.evidence_challenges)}
+                      {normalizeCount(
+                        foundingCase.evidence_challenges,
+                      )}
                     </div>
+
                     <div className="mt-1 text-sm text-slate-300">
                       Evidence Challenges
                     </div>
@@ -864,8 +1004,11 @@ export default async function ReviewsPage({
 
                   <div className="rounded-2xl border border-white/10 bg-black/10 p-4">
                     <div className="text-2xl font-semibold text-white">
-                      {normalizeCount(foundingCase.independent_reviews)}
+                      {normalizeCount(
+                        foundingCase.independent_reviews,
+                      )}
                     </div>
+
                     <div className="mt-1 text-sm text-slate-300">
                       Independent Reviews
                     </div>
@@ -877,9 +1020,9 @@ export default async function ReviewsPage({
         </section>
       ) : null}
 
-      {/* =======================================================
-          FILTERS
-      ======================================================= */}
+      {/* =====================================================
+          PUBLIC RECORD
+      ===================================================== */}
 
       <section
         id="public-record"
@@ -893,26 +1036,31 @@ export default async function ReviewsPage({
               </div>
 
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-                Inspect the governed voices attached to the record.
+                Inspect the governed voices attached to the
+                record.
               </h2>
 
               <p className="mt-3 max-w-3xl text-sm leading-7 text-slate-400">
-                Publication here preserves authorship and chronology. It does not
-                collapse participant, reviewer, challenger, or TA-14 authority into
+                Publication here preserves authorship and
+                chronology. It does not collapse participant,
+                reviewer, challenger, or TA-14 authority into
                 one voice.
               </p>
             </div>
 
             <div className="text-sm text-slate-400">
               Showing{" "}
-              <span className="font-semibold text-white">{records.length}</span>{" "}
+              <span className="font-semibold text-white">
+                {records.length}
+              </span>{" "}
               record{records.length === 1 ? "" : "s"}
             </div>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-2">
             {RECORD_FILTERS.map((filter) => {
-              const active = selectedType === filter.value;
+              const active =
+                selectedType === filter.value;
 
               return (
                 <Link
@@ -933,7 +1081,10 @@ export default async function ReviewsPage({
           <div className="mt-8 space-y-5">
             {records.length > 0 ? (
               records.map((record) => (
-                <RecordCard key={record.id} record={record} />
+                <RecordCard
+                  key={record.id}
+                  record={record}
+                />
               ))
             ) : (
               <div className="rounded-[28px] border border-dashed border-white/15 bg-white/[0.025] px-6 py-16 text-center">
@@ -942,9 +1093,10 @@ export default async function ReviewsPage({
                 </div>
 
                 <p className="mx-auto mt-3 max-w-xl text-sm leading-6 text-slate-400">
-                  An empty category is not evidence that the corresponding
-                  institutional event occurred. Records appear here only when they
-                  have been attributable, governed, and published.
+                  An empty category is not evidence that the
+                  corresponding institutional event occurred.
+                  Records appear here only when they have been
+                  attributable, governed, and published.
                 </p>
               </div>
             )}
@@ -952,9 +1104,9 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =======================================================
+      {/* =====================================================
           RECORD CLASSES
-      ======================================================= */}
+      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -964,7 +1116,8 @@ export default async function ReviewsPage({
             </div>
 
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              Different submissions carry different institutional meaning.
+              Different submissions carry different
+              institutional meaning.
             </h2>
           </div>
 
@@ -982,41 +1135,45 @@ export default async function ReviewsPage({
                         </div>
 
                         <p className="mt-2 text-xs leading-5 text-slate-400">
-                          {RECORD_DESCRIPTIONS[item.record_type] ??
+                          {RECORD_DESCRIPTIONS[
+                            item.record_type
+                          ] ??
                             "Governed attributable record."}
                         </p>
                       </div>
 
                       <div className="rounded-full border border-white/10 bg-black/10 px-3 py-1 text-sm font-semibold text-white">
-                        {normalizeCount(item.record_count)}
+                        {normalizeCount(
+                          item.record_count,
+                        )}
                       </div>
                     </div>
                   </div>
                 ))
-              : RECORD_FILTERS.filter((item) => item.value !== "ALL").map(
-                  (item) => (
-                    <div
-                      key={item.value}
-                      className="rounded-[24px] border border-white/10 bg-white/[0.035] p-5"
-                    >
-                      <div className="text-base font-semibold text-white">
-                        {item.label}
-                      </div>
-
-                      <p className="mt-2 text-xs leading-5 text-slate-400">
-                        {RECORD_DESCRIPTIONS[item.value] ??
-                          "Governed attributable record."}
-                      </p>
+              : RECORD_FILTERS.filter(
+                  (item) => item.value !== "ALL",
+                ).map((item) => (
+                  <div
+                    key={item.value}
+                    className="rounded-[24px] border border-white/10 bg-white/[0.035] p-5"
+                  >
+                    <div className="text-base font-semibold text-white">
+                      {item.label}
                     </div>
-                  )
-                )}
+
+                    <p className="mt-2 text-xs leading-5 text-slate-400">
+                      {RECORD_DESCRIPTIONS[item.value] ??
+                        "Governed attributable record."}
+                    </p>
+                  </div>
+                ))}
           </div>
         </div>
       </section>
 
-      {/* =======================================================
+      {/* =====================================================
           VERSION LINEAGE
-      ======================================================= */}
+      ===================================================== */}
 
       {lineage.length > 0 ? (
         <section className="border-b border-white/10">
@@ -1027,13 +1184,14 @@ export default async function ReviewsPage({
               </div>
 
               <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-                Improvement should not rewrite the architecture that was actually
-                evaluated.
+                Improvement should not rewrite the architecture
+                that was actually evaluated.
               </h2>
 
               <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400">
-                Version lineage preserves the distinction between the implementation
-                that entered review and subsequent engineering that emerged from
+                Version lineage preserves the distinction
+                between the implementation that entered review
+                and subsequent engineering that emerged from
                 evidence, challenge, or learning.
               </p>
             </div>
@@ -1056,30 +1214,45 @@ export default async function ReviewsPage({
                     </div>
 
                     <div className="rounded-full border border-white/10 bg-black/10 px-3 py-1 text-xs font-semibold text-slate-200">
-                      {lineageLabel(item.lineage_status)}
+                      {lineageLabel(
+                        item.lineage_status,
+                      )}
                     </div>
                   </div>
 
                   <div className="mt-5 grid grid-cols-3 gap-2">
                     {[
-                      ["Registered", item.registered],
-                      ["Frozen", item.frozen],
-                      ["Demonstrated", item.demonstrated],
+                      [
+                        "Registered",
+                        item.registered,
+                      ],
+                      [
+                        "Frozen",
+                        item.frozen,
+                      ],
+                      [
+                        "Demonstrated",
+                        item.demonstrated,
+                      ],
                     ].map(([label, value]) => (
                       <div
                         key={String(label)}
-                        className="rounded-xl border border-white/8 bg-black/10 p-3"
+                        className="rounded-xl border border-white/10 bg-black/10 p-3"
                       >
                         <div className="text-[10px] uppercase tracking-[0.14em] text-slate-500">
-                          {label}
+                          {String(label)}
                         </div>
 
                         <div
                           className={`mt-1 text-sm font-semibold ${
-                            value ? "text-emerald-200" : "text-slate-400"
+                            Boolean(value)
+                              ? "text-emerald-200"
+                              : "text-slate-400"
                           }`}
                         >
-                          {value ? "Yes" : "No"}
+                          {Boolean(value)
+                            ? "Yes"
+                            : "No"}
                         </div>
                       </div>
                     ))}
@@ -1095,7 +1268,7 @@ export default async function ReviewsPage({
                   ) : null}
 
                   {item.finding_summary ? (
-                    <div className="mt-5 rounded-2xl border border-white/8 bg-black/10 p-4">
+                    <div className="mt-5 rounded-2xl border border-white/10 bg-black/10 p-4">
                       <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500">
                         Finding
                       </div>
@@ -1118,9 +1291,9 @@ export default async function ReviewsPage({
         </section>
       ) : null}
 
-      {/* =======================================================
+      {/* =====================================================
           SUBMISSION PATHWAYS
-      ======================================================= */}
+      ===================================================== */}
 
       <section
         id="submission-pathways"
@@ -1133,14 +1306,15 @@ export default async function ReviewsPage({
             </div>
 
             <h2 className="mt-3 text-3xl font-semibold tracking-tight text-white">
-              Review the record. Challenge it. Correct it. Add another attributable
-              voice.
+              Review the record. Challenge it. Correct it. Add
+              another attributable voice.
             </h2>
 
             <p className="mt-4 text-sm leading-7 text-slate-400">
-              Reviews & Responses is not an unrestricted comment feed. Every
-              substantive submission should identify what record it addresses,
-              who submitted it, what type of contribution it represents, and what
+              Reviews & Responses is not an unrestricted comment
+              feed. Every substantive submission should identify
+              what record it addresses, who submitted it, what
+              type of contribution it represents, and what
               evidence or authority supports it.
             </p>
           </div>
@@ -1225,9 +1399,9 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =======================================================
-          MESSAGE BOUNDARY
-      ======================================================= */}
+      {/* =====================================================
+          GOVERNED MESSAGING
+      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -1242,12 +1416,14 @@ export default async function ReviewsPage({
               </h3>
 
               <p className="mt-4 text-sm leading-7 text-slate-400">
-                A message about a Registry entity, case, finding, artifact, or review
-                should remain bound to that record. The sender should not have to
-                reconstruct identifiers already known by the Exchange.
+                A message about a Registry entity, case,
+                finding, artifact, or review should remain bound
+                to that record. The sender should not have to
+                reconstruct identifiers already known by the
+                Exchange.
               </p>
 
-              <div className="mt-5 rounded-2xl border border-white/8 bg-black/10 p-4 text-sm leading-7 text-slate-300">
+              <div className="mt-5 rounded-2xl border border-white/10 bg-black/10 p-4 text-sm leading-7 text-slate-300">
                 Registry Entity
                 <br />
                 → Demonstration
@@ -1272,25 +1448,27 @@ export default async function ReviewsPage({
               </h3>
 
               <p className="mt-4 text-sm leading-7 text-slate-400">
-                A message does not become evidence merely because TA-14 received
-                it. A review does not become a finding merely because it was
-                published. A technical comment does not acquire institutional
-                authority merely by appearing in the Exchange.
+                A message does not become evidence merely
+                because TA-14 received it. A review does not
+                become a finding merely because it was
+                published. A technical comment does not acquire
+                institutional authority merely by appearing in
+                the Exchange.
               </p>
 
               <div className="mt-5 rounded-2xl border border-amber-300/15 bg-amber-300/[0.045] p-4 text-sm leading-7 text-slate-300">
-                Each submission retains its own record type, attribution,
-                publication status, evidentiary status, disposition, and
-                institutional meaning.
+                Each submission retains its own record type,
+                attribution, publication status, evidentiary
+                status, disposition, and institutional meaning.
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* =======================================================
-          NON-CLAIMS
-      ======================================================= */}
+      {/* =====================================================
+          INSTITUTIONAL BOUNDARY
+      ===================================================== */}
 
       <section className="border-b border-white/10">
         <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
@@ -1316,7 +1494,7 @@ export default async function ReviewsPage({
               ].map((item) => (
                 <div
                   key={item}
-                  className="rounded-2xl border border-white/8 bg-black/10 p-4 text-sm leading-6 text-slate-300"
+                  className="rounded-2xl border border-white/10 bg-black/10 p-4 text-sm leading-6 text-slate-300"
                 >
                   {item}
                 </div>
@@ -1326,9 +1504,9 @@ export default async function ReviewsPage({
         </div>
       </section>
 
-      {/* =======================================================
+      {/* =====================================================
           CLOSING
-      ======================================================= */}
+      ===================================================== */}
 
       <section>
         <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
