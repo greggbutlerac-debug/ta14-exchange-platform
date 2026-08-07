@@ -532,7 +532,7 @@ export async function GET(request: NextRequest) {
     }
 
     const submission =
-      submissionData as {
+      submissionData as unknown as {
         id: string;
         governance_name: string;
         current_version: string;
