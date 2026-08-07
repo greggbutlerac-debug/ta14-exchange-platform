@@ -49,6 +49,13 @@ type GovernanceProfile = {
   archived_at: string | null;
 };
 
+type ProfileLifecycleState =
+  | 'draft'
+  | 'editorial_review'
+  | 'ready'
+  | 'published'
+  | 'archived';
+
 type FormState = {
   profile_title: string;
   profile_subtitle: string;
@@ -144,6 +151,8 @@ export default function GovernanceProfileEditorRecordPage() {
   const [authorized, setAuthorized] = useState<boolean | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [transitioning, setTransitioning] =
+    useState<ProfileLifecycleState | null>(null);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
 
@@ -290,6 +299,43 @@ export default function GovernanceProfileEditorRecordPage() {
     }
   }
 
+  async function transitionProfile(target: ProfileLifecycleState) {
+    if (!supabase || !profile) return;
+
+    setTransitioning(target);
+    setError('');
+    setNotice('');
+
+    try {
+      const { data, error: transitionError } = await supabase.rpc(
+        'ta14_governance_profile_transition_v1',
+        {
+          requested_profile_id: profile.id,
+          requested_target_status: target,
+        },
+      );
+
+      if (transitionError) throw transitionError;
+
+      const transitioned = data as unknown as GovernanceProfile;
+      setProfile(transitioned);
+      setForm(toForm(transitioned));
+      setNotice(
+        `Profile ${profileNumber(transitioned.profile_number)} moved to ${label(
+          transitioned.profile_status,
+        )}.`,
+      );
+    } catch (caught) {
+      setError(
+        caught instanceof Error
+          ? caught.message
+          : 'The Governance Profile lifecycle transition could not be completed.',
+      );
+    } finally {
+      setTransitioning(null);
+    }
+  }
+
   if (loading) {
     return (
       <main className="pageShell">
@@ -341,7 +387,42 @@ export default function GovernanceProfileEditorRecordPage() {
     );
   }
 
-  const published = profile.profile_status.toLowerCase() === 'published';
+  const currentStatus =
+    profile.profile_status.toLowerCase() as ProfileLifecycleState;
+
+  const published = currentStatus === 'published';
+
+  const lifecycleActions: Array<{
+    target: ProfileLifecycleState;
+    label: string;
+    tone: 'primary' | 'secondary' | 'danger';
+    explanation: string;
+  }> =
+    currentStatus === 'draft'
+      ? [
+          { target: 'editorial_review', label: 'Send to Editorial Review', tone: 'primary', explanation: 'Moves the private draft into formal TA-14 editorial review.' },
+          { target: 'archived', label: 'Archive Draft', tone: 'danger', explanation: 'Removes the draft from active editorial work without publishing it.' },
+        ]
+      : currentStatus === 'editorial_review'
+        ? [
+            { target: 'ready', label: 'Mark Ready to Publish', tone: 'primary', explanation: 'Confirms that the required publication fields are complete.' },
+            { target: 'draft', label: 'Return to Draft', tone: 'secondary', explanation: 'Returns the profile for additional editorial work.' },
+            { target: 'archived', label: 'Archive Profile', tone: 'danger', explanation: 'Removes the profile from the active editorial lifecycle.' },
+          ]
+        : currentStatus === 'ready'
+          ? [
+              { target: 'published', label: 'Publish Governance Profile', tone: 'primary', explanation: 'Publishes the TA-14 institutional profile to the public directory.' },
+              { target: 'editorial_review', label: 'Return to Editorial Review', tone: 'secondary', explanation: 'Returns the profile for additional review before publication.' },
+              { target: 'archived', label: 'Archive Profile', tone: 'danger', explanation: 'Removes the profile from the active publication path.' },
+            ]
+          : currentStatus === 'published'
+            ? [
+                { target: 'editorial_review', label: 'Reopen Editorial Review', tone: 'secondary', explanation: 'Reopens TA-14 editorial review while preserving the existing publication timestamp.' },
+                { target: 'archived', label: 'Archive Published Profile', tone: 'danger', explanation: 'Removes the profile from the active public profile service.' },
+              ]
+            : [
+                { target: 'draft', label: 'Restore to Draft', tone: 'primary', explanation: 'Returns the archived profile to controlled private editorial work.' },
+              ];
 
   return (
     <main className="pageShell">
@@ -755,12 +836,80 @@ export default function GovernanceProfileEditorRecordPage() {
             </Field>
           </section>
 
+          <section className="sideCard lifecycleCard">
+            <p className="eyebrow">PUBLICATION LIFECYCLE</p>
+            <h2>Governed state transition</h2>
+
+            <div className="lifecycleRail" aria-label="Governance Profile lifecycle">
+              {[
+                ['draft', 'Draft'],
+                ['editorial_review', 'Editorial Review'],
+                ['ready', 'Ready to Publish'],
+                ['published', 'Published'],
+                ['archived', 'Archived'],
+              ].map(([state, stateLabel]) => {
+                const active = currentStatus === state;
+                return (
+                  <div
+                    className={active ? 'lifecycleNode activeLifecycleNode' : 'lifecycleNode'}
+                    key={state}
+                  >
+                    <span aria-hidden="true" />
+                    <strong>{stateLabel}</strong>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="lifecycleBoundary">
+              <strong>Current state: {label(profile.profile_status)}</strong>
+              <p>
+                Lifecycle actions are enforced by
+                <code> ta14_governance_profile_transition_v1 </code>
+                and require TA-14 reviewer/editor authority.
+              </p>
+            </div>
+
+            <div className="transitionActions">
+              {lifecycleActions.map((action) => (
+                <div className="transitionAction" key={action.target}>
+                  <button
+                    type="button"
+                    className={
+                      action.tone === 'primary'
+                        ? 'primaryButton'
+                        : action.tone === 'danger'
+                          ? 'dangerButton'
+                          : 'secondaryButton'
+                    }
+                    disabled={transitioning !== null || saving}
+                    onClick={() => void transitionProfile(action.target)}
+                  >
+                    {transitioning === action.target
+                      ? 'Updating State…'
+                      : action.label}
+                  </button>
+                  <p>{action.explanation}</p>
+                </div>
+              ))}
+            </div>
+
+            <p className="lifecycleNonClaim">
+              Publication is a TA-14 institutional publication decision. It does
+              not alter the registrant&apos;s Registry declaration and does not
+              constitute certification, endorsement, legal validation,
+              regulatory approval, ownership adjudication, or proof of
+              technical performance.
+            </p>
+          </section>
+
           <section className="saveCard">
             <p className="eyebrow">CONTROLLED SAVE</p>
             <h2>Preserve editorial work</h2>
             <p>
               Saving changes updates only the TA-14 Governance Profile. It does
-              not alter the underlying Registry record or publish a draft.
+              not alter the underlying Registry record and it does not perform
+              a lifecycle transition.
             </p>
 
             <button
@@ -1021,6 +1170,32 @@ const styles = `
 
   .editorSection,
   .sideCard,
+  .lifecycleCard {
+    border-color: rgba(127,228,196,.22);
+    background:
+      radial-gradient(circle at 100% 0%, rgba(127,228,196,.07), transparent 18rem),
+      rgba(11,25,47,.9);
+  }
+
+  .lifecycleRail { margin: 18px 0; display: grid; gap: 8px; }
+  .lifecycleNode { min-height: 40px; padding: 9px 11px; display: flex; align-items: center; gap: 10px; border: 1px solid rgba(164,190,231,.10); border-radius: 12px; background: rgba(7,17,33,.36); color: #8fa3ba; }
+  .lifecycleNode > span { width: 10px; height: 10px; flex: 0 0 auto; border-radius: 50%; border: 1px solid rgba(164,190,231,.35); background: rgba(164,190,231,.08); }
+  .activeLifecycleNode { border-color: rgba(127,228,196,.38); background: rgba(28,87,82,.28); color: #eafff8; }
+  .activeLifecycleNode > span { border-color: rgba(127,228,196,.92); background: #7fe4c4; box-shadow: 0 0 18px rgba(127,228,196,.65); }
+  .lifecycleBoundary { padding: 14px; border: 1px solid rgba(255,210,127,.18); border-radius: 13px; background: rgba(85,58,17,.18); }
+  .lifecycleBoundary strong { display: block; margin-bottom: 6px; color: #ffe3aa; }
+  .lifecycleBoundary p { margin: 0; color: #9fb1c8; font-size: .82rem; line-height: 1.55; }
+  .lifecycleBoundary code { color: #bff7e5; font-size: .78rem; }
+  .transitionActions { margin-top: 16px; display: grid; gap: 13px; }
+  .transitionAction { padding-top: 13px; border-top: 1px solid rgba(164,190,231,.08); }
+  .transitionAction:first-child { padding-top: 0; border-top: 0; }
+  .transitionAction button { width: 100%; }
+  .transitionAction p, .lifecycleNonClaim { margin: 8px 0 0; color: #8fa3ba; font-size: .79rem; line-height: 1.55; }
+  .lifecycleNonClaim { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(164,190,231,.10); }
+
+  .dangerButton { min-height: 46px; padding: 11px 17px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255,124,145,.38); border-radius: 13px; background: rgba(108,30,45,.32); color: #ffd4dc; font: inherit; font-weight: 900; cursor: pointer; }
+  .dangerButton:disabled { cursor: wait; opacity: .62; }
+
   .saveCard {
     padding: 24px;
   }
@@ -1188,7 +1363,8 @@ const styles = `
     }
 
     .primaryButton,
-    .secondaryButton {
+    .secondaryButton,
+    .dangerButton {
       width: 100%;
     }
   }
