@@ -1,8 +1,8 @@
-# TA14 Independent-Read Validation Record
+# TA14 Independent-Read Review Instructions
 
-**Record Template ID:** TA14-IRVR-001  
+**Instruction ID:** TA14-IRRI-001  
 **Version:** 1.0  
-**Status:** PUBLIC VALIDATION RECORD TEMPLATE  
+**Status:** PUBLIC REVIEW INSTRUCTION  
 **Effective Date:** August 7, 2026  
 **Issued By:** TA14 Authority  
 **Parent Protocol:** TA14-IRVP-001 — TA14 Independent-Read Validation Protocol  
@@ -10,839 +10,293 @@
 
 ---
 
-## 1. Purpose
+## Purpose
 
-This record preserves the result of an Independent-Read Validation conducted on a material TA14 Authority governance instrument.
+You are being asked to review a TA14 Authority governance instrument as an independent reader.
 
-The purpose is not merely to state that a document was reviewed.
+This is not a test of your expertise.
 
-The purpose is to preserve enough evidence to show:
+It is a test of whether the instrument can communicate its material meaning without relying on private explanation, drafting history, prior conversations, or institutional memory.
 
-- what instrument was tested;
-- which exact version was tested;
-- who performed the informed review;
-- who performed the independent read;
-- whether the independent reader had relevant prior context;
-- what material interpretations were reached;
-- where the readings diverged;
-- how each divergence was classified;
-- what corrections were made;
-- whether re-testing occurred;
-- what version ultimately passed or failed;
-- what limitations remained.
+The governing question is:
 
-The governing principle is:
-
-> **A validation claim should itself have a preserved validation record.**
+> **Can you determine the material rights, boundaries, consequences, and non-claims from the instrument itself?**
 
 ---
 
-# PART I — VALIDATION IDENTITY
+## Materials You Should Receive
 
-## 2. Validation Record
+You should receive only:
 
-**Validation Record ID:** ______________________________
+1. the governance instrument under review;
+2. the TA14 Independent-Read Review Form;
+3. these instructions.
 
-**Validation Status:**
+You should not need:
 
-- [ ] OPEN
-- [ ] REVIEW IN PROGRESS
-- [ ] REVISION REQUIRED
-- [ ] RE-TEST REQUIRED
-- [ ] VALIDATED FOR ADOPTION
-- [ ] VALIDATED WITH EDITORIAL CORRECTIONS
-- [ ] FAILED — GOVERNANCE DIVERGENCE
-- [ ] FAILED — HIDDEN CONTEXT
-- [ ] NOT REVIEWABLE
-- [ ] SUPERSEDED
+- prior correspondence;
+- drafting notes;
+- private messages;
+- explanatory calls;
+- institutional background conversations;
+- proposed answers;
+- commentary from the authors.
 
-**Validation Opened:** ________________________________
-
-**Validation Closed:** _________________________________
+If you receive additional context that materially affects your interpretation, identify it in the Review Form.
 
 ---
 
-## 3. Instrument Under Review
+## Before You Begin
 
-**Instrument Name:** __________________________________
+Please confirm:
 
-**Instrument ID:** ____________________________________
+- you did not materially participate in drafting the instrument;
+- you did not participate in private discussions establishing the intended meaning of its material rules;
+- you have not been given the answers TA14 Authority expects you to reach.
 
-**Candidate Version:** _________________________________
+If any of those statements are not true, disclose that fact.
 
-**Candidate Record / Commit Reference:** _______________
+Prior professional knowledge of AI governance, evidence, law, standards, registries, or institutional review does not automatically disqualify you.
 
-**Candidate Effective Date, if any:** ___________________
-
-**Institutional Owner:** TA14 Authority
-
----
-
-## 4. Review Basis
-
-This validation was conducted under:
-
-**TA14-IRVP-001 — TA14 Independent-Read Validation Protocol**
-
-using:
-
-**TA14-IRRF-001 — TA14 Independent-Read Review Form**
-
-Protocol Version: _____________________________________
-
-Review Form Version: __________________________________
+The relevant question is whether you need unpublished drafting context to understand the instrument.
 
 ---
 
-# PART II — CANDIDATE FREEZE
+## How to Read the Instrument
 
-## 5. Candidate Freeze
+Read the instrument as though you were a person deciding whether to rely on it.
 
-Before the independent read began, was the candidate body frozen for the review cycle?
+Do not assume that a missing provision must mean what seems most reasonable.
 
-- [ ] Yes
-- [ ] No
-- [ ] Not established
+Do not supply what you believe the authors probably intended.
 
-**Freeze Date / Time:** ________________________________
+Do not choose the interpretation most favorable to TA14 Authority.
 
-**Frozen Candidate Identifier:** _______________________
+Do not choose the interpretation most favorable to a registrant.
 
-**Repository / Record Reference:** _____________________
+Report what the instrument actually communicates.
 
-**Hash, if used:** ____________________________________
+Where more than one reasonable interpretation exists, report the ambiguity.
 
-### Freeze Notes
-
-____________________________________________________________
-
-____________________________________________________________
-
-A material modification after this point requires identification as a revised candidate.
+Where the instrument is silent, report the silence.
 
 ---
 
-# PART III — INFORMED REVIEW
+## What Counts as Useful Feedback
 
-## 6. Informed Reviewer
+Useful feedback includes identifying:
 
-**Reviewer Name / Identifier:** _________________________
+- a material rule that is clear;
+- a material right that is unclear;
+- a non-claim that is missing;
+- a withdrawal consequence that could be read two ways;
+- an ownership rule that depends on inference;
+- a publication right that is broader or narrower than expected;
+- a fee that cannot be determined;
+- a limitation that can be separated from a favorable finding;
+- a provenance state that is undefined;
+- a provision that appears internally inconsistent;
+- a conclusion that depends on knowledge outside the instrument.
 
-**Review Date:** _______________________________________
-
-**Relationship to Instrument:**
-
-- [ ] Author
-- [ ] Co-author
-- [ ] TA14 institutional reviewer
-- [ ] Participant in drafting discussions
-- [ ] Subject-matter reviewer
-- [ ] Other: ______________________________________
-
----
-
-## 7. Informed-Review Question
-
-The Informed Reviewer evaluated:
-
-> **Does this instrument accurately state what TA14 Authority intends the institutional rule to be?**
-
-**Result:**
-
-- [ ] INFORMED REVIEW COMPLETE
-- [ ] INFORMED REVIEW REVISION REQUIRED
-- [ ] NOT REVIEWABLE
+A finding that the document is unclear is a valid review result.
 
 ---
 
-## 8. Intended Institutional Meaning
+## Response States
 
-Summarize the material institutional meaning the informed reviewer believes the instrument establishes.
+Use the response states defined in the Review Form.
 
-____________________________________________________________
+### CLEAR
 
-____________________________________________________________
+The instrument directly provides a reasonably definite answer.
 
-____________________________________________________________
+### CLEAR WITH QUALIFICATION
 
-____________________________________________________________
+The answer is reasonably clear, but a material qualification is required.
 
----
+### AMBIGUOUS
 
-## 9. Material Boundaries Expected to Be Clear
+Two or more materially different reasonable interpretations remain possible.
 
-List the material boundaries the informed reviewer expects an independent reader to identify.
+### IMPLIED ONLY
 
-| ID | Expected Boundary |
-|---|---|
-| IB-01 | |
-| IB-02 | |
-| IB-03 | |
-| IB-04 | |
-| IB-05 | |
-| IB-06 | |
-| IB-07 | |
-| IB-08 | |
-| IB-09 | |
-| IB-10 | |
+A likely answer can be inferred, but the instrument does not state it adequately.
 
-Add rows as necessary.
+### NOT STATED
+
+The instrument does not provide the answer.
+
+### INTERNALLY CONFLICTED
+
+Different provisions appear to support materially inconsistent answers.
 
 ---
 
-# PART IV — INDEPENDENT READER
+## Do Not Ask for Clarification During the Review
 
-## 10. Independent Reader
+If you encounter a material ambiguity, do not ask TA14 Authority what it intended before recording your answer.
 
-**Reader Name / Identifier:** ___________________________
+The ambiguity is part of the evidence being collected.
 
-**Review Date:** _______________________________________
+Write down:
 
-**Relevant Professional Background, if voluntarily provided:**
+- what you understood;
+- what alternative interpretation you considered;
+- what additional language would have been necessary to resolve it.
 
-____________________________________________________________
-
-____________________________________________________________
-
----
-
-## 11. Context Qualification
-
-Did the Independent Reader materially participate in drafting the instrument?
-
-- [ ] No
-- [ ] Yes
-- [ ] Unknown
-
-Did the Independent Reader participate in private discussions establishing the intended meaning of its material rules?
-
-- [ ] No
-- [ ] Yes
-- [ ] Unknown
-
-Had the Independent Reader reviewed an earlier version?
-
-- [ ] No
-- [ ] Yes
-- [ ] Unknown
-
-Did the Independent Reader receive explanatory material beyond the candidate instrument and ordinary review instructions?
-
-- [ ] No
-- [ ] Yes
-- [ ] Unknown
-
-### Context Notes
-
-____________________________________________________________
-
-____________________________________________________________
+After the review is complete, TA14 Authority may revise the instrument and conduct another independent read.
 
 ---
 
-## 12. Independent-Read Qualification
+## Review the Instrument Before the Questionnaire
 
-Based on the context disclosure above, classify the read:
+Please read the entire governance instrument once before working through the detailed Review Form.
 
-- [ ] CLEAN INDEPENDENT READ
-- [ ] INDEPENDENT READ WITH DISCLOSED PRIOR CONTEXT
-- [ ] INFORMED READ — NOT INDEPENDENT
-- [ ] INDEPENDENCE NOT ESTABLISHED
+Then complete the open-reading section first.
 
-This classification must remain attached to the validation result.
+This helps preserve your natural interpretation before the detailed questions direct your attention to specific provisions.
 
 ---
 
-# PART V — INDEPENDENT-READ RESULT
+## Pay Particular Attention to These Boundaries
 
-## 13. Overall Reader Assessment
+The review may ask whether you can determine:
 
-The Independent Reader classified the instrument as:
+- what registration establishes;
+- what registration does not establish;
+- whether registration means certification or endorsement;
+- who owns intellectual property;
+- whether closed systems can remain closed;
+- what evidence TA14 Authority may receive;
+- what TA14 Authority may publish;
+- how private or controlled evidence is treated;
+- what withdrawal changes;
+- what historical record may remain;
+- how corrections work;
+- how disagreement is preserved;
+- whether later versions inherit prior findings;
+- what activities carry fees;
+- whether TA14 Authority distinguishes integrity from independence;
+- where independent verification terminates;
+- whether material limitations remain attached to findings.
 
-- [ ] CLEAR
-- [ ] MOSTLY CLEAR
-- [ ] MATERIAL AMBIGUITIES
-- [ ] SUBSTANTIAL HIDDEN CONTEXT
-- [ ] NOT RELIABLY INTERPRETABLE
+Do not assume these answers.
 
----
-
-## 14. Material Rights and Obligations
-
-Could the reader determine material participant and TA14 rights and obligations without private explanation?
-
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
-
----
-
-## 15. Material Non-Claims
-
-Could the reader determine what TA14 Authority explicitly does not claim?
-
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
+Derive them from the instrument.
 
 ---
 
-## 16. Financial Boundary
+## Portable-Finding Test
 
-Could the reader determine the financial consequences of entering the governed pathway?
+Where the instrument contains or permits findings, consider whether a favorable result could be copied or quoted without the limitation necessary to interpret it.
 
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
+For example, if the complete finding is:
 
----
+> **SUPPORTED — execution-path coverage not independently established**
 
-## 17. Independence Boundary
+ask whether someone could reasonably extract only:
 
-Could the reader determine what was and was not represented as independently established?
+> **SUPPORTED**
 
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
+without carrying the qualification.
+
+If so, identify that as a portability risk.
 
 ---
 
-## 18. Withdrawal Boundary
+## Blank Fields and Silence
 
-Could the reader determine what withdrawal changes and what historical chronology may remain?
+Do not interpret a blank field as the strongest possible evidentiary state.
 
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
+If the instrument does not tell you what a blank means, report that.
 
----
+Where the document uses explicit states such as:
 
-## 19. Finding Portability Boundary
+- NOT REPORTED;
+- NOT SUBMITTED;
+- NOT PRESERVED;
+- NOT INDEPENDENTLY ESTABLISHED;
+- OUTSIDE REVIEW SCOPE;
 
-Could the reader determine whether a material limitation must remain attached to the finding it qualifies?
-
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
+evaluate whether you can understand the difference among them.
 
 ---
 
-# PART VI — QUESTION-LEVEL RESULTS
+## Financial Terms
 
-## 20. Response-State Summary
+If the instrument governs participation in a TA14 pathway, determine whether you can understand:
 
-Record the number of Independent-Read Review Form answers receiving each state.
+- what is free;
+- what carries a published fee;
+- what requires separate scope;
+- whether later services are mandatory;
+- whether fees can be imposed retroactively.
 
-| Response State | Count |
-|---|---:|
-| CLEAR | |
-| CLEAR WITH QUALIFICATION | |
-| AMBIGUOUS | |
-| IMPLIED ONLY | |
-| NOT STATED | |
-| INTERNALLY CONFLICTED | |
+If you cannot determine the financial consequence of entering the pathway, identify that clearly.
 
 ---
 
-## 21. Material Question Exceptions
+## Independence Boundary
 
-List questions that were not classified as CLEAR or CLEAR WITH QUALIFICATION.
+Do not assume that a TA14-generated record is independently verified merely because TA14 Authority produced it.
 
-| Question | State | Reader Interpretation | Material Effect |
-|---|---|---|---|
-| | | | |
-| | | | |
-| | | | |
-| | | | |
+Read what the instrument actually says about:
 
-Add rows as necessary.
+- TA14-produced evidence;
+- registrant-produced evidence;
+- independent evidence;
+- externally reproducible evidence;
+- evidence whose independence is not established.
 
----
+If the instrument appears to claim more independence than it demonstrates, identify that.
 
-# PART VII — DIVERGENCE ANALYSIS
-
-## 22. Comparison Standard
-
-The informed and independent readings are compared using the following question:
-
-> **Did both readers derive materially compatible institutional meaning from the instrument itself?**
-
-The purpose is not to determine which reader is correct by authority.
-
-The purpose is to identify whether the document itself carries the intended meaning.
+If the instrument explicitly exposes where independence terminates, identify that as well.
 
 ---
 
-## 23. Divergence Register
+## Completing the Review
 
-| Divergence ID | Instrument Section | Informed Reading | Independent Reading | Classification | Correction Required |
-|---|---|---|---|---|---|
-| DIV-01 | | | | | |
-| DIV-02 | | | | | |
-| DIV-03 | | | | | |
-| DIV-04 | | | | | |
-| DIV-05 | | | | | |
+When you finish:
 
-Add rows as necessary.
+1. complete every question you can;
+2. leave no material ambiguity unreported;
+3. complete the Defect Register;
+4. complete the Hidden-Context section;
+5. complete the Portability section;
+6. provide your overall disposition;
+7. sign or otherwise identify the completed review as appropriate.
 
----
+You are not being asked to approve TA14 Authority.
 
-## 24. Divergence Classes
+You are not being asked to agree with its architecture.
 
-### D0 — NO MATERIAL DIVERGENCE
+You are not being asked whether you like the instrument.
 
-The readings are materially compatible.
-
-### D1 — EDITORIAL DIVERGENCE
-
-The difference concerns wording or presentation without materially changing institutional meaning.
-
-### D2 — INTERPRETIVE DIVERGENCE
-
-Different reasonable interpretations could affect understanding of a material rule.
-
-### D3 — GOVERNANCE DIVERGENCE
-
-The readers disagree about a material right, obligation, authority, limitation, publication condition, withdrawal consequence, evidence state, finding meaning, or financial obligation.
-
-### D4 — HIDDEN-CONTEXT DEPENDENCY
-
-The intended interpretation materially depends on information not contained in the instrument.
+You are being asked whether the instrument carries its own material meaning.
 
 ---
 
-## 25. Highest Divergence Class
+## What Happens Afterward
 
-- [ ] D0 — NO MATERIAL DIVERGENCE
-- [ ] D1 — EDITORIAL DIVERGENCE
-- [ ] D2 — INTERPRETIVE DIVERGENCE
-- [ ] D3 — GOVERNANCE DIVERGENCE
-- [ ] D4 — HIDDEN-CONTEXT DEPENDENCY
+TA14 Authority will compare your independent reading with an informed review of the same frozen candidate instrument.
 
----
+If the two readings materially diverge, TA14 Authority should examine and correct the instrument.
 
-# PART VIII — HIDDEN-CONTEXT REGISTER
+You should not be asked to change your original interpretation merely because TA14 Authority intended something different.
 
-## 26. Hidden-Context Findings
-
-Did the independent read identify any material meaning dependent on unstated context?
-
-- [ ] No
-- [ ] Yes
-- [ ] Uncertain
-
-If yes or uncertain:
-
-| ID | Section | Unstated Context | Why It Matters | Required Correction |
-|---|---|---|---|---|
-| HC-01 | | | | |
-| HC-02 | | | | |
-| HC-03 | | | | |
+A corrected document may be submitted for a new independent read.
 
 ---
 
-## 27. Private Explanation Prohibition
+# Core Instruction
 
-Was any material ambiguity resolved merely by explaining the intended answer to the Independent Reader rather than correcting the instrument?
-
-- [ ] No
-- [ ] Yes
-
-If yes, the affected question must not be treated as successfully validated without a revised independent read.
-
----
-
-# PART IX — PORTABILITY REVIEW
-
-## 28. Portable Finding Test
-
-Was the instrument examined for whether a favorable result could travel without its material qualification?
-
-- [ ] Yes
-- [ ] No
-- [ ] Not applicable
-
----
-
-## 29. Separation Risks
-
-| ID | Finding / Result | Required Qualification | Could Be Separated? | Correction |
-|---|---|---|---|---|
-| PF-01 | | | | |
-| PF-02 | | | | |
-| PF-03 | | | | |
-
----
-
-## 30. Portability Finding
-
-- [ ] MATERIAL QUALIFICATIONS ARE BOUND TO FINDINGS
-- [ ] EDITORIAL IMPROVEMENT RECOMMENDED
-- [ ] MATERIAL SEPARATION RISK EXISTS
-- [ ] NOT REVIEWABLE
-- [ ] NOT APPLICABLE
-
----
-
-# PART X — FEE LEGIBILITY
-
-## 31. Fee Disclosure Test
-
-For an instrument governing participation, could the Independent Reader determine whether each relevant pathway was:
-
-- NO FEE;
-- PUBLISHED FEE;
-- SEPARATELY SCOPED; or
-- NOT CURRENTLY OFFERED?
-
-- [ ] Yes
-- [ ] Mostly
-- [ ] No
-- [ ] Not applicable
-
----
-
-## 32. Financial Ambiguity
-
-Were any material financial obligations:
-
-- unstated;
-- implied only;
-- internally conflicted;
-- dependent on private explanation?
-
-- [ ] No
-- [ ] Yes
-
-If yes:
-
-____________________________________________________________
-
-____________________________________________________________
-
-A material unresolved financial ambiguity prevents final adoption of an instrument governing that financial commitment.
-
----
-
-# PART XI — CORRECTION CYCLE
-
-## 33. Was Revision Required?
-
-- [ ] No
-- [ ] Yes
-
-If yes:
-
-**Revised Candidate Version:** _________________________
-
-**Revision Date:** _____________________________________
-
----
-
-## 34. Correction Register
-
-| Correction ID | Source Divergence | Original Language / Problem | Correction | Revised Section |
-|---|---|---|---|---|
-| COR-01 | | | | |
-| COR-02 | | | | |
-| COR-03 | | | | |
-| COR-04 | | | | |
-
----
-
-## 35. Re-Test Scope
-
-Following correction:
-
-- [ ] No re-test required
-- [ ] Targeted independent re-test required
-- [ ] Full independent re-test required
-
-Reason:
-
-____________________________________________________________
-
-____________________________________________________________
-
----
-
-# PART XII — RE-TEST
-
-## 36. Re-Test Reader
-
-**Reader Name / Identifier:** ___________________________
-
-**Re-Test Date:** ______________________________________
-
-**Reader Classification:**
-
-- [ ] CLEAN INDEPENDENT READ
-- [ ] INDEPENDENT READ WITH DISCLOSED PRIOR CONTEXT
-- [ ] INFORMED READ — NOT INDEPENDENT
-- [ ] INDEPENDENCE NOT ESTABLISHED
-
----
-
-## 37. Re-Test Result
-
-- [ ] PRIOR DIVERGENCE RESOLVED
-- [ ] PARTIALLY RESOLVED
-- [ ] NEW DIVERGENCE IDENTIFIED
-- [ ] NOT RESOLVED
-- [ ] NOT REVIEWABLE
-
-Notes:
-
-____________________________________________________________
-
-____________________________________________________________
-
----
-
-# PART XIII — ADOPTION GATE
-
-## 38. Adoption Criteria
-
-Before an instrument receives **VALIDATED FOR ADOPTION**, confirm:
-
-- [ ] No unresolved D3 Governance Divergence remains.
-- [ ] No unresolved D4 Hidden-Context Dependency remains.
-- [ ] No material question remains INTERNALLY CONFLICTED.
-- [ ] Material participant rights are explicit.
-- [ ] Material TA14 rights are explicit.
-- [ ] Material obligations are explicit.
-- [ ] Material non-claims are explicit.
-- [ ] Material withdrawal consequences are explicit.
-- [ ] Material publication boundaries are explicit.
-- [ ] Material evidence-provenance states are explicit.
-- [ ] Material limitations travel with the findings they qualify.
-- [ ] Required fee terms are explicit.
-- [ ] The applicable instrument version is identifiable.
-- [ ] Any remaining validation limitation is disclosed.
-
----
-
-## 39. Adoption-Gate Result
-
-- [ ] VALIDATED FOR ADOPTION
-- [ ] VALIDATED WITH EDITORIAL CORRECTIONS
-- [ ] REVISION REQUIRED
-- [ ] FAILED — GOVERNANCE DIVERGENCE
-- [ ] FAILED — HIDDEN CONTEXT
-- [ ] NOT REVIEWABLE
-
----
-
-# PART XIV — VALIDATION FINDING
-
-## 40. Validation Finding
-
-Write the final bounded validation finding.
-
-The finding must include any material qualification necessary to interpret it.
-
-**Finding:**
-
-____________________________________________________________
-
-____________________________________________________________
-
-____________________________________________________________
-
----
-
-## 41. Provenance Qualification
-
-The validation finding is based on:
-
-- [ ] TA14-PRODUCED REVIEW RECORD
-- [ ] INFORMED REVIEW
-- [ ] CLEAN INDEPENDENT READ
-- [ ] INDEPENDENT READ WITH DISCLOSED PRIOR CONTEXT
-- [ ] OTHER THIRD-PARTY REVIEW
-- [ ] INDEPENDENCE NOT FULLY ESTABLISHED
-- [ ] OTHER: ______________________________________
-
----
-
-## 42. Validation Non-Claims
-
-Unless separately established, this validation does not mean:
-
-- the instrument is legally enforceable;
-- the instrument satisfies every jurisdiction;
-- the instrument has been approved by a regulator;
-- the instrument eliminates all ambiguity;
-- the instrument's substantive governance model is correct;
-- TA14 Authority has independently attested itself;
-- every future reader will interpret every sentence identically.
-
-Independent-Read Validation establishes only the bounded result preserved in this record.
-
----
-
-# PART XV — AUTHORIZATION
-
-## 43. Final Instrument
-
-**Instrument Name:** __________________________________
-
-**Instrument ID:** ____________________________________
-
-**Validated Version:** _________________________________
-
-**Final Commit / Record Reference:** ___________________
-
-**Effective Date:** ____________________________________
-
----
-
-## 44. Institutional Authorization
-
-**Authorized Status:**
-
-- [ ] PUBLIC GOVERNANCE INSTRUMENT
-- [ ] INTERNAL GOVERNANCE INSTRUMENT
-- [ ] CANDIDATE — NOT YET AUTHORITATIVE
-- [ ] SUPERSEDED
-- [ ] OTHER: ______________________________________
-
-**Authorized By:** ____________________________________
-
-**Authorization Date:** ________________________________
-
----
-
-# PART XVI — PUBLIC RECORD SUMMARY
-
-## 45. Public Validation Summary
-
-Where this validation is publicly referenced, the summary should identify at minimum:
-
-- instrument name;
-- instrument ID;
-- validated version;
-- validation date;
-- independent-read classification;
-- adoption-gate result;
-- highest divergence class;
-- material remaining qualification, if any;
-- validation record identifier.
-
-A public statement must not reduce a qualified validation result to an unqualified claim.
-
----
-
-## 46. Example
-
-An acceptable summary may read:
-
-> **TA14-RET-001 Version 1.0 completed Independent-Read Validation under TA14-IRVP-001. The review included an informed review and a clean independent read. No unresolved D3 Governance Divergence or D4 Hidden-Context Dependency remained at adoption. Validation concerns institutional readability and does not constitute legal review or independent attestation of TA14 Authority itself.**
-
-The actual summary must reflect the actual review record.
-
----
-
-# PART XVII — RECORD INTEGRITY
-
-## 47. No Validation Without Evidence
-
-TA14 Authority must not mark an instrument:
-
-**INDEPENDENTLY VALIDATED**
-
-merely because:
-
-- the protocol exists;
-- the review form exists;
-- an internal reviewer read it;
-- the document appears clear to its authors;
-- a participant familiar with the drafting history agrees with it.
-
-The validation event itself must occur.
-
----
-
-## 48. Failed Validation Is a Valid Record
-
-A failed Independent-Read Validation should not be treated as an institutional embarrassment requiring concealment.
-
-A failure may establish that:
-
-- a right was unclear;
-- a non-claim was missing;
-- a fee was ambiguous;
-- a withdrawal rule depended on private explanation;
-- a finding could travel without its limitation;
-- institutional intent was not adequately preserved in the document.
-
-Those are useful governance findings.
-
-The appropriate response is correction and re-test.
-
----
-
-## 49. Historical Preservation
-
-A later successful validation does not require erasure of an earlier failed validation.
-
-The lineage may be preserved as:
-
-**Candidate → Independent Read → Divergence → Correction → Re-Test → Validated Instrument**
-
-That chronology demonstrates the governance process operating as designed.
-
----
-
-# PART XVIII — CORE RULES
-
-## 50. Evidence Rule
-
-> **No validation claim without a validation record.**
-
-## 51. Independence Rule
-
-> **An informed reader does not become independent merely because the document is complete.**
-
-## 52. Divergence Rule
-
-> **Where informed and independent readings materially diverge, preserve the divergence and examine the instrument.**
-
-## 53. Correction Rule
-
-> **Correct the document before explaining away the reader's interpretation.**
-
-## 54. Portability Rule
-
-> **A material qualification must travel with the validation finding it qualifies.**
-
-## 55. Chronology Rule
-
-> **A failed review may be superseded. It should not be silently rewritten into a successful one.**
-
----
-
-# Closing Statement
-
-Independent readability is not established by author confidence.
-
-It is established by exposing an instrument to a reader who does not possess the private context that produced it and preserving what happens.
-
-If the reader reaches the intended material interpretation, that is evidence.
-
-If the reader does not, that is also evidence.
-
-TA14 Authority should preserve both.
-
-The purpose of the process is not to prove that TA14 Authority wrote the document correctly the first time.
-
-The purpose is to make institutional meaning durable enough that the record can carry it without requiring the people who created it to stand beside it and explain what they meant.
+> **Do not tell us what you think we meant. Tell us what the document says.**
 
 ---
 
 **TA14 Authority**  
 **TA14 AI Governance Exchange**
 
-**Record Template:** TA14-IRVR-001  
+**Instruction:** TA14-IRRI-001  
 **Version:** 1.0  
 **Effective Date:** August 7, 2026
