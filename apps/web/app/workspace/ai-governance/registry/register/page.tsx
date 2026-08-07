@@ -168,6 +168,7 @@ type FormState = {
   organization: string;
   contactEmail: string;
   website: string;
+  publicEvidenceRoute: string;
   jurisdiction: string;
   regulatoryScope: string;
   plainDescription: string;
@@ -333,6 +334,7 @@ const initialForm: FormState = {
   organization: '',
   contactEmail: '',
   website: '',
+  publicEvidenceRoute: '',
   jurisdiction: '',
   regulatoryScope: '',
   plainDescription: '',
@@ -655,6 +657,7 @@ export default function RegisterGovernancePage() {
       organization: submission.organization_name ?? '',
       contactEmail: submission.contact_email ?? '',
       website: submission.public_website ?? '',
+      publicEvidenceRoute: submission.public_evidence_route ?? '',
       jurisdiction: submission.geographic_scope ?? '',
       regulatoryScope: submission.regulatory_scope ?? '',
       plainDescription: submission.plain_language_description ?? '',
@@ -981,6 +984,15 @@ export default function RegisterGovernancePage() {
     if (!form.authorityRole) nextErrors.push('Submission authority role is required.');
     if (!form.authorityEvidence.trim()) nextErrors.push('Authority evidence or explanation is required.');
     if (!form.contactEmail.trim()) nextErrors.push('Contact email is required.');
+    if (
+      form.recordVisibility === 'PUBLIC' &&
+      !form.website.trim() &&
+      !form.publicEvidenceRoute.trim()
+    ) {
+      nextErrors.push(
+        'A public Registry record requires a public website or public evidence route.',
+      );
+    }
     if (!form.plainDescription.trim()) nextErrors.push('Plain-language description is required.');
     if (!form.claims.trim()) nextErrors.push('At least one affirmative claim is required.');
     if (!form.nonClaims.trim()) nextErrors.push('Explicit non-claims are required.');
@@ -1156,7 +1168,12 @@ export default function RegisterGovernancePage() {
           form.claimantName.trim() &&
             form.authorityRole &&
             form.authorityEvidence.trim() &&
-            form.contactEmail.trim(),
+            form.contactEmail.trim() &&
+            (
+              form.recordVisibility !== 'PUBLIC' ||
+              form.website.trim() ||
+              form.publicEvidenceRoute.trim()
+            ),
         );
       case 2:
         return Boolean(form.stewardName.trim() || form.claimantName.trim());
@@ -1193,6 +1210,11 @@ export default function RegisterGovernancePage() {
             form.authorityRole &&
             form.authorityEvidence.trim() &&
             form.contactEmail.trim() &&
+            (
+              form.recordVisibility !== 'PUBLIC' ||
+              form.website.trim() ||
+              form.publicEvidenceRoute.trim()
+            ) &&
             form.plainDescription.trim() &&
             form.claims.trim() &&
             form.nonClaims.trim() &&
@@ -1434,8 +1456,41 @@ export default function RegisterGovernancePage() {
                   <input type="email" value={form.contactEmail} onChange={(e) => updateField('contactEmail', e.target.value)} />
                 </label>
                 <label>Public website
-                  <input type="url" value={form.website} onChange={(e) => updateField('website', e.target.value)} placeholder="https://" />
+                  <input
+                    type="url"
+                    value={form.website}
+                    onChange={(e) => updateField('website', e.target.value)}
+                    placeholder="https://"
+                  />
+                  <small>
+                    Optional architecture, organization, or project website.
+                  </small>
                 </label>
+                <label>
+                  Public evidence route
+                  {form.recordVisibility === 'PUBLIC' && (
+                    <em>Website or evidence route required</em>
+                  )}
+                  <input
+                    type="url"
+                    value={form.publicEvidenceRoute}
+                    onChange={(e) => updateField('publicEvidenceRoute', e.target.value)}
+                    placeholder="https://example.org/public-evidence"
+                  />
+                  <small>
+                    A public baseline, evidence package, repository landing page,
+                    publication route, or other attributable public source.
+                  </small>
+                </label>
+              </div>
+              <div className="boundary-note">
+                <strong>Public route rule.</strong>
+                <p>
+                  A PUBLIC Registry record must provide either a Public Website
+                  or a Public Evidence Route. They are separate fields so a
+                  registrant does not need to present an evidence archive as an
+                  organization website.
+                </p>
               </div>
             </section>
           )}
@@ -1840,6 +1895,16 @@ export default function RegisterGovernancePage() {
                 <p>{form.nonClaims || 'No explicit non-claims entered yet.'}</p>
               </section>
               <section>
+                <h3>Public Access Route</h3>
+                <p>
+                  {form.website ||
+                    form.publicEvidenceRoute ||
+                    (form.recordVisibility === 'PUBLIC'
+                      ? 'Public website or public evidence route not yet declared.'
+                      : 'No public route required for this visibility setting.')}
+                </p>
+              </section>
+              <section>
                 <h3>Evidence Summary</h3>
                 <ul>
                   <li>{files.length + preservedEvidence.length} evidence file(s)</li>
@@ -1928,6 +1993,7 @@ export default function RegisterGovernancePage() {
         .field-grid.three { grid-template-columns:repeat(3,minmax(0,1fr)); }
         label { display:grid; gap:8px; color:#edf2fa; font-size:13px; font-weight:750; }
         label em { color:#eec571; font-size:9px; font-style:normal; text-transform:uppercase; letter-spacing:.1em; }
+        label > small { color:#8fa1b8; font-size:10px; font-weight:500; line-height:1.45; }
         input,select,textarea { width:100%; border:1px solid rgba(151,169,199,.28); border-radius:12px; padding:13px 14px; color:#f6f8fc; background:rgba(4,9,18,.82); font:inherit; font-weight:500; outline:none; }
         input:focus,select:focus,textarea:focus { border-color:#e8bc68; box-shadow:0 0 0 3px rgba(232,188,104,.12); }
         textarea { resize:vertical; line-height:1.55; }
