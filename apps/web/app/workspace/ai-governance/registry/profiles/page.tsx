@@ -2,6 +2,8 @@ import Link from 'next/link';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 
+import GovernanceProfileEditorLink from '../GovernanceProfileEditorLink';
+
 type GovernanceProfile = {
   id: string;
   profile_number: number;
@@ -99,10 +101,6 @@ export default async function GovernanceProfilesPage() {
 
   const supabase =
     createSupabaseClient(cookieStore);
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
 
   const {
     data,
@@ -210,40 +208,16 @@ export default async function GovernanceProfilesPage() {
               Governance Profiles
             </span>
 
-            {user ? (
-              <>
-                <span
-                  style={{
-                    color:
-                      'rgba(255,255,255,0.28)',
-                  }}
-                >
-                  /
-                </span>
+            <span
+              style={{
+                color:
+                  'rgba(255,255,255,0.28)',
+              }}
+            >
+              /
+            </span>
 
-                <Link
-                  href="/workspace/ai-governance/registry/profiles/editor"
-                  style={{
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    minHeight: 34,
-                    padding: '0 12px',
-                    border:
-                      '1px solid rgba(213, 167, 75, 0.34)',
-                    borderRadius: 10,
-                    background:
-                      'rgba(213, 167, 75, 0.08)',
-                    color: '#edc574',
-                    textDecoration: 'none',
-                    fontSize: 13,
-                    fontWeight: 800,
-                    letterSpacing: '0.04em',
-                  }}
-                >
-                  Governance Profile Editor →
-                </Link>
-              </>
-            ) : null}
+            <GovernanceProfileEditorLink />
           </nav>
 
           <div
