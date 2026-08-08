@@ -31,8 +31,38 @@ type PublicRegistryRecord = {
   boundary: string;
 };
 
+type PublicVersionSeries = {
+  seriesIdentifier: string;
+  governanceName: string;
+  shortName: string | null;
+  category: string | null;
+  steward: string | null;
+  status: string;
+  seriesSummary: string | null;
+  boundaryStatement: string;
+  memberCount: number;
+  currentMemberOrdinal: number;
+};
+
+type PublicVersionSeriesMember = {
+  seriesIdentifier: string;
+  registryIdentifier: string;
+  governanceName: string;
+  version: string | null;
+  registryStatus: string;
+  registeredAt: string;
+  ordinal: number;
+  relationshipType: string;
+  previousRegistryIdentifier: string | null;
+  lineageNote: string | null;
+  findingsInherited: boolean;
+  evidenceInherited: boolean;
+};
+
 type ApiSuccess = {
   record: PublicRegistryRecord;
+  versionSeries: PublicVersionSeries | null;
+  versionSeriesMembers: PublicVersionSeriesMember[];
   generatedAt: string;
 };
 
@@ -66,6 +96,8 @@ export default function PermanentPublicRegistryRecordPage() {
   );
 
   const [record, setRecord] = useState<PublicRegistryRecord | null>(null);
+  const [versionSeries, setVersionSeries] = useState<PublicVersionSeries | null>(null);
+  const [versionSeriesMembers, setVersionSeriesMembers] = useState<PublicVersionSeriesMember[]>([]);
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -78,6 +110,8 @@ export default function PermanentPublicRegistryRecordPage() {
       setLoading(true);
       setError('');
       setNotFound(false);
+      setVersionSeries(null);
+      setVersionSeriesMembers([]);
 
       try {
         const response = await fetch(
@@ -111,6 +145,12 @@ export default function PermanentPublicRegistryRecordPage() {
 
         const success = payload as ApiSuccess;
         setRecord(success.record);
+        setVersionSeries(success.versionSeries ?? null);
+        setVersionSeriesMembers(
+          Array.isArray(success.versionSeriesMembers)
+            ? success.versionSeriesMembers
+            : [],
+        );
         setGeneratedAt(success.generatedAt);
       } catch (caught) {
         if (cancelled) return;
@@ -406,6 +446,125 @@ export default function PermanentPublicRegistryRecordPage() {
               </p>
             )}
           </section>
+
+          {versionSeries ? (
+            <section className="sectionCard versionSeriesCard">
+              <div className="sectionHeading">
+                <p className="eyebrow">GOVERNED VERSION LINEAGE</p>
+                <h2>{versionSeries.seriesIdentifier}</h2>
+              </div>
+
+              <div className="seriesSummaryGrid">
+                <div>
+                  <span>Governance</span>
+                  <strong>{versionSeries.governanceName}</strong>
+                </div>
+                <div>
+                  <span>Series status</span>
+                  <strong>{versionSeries.status}</strong>
+                </div>
+                <div>
+                  <span>Registered versions</span>
+                  <strong>{versionSeries.memberCount}</strong>
+                </div>
+                <div>
+                  <span>This record</span>
+                  <strong>
+                    Version position {versionSeries.currentMemberOrdinal} of{' '}
+                    {versionSeries.memberCount}
+                  </strong>
+                </div>
+              </div>
+
+              {versionSeries.seriesSummary ? (
+                <p className="seriesSummary">{versionSeries.seriesSummary}</p>
+              ) : null}
+
+              <div className="seriesBoundary">
+                <strong>Lineage boundary</strong>
+                <p>{versionSeries.boundaryStatement}</p>
+              </div>
+
+              <div className="versionTimeline" aria-label="Governed version lineage">
+                {versionSeriesMembers.map((member) => {
+                  const isCurrent =
+                    member.registryIdentifier === record.registryIdentifier;
+
+                  return (
+                    <article
+                      key={member.registryIdentifier}
+                      className={`versionNode${isCurrent ? ' currentVersionNode' : ''}`}
+                    >
+                      <div className="versionNodeHeader">
+                        <div>
+                          <span className="versionOrdinal">
+                            {String(member.ordinal).padStart(2, '0')}
+                          </span>
+                          <p className="versionIdentity">
+                            {member.version ? `Version ${member.version}` : 'Version not declared'}
+                          </p>
+                        </div>
+                        <span className="versionStatus">
+                          {isCurrent ? 'CURRENT RECORD' : member.registryStatus}
+                        </span>
+                      </div>
+
+                      <Link
+                        href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                          member.registryIdentifier,
+                        )}`}
+                        className="versionRegistryLink"
+                      >
+                        {member.registryIdentifier}
+                      </Link>
+
+                      <p className="relationshipType">
+                        Relationship: {member.relationshipType.replaceAll('_', ' ')}
+                      </p>
+
+                      {member.lineageNote ? (
+                        <p className="lineageNote">{member.lineageNote}</p>
+                      ) : null}
+
+                      <div className="inheritanceGrid">
+                        <div>
+                          <span>Prior findings inherited</span>
+                          <strong>{member.findingsInherited ? 'Yes' : 'No'}</strong>
+                        </div>
+                        <div>
+                          <span>Prior evidence inherited</span>
+                          <strong>{member.evidenceInherited ? 'Yes' : 'No'}</strong>
+                        </div>
+                      </div>
+
+                      {member.previousRegistryIdentifier ? (
+                        <p className="previousVersion">
+                          Continues from{' '}
+                          <Link
+                            href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                              member.previousRegistryIdentifier,
+                            )}`}
+                          >
+                            {member.previousRegistryIdentifier}
+                          </Link>
+                        </p>
+                      ) : (
+                        <p className="previousVersion">Series baseline record.</p>
+                      )}
+                    </article>
+                  );
+                })}
+              </div>
+
+              <p className="seriesNote">
+                Version-series membership preserves attributable architectural
+                continuity without carrying a prior version&apos;s evidence,
+                finding, PASS, or review conclusion into a later registered
+                version unless a governed record expressly establishes that
+                relationship.
+              </p>
+            </section>
+          ) : null}
 
           <section className="sectionCard">
             <div className="sectionHeading">
@@ -994,6 +1153,188 @@ const styles = `
     .orbit,
     .pulseDot {
       animation: none;
+    }
+  }
+
+  .versionSeriesCard {
+    border-color: rgba(127, 228, 196, 0.26);
+    background:
+      linear-gradient(135deg, rgba(13, 36, 55, 0.94), rgba(9, 24, 43, 0.94));
+  }
+
+  .seriesSummaryGrid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 24px 0;
+  }
+
+  .seriesSummaryGrid > div,
+  .inheritanceGrid > div {
+    border: 1px solid rgba(164, 190, 231, 0.18);
+    border-radius: 14px;
+    background: rgba(6, 19, 35, 0.68);
+    padding: 16px;
+  }
+
+  .seriesSummaryGrid span,
+  .inheritanceGrid span {
+    display: block;
+    color: #94a9c8;
+    font-size: 0.76rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 7px;
+  }
+
+  .seriesSummaryGrid strong,
+  .inheritanceGrid strong {
+    color: #f4f8ff;
+  }
+
+  .seriesSummary {
+    color: #c8d8ef;
+    line-height: 1.75;
+    margin: 0 0 20px;
+  }
+
+  .seriesBoundary {
+    border-left: 3px solid rgba(127, 228, 196, 0.75);
+    padding: 4px 0 4px 18px;
+    margin: 20px 0 28px;
+  }
+
+  .seriesBoundary strong {
+    color: #9cf0d7;
+    font-size: 0.8rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .seriesBoundary p {
+    margin: 8px 0 0;
+    color: #dbe7f8;
+    line-height: 1.7;
+  }
+
+  .versionTimeline {
+    position: relative;
+    display: grid;
+    gap: 16px;
+  }
+
+  .versionNode {
+    position: relative;
+    border: 1px solid rgba(164, 190, 231, 0.2);
+    border-radius: 18px;
+    padding: 20px;
+    background: rgba(7, 20, 38, 0.82);
+  }
+
+  .currentVersionNode {
+    border-color: rgba(127, 228, 196, 0.56);
+    box-shadow: inset 0 0 0 1px rgba(127, 228, 196, 0.12);
+  }
+
+  .versionNodeHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 18px;
+    margin-bottom: 12px;
+  }
+
+  .versionOrdinal {
+    color: #7fe4c4;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 900;
+  }
+
+  .versionIdentity {
+    margin: 4px 0 0;
+    color: #f2f6ff;
+    font-weight: 900;
+    font-size: 1.08rem;
+  }
+
+  .versionStatus {
+    border: 1px solid rgba(127, 228, 196, 0.34);
+    border-radius: 999px;
+    padding: 7px 10px;
+    color: #9cf0d7;
+    font-size: 0.7rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  .versionRegistryLink {
+    color: #a9c7ff;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  .versionRegistryLink:hover,
+  .previousVersion a:hover {
+    text-decoration: underline;
+  }
+
+  .relationshipType,
+  .lineageNote,
+  .previousVersion,
+  .seriesNote {
+    color: #aebfd8;
+    line-height: 1.65;
+  }
+
+  .relationshipType {
+    margin: 12px 0 0;
+    text-transform: capitalize;
+  }
+
+  .lineageNote {
+    margin: 10px 0 0;
+  }
+
+  .inheritanceGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .previousVersion {
+    margin: 14px 0 0;
+    font-size: 0.9rem;
+  }
+
+  .previousVersion a {
+    color: #a9c7ff;
+    font-weight: 800;
+  }
+
+  .seriesNote {
+    margin: 22px 0 0;
+    padding-top: 18px;
+    border-top: 1px solid rgba(164, 190, 231, 0.14);
+    font-size: 0.92rem;
+  }
+
+  @media (max-width: 880px) {
+    .seriesSummaryGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 620px) {
+    .seriesSummaryGrid,
+    .inheritanceGrid {
+      grid-template-columns: 1fr;
+    }
+
+    .versionNodeHeader {
+      flex-direction: column;
     }
   }
 `;
