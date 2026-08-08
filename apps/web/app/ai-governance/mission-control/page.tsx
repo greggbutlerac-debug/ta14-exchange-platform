@@ -18,6 +18,7 @@
  */
 
 import type { Metadata } from "next";
+import { createClient } from "../../../lib/supabase/server";
 
 import MissionControlDashboard from "../../../components/academy/mission-control-dashboard";
 
@@ -170,37 +171,48 @@ async function resolveLiveMissionControl(
  * ========================================================================== */
 
 /**
- * This function intentionally supports a dependency-free environment-based
- * identity bridge so the page compiles before a specific authentication
- * provider is wired into the repository.
- *
- * Production integration may replace this body with the repository's existing
- * authenticated-session helper.
+ * Resolve Mission Control identity from the authenticated Supabase session.
+ * Server environment variables must never select the visible user identity.
  */
 async function resolveMissionControlIdentity():
 Promise<MissionControlLiveIdentity | null> {
-  const subjectId =
-    process.env.TA14_MISSION_CONTROL_SUBJECT_ID?.trim();
+  const supabase = await createClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
 
-  if (!subjectId) {
+  if (userError || !user) {
     return null;
   }
 
+  const [{ data: profile }, { data: registeredEntity }] = await Promise.all([
+    supabase
+      .from("exchange_profiles")
+      .select("display_name,organization_name,status")
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    supabase
+      .from("ai_governance_registry_submissions")
+      .select("registry_identifier")
+      .eq("owner_user_id", user.id)
+      .eq("status", "registered")
+      .not("registry_identifier", "is", null)
+      .order("accepted_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
   return Object.freeze({
-    subjectId,
-    email:
-      process.env.TA14_MISSION_CONTROL_EMAIL?.trim() ||
-      undefined,
+    subjectId: user.id,
+    email: user.email || undefined,
     displayName:
-      process.env.TA14_MISSION_CONTROL_DISPLAY_NAME?.trim() ||
+      profile?.display_name?.trim() ||
+      (typeof user.user_metadata?.display_name === "string"
+        ? user.user_metadata.display_name.trim()
+        : undefined) ||
+      user.email ||
       undefined,
-    organizationId:
-      process.env.TA14_MISSION_CONTROL_ORGANIZATION_ID?.trim() ||
-      undefined,
-    governanceEntityId:
-      process.env.TA14_MISSION_CONTROL_GOVERNANCE_ENTITY_ID?.trim() ||
-      undefined,
-    active: true,
+    organizationId: profile?.organization_name?.trim() || undefined,
+    governanceEntityId: registeredEntity?.registry_identifier || undefined,
+    active: profile?.status ? profile.status === "active" : true,
   });
 }
 
