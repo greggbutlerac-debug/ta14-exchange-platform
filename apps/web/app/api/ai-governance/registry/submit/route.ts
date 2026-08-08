@@ -523,6 +523,44 @@ export async function POST(
     }
 
     /*
+     * Respect the registrant's selected review pathway.
+     *
+     * Only the explicit "Record-only registration" pathway may proceed
+     * directly to the automatic Registry finalizer after readiness checks.
+     * Every other pathway represents a request for human/institutional review
+     * and therefore remains in SUBMITTED state until a reviewer records a
+     * governed decision through the Registry review workflow.
+     *
+     * This prevents a submission requesting Administrative completeness,
+     * Identity and authority, Evidence, Independent governance, Partner Review
+     * Network, or Public dispute resolution from silently becoming REGISTERED
+     * without the review it requested.
+     */
+    const reviewPathway =
+      submission.requested_review_pathway?.trim() ||
+      'Record-only registration';
+
+    if (
+      reviewPathway !==
+      'Record-only registration'
+    ) {
+      return NextResponse.json({
+        ok: true,
+        pendingReview: true,
+        submission: submittedData,
+        review: {
+          pathway: reviewPathway,
+          status: 'submitted',
+          reviewed: false,
+        },
+        notice:
+          'The Registry submission has been preserved and is awaiting the requested review pathway. No Registry Identifier has been issued and the record has not been registered.',
+        boundary:
+          'Submission for review is not registration, certification, endorsement, technical validation, legal approval, regulatory approval, ownership adjudication, or proof of performance.',
+      });
+    }
+
+    /*
      * Governed automatic registration.
      *
      * The database finalizer:
