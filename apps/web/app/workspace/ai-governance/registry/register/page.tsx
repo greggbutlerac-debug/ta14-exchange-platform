@@ -12,6 +12,19 @@ import {
 } from 'react';
 
 type Visibility = 'PUBLIC' | 'CONTROLLED' | 'PRIVATE';
+type ProvenanceStatus =
+  | ''
+  | 'REGISTRANT-PRODUCED'
+  | 'TA14-PRODUCED'
+  | 'INDEPENDENTLY PRODUCED'
+  | 'INDEPENDENTLY REPRODUCED'
+  | 'PUBLIC-SOURCE'
+  | 'CROSS-PARTY'
+  | 'NOT INDEPENDENTLY ESTABLISHED'
+  | 'NOT REPORTED'
+  | 'NOT SUBMITTED'
+  | 'NOT PRESERVED'
+  | 'OUTSIDE REVIEW SCOPE';
 type ContactVisibility = 'REGISTRY_FORM' | 'WEBSITE_ONLY' | 'PUBLIC_EMAIL' | 'PRIVATE';
 type AuthorityRole =
   | 'Founder'
@@ -64,6 +77,7 @@ type EvidenceFile = {
   visibility: Visibility;
   relationship: EvidenceRelationship;
   sha256: string;
+  provenanceStatus: ProvenanceStatus;
 };
 
 type PreservedEvidence = {
@@ -81,6 +95,7 @@ type PreservedEvidence = {
   submitted_at: string;
   storage_bucket: string | null;
   storage_path: string | null;
+  provenance_status?: ProvenanceStatus | null;
 };
 
 
@@ -98,6 +113,7 @@ type PublicationRecord = {
   description: string;
   relationshipToGovernance: string;
   visibility: Visibility;
+  provenanceStatus: ProvenanceStatus;
 };
 
 type RepositoryRecord = {
@@ -113,6 +129,7 @@ type RepositoryRecord = {
   accessState: 'PUBLIC' | 'PRIVATE' | 'RESTRICTED';
   description: string;
   relationshipToGovernance: string;
+  provenanceStatus: ProvenanceStatus;
 };
 
 type ZenodoRecord = {
@@ -129,6 +146,7 @@ type ZenodoRecord = {
   description: string;
   relationshipToGovernance: string;
   visibility: Visibility;
+  provenanceStatus: ProvenanceStatus;
 };
 
 type PatentRecord = {
@@ -212,6 +230,21 @@ const ACCEPTED_EXTENSIONS = [
   'zip',
 ];
 
+const provenanceStatuses: ProvenanceStatus[] = [
+  '',
+  'REGISTRANT-PRODUCED',
+  'TA14-PRODUCED',
+  'INDEPENDENTLY PRODUCED',
+  'INDEPENDENTLY REPRODUCED',
+  'PUBLIC-SOURCE',
+  'CROSS-PARTY',
+  'NOT INDEPENDENTLY ESTABLISHED',
+  'NOT REPORTED',
+  'NOT SUBMITTED',
+  'NOT PRESERVED',
+  'OUTSIDE REVIEW SCOPE',
+];
+
 const evidenceCategories: EvidenceCategory[] = [
   'Founding declaration',
   'Governance specification',
@@ -280,7 +313,7 @@ function createPublication(): PublicationRecord {
   return {
     id: safeId(), publicationType: 'Article', title: '', authors: '',
     publisherOrPlatform: '', publicationDate: '', url: '', doi: '', isbn: '',
-    citationText: '', description: '', relationshipToGovernance: '', visibility: 'PUBLIC',
+    citationText: '', description: '', relationshipToGovernance: '', visibility: 'PUBLIC', provenanceStatus: '',
   };
 }
 
@@ -288,7 +321,7 @@ function createRepository(): RepositoryRecord {
   return {
     id: safeId(), provider: 'GitHub', repositoryName: '', repositoryOwner: '',
     repositoryUrl: '', defaultBranch: '', releaseOrTag: '', commitSha: '', license: '',
-    accessState: 'PUBLIC', description: '', relationshipToGovernance: '',
+    accessState: 'PUBLIC', description: '', relationshipToGovernance: '', provenanceStatus: '',
   };
 }
 
@@ -296,7 +329,7 @@ function createZenodo(): ZenodoRecord {
   return {
     id: safeId(), title: '', recordUrl: '', doi: '', conceptDoi: '',
     zenodoRecordId: '', version: '', publicationDate: '', creators: '', resourceType: '',
-    description: '', relationshipToGovernance: '', visibility: 'PUBLIC',
+    description: '', relationshipToGovernance: '', visibility: 'PUBLIC', provenanceStatus: '',
   };
 }
 
@@ -479,6 +512,7 @@ export default function RegisterGovernancePage() {
         description: '',
         visibility: form.recordVisibility,
         relationship: 'Other',
+        provenanceStatus: '',
         sha256: await sha256File(file),
       });
     }
@@ -503,7 +537,7 @@ export default function RegisterGovernancePage() {
 
   function updateEvidence(
     id: string,
-    changes: Partial<Pick<EvidenceFile, 'category' | 'description' | 'visibility' | 'relationship'>>,
+    changes: Partial<Pick<EvidenceFile, 'category' | 'description' | 'visibility' | 'relationship' | 'provenanceStatus'>>,
   ) {
     setFiles((current) =>
       current.map((item) => (item.id === id ? { ...item, ...changes } : item)),
@@ -555,6 +589,7 @@ export default function RegisterGovernancePage() {
       body.append('evidenceRelationship', item.relationship);
       body.append('evidenceClassification', item.category);
       body.append('description', item.description.trim());
+      body.append('provenanceStatus', item.provenanceStatus);
       body.append(
         'visibility',
         item.visibility === 'PUBLIC'
@@ -594,6 +629,7 @@ export default function RegisterGovernancePage() {
     body.append('evidenceRelationship', item.relationship);
     body.append('evidenceClassification', item.category);
     body.append('description', item.description.trim());
+    body.append('provenanceStatus', item.provenanceStatus);
     body.append(
       'visibility',
       item.visibility === 'PUBLIC'
@@ -715,6 +751,7 @@ export default function RegisterGovernancePage() {
         citationText: item.citation_text ?? '',
         description: item.abstract_or_description ?? '',
         relationshipToGovernance: item.relationship_to_governance ?? '',
+        provenanceStatus: item.provenance_status ?? '',
         visibility: item.visibility === 'public' ? 'PUBLIC' : item.visibility === 'selective' ? 'CONTROLLED' : 'PRIVATE',
       })),
     );
@@ -735,6 +772,7 @@ export default function RegisterGovernancePage() {
         accessState: (item.access_state ?? 'public').toUpperCase() as RepositoryRecord['accessState'],
         description: item.description ?? '',
         relationshipToGovernance: item.relationship_to_governance ?? '',
+        provenanceStatus: item.provenance_status ?? '',
       })),
     );
 
@@ -752,6 +790,7 @@ export default function RegisterGovernancePage() {
         resourceType: item.resource_type ?? '',
         description: item.description ?? '',
         relationshipToGovernance: item.relationship_to_governance ?? '',
+        provenanceStatus: item.provenance_status ?? '',
         visibility: item.visibility === 'public' ? 'PUBLIC' : item.visibility === 'selective' ? 'CONTROLLED' : 'PRIVATE',
       })),
     );
@@ -1109,6 +1148,7 @@ export default function RegisterGovernancePage() {
           sizeBytes: item.size_bytes,
           category: item.evidence_classification,
           relationship: item.evidence_relationship,
+          provenanceStatus: item.provenance_status ?? '',
           description: item.description,
           visibility: item.visibility,
           sha256: item.sha256_hex,
@@ -1123,6 +1163,7 @@ export default function RegisterGovernancePage() {
           lastModified: new Date(item.file.lastModified).toISOString(),
           category: item.category,
           relationship: item.relationship,
+          provenanceStatus: item.provenanceStatus,
           description: item.description,
           visibility: item.visibility,
           sha256: item.sha256,
@@ -1658,7 +1699,7 @@ export default function RegisterGovernancePage() {
           {activeStep === 7 && (
             <section className="step-card">
               <p className="step-intro">
-                Add, hash, classify, describe, and preserve supporting evidence. Save an account draft before preserving files.
+                Add, hash, classify, describe, and preserve supporting evidence. Apply the TA14-RET-001 §07 provenance status explicitly so independence is machine-readable rather than buried in prose. Save an account draft before preserving files.
               </p>
               <div
                 className={`drop-zone ${dragActive ? 'drag-active' : ''}`}
@@ -1694,6 +1735,7 @@ export default function RegisterGovernancePage() {
                       <label>Relationship<select value={item.relationship} onChange={(e) => updateEvidence(item.id, { relationship: e.target.value as EvidenceRelationship })}>{evidenceRelationships.map((relationship) => <option key={relationship}>{relationship}</option>)}</select></label>
                       <label>Visibility<select value={item.visibility} onChange={(e) => updateEvidence(item.id, { visibility: e.target.value as Visibility })}><option value="PUBLIC">Public</option><option value="CONTROLLED">Controlled</option><option value="PRIVATE">Private</option></select></label>
                     </div>
+                    <label>Provenance status <em>Required</em><select value={item.provenanceStatus} onChange={(e) => updateEvidence(item.id, { provenanceStatus: e.target.value as ProvenanceStatus })}>{provenanceStatuses.map((status) => <option key={status || 'UNSELECTED'} value={status}>{status || 'Select provenance status'}</option>)}</select></label>
                     <label>What this file supports <em>Required</em><textarea rows={4} value={item.description} onChange={(e) => updateEvidence(item.id, { description: e.target.value })} /></label>
                   </div>
                 </article>
@@ -1735,6 +1777,7 @@ export default function RegisterGovernancePage() {
                     <label>Visibility<select value={item.visibility} onChange={(e) => updatePublication(item.id, { visibility: e.target.value as Visibility })}><option value="PUBLIC">Public</option><option value="CONTROLLED">Controlled</option><option value="PRIVATE">Private</option></select></label>
                   </div>
                   <label>Citation text<input value={item.citationText} onChange={(e) => updatePublication(item.id, { citationText: e.target.value })} /></label>
+                  <label>Provenance status <em>Required</em><select value={item.provenanceStatus} onChange={(e) => updatePublication(item.id, { provenanceStatus: e.target.value as ProvenanceStatus })}>{provenanceStatuses.map((status) => <option key={status || 'UNSELECTED'} value={status}>{status || 'Select provenance status'}</option>)}</select></label>
                   <label>Relationship to governance<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updatePublication(item.id, { relationshipToGovernance: e.target.value })} /></label>
                 </article>
               ))}
@@ -1760,6 +1803,7 @@ export default function RegisterGovernancePage() {
                     <label>Commit SHA<input value={item.commitSha} onChange={(e) => updateRepository(item.id, { commitSha: e.target.value })} /></label>
                     <label>License<input value={item.license} onChange={(e) => updateRepository(item.id, { license: e.target.value })} /></label>
                   </div>
+                  <label>Provenance status <em>Required</em><select value={item.provenanceStatus} onChange={(e) => updateRepository(item.id, { provenanceStatus: e.target.value as ProvenanceStatus })}>{provenanceStatuses.map((status) => <option key={status || 'UNSELECTED'} value={status}>{status || 'Select provenance status'}</option>)}</select></label>
                   <label>Relationship to governance<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updateRepository(item.id, { relationshipToGovernance: e.target.value })} /></label>
                 </article>
               ))}
@@ -1776,6 +1820,7 @@ export default function RegisterGovernancePage() {
                     <label>Publication date<input type="date" value={item.publicationDate} onChange={(e) => updateZenodo(item.id, { publicationDate: e.target.value })} /></label>
                     <label>Creators<input value={item.creators} onChange={(e) => updateZenodo(item.id, { creators: e.target.value })} /></label>
                   </div>
+                  <label>Provenance status <em>Required</em><select value={item.provenanceStatus} onChange={(e) => updateZenodo(item.id, { provenanceStatus: e.target.value as ProvenanceStatus })}>{provenanceStatuses.map((status) => <option key={status || 'UNSELECTED'} value={status}>{status || 'Select provenance status'}</option>)}</select></label>
                   <label>Relationship to governance<textarea rows={3} value={item.relationshipToGovernance} onChange={(e) => updateZenodo(item.id, { relationshipToGovernance: e.target.value })} /></label>
                 </article>
               ))}
