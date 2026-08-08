@@ -21,7 +21,31 @@ type ApiPayload = {
   registry_record?: PublicRegistryRecord;
   data?: PublicRegistryRecord;
   error?: string;
+  message?: string;
 };
+
+function isPublicRegistryRecord(value: unknown): value is PublicRegistryRecord {
+  if (typeof value !== 'object' || value === null) return false;
+
+  const candidate = value as Partial<PublicRegistryRecord>;
+
+  return (
+    typeof candidate.registryIdentifier === 'string' &&
+    candidate.registryIdentifier.trim().length > 0 &&
+    typeof candidate.governanceName === 'string' &&
+    candidate.governanceName.trim().length > 0
+  );
+}
+
+function resolvePublicRegistryRecord(payload: unknown) {
+  if (isPublicRegistryRecord(payload)) return payload;
+  if (typeof payload !== 'object' || payload === null) return null;
+
+  const wrapped = payload as ApiPayload;
+  const candidate = wrapped.record || wrapped.registry_record || wrapped.data;
+
+  return isPublicRegistryRecord(candidate) ? candidate : null;
+}
 
 function formatDate(value: string | null) {
   if (!value) return 'date not recorded';
@@ -79,7 +103,7 @@ export default function RegistryCitationPage() {
           },
         );
 
-        const payload = (await response.json()) as ApiPayload;
+        const payload = (await response.json()) as unknown;
 
         if (response.status === 404) {
           if (!cancelled) setNotFound(true);
@@ -88,14 +112,26 @@ export default function RegistryCitationPage() {
 
         if (!response.ok) {
           throw new Error(
-            payload.error || 'The permanent Registry record is unavailable.',
+            (typeof payload === 'object' &&
+              payload !== null &&
+              'message' in payload &&
+              typeof payload.message === 'string'
+              ? payload.message
+              : typeof payload === 'object' &&
+                  payload !== null &&
+                  'error' in payload &&
+                  typeof payload.error === 'string'
+                ? payload.error
+                : 'The permanent Registry record is unavailable.'),
           );
         }
 
-        const result = payload.record || payload.registry_record || payload.data;
+        const result = resolvePublicRegistryRecord(payload);
 
         if (!result) {
-          throw new Error('The Registry response did not contain a public record.');
+          throw new Error(
+            'The Registry response did not contain a complete citation-safe public record.',
+          );
         }
 
         if (!cancelled) setRecord(result);
@@ -137,6 +173,13 @@ export default function RegistryCitationPage() {
 
   function downloadJson() {
     if (!record) return;
+
+    if (!record.registryIdentifier?.trim() || !record.governanceName?.trim()) {
+      setError(
+        'Citation export was blocked because the permanent Registry identifier or governance name is missing.',
+      );
+      return;
+    }
 
     const exportPayload = {
       registry_identifier: record.registryIdentifier,
