@@ -2057,6 +2057,10 @@ export default function RegisterGovernancePage() {
                 <p>{form.nonClaims || 'No explicit non-claims entered yet.'}</p>
               </section>
               <section>
+                <h3>Known Limitations</h3>
+                <p>{form.limitations || 'No known limitations, dependencies, or unresolved questions entered yet.'}</p>
+              </section>
+              <section>
                 <h3>Public Access Route</h3>
                 <p>
                   {form.website ||
