@@ -437,7 +437,7 @@ export default function GovernanceProfileEditorRecordPage() {
         <div className="topLinks">
           <Link
             className="textLink"
-            href={`/workspace/ai-governance/registry/public/${encodeURIComponent(
+            href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
               profile.registry_identifier,
             )}`}
           >
