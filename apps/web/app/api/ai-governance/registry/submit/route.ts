@@ -241,12 +241,20 @@ export async function POST(
       });
     }
 
+    const isDraft =
+      submission.status ===
+      'draft';
+
+    const isSubmitted =
+      submission.status ===
+      'submitted';
+
     if (
-      submission.status !==
-      'draft'
+      !isDraft &&
+      !isSubmitted
     ) {
       return errorResponse(
-        `Only a private draft may begin automatic registration. Current status: ${submission.status}.`,
+        `Only a private draft or an already-submitted eligible registration may continue through this pathway. Current status: ${submission.status}.`,
         409,
       );
     }
@@ -454,101 +462,130 @@ export async function POST(
     }
 
     /*
-     * Stage the validated draft as submitted.
+     * Stage a validated draft as submitted.
      *
-     * "submitted" is the governed handoff point between
-     * editable intake and automatic Registry determination.
+     * An already-submitted eligible registration is preserved
+     * exactly as submitted and resumes at the automatic
+     * finalization step. This allows governed recovery when an
+     * earlier deployment preserved the submission but did not
+     * complete identifier issuance.
      */
-    const submittedAt =
-      new Date().toISOString();
+    let submittedData:
+      | Record<string, unknown>
+      | null = null;
 
-    const {
-      data: submittedData,
-      error: submitError,
-    } =
-      await supabase
-        .from(
-          'ai_governance_registry_submissions',
-        )
-        .update({
-          status:
-            'submitted',
+    const stagedFromDraft =
+      isDraft;
 
-          submitted_at:
-            submittedAt,
+    if (isDraft) {
+      const submittedAt =
+        new Date().toISOString();
 
-          updated_at:
-            submittedAt,
-        })
-        .eq(
-          'id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .eq(
-          'status',
-          'draft',
-        )
-        .select(
-          [
+      const {
+        data,
+        error: submitError,
+      } =
+        await supabase
+          .from(
+            'ai_governance_registry_submissions',
+          )
+          .update({
+            status:
+              'submitted',
+
+            submitted_at:
+              submittedAt,
+
+            updated_at:
+              submittedAt,
+          })
+          .eq(
             'id',
-            'governance_name',
-            'current_version',
+            submissionId,
+          )
+          .eq(
+            'owner_user_id',
+            user.id,
+          )
+          .eq(
             'status',
-            'submitted_at',
-            'requested_review_pathway',
-            'registry_identifier',
-            'updated_at',
-          ].join(', '),
-        )
-        .single();
+            'draft',
+          )
+          .select(
+            [
+              'id',
+              'governance_name',
+              'current_version',
+              'status',
+              'submitted_at',
+              'requested_review_pathway',
+              'registry_identifier',
+              'updated_at',
+            ].join(', '),
+          )
+          .single();
 
-    if (
-      submitError ||
-      !submittedData
-    ) {
-      return errorResponse(
-        submitError?.message ||
-          'Unable to begin Governance Entity Registration.',
-        500,
-      );
+      if (
+        submitError ||
+        !data
+      ) {
+        return errorResponse(
+          submitError?.message ||
+            'Unable to begin Governance Entity Registration.',
+          500,
+        );
+      }
+
+      submittedData = data;
+    } else {
+      submittedData = {
+        id: submission.id,
+        governance_name:
+          submission.governance_name,
+        current_version:
+          submission.current_version,
+        status:
+          submission.status,
+        submitted_at:
+          submission.submitted_at,
+        requested_review_pathway:
+          submission.requested_review_pathway,
+        registry_identifier:
+          submission.registry_identifier,
+        updated_at:
+          submission.updated_at,
+      };
     }
 
     /*
      * Respect the registrant's selected review pathway.
      *
-     * Two non-substantive pathways may proceed directly to the governed
-     * automatic Registry finalizer after readiness checks:
+     * Two administrative pathways may proceed directly to the
+     * governed automatic Registry finalizer after readiness checks:
      *
      * - Record-only registration
      * - Administrative completeness review
      *
-     * Administrative completeness review is limited to objective intake
-     * completeness, required declarations, evidence presence, public-route
-     * requirements, ownership, and Registry readiness. It is not a TA-14
-     * merits review and does not represent architecture approval, evidence
-     * validation, identity adjudication, certification, or endorsement.
+     * Administrative completeness review is limited to objective
+     * intake/readiness conditions. It does not represent a human
+     * reviewer finding, identity adjudication, evidence validation,
+     * architecture approval, certification, or endorsement.
      *
-     * Deeper pathways remain in SUBMITTED state until the requested
-     * institutional review is completed. This preserves the boundary around
-     * Identity and authority review, Evidence review, Independent governance
-     * review, Partner Review Network review, and Public dispute resolution.
+     * Deeper review pathways remain in SUBMITTED state until a
+     * separate governed review action is completed.
      */
     const reviewPathway =
       submission.requested_review_pathway?.trim() ||
       'Record-only registration';
 
-    const automaticRegistrationPathways =
+    const automaticPathways =
       new Set([
         'Record-only registration',
         'Administrative completeness review',
       ]);
 
     if (
-      !automaticRegistrationPathways.has(
+      !automaticPathways.has(
         reviewPathway,
       )
     ) {
@@ -731,39 +768,43 @@ export async function POST(
       /*
        * Unexpected infrastructure failure.
        *
-       * Restore the submission to draft because the failure
-       * was not a governed Registry readiness determination.
+       * Only restore to draft when this request itself moved the
+       * record from draft to submitted. An already-submitted record
+       * must remain preserved as submitted so recovery does not
+       * rewrite its lifecycle chronology.
        */
-      await supabase
-        .from(
-          'ai_governance_registry_submissions',
-        )
-        .update({
-          status:
-            'draft',
+      if (stagedFromDraft) {
+        await supabase
+          .from(
+            'ai_governance_registry_submissions',
+          )
+          .update({
+            status:
+              'draft',
 
-          submitted_at:
+            submitted_at:
+              null,
+
+            updated_at:
+              new Date().toISOString(),
+          })
+          .eq(
+            'id',
+            submissionId,
+          )
+          .eq(
+            'owner_user_id',
+            user.id,
+          )
+          .eq(
+            'status',
+            'submitted',
+          )
+          .is(
+            'registry_identifier',
             null,
-
-          updated_at:
-            new Date().toISOString(),
-        })
-        .eq(
-          'id',
-          submissionId,
-        )
-        .eq(
-          'owner_user_id',
-          user.id,
-        )
-        .eq(
-          'status',
-          'submitted',
-        )
-        .is(
-          'registry_identifier',
-          null,
-        );
+          );
+      }
 
       return errorResponse(
         `Automatic registration could not be completed: ${finalizeError.message}`,
