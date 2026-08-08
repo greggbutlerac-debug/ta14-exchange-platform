@@ -3,7 +3,7 @@ import Link from "next/link";
 export const metadata = {
   title: "Registration & Evidence Terms | TA14 Authority",
   description:
-    "Public terms governing AI governance registration, evidence submission, findings, publication, withdrawal, versioning, fees, and institutional recordkeeping within the TA14 AI Governance Exchange.",
+    "Public terms governing AI governance registration, evidence submission, findings, publication, withdrawal, versioning, succession, fees, and institutional recordkeeping within the TA14 AI Governance Exchange.",
 };
 
 type SectionProps = {
@@ -480,6 +480,17 @@ export default function RegistrationEvidenceTermsPage() {
           line-height: 1.45;
         }
 
+        .status-strip {
+          margin-top: 18px;
+          padding: 16px 18px;
+          border: 1px solid rgba(255, 200, 107, 0.18);
+          border-radius: 16px;
+          background: rgba(255, 200, 107, 0.045);
+          color: #f6dfb3;
+          font-size: 13px;
+          line-height: 1.65;
+        }
+
         .principles-grid {
           display: grid;
           grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -571,9 +582,17 @@ export default function RegistrationEvidenceTermsPage() {
           opacity: 0.7;
         }
 
-        .terms-section--green::before { background: linear-gradient(180deg, transparent, var(--ta-green), transparent); }
-        .terms-section--violet::before { background: linear-gradient(180deg, transparent, var(--ta-violet), transparent); }
-        .terms-section--amber::before { background: linear-gradient(180deg, transparent, var(--ta-amber), transparent); }
+        .terms-section--green::before {
+          background: linear-gradient(180deg, transparent, var(--ta-green), transparent);
+        }
+
+        .terms-section--violet::before {
+          background: linear-gradient(180deg, transparent, var(--ta-violet), transparent);
+        }
+
+        .terms-section--amber::before {
+          background: linear-gradient(180deg, transparent, var(--ta-amber), transparent);
+        }
 
         .section-head {
           display: flex;
@@ -729,10 +748,25 @@ export default function RegistrationEvidenceTermsPage() {
           box-shadow: 0 0 14px rgba(120,144,161,0.5);
         }
 
-        .provenance-card--cyan .provenance-dot { background: var(--ta-cyan); box-shadow: 0 0 14px rgba(84,232,255,.7); }
-        .provenance-card--green .provenance-dot { background: var(--ta-green); box-shadow: 0 0 14px rgba(57,242,161,.7); }
-        .provenance-card--violet .provenance-dot { background: var(--ta-violet); box-shadow: 0 0 14px rgba(159,140,255,.7); }
-        .provenance-card--amber .provenance-dot { background: var(--ta-amber); box-shadow: 0 0 14px rgba(255,200,107,.7); }
+        .provenance-card--cyan .provenance-dot {
+          background: var(--ta-cyan);
+          box-shadow: 0 0 14px rgba(84,232,255,.7);
+        }
+
+        .provenance-card--green .provenance-dot {
+          background: var(--ta-green);
+          box-shadow: 0 0 14px rgba(57,242,161,.7);
+        }
+
+        .provenance-card--violet .provenance-dot {
+          background: var(--ta-violet);
+          box-shadow: 0 0 14px rgba(159,140,255,.7);
+        }
+
+        .provenance-card--amber .provenance-dot {
+          background: var(--ta-amber);
+          box-shadow: 0 0 14px rgba(255,200,107,.7);
+        }
 
         .provenance-label {
           color: #dff7ff;
@@ -1096,7 +1130,7 @@ export default function RegistrationEvidenceTermsPage() {
             </div>
 
             <div className="instrument-id">
-              TA14-RET-001 · VERSION 1.0 · EFFECTIVE AUGUST 7, 2026
+              TA14-RET-001 · VERSION 1.1 · EFFECTIVE AUGUST 7, 2026
             </div>
 
             <h1>Registration &amp; Evidence Terms</h1>
@@ -1104,9 +1138,9 @@ export default function RegistrationEvidenceTermsPage() {
             <p className="hero-lead">
               Public operating terms governing AI governance registration,
               evidence submission, findings, publication, withdrawal,
-              versioning, intellectual-property boundaries, fees, and
-              institutional recordkeeping inside the TA14 AI Governance
-              Exchange.
+              versioning, institutional succession, intellectual-property
+              boundaries, fees, and institutional recordkeeping inside the
+              TA14 AI Governance Exchange.
             </p>
 
             <div className="metadata-grid">
@@ -1119,7 +1153,7 @@ export default function RegistrationEvidenceTermsPage() {
 
               <div className="meta-card">
                 <div className="meta-label">Instrument</div>
-                <div className="meta-value">TA14-RET-001</div>
+                <div className="meta-value">TA14-RET-001 v1.1</div>
               </div>
 
               <div className="meta-card">
@@ -1133,6 +1167,14 @@ export default function RegistrationEvidenceTermsPage() {
                   TA14 AI Governance Exchange
                 </div>
               </div>
+            </div>
+
+            <div className="status-strip">
+              <strong>Independent-read validation status:</strong>{" "}
+              NOT YET COMPLETED. Publication of this instrument does not itself
+              establish that an independent reader has validated its
+              readability. Registration is not conditioned on completion of
+              that validation.
             </div>
           </header>
 
@@ -1149,21 +1191,20 @@ export default function RegistrationEvidenceTermsPage() {
                   These Terms establish the public operating boundary for
                   registration, evidence submission, evidence preservation,
                   governed review, findings, publication, withdrawal,
-                  versioning, intellectual-property treatment, and
-                  institutional recordkeeping within the TA14 AI Governance
-                  Exchange.
+                  versioning, intellectual-property treatment, institutional
+                  succession, and institutional recordkeeping within the TA14
+                  AI Governance Exchange.
                 </p>
 
                 <p>
-                  They are intended to be understandable by a third party who
+                  They are designed to be understandable by a third party who
                   has not participated in private discussions with TA14
                   Authority or a registrant.
                 </p>
 
-                <div className="callout">
-                  No private conversation, direct message, meeting, email, or
-                  unpublished understanding is required to interpret the core
-                  boundaries stated here.
+                <div className="callout warning-callout">
+                  That design objective is not itself proof that independent
+                  readability has been established.
                 </div>
               </Section>
 
@@ -1197,12 +1238,6 @@ export default function RegistrationEvidenceTermsPage() {
                 title="What registration does not mean"
                 accent="amber"
               >
-                <p>
-                  Registration does not mean that TA14 Authority has certified,
-                  approved, endorsed, or universally validated the registered
-                  governance entity.
-                </p>
-
                 <ul className="terms-list">
                   <li>No certification or endorsement</li>
                   <li>No automatic architectural validation</li>
@@ -1230,13 +1265,6 @@ export default function RegistrationEvidenceTermsPage() {
                 title="Registration before artifact registration"
                 accent="green"
               >
-                <p>
-                  An execution artifact, evidence artifact, receipt,
-                  conformance record, demonstration record, or related governed
-                  object may be attributed to an AI governance entity only
-                  after the governance entity has an attributable registration.
-                </p>
-
                 <div className="chain">
                   <span>Governance Entity Registration</span>
                   <span className="arrow">→</span>
@@ -1264,11 +1292,6 @@ export default function RegistrationEvidenceTermsPage() {
                   Registration does not transfer ownership of the
                   registrant&apos;s intellectual property to TA14 Authority.
                 </p>
-
-                <div className="callout">
-                  A registrant may submit a bounded evidence surface without
-                  surrendering the underlying proprietary implementation.
-                </div>
               </Section>
 
               <Section number="06" title="Evidence is admitted, not assumed">
@@ -1297,12 +1320,6 @@ export default function RegistrationEvidenceTermsPage() {
                 title="Evidence provenance"
                 accent="violet"
               >
-                <p>
-                  Material evidence used in a finding should identify where it
-                  came from and what kind of independence, if any, has actually
-                  been established.
-                </p>
-
                 <div className="provenance-grid">
                   {provenanceCards.map((item) => (
                     <ProvenanceCard key={item.label} {...item} />
@@ -1315,11 +1332,6 @@ export default function RegistrationEvidenceTermsPage() {
                 title="Material qualifications travel with findings"
                 accent="green"
               >
-                <p>
-                  A material limitation that changes the meaning of a finding
-                  must remain attached to the finding it qualifies.
-                </p>
-
                 <div className="finding">
                   <div className="finding-label">
                     Example portable finding
@@ -1351,17 +1363,11 @@ export default function RegistrationEvidenceTermsPage() {
                 <div className="callout warning-callout">
                   NOT PRESERVED / EVIDENTIARY LIMITATION
                 </div>
-
-                <p>
-                  A later reconstruction may be considered only when clearly
-                  identified as a reconstruction rather than contemporaneous
-                  evidence.
-                </p>
               </Section>
 
               <Section
                 number="10"
-                title="Frozen records and later versions"
+                title="Frozen records and later governance versions"
                 accent="violet"
               >
                 <div className="chain">
@@ -1373,46 +1379,84 @@ export default function RegistrationEvidenceTermsPage() {
                 </div>
 
                 <p>
-                  A later version does not automatically inherit an earlier
-                  PASS, favorable finding, evidence sufficiency, production
-                  readiness, or independent verification.
+                  A later governance version does not automatically inherit an
+                  earlier PASS, favorable finding, evidence sufficiency,
+                  production readiness, or independent verification.
                 </p>
               </Section>
 
               <Section
                 number="11"
-                title="Publication and withdrawal"
+                title="Chronology and evidence files are different objects"
                 accent="cyan"
               >
                 <p>
-                  Evidence may carry an explicit visibility boundary including
-                  PUBLIC, CONTROLLED, PRIVATE, REGISTRY-ONLY, REVIEW-ONLY, or
-                  WITHHELD FROM PUBLICATION.
+                  TA14 Authority distinguishes institutional chronology from
+                  the underlying evidence files submitted into a governed
+                  pathway.
                 </p>
 
-                <p>
-                  Withdrawal from future voluntary participation does not
-                  automatically erase historical institutional events that
-                  already occurred.
-                </p>
+                <div className="provenance-grid">
+                  <ProvenanceCard
+                    label="INSTITUTIONAL CHRONOLOGY"
+                    text="Registration events, identifiers, dates, findings, evidence-admission events, corrections, withdrawal events, participant responses, and lineage."
+                    tone="cyan"
+                  />
+
+                  <ProvenanceCard
+                    label="SUBMITTED EVIDENCE FILES"
+                    text="Documents, screenshots, logs, receipts, datasets, test outputs, controlled artifacts, private artifacts, and other uploaded source material."
+                    tone="violet"
+                  />
+                </div>
 
                 <div className="callout">
-                  Withdrawal from continuing participation is not the same as
-                  erasure of historical chronology.
+                  Preserving chronology does not automatically require
+                  indefinite retention or public republication of every
+                  underlying evidence file.
                 </div>
               </Section>
 
               <Section
                 number="12"
+                title="Withdrawal and evidence custody"
+                accent="amber"
+              >
+                <p>
+                  Withdrawal from future voluntary participation does not
+                  automatically erase historical institutional events.
+                </p>
+
+                <p>
+                  Evidence-file custody is evaluated separately from
+                  chronology.
+                </p>
+
+                <ul className="terms-list">
+                  <li>Historical chronology may remain preserved.</li>
+                  <li>Metadata may remain preserved.</li>
+                  <li>Hashes or integrity references may remain preserved.</li>
+                  <li>
+                    Continued custody of the underlying evidence file is a
+                    separate question.
+                  </li>
+                  <li>
+                    Continued public availability of the underlying evidence
+                    file is a separate question.
+                  </li>
+                </ul>
+
+                <div className="callout warning-callout">
+                  EVIDENCE FILE NO LONGER HELD — HISTORICAL CHRONOLOGY
+                  PRESERVED
+                </div>
+              </Section>
+
+              <Section
+                number="13"
                 title="Corrections and participant responses"
                 accent="green"
               >
-                <p>
-                  A participant may request correction of an objective record
-                  error without agreeing with TA14 Authority&apos;s substantive
-                  finding.
-                </p>
-
                 <div className="chain">
                   <span>TA14 Finding</span>
                   <span className="arrow">→</span>
@@ -1426,12 +1470,40 @@ export default function RegistrationEvidenceTermsPage() {
                 </p>
               </Section>
 
-              <Section number="13" title="Fees" accent="green">
+              <Section
+                number="14"
+                title="Terms-version lineage"
+                accent="violet"
+              >
                 <p>
-                  A participant should be able to determine the financial
-                  boundary before committing to a TA14 pathway.
+                  Every governed registration or material submission should
+                  preserve the version of these Terms applicable when the
+                  relevant acceptance occurred.
                 </p>
 
+                <div className="finding">
+                  <div className="finding-label">
+                    Example historical terms reference
+                  </div>
+                  <div className="finding-text">
+                    Terms Accepted: TA14-RET-001 Version 1.1
+                  </div>
+                </div>
+
+                <p>
+                  A later Terms version does not silently replace the
+                  historical Terms-version reference attached to an earlier
+                  registration or frozen event.
+                </p>
+
+                <div className="chain">
+                  <span>Original Registration · Terms v1.1</span>
+                  <span className="arrow">→</span>
+                  <span>Later Governed Activity · Terms v1.2 Accepted</span>
+                </div>
+              </Section>
+
+              <Section number="15" title="Fees" accent="green">
                 <div className="fee-table">
                   <div className="fee-row fee-row--head">
                     <div>Activity</div>
@@ -1450,22 +1522,15 @@ export default function RegistrationEvidenceTermsPage() {
 
                 <div className="callout">
                   Registration does not create an undisclosed obligation to
-                  purchase later TA14 services. Payment purchases agreed review
-                  work—not a favorable finding.
+                  purchase later TA14 services.
                 </div>
               </Section>
 
               <Section
-                number="14"
+                number="16"
                 title="What attests TA14 Authority?"
                 accent="violet"
               >
-                <p>
-                  TA14 Authority does not claim that a record becomes
-                  independently verified merely because TA14 produced, stored,
-                  signed, hashed, published, or preserved it.
-                </p>
-
                 <div className="finding">
                   <div className="finding-label">
                     Institutional independence boundary
@@ -1475,19 +1540,75 @@ export default function RegistrationEvidenceTermsPage() {
                   </div>
                 </div>
 
-                <div className="callout">
-                  Who independently attests the attester?
-                </div>
+                <p>
+                  TA14 Authority does not claim to have solved the general
+                  recursion problem of who independently attests the attester
+                  merely by operating the Registry.
+                </p>
 
                 <p>
-                  TA14 Authority does not claim to have solved that recursion
-                  merely by operating the Registry. Where independent
-                  verification terminates, that boundary should remain visible.
+                  Where independent verification terminates, that boundary
+                  should remain visible.
                 </p>
               </Section>
 
               <Section
-                number="15"
+                number="17"
+                title="Institutional continuity and succession"
+                accent="amber"
+              >
+                <p>
+                  A registry whose value depends on chronology, attribution,
+                  evidence relationships, and durable public records must also
+                  disclose what happens if the institution itself can no
+                  longer operate.
+                </p>
+
+                <div className="callout warning-callout">
+                  INDEPENDENT SUCCESSOR CUSTODIAN: NOT DESIGNATED
+                </div>
+
+                <p>
+                  TA14 Authority will not imply that an independent successor,
+                  escrow custodian, archival institution, or continuity
+                  operator exists unless one has actually been established.
+                </p>
+
+                <ul className="terms-list">
+                  <li>
+                    Stop accepting new governed registrations if continued
+                    stewardship cannot reasonably be supported.
+                  </li>
+                  <li>Preserve the last authoritative state where possible.</li>
+                  <li>
+                    Identify the date ordinary institutional operations ceased.
+                  </li>
+                  <li>
+                    Preserve or export public registry chronology and public
+                    record metadata where possible.
+                  </li>
+                  <li>
+                    Distinguish public records from controlled or private
+                    evidence.
+                  </li>
+                  <li>
+                    Identify whether custody is ending, being archived, or
+                    being transferred.
+                  </li>
+                  <li>
+                    Name a successor only after succession has actually been
+                    established.
+                  </li>
+                </ul>
+
+                <div className="callout">
+                  A successor custodian does not automatically become the
+                  author of earlier TA14 findings.
+                </div>
+              </Section>
+
+              <Section
+                number="18"
                 title="TA14 Authority may be wrong"
                 accent="amber"
               >
@@ -1497,19 +1618,47 @@ export default function RegistrationEvidenceTermsPage() {
                   interpretation, or methodological error.
                 </p>
 
-                <p>
-                  Where a material error is identified, a correction may be
-                  issued while preserving the relationship between the original
-                  and corrected records.
-                </p>
-
                 <div className="callout warning-callout">
                   Correction is not silent overwrite.
                 </div>
               </Section>
 
               <Section
-                number="16"
+                number="19"
+                title="Independent-read control"
+                accent="cyan"
+              >
+                <p>
+                  Publication of these Terms does not itself establish
+                  independent readability.
+                </p>
+
+                <div className="chain">
+                  <span>Independent Read</span>
+                  <span className="arrow">→</span>
+                  <span>Questions Preserved</span>
+                  <span className="arrow">→</span>
+                  <span>Divergence Evaluated</span>
+                  <span className="arrow">→</span>
+                  <span>Correction if Necessary</span>
+                  <span className="arrow">→</span>
+                  <span>Re-Test</span>
+                </div>
+
+                <p>
+                  Material questions raised by an independent reader should be
+                  captured before TA14 Authority explains the intended
+                  interpretation.
+                </p>
+
+                <div className="callout warning-callout">
+                  Independent-read validation status for Version 1.1: NOT YET
+                  COMPLETED.
+                </div>
+              </Section>
+
+              <Section
+                number="20"
                 title="Core institutional principles"
                 accent="green"
               >
@@ -1535,8 +1684,18 @@ export default function RegistrationEvidenceTermsPage() {
                     tone="amber"
                   />
                   <ProvenanceCard
-                    label="VERSION"
-                    text="A later implementation does not silently rewrite an earlier frozen record."
+                    label="TERMS LINEAGE"
+                    text="A later Terms version does not silently rewrite an earlier historical event."
+                    tone="violet"
+                  />
+                  <ProvenanceCard
+                    label="EVIDENCE CUSTODY"
+                    text="Preserving chronology is not the same as indefinitely retaining every underlying evidence file."
+                    tone="amber"
+                  />
+                  <ProvenanceCard
+                    label="CONTINUITY"
+                    text="Institutional succession must be disclosed where established and its absence must remain visible where it is not."
                     tone="cyan"
                   />
                   <ProvenanceCard
@@ -1546,24 +1705,86 @@ export default function RegistrationEvidenceTermsPage() {
                   />
                 </div>
               </Section>
+
+              <Section
+                number="21"
+                title="Version 1.1 change record"
+                accent="violet"
+              >
+                <p>
+                  Version 1.1 adds explicit treatment of four institutional
+                  questions identified during the first external informed
+                  review of Version 1.0:
+                </p>
+
+                <ul className="terms-list">
+                  <li>
+                    Independent-read validation status and the distinction
+                    between publication and validation
+                  </li>
+                  <li>
+                    Terms-version lineage and non-retroactive migration
+                  </li>
+                  <li>
+                    Institutional cessation, continuity, and succession
+                  </li>
+                  <li>
+                    Separation of persistent registry chronology from custody
+                    of submitted evidence files
+                  </li>
+                </ul>
+
+                <p>
+                  These additions strengthen TA14 Authority&apos;s own
+                  governance boundary. They do not transfer authorship of the
+                  resulting institutional rules to the external reviewer who
+                  identified the questions.
+                </p>
+              </Section>
             </div>
 
             <aside className="sidebar">
               <div className="side-panel">
                 <div className="side-eyebrow">Instrument identity</div>
-                <h3>TA14-RET-001</h3>
+                <h3>TA14-RET-001 v1.1</h3>
                 <p>
-                  Registration &amp; Evidence Terms, Version 1.0. Effective
-                  August 7, 2026.
+                  Registration &amp; Evidence Terms. Effective August 7, 2026.
                 </p>
               </div>
 
               <div className="side-panel">
-                <div className="side-eyebrow">Core sequence</div>
-                <h3>Identity before artifact.</h3>
+                <div className="side-eyebrow">Validation status</div>
+                <h3>Not yet independently read.</h3>
                 <p>
-                  Register the governance entity before attaching execution or
-                  evidence artifacts to it.
+                  Publication is not being represented as independent-read
+                  validation.
+                </p>
+              </div>
+
+              <div className="side-panel">
+                <div className="side-eyebrow">Succession status</div>
+                <h3>No independent successor designated.</h3>
+                <p>
+                  TA14 Authority does not currently claim an established
+                  successor custodian or continuity operator.
+                </p>
+              </div>
+
+              <div className="side-panel">
+                <div className="side-eyebrow">Terms lineage</div>
+                <h3>No silent migration.</h3>
+                <p>
+                  Registrations preserve the Terms version accepted for the
+                  historical event. Later terms apply prospectively.
+                </p>
+              </div>
+
+              <div className="side-panel">
+                <div className="side-eyebrow">Evidence custody</div>
+                <h3>Chronology ≠ file custody.</h3>
+                <p>
+                  Historical chronology and the underlying evidence files are
+                  treated as different institutional objects.
                 </p>
               </div>
 
@@ -1591,16 +1812,6 @@ export default function RegistrationEvidenceTermsPage() {
                   </Link>
                 </div>
               </div>
-
-              <div className="side-panel">
-                <div className="side-eyebrow">Operating rule</div>
-                <h3>No hidden upgrade.</h3>
-                <p>
-                  Registration does not silently become certification. Evidence
-                  does not silently become independent proof. A limitation does
-                  not disappear when a finding travels.
-                </p>
-              </div>
             </aside>
           </div>
 
@@ -1617,11 +1828,10 @@ export default function RegistrationEvidenceTermsPage() {
             </h2>
 
             <p>
-              The purpose of these Terms is not to make every governance claim
-              appear strong. It is to preserve attributable identity, evidence
-              provenance, material limitations, version lineage, withdrawal
-              boundaries, and the difference between integrity and
-              independence.
+              Version 1.1 makes four additional institutional boundaries
+              explicit: independent-read status, Terms-version lineage,
+              succession, and the separation between historical chronology and
+              evidence-file custody.
             </p>
 
             <div className="actions">
