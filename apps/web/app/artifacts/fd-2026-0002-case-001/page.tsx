@@ -77,6 +77,7 @@ export default function HarmonicArtifactPage() {
           <div className="hero-actions">
             <Link className="button primary" href="/workspace/ai-governance/registry/profiles/harmonic-constitutional-runtime">Open Harmonic Governance Profile</Link>
             <Link className="button secondary" href="/workspace/ai-governance/reviews">Open Reviews & Responses</Link>
+            <Link className="button secondary" href="/artifacts/fd-2026-0002-case-002">Continue to Case 002</Link>
             <Link className="button academy" href="/academy/case-studies/harmonic-fd-2026-0002-case-001">Open TA-14 Academy Lesson</Link>
             <Link className="button ghost" href="/artifacts/registry">Return to Artifact Registry</Link>
           </div>
@@ -202,7 +203,8 @@ export default function HarmonicArtifactPage() {
         <p>TA-14 AUTHORITY · EXECUTION ARTIFACT REGISTRY</p>
         <h2>Expose the gap. Preserve the record. Build the bridge before consequence binds.</h2>
         <div>
-          <Link className="button primary" href="/artifacts/registry">Inspect Registry</Link>
+          <Link className="button primary" href="/artifacts/fd-2026-0002-case-002">Continue to Case 002</Link>
+          <Link className="button secondary" href="/artifacts/registry">Inspect Registry</Link>
           <Link className="button secondary" href="/artifacts/challenge?artifact=FD-2026-0002-CASE-001">Challenge This Record</Link>
         </div>
       </section>
