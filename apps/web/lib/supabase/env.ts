@@ -4,7 +4,8 @@ export interface SupabasePublicEnvironment {
 }
 
 function readSupabaseUrl(): string {
-  const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const value =
+    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 
   if (!value) {
     throw new Error(
@@ -54,12 +55,4 @@ export function getSupabasePublicEnvironment(): SupabasePublicEnvironment {
     url: readSupabaseUrl(),
     publishableKey: readSupabasePublishableKey(),
   };
-}
-
-export function getSupabaseUrl(): string {
-  return readSupabaseUrl();
-}
-
-export function getSupabasePublicKey(): string {
-  return readSupabasePublishableKey();
 }
