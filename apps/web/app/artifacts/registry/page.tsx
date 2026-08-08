@@ -113,6 +113,9 @@ const VIEW_KEY = "ta14.execution-artifact-registry.view.v1";
 const nowIso = () => new Date().toISOString();
 const makeId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`.toUpperCase();
 const shortHash = (value: string) => value.length > 18 ? `${value.slice(0, 10)}…${value.slice(-8)}` : value;
+const formatRegistryDateTime = (value: string) => /^\d{4}-\d{2}-\d{2}$/.test(value)
+  ? `${value} · exact publication time not declared in the preserved repository record`
+  : new Date(value).toLocaleString();
 
 const CHAIN = ["REALITY", "RECORD", "CONTINUITY", "ADMISSIBILITY", "BINDING", "COMMIT", "EXECUTION", "OUTCOME"] as const;
 const DETERMINATIONS: Determination[] = ["ALLOW", "HOLD", "DENY", "ESCALATE"];
@@ -127,6 +130,15 @@ const GOVERNANCE_PROFILES: GovernanceProfile[] = [
     status: "REGISTERED",
     sectors: ["Cross-sector", "AI operations", "Environmental systems", "Financial execution", "Healthcare"],
     publicHref: "/registry/ta-14-admissible-execution-architecture",
+  },
+  {
+    registryId: "TA-14-AIGR-000008",
+    name: "Harmonic Constitutional Runtime",
+    version: "1.0 · Frozen demonstration baseline",
+    organization: "Moral Clarity AI · Timothy E. Zlomke",
+    status: "REGISTERED",
+    sectors: ["AI operations", "Research governance"],
+    publicHref: "/workspace/ai-governance/registry/profiles/harmonic-constitutional-runtime",
   },
 ];
 
@@ -396,6 +408,37 @@ const FOUNDING_ARTIFACTS: RegistryArtifact[] = [
     href: "/artifacts/ta14-ea-000012",
   },
 ];
+
+const EXTERNAL_REGISTERED_ARTIFACTS: RegistryArtifact[] = [
+  {
+    registryId: "TA14-EAR-000013",
+    artifactId: "FD-2026-0002-CASE-001",
+    sequence: 13,
+    title: "Authority Revoked Before Consequential Execution",
+    determination: "DENY",
+    sector: "AI operations",
+    earliestControl: "BINDING",
+    receipt: "RUNTIME REFUSAL / BLOCK",
+    outcome: "Runtime non-execution behavior demonstrated; external outcome not independently corroborated",
+    governanceRegistryId: "TA-14-AIGR-000008",
+    governanceName: "Harmonic Constitutional Runtime",
+    routeId: "FD-2026-0002 · CASE-001",
+    verificationLevel: "L3",
+    status: "PUBLISHED",
+    publishedAt: "2026-08-07",
+    rootHash: "Not published in repository export",
+    summary: "First externally registered governance execution artifact in the Exchange. Harmonic Constitutional Runtime Version 1.0 produced a refusal / block determination under the constitutional state represented in the admitted execution packet; TA-14 preserved the surrounding chronology limitation rather than extending the finding beyond the evidence.",
+    proves: "The admitted evidence supports that the frozen Harmonic Version 1.0 runtime reconstructed the constitutional state represented within the submitted packet and produced its own refusal / block determination for FD-2026-0002 Case 001.",
+    doesNotProve: "The artifact does not independently establish the complete institutional chronology outside the runtime, including the pre-change authority state, attributable revocation event, independently preserved post-change state, or an external record confirming that execution did not occur.",
+    href: "/artifacts/fd-2026-0002-case-001",
+  },
+];
+
+const REGISTERED_ARTIFACTS: RegistryArtifact[] = [
+  ...FOUNDING_ARTIFACTS,
+  ...EXTERNAL_REGISTERED_ARTIFACTS,
+];
+
 const RUNTIME_LINKS = [
   {
     number: "01",
@@ -1671,7 +1714,7 @@ export default function ExecutionArtifactRegistryPage() {
 
   const records = useMemo(() => {
     const query = search.trim().toLowerCase();
-    const merged = [...FOUNDING_ARTIFACTS];
+    const merged = [...REGISTERED_ARTIFACTS];
     return merged
       .filter((item) => determination === "ALL" || item.determination === determination)
       .filter((item) => sector === "ALL" || item.sector === sector)
@@ -1686,7 +1729,7 @@ export default function ExecutionArtifactRegistryPage() {
       });
   }, [search, determination, sector, status, sortMode]);
 
-  const selected = FOUNDING_ARTIFACTS.find((item) => item.registryId === selectedId) ?? FOUNDING_ARTIFACTS[0];
+  const selected = REGISTERED_ARTIFACTS.find((item) => item.registryId === selectedId) ?? REGISTERED_ARTIFACTS[0];
   const checkedCount = Object.values(packageChecks).filter(Boolean).length;
   const packageProgress = Math.round((checkedCount / PACKAGE_COMPONENTS.length) * 100);
 
@@ -1740,7 +1783,7 @@ export default function ExecutionArtifactRegistryPage() {
       setRegistryMessage(`Registration intake remains incomplete: ${intakeErrors[0]}`);
       return;
     }
-    const sequence = FOUNDING_ARTIFACTS.length + localReceipts.length + 1;
+    const sequence = REGISTERED_ARTIFACTS.length + localReceipts.length + 1;
     const receipt: LocalReceipt = {
       receiptId: makeId("TA14-EAR-INTAKE"),
       registryCandidateId: `TA14-EAR-CANDIDATE-${String(sequence).padStart(6, "0")}`,
@@ -1823,10 +1866,10 @@ export default function ExecutionArtifactRegistryPage() {
       </section>
 
       <section className="metrics">
-        <article><span>Registered artifacts</span><strong>{FOUNDING_ARTIFACTS.length}</strong><small>Founding public proof set</small></article>
+        <article><span>Registered artifacts</span><strong>{REGISTERED_ARTIFACTS.length}</strong><small>12 TA-14 founding · 1 external governance artifact</small></article>
         <article><span>Registered governance</span><strong>{GOVERNANCE_PROFILES.length}</strong><small>Architecture identities linked</small></article>
         <article><span>Determination coverage</span><strong>4/4</strong><small>ALLOW · HOLD · DENY · ESCALATE</small></article>
-        <article><span>Verification floor</span><strong>L6</strong><small>Outcome closure represented</small></article>
+        <article><span>TA-14 founding verification floor</span><strong>L6</strong><small>External artifacts retain their own bounded verification level</small></article>
         <article><span>Local intake drafts</span><strong>{localReceipts.length}</strong><small>Preserved in this browser</small></article>
       </section>
 
@@ -1891,6 +1934,7 @@ export default function ExecutionArtifactRegistryPage() {
                   </div>
                   <div className="command-actions"><Link href="/registry/ta-14-admissible-execution-architecture">Inspect governance</Link><button onClick={() => changeView("directory")}>Inspect artifacts</button></div>
                 </article>
+                <article className="command-card"><span className="card-label">External governance milestone</span><h3>Harmonic Constitutional Runtime · Artifact 001</h3><p>FD-2026-0002 Case 001 is now connected to TA-14-AIGR-000008 as the Exchange's first externally registered governance execution artifact. Runtime refusal / block behavior was demonstrated; the full surrounding chronology remains explicitly evidence-bounded.</p><div className="command-actions"><Link href="/artifacts/fd-2026-0002-case-001">Inspect Harmonic artifact</Link><Link href="/workspace/ai-governance/registry/profiles/harmonic-constitutional-runtime">Open governance profile</Link></div></article>
                 <article className="command-card"><span className="card-label">Registry readiness</span><h3>Publication control</h3><Meter value={100} label="Founding package coverage" /><Meter value={75} label="External contributor readiness" /><Meter value={50} label="Connected submission service" /><p className="muted">The public directory and local intake engine are ready. Permanent third-party publication requires persistence, authentication, review, and registry issuance services.</p></article>
                 <article className="command-card"><span className="card-label">Evidence standard</span><h3>Twenty-component package</h3><p>Every registered artifact must preserve enough material to reconstruct the route, verify the technical effect, inspect the outcome, and challenge the public claim.</p><button className="text-action" onClick={() => changeView("standards")}>Open package standard →</button></article>
                 <article className="command-card"><span className="card-label">Industry invitation</span><h3>Bring yours.</h3><p>Register your governance architecture, build a route, produce a bounded execution artifact, verify the package, and submit it for permanent registration.</p><button className="text-action" onClick={() => changeView("register")}>Begin artifact intake →</button></article>
@@ -2014,7 +2058,14 @@ export default function ExecutionArtifactRegistryPage() {
             <section className="view-panel">
               <div className="section-heading"><div><p>Governance-to-artifact linkage</p><h2>A claim becomes accountable when it develops a public evidence history.</h2></div></div>
               <div className="governance-layout">
-                {GOVERNANCE_PROFILES.map((profile) => <article className="governance-card" key={profile.registryId}><div className="governance-head"><Badge tone="verified">{profile.status}</Badge><span>{profile.registryId}</span></div><h3>{profile.name}</h3><p>{profile.organization}</p><small>{profile.version}</small><div className="sector-tags">{profile.sectors.map((item) => <span key={item}>{item}</span>)}</div><div className="governance-stats"><div><strong>{FOUNDING_ARTIFACTS.filter((item) => item.governanceRegistryId === profile.registryId).length}</strong><span>Artifacts</span></div><div><strong>4</strong><span>Determinations</span></div><div><strong>L6</strong><span>Verification floor</span></div></div><Link href={profile.publicHref}>Open governance record →</Link></article>)}
+                {GOVERNANCE_PROFILES.map((profile) => {
+                  const governanceArtifacts = REGISTERED_ARTIFACTS.filter((item) => item.governanceRegistryId === profile.registryId);
+                  const determinationCount = new Set(governanceArtifacts.map((item) => item.determination)).size;
+                  const verificationFloor = governanceArtifacts.length
+                    ? [...governanceArtifacts].sort((a, b) => a.verificationLevel.localeCompare(b.verificationLevel))[0].verificationLevel
+                    : "—";
+                  return <article className="governance-card" key={profile.registryId}><div className="governance-head"><Badge tone="verified">{profile.status}</Badge><span>{profile.registryId}</span></div><h3>{profile.name}</h3><p>{profile.organization}</p><small>{profile.version}</small><div className="sector-tags">{profile.sectors.map((item) => <span key={item}>{item}</span>)}</div><div className="governance-stats"><div><strong>{governanceArtifacts.length}</strong><span>Artifacts</span></div><div><strong>{determinationCount}</strong><span>Determinations</span></div><div><strong>{verificationFloor}</strong><span>Verification floor</span></div></div><Link href={profile.publicHref}>Open governance record →</Link></article>;
+                })}
                 <article className="governance-invitation"><span>FOR GOVERNANCE BUILDERS</span><h3>Your profile should show more than claims.</h3><p>Once your governance is registered, each verified execution artifact can become part of its attributable capability history.</p><ul><li>Architecture identity and version</li><li>Sector and scope declarations</li><li>Registered execution artifacts</li><li>Determination distribution</li><li>Verification and challenge history</li><li>Correction and supersession record</li></ul><Link className="button primary" href="/workspace/ai-governance/registry/register">Register your governance</Link></article>
               </div>
             </section>
@@ -2045,10 +2096,10 @@ export default function ExecutionArtifactRegistryPage() {
             <section className="view-panel">
               <div className="section-heading"><div><p>Append-only registry ledger</p><h2>Publication, verification, challenge, correction, and supersession remain visible.</h2></div></div>
               <div className="ledger-timeline">
-                {FOUNDING_ARTIFACTS.flatMap((record, index) => [
+                {REGISTERED_ARTIFACTS.flatMap((record, index) => [
                   { id: `${record.registryId}-A`, time: record.publishedAt, event: "REGISTRY_ENTRY_CREATED", subject: record.registryId, detail: `${record.artifactId} linked to ${record.governanceRegistryId}.` },
-                  { id: `${record.registryId}-B`, time: record.publishedAt, event: "VERIFICATION_LEVEL_RECORDED", subject: record.artifactId, detail: `${record.verificationLevel} outcome-closure verification preserved.` },
-                ]).slice(0, 24).map((event, index) => <article key={event.id}><span className="ledger-dot" /><div className="ledger-time"><strong>{String(index + 1).padStart(2, "0")}</strong><small>{new Date(event.time).toLocaleString()}</small></div><div className="ledger-event"><Badge tone={event.event.includes("VERIFICATION") ? "verified" : "gold"}>{event.event}</Badge><h3>{event.subject}</h3><p>{event.detail}</p></div></article>)}
+                  { id: `${record.registryId}-B`, time: record.publishedAt, event: "VERIFICATION_LEVEL_RECORDED", subject: record.artifactId, detail: `${record.verificationLevel} artifact verification level preserved.` },
+                ]).map((event, index) => <article key={event.id}><span className="ledger-dot" /><div className="ledger-time"><strong>{String(index + 1).padStart(2, "0")}</strong><small>{formatRegistryDateTime(event.time)}</small></div><div className="ledger-event"><Badge tone={event.event.includes("VERIFICATION") ? "verified" : "gold"}>{event.event}</Badge><h3>{event.subject}</h3><p>{event.detail}</p></div></article>)}
               </div>
             </section>
           )}
@@ -2062,7 +2113,8 @@ export default function ExecutionArtifactRegistryPage() {
                 <article className="analytics-card"><span>Governance linkage</span><strong>100%</strong><p>Founding artifacts linked to a permanent governance registry identity.</p></article>
                 <article className="analytics-card"><span>Verification floor</span><strong>L6</strong><p>Every founding record includes preserved outcome-closure evidence.</p></article>
                 <article className="analytics-card"><span>Challengeability</span><strong>12/12</strong><p>Every artifact exposes a challenge and correction route.</p></article>
-                <article className="analytics-card statement"><span>Bounded conclusion</span><h3>The set proves that TA-14 can produce materially different, inspectable records across all four determinations.</h3><p>It does not prove universal performance, legal compliance in every jurisdiction, or the capability of any architecture other than the identified registered governance and preserved events.</p></article>
+                <article className="analytics-card"><span>External governance artifacts</span><strong>{EXTERNAL_REGISTERED_ARTIFACTS.length}</strong><p>Harmonic Constitutional Runtime is the first outside governance architecture with a registered execution artifact connected to its permanent governance identity.</p></article>
+                <article className="analytics-card statement"><span>Bounded conclusion</span><h3>The founding set proves that TA-14 can produce materially different, inspectable records across all four determinations. The Harmonic record separately demonstrates that the Exchange can preserve an outside architecture's bounded execution evidence without absorbing its identity or overstating the finding.</h3><p>Neither set proves universal performance, legal compliance in every jurisdiction, or behavior beyond the preserved evidence boundaries.</p></article>
               </div>
             </section>
           )}
