@@ -27,6 +27,9 @@ type PublicRegistryRecordRow = {
   supersedes_registry_identifier?: string | null;
   record_digest_sha256?: string | null;
   published_at?: string | null;
+  formal_claims?: string | null;
+  explicit_non_claims?: string | null;
+  known_limitations?: string | null;
 };
 
 function requiredEnvironment() {
@@ -84,6 +87,9 @@ function normalizeRow(row: PublicRegistryRecordRow) {
       row.supersedes_registry_identifier ?? null,
     recordDigestSha256: row.record_digest_sha256 ?? null,
     publishedAt: row.published_at ?? null,
+    formalClaims: row.formal_claims ?? null,
+    explicitNonClaims: row.explicit_non_claims ?? null,
+    knownLimitations: row.known_limitations ?? null,
     boundary: 'Registration is not certification.',
   };
 }
