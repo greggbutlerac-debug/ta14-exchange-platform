@@ -1817,7 +1817,7 @@ export default function RegisterGovernancePage() {
                     I have reviewed and explicitly accept the Registry Terms governing this submission.
                     Acceptance will be preserved as an attributable account-backed record before the intake is submitted.
                     {' '}
-                    <Link href="/workspace/ai-governance/registry/terms" target="_blank">
+                    <Link href="/governance/registration-evidence-terms" target="_blank">
                       Open Registry Terms ↗
                     </Link>
                   </span>
