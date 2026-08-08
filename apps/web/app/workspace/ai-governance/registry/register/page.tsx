@@ -389,7 +389,14 @@ export default function RegisterGovernancePage() {
   const [previewOpen, setPreviewOpen] = useState(true);
   const [receiptGenerated, setReceiptGenerated] = useState(false);
   const [submitBusy, setSubmitBusy] = useState(false);
-  const [submittedRecord, setSubmittedRecord] = useState<{ id: string; status: string; submitted_at: string | null } | null>(null);
+  const [submittedRecord, setSubmittedRecord] = useState<{
+    id: string;
+    status: string;
+    submitted_at: string | null;
+    registryIdentifier?: string | null;
+    registeredAt?: string | null;
+    pendingReview?: boolean;
+  } | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsBusy, setTermsBusy] = useState(false);
 
@@ -943,8 +950,45 @@ export default function RegisterGovernancePage() {
       }
 
       window.localStorage.removeItem(DRAFT_KEY);
-      setSubmittedRecord(payload.submission);
-      setMessage(payload.notice ?? 'Registry intake submitted for review.');
+
+      if (payload.registration?.registryIdentifier) {
+        const finalized = {
+          id: payload.registration.submissionId ?? submissionId,
+          status: 'registered',
+          submitted_at: payload.registration.registeredAt ?? null,
+          registryIdentifier: payload.registration.registryIdentifier,
+          registeredAt: payload.registration.registeredAt ?? null,
+          pendingReview: false,
+        };
+        setSubmittedRecord(finalized);
+        setMessage(
+          `${payload.notice ?? 'Governance Entity Registration completed successfully.'} Registry Identifier: ${payload.registration.registryIdentifier}.`,
+        );
+        window.location.assign(
+          `/workspace/ai-governance/registry/records/${encodeURIComponent(payload.registration.registryIdentifier)}`,
+        );
+        return;
+      }
+
+      if (payload.submission?.id) {
+        const pending = {
+          id: payload.submission.id,
+          status: payload.submission.status ?? 'submitted',
+          submitted_at: payload.submission.submitted_at ?? null,
+          registryIdentifier: payload.submission.registry_identifier ?? null,
+          registeredAt: payload.submission.accepted_at ?? null,
+          pendingReview: Boolean(payload.pendingReview),
+        };
+        setSubmittedRecord(pending);
+        setMessage(
+          payload.notice ??
+            'Registry intake submitted successfully. The submission is awaiting the selected review pathway; no Registry Identifier has been issued yet.',
+        );
+        window.location.assign('/workspace/ai-governance/registry/my-records');
+        return;
+      }
+
+      throw new Error('The Registry accepted the request but did not return a submission or registration record.');
     } catch (error) {
       setErrors([error instanceof Error ? error.message : 'Unable to submit the Registry intake for review.']);
     } finally {
@@ -1866,13 +1910,22 @@ export default function RegisterGovernancePage() {
               <div className="final-boundary">
                 {submittedRecord ? (
                   <>
-                    <strong>Submitted for Registry review.</strong>
+                    <strong>
+                      {submittedRecord.registryIdentifier
+                        ? `Registered as ${submittedRecord.registryIdentifier}.`
+                        : 'Submitted for Registry review.'}
+                    </strong>
                     <p>
-                      Submission {submittedRecord.id} is locked in status {submittedRecord.status}.
-                      Registration, identifier assignment, and public publication occur only after bounded review and acceptance.
+                      {submittedRecord.registryIdentifier
+                        ? `The permanent Registry Identifier ${submittedRecord.registryIdentifier} has been issued. The record is registered; registration is not certification.`
+                        : `Submission ${submittedRecord.id} is locked in status ${submittedRecord.status}. The requested review pathway remains pending, and no permanent Registry Identifier has been issued yet.`}
                     </p>
                     <div className="receipt-actions">
-                      <Link className="primary-button" href={`/workspace/ai-governance/registry/register/${submittedRecord.id}`}>Open submitted record →</Link>
+                      {submittedRecord.registryIdentifier ? (
+                        <Link className="primary-button" href={`/workspace/ai-governance/registry/records/${submittedRecord.registryIdentifier}`}>Open registered record →</Link>
+                      ) : (
+                        <Link className="primary-button" href={`/workspace/ai-governance/registry/register/${submittedRecord.id}`}>Open submitted record →</Link>
+                      )}
                       <Link className="secondary-button" href="/workspace/ai-governance/registry/my-records">Open My Registry Records</Link>
                     </div>
                   </>
@@ -1923,7 +1976,7 @@ export default function RegisterGovernancePage() {
             </div>
             <div className="preview-record">
               <small>REGISTRY IDENTIFIER</small>
-              <b>PENDING ASSIGNMENT</b>
+              <b>{submittedRecord?.registryIdentifier ?? 'PENDING ASSIGNMENT'}</b>
               <h2>{form.governanceName || 'Untitled Governance Architecture'}</h2>
               <p>{form.plainDescription || 'The plain-language governance description will appear here.'}</p>
 
@@ -1931,7 +1984,16 @@ export default function RegisterGovernancePage() {
                 <div><small>Claimant</small><strong>{form.claimantName || 'Not declared'}</strong></div>
                 <div><small>Steward</small><strong>{form.stewardName || form.claimantName || 'Not declared'}</strong></div>
                 <div><small>Version</small><strong>{form.currentVersion || 'Not declared'}</strong></div>
-                <div><small>Status</small><strong>DRAFT INTAKE</strong></div>
+                <div>
+                  <small>Status</small>
+                  <strong>
+                    {submittedRecord
+                      ? submittedRecord.registryIdentifier
+                        ? 'REGISTERED'
+                        : submittedRecord.status.toUpperCase()
+                      : 'DRAFT INTAKE'}
+                  </strong>
+                </div>
               </div>
 
               <section>
