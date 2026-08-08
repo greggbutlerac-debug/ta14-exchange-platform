@@ -4,6 +4,19 @@ import { cookies } from 'next/headers';
 
 import GovernanceProfileEditorLink from '../GovernanceProfileEditorLink';
 
+type PublicRegistryRecord = {
+  id: string;
+  registry_identifier: string;
+  governance_name: string;
+  short_name?: string | null;
+  version?: string | null;
+  category?: string | null;
+  steward?: string | null;
+  registered_at?: string | null;
+  status: string;
+  summary?: string | null;
+};
+
 type GovernanceProfile = {
   id: string;
   profile_number: number;
@@ -127,6 +140,42 @@ export default async function GovernanceProfilesPage() {
     error || !data
       ? []
       : (data as unknown as GovernanceProfile[]);
+
+  const {
+    data: registryData,
+    error: registryError,
+  } = await supabase.rpc(
+    'ta14_registry_public_directory_v1',
+  );
+
+  const registryRecords =
+    registryError || !Array.isArray(registryData)
+      ? []
+      : (registryData as unknown as PublicRegistryRecord[]).filter(
+          (record) =>
+            record &&
+            typeof record.registry_identifier === 'string' &&
+            typeof record.governance_name === 'string' &&
+            typeof record.status === 'string',
+        );
+
+  const activeRegistryRecords = registryRecords.filter(
+    (record) =>
+      record.status.toLowerCase() === 'registered',
+  );
+
+  const profiledRegistryIdentifiers = new Set(
+    profiles.map((profile) =>
+      profile.registry_identifier.toUpperCase(),
+    ),
+  );
+
+  const registeredWithoutProfile = activeRegistryRecords.filter(
+    (record) =>
+      !profiledRegistryIdentifiers.has(
+        record.registry_identifier.toUpperCase(),
+      ),
+  );
 
   return (
     <main
@@ -483,17 +532,188 @@ export default async function GovernanceProfilesPage() {
 
           <div
             style={{
+              display: 'flex',
+              gap: 12,
+              alignItems: 'center',
+              flexWrap: 'wrap',
               color: '#8599ad',
               fontSize: 14,
             }}
           >
-            {profiles.length}{' '}
-            published
-            {profiles.length === 1
-              ? ' profile'
-              : ' profiles'}
+            <span>
+              <strong style={{ color: '#f0c76f' }}>
+                {activeRegistryRecords.length}
+              </strong>{' '}
+              registered governance
+              {activeRegistryRecords.length === 1
+                ? ' record'
+                : ' records'}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span>
+              <strong style={{ color: '#a9c9e4' }}>
+                {profiles.length}
+              </strong>{' '}
+              published commentary
+              {profiles.length === 1
+                ? ' profile'
+                : ' profiles'}
+            </span>
           </div>
         </div>
+
+        {registryError ? (
+          <div
+            style={{
+              border: '1px solid rgba(213, 167, 75, 0.34)',
+              background: 'rgba(80, 56, 12, 0.16)',
+              borderRadius: 20,
+              padding: 24,
+              marginBottom: 24,
+              color: '#f2d28b',
+              lineHeight: 1.65,
+            }}
+          >
+            The authoritative public Registry count could not be loaded.
+            Published Governance Profiles are still shown below, but they
+            must not be interpreted as the total number of registered
+            governance records.
+          </div>
+        ) : null}
+
+        {!registryError && registeredWithoutProfile.length > 0 ? (
+          <section
+            style={{
+              border: '1px solid rgba(95, 157, 207, 0.28)',
+              borderRadius: 26,
+              background: 'linear-gradient(135deg, rgba(8,25,43,0.93), rgba(4,14,26,0.97))',
+              padding: 'clamp(24px, 4vw, 36px)',
+              marginBottom: 30,
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'end',
+                gap: 20,
+                flexWrap: 'wrap',
+                marginBottom: 22,
+              }}
+            >
+              <div>
+                <div
+                  style={{
+                    color: '#8fbbe0',
+                    fontSize: 11,
+                    fontWeight: 800,
+                    letterSpacing: '0.13em',
+                    textTransform: 'uppercase',
+                    marginBottom: 9,
+                  }}
+                >
+                  Registered First · Commentary Separate
+                </div>
+                <h3
+                  style={{
+                    margin: 0,
+                    fontSize: 'clamp(24px, 3vw, 34px)',
+                    letterSpacing: '-0.025em',
+                  }}
+                >
+                  Registered governance records without a published TA-14 commentary profile
+                </h3>
+              </div>
+              <span style={{ color: '#8da6ba', fontSize: 13 }}>
+                {registeredWithoutProfile.length}{' '}
+                {registeredWithoutProfile.length === 1 ? 'record' : 'records'}
+              </span>
+            </div>
+
+            <p
+              style={{
+                margin: '0 0 22px',
+                color: '#9fb2c4',
+                lineHeight: 1.7,
+                maxWidth: 900,
+              }}
+            >
+              These architectures are already in the authoritative Registry.
+              Their absence from the editorial profile collection does not
+              erase or delay their registration. Registration and TA-14
+              institutional commentary remain separate governed acts.
+            </p>
+
+            <div style={{ display: 'grid', gap: 14 }}>
+              {registeredWithoutProfile.map((record) => (
+                <article
+                  key={record.id}
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'minmax(0, 1fr) auto',
+                    gap: 20,
+                    alignItems: 'center',
+                    border: '1px solid rgba(255,255,255,0.08)',
+                    borderRadius: 18,
+                    background: 'rgba(255,255,255,0.025)',
+                    padding: '20px 22px',
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        color: '#f0c76f',
+                        fontSize: 12,
+                        fontWeight: 800,
+                        letterSpacing: '0.08em',
+                      }}
+                    >
+                      {record.registry_identifier}
+                    </div>
+                    <h4
+                      style={{
+                        margin: '7px 0 0',
+                        fontSize: 21,
+                      }}
+                    >
+                      {record.governance_name}
+                    </h4>
+                    <div
+                      style={{
+                        marginTop: 7,
+                        color: '#839bad',
+                        fontSize: 14,
+                      }}
+                    >
+                      Steward: {record.steward ?? 'Not declared'}
+                      {' · '}Version: {record.version ?? 'Not recorded'}
+                      {' · '}Registered: {formatDate(record.registered_at ?? null)}
+                    </div>
+                  </div>
+
+                  <Link
+                    href={`/workspace/ai-governance/registry/public/${record.registry_identifier}`}
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      minHeight: 42,
+                      padding: '0 15px',
+                      borderRadius: 11,
+                      border: '1px solid rgba(136,177,214,0.28)',
+                      color: '#c7d9e8',
+                      textDecoration: 'none',
+                      background: 'rgba(255,255,255,0.025)',
+                      whiteSpace: 'nowrap',
+                    }}
+                  >
+                    Open Registry Record →
+                  </Link>
+                </article>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {error ? (
           <div
