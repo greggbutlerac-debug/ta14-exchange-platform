@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { createBrowserClient } from "@supabase/ssr";
 
 type Priority = "critical" | "high" | "standard" | "watch";
 type ActionState = "open" | "in_progress" | "blocked" | "satisfied";
@@ -330,6 +331,82 @@ export default function MissionControlPage() {
   const [divisionFilter, setDivisionFilter] = useState<"all" | DivisionKey>("all");
   const [selectedActionId, setSelectedActionId] = useState(actions[0]?.id ?? "");
   const [compactMode, setCompactMode] = useState(false);
+  const [sessionIdentity, setSessionIdentity] = useState<{
+    displayName: string;
+    email: string;
+    organization: string;
+    subjectId: string;
+    registeredEntityCount: number;
+  } | null>(null);
+  const [identityResolved, setIdentityResolved] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function resolveSessionIdentity() {
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+      const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+      if (!url || !anonKey) {
+        if (!cancelled) setIdentityResolved(true);
+        return;
+      }
+
+      const supabase = createBrowserClient(url, anonKey);
+      const { data: { user } } = await supabase.auth.getUser();
+
+      if (!user) {
+        if (!cancelled) {
+          setSessionIdentity(null);
+          setIdentityResolved(true);
+        }
+        return;
+      }
+
+      const [{ data: profile }, { count: registeredEntityCount }] = await Promise.all([
+        supabase
+          .from("exchange_profiles")
+          .select("display_name,organization_name")
+          .eq("user_id", user.id)
+          .maybeSingle(),
+        supabase
+          .from("ai_governance_registry_submissions")
+          .select("id", { count: "exact", head: true })
+          .eq("owner_user_id", user.id)
+          .eq("status", "registered"),
+      ]);
+
+      const metadataName =
+        typeof user.user_metadata?.display_name === "string"
+          ? user.user_metadata.display_name.trim()
+          : "";
+      const email = user.email || "Authenticated account";
+      const displayName = profile?.display_name?.trim() || metadataName || email;
+
+      if (!cancelled) {
+        setSessionIdentity({
+          displayName,
+          email,
+          organization: profile?.organization_name?.trim() || "Not declared",
+          subjectId: user.id,
+          registeredEntityCount: registeredEntityCount || 0,
+        });
+        setIdentityResolved(true);
+      }
+    }
+
+    void resolveSessionIdentity();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const identityMonogram = useMemo(() => {
+    const source = sessionIdentity?.displayName || "TA-14";
+    const parts = source.split(/\s+/).filter(Boolean);
+    return parts.slice(0, 2).map((part) => part[0]?.toUpperCase() || "").join("") || "TA";
+  }, [sessionIdentity]);
 
   const filteredActions = useMemo(() => {
     return actions
@@ -495,33 +572,44 @@ export default function MissionControlPage() {
           </div>
 
           <div className="identityCard">
-            <div className="identityMonogram">GB</div>
+            <div className="identityMonogram">{identityMonogram}</div>
             <div>
-              <strong>Greggory Don Butler</strong>
-              <span>Founder · TA-14 Authority</span>
+              <strong>
+                {!identityResolved
+                  ? "Resolving authenticated identity…"
+                  : sessionIdentity?.displayName || "No authenticated identity"}
+              </strong>
+              <span>
+                {sessionIdentity?.email ||
+                  "Mission Control will not substitute another participant's identity."}
+              </span>
             </div>
           </div>
 
           <dl className="identityList">
             <div>
               <dt>Institutional subject</dt>
-              <dd>TA14-SUB-000001</dd>
+              <dd>{sessionIdentity?.subjectId || "Not resolved"}</dd>
             </div>
             <div>
               <dt>Primary organization</dt>
-              <dd>TA-14 Authority Governance Institution</dd>
+              <dd>{sessionIdentity?.organization || "Not declared"}</dd>
             </div>
             <div>
               <dt>Registered entities</dt>
-              <dd>1 current · 0 requiring revalidation</dd>
+              <dd>
+                {sessionIdentity
+                  ? `${sessionIdentity.registeredEntityCount} owned by this account`
+                  : "Not available without an authenticated account"}
+              </dd>
             </div>
             <div>
               <dt>Current roles</dt>
-              <dd>Administrator · Registry reviewer · Artifact steward</dd>
+              <dd>Authenticated participant · no role inferred from static page content</dd>
             </div>
             <div>
-              <dt>Credential state</dt>
-              <dd>1 active · 0 expired · 0 restricted</dd>
+              <dt>Identity source</dt>
+              <dd>Authenticated Supabase session</dd>
             </div>
           </dl>
 
