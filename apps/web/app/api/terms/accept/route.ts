@@ -5,8 +5,10 @@ import { cookies } from "next/headers";
 const TERMS_INSTRUMENT_ID = "TA14-RET-001";
 const TERMS_VERSION = "1.1";
 const TERMS_EFFECTIVE_DATE = "2026-08-07";
-const GOVERNANCE_REGISTRATION_PATHWAY = "GOVERNANCE_ENTITY_REGISTRATION";
-const RELATED_RECORD_TYPE = "AI_GOVERNANCE_REGISTRY_SUBMISSION";
+const GOVERNANCE_REGISTRATION_PATHWAY =
+  "GOVERNANCE_ENTITY_REGISTRATION";
+const RELATED_RECORD_TYPE =
+  "AI_GOVERNANCE_REGISTRY_SUBMISSION";
 
 type RegistrySubmission = {
   id: string;
@@ -35,8 +37,11 @@ type TermsAcceptance = {
 function createSupabaseClient(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
 ) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url =
+    process.env.NEXT_PUBLIC_SUPABASE_URL;
+
+  const anonKey =
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !anonKey) {
     throw new Error(
@@ -52,9 +57,15 @@ function createSupabaseClient(
 
       setAll(values) {
         try {
-          values.forEach(({ name, value, options }) => {
-            cookieStore.set(name, value, options);
-          });
+          values.forEach(
+            ({ name, value, options }) => {
+              cookieStore.set(
+                name,
+                value,
+                options,
+              );
+            },
+          );
         } catch {
           /*
            * Auth cookies may already be available from the
@@ -74,12 +85,16 @@ function errorResponse(
 ) {
   return NextResponse.json(
     details === undefined
-      ? { error: message }
+      ? {
+          error: message,
+        }
       : {
           error: message,
           details,
         },
-    { status },
+    {
+      status,
+    },
   );
 }
 
@@ -112,7 +127,9 @@ export async function POST(
       await cookies();
 
     const supabase =
-      createSupabaseClient(cookieStore);
+      createSupabaseClient(
+        cookieStore,
+      );
 
     const {
       data: { user },
@@ -134,7 +151,9 @@ export async function POST(
       data: submissionData,
       error: submissionError,
     } = await supabase
-      .from("ai_governance_registry_submissions")
+      .from(
+        "ai_governance_registry_submissions",
+      )
       .select(
         [
           "id",
@@ -145,14 +164,25 @@ export async function POST(
           "registry_identifier",
         ].join(","),
       )
-      .eq("id", submissionId)
-      .eq("owner_user_id", user.id)
+      .eq(
+        "id",
+        submissionId,
+      )
+      .eq(
+        "owner_user_id",
+        user.id,
+      )
       .single();
 
     const submission =
-      submissionData as RegistrySubmission | null;
+      submissionData as unknown as
+        | RegistrySubmission
+        | null;
 
-    if (submissionError || !submission) {
+    if (
+      submissionError ||
+      !submission
+    ) {
       return errorResponse(
         "Registry submission was not found.",
         404,
@@ -169,7 +199,9 @@ export async function POST(
       data: existingData,
       error: existingError,
     } = await supabase
-      .from("ta14_terms_acceptances")
+      .from(
+        "ta14_terms_acceptances",
+      )
       .select(
         [
           "acceptance_id",
@@ -186,12 +218,30 @@ export async function POST(
           "source",
         ].join(","),
       )
-      .eq("participant_id", user.id)
-      .eq("related_record_type", RELATED_RECORD_TYPE)
-      .eq("related_record_key", submission.id)
-      .eq("terms_instrument_id", TERMS_INSTRUMENT_ID)
-      .eq("terms_version", TERMS_VERSION)
-      .eq("acceptance_status", "ACCEPTED")
+      .eq(
+        "participant_id",
+        user.id,
+      )
+      .eq(
+        "related_record_type",
+        RELATED_RECORD_TYPE,
+      )
+      .eq(
+        "related_record_key",
+        submission.id,
+      )
+      .eq(
+        "terms_instrument_id",
+        TERMS_INSTRUMENT_ID,
+      )
+      .eq(
+        "terms_version",
+        TERMS_VERSION,
+      )
+      .eq(
+        "acceptance_status",
+        "ACCEPTED",
+      )
       .maybeSingle();
 
     if (existingError) {
@@ -204,7 +254,8 @@ export async function POST(
 
     if (existingData) {
       const existing =
-        existingData as TermsAcceptance;
+        existingData as unknown as
+          TermsAcceptance;
 
       return NextResponse.json({
         ok: true,
@@ -213,15 +264,26 @@ export async function POST(
         acceptance: existing,
 
         terms: {
-          instrumentId: TERMS_INSTRUMENT_ID,
-          version: TERMS_VERSION,
-          effectiveDate: TERMS_EFFECTIVE_DATE,
+          instrumentId:
+            TERMS_INSTRUMENT_ID,
+
+          version:
+            TERMS_VERSION,
+
+          effectiveDate:
+            TERMS_EFFECTIVE_DATE,
         },
 
         submission: {
-          id: submission.id,
-          governanceName: submission.governance_name,
-          governanceVersion: submission.current_version,
+          id:
+            submission.id,
+
+          governanceName:
+            submission.governance_name,
+
+          governanceVersion:
+            submission.current_version,
+
           registryIdentifier:
             submission.registry_identifier,
         },
@@ -244,12 +306,16 @@ export async function POST(
       data: insertedData,
       error: insertError,
     } = await supabase
-      .from("ta14_terms_acceptances")
+      .from(
+        "ta14_terms_acceptances",
+      )
       .insert({
-        participant_id: user.id,
+        participant_id:
+          user.id,
 
         governance_id:
-          submission.registry_identifier ?? null,
+          submission.registry_identifier ??
+          null,
 
         terms_instrument_id:
           TERMS_INSTRUMENT_ID,
@@ -293,7 +359,10 @@ export async function POST(
       )
       .single();
 
-    if (insertError || !insertedData) {
+    if (
+      insertError ||
+      !insertedData
+    ) {
       return errorResponse(
         "Unable to preserve the Terms acceptance record.",
         500,
@@ -302,7 +371,8 @@ export async function POST(
     }
 
     const acceptance =
-      insertedData as TermsAcceptance;
+      insertedData as unknown as
+        TermsAcceptance;
 
     return NextResponse.json({
       ok: true,
@@ -325,7 +395,9 @@ export async function POST(
       },
 
       submission: {
-        id: submission.id,
+        id:
+          submission.id,
+
         governanceName:
           submission.governance_name,
 
