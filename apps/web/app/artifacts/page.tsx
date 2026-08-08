@@ -902,6 +902,44 @@ export default function ExecutionArtifactsLibraryPage() {
         <button onClick={() => { setView("guide"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Follow the path →</button>
       </section>
 
+      <section className="governed-review-lineage" aria-label="Governed review artifacts">
+        <div className="review-lineage-head">
+          <div>
+            <small>Governed review lineage</small>
+            <h2>Review artifacts remain distinct from execution proof.</h2>
+          </div>
+          <p>These records preserve evidence review, architectural findings, and version-specific continuation without being counted among the twelve completed TA-14 execution artifacts.</p>
+        </div>
+        <article className="review-lineage-card">
+          <div className="review-lineage-identity">
+            <span>FD-2026-0002</span>
+            <div>
+              <small>Harmonic Constitutional Runtime · Case 002</small>
+              <h3>Version 2.0 Evidence Review</h3>
+            </div>
+          </div>
+          <div className="review-lineage-status">
+            <b>PARTIAL ADMISSIBILITY</b>
+            <span>Runtime validation open</span>
+          </div>
+          <p>Seven preserved Version 2 evidence records support material architectural and evidentiary advancement. Executable proof of changed-state re-evaluation, determination receipts, replay, binding, commit, execution control, and outcome remains open.</p>
+          <div className="review-lineage-facts">
+            <span><small>Artifact class</small><b>Evidence Review Artifact</b></span>
+            <span><small>Governance Registry</small><b>TA-14-AIGR-000010</b></span>
+            <span><small>Version</small><b>2.0</b></span>
+            <span><small>Evidence reviewed</small><b>7 records</b></span>
+          </div>
+          <div className="review-lineage-boundary">
+            <strong>Boundary</strong>
+            <span>No executable Version 2 evidence. No executable Version 2 finding.</span>
+          </div>
+          <div className="review-lineage-actions">
+            <Link href="/artifacts/fd-2026-0002-case-002">Open Case 002 →</Link>
+            <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Inspect admitted evidence</Link>
+          </div>
+        </article>
+      </section>
+
       <section id="artifact-workspace" className="workspace">
         <div className="workspace-head">
           <div><small>Public proof corpus</small><h2>{view === "library" ? "Inspect completed execution artifacts" : view === "inspector" ? selected.artifactId : view === "verification" ? "Verification center" : view === "guide" ? "From governance registration to public proof" : "Canonical proof method"}</h2></div>
@@ -1111,6 +1149,171 @@ export default function ExecutionArtifactsLibraryPage() {
           min-height:100vh;
           overflow:hidden;
           background:radial-gradient(circle at 14% 8%,rgba(42,93,187,.16),transparent 28%),radial-gradient(circle at 86% 16%,rgba(116,69,206,.13),transparent 24%),linear-gradient(180deg,#030712 0%,#050a16 44%,#030712 100%)
+        }
+        .governed-review-lineage {
+          position:relative;
+          z-index:2;
+          max-width:1480px;
+          margin:0 auto 34px;
+          padding:34px clamp(20px,4vw,64px)
+        }
+        .review-lineage-head {
+          display:grid;
+          grid-template-columns:minmax(0,1fr) minmax(280px,.75fr);
+          gap:28px;
+          align-items:end;
+          margin-bottom:18px
+        }
+        .review-lineage-head small {
+          color:#8aa6d6;
+          font-size:11px;
+          font-weight:800;
+          letter-spacing:.16em;
+          text-transform:uppercase
+        }
+        .review-lineage-head h2 {
+          margin:7px 0 0;
+          font-size:clamp(24px,3vw,42px);
+          line-height:1.04
+        }
+        .review-lineage-head p {
+          margin:0;
+          color:#93a1ba;
+          line-height:1.7
+        }
+        .review-lineage-card {
+          border:1px solid rgba(244,201,93,.24);
+          border-radius:22px;
+          padding:26px;
+          background:linear-gradient(135deg,rgba(244,201,93,.075),rgba(12,21,39,.78) 44%,rgba(9,15,29,.9));
+          box-shadow:0 22px 70px rgba(0,0,0,.2)
+        }
+        .review-lineage-identity {
+          display:flex;
+          gap:16px;
+          align-items:center
+        }
+        .review-lineage-identity>span {
+          border:1px solid rgba(244,201,93,.28);
+          border-radius:999px;
+          padding:8px 12px;
+          color:#f4c95d;
+          font-size:12px;
+          font-weight:900;
+          letter-spacing:.08em
+        }
+        .review-lineage-identity small {
+          color:#8fa0bb;
+          text-transform:uppercase;
+          letter-spacing:.11em;
+          font-size:10px;
+          font-weight:800
+        }
+        .review-lineage-identity h3 {
+          margin:4px 0 0;
+          font-size:24px
+        }
+        .review-lineage-status {
+          display:flex;
+          flex-wrap:wrap;
+          gap:10px;
+          margin:22px 0 14px
+        }
+        .review-lineage-status b,.review-lineage-status span {
+          border-radius:999px;
+          padding:8px 11px;
+          font-size:11px;
+          letter-spacing:.08em;
+          text-transform:uppercase
+        }
+        .review-lineage-status b {
+          background:rgba(244,201,93,.13);
+          color:#f4c95d;
+          border:1px solid rgba(244,201,93,.22)
+        }
+        .review-lineage-status span {
+          color:#a8b7cf;
+          border:1px solid rgba(133,160,205,.18)
+        }
+        .review-lineage-card>p {
+          max-width:1050px;
+          margin:0;
+          color:#a7b5ca;
+          line-height:1.75
+        }
+        .review-lineage-facts {
+          display:grid;
+          grid-template-columns:repeat(4,minmax(0,1fr));
+          gap:10px;
+          margin:22px 0
+        }
+        .review-lineage-facts span {
+          padding:14px;
+          border:1px solid rgba(133,160,205,.13);
+          border-radius:14px;
+          background:rgba(4,9,19,.5)
+        }
+        .review-lineage-facts small,.review-lineage-facts b {
+          display:block
+        }
+        .review-lineage-facts small {
+          color:#71829f;
+          font-size:9px;
+          letter-spacing:.1em;
+          text-transform:uppercase;
+          margin-bottom:5px
+        }
+        .review-lineage-facts b {
+          color:#e8effa;
+          font-size:12px
+        }
+        .review-lineage-boundary {
+          display:flex;
+          gap:12px;
+          align-items:center;
+          padding:13px 15px;
+          border-left:3px solid #f4c95d;
+          background:rgba(244,201,93,.055);
+          color:#aab7ca;
+          font-size:13px
+        }
+        .review-lineage-boundary strong {
+          color:#f4c95d;
+          text-transform:uppercase;
+          letter-spacing:.1em;
+          font-size:10px
+        }
+        .review-lineage-actions {
+          display:flex;
+          flex-wrap:wrap;
+          gap:10px;
+          margin-top:20px
+        }
+        .review-lineage-actions :global(a) {
+          display:inline-flex;
+          align-items:center;
+          justify-content:center;
+          min-height:42px;
+          padding:0 15px;
+          border-radius:11px;
+          border:1px solid rgba(133,160,205,.2);
+          color:#dce8fa;
+          text-decoration:none;
+          font-size:12px;
+          font-weight:800;
+          background:rgba(12,22,40,.72)
+        }
+        .review-lineage-actions :global(a:first-child) {
+          border-color:rgba(244,201,93,.3);
+          color:#f4d97f
+        }
+        @media (max-width:800px) {
+          .review-lineage-head {grid-template-columns:1fr}
+          .review-lineage-facts {grid-template-columns:1fr 1fr}
+        }
+        @media (max-width:520px) {
+          .review-lineage-facts {grid-template-columns:1fr}
+          .review-lineage-identity {align-items:flex-start;flex-direction:column}
         }
         .grid-field {
           position:fixed;
