@@ -4130,11 +4130,19 @@ function StudioPage() {
           throw new Error(payload.message || "Registered governance records could not be loaded.");
         }
 
-        const eligible = (payload.records ?? []).filter((record) =>
-          Boolean(record.registryIdentifier)
-          && record.status.trim().toLowerCase() === "registered"
-          && !record.needsAttention,
-        );
+        const eligible = (payload.records ?? []).filter((record) => {
+          const normalizedStatus = record.status.trim().toLowerCase();
+          const normalizedRegistrationState = record.registrationState?.trim().toLowerCase() ?? "";
+          const completedRegistryState =
+            normalizedStatus === "registered"
+            || normalizedStatus === "published"
+            || normalizedRegistrationState === "registered"
+            || normalizedRegistrationState === "published";
+
+          return Boolean(record.registryIdentifier)
+            && completedRegistryState
+            && !record.needsAttention;
+        });
 
         if (!cancelled) setRegistryRecords(eligible);
       } catch (caught) {
@@ -4460,7 +4468,15 @@ function StudioPage() {
   const selectedGateItem = snapshot.gates.find((item) => item.id === selectedGate) ?? snapshot.gates[0];
 
   function bindRegisteredGovernance(record: RegistryBindingRecord) {
-    if (!record.registryIdentifier || record.status.trim().toLowerCase() !== "registered") {
+    const normalizedStatus = record.status.trim().toLowerCase();
+    const normalizedRegistrationState = record.registrationState?.trim().toLowerCase() ?? "";
+    const completedRegistryState =
+      normalizedStatus === "registered"
+      || normalizedStatus === "published"
+      || normalizedRegistrationState === "registered"
+      || normalizedRegistrationState === "published";
+
+    if (!record.registryIdentifier || !completedRegistryState || record.needsAttention) {
       setNotice("Only completed Registry records with permanent TA-14 identifiers can sponsor an artifact.");
       return;
     }
