@@ -28,6 +28,8 @@ const demonstrationsHref = '/workspace/ai-governance/demonstrations';
 
 const reviewsResponsesHref = '/workspace/ai-governance/reviews';
 
+const artifactsHref = '/artifacts';
+
 const euAiActHref = '/workspace/ai-governance/eu-ai-act';
 
 const governanceLibraryHref = '/workspace/ai-governance/library';
@@ -90,6 +92,18 @@ const workspaceNavigation: NavigationItem[] = [
     glyph: 'RR',
 
     matchPrefixes: [reviewsResponsesHref],
+  },
+
+  {
+    href: artifactsHref,
+
+    label: 'Artifact Registry',
+
+    glyph: 'AR',
+
+    matchPrefixes: [artifactsHref],
+
+    institutional: true,
   },
 
   {
@@ -176,9 +190,11 @@ const mobileNavigation: NavigationItem[] = [
 
   workspaceNavigation[4],
 
-  workspaceNavigation[8],
+  workspaceNavigation[5],
 
   workspaceNavigation[9],
+
+  workspaceNavigation[10],
 ];
 
 function isItemActive(
