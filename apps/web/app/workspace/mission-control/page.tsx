@@ -429,6 +429,126 @@ export default function MissionControlPage() {
   const activeRecordCount = activeWork.length;
   const verifiedCount = activeWork.filter((work) => work.state === "verified").length;
 
+  const missionControlAdminEmails = new Set(
+    (process.env.NEXT_PUBLIC_TA14_MISSION_CONTROL_ADMIN_EMAILS ||
+      "ta14admissibleexecution@gmail.com")
+      .split(",")
+      .map((value) => value.trim().toLowerCase())
+      .filter(Boolean),
+  );
+
+  const isInstitutionAdmin = Boolean(
+    sessionIdentity?.email &&
+      missionControlAdminEmails.has(sessionIdentity.email.trim().toLowerCase()),
+  );
+
+  if (!identityResolved) {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          display: "grid",
+          placeItems: "center",
+          background: "#030712",
+          color: "#f5f8ff",
+          padding: 32,
+          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+        }}
+      >
+        <p>Resolving authenticated Mission Control access…</p>
+      </main>
+    );
+  }
+
+  if (!isInstitutionAdmin) {
+    return (
+      <main
+        style={{
+          minHeight: "100vh",
+          background: "#030712",
+          color: "#f5f8ff",
+          padding: "48px 24px",
+          fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif",
+        }}
+      >
+        <section
+          style={{
+            maxWidth: 900,
+            margin: "0 auto",
+            border: "1px solid rgba(124,167,211,.24)",
+            borderRadius: 20,
+            padding: 28,
+            background: "rgba(9,18,35,.84)",
+          }}
+        >
+          <p style={{ color: "#4dd1ff", fontWeight: 800, letterSpacing: ".08em" }}>
+            PARTICIPANT WORKSPACE
+          </p>
+          <h1 style={{ margin: "8px 0 12px" }}>Your TA-14 account</h1>
+          <p style={{ color: "#9fb0c5", lineHeight: 1.7 }}>
+            {sessionIdentity?.displayName || sessionIdentity?.email || "Authenticated participant"}
+          </p>
+          <p style={{ color: "#9fb0c5", lineHeight: 1.7 }}>
+            Institutional Mission Control contains TA-14 internal actions, commercial scopes,
+            credentials, authority records, and institution-level operating state. Those records
+            are not attributed to participant accounts and are not displayed in this workspace.
+          </p>
+          <div
+            style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: 12,
+              marginTop: 24,
+            }}
+          >
+            <Link
+              href="/workspace/ai-governance/registry/my-records"
+              style={{
+                color: "#03101c",
+                background: "#4dd1ff",
+                padding: "12px 16px",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontWeight: 800,
+              }}
+            >
+              Open My Registry Records →
+            </Link>
+            <Link
+              href="/workspace/ai-governance/registry/register"
+              style={{
+                color: "#f5f8ff",
+                border: "1px solid rgba(124,167,211,.3)",
+                padding: "12px 16px",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontWeight: 800,
+              }}
+            >
+              Register a governance architecture
+            </Link>
+            <Link
+              href="/workspace/ai-governance/reviews-responses"
+              style={{
+                color: "#f5f8ff",
+                border: "1px solid rgba(124,167,211,.3)",
+                padding: "12px 16px",
+                borderRadius: 10,
+                textDecoration: "none",
+                fontWeight: 800,
+              }}
+            >
+              Reviews & Responses
+            </Link>
+          </div>
+          <p style={{ marginTop: 24, color: "#7f93aa", fontSize: 13 }}>
+            Access boundary: institutional records are not inferred from authentication alone.
+          </p>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className={`missionControl ${compactMode ? "compact" : ""}`}>
       <div className="gridField" />
