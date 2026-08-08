@@ -23,6 +23,7 @@ import {
   createArtifactId,
   createDefaultGateSequence,
 } from "../../../lib/execution-artifacts/canonical-artifact-engine";
+import { createClient } from "../../../lib/supabase/client";
 
 type WorkspaceTab =
   | "command"
@@ -135,6 +136,25 @@ type GovernanceBinding = {
   selectedStage: string;
   sourceRouteReceiptId: string;
   correlationId: string;
+};
+
+type RegistryBindingRecord = {
+  id: string;
+  governanceName: string;
+  shortName: string | null;
+  organizationName: string | null;
+  currentSteward: string | null;
+  currentVersion: string;
+  category: string;
+  status: string;
+  registryIdentifier: string | null;
+  registrationState?: string | null;
+  needsAttention?: boolean;
+};
+
+type RegistryBindingResponse = {
+  records?: RegistryBindingRecord[];
+  message?: string;
 };
 
 type EvidenceDraft = {
@@ -3886,6 +3906,7 @@ function downloadText(filename: string, text: string, type = "application/json")
 
 function completionScore(snapshot: StudioSnapshot): number {
   const checks = [
+    snapshot.governance.registrationStatus === "REGISTERED" && snapshot.governance.registrationId !== "UNBOUND",
     Boolean(snapshot.scenario.proposedAction.trim()),
     Boolean(snapshot.scenario.consequenceAtStake.trim()),
     Boolean(snapshot.route.routeId.trim()),
@@ -4017,6 +4038,17 @@ function StudioPage() {
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [dragActive, setDragActive] = useState(false);
   const importRef = useRef<HTMLInputElement>(null);
+  const [registryRecords, setRegistryRecords] = useState<RegistryBindingRecord[]>([]);
+  const [registryRecordsLoading, setRegistryRecordsLoading] = useState(true);
+  const [registryRecordsError, setRegistryRecordsError] = useState("");
+  const [showGovernancePicker, setShowGovernancePicker] = useState(false);
+  const supabase = useMemo(() => {
+    try {
+      return createClient();
+    } catch {
+      return null;
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -4063,6 +4095,65 @@ function StudioPage() {
   }, []);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadRegisteredGovernance() {
+      setRegistryRecordsLoading(true);
+      setRegistryRecordsError("");
+
+      try {
+        if (!supabase) {
+          throw new Error("Registry connection is not configured in this browser.");
+        }
+
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
+
+        if (sessionError) throw sessionError;
+        if (!session?.access_token) {
+          throw new Error("Sign in to select one of your registered governance records.");
+        }
+
+        const response = await fetch("/api/registry/my-records", {
+          method: "GET",
+          cache: "no-store",
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+            Accept: "application/json",
+          },
+        });
+
+        const payload = await response.json() as RegistryBindingResponse;
+        if (!response.ok) {
+          throw new Error(payload.message || "Registered governance records could not be loaded.");
+        }
+
+        const eligible = (payload.records ?? []).filter((record) =>
+          Boolean(record.registryIdentifier)
+          && record.status.trim().toLowerCase() === "registered"
+          && !record.needsAttention,
+        );
+
+        if (!cancelled) setRegistryRecords(eligible);
+      } catch (caught) {
+        if (!cancelled) {
+          setRegistryRecords([]);
+          setRegistryRecordsError(caught instanceof Error ? caught.message : "Registered governance records could not be loaded.");
+        }
+      } finally {
+        if (!cancelled) setRegistryRecordsLoading(false);
+      }
+    }
+
+    void loadRegisteredGovernance();
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase]);
+
+  useEffect(() => {
     const timer = window.setTimeout(() => {
       try {
         const next = { ...snapshot, updatedAt: new Date().toISOString() };
@@ -4094,6 +4185,7 @@ function StudioPage() {
   });
 
   const score = useMemo(() => completionScore(snapshot), [snapshot]);
+  const governanceBound = snapshot.governance.registrationStatus === "REGISTERED" && snapshot.governance.registrationId !== "UNBOUND";
   const artifactId = useMemo(() => createArtifactId(snapshot.scenario.sequence), [snapshot.scenario.sequence]);
   const earliestFailure = useMemo(
     () => [...snapshot.gates].sort((a, b) => a.sequence - b.sequence).find((gate) => gate.mandatory && ["FAIL", "UNRESOLVED", "PENDING"].includes(gate.status)),
@@ -4270,6 +4362,20 @@ function StudioPage() {
     setNotice("Outcome closure created from the preserved execution effect.");
   }
 
+  function publishArtifact() {
+    if (!governanceBound) {
+      setTab("command");
+      setNotice("Publication blocked: select a completed registered governance record first. No registered governance. No registered artifact.");
+      return;
+    }
+    if (score < 80) {
+      setNotice("Publication blocked: the artifact has not reached the minimum publication-readiness threshold.");
+      return;
+    }
+    mutate((current) => ({ ...current, publicationState: "PUBLISHED" }));
+    setNotice(`Artifact ${artifactId} marked PUBLISHED in this workspace under ${snapshot.governance.registrationId}. Registration and publication are not certification.`);
+  }
+
   function exportJson() {
     const payload = makeExport(snapshot);
     downloadText(`${artifactId}.canonical.json`, JSON.stringify(payload, null, 2));
@@ -4353,6 +4459,49 @@ function StudioPage() {
   const selectedAuthorityItem = snapshot.authorities.find((item) => item.id === selectedAuthority) ?? snapshot.authorities[0];
   const selectedGateItem = snapshot.gates.find((item) => item.id === selectedGate) ?? snapshot.gates[0];
 
+  function bindRegisteredGovernance(record: RegistryBindingRecord) {
+    if (!record.registryIdentifier || record.status.trim().toLowerCase() !== "registered") {
+      setNotice("Only completed Registry records with permanent TA-14 identifiers can sponsor an artifact.");
+      return;
+    }
+
+    const boundAt = new Date().toISOString();
+    mutate((draft) => ({
+      ...draft,
+      governance: {
+        registrationId: record.registryIdentifier!,
+        organizationName: record.organizationName?.trim() || record.currentSteward?.trim() || record.governanceName,
+        architectureName: record.governanceName,
+        architectureVersion: record.currentVersion,
+        registrationStatus: "REGISTERED",
+        verificationLevel: 0,
+        sourceHandoffAt: boundAt,
+        routeOwner: "",
+        routeDomain: "",
+        selectedStage: "",
+        sourceRouteReceiptId: "",
+        correlationId: "",
+      },
+      scenario: {
+        ...draft.scenario,
+        primaryGovernance: `${record.governanceName} v${record.currentVersion}`,
+      },
+      updatedAt: boundAt,
+    }));
+    setShowGovernancePicker(false);
+    setNotice(`Bound this artifact workspace to ${record.registryIdentifier} — ${record.governanceName} v${record.currentVersion}. The Registry record remains unchanged.`);
+  }
+
+  function clearGovernanceBinding() {
+    mutate((draft) => ({
+      ...draft,
+      governance: { ...defaultGovernanceBinding },
+      updatedAt: new Date().toISOString(),
+    }));
+    setShowGovernancePicker(false);
+    setNotice("Removed the workspace governance binding. No Registry record was changed.");
+  }
+
   function renderCommand() {
     return (
       <section>
@@ -4363,6 +4512,46 @@ function StudioPage() {
             <p><strong>{snapshot.governance.organizationName}</strong></p>
             <p>{snapshot.governance.architectureName}{snapshot.governance.architectureVersion ? ` v${snapshot.governance.architectureVersion}` : ""}</p>
             <div className="tag-row"><Badge tone={snapshot.governance.registrationStatus === "REGISTERED" ? "pass" : "hold"}>{snapshot.governance.registrationStatus}</Badge><code>{snapshot.governance.registrationId}</code></div>
+            <div className="button-row" style={{ marginTop: 12 }}>
+              <button type="button" onClick={() => setShowGovernancePicker((value) => !value)}>
+                {snapshot.governance.registrationStatus === "REGISTERED" ? "Change registered governance" : "Select registered governance"}
+              </button>
+              {snapshot.governance.registrationStatus === "REGISTERED" ? (
+                <button type="button" onClick={clearGovernanceBinding}>Clear binding</button>
+              ) : null}
+            </div>
+            {showGovernancePicker ? (
+              <div style={{ marginTop: 12 }}>
+                {registryRecordsLoading ? <small>Loading your completed Registry records…</small> : null}
+                {!registryRecordsLoading && registryRecordsError ? (
+                  <small>{registryRecordsError}</small>
+                ) : null}
+                {!registryRecordsLoading && !registryRecordsError && registryRecords.length === 0 ? (
+                  <small>No eligible registered governance records were found for this signed-in account. Complete registration first, then return to the Studio.</small>
+                ) : null}
+                {!registryRecordsLoading && registryRecords.length > 0 ? (
+                  <label style={{ display: "grid", gap: 6 }}>
+                    <span>Select one of your registered governance records</span>
+                    <select
+                      defaultValue=""
+                      onChange={(event) => {
+                        const selected = registryRecords.find((record) => record.registryIdentifier === event.target.value);
+                        if (selected) bindRegisteredGovernance(selected);
+                      }}
+                    >
+                      <option value="" disabled>Choose a Registry record…</option>
+                      {registryRecords.map((record) => (
+                        <option key={record.id} value={record.registryIdentifier ?? ""}>
+                          {record.registryIdentifier} — {record.governanceName} — v{record.currentVersion}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                ) : null}
+                <p style={{ marginTop: 10 }}><small>Binding links this workspace to the selected permanent Registry identity. It does not modify, certify, endorse, or replace the Registry record.</small></p>
+                <Link href="/workspace/ai-governance/registry/my-records">Open My Registry Records →</Link>
+              </div>
+            ) : null}
           </article>
           <article className="panel">
             <h3>Imported route identity</h3>
@@ -4598,8 +4787,8 @@ function StudioPage() {
 
   function renderPublication() {
     return <section><SectionTitle eyebrow="Publisher" title="Bound the claim and publish the exact record" description="Registration, publication, or display is not certification. State precisely what this artifact proves and what remains outside the record." />
-      <div className="form-grid"><Field label="Publication state"><select value={snapshot.publicationState} onChange={(e) => mutate((c) => ({ ...c, publicationState: e.target.value as PublicationState }))}>{["DRAFT","INTERNAL_REVIEW","READY","PUBLISHED","CHALLENGED","CORRECTED","SUPERSEDED","WITHDRAWN"].map((v) => <option key={v}>{v}</option>)}</select></Field><Field label="Stable public URL"><input value={`/artifacts/${artifactId.toLowerCase()}`} readOnly /></Field><Field label="What this artifact proves" wide><textarea rows={7} value={snapshot.proves} onChange={(e) => mutate((c) => ({ ...c, proves: e.target.value }))} /></Field><Field label="What this artifact does not prove" wide><textarea rows={7} value={snapshot.doesNotProve} onChange={(e) => mutate((c) => ({ ...c, doesNotProve: e.target.value }))} /></Field></div>
-      <div className="publication-actions"><button onClick={exportJson}>Download JSON</button><button onClick={exportCsv}>Download gate CSV</button><button onClick={exportManifest}>Download manifest</button><button onClick={() => window.print()}>Print bounded brief</button><button className="primary" disabled={score < 80} onClick={() => mutate((c) => ({ ...c, publicationState: "PUBLISHED" }))}>Publish artifact</button></div>
+      <div className="form-grid"><Field label="Publication state"><select value={snapshot.publicationState} onChange={(e) => { const nextState = e.target.value as PublicationState; if (nextState === "PUBLISHED" && !governanceBound) { setTab("command"); setNotice("Publication blocked: select a completed registered governance record first. No registered governance. No registered artifact."); return; } mutate((c) => ({ ...c, publicationState: nextState })); }}>{["DRAFT","INTERNAL_REVIEW","READY","PUBLISHED","CHALLENGED","CORRECTED","SUPERSEDED","WITHDRAWN"].map((v) => <option key={v}>{v}</option>)}</select></Field><Field label="Stable public URL"><input value={`/artifacts/${artifactId.toLowerCase()}`} readOnly /></Field><Field label="What this artifact proves" wide><textarea rows={7} value={snapshot.proves} onChange={(e) => mutate((c) => ({ ...c, proves: e.target.value }))} /></Field><Field label="What this artifact does not prove" wide><textarea rows={7} value={snapshot.doesNotProve} onChange={(e) => mutate((c) => ({ ...c, doesNotProve: e.target.value }))} /></Field></div>
+      <div className="publication-actions"><button onClick={exportJson}>Download JSON</button><button onClick={exportCsv}>Download gate CSV</button><button onClick={exportManifest}>Download manifest</button><button onClick={() => window.print()}>Print bounded brief</button><button className="primary" disabled={score < 80 || !governanceBound} onClick={publishArtifact}>Publish artifact</button></div>
     </section>;
   }
 
