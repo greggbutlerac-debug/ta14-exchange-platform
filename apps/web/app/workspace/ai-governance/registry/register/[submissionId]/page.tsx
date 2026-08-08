@@ -148,6 +148,8 @@ export default function RegistrySubmissionWorkspacePage() {
   const [patentRecords, setPatentRecords] = useState<RegistryPatentRecord[]>([]);
   const [reviewNotes, setReviewNotes] = useState<RegistryReviewNote[]>([]);
   const [relatedLoading, setRelatedLoading] = useState(false);
+  const [continuationBusy, setContinuationBusy] = useState(false);
+  const [continuationMessage, setContinuationMessage] = useState('');
 
   const supabase = useMemo(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -309,6 +311,11 @@ export default function RegistrySubmissionWorkspacePage() {
     ['registered', 'published'].includes(normalizedStatus) &&
     Boolean(record?.registry_identifier);
 
+  const canResumeAdministrativeReview =
+    normalizedStatus === 'submitted' &&
+    record?.requested_review_pathway?.trim() === 'Administrative completeness review' &&
+    !record.registry_identifier;
+
   const lifecycleStages = [
     { key: 'draft', label: 'Draft' },
     { key: 'submitted', label: 'Submitted' },
@@ -425,6 +432,13 @@ export default function RegistrySubmissionWorkspacePage() {
         className: 'primaryButton',
       };
     }
+    if (canResumeAdministrativeReview) {
+      return {
+        label: 'Resume Administrative Completeness Review',
+        href: '',
+        className: 'primaryButton',
+      };
+    }
     if (['submitted', 'administrative_review', 'identity_review', 'evidence_review', 'under_review'].includes(normalizedStatus)) {
       return {
         label: 'View Review Status',
@@ -445,6 +459,53 @@ export default function RegistrySubmissionWorkspacePage() {
       className: 'secondaryButton',
     };
   })();
+
+  async function resumeAdministrativeReview() {
+    if (!record || continuationBusy) return;
+
+    setContinuationBusy(true);
+    setContinuationMessage('');
+
+    try {
+      const response = await fetch('/api/ai-governance/registry/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ submissionId: record.id }),
+      });
+
+      const payload = await response.json();
+
+      if (!response.ok) {
+        const readinessFailures = Array.isArray(payload.readinessFailures)
+          ? ` ${payload.readinessFailures.join(' ')}`
+          : '';
+        throw new Error(
+          `${payload.error ?? payload.reason ?? 'Unable to continue Administrative Completeness Review.'}${readinessFailures}`,
+        );
+      }
+
+      if (payload.registration?.registryIdentifier) {
+        window.location.assign(
+          `/workspace/ai-governance/registry/records/${encodeURIComponent(payload.registration.registryIdentifier)}`,
+        );
+        return;
+      }
+
+      setContinuationMessage(
+        payload.infrastructureWarning ??
+          payload.notice ??
+          'The existing Registry submission remains preserved. No Registry Identifier has been issued yet.',
+      );
+    } catch (caught) {
+      setContinuationMessage(
+        caught instanceof Error
+          ? caught.message
+          : 'Unable to continue Administrative Completeness Review.',
+      );
+    } finally {
+      setContinuationBusy(false);
+    }
+  }
 
   function downloadWorkspaceReceipt() {
     if (!record) return;
@@ -991,9 +1052,27 @@ export default function RegistrySubmissionWorkspacePage() {
             </div>
 
             {lifecycleAction ? (
-              <Link href={lifecycleAction.href} className={lifecycleAction.className}>
-                {lifecycleAction.label}
-              </Link>
+              canResumeAdministrativeReview ? (
+                <div className="continuationAction">
+                  <button
+                    type="button"
+                    className={lifecycleAction.className}
+                    onClick={() => void resumeAdministrativeReview()}
+                    disabled={continuationBusy}
+                  >
+                    {continuationBusy ? 'Reviewing Existing Submission…' : lifecycleAction.label}
+                  </button>
+                  {continuationMessage ? (
+                    <p className="continuationMessage" role="status">
+                      {continuationMessage}
+                    </p>
+                  ) : null}
+                </div>
+              ) : (
+                <Link href={lifecycleAction.href} className={lifecycleAction.className}>
+                  {lifecycleAction.label}
+                </Link>
+              )
             ) : null}
           </section>
         </>
@@ -1791,5 +1870,22 @@ const styles = `
     .pulseDot {
       animation: none;
     }
+  }
+
+  .continuationAction {
+    display: grid;
+    gap: 12px;
+    justify-items: start;
+  }
+
+  .continuationAction button:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
+  .continuationMessage {
+    margin: 0;
+    max-width: 760px;
+    line-height: 1.6;
   }
 `;
