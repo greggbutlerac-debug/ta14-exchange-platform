@@ -21,15 +21,18 @@ type PublicRegistryRecordRow = {
   registered_at: string;
   status: string;
   summary?: string | null;
+  formal_claims?: string | null;
+  explicit_non_claims?: string | null;
+  known_limitations?: string | null;
   domains?: string[] | null;
+  regulatory_scope?: string | null;
   evidence_count?: number | string | null;
   dispute_count?: number | string | null;
   supersedes_registry_identifier?: string | null;
   record_digest_sha256?: string | null;
+  public_projection_digest_sha256?: string | null;
+  public_projection_digest_version?: string | null;
   published_at?: string | null;
-  formal_claims?: string | null;
-  explicit_non_claims?: string | null;
-  known_limitations?: string | null;
 };
 
 function requiredEnvironment() {
@@ -80,16 +83,21 @@ function normalizeRow(row: PublicRegistryRecordRow) {
     registeredAt: row.registered_at,
     status: row.status,
     summary: row.summary ?? null,
+    formalClaims: row.formal_claims ?? null,
+    explicitNonClaims: row.explicit_non_claims ?? null,
+    knownLimitations: row.known_limitations ?? null,
     domains: Array.isArray(row.domains) ? row.domains : [],
+    regulatoryScope: row.regulatory_scope ?? null,
     evidenceCount: numericCount(row.evidence_count),
     disputeCount: numericCount(row.dispute_count),
     supersedesRegistryIdentifier:
       row.supersedes_registry_identifier ?? null,
     recordDigestSha256: row.record_digest_sha256 ?? null,
+    publicProjectionDigestSha256:
+      row.public_projection_digest_sha256 ?? null,
+    publicProjectionDigestVersion:
+      row.public_projection_digest_version ?? null,
     publishedAt: row.published_at ?? null,
-    formalClaims: row.formal_claims ?? null,
-    explicitNonClaims: row.explicit_non_claims ?? null,
-    knownLimitations: row.known_limitations ?? null,
     boundary: 'Registration is not certification.',
   };
 }
