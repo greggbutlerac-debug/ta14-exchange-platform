@@ -5,15 +5,15 @@ import { useParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 
 type PublicRegistryRecord = {
-  registry_identifier: string;
-  governance_name: string;
-  current_version: string | null;
-  steward_name: string | null;
-  establishment_date: string | null;
-  registered_at: string | null;
-  publication_date: string | null;
-  plain_language_description: string | null;
-  sha256_digest: string | null;
+  registryIdentifier: string;
+  governanceName: string;
+  version: string | null;
+  steward: string | null;
+  claimedEstablishmentDate: string | null;
+  registeredAt: string | null;
+  publishedAt: string | null;
+  summary: string | null;
+  recordDigestSha256: string | null;
 };
 
 type ApiPayload = {
@@ -37,13 +37,13 @@ function formatDate(value: string | null) {
 }
 
 function buildCitation(record: PublicRegistryRecord) {
-  const author = record.steward_name?.trim() || 'Registry steward not declared';
-  const version = record.current_version?.trim()
-    ? `Version ${record.current_version.trim()}. `
+  const author = record.steward?.trim() || 'Registry steward not declared';
+  const version = record.version?.trim()
+    ? `Version ${record.version.trim()}. `
     : '';
-  const date = formatDate(record.publication_date || record.registered_at);
+  const date = formatDate(record.publishedAt || record.registeredAt);
 
-  return `${author}. "${record.governance_name}." ${version}TA-14 AI Governance Registry, ${record.registry_identifier}, ${date}.`;
+  return `${author}. "${record.governanceName}." ${version}TA-14 AI Governance Registry, ${record.registryIdentifier}, ${date}.`;
 }
 
 export default function RegistryCitationPage() {
@@ -139,15 +139,15 @@ export default function RegistryCitationPage() {
     if (!record) return;
 
     const exportPayload = {
-      registry_identifier: record.registry_identifier,
-      governance_name: record.governance_name,
-      current_version: record.current_version,
-      steward_name: record.steward_name,
-      establishment_date: record.establishment_date,
-      publication_date: record.publication_date,
-      registered_at: record.registered_at,
-      plain_language_description: record.plain_language_description,
-      sha256_digest: record.sha256_digest,
+      registry_identifier: record.registryIdentifier,
+      governance_name: record.governanceName,
+      current_version: record.version,
+      steward_name: record.steward,
+      establishment_date: record.claimedEstablishmentDate,
+      publication_date: record.publishedAt,
+      registered_at: record.registeredAt,
+      plain_language_description: record.summary,
+      sha256_digest: record.recordDigestSha256,
       citation,
       boundary:
         'Registration is not certification and does not establish effectiveness, legality, safety, compliance, or operational fitness.',
@@ -160,7 +160,7 @@ export default function RegistryCitationPage() {
     const anchor = document.createElement('a');
 
     anchor.href = url;
-    anchor.download = `${record.registry_identifier}-citation.json`;
+    anchor.download = `${record.registryIdentifier}-citation.json`;
     document.body.appendChild(anchor);
     anchor.click();
     anchor.remove();
@@ -246,7 +246,7 @@ export default function RegistryCitationPage() {
           <section className="hero">
             <div className="heroCopy">
               <p className="eyebrow">PERMANENT PUBLIC REGISTRY RECORD</p>
-              <p className="recordId">{record.registry_identifier}</p>
+              <p className="recordId">{record.registryIdentifier}</p>
               <h1>Cite This Governance Record</h1>
               <p className="lead">
                 Use the permanent identifier, preserved publication metadata,
@@ -256,10 +256,10 @@ export default function RegistryCitationPage() {
 
             <aside className="identityPanel">
               <p className="eyebrow">GOVERNANCE RECORD</p>
-              <strong>{record.governance_name}</strong>
+              <strong>{record.governanceName}</strong>
               <p>
-                {record.current_version
-                  ? `Version ${record.current_version}`
+                {record.version
+                  ? `Version ${record.version}`
                   : 'Version not declared'}
               </p>
             </aside>
@@ -295,12 +295,12 @@ export default function RegistryCitationPage() {
           <section className="detailGrid">
             <article>
               <p className="eyebrow">PERMANENT IDENTIFIER</p>
-              <h2>{record.registry_identifier}</h2>
+              <h2>{record.registryIdentifier}</h2>
               <button
                 type="button"
                 className="secondaryButton"
                 onClick={() =>
-                  void copyText(record.registry_identifier, 'identifier')
+                  void copyText(record.registryIdentifier, 'identifier')
                 }
               >
                 {copied === 'identifier' ? 'Identifier Copied' : 'Copy Identifier'}
@@ -310,15 +310,15 @@ export default function RegistryCitationPage() {
             <article>
               <p className="eyebrow">FINALIZED SHA-256 DIGEST</p>
               <p className="digest">
-                {record.sha256_digest || 'Digest not available'}
+                {record.recordDigestSha256 || 'Digest not available'}
               </p>
               <button
                 type="button"
                 className="secondaryButton"
-                disabled={!record.sha256_digest}
+                disabled={!record.recordDigestSha256}
                 onClick={() =>
-                  record.sha256_digest
-                    ? void copyText(record.sha256_digest, 'digest')
+                  record.recordDigestSha256
+                    ? void copyText(record.recordDigestSha256, 'digest')
                     : undefined
                 }
               >
@@ -336,24 +336,24 @@ export default function RegistryCitationPage() {
             <dl>
               <div>
                 <dt>Governance name</dt>
-                <dd>{record.governance_name}</dd>
+                <dd>{record.governanceName}</dd>
               </div>
               <div>
                 <dt>Steward</dt>
-                <dd>{record.steward_name || 'Not declared'}</dd>
+                <dd>{record.steward || 'Not declared'}</dd>
               </div>
               <div>
                 <dt>Version</dt>
-                <dd>{record.current_version || 'Not declared'}</dd>
+                <dd>{record.version || 'Not declared'}</dd>
               </div>
               <div>
                 <dt>Establishment date</dt>
-                <dd>{formatDate(record.establishment_date)}</dd>
+                <dd>{formatDate(record.claimedEstablishmentDate)}</dd>
               </div>
               <div>
                 <dt>Publication date</dt>
                 <dd>
-                  {formatDate(record.publication_date || record.registered_at)}
+                  {formatDate(record.publishedAt || record.registeredAt)}
                 </dd>
               </div>
             </dl>
