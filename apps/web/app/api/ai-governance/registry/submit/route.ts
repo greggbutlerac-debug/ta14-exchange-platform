@@ -536,7 +536,7 @@ export async function POST(
         );
       }
 
-      submittedData = data;
+      submittedData = data as unknown as Record<string, unknown>;
     } else {
       submittedData = {
         id: submission.id,
