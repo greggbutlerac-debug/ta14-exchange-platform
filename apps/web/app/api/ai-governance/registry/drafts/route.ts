@@ -1,6 +1,7 @@
 import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+import { getSupabasePublicEnvironment } from '@/lib/supabase/env';
 
 type JsonRecord = Record<string, unknown>;
 
@@ -79,14 +80,9 @@ function mapRepositoryAccess(value: unknown): string {
 }
 
 function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const { url, publishableKey } = getSupabasePublicEnvironment();
 
-  if (!url || !anonKey) {
-    throw new Error('Supabase environment variables are not configured.');
-  }
-
-  return createServerClient(url, anonKey, {
+  return createServerClient(url, publishableKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -306,7 +302,10 @@ export async function GET(request: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required.' },
+        { status: 401 },
+      );
     }
 
     const requestedId = request.nextUrl.searchParams.get('id');
@@ -369,7 +368,10 @@ export async function GET(request: NextRequest) {
     ].find(Boolean);
 
     if (firstError) {
-      return NextResponse.json({ error: firstError.message }, { status: 400 });
+      return NextResponse.json(
+        { error: firstError.message },
+        { status: 400 },
+      );
     }
 
     return NextResponse.json({
@@ -383,7 +385,10 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Unable to load Registry draft.';
+      error instanceof Error
+        ? error.message
+        : 'Unable to load Registry draft.';
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -393,13 +398,17 @@ export async function POST(request: NextRequest) {
     const payload = (await request.json()) as DraftPayload;
     const cookieStore = await cookies();
     const supabase = createSupabaseClient(cookieStore);
+
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required.' },
+        { status: 401 },
+      );
     }
 
     const form = payload.form ?? {};
@@ -441,16 +450,19 @@ export async function POST(request: NextRequest) {
       submissionId,
       user.id,
     );
+
     const repositories = buildRepositoryRows(
       payload.repositories ?? [],
       submissionId,
       user.id,
     );
+
     const zenodoRecords = buildZenodoRows(
       payload.zenodoRecords ?? [],
       submissionId,
       user.id,
     );
+
     const patentRecords = buildPatentRows(
       payload.patentRecords ?? [],
       submissionId,
@@ -463,18 +475,21 @@ export async function POST(request: NextRequest) {
       submissionId,
       publications,
     );
+
     await replaceChildRows(
       supabase,
       'ai_governance_registry_repositories',
       submissionId,
       repositories,
     );
+
     await replaceChildRows(
       supabase,
       'ai_governance_registry_zenodo_records',
       submissionId,
       zenodoRecords,
     );
+
     await replaceChildRows(
       supabase,
       'ai_governance_registry_patent_records',
@@ -489,7 +504,10 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (readError) {
-      return NextResponse.json({ error: readError.message }, { status: 400 });
+      return NextResponse.json(
+        { error: readError.message },
+        { status: 400 },
+      );
     }
 
     return NextResponse.json({
@@ -501,7 +519,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Unable to save Registry draft.';
+      error instanceof Error
+        ? error.message
+        : 'Unable to save Registry draft.';
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -511,18 +532,25 @@ export async function DELETE(request: NextRequest) {
     const draftId = request.nextUrl.searchParams.get('id');
 
     if (!draftId) {
-      return NextResponse.json({ error: 'Draft ID is required.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Draft ID is required.' },
+        { status: 400 },
+      );
     }
 
     const cookieStore = await cookies();
     const supabase = createSupabaseClient(cookieStore);
+
     const {
       data: { user },
       error: userError,
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json({ error: 'Authentication required.' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required.' },
+        { status: 401 },
+      );
     }
 
     const { error } = await supabase
@@ -542,7 +570,10 @@ export async function DELETE(request: NextRequest) {
     });
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Unable to delete Registry draft.';
+      error instanceof Error
+        ? error.message
+        : 'Unable to delete Registry draft.';
+
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
