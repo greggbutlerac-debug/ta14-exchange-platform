@@ -2031,7 +2031,7 @@ export default function GovernanceRegistrationPage() {
       </section>
 
       <section className="hero">
-        <div className="hero-copy"><p className="eyebrow">Institutional onboarding · Registered governance required</p><h1>Register the governance before registering the artifact.</h1><p className="hero-lede">Create the attributable governance identity that will own routes, submit execution artifacts, accept challenge, preserve corrections, and build a public evidence history.</p><div className="hero-actions"><button type="button" className="primary" onClick={() => setStep("identity")}>Begin registration</button><Link className="secondary" href="/artifacts">Inspect founding artifacts</Link></div></div>
+        <div className="hero-copy"><p className="eyebrow">Institutional onboarding · Registered governance required</p><h1>Register the governance before registering the artifact.</h1><p className="hero-lede">Create the attributable governance identity that will own routes, submit execution artifacts, accept challenge, preserve corrections, and build a public evidence history.</p><div className="hero-actions"><button type="button" className="primary" onClick={() => { setStep("identity"); document.getElementById("registration-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Begin registration</button><Link className="secondary" href="/artifacts">Inspect founding artifacts</Link></div></div>
         <div className="hero-core">
           <div className="institution-status"><span>INSTITUTION STATUS</span><strong>{ready ? "READY FOR INSTITUTIONAL REVIEW" : "REGISTRATION IN PROGRESS"}</strong><small>{passed} of 6 mandatory conditions satisfied</small></div>
           <div className="readiness-ledger">
@@ -2048,7 +2048,7 @@ export default function GovernanceRegistrationPage() {
         <article><span>Capability claims</span><strong>{selectedClaims.length}</strong><small>Bounded public claims</small></article>
       </section>
 
-      <section className="workspace">
+      <section id="registration-workspace" className="workspace">
         <aside className="step-rail">
           <div className="rail-title"><span>Registration route</span><strong>Seven governed stages</strong></div>
           {STEPS.map((item) => { const currentIndex = STEPS.findIndex((entry) => entry.id === step); const index = STEPS.findIndex((entry) => entry.id === item.id); const complete = index < currentIndex || item.id === "submitted" && state === "SUBMITTED"; return <button type="button" key={item.id} className={cx("step-button", step === item.id && "active", complete && "complete")} onClick={() => setStep(item.id)}><span>{complete ? "✓" : item.number}</span><b>{item.title}</b><small>{item.description}</small></button>; })}
