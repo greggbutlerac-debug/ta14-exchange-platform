@@ -119,6 +119,8 @@ export default function MyRegistryRecordsPage() {
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState<FilterValue>('all');
   const [generatedAt, setGeneratedAt] = useState<string | null>(null);
+  const [discardBusyId, setDiscardBusyId] = useState<string | null>(null);
+  const [actionMessage, setActionMessage] = useState('');
 
   const supabase = useMemo(() => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -218,6 +220,48 @@ export default function MyRegistryRecordsPage() {
     );
   }, [records]);
 
+  async function discardDraft(record: RegistryRecord) {
+    if (statusGroup(record.status, record.needsAttention, record.registrationState) !== 'draft') {
+      setActionMessage('Only private draft records may be discarded from this workspace.');
+      return;
+    }
+
+    const confirmed = window.confirm(
+      `Discard the private draft for ${record.governanceName}? This removes only this draft. Submitted, accepted, and registered records cannot be deleted by this control.`,
+    );
+
+    if (!confirmed) return;
+
+    setDiscardBusyId(record.id);
+    setActionMessage('');
+
+    try {
+      const response = await fetch(
+        `/api/ai-governance/registry/drafts?id=${encodeURIComponent(record.id)}`,
+        { method: 'DELETE' },
+      );
+      const payload = (await response.json()) as ApiFailure & { notice?: string };
+
+      if (!response.ok) {
+        throw new Error(payload.message || payload.error || 'Unable to discard the Registry draft.');
+      }
+
+      setRecords((current) => current.filter((item) => item.id !== record.id));
+      setActionMessage(
+        payload.notice ||
+          'The selected private draft was discarded. No submitted, accepted, or registered record was changed.',
+      );
+    } catch (caught) {
+      setActionMessage(
+        caught instanceof Error
+          ? caught.message
+          : 'Unable to discard the Registry draft.',
+      );
+    } finally {
+      setDiscardBusyId(null);
+    }
+  }
+
   const visibleRecords = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
@@ -260,10 +304,10 @@ export default function MyRegistryRecordsPage() {
         </Link>
 
         <Link
-          href="/workspace/ai-governance/registry/register"
+          href="/workspace/ai-governance/registry/register?new=1"
           className="primaryButton"
         >
-          Register Architecture
+          Register Another Governance Architecture
         </Link>
       </nav>
 
@@ -296,6 +340,12 @@ export default function MyRegistryRecordsPage() {
           certification.
         </p>
       </section>
+
+      {actionMessage ? (
+        <section className="actionNotice" role="status">
+          {actionMessage}
+        </section>
+      ) : null}
 
       <section className="controlsCard">
         <div className="searchField">
@@ -380,7 +430,7 @@ export default function MyRegistryRecordsPage() {
           </div>
 
           <Link
-            href="/workspace/ai-governance/registry/register"
+            href="/workspace/ai-governance/registry/register?new=1"
             className="primaryButton"
           >
             Start Registration
@@ -526,6 +576,23 @@ export default function MyRegistryRecordsPage() {
                         Open Permanent Record
                       </Link>
                     </>
+                  ) : isEditable ? (
+                    <>
+                      <button
+                        type="button"
+                        className="secondaryButton dangerButton"
+                        disabled={discardBusyId === record.id}
+                        onClick={() => void discardDraft(record)}
+                      >
+                        {discardBusyId === record.id ? 'Discarding…' : 'Discard Draft'}
+                      </button>
+                      <Link
+                        href={`/workspace/ai-governance/registry/register?draft=${encodeURIComponent(record.id)}`}
+                        className="primaryButton"
+                      >
+                        Continue Draft
+                      </Link>
+                    </>
                   ) : (
                     <Link
                       href={`/workspace/ai-governance/registry/register/${encodeURIComponent(
@@ -533,11 +600,7 @@ export default function MyRegistryRecordsPage() {
                       )}`}
                       className="primaryButton"
                     >
-                      {isEditable
-                        ? 'Continue Draft'
-                        : needsAttention
-                          ? 'Open and Respond'
-                          : 'Open Submission'}
+                      {needsAttention ? 'Open and Respond' : 'Open Submission'}
                     </Link>
                   )}
                 </div>
@@ -876,6 +939,27 @@ const styles = `
     border: 1px solid rgba(164, 190, 231, 0.18);
     background: rgba(255,255,255,0.04);
     color: #9cadc8;
+  }
+
+  .actionNotice {
+    margin: 0 0 18px;
+    padding: 14px 16px;
+    border: 1px solid rgba(219, 177, 102, 0.32);
+    border-radius: 14px;
+    background: rgba(67, 48, 24, 0.34);
+    color: #f8edd5;
+    line-height: 1.6;
+  }
+
+  .dangerButton {
+    border-color: rgba(226, 124, 92, 0.42) !important;
+    color: #ffd9cc !important;
+    background: rgba(92, 35, 24, 0.3) !important;
+  }
+
+  .dangerButton:disabled {
+    cursor: wait;
+    opacity: 0.65;
   }
 
   .recordIdentifier {
