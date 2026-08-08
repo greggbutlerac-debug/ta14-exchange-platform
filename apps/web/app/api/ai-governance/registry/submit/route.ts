@@ -2,6 +2,7 @@ import { createServerClient } from '@supabase/ssr';
 import { NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
+import { getSupabasePublicEnvironment } from '@/lib/supabase/env';
 const REQUIRED_TEXT_FIELDS = [
   'governance_name',
   'governance_category',
@@ -61,16 +62,10 @@ type RegistrationException = {
 function createSupabaseClient(
   cookieStore: Awaited<ReturnType<typeof cookies>>,
 ) {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const { url, publishableKey } =
+    getSupabasePublicEnvironment();
 
-  if (!url || !anonKey) {
-    throw new Error(
-      'Supabase environment variables are not configured.',
-    );
-  }
-
-  return createServerClient(url, anonKey, {
+  return createServerClient(url, publishableKey, {
     cookies: {
       getAll() {
         return cookieStore.getAll();
@@ -525,24 +520,37 @@ export async function POST(
     /*
      * Respect the registrant's selected review pathway.
      *
-     * Only the explicit "Record-only registration" pathway may proceed
-     * directly to the automatic Registry finalizer after readiness checks.
-     * Every other pathway represents a request for human/institutional review
-     * and therefore remains in SUBMITTED state until a reviewer records a
-     * governed decision through the Registry review workflow.
+     * Two non-substantive pathways may proceed directly to the governed
+     * automatic Registry finalizer after readiness checks:
      *
-     * This prevents a submission requesting Administrative completeness,
-     * Identity and authority, Evidence, Independent governance, Partner Review
-     * Network, or Public dispute resolution from silently becoming REGISTERED
-     * without the review it requested.
+     * - Record-only registration
+     * - Administrative completeness review
+     *
+     * Administrative completeness review is limited to objective intake
+     * completeness, required declarations, evidence presence, public-route
+     * requirements, ownership, and Registry readiness. It is not a TA-14
+     * merits review and does not represent architecture approval, evidence
+     * validation, identity adjudication, certification, or endorsement.
+     *
+     * Deeper pathways remain in SUBMITTED state until the requested
+     * institutional review is completed. This preserves the boundary around
+     * Identity and authority review, Evidence review, Independent governance
+     * review, Partner Review Network review, and Public dispute resolution.
      */
     const reviewPathway =
       submission.requested_review_pathway?.trim() ||
       'Record-only registration';
 
+    const automaticRegistrationPathways =
+      new Set([
+        'Record-only registration',
+        'Administrative completeness review',
+      ]);
+
     if (
-      reviewPathway !==
-      'Record-only registration'
+      !automaticRegistrationPathways.has(
+        reviewPathway,
+      )
     ) {
       return NextResponse.json({
         ok: true,
@@ -593,6 +601,32 @@ export async function POST(
     if (
       finalizeError
     ) {
+      const missingAutoFinalizer =
+        finalizeError.code === 'PGRST202' ||
+        finalizeError.code === '42883' ||
+        finalizeError.message
+          ?.toLowerCase()
+          .includes('ta14_registry_auto_finalize_submission_v1');
+
+      if (missingAutoFinalizer) {
+        return NextResponse.json({
+          ok: true,
+          pendingReview: true,
+          submission: submittedData,
+          review: {
+            pathway: reviewPathway,
+            status: 'submitted',
+            reviewed: false,
+          },
+          infrastructureWarning:
+            'The automatic finalization RPC is not available in the deployed database. The Registry submission remains safely preserved as submitted and requires administrative finalization.',
+          notice:
+            'The Registry submission has been preserved successfully. Automatic identifier issuance is temporarily unavailable, so no Registry Identifier has been issued yet.',
+          boundary:
+            'A preserved submission is not registration, certification, endorsement, technical validation, legal approval, regulatory approval, ownership adjudication, or proof of performance.',
+        });
+      }
+
       /*
        * PostgreSQL 23514 is used for a governed readiness
        * or exception condition.
