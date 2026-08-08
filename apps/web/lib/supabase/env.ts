@@ -49,6 +49,14 @@ function readSupabasePublishableKey(): string {
   return value;
 }
 
+export function getSupabaseUrl(): string {
+  return readSupabaseUrl();
+}
+
+export function getSupabasePublicKey(): string {
+  return readSupabasePublishableKey();
+}
+
 export function getSupabasePublicEnvironment(): SupabasePublicEnvironment {
   return {
     url: readSupabaseUrl(),
