@@ -16,6 +16,9 @@ type PublicRegistryRecord = {
   registeredAt: string;
   status: string;
   summary: string | null;
+  formalClaims: string | null;
+  explicitNonClaims: string | null;
+  knownLimitations: string | null;
   domains: string[];
   evidenceCount: number;
   disputeCount: number;
@@ -311,6 +314,28 @@ export default function PermanentPublicRegistryRecordPage() {
               <div>
                 <dt>Published at</dt>
                 <dd>{formatDate(record.publishedAt)}</dd>
+              </div>
+            </dl>
+          </section>
+
+          <section className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">REGISTERED CLAIM BOUNDARY</p>
+              <h2>Claims, Non-Claims, and Limitations</h2>
+            </div>
+
+            <dl className="detailGrid">
+              <div>
+                <dt>Registered claims</dt>
+                <dd>{display(record.formalClaims)}</dd>
+              </div>
+              <div>
+                <dt>Explicit non-claims</dt>
+                <dd>{display(record.explicitNonClaims)}</dd>
+              </div>
+              <div>
+                <dt>Known limitations</dt>
+                <dd>{display(record.knownLimitations)}</dd>
               </div>
             </dl>
           </section>
