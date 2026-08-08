@@ -24,6 +24,7 @@ type AuthorityRole =
   | 'Third-party claimant'
   | 'Other';
 type ReviewPathway =
+  | ''
   | 'Record-only registration'
   | 'Administrative completeness review'
   | 'Identity and authority review'
@@ -322,7 +323,7 @@ async function sha256File(file: File) {
 const initialForm: FormState = {
   governanceName: '',
   shortName: '',
-  currentVersion: '1.0',
+  currentVersion: '',
   effectiveVersionDate: '',
   establishmentDate: '',
   governanceCategory: '',
@@ -349,7 +350,7 @@ const initialForm: FormState = {
   allowCollaboration: true,
   allowDisputeNotices: true,
   disputes: '',
-  reviewPathway: 'Record-only registration',
+  reviewPathway: '',
   publicContact: false,
   authorityConfirmed: false,
   accuracyConfirmed: false,
@@ -1098,8 +1099,8 @@ export default function RegisterGovernancePage() {
       repositories,
       zenodoRecords,
       patentRecords,
-      draftId,
-      submissionState: submittedRecord?.status ?? (draftId ? 'DRAFT_ACCOUNT_BACKED' : 'BROWSER_RECOVERY_DRAFT'),
+      draftId: draftId ?? 'browser-recovery-draft',
+      submissionState: submittedRecord?.status ?? (requiredCompletion === 100 ? 'REVIEW_READY_NOT_PUBLIC' : draftId ? 'DRAFT_ACCOUNT_BACKED' : 'BROWSER_RECOVERY_DRAFT'),
       evidenceManifest: [
         ...preservedEvidence.map((item) => ({
           evidenceId: item.id,
@@ -1345,6 +1346,7 @@ export default function RegisterGovernancePage() {
       readiness: {
         requiredCompletion,
         overallReadiness,
+        composition: 'Arithmetic mean of identity, attribution, boundaries, evidence, and rights/review quality scores. Informational only; not certification or a validity score.',
         qualityScores,
       },
       registryBoundary:
@@ -1481,7 +1483,7 @@ export default function RegisterGovernancePage() {
                   <input value={form.shortName} onChange={(e) => updateField('shortName', e.target.value)} placeholder="Optional" />
                 </label>
                 <label>Current version <em>Required</em>
-                  <input value={form.currentVersion} onChange={(e) => updateField('currentVersion', e.target.value)} />
+                  <input value={form.currentVersion} onChange={(e) => updateField('currentVersion', e.target.value)} placeholder="Enter the actual current version; do not assume 1.0" />
                 </label>
                 <label>Effective version date <em>Required</em>
                   <input type="date" value={form.effectiveVersionDate} onChange={(e) => updateField('effectiveVersionDate', e.target.value)} />
@@ -1823,19 +1825,24 @@ export default function RegisterGovernancePage() {
               <p className="step-intro">Select the depth of review being requested. The pathway changes the review scope, not the meaning of registration.</p>
               <label>Requested Registry pathway <em>Required</em>
                 <select value={form.reviewPathway} onChange={(e) => updateField('reviewPathway', e.target.value as ReviewPathway)}>
+                  <option value="">Select a review pathway…</option>
                   <option>Record-only registration</option>
                   <option>Administrative completeness review</option>
                   <option>Identity and authority review</option>
                   <option>Evidence review</option>
                   <option>Independent governance review</option>
                   <option>Partner Review Network review</option>
-                  <option>Public dispute resolution pathway</option>
+                  <option disabled>Public dispute resolution pathway — available only after a Registry record exists</option>
                 </select>
               </label>
               <div className="review-cards">
-                <article><strong>Record-only</strong><p>Preserves the submitted declaration and supporting record without independent validation.</p></article>
-                <article><strong>Administrative</strong><p>Reviews completeness, required fields, identifiers, and internal record consistency.</p></article>
-                <article><strong>Independent review</strong><p>May examine identity, authority, evidence, governance boundaries, and declared claims under a separate scope.</p></article>
+                <article><strong>Record-only registration</strong><p>Preserves the submitted declaration and supporting record. It does not add independent validation or an administrative completeness finding.</p></article>
+                <article><strong>Administrative completeness review</strong><p>Checks required fields, identifiers, internal record consistency, and whether the intake package is administratively complete before registration.</p></article>
+                <article><strong>Identity and authority review</strong><p>Examines the declared claimant, steward, submission authority, and supporting authority evidence under a separately bounded review.</p></article>
+                <article><strong>Evidence review</strong><p>Examines the submitted evidence package and its stated relationship to the registered claims and limitations. It does not convert registration into certification.</p></article>
+                <article><strong>Independent governance review</strong><p>Examines governance claims, evidence, boundaries, and architecture under a separately scoped independent review.</p></article>
+                <article><strong>Partner Review Network review</strong><p>Requests a separately scoped multi-layer review pathway where an approved independent partner layer and TA-14 review are both expressly included.</p></article>
+                <article><strong>Public dispute resolution pathway</strong><p>This is not a registration review depth. It becomes available after a Registry record exists and a bounded dispute or challenge is filed against that record.</p></article>
               </div>
             </section>
           )}
@@ -1875,7 +1882,7 @@ export default function RegisterGovernancePage() {
               <div className="readiness-hero">
                 <span>REGISTRY READINESS</span>
                 <strong>{overallReadiness}%</strong>
-                <p>Informational quality indicator only. It is not certification, endorsement, or a validity score.</p>
+                <p>Informational quality indicator only. It is not certification, endorsement, or a validity score. Overall readiness is the arithmetic mean of the five quality dimensions shown below.</p>
               </div>
 
               <div className="quality-grid">
