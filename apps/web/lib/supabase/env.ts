@@ -4,8 +4,7 @@ export interface SupabasePublicEnvironment {
 }
 
 function readSupabaseUrl(): string {
-  const value =
-    process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
 
   if (!value) {
     throw new Error(
