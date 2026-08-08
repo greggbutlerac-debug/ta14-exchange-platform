@@ -692,7 +692,7 @@ export default async function GovernanceProfilesPage() {
                   </div>
 
                   <Link
-                    href={`/workspace/ai-governance/registry/public/${record.registry_identifier}`}
+                    href={`/workspace/ai-governance/registry/records/${encodeURIComponent(record.registry_identifier)}`}
                     style={{
                       display: 'inline-flex',
                       alignItems: 'center',
@@ -1041,7 +1041,7 @@ export default async function GovernanceProfilesPage() {
                       </Link>
 
                       <Link
-                        href={`/workspace/ai-governance/registry/public/${profile.registry_identifier}`}
+                        href={`/workspace/ai-governance/registry/records/${encodeURIComponent(profile.registry_identifier)}`}
                         style={{
                           display:
                             'inline-flex',
@@ -1349,7 +1349,7 @@ export default async function GovernanceProfilesPage() {
             </Link>
 
             <Link
-              href="/workspace/ai-governance/registry/public"
+              href="/workspace/ai-governance/registry/directory"
               style={{
                 display:
                   'inline-flex',
