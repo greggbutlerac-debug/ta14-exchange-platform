@@ -828,8 +828,44 @@ export default function RegisterGovernancePage() {
     let cancelled = false;
 
     async function resumeDraft() {
+      const searchParams = new URLSearchParams(window.location.search);
+      const requestedDraftId = searchParams.get('draft')?.trim() ?? '';
+      const recoverExisting = searchParams.get('recover') === '1';
+      const forceNew = searchParams.get('new') === '1' || (!requestedDraftId && !recoverExisting);
+
+      // The normal /register route is a new-registration route. A deliberate
+      // new-registration request must never inherit a prior architecture's server
+      // draft or browser recovery state. This clears only
+      // the browser-local recovery copy; existing account-backed drafts remain
+      // preserved until their owner explicitly discards them.
+      if (forceNew) {
+        try {
+          window.localStorage.removeItem(DRAFT_KEY);
+        } catch {
+          // Storage can be unavailable in hardened browser contexts. A clean
+          // in-memory intake still remains available.
+        }
+
+        if (!cancelled) {
+          setDraftId(null);
+          setPersistenceState('NONE');
+          setForm(initialForm);
+          setFiles([]);
+          setPreservedEvidence([]);
+          setPublications([]);
+          setRepositories([]);
+          setZenodoRecords([]);
+          setPatentRecords([]);
+          setMessage('New Registry intake started. Existing account-backed drafts remain preserved and unchanged.');
+        }
+        return;
+      }
+
       try {
-        const response = await fetch('/api/ai-governance/registry/drafts', {
+        const endpoint = requestedDraftId
+          ? `/api/ai-governance/registry/drafts?id=${encodeURIComponent(requestedDraftId)}`
+          : '/api/ai-governance/registry/drafts';
+        const response = await fetch(endpoint, {
           method: 'GET',
           cache: 'no-store',
         });
@@ -842,12 +878,30 @@ export default function RegisterGovernancePage() {
             if (payload.draft.submission?.id) {
               await loadPreservedEvidence(payload.draft.submission.id);
             }
-            setMessage('Private Registry draft resumed from your signed-in account, including preserved evidence metadata.');
+            setMessage(
+              requestedDraftId
+                ? 'The selected private Registry draft was resumed from your signed-in account.'
+                : 'Private Registry draft resumed from your signed-in account, including preserved evidence metadata.',
+            );
+            return;
+          }
+
+          if (requestedDraftId && !cancelled) {
+            setPersistenceState('NONE');
+            setErrors(['The selected draft is unavailable, is no longer a draft, or does not belong to this signed-in account.']);
+            setMessage('No Registry record was changed. Return to My Registry Records and select an available draft.');
             return;
           }
         }
       } catch {
-        // Browser-local recovery below remains available as a resilience layer.
+        if (requestedDraftId && !cancelled) {
+          setPersistenceState('NONE');
+          setErrors(['The selected Registry draft could not be loaded.']);
+          setMessage('No Registry record was changed. Return to My Registry Records and try again.');
+          return;
+        }
+        // Browser-local recovery below remains available as a resilience layer
+        // only for the legacy/default intake route.
       }
 
       let saved: string | null = null;
