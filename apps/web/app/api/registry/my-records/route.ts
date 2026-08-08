@@ -8,6 +8,8 @@ type RegistrySubmissionRow = {
   owner_user_id: string;
   governance_name: string;
   short_name: string | null;
+  organization_name: string | null;
+  current_steward: string | null;
   current_version: string;
   governance_category: string;
   status: string;
@@ -151,6 +153,10 @@ function normalizeRow(
       row.governance_name,
     shortName:
       row.short_name,
+    organizationName:
+      row.organization_name,
+    currentSteward:
+      row.current_steward,
     currentVersion:
       row.current_version,
     category:
@@ -313,7 +319,7 @@ export async function GET(
   const submissionQuery =
     new URLSearchParams({
       select:
-        'id,owner_user_id,governance_name,short_name,current_version,governance_category,status,registry_identifier,record_visibility,submitted_at,reviewed_at,accepted_at,created_at,updated_at',
+        'id,owner_user_id,governance_name,short_name,organization_name,current_steward,current_version,governance_category,status,registry_identifier,record_visibility,submitted_at,reviewed_at,accepted_at,created_at,updated_at',
       owner_user_id:
         `eq.${userId}`,
       order:
