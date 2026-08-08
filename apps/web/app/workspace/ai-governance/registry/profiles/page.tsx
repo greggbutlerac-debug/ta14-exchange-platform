@@ -581,139 +581,6 @@ export default async function GovernanceProfilesPage() {
           </div>
         ) : null}
 
-        {!registryError && registeredWithoutProfile.length > 0 ? (
-          <section
-            style={{
-              border: '1px solid rgba(95, 157, 207, 0.28)',
-              borderRadius: 26,
-              background: 'linear-gradient(135deg, rgba(8,25,43,0.93), rgba(4,14,26,0.97))',
-              padding: 'clamp(24px, 4vw, 36px)',
-              marginBottom: 30,
-            }}
-          >
-            <div
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'end',
-                gap: 20,
-                flexWrap: 'wrap',
-                marginBottom: 22,
-              }}
-            >
-              <div>
-                <div
-                  style={{
-                    color: '#8fbbe0',
-                    fontSize: 11,
-                    fontWeight: 800,
-                    letterSpacing: '0.13em',
-                    textTransform: 'uppercase',
-                    marginBottom: 9,
-                  }}
-                >
-                  Registered First · Commentary Separate
-                </div>
-                <h3
-                  style={{
-                    margin: 0,
-                    fontSize: 'clamp(24px, 3vw, 34px)',
-                    letterSpacing: '-0.025em',
-                  }}
-                >
-                  Registered governance records without a published TA-14 commentary profile
-                </h3>
-              </div>
-              <span style={{ color: '#8da6ba', fontSize: 13 }}>
-                {registeredWithoutProfile.length}{' '}
-                {registeredWithoutProfile.length === 1 ? 'record' : 'records'}
-              </span>
-            </div>
-
-            <p
-              style={{
-                margin: '0 0 22px',
-                color: '#9fb2c4',
-                lineHeight: 1.7,
-                maxWidth: 900,
-              }}
-            >
-              These architectures are already in the authoritative Registry.
-              Their absence from the editorial profile collection does not
-              erase or delay their registration. Registration and TA-14
-              institutional commentary remain separate governed acts.
-            </p>
-
-            <div style={{ display: 'grid', gap: 14 }}>
-              {registeredWithoutProfile.map((record) => (
-                <article
-                  key={record.id}
-                  style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'minmax(0, 1fr) auto',
-                    gap: 20,
-                    alignItems: 'center',
-                    border: '1px solid rgba(255,255,255,0.08)',
-                    borderRadius: 18,
-                    background: 'rgba(255,255,255,0.025)',
-                    padding: '20px 22px',
-                  }}
-                >
-                  <div>
-                    <div
-                      style={{
-                        color: '#f0c76f',
-                        fontSize: 12,
-                        fontWeight: 800,
-                        letterSpacing: '0.08em',
-                      }}
-                    >
-                      {record.registry_identifier}
-                    </div>
-                    <h4
-                      style={{
-                        margin: '7px 0 0',
-                        fontSize: 21,
-                      }}
-                    >
-                      {record.governance_name}
-                    </h4>
-                    <div
-                      style={{
-                        marginTop: 7,
-                        color: '#839bad',
-                        fontSize: 14,
-                      }}
-                    >
-                      Steward: {record.steward ?? 'Not declared'}
-                      {' · '}Version: {record.version ?? 'Not recorded'}
-                      {' · '}Registered: {formatDate(record.registered_at ?? null)}
-                    </div>
-                  </div>
-
-                  <Link
-                    href={`/workspace/ai-governance/registry/records/${encodeURIComponent(record.registry_identifier)}`}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      minHeight: 42,
-                      padding: '0 15px',
-                      borderRadius: 11,
-                      border: '1px solid rgba(136,177,214,0.28)',
-                      color: '#c7d9e8',
-                      textDecoration: 'none',
-                      background: 'rgba(255,255,255,0.025)',
-                      whiteSpace: 'nowrap',
-                    }}
-                  >
-                    Open Registry Record →
-                  </Link>
-                </article>
-              ))}
-            </div>
-          </section>
-        ) : null}
 
         {error ? (
           <div
@@ -735,7 +602,8 @@ export default async function GovernanceProfilesPage() {
         ) : null}
 
         {!error &&
-        profiles.length === 0 ? (
+        profiles.length === 0 &&
+        registeredWithoutProfile.length === 0 ? (
           <div
             style={{
               border:
@@ -1238,6 +1106,287 @@ export default async function GovernanceProfilesPage() {
               </article>
             ),
           )}
+
+          {registeredWithoutProfile.map((record) => (
+            <article
+              key={`registry-${record.id}`}
+              style={{
+                position: 'relative',
+                overflow: 'hidden',
+                border: '1px solid rgba(117, 158, 195, 0.22)',
+                borderRadius: 28,
+                background:
+                  'linear-gradient(135deg, rgba(11,30,52,0.92), rgba(5,15,28,0.96))',
+                boxShadow: '0 30px 90px rgba(0,0,0,0.30)',
+              }}
+            >
+              <div
+                style={{
+                  position: 'absolute',
+                  width: 340,
+                  height: 340,
+                  borderRadius: '50%',
+                  right: -100,
+                  top: -120,
+                  background:
+                    'radial-gradient(circle, rgba(62,145,220,0.17), transparent 67%)',
+                  pointerEvents: 'none',
+                }}
+              />
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns:
+                    'minmax(0, 1.4fr) minmax(240px, 0.6fr)',
+                  gap: 30,
+                  padding: 'clamp(28px, 5vw, 48px)',
+                  position: 'relative',
+                  zIndex: 1,
+                }}
+              >
+                <div>
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 10,
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      marginBottom: 20,
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        padding: '7px 10px',
+                        border: '1px solid rgba(95,157,207,0.34)',
+                        borderRadius: 999,
+                        color: '#8fbbe0',
+                        background: 'rgba(68,119,164,0.08)',
+                        fontSize: 11,
+                        fontWeight: 800,
+                        letterSpacing: '0.11em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Registry Record
+                    </span>
+                    <span
+                      style={{
+                        color: '#d5b469',
+                        fontSize: 12,
+                        fontWeight: 700,
+                        letterSpacing: '0.08em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Commentary Pending
+                    </span>
+                  </div>
+
+                  <h3
+                    style={{
+                      margin: 0,
+                      fontSize: 'clamp(32px, 5vw, 56px)',
+                      lineHeight: 1.02,
+                      letterSpacing: '-0.04em',
+                    }}
+                  >
+                    {record.governance_name}
+                  </h3>
+
+                  {record.short_name ? (
+                    <p
+                      style={{
+                        margin: '16px 0 0',
+                        color: '#d5b469',
+                        fontSize: 18,
+                        lineHeight: 1.5,
+                        maxWidth: 850,
+                      }}
+                    >
+                      {record.short_name}
+                    </p>
+                  ) : null}
+
+                  <p
+                    style={{
+                      margin: '24px 0 0',
+                      maxWidth: 830,
+                      color: '#b5c5d5',
+                      fontSize: 17,
+                      lineHeight: 1.75,
+                    }}
+                  >
+                    {record.summary?.trim() ||
+                      'This governance architecture is registered in the authoritative TA-14 AI Governance Registry. TA-14 institutional commentary has not yet been published for this Registry record.'}
+                  </p>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexWrap: 'wrap',
+                      gap: 10,
+                      marginTop: 28,
+                    }}
+                  >
+                    {record.category ? (
+                      <span
+                        style={{
+                          padding: '7px 11px',
+                          borderRadius: 999,
+                          border: '1px solid rgba(109,155,197,0.22)',
+                          background: 'rgba(68,119,164,0.08)',
+                          color: '#a7c4dd',
+                          fontSize: 12,
+                        }}
+                      >
+                        {record.category}
+                      </span>
+                    ) : null}
+                    <span
+                      style={{
+                        padding: '7px 11px',
+                        borderRadius: 999,
+                        border: '1px solid rgba(109,155,197,0.22)',
+                        background: 'rgba(68,119,164,0.08)',
+                        color: '#a7c4dd',
+                        fontSize: 12,
+                      }}
+                    >
+                      Registered governance
+                    </span>
+                  </div>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      gap: 12,
+                      flexWrap: 'wrap',
+                      marginTop: 32,
+                    }}
+                  >
+                    <Link
+                      href={`/workspace/ai-governance/registry/records/${encodeURIComponent(record.registry_identifier)}`}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        minHeight: 46,
+                        padding: '0 18px',
+                        borderRadius: 12,
+                        background: 'linear-gradient(135deg, #d6aa50, #9c6c1c)',
+                        color: '#07111d',
+                        fontWeight: 800,
+                        textDecoration: 'none',
+                      }}
+                    >
+                      Open Registry Record →
+                    </Link>
+                  </div>
+                </div>
+
+                <aside
+                  style={{
+                    alignSelf: 'stretch',
+                    borderLeft: '1px solid rgba(255,255,255,0.08)',
+                    paddingLeft: 28,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'center',
+                    gap: 22,
+                  }}
+                >
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: '#718ba3',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Registry Identifier
+                    </div>
+                    <div
+                      style={{
+                        marginTop: 7,
+                        fontSize: 19,
+                        color: '#f0c76f',
+                        fontWeight: 800,
+                      }}
+                    >
+                      {record.registry_identifier}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: '#718ba3',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Steward
+                    </div>
+                    <div style={{ marginTop: 7, fontSize: 17 }}>
+                      {record.steward ?? 'Not declared'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: '#718ba3',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Version
+                    </div>
+                    <div style={{ marginTop: 7, fontSize: 17 }}>
+                      {record.version ?? 'Not recorded'}
+                    </div>
+                  </div>
+
+                  <div>
+                    <div
+                      style={{
+                        fontSize: 11,
+                        fontWeight: 800,
+                        color: '#718ba3',
+                        letterSpacing: '0.12em',
+                        textTransform: 'uppercase',
+                      }}
+                    >
+                      Registered
+                    </div>
+                    <div style={{ marginTop: 7, fontSize: 17 }}>
+                      {formatDate(record.registered_at ?? null)}
+                    </div>
+                  </div>
+
+                  <div
+                    style={{
+                      borderTop: '1px solid rgba(255,255,255,0.08)',
+                      paddingTop: 18,
+                      color: '#839bad',
+                      fontSize: 13,
+                      lineHeight: 1.6,
+                    }}
+                  >
+                    Registration is authoritative. TA-14 institutional commentary is a separate governed act and may be published later.
+                  </div>
+                </aside>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
