@@ -1,39 +1,65 @@
-/**
- * Resolve the public Supabase API key used by server-side route handlers.
- *
- * Newer Supabase projects expose NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.
- * Older TA-14 deployments may still expose NEXT_PUBLIC_SUPABASE_ANON_KEY.
- *
- * Registration routes must use the same public-key contract as the
- * authentication layer so a user cannot authenticate successfully while
- * Registry persistence fails because a different environment variable is
- * expected.
- */
-export function getSupabasePublicKey(): string {
-  const key =
+export interface SupabasePublicEnvironment {
+  url: string;
+  publishableKey: string;
+}
+
+function readSupabaseUrl(): string {
+  const value = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+
+  if (!value) {
+    throw new Error(
+      "Missing required environment variable: NEXT_PUBLIC_SUPABASE_URL. " +
+        "Configure it locally and in the Vercel project before using the account system.",
+    );
+  }
+
+  let parsedUrl: URL;
+
+  try {
+    parsedUrl = new URL(value);
+  } catch {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL must be a valid absolute URL.",
+    );
+  }
+
+  if (
+    parsedUrl.protocol !== "https:" &&
+    parsedUrl.hostname !== "localhost"
+  ) {
+    throw new Error(
+      "NEXT_PUBLIC_SUPABASE_URL must use HTTPS unless it points to localhost.",
+    );
+  }
+
+  return parsedUrl.toString().replace(/\/$/, "");
+}
+
+function readSupabasePublishableKey(): string {
+  const value =
     process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
-  if (!key) {
+  if (!value) {
     throw new Error(
-      "Supabase public key is not configured. Set NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY or NEXT_PUBLIC_SUPABASE_ANON_KEY."
+      "Missing Supabase public key. Configure NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY (preferred) or NEXT_PUBLIC_SUPABASE_ANON_KEY (legacy compatibility) locally and in Vercel.",
     );
   }
 
-  return key;
+  return value;
 }
 
-/**
- * Resolve the configured Supabase project URL.
- */
+export function getSupabasePublicEnvironment(): SupabasePublicEnvironment {
+  return {
+    url: readSupabaseUrl(),
+    publishableKey: readSupabasePublishableKey(),
+  };
+}
+
 export function getSupabaseUrl(): string {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  return readSupabaseUrl();
+}
 
-  if (!url) {
-    throw new Error(
-      "Supabase URL is not configured. Set NEXT_PUBLIC_SUPABASE_URL."
-    );
-  }
-
-  return url;
+export function getSupabasePublicKey(): string {
+  return readSupabasePublishableKey();
 }
