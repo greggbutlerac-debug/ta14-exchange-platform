@@ -391,6 +391,16 @@ export default function PermanentPublicRegistryRecordPage() {
                 Preserved evidence records associated with the registered
                 architecture at finalization.
               </p>
+              {record.evidenceCount > 0 ? (
+                <Link
+                  href={`/workspace/ai-governance/registry/records/${encodeURIComponent(
+                    record.registryIdentifier,
+                  )}/evidence`}
+                  className="metricEvidenceLink"
+                >
+                  Open Evidence Records →
+                </Link>
+              ) : null}
             </article>
 
             <article className="metricCard">
@@ -1000,6 +1010,20 @@ const styles = `
     display: block;
     margin: 10px 0;
     font-size: 2.5rem;
+  }
+
+  .metricEvidenceLink {
+    display: inline-flex;
+    margin-top: 16px;
+    color: #ffd27f;
+    font-size: 0.82rem;
+    font-weight: 900;
+    text-decoration: none;
+  }
+
+  .metricEvidenceLink:hover {
+    color: #fff0c7;
+    text-decoration: underline;
   }
 
   .metricCard p,
