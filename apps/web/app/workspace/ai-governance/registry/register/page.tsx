@@ -416,6 +416,9 @@ export default function RegisterGovernancePage() {
   const [patentRecords, setPatentRecords] = useState<PatentRecord[]>([]);
   const [draftId, setDraftId] = useState<string | null>(null);
   const [draftBusy, setDraftBusy] = useState(false);
+  const [persistenceState, setPersistenceState] = useState<
+    'CHECKING' | 'NONE' | 'BROWSER_ONLY' | 'ACCOUNT_BACKED' | 'SUBMITTED' | 'REGISTERED' | 'ERROR'
+  >('CHECKING');
   const [preservedEvidence, setPreservedEvidence] = useState<PreservedEvidence[]>([]);
   const [evidenceBusyId, setEvidenceBusyId] = useState<string | null>(null);
   const [evidenceListBusy, setEvidenceListBusy] = useState(false);
@@ -835,6 +838,7 @@ export default function RegisterGovernancePage() {
           const payload = await response.json();
           if (!cancelled && payload.draft) {
             hydrateFromServerDraft(payload.draft);
+            setPersistenceState('ACCOUNT_BACKED');
             if (payload.draft.submission?.id) {
               await loadPreservedEvidence(payload.draft.submission.id);
             }
@@ -852,7 +856,10 @@ export default function RegisterGovernancePage() {
       } catch {
         return;
       }
-      if (!saved || cancelled) return;
+      if (!saved || cancelled) {
+        if (!cancelled) setPersistenceState('NONE');
+        return;
+      }
 
       try {
         const parsed = JSON.parse(saved) as {
@@ -868,7 +875,8 @@ export default function RegisterGovernancePage() {
           setRepositories(asArray<RepositoryRecord>(parsed.repositories));
           setZenodoRecords(asArray<ZenodoRecord>(parsed.zenodoRecords));
           setPatentRecords(asArray<PatentRecord>(parsed.patentRecords));
-          setMessage('A browser recovery draft was loaded. Save it while signed in to preserve it under your account. Evidence files must be reattached.');
+          setPersistenceState('BROWSER_ONLY');
+          setMessage('A browser recovery draft was loaded. It is NOT yet saved to the TA-14 Registry. Save it while signed in before relying on it as a governed record. Evidence files must be reattached.');
         }
       } catch {
         window.localStorage.removeItem(DRAFT_KEY);
@@ -915,12 +923,14 @@ export default function RegisterGovernancePage() {
       }
 
       setDraftId(payload.draftId);
+      setPersistenceState('ACCOUNT_BACKED');
       await loadPreservedEvidence(payload.draftId);
-      setMessage('Private draft saved to your signed-in Registry account. Evidence files may now be preserved and bound to this draft.');
+      setMessage(`Saved to TA-14 Registry account. Governed draft ID: ${payload.draftId}. Evidence files may now be preserved and bound to this draft.`);
       return payload.draftId as string;
     } catch (error) {
+      setPersistenceState('BROWSER_ONLY');
       setErrors([error instanceof Error ? error.message : 'Unable to save the Registry draft.']);
-      setMessage('A browser recovery copy was preserved, but the account-backed draft was not saved.');
+      setMessage('Browser recovery only — NOT saved to the TA-14 Registry. Do not treat this intake as submitted or governed until an account-backed draft ID is confirmed.');
       return null;
     } finally {
       setDraftBusy(false);
@@ -938,9 +948,14 @@ export default function RegisterGovernancePage() {
     setMessage('');
 
     try {
-      const submissionId = draftId ?? (await saveDraft());
+      // Always persist the current form state before submission. A previously issued
+      // draftId is not enough: the user may have changed claims, scope, evidence metadata,
+      // or declarations since the last account-backed save.
+      const submissionId = await saveDraft();
       if (!submissionId) {
-        throw new Error('The account-backed Registry draft could not be created.');
+        throw new Error(
+          'Submission stopped because the current intake could not be confirmed as an account-backed TA-14 Registry draft.',
+        );
       }
 
       let preserved = [...preservedEvidence];
@@ -1001,6 +1016,7 @@ export default function RegisterGovernancePage() {
           pendingReview: false,
         };
         setSubmittedRecord(finalized);
+        setPersistenceState('REGISTERED');
         setMessage(
           `${payload.notice ?? 'Governance Entity Registration completed successfully.'} Registry Identifier: ${payload.registration.registryIdentifier}.`,
         );
@@ -1020,6 +1036,7 @@ export default function RegisterGovernancePage() {
           pendingReview: Boolean(payload.pendingReview),
         };
         setSubmittedRecord(pending);
+        setPersistenceState('SUBMITTED');
         setMessage(
           payload.notice ??
             'Registry intake submitted successfully. The submission is awaiting the selected review pathway; no Registry Identifier has been issued yet.',
@@ -1055,6 +1072,7 @@ export default function RegisterGovernancePage() {
 
       window.localStorage.removeItem(DRAFT_KEY);
       setDraftId(null);
+      setPersistenceState('NONE');
       setForm(initialForm);
       setFiles([]);
       setPreservedEvidence([]);
@@ -1449,9 +1467,9 @@ export default function RegisterGovernancePage() {
         <div className="boundary-banner">
           <strong>Registration is not certification.</strong>
           <span>
-            This wizard prepares and preserves an intake package. A public Registry record
-            does not exist until the intake is submitted, reviewed, accepted, assigned an
-            identifier, and published by the Registry.
+            This wizard prepares and preserves an intake package. Browser recovery is not a Registry record.
+            A governed intake exists only after the Exchange confirms an account-backed draft or submission ID,
+            and a public Registry record exists only after the Registry lifecycle issues a permanent identifier.
           </span>
         </div>
       </section>
@@ -1485,6 +1503,26 @@ export default function RegisterGovernancePage() {
                 <b>{stepHasRequiredData(index) ? '✓' : ''}</b>
               </button>
             ))}
+          </div>
+
+          <div className={`persistence-status persistence-${persistenceState.toLowerCase().replace('_', '-')}`}>
+            <span>Persistence state</span>
+            <strong>
+              {persistenceState === 'CHECKING' && 'Checking Registry account…'}
+              {persistenceState === 'NONE' && 'Not yet saved'}
+              {persistenceState === 'BROWSER_ONLY' && 'BROWSER RECOVERY ONLY — NOT IN REGISTRY'}
+              {persistenceState === 'ACCOUNT_BACKED' && 'SAVED TO TA-14 REGISTRY ACCOUNT'}
+              {persistenceState === 'SUBMITTED' && 'SUBMITTED — GOVERNED RECORD'}
+              {persistenceState === 'REGISTERED' && 'REGISTERED — PERMANENT RECORD'}
+              {persistenceState === 'ERROR' && 'Registry persistence error'}
+            </strong>
+            <small>
+              {persistenceState === 'BROWSER_ONLY'
+                ? 'This copy exists only in this browser. Save the account-backed draft before leaving the workflow or treating it as preserved.'
+                : draftId
+                  ? `Governed draft ID: ${draftId}`
+                  : 'No account-backed Registry draft ID has been confirmed yet.'}
+            </small>
           </div>
 
           <div className="draft-actions">
@@ -1979,6 +2017,7 @@ export default function RegisterGovernancePage() {
                         <Link className="primary-button" href={`/workspace/ai-governance/registry/register/${submittedRecord.id}`}>Open submitted record →</Link>
                       )}
                       <Link className="secondary-button" href="/workspace/ai-governance/registry/my-records">Open My Registry Records</Link>
+                      <Link className="secondary-button" href="/workspace/ai-governance/registry/register?new=1">Register another governance architecture / capability →</Link>
                     </div>
                   </>
                 ) : (
@@ -1989,6 +2028,11 @@ export default function RegisterGovernancePage() {
                       locks the intake, appends the submission event, and places the record in the review lifecycle.
                       Submission is not registration, certification, endorsement, or identifier assignment.
                     </p>
+                    {persistenceState === 'BROWSER_ONLY' && (
+                      <div className="persistence-warning">
+                        Browser recovery only. Submission will first attempt an account-backed save. If that save is not confirmed, submission will stop.
+                      </div>
+                    )}
                     <div className="receipt-actions">
                       <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || draftBusy || termsBusy || !termsAccepted}>
                         {termsBusy ? 'Preserving Terms Acceptance…' : submitBusy ? 'Submitting Registry Intake…' : 'Submit for Registry Review →'}
@@ -2144,6 +2188,15 @@ export default function RegisterGovernancePage() {
         .step-list button div { display:grid; gap:2px; }
         .step-list button strong { font-size:12px; }
         .step-list button small { color:#7f8ea2; font-size:9px; }
+        .persistence-status { display:grid; gap:6px; padding:12px; border:1px solid rgba(151,169,199,.2); border-radius:16px; background:rgba(7,13,25,.86); }
+        .persistence-status span { color:#94a6c5; font-size:.72rem; font-weight:800; letter-spacing:.12em; text-transform:uppercase; }
+        .persistence-status strong { color:#f4ead7; font-size:.82rem; line-height:1.35; }
+        .persistence-status small { color:#aab8d0; line-height:1.45; }
+        .persistence-browser-only { border-color:rgba(235,142,96,.62); background:rgba(88,39,25,.32); }
+        .persistence-browser-only strong { color:#ffd0b7; }
+        .persistence-account-backed,.persistence-submitted,.persistence-registered { border-color:rgba(104,190,151,.42); background:rgba(24,71,55,.24); }
+        .persistence-account-backed strong,.persistence-submitted strong,.persistence-registered strong { color:#c8f5df; }
+        .persistence-warning { margin:12px 0; padding:12px 14px; border:1px solid rgba(235,142,96,.55); border-radius:12px; background:rgba(88,39,25,.32); color:#ffd0b7; font-size:.88rem; line-height:1.5; }
         .draft-actions { display:grid; gap:8px; padding:12px; }
         .draft-actions button { padding:10px; border:1px solid rgba(219,177,102,.3); border-radius:10px; color:#f8edd5; background:rgba(68,48,24,.45); cursor:pointer; font-weight:750; }
         .draft-actions button.danger { color:#ffd9cc; border-color:rgba(226,124,92,.36); background:rgba(92,35,24,.28); }
