@@ -390,6 +390,8 @@ export default function RegisterGovernancePage() {
   const [receiptGenerated, setReceiptGenerated] = useState(false);
   const [submitBusy, setSubmitBusy] = useState(false);
   const [submittedRecord, setSubmittedRecord] = useState<{ id: string; status: string; submitted_at: string | null } | null>(null);
+  const [termsAccepted, setTermsAccepted] = useState(false);
+  const [termsBusy, setTermsBusy] = useState(false);
 
   const totalSize = useMemo(
     () => files.reduce((total, item) => total + item.file.size, 0),
@@ -911,6 +913,24 @@ export default function RegisterGovernancePage() {
         throw new Error('Preserve at least one evidence item before submitting for review.');
       }
 
+      setTermsBusy(true);
+      const termsResponse = await fetch('/api/ai-governance/registry/terms/accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submissionId,
+          termsCode: 'TA14-RET-001',
+          termsVersion: '1.1',
+          acceptanceMethod: 'explicit_checkbox',
+          accepted: true,
+        }),
+      });
+      const termsPayload = await termsResponse.json();
+      if (!termsResponse.ok) {
+        throw new Error(termsPayload.error ?? 'Unable to preserve Registry Terms acceptance.');
+      }
+      setTermsBusy(false);
+
       const response = await fetch('/api/ai-governance/registry/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -929,6 +949,7 @@ export default function RegisterGovernancePage() {
       setErrors([error instanceof Error ? error.message : 'Unable to submit the Registry intake for review.']);
     } finally {
       setEvidenceBusyId(null);
+      setTermsBusy(false);
       setSubmitBusy(false);
     }
   }
@@ -1002,6 +1023,7 @@ export default function RegisterGovernancePage() {
     if (!form.authorityConfirmed) nextErrors.push('Submission authority must be confirmed.');
     if (!form.accuracyConfirmed) nextErrors.push('Accuracy declaration must be confirmed.');
     if (!form.boundaryConfirmed) nextErrors.push('Registry boundary must be acknowledged.');
+    if (!termsAccepted) nextErrors.push('TA14-RET-001 v1.1 Registry Terms must be accepted before submission.');
 
     if (!form.reviewPathway) nextErrors.push('A requested review pathway is required.');
 
@@ -1022,6 +1044,12 @@ export default function RegisterGovernancePage() {
       registryBoundary:
         'This intake package records a declaration and supporting evidence. It is not certification, legal validation, regulatory approval, technical verification, or an ownership determination.',
       registration: form,
+      registryTermsAcceptance: {
+        termsCode: 'TA14-RET-001',
+        termsVersion: '1.1',
+        accepted: termsAccepted,
+        acceptanceMethod: 'explicit_checkbox',
+      },
       publications,
       repositories,
       zenodoRecords,
@@ -1223,6 +1251,7 @@ export default function RegisterGovernancePage() {
             form.authorityConfirmed &&
             form.accuracyConfirmed &&
             form.boundaryConfirmed &&
+            termsAccepted &&
             files.every((item) => item.description.trim()),
         );
       default:
@@ -1774,6 +1803,25 @@ export default function RegisterGovernancePage() {
                 <label className="declaration-row"><input type="checkbox" checked={form.authorityConfirmed} onChange={(e) => updateField('authorityConfirmed', e.target.checked)} /><span><strong>Authority to submit</strong>I am authorized to submit this registration and its evidence, or I have clearly disclosed the limits of that authority.</span></label>
                 <label className="declaration-row"><input type="checkbox" checked={form.accuracyConfirmed} onChange={(e) => updateField('accuracyConfirmed', e.target.checked)} /><span><strong>Accuracy and attribution</strong>The registration is accurate to the best of my knowledge and material sources, contributors, disputes, and limitations have not been knowingly concealed.</span></label>
                 <label className="declaration-row"><input type="checkbox" checked={form.boundaryConfirmed} onChange={(e) => updateField('boundaryConfirmed', e.target.checked)} /><span><strong>Registry boundary</strong>I understand that registration is not certification, legal advice, regulatory approval, ownership adjudication, or proof of technical performance.</span></label>
+                <label className="declaration-row">
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(e) => {
+                      setTermsAccepted(e.target.checked);
+                      setMessage('');
+                    }}
+                  />
+                  <span>
+                    <strong>TA14-RET-001 v1.1 Registry Terms</strong>
+                    I have reviewed and explicitly accept the Registry Terms governing this submission.
+                    Acceptance will be preserved as an attributable account-backed record before the intake is submitted.
+                    {' '}
+                    <Link href="/workspace/ai-governance/registry/terms" target="_blank">
+                      Open Registry Terms ↗
+                    </Link>
+                  </span>
+                </label>
               </div>
             </section>
           )}
@@ -1837,8 +1885,8 @@ export default function RegisterGovernancePage() {
                       Submission is not registration, certification, endorsement, or identifier assignment.
                     </p>
                     <div className="receipt-actions">
-                      <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || draftBusy}>
-                        {submitBusy ? 'Submitting Registry Intake…' : 'Submit for Registry Review →'}
+                      <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || draftBusy || termsBusy || !termsAccepted}>
+                        {termsBusy ? 'Preserving Terms Acceptance…' : submitBusy ? 'Submitting Registry Intake…' : 'Submit for Registry Review →'}
                       </button>
                     </div>
                   </>
@@ -1860,8 +1908,8 @@ export default function RegisterGovernancePage() {
             {activeStep < wizardSteps.length - 1 ? (
               <button type="button" className="primary-button" onClick={() => goToStep(activeStep + 1)}>Save & Continue →</button>
             ) : (
-              <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || Boolean(submittedRecord)}>
-                {submittedRecord ? 'Submitted ✓' : submitBusy ? 'Submitting…' : 'Submit for Review →'}
+              <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || termsBusy || !termsAccepted || Boolean(submittedRecord)}>
+                {submittedRecord ? 'Submitted ✓' : termsBusy ? 'Preserving Terms…' : submitBusy ? 'Submitting…' : 'Submit for Review →'}
               </button>
             )}
           </div>
