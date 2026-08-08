@@ -914,7 +914,7 @@ export default function RegisterGovernancePage() {
       }
 
       setTermsBusy(true);
-      const termsResponse = await fetch('/api/ai-governance/registry/terms/accept', {
+      const termsResponse = await fetch('/api/terms/accept', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
