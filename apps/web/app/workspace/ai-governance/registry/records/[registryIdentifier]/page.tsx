@@ -20,10 +20,13 @@ type PublicRegistryRecord = {
   explicitNonClaims: string | null;
   knownLimitations: string | null;
   domains: string[];
+  regulatoryScope: string | null;
   evidenceCount: number;
   disputeCount: number;
   supersedesRegistryIdentifier: string | null;
   recordDigestSha256: string | null;
+  publicProjectionDigestSha256: string | null;
+  publicProjectionDigestVersion: string | null;
   publishedAt: string | null;
   boundary: string;
 };
@@ -363,8 +366,8 @@ export default function PermanentPublicRegistryRecordPage() {
               <span>Domains</span>
               <strong>{record.domains.length}</strong>
               <p>
-                Publicly declared geographic, regulatory, or governance scope
-                markers.
+                Publicly declared enumerable geographic or governance scope
+                markers. Regulatory/framework scope is shown separately.
               </p>
             </article>
           </section>
@@ -384,6 +387,22 @@ export default function PermanentPublicRegistryRecordPage() {
             ) : (
               <p className="emptyLine">
                 No public domain markers were declared for this record.
+              </p>
+            )}
+          </section>
+
+          <section className="sectionCard">
+            <div className="sectionHeading">
+              <p className="eyebrow">REGULATORY / FRAMEWORK SCOPE</p>
+              <h2>Declared Regulatory Context</h2>
+            </div>
+
+            {record.regulatoryScope ? (
+              <p className="scopeDeclaration">{record.regulatoryScope}</p>
+            ) : (
+              <p className="emptyLine">
+                No separate regulatory or framework scope declaration is
+                recorded for this public record.
               </p>
             )}
           </section>
@@ -429,9 +448,28 @@ export default function PermanentPublicRegistryRecordPage() {
             )}
 
             <p className="digestNote">
-              The digest is a verification reference for the finalized public
-              Registry projection. It is not a certification mark.
+              This finalized-record digest is preserved as the Registry's
+              original integrity reference. It is not a certification mark.
             </p>
+
+            <div className="projectionDigestBlock">
+              <h3>Recomputable Public Projection</h3>
+              {record.publicProjectionDigestSha256 ? (
+                <code className="digest">
+                  {record.publicProjectionDigestSha256}
+                </code>
+              ) : (
+                <p className="emptyLine">
+                  No recomputable public-projection digest is available.
+                </p>
+              )}
+              <p className="digestNote">
+                Canonicalization: {display(record.publicProjectionDigestVersion)}.
+                The public-projection digest is computed from the published
+                Registry fields using the named canonicalization version so an
+                independent reader can reproduce the same projection input.
+              </p>
+            </div>
           </section>
 
           <footer className="recordFooter">
@@ -841,6 +879,23 @@ const styles = `
     color: #c8f6e7;
     line-height: 1.65;
     word-break: break-all;
+  }
+
+  .projectionDigestBlock {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(127, 228, 196, 0.14);
+  }
+
+  .projectionDigestBlock h3 {
+    margin: 0 0 12px;
+    font-size: 15px;
+  }
+
+  .scopeDeclaration {
+    margin: 0;
+    white-space: pre-wrap;
+    line-height: 1.75;
   }
 
   .digestNote {
