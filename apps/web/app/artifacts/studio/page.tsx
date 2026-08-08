@@ -244,6 +244,41 @@ type StudioSnapshot = {
   updatedAt: string;
 };
 
+type CanonicalRegisteredGovernance = {
+  registryIdentifier: string;
+  governanceName: string;
+  version: string;
+  organizationName: string;
+  registrationStatus: GovernanceBinding["registrationStatus"];
+  verificationLevel: number;
+  boundAt: string;
+};
+
+type CanonicalWorkspaceExport = {
+  schema: "ta14.artifact-studio.workspace.v2";
+  engineVersion: string;
+  artifactId: string;
+  generatedAt: string;
+  publicationState: PublicationState;
+  registeredGovernance?: CanonicalRegisteredGovernance;
+  scenario: ScenarioForm;
+  route: RouteForm;
+  evidence: EvidenceDraft[];
+  authorities: AuthorityDraft[];
+  gateLedger: GateDraft[];
+  commit: {
+    determination: Determination;
+    reason: string;
+    expectedExecutionEffect: string;
+  };
+  execution: ExecutionDraft;
+  outcome: OutcomeDraft;
+  proofBoundary: {
+    proves: string[];
+    doesNotProve: string[];
+  };
+};
+
 type ControlPattern = {
   id: string;
   domain: string;
@@ -3954,6 +3989,15 @@ function makeExport(snapshot: StudioSnapshot) {
     artifactId,
     generatedAt: new Date().toISOString(),
     publicationState: snapshot.publicationState,
+    registeredGovernance: {
+      registryIdentifier: snapshot.governance.registrationId,
+      governanceName: snapshot.governance.architectureName,
+      version: snapshot.governance.architectureVersion,
+      organizationName: snapshot.governance.organizationName,
+      registrationStatus: snapshot.governance.registrationStatus,
+      verificationLevel: snapshot.governance.verificationLevel,
+      boundAt: snapshot.governance.sourceHandoffAt,
+    },
     identity: {
       artifactId,
       seriesId: snapshot.scenario.seriesId,
@@ -3980,6 +4024,57 @@ function makeExport(snapshot: StudioSnapshot) {
       proves: splitLines(snapshot.proves),
       doesNotProve: splitLines(snapshot.doesNotProve),
     },
+  };
+}
+
+function isCanonicalWorkspaceExport(value: unknown): value is CanonicalWorkspaceExport {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<CanonicalWorkspaceExport>;
+  return candidate.schema === "ta14.artifact-studio.workspace.v2"
+    && Boolean(candidate.scenario)
+    && Boolean(candidate.route)
+    && Array.isArray(candidate.gateLedger)
+    && Boolean(candidate.commit)
+    && Boolean(candidate.execution)
+    && Boolean(candidate.outcome)
+    && Boolean(candidate.proofBoundary);
+}
+
+function snapshotFromCanonicalExport(candidate: CanonicalWorkspaceExport): StudioSnapshot {
+  const registeredGovernance = candidate.registeredGovernance;
+  const governance: GovernanceBinding = registeredGovernance
+    ? {
+        registrationId: registeredGovernance.registryIdentifier,
+        organizationName: registeredGovernance.organizationName,
+        architectureName: registeredGovernance.governanceName,
+        architectureVersion: registeredGovernance.version,
+        registrationStatus: registeredGovernance.registrationStatus,
+        verificationLevel: registeredGovernance.verificationLevel,
+        sourceHandoffAt: registeredGovernance.boundAt || candidate.generatedAt,
+        routeOwner: "",
+        routeDomain: "",
+        selectedStage: "",
+        sourceRouteReceiptId: "",
+        correlationId: "",
+      }
+    : { ...defaultGovernanceBinding };
+
+  return {
+    ...initialSnapshot,
+    governance,
+    scenario: { ...initialSnapshot.scenario, ...candidate.scenario },
+    route: { ...initialSnapshot.route, ...candidate.route },
+    evidence: Array.isArray(candidate.evidence) ? candidate.evidence : [],
+    authorities: Array.isArray(candidate.authorities) ? candidate.authorities : [],
+    gates: candidate.gateLedger,
+    determination: candidate.commit.determination,
+    commitReason: candidate.commit.reason,
+    execution: { ...initialSnapshot.execution, ...candidate.execution },
+    outcome: { ...initialSnapshot.outcome, ...candidate.outcome },
+    publicationState: candidate.publicationState,
+    proves: candidate.proofBoundary.proves.join("\n"),
+    doesNotProve: candidate.proofBoundary.doesNotProve.join("\n"),
+    updatedAt: candidate.generatedAt || new Date().toISOString(),
   };
 }
 
@@ -4429,12 +4524,33 @@ function StudioPage() {
   async function importFile(file: File) {
     try {
       const text = await file.text();
-      const parsed = JSON.parse(text) as StudioSnapshot | { workspace?: StudioSnapshot };
-      const candidate = "workspace" in parsed && parsed.workspace ? parsed.workspace : parsed as StudioSnapshot;
-      if (!candidate.scenario || !candidate.route || !Array.isArray(candidate.gates)) throw new Error("Invalid workspace package");
+      const parsed: unknown = JSON.parse(text);
+
+      let candidate: StudioSnapshot | null = null;
+
+      if (isCanonicalWorkspaceExport(parsed)) {
+        candidate = snapshotFromCanonicalExport(parsed);
+      } else if (parsed && typeof parsed === "object") {
+        const packageCandidate = parsed as { workspace?: Partial<StudioSnapshot> };
+        const rawCandidate = packageCandidate.workspace ?? parsed as Partial<StudioSnapshot>;
+        if (rawCandidate.scenario && rawCandidate.route && Array.isArray(rawCandidate.gates)) {
+          candidate = {
+            ...initialSnapshot,
+            ...rawCandidate,
+            governance: rawCandidate.governance ?? initialSnapshot.governance,
+            scenario: { ...initialSnapshot.scenario, ...rawCandidate.scenario },
+            route: { ...initialSnapshot.route, ...rawCandidate.route },
+            execution: { ...initialSnapshot.execution, ...rawCandidate.execution },
+            outcome: { ...initialSnapshot.outcome, ...rawCandidate.outcome },
+          } as StudioSnapshot;
+        }
+      }
+
+      if (!candidate) throw new Error("Invalid workspace package");
+
       setHistory((items) => [...items.slice(-24), snapshot]);
       setSnapshot(candidate);
-      setNotice(`Imported ${file.name}.`);
+      setNotice(`Imported ${file.name}. Registry binding provenance was preserved when present in the canonical package.`);
     } catch {
       setNotice("Import failed. Select a valid TA-14 Artifact Studio JSON workspace package.");
     }
