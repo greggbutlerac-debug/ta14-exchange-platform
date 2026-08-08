@@ -186,7 +186,7 @@ export default async function RegistryEvidenceViewerPage({
     throw new Error(`Unable to load Registry evidence: ${evidenceError.message}`);
   }
 
-  const evidence = (evidenceData ?? []) as EvidenceRecord[];
+  const evidence = (evidenceData ?? []) as unknown as EvidenceRecord[];
   const controlledCount = evidence.filter(
     (record) => record.visibility !== 'public',
   ).length;
