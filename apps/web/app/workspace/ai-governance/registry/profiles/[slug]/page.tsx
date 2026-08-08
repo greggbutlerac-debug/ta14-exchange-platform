@@ -1131,7 +1131,7 @@ export default async function GovernanceProfilePage({
                 }}
               >
                 <ArrowLink
-                  href={`/workspace/ai-governance/registry/public/${profile.registry_identifier}`}
+                  href={`/workspace/ai-governance/registry/records/${profile.registry_identifier}`}
                   primary
                 >
                   Open Permanent
@@ -1688,7 +1688,7 @@ export default async function GovernanceProfilePage({
               }}
             >
               <ArrowLink
-                href={`/workspace/ai-governance/registry/public/${profile.registry_identifier}`}
+                href={`/workspace/ai-governance/registry/records/${profile.registry_identifier}`}
                 primary
               >
                 Permanent Registry
@@ -1862,7 +1862,7 @@ export default async function GovernanceProfilePage({
                     key={
                       identifier
                     }
-                    href={`/workspace/ai-governance/registry/public/${identifier}`}
+                    href={`/workspace/ai-governance/registry/records/${identifier}`}
                     style={{
                       display:
                         'inline-flex',
@@ -2047,7 +2047,7 @@ export default async function GovernanceProfilePage({
             </ArrowLink>
 
             <ArrowLink
-              href="/workspace/ai-governance/registry/public"
+              href="/workspace/ai-governance/registry/directory"
             >
               Browse Public
               Registry
