@@ -16,6 +16,14 @@ type DeliveryHistoryRow = {
   created_at: string;
 };
 
+type RegistryAdminNotificationRow = {
+  id: string;
+  notification_type: string;
+  registry_identifier: string | null;
+  governance_name: string;
+  occurred_at: string;
+};
+
 function env(name: string): string {
   return process.env[name]?.trim() ?? '';
 }
@@ -271,6 +279,9 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    const verifiedNotification =
+      notification as unknown as RegistryAdminNotificationRow;
+
     const { data, error } = await supabase.rpc(
       'ta14_registry_admin_notification_delivery_history_v1',
       {
@@ -328,12 +339,12 @@ export async function GET(request: NextRequest) {
           email: administratorEmail,
         },
         notification: {
-          id: notification.id,
-          notificationType: notification.notification_type,
+          id: verifiedNotification.id,
+          notificationType: verifiedNotification.notification_type,
           registryIdentifier:
-            notification.registry_identifier ?? null,
-          governanceName: notification.governance_name,
-          occurredAt: notification.occurred_at,
+            verifiedNotification.registry_identifier ?? null,
+          governanceName: verifiedNotification.governance_name,
+          occurredAt: verifiedNotification.occurred_at,
         },
         delivery: {
           status,
