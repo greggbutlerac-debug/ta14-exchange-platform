@@ -87,6 +87,49 @@ export default function TA1424LinkExplorerPage() {
         </div>
       </section>
 
+      <section className="mx-auto max-w-7xl px-6 pt-12 lg:px-8">
+        <div className="grid gap-4 md:grid-cols-3">
+          <Link
+            href="/academy/24-link-architecture/provenance"
+            className="group rounded-2xl border border-sky-300/20 bg-sky-300/[0.05] p-5 transition hover:border-sky-300/40 hover:bg-sky-300/[0.08]"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-sky-300">
+              Provenance
+            </p>
+            <h2 className="mt-2 text-lg font-semibold">Explore the evidence graph</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Trace chronology, publications, artifacts, reviews, and source relationships across all 24 links.
+            </p>
+          </Link>
+
+          <Link
+            href="/academy/24-link-architecture/provenance/patents"
+            className="group rounded-2xl border border-amber-300/20 bg-amber-300/[0.05] p-5 transition hover:border-amber-300/40 hover:bg-amber-300/[0.08]"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-300">
+              Patent Portfolio
+            </p>
+            <h2 className="mt-2 text-lg font-semibold">Map applications to the architecture</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Explore the documented application records and their bounded patent-position relationships to the 24-link canon.
+            </p>
+          </Link>
+
+          <Link
+            href="/academy/24-link-architecture/provenance/patents/families"
+            className="group rounded-2xl border border-indigo-300/20 bg-indigo-300/[0.05] p-5 transition hover:border-indigo-300/40 hover:bg-indigo-300/[0.08]"
+          >
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-indigo-300">
+              Eight Patent Families
+            </p>
+            <h2 className="mt-2 text-lg font-semibold">Study the portfolio by family</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              See how related filings group into eight families while preserving application-level architecture boundaries.
+            </p>
+          </Link>
+        </div>
+      </section>
+
       <section className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
         <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           <Metric value="24" label="Canonical links" />
