@@ -322,6 +322,20 @@ export function RegistryRegistrationJourneyPanel() {
         </button>
       </div>
 
+      {summary && summary.needsAttention > 0 ? (
+        <div className="leftBehindAlert" role="alert">
+          <div>
+            <span>Registration intervention required</span>
+            <strong>
+              {summary.needsAttention} registrant{summary.needsAttention === 1 ? "" : "s"} have not reached a completed submission.
+            </strong>
+          </div>
+          <button type="button" onClick={() => setFilter("attention")}>
+            Show left-behind registrants
+          </button>
+        </div>
+      ) : null}
+
       {summary ? (
         <div className="attentionHero">
           <div>
@@ -654,6 +668,41 @@ export function RegistryRegistrationJourneyPanel() {
         button:disabled {
           opacity: 0.5;
           cursor: default;
+        }
+
+        .leftBehindAlert {
+          display: flex;
+          justify-content: space-between;
+          gap: 14px;
+          align-items: center;
+          padding: 14px 16px;
+          border: 1px solid rgba(255, 92, 118, 0.24);
+          border-radius: 16px;
+          background: rgba(255, 92, 118, 0.055);
+        }
+
+        .leftBehindAlert > div {
+          display: grid;
+          gap: 4px;
+        }
+
+        .leftBehindAlert span {
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+          color: #ffd4dc;
+        }
+
+        .leftBehindAlert strong {
+          font-size: 12px;
+          line-height: 1.45;
+        }
+
+        .leftBehindAlert button {
+          flex: 0 0 auto;
+          border-color: rgba(255, 92, 118, 0.24);
+          background: rgba(255, 92, 118, 0.07);
         }
 
         .attentionHero {
@@ -1125,6 +1174,7 @@ export function RegistryRegistrationJourneyPanel() {
 
         @media (max-width: 760px) {
           .journeyHeader,
+          .leftBehindAlert,
           .cardTop,
           .cardFooter,
           .lastActivity,
