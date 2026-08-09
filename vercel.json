@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/ai-governance/registry/admin-notifications/deliver",
+      "schedule": "*/5 * * * *"
+    }
+  ]
+}
