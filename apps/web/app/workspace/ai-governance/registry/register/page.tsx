@@ -404,6 +404,8 @@ function fileExtension(name: string) {
 
 export default function RegisterGovernancePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const registrationStartedRecordedRef = useRef(false);
+  const lifecycleSessionKeyRef = useRef<string | null>(null);
   const [form, setForm] = useState<FormState>(initialForm);
   const [files, setFiles] = useState<EvidenceFile[]>([]);
   const [dragActive, setDragActive] = useState(false);
@@ -436,6 +438,86 @@ export default function RegisterGovernancePage() {
   } | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsBusy, setTermsBusy] = useState(false);
+
+  async function recordLifecycleEvent(
+    eventType:
+      | 'registration_page_opened'
+      | 'registration_started'
+      | 'draft_saved'
+      | 'submission_submitted'
+      | 'registration_completed'
+      | 'registration_failed',
+    payload?: Record<string, unknown>,
+  ) {
+    try {
+      if (!lifecycleSessionKeyRef.current) {
+        const existing =
+          window.sessionStorage.getItem(
+            'ta14.registry.registration.lifecycle.session.v1',
+          );
+
+        const next =
+          existing ||
+          (
+            globalThis.crypto?.randomUUID?.() ??
+            `${Date.now()}-${Math.random().toString(36).slice(2)}`
+          );
+
+        lifecycleSessionKeyRef.current = next;
+
+        if (!existing) {
+          window.sessionStorage.setItem(
+            'ta14.registry.registration.lifecycle.session.v1',
+            next,
+          );
+        }
+      }
+
+      await fetch(
+        '/api/ai-governance/registry/lifecycle-events',
+        {
+          method: 'POST',
+          credentials: 'same-origin',
+          cache: 'no-store',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+          body: JSON.stringify({
+            eventType,
+            source: 'web',
+            sessionKey: lifecycleSessionKeyRef.current,
+            submissionId: draftId,
+            governanceName:
+              form.governanceName.trim() || null,
+            organizationName:
+              form.organization.trim() || null,
+            contactEmail:
+              form.contactEmail.trim() || null,
+            eventPayload: {
+              active_step: activeStep,
+              persistence_state: persistenceState,
+              ...payload,
+            },
+          }),
+        },
+      );
+    } catch {
+      // Telemetry must never interrupt the registration workflow.
+    }
+  }
+
+  useEffect(() => {
+    void recordLifecycleEvent(
+      'registration_page_opened',
+      {
+        route:
+          '/workspace/ai-governance/registry/register',
+      },
+    );
+    // This event is intentionally recorded once on initial mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const totalSize = useMemo(
     () => files.reduce((total, item) => total + item.file.size, 0),
@@ -472,6 +554,24 @@ export default function RegisterGovernancePage() {
   function updateField<K extends keyof FormState>(key: K, value: FormState[K]) {
     setForm((current) => ({ ...current, [key]: value }));
     setMessage('');
+
+    if (!registrationStartedRecordedRef.current) {
+      const meaningfulValue =
+        typeof value === 'string'
+          ? value.trim().length > 0
+          : Boolean(value);
+
+      if (meaningfulValue) {
+        registrationStartedRecordedRef.current = true;
+
+        void recordLifecycleEvent(
+          'registration_started',
+          {
+            first_field: String(key),
+          },
+        );
+      }
+    }
   }
 
   async function addFiles(incoming: File[]) {
@@ -980,6 +1080,14 @@ export default function RegisterGovernancePage() {
       setPersistenceState('ACCOUNT_BACKED');
       await loadPreservedEvidence(payload.draftId);
       setMessage(`Saved to TA-14 Registry account. Governed draft ID: ${payload.draftId}. Evidence files may now be preserved and bound to this draft.`);
+
+      void recordLifecycleEvent(
+        'draft_saved',
+        {
+          draft_id: payload.draftId,
+        },
+      );
+
       return payload.draftId as string;
     } catch (error) {
       setPersistenceState('BROWSER_ONLY');
@@ -1047,6 +1155,15 @@ export default function RegisterGovernancePage() {
       }
       setTermsBusy(false);
 
+      void recordLifecycleEvent(
+        'submission_submitted',
+        {
+          draft_id: submissionId,
+          requested_review_pathway:
+            form.requestedReviewPathway,
+        },
+      );
+
       const response = await fetch('/api/ai-governance/registry/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1074,6 +1191,18 @@ export default function RegisterGovernancePage() {
         setMessage(
           `${payload.notice ?? 'Governance Entity Registration completed successfully.'} Registry Identifier: ${payload.registration.registryIdentifier}.`,
         );
+
+        void recordLifecycleEvent(
+          'registration_completed',
+          {
+            draft_id: submissionId,
+            registry_identifier:
+              payload.registration.registryIdentifier,
+            registered_at:
+              payload.registration.registeredAt ?? null,
+          },
+        );
+
         window.location.assign(
           `/workspace/ai-governance/registry/records/${encodeURIComponent(payload.registration.registryIdentifier)}`,
         );
@@ -1101,7 +1230,20 @@ export default function RegisterGovernancePage() {
 
       throw new Error('The Registry accepted the request but did not return a submission or registration record.');
     } catch (error) {
-      setErrors([error instanceof Error ? error.message : 'Unable to submit the Registry intake for review.']);
+      const failureMessage =
+        error instanceof Error
+          ? error.message
+          : 'Unable to submit the Registry intake for review.';
+
+      setErrors([failureMessage]);
+
+      void recordLifecycleEvent(
+        'registration_failed',
+        {
+          failure_message: failureMessage,
+          phase: 'submission',
+        },
+      );
     } finally {
       setEvidenceBusyId(null);
       setTermsBusy(false);
