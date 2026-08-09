@@ -242,7 +242,7 @@ join public.ta14_canonical_sources as sources
   on sources.source_type = 'patent_application'
  and sources.source_identifier = mappings.source_identifier
 join public.ta14_canonical_links as links
-  on links.order_index = mappings.link_order
+  on links.link_order = mappings.link_order
 where links.doctrine_state = 'active'
 on conflict (link_id, source_id, relation_type)
 do update set
@@ -265,7 +265,7 @@ begin
     on sources.source_type = 'patent_application'
    and sources.source_identifier = mappings.source_identifier
   join public.ta14_canonical_links as links
-    on links.order_index = mappings.link_order
+    on links.link_order = mappings.link_order
    and links.doctrine_state = 'active';
 
   if expected_count <> resolved_count then
