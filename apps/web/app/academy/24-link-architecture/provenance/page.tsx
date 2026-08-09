@@ -89,7 +89,16 @@ export default function TA14ProvenanceMapPage() {
               ← Back to 24-Link Explorer
             </Link>
 
-            <TA14ProvenanceAdminLink />
+            <div className="flex flex-wrap items-center gap-3">
+              <Link
+                href="/academy/24-link-architecture/provenance/patents"
+                className="inline-flex items-center gap-2 rounded-full border border-sky-300/20 bg-sky-300/[0.06] px-4 py-2 text-xs font-semibold text-sky-200 transition hover:border-sky-300/40 hover:bg-sky-300/[0.1]"
+              >
+                Explore patent portfolio
+              </Link>
+
+              <TA14ProvenanceAdminLink />
+            </div>
           </div>
 
           <p className="mt-10 text-xs font-semibold uppercase tracking-[0.26em] text-indigo-300">
@@ -211,7 +220,7 @@ export default function TA14ProvenanceMapPage() {
               </p>
 
               <div className="mt-4">
-                <TA14ProvenanceAdminLink />
+                <TA14ProvenanceAdminLink linkId={selected.linkId} />
               </div>
             </div>
           ) : (
