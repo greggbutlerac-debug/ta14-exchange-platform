@@ -200,7 +200,75 @@ export default async function TA14CanonicalLinkPage({ params }: PageProps) {
           </div>
         </section>
 
-        <section className="mt-10 rounded-3xl border border-amber-300/20 bg-amber-300/[0.05] p-7">
+        <section className="mt-10 rounded-3xl border border-indigo-300/20 bg-indigo-300/[0.045] p-7 sm:p-9">
+          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-indigo-200">
+            Trace this canonical link
+          </p>
+          <h2 className="mt-3 text-2xl font-semibold">
+            Move from doctrine to provenance.
+          </h2>
+          <p className="mt-4 max-w-4xl text-sm leading-7 text-slate-300">
+            Continue from this lesson into the governed public record behind
+            {` ${item.canonicalName}`}: chronology, publications, patent
+            position, artifacts, reviews, and source relationships remain
+            separate evidence classes and should be read within their declared
+            boundaries.
+          </p>
+
+          <div className="mt-7 grid gap-4 md:grid-cols-3">
+            <Link
+              href="/academy/24-link-architecture/provenance"
+              className="rounded-2xl border border-sky-300/20 bg-sky-300/[0.05] p-5 transition hover:border-sky-300/40 hover:bg-sky-300/[0.08]"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-300">
+                Provenance Map
+              </p>
+              <p className="mt-2 font-semibold text-white">
+                Inspect source relationships
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                Trace the architecture to chronology, publications, artifacts,
+                reviews, and other governed public sources.
+              </p>
+            </Link>
+
+            <Link
+              href="/academy/24-link-architecture/provenance/patents"
+              className="rounded-2xl border border-amber-300/20 bg-amber-300/[0.05] p-5 transition hover:border-amber-300/40 hover:bg-amber-300/[0.08]"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-300">
+                Patent Position
+              </p>
+              <p className="mt-2 font-semibold text-white">
+                Explore mapped applications
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                Review the documented application portfolio and its bounded
+                architectural relationships.
+              </p>
+            </Link>
+
+            <Link
+              href={`/academy/24-link-architecture/provenance/intake?link=${encodeURIComponent(
+                item.linkId,
+              )}`}
+              className="rounded-2xl border border-white/10 bg-white/[0.035] p-5 transition hover:border-indigo-300/30 hover:bg-white/[0.055]"
+            >
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-indigo-300">
+                Administrative Intake
+              </p>
+              <p className="mt-2 font-semibold text-white">
+                Register a source for this link
+              </p>
+              <p className="mt-2 text-sm leading-6 text-slate-400">
+                Open provenance intake with {item.linkId} already selected for
+                a bounded source-to-link relationship.
+              </p>
+            </Link>
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-amber-300/20 bg-amber-300/[0.05] p-7">
           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-amber-200">
             Provenance boundary
           </p>
