@@ -313,11 +313,13 @@ async function getUndeliveredNotifications(
 }
 
 function authorizeRequest(request: NextRequest): boolean {
-  const configuredSecret = getEnv(
+  const ta14Secret = getEnv(
     'TA14_REGISTRY_NOTIFICATION_CRON_SECRET',
   );
 
-  if (!configuredSecret) {
+  const vercelCronSecret = getEnv('CRON_SECRET');
+
+  if (!ta14Secret && !vercelCronSecret) {
     return false;
   }
 
@@ -330,9 +332,14 @@ function authorizeRequest(request: NextRequest): boolean {
     .get('x-ta14-registry-notification-secret')
     ?.trim();
 
-  return (
-    bearer === configuredSecret ||
-    explicitSecret === configuredSecret
+  const acceptedSecrets = new Set(
+    [ta14Secret, vercelCronSecret].filter(Boolean),
+  );
+
+  return Boolean(
+    (bearer && acceptedSecrets.has(bearer)) ||
+      (explicitSecret &&
+        acceptedSecrets.has(explicitSecret)),
   );
 }
 
