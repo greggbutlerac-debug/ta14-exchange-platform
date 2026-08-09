@@ -135,6 +135,7 @@ function reviewHref(notification: NotificationRow) {
 
 function hasExternalDeliveryTracking(notification: NotificationRow) {
   return [
+    'governance_submission_received',
     'governance_registered',
     'governance_review_requested',
     'governance_registration_exception',
@@ -142,6 +143,10 @@ function hasExternalDeliveryTracking(notification: NotificationRow) {
 }
 
 function notificationActionLabel(notification: NotificationRow) {
+  if (notification.notification_type === 'governance_submission_received') {
+    return 'Submission received';
+  }
+
   if (notification.notification_type === 'governance_registration_exception') {
     return 'Registration exception';
   }
@@ -373,9 +378,9 @@ export default function RegistryAdministrationInboxPage() {
             )}
           </div>
           <p className="lead">
-            Institutional awareness for governance registrations and Registry events.
-            Automatic registration remains automatic; this inbox records what happened
-            so completed registrations do not disappear into the database unnoticed.
+            Institutional awareness from the moment a governance submission is received
+            through review, exception handling, registration, and publication readiness.
+            New submissions must not disappear into the database before TA-14 knows they exist.
           </p>
 
           <div className="heroMetaRow">
@@ -409,7 +414,7 @@ export default function RegistryAdministrationInboxPage() {
         >
           <span className="summaryLabel">Unread</span>
           <strong className="summaryNumber">{summary.unreadCount}</strong>
-          <span className="summaryHint">Not yet acknowledged</span>
+          <span className="summaryHint">New submissions and events not yet acknowledged</span>
         </button>
 
         <button
@@ -468,7 +473,7 @@ export default function RegistryAdministrationInboxPage() {
         <div className="controlHeader">
           <div>
             <p className="eyebrow">INBOX CONTROLS</p>
-            <h2>Registration awareness queue</h2>
+            <h2>Submission & registration awareness queue</h2>
           </div>
           <div className="queueReadout">
             <span>{filteredNotifications.length} shown</span>
@@ -482,7 +487,7 @@ export default function RegistryAdministrationInboxPage() {
             <input
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Governance, claimant, identifier, pathway…"
+              placeholder="Submission, governance, claimant, identifier, pathway…"
               type="search"
             />
           </label>
@@ -564,9 +569,9 @@ export default function RegistryAdministrationInboxPage() {
               <p className="eyebrow">NO MATCHING EVENTS</p>
               <h2>{summary.unreadCount === 0 ? 'Nothing is waiting on you.' : 'No events match these filters.'}</h2>
               <p>
-                Automatic registration remains active. Completed registrations, review
-                requests, and registration exceptions will appear here as preserved
-                institutional awareness events.
+                Automatic registration remains active. New submissions, completed
+                registrations, review requests, and registration exceptions will appear
+                here as preserved institutional awareness events.
               </p>
             </div>
           </div>
