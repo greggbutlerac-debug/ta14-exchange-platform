@@ -107,6 +107,42 @@ function buildRecordUrl(row: NotificationDeliveryRow): string {
   return `${normalizedBase}/workspace/ai-governance/registry/inbox`;
 }
 
+function notificationSubject(row: NotificationDeliveryRow): string {
+  if (row.notification_type === 'governance_registration_exception') {
+    return `TA-14 Registry — ACTION REQUIRED — ${row.governance_name}`;
+  }
+
+  if (row.notification_type === 'governance_review_requested') {
+    return `TA-14 Registry — Review requested — ${row.governance_name}`;
+  }
+
+  return `TA-14 Registry — ${row.governance_name} registered`;
+}
+
+function notificationHeadline(row: NotificationDeliveryRow): string {
+  if (row.notification_type === 'governance_registration_exception') {
+    return 'Registration exception requires attention';
+  }
+
+  if (row.notification_type === 'governance_review_requested') {
+    return 'Governance review requested';
+  }
+
+  return 'New governance registered';
+}
+
+function notificationIntro(row: NotificationDeliveryRow): string {
+  if (row.notification_type === 'governance_registration_exception') {
+    return 'A governance registration could not complete its governed automatic-registration pathway and requires Registry attention.';
+  }
+
+  if (row.notification_type === 'governance_review_requested') {
+    return 'A governance submission has entered a review pathway and is waiting for Registry attention.';
+  }
+
+  return 'A governance registration completed automatically in the TA-14 AI Governance Exchange. No manual registration action is required unless the Registry Inbox separately marks the event as requiring attention.';
+}
+
 function buildEmailHtml(row: NotificationDeliveryRow): string {
   const recordUrl = buildRecordUrl(row);
   const identifier =
@@ -128,12 +164,11 @@ function buildEmailHtml(row: NotificationDeliveryRow): string {
         </div>
 
         <h1 style="margin:12px 0 8px;font-size:26px;line-height:1.2;color:#ffffff;">
-          New governance registered
+          ${escapeHtml(notificationHeadline(row))}
         </h1>
 
         <p style="margin:0 0 24px;color:#b9c8da;line-height:1.65;">
-          A governance registration completed automatically in the TA-14 AI Governance Exchange.
-          No manual registration action is required unless the Registry Inbox separately marks the event as requiring attention.
+          ${escapeHtml(notificationIntro(row))}
         </p>
 
         <div style="border:1px solid rgba(255,255,255,.1);border-radius:16px;background:#091321;padding:18px;">
@@ -274,7 +309,7 @@ async function sendWithResend(
     body: JSON.stringify({
       from: fromAddress,
       to: [recipient],
-      subject: `TA-14 Registry — ${row.governance_name} registered`,
+      subject: notificationSubject(row),
       html: buildEmailHtml(row),
     }),
   });
@@ -320,7 +355,11 @@ async function getUndeliveredNotifications(
         'event_payload',
       ].join(','),
     )
-    .eq('notification_type', 'governance_registered')
+    .in('notification_type', [
+      'governance_registered',
+      'governance_review_requested',
+      'governance_registration_exception',
+    ])
     .order('occurred_at', { ascending: true })
     .limit(limit);
 
