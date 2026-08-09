@@ -817,6 +817,13 @@ export default function ExecutionArtifactsLibraryPage() {
     return () => window.clearTimeout(timer);
   }, [copied]);
 
+  function navigateToView(nextView: View, targetId = "artifact-workspace") {
+    setView(nextView);
+    window.setTimeout(() => {
+      document.getElementById(targetId)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 0);
+  }
+
   function openArtifact(item: ArtifactRecord) {
     setSelectedId(item.artifactId);
     setView("inspector");
@@ -845,10 +852,10 @@ export default function ExecutionArtifactsLibraryPage() {
           <span><b>TA-14</b><small>Admissible Execution Architecture</small></span>
         </Link>
         <nav>
-          <button className={view === "library" ? "active" : ""} onClick={() => setView("library")}>Artifact Library</button>
-          <button className={view === "verification" ? "active" : ""} onClick={() => setView("verification")}>Verification</button>
-          <button className={view === "method" ? "active" : ""} onClick={() => setView("method")}>Proof Method</button>
-          <button className={view === "guide" ? "active" : ""} onClick={() => setView("guide")}>How it works</button>
+          <button className={view === "library" ? "active" : ""} onClick={() => navigateToView("library")}>Artifact Library</button>
+          <button className={view === "verification" ? "active" : ""} onClick={() => navigateToView("verification")}>Verification</button>
+          <button className={view === "method" ? "active" : ""} onClick={() => navigateToView("method")}>Proof Method</button>
+          <button className={view === "guide" ? "active" : ""} onClick={() => navigateToView("guide")}>How it works</button>
           <Link href="/governance/directory">Governance Directory</Link>
           <Link href="/artifacts/studio" className="build-link">Build an artifact</Link>
         </nav>
@@ -860,9 +867,9 @@ export default function ExecutionArtifactsLibraryPage() {
           <h1>Execution<br/><em>Artifacts.</em></h1>
           <p>TA-14 produced the proof it asks others to produce: twelve materially different bounded records showing how evidence, authority, continuity, admissibility, binding, commitment, execution control, and outcome closure govern consequence.</p>
           <div className="hero-actions">
-            <button onClick={() => { setView("library"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth" }); }}>Inspect the first twelve</button>
-            <button className="secondary" onClick={() => setView("verification")}>Verify a record</button>
-            <button className="secondary" onClick={() => { setView("guide"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth" }); }}>See the five-step path</button>
+            <button onClick={() => navigateToView("library")}>Inspect the first twelve</button>
+            <button className="secondary" onClick={() => navigateToView("verification")}>Verify a record</button>
+            <button className="secondary" onClick={() => navigateToView("guide")}>See the five-step path</button>
           </div>
           <div className="governing-rule"><small>Governing rule</small><strong>No admissible evidence. No admissible execution.</strong></div>
         </div>
@@ -899,50 +906,12 @@ export default function ExecutionArtifactsLibraryPage() {
             <span key={mark.label}><small>{mark.label}</small><b>{mark.value}</b></span>
           ))}
         </div>
-        <button onClick={() => { setView("guide"); document.getElementById("artifact-workspace")?.scrollIntoView({ behavior: "smooth", block: "start" }); }}>Follow the path →</button>
+        <button onClick={() => navigateToView("guide")}>Follow the path →</button>
       </section>
 
-      <section className="governed-review-lineage" aria-label="Governed review artifacts">
-        <div className="review-lineage-head">
-          <div>
-            <small>Governed review lineage</small>
-            <h2>Review artifacts remain distinct from execution proof.</h2>
-          </div>
-          <p>These records preserve evidence review, architectural findings, and version-specific continuation without being counted among the twelve completed TA-14 execution artifacts.</p>
-        </div>
-        <article className="review-lineage-card">
-          <div className="review-lineage-identity">
-            <span>FD-2026-0002</span>
-            <div>
-              <small>Harmonic Constitutional Runtime · Case 002</small>
-              <h3>Version 2.0 Evidence Review</h3>
-            </div>
-          </div>
-          <div className="review-lineage-status">
-            <b>PARTIAL ADMISSIBILITY</b>
-            <span>Runtime validation open</span>
-          </div>
-          <p>Seven preserved Version 2 evidence records support material architectural and evidentiary advancement. Executable proof of changed-state re-evaluation, determination receipts, replay, binding, commit, execution control, and outcome remains open.</p>
-          <div className="review-lineage-facts">
-            <span><small>Artifact class</small><b>Evidence Review Artifact</b></span>
-            <span><small>Governance Registry</small><b>TA-14-AIGR-000010</b></span>
-            <span><small>Version</small><b>2.0</b></span>
-            <span><small>Evidence reviewed</small><b>7 records</b></span>
-          </div>
-          <div className="review-lineage-boundary">
-            <strong>Boundary</strong>
-            <span>No executable Version 2 evidence. No executable Version 2 finding.</span>
-          </div>
-          <div className="review-lineage-actions">
-            <Link href="/artifacts/fd-2026-0002-case-002">Open Case 002 →</Link>
-            <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Inspect admitted evidence</Link>
-          </div>
-        </article>
-      </section>
-
-      <section id="artifact-workspace" className="workspace">
+      <section id="artifact-workspace" className="workspace" aria-label="Founding execution artifacts and artifact tools">
         <div className="workspace-head">
-          <div><small>Public proof corpus</small><h2>{view === "library" ? "Inspect completed execution artifacts" : view === "inspector" ? selected.artifactId : view === "verification" ? "Verification center" : view === "guide" ? "From governance registration to public proof" : "Canonical proof method"}</h2></div>
+          <div><small>{view === "library" ? "Founding execution artifacts · 12 public records" : "Public proof corpus"}</small><h2>{view === "library" ? "Inspect completed execution artifacts" : view === "inspector" ? selected.artifactId : view === "verification" ? "Verification center" : view === "guide" ? "From governance registration to public proof" : "Canonical proof method"}</h2></div>
           <p>{view === "library" ? "Filter the founding set by determination, controlling chain link, sector, or verification level." : view === "inspector" ? selected.title : view === "verification" ? "Resolve an artifact, receipt, or route identifier against the published founding set." : view === "guide" ? "Five governed steps take an organization from attributable registration to a registered, inspectable execution artifact." : "The method every public artifact must preserve before TA-14 treats it as execution proof."}</p>
         </div>
 
@@ -955,7 +924,7 @@ export default function ExecutionArtifactsLibraryPage() {
                 <p>Every artifact is attributable to a registered governance, bound to a frozen route, verified against a preserved package, and open to challenge without rewriting the original event.</p>
               </div>
               <div className="onboarding-actions">
-                <button onClick={() => setView("guide")}>Show me the five steps</button>
+                <button onClick={() => navigateToView("guide")}>Show me the five steps</button>
                 <Link href="/governance/register">Register AI governance</Link>
               </div>
             </div>
@@ -1004,7 +973,7 @@ export default function ExecutionArtifactsLibraryPage() {
 
         {view === "inspector" && (
           <div className="inspector" style={{ "--tone": selected.color } as React.CSSProperties}>
-            <button className="back-button" onClick={() => setView("library")}>← Return to artifact library</button>
+            <button className="back-button" onClick={() => navigateToView("library")}>← Return to artifact library</button>
             <div className="inspector-hero">
               <div>
                 <small>{selected.series} · {selected.sector}</small>
@@ -1119,10 +1088,48 @@ export default function ExecutionArtifactsLibraryPage() {
         )}
       </section>
 
+      <section className="governed-review-lineage" aria-label="Governed review artifacts">
+        <div className="review-lineage-head">
+          <div>
+            <small>Governed review lineage</small>
+            <h2>Review artifacts remain distinct from execution proof.</h2>
+          </div>
+          <p>These records preserve evidence review, architectural findings, and version-specific continuation without being counted among the twelve completed TA-14 execution artifacts.</p>
+        </div>
+        <article className="review-lineage-card">
+          <div className="review-lineage-identity">
+            <span>FD-2026-0002</span>
+            <div>
+              <small>Harmonic Constitutional Runtime · Case 002</small>
+              <h3>Version 2.0 Evidence Review</h3>
+            </div>
+          </div>
+          <div className="review-lineage-status">
+            <b>PARTIAL ADMISSIBILITY</b>
+            <span>Runtime validation open</span>
+          </div>
+          <p>Seven preserved Version 2 evidence records support material architectural and evidentiary advancement. Executable proof of changed-state re-evaluation, determination receipts, replay, binding, commit, execution control, and outcome remains open.</p>
+          <div className="review-lineage-facts">
+            <span><small>Artifact class</small><b>Evidence Review Artifact</b></span>
+            <span><small>Governance Registry</small><b>TA-14-AIGR-000010</b></span>
+            <span><small>Version</small><b>2.0</b></span>
+            <span><small>Evidence reviewed</small><b>7 records</b></span>
+          </div>
+          <div className="review-lineage-boundary">
+            <strong>Boundary</strong>
+            <span>No executable Version 2 evidence. No executable Version 2 finding.</span>
+          </div>
+          <div className="review-lineage-actions">
+            <Link href="/artifacts/fd-2026-0002-case-002">Open Case 002 →</Link>
+            <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Inspect admitted evidence</Link>
+          </div>
+        </article>
+      </section>
+
       <footer>
         <div><b>TA-14 Authority</b><span>Governance Institution for Admissible Execution Architecture</span></div>
         <strong>No admissible evidence. No admissible execution.</strong>
-        <div><Link href="/">Exchange</Link><Link href="/artifacts/studio">Artifact Studio</Link><Link href="/governance/register">Register governance</Link><button onClick={() => setView("verification")}>Verification</button></div>
+        <div><Link href="/">Exchange</Link><Link href="/artifacts/studio">Artifact Studio</Link><Link href="/governance/register">Register governance</Link><button onClick={() => navigateToView("verification")}>Verification</button></div>
       </footer>
 
       <style jsx>{`
