@@ -1,43 +1,31 @@
 begin;
 
 -- ============================================================================
--- TA-14 REGISTRY ADMIN AWARENESS EXPANSION
+-- TA-14 REGISTRY ADMIN REVIEW / EXCEPTION AWARENESS
 --
--- Adds administrator notifications for governance submissions that require
--- human attention after the participant submits them.
+-- Expands the existing Registry Administration Inbox so it surfaces:
+--
+--   1. governance submissions waiting for a non-automatic review pathway;
+--   2. governed automatic-registration exceptions requiring attention.
 --
 -- Existing governance_registered notifications remain unchanged.
 --
--- New notification types:
---   governance_review_requested
---   governance_registration_exception
---
--- This does not alter registration eligibility, review findings, identifiers,
--- or authoritative Registry state.
+-- This migration does not alter registration eligibility, review outcomes,
+-- Registry identifiers, certification status, endorsement status, or public
+-- Registry records.
 -- ============================================================================
-
-alter table public.ta14_registry_admin_notifications
-  drop constraint if exists
-    ta14_registry_admin_notifications_notification_type_check;
-
-alter table public.ta14_registry_admin_notifications
-  add constraint
-    ta14_registry_admin_notifications_notification_type_check
-  check (
-    notification_type in (
-      'governance_registered',
-      'governance_review_requested',
-      'governance_registration_exception'
-    )
-  );
 
 
 -- ============================================================================
 -- REVIEW-REQUEST NOTIFICATION
 --
--- Fires when a governance submission enters SUBMITTED and remains without a
--- Registry Identifier. Automatic pathways that immediately reach REGISTERED
--- are not left as review requests.
+-- A submission that remains in SUBMITTED state without a Registry Identifier
+-- requires administrative awareness.
+--
+-- This trigger may briefly observe automatic-pathway submissions as SUBMITTED
+-- before the automatic finalizer completes. The resulting Inbox event remains
+-- a chronology record; when registration completes, the separate
+-- governance_registered event is also preserved.
 -- ============================================================================
 
 create or replace function
@@ -60,7 +48,8 @@ begin
 
   if tg_op = 'UPDATE'
      and old.status = new.status
-     and old.requested_review_pathway is not distinct from new.requested_review_pathway
+     and old.requested_review_pathway
+       is not distinct from new.requested_review_pathway
   then
     return new;
   end if;
@@ -72,47 +61,70 @@ begin
     notification_key,
     notification_type,
     priority,
-    registry_submission_id,
+    state,
+
+    submission_id,
     registry_identifier,
     governance_name,
     claimant_name,
     organization_name,
-    contact_email,
     requested_review_pathway,
-    registry_status,
-    occurred_at,
+
     title,
     message,
-    metadata
+    event_payload,
+
+    occurred_at
   )
   values (
     notification_key_value,
     'governance_review_requested',
     'attention',
+    'unread',
+
     new.id,
     new.registry_identifier,
     new.governance_name,
     new.claimant_name,
     new.organization_name,
-    new.contact_email,
     new.requested_review_pathway,
-    new.status,
-    coalesce(new.submitted_at, new.updated_at, now()),
+
     'Governance review requested',
-    concat(
-      coalesce(new.governance_name, 'A governance entity'),
-      ' submitted for ',
-      coalesce(new.requested_review_pathway, 'governance review'),
-      ' and is waiting for Registry attention.'
+
+    format(
+      '%s submitted through the %s pathway and is awaiting Registry attention.',
+      new.governance_name,
+      coalesce(
+        nullif(btrim(new.requested_review_pathway), ''),
+        'unspecified review'
+      )
     ),
+
     jsonb_build_object(
       'submission_id', new.id,
-      'review_pathway', new.requested_review_pathway,
+      'governance_name', new.governance_name,
+      'claimant_name', new.claimant_name,
+      'organization_name', new.organization_name,
+      'contact_email', new.contact_email,
+      'requested_review_pathway',
+        new.requested_review_pathway,
       'status', new.status,
-      'source', 'ai_governance_registry_submissions'
+      'submitted_at', new.submitted_at,
+      'source',
+        'ai_governance_registry_submissions',
+      'requires_administrative_awareness', true,
+      'boundary',
+        'A request for Registry review is not registration, certification, endorsement, technical validation, legal approval, regulatory approval, ownership adjudication, or proof of performance.'
+    ),
+
+    coalesce(
+      new.submitted_at,
+      new.updated_at,
+      timezone('utc', now())
     )
   )
-  on conflict (notification_key) do nothing;
+  on conflict (notification_key)
+  do nothing;
 
   return new;
 end;
@@ -120,11 +132,20 @@ $$;
 
 revoke all
   on function public.ta14_registry_notify_review_requested_v1()
-  from public, anon, authenticated;
+  from public;
+
+revoke all
+  on function public.ta14_registry_notify_review_requested_v1()
+  from anon;
+
+revoke all
+  on function public.ta14_registry_notify_review_requested_v1()
+  from authenticated;
+
 
 drop trigger if exists
   ta14_registry_review_requested_admin_notification
-on public.ai_governance_registry_submissions;
+  on public.ai_governance_registry_submissions;
 
 create trigger
   ta14_registry_review_requested_admin_notification
@@ -138,8 +159,27 @@ execute function
 -- ============================================================================
 -- REGISTRATION-EXCEPTION NOTIFICATION
 --
--- Fires when the governed automatic finalizer preserves a registration
--- exception requiring administrative attention.
+-- The registration-exception table is created by the deployed Registry
+-- database architecture and is already consumed by the application.
+--
+-- Its observed production/application columns include:
+--
+--   id
+--   submission_id
+--   owner_user_id
+--   exception_status
+--   exception_type
+--   exception_code
+--   exception_summary
+--   exception_details
+--   readiness_failures
+--   resolution_summary
+--   opened_at
+--   resolved_at
+--   updated_at
+--
+-- An exception is a stronger administrative signal than an ordinary review
+-- request, therefore it uses action_required priority.
 -- ============================================================================
 
 create or replace function
@@ -150,7 +190,9 @@ security definer
 set search_path = public
 as $$
 declare
-  submission_row public.ai_governance_registry_submissions%rowtype;
+  submission_row
+    public.ai_governance_registry_submissions%rowtype;
+
   notification_key_value text;
 begin
   select *
@@ -159,63 +201,106 @@ begin
   where id = new.submission_id;
 
   notification_key_value :=
-    'governance_registration_exception:' || new.id::text;
+    'governance_registration_exception:' ||
+    new.id::text;
 
   insert into public.ta14_registry_admin_notifications (
     notification_key,
     notification_type,
     priority,
-    registry_submission_id,
+    state,
+
+    submission_id,
     registry_identifier,
     governance_name,
     claimant_name,
     organization_name,
-    contact_email,
     requested_review_pathway,
-    registry_status,
-    occurred_at,
+
     title,
     message,
-    metadata
+    event_payload,
+
+    occurred_at
   )
   values (
     notification_key_value,
     'governance_registration_exception',
-    'urgent',
+    'action_required',
+    'unread',
+
     new.submission_id,
     submission_row.registry_identifier,
-    coalesce(submission_row.governance_name, 'Governance registration'),
+    coalesce(
+      submission_row.governance_name,
+      'Governance registration'
+    ),
     submission_row.claimant_name,
     submission_row.organization_name,
-    submission_row.contact_email,
     submission_row.requested_review_pathway,
-    submission_row.status,
-    coalesce(new.created_at, now()),
+
     'Registration exception requires attention',
-    concat(
-      coalesce(submission_row.governance_name, 'A governance registration'),
-      ' could not complete automatic registration and requires administrative attention.'
+
+    format(
+      '%s could not complete automatic registration and requires Registry attention.',
+      coalesce(
+        submission_row.governance_name,
+        'A governance registration'
+      )
     ),
+
     jsonb_build_object(
       'submission_id', new.submission_id,
       'exception_id', new.id,
       'exception_status', new.exception_status,
-      'source', 'ta14_registry_registration_exceptions'
+      'exception_type', new.exception_type,
+      'exception_code', new.exception_code,
+      'exception_summary', new.exception_summary,
+      'exception_details', new.exception_details,
+      'readiness_failures', new.readiness_failures,
+      'opened_at', new.opened_at,
+      'contact_email', submission_row.contact_email,
+      'requested_review_pathway',
+        submission_row.requested_review_pathway,
+      'source',
+        'ta14_registry_registration_exceptions',
+      'requires_administrative_action', true,
+      'boundary',
+        'A registration exception concerns registration readiness and does not constitute certification, endorsement, technical validation, legal approval, regulatory approval, or a merits finding concerning the governance architecture.'
+    ),
+
+    coalesce(
+      new.opened_at,
+      new.updated_at,
+      timezone('utc', now())
     )
   )
-  on conflict (notification_key) do nothing;
+  on conflict (notification_key)
+  do nothing;
 
   return new;
 end;
 $$;
 
 revoke all
-  on function public.ta14_registry_notify_registration_exception_v1()
-  from public, anon, authenticated;
+  on function
+    public.ta14_registry_notify_registration_exception_v1()
+  from public;
+
+revoke all
+  on function
+    public.ta14_registry_notify_registration_exception_v1()
+  from anon;
+
+revoke all
+  on function
+    public.ta14_registry_notify_registration_exception_v1()
+  from authenticated;
+
 
 drop trigger if exists
   ta14_registry_registration_exception_admin_notification
-on public.ta14_registry_registration_exceptions;
+  on public.ta14_registry_registration_exceptions;
 
 create trigger
   ta14_registry_registration_exception_admin_notification
@@ -229,56 +314,190 @@ execute function
 -- ============================================================================
 -- BACKFILL CURRENT WAITING SUBMISSIONS
 --
--- Makes already-submitted review-pathway records visible immediately after
--- this migration is applied.
+-- Makes already-submitted, non-registered governance records visible in the
+-- Administration Inbox after deployment.
 -- ============================================================================
 
 insert into public.ta14_registry_admin_notifications (
   notification_key,
   notification_type,
   priority,
-  registry_submission_id,
+  state,
+
+  submission_id,
   registry_identifier,
   governance_name,
   claimant_name,
   organization_name,
-  contact_email,
   requested_review_pathway,
-  registry_status,
-  occurred_at,
+
   title,
   message,
-  metadata
+  event_payload,
+
+  occurred_at
 )
 select
-  'governance_review_requested:' || s.id::text,
+  'governance_review_requested:' ||
+    submission.id::text,
+
   'governance_review_requested',
   'attention',
-  s.id,
-  s.registry_identifier,
-  s.governance_name,
-  s.claimant_name,
-  s.organization_name,
-  s.contact_email,
-  s.requested_review_pathway,
-  s.status,
-  coalesce(s.submitted_at, s.updated_at, s.created_at),
+  'unread',
+
+  submission.id,
+  submission.registry_identifier,
+  submission.governance_name,
+  submission.claimant_name,
+  submission.organization_name,
+  submission.requested_review_pathway,
+
   'Governance review requested',
-  concat(
-    coalesce(s.governance_name, 'A governance entity'),
-    ' submitted for ',
-    coalesce(s.requested_review_pathway, 'governance review'),
-    ' and is waiting for Registry attention.'
+
+  format(
+    '%s submitted through the %s pathway and is awaiting Registry attention.',
+    submission.governance_name,
+    coalesce(
+      nullif(
+        btrim(submission.requested_review_pathway),
+        ''
+      ),
+      'unspecified review'
+    )
   ),
+
   jsonb_build_object(
-    'submission_id', s.id,
-    'review_pathway', s.requested_review_pathway,
-    'status', s.status,
-    'source', 'backfill'
+    'submission_id', submission.id,
+    'governance_name', submission.governance_name,
+    'claimant_name', submission.claimant_name,
+    'organization_name', submission.organization_name,
+    'contact_email', submission.contact_email,
+    'requested_review_pathway',
+      submission.requested_review_pathway,
+    'status', submission.status,
+    'submitted_at', submission.submitted_at,
+    'source', 'migration_backfill',
+    'requires_administrative_awareness', true
+  ),
+
+  coalesce(
+    submission.submitted_at,
+    submission.updated_at,
+    submission.created_at
   )
-from public.ai_governance_registry_submissions s
-where s.status = 'submitted'
-  and s.registry_identifier is null
-on conflict (notification_key) do nothing;
+
+from public.ai_governance_registry_submissions
+  as submission
+
+where
+  submission.status = 'submitted'
+  and submission.registry_identifier is null
+
+on conflict (notification_key)
+do nothing;
+
+
+-- ============================================================================
+-- BACKFILL OPEN REGISTRATION EXCEPTIONS
+--
+-- Existing unresolved exceptions become visible immediately.
+-- ============================================================================
+
+insert into public.ta14_registry_admin_notifications (
+  notification_key,
+  notification_type,
+  priority,
+  state,
+
+  submission_id,
+  registry_identifier,
+  governance_name,
+  claimant_name,
+  organization_name,
+  requested_review_pathway,
+
+  title,
+  message,
+  event_payload,
+
+  occurred_at
+)
+select
+  'governance_registration_exception:' ||
+    exception_record.id::text,
+
+  'governance_registration_exception',
+  'action_required',
+  'unread',
+
+  exception_record.submission_id,
+  submission.registry_identifier,
+  coalesce(
+    submission.governance_name,
+    'Governance registration'
+  ),
+  submission.claimant_name,
+  submission.organization_name,
+  submission.requested_review_pathway,
+
+  'Registration exception requires attention',
+
+  format(
+    '%s has an unresolved registration exception requiring Registry attention.',
+    coalesce(
+      submission.governance_name,
+      'A governance registration'
+    )
+  ),
+
+  jsonb_build_object(
+    'submission_id', exception_record.submission_id,
+    'exception_id', exception_record.id,
+    'exception_status',
+      exception_record.exception_status,
+    'exception_type',
+      exception_record.exception_type,
+    'exception_code',
+      exception_record.exception_code,
+    'exception_summary',
+      exception_record.exception_summary,
+    'exception_details',
+      exception_record.exception_details,
+    'readiness_failures',
+      exception_record.readiness_failures,
+    'opened_at',
+      exception_record.opened_at,
+    'contact_email',
+      submission.contact_email,
+    'source',
+      'migration_backfill',
+    'requires_administrative_action',
+      true
+  ),
+
+  coalesce(
+    exception_record.opened_at,
+    exception_record.updated_at,
+    timezone('utc', now())
+  )
+
+from public.ta14_registry_registration_exceptions
+  as exception_record
+
+left join public.ai_governance_registry_submissions
+  as submission
+  on submission.id =
+    exception_record.submission_id
+
+where
+  exception_record.exception_status in (
+    'open',
+    'correction_required',
+    'under_review'
+  )
+
+on conflict (notification_key)
+do nothing;
+
 
 commit;
