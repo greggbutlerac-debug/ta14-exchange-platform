@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   TA14_24_LINKS,
-  TA14_FOUNDATIONAL_CHAIN,
+  TA14_CHAIN_OF_EIGHT,
 } from "@/lib/academy/ta14-24-link-canon";
 
 export const metadata = {
@@ -13,32 +13,34 @@ export const metadata = {
 const regions = [
   {
     title: "Reality & Evidence",
-    range: [1, 6],
+    range: [1, 6] as const,
     description:
       "Establish what is real, preserve it as a record, protect continuity, govern evidence, and determine what may be treated as admissible truth.",
   },
   {
     title: "Reliance, Authority & Consequence",
-    range: [7, 12],
+    range: [7, 12] as const,
     description:
       "Determine whether evidence may be relied upon, who may act, whether authority is legitimate, and how consequence begins to form and attach.",
   },
   {
     title: "Binding, Commit & Execution",
-    range: [13, 19],
+    range: [13, 19] as const,
     description:
       "Govern binding and commitment boundaries, current execution reality, admissible non-occurrence, prevented consequence, and execution itself.",
   },
   {
     title: "Outcome, Recursion & Memory",
-    range: [20, 24],
+    range: [20, 24] as const,
     description:
       "Observe outcome reality, determine the outcome, establish the new reality, preserve memory, and govern entry into the future chain.",
   },
 ] as const;
 
 function getRegionLinks(start: number, end: number) {
-  return TA14_24_LINKS.filter((item) => item.number >= start && item.number <= end);
+  return TA14_24_LINKS.filter(
+    (item) => item.order >= start && item.order <= end,
+  );
 }
 
 export default function TA1424LinkExplorerPage() {
@@ -71,7 +73,7 @@ export default function TA1424LinkExplorerPage() {
                 parent route; it does not move the origin of the original eight.
               </p>
               <div className="mt-5 flex flex-wrap gap-2">
-                {TA14_FOUNDATIONAL_CHAIN.map((name, index) => (
+                {TA14_CHAIN_OF_EIGHT.map((name, index) => (
                   <span
                     key={`${name}-${index}`}
                     className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-slate-300"
@@ -117,16 +119,16 @@ export default function TA1424LinkExplorerPage() {
                 <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
                   {links.map((item) => (
                     <article
-                      key={item.id}
+                      key={item.linkId}
                       className="group rounded-2xl border border-white/10 bg-white/[0.035] p-6 transition hover:-translate-y-1 hover:border-sky-300/35 hover:bg-white/[0.055]"
                     >
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-                            Link {String(item.number).padStart(2, "0")}
+                            Link {String(item.order).padStart(2, "0")}
                           </p>
                           <h3 className="mt-2 text-xl font-semibold">
-                            {item.name}
+                            {item.canonicalName}
                           </h3>
                         </div>
                         <span className="rounded-full border border-white/10 px-2.5 py-1 text-xs text-slate-400">
@@ -135,7 +137,7 @@ export default function TA1424LinkExplorerPage() {
                       </div>
 
                       <p className="mt-5 line-clamp-4 text-sm leading-6 text-slate-300">
-                        {item.canonicalDefinition}
+                        {item.definition}
                       </p>
 
                       <div className="mt-6 border-t border-white/10 pt-5">
@@ -149,7 +151,7 @@ export default function TA1424LinkExplorerPage() {
 
                       <Link
                         href={`/academy/24-link-architecture/${String(
-                          item.number,
+                          item.order,
                         ).padStart(2, "0")}-${item.slug}`}
                         className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-sky-300 transition group-hover:text-sky-200"
                       >
