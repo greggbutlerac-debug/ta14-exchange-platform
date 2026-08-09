@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 import { TA14ProvenanceAdminLink } from "@/components/academy/ta14-provenance-admin-link";
 import {
@@ -15,11 +16,36 @@ import {
 } from "@/lib/academy/ta14-canonical-registry";
 
 export default function TA14ProvenanceMapPage() {
+  return (
+    <Suspense fallback={<TA14ProvenanceMapRouteLoading />}>
+      <TA14ProvenanceMapContent />
+    </Suspense>
+  );
+}
+
+function TA14ProvenanceMapContent() {
+  const searchParams = useSearchParams();
+  const requestedLink = searchParams.get("link");
+
   const [bundles, setBundles] = useState<TA14LinkProvenanceBundle[]>([]);
   const [selectedLinkId, setSelectedLinkId] =
     useState<TA14LinkId>("TA14-LINK-01");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!requestedLink) {
+      return;
+    }
+
+    const matched = TA14_24_LINKS.find(
+      (item) => item.linkId === requestedLink,
+    );
+
+    if (matched) {
+      setSelectedLinkId(matched.linkId);
+    }
+  }, [requestedLink]);
 
   useEffect(() => {
     let cancelled = false;
@@ -122,6 +148,24 @@ export default function TA14ProvenanceMapPage() {
             and other provenance-bearing records without collapsing those
             sources into a single claim.
           </p>
+
+          {requestedLink &&
+          TA14_24_LINKS.some((item) => item.linkId === requestedLink) ? (
+            <div className="mt-7 inline-flex rounded-2xl border border-indigo-300/25 bg-indigo-300/[0.06] px-4 py-3">
+              <p className="text-sm text-indigo-100">
+                Focused provenance view:{" "}
+                <strong>
+                  {requestedLink}
+                  {" · "}
+                  {
+                    TA14_24_LINKS.find(
+                      (item) => item.linkId === requestedLink,
+                    )?.canonicalName
+                  }
+                </strong>
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -342,5 +386,27 @@ function Metric({ value, label }: { value: string; label: string }) {
       <div className="text-3xl font-semibold">{value}</div>
       <div className="mt-2 text-xs leading-5 text-slate-400">{label}</div>
     </div>
+  );
+}
+
+
+function TA14ProvenanceMapRouteLoading() {
+  return (
+    <main className="min-h-screen bg-[#030712] text-white">
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-300">
+            TA-14 Academy · Provenance Map
+          </p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+            Resolving link-focused provenance…
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400">
+            Preparing the requested canonical link and its governed source
+            relationships.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
