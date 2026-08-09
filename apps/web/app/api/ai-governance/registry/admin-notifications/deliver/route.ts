@@ -81,6 +81,27 @@ function getEmailDeliveryCutoff(): string | null {
   return parsed.toISOString();
 }
 
+function getRetryCooldownMinutes(): number {
+  const raw = getEnv(
+    'TA14_REGISTRY_NOTIFICATION_RETRY_MINUTES',
+  );
+
+  if (!raw) {
+    return 30;
+  }
+
+  const parsed = Number(raw);
+
+  if (!Number.isFinite(parsed)) {
+    return 30;
+  }
+
+  return Math.min(
+    24 * 60,
+    Math.max(5, Math.trunc(parsed)),
+  );
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -254,6 +275,38 @@ async function alreadyDelivered(
   return Boolean(data?.id);
 }
 
+async function recentlyFailed(
+  notificationId: string,
+  recipient: string,
+  cooldownMinutes: number,
+): Promise<boolean> {
+  const supabase = getServiceClient();
+
+  const cutoff = new Date(
+    Date.now() - cooldownMinutes * 60 * 1000,
+  ).toISOString();
+
+  const { data, error } = await supabase
+    .from('ta14_registry_admin_notification_deliveries')
+    .select('id,attempted_at')
+    .eq('notification_id', notificationId)
+    .eq('channel', DELIVERY_CHANNEL)
+    .eq('recipient', recipient)
+    .eq('delivery_state', 'failed')
+    .gte('attempted_at', cutoff)
+    .order('attempted_at', { ascending: false })
+    .limit(1);
+
+  if (error) {
+    throw new Error(
+      `Unable to inspect recent notification delivery failures: ${error.message}`,
+    );
+  }
+
+  return Array.isArray(data) && data.length > 0;
+}
+
+
 async function recordDelivery(args: {
   notificationId: string;
   recipient: string;
@@ -329,6 +382,24 @@ async function sendWithResend(
   return payload?.id ?? null;
 }
 
+function shouldDeliverNotification(
+  row: NotificationDeliveryRow,
+): boolean {
+  /*
+   * Completed registration is a durable awareness event and remains eligible
+   * for external delivery even if its Inbox state was acknowledged quickly.
+   *
+   * Review requests and registration exceptions represent current attention
+   * conditions. Once resolved in the Administration Inbox, they should not
+   * generate a stale action email afterward.
+   */
+  if (row.notification_type === 'governance_registered') {
+    return true;
+  }
+
+  return row.state !== 'resolved';
+}
+
 async function getUndeliveredNotifications(
   limit: number,
   cutoffAt: string | null,
@@ -360,8 +431,15 @@ async function getUndeliveredNotifications(
       'governance_review_requested',
       'governance_registration_exception',
     ])
-    .order('occurred_at', { ascending: true })
-    .limit(limit);
+    .order('occurred_at', { ascending: false })
+    /*
+     * Read a bounded candidate window larger than the requested delivery
+     * batch. Successful delivery is preserved in a separate audit table, so
+     * limiting the notification query to exactly `limit` can otherwise let
+     * already-delivered historical rows permanently starve newer undelivered
+     * notifications.
+     */
+    .limit(Math.min(Math.max(limit * 10, 100), 1000));
 
   if (cutoffAt) {
     query = query.gte('occurred_at', cutoffAt);
@@ -375,7 +453,11 @@ async function getUndeliveredNotifications(
     );
   }
 
-  return (data ?? []) as unknown as NotificationDeliveryRow[];
+  return (
+    (data ?? []) as unknown as NotificationDeliveryRow[]
+  )
+    .filter(shouldDeliverNotification)
+    .slice(0, limit);
 }
 
 function authorizeRequest(request: NextRequest): boolean {
@@ -441,6 +523,8 @@ async function deliver(request: NextRequest) {
       : 25;
 
     const cutoffAt = getEmailDeliveryCutoff();
+    const retryCooldownMinutes =
+      getRetryCooldownMinutes();
 
     const notifications =
       await getUndeliveredNotifications(
@@ -466,6 +550,27 @@ async function deliver(request: NextRequest) {
             delivered: false,
             skipped: true,
             reason: `Already delivered to ${recipient}.`,
+          });
+
+          continue;
+        }
+
+        const failedRecently = await recentlyFailed(
+          notification.id,
+          recipient,
+          retryCooldownMinutes,
+        );
+
+        if (failedRecently) {
+          results.push({
+            notificationId: notification.id,
+            registryIdentifier:
+              notification.registry_identifier,
+            governanceName: notification.governance_name,
+            delivered: false,
+            skipped: true,
+            reason:
+              `Recent failed attempt is inside the ${retryCooldownMinutes}-minute retry cooldown for ${recipient}.`,
           });
 
           continue;
@@ -523,6 +628,7 @@ async function deliver(request: NextRequest) {
       inspectedNotifications: notifications.length,
       recipients: recipients.length,
       emailDeliveryCutoffAt: cutoffAt,
+      retryCooldownMinutes,
       delivered: results.filter((item) => item.delivered).length,
       skipped: results.filter((item) => item.skipped).length,
       failed: results.filter(
