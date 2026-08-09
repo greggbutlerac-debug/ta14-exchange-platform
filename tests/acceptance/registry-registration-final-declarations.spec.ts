@@ -93,7 +93,7 @@ describe('TA-14 Registry final declaration regression', () => {
       'async function downloadManifest()',
     );
     const end = source.indexOf(
-      'async function submitForReview()',
+      'function handleSubmit',
       start,
     );
 
