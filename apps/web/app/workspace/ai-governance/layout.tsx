@@ -2,7 +2,19 @@ import Link from "next/link";
 
 import { LogoutButton } from "../../../components/auth/logout-button";
 import { AiGovernanceNavigation } from "../../../components/workspace/ai-governance-navigation";
+import { AiGovernanceWorkspaceShell } from "../../../components/workspace/ai-governance-workspace-shell";
 import { requireUser } from "../../../lib/auth/require-user";
+
+function isRegistryReviewer(email: string | null | undefined) {
+  if (!email) return false;
+
+  const reviewers = (process.env.TA14_REGISTRY_REVIEWER_EMAILS ?? "")
+    .split(",")
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+
+  return reviewers.includes(email.trim().toLowerCase());
+}
 
 export default async function AiGovernanceLayout({
   children,
@@ -11,6 +23,7 @@ export default async function AiGovernanceLayout({
 }>) {
   const user = await requireUser();
   const accountEmail = user.email ?? "Authenticated account";
+  const showRegistryMissionControl = isRegistryReviewer(user.email);
 
   return (
     <div className="ta14-workspace-frame">
@@ -496,7 +509,13 @@ export default async function AiGovernanceLayout({
 
       <AiGovernanceNavigation />
 
-      <main className="ta14-workspace-content">{children}</main>
+      <main className="ta14-workspace-content">
+        <AiGovernanceWorkspaceShell
+          showRegistryMissionControl={showRegistryMissionControl}
+        >
+          {children}
+        </AiGovernanceWorkspaceShell>
+      </main>
     </div>
   );
 }
