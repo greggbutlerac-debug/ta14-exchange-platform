@@ -97,6 +97,13 @@ export default function TA14ProvenanceMapPage() {
                 Explore patent portfolio
               </Link>
 
+              <Link
+                href="/academy/24-link-architecture/provenance/patents/families"
+                className="inline-flex items-center gap-2 rounded-full border border-indigo-300/20 bg-indigo-300/[0.06] px-4 py-2 text-xs font-semibold text-indigo-200 transition hover:border-indigo-300/40 hover:bg-indigo-300/[0.1]"
+              >
+                Browse eight patent families
+              </Link>
+
               <TA14ProvenanceAdminLink />
             </div>
           </div>
