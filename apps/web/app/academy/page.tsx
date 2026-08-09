@@ -55,6 +55,12 @@ const railItems: RailItem[] = [
     action: "Inspect",
   },
   {
+    label: "24-Link Academy",
+    href: "/academy/24-link-academy",
+    glyph: "24",
+    action: "Master",
+  },
+  {
     label: "Learning Routes",
     href: "/academy/routes",
     glyph: "RT",
@@ -159,12 +165,12 @@ const pathways: Pathway[] = [
   },
   {
     number: "02",
-    eyebrow: "ARCHITECTURE",
-    title: "Inspect the chain before you build.",
-    description: "Explore the eight visible anchors while preserving the distinction between public orientation and the verified complete 24-link runtime architecture.",
-    href: "/academy/architecture-explorer",
-    action: "Explore architecture",
-    status: "ORIENTATION",
+    eyebrow: "24-LINK ARCHITECTURE",
+    title: "Learn the full admissible-execution route.",
+    description: "Begin with the Chain of Eight publicly published May 1, 2025, then enter the current 24-link architecture through canonical lessons, Route State, failure simulation, evidence mapping, recursion, and demonstrated mastery.",
+    href: "/academy/24-link-academy",
+    action: "Enter 24-Link Academy",
+    status: "FLAGSHIP PROGRAM",
   },
   {
     number: "03",
@@ -1742,6 +1748,9 @@ export default function AcademyPage() {
                   <span>Start Here</span>
                   <b aria-hidden="true">→</b>
                 </Link>
+                <Link className="academyButtonSecondary" href="/academy/24-link-academy">
+                  Enter the 24-Link Academy
+                </Link>
                 <Link className="academyButtonSecondary" href="/academy/architecture-explorer">
                   Explore the architecture
                 </Link>
@@ -1793,8 +1802,10 @@ export default function AcademyPage() {
                 <h2>See the complete governing movement before entering the tools.</h2>
               </div>
               <p>
-                These eight visible anchors provide the public orientation. They
-                remain distinct from TA-14&apos;s verified complete 24-link runtime architecture.
+                The Chain of Eight - Reality, Record, Continuity, Admissibility, Binding,
+                Commit, Execution, and Outcome - was already created and publicly published
+                May 1, 2025. The current 24-link architecture is the subsequent
+                higher-resolution expansion and maturation of that existing parent route.
               </p>
             </div>
             <div className="academyAnchorGrid">
@@ -1811,8 +1822,21 @@ export default function AcademyPage() {
               <p>
                 Zero Trust asks whether an actor and request should be trusted.
                 Admissible execution asks whether this specific action has earned
-                the right to bind to reality now.
+                the right to bind to reality now. The 24-Link Academy makes that
+                route learnable, testable, evidence-mappable, replayable, and state-aware.
               </p>
+            </div>
+            <div className="academyHeroActions">
+              <Link className="academyButtonPrimary" href="/academy/24-link-academy">
+                <span>Enter the full 24-Link Academy</span>
+                <b aria-hidden="true">→</b>
+              </Link>
+              <Link className="academyButtonSecondary" href="/academy/24-link-architecture/route-state">
+                Open Route State Lab
+              </Link>
+              <Link className="academyButtonSecondary" href="/academy/24-link-architecture/simulator">
+                Open Chain Failure Simulator
+              </Link>
             </div>
           </section>
 
