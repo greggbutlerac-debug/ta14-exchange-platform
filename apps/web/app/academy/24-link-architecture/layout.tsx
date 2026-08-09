@@ -45,6 +45,10 @@ const navigation = [
     label: "Navigator",
   },
   {
+    href: "/academy/24-link-architecture/provenance",
+    label: "Provenance",
+  },
+  {
     href: "/academy/24-link-architecture/recursion",
     label: "Recursion",
   },
@@ -115,13 +119,20 @@ export default function TA1424LinkArchitectureLayout({
               >
                 Canon
               </Link>
+              <Link
+                href="/academy/24-link-architecture/provenance"
+                className="text-slate-400 transition hover:text-indigo-300"
+              >
+                Provenance
+              </Link>
             </div>
           </div>
 
           <div className="mt-8 border-t border-white/10 pt-6 text-xs leading-6 text-slate-600">
-            Academy learning, mapping, simulation, or evidence-state displays
-            do not by themselves constitute certification, legal determination,
-            production validation, endorsement, or authorization to execute.
+            Academy learning, mapping, simulation, provenance display, or
+            evidence-state views do not by themselves constitute certification,
+            legal determination, patent-scope determination, production
+            validation, endorsement, or authorization to execute.
           </div>
         </div>
       </footer>
