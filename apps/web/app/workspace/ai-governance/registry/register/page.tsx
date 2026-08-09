@@ -1378,7 +1378,10 @@ export default function RegisterGovernancePage() {
       repositories,
       zenodoRecords,
       patentRecords,
-      draftId: draftId ?? 'browser-recovery-draft',
+      draftId:
+        confirmedDraftId ??
+        draftId ??
+        'browser-recovery-draft',
       submissionState: submittedRecord?.status ?? (requiredCompletion === 100 ? 'REVIEW_READY_NOT_PUBLIC' : draftId ? 'DRAFT_ACCOUNT_BACKED' : 'BROWSER_RECOVERY_DRAFT'),
       evidenceManifest: [
         ...preservedEvidence.map((item) => ({
@@ -2335,6 +2338,129 @@ export default function RegisterGovernancePage() {
                 </div>
               </div>
 
+              <div className="final-required-checklist">
+                <div className="final-required-checklist__heading">
+                  <span>Final submission declarations</span>
+                  <strong>
+                    Confirm every governed declaration before manifest generation
+                  </strong>
+                  <p>
+                    Page 14 now exposes every declaration that can block the final
+                    Registry manifest or submission. These controls are bound to
+                    the same form state used by validation.
+                  </p>
+                </div>
+
+                <label
+                  className="declaration-row"
+                  data-required-incomplete={
+                    !form.authorityConfirmed
+                      ? 'true'
+                      : undefined
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.authorityConfirmed}
+                    onChange={(event) =>
+                      updateField(
+                        'authorityConfirmed',
+                        event.target.checked,
+                      )
+                    }
+                  />
+                  <span>
+                    <strong>Authority to submit</strong>
+                    I am authorized to submit this registration and its evidence,
+                    or I have clearly disclosed the limits of that authority.
+                  </span>
+                </label>
+
+                <label
+                  className="declaration-row"
+                  data-required-incomplete={
+                    !form.accuracyConfirmed
+                      ? 'true'
+                      : undefined
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.accuracyConfirmed}
+                    onChange={(event) =>
+                      updateField(
+                        'accuracyConfirmed',
+                        event.target.checked,
+                      )
+                    }
+                  />
+                  <span>
+                    <strong>Accuracy and attribution</strong>
+                    The registration is accurate to the best of my knowledge and
+                    material sources, contributors, disputes, and limitations
+                    have not been knowingly concealed.
+                  </span>
+                </label>
+
+                <label
+                  className="declaration-row"
+                  data-required-incomplete={
+                    !form.boundaryConfirmed
+                      ? 'true'
+                      : undefined
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={form.boundaryConfirmed}
+                    onChange={(event) =>
+                      updateField(
+                        'boundaryConfirmed',
+                        event.target.checked,
+                      )
+                    }
+                  />
+                  <span>
+                    <strong>Registry boundary</strong>
+                    I understand that registration is not certification, legal
+                    advice, regulatory approval, ownership adjudication, or proof
+                    of technical performance.
+                  </span>
+                </label>
+
+                <label
+                  className="declaration-row"
+                  data-required-incomplete={
+                    !termsAccepted
+                      ? 'true'
+                      : undefined
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={termsAccepted}
+                    onChange={(event) =>
+                      setTermsAccepted(event.target.checked)
+                    }
+                  />
+                  <span>
+                    <strong>TA14-RET-001 v1.1 Registry Terms</strong>
+                    I accept the Registry Terms required for governed submission.
+                  </span>
+                </label>
+
+                <div className="final-required-checklist__status">
+                  <strong>
+                    {form.authorityConfirmed &&
+                    form.accuracyConfirmed &&
+                    form.boundaryConfirmed &&
+                    termsAccepted
+                      ? 'All final declarations complete'
+                      : 'Final declarations incomplete'}
+                  </strong>
+                </div>
+              </div>
+
               <div className="receipt-panel">
                 <h3>Registry Intake Receipt</h3>
                 <p>
@@ -2623,6 +2749,12 @@ export default function RegisterGovernancePage() {
         .quality-grid strong { display:block; margin:5px 0 9px; color:#f1ce89; }
         .quality-grid article > div { height:5px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.08); }
         .quality-grid i { display:block; height:100%; background:linear-gradient(90deg,#7cb6e8,#e8bc68); }
+        .final-required-checklist { display:grid; gap:12px; margin:18px 0; padding:18px; border:1px solid rgba(255,255,255,.12); border-radius:16px; background:rgba(255,255,255,.025); }
+        .final-required-checklist__heading { display:grid; gap:5px; }
+        .final-required-checklist__heading > span { font-size:9px; font-weight:900; letter-spacing:.11em; text-transform:uppercase; opacity:.58; }
+        .final-required-checklist__heading > strong { font-size:15px; }
+        .final-required-checklist__heading > p { margin:0; max-width:820px; font-size:11px; line-height:1.65; opacity:.72; }
+        .final-required-checklist__status { padding-top:4px; font-size:10px; }
         .final-required-blocker { display:grid; gap:14px; margin:18px 0; padding:18px; border:1px solid rgba(255,190,90,.5); border-radius:16px; background:linear-gradient(145deg,rgba(255,190,90,.08),rgba(255,255,255,.025)); }
         .final-required-blocker__copy { display:grid; gap:5px; }
         .final-required-blocker__copy > span { font-size:9px; font-weight:900; letter-spacing:.11em; text-transform:uppercase; opacity:.68; }
