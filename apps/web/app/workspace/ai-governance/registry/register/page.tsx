@@ -1155,15 +1155,6 @@ export default function RegisterGovernancePage() {
       }
       setTermsBusy(false);
 
-      void recordLifecycleEvent(
-        'submission_submitted',
-        {
-          draft_id: submissionId,
-          requested_review_pathway:
-            form.reviewPathway,
-        },
-      );
-
       const response = await fetch('/api/ai-governance/registry/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1174,6 +1165,16 @@ export default function RegisterGovernancePage() {
         const details = Array.isArray(payload.details) ? ` ${payload.details.join(' ')}` : '';
         throw new Error(`${payload.error ?? 'Unable to submit the Registry intake.'}${details}`);
       }
+
+      void recordLifecycleEvent(
+        'submission_submitted',
+        {
+          draft_id: submissionId,
+          requested_review_pathway:
+            form.reviewPathway,
+          authoritative_response_received: true,
+        },
+      );
 
       window.localStorage.removeItem(DRAFT_KEY);
 
