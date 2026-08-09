@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 import {
   TA14_24_LINKS,
@@ -25,6 +25,14 @@ import {
 import { persistTA14ProvenanceSubmission } from "@/lib/academy/ta14-provenance-persistence";
 
 export default function TA14ProvenanceIntakePage() {
+  return (
+    <Suspense fallback={<ProvenanceIntakeLoading />}>
+      <TA14ProvenanceIntakePageContent />
+    </Suspense>
+  );
+}
+
+function TA14ProvenanceIntakePageContent() {
   const searchParams = useSearchParams();
 
   const [source, setSource] = useState<TA14ProvenanceSourceDraft>(
@@ -593,5 +601,26 @@ function Field({
       </span>
       {children}
     </label>
+  );
+}
+
+
+function ProvenanceIntakeLoading() {
+  return (
+    <main className="min-h-screen bg-[#030712] text-white">
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-indigo-300">
+            TA-14 Canonical Registry
+          </p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+            Loading provenance intake…
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400">
+            Preparing the bounded TA-14 link relationship state.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
