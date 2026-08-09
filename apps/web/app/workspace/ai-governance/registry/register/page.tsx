@@ -444,8 +444,6 @@ export default function RegisterGovernancePage() {
       | 'registration_page_opened'
       | 'registration_started'
       | 'draft_saved'
-      | 'submission_submitted'
-      | 'registration_completed'
       | 'registration_failed',
     payload?: Record<string, unknown>,
     submissionIdOverride?: string | null,
@@ -480,6 +478,7 @@ export default function RegisterGovernancePage() {
           method: 'POST',
           credentials: 'same-origin',
           cache: 'no-store',
+          keepalive: true,
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
@@ -1158,6 +1157,11 @@ export default function RegisterGovernancePage() {
       }
       setTermsBusy(false);
 
+      /*
+       * SUBMITTED and REGISTERED lifecycle milestones are emitted from
+       * authoritative Registry state by database triggers. The browser does
+       * not duplicate those milestones.
+       */
       const response = await fetch('/api/ai-governance/registry/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1168,17 +1172,6 @@ export default function RegisterGovernancePage() {
         const details = Array.isArray(payload.details) ? ` ${payload.details.join(' ')}` : '';
         throw new Error(`${payload.error ?? 'Unable to submit the Registry intake.'}${details}`);
       }
-
-      void recordLifecycleEvent(
-        'submission_submitted',
-        {
-          draft_id: submissionId,
-          requested_review_pathway:
-            form.reviewPathway,
-          authoritative_response_received: true,
-        },
-        submissionId,
-      );
 
       window.localStorage.removeItem(DRAFT_KEY);
 
@@ -1195,18 +1188,6 @@ export default function RegisterGovernancePage() {
         setPersistenceState('REGISTERED');
         setMessage(
           `${payload.notice ?? 'Governance Entity Registration completed successfully.'} Registry Identifier: ${payload.registration.registryIdentifier}.`,
-        );
-
-        void recordLifecycleEvent(
-          'registration_completed',
-          {
-            draft_id: submissionId,
-            registry_identifier:
-              payload.registration.registryIdentifier,
-            registered_at:
-              payload.registration.registeredAt ?? null,
-          },
-          submissionId,
         );
 
         window.location.assign(
