@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { RegistryNotificationDeliveryMount } from '@/components/workspace/registry-notification-delivery-mount';
+import { RegistryRegistrationJourneyPanel } from '@/components/workspace/registry-registration-journey-panel';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type NotificationState = 'unread' | 'acknowledged' | 'resolved';
@@ -524,6 +525,8 @@ export default function RegistryAdministrationInboxPage() {
           </button>
         </section>
       ) : null}
+
+      <RegistryRegistrationJourneyPanel />
 
       <section className="inboxSection">
         {loading ? (
