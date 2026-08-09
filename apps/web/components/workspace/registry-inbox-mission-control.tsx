@@ -1,6 +1,7 @@
 'use client';
 
 import { RegistryInboxIndicator } from './registry-inbox-indicator';
+import { RegistryDeliveryHealth } from './registry-delivery-health';
 
 type RegistryInboxMissionControlProps = {
   className?: string;
@@ -45,9 +46,15 @@ export function RegistryInboxMissionControl({
           </p>
         </div>
 
-        <RegistryInboxIndicator
-          className="ta14-registry-inbox-mission-control__indicator"
-        />
+        <div className="ta14-registry-inbox-mission-control__controls">
+          <RegistryInboxIndicator
+            className="ta14-registry-inbox-mission-control__indicator"
+          />
+
+          <RegistryDeliveryHealth
+            className="ta14-registry-inbox-mission-control__delivery"
+          />
+        </div>
       </div>
 
       <div className="ta14-registry-inbox-mission-control__boundary">
@@ -172,10 +179,20 @@ export function RegistryInboxMissionControl({
           text-transform: uppercase;
         }
 
+        .ta14-registry-inbox-mission-control__controls {
+          display: grid;
+          flex: 0 0 auto;
+          gap: 10px;
+          min-width: 280px;
+        }
+
         :global(
             .ta14-registry-inbox-mission-control__indicator
+          ),
+        :global(
+            .ta14-registry-inbox-mission-control__delivery
           ) {
-          flex: 0 0 auto;
+          width: 100%;
         }
 
         @keyframes ta14-registry-admin-pulse {
@@ -212,8 +229,16 @@ export function RegistryInboxMissionControl({
             flex-direction: column;
           }
 
+          .ta14-registry-inbox-mission-control__controls {
+            min-width: 0;
+            width: 100%;
+          }
+
           :global(
               .ta14-registry-inbox-mission-control__indicator
+            ),
+          :global(
+              .ta14-registry-inbox-mission-control__delivery
             ) {
             width: 100%;
           }
