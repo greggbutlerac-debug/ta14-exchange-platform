@@ -211,12 +211,21 @@ function TA14PatentPortfolioMapContent() {
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(251,191,36,0.13),transparent_36%),radial-gradient(circle_at_82%_12%,rgba(56,189,248,0.11),transparent_34%)]" />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
-          <Link
-            href="/academy/24-link-architecture/provenance"
-            className="text-sm font-semibold text-sky-300"
-          >
-            ← Back to Provenance Map
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Link
+              href="/academy/24-link-architecture/provenance"
+              className="text-sm font-semibold text-sky-300"
+            >
+              ← Back to Provenance Map
+            </Link>
+
+            <Link
+              href="/academy/24-link-architecture/provenance/patents/families"
+              className="inline-flex items-center gap-2 rounded-full border border-amber-300/20 bg-amber-300/[0.06] px-4 py-2 text-xs font-semibold text-amber-200 transition hover:border-amber-300/40 hover:bg-amber-300/[0.1]"
+            >
+              Explore eight patent families
+            </Link>
+          </div>
 
           <p className="mt-10 text-xs font-semibold uppercase tracking-[0.26em] text-amber-300">
             TA-14 Patent Position · Architecture Map
