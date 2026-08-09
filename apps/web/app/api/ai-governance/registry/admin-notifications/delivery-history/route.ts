@@ -1,6 +1,15 @@
+import { createServerClient } from '@supabase/ssr';
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 
-import { createClient } from '@supabase/supabase-js';
+type RegistryAdminNotificationRow = {
+  id: string;
+  notification_type: string;
+  registry_identifier: string | null;
+  governance_name: string;
+  occurred_at: string;
+};
 
 type DeliveryHistoryRow = {
   id: string;
@@ -16,165 +25,127 @@ type DeliveryHistoryRow = {
   created_at: string;
 };
 
-type RegistryAdminNotificationRow = {
-  id: string;
-  notification_type: string;
-  registry_identifier: string | null;
-  governance_name: string;
-  occurred_at: string;
-};
+function parseReviewerEmails(): Set<string> {
+  return new Set(
+    (process.env.TA14_REGISTRY_REVIEWER_EMAILS ?? '')
+      .split(',')
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
+  );
+}
 
-function env(name: string): string {
-  return process.env[name]?.trim() ?? '';
+function createSessionClient(
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
+) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
+
+  if (!url || !publishableKey) {
+    throw new Error('Supabase public environment is not configured.');
+  }
+
+  return createServerClient(url, publishableKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(values) {
+        try {
+          for (const { name, value, options } of values) {
+            cookieStore.set(name, value, options);
+          }
+        } catch {
+          // Route handlers may validate a session even when refresh cookies
+          // cannot be written during the current invocation.
+        }
+      },
+    },
+  });
 }
 
 function createAdminClient() {
-  const supabaseUrl = env('NEXT_PUBLIC_SUPABASE_URL');
-  const serviceRoleKey = env('SUPABASE_SERVICE_ROLE_KEY');
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceRoleKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
-  if (!supabaseUrl || !serviceRoleKey) {
+  if (!url || !serviceRoleKey) {
     throw new Error(
       'Registry delivery history is missing Supabase server configuration.',
     );
   }
 
-  return createClient(supabaseUrl, serviceRoleKey, {
+  return createSupabaseAdminClient(url, serviceRoleKey, {
     auth: {
-      persistSession: false,
       autoRefreshToken: false,
-      detectSessionInUrl: false,
+      persistSession: false,
     },
   });
 }
 
-function parseReviewerEmails(): Set<string> {
-  return new Set(
-    env('TA14_REGISTRY_REVIEWER_EMAILS')
-      .split(',')
-      .map((value) => value.trim().toLowerCase())
-      .filter(Boolean),
+function jsonError(
+  message: string,
+  status = 400,
+  details?: unknown,
+) {
+  return NextResponse.json(
+    details === undefined
+      ? { error: message }
+      : { error: message, details },
+    {
+      status,
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    },
   );
 }
 
-async function getBearerUserEmail(
-  request: NextRequest,
-): Promise<string | null> {
-  const supabaseUrl = env('NEXT_PUBLIC_SUPABASE_URL');
-  const anonKey = env('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-
-  if (!supabaseUrl || !anonKey) {
-    return null;
-  }
-
-  const authorization = request.headers.get('authorization');
-
-  if (!authorization?.toLowerCase().startsWith('bearer ')) {
-    return null;
-  }
-
-  const accessToken = authorization
-    .replace(/^Bearer\s+/i, '')
-    .trim();
-
-  if (!accessToken) {
-    return null;
-  }
-
-  const supabase = createClient(supabaseUrl, anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-  });
+async function requireRegistryAdministrator() {
+  const cookieStore = await cookies();
+  const sessionClient = createSessionClient(cookieStore);
 
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser(accessToken);
+  } = await sessionClient.auth.getUser();
 
-  if (error || !user?.email) {
-    return null;
+  if (error || !user) {
+    return {
+      ok: false as const,
+      response: jsonError('Authentication required.', 401),
+    };
   }
 
-  return user.email.trim().toLowerCase();
-}
+  const reviewerEmail =
+    user.email?.trim().toLowerCase() ?? '';
 
-async function getCookieUserEmail(): Promise<string | null> {
-  const { cookies } = await import('next/headers');
+  const authorizedEmails = parseReviewerEmails();
 
-  const cookieStore = await cookies();
-
-  const possibleAccessTokenNames = [
-    'sb-access-token',
-    'supabase-auth-token',
-  ];
-
-  for (const name of possibleAccessTokenNames) {
-    const token = cookieStore.get(name)?.value?.trim();
-
-    if (!token) {
-      continue;
-    }
-
-    const supabaseUrl = env('NEXT_PUBLIC_SUPABASE_URL');
-    const anonKey = env('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-
-    if (!supabaseUrl || !anonKey) {
-      return null;
-    }
-
-    const supabase = createClient(supabaseUrl, anonKey, {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-      },
-    });
-
-    const {
-      data: { user },
-      error,
-    } = await supabase.auth.getUser(token);
-
-    if (!error && user?.email) {
-      return user.email.trim().toLowerCase();
-    }
+  if (!reviewerEmail || !authorizedEmails.has(reviewerEmail)) {
+    return {
+      ok: false as const,
+      response: jsonError(
+        'This account is not authorized to access TA-14 Registry delivery history.',
+        403,
+      ),
+    };
   }
 
-  return null;
-}
-
-async function authorizeReviewer(
-  request: NextRequest,
-): Promise<string | null> {
-  const reviewers = parseReviewerEmails();
-
-  if (reviewers.size === 0) {
-    return null;
-  }
-
-  const email =
-    (await getBearerUserEmail(request)) ??
-    (await getCookieUserEmail());
-
-  if (!email || !reviewers.has(email)) {
-    return null;
-  }
-
-  return email;
+  return {
+    ok: true as const,
+    reviewerEmail,
+  };
 }
 
 function readNotificationId(request: NextRequest): string | null {
-  const raw = request.nextUrl.searchParams
-    .get('notificationId')
-    ?.trim();
+  const value =
+    request.nextUrl.searchParams
+      .get('notificationId')
+      ?.trim() ?? '';
 
-  if (!raw) {
-    return null;
-  }
-
-  return raw;
+  return value || null;
 }
 
 function readLimit(request: NextRequest): number {
@@ -195,38 +166,17 @@ function readLimit(request: NextRequest): number {
 
 export async function GET(request: NextRequest) {
   try {
-    const administratorEmail =
-      await authorizeReviewer(request);
+    const authorization =
+      await requireRegistryAdministrator();
 
-    if (!administratorEmail) {
-      return NextResponse.json(
-        {
-          error:
-            'Registry delivery history is restricted to authorized Registry reviewers.',
-        },
-        {
-          status: 401,
-          headers: {
-            'Cache-Control': 'no-store',
-          },
-        },
-      );
+    if (!authorization.ok) {
+      return authorization.response;
     }
 
     const notificationId = readNotificationId(request);
 
     if (!notificationId) {
-      return NextResponse.json(
-        {
-          error: 'notificationId is required.',
-        },
-        {
-          status: 400,
-          headers: {
-            'Cache-Control': 'no-store',
-          },
-        },
-      );
+      return jsonError('notificationId is required.', 400);
     }
 
     const limit = readLimit(request);
@@ -250,33 +200,20 @@ export async function GET(request: NextRequest) {
       .maybeSingle();
 
     if (notificationError) {
-      return NextResponse.json(
-        {
-          error:
-            'The Registry notification could not be verified.',
-          detail: notificationError.message,
-        },
-        {
-          status: 500,
-          headers: {
-            'Cache-Control': 'no-store',
-          },
-        },
+      console.error(
+        'TA-14 Registry delivery history notification lookup failed.',
+        notificationError,
+      );
+
+      return jsonError(
+        'The Registry notification could not be verified.',
+        500,
+        notificationError.message,
       );
     }
 
     if (!notification) {
-      return NextResponse.json(
-        {
-          error: 'Registry notification not found.',
-        },
-        {
-          status: 404,
-          headers: {
-            'Cache-Control': 'no-store',
-          },
-        },
-      );
+      return jsonError('Registry notification not found.', 404);
     }
 
     const verifiedNotification =
@@ -291,18 +228,15 @@ export async function GET(request: NextRequest) {
     );
 
     if (error) {
-      return NextResponse.json(
-        {
-          error:
-            'Unable to read notification delivery history.',
-          detail: error.message,
-        },
-        {
-          status: 500,
-          headers: {
-            'Cache-Control': 'no-store',
-          },
-        },
+      console.error(
+        'TA-14 Registry notification delivery history read failed.',
+        error,
+      );
+
+      return jsonError(
+        'Unable to read notification delivery history.',
+        500,
+        error.message,
       );
     }
 
@@ -336,15 +270,18 @@ export async function GET(request: NextRequest) {
       {
         ok: true,
         administrator: {
-          email: administratorEmail,
+          email: authorization.reviewerEmail,
         },
         notification: {
           id: verifiedNotification.id,
-          notificationType: verifiedNotification.notification_type,
+          notificationType:
+            verifiedNotification.notification_type,
           registryIdentifier:
-            verifiedNotification.registry_identifier ?? null,
-          governanceName: verifiedNotification.governance_name,
-          occurredAt: verifiedNotification.occurred_at,
+            verifiedNotification.registry_identifier,
+          governanceName:
+            verifiedNotification.governance_name,
+          occurredAt:
+            verifiedNotification.occurred_at,
         },
         delivery: {
           status,
@@ -366,19 +303,16 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Registry delivery history failed.',
-      },
-      {
-        status: 500,
-        headers: {
-          'Cache-Control': 'no-store',
-        },
-      },
+    console.error(
+      'TA-14 Registry delivery history route failed.',
+      error,
+    );
+
+    return jsonError(
+      error instanceof Error
+        ? error.message
+        : 'Registry delivery history failed.',
+      500,
     );
   }
 }
