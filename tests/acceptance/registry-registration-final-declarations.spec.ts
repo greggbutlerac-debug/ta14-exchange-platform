@@ -26,8 +26,8 @@ describe('TA-14 Registry final declaration regression', () => {
     const source = readRegistrationPage();
 
     expect(source).toContain('checked={form.authorityConfirmed}');
-    expect(source).toContain(
-      "updateField(\\n                        'authorityConfirmed',",
+    expect(source).toMatch(
+      /updateField\(\s*'authorityConfirmed',\s*event\.target\.checked/s,
     );
   });
 
@@ -35,8 +35,8 @@ describe('TA-14 Registry final declaration regression', () => {
     const source = readRegistrationPage();
 
     expect(source).toContain('checked={form.accuracyConfirmed}');
-    expect(source).toContain(
-      "updateField(\\n                        'accuracyConfirmed',",
+    expect(source).toMatch(
+      /updateField\(\s*'accuracyConfirmed',\s*event\.target\.checked/s,
     );
   });
 
@@ -44,8 +44,8 @@ describe('TA-14 Registry final declaration regression', () => {
     const source = readRegistrationPage();
 
     expect(source).toContain('checked={form.boundaryConfirmed}');
-    expect(source).toContain(
-      "updateField(\\n                        'boundaryConfirmed',",
+    expect(source).toMatch(
+      /updateField\(\s*'boundaryConfirmed',\s*event\.target\.checked/s,
     );
   });
 
