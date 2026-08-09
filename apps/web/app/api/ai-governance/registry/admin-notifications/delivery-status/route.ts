@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
-
-import { createClient } from '@supabase/supabase-js';
+import { createServerClient } from '@supabase/ssr';
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
 
 type DeliverySummaryRow = {
   delivered_count: number | null;
@@ -10,104 +11,119 @@ type DeliverySummaryRow = {
   latest_delivery_at: string | null;
 };
 
-function getEnv(name: string): string {
-  return process.env[name]?.trim() ?? '';
+function parseReviewerEmails(): Set<string> {
+  return new Set(
+    (process.env.TA14_REGISTRY_REVIEWER_EMAILS ?? '')
+      .split(',')
+      .map((email) => email.trim().toLowerCase())
+      .filter(Boolean),
+  );
 }
 
-function getSupabaseAdmin() {
-  const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
-  const serviceRoleKey = getEnv('SUPABASE_SERVICE_ROLE_KEY');
+function createSessionClient(
+  cookieStore: Awaited<ReturnType<typeof cookies>>,
+) {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const publishableKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim() ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim();
 
-  if (!supabaseUrl || !serviceRoleKey) {
+  if (!url || !publishableKey) {
+    throw new Error('Supabase public environment is not configured.');
+  }
+
+  return createServerClient(url, publishableKey, {
+    cookies: {
+      getAll() {
+        return cookieStore.getAll();
+      },
+      setAll(values) {
+        try {
+          for (const { name, value, options } of values) {
+            cookieStore.set(name, value, options);
+          }
+        } catch {
+          // Session validation can still proceed if cookie refresh is not
+          // writable in this route-handler invocation.
+        }
+      },
+    },
+  });
+}
+
+function createAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceRoleKey =
+    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+
+  if (!url || !serviceRoleKey) {
     throw new Error(
       'Registry delivery health is missing Supabase server configuration.',
     );
   }
 
-  return createClient(supabaseUrl, serviceRoleKey, {
+  return createSupabaseAdminClient(url, serviceRoleKey, {
     auth: {
-      persistSession: false,
       autoRefreshToken: false,
-      detectSessionInUrl: false,
+      persistSession: false,
     },
   });
 }
 
-function parseReviewerEmails(): Set<string> {
-  return new Set(
-    getEnv('TA14_REGISTRY_REVIEWER_EMAILS')
-      .split(',')
-      .map((value) => value.trim().toLowerCase())
-      .filter(Boolean),
+function jsonError(
+  message: string,
+  status = 400,
+  details?: unknown,
+) {
+  return NextResponse.json(
+    details === undefined
+      ? { error: message }
+      : { error: message, details },
+    {
+      status,
+      headers: {
+        'Cache-Control': 'no-store',
+      },
+    },
   );
 }
 
-async function getAuthenticatedEmail(
-  request: NextRequest,
-): Promise<string | null> {
-  const supabaseUrl = getEnv('NEXT_PUBLIC_SUPABASE_URL');
-  const anonKey = getEnv('NEXT_PUBLIC_SUPABASE_ANON_KEY');
-
-  if (!supabaseUrl || !anonKey) {
-    return null;
-  }
-
-  const authorization = request.headers.get('authorization');
-
-  if (!authorization?.toLowerCase().startsWith('bearer ')) {
-    return null;
-  }
-
-  const accessToken = authorization
-    .replace(/^Bearer\s+/i, '')
-    .trim();
-
-  if (!accessToken) {
-    return null;
-  }
-
-  const supabase = createClient(supabaseUrl, anonKey, {
-    auth: {
-      persistSession: false,
-      autoRefreshToken: false,
-      detectSessionInUrl: false,
-    },
-    global: {
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-      },
-    },
-  });
+async function requireRegistryAdministrator() {
+  const cookieStore = await cookies();
+  const sessionClient = createSessionClient(cookieStore);
 
   const {
     data: { user },
     error,
-  } = await supabase.auth.getUser(accessToken);
+  } = await sessionClient.auth.getUser();
 
-  if (error || !user?.email) {
-    return null;
+  if (error || !user) {
+    return {
+      ok: false as const,
+      response: jsonError('Authentication required.', 401),
+    };
   }
 
-  return user.email.trim().toLowerCase();
-}
+  const reviewerEmail =
+    user.email?.trim().toLowerCase() ?? '';
 
-async function authorizeReviewer(
-  request: NextRequest,
-): Promise<boolean> {
-  const reviewerEmails = parseReviewerEmails();
+  const authorizedEmails = parseReviewerEmails();
 
-  if (reviewerEmails.size === 0) {
-    return false;
+  if (!reviewerEmail || !authorizedEmails.has(reviewerEmail)) {
+    return {
+      ok: false as const,
+      response: jsonError(
+        'This account is not authorized to access TA-14 Registry delivery health.',
+        403,
+      ),
+    };
   }
 
-  const authenticatedEmail =
-    await getAuthenticatedEmail(request);
-
-  if (!authenticatedEmail) {
-    return false;
-  }
-
-  return reviewerEmails.has(authenticatedEmail);
+  return {
+    ok: true as const,
+    user,
+    reviewerEmail,
+  };
 }
 
 function normalizeCount(value: unknown): number {
@@ -126,37 +142,37 @@ function normalizeCount(value: unknown): number {
   return 0;
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const authorized = await authorizeReviewer(request);
+    const authorization =
+      await requireRegistryAdministrator();
 
-    if (!authorized) {
-      return NextResponse.json(
-        { error: 'Unauthorized.' },
-        { status: 401 },
-      );
+    if (!authorization.ok) {
+      return authorization.response;
     }
 
-    const supabase = getSupabaseAdmin();
+    const supabase = createAdminClient();
 
     const { data, error } = await supabase.rpc(
       'ta14_registry_admin_notification_delivery_summary_v1',
     );
 
     if (error) {
-      return NextResponse.json(
-        {
-          error:
-            'Unable to read Registry notification delivery health.',
-          detail: error.message,
-        },
-        { status: 500 },
+      console.error(
+        'TA-14 Registry notification delivery health read failed.',
+        error,
+      );
+
+      return jsonError(
+        'Unable to read Registry notification delivery health.',
+        500,
+        error.message,
       );
     }
 
     const row = (
       Array.isArray(data) ? data[0] : data
-    ) as DeliverySummaryRow | null;
+    ) as unknown as DeliverySummaryRow | null;
 
     const deliveredCount = normalizeCount(
       row?.delivered_count,
@@ -166,9 +182,10 @@ export async function GET(request: NextRequest) {
       row?.failed_count,
     );
 
-    const uniqueNotificationsDelivered = normalizeCount(
-      row?.unique_notifications_delivered,
-    );
+    const uniqueNotificationsDelivered =
+      normalizeCount(
+        row?.unique_notifications_delivered,
+      );
 
     const health =
       failedCount > 0
@@ -180,6 +197,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         ok: true,
+        administrator: {
+          email: authorization.reviewerEmail,
+        },
         health,
         summary: {
           deliveredCount,
@@ -199,14 +219,16 @@ export async function GET(request: NextRequest) {
       },
     );
   } catch (error) {
-    return NextResponse.json(
-      {
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Registry delivery health failed.',
-      },
-      { status: 500 },
+    console.error(
+      'TA-14 Registry delivery health route failed.',
+      error,
+    );
+
+    return jsonError(
+      error instanceof Error
+        ? error.message
+        : 'Registry delivery health failed.',
+      500,
     );
   }
 }
