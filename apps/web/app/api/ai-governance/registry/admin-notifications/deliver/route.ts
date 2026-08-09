@@ -129,6 +129,10 @@ function buildRecordUrl(row: NotificationDeliveryRow): string {
 }
 
 function notificationSubject(row: NotificationDeliveryRow): string {
+  if (row.notification_type === 'governance_submission_received') {
+    return `TA-14 Registry — Submission received — ${row.governance_name}`;
+  }
+
   if (row.notification_type === 'governance_registration_exception') {
     return `TA-14 Registry — ACTION REQUIRED — ${row.governance_name}`;
   }
@@ -141,6 +145,10 @@ function notificationSubject(row: NotificationDeliveryRow): string {
 }
 
 function notificationHeadline(row: NotificationDeliveryRow): string {
+  if (row.notification_type === 'governance_submission_received') {
+    return 'New Governance Entity Registration submitted';
+  }
+
   if (row.notification_type === 'governance_registration_exception') {
     return 'Registration exception requires attention';
   }
@@ -153,6 +161,10 @@ function notificationHeadline(row: NotificationDeliveryRow): string {
 }
 
 function notificationIntro(row: NotificationDeliveryRow): string {
+  if (row.notification_type === 'governance_submission_received') {
+    return 'A participant completed and submitted a Governance Entity Registration record. This is the immediate administrative-awareness event; registration completion and public publication remain separate governed states.';
+  }
+
   if (row.notification_type === 'governance_registration_exception') {
     return 'A governance registration could not complete its governed automatic-registration pathway and requires Registry attention.';
   }
@@ -393,7 +405,10 @@ function shouldDeliverNotification(
    * conditions. Once resolved in the Administration Inbox, they should not
    * generate a stale action email afterward.
    */
-  if (row.notification_type === 'governance_registered') {
+  if (
+    row.notification_type === 'governance_registered' ||
+    row.notification_type === 'governance_submission_received'
+  ) {
     return true;
   }
 
@@ -427,6 +442,7 @@ async function getUndeliveredNotifications(
       ].join(','),
     )
     .in('notification_type', [
+      'governance_submission_received',
       'governance_registered',
       'governance_review_requested',
       'governance_registration_exception',
