@@ -1096,34 +1096,71 @@ export default function ExecutionArtifactsLibraryPage() {
           </div>
           <p>These records preserve evidence review, architectural findings, and version-specific continuation without being counted among the twelve completed TA-14 execution artifacts.</p>
         </div>
-        <article className="review-lineage-card">
-          <div className="review-lineage-identity">
-            <span>FD-2026-0002</span>
-            <div>
-              <small>Harmonic Constitutional Runtime · Case 002</small>
-              <h3>Version 2.0 Evidence Review</h3>
+        <div className="review-lineage-list">
+          <article className="review-lineage-card">
+            <div className="review-lineage-identity">
+              <span>FD-2026-0002</span>
+              <div>
+                <small>Harmonic Constitutional Runtime · Case 001</small>
+                <h3>Version 1.0 Bounded Runtime Demonstration</h3>
+              </div>
             </div>
+            <div className="review-lineage-status">
+              <b>PARTIALLY DEMONSTRATED — EVIDENCE-BOUNDED</b>
+              <span>Version 1.0 frozen case</span>
+            </div>
+            <p>The frozen Harmonic Version 1.0 runtime reconstructed the constitutional state represented within the admitted packet and produced its own refusal / block determination. TA-14 preserved the demonstrated runtime behavior while keeping the surrounding institutional evidence limits explicit.</p>
+            <div className="review-lineage-facts">
+              <span><small>Artifact class</small><b>External Governance Artifact</b></span>
+              <span><small>Governance Registry</small><b>TA-14-AIGR-000008</b></span>
+              <span><small>Version</small><b>1.0</b></span>
+              <span><small>Verification</small><b>L3 · bounded runtime evidence</b></span>
+            </div>
+            <div className="review-lineage-boundary">
+              <strong>Boundary</strong>
+              <span>The case does not independently establish the complete institutional sequence outside the runtime, certify Harmonic, validate every Harmonic claim, or establish behavior outside the frozen Version 1.0 case and admitted evidence.</span>
+            </div>
+            <div className="review-lineage-actions">
+              <Link href="/artifacts/fd-2026-0002-case-001">Open Case 001 →</Link>
+              <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000008">Open Version 1 registry record</Link>
+            </div>
+          </article>
+
+          <div className="review-lineage-connector" aria-label="Harmonic version progression">
+            <span>CASE 001</span>
+            <b>Version 1.0 preserved → Version 2.0 reviewed</b>
+            <span>CASE 002</span>
           </div>
-          <div className="review-lineage-status">
-            <b>PARTIAL ADMISSIBILITY</b>
-            <span>Runtime validation open</span>
-          </div>
-          <p>Seven preserved Version 2 evidence records support material architectural and evidentiary advancement. Executable proof of changed-state re-evaluation, determination receipts, replay, binding, commit, execution control, and outcome remains open.</p>
-          <div className="review-lineage-facts">
-            <span><small>Artifact class</small><b>Evidence Review Artifact</b></span>
-            <span><small>Governance Registry</small><b>TA-14-AIGR-000010</b></span>
-            <span><small>Version</small><b>2.0</b></span>
-            <span><small>Evidence reviewed</small><b>7 records</b></span>
-          </div>
-          <div className="review-lineage-boundary">
-            <strong>Boundary</strong>
-            <span>No executable Version 2 evidence. No executable Version 2 finding.</span>
-          </div>
-          <div className="review-lineage-actions">
-            <Link href="/artifacts/fd-2026-0002-case-002">Open Case 002 →</Link>
-            <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Inspect admitted evidence</Link>
-          </div>
-        </article>
+
+          <article className="review-lineage-card">
+            <div className="review-lineage-identity">
+              <span>FD-2026-0002</span>
+              <div>
+                <small>Harmonic Constitutional Runtime · Case 002</small>
+                <h3>Version 2.0 Evidence Review</h3>
+              </div>
+            </div>
+            <div className="review-lineage-status">
+              <b>PARTIAL ADMISSIBILITY</b>
+              <span>Runtime validation open</span>
+            </div>
+            <p>Seven preserved Version 2 evidence records support material architectural and evidentiary advancement. Executable proof of changed-state re-evaluation, determination receipts, replay, binding, commit, execution control, and outcome remains open.</p>
+            <div className="review-lineage-facts">
+              <span><small>Artifact class</small><b>Evidence Review Artifact</b></span>
+              <span><small>Governance Registry</small><b>TA-14-AIGR-000010</b></span>
+              <span><small>Version</small><b>2.0</b></span>
+              <span><small>Evidence reviewed</small><b>7 records</b></span>
+            </div>
+            <div className="review-lineage-boundary">
+              <strong>Boundary</strong>
+              <span>No executable Version 2 evidence. No executable Version 2 finding.</span>
+            </div>
+            <div className="review-lineage-actions">
+              <Link href="/artifacts/fd-2026-0002-case-002">Open Case 002 →</Link>
+              <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Inspect admitted evidence</Link>
+            </div>
+          </article>
+        </div>
       </section>
 
       <footer>
@@ -1187,6 +1224,31 @@ export default function ExecutionArtifactsLibraryPage() {
           margin:0;
           color:#93a1ba;
           line-height:1.7
+        }
+        .review-lineage-list {
+          display:grid;
+          gap:16px
+        }
+        .review-lineage-connector {
+          display:flex;
+          align-items:center;
+          justify-content:center;
+          gap:14px;
+          min-height:38px;
+          color:#8190aa;
+          font-size:10px;
+          letter-spacing:.1em;
+          text-transform:uppercase
+        }
+        .review-lineage-connector::before,.review-lineage-connector::after {
+          content:"";
+          height:1px;
+          flex:1;
+          background:linear-gradient(90deg,transparent,rgba(244,201,93,.25),transparent)
+        }
+        .review-lineage-connector b {
+          color:#c7d5ea;
+          font-size:10px
         }
         .review-lineage-card {
           border:1px solid rgba(244,201,93,.24);
