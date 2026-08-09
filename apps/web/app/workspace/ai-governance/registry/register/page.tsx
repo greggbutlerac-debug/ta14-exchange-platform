@@ -448,6 +448,7 @@ export default function RegisterGovernancePage() {
       | 'registration_completed'
       | 'registration_failed',
     payload?: Record<string, unknown>,
+    submissionIdOverride?: string | null,
   ) {
     try {
       if (!lifecycleSessionKeyRef.current) {
@@ -487,7 +488,8 @@ export default function RegisterGovernancePage() {
             eventType,
             source: 'web',
             sessionKey: lifecycleSessionKeyRef.current,
-            submissionId: draftId,
+            submissionId:
+              submissionIdOverride ?? draftId,
             governanceName:
               form.governanceName.trim() || null,
             organizationName:
@@ -1086,6 +1088,7 @@ export default function RegisterGovernancePage() {
         {
           draft_id: payload.draftId,
         },
+        payload.draftId,
       );
 
       return payload.draftId as string;
@@ -1174,6 +1177,7 @@ export default function RegisterGovernancePage() {
             form.reviewPathway,
           authoritative_response_received: true,
         },
+        submissionId,
       );
 
       window.localStorage.removeItem(DRAFT_KEY);
@@ -1202,6 +1206,7 @@ export default function RegisterGovernancePage() {
             registered_at:
               payload.registration.registeredAt ?? null,
           },
+          submissionId,
         );
 
         window.location.assign(
@@ -1244,6 +1249,7 @@ export default function RegisterGovernancePage() {
           failure_message: failureMessage,
           phase: 'submission',
         },
+        draftId,
       );
     } finally {
       setEvidenceBusyId(null);
