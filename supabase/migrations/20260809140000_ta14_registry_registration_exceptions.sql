@@ -451,6 +451,28 @@ begin
   end if;
 
   /*
+   * SECURITY BOUNDARY
+   *
+   * This is a SECURITY DEFINER function. An authenticated participant may
+   * record an exception only for a submission they actually own. The
+   * service_role remains permitted for governed server-side administration.
+   *
+   * Re-resolving owner_user_id from the submission is not sufficient by
+   * itself; the caller must also be bound to that owner.
+   */
+  if auth.role() <> 'service_role'
+     and (
+       auth.uid() is null
+       or auth.uid() <> submission_record.owner_user_id
+     )
+  then
+    raise exception
+      'The authenticated account is not authorized to record an exception for Registry submission %.',
+      requested_submission_id
+      using errcode = '42501';
+  end if;
+
+  /*
    * Preserve one active readiness exception for the same submission/code.
    * Repeated finalization attempts update the existing administrative record
    * rather than multiplying equivalent open exceptions.
@@ -580,8 +602,9 @@ from anon;
 
 /*
  * Authenticated application calls execute through the participant's Supabase
- * session. The function still re-resolves ownership from the authoritative
- * submission record. Service-role/server calls remain supported.
+ * session. The function re-resolves ownership from the authoritative
+ * submission record AND requires auth.uid() to match that owner.
+ * Service-role/server calls remain supported.
  */
 grant execute
 on function
