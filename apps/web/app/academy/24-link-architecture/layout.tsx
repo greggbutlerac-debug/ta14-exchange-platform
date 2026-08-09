@@ -49,6 +49,14 @@ const navigation = [
     label: "Provenance",
   },
   {
+    href: "/academy/24-link-architecture/provenance/patents",
+    label: "Patents",
+  },
+  {
+    href: "/academy/24-link-architecture/provenance/patents/families",
+    label: "Patent Families",
+  },
+  {
     href: "/academy/24-link-architecture/recursion",
     label: "Recursion",
   },
@@ -124,6 +132,12 @@ export default function TA1424LinkArchitectureLayout({
                 className="text-slate-400 transition hover:text-indigo-300"
               >
                 Provenance
+              </Link>
+              <Link
+                href="/academy/24-link-architecture/provenance/patents"
+                className="text-slate-400 transition hover:text-amber-300"
+              >
+                Patent Portfolio
               </Link>
             </div>
           </div>
