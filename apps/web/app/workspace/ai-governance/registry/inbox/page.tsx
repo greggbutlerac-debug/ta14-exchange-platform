@@ -133,6 +133,22 @@ function reviewHref(notification: NotificationRow) {
   )}`;
 }
 
+function hasExternalDeliveryTracking(notification: NotificationRow) {
+  return notification.notification_type === 'governance_registered';
+}
+
+function notificationActionLabel(notification: NotificationRow) {
+  if (notification.notification_type === 'governance_registration_exception') {
+    return 'Registration exception';
+  }
+
+  if (notification.notification_type === 'governance_review_requested') {
+    return 'Review requested';
+  }
+
+  return 'Registration completed';
+}
+
 export default function RegistryAdministrationInboxPage() {
   const [notifications, setNotifications] = useState<NotificationRow[]>([]);
   const [summary, setSummary] = useState<NotificationSummary>(emptySummary);
@@ -544,8 +560,9 @@ export default function RegistryAdministrationInboxPage() {
               <p className="eyebrow">NO MATCHING EVENTS</p>
               <h2>{summary.unreadCount === 0 ? 'Nothing is waiting on you.' : 'No events match these filters.'}</h2>
               <p>
-                Automatic registration remains active. New qualifying registrations will
-                appear here as institutional awareness events when they are completed.
+                Automatic registration remains active. Completed registrations, review
+                requests, and registration exceptions will appear here as preserved
+                institutional awareness events.
               </p>
             </div>
           </div>
@@ -586,7 +603,9 @@ export default function RegistryAdministrationInboxPage() {
 
                     <div className="identityRow">
                       <div className="identityCopy">
-                        <p className="eyebrow">{notification.title}</p>
+                        <p className="eyebrow">
+                          {notificationActionLabel(notification)} · {notification.title}
+                        </p>
                         <h2>{notification.governance_name}</h2>
                         <p className="notificationMessage">{notification.message}</p>
                       </div>
@@ -620,11 +639,13 @@ export default function RegistryAdministrationInboxPage() {
                       </div>
                     </dl>
 
-                    <RegistryNotificationDeliveryMount
-                      notificationId={notification.id}
-                      compact
-                      className="notificationDeliveryStatus"
-                    />
+                    {hasExternalDeliveryTracking(notification) ? (
+                      <RegistryNotificationDeliveryMount
+                        notificationId={notification.id}
+                        compact
+                        className="notificationDeliveryStatus"
+                      />
+                    ) : null}
 
                     {isExpanded ? (
                       <div className="detailsPanel">
@@ -662,10 +683,12 @@ export default function RegistryAdministrationInboxPage() {
                           </details>
                         ) : null}
 
-                        <RegistryNotificationDeliveryMount
-                          notificationId={notification.id}
-                          className="notificationDeliveryAudit"
-                        />
+                        {hasExternalDeliveryTracking(notification) ? (
+                          <RegistryNotificationDeliveryMount
+                            notificationId={notification.id}
+                            className="notificationDeliveryAudit"
+                          />
+                        ) : null}
                       </div>
                     ) : null}
 
