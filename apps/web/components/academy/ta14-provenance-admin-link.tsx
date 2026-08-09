@@ -5,11 +5,17 @@ import { getTA14ProvenanceIntakeHref } from "@/lib/academy/ta14-provenance-intak
 
 export function TA14ProvenanceAdminLink({
   linkId,
-  label = "Register provenance source",
+  label,
 }: {
   linkId?: TA14LinkId | null;
   label?: string;
 }) {
+  const resolvedLabel =
+    label ??
+    (linkId
+      ? "Register source for this link"
+      : "Register provenance source");
+
   return (
     <Link
       href={getTA14ProvenanceIntakeHref(linkId)}
@@ -19,7 +25,7 @@ export function TA14ProvenanceAdminLink({
         aria-hidden="true"
         className="h-1.5 w-1.5 rounded-full bg-amber-200 shadow-[0_0_14px_rgba(253,230,138,0.8)]"
       />
-      {label}
+      {resolvedLabel}
     </Link>
   );
 }
