@@ -480,6 +480,7 @@ export default function RegisterGovernancePage() {
           method: 'POST',
           credentials: 'same-origin',
           cache: 'no-store',
+          keepalive: true,
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
