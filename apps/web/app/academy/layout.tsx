@@ -533,6 +533,33 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
           transform: translateY(-1px);
         }
 
+        .academy-cta-quick-link.featured-architecture {
+          grid-column: 1 / -1;
+          min-height: 42px;
+          justify-content: space-between;
+          padding: 8px 12px;
+          color: #eaffff;
+          border-color: rgba(84, 232, 255, .32);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(57, 242, 161, .16), transparent 42%),
+            linear-gradient(105deg, rgba(84, 232, 255, .14), rgba(57, 242, 161, .07));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,.05), 0 10px 24px rgba(24, 199, 221, .08);
+          text-align: left;
+          font-size: .65rem;
+        }
+
+        .academy-cta-quick-link.featured-architecture::after {
+          content: "→";
+          color: #65f1b5;
+          font-size: .82rem;
+          transition: transform 150ms ease;
+        }
+
+        .academy-cta-quick-link.featured-architecture:hover::after,
+        .academy-cta-quick-link.featured-architecture:focus-visible::after {
+          transform: translateX(3px);
+        }
+
         .academy-cta-boundary {
           margin-top: 12px;
           padding-top: 10px;
@@ -970,6 +997,12 @@ export default function AcademyLayout({ children }: { children: ReactNode }) {
 
           <span className="academy-cta-quick-label">Direct Academy actions</span>
           <div className="academy-cta-quick-grid">
+            <Link
+              className="academy-cta-quick-link featured-architecture"
+              href="/academy/24-link-architecture"
+            >
+              Explore 24-Link Architecture
+            </Link>
             <Link className="academy-cta-quick-link" href="/academy/architecture-explorer">
               Explore Architecture
             </Link>
