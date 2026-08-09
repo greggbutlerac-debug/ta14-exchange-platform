@@ -59,6 +59,7 @@ export default function TA14PatentPortfolioMapPage() {
 function TA14PatentPortfolioMapContent() {
   const searchParams = useSearchParams();
   const requestedApplication = searchParams.get("application");
+  const requestedLink = searchParams.get("link");
 
   const [sources, setSources] = useState<TA14CanonicalSourceRecord[]>([]);
   const [relations, setRelations] = useState<
@@ -97,7 +98,7 @@ function TA14PatentPortfolioMapContent() {
         );
 
         if (patentSources.length > 0) {
-          const requested = requestedApplication
+          const requestedApplicationRecord = requestedApplication
             ? patentSources.find(
                 (source) =>
                   source.sourceIdentifier === requestedApplication ||
@@ -105,8 +106,27 @@ function TA14PatentPortfolioMapContent() {
               )
             : null;
 
+          const validRequestedLink = requestedLink
+            ? TA14_24_LINKS.find(
+                (link) => link.linkId === requestedLink,
+              )
+            : null;
+
+          const firstSourceForRequestedLink = validRequestedLink
+            ? patentSources.find((source) =>
+                relationRecords.some(
+                  (relation) =>
+                    relation.relationType === "patent_position" &&
+                    relation.linkId === validRequestedLink.linkId &&
+                    relation.sourceId === source.id,
+                ),
+              )
+            : null;
+
           setSelectedSourceId(
-            requested?.id ?? patentSources[0].id,
+            requestedApplicationRecord?.id ??
+              firstSourceForRequestedLink?.id ??
+              patentSources[0].id,
           );
         }
       } catch (caught) {
@@ -129,7 +149,7 @@ function TA14PatentPortfolioMapContent() {
     return () => {
       cancelled = true;
     };
-  }, [requestedApplication]);
+  }, [requestedApplication, requestedLink]);
 
   const families = useMemo<PatentFamily[]>(() => {
     const grouped = new Map<number, PatentFamily>();
@@ -206,6 +226,30 @@ function TA14PatentPortfolioMapContent() {
     return TA14_24_LINKS.filter((link) => ids.has(link.linkId));
   }, [relations]);
 
+  const focusedLink = useMemo(
+    () =>
+      requestedLink
+        ? TA14_24_LINKS.find(
+            (link) => link.linkId === requestedLink,
+          ) ?? null
+        : null,
+    [requestedLink],
+  );
+
+  const focusedSourceIds = useMemo(() => {
+    if (!focusedLink) {
+      return new Set<string>();
+    }
+
+    return new Set(
+      relations
+        .filter(
+          (relation) => relation.linkId === focusedLink.linkId,
+        )
+        .map((relation) => relation.sourceId),
+    );
+  }, [focusedLink, relations]);
+
   return (
     <main className="min-h-screen bg-[#030712] text-white">
       <section className="relative overflow-hidden border-b border-white/10">
@@ -253,6 +297,22 @@ function TA14PatentPortfolioMapContent() {
               label="Bounded relationships"
             />
           </div>
+
+          {focusedLink ? (
+            <div className="mt-7 inline-flex rounded-2xl border border-amber-300/25 bg-amber-300/[0.06] px-4 py-3">
+              <p className="text-sm text-amber-100">
+                Patent-position focus:{" "}
+                <strong>
+                  {focusedLink.linkId}
+                  {" · "}
+                  {focusedLink.canonicalName}
+                </strong>
+                {" · "}
+                {focusedSourceIds.size} mapped application
+                {focusedSourceIds.size === 1 ? "" : "s"}
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
 
@@ -286,9 +346,11 @@ function TA14PatentPortfolioMapContent() {
                     ).padStart(2, "0")}-${link.slug}`}
                     className={[
                       "rounded-2xl border p-4 transition",
-                      count > 0
-                        ? "border-amber-300/25 bg-amber-300/[0.055]"
-                        : "border-white/10 bg-white/[0.025] opacity-60",
+                      focusedLink?.linkId === link.linkId
+                        ? "border-sky-300/50 bg-sky-300/[0.11] ring-1 ring-sky-300/25"
+                        : count > 0
+                          ? "border-amber-300/25 bg-amber-300/[0.055]"
+                          : "border-white/10 bg-white/[0.025] opacity-60",
                     ].join(" ")}
                   >
                     <div className="flex items-start justify-between gap-3">
@@ -342,7 +404,9 @@ function TA14PatentPortfolioMapContent() {
                             "rounded-2xl border p-5 text-left transition",
                             active
                               ? "border-amber-300/40 bg-amber-300/[0.075]"
-                              : "border-white/10 bg-black/10 hover:border-white/20",
+                              : focusedSourceIds.has(source.id)
+                                ? "border-sky-300/30 bg-sky-300/[0.045]"
+                                : "border-white/10 bg-black/10 hover:border-white/20",
                           ].join(" ")}
                         >
                           <div className="flex flex-wrap items-center justify-between gap-3">
