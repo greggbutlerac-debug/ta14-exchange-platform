@@ -134,7 +134,11 @@ function reviewHref(notification: NotificationRow) {
 }
 
 function hasExternalDeliveryTracking(notification: NotificationRow) {
-  return notification.notification_type === 'governance_registered';
+  return [
+    'governance_registered',
+    'governance_review_requested',
+    'governance_registration_exception',
+  ].includes(notification.notification_type);
 }
 
 function notificationActionLabel(notification: NotificationRow) {
