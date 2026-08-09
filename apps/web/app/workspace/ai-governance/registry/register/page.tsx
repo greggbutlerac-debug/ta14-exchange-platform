@@ -1378,10 +1378,7 @@ export default function RegisterGovernancePage() {
       repositories,
       zenodoRecords,
       patentRecords,
-      draftId:
-        confirmedDraftId ??
-        draftId ??
-        'browser-recovery-draft',
+      draftId: confirmedDraftId ?? draftId ?? 'browser-recovery-draft',
       submissionState: submittedRecord?.status ?? (requiredCompletion === 100 ? 'REVIEW_READY_NOT_PUBLIC' : draftId ? 'DRAFT_ACCOUNT_BACKED' : 'BROWSER_RECOVERY_DRAFT'),
       evidenceManifest: [
         ...preservedEvidence.map((item) => ({
