@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { RegistryInboxMissionControl } from './registry-inbox-mission-control';
+import { RegistryRegistrationJourneyIndicator } from './registry-registration-journey-indicator';
 
 type RegistryMissionControlMountProps = {
   className?: string;
@@ -76,8 +77,25 @@ export function RegistryMissionControlMount({
   }
 
   return (
-    <RegistryInboxMissionControl
-      className={className}
-    />
+    <section
+      className={[
+        'ta14-registry-mission-control-mount',
+        className,
+      ]
+        .filter(Boolean)
+        .join(' ')}
+      aria-label="TA-14 Registry administration status"
+    >
+      <RegistryInboxMissionControl />
+
+      <RegistryRegistrationJourneyIndicator />
+
+      <style jsx>{`
+        .ta14-registry-mission-control-mount {
+          display: grid;
+          gap: 12px;
+        }
+      `}</style>
+    </section>
   );
 }
