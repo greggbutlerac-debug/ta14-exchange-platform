@@ -128,7 +128,7 @@ select
 from origin_source
 cross join origin_map
 join public.ta14_canonical_links as links
-  on links.order_index = origin_map.link_order
+  on links.link_order = origin_map.link_order
 where links.doctrine_state = 'active'
 on conflict (link_id, source_id, relation_type)
 do update set
