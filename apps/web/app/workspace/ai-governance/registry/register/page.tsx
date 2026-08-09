@@ -2251,42 +2251,65 @@ export default function RegisterGovernancePage() {
                 ))}
               </div>
 
-              {!form.ownershipDeclaration.trim() && (
-                <div
-                  className="final-required-blocker"
-                  data-required-field="ownershipDeclaration"
-                  data-required-incomplete="true"
-                >
-                  <div className="final-required-blocker__copy">
-                    <span>Required before manifest generation</span>
-                    <strong>
-                      Ownership and submission-rights declaration
-                    </strong>
-                    <p>
-                      This is the specific field blocking the intake manifest.
-                      It does not require an EIN, CAGE code, or hidden corporate
-                      identifier. State the basis on which you are authorized to
-                      submit this governance entity or capability for Registry
-                      registration.
-                    </p>
-                  </div>
-
-                  <label>
-                    Declaration <em>Required</em>
-                    <textarea
-                      rows={7}
-                      value={form.ownershipDeclaration}
-                      placeholder="Example structure: I am authorized to submit this governance entity/capability for registration on behalf of the identified organization, and I have the ownership, organizational authority, or submission rights necessary to make this Registry declaration."
-                      onChange={(event) =>
-                        updateField(
-                          'ownershipDeclaration',
-                          event.target.value,
-                        )
-                      }
-                    />
-                  </label>
+              <div
+                className={[
+                  'final-required-blocker',
+                  form.ownershipDeclaration.trim()
+                    ? 'is-complete'
+                    : 'is-incomplete',
+                ].join(' ')}
+                data-required-field="ownershipDeclaration"
+                data-required-incomplete={
+                  !form.ownershipDeclaration.trim()
+                    ? 'true'
+                    : undefined
+                }
+              >
+                <div className="final-required-blocker__copy">
+                  <span>
+                    {form.ownershipDeclaration.trim()
+                      ? 'Declaration present — review before manifest generation'
+                      : 'Required before manifest generation'}
+                  </span>
+                  <strong>
+                    Ownership and submission-rights declaration
+                  </strong>
+                  <p>
+                    This is the exact declaration Page 14 evaluates. It is shown
+                    here whether complete or incomplete so the final manifest
+                    gate never depends on a hidden field from an earlier page.
+                    No EIN, CAGE code, or hidden corporate identifier is required.
+                  </p>
                 </div>
-              )}
+
+                <label>
+                  Final declaration review <em>Required</em>
+                  <textarea
+                    rows={7}
+                    value={form.ownershipDeclaration}
+                    placeholder="State the basis on which you are authorized to submit this governance entity or capability for registration, including ownership, organizational authority, or other submission rights."
+                    onChange={(event) =>
+                      updateField(
+                        'ownershipDeclaration',
+                        event.target.value,
+                      )
+                    }
+                  />
+                </label>
+
+                <div className="final-required-blocker__status">
+                  <strong>
+                    {form.ownershipDeclaration.trim()
+                      ? 'Complete'
+                      : 'Incomplete'}
+                  </strong>
+                  <span>
+                    {form.ownershipDeclaration.trim()
+                      ? 'This declaration will be included in the Registry intake manifest.'
+                      : 'Enter the declaration above before generating the intake manifest.'}
+                  </span>
+                </div>
+              </div>
 
               <div className="receipt-panel">
                 <h3>Registry Intake Receipt</h3>
@@ -2581,6 +2604,10 @@ export default function RegisterGovernancePage() {
         .final-required-blocker__copy > span { font-size:9px; font-weight:900; letter-spacing:.11em; text-transform:uppercase; opacity:.68; }
         .final-required-blocker__copy > strong { font-size:15px; }
         .final-required-blocker__copy > p { margin:0; max-width:820px; font-size:11px; line-height:1.65; opacity:.75; }
+        .final-required-blocker__status { display:flex; flex-wrap:wrap; align-items:center; gap:8px 12px; padding:10px 12px; border:1px solid rgba(255,255,255,.1); border-radius:11px; background:rgba(0,0,0,.14); font-size:10px; }
+        .final-required-blocker__status strong { text-transform:uppercase; letter-spacing:.08em; }
+        .final-required-blocker.is-complete { border-color:rgba(104,190,151,.48); background:linear-gradient(145deg,rgba(104,190,151,.08),rgba(255,255,255,.025)); }
+        .final-required-blocker.is-incomplete { border-color:rgba(255,190,90,.5); }
         .receipt-panel { padding:22px; border:1px solid rgba(126,178,225,.28); border-radius:17px; background:rgba(24,64,100,.18); }
         .receipt-panel h3 { margin-bottom:7px; font-family:Georgia,serif; font-size:25px; }
         .receipt-panel p { color:#aeb9ca; line-height:1.6; }
