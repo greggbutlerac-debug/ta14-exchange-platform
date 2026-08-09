@@ -1160,7 +1160,7 @@ export default function RegisterGovernancePage() {
         {
           draft_id: submissionId,
           requested_review_pathway:
-            form.requestedReviewPathway,
+            form.reviewPathway,
         },
       );
 
