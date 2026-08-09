@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   TA14_24_LINKS,
   type TA14LinkId,
 } from "@/lib/academy/ta14-24-link-canon";
+import {
+  readTA14ProvenanceLinkPrefill,
+} from "@/lib/academy/ta14-provenance-intake-link-prefill";
 import {
   createEmptyTA14ProvenanceSourceDraft,
   createTA14ProvenanceRelationship,
@@ -21,6 +25,8 @@ import {
 import { persistTA14ProvenanceSubmission } from "@/lib/academy/ta14-provenance-persistence";
 
 export default function TA14ProvenanceIntakePage() {
+  const searchParams = useSearchParams();
+
   const [source, setSource] = useState<TA14ProvenanceSourceDraft>(
     createEmptyTA14ProvenanceSourceDraft(),
   );
@@ -30,6 +36,36 @@ export default function TA14ProvenanceIntakePage() {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [savedSourceId, setSavedSourceId] = useState<string | null>(null);
+
+  const requestedLink = useMemo(
+    () =>
+      readTA14ProvenanceLinkPrefill(
+        searchParams.get("link"),
+      ),
+    [searchParams],
+  );
+
+  useEffect(() => {
+    if (!requestedLink) {
+      return;
+    }
+
+    setRelationships((current) => {
+      if (
+        current.some(
+          (relationship) =>
+            relationship.linkId === requestedLink,
+        )
+      ) {
+        return current;
+      }
+
+      return [
+        ...current,
+        createTA14ProvenanceRelationship(requestedLink),
+      ];
+    });
+  }, [requestedLink]);
 
   const errors = useMemo(
     () => validateTA14ProvenanceSubmission({ source, relationships }),
@@ -137,6 +173,23 @@ export default function TA14ProvenanceIntakePage() {
             artifact, review, or other public record once, then declare the
             exact relationship that source has to each applicable TA-14 link.
           </p>
+
+          {requestedLink ? (
+            <div className="mt-8 inline-flex rounded-2xl border border-indigo-300/25 bg-indigo-300/[0.06] px-4 py-3">
+              <p className="text-sm text-indigo-100">
+                Prefilled from{" "}
+                <strong>
+                  {requestedLink}
+                </strong>
+                {" · "}
+                {
+                  TA14_24_LINKS.find(
+                    (link) => link.linkId === requestedLink,
+                  )?.canonicalName
+                }
+              </p>
+            </div>
+          ) : null}
         </div>
       </section>
 
