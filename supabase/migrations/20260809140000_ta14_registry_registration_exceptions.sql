@@ -276,6 +276,94 @@ where
 
 
 -- ============================================================================
+-- EXISTING-DEPLOYMENT CONSTRAINT PARITY
+--
+-- CREATE TABLE IF NOT EXISTS does not retrofit constraints onto a table that
+-- already exists. After repairing legacy/null values above, explicitly install
+-- the same invariants that a fresh database receives.
+-- ============================================================================
+
+alter table public.ta14_registry_registration_exceptions
+  alter column submission_id set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column owner_user_id set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column exception_status set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column exception_type set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column exception_summary set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column exception_details set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column readiness_failures set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column opened_at set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column created_at set not null;
+
+alter table public.ta14_registry_registration_exceptions
+  alter column updated_at set not null;
+
+
+alter table public.ta14_registry_registration_exceptions
+  drop constraint if exists
+    ta14_registry_registration_exceptions_status_check;
+
+alter table public.ta14_registry_registration_exceptions
+  add constraint
+    ta14_registry_registration_exceptions_status_check
+  check (
+    exception_status in (
+      'open',
+      'correction_required',
+      'under_review',
+      'resolved',
+      'dismissed'
+    )
+  );
+
+
+alter table public.ta14_registry_registration_exceptions
+  drop constraint if exists
+    ta14_registry_registration_exceptions_summary_check;
+
+alter table public.ta14_registry_registration_exceptions
+  add constraint
+    ta14_registry_registration_exceptions_summary_check
+  check (
+    length(btrim(exception_summary)) > 0
+  );
+
+
+alter table public.ta14_registry_registration_exceptions
+  drop constraint if exists
+    ta14_registry_registration_exceptions_resolution_check;
+
+alter table public.ta14_registry_registration_exceptions
+  add constraint
+    ta14_registry_registration_exceptions_resolution_check
+  check (
+    (
+      exception_status in ('resolved', 'dismissed')
+      and resolved_at is not null
+    )
+    or
+    (
+      exception_status not in ('resolved', 'dismissed')
+    )
+  );
+
+
+-- ============================================================================
 -- INDEXES
 -- ============================================================================
 
@@ -309,67 +397,6 @@ on public.ta14_registry_registration_exceptions (
   submission_id,
   exception_status,
   opened_at desc
-)
-where
-  exception_status in (
-    'open',
-    'correction_required',
-    'under_review'
-  );
-
-
--- ============================================================================
--- SINGLE ACTIVE EXCEPTION INVARIANT
---
--- The recorder already reuses an equivalent active exception. This partial
--- unique index makes the database itself enforce the stronger invariant that
--- a submission cannot accumulate multiple simultaneous active registration
--- exceptions under concurrent or repeated finalization attempts.
---
--- Existing duplicate active rows are preserved historically by resolving all
--- but the newest row before the invariant is installed.
--- ============================================================================
-
-with ranked_active_exceptions as (
-  select
-    id,
-    row_number() over (
-      partition by submission_id
-      order by
-        opened_at desc nulls last,
-        created_at desc nulls last,
-        id desc
-    ) as active_rank
-  from public.ta14_registry_registration_exceptions
-  where
-    exception_status in (
-      'open',
-      'correction_required',
-      'under_review'
-    )
-)
-update public.ta14_registry_registration_exceptions exception_record
-set
-  exception_status = 'resolved',
-  resolution_summary = coalesce(
-    nullif(btrim(exception_record.resolution_summary), ''),
-    'Resolved during TA-14 Registry exception-invariant migration because a newer active registration exception exists for the same submission.'
-  ),
-  resolved_at = coalesce(
-    exception_record.resolved_at,
-    timezone('utc', now())
-  ),
-  updated_at = timezone('utc', now())
-from ranked_active_exceptions ranked
-where
-  ranked.id = exception_record.id
-  and ranked.active_rank > 1;
-
-
-create unique index if not exists
-  ta14_registry_registration_exceptions_one_active_per_submission_uidx
-on public.ta14_registry_registration_exceptions (
-  submission_id
 )
 where
   exception_status in (
@@ -534,10 +561,9 @@ begin
   end if;
 
   /*
-   * Preserve one active readiness exception per submission.
+   * Preserve one active readiness exception for the same submission/code.
    * Repeated finalization attempts update the existing administrative record
-   * rather than multiplying simultaneous open exceptions. The partial unique
-   * index below/above makes the same invariant authoritative at database level.
+   * rather than multiplying equivalent open exceptions.
    */
   select id
   into existing_exception_id
@@ -549,6 +575,8 @@ begin
       'correction_required',
       'under_review'
     )
+    and coalesce(exception_code, '') =
+      coalesce(requested_exception_code, '')
   order by opened_at desc
   limit 1;
 
