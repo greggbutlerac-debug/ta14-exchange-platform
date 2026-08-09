@@ -217,7 +217,9 @@ export default async function TA14CanonicalLinkPage({ params }: PageProps) {
 
           <div className="mt-7 grid gap-4 md:grid-cols-3">
             <Link
-              href="/academy/24-link-architecture/provenance"
+              href={`/academy/24-link-architecture/provenance?link=${encodeURIComponent(
+                item.linkId,
+              )}`}
               className="rounded-2xl border border-sky-300/20 bg-sky-300/[0.05] p-5 transition hover:border-sky-300/40 hover:bg-sky-300/[0.08]"
             >
               <p className="text-xs font-semibold uppercase tracking-[0.16em] text-sky-300">
