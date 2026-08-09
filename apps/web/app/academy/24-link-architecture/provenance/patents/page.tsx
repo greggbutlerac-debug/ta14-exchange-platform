@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useEffect, useMemo, useState } from "react";
 
 import {
   TA14_24_LINKS,
@@ -48,6 +49,17 @@ function patentFamilyName(
 }
 
 export default function TA14PatentPortfolioMapPage() {
+  return (
+    <Suspense fallback={<PatentPortfolioRouteLoading />}>
+      <TA14PatentPortfolioMapContent />
+    </Suspense>
+  );
+}
+
+function TA14PatentPortfolioMapContent() {
+  const searchParams = useSearchParams();
+  const requestedApplication = searchParams.get("application");
+
   const [sources, setSources] = useState<TA14CanonicalSourceRecord[]>([]);
   const [relations, setRelations] = useState<
     TA14CanonicalLinkSourceRecord[]
@@ -85,7 +97,17 @@ export default function TA14PatentPortfolioMapPage() {
         );
 
         if (patentSources.length > 0) {
-          setSelectedSourceId((current) => current ?? patentSources[0].id);
+          const requested = requestedApplication
+            ? patentSources.find(
+                (source) =>
+                  source.sourceIdentifier === requestedApplication ||
+                  source.id === requestedApplication,
+              )
+            : null;
+
+          setSelectedSourceId(
+            requested?.id ?? patentSources[0].id,
+          );
         }
       } catch (caught) {
         if (!cancelled) {
@@ -107,7 +129,7 @@ export default function TA14PatentPortfolioMapPage() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [requestedApplication]);
 
   const families = useMemo<PatentFamily[]>(() => {
     const grouped = new Map<number, PatentFamily>();
@@ -479,5 +501,27 @@ function Detail({ label, value }: { label: string; value: string }) {
       </p>
       <p className="mt-2 text-sm text-slate-200">{value}</p>
     </div>
+  );
+}
+
+
+function PatentPortfolioRouteLoading() {
+  return (
+    <main className="min-h-screen bg-[#030712] text-white">
+      <section className="border-b border-white/10">
+        <div className="mx-auto max-w-7xl px-6 py-16 lg:px-8">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-amber-300">
+            TA-14 Patent Position · Architecture Map
+          </p>
+          <h1 className="mt-3 text-4xl font-semibold tracking-tight">
+            Resolving patent application…
+          </h1>
+          <p className="mt-4 max-w-2xl text-sm leading-7 text-slate-400">
+            Loading the requested application and its bounded relationships to
+            the canonical 24-link architecture.
+          </p>
+        </div>
+      </section>
+    </main>
   );
 }
