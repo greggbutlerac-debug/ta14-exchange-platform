@@ -17,7 +17,7 @@ const evidenceRecords = [
     title: "Git Freeze Production.jpg",
     role: "Private implementation freeze identity",
     supports:
-      "Supports the existence of the private harmonic-stabilizer-core repository, the v2-development branch, and the declared Version 2 freeze state associated with commit 6a3a89f60711b2782453e7f16cbf1bd09653f8bc.",
+      "Supports the existence of an attributable private Version 2 implementation baseline and frozen implementation state preserved in controlled Registry evidence.",
     boundary:
       "Does not independently verify the private source-code contents or prove that the frozen implementation performs every declared constitutional behavior.",
   },
@@ -101,7 +101,7 @@ const chain = [
 ];
 
 const nextEvidence = [
-  "Exact frozen Version 2 runtime identifier and commit: 6a3a89f60711b2782453e7f16cbf1bd09653f8bc.",
+  "Exact frozen Version 2 runtime identifier and commit, as preserved in controlled Registry evidence.",
   "A bounded scenario beginning with an admissible proposed consequential transition and an attributable initial determination.",
   "A materially relevant state and/or authority change before consequential execution.",
   "The updated evidence/state packet presented to the same frozen Version 2 runtime.",
@@ -183,7 +183,7 @@ export default function HarmonicArtifactTwoPage() {
             <div><dt>Prior findings inherited</dt><dd>No</dd></div>
             <div><dt>Prior evidence inherited</dt><dd>No</dd></div>
             <div><dt>Evidence records reviewed</dt><dd>7 of 7</dd></div>
-            <div><dt>Private freeze commit</dt><dd>6a3a89f60711b2782453e7f16cbf1bd09653f8bc</dd></div>
+            <div><dt>Private freeze reference</dt><dd>Preserved in controlled Registry evidence</dd></div>
             <div><dt>TA-14 finding</dt><dd className="partial">PARTIAL ADMISSIBILITY</dd></div>
             <div><dt>Execution validation</dt><dd className="open">OPEN</dd></div>
           </dl>
