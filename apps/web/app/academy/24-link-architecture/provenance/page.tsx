@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
+import { TA14ProvenanceAdminLink } from "@/components/academy/ta14-provenance-admin-link";
 import {
   TA14_24_LINKS,
   type TA14LinkId,
@@ -80,12 +81,16 @@ export default function TA14ProvenanceMapPage() {
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_16%_0%,rgba(59,130,246,0.16),transparent_36%),radial-gradient(circle_at_84%_10%,rgba(168,85,247,0.11),transparent_34%)]" />
         <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
-          <Link
-            href="/academy/24-link-architecture"
-            className="text-sm font-semibold text-sky-300"
-          >
-            ← Back to 24-Link Explorer
-          </Link>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <Link
+              href="/academy/24-link-architecture"
+              className="text-sm font-semibold text-sky-300"
+            >
+              ← Back to 24-Link Explorer
+            </Link>
+
+            <TA14ProvenanceAdminLink />
+          </div>
 
           <p className="mt-10 text-xs font-semibold uppercase tracking-[0.26em] text-indigo-300">
             TA-14 Academy · Provenance Map
@@ -204,6 +209,10 @@ export default function TA14ProvenanceMapPage() {
                 public source relationship has yet been entered into the
                 canonical registry for this link.
               </p>
+
+              <div className="mt-4">
+                <TA14ProvenanceAdminLink />
+              </div>
             </div>
           ) : (
             <div className="mt-6 space-y-4">
