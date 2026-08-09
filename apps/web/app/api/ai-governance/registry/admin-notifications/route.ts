@@ -258,7 +258,7 @@ export async function GET(request: NextRequest) {
       return jsonError('Unable to load Registry administration notifications.', 500);
     }
 
-    const notifications = (data ?? []) as NotificationRow[];
+    const notifications = (data ?? []) as unknown as NotificationRow[];
 
     const { data: summaryData, error: summaryError } = await adminClient
       .from('ta14_registry_admin_notifications')
