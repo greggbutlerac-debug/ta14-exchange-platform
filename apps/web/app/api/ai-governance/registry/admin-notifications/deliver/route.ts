@@ -61,6 +61,26 @@ function parseReviewerEmails(): string[] {
     .filter(Boolean);
 }
 
+function getEmailDeliveryCutoff(): string | null {
+  const raw = getEnv(
+    'TA14_REGISTRY_NOTIFICATION_EMAIL_CUTOFF_AT',
+  );
+
+  if (!raw) {
+    return null;
+  }
+
+  const parsed = new Date(raw);
+
+  if (Number.isNaN(parsed.getTime())) {
+    throw new Error(
+      'TA14_REGISTRY_NOTIFICATION_EMAIL_CUTOFF_AT must be a valid ISO-8601 timestamp.',
+    );
+  }
+
+  return parsed.toISOString();
+}
+
 function escapeHtml(value: string): string {
   return value
     .replaceAll('&', '&amp;')
@@ -276,10 +296,11 @@ async function sendWithResend(
 
 async function getUndeliveredNotifications(
   limit: number,
+  cutoffAt: string | null,
 ): Promise<NotificationDeliveryRow[]> {
   const supabase = getServiceClient();
 
-  const { data, error } = await supabase
+  let query = supabase
     .from('ta14_registry_admin_notifications')
     .select(
       [
@@ -302,6 +323,12 @@ async function getUndeliveredNotifications(
     .eq('notification_type', 'governance_registered')
     .order('occurred_at', { ascending: true })
     .limit(limit);
+
+  if (cutoffAt) {
+    query = query.gte('occurred_at', cutoffAt);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     throw new Error(
@@ -374,8 +401,13 @@ async function deliver(request: NextRequest) {
       ? Math.min(100, Math.max(1, Math.trunc(requestedLimit)))
       : 25;
 
+    const cutoffAt = getEmailDeliveryCutoff();
+
     const notifications =
-      await getUndeliveredNotifications(limit);
+      await getUndeliveredNotifications(
+        limit,
+        cutoffAt,
+      );
 
     const results: DeliveryResult[] = [];
 
@@ -451,6 +483,7 @@ async function deliver(request: NextRequest) {
       ok: true,
       inspectedNotifications: notifications.length,
       recipients: recipients.length,
+      emailDeliveryCutoffAt: cutoffAt,
       delivered: results.filter((item) => item.delivered).length,
       skipped: results.filter((item) => item.skipped).length,
       failed: results.filter(
