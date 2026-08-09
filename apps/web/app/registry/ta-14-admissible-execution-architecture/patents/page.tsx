@@ -6,34 +6,365 @@ const patentRecords = [
   {
     number: '01',
     identifier: '63/940,392',
-    title: 'Standardized HVAC Diagnostic & Electrical Integrity',
+    title: 'System and Method for Standardized HVAC Diagnostic Evaluation and Electrical Integrity Assessment',
     filingType: 'Provisional Patent Application',
     filingDate: 'December 14, 2025',
+    familyNumber: '01',
+    family: 'Foundational Proof-Before-Action Diagnostic Governance',
     status: 'FILED',
-    description:
-      'Preserves the declared filing chronology for standardized HVAC diagnostic and electrical integrity architecture.',
+    description: 'Foundational proof-before-action filing for ordered diagnostic sequence, instrument-anchored measurement, threshold comparison, condition classification, and verification before intervention.',
   },
   {
     number: '02',
     identifier: '19/427,932',
-    title: 'Standardized HVAC Diagnostic & Electrical Integrity',
+    title: 'System and Method for Standardized HVAC Diagnostic Evaluation and Electrical Integrity Assessment',
     filingType: 'Non-Provisional Patent Application',
     filingDate: 'December 19, 2025',
+    familyNumber: '01',
+    family: 'Foundational Proof-Before-Action Diagnostic Governance',
     status: 'FILED',
-    description:
-      'Preserves the declared non-provisional filing record and its relationship to the earlier provisional filing.',
+    description: 'Continues the foundational diagnostic proof architecture through non-provisional application activity and links the Transparent Air field discipline to later admissible-execution governance.',
   },
   {
     number: '03',
     identifier: '63/957,580',
-    title: 'Analyzer-Driven Refrigerant Governor',
+    title: 'Analyzer-Driven Refrigerant Governor with Automated Charging and Evidentiary Compliance Recording',
     filingType: 'Provisional Patent Application',
     filingDate: 'January 9, 2026',
+    familyNumber: '02',
+    family: 'Analyzer, Refrigerant Governor, and Controlled Corrective Action',
     status: 'FILED',
-    description:
-      'Preserves the declared filing chronology for analyzer-driven refrigerant governance, evidence capture, and bounded execution control.',
+    description: 'Moves from diagnostic proof into governed corrective execution by coupling analyzer state, refrigerant governance, automated charging, evidentiary recording, and execution verification.',
+  },
+  {
+    number: '04',
+    identifier: '63/965,488',
+    title: 'Evidence-Locked Verification of Declared Refrigerant State Transitions in Environmental Integrity Governance Systems',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '02',
+    family: 'Analyzer, Refrigerant Governor, and Controlled Corrective Action',
+    status: 'FILED',
+    description: 'Governs consequence-bearing refrigerant state transitions as declared, bounded, recorded, and evidence-verified events.',
+  },
+  {
+    number: '05',
+    identifier: '63/968,807',
+    title: 'Systems and Methods for Verifying Refrigerant Charge Correctness Using Real-Time Indoor Psychrometrics, Airflow Resolution, and Time-Bounded Evidence',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '02',
+    family: 'Analyzer, Refrigerant Governor, and Controlled Corrective Action',
+    status: 'FILED',
+    description: 'Ties refrigerant charge correctness to real-time indoor psychrometric, airflow, and time-bounded evidence during the active state-changing event.',
+  },
+  {
+    number: '06',
+    identifier: '63/968,809',
+    title: 'Systems and Methods for Time-Bounded Evidence Capture and Verification During Refrigerant State Transitions',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '02',
+    family: 'Analyzer, Refrigerant Governor, and Controlled Corrective Action',
+    status: 'FILED',
+    description: 'Bounds evidence capture to the actual physical transition window and preserves a non-editable transition record.',
+  },
+  {
+    number: '07',
+    identifier: '64/015,207',
+    title: 'System-Embedded Environmental Integrity Node for Admissibility-Gated Autonomous HVAC Performance Correction and Refrigerant Governance',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '02',
+    family: 'Analyzer, Refrigerant Governor, and Controlled Corrective Action',
+    status: 'FILED',
+    description: 'Extends the architecture into autonomous HVAC correction while keeping consequence-bearing execution conditioned on admissible proof.',
+  },
+  {
+    number: '08',
+    identifier: '64/015,224',
+    title: 'Autonomous Psychrometric and System-State Driven Refrigerant Optimization System with Admissibility-Gated Execution and Closed-Loop Performance Verification',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '02',
+    family: 'Analyzer, Refrigerant Governor, and Controlled Corrective Action',
+    status: 'FILED',
+    description: 'Couples autonomous refrigerant optimization to admissibility-gated execution and closed-loop outcome verification.',
+  },
+  {
+    number: '09',
+    identifier: '63/963,010',
+    title: 'System and Method for Environmental Integrity Governance Using Continuous Psychrometric State Classification',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Establishes continuous psychrometric state governance rather than episodic environmental snapshot logic.',
+  },
+  {
+    number: '10',
+    identifier: '63/963,035',
+    title: 'System and Method for Governing Energy-to-Environmental Outcome Coupling Using Non-Invasive Electrical and Psychrometric Evidence',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Governs whether energy behavior produced the claimed environmental outcome using non-invasive electrical and psychrometric evidence.',
+  },
+  {
+    number: '11',
+    identifier: '19/452,753',
+    title: 'System and Methods for Environmental Integrity Evidence Production Using Passive Outcome Recording and Time-Bounded Risk Envelopes',
+    filingType: 'Non-Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Separates passive environmental evidence production from diagnostics, remediation, enforcement, and control.',
+  },
+  {
+    number: '12',
+    identifier: '19/452,963',
+    title: 'Evidence-Locked Environmental Integrity Governance and Witness Rendering Methods',
+    filingType: 'Non-Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Preserves environmental and energy state as time-bounded fact through evidence-locked governance and non-diagnostic witness rendering.',
+  },
+  {
+    number: '13',
+    identifier: '63/963,978',
+    title: 'System and Method for Dual-Node Psychrometric Evidence Recording and Governance in Safety-Critical Environmental Integrity Determinations',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Adds dual-node psychrometric evidence structures for environmental state transitions, persistence, and safety-critical determinations.',
+  },
+  {
+    number: '14',
+    identifier: '63/966,331',
+    title: 'Thermostat-Embedded Environmental Integrity Recording System with Longitudinal Envelope Monitoring and Change-Point Detection',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Defines a thermostat-embedded passive witness for longitudinal environmental behavior, envelope persistence, and intervention-associated change points.',
+  },
+  {
+    number: '15',
+    identifier: '63/966,959',
+    title: 'Evidence-Locked Environmental Integrity Verification for Safety-Critical Imaging Systems Using Non-Controlling Outcome Witnessing',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Extends non-controlling outcome witnessing and evidence integrity beyond HVACDR into safety-critical imaging systems.',
+  },
+  {
+    number: '16',
+    identifier: '63/973,113',
+    title: 'Systems and Methods for Time-Bounded, Evidence-Locked Environmental Integrity Recording Using a Governed Environmental Integrity Recorder',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Defines governed environmental integrity recorders producing time-bounded, evidence-locked records that can support AIR, PAIR, institutional records, and later reliance.',
+  },
+  {
+    number: '17',
+    identifier: '64/011,306',
+    title: 'Environmental Integrity Governance Systems, Atmospheric Integrity Records, and Federated Evidence Architectures for Non-Invasive Environmental Truth Verification',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '03',
+    family: 'Environmental Integrity Governance and Continuous Environmental Truth',
+    status: 'FILED',
+    description: 'Formalizes Environmental Integrity Governance, Atmospheric Integrity Records, and federated non-invasive environmental truth verification.',
+  },
+  {
+    number: '18',
+    identifier: '63/963,839',
+    title: 'System and Method for Evidence Admissibility, Invalidity Gating, and Measurement Integrity in Evidence-Locked Environmental Governance',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '04',
+    family: 'Admissibility, Invalidity, and Measurement Integrity',
+    status: 'FILED',
+    description: 'Gates authoritative evidence creation when provenance, calibration, uncertainty, synchronization, stability, or temporal sufficiency conditions fail.',
+  },
+  {
+    number: '19',
+    identifier: '63/963,826',
+    title: 'System and Method for Institutional Boundary Governance and Non-Encroachment in Evidence-Locked Environmental Integrity Determinations',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '05',
+    family: 'Institutional Authority Separation, Firewalls, and Non-Coercive Governance',
+    status: 'FILED',
+    description: 'Separates governance from diagnostics, prescriptions, optimization, enforcement, and operational control.',
+  },
+  {
+    number: '20',
+    identifier: '63/963,833',
+    title: 'System and Method for Third-Party Interpretation Firewalls in Evidence-Locked Environmental Integrity Governance',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '05',
+    family: 'Institutional Authority Separation, Firewalls, and Non-Coercive Governance',
+    status: 'FILED',
+    description: 'Preserves one-way, read-only interpretation boundaries so downstream interpretation cannot mutate the original evidence record.',
+  },
+  {
+    number: '21',
+    identifier: '63/966,338',
+    title: 'Non-Coercive Evidence Escalation and Authority-Separated Environmental Integrity Architecture',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '05',
+    family: 'Institutional Authority Separation, Firewalls, and Non-Coercive Governance',
+    status: 'FILED',
+    description: 'Preserves owner-initiated escalation while separating passive evidence usefulness from automatic coercive enforcement.',
+  },
+  {
+    number: '22',
+    identifier: '63/966,343',
+    title: 'Thermostat-Sourced Environmental Integrity Synchronization with Analyzer and Procedural Governor Systems',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '05',
+    family: 'Institutional Authority Separation, Firewalls, and Non-Coercive Governance',
+    status: 'FILED',
+    description: 'Synchronizes passive environmental witnessing, analyzer state resolution, procedural governance, and authorized service activity while preserving authority separation.',
+  },
+  {
+    number: '23',
+    identifier: '64/015,062',
+    title: 'Systems and Methods for Continuous Personal Environmental Exposure Recording, Integrity-Governed Chronology, and Federated Environmental Data Integration',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '06',
+    family: 'AIR, PAIR, Federated Atmospheric Continuity, and Human Environmental Chronology',
+    status: 'FILED',
+    description: 'Establishes Personal Atmospheric Integrity Records as continuity across multiple AIR-recorded environments.',
+  },
+  {
+    number: '24',
+    identifier: '64/015,073',
+    title: 'Systems and Methods for Federated Environmental Exposure Tracking, Risk Detection, and Cross-Domain Environmental Intelligence',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '06',
+    family: 'AIR, PAIR, Federated Atmospheric Continuity, and Human Environmental Chronology',
+    status: 'FILED',
+    description: 'Extends governed exposure continuity across homes, workplaces, schools, hospitals, vehicles, public spaces, and other domains.',
+  },
+  {
+    number: '25',
+    identifier: '64/015,076',
+    title: 'Systems and Methods for Federated Atmospheric Integrity Networks Utilizing Mobile and Fixed Environmental Nodes for Real-Time Environmental Mapping, Continuous Environmental Representation, and Cross-Domain Environmental Intelligence',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '06',
+    family: 'AIR, PAIR, Federated Atmospheric Continuity, and Human Environmental Chronology',
+    status: 'FILED',
+    description: 'Defines the network layer for mobile and fixed Atmospheric Integrity nodes, environmental mapping, and cross-domain atmospheric intelligence.',
+  },
+  {
+    number: '26',
+    identifier: '64/024,196',
+    title: 'System and Method for Continuity Assurance of Personal Environmental Chronological Records Using Multi-Node Redundant Recording Architecture',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '06',
+    family: 'AIR, PAIR, Federated Atmospheric Continuity, and Human Environmental Chronology',
+    status: 'FILED',
+    description: 'Adds multi-node redundancy and continuity assurance to personal environmental chronological records.',
+  },
+  {
+    number: '27',
+    identifier: '64/024,209',
+    title: 'System and Method for Person-Associated Environmental Sensing Using Modular Body-Proximate Nodes',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '06',
+    family: 'AIR, PAIR, Federated Atmospheric Continuity, and Human Environmental Chronology',
+    status: 'FILED',
+    description: 'Extends AIR and PAIR into body-proximate sensing that can remain associated with a person’s environmental continuity path.',
+  },
+  {
+    number: '28',
+    identifier: '64/025,521',
+    title: 'System and Method for Real-Time Guided Human Task Execution with Automated Verification and Evidence Capture',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '07',
+    family: 'Guided Human Execution and Proof-Captured Task Performance',
+    status: 'FILED',
+    description: 'Makes consequential human procedure guided, verified, and evidentiary rather than reconstructed after the fact.',
+  },
+  {
+    number: '29',
+    identifier: '64/021,710',
+    title: 'Systems and Methods for Enforcing Admissible State Transitions Using a Governed, Append-Only Chronological Record',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '08',
+    family: 'Admissible State Transitions, Continuity, and Execution Control',
+    status: 'FILED',
+    description: 'Enforces state-transition legitimacy through governed, append-only chronology and requires the underlying state transition to remain admissible.',
+  },
+  {
+    number: '30',
+    identifier: '64/022,608',
+    title: 'System and Method for Deterministic Execution Control Based on Admissible Chronological Evidence',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '08',
+    family: 'Admissible State Transitions, Continuity, and Execution Control',
+    status: 'FILED',
+    description: 'Directly connects deterministic execution control to the admissibility of the chronological evidence record.',
+  },
+  {
+    number: '31',
+    identifier: '64/030,366',
+    title: 'System and Method for Maintaining Admissible State Continuity and Determining Reliance Validity Over Time',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '08',
+    family: 'Admissible State Transitions, Continuity, and Execution Control',
+    status: 'FILED',
+    description: 'Governs continuing admissibility and reliance validity as evidence becomes stale, conditions change, or continuity breaks.',
+  },
+  {
+    number: '32',
+    identifier: '64/030,461',
+    title: 'Systems and Methods for Execution Control Based on Admissible State Validation',
+    filingType: 'Provisional Patent Application',
+    filingDate: 'Date not stated in public portfolio',
+    familyNumber: '08',
+    family: 'Admissible State Transitions, Continuity, and Execution Control',
+    status: 'FILED',
+    description: 'Direct execution-control anchor requiring admissible state validation before consequence-bearing execution is allowed to bind.',
   },
 ];
+
+const patentFamilies = Array.from(
+  new Map(
+    patentRecords.map((record) => [
+      record.familyNumber,
+      { number: record.familyNumber, title: record.family },
+    ]),
+  ).values(),
+);
 
 const filingFields = [
   {
@@ -177,8 +508,8 @@ export default function PatentsPage() {
         </h1>
 
         <p className="hero-copy">
-          This record preserves declared patent filings associated with TA-14
-          while maintaining a strict separation between filing chronology,
+          This record preserves the eight-family patent portfolio currently declared for TA-14
+          and its 32 documented U.S. application records while maintaining a strict separation between filing chronology,
           legal rights, inventorship, validity, scope, and final adjudication.
         </p>
 
@@ -212,31 +543,56 @@ export default function PatentsPage() {
           <p className="eyebrow">DECLARED PATENT AND FILING RECORDS</p>
           <h2>The Registry preserves the filing trail without overstating what the filing proves.</h2>
           <p>
-            Each entry remains tied to its identifier, filing type, filing
-            date, declared architectural relationship, supporting documents,
-            and current status.
+            Each entry remains tied to its identifier, filing type, available filing
+            date, patent family, declared architectural relationship, supporting documents,
+            and current status. Unknown dates remain explicitly unstated rather than inferred.
           </p>
         </div>
 
-        <div className="patent-list">
-          {patentRecords.map((record) => (
-            <article key={record.identifier}>
-              <div className="patent-index">
-                <span>{record.number}</span>
-                <strong>{record.status}</strong>
+        <div className="portfolio-summary">
+          <strong>8 patent families</strong>
+          <span>32 currently documented U.S. application records</span>
+          <a
+            href="https://sites.google.com/view/ta-14-admissible-execution-arc/ta-14-patent-position-and-patent-portfolio"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Open canonical public patent-position record ↗
+          </a>
+        </div>
+
+        <div className="patent-families">
+          {patentFamilies.map((family) => (
+            <section className="patent-family" key={family.number}>
+              <div className="family-heading">
+                <span>PATENT FAMILY {family.number}</span>
+                <h3>{family.title}</h3>
               </div>
 
-              <div className="patent-content">
-                <div className="patent-meta">
-                  <span>{record.identifier}</span>
-                  <time>{record.filingDate}</time>
-                  <small>{record.filingType}</small>
-                </div>
+              <div className="patent-list">
+                {patentRecords
+                  .filter((record) => record.familyNumber === family.number)
+                  .map((record) => (
+                    <article key={record.identifier}>
+                      <div className="patent-index">
+                        <span>{record.number}</span>
+                        <strong>{record.status}</strong>
+                      </div>
 
-                <h3>{record.title}</h3>
-                <p>{record.description}</p>
+                      <div className="patent-content">
+                        <div className="patent-meta">
+                          <span>US {record.identifier}</span>
+                          <time>{record.filingDate}</time>
+                          <small>{record.filingType}</small>
+                        </div>
+
+                        <h4>{record.title}</h4>
+                        <p>{record.description}</p>
+                      </div>
+                    </article>
+                  ))}
               </div>
-            </article>
+            </section>
           ))}
         </div>
       </section>
@@ -380,6 +736,44 @@ export default function PatentsPage() {
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
         }
+
+
+        .portfolio-summary {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px 22px;
+          align-items: center;
+          margin: 28px 0 34px;
+          padding: 18px 20px;
+          border: 1px solid var(--line);
+          border-radius: 18px;
+          background: rgba(8, 24, 40, 0.72);
+        }
+
+        .portfolio-summary strong { color: var(--gold); }
+        .portfolio-summary span { color: var(--muted); }
+        .portfolio-summary a { margin-left: auto; color: var(--blue); }
+
+        .patent-families { display: grid; gap: 34px; }
+
+        .patent-family {
+          padding: 24px;
+          border: 1px solid rgba(109, 216, 255, 0.16);
+          border-radius: 24px;
+          background: rgba(4, 14, 26, 0.58);
+        }
+
+        .family-heading { margin-bottom: 20px; }
+        .family-heading span {
+          display: block;
+          margin-bottom: 8px;
+          color: var(--gold);
+          font-size: 0.76rem;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+        }
+        .family-heading h3 { margin: 0; font-size: clamp(1.2rem, 2vw, 1.75rem); }
+        .patent-content h4 { margin: 10px 0 8px; font-size: 1.08rem; line-height: 1.35; }
 
         .background {
           position: fixed;
