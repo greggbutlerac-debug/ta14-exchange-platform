@@ -1360,7 +1360,7 @@ export default function RegisterGovernancePage() {
     return nextErrors.length === 0;
   }
 
-  function buildManifest() {
+  function buildManifest(confirmedDraftId?: string | null) {
     return {
       schema: 'TA-14-AI-GOVERNANCE-REGISTRY-INTAKE',
       schemaVersion: '1.0',
@@ -1413,7 +1413,7 @@ export default function RegisterGovernancePage() {
     };
   }
 
-  function downloadManifest() {
+  async function downloadManifest() {
     if (!validate()) {
       if (!form.ownershipDeclaration.trim()) {
         setMessage(
@@ -1446,9 +1446,33 @@ export default function RegisterGovernancePage() {
       return;
     }
 
-    const blob = new Blob([JSON.stringify(buildManifest(), null, 2)], {
-      type: 'application/json',
-    });
+    /*
+     * Page 14 is a governed manifest boundary. Persist the exact current form
+     * before generating the manifest so edits made on this page — especially
+     * the ownership/submission-rights declaration — cannot exist only in
+     * transient React/browser state.
+     */
+    const confirmedDraftId = await saveDraft();
+
+    if (!confirmedDraftId) {
+      setMessage(
+        'The intake manifest was not generated because the current Page 14 state could not be confirmed as an account-backed TA-14 Registry draft. Your browser recovery copy remains available, but it is not the governed Registry record.',
+      );
+      return;
+    }
+
+    const blob = new Blob(
+      [
+        JSON.stringify(
+          buildManifest(confirmedDraftId),
+          null,
+          2,
+        ),
+      ],
+      {
+        type: 'application/json',
+      },
+    );
     const url = URL.createObjectURL(blob);
     const anchor = document.createElement('a');
     anchor.href = url;
@@ -2318,7 +2342,7 @@ export default function RegisterGovernancePage() {
                   readiness indicators, declarations, manifest, and evidence hashes.
                 </p>
                 <div className="receipt-actions">
-                  <button type="button" className="secondary-button" onClick={downloadManifest}>Download Intake Manifest ↓</button>
+                  <button type="button" className="secondary-button" onClick={() => void downloadManifest()}>Download Intake Manifest ↓</button>
                   <button type="button" className="primary-button" onClick={generateReceipt}>Generate Intake Receipt ✓</button>
                 </div>
                 {receiptGenerated && <span className="receipt-success">Receipt generated successfully.</span>}
