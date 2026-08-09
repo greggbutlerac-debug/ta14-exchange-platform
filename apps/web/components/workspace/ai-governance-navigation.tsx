@@ -36,6 +36,8 @@ const governanceLibraryHref = '/workspace/ai-governance/library';
 
 const registryHref = '/workspace/ai-governance/registry';
 
+const registryInboxHref = '/workspace/ai-governance/registry/inbox';
+
 const partnerReviewNetworkHref =
   '/workspace/ai-governance/partner-review-network';
 
@@ -137,6 +139,18 @@ const workspaceNavigation: NavigationItem[] = [
   },
 
   {
+    href: registryInboxHref,
+
+    label: 'Registry Inbox',
+
+    glyph: 'IN',
+
+    matchPrefixes: [registryInboxHref],
+
+    institutional: true,
+  },
+
+  {
     href: '/workspace/routes/new',
 
     label: 'Build a Route',
@@ -211,6 +225,14 @@ function isItemActive(
 
   if (item.href === aiGovernanceHomeHref) {
     return pathname === aiGovernanceHomeHref;
+  }
+
+  if (item.href === registryHref) {
+    return (
+      pathname === registryHref ||
+      (pathname.startsWith(`${registryHref}/`) &&
+        !pathname.startsWith(registryInboxHref))
+    );
   }
 
   const prefixes =
