@@ -22,10 +22,9 @@ begin;
 -- A submission that remains in SUBMITTED state without a Registry Identifier
 -- requires administrative awareness.
 --
--- This trigger may briefly observe automatic-pathway submissions as SUBMITTED
--- before the automatic finalizer completes. The resulting Inbox event remains
--- a chronology record; when registration completes, the separate
--- governance_registered event is also preserved.
+-- Automatic registration pathways are explicitly excluded so their transient
+-- SUBMITTED staging state does not create a false human-review alert.
+-- Only pathways that genuinely remain waiting for review create this event.
 -- ============================================================================
 
 create or replace function
@@ -43,6 +42,18 @@ begin
   end if;
 
   if new.registry_identifier is not null then
+    return new;
+  end if;
+
+  -- Automatic registration pathways must not create a transient
+  -- "review requested" alert merely because the submission is staged
+  -- as SUBMITTED immediately before the governed auto-finalizer runs.
+  if coalesce(new.requested_review_pathway, 'Record-only registration')
+     in (
+       'Record-only registration',
+       'Administrative completeness review'
+     )
+  then
     return new;
   end if;
 
@@ -392,6 +403,13 @@ from public.ai_governance_registry_submissions
 where
   submission.status = 'submitted'
   and submission.registry_identifier is null
+  and coalesce(
+    submission.requested_review_pathway,
+    'Record-only registration'
+  ) not in (
+    'Record-only registration',
+    'Administrative completeness review'
+  )
 
 on conflict (notification_key)
 do nothing;
