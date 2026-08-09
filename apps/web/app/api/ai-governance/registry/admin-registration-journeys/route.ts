@@ -14,10 +14,38 @@ type JourneyRow = {
   latest_submission_submitted_at: string | null;
   latest_registration_completed_at: string | null;
   latest_registration_failed_at: string | null;
-  lifecycle_event_count: number | null;
-  governance_submission_count: number | null;
+  lifecycle_event_count: number | string | null;
+  governance_submission_count: number | string | null;
+  latest_submission_id: string | null;
   latest_submission_status: string | null;
+  latest_submission_created_at: string | null;
+  latest_submission_updated_at: string | null;
+  latest_authoritative_submission_submitted_at: string | null;
+  latest_submission_accepted_at: string | null;
+  latest_registry_identifier: string | null;
+  latest_governance_name: string | null;
+  latest_organization_name: string | null;
+  latest_claimant_name: string | null;
+  latest_contact_email: string | null;
+  latest_requested_review_pathway: string | null;
 };
+
+type JourneyState =
+  | 'registered'
+  | 'submitted'
+  | 'draft_saved'
+  | 'failed'
+  | 'started'
+  | 'opened'
+  | 'account_only';
+
+type AttentionState =
+  | 'none'
+  | 'failed'
+  | 'stalled'
+  | 'in_progress';
+
+const STALLED_AFTER_MS = 24 * 60 * 60 * 1000;
 
 function parseReviewerEmails(): Set<string> {
   return new Set(
@@ -61,8 +89,7 @@ function createSessionClient(
 
 function createAdminClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
-  const serviceRoleKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
 
   if (!url || !serviceRoleKey) {
     throw new Error(
@@ -112,9 +139,7 @@ async function requireRegistryAdministrator() {
     };
   }
 
-  const reviewerEmail =
-    user.email?.trim().toLowerCase() ?? '';
-
+  const reviewerEmail = user.email?.trim().toLowerCase() ?? '';
   const authorizedEmails = parseReviewerEmails();
 
   if (!reviewerEmail || !authorizedEmails.has(reviewerEmail)) {
@@ -136,15 +161,10 @@ async function requireRegistryAdministrator() {
 function readLimit(request: NextRequest): number {
   const raw = request.nextUrl.searchParams.get('limit');
 
-  if (!raw) {
-    return 100;
-  }
+  if (!raw) return 250;
 
   const parsed = Number(raw);
-
-  if (!Number.isFinite(parsed)) {
-    return 100;
-  }
+  if (!Number.isFinite(parsed)) return 250;
 
   return Math.min(500, Math.max(1, Math.trunc(parsed)));
 }
@@ -162,7 +182,6 @@ function normalizeCount(value: unknown): number {
 
   if (typeof value === 'string') {
     const parsed = Number(value);
-
     if (Number.isFinite(parsed)) {
       return Math.max(0, Math.trunc(parsed));
     }
@@ -171,16 +190,26 @@ function normalizeCount(value: unknown): number {
   return 0;
 }
 
-function deriveJourneyState(row: JourneyRow): string {
-  if (row.latest_registration_completed_at) {
+function deriveJourneyState(row: JourneyRow): JourneyState {
+  if (
+    row.latest_registration_completed_at ||
+    (row.latest_submission_status === 'registered' &&
+      row.latest_registry_identifier)
+  ) {
     return 'registered';
   }
 
-  if (row.latest_submission_submitted_at) {
+  if (
+    row.latest_submission_submitted_at ||
+    row.latest_authoritative_submission_submitted_at ||
+    ['submitted', 'under_review', 'hold', 'escalated', 'accepted', 'disputed'].includes(
+      row.latest_submission_status ?? '',
+    )
+  ) {
     return 'submitted';
   }
 
-  if (row.latest_draft_saved_at) {
+  if (row.latest_draft_saved_at || row.latest_submission_status === 'draft') {
     return 'draft_saved';
   }
 
@@ -202,7 +231,10 @@ function deriveJourneyState(row: JourneyRow): string {
 function latestJourneyTimestamp(row: JourneyRow): string | null {
   return (
     row.latest_registration_completed_at ??
+    row.latest_submission_accepted_at ??
+    row.latest_authoritative_submission_submitted_at ??
     row.latest_submission_submitted_at ??
+    row.latest_submission_updated_at ??
     row.latest_draft_saved_at ??
     row.latest_registration_failed_at ??
     row.first_registration_started_at ??
@@ -213,10 +245,38 @@ function latestJourneyTimestamp(row: JourneyRow): string | null {
   );
 }
 
+function deriveAttentionState(
+  journeyState: JourneyState,
+  latestJourneyAt: string | null,
+): AttentionState {
+  if (journeyState === 'registered' || journeyState === 'submitted') {
+    return 'none';
+  }
+
+  if (journeyState === 'failed') {
+    return 'failed';
+  }
+
+  if (!latestJourneyAt) {
+    return 'in_progress';
+  }
+
+  const timestamp = new Date(latestJourneyAt).getTime();
+
+  if (!Number.isFinite(timestamp)) {
+    return 'in_progress';
+  }
+
+  if (Date.now() - timestamp >= STALLED_AFTER_MS) {
+    return 'stalled';
+  }
+
+  return 'in_progress';
+}
+
 export async function GET(request: NextRequest) {
   try {
-    const authorization =
-      await requireRegistryAdministrator();
+    const authorization = await requireRegistryAdministrator();
 
     if (!authorization.ok) {
       return authorization.response;
@@ -253,7 +313,13 @@ export async function GET(request: NextRequest) {
       rows = rows.filter((row) =>
         [
           row.account_email,
+          row.latest_contact_email,
+          row.latest_governance_name,
+          row.latest_organization_name,
+          row.latest_claimant_name,
+          row.latest_registry_identifier,
           row.latest_submission_status,
+          row.latest_requested_review_pathway,
         ]
           .filter(Boolean)
           .some((value) =>
@@ -263,34 +329,77 @@ export async function GET(request: NextRequest) {
     }
 
     const journeys = rows
-      .map((row) => ({
-        userId: row.user_id,
-        accountEmail: row.account_email,
-        accountCreatedAt: row.account_created_at,
-        lastSignInAt: row.last_sign_in_at,
-        firstRegistrationPageOpenedAt:
-          row.first_registration_page_opened_at,
-        firstRegistrationStartedAt:
-          row.first_registration_started_at,
-        latestDraftSavedAt: row.latest_draft_saved_at,
-        latestSubmissionSubmittedAt:
-          row.latest_submission_submitted_at,
-        latestRegistrationCompletedAt:
-          row.latest_registration_completed_at,
-        latestRegistrationFailedAt:
-          row.latest_registration_failed_at,
-        lifecycleEventCount: normalizeCount(
-          row.lifecycle_event_count,
-        ),
-        governanceSubmissionCount: normalizeCount(
-          row.governance_submission_count,
-        ),
-        latestSubmissionStatus:
-          row.latest_submission_status,
-        journeyState: deriveJourneyState(row),
-        latestJourneyAt: latestJourneyTimestamp(row),
-      }))
+      .map((row) => {
+        const journeyState = deriveJourneyState(row);
+        const latestJourneyAt = latestJourneyTimestamp(row);
+        const attentionState = deriveAttentionState(
+          journeyState,
+          latestJourneyAt,
+        );
+
+        return {
+          userId: row.user_id,
+          accountEmail: row.account_email,
+          accountCreatedAt: row.account_created_at,
+          lastSignInAt: row.last_sign_in_at,
+          firstRegistrationPageOpenedAt:
+            row.first_registration_page_opened_at,
+          firstRegistrationStartedAt:
+            row.first_registration_started_at,
+          latestDraftSavedAt: row.latest_draft_saved_at,
+          latestSubmissionSubmittedAt:
+            row.latest_submission_submitted_at ??
+            row.latest_authoritative_submission_submitted_at,
+          latestRegistrationCompletedAt:
+            row.latest_registration_completed_at,
+          latestRegistrationFailedAt:
+            row.latest_registration_failed_at,
+          lifecycleEventCount: normalizeCount(
+            row.lifecycle_event_count,
+          ),
+          governanceSubmissionCount: normalizeCount(
+            row.governance_submission_count,
+          ),
+          latestSubmissionId: row.latest_submission_id,
+          latestSubmissionStatus: row.latest_submission_status,
+          latestSubmissionCreatedAt:
+            row.latest_submission_created_at,
+          latestSubmissionUpdatedAt:
+            row.latest_submission_updated_at,
+          latestSubmissionAcceptedAt:
+            row.latest_submission_accepted_at,
+          registryIdentifier: row.latest_registry_identifier,
+          governanceName: row.latest_governance_name,
+          organizationName: row.latest_organization_name,
+          claimantName: row.latest_claimant_name,
+          contactEmail: row.latest_contact_email,
+          requestedReviewPathway:
+            row.latest_requested_review_pathway,
+          journeyState,
+          latestJourneyAt,
+          attentionState,
+          needsAttention: attentionState !== 'none',
+        };
+      })
       .sort((a, b) => {
+        if (a.needsAttention !== b.needsAttention) {
+          return a.needsAttention ? -1 : 1;
+        }
+
+        const priority = (state: AttentionState) => {
+          if (state === 'failed') return 0;
+          if (state === 'stalled') return 1;
+          if (state === 'in_progress') return 2;
+          return 3;
+        };
+
+        const priorityDifference =
+          priority(a.attentionState) - priority(b.attentionState);
+
+        if (priorityDifference !== 0) {
+          return priorityDifference;
+        }
+
         const aTime = a.latestJourneyAt
           ? new Date(a.latestJourneyAt).getTime()
           : 0;
@@ -322,7 +431,16 @@ export async function GET(request: NextRequest) {
         (row) => row.journeyState === 'registered',
       ).length,
       failed: journeys.filter(
-        (row) => row.journeyState === 'failed',
+        (row) => row.attentionState === 'failed',
+      ).length,
+      stalled: journeys.filter(
+        (row) => row.attentionState === 'stalled',
+      ).length,
+      inProgress: journeys.filter(
+        (row) => row.attentionState === 'in_progress',
+      ).length,
+      needsAttention: journeys.filter(
+        (row) => row.needsAttention,
       ).length,
     };
 
@@ -334,6 +452,11 @@ export async function GET(request: NextRequest) {
         },
         summary,
         journeys,
+        attentionPolicy: {
+          stalledAfterHours: 24,
+          explanation:
+            'A journey needs attention when registration has not reached submitted or registered state. Failed attempts are immediate attention; incomplete journeys become stalled after 24 hours without newer activity.',
+        },
         boundary:
           'Registration journey telemetry is administrative visibility only. Authoritative registration state remains in the governance Registry submission and registration records.',
       },
