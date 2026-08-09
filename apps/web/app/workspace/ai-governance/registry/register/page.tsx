@@ -444,6 +444,8 @@ export default function RegisterGovernancePage() {
       | 'registration_page_opened'
       | 'registration_started'
       | 'draft_saved'
+      | 'submission_submitted'
+      | 'registration_completed'
       | 'registration_failed',
     payload?: Record<string, unknown>,
     submissionIdOverride?: string | null,
@@ -478,7 +480,6 @@ export default function RegisterGovernancePage() {
           method: 'POST',
           credentials: 'same-origin',
           cache: 'no-store',
-          keepalive: true,
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
@@ -1157,11 +1158,6 @@ export default function RegisterGovernancePage() {
       }
       setTermsBusy(false);
 
-      /*
-       * SUBMITTED and REGISTERED lifecycle telemetry are emitted by database
-       * triggers from authoritative Registry state. The browser intentionally
-       * does not duplicate those milestones.
-       */
       const response = await fetch('/api/ai-governance/registry/submit', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1172,6 +1168,17 @@ export default function RegisterGovernancePage() {
         const details = Array.isArray(payload.details) ? ` ${payload.details.join(' ')}` : '';
         throw new Error(`${payload.error ?? 'Unable to submit the Registry intake.'}${details}`);
       }
+
+      void recordLifecycleEvent(
+        'submission_submitted',
+        {
+          draft_id: submissionId,
+          requested_review_pathway:
+            form.reviewPathway,
+          authoritative_response_received: true,
+        },
+        submissionId,
+      );
 
       window.localStorage.removeItem(DRAFT_KEY);
 
@@ -1188,6 +1195,18 @@ export default function RegisterGovernancePage() {
         setPersistenceState('REGISTERED');
         setMessage(
           `${payload.notice ?? 'Governance Entity Registration completed successfully.'} Registry Identifier: ${payload.registration.registryIdentifier}.`,
+        );
+
+        void recordLifecycleEvent(
+          'registration_completed',
+          {
+            draft_id: submissionId,
+            registry_identifier:
+              payload.registration.registryIdentifier,
+            registered_at:
+              payload.registration.registeredAt ?? null,
+          },
+          submissionId,
         );
 
         window.location.assign(
@@ -1273,11 +1292,30 @@ export default function RegisterGovernancePage() {
   }
 
   function reviewMissingItems() {
-    validate();
-    document.querySelector<HTMLElement>('[data-required-incomplete="true"]')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-    });
+    const valid = validate();
+
+    if (valid) {
+      setMessage('All required Registry intake fields are complete.');
+      return;
+    }
+
+    window.setTimeout(() => {
+      const target =
+        document.querySelector<HTMLElement>(
+          '[data-required-incomplete="true"]',
+        );
+
+      target?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'center',
+      });
+
+      target
+        ?.querySelector<
+          HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+        >('input, textarea, select')
+        ?.focus();
+    }, 0);
   }
 
   function validate() {
@@ -1377,7 +1415,34 @@ export default function RegisterGovernancePage() {
 
   function downloadManifest() {
     if (!validate()) {
-      setMessage('Complete the required fields before generating the intake manifest.');
+      if (!form.ownershipDeclaration.trim()) {
+        setMessage(
+          'Ownership and submission-rights declaration is required. Complete the highlighted declaration on this page before generating the intake manifest. No EIN, CAGE code, or hidden corporate identifier is required by this field.',
+        );
+
+        window.setTimeout(() => {
+          const target =
+            document.querySelector<HTMLElement>(
+              '[data-required-field="ownershipDeclaration"]',
+            );
+
+          target?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'center',
+          });
+
+          target
+            ?.querySelector<HTMLTextAreaElement>('textarea')
+            ?.focus();
+        }, 0);
+
+        return;
+      }
+
+      setMessage(
+        'Complete the highlighted required fields before generating the intake manifest.',
+      );
+      reviewMissingItems();
       return;
     }
 
@@ -2074,8 +2139,26 @@ export default function RegisterGovernancePage() {
                 </article>
               ))}
               <div className="field-grid two">
-                <label>Ownership and submission-rights declaration <em>Required</em>
-                  <textarea rows={8} value={form.ownershipDeclaration} onChange={(e) => updateField('ownershipDeclaration', e.target.value)} />
+                <label
+                  data-required-field="ownershipDeclaration"
+                  data-required-incomplete={
+                    !form.ownershipDeclaration.trim()
+                      ? 'true'
+                      : undefined
+                  }
+                >
+                  Ownership and submission-rights declaration <em>Required</em>
+                  <textarea
+                    rows={8}
+                    value={form.ownershipDeclaration}
+                    placeholder="State the basis on which you are authorized to submit this governance entity or capability for registration, including ownership, organizational authority, or other submission rights."
+                    onChange={(e) =>
+                      updateField(
+                        'ownershipDeclaration',
+                        e.target.value,
+                      )
+                    }
+                  />
                 </label>
                 <label>License or permitted-use statement
                   <textarea rows={8} value={form.license} onChange={(e) => updateField('license', e.target.value)} />
@@ -2167,6 +2250,43 @@ export default function RegisterGovernancePage() {
                   </article>
                 ))}
               </div>
+
+              {!form.ownershipDeclaration.trim() && (
+                <div
+                  className="final-required-blocker"
+                  data-required-field="ownershipDeclaration"
+                  data-required-incomplete="true"
+                >
+                  <div className="final-required-blocker__copy">
+                    <span>Required before manifest generation</span>
+                    <strong>
+                      Ownership and submission-rights declaration
+                    </strong>
+                    <p>
+                      This is the specific field blocking the intake manifest.
+                      It does not require an EIN, CAGE code, or hidden corporate
+                      identifier. State the basis on which you are authorized to
+                      submit this governance entity or capability for Registry
+                      registration.
+                    </p>
+                  </div>
+
+                  <label>
+                    Declaration <em>Required</em>
+                    <textarea
+                      rows={7}
+                      value={form.ownershipDeclaration}
+                      placeholder="Example structure: I am authorized to submit this governance entity/capability for registration on behalf of the identified organization, and I have the ownership, organizational authority, or submission rights necessary to make this Registry declaration."
+                      onChange={(event) =>
+                        updateField(
+                          'ownershipDeclaration',
+                          event.target.value,
+                        )
+                      }
+                    />
+                  </label>
+                </div>
+              )}
 
               <div className="receipt-panel">
                 <h3>Registry Intake Receipt</h3>
@@ -2456,6 +2576,11 @@ export default function RegisterGovernancePage() {
         .quality-grid strong { display:block; margin:5px 0 9px; color:#f1ce89; }
         .quality-grid article > div { height:5px; overflow:hidden; border-radius:99px; background:rgba(255,255,255,.08); }
         .quality-grid i { display:block; height:100%; background:linear-gradient(90deg,#7cb6e8,#e8bc68); }
+        .final-required-blocker { display:grid; gap:14px; margin:18px 0; padding:18px; border:1px solid rgba(255,190,90,.5); border-radius:16px; background:linear-gradient(145deg,rgba(255,190,90,.08),rgba(255,255,255,.025)); }
+        .final-required-blocker__copy { display:grid; gap:5px; }
+        .final-required-blocker__copy > span { font-size:9px; font-weight:900; letter-spacing:.11em; text-transform:uppercase; opacity:.68; }
+        .final-required-blocker__copy > strong { font-size:15px; }
+        .final-required-blocker__copy > p { margin:0; max-width:820px; font-size:11px; line-height:1.65; opacity:.75; }
         .receipt-panel { padding:22px; border:1px solid rgba(126,178,225,.28); border-radius:17px; background:rgba(24,64,100,.18); }
         .receipt-panel h3 { margin-bottom:7px; font-family:Georgia,serif; font-size:25px; }
         .receipt-panel p { color:#aeb9ca; line-height:1.6; }
