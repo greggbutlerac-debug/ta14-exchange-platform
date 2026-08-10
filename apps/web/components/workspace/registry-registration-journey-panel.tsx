@@ -186,6 +186,82 @@ function submissionHref(journey: RegistrationJourney): string | null {
   )}`;
 }
 
+
+function nextAction(journey: RegistrationJourney): {
+  title: string;
+  explanation: string;
+  copyLabel?: string;
+  copyPath?: string;
+} {
+  if (journey.journeyState === "registered") {
+    return {
+      title: "Registration completed",
+      explanation:
+        "A Registry record exists. No registration recovery action is required.",
+    };
+  }
+
+  if (journey.journeyState === "submitted") {
+    return {
+      title: "Submission received",
+      explanation:
+        "The registration reached TA-14. Open the submission record to review its current processing state.",
+    };
+  }
+
+  if (journey.journeyState === "failed") {
+    return {
+      title: "Registration failed",
+      explanation:
+        "A failure was recorded before registration completed. Open the existing registration record when available; otherwise send the registrant back to Governance Entity Registration.",
+      copyLabel: "Copy recovery link",
+      copyPath: journey.latestSubmissionId
+        ? `/workspace/ai-governance/registry/register/${encodeURIComponent(journey.latestSubmissionId)}`
+        : "/workspace/ai-governance/registry/register",
+    };
+  }
+
+  if (journey.journeyState === "draft_saved") {
+    return {
+      title: "Draft exists — registration not submitted",
+      explanation:
+        "The registrant reached a saved draft but has not completed submission. Send them back to the existing draft rather than asking them to start over.",
+      copyLabel: "Copy resume draft link",
+      copyPath: journey.latestSubmissionId
+        ? `/workspace/ai-governance/registry/register/${encodeURIComponent(journey.latestSubmissionId)}`
+        : "/workspace/ai-governance/registry/register",
+    };
+  }
+
+  if (journey.journeyState === "started") {
+    return {
+      title: "Registration started — no submitted record",
+      explanation:
+        "The registrant began the Governance Entity Registration but has not reached a saved/submitted state visible to TA-14.",
+      copyLabel: "Copy continue-registration link",
+      copyPath: "/workspace/ai-governance/registry/register",
+    };
+  }
+
+  if (journey.journeyState === "opened") {
+    return {
+      title: "Registration page reached",
+      explanation:
+        "The registrant reached the registration route but has not yet produced a saved draft or submission record.",
+      copyLabel: "Copy continue-registration link",
+      copyPath: "/workspace/ai-governance/registry/register",
+    };
+  }
+
+  return {
+    title: "Account exists — no registration record yet",
+    explanation:
+      "TA-14 can see the account, but there is no registration page event, draft, or submission to repair. Send the registrant to Governance Entity Registration and have them continue while signed into this same account.",
+    copyLabel: "Copy registration link",
+    copyPath: "/workspace/ai-governance/registry/register",
+  };
+}
+
 function stageReached(
   journey: RegistrationJourney,
   stage:
@@ -218,6 +294,7 @@ export function RegistryRegistrationJourneyPanel() {
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<FilterMode>("attention");
   const [error, setError] = useState("");
+  const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -297,6 +374,25 @@ export function RegistryRegistrationJourneyPanel() {
   }, [filter, payload, search]);
 
   const summary = payload?.summary;
+
+  const copyJourneyLink = useCallback(async (journey: RegistrationJourney) => {
+    const action = nextAction(journey);
+    if (!action.copyPath) return;
+
+    const url = `${window.location.origin}${action.copyPath}`;
+
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopiedKey(journey.userId);
+      window.setTimeout(() => {
+        setCopiedKey((current) =>
+          current === journey.userId ? null : current,
+        );
+      }, 1800);
+    } catch {
+      window.prompt("Copy this registration link:", url);
+    }
+  }, []);
 
   return (
     <section className="journeyPanel">
@@ -587,6 +683,32 @@ export function RegistryRegistrationJourneyPanel() {
                   </span>
                 </div>
               ) : null}
+
+              {(() => {
+                const action = nextAction(journey);
+
+                return (
+                  <div className="nextActionBox">
+                    <div>
+                      <span>What this means</span>
+                      <strong>{action.title}</strong>
+                      <p>{action.explanation}</p>
+                    </div>
+
+                    {action.copyPath && action.copyLabel ? (
+                      <button
+                        type="button"
+                        className="copyAction"
+                        onClick={() => void copyJourneyLink(journey)}
+                      >
+                        {copiedKey === journey.userId
+                          ? "Copied"
+                          : action.copyLabel}
+                      </button>
+                    ) : null}
+                  </div>
+                );
+              })()}
 
               <div className="cardFooter">
                 <div className="recordFacts">
@@ -1135,6 +1257,53 @@ export function RegistryRegistrationJourneyPanel() {
           font-size: 9px;
         }
 
+        .nextActionBox {
+          display: flex;
+          justify-content: space-between;
+          gap: 16px;
+          align-items: center;
+          padding: 13px 14px;
+          border: 1px solid rgba(92, 220, 255, 0.14);
+          border-radius: 13px;
+          background: rgba(92, 220, 255, 0.028);
+        }
+
+        .nextActionBox > div {
+          min-width: 0;
+        }
+
+        .nextActionBox span {
+          display: block;
+          font-size: 8px;
+          font-weight: 900;
+          letter-spacing: 0.09em;
+          text-transform: uppercase;
+          opacity: 0.48;
+        }
+
+        .nextActionBox strong {
+          display: block;
+          margin-top: 4px;
+          font-size: 11px;
+        }
+
+        .nextActionBox p {
+          margin: 5px 0 0;
+          max-width: 720px;
+          font-size: 9px;
+          line-height: 1.55;
+          opacity: 0.64;
+        }
+
+        .copyAction {
+          flex: 0 0 auto;
+          border-color: rgba(92, 220, 255, 0.2);
+          background: rgba(92, 220, 255, 0.055);
+          color: #dff9ff;
+          white-space: nowrap;
+          font-size: 9px;
+        }
+
         .cardFooter {
           display: flex;
           justify-content: space-between;
@@ -1206,6 +1375,7 @@ export function RegistryRegistrationJourneyPanel() {
         @media (max-width: 760px) {
           .journeyHeader,
           .leftBehindAlert,
+          .nextActionBox,
           .cardTop,
           .cardFooter,
           .lastActivity,
