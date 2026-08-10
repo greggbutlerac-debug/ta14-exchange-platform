@@ -33,12 +33,25 @@ describe('TA-14 Registry authoritative completion boundary', () => {
     const start = page.indexOf(
       'async function generateReceipt()',
     );
-    const end = page.indexOf(
-      'function handleSubmit',
-      start,
-    );
+    const endCandidates = [
+      page.indexOf(
+        'async function submitForReview()',
+        start,
+      ),
+      page.indexOf(
+        'function reviewMissingItems()',
+        start,
+      ),
+      page.indexOf(
+        'async function downloadManifest()',
+        start,
+      ),
+    ].filter((index) => index > start);
+
+    const end = Math.min(...endCandidates);
 
     expect(start).toBeGreaterThan(-1);
+    expect(endCandidates.length).toBeGreaterThan(0);
     expect(end).toBeGreaterThan(start);
 
     const block = page.slice(start, end);
@@ -66,10 +79,24 @@ describe('TA-14 Registry authoritative completion boundary', () => {
     const start = page.indexOf(
       'async function generateReceipt()',
     );
-    const end = page.indexOf(
-      'function handleSubmit',
-      start,
-    );
+    const endCandidates = [
+      page.indexOf(
+        'async function submitForReview()',
+        start,
+      ),
+      page.indexOf(
+        'function reviewMissingItems()',
+        start,
+      ),
+      page.indexOf(
+        'async function downloadManifest()',
+        start,
+      ),
+    ].filter((index) => index > start);
+
+    const end = Math.min(...endCandidates);
+
+    expect(endCandidates.length).toBeGreaterThan(0);
 
     const block = page.slice(start, end);
 
