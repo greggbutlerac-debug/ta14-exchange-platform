@@ -236,13 +236,14 @@ export default function PublicRegistryDirectoryPage() {
           <div className="status-orb">{loading ? '…' : metrics.publicRecords}</div>
           <h2>Published public records</h2>
           <p>
-            Records appear here only after intake, review, acceptance, permanent identifier assignment,
-            and authorized public publication.
+            This number counts records authorized for publication in the public directory. A TA-14-AIGR
+            identifier may be assigned and referenced in a governed review or execution artifact before the
+            entity authorizes a public directory profile.
           </p>
           <div className="panel-list">
-            <span><b>{metrics.registered}</b> registered or published</span>
-            <span><b>{metrics.evidence}</b> referenced evidence items</span>
-            <span><b>{metrics.disputes}</b> preserved disputes</span>
+            <span><b>{metrics.publicRecords}</b> directory-published records</span>
+            <span><b>{metrics.evidence}</b> evidence references attached to those records</span>
+            <span><b>{metrics.disputes}</b> disputes attached to those records</span>
           </div>
           <button type="button" onClick={() => void loadDirectory()} className="refresh-button" disabled={loading}>
             {loading ? 'Refreshing…' : 'Refresh directory'}
@@ -259,7 +260,7 @@ export default function PublicRegistryDirectoryPage() {
         <article>
           <span>02</span>
           <strong>{metrics.registered}</strong>
-          <p>Registered or published</p>
+          <p>Directory records in registered/published lifecycle states</p>
         </article>
         <article>
           <span>03</span>
@@ -271,6 +272,19 @@ export default function PublicRegistryDirectoryPage() {
           <strong>{metrics.disputes}</strong>
           <p>Open or preserved disputes</p>
         </article>
+      </section>
+
+      <section className="publication-boundary" aria-label="Registry publication boundary">
+        <div>
+          <p className="eyebrow">IDENTIFIER ≠ PUBLIC DIRECTORY PROFILE</p>
+          <h2>Registry identity and directory publication are separate governance states.</h2>
+        </div>
+        <p>
+          An entity can receive a permanent TA-14-AIGR identifier and have that identifier cited in a governed
+          artifact, review, or demonstration while its public Registry profile remains unpublished. The metrics
+          on this page count only records released into this public directory; they are not a count of every
+          governance identity that may exist elsewhere in the Exchange.
+        </p>
       </section>
 
       <section className="directory-shell">
@@ -543,6 +557,9 @@ export default function PublicRegistryDirectoryPage() {
         .metrics article > span { color: #677b99; font-size: 11px; font-weight: 900; }
         .metrics strong { display: block; margin-top: 16px; font-size: 32px; }
         .metrics p { margin: 6px 0 0; color: #98a9c0; font-size: 13px; }
+        .publication-boundary { display: grid; grid-template-columns: .8fr 1.2fr; gap: 30px; align-items: start; max-width: 1440px; margin: 0 auto 22px; padding: 24px 36px; border: 1px solid rgba(194,155,72,.26); border-radius: 20px; background: linear-gradient(135deg,rgba(27,44,71,.86),rgba(9,20,36,.94)); box-shadow: 0 18px 50px rgba(0,0,0,.18); position: relative; z-index: 1; }
+        .publication-boundary h2 { margin: 8px 0 0; font-size: clamp(22px,2.5vw,34px); letter-spacing: -.025em; }
+        .publication-boundary > p { margin: 0; color: #aebdd4; line-height: 1.7; }
         .directory-shell { max-width: 1440px; margin: 0 auto; padding: 46px 36px 72px; }
         .directory-header { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-bottom: 28px; }
         .directory-header h2, .closing h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(34px, 4vw, 56px); letter-spacing: -.03em; }
@@ -615,7 +632,8 @@ export default function PublicRegistryDirectoryPage() {
         @media (max-width: 760px) {
           .topbar { align-items: flex-start; }
           .topnav { display: none; }
-          .topbar, .hero, .metrics, .directory-shell, .method-grid { padding-left: 20px; padding-right: 20px; }
+          .topbar, .hero, .metrics, .directory-shell, .method-grid, .publication-boundary { padding-left: 20px; padding-right: 20px; }
+          .publication-boundary { grid-template-columns: 1fr; }
           .hero { padding-top: 56px; }
           h1 { font-size: 46px; }
           .metrics, .method-grid { grid-template-columns: 1fr; }
