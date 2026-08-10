@@ -431,7 +431,7 @@ export default function MissionControlPage() {
 
   const missionControlAdminEmails = new Set(
     (process.env.NEXT_PUBLIC_TA14_MISSION_CONTROL_ADMIN_EMAILS ||
-      "ta14admissibleexecution@gmail.com")
+      "ta14admissibleexecution@gmail.com,greggbutlerac@gmail.com")
       .split(",")
       .map((value) => value.trim().toLowerCase())
       .filter(Boolean),
@@ -528,7 +528,7 @@ export default function MissionControlPage() {
               Register a governance architecture
             </Link>
             <Link
-              href="/workspace/ai-governance/reviews-responses"
+              href="/workspace/ai-governance/reviews"
               style={{
                 color: "#f5f8ff",
                 border: "1px solid rgba(124,167,211,.3)",
