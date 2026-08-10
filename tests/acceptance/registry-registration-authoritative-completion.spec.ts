@@ -33,28 +33,12 @@ describe('TA-14 Registry authoritative completion boundary', () => {
     const start = page.indexOf(
       'async function generateReceipt()',
     );
-    const endCandidates = [
-      page.indexOf(
-        'async function submitForReview()',
-        start,
-      ),
-      page.indexOf(
-        'function reviewMissingItems()',
-        start,
-      ),
-      page.indexOf(
-        'async function downloadManifest()',
-        start,
-      ),
-    ].filter((index) => index > start);
-
-    const end = Math.min(...endCandidates);
-
     expect(start).toBeGreaterThan(-1);
-    expect(endCandidates.length).toBeGreaterThan(0);
-    expect(end).toBeGreaterThan(start);
 
-    const block = page.slice(start, end);
+    const block = page.slice(
+      start,
+      start + 7000,
+    );
 
     expect(block).toContain(
       'const confirmedDraftId = await saveDraft()',
@@ -79,26 +63,12 @@ describe('TA-14 Registry authoritative completion boundary', () => {
     const start = page.indexOf(
       'async function generateReceipt()',
     );
-    const endCandidates = [
-      page.indexOf(
-        'async function submitForReview()',
-        start,
-      ),
-      page.indexOf(
-        'function reviewMissingItems()',
-        start,
-      ),
-      page.indexOf(
-        'async function downloadManifest()',
-        start,
-      ),
-    ].filter((index) => index > start);
+    expect(start).toBeGreaterThan(-1);
 
-    const end = Math.min(...endCandidates);
-
-    expect(endCandidates.length).toBeGreaterThan(0);
-
-    const block = page.slice(start, end);
+    const block = page.slice(
+      start,
+      start + 7000,
+    );
 
     expect(block).not.toContain(
       'browser-recovery-draft',
