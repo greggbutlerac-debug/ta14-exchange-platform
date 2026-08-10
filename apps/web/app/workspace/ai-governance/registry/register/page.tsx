@@ -274,6 +274,7 @@ const evidenceRelationships: EvidenceRelationship[] = [
 ];
 
 const DRAFT_KEY = 'ta14-ai-governance-registry-intake-draft-v3';
+const RECOVERY_KEY = 'ta14-ai-governance-registry-recovery-key-v1';
 
 
 const wizardSteps = [
@@ -438,6 +439,94 @@ export default function RegisterGovernancePage() {
   } | null>(null);
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [termsBusy, setTermsBusy] = useState(false);
+
+  function getRecoveryKey() {
+    let key = window.localStorage.getItem(RECOVERY_KEY)?.trim() ?? '';
+    if (!key) {
+      key = globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      window.localStorage.setItem(RECOVERY_KEY, key);
+    }
+    return key;
+  }
+
+  function buildRecoveryPayload(stepOverride?: number) {
+    return {
+      recoveryKey: getRecoveryKey(),
+      activeStep: stepOverride ?? activeStep,
+      form: { ...form, stewardName: form.stewardName.trim() || form.claimantName.trim() },
+      publications,
+      repositories,
+      zenodoRecords,
+      patentRecords,
+    };
+  }
+
+  function hasMeaningfulRecoveryData() {
+    return Boolean(
+      form.governanceName.trim() ||
+      form.currentVersion.trim() ||
+      form.claimantName.trim() ||
+      form.contactEmail.trim() ||
+      form.plainDescription.trim() ||
+      form.claims.trim() ||
+      form.nonClaims.trim() ||
+      publications.length ||
+      repositories.length ||
+      zenodoRecords.length ||
+      patentRecords.length
+    );
+  }
+
+  async function saveRecoveryDraft(stepOverride?: number): Promise<boolean> {
+    if (!hasMeaningfulRecoveryData()) return true;
+
+    const recoveryPayload = {
+      savedAt: new Date().toISOString(),
+      ...buildRecoveryPayload(stepOverride),
+    };
+
+    try {
+      window.localStorage.setItem(DRAFT_KEY, JSON.stringify(recoveryPayload));
+    } catch {
+      // The server-backed recovery record below remains the primary safeguard.
+    }
+
+    try {
+      const response = await fetch('/api/ai-governance/registry/registration-recovery', {
+        method: 'POST',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(recoveryPayload),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error ?? 'Unable to preserve registration recovery state.');
+      return true;
+    } catch (error) {
+      setPersistenceState('BROWSER_ONLY');
+      setErrors([error instanceof Error ? error.message : 'Unable to preserve registration recovery state.']);
+      setMessage('This step remains in browser recovery only. It was NOT advanced because the account-backed recovery copy could not be confirmed.');
+      return false;
+    }
+  }
+
+  async function promoteRecoveryDraft(submissionId: string) {
+    try {
+      await fetch('/api/ai-governance/registry/registration-recovery', {
+        method: 'PATCH',
+        credentials: 'same-origin',
+        cache: 'no-store',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          recoveryKey: getRecoveryKey(),
+          submissionId,
+          state: 'promoted',
+        }),
+      });
+    } catch {
+      // Promotion telemetry must not invalidate an already durable Registry draft.
+    }
+  }
 
   async function recordLifecycleEvent(
     eventType:
@@ -931,17 +1020,15 @@ export default function RegisterGovernancePage() {
     async function resumeDraft() {
       const searchParams = new URLSearchParams(window.location.search);
       const requestedDraftId = searchParams.get('draft')?.trim() ?? '';
-      const recoverExisting = searchParams.get('recover') === '1';
-      const forceNew = searchParams.get('new') === '1' || (!requestedDraftId && !recoverExisting);
+      const forceNew = searchParams.get('new') === '1';
 
-      // The normal /register route is a new-registration route. A deliberate
-      // new-registration request must never inherit a prior architecture's server
-      // draft or browser recovery state. This clears only
-      // the browser-local recovery copy; existing account-backed drafts remain
-      // preserved until their owner explicitly discards them.
+      // Only an explicit ?new=1 request discards the browser recovery copy.
+      // The ordinary /register route is recovery-first so an interrupted
+      // fourteen-step intake is never silently erased on return.
       if (forceNew) {
         try {
           window.localStorage.removeItem(DRAFT_KEY);
+          window.localStorage.removeItem(RECOVERY_KEY);
         } catch {
           // Storage can be unavailable in hardened browser contexts. A clean
           // in-memory intake still remains available.
@@ -1005,6 +1092,46 @@ export default function RegisterGovernancePage() {
         // only for the legacy/default intake route.
       }
 
+      // No authoritative draft exists yet. Recover the latest partial,
+      // account-backed registration state before falling back to browser storage.
+      try {
+        const recoveryResponse = await fetch('/api/ai-governance/registry/registration-recovery', {
+          method: 'GET',
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+        if (recoveryResponse.ok) {
+          const recovery = await recoveryResponse.json();
+          if (!cancelled && recovery.recovery?.draft_payload) {
+            const savedPayload = recovery.recovery.draft_payload as {
+              form?: FormState;
+              publications?: PublicationRecord[];
+              repositories?: RepositoryRecord[];
+              zenodoRecords?: ZenodoRecord[];
+              patentRecords?: PatentRecord[];
+              activeStep?: number;
+              recoveryKey?: string;
+            };
+            if (savedPayload.recoveryKey) {
+              window.localStorage.setItem(RECOVERY_KEY, savedPayload.recoveryKey);
+            }
+            if (savedPayload.form) {
+              setForm({ ...initialForm, ...savedPayload.form });
+              setPublications(asArray<PublicationRecord>(savedPayload.publications));
+              setRepositories(asArray<RepositoryRecord>(savedPayload.repositories));
+              setZenodoRecords(asArray<ZenodoRecord>(savedPayload.zenodoRecords));
+              setPatentRecords(asArray<PatentRecord>(savedPayload.patentRecords));
+              setActiveStep(Math.max(0, Math.min(wizardSteps.length - 1, Number(savedPayload.activeStep ?? 0))));
+              setPersistenceState('BROWSER_ONLY');
+              setMessage('Your interrupted registration was recovered from your signed-in account. Continue where you left off; it is preserved as recovery state but is NOT yet a Registry submission.');
+              return;
+            }
+          }
+        }
+      } catch {
+        // Browser-local recovery remains available below.
+      }
+
       let saved: string | null = null;
       try {
         saved = window.localStorage.getItem(DRAFT_KEY);
@@ -1023,6 +1150,8 @@ export default function RegisterGovernancePage() {
           repositories?: RepositoryRecord[];
           zenodoRecords?: ZenodoRecord[];
           patentRecords?: PatentRecord[];
+          activeStep?: number;
+          recoveryKey?: string;
         };
         if (parsed.form) {
           setForm({ ...initialForm, ...parsed.form });
@@ -1030,8 +1159,27 @@ export default function RegisterGovernancePage() {
           setRepositories(asArray<RepositoryRecord>(parsed.repositories));
           setZenodoRecords(asArray<ZenodoRecord>(parsed.zenodoRecords));
           setPatentRecords(asArray<PatentRecord>(parsed.patentRecords));
+          setActiveStep(Math.max(0, Math.min(wizardSteps.length - 1, Number(parsed.activeStep ?? 0))));
+          if (parsed.recoveryKey) window.localStorage.setItem(RECOVERY_KEY, parsed.recoveryKey);
           setPersistenceState('BROWSER_ONLY');
-          setMessage('A browser recovery draft was loaded. It is NOT yet saved to the TA-14 Registry. Save it while signed in before relying on it as a governed record. Evidence files must be reattached.');
+          setMessage('Your prior browser recovery draft was recovered. TA-14 will preserve it to your signed-in account before you advance. It is NOT yet a Registry submission. Evidence files must be reattached.');
+          // Promote legacy/browser-only work into the new account-backed recovery layer.
+          void fetch('/api/ai-governance/registry/registration-recovery', {
+            method: 'POST',
+            credentials: 'same-origin',
+            cache: 'no-store',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({
+              savedAt: new Date().toISOString(),
+              recoveryKey: parsed.recoveryKey ?? getRecoveryKey(),
+              activeStep: parsed.activeStep ?? 0,
+              form: { ...initialForm, ...parsed.form },
+              publications: asArray<PublicationRecord>(parsed.publications),
+              repositories: asArray<RepositoryRecord>(parsed.repositories),
+              zenodoRecords: asArray<ZenodoRecord>(parsed.zenodoRecords),
+              patentRecords: asArray<PatentRecord>(parsed.patentRecords),
+            }),
+          });
         }
       } catch {
         window.localStorage.removeItem(DRAFT_KEY);
@@ -1050,6 +1198,8 @@ export default function RegisterGovernancePage() {
 
     const recoveryPayload = {
       savedAt: new Date().toISOString(),
+      recoveryKey: getRecoveryKey(),
+      activeStep,
       form: { ...form, stewardName: form.stewardName.trim() || form.claimantName.trim() },
       publications,
       repositories,
@@ -1079,6 +1229,7 @@ export default function RegisterGovernancePage() {
 
       setDraftId(payload.draftId);
       setPersistenceState('ACCOUNT_BACKED');
+      await promoteRecoveryDraft(payload.draftId);
       await loadPreservedEvidence(payload.draftId);
       setMessage(`Saved to TA-14 Registry account. Governed draft ID: ${payload.draftId}. Evidence files may now be preserved and bound to this draft.`);
 
@@ -1617,7 +1768,7 @@ export default function RegisterGovernancePage() {
     }
   }
 
-  function goToStep(next: number) {
+  async function goToStep(next: number) {
     if (next > activeStep && !stepHasRequiredData(activeStep)) {
       setErrors([
         `Complete the required items in Step ${wizardSteps[activeStep].number}: ${wizardSteps[activeStep].title} before continuing.`,
@@ -1626,8 +1777,13 @@ export default function RegisterGovernancePage() {
       return;
     }
 
+    if (next > activeStep) {
+      const preserved = await saveRecoveryDraft(next);
+      if (!preserved) return;
+    }
+
     setErrors([]);
-    setMessage('');
+    setMessage(next > activeStep ? 'Step saved to your account-backed recovery record.' : '');
     setActiveStep(Math.max(0, Math.min(wizardSteps.length - 1, next)));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -2521,10 +2677,10 @@ export default function RegisterGovernancePage() {
           )}
 
           <div className="wizard-navigation">
-            <button type="button" className="secondary-button" disabled={activeStep === 0} onClick={() => goToStep(activeStep - 1)}>← Previous</button>
+            <button type="button" className="secondary-button" disabled={activeStep === 0} onClick={() => void goToStep(activeStep - 1)}>← Previous</button>
             <span>{wizardSteps[activeStep].number} / 14</span>
             {activeStep < wizardSteps.length - 1 ? (
-              <button type="button" className="primary-button" onClick={() => goToStep(activeStep + 1)}>Save & Continue →</button>
+              <button type="button" className="primary-button" onClick={() => void goToStep(activeStep + 1)}>Save & Continue →</button>
             ) : (
               <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || termsBusy || !termsAccepted || Boolean(submittedRecord)}>
                 {submittedRecord ? 'Submitted ✓' : termsBusy ? 'Preserving Terms…' : submitBusy ? 'Submitting…' : 'Submit for Review →'}
