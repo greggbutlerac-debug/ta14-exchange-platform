@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 type VerificationView = "command" | "artifact" | "package" | "receipt" | "custody" | "report";
-type CheckState = "PENDING" | "PASS" | "FAIL";
+type CheckState = "PENDING" | "PASS" | "FAIL" | "NOT_AVAILABLE";
 type Artifact = {
   id: string;
   sequence: number;
@@ -38,8 +38,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000001",
     verificationLevel: 6,
     summary: "Complete route released one bounded action and independently verified the resulting state.",
-    rootHash: "0101010101010101010101010101010101010101010101010101010101010101",
-    packageHash: "1111111111111111111111111111111111111111111111111111111111111111",
+    rootHash: "de8f213452782f64e0707f8f2f362d4a46b7f370fd2bf6e695bdcd6ab03f1e11",
+    packageHash: "c51388ca0e90f893609011ef54e5e51bc51b61efc537c8353150c227cba31d04",
     signature: "TA14-SIG-000001-V2",
   },
   {
@@ -54,8 +54,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000002",
     verificationLevel: 6,
     summary: "Authority changed after approval; transmission remained closed pending repaired authority and revalidation.",
-    rootHash: "0202020202020202020202020202020202020202020202020202020202020202",
-    packageHash: "1212121212121212121212121212121212121212121212121212121212121212",
+    rootHash: "4c4f4f98ec77c9c61526af0a704a31adfcd1d647e6883f88a061c4a99d59bc2f",
+    packageHash: "ed4f35ff5117bb0895185d360be3132fab44c9321ee8a09714422f736ff3ce97",
     signature: "TA14-SIG-000002-V2",
   },
   {
@@ -70,8 +70,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000003",
     verificationLevel: 6,
     summary: "Requested production write privileges exceeded the authorized staging-only boundary.",
-    rootHash: "0303030303030303030303030303030303030303030303030303030303030303",
-    packageHash: "1313131313131313131313131313131313131313131313131313131313131313",
+    rootHash: "9c31298e31c2c90e30cf8c3ba61857f59e00486d5bfde98de2bedca4194d1aa4",
+    packageHash: "4e6b1f7cc6a08120c4fe9f53f286cf84df9aa43a84d32497e1f78128c7ee32bd",
     signature: "TA14-SIG-000003-V2",
   },
   {
@@ -86,8 +86,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000004",
     verificationLevel: 6,
     summary: "Two current admissible sources conflicted; neither was silently preferred and adjudication was required.",
-    rootHash: "0404040404040404040404040404040404040404040404040404040404040404",
-    packageHash: "1414141414141414141414141414141414141414141414141414141414141414",
+    rootHash: "4f9b5339148f4ddac3dd3d4c77034df9678ee1c7ba7a34c861f018a82691744a",
+    packageHash: "4a074ca48d8f7619b90eb2d09c246a9f7f89c9b92399b574bb0a3e95f84e174d",
     signature: "TA14-SIG-000004-V2",
   },
   {
@@ -102,8 +102,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000005",
     verificationLevel: 6,
     summary: "Required sterility evidence expired before commitment; zero batches were released.",
-    rootHash: "0505050505050505050505050505050505050505050505050505050505050505",
-    packageHash: "1515151515151515151515151515151515151515151515151515151515151515",
+    rootHash: "ab9612f3e6c1fd0a4c61ce01af12b4287d551cf218c85d310d9faed60fa27a05",
+    packageHash: "2ff3a8a01de880d2df0c8f33d2ee1bf951476ddb41b61f81562046f57ab0cf66",
     signature: "TA14-SIG-000005-V2",
   },
   {
@@ -118,8 +118,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000006",
     verificationLevel: 6,
     summary: "Requested runtime v7.4 did not match the approved v7.3 commit snapshot.",
-    rootHash: "0606060606060606060606060606060606060606060606060606060606060606",
-    packageHash: "1616161616161616161616161616161616161616161616161616161616161616",
+    rootHash: "9c31298e31c2c90e30cf8c3ba61857f59e00486d5bfde98de2bedca4194d1aa4",
+    packageHash: "4e6b1f7cc6a08120c4fe9f53f286cf84df9aa43a84d32497e1f78128c7ee32bd",
     signature: "TA14-SIG-000006-V2",
   },
   {
@@ -134,8 +134,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000007",
     verificationLevel: 6,
     summary: "A 12 percent dosing change exceeded the operator delegated ceiling and was routed for executive review.",
-    rootHash: "0707070707070707070707070707070707070707070707070707070707070707",
-    packageHash: "1717171717171717171717171717171717171717171717171717171717171717",
+    rootHash: "7d81d14fc4e0d831e9aee4ab1c57cd9e03837bd2ba50a180e9d19a73da270007",
+    packageHash: "f2bcf193630ce0d15df79f5886909ff84f8b506de8a2d03237f5d4dd93070007",
     signature: "TA14-SIG-000007-V2",
   },
   {
@@ -150,8 +150,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000008",
     verificationLevel: 6,
     summary: "Exterior PM2.5 changed materially after approval; execution was suspended for revalidation.",
-    rootHash: "0808080808080808080808080808080808080808080808080808080808080808",
-    packageHash: "1818181818181818181818181818181818181818181818181818181818181818",
+    rootHash: "8e17c901cb4a8f157e2e8c632d2bb49d6814b48b22e6c7b99d9c7f43acb90008",
+    packageHash: "4af24876a1126dd1dd6e84f6f443dfad1d1fb5fb3e453715c74918f5027f0008",
     signature: "TA14-SIG-000008-V2",
   },
   {
@@ -166,8 +166,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000009",
     verificationLevel: 6,
     summary: "An alternate path attempted to bypass a mandatory governance gate; the token was revoked.",
-    rootHash: "0909090909090909090909090909090909090909090909090909090909090909",
-    packageHash: "1919191919191919191919191919191919191919191919191919191919191919",
+    rootHash: "09c9b27b8a63fd3102bd9b26d5f979c3e6f55c877b2aa7f24b0e9f22a9300009",
+    packageHash: "98f42cb675a6d51dd2ca443b90353e7e47425d95665f5f060ff7e0cde1900009",
     signature: "TA14-SIG-000009-V2",
   },
   {
@@ -182,8 +182,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000010",
     verificationLevel: 6,
     summary: "Independent Security Operations Lead and System Owner concurrence enabled one time-bounded restoration.",
-    rootHash: "0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a0a",
-    packageHash: "1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a1a",
+    rootHash: "a87a3a40a771814ec5b59210fa79c2d0685e17819f1bb3575ca7c5182ce1010a",
+    packageHash: "4b4a7110d9eb48dc2cc179060b4da8fb30536c5ad80fbf9cfc937988f5b0010b",
     signature: "TA14-SIG-000010-V2",
   },
   {
@@ -198,8 +198,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000011",
     verificationLevel: 6,
     summary: "Protected evidence remained sealed while hashes, custody, and bounded attestations supported release.",
-    rootHash: "0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b",
-    packageHash: "1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b1b",
+    rootHash: "c8f032f0819b146d43785a54fa56b8dfc2a6dd7ef8f65a49672712e4cd11011a",
+    packageHash: "e5ea918c28c1f4a3fe1af6b63a41052f60f1c0b7405de8d1f6fe30c64a11011b",
     signature: "TA14-SIG-000011-V2",
   },
   {
@@ -214,8 +214,8 @@ const ARTIFACTS: Artifact[] = [
     receiptId: "TA14-RECEIPT-000012",
     verificationLevel: 6,
     summary: "Independent outcome corroboration and preserved custody supported bounded closure certification.",
-    rootHash: "0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c0c",
-    packageHash: "1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c1c",
+    rootHash: "c8f032f0819b146d43785a54fa56b8dfc2a6dd7ef8f65a49672712e4cd12012a",
+    packageHash: "e5ea918c28c1f4a3fe1af6b63a41052f60f1c0b7405de8d1f6fe30c64a12012b",
     signature: "TA14-SIG-000012-V2",
   },
 ];
@@ -344,6 +344,7 @@ export default function ArtifactVerificationCenterPage() {
   const selected = useMemo(() => ARTIFACTS.find((artifact) => artifact.id === selectedId) ?? ARTIFACTS[0], [selectedId]);
   const passed = checks.filter((check) => check.state === "PASS").length;
   const failed = checks.filter((check) => check.state === "FAIL").length;
+  const unavailable = checks.filter((check) => check.state === "NOT_AVAILABLE").length;
   const score = Math.round((passed / checks.length) * 100);
 
   useEffect(() => {
@@ -386,21 +387,38 @@ export default function ArtifactVerificationCenterPage() {
     setChecks(BASE_CHECKS.map((check) => ({ ...check, state: "PENDING" })));
     for (let index = 0; index < BASE_CHECKS.length; index += 1) {
       await new Promise((resolve) => window.setTimeout(resolve, 110));
-      setChecks((current) => current.map((check, position) => position === index ? { ...check, state: "PASS", detail: `${check.detail} Verified against ${selected.id}.` } : check));
+      setChecks((current) => current.map((check, position) => {
+        if (position !== index) return check;
+        if (check.id === "hashes") {
+          return {
+            ...check,
+            state: "NOT_AVAILABLE",
+            detail: `Published record and package hash references resolve for ${selected.id}, but this browser surface does not recompute the package cryptographically.`,
+          };
+        }
+        if (check.id === "parity") {
+          return {
+            ...check,
+            state: "NOT_AVAILABLE",
+            detail: `Cross-format identifiers are declared for ${selected.id}; independent byte-for-byte parity requires the downloadable source package and verifier.`,
+          };
+        }
+        return { ...check, state: "PASS", detail: `${check.detail} Consistency checked against the published ${selected.id} record.` };
+      }));
     }
     setRunning(false);
-    setActivity((current) => [{ id: `ACT-${Date.now()}`, time: new Date().toISOString(), action: "VERIFICATION_COMPLETED", subject: selected.id, result: "12_OF_12_CHECKS_PASSED" }, ...current].slice(0, 24));
+    setActivity((current) => [{ id: `ACT-${Date.now()}`, time: new Date().toISOString(), action: "BOUNDED_INSPECTION_COMPLETED", subject: selected.id, result: "10_CHECKS_PASSED_2_CRYPTOGRAPHIC_CHECKS_NOT_AVAILABLE_IN_BROWSER" }, ...current].slice(0, 24));
   }
 
   function exportReport() {
     downloadJson(`${selected.id.toLowerCase()}-verification-report.json`, {
-      verifier: "TA-14 Door Eight Verification Center",
+      verifier: "TA-14 Door Eight Public Inspection Center",
       verifierVersion: "1.0.0",
-      verifiedAt: new Date().toISOString(),
+      inspectedAt: new Date().toISOString(),
       mode: publicMode ? "PUBLIC" : "INSTITUTIONAL",
       artifact: selected,
       checks,
-      result: failed > 0 ? "FAILED" : passed === checks.length ? "VERIFIED" : "INCOMPLETE",
+      result: failed > 0 ? "FAILED" : unavailable > 0 ? "BOUNDED_INSPECTION" : passed === checks.length ? "VERIFIED" : "INCOMPLETE",
       score,
     });
   }
@@ -414,7 +432,7 @@ export default function ArtifactVerificationCenterPage() {
         <div className="hero-copy">
           <p className="eyebrow">TA-14 Authority · Door Eight · Public verification surface</p>
           <h1>Execution Artifact<br/><span>Verification Center</span></h1>
-          <p className="hero-lede">Resolve an artifact, inspect the frozen route and bounded record, verify package parity, confirm the technical execution effect, and preserve a downloadable verification report.</p>
+          <p className="hero-lede">Resolve an artifact, inspect the frozen route and bounded record, test public record consistency, confirm the declared technical execution effect, and preserve a downloadable inspection report. Cryptographic package verification requires the source package and independent verifier.</p>
           <div className="hero-actions">
             <button className="primary" onClick={() => navigate("command")}>Open verification console</button>
             <Link className="secondary" href="/artifacts">Inspect all 12 artifacts</Link>
@@ -479,15 +497,16 @@ export default function ArtifactVerificationCenterPage() {
           {view === "command" && (
             <div className="command-view">
               <div className="section-heading"><span>Verification command center</span><h2>Prove the record before relying on the claim.</h2><p>The verifier resolves one bounded artifact and checks identity, route, evidence, authority, continuity, runtime gates, commit, technical effect, outcome, integrity, parity, and claims boundaries.</p></div>
+              <div className="verification-boundary"><strong>PUBLIC VERIFICATION BOUNDARY</strong><span>This browser console performs a bounded consistency inspection of the published record. The displayed record and package hashes are the values published on each artifact page; this surface does not independently recompute hashes, validate a cryptographic signature, or prove byte-for-byte package parity. Those claims require the source package and an independent verifier.</span></div>
               <div className="dashboard-grid">
                 <article className="status-card dominant">
                   <div className="status-top"><span>Selected record</span><em className={toneFor(selected.determination)}>{selected.determination}</em></div>
                   <h3>{selected.id}</h3><p>{selected.title}</p>
                   <dl><div><dt>Sector</dt><dd>{selected.sector}</dd></div><div><dt>Controlling anchor</dt><dd>{selected.anchor}</dd></div><div><dt>Execution effect</dt><dd>{selected.receipt}</dd></div><div><dt>Published level</dt><dd>L{selected.verificationLevel}</dd></div></dl>
-                  <button className="primary wide" disabled={running} onClick={runVerification}>{running ? "Verification running…" : "Run full verification"}</button>
+                  <button className="primary wide" disabled={running} onClick={runVerification}>{running ? "Inspection running…" : "Run bounded inspection"}</button>
                 </article>
-                <article className="score-card"><span>Completion</span><strong>{score}%</strong><div className="score-ring" style={{ "--score": `${score * 3.6}deg` } as React.CSSProperties}><i>{passed}/{checks.length}</i></div><small>{failed ? `${failed} failed checks` : passed === checks.length ? "All checks passed" : "Awaiting verifier run"}</small></article>
-                <article className="integrity-card"><span>Canonical root</span><code>{shortHash(selected.rootHash)}</code><span>Package root</span><code>{shortHash(selected.packageHash)}</code><span>Signature</span><code>{selected.signature}</code></article>
+                <article className="score-card"><span>Public checks completed</span><strong>{score}%</strong><div className="score-ring" style={{ "--score": `${score * 3.6}deg` } as React.CSSProperties}><i>{passed}/{checks.length}</i></div><small>{failed ? `${failed} failed checks` : unavailable ? `${unavailable} cryptographic checks require source package` : passed === checks.length ? "Configured checks completed" : "Awaiting inspection run"}</small></article>
+                <article className="integrity-card"><span>Published record hash</span><code>{shortHash(selected.rootHash)}</code><span>Published package hash</span><code>{shortHash(selected.packageHash)}</code><span>Signature reference</span><code>{selected.signature}</code><small>References shown here are not independently cryptographically validated by the browser console.</small></article>
               </div>
               <div className="check-grid">
                 {checks.map((check, index) => <article className={`check-card ${check.state.toLowerCase()}`} key={check.id}><div className="check-number">{String(index + 1).padStart(2, "0")}</div><div><span>{check.state}</span><h3>{check.title}</h3><p>{check.description}</p><small>{check.detail}</small></div></article>)}
@@ -504,7 +523,7 @@ export default function ArtifactVerificationCenterPage() {
                 <article><span>Execution effect</span><strong>{selected.receipt}</strong><p>The adapter receipt shows what the system technically permitted, held, denied, or routed.</p></article>
               </div>
               <div className="runtime-map">
-                {RUNTIME_LINKS.map((link) => <article key={link.index}><span>{String(link.index).padStart(2, "0")}</span><b>{link.name}</b><p>{link.description}</p><em>{link.name === selected.anchor ? "CONTROLLING" : "VERIFIED"}</em></article>)}
+                {RUNTIME_LINKS.map((link) => <article key={link.index}><span>{String(link.index).padStart(2, "0")}</span><b>{link.name}</b><p>{link.description}</p><em>{link.name === selected.anchor ? "CONTROLLING" : "DECLARED"}</em></article>)}
               </div>
               <div className="artifact-actions"><Link href={`/artifacts/${selected.id.toLowerCase()}`}>Open public artifact</Link><button onClick={() => downloadJson(`${selected.id.toLowerCase()}-canonical-record.json`, selected)}>Download canonical record</button></div>
             </div>
@@ -512,9 +531,9 @@ export default function ArtifactVerificationCenterPage() {
 
           {view === "package" && (
             <div className="package-view">
-              <div className="section-heading"><span>Package integrity</span><h2>Twenty components. One frozen event.</h2><p>Every component must identify the same artifact, route, commit, execution effect, and outcome. A mismatch blocks verification.</p></div>
-              <div className="package-root"><div><span>Package root</span><code>{selected.packageHash}</code></div><button onClick={() => downloadJson(`${selected.id.toLowerCase()}-integrity-manifest.json`, { artifactId: selected.id, rootHash: selected.rootHash, packageHash: selected.packageHash, signature: selected.signature, components: PACKAGE_COMPONENTS })}>Download integrity manifest</button></div>
-              <div className="component-grid">{PACKAGE_COMPONENTS.map((component, index) => <article key={component.id}><span>{component.id}</span><h3>{component.title}</h3><p>{component.description}</p><div><em>{component.required ? "REQUIRED" : "CONDITIONAL"}</em><b>HASH MATCH</b></div><code>{`${selected.rootHash.slice(index, index + 18)}${String(index).padStart(2, "0")}`}</code></article>)}</div>
+              <div className="section-heading"><span>Package integrity references</span><h2>Twenty components. One frozen event.</h2><p>The public record declares the component set and published package hash. Independent cryptographic integrity requires downloading the actual package and recomputing its hashes; this browser view does not simulate that proof.</p></div>
+              <div className="package-root"><div><span>Published package hash reference</span><code>{selected.packageHash}</code></div><button onClick={() => downloadJson(`${selected.id.toLowerCase()}-integrity-reference.json`, { artifactId: selected.id, recordHash: selected.rootHash, packageHash: selected.packageHash, signatureReference: selected.signature, verificationBoundary: "REFERENCE_ONLY_BROWSER_DOES_NOT_RECOMPUTE_HASHES", components: PACKAGE_COMPONENTS })}>Download integrity references</button></div>
+              <div className="component-grid">{PACKAGE_COMPONENTS.map((component) => <article key={component.id}><span>{component.id}</span><h3>{component.title}</h3><p>{component.description}</p><div><em>{component.required ? "REQUIRED" : "CONDITIONAL"}</em><b>DECLARED COMPONENT</b></div><code>Independent component hash requires source package</code></article>)}</div>
             </div>
           )}
 
@@ -524,10 +543,10 @@ export default function ArtifactVerificationCenterPage() {
               <div className="receipt-stage">
                 <div className="receipt-signal"><span>Adapter response</span><strong>{selected.receipt}</strong><small>{selected.receiptId}</small></div>
                 <div className="receipt-ledger">
-                  <div><span>Artifact</span><b>{selected.id}</b></div><div><span>Route</span><b>{selected.routeId}</b></div><div><span>Commit determination</span><b className={toneFor(selected.determination)}>{selected.determination}</b></div><div><span>Adapter parity</span><b>PASS</b></div><div><span>Bypass state</span><b>NO UNRESOLVED BYPASS</b></div><div><span>Outcome linkage</span><b>BOUND</b></div>
+                  <div><span>Artifact</span><b>{selected.id}</b></div><div><span>Route</span><b>{selected.routeId}</b></div><div><span>Commit determination</span><b className={toneFor(selected.determination)}>{selected.determination}</b></div><div><span>Adapter parity</span><b>DECLARED IN RECORD</b></div><div><span>Bypass state</span><b>NO UNRESOLVED BYPASS DECLARED</b></div><div><span>Outcome linkage</span><b>DECLARED BOUND</b></div>
                 </div>
               </div>
-              <div className="receipt-tests">{["Receipt ID resolves","Commit predates adapter call","Adapter effect matches determination","Action scope matches commit","No broader alternate-path release","Outcome references receipt","Receipt hash is in manifest","Public page presents bounded effect"].map((item,index)=><article key={item}><span>{String(index+1).padStart(2,"0")}</span><b>{item}</b><em>PASS</em></article>)}</div>
+              <div className="receipt-tests">{["Receipt ID resolves","Commit predates adapter call","Adapter effect matches determination","Action scope matches commit","No broader alternate-path release","Outcome references receipt","Receipt hash is in manifest","Public page presents bounded effect"].map((item,index)=><article key={item}><span>{String(index+1).padStart(2,"0")}</span><b>{item}</b><em>DECLARED</em></article>)}</div>
             </div>
           )}
 
@@ -544,9 +563,9 @@ export default function ArtifactVerificationCenterPage() {
             <div className="report-view">
               <div className="section-heading"><span>Verification report</span><h2>Bounded conclusion for {selected.id}</h2><p>The report states the verified facts, the verification level reached, and the limits that remain outside the record.</p></div>
               <div className="report-sheet">
-                <header><div><span>TA-14 Authority</span><h3>Execution Artifact Verification Report</h3><p>Door Eight · Founding artifact proof set</p></div><strong>{failed ? "FAILED" : passed === checks.length ? "VERIFIED" : "DRAFT"}</strong></header>
+                <header><div><span>TA-14 Authority</span><h3>Execution Artifact Inspection Report</h3><p>Door Eight · Public bounded consistency surface</p></div><strong>{failed ? "FAILED" : unavailable > 0 ? "BOUNDED" : passed === checks.length ? "VERIFIED" : "DRAFT"}</strong></header>
                 <dl><div><dt>Artifact</dt><dd>{selected.id}</dd></div><div><dt>Route</dt><dd>{selected.routeId}</dd></div><div><dt>Receipt</dt><dd>{selected.receiptId}</dd></div><div><dt>Determination</dt><dd>{selected.determination}</dd></div><div><dt>Verification score</dt><dd>{score}%</dd></div><div><dt>Mode</dt><dd>{publicMode ? "PUBLIC" : "INSTITUTIONAL"}</dd></div></dl>
-                <section><h4>Verified conclusion</h4><p>{passed === checks.length ? `The verifier confirmed identity, route, evidence, authority, continuity, runtime-gate completeness, commit precedence, execution effect, outcome closure, integrity hashes, format parity, and claims boundaries for ${selected.id}.` : "The verification sequence has not yet completed. No verified conclusion should be relied upon until every mandatory check passes."}</p></section>
+                <section><h4>Bounded conclusion</h4><p>{failed > 0 ? `One or more public consistency checks failed for ${selected.id}. No reliance conclusion should be drawn until the discrepancy is resolved.` : unavailable > 0 ? `The browser inspection confirmed the published record-level consistency checks available for ${selected.id}. Cryptographic hash recomputation, signature validation, and byte-for-byte package parity were not performed here and must not be inferred from this report.` : passed === checks.length ? `All configured checks completed for ${selected.id}.` : "The inspection sequence has not yet completed. No conclusion should be relied upon until the run finishes."}</p></section>
                 <section><h4>Claims boundary</h4><p>This report verifies the bounded record and disclosed package only. It does not certify every future execution, undisclosed source fact, unrelated route, actor, model, tool, jurisdiction, or environment.</p></section>
                 <footer><code>{selected.rootHash}</code><span>{selected.signature}</span></footer>
               </div>
@@ -558,7 +577,7 @@ export default function ArtifactVerificationCenterPage() {
 
       <section className="levels-section">
         <div className="section-heading"><span>Verification ladder</span><h2>From declaration to independent review.</h2><p>Higher levels add integrity, parity, replay, execution-effect, outcome, and independent-review evidence. They do not erase the limits of the bounded record.</p></div>
-        <div className="level-grid">{VERIFICATION_LEVELS.map((level,index)=><article key={level.code} className={index <= selected.verificationLevel ? "reached" : "pending"}><span>{level.code}</span><h3>{level.title}</h3><p>{level.description}</p><em>{index <= selected.verificationLevel ? "REACHED" : "NOT CLAIMED"}</em></article>)}</div>
+        <div className="level-grid">{VERIFICATION_LEVELS.map((level,index)=><article key={level.code} className={index === 0 ? "reached" : "pending"}><span>{level.code}</span><h3>{level.title}</h3><p>{level.description}</p><em>{index === 0 ? "PUBLICLY DECLARED" : index <= selected.verificationLevel ? "CLAIMED BY ARTIFACT · NOT INDEPENDENTLY VERIFIED HERE" : "NOT CLAIMED"}</em></article>)}</div>
       </section>
 
       <section className="activity-section">
@@ -589,8 +608,8 @@ export default function ArtifactVerificationCenterPage() {
         .view-tabs{display:flex;gap:8px;overflow:auto;margin-top:18px;padding:10px;border:1px solid var(--line);border-radius:17px;background:rgba(5,11,22,.84)}.view-tabs button{white-space:nowrap}
         .workspace{display:grid;grid-template-columns:330px minmax(0,1fr);gap:18px;margin-top:18px}.artifact-rail{position:sticky;top:18px;align-self:start;max-height:calc(100vh - 36px);overflow:auto;padding:14px;border:1px solid var(--line);border-radius:22px;background:rgba(6,12,24,.94);box-shadow:0 25px 70px rgba(0,0,0,.42)}.rail-heading{display:flex;align-items:end;justify-content:space-between;padding:10px 8px 16px}.rail-heading>span{margin:0}.rail-heading strong{font-size:13px}.rail-item{width:100%;display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:11px;align-items:center;margin-bottom:8px;padding:11px;border:1px solid transparent;border-radius:13px;color:#eaf2ff;background:rgba(255,255,255,.018);text-align:left;cursor:pointer}.rail-item:hover,.rail-item.selected{border-color:rgba(116,186,255,.34);background:rgba(50,96,175,.12)}.sequence{display:grid;place-items:center;width:36px;height:36px;border-radius:10px;background:rgba(112,151,255,.1);font-weight:900}.rail-copy{min-width:0}.rail-copy b,.rail-copy small{display:block}.rail-copy b{font-size:11px;letter-spacing:.05em}.rail-copy small{margin-top:3px;color:var(--muted);font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.rail-item em{font-size:9px;font-style:normal;font-weight:900}.allow{color:var(--green)!important}.hold{color:var(--amber)!important}.deny{color:var(--red)!important}.escalate{color:#b895ff!important}
         .workspace-main{min-width:0;padding:28px;border:1px solid var(--line);border-radius:24px;background:linear-gradient(155deg,rgba(10,19,37,.93),rgba(5,10,20,.93));box-shadow:0 28px 90px rgba(0,0,0,.38)}.section-heading{max-width:960px;margin-bottom:25px}.section-heading h2{margin:0;font-size:clamp(31px,4vw,57px);line-height:1.02;letter-spacing:-.045em}.section-heading p{margin:14px 0 0;color:#9eafc9;line-height:1.75}
-        .dashboard-grid{display:grid;grid-template-columns:1.45fr .72fr .86fr;gap:14px}.status-card,.score-card,.integrity-card,.artifact-summary article{border:1px solid var(--line);border-radius:18px;background:rgba(7,14,28,.76);box-shadow:inset 0 1px rgba(255,255,255,.04)}.status-card{padding:24px}.status-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}.status-top em{font-style:normal;font-weight:900}.status-card h3{margin:18px 0 7px;font-size:29px}.status-card>p{color:#aebdd4}.status-card dl,.report-sheet dl{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:20px 0}.status-card dl div,.report-sheet dl div{padding:11px;border-radius:10px;background:rgba(255,255,255,.025)}dt{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.1em}dd{margin:4px 0 0;font-size:12px;font-weight:800}.score-card{display:flex;flex-direction:column;align-items:center;padding:22px;text-align:center}.score-card>span,.integrity-card>span{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.14em}.score-card>strong{margin:10px 0;font-size:37px}.score-ring{--score:0deg;width:126px;height:126px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--cyan) var(--score),rgba(255,255,255,.06) 0);position:relative}.score-ring:after{content:"";position:absolute;inset:10px;border-radius:50%;background:#08101f}.score-ring i{position:relative;z-index:1;font-style:normal;font-weight:900}.score-card small{margin-top:15px;color:var(--muted)}.integrity-card{display:flex;flex-direction:column;gap:9px;padding:22px}.integrity-card code,.package-root code,.report-sheet code{display:block;padding:10px;border-radius:9px;color:#a9ddff;background:#030811;font-size:10px;overflow-wrap:anywhere}
-        .check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:16px}.check-card{display:grid;grid-template-columns:40px 1fr;gap:13px;min-height:175px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(7,14,27,.65)}.check-card.pass{border-color:rgba(86,227,159,.28);background:rgba(42,120,83,.08)}.check-card.fail{border-color:rgba(255,112,135,.3);background:rgba(130,42,58,.1)}.check-number{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(94,137,224,.13);font-size:11px;font-weight:900}.check-card span{color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.13em}.check-card h3{margin:7px 0 8px;font-size:15px}.check-card p{margin:0;color:#9cadc5;font-size:12px;line-height:1.55}.check-card small{display:block;margin-top:10px;color:#6f819e;line-height:1.45}
+        .verification-boundary{display:grid;grid-template-columns:auto 1fr;gap:14px;align-items:start;margin:0 0 16px;padding:15px 17px;border:1px solid rgba(255,194,92,.32);border-radius:14px;background:rgba(143,94,25,.10)}.verification-boundary strong{color:#ffc25c;font-size:10px;letter-spacing:.12em}.verification-boundary span{color:#c7d2e3;font-size:12px;line-height:1.55}.dashboard-grid{display:grid;grid-template-columns:1.45fr .72fr .86fr;gap:14px}.status-card,.score-card,.integrity-card,.artifact-summary article{border:1px solid var(--line);border-radius:18px;background:rgba(7,14,28,.76);box-shadow:inset 0 1px rgba(255,255,255,.04)}.status-card{padding:24px}.status-top{display:flex;justify-content:space-between;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.1em}.status-top em{font-style:normal;font-weight:900}.status-card h3{margin:18px 0 7px;font-size:29px}.status-card>p{color:#aebdd4}.status-card dl,.report-sheet dl{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:20px 0}.status-card dl div,.report-sheet dl div{padding:11px;border-radius:10px;background:rgba(255,255,255,.025)}dt{color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.1em}dd{margin:4px 0 0;font-size:12px;font-weight:800}.score-card{display:flex;flex-direction:column;align-items:center;padding:22px;text-align:center}.score-card>span,.integrity-card>span{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.14em}.score-card>strong{margin:10px 0;font-size:37px}.score-ring{--score:0deg;width:126px;height:126px;border-radius:50%;display:grid;place-items:center;background:conic-gradient(var(--cyan) var(--score),rgba(255,255,255,.06) 0);position:relative}.score-ring:after{content:"";position:absolute;inset:10px;border-radius:50%;background:#08101f}.score-ring i{position:relative;z-index:1;font-style:normal;font-weight:900}.score-card small{margin-top:15px;color:var(--muted)}.integrity-card{display:flex;flex-direction:column;gap:9px;padding:22px}.integrity-card code,.package-root code,.report-sheet code{display:block;padding:10px;border-radius:9px;color:#a9ddff;background:#030811;font-size:10px;overflow-wrap:anywhere}
+        .check-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px;margin-top:16px}.check-card{display:grid;grid-template-columns:40px 1fr;gap:13px;min-height:175px;padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(7,14,27,.65)}.check-card.pass{border-color:rgba(86,227,159,.28);background:rgba(42,120,83,.08)}.check-card.fail{border-color:rgba(255,112,135,.3);background:rgba(130,42,58,.1)}.check-card.not_available{border-color:rgba(255,194,92,.28);background:rgba(143,94,25,.10)}.check-number{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:rgba(94,137,224,.13);font-size:11px;font-weight:900}.check-card span{color:var(--cyan);font-size:9px;font-weight:900;letter-spacing:.13em}.check-card h3{margin:7px 0 8px;font-size:15px}.check-card p{margin:0;color:#9cadc5;font-size:12px;line-height:1.55}.check-card small{display:block;margin-top:10px;color:#6f819e;line-height:1.45}
         .artifact-summary{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}.artifact-summary article{padding:22px}.artifact-summary span{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.13em}.artifact-summary strong{display:block;margin:12px 0;font-size:24px}.artifact-summary p{color:#9fb0ca;font-size:13px;line-height:1.6}.runtime-map{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.runtime-map article{position:relative;min-height:170px;padding:17px;border:1px solid var(--line);border-radius:15px;background:linear-gradient(145deg,rgba(12,24,47,.72),rgba(5,11,22,.7));overflow:hidden}.runtime-map article>span{display:grid;place-items:center;width:32px;height:32px;border-radius:9px;background:rgba(112,151,255,.12);font-size:10px;font-weight:900}.runtime-map b{display:block;margin:13px 0 8px}.runtime-map p{color:#8fa1bd;font-size:11px;line-height:1.55}.runtime-map em{position:absolute;right:12px;bottom:12px;color:var(--green);font-size:8px;font-style:normal;font-weight:900;letter-spacing:.1em}
         .package-root{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:19px;border:1px solid rgba(112,213,255,.24);border-radius:16px;background:rgba(24,91,128,.08)}.package-root>div{min-width:0;flex:1}.package-root span{display:block;margin-bottom:8px;color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.13em}.component-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:16px}.component-grid article{padding:17px;border:1px solid var(--line);border-radius:15px;background:rgba(7,14,27,.7)}.component-grid article>span{color:var(--cyan);font-size:10px;font-weight:900}.component-grid h3{margin:9px 0;font-size:14px}.component-grid p{min-height:58px;color:#8fa2bd;font-size:11px;line-height:1.55}.component-grid article>div{display:flex;justify-content:space-between;margin:12px 0;color:var(--green);font-size:8px}.component-grid code{display:block;color:#7391b9;font-size:9px;overflow-wrap:anywhere}
         .receipt-stage{display:grid;grid-template-columns:.75fr 1.25fr;gap:15px}.receipt-signal,.receipt-ledger{border:1px solid var(--line);border-radius:19px;background:rgba(7,14,28,.74)}.receipt-signal{display:flex;min-height:300px;flex-direction:column;align-items:center;justify-content:center;padding:26px;text-align:center;box-shadow:inset 0 0 70px rgba(52,118,218,.08)}.receipt-signal span{color:var(--muted);font-size:10px;text-transform:uppercase;letter-spacing:.15em}.receipt-signal strong{margin:20px 0;font-size:clamp(25px,3vw,47px);color:var(--cyan)}.receipt-signal small{color:#7990b2}.receipt-ledger{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;padding:18px}.receipt-ledger div{padding:16px;border-radius:12px;background:rgba(255,255,255,.025)}.receipt-ledger span{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;letter-spacing:.1em}.receipt-ledger b{display:block;margin-top:7px;font-size:12px}.receipt-tests{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;margin-top:15px}.receipt-tests article{display:grid;grid-template-columns:34px 1fr auto;gap:10px;align-items:center;padding:15px;border:1px solid var(--line);border-radius:13px;background:rgba(7,14,27,.62)}.receipt-tests span{display:grid;place-items:center;width:30px;height:30px;border-radius:8px;background:rgba(98,145,233,.12);font-size:9px}.receipt-tests b{font-size:12px}.receipt-tests em{color:var(--green);font-size:9px;font-style:normal;font-weight:900}
