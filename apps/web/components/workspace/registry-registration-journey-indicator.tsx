@@ -11,6 +11,9 @@ type JourneySummary = {
   submitted: number;
   registered: number;
   failed: number;
+  stalled: number;
+  inProgress: number;
+  needsAttention: number;
 };
 
 type JourneySummaryResponse = {
@@ -95,6 +98,9 @@ export function RegistryRegistrationJourneyIndicator({
         submitted: normalizeCount(payload.summary.submitted),
         registered: normalizeCount(payload.summary.registered),
         failed: normalizeCount(payload.summary.failed),
+        stalled: normalizeCount(payload.summary.stalled),
+        inProgress: normalizeCount(payload.summary.inProgress),
+        needsAttention: normalizeCount(payload.summary.needsAttention),
       };
 
       if (mountedRef.current) {
@@ -154,34 +160,33 @@ export function RegistryRegistrationJourneyIndicator({
     };
   }, [load, refreshIntervalMs]);
 
-  const active =
-    (summary?.opened ?? 0) +
-    (summary?.started ?? 0) +
-    (summary?.draftSaved ?? 0) +
-    (summary?.submitted ?? 0);
-
+  const active = summary?.inProgress ?? 0;
   const failed = summary?.failed ?? 0;
+  const stalled = summary?.stalled ?? 0;
+  const needsAttention = summary?.needsAttention ?? 0;
 
   const label = loading
     ? 'Checking registration journeys'
     : unavailable
       ? 'Registration journey status unavailable'
-      : failed > 0
-        ? `${failed} registration ${
-            failed === 1 ? 'journey needs' : 'journeys need'
+      : needsAttention > 0
+        ? `${needsAttention} registration ${
+            needsAttention === 1 ? 'journey needs' : 'journeys need'
           } attention`
         : active > 0
-          ? `${active} active registration ${
-              active === 1 ? 'journey' : 'journeys'
-            }`
-          : 'No active registration journeys';
+          ? `${active} registration ${
+              active === 1 ? 'journey is' : 'journeys are'
+            } in progress`
+          : 'No registration journeys need attention';
 
   return (
     <div
       className={[
         'ta14-registration-journey-indicator',
         active > 0 ? 'has-active' : '',
+        needsAttention > 0 ? 'needs-attention' : '',
         failed > 0 ? 'has-failed' : '',
+        stalled > 0 ? 'has-stalled' : '',
         unavailable ? 'is-unavailable' : '',
         className,
       ]
@@ -230,8 +235,23 @@ export function RegistryRegistrationJourneyIndicator({
           </span>
 
           <span>
+            <strong>{summary.inProgress}</strong>
+            In progress
+          </span>
+
+          <span>
+            <strong>{summary.stalled}</strong>
+            Stalled
+          </span>
+
+          <span>
             <strong>{summary.failed}</strong>
             Failed
+          </span>
+
+          <span>
+            <strong>{summary.needsAttention}</strong>
+            Attention
           </span>
         </div>
       ) : null}
@@ -250,8 +270,17 @@ export function RegistryRegistrationJourneyIndicator({
           border-color: rgba(126, 231, 135, 0.36);
         }
 
+        .ta14-registration-journey-indicator.needs-attention {
+          border-color: rgba(255, 199, 95, 0.58);
+          box-shadow: inset 0 0 0 1px rgba(255, 199, 95, 0.08);
+        }
+
         .ta14-registration-journey-indicator.has-failed {
-          border-color: rgba(255, 199, 95, 0.48);
+          border-color: rgba(255, 118, 118, 0.58);
+        }
+
+        .ta14-registration-journey-indicator.has-stalled:not(.has-failed) {
+          border-color: rgba(255, 199, 95, 0.58);
         }
 
         .ta14-registration-journey-indicator.is-unavailable {
