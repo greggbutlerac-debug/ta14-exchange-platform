@@ -129,6 +129,12 @@ function label(linkId: TA14LinkId) {
     : linkId;
 }
 
+function orderOf(linkId: TA14LinkId) {
+  return (
+    TA14_24_LINKS.find((item) => item.linkId === linkId)?.order ?? 1
+  );
+}
+
 export default function TA14ChainFailureSimulatorPage() {
   const [scenarioId, setScenarioId] = useState(SCENARIOS[0].id);
   const [firstBroken, setFirstBroken] = useState<TA14LinkId>(
@@ -156,6 +162,10 @@ export default function TA14ChainFailureSimulatorPage() {
     return value;
   }, [submitted, firstBroken, lastAdmissible, decision, scenario]);
 
+  const firstBrokenOrder = orderOf(firstBroken);
+  const lastAdmissibleOrder = orderOf(lastAdmissible);
+  const expectedBrokenOrder = orderOf(scenario.firstBrokenLink);
+
   function chooseScenario(id: string) {
     const next = SCENARIOS.find((item) => item.id === id) ?? SCENARIOS[0];
     setScenarioId(next.id);
@@ -166,209 +176,1283 @@ export default function TA14ChainFailureSimulatorPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#030712] text-white">
-      <section className="relative overflow-hidden border-b border-white/10">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_0%,rgba(244,63,94,0.14),transparent_36%),radial-gradient(circle_at_82%_12%,rgba(56,189,248,0.12),transparent_34%)]" />
-        <div className="relative mx-auto max-w-7xl px-6 py-16 lg:px-8 lg:py-20">
+    <main className="sim">
+      <style>{`
+        .sim {
+          --bg: #020711;
+          --panel: rgba(8, 20, 32, .86);
+          --panel2: rgba(11, 28, 43, .78);
+          --line: rgba(129, 176, 210, .14);
+          --line-strong: rgba(84, 232, 255, .26);
+          --cyan: #54e8ff;
+          --cyan-soft: #c4f8ff;
+          --rose: #ff829e;
+          --rose-soft: #ffd0da;
+          --green: #45eaa6;
+          --amber: #f1c769;
+          --indigo: #a8b2ff;
+          --text: #eff8ff;
+          --muted: #93a8ba;
+          --dim: #647b8f;
+          min-height: 100vh;
+          overflow: hidden;
+          color: var(--text);
+          background:
+            radial-gradient(circle at 9% 0%, rgba(255,130,158,.11), transparent 25%),
+            radial-gradient(circle at 93% 8%, rgba(84,232,255,.09), transparent 25%),
+            linear-gradient(180deg, #020711 0%, #030a13 55%, #020711 100%);
+        }
+
+        .sim * { box-sizing: border-box; }
+
+        .sim-shell {
+          width: min(1460px, calc(100% - 48px));
+          margin: 0 auto;
+        }
+
+        .sim-hero {
+          position: relative;
+          overflow: hidden;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .sim-hero::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+          background:
+            linear-gradient(rgba(255,255,255,.018) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255,255,255,.018) 1px, transparent 1px);
+          background-size: 56px 56px;
+          mask-image: linear-gradient(to bottom, #000, transparent 90%);
+          opacity: .38;
+        }
+
+        .sim-topline {
+          position: relative;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 14px;
+          padding-top: 20px;
+        }
+
+        .sim-back {
+          color: var(--cyan-soft);
+          font-size: .72rem;
+          font-weight: 900;
+          text-decoration: none;
+        }
+
+        .sim-mode {
+          padding: 7px 11px;
+          border: 1px solid rgba(255,130,158,.18);
+          border-radius: 999px;
+          background: rgba(255,130,158,.045);
+          color: var(--rose-soft);
+          font-size: .56rem;
+          font-weight: 950;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .sim-hero-grid {
+          position: relative;
+          display: grid;
+          grid-template-columns: minmax(0, 1.08fr) minmax(420px, .92fr);
+          gap: 62px;
+          align-items: center;
+          padding: 70px 0 80px;
+        }
+
+        .sim-kicker {
+          color: var(--rose);
+          font-size: .64rem;
+          font-weight: 950;
+          letter-spacing: .20em;
+          text-transform: uppercase;
+        }
+
+        .sim-title {
+          max-width: 980px;
+          margin: 14px 0 0;
+          font-size: clamp(3.2rem, 6vw, 6.2rem);
+          line-height: .95;
+          letter-spacing: -.06em;
+        }
+
+        .sim-title span {
+          display: block;
+          color: var(--rose-soft);
+        }
+
+        .sim-lead {
+          max-width: 900px;
+          margin: 26px 0 0;
+          color: #c8d8e4;
+          font-size: clamp(1rem, 1.35vw, 1.18rem);
+          line-height: 1.8;
+        }
+
+        .sim-rules {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-top: 24px;
+        }
+
+        .sim-rule {
+          padding: 7px 10px;
+          border: 1px solid var(--line);
+          border-radius: 999px;
+          background: rgba(255,255,255,.026);
+          color: var(--muted);
+          font-size: .56rem;
+          font-weight: 850;
+        }
+
+        .sim-radar {
+          position: relative;
+          width: min(500px, 100%);
+          aspect-ratio: 1;
+          margin: 0 auto;
+        }
+
+        .sim-ring {
+          position: absolute;
+          inset: 50% auto auto 50%;
+          transform: translate(-50%, -50%);
+          border: 1px solid rgba(129,176,210,.10);
+          border-radius: 50%;
+        }
+
+        .sim-ring.r1 { width: 96%; height: 96%; }
+        .sim-ring.r2 { width: 75%; height: 75%; border-color: rgba(255,130,158,.12); }
+        .sim-ring.r3 { width: 54%; height: 54%; border-color: rgba(84,232,255,.12); }
+        .sim-ring.r4 { width: 34%; height: 34%; border-color: rgba(241,199,105,.12); }
+
+        .sim-axis-h,
+        .sim-axis-v {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        }
+
+        .sim-axis-h {
+          width: 88%;
+          height: 1px;
+          background: linear-gradient(90deg, transparent, rgba(255,130,158,.15), transparent);
+        }
+
+        .sim-axis-v {
+          width: 1px;
+          height: 88%;
+          background: linear-gradient(180deg, transparent, rgba(84,232,255,.13), transparent);
+        }
+
+        .sim-core {
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          width: 176px;
+          height: 176px;
+          transform: translate(-50%, -50%);
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(255,130,158,.24);
+          border-radius: 50%;
+          background:
+            radial-gradient(circle at 30% 25%, rgba(255,130,158,.12), transparent 44%),
+            rgba(5,16,27,.95);
+          box-shadow: 0 0 90px rgba(255,130,158,.08);
+          text-align: center;
+        }
+
+        .sim-core small {
+          display: block;
+          color: var(--rose);
+          font-size: .58rem;
+          font-weight: 950;
+          letter-spacing: .18em;
+        }
+
+        .sim-core strong {
+          display: block;
+          margin-top: 4px;
+          font-size: 3.4rem;
+          line-height: 1;
+          letter-spacing: -.06em;
+        }
+
+        .sim-core span {
+          display: block;
+          margin-top: 6px;
+          color: var(--muted);
+          font-size: .64rem;
+        }
+
+        .sim-node {
+          position: absolute;
+          min-width: 112px;
+          padding: 10px 12px;
+          border: 1px solid var(--line);
+          border-radius: 13px;
+          background: rgba(5,16,27,.92);
+          box-shadow: 0 12px 34px rgba(0,0,0,.24);
+        }
+
+        .sim-node b {
+          display: block;
+          color: var(--rose);
+          font-size: .55rem;
+          letter-spacing: .12em;
+        }
+
+        .sim-node span {
+          display: block;
+          margin-top: 4px;
+          color: #d7e5ef;
+          font-size: .66rem;
+          font-weight: 850;
+        }
+
+        .sim-node.n1 { left: 0; top: 18%; }
+        .sim-node.n2 { right: 0; top: 24%; }
+        .sim-node.n3 { right: 5%; bottom: 18%; }
+        .sim-node.n4 { left: 0; bottom: 18%; }
+        .sim-node.n5 { left: 50%; top: 0; transform: translateX(-50%); }
+
+        .sim-metrics {
+          border-bottom: 1px solid var(--line);
+          background: rgba(4,12,20,.76);
+        }
+
+        .sim-metric-grid {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+        }
+
+        .sim-metric {
+          min-height: 92px;
+          padding: 19px 20px;
+          border-right: 1px solid var(--line);
+        }
+
+        .sim-metric:last-child { border-right: 0; }
+
+        .sim-metric strong {
+          display: block;
+          font-size: 1.9rem;
+          line-height: 1;
+          letter-spacing: -.04em;
+        }
+
+        .sim-metric span {
+          display: block;
+          margin-top: 7px;
+          color: var(--dim);
+          font-size: .56rem;
+          font-weight: 900;
+          letter-spacing: .09em;
+          text-transform: uppercase;
+        }
+
+        .sim-section {
+          padding: 72px 0 88px;
+        }
+
+        .sim-section.alt {
+          border-top: 1px solid var(--line);
+          border-bottom: 1px solid var(--line);
+          background: rgba(4,12,20,.66);
+        }
+
+        .sim-section-head {
+          display: flex;
+          align-items: end;
+          justify-content: space-between;
+          gap: 28px;
+          margin-bottom: 28px;
+        }
+
+        .sim-eyebrow {
+          color: var(--cyan);
+          font-size: .62rem;
+          font-weight: 950;
+          letter-spacing: .16em;
+          text-transform: uppercase;
+        }
+
+        .sim-h2 {
+          margin: 9px 0 0;
+          font-size: clamp(2rem, 3.4vw, 3.7rem);
+          line-height: 1;
+          letter-spacing: -.045em;
+        }
+
+        .sim-copy {
+          max-width: 620px;
+          margin: 0;
+          color: var(--muted);
+          font-size: .78rem;
+          line-height: 1.7;
+        }
+
+        .sim-scenarios {
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .sim-scenario {
+          min-height: 188px;
+          display: flex;
+          flex-direction: column;
+          gap: 14px;
+          padding: 18px;
+          border: 1px solid var(--line);
+          border-radius: 18px;
+          background: rgba(255,255,255,.024);
+          color: var(--text);
+          text-align: left;
+          cursor: pointer;
+          transition: 170ms ease;
+        }
+
+        .sim-scenario:hover {
+          transform: translateY(-2px);
+          border-color: rgba(255,130,158,.22);
+          background: rgba(255,130,158,.03);
+        }
+
+        .sim-scenario.active {
+          border-color: rgba(255,130,158,.34);
+          background:
+            radial-gradient(circle at 100% 0%, rgba(255,130,158,.09), transparent 44%),
+            rgba(255,130,158,.045);
+        }
+
+        .sim-scenario-top {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 10px;
+        }
+
+        .sim-scenario-code {
+          color: var(--rose);
+          font-size: .56rem;
+          font-weight: 950;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .sim-scenario-index {
+          color: rgba(255,255,255,.09);
+          font-size: 2.5rem;
+          line-height: .9;
+          font-weight: 950;
+        }
+
+        .sim-scenario h3 {
+          margin: 0;
+          font-size: .95rem;
+          line-height: 1.3;
+        }
+
+        .sim-scenario p {
+          margin: 0;
+          color: var(--muted);
+          font-size: .68rem;
+          line-height: 1.6;
+        }
+
+        .sim-scenario-action {
+          margin-top: auto;
+          padding-top: 13px;
+          border-top: 1px solid var(--line);
+          color: var(--rose-soft);
+          font-size: .60rem;
+          font-weight: 900;
+        }
+
+        .sim-workspace {
+          display: grid;
+          grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+          gap: 20px;
+          align-items: start;
+        }
+
+        .sim-console,
+        .sim-analysis {
+          overflow: hidden;
+          border: 1px solid var(--line);
+          border-radius: 24px;
+          background: rgba(255,255,255,.024);
+        }
+
+        .sim-console-head,
+        .sim-analysis-head {
+          padding: 22px 24px 20px;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .sim-console-head {
+          background:
+            radial-gradient(circle at 100% 0%, rgba(255,130,158,.08), transparent 42%),
+            rgba(255,255,255,.01);
+        }
+
+        .sim-analysis-head {
+          background:
+            radial-gradient(circle at 100% 0%, rgba(84,232,255,.07), transparent 42%),
+            rgba(255,255,255,.01);
+        }
+
+        .sim-panel-kicker {
+          color: var(--rose);
+          font-size: .56rem;
+          font-weight: 950;
+          letter-spacing: .14em;
+          text-transform: uppercase;
+        }
+
+        .sim-analysis .sim-panel-kicker {
+          color: var(--cyan);
+        }
+
+        .sim-console h2,
+        .sim-analysis h2 {
+          margin: 8px 0 0;
+          font-size: 1.8rem;
+          line-height: 1.08;
+          letter-spacing: -.035em;
+        }
+
+        .sim-pressure {
+          margin: 13px 0 0;
+          color: var(--muted);
+          font-size: .76rem;
+          line-height: 1.7;
+        }
+
+        .sim-task {
+          margin-top: 16px;
+          padding: 14px;
+          border: 1px solid rgba(84,232,255,.14);
+          border-radius: 13px;
+          background: rgba(84,232,255,.035);
+        }
+
+        .sim-task small {
+          display: block;
+          color: var(--cyan);
+          font-size: .52rem;
+          font-weight: 950;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .sim-task p {
+          margin: 7px 0 0;
+          color: #dceaf4;
+          font-size: .70rem;
+          line-height: 1.55;
+        }
+
+        .sim-console-body,
+        .sim-analysis-body {
+          padding: 22px 24px 24px;
+        }
+
+        .sim-field {
+          display: grid;
+          gap: 7px;
+          margin-top: 15px;
+        }
+
+        .sim-field:first-child { margin-top: 0; }
+
+        .sim-field label {
+          color: #dceaf4;
+          font-size: .67rem;
+          font-weight: 900;
+        }
+
+        .sim-select {
+          width: 100%;
+          min-height: 46px;
+          padding: 0 12px;
+          border: 1px solid var(--line);
+          border-radius: 12px;
+          background: #07111e;
+          color: var(--text);
+          outline: none;
+          font-size: .68rem;
+        }
+
+        .sim-select:focus {
+          border-color: rgba(255,130,158,.38);
+          box-shadow: 0 0 0 3px rgba(255,130,158,.06);
+        }
+
+        .sim-decision-grid {
+          display: grid;
+          grid-template-columns: repeat(5, minmax(0, 1fr));
+          gap: 7px;
+        }
+
+        .sim-decision {
+          min-height: 44px;
+          border: 1px solid var(--line);
+          border-radius: 11px;
+          background: rgba(255,255,255,.025);
+          color: var(--muted);
+          cursor: pointer;
+          font-size: .58rem;
+          font-weight: 950;
+          letter-spacing: .06em;
+          transition: 150ms ease;
+        }
+
+        .sim-decision:hover {
+          border-color: rgba(255,130,158,.22);
+          color: #fff;
+        }
+
+        .sim-decision.active {
+          border-color: rgba(255,130,158,.34);
+          background: rgba(255,130,158,.075);
+          color: var(--rose-soft);
+        }
+
+        .sim-evaluate {
+          width: 100%;
+          min-height: 48px;
+          margin-top: 18px;
+          border: 1px solid rgba(255,130,158,.30);
+          border-radius: 12px;
+          background: rgba(255,130,158,.09);
+          color: var(--rose-soft);
+          cursor: pointer;
+          font-size: .69rem;
+          font-weight: 950;
+          transition: 160ms ease;
+        }
+
+        .sim-evaluate:hover {
+          transform: translateY(-1px);
+          background: rgba(255,130,158,.13);
+          border-color: rgba(255,130,158,.42);
+        }
+
+        .sim-route-map {
+          margin-top: 20px;
+          padding-top: 18px;
+          border-top: 1px solid var(--line);
+        }
+
+        .sim-route-map-label {
+          display: flex;
+          justify-content: space-between;
+          gap: 12px;
+          color: var(--dim);
+          font-size: .52rem;
+          font-weight: 900;
+          letter-spacing: .10em;
+          text-transform: uppercase;
+        }
+
+        .sim-route-track {
+          display: grid;
+          grid-template-columns: repeat(24, minmax(0, 1fr));
+          gap: 4px;
+          margin-top: 10px;
+        }
+
+        .sim-route-segment {
+          height: 9px;
+          border: 1px solid rgba(255,255,255,.05);
+          border-radius: 999px;
+          background: rgba(255,255,255,.035);
+        }
+
+        .sim-route-segment.preserved {
+          border-color: rgba(69,234,166,.13);
+          background: rgba(69,234,166,.14);
+        }
+
+        .sim-route-segment.break {
+          border-color: rgba(255,130,158,.28);
+          background: rgba(255,130,158,.27);
+          box-shadow: 0 0 14px rgba(255,130,158,.15);
+        }
+
+        .sim-route-segment.downstream {
+          border-color: rgba(241,199,105,.08);
+          background: rgba(241,199,105,.055);
+        }
+
+        .sim-analysis-placeholder {
+          min-height: 350px;
+          display: grid;
+          place-items: center;
+          padding: 24px;
+          text-align: center;
+        }
+
+        .sim-analysis-placeholder strong {
+          display: block;
+          font-size: 1rem;
+        }
+
+        .sim-analysis-placeholder p {
+          max-width: 420px;
+          margin: 10px auto 0;
+          color: var(--muted);
+          font-size: .72rem;
+          line-height: 1.65;
+        }
+
+        .sim-score-row {
+          display: flex;
+          align-items: flex-end;
+          justify-content: space-between;
+          gap: 18px;
+        }
+
+        .sim-score strong {
+          display: block;
+          font-size: 4.3rem;
+          line-height: .9;
+          letter-spacing: -.07em;
+        }
+
+        .sim-score span {
+          display: block;
+          margin-top: 8px;
+          color: var(--muted);
+          font-size: .64rem;
+        }
+
+        .sim-status {
+          padding: 7px 10px;
+          border: 1px solid rgba(241,199,105,.22);
+          border-radius: 999px;
+          background: rgba(241,199,105,.055);
+          color: var(--amber);
+          font-size: .56rem;
+          font-weight: 950;
+          letter-spacing: .08em;
+        }
+
+        .sim-status.perfect {
+          border-color: rgba(69,234,166,.22);
+          background: rgba(69,234,166,.055);
+          color: var(--green);
+        }
+
+        .sim-results {
+          display: grid;
+          gap: 10px;
+          margin-top: 22px;
+        }
+
+        .sim-result {
+          padding: 14px;
+          border: 1px solid var(--line);
+          border-radius: 13px;
+          background: rgba(0,0,0,.10);
+        }
+
+        .sim-result-top {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+        }
+
+        .sim-result-label {
+          color: var(--dim);
+          font-size: .52rem;
+          font-weight: 900;
+          letter-spacing: .10em;
+          text-transform: uppercase;
+        }
+
+        .sim-result-state {
+          font-size: .54rem;
+          font-weight: 950;
+          letter-spacing: .06em;
+        }
+
+        .sim-result-state.correct { color: var(--green); }
+        .sim-result-state.reassess { color: var(--amber); }
+
+        .sim-result p {
+          margin: 8px 0 0;
+          color: #dceaf4;
+          font-size: .67rem;
+          line-height: 1.5;
+        }
+
+        .sim-result .expected {
+          color: var(--muted);
+        }
+
+        .sim-recovery {
+          margin-top: 20px;
+          overflow: hidden;
+          border: 1px solid rgba(69,234,166,.16);
+          border-radius: 16px;
+          background: rgba(69,234,166,.035);
+        }
+
+        .sim-recovery-head {
+          padding: 14px 16px;
+          border-bottom: 1px solid rgba(69,234,166,.12);
+          color: var(--green);
+          font-size: .56rem;
+          font-weight: 950;
+          letter-spacing: .12em;
+          text-transform: uppercase;
+        }
+
+        .sim-recovery-body {
+          padding: 16px;
+        }
+
+        .sim-recovery-body p {
+          margin: 0;
+          color: #d9e9e1;
+          font-size: .70rem;
+          line-height: 1.65;
+        }
+
+        .sim-why {
+          margin-top: 14px;
+          padding-top: 14px;
+          border-top: 1px solid rgba(255,255,255,.08);
+        }
+
+        .sim-why small {
+          display: block;
+          color: var(--dim);
+          font-size: .50rem;
+          font-weight: 900;
+          letter-spacing: .10em;
+          text-transform: uppercase;
+        }
+
+        .sim-why p {
+          margin-top: 7px;
+          color: var(--muted);
+        }
+
+        .sim-doctrine-grid {
+          display: grid;
+          grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+          gap: 34px;
+          align-items: start;
+        }
+
+        .sim-doctrine h2 {
+          margin: 9px 0 0;
+          font-size: clamp(2rem, 3.4vw, 3.4rem);
+          line-height: 1.04;
+          letter-spacing: -.045em;
+        }
+
+        .sim-doctrine p {
+          margin: 18px 0 0;
+          color: var(--muted);
+          font-size: .78rem;
+          line-height: 1.75;
+        }
+
+        .sim-doctrine-cards {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 11px;
+        }
+
+        .sim-doctrine-card {
+          min-height: 148px;
+          padding: 16px;
+          border: 1px solid var(--line);
+          border-radius: 15px;
+          background: rgba(255,255,255,.022);
+        }
+
+        .sim-doctrine-card b {
+          color: var(--rose);
+          font-size: .56rem;
+          letter-spacing: .12em;
+        }
+
+        .sim-doctrine-card strong {
+          display: block;
+          margin-top: 8px;
+          font-size: .76rem;
+        }
+
+        .sim-doctrine-card span {
+          display: block;
+          margin-top: 7px;
+          color: var(--muted);
+          font-size: .64rem;
+          line-height: 1.55;
+        }
+
+        @media (max-width: 1180px) {
+          .sim-hero-grid { grid-template-columns: 1fr; }
+          .sim-radar { max-width: 500px; }
+          .sim-workspace { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 900px) {
+          .sim-scenarios { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .sim-doctrine-grid { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 760px) {
+          .sim-shell { width: min(100% - 28px, 1460px); }
+          .sim-topline,
+          .sim-section-head { display: grid; align-items: start; }
+          .sim-title { font-size: clamp(2.8rem, 13vw, 4.8rem); }
+          .sim-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .sim-metric { border-bottom: 1px solid var(--line); }
+          .sim-metric:nth-child(2n) { border-right: 0; }
+          .sim-decision-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .sim-doctrine-cards { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 560px) {
+          .sim-scenarios { grid-template-columns: 1fr; }
+          .sim-node { display: none; }
+          .sim-score-row { display: grid; }
+        }
+      `}</style>
+
+      <section className="sim-hero">
+        <div className="sim-shell sim-topline">
           <Link
             href="/academy/24-link-architecture"
-            className="text-sm font-semibold text-sky-300 transition hover:text-sky-200"
+            className="sim-back"
           >
             ← Back to 24-Link Explorer
           </Link>
-          <p className="mt-10 text-xs font-semibold uppercase tracking-[0.26em] text-rose-300">
-            TA-14 Academy · Pressure Lab
-          </p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-6xl">
-            Chain Failure Simulator
-          </h1>
-          <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-            The learner is scored on preservation of the admissible route, not
-            on whether the scenario reaches execution. Find the first broken
-            link, preserve the last admissible state, and make the correct
-            governed decision.
-          </p>
+
+          <span className="sim-mode">
+            Pressure Lab · governed simulation
+          </span>
         </div>
-      </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-          {SCENARIOS.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => chooseScenario(item.id)}
-              className={[
-                "rounded-2xl border p-5 text-left transition",
-                scenario.id === item.id
-                  ? "border-rose-300/35 bg-rose-300/[0.08]"
-                  : "border-white/10 bg-white/[0.035] hover:border-white/20",
-              ].join(" ")}
-            >
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-                Scenario
-              </p>
-              <p className="mt-2 font-semibold text-white">{item.title}</p>
-              <p className="mt-3 text-sm leading-6 text-slate-400">
-                {item.pressure}
-              </p>
-            </button>
-          ))}
-        </div>
-      </section>
+        <div className="sim-shell sim-hero-grid">
+          <div>
+            <div className="sim-kicker">
+              TA-14 Academy · Pressure Lab
+            </div>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-6 pb-20 lg:grid-cols-[0.95fr_1.05fr] lg:px-8">
-        <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 sm:p-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-rose-300">
-            Active pressure case
-          </p>
-          <h2 className="mt-3 text-2xl font-semibold">{scenario.title}</h2>
-          <p className="mt-4 leading-7 text-slate-300">{scenario.pressure}</p>
+            <h1 className="sim-title">
+              Chain Failure
+              <span>Simulator.</span>
+            </h1>
 
-          <div className="mt-6 rounded-2xl border border-white/10 bg-black/15 p-5">
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sky-300">
-              Your task
+            <p className="sim-lead">
+              The learner is scored on preservation of the admissible route,
+              not on whether the scenario reaches execution. Find the first
+              broken link, preserve the last admissible state, and make the
+              correct governed decision.
             </p>
-            <p className="mt-2 text-sm leading-7 text-slate-200">
-              {scenario.prompt}
+
+            <div className="sim-rules">
+              <span className="sim-rule">Locate first failure</span>
+              <span className="sim-rule">Preserve last admissible state</span>
+              <span className="sim-rule">Choose governed response</span>
+              <span className="sim-rule">Protect consequence boundary</span>
+            </div>
+          </div>
+
+          <div className="sim-radar" aria-label="TA-14 simulator pressure motif">
+            <div className="sim-ring r1" />
+            <div className="sim-ring r2" />
+            <div className="sim-ring r3" />
+            <div className="sim-ring r4" />
+            <div className="sim-axis-h" />
+            <div className="sim-axis-v" />
+
+            <div className="sim-core">
+              <div>
+                <small>PRESSURE LAB</small>
+                <strong>24</strong>
+                <span>links under governed pressure</span>
+              </div>
+            </div>
+
+            <div className="sim-node n1"><b>01</b><span>Evidence</span></div>
+            <div className="sim-node n2"><b>08</b><span>Authority</span></div>
+            <div className="sim-node n3"><b>16</b><span>Runtime</span></div>
+            <div className="sim-node n4"><b>21</b><span>Outcome</span></div>
+            <div className="sim-node n5"><b>23</b><span>Memory</span></div>
+          </div>
+        </div>
+      </section>
+
+      <section className="sim-metrics">
+        <div className="sim-shell sim-metric-grid">
+          <Metric value="6" label="Pressure scenarios" />
+          <Metric value="24" label="Canonical links" />
+          <Metric value="5" label="Governed decisions" />
+          <Metric value="3" label="Scored judgments" />
+          <Metric value="100" label="Maximum route score" />
+        </div>
+      </section>
+
+      <section className="sim-section alt">
+        <div className="sim-shell">
+          <div className="sim-section-head">
+            <div>
+              <div className="sim-eyebrow" style={{ color: "var(--rose)" }}>
+                Pressure cases
+              </div>
+              <h2 className="sim-h2">
+                Choose the condition that breaks the route.
+              </h2>
+            </div>
+
+            <p className="sim-copy">
+              Each scenario isolates a different admissibility pressure:
+              evidence decay, authority drift, runtime change, correct refusal,
+              outcome divergence, or institutional-memory conflict.
             </p>
           </div>
 
-          <div className="mt-7 space-y-5">
-            <LinkSelect
-              labelText="First broken link"
-              value={firstBroken}
-              onChange={setFirstBroken}
-            />
-            <LinkSelect
-              labelText="Last admissible link"
-              value={lastAdmissible}
-              onChange={setLastAdmissible}
-            />
-
-            <label className="block">
-              <span className="text-sm font-semibold text-slate-200">
-                Governed decision
-              </span>
-              <select
-                value={decision}
-                onChange={(event) =>
-                  setDecision(event.target.value as TA14RouteDecision)
-                }
-                className="mt-2 w-full rounded-xl border border-white/10 bg-[#07101f] px-4 py-3 text-sm text-white outline-none focus:border-rose-300/40"
+          <div className="sim-scenarios">
+            {SCENARIOS.map((item, index) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => chooseScenario(item.id)}
+                className={[
+                  "sim-scenario",
+                  scenario.id === item.id ? "active" : "",
+                ]
+                  .filter(Boolean)
+                  .join(" ")}
               >
-                {DECISIONS.map((item) => (
-                  <option key={item} value={item}>
-                    {item}
-                  </option>
-                ))}
-              </select>
-            </label>
-
-            <button
-              type="button"
-              onClick={() => setSubmitted(true)}
-              className="w-full rounded-xl border border-rose-300/30 bg-rose-300/10 px-5 py-3 text-sm font-semibold text-rose-100 transition hover:bg-rose-300/15"
-            >
-              Evaluate route decision
-            </button>
-          </div>
-        </section>
-
-        <div className="space-y-6">
-          <section className="rounded-3xl border border-white/10 bg-white/[0.035] p-6 sm:p-8">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-sky-300">
-              Route analysis
-            </p>
-
-            {!submitted ? (
-              <p className="mt-4 leading-7 text-slate-400">
-                Submit your route decision to reveal the governed analysis.
-              </p>
-            ) : (
-              <>
-                <div className="mt-5 flex items-end justify-between gap-4">
-                  <div>
-                    <p className="text-5xl font-semibold">{score}</p>
-                    <p className="mt-1 text-sm text-slate-400">
-                      route-preservation score / 100
-                    </p>
-                  </div>
-                  <span
-                    className={[
-                      "rounded-full border px-3 py-1 text-xs font-semibold",
-                      score === 100
-                        ? "border-emerald-300/30 bg-emerald-300/10 text-emerald-200"
-                        : "border-amber-300/30 bg-amber-300/10 text-amber-200",
-                    ].join(" ")}
-                  >
-                    {score === 100 ? "ROUTE PRESERVED" : "REASSESS"}
+                <div className="sim-scenario-top">
+                  <span className="sim-scenario-code">Scenario</span>
+                  <span className="sim-scenario-index">
+                    {String(index + 1).padStart(2, "0")}
                   </span>
                 </div>
 
-                <div className="mt-7 grid gap-4">
-                  <ResultRow
-                    labelText="First broken link"
-                    chosen={label(firstBroken)}
-                    expected={label(scenario.firstBrokenLink)}
-                    correct={firstBroken === scenario.firstBrokenLink}
-                  />
-                  <ResultRow
-                    labelText="Last admissible link"
-                    chosen={label(lastAdmissible)}
-                    expected={label(scenario.lastAdmissibleLink)}
-                    correct={lastAdmissible === scenario.lastAdmissibleLink}
-                  />
-                  <ResultRow
-                    labelText="Decision"
-                    chosen={decision}
-                    expected={scenario.decision}
-                    correct={decision === scenario.decision}
-                  />
-                </div>
-              </>
-            )}
-          </section>
+                <h3>{item.title}</h3>
+                <p>{item.pressure}</p>
 
-          {submitted ? (
-            <section className="rounded-3xl border border-emerald-300/20 bg-emerald-300/[0.045] p-6 sm:p-8">
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-emerald-200">
-                Governed recovery
-              </p>
-              <p className="mt-3 leading-7 text-slate-200">
-                {scenario.recovery}
-              </p>
-
-              <div className="mt-6 border-t border-white/10 pt-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-slate-500">
-                  Why
-                </p>
-                <p className="mt-3 leading-7 text-slate-300">
-                  {scenario.rationale}
-                </p>
-              </div>
-            </section>
-          ) : null}
+                <span className="sim-scenario-action">
+                  {scenario.id === item.id
+                    ? "Active pressure case"
+                    : "Load scenario →"}
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
       </section>
 
-      <section className="border-t border-white/10 bg-white/[0.02]">
-        <div className="mx-auto max-w-7xl px-6 py-14 lg:px-8">
-          <p className="text-xs font-semibold uppercase tracking-[0.22em] text-rose-300">
-            Simulator doctrine
-          </p>
-          <h2 className="mt-3 text-3xl font-semibold">
-            Reaching Execution is not the highest score.
-          </h2>
-          <p className="mt-4 max-w-4xl leading-7 text-slate-300">
-            Preserving admissibility is the goal. A correct HOLD, REFUSE,
-            NARROW, or ESCALATE decision can be the successful result when the
-            evidence, authority, runtime state, or consequence conditions no
-            longer support continuation.
-          </p>
+      <section className="sim-section">
+        <div className="sim-shell">
+          <div className="sim-section-head">
+            <div>
+              <div className="sim-eyebrow">
+                Live simulation console
+              </div>
+              <h2 className="sim-h2">
+                Find the first unsupported state before consequence attaches.
+              </h2>
+            </div>
+
+            <p className="sim-copy">
+              Your answer is evaluated on three separate judgments: where the
+              route first breaks, what the last still-admissible state was, and
+              which governed decision correctly preserves the chain.
+            </p>
+          </div>
+
+          <div className="sim-workspace">
+            <section className="sim-console">
+              <div className="sim-console-head">
+                <div className="sim-panel-kicker">
+                  Active pressure case
+                </div>
+                <h2>{scenario.title}</h2>
+                <p className="sim-pressure">{scenario.pressure}</p>
+
+                <div className="sim-task">
+                  <small>Your task</small>
+                  <p>{scenario.prompt}</p>
+                </div>
+              </div>
+
+              <div className="sim-console-body">
+                <LinkSelect
+                  labelText="First broken link"
+                  value={firstBroken}
+                  onChange={(value) => {
+                    setFirstBroken(value);
+                    setSubmitted(false);
+                  }}
+                />
+
+                <LinkSelect
+                  labelText="Last admissible link"
+                  value={lastAdmissible}
+                  onChange={(value) => {
+                    setLastAdmissible(value);
+                    setSubmitted(false);
+                  }}
+                />
+
+                <div className="sim-field">
+                  <label>Governed decision</label>
+                  <div className="sim-decision-grid">
+                    {DECISIONS.map((item) => (
+                      <button
+                        key={item}
+                        type="button"
+                        onClick={() => {
+                          setDecision(item);
+                          setSubmitted(false);
+                        }}
+                        className={[
+                          "sim-decision",
+                          decision === item ? "active" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        {item}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="sim-route-map">
+                  <div className="sim-route-map-label">
+                    <span>Current diagnosis</span>
+                    <span>
+                      break at {String(firstBrokenOrder).padStart(2, "0")}
+                    </span>
+                  </div>
+
+                  <div className="sim-route-track" aria-label="24-link route diagnosis">
+                    {TA14_24_LINKS.map((item) => {
+                      const state =
+                        item.order < firstBrokenOrder
+                          ? "preserved"
+                          : item.order === firstBrokenOrder
+                            ? "break"
+                            : "downstream";
+
+                      return (
+                        <span
+                          key={item.linkId}
+                          className={`sim-route-segment ${state}`}
+                          title={`${String(item.order).padStart(2, "0")} ${item.canonicalName}`}
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => setSubmitted(true)}
+                  className="sim-evaluate"
+                >
+                  Evaluate route decision
+                </button>
+              </div>
+            </section>
+
+            <section className="sim-analysis">
+              <div className="sim-analysis-head">
+                <div className="sim-panel-kicker">
+                  Route analysis
+                </div>
+                <h2>
+                  {submitted
+                    ? "Governed evaluation"
+                    : "Analysis remains sealed until submission"}
+                </h2>
+              </div>
+
+              <div className="sim-analysis-body">
+                {!submitted ? (
+                  <div className="sim-analysis-placeholder">
+                    <div>
+                      <strong>
+                        Submit your route decision to reveal the governed analysis.
+                      </strong>
+                      <p>
+                        The simulator withholds the answer until you commit to
+                        a first broken link, last admissible state, and governed
+                        response.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="sim-score-row">
+                      <div className="sim-score">
+                        <strong>{score}</strong>
+                        <span>route-preservation score / 100</span>
+                      </div>
+
+                      <span
+                        className={[
+                          "sim-status",
+                          score === 100 ? "perfect" : "",
+                        ]
+                          .filter(Boolean)
+                          .join(" ")}
+                      >
+                        {score === 100
+                          ? "ROUTE PRESERVED"
+                          : "REASSESS"}
+                      </span>
+                    </div>
+
+                    <div className="sim-results">
+                      <ResultRow
+                        labelText="First broken link"
+                        chosen={label(firstBroken)}
+                        expected={label(scenario.firstBrokenLink)}
+                        correct={firstBroken === scenario.firstBrokenLink}
+                      />
+
+                      <ResultRow
+                        labelText="Last admissible link"
+                        chosen={label(lastAdmissible)}
+                        expected={label(scenario.lastAdmissibleLink)}
+                        correct={lastAdmissible === scenario.lastAdmissibleLink}
+                      />
+
+                      <ResultRow
+                        labelText="Decision"
+                        chosen={decision}
+                        expected={scenario.decision}
+                        correct={decision === scenario.decision}
+                      />
+                    </div>
+
+                    <div className="sim-route-map">
+                      <div className="sim-route-map-label">
+                        <span>Expected pressure boundary</span>
+                        <span>
+                          break at {String(expectedBrokenOrder).padStart(2, "0")}
+                        </span>
+                      </div>
+
+                      <div className="sim-route-track">
+                        {TA14_24_LINKS.map((item) => {
+                          const state =
+                            item.order < expectedBrokenOrder
+                              ? "preserved"
+                              : item.order === expectedBrokenOrder
+                                ? "break"
+                                : "downstream";
+
+                          return (
+                            <span
+                              key={item.linkId}
+                              className={`sim-route-segment ${state}`}
+                              title={`${String(item.order).padStart(2, "0")} ${item.canonicalName}`}
+                            />
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <section className="sim-recovery">
+                      <div className="sim-recovery-head">
+                        Governed recovery
+                      </div>
+
+                      <div className="sim-recovery-body">
+                        <p>{scenario.recovery}</p>
+
+                        <div className="sim-why">
+                          <small>Why</small>
+                          <p>{scenario.rationale}</p>
+                        </div>
+                      </div>
+                    </section>
+                  </>
+                )}
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section className="sim-section alt sim-doctrine">
+        <div className="sim-shell sim-doctrine-grid">
+          <div>
+            <div className="sim-eyebrow" style={{ color: "var(--rose)" }}>
+              Simulator doctrine
+            </div>
+
+            <h2>
+              Reaching Execution is not the highest score.
+            </h2>
+
+            <p>
+              Preserving admissibility is the goal. A correct HOLD, REFUSE,
+              NARROW, or ESCALATE decision can be the successful result when
+              the evidence, authority, runtime state, or consequence conditions
+              no longer support continuation.
+            </p>
+          </div>
+
+          <div className="sim-doctrine-cards">
+            <DoctrineCard
+              code="HOLD"
+              title="Stop without abandoning the route"
+              text="Use HOLD when the route may become admissible again after evidence, authority, runtime conditions, or another support state is restored."
+            />
+            <DoctrineCard
+              code="REFUSE"
+              title="Correct non-occurrence can be success"
+              text="Use REFUSE when execution conditions are not supportable and non-execution is the governed result."
+            />
+            <DoctrineCard
+              code="NARROW"
+              title="Reduce consequence-bearing scope"
+              text="NARROW preserves only the portion of the route still supported by evidence, authority, and current conditions."
+            />
+            <DoctrineCard
+              code="ESC"
+              title="Escalate unresolved governance conflict"
+              text="ESCALATE when the system cannot safely resolve authority, evidence, memory, or consequence conflict within the current route."
+            />
+          </div>
         </div>
       </section>
     </main>
+  );
+}
+
+function Metric({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="sim-metric">
+      <strong>{value}</strong>
+      <span>{label}</span>
+    </div>
   );
 }
 
@@ -382,12 +1466,14 @@ function LinkSelect({
   onChange: (value: TA14LinkId) => void;
 }) {
   return (
-    <label className="block">
-      <span className="text-sm font-semibold text-slate-200">{labelText}</span>
+    <div className="sim-field">
+      <label>{labelText}</label>
       <select
         value={value}
-        onChange={(event) => onChange(event.target.value as TA14LinkId)}
-        className="mt-2 w-full rounded-xl border border-white/10 bg-[#07101f] px-4 py-3 text-sm text-white outline-none focus:border-rose-300/40"
+        onChange={(event) =>
+          onChange(event.target.value as TA14LinkId)
+        }
+        className="sim-select"
       >
         {TA14_24_LINKS.map((item) => (
           <option key={item.linkId} value={item.linkId}>
@@ -395,7 +1481,7 @@ function LinkSelect({
           </option>
         ))}
       </select>
-    </label>
+    </div>
   );
 }
 
@@ -411,25 +1497,42 @@ function ResultRow({
   correct: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-black/15 p-5">
-      <div className="flex items-center justify-between gap-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-500">
-          {labelText}
-        </p>
+    <div className="sim-result">
+      <div className="sim-result-top">
+        <span className="sim-result-label">{labelText}</span>
         <span
-          className={
-            correct
-              ? "text-xs font-semibold text-emerald-300"
-              : "text-xs font-semibold text-amber-300"
-          }
+          className={[
+            "sim-result-state",
+            correct ? "correct" : "reassess",
+          ].join(" ")}
         >
           {correct ? "CORRECT" : "REASSESS"}
         </span>
       </div>
-      <p className="mt-3 text-sm text-slate-200">Chosen: {chosen}</p>
+
+      <p>Chosen: {chosen}</p>
+
       {!correct ? (
-        <p className="mt-2 text-sm text-slate-400">Expected: {expected}</p>
+        <p className="expected">Expected: {expected}</p>
       ) : null}
     </div>
+  );
+}
+
+function DoctrineCard({
+  code,
+  title,
+  text,
+}: {
+  code: string;
+  title: string;
+  text: string;
+}) {
+  return (
+    <article className="sim-doctrine-card">
+      <b>{code}</b>
+      <strong>{title}</strong>
+      <span>{text}</span>
+    </article>
   );
 }
