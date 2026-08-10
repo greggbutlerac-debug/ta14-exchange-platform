@@ -448,7 +448,7 @@ export default function HomePage() {
           <div className="academyDomainGrid">
             {academyDomains.map(([code,title,text,href])=><Link href={href} key={title}><span>{code}</span><div><strong>{title}</strong><p>{text}</p></div><b>↗</b></Link>)}
           </div>
-          <div className="featureActions"><Link className="grandButton academyButton" href="/academy">Enter the Central Academy <Arrow /></Link><Link className="grandButton glass" href="/academy/simulation-center">Open Simulation Center <Arrow /></Link></div>
+          <div className="featureActions"><Link className="grandButton academyButton" href="/academy">Enter the Central Academy <Arrow /></Link><Link className="grandButton glass" href="/academy/simulator">Open Simulation Center <Arrow /></Link></div>
         </div>
       </section>
 
