@@ -286,26 +286,257 @@ export async function GET(request: NextRequest) {
     const limit = readLimit(request);
     const search = readSearch(request);
 
-    const { data, error } = await supabase
+    const { data: viewData, error: viewError } = await supabase
       .from('ta14_registry_registration_journeys_v1')
       .select('*')
       .order('account_created_at', { ascending: false })
       .limit(limit);
 
-    if (error) {
-      console.error(
-        'TA-14 Registry registration journey read failed.',
-        error,
+    let rows: JourneyRow[];
+    let dataSource: 'journey_view' | 'direct_fallback' = 'journey_view';
+    let fallbackWarning: string | null = null;
+
+    if (!viewError) {
+      rows = (viewData ?? []) as unknown as JourneyRow[];
+    } else {
+      console.warn(
+        'TA-14 Registry journey view unavailable; using direct fallback.',
+        viewError,
       );
 
-      return jsonError(
-        'Unable to read registration journeys.',
-        500,
-        error.message,
-      );
+      dataSource = 'direct_fallback';
+      fallbackWarning = viewError.message;
+
+      const [eventsResult, submissionsResult, usersResult] = await Promise.all([
+        supabase
+          .from('ta14_registry_registration_lifecycle_events')
+          .select(
+            'user_id,event_type,occurred_at,submission_id,governance_name,organization_name,contact_email',
+          )
+          .order('occurred_at', { ascending: false })
+          .limit(5000),
+        supabase
+          .from('ai_governance_registry_submissions')
+          .select(
+            'id,owner_user_id,status,created_at,updated_at,submitted_at,accepted_at,registry_identifier,governance_name,organization_name,claimant_name,contact_email,requested_review_pathway',
+          )
+          .not('owner_user_id', 'is', null)
+          .order('created_at', { ascending: false })
+          .limit(2000),
+        supabase.auth.admin.listUsers({
+          page: 1,
+          perPage: Math.max(limit, 500),
+        }),
+      ]);
+
+      if (submissionsResult.error) {
+        console.error(
+          'TA-14 Registry fallback submission read failed.',
+          submissionsResult.error,
+        );
+
+        return jsonError(
+          'Unable to read registration journeys.',
+          500,
+          `Journey view failed: ${viewError.message}; submission fallback failed: ${submissionsResult.error.message}`,
+        );
+      }
+
+      const lifecycleEvents = eventsResult.error
+        ? []
+        : (eventsResult.data ?? []);
+
+      if (eventsResult.error) {
+        console.warn(
+          'TA-14 Registry lifecycle telemetry unavailable in fallback.',
+          eventsResult.error,
+        );
+      }
+
+      const authUsers = usersResult.error
+        ? []
+        : (usersResult.data?.users ?? []);
+
+      if (usersResult.error) {
+        console.warn(
+          'TA-14 Registry account listing unavailable in fallback.',
+          usersResult.error,
+        );
+      }
+
+      type MutableJourney = JourneyRow & {
+        _latestSubmissionCreatedAtMs?: number;
+      };
+
+      const byUserId = new Map<string, MutableJourney>();
+
+      const ensureRow = (userId: string): MutableJourney => {
+        const existing = byUserId.get(userId);
+        if (existing) return existing;
+
+        const created: MutableJourney = {
+          user_id: userId,
+          account_email: null,
+          account_created_at: null,
+          last_sign_in_at: null,
+          first_registration_page_opened_at: null,
+          first_registration_started_at: null,
+          latest_draft_saved_at: null,
+          latest_submission_submitted_at: null,
+          latest_registration_completed_at: null,
+          latest_registration_failed_at: null,
+          lifecycle_event_count: 0,
+          governance_submission_count: 0,
+          latest_submission_id: null,
+          latest_submission_status: null,
+          latest_submission_created_at: null,
+          latest_submission_updated_at: null,
+          latest_authoritative_submission_submitted_at: null,
+          latest_submission_accepted_at: null,
+          latest_registry_identifier: null,
+          latest_governance_name: null,
+          latest_organization_name: null,
+          latest_claimant_name: null,
+          latest_contact_email: null,
+          latest_requested_review_pathway: null,
+        };
+
+        byUserId.set(userId, created);
+        return created;
+      };
+
+      for (const user of authUsers) {
+        const row = ensureRow(user.id);
+        row.account_email = user.email ?? null;
+        row.account_created_at = user.created_at ?? null;
+        row.last_sign_in_at = user.last_sign_in_at ?? null;
+      }
+
+      for (const event of lifecycleEvents) {
+        if (!event.user_id) continue;
+        const row = ensureRow(event.user_id);
+        row.lifecycle_event_count = normalizeCount(row.lifecycle_event_count) + 1;
+
+        const occurredAt = event.occurred_at ?? null;
+        switch (event.event_type) {
+          case 'registration_page_opened':
+            if (
+              occurredAt &&
+              (!row.first_registration_page_opened_at ||
+                new Date(occurredAt).getTime() <
+                  new Date(row.first_registration_page_opened_at).getTime())
+            ) {
+              row.first_registration_page_opened_at = occurredAt;
+            }
+            break;
+          case 'registration_started':
+            if (
+              occurredAt &&
+              (!row.first_registration_started_at ||
+                new Date(occurredAt).getTime() <
+                  new Date(row.first_registration_started_at).getTime())
+            ) {
+              row.first_registration_started_at = occurredAt;
+            }
+            break;
+          case 'draft_saved':
+            if (
+              occurredAt &&
+              (!row.latest_draft_saved_at ||
+                new Date(occurredAt).getTime() >
+                  new Date(row.latest_draft_saved_at).getTime())
+            ) {
+              row.latest_draft_saved_at = occurredAt;
+            }
+            break;
+          case 'submission_submitted':
+            if (
+              occurredAt &&
+              (!row.latest_submission_submitted_at ||
+                new Date(occurredAt).getTime() >
+                  new Date(row.latest_submission_submitted_at).getTime())
+            ) {
+              row.latest_submission_submitted_at = occurredAt;
+            }
+            break;
+          case 'registration_completed':
+            if (
+              occurredAt &&
+              (!row.latest_registration_completed_at ||
+                new Date(occurredAt).getTime() >
+                  new Date(row.latest_registration_completed_at).getTime())
+            ) {
+              row.latest_registration_completed_at = occurredAt;
+            }
+            break;
+          case 'registration_failed':
+            if (
+              occurredAt &&
+              (!row.latest_registration_failed_at ||
+                new Date(occurredAt).getTime() >
+                  new Date(row.latest_registration_failed_at).getTime())
+            ) {
+              row.latest_registration_failed_at = occurredAt;
+            }
+            break;
+        }
+
+        if (!row.latest_governance_name && event.governance_name) {
+          row.latest_governance_name = event.governance_name;
+        }
+        if (!row.latest_organization_name && event.organization_name) {
+          row.latest_organization_name = event.organization_name;
+        }
+        if (!row.latest_contact_email && event.contact_email) {
+          row.latest_contact_email = event.contact_email;
+        }
+      }
+
+      for (const submission of submissionsResult.data ?? []) {
+        if (!submission.owner_user_id) continue;
+        const row = ensureRow(submission.owner_user_id);
+        row.governance_submission_count =
+          normalizeCount(row.governance_submission_count) + 1;
+
+        const createdAtMs = submission.created_at
+          ? new Date(submission.created_at).getTime()
+          : 0;
+
+        if (
+          row._latestSubmissionCreatedAtMs === undefined ||
+          createdAtMs > row._latestSubmissionCreatedAtMs
+        ) {
+          row._latestSubmissionCreatedAtMs = createdAtMs;
+          row.latest_submission_id = submission.id;
+          row.latest_submission_status = submission.status;
+          row.latest_submission_created_at = submission.created_at;
+          row.latest_submission_updated_at = submission.updated_at;
+          row.latest_authoritative_submission_submitted_at =
+            submission.submitted_at;
+          row.latest_submission_accepted_at = submission.accepted_at;
+          row.latest_registry_identifier = submission.registry_identifier;
+          row.latest_governance_name = submission.governance_name;
+          row.latest_organization_name = submission.organization_name;
+          row.latest_claimant_name = submission.claimant_name;
+          row.latest_contact_email = submission.contact_email;
+          row.latest_requested_review_pathway =
+            submission.requested_review_pathway;
+        }
+      }
+
+      rows = Array.from(byUserId.values())
+        .sort((a, b) => {
+          const aTime = a.account_created_at
+            ? new Date(a.account_created_at).getTime()
+            : 0;
+          const bTime = b.account_created_at
+            ? new Date(b.account_created_at).getTime()
+            : 0;
+          return bTime - aTime;
+        })
+        .slice(0, limit)
+        .map(({ _latestSubmissionCreatedAtMs: _ignored, ...row }) => row);
     }
-
-    let rows = (data ?? []) as unknown as JourneyRow[];
 
     if (search) {
       const needle = search.toLowerCase();
@@ -452,6 +683,10 @@ export async function GET(request: NextRequest) {
         },
         summary,
         journeys,
+        diagnostics: {
+          dataSource,
+          fallbackWarning,
+        },
         attentionPolicy: {
           stalledAfterHours: 24,
           explanation:
