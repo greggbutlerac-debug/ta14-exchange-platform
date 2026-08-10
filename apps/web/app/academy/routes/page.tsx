@@ -242,7 +242,7 @@ export default function RouteReadingCenterPage() {
         </section>}
 
         <section className="nextDeck">
-          <article><span>Next governed practice</span><h3>Route Construction Lab</h3><p>Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction">Build a route →</Link></article>
+          <article><span>Next governed practice</span><h3>Route Construction Lab</h3><p>Convert an uncertain request into a bounded, attributable, challengeable route.</p><Link href="/academy/route-construction-lab">Build a route →</Link></article>
           <article><span>Challenge the result</span><h3>Review Workspace</h3><p>Preserve findings, objections, corrections, and version history without erasing uncertainty.</p><Link href="/academy/review">Open review →</Link></article>
           <article><span>Prove capability</span><h3>Assessment Center</h3><p>Separate attendance and completion from demonstrated, scope-bounded competency.</p><Link href="/academy/assessment">Open assessment →</Link></article>
         </section>
