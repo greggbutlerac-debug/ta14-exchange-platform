@@ -330,7 +330,26 @@ export function RegistryRegistrationJourneyPanel() {
               {summary.needsAttention} registrant{summary.needsAttention === 1 ? "" : "s"} have not reached a completed submission.
             </strong>
           </div>
-          <button type="button" onClick={() => setFilter("attention")}>
+          <button
+            type="button"
+            onClick={() => {
+              setSearch("");
+              setFilter("attention");
+
+              window.requestAnimationFrame(() => {
+                const target = document.getElementById(
+                  "ta14-left-behind-registrants",
+                );
+
+                target?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+
+                target?.focus({ preventScroll: true });
+              });
+            }}
+          >
             Show left-behind registrants
           </button>
         </div>
@@ -447,7 +466,12 @@ export function RegistryRegistrationJourneyPanel() {
         </div>
       ) : null}
 
-      <div className="journeyList">
+      <div
+        id="ta14-left-behind-registrants"
+        className="journeyList"
+        tabIndex={-1}
+        aria-label="Registration journeys matching the current filter"
+      >
         {journeys.map((journey) => {
           const href = submissionHref(journey);
           const detail = detailLine(journey);
@@ -878,6 +902,13 @@ export function RegistryRegistrationJourneyPanel() {
         .journeyList {
           display: grid;
           gap: 12px;
+          scroll-margin-top: 110px;
+          outline: none;
+        }
+
+        .journeyList:focus-visible {
+          border-radius: 16px;
+          box-shadow: 0 0 0 2px rgba(92, 220, 255, 0.2);
         }
 
         .journeyCard {
