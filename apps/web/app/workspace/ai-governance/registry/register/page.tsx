@@ -1187,7 +1187,7 @@ export default function RegisterGovernancePage() {
         setSubmittedRecord(finalized);
         setPersistenceState('REGISTERED');
         setMessage(
-          `${payload.notice ?? 'Governance Entity Registration completed successfully.'} Registry Identifier: ${payload.registration.registryIdentifier}.`,
+          `${payload.notice ?? 'AUTHORITATIVE REGISTRATION COMPLETE.'} Permanent Registry Identifier: ${payload.registration.registryIdentifier}. This is the only state that constitutes completed TA-14 Governance Entity Registration.`,
         );
 
         window.location.assign(
@@ -1209,7 +1209,7 @@ export default function RegisterGovernancePage() {
         setPersistenceState('SUBMITTED');
         setMessage(
           payload.notice ??
-            'Registry intake submitted successfully. The submission is awaiting the selected review pathway; no Registry Identifier has been issued yet.',
+            'Registry intake submitted for review. NOT REGISTERED. The submission is awaiting the selected review pathway and no permanent Registry Identifier has been issued.',
         );
         window.location.assign('/workspace/ai-governance/registry/my-records');
         return;
@@ -1632,19 +1632,30 @@ export default function RegisterGovernancePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function generateReceipt() {
+  async function generateReceipt() {
     if (!validate()) {
       setMessage('Complete the required fields before generating the Registry Intake Receipt.');
       return;
     }
 
-    const manifest = buildManifest();
+    const confirmedDraftId = await saveDraft();
+
+    if (!confirmedDraftId) {
+      setMessage(
+        'Pre-submission receipt not generated. The current intake could not be confirmed as an account-backed TA-14 Registry draft. This intake is NOT REGISTERED.',
+      );
+      return;
+    }
+
+    const manifest = buildManifest(confirmedDraftId);
     const receipt = {
-      receiptType: 'TA-14 AI Governance Registry Intake Receipt',
-      receiptVersion: '1.0',
+      receiptType: 'TA-14 AI Governance Registry PRE-SUBMISSION Draft Receipt',
+      receiptVersion: '1.1',
       generatedAt: new Date().toISOString(),
-      submissionState: 'REVIEW_READY_NOT_PUBLIC',
-      draftId: draftId ?? 'browser-recovery-draft',
+      submissionState: 'PRE_SUBMISSION_NOT_REGISTERED',
+      registrationStatus: 'NOT_REGISTERED',
+      registryIdentifier: null,
+      draftId: confirmedDraftId,
       governanceName: form.governanceName,
       currentVersion: form.currentVersion,
       claimedEstablishmentDate: form.establishmentDate,
@@ -1663,7 +1674,7 @@ export default function RegisterGovernancePage() {
         qualityScores,
       },
       registryBoundary:
-        'This receipt proves generation of an intake package. It is not a public Registry identifier, certification, legal validation, regulatory approval, ownership adjudication, or proof of technical performance.',
+        'PRE-SUBMISSION ONLY. NOT REGISTERED. This receipt proves only that an account-backed draft intake package was prepared. It is not proof of submission, registration, a public Registry identifier, certification, legal validation, regulatory approval, ownership adjudication, or technical performance.',
       manifest,
     };
 
@@ -1681,7 +1692,9 @@ export default function RegisterGovernancePage() {
     anchor.remove();
     URL.revokeObjectURL(url);
     setReceiptGenerated(true);
-    setMessage('Registry Intake Receipt generated. This is proof of intake preparation, not proof of public registration.');
+    setMessage(
+      'PRE-SUBMISSION draft receipt generated. This intake is NOT REGISTERED. Registration exists only after the TA-14 Registry returns a permanent Registry Identifier.',
+    );
   }
 
   return (
@@ -2440,16 +2453,17 @@ export default function RegisterGovernancePage() {
               </div>
 
               <div className="receipt-panel">
-                <h3>Registry Intake Receipt</h3>
+                <h3>Pre-Submission Draft Receipt</h3>
                 <p>
-                  Generate a JSON receipt containing the timestamp, draft identifier, counts,
-                  readiness indicators, declarations, manifest, and evidence hashes.
+                  Generate a JSON receipt for the account-backed draft only. This artifact is
+                  PRE-SUBMISSION and NOT REGISTERED. A registration exists only after the Registry
+                  returns a permanent TA-14-AIGR identifier.
                 </p>
                 <div className="receipt-actions">
                   <button type="button" className="secondary-button" onClick={() => void downloadManifest()}>Download Intake Manifest ↓</button>
-                  <button type="button" className="primary-button" onClick={generateReceipt}>Generate Intake Receipt ✓</button>
+                  <button type="button" className="primary-button" onClick={() => void generateReceipt()}>Generate PRE-SUBMISSION Draft Receipt ↓</button>
                 </div>
-                {receiptGenerated && <span className="receipt-success">Receipt generated successfully.</span>}
+                {receiptGenerated && <span className="receipt-success">PRE-SUBMISSION receipt generated — NOT REGISTERED.</span>}
               </div>
 
               <div className="final-boundary">
