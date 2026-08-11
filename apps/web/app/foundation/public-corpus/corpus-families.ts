@@ -1,5 +1,5 @@
 import type { CorpusRecord } from './corpus-merged';
-import { recordMatchesPrimaryFamily } from './corpus-family-classification';
+import { recordMatchesPrimaryFamily, recordMatchesRelatedFamily } from './corpus-family-classification';
 
 export type CorpusFamilyId =
   | 'CORE'
@@ -87,7 +87,7 @@ export const CORPUS_FAMILIES: CorpusFamily[] = [
 ];
 
 export function recordMatchesFamily(record: CorpusRecord, familyId: CorpusFamilyId) {
-  return recordMatchesPrimaryFamily(record, familyId);
+  return recordMatchesPrimaryFamily(record, familyId) || recordMatchesRelatedFamily(record, familyId);
 }
 
 export const TA14_LINEAGE = [
