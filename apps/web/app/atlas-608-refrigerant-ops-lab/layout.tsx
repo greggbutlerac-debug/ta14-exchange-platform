@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 import WorldAutoSelect from "./WorldAutoSelect";
 import MissionRailController from "./MissionRailController";
+import LightningStorm from "./LightningStorm";
 import "./arcade.css";
 import "./electric-palette.css";
 
@@ -15,6 +16,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
   return <>
     <Suspense fallback={null}><WorldAutoSelect /></Suspense>
     {children}
+    <LightningStorm />
     <Suspense fallback={null}><MissionRailController /></Suspense>
   </>;
 }
