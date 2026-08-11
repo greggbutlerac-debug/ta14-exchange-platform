@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import EngineAcademyHelp from "../../../components/academy/EngineAcademyHelp";
+import ArtifactClassSummary from "./artifact-class-summary";
 import ArtifactClassificationBridge from "./artifact-classification-bridge";
 import GovernedArtifactDirectory from "./governed-artifact-directory";
 
@@ -15,6 +16,7 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
         }}
       >
         <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+          <ArtifactClassSummary />
           <ArtifactClassificationBridge />
           <div id="governed-findings">
             <GovernedArtifactDirectory />
