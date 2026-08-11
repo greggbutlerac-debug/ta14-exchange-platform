@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import WorldAutoSelect from "./WorldAutoSelect";
 import MissionRailController from "./MissionRailController";
 import LightningStorm from "./LightningStorm";
+import PhaserArcadeOverlay from "./PhaserArcadeOverlay";
 import "./arcade.css";
 import "./electric-palette.css";
 
@@ -17,6 +18,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
     <Suspense fallback={null}><WorldAutoSelect /></Suspense>
     {children}
     <LightningStorm />
+    <PhaserArcadeOverlay />
     <Suspense fallback={null}><MissionRailController /></Suspense>
   </>;
 }
