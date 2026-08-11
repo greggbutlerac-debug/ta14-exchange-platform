@@ -1,0 +1,118 @@
+/* Electric blue + electric green arcade palette override */
+:root{
+  --cyan:#58edff;
+  --cyan2:#00cfff;
+  --green:#55ff9a;
+  --gold:#55ff9a;
+  --violet:#1ce8ff;
+  --red:#62ff9f;
+}
+
+/* Replace warm/gold accent language with electric green. */
+.ops .bucket,
+.ops .sideCard>b,
+.ops .lessonTop small,
+.ops .studyBar b,
+.ops .worldBoundary,
+.ops .lesson .pause,
+.ops .pressure-customer small{
+  color:#6dffab!important;
+}
+
+.ops .bucket,
+.ops .studyBar,
+.ops .studyBtn,
+.ops .worldBoundary,
+.ops .lesson .pause,
+.ops .pressure-customer{
+  border-color:rgba(78,255,151,.58)!important;
+}
+
+.ops .studyBar,
+.ops .worldBoundary,
+.ops .lesson .pause{
+  background:linear-gradient(145deg,rgba(5,42,27,.72),rgba(3,20,18,.86))!important;
+}
+
+.ops .studyBtn{
+  background:linear-gradient(180deg,#0d5132,#062919)!important;
+  color:#baffd3!important;
+  box-shadow:0 0 28px rgba(68,255,142,.16),inset 0 1px 0 rgba(255,255,255,.08)!important;
+}
+.ops .studyBtn:hover{
+  box-shadow:0 0 42px rgba(67,255,144,.34)!important;
+  border-color:#70ffad!important;
+}
+
+/* Make secondary planet electric rather than orange/red. */
+.ops .p2{
+  background:radial-gradient(circle at 35% 30%,#d8fff0 0,#62ffad 18%,#07946c 48%,#083d42 69%,#031018 80%)!important;
+  box-shadow:inset -28px -20px 48px #000d,0 0 65px rgba(69,255,163,.34)!important;
+}
+
+/* Blue-green HUD rail, no purple/gold. */
+.ops .top::after{
+  background:linear-gradient(90deg,transparent,#25dfff,#58ff9d,#25dfff,transparent)!important;
+  filter:drop-shadow(0 0 7px #42f2ff)!important;
+}
+
+/* Mission badges and progression rails. */
+.ops .runBadge{
+  color:#6dffab!important;
+  border-color:rgba(82,255,157,.55)!important;
+  box-shadow:0 0 18px rgba(72,255,151,.08)!important;
+}
+.ops .stageNode.on{
+  border-color:#45eaff!important;
+  color:#dfffff!important;
+  background:#082832!important;
+  box-shadow:0 0 21px rgba(48,227,255,.22)!important;
+}
+.ops .stageNode.done{
+  border-color:#51ff9d!important;
+  color:#77ffb2!important;
+  box-shadow:0 0 14px rgba(69,255,154,.12)!important;
+}
+
+/* No-assist state becomes high-energy blue-green, not magenta. */
+.ops .noAssist{
+  border-color:rgba(53,221,255,.72)!important;
+  background:linear-gradient(135deg,rgba(2,46,63,.88),rgba(4,31,25,.9))!important;
+  color:#72ffc1!important;
+  box-shadow:0 0 30px rgba(43,224,255,.16),inset 0 0 30px rgba(71,255,154,.05)!important;
+}
+
+/* Pressure events keep category distinction without warm palette. */
+.ops .pressure-customer{
+  border-color:#55ff9a!important;
+  box-shadow:0 18px 70px #000c,0 0 42px rgba(65,255,145,.3)!important;
+}
+.ops .pressure-equipment{
+  border-color:#38dfff!important;
+  box-shadow:0 18px 70px #000c,0 0 42px rgba(45,220,255,.3)!important;
+}
+.ops .pressure-crew{
+  border-color:#78ffd0!important;
+  box-shadow:0 18px 70px #000c,0 0 42px rgba(90,255,190,.22)!important;
+}
+.ops .pressure-crew small,
+.ops .pressure-equipment small{
+  color:#6fefff!important;
+}
+
+/* Completion and score energy stays unmistakably blue-green. */
+.ops .completionMeter i,
+.ops .progress i{
+  background:linear-gradient(90deg,#00cfff 0%,#53f2ff 38%,#52ff9a 100%)!important;
+  box-shadow:0 0 18px rgba(67,242,255,.45),0 0 28px rgba(69,255,151,.2)!important;
+}
+.ops .completionBig strong,
+.ops .stat strong{
+  color:#61ff9f!important;
+  text-shadow:0 0 18px rgba(74,255,158,.58)!important;
+}
+
+/* Keep explosions and correct-answer bloom within electric palette. */
+.ops.good .stage::after{
+  background:conic-gradient(from 0deg,transparent,#5cefff44,transparent,#fff7,transparent,#58ff9d55,transparent)!important;
+}
