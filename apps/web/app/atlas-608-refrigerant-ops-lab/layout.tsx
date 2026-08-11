@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import WorldAutoSelect from "./WorldAutoSelect";
-import ArcadePressureLayer from "./ArcadePressureLayer";
 import "./arcade.css";
+import "./electric-palette.css";
 
 export const metadata: Metadata = {
   title: "EPA 608 Refrigerant Ops | TA-14 Academy Private Preview",
@@ -14,6 +14,5 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
   return <>
     <Suspense fallback={null}><WorldAutoSelect /></Suspense>
     {children}
-    <ArcadePressureLayer stage={1} />
   </>;
 }
