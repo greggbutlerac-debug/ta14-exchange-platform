@@ -14,18 +14,36 @@ const LABELS: Record<string,string> = {
 
 export default function WorldAutoSelect(){
   const params = useSearchParams();
+
   useEffect(()=>{
     const requested = params.get("world");
     if(!requested || !LABELS[requested]) return;
-    let attempts=0;
-    const timer=window.setInterval(()=>{
-      attempts++;
-      const buttons=Array.from(document.querySelectorAll<HTMLButtonElement>("button.world"));
-      const target=buttons.find(btn=>btn.textContent?.includes(LABELS[requested]));
-      if(target){target.click();window.clearInterval(timer);}
-      if(attempts>30) window.clearInterval(timer);
-    },80);
-    return()=>window.clearInterval(timer);
+    const label = LABELS[requested];
+    let lastClick = 0;
+
+    const enforce = () => {
+      const buttons = Array.from(document.querySelectorAll<HTMLButtonElement>("button.world"));
+      const target = buttons.find(btn => btn.textContent?.includes(label));
+      if(!target) return;
+      const active = target.classList.contains("active");
+      if(!active && Date.now() - lastClick > 250){
+        lastClick = Date.now();
+        target.click();
+      }
+    };
+
+    const boot = window.setInterval(enforce, 100);
+    const observer = new MutationObserver(enforce);
+    observer.observe(document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["class"]});
+    const stopBoot = window.setTimeout(()=>window.clearInterval(boot),5000);
+    enforce();
+
+    return()=>{
+      window.clearInterval(boot);
+      window.clearTimeout(stopBoot);
+      observer.disconnect();
+    };
   },[params]);
+
   return null;
 }
