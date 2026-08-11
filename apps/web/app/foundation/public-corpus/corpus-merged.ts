@@ -12,6 +12,7 @@ import {
 } from './corpus-supplement';
 import { PUBLIC_ARCHITECTURE_SITE_RECORDS } from './site-supplement';
 import { TA14_ZENODO_STANDARDS } from './zenodo-standards';
+import { TA14_REFERENCE_IMPLEMENTATIONS } from './implementation-corpus';
 
 export { CORPUS_CATEGORY_LABELS };
 export type { CorpusCategory, CorpusRecord };
@@ -57,6 +58,7 @@ const mergedCandidates: CorpusRecord[] = [
   ...standardZenodoRecords,
   ...standardProtocolRecords,
   ...PUBLIC_ARCHITECTURE_SITE_RECORDS,
+  ...TA14_REFERENCE_IMPLEMENTATIONS,
 ];
 
 function normalizeUrl(value?: string) {
