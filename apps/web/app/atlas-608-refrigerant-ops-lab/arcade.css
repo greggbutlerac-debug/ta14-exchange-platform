@@ -1,0 +1,58 @@
+/* TA-14 EPA 608 Cosmic Arcade FX */
+.ops { isolation:isolate; }
+.ops::after {
+  content:""; position:fixed; inset:-18%; z-index:0; pointer-events:none; opacity:.34;
+  background:
+    radial-gradient(circle at 13% 18%,rgba(255,255,255,.9) 0 1px,transparent 2px),
+    radial-gradient(circle at 72% 24%,rgba(115,229,255,.8) 0 1px,transparent 2px),
+    radial-gradient(circle at 44% 72%,rgba(255,255,255,.8) 0 1.2px,transparent 2.2px),
+    radial-gradient(circle at 88% 78%,rgba(178,135,255,.9) 0 1px,transparent 2px);
+  background-size:71px 71px,113px 113px,157px 157px,211px 211px;
+  animation:ta14DeepSpace 45s linear infinite;
+}
+@keyframes ta14DeepSpace { to { transform:rotate(2deg) translate3d(-80px,55px,0) scale(1.04); } }
+
+/* Ring the large existing planet and make both bodies rotate/orbit visually. */
+.p1::before { content:""; position:absolute; inset:42% -34%; border:4px solid rgba(128,229,255,.34); border-radius:50%; transform:rotate(-18deg); box-shadow:0 0 18px rgba(74,214,255,.25); }
+.p1::after { content:""; position:absolute; width:22px; height:22px; border-radius:50%; left:-46px; top:18px; background:radial-gradient(circle at 30% 30%,#fff,#7ba5d9 42%,#263650 72%); box-shadow:0 0 15px rgba(180,220,255,.4); animation:ta14MoonBob 3.5s ease-in-out infinite; }
+@keyframes ta14MoonBob { 50% { transform:translate(22px,34px) scale(.82); opacity:.72; } }
+
+/* Meteors crossing the universe without extra DOM. */
+.circuit::before,.circuit::after { content:""; position:fixed; z-index:1; pointer-events:none; width:140px; height:2px; opacity:.45; background:linear-gradient(90deg,transparent,rgba(170,240,255,.9),#fff); filter:drop-shadow(0 0 7px rgba(94,226,255,.8)); transform:rotate(-27deg); }
+.circuit::before { top:16%; left:-180px; animation:ta14Meteor 11s linear infinite; }
+.circuit::after { top:67%; left:-240px; animation:ta14Meteor 17s 4s linear infinite; }
+@keyframes ta14Meteor { 0%{translate:0 0;opacity:0} 8%{opacity:.7} 18%,100%{translate:135vw 55vh;opacity:0} }
+
+/* Wrong answer: short arcade cabinet impact, never a punishing prolonged shake. */
+.ops.bad { animation:ta14CabinetShake .34s cubic-bezier(.36,.07,.19,.97); }
+@keyframes ta14CabinetShake {
+  10%,90%{transform:translate3d(-2px,0,0)} 20%,80%{transform:translate3d(4px,1px,0)}
+  30%,50%,70%{transform:translate3d(-6px,-1px,0)} 40%,60%{transform:translate3d(6px,1px,0)}
+}
+.ops.bad .stage { animation:ta14Glitch .42s ease-out; }
+@keyframes ta14Glitch { 25%{filter:contrast(1.35) saturate(.7)} 55%{filter:contrast(.9) brightness(.82)} 100%{filter:none} }
+
+/* Correct answer: lightning forks and energy bloom. */
+.ops.good .stage { position:relative; animation:ta14PowerBloom .72s ease-out; }
+.ops.good .stage::before,.ops.good .stage::after { content:""; position:absolute; z-index:8; pointer-events:none; top:-8%; width:4px; height:115%; opacity:0; background:linear-gradient(180deg,transparent 0 5%,#fff 6% 8%,#68eaff 9% 19%,transparent 20% 27%,#fff 28% 31%,#74f2c0 32% 43%,transparent 44% 54%,#fff 55% 58%,#68eaff 59% 74%,transparent 75%); filter:drop-shadow(0 0 9px #8df5ff); }
+.ops.good .stage::before { left:11%; transform:skewX(-14deg); animation:ta14Lightning .62s ease-out; }
+.ops.good .stage::after { right:12%; transform:skewX(17deg) scaleY(.84); animation:ta14Lightning .62s .06s ease-out; }
+@keyframes ta14Lightning { 0%{opacity:0} 12%{opacity:1} 25%{opacity:.15} 38%{opacity:1} 52%,100%{opacity:0} }
+@keyframes ta14PowerBloom { 18%{box-shadow:inset 0 0 90px rgba(99,239,195,.35),0 0 55px rgba(91,229,255,.18)} 100%{box-shadow:none} }
+
+/* Arcade answer buttons and selected-world cabinet treatment. */
+.answer { position:relative; overflow:hidden; transition:transform .12s ease,border-color .12s ease,box-shadow .12s ease; }
+.answer::after { content:""; position:absolute; inset:0; pointer-events:none; background:linear-gradient(105deg,transparent 30%,rgba(255,255,255,.08),transparent 70%); translate:-130% 0; transition:translate .35s ease; }
+.answer:hover::after { translate:130% 0; }
+.answer:hover { box-shadow:0 0 0 1px rgba(93,234,255,.25),0 0 22px rgba(61,215,255,.13); }
+.world.active { animation:ta14WorldPulse 2.3s ease-in-out infinite; }
+@keyframes ta14WorldPulse { 50%{box-shadow:0 0 32px rgba(49,217,255,.25),inset 0 0 18px rgba(49,217,255,.06)} }
+
+/* Scoreboard scanline, subtle enough to keep questions readable. */
+.top::after { content:""; position:absolute; inset:0; pointer-events:none; opacity:.06; background:repeating-linear-gradient(0deg,transparent 0 3px,#fff 4px); animation:ta14Scan 8s linear infinite; }
+@keyframes ta14Scan { to{background-position:0 80px} }
+
+@media (prefers-reduced-motion: reduce) {
+  .ops::after,.p1::after,.circuit::before,.circuit::after,.world.active,.top::after { animation:none!important; }
+  .ops.bad,.ops.bad .stage,.ops.good .stage,.ops.good .stage::before,.ops.good .stage::after { animation:none!important; }
+}
