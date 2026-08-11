@@ -10,6 +10,7 @@ import {
   PATENT_CORPUS_RECORDS,
   ZENODO_ARCHITECTURE_RECORDS,
 } from './corpus-supplement';
+import { PUBLIC_ARCHITECTURE_SITE_RECORDS } from './site-supplement';
 import { TA14_ZENODO_STANDARDS } from './zenodo-standards';
 
 export { CORPUS_CATEGORY_LABELS };
@@ -55,6 +56,7 @@ const mergedCandidates: CorpusRecord[] = [
   ...ZENODO_ARCHITECTURE_RECORDS,
   ...standardZenodoRecords,
   ...standardProtocolRecords,
+  ...PUBLIC_ARCHITECTURE_SITE_RECORDS,
 ];
 
 function normalizeUrl(value?: string) {
@@ -89,29 +91,13 @@ function normalizeTitle(value: string) {
 }
 
 function publicationIdentity(record: CorpusRecord) {
-  // Standards intentionally appear once as a standard and once as their Zenodo DOI deposit.
   const categoryNamespace = record.category === 'STANDARD' ? 'STANDARD' : record.category;
 
-  if (record.category === 'ARTICLE' && record.href) {
-    return `ARTICLE:url:${normalizeUrl(record.href)}`;
-  }
-
-  if ((record.category === 'PATENT' || record.category === 'ZENODO') && record.identifier) {
-    return `${record.category}:identifier:${normalizeIdentifier(record.identifier)}`;
-  }
-
-  if (record.category === 'ZENODO' && record.href) {
-    return `ZENODO:url:${normalizeUrl(record.href)}`;
-  }
-
-  if (record.category === 'BOOK' && record.identifier) {
-    return `BOOK:identifier:${normalizeIdentifier(record.identifier)}`;
-  }
-
-  if ((record.category === 'REPOSITORY' || record.category === 'SITE' || record.category === 'IMPLEMENTATION') && record.href) {
-    return `${record.category}:url:${normalizeUrl(record.href)}`;
-  }
-
+  if (record.category === 'ARTICLE' && record.href) return `ARTICLE:url:${normalizeUrl(record.href)}`;
+  if ((record.category === 'PATENT' || record.category === 'ZENODO') && record.identifier) return `${record.category}:identifier:${normalizeIdentifier(record.identifier)}`;
+  if (record.category === 'ZENODO' && record.href) return `ZENODO:url:${normalizeUrl(record.href)}`;
+  if (record.category === 'BOOK' && record.identifier) return `BOOK:identifier:${normalizeIdentifier(record.identifier)}`;
+  if ((record.category === 'REPOSITORY' || record.category === 'SITE' || record.category === 'IMPLEMENTATION') && record.href) return `${record.category}:url:${normalizeUrl(record.href)}`;
   return `${categoryNamespace}:fallback:${normalizeTitle(record.title)}:${record.year}`;
 }
 
@@ -126,17 +112,13 @@ for (const record of mergedCandidates) {
     continue;
   }
 
-  // Prefer the richer record when the same publication exists in both the base ledger and a supplement.
   const existingScore = Number(Boolean(existing.identifier)) + Number(Boolean(existing.href)) + Number(Boolean(existing.description)) + Number(Boolean(existing.relationship)) + (existing.tags?.length ?? 0);
   const incomingScore = Number(Boolean(record.identifier)) + Number(Boolean(record.href)) + Number(Boolean(record.description)) + Number(Boolean(record.relationship)) + (record.tags?.length ?? 0);
 
-  if (incomingScore > existingScore) {
-    recordsByIdentity.set(identity, record);
-  }
+  if (incomingScore > existingScore) recordsByIdentity.set(identity, record);
 }
 
 export const TA14_PUBLIC_CORPUS: CorpusRecord[] = Array.from(recordsByIdentity.values());
-
 export const CORPUS_TOTAL = TA14_PUBLIC_CORPUS.length;
 
 export const CORPUS_COUNTS = TA14_PUBLIC_CORPUS.reduce<Record<CorpusCategory, number>>(
@@ -144,15 +126,5 @@ export const CORPUS_COUNTS = TA14_PUBLIC_CORPUS.reduce<Record<CorpusCategory, nu
     counts[record.category] += 1;
     return counts;
   },
-  {
-    BOOK: 0,
-    ARTICLE: 0,
-    ZENODO: 0,
-    PATENT: 0,
-    STANDARD: 0,
-    REPOSITORY: 0,
-    SITE: 0,
-    IMPLEMENTATION: 0,
-    CHRONOLOGY: 0,
-  },
+  { BOOK: 0, ARTICLE: 0, ZENODO: 0, PATENT: 0, STANDARD: 0, REPOSITORY: 0, SITE: 0, IMPLEMENTATION: 0, CHRONOLOGY: 0 },
 );
