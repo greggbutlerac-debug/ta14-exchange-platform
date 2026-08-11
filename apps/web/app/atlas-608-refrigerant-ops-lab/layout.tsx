@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import WorldAutoSelect from "./WorldAutoSelect";
+import ArcadePressureLayer from "./ArcadePressureLayer";
 import "./arcade.css";
 
 export const metadata: Metadata = {
@@ -10,5 +11,9 @@ export const metadata: Metadata = {
 };
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <><Suspense fallback={null}><WorldAutoSelect /></Suspense>{children}</>;
+  return <>
+    <Suspense fallback={null}><WorldAutoSelect /></Suspense>
+    {children}
+    <ArcadePressureLayer stage={1} />
+  </>;
 }
