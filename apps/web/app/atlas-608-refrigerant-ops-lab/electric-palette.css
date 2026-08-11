@@ -1,118 +1,12 @@
 /* Electric blue + electric green arcade palette override */
-:root{
-  --cyan:#58edff;
-  --cyan2:#00cfff;
-  --green:#55ff9a;
-  --gold:#55ff9a;
-  --violet:#1ce8ff;
-  --red:#62ff9f;
-}
+:root{--cyan:#58edff;--cyan2:#00cfff;--green:#55ff9a;--gold:#55ff9a;--violet:#1ce8ff;--red:#62ff9f}
+.ops .bucket,.ops .sideCard>b,.ops .lessonTop small,.ops .studyBar b,.ops .worldBoundary,.ops .lesson .pause,.ops .pressure-customer small{color:#6dffab!important}.ops .bucket,.ops .studyBar,.ops .studyBtn,.ops .worldBoundary,.ops .lesson .pause,.ops .pressure-customer{border-color:rgba(78,255,151,.58)!important}.ops .studyBar,.ops .worldBoundary,.ops .lesson .pause{background:linear-gradient(145deg,rgba(5,42,27,.72),rgba(3,20,18,.86))!important}.ops .studyBtn{background:linear-gradient(180deg,#0d5132,#062919)!important;color:#baffd3!important;box-shadow:0 0 28px rgba(68,255,142,.16),inset 0 1px 0 rgba(255,255,255,.08)!important}.ops .studyBtn:hover{box-shadow:0 0 42px rgba(67,255,144,.34)!important;border-color:#70ffad!important}.ops .p2{background:radial-gradient(circle at 35% 30%,#d8fff0 0,#62ffad 18%,#07946c 48%,#083d42 69%,#031018 80%)!important;box-shadow:inset -28px -20px 48px #000d,0 0 65px rgba(69,255,163,.34)!important}.ops .top::after{background:linear-gradient(90deg,transparent,#25dfff,#58ff9d,#25dfff,transparent)!important;filter:drop-shadow(0 0 7px #42f2ff)!important}.ops .runBadge{color:#6dffab!important;border-color:rgba(82,255,157,.55)!important;box-shadow:0 0 18px rgba(72,255,151,.08)!important}.ops .stageNode.on{border-color:#45eaff!important;color:#dfffff!important;background:#082832!important;box-shadow:0 0 21px rgba(48,227,255,.22)!important}.ops .stageNode.done{border-color:#51ff9d!important;color:#77ffb2!important;box-shadow:0 0 14px rgba(69,255,154,.12)!important}.ops .noAssist{border-color:rgba(53,221,255,.72)!important;background:linear-gradient(135deg,rgba(2,46,63,.88),rgba(4,31,25,.9))!important;color:#72ffc1!important;box-shadow:0 0 30px rgba(43,224,255,.16),inset 0 0 30px rgba(71,255,154,.05)!important}.ops .pressure-customer{border-color:#55ff9a!important;box-shadow:0 18px 70px #000c,0 0 42px rgba(65,255,145,.3)!important}.ops .pressure-equipment{border-color:#38dfff!important;box-shadow:0 18px 70px #000c,0 0 42px rgba(45,220,255,.3)!important}.ops .pressure-crew{border-color:#78ffd0!important;box-shadow:0 18px 70px #000c,0 0 42px rgba(90,255,190,.22)!important}.ops .pressure-crew small,.ops .pressure-equipment small{color:#6fefff!important}.ops .completionMeter i,.ops .progress i{background:linear-gradient(90deg,#00cfff 0%,#53f2ff 38%,#52ff9a 100%)!important;box-shadow:0 0 18px rgba(67,242,255,.45),0 0 28px rgba(69,255,151,.2)!important}.ops .completionBig strong,.ops .stat strong{color:#61ff9f!important;text-shadow:0 0 18px rgba(74,255,158,.58)!important}.ops.good .stage::after{background:conic-gradient(from 0deg,transparent,#5cefff44,transparent,#fff7,transparent,#58ff9d55,transparent)!important}
 
-/* Replace warm/gold accent language with electric green. */
-.ops .bucket,
-.ops .sideCard>b,
-.ops .lessonTop small,
-.ops .studyBar b,
-.ops .worldBoundary,
-.ops .lesson .pause,
-.ops .pressure-customer small{
-  color:#6dffab!important;
-}
-
-.ops .bucket,
-.ops .studyBar,
-.ops .studyBtn,
-.ops .worldBoundary,
-.ops .lesson .pause,
-.ops .pressure-customer{
-  border-color:rgba(78,255,151,.58)!important;
-}
-
-.ops .studyBar,
-.ops .worldBoundary,
-.ops .lesson .pause{
-  background:linear-gradient(145deg,rgba(5,42,27,.72),rgba(3,20,18,.86))!important;
-}
-
-.ops .studyBtn{
-  background:linear-gradient(180deg,#0d5132,#062919)!important;
-  color:#baffd3!important;
-  box-shadow:0 0 28px rgba(68,255,142,.16),inset 0 1px 0 rgba(255,255,255,.08)!important;
-}
-.ops .studyBtn:hover{
-  box-shadow:0 0 42px rgba(67,255,144,.34)!important;
-  border-color:#70ffad!important;
-}
-
-/* Make secondary planet electric rather than orange/red. */
-.ops .p2{
-  background:radial-gradient(circle at 35% 30%,#d8fff0 0,#62ffad 18%,#07946c 48%,#083d42 69%,#031018 80%)!important;
-  box-shadow:inset -28px -20px 48px #000d,0 0 65px rgba(69,255,163,.34)!important;
-}
-
-/* Blue-green HUD rail, no purple/gold. */
-.ops .top::after{
-  background:linear-gradient(90deg,transparent,#25dfff,#58ff9d,#25dfff,transparent)!important;
-  filter:drop-shadow(0 0 7px #42f2ff)!important;
-}
-
-/* Mission badges and progression rails. */
-.ops .runBadge{
-  color:#6dffab!important;
-  border-color:rgba(82,255,157,.55)!important;
-  box-shadow:0 0 18px rgba(72,255,151,.08)!important;
-}
-.ops .stageNode.on{
-  border-color:#45eaff!important;
-  color:#dfffff!important;
-  background:#082832!important;
-  box-shadow:0 0 21px rgba(48,227,255,.22)!important;
-}
-.ops .stageNode.done{
-  border-color:#51ff9d!important;
-  color:#77ffb2!important;
-  box-shadow:0 0 14px rgba(69,255,154,.12)!important;
-}
-
-/* No-assist state becomes high-energy blue-green, not magenta. */
-.ops .noAssist{
-  border-color:rgba(53,221,255,.72)!important;
-  background:linear-gradient(135deg,rgba(2,46,63,.88),rgba(4,31,25,.9))!important;
-  color:#72ffc1!important;
-  box-shadow:0 0 30px rgba(43,224,255,.16),inset 0 0 30px rgba(71,255,154,.05)!important;
-}
-
-/* Pressure events keep category distinction without warm palette. */
-.ops .pressure-customer{
-  border-color:#55ff9a!important;
-  box-shadow:0 18px 70px #000c,0 0 42px rgba(65,255,145,.3)!important;
-}
-.ops .pressure-equipment{
-  border-color:#38dfff!important;
-  box-shadow:0 18px 70px #000c,0 0 42px rgba(45,220,255,.3)!important;
-}
-.ops .pressure-crew{
-  border-color:#78ffd0!important;
-  box-shadow:0 18px 70px #000c,0 0 42px rgba(90,255,190,.22)!important;
-}
-.ops .pressure-crew small,
-.ops .pressure-equipment small{
-  color:#6fefff!important;
-}
-
-/* Completion and score energy stays unmistakably blue-green. */
-.ops .completionMeter i,
-.ops .progress i{
-  background:linear-gradient(90deg,#00cfff 0%,#53f2ff 38%,#52ff9a 100%)!important;
-  box-shadow:0 0 18px rgba(67,242,255,.45),0 0 28px rgba(69,255,151,.2)!important;
-}
-.ops .completionBig strong,
-.ops .stat strong{
-  color:#61ff9f!important;
-  text-shadow:0 0 18px rgba(74,255,158,.58)!important;
-}
-
-/* Keep explosions and correct-answer bloom within electric palette. */
-.ops.good .stage::after{
-  background:conic-gradient(from 0deg,transparent,#5cefff44,transparent,#fff7,transparent,#58ff9d55,transparent)!important;
-}
+/* ELECTRIC STORM: lightning constantly arcs through the cabinet without blocking gameplay. */
+.ops .circuit:after{content:""!important;position:fixed!important;inset:-8%!important;width:auto!important;height:auto!important;left:0!important;top:0!important;z-index:2!important;pointer-events:none!important;opacity:.55!important;background:linear-gradient(117deg,transparent 0 14%,#bfffff 14.12%,#31e8ff 14.28%,transparent 14.45% 34%,#58ff9d 34.12%,#eaffff 34.24%,transparent 34.42% 61%,#27dfff 61.1%,transparent 61.32% 79%,#5aff9c 79.1%,transparent 79.28%)!important;clip-path:polygon(0 8%,18% 8%,14% 31%,29% 31%,22% 54%,41% 54%,32% 100%,38% 61%,20% 61%,27% 38%,11% 38%,18% 15%,0 15%,0 8%)!important;filter:drop-shadow(0 0 5px #56efff) drop-shadow(0 0 15px #4dff9d)!important;transform:rotate(-7deg) scale(1.25)!important;animation:lightningStorm 4.8s steps(1,end) infinite!important}
+.ops .circuit:before{content:""!important;position:fixed!important;inset:-15%!important;width:auto!important;height:auto!important;left:0!important;top:0!important;z-index:2!important;pointer-events:none!important;opacity:.38!important;background:linear-gradient(63deg,transparent 0 26%,#4fffa1 26.1%,#eaffff 26.22%,transparent 26.42% 48%,#32e4ff 48.1%,transparent 48.3% 72%,#71ffb2 72.08%,transparent 72.28%)!important;clip-path:polygon(100% 4%,79% 4%,85% 25%,67% 25%,75% 47%,55% 47%,65% 67%,43% 67%,55% 100%,48% 73%,69% 73%,60% 53%,81% 53%,73% 31%,91% 31%,84% 10%,100% 10%)!important;filter:drop-shadow(0 0 6px #55ff9f) drop-shadow(0 0 18px #22dfff)!important;transform:rotate(5deg) scale(1.2)!important;animation:lightningStormB 6.1s steps(1,end) infinite!important}
+@keyframes lightningStorm{0%,8%,11%,32%,35%,62%,65%,100%{opacity:0}9%{opacity:.78;transform:rotate(-7deg) scale(1.25) translate(0,0)}10%{opacity:.28;transform:rotate(-7deg) scale(1.26) translate(5px,-3px)}33%{opacity:.62}34%{opacity:.18}63%{opacity:.9;filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 26px #42efff)}64%{opacity:.22}}
+@keyframes lightningStormB{0%,17%,20%,47%,50%,79%,82%,100%{opacity:0}18%{opacity:.52}19%{opacity:.16}48%{opacity:.72}49%{opacity:.2}80%{opacity:.65;filter:drop-shadow(0 0 8px #fff) drop-shadow(0 0 25px #50ff9f)}81%{opacity:.14}}
+/* Correct answers trigger a brighter cabinet-wide electrical surge. */
+.ops.good:before{content:"";position:fixed;inset:0;z-index:9998;pointer-events:none;background:radial-gradient(circle at 50% 45%,rgba(255,255,255,.38),rgba(54,230,255,.18) 22%,rgba(65,255,151,.09) 45%,transparent 70%);animation:powerSurge .48s ease-out both}@keyframes powerSurge{0%{opacity:0}18%{opacity:1}42%{opacity:.18}62%{opacity:.75}100%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.ops .circuit:before,.ops .circuit:after,.ops.good:before{animation:none!important;opacity:0!important}}
