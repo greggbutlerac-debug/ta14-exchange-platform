@@ -141,7 +141,14 @@ function requiredFieldFindings() {
 
     if (record.category === 'ARTICLE' && !record.href) missing.push('public URL');
     if (record.category === 'BOOK' && !record.identifier) missing.push('ASIN/identifier');
-    if (record.category === 'PATENT' && !record.identifier) missing.push('application identifier');
+
+    // Only an actual filed patent application must carry an application identifier.
+    // Portfolio summaries and patent-position public records are higher-level institutional records,
+    // not individual filings, and should not fail integrity merely because they aggregate many filings.
+    if (record.category === 'PATENT' && record.status === 'FILED' && !record.identifier) {
+      missing.push('application identifier');
+    }
+
     if (record.category === 'ZENODO' && !record.identifier && !record.href) missing.push('DOI or Zenodo URL');
     if (record.category === 'STANDARD' && !record.identifier) missing.push('standard DOI/identifier');
     if ((record.category === 'REPOSITORY' || record.category === 'SITE' || record.category === 'IMPLEMENTATION') && !record.href) missing.push('public URL');
