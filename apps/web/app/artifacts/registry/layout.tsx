@@ -1,11 +1,12 @@
 import type { ReactNode } from "react";
 import EngineAcademyHelp from "../../../components/academy/EngineAcademyHelp";
+import ArtifactClassificationBridge from "./artifact-classification-bridge";
 import GovernedArtifactDirectory from "./governed-artifact-directory";
 
 export default function ArtifactRegistryLayout({ children }: { children: ReactNode }) {
   return (
     <>
-      {children}
+      <div id="directory">{children}</div>
       <div
         style={{
           background: "#050914",
@@ -14,7 +15,10 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
         }}
       >
         <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-          <GovernedArtifactDirectory />
+          <ArtifactClassificationBridge />
+          <div id="governed-findings">
+            <GovernedArtifactDirectory />
+          </div>
         </div>
       </div>
       <EngineAcademyHelp
