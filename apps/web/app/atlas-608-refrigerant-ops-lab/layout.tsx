@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import "./arcade.css";
 
 export const metadata: Metadata = {
   title: "EPA 608 Refrigerant Ops | TA-14 Academy Private Preview",
