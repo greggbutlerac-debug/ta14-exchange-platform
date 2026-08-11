@@ -1,4 +1,5 @@
 import type { CorpusRecord } from './corpus-merged';
+import { recordMatchesPrimaryFamily } from './corpus-family-classification';
 
 export type CorpusFamilyId =
   | 'CORE'
@@ -85,32 +86,8 @@ export const CORPUS_FAMILIES: CorpusFamily[] = [
   },
 ];
 
-function haystack(record: CorpusRecord) {
-  return [
-    record.title,
-    record.category,
-    record.author,
-    record.platform,
-    record.identifier,
-    record.description,
-    record.relationship,
-    record.sourceClass,
-    ...(record.tags || []),
-  ]
-    .filter(Boolean)
-    .join(' ')
-    .toLowerCase();
-}
-
 export function recordMatchesFamily(record: CorpusRecord, familyId: CorpusFamilyId) {
-  if (familyId === 'PATENTS') return record.category === 'PATENT';
-  if (familyId === 'STANDARDS') return record.category === 'STANDARD' || haystack(record).includes('ta14-');
-  if (familyId === 'PUBLIC') return ['ARTICLE', 'BOOK', 'REPOSITORY', 'SITE', 'CHRONOLOGY'].includes(record.category);
-
-  const family = CORPUS_FAMILIES.find((item) => item.id === familyId);
-  if (!family) return false;
-  const text = haystack(record);
-  return family.keywords.some((keyword) => text.includes(keyword));
+  return recordMatchesPrimaryFamily(record, familyId);
 }
 
 export const TA14_LINEAGE = [
