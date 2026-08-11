@@ -16,6 +16,7 @@ import {
   recordMatchesFamily,
   type CorpusFamilyId,
 } from "./corpus-families";
+import RelatedFamilyBadges from "./RelatedFamilyBadges";
 
 const categories: Array<"ALL" | CorpusCategory> = [
   "ALL", "BOOK", "ARTICLE", "ZENODO", "PATENT", "STANDARD", "REPOSITORY", "SITE", "IMPLEMENTATION", "CHRONOLOGY",
@@ -49,7 +50,6 @@ export default function PublicCorpusPage() {
   }, []);
 
   const years = useMemo(() => Array.from(new Set(TA14_PUBLIC_CORPUS.map((record) => record.year))).sort((a, b) => b - a), []);
-
   const familyCounts = useMemo(() => Object.fromEntries(CORPUS_FAMILIES.map((item) => [item.id, TA14_PUBLIC_CORPUS.filter((record) => recordMatchesFamily(record, item.id)).length])) as Record<CorpusFamilyId, number>, []);
 
   const records = useMemo(() => {
@@ -123,7 +123,7 @@ export default function PublicCorpusPage() {
 
         <section id="categories" style={{ marginBottom: 52 }}><Eyebrow>RECORD TYPES</Eyebrow><h2 style={sectionTitle}>Browse the public evidence by format.</h2><div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(290px,1fr))", gap: 16 }}>{categories.slice(1).map((c, index) => { const key = c as CorpusCategory; return <button key={key} onClick={() => { setCategory(key); setFamily("ALL"); }} style={familyCardStyle}><div style={{ opacity: .65, fontSize: 12 }}>0{index + 1}</div><h3 style={{ fontSize: 25 }}>{CORPUS_CATEGORY_LABELS[key]} <span style={{ float: "right" }}>{CORPUS_COUNTS[key]}</span></h3><p style={{ opacity: .7, lineHeight: 1.55 }}>{categoryDescriptions[key]}</p></button>; })}</div></section>
 
-        <section id="records"><Eyebrow>MASTER RECORD LIST</Eyebrow><h2 style={sectionTitle}>{family === "ALL" ? "Complete structured corpus" : CORPUS_FAMILIES.find((item) => item.id === family)?.title}</h2><div style={{ display: "grid", gap: 14 }}>{records.map((record) => <RecordCard key={record.id} record={record} />)}{records.length === 0 && <div style={{ padding: 30, border: "1px solid #21435c", borderRadius: 20 }}><h3>No matching public record was found.</h3><button onClick={clearFilters} style={textButton}>Clear the filters</button></div>}</div></section>
+        <section id="records"><Eyebrow>MASTER RECORD LIST</Eyebrow><h2 style={sectionTitle}>{family === "ALL" ? "Complete structured corpus" : CORPUS_FAMILIES.find((item) => item.id === family)?.title}</h2><div style={{ display: "grid", gap: 14 }}>{records.map((record) => <RecordCard key={record.id} record={record} onSelectFamily={openFamily} />)}{records.length === 0 && <div style={{ padding: 30, border: "1px solid #21435c", borderRadius: 20 }}><h3>No matching public record was found.</h3><button onClick={clearFilters} style={textButton}>Clear the filters</button></div>}</div></section>
 
         <section style={{ marginTop: 64, paddingTop: 30, borderTop: "1px solid #21435c", opacity: .82 }}><Eyebrow>PUBLIC CORPUS BOUNDARY</Eyebrow><h2>Evidence visibility is not automatic validation.</h2><p>Inclusion preserves the public record. It does not by itself establish legal priority, patent validity, certification, accreditation, regulatory approval, independent validation, or proof that every implementation performs as claimed. Those determinations require their own evidence and review.</p><strong>No admissible evidence. No admissible execution.</strong></section>
       </div>
@@ -140,4 +140,4 @@ const textButton = { border: 0, background: "transparent", color: "#82e7ff", pad
 
 function Eyebrow({ children }: { children: React.ReactNode }) { return <div style={{ letterSpacing: 2, fontSize: 11, fontWeight: 900, color: "#70ddff" }}>{children}</div>; }
 function Metric({ value, label }: { value: number; label: string }) { return <div style={{ padding: 18, border: "1px solid #21435c", borderRadius: 16, background: "rgba(9,27,42,.92)" }}><div style={{ fontSize: 30, fontWeight: 800 }}>{value}</div><div style={{ opacity: .7 }}>{label}</div></div>; }
-function RecordCard({ record }: { record: CorpusRecord }) { return <article style={{ padding: 22, border: "1px solid #21435c", borderRadius: 18, background: "#091b2a" }}><div style={{ fontSize: 12, letterSpacing: 1.2, opacity: .65 }}>{CORPUS_CATEGORY_LABELS[record.category]} • {record.date || record.year} • {record.status.replaceAll("_", " ")}</div><h3 style={{ margin: "9px 0", fontSize: 23 }}>{record.href ? <a href={record.href} target="_blank" rel="noreferrer">{record.title} ↗</a> : record.title}</h3><div style={{ display: "flex", gap: 14, flexWrap: "wrap", opacity: .78 }}>{record.author && <span>{record.author}</span>}{record.platform && <span>{record.platform}</span>}{record.identifier && <span>{record.identifier}</span>}</div>{(record.description || record.relationship) && <p style={{ lineHeight: 1.6, opacity: .75 }}>{record.description || record.relationship}</p>}</article>; }
+function RecordCard({ record, onSelectFamily }: { record: CorpusRecord; onSelectFamily: (familyId: CorpusFamilyId) => void }) { return <article style={{ padding: 22, border: "1px solid #21435c", borderRadius: 18, background: "#091b2a" }}><div style={{ fontSize: 12, letterSpacing: 1.2, opacity: .65 }}>{CORPUS_CATEGORY_LABELS[record.category]} • {record.date || record.year} • {record.status.replaceAll("_", " ")}</div><h3 style={{ margin: "9px 0", fontSize: 23 }}>{record.href ? <a href={record.href} target="_blank" rel="noreferrer">{record.title} ↗</a> : record.title}</h3><div style={{ display: "flex", gap: 14, flexWrap: "wrap", opacity: .78 }}>{record.author && <span>{record.author}</span>}{record.platform && <span>{record.platform}</span>}{record.identifier && <span>{record.identifier}</span>}</div>{(record.description || record.relationship) && <p style={{ lineHeight: 1.6, opacity: .75 }}>{record.description || record.relationship}</p>}<RelatedFamilyBadges record={record} onSelectFamily={onSelectFamily} /></article>; }
