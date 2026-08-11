@@ -4,6 +4,7 @@ import WorldAutoSelect from "./WorldAutoSelect";
 import MissionRailController from "./MissionRailController";
 import LightningStorm from "./LightningStorm";
 import PhaserArcadeOverlay from "./PhaserArcadeOverlay";
+import RunProgressionHUD from "./RunProgressionHUD";
 import "./arcade.css";
 import "./electric-palette.css";
 
@@ -19,6 +20,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
     {children}
     <LightningStorm />
     <PhaserArcadeOverlay />
+    <RunProgressionHUD />
     <Suspense fallback={null}><MissionRailController /></Suspense>
   </>;
 }
