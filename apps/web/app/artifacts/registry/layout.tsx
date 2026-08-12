@@ -9,7 +9,7 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
   return (
     <>
       <section
-        aria-label="Founding Demonstrations"
+        aria-label="Public governed artifact pathways"
         style={{
           position: "relative",
           zIndex: 60,
@@ -33,7 +33,7 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
             flexWrap: "wrap",
           }}
         >
-          <div>
+          <div style={{ maxWidth: 880 }}>
             <strong
               style={{
                 display: "block",
@@ -45,29 +45,50 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
             >
               Public Governed Artifact Series
             </strong>
-            <span style={{ display: "block", marginTop: 5, fontSize: 13, opacity: .78 }}>
-              Harmonic 001 · Harmonic 002 · Shango FD-2026-0005 — three different demonstrations of evidence-bounded governance.
+            <span style={{ display: "block", marginTop: 5, fontSize: 13, opacity: .82, lineHeight: 1.55 }}>
+              Harmonic Cases 001–003 · Shango FD-2026-0005 · TA-14 / ANDEKS™ IE-2026-001 — governed demonstrations, controlled findings, and bounded interoperability records preserved as separate institutional pathways.
             </span>
           </div>
 
-          <Link
-            href="/artifacts/founding-demonstrations"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: "11px 15px",
-              borderRadius: 11,
-              border: "1px solid rgba(244,186,84,.30)",
-              background: "rgba(244,186,84,.10)",
-              color: "#ffe0a2",
-              fontSize: 12,
-              fontWeight: 850,
-              textDecoration: "none",
-            }}
-          >
-            Explore Founding Demonstrations →
-          </Link>
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <Link
+              href="/artifacts/founding-demonstrations"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "11px 15px",
+                borderRadius: 11,
+                border: "1px solid rgba(244,186,84,.30)",
+                background: "rgba(244,186,84,.10)",
+                color: "#ffe0a2",
+                fontSize: 12,
+                fontWeight: 850,
+                textDecoration: "none",
+              }}
+            >
+              Founding Demonstrations →
+            </Link>
+
+            <Link
+              href="/artifacts/interoperability-examinations"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                padding: "11px 15px",
+                borderRadius: 11,
+                border: "1px solid rgba(101,221,255,.30)",
+                background: "rgba(101,221,255,.09)",
+                color: "#c8f3ff",
+                fontSize: 12,
+                fontWeight: 850,
+                textDecoration: "none",
+              }}
+            >
+              Interoperability Examinations →
+            </Link>
+          </div>
         </div>
       </section>
 
