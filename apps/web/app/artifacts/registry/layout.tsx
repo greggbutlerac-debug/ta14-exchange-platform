@@ -46,7 +46,7 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
               Public Governed Artifact Series
             </strong>
             <span style={{ display: "block", marginTop: 5, fontSize: 13, opacity: .82, lineHeight: 1.55 }}>
-              Harmonic Cases 001–003 · Shango FD-2026-0005 · TA-14 / ANDEKS™ IE-2026-001 — governed demonstrations, controlled findings, and bounded interoperability records preserved as separate institutional pathways.
+              Harmonic Cases 001–003 · Shango FD-2026-0005 · TA-14 / ANDEKS™ IE-2026-001 — governed demonstrations, controlled findings, bounded interoperability records, and independently attributable participant responses preserved as separate institutional objects.
             </span>
           </div>
 
@@ -87,6 +87,38 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
               }}
             >
               Interoperability Examinations →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <section
+        aria-label="Latest interoperability examination state"
+        style={{
+          position: "relative",
+          zIndex: 59,
+          padding: "12px 5vw",
+          borderBottom: "1px solid rgba(101,221,255,.16)",
+          background: "linear-gradient(90deg, rgba(4,18,29,.98), rgba(7,36,48,.98))",
+          color: "#eaf9ff",
+          fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
+        <div style={{ maxWidth: 1500, margin: "0 auto", display: "grid", gridTemplateColumns: "minmax(0,1fr) auto", gap: 20, alignItems: "center" }}>
+          <div>
+            <strong style={{ display: "block", color: "#8ee9ff", fontSize: 10, letterSpacing: ".14em", textTransform: "uppercase" }}>
+              TA-14 / ANDEKS™ IE-2026-001 · Independent Response Preserved
+            </strong>
+            <span style={{ display: "block", marginTop: 5, color: "#a9c3cf", fontSize: 12, lineHeight: 1.55 }}>
+              Documentary examination complete. TA-14 finding independently preserved. ANDEKS™ response independently preserved. No material factual inaccuracies identified in TA-14&apos;s representation. Pilot not authorized; next-gate decision reserved.
+            </span>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            <Link href="/artifacts/ta14-andeks-ie-2026-001" style={{ padding: "9px 12px", border: "1px solid rgba(101,221,255,.22)", borderRadius: 10, background: "rgba(101,221,255,.07)", color: "#c9f4ff", fontSize: 11, fontWeight: 850, textDecoration: "none" }}>
+              Examination →
+            </Link>
+            <Link href="/artifacts/ta14-andeks-ie-2026-001/independent-response" style={{ padding: "9px 12px", border: "1px solid rgba(114,239,182,.22)", borderRadius: 10, background: "rgba(114,239,182,.07)", color: "#caffdf", fontSize: 11, fontWeight: 850, textDecoration: "none" }}>
+              ANDEKS™ Response →
             </Link>
           </div>
         </div>
