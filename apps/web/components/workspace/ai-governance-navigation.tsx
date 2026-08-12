@@ -18,6 +18,8 @@ const playgroundHref = '/workspace/ai-governance/playground';
 const demonstrationsHref = '/workspace/ai-governance/demonstrations';
 const foundingDemonstrationsHref = '/artifacts/founding-demonstrations';
 const interoperabilityExaminationsHref = '/artifacts/interoperability-examinations';
+const andeksExaminationHref = '/artifacts/ta14-andeks-ie-2026-001';
+const andeksResponseHref = '/artifacts/ta14-andeks-ie-2026-001/independent-response';
 const reviewsResponsesHref = '/workspace/ai-governance/reviews';
 const artifactsHref = '/artifacts';
 const euAiActHref = '/workspace/ai-governance/eu-ai-act';
@@ -33,7 +35,7 @@ const workspaceNavigation: NavigationItem[] = [
   { href: playgroundHref, label: 'Playground', glyph: '◈', matchPrefixes: [playgroundHref] },
   { href: demonstrationsHref, label: 'Demonstrations', glyph: '◎', matchPrefixes: [demonstrationsHref] },
   { href: foundingDemonstrationsHref, label: 'Founding Demonstrations', glyph: 'FD', matchPrefixes: [foundingDemonstrationsHref], institutional: true },
-  { href: interoperabilityExaminationsHref, label: 'Interoperability Examinations', glyph: 'IE', matchPrefixes: [interoperabilityExaminationsHref], institutional: true },
+  { href: interoperabilityExaminationsHref, label: 'Interoperability Examinations', glyph: 'IE', matchPrefixes: [interoperabilityExaminationsHref, andeksExaminationHref], institutional: true },
   { href: reviewsResponsesHref, label: 'Reviews & Responses', glyph: 'RR', matchPrefixes: [reviewsResponsesHref] },
   { href: artifactsHref, label: 'Artifact Registry', glyph: 'AR', matchPrefixes: [artifactsHref], institutional: true },
   { href: euAiActHref, label: 'EU AI Act', glyph: 'EU', matchPrefixes: [euAiActHref] },
@@ -95,6 +97,17 @@ export function AiGovernanceNavigation() {
             })}
           </nav>
         </section>
+
+        <article className="ta14-sidebar-note">
+          <small>Latest Controlled Examination State</small>
+          <strong>TA-14 / ANDEKS™ IE-2026-001 is documentarily complete.</strong>
+          <p>
+            TA-14&apos;s finding remains independently issued. ANDEKS™ has independently preserved its response and identified no material factual inaccuracies in TA-14&apos;s representation. Pilot authorization has not been issued; the next-gate decision remains reserved.
+          </p>
+          <Link href={andeksExaminationHref}>Open completed examination →</Link>
+          <br />
+          <Link href={andeksResponseHref}>Open ANDEKS™ independent response →</Link>
+        </article>
 
         <article className="ta14-sidebar-note">
           <small>TA-14 Governed Examination Pathways</small>
