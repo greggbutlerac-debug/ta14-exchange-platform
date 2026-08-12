@@ -2,6 +2,7 @@ import { EXAM1, type ArcadeQuestion } from "./exam1-bank";
 import { CORE_EXPANSION } from "./core-expansion-bank";
 import { TYPE1_EXPANSION } from "./type1-expansion-bank";
 import { TYPE2_EXPANSION } from "./type2-expansion-bank";
+import { TYPE3_EXPANSION } from "./type3-expansion-bank";
 
 /**
  * Canonical source bank for the EPA 608 readiness arcade.
@@ -17,6 +18,7 @@ const SOURCE_608_BANK: ArcadeQuestion[] = [
   ...CORE_EXPANSION,
   ...TYPE1_EXPANSION,
   ...TYPE2_EXPANSION,
+  ...TYPE3_EXPANSION,
 ];
 
 const uniqueByWorldAndId = (questions: ArcadeQuestion[]) => {
