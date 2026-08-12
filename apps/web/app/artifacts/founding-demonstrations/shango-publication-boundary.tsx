@@ -43,11 +43,10 @@ export default function ShangoPublicationBoundary() {
         itself volunteered the later T3 narrowing.
       </p>
       <p style={{ margin: '12px 0 0', maxWidth: 1050, lineHeight: 1.7, opacity: .68 }}>
-        Version 2.2 is a Registry version string, not a released-product,
-        deployment, customer, or delivered-engagement claim. Shango MID is
-        pre-revenue with no delivered engagements, and counter-signing is not
-        running in the current build. No certification, endorsement, or
-        production validation is implied.
+        Version 2.2 is a Registry version string and should not be expanded into
+        claims about deployment state or capabilities that were outside the
+        admitted evidence. Counter-signing is not running in the current build.
+        No certification, endorsement, or production validation is implied.
       </p>
       <Link
         href="/artifacts/fd-2026-0005"
