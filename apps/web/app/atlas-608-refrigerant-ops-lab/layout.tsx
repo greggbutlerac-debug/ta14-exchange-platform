@@ -5,6 +5,7 @@ import MissionRailController from "./MissionRailController";
 import LightningStorm from "./LightningStorm";
 import PhaserArcadeOverlay from "./PhaserArcadeOverlay";
 import RunProgressionHUD from "./RunProgressionHUD";
+import RunUnlockSequence from "./RunUnlockSequence";
 import "./arcade.css";
 import "./electric-palette.css";
 
@@ -21,6 +22,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
     <LightningStorm />
     <PhaserArcadeOverlay />
     <RunProgressionHUD />
+    <RunUnlockSequence />
     <Suspense fallback={null}><MissionRailController /></Suspense>
   </>;
 }
