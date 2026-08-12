@@ -6,6 +6,7 @@ import LightningStorm from "./LightningStorm";
 import PhaserArcadeOverlay from "./PhaserArcadeOverlay";
 import RunProgressionHUD from "./RunProgressionHUD";
 import RunUnlockSequence from "./RunUnlockSequence";
+import PressureDecisionEvents from "./PressureDecisionEvents";
 import "./arcade.css";
 import "./electric-palette.css";
 
@@ -23,6 +24,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
     <PhaserArcadeOverlay />
     <RunProgressionHUD />
     <RunUnlockSequence />
+    <PressureDecisionEvents />
     <Suspense fallback={null}><MissionRailController /></Suspense>
   </>;
 }
