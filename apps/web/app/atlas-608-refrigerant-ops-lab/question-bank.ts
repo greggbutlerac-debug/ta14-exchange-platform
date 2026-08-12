@@ -34,12 +34,44 @@ function shuffle<T>(items: T[]): T[] {
   return out;
 }
 
+const reasoningTail = [
+  "Judge this choice against the equipment facts and the governing service procedure before relying on it.",
+  "This conclusion still has to survive the refrigerant identity, equipment category, and safety conditions in the stem.",
+  "Treat this as a complete answer only if the actual operating evidence and applicable rule support the conclusion.",
+  "Compare this claim with the full scenario rather than assuming one familiar clue controls the entire service decision.",
+];
+
+function wordCount(value: string) {
+  return value.trim().split(/\s+/).filter(Boolean).length;
+}
+
+/**
+ * Prevent answer-length leakage.
+ *
+ * Some original study questions naturally had a detailed correct response and
+ * very short distractors. That makes "pick the longest answer" a game exploit.
+ * We preserve the original claim in every option, but short options receive a
+ * neutral reasoning sentence so visual/word-count length is no longer a clue.
+ */
+function camouflageChoiceLength(question: ArcadeQuestion): ArcadeQuestion {
+  const lengths = question.choices.map(wordCount);
+  const longest = Math.max(...lengths);
+  const floor = Math.max(11, Math.ceil(longest * 0.72));
+  const choices = question.choices.map((choice, index) => {
+    if (wordCount(choice) >= floor) return choice;
+    const tail = reasoningTail[(question.id + index) % reasoningTail.length];
+    return `${choice} ${tail}`;
+  }) as ArcadeQuestion["choices"];
+  return { ...question, choices };
+}
+
 function shuffleChoices(question: ArcadeQuestion): ArcadeQuestion {
-  const indexed = question.choices.map((choice, index) => ({ choice, index }));
+  const balanced = camouflageChoiceLength(question);
+  const indexed = balanced.choices.map((choice, index) => ({ choice, index }));
   const randomized = shuffle(indexed);
-  const correct = randomized.findIndex((entry) => entry.index === question.correct);
+  const correct = randomized.findIndex((entry) => entry.index === balanced.correct);
   return {
-    ...question,
+    ...balanced,
     choices: randomized.map((entry) => entry.choice) as ArcadeQuestion["choices"],
     correct,
   };
@@ -58,6 +90,19 @@ export function createRandomizedDeck(
   const randomized = shuffle(source).map(shuffleChoices);
   return typeof limit === "number" ? randomized.slice(0, limit) : randomized;
 }
+
+/** Questions that still have a conspicuous authored length imbalance. */
+export const LENGTH_LEAK_AUDIT = sourceUnique.filter((question) => {
+  const counts = question.choices.map(wordCount);
+  const correctWords = counts[question.correct];
+  const wrongWords = counts.filter((_, index) => index !== question.correct);
+  const wrongAverage = wrongWords.reduce((sum, count) => sum + count, 0) / wrongWords.length;
+  return correctWords > wrongAverage * 1.35;
+}).map((question) => ({
+  id: question.id,
+  world: question.world,
+  lesson: question.lesson,
+}));
 
 export const CORE_BANK = createRandomizedDeck("core", 100);
 export const TYPE1_BANK = createRandomizedDeck("type1", 100);
