@@ -3,22 +3,16 @@ import { CORE_EXPANSION } from "./core-expansion-bank";
 import { TYPE1_EXPANSION } from "./type1-expansion-bank";
 import { TYPE2_EXPANSION } from "./type2-expansion-bank";
 import { TYPE3_EXPANSION } from "./type3-expansion-bank";
+import { TRANSITION_EXPANSION } from "./transition-expansion-bank";
 
-/**
- * Canonical source bank for the EPA 608 readiness arcade.
- *
- * Source banks stay separate so each world can be reviewed and validated
- * independently. Runtime decks are intentionally NOT tied to a calendar day.
- * Every fresh game/page start gets a newly randomized question order and
- * newly randomized answer-letter order so learners train recognition rather
- * than memorizing yesterday's sequence.
- */
+/** Canonical source bank for the EPA 608 readiness arcade. */
 const SOURCE_608_BANK: ArcadeQuestion[] = [
   ...EXAM1,
   ...CORE_EXPANSION,
   ...TYPE1_EXPANSION,
   ...TYPE2_EXPANSION,
   ...TYPE3_EXPANSION,
+  ...TRANSITION_EXPANSION,
 ];
 
 const uniqueByWorldAndId = (questions: ArcadeQuestion[]) => {
@@ -53,7 +47,7 @@ function shuffleChoices(question: ArcadeQuestion): ArcadeQuestion {
 
 const sourceUnique = uniqueByWorldAndId(SOURCE_608_BANK);
 
-/** Create a brand-new randomized deck on demand. */
+/** Create a brand-new randomized deck on demand for every run/restart. */
 export function createRandomizedDeck(
   world: ArcadeQuestion["world"] | "universal",
   limit?: number,
@@ -65,11 +59,6 @@ export function createRandomizedDeck(
   return typeof limit === "number" ? randomized.slice(0, limit) : randomized;
 }
 
-/**
- * Initial runtime banks are randomized at each fresh browser/game load.
- * The game UI can call createRandomizedDeck again whenever a player explicitly
- * starts/restarts a run, giving the next 25-question attempt a fresh draw.
- */
 export const CORE_BANK = createRandomizedDeck("core", 100);
 export const TYPE1_BANK = createRandomizedDeck("type1", 100);
 export const TYPE2_BANK = createRandomizedDeck("type2", 100);
