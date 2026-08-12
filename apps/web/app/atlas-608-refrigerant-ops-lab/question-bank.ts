@@ -4,26 +4,57 @@ import { CORE_EXPANSION } from "./core-expansion-bank";
 /**
  * Canonical runtime bank for the EPA 608 readiness arcade.
  *
- * Keep source banks separate so each world can be reviewed, expanded, and
- * validated independently while the game consumes one combined array.
+ * Source banks stay separate so each world can be reviewed and validated
+ * independently. The runtime then selects up to 100 unique questions per
+ * equipment world so a 100-question campaign never wraps back to question 1.
  */
-export const ARCADE_608_BANK: ArcadeQuestion[] = [
+const SOURCE_608_BANK: ArcadeQuestion[] = [
   ...EXAM1,
   ...CORE_EXPANSION,
 ];
 
-export const WORLD_COUNTS = ARCADE_608_BANK.reduce<Record<string, number>>(
-  (counts, question) => {
-    counts[question.world] = (counts[question.world] ?? 0) + 1;
-    return counts;
-  },
-  {},
-);
+const uniqueByWorldAndId = (questions: ArcadeQuestion[]) => {
+  const seen = new Set<string>();
+  return questions.filter((question) => {
+    const key = `${question.world}:${question.id}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+};
 
-export const CORE_BANK = ARCADE_608_BANK.filter((question) => question.world === "core");
-export const TYPE1_BANK = ARCADE_608_BANK.filter((question) => question.world === "type1");
-export const TYPE2_BANK = ARCADE_608_BANK.filter((question) => question.world === "type2");
-export const TYPE3_BANK = ARCADE_608_BANK.filter((question) => question.world === "type3");
-export const TRANSITION_BANK = ARCADE_608_BANK.filter((question) => question.world === "transition");
+const sourceUnique = uniqueByWorldAndId(SOURCE_608_BANK);
+
+export const CORE_BANK = sourceUnique.filter((question) => question.world === "core").slice(0, 100);
+export const TYPE1_BANK = sourceUnique.filter((question) => question.world === "type1").slice(0, 100);
+export const TYPE2_BANK = sourceUnique.filter((question) => question.world === "type2").slice(0, 100);
+export const TYPE3_BANK = sourceUnique.filter((question) => question.world === "type3").slice(0, 100);
+export const TRANSITION_BANK = sourceUnique.filter((question) => question.world === "transition").slice(0, 100);
+
+export const ARCADE_608_BANK: ArcadeQuestion[] = [
+  ...CORE_BANK,
+  ...TYPE1_BANK,
+  ...TYPE2_BANK,
+  ...TYPE3_BANK,
+  ...TRANSITION_BANK,
+];
+
+export const WORLD_COUNTS = {
+  core: CORE_BANK.length,
+  type1: TYPE1_BANK.length,
+  type2: TYPE2_BANK.length,
+  type3: TYPE3_BANK.length,
+  transition: TRANSITION_BANK.length,
+} as const;
+
+export const WORLD_TARGET = 100;
+export const UNIVERSAL_TARGET = WORLD_TARGET * 5;
+export const WORLD_READY = {
+  core: CORE_BANK.length >= WORLD_TARGET,
+  type1: TYPE1_BANK.length >= WORLD_TARGET,
+  type2: TYPE2_BANK.length >= WORLD_TARGET,
+  type3: TYPE3_BANK.length >= WORLD_TARGET,
+  transition: TRANSITION_BANK.length >= WORLD_TARGET,
+} as const;
 
 export type { ArcadeQuestion } from "./exam1-bank";
