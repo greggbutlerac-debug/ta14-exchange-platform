@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { EXAM1, type ArcadeQuestion } from "./exam1-bank";
+import { ARCADE_608_BANK, type ArcadeQuestion } from "./question-bank";
 import ArcadePressureLayer,{stageForQuestion,stageMeta} from "./ArcadePressureLayer";
 
 type WorldKey = "core"|"type1"|"type2"|"type3"|"transition"|"universal";
@@ -42,7 +42,7 @@ export default function RefrigerantOps(){
  const [idx,setIdx]=useState(0),[score,setScore]=useState(0),[bestScore,setBestScore]=useState(0),[streak,setStreak]=useState(0),[miss,setMiss]=useState(0),[seconds,setSeconds]=useState(30*60);
  const [msg,setMsg]=useState("Read the evidence. Choose the most defensible answer.");
  const [flash,setFlash]=useState<"good"|"bad"|null>(null),[studying,setStudying]=useState(false),[sound,setSound]=useState(true);
- const pool=useMemo(()=>world==="universal"?EXAM1:EXAM1.filter(x=>x.world===world),[world]);
+ const pool=useMemo(()=>world==="universal"?ARCADE_608_BANK:ARCADE_608_BANK.filter(x=>x.world===world),[world]);
  const campaignQuestion=(idx%100)+1;
  const stage=stageForQuestion(campaignQuestion);
  const run=stageMeta(stage);
@@ -53,7 +53,7 @@ export default function RefrigerantOps(){
  const lesson=LESSONS[world];
  const dossier=WORLD_INFO[world];
  const helpAllowed=run.help;
- const loaded=(key:WorldKey)=>key==="universal"?EXAM1.length:EXAM1.filter(x=>x.world===key).length;
+ const loaded=(key:WorldKey)=>key==="universal"?ARCADE_608_BANK.length:ARCADE_608_BANK.filter(x=>x.world===key).length;
  useEffect(()=>{const t=setInterval(()=>setSeconds(s=>Math.max(0,s-1)),1000);return()=>clearInterval(t)},[]);
  useEffect(()=>{try{const stored=Number(localStorage.getItem(`ta14-608-best-${world}`)||0);setBestScore(stored)}catch{}},[world]);
  useEffect(()=>{if(score<=bestScore)return;setBestScore(score);try{localStorage.setItem(`ta14-608-best-${world}`,String(score))}catch{}},[score,bestScore,world]);
