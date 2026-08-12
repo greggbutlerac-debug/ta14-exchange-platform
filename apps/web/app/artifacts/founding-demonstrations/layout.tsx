@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import FoundingMethodologyEntry from './methodology-entry';
 import ShangoPublicationBoundary from './shango-publication-boundary';
 
 export default function FoundingDemonstrationsLayout({
@@ -9,6 +10,7 @@ export default function FoundingDemonstrationsLayout({
   return (
     <>
       {children}
+      <FoundingMethodologyEntry />
       <ShangoPublicationBoundary />
     </>
   );
