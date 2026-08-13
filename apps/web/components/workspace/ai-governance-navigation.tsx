@@ -24,6 +24,8 @@ const reviewsResponsesHref = '/workspace/ai-governance/reviews';
 const artifactsHref = '/artifacts';
 const euAiActHref = '/workspace/ai-governance/eu-ai-act';
 const governanceLibraryHref = '/workspace/ai-governance/library';
+const institutionalAuthorityHref = '/workspace/ai-governance/institutional-authority/registration-package';
+const institutionalAuthorityPrefix = '/workspace/ai-governance/institutional-authority';
 const registryHref = '/workspace/ai-governance/registry';
 const registryInboxHref = '/workspace/ai-governance/registry/inbox';
 const partnerReviewNetworkHref = '/workspace/ai-governance/partner-review-network';
@@ -40,6 +42,7 @@ const workspaceNavigation: NavigationItem[] = [
   { href: artifactsHref, label: 'Artifact Registry', glyph: 'AR', matchPrefixes: [artifactsHref], institutional: true },
   { href: euAiActHref, label: 'EU AI Act', glyph: 'EU', matchPrefixes: [euAiActHref] },
   { href: governanceLibraryHref, label: 'Governance Library', glyph: 'L', matchPrefixes: [governanceLibraryHref] },
+  { href: institutionalAuthorityHref, label: 'Institutional Authority', glyph: 'IA', matchPrefixes: [institutionalAuthorityPrefix], institutional: true },
   { href: registryHref, label: 'Registry', glyph: 'RG', matchPrefixes: [registryHref] },
   { href: registryInboxHref, label: 'Registry Inbox', glyph: 'IN', matchPrefixes: [registryInboxHref], institutional: true },
   { href: '/workspace/routes/new', label: 'Build a Route', glyph: '◇', matchPrefixes: ['/workspace/routes/new'] },
@@ -56,6 +59,7 @@ const mobileLabels = new Set([
   'Interoperability Examinations',
   'Reviews & Responses',
   'Artifact Registry',
+  'Institutional Authority',
   'Registry Inbox',
 ]);
 
@@ -97,6 +101,15 @@ export function AiGovernanceNavigation() {
             })}
           </nav>
         </section>
+
+        <article className="ta14-sidebar-note">
+          <small>Pre-Registration Institutional Due Diligence</small>
+          <strong>Inspect the authority before you register.</strong>
+          <p>
+            Review the Governing Authority Record, Atlas Chief of Staff Delegation Record, and Participation & Publication Authorization before submitting proprietary evidence or making a consequence-bearing participation decision.
+          </p>
+          <Link href={institutionalAuthorityHref}>Open Institutional Authority →</Link>
+        </article>
 
         <article className="ta14-sidebar-note">
           <small>Latest Controlled Examination State</small>
