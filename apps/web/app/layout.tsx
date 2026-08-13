@@ -9,7 +9,7 @@ import './globals.css';
 const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ta14authority.org'),
+  metadataBase: new URL('https://ta14exchange.com'),
   title: {
     default: 'TA-14 Authority Governance Institution',
     template: '%s | TA-14 Authority Governance Institution',
