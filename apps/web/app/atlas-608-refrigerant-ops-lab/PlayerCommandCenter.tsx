@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { getArcadeSupabase } from "../../lib/arcade-supabase";
 
 type Leader = {
@@ -19,8 +19,8 @@ export default function PlayerCommandCenter(){
  const [user,setUser]=useState<User|null>(null),[leaders,setLeaders]=useState<Leader[]>([]);
  const [email,setEmail]=useState(""),[password,setPassword]=useState(""),[name,setName]=useState("");
  const [status,setStatus]=useState(supabase?"SIGN IN TO RECORD COMPETITIVE RUNS":"PLAYER NETWORK AWAITING DEPLOYMENT CONFIG");
- useEffect(()=>{if(!supabase)return;supabase.auth.getUser().then(({data})=>setUser(data.user));const {data:listener}=supabase.auth.onAuthStateChange((_event,session)=>setUser(session?.user??null));return()=>listener.subscription.unsubscribe()},[supabase]);
- useEffect(()=>{if(!supabase)return;supabase.from("arcade_leaderboard").select("user_id,display_name,best_score,games_played,questions_answered,correct_answers,best_streak").eq("arcade_key","epa-608").order("best_score",{ascending:false}).limit(25).then(({data})=>setLeaders((data??[]) as Leader[]))},[supabase,user]);
+ useEffect(()=>{if(!supabase)return;supabase.auth.getUser().then(({data}:{data:{user:User|null}})=>setUser(data.user));const {data:listener}=supabase.auth.onAuthStateChange((_event:AuthChangeEvent,session:Session|null)=>setUser(session?.user??null));return()=>listener.subscription.unsubscribe()},[supabase]);
+ useEffect(()=>{if(!supabase)return;supabase.from("arcade_leaderboard").select("user_id,display_name,best_score,games_played,questions_answered,correct_answers,best_streak").eq("arcade_key","epa-608").order("best_score",{ascending:false}).limit(25).then(({data}:{data:unknown[]|null})=>setLeaders((data??[]) as Leader[]))},[supabase,user]);
  async function signIn(){if(!supabase)return;const {error}=await supabase.auth.signInWithPassword({email,password});setStatus(error?error.message:"WELCOME BACK — COMPETITIVE RECORDING ACTIVE")}
  async function signUp(){if(!supabase)return;if(name.trim().length<2){setStatus("ENTER A PLAYER NAME");return}const {data,error}=await supabase.auth.signUp({email,password});if(error){setStatus(error.message);return}if(data.user){await supabase.from("arcade_profiles").upsert({user_id:data.user.id,display_name:name.trim(),last_seen_at:new Date().toISOString()})}setStatus(data.session?"PLAYER CREATED — COMPETITIVE RECORDING ACTIVE":"CHECK YOUR EMAIL TO CONFIRM YOUR PLAYER ACCOUNT")}
  async function signOut(){if(!supabase)return;await supabase.auth.signOut();setStatus("SIGNED OUT — PRACTICE REMAINS AVAILABLE")}
