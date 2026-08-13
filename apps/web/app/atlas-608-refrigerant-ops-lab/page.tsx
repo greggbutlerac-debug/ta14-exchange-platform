@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { ARCADE_608_BANK } from "./question-bank";
 import ArcadePressureLayer,{stageForQuestion,stageMeta} from "./ArcadePressureLayer";
+import PlayerCommandCenter from "./PlayerCommandCenter";
 
 type WorldKey="core"|"type1"|"type2"|"type3"|"transition"|"universal";
 const WORLDS=[
@@ -42,6 +43,7 @@ export default function RefrigerantOps(){
  <div className="layout"><aside className="panel left"><div className="title">SELECT TRAINING WORLD</div><div className="worlds">{WORLDS.map(w=><button key={w.key} onClick={()=>select(w.key)} className={`world ${world===w.key?"active":""}`}><span>{w.icon}</span><div><b>{w.title}</b><small>{w.sub}</small><small>{loaded(w.key)} / {w.target} loaded</small></div></button>)}</div><div className="sideCard"><b>COMPETITIVE RULE</b><p>Knowledge wins first. A more accurate run always outranks a less accurate run. When accuracy ties, the faster completion time wins.</p></div></aside>
  <section className="panel stage"><span className="badge">{currentWorld.title} // {run.name} // {runQuestion} OF 25</span><span className="badge bucket">{q.bucket} • LEVEL {q.level}{q.critical?" • CRITICAL":""}</span><h2>{q.prompt}</h2><div className="evidence"><b>TESTED RULE / EVIDENCE BOUNDARY</b>{q.lesson}. Read every choice. Answer length is not a clue.</div>{run.help?<button className="studyBtn" onClick={()=>setStudying(true)}>📘 FIELD GUIDE — CLOCK KEEPS RUNNING</button>:<div className="sideCard"><b>⚡ ASSISTANCE OFFLINE</b><br/>{run.name} is proving retention under pressure.</div>}<div className="answers">{q.choices.map((a,i)=><button className="answer" onClick={()=>choose(i)} key={`${q.id}-${i}`}><b>{String.fromCharCode(65+i)}.</b>{a}</button>)}</div><div className="msg">{msg}</div></section>
  <aside className="panel right"><div className="title">PLAYER RUN DATA</div><div className="sideCard"><b>RACE CLOCK</b><p style={{fontSize:30,color:"#ffd363",margin:"4px 0"}}>{time}</p><span>Counts upward. Faster time wins only when accuracy is tied.</span></div><div className="sideCard"><b>LIVE PERFORMANCE</b><p>Correct: {Math.max(0,campaignQuestion-1-miss)}<br/>Misses: {miss}<br/>Accuracy: {accuracy}%<br/>Streak: {streak}x<br/>Score: {score.toLocaleString()}</p></div><div className="sideCard"><b>LEADERBOARD ORDER</b><p>1. Accuracy<br/>2. Completion time<br/>3. XP / score<br/>4. Best streak</p></div><div className="sideCard"><b>QUESTION BANK</b><p>{loaded(world)} questions currently loaded for this world.</p></div></aside></div>
+ <PlayerCommandCenter />
  <div className="runDock"><div className="runDockTop"><strong>RUN STATUS</strong><span>{run.name} • Q{runQuestion}/25</span></div><div className="stageRail">{([1,2,3,4] as const).map(s=><div key={s} className={`stageNode ${s===stage?"on":s<stage?"done":""}`}>RUN {s}<br/>{s*25}</div>)}</div><div className="raceRule">ACCURACY FIRST • SPEED BREAKS TIES</div></div>
  <footer className="foot">TA-14 Academy HVACDR readiness training • Not EPA certification • Competitive timing rewards correct knowledge before speed • TA14Exchange.com</footer></main>
 }
