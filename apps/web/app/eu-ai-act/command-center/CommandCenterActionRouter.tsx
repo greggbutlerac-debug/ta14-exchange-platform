@@ -38,12 +38,12 @@ function AtlasPrompt(){
  const[question,setQuestion]=useState('');const[answer,setAnswer]=useState('');
  const placeholder=useMemo(()=> 'Ask about Article 50, evidence gaps, revalidation, oversight, source changes, or the active System Passport…',[]);
  function submit(e:React.FormEvent){e.preventDefault();const q=question.trim();if(!q)return;setAnswer(governedAnswer(q))}
- return <div style={{width:'100%'}}>
+ return <div style={{width:'100%'}} data-atlas-command-center="interactive">
   <form onSubmit={submit} style={{display:'grid',gridTemplateColumns:'1fr auto',gap:10}}>
    <input aria-label="Ask Atlas about the governed record" value={question} onChange={e=>setQuestion(e.target.value)} placeholder={placeholder} style={{minWidth:0,padding:'15px 16px',border:'1px solid #37617a',background:'#030a11',color:'#eef7ff',fontSize:14,outline:'none'}}/>
    <button type="submit" disabled={!question.trim()} style={{padding:'12px 16px',border:'1px solid #5fdcf7',background:question.trim()?'#0a2634':'#07131d',color:'#bcecff',fontSize:9,fontWeight:900,cursor:question.trim()?'pointer':'not-allowed'}}>ASK ATLAS →</button>
   </form>
-  <div style={{marginTop:8,color:'#6f8ea2',fontSize:9}}>Atlas stays inside this Command Center and reasons only over the governed record visible here.</div>
+  <div style={{marginTop:8,color:'#6f8ea2',fontSize:9}}>Atlas stays in this Command Center and reasons only over the governed record visible here.</div>
   {answer&&<div role="status" style={{marginTop:14,padding:'15px 16px',border:'1px solid #28536b',background:'#06131e',color:'#cfe7f2',fontSize:12,lineHeight:1.65}}><b style={{display:'block',marginBottom:7,color:'#70e2f8',fontSize:9,letterSpacing:'.12em'}}>ATLAS · GOVERNED RECORD RESPONSE</b>{answer}</div>}
  </div>
 }
@@ -51,8 +51,19 @@ function AtlasPrompt(){
 export default function CommandCenterActionRouter(){
   const router=useRouter();const[target,setTarget]=useState<HTMLElement|null>(null);
   useEffect(()=>{
-    const prompt=document.querySelector('.prompt') as HTMLElement|null;
-    if(prompt){prompt.textContent='';setTarget(prompt)}
+    const mountPrompt=()=>{
+      const prompt=document.querySelector('.prompt') as HTMLElement|null;
+      if(prompt){prompt.textContent='';setTarget(prompt);return true}
+      return false;
+    };
+    if(!mountPrompt()){
+      const observer=new MutationObserver(()=>{if(mountPrompt())observer.disconnect()});
+      observer.observe(document.body,{childList:true,subtree:true});
+      const timeout=window.setTimeout(()=>observer.disconnect(),5000);
+      return()=>{window.clearTimeout(timeout);observer.disconnect()};
+    }
+  },[]);
+  useEffect(()=>{
     const handler=(event:MouseEvent)=>{
       const targetEl=event.target as HTMLElement|null;
       const button=targetEl?.closest('button');
