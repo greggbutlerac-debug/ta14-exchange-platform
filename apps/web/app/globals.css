@@ -138,6 +138,245 @@ select {
   transform: translateY(0);
 }
 
+/* TA-14 governed-world portal polish. Intentionally scoped to Worlds 01-04. */
+.worldDeck .worldGrid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 18px !important;
+  align-items: stretch !important;
+  perspective: 1400px;
+}
+
+.worldDeck .worldCard {
+  position: relative !important;
+  display: flex !important;
+  min-height: 390px !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  overflow: hidden !important;
+  padding: 28px 26px 24px !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 22px !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.018) 42%, rgba(0,0,0,.23)),
+    radial-gradient(circle at 20% 0%, rgba(255,255,255,.08), transparent 42%),
+    rgba(5, 10, 22, .78) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.12),
+    inset 0 -1px 0 rgba(255,255,255,.035),
+    0 24px 64px rgba(0,0,0,.32) !important;
+  color: #f7fbff !important;
+  text-decoration: none !important;
+  backdrop-filter: blur(18px) saturate(118%);
+  -webkit-backdrop-filter: blur(18px) saturate(118%);
+  transform: translateY(0) rotateX(0) !important;
+  transition: transform .32s ease, border-color .32s ease, box-shadow .32s ease, background .32s ease !important;
+  isolation: isolate;
+}
+
+.worldDeck .worldCard::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  opacity: .72;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% -12%, var(--world-glow, rgba(104,169,255,.28)), transparent 48%);
+}
+
+.worldDeck .worldCard::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: .55;
+  background:
+    linear-gradient(115deg, transparent 0 37%, rgba(255,255,255,.10) 48%, transparent 60% 100%);
+  transform: translateX(-68%);
+  transition: transform .65s ease, opacity .32s ease;
+}
+
+.worldDeck .worldCard:hover {
+  transform: translateY(-9px) rotateX(1.4deg) !important;
+  border-color: var(--world-edge, rgba(132,190,255,.72)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.18),
+    0 30px 84px rgba(0,0,0,.45),
+    0 0 42px var(--world-shadow, rgba(75,143,255,.16)) !important;
+}
+
+.worldDeck .worldCard:hover::after {
+  transform: translateX(62%);
+  opacity: .8;
+}
+
+.worldDeck .worldCard.blue {
+  --world-edge: rgba(91, 173, 255, .82);
+  --world-glow: rgba(53, 144, 255, .34);
+  --world-shadow: rgba(37, 132, 255, .20);
+  --world-accent: #9ed5ff;
+}
+
+.worldDeck .worldCard.violet {
+  --world-edge: rgba(188, 139, 255, .82);
+  --world-glow: rgba(137, 79, 255, .32);
+  --world-shadow: rgba(123, 63, 226, .19);
+  --world-accent: #d6b8ff;
+}
+
+.worldDeck .worldCard.green {
+  --world-edge: rgba(91, 225, 177, .78);
+  --world-glow: rgba(44, 190, 137, .28);
+  --world-shadow: rgba(37, 178, 126, .17);
+  --world-accent: #9cf0cc;
+}
+
+.worldDeck .worldCard.amber {
+  --world-edge: rgba(239, 188, 99, .82);
+  --world-glow: rgba(219, 143, 44, .28);
+  --world-shadow: rgba(210, 132, 31, .17);
+  --world-accent: #f7cf8a;
+}
+
+.worldDeck .worldCard .worldOrb {
+  position: relative !important;
+  display: grid !important;
+  width: 92px !important;
+  height: 92px !important;
+  margin: 0 0 24px !important;
+  place-items: center !important;
+  border: 1px solid var(--world-edge, rgba(132,190,255,.58)) !important;
+  border-radius: 50% !important;
+  background:
+    radial-gradient(circle at 35% 27%, rgba(255,255,255,.28), transparent 17%),
+    radial-gradient(circle at 50% 62%, var(--world-glow, rgba(72,145,255,.36)), rgba(3,9,21,.92) 62%) !important;
+  box-shadow:
+    inset 0 0 24px rgba(255,255,255,.06),
+    0 0 0 8px rgba(255,255,255,.018),
+    0 0 34px var(--world-shadow, rgba(69,139,255,.20)) !important;
+  color: #fff !important;
+}
+
+.worldDeck .worldCard .worldOrb::before,
+.worldDeck .worldCard .worldOrb::after {
+  content: "";
+  position: absolute;
+  inset: -8px;
+  border: 1px solid color-mix(in srgb, var(--world-edge, #7bb8ff) 44%, transparent);
+  border-radius: 50%;
+  opacity: .38;
+}
+
+.worldDeck .worldCard .worldOrb::after {
+  inset: -15px 7px;
+  transform: rotate(58deg);
+  opacity: .22;
+}
+
+.worldDeck .worldCard .worldOrb span {
+  position: relative;
+  z-index: 2;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: .08em !important;
+  color: #fff !important;
+  text-shadow: 0 2px 15px rgba(0,0,0,.75);
+}
+
+.worldDeck .worldCard .worldLabel {
+  display: inline-flex !important;
+  margin: 0 0 12px !important;
+  padding: 7px 10px !important;
+  border: 1px solid color-mix(in srgb, var(--world-edge, #8dbfff) 42%, transparent) !important;
+  border-radius: 999px !important;
+  color: var(--world-accent, #a9d4ff) !important;
+  background: rgba(3,8,18,.45) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  letter-spacing: .16em !important;
+  line-height: 1 !important;
+  text-decoration: none !important;
+}
+
+.worldDeck .worldCard h2 {
+  margin: 0 0 14px !important;
+  color: #f9fbff !important;
+  font-family: Georgia, "Times New Roman", serif !important;
+  font-size: clamp(22px, 1.65vw, 31px) !important;
+  font-weight: 700 !important;
+  letter-spacing: -.02em !important;
+  line-height: 1.02 !important;
+  text-decoration: none !important;
+  text-wrap: balance;
+}
+
+.worldDeck .worldCard p {
+  margin: 0 0 26px !important;
+  color: rgba(231, 239, 249, .82) !important;
+  font-size: 14px !important;
+  line-height: 1.62 !important;
+  text-decoration: none !important;
+}
+
+.worldDeck .worldCard > strong {
+  display: inline-flex !important;
+  min-height: 42px !important;
+  margin-top: auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 0 15px !important;
+  border: 1px solid color-mix(in srgb, var(--world-edge, #8dbfff) 55%, transparent) !important;
+  border-radius: 999px !important;
+  color: #fff !important;
+  background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.025)) !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.08) !important;
+  font-size: 11px !important;
+  font-weight: 850 !important;
+  letter-spacing: .12em !important;
+  text-decoration: none !important;
+  transition: background .25s ease, border-color .25s ease, transform .25s ease !important;
+}
+
+.worldDeck .worldCard:hover > strong {
+  border-color: var(--world-edge, #8dbfff) !important;
+  background: color-mix(in srgb, var(--world-glow, #397eff) 35%, rgba(255,255,255,.07)) !important;
+  transform: translateX(3px);
+}
+
+.worldDeck .worldCard > strong b {
+  color: var(--world-accent, #a9d4ff) !important;
+  font-size: 16px !important;
+  transition: transform .25s ease;
+}
+
+.worldDeck .worldCard:hover > strong b {
+  transform: translateX(3px);
+}
+
+@media (max-width: 1180px) {
+  .worldDeck .worldGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 680px) {
+  .worldDeck .worldGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .worldDeck .worldCard {
+    min-height: 330px !important;
+    padding: 24px 22px 22px !important;
+  }
+
+  .worldDeck .worldCard .worldOrb {
+    width: 78px !important;
+    height: 78px !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
