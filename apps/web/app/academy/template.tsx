@@ -5,124 +5,107 @@ export default function AcademyTemplate({ children }: { children: ReactNode }) {
   return (
     <>
       {children}
-      <aside className="academyArcadeLaunch" aria-label="TA-14 Academy HVACDR Arcade launch">
-        <div className="academyArcadePulse" />
-        <div className="academyArcadeCopy">
-          <small>TA-14 ACADEMY // HVACDR ARCADE</small>
-          <strong>EPA 608 REFRIGERANT OPS</strong>
-          <span>Enter the playable training universe.</span>
-        </div>
-        <Link href="/atlas-608-refrigerant-ops-lab/campaign">ENTER ARCADE ⚡</Link>
+      <aside className="academyHvacDoor" aria-label="Open TA-14 Academy HVAC world">
+        <Link href="/academy/hvac" aria-label="Open HVAC">
+          <span className="academyHvacMark">HVAC</span>
+          <span className="academyHvacArrow">→</span>
+        </Link>
       </aside>
       <style>{`
-        .academyArcadeLaunch {
+        .academyHvacDoor {
           position: fixed;
-          right: 24px;
-          bottom: 24px;
+          left: 18px;
+          top: 50%;
           z-index: 96;
-          width: min(410px, calc(100vw - 34px));
-          display: grid;
-          grid-template-columns: 16px minmax(0, 1fr) auto;
+          transform: translateY(-50%);
+        }
+        .academyHvacDoor a {
+          width: 76px;
+          min-height: 176px;
+          display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 13px;
-          padding: 13px 14px;
-          border: 1px solid rgba(61, 233, 255, .58);
-          border-radius: 16px;
+          justify-content: space-between;
+          gap: 18px;
+          padding: 18px 10px 14px;
+          border: 1px solid rgba(61, 233, 255, .54);
+          border-radius: 17px;
           color: #effcff;
           background:
-            radial-gradient(circle at 0 50%, rgba(76,255,157,.13), transparent 28%),
-            linear-gradient(135deg, rgba(4,22,34,.97), rgba(3,13,22,.97));
+            radial-gradient(circle at 50% 0, rgba(76,255,157,.14), transparent 36%),
+            linear-gradient(180deg, rgba(4,22,34,.97), rgba(3,13,22,.98));
           box-shadow:
-            0 22px 70px rgba(0,0,0,.52),
-            0 0 36px rgba(47,220,255,.16),
+            0 22px 70px rgba(0,0,0,.5),
+            0 0 32px rgba(47,220,255,.14),
             inset 0 1px 0 rgba(255,255,255,.07);
           backdrop-filter: blur(18px);
+          text-decoration: none;
           overflow: hidden;
+          transition: 170ms ease;
         }
-        .academyArcadeLaunch::before {
+        .academyHvacDoor a::before {
           position: absolute;
           inset: 0;
           content: "";
           pointer-events: none;
-          background: linear-gradient(105deg, transparent 30%, rgba(255,255,255,.07), transparent 67%);
-          transform: translateX(-120%);
-          animation: academyArcadeSweep 5.2s linear infinite;
+          border-radius: inherit;
+          background: linear-gradient(180deg, transparent 24%, rgba(255,255,255,.06), transparent 62%);
+          transform: translateY(-120%);
+          transition: 350ms ease;
         }
-        .academyArcadePulse {
-          width: 11px;
-          height: 11px;
-          border-radius: 50%;
-          background: #53ff9b;
-          box-shadow: 0 0 11px #53ff9b, 0 0 28px rgba(61,255,155,.6);
-          animation: academyArcadePulse 1.6s ease-in-out infinite;
-        }
-        .academyArcadeCopy {
-          min-width: 0;
-          display: grid;
-          gap: 2px;
-        }
-        .academyArcadeCopy small {
-          color: #5deaff;
-          font-size: .58rem;
-          font-weight: 950;
-          letter-spacing: .15em;
-        }
-        .academyArcadeCopy strong {
-          font-size: .78rem;
-          letter-spacing: .04em;
-        }
-        .academyArcadeCopy span {
-          color: #8eaabb;
-          font-size: .66rem;
-        }
-        .academyArcadeLaunch a {
-          position: relative;
-          z-index: 1;
-          min-height: 39px;
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          padding: 0 13px;
-          border: 1px solid rgba(73,255,155,.68);
-          border-radius: 11px;
-          color: #caffdc;
-          background: linear-gradient(180deg, rgba(10,69,43,.92), rgba(5,37,26,.95));
-          box-shadow: 0 0 24px rgba(68,255,146,.13);
-          text-decoration: none;
-          font-size: .63rem;
-          font-weight: 950;
-          letter-spacing: .07em;
-          white-space: nowrap;
-          transition: 160ms ease;
-        }
-        .academyArcadeLaunch a:hover,
-        .academyArcadeLaunch a:focus-visible {
-          color: #fff;
-          border-color: #66ffa7;
-          box-shadow: 0 0 36px rgba(68,255,146,.3);
+        .academyHvacDoor a:hover,
+        .academyHvacDoor a:focus-visible {
+          border-color: #63efff;
+          box-shadow: 0 24px 80px rgba(0,0,0,.56), 0 0 42px rgba(47,220,255,.25);
           outline: none;
-          transform: translateY(-2px);
+          transform: translateX(3px);
         }
-        @keyframes academyArcadeSweep {
-          42%, 100% { transform: translateX(120%); }
+        .academyHvacDoor a:hover::before,
+        .academyHvacDoor a:focus-visible::before { transform: translateY(120%); }
+        .academyHvacMark {
+          writing-mode: vertical-rl;
+          transform: rotate(180deg);
+          font-size: .82rem;
+          font-weight: 950;
+          letter-spacing: .2em;
+          color: #dffaff;
         }
-        @keyframes academyArcadePulse {
-          50% { transform: scale(1.35); opacity: .62; }
+        .academyHvacArrow {
+          width: 36px;
+          height: 36px;
+          display: grid;
+          place-items: center;
+          border: 1px solid rgba(73,255,155,.54);
+          border-radius: 50%;
+          color: #69ffad;
+          background: rgba(13,80,51,.28);
+          font-size: 1rem;
+          font-weight: 950;
         }
         @media (max-width: 720px) {
-          .academyArcadeLaunch {
-            right: 12px;
+          .academyHvacDoor {
+            left: 10px;
+            top: auto;
             bottom: 12px;
-            grid-template-columns: 12px minmax(0,1fr);
+            transform: none;
           }
-          .academyArcadeLaunch a {
-            grid-column: 1 / -1;
-            width: 100%;
+          .academyHvacDoor a {
+            width: auto;
+            min-height: 48px;
+            flex-direction: row;
+            padding: 7px 8px 7px 14px;
+            border-radius: 14px;
           }
+          .academyHvacMark {
+            writing-mode: horizontal-tb;
+            transform: none;
+            font-size: .72rem;
+          }
+          .academyHvacArrow { width: 34px; height: 34px; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .academyArcadeLaunch::before,
-          .academyArcadePulse { animation: none; }
+          .academyHvacDoor a,
+          .academyHvacDoor a::before { transition: none; }
         }
       `}</style>
     </>
