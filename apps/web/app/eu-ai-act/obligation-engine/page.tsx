@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
+import {Suspense,useEffect,useMemo,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
-import {useEffect,useMemo,useState} from 'react';
 import GovernedSystemContextBar from '../components/GovernedSystemContextBar';
 import {createObligation,listObligations,updateObligationState,type EuAiObligation,type ObligationState} from '@/lib/eu-ai-act/obligations';
 
@@ -13,7 +13,10 @@ const templates:Omit<EuAiObligation,'id'|'systemId'|'updated'>[]=[
 {key:'OB-CHANGE',source:'TA-14 CONTROL',title:'Material-change revalidation',actor:'INTERNAL GOVERNANCE',state:'REVALIDATE',reason:'A change can weaken prior reliance without changing the historical truth of the prior record.',evidence:['Change record','Impact trace','Prior determination','Revalidation outcome'],dependencies:['System version','Evidence version','Regulatory source version'],trigger:'Any material system, evidence, authority or source change',owner:'Governance'}
 ];
 function badge(v:string){return v.toLowerCase().replaceAll(' ','-')}
-export default function ObligationEngine(){
+
+export default function ObligationEnginePage(){return <Suspense fallback={<div className="status">Loading institutional obligation ledger…</div>}><ObligationEngine/></Suspense>}
+
+function ObligationEngine(){
  const search=useSearchParams();const systemId=search.get('system');
  const [rows,setRows]=useState<EuAiObligation[]>([]);const [selected,setSelected]=useState(0);const [loading,setLoading]=useState(true);const [error,setError]=useState('');const [saving,setSaving]=useState(false);
  useEffect(()=>{let live=true;(async()=>{if(!systemId){setRows([]);setLoading(false);return}setLoading(true);setError('');try{let data=await listObligations(systemId);if(!data.length){data=[];for(const t of templates)data.push(await createObligation(systemId,t))}if(live){setRows(data);setSelected(0)}}catch(e){if(live)setError(e instanceof Error?e.message:'Unable to load obligation ledger.')}finally{if(live)setLoading(false)}})();return()=>{live=false}},[systemId]);
