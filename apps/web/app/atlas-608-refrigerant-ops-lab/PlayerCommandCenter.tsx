@@ -113,12 +113,13 @@ export default function PlayerCommandCenter() {
     }
 
     let cancelled = false;
+    const userId = user.id;
 
     async function loadPlayerHistory() {
       const recentQuery = supabase
         .from("arcade_runs")
         .select("id,world_key,score,questions_answered,correct_answers,misses,best_streak,duration_seconds,completed,created_at")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("arcade_key", "epa-608")
         .eq("completed", true)
         .order("created_at", { ascending: false })
@@ -127,14 +128,14 @@ export default function PlayerCommandCenter() {
       const countQuery = supabase
         .from("arcade_runs")
         .select("id", { count: "exact", head: true })
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("arcade_key", "epa-608")
         .eq("completed", true);
 
       const bestScoreQuery = supabase
         .from("arcade_runs")
         .select("score")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("arcade_key", "epa-608")
         .eq("completed", true)
         .order("score", { ascending: false })
@@ -143,7 +144,7 @@ export default function PlayerCommandCenter() {
       const bestStreakQuery = supabase
         .from("arcade_runs")
         .select("best_streak")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("arcade_key", "epa-608")
         .eq("completed", true)
         .order("best_streak", { ascending: false })
@@ -152,7 +153,7 @@ export default function PlayerCommandCenter() {
       const fastestQuery = supabase
         .from("arcade_runs")
         .select("duration_seconds")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("arcade_key", "epa-608")
         .eq("completed", true)
         .gt("duration_seconds", 0)
@@ -162,7 +163,7 @@ export default function PlayerCommandCenter() {
       const criticalQuery = supabase
         .from("arcade_critical_events")
         .select("id,world_key,question_id,bucket,lesson,original_why,status,remediation_attempts,locked_at,cleared_at")
-        .eq("user_id", user.id)
+        .eq("user_id", userId)
         .eq("arcade_key", "epa-608")
         .order("locked_at", { ascending: false })
         .limit(25);
