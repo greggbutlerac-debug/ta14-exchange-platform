@@ -22,7 +22,10 @@ const andeksExaminationHref = '/artifacts/ta14-andeks-ie-2026-001';
 const andeksResponseHref = '/artifacts/ta14-andeks-ie-2026-001/independent-response';
 const reviewsResponsesHref = '/workspace/ai-governance/reviews';
 const artifactsHref = '/artifacts';
-const euAiActHref = '/workspace/ai-governance/eu-ai-act';
+const euAiActHref = '/eu-ai-act';
+const euAiActCommandCenterHref = '/eu-ai-act/command-center';
+const euAiActClassifierHref = '/eu-ai-act/classifier';
+const euAiActAccessHref = '/eu-ai-act/commercial';
 const governanceLibraryHref = '/workspace/ai-governance/library';
 const institutionalAuthorityHref = '/workspace/ai-governance/institutional-authority/registration-package';
 const institutionalAuthorityPrefix = '/workspace/ai-governance/institutional-authority';
@@ -40,7 +43,7 @@ const workspaceNavigation: NavigationItem[] = [
   { href: interoperabilityExaminationsHref, label: 'Interoperability Examinations', glyph: 'IE', matchPrefixes: [interoperabilityExaminationsHref, andeksExaminationHref], institutional: true },
   { href: reviewsResponsesHref, label: 'Reviews & Responses', glyph: 'RR', matchPrefixes: [reviewsResponsesHref] },
   { href: artifactsHref, label: 'Artifact Registry', glyph: 'AR', matchPrefixes: [artifactsHref], institutional: true },
-  { href: euAiActHref, label: 'EU AI Act', glyph: 'EU', matchPrefixes: [euAiActHref] },
+  { href: euAiActHref, label: 'EU AI Act · World 05', glyph: '05', matchPrefixes: ['/eu-ai-act'] },
   { href: governanceLibraryHref, label: 'Governance Library', glyph: 'L', matchPrefixes: [governanceLibraryHref] },
   { href: institutionalAuthorityHref, label: 'Institutional Authority', glyph: 'IA', matchPrefixes: [institutionalAuthorityPrefix], institutional: true },
   { href: registryHref, label: 'Registry', glyph: 'RG', matchPrefixes: [registryHref] },
@@ -55,6 +58,7 @@ const mobileLabels = new Set([
   'Mission Control',
   'AI Governance Home',
   'Playground',
+  'EU AI Act · World 05',
   'Founding Demonstrations',
   'Interoperability Examinations',
   'Reviews & Responses',
@@ -101,6 +105,21 @@ export function AiGovernanceNavigation() {
             })}
           </nav>
         </section>
+
+        <article className="ta14-sidebar-note">
+          <small>Governed World 05 · EU AI Act</small>
+          <strong>Move from the playground into the operating environment.</strong>
+          <p>
+            Use the AI Governance Playground to explore a route, then carry the work into World 05 for persistent System Passports, governed classification, obligation mapping, evidence state, change tracking, revalidation, and controlled examination.
+          </p>
+          <Link href={euAiActHref}>Enter EU AI Act World 05 →</Link>
+          <br />
+          <Link href={euAiActClassifierHref}>Classify a system →</Link>
+          <br />
+          <Link href={euAiActCommandCenterHref}>Open Command Center →</Link>
+          <br />
+          <Link href={euAiActAccessHref}>View access & pricing →</Link>
+        </article>
 
         <article className="ta14-sidebar-note">
           <small>Pre-Registration Institutional Due Diligence</small>
