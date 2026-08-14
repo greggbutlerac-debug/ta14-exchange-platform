@@ -1,10 +1,11 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 type RouteStatus = "PUBLISHED" | "DRAFT" | "UNDER_REVIEW";
 type Decision = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
+type StageState = "PRESENT" | "PRESSURE" | "UNKNOWN";
 
 type ExchangeRoute = {
   id: string;
@@ -20,447 +21,80 @@ type ExchangeRoute = {
   tests: number;
   updated: string;
   tags: string[];
+  lineage: string[];
+  pressure: string[];
   chain: Record<string, string>;
 };
 
-const stages = [
-  "Reality",
-  "Record",
-  "Continuity",
-  "Admissibility",
-  "Binding",
-  "Commit",
-  "Execution",
-  "Outcome",
-];
+const stages = ["Reality","Record","Continuity","Admissibility","Binding","Commit","Execution","Outcome"];
 
 const seedRoutes: ExchangeRoute[] = [
-  {
-    id: "vendor-payment-v3",
-    title: "High-Value Vendor Payment",
-    domain: "Finance",
-    summary:
-      "A consequence-bearing payment route requiring authority, beneficiary, destination, and settlement correspondence before closure.",
-    author: "TA-14 Authority",
-    version: "3.0.0",
-    status: "PUBLISHED",
-    decision: "ALLOW",
-    score: 100,
-    forks: 18,
-    tests: 243,
-    updated: "2026-07-17",
-    tags: ["payment", "authority", "beneficiary", "settlement"],
-    chain: {
-      Reality: "Invoice, purchase order, supplier identity, and payment request exist.",
-      Record: "Canonical request and evidence package are preserved.",
-      Continuity: "Evidence origin, transformations, and versions are traceable.",
-      Admissibility: "Required evidence and policy thresholds are satisfied.",
-      Binding: "Actor, authority, beneficiary, amount, and destination are bound.",
-      Commit: "The admitted route is hashed and committed before execution.",
-      Execution: "The payment instruction matches the committed route.",
-      Outcome: "Settlement receipt confirms amount, account, and completion.",
-    },
-  },
-  {
-    id: "ai-agent-refund-v1",
-    title: "AI Agent Customer Refund",
-    domain: "AI Governance",
-    summary:
-      "A bounded route for an AI agent proposing and issuing refunds within verified policy, identity, and amount limits.",
-    author: "TA-14 Exchange Lab",
-    version: "1.2.0",
-    status: "UNDER_REVIEW",
-    decision: "HOLD",
-    score: 81,
-    forks: 7,
-    tests: 96,
-    updated: "2026-07-16",
-    tags: ["agent", "refund", "customer", "runtime"],
-    chain: {
-      Reality: "Customer account, order, complaint, and proposed refund exist.",
-      Record: "Conversation, order state, and refund proposal are recorded.",
-      Continuity: "Order and customer records are linked to their source systems.",
-      Admissibility: "Policy threshold is present; temporal validity remains unresolved.",
-      Binding: "Agent identity and customer account are bound.",
-      Commit: "Pending renewed admissibility before commit.",
-      Execution: "UNKNOWN",
-      Outcome: "UNKNOWN",
-    },
-  },
-  {
-    id: "hvac-refrigerant-intervention-v2",
-    title: "Refrigerant Intervention Threshold",
-    domain: "HVAC",
-    summary:
-      "A field-governance route that prevents refrigerant intervention until non-invasive evidence supports the action.",
-    author: "Transparent Air",
-    version: "2.4.1",
-    status: "PUBLISHED",
-    decision: "ALLOW",
-    score: 96,
-    forks: 12,
-    tests: 174,
-    updated: "2026-07-14",
-    tags: ["hvac", "refrigerant", "field-evidence", "threshold"],
-    chain: {
-      Reality: "Operating conditions and system state are observed in the field.",
-      Record: "Measurements, video, equipment identity, and environmental state are preserved.",
-      Continuity: "Probe, technician, location, and measurement continuity are maintained.",
-      Admissibility: "Non-invasive entry threshold is satisfied.",
-      Binding: "Technician, equipment, property, refrigerant, and intervention are bound.",
-      Commit: "The intervention route is committed before valve movement.",
-      Execution: "Measured refrigerant movement corresponds to the committed action.",
-      Outcome: "Post-intervention verification confirms system response.",
-    },
-  },
-  {
-    id: "clinical-ai-escalation-v1",
-    title: "Clinical AI Escalation Route",
-    domain: "Healthcare",
-    summary:
-      "A route that requires escalation when clinical evidence, authority, or patient-state continuity is insufficient for automated action.",
-    author: "Community Draft",
-    version: "0.8.0",
-    status: "DRAFT",
-    decision: "ESCALATE",
-    score: 68,
-    forks: 3,
-    tests: 31,
-    updated: "2026-07-11",
-    tags: ["clinical", "patient", "escalation", "ai"],
-    chain: {
-      Reality: "Patient state and proposed clinical action are described.",
-      Record: "Clinical observations are partially recorded.",
-      Continuity: "Source-system continuity is incomplete.",
-      Admissibility: "Required clinician review is absent.",
-      Binding: "Patient identity is present; authority binding is unresolved.",
-      Commit: "UNKNOWN",
-      Execution: "UNKNOWN",
-      Outcome: "UNKNOWN",
-    },
-  },
+  {id:"vendor-payment-v3",title:"High-Value Vendor Payment",domain:"Finance",summary:"A consequence-bearing payment route requiring authority, beneficiary, destination, and settlement correspondence before closure.",author:"TA-14 Authority",version:"3.0.0",status:"PUBLISHED",decision:"ALLOW",score:100,forks:18,tests:243,updated:"2026-07-17",tags:["payment","authority","beneficiary","settlement"],lineage:["v1.0 created","v2.1 authority binding expanded","v3.0 settlement correspondence added"],pressure:["beneficiary substitution","authority expiry","destination mismatch"],chain:{Reality:"Invoice, purchase order, supplier identity, and payment request exist.",Record:"Canonical request and evidence package are preserved.",Continuity:"Evidence origin, transformations, and versions are traceable.",Admissibility:"Required evidence and policy thresholds are satisfied.",Binding:"Actor, authority, beneficiary, amount, and destination are bound.",Commit:"The admitted route is hashed and committed before execution.",Execution:"The payment instruction matches the committed route.",Outcome:"Settlement receipt confirms amount, account, and completion."}},
+  {id:"ai-agent-refund-v1",title:"AI Agent Customer Refund",domain:"AI Governance",summary:"A bounded route for an AI agent proposing and issuing refunds within verified policy, identity, and amount limits.",author:"TA-14 Exchange Lab",version:"1.2.0",status:"UNDER_REVIEW",decision:"HOLD",score:81,forks:7,tests:96,updated:"2026-07-16",tags:["agent","refund","customer","runtime"],lineage:["v1.0 route drafted","v1.1 identity binding added","v1.2 temporal policy test opened"],pressure:["policy age","customer identity ambiguity","refund threshold drift"],chain:{Reality:"Customer account, order, complaint, and proposed refund exist.",Record:"Conversation, order state, and refund proposal are recorded.",Continuity:"Order and customer records are linked to their source systems.",Admissibility:"Policy threshold is present; temporal validity remains unresolved.",Binding:"Agent identity and customer account are bound.",Commit:"Pending renewed admissibility before commit.",Execution:"UNKNOWN",Outcome:"UNKNOWN"}},
+  {id:"hvac-refrigerant-intervention-v2",title:"Refrigerant Intervention Threshold",domain:"HVAC",summary:"A field-governance route that prevents refrigerant intervention until non-invasive evidence supports the action.",author:"Transparent Air",version:"2.4.1",status:"PUBLISHED",decision:"ALLOW",score:96,forks:12,tests:174,updated:"2026-07-14",tags:["hvac","refrigerant","field-evidence","threshold"],lineage:["v1.0 non-invasive threshold","v2.0 evidence continuity expanded","v2.4.1 post-intervention outcome proof"],pressure:["instrument continuity break","equipment identity mismatch","refrigerant entry before threshold"],chain:{Reality:"Operating conditions and system state are observed in the field.",Record:"Measurements, video, equipment identity, and environmental state are preserved.",Continuity:"Probe, technician, location, and measurement continuity are maintained.",Admissibility:"Non-invasive entry threshold is satisfied.",Binding:"Technician, equipment, property, refrigerant, and intervention are bound.",Commit:"The intervention route is committed before valve movement.",Execution:"Measured refrigerant movement corresponds to the committed action.",Outcome:"Post-intervention verification confirms system response."}},
+  {id:"clinical-ai-escalation-v1",title:"Clinical AI Escalation Route",domain:"Healthcare",summary:"A route that requires escalation when clinical evidence, authority, or patient-state continuity is insufficient for automated action.",author:"Community Draft",version:"0.8.0",status:"DRAFT",decision:"ESCALATE",score:68,forks:3,tests:31,updated:"2026-07-11",tags:["clinical","patient","escalation","ai"],lineage:["v0.5 clinical boundary drafted","v0.7 patient identity added","v0.8 clinician authority unresolved"],pressure:["clinician unavailable","patient-state drift","source-system continuity gap"],chain:{Reality:"Patient state and proposed clinical action are described.",Record:"Clinical observations are partially recorded.",Continuity:"Source-system continuity is incomplete.",Admissibility:"Required clinician review is absent.",Binding:"Patient identity is present; authority binding is unresolved.",Commit:"UNKNOWN",Execution:"UNKNOWN",Outcome:"UNKNOWN"}},
 ];
 
-function badgeClasses(value: string) {
-  if (value === "ALLOW" || value === "PUBLISHED") {
-    return "border-emerald-400/30 bg-emerald-400/10 text-emerald-200";
-  }
-  if (value === "HOLD" || value === "UNDER_REVIEW") {
-    return "border-amber-400/30 bg-amber-400/10 text-amber-200";
-  }
-  if (value === "DENY") {
-    return "border-rose-400/30 bg-rose-400/10 text-rose-200";
-  }
-  if (value === "ESCALATE") {
-    return "border-violet-400/30 bg-violet-400/10 text-violet-200";
-  }
+const activity = [
+  ["TEST","High-Value Vendor Payment","authority-expiry pressure run","PASS WITH BOUNDARY"],
+  ["FORK","Refrigerant Intervention Threshold","private organizational copy created","PROVENANCE PRESERVED"],
+  ["CHALLENGE","AI Agent Customer Refund","temporal policy validity questioned","OPEN"],
+  ["REVIEW","Clinical AI Escalation Route","clinician authority unresolved","ESCALATE"],
+];
+
+function badge(value:string){
+  if(value==="ALLOW"||value==="PUBLISHED"||value==="PASS WITH BOUNDARY")return "border-emerald-400/30 bg-emerald-400/10 text-emerald-200";
+  if(value==="HOLD"||value==="UNDER_REVIEW"||value==="OPEN")return "border-amber-400/30 bg-amber-400/10 text-amber-200";
+  if(value==="DENY")return "border-rose-400/30 bg-rose-400/10 text-rose-200";
+  if(value==="ESCALATE")return "border-violet-400/30 bg-violet-400/10 text-violet-200";
   return "border-slate-400/30 bg-slate-400/10 text-slate-200";
 }
+function stageState(value:string|undefined):StageState{if(!value||value==="UNKNOWN")return "UNKNOWN";if(/unresolved|incomplete|pending|absent/i.test(value))return "PRESSURE";return "PRESENT"}
 
-export default function RouteExchangePage() {
-  const [query, setQuery] = useState("");
-  const [domain, setDomain] = useState("All domains");
-  const [decision, setDecision] = useState("All decisions");
-  const [selected, setSelected] = useState<ExchangeRoute>(seedRoutes[0]);
-  const [notice, setNotice] = useState("");
+export default function RouteExchangePage(){
+  const[query,setQuery]=useState("");const[domain,setDomain]=useState("All domains");const[decision,setDecision]=useState("All decisions");const[selected,setSelected]=useState(seedRoutes[2]);const[stage,setStage]=useState("Admissibility");const[tab,setTab]=useState<"CHAIN"|"LINEAGE"|"PRESSURE">("CHAIN");const[notice,setNotice]=useState("");
+  const domains=useMemo(()=>["All domains",...Array.from(new Set(seedRoutes.map(r=>r.domain)))],[]);
+  const filtered=useMemo(()=>seedRoutes.filter(r=>{const q=query.trim().toLowerCase();return(!q||r.title.toLowerCase().includes(q)||r.summary.toLowerCase().includes(q)||r.tags.some(t=>t.includes(q)))&&(domain==="All domains"||r.domain===domain)&&(decision==="All decisions"||r.decision===decision)}),[query,domain,decision]);
+  const network=useMemo(()=>seedRoutes.reduce((a,r)=>({tests:a.tests+r.tests,forks:a.forks+r.forks}),{tests:0,forks:0}),[]);
+  function selectRoute(r:ExchangeRoute){setSelected(r);setStage("Admissibility");setTab("CHAIN");setNotice("")}
+  function packageRoute(route:ExchangeRoute){return{schema:"TA14_EXCHANGE_ROUTE_V1",exchangeRouteId:route.id,title:route.title,domain:route.domain,version:route.version,author:route.author,status:route.status,latestDecision:route.decision,readinessScore:route.score,route:route.chain,provenance:{source:"TA-14 Governance Route Exchange",relationship:"source-preserved"}}}
+  async function copyRoute(){await navigator.clipboard.writeText(JSON.stringify(packageRoute(selected),null,2));setNotice("Route package copied with source provenance preserved. A copy is not an admissible fork until retested in its new environment.")}
+  function downloadRoute(){const blob=new Blob([JSON.stringify(packageRoute(selected),null,2)],{type:"application/json"});const url=URL.createObjectURL(blob);const a=document.createElement("a");a.href=url;a.download=`${selected.id}.json`;a.click();URL.revokeObjectURL(url);setNotice("Source package exported. Export does not transfer admissibility.")}
 
-  const domains = useMemo(
-    () => ["All domains", ...Array.from(new Set(seedRoutes.map((route) => route.domain)))],
-    [],
-  );
+  return <main className="min-h-screen overflow-hidden bg-[#02050a] text-white">
+    <div className="pointer-events-none fixed inset-0 opacity-80" style={{background:"radial-gradient(circle at 75% 0%,rgba(14,92,142,.38),transparent 30%),radial-gradient(circle at 10% 60%,rgba(91,39,147,.20),transparent 26%),linear-gradient(rgba(104,214,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(104,214,255,.025) 1px,transparent 1px)",backgroundSize:"auto,auto,42px 42px,42px 42px"}}/>
+    <div className="relative z-10 mx-auto max-w-[1600px] px-5 pb-24 lg:px-10">
+      <nav className="flex min-h-20 items-center justify-between border-b border-cyan-300/15 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400"><Link href="/" className="text-cyan-200">TA-14 Authority</Link><span>Governance Route Exchange</span><div className="flex gap-5"><Link href="/workspace/scanner">Scanner</Link><Link href="/workspace/build">Build</Link></div></nav>
 
-  const filtered = useMemo(() => {
-    const normalized = query.trim().toLowerCase();
-    return seedRoutes.filter((route) => {
-      const matchesQuery =
-        !normalized ||
-        route.title.toLowerCase().includes(normalized) ||
-        route.summary.toLowerCase().includes(normalized) ||
-        route.tags.some((tag) => tag.includes(normalized));
-      const matchesDomain = domain === "All domains" || route.domain === domain;
-      const matchesDecision = decision === "All decisions" || route.decision === decision;
-      return matchesQuery && matchesDomain && matchesDecision;
-    });
-  }, [query, domain, decision]);
+      <header className="grid gap-10 py-20 xl:grid-cols-[1fr_430px] xl:items-end">
+        <div><div className="text-[10px] font-black uppercase tracking-[.28em] text-cyan-300">TA-14 Governance Route Exchange · Founding Network</div><h1 className="mt-5 max-w-6xl font-serif text-6xl leading-[.9] tracking-[-.04em] sm:text-7xl lg:text-[108px]">Governance routes should be <span className="text-cyan-200">inspectable under pressure.</span></h1><p className="mt-7 max-w-4xl text-base leading-8 text-slate-300">Discover public route packages. Inspect the chain behind the decision. See where evidence, authority, continuity, binding, commit or outcome can fail. Test a route. Preserve provenance when you fork it. Challenge what you cannot rely on.</p><div className="mt-8 flex flex-wrap gap-3"><Link href="/workspace/scanner" className="rounded-xl bg-cyan-200 px-5 py-4 text-xs font-black tracking-[.12em] text-slate-950">TEST A ROUTE →</Link><Link href="/workspace/build" className="rounded-xl border border-white/15 px-5 py-4 text-xs font-black tracking-[.12em]">BUILD A ROUTE</Link></div></div>
+        <aside className="rounded-[28px] border border-cyan-300/20 bg-cyan-300/[.04] p-7 shadow-[0_0_70px_rgba(22,147,205,.12)]"><span className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-300">Exchange principle</span><h2 className="mt-4 font-serif text-3xl">Publication is not admissibility.</h2><p className="mt-4 text-sm leading-7 text-slate-400">A route can be published, popular, tested, or forked and still fail in a new environment. Every reuse must re-establish the evidence, authority, scope, continuity and consequence conditions it depends on.</p></aside>
+      </header>
 
-  function copyRoute(route: ExchangeRoute) {
-    const payload = {
-      schema: "TA14_EXCHANGE_ROUTE_V1",
-      exchangeRouteId: route.id,
-      title: route.title,
-      domain: route.domain,
-      version: route.version,
-      author: route.author,
-      status: route.status,
-      latestDecision: route.decision,
-      readinessScore: route.score,
-      route: route.chain,
-      provenance: {
-        source: "TA-14 Exchange",
-        importedAt: new Date().toISOString(),
-        relationship: "forked-copy",
-      },
-    };
+      <section className="grid grid-cols-2 gap-2 border-y border-white/10 py-5 md:grid-cols-5">{[["FOUNDING ROUTES",seedRoutes.length],["RECORDED TESTS",network.tests],["RECORDED FORKS",network.forks],["DOMAINS",new Set(seedRoutes.map(r=>r.domain)).size],["NETWORK STATE","FOUNDING"]].map(([k,v])=><article key={String(k)} className="rounded-2xl border border-white/10 bg-white/[.025] p-5"><span className="text-[8px] font-bold tracking-[.16em] text-slate-500">{k}</span><strong className="mt-2 block font-serif text-3xl">{v}</strong></article>)}</section>
 
-    navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
-    setNotice(`Copied ${route.title} as a forkable TA14_EXCHANGE_ROUTE_V1 package.`);
-  }
+      <section className="mt-8 grid gap-3 rounded-3xl border border-white/10 bg-white/[.025] p-4 lg:grid-cols-[1fr_210px_210px]"><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search route, consequence, tag, or domain" className="rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none focus:border-cyan-300/40"/><select value={domain} onChange={e=>setDomain(e.target.value)} className="rounded-2xl border border-white/10 bg-[#07101a] px-4 py-3 text-sm">{domains.map(x=><option key={x}>{x}</option>)}</select><select value={decision} onChange={e=>setDecision(e.target.value)} className="rounded-2xl border border-white/10 bg-[#07101a] px-4 py-3 text-sm">{["All decisions","ALLOW","HOLD","DENY","ESCALATE"].map(x=><option key={x}>{x}</option>)}</select></section>
 
-  function downloadRoute(route: ExchangeRoute) {
-    const payload = {
-      schema: "TA14_EXCHANGE_ROUTE_V1",
-      exchangeRouteId: route.id,
-      title: route.title,
-      domain: route.domain,
-      version: route.version,
-      author: route.author,
-      status: route.status,
-      latestDecision: route.decision,
-      readinessScore: route.score,
-      route: route.chain,
-      provenance: {
-        source: "TA-14 Exchange",
-        exportedAt: new Date().toISOString(),
-      },
-    };
+      <section className="mt-14 grid gap-8 xl:grid-cols-[minmax(0,1fr)_560px]">
+        <div><div className="mb-5 flex items-end justify-between"><div><span className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-300">Founding route library</span><h2 className="mt-2 font-serif text-4xl">Choose a consequence-bearing route.</h2></div><span className="text-xs text-slate-500">{filtered.length} visible</span></div><div className="grid gap-4 md:grid-cols-2">{filtered.map(r=><button key={r.id} onClick={()=>selectRoute(r)} className={`group rounded-[26px] border p-6 text-left transition ${selected.id===r.id?"border-cyan-300/45 bg-cyan-300/[.07] shadow-[0_0_40px_rgba(70,205,245,.08)]":"border-white/10 bg-white/[.025] hover:border-white/20"}`}><div className="flex items-start justify-between gap-4"><div><span className="text-[9px] font-black uppercase tracking-[.16em] text-slate-500">{r.domain}</span><h3 className="mt-3 text-xl font-semibold">{r.title}</h3></div><span className={`rounded-full border px-2.5 py-1 text-[9px] font-black ${badge(r.decision)}`}>{r.decision}</span></div><p className="mt-4 min-h-[72px] text-sm leading-6 text-slate-400">{r.summary}</p><div className="mt-5 flex flex-wrap gap-2">{r.tags.slice(0,3).map(t=><span key={t} className="rounded-full border border-white/10 px-2.5 py-1 text-[10px] text-slate-500">{t}</span>)}</div><div className="mt-6 grid grid-cols-4 gap-2 border-t border-white/10 pt-5 text-center"><div><b className="block text-lg">{r.score}%</b><small className="text-[8px] text-slate-500">READINESS</small></div><div><b className="block text-lg">{r.tests}</b><small className="text-[8px] text-slate-500">TESTS</small></div><div><b className="block text-lg">{r.forks}</b><small className="text-[8px] text-slate-500">FORKS</small></div><div><b className="block text-lg">v{r.version}</b><small className="text-[8px] text-slate-500">VERSION</small></div></div></button>)}</div>{!filtered.length&&<div className="rounded-3xl border border-dashed border-white/15 p-12 text-center text-slate-500">No founding routes match those filters.</div>}</div>
 
-    const blob = new Blob([JSON.stringify(payload, null, 2)], {
-      type: "application/json",
-    });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `${route.id}.json`;
-    anchor.click();
-    URL.revokeObjectURL(url);
-    setNotice(`Downloaded ${route.title}.`);
-  }
+        <aside className="h-fit rounded-[30px] border border-cyan-300/20 bg-[#050c13] p-6 xl:sticky xl:top-6"><div className="flex items-start justify-between gap-4"><div><span className="text-[9px] font-black uppercase tracking-[.18em] text-cyan-300">Active route record</span><h2 className="mt-3 font-serif text-4xl">{selected.title}</h2><p className="mt-2 text-sm text-slate-500">{selected.author} · v{selected.version} · updated {selected.updated}</p></div><span className={`rounded-full border px-3 py-1 text-[9px] font-black ${badge(selected.status)}`}>{selected.status.replace("_"," ")}</span></div>
+          <div className="mt-6 grid grid-cols-3 gap-2"><article className="rounded-2xl border border-white/10 p-4"><small className="text-[8px] text-slate-500">DECISION</small><b className="mt-2 block">{selected.decision}</b></article><article className="rounded-2xl border border-white/10 p-4"><small className="text-[8px] text-slate-500">TESTS</small><b className="mt-2 block">{selected.tests}</b></article><article className="rounded-2xl border border-white/10 p-4"><small className="text-[8px] text-slate-500">FORKS</small><b className="mt-2 block">{selected.forks}</b></article></div>
+          <div className="mt-6 flex gap-2 border-b border-white/10 pb-3">{(["CHAIN","LINEAGE","PRESSURE"] as const).map(t=><button key={t} onClick={()=>setTab(t)} className={`rounded-lg px-3 py-2 text-[9px] font-black tracking-[.12em] ${tab===t?"bg-cyan-200 text-slate-950":"text-slate-500"}`}>{t}</button>)}</div>
+          {tab==="CHAIN"&&<div className="mt-5"><div className="grid grid-cols-4 gap-2">{stages.map((s,i)=>{const st=stageState(selected.chain[s]);return <button key={s} onClick={()=>setStage(s)} className={`rounded-xl border p-3 text-left ${stage===s?"border-cyan-300/50 bg-cyan-300/[.08]":"border-white/10"}`}><span className="text-[8px] text-slate-600">{String(i+1).padStart(2,"0")}</span><b className="mt-1 block text-[10px]">{s}</b><small className={`mt-2 block text-[8px] font-black ${st==="PRESENT"?"text-emerald-300":st==="PRESSURE"?"text-amber-300":"text-rose-300"}`}>{st}</small></button>})}</div><article className="mt-4 rounded-2xl border border-white/10 bg-black/25 p-5"><span className="text-[8px] font-black tracking-[.15em] text-cyan-300">{stage.toUpperCase()} · GOVERNED PROPOSITION</span><p className="mt-3 font-serif text-2xl leading-8">{selected.chain[stage]}</p><p className="mt-4 text-xs leading-6 text-slate-500">This statement describes the route package. It does not establish that the condition exists in a user&apos;s environment.</p></article></div>}
+          {tab==="LINEAGE"&&<div className="mt-5 space-y-3">{selected.lineage.map((x,i)=><article key={x} className="flex gap-4 rounded-2xl border border-white/10 p-4"><span className="font-serif text-2xl text-cyan-300">{String(i+1).padStart(2,"0")}</span><div><b className="text-xs">{x}</b><p className="mt-1 text-[10px] text-slate-500">Source chronology remains attached to downstream reuse.</p></div></article>)}</div>}
+          {tab==="PRESSURE"&&<div className="mt-5 space-y-3">{selected.pressure.map((x,i)=><article key={x} className="rounded-2xl border border-amber-300/15 bg-amber-300/[.035] p-4"><div className="flex justify-between"><b className="text-sm">{x}</b><span className="text-[8px] font-black text-amber-300">PRESSURE CASE {i+1}</span></div><p className="mt-2 text-xs leading-6 text-slate-500">Test whether the route still blocks, escalates, or preserves admissibility when this condition changes.</p></article>)}</div>}
+          {notice&&<div className="mt-5 rounded-xl border border-cyan-300/20 bg-cyan-300/[.06] p-4 text-xs leading-6 text-cyan-100">{notice}</div>}
+          <div className="mt-6 grid grid-cols-2 gap-2"><Link href={`/workspace/scanner?route=${selected.id}`} className="rounded-xl bg-white px-4 py-3 text-center text-[10px] font-black text-black">TEST THIS ROUTE →</Link><Link href={`/workspace/build?fork=${selected.id}`} className="rounded-xl border border-cyan-300/30 px-4 py-3 text-center text-[10px] font-black text-cyan-200">FORK INTO WORKSPACE</Link><button onClick={copyRoute} className="rounded-xl border border-white/10 px-4 py-3 text-[10px] font-black">COPY SOURCE PACKAGE</button><button onClick={downloadRoute} className="rounded-xl border border-white/10 px-4 py-3 text-[10px] font-black">EXPORT JSON</button></div>
+          <p className="mt-4 text-[10px] leading-5 text-slate-600">Forking preserves source provenance. Admissibility never travels merely because code, text, evidence labels, test counts, or prior decisions were copied.</p>
+        </aside>
+      </section>
 
-  return (
-    <main className="min-h-screen bg-[#07090d] text-white">
-      <div className="mx-auto max-w-[1500px] px-5 py-8 lg:px-10 lg:py-12">
-        <header className="mb-8 flex flex-col gap-6 border-b border-white/10 pb-8 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-3xl">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">
-              TA-14 Exchange
-            </div>
-            <h1 className="text-4xl font-semibold tracking-tight sm:text-5xl">
-              Browse, inspect, test, and fork governance routes.
-            </h1>
-            <p className="mt-4 max-w-2xl text-base leading-7 text-slate-300">
-              Exchange entries are route packages, not endorsements. Published status does not replace independent admissibility testing against the user&apos;s actual evidence, authority, environment, and consequence.
-            </p>
-          </div>
+      <section className="mt-24 border-t border-white/10 pt-16"><div className="grid gap-8 lg:grid-cols-[.8fr_1.2fr]"><div><span className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-300">Exchange activity model</span><h2 className="mt-3 font-serif text-5xl">A route should have a life, not just a page.</h2><p className="mt-5 max-w-xl text-sm leading-7 text-slate-400">Testing, forks, challenges, revisions, degraded conditions and revalidation should become first-class Exchange events. The founding routes establish the interaction model while persistent network records are built underneath it.</p></div><div className="space-y-2">{activity.map(([kind,title,detail,state])=><article key={kind+title} className="grid gap-3 rounded-2xl border border-white/10 bg-white/[.025] p-5 sm:grid-cols-[90px_1fr_auto] sm:items-center"><b className="text-[9px] tracking-[.14em] text-cyan-300">{kind}</b><div><strong className="text-sm">{title}</strong><p className="mt-1 text-xs text-slate-500">{detail}</p></div><span className={`w-fit rounded-full border px-2.5 py-1 text-[8px] font-black ${badge(state)}`}>{state}</span></article>)}</div></div></section>
 
-          <div className="flex flex-wrap gap-3">
-            <Link
-              href="/workspace/build"
-              className="rounded-full border border-white/15 px-5 py-3 text-sm font-medium text-white transition hover:border-white/30 hover:bg-white/5"
-            >
-              Build a route
-            </Link>
-            <Link
-              href="/workspace/scanner"
-              className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-black transition hover:bg-slate-200"
-            >
-              Open scanner
-            </Link>
-          </div>
-        </header>
+      <section className="mt-24 rounded-[34px] border border-white/10 bg-gradient-to-br from-cyan-300/[.06] to-violet-400/[.035] p-8 lg:p-12"><span className="text-[9px] font-black uppercase tracking-[.2em] text-cyan-300">Subscription expansion</span><h2 className="mt-3 max-w-5xl font-serif text-5xl">Browse freely. Govern privately. Automate at scale.</h2><div className="mt-8 grid gap-3 md:grid-cols-4">{[["FREE","Browse public routes","Inspect chain, lineage and pressure cases. Run limited public tests."],["$19 PASSPORT","Connect routes","Follow relevant routes and connect public governance references to your governed systems."],["$49 WORKSPACE","Fork & work","Create private provenance-preserved forks, modify them and coordinate route work."],["$99+","Automate & govern","Automated pressure testing, change impact, revalidation, portfolio analysis and institutional controls."]].map(([p,t,c])=><article key={p} className="rounded-2xl border border-white/10 bg-black/20 p-5"><span className="text-[9px] font-black text-cyan-300">{p}</span><h3 className="mt-3 text-lg font-semibold">{t}</h3><p className="mt-3 text-xs leading-6 text-slate-500">{c}</p></article>)}</div></section>
 
-        <section className="mb-8 grid gap-4 rounded-3xl border border-white/10 bg-white/[0.03] p-4 lg:grid-cols-[1fr_220px_220px]">
-          <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Search routes
-            </span>
-            <input
-              value={query}
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search title, purpose, or tag"
-              className="w-full rounded-2xl border border-white/10 bg-black/30 px-4 py-3 text-sm outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
-            />
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Domain
-            </span>
-            <select
-              value={domain}
-              onChange={(event) => setDomain(event.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-[#0b0f16] px-4 py-3 text-sm outline-none focus:border-cyan-300/50"
-            >
-              {domains.map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="block">
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-              Latest decision
-            </span>
-            <select
-              value={decision}
-              onChange={(event) => setDecision(event.target.value)}
-              className="w-full rounded-2xl border border-white/10 bg-[#0b0f16] px-4 py-3 text-sm outline-none focus:border-cyan-300/50"
-            >
-              {["All decisions", "ALLOW", "HOLD", "DENY", "ESCALATE"].map((item) => (
-                <option key={item}>{item}</option>
-              ))}
-            </select>
-          </label>
-        </section>
-
-        {notice ? (
-          <div className="mb-6 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 px-4 py-3 text-sm text-cyan-100">
-            {notice}
-          </div>
-        ) : null}
-
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_460px]">
-          <section>
-            <div className="mb-4 flex items-center justify-between">
-              <h2 className="text-lg font-semibold">{filtered.length} exchange routes</h2>
-              <span className="text-sm text-slate-500">Public preview catalog</span>
-            </div>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              {filtered.map((route) => (
-                <button
-                  key={route.id}
-                  type="button"
-                  onClick={() => setSelected(route)}
-                  className={`rounded-3xl border p-5 text-left transition ${
-                    selected.id === route.id
-                      ? "border-cyan-300/40 bg-cyan-300/[0.08]"
-                      : "border-white/10 bg-white/[0.03] hover:border-white/20 hover:bg-white/[0.05]"
-                  }`}
-                >
-                  <div className="mb-4 flex items-start justify-between gap-3">
-                    <div>
-                      <div className="text-xs uppercase tracking-[0.18em] text-slate-500">
-                        {route.domain}
-                      </div>
-                      <h3 className="mt-2 text-xl font-semibold">{route.title}</h3>
-                    </div>
-                    <span className={`rounded-full border px-2.5 py-1 text-[10px] font-bold tracking-[0.14em] ${badgeClasses(route.decision)}`}>
-                      {route.decision}
-                    </span>
-                  </div>
-
-                  <p className="min-h-[72px] text-sm leading-6 text-slate-300">{route.summary}</p>
-
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {route.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="rounded-full bg-white/5 px-2.5 py-1 text-xs text-slate-400">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 grid grid-cols-3 gap-3 border-t border-white/10 pt-4 text-xs text-slate-400">
-                    <div>
-                      <div className="text-base font-semibold text-white">{route.score}%</div>
-                      readiness
-                    </div>
-                    <div>
-                      <div className="text-base font-semibold text-white">{route.tests}</div>
-                      tests
-                    </div>
-                    <div>
-                      <div className="text-base font-semibold text-white">{route.forks}</div>
-                      forks
-                    </div>
-                  </div>
-                </button>
-              ))}
-            </div>
-
-            {filtered.length === 0 ? (
-              <div className="rounded-3xl border border-dashed border-white/15 p-10 text-center text-slate-400">
-                No routes match those filters.
-              </div>
-            ) : null}
-          </section>
-
-          <aside className="h-fit rounded-3xl border border-white/10 bg-[#0b0f16] p-5 xl:sticky xl:top-6">
-            <div className="flex items-start justify-between gap-3">
-              <div>
-                <div className="text-xs uppercase tracking-[0.18em] text-slate-500">Selected route</div>
-                <h2 className="mt-2 text-2xl font-semibold">{selected.title}</h2>
-                <div className="mt-2 text-sm text-slate-400">
-                  {selected.author} · v{selected.version}
-                </div>
-              </div>
-              <span className={`rounded-full border px-3 py-1 text-[10px] font-bold tracking-[0.14em] ${badgeClasses(selected.status)}`}>
-                {selected.status.replace("_", " ")}
-              </span>
-            </div>
-
-            <div className="mt-6 rounded-2xl border border-white/10 bg-black/25 p-4">
-              <div className="mb-3 flex items-center justify-between text-sm">
-                <span className="text-slate-400">Construction readiness</span>
-                <span className="font-semibold">{selected.score}%</span>
-              </div>
-              <div className="h-2 overflow-hidden rounded-full bg-white/10">
-                <div className="h-full rounded-full bg-cyan-300" style={{ width: `${selected.score}%` }} />
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              {stages.map((stage, index) => {
-                const value = selected.chain[stage];
-                const unknown = !value || value === "UNKNOWN";
-                return (
-                  <div key={stage} className="rounded-2xl border border-white/10 bg-white/[0.025] p-4">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white/10 text-xs text-slate-300">
-                          {index + 1}
-                        </span>
-                        <span className="text-sm font-semibold">{stage}</span>
-                      </div>
-                      <span className={`text-[10px] font-bold tracking-[0.14em] ${unknown ? "text-amber-300" : "text-emerald-300"}`}>
-                        {unknown ? "UNKNOWN" : "PRESENT"}
-                      </span>
-                    </div>
-                    <p className="mt-3 text-xs leading-5 text-slate-400">{value || "UNKNOWN"}</p>
-                  </div>
-                );
-              })}
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => copyRoute(selected)}
-                className="rounded-2xl border border-white/15 px-4 py-3 text-sm font-medium transition hover:border-white/30 hover:bg-white/5"
-              >
-                Copy package
-              </button>
-              <button
-                type="button"
-                onClick={() => downloadRoute(selected)}
-                className="rounded-2xl border border-white/15 px-4 py-3 text-sm font-medium transition hover:border-white/30 hover:bg-white/5"
-              >
-                Download JSON
-              </button>
-            </div>
-
-            <Link
-              href="/workspace/scanner"
-              className="mt-3 block rounded-2xl bg-white px-4 py-3 text-center text-sm font-semibold text-black transition hover:bg-slate-200"
-            >
-              Test this route
-            </Link>
-
-            <p className="mt-4 text-xs leading-5 text-slate-500">
-              Forking preserves source provenance. A copied route must be retested against its new evidence, authority, environment, and intended consequence before it can become admissible.
-            </p>
-          </aside>
-        </div>
-      </div>
-    </main>
-  );
+      <footer className="mt-20 border-t border-white/10 pt-8 text-[10px] leading-6 text-slate-600">TA-14 Governance Route Exchange · Founding network view. Route packages are not endorsements, certifications, legal determinations, or transferable proof of admissibility. Public examples must be independently tested against the actual evidence, authority, environment, scope and consequence before reliance.</footer>
+    </div>
+  </main>;
 }
