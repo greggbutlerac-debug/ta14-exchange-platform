@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import SevenInSevenOutIntegrity from "./SevenInSevenOutIntegrity";
 
 export const metadata: Metadata = {
   title: "TA-14 Field Ops Lab | Private Preview",
@@ -15,5 +16,8 @@ export default function AtlasFieldOpsLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return children;
+  return <>
+    {children}
+    <SevenInSevenOutIntegrity />
+  </>;
 }
