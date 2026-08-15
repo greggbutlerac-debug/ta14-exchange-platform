@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     template: '%s | TA-14 Authority Governance Institution',
   },
   description:
-    'Build, test, correct, preserve, and verify consequential execution routes through TA-14 admissible execution records.',
+    'Govern AI systems, evidence, obligations, decisions, change, and consequence through TA-14 admissible execution records and governed operating worlds.',
   applicationName: 'TA-14 Authority Governance Institution',
   authors: [
     {
@@ -28,6 +28,10 @@ export const metadata: Metadata = {
     'TA-14',
     'Admissible Execution',
     'AI Governance',
+    'EU AI Act compliance',
+    'EU AI Act governance',
+    'AI compliance evidence',
+    'AI system governance',
     'Execution Governance',
     'Evidence Integrity',
     'Admissible Execution Record',
@@ -39,9 +43,6 @@ export const metadata: Metadata = {
     'Global Admissible Execution Exchange',
   ],
   category: 'technology',
-  alternates: {
-    canonical: '/',
-  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -55,7 +56,7 @@ export const metadata: Metadata = {
         url: '/ta14-social-preview.png',
         width: 1200,
         height: 630,
-        alt: 'TA-14 Global Admissible Execution Exchange',
+        alt: 'TA-14 Authority Governance Institution',
       },
     ],
   },
@@ -119,7 +120,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {/* Google Analytics */}
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
           strategy="afterInteractive"
