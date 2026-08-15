@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { AuthChangeEvent, Session, User } from "@supabase/supabase-js";
 import { getArcadeSupabase } from "../../lib/arcade-supabase";
 
 type Determination = {
@@ -80,8 +80,8 @@ export default function PersistedReadinessPanel() {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getUser().then(({ data }) => setUser(data.user));
-    const { data } = supabase.auth.onAuthStateChange((_event, session) => setUser(session?.user ?? null));
+    supabase.auth.getUser().then((result: { data: { user: User | null } }) => setUser(result.data.user));
+    const { data } = supabase.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => setUser(session?.user ?? null));
     return () => data.subscription.unsubscribe();
   }, [supabase]);
 
