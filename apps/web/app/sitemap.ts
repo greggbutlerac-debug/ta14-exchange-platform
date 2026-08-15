@@ -7,6 +7,7 @@ const routes = [
   '/eu-ai-act',
   '/eu-ai-act/start',
   '/eu-ai-act/classifier',
+  '/eu-ai-act/system-classification',
   '/eu-ai-act/article-50',
   '/eu-ai-act/article-50-compliance',
   '/eu-ai-act/ai-literacy',
