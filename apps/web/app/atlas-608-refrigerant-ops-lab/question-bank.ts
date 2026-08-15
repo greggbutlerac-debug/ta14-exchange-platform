@@ -5,7 +5,13 @@ import { TYPE2_EXPANSION } from "./type2-expansion-bank";
 import { TYPE3_EXPANSION } from "./type3-expansion-bank";
 import { TRANSITION_EXPANSION } from "./transition-expansion-bank";
 
-/** Canonical source bank for the EPA 608 readiness arcade. */
+/**
+ * Canonical source bank for the EPA 608 readiness arcade.
+ *
+ * NOTE: type1-final-bank.ts is intentionally not part of the runtime source.
+ * It is retained only as legacy authored material. The canonical Type I runtime
+ * source is EXAM1 + TYPE1_EXPANSION, deduplicated below.
+ */
 const SOURCE_608_BANK: ArcadeQuestion[] = [
   ...EXAM1,
   ...CORE_EXPANSION,
@@ -91,6 +97,40 @@ export function createRandomizedDeck(
   return typeof limit === "number" ? randomized.slice(0, limit) : randomized;
 }
 
+/**
+ * Put one example of each required bucket at the front of a deck while
+ * preserving random order for the rest. This prevents a legitimate 100-question
+ * readiness run from failing only because random ordering never surfaced a
+ * required evidence bucket.
+ */
+function promoteRequiredBuckets(
+  questions: ArcadeQuestion[],
+  requiredBuckets: string[],
+): ArcadeQuestion[] {
+  const remaining = [...questions];
+  const promoted: ArcadeQuestion[] = [];
+
+  for (const bucket of requiredBuckets) {
+    const index = remaining.findIndex((question) => question.bucket === bucket);
+    if (index >= 0) promoted.push(...remaining.splice(index, 1));
+  }
+
+  return [...promoted, ...remaining];
+}
+
+function interleaveWorlds(worldDecks: ArcadeQuestion[][]): ArcadeQuestion[] {
+  const out: ArcadeQuestion[] = [];
+  const max = Math.max(...worldDecks.map((deck) => deck.length));
+
+  for (let index = 0; index < max; index += 1) {
+    for (const deck of worldDecks) {
+      if (deck[index]) out.push(deck[index]);
+    }
+  }
+
+  return out;
+}
+
 /** Questions that still have a conspicuous authored length imbalance. */
 export const LENGTH_LEAK_AUDIT = sourceUnique.filter((question) => {
   const counts = question.choices.map(wordCount);
@@ -104,19 +144,29 @@ export const LENGTH_LEAK_AUDIT = sourceUnique.filter((question) => {
   lesson: question.lesson,
 }));
 
-export const CORE_BANK = createRandomizedDeck("core", 100);
+export const CORE_BANK = promoteRequiredBuckets(
+  createRandomizedDeck("core", 100),
+  ["Core", "Three Rs", "Safety"],
+);
 export const TYPE1_BANK = createRandomizedDeck("type1", 100);
 export const TYPE2_BANK = createRandomizedDeck("type2", 100);
 export const TYPE3_BANK = createRandomizedDeck("type3", 100);
 export const TRANSITION_BANK = createRandomizedDeck("transition", 100);
 
-export const ARCADE_608_BANK: ArcadeQuestion[] = [
-  ...CORE_BANK,
-  ...TYPE1_BANK,
-  ...TYPE2_BANK,
-  ...TYPE3_BANK,
-  ...TRANSITION_BANK,
-];
+/**
+ * Runtime bank order is deliberately interleaved rather than concatenated.
+ * World-specific runs still filter to their full 100-question deck. The
+ * Universe Gate consumes the first 100 entries and therefore receives a
+ * balanced 20-question sample from each of the five worlds, with Core/Three
+ * Rs/Safety promoted early enough to guarantee required-bucket coverage.
+ */
+export const ARCADE_608_BANK: ArcadeQuestion[] = interleaveWorlds([
+  CORE_BANK,
+  TYPE1_BANK,
+  TYPE2_BANK,
+  TYPE3_BANK,
+  TRANSITION_BANK,
+]);
 
 export const WORLD_COUNTS = {
   core: sourceUnique.filter((question) => question.world === "core").length,
