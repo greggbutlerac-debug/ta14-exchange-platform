@@ -15,6 +15,7 @@ const routes = [
   '/eu-ai-act/chatbots',
   '/eu-ai-act/customer-service-ai',
   '/eu-ai-act/recruitment-hr',
+  '/eu-ai-act/financial-services',
   '/eu-ai-act/saas-companies',
   '/eu-ai-act/small-business',
   '/eu-ai-act/evidence-requirements',
