@@ -13,6 +13,7 @@ const routes = [
   '/eu-ai-act/us-companies',
   '/eu-ai-act/chatbots',
   '/eu-ai-act/high-risk',
+  '/eu-ai-act/high-risk-requirements',
   '/eu-ai-act/fundamental-rights',
   '/eu-ai-act/source-state',
   '/eu-ai-act/system-passport',
