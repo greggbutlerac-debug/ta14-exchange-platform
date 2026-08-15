@@ -398,15 +398,20 @@ export default async function GovernanceShowcasePage() {
                 </div>
 
                 <div className="card-actions">
+                  <Link
+                    className="button button-primary"
+                    href={`/workspace/ai-governance/registry/showcase/${encodeURIComponent(item.registryIdentifier)}`}
+                  >
+                    Explore Governance →
+                  </Link>
                   {item.profile ? (
-                    <Link className="button button-primary" href={`/workspace/ai-governance/registry/profiles/${item.profile.slug}`}>
-                      Explore Governance →
+                    <Link
+                      className="button button-secondary"
+                      href={`/workspace/ai-governance/registry/profiles/${item.profile.slug}`}
+                    >
+                      Institutional Commentary
                     </Link>
-                  ) : (
-                    <Link className="button button-primary" href="/workspace/ai-governance/registry">
-                      View Registry Record →
-                    </Link>
-                  )}
+                  ) : null}
                   {item.profile?.primary_website ? (
                     <a className="button button-secondary" href={item.profile.primary_website} target="_blank" rel="noreferrer">
                       Governance Website ↗
