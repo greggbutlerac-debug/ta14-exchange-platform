@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import CommercialConversionAnalytics from './CommercialConversionAnalytics';
 
 export const metadata: Metadata = {
   title: 'EU AI Act Compliance Software Pricing',
@@ -25,5 +26,5 @@ export const metadata: Metadata = {
 };
 
 export default function CommercialLayout({ children }: { children: ReactNode }) {
-  return children;
+  return <><CommercialConversionAnalytics />{children}</>;
 }
