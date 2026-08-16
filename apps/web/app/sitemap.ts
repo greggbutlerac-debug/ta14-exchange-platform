@@ -21,6 +21,7 @@ const routes = [
   '/eu-ai-act/education-ai',
   '/eu-ai-act/biometric-ai',
   '/eu-ai-act/law-enforcement-ai',
+  '/eu-ai-act/migration-asylum-border-ai',
   '/eu-ai-act/saas-companies',
   '/eu-ai-act/small-business',
   '/eu-ai-act/evidence-requirements',
