@@ -23,6 +23,7 @@ const routes = [
   '/eu-ai-act/healthcare-medical-ai',
   '/eu-ai-act/education-ai',
   '/eu-ai-act/education-admissions-testing-assessment-ai',
+  '/eu-ai-act/ai-proctoring-exam-monitoring',
   '/eu-ai-act/biometric-ai',
   '/eu-ai-act/emotion-recognition-ai',
   '/eu-ai-act/law-enforcement-ai',
