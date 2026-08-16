@@ -19,6 +19,127 @@ export default function HomePage() {
   return (
     <>
       <AtlasFrontDoor />
+
+      <section
+        aria-label="TA-14 Governance Showcase"
+        style={{
+          position: 'relative',
+          zIndex: 3,
+          margin: '0 auto',
+          padding: '0 clamp(18px,4vw,54px) 58px',
+          maxWidth: 1500,
+        }}
+      >
+        <Link
+          href="/governance-showcase"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'minmax(180px,280px) 1fr auto',
+            gap: 30,
+            alignItems: 'center',
+            minHeight: 260,
+            padding: '34px clamp(24px,4vw,58px)',
+            border: '1px solid rgba(117,209,255,.62)',
+            background:
+              'radial-gradient(circle at 12% 20%,rgba(54,178,255,.2),transparent 30%),radial-gradient(circle at 84% 18%,rgba(176,121,255,.15),transparent 28%),linear-gradient(135deg,rgba(4,19,35,.99),rgba(4,12,27,.99) 52%,rgba(12,8,30,.99))',
+            boxShadow:
+              'inset 0 0 90px rgba(48,171,255,.08),0 26px 70px rgba(0,0,0,.38),0 0 48px rgba(74,172,255,.12)',
+            color: '#f4fbff',
+            textDecoration: 'none',
+            overflow: 'hidden',
+          }}
+        >
+          <div style={{ textAlign: 'center' }}>
+            <div
+              style={{
+                width: 132,
+                height: 132,
+                margin: '0 auto 14px',
+                borderRadius: '50%',
+                display: 'grid',
+                placeItems: 'center',
+                border: '1px solid rgba(120,214,255,.86)',
+                background:
+                  'radial-gradient(circle at 34% 26%,#ffffff,#91dcff 8%,#205e8c 34%,#07182a 66%,#030812 100%)',
+                boxShadow: '0 0 48px rgba(74,190,255,.44),inset 0 0 32px rgba(255,255,255,.08)',
+                fontFamily: 'Georgia,serif',
+                fontSize: 25,
+                lineHeight: 1,
+                fontWeight: 900,
+                letterSpacing: '-.04em',
+              }}
+            >
+              AIGR
+            </div>
+            <small style={{ color: '#83d6ff', letterSpacing: '.18em', fontWeight: 900 }}>
+              PUBLIC INSTITUTIONAL RECORD
+            </small>
+          </div>
+
+          <div>
+            <small style={{ color: '#8fdcff', letterSpacing: '.18em', fontWeight: 900 }}>
+              REGISTERED GOVERNANCES · FOUNDING DEMONSTRATIONS · EVIDENCE · CHRONOLOGY
+            </small>
+            <h2
+              style={{
+                margin: '10px 0 12px',
+                fontFamily: 'Georgia,serif',
+                fontSize: 'clamp(36px,4vw,64px)',
+                lineHeight: .94,
+                color: '#f5fbff',
+              }}
+            >
+              GOVERNANCE SHOWCASE
+            </h2>
+            <p style={{ margin: 0, maxWidth: 820, color: '#bdcfe1', lineHeight: 1.7, fontSize: 14 }}>
+              Explore governance architectures as living institutional records. See permanent Registry identity,
+              declared boundaries, demonstrations, governed artifacts, evidence, architecture relationships,
+              version progression, and public chronology as each governance builds a record over time.
+            </p>
+            <div style={{ display: 'flex', gap: 9, flexWrap: 'wrap', marginTop: 20 }}>
+              {[
+                'REGISTERED IDENTITY',
+                'FOUNDING DEMONSTRATIONS',
+                'GOVERNED ARTIFACTS',
+                'EVIDENCE',
+                'VERSION HISTORY',
+                'PUBLIC CHRONOLOGY',
+              ].map((item) => (
+                <span
+                  key={item}
+                  style={{
+                    padding: '7px 9px',
+                    border: '1px solid rgba(115,207,255,.22)',
+                    color: '#9ddcff',
+                    fontSize: 7,
+                    letterSpacing: '.1em',
+                    fontWeight: 900,
+                  }}
+                >
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          <strong
+            style={{
+              minWidth: 220,
+              padding: '20px 22px',
+              border: '1px solid rgba(123,216,255,.76)',
+              background: 'linear-gradient(180deg,rgba(33,147,204,.3),rgba(3,16,30,.96))',
+              color: '#e2f7ff',
+              textAlign: 'center',
+              fontSize: 10,
+              letterSpacing: '.13em',
+              boxShadow: '0 0 30px rgba(63,180,238,.12)',
+            }}
+          >
+            EXPLORE THE GOVERNANCE SHOWCASE →
+          </strong>
+        </Link>
+      </section>
+
       {worldGrid
         ? createPortal(
             <Link
