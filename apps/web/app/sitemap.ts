@@ -27,6 +27,7 @@ const routes = [
   '/eu-ai-act/justice-democratic-processes-ai',
   '/eu-ai-act/gpai-providers',
   '/eu-ai-act/vendor-procurement',
+  '/eu-ai-act/ai-agents-autonomous-workflows',
   '/eu-ai-act/saas-companies',
   '/eu-ai-act/small-business',
   '/eu-ai-act/evidence-requirements',
