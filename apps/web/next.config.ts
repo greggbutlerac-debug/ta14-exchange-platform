@@ -1,9 +1,18 @@
 import path from "node:path";
 import type { NextConfig } from "next";
 
+const supabasePublicKey =
+  process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+  "";
+
 const nextConfig: NextConfig = {
   experimental: {
     externalDir: true,
+  },
+
+  env: {
+    NEXT_PUBLIC_SUPABASE_ANON_KEY: supabasePublicKey,
   },
 
   outputFileTracingRoot: path.resolve(process.cwd(), "../.."),
