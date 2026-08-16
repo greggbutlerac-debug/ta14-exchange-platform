@@ -41,6 +41,25 @@ function text(value: unknown): string {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function errorText(value: unknown, fallback: string): string {
+  if (typeof value === 'string' && value.trim()) return value.trim();
+  if (value instanceof Error && value.message.trim()) return value.message.trim();
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>;
+    const message = record.message;
+    if (typeof message === 'string' && message.trim()) return message.trim();
+    const details = record.details;
+    if (typeof details === 'string' && details.trim()) return details.trim();
+    try {
+      const serialized = JSON.stringify(value);
+      if (serialized && serialized !== '{}') return serialized.slice(0, 1000);
+    } catch {
+      // Fall through to the stable fallback below.
+    }
+  }
+  return fallback;
+}
+
 function cleanText(value: unknown, max = 500): string | null {
   const next = text(value);
   return next ? next.slice(0, max) : null;
@@ -130,8 +149,8 @@ async function syncLinkedDraft(
   userId: string,
   submissionId: string | null,
   form: JsonRecord,
-) {
-  if (!submissionId) return;
+): Promise<string | null> {
+  if (!submissionId) return null;
 
   const { error } = await session
     .from('ai_governance_registry_submissions')
@@ -140,9 +159,8 @@ async function syncLinkedDraft(
     .eq('owner_user_id', userId)
     .eq('status', 'draft');
 
-  if (error) {
-    throw new Error(`Registry draft synchronization failed: ${error.message}`);
-  }
+  if (!error) return null;
+  return `Registry draft synchronization deferred: ${errorText(error, 'Unknown draft synchronization error.')}`;
 }
 
 export async function GET() {
@@ -160,11 +178,11 @@ export async function GET() {
       .limit(1)
       .maybeSingle();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) return NextResponse.json({ error: errorText(error, 'Unable to load registration recovery.') }, { status: 400 });
     return NextResponse.json({ recovery: data ?? null }, { headers: { 'Cache-Control': 'no-store' } });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unable to load registration recovery.' },
+      { error: errorText(error, 'Unable to load registration recovery.') },
       { status: 500 },
     );
   }
@@ -198,15 +216,11 @@ export async function POST(request: NextRequest) {
       .maybeSingle();
 
     if (existingError) {
-      return NextResponse.json({ error: existingError.message }, { status: 400 });
+      return NextResponse.json(
+        { error: errorText(existingError, 'Unable to inspect the existing registration recovery checkpoint.') },
+        { status: 400 },
+      );
     }
-
-    await syncLinkedDraft(
-      session,
-      user.id,
-      typeof existing?.submission_id === 'string' ? existing.submission_id : null,
-      form,
-    );
 
     const row = {
       user_id: user.id,
@@ -220,25 +234,48 @@ export async function POST(request: NextRequest) {
       last_saved_at: new Date().toISOString(),
     };
 
+    // Preserve the signed-in account recovery checkpoint first. Draft synchronization
+    // is related but must not be allowed to erase a durable recovery checkpoint.
     const { data, error } = await session
       .from('ta14_registry_registration_recovery_drafts')
       .upsert(row, { onConflict: 'user_id,recovery_key' })
       .select('id, recovery_key, state, submission_id, active_step, first_saved_at, last_saved_at')
       .single();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      return NextResponse.json(
+        { error: errorText(error, 'Unable to preserve registration recovery state.') },
+        { status: 400 },
+      );
+    }
+
+    const submissionId =
+      typeof data?.submission_id === 'string'
+        ? data.submission_id
+        : typeof existing?.submission_id === 'string'
+          ? existing.submission_id
+          : null;
+
+    const draftSyncWarning = await syncLinkedDraft(
+      session,
+      user.id,
+      submissionId,
+      form,
+    );
 
     return NextResponse.json({
       ok: true,
       recovery: data,
-      notice:
-        existing?.submission_id
-          ? 'Step preserved to recovery and synchronized to the linked private Registry draft.'
-          : 'Incomplete registration preserved to the signed-in account. This is recovery state only, not a Registry submission.',
+      draftSyncWarning,
+      notice: submissionId
+        ? draftSyncWarning
+          ? 'Step preserved to signed-in account recovery. Linked Registry draft synchronization was deferred and will be retried on the next authoritative draft save.'
+          : 'Step preserved to recovery and synchronized to the linked private Registry draft.'
+        : 'Incomplete registration preserved to the signed-in account. This is recovery state only, not a Registry submission.',
     });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unable to preserve registration recovery.' },
+      { error: errorText(error, 'Unable to preserve registration recovery.') },
       { status: 500 },
     );
   }
@@ -272,7 +309,12 @@ export async function PATCH(request: NextRequest) {
       .select('id, state, submission_id, promoted_at, completed_at')
       .maybeSingle();
 
-    if (error) return NextResponse.json({ error: error.message }, { status: 400 });
+    if (error) {
+      return NextResponse.json(
+        { error: errorText(error, 'Unable to update registration recovery.') },
+        { status: 400 },
+      );
+    }
 
     if (submissionId && data) {
       const now = new Date().toISOString();
@@ -285,14 +327,17 @@ export async function PATCH(request: NextRequest) {
         .neq('id', data.id);
 
       if (cleanupError) {
-        return NextResponse.json({ error: cleanupError.message }, { status: 400 });
+        return NextResponse.json(
+          { error: errorText(cleanupError, 'Unable to reconcile duplicate recovery checkpoints.') },
+          { status: 400 },
+        );
       }
     }
 
     return NextResponse.json({ ok: true, recovery: data ?? null });
   } catch (error) {
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unable to update registration recovery.' },
+      { error: errorText(error, 'Unable to update registration recovery.') },
       { status: 500 },
     );
   }
