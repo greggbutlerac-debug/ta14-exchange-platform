@@ -1,0 +1,70 @@
+import type { Metadata } from 'next';
+import Link from 'next/link';
+
+const PRIMARY_PHONE_DISPLAY = '386-337-7215';
+const PRIMARY_PHONE_HREF = 'tel:+13863377215';
+const SECONDARY_PHONE_DISPLAY = '386-479-0435';
+const SECONDARY_PHONE_HREF = 'tel:+13864790435';
+const PAGE_URL = 'https://www.ta14exchange.com/transparent-air/gulfport-ac-repair';
+
+export const metadata: Metadata = {
+  title: 'AC Repair Gulfport FL | AC Second Opinions | Transparent Air',
+  description:
+    'Need AC repair in Gulfport, Florida, or unsure about an expensive diagnosis? Transparent Air provides evidence-based AC diagnostics and second opinions personally performed by Greggory Don Butler.',
+  alternates: { canonical: PAGE_URL },
+  robots: { index: true, follow: true },
+  openGraph: {
+    title: 'AC Repair & Second Opinions in Gulfport, FL | Transparent Air',
+    description:
+      'Before paying for an expensive AC repair or replacement in Gulfport, get an evidence-based second opinion from Transparent Air.',
+    url: PAGE_URL,
+    type: 'website',
+  },
+};
+
+const symptoms = [
+  'AC running but the house is not cooling',
+  'Warm air coming from the vents',
+  'System starts and stops repeatedly',
+  'Outdoor unit or compressor will not run',
+  'Frozen evaporator coil or refrigerant-line concerns',
+  'Water around the air handler or drain problems',
+  'Electrical, capacitor, motor, airflow, or thermostat concerns',
+  'A major repair or complete system replacement was recommended',
+];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: 'Transparent Air Gulfport AC Repair and Second Opinion Service',
+  serviceType: 'Air conditioning diagnostic, repair evaluation, and second opinion',
+  provider: { '@type': 'LocalBusiness', name: 'Transparent Air', telephone: '+1-386-337-7215', url: PAGE_URL },
+  areaServed: { '@type': 'City', name: 'Gulfport', addressRegion: 'FL' },
+  url: PAGE_URL,
+};
+
+export default function GulfportACRepairPage() {
+  return (
+    <main style={{ background: '#f6fafb', color: '#123542', minHeight: '100vh' }}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <style>{`
+        .g-wrap{width:min(1160px,92vw);margin:auto}.g-hero{padding:76px 0;background:radial-gradient(circle at 82% 12%,rgba(31,166,173,.2),transparent 31%),linear-gradient(135deg,#061f2b,#0a4050 70%,#096773);color:#fff}.g-grid{display:grid;grid-template-columns:1.18fr .82fr;gap:44px;align-items:center}.g-eye{font-size:.78rem;font-weight:900;letter-spacing:.15em;text-transform:uppercase;color:#82e1df}.g-h1{font-size:clamp(2.7rem,6vw,5.4rem);line-height:.98;letter-spacing:-.045em;margin:15px 0 22px}.g-lead{font-size:1.2rem;line-height:1.7;color:#e4f3f4}.g-card{background:#fff;color:#143945;border-radius:16px;padding:28px;box-shadow:0 20px 55px rgba(0,0,0,.16)}.g-btn{display:inline-flex;padding:15px 21px;border-radius:8px;background:#e7ad45;color:#082934;text-decoration:none;font-weight:900;margin-top:12px}.g-btn.teal{background:#087f89;color:#fff}.g-alt{display:inline-flex;padding:14px 19px;border:1px solid rgba(255,255,255,.45);border-radius:8px;color:#fff;text-decoration:none;font-weight:900;margin:12px 0 0 8px}.g-card .g-alt{color:#086b75;border-color:#b1d4d7}.g-section{padding:68px 0;background:#fff}.g-section.alt{background:#edf7f7}.g-section.dark{background:#082c3a;color:#e2eff1}.g-section h2{font-size:clamp(2rem,4vw,3.2rem);line-height:1.08;color:#0a3948;margin:10px 0 22px}.g-section.dark h2{color:#fff}.g-cols{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}.g-box{background:#fff;color:#173a46;border-radius:12px;padding:25px;border-top:4px solid #0b8b94}.g-list{padding:0;list-style:none}.g-list li{position:relative;padding:10px 0 10px 27px;border-bottom:1px solid #e4edef}.g-list li:before{content:'✓';position:absolute;left:0;color:#078993;font-weight:900}.g-list li:last-child{border:0}.g-callout{font-size:clamp(1.5rem,3vw,2.15rem);font-weight:900;line-height:1.28;border-left:5px solid #e7ad45;padding-left:22px;margin:34px 0}.g-link{color:#087985;font-weight:900}.g-center{text-align:center}.g-footer{background:#041a24;color:#bfd2d6;padding:38px 0}.g-sticky{display:none}@media(max-width:800px){.g-grid,.g-cols{grid-template-columns:1fr}.g-hero{padding:48px 0}.g-alt{margin-left:0}.g-sticky{display:block;position:fixed;bottom:0;left:0;right:0;background:#061f2b;padding:10px;text-align:center;z-index:50}.g-sticky .g-btn{width:94%;justify-content:center;margin:0}main{padding-bottom:70px}}
+      `}</style>
+
+      <header className="g-hero"><div className="g-wrap g-grid"><div><div className="g-eye">Transparent Air · Gulfport, Florida</div><h1 className="g-h1">AC Repair in Gulfport Starts With Getting the Diagnosis Right.</h1><p className="g-lead">When your Gulfport home is hot, the goal is not simply to replace a part. The goal is to determine what is actually wrong with the air-conditioning system before you spend money on the repair.</p><p className="g-lead"><strong>If you have already received an expensive diagnosis or replacement recommendation, Greggory Don Butler personally provides Transparent Air second-opinion evaluations.</strong></p><a className="g-btn" href={PRIMARY_PHONE_HREF}>Call {PRIMARY_PHONE_DISPLAY}</a><a className="g-alt" href={SECONDARY_PHONE_HREF}>Or {SECONDARY_PHONE_DISPLAY}</a></div><aside className="g-card"><div className="g-eye" style={{color:'#087f89'}}>Gulfport AC help</div><h2 style={{marginTop:8}}>Is your AC not cooling?</h2><ul className="g-list">{symptoms.slice(0,6).map(x=><li key={x}>{x}</li>)}</ul><a className="g-btn teal" href={PRIMARY_PHONE_HREF}>Call Transparent Air</a></aside></div></header>
+
+      <section className="g-section"><div className="g-wrap"><div className="g-eye" style={{color:'#087f89'}}>Local diagnostic service</div><h2>Before Replacing Parts, Establish What the System Is Actually Doing.</h2><p>Air-conditioning problems can have similar symptoms while requiring very different corrections. Poor airflow, an electrical failure, a control problem, a drainage issue, a failed component, a refrigerant-side condition, or another system problem can all present differently once the equipment is actually measured and evaluated.</p><p>Transparent Air approaches the service call around evidence: establish the condition, evaluate the operating sequence and relevant measurements, make a diagnostic determination, explain what the evidence supports, and then determine what intervention should follow.</p><div className="g-callout">A repair is only a good repair when it addresses the condition that actually caused the problem.</div></div></section>
+
+      <section className="g-section dark"><div className="g-wrap"><div className="g-eye">When another company has already been out</div><h2>Gulfport AC Second Opinions</h2><div className="g-cols"><article className="g-box"><h3>Expensive repair?</h3><p>If the recommendation is costly and you are uncertain about the diagnosis, another evidence-based evaluation can help you make the decision with more confidence.</p></article><article className="g-box"><h3>Told you need a new system?</h3><p>A replacement recommendation is consequential. If you are unsure, Transparent Air can evaluate the existing equipment before you authorize replacement.</p></article><article className="g-box"><h3>Repair did not solve it?</h3><p>If work has already been performed and the original problem remains, the next step should begin with the present condition rather than another assumption.</p></article></div><p style={{marginTop:28}}><Link className="g-link" style={{color:'#8be0df'}} href="/transparent-air/second-opinion">Read about Transparent Air's full AC Second Opinion service →</Link></p></div></section>
+
+      <section className="g-section alt"><div className="g-wrap g-grid"><div><div className="g-eye" style={{color:'#087f89'}}>Why Transparent Air?</div><h2>Greggory Don Butler Personally Evaluates the System.</h2><p>Transparent Air's second-opinion service is intentionally personal. Greggory Don Butler is an HVAC educator, author, founder of TA-14 Academy, and founder of the TA-14 AI Governance Institute. His published work includes a documented service discipline centered on sequence, baseline, threshold, diagnostic determination, intervention, and post-intervention performance.</p><p><strong>If you do not know who Greggory Don Butler is, Google his name.</strong> The point is not to ask a homeowner to accept a marketing claim. It is to give you a public record you can examine before deciding who you want evaluating your air-conditioning system.</p></div><aside className="g-card"><div className="g-eye" style={{color:'#087f89'}}>Common reasons to call</div><ul className="g-list">{symptoms.map(x=><li key={x}>{x}</li>)}</ul></aside></div></section>
+
+      <section className="g-section"><div className="g-wrap"><div className="g-eye" style={{color:'#087f89'}}>Florida homeowner awareness</div><h2>Florida Does Not Issue a State HVAC Journeyman License to the Individual Service Technician.</h2><p>Florida licenses HVAC contractors at the state level, but it does not issue a state HVAC journeyman license to each individual service technician. A contractor's license therefore does not, by itself, tell a Gulfport homeowner what diagnostic standard the individual technician at the door follows.</p><p>There are excellent HVAC technicians and contractors throughout Florida. The reason Transparent Air discusses this distinction is straightforward: homeowners should pay attention to the quality of the diagnosis itself, particularly before authorizing an expensive repair or replacement.</p><p><Link className="g-link" href="/academy/hvac">Explore the TA-14 Academy HVAC educational section →</Link></p></div></section>
+
+      <section className="g-section alt g-center"><div className="g-wrap"><div className="g-eye" style={{color:'#087f89'}}>Transparent Air · Gulfport AC service</div><h2>Hot House? Expensive Estimate? Unsure About the Diagnosis?</h2><p style={{fontSize:'1.2rem'}}>Call Transparent Air. If a second opinion is what you need, Greggory Don Butler personally evaluates the system.</p><a className="g-btn" href={PRIMARY_PHONE_HREF}>Call {PRIMARY_PHONE_DISPLAY}</a><a className="g-alt" style={{color:'#086b75',borderColor:'#afd0d3'}} href={SECONDARY_PHONE_HREF}>Or {SECONDARY_PHONE_DISPLAY}</a></div></section>
+
+      <footer className="g-footer"><div className="g-wrap"><strong>Transparent Air</strong><br/>Air-conditioning diagnostics, repair evaluation, and second opinions serving Gulfport and selected Pinellas County areas.<br/><a style={{color:'#fff'}} href={PRIMARY_PHONE_HREF}>{PRIMARY_PHONE_DISPLAY}</a> · <a style={{color:'#fff'}} href={SECONDARY_PHONE_HREF}>{SECONDARY_PHONE_DISPLAY}</a><p style={{fontSize:'.85rem',color:'#9fb7bd'}}>TA-14 is a diagnostic/governance methodology and is not an occupational license or government certification. Service availability and applicable contractor/license information should be confirmed before scheduling.</p></div></footer>
+      <div className="g-sticky"><a className="g-btn" href={PRIMARY_PHONE_HREF}>Call {PRIMARY_PHONE_DISPLAY}</a></div>
+    </main>
+  );
+}
