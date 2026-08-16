@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
 import RegistrationMilestoneCelebration from './RegistrationMilestoneCelebration';
+import RecoveryResponseTransport from './RecoveryResponseTransport';
 
 export const dynamic = 'force-dynamic';
 
@@ -97,6 +98,7 @@ export default async function RegistryRegisterLayout({ children }: Readonly<{ ch
 
   return (
     <>
+      <RecoveryResponseTransport />
       {children}
       <RegistrationMilestoneCelebration />
     </>
