@@ -17,6 +17,7 @@ const routes = [
   '/eu-ai-act/recruitment-hr',
   '/eu-ai-act/financial-services',
   '/eu-ai-act/healthcare-medical-ai',
+  '/eu-ai-act/education-ai',
   '/eu-ai-act/saas-companies',
   '/eu-ai-act/small-business',
   '/eu-ai-act/evidence-requirements',
