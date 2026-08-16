@@ -29,6 +29,26 @@ const WRONG_ANSWER_EXTENSIONS = [
   " A more aggressive service approach could choose this path on the theory that multiple abnormal observations justify acting early, but the TA-14 sequence requires those observations to remain bounded until the governing measurements and comparison state are complete.",
 ];
 
+// Each step receives a different visual order. The underlying DOM nodes are
+// not reordered, so the game's native click handlers and correct-answer logic
+// remain attached to the original choices. CSS order changes presentation only.
+const POSITION_ROTATION: Record<number, number[]> = {
+  1: [2, 0, 3, 1],
+  2: [1, 3, 0, 2],
+  3: [3, 1, 2, 0],
+  4: [0, 2, 1, 3],
+  5: [2, 3, 0, 1],
+  6: [1, 0, 3, 2],
+  7: [3, 2, 1, 0],
+  8: [2, 0, 1, 3],
+  9: [1, 3, 2, 0],
+  10: [3, 1, 0, 2],
+  11: [0, 2, 3, 1],
+  12: [2, 1, 3, 0],
+  13: [3, 0, 2, 1],
+  14: [1, 2, 0, 3],
+};
+
 function getStepNumber() {
   const zone = document.querySelector<HTMLElement>(".zone")?.textContent ?? "";
   const match = zone.match(/STEP\s+(\d+)\s+OF\s+14/i);
@@ -48,6 +68,7 @@ export default function AnswerLengthIntegrity() {
       document.querySelectorAll<HTMLElement>(".choice").forEach((button) => {
         const original = originals.get(button);
         if (original) button.textContent = original;
+        button.style.order = "";
       });
     };
 
@@ -70,10 +91,6 @@ export default function AnswerLengthIntegrity() {
 
       const correctLength = normalize(originals.get(buttons[correctIndex]) ?? "").length;
       const wrongIndexes = buttons.map((_, index) => index).filter((index) => index !== correctIndex);
-
-      // Alternate by step: on roughly half the questions, make one wrong answer
-      // intentionally longer than the correct answer. On the others, keep lengths
-      // close enough that "pick the longest" is still unreliable.
       const makeWrongLongest = step % 2 === 0;
       const selectedWrong = wrongIndexes[(step * 7) % wrongIndexes.length];
 
@@ -93,6 +110,11 @@ export default function AnswerLengthIntegrity() {
         }
 
         if (button.textContent !== next) button.textContent = next;
+      });
+
+      const visualOrder = POSITION_ROTATION[step] ?? [0, 1, 2, 3];
+      buttons.forEach((button, originalIndex) => {
+        button.style.order = String(visualOrder[originalIndex]);
       });
     };
 
