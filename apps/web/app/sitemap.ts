@@ -43,6 +43,7 @@ const routes = [
   '/eu-ai-act/high-risk',
   '/eu-ai-act/high-risk-requirements',
   '/eu-ai-act/fundamental-rights',
+  '/eu-ai-act/fundamental-rights-impact-assessment',
   '/eu-ai-act/source-state',
   '/eu-ai-act/system-passport',
   '/eu-ai-act/passport',
