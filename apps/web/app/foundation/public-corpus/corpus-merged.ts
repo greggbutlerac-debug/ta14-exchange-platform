@@ -10,6 +10,7 @@ import {
   PATENT_CORPUS_RECORDS,
   ZENODO_ARCHITECTURE_RECORDS,
 } from './corpus-supplement';
+import { AUTOMATEDBUILDINGS_LATEST_CORPUS_RECORDS } from './corpus-automatedbuildings-latest';
 import { PUBLIC_ARCHITECTURE_SITE_RECORDS } from './site-supplement';
 import { TA14_ZENODO_STANDARDS } from './zenodo-standards';
 import { TA14_REFERENCE_IMPLEMENTATIONS } from './implementation-corpus';
@@ -53,6 +54,7 @@ const mergedCandidates: CorpusRecord[] = [
   ...BASE_CORPUS,
   ...MEDIUM_CORPUS_RECORDS,
   ...AUTOMATEDBUILDINGS_CORPUS_RECORDS,
+  ...AUTOMATEDBUILDINGS_LATEST_CORPUS_RECORDS,
   ...PATENT_CORPUS_RECORDS,
   ...ZENODO_ARCHITECTURE_RECORDS,
   ...standardZenodoRecords,
