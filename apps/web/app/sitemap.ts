@@ -25,6 +25,7 @@ const routes = [
   '/eu-ai-act/critical-infrastructure-ai',
   '/eu-ai-act/public-benefits-essential-services-ai',
   '/eu-ai-act/justice-democratic-processes-ai',
+  '/eu-ai-act/gpai-providers',
   '/eu-ai-act/saas-companies',
   '/eu-ai-act/small-business',
   '/eu-ai-act/evidence-requirements',
