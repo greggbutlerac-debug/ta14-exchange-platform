@@ -742,16 +742,42 @@ export default function RegisterGovernancePage() {
     setMessage('Evidence file removed from this intake package.');
   }
 
+  async function readApiPayload(response: Response): Promise<any> {
+    const contentType = response.headers.get('content-type') ?? '';
+    const raw = await response.text();
+
+    if (!raw) return {};
+
+    if (contentType.includes('application/json')) {
+      try {
+        return JSON.parse(raw);
+      } catch {
+        throw new Error(`Registry API returned invalid JSON (${response.status}).`);
+      }
+    }
+
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return { error: raw.slice(0, 500) || `Registry API request failed (${response.status}).` };
+    }
+  }
+
+  async function fetchPreservedEvidence(submissionId: string): Promise<PreservedEvidence[]> {
+    const response = await fetch(
+      `/api/ai-governance/registry/evidence?submissionId=${encodeURIComponent(submissionId)}`,
+      { method: 'GET', cache: 'no-store' },
+    );
+    const payload = await readApiPayload(response);
+    if (!response.ok) throw new Error(payload.error ?? 'Unable to load preserved evidence.');
+    return asArray<PreservedEvidence>(payload.evidence);
+  }
+
   async function loadPreservedEvidence(submissionId: string) {
     setEvidenceListBusy(true);
     try {
-      const response = await fetch(
-        `/api/ai-governance/registry/evidence?submissionId=${encodeURIComponent(submissionId)}`,
-        { method: 'GET', cache: 'no-store' },
-      );
-      const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error ?? 'Unable to load preserved evidence.');
-      setPreservedEvidence(payload.evidence ?? []);
+      const evidence = await fetchPreservedEvidence(submissionId);
+      setPreservedEvidence(evidence);
     } catch (error) {
       setErrors((current) => [
         ...current,
@@ -770,6 +796,10 @@ export default function RegisterGovernancePage() {
     }
     if (!item.description.trim()) {
       setErrors([`${item.file.name}: describe what this file supports before preserving it.`]);
+      return;
+    }
+    if (!item.provenanceStatus) {
+      setErrors([`${item.file.name}: select a provenance status before preserving it.`]);
       return;
     }
 
@@ -796,7 +826,7 @@ export default function RegisterGovernancePage() {
         method: 'POST',
         body,
       });
-      const payload = await response.json();
+      const payload = await readApiPayload(response);
       if (!response.ok) throw new Error(payload.error ?? 'Unable to preserve evidence.');
 
       setPreservedEvidence((current) => [...current, payload.evidence]);
@@ -814,6 +844,9 @@ export default function RegisterGovernancePage() {
   async function preserveEvidenceForSubmission(item: EvidenceFile, submissionId: string) {
     if (!item.description.trim()) {
       throw new Error(`${item.file.name}: describe what this file supports before preserving it.`);
+    }
+    if (!item.provenanceStatus) {
+      throw new Error(`${item.file.name}: select a provenance status before preserving it.`);
     }
 
     const body = new FormData();
@@ -836,7 +869,7 @@ export default function RegisterGovernancePage() {
       method: 'POST',
       body,
     });
-    const payload = await response.json();
+    const payload = await readApiPayload(response);
     if (!response.ok) {
       throw new Error(payload.error ?? `Unable to preserve ${item.file.name}.`);
     }
@@ -1487,6 +1520,13 @@ export default function RegisterGovernancePage() {
     if (undocumented.length > 0) {
       nextErrors.push('Every evidence file requires a short description.');
     }
+    const unprovenanced = files.filter((item) => !item.provenanceStatus);
+    if (unprovenanced.length > 0) {
+      nextErrors.push('Every evidence file requires a provenance status.');
+    }
+    if (files.length === 0 && preservedEvidence.length === 0) {
+      nextErrors.push('At least one preserved evidence item is required.');
+    }
 
     setErrors(nextErrors);
     return nextErrors.length === 0;
@@ -1723,7 +1763,10 @@ export default function RegisterGovernancePage() {
       case 6:
         return true;
       case 7:
-        return files.every((item) => item.description.trim());
+        return Boolean(
+          preservedEvidence.length > 0 ||
+            (files.length > 0 && files.every((item) => item.description.trim() && item.provenanceStatus)),
+        );
       case 8:
       case 9:
       case 10:
@@ -1761,7 +1804,8 @@ export default function RegisterGovernancePage() {
             form.accuracyConfirmed &&
             form.boundaryConfirmed &&
             termsAccepted &&
-            files.every((item) => item.description.trim()),
+            preservedEvidence.length > 0 &&
+            files.length === 0,
         );
       default:
         return true;
@@ -1777,13 +1821,51 @@ export default function RegisterGovernancePage() {
       return;
     }
 
-    if (next > activeStep) {
+    if (next > activeStep && activeStep === 7) {
+      setErrors([]);
+      setMessage('Preserving and verifying evidence before Step 09…');
+
+      const submissionId = await saveDraft();
+      if (!submissionId) return;
+
+      try {
+        for (const item of files) {
+          setEvidenceBusyId(item.id);
+          await preserveEvidenceForSubmission(item, submissionId);
+        }
+        setEvidenceBusyId(null);
+
+        const authoritativeEvidence = await fetchPreservedEvidence(submissionId);
+        if (authoritativeEvidence.length < 1) {
+          throw new Error(
+            'Step 08 cannot advance because the Registry did not confirm any preserved evidence for this draft.',
+          );
+        }
+
+        setPreservedEvidence(authoritativeEvidence);
+        setFiles([]);
+        const recoveryPreserved = await saveRecoveryDraft(next);
+        if (!recoveryPreserved) return;
+        setErrors([]);
+        setMessage('Evidence preserved and verified. Step 09 is now available.');
+      } catch (error) {
+        setEvidenceBusyId(null);
+        setErrors([
+          error instanceof Error ? error.message : 'Unable to preserve and verify evidence.',
+        ]);
+        setMessage('Step 08 remains open. Evidence must be durably preserved before continuing.');
+        return;
+      }
+    } else if (next > activeStep) {
       const preserved = await saveRecoveryDraft(next);
       if (!preserved) return;
+      setErrors([]);
+      setMessage('Step saved to your account-backed recovery record.');
+    } else {
+      setErrors([]);
+      setMessage('');
     }
 
-    setErrors([]);
-    setMessage(next > activeStep ? 'Step saved to your account-backed recovery record.' : '');
     setActiveStep(Math.max(0, Math.min(wizardSteps.length - 1, next)));
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
@@ -2680,7 +2762,7 @@ export default function RegisterGovernancePage() {
             <button type="button" className="secondary-button" disabled={activeStep === 0} onClick={() => void goToStep(activeStep - 1)}>← Previous</button>
             <span>{wizardSteps[activeStep].number} / 14</span>
             {activeStep < wizardSteps.length - 1 ? (
-              <button type="button" className="primary-button" onClick={() => void goToStep(activeStep + 1)}>Save & Continue →</button>
+              <button type="button" className="primary-button" onClick={() => void goToStep(activeStep + 1)} disabled={activeStep === 7 && Boolean(evidenceBusyId)}>{activeStep === 7 && evidenceBusyId ? 'Preserving Evidence…' : 'Save & Continue →'}</button>
             ) : (
               <button type="button" className="primary-button" onClick={submitForReview} disabled={submitBusy || termsBusy || !termsAccepted || Boolean(submittedRecord)}>
                 {submittedRecord ? 'Submitted ✓' : termsBusy ? 'Preserving Terms…' : submitBusy ? 'Submitting…' : 'Submit for Review →'}
