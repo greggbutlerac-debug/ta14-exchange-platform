@@ -17,6 +17,7 @@ const routes = [
   '/eu-ai-act/recruitment-hr',
   '/eu-ai-act/hiring-interviews-candidate-screening',
   '/eu-ai-act/financial-services',
+  '/eu-ai-act/credit-scoring-lending-ai',
   '/eu-ai-act/insurance-ai',
   '/eu-ai-act/healthcare-medical-ai',
   '/eu-ai-act/education-ai',
