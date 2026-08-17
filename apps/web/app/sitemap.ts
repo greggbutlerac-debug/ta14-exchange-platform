@@ -33,6 +33,7 @@ const routes = [
   '/eu-ai-act/public-administration-government-ai',
   '/eu-ai-act/justice-democratic-processes-ai',
   '/eu-ai-act/gpai-providers',
+  '/eu-ai-act/importers-distributors',
   '/eu-ai-act/vendor-procurement',
   '/eu-ai-act/ai-agents-autonomous-workflows',
   '/eu-ai-act/synthetic-media-deepfakes',
