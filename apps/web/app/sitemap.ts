@@ -52,6 +52,7 @@ const routes = [
   '/eu-ai-act/proof-lab',
   '/eu-ai-act/command-center',
   '/eu-ai-act/commercial',
+  '/eu-ai-act/readiness-review',
   '/academy/eu-ai-act',
   '/workspace/governed-records/eu-ai-act',
   '/ai-governance-registry',
