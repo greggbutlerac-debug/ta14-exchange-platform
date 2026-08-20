@@ -72,7 +72,7 @@ export default function EUAICommercial(){return <main className="page">
       <h2>EU AI Act Governed Readiness Review</h2>
       <p>A fixed-scope review for one AI system when your organization needs more than software and wants a bounded second set of eyes on the current position.</p>
       <div className="price"><strong>$750</strong><span>starting fixed scope · one AI system</span></div>
-      <Link href="/workspace/request-review">REQUEST THE REVIEW →</Link>
+      <Link href="/eu-ai-act/readiness-review">REQUEST THE REVIEW →</Link>
     </div>
     <div className="reviewScope">
       <article><b>01 · SYSTEM & ROLE</b><p>Identify the system, intended purpose, organizational role, EU exposure and declared scope.</p></article>
@@ -120,7 +120,7 @@ export default function EUAICommercial(){return <main className="page">
     <div><small>START WITH THE PROBLEM YOU HAVE</small><h2>You do not need to choose the perfect plan first.</h2><p>If you are unsure what applies, classify the system free. If you already know you need help, request the $750 readiness review. If you need continuing evidence infrastructure, start a subscription.</p></div>
     <div className="decisionActions">
       <Link className="primary" href="/eu-ai-act/classifier">CLASSIFY MY SYSTEM →</Link>
-      <Link className="reviewCta" href="/workspace/request-review">REQUEST A REVIEW →</Link>
+      <Link className="reviewCta" href="/eu-ai-act/readiness-review">REQUEST A REVIEW →</Link>
       <Link className="secondary" href="/eu-ai-act/join">START PAID ACCESS →</Link>
     </div>
   </section>
