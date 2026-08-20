@@ -50,7 +50,7 @@ export default function SeoAcquisitionPage({eyebrow,title,accent,intro,sourceLab
       <small>START WITH ONE SYSTEM</small>
       <h2>Find out what may apply before you buy anything.</h2>
       <p>Use the free classifier to establish the system, intended purpose, possible actor role, EU exposure and unresolved facts. If you then need continuing evidence infrastructure or a human readiness review, those are separate next steps.</p>
-      <div className="actions"><Link className="primary" href={classifierHref}>CHECK MY AI SYSTEM — FREE →</Link><Link className="secondary" href="/eu-ai-act/commercial#readiness-review">REQUEST A $750 READINESS REVIEW →</Link></div>
+      <div className="actions"><Link className="primary" href={classifierHref}>CHECK MY AI SYSTEM — FREE →</Link><Link className="secondary" href="/eu-ai-act/readiness-review">REQUEST A $750 READINESS REVIEW →</Link></div>
     </section>
 
     <section className="faq">
