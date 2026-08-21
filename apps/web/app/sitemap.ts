@@ -2,8 +2,22 @@ import type { MetadataRoute } from 'next';
 
 const baseUrl = 'https://ta14exchange.com';
 
+// Public, institutionally controlled surfaces only. Private Registry submissions
+// and authenticated workspaces must never be enumerated here.
 const routes = [
   '/',
+  '/ai-governance',
+  '/ai-governance-registry',
+  '/workspace/ai-governance/registry/directory',
+  '/artifacts',
+  '/artifacts/registry',
+  '/artifacts/founding-demonstrations',
+  '/artifacts/interoperability-examinations',
+  '/academy',
+  '/environmental-integrity-governance',
+  '/foundation',
+  '/law-standards-public-policy',
+  '/marketplace',
   '/eu-ai-act',
   '/eu-ai-act/start',
   '/eu-ai-act/classifier',
@@ -55,10 +69,6 @@ const routes = [
   '/eu-ai-act/readiness-review',
   '/academy/eu-ai-act',
   '/workspace/governed-records/eu-ai-act',
-  '/ai-governance-registry',
-  '/ai-governance',
-  '/academy',
-  '/marketplace',
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -68,6 +78,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: now,
     changeFrequency: index === 0 ? 'daily' : 'weekly',
-    priority: route === '/' ? 1 : route.startsWith('/eu-ai-act') ? 0.9 : 0.7,
+    priority:
+      route === '/'
+        ? 1
+        : route.startsWith('/eu-ai-act')
+          ? 0.9
+          : route.includes('registry') || route.startsWith('/artifacts')
+            ? 0.85
+            : 0.7,
   }));
 }
