@@ -1,25 +1,50 @@
-'use client';
+import RegistryDirectoryClient, { type PublicRegistryRecord } from './RegistryDirectoryClient';
 
-import Link from 'next/link';
-import { useEffect, useMemo, useState } from 'react';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 
-type PublicRegistryRecord={id:string;registryIdentifier:string;governanceName:string;shortName?:string|null;version?:string|null;category?:string|null;steward?:string|null;claimedEstablishmentDate?:string|null;registeredAt?:string|null;status:string;summary?:string|null;domains?:string[];evidenceCount?:number;disputeCount?:number};
-type RegistryResponse={records:PublicRegistryRecord[];count:number};
-type HistorySummary={registry_identifier:string;event_count:number;examination_count:number;response_correction_count:number;latest_event_date:string|null;latest_event_type:string|null;latest_event_title:string|null};
-const STATUS_OPTIONS=['All','Registered','Disputed','Superseded','Withdrawn','Archived'];
-function formatDate(v?:string|null){if(!v)return 'Not declared';const d=new Date(v);return Number.isNaN(d.getTime())?v:new Intl.DateTimeFormat('en-US',{year:'numeric',month:'short',day:'numeric'}).format(d)}
-function label(v?:string|null){return v?v.replaceAll('_',' ').replace(/\b\w/g,c=>c.toUpperCase()):'No event yet'}
-function statusClass(s:string){return `status status-${s.toLowerCase().replace(/\s+/g,'-')}`}
-export default function RegistryDirectoryPage(){
- const[records,setRecords]=useState<PublicRegistryRecord[]>([]);const[history,setHistory]=useState<Record<string,HistorySummary>>({});const[query,setQuery]=useState('');const[status,setStatus]=useState('All');const[loading,setLoading]=useState(true);const[error,setError]=useState('');
- useEffect(()=>{let cancelled=false;(async()=>{try{setLoading(true);const r=await fetch('/api/registry/public',{cache:'no-store'});if(!r.ok)throw new Error(`Registry request failed with status ${r.status}.`);const p=await r.json() as RegistryResponse;if(cancelled)return;setRecords(Array.isArray(p.records)?p.records:[]);const h=await fetch('/api/registry/history-summary',{cache:'no-store'});if(h.ok){const hp=await h.json() as {records:HistorySummary[]};if(!cancelled)setHistory(Object.fromEntries((hp.records||[]).map(x=>[x.registry_identifier,x])));}}catch(e){if(!cancelled)setError(e instanceof Error?e.message:'The Registry directory could not be loaded.')}finally{if(!cancelled)setLoading(false)}})();return()=>{cancelled=true}},[]);
- const filtered=useMemo(()=>{const q=query.trim().toLowerCase();return records.filter(r=>{const hs=history[r.registryIdentifier];const hay=[r.registryIdentifier,r.governanceName,r.shortName,r.category,r.steward,r.summary,...(r.domains||[]),hs?.latest_event_title,hs?.latest_event_type].filter(Boolean).join(' ').toLowerCase();return(status==='All'||r.status===status)&&(!q||hay.includes(q))})},[records,history,query,status]);
- return <main className="page"><div className="stars"/><header><Link href="/workspace/ai-governance/registry"><b>TA-14</b><span>Public Registry Directory</span></Link><nav><Link href="/workspace/ai-governance/registry">Registry Home</Link><Link className="primary" href="/workspace/ai-governance/registry/register">Register an Architecture</Link></nav></header>
- <section className="hero"><p>SEARCHABLE PUBLIC GOVERNANCE RECORDS</p><h1>Registered governance<br/><em>architectures and their histories.</em></h1><div>Search public identities, versions and preserved institutional progression. Registration preserves an attributable declaration; it does not certify legal compliance, effectiveness, ownership priority, or fitness for use.</div></section>
- <section className="search"><label><span>Search the Registry</span><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Governance, Registry ID, steward, event, domain..."/></label><label><span>Status</span><select value={status} onChange={e=>setStatus(e.target.value)}>{STATUS_OPTIONS.map(x=><option key={x}>{x}</option>)}</select></label><aside><strong>{loading?'—':filtered.length}</strong><small>public records</small></aside></section>
- <section className="records">{loading?<div className="state">Opening the public Registry…</div>:error?<div className="state">{error}</div>:filtered.length===0?<div className="state">No public Registry record matches this search.</div>:<div className="grid">{filtered.map(r=>{const h=history[r.registryIdentifier];return <article key={r.id}><div className="top"><span className={statusClass(r.status)}>{r.status}</span><code>{r.registryIdentifier}</code></div><p className="category">{r.category||'AI Governance Architecture'}</p><h2>{r.governanceName}</h2>{r.shortName&&<h3>{r.shortName}</h3>}<p className="summary">{r.summary||'Open the permanent Registry record to inspect the declared governance identity and its preserved institutional history.'}</p><dl><div><dt>Current version</dt><dd>{r.version||'Not declared'}</dd></div><div><dt>Steward</dt><dd>{r.steward||'Not publicly declared'}</dd></div><div><dt>Registered</dt><dd>{formatDate(r.registeredAt)}</dd></div></dl>
- <section className="history"><div className="historyTitle"><span>GOVERNED HISTORY</span><strong>{h?.event_count??0} preserved events</strong></div><div className="historyStats"><span><b>{h?.examination_count??0}</b> demonstrations / examinations</span><span><b>{h?.response_correction_count??0}</b> responses / corrections</span></div><div className="latest"><small>LATEST PRESERVED EVENT</small><b>{label(h?.latest_event_type)}</b><span>{h?.latest_event_title||'The permanent identity is established; additional governed progression has not yet been published.'}</span><time>{formatDate(h?.latest_event_date)}</time></div></section>
- <div className="actions"><Link href={`/workspace/ai-governance/registry/records/${encodeURIComponent(r.registryIdentifier)}`}>Permanent Record →</Link><Link className="life" href={`/workspace/ai-governance/registry/history/${encodeURIComponent(r.registryIdentifier)}`}>View Life History →</Link></div></article>})}</div>}</section>
- <section className="note"><div><p>INSTITUTIONAL MEMORY</p><h2>Registration is the beginning of the record, not the end.</h2></div><p>Each architecture keeps one permanent identity while versions, demonstrations, findings, examinations, challenges, corrections, participant responses and external publications accumulate beneath it. Later events do not silently erase earlier states.</p></section><footer><b>TA-14 AI Governance Registry</b><span>Dated · Searchable · Attributable · Challengeable · Historically preserved</span></footer>
- <style jsx global>{`:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#020914;color:#edf7ff;font-family:Inter,system-ui,sans-serif}a{color:inherit;text-decoration:none}.page{min-height:100vh;position:relative;overflow:hidden;background:radial-gradient(circle at 52% 5%,rgba(23,105,175,.24),transparent 31%),linear-gradient(#020812,#061321,#020812)}.stars{position:fixed;inset:-20%;opacity:.45;pointer-events:none;background-image:radial-gradient(circle,rgba(255,255,255,.8) 0 1px,transparent 1.5px);background-size:110px 110px;animation:drift 65s linear infinite}header,.hero,.search,.records,.note,footer{position:relative;z-index:2;width:min(1240px,calc(100% - 40px));margin-inline:auto}header{margin-top:18px;min-height:76px;padding:12px 15px;display:flex;align-items:center;justify-content:space-between;border:1px solid #7dcbff2e;border-radius:20px;background:#020a13c7}header>a{display:flex;align-items:center;gap:13px}header>a b{width:50px;height:50px;display:grid;place-items:center;border:1px solid #ffd68c66;border-radius:15px;color:#ffd68c}header>a span{font-family:Georgia,serif;font-weight:700}nav{display:flex;gap:8px}nav a,.actions a{padding:12px 14px;border:1px solid #88ccff38;border-radius:11px;font-size:11px;font-weight:900}.primary,.actions .life{background:linear-gradient(135deg,#bcf1ff,#66ceff);color:#03121d!important}.hero{padding:100px 0 55px;text-align:center}.hero>p,.note>div>p{color:#ffd68c;font-size:10px;font-weight:900;letter-spacing:.2em}.hero h1{margin:0;font:500 clamp(45px,7vw,82px)/.98 Georgia,serif;letter-spacing:-.04em}.hero h1 em{color:#75dfff}.hero>div{max-width:850px;margin:25px auto;color:#b9cad6;line-height:1.8}.search{display:grid;grid-template-columns:1fr 220px 120px;gap:14px;padding:20px;border:1px solid #7dcbff2e;border-radius:20px;background:#05121fe6}.search label{display:grid;gap:7px}.search label span{font-size:10px;font-weight:900;color:#b9cbd8}.search input,.search select{min-height:48px;padding:0 14px;border:1px solid #7ec7f838;border-radius:12px;background:#030f1ae6;color:#edf7ff}.search aside{display:grid;place-content:center;text-align:center}.search aside strong{font:26px Georgia,serif;color:#ffd68c}.search aside small{color:#8ca4b5}.records{padding:40px 0 90px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}.grid>article{padding:27px;border:1px solid #7dcbff2b;border-radius:22px;background:linear-gradient(155deg,#071a2be8,#04101ce8);box-shadow:0 24px 70px #0005}.top{display:flex;justify-content:space-between;align-items:center}.status{padding:6px 9px;border:1px solid #6ce3b055;border-radius:999px;color:#6ce3b0;font-size:9px;font-weight:900;text-transform:uppercase}.top code{color:#75dfff;font-size:10px}.category{margin:25px 0 7px;color:#ffd68c;font-size:9px;font-weight:900;letter-spacing:.13em}.grid h2{margin:0;font:500 30px/1.05 Georgia,serif}.grid h3{margin:7px 0;color:#8fb1c6;font-size:13px}.summary{min-height:68px;color:#a9bdca;line-height:1.65;font-size:13px}.grid dl{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.grid dl div{padding:10px;border:1px solid #7dcbff1c;border-radius:10px}.grid dt{color:#708a9b;font-size:8px;text-transform:uppercase}.grid dd{margin:5px 0 0;font-size:11px}.history{margin-top:18px;padding:18px;border:1px solid #d9ad5540;border-radius:15px;background:linear-gradient(120deg,#7b551b1c,#061827c7)}.historyTitle{display:flex;justify-content:space-between;gap:10px}.historyTitle span{color:#d9ad55;font-size:9px;font-weight:900;letter-spacing:.13em}.historyTitle strong{font-size:11px}.historyStats{display:flex;gap:8px;margin:13px 0}.historyStats span{flex:1;padding:8px;border:1px solid #75dfff1d;border-radius:9px;color:#8da8ba;font-size:9px}.historyStats b{color:#75dfff;font-size:13px}.latest{display:grid;gap:4px;padding-top:12px;border-top:1px solid #d9ad5525}.latest small{color:#6e899b;font-size:8px;letter-spacing:.1em}.latest b{color:#edf7ff;font-size:11px}.latest span{color:#9db2c3;font-size:10px;line-height:1.5}.latest time{margin-top:4px;color:#d9ad55;font-size:9px}.actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.note{margin-bottom:90px;padding:35px;display:grid;grid-template-columns:1fr 1.2fr;gap:40px;border:1px solid #d9ad5540;border-radius:20px;background:#071522d9}.note h2{margin:5px 0;font:500 30px Georgia,serif}.note>p{color:#a7bdca;line-height:1.75}.page footer{padding:30px 0 45px;display:flex;justify-content:space-between;border-top:1px solid #75dfff20;color:#7f9aaa;font-size:11px}.page footer span{color:#d9ad55}@keyframes drift{to{transform:translate3d(110px,110px,0)}}@media(max-width:850px){nav a:first-child{display:none}.search{grid-template-columns:1fr}.grid{grid-template-columns:1fr}.note{grid-template-columns:1fr}.grid dl{grid-template-columns:1fr}.actions{flex-direction:column}.actions a{text-align:center}}`}</style></main>
+type PublicRegistryRow = {
+  id: string;
+  registry_identifier: string;
+  governance_name: string;
+  short_name?: string | null;
+  version?: string | null;
+  category?: string | null;
+  steward?: string | null;
+  claimed_establishment_date?: string | null;
+  registered_at?: string | null;
+  status: string;
+  summary?: string | null;
+  domains?: string[] | null;
+  evidence_count?: number | string | null;
+  dispute_count?: number | string | null;
+};
+
+function numericCount(value:number|string|null|undefined){
+ if(typeof value==='number'&&Number.isFinite(value))return value;
+ if(typeof value==='string'){const parsed=Number.parseInt(value,10);if(Number.isFinite(parsed))return parsed;}
+ return 0;
+}
+
+function normalizeRow(row:PublicRegistryRow):PublicRegistryRecord{
+ return {id:row.id,registryIdentifier:row.registry_identifier,governanceName:row.governance_name,shortName:row.short_name??null,version:row.version??null,category:row.category??null,steward:row.steward??null,claimedEstablishmentDate:row.claimed_establishment_date??null,registeredAt:row.registered_at??null,status:row.status,summary:row.summary??null,domains:Array.isArray(row.domains)?row.domains:[],evidenceCount:numericCount(row.evidence_count),disputeCount:numericCount(row.dispute_count)};
+}
+
+async function loadPublicRegistry():Promise<{records:PublicRegistryRecord[];error:string}>{
+ const supabaseUrl=process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/,'');
+ const supabaseAnonKey=process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+ if(!supabaseUrl||!supabaseAnonKey)return {records:[],error:'The public Registry is temporarily unavailable.'};
+ try{
+  const response=await fetch(`${supabaseUrl}/rest/v1/rpc/ta14_registry_public_directory_v1`,{method:'POST',cache:'no-store',headers:{apikey:supabaseAnonKey,Authorization:`Bearer ${supabaseAnonKey}`,Accept:'application/json','Content-Type':'application/json'},body:JSON.stringify({})});
+  if(!response.ok)return {records:[],error:'The public Registry could not be loaded.'};
+  const payload:unknown=await response.json();
+  if(!Array.isArray(payload))return {records:[],error:'The public Registry returned an invalid response.'};
+  const records=(payload as PublicRegistryRow[]).filter(row=>row&&typeof row.id==='string'&&typeof row.registry_identifier==='string'&&typeof row.governance_name==='string'&&typeof row.status==='string').map(normalizeRow);
+  return {records,error:''};
+ }catch{return {records:[],error:'The public Registry service is temporarily unavailable.'};}
+}
+
+export default async function RegistryDirectoryPage(){
+ const {records,error}=await loadPublicRegistry();
+ return <RegistryDirectoryClient initialRecords={records} initialError={error}/>;
 }
