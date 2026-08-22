@@ -11,6 +11,7 @@ const supported = [
 const limits = [
   "Complete correspondence between the three callable frozen aliases and the authenticated tools/list catalog is not established.",
   "TA-14 did not independently reproduce the Azure MCP execution during this documentary review.",
+  "This demonstration did not independently test or establish VSA's broader standing-transition mechanism, including changed-condition reassessment, standing withdrawal, or evidence-based standing restoration.",
   "The record does not establish Azure write authority, universal Azure-read safety, future-state standing, production readiness, legal compliance, certification, endorsement, or universal security.",
 ] as const;
 
@@ -21,8 +22,8 @@ const states = [
   ["Catalog correspondence", "NOT ESTABLISHED"],
   ["Canonical evidence-content digest", "VERIFIED - MATCHES PARTICIPANT ASSERTED DIGEST"],
   ["Independent live reproduction by TA-14", "NOT PERFORMED"],
-  ["Participant factual review", "PENDING"],
-  ["Case state", "OPEN - DRAFT NOT CLOSED"],
+  ["Participant factual review", "COMPLETED - SCOPE CLARIFICATION INCORPORATED"],
+  ["Case state", "OPEN - FINAL SEALING PENDING"],
 ] as const;
 
 export default function VsaCobitChainR1Showcase(){
@@ -34,11 +35,11 @@ export default function VsaCobitChainR1Showcase(){
     </header>
 
     <section className="hero">
-      <div className="badges"><span>OPEN GOVERNED DEMONSTRATION</span><span>PARTICIPANT FACTUAL REVIEW PENDING</span></div>
+      <div className="badges"><span>OPEN GOVERNED DEMONSTRATION</span><span>PARTICIPANT FACTUAL REVIEW COMPLETED</span></div>
       <p className="eyebrow">VALIDATION STANDING ASSURANCE v1.0 · TA-14-AIGR-000025</p>
       <h1>A PASS can survive beside an unresolved condition.</h1>
       <p className="lede">VSA / COBIT-Chain Azure MCP Gateway R1 entered a bounded documentary review around one question: can three frozen read-only calls execute while every non-frozen route advertised by the authenticated live upstream catalog is refused before upstream execution?</p>
-      <div className="finding"><span>CURRENT TA-14 DRAFT FINDING</span><strong>SUPPORTED - BOUNDED PASS</strong><p>The bounded containment proposition is supported by the admitted participant evidence. Catalog correspondence remains not established and travels with the PASS.</p></div>
+      <div className="finding"><span>CURRENT TA-14 GOVERNED FINDING</span><strong>SUPPORTED - BOUNDED PASS</strong><p>The bounded containment proposition is supported by the admitted participant evidence. Catalog correspondence remains not established and travels with the PASS.</p></div>
       <div className="actions"><Link className="button primary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000025">Open VSA Registry Identity</Link><Link className="button secondary" href="/artifacts/founding-demonstrations/methodology">Review Demonstration Methodology</Link></div>
     </section>
 
@@ -46,7 +47,7 @@ export default function VsaCobitChainR1Showcase(){
       <div><span>PARTICIPANT CHALLENGE</span><strong>TA14-VSA-GREG-R1-002</strong></div>
       <div><span>GATEWAY MODE</span><strong>r1-read-only</strong></div>
       <div><span>TA-14 FINDING RECORD ID</span><strong>PENDING ASSIGNMENT</strong></div>
-      <div><span>PUBLICATION STATE</span><strong>OPEN DRAFT</strong></div>
+      <div><span>PUBLICATION STATE</span><strong>OPEN - FINALIZATION PENDING</strong></div>
     </section>
 
     <section className="section">
@@ -69,7 +70,7 @@ export default function VsaCobitChainR1Showcase(){
 
     <section className="section panel">
       <div className="heading"><p>05 · FINAL GOVERNED STATE</p><h2>Support and ceiling remain visible together.</h2></div>
-      <div className="state-grid">{states.map(([label,value])=><div key={label}><span>{label}</span><strong className={value.includes("SUPPORTED")||value.includes("VERIFIED")?"good":value.includes("NOT ESTABLISHED")||value.includes("NOT PERFORMED")?"open":"pending"}>{value}</strong></div>)}</div>
+      <div className="state-grid">{states.map(([label,value])=><div key={label}><span>{label}</span><strong className={value.includes("SUPPORTED")||value.includes("VERIFIED")||value.includes("COMPLETED")?"good":value.includes("NOT ESTABLISHED")||value.includes("NOT PERFORMED")?"open":"pending"}>{value}</strong></div>)}</div>
     </section>
 
     <section className="section integrity">
@@ -87,8 +88,8 @@ export default function VsaCobitChainR1Showcase(){
     </section>
 
     <section className="section pending">
-      <p className="eyebrow">08 · CURRENT CASE POSTURE</p><h2>Participant factual review is pending.</h2>
-      <p>This public showcase reflects the current draft governed state. It is not a closed case, final certification, or participant endorsement of TA-14's wording. If a factual correction or dispute is submitted, the correction is evaluated against the evidence and preserved in chronology rather than silently rewriting the record.</p>
+      <p className="eyebrow">08 · CURRENT CASE POSTURE</p><h2>Participant factual review is complete.</h2>
+      <p>The participant identified no disputed factual statements in the reviewed finding and accepted the SUPPORTED - BOUNDED PASS together with preservation of catalog_correspondence_established: false. The participant requested, and TA-14 incorporated, one scope clarification: this demonstration tested only the bounded COBIT-Chain Azure MCP Gateway R1 execution-containment and restraint proposition. It did not independently test or establish the broader VSA standing-transition mechanism, including changed-condition reassessment, standing withdrawal, or evidence-based standing restoration. The case remains open pending final institutional sealing and authoritative finding-record assignment.</p>
     </section>
 
     <footer><div><strong>TA-14 Authority Governance Institution</strong><span>VSA / COBIT-Chain Azure MCP Gateway R1 · Open Governed Demonstration</span></div><p>No claim beyond the evidence.</p></footer>
