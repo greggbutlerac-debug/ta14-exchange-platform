@@ -1,52 +1,39 @@
-# TA-14 Global Admissible Execution Exchange
+What makes this discussion important is that it is no longer about whether an organization can point to policies, controls, signatures, approval gates, or human accountability.
 
-## V0.3.2 — Multi-Domain Route Construction and Evaluation
+All of those matter.
 
-The TA-14 Exchange Platform is a runnable governance workspace for constructing, evaluating, correcting, preserving, and independently verifying consequential execution routes.
+The harder question is whether they remain connected when consequence actually occurs.
 
-The governing principle is:
+That is why I keep returning to the TA-14 chain:
 
-> **No admissible evidence. No admissible execution.**
+Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome.
 
-TA-14 does not treat declarations, dashboards, approvals, policy checks, or system confidence as proof that an execution is legitimate.
+A human may have had legitimate authority.
 
-A consequence-bearing route must remain connected to admissible evidence, valid authority, preserved continuity, explicit bindings, committed intent, corresponding execution, and recorded outcome.
+A policy may have been valid.
 
----
+Evidence may have supported the decision.
 
-## Live application
+An approval may have been properly issued.
 
-Production deployment:
+But if the governing reality changed before execution, if authority expired or exceeded scope, if the evidence became stale, or if the execution path detached from the authorized determination, then yesterday’s valid approval cannot automatically govern today’s consequence.
 
-**https://ta14-exchange-platform-theta.vercel.app/**
+That is the distinction between governance as documentation and governance as inspectable evidence.
 
-Governance workspace:
+And I agree with an important point raised in this discussion: human provenance and accountability are indispensable. TA-14 does not replace them. It asks whether we can prove that they remained attributable, bounded, continuous, and connected all the way through consequence.
 
-**https://ta14-exchange-platform-theta.vercel.app/workspace**
+The standard should not be:
 
-Route evaluation workspace:
+“We had governance.”
 
-**https://ta14-exchange-platform-theta.vercel.app/workspace/routes/new**
+It should be:
 
----
+“Here is the record. Here is the authority. Here is the evidence. Here is what changed. Here is why the determination remained admissible. Here is what was permitted to bind. Here is what actually executed. Examine it.”
 
-## Canonical TA-14 chain
+That is a much harder standard.
 
-Every route is governed through the same eight-stage admissibility chain:
+It is also the standard consequential AI is eventually going to need.
 
-```text
-Reality
-  ↓
-Record
-  ↓
-Continuity
-  ↓
-Admissibility
-  ↓
-Binding
-  ↓
-Commit
-  ↓
-Execution
-  ↓
-Outcome
+Governance should not win by assertion.
+
+It should survive inspection.
