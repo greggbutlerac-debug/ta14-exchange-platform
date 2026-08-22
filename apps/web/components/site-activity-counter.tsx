@@ -19,10 +19,18 @@ type SiteActivityState = {
 
 function formatCount(value: number | null): string {
   if (value === null) {
-    return "—";
+    return "Unavailable";
   }
 
   return new Intl.NumberFormat("en-US").format(value);
+}
+
+function displayCount(value: number | null, status: SiteActivityState["status"]): string {
+  if (status === "loading") {
+    return "Loading";
+  }
+
+  return formatCount(value);
 }
 
 export function SiteActivityCounter() {
@@ -119,7 +127,7 @@ export function SiteActivityCounter() {
         <div className="grid grid-cols-2 gap-3">
           <div className="min-w-28 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-center">
             <p className="text-2xl font-semibold tabular-nums text-white">
-              {formatCount(activity.visitors)}
+              {displayCount(activity.visitors, activity.status)}
             </p>
             <p className="mt-1 text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/45">
               Visitors
@@ -128,7 +136,7 @@ export function SiteActivityCounter() {
 
           <div className="min-w-28 rounded-xl border border-white/10 bg-white/[0.035] px-4 py-3 text-center">
             <p className="text-2xl font-semibold tabular-nums text-white">
-              {formatCount(activity.pageViews)}
+              {displayCount(activity.pageViews, activity.status)}
             </p>
             <p className="mt-1 text-[0.65rem] font-medium uppercase tracking-[0.2em] text-white/45">
               Page Views
@@ -136,6 +144,12 @@ export function SiteActivityCounter() {
           </div>
         </div>
       </div>
+
+      {activity.status === "loading" ? (
+        <p className="mt-3 text-xs text-white/35">
+          Live public totals are loading.
+        </p>
+      ) : null}
 
       {activity.status === "unavailable" ? (
         <p className="mt-3 text-xs text-white/35">
