@@ -20,6 +20,11 @@ const nextConfig: NextConfig = {
   async redirects() {
     return [
       {
+        source: "/workspace/ai-governance/registry/records/TA-14-AIGR-000025",
+        destination: "/registry/records/TA-14-AIGR-000025",
+        permanent: true,
+      },
+      {
         source: "/workspace/ai-governance/registry/showcase",
         destination: "/governance-showcase",
         permanent: true,
