@@ -5,13 +5,16 @@ import {
   type PreservedRuntimeGovernedRecord,
 } from "./runtime-preserved-governed-record";
 import {
-  savePreservedRuntimeGovernedRecord,
-} from "./runtime-preserved-governed-record-storage";
-import {
   assertRuntimePreservationReady,
   evaluateRuntimePreservationReadiness,
   type RuntimePreservationReadiness,
 } from "./runtime-preservation-readiness";
+import {
+  assertAuthoritativeReceipt,
+  AuthoritativePreservationUnavailableError,
+  type AuthoritativePreservationReceipt,
+  type AuthoritativeRuntimeRecordStore,
+} from "./runtime-authoritative-preservation";
 
 export interface PreserveRuntimeCandidateRequest {
   candidate: GovernedRecordCandidate;
@@ -28,6 +31,7 @@ export interface PreserveRuntimeCandidateRequest {
 export interface PreserveRuntimeCandidateResult {
   readiness: RuntimePreservationReadiness;
   record: PreservedRuntimeGovernedRecord;
+  receipt: AuthoritativePreservationReceipt;
 }
 
 export function inspectRuntimeCandidateForPreservation(
@@ -36,21 +40,26 @@ export function inspectRuntimeCandidateForPreservation(
   return evaluateRuntimePreservationReadiness(candidate);
 }
 
-export function preserveRuntimeCandidate(
+/**
+ * Preserve only through an explicitly supplied authoritative server store.
+ * There is intentionally no browser/local fallback. If the institutional
+ * boundary is unavailable, preservation fails closed and no preservation
+ * receipt is issued.
+ */
+export async function preserveRuntimeCandidate(
   request: PreserveRuntimeCandidateRequest,
-): PreserveRuntimeCandidateResult {
-  const readiness = evaluateRuntimePreservationReadiness(
-    request.candidate,
-  );
-
+  store?: AuthoritativeRuntimeRecordStore,
+): Promise<PreserveRuntimeCandidateResult> {
+  const readiness = evaluateRuntimePreservationReadiness(request.candidate);
   assertRuntimePreservationReady(request.candidate);
 
   const authorityBasis = request.authorityBasis.trim();
-
   if (!authorityBasis) {
-    throw new Error(
-      "An explicit preservation authority basis is required.",
-    );
+    throw new Error("An explicit preservation authority basis is required.");
+  }
+
+  if (!store) {
+    throw new AuthoritativePreservationUnavailableError();
   }
 
   const record = preserveGovernedRecordCandidate({
@@ -65,10 +74,8 @@ export function preserveRuntimeCandidate(
     metadata: request.metadata,
   });
 
-  savePreservedRuntimeGovernedRecord(record);
+  const receipt = await store.preserve(record);
+  assertAuthoritativeReceipt(record, receipt);
 
-  return {
-    readiness,
-    record,
-  };
+  return { readiness, record, receipt };
 }
