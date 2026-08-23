@@ -42,6 +42,16 @@ export default function AgentExecutedWithoutAuthorityPage() {
       <p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 can examine one bounded execution claim without requiring the system under review to become TA-14. Native architecture and evidence remain native; unsupported findings and bypass conditions remain valid examination results.</p>
     </div></section>
 
+    <section className="mx-auto max-w-5xl px-6 py-16">
+      <h2 className="text-2xl font-bold">Related execution-evidence problems</h2>
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <Link href="/ai-governance/authorization-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-rose-300/60"><h3 className="font-semibold">Did authority change first?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine whether a previously valid authorization lost standing before execution.</p></Link>
+        <Link href="/ai-governance/evidence-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-rose-300/60"><h3 className="font-semibold">Did the evidence become stale?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Determine whether changed evidence should have triggered revalidation before consequence.</p></Link>
+        <Link href="/ai-governance/prove-ai-action-was-blocked" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-rose-300/60"><h3 className="font-semibold">Compare against a blocking claim</h3><p className="mt-2 text-sm leading-6 text-slate-300">See what evidence would be needed to prove an action actually stopped instead.</p></Link>
+      </div>
+      <Link href="/ai-governance/execution-evidence" className="mt-6 inline-block font-semibold text-rose-300">Explore the complete AI Execution Evidence hub →</Link>
+    </section>
+
     <section className="mx-auto max-w-5xl px-6 py-20">
       <div className="rounded-2xl border border-rose-300/30 bg-rose-300/5 p-8 md:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-rose-300">Commercial examination</p>
