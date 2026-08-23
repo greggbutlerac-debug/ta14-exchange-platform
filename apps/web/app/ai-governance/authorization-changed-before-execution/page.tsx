@@ -49,6 +49,16 @@ export default function AuthorizationChangedBeforeExecutionPage() {
       <p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 examines that claim without requiring your architecture to adopt TA-14 terminology. The object is bounded, the native evidence is preserved, changed conditions are introduced where agreed, and the result records what the system can and cannot support.</p>
     </div></section>
 
+    <section className="mx-auto max-w-5xl px-6 py-16">
+      <h2 className="text-2xl font-bold">Related execution-evidence problems</h2>
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <Link href="/ai-governance/evidence-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-300/60"><h3 className="font-semibold">Evidence changed too?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine whether the evidence itself retained standing before execution.</p></Link>
+        <Link href="/ai-governance/ai-agent-executed-without-authority" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-300/60"><h3 className="font-semibold">Execution already happened?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Reconstruct authority, commitment, execution path, and outcome.</p></Link>
+        <Link href="/ai-governance/prove-ai-action-was-blocked" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-300/60"><h3 className="font-semibold">System says it blocked the action?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Determine what evidence actually supports the blocking claim.</p></Link>
+      </div>
+      <Link href="/ai-governance/execution-evidence" className="mt-6 inline-block font-semibold text-cyan-300">Explore the complete AI Execution Evidence hub →</Link>
+    </section>
+
     <section className="mx-auto max-w-5xl px-6 py-20">
       <div className="rounded-2xl border border-cyan-300/30 bg-cyan-300/5 p-8 md:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Commercial examination</p>
