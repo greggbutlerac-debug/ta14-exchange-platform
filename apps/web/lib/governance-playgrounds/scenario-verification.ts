@@ -9,9 +9,8 @@ import type {
  * TA-14 Governance-Specific Playgrounds
  * Scenario result verification
  *
- * This module compares an observed scenario run against the scenario
- * definition that governed the test. It does not determine the route outcome;
- * it verifies whether the scenario behaved as expected.
+ * Frozen definition-to-run verification. Readiness fails closed on missing,
+ * duplicate, incomplete, mismatched or malformed required scenario evidence.
  */
 
 export type ScenarioVerificationSeverity = "ERROR" | "WARNING";
@@ -42,23 +41,11 @@ function verificationIssue(
   message: string,
   gateId?: string,
 ): ScenarioVerificationIssue {
-  return {
-    severity,
-    code,
-    message,
-    gateId,
-  };
+  return { severity, code, message, gateId };
 }
 
-function observedGateStatusById(
-  run: ScenarioRun,
-): ReadonlyMap<string, GateResultStatus> {
-  return new Map(
-    run.gateResults.map((gateResult) => [
-      gateResult.gateId,
-      gateResult.status,
-    ]),
-  );
+function observedGateStatusById(run: ScenarioRun): ReadonlyMap<string, GateResultStatus> {
+  return new Map(run.gateResults.map((gateResult) => [gateResult.gateId, gateResult.status]));
 }
 
 export function verifyScenarioRun(
@@ -72,120 +59,44 @@ export function verifyScenarioRun(
   const unexpectedGateIds: string[] = [];
 
   if (run.scenarioId !== definition.scenarioId) {
-    issues.push(
-      verificationIssue(
-        "ERROR",
-        "SCENARIO_ID_MISMATCH",
-        `Scenario run "${run.scenarioRunId}" references "${run.scenarioId}" but was verified against "${definition.scenarioId}".`,
-      ),
-    );
+    issues.push(verificationIssue("ERROR", "SCENARIO_ID_MISMATCH", `Scenario run "${run.scenarioRunId}" references "${run.scenarioId}" but was verified against "${definition.scenarioId}".`));
   }
-
   if (run.status !== "COMPLETED") {
-    issues.push(
-      verificationIssue(
-        "ERROR",
-        "SCENARIO_RUN_INCOMPLETE",
-        `Scenario run "${run.scenarioRunId}" has status "${run.status}" and cannot be treated as complete.`,
-      ),
-    );
+    issues.push(verificationIssue("ERROR", "SCENARIO_RUN_INCOMPLETE", `Scenario run "${run.scenarioRunId}" has status "${run.status}" and cannot be treated as complete.`));
+  }
+  if (!run.determination) {
+    issues.push(verificationIssue("ERROR", "SCENARIO_DETERMINATION_MISSING", `Scenario run "${run.scenarioRunId}" does not contain a determination.`));
+  } else if (run.determination !== definition.expectedDetermination) {
+    issues.push(verificationIssue("ERROR", "SCENARIO_DETERMINATION_MISMATCH", `Scenario "${definition.scenarioId}" expected "${definition.expectedDetermination}" but observed "${run.determination}".`));
   }
 
-  if (!run.determination) {
-    issues.push(
-      verificationIssue(
-        "ERROR",
-        "SCENARIO_DETERMINATION_MISSING",
-        `Scenario run "${run.scenarioRunId}" does not contain a determination.`,
-      ),
-    );
-  } else if (run.determination !== definition.expectedDetermination) {
-    issues.push(
-      verificationIssue(
-        "ERROR",
-        "SCENARIO_DETERMINATION_MISMATCH",
-        `Scenario "${definition.scenarioId}" expected "${definition.expectedDetermination}" but observed "${run.determination}".`,
-      ),
-    );
+  const duplicateObservedGateIds = run.gateResults.map((g) => g.gateId).filter((id, index, all) => all.indexOf(id) !== index);
+  for (const gateId of [...new Set(duplicateObservedGateIds)]) {
+    issues.push(verificationIssue("ERROR", "DUPLICATE_OBSERVED_GATE_RESULT", `Scenario run "${run.scenarioRunId}" contains more than one result for gate "${gateId}".`, gateId));
   }
 
   const observedStatuses = observedGateStatusById(run);
-  const expectedEntries = Object.entries(
-    definition.expectedGateStatuses,
-  ) as Array<[string, GateResultStatus | undefined]>;
-
+  const expectedEntries = Object.entries(definition.expectedGateStatuses) as Array<[string, GateResultStatus | undefined]>;
   for (const [gateId, expectedStatus] of expectedEntries) {
-    if (!expectedStatus) {
-      continue;
-    }
-
+    if (!expectedStatus) continue;
     const observedStatus = observedStatuses.get(gateId);
-
     if (!observedStatus) {
       missingGateIds.push(gateId);
-      issues.push(
-        verificationIssue(
-          "ERROR",
-          "EXPECTED_GATE_RESULT_MISSING",
-          `Scenario "${definition.scenarioId}" expected gate "${gateId}" to return "${expectedStatus}", but no result was observed.`,
-          gateId,
-        ),
-      );
-      continue;
-    }
-
-    if (observedStatus !== expectedStatus) {
+      issues.push(verificationIssue("ERROR", "EXPECTED_GATE_RESULT_MISSING", `Scenario "${definition.scenarioId}" expected gate "${gateId}" to return "${expectedStatus}", but no result was observed.`, gateId));
+    } else if (observedStatus !== expectedStatus) {
       mismatchedGateIds.push(gateId);
-      issues.push(
-        verificationIssue(
-          "ERROR",
-          "EXPECTED_GATE_STATUS_MISMATCH",
-          `Scenario "${definition.scenarioId}" expected gate "${gateId}" to return "${expectedStatus}", but observed "${observedStatus}".`,
-          gateId,
-        ),
-      );
-      continue;
+      issues.push(verificationIssue("ERROR", "EXPECTED_GATE_STATUS_MISMATCH", `Scenario "${definition.scenarioId}" expected gate "${gateId}" to return "${expectedStatus}", but observed "${observedStatus}".`, gateId));
+    } else {
+      matchedGateIds.push(gateId);
     }
-
-    matchedGateIds.push(gateId);
   }
 
-  const expectedGateIds = new Set(
-    expectedEntries
-      .filter(([, expectedStatus]) => Boolean(expectedStatus))
-      .map(([gateId]) => gateId),
-  );
-
+  const expectedGateIds = new Set(expectedEntries.filter(([, status]) => Boolean(status)).map(([gateId]) => gateId));
   for (const gateResult of run.gateResults) {
     if (!expectedGateIds.has(gateResult.gateId)) {
       unexpectedGateIds.push(gateResult.gateId);
-      issues.push(
-        verificationIssue(
-          "WARNING",
-          "UNDECLARED_GATE_RESULT",
-          `Scenario run "${run.scenarioRunId}" returned gate "${gateResult.gateId}", but the scenario definition did not declare an expected status for that gate.`,
-          gateResult.gateId,
-        ),
-      );
+      issues.push(verificationIssue("WARNING", "UNDECLARED_GATE_RESULT", `Scenario run "${run.scenarioRunId}" returned gate "${gateResult.gateId}", but the scenario definition did not declare an expected status for that gate.`, gateResult.gateId));
     }
-  }
-
-  const duplicateObservedGateIds = run.gateResults
-    .map((gateResult) => gateResult.gateId)
-    .filter(
-      (gateId, index, allGateIds) =>
-        allGateIds.indexOf(gateId) !== index,
-    );
-
-  for (const gateId of [...new Set(duplicateObservedGateIds)]) {
-    issues.push(
-      verificationIssue(
-        "ERROR",
-        "DUPLICATE_OBSERVED_GATE_RESULT",
-        `Scenario run "${run.scenarioRunId}" contains more than one result for gate "${gateId}".`,
-        gateId,
-      ),
-    );
   }
 
   return {
@@ -206,19 +117,10 @@ export function verifyRequiredScenarioRuns(
   definitions: readonly ScenarioDefinition[],
   runs: readonly ScenarioRun[],
 ): ScenarioVerificationResult[] {
-  const runByScenarioId = new Map(
-    runs.map((run) => [run.scenarioId, run]),
-  );
+  return definitions.filter((definition) => definition.required).map((definition) => {
+    const matchingRuns = runs.filter((run) => run.scenarioId === definition.scenarioId);
 
-  return definitions
-    .filter((definition) => definition.required)
-    .map((definition) => {
-      const run = runByScenarioId.get(definition.scenarioId);
-
-      if (run) {
-        return verifyScenarioRun(definition, run);
-      }
-
+    if (matchingRuns.length === 0) {
       return {
         valid: false,
         scenarioId: definition.scenarioId,
@@ -227,26 +129,34 @@ export function verifyRequiredScenarioRuns(
         observedDetermination: undefined,
         matchedGateIds: [],
         mismatchedGateIds: [],
-        missingGateIds: Object.keys(
-          definition.expectedGateStatuses,
-        ),
+        missingGateIds: Object.keys(definition.expectedGateStatuses),
         unexpectedGateIds: [],
-        issues: [
-          verificationIssue(
-            "ERROR",
-            "REQUIRED_SCENARIO_RUN_MISSING",
-            `Required scenario "${definition.scenarioId}" has not been run.`,
-          ),
-        ],
+        issues: [verificationIssue("ERROR", "REQUIRED_SCENARIO_RUN_MISSING", `Required scenario "${definition.scenarioId}" has not been run.`)],
       };
-    });
+    }
+
+    if (matchingRuns.length > 1) {
+      return {
+        valid: false,
+        scenarioId: definition.scenarioId,
+        scenarioRunId: matchingRuns.map((run) => run.scenarioRunId).join(","),
+        expectedDetermination: definition.expectedDetermination,
+        observedDetermination: undefined,
+        matchedGateIds: [],
+        mismatchedGateIds: [],
+        missingGateIds: [],
+        unexpectedGateIds: [],
+        issues: [verificationIssue("ERROR", "DUPLICATE_REQUIRED_SCENARIO_RUN", `Required scenario "${definition.scenarioId}" has ${matchingRuns.length} runs in the readiness set. Exactly one frozen run is required.`)],
+      };
+    }
+
+    return verifyScenarioRun(definition, matchingRuns[0]);
+  });
 }
 
 export function allRequiredScenarioRunsValid(
   definitions: readonly ScenarioDefinition[],
   runs: readonly ScenarioRun[],
 ): boolean {
-  return verifyRequiredScenarioRuns(definitions, runs).every(
-    (result) => result.valid,
-  );
+  return verifyRequiredScenarioRuns(definitions, runs).every((result) => result.valid);
 }
