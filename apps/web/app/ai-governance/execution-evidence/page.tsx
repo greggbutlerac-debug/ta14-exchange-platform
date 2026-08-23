@@ -3,6 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'AI Execution Evidence: Authority, Changed Conditions, Refusal & Proof | TA-14',
   description: 'A practical hub for proving AI execution claims: changed authorization, changed evidence, unauthorized execution, refusal, blocking, and replayable evidence.',
+  alternates: { canonical: 'https://ta14exchange.com/ai-governance/execution-evidence' },
 };
 
 const problems = [
@@ -28,9 +29,54 @@ const problems = [
   },
 ];
 
+const proofExamples = [
+  {
+    href: '/artifacts/ta14-ea-000013',
+    title: 'Authority expires after approval but before execution',
+    disposition: 'HOLD',
+    body: 'Executable evidence for present-authority revalidation at the pre-execution boundary.',
+  },
+  {
+    href: '/artifacts/ta14-ea-000017',
+    title: 'New evidence supersedes admitted evidence',
+    disposition: 'HOLD',
+    body: 'Executable evidence showing prior admissibility suspended after material evidence supersession.',
+  },
+  {
+    href: '/artifacts/ta14-ea-000020',
+    title: 'Executed action differs from committed action',
+    disposition: 'DENY',
+    body: 'Executable evidence for commit-to-execution correspondence failure.',
+  },
+  {
+    href: '/artifacts/ta14-ea-000030',
+    title: 'Protected Consequence Non-Formation',
+    disposition: 'HOLD',
+    body: 'A hardened proof record showing why an internal denial alone is insufficient to establish downstream non-occurrence.',
+  },
+];
+
+const faq = [
+  ['What is AI execution evidence?', 'AI execution evidence is the record needed to support what an AI or agentic system was allowed to do, what conditions applied, what actually executed, and what outcome followed.'],
+  ['Is an AI denial message proof that an action was blocked?', 'Not necessarily. A denial message can prove that one interface or governed path returned a denial. Proving non-occurrence may require evidence that the protected consequence did not form through the relevant execution surface.'],
+  ['What if authorization changed after approval?', 'The relevant question is whether the earlier authorization still had standing at the immediate consequence boundary. A defensible system should preserve the authority state, changed condition, revalidation, and resulting determination.'],
+  ['Can TA-14 review a system without forcing it to adopt TA-14?', 'Yes. A bounded examination can preserve the system’s native architecture, terminology, evidence, and result while testing the stated execution claim.'],
+];
+
 export default function ExecutionEvidenceHub() {
+  const faqSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faq.map(([question, answer]) => ({
+      '@type': 'Question',
+      name: question,
+      acceptedAnswer: { '@type': 'Answer', text: answer },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-slate-950 text-slate-100">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
       <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
         <p className="text-sm font-semibold uppercase tracking-[0.22em] text-cyan-300">TA-14 Execution Evidence</p>
         <h1 className="mt-5 max-w-5xl text-4xl font-bold tracking-tight md:text-6xl">Can you prove what your AI system was allowed to execute—and what it was not?</h1>
@@ -57,10 +103,32 @@ export default function ExecutionEvidenceHub() {
       </section>
 
       <section className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className="text-3xl font-bold">Inspect executable examples—not just claims</h2>
+        <p className="mt-5 max-w-4xl leading-8 text-slate-300">The TA-14 artifact registry now exposes executable specifications, stage traces, receipts, manifests, hashes, claims boundaries, and source paths. These examples show how changed authority, changed evidence, execution divergence, and non-occurrence claims are represented as bounded testable records.</p>
+        <div className="mt-8 grid gap-5 md:grid-cols-2">
+          {proofExamples.map((item) => (
+            <Link key={item.href} href={item.href} className="rounded-xl border border-slate-800 bg-slate-900 p-6 transition hover:border-cyan-300/60">
+              <div className="flex items-center justify-between gap-4"><h3 className="text-lg font-semibold">{item.title}</h3><span className="rounded-full border border-slate-700 px-3 py-1 text-xs font-bold text-cyan-300">{item.disposition}</span></div>
+              <p className="mt-3 leading-7 text-slate-300">{item.body}</p>
+              <p className="mt-4 font-semibold text-cyan-300">Inspect the artifact →</p>
+            </Link>
+          ))}
+        </div>
+        <Link href="/artifacts/registry" className="mt-7 inline-block font-semibold text-cyan-300">Open the complete Artifact Registry →</Link>
+      </section>
+
+      <section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-6xl px-6 py-20">
         <h2 className="text-3xl font-bold">The evidence chain matters</h2>
         <p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 treats execution evidence as a chain rather than a screenshot. The relevant question may require reconstructing reality, record, continuity, admissibility, binding, commit, execution, and outcome. A break at one point can change what the final record can support.</p>
         <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {['Reality → Record','Continuity → Admissibility','Binding → Commit','Execution → Outcome'].map((item) => <div key={item} className="rounded-lg border border-slate-800 bg-slate-900 p-5 font-semibold">{item}</div>)}
+          {['Reality → Record','Continuity → Admissibility','Binding → Commit','Execution → Outcome'].map((item) => <div key={item} className="rounded-lg border border-slate-800 bg-slate-950 p-5 font-semibold">{item}</div>)}
+        </div>
+      </div></section>
+
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <h2 className="text-3xl font-bold">Common AI execution-evidence questions</h2>
+        <div className="mt-8 space-y-6">
+          {faq.map(([question, answer]) => <article key={question} className="rounded-xl border border-slate-800 bg-slate-900 p-6"><h3 className="text-xl font-semibold">{question}</h3><p className="mt-3 max-w-4xl leading-7 text-slate-300">{answer}</p></article>)}
         </div>
       </section>
 
