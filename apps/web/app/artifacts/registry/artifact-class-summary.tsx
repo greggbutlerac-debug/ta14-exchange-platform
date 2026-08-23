@@ -61,7 +61,7 @@ export default function ArtifactClassSummary() {
       </div>
 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14, marginTop: 24 }}>
-        <Metric label="Execution artifact corpus" value="25" detail="24 TA-14 execution artifacts · 1 external governance execution artifact" />
+        <Metric label="Execution artifact corpus" value="41" detail="40 TA-14 execution artifacts · 1 external governance execution artifact" />
         <Metric label="Governed finding corpus" value={status === "ready" ? String(governedCount ?? 0) : status === "error" ? "—" : "…"} detail={status === "error" ? "Live governed-finding metric unavailable" : "Live from production governed-artifact projection"} />
         <Metric label="Artifact classes" value="2" detail="Execution artifacts · Governed finding artifacts" />
         <Metric label="Registry principle" value="Bounded" detail="Artifact class never widens the proposition the evidence can support" />
