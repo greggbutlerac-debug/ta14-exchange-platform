@@ -1,3 +1,4 @@
 import type { ReactNode } from 'react';
 import ExecutableArtifactProof from '../components/ExecutableArtifactProof';
-export default function Layout({children}:{children:ReactNode}){return <>{children}<ExecutableArtifactProof artifactId='TA14-EA-000004'/></>}
+import FoundingArtifactCopyCorrections from '../components/FoundingArtifactCopyCorrections';
+export default function Layout({children}:{children:ReactNode}){return <><FoundingArtifactCopyCorrections artifactId='TA14-EA-000004' sequence={4}/>{children}<ExecutableArtifactProof artifactId='TA14-EA-000004'/></>}
