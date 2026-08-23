@@ -93,12 +93,8 @@ function isBrowser(): boolean {
 function isVerificationIssue(
   value: unknown,
 ): value is ScenarioVerificationIssue {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
+  if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<ScenarioVerificationIssue>;
-
   return (
     typeof candidate.code === "string" &&
     typeof candidate.message === "string" &&
@@ -109,13 +105,8 @@ function isVerificationIssue(
 function isVerificationResult(
   value: unknown,
 ): value is ScenarioVerificationResult {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
-  const candidate =
-    value as Partial<ScenarioVerificationResult>;
-
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<ScenarioVerificationResult>;
   return (
     typeof candidate.valid === "boolean" &&
     Array.isArray(candidate.issues) &&
@@ -127,15 +118,9 @@ function isVerificationResult(
   );
 }
 
-function isStoredScenarioRun(
-  value: unknown,
-): value is StoredScenarioRun {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
+function isStoredScenarioRun(value: unknown): value is StoredScenarioRun {
+  if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<StoredScenarioRun>;
-
   return (
     typeof candidate.schemaVersion === "string" &&
     typeof candidate.storedRunId === "string" &&
@@ -152,19 +137,37 @@ function isStoredScenarioRun(
   );
 }
 
+/**
+ * Browser/local/imported verification is documentary evidence only. It cannot
+ * carry governance standing into a new trust boundary. Consumers must
+ * recompute verification against the current frozen scenario definition.
+ */
+function markVerificationUntrusted(
+  run: StoredScenarioRun,
+  code: string,
+  message: string,
+): StoredScenarioRun {
+  return {
+    ...run,
+    verification: {
+      ...run.verification,
+      valid: false,
+      issues: [
+        ...run.verification.issues,
+        { severity: "ERROR", code, message },
+      ],
+    },
+  };
+}
+
 export function createStoredScenarioRun(
   input: CreateStoredScenarioRunInput,
 ): StoredScenarioRun {
   const timestamp = new Date().toISOString();
-  const observedDetermination =
-    input.scenarioRun.determination;
-
+  const observedDetermination = input.scenarioRun.determination;
   if (!observedDetermination) {
-    throw new Error(
-      "A stored scenario run requires an observed determination.",
-    );
+    throw new Error("A stored scenario run requires an observed determination.");
   }
-
   return {
     schemaVersion: SCENARIO_RUN_SCHEMA_VERSION,
     storedRunId: createId(),
@@ -184,22 +187,18 @@ export function createStoredScenarioRun(
   };
 }
 
-export function saveStoredScenarioRun(
-  run: StoredScenarioRun,
-): StoredScenarioRun {
-  const updatedRun: StoredScenarioRun = {
+export function saveStoredScenarioRun(run: StoredScenarioRun): StoredScenarioRun {
+  const updatedRun = {
     ...run,
     schemaVersion: SCENARIO_RUN_SCHEMA_VERSION,
     updatedAt: new Date().toISOString(),
   };
-
   if (isBrowser()) {
     window.localStorage.setItem(
       storageKey(updatedRun.laneId, updatedRun.storedRunId),
       JSON.stringify(updatedRun),
     );
   }
-
   return updatedRun;
 }
 
@@ -207,57 +206,36 @@ export function loadStoredScenarioRun(
   laneId: string,
   storedRunId: string,
 ): StoredScenarioRun | undefined {
-  if (!isBrowser()) {
-    return undefined;
-  }
-
-  const raw = window.localStorage.getItem(
-    storageKey(laneId, storedRunId),
-  );
-
-  if (!raw) {
-    return undefined;
-  }
-
+  if (!isBrowser()) return undefined;
+  const raw = window.localStorage.getItem(storageKey(laneId, storedRunId));
+  if (!raw) return undefined;
   try {
     const parsed: unknown = JSON.parse(raw);
-
-    return isStoredScenarioRun(parsed) ? parsed : undefined;
+    if (!isStoredScenarioRun(parsed)) return undefined;
+    return markVerificationUntrusted(
+      parsed,
+      "LOCAL_VERIFICATION_REQUIRES_RECOMPUTATION",
+      "Stored browser verification is not authoritative and must be recomputed against the frozen scenario definition before readiness use.",
+    );
   } catch {
     return undefined;
   }
 }
 
-export function listStoredScenarioRuns(
-  laneId: string,
-): ScenarioRunSummary[] {
-  if (!isBrowser()) {
-    return [];
-  }
-
+export function listStoredScenarioRuns(laneId: string): ScenarioRunSummary[] {
+  if (!isBrowser()) return [];
   const prefix = lanePrefix(laneId);
   const summaries: ScenarioRunSummary[] = [];
-
   for (let index = 0; index < window.localStorage.length; index += 1) {
     const key = window.localStorage.key(index);
-
-    if (!key || !key.startsWith(prefix)) {
-      continue;
-    }
-
+    if (!key || !key.startsWith(prefix)) continue;
     const raw = window.localStorage.getItem(key);
-
-    if (!raw) {
-      continue;
-    }
-
+    if (!raw) continue;
     try {
       const parsed: unknown = JSON.parse(raw);
-
-      if (!isStoredScenarioRun(parsed)) {
-        continue;
-      }
-
+      if (!isStoredScenarioRun(parsed)) continue;
+      // Summaries intentionally do not propagate persisted verification.valid.
+      // Browser storage is a presentation/persistence surface, not authority.
       summaries.push({
         storedRunId: parsed.storedRunId,
         laneId: parsed.laneId,
@@ -265,12 +243,10 @@ export function listStoredScenarioRuns(
         routeTitle: parsed.routeTitle,
         scenarioId: parsed.scenarioId,
         scenarioTitle: parsed.scenarioTitle,
-        expectedDetermination:
-          parsed.expectedDetermination,
-        observedDetermination:
-          parsed.observedDetermination,
-        valid: parsed.verification.valid,
-        issueCount: parsed.verification.issues.length,
+        expectedDetermination: parsed.expectedDetermination,
+        observedDetermination: parsed.observedDetermination,
+        valid: false,
+        issueCount: parsed.verification.issues.length + 1,
         createdAt: parsed.createdAt,
         updatedAt: parsed.updatedAt,
       });
@@ -278,86 +254,60 @@ export function listStoredScenarioRuns(
       continue;
     }
   }
-
   return summaries.sort((left, right) =>
     right.updatedAt.localeCompare(left.updatedAt),
   );
 }
 
-export function deleteStoredScenarioRun(
-  laneId: string,
-  storedRunId: string,
-): void {
-  if (!isBrowser()) {
-    return;
-  }
-
-  window.localStorage.removeItem(
-    storageKey(laneId, storedRunId),
-  );
+export function deleteStoredScenarioRun(laneId: string, storedRunId: string): void {
+  if (!isBrowser()) return;
+  window.localStorage.removeItem(storageKey(laneId, storedRunId));
 }
 
-export function clearStoredScenarioRuns(
-  laneId: string,
-): number {
-  if (!isBrowser()) {
-    return 0;
-  }
-
+export function clearStoredScenarioRuns(laneId: string): number {
+  if (!isBrowser()) return 0;
   const prefix = lanePrefix(laneId);
   const keys: string[] = [];
-
   for (let index = 0; index < window.localStorage.length; index += 1) {
     const key = window.localStorage.key(index);
-
-    if (key?.startsWith(prefix)) {
-      keys.push(key);
-    }
+    if (key?.startsWith(prefix)) keys.push(key);
   }
-
-  for (const key of keys) {
-    window.localStorage.removeItem(key);
-  }
-
+  for (const key of keys) window.localStorage.removeItem(key);
   return keys.length;
 }
 
-export function exportStoredScenarioRun(
-  run: StoredScenarioRun,
-): string {
+export function exportStoredScenarioRun(run: StoredScenarioRun): string {
   return JSON.stringify(run, null, 2);
 }
 
-export function importStoredScenarioRun(
-  serializedRun: string,
-): ScenarioRunImportResult {
+export function importStoredScenarioRun(serializedRun: string): ScenarioRunImportResult {
   try {
     const parsed: unknown = JSON.parse(serializedRun);
-
     if (!isStoredScenarioRun(parsed)) {
       return {
         success: false,
-        issues: [
-          "The imported file is not a valid TA-14 scenario run.",
-        ],
+        issues: ["The imported file is not a valid TA-14 scenario run."],
+      };
+    }
+    if (parsed.schemaVersion !== SCENARIO_RUN_SCHEMA_VERSION) {
+      return {
+        success: false,
+        issues: [`Unsupported scenario-run schema version "${parsed.schemaVersion}".`],
       };
     }
 
-    if (
-      parsed.schemaVersion !== SCENARIO_RUN_SCHEMA_VERSION
-    ) {
-      return {
-        success: false,
-        issues: [
-          `Unsupported scenario-run schema version "${parsed.schemaVersion}".`,
-        ],
-      };
-    }
+    const untrusted = markVerificationUntrusted(
+      parsed,
+      "IMPORTED_VERIFICATION_REQUIRES_RECOMPUTATION",
+      "Imported verification claims are untrusted until recomputed against the frozen scenario definition.",
+    );
 
     return {
       success: true,
-      run: parsed,
-      issues: [],
+      run: untrusted,
+      issues: [
+        "Import accepted as documentary scenario evidence only. Verification must be recomputed before readiness use.",
+      ],
     };
   } catch {
     return {
