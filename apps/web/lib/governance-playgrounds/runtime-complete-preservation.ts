@@ -40,7 +40,7 @@ export interface CompleteRuntimePreservationResult {
 export async function completeRuntimePreservation(
   request: CompleteRuntimePreservationRequest,
 ): Promise<CompleteRuntimePreservationResult> {
-  const preservation = preserveRuntimeCandidate({
+  const preservation = await preserveRuntimeCandidate({
     candidate: request.candidate,
     preservedBy: request.preservedBy,
     authorityBasis: request.authorityBasis,
