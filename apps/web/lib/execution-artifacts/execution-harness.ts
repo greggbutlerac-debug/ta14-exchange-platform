@@ -1,162 +1,21 @@
-import { createHash } from "node:crypto";
-
 export const TA14_CHAIN = [
-  "REALITY",
-  "RECORD",
-  "CONTINUITY",
-  "ADMISSIBILITY",
-  "BINDING",
-  "COMMIT",
-  "EXECUTION",
-  "OUTCOME",
+  "REALITY","RECORD","CONTINUITY","ADMISSIBILITY","BINDING","COMMIT","EXECUTION","OUTCOME",
 ] as const;
-
-export type ChainStage = (typeof TA14_CHAIN)[number];
-export type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
-export type StageDisposition = "PASS" | "HOLD" | "DENY" | "ESCALATE" | "NOT_REACHED";
-
-export interface ArtifactPredicate {
-  id: string;
-  stage: ChainStage;
-  description: string;
-  required: boolean;
-  observed: boolean | null;
-  failureDetermination: Exclude<Determination, "ALLOW">;
-  evidenceRef?: string;
-}
-
-export interface ArtifactTestSpecification {
-  schemaVersion: "ta14.execution-spec.v1";
-  artifactId: string;
-  routeId: string;
-  title: string;
-  frozenAt: string;
-  input: Readonly<Record<string, unknown>>;
-  predicates: readonly ArtifactPredicate[];
-  expectedDetermination: Determination;
-  claimsBoundary: string;
-}
-
-export interface StageTrace {
-  stage: ChainStage;
-  disposition: StageDisposition;
-  evaluatedPredicateIds: string[];
-  evidenceRefs: string[];
-  reason: string;
-}
-
-export interface ExecutionReceipt {
-  schemaVersion: "ta14.execution-receipt.v1";
-  artifactId: string;
-  routeId: string;
-  specificationHash: string;
-  determination: Determination;
-  terminalStage: ChainStage;
-  traceHash: string;
-  executedAt: string;
-}
-
-export interface EvidenceManifestEntry {
-  name: "specification.json" | "trace.json" | "receipt.json";
-  sha256: string;
-}
-
-export interface ExecutionEvidencePackage {
-  specification: ArtifactTestSpecification;
-  trace: StageTrace[];
-  receipt: ExecutionReceipt;
-  manifest: EvidenceManifestEntry[];
-  rootHash: string;
-}
-
-function canonicalize(value: unknown): string {
-  if (value === null || typeof value !== "object") return JSON.stringify(value);
-  if (Array.isArray(value)) return `[${value.map(canonicalize).join(",")}]`;
-  const object = value as Record<string, unknown>;
-  return `{${Object.keys(object).sort().map((key) => `${JSON.stringify(key)}:${canonicalize(object[key])}`).join(",")}}`;
-}
-
-export function sha256(value: unknown): string {
-  return `sha256:${createHash("sha256").update(typeof value === "string" ? value : canonicalize(value)).digest("hex")}`;
-}
-
-function outcomeForStage(predicates: readonly ArtifactPredicate[]): Determination {
-  const failures = predicates.filter((p) => p.required && p.observed !== true);
-  if (!failures.length) return "ALLOW";
-  // Deterministic precedence: DENY is disqualifying; unresolved conflicts
-  // ESCALATE; missing/uncertain qualification HOLDs.
-  if (failures.some((p) => p.failureDetermination === "DENY")) return "DENY";
-  if (failures.some((p) => p.failureDetermination === "ESCALATE")) return "ESCALATE";
-  return "HOLD";
-}
-
-export function executeArtifactSpecification(
-  specification: ArtifactTestSpecification,
-  executedAt = new Date().toISOString(),
-): ExecutionEvidencePackage {
-  const trace: StageTrace[] = [];
-  let determination: Determination = "ALLOW";
-  let terminalStage: ChainStage = "OUTCOME";
-  let stopped = false;
-
-  for (const stage of TA14_CHAIN) {
-    if (stopped) {
-      trace.push({ stage, disposition: "NOT_REACHED", evaluatedPredicateIds: [], evidenceRefs: [], reason: "Prior governed determination prevented progression." });
-      continue;
-    }
-
-    const predicates = specification.predicates.filter((p) => p.stage === stage);
-    const stageDetermination = outcomeForStage(predicates);
-    const evidenceRefs = predicates.flatMap((p) => p.evidenceRef ? [p.evidenceRef] : []);
-
-    if (stageDetermination === "ALLOW") {
-      trace.push({ stage, disposition: "PASS", evaluatedPredicateIds: predicates.map((p) => p.id), evidenceRefs, reason: predicates.length ? "All required predicates at this stage have standing." : "No blocking predicate configured for this stage." });
-      continue;
-    }
-
-    determination = stageDetermination;
-    terminalStage = stage;
-    stopped = true;
-    trace.push({ stage, disposition: stageDetermination, evaluatedPredicateIds: predicates.map((p) => p.id), evidenceRefs, reason: `Required predicate standing failed at ${stage}; governed determination is ${stageDetermination}.` });
-  }
-
-  const specificationHash = sha256(specification);
-  const traceHash = sha256(trace);
-  const receipt: ExecutionReceipt = {
-    schemaVersion: "ta14.execution-receipt.v1",
-    artifactId: specification.artifactId,
-    routeId: specification.routeId,
-    specificationHash,
-    determination,
-    terminalStage,
-    traceHash,
-    executedAt,
-  };
-
-  const manifest: EvidenceManifestEntry[] = [
-    { name: "specification.json", sha256: specificationHash },
-    { name: "trace.json", sha256: traceHash },
-    { name: "receipt.json", sha256: sha256(receipt) },
-  ];
-  const rootHash = sha256(manifest);
-
-  return { specification, trace, receipt, manifest, rootHash };
-}
-
-export function assertExpectedDetermination(result: ExecutionEvidencePackage): void {
-  if (result.receipt.determination !== result.specification.expectedDetermination) {
-    throw new Error(`Artifact ${result.specification.artifactId} expected ${result.specification.expectedDetermination} but executed as ${result.receipt.determination}.`);
-  }
-}
-
-export function mutatePredicate(
-  specification: ArtifactTestSpecification,
-  predicateId: string,
-  observed: boolean | null,
-): ArtifactTestSpecification {
-  if (!specification.predicates.some((p) => p.id === predicateId)) throw new Error(`Unknown predicate: ${predicateId}`);
-  return {
-    ...specification,
-    predicates: specification.predicates.map((p) => p.id === predicateId ? { ...p, observed } : p),
-  };
-}
+export type ChainStage=(typeof TA14_CHAIN)[number];
+export type Determination="ALLOW"|"HOLD"|"DENY"|"ESCALATE";
+export type StageDisposition="PASS"|"HOLD"|"DENY"|"ESCALATE"|"NOT_REACHED";
+export interface ArtifactPredicate{id:string;stage:ChainStage;description:string;required:boolean;observed:boolean|null;failureDetermination:Exclude<Determination,"ALLOW">;evidenceRef?:string}
+export interface ArtifactTestSpecification{schemaVersion:"ta14.execution-spec.v1";artifactId:string;routeId:string;title:string;frozenAt:string;input:Readonly<Record<string,unknown>>;predicates:readonly ArtifactPredicate[];expectedDetermination:Determination;claimsBoundary:string}
+export interface StageTrace{stage:ChainStage;disposition:StageDisposition;evaluatedPredicateIds:string[];evidenceRefs:string[];reason:string}
+export interface ExecutionReceipt{schemaVersion:"ta14.execution-receipt.v1";artifactId:string;routeId:string;specificationHash:string;determination:Determination;terminalStage:ChainStage;traceHash:string;executedAt:string}
+export interface EvidenceManifestEntry{name:"specification.json"|"trace.json"|"receipt.json";sha256:string}
+export interface ExecutionEvidencePackage{specification:ArtifactTestSpecification;trace:StageTrace[];receipt:ExecutionReceipt;manifest:EvidenceManifestEntry[];rootHash:string}
+function canonicalize(value:unknown):string{if(value===null||typeof value!=="object")return JSON.stringify(value);if(Array.isArray(value))return`[${value.map(canonicalize).join(",")}]`;const o=value as Record<string,unknown>;return`{${Object.keys(o).sort().map(k=>`${JSON.stringify(k)}:${canonicalize(o[k])}`).join(",")}}`}
+/* Pure TypeScript SHA-256 so executable proof can be inspected in client pages without importing Node crypto. */
+function r(n:number,x:number){return(x>>>n)|(x<<(32-n))}
+function sha256hex(s:string){const K=[1116352408,1899447441,3049323471,3921009573,961987163,1508970993,2453635748,2870763221,3624381080,310598401,607225278,1426881987,1925078388,2162078206,2614888103,3248222580,3835390401,4022224774,264347078,604807628,770255983,1249150122,1555081692,1996064986,2554220882,2821834349,2952996808,3210313671,3336571891,3584528711,113926993,338241895,666307205,773529912,1294757372,1396182291,1695183700,1986661051,2177026350,2456956037,2730485921,2820302411,3259730800,3345764771,3516065817,3600352804,4094571909,275423344,430227734,506948616,659060556,883997877,958139571,1322822218,1537002063,1747873779,1955562222,2024104815,2227730452,2361852424,2428436474,2756734187,3204031479,3329325298];const bytes=Array.from(new TextEncoder().encode(s));const bitLen=bytes.length*8;bytes.push(128);while(bytes.length%64!==56)bytes.push(0);const hi=Math.floor(bitLen/4294967296),lo=bitLen>>>0;for(let i=3;i>=0;i--)bytes.push((hi>>>(i*8))&255);for(let i=3;i>=0;i--)bytes.push((lo>>>(i*8))&255);let h=[1779033703,3144134277,1013904242,2773480762,1359893119,2600822924,528734635,1541459225];for(let off=0;off<bytes.length;off+=64){const w=new Array<number>(64);for(let i=0;i<16;i++)w[i]=((bytes[off+i*4]<<24)|(bytes[off+i*4+1]<<16)|(bytes[off+i*4+2]<<8)|bytes[off+i*4+3])>>>0;for(let i=16;i<64;i++){const a=w[i-15],b=w[i-2],s0=(r(7,a)^r(18,a)^(a>>>3))>>>0,s1=(r(17,b)^r(19,b)^(b>>>10))>>>0;w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0}let[a,b,c,d,e,f,g,hh]=h;for(let i=0;i<64;i++){const S1=(r(6,e)^r(11,e)^r(25,e))>>>0,ch=((e&f)^((~e)&g))>>>0,t1=(hh+S1+ch+K[i]+w[i])>>>0,S0=(r(2,a)^r(13,a)^r(22,a))>>>0,maj=((a&b)^(a&c)^(b&c))>>>0,t2=(S0+maj)>>>0;hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0}h=[(h[0]+a)>>>0,(h[1]+b)>>>0,(h[2]+c)>>>0,(h[3]+d)>>>0,(h[4]+e)>>>0,(h[5]+f)>>>0,(h[6]+g)>>>0,(h[7]+hh)>>>0]}return h.map(x=>x.toString(16).padStart(8,"0")).join("")}
+export function sha256(value:unknown):string{return`sha256:${sha256hex(typeof value==="string"?value:canonicalize(value))}`}
+function outcomeForStage(ps:readonly ArtifactPredicate[]):Determination{const f=ps.filter(p=>p.required&&p.observed!==true);if(!f.length)return"ALLOW";if(f.some(p=>p.failureDetermination==="DENY"))return"DENY";if(f.some(p=>p.failureDetermination==="ESCALATE"))return"ESCALATE";return"HOLD"}
+export function executeArtifactSpecification(specification:ArtifactTestSpecification,executedAt=new Date().toISOString()):ExecutionEvidencePackage{const trace:StageTrace[]=[];let determination:Determination="ALLOW",terminalStage:ChainStage="OUTCOME",stopped=false;for(const stage of TA14_CHAIN){if(stopped){trace.push({stage,disposition:"NOT_REACHED",evaluatedPredicateIds:[],evidenceRefs:[],reason:"Prior governed determination prevented progression."});continue}const ps=specification.predicates.filter(p=>p.stage===stage),sd=outcomeForStage(ps),refs=ps.flatMap(p=>p.evidenceRef?[p.evidenceRef]:[]);if(sd==="ALLOW"){trace.push({stage,disposition:"PASS",evaluatedPredicateIds:ps.map(p=>p.id),evidenceRefs:refs,reason:ps.length?"All required predicates at this stage have standing.":"No blocking predicate configured for this stage."});continue}determination=sd;terminalStage=stage;stopped=true;trace.push({stage,disposition:sd,evaluatedPredicateIds:ps.map(p=>p.id),evidenceRefs:refs,reason:`Required predicate standing failed at ${stage}; governed determination is ${sd}.`})}const specificationHash=sha256(specification),traceHash=sha256(trace);const receipt:ExecutionReceipt={schemaVersion:"ta14.execution-receipt.v1",artifactId:specification.artifactId,routeId:specification.routeId,specificationHash,determination,terminalStage,traceHash,executedAt};const manifest:EvidenceManifestEntry[]=[{name:"specification.json",sha256:specificationHash},{name:"trace.json",sha256:traceHash},{name:"receipt.json",sha256:sha256(receipt)}];return{specification,trace,receipt,manifest,rootHash:sha256(manifest)}}
+export function assertExpectedDetermination(r:ExecutionEvidencePackage){if(r.receipt.determination!==r.specification.expectedDetermination)throw new Error(`Artifact ${r.specification.artifactId} expected ${r.specification.expectedDetermination} but executed as ${r.receipt.determination}.`)}
+export function mutatePredicate(s:ArtifactTestSpecification,id:string,observed:boolean|null):ArtifactTestSpecification{if(!s.predicates.some(p=>p.id===id))throw new Error(`Unknown predicate: ${id}`);return{...s,predicates:s.predicates.map(p=>p.id===id?{...p,observed}:p)}}
