@@ -11,9 +11,10 @@ import type {
  * TA-14 Runtime Governance Playground
  * Evidence-to-gate binding
  *
- * This adapter links locally attached evidence candidates to observed
- * gate results. It does not independently verify authenticity,
- * sufficiency, continuity, admissibility, or truth.
+ * Relationship is not admissibility. This adapter preserves the declared
+ * relationship of evidence candidates to gates, but it MUST NOT promote
+ * CONTEXT_ONLY evidence into supporting evidence. Authenticity, sufficiency,
+ * continuity, admissibility and truth are evaluated elsewhere.
  */
 
 export interface GateEvidenceBinding {
@@ -88,8 +89,7 @@ export function bindEvidenceToGateResults(
   const gateResultsWithEvidence = gateResults.map(
     (gateResult) => {
       const binding = bindings.find(
-        (candidate) =>
-          candidate.gateId === gateResult.gateId,
+        (candidate) => candidate.gateId === gateResult.gateId,
       );
 
       if (!binding) {
@@ -98,10 +98,11 @@ export function bindEvidenceToGateResults(
 
       return {
         ...gateResult,
+        // Critical hardening rule: CONTEXT_ONLY remains context-only and can
+        // never satisfy a mandatory gate merely because it is attached.
         supportingEvidenceIds: unique([
           ...gateResult.supportingEvidenceIds,
           ...binding.supportingEvidenceIds,
-          ...binding.contextEvidenceIds,
         ]),
         conflictingEvidenceIds: unique([
           ...gateResult.conflictingEvidenceIds,
@@ -147,16 +148,13 @@ export function evidenceAttachmentCounts(
   return {
     total: attachments.length,
     supporting: attachments.filter(
-      (attachment) =>
-        attachment.relationship === "SUPPORTING",
+      (attachment) => attachment.relationship === "SUPPORTING",
     ).length,
     conflicting: attachments.filter(
-      (attachment) =>
-        attachment.relationship === "CONFLICTING",
+      (attachment) => attachment.relationship === "CONFLICTING",
     ).length,
     contextOnly: attachments.filter(
-      (attachment) =>
-        attachment.relationship === "CONTEXT_ONLY",
+      (attachment) => attachment.relationship === "CONTEXT_ONLY",
     ).length,
     gateBound: attachments.filter(
       (attachment) => Boolean(attachment.gateId),
