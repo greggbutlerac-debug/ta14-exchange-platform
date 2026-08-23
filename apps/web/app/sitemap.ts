@@ -4,6 +4,8 @@ const baseUrl = 'https://ta14exchange.com';
 
 const routes = [
   '/',
+  '/transparent-air/gulfport-ac-repair',
+  '/transparent-air/second-opinion',
   '/eu-ai-act',
   '/eu-ai-act/start',
   '/eu-ai-act/classifier',
@@ -81,6 +83,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${baseUrl}${route}`,
     lastModified: now,
     changeFrequency: index === 0 ? 'daily' : 'weekly',
-    priority: route === '/' ? 1 : route.startsWith('/eu-ai-act') ? 0.9 : 0.7,
+    priority:
+      route === '/'
+        ? 1
+        : route.startsWith('/transparent-air')
+          ? 0.95
+          : route.startsWith('/eu-ai-act')
+            ? 0.9
+            : 0.7,
   }));
 }
