@@ -1,71 +1,38 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Atlas Environmental Integrity Fund | Public Allocation Ledger',
-  description: 'TA-14 public ledger for its 15% Environmental Integrity Commitment: amounts designated, allocations, recipients, purposes, evidence, transfers, interventions, and outcomes.',
+  title: 'TA-14 Environmental Integrity Reinvestment | Public Ledger',
+  description: 'TA-14 publicly tracks its 30% environmental-integrity reinvestment commitment, with up to 50% for qualifying municipal deployments: source, allocation, recipient, purpose, execution evidence, and outcome.',
   alternates: { canonical: 'https://ta14exchange.com/atlas-environmental-integrity-fund' },
 };
 
-const ledger = {
-  qualifyingReceipts: 0,
-  designated: 0,
-  allocated: 0,
-  unallocated: 0,
-  distributed: 0,
-};
+const ledger = { qualifyingReceipts: 0, designated: 0, allocated: 0, unallocated: 0, distributed: 0 };
+const allocations: Array<{id:string;date:string;recipient:string;amount:number;purpose:string;why:string;status:string}> = [];
+const money=(v:number)=>new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(v);
 
-const allocations: Array<{id:string;date:string;recipient:string;amount:number;purpose:string;why:string;status:string;proof?:string;outcome?:string}> = [];
+const missions=[
+  ['Environmental Integrity Governance','Help qualifying organizations and communities establish evidence-governed environmental programs and interventions.'],
+  ['Atmospheric Integrity Records','Expand building, facility, community, and network-scale atmospheric evidence infrastructure.'],
+  ['Personal Atmospheric Integrity','Support qualifying personal atmospheric-integrity access for children, students, older adults, underserved populations, and other appropriate beneficiaries.'],
+  ['Schools & critical human environments','Support qualifying schools, childcare, elder-care, neonatal/incubation, and similarly sensitive environments while keeping environmental evidence distinct from medical diagnosis or clinical claims.'],
+  ['Zoos & critical animal environments','Support qualifying zoos, conservation facilities, shelters, habitats, and other critical animal environments with atmospheric/environmental integrity records and monitoring.'],
+  ['Global Atmospheric Integrity Network','Help connect local environmental evidence infrastructure into interoperable municipal, regional, national, and global atmospheric-integrity networks.'],
+];
 
-const money = (value:number) => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(value);
+export default function Page(){return <main className="min-h-screen bg-slate-950 text-slate-100">
+<section className="mx-auto max-w-6xl px-6 py-20 md:py-28"><p className="text-sm font-bold uppercase tracking-[.22em] text-emerald-300">Public-benefit infrastructure</p><h1 className="mt-5 max-w-5xl text-4xl font-bold md:text-6xl">When TA-14 earns, environmental integrity should advance with it.</h1><p className="mt-7 max-w-4xl text-lg leading-8 text-slate-300">TA-14 is building a commercial institution whose success is designed to finance public environmental benefit. The starting commitment is 30% of qualifying commercial service receipts. Qualifying municipal and citywide deployments may dedicate up to 50% under contract. The objective is not a vague promise to give back. It is a public, inspectable reinvestment system.</p><p className="mt-5 max-w-4xl text-slate-400">This is presently a TA-14 institutional program, not a separately incorporated tax-exempt foundation. No charitable-deduction representation is made.</p></section>
 
-export default function AtlasEnvironmentalIntegrityFundPage() {
-  return <main className="min-h-screen bg-slate-950 text-slate-100">
-    <section className="mx-auto max-w-6xl px-6 py-20 md:py-28">
-      <p className="text-sm font-bold uppercase tracking-[0.22em] text-emerald-300">TA-14 Public Impact Ledger</p>
-      <h1 className="mt-5 max-w-5xl text-4xl font-bold tracking-tight md:text-6xl">Atlas Environmental Integrity Fund</h1>
-      <p className="mt-7 max-w-4xl text-lg leading-8 text-slate-300">A transparent institutional program for turning a defined share of TA-14 commercial activity into evidence-governed environmental benefit. The ledger is designed to show what was designated, what remains available, where money went, who received it, why the allocation was made, what was done, and what outcome evidence supports the resulting impact claim.</p>
-      <p className="mt-5 max-w-4xl text-sm leading-7 text-slate-400">This is a TA-14 institutional program. The name does not represent a separately incorporated charitable foundation or tax-exempt entity unless and until that legal status is separately established and disclosed here.</p>
-    </section>
+<section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-6xl px-6 py-16"><p className="text-sm font-bold uppercase tracking-[.2em] text-emerald-300">The commitment</p><h2 className="mt-3 text-3xl font-bold">30% standard. Up to 50% municipal. Public from receipt to outcome.</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">The current standard designates 30% of qualifying commercial service receipts after refunds and payment-processing fees and before owner distributions. Municipal percentages are established by contract and may reach 50% when the deployment economics remain sustainable. The ledger begins at zero and records reality rather than projections.</p><div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">{[['Qualifying receipts',ledger.qualifyingReceipts],['30% designated',ledger.designated],['Allocated',ledger.allocated],['Unallocated',ledger.unallocated],['Distributed',ledger.distributed]].map(([l,v])=><article key={String(l)} className="rounded-xl border border-slate-800 bg-slate-950 p-5"><p className="text-xs font-bold uppercase tracking-[.14em] text-slate-400">{l}</p><p className="mt-3 text-2xl font-bold text-emerald-300">{money(Number(v))}</p></article>)}</div></div></section>
 
-    <section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-6xl px-6 py-16">
-      <p className="text-sm font-bold uppercase tracking-[0.2em] text-emerald-300">The commitment</p>
-      <h2 className="mt-3 text-3xl font-bold">15% is visible from receipt to outcome.</h2>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 designates 15% of qualifying commercial service receipts after refunds and payment-processing fees and before owner distributions. The designated amount enters this public ledger. Allocation does not itself establish impact; transfer, intervention, and outcome evidence are recorded separately.</p>
-      <div className="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {[['Qualifying receipts',ledger.qualifyingReceipts],['15% designated',ledger.designated],['Allocated',ledger.allocated],['Unallocated balance',ledger.unallocated],['Distributed',ledger.distributed]].map(([label,value])=><article key={String(label)} className="rounded-xl border border-slate-800 bg-slate-950 p-5"><p className="text-xs font-bold uppercase tracking-[0.14em] text-slate-400">{label}</p><p className="mt-3 text-2xl font-bold text-emerald-300">{money(Number(value))}</p></article>)}
-      </div>
-      <p className="mt-5 text-sm leading-6 text-slate-400">Opening ledger: no qualifying receipts or allocations have yet been entered. Zero means zero; future balances will be recorded rather than estimated.</p>
-    </div></section>
+<section className="mx-auto max-w-6xl px-6 py-20"><p className="text-sm font-bold uppercase tracking-[.2em] text-emerald-300">Why use TA-14?</p><h2 className="mt-3 text-3xl font-bold">Investing in governance can also invest in people and environments.</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">A customer should be able to choose TA-14 because the architecture and evidence services solve a real governance problem and also know that qualifying commercial activity creates a measurable environmental reinvestment. Where program rules permit, participants may express a preference for their own qualifying project, another eligible building or organization, a local project, a global project, or the Atlas-directed general pool.</p><p className="mt-5 max-w-4xl leading-8 text-slate-300">Direction never overrides mission eligibility, evidence requirements, conflicts review, legal requirements, or available funds. The goal is a system in which institutional success, customer value, and public benefit reinforce one another.</p></section>
 
-    <section className="mx-auto max-w-6xl px-6 py-20">
-      <h2 className="text-3xl font-bold">Every allocation gets a complete public record.</h2>
-      <div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {['Allocation ID and date','Recipient and amount','Purpose and eligibility basis','Why this project was selected','Conflict and eligibility review','Proof of transfer','Environmental baseline','Work or intervention performed','TA-14 governance/evidence requirements','Post-intervention evidence','Outcome and limitations','Unused/returned funds or follow-up'].map(item=><div key={item} className="rounded-xl border border-slate-800 bg-slate-900 p-5 font-semibold">{item}</div>)}
-      </div>
-    </section>
+<section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-6xl px-6 py-20"><h2 className="text-3xl font-bold">Where reinvestment can go</h2><div className="mt-8 grid gap-5 md:grid-cols-2 lg:grid-cols-3">{missions.map(([t,b])=><article key={t} className="rounded-xl border border-slate-800 bg-slate-950 p-6"><h3 className="text-xl font-semibold">{t}</h3><p className="mt-3 text-sm leading-7 text-slate-300">{b}</p></article>)}</div></div></section>
 
-    <section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-6xl px-6 py-20">
-      <h2 className="text-3xl font-bold">Allocation ledger</h2>
-      <p className="mt-4 max-w-4xl leading-7 text-slate-300">Records appear here only after an allocation exists. No placeholder recipient, invented impact, or projected donation is presented as completed activity.</p>
-      {allocations.length === 0 ? <div className="mt-8 rounded-xl border border-dashed border-slate-700 bg-slate-950 p-8"><p className="font-semibold">No allocations recorded yet.</p><p className="mt-2 text-slate-400">The first qualifying commercial receipts will establish the first designated balance. Subsequent allocation records will disclose the recipient, purpose, transfer evidence, intervention, and outcome status.</p></div> : <div className="mt-8 space-y-5">{allocations.map(a=><article key={a.id} className="rounded-xl border border-slate-800 bg-slate-950 p-6"><div className="flex flex-wrap justify-between gap-3"><h3 className="text-xl font-semibold">{a.recipient}</h3><span className="font-bold text-emerald-300">{money(a.amount)}</span></div><p className="mt-3 text-slate-300">{a.purpose}</p><p className="mt-3 text-sm text-slate-400">Why selected: {a.why}</p><p className="mt-3 text-sm text-slate-400">Status: {a.status}</p></article>)}</div>}
-    </div></section>
+<section className="mx-auto max-w-6xl px-6 py-20"><h2 className="text-3xl font-bold">Entities can petition for funding.</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">When sufficient unallocated funds exist, qualifying entities may petition for a bounded environmental project. Applications should identify the environmental need, requested amount, proposed intervention, baseline evidence, budget, expected measurable benefit, execution evidence that can be preserved, and post-intervention measurement plan. Funding is not guaranteed merely because an application is submitted.</p></section>
 
-    <section className="mx-auto max-w-6xl px-6 py-20">
-      <h2 className="text-3xl font-bold">What the fund is intended to support</h2>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">Priority projects may include indoor-air quality improvement, ventilation, filtration, environmental monitoring, mold-risk reduction, Legionella-risk reduction, environmental-health interventions, and other clean-air or environmental-integrity work where the need, execution, and outcome can be governed through evidence.</p>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">Preference is given to projects where a baseline can be established, the intervention can be bounded, execution can be documented, and post-intervention conditions can be examined. The objective is not to manufacture a success story. The objective is to know what the money actually did.</p>
-    </section>
+<section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-6xl px-6 py-20"><h2 className="text-3xl font-bold">Every dollar should have a trail.</h2><p className="mt-4 max-w-4xl leading-7 text-slate-300">The public record is designed to disclose the source class, applicable percentage, amount designated, allocation identifier, recipient, jurisdiction, amount, direction status, purpose, eligibility basis, selection rationale, conflicts review, transfer evidence, environmental baseline, intervention record, post-intervention evidence, outcome, limitations, and returned or unused funds where applicable.</p>{allocations.length===0?<div className="mt-8 rounded-xl border border-dashed border-slate-700 bg-slate-950 p-8"><p className="font-semibold">No allocations recorded yet.</p><p className="mt-2 text-slate-400">Zero means zero. Recipients and impacts will appear only when actual qualifying receipts and allocations exist.</p></div>:null}</div></section>
 
-    <section className="bg-slate-900"><div className="mx-auto max-w-6xl px-6 py-20">
-      <h2 className="text-3xl font-bold">Allocation governance</h2>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">Atlas serves as the AI allocation steward: researching candidate projects, evaluating them against the published mission and evidence requirements, documenting recommendations, and examining outcome records. Legal possession and transfer of funds remain with the responsible human or institutional entity. No AI system independently owns, banks, or transfers fund assets.</p>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">A recommendation should consider environmental need, expected measurable benefit, evidence quality, conflict risk, feasibility, recipient eligibility, ability to preserve execution evidence, and capacity to examine the resulting outcome. Human authorization confirms legal and financial eligibility and executes the transfer.</p>
-    </div></section>
+<section className="mx-auto max-w-6xl px-6 py-20"><h2 className="text-3xl font-bold">No impact claim without an evidence record.</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">A transfer receipt proves money moved. It does not establish environmental or health impact. Where an outcome is claimed, the record should connect the allocation to an appropriate baseline, intervention, execution evidence, post-intervention condition, result, and limitations. Environmental monitoring must not be represented as medical diagnosis, treatment, or proof of clinical outcome without appropriate independent clinical evidence and authority.</p><p className="mt-5 max-w-4xl leading-8 text-slate-300">Atlas may research eligible projects, compare evidence, identify gaps and conflicts, document allocation recommendations, and review outcome records. Legal custody, fiduciary responsibility, contracting, and transfer authority remain with the responsible human or legal entity.</p></section>
 
-    <section className="mx-auto max-w-6xl px-6 py-20">
-      <h2 className="text-3xl font-bold">No impact claim without an evidence record.</h2>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">A donation receipt proves a transfer. It does not by itself prove an environmental outcome. Where an outcome is claimed, this ledger is intended to connect the allocation to the baseline, intervention, execution evidence, post-intervention record, result, and limitations. If an intended result is not established, the record should say so.</p>
-      <Link href="/environmental-integrity-governance" className="mt-7 inline-block font-semibold text-emerald-300">Explore TA-14 Environmental Integrity Governance -&gt;</Link>
-    </section>
-  </main>;
-}
+<section className="bg-emerald-300/5"><div className="mx-auto max-w-6xl px-6 py-20"><p className="text-sm font-bold uppercase tracking-[.2em] text-emerald-300">Long-term direction</p><h2 className="mt-3 text-3xl font-bold">The destination is infrastructure.</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 is evaluating a transition in which broadly adoptable architecture, sustainable institutional stewardship, and progressively larger public-benefit reinvestment work together. The institution should preserve what is required to maintain and verify the infrastructure while seeking to expand Environmental Integrity Governance, Atmospheric Integrity Records, Personal Atmospheric Integrity, and global environmental-integrity infrastructure.</p><div className="mt-7 flex flex-wrap gap-5"><Link href="/environmental-integrity-governance" className="font-semibold text-emerald-300">Explore Environmental Integrity Governance -&gt;</Link><Link href="/artifacts/registry" className="font-semibold text-emerald-300">Inspect TA-14 evidence -&gt;</Link></div></div></section>
+</main>}
