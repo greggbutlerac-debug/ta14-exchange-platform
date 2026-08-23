@@ -7,7 +7,7 @@ const routes = [
   '/execution-claim-review',
   '/execution-evidence-snapshot',
   '/execution-claim-review/intake',
-  '/ai-governance/prove-ai-refused-unauthorized-action',
+  '/ai-governance/execution-evidence',
   '/ai-governance/authorization-changed-before-execution',
   '/ai-governance/evidence-changed-before-execution',
   '/ai-governance/ai-agent-executed-without-authority',
@@ -108,26 +108,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
           ? 0.98
           : route === '/execution-evidence-snapshot'
             ? 0.96
-            : route === '/ai-governance/prove-ai-refused-unauthorized-action'
-              ? 0.94
-              : route === '/ai-governance/authorization-changed-before-execution'
+            : route === '/ai-governance/execution-evidence'
+              ? 0.95
+              : route.startsWith('/ai-governance/')
                 ? 0.94
-                : route === '/ai-governance/evidence-changed-before-execution'
-                  ? 0.94
-                  : route === '/ai-governance/ai-agent-executed-without-authority'
-                    ? 0.94
-                    : route === '/ai-governance/prove-ai-action-was-blocked'
-                      ? 0.94
-                      : route === '/execution-claim-review/intake'
-                        ? 0.9
-                        : route === '/artifacts/registry'
+                : route === '/execution-claim-review/intake'
+                  ? 0.9
+                  : route === '/artifacts/registry'
+                    ? 0.9
+                    : route.startsWith('/artifacts/ta14-ea-')
+                      ? 0.82
+                      : route.startsWith('/transparent-air')
+                        ? 0.95
+                        : route.startsWith('/eu-ai-act')
                           ? 0.9
-                          : route.startsWith('/artifacts/ta14-ea-')
-                            ? 0.82
-                            : route.startsWith('/transparent-air')
-                              ? 0.95
-                              : route.startsWith('/eu-ai-act')
-                                ? 0.9
-                                : 0.7,
+                          : 0.7,
   }));
 }
