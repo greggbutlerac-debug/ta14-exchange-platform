@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 
 import { SiteActivityCounter } from '../components/site-activity-counter';
+import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 
 import './globals.css';
 
@@ -138,6 +139,7 @@ export default function RootLayout({
         </Script>
 
         {children}
+        <ArtifactCorpusStatusShell />
 
         <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
           <SiteActivityCounter />
