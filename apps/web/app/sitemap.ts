@@ -4,6 +4,9 @@ const baseUrl = 'https://ta14exchange.com';
 
 const routes = [
   '/',
+  '/execution-claim-review',
+  '/execution-evidence-snapshot',
+  '/execution-claim-review/intake',
   '/transparent-air/gulfport-ac-repair',
   '/transparent-air/second-opinion',
   '/eu-ai-act',
@@ -96,14 +99,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority:
       route === '/'
         ? 1
-        : route === '/artifacts/registry'
-          ? 0.9
-          : route.startsWith('/artifacts/ta14-ea-')
-            ? 0.82
-            : route.startsWith('/transparent-air')
-              ? 0.95
-              : route.startsWith('/eu-ai-act')
+        : route === '/execution-claim-review'
+          ? 0.98
+          : route === '/execution-evidence-snapshot'
+            ? 0.96
+            : route === '/execution-claim-review/intake'
+              ? 0.9
+              : route === '/artifacts/registry'
                 ? 0.9
-                : 0.7,
+                : route.startsWith('/artifacts/ta14-ea-')
+                  ? 0.82
+                  : route.startsWith('/transparent-air')
+                    ? 0.95
+                    : route.startsWith('/eu-ai-act')
+                      ? 0.9
+                      : 0.7,
   }));
 }
