@@ -3,62 +3,38 @@ import Link from 'next/link';
 export const metadata = {
   title: 'What If the Evidence Changes Before AI Execution? | TA-14',
   description: 'How changed evidence, stale records, material updates, and revalidation affect AI execution standing before consequence occurs.',
+  alternates: { canonical: 'https://ta14exchange.com/ai-governance/evidence-changed-before-execution' },
 };
 
+const faq = [
+  ['Can evidence be authentic and still be unusable for a current AI decision?', 'Yes. Evidence can remain authentic and historically accurate while becoming stale, superseded, incomplete, or no longer sufficient for the present execution decision.'],
+  ['What should happen when material evidence changes before execution?', 'The system should identify the changed evidence, determine whether it is material to the pending consequence, revalidate the proposition, and preserve the resulting hold, denial, escalation, or continued support.'],
+  ['Does a prior validation prove present execution standing?', 'Not necessarily. A prior validation can remain historically valid while no longer supporting the current action after relevant conditions or evidence change.'],
+];
+
 export default function EvidenceChangedBeforeExecutionPage() {
+  const faqSchema = {'@context':'https://schema.org','@type':'FAQPage',mainEntity:faq.map(([q,a])=>({'@type':'Question',name:q,acceptedAnswer:{'@type':'Answer',text:a}}))};
   return <main className="min-h-screen bg-slate-950 text-slate-100">
+    <script type="application/ld+json" dangerouslySetInnerHTML={{__html:JSON.stringify(faqSchema)}} />
     <section className="mx-auto max-w-5xl px-6 py-20 md:py-28">
       <p className="text-sm font-semibold uppercase tracking-[0.22em] text-emerald-300">AI Evidence Governance</p>
       <h1 className="mt-5 text-4xl font-bold tracking-tight md:text-6xl">What if the evidence changes before AI execution?</h1>
       <p className="mt-7 max-w-4xl text-lg leading-8 text-slate-300">A system can be supportable at one moment and unsupported later. If the evidence behind an action changes before execution, the important question is not whether the evidence was once valid. The important question is whether it still has standing when consequence is about to occur.</p>
-      <div className="mt-9 flex flex-wrap gap-4">
-        <Link href="/execution-evidence-snapshot?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md bg-emerald-300 px-6 py-3 font-semibold text-slate-950">Test one evidence question — $249</Link>
-        <Link href="/execution-claim-review/intake?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">Request a bounded claim review</Link>
-      </div>
+      <div className="mt-9 flex flex-wrap gap-4"><Link href="/execution-evidence-snapshot?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md bg-emerald-300 px-6 py-3 font-semibold text-slate-950">Test one evidence question — $249</Link><Link href="/execution-claim-review/intake?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">Request a bounded claim review</Link></div>
     </section>
 
-    <section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className="text-3xl font-bold">The stale-evidence problem</h2>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">A model, agent, workflow, or approval process may rely on records that were true when first captured: identity data, account state, policy status, environmental conditions, risk classification, customer consent, inventory state, financial limits, or other execution-relevant facts. If those facts materially change, old evidence can become historically accurate but presently insufficient.</p>
-    </div></section>
+    <section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-5xl px-6 py-16"><h2 className="text-3xl font-bold">The stale-evidence problem</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">A model, agent, workflow, or approval process may rely on records that were true when first captured: identity data, account state, policy status, environmental conditions, risk classification, customer consent, inventory state, financial limits, or other execution-relevant facts. If those facts materially change, old evidence can become historically accurate but presently insufficient.</p></div></section>
 
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <h2 className="text-3xl font-bold">What a defensible execution record should show</h2>
-      <div className="mt-8 grid gap-6 md:grid-cols-2">
-        {[
-          ['Evidence identity','What exact evidence object, version, source, or record supported the original action?'],
-          ['Continuity','Can the system show that the evidence used at execution is the same evidence—or a governed successor—to what was originally relied upon?'],
-          ['Material change','What changed, when did it change, and why could that change affect execution standing?'],
-          ['Revalidation','Was the proposition evaluated again against the changed evidence before binding or commitment?'],
-          ['Refusal or hold behavior','If support was lost, did the system stop, narrow, hold, deny, or escalate rather than execute on stale standing?'],
-          ['Replay','Can a reviewer reconstruct the original support, the change, the revalidation decision, and the final outcome?'],
-        ].map(([t,b])=><article key={t} className="rounded-xl border border-slate-800 bg-slate-900 p-6"><h3 className="text-xl font-semibold">{t}</h3><p className="mt-3 leading-7 text-slate-300">{b}</p></article>)}
-      </div>
-    </section>
+    <section className="mx-auto max-w-5xl px-6 py-20"><h2 className="text-3xl font-bold">What a defensible execution record should show</h2><div className="mt-8 grid gap-6 md:grid-cols-2">{[['Evidence identity','What exact evidence object, version, source, or record supported the original action?'],['Continuity','Can the system show that the evidence used at execution is the same evidence—or a governed successor—to what was originally relied upon?'],['Material change','What changed, when did it change, and why could that change affect execution standing?'],['Revalidation','Was the proposition evaluated again against the changed evidence before binding or commitment?'],['Refusal or hold behavior','If support was lost, did the system stop, narrow, hold, deny, or escalate rather than execute on stale standing?'],['Replay','Can a reviewer reconstruct the original support, the change, the revalidation decision, and the final outcome?']].map(([t,b])=><article key={t} className="rounded-xl border border-slate-800 bg-slate-900 p-6"><h3 className="text-xl font-semibold">{t}</h3><p className="mt-3 leading-7 text-slate-300">{b}</p></article>)}</div></section>
 
-    <section className="bg-slate-900"><div className="mx-auto max-w-5xl px-6 py-20">
-      <h2 className="text-3xl font-bold">Historical validation is not always present standing.</h2>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">A prior approval, validation, test result, or evidence package can remain historically true while no longer being sufficient for a later execution decision. That distinction matters in finance, autonomous workflows, enterprise infrastructure, AI governance, healthcare, and other domains where conditions can change between proposal and consequence.</p>
-      <p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 examines whether the evidence actually retained execution standing under the changed condition. The architecture under review remains sovereign; the examination does not rewrite it into TA-14 terminology.</p>
-    </div></section>
+    <section className="border-y border-slate-800 bg-slate-900/50"><div className="mx-auto max-w-5xl px-6 py-16"><p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Executable proof example</p><h2 className="mt-3 text-3xl font-bold">New evidence supersedes admitted evidence</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">TA14-EA-000017 is an executable artifact for this exact changed-evidence failure class. The frozen specification tests whether evidence supporting a pending consequence has been materially superseded by newer evidence. The bounded result is HOLD when present admissibility can no longer be carried forward without re-evaluation.</p><Link href="/artifacts/ta14-ea-000017" className="mt-6 inline-block rounded-md border border-emerald-300/40 px-5 py-3 font-semibold text-emerald-300">Inspect TA14-EA-000017 →</Link></div></section>
 
-    <section className="mx-auto max-w-5xl px-6 py-16">
-      <h2 className="text-2xl font-bold">Related execution-evidence problems</h2>
-      <div className="mt-6 grid gap-4 md:grid-cols-3">
-        <Link href="/ai-governance/authorization-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">Authorization changed too?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine whether the authority basis still had standing at execution.</p></Link>
-        <Link href="/ai-governance/ai-agent-executed-without-authority" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">Execution already happened?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Reconstruct whether the agent executed on evidence or authority that no longer supported the action.</p></Link>
-        <Link href="/ai-governance/prove-ai-action-was-blocked" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">System says it stopped the action?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine what proves commitment or execution did not proceed.</p></Link>
-      </div>
-      <Link href="/ai-governance/execution-evidence" className="mt-6 inline-block font-semibold text-emerald-300">Explore the complete AI Execution Evidence hub →</Link>
-    </section>
+    <section className="mx-auto max-w-5xl px-6 py-20"><h2 className="text-3xl font-bold">Historical validation is not always present standing.</h2><p className="mt-5 max-w-4xl leading-8 text-slate-300">A prior approval, validation, test result, or evidence package can remain historically true while no longer being sufficient for a later execution decision. That distinction matters in finance, autonomous workflows, enterprise infrastructure, AI governance, healthcare, and other domains where conditions can change between proposal and consequence.</p><p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 examines whether the evidence actually retained execution standing under the changed condition. The architecture under review remains sovereign; the examination does not rewrite it into TA-14 terminology.</p></section>
 
-    <section className="mx-auto max-w-5xl px-6 py-20">
-      <div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/5 p-8 md:p-10">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Commercial examination</p>
-        <h2 className="mt-3 text-3xl font-bold">Have a stale-evidence or changed-condition problem?</h2>
-        <p className="mt-4 max-w-3xl leading-7 text-slate-300">Start with a $249 Execution Evidence Snapshot when you need one narrow answer. Use the $750+ Execution Claim Review when the question requires changed-condition testing, failure behavior, authority analysis, or replay. Payment buys examination work—not a favorable result.</p>
-        <div className="mt-7 flex flex-wrap gap-4"><Link href="/execution-evidence-snapshot?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md bg-emerald-300 px-6 py-3 font-semibold text-slate-950">Start with the $249 Snapshot</Link><Link href="/execution-claim-review?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">See the full Claim Review</Link></div>
-      </div>
-    </section>
+    <section className="bg-slate-900"><div className="mx-auto max-w-5xl px-6 py-16"><h2 className="text-3xl font-bold">Frequently asked questions</h2><div className="mt-7 space-y-5">{faq.map(([q,a])=><article key={q} className="rounded-xl border border-slate-800 bg-slate-950 p-6"><h3 className="text-lg font-semibold">{q}</h3><p className="mt-3 leading-7 text-slate-300">{a}</p></article>)}</div></div></section>
+
+    <section className="mx-auto max-w-5xl px-6 py-16"><h2 className="text-2xl font-bold">Related execution-evidence problems</h2><div className="mt-6 grid gap-4 md:grid-cols-3"><Link href="/ai-governance/authorization-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">Authorization changed too?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine whether the authority basis still had standing at execution.</p></Link><Link href="/ai-governance/ai-agent-executed-without-authority" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">Execution already happened?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Reconstruct whether the agent executed on evidence or authority that no longer supported the action.</p></Link><Link href="/ai-governance/prove-ai-action-was-blocked" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">System says it stopped the action?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine what proves commitment or execution did not proceed.</p></Link></div><Link href="/ai-governance/execution-evidence" className="mt-6 inline-block font-semibold text-emerald-300">Explore the complete AI Execution Evidence hub →</Link></section>
+
+    <section className="mx-auto max-w-5xl px-6 py-20"><div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/5 p-8 md:p-10"><p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Commercial examination</p><h2 className="mt-3 text-3xl font-bold">Have a stale-evidence or changed-condition problem?</h2><p className="mt-4 max-w-3xl leading-7 text-slate-300">Start with a $249 Execution Evidence Snapshot when you need one narrow answer. Use the $750+ Execution Claim Review when the question requires changed-condition testing, failure behavior, authority analysis, or replay. Payment buys examination work—not a favorable result.</p><div className="mt-7 flex flex-wrap gap-4"><Link href="/execution-evidence-snapshot?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md bg-emerald-300 px-6 py-3 font-semibold text-slate-950">Start with the $249 Snapshot</Link><Link href="/execution-claim-review?utm_source=organic&utm_medium=problem_page&utm_campaign=evidence_change" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">See the full Claim Review</Link></div></div></section>
   </main>;
 }
