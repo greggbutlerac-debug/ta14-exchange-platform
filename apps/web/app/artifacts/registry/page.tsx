@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState, type ChangeEvent, type CSSProperties } from "react";
 import { SECOND_CORPUS_ARTIFACTS } from "./second-corpus-artifacts";
+import { EVIDENCE_HARDENING_ARTIFACTS } from "./evidence-hardening-artifacts";
 
 type Determination = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 type RegistryStatus = "DRAFT" | "UNDER_REVIEW" | "PUBLISHED" | "CHALLENGED" | "CORRECTED" | "SUPERSEDED" | "WITHDRAWN";
@@ -438,6 +439,7 @@ const EXTERNAL_REGISTERED_ARTIFACTS: RegistryArtifact[] = [
 const REGISTERED_ARTIFACTS: RegistryArtifact[] = [
   ...FOUNDING_ARTIFACTS,
   ...SECOND_CORPUS_ARTIFACTS,
+  ...EVIDENCE_HARDENING_ARTIFACTS,
   ...EXTERNAL_REGISTERED_ARTIFACTS,
 ];
 
@@ -1868,7 +1870,7 @@ export default function ExecutionArtifactRegistryPage() {
       </section>
 
       <section className="metrics">
-        <article><span>Registered artifacts</span><strong>{REGISTERED_ARTIFACTS.length}</strong><small>24 TA-14 execution artifacts · 1 external governance artifact</small></article>
+        <article><span>Registered artifacts</span><strong>{REGISTERED_ARTIFACTS.length}</strong><small>40 TA-14 execution artifacts · 1 external governance artifact</small></article>
         <article><span>Registered governance</span><strong>{GOVERNANCE_PROFILES.length}</strong><small>Architecture identities linked</small></article>
         <article><span>Determination coverage</span><strong>4/4</strong><small>ALLOW · HOLD · DENY · ESCALATE</small></article>
         <article><span>TA-14 founding verification floor</span><strong>L6</strong><small>External artifacts retain their own bounded verification level</small></article>
