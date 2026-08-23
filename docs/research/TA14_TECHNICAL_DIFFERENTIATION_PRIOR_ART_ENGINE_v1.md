@@ -1,157 +1,150 @@
-# TA-14 Technical Differentiation & Prior-Art Engine v1
+# TA-14 Technical Differentiation & Prior-Art Engine v1.1
 
 **Status:** OPEN RESEARCH RECORD — no novelty or patentability conclusion is self-awarded.
 
-**Purpose:** Test TA-14's asserted architectural differentiation against the strongest known pre-existing and contemporary comparators. This record separates established components, potentially differentiating composition/semantics, later/contemporary convergence, and questions requiring claim-by-claim patent counsel review.
+**Correction notice:** Earlier v1 analysis treated the public Chain of Eight as though it were the complete architecture. That was incomplete. This record is now governed by the canonical 24-link source `apps/web/lib/academy/ta14-24-link-canon.ts`. The Chain of Eight remains the parent route; the 24-link architecture is its higher-resolution decomposition and maturation.
 
-## Governing rule
+## Canonical provenance
 
-Do not ask whether another system uses TA-14 vocabulary. Ask whether it discloses the same operative mechanism. A component is not novel merely because TA-14 gives it a different name. A combination is not novel merely because its components are old. Any surviving differentiation must be stated as a bounded mechanism and tested against dated evidence.
+Canonical source states:
 
-## TA-14 executable reference object
+- Chain of Eight origin date: **2025-05-01**.
+- Parent anchors: **Reality -> Record -> Continuity -> Admissibility -> Binding -> Commit -> Execution -> Outcome**.
+- The 24-link architecture is the subsequent higher-resolution decomposition of that already-existing parent route.
 
-Current executable harness: `apps/web/lib/execution-artifacts/execution-harness.ts`.
+## Canonical 24-link TA-14 Admissible Execution Architecture
 
-`REALITY -> RECORD -> CONTINUITY -> ADMISSIBILITY -> BINDING -> COMMIT -> EXECUTION -> OUTCOME`
+1. Admissible Reality
+2. Record
+3. Continuity
+4. Evidence Governance
+5. Admissible Evidence
+6. Admissible Truth
+7. Reliance
+8. Authority
+9. Legitimacy
+10. Consequence Formation
+11. Attachment / Assent
+12. Binding Reality
+13. Binding
+14. Commit Reality
+15. Commit
+16. Execution Reality
+17. Admissible Non-Occurrence
+18. Prevented Consequence
+19. Execution
+20. Outcome Reality
+21. Outcome
+22. New Reality
+23. Memory
+24. Future Chain
 
-Determinations: `ALLOW | HOLD | DENY | ESCALATE`. Required predicates are evaluated stage-by-stage; a non-passing predicate terminates progression with its configured governed determination; downstream stages are not reached. The package preserves specification, trace, receipt, manifest and root hash. Expected determination is asserted after execution rather than supplied as the runtime answer.
+## Governing research rule
 
-## Candidate differentiation propositions
+Do not ask whether another system uses TA-14 vocabulary. Ask whether it discloses the same operative mechanism, the same material dependency, or an obvious equivalent. TA-14 does not claim ownership of words such as authority, admissibility, binding, commit, execution, outcome, provenance, authorization or audit. The research object is the **integrated consequence architecture and the operative relationships among its links**.
 
-- **DP-01 — Proposition-specific evidentiary standing before consequence.** Required evidence must have standing for the particular proposition on which the consequence depends; authentication or a generic Permit is not sufficient by itself.
-- **DP-02 — Continuity of standing through the consequence boundary.** Previously valid authority/evidence can lose standing after material change and require requalification.
-- **DP-03 — Ordered separation of admissibility, binding, commit and execution.** Evidence qualification, consequence binding, bounded commitment and execution are represented as distinct governed states.
-- **DP-04 — Semantically distinct non-ALLOW outcomes.** HOLD, DENY and ESCALATE represent different governance conditions rather than interchangeable failure labels.
-- **DP-05 — Outcome is evidence-bearing closure, not retroactive authorization.** Execution does not prove its own prerequisites; outcome evidence closes the bounded chain and may require independent observation.
-- **DP-06 — Evidence-bearing reconstruction of the determination path.** Frozen specification, stage trace, receipt, hashes and manifest preserve how and where the determination formed.
-- **DP-07 — Alternate-route/bypass challenge as part of execution standing.** A protected consequence is not considered governed if it remains reachable through an ungoverned alternate route inside the tested boundary.
+A component is not novel because TA-14 names it differently. A collection is not non-obvious merely because nobody used the same list. The burden is to determine whether the 24-link ordering/dependencies create technical behavior not already disclosed or predictably obtainable from known systems.
+
+## Terry Snyder review — corrected scope
+
+Terry Snyder's technical review is retained as an adversarial evidence input. Its strongest criticisms concern whether public TA-14 artifacts demonstrated live mechanisms, externally observed conditions, external authority resolution, external-world execution, independent outcome evidence, protected-consequence non-formation and independent verification. Those criticisms materially improved the artifact evidence surface.
+
+However, Snyder's Johnson Controls comparison principally establishes overlap in familiar component functions: external physical state acquisition, programmed evaluation, authentication/authorization, command/no-command control, physical effect and audit/history. It does **not by itself establish equivalence to the canonical 24-link TA-14 architecture**.
+
+Therefore the Johnson Controls question is no longer: "does Metasys perform control?" It clearly does. The question is: **does Metasys disclose an equivalent consequence-governance dependency architecture across the 24 canonical TA-14 functions, or would additional orchestration/semantics have to be introduced?**
 
 ## Established mechanisms TA-14 should NOT claim to have invented
 
-Sensors/external-state acquisition; programmed conditional control; authentication/authorization/RBAC; Permit/Deny policy decisions; policy decision/enforcement points; ongoing authorization and revocation; environmental/system conditions as authorization inputs; obligations/advice; audit/event histories; hashing/signatures/manifests; ordered workflows; authorized functionaries; provenance chains; generic fail-closed gates.
+Sensors/external-state acquisition; programmed conditional control; authentication/authorization/RBAC; Permit/Deny policy decisions; PDP/PEP separation; ongoing authorization and revocation; environmental/system conditions as authorization inputs; obligations/advice; audit/event histories; hashing/signatures/manifests; ordered workflows; authorized functionaries; provenance chains; generic fail-closed gates; generic command/no-command physical control.
 
-## Primary dated comparator record
+## Comparator set
 
-### UCONABC — Park & Sandhu, ACM TISSEC, 1 Feb 2004, DOI 10.1145/984334.984339
-Integrates Authorizations, oBligations and Conditions and expressly covers continuity/ongoing controls and mutability. Conditions include environmental/system requirements. The model addresses ongoing control and immediate revocation.
+- **UCONABC (2004):** authorization, obligations, conditions, continuity/ongoing controls, mutability and revocation.
+- **XACML 3.0:** PDP/PEP, Permit/Deny/Indeterminate/NotApplicable, conditions, obligations/advice and combining algorithms.
+- **NIST SP 800-207 Zero Trust (2020):** policy engine/administrator/enforcement separation using supporting/current information to grant, deny or revoke.
+- **in-toto (pre-TA-14):** signed ordered layouts, authorized functionaries, link metadata, materials/products/byproducts, verification and freshness/expiration.
+- **Johnson Controls Metasys (pre-TA-14):** physical state acquisition, programmed control, authorization, protected operations, command/no-command and audit/history.
 
-### XACML 3.0 — OASIS standard, pre-TA-14
-Defines PDP/PEP authorization decisions of Permit, Deny, Indeterminate and NotApplicable; conditions; obligations/advice; combining algorithms; and enforcement behavior. A PEP may condition Permit on its ability to discharge obligations.
+## Canonical 24-link comparator matrix — v1
 
-### NIST SP 800-207 Zero Trust Architecture — Aug 2020
-Separates policy engine, policy administrator and policy enforcement point. The policy engine uses enterprise policy plus supporting/external information to grant, deny or revoke access; the administrator executes the decision; the PEP enables, monitors and terminates access.
+Legend: **S** = substantial analogue established; **P** = partial/analogous; **N/E** = equivalent not established in reviewed material; **C** = known component but TA-14-specific relationship remains open.
 
-### in-toto — public pre-TA-14
-Defines signed layouts containing ordered steps, requirements and authorized functionaries; signed link metadata records materials, products, commands and byproducts; client verification checks the final product against the layout. Layout freshness/expiration is also verified.
+| # | TA-14 canonical link | UCON | XACML | ZTA | in-toto | Metasys | Current pressure finding |
+|---:|---|:---:|:---:|:---:|:---:|:---:|---|
+| 1 | Admissible Reality | P | P | P | N/E | P | External/current state is old; the additional claim that reality itself must obtain governed admissibility before consequence is not yet mapped as an equivalent mechanism. |
+| 2 | Record | P | P | P | S | S/P | Records/logs/provenance are established. Weak standalone differentiation. |
+| 3 | Continuity | S | P | S | P | P | Broad continuity novelty is defeated by UCON and pressured by ZTA. |
+| 4 | Evidence Governance | P | P | P | S/P | Evidence/provenance governance exists; TA-14 must show a distinct runtime consequence role, not mere metadata management. |
+| 5 | Admissible Evidence | P | P | P | P | N/E | Candidate distinction only if evidence can be authentic/integrity-valid yet lack proposition-specific consequence standing. |
+| 6 | Admissible Truth | N/E | P | N/E | P | N/E | **High-interest link.** Reviewed comparators do not yet establish an equivalent governed transition from admissible evidence to bounded truth standing for consequence. |
+| 7 | Reliance | P | P | P | P | N/E | Trust/reliance concepts exist broadly; TA-14 must show operative reliance standing rather than terminology. |
+| 8 | Authority | S/P | S/P | S | P | S | Authorization/authority is established territory. No standalone novelty claim recommended. |
+| 9 | Legitimacy | N/E | P | P | N/E | N/E | **High-interest link.** Need to establish whether legitimacy is technically distinct from authorization/policy validity and has independent execution consequences. |
+| 10 | Consequence Formation | P | P | P | N/E | P | Control systems form consequences; TA-14's candidate delta is treating consequence formation as a governed pre-binding state. |
+| 11 | Attachment / Assent | P | P | N/E | P | N/E | **Open.** Need canonical semantics and comparator mapping; avoid novelty assertion until defined mechanistically. |
+| 12 | Binding Reality | N/E | P | N/E | N/E | P | **High-interest link.** Need to show this is not simply current-state validation or policy condition checking. |
+| 13 | Binding | P | S/P | P | P | P | Generic binding/authorization-to-enforcement concepts are old; TA-14-specific evidence-to-consequence binding remains open. |
+| 14 | Commit Reality | N/E | N/E | N/E | P | P | **High-interest link.** Current evidence does not establish an equivalent separately governed reality state immediately associated with consequence commitment. |
+| 15 | Commit | P | P | P | P | S/P | Commit/transaction/command concepts are established; only its dependency position in the full chain is potentially differentiating. |
+| 16 | Execution Reality | P | P | P | N/E | S | Current runtime/physical state is established; TA-14-specific separation from commit and execution remains open. |
+| 17 | Admissible Non-Occurrence | N/E | N/E | N/E | N/E | N/E | **Very high-interest link.** Snyder's critique actually reinforces the need for it: an internal DENY does not prove external non-occurrence. Equivalent pre-TA-14 architecture not yet established. |
+| 18 | Prevented Consequence | N/E | N/E | P | N/E | P | Prevention is old; separately evidencing the prevented consequence after admissible non-occurrence is not yet mapped as equivalent. |
+| 19 | Execution | P | P | S | P | S | Execution/enforcement is established territory. No standalone novelty claim. |
+| 20 | Outcome Reality | P | N/E | P | P | S/P | Observation/telemetry is old; separate outcome-reality standing before governed Outcome remains open. |
+| 21 | Outcome | P | N/E | P | S/P | S | Outcomes/results/history are established; TA-14 closure semantics remain candidate differentiation. |
+| 22 | New Reality | P | N/E | P | P | S/P | Systems update state after action; TA-14's recursive consequence-to-new-reality semantics must be shown, not merely named. |
+| 23 | Memory | P | P | P | S | S | Preservation/history is established. No standalone novelty claim. |
+| 24 | Future Chain | P | N/E | P | P | P | **Candidate compositional distinction:** prior outcome/new reality/memory becomes governed input to a subsequent consequence chain. Requires deeper workflow/control prior-art search. |
 
-### Johnson Controls Metasys — documented pre-TA-14/current manuals examined
-Establishes physical state acquisition, programmed control, authenticated/authorized commands, protected operations and audit/history. This defeats broad claims that conditional physical control, authorization, refusal or command logging are themselves TA-14 inventions.
+## What Terry's report pressures directly in the canonical chain
 
-## Limitation-by-limitation matrix — v1
+Terry's criticism maps strongly to links **1-6** (reality/evidence/truth), **8** (authority), **13-21** (binding through outcome), and especially **17-18** because he correctly distinguishes an internal denial/receipt from evidence that the prohibited consequence did not occur externally.
 
-Legend: **S** = substantially disclosed by comparator; **P** = partial/analogous disclosure; **N/E** = not established in the evidence reviewed; **OPEN** = deeper implementation/patent review required.
+This is useful pressure, not a defeat of the architecture. TA-14 must demonstrate these links as mechanisms rather than labels.
 
-| TA-14 proposition | UCONABC | XACML | NIST ZTA | in-toto | Metasys | v1 pressure finding |
-|---|---|---|---|---|---|---|
-| DP-01 proposition-specific evidentiary standing | P | P | P | P | N/E | **SURVIVES NARROWLY.** All can consume attributes/evidence-like information, but reviewed sources do not establish TA-14's claimed distinction between evidence existence/integrity and proposition-specific admissible standing as a separately governed pre-consequence state. |
-| DP-02 continuity through consequence boundary | **S** | P | **S** | P (expiry/freshness) | P | **BROAD CLAIM DEFEATED.** UCON expressly teaches decision continuity/ongoing control and immediate revocation; ZTA teaches grant/deny/revoke using current supporting information. TA-14 differentiation cannot rest on continuity alone. |
-| DP-03 separate admissibility -> binding -> commit -> execution | P | P | P | P | P | **SURVIVES, HIGH OBVIOUSNESS PRESSURE.** PDP/PEP and workflow/provenance systems separate decision from enforcement and ordered steps, but the exact four-state semantic decomposition has not yet been established as one pre-TA-14 mechanism. Mere relabeling would not be enough. |
-| DP-04 HOLD vs DENY vs ESCALATE semantics | P | **S/P** | P | N/E | P | **LABEL NOVELTY DEFEATED; OPERATIVE SEMANTICS OPEN.** XACML already has Permit/Deny/Indeterminate/NotApplicable and obligations/advice. TA-14 must prove materially different consequence behavior, especially HOLD vs ESCALATE. |
-| DP-05 outcome evidence closes but does not authorize | P | N/E | P | **P/S** | P | **SURVIVES NARROWLY.** in-toto strongly anticipates post-step evidence/verification. What remains open is TA-14's rule that outcome cannot cure missing pre-execution standing and closes a consequence-governance chain rather than merely verifying workflow/product conformance. |
-| DP-06 reconstructable evidence-bearing determination path | P | P | P | **S** | P | **BROAD CLAIM DEFEATED.** Signed layouts/link metadata and verification strongly anticipate reconstructable evidence chains; TA-14's narrower possible delta is reconstructing the *governed consequence determination*, including terminal non-progression semantics. |
-| DP-07 alternate-route/bypass closure | P | P | P | N/E | P | **OPEN / HIGH PRESSURE.** Enforcement architectures assume protected resources are behind PEPs; bypass resistance is a known security requirement. TA-14 cannot claim bypass resistance generally; only a specific evidence requirement tying alternate-route closure to execution standing might survive. |
+## What Terry's Johnson Controls comparison does NOT yet establish
 
-## Destructive finding 01 — CONTINUITY is not the novelty center
+The reviewed comparison does not establish native Metasys equivalents for the complete sequence involving:
 
-**Finding:** DP-02 as a broad proposition is defeated by pre-existing usage-control literature. UCONABC expressly generalizes access control to include continuity (ongoing controls), obligations, conditions and mutability and discusses immediate revocation. NIST ZTA later reinforces current-information grant/deny/revoke behavior.
+`Admissible Evidence -> Admissible Truth -> Reliance -> Authority -> Legitimacy -> Consequence Formation -> Attachment / Assent -> Binding Reality -> Binding -> Commit Reality -> Commit -> Execution Reality -> Admissible Non-Occurrence -> Prevented Consequence -> Execution -> Outcome Reality -> Outcome -> New Reality -> Memory -> Future Chain`.
 
-**TA-14 correction:** Never claim that TA-14 invented the idea that authority/permission must remain valid as conditions change.
+Absence from Terry's report is **not proof of absence from all Johnson Controls technology or prior art**. It means equivalence remains unestablished and requires direct documentation/patent mapping.
 
-## Destructive finding 02 — Multiple determinations are not the novelty center
+## Architectural differentiation hypothesis — corrected v3
 
-XACML already supplies Permit, Deny, Indeterminate and NotApplicable, plus obligations/advice and deterministic combining algorithms. Therefore the existence of four TA-14 labels is not a defensible novelty proposition.
+> **TA-14 is a 24-link admissible-execution consequence architecture, derived from the May 1, 2025 Chain of Eight, in which reality/evidence are progressively governed into bounded truth and reliance standing; authority and legitimacy govern whether consequence may form and attach; binding reality/binding and commit reality/commit establish the consequence boundary; execution reality and admissible non-occurrence/prevented-consequence states govern whether execution may or may not bind with reality; and outcome reality/outcome produce new reality, memory and the conditions for a future chain.**
 
-**Surviving question:** Do HOLD and ESCALATE create distinct mandatory state transitions and authority consequences that cannot be reproduced by ordinary XACML decision + obligation/advice orchestration without adding an external governance state machine?
+**STATUS: UNPROVEN ARCHITECTURAL DIFFERENTIATION HYPOTHESIS.**
 
-## Destructive finding 03 — Provenance/reconstruction is not the novelty center
+The asserted distinction is the integrated dependency architecture, not ownership of any individual word or known component.
 
-in-toto already supplies signed ordered layouts, authorized functionaries, link metadata, materials/products/byproducts, verification and freshness/expiration checks.
+## Combination / obviousness challenge
 
-**TA-14 correction:** Never claim that an ordered signed evidence chain, authorized actors, cryptographic reconstruction or replayability alone is novel.
+The strongest attack is not "Metasys already has a controller." It is:
 
-**Surviving question:** Is the evidence object merely proving that steps occurred, or is proposition-specific evidentiary standing itself a prerequisite that controls whether a consequence is allowed to form at runtime?
+> Could a skilled engineer, before TA-14, predictably combine UCON + XACML/OPA + PDP/PEP/Zero Trust + provenance systems + transactional/industrial control and arrive at the materially equivalent 24-link consequence architecture without inventive orchestration?
 
-## Destructive finding 04 — PDP/PEP separation is not the novelty center
+That question remains OPEN. A serious analysis must map not only all 24 functions but also the **dependencies between them** and the technical behavior created when a link fails, changes, or lacks standing.
 
-NIST ZTA separates decision, administration and enforcement. XACML likewise distinguishes PDP and PEP. Metasys protects physical operations with authorization and execution controls.
+## Required destructive tests — 24-link edition
 
-**TA-14 correction:** Never claim that separating decision from enforcement, or checking policy before physical/digital execution, is itself novel.
-
-## Stage-by-stage pressure map
-
-| TA-14 stage | Closest established analogues | What TA-14 must still establish if differentiation is claimed |
-|---|---|---|
-| REALITY | sensor/system/environment attributes; PIPs; conditions | A technical mechanism beyond ordinary state/input acquisition. No standalone novelty position recommended. |
-| RECORD | audit/event records; signed link metadata; attributes | A governed record whose evidentiary role is materially different from ordinary logs/provenance. Weak standalone novelty position. |
-| CONTINUITY | UCON ongoing control; ZTA revoke; freshness/expiry | Broad novelty unavailable. Treat as inherited mechanism unless coupled to a narrower proposition-standing construct. |
-| ADMISSIBILITY | XACML conditions/attributes; UCON predicates; provenance verification | Define why evidence can be authentic yet lack standing for a particular proposition, and show this state has operative consequences not reducible to a normal policy predicate. **Key candidate delta.** |
-| BINDING | authorization decision; obligations; policy-to-PEP control | Define the object/transition by which admissible evidence becomes consequence-specific constraint. Must be more than renamed Permit/obligation. **Key candidate delta.** |
-| COMMIT | PA/PEP command establishment; transaction/workflow commit concepts | Define a frozen consequence commitment distinct from authorization and execution, including what is cryptographically/evidentially fixed and what changes invalidate it. **Key candidate delta, high prior-art risk.** |
-| EXECUTION | PEP, controller output, protected operation | No broad novelty position. Candidate distinction exists only in dependency on surviving upstream standing and evidence of terminal state. |
-| OUTCOME | telemetry, history, in-toto products/byproducts/verification | Define closure semantics: outcome evidence cannot retroactively cure invalid execution standing; independent external observation may be required. **Candidate delta.** |
-
-## Current strongest differentiation hypothesis — narrowed v2
-
-The first-pass eight-stage story is too broad for a novelty proposition because multiple individual stages are strongly anticipated. The more defensible research hypothesis is now:
-
-> **A proposition-standing consequence protocol in which evidence that is merely present, authentic or policy-relevant does not thereby possess execution standing; qualifying evidence is admitted for a bounded proposition, transformed into a consequence-specific binding, frozen at commit, and required to retain continuity through the execution boundary; materially different failure states force HOLD, DENY or authority-transfer/ESCALATE before consequence; and outcome evidence closes the chain without retroactively curing absent pre-execution standing.**
-
-**STATUS: UNPROVEN; SURVIVES FIRST LIMITATION PASS; HIGH COMBINATION/OBVIOUSNESS RISK.**
-
-This hypothesis is narrower than TA-14 as a whole. It intentionally concedes UCON continuity, XACML policy outcomes/obligations, PDP/PEP enforcement, industrial control, provenance and cryptographic reconstruction.
-
-## Combined-obviousness pressure
-
-A serious reviewer can plausibly argue that a skilled engineer could combine:
-
-1. UCON for ongoing authorization/conditions/revocation;
-2. XACML or OPA for policy evaluation and non-binary decision handling;
-3. NIST-style PDP/PEP separation for enforcement;
-4. in-toto-style signed provenance/verification; and
-5. industrial-control or transactional commit/execution mechanisms.
-
-The research burden is therefore **not** merely to show that no single reference uses all eight TA-14 words. We must identify a technical interaction among `ADMISSIBILITY -> BINDING -> COMMIT -> EXECUTION -> OUTCOME` that would not be an ordinary predictable combination of those known teachings.
-
-This is the central unresolved patentability pressure point.
-
-## Required executable comparator challenge vectors
-
-### CV-01 — Authentic evidence, wrong proposition
-Evidence is authentic and integrity-valid but supports proposition A while requested consequence depends on proposition B. Test whether comparator systems represent a separate admissibility-standing failure rather than merely evaluating a false policy attribute.
-
-### CV-02 — Valid approval, material evidence changes before commit
-Approval exists at T0; qualifying evidence materially changes at T1; commit requested at T2. Test whether prior approval is withdrawn because proposition standing is no longer continuous.
-
-### CV-03 — Commit fixed, runtime destination/version changes
-Authority and evidence remain valid but the execution target diverges after commit. Test whether the system distinguishes invalid binding/commit correspondence from ordinary access denial.
-
-### CV-04 — Two valid obligations conflict
-Both obligations are individually valid but consequences are incompatible. Test whether the system transfers authority (ESCALATE) rather than selecting by ordinary policy-combining precedence.
-
-### CV-05 — Internal DENY but alternate route remains open
-Primary PEP denies the action while an alternate route can still create the protected consequence. Test whether governance standing itself remains unclosed until alternate-route containment is evidenced.
-
-### CV-06 — Execution receipt exists; external outcome unobserved
-Execution telemetry says success but no qualifying independent outcome evidence exists. Test whether the system distinguishes execution completion from outcome standing/closure.
+1. **Full-link reduction test:** map every canonical link to each comparator and to the strongest combination of comparators.
+2. **Dependency deletion test:** remove each link from TA-14 and record whether governed consequence behavior materially changes.
+3. **Reordering test:** reorder high-interest links (5-18) and determine whether the same consequence semantics survive.
+4. **Known-system composition test:** implement the closest UCON + XACML + provenance + PEP composition without TA-14-specific orchestration and identify where it fails to reproduce the chain.
+5. **Non-occurrence test:** distinguish command denial from admissible evidence that a prohibited consequence did not occur.
+6. **Recursive-chain test:** test whether Outcome -> New Reality -> Memory -> Future Chain produces a governed successor-chain dependency not present in ordinary audit/history systems.
+7. **Terry/Metasys 24-link challenge:** require an evidence-backed S/P/N-E mapping for all 24 links, not a vocabulary comparison.
 
 ## Patent-analysis boundary
 
-This engineering record does not determine patent novelty, non-obviousness, infringement, validity or freedom to operate. Those require actual patent claims, filing/priority chain, jurisdiction, claim construction and legally cognizable prior art. The final claim chart should be reviewed by patent counsel.
+This engineering record does not determine patent novelty, non-obviousness, infringement, validity or freedom to operate. Those require actual patent claims, filing/priority chain, jurisdiction, claim construction and legally cognizable prior art. A patent professional should review the final claim chart.
 
 ## Next work items
 
-1. Execute CV-01 through CV-06 conceptually against UCON, XACML, NIST ZTA, in-toto and the TA-14 harness and record PASS/PARTIAL/NO-MATCH.
-2. Search patent literature specifically around evidence-qualified authorization, pre-execution evidence standing, commit-bound authorization, authorization receipts, usage-control provenance and consequence closure.
-3. Establish TA-14's actual earliest support/priority dates for each surviving proposition rather than relying on a single global date.
-4. Produce a claim-chart-ready record separating **known element**, **known combination**, **surviving interaction**, and **unsupported assertion**.
-5. Do not resume aggressive novelty messaging until the combination/obviousness test is complete.
+1. Retrieve the canonical definitions/semantics for all 24 links, not merely their names.
+2. Build the dependency graph showing which links gate, invalidate or transform standing at adjacent links.
+3. Run the Terry/Metasys 24-link challenge against primary Johnson Controls documentation.
+4. Run the combined-obviousness mapping against UCON, XACML, ZTA and in-toto.
+5. Establish earliest documentary support dates for the Chain of Eight and each later 24-link refinement.
+6. Produce a claim-chart-ready record separating known element, known combination, surviving interaction and unsupported assertion.
