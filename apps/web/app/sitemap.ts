@@ -74,22 +74,36 @@ const routes = [
   '/ai-governance',
   '/academy',
   '/marketplace',
+  '/artifacts',
+  '/artifacts/registry',
+  '/artifacts/founding-demonstrations',
+  '/artifacts/interoperability-examinations',
 ];
+
+const executionArtifactRoutes = Array.from(
+  { length: 40 },
+  (_, index) => `/artifacts/ta14-ea-${String(index + 1).padStart(6, '0')}`,
+);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
+  const allRoutes = [...routes, ...executionArtifactRoutes];
 
-  return routes.map((route, index) => ({
+  return allRoutes.map((route, index) => ({
     url: `${baseUrl}${route}`,
     lastModified: now,
     changeFrequency: index === 0 ? 'daily' : 'weekly',
     priority:
       route === '/'
         ? 1
-        : route.startsWith('/transparent-air')
-          ? 0.95
-          : route.startsWith('/eu-ai-act')
-            ? 0.9
-            : 0.7,
+        : route === '/artifacts/registry'
+          ? 0.9
+          : route.startsWith('/artifacts/ta14-ea-')
+            ? 0.82
+            : route.startsWith('/transparent-air')
+              ? 0.95
+              : route.startsWith('/eu-ai-act')
+                ? 0.9
+                : 0.7,
   }));
 }
