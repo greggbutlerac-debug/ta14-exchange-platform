@@ -5,6 +5,21 @@ import ArtifactClassSummary from "./artifact-class-summary";
 import ArtifactClassificationBridge from "./artifact-classification-bridge";
 import GovernedArtifactDirectory from "./governed-artifact-directory";
 
+const SECOND_CORPUS = [
+  ["TA14-EA-000013", "TA14-EAR-000025", "Authority expires after approval but before execution", "HOLD"],
+  ["TA14-EA-000014", "TA14-EAR-000026", "Evidence source identity substituted mid-chain", "DENY"],
+  ["TA14-EA-000015", "TA14-EAR-000027", "Conflicting chain-of-custody histories detected", "ESCALATE"],
+  ["TA14-EA-000016", "TA14-EAR-000028", "Dependency version changes after commit", "HOLD"],
+  ["TA14-EA-000017", "TA14-EAR-000029", "New evidence supersedes admitted evidence", "HOLD"],
+  ["TA14-EA-000018", "TA14-EAR-000030", "Authorized action sent toward wrong destination", "DENY"],
+  ["TA14-EA-000019", "TA14-EAR-000031", "Execution begins but interruption prevents completion", "ESCALATE"],
+  ["TA14-EA-000020", "TA14-EAR-000032", "Executed action differs from committed action", "DENY"],
+  ["TA14-EA-000021", "TA14-EAR-000033", "Material condition changes during final revalidation", "HOLD"],
+  ["TA14-EA-000022", "TA14-EAR-000034", "Two valid obligations produce incompatible consequences", "ESCALATE"],
+  ["TA14-EA-000023", "TA14-EAR-000035", "Historical artifact cannot be cryptographically reconstructed", "HOLD"],
+  ["TA14-EA-000024", "TA14-EAR-000036", "Changed state revalidated and authorized execution succeeds", "ALLOW"],
+] as const;
+
 export default function ArtifactRegistryLayout({ children }: { children: ReactNode }) {
   return (
     <>
@@ -124,7 +139,70 @@ export default function ArtifactRegistryLayout({ children }: { children: ReactNo
         </div>
       </section>
 
+      <section
+        aria-label="TA-14 execution artifact corpus status"
+        style={{
+          padding: "16px 5vw",
+          borderBottom: "1px solid rgba(86,227,159,.18)",
+          background: "linear-gradient(90deg, rgba(5,20,18,.99), rgba(5,16,27,.99))",
+          color: "#eefaff",
+          fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
+        <div style={{ maxWidth: 1500, margin: "0 auto", display: "flex", gap: 18, alignItems: "center", justifyContent: "space-between", flexWrap: "wrap" }}>
+          <div>
+            <strong style={{ display: "block", color: "#65e7ad", fontSize: 11, letterSpacing: ".14em" }}>TA-14 EXECUTION ARTIFACT CORPUS · 24 PUBLIC RECORDS</strong>
+            <span style={{ display: "block", marginTop: 5, color: "#a8bec8", fontSize: 12, lineHeight: 1.55 }}>
+              TA14-EA-000001 through TA14-EA-000024 are now represented in the public registry estate. The second corpus uses permanent EAR identities TA14-EAR-000025 through TA14-EAR-000036 so previously issued historical registry identities remain intact.
+            </span>
+          </div>
+          <Link href="/artifacts" style={{ color: "#caffdf", textDecoration: "none", fontWeight: 850, fontSize: 12 }}>Open Artifact Library →</Link>
+        </div>
+      </section>
+
       <div id="directory">{children}</div>
+
+      <section
+        aria-label="TA-14 second execution artifact corpus"
+        style={{
+          background: "#050914",
+          color: "#eef5ff",
+          padding: "30px 24px 24px",
+          fontFamily: 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+        }}
+      >
+        <div style={{ maxWidth: 1240, margin: "0 auto" }}>
+          <div style={{ marginBottom: 18 }}>
+            <div style={{ color: "#65e7ad", fontSize: 11, fontWeight: 900, letterSpacing: ".14em" }}>SECOND EXECUTION ARTIFACT CORPUS · REGISTERED</div>
+            <h2 style={{ margin: "7px 0 8px", fontSize: "clamp(25px,3vw,38px)" }}>TA14-EA-000013 through TA14-EA-000024</h2>
+            <p style={{ margin: 0, maxWidth: 900, color: "#9fb4c2", lineHeight: 1.65, fontSize: 13 }}>
+              Twelve additional bounded TA-14 execution artifacts. Their permanent registry identities are TA14-EAR-000025 through TA14-EAR-000036. Registration does not expand the claims boundary of any individual artifact; each record remains limited to its preserved case.
+            </p>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(260px,1fr))", gap: 12 }}>
+            {SECOND_CORPUS.map(([artifactId, registryId, title, determination]) => (
+              <Link
+                key={artifactId}
+                href={`/artifacts/${artifactId.toLowerCase()}`}
+                style={{
+                  display: "block",
+                  padding: 16,
+                  borderRadius: 14,
+                  border: "1px solid rgba(101,231,173,.16)",
+                  background: "linear-gradient(145deg,rgba(8,23,31,.96),rgba(5,12,20,.98))",
+                  color: "#eff8ff",
+                  textDecoration: "none",
+                }}
+              >
+                <div style={{ color: "#65e7ad", fontSize: 10, fontWeight: 900, letterSpacing: ".09em" }}>{artifactId} · {registryId}</div>
+                <div style={{ marginTop: 8, minHeight: 40, fontWeight: 820, lineHeight: 1.35 }}>{title}</div>
+                <div style={{ marginTop: 10, color: "#ffd37b", fontSize: 11, fontWeight: 850 }}>{determination}</div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <div
         style={{
           background: "#050914",
