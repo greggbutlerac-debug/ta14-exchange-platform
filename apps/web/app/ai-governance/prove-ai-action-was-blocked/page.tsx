@@ -44,6 +44,16 @@ export default function ProveAiActionWasBlockedPage() {
       <p className="mt-5 max-w-4xl leading-8 text-slate-300">A route-specific control may prove that one governed path refused execution without proving that every external path to the same consequence was impossible. A truthful examination preserves that distinction. TA-14 does not turn a bounded blocking result into a universal claim unless the evidence actually supports it.</p>
     </div></section>
 
+    <section className="mx-auto max-w-5xl px-6 py-16">
+      <h2 className="text-2xl font-bold">Related execution-evidence problems</h2>
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <Link href="/ai-governance/authorization-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-300/60"><h3 className="font-semibold">Was authorization still valid?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine whether authority changed before the attempted action reached execution.</p></Link>
+        <Link href="/ai-governance/evidence-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-300/60"><h3 className="font-semibold">Did supporting evidence change?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Determine whether stale or changed evidence should have altered the execution determination.</p></Link>
+        <Link href="/ai-governance/ai-agent-executed-without-authority" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-cyan-300/60"><h3 className="font-semibold">What if the action executed anyway?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Reconstruct authority, commitment, execution route, control failure, and outcome.</p></Link>
+      </div>
+      <Link href="/ai-governance/execution-evidence" className="mt-6 inline-block font-semibold text-cyan-300">Explore the complete AI Execution Evidence hub →</Link>
+    </section>
+
     <section className="mx-auto max-w-5xl px-6 py-20"><div className="rounded-2xl border border-cyan-300/30 bg-cyan-300/5 p-8 md:p-10">
       <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-300">Commercial examination</p>
       <h2 className="mt-3 text-3xl font-bold">Need to establish whether a control really blocked execution?</h2>
