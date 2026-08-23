@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 import ExecutableArtifactProof from '../components/ExecutableArtifactProof';
+import FoundingArtifactCopyCorrections from '../components/FoundingArtifactCopyCorrections';
 
 const auditUrl='https://github.com/greggbutlerac-debug/ta14-exchange-platform/blob/main/docs/audits/2026-08-23-artifact-integrity-parity-audit.md';
 
 export default function Layout({children}:{children:ReactNode}){
  return <>
+  <FoundingArtifactCopyCorrections artifactId='TA14-EA-000003' sequence={3}/>
   {children}
   <section style={{maxWidth:1180,margin:'28px auto 0',padding:'0 24px'}}>
    <div style={{padding:20,border:'1px solid rgba(242,204,104,.45)',borderRadius:14,background:'rgba(242,204,104,.06)',color:'#eef6ff'}}>
