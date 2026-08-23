@@ -42,6 +42,16 @@ export default function EvidenceChangedBeforeExecutionPage() {
       <p className="mt-5 max-w-4xl leading-8 text-slate-300">TA-14 examines whether the evidence actually retained execution standing under the changed condition. The architecture under review remains sovereign; the examination does not rewrite it into TA-14 terminology.</p>
     </div></section>
 
+    <section className="mx-auto max-w-5xl px-6 py-16">
+      <h2 className="text-2xl font-bold">Related execution-evidence problems</h2>
+      <div className="mt-6 grid gap-4 md:grid-cols-3">
+        <Link href="/ai-governance/authorization-changed-before-execution" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">Authorization changed too?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine whether the authority basis still had standing at execution.</p></Link>
+        <Link href="/ai-governance/ai-agent-executed-without-authority" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">Execution already happened?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Reconstruct whether the agent executed on evidence or authority that no longer supported the action.</p></Link>
+        <Link href="/ai-governance/prove-ai-action-was-blocked" className="rounded-xl border border-slate-800 bg-slate-900 p-5 hover:border-emerald-300/60"><h3 className="font-semibold">System says it stopped the action?</h3><p className="mt-2 text-sm leading-6 text-slate-300">Examine what proves commitment or execution did not proceed.</p></Link>
+      </div>
+      <Link href="/ai-governance/execution-evidence" className="mt-6 inline-block font-semibold text-emerald-300">Explore the complete AI Execution Evidence hub →</Link>
+    </section>
+
     <section className="mx-auto max-w-5xl px-6 py-20">
       <div className="rounded-2xl border border-emerald-300/30 bg-emerald-300/5 p-8 md:p-10">
         <p className="text-sm font-semibold uppercase tracking-[0.2em] text-emerald-300">Commercial examination</p>
