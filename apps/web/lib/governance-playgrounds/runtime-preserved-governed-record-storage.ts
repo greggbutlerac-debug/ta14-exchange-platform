@@ -4,8 +4,19 @@ import type {
   PreservedRuntimeRecordStatus,
 } from "./runtime-preserved-governed-record";
 
+/**
+ * Browser-local cache for preserved-record shaped objects.
+ *
+ * SECURITY / GOVERNANCE BOUNDARY:
+ * localStorage is mutable by the browser operator and is NOT authoritative
+ * preservation. Objects read from or written to this module are cache copies
+ * only. No caller may use successful browser persistence as evidence that an
+ * append-only institutional record was durably preserved.
+ */
 const STORAGE_KEY =
-  "ta14.runtime-governance.preserved-governed-records.v1";
+  "ta14.runtime-governance.preserved-governed-record-cache.v2";
+
+export const RUNTIME_RECORD_STORAGE_AUTHORITY = "NON_AUTHORITATIVE_BROWSER_CACHE" as const;
 
 export interface PreservedRuntimeRecordSummary {
   recordId: RecordId;
@@ -18,24 +29,16 @@ export interface PreservedRuntimeRecordSummary {
   routeDraftId: string;
   storedRunId: string;
   determination: PreservedRuntimeGovernedRecord["determination"];
+  storageAuthority: typeof RUNTIME_RECORD_STORAGE_AUTHORITY;
 }
 
 function canUseBrowserStorage(): boolean {
-  return (
-    typeof window !== "undefined" &&
-    typeof window.localStorage !== "undefined"
-  );
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
 }
 
-function isPreservedRuntimeGovernedRecord(
-  value: unknown,
-): value is PreservedRuntimeGovernedRecord {
-  if (!value || typeof value !== "object") {
-    return false;
-  }
-
+function isPreservedRuntimeGovernedRecord(value: unknown): value is PreservedRuntimeGovernedRecord {
+  if (!value || typeof value !== "object") return false;
   const candidate = value as Partial<PreservedRuntimeGovernedRecord>;
-
   return (
     typeof candidate.recordId === "string" &&
     typeof candidate.schemaVersion === "string" &&
@@ -48,58 +51,33 @@ function isPreservedRuntimeGovernedRecord(
   );
 }
 
-function readStoredRecords(): PreservedRuntimeGovernedRecord[] {
-  if (!canUseBrowserStorage()) {
-    return [];
-  }
-
+function readCachedRecords(): PreservedRuntimeGovernedRecord[] {
+  if (!canUseBrowserStorage()) return [];
   const raw = window.localStorage.getItem(STORAGE_KEY);
-
-  if (!raw) {
-    return [];
-  }
-
+  if (!raw) return [];
   try {
     const parsed = JSON.parse(raw) as unknown;
-
-    if (!Array.isArray(parsed)) {
-      return [];
-    }
-
-    return parsed.filter(isPreservedRuntimeGovernedRecord);
+    return Array.isArray(parsed) ? parsed.filter(isPreservedRuntimeGovernedRecord) : [];
   } catch {
     return [];
   }
 }
 
-function writeStoredRecords(
-  records: readonly PreservedRuntimeGovernedRecord[],
-): void {
-  if (!canUseBrowserStorage()) {
-    return;
-  }
-
-  window.localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(records),
-  );
+function writeCachedRecords(records: readonly PreservedRuntimeGovernedRecord[]): void {
+  if (!canUseBrowserStorage()) return;
+  window.localStorage.setItem(STORAGE_KEY, JSON.stringify(records));
 }
 
-function sortNewestFirst(
-  records: readonly PreservedRuntimeGovernedRecord[],
-): PreservedRuntimeGovernedRecord[] {
-  return [...records].sort((left, right) =>
-    right.preservedAt.localeCompare(left.preservedAt),
-  );
+function sortNewestFirst(records: readonly PreservedRuntimeGovernedRecord[]): PreservedRuntimeGovernedRecord[] {
+  return [...records].sort((left, right) => right.preservedAt.localeCompare(left.preservedAt));
 }
 
-export function listPreservedRuntimeGovernedRecords():
-  PreservedRuntimeGovernedRecord[] {
-  return sortNewestFirst(readStoredRecords());
+/** @deprecated Non-authoritative browser cache only. */
+export function listPreservedRuntimeGovernedRecords(): PreservedRuntimeGovernedRecord[] {
+  return sortNewestFirst(readCachedRecords());
 }
 
-export function listPreservedRuntimeRecordSummaries():
-  PreservedRuntimeRecordSummary[] {
+export function listPreservedRuntimeRecordSummaries(): PreservedRuntimeRecordSummary[] {
   return listPreservedRuntimeGovernedRecords().map((record) => ({
     recordId: record.recordId,
     title: record.title,
@@ -111,93 +89,64 @@ export function listPreservedRuntimeRecordSummaries():
     routeDraftId: record.lineage.routeDraftId,
     storedRunId: record.lineage.storedRunId,
     determination: record.determination,
+    storageAuthority: RUNTIME_RECORD_STORAGE_AUTHORITY,
   }));
 }
 
-export function getPreservedRuntimeGovernedRecord(
-  recordId: RecordId,
-): PreservedRuntimeGovernedRecord | undefined {
-  return readStoredRecords().find(
-    (record) => record.recordId === recordId,
-  );
+/** @deprecated Returns a mutable browser-cache copy, not an authoritative record. */
+export function getPreservedRuntimeGovernedRecord(recordId: RecordId): PreservedRuntimeGovernedRecord | undefined {
+  return readCachedRecords().find((record) => record.recordId === recordId);
 }
 
+/**
+ * Cache a record-shaped object for browser display/export convenience.
+ * This function deliberately refuses to represent the operation as durable
+ * institutional preservation.
+ */
 export function savePreservedRuntimeGovernedRecord(
   record: PreservedRuntimeGovernedRecord,
 ): PreservedRuntimeGovernedRecord {
-  const existingRecords = readStoredRecords();
-
-  if (
-    existingRecords.some(
-      (existing) => existing.recordId === record.recordId,
-    )
-  ) {
-    throw new Error(
-      `Preserved governed record ${record.recordId} already exists and cannot be silently overwritten.`,
-    );
+  const existingRecords = readCachedRecords();
+  if (existingRecords.some((existing) => existing.recordId === record.recordId)) {
+    throw new Error(`Browser cache record ${record.recordId} already exists and cannot be silently overwritten.`);
   }
-
-  writeStoredRecords(
-    sortNewestFirst([record, ...existingRecords]),
-  );
-
+  writeCachedRecords(sortNewestFirst([record, ...existingRecords]));
   return record;
 }
 
+/**
+ * Browser status mutation is presentation state only. It cannot supersede,
+ * revoke or otherwise mutate an authoritative institutional record.
+ */
 export function updatePreservedRuntimeRecordStatus(
   recordId: RecordId,
   status: Exclude<PreservedRuntimeRecordStatus, "PRESERVED">,
 ): PreservedRuntimeGovernedRecord {
-  const existingRecords = readStoredRecords();
-  const index = existingRecords.findIndex(
-    (record) => record.recordId === recordId,
-  );
-
-  if (index < 0) {
-    throw new Error(
-      `Preserved governed record ${recordId} was not found.`,
-    );
-  }
-
+  const existingRecords = readCachedRecords();
+  const index = existingRecords.findIndex((record) => record.recordId === recordId);
+  if (index < 0) throw new Error(`Browser cache record ${recordId} was not found.`);
   const existing = existingRecords[index];
-
   if (existing.status !== "PRESERVED") {
-    throw new Error(
-      `Preserved governed record ${recordId} is already ${existing.status}.`,
-    );
+    throw new Error(`Browser cache record ${recordId} is already ${existing.status}.`);
   }
-
-  const updated: PreservedRuntimeGovernedRecord = {
-    ...existing,
-    status,
-  };
-
+  const updated = { ...existing, status } as PreservedRuntimeGovernedRecord;
   const nextRecords = [...existingRecords];
   nextRecords[index] = updated;
-
-  writeStoredRecords(sortNewestFirst(nextRecords));
-
+  writeCachedRecords(sortNewestFirst(nextRecords));
   return updated;
 }
 
-export function exportPreservedRuntimeRecordById(
-  recordId: RecordId,
-): string {
+export function exportPreservedRuntimeRecordById(recordId: RecordId): string {
   const record = getPreservedRuntimeGovernedRecord(recordId);
-
-  if (!record) {
-    throw new Error(
-      `Preserved governed record ${recordId} was not found.`,
-    );
-  }
-
-  return JSON.stringify(record, null, 2);
+  if (!record) throw new Error(`Browser cache record ${recordId} was not found.`);
+  return JSON.stringify({
+    storageAuthority: RUNTIME_RECORD_STORAGE_AUTHORITY,
+    warning: "This export is a mutable browser-cache copy and is not proof of authoritative institutional preservation.",
+    record,
+  }, null, 2);
 }
 
 export function deleteAllPreservedRuntimeGovernedRecords(): void {
-  if (!canUseBrowserStorage()) {
-    return;
-  }
-
+  if (!canUseBrowserStorage()) return;
   window.localStorage.removeItem(STORAGE_KEY);
 }
