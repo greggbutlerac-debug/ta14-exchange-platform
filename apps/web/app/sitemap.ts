@@ -10,6 +10,7 @@ const routes = [
   '/ai-governance/prove-ai-refused-unauthorized-action',
   '/ai-governance/authorization-changed-before-execution',
   '/ai-governance/evidence-changed-before-execution',
+  '/ai-governance/ai-agent-executed-without-authority',
   '/transparent-air/gulfport-ac-repair',
   '/transparent-air/second-opinion',
   '/eu-ai-act',
@@ -112,16 +113,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
                 ? 0.94
                 : route === '/ai-governance/evidence-changed-before-execution'
                   ? 0.94
-                  : route === '/execution-claim-review/intake'
-                    ? 0.9
-                    : route === '/artifacts/registry'
+                  : route === '/ai-governance/ai-agent-executed-without-authority'
+                    ? 0.94
+                    : route === '/execution-claim-review/intake'
                       ? 0.9
-                      : route.startsWith('/artifacts/ta14-ea-')
-                        ? 0.82
-                        : route.startsWith('/transparent-air')
-                          ? 0.95
-                          : route.startsWith('/eu-ai-act')
-                            ? 0.9
-                            : 0.7,
+                      : route === '/artifacts/registry'
+                        ? 0.9
+                        : route.startsWith('/artifacts/ta14-ea-')
+                          ? 0.82
+                          : route.startsWith('/transparent-air')
+                            ? 0.95
+                            : route.startsWith('/eu-ai-act')
+                              ? 0.9
+                              : 0.7,
   }));
 }
