@@ -43,7 +43,7 @@ function build(c:Case): ArtifactTestSpecification {
     routeId:`TA14-ROUTE-${String(c.n).padStart(3,"0")}`,
     title:c.title,
     frozenAt:"2026-08-23T19:36:00.000Z",
-    input:{ testVector:"TA-14 evidence hardening corpus", case:c.n, synthetic:true, requestedStanding:c.expected },
+    input:{ testVector:"TA-14 evidence hardening corpus", case:c.n, synthetic:true },
     predicates,
     expectedDetermination:c.expected,
     claimsBoundary:c.boundary,
