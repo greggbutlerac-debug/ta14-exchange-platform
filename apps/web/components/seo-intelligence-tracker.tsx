@@ -18,12 +18,23 @@ function payload(pathname: string, params: URLSearchParams) {
 }
 
 function send(data: Record<string, unknown>) {
+  const body = JSON.stringify(data);
+
+  // sendBeacon is the most reliable path for analytics because navigation
+  // cannot cancel an in-flight event. Fall back to keepalive fetch where
+  // Beacon is unavailable or declines the payload.
+  if (typeof navigator !== "undefined" && typeof navigator.sendBeacon === "function") {
+    const blob = new Blob([body], { type: "application/json" });
+    if (navigator.sendBeacon("/api/seo-intelligence/collect", blob)) return;
+  }
+
   void fetch("/api/seo-intelligence/collect", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body,
     keepalive: true,
     cache: "no-store",
+    credentials: "same-origin",
   }).catch(() => {});
 }
 
@@ -37,12 +48,17 @@ export function SeoIntelligenceTracker() {
     const key = `${pathname}?${params.toString()}`;
     if (last.current === key) return;
     last.current = key;
-    send(payload(pathname, params));
+
+    // Run after hydration/paint so telemetry never blocks the page.
+    const timer = window.setTimeout(() => send(payload(pathname, params)), 0);
+    return () => window.clearTimeout(timer);
   }, [pathname]);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
-      const anchor = (event.target as HTMLElement | null)?.closest("a") as HTMLAnchorElement | null;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a") as HTMLAnchorElement | null;
       if (!anchor?.href) return;
       const params = new URLSearchParams(window.location.search);
       send({
