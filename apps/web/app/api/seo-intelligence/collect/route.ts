@@ -30,16 +30,35 @@ function device(ua: string) {
   return "desktop";
 }
 
+async function readBody(req: NextRequest) {
+  // navigator.sendBeacon with a Blob can arrive as application/json or a
+  // generic body depending on browser/runtime. Parse text explicitly so the
+  // collector accepts both Beacon and fetch delivery paths.
+  const text = await req.text();
+  if (!text) return {};
+  try {
+    return JSON.parse(text);
+  } catch {
+    return {};
+  }
+}
+
 export async function POST(req: NextRequest) {
   try {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
-    if (!url || !key) return NextResponse.json({ ok: false }, { status: 503 });
+    if (!url || !key) {
+      console.error("SEO_INTELLIGENCE_CONFIG_MISSING", { url: Boolean(url), key: Boolean(key) });
+      return NextResponse.json({ ok: false, stage: "config" }, { status: 503 });
+    }
 
-    const body = await req.json().catch(() => ({}));
+    const body = await readBody(req);
     const eventType = body?.eventType === "click" ? "click" : "page_view";
     const pagePath = clean(body?.pagePath, 1000);
-    if (!pagePath) return NextResponse.json({ ok: false }, { status: 400 });
+    if (!pagePath) {
+      console.error("SEO_INTELLIGENCE_INVALID_PAYLOAD", { contentType: req.headers.get("content-type") });
+      return NextResponse.json({ ok: false, stage: "payload" }, { status: 400 });
+    }
 
     const cookieStore = await cookies();
     const existing = cookieStore.get(VISIT_COOKIE)?.value;
@@ -65,7 +84,7 @@ export async function POST(req: NextRequest) {
       page_title: clean(body?.pageTitle, 500),
       target_href: clean(body?.targetHref, 2000),
       target_text: clean(body?.targetText, 500),
-      referrer: referrer,
+      referrer,
       referrer_host: referrerHost,
       search_engine: engine(referrerHost),
       search_query: searchQuery,
@@ -83,13 +102,32 @@ export async function POST(req: NextRequest) {
       device_class: device(ua),
       metadata: { source: "ta14-exchange", schema: 1 },
     });
-    if (error) throw error;
+
+    if (error) {
+      console.error("SEO_INTELLIGENCE_INSERT_FAILED", {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+      });
+      return NextResponse.json({ ok: false, stage: "insert", code: error.code ?? null }, { status: 500 });
+    }
 
     const response = NextResponse.json({ ok: true });
-    if (!existing) response.cookies.set({ name: VISIT_COOKIE, value: visitId, httpOnly: true, sameSite: "lax", secure: process.env.NODE_ENV === "production", path: "/", maxAge: 60 * 60 * 24 * 365 });
+    if (!existing) {
+      response.cookies.set({
+        name: VISIT_COOKIE,
+        value: visitId,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        path: "/",
+        maxAge: 60 * 60 * 24 * 365,
+      });
+    }
     return response;
   } catch (error) {
     console.error("SEO_INTELLIGENCE_COLLECT_FAILED", error);
-    return NextResponse.json({ ok: false }, { status: 500 });
+    return NextResponse.json({ ok: false, stage: "exception" }, { status: 500 });
   }
 }
