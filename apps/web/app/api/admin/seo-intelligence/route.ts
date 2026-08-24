@@ -4,7 +4,7 @@ import { createClient as createServerClient } from "@/lib/supabase/server";
 export const dynamic="force-dynamic";
 export async function GET(){
  const auth=await createServerClient();const{data:{user}}=await auth.auth.getUser();if(!user)return NextResponse.json({error:"AUTH_REQUIRED"},{status:401});
- const ownerId=(process.env.TA14_SEO_OWNER_USER_ID||process.env.TA14_REVENUE_OWNER_USER_ID||"").trim();if(!ownerId||user.id!==ownerId)return NextResponse.json({error:"OWNER_ACCESS_REQUIRED"},{status:403});
+ const ownerId=(process.env.TA14_SEO_OWNER_USER_ID||process.env.TA14_REVENUE_OWNER_USER_ID||"").trim();const adminEmails=new Set((process.env.TA14_SEO_ADMIN_EMAILS||process.env.NEXT_PUBLIC_TA14_MISSION_CONTROL_ADMIN_EMAILS||"ta14admissibleexecution@gmail.com,greggbutlerac@gmail.com").split(",").map(v=>v.trim().toLowerCase()).filter(Boolean));const email=(user.email||"").trim().toLowerCase();const allowed=(ownerId&&user.id===ownerId)||(email&&adminEmails.has(email));if(!allowed)return NextResponse.json({error:"OWNER_ACCESS_REQUIRED"},{status:403});
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)return NextResponse.json({error:"NOT_CONFIGURED"},{status:503});
  const db=createServiceClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}});const since=new Date(Date.now()-30*86400000).toISOString();
  const[{data,error},{data:bindings,error:bindingError},{data:subs,error:subsError}]=await Promise.all([
