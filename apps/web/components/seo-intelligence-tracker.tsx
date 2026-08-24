@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 function payload(pathname: string, params: URLSearchParams) {
   return {
@@ -29,16 +29,16 @@ function send(data: Record<string, unknown>) {
 
 export function SeoIntelligenceTracker() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
   const last = useRef("");
 
   useEffect(() => {
-    if (!pathname) return;
-    const key = `${pathname}?${searchParams.toString()}`;
+    if (!pathname || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const key = `${pathname}?${params.toString()}`;
     if (last.current === key) return;
     last.current = key;
-    send(payload(pathname, searchParams));
-  }, [pathname, searchParams]);
+    send(payload(pathname, params));
+  }, [pathname]);
 
   useEffect(() => {
     const onClick = (event: MouseEvent) => {
