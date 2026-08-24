@@ -7,11 +7,11 @@ export function AtlasEnvironmentalIntegrityFundStrip() {
         <div>
           <p className="text-xs font-bold uppercase tracking-[0.2em] text-emerald-300">30% Environmental Integrity Reinvestment · Up to 50% Municipal</p>
           <p className="mt-1 max-w-4xl text-sm leading-6 text-slate-300">
-            Qualifying TA-14 commercial activity is designed to finance Environmental Integrity Governance, Atmospheric Integrity Records, Personal Atmospheric Integrity, schools and other critical environments, zoos and critical animal environments, and global atmospheric-integrity infrastructure. Every actual allocation is intended to be publicly traceable from source to recipient to outcome evidence.
+            Across qualifying paid TA-14 products and services, covered payments can create recurring environmental-integrity reinvestment allocations. Participants can direct eligible mission preferences and receive private verification, annual/cumulative records, and qualifying recognition tied to actual allocation evidence.
           </p>
         </div>
         <Link href="/atlas-environmental-integrity-fund" className="shrink-0 text-sm font-semibold text-emerald-300 hover:text-emerald-200">
-          See the commitment and public ledger -&gt;
+          See how your participation creates impact -&gt;
         </Link>
       </div>
     </aside>
