@@ -3,6 +3,7 @@ import Script from 'next/script';
 import { Analytics } from '@vercel/analytics/next';
 
 import { SiteActivityCounter } from '../components/site-activity-counter';
+import { SeoIntelligenceTracker } from '../components/seo-intelligence-tracker';
 import { AtlasEnvironmentalIntegrityFundStrip } from '../components/atlas-environmental-integrity-fund-strip';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 
@@ -75,6 +76,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: true });
         `}</Script>
 
+        <SeoIntelligenceTracker />
         {children}
         <AtlasEnvironmentalIntegrityFundStrip />
         <ArtifactCorpusStatusShell />
