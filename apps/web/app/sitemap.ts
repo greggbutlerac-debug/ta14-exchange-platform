@@ -12,6 +12,10 @@ const routes = [
   '/ai-governance/evidence-changed-before-execution',
   '/ai-governance/ai-agent-executed-without-authority',
   '/ai-governance/prove-ai-action-was-blocked',
+  '/ai-governance/ai-agent-audit-trail',
+  '/ai-governance/prove-ai-agent-action-was-authorized',
+  '/ai-governance/ai-logs-vs-execution-evidence',
+  '/atlas-environmental-integrity-fund',
   '/transparent-air/gulfport-ac-repair',
   '/transparent-air/second-opinion',
   '/eu-ai-act',
@@ -88,40 +92,13 @@ const routes = [
   '/artifacts/interoperability-examinations',
 ];
 
-const executionArtifactRoutes = Array.from(
-  { length: 40 },
-  (_, index) => `/artifacts/ta14-ea-${String(index + 1).padStart(6, '0')}`,
-);
+const executionArtifactRoutes = Array.from({ length: 40 },(_, index) => `/artifacts/ta14-ea-${String(index + 1).padStart(6, '0')}`);
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
   const allRoutes = [...routes, ...executionArtifactRoutes];
-
   return allRoutes.map((route, index) => ({
-    url: `${baseUrl}${route}`,
-    lastModified: now,
-    changeFrequency: index === 0 ? 'daily' : 'weekly',
-    priority:
-      route === '/'
-        ? 1
-        : route === '/execution-claim-review'
-          ? 0.98
-          : route === '/execution-evidence-snapshot'
-            ? 0.96
-            : route === '/ai-governance/execution-evidence'
-              ? 0.95
-              : route.startsWith('/ai-governance/')
-                ? 0.94
-                : route === '/execution-claim-review/intake'
-                  ? 0.9
-                  : route === '/artifacts/registry'
-                    ? 0.9
-                    : route.startsWith('/artifacts/ta14-ea-')
-                      ? 0.82
-                      : route.startsWith('/transparent-air')
-                        ? 0.95
-                        : route.startsWith('/eu-ai-act')
-                          ? 0.9
-                          : 0.7,
+    url: `${baseUrl}${route}`, lastModified: now, changeFrequency: index === 0 ? 'daily' : 'weekly',
+    priority: route === '/' ? 1 : route === '/execution-claim-review' ? 0.98 : route === '/execution-evidence-snapshot' ? 0.96 : route === '/ai-governance/execution-evidence' ? 0.95 : route.startsWith('/ai-governance/') ? 0.94 : route === '/execution-claim-review/intake' ? 0.9 : route === '/artifacts/registry' ? 0.9 : route.startsWith('/artifacts/ta14-ea-') ? 0.82 : route.startsWith('/transparent-air') ? 0.95 : route.startsWith('/eu-ai-act') ? 0.9 : 0.7,
   }));
 }
