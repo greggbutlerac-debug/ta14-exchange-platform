@@ -20,8 +20,8 @@ export default function HomePage() {
     <>
       <AtlasFrontDoor />
       <Link
-        href="/start"
-        aria-label="Choose how to start with TA-14"
+        href="/start-free"
+        aria-label="Start TA-14 free for 60 days"
         style={{
           position: 'fixed',
           right: 18,
@@ -30,30 +30,32 @@ export default function HomePage() {
           display: 'flex',
           alignItems: 'center',
           gap: 12,
-          minHeight: 58,
+          minHeight: 64,
           padding: '10px 16px',
-          border: '1px solid rgba(103,222,255,.58)',
+          border: '1px solid rgba(103,222,255,.72)',
           borderRadius: 16,
-          background: 'linear-gradient(135deg,rgba(5,27,43,.96),rgba(4,14,24,.98))',
-          boxShadow: '0 18px 50px rgba(0,0,0,.42),0 0 28px rgba(74,198,240,.14)',
+          background: 'linear-gradient(135deg,rgba(5,35,52,.98),rgba(4,14,24,.98))',
+          boxShadow: '0 18px 50px rgba(0,0,0,.42),0 0 32px rgba(74,198,240,.2)',
           color: '#eefaff',
           textDecoration: 'none',
           backdropFilter: 'blur(18px)',
         }}
       >
         <span style={{
-          width: 36,
-          height: 36,
+          width: 40,
+          height: 40,
           display: 'grid',
           placeItems: 'center',
           borderRadius: 11,
-          background: 'linear-gradient(135deg,#74e5ff,#62e6ae)',
+          background: 'linear-gradient(135deg,#8aeaff,#62e6ae)',
           color: '#031018',
           fontWeight: 950,
-        }}>→</span>
+          fontSize: 16,
+        }}>60</span>
         <span>
-          <small style={{display:'block',color:'#79dfff',fontSize:8,fontWeight:900,letterSpacing:'.14em'}}>NOT SURE WHERE TO START?</small>
-          <strong style={{display:'block',marginTop:3,fontSize:12,letterSpacing:'.04em'}}>CHOOSE YOUR TA-14 PATH</strong>
+          <small style={{display:'block',color:'#79dfff',fontSize:8,fontWeight:900,letterSpacing:'.14em'}}>NO CREDIT CARD · NO CONTRACT</small>
+          <strong style={{display:'block',marginTop:3,fontSize:13,letterSpacing:'.04em'}}>START 60 DAYS FREE →</strong>
+          <small style={{display:'block',marginTop:3,color:'#8fa8b8',fontSize:8}}>Then $19 / $49 / $99 monthly if you continue</small>
         </span>
       </Link>
       {worldGrid
