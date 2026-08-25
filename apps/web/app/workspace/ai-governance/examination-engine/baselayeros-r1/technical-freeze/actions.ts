@@ -8,6 +8,7 @@ import { baseLayerTechnicalFreezeRecord as freeze } from '@/lib/governance/techn
 const FREEZE_PATH = '/workspace/ai-governance/examination-engine/baselayeros-r1/technical-freeze';
 
 type PersistedDraft = {
+  id: string;
   record_id: string;
   instrument_id: string;
   intake_id: string;
@@ -33,7 +34,7 @@ export async function issueBaseLayerTechnicalFreeze(): Promise<FreezeIssueResult
 
   const { data, error } = await supabase
     .from('consequence_technical_freezes')
-    .select('record_id,instrument_id,intake_id,participant_user_id,participant_name,participant_organization,participant_review_state,issuer_user_id,issuer_name,issuer_authority_record_id,gate_state,frozen_objects,status')
+    .select('id,record_id,instrument_id,intake_id,participant_user_id,participant_name,participant_organization,participant_review_state,issuer_user_id,issuer_name,issuer_authority_record_id,gate_state,frozen_objects,status')
     .eq('record_id', freeze.recordId)
     .maybeSingle();
 
@@ -62,7 +63,7 @@ export async function issueBaseLayerTechnicalFreeze(): Promise<FreezeIssueResult
   const { data: updated, error: updateError } = await supabase
     .from('consequence_technical_freezes')
     .update({ canonical_json: compiled.canonicalJson, freeze_sha256: compiled.sha256, status: 'TECHNICAL_FREEZE_ISSUED', issued_at: issuedAt, updated_at: issuedAt })
-    .eq('id', (data as { id?: string }).id ?? '')
+    .eq('id', draft.id)
     .eq('record_id', draft.record_id)
     .eq('issuer_user_id', user.id)
     .eq('status', 'DRAFT')
