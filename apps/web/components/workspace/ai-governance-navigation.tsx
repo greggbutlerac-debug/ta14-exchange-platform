@@ -16,6 +16,7 @@ const missionControlHref = '/workspace/mission-control';
 const aiGovernanceHomeHref = '/workspace/ai-governance';
 const playgroundHref = '/workspace/ai-governance/playground';
 const adversarialExaminationHref = '/workspace/ai-governance/adversarial-examination';
+const examinationEngineHref = '/workspace/ai-governance/examination-engine';
 const demonstrationsHref = '/workspace/ai-governance/demonstrations';
 const foundingDemonstrationsHref = '/artifacts/founding-demonstrations';
 const interoperabilityExaminationsHref = '/artifacts/interoperability-examinations';
@@ -40,6 +41,7 @@ const workspaceNavigation: NavigationItem[] = [
   { href: aiGovernanceHomeHref, label: 'AI Governance Home', glyph: '⌂', matchPrefixes: [aiGovernanceHomeHref] },
   { href: playgroundHref, label: 'Playground', glyph: '◈', matchPrefixes: [playgroundHref] },
   { href: adversarialExaminationHref, label: 'Adversarial Examination', glyph: 'AX', matchPrefixes: [adversarialExaminationHref], institutional: true },
+  { href: examinationEngineHref, label: 'Consequence Examination', glyph: 'CE', matchPrefixes: [examinationEngineHref], institutional: true },
   { href: demonstrationsHref, label: 'Demonstrations', glyph: '◎', matchPrefixes: [demonstrationsHref] },
   { href: foundingDemonstrationsHref, label: 'Founding Demonstrations', glyph: 'FD', matchPrefixes: [foundingDemonstrationsHref], institutional: true },
   { href: interoperabilityExaminationsHref, label: 'Interoperability Examinations', glyph: 'IE', matchPrefixes: [interoperabilityExaminationsHref, andeksExaminationHref], institutional: true },
@@ -61,6 +63,7 @@ const mobileLabels = new Set([
   'AI Governance Home',
   'Playground',
   'Adversarial Examination',
+  'Consequence Examination',
   'EU AI Act · World 05',
   'Founding Demonstrations',
   'Interoperability Examinations',
@@ -108,6 +111,13 @@ export function AiGovernanceNavigation() {
             })}
           </nav>
         </section>
+
+        <article className="ta14-sidebar-note">
+          <small>Consequence Examination Engine</small>
+          <strong>Make the claim executable.</strong>
+          <p>Apply machine-readable invariants, consequence-boundary proof, adversarial bypass challenges, independent replay requirements, and claim-to-proof coverage to bounded architecture claims.</p>
+          <Link href={examinationEngineHref}>Open Consequence Examination →</Link>
+        </article>
 
         <article className="ta14-sidebar-note">
           <small>Adversarial Examination</small>
