@@ -15,6 +15,7 @@ type NavigationItem = {
 const missionControlHref = '/workspace/mission-control';
 const aiGovernanceHomeHref = '/workspace/ai-governance';
 const playgroundHref = '/workspace/ai-governance/playground';
+const adversarialExaminationHref = '/workspace/ai-governance/adversarial-examination';
 const demonstrationsHref = '/workspace/ai-governance/demonstrations';
 const foundingDemonstrationsHref = '/artifacts/founding-demonstrations';
 const interoperabilityExaminationsHref = '/artifacts/interoperability-examinations';
@@ -38,6 +39,7 @@ const workspaceNavigation: NavigationItem[] = [
   { href: missionControlHref, label: 'Mission Control', glyph: 'MC', matchPrefixes: [missionControlHref], institutional: true },
   { href: aiGovernanceHomeHref, label: 'AI Governance Home', glyph: '⌂', matchPrefixes: [aiGovernanceHomeHref] },
   { href: playgroundHref, label: 'Playground', glyph: '◈', matchPrefixes: [playgroundHref] },
+  { href: adversarialExaminationHref, label: 'Adversarial Examination', glyph: 'AX', matchPrefixes: [adversarialExaminationHref], institutional: true },
   { href: demonstrationsHref, label: 'Demonstrations', glyph: '◎', matchPrefixes: [demonstrationsHref] },
   { href: foundingDemonstrationsHref, label: 'Founding Demonstrations', glyph: 'FD', matchPrefixes: [foundingDemonstrationsHref], institutional: true },
   { href: interoperabilityExaminationsHref, label: 'Interoperability Examinations', glyph: 'IE', matchPrefixes: [interoperabilityExaminationsHref, andeksExaminationHref], institutional: true },
@@ -58,6 +60,7 @@ const mobileLabels = new Set([
   'Mission Control',
   'AI Governance Home',
   'Playground',
+  'Adversarial Examination',
   'EU AI Act · World 05',
   'Founding Demonstrations',
   'Interoperability Examinations',
@@ -105,6 +108,13 @@ export function AiGovernanceNavigation() {
             })}
           </nav>
         </section>
+
+        <article className="ta14-sidebar-note">
+          <small>Adversarial Examination</small>
+          <strong>Do not stop at the happy path.</strong>
+          <p>Challenge changed conditions, authority, evidence supportability, succession, revalidation, historical integrity, offline reconstruction, and compound bypass routes before treating a claim as demonstrated.</p>
+          <Link href={adversarialExaminationHref}>Open Adversarial Examination →</Link>
+        </article>
 
         <article className="ta14-sidebar-note">
           <small>Governed World 05 · EU AI Act</small>
