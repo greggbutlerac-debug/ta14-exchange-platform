@@ -14,9 +14,13 @@ export async function GET(){
  ]);
  if(eventsResult.error)return NextResponse.json({error:"SEO_TELEMETRY_QUERY_FAILED"},{status:500});
  const allRows=eventsResult.data||[],bindings=bindingsResult.error?[]:(bindingsResult.data||[]),subscriptions=subsResult.error?[]:(subsResult.data||[]);
- // Commercial reporting excludes visits that have been bound to an authenticated TA-14 admin/owner identity.
- // This keeps institution testing/navigation from being mistaken for outside buyer demand.
- const adminUserIds=new Set<string>();if(ownerId)adminUserIds.add(ownerId);for(const b of bindings as any[]){const touch:any=b.latest_touch||b.first_touch||{};const boundEmail=String(touch?.email||touch?.user_email||"").trim().toLowerCase();if(boundEmail&&adminEmails.has(boundEmail))adminUserIds.add(String(b.user_id));}
+ // Only exclude identities that are actually TA-14 admins. Attribution touch JSON intentionally contains traffic metadata, not email,
+ // so admin detection must resolve user IDs against auth.users rather than guessing from touch payloads.
+ const boundUserIds=[...new Set((bindings as any[]).map(b=>String(b.user_id||"")).filter(Boolean))];
+ const adminUserIds=new Set<string>();if(ownerId)adminUserIds.add(ownerId);
+ if(boundUserIds.length){const{data:authUsers}=await db.schema("auth").from("users").select("id,email").in("id",boundUserIds);for(const u of authUsers||[]){if(adminEmails.has(String(u.email||"").trim().toLowerCase()))adminUserIds.add(String(u.id));}}
+ // The currently authenticated owner/admin is authoritative evidence of an internal identity even if auth schema lookup is unavailable.
+ if(adminEmails.has(email))adminUserIds.add(String(user.id));
  const internalVisitIds=new Set<string>();for(const b of bindings as any[]){if(adminUserIds.has(String(b.user_id))){if(b.first_visit_id)internalVisitIds.add(String(b.first_visit_id));if(b.latest_visit_id)internalVisitIds.add(String(b.latest_visit_id));}}
  const rows=allRows.filter((r:any)=>!internalVisitIds.has(String(r.visit_id||""))),views=rows.filter((r:any)=>r.event_type==="page_view"),clicks=rows.filter((r:any)=>r.event_type==="click"),intents=rows.filter((r:any)=>r.event_type==="commercial_intent");
  function rank(key:string,source:any[]=views){const counts:Record<string,number>={};for(const r of source){const v=String(r[key]||"").trim();if(v)counts[v]=(counts[v]||0)+1;}return Object.entries(counts).map(([name,count])=>({name,count})).sort((a,b)=>b.count-a.count).slice(0,50)}
