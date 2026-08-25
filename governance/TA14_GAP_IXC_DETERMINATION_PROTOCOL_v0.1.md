@@ -1,7 +1,7 @@
 # TA-14 GAP-IXC Determination Protocol
 
 **Instrument ID:** TA14-GAP-IXC-DP-001  
-**Version:** 0.2 — CAR-E Candidate  
+**Version:** 0.3 — CAR-E Candidate  
 **Status:** NOT ADOPTED / ADVERSARIAL REVIEW REQUIRED  
 **Issued by:** TA-14 Authority  
 
@@ -11,13 +11,28 @@ This protocol defines a reproducible, proposition-addressable method for express
 
 This candidate does not replace L0-L7 and does not create an issued assurance finding until it passes CAR-E review and an adoption event is separately recorded.
 
-## 2. Governing object
+## 2. Governing object and pre-evidence freeze
 
 No GAP-IXC determination attaches to an architecture in the abstract. The minimum addressable object is:
 
 **Architecture identity → version → proposition → evidence set → assessment time**
 
+Before evidentiary determination begins, the assessment must freeze:
+
+1. exact proposition and stable proposition identifier;
+2. any material sub-propositions;
+3. architecture identity and target version/build/commit;
+4. route/environment where material;
+5. scope and exclusions;
+6. execution boundary where applicable;
+7. consequence boundary and observation window where applicable;
+8. applicable dimension criteria;
+9. evidence-admission rules;
+10. required output schema.
+
 The proposition must be atomic enough that one determination state can answer it without silently combining materially different claims.
+
+After evidence review begins, narrowing, decomposition, exclusion, route restriction, consequence-boundary change, or other material reframing may not improve the determination of the frozen proposition. A materially reframed claim becomes a **new proposition with a new determination identity**. The original proposition and its result remain preserved.
 
 A determination must not migrate to another version, proposition, route, environment, consequence, or time without an explicit revalidation basis.
 
@@ -58,7 +73,7 @@ A DENY label or execution refusal does not by itself establish downstream non-oc
 Each applicable dimension receives exactly one state:
 
 - **ESTABLISHED** — the admitted frozen evidence satisfies every mandatory criterion for the bounded proposition.
-- **PARTIALLY ESTABLISHED** — the proposition has been expressly decomposed into material sub-propositions, at least one sub-proposition is ESTABLISHED, and at least one other material sub-proposition is UNESTABLISHED or INDETERMINATE. The record must identify each sub-proposition and its state. PARTIALLY ESTABLISHED must not be used as a discretionary midpoint for weak evidence.
+- **PARTIALLY ESTABLISHED** — only available when material sub-propositions were frozen before evidence review began, at least one frozen sub-proposition is ESTABLISHED, and at least one other material frozen sub-proposition is UNESTABLISHED or INDETERMINATE. The record must identify every material frozen sub-proposition and its state. PARTIALLY ESTABLISHED must not be created through post-evidence decomposition or used as a discretionary midpoint for weak evidence.
 - **UNESTABLISHED** — the admitted evidence does not establish the proposition within scope. This does not establish the opposite proposition.
 - **INDETERMINATE** — the available record cannot support a defensible determination because admitted evidence is materially conflicting, inaccessible, ambiguous, integrity-compromised, or otherwise incapable of resolving the proposition.
 - **NOT APPLICABLE** — the dimension is outside the frozen proposition. N/A must include an applicability rationale and must not be used merely because evidence is missing.
@@ -71,7 +86,7 @@ No evidence item may contribute to an ESTABLISHED or PARTIALLY ESTABLISHED state
 
 1. the evidence object;
 2. provenance;
-3. the proposition or sub-proposition it is offered to support;
+3. the proposition or frozen sub-proposition it is offered to support;
 4. temporal relevance;
 5. integrity state where material;
 6. scope/applicability;
@@ -80,23 +95,47 @@ No evidence item may contribute to an ESTABLISHED or PARTIALLY ESTABLISHED state
 
 Evidence existence is not evidence admission. Evidence admission is not proof. An assessor must state why an admitted item is capable of supporting the proposition for which it is relied upon.
 
+### 5.1 Derived-evidence lineage
+
+Derived evidence may not be relied upon as if it were an independent primary observation. Where an admitted evidence object is transformed, summarized, calculated, normalized, aggregated, AI-generated/interpreted, converted, extracted, or otherwise derived, the record must preserve where applicable:
+
+- source evidence identifier(s);
+- transformation method or procedure;
+- tool/model/software identity and version;
+- parameters or material configuration;
+- operator or attributable process identity;
+- transformation time;
+- output identifier and integrity binding;
+- known information loss, uncertainty, or non-reversibility.
+
+If material lineage required to evaluate a derived claim is absent, the derived object cannot independently establish that claim.
+
+### 5.2 Material contradiction rule
+
+An ESTABLISHED determination is prohibited while admitted evidence contains an unresolved material contradiction relevant to a mandatory establishment criterion.
+
+A contradiction may be resolved only by an attributable resolution supported by admitted evidence, or excluded only when the exclusion was frozen before evidence review or the item is demonstrably outside the frozen proposition under a pre-existing rule. Post-evidence exclusion may not be used to manufacture a favorable state.
+
+Where material contradiction remains unresolved, the determination must be INDETERMINATE unless the frozen proposition can be answered UNESTABLISHED without resolving the conflict.
+
 ## 6. Mandatory qualifiers
 
 Every dimension determination must preserve:
 
 1. architecture identity;
 2. version/build/commit where applicable;
-3. exact atomic proposition;
-4. scope and exclusions;
-5. admitted evidence identifiers;
-6. evidence provenance;
-7. determination time;
-8. validity or observation window where applicable;
-9. revalidation trigger;
-10. unresolved conditions;
-11. assessor identity or attributable assessor role;
-12. independence boundary;
-13. applicable establishment criteria and criterion-by-criterion disposition.
+3. exact frozen proposition and stable identifier;
+4. frozen material sub-propositions where applicable;
+5. scope and exclusions;
+6. admitted evidence identifiers;
+7. evidence provenance and lineage where applicable;
+8. determination time;
+9. validity or observation window where applicable;
+10. revalidation trigger;
+11. unresolved conditions and contradictions;
+12. assessor identity or attributable assessor role;
+13. independence boundary;
+14. applicable establishment criteria and criterion-by-criterion disposition.
 
 Provenance, time, scope, and independence are qualifiers of a determination, not additional assurance dimensions.
 
@@ -141,7 +180,7 @@ Integrity and independence are not synonyms. A hash may establish integrity of p
 - admitted evidence capable of supporting that proposition;
 - temporal relevance;
 - provenance;
-- material conflicts resolved or bounded;
+- material conflicts resolved or bounded under frozen rules;
 - no missing mandatory evidence concealed by inference.
 
 ### 8.4 I — ESTABLISHED requires
@@ -166,7 +205,7 @@ Integrity and independence are not synonyms. A hash may establish integrity of p
 - observation method capable of detecting the claimed formation or non-formation;
 - observation window;
 - evidence binding the observed result to the frozen case;
-- material alternate-route/bypass conditions addressed or explicitly bounded.
+- material alternate-route/bypass conditions addressed or explicitly bounded under the pre-evidence freeze.
 
 ## 9. No cross-dimension inheritance
 
@@ -203,19 +242,19 @@ Historical validity for a frozen target does not create current standing for a c
 
 Before this protocol can be adopted as an assurance standard, at least two reviewers must independently assess the same frozen packet using the same question set without relying on private drafting context.
 
-The frozen packet must include the exact proposition set, evidence inventory, evidence-admission rules, dimension criteria, and required output schema. Assessors may not privately supplement the packet with undisclosed evidence or drafting intent.
+The frozen packet must include the exact proposition set and identifiers, frozen material sub-propositions, evidence inventory, evidence-admission rules, dimension criteria, scope/exclusions, relevant boundaries, and required output schema. Assessors may not privately supplement the packet with undisclosed evidence or drafting intent.
 
 Compare results dimension by dimension:
 
 - **R0 — MATCH:** same state and materially compatible reasoning.
 - **R1 — QUALIFICATION DIVERGENCE:** same state but materially different qualification.
 - **R2 — STATE DIVERGENCE:** different states.
-- **R3 — BOUNDARY DIVERGENCE:** disagreement about the proposition, scope, applicability, evidence admission, or evidence boundary.
+- **R3 — BOUNDARY DIVERGENCE:** disagreement about the proposition, scope, applicability, evidence admission, evidence lineage, contradiction treatment, or evidence boundary.
 - **R4 — HIDDEN-CONTEXT DEPENDENCY:** a result materially depends on information outside the frozen packet.
 
 R2, R3, or R4 prevents adoption of the affected rubric until corrected and retested. R1 requires review of whether the qualification could materially change reliance.
 
-Assessor disagreement must not be resolved merely by averaging, majority vote, or selecting the more favorable determination. Correct the rubric, proposition, evidence packet, or admission rule and repeat the test.
+Assessor disagreement must not be resolved merely by averaging, majority vote, or selecting the more favorable determination. Correct the rubric, proposition, evidence packet, admission rule, lineage record, or contradiction rule and repeat the test.
 
 ## 12. Qualification portability
 
@@ -239,14 +278,15 @@ This candidate must not be adopted until:
 
 1. all six dimensions survive overlap and authority-laundering review;
 2. establishment criteria survive adversarial counterexamples;
-3. PARTIALLY ESTABLISHED and INDETERMINATE are independently reproducible rather than discretionary catch-all states;
-4. evidence-admission decisions are preserved and reproducible;
-5. at least two independent-read assessments are performed on the same frozen evidence packet;
-6. no unresolved R2-R4 divergence remains in the tested rubric;
-7. qualification portability is demonstrated;
-8. at least one TA-14 self-record and one external architecture record are tested;
-9. historical L0-L7 records are not silently reinterpreted through GAP-IXC;
-10. migration and non-migration rules are documented.
+3. proposition/sub-proposition freeze prevents post-evidence scope laundering;
+4. PARTIALLY ESTABLISHED and INDETERMINATE are independently reproducible rather than discretionary catch-all states;
+5. evidence-admission decisions, derived-evidence lineage, and contradiction treatment are preserved and reproducible;
+6. at least two independent-read assessments are performed on the same frozen evidence packet;
+7. no unresolved R2-R4 divergence remains in the tested rubric;
+8. qualification portability is demonstrated;
+9. at least one TA-14 self-record and one external architecture record are tested;
+10. historical L0-L7 records are not silently reinterpreted through GAP-IXC;
+11. migration and non-migration rules are documented.
 
 ## 16. Current status
 
