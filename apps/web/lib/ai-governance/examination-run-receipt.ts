@@ -55,7 +55,11 @@ export async function createTA14ExaminationRunReceipt(input: {
   const pass = input.findings.filter(f => f.result === 'PASS').length;
   const fail = input.findings.filter(f => f.result === 'FAIL').length;
   const unresolved = input.findings.filter(f => f.result === 'UNRESOLVED').length;
-  const workingStanding = fail ? 'NOT SUPPORTED' : unresolved ? 'UNRESOLVED' : 'SUPPORTED WITHIN TESTED BOUNDARY';
+  const workingStanding: TA14ExaminationRunReceipt['workingStanding'] = fail
+    ? 'NOT SUPPORTED'
+    : unresolved
+      ? 'UNRESOLVED'
+      : 'SUPPORTED WITHIN TESTED BOUNDARY';
   const body = {
     schema: 'TA14-Examination-Run-Receipt-v1' as const,
     receiptId: input.receiptId.trim(),
