@@ -27,6 +27,24 @@ export type TA14InstitutionalFinding = {
   institutionalStanding: 'ISSUED';
 };
 
+export type TA14SealedInstitutionalFinding = TA14InstitutionalFinding & {
+  sealSchema: 'TA14-Institutional-Finding-Seal-v1';
+  canonicalDigest: string;
+};
+
+function stable(value: unknown): string {
+  if (value === null || typeof value !== 'object') return JSON.stringify(value);
+  if (Array.isArray(value)) return `[${value.map(stable).join(',')}]`;
+  const object = value as Record<string, unknown>;
+  return `{${Object.keys(object).sort().map(key => `${JSON.stringify(key)}:${stable(object[key])}`).join(',')}}`;
+}
+
+async function sha256(value: string): Promise<string> {
+  const bytes = new TextEncoder().encode(value);
+  const digest = await crypto.subtle.digest('SHA-256', bytes);
+  return Array.from(new Uint8Array(digest)).map(byte => byte.toString(16).padStart(2, '0')).join('');
+}
+
 export function createTA14InstitutionalFinding(input: {
   findingId: string;
   verifiedReceipt: TA14ExaminationRunReceipt;
@@ -73,4 +91,16 @@ export function createTA14InstitutionalFinding(input: {
     authorityRef: input.authorityRef.trim(),
     institutionalStanding: 'ISSUED',
   };
+}
+
+export async function sealTA14InstitutionalFinding(finding: TA14InstitutionalFinding): Promise<TA14SealedInstitutionalFinding> {
+  const sealSchema = 'TA14-Institutional-Finding-Seal-v1' as const;
+  const body = { ...finding, sealSchema };
+  const canonicalDigest = await sha256(stable(body));
+  return { ...body, canonicalDigest };
+}
+
+export async function verifyTA14InstitutionalFindingSeal(finding: TA14SealedInstitutionalFinding): Promise<boolean> {
+  const { canonicalDigest, ...body } = finding;
+  return canonicalDigest === await sha256(stable(body));
 }
