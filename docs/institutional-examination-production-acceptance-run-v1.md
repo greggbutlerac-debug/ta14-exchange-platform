@@ -2,7 +2,8 @@
 
 Status: INCOMPLETE — OPEN
 Protocol: `docs/institutional-examination-production-acceptance-v1.md`
-Production baseline commit: `76053569784e44af08a495b36349d881c5b92a07`
+Original production baseline commit: `76053569784e44af08a495b36349d881c5b92a07`
+Executable harness commit: `b78542d27e239fc20254d0bcf9c1543078e22231`
 
 ## Purpose
 
@@ -11,6 +12,12 @@ This is the controlled execution record for the first production acceptance run 
 ## Frozen chain
 
 Registered governance -> bounded examination -> sealed run receipt -> evidence admission review -> institutional finding -> cryptographic seal -> authenticated admission -> governed-artifact persistence -> append-only chronology -> controlled retrieval.
+
+## Executable acceptance surface
+
+Authenticated server route: `POST /api/acceptance/institutional-finding`
+
+The deployed harness is presently bounded to N02, N03, P04, P05, and the cryptographic-verification portion of N04. Deployment of the harness is not execution evidence. These controls remain PENDING until an authenticated production invocation result is preserved.
 
 ## Positive controls
 
@@ -43,14 +50,19 @@ Registered governance -> bounded examination -> sealed run receipt -> evidence a
 
 | Control | Result | Evidence reference | Notes |
 |---|---|---|---|
-| P01-P11 | PENDING | — | Execution evidence not yet admitted. |
-| N01-N10 | PENDING | — | Execution evidence not yet admitted. |
+| P04 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
+| P05 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
+| N02 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
+| N03 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
+| N04 | PENDING | `POST /api/acceptance/institutional-finding` | Harness currently proves seal-tamper rejection only; admission/no-persistence portion remains separately required. |
+| P01-P03, P06-P11 | PENDING | — | Execution evidence not yet admitted. |
+| N01, N05-N10 | PENDING | — | Execution evidence not yet admitted. |
 
 ## Run determination
 
 `INCOMPLETE`
 
-Reason: the production baseline is deployed, but the protocol has not yet been executed end-to-end with preserved evidence.
+Reason: the acceptance harness is deployed but has not yet produced preserved authenticated production execution evidence, and the remaining production-boundary controls have not been executed.
 
 ## Fail-closed representation rule
 
