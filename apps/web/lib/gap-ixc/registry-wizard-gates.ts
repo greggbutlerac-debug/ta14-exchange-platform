@@ -26,11 +26,7 @@ export function registryWizardStepComplete(stepIndex: number, form: RegistryWiza
     case 0:
       return present(form.governanceName) && present(form.currentVersion);
     case 1:
-      return (
-        present(form.claimantName) &&
-        present(form.authorityRole) &&
-        form.authorityConfirmed === true
-      );
+      return present(form.claimantName) && present(form.authorityRole);
     case 2:
       return present(normalizedStewardName(form)) && present(form.contactEmail);
     case 3:
@@ -46,7 +42,12 @@ export function registryWizardStepComplete(stepIndex: number, form: RegistryWiza
     case 11: // Additional Review — optional
       return true;
     case 12:
-      return form.accuracyConfirmed === true && form.boundaryConfirmed === true;
+      return (
+        form.authorityConfirmed === true &&
+        form.accuracyConfirmed === true &&
+        form.boundaryConfirmed === true &&
+        form.termsAccepted === true
+      );
     case 13:
       return registryWizardValidationErrors(form).length === 0;
     default:
