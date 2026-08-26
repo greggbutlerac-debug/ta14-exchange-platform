@@ -23,7 +23,7 @@ export default async function ExaminationChronologyPage({params}:{params:Promise
    <h2 style={{marginBottom:8}}>{run.final_determination}</h2><p>{run.outcome_record?.rationale}</p>
    <p><strong>Run:</strong> {run.run_id}<br/><strong>Freeze:</strong> {run.freeze_record_id}<br/><strong>Operator:</strong> {run.operator_name}<br/><strong>Events:</strong> {run.outcome_record?.event_count??'Preserved'}</p>
    <p style={{overflowWrap:'anywhere',fontSize:12,color:'#94a3b8'}}><strong>Freeze SHA-256:</strong> {run.freeze_sha256}<br/><strong>Run SHA-256:</strong> {run.run_sha256}</p>
-   <Link href={`/workspace/ai-governance/examination-engine/baselayeros-r1/run/${encodeURIComponent(run.run_id)}/receipt`} style={{color:'#efc66e',fontWeight:900}}>Inspect sealed receipt →</Link>
+   <Link href={`/workspace/ai-governance/examinations/${encodeURIComponent(run.run_id)}`} style={{color:'#efc66e',fontWeight:900}}>Inspect sealed receipt →</Link>
   </article>)}</div>}
   <section style={{...panel,marginTop:28}}><h2>Institutional boundary</h2><p>Chronology preserves what was examined and what survived examination. It does not permit retrospective claim expansion. Replays, corrections, changed environments, or successor versions require separately attributable records.</p></section>
   <p style={{marginTop:24}}><Link href={`/workspace/ai-governance/registry/showcase/${encodeURIComponent(registryIdentifier)}`}>← Return to governance showcase</Link></p>
