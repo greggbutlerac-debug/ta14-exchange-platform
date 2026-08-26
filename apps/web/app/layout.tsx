@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import Script from 'next/script';
+import { Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 
 import { SiteActivityCounter } from '../components/site-activity-counter';
@@ -77,14 +78,14 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           gtag('config', '${GA_MEASUREMENT_ID}', { send_page_view: true });
         `}</Script>
 
-        <SeoIntelligenceTracker />
+        <Suspense fallback={null}><SeoIntelligenceTracker /></Suspense>
         {children}
-        <CommercialTrialConversion />
+        <Suspense fallback={null}><CommercialTrialConversion /></Suspense>
         <AtlasEnvironmentalIntegrityFundStrip />
-        <ArtifactCorpusStatusShell />
+        <Suspense fallback={null}><ArtifactCorpusStatusShell /></Suspense>
 
         <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
-          <SiteActivityCounter />
+          <Suspense fallback={null}><SiteActivityCounter /></Suspense>
         </div>
         <Analytics />
       </body>
