@@ -7,7 +7,7 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/admin/', '/api/'],
     },
-    sitemap: 'https://ta14exchange.com/sitemap.xml',
-    host: 'https://ta14exchange.com',
+    sitemap: 'https://www.ta14exchange.com/sitemap.xml',
+    host: 'https://www.ta14exchange.com',
   };
 }
