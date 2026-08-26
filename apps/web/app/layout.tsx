@@ -3,10 +3,9 @@ import Script from 'next/script';
 import { Suspense } from 'react';
 import { Analytics } from '@vercel/analytics/next';
 
-import { SiteActivityCounter } from '../components/site-activity-counter';
 import { SeoIntelligenceTracker } from '../components/seo-intelligence-tracker';
 import { CommercialTrialConversion } from '../components/commercial-trial-conversion';
-import { AtlasEnvironmentalIntegrityFundStrip } from '../components/atlas-environmental-integrity-fund-strip';
+import { RouteAwareGlobalChrome } from '../components/route-aware-global-chrome';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 
 import './globals.css';
@@ -81,12 +80,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <Suspense fallback={null}><SeoIntelligenceTracker /></Suspense>
         {children}
         <Suspense fallback={null}><CommercialTrialConversion /></Suspense>
-        <AtlasEnvironmentalIntegrityFundStrip />
+        <RouteAwareGlobalChrome />
         <Suspense fallback={null}><ArtifactCorpusStatusShell /></Suspense>
-
-        <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
-          <Suspense fallback={null}><SiteActivityCounter /></Suspense>
-        </div>
         <Analytics />
       </body>
     </html>
