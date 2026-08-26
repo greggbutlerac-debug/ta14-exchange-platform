@@ -7,7 +7,7 @@ export type RegistrySubmissionContractInput = {
   current_version?: string | null;
   claimant_name?: string | null;
   submitter_authority_role?: string | null;
-  steward_name?: string | null;
+  current_steward?: string | null;
   contact_email?: string | null;
   plain_language_description?: string | null;
   formal_claims?: string | null;
@@ -26,7 +26,7 @@ export function evaluateRecordOnlySubmission(
     currentVersion: submission.current_version,
     claimantName: submission.claimant_name,
     authorityRole: submission.submitter_authority_role,
-    stewardName: submission.steward_name,
+    stewardName: submission.current_steward,
     contactEmail: submission.contact_email,
     plainDescription: submission.plain_language_description,
     claims: submission.formal_claims,
@@ -44,16 +44,10 @@ export function evaluateRecordOnlySubmission(
   };
 }
 
-/**
- * These fields are enrichment, not record-only registration gates.
- * Their presence may activate additional validation for the information supplied,
- * but their absence cannot by itself make an otherwise complete record-only
- * registration ineligible.
- */
 export const TA14_OPTIONAL_REGISTRY_ENRICHMENT_FIELDS = [
   'short_name',
   'effective_version_date',
-  'establishment_date',
+  'claimed_establishment_date',
   'governance_category',
   'claimant_type',
   'authority_basis',
@@ -62,8 +56,8 @@ export const TA14_OPTIONAL_REGISTRY_ENRICHMENT_FIELDS = [
   'public_website',
   'public_evidence_route',
   'explicit_non_claims',
-  'limitations',
-  'jurisdiction',
+  'known_limitations',
+  'geographic_scope',
   'regulatory_scope',
   'evidence',
   'publications',
@@ -71,6 +65,6 @@ export const TA14_OPTIONAL_REGISTRY_ENRICHMENT_FIELDS = [
   'zenodo_records',
   'patent_records',
   'ownership_declaration',
-  'license',
-  'disputes',
+  'license_statement',
+  'known_disputes',
 ] as const;
