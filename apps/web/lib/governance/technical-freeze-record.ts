@@ -5,6 +5,8 @@ export type FreezeGate = {
   title: string;
   state: FreezeGateState;
   requiredObject: string;
+  resolutionReason?: string;
+  evidenceObjectIds?: string[];
 };
 
 export const baseLayerTechnicalFreezeRecord = {
