@@ -3,6 +3,11 @@ import type { NextRequest } from "next/server";
 import { updateSession } from "./lib/supabase/middleware";
 
 export async function middleware(request: NextRequest) {
+  request.headers.set(
+    "x-ta14-requested-path",
+    `${request.nextUrl.pathname}${request.nextUrl.search}`,
+  );
+
   return updateSession(request);
 }
 
