@@ -4,6 +4,7 @@ Status: INCOMPLETE — OPEN
 Protocol: `docs/institutional-examination-production-acceptance-v1.md`
 Original production baseline commit: `76053569784e44af08a495b36349d881c5b92a07`
 Executable harness commit: `b78542d27e239fc20254d0bcf9c1543078e22231`
+Execution surface commit: `740b77d6380877cbc3ac77de81fa9e5400485e81`
 
 ## Purpose
 
@@ -13,19 +14,30 @@ This is the controlled execution record for the first production acceptance run 
 
 Registered governance -> bounded examination -> sealed run receipt -> evidence admission review -> institutional finding -> cryptographic seal -> authenticated admission -> governed-artifact persistence -> append-only chronology -> controlled retrieval.
 
-## Executable acceptance surface
+## Admitted production execution evidence — E01
 
-Authenticated server route: `POST /api/acceptance/institutional-finding`
+Authenticated production execution timestamp: `2026-08-26T21:25:53.322Z`
+Harness determination: `PASS`
+Harness count: `5/5 controls passed`
+Execution context: authenticated TA-14 Exchange institutional session.
 
-The deployed harness is presently bounded to N02, N03, P04, P05, and the cryptographic-verification portion of N04. Deployment of the harness is not execution evidence. These controls remain PENDING until an authenticated production invocation result is preserved.
+Observed results:
+
+- N02 PASS — Unverified receipt refused finding issuance.
+- N03 PASS — Missing evidence-admission disposition refused issuance.
+- P04 PASS — Bounded institutional finding issued from verified receipt and admitted evidence fixture.
+- P05 PASS — Finding seal independently verified.
+- N04-CRYPTO PASS — Tampered sealed finding failed cryptographic verification.
+
+Boundary: E01 proves only N02, N03, P04, P05, and the cryptographic-verification component of N04. Full N04 remains PENDING until tampered authoritative admission is refused and absence of artifact persistence is demonstrated. E01 does not establish persistence, chronology, public-projection, or admission-endpoint controls.
 
 ## Positive controls
 
 - [ ] P01 Valid examination run produces sealed receipt with verifiable canonical digest.
 - [ ] P02 Institutional review accepts the valid receipt only after verification.
 - [ ] P03 Evidence references receive explicit admission dispositions.
-- [ ] P04 Bounded institutional finding issues from verified receipt and reviewed evidence.
-- [ ] P05 Finding seal and canonical digest independently verify.
+- [x] P04 Bounded institutional finding issues from verified receipt and reviewed evidence. — E01
+- [x] P05 Finding seal and canonical digest independently verify. — E01
 - [ ] P06 Authenticated institutional session submits sealed finding to authoritative admission endpoint.
 - [ ] P07 Server independently re-verifies finding seal before persistence.
 - [ ] P08 Exactly one `INSTITUTIONAL_EXAMINATION_FINDING` governed-artifact record is created.
@@ -36,9 +48,9 @@ The deployed harness is presently bounded to N02, N03, P04, P05, and the cryptog
 ## Negative controls
 
 - [ ] N01 Tampered receipt digest refuses review progression.
-- [ ] N02 Unverified receipt refuses finding issuance.
-- [ ] N03 Missing required evidence references refuses issuance.
-- [ ] N04 Tampered sealed finding refuses authoritative admission and creates no artifact record.
+- [x] N02 Unverified receipt refuses finding issuance. — E01
+- [x] N03 Missing required evidence references refuses issuance. — E01
+- [ ] N04 Tampered sealed finding refuses authoritative admission and creates no artifact record. — cryptographic component PASS under E01; authoritative admission/no-persistence component PENDING.
 - [ ] N05 Missing authenticated institutional session refuses authoritative admission.
 - [ ] N06 Missing required admission fields refuses admission.
 - [ ] N07 Duplicate immutable institutional record ID refuses overwrite.
@@ -50,11 +62,11 @@ The deployed harness is presently bounded to N02, N03, P04, P05, and the cryptog
 
 | Control | Result | Evidence reference | Notes |
 |---|---|---|---|
-| P04 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
-| P05 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
-| N02 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
-| N03 | PENDING | `POST /api/acceptance/institutional-finding` | Harness deployed; authenticated production execution still required. |
-| N04 | PENDING | `POST /api/acceptance/institutional-finding` | Harness currently proves seal-tamper rejection only; admission/no-persistence portion remains separately required. |
+| P04 | PASS | E01 · `2026-08-26T21:25:53.322Z` | Authenticated production harness issued bounded finding from verified receipt and admitted evidence fixture. |
+| P05 | PASS | E01 · `2026-08-26T21:25:53.322Z` | Finding seal independently verified. |
+| N02 | PASS | E01 · `2026-08-26T21:25:53.322Z` | Unverified receipt refused finding issuance. |
+| N03 | PASS | E01 · `2026-08-26T21:25:53.322Z` | Missing evidence-admission disposition refused issuance. |
+| N04 | PARTIAL | E01 · `2026-08-26T21:25:53.322Z` | Cryptographic tamper rejection demonstrated; authoritative admission refusal and no-persistence proof still required. |
 | P01-P03, P06-P11 | PENDING | — | Execution evidence not yet admitted. |
 | N01, N05-N10 | PENDING | — | Execution evidence not yet admitted. |
 
@@ -62,8 +74,8 @@ The deployed harness is presently bounded to N02, N03, P04, P05, and the cryptog
 
 `INCOMPLETE`
 
-Reason: the acceptance harness is deployed but has not yet produced preserved authenticated production execution evidence, and the remaining production-boundary controls have not been executed.
+Reason: E01 establishes four complete controls and one bounded component, but the remaining production-boundary controls have not yet been executed and preserved.
 
 ## Fail-closed representation rule
 
-Until every required control has execution evidence and the run determination is changed under the protocol, the Exchange institutional examination architecture may be described as implemented and deployed, but the complete chain must not be represented as production acceptance proven.
+Until every required control has execution evidence and the run determination is changed under the protocol, the Exchange institutional examination architecture may be described as implemented and deployed, with E01 proving the bounded controls above, but the complete chain must not be represented as production acceptance proven.
