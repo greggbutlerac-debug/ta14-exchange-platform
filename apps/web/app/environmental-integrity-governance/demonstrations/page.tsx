@@ -7,7 +7,13 @@ export default function EnvironmentalDemonstrationsPage(){
       <p style={{color:'#71e5ad',fontWeight:900,letterSpacing:'.18em',fontSize:12}}>DOOR 03 · ENVIRONMENTAL PROVING GROUND</p>
       <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(44px,7vw,78px)',lineHeight:1,margin:'14px 0 20px'}}>Governance should be demonstrated, not merely described.</h1>
       <p style={{maxWidth:850,color:'#b8d0c5',fontSize:18,lineHeight:1.7}}>Run bounded environmental cases against preserved evidence, declared non-claims, proposition-specific admissibility, changed conditions, and the commit boundary.</p>
-      <Link href='/environmental-integrity-governance/demonstrations/conflicting-environmental-record' style={{display:'block',marginTop:42,padding:30,border:'1px solid rgba(120,240,190,.3)',borderRadius:18,background:'rgba(7,28,21,.8)',color:'#edf9f4',textDecoration:'none'}}>
+      <Link href='/environmental-integrity-governance/demonstrations/architecture' style={{display:'block',marginTop:34,padding:24,border:'1px solid rgba(120,240,190,.24)',borderRadius:18,background:'rgba(5,20,15,.62)',color:'#edf9f4',textDecoration:'none'}}>
+        <small style={{color:'#71e5ad',fontWeight:900,letterSpacing:'.14em'}}>REUSABLE GOVERNANCE FRAMEWORK · R1</small>
+        <h2 style={{fontFamily:'Georgia,serif',fontSize:32,margin:'9px 0'}}>EIG Demonstration Architecture</h2>
+        <p style={{color:'#b8d0c5',lineHeight:1.65}}>The common evidence, admissibility, changed-condition, authority, commit, execution, and outcome structure used across environmental demonstration families.</p>
+        <strong style={{display:'inline-block',marginTop:10,color:'#83f0bd'}}>INSPECT THE ARCHITECTURE →</strong>
+      </Link>
+      <Link href='/environmental-integrity-governance/demonstrations/conflicting-environmental-record' style={{display:'block',marginTop:18,padding:30,border:'1px solid rgba(120,240,190,.3)',borderRadius:18,background:'rgba(7,28,21,.8)',color:'#edf9f4',textDecoration:'none'}}>
         <small style={{color:'#71e5ad',fontWeight:900,letterSpacing:'.14em'}}>EIG DEMONSTRATION 001 · R1</small>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:38,margin:'10px 0'}}>The Conflicting Environmental Record</h2>
         <p style={{color:'#b8d0c5',lineHeight:1.65}}>Two environmental measurements. Different contexts. One governed question: may the proposed consequence cross the boundary?</p>
