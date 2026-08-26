@@ -1,6 +1,6 @@
 export type ReadinessState = 'NOT_YET_GOVERNED' | 'PARTIALLY_GOVERNABLE' | 'READY_FOR_ADMISSIBILITY_REVIEW' | 'ADMISSIBLE_FOR_DECLARED_INTERPRETATION' | 'INSUFFICIENT_OR_INCONCLUSIVE';
 export type ReadinessFinding = { id:string; label:string; status:'ESTABLISHED'|'PARTIAL'|'MISSING'|'CONFLICT'|'NOT_APPLICABLE'; detail:string; evidence:string[] };
-export type ReadinessReport = { engine:'TA14-EGRI'; engineVersion:'1.2.0'; state:ReadinessState; score:number; inspectionObject:string; proposition:string; supportedNow:string[]; prohibitedInferences:string[]; missingBeforeStrongerReliance:string[]; nextAdmissibleSteps:string[]; findings:ReadinessFinding[]; eriEligible:boolean; generatedAt:string };
+export type ReadinessReport = { engine:'TA14-EGRI'; engineVersion:'1.2.1'; state:ReadinessState; score:number; inspectionObject:string; proposition:string; supportedNow:string[]; prohibitedInferences:string[]; missingBeforeStrongerReliance:string[]; nextAdmissibleSteps:string[]; findings:ReadinessFinding[]; eriEligible:boolean; generatedAt:string };
 
 function has(text:string, pattern:RegExp){return pattern.test(text)}
 function snippets(text:string, pattern:RegExp){return text.split(/\n+/).map(x=>x.trim()).filter(Boolean).filter(x=>pattern.test(x)).slice(0,4)}
@@ -27,9 +27,12 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  add('calibration','Calibration / instrument standing',calibrationAbsent?'MISSING':calibrationMention?'ESTABLISHED':'MISSING',calibrationAbsent?'Calibration or instrument standing is explicitly absent, unavailable, or not established by the submitted package.':calibrationMention?'Calibration or instrument-verification evidence is affirmatively present.':'Calibration or instrument standing is not established.',/(calibrat|certificate|traceable|nist|sensor validation)/i);
 
  const rawAbsent=has(lower,/(raw (sensor )?data.{0,70}(not supplied|not provided|unavailable|missing)|underlying.{0,50}(not supplied|not provided|unavailable)|sampling frequency.{0,60}(not stated|unknown)|aggregation method.{0,60}(unknown|not stated)|unknown whether.{0,80}(instantaneous|average|maximum|minimum))/i);
- const gap=has(lower,/(missing interval|data gap|gap detected|interruption|offline|dropout|loss of data|no data)/i);
- const continuityPositive=has(lower,/(continuous raw|continuous record|complete period|sampling interval:\s*\d|sample interval:\s*\d|uptime:\s*\d)/i);
- add('continuity','Chronology / continuity',gap||rawAbsent?'PARTIAL':continuityPositive?'ESTABLISHED':'MISSING',gap?'The package declares a continuity interruption or missing interval.':rawAbsent?'Reported chronology exists, but native sampling continuity or underlying observations are not established.':continuityPositive?'Affirmative continuity or sampling evidence is present.':'Native continuity and coverage are not established.',/(continuous|sampling|sample interval|uptime|missing interval|gap|raw data|aggregation)/i);
+ const explicitZeroMissing=has(lower,/(missing (observations|samples|readings|intervals?)\s*:\s*0\b|data gaps?\s*:\s*0\b|dropouts?\s*:\s*0\b)/i);
+ const explicitNoGap=has(lower,/(no (communication )?interruption|no missing interval|no data gap|no dropout|missing observations\s*:\s*0|recorded native observations\s*:\s*\d+[\s\S]{0,80}expected native observations\s*:\s*\d+)/i);
+ const gapSignal=has(lower,/(missing interval|data gap|gap detected|interruption|offline|dropout|loss of data|no data)/i);
+ const gap=gapSignal&&!explicitZeroMissing&&!explicitNoGap;
+ const continuityPositive=has(lower,/(continuous raw|continuous record|complete period|sampling interval:\s*\d|sample interval:\s*\d|uptime(?: during declared boundary)?\s*:\s*\d|monitoring uptime[^\n]*100%|missing observations\s*:\s*0)/i);
+ add('continuity','Chronology / continuity',gap||rawAbsent?'PARTIAL':continuityPositive?'ESTABLISHED':'MISSING',gap?'The package declares a continuity interruption or missing interval.':rawAbsent?'Reported chronology exists, but native sampling continuity or underlying observations are not established.':continuityPositive?'Affirmative continuity or sampling evidence is present.':'Native continuity and coverage are not established.',/(continuous|sampling|sample interval|uptime|missing interval|missing observations|gap|raw data|aggregation)/i);
 
  const provenancePositive=has(lower,/(sha-?256|cryptographic hash|digitally signed|chain of custody:\s*(established|complete)|provenance id|record version:\s*[a-z0-9])/i);
  const provenanceAbsent=absent(lower,'chain of custody')||absent(lower,'cryptographic')||absent(lower,'record version')||has(lower,/(no chain-of-custody|no cryptographic|no record version|version identifier.{0,50}(not provided|missing))/i);
@@ -39,9 +42,6 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  const thresholdPositive=has(lower,/(threshold source:\s*\S|reference standard:\s*\S|ashrae\s*\d|epa\s+[^\n]+|who\s+[^\n]+|osha\s+[^\n]+|declared limit:\s*\d|guideline:\s*\d)/i);
  add('threshold_source','Threshold / reference source',thresholdAbsent?'MISSING':thresholdPositive?'ESTABLISHED':'MISSING',thresholdAbsent?'The package uses or reports a classification without establishing its threshold or reference source.':thresholdPositive?'A declared threshold or reference source is affirmatively identified.':'The governing threshold or reference source is not established.',/(threshold|reference standard|ashrae|epa|who|osha|acceptable|guideline)/i);
 
- // Environmental Object Definition Boundary: evidence cannot earn stronger reliance
- // until the object to which it attaches is sufficiently bounded. This remains an
- // enforcement boundary inside Reality -> Record, not a new canonical TA-14 stage.
  const objectText=input.inspectionObject.trim();
  const objectLower=objectText.toLowerCase();
  const objectIdentity=objectText.length>=20;
@@ -52,19 +52,13 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  const objectDimensions=[objectSpatial,objectTemporal,objectMediumOrSystem,objectCondition].filter(Boolean).length;
  const objectStatus:ReadinessFinding['status']=!objectIdentity?'MISSING':objectDimensions>=3?'ESTABLISHED':objectDimensions>=2?'PARTIAL':'MISSING';
  const missingObjectDimensions=[!objectSpatial?'spatial boundary':'',!objectTemporal?'temporal boundary':'',!objectMediumOrSystem?'environmental medium or governed system':'',!objectCondition?'condition or state under examination':''].filter(Boolean);
- const objectDetail=objectStatus==='ESTABLISHED'
-   ?'The declared environmental object is bounded across sufficient spatial, temporal, system/medium, and condition dimensions for this readiness review.'
-   :objectStatus==='PARTIAL'
-     ?`The declared object is only partially bounded. Still unresolved: ${missingObjectDimensions.join(', ')}.`
-     :'The environmental object is not defined with enough precision to establish what the submitted evidence actually attaches to.';
+ const objectDetail=objectStatus==='ESTABLISHED'?'The declared environmental object is bounded across sufficient spatial, temporal, system/medium, and condition dimensions for this readiness review.':objectStatus==='PARTIAL'?`The declared object is only partially bounded. Still unresolved: ${missingObjectDimensions.join(', ')}.`:'The environmental object is not defined with enough precision to establish what the submitted evidence actually attaches to.';
  add('object_localization','Environmental object definition',objectStatus,objectDetail);
 
  const propositionBound=input.proposition.trim().length>=20;
  add('proposition','Bounded proposition',propositionBound?'ESTABLISHED':'MISSING',propositionBound?'A bounded interpretation question has been declared.':'The proposition or interpretation question is too weakly bounded.');
-
  const conflict=has(lower,/(conflicting (records|readings|evidence)|contradictory (records|readings|evidence)|sensor disagreement|measurements disagree)/i);
  add('conflict','Conflicting evidence',conflict?'CONFLICT':'NOT_APPLICABLE',conflict?'The package declares conflicting evidence requiring resolution or explicit bounding.':'No explicit evidentiary conflict is declared.',/(conflicting|contradictory|sensor disagreement|measurements disagree)/i);
-
  const authorityAbsent=has(lower,/(no intervention authority|authority.{0,50}(not identified|unknown|missing)|intervention authority.{0,50}(not identified|not established))/i);
  const authorityPositive=has(lower,/(authorized by:\s*\S|approved by:\s*\S|responsible party:\s*\S|owner authorization:\s*\S|engineer of record:\s*\S|permit:\s*\S)/i);
  add('authority','Authority / reliance boundary',authorityAbsent?'MISSING':authorityPositive?'ESTABLISHED':'MISSING',authorityAbsent?'Authority for consequential intervention is explicitly absent or not established.':authorityPositive?'An affirmative authority or responsibility boundary is present.':'Authority for consequential reliance is not established.',/(authorized by|authority|approved by|responsible party|owner authorization|engineer of record|permit)/i);
@@ -82,7 +76,6 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  else if(criticalWeak>=2||missing>=3||partial>=2)state='PARTIALLY_GOVERNABLE';
  else if(missing>=1||partial>=1)state='READY_FOR_ADMISSIBILITY_REVIEW';
  else state='ADMISSIBLE_FOR_DECLARED_INTERPRETATION';
-
  const criticalIds=['source_identity','time_boundary','location','calibration','continuity','provenance','threshold_source','object_localization','proposition'];
  const eriEligible=criticalIds.every(id=>findings.find(f=>f.id===id)?.status==='ESTABLISHED')&&!findings.some(f=>f.status==='CONFLICT')&&state==='ADMISSIBLE_FOR_DECLARED_INTERPRETATION';
  const missingBeforeStrongerReliance=findings.filter(f=>['MISSING','PARTIAL','CONFLICT'].includes(f.status)).map(f=>`${f.label}: ${f.detail}`);
@@ -93,5 +86,5 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  if(thresholdAbsent)prohibitedInferences.push('Do not treat the record’s ACCEPTABLE classification as independently supported when its threshold source is undisclosed.');
  if(conflict)prohibitedInferences.push('Do not select one conflicting source as authoritative without a declared resolution rule or bounded rationale.');
  const nextAdmissibleSteps=missingBeforeStrongerReliance.length?missingBeforeStrongerReliance.slice(0,6).map(x=>`Resolve ${x}`):['Submit the admitted evidence package to ERI for bounded interpretation.'];
- return {engine:'TA14-EGRI',engineVersion:'1.2.0',state,score,inspectionObject:objectText,proposition:input.proposition.trim(),supportedNow,prohibitedInferences,missingBeforeStrongerReliance,nextAdmissibleSteps,findings,eriEligible,generatedAt:new Date().toISOString()};
+ return {engine:'TA14-EGRI',engineVersion:'1.2.1',state,score,inspectionObject:objectText,proposition:input.proposition.trim(),supportedNow,prohibitedInferences,missingBeforeStrongerReliance,nextAdmissibleSteps,findings,eriEligible,generatedAt:new Date().toISOString()};
 }
