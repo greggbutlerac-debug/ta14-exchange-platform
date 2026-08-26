@@ -3,7 +3,7 @@ import type { Metadata } from 'next';
 export const metadata: Metadata = {
   title: {
     default: 'Transparent Air | AC Repair & Second Opinions',
-    template: '%s | Transparent Air',
+    template: '%s',
   },
   description:
     'Transparent Air provides evidence-based air-conditioning diagnostics, AC repair evaluations, and second opinions for homeowners in selected Pinellas County, Florida communities.',
