@@ -1,6 +1,6 @@
 export type ReadinessState = 'NOT_YET_GOVERNED' | 'PARTIALLY_GOVERNABLE' | 'READY_FOR_ADMISSIBILITY_REVIEW' | 'ADMISSIBLE_FOR_DECLARED_INTERPRETATION' | 'INSUFFICIENT_OR_INCONCLUSIVE';
 export type ReadinessFinding = { id:string; label:string; status:'ESTABLISHED'|'PARTIAL'|'MISSING'|'CONFLICT'|'NOT_APPLICABLE'; detail:string; evidence:string[] };
-export type ReadinessReport = { engine:'TA14-EGRI'; engineVersion:'1.2.2'; state:ReadinessState; score:number; inspectionObject:string; proposition:string; supportedNow:string[]; prohibitedInferences:string[]; missingBeforeStrongerReliance:string[]; nextAdmissibleSteps:string[]; findings:ReadinessFinding[]; eriEligible:boolean; generatedAt:string };
+export type ReadinessReport = { engine:'TA14-EGRI'; engineVersion:'1.2.3'; state:ReadinessState; score:number; inspectionObject:string; proposition:string; supportedNow:string[]; prohibitedInferences:string[]; missingBeforeStrongerReliance:string[]; nextAdmissibleSteps:string[]; findings:ReadinessFinding[]; eriEligible:boolean; generatedAt:string };
 
 function has(text:string, pattern:RegExp){return pattern.test(text)}
 function snippets(text:string, pattern:RegExp){return text.split(/\n+/).map(x=>x.trim()).filter(Boolean).filter(x=>pattern.test(x)).slice(0,4)}
@@ -45,7 +45,7 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  const objectStatus:ReadinessFinding['status']=!objectIdentity?'MISSING':objectDimensions>=3?'ESTABLISHED':objectDimensions>=2?'PARTIAL':'MISSING';
  const missingObjectDimensions=[!objectSpatial?'spatial boundary':'',!objectTemporal?'temporal boundary':'',!objectMediumOrSystem?'environmental medium or governed system':'',!objectCondition?'condition or state under examination':''].filter(Boolean);
  const objectDetail=objectStatus==='ESTABLISHED'?'The declared environmental object is bounded across sufficient spatial, temporal, system/medium, and condition dimensions for this readiness review.':objectStatus==='PARTIAL'?`The declared object is only partially bounded. Still unresolved: ${missingObjectDimensions.join(', ')}.`:'The environmental object is not defined with enough precision to establish what the submitted evidence actually attaches to.';
- add('object_localization','Environmental object definition',objectStatus,objectDetail);
+ findings.push({id:'object_localization',label:'Environmental object definition',status:objectStatus,detail:objectDetail,evidence:[`PRIVATE_DIAGNOSTIC identity=${objectIdentity}; spatial=${objectSpatial}; temporal=${objectTemporal}; medium_or_system=${objectMediumOrSystem}; condition=${objectCondition}; dimensions=${objectDimensions}`]});
  const propositionBound=input.proposition.trim().length>=20;
  add('proposition','Bounded proposition',propositionBound?'ESTABLISHED':'MISSING',propositionBound?'A bounded interpretation question has been declared.':'The proposition or interpretation question is too weakly bounded.');
  const conflict=has(lower,/(conflicting (records|readings|evidence)|contradictory (records|readings|evidence)|sensor disagreement|measurements disagree)/i);
@@ -76,5 +76,5 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  if(thresholdAbsent)prohibitedInferences.push('Do not treat the record’s ACCEPTABLE classification as independently supported when its threshold source is undisclosed.');
  if(conflict)prohibitedInferences.push('Do not select one conflicting source as authoritative without a declared resolution rule or bounded rationale.');
  const nextAdmissibleSteps=missingBeforeStrongerReliance.length?missingBeforeStrongerReliance.slice(0,6).map(x=>`Resolve ${x}`):['Submit the admitted evidence package to ERI for bounded interpretation.'];
- return {engine:'TA14-EGRI',engineVersion:'1.2.2',state,score,inspectionObject:objectText,proposition:input.proposition.trim(),supportedNow,prohibitedInferences,missingBeforeStrongerReliance,nextAdmissibleSteps,findings,eriEligible,generatedAt:new Date().toISOString()};
+ return {engine:'TA14-EGRI',engineVersion:'1.2.3',state,score,inspectionObject:objectText,proposition:input.proposition.trim(),supportedNow,prohibitedInferences,missingBeforeStrongerReliance,nextAdmissibleSteps,findings,eriEligible,generatedAt:new Date().toISOString()};
 }
