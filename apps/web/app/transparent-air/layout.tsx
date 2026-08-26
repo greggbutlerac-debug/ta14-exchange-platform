@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import TransparentAirCallAnalytics from './TransparentAirCallAnalytics';
 
 export const metadata: Metadata = {
   title: {
@@ -69,6 +70,7 @@ export default function TransparentAirLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <>
+      <TransparentAirCallAnalytics />
       {children}
       <nav aria-label="Transparent Air local service areas" style={{ background: '#062531', color: '#dcebed', padding: '30px 4vw 38px', borderTop: '1px solid #174653' }}>
         <div style={{ width: 'min(1160px, 92vw)', margin: '0 auto' }}>
