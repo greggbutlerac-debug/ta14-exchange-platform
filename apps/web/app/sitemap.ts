@@ -19,6 +19,7 @@ const routes = [
   '/transparent-air/gulfport-ac-repair',
   '/transparent-air/seminole-ac-repair',
   '/transparent-air/pinellas-park-ac-repair',
+  '/transparent-air/south-st-petersburg-ac-repair',
   '/transparent-air/second-opinion',
   '/eu-ai-act',
   '/eu-ai-act/start',
