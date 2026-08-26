@@ -36,24 +36,44 @@ export default function MissionControlLayout({ children }: { children: ReactNode
             Discovery → Intent → Identity → Conversion → Revenue
           </span>
         </div>
-        <Link
-          href="/workspace/mission-control/seo-intelligence"
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            minHeight: 38,
-            padding: "0 14px",
-            border: "1px solid rgba(76,202,255,.36)",
-            borderRadius: 10,
-            background: "rgba(34,167,226,.12)",
-            color: "#effbff",
-            textDecoration: "none",
-            fontSize: 12,
-            fontWeight: 800,
-          }}
-        >
-          SEO Intelligence · Private →
-        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+          <Link
+            href="/workspace/mission-control/governance-registry"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              minHeight: 38,
+              padding: "0 14px",
+              border: "1px solid rgba(112,229,174,.34)",
+              borderRadius: 10,
+              background: "rgba(74,190,139,.10)",
+              color: "#effff7",
+              textDecoration: "none",
+              fontSize: 12,
+              fontWeight: 800,
+            }}
+          >
+            Governance Registry Watch →
+          </Link>
+          <Link
+            href="/workspace/mission-control/seo-intelligence"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              minHeight: 38,
+              padding: "0 14px",
+              border: "1px solid rgba(76,202,255,.36)",
+              borderRadius: 10,
+              background: "rgba(34,167,226,.12)",
+              color: "#effbff",
+              textDecoration: "none",
+              fontSize: 12,
+              fontWeight: 800,
+            }}
+          >
+            SEO Intelligence · Private →
+          </Link>
+        </div>
       </div>
       {children}
     </>
