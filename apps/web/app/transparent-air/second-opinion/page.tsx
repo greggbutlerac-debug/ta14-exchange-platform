@@ -1,11 +1,21 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
+const PAGE_URL = 'https://www.ta14exchange.com/transparent-air/second-opinion';
+
 export const metadata: Metadata = {
   title: 'AC Second Opinion in Pinellas County, FL | Transparent Air',
   description:
     'Unsure about an AC diagnosis or expensive repair recommendation? Transparent Air offers second-opinion air-conditioning evaluations in Gulfport, South St. Pete, Seminole and Pinellas Park.',
+  alternates: { canonical: PAGE_URL },
   robots: { index: true, follow: true },
+  openGraph: {
+    title: 'AC Second Opinion in Pinellas County, FL | Transparent Air',
+    description:
+      'Before authorizing an expensive AC repair or replacement, get an evidence-based second opinion from Transparent Air.',
+    url: PAGE_URL,
+    type: 'website',
+  },
 };
 
 const PRIMARY_PHONE_DISPLAY = '386-337-7215';
