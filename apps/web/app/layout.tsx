@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next';
 
 import { SiteActivityCounter } from '../components/site-activity-counter';
 import { SeoIntelligenceTracker } from '../components/seo-intelligence-tracker';
+import { CommercialTrialConversion } from '../components/commercial-trial-conversion';
 import { AtlasEnvironmentalIntegrityFundStrip } from '../components/atlas-environmental-integrity-fund-strip';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 
@@ -78,6 +79,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 
         <SeoIntelligenceTracker />
         {children}
+        <CommercialTrialConversion />
         <AtlasEnvironmentalIntegrityFundStrip />
         <ArtifactCorpusStatusShell />
 
