@@ -18,6 +18,7 @@ const routes = [
   '/atlas-environmental-integrity-fund',
   '/transparent-air/gulfport-ac-repair',
   '/transparent-air/seminole-ac-repair',
+  '/transparent-air/pinellas-park-ac-repair',
   '/transparent-air/second-opinion',
   '/eu-ai-act',
   '/eu-ai-act/start',
