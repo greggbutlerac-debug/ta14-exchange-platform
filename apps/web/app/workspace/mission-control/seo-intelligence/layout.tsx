@@ -1,4 +1,5 @@
 import Link from "next/link";
+import CommercialPipeline from "./commercial-pipeline";
 
 export default function SeoIntelligenceLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ export default function SeoIntelligenceLayout({ children }: { children: React.Re
           Open Click Intelligence →
         </Link>
       </div>
+      <CommercialPipeline />
       {children}
       <style>{`
         .seo-intelligence-drilldown-nav {
