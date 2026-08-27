@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:ta14:velos:r1:vect:1.0.0",
+  "title": "Velos Execution Capability Token",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "assertion_id",
+    "capability_token_fingerprint",
+    "target_binding",
+    "temporal_authority",
+    "idempotency_constraints"
+  ],
+  "properties": {
+    "assertion_id": { "type": "string", "minLength": 1 },
+    "capability_token_fingerprint": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+    "target_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["protocol", "dst_ip", "dst_port", "payload_binding_hash"],
+      "properties": {
+        "protocol": { "const": "TCP" },
+        "dst_ip": { "type": "string", "minLength": 1 },
+        "dst_port": { "type": "integer", "minimum": 1, "maximum": 65535 },
+        "payload_binding_hash": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" }
+      }
+    },
+    "temporal_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clock_source", "epoch_ts_micros", "valid_for_micros", "max_skew_tolerance_micros"],
+      "properties": {
+        "clock_source": { "const": "CLOCK_REALTIME" },
+        "epoch_ts_micros": { "type": "integer", "minimum": 0 },
+        "valid_for_micros": { "type": "integer", "minimum": 1 },
+        "max_skew_tolerance_micros": { "const": 5000 }
+      }
+    },
+    "idempotency_constraints": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["nonce", "max_allowed_retransmissions", "single_session_only"],
+      "properties": {
+        "nonce": { "type": "string", "pattern": "^[0-9a-fA-F]{64}$" },
+        "max_allowed_retransmissions": { "const": 3 },
+        "single_session_only": { "const": true }
+      }
+    }
+  }
+}
