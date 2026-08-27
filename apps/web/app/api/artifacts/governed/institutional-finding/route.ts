@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { createClient } from '../../../../../lib/supabase/server';
 import { verifyTA14InstitutionalFindingSeal, type TA14SealedInstitutionalFinding } from '../../../../../lib/ai-governance/institutional-examination-finding';
 import { createTA14InstitutionalFindingRecord } from '../../../../../lib/ai-governance/institutional-finding-record';
@@ -11,6 +12,17 @@ async function authenticatedClient() {
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getUser();
   return { supabase, user: error ? null : data.user };
+}
+
+function acceptancePersistenceClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+  if (!url || !serviceRoleKey) {
+    throw new Error('Acceptance executor persistence is not configured.');
+  }
+  return createSupabaseAdminClient(url, serviceRoleKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
 }
 
 export async function GET(request: Request) {
@@ -38,9 +50,10 @@ export async function POST(request: Request) {
     if (!sealVerified) return NextResponse.json({ error: 'Finding seal verification failed. Nothing was recorded.' }, { status: 422 });
     const record = createTA14InstitutionalFindingRecord({ recordId: body.recordId, sealedFinding: body.finding, findingSealVerified: true });
     const artifact = mapInstitutionalFindingToGovernedArtifact({ record, finding: body.finding, governanceRegistryIdentifier: body.governanceRegistryIdentifier, governanceName: body.governanceName });
-    const { supabase, user } = await authenticatedClient();
+    const { supabase: sessionClient, user } = await authenticatedClient();
     const executorDecision = verifyTA14AcceptanceExecutor({ presentedCredential: acceptanceExecutorCredentialFrom(request), recordId: body.recordId, fixtureMarker: acceptanceFixtureMarkerFrom(request) });
     if (!user && !executorDecision.authorized) return NextResponse.json({ error: 'Authenticated institutional session or authorized acceptance executor required.' }, { status: 401 });
+    const supabase = user ? sessionClient : acceptancePersistenceClient();
     const actorMetadata = user ? { actor_user_id: user.id } : { actor_executor_id: executorDecision.authorized ? executorDecision.executorId : 'UNAUTHORIZED' };
     const { data, error } = await supabase.from('ta14_governed_artifact_records').insert(artifact).select('id, artifact_identifier, artifact_series_identifier, registered_at').single();
     if (error) { const duplicate = error.code === '23505'; return NextResponse.json({ error: duplicate ? 'Institutional record identifier already exists; immutable records are not overwritten.' : 'Authoritative persistence failed.', detail: error.message }, { status: duplicate ? 409 : 500 }); }
