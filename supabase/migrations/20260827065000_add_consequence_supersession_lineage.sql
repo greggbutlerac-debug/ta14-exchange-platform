@@ -25,6 +25,9 @@ create table if not exists public.consequence_examination_lineage (
 
 create unique index if not exists consequence_examination_lineage_pair_uq
   on public.consequence_examination_lineage(source_run_id, successor_run_id, relationship);
+create unique index if not exists consequence_examination_lineage_source_supersedes_uq
+  on public.consequence_examination_lineage(source_run_id)
+  where relationship='SUPERSEDES';
 create index if not exists consequence_examination_lineage_source_idx
   on public.consequence_examination_lineage(source_run_id, recorded_at);
 create index if not exists consequence_examination_lineage_successor_idx
@@ -54,6 +57,7 @@ declare
   v_reconsideration public.consequence_examination_reconsiderations;
   v_record public.consequence_examination_lineage;
   v_seq integer;
+  v_creates_cycle boolean := false;
 begin
   if p_relationship not in ('SUPERSEDES','REEXAMINES') then raise exception 'Invalid examination lineage relationship'; end if;
   if p_source_run_id=p_successor_run_id then raise exception 'An examination cannot be its own successor'; end if;
@@ -71,6 +75,30 @@ begin
   end if;
 
   if p_relationship='SUPERSEDES' then
+    if exists (
+      select 1
+      from public.consequence_examination_lineage
+      where source_run_id=p_source_run_id and relationship='SUPERSEDES'
+    ) then
+      raise exception 'Source examination already has a superseding successor';
+    end if;
+
+    with recursive successor_path(run_id) as (
+      select p_successor_run_id
+      union
+      select l.successor_run_id
+      from public.consequence_examination_lineage l
+      join successor_path p on l.source_run_id=p.run_id
+      where l.relationship='SUPERSEDES'
+    )
+    select exists (
+      select 1 from successor_path where run_id=p_source_run_id
+    ) into v_creates_cycle;
+
+    if v_creates_cycle then
+      raise exception 'Supersession lineage would create a cycle';
+    end if;
+
     if p_reconsideration_id is null then raise exception 'SUPERSEDES requires a reconsideration record'; end if;
     select * into v_reconsideration from public.consequence_examination_reconsiderations where reconsideration_id=p_reconsideration_id;
     if v_reconsideration.id is null then raise exception 'Reconsideration not found'; end if;
