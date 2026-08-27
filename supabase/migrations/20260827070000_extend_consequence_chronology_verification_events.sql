@@ -18,6 +18,8 @@ alter table public.consequence_examination_chronology
       'RECEIPT_PUBLISHED',
       'INDEPENDENT_VERIFICATION',
       'VERIFIER_ADMISSIBILITY',
+      'CHALLENGE_SUBMITTED',
+      'RECONSIDERATION_ISSUED',
       'EXAMINATION_LINEAGE',
       'VOIDED'
     )
