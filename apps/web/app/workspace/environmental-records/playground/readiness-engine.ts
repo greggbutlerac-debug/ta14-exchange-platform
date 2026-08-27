@@ -1,6 +1,11 @@
+import {
+ establishPropositionEntitlement,
+ type PropositionEntitlement,
+} from '../../../lib/environmental-governance/proposition-entitlement';
+
 export type ReadinessState = 'NOT_YET_GOVERNED' | 'PARTIALLY_GOVERNABLE' | 'READY_FOR_ADMISSIBILITY_REVIEW' | 'ADMISSIBLE_FOR_DECLARED_INTERPRETATION' | 'INSUFFICIENT_OR_INCONCLUSIVE';
 export type ReadinessFinding = { id:string; label:string; status:'ESTABLISHED'|'PARTIAL'|'MISSING'|'CONFLICT'|'NOT_APPLICABLE'; detail:string; evidence:string[] };
-export type ReadinessReport = { engine:'TA14-EGRI'; engineVersion:'1.2.3'; state:ReadinessState; score:number; inspectionObject:string; proposition:string; supportedNow:string[]; prohibitedInferences:string[]; missingBeforeStrongerReliance:string[]; nextAdmissibleSteps:string[]; findings:ReadinessFinding[]; eriEligible:boolean; generatedAt:string };
+export type ReadinessReport = { engine:'TA14-EGRI'; engineVersion:'1.3.0'; state:ReadinessState; score:number; inspectionObject:string; proposition:string; supportedNow:string[]; prohibitedInferences:string[]; missingBeforeStrongerReliance:string[]; nextAdmissibleSteps:string[]; findings:ReadinessFinding[]; entitlement:PropositionEntitlement; eriEligible:boolean; generatedAt:string };
 
 function has(text:string, pattern:RegExp){return pattern.test(text)}
 function snippets(text:string, pattern:RegExp){return text.split(/\n+/).map(x=>x.trim()).filter(Boolean).filter(x=>pattern.test(x)).slice(0,4)}
@@ -66,8 +71,6 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  else if(criticalWeak>=2||missing>=3||partial>=2)state='PARTIALLY_GOVERNABLE';
  else if(missing>=1||partial>=1)state='READY_FOR_ADMISSIBILITY_REVIEW';
  else state='ADMISSIBLE_FOR_DECLARED_INTERPRETATION';
- const criticalIds=['source_identity','time_boundary','location','calibration','continuity','provenance','threshold_source','object_localization','proposition'];
- const eriEligible=criticalIds.every(id=>findings.find(f=>f.id===id)?.status==='ESTABLISHED')&&!findings.some(f=>f.status==='CONFLICT')&&state==='ADMISSIBLE_FOR_DECLARED_INTERPRETATION';
  const missingBeforeStrongerReliance=findings.filter(f=>['MISSING','PARTIAL','CONFLICT'].includes(f.status)).map(f=>`${f.label}: ${f.detail}`);
  const supportedNow=[sourceIdentity?'The package contains identifiable environmental source or record information.':'The package can be preserved as submitted material, but source identity is not established.',timeBoundary?'The material contains observations tied to a detectable time context.':'The material does not establish a reliable time-bounded observation period.',location?'The material contains spatial or facility context relevant to bounded environmental interpretation.':'The material does not establish a reliable location-specific observation boundary.',objectStatus==='ESTABLISHED'?'The evidence has a sufficiently bounded declared environmental object for this readiness review.':'The evidence-object relationship is not yet sufficiently bounded for stronger consequential reliance.'];
  const prohibitedInferences=['Do not convert environmental observations into a medical diagnosis or health outcome.','Do not convert a reported classification or threshold comparison into causal attribution without separate evidence.','Do not treat missing, declared-only, or unparsed evidence as if it were inspected.','Do not treat interpretation readiness as authority to execute a consequential intervention.'];
@@ -75,6 +78,26 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  if(gap||rawAbsent)prohibitedInferences.push('Do not make an unrestricted whole-period claim when native sampling continuity or aggregation behavior is not established.');
  if(thresholdAbsent)prohibitedInferences.push('Do not treat the record’s ACCEPTABLE classification as independently supported when its threshold source is undisclosed.');
  if(conflict)prohibitedInferences.push('Do not select one conflicting source as authoritative without a declared resolution rule or bounded rationale.');
- const nextAdmissibleSteps=missingBeforeStrongerReliance.length?missingBeforeStrongerReliance.slice(0,6).map(x=>`Resolve ${x}`):['Submit the admitted evidence package to ERI for bounded interpretation.'];
- return {engine:'TA14-EGRI',engineVersion:'1.2.3',state,score,inspectionObject:objectText,proposition:input.proposition.trim(),supportedNow,prohibitedInferences,missingBeforeStrongerReliance,nextAdmissibleSteps,findings,eriEligible,generatedAt:new Date().toISOString()};
+ const evidenceRefs=findings.flatMap(f=>f.evidence.filter(e=>!e.startsWith('PRIVATE_DIAGNOSTIC'))).map((_,index)=>`EGRI-EVID-${String(index+1).padStart(3,'0')}`);
+ const entitlement=establishPropositionEntitlement({
+  proposition:input.proposition,
+  inspectionObject:objectText,
+  evidenceRefs,
+  temporalBoundary:timeBoundary?findings.find(f=>f.id==='time_boundary')?.detail:undefined,
+  spatialBoundary:location?findings.find(f=>f.id==='location')?.detail:undefined,
+  environmentalMediumOrSystem:objectMediumOrSystem?objectText:undefined,
+  conditionOrVariable:objectCondition?objectText:undefined,
+  thresholdReference:thresholdPositive?findings.find(f=>f.id==='threshold_source')?.detail:undefined,
+  continuityEstablished:findings.find(f=>f.id==='continuity')?.status==='ESTABLISHED',
+  objectEstablished:objectStatus==='ESTABLISHED',
+  propositionEstablished:propositionBound,
+  conflictPresent:conflict,
+  limitations:missingBeforeStrongerReliance,
+  prohibitedExtensions:prohibitedInferences,
+ });
+ const criticalIds=['source_identity','time_boundary','location','calibration','continuity','provenance','threshold_source','object_localization','proposition'];
+ const readinessEligible=criticalIds.every(id=>findings.find(f=>f.id===id)?.status==='ESTABLISHED')&&!findings.some(f=>f.status==='CONFLICT')&&state==='ADMISSIBLE_FOR_DECLARED_INTERPRETATION';
+ const eriEligible=readinessEligible&&entitlement.standing==='ESTABLISHED';
+ const nextAdmissibleSteps=missingBeforeStrongerReliance.length?missingBeforeStrongerReliance.slice(0,6).map(x=>`Resolve ${x}`):eriEligible?['Submit the entitled evidence package to ERI for bounded interpretation.']:['Establish proposition entitlement before ERI progression.'];
+ return {engine:'TA14-EGRI',engineVersion:'1.3.0',state,score,inspectionObject:objectText,proposition:input.proposition.trim(),supportedNow,prohibitedInferences,missingBeforeStrongerReliance,nextAdmissibleSteps,findings,entitlement,eriEligible,generatedAt:new Date().toISOString()};
 }
