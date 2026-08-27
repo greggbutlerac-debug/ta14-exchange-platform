@@ -43,6 +43,30 @@ function boundaryExpansion(
   return reason ?? "DET_SCOPE_EXPANSION";
 }
 
+function validateStandingState(
+  standing: PropositionEntitlement["standing"],
+  state: EnvironmentalDeterminationState,
+): string | null {
+  switch (standing) {
+    case "ESTABLISHED":
+      return null;
+    case "PARTIAL":
+      return state === "PARTIALLY_SUPPORTED" || state === "UNSUPPORTED" || state === "INDETERMINATE"
+        ? null
+        : "DET_STATE_EXCEEDS_PARTIAL_STANDING";
+    case "NOT_ESTABLISHED":
+      return state === "UNSUPPORTED" || state === "INDETERMINATE"
+        ? null
+        : "DET_STATE_EXCEEDS_UNESTABLISHED_STANDING";
+    case "CONFLICT":
+      return state === "INDETERMINATE"
+        ? null
+        : "DET_STATE_INCOMPATIBLE_WITH_CONFLICT";
+    default:
+      return "DET_UNKNOWN_ENTITLEMENT_STANDING";
+  }
+}
+
 export function validateDeterminationBoundary(
   entitlement: PropositionEntitlement,
   determination: BoundedEnvironmentalDetermination,
@@ -95,9 +119,11 @@ export function validateDeterminationBoundary(
     reasons.push("DET_AUTHORITY_SCOPE_EXPANSION");
   }
 
-  if (entitlement.standing !== "ESTABLISHED") {
-    reasons.push(`ENT_STANDING_${entitlement.standing}`);
-  }
+  const standingStateFailure = validateStandingState(
+    entitlement.standing,
+    determination.state,
+  );
+  if (standingStateFailure) reasons.push(standingStateFailure);
 
   return { valid: reasons.length === 0, reasons: [...new Set(reasons)] };
 }
