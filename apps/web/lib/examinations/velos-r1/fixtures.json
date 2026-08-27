@@ -1,0 +1,137 @@
+{
+  "fixture_set": "TA14-VELOS-R1-VECT-FIXTURES-v0.1",
+  "status": "UNFROZEN — TECHNICAL FREEZE REQUIRED",
+  "notes": [
+    "These fixtures are TA-14-side R1 contract artifacts only.",
+    "They do not establish Velos runtime behavior or interoperability.",
+    "Epoch values are deterministic test values and must be interpreted under the frozen examination clock method."
+  ],
+  "f0_valid": {
+    "assertion_id": "urn:ta14:velos:r1:assertion:f0-valid",
+    "capability_token_fingerprint": "1111111111111111111111111111111111111111111111111111111111111111",
+    "target_binding": {
+      "protocol": "TCP",
+      "dst_ip": "192.0.2.10",
+      "dst_port": 8443,
+      "payload_binding_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "temporal_authority": {
+      "clock_source": "CLOCK_REALTIME",
+      "epoch_ts_micros": 1800000000000000,
+      "valid_for_micros": 60000000,
+      "max_skew_tolerance_micros": 5000
+    },
+    "idempotency_constraints": {
+      "nonce": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "max_allowed_retransmissions": 3,
+      "single_session_only": true
+    }
+  },
+  "f2_expired": {
+    "assertion_id": "urn:ta14:velos:r1:assertion:f2-expired",
+    "capability_token_fingerprint": "2222222222222222222222222222222222222222222222222222222222222222",
+    "target_binding": {
+      "protocol": "TCP",
+      "dst_ip": "192.0.2.10",
+      "dst_port": 8443,
+      "payload_binding_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "temporal_authority": {
+      "clock_source": "CLOCK_REALTIME",
+      "epoch_ts_micros": 1800000000000000,
+      "valid_for_micros": 1000000,
+      "max_skew_tolerance_micros": 5000
+    },
+    "idempotency_constraints": {
+      "nonce": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "max_allowed_retransmissions": 3,
+      "single_session_only": true
+    }
+  },
+  "f3_out_of_scope_target": {
+    "assertion_id": "urn:ta14:velos:r1:assertion:f3-target",
+    "capability_token_fingerprint": "3333333333333333333333333333333333333333333333333333333333333333",
+    "target_binding": {
+      "protocol": "TCP",
+      "dst_ip": "192.0.2.99",
+      "dst_port": 9443,
+      "payload_binding_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "temporal_authority": {
+      "clock_source": "CLOCK_REALTIME",
+      "epoch_ts_micros": 1800000000000000,
+      "valid_for_micros": 60000000,
+      "max_skew_tolerance_micros": 5000
+    },
+    "idempotency_constraints": {
+      "nonce": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "max_allowed_retransmissions": 3,
+      "single_session_only": true
+    }
+  },
+  "f7_malformed": {
+    "assertion_id": "",
+    "capability_token_fingerprint": "NOT_A_SHA256",
+    "target_binding": {
+      "protocol": "UDP",
+      "dst_ip": "",
+      "dst_port": 0,
+      "payload_binding_hash": "BAD"
+    },
+    "temporal_authority": {
+      "clock_source": "CLOCK_MONOTONIC",
+      "epoch_ts_micros": -1,
+      "valid_for_micros": 0,
+      "max_skew_tolerance_micros": 9999
+    },
+    "idempotency_constraints": {
+      "nonce": "BAD",
+      "max_allowed_retransmissions": 99,
+      "single_session_only": false
+    }
+  },
+  "f8_replay": {
+    "assertion_id": "urn:ta14:velos:r1:assertion:f8-replay",
+    "capability_token_fingerprint": "8888888888888888888888888888888888888888888888888888888888888888",
+    "target_binding": {
+      "protocol": "TCP",
+      "dst_ip": "192.0.2.10",
+      "dst_port": 8443,
+      "payload_binding_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "temporal_authority": {
+      "clock_source": "CLOCK_REALTIME",
+      "epoch_ts_micros": 1800000000000000,
+      "valid_for_micros": 60000000,
+      "max_skew_tolerance_micros": 5000
+    },
+    "idempotency_constraints": {
+      "nonce": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "max_allowed_retransmissions": 3,
+      "single_session_only": true
+    },
+    "challenge_instruction": "Present the same canonical VECT beyond the frozen allowed retransmission/session constraint."
+  },
+  "f9_clock_skew": {
+    "assertion_id": "urn:ta14:velos:r1:assertion:f9-skew",
+    "capability_token_fingerprint": "9999999999999999999999999999999999999999999999999999999999999999",
+    "target_binding": {
+      "protocol": "TCP",
+      "dst_ip": "192.0.2.10",
+      "dst_port": 8443,
+      "payload_binding_hash": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    "temporal_authority": {
+      "clock_source": "CLOCK_REALTIME",
+      "epoch_ts_micros": 1800000000010000,
+      "valid_for_micros": 60000000,
+      "max_skew_tolerance_micros": 5000
+    },
+    "idempotency_constraints": {
+      "nonce": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+      "max_allowed_retransmissions": 3,
+      "single_session_only": true
+    },
+    "challenge_instruction": "Freeze the Velos evaluation clock at least 10000 microseconds behind the carrier epoch reference so the declared 5000-microsecond skew tolerance is exceeded."
+  }
+}
