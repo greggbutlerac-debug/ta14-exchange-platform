@@ -163,6 +163,7 @@ end;
 $$;
 
 revoke all on table public.consequence_verification_admissibility from public, anon, authenticated;
+revoke execute on function public.consequence_record_independent_verification(text,text,uuid,text,text,text,jsonb,text,jsonb,text) from service_role;
 revoke all on function public.consequence_record_verification_admissibility(text,text,uuid,text,text,jsonb,jsonb,jsonb,jsonb,text,jsonb,jsonb,text) from public, anon, authenticated;
 revoke all on function public.consequence_record_independent_verification_v2(text,text,text,uuid,text,text,jsonb,jsonb,text,jsonb,text,jsonb,text) from public, anon, authenticated;
 grant execute on function public.consequence_record_verification_admissibility(text,text,uuid,text,text,jsonb,jsonb,jsonb,jsonb,text,jsonb,jsonb,text) to service_role;
