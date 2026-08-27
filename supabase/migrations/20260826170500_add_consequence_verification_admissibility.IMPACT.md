@@ -34,7 +34,9 @@ RLS is enabled. No anon/authenticated table privileges are granted.
 
 ### public.consequence_record_independent_verification_v2(...)
 - Requires an existing verifier-admissibility record.
-- Requires same run and same verifier identity.
+- Requires the same run and verifier UUID.
+- Requires verifier name and organization attribution to match the frozen admissibility record.
+- Requires the supplied accepted scope and replay boundary to exactly match the frozen admissibility record.
 - Permits verification recording only when admissibility is ADMISSIBLE or PARTIALLY_ADMISSIBLE.
 - Delegates final evidence recording to the existing independent-verification function.
 
@@ -54,3 +56,8 @@ Table access and function execution revoked from PUBLIC, anon, authenticated. Co
 
 ## Semantic boundary
 An admissible verifier is not thereby correct, and an independent verification does not become a new source determination. This layer establishes whether the verification evidence is eligible to be considered as separately attributable verification evidence; it cannot retrospectively modify the original examination, finding, seal, receipt, or Registry identity.
+
+
+## v2 boundary hardening
+
+The v2 function signature expressly receives the claimed accepted scope and replay boundary and refuses delegation when either differs from the frozen admissibility record. This prevents a verifier from obtaining standing for one bounded replay and recording a materially broader or different replay through the same admissibility identity.
