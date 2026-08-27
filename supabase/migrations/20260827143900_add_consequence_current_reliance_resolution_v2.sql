@@ -17,6 +17,7 @@ declare
   v_latest_lineage public.consequence_examination_lineage;
   v_open_challenges integer := 0;
   v_latest_reconsideration public.consequence_examination_reconsiderations;
+  v_lineage_resolution jsonb;
   v_current_run_id text;
   v_current_run_sha256 text;
   v_posture text;
@@ -52,6 +53,16 @@ begin
   from public.consequence_examination_seals
   where run_id=p_run_id;
 
+  if v_finding.id is null or v_seal.id is null then
+    return jsonb_build_object(
+      'run_id',p_run_id,
+      'registry_record_id',v_run.registry_record_id,
+      'registry_version_record_id',v_run.registry_version_record_id,
+      'reliance_posture','NOT_RELIANCE_ELIGIBLE',
+      'reason','SEALED_EXAMINATION_MISSING_FINDING_OR_SEAL'
+    );
+  end if;
+
   select count(*) into v_open_challenges
   from public.consequence_examination_challenges
   where run_id=p_run_id and status in ('OPEN','UNDER_RECONSIDERATION');
@@ -69,10 +80,23 @@ begin
   limit 1;
 
   if v_latest_lineage.id is not null then
-    v_current_run_id:=v_latest_lineage.successor_run_id;
-    v_current_run_sha256:=v_latest_lineage.successor_run_sha256;
+    v_lineage_resolution:=public.consequence_resolve_lineage_head(p_run_id);
+    if v_lineage_resolution->>'status' <> 'RESOLVED' then
+      return jsonb_build_object(
+        'run_id',p_run_id,
+        'registry_record_id',v_run.registry_record_id,
+        'registry_version_record_id',v_run.registry_version_record_id,
+        'reliance_posture','RELIANCE_UNRESOLVED',
+        'reason',v_lineage_resolution->>'status',
+        'lineage_resolution',v_lineage_resolution
+      );
+    end if;
+    v_current_run_id:=v_lineage_resolution->>'lineage_head_run_id';
+    select run_sha256 into v_current_run_sha256
+    from public.consequence_examination_runs
+    where run_id=v_current_run_id;
     v_posture:='SUPERSEDED';
-    v_reason:='A separately sealed successor examination is the later reliance object.';
+    v_reason:='The resolved head of the separately sealed supersession lineage is the later reliance object.';
   elsif v_latest_reconsideration.id is not null and v_latest_reconsideration.determination='SUPERSEDING_EXAMINATION_REQUIRED' then
     v_current_run_id:=p_run_id;
     v_current_run_sha256:=v_run.run_sha256;
@@ -112,6 +136,7 @@ begin
     'latest_reconsideration_id',v_latest_reconsideration.reconsideration_id,
     'latest_reconsideration_determination',v_latest_reconsideration.determination,
     'supersession_lineage_id',v_latest_lineage.lineage_id,
+    'lineage_resolution',v_lineage_resolution,
     'semantic_boundary','This function derives current reliance posture from preserved historical records. It does not amend, revoke, erase, or rewrite any examination, finding, seal, receipt, challenge, reconsideration, lineage object, or Registry identity.'
   );
 end;
@@ -176,3 +201,5 @@ revoke all on function public.consequence_resolve_current_reliance(text) from pu
 revoke all on function public.consequence_resolve_lineage_head(text) from public, anon, authenticated;
 grant execute on function public.consequence_resolve_current_reliance(text) to service_role;
 grant execute on function public.consequence_resolve_lineage_head(text) to service_role;
+
+
