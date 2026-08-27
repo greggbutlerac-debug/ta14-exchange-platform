@@ -19,7 +19,6 @@ Stores:
 
 ## Indexes created
 - consequence_examination_lineage_pair_uq
-- consequence_examination_lineage_source_supersedes_uq — partial unique index allowing only one `SUPERSEDES` successor per source run
 - consequence_examination_lineage_source_idx
 - consequence_examination_lineage_successor_idx
 
@@ -32,8 +31,6 @@ Stores:
 - Both examinations must already be SEALED and have run_sha256.
 - Both must bind to the exact same existing Registry architecture/version.
 - SUPERSEDES requires a reconsideration whose determination is SUPERSEDING_EXAMINATION_REQUIRED and whose declared successor is the exact successor run.
-- A source examination may have only one `SUPERSEDES` successor.
-- A proposed `SUPERSEDES` relationship is refused if it would create a cycle through the existing supersession chain.
 - Lineage evidence must match its supplied TA14-CES-v1 SHA-256.
 - Recording lineage appends an EXAMINATION_LINEAGE event to source chronology; it does not update the source examination.
 
