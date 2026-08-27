@@ -1,7 +1,7 @@
 import {
  establishPropositionEntitlement,
  type PropositionEntitlement,
-} from '../../../lib/environmental-governance/proposition-entitlement';
+} from '../../../../lib/environmental-governance/proposition-entitlement';
 
 export type ReadinessState = 'NOT_YET_GOVERNED' | 'PARTIALLY_GOVERNABLE' | 'READY_FOR_ADMISSIBILITY_REVIEW' | 'ADMISSIBLE_FOR_DECLARED_INTERPRETATION' | 'INSUFFICIENT_OR_INCONCLUSIVE';
 export type ReadinessFinding = { id:string; label:string; status:'ESTABLISHED'|'PARTIAL'|'MISSING'|'CONFLICT'|'NOT_APPLICABLE'; detail:string; evidence:string[] };
