@@ -162,7 +162,14 @@ begin
 
   select * into v_challenge from public.consequence_examination_challenges where challenge_id=p_challenge_id for update;
   if v_challenge.id is null or v_challenge.status='RESOLVED' then raise exception 'Open challenge required'; end if;
-  select * into v_run from public.consequence_examination_runs where run_id=v_challenge.run_id;
+  select * into v_run
+  from public.consequence_examination_runs
+  where run_id=v_challenge.run_id
+  for update;
+
+  if v_run.id is null or v_run.status<>'SEALED' or v_run.run_sha256 is null then
+    raise exception 'Reconsideration requires the preserved sealed source examination';
+  end if;
 
   if p_determination='SUPERSEDING_EXAMINATION_REQUIRED' then
     if p_superseding_run_id is null then raise exception 'Superseding run is required'; end if;
