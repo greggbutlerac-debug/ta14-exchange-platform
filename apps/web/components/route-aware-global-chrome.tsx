@@ -9,8 +9,9 @@ import { AtlasEnvironmentalIntegrityFundStrip } from './atlas-environmental-inte
 export function RouteAwareGlobalChrome() {
   const pathname = usePathname();
   const isTransparentAir = pathname === '/transparent-air' || pathname.startsWith('/transparent-air/');
+  const isPrivateEnvironmentalGateway = pathname === '/admin/environmental-evidence-gateway' || pathname.startsWith('/admin/environmental-evidence-gateway/');
 
-  if (isTransparentAir) return null;
+  if (isTransparentAir || isPrivateEnvironmentalGateway) return null;
 
   return (
     <>

@@ -9,43 +9,111 @@ export default function EnvironmentalEvidenceGatewayPage() {
   const now = new Date();
   const observations = buildDemoObservations(now);
   const authority: AuthorityObject = {
-    authorityId: 'AUTH-VENT-001',
-    issuer: 'TA-14 PRIVATE R1 DEMONSTRATION',
-    subject: 'DECLARED OPERATOR',
-    zoneScope: 'declared-zone-01',
-    permittedConsequence: 'ventilation_increase_only',
-    effectiveAt: new Date(now.getTime() - 3600000).toISOString(),
-    expiresAt: new Date(now.getTime() + 3600000).toISOString(),
-    revocationState: 'ACTIVE',
-    sourceReference: 'PRIVATE-R1-DEMO-AUTHORITY',
+    authorityId: 'AUTH-VENT-001', issuer: 'TA-14 PRIVATE R1 DEMONSTRATION', subject: 'DECLARED OPERATOR',
+    zoneScope: 'declared-zone-01', permittedConsequence: 'ventilation_increase_only',
+    effectiveAt: new Date(now.getTime() - 3600000).toISOString(), expiresAt: new Date(now.getTime() + 3600000).toISOString(),
+    revocationState: 'ACTIVE', sourceReference: 'PRIVATE-R1-DEMO-AUTHORITY',
   };
   const result = evaluateGateway({ observations, policy, authority, consequence: 'ventilation_increase_only', now: now.toISOString() });
   const conformance = summarizeEnvironmentalGatewayConformance(now);
   const latest = observations.at(-1)!;
-  const receiptSeed = {
-    record_id: result.recordId,
-    replay_id: result.receipt.replayId,
-    evidence_hash: result.receipt.evidenceHash,
-    determination_hash: result.receipt.hash,
-    determination: result.determination,
-    receipt_payload: result.receipt.payload,
-  };
+  const receiptSeed = { record_id: result.recordId, replay_id: result.receipt.replayId, evidence_hash: result.receipt.evidenceHash, determination_hash: result.receipt.hash, determination: result.determination, receipt_payload: result.receipt.payload };
 
-  return <main style={{maxWidth:1180,margin:'0 auto',padding:'48px 24px 80px',fontFamily:'Arial,sans-serif',color:'#17212b'}}>
-    <div style={{fontSize:12,letterSpacing:2,fontWeight:700}}>TA-14 AUTHORITY · PRIVATE OWNER CONSOLE</div>
-    <h1 style={{fontSize:42,margin:'12px 0 4px'}}>Environmental Evidence Gateway</h1>
-    <div style={{fontSize:20,color:'#59636e'}}>HibouAir Reference Implementation · R1 private build</div>
-    <div style={{marginTop:22,border:'1px solid #9d7c35',padding:18,background:'#fffdf7'}}><strong>PRIVATE / NOT PUBLIC.</strong> Simulated HibouAir-format observations only. No HibouAir credentials, equipment execution authority, Registry publication, or public showcase.</div>
-    <section style={{marginTop:34}}><h2>Live Evidence / Governed Reliance</h2><div style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:14}}><Card title="Environmental evidence"><p>CO₂: <b>{latest.measurements.co2Ppm} ppm</b></p><p>PM2.5: <b>{latest.measurements.pm25UgM3} µg/m³</b></p><p>VOC: <b>{latest.measurements.voc}</b></p><p>Temperature: <b>{latest.measurements.temperatureC} °C</b> · RH: <b>{latest.measurements.rhPct}%</b></p><p>Source: <b>{latest.source.deviceId}</b> · Zone: <b>{latest.zone}</b></p></Card><Card title="Governed reliance"><p>R1A admissibility: <b>{result.admissibility}</b></p><p>Continuity: <b>{result.continuity}</b></p><p>Authority: <b>{result.authorityStatus}</b></p><p>Binding: <b>{result.bindingScope ?? 'NONE'}</b></p><p style={{fontSize:28}}>R1B: <b>{result.determination}</b></p></Card></div></section>
-    <section style={{marginTop:34}}><h2>Cryptographic receipt / replay</h2><table style={{width:'100%',borderCollapse:'collapse'}}><tbody><Row k="Algorithm" v={result.receipt.algorithm}/><Row k="Canonical receipt" v={result.receipt.canonicalVersion}/><Row k="Evidence SHA-256" v={result.receipt.evidenceHash}/><Row k="Determination SHA-256" v={result.receipt.hash}/><Row k="Replay ID" v={result.receipt.replayId}/></tbody></table><p style={{color:'#59636e'}}>The receipt is derived server-side from canonicalized evidence and governed determination inputs. Identical evidence and inputs reproduce the same digest; changed evidence produces a different receipt.</p></section>
-    <ReceiptLedger seed={receiptSeed} />
-    <section style={{marginTop:34}}><h2>Preserved AIR specimen</h2><table style={{width:'100%',borderCollapse:'collapse'}}><tbody><Row k="Record" v={result.recordId}/><Row k="Proposition" v="Can the preserved environmental record support ventilation_increase_only under the declared authority?"/><Row k="Authority object" v={`${authority.authorityId} · ${authority.zoneScope} · ${authority.revocationState}`}/><Row k="Determination" v={result.determination}/><Row k="Reason codes" v={result.reasonCodes.join(' · ')}/><Row k="Valid until" v={result.validUntil ?? 'No current standing'}/><Row k="Non-claims" v={result.limitations.join(' · ')}/></tbody></table></section>
-    <section style={{marginTop:34}}><h2>R1 Conformance Suite · {conformance.overall}</h2><p><b>{conformance.passed}/{conformance.total}</b> bounded scenarios match their expected fail-closed determination.</p><table style={{width:'100%',borderCollapse:'collapse'}}><thead><tr><th style={head}>ID</th><th style={head}>Scenario</th><th style={head}>Expected</th><th style={head}>Actual</th><th style={head}>Status</th></tr></thead><tbody>{conformance.scenarios.map(s => <tr key={s.id}><td style={cell}>{s.id}</td><td style={cell}>{s.name}</td><td style={cell}>{s.expected}</td><td style={cell}>{s.actual}</td><td style={cell}><b>{s.pass ? 'PASS' : 'FAIL'}</b></td></tr>)}</tbody></table></section>
-    <section style={{marginTop:34}}><h2>R1 build status</h2><p><b>Implemented:</b> canonical observation model, continuity policy, authority object, binding check, determination logic, reason codes, AIR specimen, SHA-256 canonical receipt/replay identity, owner-only Exchange surface, private 12-scenario conformance harness, and owner-scoped durable receipt preservation/replay verification.</p><p><b>Still intentionally absent:</b> live HibouAir API adapter, equipment execution, public navigation, Registry publication, or public showcase.</p><p><b>Next gate:</b> verify the durable private ledger in deployed production, then prepare the bounded live HibouAir adapter without opening any public Exchange surface.</p></section>
+  return <main style={shell}>
+    <header style={hero}>
+      <div style={{display:'flex',justifyContent:'space-between',gap:20,alignItems:'flex-start',flexWrap:'wrap'}}>
+        <div>
+          <div style={eyebrow}>TA-14 AUTHORITY · PRIVATE OWNER CONSOLE</div>
+          <h1 style={{fontSize:'clamp(34px,5vw,58px)',lineHeight:1.02,margin:'12px 0 10px',letterSpacing:'-0.035em'}}>Environmental Evidence Gateway</h1>
+          <p style={{fontSize:19,margin:0,color:'#aebbd0'}}>HibouAir Reference Implementation · R1 private build</p>
+        </div>
+        <div style={privateBadge}>PRIVATE · OWNER ONLY</div>
+      </div>
+      <p style={{maxWidth:820,color:'#cad4e3',lineHeight:1.65,margin:'26px 0 0'}}>A private execution workspace for testing when environmental observations become admissible evidence and when that evidence may support a bounded consequence. Current observations are simulated HibouAir-format data only.</p>
+      <div style={flow}><Flow label="Environment"/><Arrow/><Flow label="Evidence"/><Arrow/><Flow label="R1A"/><Arrow/><Flow label="Authority"/><Arrow/><Flow label="R1B"/><Arrow/><Flow label="Receipt"/></div>
+    </header>
+
+    <section style={section}>
+      <SectionHead kicker="CURRENT RUN" title="Environmental evidence → governed reliance" note={`Record ${result.recordId}`} />
+      <div style={twoCol}>
+        <article style={panel}>
+          <div style={panelLabel}>ENVIRONMENTAL EVIDENCE</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:12,marginTop:18}}>
+            <Metric label="CO₂" value={`${latest.measurements.co2Ppm}`} unit="ppm" />
+            <Metric label="PM2.5" value={`${latest.measurements.pm25UgM3}`} unit="µg/m³" />
+            <Metric label="VOC" value={`${latest.measurements.voc}`} unit="index" />
+            <Metric label="Relative humidity" value={`${latest.measurements.rhPct}`} unit="%" />
+          </div>
+          <div style={metaGrid}><Meta label="Temperature" value={`${latest.measurements.temperatureC} °C`}/><Meta label="Source" value={latest.source.deviceId}/><Meta label="Zone" value={latest.zone}/><Meta label="Observed" value={new Date(latest.observedAt).toLocaleTimeString()}/></div>
+        </article>
+
+        <article style={{...panel,border:'1px solid #b9d7c2'}}>
+          <div style={panelLabel}>GOVERNED RELIANCE</div>
+          <div style={{display:'flex',justifyContent:'space-between',alignItems:'end',gap:18,marginTop:16}}><div><div style={{fontSize:13,color:'#667085'}}>R1B determination</div><div style={{fontSize:46,fontWeight:850,letterSpacing:'-0.04em',marginTop:2}}>{result.determination}</div></div><span style={statusPill}>{result.continuity}</span></div>
+          <div style={decisionGrid}><Decision label="R1A admissibility" value={result.admissibility}/><Decision label="Continuity" value={result.continuity}/><Decision label="Authority" value={result.authorityStatus}/><Decision label="Binding scope" value={result.bindingScope ?? 'NONE'}/></div>
+          <div style={boundaryNote}><b>Bounded consequence:</b> ventilation increase only. No diagnosis, no compliance certification, no future-condition certification.</div>
+        </article>
+      </div>
+    </section>
+
+    <section style={section}>
+      <SectionHead kicker="PROOF" title="Cryptographic receipt & replay" note="Canonical server-side receipt" />
+      <div style={{...panel,padding:0,overflow:'hidden'}}>
+        <div style={{display:'grid',gridTemplateColumns:'minmax(0,1fr) minmax(0,1fr)',gap:0}}>
+          <Proof label="Evidence SHA-256" value={result.receipt.evidenceHash}/><Proof label="Determination SHA-256" value={result.receipt.hash}/><Proof label="Replay ID" value={result.receipt.replayId}/><Proof label="Canonical format" value={`${result.receipt.canonicalVersion} · ${result.receipt.algorithm}`}/>
+        </div>
+      </div>
+      <ReceiptLedger seed={receiptSeed} />
+    </section>
+
+    <section style={section}>
+      <SectionHead kicker="GOVERNED RECORD" title="Atmospheric Integrity Record specimen" note="R1 bounded demonstration" />
+      <div style={recordCard}>
+        <div style={{display:'flex',justifyContent:'space-between',gap:20,flexWrap:'wrap',alignItems:'center'}}><div><div style={panelLabel}>AIR RECORD</div><div style={{fontSize:25,fontWeight:800,marginTop:6}}>{result.recordId}</div></div><div style={{...statusPill,fontSize:15,padding:'8px 13px'}}>{result.determination}</div></div>
+        <div style={recordRows}><RecordRow label="Proposition" value="Can the preserved environmental record support ventilation_increase_only under the declared authority?"/><RecordRow label="Authority" value={`${authority.authorityId} · ${authority.zoneScope} · ${authority.revocationState}`}/><RecordRow label="Reason codes" value={result.reasonCodes.join(' · ')}/><RecordRow label="Standing until" value={result.validUntil ?? 'No current standing'}/><RecordRow label="Non-claims" value={result.limitations.join(' · ')}/></div>
+      </div>
+    </section>
+
+    <section style={section}>
+      <SectionHead kicker="VERIFICATION" title={`R1 conformance suite · ${conformance.overall}`} note={`${conformance.passed}/${conformance.total} expected determinations matched`} />
+      <div style={suiteSummary}><div style={{fontSize:42,fontWeight:850}}>{conformance.passed}/{conformance.total}</div><div><b>Fail-closed scenarios verified.</b><br/><span style={{color:'#667085'}}>Healthy, stale, missing/revoked/expired authority, scope mismatch, continuity failure, source change, quality fault, and deterministic replay.</span></div></div>
+      <details style={details}><summary style={summary}>Inspect all 12 conformance scenarios</summary><div style={{overflowX:'auto',marginTop:16}}><table style={{width:'100%',borderCollapse:'collapse',minWidth:720}}><thead><tr><th style={head}>ID</th><th style={head}>Scenario</th><th style={head}>Expected</th><th style={head}>Actual</th><th style={head}>Status</th></tr></thead><tbody>{conformance.scenarios.map(s=><tr key={s.id}><td style={cell}>{s.id}</td><td style={cell}>{s.name}</td><td style={cell}>{s.expected}</td><td style={cell}>{s.actual}</td><td style={cell}><b>{s.pass?'PASS':'FAIL'}</b></td></tr>)}</tbody></table></div></details>
+    </section>
+
+    <section style={section}>
+      <SectionHead kicker="BUILD STATE" title="Private R1 readiness" note="Not connected to HibouAir" />
+      <div style={twoCol}><div style={panel}><div style={panelLabel}>IMPLEMENTED</div><p style={bodyText}>Observation normalization, continuity, authority, binding, four-state determination, AIR specimen, SHA-256 receipt/replay, owner-only access, durable private preservation, replay verification, and 12-scenario conformance.</p></div><div style={panel}><div style={panelLabel}>INTENTIONALLY ABSENT</div><p style={bodyText}>Live HibouAir API credentials, equipment execution, public navigation, Registry publication, and public showcase.</p><div style={nextGate}><b>Next gate</b><br/>Preserve and independently verify the first production receipt, then freeze the least-privilege live HibouAir adapter contract.</div></div></div>
+    </section>
   </main>;
 }
 
-const head = {textAlign:'left' as const,padding:10,border:'1px solid #d8dde3',background:'#17212b',color:'#fff'};
-const cell = {padding:10,border:'1px solid #d8dde3'};
-function Card({title,children}:{title:string;children:React.ReactNode}) { return <div style={{border:'1px solid #d8dde3',padding:22,background:'#fff'}}><h3 style={{marginTop:0}}>{title}</h3>{children}</div>; }
-function Row({k,v}:{k:string;v:string}) { return <tr><th style={{textAlign:'left',verticalAlign:'top',width:190,padding:12,border:'1px solid #d8dde3',background:'#f5f7f9'}}>{k}</th><td style={{padding:12,border:'1px solid #d8dde3',wordBreak:'break-all'}}>{v}</td></tr>; }
+const shell:React.CSSProperties={maxWidth:1220,margin:'0 auto',padding:'34px 22px 90px',fontFamily:'Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',color:'#17212b'};
+const hero:React.CSSProperties={background:'linear-gradient(135deg,#101b2b,#17283e)',color:'#fff',borderRadius:24,padding:'34px clamp(22px,4vw,46px)',boxShadow:'0 18px 50px rgba(15,23,42,.14)'};
+const eyebrow:React.CSSProperties={fontSize:11,letterSpacing:'0.16em',fontWeight:800,color:'#8fa7c8'};
+const privateBadge:React.CSSProperties={fontSize:12,fontWeight:800,letterSpacing:'.08em',padding:'9px 12px',border:'1px solid rgba(255,255,255,.22)',borderRadius:999,background:'rgba(255,255,255,.07)'};
+const flow:React.CSSProperties={display:'flex',alignItems:'center',gap:8,flexWrap:'wrap',marginTop:30};
+const section:React.CSSProperties={marginTop:34};
+const twoCol:React.CSSProperties={display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(330px,1fr))',gap:18};
+const panel:React.CSSProperties={background:'#fff',border:'1px solid #e2e8f0',borderRadius:18,padding:24,boxShadow:'0 8px 28px rgba(15,23,42,.055)'};
+const panelLabel:React.CSSProperties={fontSize:11,letterSpacing:'.14em',fontWeight:800,color:'#64748b'};
+const metaGrid:React.CSSProperties={display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:12,marginTop:18,paddingTop:18,borderTop:'1px solid #edf0f4'};
+const decisionGrid:React.CSSProperties={display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:10,marginTop:20};
+const statusPill:React.CSSProperties={background:'#ecf8ef',color:'#256239',border:'1px solid #cce8d4',padding:'6px 10px',borderRadius:999,fontSize:12,fontWeight:800};
+const boundaryNote:React.CSSProperties={marginTop:18,padding:14,borderRadius:12,background:'#f7f9fc',fontSize:13,lineHeight:1.55,color:'#475569'};
+const recordCard:React.CSSProperties={...panel,borderLeft:'5px solid #18375b'};
+const recordRows:React.CSSProperties={marginTop:22,borderTop:'1px solid #e8edf3'};
+const suiteSummary:React.CSSProperties={display:'flex',gap:22,alignItems:'center',background:'#eef8f1',border:'1px solid #d3ead9',borderRadius:18,padding:22};
+const details:React.CSSProperties={marginTop:14,background:'#fff',border:'1px solid #e2e8f0',borderRadius:16,padding:'16px 18px'};
+const summary:React.CSSProperties={cursor:'pointer',fontWeight:750,color:'#26384d'};
+const head:React.CSSProperties={textAlign:'left',padding:'11px 12px',borderBottom:'1px solid #d9e1ea',background:'#f6f8fb',fontSize:12,color:'#526071'};
+const cell:React.CSSProperties={padding:'11px 12px',borderBottom:'1px solid #edf0f4',fontSize:13};
+const bodyText:React.CSSProperties={color:'#526071',lineHeight:1.7,margin:'13px 0 0'};
+const nextGate:React.CSSProperties={marginTop:18,padding:14,borderRadius:12,background:'#f4f7fb',lineHeight:1.55,color:'#334155'};
+function SectionHead({kicker,title,note}:{kicker:string;title:string;note:string}){return <div style={{display:'flex',justifyContent:'space-between',alignItems:'end',gap:20,flexWrap:'wrap',marginBottom:14}}><div><div style={eyebrow}>{kicker}</div><h2 style={{fontSize:27,letterSpacing:'-.02em',margin:'6px 0 0'}}>{title}</h2></div><div style={{fontSize:12,color:'#7b8798'}}>{note}</div></div>}
+function Flow({label}:{label:string}){return <span style={{fontSize:12,fontWeight:750,padding:'8px 11px',borderRadius:999,background:'rgba(255,255,255,.08)',border:'1px solid rgba(255,255,255,.12)'}}>{label}</span>}
+function Arrow(){return <span style={{color:'#7891b2'}}>→</span>}
+function Metric({label,value,unit}:{label:string;value:string;unit:string}){return <div style={{background:'#f7f9fc',borderRadius:14,padding:15}}><div style={{fontSize:12,color:'#6b7788'}}>{label}</div><div style={{fontSize:28,fontWeight:800,marginTop:4}}>{value} <span style={{fontSize:12,fontWeight:600,color:'#7b8798'}}>{unit}</span></div></div>}
+function Meta({label,value}:{label:string;value:string}){return <div><div style={{fontSize:11,color:'#8a96a5'}}>{label}</div><div style={{fontSize:13,fontWeight:700,marginTop:3,wordBreak:'break-word'}}>{value}</div></div>}
+function Decision({label,value}:{label:string;value:string}){return <div style={{border:'1px solid #e4eaf0',borderRadius:12,padding:12}}><div style={{fontSize:11,color:'#7b8798'}}>{label}</div><div style={{fontWeight:800,marginTop:4,wordBreak:'break-word'}}>{value}</div></div>}
+function Proof({label,value}:{label:string;value:string}){return <div style={{padding:20,borderBottom:'1px solid #edf0f4',borderRight:'1px solid #edf0f4'}}><div style={{fontSize:11,color:'#7b8798'}}>{label}</div><div style={{fontFamily:'ui-monospace,SFMono-Regular,Menlo,monospace',fontSize:12,fontWeight:700,marginTop:7,wordBreak:'break-all',lineHeight:1.5}}>{value}</div></div>}
+function RecordRow({label,value}:{label:string;value:string}){return <div style={{display:'grid',gridTemplateColumns:'150px 1fr',gap:16,padding:'14px 0',borderBottom:'1px solid #edf0f4'}}><div style={{fontSize:12,color:'#7b8798'}}>{label}</div><div style={{fontSize:13,fontWeight:650,lineHeight:1.55,wordBreak:'break-word'}}>{value}</div></div>}
