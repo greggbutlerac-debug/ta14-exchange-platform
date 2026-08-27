@@ -118,6 +118,8 @@ create or replace function public.consequence_record_independent_verification_v2
   p_verifier_user_id uuid,
   p_verifier_name text,
   p_verifier_organization text,
+  p_accepted_scope jsonb,
+  p_replay_boundary jsonb,
   p_verification_method text,
   p_replay_environment jsonb,
   p_verification_result text,
@@ -139,6 +141,16 @@ begin
   if v_adm.id is null then raise exception 'Frozen verifier admissibility record is required'; end if;
   if v_adm.run_id <> p_run_id then raise exception 'Admissibility record belongs to another run'; end if;
   if v_adm.verifier_user_id <> p_verifier_user_id then raise exception 'Verifier identity does not match admissibility record'; end if;
+  if v_adm.verifier_name is distinct from p_verifier_name
+     or v_adm.verifier_organization is distinct from p_verifier_organization then
+    raise exception 'Verifier attribution does not match admissibility record';
+  end if;
+  if v_adm.accepted_scope is distinct from p_accepted_scope then
+    raise exception 'Verification scope does not match frozen admissibility scope';
+  end if;
+  if v_adm.replay_boundary is distinct from p_replay_boundary then
+    raise exception 'Replay boundary does not match frozen admissibility boundary';
+  end if;
   if v_adm.admissibility_determination not in ('ADMISSIBLE','PARTIALLY_ADMISSIBLE') then
     raise exception 'Verifier is not admissible for independent verification';
   end if;
@@ -152,6 +164,6 @@ $$;
 
 revoke all on table public.consequence_verification_admissibility from public, anon, authenticated;
 revoke all on function public.consequence_record_verification_admissibility(text,text,uuid,text,text,jsonb,jsonb,jsonb,jsonb,text,jsonb,jsonb,text) from public, anon, authenticated;
-revoke all on function public.consequence_record_independent_verification_v2(text,text,text,uuid,text,text,text,jsonb,text,jsonb,text) from public, anon, authenticated;
+revoke all on function public.consequence_record_independent_verification_v2(text,text,text,uuid,text,text,jsonb,jsonb,text,jsonb,text,jsonb,text) from public, anon, authenticated;
 grant execute on function public.consequence_record_verification_admissibility(text,text,uuid,text,text,jsonb,jsonb,jsonb,jsonb,text,jsonb,jsonb,text) to service_role;
-grant execute on function public.consequence_record_independent_verification_v2(text,text,text,uuid,text,text,text,jsonb,text,jsonb,text) to service_role;
+grant execute on function public.consequence_record_independent_verification_v2(text,text,text,uuid,text,text,jsonb,jsonb,text,jsonb,text,jsonb,text) to service_role;
