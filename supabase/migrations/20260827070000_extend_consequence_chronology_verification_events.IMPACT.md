@@ -1,4 +1,4 @@
-# 20260827070000 — Consequence Chronology Verification Events
+# 20260827070000 — Consequence Chronology Post-Examination Events
 
 **Status:** STAGED ON `atlas/consequence-chronology-hardening` / NOT EXECUTED IN SUPABASE
 
@@ -29,15 +29,32 @@ None created, replaced, or removed.
 
 - `INDEPENDENT_VERIFICATION`
 - `VERIFIER_ADMISSIBILITY`
+- `CHALLENGE_SUBMITTED`
+- `RECONSIDERATION_ISSUED`
 - `EXAMINATION_LINEAGE`
 
 ## Existing event kinds preserved
 
 `TECHNICAL_FREEZE`, `RUN_OPENED`, `S0`–`S7`, `FINDING`, `SEALED`, `RECEIPT_PUBLISHED`, `VOIDED`.
 
-## Why all three are included
+## Why all five are included
 
-The independent-verification implementation appends `INDEPENDENT_VERIFICATION`; the staged Verification Admissibility architecture appends `VERIFIER_ADMISSIBILITY`; and the staged supersession-lineage architecture appends `EXAMINATION_LINEAGE`. The live chronology constraint predates those institutional layers.
+- The live independent-verification implementation appends `INDEPENDENT_VERIFICATION`.
+- Verification Admissibility appends `VERIFIER_ADMISSIBILITY`.
+- Challenge/Reconsideration appends `CHALLENGE_SUBMITTED` and `RECONSIDERATION_ISSUED`.
+- Supersession Lineage appends `EXAMINATION_LINEAGE`.
+
+The live chronology constraint predates all five post-examination institutional event types.
+
+## Execution dependency
+
+This migration must execute before:
+
+1. `20260826170500_add_consequence_verification_admissibility.sql`
+2. `20260826172000_add_consequence_challenge_reconsideration.sql`
+3. `20260827065000_add_consequence_supersession_lineage.sql`
+
+The existing independent-verification function is already live but cannot successfully append its chronology event until this grammar repair is applied.
 
 ## Execution
 
