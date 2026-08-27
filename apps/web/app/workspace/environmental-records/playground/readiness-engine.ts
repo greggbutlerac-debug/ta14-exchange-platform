@@ -62,7 +62,7 @@ export function examineEnvironmentalReadiness(input:{text:string;inspectionObjec
  const closure=affirmative(lower,/(closure record id:\s*\S[\s\S]{0,500}(record state:\s*closed|closure time)/i,/(closure.{0,60}(not performed|missing|absent))/i);
  const chain=[changed,validation,authorityPositive&&!authorityAbsent,binding,revalidation,commit,execution,outcome,closure];
  const chainCount=chain.filter(Boolean).length;
- const interventionStatus:ReadinessFinding['status']=chainCount>=8?'ESTABLISHED':chainCount>=4?'PARTIAL':'MISSING';
+ const interventionStatus:ReadinessFinding['status']=chainCount===9?'ESTABLISHED':chainCount>=4?'PARTIAL':'MISSING';
  const chainLabels=['changed condition','pre-execution validation','authority','binding','pre-commit revalidation','commit','execution','outcome','closure'];
  const missingChain=chainLabels.filter((_,i)=>!chain[i]);
  add('intervention_chain','Governed change / intervention chain',interventionStatus,interventionStatus==='ESTABLISHED'?'The submitted package independently evidences a bounded changed-condition-to-closure intervention chronology.':interventionStatus==='PARTIAL'?`A governed intervention chronology is present but incomplete. Unresolved links: ${missingChain.join(', ')}.`:'A governed changed-condition, authority, execution, and outcome chronology is not established.',/(changed condition id|validation id|authority record id|binding record id|revalidation determination|commit record id|execution event id|outcome record id|closure record id)/i);
