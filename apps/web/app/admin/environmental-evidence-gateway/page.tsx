@@ -1,63 +1,39 @@
 import { buildDemoObservations, evaluateGateway, type AuthorityObject } from '@/lib/environmental-evidence-gateway';
+import { summarizeEnvironmentalGatewayConformance } from '@/lib/environmental-evidence-gateway-conformance';
 
 export const dynamic = 'force-dynamic';
-
 const policy = { maxSampleAgeSeconds: 60, maxGapSeconds: 120, minimumContinuityWindowSeconds: 600 };
 
 export default function EnvironmentalEvidenceGatewayPage() {
   const now = new Date();
   const observations = buildDemoObservations(now);
-  const authority: AuthorityObject = {
-    authorityId: 'AUTH-VENT-001', issuer: 'TA-14 PRIVATE R1 DEMONSTRATION', subject: 'DECLARED OPERATOR',
-    zoneScope: 'declared-zone-01', permittedConsequence: 'ventilation_increase_only',
-    effectiveAt: new Date(now.getTime() - 3_600_000).toISOString(), expiresAt: new Date(now.getTime() + 3_600_000).toISOString(),
-    revocationState: 'ACTIVE', sourceReference: 'PRIVATE-R1-DEMO-AUTHORITY',
-  };
+  const authority: AuthorityObject = { authorityId: 'AUTH-VENT-001', issuer: 'TA-14 PRIVATE R1 DEMONSTRATION', subject: 'DECLARED OPERATOR', zoneScope: 'declared-zone-01', permittedConsequence: 'ventilation_increase_only', effectiveAt: new Date(now.getTime() - 3_600_000).toISOString(), expiresAt: new Date(now.getTime() + 3_600_000).toISOString(), revocationState: 'ACTIVE', sourceReference: 'PRIVATE-R1-DEMO-AUTHORITY' };
   const result = evaluateGateway({ observations, policy, authority, consequence: 'ventilation_increase_only', now: now.toISOString() });
+  const conformance = summarizeEnvironmentalGatewayConformance(now);
   const latest = observations.at(-1)!;
 
-  return (
-    <main style={{ maxWidth: 1180, margin: '0 auto', padding: '48px 24px 80px', fontFamily: 'Arial, sans-serif', color: '#17212b' }}>
-      <div style={{ fontSize: 12, letterSpacing: 2, fontWeight: 700 }}>TA-14 AUTHORITY · PRIVATE OWNER CONSOLE</div>
-      <h1 style={{ fontSize: 42, margin: '12px 0 4px' }}>Environmental Evidence Gateway</h1>
-      <div style={{ fontSize: 20, color: '#59636e' }}>HibouAir Reference Implementation · R1 private build</div>
-      <div style={{ marginTop: 22, border: '1px solid #9d7c35', padding: 18, background: '#fffdf7' }}>
-        <strong>PRIVATE / NOT PUBLIC.</strong> This surface uses simulated HibouAir-format observations only. It is not connected to HibouAir, does not hold HibouAir credentials, and has no equipment execution authority.
-      </div>
+  return <main style={{maxWidth:1180,margin:'0 auto',padding:'48px 24px 80px',fontFamily:'Arial, sans-serif',color:'#17212b'}}>
+    <div style={{fontSize:12,letterSpacing:2,fontWeight:700}}>TA-14 AUTHORITY · PRIVATE OWNER CONSOLE</div>
+    <h1 style={{fontSize:42,margin:'12px 0 4px'}}>Environmental Evidence Gateway</h1>
+    <div style={{fontSize:20,color:'#59636e'}}>HibouAir Reference Implementation · R1 private build</div>
+    <div style={{marginTop:22,border:'1px solid #9d7c35',padding:18,background:'#fffdf7'}}><strong>PRIVATE / NOT PUBLIC.</strong> Simulated HibouAir-format observations only. No HibouAir credentials, equipment execution authority, Registry publication, or public showcase.</div>
 
-      <section style={{ marginTop: 34 }}>
-        <h2>Live Evidence / Governed Reliance</h2>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, minmax(0, 1fr))', gap: 14 }}>
-          <Card title="Environmental evidence">
-            <p>CO₂: <b>{latest.measurements.co2Ppm} ppm</b></p><p>PM2.5: <b>{latest.measurements.pm25UgM3} µg/m³</b></p>
-            <p>VOC: <b>{latest.measurements.voc}</b></p><p>Temperature: <b>{latest.measurements.temperatureC} °C</b> · RH: <b>{latest.measurements.rhPct}%</b></p>
-            <p>Source: <b>{latest.source.deviceId}</b> · Zone: <b>{latest.zone}</b></p>
-          </Card>
-          <Card title="Governed reliance">
-            <p>R1A admissibility: <b>{result.admissibility}</b></p><p>Continuity: <b>{result.continuity}</b></p>
-            <p>Authority: <b>{result.authorityStatus}</b></p><p>Binding: <b>{result.bindingScope ?? 'NONE'}</b></p>
-            <p style={{ fontSize: 28 }}>R1B: <b>{result.determination}</b></p>
-          </Card>
-        </div>
-      </section>
+    <section style={{marginTop:34}}><h2>Live Evidence / Governed Reliance</h2><div style={{display:'grid',gridTemplateColumns:'repeat(2,minmax(0,1fr))',gap:14}}>
+      <Card title="Environmental evidence"><p>CO₂: <b>{latest.measurements.co2Ppm} ppm</b></p><p>PM2.5: <b>{latest.measurements.pm25UgM3} µg/m³</b></p><p>VOC: <b>{latest.measurements.voc}</b></p><p>Temperature: <b>{latest.measurements.temperatureC} °C</b> · RH: <b>{latest.measurements.rhPct}%</b></p><p>Source: <b>{latest.source.deviceId}</b> · Zone: <b>{latest.zone}</b></p></Card>
+      <Card title="Governed reliance"><p>R1A admissibility: <b>{result.admissibility}</b></p><p>Continuity: <b>{result.continuity}</b></p><p>Authority: <b>{result.authorityStatus}</b></p><p>Binding: <b>{result.bindingScope ?? 'NONE'}</b></p><p style={{fontSize:28}}>R1B: <b>{result.determination}</b></p></Card>
+    </div></section>
 
-      <section style={{ marginTop: 34 }}><h2>Preserved AIR specimen</h2>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}><tbody>
-          <Row k="Record" v={result.recordId}/><Row k="Proposition" v="Can the preserved environmental record support ventilation_increase_only under the declared authority?"/>
-          <Row k="Authority object" v={`${authority.authorityId} · ${authority.zoneScope} · ${authority.revocationState}`}/><Row k="Determination" v={result.determination}/>
-          <Row k="Reason codes" v={result.reasonCodes.join(' · ')}/><Row k="Valid until" v={result.validUntil ?? 'No current standing'}/>
-          <Row k="Receipt" v={`${result.receipt.hash} · ${result.receipt.replayId}`}/><Row k="Non-claims" v={result.limitations.join(' · ')}/>
-        </tbody></table>
-      </section>
+    <section style={{marginTop:34}}><h2>Preserved AIR specimen</h2><table style={{width:'100%',borderCollapse:'collapse'}}><tbody>
+      <Row k="Record" v={result.recordId}/><Row k="Proposition" v="Can the preserved environmental record support ventilation_increase_only under the declared authority?"/><Row k="Authority object" v={`${authority.authorityId} · ${authority.zoneScope} · ${authority.revocationState}`}/><Row k="Determination" v={result.determination}/><Row k="Reason codes" v={result.reasonCodes.join(' · ')}/><Row k="Valid until" v={result.validUntil ?? 'No current standing'}/><Row k="Receipt" v={`${result.receipt.hash} · ${result.receipt.replayId}`}/><Row k="Non-claims" v={result.limitations.join(' · ')}/>
+    </tbody></table></section>
 
-      <section style={{ marginTop: 34 }}><h2>R1 build status</h2>
-        <p><b>Implemented:</b> canonical observation model, continuity policy, authority object, binding check, four-state determination model, reason codes, AIR specimen, deterministic private receipt/replay identity, and owner-only Exchange surface.</p>
-        <p><b>Intentionally not implemented yet:</b> live HibouAir API adapter, production cryptographic receipt store, equipment execution, public navigation, Registry publication, or public showcase.</p>
-        <p><b>Next technical gate:</b> freeze the HibouAir R1 contract and replace the simulator with one least-privilege authorized AQM stream.</p>
-      </section>
-    </main>
-  );
+    <section style={{marginTop:34}}><h2>R1 Conformance Suite · {conformance.overall}</h2><p><b>{conformance.passed}/{conformance.total}</b> bounded scenarios match their expected fail-closed determination.</p><table style={{width:'100%',borderCollapse:'collapse'}}><thead><tr><th style={head}>ID</th><th style={head}>Scenario</th><th style={head}>Expected</th><th style={head}>Actual</th><th style={head}>Status</th></tr></thead><tbody>{conformance.scenarios.map(s=><tr key={s.id}><td style={cell}>{s.id}</td><td style={cell}>{s.name}</td><td style={cell}>{s.expected}</td><td style={cell}>{s.actual}</td><td style={cell}><b>{s.pass?'PASS':'FAIL'}</b></td></tr>)}</tbody></table></section>
+
+    <section style={{marginTop:34}}><h2>R1 build status</h2><p><b>Implemented:</b> canonical observation model, continuity policy, authority object, binding check, determination logic, reason codes, AIR specimen, deterministic private receipt/replay identity, owner-only Exchange surface, and private 12-scenario conformance harness.</p><p><b>Still intentionally absent:</b> live HibouAir API adapter, production cryptographic receipt store, equipment execution, public navigation, Registry publication, or public showcase.</p><p><b>Next gate:</b> harden receipt/replay cryptography and persistence, then freeze the real HibouAir adapter contract when authorized API documentation arrives.</p></section>
+  </main>;
 }
 
-function Card({ title, children }: { title: string; children: React.ReactNode }) { return <div style={{ border: '1px solid #d8dde3', padding: 22, background: '#fff' }}><h3 style={{ marginTop: 0 }}>{title}</h3>{children}</div>; }
-function Row({ k, v }: { k: string; v: string }) { return <tr><th style={{ textAlign: 'left', verticalAlign: 'top', width: 190, padding: 12, border: '1px solid #d8dde3', background: '#f5f7f9' }}>{k}</th><td style={{ padding: 12, border: '1px solid #d8dde3' }}>{v}</td></tr>; }
+const head={textAlign:'left' as const,padding:10,border:'1px solid #d8dde3',background:'#17212b',color:'#fff'};
+const cell={padding:10,border:'1px solid #d8dde3'};
+function Card({title,children}:{title:string;children:React.ReactNode}){return <div style={{border:'1px solid #d8dde3',padding:22,background:'#fff'}}><h3 style={{marginTop:0}}>{title}</h3>{children}</div>}
+function Row({k,v}:{k:string;v:string}){return <tr><th style={{textAlign:'left',verticalAlign:'top',width:190,padding:12,border:'1px solid #d8dde3',background:'#f5f7f9'}}>{k}</th><td style={{padding:12,border:'1px solid #d8dde3'}}>{v}</td></tr>}
