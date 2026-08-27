@@ -9,6 +9,9 @@ Status: STAGED ONLY — DO NOT EXECUTE UNTIL APPROVED.
    - Read-only/STABLE resolver.
    - Reads sealed run, finding, seal, challenges, reconsiderations, and supersession lineage.
    - Returns present reliance posture without modifying historical records.
+   - Fails closed when a SEALED run lacks its required finding or seal.
+   - Resolves a superseded run to the terminal head of the full `SUPERSEDES` chain rather than stopping at the first successor.
+   - Returns `RELIANCE_UNRESOLVED` if lineage traversal detects a cycle or exceeds its bounded depth.
    - Possible postures: `NOT_FOUND`, `NOT_RELIANCE_ELIGIBLE`, `SUPERSEDED`, `REEXAMINATION_REQUIRED`, `CHALLENGED`, `RELIANCE_UNRESOLVED`, `CURRENT`.
 
 2. `public.consequence_resolve_lineage_head(text)`
@@ -42,4 +45,6 @@ Status: STAGED ONLY — DO NOT EXECUTE UNTIL APPROVED.
 
 ## Historical integrity boundary
 - No examination, finding, seal, receipt, challenge, reconsideration, verification, or lineage object is amended, revoked, erased, or rewritten.
+- A SEALED status alone is insufficient for current reliance when the terminal finding or seal is missing.
+- A superseded examination resolves to the terminal preserved lineage head, not merely its immediate successor.
 - The migration derives current reliance posture from preserved chronology only.
