@@ -53,7 +53,7 @@ function validateStandingState(
     case "PARTIAL":
       return state === "PARTIALLY_SUPPORTED" || state === "UNSUPPORTED" || state === "INDETERMINATE"
         ? null
-        : "DET_STATE_EXCEEDS_PARTIAL_STANDING";
+        : "ENT_STANDING_PARTIAL";
     case "NOT_ESTABLISHED":
       return state === "UNSUPPORTED" || state === "INDETERMINATE"
         ? null
@@ -115,7 +115,7 @@ export function validateDeterminationBoundary(
   if (/\b(diagnos|disease|illness|injury|health outcome|medical)\b/.test(text)) {
     reasons.push("DET_HEALTH_SCOPE_EXPANSION");
   }
-  if (/\b(authoriz|permission to execute|may execute|must execute|intervention required)\b/.test(text)) {
+  if (/\b(authoriz(?:e|ed|es|ation|ing)?|permission to execute|may execute|must execute|intervention required)\b/.test(text)) {
     reasons.push("DET_AUTHORITY_SCOPE_EXPANSION");
   }
 
