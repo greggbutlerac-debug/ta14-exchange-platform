@@ -1,0 +1,117 @@
+import { describe, expect, it } from "vitest";
+import { establishPropositionEntitlement } from "./proposition-entitlement";
+import {
+  type BoundedEnvironmentalDetermination,
+  validateDeterminationBoundary,
+} from "./bounded-determination";
+
+const entitlement = establishPropositionEntitlement({
+  proposition: "Did Room 204 RH exceed 65% at 14:15?",
+  inspectionObject: "Room 204 air condition at 14:15 on 2026-08-26",
+  evidenceRefs: ["OBS-1"],
+  temporalBoundary: "2026-08-26 14:15",
+  spatialBoundary: "Room 204",
+  environmentalMediumOrSystem: "occupied-zone air",
+  conditionOrVariable: "relative humidity",
+  thresholdReference: "65% RH",
+  continuityEstablished: true,
+  objectEstablished: true,
+  propositionEstablished: true,
+  createdAt: "2026-08-26T18:15:00.000Z",
+});
+
+function determination(
+  overrides: Partial<BoundedEnvironmentalDetermination> = {},
+): BoundedEnvironmentalDetermination {
+  return {
+    determinationId: "DET-1",
+    entitlementId: entitlement.entitlementId,
+    proposition: entitlement.proposition,
+    state: "SUPPORTED",
+    determinationText: "Room 204 RH exceeded 65% at 14:15.",
+    establishedBoundary: { ...entitlement.boundary },
+    evidenceRefs: ["OBS-1"],
+    unresolvedConditions: [],
+    prohibitedExtensions: [],
+    createdAt: "2026-08-26T18:16:00.000Z",
+    ...overrides,
+  };
+}
+
+describe("environmental determination bounding", () => {
+  it("allows a determination exactly within entitlement", () => {
+    expect(validateDeterminationBoundary(entitlement, determination())).toEqual({
+      valid: true,
+      reasons: [],
+    });
+  });
+
+  it("holds temporal expansion", () => {
+    const result = validateDeterminationBoundary(
+      entitlement,
+      determination({
+        establishedBoundary: {
+          ...entitlement.boundary,
+          temporalBoundary: "2026-08-26 14:00 through 15:00",
+        },
+      }),
+    );
+    expect(result.valid).toBe(false);
+    expect(result.reasons).toContain("DET_TEMPORAL_SCOPE_EXPANSION");
+  });
+
+  it("holds object expansion", () => {
+    const result = validateDeterminationBoundary(
+      entitlement,
+      determination({
+        establishedBoundary: {
+          ...entitlement.boundary,
+          inspectionObject: "Entire second floor air condition",
+        },
+      }),
+    );
+    expect(result.reasons).toContain("DET_OBJECT_SCOPE_EXPANSION");
+  });
+
+  it("holds causal expansion", () => {
+    const result = validateDeterminationBoundary(
+      entitlement,
+      determination({
+        determinationText: "The HVAC system caused the elevated relative humidity.",
+      }),
+    );
+    expect(result.reasons).toContain("DET_CAUSAL_EXPANSION");
+  });
+
+  it("holds health and authority expansion", () => {
+    const result = validateDeterminationBoundary(
+      entitlement,
+      determination({
+        determinationText:
+          "A health outcome is established and intervention is authorized.",
+      }),
+    );
+    expect(result.reasons).toContain("DET_HEALTH_SCOPE_EXPANSION");
+    expect(result.reasons).toContain("DET_AUTHORITY_SCOPE_EXPANSION");
+  });
+
+  it("does not treat partial entitlement as full determination authority", () => {
+    const partial = establishPropositionEntitlement({
+      proposition: entitlement.proposition,
+      inspectionObject: entitlement.boundary.inspectionObject,
+      evidenceRefs: ["OBS-1"],
+      temporalBoundary: entitlement.boundary.temporalBoundary,
+      spatialBoundary: entitlement.boundary.spatialBoundary,
+      continuityEstablished: false,
+      objectEstablished: true,
+      propositionEstablished: true,
+      createdAt: "2026-08-26T18:15:00.000Z",
+    });
+    const result = validateDeterminationBoundary(
+      partial,
+      determination({ entitlementId: partial.entitlementId }),
+    );
+    expect(result.valid).toBe(false);
+    expect(result.reasons).toContain("ENT_STANDING_PARTIAL");
+  });
+});
