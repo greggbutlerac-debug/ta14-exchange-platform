@@ -52,7 +52,9 @@ RLS is enabled. No anon/authenticated table privileges are granted.
 None. Existing Registry record/version references are carried into chronology only. No Registry identity, submission, readiness, review, finalization, or version row is created or modified.
 
 ## Security
-Table access and function execution revoked from PUBLIC, anon, authenticated. Controlled functions granted only to service_role.
+Table access and function execution revoked from PUBLIC, anon, authenticated. Controlled v2 functions are granted only to service_role.
+
+The prior `consequence_record_independent_verification(...)` v1 function has its direct `service_role` execution privilege revoked. It remains an internal implementation invoked by the security-definer v2 gate, preventing callers from bypassing verifier admissibility through the older RPC.
 
 ## Semantic boundary
 An admissible verifier is not thereby correct, and an independent verification does not become a new source determination. This layer establishes whether the verification evidence is eligible to be considered as separately attributable verification evidence; it cannot retrospectively modify the original examination, finding, seal, receipt, or Registry identity.
