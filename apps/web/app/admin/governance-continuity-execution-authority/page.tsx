@@ -1,5 +1,6 @@
 import { buildPrivateGceaDemonstration } from '@/lib/governance-continuity-execution-authority';
 import R1ExecutionControl from './r1-execution-control';
+import LifecycleVerificationControl from './lifecycle-verification-control';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ export default function GovernanceContinuityExecutionAuthorityPage() {
       <header style={{ marginBottom: 28 }}>
         <div style={{ display: 'inline-block', padding: '7px 10px', borderRadius: 999, background: '#17212b', color: '#fff', fontSize: 11, letterSpacing: 1.7, fontWeight: 700 }}>TA-14 AUTHORITY · OWNER ONLY</div>
         <h1 style={{ fontSize: 'clamp(34px,5vw,52px)', lineHeight: 1.05, margin: '18px 0 8px', letterSpacing: '-.035em' }}>Governance Continuity &<br/>Execution Authority Engine</h1>
-        <p style={{ fontSize: 19, color: '#5c6772', maxWidth: 800, lineHeight: 1.55 }}>Private GCEA control surface for present standing, material-change challenge, execution-boundary refusal, reauthorization, preservation, and semantic replay.</p>
+        <p style={{ fontSize: 19, color: '#5c6772', maxWidth: 800, lineHeight: 1.55 }}>Private GCEA control surface for present standing, material-change challenge, execution-boundary refusal, reauthorization, preservation, semantic replay, and complete lifecycle verification.</p>
       </header>
 
       <div style={{ ...card, borderColor: '#d6b35b', background: '#fffdf6', marginBottom: 22 }}>
@@ -30,6 +31,7 @@ export default function GovernanceContinuityExecutionAuthorityPage() {
       </div>
 
       <R1ExecutionControl />
+      <div style={{ marginTop: 22 }}><LifecycleVerificationControl /></div>
 
       <section style={{ ...card, marginTop: 22, borderColor: '#9cc5a1', background: '#f7fff8' }}>
         <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.3, color: '#35633b' }}>R2 PRODUCTION EVIDENCE · PASS</div>
@@ -53,7 +55,7 @@ export default function GovernanceContinuityExecutionAuthorityPage() {
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 22, marginTop: 22 }}>
         <section style={card}><div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.3, color: '#66717c' }}>FROZEN R1 OBJECT</div><h2 style={{ fontSize: 22 }}>Material-change challenge</h2><p style={{ lineHeight: 1.65 }}><b>{run.asset.assetId}</b><br/>Version {run.asset.version}<br/>Route {run.asset.routeId}</p><p style={{ lineHeight: 1.65, color: '#52606c' }}>Change <b>{run.change.changeId}</b> · {run.change.category} · material = <b>{String(run.change.material)}</b>. Historical authority is preserved while present binding collapses to <b>NONE</b> pending reauthorization.</p></section>
-        <section style={card}><div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.3, color: '#66717c' }}>CURRENT CONTROL STATUS</div><h2 style={{ fontSize: 22 }}>R1 and R2 evidence established</h2><p style={{ lineHeight: 1.65 }}>R1 established authenticated production preservation, append-only chronology, and persisted replay. R2 established preserved authority inputs, semantic replay, and explicit execution-boundary refusal during challenged standing.</p><p style={{ lineHeight: 1.65, color: '#52606c' }}>No further numbered gate is implied by this console. Any next test must be separately scoped before execution.</p></section>
+        <section style={card}><div style={{ fontSize: 12, fontWeight: 800, letterSpacing: 1.3, color: '#66717c' }}>CURRENT CONTROL STATUS</div><h2 style={{ fontSize: 22 }}>R1 and R2 evidence established</h2><p style={{ lineHeight: 1.65 }}>R1 established authenticated production preservation, append-only chronology, and persisted replay. R2 established preserved authority inputs, semantic replay, and explicit execution-boundary refusal during challenged standing.</p><p style={{ lineHeight: 1.65, color: '#52606c' }}>Complete lifecycle verification is a separate post-R2 control. Until its result is durably preserved, it does not alter the historical R1 or R2 evidence claims.</p></section>
       </div>
 
       <section style={{ ...card, marginTop: 22 }}>
