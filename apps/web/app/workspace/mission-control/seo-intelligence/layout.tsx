@@ -6,9 +6,14 @@ export default function SeoIntelligenceLayout({ children }: { children: React.Re
     <>
       <div className="seo-intelligence-drilldown-nav">
         <span>SEO INTELLIGENCE · PRIVATE</span>
-        <Link href="/workspace/mission-control/seo-intelligence/click-intelligence">
-          Open Click Intelligence →
-        </Link>
+        <div className="seo-intelligence-drilldown-links">
+          <Link href="/workspace/mission-control/seo-intelligence/eu-ai-act-commercial">
+            EU AI Act Commercial Engine →
+          </Link>
+          <Link href="/workspace/mission-control/seo-intelligence/click-intelligence">
+            Open Click Intelligence →
+          </Link>
+        </div>
       </div>
       <CommercialPipeline />
       {children}
@@ -32,6 +37,13 @@ export default function SeoIntelligenceLayout({ children }: { children: React.Re
           font-weight: 850;
           letter-spacing: .12em;
         }
+        .seo-intelligence-drilldown-links {
+          display: flex;
+          align-items: center;
+          justify-content: flex-end;
+          gap: 8px;
+          flex-wrap: wrap;
+        }
         .seo-intelligence-drilldown-nav a {
           padding: 7px 11px;
           border: 1px solid rgba(77, 200, 255, .34);
@@ -45,9 +57,20 @@ export default function SeoIntelligenceLayout({ children }: { children: React.Re
           border-color: rgba(105, 218, 255, .65);
           background: rgba(24, 139, 190, .2);
         }
+        @media (max-width: 760px) {
+          .seo-intelligence-drilldown-nav {
+            align-items: flex-start;
+            flex-direction: column;
+          }
+          .seo-intelligence-drilldown-links {
+            width: 100%;
+            justify-content: flex-start;
+          }
+        }
         @media (max-width: 560px) {
           .seo-intelligence-drilldown-nav span { display: none; }
-          .seo-intelligence-drilldown-nav { justify-content: flex-end; }
+          .seo-intelligence-drilldown-nav { align-items: stretch; }
+          .seo-intelligence-drilldown-links { display: grid; }
         }
       `}</style>
     </>
