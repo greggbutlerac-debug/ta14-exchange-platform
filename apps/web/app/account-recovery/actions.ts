@@ -30,12 +30,17 @@ export async function requestAccountRecovery(formData: FormData): Promise<never>
   }
 
   const origin = await requestOrigin();
-  const callback = new URL("/auth/callback", origin);
-  callback.searchParams.set("next", `/account-recovery/reset?next=${encodeURIComponent(next)}`);
+
+  // Password recovery already returns an authenticated recovery session to the
+  // supplied redirect URL. Send it directly to the password-reset surface.
+  // Routing it through /auth/callback incorrectly required a second `code`
+  // parameter and could send a valid recovery visit back to /login.
+  const recoveryDestination = new URL("/account-recovery/reset", origin);
+  recoveryDestination.searchParams.set("next", next);
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(rawEmail.trim().toLowerCase(), {
-    redirectTo: callback.toString(),
+    redirectTo: recoveryDestination.toString(),
   });
 
   if (error) {
