@@ -1,11 +1,11 @@
 "use server";
 
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { createClient } from "../../lib/supabase/server";
 
 const DEFAULT_NEXT = "/workspace/ai-governance/registry/register";
+const CANONICAL_EXCHANGE_ORIGIN = "https://www.ta14exchange.com";
 
 function safeNext(value: FormDataEntryValue | string | null | undefined): string {
   if (typeof value !== "string") return DEFAULT_NEXT;
@@ -14,12 +14,13 @@ function safeNext(value: FormDataEntryValue | string | null | undefined): string
   return next;
 }
 
-async function requestOrigin(): Promise<string> {
-  const h = await headers();
-  const host = h.get("x-forwarded-host") ?? h.get("host");
-  const proto = h.get("x-forwarded-proto") ?? "https";
-  if (host) return `${proto}://${host}`;
-  return (process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.ta14exchange.com").replace(/\/$/, "");
+function recoveryOrigin(): string {
+  // Recovery is an identity-continuity boundary. Do not derive its return
+  // origin from deployment aliases or forwarded host headers: the recovered
+  // session must return on the canonical Exchange host.
+  const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
+  if (configured === CANONICAL_EXCHANGE_ORIGIN) return configured;
+  return CANONICAL_EXCHANGE_ORIGIN;
 }
 
 export async function requestAccountRecovery(formData: FormData): Promise<never> {
@@ -29,12 +30,7 @@ export async function requestAccountRecovery(formData: FormData): Promise<never>
     redirect(`/account-recovery?error=${encodeURIComponent("Enter the email address associated with your Exchange account.")}&next=${encodeURIComponent(next)}`);
   }
 
-  const origin = await requestOrigin();
-
-  // Password recovery already returns an authenticated recovery session to the
-  // supplied redirect URL. Send it directly to the password-reset surface.
-  // Routing it through /auth/callback incorrectly required a second `code`
-  // parameter and could send a valid recovery visit back to /login.
+  const origin = recoveryOrigin();
   const recoveryDestination = new URL("/account-recovery/reset", origin);
   recoveryDestination.searchParams.set("next", next);
 
