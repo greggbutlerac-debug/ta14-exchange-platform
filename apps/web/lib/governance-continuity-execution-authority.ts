@@ -33,9 +33,11 @@ function stable(value: unknown): string {
   return `{${Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`).join(',')}}`;
 }
 
-function receipt(payload: unknown, canonicalVersion: 'TA14.GCEA.RECEIPT.v1' | 'TA14.GCEA.EXECUTION.v1') {
+type GceaCanonicalVersion = 'TA14.GCEA.RECEIPT.v1' | 'TA14.GCEA.EXECUTION.v1';
+
+function receipt<T extends GceaCanonicalVersion>(payload: unknown, canonicalVersion: T): { algorithm: 'SHA-256'; canonicalVersion: T; hash: string; replayId: string; payload: unknown } {
   const hash = createHash('sha256').update(stable(payload)).digest('hex');
-  return { algorithm: 'SHA-256' as const, canonicalVersion, hash, replayId: `TA14-GCEA-${hash.slice(0, 20).toUpperCase()}`, payload };
+  return { algorithm: 'SHA-256', canonicalVersion, hash, replayId: `TA14-GCEA-${hash.slice(0, 20).toUpperCase()}`, payload };
 }
 
 export function evaluateExecutionAuthority(input: ExecutionAuthorityInput): AuthorityEvaluation {
