@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
-import { applicableInstruments, jurisdictions as governedJurisdictions } from '../../lib/world-law-catalog';
+import { applicableInstruments, jurisdictions as governedJurisdictions } from '../../lib/world-law-runtime';
 
 const mapNodes = governedJurisdictions.filter(j => ['GLOBAL','US','CA','GB','BR','ZA','IN','JP','AU','EU'].includes(j.code));
 const floridaLadder = governedJurisdictions.filter(j => ['US','US-FL','US-FL-PINELLAS','US-FL-STPETE'].includes(j.code));
