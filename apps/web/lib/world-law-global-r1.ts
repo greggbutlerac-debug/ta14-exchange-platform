@@ -1,0 +1,83 @@
+import type { WorldLawInstrument } from './world-law-catalog';
+
+// R1 multinational records are admitted only after official-source/version review.
+// Geography is never sufficient to establish applicability.
+export const globalR1Instruments: WorldLawInstrument[] = [
+  {
+    slug:'eu-european-climate-law', title:'Regulation (EU) 2021/1119 — European Climate Law', shortTitle:'European Climate Law', jurisdiction:'European Union', jurisdictionCode:'EU', layer:'SUPRANATIONAL', domain:'Climate · Greenhouse Gas Emissions', enacted:'30 June 2021; current consolidated version 7 April 2026', status:'In force · amended · EUR-Lex current consolidated version 07/04/2026', authority:'European Parliament and Council of the European Union',
+    history:'Regulation (EU) 2021/1119 established the Union framework for achieving climate neutrality and was amended by Regulation (EU) 2026/667.',
+    currentMeaning:'Establishes the EU framework for irreversible and gradual reduction of anthropogenic greenhouse-gas emissions and enhancement of removals, including a binding Union climate-neutrality objective for 2050.',
+    applicability:'The Regulation operates within Union law. Whether a particular actor, installation, activity or decision is governed depends on the applicable EU and implementing legal provisions; selection of an EU location alone is not an applicability determination.',
+    architecture:['Binding Union climate-neutrality objective for 2050','Union climate-target framework','Adaptation and progress framework','EU institutional monitoring and review'],
+    structuralLimit:'A binding climate objective and institutional progress framework do not by themselves prove the evidentiary standing or causal outcome of a specific environmental intervention.',
+    ta14Defect:'Climate-governance obligations and progress measures should remain distinct from proposition-bound evidence, authority to bind a specific consequence, execution proof and verified outcome.',
+    ta14Rewrite:'Preserve Union climate obligations while adding explicit evidence identity, continuity, admissibility, bounded consequence authority, execution receipts and outcome verification where consequential action relies on environmental evidence.',
+    proposedSections:['Climate Evidence Identity & Provenance','Current Reliance and Continuity','Admissibility for Consequential Climate Action','Bounded Binding Authority','Execution Correspondence','Outcome Verification'], rewriteState:'PROPOSED',
+    officialSources:[{label:'EUR-Lex — Regulation (EU) 2021/1119',url:'https://eur-lex.europa.eu/eli/reg/2021/1119/oj',role:'Official legal act and status record'},{label:'EUR-Lex — Consolidated version 07/04/2026',url:'https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:02021R1119-20260407',role:'Current consolidated documentation text; authentic acts remain those published in the Official Journal'}]
+  },
+  {
+    slug:'canadian-environmental-protection-act-1999', title:'Canadian Environmental Protection Act, 1999', shortTitle:'CEPA 1999', jurisdiction:'Canada', jurisdictionCode:'CA', layer:'NATIONAL', domain:'Environmental Protection · Pollution · Toxic Substances', enacted:'1999 · S.C. 1999, c. 33', status:'Current federal Act · official Justice Laws text current to 21 June 2026; last amended 26 March 2026', authority:'Parliament of Canada; federal administration under the Act',
+    currentMeaning:'Provides a broad federal environmental-protection framework including administration, public participation, toxic-substance controls, pollution prevention, environmental emergencies, intergovernmental and international matters, enforcement and related regulation-making powers.',
+    applicability:'CEPA contains subject-, substance-, source-, activity- and federal-authority-specific provisions. Canadian geography alone does not establish that a particular CEPA duty or power governs a specific activity.',
+    architecture:['Administration and right-to-a-healthy-environment implementation','Public participation','Toxic-substance and pollution-prevention controls','Environmental emergencies','International air and water pollution','Enforcement and regulatory powers'],
+    structuralLimit:'A statutory duty, regulatory limit, monitoring result or enforcement record under CEPA does not automatically prove the complete evidence-to-outcome chain for a particular environmental proposition.',
+    ta14Rewrite:'Preserve CEPA authority while making consequential reliance inspectable through proposition identity, evidence continuity, admissibility, bounded authority, execution proof and outcome verification.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'Justice Laws — Canadian Environmental Protection Act, 1999',url:'https://laws-lois.justice.gc.ca/eng/acts/C-15.31/FullText.html',role:'Official consolidated federal Act and version status'}]
+  },
+  {
+    slug:'uk-environment-act-2021', title:'Environment Act 2021', shortTitle:'Environment Act 2021', jurisdiction:'United Kingdom', jurisdictionCode:'GB', layer:'NATIONAL', domain:'Environmental Governance · Targets · Nature · Waste · Water · Air', enacted:'2021 · 2021 c. 30', status:'Current UK public general Act; extent and application vary by provision', authority:'Parliament of the United Kingdom',
+    currentMeaning:'Creates a wide environmental-governance framework including environmental targets and improvement planning, environmental principles and oversight, waste and resource efficiency, air quality, water, nature and biodiversity measures.',
+    applicability:'Extent and application are provision-specific. Most of the Act forms part of the law of England and Wales and applies to England, while other provisions apply to Wales, Scotland, Northern Ireland, Great Britain or the United Kingdom. A UK location alone is insufficient.',
+    architecture:['Environmental targets','Environmental improvement plans and monitoring','Environmental principles and governance','Waste and resource efficiency','Air quality and environmental recall','Water','Nature and biodiversity'],
+    structuralLimit:'Statutory targets, plans, monitoring and regulator functions do not by themselves establish the admissibility or verified outcome of every downstream environmental claim or intervention.',
+    ta14Rewrite:'Preserve the Act’s jurisdiction-specific governance while binding consequential environmental decisions to explicit record identity, continuity, admissibility, authority, execution and outcome evidence.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'legislation.gov.uk — Environment Act 2021',url:'https://www.legislation.gov.uk/ukpga/2021/30/contents',role:'Official legislation publication and revised-text gateway'},{label:'Environment Act 2021 — Explanatory Notes: territorial extent/application',url:'https://www.legislation.gov.uk/ukpga/2021/30/notes/division/31/index.htm',role:'Official extent and application explanation'}]
+  },
+  {
+    slug:'brazil-national-environment-policy-law', title:'Lei nº 6.938, de 31 de agosto de 1981 — Política Nacional do Meio Ambiente', shortTitle:'Brazil National Environment Policy Law', jurisdiction:'Brazil', jurisdictionCode:'BR', layer:'NATIONAL', domain:'Environmental Policy · Pollution Control · Licensing', enacted:'31 August 1981', status:'Federal law · official Presidency consolidated publication reviewed for R1', authority:'Brazilian federal law; SISNAMA environmental governance structure',
+    currentMeaning:'Establishes Brazil’s National Environment Policy, its objectives and instruments, SISNAMA, environmental-quality standards, zoning, environmental-impact assessment, licensing and review of potentially polluting activities, protected spaces and related governance mechanisms.',
+    applicability:'Specific duties and controls depend on the activity, environmental impact, licensing regime, competent authority and other federal, state, district or municipal law. Brazilian geography alone is not sufficient.',
+    architecture:['National Environment Policy objectives and principles','SISNAMA','Environmental quality standards','Environmental zoning','Environmental impact assessment','Licensing and review of polluting activities'],
+    structuralLimit:'Policy instruments, licensing and environmental standards establish legal controls but do not automatically establish a continuous proposition-bound evidentiary chain through verified outcome.',
+    ta14Rewrite:'Preserve PNMA and SISNAMA authority while adding explicit evidence continuity, admissibility, consequence authority, execution correspondence and outcome verification for consequential environmental action.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'Presidência da República — Lei 6.938/1981, consolidated',url:'https://www.planalto.gov.br/ccivil_03/leis/l6938compilada.htm',role:'Official federal consolidated legislative publication'}]
+  },
+  {
+    slug:'south-africa-nema-1998', title:'National Environmental Management Act 107 of 1998', shortTitle:'NEMA 107 of 1998', jurisdiction:'South Africa', jurisdictionCode:'ZA', layer:'NATIONAL', domain:'Environmental Governance · Decision-Making', enacted:'1998; commenced 29 January 1999', status:'In force framework; official government page lists amendments; linked consolidated text is stated updated only to 30 June 2023', authority:'Parliament of South Africa; cooperative environmental governance framework',
+    currentMeaning:'Provides principles for environmental decision-making, institutions for cooperative governance and procedures for coordinating environmental functions exercised by organs of state.',
+    applicability:'Application depends on the relevant NEMA provision, listed or regulated activity, competent authority and related specific environmental-management legislation. South African geography alone is not an applicability determination.',
+    architecture:['Environmental management principles','Co-operative governance','Decision-making framework','Institutional coordination','Environmental authorisation and related governance as amended'],
+    structuralLimit:'The government source confirms the Act and amendment history but its linked consolidated text is not represented here as fully current beyond 30 June 2023.',
+    ta14Defect:'Version uncertainty must fail closed: the engine must not convert an older consolidation into a current-law assertion.',
+    ta14Rewrite:'Preserve NEMA governance while requiring current-version evidence plus proposition identity, continuity, admissibility, bounded authority, execution and outcome proof before consequential reliance.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'South African Government — NEMA 107 of 1998',url:'https://www.gov.za/documents/national-environmental-management-act',role:'Official Act, commencement and amendment-history page'}]
+  },
+  {
+    slug:'india-environment-protection-act-1986', title:'The Environment (Protection) Act, 1986', shortTitle:'Environment (Protection) Act 1986', jurisdiction:'India', jurisdictionCode:'IN', layer:'NATIONAL', domain:'Environmental Protection · Pollution Control', enacted:'23 May 1986 · Act 29 of 1986; enforced 19 November 1986', status:'Central Act · official India Code record', authority:'Parliament of India; Ministry of Environment, Forest and Climate Change',
+    currentMeaning:'Provides for protection and improvement of the environment and grants central-government powers to take environmental-protection measures, alongside provisions for prevention, control and abatement of environmental pollution.',
+    applicability:'The Act supplies central statutory authority, but particular obligations and controls may depend on rules, notifications, standards, activities and delegated or competent authorities. Indian geography alone is insufficient.',
+    architecture:['Definitions','Central Government environmental-protection powers','Prevention, control and abatement of environmental pollution','Rules, directions and enforcement-related provisions'],
+    structuralLimit:'The existence of statutory power or a pollution-control requirement does not by itself prove that evidence supporting a specific consequential action is current, admissible and outcome-verified.',
+    ta14Rewrite:'Preserve central environmental authority while adding proposition-bound record identity, continuity, admissibility, bounded intervention authority, execution receipts and outcome verification.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'India Code — Environment (Protection) Act, 1986',url:'https://www.indiacode.nic.in/handle/123456789/1876?view_type=search',role:'Official Act metadata, sections and subordinate-instrument gateway'}]
+  },
+  {
+    slug:'japan-basic-environment-law-1993', title:'Basic Environment Law — Law No. 91 of 1993', shortTitle:'Basic Environment Law', jurisdiction:'Japan', jurisdictionCode:'JP', layer:'NATIONAL', domain:'Environmental Policy · Quality Standards · Conservation', enacted:'Law No. 91 of 1993 · effective 13 November 1993', status:'Official Ministry of the Environment English law publication', authority:'Japan national environmental framework',
+    currentMeaning:'Establishes general environmental principles and a basic policy structure including the Basic Environment Plan, environmental quality standards, pollution control in specific areas, state and local-government measures, international cooperation and environmental councils.',
+    applicability:'The Basic Environment Law establishes framework policy and responsibilities; specific controls and consequences may arise under other statutes, standards and implementing measures. Japanese geography alone is insufficient.',
+    architecture:['General provisions','Basic Environment Plan','Environmental quality standards','Environmental pollution control in specific areas','State and local-government measures','International cooperation','Environment Council'],
+    structuralLimit:'Framework policy and environmental-quality standards do not automatically establish a proposition-specific evidence chain or authority for every intervention.',
+    ta14Rewrite:'Preserve the national policy framework while adding explicit evidence identity, continuity, admissibility, binding authority, execution correspondence and verified outcome for consequential environmental decisions.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'Ministry of the Environment, Japan — Basic Environment Law',url:'https://www.env.go.jp/en/laws/policy/basic/index.html',role:'Official English law publication and structure'}]
+  },
+  {
+    slug:'australia-epbc-act-1999', title:'Environment Protection and Biodiversity Conservation Act 1999', shortTitle:'EPBC Act 1999', jurisdiction:'Australia', jurisdictionCode:'AU', layer:'NATIONAL', domain:'Biodiversity · Environmental Assessment · Protected Matters', enacted:'1999 · No. 91, 1999', status:'In force · active reform sequence; Federal Register shows amendments commencing 24 August 2026 after Compilation 69 ended 23 August 2026', authority:'Parliament of Australia; administered by the Department of Climate Change, Energy, the Environment and Water',
+    currentMeaning:'Australia’s principal Commonwealth environmental statute for matters of national environmental significance and related assessment, approval, biodiversity and conservation mechanisms, subject to the current reform and amendment sequence.',
+    applicability:'Commonwealth applicability depends on statutory triggers, protected matters, actions, places, persons and other provisions. Australian geography alone does not establish that EPBC assessment or approval requirements apply.',
+    architecture:['Matters of national environmental significance','Environmental assessment and approvals','Biodiversity and conservation mechanisms','Commonwealth environmental administration'],
+    structuralLimit:'The Federal Register shows an active version transition. The engine must not label the superseded 1 July–23 August 2026 Compilation 69 as the current post-24-August text.',
+    ta14Defect:'A stale compilation cannot support current consequential reliance merely because it was recently current.',
+    ta14Rewrite:'Preserve EPBC statutory authority while enforcing version-currentness, proposition identity, continuity, admissibility, bounded authority, execution correspondence and outcome verification.', rewriteState:'IN_EXAMINATION',
+    officialSources:[{label:'Federal Register of Legislation — EPBC Act 1999 versions',url:'https://www.legislation.gov.au/C2004A00485/latest/versions',role:'Official in-force/version and amendment sequence'}]
+  }
+];
