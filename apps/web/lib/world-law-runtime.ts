@@ -1,4 +1,5 @@
 import { globalR1Instruments } from './world-law-global-r1';
+import { globalR2Instruments } from './world-law-global-r2';
 import { instruments as baseInstruments, jurisdictions, jurisdictionChain } from './world-law-catalog';
 import type { WorldLawInstrument } from './world-law-catalog';
 
@@ -6,8 +7,8 @@ export type { LawLayer, OfficialSource, WorldLawInstrument, JurisdictionNode } f
 export { jurisdictions, jurisdictionChain };
 
 // Runtime admission is explicit: the production-proven base catalog plus the
-// source-controlled R1 multinational set. Do not infer applicability from geography.
-export const instruments: WorldLawInstrument[] = [...baseInstruments, ...globalR1Instruments];
+// source-controlled multinational sets. Do not infer applicability from geography.
+export const instruments: WorldLawInstrument[] = [...baseInstruments, ...globalR1Instruments, ...globalR2Instruments];
 
 export function findInstrument(slug:string){
   return instruments.find(instrument=>instrument.slug===slug);
