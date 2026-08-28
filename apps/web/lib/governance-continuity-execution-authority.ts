@@ -10,6 +10,19 @@ export type EvidenceStanding = { continuitySupported: boolean; admissibilitySupp
 export type ExecutionAuthorityInput = { asset: GovernedAsset; authority: AuthorityGrant | null; change: MaterialChange | null; evidence: EvidenceStanding; now: string };
 export type ExecutionAttempt = { attemptId: string; attemptedAt: string; consequence: string };
 export type InterventionAuthority = { authorityId: string; routeId: string; consequence: string; effectiveAt: string; expiresAt: string; revoked: boolean };
+export type CommitRecord = {
+  commitId: string;
+  committedAt: string;
+  assetId: string;
+  assetVersion: string;
+  routeId: string;
+  consequence: string;
+  authorityReceiptHash: string;
+  authorityReplayId: string;
+  authorityId: string;
+  evidenceId: string;
+  bindingScope: string;
+};
 
 export type AuthorityEvaluation = {
   determination: AuthorityDetermination;
@@ -17,6 +30,14 @@ export type AuthorityEvaluation = {
   bindingScope: string | null;
   reasonCodes: string[];
   receipt: { algorithm: 'SHA-256'; canonicalVersion: 'TA14.GCEA.RECEIPT.v1'; hash: string; replayId: string; payload: unknown };
+};
+
+export type CommitEvaluation = {
+  determination: AuthorityDetermination;
+  commitPermitted: boolean;
+  reasonCodes: string[];
+  commit: CommitRecord | null;
+  receipt: { algorithm: 'SHA-256'; canonicalVersion: 'TA14.GCEA.COMMIT.v1'; hash: string; replayId: string; payload: unknown };
 };
 
 export type ExecutionAttemptEvaluation = {
@@ -33,7 +54,7 @@ function stable(value: unknown): string {
   return `{${Object.entries(value as Record<string, unknown>).sort(([a], [b]) => a.localeCompare(b)).map(([key, item]) => `${JSON.stringify(key)}:${stable(item)}`).join(',')}}`;
 }
 
-type GceaCanonicalVersion = 'TA14.GCEA.RECEIPT.v1' | 'TA14.GCEA.EXECUTION.v1';
+type GceaCanonicalVersion = 'TA14.GCEA.RECEIPT.v1' | 'TA14.GCEA.COMMIT.v1' | 'TA14.GCEA.EXECUTION.v1';
 
 function receipt<T extends GceaCanonicalVersion>(payload: unknown, canonicalVersion: T): { algorithm: 'SHA-256'; canonicalVersion: T; hash: string; replayId: string; payload: unknown } {
   const hash = createHash('sha256').update(stable(payload)).digest('hex');
@@ -60,6 +81,39 @@ export function evaluateExecutionAuthority(input: ExecutionAuthorityInput): Auth
   if (determination === 'ALLOW') reasons.push('PRESENT_STANDING_ESTABLISHED');
   const payload = { canonicalVersion: 'TA14.GCEA.RECEIPT.v1', asset, authority, change, evidence, now, determination, standing, bindingScope, reasonCodes: reasons };
   return { determination, standing, bindingScope, reasonCodes: reasons, receipt: receipt(payload, 'TA14.GCEA.RECEIPT.v1') };
+}
+
+export function evaluateCommit(input: ExecutionAuthorityInput): CommitEvaluation {
+  const authority = evaluateExecutionAuthority(input);
+  const reasons = [...authority.reasonCodes];
+  const commitPermitted = authority.determination === 'ALLOW' && authority.standing === 'CURRENT' && authority.bindingScope === input.asset.consequence && input.authority !== null;
+
+  let commit: CommitRecord | null = null;
+  let determination: AuthorityDetermination = authority.determination;
+  if (!commitPermitted) {
+    if (determination === 'ALLOW') determination = 'HOLD';
+    reasons.push('COMMIT_BOUNDARY_REFUSED');
+  } else {
+    const seed = `${authority.receipt.hash}:${input.asset.assetId}:${input.asset.version}:${input.asset.routeId}:${input.asset.consequence}`;
+    const commitHash = createHash('sha256').update(seed).digest('hex');
+    commit = {
+      commitId: `TA14-GCEA-COMMIT-${commitHash.slice(0, 20).toUpperCase()}`,
+      committedAt: input.now,
+      assetId: input.asset.assetId,
+      assetVersion: input.asset.version,
+      routeId: input.asset.routeId,
+      consequence: input.asset.consequence,
+      authorityReceiptHash: authority.receipt.hash,
+      authorityReplayId: authority.receipt.replayId,
+      authorityId: input.authority!.authorityId,
+      evidenceId: input.evidence.evidenceId,
+      bindingScope: authority.bindingScope!,
+    };
+    reasons.push('COMMIT_BOUNDARY_ESTABLISHED');
+  }
+
+  const payload = { canonicalVersion: 'TA14.GCEA.COMMIT.v1', authorityInput: input, authorityReceiptHash: authority.receipt.hash, determination, commitPermitted, commit, reasonCodes: reasons };
+  return { determination, commitPermitted, reasonCodes: reasons, commit, receipt: receipt(payload, 'TA14.GCEA.COMMIT.v1') };
 }
 
 export function evaluateExecutionAttempt(input: { authorityInput: ExecutionAuthorityInput; attempt: ExecutionAttempt; interventionAuthority?: InterventionAuthority | null }): ExecutionAttemptEvaluation {
@@ -89,13 +143,16 @@ export function buildPrivateGceaDemonstration(now = new Date()) {
   const evidence: EvidenceStanding = { continuitySupported: true, admissibilitySupported: true, evidenceId: 'TA14-DEMO-EVIDENCE-001' };
   const baselineInput: ExecutionAuthorityInput = { asset, authority, change: null, evidence, now: now.toISOString() };
   const baseline = evaluateExecutionAuthority(baselineInput);
+  const baselineCommit = evaluateCommit(baselineInput);
   const change: MaterialChange = { changeId: 'TA14-DEMO-CHANGE-001', detectedAt: now.toISOString(), category: 'MODEL', material: true, description: 'Material model change challenges prior execution standing.' };
   const challengedInput: ExecutionAuthorityInput = { asset, authority, change, evidence, now: now.toISOString() };
   const challenged = evaluateExecutionAuthority(challengedInput);
+  const challengedCommit = evaluateCommit(challengedInput);
   const deniedAttempt = evaluateExecutionAttempt({ authorityInput: challengedInput, attempt: { attemptId: 'TA14-DEMO-ATTEMPT-001', attemptedAt: now.toISOString(), consequence: asset.consequence } });
   const reauthorizedAsset = { ...asset, version: '1.1.0' };
   const reauthorizedAuthority = { ...authority, authorityId: 'TA14-DEMO-AUTH-002', assetVersion: '1.1.0' };
   const restoredInput: ExecutionAuthorityInput = { asset: reauthorizedAsset, authority: reauthorizedAuthority, change: null, evidence: { ...evidence, evidenceId: 'TA14-DEMO-EVIDENCE-002' }, now: now.toISOString() };
   const restored = evaluateExecutionAuthority(restoredInput);
-  return { asset, authority, evidence, baselineInput, baseline, change, challengedInput, challenged, deniedAttempt, reauthorizedAsset, reauthorizedAuthority, restoredInput, restored };
+  const restoredCommit = evaluateCommit(restoredInput);
+  return { asset, authority, evidence, baselineInput, baseline, baselineCommit, change, challengedInput, challenged, challengedCommit, deniedAttempt, reauthorizedAsset, reauthorizedAuthority, restoredInput, restored, restoredCommit };
 }
