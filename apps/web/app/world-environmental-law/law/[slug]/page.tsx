@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { findInstrument, jurisdictionChain } from "../../../../lib/world-law-catalog";
+import { findInstrument, jurisdictionChain } from "../../../../lib/world-law-runtime";
 
 const chain = [["Reality","What environmental condition, risk, activity, asset, emission, discharge, exposure, or state is this law attempting to govern?"],["Record","What record establishes that reality, and who may create it?"],["Continuity","How are identity, custody, timing, version, and chain-of-evidence preserved?"],["Admissibility","What evidence is sufficient for the proposition at issue?"],["Binding","What consequence is that admissible evidence legally authorized to bind?"],["Commit","Who may commit the institution or regulated actor to consequential action?"],["Execution","What prevents unauthorized, stale, unsupported, or bypassed execution?"],["Outcome","What must be verified after execution, and what happens if the outcome is not established?"]] as const;
 
