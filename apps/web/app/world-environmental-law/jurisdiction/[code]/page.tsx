@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { applicableInstruments, jurisdictionChain, jurisdictions } from '../../../../lib/world-law-catalog';
+import { applicableInstruments, jurisdictionChain, jurisdictions } from '../../../../lib/world-law-runtime';
 
 export default async function JurisdictionLawPage({params}:{params:Promise<{code:string}>}){
   const {code}=await params;
