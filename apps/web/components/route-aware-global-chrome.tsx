@@ -10,8 +10,9 @@ export function RouteAwareGlobalChrome() {
   const pathname = usePathname();
   const isTransparentAir = pathname === '/transparent-air' || pathname.startsWith('/transparent-air/');
   const isPrivateEnvironmentalGateway = pathname === '/admin/environmental-evidence-gateway' || pathname.startsWith('/admin/environmental-evidence-gateway/');
+  const isPrivateGcea = pathname === '/admin/governance-continuity-execution-authority' || pathname.startsWith('/admin/governance-continuity-execution-authority/');
 
-  if (isTransparentAir || isPrivateEnvironmentalGateway) return null;
+  if (isTransparentAir || isPrivateEnvironmentalGateway || isPrivateGcea) return null;
 
   return (
     <>
