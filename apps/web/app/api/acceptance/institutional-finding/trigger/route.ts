@@ -5,12 +5,14 @@ import { createClient } from '@supabase/supabase-js';
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
-const EXECUTION_KEY = 'TA14-INSTITUTIONAL-ACCEPTANCE-FIRST-PRODUCTION-RUN-V1';
-const RECORD_ID = 'TA14-ACCEPTANCE-PRODUCTION-FIRST-2026-08-27-A1';
+// Successor attempt. The original V1 / A1 execution remains preserved unchanged.
+const EXECUTION_KEY = 'TA14-INSTITUTIONAL-ACCEPTANCE-SUCCESSOR-PRODUCTION-RUN-V2';
+const RECORD_ID = 'TA14-ACCEPTANCE-PRODUCTION-SUCCESSOR-2026-08-27-A2';
 const GOVERNANCE_REGISTRY_IDENTIFIER = 'TA-14-AIGR-000007';
 const GOVERNANCE_NAME = 'TA-14 AI Governance Exchange Architecture';
 const GOVERNANCE_VERSION = '1.0';
 const EXECUTOR_PATH = '/api/acceptance/institutional-finding/executor';
+const PRODUCTION_ORIGIN = 'https://www.ta14authority.org';
 
 function env(name: string) {
   return process.env[name]?.trim() ?? '';
@@ -65,7 +67,7 @@ export async function GET(request: Request) {
       schema: 'TA14-Institutional-Acceptance-One-Shot-Trigger-v1',
       executionPerformed: false,
       determination: 'INCOMPLETE',
-      reason: 'Acceptance prerequisites are not configured; first execution was not claimed.',
+      reason: 'Acceptance prerequisites are not configured; successor execution was not claimed.',
       prerequisites,
       deploymentCommit: process.env.VERCEL_GIT_COMMIT_SHA ?? null,
     }, { status: 503 });
@@ -73,8 +75,8 @@ export async function GET(request: Request) {
 
   const supabase = persistenceClient();
 
-  // The insert is the irreversible first-attempt lock. It occurs immediately
-  // before execution. A duplicate means the first attempt has already been
+  // The insert is the irreversible successor-attempt lock. It occurs immediately
+  // before execution. A duplicate means this successor attempt has already been
   // consumed, regardless of whether that attempt later passed, failed, or
   // ended incomplete. No rerun is permitted.
   const claimedAt = new Date().toISOString();
@@ -99,9 +101,9 @@ export async function GET(request: Request) {
       return NextResponse.json({
         schema: 'TA14-Institutional-Acceptance-One-Shot-Trigger-v1',
         executionPerformed: false,
-        firstExecutionAlreadyConsumed: true,
+        successorExecutionAlreadyConsumed: true,
         existing: existing ?? null,
-        boundary: 'The first-attempt lock already exists. The acceptance fixture was not rerun.',
+        boundary: 'The successor-attempt lock already exists. The acceptance fixture was not rerun.',
       }, { status: 409 });
     }
 
@@ -109,13 +111,15 @@ export async function GET(request: Request) {
       schema: 'TA14-Institutional-Acceptance-One-Shot-Trigger-v1',
       executionPerformed: false,
       determination: 'INCOMPLETE',
-      reason: 'The durable first-attempt lock could not be created. The acceptance fixture was not executed.',
+      reason: 'The durable successor-attempt lock could not be created. The acceptance fixture was not executed.',
       detail: claimError.message,
     }, { status: 503 });
   }
 
   const executorSecret = env('TA14_ACCEPTANCE_EXECUTOR_SECRET');
-  const executorUrl = new URL(EXECUTOR_PATH, request.url);
+  // Do not inherit a deployment-specific Vercel hostname from the cron request.
+  // The governed executor call crosses the canonical public production origin.
+  const executorUrl = new URL(EXECUTOR_PATH, PRODUCTION_ORIGIN);
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 60_000);
 
@@ -177,27 +181,28 @@ export async function GET(request: Request) {
     return NextResponse.json({
       schema: 'TA14-Institutional-Acceptance-One-Shot-Trigger-v1',
       executionPerformed: true,
-      firstExecutionConsumed: true,
+      successorExecutionConsumed: true,
       determination: 'INCOMPLETE',
       preservationFailure: preserveError.message,
       observedExecutorStatus: resultHttpStatus,
       observedExecutorDetermination: resultDetermination,
-      boundary: 'The acceptance fixture executed after the durable claim. The execution must not be rerun even though result preservation encountered an error.',
+      boundary: 'The successor acceptance fixture executed after the durable claim. The execution must not be rerun even though result preservation encountered an error.',
     }, { status: 500 });
   }
 
   return NextResponse.json({
     schema: 'TA14-Institutional-Acceptance-One-Shot-Trigger-v1',
     executionPerformed: true,
-    firstExecutionConsumed: true,
+    successorExecutionConsumed: true,
     executionKey: EXECUTION_KEY,
     fixtureRecordId: RECORD_ID,
     claimedAt,
     completedAt,
     deploymentCommit: process.env.VERCEL_GIT_COMMIT_SHA ?? null,
+    executorOrigin: PRODUCTION_ORIGIN,
     resultHttpStatus,
     resultDetermination,
     result: resultBody,
-    boundary: 'This cron trigger executes one acceptance-only production fixture exactly once. It does not issue participant findings, alter Registry standing, or award full protocol PASS.',
+    boundary: 'This successor cron trigger executes one acceptance-only production fixture exactly once. It does not modify or rerun the preserved first production attempt.',
   });
 }
