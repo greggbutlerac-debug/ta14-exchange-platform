@@ -15,18 +15,16 @@ async function ownerAuth() {
 export async function POST() {
   const owner = await ownerAuth();
   if (!owner) return NextResponse.json({ error: 'Not found.' }, { status: 404 });
-
   const now = new Date();
   const verificationId = `TA14-GCEA-LIFECYCLE-${now.toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}`;
   const verification = verifyCompleteGceaLifecycle(now);
-
   return NextResponse.json({
     ok: verification.status === 'PASS',
-    gate: 'GCEA_COMPLETE_CANONICAL_LIFECYCLE_VERIFICATION',
+    gate: 'GCEA_V1_1_CANDIDATE_LIFECYCLE_VERIFICATION',
     verification_id: verificationId,
-    canonical_chain: ['Reality', 'Record', 'Continuity', 'Admissibility', 'Binding', 'Commit', 'Execution', 'Outcome'],
+    intended_chain: ['Reality', 'Record', 'Continuity', 'Admissibility', 'Binding', 'Commit', 'Execution', 'Outcome'],
     verification,
     preservation: 'NOT_YET_DURABLY_PRESERVED',
-    claim_boundary: 'Authenticated production execution of the complete lifecycle verifier only. This response does not by itself establish append-only durable evidence.',
+    claim_boundary: 'Owner-authenticated candidate semantic verification only. Commit, ExecutionRecord, and Outcome are not production-proven, durably replayed, or frozen by this response.',
   }, { status: verification.status === 'PASS' ? 200 : 409 });
 }
