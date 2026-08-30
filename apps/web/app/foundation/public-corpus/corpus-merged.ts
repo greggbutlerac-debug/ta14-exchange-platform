@@ -14,6 +14,7 @@ import { AUTOMATEDBUILDINGS_LATEST_CORPUS_RECORDS } from './corpus-automatedbuil
 import { PUBLIC_ARCHITECTURE_SITE_RECORDS } from './site-supplement';
 import { TA14_ZENODO_STANDARDS } from './zenodo-standards';
 import { TA14_REFERENCE_IMPLEMENTATIONS } from './implementation-corpus';
+import { PROVENANCE_EVIDENCE_CORPUS_RECORDS } from './corpus-provenance-evidence';
 
 export { CORPUS_CATEGORY_LABELS };
 export type { CorpusCategory, CorpusRecord };
@@ -61,6 +62,7 @@ const mergedCandidates: CorpusRecord[] = [
   ...standardProtocolRecords,
   ...PUBLIC_ARCHITECTURE_SITE_RECORDS,
   ...TA14_REFERENCE_IMPLEMENTATIONS,
+  ...PROVENANCE_EVIDENCE_CORPUS_RECORDS,
 ];
 
 function normalizeUrl(value?: string) {
