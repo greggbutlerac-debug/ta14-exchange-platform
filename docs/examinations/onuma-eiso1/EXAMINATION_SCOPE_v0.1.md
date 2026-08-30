@@ -12,8 +12,10 @@ Prepare a bounded TA-14 Exchange examination around one externally governed buil
 - External architecture: ONUMA Semantic Bridge
 - Building context: RE1 residential tower public Semantic Bridge snapshot
 - Object: EISO-1 — Power Disconnect
-- ONUMA ID: 3254365
-- RDF subject: `http://onuma.com/bldg-3593#Component_177_3254365`
+- Stable identity namespace: `ONUMA_ID`
+- ONUMA ID: `3254365`
+- RDF namespace: `http://onuma.com/schema#`
+- RDF subject: `http://onuma.com/schema#Component_177_3254365`
 - Persistent external identity remains ONUMA-governed; TA-14 does not mint a replacement object identifier.
 
 ## Examination proposition
