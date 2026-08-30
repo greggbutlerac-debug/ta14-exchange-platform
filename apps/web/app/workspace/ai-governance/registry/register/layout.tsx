@@ -102,11 +102,11 @@ export default async function RegistryRegisterLayout({ children }: Readonly<{ ch
       <RecoveryResponseTransport />
       <aside className="ta14-registry-terms-notice" aria-label="Registry registration terms">
         <div>
-          <p>REGISTRY PARTICIPATION BOUNDARY · TERMS v0.1</p>
-          <strong>Review the standing rules before you submit.</strong>
-          <span>IP ownership, attribution, confidentiality, evidence handling, licensing, publication, claims and non-claims, and Founding Demonstration boundaries are defined before registration.</span>
+          <p>PRE-REGISTRATION PROTECTION &amp; EXAMINATION BOUNDARY · TERMS v0.2</p>
+          <strong>Know the authority, evidence, and IP boundary before you submit.</strong>
+          <span>Registration does not transfer IP, certify an architecture, grant operational authority, admit undisclosed evidence, or authorize appropriation of another methodology. TA-14 findings remain proposition-bounded and separate from participant authority.</span>
         </div>
-        <Link href="/workspace/ai-governance/registry/terms">Review Registration &amp; Demonstration Terms →</Link>
+        <Link href="/workspace/ai-governance/registry/terms">Review Protection &amp; Examination Terms →</Link>
       </aside>
       {children}
       <RegistrationMilestoneCelebration />
