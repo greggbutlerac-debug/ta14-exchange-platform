@@ -52,19 +52,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'CLAIMANT_TARGET_AND_CONCERN_REQUIRED' }, { status: 400 });
     }
 
-    const admin = service();
-    const { data: claimant, error: claimantError } = await admin.from('ai_governance_registry_submissions')
-      .select('id,governance_name,organization_name,registry_identifier,status,user_id')
+    // Petitioner standing is resolved through the same authenticated Registry client
+    // and Row Level Security boundary used by the account-scoped Registry workspace.
+    // Do not bypass Registry ownership with the service role or assume a specific
+    // ownership-column name in the Registry table.
+    const { data: claimant, error: claimantError } = await userClient.from('ai_governance_registry_submissions')
+      .select('id,governance_name,organization_name,registry_identifier,status')
       .eq('registry_identifier', claimantRegistryIdentifier).maybeSingle();
     if (claimantError) throw claimantError;
     const claimantStatus = String(claimant?.status ?? '').toLowerCase();
-    if (!claimant || claimant.user_id !== user.id || !['registered', 'published'].includes(claimantStatus)) {
+    if (!claimant || !['registered', 'published'].includes(claimantStatus)) {
       return NextResponse.json({
         error: 'REGISTERED_CLAIMANT_REQUIRED',
-        boundary: 'Only an Exchange-registered architecture controlled by the authenticated claimant may initiate a provenance reconciliation case.'
+        boundary: 'Only an Exchange-registered architecture visible to the authenticated claimant through the Registry access boundary may initiate a provenance reconciliation case.'
       }, { status: 403 });
     }
 
+    const admin = service();
     let targetRegistered = false;
     let targetArchitectureName = targetName;
     if (targetRegistryIdentifier) {
