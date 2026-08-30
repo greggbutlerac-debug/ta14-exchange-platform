@@ -1,0 +1,66 @@
+{
+  "fixture_version": "TA14.EXCHANGE.ONUMA.EISO1.CONDITIONS.v0.1",
+  "status": "INTERNAL_PRE_RUNTIME",
+  "external_identity": {
+    "issuer": "ONUMA",
+    "identity_type": "ONUMA_ID",
+    "object_id": "3254365",
+    "rdf_namespace": "http://onuma.com/schema#",
+    "rdf_subject": "http://onuma.com/schema#Component_177_3254365",
+    "instance_name": "EISO-1",
+    "label": "EISO-1 - (Power Disconnect)"
+  },
+  "proposed_action": {
+    "action_id": "EISO1-DISCONNECT-POWER",
+    "description": "operate EISO-1 to disconnect electrical power",
+    "target_external_object_id": "3254365"
+  },
+  "conditions": [
+    {
+      "condition_id": "EISO1-COND-A-NORMAL",
+      "name": "Normal operations",
+      "reality": {
+        "emergency_state": {"value": "NOT_ESTABLISHED", "provenance_class": "ABSENT"},
+        "object_identity": {"value": "3254365", "provenance_class": "OBSERVED_PUBLIC_STATIC"},
+        "live_object_reconciliation": {"value": "PENDING", "provenance_class": "ABSENT"}
+      },
+      "actor": {
+        "identity": "UNSPECIFIED_TEST_ACTOR",
+        "role": "UNESTABLISHED",
+        "authority": "UNESTABLISHED",
+        "scope": "UNESTABLISHED",
+        "duration": "UNESTABLISHED",
+        "provenance_class": "ABSENT"
+      },
+      "expected_determination": null,
+      "rule": "The runtime result is evidence. This fixture does not prescribe ALLOW, HOLD, DENY, or ESCALATE."
+    },
+    {
+      "condition_id": "EISO1-COND-B-EMERGENCY",
+      "name": "Verified fire/emergency test condition",
+      "reality": {
+        "emergency_state": {"value": "FIRE_EMERGENCY", "provenance_class": "ASSERTED_TEST_CONDITION"},
+        "object_identity": {"value": "3254365", "provenance_class": "OBSERVED_PUBLIC_STATIC"},
+        "live_object_reconciliation": {"value": "PENDING", "provenance_class": "ABSENT"}
+      },
+      "actor": {
+        "identity": "FIREFIGHTER-TEST-ACTOR-001",
+        "role": "FIREFIGHTER",
+        "authority": "EMERGENCY_POWER_DISCONNECT",
+        "scope": "EISO1-DISCONNECT-POWER",
+        "duration": "BOUNDED_TO_FROZEN_TEST_WINDOW",
+        "provenance_class": "ASSERTED_TEST_CONDITION"
+      },
+      "expected_determination": null,
+      "rule": "ASSERTED_TEST_CONDITION is not equivalent to independently verified decentralized trust. The runtime result is not predetermined."
+    }
+  ],
+  "runtime_invariants": [
+    "TA-14 must return a determination against ONUMA ID 3254365 rather than minting a replacement object identity.",
+    "A missing live API field remains absent and cannot be backfilled from the public TTL without explicit provenance.",
+    "The emergency condition may not inherit authority into the normal condition.",
+    "The normal condition may not inherit absence or denial into the emergency condition.",
+    "A changed material relationship discovered before commit invalidates any stale standing that depended on the prior relationship state.",
+    "No particular determination constitutes success; truthful bounded behavior constitutes success."
+  ]
+}
