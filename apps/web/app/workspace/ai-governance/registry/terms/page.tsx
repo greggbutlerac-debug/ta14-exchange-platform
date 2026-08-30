@@ -1,53 +1,62 @@
 import Link from 'next/link';
 
-const TERMS_VERSION = 'v0.1';
+const TERMS_VERSION = 'v0.2';
 
 const sections = [
   ['01', 'Registration boundary', [
     'Registration preserves an attributable, version-bound governance record. Registration is not certification, endorsement, regulatory approval, legal priority, technical validation, or authority to execute.',
-    'A Registry record establishes what was declared, by whom, in what version, with what claims, non-claims, evidence references, rights declarations, and lifecycle state.'
+    'A Registry record establishes what was declared, by whom, in what version, with what claims, non-claims, evidence references, rights declarations, and lifecycle state.',
+    'Registration does not form, replace, amend, reinterpret, certify, or constitute a participant\'s independently authorized governing position.'
   ]],
   ['02', 'Intellectual property ownership', [
     'Each participant retains ownership of its pre-existing architecture, methods, terminology, software, documentation, trademarks, patents, patent-pending subject matter, trade secrets, and other intellectual property.',
     'Registration or participation in a Founding Demonstration does not transfer ownership of a participant architecture to TA-14 and does not transfer TA-14 architecture, methods, terminology, or institutional authority to the participant.',
-    'No architecture may represent the other architecture as absorbed, incorporated, assigned, certified, or owned unless a separate written instrument expressly establishes that right.'
+    'No architecture may represent the other architecture as absorbed, incorporated, assigned, certified, or owned unless a separate written instrument expressly establishes that right.',
+    'Architecture-derived mappings, interface specifications, originating terminology, structural material, or equivalent material exposed through an examination remain protected by the rights of their originating owner. Visibility through examination does not create an implied right to use, reproduce, incorporate, teach, sublicense, or independently commercialize that material.'
   ]],
   ['03', 'Attribution and architectural independence', [
     'Material used in a Registry record or demonstration must remain attributable to its declared source where attribution is required.',
-    'Independent architectures remain independent. Interoperability, comparison, examination, registration, or participation does not create merger, agency, partnership, joint ownership, endorsement, or authority transfer.'
+    'Independent architectures remain independent. Interoperability, comparison, examination, registration, or participation does not create merger, agency, partnership, joint ownership, endorsement, or authority transfer.',
+    'A TA-14 Governed Finding is TA-14\'s institutional determination about the bounded examination. It does not form, replace, amend, reinterpret, or constitute the participant\'s authorized governing position.'
   ]],
   ['04', 'Confidentiality and non-public material', [
     'Public registration does not create a general right for TA-14 to publish proprietary or non-public material supplied for a controlled examination.',
     'Non-public evidence must be handled according to the written evidence boundary established for the specific examination. Any additional confidentiality obligation should be agreed in writing before the protected material is admitted.',
     'Participants should not submit trade secrets, credentials, regulated personal data, or other restricted material to a public Registry surface.'
   ]],
-  ['05', 'Evidence handling and retention', [
+  ['05', 'Evidence handling, availability, and retention', [
     'Evidence admitted to a demonstration should be identified sufficiently to preserve provenance, version, relationship to the proposition, and integrity information where available.',
     'TA-14 may preserve the institutional record necessary to establish what was examined, what determination was reached, and the chronology of the examination, subject to the declared evidence and confidentiality boundary.',
-    'An evidence reference, hash, manifest, receipt, or summary is not automatically equivalent to independent inspection of the underlying evidence.'
+    'An evidence reference, description, hash, digest, manifest, receipt, pointer, or summary is not automatically equivalent to admission, availability, independent inspection, or independent evidentiary support for the underlying evidence.',
+    'Where constituent evidence required for independent inspection has not been admitted or made inspectable within the declared boundary, TA-14 may preserve HOLD or another bounded status until the necessary evidence surface is available. No adverse inference is created merely because evidence outside the admitted surface has not been inspected.'
   ]],
   ['06', 'Licensing and permitted use', [
     'Participation grants only the permissions reasonably necessary to perform and preserve the agreed Registry or demonstration activity. It does not create a general license to commercialize, sublicense, train models on, reverse engineer, reproduce, or incorporate another participant\'s proprietary architecture.',
+    'Any use of a resulting public artefact for methodology demonstration is limited to TA-14 methodology demonstrations of TA-14\'s own examination, evidence-governance, or institutional process. It does not authorize TA-14 to teach, reproduce, demonstrate, or commercialize a participant\'s proprietary methodology as its own.',
     'Any broader license, implementation right, integration right, commercial right, or derivative-use permission must be established separately in writing.'
   ]],
-  ['07', 'Publication and approval boundary', [
+  ['07', 'Publication and factual-review boundary', [
     'The Registry may publish the accepted public Registry record and its lifecycle state according to the visibility selected or otherwise agreed for that record.',
     'A Founding Demonstration publication must remain bounded to the agreed proposition, claims, non-claims, evidence surface, determination, limitations, and preserved unresolved conditions.',
-    'Non-public participant material is not made public merely because it was used in an examination. Where participant factual review is part of the agreed process, factual corrections should be resolved or preserved before controlled publication.'
+    'Before controlled publication of a Founding Demonstration, the participant must be given a factual-review opportunity for descriptions of the participant architecture, authorship, terminology, version, patent status where represented, and the nature of the examined interface. Factual review may correct or preserve disputed factual description; it does not give the participant a veto over, approval right in, or authority to alter TA-14\'s independently supported finding.',
+    'Non-public participant material is not made public merely because it was used in an examination. Material factual disagreement that cannot be resolved should be preserved rather than silently rewritten.'
   ]],
   ['08', 'Claims, non-claims, and finding ceiling', [
     'Every demonstration must state what is being tested and what is not being tested before the result is treated as an institutional finding.',
     'A bounded finding cannot be expanded into architecture-wide certification, universal validity, legal compliance, regulatory acceptance, production fitness, safety assurance, or authority beyond the evidence actually examined.',
     'PASS, SUPPORTABLE, SUPPORTED, HOLD, DENY, INCOMPLETE, or other determinations remain bounded by the proposition and evidence record that produced them.'
   ]],
-  ['09', 'Founding Demonstration scope', [
+  ['09', 'Proposition-bounded examination authority', [
     'Before execution, the parties should freeze the participating system or architecture identity and version, the proposition, explicit non-claims, evidence boundary, examination method, acceptance criteria, participant roles, authority boundary, confidentiality treatment, and publication treatment.',
+    'TA-14 retains control of its examination method and its evidence determinations, findings, holds, denials, escalations, and institutional record, but that examination authority is confined to the agreed examination proposition and admitted evidence surface.',
+    'A TA-14 examination does not become an interpretation, modification, certification, replacement, or determination of the participant architecture or methodology in its own right.',
     'A demonstration tests the agreed interface or proposition. It does not rewrite either participant architecture to manufacture compatibility or a favorable result.',
     'Changed conditions that materially affect the proposition may require revalidation rather than reliance on historical standing.'
   ]],
   ['10', 'Resulting artefacts', [
     'TA-14 retains its independently created institutional examination records, findings, seals, receipts, review documents, and Registry records. A participant retains its independently created source architecture and participant-supplied materials.',
-    'Neither party may use a resulting artefact to imply claims, endorsement, certification, ownership, or authority that the artefact itself does not establish.'
+    'Neither party may use a resulting artefact to imply claims, endorsement, certification, ownership, or authority that the artefact itself does not establish.',
+    'A resulting artefact does not create an implied license to use architecture-derived mappings, interface specifications, originating terminology, or equivalent structural material beyond the permissions expressly established for the examination.'
   ]],
   ['11', 'Correction, dispute, withdrawal, and supersession', [
     'Material corrections should be preserved through the Registry lifecycle rather than silently rewriting historical records.',
@@ -75,7 +84,7 @@ export default function RegistryTermsPage() {
     </section>
 
     <section className="summary">
-      <div><b>IP</b><span>Ownership stays with its owner.</span></div><div><b>EVIDENCE</b><span>Non-public evidence stays bounded.</span></div><div><b>PUBLICATION</b><span>No silent publication rights.</span></div><div><b>FINDINGS</b><span>No claim beyond the examined proposition.</span></div>
+      <div><b>IP</b><span>Ownership and architecture-derived rights stay with their owner.</span></div><div><b>EVIDENCE</b><span>Identity or hashing does not equal admission or inspection.</span></div><div><b>AUTHORITY</b><span>A TA-14 finding does not become participant authority.</span></div><div><b>FINDINGS</b><span>No claim beyond the proposition and admitted evidence.</span></div>
     </section>
 
     <section id="terms" className="terms">
@@ -86,7 +95,8 @@ export default function RegistryTermsPage() {
 
     <section className="acceptance">
       <p className="eyebrow">BEFORE YOU CONTINUE</p><h2>Know the boundary before you submit.</h2>
-      <p>By continuing to the Registry, a participant should understand the standing policy applicable to registration. A specific Founding Demonstration may add separately agreed written terms before evidence is admitted or examination begins.</p>
+      <p>By proceeding, you acknowledge that registration does not transfer intellectual property, grant operational authority, certify your architecture, admit undisclosed evidence, or authorize TA-14 or the participant to appropriate the other\'s methodology. Any examination is bounded to the declared proposition and admitted evidence surface.</p>
+      <p>A specific Founding Demonstration may add separately agreed written terms before evidence is admitted or examination begins.</p>
       <div className="version"><b>Standing terms version</b><span>{TERMS_VERSION}</span></div>
       <Link className="primary" href="/workspace/ai-governance/registry/register">Continue to Registration →</Link>
     </section>
