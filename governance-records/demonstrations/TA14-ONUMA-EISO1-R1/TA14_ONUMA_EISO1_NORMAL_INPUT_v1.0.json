@@ -1,0 +1,17 @@
+{
+  "examination": "TA14-ONUMA-EISO1-R1",
+  "condition": "NORMAL_OPERATIONS",
+  "external_namespace": "ONUMA",
+  "onuma_id": 3254365,
+  "instance_name": "EISO-1",
+  "proposed_action": "OPEN_POWER_DISCONNECT",
+  "actor": "UNSPECIFIED",
+  "asserted_authority": "NONE",
+  "emergency_condition": false,
+  "evidence_status": "INSUFFICIENT",
+  "authority_status": "NOT_ESTABLISHED",
+  "identity_reconciliation": "MATCH",
+  "identity_reconciliation_sha256": "49F0749CEAF06780CDB5DF6AAC607E570C828BF9E790A551C46EFAA4C6F59345",
+  "physical_execution_requested": false,
+  "physical_execution_claimed": false
+}
