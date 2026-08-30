@@ -1,11 +1,12 @@
 {
-  "manifest_version": "TA14.EXCHANGE.ONUMA.EISO1.EVIDENCE.v0.1",
+  "manifest_version": "TA14.EXCHANGE.ONUMA.EISO1.EVIDENCE.v0.2",
   "status": "INTERNAL_PRE_EXAMINATION",
   "object": {
     "originating_architecture": "ONUMA Semantic Bridge",
-    "external_namespace": "http://onuma.com/bldg-3593#",
+    "identity_namespace": "ONUMA_ID",
     "external_object_id": "3254365",
-    "rdf_subject": "http://onuma.com/bldg-3593#Component_177_3254365",
+    "rdf_namespace": "http://onuma.com/schema#",
+    "rdf_subject": "http://onuma.com/schema#Component_177_3254365",
     "instance_name": "EISO-1",
     "label": "EISO-1 - (Power Disconnect)",
     "ifc_guid_public_snapshot": "56392c405fd44d55ab63b9"
