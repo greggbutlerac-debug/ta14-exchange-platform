@@ -1,0 +1,23 @@
+{
+  "examination": "TA14-ONUMA-EISO1-R1",
+  "result_version": "1.0",
+  "external_namespace": "ONUMA",
+  "onuma_id": 3254365,
+  "instance_name": "EISO-1",
+  "condition": "NORMAL_OPERATIONS",
+  "proposed_action": "OPEN_POWER_DISCONNECT",
+  "actor": "UNSPECIFIED",
+  "asserted_authority": "NONE",
+  "identity_reconciliation": "MATCH",
+  "evidence_status": "INSUFFICIENT",
+  "authority_status": "NOT_ESTABLISHED",
+  "determination": "HOLD",
+  "reason": "Identity is reconciled, but evidence is insufficient and execution authority is not established for the proposed action under normal operations.",
+  "input_file": "TA14_ONUMA_EISO1_NORMAL_INPUT_v1.0.json",
+  "input_sha256": "0D7EC682EAABD33D51109E4E51F4610D1B859A01D65F5BD14E39B2FA1099E417",
+  "identity_reconciliation_sha256": "49F0749CEAF06780CDB5DF6AAC607E570C828BF9E790A551C46EFAA4C6F59345",
+  "identity_replaced_by_ta14": false,
+  "execution_authority_established": false,
+  "physical_execution_requested": false,
+  "physical_execution_claimed": false
+}
