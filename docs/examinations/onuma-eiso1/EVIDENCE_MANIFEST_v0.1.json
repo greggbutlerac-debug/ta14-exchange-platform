@@ -1,0 +1,57 @@
+{
+  "manifest_version": "TA14.EXCHANGE.ONUMA.EISO1.EVIDENCE.v0.1",
+  "status": "INTERNAL_PRE_EXAMINATION",
+  "object": {
+    "originating_architecture": "ONUMA Semantic Bridge",
+    "external_namespace": "http://onuma.com/bldg-3593#",
+    "external_object_id": "3254365",
+    "rdf_subject": "http://onuma.com/bldg-3593#Component_177_3254365",
+    "instance_name": "EISO-1",
+    "label": "EISO-1 - (Power Disconnect)",
+    "ifc_guid_public_snapshot": "56392c405fd44d55ab63b9"
+  },
+  "proposition": "Can TA-14 preserve an externally established building identity and provenance, evaluate standing for a proposed consequential action, and return a native determination against the same identity without architectural absorption?",
+  "conditions": [
+    {
+      "condition_id": "NORMAL-OPS",
+      "description": "Operation proposed without inferred emergency privilege.",
+      "authority_state": "TO_BE_ESTABLISHED",
+      "fire_state": "NOT_ASSERTED",
+      "determination": "UNRUN"
+    },
+    {
+      "condition_id": "VERIFIED-EMERGENCY",
+      "description": "Same object and proposed consequence under frozen emergency/fire and actor-authority assertions for first-pass examination.",
+      "authority_state": "ASSERTED_TEST_CONDITION_PENDING_FREEZE",
+      "fire_state": "ASSERTED_TEST_CONDITION_PENDING_FREEZE",
+      "determination": "UNRUN"
+    }
+  ],
+  "evidence_slots": [
+    {"slot":"PUBLIC_TTL_IDENTITY","state":"PRESENT","mode":"STATIC","required":true},
+    {"slot":"LIVE_API_IDENTITY","state":"ABSENT","mode":"LIVE_API","required":true},
+    {"slot":"LIVE_API_CONTEXT","state":"ABSENT","mode":"LIVE_API","required":true},
+    {"slot":"ACTOR_IDENTITY","state":"ABSENT","mode":"ASSERTED_OR_VERIFIED","required":true},
+    {"slot":"AUTHORITY_SCOPE","state":"ABSENT","mode":"ASSERTED_OR_VERIFIED","required":true},
+    {"slot":"AUTHORITY_DURATION","state":"ABSENT","mode":"ASSERTED_OR_VERIFIED","required":true},
+    {"slot":"FIRE_EMERGENCY_STATE","state":"ABSENT","mode":"ASSERTED_OR_VERIFIED","required":true},
+    {"slot":"PROPOSED_ACTION","state":"PRESENT","mode":"FROZEN_TEST_PROPOSITION","required":true},
+    {"slot":"TA14_DETERMINATION_RECEIPT","state":"ABSENT","mode":"RUNTIME","required":true},
+    {"slot":"EXTERNAL_CONSUMPTION_RECEIPT","state":"ABSENT","mode":"EXTERNAL","required":false},
+    {"slot":"PHYSICAL_EXECUTION_EVIDENCE","state":"ABSENT","mode":"PHYSICAL","required":false}
+  ],
+  "proposed_action": {
+    "object_id": "3254365",
+    "action": "operate/disconnect electrical power through EISO-1",
+    "physical_execution_required_for_first_pass": false
+  },
+  "native_determinations": ["ALLOW","HOLD","DENY","ESCALATE"],
+  "rules": {
+    "predetermined_outcome": false,
+    "external_identity_replacement": false,
+    "missing_evidence_may_be_inferred": false,
+    "static_source_may_be_called_live": false,
+    "asserted_authority_may_be_called_verified": false,
+    "machine_readable_return_may_be_called_external_consumption_without_receipt": false
+  }
+}
