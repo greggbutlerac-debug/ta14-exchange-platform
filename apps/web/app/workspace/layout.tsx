@@ -1,12 +1,8 @@
-import { requireUser } from "../../lib/auth/require-user";
-
-export default async function WorkspaceLayout({
+export default function WorkspaceLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  await requireUser();
-
   return (
     <>
       <style>{`
