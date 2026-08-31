@@ -1,0 +1,128 @@
+import Link from 'next/link';
+
+export const dynamic = 'force-dynamic';
+
+const artifactId = 'TA14-EA-000041';
+const registryId = 'TA-14-AIGR-0001';
+const sourceSha = '77f9376d166ba298c3f8abeeb61e8cddbbd9dec7d895c2fd12c76cfce31ba261';
+
+const panel: React.CSSProperties = {
+  border: '1px solid rgba(148,163,184,.20)',
+  borderRadius: 22,
+  padding: 24,
+  background: 'linear-gradient(145deg,rgba(7,22,37,.86),rgba(3,12,22,.92))',
+  boxShadow: '0 24px 70px rgba(0,0,0,.22)',
+};
+
+const gold: React.CSSProperties = { color: '#efc66e' };
+const muted: React.CSSProperties = { color: '#9bb2c7', lineHeight: 1.75 };
+
+export const metadata = {
+  title: `${artifactId} | TA-14 Admissible Execution Architecture Governance Showcase`,
+  description: 'Governance showcase artifact preserving the TA-14 Partner Review and provenance-reconciliation record concerning BIGMAE.',
+};
+
+export default function Page() {
+  const chronology = [
+    {
+      title: 'Repeated architecture-level review',
+      text: 'TA-14 reviewed BIGMAE across successive states rather than treating one submission as the permanent truth. The review record identified admissible-execution conditions that were not yet fully established at particular review stages, including route-complete non-bypass governance, Binding/Commit separation, authority-state continuity, evidence-object maturity, runtime-pressure survivability, and outcome accountability.',
+    },
+    {
+      title: 'A written sovereignty boundary was established',
+      text: 'The parties preserved a written separation: BIGMAE / Elias remained BIGMAE / Elias, while TA-14 remained the separate admissible-execution review architecture. The purpose of the boundary was to preserve architectural identity, attribution, implementation ownership, and review provenance as later development occurred.',
+    },
+    {
+      title: 'The boundary itself became reviewable evidence',
+      text: 'When later BIGMAE positioning entered territory previously surfaced through TA-14 review, TA-14 did not silently rewrite the history. It froze further registry and partner-review activity, raised the provenance question in writing, and required the chronology to be examined against dated artifacts.',
+    },
+    {
+      title: 'The subject acknowledged review-informed successor development',
+      text: 'AB Sahoo expressly acknowledged that TA-14 reviews identified areas for strengthening and that subsequent BIGMAE development was review-informed in specified areas. Later correspondence identified the eight-stage sequence terminology, route-complete framing, and execution-time verification focus as review-informed development.',
+    },
+    {
+      title: 'Competing antecedence evidence was admitted rather than suppressed',
+      text: 'BIGMAE produced pre-contact VCS and Zenodo material, including an April 15, 2026 v1.0 publication, to support antecedence for core mechanisms. TA-14 preserved that evidence where it established an earlier BIGMAE mechanism instead of converting review influence into a claim of whole-architecture ownership.',
+    },
+    {
+      title: 'TA-14 applied the same test to itself',
+      text: 'TA-14 produced a reciprocal antecedence reconciliation for consequence-time admissibility, authority/scope continuity requirements, and evidence-state conditions. AB Sahoo acknowledged that the dated TA-14 record supported antecedence for the high-level articulation of those governing principles.',
+    },
+  ];
+
+  return (
+    <main style={{ minHeight: '100vh', color: '#f5f8fc', background: 'radial-gradient(circle at 12% 4%,rgba(35,104,173,.25),transparent 27%),radial-gradient(circle at 88% 6%,rgba(227,177,76,.16),transparent 25%),linear-gradient(180deg,#01050b 0%,#04111f 44%,#02070d 100%)' }}>
+      <div style={{ width: 'min(1160px,calc(100% - 40px))', margin: '0 auto', padding: '42px 0 90px' }}>
+        <nav style={{ fontSize: 12, color: '#7892a8', marginBottom: 54 }}>
+          <Link href="/workspace/ai-governance/registry/showcase/TA-14-AIGR-0001" style={{ color: '#c4d9ea', textDecoration: 'none' }}>TA-14 Admissible Execution Architecture Showcase</Link>
+          <span> / </span><strong style={gold}>{artifactId}</strong>
+        </nav>
+
+        <section style={{ display: 'grid', gridTemplateColumns: 'minmax(0,1.45fr) minmax(300px,.55fr)', gap: 34, alignItems: 'start' }}>
+          <div>
+            <p style={{ ...gold, fontSize: 11, fontWeight: 900, letterSpacing: '.15em', textTransform: 'uppercase' }}>TA-14 AEA Governance Showcase · Review Integrity Record</p>
+            <h1 style={{ fontSize: 'clamp(42px,6.5vw,82px)', lineHeight: .94, letterSpacing: '-.055em', margin: '18px 0 0' }}>When the Review Boundary Became the Evidence</h1>
+            <p style={{ ...muted, fontSize: 21, maxWidth: 850, marginTop: 26 }}>A governed record of the TA-14 Partner Review and provenance-reconciliation process concerning BIGMAE - showing how TA-14 handled later architectural convergence, competing antecedence evidence, boundary conflict, and review-informed successor development without claiming the subject architecture as its own.</p>
+          </div>
+
+          <aside style={{ ...panel, borderColor: 'rgba(239,198,110,.30)' }}>
+            <p style={{ color: '#6f879c', fontSize: 10, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>Artifact identity</p>
+            <div style={{ ...gold, fontWeight: 950, fontSize: 20, overflowWrap: 'anywhere' }}>{artifactId}</div>
+            <div style={{ marginTop: 18, display: 'grid', gap: 13 }}>
+              <div><small style={{ color: '#70879b' }}>Parent governance</small><br/><strong>{registryId}</strong></div>
+              <div><small style={{ color: '#70879b' }}>Artifact class</small><br/><strong>Governance Showcase / Review Provenance</strong></div>
+              <div><small style={{ color: '#70879b' }}>Finding</small><br/><strong style={gold}>SUPPORTED - BOUNDED</strong></div>
+              <div><small style={{ color: '#70879b' }}>Subject registration status</small><br/><strong>Not registered in the TA-14 public governance directory</strong></div>
+            </div>
+          </aside>
+        </section>
+
+        <section style={{ ...panel, marginTop: 38, borderColor: 'rgba(239,198,110,.32)' }}>
+          <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.14em', textTransform: 'uppercase' }}>Institutional finding</p>
+          <h2 style={{ fontSize: 31, margin: '10px 0 12px' }}>The review process produced an inspectable provenance record under conflict.</h2>
+          <p style={{ ...muted, fontSize: 18, margin: 0 }}>The evidence supports a bounded finding that TA-14's review process identified maturity gaps, preserved a written architectural boundary, detected a later provenance dispute, froze expansion, required dated evidence from both sides, admitted evidence favorable to the subject where established, preserved review-informed successor development where acknowledged, and maintained TA-14's own architectural identity without converting review influence into code ownership or whole-system derivation.</p>
+        </section>
+
+        <section style={{ marginTop: 52 }}>
+          <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.14em', textTransform: 'uppercase' }}>What the chronology shows</p>
+          <div style={{ display: 'grid', gap: 16, marginTop: 18 }}>
+            {chronology.map((item, i) => (
+              <article key={item.title} style={{ ...panel, display: 'grid', gridTemplateColumns: '54px minmax(0,1fr)', gap: 18 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 999, display: 'grid', placeItems: 'center', border: '1px solid rgba(239,198,110,.35)', color: '#efc66e', fontWeight: 950 }}>{String(i + 1).padStart(2, '0')}</div>
+                <div><h3 style={{ margin: 0, fontSize: 21 }}>{item.title}</h3><p style={{ ...muted, margin: '8px 0 0' }}>{item.text}</p></div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section style={{ display: 'grid', gridTemplateColumns: 'repeat(2,minmax(0,1fr))', gap: 16, marginTop: 40 }}>
+          <article style={panel}>
+            <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>What this does establish</p>
+            <p style={muted}>TA-14's review function created a usable before / finding / after chronology. The subject later acknowledged review-informed development in multiple execution-governance areas and recognized TA-14's eight-stage admissible-execution evaluation architecture as TA-14's framework.</p>
+          </article>
+          <article style={panel}>
+            <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>What this does not establish</p>
+            <p style={muted}>This artifact does not find that TA-14 authored BIGMAE source code, owns BIGMAE, or that every BIGMAE mechanism originated in TA-14. It does not label review-informed successor development as theft. Competing antecedence and independent engineering are preserved wherever the dated evidence supports them.</p>
+          </article>
+        </section>
+
+        <section style={{ ...panel, marginTop: 18 }}>
+          <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>Why this belongs in the TA-14 AEA showcase</p>
+          <p style={{ ...muted, fontSize: 18 }}>Governance is easiest to claim when everyone agrees. This record tests something harder: whether the institution preserves boundaries and evidence when the relationship becomes adverse. TA-14 did not erase the subject's April 15 evidence because it was inconvenient, and it did not surrender its own review chronology because the subject disputed the interpretation. The result is a proposition-specific record that an outside reader can inspect without being asked to accept either party's preferred story.</p>
+        </section>
+
+        <section style={{ ...panel, marginTop: 18 }}>
+          <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>Controlled source record</p>
+          <p style={muted}><strong>Source filename:</strong> TA14_AEA_Governance_Showcase_AB_BIGMAE_Review_Provenance_Artifact_v1.0.pdf<br/><strong>Source SHA-256:</strong> <span style={{ overflowWrap: 'anywhere' }}>{sourceSha}</span><br/><strong>Source size:</strong> 134,510 bytes<br/><strong>Publication posture:</strong> Public showcase record; source PDF retained as the controlled artifact.</p>
+        </section>
+
+        <section style={{ ...panel, marginTop: 18, borderColor: 'rgba(239,198,110,.30)' }}>
+          <p style={{ ...gold, fontSize: 10, fontWeight: 900, letterSpacing: '.12em', textTransform: 'uppercase' }}>Final boundary</p>
+          <p style={{ ...muted, fontSize: 18, marginBottom: 0 }}><strong style={{ color: '#f5f8fc' }}>Finding: SUPPORTED - BOUNDED.</strong> This showcase supports the performance of the TA-14 review and provenance-reconciliation process in this historical record. It is not a certification of BIGMAE, not a registration of BIGMAE, and not an adjudication binding on the subject organization.</p>
+        </section>
+
+        <p style={{ marginTop: 28 }}><Link href="/workspace/ai-governance/registry/showcase/TA-14-AIGR-0001" style={{ color: '#efc66e', fontWeight: 900, textDecoration: 'none' }}>← Return to TA-14 Admissible Execution Architecture Governance Showcase</Link></p>
+      </div>
+    </main>
+  );
+}
