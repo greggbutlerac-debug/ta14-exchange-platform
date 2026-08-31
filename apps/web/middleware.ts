@@ -1,22 +1,33 @@
 import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 
 import { updateSession } from "./lib/supabase/middleware";
 
+const SHOWCASE_PREFIX = "/workspace/ai-governance/registry/showcase";
+const PUBLIC_SHOWCASE_PREFIX = "/public/ai-governance/registry/showcase";
+
 export async function middleware(request: NextRequest) {
-  request.headers.set(
-    "x-ta14-requested-path",
-    `${request.nextUrl.pathname}${request.nextUrl.search}`,
-  );
+  const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
+  request.headers.set("x-ta14-requested-path", requestedPath);
+
+  // Published governance identities, showcase records, provenance series, and
+  // governed showcase artifacts are public institutional evidence. They must
+  // remain anonymously inspectable. Registration, review, mission-control,
+  // drafts, account functions, and other workspace routes remain protected.
+  if (
+    request.nextUrl.pathname === SHOWCASE_PREFIX ||
+    request.nextUrl.pathname.startsWith(`${SHOWCASE_PREFIX}/`)
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = `${PUBLIC_SHOWCASE_PREFIX}${request.nextUrl.pathname.slice(SHOWCASE_PREFIX.length)}`;
+    return NextResponse.rewrite(url, { request: { headers: request.headers } });
+  }
 
   return updateSession(request);
 }
 
 export const config = {
   matcher: [
-    /*
-     * Run authentication-cookie synchronization on application routes while
-     * excluding Next.js assets and common static files.
-     */
     "/((?!_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
   ],
 };
