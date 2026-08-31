@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const dynamic = 'force-dynamic';
-const artifactId='TA14-EA-000041'; const registryId='TA-14-AIGR-0001'; const sourceSha='77f9376d166ba298c3f8abeeb61e8cddbd9dec7d895c2fd12c76cfce31ba261';
+const artifactId='TA14-EA-000041'; const registryId='TA-14-AIGR-0001'; const sourceSha='77f9376d166ba298c3f8abeeb61e8cddbbd9dec7d895c2fd12c76cfce31ba261';
 const panel:React.CSSProperties={border:'1px solid rgba(148,163,184,.20)',borderRadius:22,padding:24,background:'linear-gradient(145deg,rgba(7,22,37,.86),rgba(3,12,22,.92))',boxShadow:'0 24px 70px rgba(0,0,0,.22)'};
 const gold:React.CSSProperties={color:'#efc66e'}; const muted:React.CSSProperties={color:'#9bb2c7',lineHeight:1.75};
 export const metadata={title:`${artifactId} | TA-14 Admissible Execution Architecture Governance Showcase`,description:'Governance showcase artifact preserving the TA-14 Partner Review and provenance-reconciliation record concerning BIGMAE.'};
