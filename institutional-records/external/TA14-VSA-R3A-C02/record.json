@@ -1,0 +1,58 @@
+{
+  "schema": "TA14-External-Institutional-Examination-Preserved-Determination-v1",
+  "record_id": "TA14-VSA-R3A-C02",
+  "publication_class": "EXTERNAL INSTITUTIONAL EXAMINATION — PRESERVED DETERMINATION",
+  "native_consequence_examination_engine_finding": false,
+  "registry_binding": {
+    "registry_id": "TA-14-AIGR-000025",
+    "architecture": "Validation Standing Assurance (VSA) v1.0"
+  },
+  "examination": {
+    "surface": "R3A / C02",
+    "condition": "R3A-C02 — Independent Evidence Availability Boundary",
+    "condition_disposition": "SATISFIED",
+    "determination": "SUPPORTED — BOUNDED CONFIGURED PHYSICAL-WITNESS DEMONSTRATION"
+  },
+  "preserved_claim_ceiling": {
+    "configured_witness_proposition": "SUPPORTED, BOUNDED",
+    "universal_hidden_drift_detection": "NOT ESTABLISHED",
+    "t4e_run1": "NOT_ESTABLISHED / PRESERVED",
+    "later_run2_retroactively_repairs_run1": false
+  },
+  "controlling_separations": [
+    "physical observation ≠ materiality",
+    "materiality ≠ admissibility",
+    "admissibility ≠ Validation Standing",
+    "Validation Standing ≠ authority",
+    "authority ≠ action"
+  ],
+  "preserved_state": {
+    "R2A": "FROZEN",
+    "C01": "PRESERVED",
+    "R3A": "FROZEN",
+    "C02": "SATISFIED"
+  },
+  "evidence_identity": {
+    "r3a_frozen_master_evidence_root": "39c79046c5631e20d20867c9370c7ecb84ba63b7ee5649ca74b7e67ca8d5bc87",
+    "c02_byte_identical_transport_root": "34f24b1cf2401069a631e9b7c7ba521a2f841b1c32916ce375448017d7b3ce57",
+    "c02_sealed_archive_sha256": "f068d0ea0e9e81e66d011e70bafa2aec848f70bf7c728ef8ab03f2e2255fb2cf",
+    "constituent_file_count": 125,
+    "inspection_release": "https://github.com/bounded-evidence-review/vsa-r3a-c02-evidence-inspection/releases/tag/r3a-c02-inspection-v1"
+  },
+  "counterpart_factual_reconciliation": {
+    "status": "COMPLETE",
+    "counterpart": "Taiwo M. Yusuf",
+    "record_reviewed": "R3A / C02 Institutional Determination Record v1.0",
+    "factual_inaccuracies_identified": false,
+    "controlled_publication_accepted": true,
+    "final_acceptance_preserves_claim_ceiling": true
+  },
+  "historical_integrity": {
+    "experiment_rerun_for_c02": false,
+    "experiment_reconstructed_for_c02": false,
+    "frozen_evidence_rewritten_for_c02": false,
+    "retroactive_native_engine_receipt_created": false
+  },
+  "institution": "TA-14 Authority Governance Institution",
+  "governing_principle": "No admissible evidence. No admissible execution."
+}
