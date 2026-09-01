@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const TERMS_VERSION = 'v0.2';
+const TERMS_VERSION = 'v0.3';
 
 const sections = [
   ['01', 'Registration boundary', [
@@ -53,16 +53,26 @@ const sections = [
     'A demonstration tests the agreed interface or proposition. It does not rewrite either participant architecture to manufacture compatibility or a favorable result.',
     'Changed conditions that materially affect the proposition may require revalidation rather than reliance on historical standing.'
   ]],
-  ['10', 'Resulting artefacts', [
+  ['10', 'Challenge selection, coverage, and examination independence', [
+    'Where a demonstration uses induced, adversarial, sampled, randomized, or otherwise selected challenge conditions, the examination record should distinguish the declared claim surface, the derivation of the challenge population, the selection method, the selected condition, the executed run, and the resulting finding.',
+    'The challenge population should be derivable from the bounded claims, declared routes, authority conditions, refusal conditions, consequence classes, or other examination-relevant surfaces under a declared derivation method. A participant-selected list is not by itself evidence that the list exhausts the challengeable population.',
+    'The party whose architecture is being examined should not have unilateral control over both the challenge population and the specific condition selected for examination. Roles responsible for claim declaration, population derivation, condition selection, examination execution, and institutional finding should be identified where material to the examination.',
+    'Where random or pseudorandom selection is used, the selection method should be frozen before the run and should be independently reproducible. A precommitted seed, commitment-and-reveal mechanism, or equivalent integrity method may be used so that a later reviewer can verify that the selected condition followed the frozen method rather than discretionary post-selection.',
+    'Coverage must state both the number of conditions actually examined and the declared or derivable challenge population to which that count relates. Examination of X conditions from a population of Y establishes evidence for the X examined conditions; it does not establish that the remaining Y minus X conditions passed.',
+    'A coverage ratio is not independently meaningful when its denominator is materially controlled by narrowing the claim surface after selection or by excluding otherwise derivable challenge conditions without preserved justification. Material exclusions, population changes, and derivation assumptions should remain inspectable.',
+    'A historical PASS, HOLD, DENY, ESCALATE, SUPPORTABLE, SUPPORTED, or other finding remains bounded to the frozen run and evidence that produced it. A later result does not silently rewrite the historical finding, but it may change what coverage, present standing, or broader claim remains supportable.',
+    'Challenge selection and coverage evidence do not convert a bounded Founding Demonstration into architecture-wide certification. The examination record should make independently reconstructable what could have been challenged, how the actual challenge was selected, what was run, and what proportion of the declared challenge surface has actually been examined.'
+  ]],
+  ['11', 'Resulting artefacts', [
     'TA-14 retains its independently created institutional examination records, findings, seals, receipts, review documents, and Registry records. A participant retains its independently created source architecture and participant-supplied materials.',
     'Neither party may use a resulting artefact to imply claims, endorsement, certification, ownership, or authority that the artefact itself does not establish.',
     'A resulting artefact does not create an implied license to use architecture-derived mappings, interface specifications, originating terminology, or equivalent structural material beyond the permissions expressly established for the examination.'
   ]],
-  ['11', 'Correction, dispute, withdrawal, and supersession', [
+  ['12', 'Correction, dispute, withdrawal, and supersession', [
     'Material corrections should be preserved through the Registry lifecycle rather than silently rewriting historical records.',
     'A participant may raise a documented challenge concerning attribution, ownership, scope, evidence, or material factual accuracy. Withdrawal or supersession changes current standing but does not require erasure of the historical event chain where retention is necessary for institutional continuity.'
   ]],
-  ['12', 'Special terms', [
+  ['13', 'Special terms', [
     'These standing terms provide the default Registry and Founding Demonstration boundary. A specific examination may require additional written terms for confidentiality, restricted evidence, licensing, publication, security, commercial arrangements, or other exceptional conditions.',
     'Where specific written terms conflict with these standing terms for a defined demonstration, the specific terms govern that demonstration only to the extent of the stated conflict.'
   ]],

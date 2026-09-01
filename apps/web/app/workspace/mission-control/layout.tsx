@@ -1,7 +1,10 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { requireUser } from "../../../lib/auth/require-user";
 
-export default function MissionControlLayout({ children }: { children: ReactNode }) {
+export default async function MissionControlLayout({ children }: { children: ReactNode }) {
+  await requireUser();
+
   return (
     <>
       <div

@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { createServerClient } from '@supabase/ssr';
 import { createClient as createSupabaseAdminClient } from '@supabase/supabase-js';
 import { cookies } from 'next/headers';
+import { requireUser } from '../../../../../lib/auth/require-user';
 import RegistrationMilestoneCelebration from './RegistrationMilestoneCelebration';
 import RecoveryResponseTransport from './RecoveryResponseTransport';
 
@@ -95,6 +96,7 @@ async function preserveServerRegistrationEntry(): Promise<void> {
 }
 
 export default async function RegistryRegisterLayout({ children }: Readonly<{ children: ReactNode }>) {
+  await requireUser();
   await preserveServerRegistrationEntry();
 
   return (
