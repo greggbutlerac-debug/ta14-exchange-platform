@@ -11,17 +11,17 @@ export function RouteAwareGlobalChrome() {
   const isTransparentAir = pathname === '/transparent-air' || pathname.startsWith('/transparent-air/');
   const isPrivateEnvironmentalGateway = pathname === '/admin/environmental-evidence-gateway' || pathname.startsWith('/admin/environmental-evidence-gateway/');
   const isPrivateGcea = pathname === '/admin/governance-continuity-execution-authority' || pathname.startsWith('/admin/governance-continuity-execution-authority/');
-  const isOnumaMissionRecord =
-    pathname === '/workspace/ai-governance/operational-mission-records/onuma-re1' ||
-    pathname.startsWith('/workspace/ai-governance/operational-mission-records/onuma-re1/') ||
-    pathname === '/public/ai-governance/operational-mission-records/onuma-re1' ||
-    pathname.startsWith('/public/ai-governance/operational-mission-records/onuma-re1/');
+  const isOperationalMissionRecord =
+    pathname === '/workspace/ai-governance/operational-mission-records' ||
+    pathname.startsWith('/workspace/ai-governance/operational-mission-records/') ||
+    pathname === '/public/ai-governance/operational-mission-records' ||
+    pathname.startsWith('/public/ai-governance/operational-mission-records/');
 
   if (isTransparentAir || isPrivateEnvironmentalGateway || isPrivateGcea) return null;
 
   return (
     <>
-      {!isOnumaMissionRecord && <AtlasEnvironmentalIntegrityFundStrip />}
+      {!isOperationalMissionRecord && <AtlasEnvironmentalIntegrityFundStrip />}
       <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
         <Suspense fallback={null}>
           <SiteActivityCounter />
