@@ -30,7 +30,7 @@ export default function KeystoneShowcase(){
     <div style={{maxWidth:1180,margin:'0 auto'}}>
       <div style={{display:'flex',justifyContent:'space-between',gap:16,flexWrap:'wrap',alignItems:'center'}}>
         <div><div style={{fontSize:11,letterSpacing:2.1,color:'#71e7ff',fontWeight:900}}>TA-14 GOVERNED SHOWCASE · EXTERNAL ARCHITECTURE</div><div style={{marginTop:7,color:'#7ff0bd',fontWeight:850}}>TA-14-AIGR-000026 · REGISTERED AUGUST 23, 2026</div></div>
-        <Link href="/registry/records/TA-14-AIGR-000026" style={{color:'#dbeaf5',textDecoration:'none',border:'1px solid rgba(113,231,255,.25)',padding:'11px 15px',borderRadius:10}}>Open Permanent Registry Record</Link>
+        <Link href="/registry/TA-14-AIGR-000026" style={{color:'#dbeaf5',textDecoration:'none',border:'1px solid rgba(113,231,255,.25)',padding:'11px 15px',borderRadius:10}}>Open Permanent Registry Record</Link>
       </div>
 
       <section style={{marginTop:28,padding:'clamp(28px,5vw,54px)',border:'1px solid rgba(113,231,255,.18)',borderRadius:26,background:'linear-gradient(145deg,rgba(10,30,46,.92),rgba(5,14,24,.96))',boxShadow:'0 30px 90px rgba(0,0,0,.3)'}}>
@@ -45,7 +45,7 @@ export default function KeystoneShowcase(){
 
       <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(320px,1fr))',gap:15,marginTop:32}}>
         <article style={{padding:28,border:'1px solid rgba(113,231,255,.14)',borderRadius:18,background:'rgba(7,18,30,.72)'}}><div style={{color:'#71e7ff',fontWeight:900,fontSize:11,letterSpacing:'.14em'}}>WHAT KEYSTONE CLAIMS</div><div style={{marginTop:17,display:'grid',gap:11}}>{claims.map((x,i)=><div key={x} style={{display:'grid',gridTemplateColumns:'28px 1fr',gap:10,color:'#afc1cd',lineHeight:1.6}}><b style={{color:'#7ff0bd'}}>{String(i+1).padStart(2,'0')}</b><span>{x}</span></div>)}</div></article>
-        <article style={{padding:28,border:'1px solid rgba(242,204,104,.18)',borderRadius:18,background:'linear-gradient(145deg,rgba(242,204,104,.045),rgba(7,18,30,.78))'}}><div style={{color:'#f2cc68',fontWeight:900,fontSize:11,letterSpacing:'.14em'}}>WHAT THIS RECORD DOES NOT CLAIM</div><div style={{marginTop:17,display:'grid',gap:12}}>{boundaries.map(x=><div key={x} style={{padding:'11px 13px',borderLeft:'3px solid #f2cc68',background:'rgba(242,204,104,.04)',color:'#aebdc8',lineHeight:1.55}}>{x}</div>)}</div></article>
+        <article style={{padding:28,border:'1px solid rgba(242,204,104,.18)',borderRadius:18,background:'linear-gradient(145deg,rgba(242,204,104,.045),rgba(7,18,30,.78))'}}><div style={{color:'#f2cc68',fontWeight:900,fontSize:11,letterSpacing:'.14em'}}>WHAT THIS RECORD DOES NOT CLAIM</div><div style={{marginTop:17,display:'grid',gap:12}}>{boundaries.map(x=><div key={x} style={{padding:'11px 13px',borderLeft:'3px solid #f2cc68',background:'rgba(242,204,104,.04)',color:'#aebdc8',lineHeight:1.55}}>{x}</div>)}</article>
       </section>
 
       <section style={{marginTop:32,padding:30,border:'1px solid rgba(242,204,104,.24)',borderRadius:20,background:'linear-gradient(135deg,rgba(50,38,9,.42),rgba(7,18,30,.82))'}}>
@@ -66,7 +66,7 @@ export default function KeystoneShowcase(){
         <p style={{color:'#aebfcb',lineHeight:1.8,fontSize:16,margin:0}}>Freeze one proposition before testing: can an action that satisfies Keystone identity, authority, permission, and payload-bound authorization still be withheld when TA-14 independently finds that the evidence required for admissible financial consequence lacks present standing? The examination should preserve both sovereign architectures and allow SUPPORTED, PARTIALLY SUPPORTED, NOT SUPPORTED, HOLD, or ESCALATE-type outcomes according to the evidence.</p>
       </section>
 
-      <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:32}}><Link href="/registry/records/TA-14-AIGR-000026" style={{padding:'13px 17px',borderRadius:11,textDecoration:'none',fontWeight:850,background:'linear-gradient(135deg,#71e7ff,#3ba4c7)',color:'#03131a'}}>Permanent Registry Record →</Link><Link href="/artifacts/interoperability-examinations" style={{padding:'13px 17px',borderRadius:11,textDecoration:'none',fontWeight:850,border:'1px solid rgba(127,240,189,.24)',color:'#c9f6df'}}>Interoperability Examinations</Link><Link href="/artifacts" style={{padding:'13px 17px',borderRadius:11,textDecoration:'none',fontWeight:850,border:'1px solid rgba(113,231,255,.18)',color:'#dbeaf5'}}>Artifact Registry</Link></div>
+      <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:32}}><Link href="/registry/TA-14-AIGR-000026" style={{padding:'13px 17px',borderRadius:11,textDecoration:'none',fontWeight:850,background:'linear-gradient(135deg,#71e7ff,#3ba4c7)',color:'#03131a'}}>Permanent Registry Record →</Link><Link href="/artifacts/interoperability-examinations" style={{padding:'13px 17px',borderRadius:11,textDecoration:'none',fontWeight:850,border:'1px solid rgba(127,240,189,.24)',color:'#c9f6df'}}>Interoperability Examinations</Link><Link href="/artifacts" style={{padding:'13px 17px',borderRadius:11,textDecoration:'none',fontWeight:850,border:'1px solid rgba(113,231,255,.18)',color:'#dbeaf5'}}>Artifact Registry</Link></div>
     </div>
   </main>;
 }
