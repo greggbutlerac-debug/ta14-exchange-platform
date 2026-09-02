@@ -28,7 +28,7 @@ export default function FeigShowcase() {
     <div style={{width:'min(1120px,100%)',margin:'0 auto'}}>
       <div style={{display:'flex',justifyContent:'space-between',gap:16,flexWrap:'wrap',alignItems:'center'}}>
         <Link href="/artifacts" style={{color:'#a7bed0',textDecoration:'none'}}>← Artifact Registry</Link>
-        <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000027" style={{color:'#f1cf70',textDecoration:'none',fontWeight:800}}>Open Permanent Registry Record →</Link>
+        <Link href="/registry/TA-14-AIGR-000027" style={{color:'#f1cf70',textDecoration:'none',fontWeight:800}}>Open Permanent Registry Record →</Link>
       </div>
 
       <section style={{marginTop:34,border:'1px solid rgba(242,204,104,.26)',borderRadius:30,padding:'clamp(28px,6vw,62px)',background:'linear-gradient(145deg,rgba(7,25,42,.95),rgba(4,14,25,.99))',boxShadow:'0 30px 100px rgba(0,0,0,.35)'}}>
@@ -88,7 +88,7 @@ export default function FeigShowcase() {
       </section>
 
       <div style={{display:'flex',gap:11,flexWrap:'wrap',marginTop:32}}>
-        <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000027" style={{display:'inline-flex',alignItems:'center',minHeight:48,padding:'0 18px',borderRadius:12,textDecoration:'none',fontWeight:850,background:'linear-gradient(135deg,#f2cc68,#b68529)',color:'#07111a'}}>Permanent Registry Record →</Link>
+        <Link href="/registry/TA-14-AIGR-000027" style={{display:'inline-flex',alignItems:'center',minHeight:48,padding:'0 18px',borderRadius:12,textDecoration:'none',fontWeight:850,background:'linear-gradient(135deg,#f2cc68,#b68529)',color:'#07111a'}}>Permanent Registry Record →</Link>
         <a href="https://sites.google.com/view/ta-14financialexecutionintegri/home" target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',minHeight:48,padding:'0 18px',borderRadius:12,textDecoration:'none',fontWeight:800,border:'1px solid rgba(126,221,255,.22)',color:'#d6ebf5'}}>Public Architecture Site ↗</a>
         <a href="https://doi.org/10.5281/zenodo.22067955" target="_blank" rel="noreferrer" style={{display:'inline-flex',alignItems:'center',minHeight:48,padding:'0 18px',borderRadius:12,textDecoration:'none',fontWeight:800,border:'1px solid rgba(120,239,189,.22)',color:'#c9f4df'}}>Zenodo DOI ↗</a>
       </div>
