@@ -5,6 +5,10 @@ import { updateSession } from "./lib/supabase/middleware";
 
 const SHOWCASE_PREFIX = "/workspace/ai-governance/registry/showcase";
 const PUBLIC_SHOWCASE_PREFIX = "/public/ai-governance/registry/showcase";
+const OPERATIONAL_MISSION_INDEX =
+  "/workspace/ai-governance/operational-mission-records";
+const PUBLIC_OPERATIONAL_MISSION_INDEX =
+  "/public/ai-governance/operational-mission-records";
 const OPERATIONAL_MISSION_PREFIX =
   "/workspace/ai-governance/operational-mission-records/onuma-re1";
 const PUBLIC_OPERATIONAL_MISSION_PREFIX =
@@ -24,6 +28,15 @@ export async function middleware(request: NextRequest) {
   ) {
     const url = request.nextUrl.clone();
     url.pathname = `${PUBLIC_SHOWCASE_PREFIX}${request.nextUrl.pathname.slice(SHOWCASE_PREFIX.length)}`;
+    return NextResponse.rewrite(url, { request: { headers: request.headers } });
+  }
+
+  // The Operational Mission Records index is itself a public evidence pathway.
+  // Rewrite only the exact index URL; other workspace OMR authoring routes stay
+  // behind the normal authenticated workspace boundary.
+  if (request.nextUrl.pathname === OPERATIONAL_MISSION_INDEX) {
+    const url = request.nextUrl.clone();
+    url.pathname = PUBLIC_OPERATIONAL_MISSION_INDEX;
     return NextResponse.rewrite(url, { request: { headers: request.headers } });
   }
 
