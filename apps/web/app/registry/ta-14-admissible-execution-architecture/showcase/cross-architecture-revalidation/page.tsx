@@ -3,14 +3,13 @@
 import Link from 'next/link';
 
 const stages = [
-  ['01', 'LIVE INTEROPERABILITY', 'ONUMA / RE1', 'A live information environment exposed the practical problem: machine-readable identity can be technically available while the selected identity or context can still be wrong.'],
-  ['02', 'CONTRADICTION', 'Identity mismatch surfaced', 'The workflow did not become evidence of perfection. It became evidence of why consequential execution needs cross-checking, provenance, and correction.'],
-  ['03', 'RECONSTRUCTION', 'Records before narrative', 'The event chronology was reconstructed against the API and records rather than silently rewritten after the mismatch was discovered.'],
-  ['04', 'REVALIDATION', 'Changed context matters', 'A prior determination cannot simply ride forward when identity, evidence, authority, or material context has changed.'],
-  ['05', 'PATENT PROVENANCE', 'U.S. Application 19/794,767', 'On September 2, 2026, USPTO electronically acknowledged receipt of the non-provisional filing directed to cross-architecture evidence-bound admissible execution and changed-context revalidation.'],
-  ['06', 'NEXT REALITY', 'PAE operating-building boundary', 'The next proposed test moves from a corrected RE1 identity event toward unresolved equipment and incomplete information in an operating-building context, subject to access and permission.'],
+  ['01','LIVE INTEROPERABILITY','ONUMA / RE1','A live information environment exposed the practical problem: machine-readable identity can be technically available while the selected identity or context can still be wrong.'],
+  ['02','CONTRADICTION','Identity mismatch surfaced','The workflow did not become evidence of perfection. It became evidence of why consequential execution needs cross-checking, provenance, and correction.'],
+  ['03','RECONSTRUCTION','Records before narrative','The event chronology was reconstructed against the API and records rather than silently rewritten after the mismatch was discovered.'],
+  ['04','REVALIDATION','Changed context matters','A prior determination cannot simply ride forward when identity, evidence, authority, or material context has changed.'],
+  ['05','PATENT PROVENANCE','U.S. Application 19/794,767','On September 2, 2026, USPTO electronically acknowledged receipt of the non-provisional filing directed to cross-architecture evidence-bound admissible execution and changed-context revalidation.'],
+  ['06','NEXT REALITY','PAE operating-building boundary','The next proposed test moves from a corrected RE1 identity event toward unresolved equipment and incomplete information in an operating-building context, subject to access and permission.'],
 ];
-
 const boundaries = [
   'The USPTO acknowledgement establishes receipt of the identified filing package; it does not establish allowance, issuance, patentability, validity, enforceability, novelty, or exclusivity.',
   'The ONUMA / RE1 interoperability activity and the patent filing are separate evidence streams. Their proximity and architectural relationship are shown as chronology, not as proof that one legally caused or validates the other.',
@@ -18,52 +17,25 @@ const boundaries = [
   'PAE operating-building work remains prospective until the required access, scope, authority, confidentiality, and publication boundaries are established.',
   'Unexpected failures and unresolved conditions remain part of the record; they are not converted into successful findings by narrative.',
 ];
+const facts = [['ARCHITECTURE','Cross-Architecture'],['CONDITION','Evidence-Bound'],['CHANGE','Δ Context'],['CONTROL','Revalidate'],['BOUNDARY','Before Execution']];
 
-export default function CrossArchitectureShowcase() {
-  return (
-    <main className="min-h-screen bg-[#050914] text-slate-100">
-      <div className="mx-auto max-w-7xl px-6 py-12 lg:px-8">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <Link href="/registry/ta-14-admissible-execution-architecture" className="text-sm text-cyan-300 hover:text-cyan-200">← TA-14 Admissible Execution Architecture</Link>
-          <Link href="/registry/ta-14-admissible-execution-architecture/patents" className="text-sm text-slate-400 hover:text-slate-200">Patent provenance registry →</Link>
-        </div>
+export default function CrossArchitectureShowcase(){return <main style={{minHeight:'100vh',padding:'54px 22px 100px',background:'radial-gradient(circle at 88% 2%,rgba(66,211,255,.18),transparent 30%),radial-gradient(circle at 7% 35%,rgba(72,235,176,.09),transparent 28%),linear-gradient(180deg,#030811 0%,#06101b 48%,#030811 100%)',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
+<div style={{maxWidth:1220,margin:'0 auto'}}>
+  <nav style={{display:'flex',justifyContent:'space-between',gap:14,flexWrap:'wrap',alignItems:'center',paddingBottom:20,borderBottom:'1px solid rgba(113,231,255,.12)'}}><Link href="/registry/ta-14-admissible-execution-architecture" style={{color:'#9edff0',textDecoration:'none',fontWeight:800}}>← TA-14 Admissible Execution Architecture</Link><Link href="/registry/ta-14-admissible-execution-architecture/patents" style={{color:'#91a8b7',textDecoration:'none'}}>Patent provenance registry →</Link></nav>
 
-        <section className="relative mt-8 overflow-hidden rounded-[2rem] border border-cyan-700/50 bg-gradient-to-br from-cyan-950/40 via-slate-950 to-indigo-950/30 p-8 shadow-2xl lg:p-12">
-          <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl" />
-          <p className="relative text-xs font-bold uppercase tracking-[0.32em] text-cyan-300">TA-14 Founding Interoperability Showcase</p>
-          <h1 className="relative mt-5 max-w-5xl text-4xl font-black tracking-tight sm:text-6xl">Cross-Architecture Evidence-Bound Admissible Execution</h1>
-          <p className="relative mt-5 max-w-4xl text-lg leading-8 text-slate-300">A provenance-first chronology connecting live interoperability, identity contradiction, record reconstruction, changed-context revalidation, patent filing, and the next operating-building test boundary.</p>
-          <div className="relative mt-8 flex flex-wrap gap-3">
-            <span className="rounded-full border border-cyan-600/70 bg-cyan-950/50 px-4 py-2 text-sm font-semibold text-cyan-200">U.S. 19/794,767</span>
-            <span className="rounded-full border border-slate-600 px-4 py-2 text-sm text-slate-300">NON-PROVISIONAL §111(a)</span>
-            <span className="rounded-full border border-emerald-700/70 bg-emerald-950/30 px-4 py-2 text-sm font-semibold text-emerald-200">USPTO RECEIPT 2026-09-02</span>
-          </div>
-        </section>
+  <section style={{position:'relative',overflow:'hidden',marginTop:26,padding:'clamp(34px,6vw,70px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:30,background:'linear-gradient(145deg,rgba(8,35,52,.96),rgba(5,14,24,.98) 55%,rgba(19,24,54,.92))',boxShadow:'0 36px 110px rgba(0,0,0,.42)'}}>
+    <div style={{position:'absolute',right:-90,top:-120,width:380,height:380,borderRadius:'50%',background:'rgba(68,211,255,.10)',filter:'blur(65px)'}} />
+    <div style={{position:'relative'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.22em',color:'#78e8ff'}}>TA-14 · FLAGSHIP FOUNDING INTEROPERABILITY SHOWCASE</div><h1 style={{fontSize:'clamp(46px,7.8vw,94px)',lineHeight:.93,letterSpacing:'-.055em',margin:'22px 0 24px',maxWidth:1050}}>CROSS-ARCHITECTURE<br/><span style={{color:'#7ff0bd'}}>ADMISSIBLE EXECUTION</span></h1><p style={{fontSize:'clamp(18px,2.2vw,27px)',lineHeight:1.45,maxWidth:940,color:'#b7c9d5',margin:0}}>A provenance-first record connecting live interoperability, identity contradiction, reconstruction, changed-context revalidation, patent provenance, and the next operating-building boundary.</p>
+    <div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:30}}>{['ONUMA / RE1','U.S. 19/794,767','NON-PROVISIONAL §111(a)','USPTO RECEIPT · 2026-09-02','PAE · PROSPECTIVE'].map((x,i)=><b key={x} style={{padding:'9px 12px',borderRadius:999,border:`1px solid ${i===3?'rgba(127,240,189,.32)':'rgba(113,231,255,.22)'}`,background:i===3?'rgba(127,240,189,.07)':'rgba(113,231,255,.035)',color:i===3?'#7ff0bd':'#c8edf6',fontSize:10,letterSpacing:'.07em'}}>{x}</b>)}</div></div>
+  </section>
 
-        <section className="mt-8 grid gap-4 lg:grid-cols-5">
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Architecture</p><p className="mt-2 font-bold">Cross-Architecture</p><p className="mt-2 text-sm text-slate-400">Independent systems remain independently attributable.</p></div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Condition</p><p className="mt-2 font-bold">Evidence-Bound</p><p className="mt-2 text-sm text-slate-400">Capability alone does not establish admissible consequence.</p></div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Change</p><p className="mt-2 font-bold">Δ Context</p><p className="mt-2 text-sm text-slate-400">Material change can invalidate prior reliance.</p></div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Control</p><p className="mt-2 font-bold">Revalidate</p><p className="mt-2 text-sm text-slate-400">Current evidence and authority must support the current action.</p></div>
-          <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-5"><p className="text-xs uppercase tracking-wider text-slate-500">Boundary</p><p className="mt-2 font-bold">Before Execution</p><p className="mt-2 text-sm text-slate-400">No admissible evidence. No admissible execution.</p></div>
-        </section>
+  <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:12,margin:'22px 0 42px'}}>{facts.map(([k,v])=><div key={k} style={{padding:'19px 20px',border:'1px solid rgba(113,231,255,.12)',borderRadius:15,background:'rgba(7,18,30,.78)'}}><small style={{color:'#71899a',letterSpacing:1.3,fontWeight:800}}>{k}</small><div style={{marginTop:7,fontSize:18,fontWeight:900,color:k==='BOUNDARY'?'#7ff0bd':'#eef7fb'}}>{v}</div></div>)}</section>
 
-        <section className="mt-12">
-          <div className="mb-6"><p className="text-xs font-bold uppercase tracking-[0.25em] text-indigo-300">Founding chronology</p><h2 className="mt-2 text-3xl font-bold">From live contradiction to governed continuation</h2></div>
-          <div className="space-y-4">{stages.map(([n, label, title, text]) => <article key={n} className="grid gap-5 rounded-2xl border border-slate-800 bg-slate-900/50 p-6 md:grid-cols-[72px_1fr]"><div className="text-3xl font-black text-cyan-400/70">{n}</div><div><p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-500">{label}</p><h3 className="mt-1 text-xl font-bold">{title}</h3><p className="mt-2 max-w-4xl leading-7 text-slate-300">{text}</p></div></article>)}</div>
-        </section>
+  <section style={{marginTop:46}}><div style={{color:'#7ff0bd',fontSize:11,fontWeight:900,letterSpacing:'.17em'}}>FOUNDING CHRONOLOGY · REALITY BEFORE NARRATIVE</div><h2 style={{fontSize:'clamp(30px,4vw,48px)',letterSpacing:'-.035em',margin:'10px 0 24px'}}>From live contradiction to governed continuation.</h2><div style={{display:'grid',gap:12}}>{stages.map(([n,label,title,text],i)=><article key={n} style={{display:'grid',gridTemplateColumns:'70px minmax(0,1fr)',gap:18,padding:'24px clamp(20px,4vw,34px)',border:`1px solid ${i===4?'rgba(127,240,189,.25)':'rgba(113,231,255,.12)'}`,borderRadius:18,background:i===4?'linear-gradient(120deg,rgba(34,93,72,.18),rgba(7,18,30,.82))':'rgba(7,18,30,.72)'}}><div style={{fontSize:32,fontWeight:950,color:i===4?'#7ff0bd':'#58cfe8'}}>{n}</div><div><div style={{fontSize:10,fontWeight:900,letterSpacing:'.16em',color:'#7893a4'}}>{label}</div><h3 style={{fontSize:22,margin:'5px 0 8px'}}>{title}</h3><p style={{margin:0,maxWidth:930,color:'#afc1cd',lineHeight:1.72}}>{text}</p></div></article>)}</div></section>
 
-        <section className="mt-12 overflow-hidden rounded-[2rem] border border-cyan-700/60 bg-cyan-950/20 p-8">
-          <p className="text-xs font-bold uppercase tracking-[0.25em] text-cyan-300">The patent provenance moment</p>
-          <h2 className="mt-3 text-3xl font-black">Systems and Methods for Cross-Architecture Evidence-Bound Admissible Execution and Changed-Context Revalidation</h2>
-          <div className="mt-6 grid gap-4 md:grid-cols-4"><div className="rounded-xl bg-slate-950/60 p-4"><p className="text-xs text-slate-500">APPLICATION</p><p className="mt-1 font-mono font-bold text-cyan-200">19/794,767</p></div><div className="rounded-xl bg-slate-950/60 p-4"><p className="text-xs text-slate-500">RECEIVED</p><p className="mt-1 font-bold">Sep 2, 2026</p></div><div className="rounded-xl bg-slate-950/60 p-4"><p className="text-xs text-slate-500">TIME</p><p className="mt-1 font-bold">08:27:08 AM ET</p></div><div className="rounded-xl bg-slate-950/60 p-4"><p className="text-xs text-slate-500">SPECIFICATION</p><p className="mt-1 font-bold">23 pages • digest recorded</p></div></div>
-          <p className="mt-6 max-w-5xl leading-7 text-slate-300">The filing record and the live interoperability work are preserved as separate evidence streams. Their significance here is the convergence of the architectural questions they expose: identity, evidence, changed context, revalidation, authority, and consequence before execution.</p>
-        </section>
+  <section style={{marginTop:42,padding:'clamp(28px,5vw,46px)',border:'1px solid rgba(127,240,189,.22)',borderRadius:26,background:'linear-gradient(135deg,rgba(21,70,55,.24),rgba(5,17,28,.9))'}}><div style={{color:'#7ff0bd',fontSize:11,fontWeight:900,letterSpacing:'.17em'}}>PATENT PROVENANCE MOMENT · RECEIPT, NOT ADJUDICATION</div><h2 style={{fontSize:'clamp(30px,4.5vw,50px)',lineHeight:1.04,letterSpacing:'-.035em',maxWidth:1000,margin:'13px 0 25px'}}>Systems and Methods for Cross-Architecture Evidence-Bound Admissible Execution and Changed-Context Revalidation</h2><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:11}}>{[['APPLICATION','19/794,767'],['RECEIVED','SEP 2, 2026'],['TIME','08:27:08 AM ET'],['SPECIFICATION','23 PAGES · DIGEST RECORDED']].map(([k,v])=><div key={k} style={{padding:18,borderRadius:13,background:'rgba(2,10,17,.58)',border:'1px solid rgba(127,240,189,.1)'}}><small style={{color:'#6f8c80',letterSpacing:1.1}}>{k}</small><div style={{marginTop:7,fontWeight:900,color:k==='APPLICATION'?'#7ff0bd':'#eaf5ef'}}>{v}</div></div>)}</div><p style={{margin:'24px 0 0',maxWidth:1000,color:'#b5c8c0',lineHeight:1.8}}>The filing record and live interoperability work remain separate evidence streams. This showcase preserves their chronological convergence around identity, evidence, changed context, revalidation, authority, and consequence before execution.</p></section>
 
-        <section className="mt-12 rounded-[2rem] border border-amber-800/50 bg-amber-950/20 p-8"><p className="text-xs font-bold uppercase tracking-[0.25em] text-amber-300">Evidence boundaries</p><h2 className="mt-2 text-2xl font-bold">What this showcase does not claim</h2><ul className="mt-5 space-y-3 text-sm leading-6 text-slate-300">{boundaries.map((b) => <li key={b} className="rounded-xl border border-amber-900/40 bg-slate-950/30 p-4">{b}</li>)}</ul></section>
+  <section style={{marginTop:28,padding:'clamp(26px,4vw,38px)',border:'1px solid rgba(242,204,104,.22)',borderRadius:24,background:'linear-gradient(135deg,rgba(61,46,11,.25),rgba(7,18,30,.84))'}}><div style={{color:'#f2cc68',fontSize:11,fontWeight:900,letterSpacing:'.16em'}}>EVIDENCE BOUNDARIES · WHAT THIS RECORD DOES NOT CLAIM</div><div style={{display:'grid',gap:10,marginTop:20}}>{boundaries.map((b,i)=><div key={b} style={{display:'grid',gridTemplateColumns:'30px 1fr',gap:10,padding:'13px 15px',borderLeft:'3px solid rgba(242,204,104,.75)',background:'rgba(242,204,104,.035)',color:'#b9c3c9',lineHeight:1.62}}><b style={{color:'#f2cc68'}}>{String(i+1).padStart(2,'0')}</b><span>{b}</span></div>)}</div></section>
 
-        <section className="mt-12 rounded-[2rem] border border-slate-800 bg-slate-900/60 p-8 text-center"><p className="text-xs font-bold uppercase tracking-[0.3em] text-slate-500">Forward path</p><p className="mt-4 text-xl font-bold sm:text-2xl">RE1 → Cross-check → Reconstruction → Revalidation → Patent Provenance → PAE Operating Building</p><p className="mx-auto mt-4 max-w-3xl text-sm leading-6 text-slate-400">The next stage is not pre-declared as a success. The building, evidence, authority, and observed conditions determine what becomes supportable.</p></section>
-      </div>
-    </main>
-  );
-}
+  <section style={{marginTop:28,padding:'38px 28px',textAlign:'center',border:'1px solid rgba(113,231,255,.15)',borderRadius:24,background:'rgba(7,18,30,.72)'}}><div style={{color:'#71899a',fontSize:10,fontWeight:900,letterSpacing:'.18em'}}>FORWARD PATH · OUTCOME NOT PRE-DECLARED</div><div style={{marginTop:13,fontSize:'clamp(20px,3vw,31px)',fontWeight:950,color:'#dff7fb'}}>RE1 → Cross-check → Reconstruction → Revalidation → Patent Provenance → PAE</div><p style={{maxWidth:800,margin:'14px auto 0',color:'#91a7b5',lineHeight:1.7}}>The next stage is not pre-declared as a success. The building, evidence, authority, and observed conditions determine what becomes supportable.</p></section>
+</div></main>;}
