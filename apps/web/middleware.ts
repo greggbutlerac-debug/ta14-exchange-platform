@@ -5,8 +5,10 @@ import { updateSession } from "./lib/supabase/middleware";
 
 const SHOWCASE_PREFIX = "/workspace/ai-governance/registry/showcase";
 const PUBLIC_SHOWCASE_PREFIX = "/public/ai-governance/registry/showcase";
-const PUBLIC_OPERATIONAL_MISSION_PREFIX =
+const OPERATIONAL_MISSION_PREFIX =
   "/workspace/ai-governance/operational-mission-records/onuma-re1";
+const PUBLIC_OPERATIONAL_MISSION_PREFIX =
+  "/public/ai-governance/operational-mission-records/onuma-re1";
 
 export async function middleware(request: NextRequest) {
   const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
@@ -25,15 +27,18 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(url, { request: { headers: request.headers } });
   }
 
-  // Founding Operational Mission Records are published evidence artifacts,
-  // not private authoring surfaces. Permit anonymous inspection of the
-  // canonical ONUMA / TA-14 RE1 record while leaving the rest of the
-  // authenticated workspace boundary unchanged.
+  // OMR-000001 is a published institutional evidence artifact. Rewrite only
+  // this canonical workspace URL to its anonymous rendering boundary so the
+  // parent authenticated AI-governance layout is never entered. The public
+  // page reuses the canonical OMR page and bridge components; authoring and
+  // every other workspace route remain protected.
   if (
-    request.nextUrl.pathname === PUBLIC_OPERATIONAL_MISSION_PREFIX ||
-    request.nextUrl.pathname.startsWith(`${PUBLIC_OPERATIONAL_MISSION_PREFIX}/`)
+    request.nextUrl.pathname === OPERATIONAL_MISSION_PREFIX ||
+    request.nextUrl.pathname.startsWith(`${OPERATIONAL_MISSION_PREFIX}/`)
   ) {
-    return NextResponse.next({ request: { headers: request.headers } });
+    const url = request.nextUrl.clone();
+    url.pathname = `${PUBLIC_OPERATIONAL_MISSION_PREFIX}${request.nextUrl.pathname.slice(OPERATIONAL_MISSION_PREFIX.length)}`;
+    return NextResponse.rewrite(url, { request: { headers: request.headers } });
   }
 
   return updateSession(request);
