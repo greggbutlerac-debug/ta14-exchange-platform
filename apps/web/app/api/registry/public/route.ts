@@ -22,23 +22,21 @@ type PublicRegistryRow = {
 
 function requiredEnvironment() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/+$/, '');
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const supabasePublicKey =
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ??
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??
+    process.env.SUPABASE_PUBLISHABLE_KEY;
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return null;
-  }
-
-  return { supabaseUrl, supabaseAnonKey };
+  if (!supabaseUrl || !supabasePublicKey) return null;
+  return { supabaseUrl, supabasePublicKey };
 }
 
 function numericCount(value: number | string | null | undefined) {
   if (typeof value === 'number' && Number.isFinite(value)) return value;
-
   if (typeof value === 'string') {
     const parsed = Number.parseInt(value, 10);
     if (Number.isFinite(parsed)) return parsed;
   }
-
   return 0;
 }
 
@@ -61,24 +59,26 @@ function normalizeRow(row: PublicRegistryRow) {
   };
 }
 
+function unavailable(message: string, error: string, status = 503) {
+  return NextResponse.json(
+    {
+      available: false,
+      error,
+      message,
+      records: null,
+      count: null,
+      generatedAt: new Date().toISOString(),
+    },
+    { status, headers: { 'Cache-Control': 'no-store, max-age=0' } },
+  );
+}
+
 export async function GET() {
   const environment = requiredEnvironment();
-
   if (!environment) {
-    return NextResponse.json(
-      {
-        error: 'REGISTRY_CONFIGURATION_MISSING',
-        message:
-          'NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are required to publish the public Registry directory.',
-        records: [],
-        count: 0,
-      },
-      {
-        status: 503,
-        headers: {
-          'Cache-Control': 'no-store, max-age=0',
-        },
-      },
+    return unavailable(
+      'The public Registry is temporarily unavailable because its publication service is not configured.',
+      'REGISTRY_CONFIGURATION_MISSING',
     );
   }
 
@@ -89,8 +89,8 @@ export async function GET() {
         method: 'POST',
         cache: 'no-store',
         headers: {
-          apikey: environment.supabaseAnonKey,
-          Authorization: `Bearer ${environment.supabaseAnonKey}`,
+          apikey: environment.supabasePublicKey,
+          Authorization: `Bearer ${environment.supabasePublicKey}`,
           Accept: 'application/json',
           'Content-Type': 'application/json',
         },
@@ -100,74 +100,38 @@ export async function GET() {
 
     const rawBody = await response.text();
     let payload: unknown = null;
-
     if (rawBody) {
-      try {
-        payload = JSON.parse(rawBody);
-      } catch {
-        payload = rawBody;
-      }
+      try { payload = JSON.parse(rawBody); } catch { payload = rawBody; }
     }
 
     if (!response.ok) {
-      const unavailable =
+      const missingFunction =
         response.status === 404 ||
-        (typeof payload === 'object' &&
-          payload !== null &&
-          'code' in payload &&
-          payload.code === 'PGRST202');
-
-      return NextResponse.json(
-        {
-          error: unavailable
-            ? 'PUBLIC_REGISTRY_FUNCTION_NOT_INSTALLED'
-            : 'PUBLIC_REGISTRY_QUERY_FAILED',
-          message: unavailable
-            ? 'The public Registry database function has not been installed yet.'
-            : 'The public Registry directory could not be queried.',
-          detail: payload,
-          records: [],
-          count: 0,
-        },
-        {
-          status: unavailable ? 503 : 500,
-          headers: {
-            'Cache-Control': 'no-store, max-age=0',
-          },
-        },
+        (typeof payload === 'object' && payload !== null && 'code' in payload && payload.code === 'PGRST202');
+      return unavailable(
+        missingFunction
+          ? 'The public Registry publication function is temporarily unavailable.'
+          : 'The public Registry directory could not be queried.',
+        missingFunction ? 'PUBLIC_REGISTRY_FUNCTION_UNAVAILABLE' : 'PUBLIC_REGISTRY_QUERY_FAILED',
+        missingFunction ? 503 : 502,
       );
     }
 
     if (!Array.isArray(payload)) {
-      return NextResponse.json(
-        {
-          error: 'PUBLIC_REGISTRY_RESPONSE_INVALID',
-          message: 'The public Registry database function returned an invalid response.',
-          records: [],
-          count: 0,
-        },
-        {
-          status: 500,
-          headers: {
-            'Cache-Control': 'no-store, max-age=0',
-          },
-        },
+      return unavailable(
+        'The public Registry returned an invalid response. No zero-value metrics have been inferred.',
+        'PUBLIC_REGISTRY_RESPONSE_INVALID',
+        502,
       );
     }
 
     const records = (payload as PublicRegistryRow[])
-      .filter(
-        (row) =>
-          row &&
-          typeof row.id === 'string' &&
-          typeof row.registry_identifier === 'string' &&
-          typeof row.governance_name === 'string' &&
-          typeof row.status === 'string',
-      )
+      .filter((row) => row && typeof row.id === 'string' && typeof row.registry_identifier === 'string' && typeof row.governance_name === 'string' && typeof row.status === 'string')
       .map(normalizeRow);
 
     return NextResponse.json(
       {
+        available: true,
         records,
         count: records.length,
         generatedAt: new Date().toISOString(),
@@ -180,21 +144,10 @@ export async function GET() {
         },
       },
     );
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: 'PUBLIC_REGISTRY_UNAVAILABLE',
-        message: 'The public Registry service is temporarily unavailable.',
-        detail: error instanceof Error ? error.message : 'Unknown Registry service error.',
-        records: [],
-        count: 0,
-      },
-      {
-        status: 503,
-        headers: {
-          'Cache-Control': 'no-store, max-age=0',
-        },
-      },
+  } catch {
+    return unavailable(
+      'The public Registry service is temporarily unavailable. No zero-value metrics have been inferred.',
+      'PUBLIC_REGISTRY_UNAVAILABLE',
     );
   }
 }
