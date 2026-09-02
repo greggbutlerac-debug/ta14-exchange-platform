@@ -13,17 +13,17 @@ type SiteActivityRpcRow = {
   updated_at: string | null;
 };
 
-function toSafeNumber(value: number | string | null | undefined): number {
+function toSafeNumber(value: number | string | null | undefined): number | null {
   if (typeof value === "number") {
-    return Number.isFinite(value) ? value : 0;
+    return Number.isFinite(value) && value >= 0 ? value : null;
   }
 
-  if (typeof value === "string") {
+  if (typeof value === "string" && value.trim() !== "") {
     const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : 0;
+    return Number.isFinite(parsed) && parsed >= 0 ? parsed : null;
   }
 
-  return 0;
+  return null;
 }
 
 export async function POST(_req: NextRequest) {
@@ -81,13 +81,27 @@ export async function POST(_req: NextRequest) {
       | null
       | undefined;
 
+    const visitors = toSafeNumber(result?.total_visitors);
+    const pageViews = toSafeNumber(result?.total_page_views);
+
+    if (!result || visitors === null || pageViews === null) {
+      console.error("Site activity RPC returned an incomplete or invalid aggregate row.", result);
+      return NextResponse.json(
+        {
+          counted: false,
+          error: "Site activity totals are unavailable.",
+        },
+        { status: 503 }
+      );
+    }
+
     const response = NextResponse.json({
       counted: true,
       newVisitor: isNewVisitor,
-      visitors: toSafeNumber(result?.total_visitors),
-      pageViews: toSafeNumber(result?.total_page_views),
-      firstRecordedAt: result?.first_recorded_at ?? null,
-      updatedAt: result?.updated_at ?? null,
+      visitors,
+      pageViews,
+      firstRecordedAt: result.first_recorded_at ?? null,
+      updatedAt: result.updated_at ?? null,
     });
 
     response.cookies.set({
