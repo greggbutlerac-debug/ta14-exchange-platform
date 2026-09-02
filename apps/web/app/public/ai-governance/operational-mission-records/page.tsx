@@ -1,12 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+const description =
+  "Public TA-14 Operational Mission Records preserve consequential real-world workflows as evidence evolves without turning connectivity, status, or capability into execution authority.";
+const canonical = "https://www.ta14exchange.com/public/ai-governance/operational-mission-records";
+
 export const metadata: Metadata = {
-  title: "Operational Mission Records | TA-14 Authority",
-  description:
-    "Public TA-14 Operational Mission Records preserve consequential real-world workflows as evidence evolves without turning connectivity, status, or capability into execution authority.",
-  alternates: {
-    canonical: "https://www.ta14exchange.com/public/ai-governance/operational-mission-records",
+  title: "Operational Mission Records",
+  description,
+  alternates: { canonical },
+  openGraph: {
+    title: "Operational Mission Records | TA-14 Authority",
+    description,
+    url: canonical,
+    siteName: "TA-14 Authority",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Operational Mission Records | TA-14 Authority",
+    description,
+    images: ["https://www.ta14exchange.com/ta14-social-preview.png"],
   },
 };
 
