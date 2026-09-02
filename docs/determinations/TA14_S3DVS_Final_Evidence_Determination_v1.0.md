@@ -23,7 +23,9 @@ This determination establishes only the observed behavior of the S3DVS Version 1
 
 ## Registry identity
 
-The governed demonstration remains anchored exclusively to **TA-14-AIGR-000033**. The previously claimant-referenced identifier `TA-14-AIGR-000034` is not recognized or adopted by this determination.
+The governed demonstration remains anchored exclusively to **TA-14-AIGR-000033**.
+
+During the S3DVS evidence cycle, `TA-14-AIGR-000034` was referenced by the claimant before that identifier had been assigned and was therefore not recognized or adopted as an S3DVS identity by this determination. The identifier **TA-14-AIGR-000034 has since been independently issued to Elias Human Sovereignty Gateway (HSG) v1.0**. That later Registry issuance does not alter, supersede, or participate in the S3DVS governed demonstration. S3DVS Version 1.0 remains **TA-14-AIGR-000033**.
 
 ## Digest treatment
 
