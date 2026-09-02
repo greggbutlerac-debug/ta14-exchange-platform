@@ -41,6 +41,7 @@ export default function OnumaRe1Layout({ children }: { children: ReactNode }) {
               <small>ONUMA / BECOME THE BUILDING</small>
               <strong>Native mission + lifecycle record</strong>
               <p>Chronology · participants · building semantics · workflow · maturity context · presentation output</p>
+              <a className="omr-public-link" href="https://sites.google.com/onuma.com/becomethebuildingbimstorm/Become-the-Building-BIMStorm" target="_blank" rel="noreferrer">OPEN PUBLIC MISSION SURFACE →</a>
               <b>AUTHORITATIVE FOR ITS NATIVE RECORD</b>
             </article>
             <div className="omr-bridge-core">
@@ -111,7 +112,9 @@ export default function OnumaRe1Layout({ children }: { children: ReactNode }) {
           .omr-bridge-architecture small,.omr-bridge-bottom small{color:#8fa4b4;font-size:9px;font-weight:900;letter-spacing:.13em}
           .omr-bridge-architecture article>strong{display:block;font-family:Georgia,serif;font-size:24px;margin:10px 0}
           .omr-bridge-architecture p,.omr-bridge-bottom p{color:#9fb0bc;line-height:1.55}
-          .omr-bridge-architecture article>b{display:block;margin-top:18px;color:#7edcf3;font-size:9px;letter-spacing:.12em}
+          .omr-public-link{display:inline-block;margin:4px 0 16px;color:#7edcf3;text-decoration:none;font-size:10px;font-weight:900;letter-spacing:.09em;border-bottom:1px solid #7edcf366;padding-bottom:4px}
+          .omr-public-link:hover{color:#bdefff;border-bottom-color:#bdefff}
+          .omr-bridge-architecture article>b{display:block;margin-top:8px;color:#7edcf3;font-size:9px;letter-spacing:.12em}
           .omr-bridge-architecture .ta14>b{color:#e9b84f}
           .omr-bridge-core{display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;border:1px solid #ffffff18;border-radius:17px;background:#06111c;padding:20px}
           .omr-bridge-core>span{font-size:44px;color:#7edcf3}.omr-bridge-core strong{font-size:11px;letter-spacing:.11em}.omr-bridge-core em{margin-top:10px;color:#e9b84f;font-size:10px;font-style:normal;font-weight:900}
