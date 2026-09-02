@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/workspace/ai-governance/registry/records/TA-14-AIGR-000025",
-        destination: "/registry/records/TA-14-AIGR-000025",
+        destination: "/registry/TA-14-AIGR-000025",
         permanent: true,
       },
       {
