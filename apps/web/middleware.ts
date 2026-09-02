@@ -31,13 +31,13 @@ export async function middleware(request: NextRequest) {
     return NextResponse.rewrite(url, { request: { headers: request.headers } });
   }
 
-  // The Operational Mission Records index is itself a public evidence pathway.
-  // Rewrite only the exact index URL; other workspace OMR authoring routes stay
-  // behind the normal authenticated workspace boundary.
+  // The Operational Mission Records index is a published public pathway.
+  // Redirect the legacy workspace-looking URL to the canonical public URL so
+  // visitors, crawlers, and shared links all converge on the same address.
   if (request.nextUrl.pathname === OPERATIONAL_MISSION_INDEX) {
     const url = request.nextUrl.clone();
     url.pathname = PUBLIC_OPERATIONAL_MISSION_INDEX;
-    return NextResponse.rewrite(url, { request: { headers: request.headers } });
+    return NextResponse.redirect(url, 308);
   }
 
   // OMR-000001 is a published institutional evidence artifact. Rewrite only
