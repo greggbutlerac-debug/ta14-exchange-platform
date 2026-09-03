@@ -20,6 +20,45 @@ export default function HomePage() {
     <>
       <AtlasFrontDoor />
       <Link
+        href="/governance-showcase"
+        aria-label="Open TA-14 Governance Showcase"
+        style={{
+          position: 'fixed',
+          left: 18,
+          bottom: 18,
+          zIndex: 90,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          minHeight: 64,
+          padding: '10px 16px',
+          border: '1px solid rgba(229,184,92,.68)',
+          borderRadius: 16,
+          background: 'linear-gradient(135deg,rgba(34,25,8,.98),rgba(4,14,24,.98))',
+          boxShadow: '0 18px 50px rgba(0,0,0,.42),0 0 32px rgba(220,174,77,.16)',
+          color: '#fff7e5',
+          textDecoration: 'none',
+          backdropFilter: 'blur(18px)',
+        }}
+      >
+        <span style={{
+          width: 40,
+          height: 40,
+          display: 'grid',
+          placeItems: 'center',
+          borderRadius: 11,
+          background: 'linear-gradient(135deg,#f4d38b,#d7a64b)',
+          color: '#160f04',
+          fontWeight: 950,
+          fontSize: 13,
+        }}>GS</span>
+        <span>
+          <small style={{display:'block',color:'#e9c978',fontSize:8,fontWeight:900,letterSpacing:'.14em'}}>PUBLIC · INSPECTABLE · GOVERNED</small>
+          <strong style={{display:'block',marginTop:3,fontSize:13,letterSpacing:'.04em'}}>GOVERNANCE SHOWCASE →</strong>
+          <small style={{display:'block',marginTop:3,color:'#b4a88e',fontSize:8}}>Architectures · examinations · demonstrations · evidence</small>
+        </span>
+      </Link>
+      <Link
         href="/start-free"
         aria-label="Start TA-14 free for 60 days"
         style={{
