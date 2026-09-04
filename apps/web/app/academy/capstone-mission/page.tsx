@@ -11,6 +11,7 @@ type MissionGate = {
   label: string;
   question: string;
   standard: string;
+  evidencePrompt: string;
 };
 
 type SavedMission = {
@@ -39,71 +40,71 @@ const gates: MissionGate[] = [
     id: "reality",
     label: "Reality",
     question: "What condition actually exists now?",
-    standard:
-      "State the present condition without converting allegation, prediction, or assumption into fact.",
+    standard: "State the present condition without converting allegation, prediction, expectation, or assumption into fact.",
+    evidencePrompt: "Preserve observations, measurements, timestamps, source conditions, and material uncertainty about the present state.",
   },
   {
     id: "record",
     label: "Record",
     question: "What attributable evidence preserves that reality?",
-    standard:
-      "Identify sources, timestamps, measurements, artifacts, authorship, and material limitations.",
+    standard: "Identify the record that converts observed reality into evidence another reviewer can inspect and challenge.",
+    evidencePrompt: "Identify authorship, source, time, method, artifact, measurement, record location, and limitations.",
   },
   {
     id: "continuity",
     label: "Continuity",
     question: "Has the evidence remained intact and current?",
-    standard:
-      "Confirm custody, version, timing, dependencies, and whether intervening change broke the chain.",
+    standard: "Confirm that the evidence still corresponds to the present decision state and has not been broken by drift, delay, replacement, or dependency change.",
+    evidencePrompt: "Preserve custody, version, timing, dependencies, intervening changes, and any continuity break.",
   },
   {
     id: "admissibility",
     label: "Admissibility",
     question: "Is the evidence sufficient for this exact decision?",
-    standard:
-      "Evaluate relevance, completeness, currency, contradiction, uncertainty, and scope before consequence.",
+    standard: "The question is not whether evidence exists, but whether it is sufficient, current, relevant, and bounded enough to support this consequence-bearing decision.",
+    evidencePrompt: "Evaluate relevance, completeness, contradiction, uncertainty, scope, currency, and whether more evidence is required.",
   },
   {
     id: "binding",
     label: "Binding",
     question: "Who or what has authority to bind the decision?",
-    standard:
-      "Separate identity, access, capability, and role from valid authority for this action now.",
+    standard: "Identity, access, technical capability, or organizational role do not by themselves establish valid authority for this action now.",
+    evidencePrompt: "Identify the authority source, actor, delegation, scope, limits, jurisdiction, expiration, and any conflicting authority.",
   },
   {
     id: "commit",
     label: "Commit",
     question: "What exact decision state will be preserved?",
-    standard:
-      "Record the approved version, rationale, conditions, exceptions, reviewer, and expiration point.",
+    standard: "The system must preserve the exact approved decision state before execution begins so the action can later be compared against what was actually authorized.",
+    evidencePrompt: "Record the approved version, rationale, conditions, exceptions, reviewer, timestamp, and expiration or reassessment point.",
   },
   {
     id: "execution",
     label: "Execution",
     question: "Does the proposed action correspond to the committed decision?",
-    standard:
-      "Confirm the action remains inside the approved boundary and has not drifted in purpose or scope.",
+    standard: "Execution must remain inside the preserved decision boundary and must not silently drift in purpose, subject, method, scope, timing, or consequence.",
+    evidencePrompt: "Compare proposed or actual execution against the committed state and record deviations, controls, interruptions, or refusal conditions.",
   },
   {
     id: "outcome",
     label: "Outcome",
     question: "How will the result be independently verified?",
-    standard:
-      "Define expected results, verification evidence, exception handling, challenge rights, and preservation.",
+    standard: "Completion is not proof. Define the evidence that will establish whether the intended result occurred and whether unintended consequences appeared.",
+    evidencePrompt: "Define expected results, verification evidence, reviewer, timing, exception handling, preservation, and challenge rights.",
   },
 ];
 
-const gateStyles: Record<GateState, string> = {
-  UNRESOLVED: "border-white/10 bg-white/[0.03] text-slate-300",
-  SUPPORTED: "border-emerald-300/40 bg-emerald-300/10 text-emerald-100",
-  DEFECT: "border-rose-300/40 bg-rose-300/10 text-rose-100",
+const decisionDescriptions: Record<Decision, string> = {
+  ALLOW: "All required conditions are supported and execution may proceed only within the preserved boundary.",
+  HOLD: "A correctable deficiency, stale condition, or unresolved question prevents execution for now.",
+  DENY: "The proposed action lacks admissible evidence, valid authority, or a permissible execution boundary.",
+  ESCALATE: "A qualified authority must resolve a conflict, exception, or material uncertainty before the decision can be completed.",
 };
 
-const decisionDescriptions: Record<Decision, string> = {
-  ALLOW: "Every required condition is supported and the execution may proceed within the preserved boundary.",
-  HOLD: "A correctable deficiency or unresolved condition prevents execution for now.",
-  DENY: "The action lacks admissible evidence, valid authority, or a permissible execution boundary.",
-  ESCALATE: "A qualified authority must resolve a conflict, exception, or material uncertainty.",
+const gateTone: Record<GateState, string> = {
+  UNRESOLVED: "border-slate-700/80 bg-slate-900/55 text-slate-300",
+  SUPPORTED: "border-emerald-400/35 bg-emerald-400/10 text-emerald-100",
+  DEFECT: "border-rose-400/35 bg-rose-400/10 text-rose-100",
 };
 
 export default function CapstoneMissionPage() {
@@ -149,22 +150,23 @@ export default function CapstoneMissionPage() {
     }
   }, []);
 
-  const currentGate = useMemo(
-    () => gates.find((gate) => gate.id === activeGate) ?? gates[0],
-    [activeGate],
-  );
-
+  const currentGate = useMemo(() => gates.find((gate) => gate.id === activeGate) ?? gates[0], [activeGate]);
   const supportedCount = gates.filter((gate) => gateStates[gate.id] === "SUPPORTED").length;
   const defectCount = gates.filter((gate) => gateStates[gate.id] === "DEFECT").length;
   const resolvedCount = supportedCount + defectCount;
+  const unresolvedCount = gates.length - resolvedCount;
   const progress = Math.round((resolvedCount / gates.length) * 100);
   const complete = resolvedCount === gates.length;
   const recommendedDecision: Decision = defectCount > 0 ? "HOLD" : complete ? "ALLOW" : "HOLD";
   const decisionConflict = decision === "ALLOW" && (!complete || defectCount > 0);
 
+  function markDirty() {
+    setSaveState("idle");
+  }
+
   function setGateState(state: GateState) {
     setGateStates((current) => ({ ...current, [currentGate.id]: state }));
-    setSaveState("idle");
+    markDirty();
   }
 
   function saveMission() {
@@ -223,13 +225,13 @@ export default function CapstoneMissionPage() {
       "TA-14 ACADEMY — CAPSTONE MISSION RECORD",
       "",
       `Mission: ${missionTitle || "Untitled mission"}`,
-      `Learner: ${learnerName || "Not provided"}`,
+      `Learner / review team: ${learnerName || "Not provided"}`,
       `Generated: ${new Date().toLocaleString()}`,
       "",
       "SCENARIO",
       scenario || "Not provided",
       "",
-      "OBJECTIVE",
+      "MISSION OBJECTIVE",
       objective || "Not provided",
       "",
       "AUTHORITY SOURCE",
@@ -241,13 +243,13 @@ export default function CapstoneMissionPage() {
       "EVIDENCE SUMMARY",
       evidenceSummary || "Not provided",
       "",
-      "UNCERTAINTY",
+      "KNOWN UNCERTAINTY",
       uncertainty || "None recorded",
       "",
       "GOVERNANCE CHAIN",
-      ...gates.flatMap((gate) => [
-        `${gate.label}: ${gateStates[gate.id] || "UNRESOLVED"}`,
-        gateNotes[gate.id] || "No note recorded.",
+      ...gates.flatMap((gate, index) => [
+        `${String(index + 1).padStart(2, "0")} ${gate.label}: ${gateStates[gate.id] || "UNRESOLVED"}`,
+        gateNotes[gate.id] || "No preserved analysis.",
         "",
       ]),
       `FINAL DETERMINATION: ${decision}`,
@@ -274,103 +276,133 @@ export default function CapstoneMissionPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#030812] text-slate-100">
-      <div className="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div className="absolute left-[3%] top-20 h-96 w-96 rounded-full bg-cyan-500/10 blur-3xl" />
-        <div className="absolute right-[4%] top-72 h-[28rem] w-[28rem] rounded-full bg-violet-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-[38%] h-80 w-80 rounded-full bg-emerald-500/10 blur-3xl" />
-      </div>
-
-      <div className="relative mx-auto max-w-7xl px-5 py-8 sm:px-8 lg:px-10">
-        <header className="flex flex-col gap-5 border-b border-white/10 pb-7 lg:flex-row lg:items-center lg:justify-between">
-          <Link href="/academy" className="flex items-center gap-3">
-            <span className="rounded-xl border border-cyan-300/30 bg-cyan-300/10 px-3 py-2 text-sm font-black tracking-[0.18em] text-cyan-200">
-              TA-14
-            </span>
-            <span>
-              <strong className="block text-sm text-white">Academy</strong>
-              <small className="text-xs text-slate-400">Capstone Mission</small>
-            </span>
-          </Link>
-
-          <nav className="flex flex-wrap gap-2 text-sm" aria-label="Academy navigation">
-            <Link href="/academy/dashboard" className="rounded-full border border-white/10 px-4 py-2 text-slate-300 transition hover:border-cyan-300/40 hover:text-white">
-              Mission Control
-            </Link>
-            <Link href="/academy/governed-execution-studio" className="rounded-full border border-white/10 px-4 py-2 text-slate-300 transition hover:border-cyan-300/40 hover:text-white">
-              Execution Studio
-            </Link>
-            <Link href="/academy/assessment" className="rounded-full border border-white/10 px-4 py-2 text-slate-300 transition hover:border-cyan-300/40 hover:text-white">
-              Assessment Center
-            </Link>
-          </nav>
-        </header>
-
-        <section className="py-12 lg:py-16">
-          <p className="mb-4 text-xs font-black uppercase tracking-[0.28em] text-cyan-300">Final practical examination</p>
-          <h1 className="max-w-5xl text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-6xl">
-            Govern one consequential execution from reality through verified outcome.
-          </h1>
-          <p className="mt-6 max-w-4xl text-lg leading-8 text-slate-300">
-            The Capstone Mission requires a complete, attributable, challengeable governance record. The learner must preserve the evidence, validate authority, constrain execution, and define how the outcome will be independently verified.
-          </p>
-
-          <div className="mt-8 grid gap-4 md:grid-cols-4">
-            <Metric label="Resolved gates" value={`${resolvedCount}/${gates.length}`} />
-            <Metric label="Supported" value={String(supportedCount)} />
-            <Metric label="Defects" value={String(defectCount)} />
-            <Metric label="Recommended" value={recommendedDecision} emphasis />
-          </div>
-
-          <div className="mt-5 h-2 overflow-hidden rounded-full bg-white/10">
-            <div className="h-full rounded-full bg-cyan-300 transition-all" style={{ width: `${progress}%` }} />
-          </div>
-        </section>
-
-        <section className="grid gap-6 rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-xl lg:grid-cols-2 lg:p-7">
-          <Field label="Mission title" value={missionTitle} onChange={setMissionTitle} placeholder="Name the governed execution mission." />
-          <Field label="Learner or review team" value={learnerName} onChange={setLearnerName} placeholder="Preserve attribution." />
-          <TextArea label="Scenario" value={scenario} onChange={setScenario} placeholder="Describe the consequential situation without assuming the conclusion." />
-          <TextArea label="Mission objective" value={objective} onChange={setObjective} placeholder="Define the exact decision or action under review." />
-          <TextArea label="Authority source" value={authoritySource} onChange={setAuthoritySource} placeholder="Identify the law, policy, delegation, contract, order, or approved rule." />
-          <TextArea label="Execution boundary" value={executionBoundary} onChange={setExecutionBoundary} placeholder="Define what may occur, what may not occur, duration, subject, system, and jurisdiction." />
-          <TextArea label="Evidence summary" value={evidenceSummary} onChange={setEvidenceSummary} placeholder="Summarize the attributable evidence supporting the mission." />
-          <TextArea label="Known uncertainty" value={uncertainty} onChange={setUncertainty} placeholder="Preserve missing, conflicting, stale, or unresolved conditions." />
-        </section>
-
-        <section className="mt-6 grid gap-6 xl:grid-cols-[330px_1fr]">
-          <aside className="rounded-3xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-xl">
-            <p className="px-2 pb-3 text-xs font-black uppercase tracking-[0.22em] text-slate-400">Governance chain</p>
-            <div className="space-y-2">
-              {gates.map((gate, index) => {
-                const state = gateStates[gate.id] || "UNRESOLVED";
-                const active = gate.id === currentGate.id;
-                return (
-                  <button
-                    key={gate.id}
-                    type="button"
-                    onClick={() => setActiveGate(gate.id)}
-                    className={`w-full rounded-2xl border p-4 text-left transition ${active ? "border-cyan-300/40 bg-cyan-300/10" : "border-white/10 bg-black/10 hover:border-white/20 hover:bg-white/[0.04]"}`}
-                  >
-                    <div className="flex items-center justify-between gap-3">
-                      <span className="text-xs font-black tracking-[0.18em] text-cyan-200">{String(index + 1).padStart(2, "0")}</span>
-                      <span className={`rounded-full border px-2 py-1 text-[10px] font-black tracking-[0.1em] ${gateStyles[state]}`}>{state}</span>
-                    </div>
-                    <strong className="mt-3 block text-sm text-white">{gate.label}</strong>
-                    <span className="mt-1 block text-xs leading-5 text-slate-400">{gate.question}</span>
-                  </button>
-                );
-              })}
+    <div className="mx-auto w-full max-w-[1180px] px-4 pb-16 pt-7 sm:px-6 lg:px-8">
+      <section className="overflow-hidden rounded-[30px] border border-cyan-300/15 bg-[linear-gradient(135deg,rgba(7,23,35,.96),rgba(5,14,24,.94))] shadow-[0_30px_90px_rgba(0,0,0,.28)]">
+        <div className="grid gap-8 px-6 py-8 lg:grid-cols-[1.35fr_.65fr] lg:px-9 lg:py-10">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] font-black uppercase tracking-[0.22em] text-cyan-300">
+              <span>TA-14 Academy</span>
+              <span className="text-slate-600">•</span>
+              <span>Final practical examination</span>
             </div>
+            <h1 className="mt-4 max-w-4xl text-4xl font-black leading-[1.03] tracking-[-0.04em] text-white sm:text-5xl">
+              Capstone Mission
+            </h1>
+            <p className="mt-4 max-w-4xl text-xl font-bold leading-8 text-slate-200">
+              Govern one consequential execution from reality through verified outcome.
+            </p>
+            <p className="mt-4 max-w-3xl text-sm leading-7 text-slate-400 sm:text-base">
+              Build a complete, attributable, challengeable decision record. Preserve the evidence, validate authority, constrain execution, and define how the outcome will be independently verified before you issue the final determination.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <Link href="/academy/review" className="rounded-xl border border-cyan-300/25 bg-cyan-300/10 px-4 py-2.5 text-sm font-black text-cyan-100 transition hover:bg-cyan-300/15">
+                Review Workspace
+              </Link>
+              <Link href="/academy/assessment" className="rounded-xl border border-white/10 bg-white/[0.035] px-4 py-2.5 text-sm font-bold text-slate-300 transition hover:border-white/20 hover:text-white">
+                Assessment Center
+              </Link>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-black/20 p-5">
+            <p className="text-[11px] font-black uppercase tracking-[0.18em] text-slate-500">Mission readiness</p>
+            <div className="mt-5 grid grid-cols-2 gap-3">
+              <Metric label="Resolved" value={`${resolvedCount}/${gates.length}`} />
+              <Metric label="Supported" value={String(supportedCount)} />
+              <Metric label="Defects" value={String(defectCount)} danger={defectCount > 0} />
+              <Metric label="Unresolved" value={String(unresolvedCount)} />
+            </div>
+            <div className="mt-5">
+              <div className="flex items-center justify-between gap-3 text-xs font-bold text-slate-400">
+                <span>Governance record completion</span>
+                <span>{progress}%</span>
+              </div>
+              <div className="mt-2 h-2 overflow-hidden rounded-full bg-white/10">
+                <div className="h-full rounded-full bg-cyan-300 transition-all duration-300" style={{ width: `${progress}%` }} />
+              </div>
+            </div>
+            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-4">
+              <span className="text-[10px] font-black uppercase tracking-[0.16em] text-cyan-300">Recommended determination</span>
+              <strong className="mt-1 block text-2xl font-black text-white">{recommendedDecision}</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-[28px] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
+        <div className="flex flex-col gap-3 border-b border-white/10 pb-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Step 1 · Establish the mission</p>
+            <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Define the consequential decision before you evaluate it.</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-400">A capstone record should make the decision, authority, boundary, evidence, and uncertainty clear enough that another qualified reviewer can understand the problem without reconstructing it from memory.</p>
+        </div>
+
+        <div className="mt-6 grid gap-5 lg:grid-cols-2">
+          <Field label="Mission title" value={missionTitle} onChange={(value) => { setMissionTitle(value); markDirty(); }} placeholder="Name the governed execution mission." />
+          <Field label="Learner or review team" value={learnerName} onChange={(value) => { setLearnerName(value); markDirty(); }} placeholder="Preserve attribution." />
+          <TextArea label="Scenario" value={scenario} onChange={(value) => { setScenario(value); markDirty(); }} placeholder="Describe the consequential situation without assuming the conclusion." />
+          <TextArea label="Mission objective" value={objective} onChange={(value) => { setObjective(value); markDirty(); }} placeholder="Define the exact decision or action under review." />
+          <TextArea label="Authority source" value={authoritySource} onChange={(value) => { setAuthoritySource(value); markDirty(); }} placeholder="Identify the law, policy, delegation, contract, order, or approved rule." />
+          <TextArea label="Execution boundary" value={executionBoundary} onChange={(value) => { setExecutionBoundary(value); markDirty(); }} placeholder="Define what may occur, what may not occur, duration, subject, system, and jurisdiction." />
+          <TextArea label="Evidence summary" value={evidenceSummary} onChange={(value) => { setEvidenceSummary(value); markDirty(); }} placeholder="Summarize the attributable evidence supporting the mission." />
+          <TextArea label="Known uncertainty" value={uncertainty} onChange={(value) => { setUncertainty(value); markDirty(); }} placeholder="Preserve missing, conflicting, stale, or unresolved conditions." />
+        </div>
+      </section>
+
+      <section className="mt-6 rounded-[28px] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
+        <div className="flex flex-col gap-3 border-b border-white/10 pb-5 lg:flex-row lg:items-end lg:justify-between">
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Step 2 · Resolve the governance chain</p>
+            <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Work every gate before issuing consequence.</h2>
+          </div>
+          <p className="max-w-xl text-sm leading-6 text-slate-400">A gate is resolved only when you have preserved enough analysis to mark it supported or defective. Leaving a gate unresolved keeps the recommended determination at HOLD.</p>
+        </div>
+
+        <div className="mt-6 grid gap-6 xl:grid-cols-[320px_1fr]">
+          <aside className="space-y-2">
+            {gates.map((gate, index) => {
+              const state = gateStates[gate.id] || "UNRESOLVED";
+              const active = gate.id === currentGate.id;
+              return (
+                <button
+                  key={gate.id}
+                  type="button"
+                  onClick={() => setActiveGate(gate.id)}
+                  className={`w-full rounded-2xl border p-4 text-left transition ${active ? "border-cyan-300/40 bg-cyan-300/10 shadow-[inset_3px_0_0_#67e8f9]" : "border-white/10 bg-black/15 hover:border-white/20 hover:bg-white/[0.04]"}`}
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="text-xs font-black tracking-[0.16em] text-cyan-200">{String(index + 1).padStart(2, "0")}</span>
+                    <span className={`rounded-full border px-2 py-1 text-[9px] font-black tracking-[0.08em] ${gateTone[state]}`}>{state}</span>
+                  </div>
+                  <strong className="mt-2 block text-sm text-white">{gate.label}</strong>
+                  <span className="mt-1 block text-xs leading-5 text-slate-500">{gate.question}</span>
+                </button>
+              );
+            })}
           </aside>
 
-          <article className="rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:p-8">
-            <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Active gate</p>
-            <h2 className="mt-3 text-3xl font-black text-white">{currentGate.label}</h2>
-            <p className="mt-3 text-lg text-slate-200">{currentGate.question}</p>
-            <div className="mt-5 rounded-2xl border border-cyan-300/20 bg-cyan-300/[0.06] p-5 text-sm leading-7 text-slate-300">
-              <strong className="block text-cyan-100">Capstone standard</strong>
-              {currentGate.standard}
+          <article className="rounded-3xl border border-cyan-300/15 bg-[linear-gradient(150deg,rgba(8,25,37,.92),rgba(5,14,23,.92))] p-5 sm:p-7">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Active gate</p>
+                <h3 className="mt-2 text-3xl font-black text-white">{currentGate.label}</h3>
+                <p className="mt-2 text-lg font-semibold text-slate-200">{currentGate.question}</p>
+              </div>
+              <span className={`w-fit rounded-full border px-3 py-1.5 text-[10px] font-black tracking-[0.1em] ${gateTone[gateStates[currentGate.id] || "UNRESOLVED"]}`}>
+                {gateStates[currentGate.id] || "UNRESOLVED"}
+              </span>
+            </div>
+
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              <div className="rounded-2xl border border-cyan-300/15 bg-cyan-300/[0.055] p-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.16em] text-cyan-300">Capstone standard</span>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{currentGate.standard}</p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <span className="text-[10px] font-black uppercase tracking-[0.16em] text-slate-400">What to preserve</span>
+                <p className="mt-2 text-sm leading-6 text-slate-300">{currentGate.evidencePrompt}</p>
+              </div>
             </div>
 
             <label className="mt-6 block text-sm font-bold text-slate-200">
@@ -379,10 +411,10 @@ export default function CapstoneMissionPage() {
                 value={gateNotes[currentGate.id] || ""}
                 onChange={(event) => {
                   setGateNotes((current) => ({ ...current, [currentGate.id]: event.target.value }));
-                  setSaveState("idle");
+                  markDirty();
                 }}
-                className="mt-2 min-h-52 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-7 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
-                placeholder="Preserve the evidence, reasoning, limitations, and unresolved questions for this gate."
+                className="mt-2 min-h-56 w-full rounded-2xl border border-white/10 bg-black/25 px-4 py-3 text-sm leading-7 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/45 focus:ring-2 focus:ring-cyan-300/10"
+                placeholder="Preserve the evidence, reasoning, limitations, contradictions, and unresolved questions for this gate."
               />
             </label>
 
@@ -392,88 +424,85 @@ export default function CapstoneMissionPage() {
                   key={state}
                   type="button"
                   onClick={() => setGateState(state)}
-                  className={`rounded-2xl border px-4 py-3 text-sm font-black tracking-[0.08em] transition ${gateStates[currentGate.id] === state ? gateStyles[state] : "border-white/10 bg-black/10 text-slate-400 hover:border-white/25 hover:text-white"}`}
+                  className={`rounded-2xl border px-4 py-3 text-sm font-black tracking-[0.06em] transition ${gateStates[currentGate.id] === state ? gateTone[state] : "border-white/10 bg-black/15 text-slate-400 hover:border-white/25 hover:text-white"}`}
                 >
                   {state}
                 </button>
               ))}
             </div>
           </article>
-        </section>
+        </div>
+      </section>
 
-        <section className="mt-6 rounded-3xl border border-white/10 bg-white/[0.04] p-6 backdrop-blur-xl lg:p-8">
-          <p className="text-xs font-black uppercase tracking-[0.22em] text-cyan-300">Final determination</p>
-          <h2 className="mt-3 text-3xl font-black text-white">Select the decision supported by the preserved record.</h2>
-          <p className="mt-3 max-w-4xl leading-7 text-slate-300">
-            The capstone is not passed by selecting ALLOW. It is passed by issuing the decision the evidence, authority, continuity, and boundary actually support.
-          </p>
+      <section className="mt-6 rounded-[28px] border border-white/10 bg-white/[0.035] p-5 sm:p-7">
+        <div className="border-b border-white/10 pb-5">
+          <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Step 3 · Issue the determination</p>
+          <h2 className="mt-2 text-2xl font-black text-white sm:text-3xl">Select the decision supported by the preserved record.</h2>
+          <p className="mt-3 max-w-4xl text-sm leading-6 text-slate-400">The capstone is not passed by choosing ALLOW. It is passed by issuing the determination the evidence, authority, continuity, and execution boundary actually support.</p>
+        </div>
 
-          <div className="mt-6 grid gap-3 md:grid-cols-4">
-            {(["ALLOW", "HOLD", "DENY", "ESCALATE"] as Decision[]).map((option) => (
-              <button
-                key={option}
-                type="button"
-                onClick={() => setDecision(option)}
-                className={`rounded-2xl border p-5 text-left transition ${decision === option ? "border-cyan-300/50 bg-cyan-300/10" : "border-white/10 bg-black/10 hover:border-white/25"}`}
-              >
-                <strong className="block text-lg text-white">{option}</strong>
-                <span className="mt-2 block text-xs leading-5 text-slate-400">{decisionDescriptions[option]}</span>
-              </button>
-            ))}
+        <div className="mt-6 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+          {(["ALLOW", "HOLD", "DENY", "ESCALATE"] as Decision[]).map((option) => (
+            <button
+              key={option}
+              type="button"
+              onClick={() => { setDecision(option); markDirty(); }}
+              className={`rounded-2xl border p-5 text-left transition ${decision === option ? "border-cyan-300/45 bg-cyan-300/10 shadow-[inset_0_0_0_1px_rgba(103,232,249,.06)]" : "border-white/10 bg-black/15 hover:border-white/20 hover:bg-white/[0.035]"}`}
+            >
+              <strong className="block text-xl font-black text-white">{option}</strong>
+              <span className="mt-2 block text-xs leading-5 text-slate-400">{decisionDescriptions[option]}</span>
+            </button>
+          ))}
+        </div>
+
+        {decisionConflict && (
+          <div className="mt-5 rounded-2xl border border-rose-400/35 bg-rose-400/10 p-4 text-sm leading-6 text-rose-100">
+            <strong>ALLOW is not supported by the current record.</strong> One or more governance gates remain unresolved or defective. Resolve the record or select the determination the evidence supports.
           </div>
+        )}
 
-          {decisionConflict && (
-            <div className="mt-5 rounded-2xl border border-rose-300/40 bg-rose-300/10 p-4 text-sm leading-6 text-rose-100">
-              ALLOW conflicts with the current capstone record because one or more gates remain unresolved or defective.
-            </div>
-          )}
+        <div className="mt-6 grid gap-5 lg:grid-cols-3">
+          <TextArea label="Decision rationale" value={decisionRationale} onChange={(value) => { setDecisionRationale(value); markDirty(); }} placeholder="Explain why the selected determination is supported by the preserved record." />
+          <TextArea label="Outcome verification plan" value={outcomePlan} onChange={(value) => { setOutcomePlan(value); markDirty(); }} placeholder="Define what must be measured, observed, preserved, and reviewed after execution." />
+          <TextArea label="Challenge and appeal path" value={challengePath} onChange={(value) => { setChallengePath(value); markDirty(); }} placeholder="Define who may challenge the decision, what evidence is required, and who reviews it." />
+        </div>
+      </section>
 
-          <div className="mt-6 grid gap-5 lg:grid-cols-3">
-            <TextArea label="Decision rationale" value={decisionRationale} onChange={setDecisionRationale} placeholder="Explain why the selected determination is supported." />
-            <TextArea label="Outcome verification plan" value={outcomePlan} onChange={setOutcomePlan} placeholder="Define what must be measured, observed, preserved, and reviewed after execution." />
-            <TextArea label="Challenge and appeal path" value={challengePath} onChange={setChallengePath} placeholder="Define who may challenge the decision, what evidence is required, and who reviews it." />
-          </div>
-        </section>
-
-        <section className="mt-6 flex flex-col gap-4 rounded-3xl border border-cyan-300/20 bg-cyan-300/[0.06] p-6 sm:flex-row sm:items-center sm:justify-between">
+      <section className="mt-6 rounded-[28px] border border-cyan-300/20 bg-[linear-gradient(135deg,rgba(34,211,238,.07),rgba(255,255,255,.025))] p-5 sm:p-7">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-300">Capstone record</p>
-            <p className="mt-2 text-sm text-slate-300">
-              {saveState === "saved" && "Mission saved locally."}
-              {saveState === "error" && "The browser could not preserve the mission."}
-              {saveState === "idle" && "Save the mission before leaving this page."}
+            <p className="text-[11px] font-black uppercase tracking-[0.2em] text-cyan-300">Capstone record</p>
+            <h2 className="mt-2 text-xl font-black text-white">Preserve the mission before you leave.</h2>
+            <p className="mt-2 text-sm text-slate-400">
+              {saveState === "saved" && "Mission saved locally in this browser."}
+              {saveState === "error" && "The browser could not preserve the mission locally."}
+              {saveState === "idle" && "Unsaved changes are not yet preserved."}
             </p>
           </div>
           <div className="flex flex-wrap gap-3">
-            <button type="button" onClick={resetMission} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 transition hover:border-white/25 hover:text-white">
-              Reset
-            </button>
-            <button type="button" onClick={saveMission} className="rounded-xl border border-cyan-300/40 bg-cyan-300/10 px-4 py-3 text-sm font-black text-cyan-100 transition hover:bg-cyan-300/20">
-              Save mission
-            </button>
-            <button type="button" onClick={exportMission} className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200">
-              Export record
-            </button>
+            <button type="button" onClick={resetMission} className="rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-slate-300 transition hover:border-white/25 hover:text-white">Reset</button>
+            <button type="button" onClick={saveMission} className="rounded-xl border border-cyan-300/35 bg-cyan-300/10 px-4 py-3 text-sm font-black text-cyan-100 transition hover:bg-cyan-300/15">Save mission</button>
+            <button type="button" onClick={exportMission} className="rounded-xl bg-cyan-300 px-4 py-3 text-sm font-black text-slate-950 transition hover:bg-cyan-200">Export record</button>
           </div>
-        </section>
+        </div>
+      </section>
 
-        <footer className="mt-10 flex flex-col gap-4 border-t border-white/10 py-8 text-sm text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-          <p>No admissible evidence. No admissible execution.</p>
-          <div className="flex flex-wrap gap-4">
-            <Link href="/academy/review" className="transition hover:text-white">Review Workspace</Link>
-            <Link href="/academy/assessment" className="transition hover:text-white">Assessment Center →</Link>
-          </div>
-        </footer>
+      <div className="mt-7 flex flex-col gap-3 border-t border-white/10 pt-6 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
+        <p className="font-bold text-slate-400">No admissible evidence. No admissible execution.</p>
+        <div className="flex flex-wrap gap-4">
+          <Link href="/academy/review" className="transition hover:text-white">Review Workspace</Link>
+          <Link href="/academy/assessment" className="transition hover:text-white">Assessment Center →</Link>
+        </div>
       </div>
-    </main>
+    </div>
   );
 }
 
-function Metric({ label, value, emphasis = false }: { label: string; value: string; emphasis?: boolean }) {
+function Metric({ label, value, danger = false }: { label: string; value: string; danger?: boolean }) {
   return (
-    <div className={`rounded-2xl border p-5 ${emphasis ? "border-cyan-300/30 bg-cyan-300/[0.08]" : "border-white/10 bg-white/[0.04]"}`}>
-      <span className="text-xs font-black uppercase tracking-[0.16em] text-slate-500">{label}</span>
-      <strong className={`mt-2 block text-2xl font-black ${emphasis ? "text-cyan-200" : "text-white"}`}>{value}</strong>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4">
+      <span className="text-[10px] font-black uppercase tracking-[0.15em] text-slate-500">{label}</span>
+      <strong className={`mt-1 block text-2xl font-black ${danger ? "text-rose-200" : "text-white"}`}>{value}</strong>
     </div>
   );
 }
@@ -485,7 +514,7 @@ function Field({ label, value, onChange, placeholder }: { label: string; value: 
       <input
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
+        className="mt-2 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/45 focus:ring-2 focus:ring-cyan-300/10"
         placeholder={placeholder}
       />
     </label>
@@ -499,7 +528,7 @@ function TextArea({ label, value, onChange, placeholder }: { label: string; valu
       <textarea
         value={value}
         onChange={(event) => onChange(event.target.value)}
-        className="mt-2 min-h-36 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3 text-sm leading-6 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/50"
+        className="mt-2 min-h-36 w-full rounded-2xl border border-white/10 bg-black/20 px-4 py-3.5 text-sm leading-6 text-white outline-none transition placeholder:text-slate-600 focus:border-cyan-300/45 focus:ring-2 focus:ring-cyan-300/10"
         placeholder={placeholder}
       />
     </label>
