@@ -16,12 +16,19 @@ export function RouteAwareGlobalChrome() {
     pathname.startsWith('/workspace/ai-governance/operational-mission-records/') ||
     pathname === '/public/ai-governance/operational-mission-records' ||
     pathname.startsWith('/public/ai-governance/operational-mission-records/');
+  const isAdmissibleComputationResearch =
+    pathname === '/ai-governance/admissible-computation' ||
+    pathname.startsWith('/ai-governance/admissible-computation/') ||
+    pathname === '/workspace/ai-governance/admissible-computation' ||
+    pathname.startsWith('/workspace/ai-governance/admissible-computation/') ||
+    pathname === '/public/ai-governance/admissible-computation' ||
+    pathname.startsWith('/public/ai-governance/admissible-computation/');
 
   if (isTransparentAir || isPrivateEnvironmentalGateway || isPrivateGcea) return null;
 
   return (
     <>
-      {!isOperationalMissionRecord && <AtlasEnvironmentalIntegrityFundStrip />}
+      {!isOperationalMissionRecord && !isAdmissibleComputationResearch && <AtlasEnvironmentalIntegrityFundStrip />}
       <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
         <Suspense fallback={null}>
           <SiteActivityCounter />
