@@ -18,13 +18,23 @@ export async function POST(req:NextRequest){
 
   try{
     const result=await provider.search(request,10);
-    const governed:GovernedCandidate[]=result.candidates.slice(0,10).map((r,index)=>{
+    const frozenProviderCandidates=result.candidates.slice(0,10).map((r,index)=>({
+      providerRank:r.rank||index+1,
+      title:r.title,
+      url:r.url,
+      snippet:r.snippet,
+      displayUrl:r.displayUrl,
+      provider:r.provider,
+      providerResultId:r.providerResultId,
+    }));
+
+    const governed:GovernedCandidate[]=frozenProviderCandidates.map((r,index)=>{
       let canonicalHost:string|undefined;
       try{canonicalHost=new URL(r.url).hostname}catch{}
       const mediaType=/youtube\.com|youtu\.be|\bvideo\b/i.test(`${r.url} ${r.title} ${r.snippet}`)?"video":"web";
       const candidate:Candidate={
         id:r.providerResultId||`${recordId}-C${String(index+1).padStart(2,"0")}`,
-        providerRank:r.rank,
+        providerRank:r.providerRank,
         title:r.title,
         url:r.url,
         snippet:r.snippet,
@@ -34,9 +44,61 @@ export async function POST(req:NextRequest){
       };
       return {...candidate,provider:r.provider,providerResultId:r.providerResultId,determination:evaluateCandidate(request,profile,candidate)};
     });
-    const delivered=governed.filter(c=>c.determination.state==="ALLOW").map((c,deliveryIndex)=>({...c,deliveryRank:deliveryIndex+1}));
+
+    const admitted=governed.filter(c=>c.determination.state==="ALLOW").map((c,deliveryIndex)=>({...c,deliveryRank:deliveryIndex+1}));
+    const nonAdmitted=governed.filter(c=>c.determination.state!=="ALLOW");
+
+    const admittedRecord={
+      schema:"ta14.asg.admitted-record.v0.1",
+      parentRecordId:recordId,
+      request,
+      provider:result.provider,
+      providerLive:result.live,
+      engineVersion:ASG_ENGINE_VERSION,
+      profileVersion:ASG_PROFILE_VERSION,
+      profile,
+      admittedCount:admitted.length,
+      admitted:admitted.map(c=>({
+        originalProviderRank:c.providerRank,
+        deliveredRank:c.deliveryRank,
+        title:c.title,
+        url:c.url,
+        snippet:c.snippet,
+        canonicalHost:c.canonicalHost,
+        determination:c.determination.state,
+        reasonCode:c.determination.reasonCode,
+        reason:c.determination.explanation,
+        evaluationTier:c.determination.evaluationTier,
+      })),
+      rule:"Each item crossed the delivery boundary because it acquired ALLOW standing under the active bounded request and profile. ALLOW is not a certificate of absolute truth.",
+    };
+
+    const nonAdmittedRecord={
+      schema:"ta14.asg.non-admitted-record.v0.1",
+      parentRecordId:recordId,
+      request,
+      provider:result.provider,
+      providerLive:result.live,
+      engineVersion:ASG_ENGINE_VERSION,
+      profileVersion:ASG_PROFILE_VERSION,
+      profile,
+      nonAdmittedCount:nonAdmitted.length,
+      nonAdmitted:nonAdmitted.map(c=>({
+        originalProviderRank:c.providerRank,
+        title:c.title,
+        url:c.url,
+        snippet:c.snippet,
+        canonicalHost:c.canonicalHost,
+        determination:c.determination.state,
+        reasonCode:c.determination.reasonCode,
+        reason:c.determination.explanation,
+        evaluationTier:c.determination.evaluationTier,
+      })),
+      rule:"Every HOLD, DENY, or ESCALATE candidate remains preserved with its original provider rank and reason for not crossing the delivery boundary.",
+    };
+
     return NextResponse.json({
-      schema:"ta14.asg.runtime-record.v0.1",
+      schema:"ta14.asg.runtime-record.v0.2",
       recordId,
       request,
       profile,
@@ -44,20 +106,24 @@ export async function POST(req:NextRequest){
       profileVersion:ASG_PROFILE_VERSION,
       provider:result.provider,
       providerLive:result.live,
-      providerWindow:{startRank:1,endRank:governed.length,candidateCount:governed.length},
+      providerWindow:{startRank:1,endRank:frozenProviderCandidates.length,candidateCount:frozenProviderCandidates.length},
+      frozenProviderCandidates,
       candidates:governed,
-      deliveryCommit:{candidateRanks:delivered.map(c=>c.providerRank),deliveredCount:delivered.length,delivered},
-      notice:"Provider candidates are preserved before TA-14 delivery determination. ALLOW establishes bounded delivery standing, not absolute truth.",
+      deliveryCommit:{candidateRanks:admitted.map(c=>c.providerRank),deliveredCount:admitted.length,delivered:admitted},
+      admittedRecord,
+      nonAdmittedRecord,
+      notice:"The provider's first ten candidates are frozen before TA-14 evaluation. Provider rank is preserved. Admitted and non-admitted outcomes are exported as separate evidence records.",
     });
   }catch(error:any){
     const code=String(error?.message||"PROVIDER_ERROR");
     const notConfigured=code==="GOOGLE_WEB_SEARCH_PROVIDER_NOT_CONFIGURED";
     return NextResponse.json({
-      schema:"ta14.asg.runtime-record.v0.1",recordId,request,profile,
+      schema:"ta14.asg.runtime-record.v0.2",recordId,request,profile,
       engineVersion:ASG_ENGINE_VERSION,profileVersion:ASG_PROFILE_VERSION,
       state:"HOLD",reasonCode:notConfigured?"PROVIDER_CANDIDATE_SET_UNAVAILABLE":"PROVIDER_ERROR",
       explanation:notConfigured?"The request is preserved, but legitimate Google Web Search Service credentials are not configured. TA-14 will not manufacture provider candidates.":"The provider did not establish a candidate set. No delivery commit occurred.",
-      provider:"GOOGLE_WEB_SEARCH_SERVICE",providerLive:false,candidates:[],deliveryCommit:{candidateRanks:[],deliveredCount:0,delivered:[]}
+      provider:"GOOGLE_WEB_SEARCH_SERVICE",providerLive:false,frozenProviderCandidates:[],candidates:[],deliveryCommit:{candidateRanks:[],deliveredCount:0,delivered:[]},
+      admittedRecord:null,nonAdmittedRecord:null,
     },{status:notConfigured?503:502});
   }
 }
