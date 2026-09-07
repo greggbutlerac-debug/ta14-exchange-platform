@@ -25,10 +25,24 @@ export interface SearchProvider {
 }
 
 export class SearchProviderError extends Error {
-  constructor(public readonly code: string, public readonly status?: number) {
+  constructor(
+    public readonly code: string,
+    public readonly status?: number,
+    public readonly detail?: string,
+  ) {
     super(code);
     this.name = "SearchProviderError";
   }
+}
+
+function sanitizeProviderDetail(value: string): string | undefined {
+  const compact = value.replace(/\s+/g, " ").trim();
+  if (!compact) return undefined;
+  // Provider diagnostics only: cap length and redact common credential-bearing fields.
+  return compact
+    .replace(/("?(?:api[-_ ]?key|token|authorization)"?\s*[:=]\s*")([^"]+)(")/gi, "$1[REDACTED]$3")
+    .replace(/(bearer\s+)[A-Za-z0-9._~+\/-]+/gi, "$1[REDACTED]")
+    .slice(0, 500);
 }
 
 type SerperOrganicResult = {
@@ -61,7 +75,12 @@ export class SerperGoogleSearchAdapter implements SearchProvider {
       body: JSON.stringify({q: request, num: limit}),
       cache: "no-store",
     });
-    if (!response.ok) throw new SearchProviderError(`SEARCH_PROVIDER_ERROR_${response.status}`, response.status);
+    if (!response.ok) {
+      let detail: string | undefined;
+      try { detail = sanitizeProviderDetail(await response.text()); }
+      catch { detail = undefined; }
+      throw new SearchProviderError(`SEARCH_PROVIDER_ERROR_${response.status}`, response.status, detail);
+    }
 
     let body: SerperResponse;
     try { body = (await response.json()) as SerperResponse; }
