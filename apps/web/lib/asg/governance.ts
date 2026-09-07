@@ -16,6 +16,8 @@ const CLEAR_NON_BOOK_PAGE=/\b(obituary|license detail|professional profile|linke
 const REQUEST_NOISE=new Set(["published","books","book","articles","article","works","work","author","by","about","find","show","give","me","the","of","for"]);
 const QUESTION_WORDS=new Set(["what","who","where","when","why","how","which","is","are","was","were","does","do","did","explain","define","meaning"]);
 const BINDING_NOISE=new Set(["what","who","where","when","why","how","which","is","are","was","were","does","do","did","explain","define","meaning","the","a","an","of","for","to","in","on","and","or","with","about","find","show","give","me"]);
+const EVALUATIVE_WORDS=new Set(["best","greatest","worst","better","worse","top","ranking","ranked","rank","favorite","favourite","good","bad"]);
+const EVALUATIVE_EVIDENCE=/\b(best|greatest|worst|better|worse|top|ranking|ranked|rank|good|bad|survey|poll|rating|ratings|historian|historians|assessment|opinion)\b/i;
 
 export function classifyProfile(request:string):ASGProfile { if(HIGH_CONSEQUENCE.test(request))return"high-consequence"; if(CURRENT.test(request))return"current-events"; if(RESEARCH.test(request))return"research"; if(ENTERTAINMENT.test(request))return"entertainment"; return"general-factual"; }
 function words(value:string){return value.toLowerCase().replace(/[^a-z0-9]+/g," ").split(/\s+/).filter(Boolean)}
@@ -25,9 +27,11 @@ function lexicalEquivalent(a:string,b:string){ const x=lexeme(a),y=lexeme(b); if
 function structuredIdentifiers(value:string){return (value.toLowerCase().match(/\b[a-z]{1,8}[-_][a-z0-9]{1,12}\b/g)||[]).map(x=>x.replace(/_/g,"-"));}
 function candidateIdentifiers(c:Candidate){return structuredIdentifiers(`${c.title} ${c.snippet||""} ${c.url}`);}
 function identifierStanding(request:string,c:Candidate):Determination|null {const ids=structuredIdentifiers(request);if(!ids.length)return null;const candidateIds=new Set(candidateIdentifiers(c));if(ids.every(id=>candidateIds.has(id)))return null;return{state:"DENY",reasonCode:"IDENTIFIER_BINDING_FAIL",explanation:"The bounded request contains a structured identifier that is not preserved as the same identifier in the candidate evidence.",evaluationTier:"T1"};}
-function tokens(value:string){return words(value).filter(x=>x.length>2&&!BINDING_NOISE.has(x))}
+function isEvaluativeRequest(request:string){return words(request).some(x=>EVALUATIVE_WORDS.has(x));}
+function tokens(value:string){return words(value).filter(x=>x.length>2&&!BINDING_NOISE.has(x)&&!EVALUATIVE_WORDS.has(x))}
 function bindingCoverage(request:string,c:Candidate){const a=tokens(request),b=tokens(`${c.title} ${c.snippet||""}`);let hits=0;a.forEach(x=>{if(b.some(y=>lexicalEquivalent(x,y)))hits++});return {hits,total:a.length,ratio:a.length?hits/a.length:0};}
 function sufficientSubjectBinding(request:string,c:Candidate){const ids=structuredIdentifiers(request);if(ids.length){const candidateIds=new Set(candidateIdentifiers(c));if(ids.every(id=>candidateIds.has(id)))return true;}const coverage=bindingCoverage(request,c);if(coverage.total===0)return false;if(coverage.total===1)return coverage.hits===1;if(coverage.total===2)return coverage.hits===2;return coverage.ratio>=0.67;}
+function evaluativeStanding(request:string,c:Candidate):Determination|null {if(!isEvaluativeRequest(request))return null;const text=`${c.title} ${c.snippet||""}`;if(EVALUATIVE_EVIDENCE.test(text))return null;return{state:"DENY",reasonCode:"EVALUATIVE_INTENT_FAIL",explanation:"The candidate may match the subject, but the preserved evidence does not establish that it addresses the bounded evaluative or ranking intent of the request.",evaluationTier:"T1"};}
 function requestedIdentity(request:string){ const raw=words(request); if(raw.some(x=>QUESTION_WORDS.has(x)))return null; const parts=raw.filter(x=>x.length>1&&!REQUEST_NOISE.has(x)); if(parts.length<2||parts.length>4)return null; if(BOOK_REQUEST.test(request)||/\b(author|profile|biography|bio|person|people|wrote|written by)\b/i.test(request))return parts; return null; }
 function identityStanding(request:string,c:Candidate):Determination|null { const identity=requestedIdentity(request);if(!identity)return null;const set=new Set(words(`${c.title} ${c.snippet||""} ${c.url}`));if(identity.every(x=>set.has(x)))return null;const firstOk=set.has(identity[0]),lastOk=set.has(identity[identity.length-1]);if(firstOk&&lastOk)return{state:"HOLD",reasonCode:"IDENTITY_BINDING_INSUFFICIENT",explanation:"The candidate partially matches the requested person, but the preserved provider evidence does not establish the full requested identity strongly enough for delivery.",evaluationTier:"T1"};return{state:"DENY",reasonCode:"IDENTITY_BINDING_FAIL",explanation:"The candidate does not establish sufficient identity binding to the person named in the bounded request.",evaluationTier:"T1"}; }
 function bookPurposeStanding(c:Candidate):Determination|null { const text=`${c.title} ${c.snippet||""} ${c.url}`;if(!BOOK_EVIDENCE.test(text))return{state:"DENY",reasonCode:"PURPOSE_BINDING_FAIL",explanation:"The request is for published books, but this candidate does not establish book-level evidence or a book record.",evaluationTier:"T1"};if(CLEAR_NON_BOOK_PAGE.test(text)&&!CANONICAL_BOOK_RECORD.test(text)&&!SUPPORTING_BOOK_EVIDENCE.test(text))return{state:"DENY",reasonCode:"PURPOSE_BINDING_FAIL",explanation:"The candidate may match the person or topic, but its page purpose is not sufficiently bound to the request for published books.",evaluationTier:"T1"};return null; }
@@ -38,6 +42,7 @@ export function evaluateCandidate(request:string,profile:ASGProfile,c:Candidate)
  if(VIDEO.test(request)&&c.mediaType&&!/video/i.test(c.mediaType))return{state:"DENY",reasonCode:"REL_SCOPE_FAIL",explanation:"Candidate fails the requested media-format binding.",evaluationTier:"T0"};
  const identifier=identifierStanding(request,c);if(identifier)return identifier;
  if(!sufficientSubjectBinding(request,c))return{state:"DENY",reasonCode:"REL_SCOPE_FAIL",explanation:"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.",evaluationTier:"T1"};
+ const evaluative=evaluativeStanding(request,c);if(evaluative)return evaluative;
  if(BOOK_REQUEST.test(request)){const purpose=bookPurposeStanding(c);if(purpose)return purpose;}
  const identity=identityStanding(request,c);if(identity)return identity;
  if(BOOK_REQUEST.test(request)){const record=bookRecordStanding(c);if(record)return record;}
@@ -47,5 +52,5 @@ export function evaluateCandidate(request:string,profile:ASGProfile,c:Candidate)
  if((profile==="research"||profile==="general-factual")&&!c.canonicalHost)return{state:"HOLD",reasonCode:"PROVENANCE_INSUFFICIENT",explanation:"Source provenance requires additional evidence before delivery.",evaluationTier:"T2"};
  return{state:"ALLOW",reasonCode:"EVIDENCE_SUFFICIENT",explanation:"Preserved candidate evidence satisfies the active request binding and profile at this evaluation stage.",evaluationTier:profile==="entertainment"?"T1":"T2"};
 }
-export const ASG_ENGINE_VERSION="asg.v0.8";
+export const ASG_ENGINE_VERSION="asg.v0.9";
 export const ASG_PROFILE_VERSION="profiles.v0.1";
