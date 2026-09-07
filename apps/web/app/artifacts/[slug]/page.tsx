@@ -9,13 +9,15 @@ import { getGeneratedExecutionEvidence } from '../../../lib/execution-artifacts/
 const artifacts = [...SECOND_CORPUS_ARTIFACTS, ...EVIDENCE_HARDENING_ARTIFACTS];
 const repo='https://github.com/greggbutlerac-debug/ta14-exchange-platform/blob/main/';
 const codeStyle={display:'block',whiteSpace:'pre-wrap' as const,overflowWrap:'anywhere' as const,padding:18,borderRadius:12,background:'#02060a',border:'1px solid rgba(127,223,255,.14)',color:'#bfe9ff',fontSize:12,lineHeight:1.65};
+const navLink={color:'#7fdfff',textDecoration:'none',fontWeight:800,padding:'10px 14px',border:'1px solid rgba(127,223,255,.22)',borderRadius:10,background:'rgba(127,223,255,.04)'};
 
 export default function ArtifactPage(){
  const p=useParams<{slug:string}>(); const slug=String(p.slug||'').toLowerCase(); const a=artifacts.find(x=>x.href.endsWith(slug));
- if(!a)return <main style={{minHeight:'70vh',padding:'80px 24px',background:'#050b12',color:'#eef6ff'}}><h1>Artifact record not found.</h1><Link href='/artifacts/registry'>Return to registry</Link></main>;
+ if(!a)return <main style={{minHeight:'70vh',padding:'80px 24px',background:'#050b12',color:'#eef6ff'}}><div style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:28}}><Link href='/' style={navLink}>← TA-14 Exchange</Link><Link href='/artifacts/registry' style={navLink}>Artifact Registry</Link></div><h1>Artifact record not found.</h1></main>;
  const evidence=getGeneratedExecutionEvidence(a.artifactId); const hardening=Number(a.artifactId.slice(-6))>=25;
  const specPath=hardening?'apps/web/lib/execution-artifacts/specifications/evidence-hardening-specifications.ts':'apps/web/lib/execution-artifacts/specifications/second-corpus-specifications.ts';
- return <main style={{minHeight:'100vh',padding:'72px 24px 96px',background:'#050b12',color:'#eef6ff',fontFamily:'Inter,system-ui,sans-serif'}}><div style={{maxWidth:1180,margin:'0 auto'}}>
+ return <main style={{minHeight:'100vh',padding:'32px 24px 96px',background:'#050b12',color:'#eef6ff',fontFamily:'Inter,system-ui,sans-serif'}}><div style={{maxWidth:1180,margin:'0 auto'}}>
+  <nav aria-label='Artifact navigation' style={{display:'flex',gap:10,flexWrap:'wrap',marginBottom:34}}><Link href='/' style={navLink}>← TA-14 Exchange</Link><Link href='/artifacts/registry' style={navLink}>Artifact Registry</Link></nav>
   <div style={{fontSize:11,letterSpacing:2.2,color:'#f2cc68',fontWeight:900}}>TA-14 EXECUTION ARTIFACT · {hardening?'EVIDENCE HARDENING CORPUS':'SECOND CORPUS'}</div><div style={{marginTop:8,color:'#7fdfff',fontWeight:800}}>{a.artifactId} · {a.registryId}</div>
   <h1 style={{fontSize:'clamp(36px,6vw,72px)',lineHeight:1,letterSpacing:'-.045em',margin:'28px 0 18px'}}>{a.title}</h1>
   <p style={{color:'#b1c2cf',lineHeight:1.8,fontSize:16}}>{a.summary}</p>
@@ -34,6 +36,6 @@ export default function ArtifactPage(){
    <h2 style={{marginTop:46}}>6. Source code / reproduce it</h2><div style={{display:'flex',gap:12,flexWrap:'wrap'}}><a href={repo+'apps/web/lib/execution-artifacts/execution-harness.ts'} target='_blank' rel='noreferrer' style={{color:'#7fdfff'}}>Execution harness ↗</a><a href={repo+specPath} target='_blank' rel='noreferrer' style={{color:'#7fdfff'}}>Frozen corpus specification ↗</a><a href={repo+'apps/web/lib/execution-artifacts/generated-evidence.ts'} target='_blank' rel='noreferrer' style={{color:'#7fdfff'}}>Evidence generator ↗</a><a href={repo+specPath.replace('.ts','.test.ts')} target='_blank' rel='noreferrer' style={{color:'#7fdfff'}}>Mutation / corpus tests ↗</a></div>
    <section style={{marginTop:32,padding:20,border:'1px solid rgba(242,204,104,.25)',borderRadius:14,background:'rgba(242,204,104,.04)'}}><b style={{color:'#f2cc68'}}>CLAIMS BOUNDARY</b><p style={{color:'#afc1ce'}}>{evidence.specification.claimsBoundary}</p></section>
   </>}
-  <div style={{marginTop:44}}><Link href='/artifacts/registry' style={{color:'#7fdfff'}}>← Artifact Registry</Link></div>
+  <nav aria-label='Artifact exit navigation' style={{marginTop:44,display:'flex',gap:10,flexWrap:'wrap'}}><Link href='/artifacts/registry' style={navLink}>← Artifact Registry</Link><Link href='/' style={navLink}>TA-14 Exchange Home →</Link></nav>
  </div></main>;
 }
