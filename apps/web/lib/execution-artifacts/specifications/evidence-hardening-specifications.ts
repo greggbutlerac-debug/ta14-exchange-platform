@@ -1,5 +1,6 @@
 import type { ArtifactPredicate, ArtifactTestSpecification, ChainStage, Determination } from "../execution-harness";
 import { TA14_EA_000025_SPECIFICATION } from "./ta14-ea-000025";
+import { TA14_EA_000041_SPECIFICATION } from "./ta14-ea-000041";
 
 type Case = {
   n: number; title: string; expected: Determination; terminal: ChainStage;
@@ -53,6 +54,7 @@ function build(c:Case): ArtifactTestSpecification {
 export const EVIDENCE_HARDENING_SPECIFICATIONS: ArtifactTestSpecification[] = [
   TA14_EA_000025_SPECIFICATION,
   ...cases.map(build),
+  TA14_EA_000041_SPECIFICATION,
 ];
 
 export function getEvidenceHardeningSpecification(artifactId:string): ArtifactTestSpecification | undefined {
