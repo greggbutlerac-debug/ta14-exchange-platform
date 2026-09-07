@@ -14,14 +14,14 @@ export function getExecutableArtifactSpecification(artifactId: string): Artifact
 }
 
 export function assertCompleteExecutableCorpus(): void {
-  if (ALL_EXECUTABLE_ARTIFACT_SPECIFICATIONS.length !== 40) {
-    throw new Error(`Expected 40 executable artifact specifications; found ${ALL_EXECUTABLE_ARTIFACT_SPECIFICATIONS.length}.`);
+  if (ALL_EXECUTABLE_ARTIFACT_SPECIFICATIONS.length !== 41) {
+    throw new Error(`Expected 41 executable artifact specifications; found ${ALL_EXECUTABLE_ARTIFACT_SPECIFICATIONS.length}.`);
   }
 
   const ids = new Set(ALL_EXECUTABLE_ARTIFACT_SPECIFICATIONS.map((specification) => specification.artifactId));
-  if (ids.size !== 40) throw new Error("Executable artifact corpus contains duplicate artifact IDs.");
+  if (ids.size !== 41) throw new Error("Executable artifact corpus contains duplicate artifact IDs.");
 
-  for (let n = 1; n <= 40; n += 1) {
+  for (let n = 1; n <= 41; n += 1) {
     const artifactId = `TA14-EA-${String(n).padStart(6, "0")}`;
     if (!ids.has(artifactId)) throw new Error(`Executable artifact corpus is missing ${artifactId}.`);
   }
