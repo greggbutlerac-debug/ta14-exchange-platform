@@ -32,8 +32,9 @@ export async function POST(req:NextRequest){
   }catch(error:any){
     const code=String(error?.code||error?.message||"PROVIDER_ERROR");
     const providerStatus=typeof error?.status==="number"?error.status:undefined;
+    const providerDetail=typeof error?.detail==="string"?error.detail:undefined;
     const notConfigured=code==="SEARCH_PROVIDER_NOT_CONFIGURED";
-    console.error("ASG_PROVIDER_FAILURE",{recordId,provider:"GOOGLE_VIA_SERPER",code,providerStatus});
-    return NextResponse.json({schema:"ta14.asg.runtime-record.v0.2",recordId,request,profile,engineVersion:ASG_ENGINE_VERSION,profileVersion:ASG_PROFILE_VERSION,state:"HOLD",reasonCode:notConfigured?"PROVIDER_CANDIDATE_SET_UNAVAILABLE":code,providerErrorCode:code,providerStatus,explanation:notConfigured?"The request is preserved, but the live Google-results provider API key is not configured. TA-14 will not manufacture provider candidates.":`The provider did not establish a candidate set (${code}). No delivery commit occurred.`,provider:"GOOGLE_VIA_SERPER",providerLive:false,frozenProviderCandidates:[],candidates:[],deliveryCommit:{candidateRanks:[],deliveredCount:0,delivered:[]},admittedRecord:null,nonAdmittedRecord:null},{status:notConfigured?503:502});
+    console.error("ASG_PROVIDER_FAILURE",{recordId,provider:"GOOGLE_VIA_SERPER",code,providerStatus,providerDetail});
+    return NextResponse.json({schema:"ta14.asg.runtime-record.v0.2",recordId,request,profile,engineVersion:ASG_ENGINE_VERSION,profileVersion:ASG_PROFILE_VERSION,state:"HOLD",reasonCode:notConfigured?"PROVIDER_CANDIDATE_SET_UNAVAILABLE":code,providerErrorCode:code,providerStatus,providerDetail,explanation:notConfigured?"The request is preserved, but the live Google-results provider API key is not configured. TA-14 will not manufacture provider candidates.":`The provider did not establish a candidate set (${code}). No delivery commit occurred.${providerDetail?` Provider detail: ${providerDetail}`:""}`,provider:"GOOGLE_VIA_SERPER",providerLive:false,frozenProviderCandidates:[],candidates:[],deliveryCommit:{candidateRanks:[],deliveredCount:0,delivered:[]},admittedRecord:null,nonAdmittedRecord:null},{status:notConfigured?503:502});
   }
 }
