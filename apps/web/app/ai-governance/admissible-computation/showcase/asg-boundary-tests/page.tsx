@@ -27,6 +27,15 @@ const runs = [
     result: "9 established · 8 ALLOW · 1 DENY · 8 delivered",
     finding: "The candidate ‘SOM BITCH’ remained outside lexical standing because admitting it would require a phonetic/colloquial transformation across token boundaries.",
     consequence: "Demonstrates where bounded normalization deliberately stops interpreting."
+  },
+  {
+    id: "ASG-MTRPZ6TK",
+    engine: "asg.v0.6",
+    query: ".khvlugckjtdxjkhv b/lm n /lkhblvu ky fijyfxcikulhbj 'kn';ulgc itrxi",
+    state: "PROVIDER-INFERENCE REJECTION",
+    result: "7 established · 0 ALLOW · 7 DENY · 0 delivered",
+    finding: "The provider inferred University of Louisville Golf Club candidates from an otherwise unbound request. TA-14 preserved all seven candidates but did not inherit the provider’s inferred meaning as delivery standing.",
+    consequence: "Demonstrates provider interpretation is candidate evidence, not delivery authority."
   }
 ];
 
@@ -39,13 +48,13 @@ export default function Page(){
 
     <section style={{marginTop:48,padding:"28px",border:"1px solid #777"}}>
       <strong>GOVERNING RULE</strong>
-      <p style={{fontSize:22,lineHeight:1.5,marginBottom:0}}>The original request is never rewritten. Normalization may establish tightly bounded lexical continuity; it does not automatically authorize phonetic, colloquial, conceptual, or cross-token interpretation.</p>
+      <p style={{fontSize:22,lineHeight:1.5,marginBottom:0}}>The original request is never rewritten. Normalization may establish tightly bounded lexical continuity; it does not automatically authorize phonetic, colloquial, conceptual, cross-token, or provider-inferred interpretation.</p>
     </section>
 
     <div style={{display:"grid",gap:24,marginTop:40}}>
       {runs.map((r)=><article key={r.id} style={{padding:"28px",border:"1px solid #777"}}>
         <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:13,fontWeight:700,letterSpacing:1}}><span>{r.id}</span><span>·</span><span>{r.engine}</span><span>·</span><span>{r.state}</span></div>
-        <h2 style={{fontSize:32,margin:"14px 0 6px"}}>{r.query}</h2>
+        <h2 style={{fontSize:32,margin:"14px 0 6px",overflowWrap:"anywhere"}}>{r.query}</h2>
         <p><strong>{r.result}</strong></p>
         <p style={{fontSize:18,lineHeight:1.55}}>{r.finding}</p>
         <p style={{lineHeight:1.55}}><strong>Architectural consequence:</strong> {r.consequence}</p>
