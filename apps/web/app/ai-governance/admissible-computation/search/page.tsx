@@ -8,7 +8,7 @@ type Candidate={id:string;providerRank:number;title:string;url:string;snippet?:s
 type RuntimeRecord={schema:string;recordId:string;request:string;profile:string;provider:string;providerLive:boolean;providerWindow?:{startRank:number;endRank:number;candidateCount:number};frozenProviderCandidates?:Frozen[];candidates:Candidate[];deliveryCommit:{candidateRanks:number[];deliveredCount:number;delivered:Candidate[]};admittedRecord?:unknown;nonAdmittedRecord?:unknown;notice?:string;state?:string;reasonCode?:string;explanation?:string};
 
 export default function Page(){
- const [q,setQ]=useState("Greggory Don Butler articles");
+ const [q,setQ]=useState("");
  const [record,setRecord]=useState<RuntimeRecord|null>(null); const [loading,setLoading]=useState(false); const [failure,setFailure]=useState("");
  const rows=record?.candidates??[]; const frozen=record?.frozenProviderCandidates??[]; const delivered=record?.deliveryCommit?.delivered??[];
  const count=(s:string)=>rows.filter(r=>r.determination.state===s).length;
