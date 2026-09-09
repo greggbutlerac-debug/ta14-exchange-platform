@@ -87,6 +87,10 @@ const registrySections = [
 
 const quickLinks = [
   {
+    label: 'Inspect ONUMA / BIMgenie LT-2 Evidence Case',
+    href: '/ai-governance/admissible-architecture/onuma-lt2',
+  },
+  {
     label: 'Open TA-14 AI Governance Registry',
     href: '/registry',
   },
@@ -154,6 +158,11 @@ export default function ArchitectureRegistryBridgePage() {
         </p>
 
         <div className="hero-actions">
+          <Link href="/ai-governance/admissible-architecture" className="button button-primary">
+            Enter the ACA + AEA Showroom
+            <span aria-hidden="true">→</span>
+          </Link>
+
           <a href="#sections" className="button button-primary">
             Open the Complete Record
             <span aria-hidden="true">↓</span>
