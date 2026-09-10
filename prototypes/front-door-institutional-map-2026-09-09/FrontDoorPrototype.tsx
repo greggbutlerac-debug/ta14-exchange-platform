@@ -37,7 +37,7 @@ const rain = [
   '01001101 10110100 ACA::PRECOMPUTE HOLD 7F2A','REALITY RECORD CONTINUITY ADMISSIBILITY','TA14-AIGR-000040 ESGL PROVENANCE::PRESERVED','ALLOW HOLD DENY ESCALATE 00110110','AEA::AUTHORITY_PRESENT? FALSE -> HOLD','SHA256 8E4A 19CF BOUNDED_EVIDENCE TRUE','FEIG COMMIT::WITHHELD 101001110010','CHECK RECHECK COMMIT EXECUTION OUTCOME','ONUMA BIMGENIE WO::3593-22790','NO_ADMISSIBLE_EVIDENCE NO_ADMISSIBLE_EXECUTION','PROPOSITION FALSIFIER STOP_RULE EVIDENCE','REGISTER SHOWCASE EXAMINE DEMONSTRATE ARTIFACT','CURRENT_STATE != REPRESENTED_STATE ? ESCALATE','01101001 01101110 01110100 01100101 01100111','AUTHORITY != CAPABILITY :: PERMISSION != STANDING','ACA AEA FEIG AIR PAIR ESGL HSG KEYSTONE',
 ];
 
-function CodeRain(){return <div className="codeRain" aria-hidden="true">{rain.map((text,i)=><div className={`rainCol r${i}`} key={i}><span>{text}</span><span>{text}</span><span>{text}</span><span>{text}</span></div>)}</div>}
+function CodeRain(){return <div className="codeRain" aria-hidden="true">{Array.from({length:32},(_,i)=>rain[i%rain.length]).map((text,i)=><div className="rainCol" key={i} style={{left:`${i*3.15}%`,animationDuration:`${22+(i%9)*2}s`,animationDelay:`-${(i*7)%31}s`,animationDirection:i%2?'reverse':'normal',opacity:.38+(i%5)*.1} as React.CSSProperties}><span>{text}</span><span>{text}</span><span>{text}</span><span>{text}</span></div>)}</div>}
 
 export default function FrontDoorPrototype(){
   return <main className="fdp">
