@@ -5,10 +5,10 @@ import { EVIDENCE_HARDENING_SPECIFICATIONS } from "./specifications/evidence-har
 const EXECUTED_AT = "2026-08-23T19:36:00.000Z";
 
 describe("TA-14 evidence hardening executable corpus", () => {
-  it("contains one executable frozen specification for every artifact EA-000025 through EA-000040", () => {
-    expect(EVIDENCE_HARDENING_SPECIFICATIONS).toHaveLength(16);
+  it("contains one executable frozen specification for every artifact EA-000025 through EA-000041", () => {
+    expect(EVIDENCE_HARDENING_SPECIFICATIONS).toHaveLength(17);
     expect(EVIDENCE_HARDENING_SPECIFICATIONS.map((x)=>x.artifactId)).toEqual(
-      Array.from({length:16},(_,i)=>`TA14-EA-${String(i+25).padStart(6,"0")}`),
+      Array.from({length:17},(_,i)=>`TA14-EA-${String(i+25).padStart(6,"0")}`),
     );
   });
 
