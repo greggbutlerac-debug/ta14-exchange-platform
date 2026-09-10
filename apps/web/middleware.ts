@@ -13,10 +13,18 @@ const OPERATIONAL_MISSION_PREFIX =
   "/workspace/ai-governance/operational-mission-records/onuma-re1";
 const PUBLIC_OPERATIONAL_MISSION_PREFIX =
   "/public/ai-governance/operational-mission-records/onuma-re1";
+const FRONT_DOOR_PREVIEW = "/front-door-preview";
 
 export async function middleware(request: NextRequest) {
   const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   request.headers.set("x-ta14-requested-path", requestedPath);
+
+  // The branch-isolated front-door review surface is intentionally public and
+  // non-indexed. It must remain viewable on a preview deployment that does not
+  // carry the production account-system environment variables.
+  if (request.nextUrl.pathname === FRONT_DOOR_PREVIEW) {
+    return NextResponse.next({ request });
+  }
 
   // Published governance identities, showcase records, provenance series, and
   // governed showcase artifacts are public institutional evidence. They must
