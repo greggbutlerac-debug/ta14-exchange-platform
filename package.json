@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "next dev apps/web",
-    "build": "next build apps/web",
+    "build": "next build apps/web && node scripts/vercel-jxf6-output-compat.mjs",
     "start": "next start apps/web",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
