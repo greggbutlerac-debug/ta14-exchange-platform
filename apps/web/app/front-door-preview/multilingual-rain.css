@@ -1,0 +1,6 @@
+.codeRain .rainCol:nth-child(6n+1){color:#00eaff;text-shadow:0 0 7px rgba(0,234,255,.85),0 0 16px rgba(0,234,255,.45)}
+.codeRain .rainCol:nth-child(6n+2){color:#39ff88;text-shadow:0 0 7px rgba(57,255,136,.85),0 0 16px rgba(57,255,136,.45)}
+.codeRain .rainCol:nth-child(6n+3){color:#00bfff;text-shadow:0 0 7px rgba(0,191,255,.85),0 0 16px rgba(0,191,255,.45)}
+.codeRain .rainCol:nth-child(6n+4){color:#66ff66;text-shadow:0 0 7px rgba(102,255,102,.85),0 0 16px rgba(102,255,102,.45)}
+.codeRain .rainCol:nth-child(6n+5){color:#19e6ff;text-shadow:0 0 7px rgba(25,230,255,.85),0 0 16px rgba(25,230,255,.45)}
+.codeRain .rainCol:nth-child(6n){color:#45ff9a;text-shadow:0 0 7px rgba(69,255,154,.85),0 0 16px rgba(69,255,154,.45)}
