@@ -1,4 +1,5 @@
 import FrontDoorPrototype from '../../../../prototypes/front-door-institutional-map-2026-09-09/FrontDoorPrototype';
+import './multilingual-rain.css';
 
 export const metadata = {
   title: 'TA-14 Exchange Front Door — Non-Production Preview',
