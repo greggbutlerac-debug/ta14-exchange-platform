@@ -23,6 +23,9 @@ export default function CanonicalChain24(){
       </div>)}
     </div>
     <div className="chain24Rule">PRESERVING ADMISSIBILITY IS THE GOAL · NON-EXECUTION CAN BE A GOVERNED SUCCESS</div>
-    <Link className="chain24Cta" href="/academy/24-link-architecture">EXPLORE THE COMPLETE 24-LINK ARCHITECTURE →</Link>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:10}}>
+      <Link className="chain24Cta" href="/academy/24-link-architecture">EXPLORE THE COMPLETE 24-LINK ARCHITECTURE →</Link>
+      <Link className="chain24Cta" href="/ai-governance/ta14-architecture-showroom">ENTER THE TA-14 ARCHITECTURE SHOWROOM →</Link>
+    </div>
   </section>;
 }
