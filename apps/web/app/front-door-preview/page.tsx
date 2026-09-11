@@ -1,5 +1,6 @@
 import FrontDoorPrototype from '../../../../prototypes/front-door-institutional-map-2026-09-09/FrontDoorPrototype';
 import RainEnhancer from './RainEnhancer';
+import CanonicalChain24 from './CanonicalChain24';
 import './multilingual-rain.css';
 
 export const metadata = {
@@ -9,5 +10,5 @@ export const metadata = {
 };
 
 export default function FrontDoorPreviewPage() {
-  return <><RainEnhancer /><FrontDoorPrototype /></>;
+  return <><RainEnhancer /><FrontDoorPrototype /><CanonicalChain24 /></>;
 }
