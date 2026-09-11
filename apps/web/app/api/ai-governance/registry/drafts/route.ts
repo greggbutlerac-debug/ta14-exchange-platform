@@ -60,12 +60,9 @@ function mapContactMode(
 
 function mapProvider(value: unknown): string {
   const provider = text(value).toLowerCase();
-
-  if (['github', 'gitlab', 'bitbucket', 'codeberg'].includes(provider)) {
-    return provider;
-  }
-
-  return 'other';
+  return ['github', 'gitlab', 'bitbucket', 'codeberg'].includes(provider)
+    ? provider
+    : 'other';
 }
 
 function mapRepositoryAccess(value: unknown): string {
@@ -93,12 +90,29 @@ function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) 
             cookieStore.set(name, value, options);
           });
         } catch {
-          // A Server Component may have initiated the request. The route can
-          // still read the existing authenticated session.
+          // The existing authenticated session remains readable.
         }
       },
     },
   });
+}
+
+/**
+ * Older/recovered drafts can contain an empty string for select-backed fields.
+ * A controlled React <select> with no empty option can visually render its first
+ * option while state remains ''. That makes the wizard look complete while its
+ * completion gate correctly sees an empty value. Normalize only UI defaults on
+ * read; substantive authority evidence and all registrant declarations remain
+ * untouched and must still be supplied by the registrant.
+ */
+function normalizeDraftForHydration(submission: JsonRecord): JsonRecord {
+  return {
+    ...submission,
+    claimant_type:
+      text(submission.claimant_type) || 'Individual founder or author',
+    submitter_authority_role:
+      text(submission.submitter_authority_role) || 'Founder',
+  };
 }
 
 function buildSubmissionRow(form: JsonRecord, ownerUserId: string) {
@@ -110,7 +124,6 @@ function buildSubmissionRow(form: JsonRecord, ownerUserId: string) {
     current_version: text(form.currentVersion),
     claimed_establishment_date: nullable(form.establishmentDate),
     effective_version_date: nullable(form.effectiveVersionDate),
-
     claimant_name: text(form.claimantName),
     claimant_type: text(form.claimantType),
     submitter_authority_role: text(form.authorityRole),
@@ -121,7 +134,6 @@ function buildSubmissionRow(form: JsonRecord, ownerUserId: string) {
     public_contact_mode: mapContactMode(form.contactVisibility),
     public_website: nullable(form.website),
     public_evidence_route: nullable(form.publicEvidenceRoute),
-
     geographic_scope: nullable(form.jurisdiction),
     regulatory_scope: nullable(form.regulatoryScope),
     plain_language_description: text(form.plainDescription),
@@ -129,20 +141,16 @@ function buildSubmissionRow(form: JsonRecord, ownerUserId: string) {
     explicit_non_claims: text(form.nonClaims),
     known_limitations: nullable(form.limitations),
     known_disputes: nullable(form.disputes),
-
     ownership_declaration: text(form.ownershipDeclaration),
     license_statement: nullable(form.license),
     requested_review_pathway: text(form.reviewPathway),
     record_visibility: mapVisibility(form.recordVisibility),
-
     allow_review_requests: bool(form.allowReviewRequests),
     allow_collaboration_inquiries: bool(form.allowCollaboration),
     allow_dispute_notices: bool(form.allowDisputeNotices),
-
     authority_declaration_accepted: bool(form.authorityConfirmed),
     accuracy_declaration_accepted: bool(form.accuracyConfirmed),
     registry_boundary_accepted: bool(form.boundaryConfirmed),
-
     intake_manifest: {
       draft_format: 'TA-14-AIGR-DRAFT-1.0',
       saved_from: 'registry_intake',
@@ -260,9 +268,6 @@ function buildPatentRows(
       relationship_to_governance: text(record.relationshipToGovernance),
       visibility: mapVisibility(record.visibility),
       record_state: 'current',
-      // Lineage IDs are assigned in a later route after all patent rows have
-      // durable database IDs. The intake manifest still preserves the local
-      // convertedFromId and continuationOfId references.
     }));
 }
 
@@ -281,12 +286,9 @@ async function replaceChildRows(
     throw new Error(`${table}: ${deleteError.message}`);
   }
 
-  if (rows.length === 0) {
-    return;
-  }
+  if (rows.length === 0) return;
 
   const { error: insertError } = await supabase.from(table).insert(rows);
-
   if (insertError) {
     throw new Error(`${table}: ${insertError.message}`);
   }
@@ -309,7 +311,6 @@ export async function GET(request: NextRequest) {
     }
 
     const requestedId = request.nextUrl.searchParams.get('id');
-
     let query = supabase
       .from('ai_governance_registry_submissions')
       .select('*')
@@ -321,17 +322,16 @@ export async function GET(request: NextRequest) {
       : query.order('updated_at', { ascending: false }).limit(1);
 
     const { data: submissions, error } = await query;
-
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
-    const submission = submissions?.[0];
-
+    const submission = submissions?.[0] as JsonRecord | undefined;
     if (!submission) {
       return NextResponse.json({ draft: null });
     }
 
+    const submissionId = text(submission.id);
     const [
       publicationsResult,
       repositoriesResult,
@@ -341,22 +341,22 @@ export async function GET(request: NextRequest) {
       supabase
         .from('ai_governance_registry_publications')
         .select('*')
-        .eq('submission_id', submission.id)
+        .eq('submission_id', submissionId)
         .order('created_at'),
       supabase
         .from('ai_governance_registry_repositories')
         .select('*')
-        .eq('submission_id', submission.id)
+        .eq('submission_id', submissionId)
         .order('created_at'),
       supabase
         .from('ai_governance_registry_zenodo_records')
         .select('*')
-        .eq('submission_id', submission.id)
+        .eq('submission_id', submissionId)
         .order('created_at'),
       supabase
         .from('ai_governance_registry_patent_records')
         .select('*')
-        .eq('submission_id', submission.id)
+        .eq('submission_id', submissionId)
         .order('created_at'),
     ]);
 
@@ -376,7 +376,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       draft: {
-        submission,
+        submission: normalizeDraftForHydration(submission),
         publications: publicationsResult.data ?? [],
         repositories: repositoriesResult.data ?? [],
         zenodoRecords: zenodoResult.data ?? [],
@@ -388,7 +388,6 @@ export async function GET(request: NextRequest) {
       error instanceof Error
         ? error.message
         : 'Unable to load Registry draft.';
-
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -398,7 +397,6 @@ export async function POST(request: NextRequest) {
     const payload = (await request.json()) as DraftPayload;
     const cookieStore = await cookies();
     const supabase = createSupabaseClient(cookieStore);
-
     const {
       data: { user },
       error: userError,
@@ -413,7 +411,6 @@ export async function POST(request: NextRequest) {
 
     const form = payload.form ?? {};
     const submissionRow = buildSubmissionRow(form, user.id);
-
     let submissionId = text(payload.id);
 
     if (submissionId) {
@@ -429,7 +426,6 @@ export async function POST(request: NextRequest) {
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
-
       submissionId = data.id;
     } else {
       const { data, error } = await supabase
@@ -441,7 +437,6 @@ export async function POST(request: NextRequest) {
       if (error) {
         return NextResponse.json({ error: error.message }, { status: 400 });
       }
-
       submissionId = data.id;
     }
 
@@ -450,19 +445,16 @@ export async function POST(request: NextRequest) {
       submissionId,
       user.id,
     );
-
     const repositories = buildRepositoryRows(
       payload.repositories ?? [],
       submissionId,
       user.id,
     );
-
     const zenodoRecords = buildZenodoRows(
       payload.zenodoRecords ?? [],
       submissionId,
       user.id,
     );
-
     const patentRecords = buildPatentRows(
       payload.patentRecords ?? [],
       submissionId,
@@ -475,21 +467,18 @@ export async function POST(request: NextRequest) {
       submissionId,
       publications,
     );
-
     await replaceChildRows(
       supabase,
       'ai_governance_registry_repositories',
       submissionId,
       repositories,
     );
-
     await replaceChildRows(
       supabase,
       'ai_governance_registry_zenodo_records',
       submissionId,
       zenodoRecords,
     );
-
     await replaceChildRows(
       supabase,
       'ai_governance_registry_patent_records',
@@ -522,7 +511,6 @@ export async function POST(request: NextRequest) {
       error instanceof Error
         ? error.message
         : 'Unable to save Registry draft.';
-
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
@@ -530,7 +518,6 @@ export async function POST(request: NextRequest) {
 export async function DELETE(request: NextRequest) {
   try {
     const draftId = request.nextUrl.searchParams.get('id');
-
     if (!draftId) {
       return NextResponse.json(
         { error: 'Draft ID is required.' },
@@ -540,7 +527,6 @@ export async function DELETE(request: NextRequest) {
 
     const cookieStore = await cookies();
     const supabase = createSupabaseClient(cookieStore);
-
     const {
       data: { user },
       error: userError,
@@ -573,7 +559,6 @@ export async function DELETE(request: NextRequest) {
       error instanceof Error
         ? error.message
         : 'Unable to delete Registry draft.';
-
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
