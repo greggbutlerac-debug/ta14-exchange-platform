@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "es2022"
-    ],
+    "lib": ["dom", "dom.iterable", "es2022"],
     "allowJs": false,
     "skipLibCheck": true,
     "strict": true,
@@ -19,34 +15,14 @@
     "jsx": "preserve",
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./*"
-      ],
-      "@vercel/blob": [
-        "./node_modules/@vercel/blob"
-      ],
-      "ajv": [
-        "./node_modules/ajv"
-      ],
-      "ajv/*": [
-        "./node_modules/ajv/*"
-      ]
+      "@/*": ["./*"],
+      "next/link": ["./node_modules/next/link"],
+      "@vercel/blob": ["./node_modules/@vercel/blob"],
+      "ajv": ["./node_modules/ajv"],
+      "ajv/*": ["./node_modules/ajv/*"]
     },
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "plugins": [{"name": "next"}]
   },
-  "include": [
-    "next-env.d.ts",
-    ".next/types/**/*.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "../../packages/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "../../prototypes"
-  ]
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx", "../../packages/**/*.ts"],
+  "exclude": ["node_modules", "../../prototypes"]
 }
