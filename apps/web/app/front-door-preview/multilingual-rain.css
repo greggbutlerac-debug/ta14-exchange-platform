@@ -1,6 +1,8 @@
-.codeRain .rainCol:nth-child(6n+1){color:#00eaff;text-shadow:0 0 7px rgba(0,234,255,.85),0 0 16px rgba(0,234,255,.45)}
-.codeRain .rainCol:nth-child(6n+2){color:#39ff88;text-shadow:0 0 7px rgba(57,255,136,.85),0 0 16px rgba(57,255,136,.45)}
-.codeRain .rainCol:nth-child(6n+3){color:#00bfff;text-shadow:0 0 7px rgba(0,191,255,.85),0 0 16px rgba(0,191,255,.45)}
-.codeRain .rainCol:nth-child(6n+4){color:#66ff66;text-shadow:0 0 7px rgba(102,255,102,.85),0 0 16px rgba(102,255,102,.45)}
-.codeRain .rainCol:nth-child(6n+5){color:#19e6ff;text-shadow:0 0 7px rgba(25,230,255,.85),0 0 16px rgba(25,230,255,.45)}
-.codeRain .rainCol:nth-child(6n){color:#45ff9a;text-shadow:0 0 7px rgba(69,255,154,.85),0 0 16px rgba(69,255,154,.45)}
+.fdp .codeRain{opacity:.78!important;filter:none!important;z-index:-1!important}
+.fdp .codeRain .rainCol{font-size:11px!important;font-weight:900!important;line-height:2!important;letter-spacing:.12em!important;text-orientation:sideways!important;opacity:.88!important}
+.codeRain .rainCol:nth-child(6n+1){color:#00f5ff!important;text-shadow:0 0 5px #00f5ff,0 0 13px #00d9ff,0 0 26px rgba(0,217,255,.9)}
+.codeRain .rainCol:nth-child(6n+2){color:#39ff14!important;text-shadow:0 0 5px #39ff14,0 0 13px #00ff66,0 0 26px rgba(0,255,102,.9)}
+.codeRain .rainCol:nth-child(6n+3){color:#00c8ff!important;text-shadow:0 0 5px #00c8ff,0 0 14px #009dff,0 0 28px rgba(0,157,255,.9)}
+.codeRain .rainCol:nth-child(6n+4){color:#00ff88!important;text-shadow:0 0 5px #00ff88,0 0 14px #00ff44,0 0 28px rgba(0,255,68,.9)}
+.codeRain .rainCol:nth-child(6n+5){color:#22eaff!important;text-shadow:0 0 5px #22eaff,0 0 14px #00bfff,0 0 28px rgba(0,191,255,.9)}
+.codeRain .rainCol:nth-child(6n){color:#66ff33!important;text-shadow:0 0 5px #66ff33,0 0 14px #19ff19,0 0 28px rgba(25,255,25,.9)}
