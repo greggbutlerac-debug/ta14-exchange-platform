@@ -1,0 +1,21 @@
+{
+  "schema": "ta14.asg.non-admitted-record.v0.1",
+  "parentRecordId": "ASG-MTXOZ67X",
+  "request": "eat raw oysters",
+  "provider": "GOOGLE_VIA_SERPER",
+  "providerLive": true,
+  "engineVersion": "asg.v0.9",
+  "profileVersion": "profiles.v0.1",
+  "profile": "general-factual",
+  "nonAdmittedCount": 6,
+  "nonAdmitted": [
+    {"originalProviderRank":1,"determination":"DENY","reasonCode":"REL_SCOPE_FAIL","reason":"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.","evaluationTier":"T1"},
+    {"originalProviderRank":2,"determination":"DENY","reasonCode":"REL_SCOPE_FAIL","reason":"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.","evaluationTier":"T1"},
+    {"originalProviderRank":3,"determination":"DENY","reasonCode":"REL_SCOPE_FAIL","reason":"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.","evaluationTier":"T1"},
+    {"originalProviderRank":7,"determination":"DENY","reasonCode":"REL_SCOPE_FAIL","reason":"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.","evaluationTier":"T1"},
+    {"originalProviderRank":9,"determination":"DENY","reasonCode":"REL_SCOPE_FAIL","reason":"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.","evaluationTier":"T1"},
+    {"originalProviderRank":10,"determination":"DENY","reasonCode":"REL_SCOPE_FAIL","reason":"Candidate does not establish sufficient bounded coverage of the request's meaningful subject tokens after lexical normalization.","evaluationTier":"T1"}
+  ],
+  "rule": "Every HOLD, DENY, or ESCALATE candidate remains preserved with its original provider rank and reason for not crossing the delivery boundary.",
+  "preservationNote": "Static public evidence reconstruction from preserved public record ASG-MTXOZ67X. Candidate title, URL, snippet and host fields are omitted here where they were not established in the preserved source available to this implementation; no missing evidence is inferred."
+}
