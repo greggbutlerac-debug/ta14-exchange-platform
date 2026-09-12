@@ -65,21 +65,41 @@ function AtlasPrompt(){
  </div>
 }
 
+function CommercialReviewBridge(){
+  return <div data-commercial-review-bridge="true" style={{margin:'34px auto 0',maxWidth:980,padding:'28px 30px',textAlign:'left',border:'1px solid #2f6f8d',background:'linear-gradient(135deg,rgba(9,31,45,.96),rgba(5,16,26,.96))',boxShadow:'0 24px 70px rgba(0,0,0,.28)'}}>
+    <div style={{fontSize:9,fontWeight:900,letterSpacing:'.18em',color:'#72e0fa'}}>NEED A FORMAL TA-14 REVIEW?</div>
+    <h3 style={{margin:'10px 0 12px',font:'32px/1.05 Georgia,serif',color:'#eef7ff'}}>Move from exploration to a bounded professional review.</h3>
+    <p style={{margin:0,maxWidth:800,color:'#96adbd',fontSize:12,lineHeight:1.75}}>Bring a real AI system, agent, API, automation, or consequential workflow. TA-14 can review the evidence path, authority boundary, execution controls, and unresolved conditions without turning a preliminary assessment into a certification claim.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(4,minmax(0,1fr))',gap:8,margin:'20px 0 18px'}}>
+      {[['$49','Reviewability Check'],['$250','API Readiness Check'],['From $450','Evidence Integrity Review'],['From $1,000','Runtime Readiness Review']].map(([price,label])=><div key={label} style={{padding:'13px 14px',border:'1px solid #1b4058',background:'#06121c'}}><b style={{display:'block',color:'#69dfb5',fontSize:15}}>{price}</b><span style={{display:'block',marginTop:5,color:'#b9cfdb',fontSize:9,lineHeight:1.4}}>{label}</span></div>)}
+    </div>
+    <div style={{display:'flex',gap:10,flexWrap:'wrap',alignItems:'center'}}>
+      <a href="/review" style={{padding:'13px 18px',background:'#72e0fa',color:'#031018',textDecoration:'none',fontSize:9,fontWeight:900,letterSpacing:'.08em'}}>REQUEST A TA-14 REVIEW →</a>
+      <a href="/eu-ai-act/readiness-review" style={{padding:'13px 18px',border:'1px solid #35647f',color:'#bcecff',textDecoration:'none',fontSize:9,fontWeight:900,letterSpacing:'.08em'}}>EU AI ACT READINESS REVIEW →</a>
+      <span style={{color:'#6f8ea2',fontSize:9}}>Review scope and acceptance remain bounded to the submitted evidence.</span>
+    </div>
+  </div>
+}
+
 export default function CommandCenterActionRouter(){
-  const router=useRouter();const[target,setTarget]=useState<HTMLElement|null>(null);
+  const router=useRouter();
+  const[promptTarget,setPromptTarget]=useState<HTMLElement|null>(null);
+  const[commercialTarget,setCommercialTarget]=useState<HTMLElement|null>(null);
   useEffect(()=>{
-    const mountPrompt=()=>{
+    const mountTargets=()=>{
       const prompt=document.querySelector('.prompt') as HTMLElement|null;
-      if(prompt){prompt.textContent='';setTarget(prompt);return true}
-      return false;
+      const end=document.querySelector('.end') as HTMLElement|null;
+      if(prompt&&!promptTarget){prompt.textContent='';setPromptTarget(prompt)}
+      if(end&&!commercialTarget)setCommercialTarget(end);
+      return Boolean(prompt&&end);
     };
-    if(!mountPrompt()){
-      const observer=new MutationObserver(()=>{if(mountPrompt())observer.disconnect()});
+    if(!mountTargets()){
+      const observer=new MutationObserver(()=>{if(mountTargets())observer.disconnect()});
       observer.observe(document.body,{childList:true,subtree:true});
       const timeout=window.setTimeout(()=>observer.disconnect(),5000);
       return()=>{window.clearTimeout(timeout);observer.disconnect()};
     }
-  },[]);
+  },[promptTarget,commercialTarget]);
   useEffect(()=>{
     const handler=(event:MouseEvent)=>{
       const targetEl=event.target as HTMLElement|null;
@@ -92,5 +112,8 @@ export default function CommandCenterActionRouter(){
     document.addEventListener('click',handler,true);
     return()=>document.removeEventListener('click',handler,true);
   },[router]);
-  return target?createPortal(<AtlasPrompt/>,target):null;
+  return <>
+    {promptTarget?createPortal(<AtlasPrompt/>,promptTarget):null}
+    {commercialTarget?createPortal(<CommercialReviewBridge/>,commercialTarget):null}
+  </>;
 }
