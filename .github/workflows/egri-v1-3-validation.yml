@@ -1,0 +1,43 @@
+name: EGRI v1.3 Validation
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/web/app/workspace/environmental-records/playground/**'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - '.github/workflows/egri-v1-3-validation.yml'
+  push:
+    branches:
+      - feature/egri-v1-3-governed-chain
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: EGRI regression tests
+        run: npm run test -- apps/web/app/workspace/environmental-records/playground/readiness-engine.test.ts
+
+      - name: Production build
+        run: npm run build
