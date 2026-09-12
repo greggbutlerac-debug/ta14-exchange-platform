@@ -11,19 +11,29 @@ const OPERATIONAL_MISSION_PREFIX = "/workspace/ai-governance/operational-mission
 const PUBLIC_OPERATIONAL_MISSION_PREFIX = "/public/ai-governance/operational-mission-records/onuma-re1";
 const FRONT_DOOR_PREVIEW = "/front-door-preview";
 const ARCHITECTURE_SHOWROOM = "/ai-governance/ta14-architecture-showroom";
+const PUBLIC_ROUTE_PREFIXES = [
+  "/academy",
+  "/commercial",
+  "/environmental-integrity-governance",
+];
 
 export async function middleware(request: NextRequest) {
   const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   request.headers.set("x-ta14-requested-path", requestedPath);
 
-  // Public institutional surfaces do not require account/session middleware.
-  // Keeping them outside Supabase also makes preview deployments inspectable
-  // when account environment variables are intentionally unavailable.
+  // Public institutional, learning, and commercial surfaces do not require
+  // account/session middleware. This keeps public acquisition routes usable
+  // even when Supabase authentication is unavailable or intentionally absent.
   if (
     request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname === FRONT_DOOR_PREVIEW ||
     request.nextUrl.pathname === ARCHITECTURE_SHOWROOM ||
-    request.nextUrl.pathname.startsWith(`${ARCHITECTURE_SHOWROOM}/`)
+    request.nextUrl.pathname.startsWith(`${ARCHITECTURE_SHOWROOM}/`) ||
+    PUBLIC_ROUTE_PREFIXES.some(
+      (prefix) =>
+        request.nextUrl.pathname === prefix ||
+        request.nextUrl.pathname.startsWith(`${prefix}/`),
+    )
   ) {
     return NextResponse.next({ request });
   }
