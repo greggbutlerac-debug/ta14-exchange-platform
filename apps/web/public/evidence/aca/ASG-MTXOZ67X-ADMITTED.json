@@ -1,0 +1,59 @@
+{
+  "schema": "ta14.asg.admitted-record.v0.1",
+  "parentRecordId": "ASG-MTXOZ67X",
+  "request": "eat raw oysters",
+  "provider": "GOOGLE_VIA_SERPER",
+  "providerLive": true,
+  "engineVersion": "asg.v0.9",
+  "profileVersion": "profiles.v0.1",
+  "profile": "general-factual",
+  "admittedCount": 4,
+  "admitted": [
+    {
+      "originalProviderRank": 4,
+      "deliveredRank": 1,
+      "title": "Have humans ever tried eating raw oysters? Can they eat them without ...",
+      "url": "https://www.quora.com/Have-humans-ever-tried-eating-raw-oysters-Can-they-eat-them-without-getting-sick-What-is-your-opinion-on-this-matter",
+      "determination": "ALLOW",
+      "reasonCode": "EVIDENCE_SUFFICIENT",
+      "reason": "Preserved candidate evidence satisfies the active request binding and profile at this evaluation stage.",
+      "evaluationTier": "T2"
+    },
+    {
+      "originalProviderRank": 5,
+      "deliveredRank": 2,
+      "title": "How dangerous or how much of a life threatening risk is it to eat raw oysters?",
+      "url": "https://www.quora.com/How-dangerous-or-how-much-of-a-life-threatening-risk-is-it-to-eat-raw-oysters",
+      "determination": "ALLOW",
+      "reasonCode": "EVIDENCE_SUFFICIENT",
+      "reason": "Preserved candidate evidence satisfies the active request binding and profile at this evaluation stage.",
+      "evaluationTier": "T2"
+    },
+    {
+      "originalProviderRank": 6,
+      "deliveredRank": 3,
+      "title": "Oyster Myths & Facts (April 2025)",
+      "url": "https://www.inahalfshell.com/oyster-myths-facts",
+      "snippet": "Yes, it absolutely is safe to eat raw oysters during months without the letter ‘r’ (e.g., May, June, July, August).",
+      "canonicalHost": "www.inahalfshell.com",
+      "determination": "ALLOW",
+      "reasonCode": "EVIDENCE_SUFFICIENT",
+      "reason": "Preserved candidate evidence satisfies the active request binding and profile at this evaluation stage.",
+      "evaluationTier": "T2"
+    },
+    {
+      "originalProviderRank": 8,
+      "deliveredRank": 4,
+      "title": "The Right Way to Eat a Raw Oyster",
+      "url": "https://www.vanityfair.com/news/2009/02/the-right-way-to-eat-a-raw-oyster?srsltid=AfmBOorWdWakUCawSA1PHqX3M2X3AqasXONcZCqX6deQojTmyfykqU2g",
+      "snippet": "Chew the fish one or twice before you swallow it. It's an urban legend that you are supposed to let it slide down your throat without biting ...",
+      "canonicalHost": "www.vanityfair.com",
+      "determination": "ALLOW",
+      "reasonCode": "EVIDENCE_SUFFICIENT",
+      "reason": "Preserved candidate evidence satisfies the active request binding and profile at this evaluation stage.",
+      "evaluationTier": "T2"
+    }
+  ],
+  "rule": "Each item crossed the delivery boundary because it acquired ALLOW standing under the active bounded request and profile. ALLOW is not a certificate of absolute truth.",
+  "preservationNote": "Static public evidence reconstruction from preserved public record ASG-MTXOZ67X. Fields not established in the preserved display are intentionally omitted rather than inferred."
+}
