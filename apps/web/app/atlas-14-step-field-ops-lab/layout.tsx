@@ -3,7 +3,7 @@ import SevenInSevenOutIntegrity from "./SevenInSevenOutIntegrity";
 import AnswerLengthIntegrity from "./AnswerLengthIntegrity";
 
 export const metadata: Metadata = {
-  title: "TA-14 Field Ops Lab | Private Preview",
+  title: "TA-14 Field Ops Lab | TA-14 Academy",
   description: "Private TA-14 Academy field operations game prototype.",
   robots: {
     index: false,
@@ -17,9 +17,11 @@ export default function AtlasFieldOpsLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return <>
-    {children}
-    <SevenInSevenOutIntegrity />
-    <AnswerLengthIntegrity />
-  </>;
+  return (
+    <>
+      {children}
+      <SevenInSevenOutIntegrity />
+      <AnswerLengthIntegrity />
+    </>
+  );
 }
