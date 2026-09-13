@@ -4,11 +4,10 @@ import AnswerLengthIntegrity from "./AnswerLengthIntegrity";
 
 export const metadata: Metadata = {
   title: "TA-14 Field Ops Lab | TA-14 Academy",
-  description: "Private TA-14 Academy field operations game prototype.",
+  description: "Public TA-14 Academy 14-step field operations training arcade.",
   robots: {
-    index: false,
-    follow: false,
-    nocache: true,
+    index: true,
+    follow: true,
   },
 };
 
