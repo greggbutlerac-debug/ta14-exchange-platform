@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const TERMS_VERSION = 'v0.3';
+const TERMS_VERSION = 'v0.4';
 
 const sections = [
   ['01', 'Registration boundary', [
@@ -47,7 +47,7 @@ const sections = [
     'PASS, SUPPORTABLE, SUPPORTED, HOLD, DENY, INCOMPLETE, or other determinations remain bounded by the proposition and evidence record that produced them.'
   ]],
   ['09', 'Proposition-bounded examination authority', [
-    'Before execution, the parties should freeze the participating system or architecture identity and version, the proposition, explicit non-claims, evidence boundary, examination method, acceptance criteria, participant roles, authority boundary, confidentiality treatment, and publication treatment.',
+    'Before execution, the parties should freeze the participating system or architecture identity and version, the proposition, explicit non-claims, evidence boundary, examination method, acceptance criteria, participant roles, authority boundary, confidentiality treatment, publication treatment, planned run set, correction allowance, expected deliverables, and closure condition.',
     'TA-14 retains control of its examination method and its evidence determinations, findings, holds, denials, escalations, and institutional record, but that examination authority is confined to the agreed examination proposition and admitted evidence surface.',
     'A TA-14 examination does not become an interpretation, modification, certification, replacement, or determination of the participant architecture or methodology in its own right.',
     'A demonstration tests the agreed interface or proposition. It does not rewrite either participant architecture to manufacture compatibility or a favorable result.',
@@ -70,9 +70,20 @@ const sections = [
   ]],
   ['12', 'Correction, dispute, withdrawal, and supersession', [
     'Material corrections should be preserved through the Registry lifecycle rather than silently rewriting historical records.',
-    'A participant may raise a documented challenge concerning attribution, ownership, scope, evidence, or material factual accuracy. Withdrawal or supersession changes current standing but does not require erasure of the historical event chain where retention is necessary for institutional continuity.'
+    'A participant may raise a documented challenge concerning attribution, ownership, scope, evidence, or material factual accuracy. Withdrawal or supersession changes current standing but does not require erasure of the historical event chain where retention is necessary for institutional continuity.',
+    'Unless a demonstration-specific written scope provides otherwise, one substantive post-finding factual-correction or reconciliation cycle is included before closure. Additional substantive cycles require separate written authorization and may require separate commercial terms.'
   ]],
-  ['13', 'Special terms', [
+  ['13', 'No-cost Founding Demonstration scope, closure, and successor work', [
+    'A no-cost Founding Demonstration is a bounded institutional examination, not an open-ended architecture-development, advisory, assurance, remediation, documentation, or continuing-review program.',
+    'Before substantive examination begins, the controlled scope should identify the frozen proposition, admitted evidence surface, planned execution or review set, expected TA-14 deliverables, included factual-correction or reconciliation allowance, publication treatment if any, and the condition that closes the demonstration.',
+    'TA-14 may HOLD, narrow, or close a no-cost demonstration when the work materially expands beyond the frozen proposition, requires repeated participant-specific design or documentation work, introduces additional routes or propositions, or becomes an ongoing development or assurance function.',
+    'Issuance of the final bounded finding, institutional closure record, or other expressly defined closure event ends the no-cost Founding Demonstration obligation. Closure does not create implied authority for another run, another route, another proposition, additional failed-condition testing, Technical Freeze activity, production-readiness evaluation, continuing assurance, monitoring, successor examination, showroom development, promotional drafting, or other follow-on work.',
+    'Any successor examination, additional substantive evidence review, new execution stage, expanded publication package, or post-closure institutional service requires a new written authorization before work begins. Commercial terms apply unless TA-14 expressly grants a new written fee waiver for the specifically identified successor work.',
+    'A prior fee waiver does not roll forward by implication. Any new fee waiver must identify the exact work it covers and does not create a continuing entitlement to additional no-cost services.',
+    'TA-14 may decline successor work even where a participant is willing to pay. Registration, a prior finding, a prior fee waiver, or historical participation does not create a right to continued TA-14 examination capacity.',
+    'Closure preserves the historical evidence chain and the finding actually earned. Ending the working relationship does not erase, weaken, upgrade, or retrospectively rewrite the institutional record.'
+  ]],
+  ['14', 'Special terms', [
     'These standing terms provide the default Registry and Founding Demonstration boundary. A specific examination may require additional written terms for confidentiality, restricted evidence, licensing, publication, security, commercial arrangements, or other exceptional conditions.',
     'Where specific written terms conflict with these standing terms for a defined demonstration, the specific terms govern that demonstration only to the extent of the stated conflict.'
   ]],
@@ -94,7 +105,7 @@ export default function RegistryTermsPage() {
     </section>
 
     <section className="summary">
-      <div><b>IP</b><span>Ownership and architecture-derived rights stay with their owner.</span></div><div><b>EVIDENCE</b><span>Identity or hashing does not equal admission or inspection.</span></div><div><b>AUTHORITY</b><span>A TA-14 finding does not become participant authority.</span></div><div><b>FINDINGS</b><span>No claim beyond the proposition and admitted evidence.</span></div>
+      <div><b>IP</b><span>Ownership and architecture-derived rights stay with their owner.</span></div><div><b>EVIDENCE</b><span>Identity or hashing does not equal admission or inspection.</span></div><div><b>AUTHORITY</b><span>A TA-14 finding does not become participant authority.</span></div><div><b>CLOSURE</b><span>A no-cost demonstration ends at its defined closure boundary.</span></div>
     </section>
 
     <section id="terms" className="terms">
@@ -106,6 +117,7 @@ export default function RegistryTermsPage() {
     <section className="acceptance">
       <p className="eyebrow">BEFORE YOU CONTINUE</p><h2>Know the boundary before you submit.</h2>
       <p>By proceeding, you acknowledge that registration does not transfer intellectual property, grant operational authority, certify your architecture, admit undisclosed evidence, or authorize TA-14 or the participant to appropriate the other\'s methodology. Any examination is bounded to the declared proposition and admitted evidence surface.</p>
+      <p>A no-cost Founding Demonstration is not a continuing service entitlement. Its obligation ends at the defined closure boundary. Any successor examination, additional substantive review, expanded publication package, or other post-closure work requires new written authorization and, unless expressly waived in writing for that identified work, separate commercial terms.</p>
       <p>A specific Founding Demonstration may add separately agreed written terms before evidence is admitted or examination begins.</p>
       <div className="version"><b>Standing terms version</b><span>{TERMS_VERSION}</span></div>
       <Link className="primary" href="/workspace/ai-governance/registry/register">Continue to Registration →</Link>
