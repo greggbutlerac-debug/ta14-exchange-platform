@@ -4,6 +4,7 @@ import WorldAutoSelect from "./WorldAutoSelect";
 import FreshRunDeck from "./FreshRunDeck";
 import MissionRailController from "./MissionRailController";
 import LightningStorm from "./LightningStorm";
+import ArcadeFeedbackFX from "./ArcadeFeedbackFX";
 import PhaserArcadeOverlay from "./PhaserArcadeOverlay";
 import RunProgressionHUD from "./RunProgressionHUD";
 import RunUnlockSequence from "./RunUnlockSequence";
@@ -15,8 +16,8 @@ import "./electric-palette.css";
 export const metadata: Metadata = {
   title: "EPA 608 Refrigerant Ops | TA-14 Academy",
   description:
-    "Private TA-14 Academy EPA Section 608 readiness game prototype.",
-  robots: { index: false, follow: false, nocache: true },
+    "Public TA-14 Academy EPA Section 608 readiness training arcade.",
+  robots: { index: true, follow: true },
 };
 
 export default function Layout({
@@ -31,6 +32,7 @@ export default function Layout({
       {children}
       <PersistedReadinessPanel />
       <LightningStorm />
+      <ArcadeFeedbackFX />
       <PhaserArcadeOverlay />
       <RunProgressionHUD />
       <RunUnlockSequence />
