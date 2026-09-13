@@ -4,6 +4,7 @@ import WorldAutoSelect from "./WorldAutoSelect";
 import FreshRunDeck from "./FreshRunDeck";
 import MissionRailController from "./MissionRailController";
 import LightningStorm from "./LightningStorm";
+import ArcadeFeedbackFX from "./ArcadeFeedbackFX";
 import PhaserArcadeOverlay from "./PhaserArcadeOverlay";
 import RunProgressionHUD from "./RunProgressionHUD";
 import RunUnlockSequence from "./RunUnlockSequence";
@@ -25,6 +26,7 @@ export default function Layout({ children }: Readonly<{ children: React.ReactNod
     {children}
     <PersistedReadinessPanel />
     <LightningStorm />
+    <ArcadeFeedbackFX />
     <PhaserArcadeOverlay />
     <RunProgressionHUD />
     <RunUnlockSequence />
