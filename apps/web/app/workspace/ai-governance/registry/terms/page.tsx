@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-const TERMS_VERSION = 'v0.3';
+const TERMS_VERSION = 'v0.4';
 
 const sections = [
   ['01', 'Registration boundary', [
@@ -35,8 +35,11 @@ const sections = [
     'Any use of a resulting public artefact for methodology demonstration is limited to TA-14 methodology demonstrations of TA-14\'s own examination, evidence-governance, or institutional process. It does not authorize TA-14 to teach, reproduce, demonstrate, or commercialize a participant\'s proprietary methodology as its own.',
     'Any broader license, implementation right, integration right, commercial right, or derivative-use permission must be established separately in writing.'
   ]],
-  ['07', 'Publication and factual-review boundary', [
+  ['07', 'Publication, showcase eligibility, and factual-review boundary', [
     'The Registry may publish the accepted public Registry record and its lifecycle state according to the visibility selected or otherwise agreed for that record.',
+    'A governance record registered or maintained as private is not eligible for a public TA-14 Exchange showcase while that private status remains in effect. TA-14 does not create or publish a public showcase for a private governance record.',
+    'If the participant later changes the registered governance record from private to public, the record becomes eligible for a TA-14 Exchange showcase. At that point TA-14 may create the showcase and may display eligible public demonstration records, findings, execution or evidence artefacts, interoperability records, and other artefacts associated with that governance, subject to their own publication, confidentiality, rights, and evidence boundaries.',
+    'Private registration does not erase, invalidate, or alter a completed bounded examination or its preserved institutional record; it limits public showcase eligibility until the governance record becomes public.',
     'A Founding Demonstration publication must remain bounded to the agreed proposition, claims, non-claims, evidence surface, determination, limitations, and preserved unresolved conditions.',
     'Before controlled publication of a Founding Demonstration, the participant must be given a factual-review opportunity for descriptions of the participant architecture, authorship, terminology, version, patent status where represented, and the nature of the examined interface. Factual review may correct or preserve disputed factual description; it does not give the participant a veto over, approval right in, or authority to alter TA-14\'s independently supported finding.',
     'Non-public participant material is not made public merely because it was used in an examination. Material factual disagreement that cannot be resolved should be preserved rather than silently rewritten.'
@@ -84,7 +87,6 @@ export default function RegistryTermsPage() {
       <Link href="/workspace/ai-governance/registry" className="brand"><strong>TA-14</strong><span>AI Governance Registry</span></Link>
       <nav><Link href="/workspace/ai-governance/registry">Registry Home</Link><Link href="/workspace/ai-governance/registry/directory">Browse Registry</Link></nav>
     </header>
-
     <section className="hero">
       <p className="eyebrow">AUTHORITATIVE STANDING POLICY · {TERMS_VERSION}</p>
       <h1>Registration &<br/><span>Demonstration Terms</span></h1>
@@ -92,17 +94,14 @@ export default function RegistryTermsPage() {
       <div className="boundary"><strong>Registration is not certification.</strong><span>A Registry record preserves identity, claims, evidence references, provenance, rights declarations, and lifecycle state. A demonstration may establish only the bounded proposition actually examined.</span></div>
       <div className="actions"><Link className="primary" href="/workspace/ai-governance/registry/register">Continue to Registration →</Link><a className="secondary" href="#terms">Review Terms Below</a></div>
     </section>
-
     <section className="summary">
       <div><b>IP</b><span>Ownership and architecture-derived rights stay with their owner.</span></div><div><b>EVIDENCE</b><span>Identity or hashing does not equal admission or inspection.</span></div><div><b>AUTHORITY</b><span>A TA-14 finding does not become participant authority.</span></div><div><b>FINDINGS</b><span>No claim beyond the proposition and admitted evidence.</span></div>
     </section>
-
     <section id="terms" className="terms">
       {sections.map(([number,title,paragraphs]) => <article key={number}>
         <div className="number">{number}</div><div><h2>{title}</h2>{paragraphs.map((p,i)=><p key={i}>{p}</p>)}</div>
       </article>)}
     </section>
-
     <section className="acceptance">
       <p className="eyebrow">BEFORE YOU CONTINUE</p><h2>Know the boundary before you submit.</h2>
       <p>By proceeding, you acknowledge that registration does not transfer intellectual property, grant operational authority, certify your architecture, admit undisclosed evidence, or authorize TA-14 or the participant to appropriate the other\'s methodology. Any examination is bounded to the declared proposition and admitted evidence surface.</p>
@@ -110,7 +109,6 @@ export default function RegistryTermsPage() {
       <div className="version"><b>Standing terms version</b><span>{TERMS_VERSION}</span></div>
       <Link className="primary" href="/workspace/ai-governance/registry/register">Continue to Registration →</Link>
     </section>
-
     <footer><span>TA-14 Authority · AI Governance Registry</span><span>No admissible evidence. No admissible execution.</span></footer>
     <style>{`*{box-sizing:border-box}body{margin:0;background:#07101f;color:#eef4ff;font-family:Inter,system-ui,sans-serif}.page{min-height:100vh;background:radial-gradient(circle at 12% 0%,rgba(74,122,255,.17),transparent 34rem);padding:0 24px 70px}.topbar{max-width:1180px;margin:auto;padding:25px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(164,190,231,.14)}a{color:inherit;text-decoration:none}.brand{display:flex;gap:12px;align-items:center}.brand strong{color:#7fe4c4;letter-spacing:.12em}.brand span{color:#aebdd4}.topbar nav{display:flex;gap:22px;color:#aebdd4;font-size:.9rem}.hero,.summary,.terms,.acceptance,footer{max-width:1080px;margin-inline:auto}.hero{padding:88px 0 58px}.eyebrow{color:#7fe4c4!important;font-size:.72rem;font-weight:900;letter-spacing:.17em}.hero h1{font-size:clamp(3.2rem,8vw,6.8rem);line-height:.88;letter-spacing:-.065em;margin:18px 0 28px}.hero h1 span{color:#9eb9ff}.lede{max-width:800px;font-size:1.18rem;line-height:1.75;color:#b6c4d8}.boundary{margin:30px 0;max-width:900px;padding:20px 22px;border-left:4px solid #ffd27f;background:rgba(255,210,127,.06);border-radius:0 14px 14px 0}.boundary strong,.boundary span{display:block}.boundary strong{color:#ffd27f;margin-bottom:7px}.boundary span{color:#aebdd4;line-height:1.65}.actions{display:flex;gap:12px;flex-wrap:wrap}.primary,.secondary{display:inline-flex;align-items:center;justify-content:center;min-height:50px;padding:12px 18px;border-radius:13px;font-weight:850}.primary{background:linear-gradient(135deg,#7fe4c4,#4da9d8);color:#07101f}.secondary{border:1px solid rgba(164,190,231,.25);background:rgba(255,255,255,.04)}.summary{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:70px}.summary div{padding:18px;border:1px solid rgba(164,190,231,.13);border-radius:15px;background:rgba(11,25,47,.75)}.summary b,.summary span{display:block}.summary b{font-size:.67rem;color:#7fe4c4;letter-spacing:.13em;margin-bottom:8px}.summary span{font-size:.86rem;color:#aebdd4;line-height:1.45}.terms article{display:grid;grid-template-columns:72px 1fr;gap:18px;padding:31px 0;border-top:1px solid rgba(164,190,231,.13)}.number{font-size:.78rem;font-weight:900;color:#7fe4c4;letter-spacing:.1em}.terms h2{margin:0 0 14px;font-size:1.75rem;letter-spacing:-.03em}.terms p{margin:0 0 10px;color:#aebdd4;line-height:1.72}.acceptance{margin-top:55px;padding:34px;border:1px solid rgba(127,228,196,.28);border-radius:22px;background:linear-gradient(135deg,rgba(17,70,60,.25),rgba(11,25,47,.92))}.acceptance h2{font-size:2.3rem;margin:8px 0 12px}.acceptance>p:not(.eyebrow){max-width:800px;color:#aebdd4;line-height:1.7}.version{display:flex;gap:12px;margin:20px 0;align-items:center}.version b{color:#8092ae;text-transform:uppercase;font-size:.7rem}.version span{padding:5px 9px;border-radius:999px;background:rgba(127,228,196,.12);color:#c8f6e7;font-size:.8rem}footer{display:flex;justify-content:space-between;gap:20px;margin-top:60px;padding-top:20px;border-top:1px solid rgba(164,190,231,.13);color:#71829d;font-size:.75rem}@media(max-width:720px){.topbar nav{display:none}.hero{padding-top:55px}.summary{grid-template-columns:1fr 1fr}.terms article{grid-template-columns:42px 1fr}.acceptance{padding:24px}footer{flex-direction:column}}`}</style>
   </main>;
