@@ -13,8 +13,6 @@ const FRONT_DOOR_PREVIEW = "/front-door-preview";
 const ARCHITECTURE_SHOWROOM = "/ai-governance/ta14-architecture-showroom";
 const PUBLIC_ROUTE_PREFIXES = [
   "/academy",
-  "/atlas-14-step-field-ops-lab",
-  "/atlas-608-refrigerant-ops-lab",
   "/commercial",
   "/environmental-integrity-governance",
 ];
