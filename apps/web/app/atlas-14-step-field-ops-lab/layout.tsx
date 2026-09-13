@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import SevenInSevenOutIntegrity from "./SevenInSevenOutIntegrity";
-import AnswerLengthIntegrity from "./AnswerLengthIntegrity";
+import QuestionOnlyPlay from "./QuestionOnlyPlay";
 
 export const metadata: Metadata = {
   title: "TA-14 Field Ops Lab | TA-14 Academy",
@@ -20,7 +20,7 @@ export default function AtlasFieldOpsLayout({
     <>
       {children}
       <SevenInSevenOutIntegrity />
-      <AnswerLengthIntegrity />
+      <QuestionOnlyPlay />
     </>
   );
 }
