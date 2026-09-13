@@ -1,34 +1,59 @@
 "use client";
-import {useMemo,useState} from "react";
+import {useMemo,useState,useEffect} from "react";
 
 type Props={step:number;world:"inside"|"outside";onScore:(delta:number,message:string)=>void};
-type Target={label:string;icon:string;from:number;instruction:string;good:string;x:string;y:string};
+type Target={label:string;icon:string;from:number;instruction:string;good:string};
 
 const TARGETS:Target[]=[
- {from:1,label:"OPEN AIR HANDLER",icon:"▣",instruction:"Invite the homeowner to come with you when safe. Approach the air handler, preserve its original condition, control the screws, and photograph or video what exists before touching components.",good:"ORIGINAL INDOOR CONDITION PRESERVED",x:"50%",y:"53%"},
- {from:2,label:"PROVE HEAT RESPONSE",icon:"♨",instruction:"Run the Heat Kit & Furnace Operation Check. For electric heat, verify heat-strip response and amperage. For gas heat, observe and narrate the ignition and safety sequence. This is command-response proof — not cooling diagnosis.",good:"HEAT / FURNACE COMMAND-RESPONSE VERIFIED",x:"50%",y:"53%"},
- {from:3,label:"PROVE BLOWER + AIRFLOW",icon:"◉",instruction:"Make electrical safety the hard stop first. Remove power, verify zero voltage, handle stored energy correctly, then inspect blower type, wheel, restrictions, motor condition, amperage and airflow evidence.",good:"BLOWER MOTOR & AIRFLOW INTEGRITY VERIFIED",x:"50%",y:"53%"},
- {from:4,label:"SHOW THE EVAPORATOR",icon:"≋",instruction:"Inspect the evaporator coil from the meaningful air-entering side when access allows. Use photos or video, show the homeowner what is actually there, and document blockage, corrosion, water, oil staining or access limits without fear language.",good:"EVAPORATOR COIL CONDITION PRESERVED",x:"50%",y:"53%"},
- {from:5,label:"IDENTIFY METERING DEVICE",icon:"◇",instruction:"Locate and identify the metering device before discussing charging method. Determine piston, TXV or EEV and document the evidence. Do not guess from pressures and do not talk superheat/subcooling before the device is known.",good:"METERING DEVICE IDENTIFIED",x:"50%",y:"53%"},
- {from:6,label:"CHECK FILTER + RETURN",icon:"▥",instruction:"Inspect the filter and return-air path completely. Check size, direction, restriction, bypass, return opening, duct condition and static pressure when appropriate. Do not shame the homeowner or assume high-MERV is automatically better.",good:"FILTER & RETURN AIRFLOW VERIFIED",x:"50%",y:"53%"},
- {from:7,label:"REASSEMBLE AIR HANDLER",icon:"▤",instruction:"Close the indoor system correctly before going outside. Reinstall panels, protect wires, install every screw, verify condensate/float-switch concerns and preserve the completed indoor baseline.",good:"INDOOR SEQUENCE CLOSED CORRECTLY",x:"50%",y:"53%"},
- {from:8,label:"PRESERVE CONDENSER BASELINE",icon:"▧",instruction:"Begin outside by observing before disturbing anything. Inspect clearance, coil condition, pad, level, vegetation, disconnect, whip and visible damage; photograph the original condition, then open the panel carefully.",good:"OUTDOOR ORIGINAL STATE PRESERVED",x:"50%",y:"53%"},
- {from:9,label:"TEST START COMPONENTS",icon:"⚡",instruction:"Confirm electrical safety and stored-energy protocol. Identify start components, test capacitor values, inspect contactor and wiring, and verify compressor insulation condition using the proper tool and explanation — no drama and no fear tactics.",good:"START / CAPACITOR / INSULATION EVIDENCE VERIFIED",x:"50%",y:"53%"},
- {from:10,label:"MEASURE OPERATING AMPS",icon:"A",instruction:"After operation stabilizes, measure compressor and condenser-fan amperage, compare with nameplate and operating context, and correlate voltage, heat, sound and mechanical evidence. One amp number alone does not condemn a motor.",good:"COMPRESSOR & FAN AMP DRAW VERIFIED",x:"50%",y:"53%"},
- {from:11,label:"REASSEMBLE CONDENSER",icon:"▤",instruction:"Restore mechanical integrity before later judgment. Protect wiring from metal and copper, reinstall panels and every screw, and verify nothing has been left rubbing, loose or vulnerable to vibration.",good:"CONDENSER MECHANICAL INTEGRITY RESTORED",x:"50%",y:"53%"},
- {from:12,label:"RESTORE CONDENSER AIRFLOW",icon:"↻",instruction:"Show the homeowner the coil condition before cleaning. Protect electrical components and restore the condenser heat-rejection path correctly. Do not judge or adjust refrigerant through a restricted condenser coil.",good:"CONDENSER AIRFLOW & HEAT REJECTION RESTORED",x:"50%",y:"53%"},
- {from:13,label:"EVALUATE REFRIGERANT",icon:"❄",instruction:"Only now evaluate refrigerant charge approximation. Confirm clean/stable conditions and the metering-device method first, then use the appropriate superheat, subcooling or manufacturer method. Do not add refrigerant because it 'feels low.'",good:"REFRIGERANT EVALUATION THRESHOLD EARNED",x:"50%",y:"53%"},
- {from:14,label:"VERIFY CONDENSATE + CLOSE",icon:"✓",instruction:"Finish by proving condensate management and system closure. Verify primary/secondary drain paths, safety switches, flow and final operation, then preserve the final condition so it can be compared with the starting condition.",good:"TA-14 SYSTEM CLOSURE PROVEN",x:"50%",y:"53%"},
+ {from:1,label:"OPEN AIR HANDLER",icon:"▣",instruction:"What is the correct first field move at this node?",good:"ORIGINAL INDOOR CONDITION PRESERVED"},
+ {from:2,label:"PROVE HEAT RESPONSE",icon:"♨",instruction:"What should the technician prove next?",good:"HEAT / FURNACE COMMAND-RESPONSE VERIFIED"},
+ {from:3,label:"PROVE BLOWER + AIRFLOW",icon:"◉",instruction:"What is the correct next evidence move?",good:"BLOWER MOTOR & AIRFLOW INTEGRITY VERIFIED"},
+ {from:4,label:"SHOW THE EVAPORATOR",icon:"≋",instruction:"What should be inspected and preserved next?",good:"EVAPORATOR COIL CONDITION PRESERVED"},
+ {from:5,label:"IDENTIFY METERING DEVICE",icon:"◇",instruction:"What must be established before charge-method discussion?",good:"METERING DEVICE IDENTIFIED"},
+ {from:6,label:"CHECK FILTER + RETURN",icon:"▥",instruction:"What airflow evidence should be checked next?",good:"FILTER & RETURN AIRFLOW VERIFIED"},
+ {from:7,label:"REASSEMBLE AIR HANDLER",icon:"▤",instruction:"What closes the indoor sequence before moving outside?",good:"INDOOR SEQUENCE CLOSED CORRECTLY"},
+ {from:8,label:"PRESERVE CONDENSER BASELINE",icon:"▧",instruction:"What is the correct first outdoor move?",good:"OUTDOOR ORIGINAL STATE PRESERVED"},
+ {from:9,label:"TEST START COMPONENTS",icon:"⚡",instruction:"What electrical evidence should be established next?",good:"START / CAPACITOR / INSULATION EVIDENCE VERIFIED"},
+ {from:10,label:"MEASURE OPERATING AMPS",icon:"A",instruction:"What operating evidence should be measured next?",good:"COMPRESSOR & FAN AMP DRAW VERIFIED"},
+ {from:11,label:"REASSEMBLE CONDENSER",icon:"▤",instruction:"What should happen before later system judgment?",good:"CONDENSER MECHANICAL INTEGRITY RESTORED"},
+ {from:12,label:"RESTORE CONDENSER AIRFLOW",icon:"↻",instruction:"What must be restored before refrigerant interpretation?",good:"CONDENSER AIRFLOW & HEAT REJECTION RESTORED"},
+ {from:13,label:"EVALUATE REFRIGERANT",icon:"❄",instruction:"The prior evidence gates are complete. What comes next?",good:"REFRIGERANT EVALUATION THRESHOLD EARNED"},
+ {from:14,label:"VERIFY CONDENSATE + CLOSE",icon:"✓",instruction:"What action closes the TA-14 service chain?",good:"TA-14 SYSTEM CLOSURE PROVEN"},
 ];
 
 export default function EquipmentArcade({step,onScore}:Props){
- const[hit,setHit]=useState(false);
+ const[selected,setSelected]=useState<number|null>(null);
  const target=useMemo(()=>TARGETS.find(t=>t.from===step)!,[step]);
- function fire(){onScore(300,`CORRECT ACTION // ${target.good}`);setHit(true);setTimeout(()=>setHit(false),450)}
+ useEffect(()=>setSelected(null),[step]);
+ const choices=useMemo(()=>{
+  const correct=TARGETS.findIndex(t=>t.from===step);
+  const offsets=[0,3,7,10];
+  const indexes=offsets.map(offset=>(correct+offset)%TARGETS.length);
+  if(!indexes.includes(correct))indexes[0]=correct;
+  const unique=Array.from(new Set(indexes));
+  for(let i=0;unique.length<4&&i<TARGETS.length;i++)if(!unique.includes(i))unique.push(i);
+  return unique.slice(0,4).map(i=>TARGETS[i]);
+ },[step]);
+ function answer(choice:Target,index:number){
+  if(selected!==null)return;
+  setSelected(index);
+  if(choice.from===step)onScore(300,`CORRECT ACTION // ${target.good}`);
+  else onScore(-75,`NOT YET // STEP ${String(step).padStart(2,"0")} REQUIRES ${target.label}`);
+ }
  return <div className="equipmentArcade">
-  <div className="guidedMission"><small>TA-14 ACADEMY // CURRENT MOVE</small><strong>STEP {String(step).padStart(2,"0")}</strong><p>{target.instruction}</p><span>GO TO: {target.label}</span></div>
-  <button onClick={fire} className={`equipmentTarget live ${hit?"hit":""}`} style={{left:target.x,top:target.y}} aria-label={target.label}><span>{target.icon}</span><b>{target.label}</b><em>PLAY STEP</em></button>
-  <div className="equipmentHint">ONE STEP AT A TIME // DO NOT PUT THE CART BEFORE THE HORSE</div>
-  <style jsx>{`.equipmentArcade{position:absolute;inset:0;z-index:12}.guidedMission{position:absolute;z-index:6;left:50%;top:14px;transform:translateX(-50%);width:min(650px,78%);padding:12px 18px;border:1px solid #5ceaff88;border-radius:8px;background:linear-gradient(180deg,#06182ff5,#03101ef5);box-shadow:0 0 34px #40dfff22;text-align:center}.guidedMission small{display:block;color:#65eaff;font:1000 7px ui-monospace;letter-spacing:.18em}.guidedMission strong{display:block;margin-top:3px;color:#75ffb3;font:1000 14px ui-monospace}.guidedMission p{margin:6px auto;color:#d5e6ed;font-size:10px;line-height:1.45;max-width:600px}.guidedMission span{display:inline-block;padding:5px 9px;border:1px solid #63ffad55;background:#092519;color:#7affb6;font:1000 7px ui-monospace;letter-spacing:.12em}.equipmentTarget{position:absolute;transform:translate(-50%,-50%);width:138px;height:138px;border-radius:50%;border:3px solid #6affae;background:radial-gradient(circle,#103c35,#071d29 55%,#020914);color:#8affbf;cursor:pointer;box-shadow:0 0 0 8px #06140faa,0 0 34px #54ff9b88,0 0 70px #38dfff44;animation:targetLive .75s ease-in-out infinite alternate}.equipmentTarget span{display:block;font:1000 31px ui-monospace}.equipmentTarget b{display:block;margin:5px 10px 0;font:1000 7px ui-monospace;line-height:1.25}.equipmentTarget em{display:block;margin-top:6px;color:#fff;font:1000 6px ui-monospace;font-style:normal;letter-spacing:.12em}.equipmentTarget.hit{animation:targetHit .45s ease-out}.equipmentHint{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);padding:7px 11px;border:1px solid #5aeaff33;background:#020b15e8;color:#88b8c7;font:900 7px ui-monospace;letter-spacing:.12em;white-space:nowrap}@keyframes targetLive{to{box-shadow:0 0 0 12px #07170faa,0 0 48px #54ff9baa,0 0 90px #38dfff66}}@keyframes targetHit{35%{transform:translate(-50%,-50%) scale(1.3);filter:brightness(2)}}@media(max-width:700px){.guidedMission{width:88%}.equipmentTarget{width:108px;height:108px}.equipmentHint{max-width:90%;white-space:normal;text-align:center}}`}</style>
+  <section className="questionCard" aria-label={`TA-14 step ${step} question`}>
+   <div className="questionMeta">{step<=7?"7 IN // INSIDE":"7 OUT // OUTSIDE"} · STEP {String(step).padStart(2,"0")} OF 14</div>
+   <h2>{target.instruction}</h2>
+   <div className="choiceGrid">{choices.map((choice,i)=>{
+    const answered=selected!==null;
+    const correct=choice.from===step;
+    const state=answered?(correct?"correct":selected===i?"wrong":""):"";
+    return <button key={choice.from} className={`choice ${state}`} onClick={()=>answer(choice,i)} disabled={answered}>
+     <b>{String.fromCharCode(65+i)}</b><span>{choice.label}</span>
+    </button>
+   })}</div>
+   {selected!==null&&<div className="result">{choices[selected].from===step?`CORRECT — ${target.good}`:`NOT YET — THE SUPPORTED NEXT MOVE IS ${target.label}`}</div>}
+  </section>
+  <style jsx>{`.equipmentArcade{position:absolute;inset:0;z-index:12;display:grid;place-items:center;padding:22px;background:rgba(2,8,13,.72);backdrop-filter:blur(3px)}.questionCard{width:min(760px,94%);padding:24px;border:1px solid rgba(92,234,255,.5);border-radius:18px;background:linear-gradient(180deg,rgba(4,18,29,.98),rgba(2,9,16,.98));box-shadow:0 28px 80px rgba(0,0,0,.55);text-align:center}.questionMeta{color:#65eaff;font:1000 9px ui-monospace;letter-spacing:.16em}.questionCard h2{margin:16px auto 22px;max-width:680px;color:#f4fbff;font-size:clamp(22px,3vw,34px);line-height:1.18}.choiceGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{min-height:76px;display:grid;grid-template-columns:38px 1fr;align-items:center;gap:10px;padding:12px;border:1px solid rgba(92,211,242,.28);border-radius:12px;background:#071725;color:#e4f5fb;text-align:left;cursor:pointer}.choice b{width:34px;height:34px;display:grid;place-items:center;border:1px solid rgba(101,234,255,.5);border-radius:50%;color:#65eaff;font:1000 13px ui-monospace}.choice span{font-size:12px;font-weight:900;letter-spacing:.02em}.choice:hover:not(:disabled){border-color:#65eaff;background:#0a2635}.choice.correct{border-color:#65ffad;background:#09251a}.choice.wrong{border-color:#ff7189;background:#2b0b13}.choice:disabled{cursor:default}.result{margin-top:14px;padding:10px;border-radius:10px;background:rgba(3,11,17,.92);color:#bfffd9;font:1000 9px ui-monospace;letter-spacing:.08em}@media(max-width:700px){.equipmentArcade{padding:10px}.questionCard{padding:16px}.choiceGrid{grid-template-columns:1fr}.choice{min-height:62px}.questionCard h2{font-size:22px}}`}</style>
  </div>
 }
