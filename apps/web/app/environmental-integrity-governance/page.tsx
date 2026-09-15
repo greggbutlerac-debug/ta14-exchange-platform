@@ -140,6 +140,30 @@ const pathways: Pathway[] = [
     ],
   },
   {
+    id: "uae",
+    code: "UAE",
+    title: "UAE Environmental Integrity Showroom",
+    subtitle: "Apply AIR + EIG + AEA to existing UAE air-quality infrastructure",
+    description:
+      "Examine how Atmospheric Integrity Records, Environmental Integrity Governance, and the AEA execution boundary could complement the UAE National Air Quality Agenda 2031, National MRV, deployed sensors, indoor-air initiatives, and existing federal and local monitoring infrastructure without replacing them.",
+    href: "/environmental-integrity-governance/uae",
+    accent: "#d7b85b",
+    glow: "rgba(215, 184, 91, .42)",
+    academy: "UAE Environmental Integrity Technical Examination",
+    capabilities: [
+      "Use existing UAE sensors, monitoring platforms, and MRV data streams",
+      "Create attributable Atmospheric Integrity Records from bounded environmental observations",
+      "Govern continuity, admissibility, binding, and changed-condition revalidation",
+      "Expose the AEA authority boundary before consequential intervention",
+    ],
+    outputs: [
+      "UAE Atmospheric Integrity Record demonstration",
+      "Bounded EIG determination",
+      "Execution-authority boundary record",
+      "Verified post-intervention environmental outcome",
+    ],
+  },
+  {
     id: "review",
     code: "ER",
     title: "Environmental Entity Review",
@@ -320,7 +344,7 @@ export default function EnvironmentalIntegrityGovernancePage() {
             <em> before intervention becomes consequence.</em>
           </h1>
           <p className="heroLead">
-            Environmental Integrity Governance is the institutional division that preserves environmental reality from measurement through outcome. It brings Atmospheric Integrity Records, Personal Atmospheric Integrity Records, buildings, HVAC, air, water, land, pollution, environmental entity review, records, registries, and Academy pathways under one governed roof.
+            Environmental Integrity Governance is the institutional division that preserves environmental reality from measurement through outcome. It brings Atmospheric Integrity Records, Personal Atmospheric Integrity Records, buildings, HVAC, air, water, land, pollution, environmental entity review, records, registries, national technical showrooms, and Academy pathways under one governed roof.
           </p>
           <div className="heroActions">
             <Link className="button primary" href="#pathways">Enter Environmental Integrity Governance <span>↓</span></Link>
@@ -346,7 +370,7 @@ export default function EnvironmentalIntegrityGovernancePage() {
           <div className="orbit orbitD"><i>HVAC</i></div>
           <div className="orbit orbitE"><i>Evidence</i></div>
           <div className="instrumentReadout">
-            <span><b>08</b> governed pathways</span>
+            <span><b>09</b> governed pathways</span>
             <span><b>04</b> determination states</span>
             <span><b>01</b> preserved route</span>
           </div>
@@ -374,8 +398,8 @@ export default function EnvironmentalIntegrityGovernancePage() {
       <section className="pathwaySection shell" id="pathways">
         <div className="sectionHeading centered">
           <p className="eyebrow">THE ENVIRONMENTAL INSTITUTION</p>
-          <h2>One governed division. Eight connected pathways.</h2>
-          <p>Atmospheric records and HVAC do not stand outside Environmental Integrity Governance. They are specialized pathways inside the division, connected to records, entity review, Academy instruction, intervention governance, and outcome verification.</p>
+          <h2>One governed division. Nine connected pathways.</h2>
+          <p>Atmospheric records, national technical showrooms, and HVAC do not stand outside Environmental Integrity Governance. They are specialized pathways inside the division, connected to records, entity review, Academy instruction, intervention governance, and outcome verification.</p>
         </div>
 
         <div className="pathwayLayout">
