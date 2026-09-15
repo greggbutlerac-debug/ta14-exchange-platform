@@ -5,9 +5,10 @@ import { usePathname } from 'next/navigation';
 
 const localPages = [
   { href: '/transparent-air/gulfport-ac-repair', label: 'Gulfport AC Repair' },
+  { href: '/transparent-air/south-st-petersburg-ac-repair', label: 'South St. Petersburg AC Repair' },
+  { href: '/transparent-air/maximo-pinellas-point-ac-repair', label: 'Maximo / Pinellas Point · 33711 AC Repair' },
   { href: '/transparent-air/seminole-ac-repair', label: 'Seminole AC Repair' },
   { href: '/transparent-air/pinellas-park-ac-repair', label: 'Pinellas Park AC Repair' },
-  { href: '/transparent-air/south-st-petersburg-ac-repair', label: 'South St. Petersburg AC Repair' },
   { href: '/transparent-air/second-opinion', label: 'Pinellas County AC Second Opinions' },
 ];
 
