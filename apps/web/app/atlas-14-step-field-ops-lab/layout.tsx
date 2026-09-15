@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import SevenInSevenOutIntegrity from "./SevenInSevenOutIntegrity";
 import QuestionOnlyPlay from "./QuestionOnlyPlay";
+import MissionRouteExactTitles from "./MissionRouteExactTitles";
 
 export const metadata: Metadata = {
   title: "TA-14 Field Ops Lab | Private Preview",
@@ -9,5 +10,5 @@ export const metadata: Metadata = {
 };
 
 export default function AtlasFieldOpsLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <>{children}<SevenInSevenOutIntegrity /><QuestionOnlyPlay /></>;
+  return <>{children}<SevenInSevenOutIntegrity /><QuestionOnlyPlay /><MissionRouteExactTitles /></>;
 }
