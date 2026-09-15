@@ -15,14 +15,15 @@ const PUBLIC_ROUTE_PREFIXES = [
   "/academy",
   "/commercial",
   "/environmental-integrity-governance",
+  "/greenbuild",
 ];
 
 export async function middleware(request: NextRequest) {
   const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   request.headers.set("x-ta14-requested-path", requestedPath);
 
-  // Public institutional, learning, and commercial surfaces do not require
-  // account/session middleware. This keeps public acquisition routes usable
+  // Public institutional, learning, commercial, and event surfaces do not require
+  // account/session middleware. This keeps public acquisition and embed routes usable
   // even when Supabase authentication is unavailable or intentionally absent.
   if (
     request.nextUrl.pathname === "/" ||
