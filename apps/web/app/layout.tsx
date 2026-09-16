@@ -9,6 +9,7 @@ import { RouteAwareGlobalChrome } from '../components/route-aware-global-chrome'
 import { SixthWorldBilateralEnhancer } from '../components/sixth-world-bilateral-enhancer';
 import { SixthWorldNativeDominance } from '../components/sixth-world-native-dominance';
 import { SixthWorldUAEStandard } from '../components/sixth-world-uae-standard';
+import { EIGGlobalInstitutionalBridge } from '../components/eig-global-institutional-bridge';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 
 import './globals.css';
@@ -40,6 +41,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <SixthWorldBilateralEnhancer />
     <SixthWorldNativeDominance />
     <SixthWorldUAEStandard />
+    <EIGGlobalInstitutionalBridge />
     {children}
     <Suspense fallback={null}><CommercialTrialConversion /></Suspense>
     <RouteAwareGlobalChrome />
