@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import WorldAutoSelect from "./WorldAutoSelect";
-import FreshRunDeck from "./FreshRunDeck";
 import MissionRailController from "./MissionRailController";
 import LightningStorm from "./LightningStorm";
 import ArcadeFeedbackFX from "./ArcadeFeedbackFX";
@@ -21,7 +20,6 @@ export const metadata: Metadata = {
 
 export default function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   return <>
-    <FreshRunDeck />
     <Suspense fallback={null}><WorldAutoSelect /></Suspense>
     {children}
     <PersistedReadinessPanel />
