@@ -11,7 +11,7 @@ export function SixthWorldShowroomRail({ current }: Props) {
     <span className="swRailLabel">EXPLORE</span>
     <Link href="/environmental-integrity-governance">EIG Architecture</Link>
     <Link href="/environmental-integrity-governance">Atmospheric Integrity Records</Link>
-    <Link href="/workspace/admissible-execution-architecture">AEA Architecture</Link>
+    <Link href="/registry/ta-14-admissible-execution-architecture">AEA Architecture</Link>
     <Link href="/global-institutional-engagement">All Institutional Showrooms</Link>
     <Link href={other.href}>{other.label}</Link>
     <a href="mailto:ta14admissibleexecution@gmail.com">Request Technical Examination</a>
