@@ -1,0 +1,21 @@
+/* Guatemala institutional showroom: compact but recognizable 50-star U.S. canton.
+   Nine staggered rows follow the 6/5 alternating arrangement (50 total). */
+.page .usFlag::before{
+  content:"★ ★ ★ ★ ★ ★\A  ★ ★ ★ ★ ★\A★ ★ ★ ★ ★ ★\A  ★ ★ ★ ★ ★\A★ ★ ★ ★ ★ ★\A  ★ ★ ★ ★ ★\A★ ★ ★ ★ ★ ★\A  ★ ★ ★ ★ ★\A★ ★ ★ ★ ★ ★" !important;
+  white-space:pre !important;
+  position:absolute !important;
+  left:0 !important;
+  top:0 !important;
+  width:40px !important;
+  height:31px !important;
+  padding:2px 2px !important;
+  overflow:hidden !important;
+  background:#3c3b6e !important;
+  color:#fff !important;
+  font-family:Arial,sans-serif !important;
+  font-size:3.1px !important;
+  font-weight:400 !important;
+  line-height:3px !important;
+  letter-spacing:.15px !important;
+  text-align:left !important;
+}

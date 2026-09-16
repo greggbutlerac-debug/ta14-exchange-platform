@@ -14,6 +14,7 @@ import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell'
 
 import './globals.css';
 import './activity-dock.css';
+import './guatemala-flag-fix.css';
 
 const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
 
