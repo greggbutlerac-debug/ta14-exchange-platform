@@ -13,6 +13,7 @@ const FRONT_DOOR_PREVIEW = "/front-door-preview";
 const ARCHITECTURE_SHOWROOM = "/ai-governance/ta14-architecture-showroom";
 const PUBLIC_ROUTE_PREFIXES = [
   "/academy",
+  "/artifacts",
   "/commercial",
   "/environmental-integrity-governance",
   "/greenbuild",
@@ -22,9 +23,10 @@ export async function middleware(request: NextRequest) {
   const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   request.headers.set("x-ta14-requested-path", requestedPath);
 
-  // Public institutional, learning, commercial, and event surfaces do not require
-  // account/session middleware. This keeps public acquisition and embed routes usable
-  // even when Supabase authentication is unavailable or intentionally absent.
+  // Public institutional, learning, artifact/showroom, commercial, and event surfaces
+  // do not require account/session middleware. This keeps public acquisition,
+  // evidence, showcase, and embed routes usable even when Supabase authentication is
+  // unavailable or intentionally absent.
   if (
     request.nextUrl.pathname === "/" ||
     request.nextUrl.pathname === FRONT_DOOR_PREVIEW ||
