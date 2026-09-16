@@ -7,6 +7,7 @@ import { SeoIntelligenceTracker } from '../components/seo-intelligence-tracker';
 import { CommercialTrialConversion } from '../components/commercial-trial-conversion';
 import { RouteAwareGlobalChrome } from '../components/route-aware-global-chrome';
 import { SixthWorldBilateralEnhancer } from '../components/sixth-world-bilateral-enhancer';
+import { SixthWorldNativeDominance } from '../components/sixth-world-native-dominance';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 
 import './globals.css';
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <Script id="google-analytics" strategy="afterInteractive">{`window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}gtag('js',new Date());gtag('config','${GA_MEASUREMENT_ID}',{send_page_view:true});`}</Script>
     <Suspense fallback={null}><SeoIntelligenceTracker /></Suspense>
     <SixthWorldBilateralEnhancer />
+    <SixthWorldNativeDominance />
     {children}
     <Suspense fallback={null}><CommercialTrialConversion /></Suspense>
     <RouteAwareGlobalChrome />
