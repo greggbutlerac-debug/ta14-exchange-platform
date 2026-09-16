@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import MissionRouteExactTitles from "./MissionRouteExactTitles";
 
 export const metadata: Metadata = {
   title: "TA-14 Field Ops Lab | 7 In / 7 Out Arcade",
@@ -8,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function AtlasFieldOpsLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <>{children}<MissionRouteExactTitles /></>;
+  return children;
 }
