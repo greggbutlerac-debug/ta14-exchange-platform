@@ -1,0 +1,25 @@
+.bilateral > div:first-child,
+.bilateral > div.right {
+  font-size: 64px;
+  line-height: 1;
+}
+
+.bilateral > div:first-child b,
+.bilateral > div.right b {
+  font-size: 12px;
+  line-height: 1.25;
+  vertical-align: middle;
+}
+
+.bilateral > div:first-child small,
+.bilateral > div.right small {
+  font-size: 9px;
+  line-height: 1.45;
+}
+
+@media (max-width: 820px) {
+  .bilateral > div:first-child,
+  .bilateral > div.right {
+    font-size: 52px;
+  }
+}
