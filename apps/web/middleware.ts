@@ -16,6 +16,7 @@ const PUBLIC_ROUTE_PREFIXES = [
   "/artifacts",
   "/commercial",
   "/environmental-integrity-governance",
+  "/global-institutional-engagement",
   "/greenbuild",
   "/registry/records",
 ];
