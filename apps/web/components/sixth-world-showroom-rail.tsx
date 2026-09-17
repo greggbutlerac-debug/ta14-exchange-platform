@@ -1,11 +1,12 @@
 import Link from 'next/link';
 
-type Props = { current: 'thailand' | 'uae' | 'guatemala' };
+type Props = { current: 'thailand' | 'uae' | 'guatemala' | 'kazakhstan' };
 
 const showrooms = [
   { key: 'uae', href: '/environmental-integrity-governance/uae', label: 'UAE Showroom' },
   { key: 'thailand', href: '/global-institutional-engagement/thailand', label: 'Thailand Showroom' },
   { key: 'guatemala', href: '/global-institutional-engagement/guatemala', label: 'Guatemala Showroom' },
+  { key: 'kazakhstan', href: '/global-institutional-engagement/kazakhstan', label: 'Kazakhstan Showroom' },
 ] as const;
 
 export function SixthWorldShowroomRail({ current }: Props) {
