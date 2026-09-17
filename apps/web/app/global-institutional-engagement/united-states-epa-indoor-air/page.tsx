@@ -57,6 +57,18 @@ export default function USEPAIndoorAirShowroom() {
     </div></section>
 
     <section>
+      <p className="eyebrow">INSTITUTIONAL EXAMINATION RECORD · SEPTEMBER 17, 2026</p>
+      <h2>What the EPA exchange now establishes — and what remains unresolved.</h2>
+      <div className="questions">
+        <article><span>01</span><p><b>EPA · AUTOMATION + CONTINUOUS MONITORING</b><br/>EPA explained that mitigation may be automated or human-directed and that continuous monitoring before and after mitigation can show whether an action addressed the indoor-air issue.</p></article>
+        <article><span>02</span><p><b>EPA · ACTIVE RESPONSE TO CHANGING CONDITIONS</b><br/>For the classroom CO₂ / wildfire PM₂.₅ example, EPA stated that continuous indoor/outdoor monitoring can support active ventilation adjustment as indoor and outdoor pollution conditions change, and pointed to ASHRAE wildfire-smoke guidance.</p></article>
+        <article><span>03</span><p><b>EPA · REALITY REMAINS DYNAMIC</b><br/>EPA further noted that indoor and outdoor air-quality conditions are continuously in flux and that some delay necessarily exists between HVAC system changes and the resulting air-quality response.</p></article>
+        <article><span>04</span><p><b>TA-14 · UNRESOLVED PRE-EXECUTION SEAM</b><br/>Those points explain sensing, adjustment and post-action observation. The exchange has not yet identified the mechanism that determines whether authority established under T₀ remains valid after a material ΔN but before the prepared physical action executes.</p></article>
+      </div>
+      <div className="callout gold"><b>STATUS · QUESTION RETURNED TO EPA</b><p>TA-14 has now put the counterfactual directly into the institutional record: if the outdoor condition changes after the ventilation action has been established but before it executes, and nobody and nothing explicitly says HOLD, what would the building do? If it executes, absence of refusal has effectively become permission. If it does not, something must have withheld, revoked or conditioned that authority. The examination is awaiting EPA's response to that boundary.</p></div>
+    </section>
+
+    <section>
       <p className="eyebrow">FREEZE THE SYSTEM ONE INSTANT BEFORE EXECUTION</p>
       <h2>Nothing has to malfunction for the governance problem to exist.</h2>
       <div className="timeline">
