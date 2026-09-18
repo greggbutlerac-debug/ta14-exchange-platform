@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 export const metadata = {
-  title: 'Start with TA-14 | 60 days free',
+  title: 'Start with TA-14 | 14 days free',
   description: 'Start TA-14 governance software free for 60 days with no credit card, or choose independent review, governance registration, or institutional deployment.',
 };
 
@@ -9,11 +9,11 @@ const paths = [
   {
     n: '01',
     title: 'I need continuing governance software',
-    price: '60 DAYS FREE · then $19 / $49 / $99 monthly',
+    price: '14 DAYS FREE · then $19 / $49 / $99 monthly',
     copy: 'For organizations operating AI connected to the European market that need system identity, obligations, evidence, change, review, and revalidation kept connected over time.',
     bullets: ['No credit card to start', 'Evidence Passport — $19/month after trial', 'Compliance Workspace — $49/month after trial', 'Governance Pro — $99/month after trial'],
     href: '/start-free',
-    cta: 'Start 60 days free',
+    cta: 'Start 14 days free',
     featured: true,
   },
   {
@@ -47,12 +47,12 @@ const paths = [
 
 export default function StartPage() {
   return <main className="page">
-    <nav><Link href="/">TA-14 EXCHANGE</Link><span>START HERE</span><Link href="/start-free">60 DAYS FREE →</Link></nav>
+    <nav><Link href="/">TA-14 EXCHANGE</Link><span>START HERE</span><Link href="/start-free">14 DAYS FREE →</Link></nav>
     <header className="hero">
       <small>ONE QUESTION BEFORE THE PRODUCT</small>
       <h1>WHAT DO YOU NEED<br/><em>TA-14 TO DO?</em></h1>
       <p>The Exchange contains governance software, independent review, registration, demonstrations, artifacts, verification, education, and institutional deployment. You should not have to understand the whole institution before knowing where to start.</p>
-      <div className="trialBanner"><div><b>TRY THE GOVERNANCE SOFTWARE ON REAL WORK</b><strong>60 DAYS FREE</strong><span>No credit card · No contract · No automatic charge</span></div><Link href="/start-free">START FREE →</Link></div>
+      <div className="trialBanner"><div><b>TRY THE GOVERNANCE SOFTWARE ON REAL WORK</b><strong>14 DAYS FREE</strong><span>No credit card · No contract · No automatic charge</span></div><Link href="/start-free">START FREE →</Link></div>
       <div className="chain">REALITY <b>→</b> RECORD <b>→</b> CONTINUITY <b>→</b> ADMISSIBILITY <b>→</b> BINDING <b>→</b> COMMIT <b>→</b> EXECUTION <b>→</b> OUTCOME</div>
     </header>
 
