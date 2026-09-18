@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+const institutionalTimeline=[['15 Sep 2026','ALN → TA-14','Michael Bordenaro invites TA-14 to a practical ALN web discussion.'],['17 Sep 2026','ALN → TA-14','Fire-chief electrical shutoff proposed as a step-by-step sandbox/workshop case for Kimon and possible NIST handoff.'],['17 Sep 2026','TA-14 → ALN','TA-14 accepts the bounded scenario and corrects the proposed date to Thursday, September 24.'],['18 Sep 2026','ALN → TA-14 + ONUMA','Michael confirms September 24 and adds Kimon to align the technical handoff toward NIST / ASHRAE.'],['24 Sep 2026 · 3 PM ET','WORKING SESSION','30-minute discussion + 30-minute workshop planned around authority-bound electrical shutoff.']];
 const chain=[
 ['01','REALITY','A fire condition exists at a defined building, electrical asset, location and time.'],
 ['02','RECORD','The initiating condition, asset identity, source, timestamp and provenance are preserved.'],
