@@ -5,8 +5,6 @@ import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 type SubmitState = 'IDLE' | 'SUBMITTING' | 'PAYMENT' | 'SUCCESS' | 'ERROR';
 
-declare global { interface Window { paypal?: any; } }
-
 type ApiSuccess = {
   ok: true;
   intakeId: string;
