@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { SixthWorldShowroomRail } from '../../../components/sixth-world-showroom-rail';
 
+const institutionalTimeline=[['15 Sep 2026','TA-14 → PCD','Corrected institutional routing sent to the Pollution Control Department.'],['16 Sep 2026','PCD → TA-14','PCD requests an official PDF addressed to the Director-General for presentation to the next executive.'],['16 Sep 2026','TA-14 → Director-General','Official executive technical examination brief submitted with the Thailand showroom.'],['17 Sep 2026','PCD correspondence','Administrative correspondence received; no new technical determination stated.']];
 const chain=[['ความเป็นจริง','Reality'],['บันทึก','Record'],['ความต่อเนื่อง','Continuity'],['การยอมรับได้','Admissibility'],['การผูกพัน','Binding'],['การยืนยัน','Commit'],['การดำเนินการ','Execution'],['ผลลัพธ์','Outcome']];
 const sources=[['กรมควบคุมมลพิษ · Pollution Control Department','https://www.pcd.go.th/'],['Air4Thai · ข้อมูลคุณภาพอากาศแห่งชาติ','http://air4thai.pcd.go.th/']];
 export const metadata={title:'Thailand · Pollution Control Department | TA-14',description:'TA-14 country-specific technical examination surface for Thailand and the Pollution Control Department.'};
