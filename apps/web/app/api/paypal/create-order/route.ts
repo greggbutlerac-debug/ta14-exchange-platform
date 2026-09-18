@@ -19,7 +19,8 @@ type ProductId =
   | 'organization-annual'
   | 'verified-network-partner-annual'
   | 'governance-entity-partner-annual'
-  | 'institutional-partner-annual';
+  | 'institutional-partner-annual'
+  | 'eu-ai-act-readiness-review';
 
 type CatalogProduct = {
   id: ProductId;
@@ -70,6 +71,16 @@ const NO_STORE_HEADERS = {
 };
 
 const PRODUCT_CATALOG: Record<ProductId, CatalogProduct> = {
+  'eu-ai-act-readiness-review': {
+    id: 'eu-ai-act-readiness-review',
+    name: 'EU AI Act Governed Readiness Review',
+    description:
+      'One fixed-scope governed readiness review for one AI system, covering bounded applicability, evidence state, unresolved gaps, and next evidence actions.',
+    price: '750.00',
+    currency: 'USD',
+    category: 'review',
+    billing: 'one-time',
+  },
   'preserved-governed-run': {
     id: 'preserved-governed-run',
     name: 'Preserved Governed Run',
