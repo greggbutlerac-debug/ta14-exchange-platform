@@ -38,7 +38,7 @@ export default function USEPAIndoorAirShowroom() {
         <i>BOUNDED TECHNICAL EXAMINATION</i>
         <div className="right"><strong>TA-14 AUTHORITY</strong><span>🇺🇸</span><small>EVIDENCE · CONTEXT · AUTHORITY · EXECUTION</small></div>
       </div>
-      <p className="eyebrow">PUBLIC INSTITUTIONAL TECHNICAL RECORD · UPDATED SEPTEMBER 17, 2026</p>
+      <p className="eyebrow">PUBLIC INSTITUTIONAL TECHNICAL RECORD · UPDATED SEPTEMBER 18, 2026</p>
       <h1>The sensors can all be right.<br/><em>The building can still act wrong.</em></h1>
       <p className="lead">EPA's latest response accepts the central operational premise: with continuous indoor/outdoor PM₂.₅ and indoor CO₂ monitoring, a building can actively adjust ventilation as conditions change. TA-14 now freezes the question one instant later — after the system knows reality changed, but before the prepared physical action executes.</p>
       <div className="rule"><small>THE EXECUTION-AUTHORITY QUESTION</small><b>What prevents a command established at T₀ from executing at T₁ after the material conditions that justified it have changed?</b></div>
@@ -65,7 +65,7 @@ export default function USEPAIndoorAirShowroom() {
         <article><span>03</span><p><b>EPA · REALITY REMAINS DYNAMIC</b><br/>EPA further noted that indoor and outdoor air-quality conditions are continuously in flux and that some delay necessarily exists between HVAC system changes and the resulting air-quality response.</p></article>
         <article><span>04</span><p><b>TA-14 · UNRESOLVED PRE-EXECUTION SEAM</b><br/>Those points explain sensing, adjustment and post-action observation. The exchange has not yet identified the mechanism that determines whether authority established under T₀ remains valid after a material ΔN but before the prepared physical action executes.</p></article>
       </div>
-      <div className="callout gold"><b>STATUS · QUESTION RETURNED TO EPA</b><p>TA-14 has now put the counterfactual directly into the institutional record: if the outdoor condition changes after the ventilation action has been established but before it executes, and nobody and nothing explicitly says HOLD, what would the building do? If it executes, absence of refusal has effectively become permission. If it does not, something must have withheld, revoked or conditioned that authority. The examination is awaiting EPA's response to that boundary.</p></div>
+      <div className="callout gold"><b>STATUS · EPA RESPONSE RECEIVED · AUTHORITY BOUNDARY REFERRED BEYOND EPA IAQ</b><p>EPA responded that indoor and outdoor air-quality conditions are continuously in flux, that some delay exists between automated HVAC changes and monitored air-quality response, and that EPA does not have regulatory authority over indoor air quality. EPA referred TA-14 to ASHRAE standards for the technical layer. The exchange did not identify a distinct EPA pre-execution authority or changed-context revalidation mechanism. TA-14 therefore closes this EPA IAQ exchange as a bounded institutional record and carries the unresolved execution-authority question forward to the standards and building-control layer.</p></div>
     </section>
 
     <section>
