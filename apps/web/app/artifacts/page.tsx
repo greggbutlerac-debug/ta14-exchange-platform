@@ -863,7 +863,7 @@ export default function ExecutionArtifactsLibraryPage() {
 
       <section className="hero">
         <div className="hero-copy">
-          <div className="door-label"><span>08</span> Eighth major door of the TA-14 AI Governance Exchange</div>
+          <div className="door-label"><span>08</span> Seventh major door of the TA-14 AI Governance Exchange</div>
           <h1>Execution<br/><em>Artifacts.</em></h1>
           <p>TA-14 produced the proof it asks others to produce: twelve materially different bounded records showing how evidence, authority, continuity, admissibility, binding, commitment, execution control, and outcome closure govern consequence.</p>
           <div className="hero-actions">
