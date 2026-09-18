@@ -67,7 +67,8 @@ export default function ServiceCallHold(){
  const [result,setResult]=useState<Choice|null>(null),[history,setHistory]=useState<Choice[]>([]);
  const s=scenarios[round]; const complete=round>=scenarios.length;
  const chainCount=complete?8:Math.min(7,1+round*2+(answered?1:0));
- const title=useMemo(()=>complete?(score>=800?"DISCIPLINED EXECUTION":"REMEDIATION REQUIRED"):"LIVE SERVICE CALL",[complete,score]);\n const holds=history.filter(x=>x.verdict==="HOLD").length, escalations=history.filter(x=>x.verdict==="ESCALATE").length, denies=history.filter(x=>x.verdict==="DENY").length;
+ const title=useMemo(()=>complete?(score>=800?"DISCIPLINED EXECUTION":"REMEDIATION REQUIRED"):"LIVE SERVICE CALL",[complete,score]);
+ const holds=history.filter(x=>x.verdict==="HOLD").length, escalations=history.filter(x=>x.verdict==="ESCALATE").length, denies=history.filter(x=>x.verdict==="DENY").length;
  function choose(c:Choice){if(answered)return;setAnswered(true);setResult(c);setHistory(v=>[...v,c]);setScore(v=>v+c.points)}
  function next(){if(round+1>=scenarios.length){setRound(scenarios.length)}else{setRound(v=>v+1);setAnswered(false);setResult(null)}}
  function restart(){setStarted(false);setRound(0);setScore(0);setAnswered(false);setResult(null);setHistory([])}
