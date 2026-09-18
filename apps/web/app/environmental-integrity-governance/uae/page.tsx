@@ -5,10 +5,11 @@ export const metadata = {
   description: 'A bounded TA-14 showroom mapping Atmospheric Integrity Records and Environmental Integrity Governance to the UAE National Air Quality Agenda 2031 and existing monitoring infrastructure.',
 };
 
-['15 Sep 2026', 'MOCCAE requests details', 'MOCCAE asks TA-14 for a work paper or additional proposal details and direct contact information.'],
-['16 Sep 2026', 'UAE showroom returned', 'TA-14 provides the dedicated UAE technical showroom and bounds the request to technical examination rather than infrastructure replacement.'],
-['16 Sep 2026', 'MOCCAE confirms follow-up', 'MOCCAE states that the request is under follow-up and that TA-14 will be informed as soon as possible.'],
-['17 Sep 2026', 'Suggestion 5200001108 closed', '171 Tawasul records the MOCCAE suggestion as resolved; TA-14 returns a clarification that no procurement, expenditure or paid pilot is being requested at this stage.'],const milestones = [
+const milestones = [
+  ['15 Sep 2026', 'MOCCAE requests details', 'MOCCAE asks TA-14 for a work paper or additional proposal details and direct contact information.'],
+  ['16 Sep 2026', 'UAE showroom returned', 'TA-14 provides the dedicated UAE technical showroom and bounds the request to technical examination rather than infrastructure replacement.'],
+  ['16 Sep 2026', 'MOCCAE confirms follow-up', 'MOCCAE states that the request is under follow-up and that TA-14 will be informed as soon as possible.'],
+  ['17 Sep 2026', 'Suggestion 5200001108 closed', '171 Tawasul records the MOCCAE suggestion as resolved; TA-14 returns a clarification that no procurement, expenditure or paid pilot is being requested at this stage.'],
   ['2007', 'Abu Dhabi monitoring network', 'Environment Agency - Abu Dhabi has operated a fixed and mobile air-quality monitoring network since 2007, contributing detailed pollutant concentration data.'],
   ['07 Sep 2020', 'National Air Quality Platform', 'MOCCAE launched a centralized platform designed to connect ambient-air monitoring stations, unify reporting, and provide real-time air-quality information.'],
   ['June 2022', 'National Air Quality Agenda 2031 approved', 'The Cabinet-approved agenda established a national framework for federal, local and private-sector coordination.'],
