@@ -176,7 +176,64 @@ TA-14 governs the consequence-bearing determination after the crossing. No CP st
 | Local Capsule | receiving-domain runtime | Excluded | Does not cross |
 | Commit / Execution / Effect | receiving-domain runtime | Excluded | Does not cross |
 
-## 9. Initial interoperability fixtures
+## 9. Registry mechanics confirmed from current Arete implementation
+
+Current Project Arete implementation code resolves Connection Profiles from `https://cp.padi.io/profiles/<name>` and treats the registry profile as authoritative for roles and property direction.
+
+The current parser establishes these mechanics:
+
+- the latest entry in the profile's `versions` array supplies the active property list;
+- top-level `server` and `client` strings describe the two ends of the use case;
+- CNS/CP application role `provider` maps to the profile's `server` side;
+- application role `consumer` maps to the profile's `client` side;
+- property direction is encoded by key presence: a property containing a `server` key is provider/server-written; absence of that key makes it consumer/client-written;
+- a `propagate` key means writes propagate to active connections; without it the value remains capability-local and peers do not receive it;
+- a `required` key marks a required property;
+- application implementations are expected to stop if the named CP is not registered rather than inventing a profile locally.
+
+This materially sharpens CP v0.1. The AVP Passport and PassportAcceptanceReceipt cannot remain merely conceptual request/response objects in the CP design. Their constituent properties must be assigned to the appropriate CNS/CP side and propagation behavior.
+
+### Proposed directional translation — subject to registry-form confirmation
+
+**Provider/server-written, propagated toward receiver**
+
+Candidate Passport properties:
+
+- `passport_id`
+- `issuer`
+- `principal_lineage`
+- `constitution_reference`
+- `purpose`
+- `delegation_envelope`
+- `authority_state`
+- `freshness`
+- `consequence_budget`
+- `irreversibility_position`
+- `jurisdiction`
+- `proof_obligations`
+- `revocation`
+- `closure_responsibility`
+
+**Consumer/client-written, propagated toward provider**
+
+Candidate acceptance-receipt properties:
+
+- `receipt_type`
+- `passport_digest`
+- `receiver_identity`
+- `decision`
+- `narrowing_proof_digest`
+- `local_constitution_digest`
+- `freshness_status`
+- `revocation_sequence`
+- `jurisdiction_profile`
+- `limitations`
+- `signer`
+- `signature`
+
+This is a directional mapping, not yet a registry-ready schema. Whether AVP compound structures are represented as individual CP properties, serialized values, digests/references, or a smaller profile vocabulary remains a freeze question. The design must not flatten AVP semantics merely to fit a transport surface.
+
+## 10. Initial interoperability fixtures
 
 The first bounded examination should select AVP reference vectors that attack the seam rather than merely demonstrate a happy path. Initial fixture classes should include:
 
@@ -193,7 +250,7 @@ The first bounded examination should select AVP reference vectors that attack th
 
 Expected behavior is fail-closed where the required present evidence, authority, freshness, semantic compatibility or local entitlement is not established.
 
-## 10. Conformance and commercial boundary
+## 11. Conformance and commercial boundary
 
 The Connection Profile itself remains an open interface artifact. Commercial work may exist behind implementation, examination, assurance, recognition and revalidation.
 
@@ -209,7 +266,7 @@ TA14_RECOGNIZED is not implied by compatibility, copied terminology, successful 
 
 A conformance claim should identify the applicable AVP version, dependency versions, sector profile, issuer/receiver domains, trust anchors, conformance level, evidence bundle, validity period and reassessment triggers.
 
-## 11. Non-claims
+## 12. Non-claims
 
 This v0.1 Design Record does not claim:
 
@@ -221,13 +278,13 @@ This v0.1 Design Record does not claim:
 - transfer of execution authority between domains;
 - modification of frozen AVP semantics.
 
-## 12. Freeze gates for CP v0.1
+## 13. Freeze gates for CP v0.1
 
 Before the first CP is frozen or registered:
 
-1. inspect the live CNS/CP registry form;
-2. inspect representative existing Connection Profiles;
-3. map actual registry fields to this design record;
+1. inspect the live CNS/CP registry authoring form and its required metadata;
+2. inspect representative existing Connection Profiles beyond implementation examples;
+3. reconcile the confirmed provider/server and consumer/client property-direction mechanics with the registry authoring form;
 4. confirm TA-14 organization/prefix practicalities;
 5. define exact provider and consumer identifiers;
 6. define field cardinality and serialization requirements;
