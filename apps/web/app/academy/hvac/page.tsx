@@ -35,6 +35,15 @@ const worlds = [
     primary: true,
   },
   {
+    tag: "PLAYABLE DECISION ARCADE",
+    title: "SERVICE CALL: HOLD",
+    copy: "Enter an unfolding field call where technically plausible actions appear before the evidence supports them. Earn ALLOW, recognize HOLD, respect DENY, and escalate only when the boundary requires it.",
+    href: "/atlas-service-call-hold",
+    action: "ENTER SERVICE CALL: HOLD",
+    live: true,
+    primary: true,
+  },
+  {
     tag: "BASELINE LAB",
     title: "Measure Before Disturbance",
     copy: "Build pre-intervention records from operating conditions, temperature, airflow, electrical, equipment identity, and measurement integrity before the system is changed.",
@@ -107,7 +116,7 @@ export default function HvacAcademyWorldPage() {
           <div className="arcadeIntro">
             <small>LIVE PLAYABLE TRAINING</small>
             <h2>Train it. Run it. Prove it.</h2>
-            <p>Choose the training environment you need now, or learn the full 14-step route before entering the Field Ops challenge.</p>
+            <p>Three independent arcade environments now train knowledge, field sequence, and execution discipline. Choose the skill you need to exercise.</p>
           </div>
           <div className="arcadeButtons">
             <Link className="primaryCta" href="/atlas-14-step-field-ops-lab">
@@ -119,6 +128,11 @@ export default function HvacAcademyWorldPage() {
               <span>STEP-BY-STEP ACADEMY PATH</span>
               <strong>LEARN THE 14 STEPS FIRST</strong>
               <i>OPEN STEP 01 →</i>
+            </Link>
+            <Link className="secondaryCta" href="/atlas-service-call-hold">
+              <span>ARCADE 03 · DECISION DISCIPLINE</span>
+              <strong>SERVICE CALL: HOLD</strong>
+              <i>ACCEPT DISPATCH →</i>
             </Link>
             <Link className="secondaryCta" href="/atlas-608-refrigerant-ops-lab/campaign">
               <span>EPA 608 READINESS</span>
