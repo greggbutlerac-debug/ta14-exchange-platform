@@ -5,6 +5,7 @@ export const metadata={title:'Қазақстан · Экология және т
 
 type T={kz:string;ru:string;en?:string};
 const L=({kz,ru,en}:T)=><><span className="kz">{kz}</span><span className="ru">{ru}</span>{en&&<span className="enRef">{en}</span>}</>;
+const institutionalTimeline=[['16 Sep 2026','TA-14 → Ministry','Initial institutional technical request sent.'],['17 Sep 2026','Ministry → TA-14','Ministry requests an official letter addressed to the Ministry.'],['17 Sep 2026','TA-14 → Ministry','Formal Kazakh/Russian ministry letter submitted with the Kazakhstan showroom.'],['NEXT','OPEN RECORD','Awaiting ministry routing or technical response.']];
 const chain:T[]=[
 {kz:'Шындық',ru:'Реальность',en:'Reality'},{kz:'Жазба',ru:'Запись',en:'Record'},{kz:'Үздіксіздік',ru:'Непрерывность',en:'Continuity'},{kz:'Жол берілетіндік',ru:'Допустимость',en:'Admissibility'},{kz:'Байланыстыру',ru:'Связывание',en:'Binding'},{kz:'Бекіту',ru:'Фиксация',en:'Commit'},{kz:'Орындау',ru:'Исполнение',en:'Execution'},{kz:'Нәтиже',ru:'Результат',en:'Outcome'}];
 const milestones=[
