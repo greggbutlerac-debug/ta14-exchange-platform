@@ -53,7 +53,7 @@ export default function USEPAIndoorAirShowroom() {
         <article><b>ACTIVE ADJUSTMENT</b><p>EPA notes that ventilation can be actively adjusted as indoor and outdoor conditions change.</p></article>
         <article><b>ASHRAE WILDFIRE GUIDANCE</b><p>EPA points to ASHRAE wildfire-smoke guidance as an additional technical resource.</p></article>
       </div>
-      <div className="callout"><b>TA-14 ACCEPTS ALL FOUR POINTS.</b><p>The examination is no longer asking whether the building can know that the environment changed. It asks what gives that new knowledge authority to stop, revoke, or require revalidation of a physical action that was already prepared under the prior state.</p></div>
+      <div className="callout"><b>TA-14 ACCEPTS ALL FOUR POINTS.</b><p>The examination is no longer asking whether the building can know that the environment changed. Atmospheric Integrity Records address that evidentiary side through Reality → Record → Continuity → Admissibility. The remaining seam is the handoff into AEA: what gives admissible current evidence authority to stop, revoke, or require revalidation of a physical action already prepared under the prior state.</p></div>
     </div></section>
 
     <section>
@@ -112,8 +112,11 @@ export default function USEPAIndoorAirShowroom() {
     </section>
 
     <section className="band"><div className="inner">
-      <p className="eyebrow">TA-14 GOVERNING CHAIN</p>
-      <h2>Preserve the transition before consequence.</h2>
+      <p className="eyebrow">AIR → AEA · THE ENVIRONMENTAL HANDOFF</p>
+      <h2>AIR carries admissible environmental reality. AEA governs what that reality is allowed to cause.</h2>
+      <div className="callout"><b>ATMOSPHERIC INTEGRITY RECORDS · LINKS 01–04</b><p>In the environmental domain, AIR carries Reality → Record → Continuity → Admissibility: what condition existed, what was recorded, whether evidentiary continuity survives, and exactly what the environmental evidence is sufficient to support.</p></div>
+      <div className="callout gold"><b>ADMISSIBLE EXECUTION ARCHITECTURE · LINKS 05–08</b><p>AEA carries the consequence boundary forward through Binding → Commit → Execution → Outcome: what the admissible evidence is bound to, whether authority remains current at commit, whether physical execution is permitted, and what outcome becomes the next record.</p></div>
+      <h2>Preserve the handoff before consequence.</h2>
       <div className="chain">{chain.map(([n,a,b]) => <article key={n}><span>{n}</span><h3>{a}</h3><p>{b}</p></article>)}</div>
       <div className="states"><b>ALLOW</b><b>HOLD</b><b>DENY</b><b>ESCALATE</b></div>
       <div className="callout gold"><b>WHY HOLD MATTERS</b><p>A HOLD does not claim the earlier CO₂ evidence was wrong. It means that evidence was established under a context that materially changed before physical execution. TA-14 therefore does not let the absence of an explicit refusal silently become permission.</p></div>
