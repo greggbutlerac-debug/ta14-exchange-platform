@@ -3,6 +3,7 @@ import Link from 'next/link';
 export const metadata={title:'PNG Atmospheric Integrity Pilot | TA-14 Environmental Integrity Governance',description:'Crusaders Air Solution × TA-14 Authority — Exploratory Governance Alignment · Open Chain'};
 type T={tp:string;hm:string;en:string};
 const L=({tp,hm,en}:T)=><><span className="tp">{tp}</span><span className="hm">{hm}</span><span className="en">{en}</span></>;
+const institutionalTimeline=[['24 Aug 2026','Crusaders → TA-14','PNG Atmospheric Integrity Pilot exploratory discussion material received.'],['24 Aug 2026','TA-14 → Crusaders','Exploratory Governance Alignment Response v2 returned; bounded Phase 1 scope recommended.'],['17 Sep 2026','TA-14 → Crusaders','Dedicated PNG governance-alignment showroom delivered for review.'],['18 Sep 2026','Crusaders → TA-14','Founder confirms careful showroom review and will return feedback plus thoughts on the Phase 1 object.'],['NEXT','OPEN RECORD','Awaiting Crusaders feedback before freezing the Phase 1 object.']];
 const chain:T[]=[
 {tp:'Tru samting i stap',hm:'Momokani gauna',en:'Reality'},{tp:'Ripot / Rekot',hm:'Rekodi',en:'Record'},{tp:'I go yet',hm:'Hanamoa noho',en:'Continuity'},{tp:'I stret long yusim',hm:'Dibaia abia',en:'Admissibility'},{tp:'Pasim wantaim as',hm:'Horeia',en:'Binding'},{tp:'Pasim disisen',hm:'Hamai dibagani',en:'Commit'},{tp:'Mekim wok',hm:'Gaukaraia',en:'Execution'},{tp:'Samting i kamap',hm:'Dohore',en:'Outcome'}];
 const scope:T[]=[
