@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+const institutionalTimeline=[['15 Sep 2026','TA-14 → EPA Ireland','Technical-conversation request sent.'],['16 Sep 2026','EPA Ireland','Request enters EPA correspondence route.'],['17 Sep 2026','EPA Ireland → TA-14','EPA explains that ambient monitoring follows Irish/EU legal requirements and defined QA/verification before regulatory assessment and reporting.'],['17 Sep 2026','TA-14 → EPA Ireland','TA-14 accepts the evidence controls and narrows the question to the verified-evidence → execution-authority boundary.'],['NEXT','OPEN RECORD','Awaiting routing or further technical response.']];
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
 const sources=[
  ['EPA Ireland · Air','https://www.epa.ie/environment-and-you/air/'],

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 
+const institutionalTimeline=[['15 Sep 2026','TA-14 → EPA / Ministry','Technical-conversation request sent.'],['16 Sep 2026','Ministry → TA-14','Ministry identifies the Environmental Protection Agency as competent for monitoring, provenance, continuity, validation, currentness and reliability questions.'],['16 Sep 2026','TA-14 → Ministry / EPA','TA-14 accepts the referral and narrows the examination to the evidence-to-consequence boundary.'],['NEXT','OPEN RECORD','Awaiting EPA technical engagement.']];
 const chain=[
 ['01','REALNOST','Stvarno stanje vazduha u određenom mjestu i vremenu.'],
 ['02','ZAPIS','Mjerenje čuva identitet stanice, zagađujuće materije, vrijeme, metodu i stanje podatka.'],
