@@ -1,4 +1,5 @@
 import Link from 'next/link';
+const institutionalTimeline=[['16 Sep 2026','TA-14 → Miljødirektoratet','Technical-dialogue request sent by email.'],['16 Sep 2026','Miljødirektoratet → TA-14','Agency instructs TA-14 to resubmit this type of request through its official Svartjenesten web form.'],['NEXT','ACTION','Submit through the official web-form route; no technical response has yet been recorded.']];
 const chain=['VIRKELIGHET','REGISTRERING','KONTINUITET','ADMISSIBILITET','BINDING','COMMIT','UTFØRELSE','UTFALL'];
 export const metadata={title:'Norge · Luftkvalitet fra varsel til styrt handling | TA-14',description:'Offentlig TA-14 teknisk undersøkelsesflate for norsk lokal luftkvalitet, måledata, varsling, kommunalt ansvar og endrede forhold.'};
 export default function Page(){return <main className="p"><div className="s"><nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/global-institutional-engagement">GLOBAL INSTITUTIONAL ENGAGEMENT</Link><Link href="/global-institutional-engagement/control-board">CONTROL BOARD</Link></nav>
