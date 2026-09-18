@@ -48,7 +48,7 @@ export default function FederationAuthorityPage(){
         <div style={{fontSize:10,fontWeight:900,letterSpacing:'.15em',color:'#e4ca87'}}>COMMERCIAL ENTRY</div>
         <h2 style={{fontSize:30,margin:'10px 0'}}>Need to prove a real cross-domain authority seam?</h2>
         <p style={{color:'#aebdc1',lineHeight:1.65}}>Begin with a bounded readiness review. Map what crosses, what does not, what evidence exists, and what the receiving runtime must independently establish before consequence.</p>
-        <Link href="/contact" style={{display:'inline-block',marginTop:10,padding:'13px 16px',borderRadius:9,background:'#70e7e0',color:'#031216',textDecoration:'none',fontSize:11,fontWeight:900}}>REQUEST TA-14 READINESS REVIEW →</Link>
+        <Link href="/review" style={{display:'inline-block',marginTop:10,padding:'13px 16px',borderRadius:9,background:'#70e7e0',color:'#031216',textDecoration:'none',fontSize:11,fontWeight:900}}>REQUEST TA-14 READINESS REVIEW →</Link>
       </section>
     </div>
   </main>
