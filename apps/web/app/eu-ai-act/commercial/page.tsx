@@ -36,7 +36,7 @@ export default function EUAICommercial(){return <main className="page">
     <p>If your organization develops, sells, deploys, imports or operates AI connected to the European market, the hard part is no longer finding the regulation. The hard part is maintaining a defensible record of the system, the obligation, the evidence, the decision, the limitation and what changed.</p>
     <div className="heroActions">
       <Link className="primary" href="/eu-ai-act/classifier">CHECK MY AI SYSTEM — FREE →</Link>
-      <Link className="reviewCta" href="#readiness-review">GET A GOVERNED READINESS REVIEW →</Link>
+      <Link className="reviewCta" href="/eu-ai-act/readiness-review">START $750 READINESS REVIEW →</Link>
       <Link className="secondary" href="#pricing">VIEW SOFTWARE PLANS ↓</Link>
     </div>
     <div className="trust">
@@ -72,7 +72,7 @@ export default function EUAICommercial(){return <main className="page">
       <h2>EU AI Act Governed Readiness Review</h2>
       <p>A fixed-scope review for one AI system when your organization needs more than software and wants a bounded second set of eyes on the current position.</p>
       <div className="price"><strong>$750</strong><span>starting fixed scope · one AI system</span></div>
-      <Link href="/eu-ai-act/readiness-review">REQUEST THE REVIEW →</Link>
+      <Link href="/eu-ai-act/readiness-review">START $750 READINESS REVIEW →</Link>
     </div>
     <div className="reviewScope">
       <article><b>01 · SYSTEM & ROLE</b><p>Identify the system, intended purpose, organizational role, EU exposure and declared scope.</p></article>
