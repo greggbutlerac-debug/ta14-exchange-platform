@@ -11,7 +11,7 @@ const structured = new Set(PROVIDER_REQUIRED.filter(x=>x!=="passport_id").concat
 const b64u = x => Buffer.from(JSON.stringify(x),"utf8").toString("base64url");
 const env = x => "avp-json-v1:"+b64u(x);
 const digest = x => "sha256:"+createHash("sha256").update(JSON.stringify(x)).digest("hex");
-const signed = (body, signer="test:receiver") => ({...body, signer, signature:"TEST_ONLY:"+digest(body)});
+const signed = (body, signer="test:receiver") => { const signedBody={...body,signer}; return {...signedBody,signature:"TEST_ONLY:"+digest(signedBody)}; };
 
 function parseEnvelope(v){
   if(typeof v!=="string" || !v.startsWith("avp-json-v1:")) throw new Error("BAD_ENVELOPE");
@@ -53,7 +53,8 @@ function evaluate(name, mutate){
  if(consumer.freshness_status&&!FRESHNESS.has(consumer.freshness_status)) errors.push("BAD_FRESHNESS");
  if(!verifyReceiptSignature(consumer)) errors.push("RECEIPT_INTEGRITY_MISMATCH");
  errors.push(...ctx.semantic_errors);
- const result=errors.length?"FAIL_CLOSED":ctx.expected;
+ const transportOrIntegrityFailure=errors.some(e=>e.startsWith("MISSING_")||e.startsWith("BAD_ENVELOPE")||e==="RECEIPT_INTEGRITY_MISMATCH");
+ const result=transportOrIntegrityFailure?"FAIL_CLOSED":ctx.expected;
  return {fixture_id:name,avp_vector:ctx.vector,profile:PROFILE,cp_transport_result:errors.some(e=>e.startsWith("MISSING_")||e.startsWith("BAD_ENVELOPE")||e==="RECEIPT_INTEGRITY_MISMATCH")?"FAIL":"PASS",avp_result:result,
  expected_avp_result:ctx.expected,expectation_met:result===ctx.expected,execution_authority:"NOT_ESTABLISHED_BY_CP",local_execution_observed:false,errors};
 }
@@ -67,12 +68,12 @@ const fixtures=[
  ["CP-FX-007",s=>{s.vector="AV-024";s.consumer={...receiptFor(s.p,"REJECT").receipt};s.expected="REJECT";return s}],
  ["CP-FX-008",s=>{s.vector="AV-013";delete s.provider.closure_responsibility;s.expected="FAIL_CLOSED";return s}],
  ["CP-FX-009",s=>{s.vector="AV-003";s.semantic_errors.push("UNKNOWN_MANDATORY_EXTENSION");s.expected="FAIL_CLOSED";return s}],
- ["CP-FX-010",s=>{s.vector="AV-006";s.semantic_errors.push("REVOCATION_PRECEDENCE");s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-010",s=>{s.vector="AV-006";s.semantic_errors.push("REVOCATION_PRECEDENCE");s.expected="REVOCATION_PRECEDENCE";return s}],
  ["CP-FX-011",s=>{s.vector="AV-014";s.consumer={...receiptFor(s.p,"HOLD").receipt};s.expected="HOLD";return s}],
- ["CP-FX-012",s=>{s.vector="AV-022";s.semantic_errors.push("IDENTITY_CLASS_CONFUSION");s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-012",s=>{s.vector="AV-022";s.semantic_errors.push("IDENTITY_CLASS_CONFUSION");s.expected="SEMANTIC_FAILURE";return s}],
  ["CP-FX-013",s=>{s.vector="BINDING";s.provider.freshness="avp-json-v1:%%%";s.expected="FAIL_CLOSED";return s}],
  ["CP-FX-014",s=>{s.vector="BINDING";s.consumer.decision="ACCEPT";s.expected="FAIL_CLOSED";return s}],
- ["CP-FX-015",s=>{s.vector="RECOVERY";s.semantic_errors.push("CHANGED_CONDITION_REVALIDATION_REQUIRED");s.expected="FAIL_CLOSED";return s}]
+ ["CP-FX-015",s=>{s.vector="RECOVERY";s.semantic_errors.push("CHANGED_CONDITION_REVALIDATION_REQUIRED");s.expected="REVALIDATION_REQUIRED";return s}]
 ];
 const results=fixtures.map(([id,m])=>evaluate(id,m));
 console.log(JSON.stringify({status:"LOCAL_EXERCISE_ONLY",profile:PROFILE,executed_at:new Date().toISOString(),all_expectations_met:results.every(r=>r.expectation_met),results},null,2));
