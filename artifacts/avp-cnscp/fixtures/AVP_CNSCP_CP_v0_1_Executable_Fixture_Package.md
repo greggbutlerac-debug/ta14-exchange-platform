@@ -234,9 +234,9 @@ The exact digest strings are not populated until the fixture artifacts and diges
 
 ## 6. Execution status
 
-**LOCAL HARNESS EXECUTED — 15/15 EXPECTED OUTCOMES OBSERVED.**
+**LOCAL HARNESS IMPLEMENTED — RUNTIME EXECUTION EVIDENCE PENDING.**
 
-The corrected local harness exercised CP-FX-001 through CP-FX-015 under the reserved, non-resolvable `test` Top Level Prefix. All 15 observed outcomes matched the independently defined expected outcomes. Preserved evidence includes the initial HOLD, the CP-FX-014 corrective retest, and the complete-suite validation record. This does not claim CNS/CP registry publication, globally resolvable registration, conformance, or interoperability.
+The local harness implements CP-FX-001 through CP-FX-015 under the reserved, non-resolvable `test` Top Level Prefix. Preserved deterministic validation records document the expected and code-derived outcomes, including the initial HOLD and the CP-FX-014 corrective retest. A real Node/CI execution record is still required before this package claims the harness was executed. This does not claim CNS/CP registry publication, globally resolvable registration, conformance, interoperability, or execution authority.
 
 ## 7. Exit criteria
 
