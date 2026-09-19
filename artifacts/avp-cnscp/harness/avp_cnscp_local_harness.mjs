@@ -54,7 +54,9 @@ function evaluate(name, mutate){
  if(!verifyReceiptSignature(consumer)) errors.push("RECEIPT_INTEGRITY_MISMATCH");
  errors.push(...ctx.semantic_errors);
  const transportOrIntegrityFailure=errors.some(e=>e.startsWith("MISSING_")||e.startsWith("BAD_ENVELOPE")||e==="RECEIPT_INTEGRITY_MISMATCH");
- const result=transportOrIntegrityFailure?"FAIL_CLOSED":ctx.expected;
+ const semanticFailureMap={INHERITANCE_BROADENING:"INHERITANCE_FAILURE",UNKNOWN_MANDATORY_EXTENSION:"FAIL_CLOSED",REVOCATION_PRECEDENCE:"REVOCATION_PRECEDENCE",IDENTITY_CLASS_CONFUSION:"SEMANTIC_FAILURE",CHANGED_CONDITION_REVALIDATION_REQUIRED:"REVALIDATION_REQUIRED"};
+ const semanticFailure=ctx.semantic_errors.map(e=>semanticFailureMap[e]).find(Boolean);
+ const result=transportOrIntegrityFailure?"FAIL_CLOSED":semanticFailure||consumer.decision;
  return {fixture_id:name,avp_vector:ctx.vector,profile:PROFILE,cp_transport_result:errors.some(e=>e.startsWith("MISSING_")||e.startsWith("BAD_ENVELOPE")||e==="RECEIPT_INTEGRITY_MISMATCH")?"FAIL":"PASS",avp_result:result,
  expected_avp_result:ctx.expected,expectation_met:result===ctx.expected,execution_authority:"NOT_ESTABLISHED_BY_CP",local_execution_observed:false,errors};
 }
