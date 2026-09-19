@@ -234,9 +234,9 @@ The exact digest strings are not populated until the fixture artifacts and diges
 
 ## 6. Execution status
 
-**LOCAL HARNESS EXECUTION IN PROGRESS.**
+**LOCAL HARNESS EXECUTED — 15/15 EXPECTED OUTCOMES OBSERVED.**
 
-The local harness and preserved evidence records exercise this package under the reserved, non-resolvable `test` Top Level Prefix. This does not claim CNS/CP registry publication, globally resolvable registration, conformance, or interoperability.
+The corrected local harness exercised CP-FX-001 through CP-FX-015 under the reserved, non-resolvable `test` Top Level Prefix. All 15 observed outcomes matched the independently defined expected outcomes. Preserved evidence includes the initial HOLD, the CP-FX-014 corrective retest, and the complete-suite validation record. This does not claim CNS/CP registry publication, globally resolvable registration, conformance, or interoperability.
 
 ## 7. Exit criteria
 
