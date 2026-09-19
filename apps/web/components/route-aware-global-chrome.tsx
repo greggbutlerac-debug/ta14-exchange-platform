@@ -19,7 +19,8 @@ export function RouteAwareGlobalChrome() {
     pathname === '/atlas-environmental-integrity-fund' ||
     pathname.startsWith('/atlas-environmental-integrity-fund/');
 
-  if (isTransparentAir || isPrivateEnvironmentalGateway || isPrivateGcea) return null;
+  const isGuidedEuClassifier = pathname === '/eu-ai-act/classifier-review' || pathname === '/eu-ai-act/classifier';
+  if (isTransparentAir || isPrivateEnvironmentalGateway || isPrivateGcea || isGuidedEuClassifier) return null;
 
   return (
     <>
