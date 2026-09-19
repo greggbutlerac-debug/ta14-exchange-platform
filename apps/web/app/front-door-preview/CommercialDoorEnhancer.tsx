@@ -12,14 +12,14 @@ export default function CommercialDoorEnhancer() {
     const kicker = sectionHead?.querySelector('small');
     if (kicker) kicker.textContent = 'ONE INSTITUTION · EIGHT GOVERNED DOORS';
 
-    if (!grid.querySelector('[data-seventh-world="execution-artifacts"]')) {
+    if (!grid.querySelector('[data-eighth-world="execution-artifacts"]')) {
       const artifacts = document.createElement('a');
       artifacts.href = '/artifacts';
       artifacts.className = 'door artifactDoor';
-      artifacts.setAttribute('data-seventh-world', 'execution-artifacts');
+      artifacts.setAttribute('data-eighth-world', 'execution-artifacts');
       artifacts.innerHTML = `
         <span>EA</span>
-        <small>GOVERNED DOOR 07</small>
+        <small>GOVERNED DOOR 08</small>
         <h3>EXECUTION ARTIFACTS</h3>
         <p>Inspect portable records of determinations, execution effects, evidence boundaries, receipts, replay, verification and preserved outcomes.</p>
         <strong>INSPECT THE RECORD →</strong>
@@ -27,14 +27,14 @@ export default function CommercialDoorEnhancer() {
       grid.appendChild(artifacts);
     }
 
-    if (!grid.querySelector('[data-eighth-world="commercial-entry"]')) {
+    if (!grid.querySelector('[data-commercial-entry="work-with-ta14"]')) {
       const commercial = document.createElement('a');
       commercial.href = '/work-with-ta14';
       commercial.className = 'door commercialDoor';
-      commercial.setAttribute('data-eighth-world', 'commercial-entry');
+      commercial.setAttribute('data-commercial-entry', 'work-with-ta14');
       commercial.innerHTML = `
-        <span>08</span>
-        <small>GOVERNED DOOR 08 · COMMERCIAL ENTRY</small>
+        <span>→</span>
+        <small>COMMERCIAL ENTRY</small>
         <h3>WORK WITH TA-14</h3>
         <p>Need governance architecture, an interoperability examination, execution-readiness review, institutional pilot, training, or a custom integration? Start here.</p>
         <strong>SEE WHAT YOU CAN HIRE TA-14 TO DO →</strong>
