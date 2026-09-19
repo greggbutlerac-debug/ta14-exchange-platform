@@ -1,0 +1,22 @@
+{
+  "status": "LOCAL_EXERCISE_ONLY",
+  "profile": "cp:test.ta14-avp-passport-acceptance:unpublished",
+  "harness_commit": "0dc989dd06a8591b262249905ece50064299df23",
+  "retest_scope": "CP-FX-014 receipt integrity mismatch",
+  "claim_boundary": "Deterministic harness retest record. No registry, publication, CNS/CP conformance, interoperability, or execution-authority claim.",
+  "result": {
+    "fixture_id": "CP-FX-014",
+    "mutation": "Decision changed from ACCEPT_NARROWED to ACCEPT after receipt signature construction.",
+    "expected_error": "RECEIPT_INTEGRITY_MISMATCH",
+    "cp_transport_result": "FAIL",
+    "avp_result": "FAIL_CLOSED",
+    "execution_authority": "NOT_ESTABLISHED_BY_CP",
+    "local_execution_observed": false,
+    "errors": ["RECEIPT_INTEGRITY_MISMATCH"]
+  },
+  "prior_evidence_preserved": "LOCAL_RUN_2026-09-19_020758Z.json",
+  "finding": {
+    "status": "SUPPORTED_FOR_THIS_FIXTURE",
+    "statement": "The corrected harness detects post-signature receipt mutation and fails closed. This closes the specific CP-FX-014 harness defect only."
+  }
+}

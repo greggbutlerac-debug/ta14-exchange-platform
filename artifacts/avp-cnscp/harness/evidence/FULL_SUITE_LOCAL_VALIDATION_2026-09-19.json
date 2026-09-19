@@ -1,0 +1,33 @@
+{
+  "status": "LOCAL_EXERCISE_ONLY",
+  "profile": "cp:test.ta14-avp-passport-acceptance:unpublished",
+  "harness_commit": "00e46f7ee3f6af5c665c4f2dd68b78c3e1c985a5",
+  "run_scope": "CP-FX-001 through CP-FX-015",
+  "all_expectations_met": true,
+  "claim_boundary": "Local deterministic validation only. No CNS/CP registry, publication, conformance, interoperability, or execution-authority claim.",
+  "results": [
+    ["CP-FX-001","ACCEPT_NARROWED",true,[]],
+    ["CP-FX-002","SUSPEND",true,[]],
+    ["CP-FX-003","HOLD",true,[]],
+    ["CP-FX-004","INHERITANCE_FAILURE",true,["INHERITANCE_BROADENING"]],
+    ["CP-FX-005","ESCALATE",true,[]],
+    ["CP-FX-006","REJECT",true,[]],
+    ["CP-FX-007","REJECT",true,[]],
+    ["CP-FX-008","FAIL_CLOSED",true,["MISSING_PROVIDER:closure_responsibility"]],
+    ["CP-FX-009","FAIL_CLOSED",true,["UNKNOWN_MANDATORY_EXTENSION"]],
+    ["CP-FX-010","REVOCATION_PRECEDENCE",true,["REVOCATION_PRECEDENCE"]],
+    ["CP-FX-011","HOLD",true,[]],
+    ["CP-FX-012","SEMANTIC_FAILURE",true,["IDENTITY_CLASS_CONFUSION"]],
+    ["CP-FX-013","FAIL_CLOSED",true,["BAD_ENVELOPE:freshness"]],
+    ["CP-FX-014","FAIL_CLOSED",true,["RECEIPT_INTEGRITY_MISMATCH"]],
+    ["CP-FX-015","REVALIDATION_REQUIRED",true,["CHANGED_CONDITION_REVALIDATION_REQUIRED"]]
+  ],
+  "invariant": {
+    "execution_authority": "NOT_ESTABLISHED_BY_CP",
+    "local_execution_observed": false
+  },
+  "finding": {
+    "status": "SUPPORTED_FOR_LOCAL_FIXTURE_SUITE",
+    "statement": "All 15 local fixture expectations were met under the corrected harness semantics. This finding is bounded to the local fixture suite."
+  }
+}

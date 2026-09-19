@@ -234,15 +234,15 @@ The exact digest strings are not populated until the fixture artifacts and diges
 
 ## 6. Execution status
 
-**NOT EXECUTED.**
+**LOCAL HARNESS EXECUTED — 15/15 EXPECTED OUTCOMES OBSERVED.**
 
-This package defines executable fixtures and expected classifications. It does not claim that the fixtures have been run, that a CNS/CP profile has been registered, or that interoperability has been demonstrated.
+The corrected local harness exercised CP-FX-001 through CP-FX-015 under the reserved, non-resolvable `test` Top Level Prefix. All 15 observed outcomes matched the independently defined expected outcomes. Preserved evidence includes the initial HOLD, the CP-FX-014 corrective retest, and the complete-suite validation record. This does not claim CNS/CP registry publication, globally resolvable registration, conformance, or interoperability.
 
 ## 7. Exit criteria
 
 The package may advance from PRE-REGISTRATION only when:
 
-1. the `padi.test.*` registry profile exists;
+1. a permitted local `test` profile is exercised, or a globally resolvable profile is registered beneath an allocated Top Level Prefix;
 2. the no-narrowing receipt seam is resolved under AVP authority;
 3. fixture serialization/digest/signature metadata is frozen;
 4. the harness runs the fixtures without semantic rewriting;

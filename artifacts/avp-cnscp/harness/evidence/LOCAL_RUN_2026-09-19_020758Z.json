@@ -1,0 +1,20 @@
+{
+  "status": "LOCAL_EXERCISE_ONLY",
+  "profile": "cp:test.ta14-avp-passport-acceptance:unpublished",
+  "executed_at": "2026-09-19T02:07:58.350Z",
+  "harness_commit": "b784338ca2774eacfc24aeb0ffd6e81719fe1ea3",
+  "claim_boundary": "Local harness execution only. No CNS/CP registry, publication, conformance, interoperability, or execution-authority claim.",
+  "results": [
+    {"fixture_id":"CP-FX-001","cp_transport_result":"PASS","avp_result":"ACCEPT_NARROWED","execution_authority":"NOT_ESTABLISHED_BY_CP","local_execution_observed":false,"errors":[]},
+    {"fixture_id":"CP-FX-002","cp_transport_result":"PASS","avp_result":"SUSPEND","execution_authority":"NOT_ESTABLISHED_BY_CP","local_execution_observed":false,"errors":[]},
+    {"fixture_id":"CP-FX-006","cp_transport_result":"PASS","avp_result":"REJECT","execution_authority":"NOT_ESTABLISHED_BY_CP","local_execution_observed":false,"errors":[]},
+    {"fixture_id":"CP-FX-008","cp_transport_result":"FAIL","avp_result":"FAIL_CLOSED","execution_authority":"NOT_ESTABLISHED_BY_CP","local_execution_observed":false,"errors":["MISSING_PROVIDER:closure_responsibility"]},
+    {"fixture_id":"CP-FX-013","cp_transport_result":"FAIL","avp_result":"FAIL_CLOSED","execution_authority":"NOT_ESTABLISHED_BY_CP","local_execution_observed":false,"errors":["BAD_ENVELOPE:freshness"]},
+    {"fixture_id":"CP-FX-014","cp_transport_result":"PASS","avp_result":"ACCEPT","execution_authority":"NOT_ESTABLISHED_BY_CP","local_execution_observed":false,"errors":[]}
+  ],
+  "finding": {
+    "status": "HOLD",
+    "reason": "CP-FX-014 did not detect the intended receipt/projection integrity mismatch. The harness changed the projected decision after signing but lacks signed-receipt reconstruction/verification, so it incorrectly returned CP PASS / AVP ACCEPT.",
+    "next_required_action": "Add receipt integrity verification, rerun CP-FX-014, and preserve the corrected run before advancing."
+  }
+}
