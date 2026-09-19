@@ -79,4 +79,7 @@ const fixtures=[
 ];
 const results=fixtures.map(([id,m])=>evaluate(id,m));
 console.log(JSON.stringify({status:"LOCAL_EXERCISE_ONLY",profile:PROFILE,executed_at:new Date().toISOString(),all_expectations_met:results.every(r=>r.expectation_met),results},null,2));
-if(results.some(r=>r.execution_authority!=="NOT_ESTABLISHED_BY_CP")) process.exit(2);
+const expectationFailure=results.some(r=>!r.expectation_met);
+const authorityInvariantFailure=results.some(r=>r.execution_authority!=="NOT_ESTABLISHED_BY_CP");
+const localExecutionInvariantFailure=results.some(r=>r.local_execution_observed!==false);
+if(expectationFailure||authorityInvariantFailure||localExecutionInvariantFailure) process.exit(2);
