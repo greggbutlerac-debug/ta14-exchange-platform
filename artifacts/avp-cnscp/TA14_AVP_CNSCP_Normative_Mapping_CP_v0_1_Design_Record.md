@@ -176,9 +176,9 @@ TA-14 governs the consequence-bearing determination after the crossing. No CP st
 | Local Capsule | receiving-domain runtime | Excluded | Does not cross |
 | Commit / Execution / Effect | receiving-domain runtime | Excluded | Does not cross |
 
-## 9. Registry mechanics confirmed from current Arete implementation
+## 9. CNS/CP design and registry mechanics confirmed from current Arete guidance
 
-Current Project Arete implementation code resolves Connection Profiles from `https://cp.padi.io/profiles/<name>` and treats the registry profile as authoritative for roles and property direction.
+Current Project Arete design guidance and implementation code resolve Connection Profiles from `https://cp.padi.io/profiles/<name>` and treats the registry profile as authoritative for roles and property direction.
 
 The current parser establishes these mechanics:
 
@@ -190,6 +190,18 @@ The current parser establishes these mechanics:
 - a `propagate` key means writes propagate to active connections; without it the value remains capability-local and peers do not receive it;
 - a `required` key marks a required property;
 - application implementations are expected to stop if the named CP is not registered rather than inventing a profile locally.
+
+The current Arete design guidance adds several load-bearing constraints:
+
+- every CP has exactly two asymmetric roles: provider and consumer;
+- authority attaches to the role in realm/context policy, not to an individual property;
+- a property's source partitions it into the provider or consumer capability and determines value direction, but source is not itself permission;
+- split CPs where authority differs, not merely where data structure differs;
+- context is first-class and a binding exists within a context;
+- published CPs are immutable, so development should occur under a `padi.test.*` name before publication;
+- profile names should describe the use case, while property names should describe purpose rather than carrying direction prefixes;
+- absence semantics must be explicit; an absent/empty value must not silently mean zero, false, off, or authorized denial;
+- multi-connection behavior is application semantics and must be planned rather than collapsed by the profile.
 
 This materially sharpens CP v0.1. The AVP Passport and PassportAcceptanceReceipt cannot remain merely conceptual request/response objects in the CP design. Their constituent properties must be assigned to the appropriate CNS/CP side and propagation behavior.
 
@@ -231,7 +243,7 @@ Candidate acceptance-receipt properties:
 - `signer`
 - `signature`
 
-This is a directional mapping, not yet a registry-ready schema. Whether AVP compound structures are represented as individual CP properties, serialized values, digests/references, or a smaller profile vocabulary remains a freeze question. The design must not flatten AVP semantics merely to fit a transport surface.
+This is a directional mapping, not yet a registry-ready schema. Whether AVP compound structures are represented as individual CP properties, serialized values, digests/references, or a smaller profile vocabulary remains a freeze question. Current Arete guidance warns that serialized envelopes trade away per-property source/delivery semantics and have no registry type validation, so any envelope decision must be deliberate. The design must not flatten AVP semantics merely to fit a transport surface.
 
 ## 10. Initial interoperability fixtures
 
@@ -285,13 +297,17 @@ Before the first CP is frozen or registered:
 1. inspect the live CNS/CP registry authoring form and its required metadata;
 2. inspect representative existing Connection Profiles beyond implementation examples;
 3. reconcile the confirmed provider/server and consumer/client property-direction mechanics with the registry authoring form;
-4. confirm TA-14 organization/prefix practicalities;
-5. define exact provider and consumer identifiers;
-6. define field cardinality and serialization requirements;
-7. define integrity/digest/signature handling;
-8. select the exact AVP reference-vector identifiers used as fixtures;
-9. verify positive and negative space against AVP V1.0.2;
-10. perform a final claim-control review.
+4. name the exact two parties and state the authority each holds in this interaction;
+5. apply the CNS/CP coarse/fine, party-as-property and naming-level tests;
+6. confirm TA-14 organization/prefix practicalities;
+7. define exact provider and consumer identifiers and context semantics;
+8. define field cardinality, absence semantics and serialization requirements;
+9. define source and delivery behavior for every property, including broadcast versus addressed return;
+10. define integrity/digest/signature handling;
+11. select the exact AVP reference-vector identifiers used as fixtures;
+12. verify positive and negative space against AVP V1.0.2;
+13. register and test a development profile under `padi.test.*` before immutable publication;
+14. perform a final claim-control review.
 
 Only after those gates close should the artifact advance from Design Record to a candidate Connection Profile.
 
