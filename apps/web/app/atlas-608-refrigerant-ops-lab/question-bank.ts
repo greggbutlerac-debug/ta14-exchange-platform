@@ -161,11 +161,11 @@ export const TRANSITION_BANK = createRandomizedDeck("transition", 100);
  * Rs/Safety promoted early enough to guarantee required-bucket coverage.
  */
 export const ARCADE_608_BANK: ArcadeQuestion[] = interleaveWorlds([
-  CORE_BANK,
-  TYPE1_BANK,
-  TYPE2_BANK,
-  TYPE3_BANK,
-  TRANSITION_BANK,
+  promoteRequiredBuckets(sourceUnique.filter((question) => question.world === "core").map(camouflageChoiceLength).slice(0, 100), ["Core", "Three Rs", "Safety"]),
+  sourceUnique.filter((question) => question.world === "type1").map(camouflageChoiceLength).slice(0, 100),
+  sourceUnique.filter((question) => question.world === "type2").map(camouflageChoiceLength).slice(0, 100),
+  sourceUnique.filter((question) => question.world === "type3").map(camouflageChoiceLength).slice(0, 100),
+  sourceUnique.filter((question) => question.world === "transition").map(camouflageChoiceLength).slice(0, 100),
 ]);
 
 export const WORLD_COUNTS = {
