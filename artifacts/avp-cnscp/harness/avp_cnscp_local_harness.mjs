@@ -18,6 +18,11 @@ function parseEnvelope(v){
   return JSON.parse(Buffer.from(v.slice(12),"base64url").toString("utf8"));
 }
 function required(obj,names){return names.filter(k=>!(k in obj)||obj[k]===""||obj[k]===undefined);}
+function verifyReceiptSignature(receipt){
+ const {signature,...signedBody}=receipt;
+ if(typeof signature!=="string" || !signature.startsWith("TEST_ONLY:")) return false;
+ return signature==="TEST_ONLY:"+digest(signedBody);
+}
 function basePassport(){
  return {
   passport_id:"avp_test_001",issuer:{domain:"ta14.test",id:"issuer-001"},principal_lineage:["principal-001"],
@@ -44,6 +49,7 @@ function evaluate(name, mutate){
  for(const k of structured) if(k in provider||k==="limitations") try{parseEnvelope(k==="limitations"?consumer[k]:provider[k])}catch{errors.push("BAD_ENVELOPE:"+k)}
  if(consumer.decision&&!DECISIONS.has(consumer.decision)) errors.push("BAD_DECISION");
  if(consumer.freshness_status&&!FRESHNESS.has(consumer.freshness_status)) errors.push("BAD_FRESHNESS");
+ if(!verifyReceiptSignature(consumer)) errors.push("RECEIPT_INTEGRITY_MISMATCH");
  return {fixture_id:name,profile:PROFILE,cp_transport_result:errors.length?"FAIL":"PASS",avp_result:errors.length?"FAIL_CLOSED":consumer.decision,
  execution_authority:"NOT_ESTABLISHED_BY_CP",local_execution_observed:false,errors};
 }
