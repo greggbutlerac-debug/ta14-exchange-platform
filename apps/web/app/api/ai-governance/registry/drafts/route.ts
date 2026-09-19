@@ -101,6 +101,24 @@ function createSupabaseClient(cookieStore: Awaited<ReturnType<typeof cookies>>) 
   });
 }
 
+/**
+ * Older/recovered drafts can contain an empty string for select-backed fields.
+ * A controlled React <select> with no empty option can visually render its first
+ * option while state remains ''. That makes the wizard look complete while its
+ * completion gate correctly sees an empty value. Normalize only UI defaults on
+ * read; substantive authority evidence and all registrant declarations remain
+ * untouched and must still be supplied by the registrant.
+ */
+function normalizeDraftForHydration(submission: JsonRecord): JsonRecord {
+  return {
+    ...submission,
+    claimant_type:
+      text(submission.claimant_type) || 'Individual founder or author',
+    submitter_authority_role:
+      text(submission.submitter_authority_role) || 'Founder',
+  };
+}
+
 function buildSubmissionRow(form: JsonRecord, ownerUserId: string) {
   return {
     owner_user_id: ownerUserId,
@@ -376,7 +394,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       draft: {
-        submission,
+        submission: normalizeDraftForHydration(submission),
         publications: publicationsResult.data ?? [],
         repositories: repositoriesResult.data ?? [],
         zenodoRecords: zenodoResult.data ?? [],
