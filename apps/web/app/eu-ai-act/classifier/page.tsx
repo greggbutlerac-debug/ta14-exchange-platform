@@ -34,19 +34,35 @@ const questions:Question[]=[
 ];
 
 const guidedSteps:GuidedStep[]=[
-{id:'relationship',section:'START HERE',title:'What is your relationship to this AI?',description:'Pick the closest answer. We will use it to narrow which EU AI Act role may matter.',answers:[
-{label:'WE BUILT IT OR SELL IT AS OURS',value:'yes',apply:a=>({...a,developsSystem:'yes',usesSystem:'no'})},
+{id:'object',section:'START HERE',title:'What are we checking?',description:'Choose the closest fit. A general-purpose AI model has its own model-level pathway under the EU AI Act.',answers:[
+{label:'AN AI SYSTEM OR USE CASE',value:'yes',apply:a=>({...a,developsGpai:'no'})},
+{label:'A GENERAL-PURPOSE AI MODEL',value:'yes',apply:a=>({...a,developsGpai:'yes'})},
+{label:'NOT SURE',value:'unknown',apply:a=>a}]},
+{id:'relationship',section:'YOUR ROLE',title:'What is your relationship to it?',description:'Pick the closest answer. We will narrow the operator role from there instead of making you learn the legal definitions first.',answers:[
+{label:'WE BUILT IT OR OFFER IT AS OURS',value:'yes',apply:a=>({...a,developsSystem:'yes',usesSystem:'no'})},
 {label:'WE USE SOMEONE ELSE’S AI',value:'yes',apply:a=>({...a,usesSystem:'yes',developsSystem:'no'})},
 {label:'WE IMPORT OR RESELL IT',value:'yes',apply:a=>({...a,placesOnMarket:'yes',makesAvailable:'yes'})},
 {label:'NOT SURE',value:'unknown',apply:a=>a}]},
-{id:'euConnection',section:'EU CONNECTION',title:'Does this AI have a connection to the European Union?',description:'For example: it is offered or used in the EU, your organisation is in the EU, or its output is used there.',answers:[
-{label:'YES',value:'yes',apply:a=>a},{label:'NO',value:'no',apply:a=>a},{label:'NOT SURE',value:'unknown',apply:a=>a}]},
-{id:'people',section:'PEOPLE & CONTENT',title:'Does it talk to people, create content, recognise emotion, or use biometric categories?',description:'These uses can open transparency duties. Choose yes even if only one applies.',answers:[
-{label:'YES',value:'yes',apply:a=>({...a,directInteraction:'yes'})},{label:'NO',value:'no',apply:a=>({...a,directInteraction:'no',syntheticContent:'no',emotionOrBiometric:'no',deepfakeOrPublicInterest:'no'})},{label:'NOT SURE',value:'unknown',apply:a=>a}]},
-{id:'sensitive',section:'RISK',title:'Is it used for a sensitive or consequential decision?',description:'Think employment, education, essential services, critical infrastructure, biometrics, law enforcement, migration, justice, or regulated-product safety.',answers:[
-{label:'YES',value:'yes',apply:a=>({...a,annexContext:'yes'})},{label:'NO',value:'no',apply:a=>({...a,annexContext:'no',safetyComponent:'no'})},{label:'NOT SURE',value:'unknown',apply:a=>a}]},
-{id:'redFlag',section:'BOUNDARY CHECK',title:'Could the use involve manipulation, exploitation, social scoring, certain biometric uses, or another practice that may be prohibited?',description:'You do not need to know the legal category. If anything here sounds possible, choose yes or not sure and we will flag it for review.',answers:[
-{label:'YES — REVIEW IT',value:'yes',apply:a=>({...a,prohibitedIndicator:'yes'})},{label:'NO',value:'no',apply:a=>({...a,prohibitedIndicator:'no'})},{label:'NOT SURE',value:'unknown',apply:a=>a}]}
+{id:'euConnection',section:'EU CONNECTION',title:'Is there a European Union connection?',description:'Choose yes if it is placed on the EU market, used by an organisation in the EU, or its output is used in the EU. If you are unsure, leave the scope question open.',answers:[
+{label:'YES',value:'yes',apply:a=>({...a,outsideUnionProvider:a.outsideUnionProvider})},
+{label:'NO',value:'no',apply:a=>a},
+{label:'NOT SURE',value:'unknown',apply:a=>a}]},
+{id:'interaction',section:'TRANSPARENCY',title:'Does the AI interact directly with people?',description:'This can open an Article 50 transparency pathway. We keep exceptions and context for the detailed review.',answers:[
+{label:'YES',value:'yes',apply:a=>({...a,directInteraction:'yes'})},
+{label:'NO',value:'no',apply:a=>({...a,directInteraction:'no'})},
+{label:'NOT SURE',value:'unknown',apply:a=>a}]},
+{id:'content',section:'CONTENT & BIOMETRICS',title:'Does it create or alter content, recognise emotion, use biometric categories, or produce deepfakes?',description:'These uses can open additional transparency duties and, in some cases, other risk review.',answers:[
+{label:'YES',value:'yes',apply:a=>({...a,syntheticContent:'yes'})},
+{label:'NO',value:'no',apply:a=>({...a,syntheticContent:'no',emotionOrBiometric:'no',deepfakeOrPublicInterest:'no'})},
+{label:'NOT SURE',value:'unknown',apply:a=>a}]},
+{id:'sensitive',section:'HIGH-RISK SCREEN',title:'Is it used in a sensitive or consequential context?',description:'Think certain uses involving biometrics, critical infrastructure, education, employment, essential services, law enforcement, migration, justice, elections, or regulated-product safety.',answers:[
+{label:'YES — CHECK THE HIGH-RISK PATH',value:'yes',apply:a=>({...a,annexContext:'yes'})},
+{label:'NO',value:'no',apply:a=>({...a,annexContext:'no',safetyComponent:'no'})},
+{label:'NOT SURE',value:'unknown',apply:a=>a}]},
+{id:'redFlag',section:'PROHIBITED-PRACTICE SCREEN',title:'Could the use involve manipulation, exploitation, social scoring, or a restricted biometric practice?',description:'A yes does not mean the practice is prohibited. It means the Article 5 boundary should be resolved before reliance.',answers:[
+{label:'YES — REVIEW IT',value:'yes',apply:a=>({...a,prohibitedIndicator:'yes'})},
+{label:'NO',value:'no',apply:a=>({...a,prohibitedIndicator:'no'})},
+{label:'NOT SURE',value:'unknown',apply:a=>a}]}
 ];
 
 const defaults=Object.fromEntries(questions.map(q=>[q.id,'unknown'])) as Record<QuestionId,Answer>;
