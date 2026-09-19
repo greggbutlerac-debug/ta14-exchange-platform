@@ -51,14 +51,31 @@ export default function CommercialDoorEnhancer() {
       .fdp .door.commercialDoor{
         --accent:#ffd166;
         grid-column:1 / -1!important;
+        margin-top:72px;
         min-height:315px;
         padding:72px 44px 38px 230px;
         border-radius:28px;
         background:radial-gradient(circle at 10% 35%,rgba(255,209,102,.30),transparent 28%),linear-gradient(135deg,rgba(74,50,8,.92),rgba(4,15,24,.98) 62%);
         box-shadow:inset 0 0 85px rgba(255,209,102,.10),0 30px 80px rgba(0,0,0,.45),0 0 32px rgba(255,209,102,.12)
       }
-      .fdp .door.commercialDoor:before{left:102px;top:72px;width:126px;height:126px;transform:none}
-      .fdp .door.commercialDoor>span{left:165px;top:112px;transform:none;font-size:30px}
+      .fdp .door.commercialDoor:before{
+        content:'COMMERCIAL ENTRY';
+        position:absolute;
+        left:0;
+        top:-48px;
+        width:auto;
+        height:auto;
+        border:0;
+        border-radius:0;
+        background:none;
+        box-shadow:none;
+        font-size:10px;
+        font-weight:950;
+        letter-spacing:.22em;
+        color:rgba(255,230,170,.86)
+      }
+      .fdp .door.commercialDoor>span:before{content:'';position:absolute;left:50%;top:50%;width:126px;height:126px;transform:translate(-50%,-50%);border:1px solid rgba(255,209,102,.32);border-radius:50%;box-shadow:0 0 35px rgba(255,209,102,.12)}
+      .fdp .door.commercialDoor>span{left:165px;top:112px;transform:none;font-size:30px;z-index:2}
       .fdp .door.commercialDoor h3{font-size:clamp(34px,5vw,58px);min-height:0;margin-top:13px;letter-spacing:-.035em}
       .fdp .door.commercialDoor p{font-size:16px;line-height:1.65;max-width:760px;min-height:0}
       .fdp .door.commercialDoor strong{font-size:11px;margin-top:24px}
@@ -67,7 +84,7 @@ export default function CommercialDoorEnhancer() {
         .fdp .doorGrid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
         .fdp .doorGrid .door{grid-column:span 1!important}
         .fdp .door.commercialDoor{grid-column:1 / -1!important;padding:170px 28px 30px}
-        .fdp .door.commercialDoor:before{left:50%;top:28px;transform:translateX(-50%)}
+        .fdp .door.commercialDoor:before{left:0;top:-42px;transform:none}
         .fdp .door.commercialDoor>span{left:50%;top:70px;transform:translateX(-50%)}
       }
       @media(max-width:620px){
