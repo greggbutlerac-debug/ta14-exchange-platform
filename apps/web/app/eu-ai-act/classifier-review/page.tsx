@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import {Suspense,useEffect,useMemo,useState} from 'react';
 import {useSearchParams} from 'next/navigation';
-import GovernedSystemContextBar from '../components/GovernedSystemContextBar';
 import {getClassificationDetermination,saveClassificationDetermination,type ClassificationDetermination} from '@/lib/eu-ai-act/classification-determinations';
 import {listSystemPassports,type SystemPassport} from '@/lib/eu-ai-act/system-passports';
 
