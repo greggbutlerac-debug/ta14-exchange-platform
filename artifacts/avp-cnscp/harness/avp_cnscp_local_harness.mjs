@@ -43,24 +43,37 @@ function receiptFor(p, decision="ACCEPT_NARROWED"){
 }
 function evaluate(name, mutate){
  let p=basePassport(); let {receipt,proof}=receiptFor(p); let provider=projectPassport(p); let consumer={...receipt};
- ({p,provider,consumer,proof}=mutate?mutate({p,provider,consumer,proof})||{p,provider,consumer,proof}:{p,provider,consumer,proof});
+ let ctx={p,provider,consumer,proof,expected:"ACCEPT_NARROWED",vector:"AV-005",semantic_errors:[]};
+ ctx=mutate?mutate(ctx)||ctx:ctx;
+ ({p,provider,consumer,proof}=ctx);
  const errors=[]; const pm=required(provider,PROVIDER_REQUIRED), cm=required(consumer,CONSUMER_REQUIRED);
  if(pm.length) errors.push("MISSING_PROVIDER:"+pm.join(",")); if(cm.length) errors.push("MISSING_CONSUMER:"+cm.join(","));
  for(const k of structured) if(k in provider||k==="limitations") try{parseEnvelope(k==="limitations"?consumer[k]:provider[k])}catch{errors.push("BAD_ENVELOPE:"+k)}
  if(consumer.decision&&!DECISIONS.has(consumer.decision)) errors.push("BAD_DECISION");
  if(consumer.freshness_status&&!FRESHNESS.has(consumer.freshness_status)) errors.push("BAD_FRESHNESS");
  if(!verifyReceiptSignature(consumer)) errors.push("RECEIPT_INTEGRITY_MISMATCH");
- return {fixture_id:name,profile:PROFILE,cp_transport_result:errors.length?"FAIL":"PASS",avp_result:errors.length?"FAIL_CLOSED":consumer.decision,
- execution_authority:"NOT_ESTABLISHED_BY_CP",local_execution_observed:false,errors};
+ errors.push(...ctx.semantic_errors);
+ const result=errors.length?"FAIL_CLOSED":ctx.expected;
+ return {fixture_id:name,avp_vector:ctx.vector,profile:PROFILE,cp_transport_result:errors.some(e=>e.startsWith("MISSING_")||e.startsWith("BAD_ENVELOPE")||e==="RECEIPT_INTEGRITY_MISMATCH")?"FAIL":"PASS",avp_result:result,
+ expected_avp_result:ctx.expected,expectation_met:result===ctx.expected,execution_authority:"NOT_ESTABLISHED_BY_CP",local_execution_observed:false,errors};
 }
 const fixtures=[
  ["CP-FX-001",null],
- ["CP-FX-002",s=>{s.p.freshness.status="STALE";s.provider.freshness=env(s.p.freshness);s.consumer.freshness_status="STALE";s.consumer.decision="SUSPEND";return s}],
- ["CP-FX-006",s=>{s.consumer.decision="REJECT";return s}],
- ["CP-FX-008",s=>{delete s.provider.closure_responsibility;return s}],
- ["CP-FX-013",s=>{s.provider.freshness="avp-json-v1:%%%";return s}],
- ["CP-FX-014",s=>{s.consumer.decision="ACCEPT";return s}]
+ ["CP-FX-002",s=>{s.vector="AV-021";s.p.freshness.status="STALE";s.provider.freshness=env(s.p.freshness);s.consumer={...receiptFor(s.p,"SUSPEND").receipt};s.expected="SUSPEND";return s}],
+ ["CP-FX-003",s=>{s.vector="AV-007";s.consumer={...receiptFor(s.p,"HOLD").receipt};s.expected="HOLD";return s}],
+ ["CP-FX-004",s=>{s.vector="AV-004";s.semantic_errors.push("INHERITANCE_BROADENING");s.expected="INHERITANCE_FAILURE";return s}],
+ ["CP-FX-005",s=>{s.vector="AV-008";s.consumer={...receiptFor(s.p,"ESCALATE").receipt};s.expected="ESCALATE";return s}],
+ ["CP-FX-006",s=>{s.vector="AV-002";s.consumer={...receiptFor(s.p,"REJECT").receipt};s.expected="REJECT";return s}],
+ ["CP-FX-007",s=>{s.vector="AV-024";s.consumer={...receiptFor(s.p,"REJECT").receipt};s.expected="REJECT";return s}],
+ ["CP-FX-008",s=>{s.vector="AV-013";delete s.provider.closure_responsibility;s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-009",s=>{s.vector="AV-003";s.semantic_errors.push("UNKNOWN_MANDATORY_EXTENSION");s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-010",s=>{s.vector="AV-006";s.semantic_errors.push("REVOCATION_PRECEDENCE");s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-011",s=>{s.vector="AV-014";s.consumer={...receiptFor(s.p,"HOLD").receipt};s.expected="HOLD";return s}],
+ ["CP-FX-012",s=>{s.vector="AV-022";s.semantic_errors.push("IDENTITY_CLASS_CONFUSION");s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-013",s=>{s.vector="BINDING";s.provider.freshness="avp-json-v1:%%%";s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-014",s=>{s.vector="BINDING";s.consumer.decision="ACCEPT";s.expected="FAIL_CLOSED";return s}],
+ ["CP-FX-015",s=>{s.vector="RECOVERY";s.semantic_errors.push("CHANGED_CONDITION_REVALIDATION_REQUIRED");s.expected="FAIL_CLOSED";return s}]
 ];
 const results=fixtures.map(([id,m])=>evaluate(id,m));
-console.log(JSON.stringify({status:"LOCAL_EXERCISE_ONLY",profile:PROFILE,executed_at:new Date().toISOString(),results},null,2));
+console.log(JSON.stringify({status:"LOCAL_EXERCISE_ONLY",profile:PROFILE,executed_at:new Date().toISOString(),all_expectations_met:results.every(r=>r.expectation_met),results},null,2));
 if(results.some(r=>r.execution_authority!=="NOT_ESTABLISHED_BY_CP")) process.exit(2);
