@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 const architectures = [
   {
@@ -83,6 +84,21 @@ export default function Page(){return <main style={{minHeight:'100vh',background
       <p style={{fontSize:20,lineHeight:1.65,color:'#b4c5cf',maxWidth:900}}>TA-14 is the institutional authority umbrella. AEA governs the consequence-bearing execution route. HPS, AHIA and ACA are distinct governance jurisdictions that may intersect that route without inheriting authority from one another.</p>
       <div style={{marginTop:28,padding:'22px 24px',border:'1px solid rgba(119,234,255,.34)',borderRadius:16,background:'rgba(2,15,23,.86)',boxShadow:'0 0 35px rgba(0,218,255,.08)'}}><strong style={{display:'block',fontSize:'clamp(22px,4vw,36px)',lineHeight:1.15}}>NO COMPONENT MAY BORROW AUTHORITY FROM ANOTHER COMPONENT’S ADMISSIBILITY.</strong><p style={{margin:'10px 0 0',color:'#78f6bb'}}>Architectures may interoperate. Authority does not automatically transfer between them.</p></div>
     </header>
+
+    <GuidedShowroom
+      eyebrow="TA-14 ARCHITECTURE · GUIDED TOUR"
+      title="Four jurisdictions. One consequence-bearing route."
+      intro="This showroom becomes much easier once you stop treating every architecture as the same kind of gate. Each one answers a different question, and none may borrow authority from another."
+      accent="#77eaff"
+      gold="#f0c66f"
+      steps={[
+        {label:'01 · HPS',title:'Can this human perform?',plain:'HPS addresses readiness, capability, condition, guidance, and human performance context.',why:'Being capable does not itself create authority to intervene.'},
+        {label:'02 · AHIA',title:'May this human intervene?',plain:'AHIA governs whether human intervention may enter, alter, override, continue, or terminate a consequential route.',result:'HUMAN PRESENCE ≠ INTERVENTION AUTHORITY'},
+        {label:'03 · ACA',title:'May this computation occur?',plain:'ACA governs whether a bounded computational proposal has standing before compute, retrieval, model work, or downstream action is committed.',why:'A valid computation can still end in HOLD at the execution boundary.'},
+        {label:'04 · AEA',title:'May the consequence-bearing execution proceed?',plain:'AEA governs the larger route from admissible reality and evidence through authority, binding, commit, execution, outcome, memory, and future-chain inheritance.',result:'NO ADMISSIBLE EVIDENCE · NO ADMISSIBLE EXECUTION'},
+        {label:'05 · INTEROPERATE',title:'The architectures can work together without merging authority',plain:'A route may rely on multiple governance jurisdictions, but each keeps its own burden and decision boundary.',why:'Interoperability is not authority inheritance.'},
+      ]}
+    />
 
     <section style={{padding:'24px 0 60px'}}>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:16}}>{architectures.map(a=><article key={a.mark} style={{padding:24,border:`1px solid ${a.accent}55`,borderRadius:18,background:'linear-gradient(160deg,rgba(7,22,32,.95),rgba(2,9,14,.97))',boxShadow:`inset 0 0 40px ${a.accent}0d`}}>

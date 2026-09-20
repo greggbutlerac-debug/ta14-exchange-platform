@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import GuidedShowroom from '../components/GuidedShowroom';
 
 export const metadata = {
   title: 'Federation & Authority | TA-14 Exchange',
@@ -53,6 +54,21 @@ export default function FederationAuthorityPage(){
         <h1 style={{fontSize:'clamp(48px,8vw,92px)',lineHeight:.94,letterSpacing:'-.05em',margin:'18px 0'}}>AUTHORITY CAN TRAVEL.<br/><span style={{color:'#70e7e0'}}>EXECUTION AUTHORITY CANNOT.</span></h1>
         <p style={{fontSize:20,lineHeight:1.65,color:'#a9c3ca',maxWidth:820}}>TA-14 Federation & Authority exposes the governed seam between independent domains: what authority context may cross, what the receiving domain may accept, and what must still be re-established locally before protected consequence.</p>
       </section>
+      <GuidedShowroom
+        eyebrow="FEDERATION & AUTHORITY · GUIDED TOUR"
+        title="The crossing is not the permission."
+        intro="This surface explains the machinery beneath AFA: what an Authority Passport may carry, what a Connection Profile must declare, and what the receiving domain must still establish for itself."
+        accent="#70e7e0"
+        gold="#e4ca87"
+        steps={[
+          {label:'01 · PACKAGE',title:'Package bounded authority context',plain:'The Authority Passport carries identity, issuer, lineage, purpose, authority state, scope, freshness, revocation context, and integrity references.'},
+          {label:'02 · PROFILE',title:'Declare the interface',plain:'The Connection Profile says what the provider supplies, what the consumer expects, what is allowed to cross, and what is prohibited from crossing.',why:'Negative space is part of the protocol.'},
+          {label:'03 · RECEIVE',title:'Make a receiving-domain determination',plain:'The receiver verifies the presentation and records a bounded decision. It does not inherit execution permission from the sender.'},
+          {label:'04 · STOP',title:'Terminate federation before effect',plain:'Local lease, local capsule, commit, execution, and effect remain outside the federation crossing.',result:'ACCEPTANCE DOES NOT GRANT COMMIT OR EXECUTION AUTHORITY'},
+          {label:'05 · RE-ESTABLISH',title:'Local governance begins',plain:'Only after the crossing terminates may the receiving domain establish its own admissibility, authority, binding, and consequence route.'},
+        ]}
+      />
+
       <section style={{padding:'30px',border:'1px solid #1f4a51',borderRadius:22,background:'rgba(4,20,27,.78)'}}>
         <div style={{fontSize:10,fontWeight:900,letterSpacing:'.16em',color:'#70e7e0',marginBottom:18}}>CROSS-DOMAIN SEAM</div>
         <div style={{display:'flex',flexWrap:'wrap',gap:10,alignItems:'center'}}>{flow.map((x,i)=><span key={x} style={{padding:'14px 16px',border:'1px solid #2a646a',borderRadius:10,fontSize:11,fontWeight:900}}>{x}{i<flow.length-1?'  →':''}</span>)}</div>
