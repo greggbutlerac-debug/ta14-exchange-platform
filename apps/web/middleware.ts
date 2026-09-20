@@ -20,6 +20,7 @@ const PUBLIC_ROUTE_PREFIXES = [
   "/global-institutional-engagement",
   "/greenbuild",
   "/registry/records",
+  "/governance-showcase",
 ];
 
 export async function middleware(request: NextRequest) {
