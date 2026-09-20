@@ -12,11 +12,11 @@ function canonical(v:unknown):string{if(v===null||typeof v!=='object')return JSO
 function db(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw new Error('CHALLENGE_LEDGER_NOT_CONFIGURED');return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}})}
 function inputFor(action:Exclude<Action,'replay'>):Input{return action==='baseline'?{passportIntegrity:true,freshness:true,scope:true,localStanding:true,commitBinding:true,bypass:false}:action==='changed-condition'?{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:false}:{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:true}}
 
-async function execute(action:Exclude<Action,'replay'>,sequence?:{examinationId:string;previousReceiptId?:string|null}){
+async function execute(action:Exclude<Action,'replay'>,sequence?:{examinationId:string;previousReceiptId?:string|null;skipSequenceValidation?:boolean}){
  const input=inputFor(action),runId=randomUUID(),s=db();
  const examinationId=sequence?.examinationId??randomUUID();
  const expectedPrevious=PREVIOUS_ACTION[action];
- if(expectedPrevious){
+ if(expectedPrevious&&!sequence?.skipSequenceValidation){
   if(!sequence?.previousReceiptId)throw new Error('SEQUENCE_EVIDENCE_REQUIRED:'+expectedPrevious);
   const {data:previous,error:previousError}=await s.from('ta14_afa_eaba_challenge_receipts').select('receipt_id,action,evidence_json').eq('receipt_id',sequence.previousReceiptId).maybeSingle();
   if(previousError||!previous)throw new Error('SEQUENCE_RECEIPT_NOT_FOUND');
@@ -56,7 +56,8 @@ export async function POST(req:Request){
    const consequenceStillCorresponds=Boolean(effectRow)===Boolean(original.protectedConsequence?.fired);
    const replayAction=stored.action as Exclude<Action,'replay'>;
    if(!['baseline','changed-condition','bypass'].includes(replayAction))return NextResponse.json({error:'preserved action is not replayable'},{status:400});
-   const reexecution=await execute(replayAction,{examinationId:randomUUID()});
+   const replayExaminationId=randomUUID();
+   const reexecution=await execute(replayAction,{examinationId:replayExaminationId,skipSequenceValidation:true});
    const sameInput=canonical(reexecution.input)===canonical(original.input);
    const sameDetermination=reexecution.determination===original.determination;
    const sameGateState=reexecution.gateOpen===original.gateOpen;
