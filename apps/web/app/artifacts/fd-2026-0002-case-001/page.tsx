@@ -77,7 +77,7 @@ export default function HarmonicArtifactPage() {
           </div>
 
           <div className="hero-actions">
-            <Link className="button primary" href="/workspace/ai-governance/registry/profiles/harmonic-constitutional-runtime">Open Harmonic Governance Profile</Link>
+            <Link className="button primary" href="/workspace/ai-governance/registry/profiles/harmonic-constitutional-runtime">Open Harmonic Governance Profile</Link>\n            <Link className="button secondary" href="/governance-showcase/TA-14-AIGR-000008">Open Interactive Harmonic Showroom</Link>
             <Link className="button secondary" href="/workspace/ai-governance/reviews">Open Reviews & Responses</Link>
             <Link className="button secondary" href="/artifacts/fd-2026-0002-case-002">Continue to Case 002</Link>
             <Link className="button academy" href="/academy/case-studies/harmonic-fd-2026-0002-case-001">Open TA-14 Academy Lesson</Link>
