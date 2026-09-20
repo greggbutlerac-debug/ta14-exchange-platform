@@ -2,17 +2,18 @@ import {createHash,randomUUID} from 'crypto';
 import {createClient} from '@supabase/supabase-js';
 import {NextResponse} from 'next/server';
 
-const MECHANISM_SOURCE_BINDING={sourceCommit:'61cfa5483fe927e08a8dcdd4261b30f32b904603',sourcePath:'apps/web/app/api/afa-eaba-challenge/route.ts',freezeBasis:'GIT_COMMIT_AND_MECHANISM_SPEC'} as const;
+const MECHANISM_SOURCE_BINDING={sourceCommit:'61cfa5483fe927e08a8dcdd4261b30f32b904603',sourcePath:'apps/web/app/api/afa-eaba-challenge/route.ts',freezeBasis:'CANONICAL_MECHANISM_SPEC',deploymentCommit:process.env.VERCEL_GIT_COMMIT_SHA??'LOCAL_OR_UNKNOWN'} as const;
 const MECHANISM={id:'TA14-AFA-EABA-SX-001',version:'1.2.0',status:'FROZEN-CHALLENGE-SPEC',sourceBinding:MECHANISM_SOURCE_BINDING,acceptance:['freeze mechanism','run baseline','change one material condition','show verdict change','attempt bypass','show protected consequence did not fire','preserve receipt','replay']};
-type Action='baseline'|'changed-condition'|'bypass'|'replay';
-const PREVIOUS_ACTION:Record<Exclude<Action,'replay'>,Exclude<Action,'replay'>|null>={baseline:null,'changed-condition':'baseline',bypass:'changed-condition'};
+type Action='baseline'|'changed-condition'|'bypass'|'replay'|'finalize';
+type ExecutableAction='baseline'|'changed-condition'|'bypass';
+const PREVIOUS_ACTION:Record<ExecutableAction,ExecutableAction|null>={baseline:null,'changed-condition':'baseline',bypass:'changed-condition'};
 type Input={passportIntegrity:boolean;freshness:boolean;scope:boolean;localStanding:boolean;commitBinding:boolean;bypass:boolean};
 
 function canonical(v:unknown):string{if(v===null||typeof v!=='object')return JSON.stringify(v);if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';const o=v as Record<string,unknown>;return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canonical(o[k])).join(',')+'}'}
 function db(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw new Error('CHALLENGE_LEDGER_NOT_CONFIGURED');return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}})}
-function inputFor(action:Exclude<Action,'replay'>):Input{return action==='baseline'?{passportIntegrity:true,freshness:true,scope:true,localStanding:true,commitBinding:true,bypass:false}:action==='changed-condition'?{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:false}:{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:true}}
+function inputFor(action:ExecutableAction):Input{return action==='baseline'?{passportIntegrity:true,freshness:true,scope:true,localStanding:true,commitBinding:true,bypass:false}:action==='changed-condition'?{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:false}:{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:true}}
 
-async function execute(action:Exclude<Action,'replay'>,sequence?:{examinationId:string;previousReceiptId?:string|null;skipSequenceValidation?:boolean}){
+async function execute(action:ExecutableAction,sequence?:{examinationId:string;previousReceiptId?:string|null;skipSequenceValidation?:boolean}){
  const input=inputFor(action),runId=randomUUID(),s=db();
  const examinationId=sequence?.examinationId??randomUUID();
  const expectedPrevious=PREVIOUS_ACTION[action];
@@ -54,7 +55,7 @@ export async function POST(req:Request){
    const original=stored.evidence_json as any;
    const {data:effectRow}=await s.from('ta14_afa_eaba_challenge_effects').select('effect_id').eq('run_id',original.runId).maybeSingle();
    const consequenceStillCorresponds=Boolean(effectRow)===Boolean(original.protectedConsequence?.fired);
-   const replayAction=stored.action as Exclude<Action,'replay'>;
+   const replayAction=stored.action as ExecutableAction;
    if(!['baseline','changed-condition','bypass'].includes(replayAction))return NextResponse.json({error:'preserved action is not replayable'},{status:400});
    const replayExaminationId=randomUUID();
    const reexecution=await execute(replayAction,{examinationId:replayExaminationId,skipSequenceValidation:true});
@@ -65,11 +66,28 @@ export async function POST(req:Request){
    const operationalMatch=sameInput&&sameDetermination&&sameGateState&&sameConsequenceOutcome;
    return NextResponse.json({mechanism:MECHANISM,replay:{match:receiptIntact&&consequenceStillCorresponds&&operationalMatch,receiptIntact,consequenceStillCorresponds,operationalMatch,comparison:{sameInput,sameDetermination,sameGateState,sameConsequenceOutcome},source:'DURABLE_SERVER_LEDGER_PLUS_FRESH_REEXECUTION',receiptId,originalHash:stored.integrity_hash,persistedAt:stored.created_at,reexecution:{runId:reexecution.runId,receiptId:reexecution.receipt.receiptId,integrityHash:reexecution.receipt.integrityHash,determination:reexecution.determination,gateOpen:reexecution.gateOpen,protectedConsequence:reexecution.protectedConsequence}}});
   }
+  if(action==='finalize'){
+   const examinationId=body.examinationId as string|undefined;
+   const replayResult=body.replay;
+   if(!examinationId||!replayResult?.replay?.match)return NextResponse.json({error:'completed examination and matching replay required'},{status:400});
+   const s=db();
+   const {data:rows,error}=await s.from('ta14_afa_eaba_challenge_receipts').select('receipt_id,action,evidence_json,integrity_hash,created_at').in('action',['baseline','changed-condition','bypass']).order('created_at',{ascending:true});
+   if(error)return NextResponse.json({error:'examination receipts unavailable'},{status:500});
+   const chain=(rows??[]).filter((r:any)=>r.evidence_json?.examinationId===examinationId);
+   const baseline=chain.find((r:any)=>r.action==='baseline'),changed=chain.find((r:any)=>r.action==='changed-condition'),bypass=chain.find((r:any)=>r.action==='bypass');
+   if(!baseline||!changed||!bypass)return NextResponse.json({error:'complete durable examination chain not found'},{status:400});
+   if(changed.evidence_json?.sequence?.previousReceiptId!==baseline.receipt_id||bypass.evidence_json?.sequence?.previousReceiptId!==changed.receipt_id)return NextResponse.json({error:'durable examination chain is not contiguous'},{status:400});
+   const report={schema:'TA14_BOUNDED_EXAMINATION_REPORT_V2',finding:'SUPPORTED — BOUNDED EXAMINATION',examinationId,mechanism:MECHANISM,acceptanceSource:{type:'PUBLIC_LINKEDIN_COMMENT',url:'https://www.linkedin.com/posts/ta-14-authority-today-we-published-another-ugcPost-7507215874878054400-OJfm/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFovYx4B0iJkFAupdhBF61p2RryWF88x0q0'},controlledDelta:{field:'localStanding',baseline:true,changed:false},receipts:{baseline,changed,bypass},replay:replayResult.replay,claimBoundary:'Bounded to TA14-AFA-EABA-SX-001 and its durable database effect sink.'};
+   const integrityHash=createHash('sha256').update(canonical(report)).digest('hex');
+   const {data:stored,error:storeError}=await s.from('ta14_afa_eaba_challenge_reports').insert({examination_id:examinationId,mechanism_id:MECHANISM.id,mechanism_version:MECHANISM.version,report_json:report,integrity_hash:integrityHash}).select('report_id,created_at').single();
+   if(storeError){const {data:existing}=await s.from('ta14_afa_eaba_challenge_reports').select('report_id,created_at,report_json,integrity_hash').eq('examination_id',examinationId).maybeSingle();if(existing)return NextResponse.json({report:existing.report_json,preservation:{reportId:existing.report_id,persistedAt:existing.created_at,integrityHash:existing.integrity_hash,storageAuthority:'SUPABASE_APPEND_ONLY_REPORT_LEDGER'}});throw new Error('REPORT_PRESERVATION_FAILED:'+storeError.code);}
+   return NextResponse.json({report,preservation:{reportId:stored.report_id,persistedAt:stored.created_at,integrityHash,storageAuthority:'SUPABASE_APPEND_ONLY_REPORT_LEDGER'}});
+  }
   if(!['baseline','changed-condition','bypass'].includes(action))return NextResponse.json({error:'invalid action'},{status:400});
   const sequence=body.sequence as {examinationId?:string;previousReceiptId?:string|null}|undefined;
   if(action!=='baseline'&&!sequence?.examinationId)return NextResponse.json({error:'examination sequence required'},{status:400});
   const examinationId=action==='baseline'?(sequence?.examinationId??randomUUID()):sequence!.examinationId!;
-  return NextResponse.json({action,record:await execute(action as Exclude<Action,'replay'>,{examinationId,previousReceiptId:sequence?.previousReceiptId??null})});
+  return NextResponse.json({action,record:await execute(action as ExecutableAction,{examinationId,previousReceiptId:sequence?.previousReceiptId??null})});
  }catch(e){return NextResponse.json({error:e instanceof Error?e.message:'challenge execution failed'},{status:500})}
 }
 export async function GET(){return NextResponse.json({mechanism:MECHANISM,evidenceBoundary:'DURABLE_SERVER_LEDGER_AND_DATABASE_EFFECT_SINK'});}
