@@ -2,7 +2,8 @@ import {createHash,randomUUID} from 'crypto';
 import {createClient} from '@supabase/supabase-js';
 import {NextResponse} from 'next/server';
 
-const MECHANISM={id:'TA14-AFA-EABA-SX-001',version:'1.1.0',status:'FROZEN-CHALLENGE-SPEC',acceptance:['freeze mechanism','run baseline','change one material condition','show verdict change','attempt bypass','show protected consequence did not fire','preserve receipt','replay']};
+const MECHANISM_SOURCE_BINDING={sourceCommit:'61cfa5483fe927e08a8dcdd4261b30f32b904603',sourcePath:'apps/web/app/api/afa-eaba-challenge/route.ts',freezeBasis:'GIT_COMMIT_AND_MECHANISM_SPEC'} as const;
+const MECHANISM={id:'TA14-AFA-EABA-SX-001',version:'1.2.0',status:'FROZEN-CHALLENGE-SPEC',sourceBinding:MECHANISM_SOURCE_BINDING,acceptance:['freeze mechanism','run baseline','change one material condition','show verdict change','attempt bypass','show protected consequence did not fire','preserve receipt','replay']};
 type Action='baseline'|'changed-condition'|'bypass'|'replay';
 type Input={passportIntegrity:boolean;freshness:boolean;scope:boolean;localStanding:boolean;commitBinding:boolean;bypass:boolean};
 
@@ -20,7 +21,8 @@ async function execute(action:Exclude<Action,'replay'>){
  if(effectReadError)throw new Error('PROTECTED_EFFECT_OBSERVATION_FAILED:'+effectReadError.code);
  const protectedConsequence={attempted:true,authorized:Boolean(effect?.authorized),fired:Boolean(effectRow),effectId:effectRow?.effect_id??null,databaseResult:effectRow?'DURABLE_EFFECT_ROW_OBSERVED':'NO_EFFECT_ROW_OBSERVED',observation:'SEPARATE_POST_GATE_DATABASE_READ'};
  const trace=['AUTHORITY_CONTEXT_PRESENTED','AFA_BOUNDARY_VERIFIED',input.localStanding?'LOCAL_STANDING_ESTABLISHED':'LOCAL_STANDING_NOT_ESTABLISHED','EABA_DETERMINATION_'+determination,input.bypass?'BYPASS_INVOCATION_ATTEMPTED':'NORMAL_ROUTE','DATABASE_EFFECT_'+(effectRow?'OBSERVED':'ABSENT')];
- const evidence={runId,mechanism:MECHANISM,input,determination,gateOpen,protectedConsequence,trace};
+ const mechanismBindingHash=createHash('sha256').update(canonical({id:MECHANISM.id,version:MECHANISM.version,status:MECHANISM.status,sourceBinding:MECHANISM.sourceBinding,acceptance:MECHANISM.acceptance})).digest('hex');
+ const evidence={runId,mechanism:MECHANISM,mechanismBinding:{...MECHANISM_SOURCE_BINDING,hashAlgorithm:'SHA-256',bindingHash:mechanismBindingHash},input,determination,gateOpen,protectedConsequence,trace};
  const integrityHash=createHash('sha256').update(canonical(evidence)).digest('hex');
  const {data:stored,error:storeError}=await s.from('ta14_afa_eaba_challenge_receipts').insert({run_id:runId,mechanism_id:MECHANISM.id,mechanism_version:MECHANISM.version,action,evidence_json:evidence,integrity_hash:integrityHash}).select('receipt_id,created_at').single();
  if(storeError||!stored)throw new Error('RECEIPT_PRESERVATION_FAILED:'+(storeError?.code??'UNKNOWN'));
