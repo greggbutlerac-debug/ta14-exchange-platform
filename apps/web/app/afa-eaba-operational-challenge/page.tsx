@@ -11,7 +11,7 @@ const requirements=[
  ['05','Attempt bypass.','ATTEMPT BYPASS invokes a separate server-side bypass action against the same frozen mechanism.'],
  ['06','Show the protected consequence did not fire.','The bypass run makes the same server-side protected-effect request. A database-enforced gate evaluates the frozen predicates. When local standing is absent or bypass=true, no protected-effect row can be created. The API then performs a separate database read for the run ID and records NO_EFFECT_ROW_OBSERVED.'],
  ['07','Preserve the receipt.','Each execution is written to the server-side challenge receipt ledger as TA14_EXECUTION_RECEIPT_V2. The returned receipt carries its durable receipt ID, persistence timestamp, and SHA-256 hash over the complete recursively canonicalized evidence object. The JSON can also be downloaded.'],
- ['08','Replay it.','REPLAY retrieves the preserved receipt from the server ledger by receipt ID, recomputes its evidence hash, and independently queries the protected-effect table for the original run ID. Receipt integrity and effect/non-effect correspondence must both hold.'],
+ ['08','Replay it.','REPLAY retrieves the preserved receipt from the server ledger by receipt ID, recomputes its evidence hash, and separately queries the protected-effect table for the original run ID. Receipt integrity and effect/non-effect correspondence must both hold.'],
 ] as const;
 export default function ChallengeExam(){
  const [runs,setRuns]=useState<Run[]>([]);
