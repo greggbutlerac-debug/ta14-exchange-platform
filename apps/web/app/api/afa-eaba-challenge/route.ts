@@ -5,14 +5,25 @@ import {NextResponse} from 'next/server';
 const MECHANISM_SOURCE_BINDING={sourceCommit:'61cfa5483fe927e08a8dcdd4261b30f32b904603',sourcePath:'apps/web/app/api/afa-eaba-challenge/route.ts',freezeBasis:'GIT_COMMIT_AND_MECHANISM_SPEC'} as const;
 const MECHANISM={id:'TA14-AFA-EABA-SX-001',version:'1.2.0',status:'FROZEN-CHALLENGE-SPEC',sourceBinding:MECHANISM_SOURCE_BINDING,acceptance:['freeze mechanism','run baseline','change one material condition','show verdict change','attempt bypass','show protected consequence did not fire','preserve receipt','replay']};
 type Action='baseline'|'changed-condition'|'bypass'|'replay';
+const PREVIOUS_ACTION:Record<Exclude<Action,'replay'>,Exclude<Action,'replay'>|null>={baseline:null,'changed-condition':'baseline',bypass:'changed-condition'};
 type Input={passportIntegrity:boolean;freshness:boolean;scope:boolean;localStanding:boolean;commitBinding:boolean;bypass:boolean};
 
 function canonical(v:unknown):string{if(v===null||typeof v!=='object')return JSON.stringify(v);if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';const o=v as Record<string,unknown>;return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canonical(o[k])).join(',')+'}'}
 function db(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw new Error('CHALLENGE_LEDGER_NOT_CONFIGURED');return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}})}
 function inputFor(action:Exclude<Action,'replay'>):Input{return action==='baseline'?{passportIntegrity:true,freshness:true,scope:true,localStanding:true,commitBinding:true,bypass:false}:action==='changed-condition'?{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:false}:{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:true}}
 
-async function execute(action:Exclude<Action,'replay'>){
+async function execute(action:Exclude<Action,'replay'>,sequence?:{examinationId:string;previousReceiptId?:string|null;skipSequenceValidation?:boolean}){
  const input=inputFor(action),runId=randomUUID(),s=db();
+ const examinationId=sequence?.examinationId??randomUUID();
+ const expectedPrevious=PREVIOUS_ACTION[action];
+ if(expectedPrevious&&!sequence?.skipSequenceValidation){
+  if(!sequence?.previousReceiptId)throw new Error('SEQUENCE_EVIDENCE_REQUIRED:'+expectedPrevious);
+  const {data:previous,error:previousError}=await s.from('ta14_afa_eaba_challenge_receipts').select('receipt_id,action,evidence_json').eq('receipt_id',sequence.previousReceiptId).maybeSingle();
+  if(previousError||!previous)throw new Error('SEQUENCE_RECEIPT_NOT_FOUND');
+  if(previous.action!==expectedPrevious)throw new Error('SEQUENCE_VIOLATION:EXPECTED_'+expectedPrevious.toUpperCase().replace('-','_'));
+  const previousEvidence=previous.evidence_json as any;
+  if(previousEvidence?.examinationId!==examinationId)throw new Error('SEQUENCE_EXAMINATION_MISMATCH');
+ }
  const all=input.passportIntegrity&&input.freshness&&input.scope&&input.localStanding&&input.commitBinding;
  const determination=all?'ALLOW':'HOLD',gateOpen=determination==='ALLOW'&&!input.bypass;
  const {data:effect,error:rpcError}=await s.rpc('ta14_afa_eaba_apply_effect',{p_run_id:runId,p_mechanism_id:MECHANISM.id,p_mechanism_version:MECHANISM.version,p_action:action,p_passport_integrity:input.passportIntegrity,p_freshness:input.freshness,p_scope:input.scope,p_local_standing:input.localStanding,p_commit_binding:input.commitBinding,p_bypass:input.bypass});
@@ -22,7 +33,7 @@ async function execute(action:Exclude<Action,'replay'>){
  const protectedConsequence={attempted:true,authorized:Boolean(effect?.authorized),fired:Boolean(effectRow),effectId:effectRow?.effect_id??null,databaseResult:effectRow?'DURABLE_EFFECT_ROW_OBSERVED':'NO_EFFECT_ROW_OBSERVED',observation:'SEPARATE_POST_GATE_DATABASE_READ'};
  const trace=['AUTHORITY_CONTEXT_PRESENTED','AFA_BOUNDARY_VERIFIED',input.localStanding?'LOCAL_STANDING_ESTABLISHED':'LOCAL_STANDING_NOT_ESTABLISHED','EABA_DETERMINATION_'+determination,input.bypass?'BYPASS_INVOCATION_ATTEMPTED':'NORMAL_ROUTE','DATABASE_EFFECT_'+(effectRow?'OBSERVED':'ABSENT')];
  const mechanismBindingHash=createHash('sha256').update(canonical({id:MECHANISM.id,version:MECHANISM.version,status:MECHANISM.status,sourceBinding:MECHANISM.sourceBinding,acceptance:MECHANISM.acceptance})).digest('hex');
- const evidence={runId,mechanism:MECHANISM,mechanismBinding:{...MECHANISM_SOURCE_BINDING,hashAlgorithm:'SHA-256',bindingHash:mechanismBindingHash},input,determination,gateOpen,protectedConsequence,trace};
+ const evidence={runId,examinationId,sequence:{action,previousReceiptId:sequence?.previousReceiptId??null},mechanism:MECHANISM,mechanismBinding:{...MECHANISM_SOURCE_BINDING,hashAlgorithm:'SHA-256',bindingHash:mechanismBindingHash},input,determination,gateOpen,protectedConsequence,trace};
  const integrityHash=createHash('sha256').update(canonical(evidence)).digest('hex');
  const {data:stored,error:storeError}=await s.from('ta14_afa_eaba_challenge_receipts').insert({run_id:runId,mechanism_id:MECHANISM.id,mechanism_version:MECHANISM.version,action,evidence_json:evidence,integrity_hash:integrityHash}).select('receipt_id,created_at').single();
  if(storeError||!stored)throw new Error('RECEIPT_PRESERVATION_FAILED:'+(storeError?.code??'UNKNOWN'));
@@ -45,7 +56,8 @@ export async function POST(req:Request){
    const consequenceStillCorresponds=Boolean(effectRow)===Boolean(original.protectedConsequence?.fired);
    const replayAction=stored.action as Exclude<Action,'replay'>;
    if(!['baseline','changed-condition','bypass'].includes(replayAction))return NextResponse.json({error:'preserved action is not replayable'},{status:400});
-   const reexecution=await execute(replayAction);
+   const replayExaminationId=randomUUID();
+   const reexecution=await execute(replayAction,{examinationId:replayExaminationId,skipSequenceValidation:true});
    const sameInput=canonical(reexecution.input)===canonical(original.input);
    const sameDetermination=reexecution.determination===original.determination;
    const sameGateState=reexecution.gateOpen===original.gateOpen;
@@ -54,7 +66,10 @@ export async function POST(req:Request){
    return NextResponse.json({mechanism:MECHANISM,replay:{match:receiptIntact&&consequenceStillCorresponds&&operationalMatch,receiptIntact,consequenceStillCorresponds,operationalMatch,comparison:{sameInput,sameDetermination,sameGateState,sameConsequenceOutcome},source:'DURABLE_SERVER_LEDGER_PLUS_FRESH_REEXECUTION',receiptId,originalHash:stored.integrity_hash,persistedAt:stored.created_at,reexecution:{runId:reexecution.runId,receiptId:reexecution.receipt.receiptId,integrityHash:reexecution.receipt.integrityHash,determination:reexecution.determination,gateOpen:reexecution.gateOpen,protectedConsequence:reexecution.protectedConsequence}}});
   }
   if(!['baseline','changed-condition','bypass'].includes(action))return NextResponse.json({error:'invalid action'},{status:400});
-  return NextResponse.json({action,record:await execute(action as Exclude<Action,'replay'>)});
+  const sequence=body.sequence as {examinationId?:string;previousReceiptId?:string|null}|undefined;
+  if(action!=='baseline'&&!sequence?.examinationId)return NextResponse.json({error:'examination sequence required'},{status:400});
+  const examinationId=action==='baseline'?(sequence?.examinationId??randomUUID()):sequence!.examinationId!;
+  return NextResponse.json({action,record:await execute(action as Exclude<Action,'replay'>,{examinationId,previousReceiptId:sequence?.previousReceiptId??null})});
  }catch(e){return NextResponse.json({error:e instanceof Error?e.message:'challenge execution failed'},{status:500})}
 }
 export async function GET(){return NextResponse.json({mechanism:MECHANISM,evidenceBoundary:'DURABLE_SERVER_LEDGER_AND_DATABASE_EFFECT_SINK'});}
