@@ -1,6 +1,7 @@
 import type {Metadata} from 'next';
 import Link from 'next/link';
 import CommissioningContinuityLab from './CommissioningContinuityLab';
+import CommissioningTimeline from './CommissioningTimeline';
 
 export const metadata:Metadata={
   title:'Continuous Commissioning Showroom | TA-14 Exchange',
@@ -22,7 +23,7 @@ export default function ContinuousCommissioningShowroom(){
         <p>This showroom examines the evidence boundary between a correctly commissioned condition and a later operational consequence. It does not replace commissioning. It asks what must still be true after handoff before yesterday's verified condition can support today's action.</p>
       </section>
       <div className="sixty">
-        <article><small>UNDERSTAND THIS ROOM IN 60 SECONDS</small><h2>Commissioning proves a condition. Operations changes it.</h2><p>A building can be correctly commissioned on Monday and face a different reality later. Sensors drift. Sequences change. equipment is replaced. Operators intervene. Utilities degrade. A correction may clear an alarm without proving the condition stayed corrected.</p></article>
+        <article><small>UNDERSTAND THIS ROOM IN 60 SECONDS</small><h2>Commissioning proves a condition. Operations changes it.</h2><p>A building can be correctly commissioned on Monday and face a different reality later. Sensors drift. Sequences change. Equipment is replaced. Operators intervene. Utilities degrade. A correction may clear an alarm without proving the condition stayed corrected.</p></article>
         <article className="why"><small>WHY THIS ROOM EXISTS</small><h2>The gap appears when yesterday's proof is used for today's consequence.</h2><p>Continuous commissioning helps detect and investigate change. TA-14 asks the adjoining governance question immediately before consequence: does the evidence still describe reality, does authority still stand, is the exact action bound, and may execution proceed now?</p></article>
       </div>
       <div className="principle">COMMISSIONED ONCE ≠ AUTHORIZED FOREVER · PRESENT CONSEQUENCE REQUIRES PRESENT STANDING.</div>
@@ -31,9 +32,7 @@ export default function ContinuousCommissioningShowroom(){
       <section className="section">
         <div className="eyebrow">THE WHOLE ROOM · ONE LINE</div>
         <h2>Verify it. Watch it. Detect change. Re-establish standing. Act. Prove the outcome.</h2>
-        <div className="timeline">
-          {['COMMISSIONED BASELINE','HANDOFF','OPERATIONS','DRIFT DETECTED','INVESTIGATE','CORRECT','VERIFY CORRECTION','REVALIDATE + COMMIT','OUTCOME'].map(x=><div key={x}>{x}</div>)}
-        </div>
+        <CommissioningTimeline/>
       </section>
 
       <CommissioningContinuityLab/>
