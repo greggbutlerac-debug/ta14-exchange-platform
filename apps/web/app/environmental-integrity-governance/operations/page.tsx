@@ -322,7 +322,7 @@ export default function EnvironmentalIntegrityOperationsPage() {
       </div>
 
       <section className="institutionBar shell">
-        <Link href="/" className="institutionIdentity">
+        <Link href="/environmental-integrity-governance" className="institutionIdentity">
           <span className="institutionSeal">TA</span>
           <span>
             <strong>TA-14 Authority Governance Institution</strong>
@@ -330,7 +330,7 @@ export default function EnvironmentalIntegrityOperationsPage() {
           </span>
         </Link>
         <nav aria-label="Environmental integrity navigation">
-          <Link href="/">Institution Home</Link>
+          <Link href="/environmental-integrity-governance">Environmental Integrity World</Link>
           <Link href="/academy">TA-14 Academy</Link>
           <Link href="/environmental-records">Environmental Records</Link>
           <Link className="navPrimary" href="/workspace/environmental-records">Enter Workspace</Link>
