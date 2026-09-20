@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";\nimport RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
+import Link from "next/link";
+import RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
 import GuidedShowroom from '../../components/GuidedShowroom';
 
 const supported = [
