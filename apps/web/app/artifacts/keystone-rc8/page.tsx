@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GuidedShowroom from '../../components/GuidedShowroom';
+import KeystoneInteractive from './KeystoneInteractive';
 
 export const metadata = {
   title: 'Keystone RC8 | TA-14 Governed Showcase',
@@ -41,6 +42,8 @@ export default function KeystoneShowcase(){
         <p style={{color:'#a8bbc8',fontSize:17,lineHeight:1.8,maxWidth:900}}>Keystone v1.0.0-rc8 is preserved here as a frozen historical baseline. It governs the execution boundary through identity, authority, permission, payload-bound authorization, fail-closed behavior, execution-time revalidation, and provenance. The point of this showcase is not to make Keystone bigger than its evidence. It is to make the evidence boundary visible.</p>
         <div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:26}}>{['FROZEN RC8','256 / 256 REPORTED SYSTEM TESTS','PUBLIC EVIDENCE','ADVERSE FINDING PRESERVED'].map(x=><b key={x} style={{padding:'8px 11px',borderRadius:999,border:'1px solid rgba(127,240,189,.24)',color:'#7ff0bd',fontSize:10,letterSpacing:'.08em'}}>{x}</b>)}</div>
       </section>
+
+      <KeystoneInteractive />
 
       <GuidedShowroom eyebrow="KEYSTONE RC8 · GUIDED BASELINE" title="Capability does not equal financial execution authority." intro="Walk the frozen RC8 record from identity and permission through execution-time revalidation, while keeping the preserved adverse condition attached to the version." accent="#71e7ff" gold="#f2cc68" steps={[
        {label:'01 · IDENTITY',title:'Know the actor and frozen object',plain:'Keystone v1.0.0-rc8 is preserved as the dated registered baseline TA-14-AIGR-000026.'},
