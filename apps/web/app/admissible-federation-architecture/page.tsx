@@ -39,6 +39,13 @@ export default function AFAShowroom(){
     <Link href="/" style={{color:'#fff',textDecoration:'none',fontWeight:950,letterSpacing:'.13em'}}>TA-14 EXCHANGE</Link>
     <span style={{fontSize:10,color:'#71e7df',fontWeight:900,letterSpacing:'.14em'}}>AFA v1.0-RC1 · REGISTERED · TA-14-AIGR-000042</span>
    </nav>
+ <div style={{display:'flex',flexWrap:'wrap',gap:8,margin:'18px 0 28px',padding:'12px',border:'1px solid #24464d',borderRadius:12,background:'rgba(3,15,21,.82)'}}>
+<Link href="/federation-authority" style={{padding:'10px 12px',border:'1px solid #31545b',borderRadius:8,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>FAMILY HOME</Link>
+<Link href="/admissible-federation-architecture" style={{padding:'10px 12px',border:'1px solid #31545b',borderRadius:8,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>EXPLORE AFA</Link>
+<Link href="/execution-authority-boundary-architecture" style={{padding:'10px 12px',border:'1px solid #31545b',borderRadius:8,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>EXPLORE EABA</Link>
+<Link href="/authority-journey" style={{padding:'10px 12px',borderRadius:8,background:'#71e7df',color:'#031216',textDecoration:'none',fontSize:10,fontWeight:950}}>RUN AUTHORITY JOURNEY</Link>
+<Link href="/afa-eaba-operational-challenge" style={{padding:'10px 12px',border:'1px solid #e7c76e',borderRadius:8,color:'#e7c76e',textDecoration:'none',fontSize:10,fontWeight:900}}>INSPECT FROZEN CHALLENGE</Link>
+</div>
 
    <section style={{padding:'82px 0 54px',maxWidth:1050}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.2em',color:'#71e7df'}}>ADMISSIBLE FEDERATION ARCHITECTURE</div>
