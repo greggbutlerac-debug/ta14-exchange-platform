@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ERARecordedExamination from './ERARecordedExamination';
 
 export const metadata = {
   title: 'Elias Reference Agent | TA-14 Governed Showcase',
@@ -55,6 +56,8 @@ export default function EliasReferenceAgentShowcase(){
       </section>
 
       <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(205px,1fr))',gap:12,margin:'24px 0'}}>{[['Architecture','Agentic execution governance'],['Version','1.0'],['Claimant','Gary Williams'],['Organization','Elias Systems Ltd'],['Registry','TA-14-AIGR-000041'],['Effective','September 14, 2026']].map(([k,v])=><div key={k} style={{padding:19,border:'1px solid rgba(158,140,255,.15)',borderRadius:15,background:'rgba(9,16,31,.82)'}}><small style={{color:'#7886a4',textTransform:'uppercase',letterSpacing:1.25}}>{k}</small><div style={{marginTop:7,fontWeight:900}}>{v}</div></div>)}</section>
+
+      <ERARecordedExamination />
 
       <section style={{marginTop:34,padding:'30px clamp(22px,4vw,40px)',border:'1px solid rgba(114,240,201,.22)',borderRadius:22,background:'linear-gradient(135deg,rgba(18,67,58,.23),rgba(8,15,29,.84))'}}>
         <div style={{color:'#72f0c9',fontWeight:950,fontSize:11,letterSpacing:'.15em'}}>THE EXECUTION SEAM</div>
