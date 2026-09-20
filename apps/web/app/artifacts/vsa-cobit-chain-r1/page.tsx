@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 const supported = [
   "The participant evidence reports successful authenticated execution of subscription_list, group_list, and group_resource_list.",
@@ -30,6 +31,14 @@ export default function VsaCobitChainR1Showcase(){return <main className="page-s
   <header className="topbar"><Link href="/artifacts/founding-demonstrations" className="brand"><span className="mark">TA</span><span><strong>TA-14</strong><small>Governed Demonstration</small></span></Link><nav><Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000025">VSA Registry Record</Link><Link href="/artifacts/founding-demonstrations">Founding Demonstrations</Link><Link href="/artifacts/registry">Artifact Registry</Link></nav></header>
 
   <section className="hero"><div className="badges"><span>CLOSED GOVERNED DEMONSTRATION</span><span>PARTICIPANT FACTUAL REVIEW COMPLETED</span><span>FINAL INSTITUTIONAL SEAL</span></div><p className="eyebrow">VALIDATION STANDING ASSURANCE v1.0 · TA-14-AIGR-000025</p><h1>A PASS can survive beside an unresolved condition.</h1><p className="lede">VSA / COBIT-Chain Azure MCP Gateway R1 entered a bounded documentary review around one question: can three frozen read-only calls execute while every non-frozen route advertised by the authenticated live upstream catalog is refused before upstream execution?</p><div className="finding"><span>FINAL TA-14 GOVERNED FINDING</span><strong>SUPPORTED - BOUNDED PASS</strong><p>The bounded containment proposition is supported by the admitted participant evidence. Catalog correspondence remains not established and is permanently preserved with the PASS.</p></div><div className="actions"><Link className="button primary" href="/artifacts/governed/ta14-vsa-greg-r1-002-gfr">Open Governed Finding Record</Link><Link className="button secondary" href="/artifacts/vsa-environmental-standing-r2a">Open VSA Case 02</Link></div></section>
+
+  <GuidedShowroom eyebrow="VSA × TA-14 · GUIDED FINDING" title="A PASS can coexist with an unresolved condition." intro="This case is useful because governance does not force a clean story. The bounded containment proposition passed while catalog correspondence remained not established." accent="#78dfff" gold="#f4ba54" steps={[
+    {label:'01 · FREEZE',title:'Freeze the containment proposition',plain:'Three identified read-only Azure MCP calls are tested against one restraint question: are non-frozen advertised routes refused before upstream execution?'},
+    {label:'02 · TEST',title:'Observe execution and refusal',plain:'The admitted participant evidence supports the bounded execution-containment and restraint proposition.'},
+    {label:'03 · PASS',title:'Record what succeeded',plain:'TA-14 records SUPPORTED — BOUNDED PASS for the proposition actually examined.',result:'SUPPORTED · BOUNDED PASS'},
+    {label:'04 · PRESERVE',title:'Keep the unresolved condition beside the PASS',plain:'The authenticated tools/list catalog did not advertise the three callable frozen aliases, so complete catalog correspondence is not established.',result:'catalog_correspondence_established: FALSE'},
+    {label:'05 · SEAL',title:'Close without erasing either state',plain:'The PASS and the unresolved condition travel together in the final sealed record. Neither is allowed to overwrite the other.'},
+  ]}/>
 
   <section className="meta"><div><span>PARTICIPANT CHALLENGE</span><strong>TA14-VSA-GREG-R1-002</strong></div><div><span>GATEWAY MODE</span><strong>r1-read-only</strong></div><div><span>TA-14 FINDING RECORD ID</span><strong>TA14-VSA-GREG-R1-002-GFR</strong></div><div><span>PUBLICATION STATE</span><strong>CLOSED - FINAL SEALED</strong></div></section>
 

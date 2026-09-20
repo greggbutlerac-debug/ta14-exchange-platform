@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 const lineage = [
   "Harmonic Version 1.0",
@@ -103,6 +104,14 @@ export default function HarmonicArtifactPage() {
           </dl>
         </aside>
       </section>
+
+      <GuidedShowroom eyebrow="HARMONIC CASE 001 · GUIDED EVIDENCE BOUNDARY" title="The runtime refused. What did the evidence actually prove?" intro="This walkthrough separates demonstrated runtime behavior from the surrounding institutional chronology that the admitted evidence did not independently establish." accent="#78dfff" gold="#f4ba54" steps={[
+        {label:'01 · FREEZE',title:'Freeze Harmonic Version 1.0',plain:'The evaluated implementation is preserved before the bounded demonstration rather than changed in response to review.'},
+        {label:'02 · RUN',title:'Observe the runtime determination',plain:'The admitted execution packet produces a refusal / block determination under the constitutional state represented inside that packet.',result:'RUNTIME DETERMINATION · REFUSAL / BLOCK'},
+        {label:'03 · SUPPORT',title:'Preserve what was demonstrated',plain:'The evidence supports that the frozen runtime reconstructed the represented constitutional state and produced its own determination.'},
+        {label:'04 · LIMIT',title:'Preserve what was not independently demonstrated',plain:'The complete pre-change authority state, independently attributable revocation event, independent post-change state, and external no-execution outcome record were not all established.'},
+        {label:'05 · FIND',title:'Issue the evidence-bounded finding',plain:'The result remains PARTIALLY DEMONSTRATED — EVIDENCE-BOUNDED. Runtime behavior and evidentiary limits remain visible together.',result:'PARTIALLY DEMONSTRATED · EVIDENCE-BOUNDED'},
+      ]}/>
 
       <section className="principle-strip">
         <div><span>01</span><strong>Preserve what was demonstrated.</strong></div>

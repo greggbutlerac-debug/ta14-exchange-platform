@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 export const metadata = {
   title: 'Keystone RC8 | TA-14 Governed Showcase',
@@ -40,6 +41,14 @@ export default function KeystoneShowcase(){
         <p style={{color:'#a8bbc8',fontSize:17,lineHeight:1.8,maxWidth:900}}>Keystone v1.0.0-rc8 is preserved here as a frozen historical baseline. It governs the execution boundary through identity, authority, permission, payload-bound authorization, fail-closed behavior, execution-time revalidation, and provenance. The point of this showcase is not to make Keystone bigger than its evidence. It is to make the evidence boundary visible.</p>
         <div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:26}}>{['FROZEN RC8','256 / 256 REPORTED SYSTEM TESTS','PUBLIC EVIDENCE','ADVERSE FINDING PRESERVED'].map(x=><b key={x} style={{padding:'8px 11px',borderRadius:999,border:'1px solid rgba(127,240,189,.24)',color:'#7ff0bd',fontSize:10,letterSpacing:'.08em'}}>{x}</b>)}</div>
       </section>
+
+      <GuidedShowroom eyebrow="KEYSTONE RC8 · GUIDED BASELINE" title="Capability does not equal financial execution authority." intro="Walk the frozen RC8 record from identity and permission through execution-time revalidation, while keeping the preserved adverse condition attached to the version." accent="#71e7ff" gold="#f2cc68" steps={[
+       {label:'01 · IDENTITY',title:'Know the actor and frozen object',plain:'Keystone v1.0.0-rc8 is preserved as the dated registered baseline TA-14-AIGR-000026.'},
+       {label:'02 · AUTHORITY',title:'Separate identity from authority',plain:'Identity credentials, technical capability, or model output do not independently create permission for a consequence-bearing financial action.'},
+       {label:'03 · BIND',title:'Bind permission to the exact payload',plain:'The claimed execution permission is action-specific rather than a reusable blanket entitlement.'},
+       {label:'04 · REVALIDATE',title:'Check relevant conditions at execution',plain:'The architecture claims fail-closed behavior and execution-time revalidation before financial consequence.'},
+       {label:'05 · PRESERVE',title:'Keep the adverse condition visible',plain:'The frozen RC8 record also preserves the H4/H5 trust-anchor and registration-continuity weakness. The reported test position does not erase it.',result:'FROZEN BASELINE · EVIDENCE AND LIMITATION TRAVEL TOGETHER'},
+      ]}/>
 
       <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12,margin:'24px 0'}}>{[['Architecture','Governed financial execution'],['Version','v1.0.0-rc8'],['Claimant','Gary Williams'],['Organization','Elias Systems Ltd'],['Registry','TA-14-AIGR-000026'],['Baseline date','August 22, 2026']].map(([k,v])=><div key={k} style={{padding:18,border:'1px solid rgba(113,231,255,.12)',borderRadius:14,background:'rgba(7,18,30,.78)'}}><small style={{color:'#71899a',textTransform:'uppercase',letterSpacing:1.2}}>{k}</small><div style={{marginTop:7,fontWeight:850}}>{v}</div></div>)}</section>
 
