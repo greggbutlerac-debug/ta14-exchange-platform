@@ -1,50 +1,50 @@
-import {createHash} from 'crypto';
+import {createHash,randomUUID} from 'crypto';
+import {createClient} from '@supabase/supabase-js';
 import {NextResponse} from 'next/server';
 
-const MECHANISM={id:'TA14-AFA-EABA-SX-001',version:'1.0.1',status:'FROZEN-CHALLENGE-SPEC',acceptance:['freeze mechanism','run baseline','change one material condition','show verdict change','attempt bypass','show protected consequence did not fire','preserve receipt','replay']};
+const MECHANISM={id:'TA14-AFA-EABA-SX-001',version:'1.1.0',status:'FROZEN-CHALLENGE-SPEC',acceptance:['freeze mechanism','run baseline','change one material condition','show verdict change','attempt bypass','show protected consequence did not fire','preserve receipt','replay']};
 type Action='baseline'|'changed-condition'|'bypass'|'replay';
 type Input={passportIntegrity:boolean;freshness:boolean;scope:boolean;localStanding:boolean;commitBinding:boolean;bypass:boolean};
 
-function canonical(v:unknown):string{
- if(v===null||typeof v!=='object') return JSON.stringify(v);
- if(Array.isArray(v)) return '['+v.map(canonical).join(',')+']';
- const o=v as Record<string,unknown>;
- return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canonical(o[k])).join(',')+'}';
-}
-function consequence(input:Input,determination:string){
- const authorized=determination==='ALLOW'&&!input.bypass;
- return {attempted:true,authorized,fired:authorized,result:authorized?'EXECUTED':'BLOCKED_AT_EABA_GATE'};
-}
-function execute(action:Exclude<Action,'replay'>){
- const input:Input=action==='baseline'
-  ?{passportIntegrity:true,freshness:true,scope:true,localStanding:true,commitBinding:true,bypass:false}
-  :action==='changed-condition'
-   ?{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:false}
-   :{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:true};
+function canonical(v:unknown):string{if(v===null||typeof v!=='object')return JSON.stringify(v);if(Array.isArray(v))return '['+v.map(canonical).join(',')+']';const o=v as Record<string,unknown>;return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canonical(o[k])).join(',')+'}'}
+function db(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL,key=process.env.SUPABASE_SERVICE_ROLE_KEY;if(!url||!key)throw new Error('CHALLENGE_LEDGER_NOT_CONFIGURED');return createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false}})}
+function inputFor(action:Exclude<Action,'replay'>):Input{return action==='baseline'?{passportIntegrity:true,freshness:true,scope:true,localStanding:true,commitBinding:true,bypass:false}:action==='changed-condition'?{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:false}:{passportIntegrity:true,freshness:true,scope:true,localStanding:false,commitBinding:true,bypass:true}}
+
+async function execute(action:Exclude<Action,'replay'>){
+ const input=inputFor(action),runId=randomUUID(),s=db();
  const all=input.passportIntegrity&&input.freshness&&input.scope&&input.localStanding&&input.commitBinding;
- const determination=all?'ALLOW':'HOLD';
- const gateOpen=determination==='ALLOW'&&!input.bypass;
- const protectedConsequence=consequence(input,determination);
- const trace=['AUTHORITY_CONTEXT_PRESENTED','AFA_BOUNDARY_VERIFIED',input.localStanding?'LOCAL_STANDING_ESTABLISHED':'LOCAL_STANDING_NOT_ESTABLISHED','EABA_DETERMINATION_'+determination,input.bypass?'BYPASS_INVOCATION_ATTEMPTED':'NORMAL_ROUTE','CONSEQUENCE_'+protectedConsequence.result];
- const evidence={mechanism:MECHANISM,input,determination,gateOpen,protectedConsequence,trace};
+ const determination=all?'ALLOW':'HOLD',gateOpen=determination==='ALLOW'&&!input.bypass;
+ const {data:effect,error:rpcError}=await s.rpc('ta14_afa_eaba_apply_effect',{p_run_id:runId,p_mechanism_id:MECHANISM.id,p_mechanism_version:MECHANISM.version,p_action:action,p_passport_integrity:input.passportIntegrity,p_freshness:input.freshness,p_scope:input.scope,p_local_standing:input.localStanding,p_commit_binding:input.commitBinding,p_bypass:input.bypass});
+ if(rpcError)throw new Error('PROTECTED_EFFECT_GATE_FAILED:'+rpcError.code);
+ const {data:effectRow,error:effectReadError}=await s.from('ta14_afa_eaba_challenge_effects').select('effect_id,run_id,created_at').eq('run_id',runId).maybeSingle();
+ if(effectReadError)throw new Error('PROTECTED_EFFECT_OBSERVATION_FAILED:'+effectReadError.code);
+ const protectedConsequence={attempted:true,authorized:Boolean(effect?.authorized),fired:Boolean(effectRow),effectId:effectRow?.effect_id??null,databaseResult:effectRow?'DURABLE_EFFECT_ROW_OBSERVED':'NO_EFFECT_ROW_OBSERVED',observation:'INDEPENDENT_POST_GATE_DATABASE_READ'};
+ const trace=['AUTHORITY_CONTEXT_PRESENTED','AFA_BOUNDARY_VERIFIED',input.localStanding?'LOCAL_STANDING_ESTABLISHED':'LOCAL_STANDING_NOT_ESTABLISHED','EABA_DETERMINATION_'+determination,input.bypass?'BYPASS_INVOCATION_ATTEMPTED':'NORMAL_ROUTE','DATABASE_EFFECT_'+(effectRow?'OBSERVED':'ABSENT')];
+ const evidence={runId,mechanism:MECHANISM,input,determination,gateOpen,protectedConsequence,trace};
  const integrityHash=createHash('sha256').update(canonical(evidence)).digest('hex');
- return {...evidence,receipt:{schema:'TA14_EXECUTION_RECEIPT_V1',hashAlgorithm:'SHA-256',canonicalization:'TA14-RECURSIVE-SORTED-JSON-V1',integrityHash}};
+ const {data:stored,error:storeError}=await s.from('ta14_afa_eaba_challenge_receipts').insert({run_id:runId,mechanism_id:MECHANISM.id,mechanism_version:MECHANISM.version,action,evidence_json:evidence,integrity_hash:integrityHash}).select('receipt_id,created_at').single();
+ if(storeError||!stored)throw new Error('RECEIPT_PRESERVATION_FAILED:'+(storeError?.code??'UNKNOWN'));
+ return {...evidence,receipt:{schema:'TA14_EXECUTION_RECEIPT_V2',receiptId:stored.receipt_id,persistedAt:stored.created_at,storageAuthority:'SUPABASE_SERVER_LEDGER',hashAlgorithm:'SHA-256',canonicalization:'TA14-RECURSIVE-SORTED-JSON-V1',integrityHash}};
 }
 export async function POST(req:Request){
- const body=await req.json().catch(()=>({}));
- const action=body.action as Action;
- if(action==='replay'){
-  const supplied=body.receipt;
-  if(!supplied?.action||!supplied?.record||!['baseline','changed-condition','bypass'].includes(supplied.action)) return NextResponse.json({error:'valid receipt required'},{status:400});
-  const fresh=execute(supplied.action);
-  const originalHash=supplied.record.receipt?.integrityHash;
-  const receiptEvidence={mechanism:supplied.record.mechanism,input:supplied.record.input,determination:supplied.record.determination,gateOpen:supplied.record.gateOpen,protectedConsequence:supplied.record.protectedConsequence,trace:supplied.record.trace};
-  const receiptHash=createHash('sha256').update(canonical(receiptEvidence)).digest('hex');
-  const receiptIntact=receiptHash===originalHash;
-  const deterministicMatch=fresh.receipt.integrityHash===originalHash;
-  return NextResponse.json({mechanism:MECHANISM,replay:{match:receiptIntact&&deterministicMatch,receiptIntact,deterministicMatch,recomputed:fresh,originalHash,recomputedHash:fresh.receipt.integrityHash}});
- }
- if(!['baseline','changed-condition','bypass'].includes(action)) return NextResponse.json({error:'invalid action'},{status:400});
- return NextResponse.json({action,record:execute(action as Exclude<Action,'replay'>)});
+ try{
+  const body=await req.json().catch(()=>({})),action=body.action as Action;
+  if(action==='replay'){
+   const supplied=body.receipt;
+   const receiptId=supplied?.record?.receipt?.receiptId;
+   if(!receiptId)return NextResponse.json({error:'preserved receipt required'},{status:400});
+   const s=db();
+   const {data:stored,error}=await s.from('ta14_afa_eaba_challenge_receipts').select('action,evidence_json,integrity_hash,created_at').eq('receipt_id',receiptId).maybeSingle();
+   if(error||!stored)return NextResponse.json({error:'preserved receipt not found'},{status:404});
+   const storedHash=createHash('sha256').update(canonical(stored.evidence_json)).digest('hex');
+   const receiptIntact=storedHash===stored.integrity_hash;
+   const original=stored.evidence_json as any;
+   const {data:effectRow}=await s.from('ta14_afa_eaba_challenge_effects').select('effect_id').eq('run_id',original.runId).maybeSingle();
+   const consequenceStillCorresponds=Boolean(effectRow)===Boolean(original.protectedConsequence?.fired);
+   return NextResponse.json({mechanism:MECHANISM,replay:{match:receiptIntact&&consequenceStillCorresponds,receiptIntact,consequenceStillCorresponds,source:'DURABLE_SERVER_LEDGER',receiptId,originalHash:stored.integrity_hash,persistedAt:stored.created_at}});
+  }
+  if(!['baseline','changed-condition','bypass'].includes(action))return NextResponse.json({error:'invalid action'},{status:400});
+  return NextResponse.json({action,record:await execute(action as Exclude<Action,'replay'>)});
+ }catch(e){return NextResponse.json({error:e instanceof Error?e.message:'challenge execution failed'},{status:500})}
 }
-export async function GET(){return NextResponse.json({mechanism:MECHANISM});}
+export async function GET(){return NextResponse.json({mechanism:MECHANISM,evidenceBoundary:'DURABLE_SERVER_LEDGER_AND_DATABASE_EFFECT_SINK'});}
