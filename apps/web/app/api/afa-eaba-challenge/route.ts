@@ -41,7 +41,15 @@ export async function POST(req:Request){
    const original=stored.evidence_json as any;
    const {data:effectRow}=await s.from('ta14_afa_eaba_challenge_effects').select('effect_id').eq('run_id',original.runId).maybeSingle();
    const consequenceStillCorresponds=Boolean(effectRow)===Boolean(original.protectedConsequence?.fired);
-   return NextResponse.json({mechanism:MECHANISM,replay:{match:receiptIntact&&consequenceStillCorresponds,receiptIntact,consequenceStillCorresponds,source:'DURABLE_SERVER_LEDGER',receiptId,originalHash:stored.integrity_hash,persistedAt:stored.created_at}});
+   const replayAction=stored.action as Exclude<Action,'replay'>;
+   if(!['baseline','changed-condition','bypass'].includes(replayAction))return NextResponse.json({error:'preserved action is not replayable'},{status:400});
+   const reexecution=await execute(replayAction);
+   const sameInput=canonical(reexecution.input)===canonical(original.input);
+   const sameDetermination=reexecution.determination===original.determination;
+   const sameGateState=reexecution.gateOpen===original.gateOpen;
+   const sameConsequenceOutcome=Boolean(reexecution.protectedConsequence?.fired)===Boolean(original.protectedConsequence?.fired);
+   const operationalMatch=sameInput&&sameDetermination&&sameGateState&&sameConsequenceOutcome;
+   return NextResponse.json({mechanism:MECHANISM,replay:{match:receiptIntact&&consequenceStillCorresponds&&operationalMatch,receiptIntact,consequenceStillCorresponds,operationalMatch,comparison:{sameInput,sameDetermination,sameGateState,sameConsequenceOutcome},source:'DURABLE_SERVER_LEDGER_PLUS_FRESH_REEXECUTION',receiptId,originalHash:stored.integrity_hash,persistedAt:stored.created_at,reexecution:{runId:reexecution.runId,receiptId:reexecution.receipt.receiptId,integrityHash:reexecution.receipt.integrityHash,determination:reexecution.determination,gateOpen:reexecution.gateOpen,protectedConsequence:reexecution.protectedConsequence}}});
   }
   if(!['baseline','changed-condition','bypass'].includes(action))return NextResponse.json({error:'invalid action'},{status:400});
   return NextResponse.json({action,record:await execute(action as Exclude<Action,'replay'>)});
