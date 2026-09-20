@@ -61,7 +61,7 @@ export default function EnvironmentalRecordsPage() {
       <div className="glow glowTwo" />
 
       <header className="topbar shell">
-        <Link href="/" className="brand">
+        <Link href="/environmental-integrity-governance" className="brand">
           <span className="brandMark">TA-14</span>
           <span>
             <strong>Environmental Records</strong>
@@ -70,7 +70,7 @@ export default function EnvironmentalRecordsPage() {
         </Link>
 
         <nav>
-          <Link href="/">Home</Link>
+          <Link href="/environmental-integrity-governance">Environmental Integrity World</Link>
           <Link href="/workspace/ai-governance">AI Governance</Link>
           <Link href="/workspace/governed-records">Governed Records</Link>
           <Link href="/workspace/entity-review">Entity Review</Link>

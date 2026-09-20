@@ -72,7 +72,7 @@ export default function EnvironmentalRecordsIntroductionPage() {
 
       <section className="shell">
         <header className="topbar">
-          <Link className="brand" href="/">
+          <Link className="brand" href="/environmental-integrity-governance">
             <span className="brandMark">TA</span>
             <span>
               <strong>TA-14 AI Governance Exchange</strong>
@@ -81,7 +81,7 @@ export default function EnvironmentalRecordsIntroductionPage() {
           </Link>
 
           <nav>
-            <Link href="/">Homepage</Link>
+            <Link href="/environmental-integrity-governance">Environmental Integrity World</Link>
             <Link href="/workspace">All Playgrounds</Link>
             <Link className="navButton" href="/workspace/environmental-records">
               Enter Playground
