@@ -583,7 +583,7 @@ export default function ReviewWorkspacePage() {
   }
 
   return (
-    <main className="reviewPage">
+    <main className="reviewPage"><div style={{padding:'12px 18px',borderBottom:'1px solid rgba(86,232,255,.16)',background:'rgba(2,8,14,.82)'}}><Link href="/academy" style={{color:'#8eefff',textDecoration:'none',fontSize:11,fontWeight:900,letterSpacing:'.08em'}}>← TA-14 ACADEMY WORLD</Link></div>
       <div className="cosmos" aria-hidden="true">
         <span className="starField starField1" />
         <span className="starField starField2" />

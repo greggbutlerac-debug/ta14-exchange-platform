@@ -498,7 +498,7 @@ export default function InstructorConsolePage() {
   }
 
   return (
-    <main className="academy-shell">
+    <main className="academy-shell"><div style={{padding:'12px 18px',borderBottom:'1px solid rgba(86,232,255,.16)',background:'rgba(2,8,14,.82)'}}><Link href="/academy" style={{color:'#8eefff',textDecoration:'none',fontSize:11,fontWeight:900,letterSpacing:'.08em'}}>← TA-14 ACADEMY WORLD</Link></div>
       <header className="topbar">
         <div className="brand-block">
           <Link className="brand" href="/academy">TA-14 Academy</Link>

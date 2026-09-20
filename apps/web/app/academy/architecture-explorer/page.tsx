@@ -1682,7 +1682,7 @@ export default function ArchitectureExplorerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#020611] text-slate-100">
+    <main className="min-h-screen bg-[#020611] text-slate-100"><div style={{padding:'12px 18px',borderBottom:'1px solid rgba(86,232,255,.16)',background:'rgba(2,8,14,.82)'}}><Link href="/academy" style={{color:'#8eefff',textDecoration:'none',fontSize:11,fontWeight:900,letterSpacing:'.08em'}}>← TA-14 ACADEMY WORLD</Link></div>
       <style>{`
         :root { color-scheme: dark; }
         * { box-sizing: border-box; }
