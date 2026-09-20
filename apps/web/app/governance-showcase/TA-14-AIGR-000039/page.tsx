@@ -1,9 +1,9 @@
 // Canonical public presentation for TA-14 Admissible Computation Architecture v1.1.
 // A static route intentionally takes precedence over the generic governance-showcase projection.
 import Link from 'next/link';
-import ACAShowcase, { metadata } from '../../public/ai-governance/registry/showcase/TA-14-AIGR-000039/page';
+import ACAShowcase from '../../public/ai-governance/registry/showcase/TA-14-AIGR-000039/page';
 
-export { metadata };
+export const metadata={title:'TA-14 ACA v1.1 | TA-14 Governance Showcase',description:'Interactive public TA-14 Registry showcase for TA-14 Admissible Computation Architecture v1.1, TA-14-AIGR-000039.'};
 
 export default function CanonicalACAShowcase(){
   return <>
