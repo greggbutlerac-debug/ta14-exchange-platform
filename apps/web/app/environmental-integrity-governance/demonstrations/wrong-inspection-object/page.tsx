@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ConsequenceLab from '../../components/ConsequenceLab';
+import ConsequenceLab from '../../../components/ConsequenceLab';
 
 const candidates = [
   ['Visible symptom','Three occupied rooms repeatedly exceed the declared humidity envelope.'],
