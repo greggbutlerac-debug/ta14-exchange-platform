@@ -1591,7 +1591,7 @@ export default function SimulatorPage() {
   };
 
   return (
-    <main className="simPage">
+    <main className="simPage"><div style={{padding:'12px 18px',borderBottom:'1px solid rgba(86,232,255,.16)',background:'rgba(2,8,14,.82)'}}><Link href="/academy" style={{color:'#8eefff',textDecoration:'none',fontSize:11,fontWeight:900,letterSpacing:'.08em'}}>← TA-14 ACADEMY WORLD</Link></div>
       <div className="ambient" aria-hidden="true"><div className="stars"/><div className="gridFloor"/><div className="aurora auroraOne"/><div className="aurora auroraTwo"/></div>
       <div className="shell">
         <header className="hero">
