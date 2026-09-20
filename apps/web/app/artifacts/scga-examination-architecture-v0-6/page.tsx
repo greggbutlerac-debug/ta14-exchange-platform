@@ -1,9 +1,7 @@
-import Link from 'next/link';
+'use client';
 
-export const metadata = {
-  title: 'SCGA Examination Architecture v0.6 | TA-14 Governed Examination Record',
-  description: 'Permanent TA-14 governed record of the adversarial redesign lineage for the Elias Systems SCGA Examination Architecture through frozen v0.6.',
-};
+import Link from 'next/link';
+import { useState } from 'react';
 
 const lineage = [
   {
@@ -32,7 +30,17 @@ const hashes = [
   ['Frozen Stopping Rule v1.0 SHA-256', 'f9408ec60d216bbc7b7f3f12a5b1e9709efa9def3dc57b75cf78907013378f8b'],
 ] as const;
 
+const replay = [
+  { label: 'v0.4 · ATTACK THE EXAMINER', state: 'REDESIGN CONTINUES', determination: 'LOSS PRESERVED', explanation: 'Five findings were preserved: three BLOCKING and two MAJOR. The stopping-rule content was not inside the supplied review object, so SR-1 through SR-4 could not legitimately be inferred.', boundary: 'A sophisticated examiner was not allowed to award itself closure.' },
+  { label: 'v0.5 · RE-ATTACK', state: 'REDESIGN CONTINUES', determination: 'B-01 BLOCKING', explanation: 'The v0.4 failure classes did not reproduce, but Applicability-Entitlement / Conditional-Gate Suppression remained. Predicate state could still suppress a materially applicable branch without sufficiently establishing exclusion against reality.', boundary: 'Fixing yesterday’s failure did not earn a pass when a materially new blocking path remained.' },
+  { label: 'v0.6 · ADD AP-001', state: 'FROZEN', determination: '0 BLOCKING', explanation: 'AP-001 Applicability Entitlement / Predicate-to-Reality Fidelity prevents unresolved applicability from disappearing before dependency closure.', boundary: 'The mechanism is credited only inside the frozen bounded examiner scope.' },
+  { label: 'APPLY STOPPING RULE', state: 'SR-1 · SR-2 · SR-3 · SR-4 PASS', determination: 'ARCHITECTURE_REDESIGN_STOPS = TRUE', explanation: 'Under the unchanged Frozen Stopping Rule v1.0, no materially new primitive/layer/mechanism failure class and no materially false strongest-positive pathway were established in v0.6.', boundary: 'This closes examiner redesign. It does not validate SCGA itself.' },
+  { label: 'TRY TO CLAIM SCGA PASSED', state: 'STOP', determination: 'TARGET RESULT REMAINS OPEN', explanation: 'The frozen examiner earned the right to be used. The Sovereign Constitutional Governance Architecture has not thereby earned a substantive validation result.', boundary: 'Examiner closure is not target validation. Registration is not validation.' },
+];
+
 export default function ScgaExaminationArchitectureV06() {
+  const [step, setStep] = useState(0);
+  const current = replay[step];
   return (
     <main style={{minHeight:'100vh',padding:'70px 22px 100px',background:'radial-gradient(circle at 84% 0,rgba(94,214,255,.16),transparent 31%),radial-gradient(circle at 8% 38%,rgba(132,255,193,.08),transparent 25%),#040a12',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
       <div style={{maxWidth:1220,margin:'0 auto'}}>
@@ -53,6 +61,16 @@ export default function ScgaExaminationArchitectureV06() {
 
         <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:12,marginTop:24}}>
           {[['Participant','Gary Williams · Elias Systems Ltd'],['Object','Sovereign Constitutional Governance Architecture Examination Architecture'],['Frozen version','v0.6'],['Registry posture','SUBMITTED · permanent identifier pending'],['Examination posture','Architecture frozen for execution'],['SCGA result','NONE PRESUMED']].map(([k,v])=><div key={k} style={{padding:18,border:'1px solid rgba(113,231,255,.12)',borderRadius:14,background:'rgba(7,18,30,.78)'}}><small style={{color:'#71899a',textTransform:'uppercase',letterSpacing:1.1}}>{k}</small><div style={{marginTop:7,fontWeight:850,lineHeight:1.45}}>{v}</div></div>)}
+        </section>
+
+        <section style={{marginTop:34,padding:30,border:'1px solid rgba(113,231,255,.2)',borderRadius:22,background:'rgba(5,17,29,.88)'}}>
+          <div style={{color:'#71e7ff',fontWeight:900,fontSize:11,letterSpacing:'.14em'}}>INTERACTIVE ADVERSARIAL REDESIGN REPLAY</div>
+          <h2 style={{fontSize:'clamp(30px,4vw,48px)',margin:'10px 0 8px',letterSpacing:'-.035em'}}>Make the examiner earn the right to stop.</h2>
+          <p style={{color:'#9fb3c1',lineHeight:1.7,maxWidth:900}}>Move through the preserved v0.4 → v0.5 → v0.6 lineage. This replay does not create a new examination result and cannot turn examiner closure into an SCGA validation finding.</p>
+          <div style={{display:'grid',gridTemplateColumns:'minmax(250px,.72fr) minmax(0,1.28fr)',gap:16,marginTop:22}}>
+            <div style={{display:'grid',gap:9}}>{replay.map((r,i)=><button key={r.label} onClick={()=>setStep(i)} style={{textAlign:'left',padding:'14px 15px',borderRadius:12,cursor:'pointer',fontWeight:850,border:step===i?'1px solid rgba(130,241,187,.65)':'1px solid rgba(113,231,255,.16)',background:step===i?'rgba(130,241,187,.08)':'rgba(7,22,35,.72)',color:step===i?'#82f1bb':'#b8cad5'}}>{i+1}. {r.label}</button>)}<button onClick={()=>setStep(0)} style={{textAlign:'left',padding:'14px 15px',borderRadius:12,cursor:'pointer',fontWeight:850,border:'1px solid rgba(243,206,106,.2)',background:'rgba(62,45,10,.18)',color:'#f3ce6a'}}>↺ RESTORE v0.4 START</button></div>
+            <div style={{padding:24,borderRadius:18,border:'1px solid rgba(255,255,255,.08)',background:'#030c14'}}><small style={{color:'#71899a',letterSpacing:1.2}}>CURRENT FROZEN CONDITION</small><h3 style={{fontSize:29,margin:'8px 0 16px'}}>{current.label}</h3><div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}><div style={{padding:14,borderRadius:11,background:'rgba(255,255,255,.035)'}}><small style={{color:'#71e7ff'}}>STATE</small><div style={{fontWeight:900,marginTop:5}}>{current.state}</div></div><div style={{padding:14,borderRadius:11,background:'rgba(255,255,255,.035)'}}><small style={{color:'#82f1bb'}}>DETERMINATION</small><div style={{fontWeight:900,marginTop:5}}>{current.determination}</div></div></div><p style={{color:'#aebfcb',lineHeight:1.75}}>{current.explanation}</p><p style={{color:'#d7c996',lineHeight:1.7}}><strong>Boundary:</strong> {current.boundary}</p><p style={{fontSize:12,color:'#657d8d'}}>Historical replay only · preserved findings remain attached to the versions that earned them.</p></div>
+          </div>
         </section>
 
         <section style={{marginTop:34}}>
