@@ -14,15 +14,18 @@ export default function CommissioningContinuityLab(){
   const [reality,setReality]=useState(false);
   const [authority,setAuthority]=useState(true);
   const [binding,setBinding]=useState(false);
+  const [correctionVerified,setCorrectionVerified]=useState(false);
+  const [correctionHeld,setCorrectionHeld]=useState(false);
   const scenario=scenarios[active];
 
   const determination=useMemo(()=>{
     if(!authority)return {state:'DENY',copy:'The actor or route lacks present authority for the proposed consequence.'};
     if(!continuity||!reality||!binding)return {state:'HOLD',copy:'Execution does not proceed until continuity, present reality and exact action binding are established.'};
+    if(active===3 && (!correctionVerified||!correctionHeld))return {state:'HOLD',copy:'The correction exists, but outcome standing is incomplete until the correction is verified and shown to hold.'};
     return {state:'ALLOW',copy:'The bounded action has present standing for this demonstration state. Outcome evidence is still required after execution.'};
-  },[continuity,reality,authority,binding]);
+  },[continuity,reality,authority,binding,active,correctionVerified,correctionHeld]);
 
-  const reset=(i:number)=>{setActive(i);setContinuity(true);setReality(false);setAuthority(true);setBinding(false)};
+  const reset=(i:number)=>{setActive(i);setContinuity(true);setReality(false);setAuthority(true);setBinding(false);setCorrectionVerified(false);setCorrectionHeld(false)};
 
   return <section className="lab">
     <style>{`
@@ -40,6 +43,7 @@ export default function CommissioningContinuityLab(){
           <Gate title="Present reality re-established" note="The live condition has been checked after the change." value={reality} set={setReality}/>
           <Gate title="Authority remains valid" note="The actor or system still has authority for this bounded consequence." value={authority} set={setAuthority}/>
           <Gate title="Exact action is bound" note="The evidence and authority attach to this target, action, condition and moment." value={binding} set={setBinding}/>
+          {active===3&&<><Gate title="Correction independently verified" note="Post-action evidence establishes that the intended condition actually recovered." value={correctionVerified} set={setCorrectionVerified}/><Gate title="Correction shown to hold" note="Follow-up evidence establishes that recovery persisted rather than merely clearing momentarily." value={correctionHeld} set={setCorrectionHeld}/></>}
         </div>
       </div>
       <div className="result">
@@ -51,6 +55,7 @@ export default function CommissioningContinuityLab(){
           <div className={reality?'ok':'bad'}>PRESENT REALITY · {reality?'ESTABLISHED':'NOT ESTABLISHED'}</div>
           <div className={authority?'ok':'bad'}>AUTHORITY · {authority?'STANDING':'NO STANDING'}</div>
           <div className={binding?'ok':'bad'}>BINDING · {binding?'EXACT':'NOT ESTABLISHED'}</div>
+          {active===3&&<><div className={correctionVerified?'ok':'bad'}>CORRECTION · {correctionVerified?'VERIFIED':'NOT VERIFIED'}</div><div className={correctionHeld?'ok':'bad'}>PERSISTENCE · {correctionHeld?'HELD':'NOT ESTABLISHED'}</div></>}
         </div>
       </div>
     </div>
