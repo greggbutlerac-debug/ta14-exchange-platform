@@ -11,12 +11,13 @@ const requirements=[
  ['05','Attempt bypass.','ATTEMPT BYPASS invokes a separate server-side bypass action against the same frozen mechanism.'],
  ['06','Show the protected consequence did not fire.','The bypass run makes the same server-side protected-effect request. A database-enforced gate evaluates the frozen predicates. When local standing is absent or bypass=true, no protected-effect row can be created. The API then performs a separate database read for the run ID and records NO_EFFECT_ROW_OBSERVED.'],
  ['07','Preserve the receipt.','Each execution is written to the server-side challenge receipt ledger as TA14_EXECUTION_RECEIPT_V2. The returned receipt carries its durable receipt ID, persistence timestamp, and SHA-256 hash over the complete recursively canonicalized evidence object. The JSON can also be downloaded.'],
- ['08','Replay it.','REPLAY retrieves the preserved receipt from the server ledger by receipt ID, recomputes its evidence hash, and independently queries the protected-effect table for the original run ID. Receipt integrity and effect/non-effect correspondence must both hold.'],
+ ['08','Replay it.','REPLAY retrieves the preserved receipt from the server ledger by receipt ID, recomputes its evidence hash, and separately queries the protected-effect table for the original run ID. Receipt integrity and effect/non-effect correspondence must both hold.'],
 ] as const;
 export default function ChallengeExam(){
  const [runs,setRuns]=useState<Run[]>([]);
  const [busy,setBusy]=useState(false);
  const [replay,setReplay]=useState<any>(null);
+ const sourceScreenshot='/evidence/terry-snyder-acceptance-condition-2026-09-20.png';
  async function run(action:string){
   setBusy(true);setReplay(null);
   const res=await fetch('/api/afa-eaba-challenge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action})});
@@ -82,7 +83,7 @@ Replay it.
 That is not a moving target.
 That has been the target the entire time.`}</div>
     </div>
-    <div style={{marginTop:14,padding:14,border:'1px dashed #6c5b31',borderRadius:10,color:'#d8c98f',fontSize:11,lineHeight:1.6}}><b>RECORD NOTE:</b> This is a transcript-style rendering, not a photographic screenshot. TA-14 should replace or supplement it with the original LinkedIn screenshot when that image is available as a repository asset. The operative eight-part wording is preserved here without adding a ninth condition.</div>
+    <div style={{marginTop:16,padding:16,border:'1px solid #6c5b31',borderRadius:12,background:'#020b0f'}}><b style={{color:'#e7c76e'}}>ORIGINAL SOURCE SCREENSHOT · PRESERVED</b><p style={{color:'#a8c1c8',fontSize:11,lineHeight:1.6}}>The original LinkedIn screenshot supplied by TA-14 is preserved below as source evidence. The transcript above remains for legibility and one-to-one requirement mapping.</p><a href={sourceScreenshot} target="_blank" rel="noreferrer"><img src={sourceScreenshot} alt="Original LinkedIn screenshot showing Terry Snyder's operational acceptance-condition comment" style={{display:'block',width:'100%',height:'auto',borderRadius:9,border:'1px solid #38525a'}}/></a></div>
    </section>
    <section style={{padding:24,border:'1px solid #28545b',borderRadius:18,background:'#04151c'}}>
     <b style={{color:'#e7c76e'}}>TERRY SNYDER · STATED ACCEPTANCE CONDITION · FROZEN v1.0</b>

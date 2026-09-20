@@ -18,7 +18,7 @@ async function execute(action:Exclude<Action,'replay'>){
  if(rpcError)throw new Error('PROTECTED_EFFECT_GATE_FAILED:'+rpcError.code);
  const {data:effectRow,error:effectReadError}=await s.from('ta14_afa_eaba_challenge_effects').select('effect_id,run_id,created_at').eq('run_id',runId).maybeSingle();
  if(effectReadError)throw new Error('PROTECTED_EFFECT_OBSERVATION_FAILED:'+effectReadError.code);
- const protectedConsequence={attempted:true,authorized:Boolean(effect?.authorized),fired:Boolean(effectRow),effectId:effectRow?.effect_id??null,databaseResult:effectRow?'DURABLE_EFFECT_ROW_OBSERVED':'NO_EFFECT_ROW_OBSERVED',observation:'INDEPENDENT_POST_GATE_DATABASE_READ'};
+ const protectedConsequence={attempted:true,authorized:Boolean(effect?.authorized),fired:Boolean(effectRow),effectId:effectRow?.effect_id??null,databaseResult:effectRow?'DURABLE_EFFECT_ROW_OBSERVED':'NO_EFFECT_ROW_OBSERVED',observation:'SEPARATE_POST_GATE_DATABASE_READ'};
  const trace=['AUTHORITY_CONTEXT_PRESENTED','AFA_BOUNDARY_VERIFIED',input.localStanding?'LOCAL_STANDING_ESTABLISHED':'LOCAL_STANDING_NOT_ESTABLISHED','EABA_DETERMINATION_'+determination,input.bypass?'BYPASS_INVOCATION_ATTEMPTED':'NORMAL_ROUTE','DATABASE_EFFECT_'+(effectRow?'OBSERVED':'ABSENT')];
  const evidence={runId,mechanism:MECHANISM,input,determination,gateOpen,protectedConsequence,trace};
  const integrityHash=createHash('sha256').update(canonical(evidence)).digest('hex');
