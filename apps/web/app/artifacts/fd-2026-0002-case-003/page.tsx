@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
 
 const supported = [
   "The later preserved Engineering View directly records AUTHORITY_LOST and authority_invalidated_before_execution.",
@@ -54,6 +55,20 @@ export default function HarmonicCase003Page(){
       </div>
       <aside className="identity"><p>GOVERNED CASE IDENTITY</p><dl><div><dt>Architecture</dt><dd>Harmonic Constitutional Runtime</dd></div><div><dt>Steward</dt><dd>Timothy E. Zlomke</dd></div><div><dt>Organization</dt><dd>Moral Clarity AI</dd></div><div><dt>Version examined</dt><dd>Version 2</dd></div><div><dt>Demonstration</dt><dd>FD-2026-0002</dd></div><div><dt>Case</dt><dd>003</dd></div><div><dt>Finding</dt><dd className="amber">PARTIALLY SUPPORTED</dd></div><div><dt>Frozen test object</dt><dd className="red">NOT ESTABLISHED AS FROZEN</dd></div><div><dt>Historical record</dt><dd>Preserved without retrofit</dd></div><div><dt>Participant response</dt><dd>Separately attributable</dd></div></dl></aside>
     </section>
+
+
+    <RecordedExaminationPlayer
+      eyebrow="HARMONIC CASE 003 · RECORDED EXAMINATION PLAYER"
+      title="Do not read the finding. Replay why the record could not earn the expected result."
+      intro="Operate the preserved Case 003 sequence. The player separates the intended frozen proposition from what the returned evidence actually established."
+      stages={[
+        {label:"FROZEN PROPOSITION",title:"The intended test begins",state:"The examination expected an initially admissible state followed by authority loss before consequential execution.",determination:"TEST OBJECT FROZEN",explanation:"The proposition and observation points were established before the result was known.",supports:"A bounded changed-authority question existed before execution.",limit:"Freezing the proposition does not prove the returned evidence will satisfy it."},
+        {label:"FIRST PACKET",title:"The baseline is already blocked",state:"The first preserved packet records AUTHORITY_SCOPE_INVALID, CONTACT_DEGRADED, INADMISSIBLE and BLOCKED.",determination:"INITIAL ADMISSIBLE STATE · NOT ESTABLISHED",explanation:"The expected admissible starting state is not present in the admitted first packet.",supports:"A governed runtime response is visible.",limit:"The intended admissible-to-revoked transition."},
+        {label:"AUTHORITY LOSS",title:"A later authority-loss condition is visible",state:"The later Engineering View records AUTHORITY_LOST and authority_invalidated_before_execution.",determination:"AUTHORITY CHANGE · PARTIAL",explanation:"The later packet directly records authority loss, but the complete transition chronology is not independently evidenced.",supports:"Later authority-loss classification.",limit:"Complete T0 → T4 provenance and an independent pre-state evidence object."},
+        {label:"EXECUTION BOUNDARY",title:"The runtime refuses consequential execution",state:"The later condition is INADMISSIBLE; the execution surface records REFUSED, BLOCK, should_execute false and EXECUTION_BLOCKED.",determination:"REFUSED / BLOCK · SUPPORTED",explanation:"The admitted runtime surface directly records execution-blocking fields under the later authority-loss condition.",supports:"Bounded authority-loss classification and execution blocking.",limit:"Independent downstream zero-action closure or universal non-bypassability."},
+        {label:"TA-14 FINDING",title:"The record stops where the evidence stops",state:"Supported runtime behavior is preserved alongside the unsatisfied frozen test object.",determination:"PARTIALLY SUPPORTED",explanation:"TA-14 does not repair the starting state or infer the missing chronology after the run.",supports:"Authority-loss response and execution blocking on the examined surface.",limit:"The complete frozen changed-state sequence, production readiness, certification, or endorsement."}
+      ]}
+    />
 
     <section className="principles"><div><span>01</span><b>Freeze before outcome.</b></div><div><span>02</span><b>Do not repair history.</b></div><div><span>03</span><b>Separate capability from test satisfaction.</b></div><div><span>04</span><b>Preserve participant and assessor voices.</b></div></section>
 
