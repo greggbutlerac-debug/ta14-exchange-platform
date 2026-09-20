@@ -29,22 +29,25 @@ export default function AFAShowroom(){
  const [blockedAttempt,setBlockedAttempt]=useState('');
  const [boundaryStep,setBoundaryStep]=useState(0);
  const [changedCondition,setChangedCondition]=useState(false);
+ const [lab,setLab]=useState({identity:true,integrity:true,freshness:true,scope:true,revocation:true,localStanding:true});
+ const labResult=!lab.identity||!lab.integrity?'REJECT':!lab.revocation?'SUSPEND':!lab.localStanding?'ESCALATE':!lab.freshness||!lab.scope?'HOLD':'ACCEPT_NARROWED';
+ const toggleLab=(k:keyof typeof lab)=>setLab(v=>({...v,[k]:!v[k]}));
  const d=decisions[decision], f=failures[failure];
  return <main style={{minHeight:'100vh',background:'radial-gradient(circle at 50% 0,#0a2730 0,#031015 35%,#010609 78%)',color:'#efffff',fontFamily:'Inter,system-ui,sans-serif'}}>
   <div style={{width:'min(1220px,calc(100% - 34px))',margin:'0 auto',padding:'26px 0 100px'}}>
    <nav style={{display:'flex',justifyContent:'space-between',gap:18,alignItems:'center',paddingBottom:22,borderBottom:'1px solid #17363e'}}>
     <Link href="/" style={{color:'#fff',textDecoration:'none',fontWeight:950,letterSpacing:'.13em'}}>TA-14 EXCHANGE</Link>
-    <span style={{fontSize:10,color:'#71e7df',fontWeight:900,letterSpacing:'.14em'}}>AFA v1.0-RC1 · RELEASE CANDIDATE</span>
+    <span style={{fontSize:10,color:'#71e7df',fontWeight:900,letterSpacing:'.14em'}}>AFA v1.0-RC1 · REGISTERED · TA-14-AIGR-000042</span>
    </nav>
 
    <section style={{padding:'82px 0 54px',maxWidth:1050}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.2em',color:'#71e7df'}}>ADMISSIBLE FEDERATION ARCHITECTURE</div>
-    <div style={{display:'flex',flexWrap:'wrap',gap:8,marginTop:16}}>{['STATUS · RELEASE CANDIDATE / NOT YET FROZEN','STEWARD · TA-14 AUTHORITY · GREGGORY DON BUTLER','AUTHORITY OBJECT · AVP V1.0.2','FOUNDING PROFILE · AFA-IP-001'].map(x=><span key={x} style={{padding:'7px 9px',border:'1px solid #244b52',borderRadius:7,color:'#91aeb5',fontSize:9,fontWeight:900}}>{x}</span>)}</div>
+    <div style={{display:'flex',flexWrap:'wrap',gap:8,marginTop:16}}>{['REGISTRY · TA-14-AIGR-000042','STATUS · REGISTERED RC1 / NOT YET FROZEN','STEWARD · TA-14 AUTHORITY · GREGGORY DON BUTLER','AUTHORITY OBJECT · AVP V1.0.2','FOUNDING PROFILE · AFA-IP-001'].map(x=><span key={x} style={{padding:'7px 9px',border:'1px solid #244b52',borderRadius:7,color:'#91aeb5',fontSize:9,fontWeight:900}}>{x}</span>)}</div>
     <h1 style={{fontSize:'clamp(48px,8.3vw,104px)',lineHeight:.91,letterSpacing:'-.055em',margin:'18px 0 28px'}}>AUTHORITY CONTEXT<br/><span style={{color:'#71e7df'}}>MAY CROSS.</span><br/>EXECUTION AUTHORITY<br/><span style={{color:'#e7c76e'}}>MUST BE ESTABLISHED LOCALLY.</span></h1>
     <p style={{fontSize:19,lineHeight:1.7,color:'#a8c1c8',maxWidth:860}}>AFA governs the seam between independently governed domains. It permits bounded authority context to travel while preserving a hard architectural barrier before local consequence.</p>
     <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:28}}>
      <a href="https://doi.org/10.5281/zenodo.22846133" target="_blank" rel="noreferrer" style={{padding:'13px 16px',borderRadius:9,background:'#71e7df',color:'#031216',fontWeight:950,fontSize:11,textDecoration:'none'}}>OPEN CANONICAL RC1 · DOI 10.5281/zenodo.22846133 ↗</a>
-     <Link href="/federation-authority" style={{padding:'13px 16px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:11,textDecoration:'none'}}>FEDERATION & AUTHORITY →</Link>
+     <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000042" style={{padding:'13px 16px',border:'1px solid #e7c76e',borderRadius:9,color:'#e7c76e',fontWeight:950,fontSize:11,textDecoration:'none'}}>OPEN PERMANENT REGISTRY RECORD →</Link><Link href="/federation-authority" style={{padding:'13px 16px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:11,textDecoration:'none'}}>FEDERATION & AUTHORITY →</Link>
     </div>
    </section>
 
@@ -88,6 +91,23 @@ export default function AFAShowroom(){
     <h2 style={{fontSize:40,letterSpacing:'-.03em',margin:'10px 0'}}>The receiver keeps the right to refuse.</h2>
     <div style={{display:'flex',flexWrap:'wrap',gap:8,margin:'20px 0'}}>{decisions.map((x,i)=><button key={x[0]} onClick={()=>setDecision(i)} style={{cursor:'pointer',padding:'11px 13px',borderRadius:9,border:i===decision?'1px solid #71e7df':'1px solid #24464d',background:i===decision?'rgba(45,141,143,.18)':'#041318',color:i===decision?'#8ff5ee':'#a2b8be',fontWeight:900,fontSize:10}}>{x[0]}</button>)}</div>
     <div style={{padding:25,border:'1px solid #214a51',borderRadius:15,background:'#04151c'}}><strong style={{fontSize:25,color:'#71e7df'}}>{d[0]}</strong><p style={{fontSize:15,color:'#a6bcc2',lineHeight:1.7}}>{d[1]}</p><b style={{fontSize:11,color:'#e7c76e'}}>EXECUTION AUTHORITY: NOT ESTABLISHED BY FEDERATION</b><div style={{marginTop:18}}><button onClick={()=>setReceipt(true)} style={{cursor:'pointer',padding:'11px 14px',borderRadius:8,border:'1px solid #71e7df',background:'rgba(45,141,143,.14)',color:'#8ff5ee',fontWeight:950}}>GENERATE BOUNDARY RECEIPT</button></div>{receipt&&<pre style={{marginTop:16,padding:16,overflow:'auto',border:'1px solid #24464d',borderRadius:10,background:'#02090c',color:'#9bded9',fontSize:11,lineHeight:1.6}}>{`ReceivingDetermination {\n  decision: "${d[0]}",\n  boundary: "AFA-IP-001",\n  receipt: "INTEGRITY_BOUND",\n  federation_state: "TERMINATED",\n  execution_authority: "NOT_ESTABLISHED"\n}`}</pre>}</div>
+   </section>
+
+   <section id="authority-lab" style={{padding:'72px 0 30px'}}>
+    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>LIVE RECEIVING-DOMAIN LAB</div>
+    <h2 style={{fontSize:'clamp(34px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>Change the authority context. Watch the receiving decision change.</h2>
+    <p style={{color:'#9fb7be',lineHeight:1.72,maxWidth:900}}>Start with a valid crossing. Break one condition at a time. AFA does not silently repair the Passport, inherit permission, or convert successful transport into execution authority.</p>
+    <div style={{display:'grid',gridTemplateColumns:'minmax(280px,1.2fr) minmax(260px,.8fr)',gap:14,marginTop:24}}>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:8}}>
+      {([['identity','ISSUER IDENTITY'],['integrity','PASSPORT INTEGRITY'],['freshness','FRESHNESS'],['scope','SCOPE'],['revocation','REVOCATION STATUS'],['localStanding','LOCAL STANDING']] as const).map(([k,label])=><button key={k} onClick={()=>toggleLab(k)} style={{cursor:'pointer',padding:17,textAlign:'left',borderRadius:10,border:'1px solid '+(lab[k]?'#3b7d78':'#8b4937'),background:lab[k]?'rgba(45,141,143,.13)':'rgba(86,25,13,.22)',color:lab[k]?'#8ff5ee':'#ffb29a',fontWeight:950}}><span>{lab[k]?'●':'×'} {label}</span><small style={{display:'block',marginTop:7,color:'#8fa9af'}}>{lab[k]?'ESTABLISHED · click to break':'NOT ESTABLISHED · click to restore'}</small></button>)}
+     </div>
+     <div style={{padding:28,borderRadius:16,border:'1px solid '+(labResult==='ACCEPT_NARROWED'?'#71e7df':'#e7c76e'),background:'#04151c'}}>
+      <small style={{color:'#8299ad'}}>RECEIVING DETERMINATION</small><strong style={{display:'block',fontSize:38,margin:'8px 0',color:labResult==='ACCEPT_NARROWED'?'#71e7df':'#e7c76e'}}>{labResult}</strong>
+      <p style={{color:'#a6bcc2',lineHeight:1.7}}>{labResult==='ACCEPT_NARROWED'?'The bounded authority context may enter local assessment. Execution authority is still not established.':labResult==='REJECT'?'Identity or integrity failed. The receiving domain refuses the presented context.':labResult==='SUSPEND'?'Revocation status no longer supports continued reliance. The route is suspended.':labResult==='ESCALATE'?'Local standing is unresolved. The receiving domain preserves the safe posture and escalates.':'A required condition is not established. The receiving domain holds the route pending revalidation.'}</p>
+      <div style={{padding:'12px 14px',border:'1px dashed #e7c76e',borderRadius:9,color:'#e7c76e',fontSize:10,fontWeight:950}}>EXECUTION AUTHORITY · NOT ESTABLISHED BY FEDERATION</div>
+      <button onClick={()=>setLab({identity:true,integrity:true,freshness:true,scope:true,revocation:true,localStanding:true})} style={{cursor:'pointer',marginTop:14,padding:'11px 14px',borderRadius:8,border:'1px solid #28545b',background:'transparent',color:'#d7eeee',fontWeight:900}}>RESET CROSSING</button>
+     </div>
+    </div>
    </section>
 
    <section style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
