@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import {useState} from 'react';
+import {useEffect,useState} from 'react';
 
 type Run={action:string;record:any};
 const requirements=[
@@ -18,7 +18,8 @@ export default function ChallengeExam(){
  const [busy,setBusy]=useState(false);
  const [replay,setReplay]=useState<any>(null);
  const [finalReport,setFinalReport]=useState<any>(null);
- const sourceScreenshot='/evidence/terry-snyder-acceptance-condition-2026-09-20.png';
+ const [sourceScreenshotData,setSourceScreenshotData]=useState('');
+ useEffect(()=>{fetch('/evidence/terry-snyder-acceptance-condition-display.b64.txt').then(r=>r.ok?r.text():'').then(t=>{if(t)setSourceScreenshotData('data:image/webp;base64,'+t.trim())}).catch(()=>{})},[]);
  async function run(action:string){
   setBusy(true);setReplay(null);setFinalReport(null);
   const res=await fetch('/api/afa-eaba-challenge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,sequence:action==='baseline'?undefined:{examinationId:baseline?.examinationId,previousReceiptId:action==='changed-condition'?baseline?.receipt?.receiptId:changed?.receipt?.receiptId}})});
@@ -65,6 +66,7 @@ export default function ChallengeExam(){
    <section style={{padding:26,border:'1px solid #6c5b31',borderRadius:18,background:'linear-gradient(145deg,rgba(83,62,14,.20),rgba(4,21,28,.96))',marginBottom:18}}>
     <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',alignItems:'center'}}><div><div style={{fontSize:10,fontWeight:950,letterSpacing:'.16em',color:'#e7c76e'}}>SOURCE EVIDENCE · LINKEDIN COMMENT</div><h2 style={{fontSize:30,margin:'7px 0 0'}}>Where the eight requirements came from.</h2></div><a href="https://www.linkedin.com/posts/ta-14-authority-today-we-published-another-ugcPost-7507215874878054400-OJfm/?utm_source=share&utm_medium=member_desktop&rcm=ACoAAFovYx4B0iJkFAupdhBF61p2RryWF88x0q0" target="_blank" rel="noreferrer" style={{fontSize:10,color:'#71e7df'}}>OPEN ORIGINAL LINKEDIN SOURCE ↗</a></div>
     <p style={{color:'#a8c1c8',lineHeight:1.7,maxWidth:930}}>Before TA-14 answers the challenge, the source requirement should be visible. The panel below is a transcript-style evidence card of the operative portion of Terry Snyder&apos;s LinkedIn comment. It is deliberately shown before TA-14&apos;s coverage mapping so a reviewer can compare the stated test with the implementation.</p>
+    {sourceScreenshotData&&<img src={sourceScreenshotData} alt="Display copy of the Terry Snyder LinkedIn acceptance-condition screenshot supplied to TA-14" style={{display:'block',width:'100%',height:'auto',margin:'20px 0',borderRadius:12}}/>}
     <div style={{marginTop:20,border:'1px solid #38525a',borderRadius:16,overflow:'hidden',boxShadow:'0 24px 70px rgba(0,0,0,.28)'}}>
       <div style={{display:'flex',gap:12,alignItems:'center',padding:'16px 18px',background:'#f4f2ee',color:'#172126',borderBottom:'1px solid #d3d0ca'}}>
        <div style={{width:44,height:44,borderRadius:'50%',display:'grid',placeItems:'center',background:'#27373c',color:'#fff',fontWeight:950}}>TS</div>
@@ -99,7 +101,6 @@ Replay it.
 That is not a moving target.
 That has been the target the entire time.`}</div>
     </div>
-    <div style={{marginTop:16,padding:16,border:'1px solid #6c5b31',borderRadius:12,background:'#020b0f'}}><b style={{color:'#e7c76e'}}>ORIGINAL SOURCE SCREENSHOT · PRESERVED</b><p style={{color:'#a8c1c8',fontSize:11,lineHeight:1.6}}>The original LinkedIn screenshot supplied by TA-14 is displayed below when the preserved source file is available. The transcript above remains for legibility and one-to-one requirement mapping.</p><a href={sourceScreenshot} target="_blank" rel="noreferrer"><img src={sourceScreenshot} alt="Original LinkedIn screenshot showing Terry Snyder's operational acceptance-condition comment" style={{display:'block',width:'100%',height:'auto',borderRadius:9,border:'1px solid #38525a'}}/></a></div>
    </section>
    <section style={{padding:24,border:'1px solid #28545b',borderRadius:18,background:'#04151c'}}>
     <b style={{color:'#e7c76e'}}>TERRY SNYDER · STATED ACCEPTANCE CONDITION · FROZEN v1.0</b>
