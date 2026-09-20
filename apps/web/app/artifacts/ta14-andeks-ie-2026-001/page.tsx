@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 const surfaces = [
   ["S-01", "Object identity", "SUPPORTED", "The frozen record preserves the identity and role of the bounded examination objects without collapsing them into one architecture."],
@@ -51,6 +52,14 @@ export default function AndeksExaminationPage(){
       </div>
       <aside className="identity"><p>CONTROLLED EXAMINATION IDENTITY</p><dl><div><dt>Examination ID</dt><dd>TA-14-ANDEKS-IE-2026-001</dd></div><div><dt>Controlled finding</dt><dd>TA14-ANDEKS-IEF-001</dd></div><div><dt>Controlling revision</dt><dd>v1.1</dd></div><div><dt>ANDEKS™ Registry ID</dt><dd>TA-14-AIGR-000012</dd></div><div><dt>Frozen Stage B</dt><dd>v0.2.1</dd></div><div><dt>Boundary</dt><dd>v0.4.1</dd></div><div><dt>Stage A conditions</dt><dd>v0.3</dd></div><div><dt>Evidence</dt><dd>E-001 → E-007</dd></div><div><dt>Surfaces</dt><dd>S-01 → S-08</dd></div><div><dt>Falsification criteria</dt><dd>F-01 → F-10 NOT TRIGGERED</dd></div><div><dt>State</dt><dd className="green">EXAMINATION COMPLETE</dd></div><div><dt>Next-gate disposition</dt><dd className="gold">SUFFICIENT BASIS FOR A BOUNDED PILOT</dd></div></dl></aside>
     </section>
+
+    <GuidedShowroom eyebrow="ANDEKS × TA-14 · GUIDED INTEROPERABILITY RECORD" title="Interoperate without merging authority." intro="This examination demonstrates a documentary governance interface. It preserves two sovereign architectures, two separate authorizations, and a finding that stops before runtime or deployment." accent="#74dfff" gold="#f1c96d" steps={[
+      {label:'01 · BOUND',title:'Define what may be examined',plain:'The accepted boundary establishes the documentary objects and exclusions. Boundary acceptance alone does not authorize examination.'},
+      {label:'02 · FREEZE',title:'Freeze evidence, surfaces, and falsifiers',plain:'Stage B freezes admitted evidence, S-01 through S-08, falsification criteria, authority boundaries, and protection controls.'},
+      {label:'03 · AUTHORIZE',title:'Require two sovereign authorizations',plain:'TA-14 authorizes its participation separately. ANDEKS authorizes its participation separately. Neither substitutes for the other.',result:'DUAL AUTHORIZATION · NO AUTHORITY MERGER'},
+      {label:'04 · EXAMINE',title:'Test only the frozen documentary interface',plain:'The examination asks whether evidence and governance references can cross while provenance, attribution, normative lineage, and architectural sovereignty remain intact.'},
+      {label:'05 · CLOSE',title:'Stop at the earned finding',plain:'SUPPORTED INTEROPERABILITY — DOCUMENTARY GOVERNANCE-INTERFACE ONLY. Runtime interoperability, integration, deployment, certification, and pilot authority remain outside the finding.'},
+    ]}/>
 
     <section className="axioms"><div><span>01</span><b>Separate sovereignty preserved.</b></div><div><span>02</span><b>Same frozen boundary.</b></div><div><span>03</span><b>Dual authorization required.</b></div><div><span>04</span><b>Positive finding remains bounded.</b></div></section>
 
