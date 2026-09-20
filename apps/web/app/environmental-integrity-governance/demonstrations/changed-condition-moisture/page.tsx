@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import ConsequenceLab from '../../components/ConsequenceLab';
+import ConsequenceLab from '../../../components/ConsequenceLab';
 
 const evidence=[
  ['T0 · Baseline','Localized elevated moisture is documented at the affected wall assembly. HVAC operation, indoor RH, visible condition, instrument identity, location, and time are preserved.','SUPPORTS INVESTIGATION'],
