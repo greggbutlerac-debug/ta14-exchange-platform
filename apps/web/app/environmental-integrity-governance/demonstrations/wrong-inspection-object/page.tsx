@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ConsequenceLab from '../../components/ConsequenceLab';
 
 const candidates = [
   ['Visible symptom','Three occupied rooms repeatedly exceed the declared humidity envelope.'],
@@ -35,7 +36,13 @@ export default function WrongInspectionObjectDemo(){
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:12}}>{candidates.map(([title,body],i)=><article key={title} style={{padding:23,border:i===0?'1px solid rgba(255,173,142,.35)':'1px solid rgba(120,240,190,.18)',background:i===0?'rgba(49,22,10,.58)':'rgba(5,22,16,.66)',borderRadius:15}}><strong style={{fontSize:19,color:i===0?'#ffad8e':'#e9fff5'}}>{title}</strong><p style={{color:'#b8cdc3',lineHeight:1.65,marginBottom:0}}>{body}</p></article>)}</div>
     </section>
 
-    <section style={{maxWidth:1200,margin:'20px auto',padding:24}}>
+    <ConsequenceLab eyebrow="LIVE INSPECTION-OBJECT LAB" title="A symptom is visible. Is the governed object actually established?" intro="Keep the humidity observation intact while testing whether localization, causal identity, evidence binding and intervention target are sufficiently bounded. The lab is designed to refuse unsupported inference." actionLabel="BREAK OBJECT LOCALIZATION →" allowReason="The modeled inspection object is sufficiently bounded for proposition-specific examination. This does not establish cause, fault or intervention authority." conditions={[
+{id:'localization',label:'LOCALIZATION',question:'Is the exact condition and inspection boundary identified?',healthy:'BOUNDED',failed:'AMBIGUOUS',failure:'HOLD',failureReason:'The inspection object is not sufficiently localized for proposition-specific reliance.'},
+{id:'cause',label:'CAUSAL IDENTITY',question:'Has the proposed causal object actually been established rather than inferred from the symptom?',healthy:'ESTABLISHED FOR TEST',failed:'ASSUMED',failure:'HOLD',failureReason:'A visible symptom cannot silently become a causal finding.'},
+{id:'evidence',label:'EVIDENCE BINDING',question:'Is the evidence attributable to this exact inspection object?',healthy:'BOUND',failed:'UNBOUND',failure:'HOLD',failureReason:'Evidence is not bound to the exact governed object.'},
+{id:'intervention',label:'INTERVENTION TARGET',question:'Does the proposed intervention remain within the object and proposition actually established?',healthy:'MATCHED',failed:'OVERREACH',failure:'DENY',failureReason:'The proposed intervention exceeds the established inspection object.'}
+]} />
+<section style={{maxWidth:1200,margin:'20px auto',padding:24}}>
       <div style={{padding:30,border:'1px solid rgba(130,187,255,.3)',background:'rgba(7,19,34,.7)',borderRadius:18}}>
         <small style={{color:'#87bcff',fontWeight:900,letterSpacing:'.14em'}}>THE GOVERNANCE TEST</small>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:38,margin:'9px 0 15px'}}>Can the record distinguish the condition without pretending it has already explained it?</h2>
