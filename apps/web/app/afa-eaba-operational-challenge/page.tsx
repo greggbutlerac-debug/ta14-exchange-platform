@@ -20,7 +20,7 @@ export default function ChallengeExam(){
  const sourceScreenshot='/evidence/terry-snyder-acceptance-condition-2026-09-20.png';
  async function run(action:string){
   setBusy(true);setReplay(null);
-  const res=await fetch('/api/afa-eaba-challenge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action})});
+  const res=await fetch('/api/afa-eaba-challenge',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({action,sequence:action==='baseline'?undefined:{examinationId:baseline?.examinationId,previousReceiptId:action==='changed-condition'?baseline?.receipt?.receiptId:changed?.receipt?.receiptId}})});
   const data=await res.json(); setRuns(v=>[...v,data]); setBusy(false);
  }
  async function doReplay(){
