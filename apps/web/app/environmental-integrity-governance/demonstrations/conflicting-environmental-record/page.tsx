@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+import ConsequenceLab from '../../../components/ConsequenceLab';
 const chain = ['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'] as const;
 const consequences = [
   ['investigation','Authorize additional investigation'],
@@ -43,7 +44,13 @@ export default function ConflictingEnvironmentalRecordDemo(){
       <span style={{fontSize:12,letterSpacing:'.16em',color:'#9ebcaf'}}>EIG DEMONSTRATION 001 · R1</span>
     </nav>
 
-    <section style={{maxWidth:1240,margin:'0 auto',padding:'72px 24px 30px'}}>
+    <ConsequenceLab eyebrow="CONFLICTING-RECORD STRESS TEST" title="Both records can be authentic and the consequence can still be HOLD." intro="Keep both evidence packages visible. Change comparability, proposition fit, present standing or consequence scope without deleting either historical record." actionLabel="CHANGE ONE MATERIAL CONDITION →" allowReason="For this modeled state, the combined record supports bounded investigation while preserving the differences between the evidence packages." conditions={[
+{id:'context',label:'SAMPLING CONTEXT',question:'Are the different collection conditions preserved rather than treated as equivalent?',healthy:'DISTINGUISHED',failed:'COLLAPSED',failure:'HOLD',failureReason:'Different sampling contexts cannot silently be treated as directly equivalent.'},
+{id:'continuity',label:'EVIDENCE CONTINUITY',question:'Can each package retain its own provenance and chronology?',healthy:'PRESERVED',failed:'INCOMPLETE',failure:'HOLD',failureReason:'The evidence packages lack sufficient continuity for the proposed reliance.'},
+{id:'fit',label:'PROPOSITION FIT',question:'Is the consequence bounded to what the combined evidence actually establishes?',healthy:'BOUNDED',failed:'OVERCLAIMED',failure:'DENY',failureReason:'The proposed consequence exceeds the demonstrated evidentiary proposition.'},
+{id:'current',label:'PRESENT STANDING',question:'Has a new condition entered the record before commitment?',healthy:'CURRENT',failed:'CHANGED',failure:'HOLD',failureReason:'A material changed condition requires revalidation before commitment.'}
+]} />
+<section style={{maxWidth:1240,margin:'0 auto',padding:'72px 24px 30px'}}>
       <p style={{color:'#71e5ad',fontWeight:900,letterSpacing:'.18em',fontSize:12}}>ENVIRONMENTAL PROVING GROUND · SYNTHETIC BOUNDED CASE</p>
       <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(42px,7vw,82px)',lineHeight:.95,margin:'14px 0 20px'}}>The Conflicting<br/>Environmental Record</h1>
       <p style={{maxWidth:900,color:'#b8d0c5',fontSize:18,lineHeight:1.7}}>Two environmental measurements can both be authentic records without being equivalent evidence. This demonstration tests whether consequence can be prevented from outrunning what the admitted evidence actually supports.</p>

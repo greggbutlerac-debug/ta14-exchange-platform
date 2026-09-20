@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import ConsequenceLab from '../../../components/ConsequenceLab';
 
 const stages = [
   ['01','MONITORING','Sensors observe environmental conditions over time.'],
@@ -32,7 +33,14 @@ export default function ReportingToAuthorityDemo(){
       <div style={{marginTop:26,padding:18,border:'1px solid rgba(255,211,106,.32)',background:'rgba(83,57,8,.16)',color:'#f1d994'}}><strong>NON-CLAIM:</strong> TA-14 does not claim that historical exposure reporting is invalid, insufficient for every use, or equivalent to environmental governance. The question here is narrower: what additional conditions must be established before a record may support governed consequence?</div>
     </section>
 
-    <section style={{maxWidth:1240,margin:'0 auto',padding:'18px 24px'}}>
+    <ConsequenceLab eyebrow="LIVE REPORT-TO-AUTHORITY LAB" title="The report is useful. What is it authorized to cause?" intro="Start with a technically useful environmental report. Then test the additional predicates required before that information can support a governed consequence." actionLabel="BREAK ONE GOVERNANCE PREDICATE →" allowReason="For this modeled state, attribution, continuity, proposition fit, present standing and authority are established for the bounded consequence." conditions={[
+{id:'attribution',label:'ATTRIBUTION',question:'Are measurements bound to identified sources, places and periods?',healthy:'ESTABLISHED',failed:'INCOMPLETE',failure:'HOLD',failureReason:'The report lacks sufficient attribution for the proposed consequence.'},
+{id:'continuity',label:'CONTINUITY',question:'Is the chronology sufficiently intact and comparable?',healthy:'PRESERVED',failed:'GAPPED',failure:'HOLD',failureReason:'Evidence continuity is insufficient.'},
+{id:'fit',label:'PROPOSITION FIT',question:'Does the record support this exact conclusion rather than a broader observation?',healthy:'FITS',failed:'OVERCLAIM',failure:'DENY',failureReason:'The proposed conclusion exceeds what the report establishes.'},
+{id:'standing',label:'PRESENT STANDING',question:'Have material conditions remained current since the report was formed?',healthy:'CURRENT',failed:'CHANGED',failure:'HOLD',failureReason:'Material conditions changed; historical support does not silently become present standing.'},
+{id:'authority',label:'AUTHORITY',question:'Is the actor permitted to bind this exact consequence?',healthy:'BOUND',failed:'UNRESOLVED',failure:'ESCALATE',failureReason:'The authority required to bind consequence is unresolved.'}
+]} />
+<section style={{maxWidth:1240,margin:'0 auto',padding:'18px 24px'}}>
       <p style={{color:'#71e5ad',fontWeight:900,letterSpacing:'.14em',fontSize:12}}>THE ARCHITECTURAL LADDER</p>
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:12}}>{stages.map(([n,title,body])=><article key={n} style={{padding:24,border:'1px solid rgba(120,240,190,.2)',background:'rgba(6,24,18,.74)',borderRadius:16}}><small style={{color:'#6ee8ad',fontWeight:900}}>{n}</small><h2 style={{fontFamily:'Georgia,serif',fontSize:27,margin:'8px 0'}}>{title}</h2><p style={{color:'#b7cec3',lineHeight:1.65,margin:0}}>{body}</p></article>)}</div>
     </section>
