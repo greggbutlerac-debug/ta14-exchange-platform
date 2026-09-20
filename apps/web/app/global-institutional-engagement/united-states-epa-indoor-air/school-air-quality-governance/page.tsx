@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import InstitutionalSeamLab from '../../../components/InstitutionalSeamLab';
 
 const fellowshipFacts = [
   ['53', 'school-system leaders'],
@@ -92,7 +93,7 @@ export default function SchoolAirQualityGovernancePage() {
           </div>
         </section>
 
-        <section className="band"><div className="inner">
+        <InstitutionalSeamLab eyebrow="SCHOOL IAQ · LIVE CONSEQUENCE LAB" title="Raise outdoor PM2.5 after the ventilation response is prepared." intro="This turns the bounded school scenario into an operable model. The indoor CO₂ evidence does not become false; the outdoor context changes what may execute." nativeLabel="SCHOOL IAQ RECORD" nativeValue="CO₂ elevated · outdoor air initially acceptable" actionLabel="PREPARED HVAC ACTION" actionValue="Increase outdoor air" stages={[{label:'CO₂ RESPONSE PREPARED',state:'INITIAL CONTEXT',determination:'ALLOW',explanation:'The initial evidence supports the prepared ventilation response.'},{label:'WILDFIRE SMOKE ARRIVES',state:'OUTDOOR PM2.5 ↑',determination:'HOLD',changed:'MATERIAL OUTDOOR CHANGE',explanation:'The indoor evidence remains real, but the proposed response must not silently execute against the changed outdoor condition.'},{label:'REVALIDATE IAQ PLAN + AUTHORITY',state:'CURRENT RESPONSE ESTABLISHED',determination:'ALLOW',changed:'NEW EVIDENCE BOUND',explanation:'A fresh bounded response can proceed after the competing conditions are evaluated under current policy and authority.'}]} /><section className="band"><div className="inner">
           <p className="eyebrow">TA-14 EXECUTION TRACE</p>
           <h2>Eight anchors preserve the transition before consequence.</h2>
           <div className="trace">{executionTrace.map(([n, a, b]) => <article key={n}><span>{n}</span><div><h3>{a}</h3><p>{b}</p></div></article>)}</div>

@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import GuidedShowroom from '../../components/GuidedShowroom';
+import InstitutionalSeamLab from '../../components/InstitutionalSeamLab';
 
 const chain = [
   ['01','REALITY','The actual indoor and outdoor environmental condition at a defined place and time.'],
@@ -126,7 +127,7 @@ export default function USEPAIndoorAirShowroom() {
       <div className="callout"><b>ATMOSPHERIC INTEGRITY RECORDS · LINKS 01–04</b><p>In the environmental domain, AIR carries Reality → Record → Continuity → Admissibility: what condition existed, what was recorded, whether evidentiary continuity survives, and exactly what the environmental evidence is sufficient to support.</p></div>
       <div className="callout gold"><b>ADMISSIBLE EXECUTION ARCHITECTURE · LINKS 05–08</b><p>AEA carries the consequence boundary forward through Binding → Commit → Execution → Outcome: what the admissible evidence is bound to, whether authority remains current at commit, whether physical execution is permitted, and what outcome becomes the next record.</p></div>
       <h2>Preserve the handoff before consequence.</h2>
-      <div className="chain">{chain.map(([n,a,b]) => <article key={n}><span>{n}</span><h3>{a}</h3><p>{b}</p></article>)}</div>
+      <InstitutionalSeamLab eyebrow="EPA IAQ · EXECUTION-SEAM LAB" title="A prepared ventilation action does not inherit permission forever." intro="Start with current indoor and outdoor evidence supporting a prepared building action. Then change the outdoor condition before commit and see why current evidence must be re-established." nativeLabel="EPA / BUILDING IAQ EVIDENCE" nativeValue="Indoor + outdoor environmental record" actionLabel="PREPARED PHYSICAL ACTION" actionValue="Ventilation adjustment" stages={[{label:'PREPARE ACTION',state:'EVIDENCE CURRENT',determination:'ALLOW',explanation:'Current evidence and authority support the exact prepared ventilation action.'},{label:'CHANGE OUTDOOR AIR',state:'MATERIAL CHANGE',determination:'HOLD',changed:'OUTDOOR CONDITION CHANGED',explanation:'The earlier recommendation may remain historically reasonable, but its present execution basis is no longer established.'},{label:'REVALIDATE BEFORE COMMIT',state:'NEW BASIS ESTABLISHED',determination:'ALLOW',changed:'CURRENT EVIDENCE REBOUND',explanation:'Only the newly evaluated action receives a fresh determination for the current condition.'}]} /><div className="chain">{chain.map(([n,a,b]) => <article key={n}><span>{n}</span><h3>{a}</h3><p>{b}</p></article>)}</div>
       <div className="states"><b>ALLOW</b><b>HOLD</b><b>DENY</b><b>ESCALATE</b></div>
       <div className="callout gold"><b>WHY HOLD MATTERS</b><p>A HOLD does not claim the earlier CO₂ evidence was wrong. It means that evidence was established under a context that materially changed before physical execution. TA-14 therefore does not let the absence of an explicit refusal silently become permission.</p></div>
     </div></section>
