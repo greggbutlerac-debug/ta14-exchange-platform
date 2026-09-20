@@ -164,7 +164,7 @@ export default function HarmonicArtifactTwoPage() {
 
           <div className="hero-actions">
             <Link className="button primary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Open Seven Evidence Records</Link>
-            <Link className="button secondary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010">Open Permanent Registry Record</Link>
+            <Link className="button secondary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010">Open Permanent Registry Record</Link>\n            <Link className="button secondary" href="/governance-showcase/TA-14-AIGR-000008">Open Interactive Harmonic Showroom</Link>
             <Link className="button secondary" href="/artifacts/fd-2026-0002-case-001">Open Case 001</Link>
             <Link className="button ghost" href="/artifacts/registry">Return to Artifact Registry</Link>
           </div>
