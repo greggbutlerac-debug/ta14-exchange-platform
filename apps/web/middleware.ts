@@ -27,6 +27,15 @@ export async function middleware(request: NextRequest) {
   const requestedPath = `${request.nextUrl.pathname}${request.nextUrl.search}`;
   request.headers.set("x-ta14-requested-path", requestedPath);
 
+  // Resolve dedicated registered-governance showrooms before the generic public
+  // showcase route. This makes the canonical public Velos page authoritative even
+  // when a dynamic showcase fallback is also present in the App Router tree.
+  if (request.nextUrl.pathname === "/governance-showcase/TA-14-AIGR-000029") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/public/ai-governance/registry/showcase/TA-14-AIGR-000029";
+    return NextResponse.rewrite(url, { request: { headers: request.headers } });
+  }
+
   // Public institutional, learning, artifact/showroom, registry-record, commercial,
   // and event surfaces do not require account/session middleware. This keeps public
   // acquisition, evidence, showcase, and embed routes usable even when Supabase
