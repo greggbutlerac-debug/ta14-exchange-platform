@@ -36,7 +36,47 @@ export default function ChallengeExam(){
  return <main style={{minHeight:'100vh',background:'radial-gradient(circle at 50% 0,#102d35,#031015 38%,#010609 80%)',color:'#efffff',fontFamily:'Inter,system-ui,sans-serif'}}>
   <div style={{width:'min(1180px,calc(100% - 32px))',margin:'0 auto',padding:'26px 0 90px'}}>
    <nav style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',paddingBottom:20,borderBottom:'1px solid #17363e'}}><Link href="/" style={{color:'#fff',textDecoration:'none',fontWeight:950}}>TA-14 EXCHANGE</Link><span style={{fontSize:10,color:'#71e7df',fontWeight:900}}>TA14-AFA-EABA-SX-001 · FROZEN CHALLENGE SPEC</span></nav>
-   <section style={{padding:'68px 0 34px'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#71e7df'}}>AFA × EABA · OPERATIONAL CHALLENGE EXAMINATION</div><h1 style={{fontSize:'clamp(44px,7vw,88px)',lineHeight:.93,letterSpacing:'-.05em',margin:'14px 0 22px'}}>NAME THE TEST.<br/><span style={{color:'#e7c76e'}}>FREEZE THE TEST.</span><br/>RUN THE TEST.</h1><p style={{maxWidth:900,color:'#a8c1c8',fontSize:18,lineHeight:1.7}}>This surface implements the stated acceptance sequence as a server-executed bounded harness. The showroom is the control and evidence surface; the API route performs the determination and returns the preserved receipt.</p></section>
+   <section style={{padding:'68px 0 34px'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#71e7df'}}>AFA × EABA · OPERATIONAL CHALLENGE EXAMINATION</div><h1 style={{fontSize:'clamp(44px,7vw,88px)',lineHeight:.93,letterSpacing:'-.05em',margin:'14px 0 22px'}}>NAME THE TEST.<br/><span style={{color:'#e7c76e'}}>FREEZE THE TEST.</span><br/>RUN THE TEST.</h1><p style={{maxWidth:940,color:'#a8c1c8',fontSize:18,lineHeight:1.7}}>This is not a static claim page. It is a bounded examination surface built around a publicly stated operational challenge. First, the source requirement is preserved. Second, each requirement is mapped one-for-one to a concrete test action or evidence object. Third, the visitor executes the sequence against the server-side harness and inspects the resulting determination, consequence state, receipt, and replay result.</p>
+   <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:9,marginTop:26}}><div style={{padding:16,border:'1px solid #21444b',borderRadius:11}}><small style={{color:'#71e7df',fontWeight:950}}>OBJECT UNDER EXAMINATION</small><strong style={{display:'block',marginTop:7}}>AFA × EABA bounded execution path</strong></div><div style={{padding:16,border:'1px solid #21444b',borderRadius:11}}><small style={{color:'#71e7df',fontWeight:950}}>MECHANISM</small><strong style={{display:'block',marginTop:7}}>TA14-AFA-EABA-SX-001 · v1.0.0</strong></div><div style={{padding:16,border:'1px solid #21444b',borderRadius:11}}><small style={{color:'#71e7df',fontWeight:950}}>EXAMINATION QUESTION</small><strong style={{display:'block',marginTop:7}}>Does changed authority state prevent protected consequence?</strong></div></div></section>
+   <section style={{padding:26,border:'1px solid #6c5b31',borderRadius:18,background:'linear-gradient(145deg,rgba(83,62,14,.20),rgba(4,21,28,.96))',marginBottom:18}}>
+    <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',alignItems:'center'}}><div><div style={{fontSize:10,fontWeight:950,letterSpacing:'.16em',color:'#e7c76e'}}>SOURCE EVIDENCE · LINKEDIN COMMENT</div><h2 style={{fontSize:30,margin:'7px 0 0'}}>Where the eight requirements came from.</h2></div><span style={{fontSize:10,color:'#a8c1c8'}}>Preserved as the challenge source</span></div>
+    <p style={{color:'#a8c1c8',lineHeight:1.7,maxWidth:930}}>Before TA-14 answers the challenge, the source requirement should be visible. The panel below is a transcript-style evidence card of the operative portion of Terry Snyder&apos;s LinkedIn comment. It is deliberately shown before TA-14&apos;s coverage mapping so a reviewer can compare the stated test with the implementation.</p>
+    <div style={{marginTop:20,border:'1px solid #38525a',borderRadius:16,overflow:'hidden',boxShadow:'0 24px 70px rgba(0,0,0,.28)'}}>
+      <div style={{display:'flex',gap:12,alignItems:'center',padding:'16px 18px',background:'#f4f2ee',color:'#172126',borderBottom:'1px solid #d3d0ca'}}>
+       <div style={{width:44,height:44,borderRadius:'50%',display:'grid',placeItems:'center',background:'#27373c',color:'#fff',fontWeight:950}}>TS</div>
+       <div><strong style={{display:'block'}}>Terry Snyder</strong><span style={{fontSize:11,color:'#5e6a70'}}>LinkedIn comment · challenge source</span></div>
+      </div>
+      <div style={{padding:'22px 24px',background:'#fff',color:'#1f2a2e',fontSize:15,lineHeight:1.72,whiteSpace:'pre-line'}}>{`So the acceptance condition is obvious:
+Show the artifact that performs the claimed operation.
+
+Not a registry entry.
+Not an invariant.
+Not a diagram.
+Not a showroom.
+Not a HOLD screen.
+Not a receipt generated by a staged flow.
+
+Freeze the mechanism.
+
+Run it.
+
+Change one material condition.
+
+Show the verdict change.
+
+Attempt bypass.
+
+Show the protected consequence did not fire.
+
+Preserve the receipt.
+
+Replay it.
+
+That is not a moving target.
+That has been the target the entire time.`}</div>
+    </div>
+    <div style={{marginTop:14,padding:14,border:'1px dashed #6c5b31',borderRadius:10,color:'#d8c98f',fontSize:11,lineHeight:1.6}}><b>RECORD NOTE:</b> This is a transcript-style rendering, not a photographic screenshot. TA-14 should replace or supplement it with the original LinkedIn screenshot when that image is available as a repository asset. The operative eight-part wording is preserved here without adding a ninth condition.</div>
+   </section>
    <section style={{padding:24,border:'1px solid #28545b',borderRadius:18,background:'#04151c'}}>
     <b style={{color:'#e7c76e'}}>TERRY SNYDER · STATED ACCEPTANCE CONDITION · FROZEN v1.0</b>
     <p style={{color:'#a8c1c8',lineHeight:1.7,maxWidth:920}}>The requirements below are the operational sequence Terry Snyder explicitly stated should constitute the acceptance condition. They are preserved here before examination and paired one-for-one with the mechanism used to answer each requirement.</p>
@@ -47,7 +87,8 @@ export default function ChallengeExam(){
     </div>)}</div>
     <div style={{marginTop:18,padding:15,border:'1px dashed #71e7df',borderRadius:10,color:'#9bded9',fontSize:11,lineHeight:1.65}}><b>ONE-TO-ONE RULE:</b> Requirement 01 is answered by Coverage 01, Requirement 02 by Coverage 02, and so on through Requirement 08. No additional acceptance condition is inserted into this frozen challenge specification.</div>
    </section>
-   <section style={{padding:'54px 0 20px'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>EXECUTE THE SAME EIGHT CONDITIONS</div><h2 style={{fontSize:38,margin:'8px 0 10px'}}>Run the frozen mechanism.</h2><p style={{color:'#9fb7be'}}>Run in order. The changed-condition test alters exactly one material fact: LOCAL STANDING.</p><div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:20}}><button disabled={busy} onClick={()=>run('baseline')} style={btn}>1 · RUN BASELINE</button><button disabled={busy||!baseline} onClick={()=>run('changed-condition')} style={btn}>2 · CHANGE ONE CONDITION</button><button disabled={busy||!changed} onClick={()=>run('bypass')} style={btn}>3 · ATTEMPT BYPASS</button><button disabled={busy||!bypass} onClick={doReplay} style={btn}>4 · REPLAY LAST RECEIPT</button></div></section>
+   <section style={{padding:'54px 0 20px'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>EXECUTE THE SAME EIGHT CONDITIONS</div><h2 style={{fontSize:38,margin:'8px 0 10px'}}>Run the frozen mechanism.</h2><p style={{color:'#9fb7be',maxWidth:900,lineHeight:1.7}}>Run in order. The baseline establishes the positive path. The second run alters exactly one material fact—<b>LOCAL STANDING</b>—so the verdict comparison has a controlled delta. The bypass run then attempts to reach the protected consequence outside the permitted gate. Finally, replay verifies the preserved execution record against the same frozen mechanism.</p>
+   <div style={{padding:16,border:'1px solid #21444b',borderRadius:11,background:'#020b0f',marginTop:16,color:'#a8c1c8',lineHeight:1.65}}><b style={{color:'#71e7df'}}>WHAT COUNTS AS SUCCESS IN THIS BOUNDED EXAMINATION?</b><br/>Baseline reaches an ALLOW state and may fire the protected consequence. Removing local standing changes the determination and prevents release. A bypass attempt also fails to fire the protected consequence. Each run produces an integrity-bound receipt, and replay must reproduce the same integrity hash.</div><div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:20}}><button disabled={busy} onClick={()=>run('baseline')} style={btn}>1 · RUN BASELINE</button><button disabled={busy||!baseline} onClick={()=>run('changed-condition')} style={btn}>2 · CHANGE ONE CONDITION</button><button disabled={busy||!changed} onClick={()=>run('bypass')} style={btn}>3 · ATTEMPT BYPASS</button><button disabled={busy||!bypass} onClick={doReplay} style={btn}>4 · REPLAY LAST RECEIPT</button></div></section>
    <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:10,marginTop:18}}>
     <Card title="BASELINE" r={baseline}/><Card title="CHANGED CONDITION" r={changed}/><Card title="BYPASS ATTEMPT" r={bypass}/>
    </section>
