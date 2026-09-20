@@ -42,6 +42,13 @@ const C={bg:'#02060c',panel:'#071522',line:'#28445e',cyan:'#79d8ff',gold:'#f1cb7
 export default function EABAShowroom(){
  const [proof,setProof]=useState(0),[gate,setGate]=useState(0),[attack,setAttack]=useState(0);
  const [ran,setRan]=useState(false),[effect,setEffect]=useState(false),[tour,setTour]=useState(0);
+ const [domain,setDomain]=useState(0),[attempts,setAttempts]=useState<{id:number;result:Result;domain:string;note:string}[]>([]);
+ const domains=[
+  {name:'BUILDING CONTROL',action:'Raise occupied-zone supply-air setpoint',target:'AHU-04 / Zone 3',consequence:'Changes a live occupied environment'},
+  {name:'AI AGENT',action:'Release a consequential external transaction',target:'Protected account / exact request',consequence:'Creates an external irreversible obligation'},
+  {name:'CRITICAL INFRASTRUCTURE',action:'Issue a protected control command',target:'Bound field endpoint / current version',consequence:'Changes infrastructure state'},
+  {name:'INSTITUTIONAL WORKFLOW',action:'Commit a governed institutional action',target:'Named case / authorized scope',consequence:'Creates an attributable institutional consequence'}
+ ];
  const [scenario,setScenario]=useState({state:true,target:true,authority:true,scope:true,standing:true,binding:true,evidence:true});
  const selected=proofs[proof], a=attacks[attack];
  const scenarioResult=useMemo<Result>(()=>{
@@ -51,6 +58,7 @@ export default function EABAShowroom(){
   return 'ALLOW';
  },[scenario]);
  const toggle=(k:keyof typeof scenario)=>setScenario(v=>({...v,[k]:!v[k]}));
+ const attemptCommit=()=>setAttempts(v=>[{id:v.length+1,result:scenarioResult,domain:domains[domain].name,note:scenarioResult==='ALLOW'?'Commit eligibility established; effect proof still required.':scenarioResult==='HOLD'?'Commit blocked; revalidation required.':scenarioResult==='DENY'?'Commit refused; authority absent.':'Commit blocked; institutional resolution required.'},...v].slice(0,6));
  const tourSteps=[
   ['1 · START WITH REALITY','A system may understand a request perfectly. EABA still asks whether protected consequence is permitted now.'],
   ['2 · PROVE STANDING','EABS keeps ten proof burdens explicit so one kind of proof cannot silently substitute for another.'],
@@ -122,6 +130,17 @@ export default function EABAShowroom(){
     <div style={{marginTop:12,padding:20,border:'1px solid '+C.line,borderRadius:12,background:'#050d17'}}><b style={{color:C.gold}}>{gates[gate][0]} · {gates[gate][1]}</b><p style={{color:'#afc2d3',lineHeight:1.7,marginBottom:0}}>{gates[gate][2]}</p></div>
    </section>
 
+   <section style={{...feature,margin:'34px 0'}}>
+    <Eyebrow>EABA CONSEQUENCE CONSOLE · CHOOSE THE WORLD</Eyebrow><h2 style={h2}>Do not read the architecture. Operate it.</h2>
+    <p style={lead}>Select a consequence domain. The same execution-authority question is then applied to a different protected world. EABA does not grant permission because a system is smart, connected, confident, or technically capable.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:9,marginTop:22}}>{domains.map((d,i)=><button key={d.name} onClick={()=>setDomain(i)} style={button(domain===i)}><small style={{color:C.cyan}}>WORLD 0{i+1}</small><strong style={{display:'block',margin:'7px 0'}}>{d.name}</strong><span style={{fontSize:10,color:'#91a9bd'}}>{d.consequence}</span></button>)}</div>
+    <div style={{marginTop:14,padding:24,border:'1px solid '+C.gold,borderRadius:14,background:'rgba(99,70,17,.12)',display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:18}}>
+     <div><small style={{color:'#879eb2'}}>PROPOSED ACTION</small><b style={{display:'block',marginTop:7}}>{domains[domain].action}</b></div>
+     <div><small style={{color:'#879eb2'}}>BOUND TARGET</small><b style={{display:'block',marginTop:7}}>{domains[domain].target}</b></div>
+     <div><small style={{color:'#879eb2'}}>WHY PROTECTED</small><b style={{display:'block',marginTop:7,color:C.gold}}>{domains[domain].consequence}</b></div>
+    </div>
+   </section>
+
    <section id="lab" style={{padding:'70px 0 30px'}}>
     <Eyebrow>LIVE CONSEQUENCE LAB</Eyebrow><h2 style={h2}>Change one fact. Watch permission disappear.</h2>
     <p style={lead}>Start with a fully established route. Toggle any condition. EABA recomputes the governed determination without silently repairing the failure.</p>
@@ -132,9 +151,15 @@ export default function EABAShowroom(){
      <div style={{padding:28,borderRadius:16,border:'1px solid '+(scenarioResult==='ALLOW'?C.green:scenarioResult==='DENY'?C.red:C.gold),background:'#050d17'}}>
       <small style={{color:'#8299ad'}}>CURRENT DETERMINATION</small><strong style={{display:'block',fontSize:42,margin:'8px 0',color:scenarioResult==='ALLOW'?C.green:scenarioResult==='DENY'?C.red:C.gold}}>{scenarioResult}</strong>
       <p style={{color:'#afc2d3',lineHeight:1.65}}>{scenarioResult==='ALLOW'?'All modeled conditions are established. This attempt is eligible to proceed to protected commit; effect and outcome evidence are still required.':scenarioResult==='DENY'?'Authority is affirmatively absent. Protected commit is refused.':scenarioResult==='ESCALATE'?'Local standing is unresolved. The architecture refuses to invent permission and routes the question for resolution.':'At least one required condition is not established. Protected commit remains blocked until the route is re-established.'}</p>
-      <button onClick={()=>setScenario({state:true,target:true,authority:true,scope:true,standing:true,binding:true,evidence:true})} style={secondary}>RESET ALL CONDITIONS</button>
+      <div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button onClick={attemptCommit} style={primary}>ATTEMPT PROTECTED COMMIT</button><button onClick={()=>setScenario({state:true,target:true,authority:true,scope:true,standing:true,binding:true,evidence:true})} style={secondary}>RESET ALL CONDITIONS</button></div>
      </div>
     </div>
+   </section>
+
+   <section style={{padding:'28px 0 38px'}}>
+    <Eyebrow>LIVE ATTEMPT LEDGER</Eyebrow><h2 style={h2}>Every crossing attempt leaves a determination trace.</h2>
+    <p style={lead}>Change conditions and attempt the commit again. A previous ALLOW does not silently survive a changed present.</p>
+    {attempts.length===0?<div style={{padding:24,border:'1px dashed '+C.line,borderRadius:12,color:'#8fa9bf'}}>No attempt recorded yet. Use the Consequence Lab above and press ATTEMPT PROTECTED COMMIT.</div>:<div style={{display:'grid',gap:8}}>{attempts.map(x=><div key={x.id} style={{display:'grid',gridTemplateColumns:'70px minmax(150px,.6fr) 110px minmax(220px,1.4fr)',gap:12,alignItems:'center',padding:16,border:'1px solid '+C.line,borderRadius:10,background:C.panel}}><b style={{color:C.cyan}}>#{String(x.id).padStart(2,'0')}</b><span style={{fontSize:10,fontWeight:900}}>{x.domain}</span><strong style={{color:x.result==='ALLOW'?C.green:x.result==='DENY'?C.red:C.gold}}>{x.result}</strong><span style={{fontSize:11,color:'#9fb5ca'}}>{x.note}</span></div>)}</div>}
    </section>
 
    <section style={{padding:'66px 0 30px'}}>
