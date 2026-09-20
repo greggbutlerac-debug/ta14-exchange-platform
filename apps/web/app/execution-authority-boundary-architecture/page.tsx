@@ -62,7 +62,7 @@ export default function EABAShowroom(){
   <div style={{width:'min(1280px,calc(100% - 28px))',margin:'0 auto',padding:'22px 0 100px'}}>
    <nav style={{display:'flex',justifyContent:'space-between',gap:16,alignItems:'center',paddingBottom:20,borderBottom:'1px solid '+C.line,flexWrap:'wrap'}}>
     <Link href="/" style={{color:'#fff',textDecoration:'none',fontWeight:950,letterSpacing:'.13em'}}>TA-14 EXCHANGE</Link>
-    <span style={{fontSize:10,color:C.cyan,fontWeight:900,letterSpacing:'.13em'}}>EABA v1.0-RC1 · PUBLISHED · DOI 10.5281/zenodo.22851885</span>
+    <span style={{fontSize:10,color:C.cyan,fontWeight:900,letterSpacing:'.13em'}}>EABA v1.0-RC1 · REGISTERED · TA-14-AIGR-000043</span>
    </nav>
 
    <section style={{padding:'72px 0 44px',maxWidth:1120}}>
@@ -71,8 +71,19 @@ export default function EABAShowroom(){
     <p style={{fontSize:'clamp(17px,2vw,22px)',lineHeight:1.65,color:'#bdd0e2',maxWidth:940}}>EABA is the architecture between <b style={{color:'#fff'}}>knowing</b> and <b style={{color:C.gold}}>doing</b>. It requires a consequential system to prove that authority is present, evidence is admissible, the exact target is bound, conditions have not materially changed, and the protected commit is still authorized <em>now</em>.</p>
     <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:26}}>
      <a href="#learn" style={primary}>UNDERSTAND EABA IN 60 SECONDS ↓</a>
+     <a href="https://www.ta14exchange.com/workspace/ai-governance/registry/records/TA-14-AIGR-000043" target="_blank" rel="noreferrer" style={secondary}>REGISTRY · TA-14-AIGR-000043 ↗</a>
      <a href="#lab" style={secondary}>TRY THE CONSEQUENCE LAB ↓</a>
      <a href="https://doi.org/10.5281/zenodo.22851885" target="_blank" rel="noreferrer" style={secondary}>CANONICAL RC1 ↗</a>
+    </div>
+   </section>
+
+   <section style={{...feature,marginBottom:22}}>
+    <Eyebrow>REGISTERED GOVERNANCE · PUBLIC EVIDENCE DRAWER</Eyebrow><h2 style={h2}>One architecture. Three inspectable records.</h2>
+    <p style={lead}>EABA now has a permanent governed identity, a canonical public archive, and a public explanatory article. Registration preserves identity and boundaries; it does not convert RC1 into Technical Freeze or certification.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:10,marginTop:20}}>
+     <a href="https://www.ta14exchange.com/workspace/ai-governance/registry/records/TA-14-AIGR-000043" target="_blank" rel="noreferrer" style={{...secondary,padding:20}}><b style={{display:'block',color:C.cyan,marginBottom:8}}>REGISTRY RECORD</b>TA-14-AIGR-000043 · Registered Sep 20, 2026</a>
+     <a href="https://doi.org/10.5281/zenodo.22851885" target="_blank" rel="noreferrer" style={{...secondary,padding:20}}><b style={{display:'block',color:C.gold,marginBottom:8}}>CANONICAL ARCHIVE</b>DOI 10.5281/zenodo.22851885 · v1.0-RC1</a>
+     <a href="https://www.linkedin.com/feed/update/urn:li:activity:7507281412740308992" target="_blank" rel="noreferrer" style={{...secondary,padding:20}}><b style={{display:'block',color:C.green,marginBottom:8}}>PUBLIC EXPLANATION</b>The Crossing Can Be Valid and the Answer Can Still Be HOLD</a>
     </div>
    </section>
 
@@ -163,9 +174,9 @@ export default function EABAShowroom(){
    </section>
 
    <section style={{padding:'70px 0 10px',textAlign:'center'}}>
-    <Eyebrow>THE COMPLETE LOOP</Eyebrow><h2 style={{...h2,fontSize:'clamp(30px,5vw,58px)'}}>SPECIFY → ESTABLISH → BIND → GATE → DETERMINE → COMMIT → EFFECT → PROVE → CLOSE</h2>
+    <Eyebrow>REGISTERED RC1 · THE COMPLETE LOOP</Eyebrow><h2 style={{...h2,fontSize:'clamp(30px,5vw,58px)'}}>SPECIFY → ESTABLISH → BIND → GATE → DETERMINE → COMMIT → EFFECT → PROVE → CLOSE</h2>
     <p style={{...lead,margin:'0 auto',maxWidth:920}}>EABA does not ask intelligent systems to know less. It requires consequential systems to establish more before acting—and to leave behind enough evidence to prove what actually happened.</p>
-    <div style={{display:'flex',justifyContent:'center',gap:10,flexWrap:'wrap',marginTop:25}}><a href="https://doi.org/10.5281/zenodo.22851885" target="_blank" rel="noreferrer" style={primary}>READ PUBLISHED EABA RC1 ↗</a><Link href="/admissible-federation-architecture" style={secondary}>EXPLORE AFA →</Link><Link href="/" style={secondary}>RETURN TO EXCHANGE →</Link></div>
+    <div style={{display:'flex',justifyContent:'center',gap:10,flexWrap:'wrap',marginTop:25}}><a href="https://www.ta14exchange.com/workspace/ai-governance/registry/records/TA-14-AIGR-000043" target="_blank" rel="noreferrer" style={primary}>OPEN PERMANENT REGISTRY RECORD ↗</a><a href="https://doi.org/10.5281/zenodo.22851885" target="_blank" rel="noreferrer" style={secondary}>READ CANONICAL EABA RC1 ↗</a><Link href="/admissible-federation-architecture" style={secondary}>EXPLORE AFA →</Link><Link href="/" style={secondary}>RETURN TO EXCHANGE →</Link></div>
    </section>
   </div>
  </main>
