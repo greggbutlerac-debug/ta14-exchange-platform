@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import {useState} from 'react';
+import GuidedShowroom from '../components/GuidedShowroom';
 
 const decisions=[
  ['ACCEPT_NARROWED','Receiver accepts only a provably narrower authority context.'],
@@ -44,6 +45,21 @@ export default function AFAShowroom(){
      <Link href="/federation-authority" style={{padding:'13px 16px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:11,textDecoration:'none'}}>FEDERATION & AUTHORITY →</Link>
     </div>
    </section>
+
+   <GuidedShowroom
+    eyebrow="AFA · GUIDED SHOWROOM"
+    title="Understand federation before you move the Passport."
+    intro="AFA is about crossing between independently governed domains without pretending that context, trust, identity, or acceptance automatically becomes local permission to act."
+    accent="#71e7df"
+    gold="#e7c76e"
+    steps={[
+      {label:'01 · ORIGIN',title:'Domain A has bounded authority context',plain:'The issuing domain knows what it is presenting, under what version, purpose, lineage, and authority state.',why:'Nothing here proves that another domain may execute anything.'},
+      {label:'02 · PRESENT',title:'The Authority Passport crosses',plain:'A bounded authority context is presented at a named federation boundary. The crossing carries context, not local execution entitlement.',result:'CONTEXT MAY CROSS · EXECUTION AUTHORITY DOES NOT'},
+      {label:'03 · VERIFY',title:'The receiver checks what arrived',plain:'Identity, integrity, version, freshness, revocation context, scope, and interface semantics are evaluated before reliance.',why:'Successful transport is not successful authorization.'},
+      {label:'04 · DETERMINE',title:'The receiving domain decides',plain:'The receiver may accept narrowly, HOLD, reject, suspend, or escalate. The receiving domain keeps its right to refuse.',result:'ACCEPTANCE STILL DOES NOT GRANT COMMIT OR EXECUTION AUTHORITY'},
+      {label:'05 · TERMINATE',title:'Federation stops before local consequence',plain:'The federation interaction ends. Local lease, local capsule, commit, execution, and effect must be established under the receiving domain’s own governance.',why:'This is the seam AFA protects.'},
+    ]}
+   />
 
    <section style={{padding:'30px',border:'1px solid #20525a',borderRadius:22,background:'rgba(4,20,27,.88)',boxShadow:'0 28px 90px rgba(0,0,0,.35)'}}>
     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#71e7df'}}>INTERACTIVE FEDERATION SEAM</div>
