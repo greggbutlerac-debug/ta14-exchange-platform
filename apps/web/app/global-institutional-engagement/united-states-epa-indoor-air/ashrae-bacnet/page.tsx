@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import GuidedShowroom from '../../../components/GuidedShowroom';
 
 const timeline=[
 ['5 Sep 2026','TA-14 → ASHRAE Standards Section','Technical question submitted: when does an interoperable, technically valid building command become presently authorized physical execution?'],
@@ -25,6 +26,14 @@ export default function AshraeBacnetContinuation(){
   <nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/global-institutional-engagement/united-states-epa-indoor-air">U.S. SHOWROOM 07</Link><Link href="/global-institutional-engagement">GLOBAL ENGAGEMENT</Link></nav>
   <header><p className="eye">UNITED STATES · SHOWROOM 07 · STANDARDS / BUILDING-CONTROL CONTINUATION</p><h1>A valid command is not the same thing as<br/><em>present authority to execute.</em></h1><p className="lead">This surface continues the bounded U.S. institutional record from EPA Indoor Air into the ASHRAE / BACnet standards layer. It does not restart the examination. It preserves the referral chain already earned and carries forward one unresolved question: after material conditions change, what prevents authority established under the earlier state from persisting silently into physical execution?</p>
   <div className="status"><b>ASHRAE REFERRAL RECORDED</b><b>BACNET INQUIRY SENT</b><b>EPA → ASHRAE REFERRAL RECORDED</b><b>NO ENDORSEMENT IMPLIED</b></div></header>
+
+  <GuidedShowroom eyebrow="ASHRAE / BACNET · GUIDED QUESTION" title="Interoperability can carry a command. What makes it executable now?" intro="This continuation keeps the standards question narrow. It does not claim an answer from ASHRAE or BACnet; it lets the visitor walk the unresolved pre-execution authority seam." accent="#78c9ee" gold="#e8b95e" steps={[
+   {label:'01 · CONNECT',title:'The systems interoperate',plain:'BACnet or another building-control layer can carry valid information and commands between components.'},
+   {label:'02 · PREPARE',title:'A technically valid command is prepared',plain:'The command can be syntactically and operationally valid under the earlier state.',why:'Technical validity is not the same proposition as present authority.'},
+   {label:'03 · CHANGE',title:'Material reality changes before execution',plain:'New environmental evidence arrives after preparation but before physical consequence.'},
+   {label:'04 · ASK',title:'Where is the authority gate?',plain:'What mechanism withholds, revokes, expires, or requires revalidation of the already-prepared action?',result:'THIS REMAINS THE BOUNDED TECHNICAL QUESTION'},
+   {label:'05 · PRESERVE',title:'Do not turn referral or silence into agreement',plain:'The public record preserves the ASHRAE referral, BACnet inquiry, and EPA referral without treating any of them as adoption, endorsement, or technical agreement.'},
+  ]}/>
 
   <section><p className="eye">WHY THIS IS A CONTINUATION — NOT A NEW SHOWROOM</p><h2>Two independent institutional paths converge on the same technical layer.</h2>
    <div className="paths"><article><span>PATH A</span><b>TA-14 → ASHRAE → BACnet</b><p>TA-14 raised the execution-authority boundary with ASHRAE first. ASHRAE Technical Services directed the Standard 135 question to BACnet contacts, and TA-14 followed that route.</p></article><article><span>PATH B</span><b>TA-14 ↔ U.S. EPA → ASHRAE</b><p>The later EPA exchange sharpened the question around changed environmental conditions between prepared action and execution. EPA then independently directed TA-14 to ASHRAE standards.</p></article></div>

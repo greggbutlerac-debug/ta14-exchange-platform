@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import GuidedShowroom from '../components/GuidedShowroom';
 import { useMemo, useState } from "react";
 import type { CSSProperties } from "react";
 
@@ -335,6 +336,14 @@ export default function EnvironmentalIntegrityGovernancePage() {
           <Link className="navPrimary" href="/workspace/environmental-records">Enter Workspace</Link>
         </nav>
       </section>
+
+      <div className="shell"><GuidedShowroom eyebrow="ENVIRONMENTAL INTEGRITY · GUIDED TOUR" title="From environmental measurement to defensible consequence." intro="Environmental data becomes governance only when the record preserves what was measured, whether it remained continuous and admissible, what authority may rely on it, and what happened after intervention." accent="#6fe8ff" gold="#ffd15c" steps={[
+       {label:'01 · REALITY',title:'Measure the environment',plain:'Air, water, land, building, HVAC, or personal exposure begins with a bounded observation at a place, time, condition, and instrument state.'},
+       {label:'02 · RECORD',title:'Turn observation into attributable evidence',plain:'Identity, location, chronology, method, instrument context, limitations, and relevant conditions remain attached to the record.',why:'A number without provenance is not enough.'},
+       {label:'03 · TEST',title:'Ask what the evidence can actually support',plain:'Continuity and admissibility separate supported environmental interpretation from assumption, diagnosis, or unsupported certainty.'},
+       {label:'04 · BIND',title:'Bind evidence to the right authority and action',plain:'Environmental evidence does not itself grant intervention authority. The contemplated consequence must be bound to competent authority and current conditions.',result:'ADMISSIBLE EVIDENCE ≠ INTERVENTION AUTHORITY'},
+       {label:'05 · VERIFY',title:'Preserve the post-intervention outcome',plain:'After action, the environmental state is measured again so the record can establish what changed and whether a new chain is required.'},
+      ]}/></div>
 
       <section className="hero shell">
         <div className="heroCopy">

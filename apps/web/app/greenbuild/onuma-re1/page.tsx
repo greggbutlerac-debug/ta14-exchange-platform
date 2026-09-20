@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 export const metadata: Metadata = {
   title: 'ONUMA × TA-14 — RE1 Trusted Operational Intelligence Record | Greenbuild 2026',
@@ -23,6 +24,14 @@ export default function GreenbuildOnumaRE1(){
    <p className="lead">Independent systems met through the building itself. ONUMA/BIMgenie established operational context. TA-14 evaluated whether represented evidence had standing—and whether that standing was sufficient to become physical consequence.</p>
    <div className="result"><div><small>ACA · COMPUTATION</small><strong>SUPPORTED</strong><span>Represented topology only</span></div><i>→</i><div><small>AEA · EXECUTION</small><strong>ALLOW</strong><span>Bounded investigation</span></div><i>→</i><div className="hold"><small>PHYSICAL CONSEQUENCE</small><strong>HOLD</strong><span>New field evidence required</span></div></div>
   </header>
+
+  <GuidedShowroom eyebrow="ONUMA × TA-14 · GUIDED FIELD CASE" title="Follow the work order until the evidence says STOP." intro="This is the easiest way to understand the ONUMA case: shared building intelligence successfully supported investigation, but the same record did not support physical electrical intervention." accent="#6eeaff" gold="#efc66f" steps={[
+   {label:'01 · CONTEXT',title:'ONUMA identifies the operational object',plain:'Work order 3593-22790, the represented space, assignment, component relationships, and reported condition establish the operational context.',why:'Context tells us what to investigate; it does not authorize intervention.'},
+   {label:'02 · COMPUTE',title:'ACA permits bounded represented-topology work',plain:'The represented topology can be located, related, compared, and used to guide a non-intervention investigation.',result:'ACA · SUPPORTED · REPRESENTED TOPOLOGY ONLY'},
+   {label:'03 · INVESTIGATE',title:'AEA allows bounded field investigation',plain:'The technician may observe accessible conditions, compare identifiers, preserve discrepancies, and return new evidence.',result:'AEA · ALLOW · BOUNDED NON-INTERVENTION INVESTIGATION'},
+   {label:'04 · BOUNDARY',title:'The record reaches physical consequence',plain:'Breaker operation, panel access, measurement, switching, repair, replacement, rewiring, energization, or de-energization would cross into a different consequence class.'},
+   {label:'05 · HOLD',title:'The building refuses unsupported intervention',plain:'Present evidence does not establish standing for the physical electrical consequence. New field evidence and revalidation are required.',result:'PHYSICAL CONSEQUENCE · HOLD'},
+  ]}/>
 
   <section className="mission"><div><p className="eyebrow">BECOME THE BUILDING · LIVE MISSION RECORD</p><h2>Shared intelligence without forced convergence.</h2><p>Greenbuild's mission asks how people, machines and AI create trusted operational intelligence together. This case adds the execution question: <b>when shared intelligence reaches the edge of physical consequence, what establishes present authority to proceed?</b></p><p>Here, interoperability succeeded without requiring ONUMA and TA-14 to become one system. The systems encountered the same operational reality, preserved what each could establish, exposed what remained unverified, and stopped where evidence no longer supported consequence.</p></div><aside><small>OPERATIONAL OBJECT</small><b>3593-22790</b><span>RE-7 · Living Room Small</span><hr/><small>REPORTED CONDITION</small><p>Light not illuminating; local Circuit 2 breaker reported as appearing ON and not visibly tripped.</p><hr/><small>ASSIGNMENT</small><p>Electrical · Urgent · Greggory Don Butler · 1.0 hr · Work In Progress</p></aside></section>
 
