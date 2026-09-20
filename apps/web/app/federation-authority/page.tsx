@@ -49,6 +49,13 @@ export default function FederationAuthorityPage(){
         <Link href="/" style={{color:'#fff',textDecoration:'none',fontWeight:900,letterSpacing:'.12em'}}>TA-14 EXCHANGE</Link>
         <span style={{fontSize:11,color:'#78d9d3',letterSpacing:'.12em'}}>FEDERATION & AUTHORITY</span>
       </nav>
+      <div style={{display:'flex',flexWrap:'wrap',gap:8,margin:'18px 0 28px',padding:'12px',border:'1px solid #24464d',borderRadius:12,background:'rgba(3,15,21,.82)'}}>
+<Link href="/federation-authority" style={{padding:'10px 12px',border:'1px solid #31545b',borderRadius:8,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>FAMILY HOME</Link>
+<Link href="/admissible-federation-architecture" style={{padding:'10px 12px',border:'1px solid #31545b',borderRadius:8,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>EXPLORE AFA</Link>
+<Link href="/execution-authority-boundary-architecture" style={{padding:'10px 12px',border:'1px solid #31545b',borderRadius:8,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>EXPLORE EABA</Link>
+<Link href="/authority-journey" style={{padding:'10px 12px',borderRadius:8,background:'#71e7df',color:'#031216',textDecoration:'none',fontSize:10,fontWeight:950}}>RUN AUTHORITY JOURNEY</Link>
+<Link href="/afa-eaba-operational-challenge" style={{padding:'10px 12px',border:'1px solid #e7c76e',borderRadius:8,color:'#e7c76e',textDecoration:'none',fontSize:10,fontWeight:900}}>INSPECT FROZEN CHALLENGE</Link>
+</div>
       <section style={{padding:'76px 0 50px',maxWidth:930}}>
         <div style={{fontSize:11,fontWeight:900,letterSpacing:'.18em',color:'#70e7e0'}}>AUTHORITY PASSPORT PROTOCOL · CROSS-DOMAIN GOVERNANCE</div>
         <h1 style={{fontSize:'clamp(48px,8vw,92px)',lineHeight:.94,letterSpacing:'-.05em',margin:'18px 0'}}>AUTHORITY CAN TRAVEL.<br/><span style={{color:'#70e7e0'}}>EXECUTION AUTHORITY CANNOT.</span></h1>
@@ -95,6 +102,13 @@ export default function FederationAuthorityPage(){
           <a href="https://doi.org/10.5281/zenodo.22846133" target="_blank" rel="noreferrer" style={{padding:'12px 15px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>INSPECT AFA v1.0-RC1 ↗</a>
         </div>
         <p style={{marginTop:16,color:'#78939a',fontSize:10,lineHeight:1.6}}>AFA-IP-001 v0.3 remains an examination artifact with evidence gates open. CNS/CP certification or endorsement, registry publication, proven external interoperability, TA14_RECOGNIZED status and completed runtime/CI execution evidence are not claimed.</p>
+      </section>
+
+      <section style={{padding:'34px',border:'1px solid #6c5b31',borderRadius:20,background:'linear-gradient(135deg,rgba(83,62,14,.20),rgba(3,15,21,.94))',margin:'28px 0'}}>
+        <div style={{fontSize:10,fontWeight:950,letterSpacing:'.16em',color:'#e7c76e'}}>AFA × EABA · FLAGSHIP COMPOSITION</div>
+        <h2 style={{fontSize:'clamp(34px,5vw,56px)',lineHeight:1.02,letterSpacing:'-.04em',margin:'12px 0'}}>INTEROPERABILITY WITHOUT AUTHORITY LAUNDERING.</h2>
+        <p style={{color:'#a9c3ca',fontSize:16,lineHeight:1.7,maxWidth:900}}>AFA can accept bounded authority context across an independent-domain seam while EABA still HOLDs, DENYs, or ESCALATEs the exact local consequence. The Authority Journey lets you operate both boundaries as one end-to-end path without collapsing them into one architecture.</p>
+        <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:20}}><Link href="/authority-journey" style={{padding:'13px 16px',borderRadius:9,background:'#71e7df',color:'#031216',textDecoration:'none',fontSize:10,fontWeight:950}}>RUN THE AUTHORITY JOURNEY →</Link><Link href="/afa-eaba-operational-challenge" style={{padding:'13px 16px',border:'1px solid #e7c76e',borderRadius:9,color:'#e7c76e',textDecoration:'none',fontSize:10,fontWeight:900}}>INSPECT FROZEN OPERATIONAL CHALLENGE →</Link></div>
       </section>
 
       <section style={{padding:'64px 0 20px'}}>
