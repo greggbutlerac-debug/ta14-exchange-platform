@@ -62,7 +62,7 @@ export default function AiGovernanceLayout({
       `}</style>
 
       <header className="ta14-command-bar">
-        <Link className="ta14-brand" href="/" aria-label="Return to the TA-14 AI Governance Exchange">
+        <Link className="ta14-brand" href="/workspace/ai-governance" aria-label="Return to the TA-14 AI Governance world">
           <span className="ta14-brand-mark">TA-14</span>
           <span className="ta14-brand-copy">
             <strong>TA-14 EXCHANGE</strong>
@@ -70,7 +70,7 @@ export default function AiGovernanceLayout({
           </span>
         </Link>
         <div className="ta14-account-actions">
-          <Link className="ta14-return-link" href="/">Return to Exchange</Link>
+          <Link className="ta14-return-link" href="/workspace/ai-governance">AI Governance World</Link>
           <Link className="ta14-signin-link" href="/login">Sign in</Link>
         </div>
       </header>
