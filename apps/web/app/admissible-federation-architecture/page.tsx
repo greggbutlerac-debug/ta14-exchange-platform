@@ -103,7 +103,7 @@ export default function AFAShowroom(){
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(235px,1fr))',gap:11,marginTop:22}}>
      {[
       ['AFA v1.0-RC1','22-page release candidate. Not yet frozen.','https://doi.org/10.5281/zenodo.22846133'],
-      ['AFA-IP-001','AVP × CNS/CP founding implementation profile.','/federation-authority'],
+      ['AFA-IP-001 v0.3','TA-14-authored AVP × CNS/CP Connection Profile examination artifact · LOCAL EXERCISE / UNPUBLISHED / NON-RESOLVABLE.','/federation-authority'],
       ['15 FIXTURES','Failure-first bounded examination model.','#failure-lab'],
       ['RUNTIME STATUS','Harness implemented. Real Node/CI execution evidence pending.','#runtime'],
      ].map(([t,p,h])=><a key={t} href={h} style={{padding:20,border:'1px solid #214a51',borderRadius:13,background:'#04151c',textDecoration:'none'}}><strong style={{display:'block',color:'#71e7df',fontSize:11}}>{t}</strong><span style={{display:'block',marginTop:9,color:'#9db3b9',fontSize:12,lineHeight:1.55}}>{p}</span></a>)}
@@ -114,7 +114,7 @@ export default function AFAShowroom(){
    <section style={{padding:34,border:'1px solid #24555d',borderRadius:20,background:'linear-gradient(135deg,rgba(17,69,76,.35),rgba(4,20,27,.85))',marginTop:10}}>
     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>MONDAY LIVE</div>
     <h2 style={{fontSize:'clamp(30px,5vw,54px)',lineHeight:1.05,letterSpacing:'-.04em',margin:'12px 0'}}>“You told me the Connection Profile was the seam. I built the seam.”</h2>
-    <p style={{color:'#a9c0c6',fontSize:16,lineHeight:1.7,maxWidth:900}}>Then we separated the seam from the architecture, made AFA protocol-neutral, and defined exactly why authority context can cross while execution authority must still be earned locally.</p>
+    <p style={{color:'#a9c0c6',fontSize:16,lineHeight:1.7,maxWidth:900}}>Then we separated the seam from the architecture, made AFA protocol-neutral, and defined exactly why authority context can cross while execution authority must still be established locally. AFA-IP-001 v0.3 is now the bounded examination object for that proposition.</p>
    </section>
   </div>
  </main>

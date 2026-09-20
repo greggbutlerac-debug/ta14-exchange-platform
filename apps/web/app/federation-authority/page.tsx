@@ -59,6 +59,28 @@ export default function FederationAuthorityPage(){
         <div style={{margin:'28px 0 18px',padding:'12px 14px',border:'1px dashed #d8b45f',color:'#e4ca87',fontSize:11,fontWeight:900,letterSpacing:'.1em'}}>BOUNDARY: ACCEPTANCE DOES NOT GRANT COMMIT OR EXECUTION AUTHORITY</div>
         <div style={{display:'flex',flexWrap:'wrap',gap:8}}>{local.map((x,i)=><span key={x} style={{padding:'10px 12px',background:'#071a21',borderRadius:8,color:'#a9c3ca',fontSize:10,fontWeight:800}}>{x}{i<local.length-1?'  →':''}</span>)}</div>
       </section>
+      <section style={{padding:'34px',border:'1px solid #2a646a',borderRadius:20,background:'linear-gradient(135deg,rgba(22,79,84,.34),rgba(3,15,21,.92))',margin:'28px 0 18px'}}>
+        <div style={{fontSize:10,fontWeight:900,letterSpacing:'.16em',color:'#70e7e0'}}>FOUNDING CONNECTION PROFILE · AFA-IP-001 v0.3</div>
+        <h2 style={{fontSize:'clamp(30px,5vw,50px)',lineHeight:1.04,letterSpacing:'-.04em',margin:'12px 0'}}>The Connection Profile is the crossing. <span style={{color:'#e4ca87'}}>It is not permission to act.</span></h2>
+        <p style={{color:'#a9c3ca',fontSize:16,lineHeight:1.7,maxWidth:900}}>AFA-IP-001 is the TA-14-authored Authority Passport × CNS/CP Connection Profile examination artifact for Passport Presentation & Acceptance. It defines the bounded crossing, preserves negative space, records receipt or refusal, and terminates federation before any local execution entitlement exists.</p>
+        <div style={{display:'flex',flexWrap:'wrap',gap:8,margin:'18px 0'}}>
+          {['LOCAL EXERCISE','UNPUBLISHED','NON-RESOLVABLE','EXTERNAL INTEROPERABILITY · NOT CLAIMED'].map(x=><span key={x} style={{padding:'8px 10px',border:'1px solid #31545a',borderRadius:8,color:'#a8c1c8',fontSize:9,fontWeight:900}}>{x}</span>)}
+        </div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:10,marginTop:20}}>
+          {[
+            ['REQUIRED FOR THIS PROFILE','Passport identity, issuer, lineage, purpose, authority state, freshness, revocation context, consequence bounds, jurisdiction and integrity reference.'],
+            ['OPTIONAL IF DECLARED','Constitution reference, delegation envelope, proof obligations, irreversibility position, closure responsibility and understood bounded extensions.'],
+            ['PROHIBITED IMPORT','Local Lease, Local Capsule, Commit authorization, Execution authorization, permission to produce Effect, or proof that present local reality remains admissible.'],
+          ].map(([t,p])=><article key={t} style={{padding:18,border:'1px solid #214a51',borderRadius:12,background:'#04151c'}}><strong style={{display:'block',color:t==='PROHIBITED IMPORT'?'#ffb29a':'#70e7e0',fontSize:10}}>{t}</strong><p style={{color:'#94adb5',fontSize:11,lineHeight:1.6}}>{p}</p></article>)}
+        </div>
+        <div style={{marginTop:20,padding:'14px 16px',border:'1px dashed #e4ca87',borderRadius:10,color:'#e4ca87',fontSize:11,fontWeight:900,textAlign:'center'}}>PRESENT → VERIFY → RECEIVE → DETERMINE → TERMINATE → RE-ESTABLISH → LOCAL GOVERNANCE ONLY</div>
+        <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:20}}>
+          <Link href="/admissible-federation-architecture" style={{padding:'12px 15px',borderRadius:9,background:'#70e7e0',color:'#031216',textDecoration:'none',fontSize:10,fontWeight:900}}>OPEN AFA SHOWROOM →</Link>
+          <a href="https://doi.org/10.5281/zenodo.22846133" target="_blank" rel="noreferrer" style={{padding:'12px 15px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',textDecoration:'none',fontSize:10,fontWeight:900}}>INSPECT AFA v1.0-RC1 ↗</a>
+        </div>
+        <p style={{marginTop:16,color:'#78939a',fontSize:10,lineHeight:1.6}}>AFA-IP-001 v0.3 remains an examination artifact with evidence gates open. CNS/CP certification or endorsement, registry publication, proven external interoperability, TA14_RECOGNIZED status and completed runtime/CI execution evidence are not claimed.</p>
+      </section>
+
       <section style={{padding:'64px 0 20px'}}>
         <h2 style={{fontSize:38,letterSpacing:'-.03em'}}>Enter the federation work.</h2>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:14}}>
