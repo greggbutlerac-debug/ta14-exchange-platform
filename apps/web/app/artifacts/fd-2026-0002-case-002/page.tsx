@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
 
 const evidenceRecords = [
   {
@@ -163,7 +164,7 @@ export default function HarmonicArtifactTwoPage() {
 
           <div className="hero-actions">
             <Link className="button primary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010/evidence">Open Seven Evidence Records</Link>
-            <Link className="button secondary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010">Open Permanent Registry Record</Link>
+            <Link className="button secondary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000010">Open Permanent Registry Record</Link>\n            <Link className="button secondary" href="/governance-showcase/TA-14-AIGR-000008">Open Interactive Harmonic Showroom</Link>
             <Link className="button secondary" href="/artifacts/fd-2026-0002-case-001">Open Case 001</Link>
             <Link className="button ghost" href="/artifacts/registry">Return to Artifact Registry</Link>
           </div>
@@ -190,7 +191,15 @@ export default function HarmonicArtifactTwoPage() {
         </aside>
       </section>
 
-      <section className="principle-strip">
+            <RecordedExaminationPlayer eyebrow="HARMONIC CASE 002 · EVIDENCE ARTIFACT PLAYER" title="Inspect how stronger evidence advances architecture without becoming runtime proof." intro="Walk the Version 2 evidence package from attributable records through the open execution boundary." stages={[
+        {label:"VERSION 2 BASELINE",title:"Version 2 stands on its own record",state:"TA-14-AIGR-000010 is separately registered; prior findings and evidence are not inherited.",determination:"SEPARATE BASELINE",explanation:"Version lineage is preserved without allowing Version 1 findings to silently carry into Version 2.",supports:"Independent Version 2 registry identity.",limit:"Inherited runtime validation."},
+        {label:"SEVEN RECORDS",title:"The evidence package is admitted",state:"Declaration, methodology, composition, implementation identity, lineage and provenance occupy distinct evidentiary roles.",determination:"7 / 7 RECORDS REVIEWED",explanation:"Evidence presence is not treated as universal proof; each record is bounded to what it supports.",supports:"Architecture, lineage, methodology and attributable freeze references.",limit:"Independent source-code behavior or end-to-end execution."},
+        {label:"CHANGED STATE",title:"The architecture declares re-evaluation under material change",state:"The Version 2 declaration preserves UNKNOWN and requires re-evaluation when materially relevant constitutional state changes.",determination:"ARCHITECTURAL ADVANCEMENT · SUPPORTED",explanation:"The public package materially strengthens the declared changed-state governance model.",supports:"Declared continuation-admissibility and re-evaluation posture.",limit:"An executable Version 2 changed-state run."},
+        {label:"EXECUTION BOUNDARY",title:"The proof surface remains open",state:"No admitted record independently demonstrates bind, commit, downstream execution control or outcome reconciliation by the frozen Version 2 runtime.",determination:"RUNTIME VALIDATION · OPEN",explanation:"Implementation identity and methodology do not become executable proof merely because they are attributable.",supports:"A stronger falsifiable basis for the next examination.",limit:"Non-bypassability, downstream effect control, or production validation."},
+        {label:"FINDING",title:"Evidence advances; execution proof stays open",state:"The record preserves the improvement and the remaining burden at the same time.",determination:"PARTIAL ADMISSIBILITY",explanation:"TA-14 can support architectural advancement without overstating what the runtime has demonstrated.",supports:"Version 2 evidence advancement.",limit:"Executable end-to-end validation."}
+      ]}/>
+
+<section className="principle-strip">
         <div><span>01</span><strong>Read every admitted record.</strong></div>
         <div><span>02</span><strong>Keep declaration separate from demonstration.</strong></div>
         <div><span>03</span><strong>Preserve Version 1 and Version 2 independently.</strong></div>
