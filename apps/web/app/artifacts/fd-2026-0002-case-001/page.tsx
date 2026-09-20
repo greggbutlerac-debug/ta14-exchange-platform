@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
 import GuidedShowroom from '../../components/GuidedShowroom';
 
 const lineage = [
@@ -113,7 +114,15 @@ export default function HarmonicArtifactPage() {
         {label:'05 · FIND',title:'Issue the evidence-bounded finding',plain:'The result remains PARTIALLY DEMONSTRATED — EVIDENCE-BOUNDED. Runtime behavior and evidentiary limits remain visible together.',result:'PARTIALLY DEMONSTRATED · EVIDENCE-BOUNDED'},
       ]}/>
 
-      <section className="principle-strip">
+            <RecordedExaminationPlayer eyebrow="HARMONIC CASE 001 · RECORDED EXAMINATION PLAYER" title="Replay the difference between runtime behavior and surrounding proof." intro="Operate the preserved evidence boundary. The runtime response was demonstrated; the complete institutional chronology was not." stages={[
+        {label:"FROZEN BASELINE",title:"Version 1.0 is frozen",state:"The evaluated Harmonic implementation is fixed before the bounded demonstration.",determination:"BASELINE FROZEN",explanation:"The evaluated version is not rewritten in response to what the examination finds.",supports:"Attribution of the bounded test to the frozen Version 1.0 object.",limit:"Any result outside the frozen case."},
+        {label:"EXECUTION PACKET",title:"The represented constitutional state enters the runtime",state:"The admitted packet carries the constitutional state used by the frozen runtime.",determination:"STATE PRESENTED",explanation:"The record can establish what the runtime received without pretending it independently establishes every surrounding institutional fact.",supports:"The state represented within the submitted packet.",limit:"Independent pre-change authority chronology outside that packet."},
+        {label:"RUNTIME RESPONSE",title:"Harmonic refuses / blocks",state:"The frozen runtime produces its own refusal / block determination.",determination:"REFUSAL / BLOCK",explanation:"This is the behavior the admitted runtime artifact actually demonstrates.",supports:"Bounded runtime behavior under the represented state.",limit:"Universal Harmonic capability or downstream outcome."},
+        {label:"EVIDENCE BOUNDARY",title:"The surrounding chronology remains incomplete",state:"Independent pre-change authority, revocation chronology, post-change state and external zero-action closure are not all established.",determination:"SURROUNDING PROOF · INCOMPLETE",explanation:"TA-14 preserves the missing evidence rather than filling the chronology by inference.",supports:"A bounded runtime finding.",limit:"The complete institutional sequence outside the runtime."},
+        {label:"FINDING",title:"The record earns only the bounded result",state:"Demonstrated runtime behavior and unproven surrounding chronology remain visible together.",determination:"PARTIALLY DEMONSTRATED · EVIDENCE-BOUNDED",explanation:"The finding stops exactly where the admitted evidence stops.",supports:"Case 001 bounded finding.",limit:"Certification, universal capability, or invented surrounding facts."}
+      ]}/>
+
+<section className="principle-strip">
         <div><span>01</span><strong>Preserve what was demonstrated.</strong></div>
         <div><span>02</span><strong>Preserve what remained unproven.</strong></div>
         <div><span>03</span><strong>Do not rewrite the evaluated version.</strong></div>
