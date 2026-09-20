@@ -1,6 +1,7 @@
 "use client";
 
-import Link from "next/link";\nimport RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
+import Link from "next/link";
+import RecordedExaminationPlayer from "../../components/RecordedExaminationPlayer";
 
 const supported = [
   "Historical T0 qualification remains preserved while current proposition-specific standing changes under the declared changed-condition rules.",
