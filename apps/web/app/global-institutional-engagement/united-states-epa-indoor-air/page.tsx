@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import GuidedShowroom from '../../components/GuidedShowroom';
 
 const chain = [
   ['01','REALITY','The actual indoor and outdoor environmental condition at a defined place and time.'],
@@ -31,6 +32,14 @@ export default function USEPAIndoorAirShowroom() {
       <Link href="/global-institutional-engagement">GLOBAL INSTITUTIONAL ENGAGEMENT</Link>
       <Link href="/environmental-integrity-governance">ENVIRONMENTAL INTEGRITY</Link>
     </nav>
+
+    <GuidedShowroom eyebrow="U.S. EPA INDOOR AIR · GUIDED SCENARIO" title="A valid command can become invalid before it executes." intro="Follow the changed-condition problem step by step: indoor evidence supports an action, the command is prepared, outside conditions materially change, and the system must decide whether the old permission still has standing." accent="#78c9ee" gold="#e8b95e" steps={[
+      {label:'T₀ · VALID',title:'Indoor evidence supports more outdoor air',plain:'The initial environmental state supports a contemplated ventilation response under the applicable logic.'},
+      {label:'T₀+ · PREPARE',title:'The command is prepared',plain:'The building system is ready to act, but preparation is not yet physical consequence.'},
+      {label:'ΔN · CHANGE',title:'Outdoor wildfire PM₂.₅ rises',plain:'A material condition changes after preparation and before execution.',why:'The evidence that supported the earlier action no longer describes the complete present state.'},
+      {label:'T₁ · REVALIDATE',title:'The authority question reopens',plain:'The prepared action must be tested against current evidence and present authority instead of inheriting its earlier permission.',result:'ABSENCE OF REFUSAL MUST NOT BECOME PERMISSION'},
+      {label:'T₂ · DETERMINE',title:'ALLOW / HOLD / DENY / ESCALATE',plain:'Only a current determination may reach the consequence boundary; the resulting environmental outcome starts the next evidentiary chain.'},
+    ]}/>
 
     <header>
       <div className="bilateral">
