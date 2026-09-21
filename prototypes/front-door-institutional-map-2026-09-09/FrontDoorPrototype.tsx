@@ -19,6 +19,7 @@ const audienceRoutes = [
   ['BUILDING / ENVIRONMENTAL OPERATOR','Enter environmental evidence, AIR / PAIR, buildings, HVAC, intervention governance, and outcome records.','/environmental-integrity-governance'],
   ['TECHNICIAN / STUDENT','Learn by doing through guided instruction, simulation, assessment, arcades, and credentials.','/academy'],
   ['RESEARCHER / REVIEWER','Inspect the Registry, public findings, evidence artifacts, chronology, and preserved limitations.','/governance-showcase'],
+  ['AI / AGENT IMPLEMENTER','Start with a concrete autonomous-agent implementation and inspect what cryptographic trust establishes, what remains unestablished, and where ACA, AEA, AFA and EABA govern the path to consequence.','/autonomous-agent-examination/tulshekar-gangireddy'],
 ];
 
 const engagements = [
@@ -27,6 +28,7 @@ const engagements = [
   ['EXAMINE INTEROPERABILITY','Test how independent architectures meet without either one silently becoming the other.','/work-with-ta14'],
   ['EXAMINE AN EXECUTION BOUNDARY','Test what must be true before a proposed consequence is allowed to cross.','/work-with-ta14'],
   ['BUILD AN INTERACTIVE SHOWROOM','Turn a registered governance or bounded examination into an inspectable public or private experience.','/work-with-ta14'],
+  ['EXAMINE AN AUTONOMOUS AGENT','Walk a real implementation candidate from agent decision through computation, cryptographic binding, federation, revalidation, local execution authority and outcome.','/autonomous-agent-examination/tulshekar-gangireddy'],
   ['PRODUCE A GOVERNED ARTIFACT','Create a portable evidence record that preserves claims, determinations, limits, and outcomes.','/artifacts'],
 ];
 
@@ -45,6 +47,7 @@ const architecturePaths = [
   ['ACA','ADMISSIBLE COMPUTATION','Govern before computational commitment.','/ai-governance/admissible-computation'],
   ['AEA','ADMISSIBLE EXECUTION','Govern before consequence.','/registry/ta-14-admissible-execution-architecture'],
   ['FEIG','FINANCIAL EXECUTION INTEGRITY','Govern proof-bound financial consequence.','/artifacts/ta14-feig'],
+  ['AGENT','AUTONOMOUS AGENT EXAMINATION','Start with an implementation candidate and inspect the TA-14 seams before consequence.','/autonomous-agent-examination/tulshekar-gangireddy'],
 ];
 
 const proof = [
