@@ -19,6 +19,7 @@ export default function InstitutionalSeamLab({
   actionLabel,
   actionValue,
   stages,
+  ui,
 }: {
   eyebrow: string;
   title: string;
@@ -28,8 +29,10 @@ export default function InstitutionalSeamLab({
   actionLabel: string;
   actionValue: string;
   stages: Stage[];
+  ui?: Partial<{nativeSystem:string; governanceSeam:string; currentEvidenceAuthority:string; proposedConsequence:string; currentDetermination:string; reset:string; runAgain:string; readSeam:string; seamRule:string}>;
 }) {
   const [step, setStep] = useState(0);
+  const labels = {nativeSystem:'{labels.nativeSystem}',governanceSeam:'{labels.governanceSeam}',currentEvidenceAuthority:'{labels.currentEvidenceAuthority}',proposedConsequence:'{labels.proposedConsequence}',currentDetermination:'{labels.currentDetermination}',reset:'RESET',runAgain:'RUN AGAIN',readSeam:'READ THE SEAM',seamRule:'The upstream evidence or institution does not have to become false for permission to disappear. A material change can preserve the earlier record while requiring a new determination before consequence.',...ui};
   const current = stages[step];
   const next = step < stages.length - 1 ? stages[step + 1] : null;
 
@@ -53,9 +56,9 @@ export default function InstitutionalSeamLab({
     </div>
 
     <div className="islab-controls">
-      <button type="button" onClick={() => setStep(0)} disabled={step === 0}>RESET</button>
+      <button type="button" onClick={() => setStep(0)} disabled={step === 0}>{labels.reset}</button>
       {next && <button type="button" className="primary" onClick={() => setStep(step + 1)}>{next.label} →</button>}
-      {!next && <button type="button" className="primary" onClick={() => setStep(0)}>RUN AGAIN ↻</button>}
+      {!next && <button type="button" className="primary" onClick={() => setStep(0)}>{labels.runAgain} ↻</button>}
     </div>
 
     <div className="islab-ledger">
@@ -64,7 +67,7 @@ export default function InstitutionalSeamLab({
       </div>)}
     </div>
 
-    <p className="islab-rule"><b>READ THE SEAM:</b> The upstream evidence or institution does not have to become false for permission to disappear. A material change can preserve the earlier record while requiring a new determination before consequence.</p>
+    <p className="islab-rule"><b>{labels.readSeam}:</b> {labels.seamRule}</p>
 
     <style jsx>{`
       .islab{padding:68px 0;border-top:1px solid rgba(255,255,255,.09)}
