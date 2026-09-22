@@ -33,4 +33,12 @@ describe("changed-reality R1 showroom invariants",()=>{
  it("states the bounded physical-enforcement limitation",()=>{
   expect(source).toContain("does not establish universal runtime efficacy or independent physical enforcement outside this examination environment");
  });
+ it("publishes the verified production receipt evidence set without overstating the hashes",()=>{
+  expect(source).toContain("05 · VERIFIED PRODUCTION EVIDENCE SET");
+  expect(source).toContain("4ca655769755c36b394ff208ea1b49a8a8b11b56cbef029970001ecaf5397194");
+  expect(source).toContain("a824df1cea86d952fd4dd1ec87f6efb4a3c5810bbbbad90e441f5d65a14a895f");
+  expect(source).toContain("bbd8918bebbd47114c3d72f80ebcfc90615208af36c1423c179a3edb6bc76155");
+  expect(source).toContain("db47c21446b0351db81e02826f12441b9d928b84fd864cca1e48eebb5b4eb130");
+  expect(source).toContain("integrity digests, not digital signatures or external notarization");
+ });
 });
