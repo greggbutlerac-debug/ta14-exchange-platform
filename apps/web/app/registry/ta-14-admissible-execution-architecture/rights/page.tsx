@@ -342,7 +342,7 @@ export default function RightsPage() {
           <span>Permanent Registry record TA-14-AIGR-0001.</span>
         </div>
 
-        <p>No admissible evidence. No admissible execution.</p>
+        <p>Admissible evidence. Applicable authority. Established standing. Now.</p>
       </footer>
 
       <style jsx global>{`

@@ -305,7 +305,7 @@ export default function ClaimsAndBoundariesPage() {
       <section className="section shell final-boundary-section">
         <div className="final-boundary-card">
           <p className="eyebrow">CONTROLLING BOUNDARY</p>
-          <h2>No admissible evidence. No admissible execution.</h2>
+          <h2>Admissible evidence. Applicable authority. Established standing. Now.</h2>
           <p>
             This motto does not mean that evidence alone is sufficient. It
             means that execution cannot be treated as admissible without an
@@ -340,7 +340,7 @@ export default function ClaimsAndBoundariesPage() {
           <span>Permanent Registry record TA-14-AIGR-0001.</span>
         </div>
 
-        <p>No admissible evidence. No admissible execution.</p>
+        <p>Admissible evidence. Applicable authority. Established standing. Now.</p>
       </footer>
 
       <style jsx global>{`
