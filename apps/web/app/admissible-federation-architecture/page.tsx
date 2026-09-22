@@ -159,12 +159,12 @@ export default function AFAShowroom(){
    <section id="cnscp-eaba-seam" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>CNS/CP × TA-14 · THE HANDOFF</div>
     <h2 style={{fontSize:'clamp(34px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>The Connection Profile stops here.<br/><span style={{color:'#e7c76e'}}>TA-14 consequence determination begins here.</span></h2>
-    <p style={{color:'#a9c0c6',fontSize:16,lineHeight:1.75,maxWidth:940}}>Two independently developed architectures can meet at one boundary without either absorbing the other. CNS/CP governs whether parties may bind across an organizational boundary and the Connection Profile defines the contract for the crossing. TA-14 does not re-determine that relationship. The receiving TA-14-governed domain independently determines whether what arrived has sufficient present standing to become protected consequence.</p>
+    <p style={{color:'#a9c0c6',fontSize:16,lineHeight:1.75,maxWidth:940}}>Two independently developed architectures can meet at one boundary without either absorbing the other. CNS/CP governs whether parties may bind across an organizational boundary and the Connection Profile defines the <strong style={{color:'#eef7fb'}}>permitted crossing envelope</strong>: both the minimum that must cross for the relationship to be meaningful and the maximum that may cross without importing local execution entitlement. TA-14 does not re-determine that relationship. The receiving TA-14-governed domain independently determines whether what arrived has sufficient present standing to become protected consequence.</p>
 
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:8,marginTop:28}}>
      {[
       ['01','CNS/CP','May these parties bind, under what contract and context?'],
-      ['02','CONNECTION PROFILE','Exactly what crosses — and what explicitly does not?'],
+      ['02','CONNECTION PROFILE','Minimum required crossing + maximum permitted crossing.'],
       ['03','AFA / AVP','Bounded authority context may travel. Execution authority does not.'],
       ['04','RECEIVING DOMAIN','Received context becomes evidence for local determination, not permission.'],
       ['05','EABA','Does present authority still stand for this exact consequence now?'],
@@ -176,7 +176,7 @@ export default function AFAShowroom(){
      <div style={{fontSize:10,color:'#71e7df',fontWeight:950}}>BOUNDARY EXPLANATION</div>
      <strong style={{display:'block',fontSize:24,color:'#fff',margin:'8px 0'}}>{[
       'CNS/CP establishes the cross-boundary relationship.',
-      'The Connection Profile defines the crossing.',
+      'The Connection Profile bounds the permitted crossing envelope.',
       'AFA preserves authority context without transferring execution authority.',
       'The receiving domain owns the next determination.',
       'EABA tests present execution standing at consequence.',
@@ -184,13 +184,15 @@ export default function AFAShowroom(){
      ][boundaryStep]}</strong>
      <p style={{color:'#9fb7be',lineHeight:1.7,marginBottom:0}}>{[
       'TA-14 does not reach backward and re-grade whether CNS/CP legitimately established the relationship. That remains CNS/CP ground.',
-      'Positive space says what may cross. Negative space says what must not. The profile is the contract for the interaction itself.',
+      'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning, evidence and bounded authority context may travel; local lease, local capsule, commit, execution and effect do not become transferable entitlement.'
       'Identity, provenance, scope, freshness, revocation context and other bounded authority context may be presented. Local lease, local capsule, commit, execution and effect do not ride the Passport.',
       'Receipt is not consequence. Acceptance is not execution permission. The receiving runtime must establish its own admissibility, authority, continuity, scope and standing.',
       'EABA asks whether the exact actor, target, evidence, authority, scope, local standing and changed conditions still support this exact attempt now.',
       'A legitimate crossing can end in HOLD, DENY or ESCALATE without implying that CNS/CP or the Connection Profile failed.'
      ][boundaryStep]}</p>
     </div>
+
+    <div style={{marginTop:22,padding:22,border:'1px dashed #6b5829',borderRadius:14,background:'rgba(74,56,12,.12)',textAlign:'center'}}><strong style={{color:'#e7c76e',fontSize:'clamp(16px,2.3vw,24px)'}}>MEANING MAY CROSS · EVIDENCE MAY CROSS · AUTHORITY CONTEXT MAY CROSS · EXECUTION AUTHORITY MUST BE ESTABLISHED LOCALLY</strong></div>
 
     <div style={{marginTop:28,padding:28,border:'1px solid #6b5829',borderRadius:18,background:'linear-gradient(135deg,rgba(74,56,12,.24),rgba(4,20,27,.9))'}}>
      <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#e7c76e'}}>MONDAY LIVE · ONE-FACT DEMONSTRATION</div>
