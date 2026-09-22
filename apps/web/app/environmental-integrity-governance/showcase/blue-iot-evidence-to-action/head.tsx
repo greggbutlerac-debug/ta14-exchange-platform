@@ -1,0 +1,1 @@
+export default function Head(){return <><title>Evidence to Action | TA-14 × Blue IoT Discussion Surface</title><meta name="description" content="TA-14 public technical showroom exploring a bounded CO2 evidence-to-action pathway for discussion with Blue IoT and Encompass Blue." /></>}
