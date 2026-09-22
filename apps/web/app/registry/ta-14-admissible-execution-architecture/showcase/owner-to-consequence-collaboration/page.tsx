@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useState } from 'react';
 
 const partners = [
   ['01','OWNER / ASSET LEADERSHIP','Asset Leadership Network · Michael Bordenaro','Starts with owner need, business-process requirements, organizational adoption, and the standards context that lets leaders require a repeatable process without prescribing one software stack.'],
@@ -22,6 +23,12 @@ const sop = [
 ];
 
 export default function OwnerToConsequenceCollaboration(){
+  const [ahuState,setAhuState] = useState<'baseline'|'unchanged'|'changed'>('baseline');
+  const ahuResult = ahuState === 'changed'
+    ? {label:'PRIOR DETERMINATION NO LONGER CARRIES STANDING',detail:'Outdoor PM2.5 changed materially. The earlier state remains in the record, but permission is not inherited. Revalidation is required before a new determination can govern execution.'}
+    : ahuState === 'unchanged'
+      ? {label:'CONDITIONS REMAIN MATERIALLY CONSISTENT',detail:'No material context change has been introduced in this demonstration. The prior record remains attributable; the consequence may continue through the governed sequence subject to the same bounded proposition.'}
+      : {label:'SELECT A CURRENT-STATE CONDITION',detail:'Run the same AHU-17 object through two different present-state conditions. The earlier record is preserved in both paths.'};
   return <main style={{minHeight:'100vh',padding:'48px 20px 96px',background:'radial-gradient(circle at 50% -10%,rgba(90,225,255,.18),transparent 34%),radial-gradient(circle at 10% 55%,rgba(127,240,189,.08),transparent 28%),linear-gradient(180deg,#02070d,#06111c 48%,#02070d)',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
     <div style={{maxWidth:1220,margin:'0 auto'}}>
       <nav style={{display:'flex',justifyContent:'space-between',gap:14,flexWrap:'wrap',paddingBottom:20,borderBottom:'1px solid rgba(113,231,255,.14)'}}>
@@ -62,8 +69,8 @@ export default function OwnerToConsequenceCollaboration(){
             ['TA-14 / BOUNDARY','The proposed ventilation consequence is tested for sufficient ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY, and ESTABLISHED STANDING to become REALITY NOW.'],
           ].map(([k,v])=><div key={k} style={{padding:20,borderRadius:15,border:'1px solid rgba(113,231,255,.14)',background:'rgba(2,10,17,.5)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.08em',color:'#78e8ff'}}>{k}</div><p style={{margin:'9px 0 0',color:'#c1d1d9',lineHeight:1.6}}>{v}</p></div>)}
         </div>
-        <div style={{marginTop:18,padding:'22px',border:'1px solid rgba(242,204,104,.28)',borderRadius:16,background:'rgba(242,204,104,.045)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.12em',color:'#f2cc68'}}>MATERIAL CHANGE</div><p style={{fontSize:18,lineHeight:1.6,color:'#e5dfca',margin:'8px 0 0'}}>Outdoor PM2.5 rises materially after the earlier state was evaluated. The old decision does not silently carry forward.</p></div>
-        <div style={{marginTop:14,textAlign:'center',fontSize:'clamp(20px,3vw,30px)',fontWeight:950,color:'#7ff0bd'}}>REVALIDATE → ALLOW · HOLD · DENY · ESCALATE</div>
+        <div style={{marginTop:18,padding:'22px',border:'1px solid rgba(242,204,104,.28)',borderRadius:16,background:'rgba(242,204,104,.045)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.12em',color:'#f2cc68'}}>CHANGE REALITY · PRESERVE THE RECORD</div><p style={{fontSize:18,lineHeight:1.6,color:'#e5dfca',margin:'8px 0 16px'}}>Choose the current condition for the same persistently identified AHU-17. The demonstration changes the present state; it does not rewrite the earlier determination.</p><div style={{display:'flex',gap:10,flexWrap:'wrap'}}><button onClick={()=>setAhuState('unchanged')} style={{cursor:'pointer',padding:'13px 16px',borderRadius:10,border:'1px solid rgba(127,240,189,.45)',background:ahuState==='unchanged'?'rgba(127,240,189,.16)':'rgba(2,10,17,.6)',color:'#dff8eb',fontWeight:900}}>OUTDOOR PM2.5 UNCHANGED</button><button onClick={()=>setAhuState('changed')} style={{cursor:'pointer',padding:'13px 16px',borderRadius:10,border:'1px solid rgba(242,204,104,.5)',background:ahuState==='changed'?'rgba(242,204,104,.16)':'rgba(2,10,17,.6)',color:'#f6e8bd',fontWeight:900}}>OUTDOOR PM2.5 RISES</button></div></div>
+        <div aria-live="polite" style={{marginTop:14,padding:'22px',border:'1px solid rgba(127,240,189,.22)',borderRadius:16,background:'rgba(127,240,189,.04)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.12em',color:ahuState==='changed'?'#f2cc68':'#7ff0bd'}}>{ahuResult.label}</div><p style={{margin:'9px 0 0',color:'#c6d7cf',lineHeight:1.65}}>{ahuResult.detail}</p>{ahuState==='changed'&&<div style={{marginTop:13,fontSize:'clamp(19px,2.7vw,28px)',fontWeight:950,color:'#7ff0bd'}}>REVALIDATE → ALLOW · HOLD · DENY · ESCALATE</div>}</div>
       </section>
 
       <section style={{marginTop:26,padding:'clamp(28px,5vw,48px)',border:'1px solid rgba(242,204,104,.24)',borderRadius:26,background:'linear-gradient(135deg,rgba(65,48,13,.2),rgba(5,17,28,.94))'}}>
@@ -107,6 +114,7 @@ export default function OwnerToConsequenceCollaboration(){
         <p style={{maxWidth:940,color:'#c9c1aa',lineHeight:1.7}}>Material revisions to this collaboration are preserved as attributable states. Later versions may supersede earlier interpretations, but they do not silently rewrite them. Demonstrations, negative results, HOLD conditions, expired determinations, and subsequent revalidations remain part of the record.</p>
         <div style={{marginTop:18,padding:'18px',borderLeft:'3px solid #f2cc68',background:'rgba(242,204,104,.035)'}}><b style={{color:'#f2cc68'}}>v0.1 · September 22, 2026</b><p style={{margin:'7px 0 0',color:'#d5cfbd',lineHeight:1.6}}>Proposed Owner-to-Consequence working collaboration established as a public technical examination surface. Initial roles, candidate shared SOP, AHU-17 changed-context example, bounded first mandate, and collaboration boundaries recorded.</p></div>
         <div style={{marginTop:10,padding:'18px',borderLeft:'3px solid #7ff0bd',background:'rgba(127,240,189,.035)'}}><b style={{color:'#7ff0bd'}}>v0.2 · September 22, 2026</b><p style={{margin:'7px 0 0',color:'#c5d8cf',lineHeight:1.6}}>Canonical TA-14 consequence test made explicit: ADMISSIBLE EVIDENCE · APPLICABLE AUTHORITY · ESTABLISHED STANDING · REALITY NOW. Determination separated from execution, persistent-record doctrine added, and supersession made visible without erasure.</p></div>
+        <div style={{marginTop:10,padding:'18px',borderLeft:'3px solid #78e8ff',background:'rgba(113,231,255,.035)'}}><b style={{color:'#78e8ff'}}>v0.3 · September 22, 2026</b><p style={{margin:'7px 0 0',color:'#c4d8df',lineHeight:1.6}}>AHU-17 changed-context examination made interactive. Visitors can hold outdoor PM2.5 materially consistent or introduce a material rise and observe that the prior determination remains recorded while its standing is re-examined rather than silently inherited.</p></div>
       </section>
 
       <section style={{marginTop:26,padding:'40px 26px',textAlign:'center',border:'1px solid rgba(127,240,189,.2)',borderRadius:24,background:'linear-gradient(135deg,rgba(17,64,52,.18),rgba(7,18,30,.82))'}}>
