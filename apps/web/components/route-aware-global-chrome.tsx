@@ -33,7 +33,7 @@ export function RouteAwareGlobalChrome() {
 
   return (
     <>
-      {isEnvironmentalIntegrityContext ? <AtlasEnvironmentalIntegrityFundStrip /> : null}
+      {isEnvironmentalIntegrityContext && !isPublicShowroom ? <AtlasEnvironmentalIntegrityFundStrip /> : null}
 
       {isAcademy && !isHvacSchoolOffer ? (
         <>
