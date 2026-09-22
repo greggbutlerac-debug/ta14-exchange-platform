@@ -28,7 +28,7 @@ function derive(run:Run):DerivedState{
  const authority=x.fireSmokeOverride===true?"NORMAL PATH DISPLACED":"APPLICABLE"; rulesApplied.push("R-AUTHORITY-01");
  const standing=evidence!=="ESTABLISHED"?"UNRESOLVED":authority!=="APPLICABLE"?"DEFEATED":"ESTABLISHED"; rulesApplied.push("R-STANDING-01");
  const decision=run==="baseline"?"READY TO TEST":standing==="ESTABLISHED"?"ALLOW":standing==="DEFEATED"?"HOLD":"ESCALATE";
- const guarded=run==="baseline"?{authorized:false,gate:"COMMIT NOT YET REQUESTED"}:commitGuard(decision); rulesApplied.push("R-COMMIT-01");
+ const guarded=run==="baseline"?{authorized:false,gate:"COMMIT NOT YET REQUESTED"}:commitGuard(decision); if(run!=="baseline") rulesApplied.push("R-COMMIT-01");
  const why=run==="baseline"?"The baseline is the control, not the answer. Run changed-reality cases against this same frozen proposition.":standing==="DEFEATED"?"The constituted authority rule displaces the normal command path when the raw fire-smoke override is active. The independent commit guard refuses every non-ALLOW determination.":standing==="UNRESOLVED"?"Structured provenance is incomplete, so admissible evidence and standing remain unresolved. The independent commit guard refuses execution.":"The changed occupancy fact preserves the constituted authority relationship. Structured provenance establishes the evidence record, standing is established, and only then may the independent commit guard authorize commit.";
  return {...x,evidence,authority,standing,decision,gate:guarded.gate,commitAuthorized:guarded.authorized,why,rulesApplied};
 }
