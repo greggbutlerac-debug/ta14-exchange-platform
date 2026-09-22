@@ -1,120 +1,20 @@
 "use client";
-
-import { useMemo, useState } from "react";
-
-type Run = "preserved" | "defeated";
-
-const fixed = [
-  ["T₀ authority", "Facilities authority A-214 · active"],
-  ["Actor", "Building automation controller BAC-07"],
-  ["Proposed consequence", "Increase outdoor-air ventilation in Classroom 214"],
-  ["Execution path", "Controller → governed commit → AHU-2 outside-air command"],
-];
-
-const evidence = {
-  preserved: {
-    delta: "ΔN₁",
-    change: "Occupancy increases from 21 to 27. The actor, authority, scope, equipment relationship, and intervention boundary remain unchanged.",
-    standing: "ESTABLISHED",
-    determination: "ALLOW",
-    reason: "Changed reality is material to the operating state, but it does not defeat a standing-bearing fact. The authoritative facts still connect the actor, applicable authority, governed object, scope, and proposed consequence.",
-    record: [
-      ["Authoritative changed fact", "Occupancy: 21 → 27"],
-      ["Provenance", "Room occupancy service · signed event · sequence continuous"],
-      ["Admissible evidence", "ESTABLISHED · current and attributable"],
-      ["Applicable authority", "ESTABLISHED · A-214 remains active and in scope"],
-      ["Standing", "ESTABLISHED · required relationships survive ΔN₁"],
-      ["Execution state", "ALLOW · governed commit may proceed"],
-    ],
-  },
-  defeated: {
-    delta: "ΔN₂",
-    change: "AHU-2 is placed under an active fire-smoke control override. That authoritative state change removes the controller's standing to issue the proposed ventilation consequence through the normal execution path.",
-    standing: "DEFEATED",
-    determination: "HOLD",
-    reason: "The proposed consequence is unchanged, but a standing-bearing fact is not. TA-14 derives the failure from the authoritative fire-smoke override and preserved provenance before commit. No upstream STANDING = TRUE verdict is accepted.",
-    record: [
-      ["Authoritative changed fact", "AHU-2 fire-smoke override: INACTIVE → ACTIVE"],
-      ["Provenance", "Life-safety control record · signed event · sequence continuous"],
-      ["Admissible evidence", "ESTABLISHED · current and attributable"],
-      ["Applicable authority", "A-214 exists, but normal execution authority no longer applies to this path"],
-      ["Standing", "DEFEATED · execution relationship broken by ΔN₂"],
-      ["Execution state", "HOLD · commit blocked before consequence binds"],
-    ],
-  },
-};
-
-export default function ChangedRealityTestPage() {
-  const [run, setRun] = useState<Run>("preserved");
-  const current = useMemo(() => evidence[run], [run]);
-
-  return (
-    <main style={{minHeight:"100vh",background:"#05070b",color:"#f5f7fb",fontFamily:"ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace"}}>
-      <div style={{maxWidth:1180,margin:"0 auto",padding:"56px 22px 90px"}}>
-        <div style={{fontSize:12,letterSpacing:3,color:"#7dd3fc",marginBottom:14}}>TA-14 AUTHORITY · PUBLIC TECHNICAL SHOWROOM · RUNTIME TEST</div>
-        <h1 style={{fontSize:"clamp(38px,7vw,82px)",lineHeight:.95,margin:"0 0 18px",letterSpacing:-3}}>THE CHANGED-REALITY TEST</h1>
-        <p style={{fontSize:"clamp(20px,3vw,34px)",maxWidth:900,lineHeight:1.15,margin:"0 0 22px"}}>Can one authoritative fact stop the same consequence?</p>
-        <p style={{maxWidth:900,color:"#b7c0cf",fontSize:16,lineHeight:1.65}}>
-          Freeze the starting conditions. Keep the authority, actor, proposed consequence, and execution path identical.
-          Change one authoritative fact. Then inspect whether TA-14 derives a different standing and execution determination before consequence binds.
-        </p>
-
-        <section style={{marginTop:34,border:"1px solid #263142",background:"#0a0f18",borderRadius:18,padding:22}}>
-          <div style={{fontSize:12,letterSpacing:2,color:"#94a3b8",marginBottom:16}}>CONTROL · HELD CONSTANT</div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:12}}>
-            {fixed.map(([k,v]) => <div key={k} style={{border:"1px solid #1f2937",borderRadius:12,padding:15,background:"#080c13"}}><div style={{fontSize:11,color:"#7dd3fc",marginBottom:8}}>{k.toUpperCase()}</div><div style={{lineHeight:1.45}}>{v}</div></div>)}
-          </div>
-        </section>
-
-        <section style={{marginTop:24,display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14}}>
-          <button onClick={()=>setRun("preserved")} style={{textAlign:"left",cursor:"pointer",border:run==="preserved"?"1px solid #67e8f9":"1px solid #263142",background:run==="preserved"?"#0c1b22":"#0a0f18",color:"#f8fafc",borderRadius:16,padding:20}}>
-            <div style={{fontSize:12,letterSpacing:2,color:"#67e8f9"}}>RUN A · ΔN₁</div>
-            <div style={{fontSize:24,fontWeight:800,marginTop:8}}>STANDING PRESERVED</div>
-            <div style={{color:"#aeb8c7",marginTop:10,lineHeight:1.5}}>Change reality without defeating a standing-bearing fact.</div>
-          </button>
-          <button onClick={()=>setRun("defeated")} style={{textAlign:"left",cursor:"pointer",border:run==="defeated"?"1px solid #fbbf24":"1px solid #263142",background:run==="defeated"?"#211807":"#0a0f18",color:"#f8fafc",borderRadius:16,padding:20}}>
-            <div style={{fontSize:12,letterSpacing:2,color:"#fbbf24"}}>RUN B · ΔN₂</div>
-            <div style={{fontSize:24,fontWeight:800,marginTop:8}}>STANDING DEFEATED</div>
-            <div style={{color:"#aeb8c7",marginTop:10,lineHeight:1.5}}>Change one standing-bearing authoritative fact.</div>
-          </button>
-        </section>
-
-        <section style={{marginTop:24,border:"1px solid #263142",borderRadius:18,overflow:"hidden",background:"#080c13"}}>
-          <div style={{padding:22,borderBottom:"1px solid #263142"}}>
-            <div style={{fontSize:12,letterSpacing:2,color:"#94a3b8"}}>AUTHORITATIVE CHANGED REALITY · {current.delta}</div>
-            <p style={{fontSize:18,lineHeight:1.6,margin:"12px 0 0"}}>{current.change}</p>
-          </div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))"}}>
-            <div style={{padding:22,borderRight:"1px solid #263142"}}>
-              <div style={{fontSize:11,color:"#94a3b8",letterSpacing:2}}>DERIVED STANDING</div>
-              <div style={{fontSize:34,fontWeight:900,marginTop:8}}>{current.standing}</div>
-            </div>
-            <div style={{padding:22}}>
-              <div style={{fontSize:11,color:"#94a3b8",letterSpacing:2}}>EXECUTION DETERMINATION</div>
-              <div style={{fontSize:34,fontWeight:900,marginTop:8}}>{current.determination}</div>
-            </div>
-          </div>
-        </section>
-
-        <section style={{marginTop:24}}>
-          <div style={{fontSize:12,letterSpacing:2,color:"#7dd3fc",marginBottom:12}}>DO NOT TRUST THE RESULT. INSPECT WHERE IT WAS DERIVED.</div>
-          <div style={{border:"1px solid #263142",borderRadius:18,overflow:"hidden"}}>
-            {current.record.map(([k,v],i)=><div key={k} style={{display:"grid",gridTemplateColumns:"minmax(190px,.7fr) 2fr",gap:16,padding:"15px 18px",background:i%2?"#080c13":"#0b111b",borderBottom:i===current.record.length-1?"none":"1px solid #1f2937"}}><strong style={{color:"#cbd5e1"}}>{k}</strong><span style={{color:"#e5e7eb",lineHeight:1.45}}>{v}</span></div>)}
-          </div>
-          <p style={{color:"#aeb8c7",lineHeight:1.65,marginTop:16}}>{current.reason}</p>
-        </section>
-
-        <section style={{marginTop:38,borderTop:"1px solid #263142",paddingTop:30}}>
-          <div style={{fontSize:12,letterSpacing:2,color:"#94a3b8"}}>THE CONSEQUENCE BOUNDARY</div>
-          <h2 style={{fontSize:"clamp(26px,4vw,44px)",lineHeight:1.08,maxWidth:980}}>Does this proposed consequence have admissible evidence, applicable authority, and established standing to become reality now?</h2>
-          <div style={{display:"flex",flexWrap:"wrap",gap:9,marginTop:18}}>
-            {["REALITY","RECORD","CONTINUITY","ADMISSIBILITY","BINDING","COMMIT","EXECUTION","OUTCOME"].map((x,i)=><span key={x} style={{border:"1px solid #263142",borderRadius:999,padding:"8px 11px",fontSize:11,color:i===3||i===4?"#7dd3fc":"#cbd5e1"}}>{x}</span>)}
-          </div>
-          <p style={{marginTop:22,fontSize:18,fontWeight:800}}>ADMISSIBLE EVIDENCE · APPLICABLE AUTHORITY · ESTABLISHED STANDING · NOW.</p>
-          <p style={{color:"#94a3b8",lineHeight:1.6,maxWidth:900}}>This showroom is a controlled TA-14 runtime demonstration. It tests whether changed authoritative reality changes the derived execution state before consequence binds. It does not treat an upstream standing verdict as proof.</p>
-          <p style={{marginTop:24,fontSize:18}}><strong>No admissible evidence. No admissible execution.</strong></p>
-        </section>
-      </div>
-    </main>
-  );
-}
+import Link from "next/link";
+import {useState} from "react";
+import "./showroom.css";
+type Run="baseline"|"preserved"|"defeated";
+const fixed=[["T₀ AUTHORITY","Facilities authority A-214 · active"],["ACTOR","Building automation controller BAC-07"],["PROPOSED CONSEQUENCE","Increase outdoor-air ventilation in Classroom 214"],["EXECUTION PATH","Controller → governed commit → AHU-2 outside-air command"]];
+const data:Record<Run,{tag:string,name:string,tone:string,change:string,fact:string,source:string,evidence:string,authority:string,standing:string,decision:string,gate:string,why:string}>={baseline:{tag:"T₀",name:"FROZEN BASELINE",tone:"blue",change:"No changed-context event has been introduced. The governed proposition is frozen so both runs can be compared against the same starting state.",fact:"Baseline frozen",source:"Authority + actor + object + scope + path",evidence:"ESTABLISHED",authority:"APPLICABLE",standing:"ESTABLISHED",decision:"READY TO TEST",gate:"COMMIT NOT YET REQUESTED",why:"The baseline is the control, not the answer. Run ΔN₁ and ΔN₂ against this same frozen proposition."},preserved:{tag:"ΔN₁",name:"STANDING PRESERVED",tone:"green",change:"Occupancy increases from 21 to 27. Authoritative reality changes, but the actor, authority, governed object, scope, equipment relationship, and intervention boundary remain intact.",fact:"Occupancy: 21 → 27",source:"Room occupancy service · signed event · sequence continuous",evidence:"ESTABLISHED",authority:"APPLICABLE",standing:"ESTABLISHED",decision:"ALLOW",gate:"COMMIT MAY PROCEED",why:"TA-14 derives that the changed fact does not defeat the standing-bearing relationships. The same consequence remains eligible to cross the boundary if all remaining execution conditions are satisfied."},defeated:{tag:"ΔN₂",name:"STANDING DEFEATED",tone:"gold",change:"AHU-2 enters an active fire-smoke control override. The proposed consequence is unchanged, but the authoritative relationship governing who may command this path is not.",fact:"Fire-smoke override: INACTIVE → ACTIVE",source:"Life-safety control record · signed event · sequence continuous",evidence:"ESTABLISHED",authority:"NORMAL PATH DISPLACED",standing:"DEFEATED",decision:"HOLD",gate:"COMMIT BLOCKED",why:"TA-14 derives the refusal from authoritative changed reality and preserved provenance. It does not receive an upstream standing verdict. The consequence stops before it binds."}};
+const chain=["REALITY","RECORD","CONTINUITY","ADMISSIBILITY","BINDING","COMMIT","EXECUTION","OUTCOME"];
+export default function Page(){const[run,setRun]=useState<Run>("baseline"),[inspect,setInspect]=useState(false),[compare,setCompare]=useState(false);const r=data[run];return <main className={"crt "+r.tone}><div className="mx" aria-hidden="true">{["REALITY","RECORD","CONTINUITY","ADMISSIBILITY","BINDING","COMMIT","EXECUTION","OUTCOME","REALIDAD","REGISTRO","CONTINUIDAD","AUTORIDAD","STANDING","RÉALITÉ","PREUVE","EXÉCUTION","現実","記録","実行","현실","기록","실행"].map((x,i)=><span key={i}>{x}</span>)}</div><div className="w">
+<nav><Link href="/registry/ta-14-admissible-execution-architecture">← TA-14 AEA</Link><Link href="/registry/ta-14-admissible-execution-architecture/showcase/cross-architecture-revalidation">FLAGSHIP FOUNDING SHOWCASE →</Link></nav>
+<header className="hero"><div className="badges"><b>TA-14 AUTHORITY</b><b>PUBLIC TECHNICAL SHOWROOM</b><b>CONTROLLED RUNTIME TEST</b></div><p className="eye">THE CONSEQUENCE BOUNDARY · FORMAL CHANGED-REALITY EXAMINATION</p><h1>THE CHANGED-<br/><em>REALITY</em> TEST</h1><p className="challenge">CAN ONE AUTHORITATIVE FACT STOP THE SAME CONSEQUENCE?</p><p className="lede">Freeze everything that matters. Change one authoritative fact. Watch TA-14 derive whether the consequence still has admissible evidence, applicable authority, and established standing to become reality <strong>now</strong>.</p></header>
+<section className="question"><small>THE QUESTION TA-14 MUST ANSWER AT RUNTIME</small><h2>Does this proposed consequence have <i>admissible evidence</i>, <i>applicable authority</i>, and <i>established standing</i> to become reality <i>now</i>?</h2><div className="dets"><b>ALLOW</b><b>HOLD</b><b>DENY</b><b>ESCALATE</b></div></section>
+<section><p className="eye">01 · FREEZE THE CONTROL</p><h2 className="title">Four things are not allowed to move.</h2><div className="fixed">{fixed.map(([a,b])=><article key={a}><small>{a}</small><strong>{b}</strong><span>LOCKED</span></article>)}</div></section>
+<section><p className="eye">02 · RUN THE TEST</p><h2 className="title">Same consequence. Different authoritative reality.</h2><div className="runs">{([["baseline","T₀","FREEZE BASELINE"],["preserved","ΔN₁","PRESERVE STANDING"],["defeated","ΔN₂","DEFEAT STANDING"]] as const).map(([k,a,b])=><button key={k} className={run===k?"active":""} onClick={()=>{setRun(k);setInspect(false)}}><small>{a}</small><strong>{b}</strong><span>{k==="baseline"?"Establish the control":k==="preserved"?"Change a non-standing-bearing fact":"Change a standing-bearing fact"}</span></button>)}</div>
+<div className="runtime"><div className="rhead"><div><small>ACTIVE RUNTIME STATE · {r.tag}</small><h3>{r.name}</h3></div><div className="decision">{r.decision}</div></div><p className="change">{r.change}</p><div className="pipe">{[["AUTHORITATIVE REALITY",r.fact],["PROVENANCE",r.source],["ADMISSIBLE EVIDENCE",r.evidence],["APPLICABLE AUTHORITY",r.authority],["DERIVED STANDING",r.standing],["EXECUTION STATE",r.decision]].map(([a,b],i)=><div key={a}><small>0{i+1} · {a}</small><strong>{b}</strong>{i<5&&<i>→</i>}</div>)}</div><div className="gate"><small>CONSEQUENCE GATE</small><strong>{r.gate}</strong><p>{r.why}</p></div><button className="action" onClick={()=>setInspect(!inspect)}>{inspect?"CLOSE DERIVATION RECORD ↑":"INSPECT WHERE THE DETERMINATION HAPPENED ↓"}</button>{inspect&&<div className="record"><div><small>INPUT TYPE</small><b>Authoritative facts + preserved provenance</b></div><div><small>NOT ACCEPTED AS PROOF</small><b>Upstream standing verdict</b></div><div><small>DERIVATION LOCATION</small><b>TA-14 consequence boundary · before commit</b></div><div><small>BINDING EFFECT</small><b>{run==="defeated"?"HOLD prevents governed commit":"Determination controls whether commit may proceed"}</b></div></div>}</div></section>
+<section><p className="eye">03 · COMPARE THE EVIDENCE</p><h2 className="title">Do not trust the result. Inspect the divergence.</h2><button className="action compareBtn" onClick={()=>setCompare(!compare)}>{compare?"HIDE SIDE-BY-SIDE DIFF":"OPEN ΔN₁ ↔ ΔN₂ SIDE-BY-SIDE DIFF"}</button>{compare&&<div className="cmp"><article><small>RUN A · ΔN₁</small><h3>STANDING PRESERVED</h3><p><b>Changed fact:</b> Occupancy 21 → 27</p><p><b>Evidence:</b> Established</p><p><b>Authority:</b> Applicable</p><p><b>Standing:</b> Established</p><strong>ALLOW · COMMIT MAY PROCEED</strong></article><div className="only"><small>ONLY MATERIAL DIFFERENCE</small><b>AUTHORITATIVE ΔN</b><span>Everything in the frozen control remains identical.</span></div><article><small>RUN B · ΔN₂</small><h3>STANDING DEFEATED</h3><p><b>Changed fact:</b> Fire-smoke override activates</p><p><b>Evidence:</b> Established</p><p><b>Authority:</b> Normal path displaced</p><p><b>Standing:</b> Defeated</p><strong>HOLD · COMMIT BLOCKED</strong></article></div>}</section>
+<section><p className="eye">04 · THE PUBLIC CHAIN</p><div className="chain">{chain.map((x,i)=><div key={x}><small>0{i+1}</small><b>{x}</b></div>)}</div><div className="bound"><span>PROPOSAL</span><i>→</i><strong>TA-14 CONSEQUENCE BOUNDARY</strong><i>→</i><span>REALITY</span></div></section>
+<section className="falsify"><p className="eye">WHAT WOULD FALSIFY THIS DEMONSTRATION?</p><h2 className="title">A showroom is not proof merely because it says PASS.</h2><div className="fgrid">{["The runs do not begin from the same frozen T₀ authority, actor, consequence, and execution path.","The ΔN event cannot be traced to an authoritative source with preserved provenance.","TA-14 receives a standing conclusion upstream instead of deriving it from underlying facts.","A HOLD or DENY can be ignored while the governed consequence still commits.","The evidence cannot show where the execution paths diverged before consequence bound."].map((x,i)=><p key={x}><b>0{i+1}</b>{x}</p>)}</div></section>
+<footer><p>THE ARCHITECTURE DID NOT ASK WHETHER STANDING HAD BEEN DECLARED.</p><h2>It asked whether standing was established from authoritative reality <em>now.</em></h2><strong>NO ADMISSIBLE EVIDENCE. NO ADMISSIBLE EXECUTION.</strong><div className="links"><Link href="/registry/ta-14-admissible-execution-architecture">OPEN AEA REGISTRY RECORD →</Link><Link href="/registry/ta-14-admissible-execution-architecture/showcase/cross-architecture-revalidation">OPEN FLAGSHIP FOUNDING SHOWCASE →</Link></div></footer>
+</div></main>}
