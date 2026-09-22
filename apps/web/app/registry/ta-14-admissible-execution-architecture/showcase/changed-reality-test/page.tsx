@@ -34,12 +34,12 @@ function derive(run:Run):DerivedState{
 }
 const data:Record<Run,DerivedState>={baseline:derive("baseline"),preserved:derive("preserved"),defeated:derive("defeated"),unresolved:derive("unresolved")};
 const chain=["REALITY","RECORD","CONTINUITY","ADMISSIBILITY","BINDING","COMMIT","EXECUTION","OUTCOME"];
-const receiptId=(run:Run)=>`TA14-AEA-CRR-R1-${run==="preserved"?"DN1":run==="defeated"?"DN2":"T0"}`;
+const receiptId=(run:Run)=>`TA14-AEA-CRR-R1-${run==="preserved"?"DN1":run==="defeated"?"DN2":run==="unresolved"?"DN3":"T0"}`;
 async function downloadReceipt(run:Run){
  const r=data[run], timestamp=new Date().toISOString();
  const runId=`${receiptId(run)}-${timestamp.replace(/[-:.TZ]/g,"").slice(0,14)}Z`;
  const frozenRecord="T0:A-214|ACTOR:BAC-07|CONSEQUENCE:OA-VENT-CLASSROOM-214|PATH:BAC-07>GOVERNED-COMMIT>AHU-2-OA";
- const deltaId=run==="preserved"?"DN1:OCCUPANCY-21-TO-27":run==="defeated"?"DN2:FIRE-SMOKE-OVERRIDE-ACTIVE":"T0:NO-DELTA";
+ const deltaId=run==="preserved"?"DN1:OCCUPANCY-21-TO-27":run==="defeated"?"DN2:FIRE-SMOKE-OVERRIDE-ACTIVE":run==="unresolved"?"DN3:PROVENANCE-INCOMPLETE":"T0:NO-DELTA";
  const integrityPayload=[runId,frozenRecord,deltaId,r.fact,provenanceText(r.provenance),String(r.occupancy??""),String(r.fireSmokeOverride??""),RULESET.id,RULESET.version,EVALUATOR.id,EVALUATOR.version,r.evidence,r.authority,r.standing,r.decision,r.gate,String(r.commitAuthorized)].join("|");
  const bytes=new TextEncoder().encode(integrityPayload);
  const digest=await crypto.subtle.digest("SHA-256",bytes);
