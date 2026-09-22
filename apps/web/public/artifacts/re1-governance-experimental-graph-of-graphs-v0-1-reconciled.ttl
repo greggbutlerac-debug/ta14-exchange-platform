@@ -1,0 +1,102 @@
+@prefix expgov: <https://onuma.com/ns/experimental/governance#> .
+@prefix re1: <http://onuma.com/id#> .
+@prefix dcterms: <http://purl.org/dc/terms/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# RE1 Experimental Governance Companion Graph
+# Reconciled reference copy — September 22, 2026.
+# Prototype only — not production integration or a formal TA-14 / Fixed Asset ontology.
+# Source prototype received from ONUMA used a provisional re1 namespace.
+# This preserved companion changes only the re1 namespace binding to the exact
+# source-building base URI established in building_3593_s223_20260922_102121.ttl.
+# Local node IDs and governance assertions remain unchanged.
+
+expgov:RE1_Governance_Experimental
+    a expgov:ExperimentalCompanionGraph ;
+    dcterms:title "RE1 Governance Connection Profile — Experimental Reference Implementation" ;
+    dcterms:description "Graph-of-graphs prototype connecting independently governed evidence and consequence-governance information to persistent RE1 building objects without merging graphs." ;
+    expgov:productionIntegration false ;
+    expgov:formalInteroperability false ;
+    expgov:sourceBuildingGraph "building_3593_s223_20260922_102121.ttl" .
+
+expgov:AHU1_Reference
+    a expgov:PersistentObjectReference ;
+    expgov:references re1:Component_177_3263151 ;
+    expgov:onumaId "3263151" ;
+    expgov:ifcGuid "1EBsSULHHFzvOJ4cyCdZ8w" ;
+    expgov:label "AHU-1" .
+
+expgov:EISO1_Reference
+    a expgov:PersistentObjectReference ;
+    expgov:references re1:Component_177_3254365 ;
+    expgov:onumaId "3254365" ;
+    expgov:ifcGuid "56392c405fd44d55ab63b9" ;
+    expgov:label "EISO-1 Power Disconnect" .
+
+expgov:AHU1_CurrentReality_001
+    a expgov:CurrentReality ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:description "Current asset condition and context to be established from authoritative owner sources at evaluation time." .
+
+expgov:AHU1_AssetInformationReadiness_001
+    a expgov:AssetInformationReadiness ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:role "Fixed Asset Health Assessment — Experimental Layer" ;
+    expgov:description "Experimental representation of independently validated and reconciled asset information for an intended downstream use." ;
+    expgov:checks "completeness, reconciliation, match to reality, provenance, and applicable source authority" .
+
+expgov:AHU1_ProposedConsequence_001
+    a expgov:ProposedConsequence ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:description "Approve repair, warranty action, or related maintenance consequence for AHU-1." .
+
+expgov:AHU1_AdmissibleEvidence_001
+    a expgov:AdmissibleEvidence ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:supports expgov:AHU1_ProposedConsequence_001 ;
+    expgov:description "Condition evidence, warranty terms, maintenance/work-order evidence, and provenance required for this proposition." .
+
+expgov:AHU1_ApplicableAuthority_001
+    a expgov:ApplicableAuthority ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:appliesTo expgov:AHU1_ProposedConsequence_001 ;
+    expgov:description "Authority to approve repair, cost, warranty disposition, or related consequence must be established." .
+
+expgov:AHU1_EstablishedStanding_001
+    a expgov:EstablishedStanding ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:appliesTo expgov:AHU1_ProposedConsequence_001 ;
+    expgov:description "The requester or actor must have legitimate standing for this asset and proposed consequence in the current context." .
+
+expgov:AHU1_Determination_001
+    a expgov:ConsequenceGovernanceDetermination ;
+    expgov:aboutAsset re1:Component_177_3263151 ;
+    expgov:appliesTo expgov:AHU1_ProposedConsequence_001 ;
+    expgov:role "TA-14 — Experimental Layer" ;
+    expgov:governanceQuestion "Does this proposed consequence have sufficient ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY, and ESTABLISHED STANDING to become REALITY NOW?" ;
+    expgov:result "HOLD" ;
+    expgov:reason "Actual warranty terms and current governing context are not asserted in this prototype." ;
+    expgov:isExecutionCommand false ;
+    expgov:requiresRevalidationAfterMaterialChange true .
+
+expgov:EISO1_ProposedConsequence_001
+    a expgov:ProposedConsequence ;
+    expgov:aboutAsset re1:Component_177_3254365 ;
+    expgov:description "Open or isolate electrical power during an emergency." .
+
+expgov:EISO1_Determination_001
+    a expgov:ConsequenceGovernanceDetermination ;
+    expgov:aboutAsset re1:Component_177_3254365 ;
+    expgov:appliesTo expgov:EISO1_ProposedConsequence_001 ;
+    expgov:role "TA-14 — Experimental Layer" ;
+    expgov:governanceQuestion "Does this proposed consequence have sufficient ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY, and ESTABLISHED STANDING to become REALITY NOW?" ;
+    expgov:result "HOLD" ;
+    expgov:reason "Active incident, actor authority, standing, and current operational state must be established before a consequence determination." ;
+    expgov:isExecutionCommand false ;
+    expgov:requiresRevalidationAfterMaterialChange true .
+
+expgov:ExperimentalBoundary_001
+    a expgov:BoundaryStatement ;
+    expgov:description "This companion graph is a quick C4SB graph-of-graphs prototype. It does not define TA-14 or Fixed Asset semantics, does not claim production integration, and does not merge governance assertions into the independently maintained RE1 building graph." ;
+    expgov:principle "Different graphs, different purposes and potentially different authorities, but the same persistent thing." .
