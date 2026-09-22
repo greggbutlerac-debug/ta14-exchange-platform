@@ -93,6 +93,12 @@ export default function BlueIotEvidenceToActionShowroom(){
  </div>
  </section>
 
+ <section style={{marginTop:22,padding:'clamp(26px,4vw,40px)',borderRadius:24,border:'1px solid rgba(127,240,189,.2)',background:'linear-gradient(135deg,rgba(12,52,43,.28),rgba(4,14,23,.92))'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>PROPOSED NEXT STEP</div>
+ <h2 style={{fontSize:'clamp(26px,4vw,44px)',letterSpacing:'-.035em',margin:'10px 0 12px'}}>Run this exact CO₂ pathway together.</h2>
+ <p style={{color:'#a9bbc4',lineHeight:1.65,maxWidth:900,margin:0}}>Use the states, evidence, equipment relationships, recommendations, control context, and post-action observations that Encompass Blue actually exposes. Then examine where the bounded consequence proposition reaches TA-14, what governance determination can be returned without taking over execution, and what evidence closes the resulting outcome.</p>
+ </section>
+
  <section style={{marginTop:22,padding:'28px',borderRadius:24,border:'1px solid rgba(242,191,106,.18)',background:'rgba(45,33,10,.22)'}}>
  <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#f2bf6a'}}>BOUNDARY NOTICE</div>
  <p style={{color:'#b8b2a2',lineHeight:1.6,marginBottom:0}}>This showroom is a TA-14 discussion surface derived from the technical pathway proposed in correspondence with Robert Sharon. It does not state or imply that Blue IoT, Encompass Blue, Robert Sharon, or any associated party has adopted, integrated, certified, endorsed, or transferred authority to TA-14. The example is conceptual until a bounded technical examination is mutually defined and performed.</p>
