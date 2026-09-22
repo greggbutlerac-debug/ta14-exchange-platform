@@ -27,6 +27,10 @@ export default function FAINShowroom(){
  const [authority,setAuthority]=useState(true);
  const [region,setRegion]=useState('NORTH AMERICA');
  const [federatedRegion,setFederatedRegion]=useState<string|null>(null);
+ const [signalClass,setSignalClass]=useState<'ambient'|'exposure'|'event'|'advisory'>('ambient');
+ const [jurisdiction,setJurisdiction]=useState(true);
+ const [provenance,setProvenance]=useState(true);
+ const [clock,setClock]=useState(true);
  const p=places[place];
  const determination=useMemo(()=>{
    if(!continuity) return 'HOLD';
@@ -70,6 +74,44 @@ export default function FAINShowroom(){
       ['CONSEQUENCE','TA-14 determines what may cross from proposal into reality now.']
      ].map(([a,b],i)=><article key={a} style={{padding:18,borderRadius:15,border:'1px solid rgba(111,232,255,.15)',background:i===3?'rgba(111,232,255,.09)':'rgba(2,10,12,.7)'}}><b style={{color:i===3?'#6fe8ff':'#62f0c4'}}>{a}</b><p style={{fontSize:13,lineHeight:1.55,color:'#9db7b0'}}>{b}</p></article>)}
     </div>
+   </section>
+
+   <section style={{marginTop:26,padding:'clamp(28px,5vw,52px)',border:'1px solid rgba(111,232,255,.2)',borderRadius:22,background:'linear-gradient(180deg,rgba(3,18,22,.93),rgba(2,10,13,.96))'}}>
+    <p style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#6fe8ff'}}>FAIN · FEDERATION OPERATING MODEL</p>
+    <h2 style={{fontSize:'clamp(34px,5vw,62px)',letterSpacing:'-.045em',margin:'10px 0 14px'}}>Federation is not connection. It is governed continuity across boundaries.</h2>
+    <p style={{maxWidth:1000,color:'#a8c1ba',fontSize:17,lineHeight:1.72}}>A FAIN node does not simply publish sensor values. Each bounded signal must preserve what it represents, where it originated, when it was established, which record class it belongs to, what limitations travel with it, what jurisdiction governs its use, and whether later reliance remains admissible.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12,marginTop:22}}>
+     {[
+      ['NODE IDENTITY','Every participating source remains attributable to a bounded local node.'],
+      ['RECORD CLASS','AIR, PAIR, ambient network signal, event evidence, or advisory context are not interchangeable.'],
+      ['TIME INTEGRITY','Currentness, chronology, transitions and unresolved gaps remain visible.'],
+      ['PROVENANCE','Source lineage, instrument context and declared limitations travel with federation.'],
+      ['JURISDICTION','Cross-boundary availability does not erase local legal, institutional or contractual authority.'],
+      ['RELIANCE BOUNDARY','Receiving a signal does not automatically authorize diagnosis, intervention or execution.']
+     ].map(([a,b])=><article key={a} style={{padding:20,borderRadius:15,border:'1px solid rgba(111,232,255,.14)',background:'rgba(1,10,13,.72)'}}><b style={{color:'#62f0c4'}}>{a}</b><p style={{color:'#93ada6',lineHeight:1.6,fontSize:13}}>{b}</p></article>)}
+    </div>
+   </section>
+
+   <section style={{marginTop:26,padding:'clamp(28px,5vw,52px)',border:'1px solid rgba(180,148,255,.22)',borderRadius:22,background:'rgba(6,12,21,.92)'}}>
+    <p style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#b494ff'}}>FAIN SIGNAL ENVELOPE</p>
+    <h2 style={{fontSize:'clamp(32px,4.8vw,58px)',letterSpacing:'-.04em',margin:'10px 0'}}>What exactly is allowed to federate?</h2>
+    <div style={{display:'flex',gap:8,flexWrap:'wrap',margin:'20px 0'}}>{([['ambient','AMBIENT'],['exposure','EXPOSURE'],['event','EVENT'],['advisory','ADVISORY']] as const).map(([k,label])=><button key={k} onClick={()=>setSignalClass(k)} style={{padding:'11px 14px',borderRadius:999,cursor:'pointer',fontWeight:950,border:signalClass===k?'1px solid #b494ff':'1px solid rgba(180,148,255,.2)',background:signalClass===k?'rgba(180,148,255,.12)':'rgba(4,8,14,.72)',color:signalClass===k?'#e7ddff':'#8f88a8'}}>{label}</button>)}</div>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
+     <article style={{padding:20,border:'1px solid rgba(180,148,255,.2)',borderRadius:15}}><small style={{color:'#8f88a8'}}>CURRENT CLASS</small><h3 style={{color:'#b494ff',fontSize:26,margin:'7px 0'}}>{signalClass.toUpperCase()}</h3><p style={{color:'#a8a4b8',lineHeight:1.6}}>{signalClass==='ambient'?'Place-centered atmospheric conditions available for bounded environmental representation.':signalClass==='exposure'?'Person-associated atmospheric chronology requiring stronger continuity and privacy boundaries.':signalClass==='event'?'A bounded environmental event such as wildfire smoke, plume, ventilation failure or contamination episode.':'A derived awareness signal that may support attention but does not inherit the standing of the underlying record.'}</p></article>
+     <article style={{padding:20,border:'1px solid rgba(111,232,255,.16)',borderRadius:15}}><small style={{color:'#789f98'}}>MUST TRAVEL WITH IT</small><p style={{color:'#a8c1ba',lineHeight:1.65}}>Source identity · time window · place or subject binding · instrument context · confidence/limitations · continuity state · jurisdictional context · permitted reliance.</p></article>
+     <article style={{padding:20,border:'1px solid rgba(98,240,196,.16)',borderRadius:15}}><small style={{color:'#78a99c'}}>MUST NOT BE IMPLIED</small><p style={{color:'#a8c1ba',lineHeight:1.65}}>Ownership transfer · medical causation · regulatory finding · intervention authority · universal comparability · silent correction · execution permission.</p></article>
+    </div>
+   </section>
+
+   <section style={{marginTop:26,padding:'clamp(28px,5vw,52px)',border:'1px solid rgba(255,209,92,.2)',borderRadius:22,background:'rgba(18,14,4,.72)'}}>
+    <p style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#ffd15c'}}>CROSS-JURISDICTION TEST</p>
+    <h2 style={{fontSize:'clamp(32px,4.8vw,58px)',letterSpacing:'-.04em',margin:'10px 0'}}>A signal can cross geography without crossing every authority boundary.</h2>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:12,marginTop:20}}>
+     <button onClick={()=>setJurisdiction(!jurisdiction)} style={{padding:20,textAlign:'left',cursor:'pointer',borderRadius:15,border:'1px solid rgba(255,209,92,.25)',background:'rgba(20,15,4,.72)',color:'#f6df9a'}}><b>JURISDICTION</b><div style={{marginTop:8}}>{jurisdiction?'BOUNDARY PRESERVED':'BOUNDARY UNKNOWN'}</div></button>
+     <button onClick={()=>setProvenance(!provenance)} style={{padding:20,textAlign:'left',cursor:'pointer',borderRadius:15,border:'1px solid rgba(255,209,92,.25)',background:'rgba(20,15,4,.72)',color:'#f6df9a'}}><b>PROVENANCE</b><div style={{marginTop:8}}>{provenance?'SOURCE TRACEABLE':'SOURCE BROKEN'}</div></button>
+     <button onClick={()=>setClock(!clock)} style={{padding:20,textAlign:'left',cursor:'pointer',borderRadius:15,border:'1px solid rgba(255,209,92,.25)',background:'rgba(20,15,4,.72)',color:'#f6df9a'}}><b>TIME CONTINUITY</b><div style={{marginTop:8}}>{clock?'CURRENT / ORDERED':'STALE / DISCONTINUOUS'}</div></button>
+    </div>
+    <div style={{marginTop:18,padding:20,borderRadius:15,background:'rgba(5,8,10,.72)',border:'1px solid rgba(255,255,255,.08)'}}><b style={{color:'#ffd15c'}}>FEDERATION DETERMINATION</b><p style={{color:'#b8b39f',lineHeight:1.65}}>{jurisdiction&&provenance&&clock?'The signal may participate in bounded federation. Local provenance, chronology and jurisdictional boundaries remain preserved.':!provenance?'HOLD — the signal cannot carry reliable standing across the federation because source provenance is broken.':!clock?'HOLD — temporal continuity is not sufficient to silently treat earlier evidence as current.':'ESCALATE — the receiving jurisdiction cannot determine permitted reliance from the current bounded state.'}</p></div>
    </section>
 
    <section style={{marginTop:26,padding:'clamp(24px,5vw,46px)',border:'1px solid rgba(98,240,196,.23)',borderRadius:22,background:'rgba(3,16,18,.88)'}}>
