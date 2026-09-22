@@ -38,6 +38,9 @@ export default function ThreeBoundariesShowroom(){
   }[result];
 
   const resultColor={ALLOW:'#6cf0b8',HOLD:'#ffd36b',DENY:'#ff7b83',ESCALATE:'#b9a7ff'}[result];
+  const blocker = scope==='outside' ? 'SCOPE OUTSIDE AUTHORIZED BOUNDARY' : evidence==='stale' ? 'EVIDENCE IS STALE' : network==='unverified' ? 'EXECUTION PATH IS UNVERIFIED' : authority==='expired' ? 'CURRENT AUTHORITY / STANDING NOT ESTABLISHED' : 'NO BLOCKING CONDITION';
+  const executionState = result==='ALLOW' ? 'EXECUTION AUTHORIZED WITHIN BOUNDARY' : 'EXECUTION PREVENTED';
+  const resetDemo=()=>{setEvidence('current');setAuthority('expired');setScope('authorized');setNetwork('observable');};
 
   const Toggle=({label,value,onChange,options}:{label:string,value:Choice,onChange:(v:Choice)=>void,options:[Choice,string][]})=><div style={{padding:18,...card()}}>
     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.16em',color:'#7f9baa'}}>{label}</div>
@@ -88,6 +91,41 @@ export default function ThreeBoundariesShowroom(){
           {[['RECORD',evidence==='current'?'SUPPORTED':'STALE'],['TA-14',result],['PHYSICAL CONSEQUENCE',result==='ALLOW'?'AUTHORIZED':'NOT AUTHORIZED']].map(([a,b],i)=><div key={a} style={{minWidth:190,padding:18,textAlign:'center',...card(i===1)}}><div style={{fontSize:10,letterSpacing:'.12em',color:'#718b99',fontWeight:900}}>{a}</div><div style={{marginTop:7,fontWeight:1000,color:i===1?resultColor:'#e7f4f8'}}>{b}</div></div>).reduce((acc,el,i)=>{if(i)acc.push(<b key={'a'+i} style={{color:'#4e7181'}}>→</b>);acc.push(el);return acc},[] as React.ReactNode[])}
         </div>
         <div style={{marginTop:18,textAlign:'center',fontWeight:950,fontSize:'clamp(17px,2vw,23px)',color:'#dcecf1'}}>THE ABILITY TO TRANSPORT A COMMAND IS NOT AUTHORITY TO EXECUTE THE CONSEQUENCE.</div>
+
+        <div style={{marginTop:26,padding:'clamp(24px,4vw,38px)',...card()}}>
+          <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#69dcff'}}>LIVE EXECUTION PATH</div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10,marginTop:18}}>
+            {[
+              ['01 · RECORD BOUNDARY',evidence==='current'?'SUPPORTED RECORD':'STALE RECORD','Can the operational record be trusted now?'],
+              ['02 · CONSEQUENCE BOUNDARY',result,'TA-14 evaluates admissibility, authority, standing, and scope.'],
+              ['03 · NETWORK BOUNDARY',network==='observable'?'PATH OBSERVABLE':'PATH UNVERIFIED','Can the determination meet the command path?'],
+              ['04 · REALITY',executionState,result==='ALLOW'?'The bounded consequence may proceed.':'The proposed consequence does not cross into physical reality.']
+            ].map(([a,b,d],i)=><div key={a} style={{padding:20,...card(i===1)}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.1em',color:i===1?'#6cf0b8':'#69dcff'}}>{a}</div><div style={{fontSize:18,fontWeight:1000,margin:'10px 0',color:i===1?resultColor:'#eef8fb'}}>{b}</div><div style={{fontSize:12,lineHeight:1.55,color:'#8fa7b4'}}>{d}</div></div>)}
+          </div>
+          <div style={{marginTop:16,padding:18,borderRadius:14,border:`1px solid ${resultColor}44`,background:`${resultColor}0c`}}>
+            <div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:'#7894a2'}}>WHY THIS RESULT?</div>
+            <div style={{fontSize:'clamp(18px,2.4vw,26px)',fontWeight:1000,marginTop:7,color:resultColor}}>{blocker}</div>
+          </div>
+        </div>
+
+        <div style={{marginTop:26,padding:'clamp(24px,4vw,38px)',...card()}}>
+          <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#b9a7ff'}}>BREAK THE CHAIN · ADVERSARIAL MODE</div>
+          <p style={{color:'#9fb4bf',lineHeight:1.65,maxWidth:850}}>Change one condition and watch the consequence boundary respond. The same command can move from ALLOW to HOLD, DENY, or ESCALATE without changing the physical capability of the building.</p>
+          <div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:18}}>
+            {[
+              ['MAKE EVIDENCE STALE',()=>setEvidence('stale')],
+              ['EXPIRE AUTHORITY',()=>setAuthority('expired')],
+              ['MOVE OUTSIDE SCOPE',()=>setScope('outside')],
+              ['LOSE NETWORK VERIFICATION',()=>setNetwork('unverified')],
+              ['RESTORE ALL CONDITIONS',()=>{setEvidence('current');setAuthority('current');setScope('authorized');setNetwork('observable');}]
+            ].map(([label,fn])=><button key={label as string} onClick={fn as ()=>void} style={{cursor:'pointer',padding:'12px 14px',borderRadius:11,border:'1px solid rgba(185,167,255,.28)',background:'rgba(185,167,255,.07)',color:'#ddd6ff',fontWeight:950,fontSize:10,letterSpacing:'.06em'}}>{label as string}</button>)}
+          </div>
+          {result==='ALLOW'&&<div style={{marginTop:22,padding:22,borderRadius:16,border:'1px solid rgba(108,240,184,.4)',background:'rgba(108,240,184,.08)',textAlign:'center'}}>
+            <div style={{fontSize:12,fontWeight:950,color:'#6cf0b8'}}>AUTHORITY RE-ESTABLISHED → STANDING CURRENT → REVALIDATION COMPLETE</div>
+            <div style={{fontSize:'clamp(30px,5vw,52px)',fontWeight:1000,marginTop:10,color:'#6cf0b8'}}>ALLOW</div>
+            <div style={{color:'#b7d8ca'}}>Consequence may proceed within the bounded authorization.</div>
+          </div>}
+        </div>
       </section>
 
       <section style={{marginTop:26,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:12}}>
@@ -97,6 +135,7 @@ export default function ThreeBoundariesShowroom(){
       <section style={{marginTop:26,padding:'clamp(28px,5vw,48px)',...card()}}>
         <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#6cf0b8'}}>THE TA-14 CHAIN</div>
         <div style={{display:'flex',gap:8,alignItems:'center',flexWrap:'wrap',marginTop:20}}>{['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'].map((x,i)=><span key={x} style={{display:'contents'}}><b style={{padding:'10px 12px',borderRadius:10,border:x==='EXECUTION'?'1px solid rgba(108,240,184,.5)':'1px solid rgba(105,220,255,.13)',background:x==='EXECUTION'?'rgba(108,240,184,.1)':'rgba(2,9,15,.55)',fontSize:11,color:x==='EXECUTION'?'#6cf0b8':'#c9dbe2'}}>{x}</b>{i<7&&<span style={{color:'#4e7181'}}>→</span>}</span>)}</div>
+        <div style={{marginTop:26,padding:'18px 0',borderTop:'1px solid rgba(105,220,255,.12)',borderBottom:'1px solid rgba(105,220,255,.12)',fontSize:'clamp(14px,2vw,20px)',fontWeight:950,lineHeight:1.8,color:'#b8d0da'}}>REALITY → RECORD → TRUSTWORTHY EVIDENCE → <span style={{color:'#6cf0b8'}}>TA-14 DETERMINATION</span> → NETWORK EXECUTION PATH → PHYSICAL CONSEQUENCE → OUTCOME → NEW REALITY</div>
         <div style={{marginTop:22,fontSize:'clamp(20px,3vw,31px)',fontWeight:1000}}>NEW REALITY → NEW RECORD → NEW DETERMINATION</div>
         <p style={{color:'#91a8b5',lineHeight:1.7}}>No permanent permission. No silent inheritance of authority. No assumption that yesterday&apos;s approval authorizes today&apos;s consequence.</p>
       </section>
@@ -111,13 +150,18 @@ export default function ThreeBoundariesShowroom(){
       </section>
 
       <section style={{marginTop:26,padding:'clamp(48px,7vw,88px) clamp(24px,5vw,54px)',textAlign:'center',border:'1px solid rgba(108,240,184,.28)',borderRadius:30,background:'radial-gradient(circle at 50% 20%,rgba(108,240,184,.11),transparent 42%),rgba(2,9,15,.86)'}}>
-        <div style={{fontSize:'clamp(27px,5vw,58px)',fontWeight:1000,letterSpacing:'-.045em',lineHeight:1.05}}>THE NETWORK CAN CARRY THE COMMAND.</div>
-        <div style={{fontSize:'clamp(27px,5vw,58px)',fontWeight:1000,letterSpacing:'-.045em',lineHeight:1.05,marginTop:10}}>THE DATA CAN SUPPORT THE COMMAND.</div>
-        <p style={{fontSize:'clamp(18px,2.6vw,28px)',maxWidth:900,margin:'28px auto',color:'#9db3bd',lineHeight:1.5}}>Neither fact establishes that the consequence may become reality.</p>
-        <div style={{fontSize:'clamp(35px,6vw,72px)',fontWeight:1000,letterSpacing:'-.055em',lineHeight:1,color:'#6cf0b8'}}>THAT DETERMINATION EXISTS AT THE CONSEQUENCE BOUNDARY.</div>
-        <div style={{marginTop:32,fontWeight:950,letterSpacing:'.12em',color:'#d8e9ee'}}>NO ADMISSIBLE EVIDENCE. NO ADMISSIBLE EXECUTION.</div>
+        <div style={{fontSize:'clamp(25px,4.6vw,54px)',fontWeight:1000,letterSpacing:'-.045em',lineHeight:1.08}}>THE DATA CAN BE RIGHT.</div>
+        <div style={{fontSize:'clamp(25px,4.6vw,54px)',fontWeight:1000,letterSpacing:'-.045em',lineHeight:1.08,marginTop:8}}>THE NETWORK CAN WORK.</div>
+        <div style={{fontSize:'clamp(25px,4.6vw,54px)',fontWeight:1000,letterSpacing:'-.045em',lineHeight:1.08,marginTop:8}}>THE COMMAND CAN BE TECHNICALLY VALID.</div>
+        <div style={{fontSize:'clamp(31px,5.5vw,68px)',fontWeight:1000,letterSpacing:'-.055em',lineHeight:1.02,marginTop:28,color:'#ffd36b'}}>AND THE CORRECT DETERMINATION CAN STILL BE HOLD.</div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10,maxWidth:920,margin:'36px auto 0'}}>
+          {['EVIDENCE IS NOT AUTHORITY.','CAPABILITY IS NOT PERMISSION.','TRANSPORT IS NOT EXECUTION AUTHORITY.'].map(x=><div key={x} style={{padding:18,...card()}}><b>{x}</b></div>)}
+        </div>
+        <div style={{fontSize:'clamp(34px,6vw,72px)',fontWeight:1000,letterSpacing:'-.055em',lineHeight:1,marginTop:38,color:'#6cf0b8'}}>THE CONSEQUENCE STILL HAS TO EARN THE RIGHT TO BECOME REALITY.</div>
+        <div style={{marginTop:28,fontWeight:950,letterSpacing:'.12em',color:'#d8e9ee'}}>ADMISSIBILITY · AUTHORITY · STANDING</div>
+        <div style={{marginTop:8,fontWeight:950,letterSpacing:'.12em',color:'#8fa7b4'}}>ALLOW · HOLD · DENY · ESCALATE</div>
         <div style={{display:'flex',justifyContent:'center',gap:10,flexWrap:'wrap',marginTop:30}}>
-          <button onClick={()=>{setEvidence('current');setAuthority('expired');setScope('authorized');setNetwork('observable');window.scrollTo({top:500,behavior:'smooth'})}} style={{cursor:'pointer',padding:'13px 18px',borderRadius:999,border:'1px solid rgba(108,240,184,.4)',background:'rgba(108,240,184,.1)',color:'#dffff0',fontWeight:950}}>RUN ANOTHER CONSEQUENCE</button>
+          <button onClick={()=>{resetDemo();window.scrollTo({top:500,behavior:'smooth'})}} style={{cursor:'pointer',padding:'13px 18px',borderRadius:999,border:'1px solid rgba(108,240,184,.4)',background:'rgba(108,240,184,.1)',color:'#dffff0',fontWeight:950}}>RUN ANOTHER CONSEQUENCE</button>
           <Link href="/registry/ta-14-admissible-execution-architecture" style={{padding:'13px 18px',borderRadius:999,border:'1px solid rgba(105,220,255,.18)',color:'#bfe9f3',textDecoration:'none',fontWeight:950}}>EXPLORE TA-14</Link>
         </div>
       </section>
