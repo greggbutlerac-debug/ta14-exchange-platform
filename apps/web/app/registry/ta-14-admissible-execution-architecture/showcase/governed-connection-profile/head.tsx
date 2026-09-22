@@ -1,0 +1,1 @@
+export default function Head(){return <><title>Governed Connection Profile | TA-14</title><meta name="description" content="TA-14 public technical showroom: minimum knowledge graph and connection rules for attaching consequence governance to buildings, assets, and cities." /></>}
