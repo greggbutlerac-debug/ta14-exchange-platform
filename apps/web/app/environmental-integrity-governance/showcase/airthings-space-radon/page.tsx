@@ -44,6 +44,20 @@ export default function AirthingsSpaceRadonShowroom(){
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginTop:22}}>{sensors.map(([a,b])=><div key={a} style={{padding:17,borderRadius:14,border:'1px solid rgba(113,231,255,.14)',background:'rgba(2,9,15,.52)'}}><b style={{color:'#9eeaff'}}>{a}</b><div style={{marginTop:7,fontSize:13,lineHeight:1.45,color:'#91a8b7'}}>{b}</div></div>)}</div>
  </section>
 
+ <section style={{margin:'22px 0',padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:26,background:'linear-gradient(135deg,rgba(6,25,38,.96),rgba(7,20,27,.94))'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>THE PUBLIC AIRTHINGS PATHWAY · THE GOVERNANCE SEAM</div>
+ <p style={{fontSize:'clamp(18px,2.2vw,25px)',lineHeight:1.55,maxWidth:1000,color:'#c1d3dc',margin:'12px 0 22px'}}>Airthings describes the organizational pathway as <b style={{color:'#eef7fb'}}>“monitor, take action, and measure the impact of those actions over time.”</b> The TA-14 question sits precisely at the transition from evidence to consequence.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10,alignItems:'stretch'}}>
+ {[
+  ['MONITOR','Environmental conditions become observable evidence.'],
+  ['GOVERNANCE BOUNDARY','Is the proposed consequence admissible, authorized, and standing now?'],
+  ['TAKE ACTION','Only an appropriately authorized human or operational system executes a permitted consequence.'],
+  ['MEASURE IMPACT','The observed result becomes new evidence for the next bounded chain.'],
+ ].map(([a,b],i)=><div key={a} style={{padding:20,borderRadius:16,border:i===1?'1px solid rgba(127,240,189,.55)':'1px solid rgba(113,231,255,.16)',background:i===1?'rgba(127,240,189,.08)':'rgba(2,9,15,.52)',boxShadow:i===1?'0 0 40px rgba(127,240,189,.08)':'none'}}><b style={{color:i===1?'#7ff0bd':'#9eeaff',fontSize:i===1?16:14}}>{a}</b><p style={{fontSize:13,lineHeight:1.5,color:'#9fb3bf',margin:'8px 0 0'}}>{b}</p></div>)}
+ </div>
+ <p style={{fontSize:12,lineHeight:1.55,color:'#7f96a3',margin:'16px 0 0'}}>Quoted pathway attributed to Airthings’ September 21, 2026 public Space Radon announcement. TA-14’s governance-boundary framing is an independent examination and is not Airthings language.</p>
+ </section>
+
  <section style={{padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:26,background:'rgba(4,13,22,.9)'}}>
  <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>THE CONSEQUENCE PATH</div>
  <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 20px'}}>Detect → Record → Validate → Propose → Authority → Standing → Commit → Execute → Verify</h2>
