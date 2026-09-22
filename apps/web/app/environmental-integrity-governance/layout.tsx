@@ -1,2 +1,18 @@
-import Link from 'next/link';import type {ReactNode} from 'react';
-export default function EnvironmentalIntegrityLayout({children}:{children:ReactNode}){return <>{children}<div style={{position:'fixed',right:18,bottom:18,zIndex:95,display:'grid',gap:8,width:'min(410px,calc(100vw - 36px))'}}><Link href='/environmental-integrity-governance/verification' style={{display:'block',padding:'12px 16px',border:'1px solid rgba(255,209,92,.58)',borderRadius:14,background:'linear-gradient(135deg,rgba(45,32,6,.98),rgba(18,12,3,.98))',color:'#fff8df',textDecoration:'none'}}><small style={{display:'block',color:'#ffd15c',fontSize:8,fontWeight:900,letterSpacing:'.14em'}}>PAID COMMERCIAL ENGINE</small><strong style={{display:'block',marginTop:4,fontSize:12}}>ENVIRONMENTAL INTEGRITY VERIFICATION →</strong><small style={{display:'block',marginTop:4,color:'#c8b98d',fontSize:8}}>Baseline · pathway · intervention · post-intervention evidence · bounded closure</small></Link><Link href='/workspace/environmental-records/playground' style={{display:'block',padding:'12px 16px',border:'1px solid rgba(201,175,255,.48)',borderRadius:14,background:'#160f25',color:'#f5efff',textDecoration:'none'}}><small style={{color:'#c9afff',fontSize:8,fontWeight:900}}>ENVIRONMENTAL RECORDS PLAYGROUND</small><strong style={{display:'block',marginTop:4,fontSize:12}}>BRING YOUR RECORD. ASK WHAT IT CAN PROVE. →</strong></Link><Link href='/environmental-integrity-governance/demonstrations' style={{display:'block',padding:'12px 16px',border:'1px solid rgba(116,235,182,.62)',borderRadius:14,background:'#061e16',color:'#eefbf5',textDecoration:'none'}}><small style={{color:'#79dbae',fontSize:8,fontWeight:900}}>DOOR 03 · PROVING GROUND</small><strong style={{display:'block',marginTop:4,fontSize:12}}>RUN GOVERNED DEMONSTRATIONS →</strong></Link></div></>}
+'use client';
+
+import Link from 'next/link';
+import type {ReactNode} from 'react';
+import { usePathname } from 'next/navigation';
+
+export default function EnvironmentalIntegrityLayout({children}:{children:ReactNode}){
+  const pathname = usePathname();
+  const isShowroom = pathname.includes('/showcase/');
+  return <>
+    {children}
+    {!isShowroom ? <div style={{position:'fixed',right:18,bottom:18,zIndex:95,display:'grid',gap:8,width:'min(410px,calc(100vw - 36px))'}}>
+      <Link href='/environmental-integrity-governance/verification' style={{display:'block',padding:'12px 16px',border:'1px solid rgba(255,209,92,.58)',borderRadius:14,background:'linear-gradient(135deg,rgba(45,32,6,.98),rgba(18,12,3,.98))',color:'#fff8df',textDecoration:'none'}}><small style={{display:'block',color:'#ffd15c',fontSize:8,fontWeight:900,letterSpacing:'.14em'}}>PAID COMMERCIAL ENGINE</small><strong style={{display:'block',marginTop:4,fontSize:12}}>ENVIRONMENTAL INTEGRITY VERIFICATION →</strong><small style={{display:'block',marginTop:4,color:'#c8b98d',fontSize:8}}>Baseline · pathway · intervention · post-intervention evidence · bounded closure</small></Link>
+      <Link href='/workspace/environmental-records/playground' style={{display:'block',padding:'12px 16px',border:'1px solid rgba(201,175,255,.48)',borderRadius:14,background:'#160f25',color:'#f5efff',textDecoration:'none'}}><small style={{color:'#c9afff',fontSize:8,fontWeight:900}}>ENVIRONMENTAL RECORDS PLAYGROUND</small><strong style={{display:'block',marginTop:4,fontSize:12}}>BRING YOUR RECORD. ASK WHAT IT CAN PROVE. →</strong></Link>
+      <Link href='/environmental-integrity-governance/demonstrations' style={{display:'block',padding:'12px 16px',border:'1px solid rgba(116,235,182,.62)',borderRadius:14,background:'#061e16',color:'#eefbf5',textDecoration:'none'}}><small style={{color:'#79dbae',fontSize:8,fontWeight:900}}>DOOR 03 · PROVING GROUND</small><strong style={{display:'block',marginTop:4,fontSize:12}}>RUN GOVERNED DEMONSTRATIONS →</strong></Link>
+    </div> : null}
+  </>;
+}

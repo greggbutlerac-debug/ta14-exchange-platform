@@ -15,7 +15,7 @@ const steps=[
 
 export default function BlueIotEvidenceToActionShowroom(){
  const [phase,setPhase]=useState<'DETECTED'|'VALIDATED'|'ALLOW'|'HOLD'|'VERIFIED'>('DETECTED');
- const determination=phase==='ALLOW'?'ALLOW':phase==='HOLD'?'HOLD':'PENDING';
+ const determination=phase==='ALLOW'||phase==='VERIFIED'?'ALLOW':phase==='HOLD'?'HOLD':'PENDING';
  const accent=phase==='ALLOW'||phase==='VERIFIED'?'#7ff0bd':phase==='HOLD'?'#f2bf6a':'#6fdfff';
  return <main style={{minHeight:'100vh',padding:'48px 22px 100px',background:'radial-gradient(circle at 84% 4%,rgba(68,207,255,.16),transparent 28%),radial-gradient(circle at 10% 44%,rgba(74,229,179,.10),transparent 30%),linear-gradient(180deg,#02070d,#06111c 52%,#02070d)',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
  <div style={{maxWidth:1220,margin:'0 auto'}}>
@@ -52,8 +52,8 @@ export default function BlueIotEvidenceToActionShowroom(){
  <div style={{fontSize:'clamp(21px,3vw,34px)',fontWeight:950,margin:'14px 0'}}>Does this proposed ventilation consequence have sufficient <span style={{color:'#eef7fb'}}>admissibility, authority, and standing</span> to become reality <span style={{color:'#7ff0bd'}}>NOW?</span></div>
  <div style={{display:'flex',gap:9,justifyContent:'center',flexWrap:'wrap',marginTop:18}}>
  <button onClick={()=>setPhase('VALIDATED')} style={{cursor:'pointer',padding:'11px 18px',borderRadius:999,border:'1px solid #6fdfff',background:'rgba(111,223,255,.08)',color:'#9eeaff',fontWeight:950}}>VALIDATE EVIDENCE</button>
- <button onClick={()=>setPhase('ALLOW')} style={{cursor:'pointer',padding:'11px 18px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.09)',color:'#7ff0bd',fontWeight:950}}>SIMULATE SUFFICIENT AUTHORITY</button>
- <button onClick={()=>setPhase('HOLD')} style={{cursor:'pointer',padding:'11px 18px',borderRadius:999,border:'1px solid #f2bf6a',background:'rgba(242,191,106,.08)',color:'#f2bf6a',fontWeight:950}}>SIMULATE AUTHORITY GAP</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('ALLOW')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'11px 18px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.09)',color:'#7ff0bd',fontWeight:950}}>SIMULATE SUFFICIENT AUTHORITY</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('HOLD')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'11px 18px',borderRadius:999,border:'1px solid #f2bf6a',background:'rgba(242,191,106,.08)',color:'#f2bf6a',fontWeight:950}}>SIMULATE AUTHORITY GAP</button>
  <button onClick={()=>setPhase('DETECTED')} style={{cursor:'pointer',padding:'11px 18px',borderRadius:999,border:'1px solid #536c79',background:'transparent',color:'#8fa6b5',fontWeight:900}}>RESET</button>
  </div>
  </div>
@@ -67,6 +67,20 @@ export default function BlueIotEvidenceToActionShowroom(){
  <p style={{fontSize:13,lineHeight:1.55,color:'#a9bbc4'}}>{phase==='DETECTED'?'Detection establishes a condition to examine. It does not itself establish intervention authority.':phase==='VALIDATED'?'Evidence has been validated, but admissible evidence is still not the same thing as authority to intervene.':phase==='ALLOW'?'ALLOW is a bounded governance determination. The authorized BMS / HVAC system still retains execution control.':phase==='HOLD'?'HOLD preserves the environmental evidence while preventing the proposed consequence from being treated as authorized under an unresolved authority or standing condition.':'The post-action environmental state becomes the next evidence record.'}</p>
  {phase==='ALLOW'&&<button onClick={()=>setPhase('VERIFIED')} style={{cursor:'pointer',padding:'10px 16px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.11)',color:'#7ff0bd',fontWeight:950}}>EXECUTE EXTERNALLY + VERIFY OUTCOME</button>}
  </div>
+ </div>
+ </section>
+
+ <section style={{marginTop:22,padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:26,background:'rgba(4,13,22,.9)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>WHAT THE TECHNICAL DISCUSSION WOULD TEST</div>
+ <h2 style={{fontSize:'clamp(27px,4vw,46px)',letterSpacing:'-.035em',margin:'10px 0 18px'}}>One event. Five questions. No assumed integration.</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10}}>
+ {[
+ ['01','What evidence arrives?','Which CO₂ measurements, timestamps, sensor identities, and context are available to support the proposition?'],
+ ['02','What can Encompass Blue establish?','Which sensing, analytics, equipment relationships, recommendations, or control states are already represented?'],
+ ['03','Where is authority represented?','What identifies the person, policy, control system, or operating role permitted to approve this specific intervention?'],
+ ['04','What does TA-14 return?','What bounded determination and reason can be attached to the proposed consequence without taking over execution?'],
+ ['05','What proves the outcome?','Which post-action observations establish what actually changed and become the next environmental record?'],
+ ].map(([n,a,b])=><div key={n} style={{padding:18,borderRadius:14,border:'1px solid rgba(113,231,255,.13)',background:'rgba(2,9,15,.52)'}}><div style={{fontSize:10,fontWeight:950,color:'#78e8ff'}}>{n}</div><b style={{display:'block',marginTop:7,color:'#e9f6fa'}}>{a}</b><p style={{fontSize:13,lineHeight:1.5,color:'#91a8b7',margin:'7px 0 0'}}>{b}</p></div>)}
  </div>
  </section>
 
