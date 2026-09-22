@@ -66,7 +66,7 @@ export default function GovernedConnectionProfile(){
  </div>
  <div style={{marginTop:22,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:14}}><div style={{padding:22,borderRadius:18,border:'1px solid rgba(127,240,189,.28)',background:'rgba(1,8,13,.66)',textAlign:'center'}}>
  <div style={{fontSize:12,color:'#9ab0bc',fontWeight:900,letterSpacing:'.12em'}}>TA-14 CONSEQUENCE BOUNDARY</div>
- <div style={{fontSize:'clamp(21px,3vw,34px)',fontWeight:950,margin:'12px 0'}}>Does this consequence have sufficient admissibility, authority, and standing to become reality <span style={{color:'#7ff0bd'}}>NOW?</span></div>
+ <div style={{fontSize:'clamp(21px,3vw,34px)',fontWeight:950,margin:'12px 0'}}>Does this consequence have admissible evidence, applicable authority, and established standing to become reality <span style={{color:'#7ff0bd'}}>NOW?</span></div>
  <div style={{display:'flex',gap:10,justifyContent:'center',flexWrap:'wrap',marginTop:18}}>
  <button onClick={()=>setState('ALLOW')} style={{cursor:'pointer',padding:'12px 22px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.09)',color:'#7ff0bd',fontWeight:950}}>1 · RUN SUFFICIENT STATE</button>
  <button onClick={()=>setState(s=>s==='ALLOW'?'STALE':'HOLD')} style={{cursor:'pointer',padding:'12px 22px',borderRadius:999,border:'1px solid #f4c66a',background:'rgba(244,198,106,.09)',color:'#f4c66a',fontWeight:950}}>2 · CHANGE MATERIAL CONTEXT</button>
