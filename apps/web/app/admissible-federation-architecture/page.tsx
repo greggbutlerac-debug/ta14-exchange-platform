@@ -184,7 +184,7 @@ export default function AFAShowroom(){
      ][boundaryStep]}</strong>
      <p style={{color:'#9fb7be',lineHeight:1.7,marginBottom:0}}>{[
       'TA-14 does not reach backward and re-grade whether CNS/CP legitimately established the relationship. That remains CNS/CP ground.',
-      'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning, evidence and bounded authority context may travel; local lease, local capsule, commit, execution and effect do not become transferable entitlement.'
+      'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning, evidence and bounded authority context may travel; local lease, local capsule, commit, execution and effect do not become transferable entitlement.',
       'Identity, provenance, scope, freshness, revocation context and other bounded authority context may be presented. Local lease, local capsule, commit, execution and effect do not ride the Passport.',
       'Receipt is not consequence. Acceptance is not execution permission. The receiving runtime must establish its own admissibility, authority, continuity, scope and standing.',
       'EABA asks whether the exact actor, target, evidence, authority, scope, local standing and changed conditions still support this exact attempt now.',
