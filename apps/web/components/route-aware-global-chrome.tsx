@@ -14,6 +14,7 @@ export function RouteAwareGlobalChrome() {
   const isAcademy = pathname === '/academy' || pathname.startsWith('/academy/');
   const isHvacSchoolOffer = pathname === '/academy/hvac/schools' || pathname.startsWith('/academy/hvac/schools/');
   const isConsequenceBoundary = pathname === '/consequence-boundary';
+  const isBlueIotDiscussionShowroom = pathname === '/environmental-integrity-governance/showcase/blue-iot-evidence-to-action';
   const isPublicShowroom =
     pathname.includes('/showcase/') ||
     pathname.startsWith('/governance-showcase/') ||
@@ -198,7 +199,7 @@ export function RouteAwareGlobalChrome() {
         </>
       ) : null}
 
-      {!isConsequenceBoundary ? (
+      {!isConsequenceBoundary && !isBlueIotDiscussionShowroom ? (
         <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
           <Suspense fallback={null}>
             <SiteActivityCounter />
