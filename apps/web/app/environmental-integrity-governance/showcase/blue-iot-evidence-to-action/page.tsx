@@ -8,7 +8,7 @@ const steps=[
 ['02','VALIDATE','Evidence + provenance','Sensor identity, timing, continuity, attribution, and relevant environmental context are checked before the signal is treated as admissible evidence.'],
 ['03','PROPOSE','Explicit consequence','A specific ventilation or HVAC consequence is stated—for example, increasing outdoor-air ventilation for the affected zone.'],
 ['04','AUTHORITY','Who may approve or execute?','The asserted authority is identified and checked against the equipment, place, scope, and current condition.'],
-['05','GOVERN','TA-14 consequence boundary','TA-14 asks whether the proposed consequence has sufficient admissibility, authority, and standing to become reality now.'],
+['05','GOVERN','TA-14 consequence boundary','TA-14 asks whether the proposed consequence has admissible evidence, applicable authority, and established standing to become reality now.'],
 ['06','EXECUTE','BMS / HVAC action','Any physical or operational intervention remains under the appropriate operational system and authority. A TA-14 determination is not the execution itself.'],
 ['07','VERIFY','Outcome becomes new evidence','The resulting environmental state is observed and preserved as the next record rather than inferred from the command.'],
 ];
@@ -49,10 +49,10 @@ export default function BlueIotEvidenceToActionShowroom(){
  <div style={{marginTop:22,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:14}}>
  <div style={{padding:22,borderRadius:18,border:'1px solid rgba(127,240,189,.24)',background:'rgba(1,8,13,.68)',textAlign:'center'}}>
  <div style={{fontSize:11,color:'#9ab0bc',fontWeight:900,letterSpacing:'.12em'}}>TA-14 CONSEQUENCE BOUNDARY</div>
- <div style={{fontSize:'clamp(21px,3vw,34px)',fontWeight:950,margin:'14px 0'}}>Does this proposed ventilation consequence have sufficient <span style={{color:'#eef7fb'}}>admissibility, authority, and standing</span> to become reality <span style={{color:'#7ff0bd'}}>NOW?</span></div>
+ <div style={{fontSize:'clamp(21px,3vw,34px)',fontWeight:950,margin:'14px 0'}}>Does this proposed ventilation consequence have <span style={{color:'#eef7fb'}}>admissible evidence, applicable authority, and established standing</span> to become reality <span style={{color:'#7ff0bd'}}>NOW?</span></div>
  <div style={{display:'flex',gap:9,justifyContent:'center',flexWrap:'wrap',marginTop:18}}>
  <button onClick={()=>setPhase('VALIDATED')} style={{cursor:'pointer',padding:'11px 18px',borderRadius:999,border:'1px solid #6fdfff',background:'rgba(111,223,255,.08)',color:'#9eeaff',fontWeight:950}}>VALIDATE EVIDENCE</button>
- <button disabled={phase==='DETECTED'} onClick={()=>setPhase('ALLOW')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'11px 18px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.09)',color:'#7ff0bd',fontWeight:950}}>SIMULATE SUFFICIENT AUTHORITY</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('ALLOW')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'11px 18px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.09)',color:'#7ff0bd',fontWeight:950}}>SIMULATE ESTABLISHED STATE</button>
  <button disabled={phase==='DETECTED'} onClick={()=>setPhase('HOLD')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'11px 18px',borderRadius:999,border:'1px solid #f2bf6a',background:'rgba(242,191,106,.08)',color:'#f2bf6a',fontWeight:950}}>SIMULATE AUTHORITY GAP</button>
  <button onClick={()=>setPhase('DETECTED')} style={{cursor:'pointer',padding:'11px 18px',borderRadius:999,border:'1px solid #536c79',background:'transparent',color:'#8fa6b5',fontWeight:900}}>RESET</button>
  </div>
@@ -89,7 +89,7 @@ export default function BlueIotEvidenceToActionShowroom(){
  <h2 style={{fontSize:'clamp(27px,4vw,46px)',letterSpacing:'-.035em',margin:'10px 0 18px'}}>Environmental intelligence and execution governance remain distinct.</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:12}}>
  <div style={{padding:20,borderRadius:16,border:'1px solid rgba(113,231,255,.15)',background:'rgba(3,10,17,.58)'}}><b style={{color:'#9eeaff'}}>ENVIRONMENTAL / BUILDING SYSTEM LAYER</b><p style={{color:'#94aab6',lineHeight:1.55}}>Sensing, environmental data, analytics, equipment context, recommendations, controls, and outcome observations may be provided by platforms such as Encompass Blue, BMS, HVAC, operators, and other building systems.</p></div>
- <div style={{padding:20,borderRadius:16,border:'1px solid rgba(127,240,189,.18)',background:'rgba(3,14,13,.58)'}}><b style={{color:'#7ff0bd'}}>TA-14 GOVERNANCE LAYER</b><p style={{color:'#94aab6',lineHeight:1.55}}>TA-14 evaluates the bounded proposition at the consequence boundary: whether the evidence, authority, and standing are sufficient for that proposed consequence now. It does not replace the sensing platform, BMS, HVAC controls, or operator.</p></div>
+ <div style={{padding:20,borderRadius:16,border:'1px solid rgba(127,240,189,.18)',background:'rgba(3,14,13,.58)'}}><b style={{color:'#7ff0bd'}}>TA-14 GOVERNANCE LAYER</b><p style={{color:'#94aab6',lineHeight:1.55}}>TA-14 evaluates the bounded proposition at the consequence boundary: whether it has admissible evidence, applicable authority, and established standing for that proposed consequence now. It does not replace the sensing platform, BMS, HVAC controls, or operator.</p></div>
  </div>
  </section>
 
