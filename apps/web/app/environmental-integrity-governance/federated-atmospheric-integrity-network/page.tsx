@@ -31,6 +31,12 @@ export default function FAINShowroom(){
  const [jurisdiction,setJurisdiction]=useState(true);
  const [provenance,setProvenance]=useState(true);
  const [clock,setClock]=useState(true);
+ const [eventStep,setEventStep]=useState(0);
+ const [eventProvenance,setEventProvenance]=useState(true);
+ const [eventPair,setEventPair]=useState(true);
+ const [eventReliance,setEventReliance]=useState(true);
+ const [eventAuthority,setEventAuthority]=useState(true);
+ const eventOutcome=!eventProvenance?'HOLD':!eventPair?'HOLD':!eventReliance?'ESCALATE':!eventAuthority?'DENY':'ALLOW';
  const p=places[place];
  const determination=useMemo(()=>{
    if(!continuity) return 'HOLD';
@@ -112,6 +118,25 @@ export default function FAINShowroom(){
      <button onClick={()=>setClock(!clock)} style={{padding:20,textAlign:'left',cursor:'pointer',borderRadius:15,border:'1px solid rgba(255,209,92,.25)',background:'rgba(20,15,4,.72)',color:'#f6df9a'}}><b>TIME CONTINUITY</b><div style={{marginTop:8}}>{clock?'CURRENT / ORDERED':'STALE / DISCONTINUOUS'}</div></button>
     </div>
     <div style={{marginTop:18,padding:20,borderRadius:15,background:'rgba(5,8,10,.72)',border:'1px solid rgba(255,255,255,.08)'}}><b style={{color:'#ffd15c'}}>FEDERATION DETERMINATION</b><p style={{color:'#b8b39f',lineHeight:1.65}}>{jurisdiction&&provenance&&clock?'The signal may participate in bounded federation. Local provenance, chronology and jurisdictional boundaries remain preserved.':!provenance?'HOLD — the signal cannot carry reliable standing across the federation because source provenance is broken.':!clock?'HOLD — temporal continuity is not sufficient to silently treat earlier evidence as current.':'ESCALATE — the receiving jurisdiction cannot determine permitted reliance from the current bounded state.'}</p></div>
+   </section>
+
+   <section style={{marginTop:26,padding:'clamp(28px,5vw,54px)',border:'1px solid rgba(98,240,196,.26)',borderRadius:24,background:'radial-gradient(circle at 80% 10%,rgba(255,120,80,.08),transparent 30%),rgba(2,14,15,.95)'}}>
+    <p style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#62f0c4'}}>LIVE FEDERATED EVENT · WILDFIRE SMOKE</p>
+    <h2 style={{fontSize:'clamp(36px,5.5vw,68px)',lineHeight:1,letterSpacing:'-.05em',margin:'10px 0'}}>Watch one atmospheric event move from reality to consequence.</h2>
+    <p style={{maxWidth:1000,color:'#a8c1ba',fontSize:17,lineHeight:1.72}}>A smoke plume is detected outside a jurisdiction. The event is preserved locally, federated as bounded evidence, encountered by a school, associated with a person-centered chronology, carried into a new environment, and finally relied upon by a system proposing a consequential response.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))',gap:8,margin:'24px 0'}}>{[
+      ['REALITY','Smoke plume'],['NODE','Outdoor detection'],['AIR','School penetration'],['FAIN','Bounded event'],['PAIR','Exposure chronology'],['NEW PLACE','Clinic arrival'],['CHANGE','Conditions differ'],['PROPOSAL','Ventilation response'],['TA-14','Runtime determination']
+     ].map(([a,b],i)=><button key={a} onClick={()=>setEventStep(i)} style={{padding:15,textAlign:'left',cursor:'pointer',borderRadius:13,border:eventStep===i?'1px solid #62f0c4':'1px solid rgba(98,240,196,.12)',background:eventStep===i?'rgba(98,240,196,.1)':'rgba(1,9,11,.72)',color:eventStep===i?'#e2fff6':'#8fa9a3'}}><b style={{display:'block',fontSize:10,letterSpacing:'.1em'}}>{i+1}. {a}</b><span style={{display:'block',fontSize:12,marginTop:6}}>{b}</span></button>)}</div>
+    <div style={{padding:22,borderRadius:16,border:'1px solid rgba(111,232,255,.16)',background:'rgba(2,10,13,.78)'}}><small style={{color:'#789f98'}}>CURRENT EVENT STATE</small><h3 style={{fontSize:28,color:'#6fe8ff',margin:'8px 0'}}>{['WILDFIRE SMOKE EXISTS IN THE PHYSICAL ATMOSPHERE','OUTDOOR NODE RECORDS A BOUNDED EVENT','SCHOOL AIR RECORD OBSERVES INDOOR PENETRATION','FAIN CARRIES A BOUNDED EVENT SIGNAL','PAIR PRESERVES PERSON-CENTERED EXPOSURE CHRONOLOGY','PERSON ARRIVES IN A NEW INDEPENDENTLY GOVERNED PLACE','CURRENT LOCAL CONDITIONS NO LONGER MATCH THE PRIOR ENVIRONMENT','AUTOMATED SYSTEM PROPOSES A VENTILATION RESPONSE','TA-14 TESTS THE PROPOSED CONSEQUENCE NOW'][eventStep]}</h3><p style={{color:'#9db7b0',lineHeight:1.65}}>Prior evidence remains evidence. Each transition must preserve the bindings and limitations required for the next reliance; no step silently inherits authority from the step before it.</p></div>
+    <p style={{fontSize:11,fontWeight:950,letterSpacing:'.16em',color:'#ffd166',marginTop:26}}>BREAK THE EVENT</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10}}>
+     <button onClick={()=>setEventProvenance(!eventProvenance)} style={{padding:17,cursor:'pointer',fontWeight:900}}>{eventProvenance?'BREAK':'RESTORE'} PROVENANCE</button>
+     <button onClick={()=>setEventPair(!eventPair)} style={{padding:17,cursor:'pointer',fontWeight:900}}>{eventPair?'BREAK':'RESTORE'} PAIR CONTINUITY</button>
+     <button onClick={()=>setEventReliance(!eventReliance)} style={{padding:17,cursor:'pointer',fontWeight:900}}>{eventReliance?'REMOVE':'RESTORE'} RELIANCE BASIS</button>
+     <button onClick={()=>setEventAuthority(!eventAuthority)} style={{padding:17,cursor:'pointer',fontWeight:900}}>{eventAuthority?'REVOKE':'RESTORE'} INTERVENTION AUTHORITY</button>
+    </div>
+    <div style={{marginTop:20,padding:24,borderRadius:16,border:'1px solid rgba(255,255,255,.1)',background:'rgba(1,7,9,.9)'}}><small style={{color:'#789f98',fontWeight:900}}>END-TO-END DETERMINATION</small><div style={{fontSize:'clamp(46px,7vw,84px)',fontWeight:950,margin:'8px 0',color:eventOutcome==='ALLOW'?'#63f0b4':eventOutcome==='DENY'?'#ff7a7a':eventOutcome==='ESCALATE'?'#b9a7ff':'#ffd166'}}>{eventOutcome}</div><p style={{color:'#a9c0b9',lineHeight:1.65}}>{eventOutcome==='ALLOW'?'The modeled chain retains provenance, person-centered continuity, a permitted reliance basis, and current intervention authority. The proposed consequence may proceed within the modeled boundary.':eventOutcome==='DENY'?'The proposed physical response lacks current intervention authority. Atmospheric evidence cannot manufacture authority to act.':eventOutcome==='ESCALATE'?'The receiving context lacks an established basis for the proposed reliance. Cross-jurisdiction availability is not enough.':'A required evidentiary continuity condition is unresolved. The chain stops rather than silently repairing the missing foundation.'}</p></div>
+    <div style={{marginTop:20,padding:22,borderLeft:'3px solid #6fe8ff',background:'rgba(111,232,255,.05)'}}><b style={{color:'#6fe8ff'}}>THE POINT</b><p style={{color:'#a8c1ba',lineHeight:1.7,marginBottom:0}}>FAIN can make atmospheric evidence available across distance. AIR can preserve what happened in a place. PAIR can preserve what a person encountered. None of them, alone or together, automatically establish that a proposed consequence may become reality. That determination remains bounded to admissible evidence, applicable authority, established standing, and present conditions.</p></div>
    </section>
 
    <section style={{marginTop:26,padding:'clamp(24px,5vw,46px)',border:'1px solid rgba(98,240,196,.23)',borderRadius:22,background:'rgba(3,16,18,.88)'}}>
