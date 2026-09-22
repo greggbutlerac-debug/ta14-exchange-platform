@@ -1,0 +1,121 @@
+'use client';
+
+import Link from 'next/link';
+import { useState } from 'react';
+
+const sensors=[
+ ['RADON','Continuous radon measurement'],
+ ['CO₂','Ventilation context'],
+ ['HUMIDITY','Moisture context'],
+ ['TEMPERATURE','Thermal context'],
+ ['PRESSURE','Building / atmospheric context'],
+ ['LIGHT','Space-use context'],
+];
+
+const consequences=[
+ ['INVESTIGATE','Initiate a qualified radon investigation.'],
+ ['VENTILATE','Propose an operational ventilation change.'],
+ ['OCCUPANCY','Propose an occupancy-related precaution.'],
+ ['REMEDIATE','Refer the condition for a remediation decision.'],
+];
+
+export default function AirthingsSpaceRadonShowroom(){
+ const [phase,setPhase]=useState<'DETECTED'|'VALIDATED'|'ALLOW'|'HOLD'|'DENY'|'ESCALATE'|'VERIFIED'>('DETECTED');
+ const [choice,setChoice]=useState('INVESTIGATE');
+ const determination=phase==='ALLOW'||phase==='VERIFIED'?'ALLOW':['HOLD','DENY','ESCALATE'].includes(phase)?phase:'PENDING';
+ const accent=phase==='ALLOW'||phase==='VERIFIED'?'#7ff0bd':phase==='DENY'?'#ff7d8c':phase==='ESCALATE'?'#c5a8ff':phase==='HOLD'?'#f2bf6a':'#6fdfff';
+ const proposed=consequences.find(x=>x[0]===choice)?.[1];
+
+ return <main style={{minHeight:'100vh',padding:'48px 22px 100px',background:'radial-gradient(circle at 84% 4%,rgba(68,207,255,.16),transparent 28%),radial-gradient(circle at 10% 44%,rgba(74,229,179,.10),transparent 30%),linear-gradient(180deg,#02070d,#06111c 52%,#02070d)',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
+ <div style={{maxWidth:1220,margin:'0 auto'}}>
+ <nav style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',paddingBottom:20,borderBottom:'1px solid rgba(113,231,255,.14)'}}><Link href="/environmental-integrity-governance" style={{color:'#9edff0',textDecoration:'none',fontWeight:800}}>← Environmental Integrity Governance</Link><Link href="/" style={{color:'#91a8b7',textDecoration:'none'}}>TA-14 Exchange →</Link></nav>
+
+ <section style={{marginTop:26,padding:'clamp(34px,6vw,70px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:30,background:'linear-gradient(145deg,rgba(8,35,52,.96),rgba(5,14,24,.98) 55%,rgba(15,35,42,.92))',boxShadow:'0 36px 110px rgba(0,0,0,.42)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.22em',color:'#78e8ff'}}>TA-14 · AIRTHINGS SPACE RADON DISCUSSION SURFACE · PUBLIC TECHNICAL SHOWROOM</div>
+ <h1 style={{fontSize:'clamp(42px,7vw,84px)',lineHeight:.96,letterSpacing:'-.055em',margin:'20px 0 22px'}}>THE SENSOR DETECTED<br/><span style={{color:'#7ff0bd'}}>THE CONDITION.</span></h1>
+ <h2 style={{fontSize:'clamp(24px,4vw,46px)',lineHeight:1.04,letterSpacing:'-.04em',margin:'0 0 20px'}}>Who authorized the consequence?</h2>
+ <p style={{fontSize:'clamp(17px,2vw,24px)',lineHeight:1.5,maxWidth:1000,color:'#b7c9d5',margin:0}}>A bounded discussion surface using the publicly announced Space Radon sensing pathway to examine the point between continuous environmental evidence and consequential building action. Detection can establish a condition. It does not, by itself, establish authority to intervene.</p>
+ </section>
+
+ <section style={{margin:'22px 0',padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(127,240,189,.22)',borderRadius:26,background:'rgba(5,18,27,.88)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>THE EVIDENCE SOURCE</div>
+ <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 8px'}}>Six signals. One environmental chronology.</h2>
+ <p style={{color:'#9fb3bf',lineHeight:1.6,maxWidth:900}}>Airthings announced Space Radon on September 21, 2026 with continuous radon monitoring alongside five additional measurements. TA-14 does not replace those sensors or their cloud platform. This surface asks what must be established before evidence becomes a consequential act.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginTop:22}}>{sensors.map(([a,b])=><div key={a} style={{padding:17,borderRadius:14,border:'1px solid rgba(113,231,255,.14)',background:'rgba(2,9,15,.52)'}}><b style={{color:'#9eeaff'}}>{a}</b><div style={{marginTop:7,fontSize:13,lineHeight:1.45,color:'#91a8b7'}}>{b}</div></div>)}</div>
+ </section>
+
+ <section style={{padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:26,background:'rgba(4,13,22,.9)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>THE CONSEQUENCE PATH</div>
+ <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 20px'}}>Detect → Record → Validate → Propose → Authority → Standing → Commit → Execute → Verify</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10}}>
+ {[
+ ['DETECT','A sustained radon condition is observed.'],
+ ['RECORD','AIR can preserve attributable environmental chronology without diagnosing or controlling.'],
+ ['VALIDATE','Identity, timing, continuity, provenance and relevant context are examined.'],
+ ['PROPOSE','A specific consequence is stated rather than inferred from the signal.'],
+ ['AUTHORITY','The person, policy or system empowered to approve that consequence is identified.'],
+ ['STANDING','Authority and evidence must apply to this place, condition, scope and time.'],
+ ['COMMIT','The bounded determination is attached before execution.'],
+ ['EXECUTE','The authorized operational system performs any permitted action.'],
+ ['VERIFY','Observed outcome becomes new evidence; changed conditions require revalidation.'],
+ ].map(([a,b],i)=><div key={a} style={{padding:17,borderRadius:14,border:'1px solid rgba(113,231,255,.13)',background:i>=4&&i<=6?'rgba(127,240,189,.05)':'rgba(2,9,15,.52)'}}><b style={{color:i>=4&&i<=6?'#7ff0bd':'#eef7fb'}}>{a}</b><p style={{fontSize:13,lineHeight:1.5,color:'#91a8b7',margin:'7px 0 0'}}>{b}</p></div>)}
+ </div>
+ </section>
+
+ <section style={{marginTop:22,padding:'clamp(26px,4vw,44px)',border:`1px solid ${accent}55`,borderRadius:26,background:'linear-gradient(135deg,rgba(15,56,49,.24),rgba(4,14,23,.95))'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>RUN ONE · SUSTAINED RADON CONDITION</div>
+ <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 8px'}}>Choose the proposed consequence.</h2>
+ <p style={{color:'#9fb3bf',lineHeight:1.6}}>This is a governance demonstration, not a radon treatment recommendation. No numeric intervention threshold is asserted here.</p>
+ <div style={{display:'flex',gap:9,flexWrap:'wrap',margin:'20px 0'}}>{consequences.map(([a,b])=><button key={a} onClick={()=>{setChoice(a);setPhase('DETECTED')}} style={{cursor:'pointer',padding:'11px 16px',borderRadius:999,border:`1px solid ${choice===a?'#7ff0bd':'#536c79'}`,background:choice===a?'rgba(127,240,189,.09)':'transparent',color:choice===a?'#7ff0bd':'#9ab0bc',fontWeight:950}}>{a}</button>)}</div>
+
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:14}}>
+ <div style={{padding:22,borderRadius:18,border:'1px solid rgba(127,240,189,.24)',background:'rgba(1,8,13,.68)',textAlign:'center'}}>
+ <div style={{fontSize:11,color:'#9ab0bc',fontWeight:900,letterSpacing:'.12em'}}>TA-14 CONSEQUENCE BOUNDARY</div>
+ <div style={{fontSize:'clamp(21px,3vw,34px)',fontWeight:950,margin:'14px 0'}}>Does this specific proposed consequence have <span style={{color:'#eef7fb'}}>sufficient admissibility, authority, and standing</span> to become reality <span style={{color:'#7ff0bd'}}>NOW?</span></div>
+ <div style={{display:'flex',gap:8,justifyContent:'center',flexWrap:'wrap',marginTop:18}}>
+ <button onClick={()=>setPhase('VALIDATED')} style={{cursor:'pointer',padding:'10px 14px',borderRadius:999,border:'1px solid #6fdfff',background:'rgba(111,223,255,.08)',color:'#9eeaff',fontWeight:950}}>VALIDATE EVIDENCE</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('ALLOW')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'10px 14px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.08)',color:'#7ff0bd',fontWeight:950}}>ALLOW</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('HOLD')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'10px 14px',borderRadius:999,border:'1px solid #f2bf6a',background:'rgba(242,191,106,.08)',color:'#f2bf6a',fontWeight:950}}>HOLD</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('DENY')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'10px 14px',borderRadius:999,border:'1px solid #ff7d8c',background:'rgba(255,125,140,.07)',color:'#ff7d8c',fontWeight:950}}>DENY</button>
+ <button disabled={phase==='DETECTED'} onClick={()=>setPhase('ESCALATE')} style={{cursor:phase==='DETECTED'?'not-allowed':'pointer',opacity:phase==='DETECTED'?.38:1,padding:'10px 14px',borderRadius:999,border:'1px solid #c5a8ff',background:'rgba(197,168,255,.07)',color:'#c5a8ff',fontWeight:950}}>ESCALATE</button>
+ </div>
+ </div>
+
+ <div style={{padding:22,borderRadius:18,border:`1px solid ${accent}66`,background:'rgba(1,8,13,.72)'}}>
+ <div style={{fontSize:11,color:'#9ab0bc',fontWeight:900,letterSpacing:'.12em'}}>GOVERNED STATE</div>
+ <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>ENVIRONMENTAL CONDITION</div><div style={{fontWeight:900}}>SUSTAINED RADON CONDITION</div>
+ <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>PROPOSED CONSEQUENCE</div><div style={{fontWeight:900}}>{proposed}</div>
+ <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>DETERMINATION</div><div style={{fontSize:'clamp(24px,3vw,38px)',fontWeight:1000,color:accent}}>{determination}</div>
+ <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>EXECUTION</div><div style={{fontWeight:900}}>{phase==='VERIFIED'?'EXTERNALLY EXECUTED + OUTCOME OBSERVED':'NOT EXECUTED'}</div>
+ <p style={{fontSize:13,lineHeight:1.55,color:'#a9bbc4'}}>{phase==='DETECTED'?'The sensor establishes a condition to examine, not permission to act.':phase==='VALIDATED'?'The evidence may be admissible while intervention authority or current standing remains unresolved.':phase==='ALLOW'?'ALLOW is a bounded governance determination; TA-14 does not perform the physical intervention.':phase==='HOLD'?'HOLD preserves the record while an unresolved condition prevents execution.':phase==='DENY'?'DENY represents a bounded finding that the proposed consequence is not authorized under the examined state.':phase==='ESCALATE'?'ESCALATE routes the unresolved consequential decision to an appropriate authority rather than silently treating uncertainty as permission.':'The observed post-action condition becomes the next record; a changed condition begins a new validation chain.'}</p>
+ {phase==='ALLOW'&&<button onClick={()=>setPhase('VERIFIED')} style={{cursor:'pointer',padding:'10px 16px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.11)',color:'#7ff0bd',fontWeight:950}}>SIMULATE EXTERNAL EXECUTION + VERIFY</button>}
+ </div>
+ </div>
+ </section>
+
+ <section style={{marginTop:22,padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:26,background:'rgba(4,13,22,.9)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>WHERE THE SYSTEMS MEET</div>
+ <h2 style={{fontSize:'clamp(27px,4vw,46px)',letterSpacing:'-.035em',margin:'10px 0 18px'}}>Sensing, evidence preservation, governance and execution remain distinct.</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:12}}>
+ {[
+ ['AIRTHINGS / SENSING LAYER','Measures environmental conditions and provides the monitoring / cloud pathway described in Airthings public materials.'],
+ ['AIR / RECORD LAYER','Preserves attributable atmospheric and mechanical chronology. AIR does not diagnose, optimize, or control.'],
+ ['TA-14 GOVERNANCE LAYER','Examines whether the bounded proposed consequence has sufficient admissibility, authority, and standing now.'],
+ ['OPERATIONAL EXECUTION','Any investigation, building-control change, occupancy decision, or remediation remains with the appropriately authorized human or operational system.'],
+ ].map(([a,b])=><div key={a} style={{padding:20,borderRadius:16,border:'1px solid rgba(113,231,255,.15)',background:'rgba(3,10,17,.58)'}}><b style={{color:a.includes('TA-14')?'#7ff0bd':'#9eeaff'}}>{a}</b><p style={{color:'#94aab6',lineHeight:1.55}}>{b}</p></div>)}
+ </div>
+ </section>
+
+ <section style={{marginTop:22,padding:'clamp(26px,4vw,40px)',borderRadius:24,border:'1px solid rgba(127,240,189,.2)',background:'linear-gradient(135deg,rgba(12,52,43,.28),rgba(4,14,23,.92))'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>TECHNICAL QUESTION FOR AIRTHINGS</div>
+ <h2 style={{fontSize:'clamp(26px,4vw,44px)',letterSpacing:'-.035em',margin:'10px 0 12px'}}>Where, in the real Space Radon pathway, does evidence become an authorized consequence?</h2>
+ <p style={{color:'#a9bbc4',lineHeight:1.65,maxWidth:960,margin:0}}>A bounded examination could use the states and evidence Airthings actually exposes, preserve the resulting environmental chronology, identify the exact proposed consequence, and test where authority and standing are established without asking TA-14 to replace sensing, analytics, cloud services, operators, controls, or remediation expertise.</p>
+ </section>
+
+ <section style={{marginTop:22,padding:'28px',borderRadius:24,border:'1px solid rgba(242,191,106,.18)',background:'rgba(45,33,10,.22)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#f2bf6a'}}>INDEPENDENCE + PROVENANCE NOTICE</div>
+ <p style={{color:'#b8b2a2',lineHeight:1.6,marginBottom:8}}>This is an independent TA-14 technical discussion surface based on Airthings' September 21, 2026 public announcement of Space Radon. Airthings has not sponsored, approved, participated in, or endorsed this examination. No partnership, integration, certification, affiliation, or transfer of authority is asserted.</p>
+ <p style={{color:'#8f8a7e',lineHeight:1.55,fontSize:13,marginBottom:0}}>Product characteristics referenced here are limited to the public announcement: continuous radon monitoring; CO₂, humidity, temperature, pressure and light measurements; cloud connectivity through the Airthings Space Hub / SmartLink; and cloud-based insights described by Airthings. The simulated governance states and proposed consequences are TA-14 examples and are not Airthings recommendations.</p>
+ </section>
+ </div></main>
+}
