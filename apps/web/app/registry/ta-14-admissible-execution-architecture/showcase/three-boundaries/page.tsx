@@ -25,14 +25,15 @@ export default function ThreeBoundariesShowroom(){
 
   const result:Result=useMemo(()=>{
     if(scope==='outside') return 'DENY';
-    if(evidence==='stale'||network==='unverified') return 'ESCALATE';
+    if(evidence==='stale') return 'HOLD';
+    if(network==='unverified') return 'ESCALATE';
     if(authority==='expired') return 'HOLD';
     return 'ALLOW';
   },[evidence,authority,scope,network]);
 
   const reason={
     ALLOW:'Current evidence, current authority, bounded scope, and an observable execution path are established for this proposed consequence.',
-    HOLD:'The condition may be real and the network may be ready, but applicable authority and established standing for execution now have not been established.',
+    HOLD:'Execution is prevented because a required condition is not current. Admissible evidence, applicable authority, and established standing must all be established now before the consequence may proceed.',
     DENY:'The proposed consequence exceeds the established execution boundary.',
     ESCALATE:'The proposition cannot be resolved from the currently admissible state. Governed review is required before execution.'
   }[result];
