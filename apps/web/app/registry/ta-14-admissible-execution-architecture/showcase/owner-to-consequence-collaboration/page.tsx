@@ -6,7 +6,7 @@ const partners = [
   ['01','OWNER / ASSET LEADERSHIP','Asset Leadership Network · Michael Bordenaro','Starts with owner need, business-process requirements, organizational adoption, and the standards context that lets leaders require a repeatable process without prescribing one software stack.'],
   ['02','SEMANTIC BUILDING CONTEXT','ONUMA · Kimon Onuma','Supplies shared meaning through RDF/Turtle, persistent identity, semantic relationships, and API interaction so independently governed systems can point to and work with the same asset reality.'],
   ['03','ASSET DATA READINESS','Fixed Asset Health Assessment · Angela Bolton','Reconciles field, system, and human-supplied asset data: is it complete, does it match reality, is it reconciled, and is there authority behind it before downstream use?'],
-  ['04','CONSEQUENCE GOVERNANCE','TA-14 · Greggory Don Butler','At the final boundary, tests whether a proposed consequence has sufficient admissibility, applicable authority, and established standing to become reality now.'],
+  ['04','CONSEQUENCE GOVERNANCE','TA-14 · Greggory Don Butler','At the final boundary, determines whether a proposed consequence has sufficient ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY, and ESTABLISHED STANDING to become REALITY NOW.'],
 ];
 
 const sop = [
@@ -16,8 +16,9 @@ const sop = [
   ['LIVE INTERACTION','APIs allow bounded two-way interaction without requiring one closed platform.'],
   ['DATA VALIDATION','Asset information is checked, reconciled, and made fit for its stated downstream purpose.'],
   ['PROPOSED CONSEQUENCE','The exact action, change, decision, or downstream use is made explicit.'],
-  ['CONSEQUENCE BOUNDARY','TA-14 evaluates admissibility, authority, standing, and current context.'],
-  ['OUTCOME + REVALIDATION','ALLOW · HOLD · DENY · ESCALATE. Material change requires revalidation.'],
+  ['CONSEQUENCE BOUNDARY','TA-14 determines whether the proposed consequence has sufficient ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY, and ESTABLISHED STANDING to become REALITY NOW.'],
+  ['DETERMINATION → EXECUTION','ALLOW · HOLD · DENY · ESCALATE is recorded. ALLOW is not an actuator command; execution remains with the competent authorized system.'],
+  ['OUTCOME + REVALIDATION','Record what actually happened. Material change does not inherit permission; it requires revalidation and a new determination.'],
 ];
 
 export default function OwnerToConsequenceCollaboration(){
@@ -47,6 +48,7 @@ export default function OwnerToConsequenceCollaboration(){
         <p style={{maxWidth:980,color:'#b8cad5',lineHeight:1.7,fontSize:17}}>The owner can require the governed sequence without dictating the implementation inside every step. Each participating architecture preserves its own methods, evidence, authority, and intellectual property.</p>
         <div style={{display:'grid',gap:9,marginTop:24}}>{sop.map(([k,v],i)=><div key={k} style={{display:'grid',gridTemplateColumns:'52px minmax(190px,280px) 1fr',gap:14,padding:'17px 18px',border:'1px solid rgba(127,240,189,.12)',borderRadius:14,background:'rgba(2,10,17,.48)',alignItems:'start'}}><b style={{color:'#7ff0bd',fontSize:18}}>{String(i+1).padStart(2,'0')}</b><strong style={{fontSize:12,letterSpacing:'.07em',color:'#e7f6ee'}}>{k}</strong><span style={{fontSize:14,lineHeight:1.55,color:'#b8c8c1'}}>{v}</span></div>)}</div>
         <div style={{marginTop:22,padding:'18px 20px',border:'1px solid rgba(113,231,255,.18)',borderRadius:14,background:'rgba(113,231,255,.035)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:950}}>The technologies may change. The governed process does not.</div>
+        <div style={{marginTop:14,padding:'20px',border:'1px solid rgba(242,204,104,.24)',borderRadius:14,background:'rgba(242,204,104,.04)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.14em',color:'#f2cc68'}}>THE RECORD PERSISTS ACROSS THE ENTIRE SEQUENCE</div><p style={{margin:'10px 0 0',lineHeight:1.65,color:'#d9d0b4'}}>Owner Need → Evidence → Validation → Proposition → Determination → Execution → Outcome → Revalidation</p><p style={{margin:'10px 0 0',lineHeight:1.65,color:'#bdb7a4'}}>A later state does not erase an earlier state. It supersedes it with an attributable record. HOLD remains part of the record after ALLOW. An expired determination remains part of the record after revalidation. Negative results remain part of the record after subsequent success.</p></div>
       </section>
 
       <section style={{marginTop:26,padding:'clamp(28px,5vw,48px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:26,background:'linear-gradient(135deg,rgba(8,39,58,.8),rgba(5,17,28,.94))'}}>
@@ -57,7 +59,7 @@ export default function OwnerToConsequenceCollaboration(){
             ['OWNER','Maintain acceptable indoor conditions without creating an unmanaged outdoor-air consequence.'],
             ['ONUMA / CONTEXT','AHU-17 is persistently identified; its zone, relationships, live state, and proposed ventilation change are addressable.'],
             ['ANGELA / DATA','Relevant asset records are reconciled against field/system reality and checked for completeness and authority for downstream use.'],
-            ['TA-14 / BOUNDARY','The proposed ventilation consequence is evaluated against admissible evidence, applicable authority, standing, and current conditions.'],
+            ['TA-14 / BOUNDARY','The proposed ventilation consequence is tested for sufficient ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY, and ESTABLISHED STANDING to become REALITY NOW.'],
           ].map(([k,v])=><div key={k} style={{padding:20,borderRadius:15,border:'1px solid rgba(113,231,255,.14)',background:'rgba(2,10,17,.5)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.08em',color:'#78e8ff'}}>{k}</div><p style={{margin:'9px 0 0',color:'#c1d1d9',lineHeight:1.6}}>{v}</p></div>)}
         </div>
         <div style={{marginTop:18,padding:'22px',border:'1px solid rgba(242,204,104,.28)',borderRadius:16,background:'rgba(242,204,104,.045)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.12em',color:'#f2cc68'}}>MATERIAL CHANGE</div><p style={{fontSize:18,lineHeight:1.6,color:'#e5dfca',margin:'8px 0 0'}}>Outdoor PM2.5 rises materially after the earlier state was evaluated. The old decision does not silently carry forward.</p></div>
@@ -97,6 +99,14 @@ export default function OwnerToConsequenceCollaboration(){
           'The shared object is the interface and repeatable process to be tested. Demonstration outcomes are not pre-declared.',
           'PAE work remains prospective and subject to PAE access, scope, confidentiality, operational authority, and publication boundaries.',
         ].map((x,i)=><div key={x} style={{display:'grid',gridTemplateColumns:'32px 1fr',gap:10,padding:'14px 16px',borderLeft:'3px solid rgba(113,231,255,.65)',background:'rgba(113,231,255,.025)',color:'#aebfc8',lineHeight:1.6}}><b style={{color:'#78e8ff'}}>{String(i+1).padStart(2,'0')}</b><span>{x}</span></div>)}</div>
+      </section>
+
+      <section style={{marginTop:26,padding:'clamp(26px,4vw,40px)',border:'1px solid rgba(242,204,104,.24)',borderRadius:24,background:'linear-gradient(135deg,rgba(70,51,13,.18),rgba(7,18,30,.82))'}}>
+        <div style={{color:'#f2cc68',fontSize:11,fontWeight:950,letterSpacing:'.16em'}}>COLLABORATION RECORD · APPEND-ONLY PUBLIC HISTORY</div>
+        <h2 style={{fontSize:'clamp(28px,4vw,46px)',letterSpacing:'-.04em',margin:'12px 0'}}>SUPERSEDED ≠ ERASED.</h2>
+        <p style={{maxWidth:940,color:'#c9c1aa',lineHeight:1.7}}>Material revisions to this collaboration are preserved as attributable states. Later versions may supersede earlier interpretations, but they do not silently rewrite them. Demonstrations, negative results, HOLD conditions, expired determinations, and subsequent revalidations remain part of the record.</p>
+        <div style={{marginTop:18,padding:'18px',borderLeft:'3px solid #f2cc68',background:'rgba(242,204,104,.035)'}}><b style={{color:'#f2cc68'}}>v0.1 · September 22, 2026</b><p style={{margin:'7px 0 0',color:'#d5cfbd',lineHeight:1.6}}>Proposed Owner-to-Consequence working collaboration established as a public technical examination surface. Initial roles, candidate shared SOP, AHU-17 changed-context example, bounded first mandate, and collaboration boundaries recorded.</p></div>
+        <div style={{marginTop:10,padding:'18px',borderLeft:'3px solid #7ff0bd',background:'rgba(127,240,189,.035)'}}><b style={{color:'#7ff0bd'}}>v0.2 · September 22, 2026</b><p style={{margin:'7px 0 0',color:'#c5d8cf',lineHeight:1.6}}>Canonical TA-14 consequence test made explicit: ADMISSIBLE EVIDENCE · APPLICABLE AUTHORITY · ESTABLISHED STANDING · REALITY NOW. Determination separated from execution, persistent-record doctrine added, and supersession made visible without erasure.</p></div>
       </section>
 
       <section style={{marginTop:26,padding:'40px 26px',textAlign:'center',border:'1px solid rgba(127,240,189,.2)',borderRadius:24,background:'linear-gradient(135deg,rgba(17,64,52,.18),rgba(7,18,30,.82))'}}>
