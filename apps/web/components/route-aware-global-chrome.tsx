@@ -13,6 +13,7 @@ export function RouteAwareGlobalChrome() {
   const isPrivateGcea = pathname === '/admin/governance-continuity-execution-authority' || pathname.startsWith('/admin/governance-continuity-execution-authority/');
   const isAcademy = pathname === '/academy' || pathname.startsWith('/academy/');
   const isHvacSchoolOffer = pathname === '/academy/hvac/schools' || pathname.startsWith('/academy/hvac/schools/');
+  const isConsequenceBoundary = pathname === '/consequence-boundary';
   const isEnvironmentalIntegrityContext =
     pathname === '/environmental-integrity-governance' ||
     pathname.startsWith('/environmental-integrity-governance/') ||
@@ -129,11 +130,13 @@ export function RouteAwareGlobalChrome() {
         </>
       ) : null}
 
-      <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
-        <Suspense fallback={null}>
-          <SiteActivityCounter />
-        </Suspense>
-      </div>
+      {!isConsequenceBoundary ? (
+        <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
+          <Suspense fallback={null}>
+            <SiteActivityCounter />
+          </Suspense>
+        </div>
+      ) : null}
     </>
   );
 }
