@@ -21,8 +21,8 @@ export default function Page(){
     <header>
       <small>INDEPENDENT TA-14 PUBLIC TECHNICAL DEMONSTRATION · HEALTHY INDOOR AIR</small>
       <h1>From measurement to action.<br/><em>What authorizes the building to act?</em></h1>
-      <p>Indoor-air science can tell us what is happening. Sensors can measure it. Analytics can interpret it. AI and building automation can propose a response. TA-14 isolates the next boundary: whether that proposed physical consequence has sufficient admissibility, authority, and standing to become reality now.</p>
-      <div className="question">Does this proposed consequence have sufficient <b>ADMISSIBILITY</b>, <b>AUTHORITY</b>, and <b>STANDING</b> to become reality <b>NOW</b>?</div>
+      <p>Indoor-air science can tell us what is happening. Sensors can measure it. Analytics can interpret it. AI and building automation can propose a response. TA-14 isolates the next boundary: whether that proposed physical consequence has admissible evidence, applicable authority, and established standing to become reality now.</p>
+      <div className="question">Does this proposed consequence have <b>ADMISSIBLE EVIDENCE</b>, <b>APPLICABLE AUTHORITY</b>, and <b>ESTABLISHED STANDING</b> to become reality <b>NOW</b>?</div>
       <aside><b>INDEPENDENT TECHNICAL DEMONSTRATION</b> This surface is independently produced by TA-14 Authority. It is not a certification, endorsement, implementation, interpretation, or official examination of the Global Commission on Healthy Indoor Air, the International WELL Building Institute, the Global Framework for Action, or any participating commissioner or organization. No affiliation or endorsement is implied.</aside>
     </header>
 
@@ -42,9 +42,9 @@ export default function Page(){
       <p>The ventilation system is operational. Twenty-seven people occupy the room. Initial outdoor-air conditions are acceptable. The control system proposes a physical response.</p>
       <div className="proposal"><span>PROPOSED CONSEQUENCE</span><strong>Increase outdoor-air ventilation by 35%.</strong><p>The intervention appears technically reasonable. But a reasonable intervention is not automatically an admissible execution.</p></div>
       <div className="tri">
-        <article><b>01 · ADMISSIBILITY</b><h3>Is the evidence sufficient, attributable, and current?</h3><p>CO₂ measurement, sensor identity, occupancy, HVAC state, and relevant outdoor conditions must support the examination.</p></article>
-        <article><b>02 · AUTHORITY</b><h3>Is this exact intervention permitted within scope?</h3><p>The proposing system may possess bounded control authority without possessing unlimited authority to act under every condition.</p></article>
-        <article><b>03 · STANDING</b><h3>Do the conditions still apply now?</h3><p>Present evidence, authority, actors, systems, and environmental conditions must still support exercising that authority.</p></article>
+        <article><b>01 · ADMISSIBLE EVIDENCE</b><h3>Is the evidence attributable, continuous, current, and sufficient for this determination?</h3><p>CO₂ measurement, sensor identity, occupancy, HVAC state, and relevant outdoor conditions must support the examination.</p></article>
+        <article><b>02 · APPLICABLE AUTHORITY</b><h3>What legitimate authority applies to this exact consequence now?</h3><p>The proposing system may possess bounded control authority without possessing unlimited authority to act under every condition.</p></article>
+        <article><b>03 · ESTABLISHED STANDING</b><h3>Do the authoritative facts establish standing for this consequence now?</h3><p>The required relationship among evidence, authority, actors, systems, conditions, and this specific consequence must be established from the authoritative state at the boundary.</p></article>
       </div>
     </section>
 
