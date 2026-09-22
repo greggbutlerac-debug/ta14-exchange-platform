@@ -24,7 +24,13 @@ export default function HomePage() {
         <div className="consequence-first__inner">
           <p className="consequence-first__eyebrow">THE CONSEQUENCE BOUNDARY</p>
           <h1 id="consequence-first-title">A consequence is proposed. Can it become reality <em>NOW?</em></h1>
-          <p className="consequence-first__lead">Before capability becomes consequence, TA-14 asks whether this exact proposed action has sufficient <strong>ADMISSIBILITY</strong>, <strong>AUTHORITY</strong>, and <strong>STANDING</strong> to cross the boundary now.</p>
+          <p className="consequence-first__lead">Before capability becomes consequence, TA-14 asks whether this exact proposed consequence has <strong>ADMISSIBLE EVIDENCE</strong>, <strong>APPLICABLE AUTHORITY</strong>, and <strong>ESTABLISHED STANDING</strong> to become reality now.</p>
+          <div className="consequence-first__tests" aria-label="TA-14 consequence-boundary tests">
+            <div><small>EVIDENCE</small><b>ADMISSIBLE</b><p>Attributable, continuous, current, and sufficient for this determination.</p></div>
+            <div><small>AUTHORITY</small><b>APPLICABLE</b><p>Valid for this actor, object, scope, condition, jurisdiction, and execution path.</p></div>
+            <div><small>STANDING</small><b>ESTABLISHED</b><p>Established from the authoritative state available at the consequence boundary.</p></div>
+            <div><small>TIME</small><b>NOW</b><p>Changed reality can preserve, defeat, or leave standing unresolved.</p></div>
+          </div>
           <div className="consequence-first__states" aria-label="TA-14 determination states">
             <span>ALLOW</span><span>HOLD</span><span>DENY</span><span>ESCALATE</span>
           </div>
@@ -35,7 +41,7 @@ export default function HomePage() {
               <article key={n}><small>{n}</small><b>{title}</b><p>{copy}</p></article>
             ))}
           </div>
-          <p className="consequence-first__close"><strong>NEW PROPOSITION = NEW CHAIN.</strong> A historical determination stays fixed. If material conditions cross its evidence boundary, the answer is <strong>NEW ASSESSMENT REQUIRED.</strong></p>
+          <p className="consequence-first__close"><strong>AUTHORITY IS NOT AUTOMATICALLY APPLICABLE. STANDING IS NOT AUTOMATICALLY INHERITED.</strong><br/>NEW PROPOSITION = NEW CHAIN. A historical determination stays fixed. If material conditions cross its evidence boundary, the answer is <strong>NEW ASSESSMENT REQUIRED.</strong></p>
         </div>
       </section>
       <FrontDoorPrototype />
@@ -46,9 +52,14 @@ export default function HomePage() {
         .consequence-first__eyebrow{margin:0;color:#79dcff;font-size:10px;font-weight:950;letter-spacing:.2em}
         .consequence-first h1{max-width:1050px;margin:14px 0 20px;font-size:clamp(46px,7vw,92px);line-height:.94;letter-spacing:-.055em}
         .consequence-first h1 em{font-style:normal;color:#efc966}
-        .consequence-first__lead{max-width:900px;color:#afc0cb;font-size:clamp(17px,2vw,22px);line-height:1.62}
+        .consequence-first__lead{max-width:960px;color:#afc0cb;font-size:clamp(17px,2vw,22px);line-height:1.62}
         .consequence-first__lead strong{color:#f3d98f}
-        .consequence-first__states{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
+        .consequence-first__tests{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:26px 0 18px}
+        .consequence-first__tests div{padding:15px;border:1px solid rgba(121,220,255,.18);border-radius:12px;background:rgba(3,16,24,.72)}
+        .consequence-first__tests small{display:block;color:#7f96a4;font-size:9px;font-weight:900;letter-spacing:.12em}
+        .consequence-first__tests b{display:block;margin-top:6px;color:#f3d98f;font-size:13px;letter-spacing:.08em}
+        .consequence-first__tests p{margin:7px 0 0;color:#8fa2ad;font-size:10px;line-height:1.5}
+        .consequence-first__states{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 24px}
         .consequence-first__states span{padding:9px 13px;border:1px solid rgba(121,220,255,.28);border-radius:999px;color:#9ce6ff;font-size:10px;font-weight:950;letter-spacing:.12em;background:rgba(3,18,29,.8)}
         .consequence-first__cta{display:inline-flex;align-items:center;min-height:50px;padding:0 18px;border-radius:11px;background:linear-gradient(135deg,#81e5ff,#73e2b5);color:#04131b;text-decoration:none;font-size:11px;font-weight:950;letter-spacing:.08em}
         .consequence-first__rule{max-width:980px;margin:28px 0;color:#d6e1e7;font:20px/1.55 Georgia,serif}
@@ -59,8 +70,8 @@ export default function HomePage() {
         .consequence-first__journey p{margin:9px 0 0;color:#879ca9;font-size:10px;line-height:1.5}
         .consequence-first__close{margin:18px 0 0;padding:16px 18px;border:1px solid rgba(239,201,102,.25);border-radius:12px;background:rgba(48,35,8,.28);color:#aaafac;font-size:12px;line-height:1.65}
         .consequence-first__close strong{color:#efc966}
-        @media(max-width:980px){.consequence-first__journey{grid-template-columns:repeat(4,1fr)}}
-        @media(max-width:620px){.consequence-first__journey{grid-template-columns:repeat(2,1fr)}.consequence-first__inner{padding-top:38px}}
+        @media(max-width:980px){.consequence-first__tests,.consequence-first__journey{grid-template-columns:repeat(4,1fr)}}
+        @media(max-width:620px){.consequence-first__tests,.consequence-first__journey{grid-template-columns:repeat(2,1fr)}.consequence-first__inner{padding-top:38px}}
       `}</style>
     </>
   );
