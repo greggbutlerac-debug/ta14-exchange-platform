@@ -3,6 +3,10 @@
 import Link from 'next/link';
 import { useMemo, useState } from 'react';
 
+const networkNodes=[
+ {name:'NORTH AMERICA',x:22,y:32},{name:'SOUTH AMERICA',x:32,y:70},{name:'EUROPE',x:49,y:27},{name:'AFRICA',x:51,y:55},{name:'MIDDLE EAST',x:59,y:43},{name:'SOUTH ASIA',x:68,y:50},{name:'EAST ASIA',x:78,y:34},{name:'OCEANIA',x:84,y:72}
+];
+
 type PlaceKey='home'|'school'|'bus'|'clinic';
 type State='normal'|'event';
 
@@ -38,6 +42,18 @@ export default function FAINShowroom(){
     <h1 style={{fontSize:'clamp(52px,9vw,108px)',lineHeight:.86,letterSpacing:'-.065em',margin:'20px 0'}}>FROM ONE BREATH<br/><span style={{color:'#6fe8ff'}}>TO A FEDERATED RECORD.</span></h1>
     <p style={{maxWidth:980,fontSize:'clamp(18px,2.2vw,27px)',lineHeight:1.55,color:'#b5cbc5'}}>AIR preserves atmospheric reality by place. PAIR preserves person-centered exposure chronology across places. The Federated Atmospheric Integrity Network connects bounded environmental evidence across independently governed nodes without turning federation into ownership, diagnosis, or automatic authority to act.</p>
    </header>
+
+
+   <section style={{position:'relative',overflow:'hidden',margin:'0 0 26px',padding:'clamp(28px,5vw,52px)',minHeight:500,border:'1px solid rgba(111,232,255,.28)',borderRadius:24,background:'radial-gradient(circle at 50% 48%,rgba(25,225,190,.12),transparent 31%),linear-gradient(180deg,rgba(3,18,25,.96),rgba(1,10,13,.98))',boxShadow:'0 24px 80px rgba(0,0,0,.35)'}}>
+    <div style={{position:'relative',zIndex:3,maxWidth:760}}><small style={{fontWeight:950,letterSpacing:'.18em',color:'#6fe8ff'}}>FEDERATED ATMOSPHERIC INTEGRITY NETWORK</small><h2 style={{fontSize:'clamp(34px,5vw,64px)',lineHeight:.98,letterSpacing:'-.05em',margin:'12px 0'}}>LOCAL RECORDS.<br/><span style={{color:'#62f0c4'}}>PLANETARY CONTINUITY.</span></h2><p style={{color:'#a9c5be',lineHeight:1.7}}>A federation does not erase where evidence came from. Each node remains attributable. Bounded signals can connect across cities, institutions, regions and jurisdictions while provenance and governance remain visible.</p></div>
+    <div aria-label="Conceptual global federation map" style={{position:'relative',height:300,marginTop:22,borderRadius:'50%',border:'1px solid rgba(111,232,255,.18)',background:'radial-gradient(ellipse at center,rgba(16,72,75,.38),rgba(2,16,23,.78) 62%,rgba(0,5,8,.96))',boxShadow:'inset 0 0 60px rgba(77,230,255,.08)'}}>
+     <div style={{position:'absolute',inset:'14% 8%',border:'1px solid rgba(98,240,196,.12)',borderRadius:'50%'}}/><div style={{position:'absolute',inset:'28% 3%',borderTop:'1px solid rgba(111,232,255,.1)',borderBottom:'1px solid rgba(111,232,255,.1)',borderRadius:'50%'}}/>
+     <svg viewBox="0 0 100 100" preserveAspectRatio="none" style={{position:'absolute',inset:0,width:'100%',height:'100%',opacity:.62}}>{networkNodes.slice(1).map((n,i)=><line key={n.name} x1={networkNodes[i].x} y1={networkNodes[i].y} x2={n.x} y2={n.y} stroke="#6fe8ff" strokeWidth=".22" strokeDasharray="1.2 1.5"/>)}{networkNodes.slice(2).map((n,i)=><line key={'x'+n.name} x1={networkNodes[i].x} y1={networkNodes[i].y} x2={n.x} y2={n.y} stroke="#62f0c4" strokeWidth=".15" opacity=".7"/>)}</svg>
+     {networkNodes.map(n=><div key={n.name} style={{position:'absolute',left:n.x+'%',top:n.y+'%',transform:'translate(-50%,-50%)',textAlign:'center'}}><span style={{display:'block',width:12,height:12,margin:'auto',borderRadius:'50%',background:'#6fe8ff',boxShadow:'0 0 0 5px rgba(111,232,255,.1),0 0 22px #6fe8ff'}}/><b style={{display:'block',marginTop:8,fontSize:9,letterSpacing:'.08em',color:'#d8fbf5',whiteSpace:'nowrap'}}>{n.name}</b></div>)}
+     <div style={{position:'absolute',left:'50%',top:'50%',transform:'translate(-50%,-50%)',padding:'12px 15px',borderRadius:999,border:'1px solid rgba(98,240,196,.45)',background:'rgba(1,15,17,.9)',boxShadow:'0 0 40px rgba(98,240,196,.18)',fontWeight:950,color:'#62f0c4',letterSpacing:'.12em',fontSize:10}}>FAIN · BOUNDED SIGNALS</div>
+    </div>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:10,marginTop:20}}>{[['BUILDING','Local AIR remains attributable'],['PERSON','PAIR preserves exposure continuity'],['CITY','Bounded signals can aggregate'],['REGION','Provenance survives federation'],['WORLD','Connection does not create authority']].map(([a,b])=><div key={a} style={{padding:15,borderRadius:13,border:'1px solid rgba(111,232,255,.13)',background:'rgba(1,10,13,.72)'}}><b style={{color:'#6fe8ff',fontSize:11,letterSpacing:'.12em'}}>{a}</b><div style={{fontSize:12,color:'#8fa9a3',marginTop:6}}>{b}</div></div>)}</div>
+   </section>
 
    <section style={{padding:28,border:'1px solid rgba(111,232,255,.22)',borderRadius:22,background:'rgba(3,18,20,.84)'}}>
     <small style={{color:'#6fe8ff',fontWeight:950,letterSpacing:'.15em'}}>THE ARCHITECTURE</small>
