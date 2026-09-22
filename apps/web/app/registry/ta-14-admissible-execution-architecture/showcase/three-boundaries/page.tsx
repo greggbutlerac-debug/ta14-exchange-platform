@@ -32,13 +32,13 @@ export default function ThreeBoundariesShowroom(){
 
   const reason={
     ALLOW:'Current evidence, current authority, bounded scope, and an observable execution path are established for this proposed consequence.',
-    HOLD:'The condition may be real and the network may be ready, but current execution standing has not been established.',
+    HOLD:'The condition may be real and the network may be ready, but applicable authority and established standing for execution now have not been established.',
     DENY:'The proposed consequence exceeds the established execution boundary.',
     ESCALATE:'The proposition cannot be resolved from the currently admissible state. Governed review is required before execution.'
   }[result];
 
   const resultColor={ALLOW:'#6cf0b8',HOLD:'#ffd36b',DENY:'#ff7b83',ESCALATE:'#b9a7ff'}[result];
-  const blocker = scope==='outside' ? 'SCOPE OUTSIDE AUTHORIZED BOUNDARY' : evidence==='stale' ? 'EVIDENCE IS STALE' : network==='unverified' ? 'EXECUTION PATH IS UNVERIFIED' : authority==='expired' ? 'CURRENT AUTHORITY / STANDING NOT ESTABLISHED' : 'NO BLOCKING CONDITION';
+  const blocker = scope==='outside' ? 'SCOPE OUTSIDE AUTHORIZED BOUNDARY' : evidence==='stale' ? 'EVIDENCE IS STALE' : network==='unverified' ? 'EXECUTION PATH IS UNVERIFIED' : authority==='expired' ? 'APPLICABLE AUTHORITY / ESTABLISHED STANDING NOT CURRENT' : 'NO BLOCKING CONDITION';
   const executionState = result==='ALLOW' ? 'EXECUTION AUTHORIZED WITHIN BOUNDARY' : 'EXECUTION PREVENTED';
   const resetDemo=()=>{setEvidence('current');setAuthority('expired');setScope('authorized');setNetwork('observable');};
 
@@ -60,7 +60,7 @@ export default function ThreeBoundariesShowroom(){
         <p style={{fontSize:'clamp(21px,2.7vw,32px)',fontWeight:900,letterSpacing:'-.025em',margin:'0 0 14px'}}>GOOD DATA IS NOT PERMISSION TO ACT.</p>
         <p style={{fontSize:'clamp(17px,2vw,23px)',lineHeight:1.62,maxWidth:980,color:'#afc5d0'}}>A building can possess trustworthy data. Its network can successfully transport a command. Its equipment can be perfectly capable of executing it. None of those facts establish that the proposed consequence is authorized to become reality <b style={{color:'#6cf0b8'}}>NOW</b>.</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10,marginTop:34}}>
-          {[['01','DATA SOVEREIGNTY','Can the operational record be owned, accessed, attributed, and trusted?'],['02','EXECUTION GOVERNANCE','Does the consequence have sufficient admissibility, authority, and standing now?'],['03','NETWORK OBSERVATION & ENFORCEMENT','What is moving toward the physical system, and can the determination meet the execution path?']].map(([n,t,d],i)=><div key={n} style={{padding:20,...card(i===1)}}><b style={{color:i===1?'#6cf0b8':'#69dcff',fontSize:12}}>{n}</b><div style={{fontWeight:950,margin:'9px 0 8px',letterSpacing:'.04em'}}>{t}</div><div style={{color:'#8fa7b4',fontSize:13,lineHeight:1.55}}>{d}</div></div>)}
+          {[['01','DATA SOVEREIGNTY','Can the operational record be owned, accessed, attributed, and trusted?'],['02','EXECUTION GOVERNANCE','Does the proposed consequence have admissible evidence, applicable authority, and established standing now?'],['03','NETWORK OBSERVATION & ENFORCEMENT','What is moving toward the physical system, and can the determination meet the execution path?']].map(([n,t,d],i)=><div key={n} style={{padding:20,...card(i===1)}}><b style={{color:i===1?'#6cf0b8':'#69dcff',fontSize:12}}>{n}</b><div style={{fontWeight:950,margin:'9px 0 8px',letterSpacing:'.04em'}}>{t}</div><div style={{color:'#8fa7b4',fontSize:13,lineHeight:1.55}}>{d}</div></div>)}
         </div>
       </section>
 
@@ -97,7 +97,7 @@ export default function ThreeBoundariesShowroom(){
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10,marginTop:18}}>
             {[
               ['01 · RECORD BOUNDARY',evidence==='current'?'SUPPORTED RECORD':'STALE RECORD','Can the operational record be trusted now?'],
-              ['02 · CONSEQUENCE BOUNDARY',result,'TA-14 evaluates admissibility, authority, standing, and scope.'],
+              ['02 · CONSEQUENCE BOUNDARY',result,'TA-14 establishes admissible evidence, applicable authority, established standing, and bounded scope.'],
               ['03 · NETWORK BOUNDARY',network==='observable'?'PATH OBSERVABLE':'PATH UNVERIFIED','Can the determination meet the command path?'],
               ['04 · REALITY',executionState,result==='ALLOW'?'The bounded consequence may proceed.':'The proposed consequence does not cross into physical reality.']
             ].map(([a,b,d],i)=><div key={a} style={{padding:20,...card(i===1)}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.1em',color:i===1?'#6cf0b8':'#69dcff'}}>{a}</div><div style={{fontSize:18,fontWeight:1000,margin:'10px 0',color:i===1?resultColor:'#eef8fb'}}>{b}</div><div style={{fontSize:12,lineHeight:1.55,color:'#8fa7b4'}}>{d}</div></div>)}
@@ -121,7 +121,7 @@ export default function ThreeBoundariesShowroom(){
             ].map(([label,fn])=><button key={label as string} onClick={fn as ()=>void} style={{cursor:'pointer',padding:'12px 14px',borderRadius:11,border:'1px solid rgba(185,167,255,.28)',background:'rgba(185,167,255,.07)',color:'#ddd6ff',fontWeight:950,fontSize:10,letterSpacing:'.06em'}}>{label as string}</button>)}
           </div>
           {result==='ALLOW'&&<div style={{marginTop:22,padding:22,borderRadius:16,border:'1px solid rgba(108,240,184,.4)',background:'rgba(108,240,184,.08)',textAlign:'center'}}>
-            <div style={{fontSize:12,fontWeight:950,color:'#6cf0b8'}}>AUTHORITY RE-ESTABLISHED → STANDING CURRENT → REVALIDATION COMPLETE</div>
+            <div style={{fontSize:12,fontWeight:950,color:'#6cf0b8'}}>APPLICABLE AUTHORITY ESTABLISHED → STANDING ESTABLISHED → REVALIDATION COMPLETE</div>
             <div style={{fontSize:'clamp(30px,5vw,52px)',fontWeight:1000,marginTop:10,color:'#6cf0b8'}}>ALLOW</div>
             <div style={{color:'#b7d8ca'}}>Consequence may proceed within the bounded authorization.</div>
           </div>}
@@ -158,7 +158,7 @@ export default function ThreeBoundariesShowroom(){
           {['EVIDENCE IS NOT AUTHORITY.','CAPABILITY IS NOT PERMISSION.','TRANSPORT IS NOT EXECUTION AUTHORITY.'].map(x=><div key={x} style={{padding:18,...card()}}><b>{x}</b></div>)}
         </div>
         <div style={{fontSize:'clamp(34px,6vw,72px)',fontWeight:1000,letterSpacing:'-.055em',lineHeight:1,marginTop:38,color:'#6cf0b8'}}>THE CONSEQUENCE STILL HAS TO EARN THE RIGHT TO BECOME REALITY.</div>
-        <div style={{marginTop:28,fontWeight:950,letterSpacing:'.12em',color:'#d8e9ee'}}>ADMISSIBILITY · AUTHORITY · STANDING</div>
+        <div style={{marginTop:28,fontWeight:950,letterSpacing:'.12em',color:'#d8e9ee'}}>ADMISSIBLE EVIDENCE · APPLICABLE AUTHORITY · ESTABLISHED STANDING</div>
         <div style={{marginTop:8,fontWeight:950,letterSpacing:'.12em',color:'#8fa7b4'}}>ALLOW · HOLD · DENY · ESCALATE</div>
         <div style={{display:'flex',justifyContent:'center',gap:10,flexWrap:'wrap',marginTop:30}}>
           <button onClick={()=>{resetDemo();window.scrollTo({top:500,behavior:'smooth'})}} style={{cursor:'pointer',padding:'13px 18px',borderRadius:999,border:'1px solid rgba(108,240,184,.4)',background:'rgba(108,240,184,.1)',color:'#dffff0',fontWeight:950}}>RUN ANOTHER CONSEQUENCE</button>
