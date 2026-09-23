@@ -6,7 +6,7 @@ import "./showroom.css";
 const stages=[
  ["01","PROPOSITION","DRAFTED","Candidate continuation-admissibility property stated; not yet frozen."],
  ["02","NATIVE CONTRACT","AWAITING HARMONIC","Harmonic identifies the implementation-facing input/output contract to be examined."],
- ["03","IMPLEMENTATION","NOT FROZEN","The runtime implementation and governance mapping must be identified, hashed, timestamped and preserved before decisive specimens are disclosed."],
+ ["03","RUNTIME + GOVERNANCE MAPPING","NOT FROZEN","The runtime implementation and governance mapping must be identified, hashed, timestamped and preserved before decisive specimens are disclosed."],
  ["04","FALSIFIER","NOT FROZEN","The falsifier will be constituted against the native contract, frozen governance mapping and constituted authority model, then frozen prospectively."],
  ["05","SPECIMENS","SEALED","Decisive specimens are intentionally not disclosed before implementation freeze."],
  ["06","EXECUTION","NOT AUTHORIZED","No examination run is authorized yet."],
@@ -17,7 +17,7 @@ const stages=[
 const claims=[
  ["PRESENT STANDING","Harmonic publicly describes a runtime determination of whether a proposed action still has standing now after reality changes."],
  ["CURRENT INSTITUTIONAL STATE","Its public framing places present evidence, authority, obligations, operating conditions, continuity and consequence at the execution boundary."],
- ["BOUNDED COMPOSITION","Harmonic has described composition through a bounded interface while domain intelligence remains sovereign."],
+ ["CONTINUATION ADMISSIBILITY","The proposed examination asks whether attempted continuation remains admissible under present authoritative state before consequence binds."],
  ["PROSPECTIVE EXAMINATION","Its published testing discipline calls for freezing implementation, proposition, scope, materiality and falsifier before an unseen qualifying transition."]
 ] as const;
 
@@ -33,7 +33,7 @@ export default function Page(){
     <div className="hx-badges"><b>PUBLIC TECHNICAL SHOWROOM</b><b>PROSPECTIVE EXAMINATION</b><b>PRE-FREEZE RECORD</b><b>NO RESULT CLAIMED</b></div>
     <p className="hx-eye">TA-14 × HARMONIC · PROSPECTIVE RUNTIME EXAMINATION</p>
     <h1>WHEN THE BASIS CHANGES.<br/><em>DOES CONTINUATION REMAIN ADMISSIBLE?</em></h1>
-    <p className="hx-challenge">PRESENT AUTHORITY MUST BE DERIVED FROM CURRENT STATE.</p>
+    <p className="hx-challenge">PRESENT CONTINUATION MUST BE DERIVED FROM CURRENT AUTHORITATIVE STATE.</p>
     <p className="hx-lede">This room opens before the examination begins. It records the proposed boundary, the public claim surface being examined, and the sequence required before any decisive specimen is introduced. It does not presume a Harmonic result.</p>
    </header>
 
