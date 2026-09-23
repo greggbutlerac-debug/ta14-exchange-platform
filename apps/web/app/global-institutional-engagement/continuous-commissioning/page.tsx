@@ -70,7 +70,7 @@ export default function ContinuousCommissioningShowroom(){
       <section className="boundary">
         <b>BOUNDARY</b>
         <p>This showroom is an educational architecture demonstration. It is not ASHRAE guidance, a commissioning standard, semiconductor design guidance, certification, code compliance, safety approval, or a claim that TA-14 replaces commissioning practice. It demonstrates a possible interoperability seam between commissioning evidence and admissible execution governance.</p>
-        <div className="actions"><Link href="/ai-governance/ta14-architecture-showroom">TA-14 ARCHITECTURE SHOWROOM →</Link><Link href="/global-institutional-engagement/showrooms">ALL SHOWROOMS →</Link><Link href="/registry/ta-14-admissible-execution-architecture">AEA RECORD →</Link></div>
+        <div className="actions"><Link href="/ai-governance/ta14-architecture-showroom">TA-14 ARCHITECTURE SHOWROOM →</Link><Link href="/showrooms">ALL SHOWROOMS →</Link><Link href="/registry/ta-14-admissible-execution-architecture">AEA RECORD →</Link></div>
       </section>
     </div>
   </main>
