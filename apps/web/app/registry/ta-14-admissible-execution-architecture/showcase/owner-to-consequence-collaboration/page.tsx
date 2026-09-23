@@ -24,6 +24,19 @@ const sop = [
 
 export default function OwnerToConsequenceCollaboration(){
   const [ahuState,setAhuState] = useState<'baseline'|'unchanged'|'changed'>('baseline');
+  const [graphLayers,setGraphLayers] = useState({re1:true,semantic:true,fixed:true,ta14:true});
+  const activeGraphCount = Object.values(graphLayers).filter(Boolean).length;
+  const graphSummary = !graphLayers.re1
+    ? 'Persistent building identity is no longer available as the common anchor. Companion knowledge may still exist, but this demonstration no longer has the native RE1 object reference that binds the layers to the same building thing.'
+    : !graphLayers.semantic && !graphLayers.fixed && !graphLayers.ta14
+      ? 'The native RE1 building objects remain. Shared engineering meaning, asset-readiness context, and consequence-governance context have been removed from the view.'
+      : !graphLayers.semantic
+        ? 'The building objects remain, but much of the explicit shared engineering meaning and relationship context is absent from the composed view.'
+        : !graphLayers.ta14
+          ? 'The building and semantic context remain visible, but the explicit consequence / authority determination layer is absent. Connection and understanding remain; permission does not appear by implication.'
+          : !graphLayers.fixed
+            ? 'The building and governance context remain visible, but the experimental asset-information readiness layer is absent.'
+            : 'All four independently governed layers are visible around the same persistent building objects. No layer is merged into another.';
   const ahuResult = ahuState === 'changed'
     ? {label:'PRIOR DETERMINATION NO LONGER CARRIES STANDING',detail:'Outdoor PM2.5 changed materially. The earlier state remains in the record, but permission is not inherited. Revalidation is required before a new determination can govern execution.'}
     : ahuState === 'unchanged'
@@ -91,8 +104,8 @@ export default function OwnerToConsequenceCollaboration(){
       </section>
 
       <section style={{marginTop:26,padding:'clamp(28px,5vw,48px)',border:'1px solid rgba(177,135,255,.25)',borderRadius:26,background:'linear-gradient(135deg,rgba(70,39,105,.22),rgba(5,17,28,.95))'}}>
-        <div style={{color:'#c8a7ff',fontSize:11,fontWeight:950,letterSpacing:'.17em'}}>EXPERIMENTAL GRAPH-OF-GRAPHS · SEPTEMBER 22, 2026</div>
-        <h2 style={{fontSize:'clamp(31px,4.8vw,55px)',letterSpacing:'-.04em',lineHeight:1.04,margin:'12px 0 16px'}}>Different graphs. Same persistent thing.</h2>
+        <div style={{color:'#c8a7ff',fontSize:11,fontWeight:950,letterSpacing:'.17em'}}>EXPERIMENTAL GRAPH-OF-GRAPHS · LIVE WORKING SURFACE</div>
+        <h2 style={{fontSize:'clamp(31px,4.8vw,55px)',letterSpacing:'-.04em',lineHeight:1.04,margin:'12px 0 16px'}}>Different graphs. Same persistent thing.<br/><span style={{color:'#e7dcff'}}>Building it while examining it.</span></h2>
         <p style={{maxWidth:1000,color:'#c9bed8',lineHeight:1.7,fontSize:17}}>ONUMA independently extended its Semantic Bridge Explorer to display TA-14 consequence governance and Fixed Asset information readiness as explicitly experimental layers. A companion Turtle graph was then created beside — not inside — the original RE1 building graph.</p>
         <div style={{marginTop:22,padding:'20px',border:'1px solid rgba(177,135,255,.22)',borderRadius:15,background:'rgba(177,135,255,.045)',fontSize:'clamp(17px,2vw,22px)',fontWeight:900,lineHeight:1.55}}>RE1 BUILDING GRAPH → PERSISTENT ASSET IDENTITY ← EXPERIMENTAL GOVERNANCE GRAPH</div>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:10,marginTop:18}}>{[
@@ -101,6 +114,29 @@ export default function OwnerToConsequenceCollaboration(){
           ['TA-14 · EXPERIMENTAL','Current reality, provenance, admissible evidence, applicable authority, established standing, proposed consequence, and bounded determination attach around the persistent object without becoming an execution command.'],
           ['BOUNDARY','Prototype only. Not production integration. Not formal interoperability. Not a TA-14 or Fixed Asset ontology definition.'],
         ].map(([k,v])=><article key={k} style={{padding:20,borderRadius:15,border:'1px solid rgba(177,135,255,.14)',background:'rgba(2,10,17,.5)'}}><b style={{color:'#c8a7ff',fontSize:12,letterSpacing:'.07em'}}>{k}</b><p style={{margin:'9px 0 0',color:'#c9c2d1',lineHeight:1.6,fontSize:14}}>{v}</p></article>)}</div>
+        <div style={{marginTop:22,padding:'22px',border:'1px solid rgba(113,231,255,.2)',borderRadius:16,background:'rgba(6,20,31,.72)'}}>
+          <div style={{fontSize:11,fontWeight:950,letterSpacing:'.13em',color:'#78e8ff'}}>INTERACTIVE GRAPH-OF-GRAPHS VIEW · TURN LAYERS ON AND OFF</div>
+          <h3 style={{fontSize:'clamp(22px,3vw,34px)',margin:'10px 0 10px'}}>What survives when a graph disappears?</h3>
+          <p style={{margin:'0 0 16px',color:'#b8cad5',lineHeight:1.65}}>This is the architectural point the live exercise makes visible: the composed application can change while independently governed sources remain distinct. Toggle a layer to inspect what disappears from the combined view and what remains attributable to the persistent building object.</p>
+          <div style={{display:'flex',gap:9,flexWrap:'wrap'}}>
+            {[
+              ['re1','RE1 / ONUMA'],
+              ['semantic','SEMANTIC / 223'],
+              ['fixed','FIXED ASSET'],
+              ['ta14','TA-14 GOVERNANCE'],
+            ].map(([key,label])=><button key={key} onClick={()=>setGraphLayers(s=>({...s,[key]:!s[key as keyof typeof s]}))} style={{cursor:'pointer',padding:'11px 13px',borderRadius:10,border:'1px solid rgba(113,231,255,.35)',background:graphLayers[key as keyof typeof graphLayers]?'rgba(113,231,255,.14)':'rgba(2,10,17,.65)',color:graphLayers[key as keyof typeof graphLayers]?'#dff8ff':'#7c909b',fontWeight:900}}>{graphLayers[key as keyof typeof graphLayers]?'ON · ':'OFF · '}{label}</button>)}
+          </div>
+          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:9,marginTop:16}}>
+            {[
+              ['RE1 / ONUMA','Persistent building objects + native source graph',graphLayers.re1],
+              ['SEMANTIC / 223','Engineering meaning + relationships',graphLayers.semantic],
+              ['FIXED ASSET','Experimental information-readiness context',graphLayers.fixed],
+              ['TA-14','Experimental consequence / authority context',graphLayers.ta14],
+            ].map(([k,v,on])=><div key={k as string} style={{padding:15,borderRadius:12,border:'1px solid '+(on?'rgba(127,240,189,.22)':'rgba(255,255,255,.08)'),background:on?'rgba(127,240,189,.045)':'rgba(255,255,255,.02)',opacity:on?1:.45}}><b style={{display:'block',color:on?'#7ff0bd':'#7e8a90',fontSize:11}}>{k}</b><span style={{display:'block',marginTop:7,color:'#aebfc8',fontSize:13,lineHeight:1.5}}>{v}</span></div>)}
+          </div>
+          <div aria-live="polite" style={{marginTop:15,padding:'16px 18px',borderLeft:'3px solid #c8a7ff',background:'rgba(177,135,255,.045)'}}><b style={{color:'#c8a7ff'}}>{activeGraphCount} / 4 LAYERS VISIBLE</b><p style={{margin:'7px 0 0',color:'#cec6d7',lineHeight:1.6}}>{graphSummary}</p></div>
+          <div style={{marginTop:14,padding:'16px 18px',border:'1px solid rgba(242,204,104,.2)',borderRadius:12,background:'rgba(242,204,104,.035)'}}><b style={{color:'#f2cc68'}}>DURABLE ≠ APPLICATION</b><p style={{margin:'7px 0 0',color:'#d6ceb8',lineHeight:1.6}}>The visual application is a replaceable view. The durable layer is the accessible source data, persistent identities, relationships, RDF and APIs that can be reconstructed into another interface without silently merging ownership or authority.</p></div>
+        </div>
         <div style={{marginTop:18,padding:'20px',border:'1px solid rgba(242,204,104,.24)',borderRadius:15,background:'rgba(242,204,104,.04)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.13em',color:'#f2cc68'}}>NAMESPACE RECONCILIATION · PRESERVED, NOT SILENTLY REWRITTEN</div><p style={{margin:'9px 0 0',color:'#d8cfb5',lineHeight:1.65}}>The received experimental companion used a provisional RE1 resource namespace. Comparison with the source building Turtle established the canonical source base as <code style={{color:'#fff0bd'}}>http://onuma.com/id#</code>. The local object IDs, ONUMA IDs, and IFC GUIDs reconciled; only the companion namespace binding required correction. The source RE1 graph was not modified.</p></div>
         <div style={{marginTop:18,display:'flex',gap:10,flexWrap:'wrap'}}>
           <a href="/artifacts/re1-governance-experimental-graph-of-graphs-v0-1-reconciled.ttl" style={{padding:'12px 15px',borderRadius:10,border:'1px solid rgba(177,135,255,.38)',color:'#e4d5ff',textDecoration:'none',fontWeight:900}}>OPEN RECONCILED EXPERIMENTAL TTL →</a>
