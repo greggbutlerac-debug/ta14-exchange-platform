@@ -30,11 +30,11 @@ export default function Page(){
 
    <header className="hx-hero">
     <div className="hx-flags"><div><b>🇺🇸</b><span>TA-14 AUTHORITY</span></div><i>×</i><div><b>🇺🇸</b><span>HARMONIC · MORAL CLARITY AI</span></div></div>
-    <div className="hx-badges"><b>PUBLIC TECHNICAL SHOWROOM</b><b>PROSPECTIVE EXAMINATION</b><b>PROSPECTIVE FREEZE RECORD</b><b>NO RESULT CLAIMED</b></div>
+    <div className="hx-badges"><b>PUBLIC TECHNICAL SHOWROOM</b><b>HARMONIC ARTIFACT 004</b><b>EXECUTED R1 EXAMINATION</b><b>FROZEN RECORD PRESERVED</b></div>
     <p className="hx-eye">TA-14 × HARMONIC · PROSPECTIVE RUNTIME EXAMINATION</p>
     <h1>WHEN THE BASIS CHANGES.<br/><em>DOES CONTINUATION REMAIN ADMISSIBLE?</em></h1>
     <p className="hx-challenge">PRESENT CONTINUATION MUST BE DERIVED FROM CURRENT AUTHORITATIVE STATE.</p>
-    <p className="hx-lede">This room opens before the examination begins. It records the proposed boundary, the public claim surface being examined, and the sequence required before any decisive specimen is introduced. It does not presume a Harmonic result.</p>
+    <p className="hx-lede">This room preserves the prospective freeze and the executed R1 record. The proposition, native contract, materiality rule and falsifier were frozen before specimen opening; both specimens were then executed unchanged against Harmonic V4.1.</p>
    </header>
 
    <section className="hx-question">
@@ -108,24 +108,32 @@ export default function Page(){
    </section>
 
    <section>
-    <p className="hx-eye">07 · CURRENT RECORD</p>
-    <h2 className="hx-title">Frozen before specimen opening. Nothing has been run.</h2>
+    <p className="hx-eye">07 · EXECUTED R1 RECORD · HARMONIC ARTIFACT 004</p>
+    <h2 className="hx-title">The frozen test was executed. Preserve what happened.</h2>
     <div className="hx-status">
      <div><small>PROPOSITION</small><b>FROZEN</b></div>
      <div><small>NATIVE CONTRACT</small><b>FROZEN</b></div>
      <div><small>RUNTIME + INPUT SURFACE</small><b>FROZEN</b></div>
      <div><small>FALSIFIER</small><b>FROZEN</b></div>
-     <div><small>SPECIMENS</small><b>SEALED</b></div>
-     <div><small>EXECUTION</small><b>NEXT</b></div>
-     <div><small>DETERMINATION</small><b>NONE</b></div>
-     <div><small>CLAIM STATUS</small><b>OPEN</b></div>
+     <div><small>SPECIMENS</small><b>OPENED · A + B</b></div>
+     <div><small>EXECUTION</small><b>COMPLETE · HTTP 200 × 2</b></div>
+     <div><small>DETERMINATION</small><b>SUPPORTED — INDETERMINATE</b></div>
+     <div><small>CLAIM STATUS</small><b>BOUNDED R1 RECORD</b></div>
     </div>
+    <div className="hx-earned" style={{marginTop:18}}>
+     <article><small>SPECIMEN A · STANDING-PRESERVING ΔN</small><strong>$100K → $90K</strong><span>$75K proposed commitment · native result: REFUSED · inadmissible · BLOCK.</span></article>
+     <article><small>SPECIMEN B · STANDING-DEFEATING ΔN</small><strong>$100K → $50K</strong><span>Same $75K proposed commitment · native result: REFUSED · inadmissible · BLOCK.</span></article>
+     <article><small>NATIVE AUTHORITY RESULT</small><strong>AUTHORITY_NOT_ESTABLISHED × 2</strong><span>The runtime did not produce a differentiated authority disposition across the decisive ΔN. B recorded scope_invalid=false, scope_changed=false and condition_failed=false.</span></article>
+     <article><small>FROZEN-FALSIFIER JUDGMENT</small><strong>SUPPORTED — INDETERMINATE</strong><span>F1 not established. F2 not established. F3 presents evidence requiring bounded interpretation; the record does not establish that Harmonic required the prohibited upstream standing/admissibility conclusion.</span></article>
+    </div>
+    <p className="hx-note"><strong>No packet repair occurred between A and B.</strong> The prospective freeze remains part of the historical record. This executed layer does not rewrite the pre-execution proposition, materiality rule, native contract or falsifier.</p>
+    <div style={{marginTop:18}}><Link href="/artifacts/fd-2026-0002-case-004">OPEN HARMONIC ARTIFACT 004 →</Link></div>
    </section>
 
    <footer>
-    <p>TA-14 AUTHORITY · HARMONIC PROSPECTIVE EXAMINATION</p>
-    <h2>THE TEST IS FROZEN<br/><em>BEFORE THE SPECIMENS OPEN.</em></h2>
-    <strong>NO RESULT IS PRESUMED.</strong>
+    <p>TA-14 AUTHORITY · HARMONIC ARTIFACT 004</p>
+    <h2>THE FREEZE HELD.<br/><em>THE EXECUTED RECORD IS PRESERVED.</em></h2>
+    <strong>SUPPORTED — INDETERMINATE ON THE FROZEN PROPOSITION.</strong>
     <div><Link href="/registry/ta-14-admissible-execution-architecture">TA-14 AEA</Link><Link href="/registry/ta-14-admissible-execution-architecture/showcase/changed-reality-test">TA-14 R1 EXAMINATION</Link></div>
    </footer>
   </div>
