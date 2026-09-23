@@ -145,7 +145,7 @@ export default function AFAShowroom(){
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10,marginTop:24}}>{blocked.map(x=><button onClick={()=>setBlockedAttempt(x)} key={x} style={{cursor:'pointer',padding:'24px 15px',border:'1px solid #6a402f',borderRadius:12,background:'rgba(74,25,13,.18)',textAlign:'center',fontWeight:950,color:'#ffb29a'}}>⊘ {x}<div style={{fontSize:9,color:'#a98275',marginTop:8}}>TRY TO CROSS</div></button>)}</div>{blockedAttempt&&<div style={{marginTop:16,padding:18,border:'1px solid #8b4937',borderRadius:11,background:'rgba(86,25,13,.22)',color:'#ffb29a',fontWeight:950}}>AFA-F05 · DIRECT_EFFECTOR — DENIED · {blockedAttempt} CANNOT CROSS THE FEDERATION BOUNDARY</div>}
    </section>
 
-   <section style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
+   <section id="failure-lab" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>FAILURE LAB</div>
     <h2 style={{fontSize:40,letterSpacing:'-.03em',margin:'10px 0'}}>Attack the seam, not just the happy path.</h2>
     <div style={{display:'grid',gridTemplateColumns:'minmax(220px,.8fr) minmax(280px,1.4fr)',gap:14,marginTop:25}}>
@@ -163,18 +163,27 @@ export default function AFAShowroom(){
     <p style={{color:'#9fb7be',lineHeight:1.7,marginTop:20}}>If B accepts narrowed authority from A, B may re-present only a provably preserved or narrower descendant to C. C must make its own ReceivingDetermination. B's receipt is not proof that B possessed execution authority, and neither acceptance grants C permission to act.</p>
    </section>
 
-   <section style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
-    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>EVIDENCE DRAWER</div>
-    <h2 style={{fontSize:40,letterSpacing:'-.03em',margin:'10px 0'}}>Inspect the record behind the showroom.</h2>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(235px,1fr))',gap:11,marginTop:22}}>
+   <section id="evidence-drawer" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
+    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>LOOK UNDER THE HOOD</div>
+    <h2 style={{fontSize:'clamp(36px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>Four ways to see what TA-14 is actually doing.</h2>
+    <p style={{color:'#9fb7be',fontSize:16,lineHeight:1.72,maxWidth:900}}>You do not need to know the acronyms to understand the architecture. Think of TA-14 like a careful gatekeeper: it needs rules, a specific handoff, tests for what can go wrong, and an honest record of what has actually been proven.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(235px,1fr))',gap:11,marginTop:26}}>
      {[
-      ['AFA v1.0-RC1','22-page release candidate. Not yet frozen.','https://doi.org/10.5281/zenodo.22846133'],
-      ['AFA-IP-001 v0.3','TA-14-authored AVP × CNS/CP Connection Profile examination artifact · LOCAL EXERCISE / UNPUBLISHED / NON-RESOLVABLE.','/federation-authority'],
-      ['15 FIXTURES','Failure-first bounded examination model.','#failure-lab'],
-      ['RUNTIME STATUS','Harness implemented. Real Node/CI execution evidence pending.','#runtime'],
-     ].map(([t,p,h])=><a key={t} href={h} style={{padding:20,border:'1px solid #214a51',borderRadius:13,background:'#04151c',textDecoration:'none'}}><strong style={{display:'block',color:'#71e7df',fontSize:11}}>{t}</strong><span style={{display:'block',marginTop:9,color:'#9db3b9',fontSize:12,lineHeight:1.55}}>{p}</span></a>)}
+      ['01 · THE RULEBOOK','What are the rules?','Read the registered release candidate — the written rules for what may cross between independently governed domains and what must stop before local execution.','READ THE RULEBOOK ↗','https://doi.org/10.5281/zenodo.22846133'],
+      ['02 · THE HANDOFF','What gets passed over?','See the Connection Profile exercise. It asks what information may cross the connection without pretending that the connection itself gives permission to act.','INSPECT THE HANDOFF ↓','#cnscp-eaba'],
+      ['03 · TRY TO BREAK IT','What happens when something goes wrong?','Run the failure tests. Make the context stale, broaden the scope, change a condition, or tamper with the record and watch the architecture refuse to quietly continue.','RUN THE FAILURE LAB ↓','#failure-lab'],
+      ['04 · WHAT IS PROVEN?','Is this real or just a diagram?','See exactly what this showroom demonstrates today, what is implemented, and what still needs external runtime and CI evidence. No pretending.','CHECK THE STATUS ↓','#runtime-status'],
+     ].map(([n,q,p,cta,h])=><a key={n} href={h} style={{padding:22,border:'1px solid #214a51',borderRadius:14,background:'#04151c',textDecoration:'none',display:'flex',flexDirection:'column',minHeight:235}}><small style={{color:'#71e7df',fontSize:9,fontWeight:950,letterSpacing:'.12em'}}>{n}</small><strong style={{display:'block',color:'#eef7fb',fontSize:20,margin:'10px 0'}}>{q}</strong><span style={{display:'block',color:'#9db3b9',fontSize:13,lineHeight:1.65,flex:1}}>{p}</span><b style={{display:'block',marginTop:18,color:'#e7c76e',fontSize:10}}>{cta}</b></a>)}
     </div>
-    <div id="runtime" style={{marginTop:20,padding:18,border:'1px solid #5b4d2a',borderRadius:12,background:'rgba(42,32,8,.25)',color:'#d8c98f',fontSize:12,lineHeight:1.65}}><strong>CLAIM BOUNDARY:</strong> AFA v1.0-RC1 does not claim completed CNS/CP registry publication, proven external interoperability, TA14_RECOGNIZED implementation, transfer of execution authority, or completed runtime/CI execution evidence.</div>
+    <div id="runtime-status" style={{marginTop:26,padding:26,border:'1px solid #5b4d2a',borderRadius:16,background:'rgba(42,32,8,.25)'}}>
+     <small style={{color:'#e7c76e',fontWeight:950,letterSpacing:'.14em'}}>RUNTIME STATUS · THE HONEST SCOREBOARD</small>
+     <h3 style={{fontSize:30,margin:'9px 0 12px'}}>What can we honestly say works today?</h3>
+     <p style={{color:'#c8bd98',lineHeight:1.7,maxWidth:900}}>This showroom demonstrates the boundary logic, receiving decisions, changed-condition behavior, failure cases, and receipts. A harness has been implemented. It does not claim completed external CNS/CP registry publication, proven live interoperability with an outside system, TA14_RECOGNIZED implementation, transfer of execution authority, or completed Node/CI runtime evidence.</p>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:9,marginTop:18}}>
+      {[['SHOWROOM LOGIC','DEMONSTRABLE ✓'],['FAILURE CASES','INTERACTIVE ✓'],['BOUNDARY RECEIPTS','DEMONSTRABLE ✓'],['EXTERNAL RUNTIME / CI','EVIDENCE PENDING']].map((x,i)=><div key={x[0]} style={{padding:16,borderRadius:10,border:'1px solid '+(i===3?'#6b5829':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:6,color:i===3?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
+     </div>
+     <p style={{margin:'18px 0 0',color:'#d8c98f',fontSize:12,lineHeight:1.65}}><strong>WHY THIS MATTERS:</strong> A governance architecture should not claim more evidence than it has. The status card is part of the architecture, not fine print.</p>
+    </div>
    </section>
 
    <section id="cnscp-eaba" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
