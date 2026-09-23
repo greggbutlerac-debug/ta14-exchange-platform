@@ -266,6 +266,24 @@ export default function ArchitectureRegistryBridgePage() {
         </div>
       </section>
 
+      <section className="section shell handoff-summary">
+        <div className="handoff-panel">
+          <div>
+            <p className="eyebrow">THE SIMPLEST WAY TO REMEMBER IT</p>
+            <h2>Connection governs the relationship. TA-14 governs the consequence.</h2>
+            <p>A legitimate connection can deliver a legitimate request and TA-14 can still return HOLD. The connection did not fail. The consequence simply has not established everything required to become reality now.</p>
+          </div>
+          <div className="handoff-flow" aria-label="Connection Profile to TA-14 to consequence">
+            <div><small>01</small><strong>CONNECTION PROFILE</strong><span>Relationship + crossing rules</span></div>
+            <b>→</b>
+            <div><small>02</small><strong>TA-14</strong><span>Evidence + authority + standing now</span></div>
+            <b>→</b>
+            <div><small>03</small><strong>CONSEQUENCE</strong><span>ALLOW · HOLD · DENY · ESCALATE</span></div>
+          </div>
+          <p className="handoff-line">Linking is not connecting. Connecting is not authority to execute.</p>
+        </div>
+      </section>
+
       <section id="sections" className="section shell">
         <div className="section-heading">
           <p className="eyebrow">COMPLETE REGISTRY RECORD</p>
@@ -387,6 +405,19 @@ export default function ArchitectureRegistryBridgePage() {
             "Segoe UI", sans-serif;
         }
 
+        .handoff-summary { padding-top:20px; padding-bottom:72px; }
+        .handoff-panel { padding:34px; border:1px solid rgba(109,216,255,.25); border-radius:22px; background:linear-gradient(135deg,rgba(4,18,29,.92),rgba(8,32,48,.72)); }
+        .handoff-panel h2 { max-width:900px; margin:8px 0 10px; font-size:clamp(30px,4vw,50px); }
+        .handoff-panel > div:first-child > p:last-child { max-width:900px; color:var(--muted); line-height:1.7; }
+        .handoff-flow { display:grid; grid-template-columns:1fr auto 1fr auto 1fr; gap:12px; align-items:center; margin-top:28px; }
+        .handoff-flow > div { min-height:130px; padding:20px; border:1px solid var(--line); border-radius:14px; background:#06111d; }
+        .handoff-flow small,.handoff-flow strong,.handoff-flow span { display:block; }
+        .handoff-flow small { color:var(--blue); font-size:9px; font-weight:900; }
+        .handoff-flow strong { margin:9px 0; font-size:18px; }
+        .handoff-flow span { color:var(--muted); font-size:12px; line-height:1.5; }
+        .handoff-flow > b { color:var(--gold); font-size:22px; }
+        .handoff-line { margin:26px 0 0; padding-top:20px; border-top:1px solid var(--line); color:var(--gold); font-size:clamp(16px,2vw,22px); font-weight:900; text-align:center; }
+        @media(max-width:700px){ .handoff-flow{grid-template-columns:1fr}.handoff-flow>b{transform:rotate(90deg);text-align:center} }
         .architecture-home { padding-top: 84px; }
         .big-question { margin-top: 24px; padding: 22px; border: 1px solid rgba(242,191,109,.34); border-radius: 16px; background: rgba(242,191,109,.06); font-size: clamp(18px,2.2vw,27px) !important; line-height: 1.55 !important; color: #eaf6ff !important; }
         .chain-map { display:grid; grid-template-columns:repeat(8,1fr); gap:7px; margin:34px 0 88px; }
