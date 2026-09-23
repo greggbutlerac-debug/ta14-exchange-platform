@@ -74,7 +74,31 @@ export default function AFAShowroom(){
      {sandboxRun&&<div style={{marginTop:20,padding:20,border:'1px solid #e7c76e',borderRadius:12,background:'rgba(91,65,12,.18)'}}><strong style={{display:'block',fontSize:34,color:'#e7c76e'}}>HOLD</strong><p style={{color:'#d4c7a2',lineHeight:1.7}}>Connection established. Execution authority is not yet established.</p><p style={{color:'#eef7fb',fontWeight:850,lineHeight:1.65}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p></div>}
     </div>
     <div style={{marginTop:18,padding:'16px 18px',border:'1px dashed #71e7df',borderRadius:11,textAlign:'center',fontWeight:950,color:'#dffdfa'}}>LINKING IS NOT CONNECTING. CONNECTING IS NOT AUTHORITY TO EXECUTE.</div>
-    <a href="#architecture" style={{display:'inline-block',marginTop:18,color:'#71e7df',fontSize:11,fontWeight:950,textDecoration:'none'}}>EXPLORE HOW TA-14 WORKS ↓</a>
+    <a href="#choose-depth" style={{display:'inline-block',marginTop:18,color:'#71e7df',fontSize:11,fontWeight:950,textDecoration:'none'}}>CONTINUE THE STORY ↓</a>
+   </section>
+
+   <section id="choose-depth" style={{padding:'34px 0 54px'}}>
+    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#71e7df'}}>YOU JUST RAN THE SANDBOX</div>
+    <h2 style={{fontSize:'clamp(34px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>What do you want to understand next?</h2>
+    <p style={{color:'#9fb7be',fontSize:16,lineHeight:1.7,maxWidth:820}}>You already know the main idea. A connection can be completely legitimate and the proposed action can still be stopped. Pick how deep you want to go.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:11,marginTop:24}}>
+     <a href="#cnscp-eaba" style={{padding:24,border:'1px solid #e7c76e',borderRadius:15,background:'rgba(70,52,12,.18)',textDecoration:'none'}}>
+      <small style={{color:'#e7c76e',fontWeight:950}}>UNDERSTAND · 60 SECONDS</small>
+      <strong style={{display:'block',fontSize:23,color:'#fff',margin:'9px 0'}}>Why does TA-14 come after the connection?</strong>
+      <span style={{color:'#b9c9cd',fontSize:13,lineHeight:1.6}}>See the simple handoff: Connection Profile → TA-14 → Consequence.</span>
+     </a>
+     <a href="#failure-lab" style={{padding:24,border:'1px solid #24555d',borderRadius:15,background:'#04151c',textDecoration:'none'}}>
+      <small style={{color:'#71e7df',fontWeight:950}}>TEST IT · 2 MINUTES</small>
+      <strong style={{display:'block',fontSize:23,color:'#fff',margin:'9px 0'}}>What if something changes?</strong>
+      <span style={{color:'#b9c9cd',fontSize:13,lineHeight:1.6}}>Break a condition and watch why a prior answer cannot simply keep running.</span>
+     </a>
+     <a href="#architecture" style={{padding:24,border:'1px solid #24555d',borderRadius:15,background:'#04151c',textDecoration:'none'}}>
+      <small style={{color:'#71e7df',fontWeight:950}}>GO DEEPER · TECHNICAL</small>
+      <strong style={{display:'block',fontSize:23,color:'#fff',margin:'9px 0'}}>Show me the machinery.</strong>
+      <span style={{color:'#b9c9cd',fontSize:13,lineHeight:1.6}}>Inspect federation, receiving decisions, Passport behavior, failure modes, composition, and evidence.</span>
+     </a>
+    </div>
+    <p style={{marginTop:18,color:'#dffdfa',fontWeight:900}}>PLAY FIRST. UNDERSTAND SECOND. INSPECT THE ARCHITECTURE THIRD.</p>
    </section>
 
    <div id="architecture"></div>
