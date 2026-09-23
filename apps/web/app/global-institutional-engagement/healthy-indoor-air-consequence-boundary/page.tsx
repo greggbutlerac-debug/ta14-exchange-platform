@@ -16,7 +16,7 @@ export default function Page(){
   const [i,setI]=useState(0);
   const s=scenarios[i];
   return <main className="p"><div className="shell">
-    <nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/global-institutional-engagement/showrooms">PUBLIC SHOWROOMS</Link></nav>
+    <nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/showrooms">CLASSIFIED SHOWROOMS</Link></nav>
 
     <header>
       <small>INDEPENDENT TA-14 PUBLIC TECHNICAL DEMONSTRATION · HEALTHY INDOOR AIR</small>
