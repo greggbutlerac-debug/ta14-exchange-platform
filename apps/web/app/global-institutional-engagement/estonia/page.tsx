@@ -138,14 +138,10 @@ return <main className="p">
 </section>
 
 <section className="band"><div className="in">
-  <p className="eye">06 · WHY ESTONIA IS ESPECIALLY INTERESTING IN 2026</p>
-  <h2>The system is already changing while the evidentiary standard is getting stricter.</h2>
-  <div className="grid four">
-    <article><b>NEW EU AIR-QUALITY DIRECTIVE</b><p>Estonia adopted 2026 legislative amendments to align national law with the EU’s newer air-quality directive.</p></article>
-    <article><b>MONITORING NETWORK RENEWAL</b><p>The Ministry says Estonia is renewing and expanding its nationwide air-quality monitoring network while maintaining one of Europe’s cleaner ambient-air profiles.</p></article>
-    <article><b>2027 POLLUTANT-REDUCTION PROGRAMME</b><p>Estonia is updating its national air-pollutant reduction programme, with cross-government work already underway in 2026.</p></article>
-    <article><b>PERMIT ARCHITECTURE REFORM</b><p>Recent work examines how air-pollution permitting can better reflect actual environmental impact while relying on current, high-quality data.</p></article>
-  </div>
+  <p className="eye">06 · WHY THE 2026 TRANSITION MATTERS</p>
+  <h2>More capable evidence systems make the authority boundary more consequential.</h2>
+  <p className="lead2">Estonia’s monitoring, modelling, legal and programme changes create a useful live question: as environmental information becomes more current and operationally useful, how is the right to rely on it for a particular consequence kept equally current?</p>
+  <div className="call"><b>THE TRANSITION TEST</b><p>Improved measurement can strengthen evidence without automatically expanding who may act, what they may do, where they may do it, or how long an earlier determination remains valid. That separation is the examination boundary.</p></div>
 </div></section>
 
 <section>
