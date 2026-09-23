@@ -146,7 +146,7 @@ export function RouteAwareGlobalChrome() {
             <span aria-hidden="true">·</span>
             <a href="/governance-showcase">GOVERNANCE SHOWCASES</a>
             <span aria-hidden="true">·</span>
-            <a href="/global-institutional-engagement/showrooms">PUBLIC SHOWROOMS</a>
+            <a href="/showrooms">CLASSIFIED SHOWROOMS</a>
           </nav>
           <style>{`
             .ta14-showroom-wayfinding {
