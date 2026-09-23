@@ -24,7 +24,7 @@ export default function InstitutionalEngagementEnhancer() {
       <span>GI</span>
       <small>GOVERNED DOOR 07</small>
       <h3>GLOBAL INSTITUTIONAL ENGAGEMENT</h3>
-      <p>Enter country-specific public showrooms built from real institutional conversations, local evidence pathways, and bounded technical examination.</p>
+      <p>Enter country-specific public showrooms built from real institutional conversations, local evidence pathways, sovereign authority contexts, and preserved engagement records.</p>
       <strong>ENTER WORLD →</strong>
     `;
     grid.appendChild(door);
