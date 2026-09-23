@@ -29,6 +29,7 @@ export default function AFAShowroom(){
  const [blockedAttempt,setBlockedAttempt]=useState('');
  const [boundaryStep,setBoundaryStep]=useState(0);
  const [changedCondition,setChangedCondition]=useState(false);
+ const [sandboxRun,setSandboxRun]=useState(false);
  const [reverseDirection,setReverseDirection]=useState(false);
  const [lab,setLab]=useState({identity:true,integrity:true,freshness:true,scope:true,revocation:true,localStanding:true});
  const labResult=!lab.identity||!lab.integrity?'REJECT':!lab.revocation?'SUSPEND':!lab.localStanding?'ESCALATE':!lab.freshness||!lab.scope?'HOLD':'ACCEPT_NARROWED';
@@ -59,6 +60,24 @@ export default function AFAShowroom(){
      <Link href="/workspace/ai-governance/registry/records/TA-14-AIGR-000042" style={{padding:'13px 16px',border:'1px solid #e7c76e',borderRadius:9,color:'#e7c76e',fontWeight:950,fontSize:11,textDecoration:'none'}}>OPEN PERMANENT REGISTRY RECORD →</Link><Link href="/federation-authority" style={{padding:'13px 16px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:11,textDecoration:'none'}}>FEDERATION & AUTHORITY →</Link>
     </div>
    </section>
+
+   <section id="sandbox" style={{padding:'34px',margin:'0 0 34px',border:'1px solid #2a555c',borderRadius:22,background:'linear-gradient(135deg,rgba(12,54,61,.30),rgba(4,20,27,.94))',boxShadow:'0 28px 90px rgba(0,0,0,.28)'}}>
+    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#71e7df'}}>THE CONNECTION SANDBOX</div>
+    <h2 style={{fontSize:'clamp(36px,6vw,68px)',letterSpacing:'-.045em',lineHeight:1,margin:'12px 0 18px'}}>LINKED ✓ → CONNECTED ✓ → <span style={{color:'#e7c76e'}}>EXECUTE ?</span></h2>
+    <p style={{fontSize:17,color:'#a9c0c6',lineHeight:1.7,maxWidth:860}}>Same building object. Governed connection. One proposed consequence. The Connection Profile gets the request to the boundary. From there, the public question is simply TA-14.</p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:9,margin:'24px 0'}}>
+     {[['LINKED','BUILDING OBJECT ✓'],['CONNECTION PROFILE','CONNECTED ✓'],['TA-14',sandboxRun?'DETERMINING NOW':'READY'],['CONSEQUENCE',sandboxRun?'HOLD':'?']].map((x,i)=><div key={x[0]} style={{padding:20,borderRadius:12,border:'1px solid '+(i>=2?'#6b5829':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:7,color:i>=2?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
+    </div>
+    <div style={{padding:22,border:'1px solid #214a51',borderRadius:14,background:'#020b0f'}}>
+     <small style={{color:'#8fa9af'}}>PROPOSED ACTION</small><strong style={{display:'block',fontSize:26,margin:'8px 0 16px'}}>Change building setpoint to 72°F.</strong>
+     <button onClick={()=>setSandboxRun(true)} style={{cursor:'pointer',padding:'13px 17px',border:0,borderRadius:9,background:'#71e7df',color:'#031216',fontWeight:950}}>RUN THROUGH TA-14 →</button>
+     {sandboxRun&&<div style={{marginTop:20,padding:20,border:'1px solid #e7c76e',borderRadius:12,background:'rgba(91,65,12,.18)'}}><strong style={{display:'block',fontSize:34,color:'#e7c76e'}}>HOLD</strong><p style={{color:'#d4c7a2',lineHeight:1.7}}>Connection established. Execution authority is not yet established.</p><p style={{color:'#eef7fb',fontWeight:850,lineHeight:1.65}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p></div>}
+    </div>
+    <div style={{marginTop:18,padding:'16px 18px',border:'1px dashed #71e7df',borderRadius:11,textAlign:'center',fontWeight:950,color:'#dffdfa'}}>LINKING IS NOT CONNECTING. CONNECTING IS NOT AUTHORITY TO EXECUTE.</div>
+    <a href="#architecture" style={{display:'inline-block',marginTop:18,color:'#71e7df',fontSize:11,fontWeight:950,textDecoration:'none'}}>EXPLORE HOW TA-14 WORKS ↓</a>
+   </section>
+
+   <div id="architecture"></div>
 
    <GuidedShowroom
     eyebrow="AFA · GUIDED SHOWROOM"
@@ -167,11 +186,8 @@ export default function AFAShowroom(){
      {[
       ['01','CNS/CP','May these parties bind, under what contract and context?'],
       ['02','CONNECTION PROFILE','Minimum required crossing + maximum permitted crossing.'],
-      ['03','AFA','Governs the federation boundary and what authority context may cross.'],
-      ['04','AVP · AUTHORITY PASSPORT v1.0.2','Carries bounded authority context: authority, scope, standing, provenance and constraints.'],
-      ['05','RECEIVING DOMAIN','Received context becomes evidence for local determination, not permission.'],
-      ['06','EABA','Does present authority still stand for this exact consequence now?'],
-      ['07','CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE before protected commit.']
+      ['03','TA-14','Does the proposed consequence have sufficient present evidence, authority and standing to become reality now?'],
+      ['04','CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE before protected commit.']
      ].map((x,i)=><button key={x[0]} onClick={()=>setBoundaryStep(i)} style={{cursor:'pointer',padding:18,textAlign:'left',borderRadius:11,border:i===boundaryStep?'1px solid #e7c76e':'1px solid #214a51',background:i===boundaryStep?'rgba(112,83,18,.2)':'#04151c',color:i===boundaryStep?'#f3d989':'#a7bcc2'}}><small style={{color:'#71e7df',fontWeight:950}}>{x[0]}</small><strong style={{display:'block',margin:'7px 0',fontSize:11}}>{x[1]}</strong><span style={{fontSize:10,lineHeight:1.5}}>{x[2]}</span></button>)}
     </div>
 
@@ -180,20 +196,14 @@ export default function AFAShowroom(){
      <strong style={{display:'block',fontSize:24,color:'#fff',margin:'8px 0'}}>{[
       'CNS/CP establishes the cross-boundary relationship.',
       'The Connection Profile bounds the permitted crossing envelope.',
-      'AFA governs the federation boundary without transferring execution authority.',
-      'AVP v1.0.2 carries the bounded authority context across that boundary; it is not local execution authority.',
-      'The receiving domain owns the next determination.',
-      'EABA tests present execution standing at consequence.',
+      'TA-14 owns the independent consequence determination.',
       'The result governs the protected commit — not the prior relationship.'
      ][boundaryStep]}</strong>
      <p style={{color:'#9fb7be',lineHeight:1.7,marginBottom:0}}>{[
       'TA-14 does not reach backward and re-grade whether CNS/CP legitimately established the relationship. That remains CNS/CP ground.',
-      'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning, evidence and bounded authority context may travel; local lease, local capsule, commit, execution and effect do not become transferable entitlement.',
-      'AFA establishes the rule for the crossing: authority context may travel, while execution authority must be established locally.',
-      'The Authority Passport is the bounded transport object. It can carry relevant authority, scope, standing, provenance, constraints, identity, freshness and revocation context for receiving-domain evaluation. Local lease, local capsule, commit, execution and effect do not ride the Passport.',
-      'Receipt is not consequence. Acceptance is not execution permission. The receiving runtime must establish its own admissibility, authority, continuity, scope and standing.',
-      'EABA asks whether the exact actor, target, evidence, authority, scope, local standing and changed conditions still support this exact attempt now.',
-      'A legitimate crossing can end in HOLD, DENY or ESCALATE without implying that CNS/CP or the Connection Profile failed.'
+      'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning and evidence may travel; local execution entitlement does not.',
+      'TA-14 receives the governed request and supporting context, then independently asks whether this exact proposed consequence has sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW.',
+      'A legitimate connection can end in HOLD, DENY or ESCALATE without implying that CNS/CP or the Connection Profile failed.'
      ][boundaryStep]}</p>
     </div>
 
@@ -212,14 +222,14 @@ export default function AFAShowroom(){
       ]:[
        ['TA-14 → PAE','CHANGE THIS SETPOINT'],
        ['CNS/CP','CONNECTION TERMS'],
-       ['AFA / AVP','AUTHORITY CONTEXT CROSSES'],
-       ['EABA','LOCAL EXECUTION TEST']
+       ['CONNECTION PROFILE','GOVERNED REQUEST CROSSES'],
+       ['TA-14','CONSEQUENCE DETERMINATION']
       ]).map((x,i)=><div key={x[0]} style={{padding:18,borderRadius:11,border:'1px solid '+(reverseDirection&&i===3?'#e7c76e':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:7,color:reverseDirection&&i===3?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
      </div>
      <button onClick={()=>setReverseDirection(v=>!v)} style={{cursor:'pointer',padding:'13px 16px',borderRadius:9,border:'1px solid #71e7df',background:reverseDirection?'#71e7df':'transparent',color:reverseDirection?'#031216':'#71e7df',fontWeight:950}}>{reverseDirection?'RESTORE DATA DIRECTION':'REVERSE THE DIRECTION →'}</button>
      {reverseDirection&&<div style={{marginTop:18,padding:20,border:'1px solid #e7c76e',borderRadius:12,background:'rgba(91,65,12,.2)'}}>
       <strong style={{fontSize:22,color:'#e7c76e'}}>THE GRAPH CAN RECORD THE AGREEMENT. THE GRAPH DOES NOT CREATE THE AGREEMENT.</strong>
-      <p style={{color:'#d4c7a2',lineHeight:1.7,margin:'12px 0 0'}}>CNS/CP addresses whether the governed connection exists and on what terms. AFA governs the federation boundary. AVP carries bounded authority context across it. EABA asks whether the receiving domain establishes authority for this exact consequence now. The receiving domain retains the right to ALLOW, HOLD, DENY or ESCALATE before protected commit.</p>
+      <p style={{color:'#d4c7a2',lineHeight:1.7,margin:'12px 0 0'}}>CNS/CP addresses whether the governed connection exists and on what terms. The Connection Profile carries the governed request to the boundary. TA-14 independently determines whether this exact consequence may become reality now: ALLOW, HOLD, DENY or ESCALATE before protected commit.</p>
      </div>}
      <div style={{display:'grid',gap:7,marginTop:20,padding:'18px 20px',border:'1px dashed #6b5829',borderRadius:12,textAlign:'center',fontWeight:950}}>
       <span style={{color:'#e7c76e'}}>CONNECTION ≠ AUTHORITY</span>
@@ -231,14 +241,14 @@ export default function AFAShowroom(){
     <div style={{marginTop:28,padding:28,border:'1px solid #6b5829',borderRadius:18,background:'linear-gradient(135deg,rgba(74,56,12,.24),rgba(4,20,27,.9))'}}>
      <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#e7c76e'}}>MONDAY LIVE · ONE-FACT DEMONSTRATION</div>
      <h3 style={{fontSize:32,letterSpacing:'-.03em',margin:'10px 0'}}>A legitimate crossing can still produce HOLD.</h3>
-     <p style={{color:'#a9c0c6',lineHeight:1.7,maxWidth:880}}>Start with a legitimate CNS/CP relationship, a valid Connection Profile, and bounded authority context received through AFA. Then change one material condition before commit. Nothing about the crossing has to fail for local consequence authority to disappear.</p>
+     <p style={{color:'#a9c0c6',lineHeight:1.7,maxWidth:880}}>Start with a legitimate CNS/CP relationship and a valid Connection Profile received by TA-14. Then change one material condition before commit. Nothing about the connection has to fail for consequence authority to disappear.</p>
      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:8,margin:'22px 0'}}>
       {[
        ['CNS/CP RELATIONSHIP','LEGITIMATE'],
        ['CONNECTION PROFILE','VALID'],
-       ['AFA CROSSING','ACCEPTED'],
+       ['TA-14 INPUT','RECEIVED'],
        ['LOCAL EVIDENCE',changedCondition?'CHANGED':'CURRENT'],
-       ['EABA RESULT',changedCondition?'HOLD':'ALLOW']
+       ['TA-14 RESULT',changedCondition?'HOLD':'ALLOW']
       ].map((x,i)=><div key={x[0]} style={{padding:18,borderRadius:11,border:'1px solid '+(i===4||i===3&&changedCondition?'#e7c76e':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:7,color:i===4||i===3&&changedCondition?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
      </div>
      <button onClick={()=>setChangedCondition(v=>!v)} style={{cursor:'pointer',padding:'13px 16px',borderRadius:9,border:'1px solid #e7c76e',background:changedCondition?'#e7c76e':'transparent',color:changedCondition?'#071014':'#e7c76e',fontWeight:950}}>{changedCondition?'RESTORE ORIGINAL CONDITION':'CHANGE ONE MATERIAL CONDITION →'}</button>
@@ -246,7 +256,7 @@ export default function AFAShowroom(){
     </div>
 
     <div style={{marginTop:20,padding:'18px 20px',border:'1px dashed #71e7df',borderRadius:12,textAlign:'center',fontWeight:950,color:'#dffdfa',letterSpacing:'.03em'}}>THE CONNECTION PROFILE GOVERNS THE CROSSING. TA-14 GOVERNS WHETHER WHAT CROSSED MAY BECOME CONSEQUENCE.</div>
-    <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:18}}><Link href="/execution-authority-boundary-architecture#lab" style={{padding:'12px 15px',borderRadius:9,background:'#71e7df',color:'#031216',fontWeight:950,fontSize:10,textDecoration:'none'}}>OPEN EABA CONSEQUENCE LAB →</Link><Link href="/federation-authority" style={{padding:'12px 15px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:10,textDecoration:'none'}}>OPEN FEDERATION & AUTHORITY →</Link></div>
+    <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:18}}><Link href="/registry/ta-14-admissible-execution-architecture" style={{padding:'12px 15px',borderRadius:9,background:'#71e7df',color:'#031216',fontWeight:950,fontSize:10,textDecoration:'none'}}>EXPLORE TA-14 ARCHITECTURE →</Link><Link href="/federation-authority" style={{padding:'12px 15px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:10,textDecoration:'none'}}>OPEN FEDERATION & AUTHORITY →</Link></div>
    </section>
 
    <section style={{padding:34,border:'1px solid #24555d',borderRadius:20,background:'linear-gradient(135deg,rgba(17,69,76,.35),rgba(4,20,27,.85))',marginTop:10}}>
