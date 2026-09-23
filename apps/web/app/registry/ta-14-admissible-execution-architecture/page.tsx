@@ -194,6 +194,62 @@ export default function ArchitectureRegistryBridgePage() {
         </div>
       </section>
 
+      <section className="section shell architecture-home">
+        <div className="section-heading">
+          <p className="eyebrow">WHAT IS TA-14?</p>
+          <h2>Something wants to happen. TA-14 determines whether it may happen now.</h2>
+          <p className="big-question">Does this proposed consequence have sufficient <strong>Admissible Evidence</strong>, <strong>Applicable Authority</strong>, and <strong>Established Standing</strong> to become reality <strong>NOW?</strong></p>
+        </div>
+
+        <div className="chain-map">
+          {['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'].map((x,i)=><div className="chain-node" key={x}><small>{String(i+1).padStart(2,'0')}</small><strong>{x}</strong></div>)}
+        </div>
+
+        <div className="section-heading architecture-heading">
+          <p className="eyebrow">ONE ARCHITECTURE · CONNECTED BOUNDARIES</p>
+          <h2>Different architectures answer different questions along the same journey.</h2>
+          <p>The names matter less than the jobs. Each architecture protects a different boundary before a proposed consequence becomes real.</p>
+        </div>
+
+        <div className="architecture-grid">
+          {[
+            ['CONNECTION PROFILE','THE HANDOFF','Are the parties legitimately connected, and what may cross between them?','/admissible-federation-architecture#cnscp-eaba'],
+            ['AFA','THE CROSSING','What bounded authority context may cross between independently governed domains?','/admissible-federation-architecture'],
+            ['AVP','THE PASSPORT','What authority context is being presented, with what scope, provenance, and constraints?','/federation-authority/foundations'],
+            ['ACA','THE COMPUTATION','May this computation be relied upon as it moves toward consequence?','/registry/TA-14-AIGR-000039'],
+            ['EABA','THE COMMIT BOUNDARY','Has execution authority been established locally for this exact consequence now?','/execution-authority-boundary-architecture'],
+            ['AEA','THE WHOLE JOURNEY','Does the proposed consequence have enough evidence, authority, and standing to become reality now?','#record'],
+          ].map((x)=><Link href={x[3]} className="architecture-card" key={x[0]}><small>{x[1]}</small><h3>{x[0]}</h3><p>{x[2]}</p><b>EXPLORE →</b></Link>)}
+        </div>
+
+        <div className="consequence-lab">
+          <p className="eyebrow">ONE QUESTION · MANY CONSEQUENCES</p>
+          <h2>The thing being governed can change. The governing question does not.</h2>
+          <div className="consequence-grid">
+            {[
+              ['BUILDING','Change the building setpoint to 72°F.'],
+              ['AI AGENT','Let the agent perform the proposed action.'],
+              ['FINANCIAL','Release the proposed payment.'],
+              ['INFRASTRUCTURE','Change the protected operating state.'],
+            ].map((x)=><div key={x[0]}><small>{x[0]}</small><strong>{x[1]}</strong><span>→ TA-14 → ALLOW · HOLD · DENY · ESCALATE</span></div>)}
+          </div>
+          <p className="consequence-line">The question is not whether the system <em>can</em> execute. The question is whether execution is <strong>admissible now.</strong></p>
+        </div>
+
+        <div className="proof-doors">
+          <div>
+            <p className="eyebrow">PROVE IT</p>
+            <h2>Don't just read the architecture. Test it.</h2>
+            <p>Open public examinations and showrooms where boundaries, changed conditions, evidence, and consequences can be inspected.</p>
+          </div>
+          <div className="proof-actions">
+            <Link href="/admissible-federation-architecture">RUN THE FEDERATION SANDBOX →</Link>
+            <Link href="/registry/ta-14-admissible-execution-architecture/showcase/cross-architecture-revalidation">OPEN FOUNDING CROSS-ARCHITECTURE SHOWCASE →</Link>
+            <Link href="/ai-governance/admissible-architecture">ENTER ACA + AEA SHOWROOM →</Link>
+          </div>
+        </div>
+      </section>
+
       <section id="sections" className="section shell">
         <div className="section-heading">
           <p className="eyebrow">COMPLETE REGISTRY RECORD</p>
@@ -314,6 +370,37 @@ export default function ArchitectureRegistryBridgePage() {
             Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
             "Segoe UI", sans-serif;
         }
+
+        .architecture-home { padding-top: 84px; }
+        .big-question { margin-top: 24px; padding: 22px; border: 1px solid rgba(242,191,109,.34); border-radius: 16px; background: rgba(242,191,109,.06); font-size: clamp(18px,2.2vw,27px) !important; line-height: 1.55 !important; color: #eaf6ff !important; }
+        .chain-map { display:grid; grid-template-columns:repeat(8,1fr); gap:7px; margin:34px 0 88px; }
+        .chain-node { padding:18px 10px; border:1px solid rgba(109,216,255,.28); border-radius:12px; background:rgba(5,25,39,.72); min-width:0; }
+        .chain-node small { display:block; color:var(--blue); font-size:9px; margin-bottom:7px; }
+        .chain-node strong { font-size:11px; letter-spacing:.04em; }
+        .architecture-heading { margin-top: 20px; }
+        .architecture-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:28px; }
+        .architecture-card { padding:24px; border:1px solid var(--line); border-radius:16px; background:rgba(5,19,31,.76); transition:.2s ease; }
+        .architecture-card:hover { transform:translateY(-3px); border-color:rgba(109,216,255,.5); }
+        .architecture-card small { color:var(--gold); font-size:9px; font-weight:900; letter-spacing:.14em; }
+        .architecture-card h3 { margin:9px 0; font-size:27px; }
+        .architecture-card p { color:var(--muted); line-height:1.65; min-height:78px; }
+        .architecture-card b { color:var(--blue); font-size:10px; }
+        .consequence-lab { margin-top:72px; padding:34px; border:1px solid rgba(242,191,109,.28); border-radius:22px; background:linear-gradient(135deg,rgba(65,45,8,.16),rgba(4,18,29,.86)); }
+        .consequence-lab h2 { max-width:850px; font-size:clamp(30px,4vw,50px); margin:10px 0 24px; }
+        .consequence-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
+        .consequence-grid div { padding:19px; border:1px solid var(--line); border-radius:12px; background:#06111d; }
+        .consequence-grid small,.consequence-grid strong,.consequence-grid span { display:block; }
+        .consequence-grid small { color:var(--blue); font-size:9px; font-weight:900; }
+        .consequence-grid strong { margin:8px 0 18px; line-height:1.45; }
+        .consequence-grid span { color:var(--gold); font-size:9px; font-weight:800; line-height:1.5; }
+        .consequence-line { margin:24px 0 0; font-size:18px; line-height:1.65; }
+        .proof-doors { display:grid; grid-template-columns:1fr 1fr; gap:28px; margin:70px 0 10px; padding:32px; border:1px solid var(--line); border-radius:20px; background:rgba(5,19,31,.72); }
+        .proof-doors h2 { font-size:clamp(30px,4vw,48px); margin:8px 0; }
+        .proof-doors p { color:var(--muted); line-height:1.65; }
+        .proof-actions { display:flex; flex-direction:column; gap:9px; justify-content:center; }
+        .proof-actions a { padding:16px; border:1px solid rgba(109,216,255,.28); border-radius:10px; color:var(--blue); font-size:11px; font-weight:900; }
+        @media(max-width:900px){ .chain-map{grid-template-columns:repeat(4,1fr)} .architecture-grid{grid-template-columns:1fr 1fr}.consequence-grid{grid-template-columns:1fr 1fr}.proof-doors{grid-template-columns:1fr} }
+        @media(max-width:560px){ .chain-map{grid-template-columns:1fr 1fr}.architecture-grid,.consequence-grid{grid-template-columns:1fr} }
 
         .background {
           position: fixed;
