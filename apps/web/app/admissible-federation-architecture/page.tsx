@@ -157,7 +157,7 @@ export default function AFAShowroom(){
     <div id="runtime" style={{marginTop:20,padding:18,border:'1px solid #5b4d2a',borderRadius:12,background:'rgba(42,32,8,.25)',color:'#d8c98f',fontSize:12,lineHeight:1.65}}><strong>CLAIM BOUNDARY:</strong> AFA v1.0-RC1 does not claim completed CNS/CP registry publication, proven external interoperability, TA14_RECOGNIZED implementation, transfer of execution authority, or completed runtime/CI execution evidence.</div>
    </section>
 
-   <section id="cnscp-eaba-seam" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
+   <section id="cnscp-eaba" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>CNS/CP × TA-14 · THE HANDOFF</div>
     <h2 style={{fontSize:'clamp(34px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>The Connection Profile stops here.<br/><span style={{color:'#e7c76e'}}>TA-14 consequence determination begins here.</span></h2>
     <p style={{color:'#a9c0c6',fontSize:16,lineHeight:1.75,maxWidth:940}}>Two independently developed architectures can meet at one boundary without either absorbing the other. CNS/CP governs whether parties may bind across an organizational boundary and the Connection Profile defines the <strong style={{color:'#eef7fb'}}>permitted crossing envelope</strong>: both the minimum that must cross for the relationship to be meaningful and the maximum that may cross without importing local execution entitlement. TA-14 does not re-determine that relationship. The receiving TA-14-governed domain independently determines whether what arrived has sufficient present standing to become protected consequence.</p>
