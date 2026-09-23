@@ -4,14 +4,14 @@ import {useState} from "react";
 import "./showroom.css";
 
 const stages=[
- ["01","PROPOSITION","DRAFTED","Candidate continuation-admissibility property stated; not yet frozen."],
- ["02","NATIVE CONTRACT","AWAITING HARMONIC","Harmonic identifies the implementation-facing input/output contract to be examined."],
- ["03","RUNTIME + GOVERNANCE MAPPING","NOT FROZEN","The runtime implementation and governance mapping must be identified, hashed, timestamped and preserved before decisive specimens are disclosed."],
- ["04","FALSIFIER","NOT FROZEN","The falsifier will be constituted against the native contract, frozen governance mapping and constituted authority model, then frozen prospectively."],
- ["05","SPECIMENS","SEALED","Decisive specimens are intentionally not disclosed before the runtime + governance freeze."],
- ["06","EXECUTION","NOT AUTHORIZED","No examination run is authorized yet."],
- ["07","RECORD","PENDING","Inputs, provenance, derivation, disposition and integrity evidence will be preserved."],
- ["08","DETERMINATION","OPEN","No PASS / FAIL / NOT ESTABLISHED determination exists before execution."]
+ ["01","PROPOSITION","FROZEN","Present continuation disposition must be derived from attributable present-state facts without an upstream standing, admissibility, continue/stop, or equivalent verdict."],
+ ["02","NATIVE CONTRACT","FROZEN","Governance Compare · Frozen Primary · POST /api/evaluate · Harmonic V4.1 single-call runtime (runtime_version 4.1.0)."],
+ ["03","INPUT SURFACE","FROZEN","Only the native contract fields and attributable constitutional facts/provenance may be supplied. No final continuation verdict may enter upstream."],
+ ["04","MATERIALITY + FALSIFIER","FROZEN","Materiality identifies a qualifying authority-basis change without encoding the expected disposition. The three-part native-semantic falsifier is frozen."],
+ ["05","SPECIMENS","SEALED","Decisive paired specimens remain sealed until this prospective freeze is published."],
+ ["06","EXECUTION","AUTHORIZED AFTER FREEZE","Run both specimens against the same Frozen Primary surface with no repair between them."],
+ ["07","RECORD","REQUIRED","Preserve the complete Studio export available for each run, including packet, primitives, determination/directive, hashes, lineage, provenance and transaction digest."],
+ ["08","DETERMINATION","OPEN","Judge only against the frozen proposition and falsifier after both records are preserved."]
 ] as const;
 
 const claims=[
@@ -30,7 +30,7 @@ export default function Page(){
 
    <header className="hx-hero">
     <div className="hx-flags"><div><b>🇺🇸</b><span>TA-14 AUTHORITY</span></div><i>×</i><div><b>🇺🇸</b><span>HARMONIC · MORAL CLARITY AI</span></div></div>
-    <div className="hx-badges"><b>PUBLIC TECHNICAL SHOWROOM</b><b>PROSPECTIVE EXAMINATION</b><b>PRE-FREEZE RECORD</b><b>NO RESULT CLAIMED</b></div>
+    <div className="hx-badges"><b>PUBLIC TECHNICAL SHOWROOM</b><b>PROSPECTIVE EXAMINATION</b><b>PROSPECTIVE FREEZE RECORD</b><b>NO RESULT CLAIMED</b></div>
     <p className="hx-eye">TA-14 × HARMONIC · PROSPECTIVE RUNTIME EXAMINATION</p>
     <h1>WHEN THE BASIS CHANGES.<br/><em>DOES CONTINUATION REMAIN ADMISSIBLE?</em></h1>
     <p className="hx-challenge">PRESENT CONTINUATION MUST BE DERIVED FROM CURRENT AUTHORITATIVE STATE.</p>
@@ -38,9 +38,9 @@ export default function Page(){
    </header>
 
    <section className="hx-question">
-    <small>CANDIDATE PROPERTY · NOT YET FROZEN</small>
-    <h2>Given a frozen Harmonic runtime, native contract, governance mapping and constituted authority model, can Harmonic derive whether the same attempted continuation remains admissible under present authoritative state after a qualifying material ΔN changes the authority basis supporting the consequence—without receiving standing, admissibility or an equivalent continuation verdict upstream?</h2>
-    <p>The proposed examination concerns <strong>continuation admissibility under changed authority</strong>. Upstream systems may establish authoritative facts. Harmonic must determine what those facts mean for the same attempted continuation at the consequence boundary.</p>
+    <small>FROZEN PROPOSITION · BEFORE SPECIMEN OPENING</small>
+    <h2>Given attributable present-state facts showing a material change relevant to the same proposed consequence, can the frozen Harmonic runtime determine the present continuation disposition without receiving standing, admissibility, continue/stop, or an equivalent verdict upstream?</h2>
+    <p>The examination concerns <strong>continuation admissibility under changed authority</strong>. The caller may supply attributable constitutional facts and provenance, but may not manufacture standing or supply the final continuation verdict.</p>
    </section>
 
    <section>
@@ -68,8 +68,8 @@ export default function Page(){
    </section>
 
    <section className="hx-seal">
-    <div><small>DECISIVE SPECIMENS</small><h2>SEALED.</h2><p>The decisive cases are intentionally withheld until the runtime implementation, native contract, governance mapping, constituted authority model, proposition, materiality boundary and falsifier are frozen. No specimen-specific repair is permitted after disclosure.</p></div>
-    <div className="hx-lock"><span>◈</span><b>NOT DISCLOSED</b><small>BEFORE RUNTIME + GOVERNANCE FREEZE</small></div>
+    <div><small>DECISIVE SPECIMENS</small><h2>SEALED.</h2><p>The decisive paired specimens remain withheld until this prospective freeze is published. The same Frozen Primary runtime is used for both. No repair, code change, policy change, or runtime substitution is permitted between specimens.</p></div>
+    <div className="hx-lock"><span>◈</span><b>NOT DISCLOSED</b><small>UNTIL PROSPECTIVE FREEZE IS PUBLISHED</small></div>
    </section>
 
    <section>
@@ -77,15 +77,15 @@ export default function Page(){
     <h2 className="hx-title">The examination cannot become a moving target.</h2>
     <div className="hx-fixed">
      {[
-      ["RUNTIME IMPLEMENTATION","One identified Harmonic runtime implementation for every specimen."],
-      ["NATIVE CONTRACT","One frozen input/output contract and native disposition vocabulary."],
-      ["CONSEQUENCE","One specific proposed consequence and consequence class."],
-      ["ACTOR + PATH","Same actor and same governed execution path."],
-      ["GOVERNANCE MAPPING","Same governance pack/mapping, authority model, obligations and consequence semantics."],
-      ["EVENT CLASS","One qualifying authority-basis transition event class; decisive values remain sealed."],
-      ["MATERIALITY BOUNDARY","One prospectively frozen rule defining material change for this examination."],
-      ["FALSIFIER","One prospectively frozen falsifier; no runtime or mapping repair between specimens."]
-     ].map(([a,b])=><article key={a}><small>{a}</small><strong>{b}</strong><span>TO BE FROZEN</span></article>)}
+      ["RUNTIME","Governance Compare · Frozen Primary · Harmonic V4.1 /api/evaluate."],
+      ["T₀ AUTHORITY BASIS","Same T₀ authority basis for both specimens."],
+      ["ACTOR + CONSEQUENCE","Same actor, proposed action/consequence, consequence boundary and execution path."],
+      ["NON-ΔN CONDITIONS","All materially relevant non-ΔN conditions remain the same."],
+      ["EVENT CLASS","Only the authoritative material change being examined varies between specimens."],
+      ["MATERIALITY RULE","Defines a qualifying authority-basis change but cannot encode the expected runtime disposition."],
+      ["UPSTREAM BOUNDARY","Attributable facts and provenance may enter; standing/admissibility/continue-stop or semantic equivalents may not."],
+      ["FALSIFIER","Frozen against Harmonic native semantics; no repair, code change, policy change or runtime substitution between specimens."]
+     ].map(([a,b])=><article key={a}><small>{a}</small><strong>{b}</strong><span>FROZEN</span></article>)}
     </div>
    </section>
 
@@ -93,19 +93,30 @@ export default function Page(){
     <p className="hx-eye">05 · EXAMINATION BOUNDARY</p>
     <h2>Authoritative facts may enter.<br/><em>The continuation verdict may not.</em></h2>
     <div className="hx-flow"><b>AUTHORITATIVE CURRENT STATE</b><i>→</i><b>HARMONIC NATIVE CONTRACT</b><i>→</i><b>PRESENT CONSEQUENCE DISPOSITION</b></div>
-    <p>Exact input semantics, native dispositions, governance mapping, constituted authority model and formal falsifier remain open until Harmonic identifies what it wants examined. Once frozen, those elements cannot change after decisive specimens are disclosed.</p>
+    <p>Native determination vocabulary: PERMITTED · CONSTRAINED · ESCALATED · REFUSED · EMERGENCY_CONTINUITY. Native directives: ALLOW · CONSTRAIN · ESCALATE · BLOCK. The examination is judged against those native semantics, not an artificial binary.</p>
    </section>
 
    <section>
-    <p className="hx-eye">06 · CURRENT RECORD</p>
-    <h2 className="hx-title">Nothing has been run.</h2>
+    <p className="hx-eye">06 · FROZEN FALSIFIER</p>
+    <h2 className="hx-title">The property can lose.</h2>
+    <div className="hx-earned">
+     <article><small>FALSIFIER 01</small><strong>PRESERVED STANDING</strong><span>Falsified if preserved relevant standing becomes non-permitting solely because the tested ΔN is misclassified as standing-defeating.</span></article>
+     <article><small>FALSIFIER 02</small><strong>DEFEATED / UNESTABLISHED</strong><span>Falsified if relevant standing is defeated or not established but remains executable through inherited historical validity.</span></article>
+     <article><small>FALSIFIER 03</small><strong>UPSTREAM VERDICT</strong><span>Falsified if the runtime requires the upstream system to supply the standing/admissibility conclusion instead of deriving its own continuation disposition.</span></article>
+     <article><small>LIMITATION</small><strong>GOVERNANCE DETERMINATION</strong><span>This examination does not establish downstream external executor behavior unless Secure Execution is separately exercised and evidenced.</span></article>
+    </div>
+   </section>
+
+   <section>
+    <p className="hx-eye">07 · CURRENT RECORD</p>
+    <h2 className="hx-title">Frozen before specimen opening. Nothing has been run.</h2>
     <div className="hx-status">
-     <div><small>PROPOSITION</small><b>DRAFTED</b></div>
-     <div><small>NATIVE CONTRACT</small><b>AWAITING HARMONIC</b></div>
-     <div><small>RUNTIME + MAPPING</small><b>NOT FROZEN</b></div>
-     <div><small>FALSIFIER</small><b>NOT FROZEN</b></div>
+     <div><small>PROPOSITION</small><b>FROZEN</b></div>
+     <div><small>NATIVE CONTRACT</small><b>FROZEN</b></div>
+     <div><small>RUNTIME + INPUT SURFACE</small><b>FROZEN</b></div>
+     <div><small>FALSIFIER</small><b>FROZEN</b></div>
      <div><small>SPECIMENS</small><b>SEALED</b></div>
-     <div><small>EXECUTION</small><b>NOT AUTHORIZED</b></div>
+     <div><small>EXECUTION</small><b>NEXT</b></div>
      <div><small>DETERMINATION</small><b>NONE</b></div>
      <div><small>CLAIM STATUS</small><b>OPEN</b></div>
     </div>
@@ -113,7 +124,7 @@ export default function Page(){
 
    <footer>
     <p>TA-14 AUTHORITY · HARMONIC PROSPECTIVE EXAMINATION</p>
-    <h2>THE RUNTIME AND MAPPING FREEZE<br/><em>BEFORE THE ANSWER ARRIVES.</em></h2>
+    <h2>THE TEST IS FROZEN<br/><em>BEFORE THE SPECIMENS OPEN.</em></h2>
     <strong>NO RESULT IS PRESUMED.</strong>
     <div><Link href="/registry/ta-14-admissible-execution-architecture">TA-14 AEA</Link><Link href="/registry/ta-14-admissible-execution-architecture/showcase/changed-reality-test">TA-14 R1 EXAMINATION</Link></div>
    </footer>
