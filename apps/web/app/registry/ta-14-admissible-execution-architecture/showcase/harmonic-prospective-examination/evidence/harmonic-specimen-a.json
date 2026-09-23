@@ -1,0 +1,84 @@
+{
+  "schema": "TA-14 Harmonic prospective examination specimen v1",
+  "examination": "TA-14 x Harmonic prospective runtime examination",
+  "synthetic_examination_record": true,
+  "runtime_boundary": {
+    "surface": "Harmonic Governance Compare - Frozen Primary",
+    "endpoint": "POST /api/evaluate",
+    "native_runtime_contract": "Harmonic V4.1 single-call runtime",
+    "runtime_version": "4.1.0"
+  },
+  "packet": {
+    "response": "Synthetic examination packet; derive present continuation disposition from attributable facts only.",
+    "consequence_level": "high",
+    "requested_action": {
+      "action_id": "COMMIT-75000",
+      "actor_id": "A-17",
+      "action": "approve procurement commitment",
+      "project": "Project Orion",
+      "amount_usd": 75000
+    },
+    "secure_execution": false,
+    "understanding_state": {
+      "authority_basis_id": "AUTH-ORION-A17",
+      "authority_type": "delegated procurement approval"
+    },
+    "declared_reality": {
+      "project": "Project Orion",
+      "requested_commitment_usd": 75000
+    },
+    "observed_reality": {
+      "project": "Project Orion",
+      "requested_commitment_usd": 75000
+    },
+    "authority_chain": {
+      "authority_id": "AUTH-ORION-A17",
+      "actor_id": "A-17",
+      "scope": "Project Orion procurement commitments",
+      "t0_ceiling_usd": 100000,
+      "effective_through": "2026-12-31"
+    },
+    "revocation_state": {
+      "revoked": false
+    },
+    "present_state_provenance": {
+      "source_id": "TA14-SYNTHETIC-AUTHORITY-REGISTER",
+      "source_type": "synthetic examination authority register",
+      "attributable": true
+    },
+    "obligations": {
+      "same_across_specimens": true,
+      "additional_obligation_change": false
+    },
+    "consequence_profile": {
+      "type": "procurement commitment",
+      "amount_usd": 75000,
+      "project": "Project Orion"
+    },
+    "safeguards": {
+      "same_across_specimens": true
+    },
+    "continuity_checks": {
+      "same_actor": true,
+      "same_requested_action": true,
+      "same_consequence_boundary": true,
+      "same_execution_path": true
+    },
+    "system_context": {
+      "execution_path": "A-17 -> governed commit -> Project Orion procurement commitment",
+      "consequence_boundary": "commit of procurement approval"
+    },
+    "metadata": {
+      "purpose": "prospective paired-specimen examination",
+      "no_upstream_verdict": true
+    },
+    "packet_id": "TA14-HARMONIC-SPECIMEN-A",
+    "state_transition": {
+      "event_class": "authoritative authority-scope ceiling amendment",
+      "authority_id": "AUTH-ORION-A17",
+      "prior_ceiling_usd": 100000,
+      "current_ceiling_usd": 90000,
+      "all_other_delegation_terms_unchanged": true
+    }
+  }
+}
