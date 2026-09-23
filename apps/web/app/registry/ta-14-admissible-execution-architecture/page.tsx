@@ -211,15 +211,33 @@ export default function ArchitectureRegistryBridgePage() {
           <p>The names matter less than the jobs. Each architecture protects a different boundary before a proposed consequence becomes real.</p>
         </div>
 
-        <div className="architecture-grid">
-          {[
-            ['CONNECTION PROFILE','THE HANDOFF','Are the parties legitimately connected, and what may cross between them?','/admissible-federation-architecture#cnscp-eaba'],
-            ['AFA','THE CROSSING','What bounded authority context may cross between independently governed domains?','/admissible-federation-architecture'],
-            ['AVP','THE PASSPORT','What authority context is being presented, with what scope, provenance, and constraints?','/federation-authority/foundations'],
-            ['ACA','THE COMPUTATION','May this computation be relied upon as it moves toward consequence?','/registry/TA-14-AIGR-000039'],
-            ['EABA','THE COMMIT BOUNDARY','Has execution authority been established locally for this exact consequence now?','/execution-authority-boundary-architecture'],
-            ['AEA','THE WHOLE JOURNEY','Does the proposed consequence have enough evidence, authority, and standing to become reality now?','#record'],
-          ].map((x)=><Link href={x[3]} className="architecture-card" key={x[0]}><small>{x[1]}</small><h3>{x[0]}</h3><p>{x[2]}</p><b>EXPLORE →</b></Link>)}
+        <div className="journey">
+          <div className="journey-track">
+            {[
+              ['01','CONNECTED','CONNECTION PROFILE','Who may talk, and what may cross?'],
+              ['02','CROSSING','AFA','What authority context may cross domains?'],
+              ['03','CONTEXT','AVP','What authority, scope, provenance, and constraints arrived?'],
+              ['04','COMPUTATION','ACA','May this computation be relied upon as it moves toward consequence?'],
+              ['05','COMMIT','EABA','Is execution authority established here, for this action, now?'],
+              ['06','CONSEQUENCE','AEA','ALLOW · HOLD · DENY · ESCALATE'],
+            ].map((x,i)=><div className="journey-step" key={x[0]}>
+              <div className="journey-number">{x[0]}</div>
+              <small>{x[1]}</small>
+              <strong>{x[2]}</strong>
+              <p>{x[3]}</p>
+              {i<5&&<span className="journey-arrow">→</span>}
+            </div>)}
+          </div>
+          <div className="journey-umbrella">
+            <small>TA-14 · THE GOVERNING QUESTION ACROSS THE JOURNEY</small>
+            <strong>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</strong>
+          </div>
+          <div className="journey-actions">
+            <Link href="/admissible-federation-architecture">EXPLORE AFA + CONNECTION SANDBOX →</Link>
+            <Link href="/federation-authority/foundations">EXPLORE AVP →</Link>
+            <Link href="/registry/TA-14-AIGR-000039">EXPLORE ACA →</Link>
+            <Link href="/execution-authority-boundary-architecture">EXPLORE EABA →</Link>
+          </div>
         </div>
 
         <div className="consequence-lab">
@@ -378,13 +396,19 @@ export default function ArchitectureRegistryBridgePage() {
         .chain-node small { display:block; color:var(--blue); font-size:9px; margin-bottom:7px; }
         .chain-node strong { font-size:11px; letter-spacing:.04em; }
         .architecture-heading { margin-top: 20px; }
-        .architecture-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin-top:28px; }
-        .architecture-card { padding:24px; border:1px solid var(--line); border-radius:16px; background:rgba(5,19,31,.76); transition:.2s ease; }
-        .architecture-card:hover { transform:translateY(-3px); border-color:rgba(109,216,255,.5); }
-        .architecture-card small { color:var(--gold); font-size:9px; font-weight:900; letter-spacing:.14em; }
-        .architecture-card h3 { margin:9px 0; font-size:27px; }
-        .architecture-card p { color:var(--muted); line-height:1.65; min-height:78px; }
-        .architecture-card b { color:var(--blue); font-size:10px; }
+        .journey { margin-top:30px; padding:30px; border:1px solid var(--line); border-radius:22px; background:rgba(4,18,29,.78); }
+        .journey-track { display:grid; grid-template-columns:repeat(6,1fr); gap:8px; }
+        .journey-step { position:relative; padding:20px 14px; border:1px solid rgba(109,216,255,.22); border-radius:13px; background:#06111d; min-width:0; }
+        .journey-number { color:var(--blue); font-size:9px; font-weight:900; margin-bottom:14px; }
+        .journey-step small { display:block; color:var(--gold); font-size:8px; font-weight:900; letter-spacing:.12em; }
+        .journey-step strong { display:block; font-size:20px; margin:7px 0 9px; }
+        .journey-step p { color:var(--muted); font-size:11px; line-height:1.55; margin:0; }
+        .journey-arrow { position:absolute; right:-10px; top:48%; z-index:2; width:20px; height:20px; border-radius:50%; background:#0b2637; color:var(--blue); text-align:center; line-height:18px; font-weight:900; }
+        .journey-umbrella { margin-top:14px; padding:22px; border:1px solid rgba(242,191,109,.36); border-radius:13px; background:rgba(242,191,109,.06); }
+        .journey-umbrella small { display:block; color:var(--gold); font-size:9px; font-weight:900; letter-spacing:.12em; margin-bottom:9px; }
+        .journey-umbrella strong { font-size:clamp(17px,2vw,24px); line-height:1.5; }
+        .journey-actions { display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; }
+        .journey-actions a { padding:11px 13px; border:1px solid rgba(109,216,255,.24); border-radius:9px; color:var(--blue); font-size:9px; font-weight:900; }
         .consequence-lab { margin-top:72px; padding:34px; border:1px solid rgba(242,191,109,.28); border-radius:22px; background:linear-gradient(135deg,rgba(65,45,8,.16),rgba(4,18,29,.86)); }
         .consequence-lab h2 { max-width:850px; font-size:clamp(30px,4vw,50px); margin:10px 0 24px; }
         .consequence-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:9px; }
@@ -399,8 +423,8 @@ export default function ArchitectureRegistryBridgePage() {
         .proof-doors p { color:var(--muted); line-height:1.65; }
         .proof-actions { display:flex; flex-direction:column; gap:9px; justify-content:center; }
         .proof-actions a { padding:16px; border:1px solid rgba(109,216,255,.28); border-radius:10px; color:var(--blue); font-size:11px; font-weight:900; }
-        @media(max-width:900px){ .chain-map{grid-template-columns:repeat(4,1fr)} .architecture-grid{grid-template-columns:1fr 1fr}.consequence-grid{grid-template-columns:1fr 1fr}.proof-doors{grid-template-columns:1fr} }
-        @media(max-width:560px){ .chain-map{grid-template-columns:1fr 1fr}.architecture-grid,.consequence-grid{grid-template-columns:1fr} }
+        @media(max-width:900px){ .chain-map{grid-template-columns:repeat(4,1fr)} .journey-track{grid-template-columns:repeat(2,1fr)} .journey-arrow{display:none}.consequence-grid{grid-template-columns:1fr 1fr}.proof-doors{grid-template-columns:1fr} }
+        @media(max-width:560px){ .chain-map{grid-template-columns:1fr 1fr}.journey-track,.consequence-grid{grid-template-columns:1fr} }
 
         .background {
           position: fixed;
