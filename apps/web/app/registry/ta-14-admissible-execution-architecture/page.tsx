@@ -144,34 +144,32 @@ export default function ArchitectureRegistryBridgePage() {
           <span>ACTIVE</span>
         </div>
 
-        <p className="eyebrow">ONE ARCHITECTURE • ONE PUBLIC RECORD • EVERY SECTION CONNECTED</p>
+        <p className="eyebrow">TA-14 · THE BOUNDARY BEFORE CONSEQUENCE</p>
 
         <h1>
-          TA-14 Admissible
-          <span>Execution Architecture</span>
+          Something wants to happen.
+          <span>Should it become reality now?</span>
         </h1>
 
         <p className="hero-copy">
-          This is the public bridge into the complete founding Registry record.
-          Every completed architecture page is connected below so the entire
-          record can be opened, reviewed, shared, and challenged online.
+          TA-14 governs the boundary between a proposed consequence and reality.
+          A system may be connected, capable, informed, and ready without yet
+          having what is required to execute.
         </p>
 
         <div className="hero-actions">
-          <Link href="/ai-governance/admissible-architecture" className="button button-primary">
-            Enter the ACA + AEA Showroom
-            <span aria-hidden="true">→</span>
-          </Link>
-
-          <a href="#sections" className="button button-primary">
-            Open the Complete Record
+          <a href="#architecture-story" className="button button-primary">
+            See How TA-14 Works
             <span aria-hidden="true">↓</span>
           </a>
-
-          <Link href="/registry" className="button button-secondary">
-            Return to Registry
-            <span aria-hidden="true">←</span>
+          <Link href="/admissible-federation-architecture" className="button button-primary">
+            Run the Sandbox
+            <span aria-hidden="true">→</span>
           </Link>
+          <a href="#sections" className="button button-secondary">
+            Inspect the Permanent Record
+            <span aria-hidden="true">↓</span>
+          </a>
         </div>
 
         <div className="identity-strip">
@@ -194,7 +192,7 @@ export default function ArchitectureRegistryBridgePage() {
         </div>
       </section>
 
-      <section className="section shell architecture-home">
+      <section id="architecture-story" className="section shell architecture-home">
         <div className="section-heading">
           <p className="eyebrow">WHAT IS TA-14?</p>
           <h2>Something wants to happen. TA-14 determines whether it may happen now.</h2>
