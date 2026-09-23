@@ -30,7 +30,7 @@ export default function Page(){
  const verdict=!threshold||!continuity||!authority||!standing||changed?'HOLD':'ALLOW';
  const why=!threshold?'No benchmark exceedance is established for this bounded proposition. The proposed consequence remains on HOLD.':!continuity?'Evidence continuity is broken. Sufficient Admissible Evidence has not been established for this consequence now.':changed?'Reality has materially changed. Prior evidence, authority and standing cannot be silently carried forward; revalidation is required.':!authority?'The environmental condition may be supported, but Applicable Authority for this proposed consequence has not been established.':!standing?'Applicable Authority alone is not enough. Established Standing for this actor, scope, place and proposed consequence has not been established.':'For this bounded demonstration, Admissible Evidence, Applicable Authority and Established Standing are all established and current. The determination is ALLOW; execution remains attributable to the authorized actor.';
  return <main className="p"><div className="s">
-  <nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/global-institutional-engagement/showrooms">GLOBAL SHOWROOMS</Link><Link href="/global-institutional-engagement">GLOBAL ENGAGEMENT</Link></nav>
+  <nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/showrooms">CLASSIFIED SHOWROOMS</Link><Link href="/global-institutional-engagement">GLOBAL ENGAGEMENT</Link></nav>
   <header>
    <p className="eye">PUBLIC INTEROPERABILITY SHOWROOM · GOOD-FAITH TECHNICAL EXAMINATION</p>
    <h1>THE BENCHMARK IS NOT<br/><em>THE EXECUTION.</em></h1>
