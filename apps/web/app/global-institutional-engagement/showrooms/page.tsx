@@ -5,6 +5,7 @@ const WorldReturn=()=> <div style={{padding:'12px 18px',borderBottom:'1px solid 
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
 
 const countries=[
+{code:'GA',flag:'🇬🇦',country:'GABONESE REPUBLIC',institution:'Conseil National Climat · Secrétariat Permanent',status:'SUBSTANTIVE CNC REPLY RECEIVED · TECHNICAL DIALOGUE PREPARATION',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/gabon'},
 {code:'EE',flag:'🇪🇪',country:'REPUBLIC OF ESTONIA',institution:'Estonian Environment Agency · EKUK · Ministry of Climate',status:'INSTITUTIONAL REFERRAL RECEIVED · TECHNICAL SEAM IDENTIFIED',language:'ESTONIAN + ENGLISH',href:'/global-institutional-engagement/estonia'},
 {code:'UAE',flag:'🇦🇪',country:'UNITED ARAB EMIRATES',institution:'Ministry of Climate Change and Environment',status:'MOCCAE SUGGESTION 5200001108 · CLARIFICATION RETURNED',language:'ARABIC + ENGLISH',href:'/environmental-integrity-governance/uae'},
 {code:'TH',flag:'🇹🇭',country:'KINGDOM OF THAILAND',institution:'Pollution Control Department',status:'OFFICIAL DIRECTOR-GENERAL BRIEF SUBMITTED',language:'THAI + ENGLISH',href:'/global-institutional-engagement/thailand'},
