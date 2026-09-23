@@ -233,7 +233,7 @@ export default function ArchitectureRegistryBridgePage() {
           <div className="journey-actions">
             <Link href="/admissible-federation-architecture">EXPLORE AFA + CONNECTION SANDBOX →</Link>
             <Link href="/federation-authority/foundations">EXPLORE AVP →</Link>
-            <Link href="/registry/TA-14-AIGR-000039">EXPLORE ACA →</Link>
+            <Link href="/governance-showcase/TA-14-AIGR-000039">EXPLORE ACA →</Link>
             <Link href="/execution-authority-boundary-architecture">EXPLORE EABA →</Link>
           </div>
         </div>
