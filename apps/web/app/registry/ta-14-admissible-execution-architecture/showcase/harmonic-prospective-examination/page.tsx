@@ -8,7 +8,7 @@ const stages=[
  ["02","NATIVE CONTRACT","AWAITING HARMONIC","Harmonic identifies the implementation-facing input/output contract to be examined."],
  ["03","RUNTIME + GOVERNANCE MAPPING","NOT FROZEN","The runtime implementation and governance mapping must be identified, hashed, timestamped and preserved before decisive specimens are disclosed."],
  ["04","FALSIFIER","NOT FROZEN","The falsifier will be constituted against the native contract, frozen governance mapping and constituted authority model, then frozen prospectively."],
- ["05","SPECIMENS","SEALED","Decisive specimens are intentionally not disclosed before implementation freeze."],
+ ["05","SPECIMENS","SEALED","Decisive specimens are intentionally not disclosed before the runtime + governance freeze."],
  ["06","EXECUTION","NOT AUTHORIZED","No examination run is authorized yet."],
  ["07","RECORD","PENDING","Inputs, provenance, derivation, disposition and integrity evidence will be preserved."],
  ["08","DETERMINATION","OPEN","No PASS / FAIL / NOT ESTABLISHED determination exists before execution."]
@@ -82,7 +82,7 @@ export default function Page(){
       ["CONSEQUENCE","One specific proposed consequence and consequence class."],
       ["ACTOR + PATH","Same actor and same governed execution path."],
       ["GOVERNANCE MAPPING","Same governance pack/mapping, authority model, obligations and consequence semantics."],
-      ["EVENT CLASS","One qualifying authority-supersession event class; decisive values remain sealed."],
+      ["EVENT CLASS","One qualifying authority-basis transition event class; decisive values remain sealed."],
       ["FALSIFIER","One prospectively frozen falsifier; no runtime or mapping repair between specimens."]
      ].map(([a,b])=><article key={a}><small>{a}</small><strong>{b}</strong><span>TO BE FROZEN</span></article>)}
     </div>
