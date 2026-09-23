@@ -17,7 +17,7 @@ const stages=[
 const claims=[
  ["PRESENT STANDING","Harmonic publicly describes a runtime determination of whether a proposed action still has standing now after reality changes."],
  ["CURRENT INSTITUTIONAL STATE","Its public framing places present evidence, authority, obligations, operating conditions, continuity and consequence at the execution boundary."],
- ["CONTINUATION ADMISSIBILITY","The proposed examination asks whether attempted continuation remains admissible under present authoritative state before consequence binds."],
+ ["CONTINUATION ADMISSIBILITY","Harmonic publicly frames its constitutional runtime around whether consequential execution remains admissible under the institution’s present state before consequence binds."],
  ["PROSPECTIVE EXAMINATION","Its published testing discipline calls for freezing implementation, proposition, scope, materiality and falsifier before an unseen qualifying transition."]
 ] as const;
 
@@ -39,7 +39,7 @@ export default function Page(){
 
    <section className="hx-question">
     <small>CANDIDATE PROPERTY · NOT YET FROZEN</small>
-    <h2>Given a frozen Harmonic runtime, native contract, governance mapping and constituted authority model, can Harmonic derive whether the same attempted continuation remains admissible under present authoritative state when a qualifying authority-supersession event changes the basis supporting the consequence—without receiving standing, admissibility or an equivalent continuation verdict upstream?</h2>
+    <h2>Given a frozen Harmonic runtime, native contract, governance mapping and constituted authority model, can Harmonic derive whether the same attempted continuation remains admissible under present authoritative state after a qualifying material ΔN changes the authority basis supporting the consequence—without receiving standing, admissibility or an equivalent continuation verdict upstream?</h2>
     <p>The proposed examination concerns <strong>continuation admissibility under changed authority</strong>. Upstream systems may establish authoritative facts. Harmonic must determine what those facts mean for the same attempted continuation at the consequence boundary.</p>
    </section>
 
@@ -69,7 +69,7 @@ export default function Page(){
 
    <section className="hx-seal">
     <div><small>DECISIVE SPECIMENS</small><h2>SEALED.</h2><p>The decisive cases are intentionally withheld until the runtime implementation, native contract, governance mapping, constituted authority model, proposition, materiality boundary and falsifier are frozen. No specimen-specific repair is permitted after disclosure.</p></div>
-    <div className="hx-lock"><span>◈</span><b>NOT DISCLOSED</b><small>BEFORE IMPLEMENTATION FREEZE</small></div>
+    <div className="hx-lock"><span>◈</span><b>NOT DISCLOSED</b><small>BEFORE RUNTIME + GOVERNANCE FREEZE</small></div>
    </section>
 
    <section>
