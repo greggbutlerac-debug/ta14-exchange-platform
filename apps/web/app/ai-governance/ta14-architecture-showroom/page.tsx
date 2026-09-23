@@ -126,6 +126,23 @@ export default function Page(){return <main style={{minHeight:'100vh',background
     </section>
 
     <section style={{padding:'56px 0',borderTop:'1px solid rgba(255,255,255,.08)'}}>
+      <p style={{color:'#f0c66f',fontSize:10,fontWeight:900,letterSpacing:'.16em'}}>ARCHITECTURE · INTEROPERABILITY · TECHNICAL EXAMINATIONS</p>
+      <h2 style={{fontSize:'clamp(34px,5vw,58px)',margin:'10px 0 14px'}}>EXAMINE THE BOUNDARY, NOT THE COUNTRY.</h2>
+      <p style={{maxWidth:900,color:'#a9bbc5',lineHeight:1.7}}>These are architecture and interoperability surfaces. They examine what happens between evidence, authority, standing, commit, execution and outcome. They are intentionally separate from the country and institutional-engagement index.</p>
+      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:12,marginTop:24}}>
+        {[
+          ['GO AQS · BENCHMARK → CONSEQUENCE','A benchmark can be correct while the proposed consequence still requires independent execution governance.','/global-institutional-engagement/go-aqs'],
+          ['CONTINUOUS COMMISSIONING','Commissioned once does not mean authorized forever. Examine changed conditions before consequence.','/global-institutional-engagement/continuous-commissioning'],
+          ['HEALTHY INDOOR AIR · CONSEQUENCE BOUNDARY','Examine the transition from healthy-air evidence and policy toward a specific consequential action.','/global-institutional-engagement/healthy-indoor-air-consequence-boundary'],
+          ['ASHRAE EDUCATION IAQ · EXECUTION BOUNDARY','A BMS can respond. The examination asks whether that consequence may execute now.','/global-institutional-engagement/ashrae-education-iaq-execution-boundary'],
+          ['FIRE CHIEF · EXECUTION-AUTHORITY SANDBOX','Inspect identity, scope, asset binding, changed-context revalidation, commit and physical consequence.','/global-institutional-engagement/fire-chief-electrical-shutoff'],
+          ['OWNER → CONSEQUENCE','Follow owner need through governed connection, admissible evidence, execution and verified outcome.','/registry/ta-14-admissible-execution-architecture/showcase/owner-to-consequence-collaboration'],
+        ].map(([title,copy,href])=><Link key={title} href={href} style={{padding:22,border:'1px solid rgba(240,198,111,.24)',borderRadius:15,background:'rgba(20,15,6,.25)',color:'#f4f8fb',textDecoration:'none'}}><b style={{display:'block',color:'#f0c66f',fontSize:12,lineHeight:1.4}}>{title}</b><p style={{color:'#9fb1bc',fontSize:12,lineHeight:1.6,minHeight:58}}>{copy}</p><strong style={{fontSize:9,letterSpacing:'.1em',color:'#77eaff'}}>OPEN TECHNICAL SHOWROOM →</strong></Link>)}
+      </div>
+      <div style={{marginTop:20,padding:18,border:'1px solid rgba(119,234,255,.18)',borderRadius:12,color:'#91a8b4',fontSize:12,lineHeight:1.6}}><b style={{color:'#77eaff'}}>ROUTING RULE · </b>Country and sovereign-institution surfaces belong in Global Institutional Engagement. Architecture, interoperability and consequence-boundary examinations belong here, even where legacy published URLs remain in place to preserve existing links.</div>
+    </section>
+
+    <section style={{padding:'56px 0',borderTop:'1px solid rgba(255,255,255,.08)'}}>
       <p style={{color:'#72e6ff',fontSize:10,fontWeight:900,letterSpacing:'.16em'}}>FOLLOW THE EVIDENCE</p><h2 style={{fontSize:'clamp(34px,5vw,58px)',margin:'10px 0 22px'}}>ENTER THE INSTITUTION.</h2>
       <div style={{display:'flex',flexWrap:'wrap',gap:10}}>
         <Action href="/workspace/ai-governance/registry" label="OPEN GOVERNANCE REGISTRY"/>
