@@ -455,7 +455,7 @@ const EXTERNAL_REGISTERED_ARTIFACTS: RegistryArtifact[] = [
     proves: "The preserved native records establish that both frozen specimens executed successfully against Harmonic V4.1 and that both reached the same antecedent AUTHORITY_NOT_ESTABLISHED / inadmissibility boundary rather than a differentiated authority result on the tested delta.",
     doesNotProve: "The record does not establish frozen falsifier 1 or 2, and does not by itself establish that Harmonic required the prohibited upstream standing/admissibility conclusion under falsifier 3. No downstream physical execution was exercised.",
     href: "/artifacts/fd-2026-0002-case-004",
-,
+  },
 ];
 
 const REGISTERED_ARTIFACTS: RegistryArtifact[] = [
