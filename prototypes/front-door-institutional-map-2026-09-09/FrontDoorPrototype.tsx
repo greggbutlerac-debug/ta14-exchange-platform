@@ -39,7 +39,7 @@ const doors = [
   ['LS','LAW · STANDARDS · PUBLIC POLICY','Preserve actual authority, expose gaps, compare current instruments, and inspect proposed governed upgrades.','/law-standards-public-policy','amber'],
   ['EU','EU AI ACT WORLD','Classify systems, map obligations, build evidence, and preserve readiness within the Exchange’s flagship regulatory world.','/eu-ai-act','royal'],
   ['FA','FEDERATION & AUTHORITY','Move bounded authority context across independent domains without transferring execution authority. Explore AVP, Connection Profiles, evidence, and recognition.','/federation-authority','cyan'],
-  ['GI','GLOBAL INSTITUTIONAL ENGAGEMENT','Enter country-specific public showrooms built from real institutional conversations, local evidence pathways, and bounded technical examination.','/global-institutional-engagement','sovereign'],
+  ['GI','GLOBAL INSTITUTIONAL ENGAGEMENT','Enter country-specific public showrooms built from real institutional conversations, local evidence pathways, sovereign authority contexts, and preserved engagement records.','/global-institutional-engagement','sovereign'],
   ['EA','EXECUTION ARTIFACTS','Inspect portable records of determinations, execution effects, evidence boundaries, receipts, replay, verification and preserved outcomes.','/artifacts','artifactDoor'],
 ];
 
