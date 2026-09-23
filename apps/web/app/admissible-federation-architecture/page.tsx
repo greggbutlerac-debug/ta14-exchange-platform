@@ -187,9 +187,13 @@ export default function AFAShowroom(){
    </section>
 
    <section id="cnscp-eaba" style={{padding:'70px 0',borderTop:'1px solid #143139'}}>
-    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>CNS/CP × TA-14 · THE HANDOFF</div>
-    <h2 style={{fontSize:'clamp(34px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>The Connection Profile stops here.<br/><span style={{color:'#e7c76e'}}>TA-14 consequence determination begins here.</span></h2>
-    <p style={{color:'#a9c0c6',fontSize:16,lineHeight:1.75,maxWidth:940}}>Two independently developed architectures can meet at one boundary without either absorbing the other. CNS/CP governs whether parties may bind across an organizational boundary and the Connection Profile defines the <strong style={{color:'#eef7fb'}}>permitted crossing envelope</strong>: both the minimum that must cross for the relationship to be meaningful and the maximum that may cross without importing local execution entitlement. TA-14 does not re-determine that relationship. The receiving TA-14-governed domain independently determines whether what arrived has sufficient present standing to become protected consequence.</p>
+    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>THE HANDOFF</div>
+    <h2 style={{fontSize:'clamp(34px,5vw,58px)',letterSpacing:'-.04em',lineHeight:1.02,margin:'10px 0'}}>The connection got the request here.<br/><span style={{color:'#e7c76e'}}>Now what?</span></h2>
+    <p style={{color:'#a9c0c6',fontSize:17,lineHeight:1.75,maxWidth:900}}>The Connection Profile tells us the connection is legitimate and what may cross it. TA-14 does not redo that work. TA-14 asks the next question: <strong style={{color:'#eef7fb'}}>may this exact consequence become reality now?</strong></p>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginTop:24,alignItems:'stretch'}}>
+     {[['CONNECTION PROFILE','The governed relationship and crossing rules are established.'],['TA-14','The proposed consequence is tested against what is true now.'],['CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE']].map((x,i)=><div key={x[0]} style={{padding:'22px 16px',borderRadius:12,border:'1px solid '+(i===1?'#e7c76e':'#24555d'),background:'#04151c',textAlign:'center'}}><strong style={{display:'block',color:i===1?'#e7c76e':'#71e7df',fontSize:13}}>{x[0]}</strong><span style={{display:'block',marginTop:9,color:'#9fb7be',fontSize:11,lineHeight:1.55}}>{x[1]}</span></div>)}
+    </div>
+    <p style={{marginTop:18,color:'#dffdfa',fontWeight:900}}>The Connection Profile governs the relationship. TA-14 governs the consequence.</p>
 
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:8,marginTop:28}}>
      {[
