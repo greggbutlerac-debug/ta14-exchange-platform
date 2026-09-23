@@ -195,81 +195,18 @@ export default function AFAShowroom(){
     </div>
     <p style={{marginTop:18,color:'#dffdfa',fontWeight:900}}>The Connection Profile governs the relationship. TA-14 governs the consequence.</p>
 
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:8,marginTop:28}}>
-     {[
-      ['01','CNS/CP','May these parties bind, under what contract and context?'],
-      ['02','CONNECTION PROFILE','Minimum required crossing + maximum permitted crossing.'],
-      ['03','TA-14','Does the proposed consequence have sufficient present evidence, authority and standing to become reality now?'],
-      ['04','CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE before protected commit.']
-     ].map((x,i)=><button key={x[0]} onClick={()=>setBoundaryStep(i)} style={{cursor:'pointer',padding:18,textAlign:'left',borderRadius:11,border:i===boundaryStep?'1px solid #e7c76e':'1px solid #214a51',background:i===boundaryStep?'rgba(112,83,18,.2)':'#04151c',color:i===boundaryStep?'#f3d989':'#a7bcc2'}}><small style={{color:'#71e7df',fontWeight:950}}>{x[0]}</small><strong style={{display:'block',margin:'7px 0',fontSize:11}}>{x[1]}</strong><span style={{fontSize:10,lineHeight:1.5}}>{x[2]}</span></button>)}
-    </div>
-
-    <div style={{marginTop:16,padding:24,border:'1px solid #2a555c',borderRadius:15,background:'#020b0f'}}>
-     <div style={{fontSize:10,color:'#71e7df',fontWeight:950}}>BOUNDARY EXPLANATION</div>
-     <strong style={{display:'block',fontSize:24,color:'#fff',margin:'8px 0'}}>{[
-      'CNS/CP establishes the cross-boundary relationship.',
-      'The Connection Profile bounds the permitted crossing envelope.',
-      'TA-14 owns the independent consequence determination.',
-      'The result governs the protected commit — not the prior relationship.'
-     ][boundaryStep]}</strong>
-     <p style={{color:'#9fb7be',lineHeight:1.7,marginBottom:0}}>{[
-      'TA-14 does not reach backward and re-grade whether CNS/CP legitimately established the relationship. That remains CNS/CP ground.',
-      'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning and evidence may travel; local execution entitlement does not.',
-      'TA-14 receives the governed request and supporting context, then independently asks whether this exact proposed consequence has sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW.',
-      'A legitimate connection can end in HOLD, DENY or ESCALATE without implying that CNS/CP or the Connection Profile failed.'
-     ][boundaryStep]}</p>
-    </div>
-
-    <div style={{marginTop:22,padding:22,border:'1px dashed #6b5829',borderRadius:14,background:'rgba(74,56,12,.12)',textAlign:'center'}}><strong style={{color:'#e7c76e',fontSize:'clamp(16px,2.3vw,24px)'}}>MEANING MAY CROSS · EVIDENCE MAY CROSS · AUTHORITY CONTEXT MAY CROSS · EXECUTION AUTHORITY MUST BE ESTABLISHED LOCALLY</strong></div>
-
-    <div style={{marginTop:28,padding:28,border:'1px solid #2a555c',borderRadius:18,background:'linear-gradient(135deg,rgba(12,54,61,.28),rgba(4,20,27,.92))'}}>
-     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>REVERSE THE DIRECTION · LIVE BOUNDARY EXAM</div>
-     <h3 style={{fontSize:32,letterSpacing:'-.03em',margin:'10px 0'}}>Same parties. Same graph. Reverse the action.</h3>
-     <p style={{color:'#a9c0c6',lineHeight:1.7,maxWidth:900}}>A graph can preserve identity, meaning, relationships and provenance across independently operated environments. Reverse the direction from receiving information to proposing a live building consequence and a different boundary becomes visible.</p>
-     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:8,margin:'22px 0'}}>
-      {(!reverseDirection?[
-       ['RE1 → TA-14','GRAPH / DATA CROSSES'],
-       ['PROVENANCE','PRESERVED'],
-       ['PHYSICAL CONSEQUENCE','NOT REQUESTED'],
-       ['EXECUTION AUTHORITY','NOT INVOKED']
-      ]:[
-       ['TA-14 → PAE','CHANGE THIS SETPOINT'],
-       ['CNS/CP','CONNECTION TERMS'],
-       ['CONNECTION PROFILE','GOVERNED REQUEST CROSSES'],
-       ['TA-14','CONSEQUENCE DETERMINATION']
-      ]).map((x,i)=><div key={x[0]} style={{padding:18,borderRadius:11,border:'1px solid '+(reverseDirection&&i===3?'#e7c76e':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:7,color:reverseDirection&&i===3?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
-     </div>
-     <button onClick={()=>setReverseDirection(v=>!v)} style={{cursor:'pointer',padding:'13px 16px',borderRadius:9,border:'1px solid #71e7df',background:reverseDirection?'#71e7df':'transparent',color:reverseDirection?'#031216':'#71e7df',fontWeight:950}}>{reverseDirection?'RESTORE DATA DIRECTION':'REVERSE THE DIRECTION →'}</button>
-     {reverseDirection&&<div style={{marginTop:18,padding:20,border:'1px solid #e7c76e',borderRadius:12,background:'rgba(91,65,12,.2)'}}>
-      <strong style={{fontSize:22,color:'#e7c76e'}}>THE GRAPH CAN RECORD THE AGREEMENT. THE GRAPH DOES NOT CREATE THE AGREEMENT.</strong>
-      <p style={{color:'#d4c7a2',lineHeight:1.7,margin:'12px 0 0'}}>CNS/CP addresses whether the governed connection exists and on what terms. The Connection Profile carries the governed request to the boundary. TA-14 independently determines whether this exact consequence may become reality now: ALLOW, HOLD, DENY or ESCALATE before protected commit.</p>
-     </div>}
-     <div style={{display:'grid',gap:7,marginTop:20,padding:'18px 20px',border:'1px dashed #6b5829',borderRadius:12,textAlign:'center',fontWeight:950}}>
-      <span style={{color:'#e7c76e'}}>CONNECTION ≠ AUTHORITY</span>
-      <span style={{color:'#eef7fb'}}>AUTHORITY CAN TRAVEL. EXECUTION AUTHORITY MUST BE ESTABLISHED LOCALLY.</span>
-      <span style={{color:'#71e7df'}}>UNDERSTANDING ≠ PERMISSION.</span>
-     </div>
-    </div>
-
-    <div style={{marginTop:28,padding:28,border:'1px solid #6b5829',borderRadius:18,background:'linear-gradient(135deg,rgba(74,56,12,.24),rgba(4,20,27,.9))'}}>
-     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#e7c76e'}}>MONDAY LIVE · ONE-FACT DEMONSTRATION</div>
-     <h3 style={{fontSize:32,letterSpacing:'-.03em',margin:'10px 0'}}>A legitimate crossing can still produce HOLD.</h3>
-     <p style={{color:'#a9c0c6',lineHeight:1.7,maxWidth:880}}>Start with a legitimate CNS/CP relationship and a valid Connection Profile received by TA-14. Then change one material condition before commit. Nothing about the connection has to fail for consequence authority to disappear.</p>
-     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))',gap:8,margin:'22px 0'}}>
+    <div style={{marginTop:28,padding:26,border:'1px solid #2a555c',borderRadius:16,background:'#020b0f'}}>
+     <div style={{fontSize:10,color:'#71e7df',fontWeight:950,letterSpacing:'.14em'}}>ONE REQUEST · THREE QUESTIONS</div>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:10,marginTop:18}}>
       {[
-       ['CNS/CP RELATIONSHIP','LEGITIMATE'],
-       ['CONNECTION PROFILE','VALID'],
-       ['TA-14 INPUT','RECEIVED'],
-       ['LOCAL EVIDENCE',changedCondition?'CHANGED':'CURRENT'],
-       ['TA-14 RESULT',changedCondition?'HOLD':'ALLOW']
-      ].map((x,i)=><div key={x[0]} style={{padding:18,borderRadius:11,border:'1px solid '+(i===4||i===3&&changedCondition?'#e7c76e':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:7,color:i===4||i===3&&changedCondition?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
+       ['1','CONNECTION PROFILE','Are these parties connected, and what are they allowed to send across?'],
+       ['2','TA-14','Does this exact proposed consequence have enough evidence, authority, and standing right now?'],
+       ['3','CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE']
+      ].map((x,i)=><div key={x[0]} style={{padding:20,borderRadius:11,border:'1px solid '+(i===1?'#e7c76e':'#214a51'),background:'#04151c'}}><small style={{color:'#71e7df',fontWeight:950}}>{x[0]}</small><strong style={{display:'block',margin:'7px 0',fontSize:13,color:i===1?'#e7c76e':'#eef7fb'}}>{x[1]}</strong><span style={{fontSize:12,lineHeight:1.6,color:'#9fb7be'}}>{x[2]}</span></div>)}
      </div>
-     <button onClick={()=>setChangedCondition(v=>!v)} style={{cursor:'pointer',padding:'13px 16px',borderRadius:9,border:'1px solid #e7c76e',background:changedCondition?'#e7c76e':'transparent',color:changedCondition?'#071014':'#e7c76e',fontWeight:950}}>{changedCondition?'RESTORE ORIGINAL CONDITION':'CHANGE ONE MATERIAL CONDITION →'}</button>
-     {changedCondition&&<div style={{marginTop:18,padding:20,border:'1px solid #e7c76e',borderRadius:12,background:'rgba(91,65,12,.2)'}}><strong style={{fontSize:30,color:'#e7c76e'}}>HOLD</strong><p style={{color:'#d4c7a2',lineHeight:1.7,marginBottom:0}}>The relationship remains legitimate. The Connection Profile remains valid. The crossing remains authentic. But present consequence authority no longer stands. Revalidation is required before protected commit.</p></div>}
+     <p style={{color:'#9fb7be',lineHeight:1.7,margin:'20px 0 0'}}>A good connection can still lead to <strong style={{color:'#e7c76e'}}>HOLD</strong>. That does not mean the connection failed. It means TA-14 found that something required for this consequence is not established now.</p>
     </div>
 
-    <div style={{marginTop:20,padding:'18px 20px',border:'1px dashed #71e7df',borderRadius:12,textAlign:'center',fontWeight:950,color:'#dffdfa',letterSpacing:'.03em'}}>THE CONNECTION PROFILE GOVERNS THE CROSSING. TA-14 GOVERNS WHETHER WHAT CROSSED MAY BECOME CONSEQUENCE.</div>
-    <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:18}}><Link href="/registry/ta-14-admissible-execution-architecture" style={{padding:'12px 15px',borderRadius:9,background:'#71e7df',color:'#031216',fontWeight:950,fontSize:10,textDecoration:'none'}}>EXPLORE TA-14 ARCHITECTURE →</Link><Link href="/federation-authority" style={{padding:'12px 15px',border:'1px solid #28545b',borderRadius:9,color:'#d7eeee',fontWeight:900,fontSize:10,textDecoration:'none'}}>OPEN FEDERATION & AUTHORITY →</Link></div>
    </section>
 
    <section style={{padding:34,border:'1px solid #24555d',borderRadius:20,background:'linear-gradient(135deg,rgba(17,69,76,.35),rgba(4,20,27,.85))',marginTop:10}}>
