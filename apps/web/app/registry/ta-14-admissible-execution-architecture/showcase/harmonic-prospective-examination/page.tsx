@@ -83,6 +83,7 @@ export default function Page(){
       ["ACTOR + PATH","Same actor and same governed execution path."],
       ["GOVERNANCE MAPPING","Same governance pack/mapping, authority model, obligations and consequence semantics."],
       ["EVENT CLASS","One qualifying authority-basis transition event class; decisive values remain sealed."],
+      ["MATERIALITY BOUNDARY","One prospectively frozen rule defining material change for this examination."],
       ["FALSIFIER","One prospectively frozen falsifier; no runtime or mapping repair between specimens."]
      ].map(([a,b])=><article key={a}><small>{a}</small><strong>{b}</strong><span>TO BE FROZEN</span></article>)}
     </div>
