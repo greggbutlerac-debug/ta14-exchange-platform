@@ -29,6 +29,7 @@ export default function AFAShowroom(){
  const [blockedAttempt,setBlockedAttempt]=useState('');
  const [boundaryStep,setBoundaryStep]=useState(0);
  const [changedCondition,setChangedCondition]=useState(false);
+ const [reverseDirection,setReverseDirection]=useState(false);
  const [lab,setLab]=useState({identity:true,integrity:true,freshness:true,scope:true,revocation:true,localStanding:true});
  const labResult=!lab.identity||!lab.integrity?'REJECT':!lab.revocation?'SUSPEND':!lab.localStanding?'ESCALATE':!lab.freshness||!lab.scope?'HOLD':'ACCEPT_NARROWED';
  const toggleLab=(k:keyof typeof lab)=>setLab(v=>({...v,[k]:!v[k]}));
@@ -193,6 +194,35 @@ export default function AFAShowroom(){
     </div>
 
     <div style={{marginTop:22,padding:22,border:'1px dashed #6b5829',borderRadius:14,background:'rgba(74,56,12,.12)',textAlign:'center'}}><strong style={{color:'#e7c76e',fontSize:'clamp(16px,2.3vw,24px)'}}>MEANING MAY CROSS · EVIDENCE MAY CROSS · AUTHORITY CONTEXT MAY CROSS · EXECUTION AUTHORITY MUST BE ESTABLISHED LOCALLY</strong></div>
+
+    <div style={{marginTop:28,padding:28,border:'1px solid #2a555c',borderRadius:18,background:'linear-gradient(135deg,rgba(12,54,61,.28),rgba(4,20,27,.92))'}}>
+     <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#71e7df'}}>REVERSE THE DIRECTION · LIVE BOUNDARY EXAM</div>
+     <h3 style={{fontSize:32,letterSpacing:'-.03em',margin:'10px 0'}}>Same parties. Same graph. Reverse the action.</h3>
+     <p style={{color:'#a9c0c6',lineHeight:1.7,maxWidth:900}}>A graph can preserve identity, meaning, relationships and provenance across independently operated environments. Reverse the direction from receiving information to proposing a live building consequence and a different boundary becomes visible.</p>
+     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:8,margin:'22px 0'}}>
+      {(!reverseDirection?[
+       ['RE1 → TA-14','GRAPH / DATA CROSSES'],
+       ['PROVENANCE','PRESERVED'],
+       ['PHYSICAL CONSEQUENCE','NOT REQUESTED'],
+       ['EXECUTION AUTHORITY','NOT INVOKED']
+      ]:[
+       ['TA-14 → PAE','CHANGE THIS SETPOINT'],
+       ['CNS/CP','CONNECTION TERMS'],
+       ['AFA / AVP','AUTHORITY CONTEXT CROSSES'],
+       ['EABA','LOCAL EXECUTION TEST']
+      ]).map((x,i)=><div key={x[0]} style={{padding:18,borderRadius:11,border:'1px solid '+(reverseDirection&&i===3?'#e7c76e':'#24555d'),background:'#04151c'}}><small style={{display:'block',color:'#8fa9af',fontSize:9}}>{x[0]}</small><strong style={{display:'block',marginTop:7,color:reverseDirection&&i===3?'#e7c76e':'#71e7df'}}>{x[1]}</strong></div>)}
+     </div>
+     <button onClick={()=>setReverseDirection(v=>!v)} style={{cursor:'pointer',padding:'13px 16px',borderRadius:9,border:'1px solid #71e7df',background:reverseDirection?'#71e7df':'transparent',color:reverseDirection?'#031216':'#71e7df',fontWeight:950}}>{reverseDirection?'RESTORE DATA DIRECTION':'REVERSE THE DIRECTION →'}</button>
+     {reverseDirection&&<div style={{marginTop:18,padding:20,border:'1px solid #e7c76e',borderRadius:12,background:'rgba(91,65,12,.2)'}}>
+      <strong style={{fontSize:22,color:'#e7c76e'}}>THE GRAPH CAN RECORD THE AGREEMENT. THE GRAPH DOES NOT CREATE THE AGREEMENT.</strong>
+      <p style={{color:'#d4c7a2',lineHeight:1.7,margin:'12px 0 0'}}>CNS/CP addresses whether the governed connection exists and on what terms. AFA governs the federation boundary. AVP carries bounded authority context across it. EABA asks whether the receiving domain establishes authority for this exact consequence now. The receiving domain retains the right to ALLOW, HOLD, DENY or ESCALATE before protected commit.</p>
+     </div>}
+     <div style={{display:'grid',gap:7,marginTop:20,padding:'18px 20px',border:'1px dashed #6b5829',borderRadius:12,textAlign:'center',fontWeight:950}}>
+      <span style={{color:'#e7c76e'}}>CONNECTION ≠ AUTHORITY</span>
+      <span style={{color:'#eef7fb'}}>AUTHORITY CAN TRAVEL. EXECUTION AUTHORITY MUST BE ESTABLISHED LOCALLY.</span>
+      <span style={{color:'#71e7df'}}>UNDERSTANDING ≠ PERMISSION.</span>
+     </div>
+    </div>
 
     <div style={{marginTop:28,padding:28,border:'1px solid #6b5829',borderRadius:18,background:'linear-gradient(135deg,rgba(74,56,12,.24),rgba(4,20,27,.9))'}}>
      <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#e7c76e'}}>MONDAY LIVE · ONE-FACT DEMONSTRATION</div>
