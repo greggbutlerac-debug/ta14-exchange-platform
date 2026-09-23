@@ -166,10 +166,11 @@ export default function AFAShowroom(){
      {[
       ['01','CNS/CP','May these parties bind, under what contract and context?'],
       ['02','CONNECTION PROFILE','Minimum required crossing + maximum permitted crossing.'],
-      ['03','AFA / AVP','Bounded authority context may travel. Execution authority does not.'],
-      ['04','RECEIVING DOMAIN','Received context becomes evidence for local determination, not permission.'],
-      ['05','EABA','Does present authority still stand for this exact consequence now?'],
-      ['06','CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE before protected commit.']
+      ['03','AFA','Governs the federation boundary and what authority context may cross.'],
+      ['04','AVP · AUTHORITY PASSPORT v1.0.2','Carries bounded authority context: authority, scope, standing, provenance and constraints.'],
+      ['05','RECEIVING DOMAIN','Received context becomes evidence for local determination, not permission.'],
+      ['06','EABA','Does present authority still stand for this exact consequence now?'],
+      ['07','CONSEQUENCE','ALLOW · HOLD · DENY · ESCALATE before protected commit.']
      ].map((x,i)=><button key={x[0]} onClick={()=>setBoundaryStep(i)} style={{cursor:'pointer',padding:18,textAlign:'left',borderRadius:11,border:i===boundaryStep?'1px solid #e7c76e':'1px solid #214a51',background:i===boundaryStep?'rgba(112,83,18,.2)':'#04151c',color:i===boundaryStep?'#f3d989':'#a7bcc2'}}><small style={{color:'#71e7df',fontWeight:950}}>{x[0]}</small><strong style={{display:'block',margin:'7px 0',fontSize:11}}>{x[1]}</strong><span style={{fontSize:10,lineHeight:1.5}}>{x[2]}</span></button>)}
     </div>
 
@@ -178,7 +179,8 @@ export default function AFAShowroom(){
      <strong style={{display:'block',fontSize:24,color:'#fff',margin:'8px 0'}}>{[
       'CNS/CP establishes the cross-boundary relationship.',
       'The Connection Profile bounds the permitted crossing envelope.',
-      'AFA preserves authority context without transferring execution authority.',
+      'AFA governs the federation boundary without transferring execution authority.',
+      'AVP v1.0.2 carries the bounded authority context across that boundary; it is not local execution authority.',
       'The receiving domain owns the next determination.',
       'EABA tests present execution standing at consequence.',
       'The result governs the protected commit — not the prior relationship.'
@@ -186,7 +188,8 @@ export default function AFAShowroom(){
      <p style={{color:'#9fb7be',lineHeight:1.7,marginBottom:0}}>{[
       'TA-14 does not reach backward and re-grade whether CNS/CP legitimately established the relationship. That remains CNS/CP ground.',
       'The minimum side says what must be present for a meaningful governed crossing. The maximum side says what may cross and where inheritance must stop. Meaning, evidence and bounded authority context may travel; local lease, local capsule, commit, execution and effect do not become transferable entitlement.',
-      'Identity, provenance, scope, freshness, revocation context and other bounded authority context may be presented. Local lease, local capsule, commit, execution and effect do not ride the Passport.',
+      'AFA establishes the rule for the crossing: authority context may travel, while execution authority must be established locally.',
+      'The Authority Passport is the bounded transport object. It can carry relevant authority, scope, standing, provenance, constraints, identity, freshness and revocation context for receiving-domain evaluation. Local lease, local capsule, commit, execution and effect do not ride the Passport.',
       'Receipt is not consequence. Acceptance is not execution permission. The receiving runtime must establish its own admissibility, authority, continuity, scope and standing.',
       'EABA asks whether the exact actor, target, evidence, authority, scope, local standing and changed conditions still support this exact attempt now.',
       'A legitimate crossing can end in HOLD, DENY or ESCALATE without implying that CNS/CP or the Connection Profile failed.'
