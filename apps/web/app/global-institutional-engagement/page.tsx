@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { CSSProperties } from "react";
-export const metadata={title:"Global Institutional Engagement | TA-14 Authority",description:"Country-specific public institutional showrooms and bounded technical examination routes."};
+export const metadata={title:"Global Institutional Engagement | TA-14 Authority",description:"Country-specific public institutional showrooms, sovereign authority contexts, and preserved engagement records."};
 const doors=[
 ["MAP","COUNTRY SHOWROOM INDEX","Enter the complete public index of country-specific institutional showrooms, statuses, languages, technical questions, and preserved engagement records.","/global-institutional-engagement/showrooms","#76ddff"],
 ["ACTIVE","ACTIVE INSTITUTIONAL SIGNALS","Inspect the live institutional engagement control board: substantive replies, referrals, technical questions, meetings, route repairs, waits, and next actions.","/global-institutional-engagement/control-board","#72e6b2"],
