@@ -434,6 +434,28 @@ const EXTERNAL_REGISTERED_ARTIFACTS: RegistryArtifact[] = [
     doesNotProve: "The artifact does not independently establish the complete institutional chronology outside the runtime, including the pre-change authority state, attributable revocation event, independently preserved post-change state, or an external record confirming that execution did not occur.",
     href: "/artifacts/fd-2026-0002-case-001",
   },
+  {
+    registryId: "TA14-EAR-HARMONIC-004",
+    artifactId: "FD-2026-0002-CASE-004",
+    sequence: 14,
+    title: "When the Frozen A/B Test Reached the Runtime",
+    determination: "HOLD",
+    sector: "AI operations",
+    earliestControl: "ADMISSIBILITY",
+    receipt: "HTTP 200 × 2 · NATIVE RECORDS PRESERVED",
+    outcome: "SUPPORTED — INDETERMINATE ON THE FROZEN PROPOSITION",
+    governanceRegistryId: "TA-14-AIGR-000008",
+    governanceName: "Harmonic Constitutional Runtime",
+    routeId: "FD-2026-0002 · CASE-004",
+    verificationLevel: "L3",
+    status: "PUBLISHED",
+    publishedAt: "2026-09-23",
+    rootHash: "Native determination / receipt hashes preserved in executed R1 record",
+    summary: "Harmonic Artifact 004 preserves the executed prospective paired-specimen R1 examination against the frozen V4.1 /api/evaluate runtime. Specimen A used a $90,000 current authority ceiling and Specimen B a $50,000 ceiling against the same $75,000 proposed consequence; both returned REFUSED / inadmissible / BLOCK.",
+    proves: "The preserved native records establish that both frozen specimens executed successfully against Harmonic V4.1 and that both reached the same antecedent AUTHORITY_NOT_ESTABLISHED / inadmissibility boundary rather than a differentiated authority result on the tested delta.",
+    doesNotProve: "The record does not establish frozen falsifier 1 or 2, and does not by itself establish that Harmonic required the prohibited upstream standing/admissibility conclusion under falsifier 3. No downstream physical execution was exercised.",
+    href: "/artifacts/fd-2026-0002-case-004",
+,
 ];
 
 const REGISTERED_ARTIFACTS: RegistryArtifact[] = [
