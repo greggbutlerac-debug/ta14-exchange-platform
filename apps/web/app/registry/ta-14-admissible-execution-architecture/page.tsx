@@ -149,14 +149,14 @@ export default function ArchitectureRegistryBridgePage() {
         <div className="architecture-page-title">TA-14 ADMISSIBLE EXECUTION ARCHITECTURE</div>
 
         <h1>
-          Something wants to happen.
-          <span>Should it become reality now?</span>
+          Does this proposed consequence have sufficient
+          <span>Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</span>
         </h1>
 
         <p className="hero-copy">
           TA-14 governs the boundary between a proposed consequence and reality.
-          A system may be connected, capable, informed, and ready without yet
-          having what is required to execute.
+          Capability is not authority. Connection is not permission. Before execution,
+          the evidence, authority, and standing must hold up at the boundary now.
         </p>
 
         <div className="hero-actions">
