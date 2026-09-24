@@ -22,7 +22,8 @@ export function RouteAwareGlobalChrome() {
     pathname === '/admissible-federation-architecture' ||
     pathname === '/execution-authority-boundary-architecture' ||
     pathname === '/ai-governance/ta14-architecture-showroom' ||
-    pathname === '/ai-governance/admissible-architecture';
+    pathname === '/ai-governance/admissible-architecture' ||
+    pathname === '/the-curb-test';
   const isEnvironmentalIntegrityContext =
     pathname === '/environmental-integrity-governance' ||
     pathname.startsWith('/environmental-integrity-governance/') ||
