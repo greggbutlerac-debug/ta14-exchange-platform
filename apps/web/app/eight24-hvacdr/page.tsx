@@ -2,7 +2,8 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'TA-14 × Eight24 | HVACD/R Founding Partnership',
-  description: 'Private working overview of the TA-14 × Eight24 HVACD/R technician-readiness program.'
+  description: 'Private working overview of the TA-14 × Eight24 HVACD/R technician-readiness program.',
+  robots: { index: false, follow: false }
 };
 
 const phases = [
@@ -83,7 +84,7 @@ export default function Page(){
         <h2 style={{fontFamily:'Georgia,serif',fontSize:44,margin:'12px 0'}}>Every module becomes a room.</h2>
         <p style={{maxWidth:820,color:'#9fb4be',lineHeight:1.7}}>Instead of hiding the curriculum in a static PDF, each module gets an inspectable interactive showroom: purpose, competencies, lesson inventory, delivery mode, evidence objects, VR behavior, assessment, dependencies and completion criteria.</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:12,marginTop:26}}>
-          {modules.map(m=><Link key={m[0]} href={'/eight24-hvacdr/curriculum/module-'+m[0]} style={{padding:20,border:'1px solid #173746',borderRadius:16,background:'#06121a',textDecoration:'none',color:'#edf5f8'}}>
+          {modules.map(m=><Link key={m[0]} href={'/eight24-hvacdr/curriculum/'+m[0]} style={{padding:20,border:'1px solid #173746',borderRadius:16,background:'#06121a',textDecoration:'none',color:'#edf5f8'}}>
             <div style={{display:'flex',justifyContent:'space-between',color:'#70dcff',fontWeight:900,fontSize:11}}><span>MODULE {m[0]}</span><span>{m[2]}</span></div>
             <h3 style={{fontFamily:'Georgia,serif',fontSize:21,lineHeight:1.25}}>{m[1]}</h3>
             <b style={{color:'#efc86c',fontSize:10}}>OPEN CURRICULUM ROOM →</b>
