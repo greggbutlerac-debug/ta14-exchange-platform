@@ -17,7 +17,7 @@ export default function HarmonicArtifact004(){
     <p style={{maxWidth:920,color:"#abc0cd",fontSize:18,lineHeight:1.7}}>Artifact 004 preserves the first completed run of the prospective Harmonic continuation-admissibility examination. The proposition, native contract, materiality rule, specimens and falsifier were frozen before execution. No packet repair occurred between A and B.</p>
    </header>
    <section style={{padding:"34px",border:"1px solid #f2c66d55",borderRadius:20,background:"#f2c66d0b"}}>
-    <small style={{color:"#f2c66d",fontWeight:900}}>BOUNDED R1 DETERMINATION</small><h2 style={{font:"clamp(34px,5vw,58px)/1.04 Georgia,serif",margin:"10px 0"}}>SUPPORTED — INDETERMINATE ON THE FROZEN PROPOSITION</h2>
+    <small style={{color:"#f2c66d",fontWeight:900}}>BOUNDED R1 DETERMINATION</small><h2 style={{font:"clamp(34px,5vw,58px)/1.04 Georgia,serif",margin:"10px 0"}}>INDETERMINATE ON THE FROZEN PROPOSITION</h2>
     <p style={{color:"#b3c4ce",lineHeight:1.7}}>The examination executed successfully, but both specimens encountered the same antecedent evidentiary failures before the decisive ΔN produced a differentiated authority result. The preserved record does not establish any frozen falsifier strongly enough to declare the proposition falsified.</p>
    </section>
    <section style={{padding:"58px 0"}}>
@@ -28,7 +28,7 @@ export default function HarmonicArtifact004(){
     <p style={{color:"#78dfff",fontSize:11,fontWeight:900}}>FROZEN FALSIFIER JUDGMENT</p>
     <h3>F1 · NOT ESTABLISHED</h3><p style={{color:"#abc0cd",lineHeight:1.65}}>A was non-permitting, but the record does not show that result arose solely because the standing-preserving ΔN was misclassified as standing-defeating.</p>
     <h3>F2 · NOT ESTABLISHED</h3><p style={{color:"#abc0cd",lineHeight:1.65}}>B did not remain executable through inherited historical validity.</p>
-    <h3>F3 · EVIDENCE PRESENT · BOUNDED INTERPRETATION REQUIRED</h3><p style={{color:"#abc0cd",lineHeight:1.65}}>The runtime required additional upstream authority/evidentiary establishment, while the preserved record does not by itself prove that Harmonic required the prohibited upstream standing/admissibility conclusion rather than additional attributable facts.</p>
+    <h3>F3 · NOT ESTABLISHED ON THE PRESERVED R1 RECORD</h3><p style={{color:"#abc0cd",lineHeight:1.65}}>The runtime stated that upstream cognition establishes the attributable present-state representation and requested additional authority/evidentiary establishment. The preserved record does not establish that Harmonic required the prohibited upstream standing/admissibility conclusion rather than additional attributable facts or witnesses.</p>
    </section>
    <section style={{padding:"58px 0"}}>
     <p style={{color:"#78dfff",fontSize:11,fontWeight:900}}>PRESERVATION RULE</p><h2 style={{font:"42px Georgia,serif"}}>The result does not rewrite the test.</h2><p style={{maxWidth:900,color:"#abc0cd",lineHeight:1.7}}>Artifact 004 retains the prospective freeze as antecedent evidence. No post-result repair, new criterion, runtime substitution, or packet revision is folded back into R1. Any successor examination must constitute a new governed chain.</p>
