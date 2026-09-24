@@ -8,7 +8,7 @@ const registrySections = [
     title: 'Founding Declaration',
     description:
       'The formal public declaration establishing the TA-14 Admissible Execution Architecture, its purpose, founder, steward, and institutional intent.',
-    href: '/registry/ta-14-admissible-execution-architecture/founding-declaration',
+    href: '/registry/ta-14-admissible-execution-architecture',
     status: 'LIVE',
   },
   {
