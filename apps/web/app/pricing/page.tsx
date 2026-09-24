@@ -18,9 +18,9 @@ function money(n:number){return new Intl.NumberFormat('en-US',{style:'currency',
 
 export default function PricingPage(){
   const [consequence,setConsequence]=useState('Allow an AI agent to change an HVAC setpoint');
-  const [customer,setCustomer]=useState<Customer>('Small Business');
+  const [customer,setCustomer]=useState<Customer>('Individual');
   const [subject,setSubject]=useState('AI Agent');
-  const [routes,setRoutes]=useState(5);
+  const [routes,setRoutes]=useState(1);
   const [domains,setDomains]=useState(1);
   const [advanced,setAdvanced]=useState(false);
   const [depth,setDepth]=useState<Depth>('Examine');
