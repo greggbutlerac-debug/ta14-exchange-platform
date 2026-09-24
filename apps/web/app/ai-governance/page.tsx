@@ -287,6 +287,34 @@ export default function AiGovernancePage() {
         </div>
       </section>
 
+      <section className="border-t border-white/10 bg-white/[0.02] px-6 py-16 sm:px-10 lg:px-16">
+        <div className="mx-auto max-w-7xl">
+          <p className="text-xs font-semibold uppercase tracking-[0.3em] text-cyan-300">Start with the question you need to prove</p>
+          <h2 className="mt-4 max-w-4xl text-3xl font-black uppercase tracking-[-0.035em] sm:text-5xl">From AI governance question to inspectable execution evidence</h2>
+          <p className="mt-5 max-w-4xl leading-7 text-white/65">You do not need to adopt TA-14 terminology before examining a consequential claim. Start with the problem in plain language, inspect the evidence boundary, then decide whether a bounded professional examination is warranted.</p>
+          <div className="mt-9 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+            {[
+              ['/ai-governance/execution-evidence','AI execution evidence','What evidence supports what the system was allowed to execute, what actually executed, and what outcome followed?'],
+              ['/ai-governance/ai-agent-audit-trail','AI agent audit trail','What should an agent audit trail prove beyond ordinary logging?'],
+              ['/ai-governance/prove-ai-agent-action-was-authorized','AI agent authorization','Can you prove this specific agent action had valid authority when it executed?'],
+              ['/ai-governance/authorization-changed-before-execution','Changed authorization','What happens when approval or authority changes before consequence?'],
+              ['/ai-governance/ai-logs-vs-execution-evidence','Logs vs execution evidence','When are logs useful evidence, and what may they still fail to establish?'],
+              ['/ai-governance/prove-ai-action-was-blocked','Proof of blocking','Can you prove a protected consequence was actually prevented rather than merely denied on one path?'],
+            ].map(([href,title,description]) => (
+              <Link key={href} href={href} className="rounded-3xl border border-white/10 bg-[#05070b] p-7 transition hover:border-cyan-300/60">
+                <h3 className="text-xl font-black uppercase tracking-[-0.025em]">{title}</h3>
+                <p className="mt-4 text-sm leading-6 text-white/58">{description}</p>
+                <p className="mt-6 text-xs font-black uppercase tracking-[0.18em] text-cyan-300">Examine the question →</p>
+              </Link>
+            ))}
+          </div>
+          <div className="mt-9 flex flex-wrap gap-4">
+            <Link href="/pricing?utm_source=internal&utm_medium=ai_governance_hub&utm_campaign=execution_evidence" className="rounded-full border border-cyan-300 bg-cyan-300 px-7 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-black">Bounded examination — from $149</Link>
+            <Link href="/pricing/ai-governance?utm_source=internal&utm_medium=ai_governance_hub&utm_campaign=architecture_engagement" className="rounded-full border border-white/20 px-7 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-white">Architecture & interoperability work</Link>
+          </div>
+        </div>
+      </section>
+
       <section className="border-t border-white/10 px-6 py-16 sm:px-10 lg:px-16">
         <div className="mx-auto max-w-7xl">
           <div className="mb-9">
