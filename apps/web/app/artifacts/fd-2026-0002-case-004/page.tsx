@@ -30,6 +30,14 @@ export default function HarmonicArtifact004(){
     <h3>F2 · NOT ESTABLISHED</h3><p style={{color:"#abc0cd",lineHeight:1.65}}>B did not remain executable through inherited historical validity.</p>
     <h3>F3 · NOT ESTABLISHED ON THE PRESERVED R1 RECORD</h3><p style={{color:"#abc0cd",lineHeight:1.65}}>The runtime stated that upstream cognition establishes the attributable present-state representation and requested additional authority/evidentiary establishment. The preserved record does not establish that Harmonic required the prohibited upstream standing/admissibility conclusion rather than additional attributable facts or witnesses.</p>
    </section>
+   <section style={{padding:"34px",border:"1px solid #ffffff18",borderRadius:20,marginTop:18}}>
+    <p style={{color:"#78dfff",fontSize:11,fontWeight:900}}>NATIVE RECORD ANCHORS · PRESERVED R1</p>
+    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:18}}>
+     <article><h3>SPECIMEN A</h3><p style={{color:"#abc0cd",lineHeight:1.7,wordBreak:"break-all"}}><b>Packet hash</b><br/>6597b04682975fc4ddaf2d9553466883ffca97c3a0d44f867218cb27fcc1e93b<br/><br/><b>Determination ID</b><br/>CD-4dbce442-8f2f-4386-99f4-41484140252a<br/><br/><b>Receipt ID</b><br/>CR-744aec81-ce54-4f64-8225-8c3b863b7919<br/><br/><b>Transaction digest</b><br/>d6c5f9aac449b5f9f862a26795a1ca1c2ab3d42079213325e50a216c59a4aae6</p></article>
+     <article><h3>SPECIMEN B</h3><p style={{color:"#abc0cd",lineHeight:1.7,wordBreak:"break-all"}}><b>Packet hash</b><br/>bd0815afb9165eb00202f9ede8777bbaa2d67a7b7aa1d00ac50360962bd16e33<br/><br/><b>Determination ID</b><br/>CD-04ec710a-de2c-4955-bb09-ed7ae287ddef<br/><br/><b>Receipt ID</b><br/>CR-d7281a3d-f2b4-4f74-9de0-0617f6668c00<br/><br/><b>Transaction digest</b><br/>3a46d2dc9cbd79463326efc64881336d0313b2c6a6733cef4e7789cf8c73cc63</p></article>
+    </div>
+    <p style={{color:"#8199a8",lineHeight:1.65,marginBottom:0}}>These anchors identify the frozen input packets and the native Harmonic records returned during R1. They preserve execution lineage; they do not expand the bounded determination.</p>
+   </section>
    <section style={{padding:"58px 0"}}>
     <p style={{color:"#78dfff",fontSize:11,fontWeight:900}}>PRESERVATION RULE</p><h2 style={{font:"42px Georgia,serif"}}>The result does not rewrite the test.</h2><p style={{maxWidth:900,color:"#abc0cd",lineHeight:1.7}}>Artifact 004 retains the prospective freeze as antecedent evidence. No post-result repair, new criterion, runtime substitution, or packet revision is folded back into R1. Any successor examination must constitute a new governed chain.</p>
     <div style={{display:"flex",gap:12,flexWrap:"wrap",marginTop:24}}><Link href="/registry/ta-14-admissible-execution-architecture/showcase/harmonic-prospective-examination">OPEN EXECUTED SHOWROOM →</Link><Link href="/artifacts/fd-2026-0002-case-003">← HARMONIC ARTIFACT 003</Link></div>
