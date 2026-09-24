@@ -72,7 +72,7 @@ const registrySections = [
     title: 'Version History',
     description:
       'The preserved amendment and supersession record showing how the architecture changes without erasing prior versions or challenges.',
-    href: '/registry/ta-14-admissible-execution-architecture/versions',
+    href: '/academy/commit-and-version-history',
     status: 'LIVE',
   },
   {
@@ -80,8 +80,8 @@ const registrySections = [
     title: 'Challenges and Disputes',
     description:
       'The public route for submitting, preserving, reviewing, and resolving material challenges to claims, evidence, chronology, standing, or scope.',
-    href: '/registry/ta-14-admissible-execution-architecture/challenges',
-    status: 'NEXT',
+    href: '/workspace/records/disputes',
+    status: 'LIVE',
   },
 ];
 
