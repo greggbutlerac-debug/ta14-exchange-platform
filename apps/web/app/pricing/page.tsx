@@ -7,139 +7,96 @@ type Customer = 'Individual' | 'Professional' | 'Small Business' | 'Organization
 type Depth = 'Examine' | 'Establish' | 'Operate';
 
 const anchors = ['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome'];
+const customerBase: Record<Customer, number> = {'Individual':49,'Professional':149,'Small Business':349,'Organization':750,'Enterprise / Public Institution':1500};
+const depthFactor: Record<Depth, number> = {Examine:1,Establish:1.8,Operate:2.6};
+const market = [
+  {name:'Cloud Sentry',price:2500,label:'AI Governance Assessment',scope:'Published one-time assessment of governance capability, decision-making, data and access.',url:'https://cloudsentry.com/plans'},
+  {name:'Pivot AI Solutions',price:5000,label:'AI Exposure Assessment',scope:'Published 1–2 week discovery, data-flow, credential and logging review with findings and remediation roadmap.',url:'https://pivotalsolutions.ai/ai-governance-assessment/'},
+  {name:'Reigne Intelligence',price:9500,label:'AI Governance Assessment',scope:'Published standard rate for decision inventory, risk-tier map, approval paths, evidence design and roadmap.',url:'https://reigneintelligence.com/'},
+];
+function money(n:number){return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n)}
 
-const customerBase: Record<Customer, number> = {
-  'Individual': 49,
-  'Professional': 149,
-  'Small Business': 349,
-  'Organization': 750,
-  'Enterprise / Public Institution': 1500,
-};
+export default function PricingPage(){
+  const [consequence,setConsequence]=useState('Allow an AI agent to change an HVAC setpoint');
+  const [customer,setCustomer]=useState<Customer>('Small Business');
+  const [subject,setSubject]=useState('AI Agent');
+  const [routes,setRoutes]=useState(5);
+  const [domains,setDomains]=useState(1);
+  const [depth,setDepth]=useState<Depth>('Examine');
+  const [implementation,setImplementation]=useState(false);
+  const [revalidation,setRevalidation]=useState(false);
+  const [failure,setFailure]=useState<string|null>(null);
+  const [budget,setBudget]=useState(2500);
 
-const depthFactor: Record<Depth, number> = { Examine: 1, Establish: 1.8, Operate: 2.6 };
-
-function money(n:number) {
-  return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',maximumFractionDigits:0}).format(n);
-}
-
-export default function PricingPage() {
-  const [customer,setCustomer] = useState<Customer>('Small Business');
-  const [subject,setSubject] = useState('AI Agent');
-  const [routes,setRoutes] = useState(1);
-  const [domains,setDomains] = useState(1);
-  const [depth,setDepth] = useState<Depth>('Examine');
-  const [implementation,setImplementation] = useState(false);
-  const [revalidation,setRevalidation] = useState(false);
-  const [broken,setBroken] = useState<string | null>(null);
-
-  const price = useMemo(() => {
-    const base = customerBase[customer];
-    const extraRoutes = Math.max(0,routes-1) * Math.max(35,Math.round(base*.22));
-    const federation = Math.max(0,domains-1) * Math.max(50,Math.round(base*.18));
-    const implementationCost = implementation ? Math.max(100,Math.round(base*.45)) : 0;
-    const revalidationCost = revalidation ? Math.max(49,Math.round(base*.2)) : 0;
-    return Math.round((base+extraRoutes+federation+implementationCost+revalidationCost)*depthFactor[depth]);
+  const calc=useMemo(()=>{
+    const base=customerBase[customer];
+    const routeUnit=Math.max(35,Math.round(base*.22));
+    const routeCost=Math.max(0,routes-1)*routeUnit;
+    const federationUnit=Math.max(50,Math.round(base*.18));
+    const federation=Math.max(0,domains-1)*federationUnit;
+    const implementationCost=implementation?Math.max(100,Math.round(base*.45)):0;
+    const revalidationCost=revalidation?Math.max(49,Math.round(base*.2)):0;
+    const subtotal=base+routeCost+federation+implementationCost+revalidationCost;
+    return {base,routeUnit,routeCost,federationUnit,federation,implementationCost,revalidationCost,total:Math.round(subtotal*depthFactor[depth])};
   },[customer,routes,domains,depth,implementation,revalidation]);
 
-  const determination = broken ? (broken === 'Admissibility' || broken === 'Binding' ? 'DENY / ESCALATE' : 'HOLD') : 'ALLOW — DEMONSTRATION ONLY';
+  const sameBudgetRoutes=Math.max(1,1+Math.floor((budget-calc.base)/calc.routeUnit));
+  const state = failure==='Authority revoked'?'HOLD — authority must be re-established locally':failure==='Continuity broken'?'HOLD — continuity is not established':failure==='Connection revoked'?'HOLD — governed relationship no longer supports crossing':failure==='Reality changed'?'HOLD — changed conditions require re-examination':failure==='Evidence inadmissible'?'DENY / ESCALATE — required evidence is not admissible':'ALLOW — DEMONSTRATION ONLY';
+  const stopAt = failure==='Continuity broken'?2:failure==='Evidence inadmissible'?3:failure==='Authority revoked'||failure==='Connection revoked'?5:failure==='Reality changed'?5:8;
 
-  return (
-    <div className="page">
-      <style>{`
-        :root{--bg:#02060b;--panel:#07111d;--line:rgba(129,190,235,.18);--text:#f6fbff;--muted:#9bb0c3;--cyan:#5ce9ff;--green:#42f5a7;--gold:#ffd56e}
-        *{box-sizing:border-box} body{margin:0;background:radial-gradient(circle at 15% 0,rgba(45,157,255,.17),transparent 30%),linear-gradient(180deg,#02060b,#07111d 52%,#02060b);color:var(--text);font-family:Inter,system-ui,sans-serif}
-        button,select,input{font:inherit}.page{min-height:100vh}.shell{width:min(1180px,92vw);margin:auto}.top{position:sticky;top:0;z-index:20;background:rgba(2,6,11,.86);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
-        .nav{height:68px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;color:white;text-decoration:none;font-weight:950;letter-spacing:.08em}.mark{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(92,233,255,.4);border-radius:13px;color:var(--cyan)}
-        .navlinks{display:flex;gap:18px}.navlinks a{color:var(--muted);text-decoration:none;font-size:14px}.hero{text-align:center;padding:82px 0 48px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:950;letter-spacing:.19em;text-transform:uppercase}
-        h1{font-size:clamp(48px,7vw,88px);line-height:.94;letter-spacing:-.055em;margin:13px auto 20px;max-width:1050px}.grad{color:transparent;background:linear-gradient(90deg,#fff,var(--cyan),var(--green));background-clip:text}
-        .hero p{max-width:850px;margin:auto;color:#b5c6d7;font-size:19px;line-height:1.7}.manifesto{margin:26px auto 0;padding:15px 20px;width:fit-content;border:1px solid rgba(66,245,167,.25);border-radius:999px;color:var(--green);font-weight:900}
-        .chain{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin:10px 0 44px}.anchor{padding:14px 6px;text-align:center;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.025);font-size:12px;font-weight:850}.anchor.off{border-color:rgba(255,95,95,.5);color:#ff9292;background:rgba(255,70,70,.08)}
-        .builder{display:grid;grid-template-columns:1.25fr .75fr;gap:18px;margin-bottom:70px}.panel{border:1px solid var(--line);border-radius:25px;background:rgba(7,17,29,.86);padding:28px;box-shadow:0 24px 70px rgba(0,0,0,.24)}
-        .panel h2{font-size:34px;letter-spacing:-.04em;margin:7px 0 8px}.panel>p{color:var(--muted);line-height:1.6}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:24px}.field{display:grid;gap:7px}.field label{font-size:12px;color:#c8d7e5;font-weight:850}.field select,.field input{width:100%;min-height:48px;border:1px solid var(--line);border-radius:12px;background:#06101b;color:white;padding:0 12px}
-        .rangeRow{display:flex;align-items:center;gap:12px}.rangeRow input{padding:0}.count{min-width:42px;text-align:center;font-weight:950;color:var(--cyan)}.toggles{display:grid;gap:10px;margin-top:15px}.toggle{display:flex;align-items:center;justify-content:space-between;padding:13px 14px;border:1px solid var(--line);border-radius:12px;color:#d8e5ef}.toggle input{width:20px;height:20px}
-        .receipt{position:sticky;top:88px;height:fit-content}.price{font-size:58px;font-weight:950;letter-spacing:-.06em;color:var(--green);margin:10px 0}.small{font-size:12px;color:var(--muted)}.summary{display:grid;gap:9px;margin:20px 0}.row{display:flex;justify-content:space-between;gap:20px;padding-bottom:9px;border-bottom:1px solid var(--line);font-size:13px}.row span:first-child{color:var(--muted)}.notice{padding:14px;border-radius:13px;background:rgba(255,213,110,.07);border:1px solid rgba(255,213,110,.2);color:#ffe6a3;font-size:13px;line-height:1.55}
-        .cta{display:flex;justify-content:center;align-items:center;min-height:50px;margin-top:16px;border-radius:13px;background:linear-gradient(90deg,var(--cyan),var(--green));color:#02110b;text-decoration:none;font-weight:950}
-        .section{margin-bottom:78px}.section h2{font-size:clamp(36px,5vw,58px);letter-spacing:-.05em;line-height:1;margin:10px 0 14px}.section p{color:var(--muted);line-height:1.7;max-width:850px}.routes{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:24px}.route{padding:20px;border:1px solid var(--line);border-radius:18px;background:rgba(7,17,29,.75)}.route b{display:block;margin-bottom:7px}.route span{color:var(--muted);font-size:13px;line-height:1.5}
-        .break{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;margin:22px 0}.break button{min-height:45px;border-radius:11px;border:1px solid var(--line);background:rgba(255,255,255,.03);color:white;cursor:pointer}.break button.active{border-color:#ff7373;color:#ff9b9b;background:rgba(255,70,70,.08)}.determination{padding:18px;border:1px solid var(--line);border-radius:15px;font-weight:950;font-size:20px}.determination strong{color:var(--gold)}
-        .compare{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:22px}.compareCard{padding:23px;border:1px solid var(--line);border-radius:20px;background:rgba(7,17,29,.78)}.compareCard h3{margin:0 0 8px}.compareCard p{font-size:14px}.bigline{font-size:25px;font-weight:950;color:var(--cyan);margin:15px 0 6px}
-        .footerRule{margin:0 0 90px;padding:34px;border-radius:25px;border:1px solid rgba(92,233,255,.28);background:linear-gradient(135deg,rgba(45,157,255,.1),rgba(66,245,167,.05))}.footerRule h2{font-size:42px;margin:8px 0 12px;letter-spacing:-.04em}.footerRule p{color:#b7c8d7;line-height:1.7}
-        @media(max-width:850px){.builder,.compare{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.chain{grid-template-columns:repeat(4,1fr)}.routes{grid-template-columns:1fr}.break{grid-template-columns:repeat(2,1fr)}.receipt{position:static}.navlinks{display:none}}
-      `}</style>
+  return <div className="page"><style>{`
+    :root{--bg:#02060b;--panel:#07111d;--line:rgba(129,190,235,.18);--text:#f6fbff;--muted:#9bb0c3;--cyan:#5ce9ff;--green:#42f5a7;--gold:#ffd56e;--red:#ff8181}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 12% 0,rgba(45,157,255,.17),transparent 28%),linear-gradient(180deg,#02060b,#07111d 48%,#02060b);color:var(--text);font-family:Inter,system-ui,sans-serif}button,select,input{font:inherit}.shell{width:min(1180px,92vw);margin:auto}
+    .top{position:sticky;top:0;z-index:20;background:rgba(2,6,11,.88);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}.nav{height:68px;display:flex;align-items:center;justify-content:space-between}.brand{display:flex;align-items:center;gap:10px;color:#fff;text-decoration:none;font-weight:950;letter-spacing:.07em}.mark{display:grid;place-items:center;width:40px;height:40px;border:1px solid rgba(92,233,255,.4);border-radius:13px;color:var(--cyan)}.navlinks{display:flex;gap:18px}.navlinks a{color:var(--muted);text-decoration:none;font-size:14px}
+    .hero{text-align:center;padding:80px 0 40px}.eyebrow{color:var(--cyan);font-size:11px;font-weight:950;letter-spacing:.19em;text-transform:uppercase}h1{font-size:clamp(48px,7vw,88px);line-height:.94;letter-spacing:-.055em;margin:13px auto 20px;max-width:1050px}.grad{color:transparent;background:linear-gradient(90deg,#fff,var(--cyan),var(--green));background-clip:text}.hero p{max-width:820px;margin:auto;color:#b5c6d7;font-size:19px;line-height:1.65}.manifesto{margin:25px auto 0;padding:14px 20px;width:fit-content;border:1px solid rgba(66,245,167,.28);border-radius:999px;color:var(--green);font-weight:950}
+    .panel{border:1px solid var(--line);border-radius:25px;background:rgba(7,17,29,.88);padding:28px;box-shadow:0 24px 70px rgba(0,0,0,.24)}.builder{display:grid;grid-template-columns:1.28fr .72fr;gap:18px;margin:24px 0 72px}.panel h2,.section h2{letter-spacing:-.045em}.panel h2{font-size:35px;margin:7px 0}.panel>p,.section>p{color:var(--muted);line-height:1.65}.consequence{margin:22px 0}.consequence label,.field label{display:block;font-size:11px;color:#c8d7e5;font-weight:900;letter-spacing:.07em;margin-bottom:7px}.consequence input,.field select{width:100%;min-height:52px;border:1px solid rgba(92,233,255,.22);border-radius:13px;background:#06101b;color:#fff;padding:0 14px}.consequence input{font-size:16px}.fields{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field{display:grid;gap:4px}.rangeRow{display:flex;align-items:center;gap:12px;min-height:52px}.rangeRow input{width:100%}.count{min-width:38px;text-align:center;color:var(--cyan);font-weight:950}.toggles{display:grid;gap:9px;margin-top:14px}.toggle{display:flex;justify-content:space-between;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;color:#d8e5ef}
+    .receipt{position:sticky;top:88px;height:fit-content}.price{font-size:58px;font-weight:950;letter-spacing:-.06em;color:var(--green);margin:8px 0}.small{font-size:12px;color:var(--muted);line-height:1.5}.summary{display:grid;gap:8px;margin:20px 0}.row{display:flex;justify-content:space-between;gap:18px;padding-bottom:8px;border-bottom:1px solid var(--line);font-size:13px}.row span:first-child{color:var(--muted)}.economics{padding:14px;border-radius:14px;background:rgba(92,233,255,.05);border:1px solid rgba(92,233,255,.17);font-size:13px;line-height:1.7}.economics b{color:var(--cyan)}.notice{margin-top:12px;padding:14px;border-radius:13px;background:rgba(255,213,110,.07);border:1px solid rgba(255,213,110,.2);color:#ffe6a3;font-size:13px;line-height:1.55}.cta{display:flex;justify-content:center;align-items:center;min-height:52px;margin-top:15px;border-radius:13px;background:linear-gradient(90deg,var(--cyan),var(--green));color:#02110b;text-decoration:none;font-weight:950}
+    .chain{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin:20px 0}.anchor{position:relative;padding:15px 5px;text-align:center;border:1px solid rgba(66,245,167,.24);border-radius:12px;background:rgba(66,245,167,.04);font-size:12px;font-weight:850}.anchor.stop{border-color:rgba(255,129,129,.55);background:rgba(255,80,80,.08);color:var(--red)}.anchor.after{opacity:.3}.section{margin-bottom:82px}.section h2{font-size:clamp(36px,5vw,58px);line-height:1;margin:9px 0 14px}.scenario{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin:22px 0}.scenario button{min-height:58px;padding:8px;border:1px solid var(--line);border-radius:12px;background:rgba(255,255,255,.03);color:#fff;cursor:pointer}.scenario button.active{border-color:var(--red);background:rgba(255,80,80,.08);color:#ffaaaa}.determination{padding:19px;border:1px solid var(--line);border-radius:15px;font-weight:950;font-size:19px}.determination strong{color:var(--gold)}
+    .budgetBox{border:1px solid rgba(92,233,255,.3);border-radius:28px;padding:30px;background:linear-gradient(135deg,rgba(45,157,255,.11),rgba(66,245,167,.05));margin-top:22px}.budgetHead{display:grid;grid-template-columns:1fr auto;gap:18px;align-items:end}.budgetNumber{font-size:clamp(54px,8vw,92px);font-weight:950;letter-spacing:-.065em;color:var(--green)}.budgetSelect{display:flex;gap:8px;flex-wrap:wrap}.budgetSelect button{border:1px solid var(--line);border-radius:999px;background:#06101b;color:#fff;padding:10px 15px;cursor:pointer}.budgetSelect button.active{border-color:var(--cyan);color:var(--cyan)}.reveal{display:grid;grid-template-columns:1fr 80px 1fr;gap:15px;align-items:stretch;margin-top:24px}.revealCard{padding:22px;border:1px solid var(--line);border-radius:18px;background:rgba(2,6,11,.45)}.revealCard h3{margin:0 0 9px}.versus{display:grid;place-items:center;font-weight:950;color:var(--muted)}.routesBig{font-size:48px;font-weight:950;color:var(--cyan);letter-spacing:-.05em}.marketCards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:20px}.marketCard{padding:18px;border:1px solid var(--line);border-radius:16px;background:rgba(7,17,29,.8)}.marketCard b{display:block;font-size:18px}.marketCard strong{display:block;color:var(--gold);font-size:25px;margin:7px 0}.marketCard p{font-size:12px;color:var(--muted);line-height:1.5}.marketCard a{color:var(--cyan);font-size:12px}.disclaimer{font-size:11px;color:#7f95a8;line-height:1.6;margin-top:13px}
+    .routes{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.route{padding:19px;border:1px solid var(--line);border-radius:17px;background:rgba(7,17,29,.72)}.route b{display:block;margin-bottom:6px}.route span{font-size:13px;color:var(--muted);line-height:1.5}.footerRule{margin:0 0 90px;padding:34px;border-radius:25px;border:1px solid rgba(92,233,255,.28);background:linear-gradient(135deg,rgba(45,157,255,.1),rgba(66,245,167,.05))}.footerRule h2{font-size:42px;margin:8px 0 12px;letter-spacing:-.04em}.footerRule p{color:#b7c8d7;line-height:1.7}
+    @media(max-width:850px){.builder,.reveal,.budgetHead{grid-template-columns:1fr}.fields{grid-template-columns:1fr}.chain{grid-template-columns:repeat(4,1fr)}.scenario{grid-template-columns:1fr 1fr}.routes,.marketCards{grid-template-columns:1fr}.receipt{position:static}.navlinks{display:none}.versus{min-height:35px}}
+  `}</style>
+  <header className="top"><div className="shell nav"><Link className="brand" href="/"><span className="mark">14</span>TA-14 PRICING & ENGAGEMENT</Link><nav className="navlinks"><Link href="/admissible-federation-architecture">AFA</Link><Link href="/execution-authority-boundary-architecture">EABA</Link><Link href="/showrooms">Showrooms</Link><Link href="/review">Review</Link></nav></div></header>
+  <main className="shell">
+    <section className="hero"><div className="eyebrow">TA-14 Admissible Execution Architecture</div><h1>You can afford to ask<br/><span className="grad">more than one question.</span></h1><p>Start with one proposed consequence. Establish the baseline once. Then change the evidence, authority, connection or reality and run another bounded route without buying the whole engagement again.</p><div className="manifesto">DON'T SPEND MORE TO EXAMINE LESS.</div></section>
 
-      <header className="top"><div className="shell nav"><Link className="brand" href="/"><span className="mark">14</span>TA-14 PRICING & ENGAGEMENT</Link><nav className="navlinks"><Link href="/admissible-federation-architecture">AFA</Link><Link href="/execution-authority-boundary-architecture">EABA</Link><Link href="/showrooms">Showrooms</Link><Link href="/review">Review</Link></nav></div></header>
+    <section className="builder">
+      <div className="panel"><div className="eyebrow">1 · Name the consequence</div><h2>What are you trying to make happen safely?</h2><p>Say it in plain language. Everything else is built around the consequence you want examined.</p>
+        <div className="consequence"><label>PROPOSED CONSEQUENCE</label><input value={consequence} onChange={e=>setConsequence(e.target.value)} placeholder="Example: Release a payment, change a setpoint, issue a warning…"/></div>
+        <div className="fields">
+          <div className="field"><label>WHAT ARE YOU EXAMINING?</label><select value={subject} onChange={e=>setSubject(e.target.value)}>{['AI Agent','Building / HVACD/R','Indoor Environmental Quality','Financial Transaction','Data / API','Autonomous System','Human Decision','Other'].map(x=><option key={x}>{x}</option>)}</select></div>
+          <div className="field"><label>HOW FAR SHOULD TA-14 GO?</label><select value={depth} onChange={e=>setDepth(e.target.value as Depth)}><option>Examine</option><option>Establish</option><option>Operate</option></select></div>
+          <div className="field"><label>HOW MANY ROUTES?</label><div className="rangeRow"><input type="range" min="1" max="20" value={routes} onChange={e=>setRoutes(Number(e.target.value))}/><span className="count">{routes}</span></div></div>
+          <div className="field"><label>INDEPENDENT DOMAINS</label><div className="rangeRow"><input type="range" min="1" max="6" value={domains} onChange={e=>setDomains(Number(e.target.value))}/><span className="count">{domains}</span></div></div>
+          <div className="field"><label>WHO ARE YOU?</label><select value={customer} onChange={e=>setCustomer(e.target.value as Customer)}>{Object.keys(customerBase).map(x=><option key={x}>{x}</option>)}</select></div>
+        </div>
+        <div className="toggles"><label className="toggle"><span>Add implementation work</span><input type="checkbox" checked={implementation} onChange={e=>setImplementation(e.target.checked)}/></label><label className="toggle"><span>Add continuing revalidation</span><input type="checkbox" checked={revalidation} onChange={e=>setRevalidation(e.target.checked)}/></label></div>
+      </div>
+      <aside className="panel receipt"><div className="eyebrow">Live planning estimate</div><div className="price">{money(calc.total)}</div><div className="small">Final scope and fixed price are confirmed before paid work begins.</div>
+        <div className="summary"><div className="row"><span>Baseline / first route</span><b>{money(calc.base)}</b></div><div className="row"><span>Additional routes</span><b>{routes-1} × {money(calc.routeUnit)}</b></div>{domains>1&&<div className="row"><span>Additional domains</span><b>{domains-1} × {money(calc.federationUnit)}</b></div>}<div className="row"><span>Parent chain</span><b>8 anchors</b></div></div>
+        <div className="economics"><b>Why routes get cheaper:</b> the first route establishes the bounded baseline. Additional routes reuse what remains valid and change named conditions. They are not priced as brand-new engagements.</div>
+        <div className="notice"><b>TA-14 does not sell ALLOW.</b><br/>Payment buys the examination and professional work — never a predetermined determination.</div>
+        <a className="cta" href={`mailto:ta14admissibleexecution@gmail.com?subject=TA-14%20Bounded%20Examination%20Request&body=Proposed%20consequence:%20${encodeURIComponent(consequence)}%0ACustomer:%20${encodeURIComponent(customer)}%0ASubject:%20${encodeURIComponent(subject)}%0ADepth:%20${depth}%0ARoutes:%20${routes}%0ADomains:%20${domains}%0APlanning%20estimate:%20${encodeURIComponent(money(calc.total))}`}>START THIS BOUNDED EXAMINATION</a>
+      </aside>
+    </section>
 
-      <main className="shell">
-        <section className="hero">
-          <div className="eyebrow">TA-14 Admissible Execution Architecture</div>
-          <h1>Do more examination.<br/><span className="grad">Not less.</span></h1>
-          <p>One proposed consequence is rarely one question. Configure a bounded TA-14 examination, add routes, change conditions, and see the price update as you build. The goal is simple: make rigorous examination affordable enough to run again.</p>
-          <div className="manifesto">DON'T SPEND MORE TO EXAMINE LESS.</div>
-        </section>
+    <section className="section"><div className="eyebrow">2 · Name the test. Freeze the test. Run the test.</div><h2>One consequence. Multiple realities.</h2><p><b style={{color:'#fff'}}>{consequence||'Your proposed consequence'}</b> can be examined under more than one condition. Change one bounded fact and watch where the demonstration route stops.</p>
+      <div className="scenario">{['Evidence inadmissible','Continuity broken','Authority revoked','Connection revoked','Reality changed'].map(x=><button key={x} className={failure===x?'active':''} onClick={()=>setFailure(failure===x?null:x)}>{failure===x?'RESTORE · ':''}{x}</button>)}</div>
+      <div className="chain">{anchors.map((a,i)=><div key={a} className={'anchor '+(failure&&i===stopAt?'stop ':failure&&i>stopAt?'after':'')}>{a}</div>)}</div>
+      <div className="determination">DEMONSTRATION DISPOSITION: <strong>{state}</strong></div>
+      <div className="disclaimer">Illustrative teaching interaction only. A real determination requires the frozen examination criteria and attributable evidence for the actual proposed consequence.</div>
+    </section>
 
-        <div className="chain">{anchors.map(a=><div key={a} className={'anchor '+(broken===a?'off':'')}>{a}</div>)}</div>
+    <section className="section"><div className="eyebrow">3 · The economic difference</div><h2>You have {money(budget)}. What can you examine?</h2><p>Use a real published assessment budget as a reference point. This does not claim the services are equivalent. It shows what the same available budget can fund under the current TA-14 planning model.</p>
+      <div className="budgetBox"><div className="budgetHead"><div><div className="eyebrow">Use a published budget</div><div className="budgetNumber">{money(budget)}</div></div><div className="budgetSelect">{market.map(m=><button key={m.price} className={budget===m.price?'active':''} onClick={()=>setBudget(m.price)}>{money(m.price)}</button>)}</div></div>
+        <div className="reveal"><div className="revealCard"><h3>Published external engagement</h3>{market.filter(m=>m.price===budget).map(m=><div key={m.name}><div className="routesBig">1</div><b>{m.label}</b><p>{m.name} publishes this engagement at {money(m.price)}. Its stated scope is summarized below from the provider's own page.</p></div>)}</div><div className="versus">SAME<br/>BUDGET</div><div className="revealCard"><h3>TA-14 planning model</h3><div className="routesBig">{sameBudgetRoutes}</div><b>bounded routes through one parent chain</b><p>At the current {customer.toLowerCase()} / {depth.toLowerCase()} baseline economics, before optional implementation, extra domains or continuing operation.</p></div></div>
+      </div>
+      <div className="marketCards">{market.map(m=><div className="marketCard" key={m.name}><b>{m.name}</b><strong>{money(m.price)}</strong><span>{m.label}</span><p>{m.scope}</p><a href={m.url} target="_blank" rel="noreferrer">VIEW PUBLISHED SOURCE ↗</a></div>)}</div>
+      <div className="disclaimer">Published examples accessed September 24, 2026. They are different services with different methods, deliverables and scopes. TA-14 does not represent them as substitutes or equivalents. External prices may change; follow the source for the provider's current terms.</div>
+    </section>
 
-        <section className="builder">
-          <div className="panel">
-            <div className="eyebrow">Build your examination</div><h2>What are you trying to make happen safely?</h2>
-            <p>Start with the consequence. The architecture stays underneath the experience and calculates the bounded scope as you make selections.</p>
-            <div className="fields">
-              <div className="field"><label>WHO ARE YOU?</label><select value={customer} onChange={e=>setCustomer(e.target.value as Customer)}>{Object.keys(customerBase).map(x=><option key={x}>{x}</option>)}</select></div>
-              <div className="field"><label>WHAT ARE YOU EXAMINING?</label><select value={subject} onChange={e=>setSubject(e.target.value)}>{['AI Agent','Building / HVACD/R','Indoor Environmental Quality','Financial Transaction','Data / API','Autonomous System','Human Decision','Other'].map(x=><option key={x}>{x}</option>)}</select></div>
-              <div className="field"><label>HOW FAR SHOULD TA-14 GO?</label><select value={depth} onChange={e=>setDepth(e.target.value as Depth)}><option>Examine</option><option>Establish</option><option>Operate</option></select></div>
-              <div className="field"><label>INDEPENDENT DOMAINS</label><div className="rangeRow"><input type="range" min="1" max="6" value={domains} onChange={e=>setDomains(Number(e.target.value))}/><span className="count">{domains}</span></div></div>
-              <div className="field" style={{gridColumn:'1 / -1'}}><label>EXAMINATION ROUTES — ADD ROUTES, NOT GIANT NEW ENGAGEMENTS</label><div className="rangeRow"><input type="range" min="1" max="12" value={routes} onChange={e=>setRoutes(Number(e.target.value))}/><span className="count">{routes}</span></div></div>
-            </div>
-            <div className="toggles">
-              <label className="toggle"><span>Add implementation work</span><input type="checkbox" checked={implementation} onChange={e=>setImplementation(e.target.checked)}/></label>
-              <label className="toggle"><span>Add continuing revalidation</span><input type="checkbox" checked={revalidation} onChange={e=>setRevalidation(e.target.checked)}/></label>
-            </div>
-          </div>
+    <section className="section"><div className="eyebrow">4 · Do more examination, not less</div><h2>Change the condition. Run it again.</h2><p>The point is not to manufacture more work. It is to make it economically reasonable to examine the routes that could materially change the answer.</p><div className="routes"><div className="route"><b>Normal route</b><span>Evidence, authority and conditions remain valid through commit.</span></div><div className="route"><b>Evidence route</b><span>Remove provenance, continuity, currency or a required record.</span></div><div className="route"><b>Authority route</b><span>Revoke, expire or narrow authority before commit.</span></div><div className="route"><b>Connection route</b><span>Change or revoke the governed relationship between independent parties.</span></div><div className="route"><b>Changed-reality route</b><span>Occupancy, equipment, environment or another material condition changes.</span></div><div className="route"><b>Federated route</b><span>Context crosses domains while execution authority is established locally.</span></div></div></section>
 
-          <aside className="panel receipt">
-            <div className="eyebrow">Live scope estimate</div><div className="price">{money(price)}</div>
-            <div className="small">Interactive planning estimate. Final scope is confirmed before paid work begins.</div>
-            <div className="summary">
-              <div className="row"><span>Subject</span><b>{subject}</b></div><div className="row"><span>Depth</span><b>{depth}</b></div><div className="row"><span>Routes</span><b>{routes}</b></div><div className="row"><span>Domains</span><b>{domains}</b></div><div className="row"><span>Parent chain</span><b>8 anchors</b></div>
-            </div>
-            <div className="notice"><b>TA-14 does not sell ALLOW.</b><br/>You are paying for examination, evidence work, implementation, documentation and governance — never a predetermined determination.</div>
-            <a className="cta" href={`mailto:ta14admissibleexecution@gmail.com?subject=TA-14%20Bounded%20Examination%20Request&body=Customer:%20${encodeURIComponent(customer)}%0ASubject:%20${encodeURIComponent(subject)}%0ADepth:%20${depth}%0ARoutes:%20${routes}%0ADomains:%20${domains}%0APlanning%20estimate:%20${encodeURIComponent(money(price))}`}>START THIS BOUNDED EXAMINATION</a>
-          </aside>
-        </section>
-
-        <section className="section">
-          <div className="eyebrow">One consequence. Multiple routes.</div><h2>Ask more questions with the same baseline.</h2>
-          <p>The first route establishes the field. Additional bounded routes can reuse what remains valid, so testing changed conditions does not automatically become another full engagement.</p>
-          <div className="routes">
-            <div className="route"><b>Normal route</b><span>Evidence, authority and conditions remain valid through commit.</span></div>
-            <div className="route"><b>Evidence changes</b><span>Remove provenance, continuity, currency or a required record and run again.</span></div>
-            <div className="route"><b>Authority changes</b><span>Revoke, expire or narrow authority before the proposed consequence reaches commit.</span></div>
-            <div className="route"><b>Connection changes</b><span>Change or revoke the governed relationship between independent parties.</span></div>
-            <div className="route"><b>Reality changes</b><span>Occupancy, equipment, environment or another material condition changes.</span></div>
-            <div className="route"><b>Federated route</b><span>Carry governed context across domains while execution authority remains locally established.</span></div>
-          </div>
-        </section>
-
-        <section className="section">
-          <div className="eyebrow">Interactive demonstration</div><h2>Break the chain.</h2>
-          <p>Remove an anchor and watch the demonstration disposition change. This is illustrative, not a real determination; actual TA-14 findings depend on the evidence, authority, standing and frozen examination criteria.</p>
-          <div className="break">{anchors.map(a=><button key={a} className={broken===a?'active':''} onClick={()=>setBroken(broken===a?null:a)}>{broken===a?'Restore ':'Remove '}{a}</button>)}</div>
-          <div className="determination">DEMONSTRATION DISPOSITION: <strong>{determination}</strong></div>
-        </section>
-
-        <section className="section">
-          <div className="eyebrow">Pricing philosophy</div><h2>Different services answer different questions.</h2>
-          <p>TA-14 does not claim that commissioning, cybersecurity, AI governance, interoperability, legal review or compliance are interchangeable. The comparison that matters is what each engagement explicitly establishes — and what still must be established before a proposed consequence may become reality.</p>
-          <div className="compare">
-            <div className="compareCard"><h3>Published market examples</h3><p>Where we display outside pricing, it should be dated, sourced and described as that provider's published scope — never presented as an invented industry average or as an equivalent service.</p><div className="bigline">Source the claim.</div><p>Then let the visitor compare budgets without attacking the provider.</p></div>
-            <div className="compareCard"><h3>TA-14 budget view</h3><p>The useful question is not “who is cheaper?” It is: with the same available budget, how many bounded routes and changed conditions can be put under examination here?</p><div className="bigline">{routes} route{routes===1?'':'s'} · {money(price)}</div><p>Change the route count above and the estimate recalculates immediately.</p></div>
-          </div>
-        </section>
-
-        <section className="footerRule">
-          <div className="eyebrow">Independent execution boundary</div><h2>No admissible evidence. No admissible execution.</h2>
-          <p><b>Payment cannot purchase a favorable result.</b> TA-14 fees compensate the professional work required to examine and, where engaged, establish or operate the route. The governing question remains: Does this proposed consequence have sufficient <b>Admissible Evidence</b>, <b>Applicable Authority</b>, and <b>Established Standing</b> to become reality NOW?</p>
-        </section>
-      </main>
-    </div>
-  );
+    <section className="footerRule"><div className="eyebrow">Independent execution boundary</div><h2>No admissible evidence. No admissible execution.</h2><p><b>Payment cannot purchase a favorable result.</b> TA-14 fees compensate the work required to examine and, where engaged, establish or operate the route. The governing question remains: Does this proposed consequence have sufficient <b>Admissible Evidence</b>, <b>Applicable Authority</b>, and <b>Established Standing</b> to become reality <b>NOW?</b></p></section>
+  </main></div>
 }
