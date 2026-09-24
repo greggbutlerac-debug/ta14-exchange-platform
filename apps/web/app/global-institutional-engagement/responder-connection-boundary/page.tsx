@@ -2,96 +2,90 @@ import Link from 'next/link';
 import ResponderConnectionLab from './ResponderConnectionLab';
 
 export const metadata = {
-  title: 'Responder Connection Boundary | CNS/CP × TA-14',
-  description: 'Interactive public technical showroom separating building meaning, fixed Connection Profiles, dynamic connection policy, federation context and local execution authority.',
+  title: 'The Governed Crossing | CNS/CP × ONUMA × TA-14',
+  description: 'An interactive examination of the boundary between building meaning, Connection Profiles, connection policy, authority context and local execution.',
 };
 
 const layers = [
-  ['01','BUILDING / GRAPH','ONUMA · RE1 · ASHRAE 223','Persistent identity, semantics, topology and APIs establish what the building objects are and how they relate.'],
-  ['02','INTERACTION CONTRACT','CNS/CP','Fixed, named Profiles define a reusable interaction between independently operated parties.'],
-  ['03','CONNECTION POLICY','CNS/CP ORCHESTRATION','The situation determines which connection is established under which Profile, for whom, for how long, and when it is revoked.'],
-  ['04','FEDERATION CONTEXT','AFA + AVP','Authority context may cross between independent domains without becoming local execution authority merely because it traveled.'],
-  ['05','LOCAL COMMIT','EABA + TA-14','The receiving domain independently determines whether this exact proposed consequence may become reality now.'],
+ ['01','BUILDING REALITY','ONUMA · RE1 · 223P','What exists? What is it? How is it related?','IDENTITY · SEMANTICS · TOPOLOGY'],
+ ['02','INTERACTION CONTRACT','CNS/CP','What interaction exists between independent parties?','PROFILE · PURPOSE · SCOPE'],
+ ['03','LIVE CONNECTION','CNS/CP','Who is connected under that Profile now?','PARTIES · DURATION · REVOCATION'],
+ ['04','AUTHORITY CONTEXT','AFA · AVP','What attributable authority context may cross?','CONTEXT MAY TRAVEL'],
+ ['05','LOCAL CONSEQUENCE','EABA · TA-14','May this exact consequence become reality now?','ALLOW · HOLD · DENY · ESCALATE'],
 ];
 
 export default function Page(){
-  return <main className="p"><div className="s">
-    <nav>
-      <Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link>
-      <Link href="/global-institutional-engagement/fire-chief-electrical-shutoff">FIRE-CHIEF SHUTOFF SANDBOX</Link>
-      <Link href="/registry/ta-14-admissible-execution-architecture/showcase/owner-to-consequence-collaboration">OWNER → CONSEQUENCE</Link>
-    </nav>
+ return <main className="p"><div className="shell">
+  <nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/global-institutional-engagement/fire-chief-electrical-shutoff">SHUTOFF SANDBOX</Link><Link href="/registry/ta-14-admissible-execution-architecture/showcase/owner-to-consequence-collaboration">OWNER → CONSEQUENCE</Link></nav>
 
-    <header>
-      <div className="flags"><span>CONNECTION</span><i>×</i><span>CONSEQUENCE</span></div>
-      <p className="eye">CNS/CP × ONUMA × TA-14 · PUBLIC TECHNICAL SHOWROOM</p>
-      <h1>The connection can be valid.<br/><em>The command can still be HOLD.</em></h1>
-      <p className="lead">A responder may be correctly identified. The building graph may be correct. A Connection Profile may be valid. A connection may be properly established. And the receiving system can still require a separate local determination before a physical consequence executes.</p>
-      <div className="heroRule"><small>THE WHOLE SEAM IN ONE LINE</small><b>Graph establishes meaning → Profile establishes the interaction contract → connection policy establishes who is connected now → federation carries context → TA-14 governs whether this consequence may execute here, now.</b></div>
-    </header>
+  <header>
+   <p className="kicker">CNS/CP × ONUMA × TA-14 · PROPOSED JOINT EXAMINATION</p>
+   <div className="status"><span>DRAFT</span><span>NOT FROZEN</span><span>NOT REGISTERED</span><span>OPEN FOR CORRECTION</span></div>
+   <h1>THE GOVERNED<br/><em>CROSSING.</em></h1>
+   <p className="dek">A graph can be right. A Profile can be right. A connection can be valid. Authority context can cross correctly. <strong>And the proposed consequence can still be HOLD.</strong></p>
+   <div className="thesis"><small>THE SEAM WE ARE TESTING</small><b>The Connection Profile governs the crossing. TA-14 governs whether what crossed may become consequence.</b></div>
+  </header>
 
-    <section>
-      <p className="eye">WHAT ANTO'S RESPONSE CHANGED</p>
-      <h2>Start from the interaction — not from the building object.</h2>
-      <div className="two">
-        <article><b>NOT ENOUGH</b><h3>“There is an AHU, therefore there must be an AHU Profile.”</h3><p>A building graph can expose the correct object, semantics and API without establishing a governed interaction between two independent parties.</p></article>
-        <article><b>THE BETTER START</b><h3>“What does the responder need to do?”</h3><p>READ and COMMAND are different interactions. They can be represented as separate fixed Profiles, while emergency conditions change the connections established under them.</p></article>
-      </div>
-    </section>
+  <section className="discovery">
+   <p className="eyebrow">THE DISCOVERY</p><h2>The Profile is not derived from the building.<br/><em>It is derived from the interaction.</em></h2>
+   <div className="contrast">
+    <article className="no"><span>✕</span><small>OBJECT-FIRST</small><h3>“There is an AHU. Write an AHU Profile.”</h3><p>The graph can identify an AHU perfectly and still tell us nothing about the agreement between two independently operated parties.</p></article>
+    <article className="yes"><span>✓</span><small>INTERACTION-FIRST</small><h3>“What does the responder need to read? What do they need to command?”</h3><p>Those are bounded interactions. They give the Profile a purpose, consumer, provider, scope, duration model and revocation surface.</p></article>
+   </div>
+  </section>
 
-    <section>
-      <p className="eye">THE FIVE LAYERS</p>
-      <h2>Nobody has to become somebody else.</h2>
-      <div className="layers">{layers.map(([n,k,a,d])=><article key={n}><span>{n}</span><small>{k}</small><h3>{a}</h3><p>{d}</p></article>)}</div>
-    </section>
+  <section>
+   <p className="eyebrow">THE NARROW WAIST</p><h2>Five layers. Five different jobs.<br/><em>No silent inheritance.</em></h2>
+   <div className="layers">{layers.map(([n,t,o,q,b],i)=><div className="layerRow" key={n}><div className="num">{n}</div><div className="owner"><small>{t}</small><b>{o}</b></div><div className="question">{q}</div><div className="badge">{b}</div>{i<4&&<div className="down">↓</div>}</div>)}</div>
+   <div className="warning">LINKING ≠ CONNECTING <i>·</i> CONNECTING ≠ AUTHORITY TO EXECUTE <i>·</i> CROSSING ≠ COMMITMENT</div>
+  </section>
 
-    <section className="profiles">
-      <p className="eye">TWO FIXED PROFILES · ONE DYNAMIC SITUATION</p>
-      <h2>The emergency changes the connection policy. <em>Not the Profile.</em></h2>
-      <div className="profileGrid">
-        <article><div className="profileTag">PROFILE 01</div><h3>RESPONDER READ</h3><p>Defines the reusable interaction for reading the bounded building state a responder is permitted to inspect.</p><div className="fixed">FIXED CONTRACT SHAPE</div></article>
-        <article><div className="profileTag">PROFILE 02</div><h3>RESPONDER COMMAND</h3><p>Defines the reusable interaction for proposing a bounded command into the independently operated receiving domain.</p><div className="fixed">FIXED CONTRACT SHAPE</div></article>
-      </div>
-      <div className="policy"><b>CONNECTION POLICY MOVES</b><p>Emergency declared → establish the appropriate connection under the appropriate Profile → bind the named parties, scope, duration and revocation conditions → revoke or narrow the connection when the declaration or operational need changes.</p></div>
-    </section>
+  <section className="profiles">
+   <p className="eyebrow">THE TWO PROFILES</p><h2>Same responder. <em>Two different interactions.</em></h2>
+   <p className="sectionLead">The emergency does not rewrite these Profiles. It changes which connections are established under them.</p>
+   <div className="profileGrid">
+    <article><div className="phead"><span>CP-01</span><small>PROPOSED · NOT FROZEN</small></div><h3>RESPONDER / READ</h3><p className="big">“Show me the bounded state I need to understand.”</p><dl><div><dt>PROFILE GOVERNS</dt><dd>Readable objects · purpose · scope · parties · duration model · revocation model</dd></div><div><dt>PROFILE DOES NOT ESTABLISH</dt><dd>Permission to alter the building or execute a physical consequence</dd></div></dl></article>
+    <article><div className="phead"><span>CP-02</span><small>PROPOSED · NOT FROZEN</small></div><h3>RESPONDER / COMMAND</h3><p className="big">“Present this bounded command to the receiving domain.”</p><dl><div><dt>PROFILE GOVERNS</dt><dd>Commandable interaction · purpose · scope · parties · duration model · revocation model</dd></div><div><dt>PROFILE DOES NOT ESTABLISH</dt><dd>Admissibility · Applicable Authority · Established Standing · ALLOW · physical execution</dd></div></dl></article>
+   </div>
+   <div className="moves"><div><small>PROFILES</small><b>STAY FIXED</b></div><span>while</span><div><small>CONNECTION POLICY</small><b>MOVES</b></div></div>
+  </section>
 
-    <ResponderConnectionLab />
+  <ResponderConnectionLab />
 
-    <section>
-      <p className="eye">THE HANDOFF TO TA-14</p>
-      <h2>A COMMAND connection does not silently become execution authority.</h2>
-      <div className="handoffFlow">
-        <div><b>01</b><span>PROFILE VALID</span><p>The responder-command interaction is a recognized contract.</p></div><i>→</i>
-        <div><b>02</b><span>CONNECTION ESTABLISHED</span><p>This responder is connected under that Profile in this context.</p></div><i>→</i>
-        <div><b>03</b><span>AUTHORITY CONTEXT CROSSES</span><p>AFA / AVP may carry bounded authority context across the independent-domain boundary.</p></div><i>→</i>
-        <div className="hot"><b>04</b><span>LOCAL COMMIT</span><p>TA-14 asks whether this exact consequence has sufficient Admissible Evidence, Applicable Authority and Established Standing to become reality NOW.</p></div>
-      </div>
-    </section>
+  <section>
+   <p className="eyebrow">POSITIVE SPACE / NEGATIVE SPACE</p><h2>A good Profile says what it establishes.<br/><em>A trustworthy Profile says what it cannot.</em></h2>
+   <div className="spaceGrid">
+    <article className="positive"><small>POSITIVE SPACE</small><h3>What may cross</h3><ul><li>Named provider and consumer</li><li>Named interaction and purpose</li><li>Bounded object / command scope</li><li>Connection duration and revocation terms</li><li>Required provenance and attributable context</li><li>Authority context when required by the receiving interaction</li></ul></article>
+    <article className="negative"><small>NEGATIVE SPACE</small><h3>What crossing does not create</h3><ul><li>Local execution authority</li><li>Admissibility of the consequence</li><li>Applicable Authority in the receiving domain</li><li>Established Standing at commit time</li><li>ALLOW / HOLD / DENY / ESCALATE</li><li>Permission to actuate merely because the connection succeeded</li></ul></article>
+   </div>
+  </section>
 
-    <section>
-      <p className="eye">WHAT EACH ARCHITECTURE IS ALLOWED TO SAY</p>
-      <h2>Clear seams prevent accidental authority inheritance.</h2>
-      <div className="matrix">
-        <article><b>GRAPH</b><p>“I know what this object is and how it relates.”</p><strong>Does not say:</strong><p>“This party may command it.”</p></article>
-        <article><b>CNS/CP</b><p>“These parties have this governed interaction under this Profile.”</p><strong>Does not say:</strong><p>“This exact consequence is locally authorized now.”</p></article>
-        <article><b>AFA / AVP</b><p>“This authority context may cross and remain attributable.”</p><strong>Does not say:</strong><p>“Transported context is local execution authority.”</p></article>
-        <article><b>EABA / TA-14</b><p>“This exact consequence may or may not cross the local commit boundary now.”</p><strong>Does not replace:</strong><p>The graph, Profile, connection policy, identity system or actuator.</p></article>
-      </div>
-    </section>
+  <section className="avp">
+   <p className="eyebrow">WHERE AVP FITS</p><h2>The Profile can require authority context.<br/><em>The passport does not become permission.</em></h2>
+   <div className="avpFlow"><div><small>CNS/CP</small><b>Profile permits / requires bounded authority context</b></div><span>→</span><div><small>AFA + AVP</small><b>Context crosses attributable and bounded</b></div><span>→</span><div className="commit"><small>EABA + TA-14</small><b>Receiving domain establishes local execution authority</b></div></div>
+  </section>
 
-    <section>
-      <p className="eye">PROPOSED FIRST BOUNDED EXAMINATION</p>
-      <h2>Name the interactions. Freeze them. Then change the situation.</h2>
-      <div className="freezeGrid">
-        <article><b>FREEZE 01</b><h3>Responder Read Profile</h3><p>Named parties · readable scope · purpose · duration model · revocation model · required building references.</p></article>
-        <article><b>FREEZE 02</b><h3>Responder Command Profile</h3><p>Named parties · command scope · purpose · duration model · revocation model · exact objects the request may address.</p></article>
-        <article><b>RUN</b><h3>Emergency declaration changes</h3><p>Establish, narrow or revoke connections without rewriting the Profiles.</p></article>
-        <article><b>TEST</b><h3>Command reaches commit boundary</h3><p>Observe whether TA-14 can independently ALLOW, HOLD, DENY or ESCALATE without CNS/CP being asked to make the execution decision.</p></article>
-      </div>
-    </section>
+  <section className="question">
+   <p className="eyebrow">THE EXAMINATION QUESTION</p>
+   <h2>Can the connection change without silently changing the execution-authority boundary?</h2>
+   <p>If the same TA-14 receiving architecture can operate under different Connection Profiles while retaining the same local consequence rule, the seam becomes observable rather than rhetorical.</p>
+   <div className="canon"><small>TA-14 LOCAL COMMIT QUESTION</small><b>Does this proposed consequence have sufficient <em>Admissible Evidence</em>, <em>Applicable Authority</em>, and <em>Established Standing</em> to become reality <em>NOW?</em></b></div>
+  </section>
 
-    <section className="boundary"><b>PUBLIC-RECORD BOUNDARY</b><p>This showroom records a proposed technical examination derived from the ongoing Monday Live / ONUMA / CNS/CP / TA-14 discussion. It is not a claim that Padi, CNS/CP, ONUMA, ALN, NIST, ASHRAE, any responder, or any public authority endorses or has adopted TA-14. The emergency-responder scenario is an examination surface, not operational emergency guidance.</p></section>
+  <section>
+   <p className="eyebrow">PROPOSED FREEZE SEQUENCE</p><h2>Correct the seam first.<br/><em>Then freeze the test.</em></h2>
+   <div className="steps">
+    <article><span>01</span><b>INSPECT</b><p>CNS/CP author reviews this representation and corrects anything attributed incorrectly.</p></article>
+    <article><span>02</span><b>DRAFT</b><p>Construct CP-01 READ and CP-02 COMMAND with positive and negative space explicit.</p></article>
+    <article><span>03</span><b>FREEZE</b><p>Freeze the Profiles only after the interaction boundary is mutually intelligible.</p></article>
+    <article><span>04</span><b>RUN</b><p>Change declaration, connection, revocation and context while Profiles remain fixed.</p></article>
+    <article><span>05</span><b>OBSERVE</b><p>Record whether the receiving domain retains an independent consequence decision.</p></article>
+   </div>
+  </section>
 
-    <footer>TA-14 AUTHORITY · CNS/CP × RESPONDER CONNECTION BOUNDARY<br/>LINKING IS NOT CONNECTING · CONNECTING IS NOT AUTHORITY TO EXECUTE · UNDERSTANDING IS NOT PERMISSION</footer>
-  </div><style>{'.p{min-height:100vh;background:radial-gradient(circle at 10% 0%,rgba(84,203,255,.16),transparent 30%),radial-gradient(circle at 88% 18%,rgba(163,111,255,.12),transparent 25%),linear-gradient(180deg,#02070c,#06111a 44%,#02070c);color:#eef7fb;font-family:Inter,Arial,sans-serif}.p *{box-sizing:border-box}.s{max-width:1220px;margin:auto;padding:0 28px}nav{height:78px;display:flex;align-items:center;gap:24px;border-bottom:1px solid #ffffff17;font-size:10px;letter-spacing:.12em;font-weight:850}nav a{color:#9fb4c1;text-decoration:none}.brand{margin-right:auto;font-size:15px!important}.brand b,.eye{color:#74dfff}header{padding:82px 0 68px}.flags{display:flex;align-items:center;gap:16px;font-size:11px;font-weight:950;letter-spacing:.2em;color:#9cb5c2}.flags i{font-style:normal;color:#ffd35f;font:38px Georgia,serif}.eye{font-size:10px;font-weight:950;letter-spacing:.18em;margin-top:18px}h1{font-size:clamp(48px,7vw,88px);line-height:.96;letter-spacing:-.055em;margin:16px 0 24px}h1 em,h2 em{font-style:normal;color:#ffd35f}.lead{max-width:1000px;font-size:clamp(18px,2vw,24px);line-height:1.62;color:#b6c8d2}.heroRule{margin-top:30px;padding:24px;border-left:4px solid #ffd35f;background:#ffd35f0c}.heroRule small{display:block;color:#ffd35f;font-size:9px;font-weight:950;letter-spacing:.16em}.heroRule b{display:block;margin-top:10px;font-size:clamp(18px,2vw,24px);line-height:1.5}section{padding:66px 0;border-top:1px solid #ffffff12}h2{font-size:clamp(32px,4.8vw,58px);line-height:1.03;letter-spacing:-.045em;max-width:1000px;margin:12px 0 26px}.two,.profileGrid,.freezeGrid,.matrix{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}.two article,.profileGrid article,.freezeGrid article,.matrix article{padding:24px;border:1px solid #ffffff17;border-radius:17px;background:#07151f}.two b,.profileTag,.freezeGrid b,.matrix b{color:#74dfff;font-size:10px;font-weight:950;letter-spacing:.12em}.two h3,.profileGrid h3,.freezeGrid h3{font-size:22px;margin:10px 0}.two p,.profileGrid p,.freezeGrid p,.matrix p{color:#a8bac4;line-height:1.65}.layers{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.layers article{padding:20px;border:1px solid #ffffff14;border-radius:15px;background:#07151f}.layers span{display:block;color:#ffd35f;font:28px Georgia,serif}.layers small{display:block;margin-top:14px;color:#8299a7;font-size:9px;font-weight:950;letter-spacing:.1em}.layers h3{font-size:16px;margin:7px 0}.layers p{color:#a9bac4;font-size:13px;line-height:1.58}.profiles{background:linear-gradient(135deg,#ffffff03,#74dfff08);margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding-left:max(28px,calc((100vw - 1164px)/2));padding-right:max(28px,calc((100vw - 1164px)/2))}.profileGrid article{border-color:#74dfff35}.fixed{display:inline-block;margin-top:12px;padding:7px 9px;border-radius:999px;border:1px solid #74dfff44;color:#98e8ff;font-size:9px;font-weight:950}.policy{margin-top:14px;padding:22px;border:1px solid #ffd35f40;border-radius:15px;background:#ffd35f09}.policy b{color:#ffd35f;font-size:10px;letter-spacing:.12em}.policy p{margin-bottom:0;color:#d1c9ab;line-height:1.65}.handoffFlow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr auto 1.2fr;gap:10px;align-items:stretch}.handoffFlow>div{padding:20px;border:1px solid #ffffff16;border-radius:15px;background:#07151f}.handoffFlow>i{align-self:center;color:#5f7e8d;font-style:normal}.handoffFlow b{display:block;color:#ffd35f;font:24px Georgia,serif}.handoffFlow span{display:block;margin-top:10px;color:#9feaff;font-size:9px;font-weight:950;letter-spacing:.1em}.handoffFlow p{color:#a8bac4;font-size:12px;line-height:1.55}.handoffFlow .hot{border:2px solid #ffd35f75;background:#ffd35f0a}.matrix{grid-template-columns:repeat(4,1fr)}.matrix article strong{display:block;margin-top:14px;color:#ffd35f;font-size:9px;letter-spacing:.1em}.freezeGrid{grid-template-columns:repeat(4,1fr)}.freezeGrid article{border-color:#9b77ff30}.boundary{padding:26px;margin:58px 0 0;border:1px solid #8c6b32;background:#15150f;border-radius:16px}.boundary>b{color:#ffd35f;font-size:10px;letter-spacing:.12em}.boundary p{color:#c9c3b5;line-height:1.65}footer{padding:50px 0 72px;color:#6f8794;font-size:10px;letter-spacing:.12em;line-height:1.8}@media(max-width:980px){.layers{grid-template-columns:1fr 1fr}.matrix,.freezeGrid{grid-template-columns:1fr 1fr}.handoffFlow{grid-template-columns:1fr}.handoffFlow>i{text-align:center;transform:rotate(90deg)}}@media(max-width:680px){.s{padding:0 18px}nav{height:auto;padding:18px 0;flex-wrap:wrap}.two,.profileGrid,.matrix,.freezeGrid,.layers{grid-template-columns:1fr}h1{letter-spacing:-.02em}}'}</style></main>
+  <section className="boundary"><div><small>PUBLIC-RECORD BOUNDARY</small><b>Examination surface — not adoption.</b></div><p>This page is a proposed technical model derived from the ongoing Monday Live / ONUMA / CNS/CP / TA-14 discussion. It is intentionally marked DRAFT / NOT FROZEN / NOT REGISTERED. Nothing here claims endorsement, adoption, operational approval, emergency procedure, or agreement by Padi, CNS/CP, ONUMA, ALN, NIST, ASHRAE, a responder, or a public authority. CNS/CP representation remains open to correction by its authors before any TA-14 Connection Profile is frozen.</p></section>
+  <footer>TA-14 AUTHORITY · THE GOVERNED CROSSING<br/><b>NAME THE INTERACTION · FREEZE THE CONTRACT · CHANGE THE SITUATION · RUN THE TEST</b></footer>
+ </div><style>{`
+ .p{min-height:100vh;background:radial-gradient(circle at 82% 3%,#0e4160 0,transparent 26%),radial-gradient(circle at 0 36%,#182a50 0,transparent 23%),#02070b;color:#f1f7fa;font-family:Inter,Arial,sans-serif}.p *{box-sizing:border-box}.shell{max-width:1220px;margin:auto;padding:0 28px}nav{height:76px;display:flex;align-items:center;gap:26px;border-bottom:1px solid #ffffff16;font-size:9px;font-weight:900;letter-spacing:.14em}nav a{color:#8da4b1;text-decoration:none}.brand{margin-right:auto;font-size:14px!important}.brand b,.eyebrow,.kicker{color:#65ddff}header{padding:92px 0 78px}.kicker,.eyebrow{font-size:10px;font-weight:950;letter-spacing:.19em}.status{display:flex;gap:7px;flex-wrap:wrap;margin:17px 0 24px}.status span{padding:7px 9px;border:1px solid #ffcf6045;border-radius:999px;color:#ffdb82;font-size:8px;font-weight:950;letter-spacing:.1em;background:#ffcf6008}h1{font-size:clamp(64px,10vw,132px);line-height:.77;letter-spacing:-.075em;margin:30px 0 38px}h1 em{font-style:normal;color:#ffcf60}.dek{max-width:980px;font-size:clamp(20px,2.5vw,30px);line-height:1.5;color:#b8c9d2}.dek strong{color:#fff}.thesis{margin-top:38px;padding:26px 28px;border-left:5px solid #ffcf60;background:linear-gradient(90deg,#ffcf6012,transparent)}.thesis small{display:block;color:#ffcf60;font-size:9px;font-weight:950;letter-spacing:.16em}.thesis b{display:block;max-width:1000px;margin-top:10px;font-size:clamp(21px,2.6vw,32px);line-height:1.4}section{padding:76px 0;border-top:1px solid #ffffff11}h2{font-size:clamp(37px,5.3vw,66px);line-height:1.01;letter-spacing:-.05em;margin:12px 0 32px;max-width:1080px}h2 em{font-style:normal;color:#ffcf60}.sectionLead{font-size:18px;color:#9db1bc;max-width:850px;line-height:1.65}.contrast,.profileGrid,.spaceGrid{display:grid;grid-template-columns:1fr 1fr;gap:13px}.contrast article,.profileGrid article,.spaceGrid article{padding:28px;border-radius:19px;border:1px solid #ffffff16;background:#07131c}.contrast span{font-size:32px}.contrast .no span{color:#758792}.contrast .yes{border-color:#65ddff45;background:linear-gradient(145deg,#07131c,#06202b)}.contrast .yes span{color:#65ddff}.contrast small,.spaceGrid small{display:block;margin-top:16px;font-size:9px;font-weight:950;letter-spacing:.14em;color:#8198a5}.contrast h3{font-size:23px;line-height:1.3}.contrast p,.spaceGrid li{color:#a7bac4;line-height:1.65}.layers{margin-top:34px}.layerRow{position:relative;display:grid;grid-template-columns:80px 220px 1fr 220px;align-items:center;gap:18px;padding:20px 0;border-bottom:1px solid #ffffff10}.num{font:34px Georgia,serif;color:#ffcf60}.owner small{display:block;color:#718996;font-size:8px;font-weight:950;letter-spacing:.13em}.owner b{display:block;margin-top:5px;font-size:15px}.question{font-size:17px;color:#c8d5dc}.badge{justify-self:end;padding:8px 10px;border:1px solid #65ddff2f;border-radius:999px;color:#86e6ff;font-size:8px;font-weight:950;letter-spacing:.1em}.down{display:none}.warning{text-align:center;margin-top:26px;padding:16px;border:1px solid #ffcf6030;color:#ffdf91;font-size:10px;font-weight:950;letter-spacing:.12em}.warning i{margin:0 12px;color:#526c79}.profiles{margin-left:calc(50% - 50vw);margin-right:calc(50% - 50vw);padding-left:max(28px,calc((100vw - 1164px)/2));padding-right:max(28px,calc((100vw - 1164px)/2));background:linear-gradient(135deg,#07151e,#07101a)}.profileGrid article{border-color:#65ddff35}.phead{display:flex;justify-content:space-between;align-items:center}.phead span{color:#ffcf60;font:24px Georgia,serif}.phead small{color:#7e96a2;font-size:8px;font-weight:950;letter-spacing:.1em}.profileGrid h3{font-size:29px;margin:22px 0 8px}.profileGrid .big{font-size:18px;color:#dce7eb;min-height:55px}.profileGrid dl{margin:26px 0 0}.profileGrid dl div{padding:15px 0;border-top:1px solid #ffffff10}.profileGrid dt{color:#65ddff;font-size:8px;font-weight:950;letter-spacing:.12em}.profileGrid dd{margin:7px 0 0;color:#9eb1bb;line-height:1.55}.moves{display:grid;grid-template-columns:1fr auto 1fr;gap:15px;align-items:center;margin-top:14px;text-align:center}.moves div{padding:19px;border:1px solid #ffffff15;border-radius:13px}.moves small{display:block;color:#8096a1;font-size:8px;font-weight:950}.moves b{display:block;margin-top:5px;color:#ffcf60;font-size:22px}.moves>span{color:#718793;font:italic 17px Georgia,serif}.spaceGrid .positive{border-color:#65ddff35}.spaceGrid .negative{border-color:#ffcf6040}.spaceGrid .positive small{color:#65ddff}.spaceGrid .negative small{color:#ffcf60}.spaceGrid h3{font-size:27px;margin:9px 0}.spaceGrid ul{padding-left:20px}.spaceGrid li{margin:9px 0}.avpFlow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;align-items:stretch;gap:10px}.avpFlow div{padding:23px;border:1px solid #ffffff16;border-radius:15px;background:#07131c}.avpFlow span{align-self:center;color:#617a87}.avpFlow small{display:block;color:#65ddff;font-size:8px;font-weight:950;letter-spacing:.12em}.avpFlow b{display:block;margin-top:9px;line-height:1.5}.avpFlow .commit{border:2px solid #ffcf6055;background:#ffcf6009}.question{text-align:left}.question>p{max-width:900px;color:#a7bac4;font-size:18px;line-height:1.7}.canon{margin-top:30px;padding:28px;border:1px solid #ffcf6050;border-radius:17px;background:#ffcf6009}.canon small{display:block;color:#ffcf60;font-size:9px;font-weight:950;letter-spacing:.13em}.canon b{display:block;margin-top:10px;font-size:clamp(21px,3vw,34px);line-height:1.4}.canon em{font-style:normal;color:#fff0ad}.steps{display:grid;grid-template-columns:repeat(5,1fr);gap:9px}.steps article{padding:21px;border:1px solid #ffffff14;border-radius:14px;background:#07131c}.steps span{display:block;color:#ffcf60;font:27px Georgia,serif}.steps b{display:block;margin-top:14px;font-size:10px;letter-spacing:.11em;color:#70dfff}.steps p{color:#96aab5;font-size:12px;line-height:1.6}.boundary{display:grid;grid-template-columns:270px 1fr;gap:30px;padding:28px;margin:54px 0 0;border:1px solid #8b6d36;background:#15140e;border-radius:16px}.boundary small{display:block;color:#ffcf60;font-size:9px;font-weight:950;letter-spacing:.12em}.boundary b{display:block;margin-top:8px;font-size:21px}.boundary p{margin:0;color:#c2bcaf;line-height:1.65}footer{padding:52px 0 78px;color:#6f8793;font-size:9px;letter-spacing:.13em;line-height:2}footer b{color:#8ea4af}@media(max-width:900px){.layerRow{grid-template-columns:55px 180px 1fr}.badge{grid-column:2/4;justify-self:start}.steps{grid-template-columns:1fr 1fr}.avpFlow{grid-template-columns:1fr}.avpFlow>span{text-align:center;transform:rotate(90deg)}}@media(max-width:650px){.shell{padding:0 18px}nav{height:auto;padding:18px 0;flex-wrap:wrap}.contrast,.profileGrid,.spaceGrid{grid-template-columns:1fr}.layerRow{grid-template-columns:45px 1fr}.question,.badge{grid-column:2}.moves{grid-template-columns:1fr}.steps{grid-template-columns:1fr}.boundary{grid-template-columns:1fr}h1{font-size:59px;letter-spacing:-.05em}}
+ `}</style></main>
 }
