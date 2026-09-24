@@ -100,7 +100,7 @@ const quickLinks = [
   },
   {
     label: 'Open Governed Records',
-    href: '/workspace/ai-governance/records',
+    href: '/workspace/records',
   },
 ];
 
