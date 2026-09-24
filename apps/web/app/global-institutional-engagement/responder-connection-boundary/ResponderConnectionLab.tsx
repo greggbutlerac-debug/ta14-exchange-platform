@@ -29,9 +29,9 @@ const states = {
     id: 'R1-03',
     title: 'Emergency stands down',
     inputs: 'Stand-down recorded · prior emergency connection exists · COMMAND connection is narrowed, expired or revoked.',
-    expected: 'Revocation changes the live connection, not CP-02. Prior connection state cannot silently preserve permission.',
-    connection: 'The emergency COMMAND connection is revoked or narrowed when the declaration or operational need ends.',
-    cp: 'The Responder Command Profile still exists. Only the live connection changes.',
+    expected: 'Stand-down changes the live COMMAND connection, not CP-02. This is connection revocation; it must not be conflated with revocation of an Authority Passport on its separate revocation channel.',
+    connection: 'The emergency COMMAND connection is revoked or narrowed when the declaration or operational need ends. This changes CNS/CP connection state; it does not itself revoke an Authority Passport.',
+    cp: 'The Responder Command Profile still exists. Only the live COMMAND connection changes. Passport revocation, if any, is a separate TA-14 lifecycle event carried on a separate revocation connection.',
     ta14: 'A later command arriving through an expired or revoked connection cannot inherit the old standing.',
     result: 'HOLD / DENY BEFORE COMMIT'
   },
@@ -87,8 +87,8 @@ export default function ResponderConnectionLab(){
       <div className="pending"><b>ACTUAL OBSERVATION</b><p>NOT RUN · No result or durable receipt may be claimed until the candidate Profiles are corrected, frozen and the examination is executed.</p></div>
     </div>
     <div className="immutables">
-      <article><b>FROZEN VARIABLES — AFTER FREEZE</b><p>CP-01 READ · CP-02 COMMAND · profile purpose · interaction shape · required fields · negative-space boundary.</p></article>
-      <article><b>MANIPULATED VARIABLES</b><p>Declaration · named connection · parties · instance scope · duration · revocation · authority context · present reality.</p></article>
+      <article><b>FROZEN VARIABLES — AFTER FREEZE</b><p>CP-01 READ · CP-02 COMMAND · profile purpose · interaction shape · connection-layer property set · negative space enforced by absent properties.</p></article>
+      <article><b>MANIPULATED VARIABLES</b><p>Declaration · named connection · parties · instance scope · duration · connection revocation · Passport lifecycle/context · present reality.</p></article>
       <article><b>OBSERVED VARIABLE</b><p>Whether the receiving domain still performs an independent ALLOW / HOLD / DENY / ESCALATE consequence determination.</p></article>
     </div>
     <div className="falsifier">
