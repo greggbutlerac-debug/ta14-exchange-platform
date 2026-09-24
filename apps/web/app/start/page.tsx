@@ -19,9 +19,9 @@ const paths = [
   {
     n: '02',
     title: 'I need TA-14 to review one consequential claim',
-    price: '$249 Snapshot · $750+ Execution Claim Review',
+    price: 'Bounded examination from $149 · specialist reviews available',
     copy: 'For APIs, agents, workflows, evidence chains, financial routes, and other consequential execution claims that need a bounded examination rather than another self-assessment.',
-    bullets: ['Execution Evidence Snapshot — $249', 'Execution Claim Review — from $750', 'Evidence, authority, and changed-condition boundary', 'Truthful result preserved even when the claim is unsupported'],
+    bullets: ['Bounded examination — from $149', 'Specialist Snapshot — $249 · Claim Review — from $750', 'Evidence, authority, and changed-condition boundary', 'Truthful result preserved even when the claim is unsupported'],
     href: '/execution-claim-review',
     cta: 'Examine a consequential claim',
   },
@@ -64,8 +64,8 @@ export default function StartPage() {
     </section>
 
     <section className="conversion">
-      <div><small>NEED A BOUNDED INDEPENDENT REVIEW?</small><h2>Not sure whether the evidence can support the claim?</h2><p>Start with a $249 Execution Evidence Snapshot. If the question requires deeper failure challenges, changed-condition analysis, authority review, or replay, move into the full Execution Claim Review from $750. Payment never purchases a favorable result.</p></div>
-      <div className="conversionlinks"><Link href="/execution-evidence-snapshot">START WITH THE $249 SNAPSHOT →</Link><Link href="/execution-claim-review">OPEN THE $750+ CLAIM REVIEW →</Link><Link href="/execution-claim-review/intake">REQUEST A BOUNDED SCOPE →</Link></div>
+      <div><small>NEED A BOUNDED INDEPENDENT REVIEW?</small><h2>Not sure whether the evidence can support the claim?</h2><p>Start with the $149 bounded-examination baseline. When the question specifically requires a specialist evidence snapshot, deeper failure challenges, changed-condition analysis, authority review, or replay, the $249 Snapshot and $750+ Execution Claim Review remain available as expanded professional scopes. Payment never purchases a favorable result.</p></div>
+      <div className="conversionlinks"><Link href="/pricing">START WITH THE $149 BASELINE →</Link><Link href="/execution-evidence-snapshot">SPECIALIST $249 SNAPSHOT →</Link><Link href="/execution-claim-review">FULL $750+ CLAIM REVIEW →</Link><Link href="/execution-claim-review/intake">REQUEST A BOUNDED SCOPE →</Link></div>
     </section>
 
     <section className="proof">
