@@ -144,7 +144,9 @@ export default function ArchitectureRegistryBridgePage() {
           <span>ACTIVE</span>
         </div>
 
-        <p className="eyebrow">TA-14 · THE BOUNDARY BEFORE CONSEQUENCE</p>
+        <p className="eyebrow">TA-14 · FOUNDING ARCHITECTURE · TA-14-AIGR-0001</p>
+
+        <div className="architecture-page-title">TA-14 ADMISSIBLE EXECUTION ARCHITECTURE</div>
 
         <h1>
           Something wants to happen.
@@ -708,6 +710,15 @@ export default function ArchitectureRegistryBridgePage() {
           -webkit-background-clip: text;
           background-clip: text;
           font-style: italic;
+        }
+
+        .architecture-page-title {
+          margin: 18px 0 22px;
+          font-size: clamp(2.1rem, 5vw, 4.8rem);
+          line-height: 0.96;
+          font-weight: 900;
+          letter-spacing: -0.045em;
+          max-width: 1100px;
         }
 
         .hero-copy {
