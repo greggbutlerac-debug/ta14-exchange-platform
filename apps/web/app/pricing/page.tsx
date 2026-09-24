@@ -21,7 +21,8 @@ export default function PricingPage(){
   const [customer,setCustomer]=useState<Customer>('Small Business');
   const [subject,setSubject]=useState('AI Agent');
   const [routes,setRoutes]=useState(5);
-  const [domains,setDomains]=useState(1);\n  const [advanced,setAdvanced]=useState(false);
+  const [domains,setDomains]=useState(1);
+  const [advanced,setAdvanced]=useState(false);
   const [depth,setDepth]=useState<Depth>('Examine');
   const [implementation,setImplementation]=useState(false);
   const [revalidation,setRevalidation]=useState(false);
