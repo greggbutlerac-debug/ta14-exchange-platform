@@ -7,7 +7,8 @@ type Customer = 'Individual' | 'Professional' | 'Small Business' | 'Organization
 type Depth = 'Examine' | 'Establish' | 'Operate';
 
 const anchors = ['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome'];
-const customerBase: Record<Customer, number> = {'Individual':149,'Professional':295,'Small Business':595,'Organization':1250,'Enterprise / Public Institution':2500};
+const customerBase: Record<Customer, number> = {'Individual':149,'Professional':295,'Small Business':750,'Organization':1500,'Enterprise / Public Institution':3000};
+const routePrice: Record<Customer, number> = {'Individual':49,'Professional':75,'Small Business':150,'Organization':250,'Enterprise / Public Institution':500};
 const depthFactor: Record<Depth, number> = {Examine:1,Establish:1.8,Operate:2.6};
 const market = [
   {name:'Cloud Sentry',price:2500,label:'AI Governance Assessment',scope:'Published one-time assessment of governance capability, decision-making, data and access.',url:'https://cloudsentry.com/plans'},
@@ -31,7 +32,7 @@ export default function PricingPage(){
 
   const calc=useMemo(()=>{
     const base=customerBase[customer];
-    const routeUnit=Math.max(49,Math.round(base*.25));
+    const routeUnit=routePrice[customer];
     const routeCost=Math.max(0,routes-1)*routeUnit;
     const federationUnit=Math.max(95,Math.round(base*.20));
     const federation=Math.max(0,domains-1)*federationUnit;
