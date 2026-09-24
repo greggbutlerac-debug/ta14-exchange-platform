@@ -56,6 +56,13 @@ export default function OwnerToConsequenceCollaboration(){
         <div style={{marginTop:28,padding:'18px 20px',borderLeft:'3px solid #7ff0bd',background:'rgba(127,240,189,.045)',fontSize:'clamp(18px,2.2vw,24px)',fontWeight:900}}>The collaboration is the interface between the architectures — not a merger of them.</div>
       </section>
 
+      <section style={{marginTop:26,padding:'clamp(24px,4vw,36px)',border:'1px solid rgba(242,204,104,.26)',borderRadius:24,background:'linear-gradient(135deg,rgba(70,51,13,.18),rgba(5,17,28,.94))'}}>
+        <div style={{color:'#f2cc68',fontSize:11,fontWeight:950,letterSpacing:'.17em'}}>COMPANION LIFECYCLE VIEW · FIXED ASSET CONSULTANT</div>
+        <h2 style={{fontSize:'clamp(28px,4.2vw,48px)',letterSpacing:'-.04em',lineHeight:1.04,margin:'12px 0 14px'}}>See the collaboration across the full asset lifecycle.</h2>
+        <p style={{maxWidth:960,color:'#c9c1aa',lineHeight:1.7,fontSize:16}}>Angela Bolton's Design to Disposal page maps the independently owned systems across the fixed-asset lifecycle, including RE1, CNS/CP, TA-14, Fixed Asset Health Assessment, ERP, capital planning, and the Asset Leadership Network.</p>
+        <a href="https://fixedassetconsultant.com/design-to-disposal/" target="_blank" rel="noreferrer" style={{display:'inline-flex',marginTop:18,padding:'13px 17px',borderRadius:11,border:'1px solid rgba(242,204,104,.48)',background:'rgba(242,204,104,.1)',color:'#fff0bd',textDecoration:'none',fontWeight:950,letterSpacing:'.04em'}}>OPEN DESIGN TO DISPOSAL →</a>
+      </section>
+
       <section style={{marginTop:26,padding:'clamp(28px,5vw,48px)',border:'1px solid rgba(242,204,104,.25)',borderRadius:26,background:'linear-gradient(135deg,rgba(70,51,13,.22),rgba(5,17,28,.94))'}}>
         <div style={{color:'#f2cc68',fontSize:11,fontWeight:950,letterSpacing:'.17em'}}>FOUR INDEPENDENT ROLES · ONE SHARED PROCESS</div>
         <h2 style={{fontSize:'clamp(31px,4.8vw,55px)',letterSpacing:'-.04em',lineHeight:1.04,margin:'12px 0 24px'}}>Nobody has to become somebody else.</h2>
