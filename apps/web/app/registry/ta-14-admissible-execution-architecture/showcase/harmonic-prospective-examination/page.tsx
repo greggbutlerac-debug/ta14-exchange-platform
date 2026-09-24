@@ -8,10 +8,10 @@ const stages=[
  ["02","NATIVE CONTRACT","FROZEN","Governance Compare · Frozen Primary · POST /api/evaluate · Harmonic V4.1 single-call runtime (runtime_version 4.1.0)."],
  ["03","INPUT SURFACE","FROZEN","Only the native contract fields and attributable constitutional facts/provenance may be supplied. No final continuation verdict may enter upstream."],
  ["04","MATERIALITY + FALSIFIER","FROZEN","Materiality identifies a qualifying authority-basis change without encoding the expected disposition. The three-part native-semantic falsifier is frozen."],
- ["05","SPECIMENS","SEALED","Decisive paired specimens remain sealed until this prospective freeze is published."],
- ["06","EXECUTION","AUTHORIZED AFTER FREEZE","Run both specimens against the same Frozen Primary surface with no repair between them."],
+ ["05","SPECIMENS","OPENED · PRESERVED","The prospectively sealed paired specimens were opened only after the freeze was published and are preserved unchanged as the executed R1 inputs."],
+ ["06","EXECUTION","COMPLETE · HTTP 200 × 2","Both specimens ran against the same Frozen Primary surface with no repair between them."],
  ["07","RECORD","REQUIRED","Preserve the complete Studio export available for each run, including packet, primitives, determination/directive, hashes, lineage, provenance and transaction digest."],
- ["08","DETERMINATION","OPEN","Judge only against the frozen proposition and falsifier after both records are preserved."]
+ ["08","DETERMINATION","R1 INDETERMINATE","The preserved native records were judged only against the prospectively frozen proposition and falsifier."]
 ] as const;
 
 const claims=[
@@ -64,12 +64,12 @@ export default function Page(){
    <section>
     <p className="hx-eye">03 · EXAMINATION RAIL</p>
     <h2 className="hx-title">Name the test. Freeze the test. Then run the test.</h2>
-    <div className="hx-rail">{stages.map(([n,a,b,c])=><article key={n} className={b==="SEALED"?"sealed":""}><small>{n} · {a}</small><strong>{b}</strong><p>{c}</p></article>)}</div>
+    <div className="hx-rail">{stages.map(([n,a,b,c])=><article key={n} className={b==="OPENED · PRESERVED"?"sealed":""}><small>{n} · {a}</small><strong>{b}</strong><p>{c}</p></article>)}</div>
    </section>
 
    <section className="hx-seal">
-    <div><small>DECISIVE SPECIMENS</small><h2>SEALED.</h2><p>The decisive paired specimens remain withheld until this prospective freeze is published. The same Frozen Primary runtime is used for both. No repair, code change, policy change, or runtime substitution is permitted between specimens.</p></div>
-    <div className="hx-lock"><span>◈</span><b>NOT DISCLOSED</b><small>UNTIL PROSPECTIVE FREEZE IS PUBLISHED</small></div>
+    <div><small>DECISIVE SPECIMENS</small><h2>OPENED AFTER FREEZE.</h2><p>The decisive paired specimens were withheld until the prospective freeze was published, then opened and executed against the same Frozen Primary runtime. No repair, code change, policy change, or runtime substitution occurred between specimens.</p></div>
+    <div className="hx-lock"><span>◈</span><b>DISCLOSED · PRESERVED</b><small>OPENED ONLY AFTER PROSPECTIVE FREEZE</small></div>
    </section>
 
    <section>
@@ -117,14 +117,14 @@ export default function Page(){
      <div><small>FALSIFIER</small><b>FROZEN</b></div>
      <div><small>SPECIMENS</small><b>OPENED · A + B</b></div>
      <div><small>EXECUTION</small><b>COMPLETE · HTTP 200 × 2</b></div>
-     <div><small>DETERMINATION</small><b>SUPPORTED — INDETERMINATE</b></div>
+     <div><small>DETERMINATION</small><b>INDETERMINATE</b></div>
      <div><small>CLAIM STATUS</small><b>BOUNDED R1 RECORD</b></div>
     </div>
     <div className="hx-earned" style={{marginTop:18}}>
      <article><small>SPECIMEN A · STANDING-PRESERVING ΔN</small><strong>$100K → $90K</strong><span>$75K proposed commitment · native result: REFUSED · inadmissible · BLOCK.</span></article>
      <article><small>SPECIMEN B · STANDING-DEFEATING ΔN</small><strong>$100K → $50K</strong><span>Same $75K proposed commitment · native result: REFUSED · inadmissible · BLOCK.</span></article>
      <article><small>NATIVE AUTHORITY RESULT</small><strong>AUTHORITY_NOT_ESTABLISHED × 2</strong><span>The runtime did not produce a differentiated authority disposition across the decisive ΔN. B recorded scope_invalid=false, scope_changed=false and condition_failed=false.</span></article>
-     <article><small>FROZEN-FALSIFIER JUDGMENT</small><strong>SUPPORTED — INDETERMINATE</strong><span>F1 not established. F2 not established. F3 presents evidence requiring bounded interpretation; the record does not establish that Harmonic required the prohibited upstream standing/admissibility conclusion.</span></article>
+     <article><small>FROZEN-FALSIFIER JUDGMENT</small><strong>NO FROZEN FALSIFIER ESTABLISHED</strong><span>F1 not established. F2 not established. F3 not established on the preserved R1 record; the record does not establish that Harmonic required the prohibited upstream standing/admissibility conclusion.</span></article>
     </div>
     <p className="hx-note"><strong>No packet repair occurred between A and B.</strong> The prospective freeze remains part of the historical record. This executed layer does not rewrite the pre-execution proposition, materiality rule, native contract or falsifier.</p>
     <div style={{marginTop:18}}><Link href="/artifacts/fd-2026-0002-case-004">OPEN HARMONIC ARTIFACT 004 →</Link></div>
@@ -133,7 +133,7 @@ export default function Page(){
    <footer>
     <p>TA-14 AUTHORITY · HARMONIC ARTIFACT 004</p>
     <h2>THE FREEZE HELD.<br/><em>THE EXECUTED RECORD IS PRESERVED.</em></h2>
-    <strong>SUPPORTED — INDETERMINATE ON THE FROZEN PROPOSITION.</strong>
+    <strong>INDETERMINATE ON THE FROZEN PROPOSITION · NO FROZEN FALSIFIER ESTABLISHED.</strong>
     <div><Link href="/registry/ta-14-admissible-execution-architecture">TA-14 AEA</Link><Link href="/registry/ta-14-admissible-execution-architecture/showcase/changed-reality-test">TA-14 R1 EXAMINATION</Link></div>
    </footer>
   </div>
