@@ -16,7 +16,7 @@ export default function SwedenExecutionLayer() {
     <section className="layerDemo">
       <p className="eyebrow">SEE THE BOUNDARY · INTERACTIVE</p>
       <h2>Sweden stays Sweden. TA-14 sits <em>around the consequence.</em></h2>
-      <p className="copy">Nothing in Sweden's monitoring, law, thresholds, competent authorities, QA/QC or action plans has to be replaced. TA-14 is an additional governance layer that keeps asking whether the evidence and authority supporting a pending consequence are still sufficient <strong>now</strong>.</p>
+      <p className="copy">Nothing in Sweden's monitoring, law, thresholds, competent authorities, QA/QC or action plans has to be replaced. TA-14 is being examined here as a proposed execution-integrity layer. This model asks whether the evidence and authority supporting a pending consequence remain sufficient <strong>now</strong>; it does not presume that Sweden lacks an equivalent native control.</p>
 
       <div className="layerStack">
         <div className="native">
@@ -24,7 +24,7 @@ export default function SwedenExecutionLayer() {
           <div className="nativeFlow"><span>MEASURE</span><i>→</i><span>THRESHOLD</span><i>→</i><span>3 HOURS</span><i>→</i><span>≥100 km²</span><i>→</i><span>ACTION PLAN</span><i>→</i><span>EXECUTE</span></div>
         </div>
         <div className="taLayer">
-          <b>TA-14 · ADDITIVE EXECUTION-INTEGRITY LAYER</b>
+          <b>TA-14 · PROPOSED EXECUTION-INTEGRITY EXAMINATION</b>
           <p>At the boundary before consequence: <strong>Does this proposed consequence still have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</strong></p>
         </div>
       </div>
@@ -50,7 +50,7 @@ export default function SwedenExecutionLayer() {
         <span>+</span>
         <div><strong>TA-14 ADDS</strong><p>Continuity · admissibility · authority binding · standing · revalidation · bounded determination · execution receipt.</p></div>
         <span>=</span>
-        <div><strong>THE POINT</strong><p>No replacement architecture. A layer that helps prevent yesterday's valid evidence or authority from becoming today's unauthorized consequence.</p></div>
+        <div><strong>THE POINT</strong><p>No replacement architecture. A proposed examination layer for testing whether an earlier evidence-and-authority state remains sufficient at the moment of consequence.</p></div>
       </div>
 
       <style jsx>{`
