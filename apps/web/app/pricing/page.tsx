@@ -62,7 +62,7 @@ export default function PricingPage(){
   <main className="shell">
     <section className="hero"><div className="eyebrow">TA-14 Admissible Execution Architecture</div><h1>You can afford to ask<br/><span className="grad">more than one question.</span></h1><p>Start with one proposed consequence. Establish the baseline once. Then change the evidence, authority, connection or reality and run another bounded route without buying the whole engagement again.</p><div className="manifesto">DON'T SPEND MORE TO EXAMINE LESS.</div></section>
 
-    <section className="builder">
+    <section className="panel" style={{marginBottom:24}}><div className="eyebrow">AI governance, standard or architecture?</div><h2>Keep your architecture. Test the boundary.</h2><p>Registration and the standing institutional baseline remain distinct from paid professional examination. Explore bounded demonstrations, interoperability, evidence review and execution-readiness work.</p><Link className="cta" href="/pricing/ai-governance">EXPLORE AI GOVERNANCE ENGAGEMENTS →</Link></section>\n\n    <section className="builder">
       <div className="panel"><div className="eyebrow">1 · Name the consequence</div><h2>What are you trying to make happen safely?</h2><p>Say it in plain language. Everything else is built around the consequence you want examined.</p>
         <div className="consequence"><label>PROPOSED CONSEQUENCE</label><input value={consequence} onChange={e=>setConsequence(e.target.value)} placeholder="Example: Release a payment, change a setpoint, issue a warning…"/></div>
         <div className="fields">
