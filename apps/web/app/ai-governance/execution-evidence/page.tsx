@@ -82,8 +82,8 @@ export default function ExecutionEvidenceHub() {
         <h1 className="mt-5 max-w-5xl text-4xl font-bold tracking-tight md:text-6xl">Can you prove what your AI system was allowed to execute—and what it was not?</h1>
         <p className="mt-7 max-w-4xl text-lg leading-8 text-slate-300">AI governance claims become consequential when an action is about to bind to reality. This hub focuses on the evidence needed to examine authority, changed conditions, refusal, commitment formation, execution, and outcome without assuming that a policy statement, log entry, or interface message proves the underlying control.</p>
         <div className="mt-9 flex flex-wrap gap-4">
-          <Link href="/execution-evidence-snapshot?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md bg-cyan-300 px-6 py-3 font-semibold text-slate-950">Start with one evidence question — $249</Link>
-          <Link href="/execution-claim-review?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">Execution Claim Review — $750+</Link>
+          <Link href="/pricing?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md bg-cyan-300 px-6 py-3 font-semibold text-slate-950">Start one bounded examination — from $149</Link>
+          <Link href="/pricing?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">Explore examination pricing</Link>
         </div>
       </section>
 
@@ -141,7 +141,7 @@ export default function ExecutionEvidenceHub() {
         <div className="rounded-2xl border border-cyan-300/30 bg-cyan-300/5 p-8 md:p-10">
           <h2 className="text-3xl font-bold">Turn an AI execution claim into an evidence question.</h2>
           <p className="mt-4 max-w-3xl leading-7 text-slate-300">If you can state the claim—“the agent was blocked,” “the approval was still valid,” “the evidence remained current,” “the action could not execute”—TA-14 can scope what evidence would be required to examine it.</p>
-          <div className="mt-7 flex flex-wrap gap-4"><Link href="/execution-evidence-snapshot?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md bg-cyan-300 px-6 py-3 font-semibold text-slate-950">$249 Execution Evidence Snapshot</Link><Link href="/execution-claim-review/intake?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">Submit a bounded claim</Link></div>
+          <div className="mt-7 flex flex-wrap gap-4"><Link href="/pricing?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md bg-cyan-300 px-6 py-3 font-semibold text-slate-950">Bounded examination — from $149</Link><Link href="/pricing?utm_source=organic&utm_medium=topic_hub&utm_campaign=execution_evidence" className="rounded-md border border-slate-600 px-6 py-3 font-semibold">Explore examination pricing</Link></div>
         </div>
       </section>
     </main>
