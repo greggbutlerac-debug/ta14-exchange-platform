@@ -24,7 +24,8 @@ const countries=[
 {code:'ME',flag:'🇲🇪',country:'MONTENEGRO',institution:'Environmental Protection Agency of Montenegro',status:'MINISTERIAL REFERRAL · TECHNICAL BOUNDARY IDENTIFIED',language:'MONTENEGRIN + ENGLISH',href:'/global-institutional-engagement/montenegro'},
 {code:'NO',flag:'🇳🇴',country:'KINGDOM OF NORWAY',institution:'Norwegian Environment Agency · Miljødirektoratet',status:'OFFICIAL WEB-FORM ROUTE REQUIRED',language:'NORWEGIAN + ENGLISH',href:'/global-institutional-engagement/norway'},
 {code:'SG',flag:'🇸🇬',country:'REPUBLIC OF SINGAPORE',institution:'National Environment Agency · Environment Health Institute',status:'SUBSTANTIVE NEA ENGAGEMENT',language:'ENGLISH',href:'/global-institutional-engagement/singapore'},
-{code:'FR',flag:'🇫🇷',country:'FRANCE',institution:'Bruno Tudal · TA-14 Ambassador · Environmental Health & IAQ',status:'NATIONAL AMBASSADOR SHOWROOM',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/france'}
+{code:'FR',flag:'🇫🇷',country:'FRANCE',institution:'Bruno Tudal · TA-14 Ambassador · Environmental Health & IAQ',status:'NATIONAL AMBASSADOR SHOWROOM',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/france'},
+{code:'ES',flag:'🇪🇸',country:'KINGDOM OF SPAIN',institution:'Country-specific healthy indoor air / Global Framework examination surface',status:'PUBLIC COUNTRY SHOWROOM · TECHNICAL EXAMINATION SURFACE',language:'SPANISH + ENGLISH',href:'/global-institutional-engagement/spain'}
 ];
 
 const related=[
