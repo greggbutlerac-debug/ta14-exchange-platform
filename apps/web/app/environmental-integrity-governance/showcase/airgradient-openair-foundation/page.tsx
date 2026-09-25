@@ -1,20 +1,4 @@
-'use client';
-
 import Link from 'next/link';
-import { useState } from 'react';
-
-type State='supported'|'missing';
-type Action='OPEN_WINDOWS'|'MECH_VENT'|'FILTRATION'|'ADVISORY'|'HOLD';
-type Result='ALLOW'|'HOLD'|'DENY'|'ESCALATE';
-
-const actions=[
-  ['OPEN_WINDOWS','OPEN WINDOWS','Increase natural ventilation.'],
-  ['MECH_VENT','MECHANICAL VENTILATION','Increase or adjust mechanical outdoor-air delivery.'],
-  ['FILTRATION','FILTRATION','Increase or deploy filtration within an authorized operating plan.'],
-  ['ADVISORY','ISSUE ADVISORY','Communicate a bounded precaution or response instruction.'],
-  ['HOLD','HOLD ACTION','Preserve the evidence and wait for an authorized decision.'],
-] as const;
-
 export default function AirGradientOpenAirFoundationShowroom(){
   const [indoor,setIndoor]=useState<State>('supported');
   const [outdoor,setOutdoor]=useState<State>('supported');
@@ -104,27 +88,47 @@ export default function AirGradientOpenAirFoundationShowroom(){
         <p style={{margin:'18px 0 0',fontSize:15,lineHeight:1.68,color:'#9fb4be'}}>The air-quality path is an entry question for this showroom. It does not replace the canonical TA-14 architecture. Measurements must still survive the record, continuity, admissibility, authority, standing and execution-boundary examination before a proposed consequence may become real.</p>
       </section>
 
-      <section style={{marginTop:22,padding:'clamp(30px,5vw,54px)',border:`1px solid ${accent}55`,borderRadius:27,background:'linear-gradient(145deg,rgba(7,30,38,.94),rgba(3,11,18,.98))'}}>
-        <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>RUN THE SCHOOL AIR EXAM</div>
-        <h2 style={{fontSize:'clamp(34px,5.5vw,66px)',letterSpacing:'-.05em',lineHeight:1,margin:'12px 0 12px'}}>The dashboard has measurements. Are they sufficient evidence for this consequence?</h2>
-        <p style={{maxWidth:980,color:'#9fb4be',lineHeight:1.68}}>This is a governance demonstration, not ventilation, filtration, exposure or medical guidance. No intervention threshold is asserted.</p>
+      <section style={{marginTop:22,padding:'clamp(30px,5vw,54px)',border:'1px solid rgba(111,220,255,.22)',borderRadius:27,background:'linear-gradient(145deg,rgba(7,30,38,.94),rgba(3,11,18,.98))'}}>
+        <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>SCHOOL AIR BOUNDARY TRACE</div>
+        <h2 style={{fontSize:'clamp(34px,5.5vw,66px)',letterSpacing:'-.05em',lineHeight:1,margin:'12px 0 12px'}}>The same measurements can lead to different governance outcomes.</h2>
+        <p style={{maxWidth:980,color:'#9fb4be',lineHeight:1.68}}>These are bounded governance examples, not ventilation, filtration, exposure or medical guidance. No intervention threshold is asserted and TA-14 does not select the physical response.</p>
 
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:12,marginTop:22}}>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>INDOOR EVIDENCE</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setIndoor('supported')} onClick={()=>setIndoor('supported')} style={chip(indoor==='supported')}>CURRENT</button><button type='button' onPointerUp={()=>setIndoor('missing')} onClick={()=>setIndoor('missing')} style={chip(indoor==='missing')}>INSUFFICIENT</button></div></div>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>OUTDOOR EVIDENCE</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setOutdoor('supported')} onClick={()=>setOutdoor('supported')} style={chip(outdoor==='supported')}>CURRENT</button><button type='button' onPointerUp={()=>setOutdoor('missing')} onClick={()=>setOutdoor('missing')} style={chip(outdoor==='missing')}>INSUFFICIENT</button></div></div>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>APPLICABLE AUTHORITY</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setAuthority('supported')} onClick={()=>setAuthority('supported')} style={chip(authority==='supported')}>ESTABLISHED</button><button type='button' onPointerUp={()=>setAuthority('missing')} onClick={()=>setAuthority('missing')} style={chip(authority==='missing')}>UNRESOLVED</button></div></div>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>ESTABLISHED STANDING</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setStanding('supported')} onClick={()=>setStanding('supported')} style={chip(standing==='supported')}>ESTABLISHED</button><button type='button' onPointerUp={()=>setStanding('missing')} onClick={()=>setStanding('missing')} style={chip(standing==='missing')}>UNRESOLVED</button></div></div>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:14,marginTop:24}}>
+          {[
+            {
+              result:'HOLD',
+              color:'#f2c46d',
+              title:'AUTHORITY NOT ESTABLISHED',
+              rows:[['Indoor evidence','Current'],['Outdoor evidence','Current'],['Applicable Authority','Unresolved'],['Established Standing','Established'],['Proposed consequence','Increase ventilation']],
+              copy:'The measurements may be current, but the proposed consequence stops before execution because Applicable Authority has not been established.'
+            },
+            {
+              result:'ESCALATE',
+              color:'#c7adff',
+              title:'STANDING UNRESOLVED',
+              rows:[['Indoor evidence','Current'],['Outdoor evidence','Current'],['Applicable Authority','Established'],['Established Standing','Unresolved'],['Proposed consequence','Issue bounded response']],
+              copy:'Authority exists, but the actor or system seeking execution has not established standing for this consequence. The matter is routed for authorized review.'
+            },
+            {
+              result:'ALLOW',
+              color:'#7ff0bd',
+              title:'BOUNDARY CONDITIONS ESTABLISHED',
+              rows:[['Indoor evidence','Current'],['Outdoor evidence','Current'],['Applicable Authority','Established'],['Established Standing','Established'],['Proposed consequence','Bounded authorized action']],
+              copy:'The governance gates are established for the selected bounded consequence. ALLOW is a TA-14 determination of admissibility, not a command to operate equipment.'
+            }
+          ].map(card=><div key={card.result} style={{padding:24,borderRadius:19,border:`1px solid ${card.color}55`,background:`${card.color}0b`}}>
+            <div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:card.color}}>{card.title}</div>
+            <div style={{fontSize:'clamp(46px,6vw,76px)',fontWeight:1000,letterSpacing:'-.055em',lineHeight:.95,color:card.color,margin:'12px 0 20px'}}>{card.result}</div>
+            <div style={{display:'grid',gap:8}}>
+              {card.rows.map(([label,value])=><div key={label} style={{display:'flex',justifyContent:'space-between',gap:14,paddingBottom:8,borderBottom:'1px solid rgba(111,220,255,.10)'}}><span style={{fontSize:11,color:'#8299a5'}}>{label}</span><strong style={{fontSize:11,textAlign:'right'}}>{value}</strong></div>)}
+            </div>
+            <p style={{margin:'18px 0 0',fontSize:13,lineHeight:1.62,color:'#a8bcc6'}}>{card.copy}</p>
+          </div>)}
         </div>
 
-        <div style={{marginTop:18}}>
-          <div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:'#70dcff'}}>PROPOSED CONSEQUENCE</div>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginTop:10}}>{actions.map(([id,label])=><button key={id} type='button' onPointerUp={()=>setAction(id)} onClick={()=>setAction(id)} style={{cursor:'pointer',padding:'11px 14px',borderRadius:999,border:action===id?'1px solid #7ff0bd':'1px solid rgba(111,220,255,.18)',background:action===id?'rgba(127,240,189,.10)':'transparent',color:action===id?'#7ff0bd':'#9ab0bc',fontWeight:950,fontSize:10}}>{label}</button>)}</div>
-        </div>
-
-        <div style={{marginTop:20,padding:'clamp(28px,5vw,48px)',borderRadius:22,border:`1px solid ${accent}55`,background:`${accent}0d`,textAlign:'center'}}>
-          <div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#839aa5'}}>TA-14 DETERMINATION</div>
-          <div style={{fontSize:'clamp(58px,10vw,118px)',lineHeight:.9,fontWeight:1000,letterSpacing:'-.07em',margin:'16px 0',color:accent}}>{result}</div>
-          <p style={{maxWidth:850,margin:'0 auto',fontSize:'clamp(15px,2vw,20px)',lineHeight:1.65,color:'#b9ccd5'}}>{explanation}</p>
+        <div style={{marginTop:18,padding:22,borderRadius:17,border:'1px solid rgba(111,220,255,.20)',background:'rgba(2,10,17,.58)'}}>
+          <div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:'#70dcff'}}>READ THE BOUNDARY, NOT THE BUTTON</div>
+          <p style={{margin:'9px 0 0',fontSize:'clamp(17px,2vw,22px)',lineHeight:1.55,color:'#d7e7ed'}}>The point is not that one response is always correct. The point is that a measurement cannot silently become execution. Evidence, Applicable Authority, Established Standing and bounded scope must survive before the consequence may become reality.</p>
         </div>
       </section>
 
