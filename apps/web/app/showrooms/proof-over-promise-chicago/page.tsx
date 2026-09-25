@@ -22,8 +22,8 @@ const convergence = [
   {
     tag: 'CONNECTION PROFILE',
     title: 'THE GOVERNED CROSSING',
-    lead: 'Anto · independently governed work',
-    text: 'A Connection Profile can define what may cross between independently governed systems. Context can travel without silently converting connectivity into execution authority.'
+    lead: 'Anto · Connection Profile discussion · role open for confirmation',
+    text: 'A Connection Profile can define what may cross between independently governed systems. Context can travel without silently converting connectivity into execution authority. Anto is explicitly invited to correct, narrow, or refine how his role and the Connection Profile are represented here.'
   },
   {
     tag: 'ONUMA',
@@ -41,7 +41,7 @@ const convergence = [
     tag: 'ASHRAE TC 1.4',
     title: 'TECHNICAL CHALLENGE IN CHICAGO',
     lead: 'Innovative & Disruptive Technologies',
-    text: 'TC 1.4 invited TA-14 into its Winter Conference discussion and indicated roughly ten minutes would be allocated to the TA-14 execution-boundary topic, followed by the opportunity for technical challenge and possible research-subcommittee consideration.'
+    text: 'TC 1.4 invited TA-14 into its Winter Conference discussion and indicated roughly ten minutes would be allocated to the TA-14 execution-boundary topic. The committee can challenge the question and determine whether a broader technical gap exists; if it does, Research Subcommittee consideration and possible development toward an ASHRAE research topic could follow.'
   }
 ];
 
@@ -275,6 +275,19 @@ export default function ProofOverPromiseChicagoShowroom() {
           <p style={{fontSize:'clamp(18px,2.3vw,26px)',lineHeight:1.58,maxWidth:1000,color:'#bdd0d8'}}>
             The opportunity in Chicago is not to make every architecture become TA-14. It is to freeze the interfaces, preserve independent ownership, test the evidence, locate the authority boundary, and show exactly where a proposed digital decision either earns permission to become physical reality — or stops.
           </p>
+          <div style={{marginTop:28,padding:'clamp(22px,4vw,38px)',borderRadius:20,border:'1px solid rgba(113,242,182,.34)',background:'rgba(113,242,182,.055)'}}>
+            <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#71f2b6'}}>AN OPEN EXAMINATION FOR CHICAGO</div>
+            <div style={{marginTop:12,fontSize:'clamp(25px,3.8vw,48px)',fontWeight:1000,letterSpacing:'-.04em',lineHeight:1.06}}>BRING ONE VERIFIED RESULT.</div>
+            <div style={{marginTop:18,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:9}}>
+              {[
+                ['01','NAME THE PROOF.'],
+                ['02','NAME THE PROPOSED CONSEQUENCE.'],
+                ['03','FREEZE THE BOUNDARY.'],
+                ['04','TEST WHETHER THE PROOF ESTABLISHES THE AUTHORITY REQUIRED FOR THAT CONSEQUENCE.']
+              ].map(([n,t])=><div key={n} style={{padding:17,borderRadius:14,border:'1px solid rgba(111,220,255,.13)',background:'rgba(2,10,17,.5)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>{n}</div><div style={{marginTop:7,fontSize:14,fontWeight:950,lineHeight:1.4}}>{t}</div></div>)}
+            </div>
+            <p style={{margin:'18px 0 0',color:'#a9bec8',fontSize:14,lineHeight:1.65}}>This is an invitation to examination, not a claim that any AHR Expo session, presenter, organization, or architecture has accepted TA-14. The proposition is public so it can be challenged, corrected, bounded, or rejected on the record.</p>
+          </div>
           <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:28}}>
             <Link href="/registry/ta-14-admissible-execution-architecture/showcase/owner-to-consequence-collaboration" style={{padding:'13px 17px',borderRadius:11,background:'rgba(113,242,182,.11)',border:'1px solid rgba(113,242,182,.38)',color:'#e5fff2',textDecoration:'none',fontWeight:950,fontSize:12}}>OWNER → CONSEQUENCE →</Link>
             <Link href="/registry/ta-14-admissible-execution-architecture/showcase/governed-connection-profile" style={{padding:'13px 17px',borderRadius:11,border:'1px solid rgba(111,220,255,.27)',color:'#b9f2ff',textDecoration:'none',fontWeight:950,fontSize:12}}>GOVERNED CONNECTION PROFILE →</Link>
