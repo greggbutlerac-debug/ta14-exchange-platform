@@ -91,7 +91,7 @@ export default function Page(){
    <div className="econFlow">{[
     ['OWNER / CUSTOMER','Need · outcome · accountable objective'],
     ['SEMANTIC / ASSET LAYER','Identity · relationships · spatial/system context'],
-    ['CNS/CP','Connection Profile · CP Registry · bind / revoke · crossing services'],
+    ['CNS/CP','Connection Profile · CP Registry · bind · revoke · Profile-governed crossing'],
     ['LIFECYCLE / EVIDENCE','Provenance · records · institutional context'],
     ['TA-14 GOVERNANCE','Admissibility · authority · standing · NOW · determination'],
     ['EXECUTION / INTEGRATION','Local execution · implementation · system services'],
