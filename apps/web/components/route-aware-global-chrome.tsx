@@ -15,6 +15,7 @@ export function RouteAwareGlobalChrome() {
   const isHvacSchoolOffer = pathname === '/academy/hvac/schools' || pathname.startsWith('/academy/hvac/schools/');
   const isConsequenceBoundary = pathname === '/consequence-boundary';
   const isP3479TechnicalProposition = pathname === '/ieee-p3479-technical-proposition';
+  const isNistBuildingControlsConversation = pathname === '/nist-ai-optimized-building-controls';
   const isBlueIotDiscussionShowroom = pathname === '/environmental-integrity-governance/showcase/blue-iot-evidence-to-action';
   const isPublicShowroom =
     pathname.includes('/showcase/') ||
@@ -201,7 +202,7 @@ export function RouteAwareGlobalChrome() {
         </>
       ) : null}
 
-      {!isConsequenceBoundary && !isBlueIotDiscussionShowroom && !isP3479TechnicalProposition ? (
+      {!isConsequenceBoundary && !isBlueIotDiscussionShowroom && !isP3479TechnicalProposition && !isNistBuildingControlsConversation ? (
         <div className="fixed bottom-4 right-4 z-50 w-[min(24rem,calc(100vw-2rem))]">
           <Suspense fallback={null}>
             <SiteActivityCounter />
