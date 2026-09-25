@@ -69,6 +69,11 @@ export default function ProofOverPromiseChicagoShowroom() {
   const [authority, setAuthority] = useState<Gate>('expired');
   const [standing, setStanding] = useState<Gate>('supported');
   const [scope, setScope] = useState<Gate>('supported');
+  const [submittedProof, setSubmittedProof] = useState('');
+  const [submittedConsequence, setSubmittedConsequence] = useState('');
+  const [receiptOpen, setReceiptOpen] = useState(false);
+
+  const failureIndex = scope === 'outside' ? 5 : proof === 'missing' ? 1 : (authority === 'missing' || authority === 'expired') ? 2 : standing === 'missing' ? 3 : 7;
 
   const result: Result = useMemo(() => {
     if (scope === 'outside') return 'DENY';
@@ -140,6 +145,7 @@ export default function ProofOverPromiseChicagoShowroom() {
             Proof matters. But proof, by itself, does not establish permission to change physical reality. Chicago creates a rare convergence: AutomatedBuildings is building 18 education sessions around <b style={{color:'#fff'}}>Proof Over Promise</b>, while TA-14 has been invited into ASHRAE TC 1.4&apos;s Innovative &amp; Disruptive Technologies discussion to put the execution boundary under technical challenge.
           </p>
           <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:30}}>
+            <a href="#chicago-exam" style={{padding:'10px 16px',borderRadius:999,background:'#71f2b6',color:'#02100a',textDecoration:'none',fontWeight:1000,fontSize:10,letterSpacing:'.08em'}}>RUN THE CHICAGO EXAM ↓</a>
             {['PROMISE','PROOF','EVIDENCE','AUTHORITY','STANDING','EXECUTION','OUTCOME'].map((x,i)=><span key={x} style={{padding:'10px 13px',borderRadius:999,border:i===1?'1px solid rgba(113,242,182,.5)':'1px solid rgba(111,220,255,.17)',background:i===1?'rgba(113,242,182,.1)':'rgba(3,12,20,.6)',fontSize:10,fontWeight:950,letterSpacing:'.1em',color:i===1?'#dffff0':'#8facba'}}>{x}</span>)}
           </div>
         </section>
@@ -206,7 +212,7 @@ export default function ProofOverPromiseChicagoShowroom() {
           </div>
         </section>
 
-        <section style={{marginTop:24,padding:'clamp(28px,5vw,50px)',...card}}>
+        <section id="chicago-exam" style={{marginTop:24,padding:'clamp(28px,5vw,50px)',...card,scrollMarginTop:24}}>
           <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#71f2b6'}}>RUN THE PROOF → CONSEQUENCE EXAM</div>
           <h2 style={{fontSize:'clamp(34px,5vw,62px)',letterSpacing:'-.045em',lineHeight:1.02,margin:'12px 0 10px'}}>The building has proof. Does it have permission?</h2>
           <p style={{maxWidth:930,color:'#9eb3bd',lineHeight:1.68,fontSize:16}}>
@@ -244,6 +250,8 @@ export default function ProofOverPromiseChicagoShowroom() {
             </div>
           </div>
 
+          <div style={{marginTop:18,padding:18,borderRadius:18,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.56)'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.15em',color:'#70dcff'}}>LIVE BOUNDARY TRACE</div><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))',gap:7,marginTop:13}}>{['PROOF','EVIDENCE','AUTHORITY','STANDING','COMMIT','EXECUTION','OUTCOME'].map((x,i)=>{const passed=i<failureIndex;const stopped=i===failureIndex;return <div key={x} style={{padding:'12px 9px',borderRadius:12,textAlign:'center',border:stopped?`1px solid ${color}88`:'1px solid rgba(111,220,255,.12)',background:passed?'rgba(113,242,182,.08)':stopped?`${color}12`:'rgba(2,10,17,.45)',color:passed?'#dffff0':stopped?color:'#647d89',fontSize:10,fontWeight:950}}>{x}<div style={{marginTop:5,fontSize:9}}>{passed?'SURVIVES':stopped?'STOPS HERE':'NOT REACHED'}</div></div>})}</div></div>
+
           <div style={{marginTop:18,padding:'clamp(30px,5vw,52px)',borderRadius:24,border:`1px solid ${color}55`,background:`linear-gradient(135deg,${color}10,rgba(2,10,17,.96))`,textAlign:'center'}}>
             <div style={{fontSize:10,fontWeight:950,letterSpacing:'.2em',color:'#8099a5'}}>TA-14 DETERMINATION</div>
             <div style={{fontSize:'clamp(64px,11vw,132px)',fontWeight:1000,lineHeight:.9,letterSpacing:'-.07em',margin:'17px 0',color}}>{result}</div>
@@ -275,6 +283,8 @@ export default function ProofOverPromiseChicagoShowroom() {
           <p style={{fontSize:'clamp(18px,2.3vw,26px)',lineHeight:1.58,maxWidth:1000,color:'#bdd0d8'}}>
             The opportunity in Chicago is not to make every architecture become TA-14. It is to freeze the interfaces, preserve independent ownership, test the evidence, locate the authority boundary, and show exactly where a proposed digital decision either earns permission to become physical reality — or stops.
           </p>
+          <div style={{marginTop:28,padding:'clamp(22px,4vw,38px)',borderRadius:20,border:'1px solid rgba(111,220,255,.2)',background:'rgba(2,10,17,.58)'}}><div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#70dcff'}}>BRING YOUR OWN VERIFIED RESULT</div><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:12,marginTop:16}}><label style={{fontSize:11,fontWeight:900,color:'#9bb1bc'}}>WHAT DID YOU PROVE?<textarea value={submittedProof} onChange={e=>{setSubmittedProof(e.target.value);setReceiptOpen(false)}} style={{display:'block',width:'100%',minHeight:105,marginTop:8,padding:14,borderRadius:12,border:'1px solid rgba(111,220,255,.18)',background:'#020a11',color:'#eef8fb',font:'inherit',boxSizing:'border-box'}} /></label><label style={{fontSize:11,fontWeight:900,color:'#9bb1bc'}}>WHAT CONSEQUENCE DOES THAT PROOF PROPOSE?<textarea value={submittedConsequence} onChange={e=>{setSubmittedConsequence(e.target.value);setReceiptOpen(false)}} style={{display:'block',width:'100%',minHeight:105,marginTop:8,padding:14,borderRadius:12,border:'1px solid rgba(111,220,255,.18)',background:'#020a11',color:'#eef8fb',font:'inherit',boxSizing:'border-box'}} /></label></div><button disabled={!submittedProof.trim()||!submittedConsequence.trim()} onClick={()=>setReceiptOpen(true)} style={{marginTop:14,padding:'13px 18px',borderRadius:11,border:'1px solid rgba(113,242,182,.4)',background:'rgba(113,242,182,.13)',color:'#e4fff1',fontWeight:1000}}>FREEZE THIS EXAMINATION →</button>{receiptOpen&&<div style={{marginTop:18,padding:20,borderRadius:15,border:`1px solid ${color}55`}}><b>BOUNDED EXAMINATION RECEIPT · LOCAL SESSION</b><div style={{marginTop:10,lineHeight:1.7}}>PROOF: {submittedProof}<br/>PROPOSED CONSEQUENCE: {submittedConsequence}<br/>DETERMINATION: <span style={{color,fontWeight:1000}}>{result}</span></div><div style={{marginTop:8,fontSize:11,color:'#78909b'}}>Demonstration only. Not a durable registry receipt, certification, endorsement, or execution authorization.</div></div>}</div>
+
           <div style={{marginTop:28,padding:'clamp(22px,4vw,38px)',borderRadius:20,border:'1px solid rgba(113,242,182,.34)',background:'rgba(113,242,182,.055)'}}>
             <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#71f2b6'}}>AN OPEN EXAMINATION FOR CHICAGO</div>
             <div style={{marginTop:12,fontSize:'clamp(25px,3.8vw,48px)',fontWeight:1000,letterSpacing:'-.04em',lineHeight:1.06}}>BRING ONE VERIFIED RESULT.</div>
