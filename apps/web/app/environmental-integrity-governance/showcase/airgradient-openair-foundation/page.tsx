@@ -118,7 +118,7 @@ export default function AirGradientOpenAirFoundationShowroom(){
 
         <div style={{marginTop:18}}>
           <div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:'#70dcff'}}>PROPOSED CONSEQUENCE</div>
-          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginTop:10}}>{actions.map(([id,label])=><button key={id} onClick={()=>setAction(id)} style={{cursor:'pointer',padding:'11px 14px',borderRadius:999,border:action===id?'1px solid #7ff0bd':'1px solid rgba(111,220,255,.18)',background:action===id?'rgba(127,240,189,.10)':'transparent',color:action===id?'#7ff0bd':'#9ab0bc',fontWeight:950,fontSize:10}}>{label}</button>)}</div>
+          <div style={{display:'flex',gap:8,flexWrap:'wrap',marginTop:10}}>{actions.map(([id,label])=><button key={id} type='button' onPointerUp={()=>setAction(id)} onClick={()=>setAction(id)} style={{cursor:'pointer',padding:'11px 14px',borderRadius:999,border:action===id?'1px solid #7ff0bd':'1px solid rgba(111,220,255,.18)',background:action===id?'rgba(127,240,189,.10)':'transparent',color:action===id?'#7ff0bd':'#9ab0bc',fontWeight:950,fontSize:10}}>{label}</button>)}</div>
         </div>
 
         <div style={{marginTop:20,padding:'clamp(28px,5vw,48px)',borderRadius:22,border:`1px solid ${accent}55`,background:`${accent}0d`,textAlign:'center'}}>
