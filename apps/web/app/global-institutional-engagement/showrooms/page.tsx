@@ -25,7 +25,7 @@ const countries=[
 {code:'NO',flag:'🇳🇴',country:'KINGDOM OF NORWAY',institution:'Norwegian Environment Agency · Miljødirektoratet',status:'OFFICIAL WEB-FORM ROUTE REQUIRED',language:'NORWEGIAN + ENGLISH',href:'/global-institutional-engagement/norway'},
 {code:'SG',flag:'🇸🇬',country:'REPUBLIC OF SINGAPORE',institution:'National Environment Agency · Environment Health Institute',status:'SUBSTANTIVE NEA ENGAGEMENT',language:'ENGLISH',href:'/global-institutional-engagement/singapore'},
 {code:'FR',flag:'🇫🇷',country:'FRANCE',institution:'Bruno Tudal · TA-14 Ambassador · Environmental Health & IAQ',status:'NATIONAL AMBASSADOR SHOWROOM',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/france'},
-{code:'ES',flag:'🇪🇸',country:'KINGDOM OF SPAIN',institution:'Country-specific healthy indoor air / Global Framework examination surface',status:'PUBLIC COUNTRY SHOWROOM · TECHNICAL EXAMINATION SURFACE',language:'SPANISH + ENGLISH',href:'/global-institutional-engagement/spain'}
+{code:'ES',flag:'🇪🇸',country:'KINGDOM OF SPAIN',institution:'MITECO outreach · inBiot / María Figols invited examination',status:'OUTREACH INITIATED · SPAIN-SPECIFIC EXAMINATION PUBLISHED · RESPONSE NOT YET ESTABLISHED',language:'SPANISH + ENGLISH',href:'/global-institutional-engagement/spain'}
 ];
 
 const related=[
