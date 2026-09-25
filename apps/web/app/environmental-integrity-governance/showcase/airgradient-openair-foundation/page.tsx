@@ -98,9 +98,19 @@ export default function AirGradientOpenAirFoundationShowroom(){
         </div>
       </section>
 
+      <section style={{marginTop:22,padding:'clamp(28px,5vw,50px)',border:'1px solid rgba(199,173,255,.26)',borderRadius:25,background:'linear-gradient(135deg,rgba(25,18,43,.72),rgba(3,12,20,.96))'}}>
+        <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#c7adff'}}>TWO LAYERS · ONE BOUNDARY</div>
+        <h2 style={{fontSize:'clamp(32px,5vw,58px)',letterSpacing:'-.045em',lineHeight:1.02,margin:'11px 0 22px'}}>The air-quality path is the entry question. TA-14 keeps the full examination intact.</h2>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:12}}>
+          <div style={{padding:24,borderRadius:18,border:'1px solid rgba(111,220,255,.18)',background:'rgba(2,10,17,.58)'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:'#70dcff'}}>AIR-QUALITY EXAMINATION</div><div style={{fontSize:'clamp(19px,2.5vw,30px)',fontWeight:1000,lineHeight:1.25,marginTop:12}}>Measurement → Evidence → Authority → Action → Verification</div></div>
+          <div style={{padding:24,borderRadius:18,border:'1px solid rgba(127,240,189,.32)',background:'rgba(127,240,189,.05)'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.14em',color:'#7ff0bd'}}>CANONICAL TA-14 EXAMINATION</div><div style={{fontSize:'clamp(19px,2.5vw,30px)',fontWeight:1000,lineHeight:1.25,marginTop:12}}>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</div></div>
+        </div>
+        <p style={{margin:'18px 0 0',fontSize:15,lineHeight:1.68,color:'#9fb4be'}}>The air-quality path is an entry question for this showroom. It does not replace the canonical TA-14 architecture. Measurements must still survive the record, continuity, admissibility, authority, standing and execution-boundary examination before a proposed consequence may become real.</p>
+      </section>
+
       <section style={{marginTop:22,padding:'clamp(30px,5vw,54px)',border:`1px solid ${accent}55`,borderRadius:27,background:'linear-gradient(145deg,rgba(7,30,38,.94),rgba(3,11,18,.98))'}}>
         <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>RUN THE SCHOOL AIR EXAM</div>
-        <h2 style={{fontSize:'clamp(34px,5.5vw,66px)',letterSpacing:'-.05em',lineHeight:1,margin:'12px 0 12px'}}>The dashboard has evidence. Does the consequence have permission?</h2>
+        <h2 style={{fontSize:'clamp(34px,5.5vw,66px)',letterSpacing:'-.05em',lineHeight:1,margin:'12px 0 12px'}}>The dashboard has measurements. Are they sufficient evidence for this consequence?</h2>
         <p style={{maxWidth:980,color:'#9fb4be',lineHeight:1.68}}>This is a governance demonstration, not ventilation, filtration, exposure or medical guidance. No intervention threshold is asserted.</p>
 
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:12,marginTop:22}}>
