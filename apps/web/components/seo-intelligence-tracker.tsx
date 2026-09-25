@@ -63,7 +63,14 @@ export function SeoIntelligenceTracker() {
     if (last.current === key) return;
     last.current = key;
 
-    const telemetryTimer = window.setTimeout(() => send(payload(pathname, params)), 0);
+    const telemetryTimer = window.setTimeout(() => {
+      send(payload(pathname, params));
+      if (pathname === "/pricing") {
+        send({...payload(pathname, params), eventType:"pricing_viewed", targetText:"TA14_PRICING_VIEWED", metadata:{funnel:"ta14-commercial-v1",stage:"pricing_viewed",offer:"bounded-examination",price:149}});
+      } else if (pathname === "/pricing/ai-governance") {
+        send({...payload(pathname, params), eventType:"pricing_viewed", targetText:"TA14_AI_GOVERNANCE_PRICING_VIEWED", metadata:{funnel:"ta14-commercial-v1",stage:"pricing_viewed",offer:"ai-governance"}});
+      }
+    }, 0);
     const bindTimer = window.setTimeout(bindAuthenticatedUser, 350);
     return () => {
       window.clearTimeout(telemetryTimer);
@@ -78,12 +85,20 @@ export function SeoIntelligenceTracker() {
       const params = new URLSearchParams(window.location.search);
       const anchor = target.closest("a") as HTMLAnchorElement | null;
       if (anchor?.href) {
+        const targetText=(anchor.innerText || anchor.getAttribute("aria-label") || "").trim().slice(0, 500);
         send({
           ...payload(window.location.pathname, params),
           eventType: "click",
           targetHref: anchor.href,
-          targetText: (anchor.innerText || anchor.getAttribute("aria-label") || "").trim().slice(0, 500),
+          targetText,
         });
+        if(window.location.pathname==="/pricing"||window.location.pathname==="/pricing/ai-governance"){
+          const upper=targetText.toUpperCase();
+          const isStart=/START|EXAMINATION|SCOPING|ENGAGEMENT/.test(upper);
+          if(isStart){
+            send({...payload(window.location.pathname,params),eventType:"bounded_exam_clicked",targetHref:anchor.href,targetText,metadata:{funnel:"ta14-commercial-v1",stage:"bounded_exam_clicked",offer:"bounded-examination",price:149}});
+          }
+        }
         return;
       }
       if(window.location.pathname!=="/eu-ai-act/join")return;
