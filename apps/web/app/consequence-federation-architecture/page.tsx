@@ -1,0 +1,73 @@
+'use client';
+import Link from 'next/link';
+import {useMemo,useState} from 'react';
+
+type Gap='G-01'|'G-02'|'G-03'|'G-04'|'G-05'|'G-06'|'G-07'|'G-08'|'G-09';
+const C={bg:'#010609',panel:'#06151c',line:'#24464d',cyan:'#71e7df',gold:'#e7c76e',green:'#8de6b0',red:'#ff9f82',text:'#efffff',muted:'#9fb7be'};
+const domains=[
+ ['OWNER / OPERATOR','Need · intent · accountable objective','Proposed origin'],
+ ['ONUMA / RE1','Asset identity · semantic relationships · spatial/system context','Proposed · open for correction'],
+ ['ANTO / CONNECTION PROFILE','Interface contract · what may cross · constraints','Proposed · exact role requires correction'],
+ ['LIFECYCLE / EVIDENCE','Provenance · maintenance · warranty · financial / institutional context','Proposed · open for correction'],
+ ['TA-14','Admissibility · authority · standing · present reality · determination','Governed consequence boundary'],
+ ['EXECUTING DOMAIN','Local execution authority · Commit · Execution','Authority established locally'],
+ ['OUTCOME RECORD','Attempt · result · time · new record / baseline','Verifiable continuity']
+];
+const gaps:{id:Gap;name:string;key:string}[]=[
+ {id:'G-01',name:'IDENTITY GAP',key:'identity'},{id:'G-02',name:'RELATIONSHIP GAP',key:'relationship'},
+ {id:'G-03',name:'PROFILE GAP',key:'profile'},{id:'G-04',name:'PROVENANCE GAP',key:'provenance'},
+ {id:'G-05',name:'AUTHORITY GAP',key:'authority'},{id:'G-06',name:'STANDING GAP',key:'standing'},
+ {id:'G-07',name:'NOW GAP',key:'now'},{id:'G-08',name:'EXECUTION BOUNDARY GAP',key:'execution'},
+ {id:'G-09',name:'OUTCOME GAP',key:'outcome'}
+];
+export default function Page(){
+ const [state,setState]=useState<Record<string,boolean>>({identity:true,relationship:true,profile:true,provenance:true,authority:true,standing:true,now:true,execution:true,outcome:true});
+ const [hazard,setHazard]=useState(false);
+ const [runs,setRuns]=useState<{id:number;determination:string;reason:string;receipt:string}[]>([]);
+ const broken=useMemo(()=>gaps.find(g=>!state[g.key]),[state]);
+ const determination=hazard||broken?'HOLD':'ALLOW';
+ const reason=hazard?'Changed reality: technician entered hazard zone. Fresh NOW required.':broken?broken.id+' · '+broken.name:'Admissible Evidence, Applicable Authority, Established Standing and current conditions established for this candidate route.';
+ const run=()=>setRuns(v=>[{id:v.length+1,determination,reason,receipt:'FCR-'+String(v.length+1).padStart(3,'0')},...v].slice(0,6));
+ const restore=()=>{setHazard(false);setState({identity:true,relationship:true,profile:true,provenance:true,authority:true,standing:true,now:true,execution:true,outcome:true})};
+ return <main className="page"><div className="shell">
+  <nav><Link href="/">TA-14 EXCHANGE</Link><span>CFA · CANDIDATE v0.4 · OPEN FOR CORRECTION</span></nav>
+  <header>
+   <small>CONSEQUENCE FEDERATION ARCHITECTURE</small>
+   <h1>INDEPENDENT SYSTEMS.<br/><em>ONE GOVERNED CONSEQUENCE.</em></h1>
+   <p>Shared context can cross independently governed domains without turning any one system into the whole system. Identity, evidence, context and authority context may travel. Execution authority does not.</p>
+   <div className="status">OPEN FOR CORRECTION · NOT FROZEN · NOT REGISTERED · NO ENDORSEMENT OR ADOPTION IMPLIED</div>
+  </header>
+
+  <section><small>THE FEDERATION MAP</small><h2>Everybody keeps their domain.</h2><p className="lead">The federation asks each participant to contribute only what its domain can establish, across an explicit boundary, while preserving local authority where the consequence becomes real.</p>
+   <div className="domains">{domains.map((d,i)=><article key={d[0]}><b>{String(i+1).padStart(2,'0')}</b><h3>{d[0]}</h3><p>{d[1]}</p><small>{d[2]}</small></article>)}</div>
+  </section>
+
+  <section className="boundary"><small>THE NON-TRANSFER RULE</small><h2>CONTEXT MAY TRAVEL.<br/><em>EXECUTION AUTHORITY DOES NOT.</em></h2><div className="travels">{['IDENTITY','EVIDENCE','CONTEXT','AUTHORITY CONTEXT'].map(x=><span key={x}>{x} MAY TRAVEL</span>)}</div><strong>ORCHESTRATION ≠ AUTHORITY</strong><p>A coordinator may request context, route objects, wait, assemble receipts and preserve continuity. Coordination does not make the coordinator authoritative for identity, evidence, determination or execution.</p></section>
+
+  <section><small>FOUNDING SPECIMEN 01 · AHU-1 ELECTRICAL SHUTOFF</small><h2>Run the federation.</h2><div className="lab">
+   <div className="controls"><div className="proposal"><small>PROPOSED CONSEQUENCE</small><b>SHUT DOWN AHU-1</b><span>Candidate examination specimen — not a claim about a real asset or real authority.</span></div>
+    {gaps.map(g=><button key={g.id} onClick={()=>setState(s=>({...s,[g.key]:!s[g.key]}))} className={state[g.key]?'ok':'bad'}><b>{g.id}</b> {g.name}<span>{state[g.key]?'ESTABLISHED':'BROKEN'}</span></button>)}
+    <button className={hazard?'hazard on':'hazard'} onClick={()=>setHazard(x=>!x)}><b>CHANGE REALITY</b><span>{hazard?'TECHNICIAN IN HAZARD ZONE':'INTRODUCE HAZARD'}</span></button>
+   </div>
+   <div className="result"><small>CURRENT DETERMINATION</small><strong className={determination==='ALLOW'?'allow':'hold'}>{determination}</strong><p>{reason}</p><div className="question">Does this proposed consequence have sufficient <b>Admissible Evidence</b>, <b>Applicable Authority</b>, and <b>Established Standing</b> to become reality <b>NOW?</b></div><div className="actions"><button onClick={run}>RUN CONSEQUENCE</button><button onClick={restore}>RESTORE CONDITIONS</button></div><p className="rule">Clearing a HOLD does not resurrect an old ALLOW. Every proposed Commit gets a new NOW.</p></div>
+  </div></section>
+
+  <section><small>FEDERATED CONSEQUENCE RECORD</small><h2>Reference. Do not swallow.</h2><p className="lead">The FCR references domain-native identifiers, evidence and receipts rather than replacing the participating systems with a new master database.</p>
+   <div className="fcr">{['FCR IDENTITY','INTENT','TARGET REFERENCES','CROSSING REFERENCES','EVIDENCE REFERENCES','AUTHORITY CONTEXT','STANDING','NOW EVIDENCE','DETERMINATION','COMMIT RECEIPT','OUTCOME RECEIPT'].map((x,i)=><span key={x} className={i<9?'live':''}>{x}</span>)}</div>
+   <div className="ledger">{runs.length===0?<p>No run yet. Change a condition or break a seam, then run the consequence.</p>:runs.map(r=><article key={r.id}><b>{r.receipt}</b><strong className={r.determination==='ALLOW'?'allowText':'holdText'}>{r.determination}</strong><span>{r.reason}</span></article>)}</div>
+  </section>
+
+  <section><small>BREAK THE FEDERATION</small><h2>A gap is not a failed demonstration.</h2><p className="lead">A bounded HOLD, DENY, ESCALATE or localized gap can be the correct and valuable result. The point is to show exactly which seam cannot support the proposed consequence.</p><div className="gapGrid">{gaps.map(g=><button key={g.id} onClick={()=>setState(s=>({...s,[g.key]:false}))}><b>{g.id}</b><span>{g.name}</span></button>)}</div></section>
+
+  <section><small>PARTICIPANT CORRECTION</small><h2>Correct your domain before we freeze ours.</h2><div className="correction">{['Is your domain represented correctly?','Is your boundary represented correctly?','What may the federation rely on your domain for?','What must the federation NOT assume?','What artifact or evidence can you contribute to Examination 01?','Are any terms materially different in your architecture?'].map(q=><div key={q}>{q}<span>YES · NO · CORRECT</span></div>)}</div><p className="lead">This is a review instrument, not an endorsement mechanism. Each represented participant corrects its own contribution, interface and boundary before freeze.</p></section>
+
+  <section className="patent"><small>PROPOSED PATENT PATH</small><h2>If accepted, protect the combined invention before commercialization.</h2><p>The accepted architecture may proceed to patent-counsel review and, if the participating inventors and rights holders agree, filing directed to patentable systems, methods, data structures, interfaces, receipts, state transitions and implementations.</p><div className="patentGrid">{['COMBINED CFA ARCHITECTURE','CONTRACT MATRIX + CROSSING RECEIPTS','AUTHORITY SEPARATION','FEDERATED CONSEQUENCE RECORD','CHANGED-CONDITION / NON-INHERITANCE','GAP LOCALIZATION + TECHNICAL EMBODIMENTS'].map(x=><span key={x}>{x}</span>)}</div><div className="warning">CANDIDATE ONLY · NO PATENT-PENDING CLAIM · ACCEPTANCE DOES NOT DETERMINE INVENTORSHIP, TRANSFER OWNERSHIP OR OBLIGATE PARTICIPATION IN A FILING.</div></section>
+
+  <section className="exam"><small>FOUNDING EXAMINATION</small><h2>THE NEXT MOVE IS A TEST.</h2><p>Can independently governed systems establish enough identity, relationship, provenance, interface context, authority, standing and present-condition evidence for a reproducible determination — without transferring ownership or execution authority between domains?</p><button onClick={run}>RUN EXAMINATION 01 →</button></section>
+
+  <footer><b>CFA · CANDIDATE v0.4</b><span>OPEN FOR CORRECTION · NOT FROZEN · NOT REGISTERED · NO ENDORSEMENT OR ADOPTION IMPLIED</span><Link href="/federation-authority">RETURN TO FEDERATION & AUTHORITY WORLD →</Link></footer>
+ </div><style>{css}</style></main>
+}
+const css=`
+.page{min-height:100vh;background:radial-gradient(circle at 50% 0,#12333a,#031015 32%,#010609 76%);color:#efffff;font-family:Inter,system-ui,sans-serif}.page *{box-sizing:border-box}.page a{color:inherit;text-decoration:none}.shell{width:min(1280px,calc(100% - 32px));margin:auto}nav{min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:14px;border-bottom:1px solid #24464d;font-size:10px;font-weight:950;letter-spacing:.1em;color:#71e7df}header{padding:95px 0 75px;max-width:1100px}small{color:#71e7df;font-weight:950;letter-spacing:.16em;font-size:9px}h1{font:clamp(54px,8vw,105px)/.88 Georgia,serif;letter-spacing:-.055em;margin:18px 0 28px}h1 em,h2 em{font-style:normal;color:#e7c76e}header p,.lead{color:#9fb7be;line-height:1.75;font-size:17px;max-width:900px}.status{display:inline-block;margin-top:24px;padding:12px 15px;border:1px solid #e7c76e;color:#e7c76e;font-size:9px;font-weight:950;letter-spacing:.1em}section{padding:65px 0;border-top:1px solid #17363e}h2{font:clamp(38px,5vw,62px)/.98 Georgia,serif;letter-spacing:-.035em;margin:10px 0 18px}.domains{display:grid;grid-template-columns:repeat(7,1fr);gap:7px;margin-top:30px}.domains article{padding:18px 14px;border:1px solid #24464d;background:#06151c;min-height:210px}.domains article>b{color:#e7c76e;font-size:12px}.domains h3{font-size:14px;line-height:1.25;margin:18px 0 10px}.domains p{font-size:11px;line-height:1.6;color:#9fb7be}.domains small{font-size:7px;color:#78969c}.boundary{padding:55px 35px;margin:35px 0;border:1px solid #6c5b31;background:linear-gradient(135deg,rgba(231,199,110,.08),rgba(3,16,21,.9))}.travels{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:25px 0}.travels span{padding:14px;border:1px solid #31545b;text-align:center;font-size:9px;font-weight:900;color:#aeefff}.boundary>strong{display:block;font-size:25px;color:#e7c76e;margin:22px 0 8px}.boundary p{color:#9fb7be;max-width:850px;line-height:1.7}.lab{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-top:28px}.controls,.result{padding:22px;border:1px solid #24464d;background:#06151c}.proposal{padding:18px;border:1px solid #31545b;margin-bottom:10px}.proposal b{display:block;font:27px Georgia,serif;margin:7px 0}.proposal span{font-size:10px;color:#9fb7be}.controls button{width:100%;padding:12px;margin:3px 0;text-align:left;border-radius:7px;cursor:pointer;font-weight:900}.controls button span{float:right;font-size:9px}.ok{border:1px solid #315e61;background:rgba(45,141,143,.1);color:#9be7e2}.bad,.hazard.on{border:1px solid #8b4937;background:rgba(86,25,13,.25);color:#ffb29a}.hazard{border:1px solid #6c5b31;background:rgba(231,199,110,.08);color:#e7c76e}.result>strong{display:block;font-size:75px;line-height:1;margin:18px 0}.allow{color:#8de6b0}.hold{color:#e7c76e}.result>p{color:#9fb7be;line-height:1.6}.question{padding:18px;border:1px solid #31545b;line-height:1.65;background:#020b0f}.actions{display:flex;gap:8px;margin-top:15px}.actions button,.exam button{cursor:pointer;padding:13px 16px;border:1px solid #71e7df;background:#71e7df;color:#031216;font-weight:950}.actions button+button{background:transparent;color:#d7eeee;border-color:#31545b}.rule{font-size:11px;color:#e7c76e!important}.fcr{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin:25px 0}.fcr span{padding:12px 8px;border:1px solid #24464d;text-align:center;font-size:8px;font-weight:900;color:#78969c}.fcr .live{border-color:#315e61;color:#9be7e2}.ledger{display:grid;gap:7px}.ledger>p,.ledger article{padding:16px;border:1px solid #24464d;background:#06151c}.ledger article{display:grid;grid-template-columns:110px 100px 1fr;gap:12px}.ledger article span{color:#9fb7be;font-size:11px}.allowText{color:#8de6b0}.holdText{color:#e7c76e}.gapGrid,.patentGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:25px}.gapGrid button,.patentGrid span{padding:17px;border:1px solid #24464d;background:#06151c;color:#efffff;text-align:left}.gapGrid button{cursor:pointer}.gapGrid b{color:#e7c76e;margin-right:8px}.gapGrid span,.patentGrid span{font-size:10px;font-weight:900}.correction{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:25px 0}.correction div{padding:20px;border:1px solid #24464d;background:#06151c;font-weight:800}.correction span{display:block;color:#71e7df;font-size:9px;margin-top:12px}.patent{padding:50px 35px;border:1px solid #31545b;background:linear-gradient(135deg,rgba(45,141,143,.09),rgba(3,16,21,.95))}.patent>p,.exam p{color:#9fb7be;line-height:1.75;max-width:900px}.warning{margin-top:18px;padding:15px;border:1px solid #e7c76e;color:#e7c76e;font-size:9px;font-weight:950;letter-spacing:.07em}.exam{text-align:center;padding:90px 0}.exam p{margin:0 auto 28px;font-size:17px}.exam h2{font-size:clamp(52px,8vw,96px)}footer{padding:35px 0 80px;border-top:1px solid #24464d;display:grid;gap:10px;font-size:9px;color:#9fb7be}footer b{color:#71e7df}footer a{color:#e7c76e!important;font-weight:900}@media(max-width:950px){.domains{grid-template-columns:repeat(2,1fr)}.lab{grid-template-columns:1fr}.fcr{grid-template-columns:repeat(3,1fr)}}@media(max-width:650px){nav{align-items:flex-start;flex-direction:column;padding:18px 0}.domains,.gapGrid,.patentGrid,.correction,.travels{grid-template-columns:1fr}.fcr{grid-template-columns:repeat(2,1fr)}.ledger article{grid-template-columns:1fr}.boundary,.patent{padding:30px 20px}header{padding-top:65px}}
+`;
