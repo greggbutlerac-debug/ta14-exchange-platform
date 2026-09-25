@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 
 type State='supported'|'missing';
 type Action='OPEN_WINDOWS'|'MECH_VENT'|'FILTRATION'|'ADVISORY'|'HOLD';
@@ -22,17 +22,10 @@ export default function AirGradientOpenAirFoundationShowroom(){
   const [standing,setStanding]=useState<State>('supported');
   const [action,setAction]=useState<Action>('OPEN_WINDOWS');
 
-  const result:Result=useMemo(()=>{
-    // This public exam demonstrates the gates, not an air-quality control rule.
-    // Missing evidence or authority holds execution; unresolved standing escalates;
-    // an explicitly held action remains held. A fully established record can ALLOW
-    // any selected bounded consequence without pretending TA-14 chose the action.
-    if(indoor==='missing'||outdoor==='missing') return 'HOLD';
-    if(authority==='missing') return 'HOLD';
-    if(standing==='missing') return 'ESCALATE';
-    if(action==='HOLD') return 'HOLD';
-    return 'ALLOW';
-  },[indoor,outdoor,authority,standing,action]);
+  const result:Result = action==='HOLD' ? 'HOLD'
+    : indoor==='missing'||outdoor==='missing'||authority==='missing' ? 'HOLD'
+    : standing==='missing' ? 'ESCALATE'
+    : 'ALLOW';
 
   const accent={ALLOW:'#7ff0bd',HOLD:'#f2c46d',DENY:'#ff7d8c',ESCALATE:'#c7adff'}[result];
   const explanation={
@@ -117,10 +110,10 @@ export default function AirGradientOpenAirFoundationShowroom(){
         <p style={{maxWidth:980,color:'#9fb4be',lineHeight:1.68}}>This is a governance demonstration, not ventilation, filtration, exposure or medical guidance. No intervention threshold is asserted.</p>
 
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:12,marginTop:22}}>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>INDOOR EVIDENCE</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button onClick={()=>setIndoor('supported')} style={chip(indoor==='supported')}>CURRENT</button><button onClick={()=>setIndoor('missing')} style={chip(indoor==='missing')}>INSUFFICIENT</button></div></div>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>OUTDOOR EVIDENCE</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button onClick={()=>setOutdoor('supported')} style={chip(outdoor==='supported')}>CURRENT</button><button onClick={()=>setOutdoor('missing')} style={chip(outdoor==='missing')}>INSUFFICIENT</button></div></div>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>APPLICABLE AUTHORITY</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button onClick={()=>setAuthority('supported')} style={chip(authority==='supported')}>ESTABLISHED</button><button onClick={()=>setAuthority('missing')} style={chip(authority==='missing')}>UNRESOLVED</button></div></div>
-          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>ESTABLISHED STANDING</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button onClick={()=>setStanding('supported')} style={chip(standing==='supported')}>ESTABLISHED</button><button onClick={()=>setStanding('missing')} style={chip(standing==='missing')}>UNRESOLVED</button></div></div>
+          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>INDOOR EVIDENCE</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setIndoor('supported')} onClick={()=>setIndoor('supported')} style={chip(indoor==='supported')}>CURRENT</button><button type='button' onPointerUp={()=>setIndoor('missing')} onClick={()=>setIndoor('missing')} style={chip(indoor==='missing')}>INSUFFICIENT</button></div></div>
+          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>OUTDOOR EVIDENCE</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setOutdoor('supported')} onClick={()=>setOutdoor('supported')} style={chip(outdoor==='supported')}>CURRENT</button><button type='button' onPointerUp={()=>setOutdoor('missing')} onClick={()=>setOutdoor('missing')} style={chip(outdoor==='missing')}>INSUFFICIENT</button></div></div>
+          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>APPLICABLE AUTHORITY</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setAuthority('supported')} onClick={()=>setAuthority('supported')} style={chip(authority==='supported')}>ESTABLISHED</button><button type='button' onPointerUp={()=>setAuthority('missing')} onClick={()=>setAuthority('missing')} style={chip(authority==='missing')}>UNRESOLVED</button></div></div>
+          <div style={{padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.14)',background:'rgba(2,9,15,.55)'}}><div style={{fontSize:10,fontWeight:950,color:'#70dcff'}}>ESTABLISHED STANDING</div><div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:12}}><button type='button' onPointerUp={()=>setStanding('supported')} onClick={()=>setStanding('supported')} style={chip(standing==='supported')}>ESTABLISHED</button><button type='button' onPointerUp={()=>setStanding('missing')} onClick={()=>setStanding('missing')} style={chip(standing==='missing')}>UNRESOLVED</button></div></div>
         </div>
 
         <div style={{marginTop:18}}>
