@@ -4,9 +4,16 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 export default function P3479TechnicalProposition(){
-  const [changed,setChanged]=useState(false);
+  const [condition,setCondition]=useState<'none'|'evidence'|'binding'|'safety'>('none');
   const [authority,setAuthority]=useState(true);
+  const changed=condition!=='none';
   const determination=!authority?'DENY':changed?'HOLD':'ALLOW';
+  const conditionText={
+    none:'The evidence context remains the one against which the decision was evaluated.',
+    evidence:'Sensor evidence materially changed after the model decision. Revalidation is required before execution.',
+    binding:'The equipment or control-point binding changed after the model decision. The target must be re-established before execution.',
+    safety:'A downstream safety condition materially changed after the model decision. The proposed action must be re-evaluated against current reality.'
+  }[condition];
   return <main className="p">
     <nav><Link href="/">TA-14 AUTHORITY</Link><span>TECHNICAL PROPOSITION · OPEN FOR CHAIR REVIEW</span></nav>
     <section className="hero">
