@@ -23,10 +23,13 @@ export default function AirGradientOpenAirFoundationShowroom(){
   const [action,setAction]=useState<Action>('OPEN_WINDOWS');
 
   const result:Result=useMemo(()=>{
+    // This public exam demonstrates the gates, not an air-quality control rule.
+    // Missing evidence or authority holds execution; unresolved standing escalates;
+    // an explicitly held action remains held. A fully established record can ALLOW
+    // any selected bounded consequence without pretending TA-14 chose the action.
     if(indoor==='missing'||outdoor==='missing') return 'HOLD';
     if(authority==='missing') return 'HOLD';
     if(standing==='missing') return 'ESCALATE';
-    if(action==='OPEN_WINDOWS') return 'ESCALATE';
     if(action==='HOLD') return 'HOLD';
     return 'ALLOW';
   },[indoor,outdoor,authority,standing,action]);
