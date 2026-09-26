@@ -3,78 +3,18 @@ export const metadata = {
   description: "Candidate TA-14 Authority Passport presentation Connection Profile review surface.",
   robots: { index: false, follow: false },
 };
-
-const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (
-  <section style={{border:"1px solid #334155",borderRadius:16,padding:24,background:"#0f172a",marginBottom:18}}>
-    <h2 style={{fontSize:22,margin:"0 0 12px"}}>{title}</h2>{children}
-  </section>
-);
-
-export default function Page() {
-  return <main style={{maxWidth:1040,margin:"0 auto",padding:"48px 22px 90px",fontFamily:"Arial, sans-serif",color:"#e2e8f0",background:"#020617",minHeight:"100vh"}}>
-    <div style={{border:"2px solid #f59e0b",borderRadius:14,padding:16,marginBottom:28,color:"#fde68a",fontWeight:800}}>
-      CANDIDATE CONNECTION PROFILE — NOT REGISTERED
-    </div>
-    <p style={{letterSpacing:2,textTransform:"uppercase",color:"#94a3b8"}}>TA-14 Authority · Authority Passport × CNS/CP</p>
-    <h1 style={{fontSize:46,lineHeight:1.05,margin:"8px 0 14px"}}>cp:ta14.avp.passport</h1>
-    <p style={{fontSize:22,lineHeight:1.5,color:"#cbd5e1"}}>A bounded connection contract for presenting a TA-14 Authority Passport across an organizational boundary. The connection may carry authority context. It does not create execution authority.</p>
-
-    <Card title="Governing separation">
-      <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12}}>
-        {["Presenter domain","CNS/CP connection","Receiving domain","TA-14 consequence boundary"].map((x,i)=><div key={x} style={{padding:16,border:"1px solid #475569",borderRadius:12}}><b>{i+1}. {x}</b><p>{["Presents the Authority Passport as the governed authority-context object.","Governs whether the parties are connected and the named properties permitted to cross.","Returns the connection-layer decision and integrity-bound receipt.","Independently determines whether any proposed consequence has standing to become reality NOW."][i]}</p></div>)}
-      </div>
-      <p style={{fontSize:20,fontWeight:800}}>Connection ≠ authority to execute.</p>
-    </Card>
-
-    <Card title="Connection Profile projection">
-      <p><b>Provider → Consumer:</b> opaque <code>passport</code> + <code>passport_digest</code>.</p>
-      <p><b>Consumer → Provider:</b> <code>decision</code> + signed <code>receipt</code> + conditional <code>narrowing_proof</code>.</p>
-      <p><b>Connection-layer decisions:</b> ACCEPT · ACCEPT_NARROWED · HOLD · REJECT.</p>
-      <p>The Passport remains opaque to CNS/CP. Purpose, scope, delegation, consequence budget, expiry, lineage and other AVP semantics remain inside the governed Passport rather than being promoted into independent Connection Profile properties.</p>
-    </Card>
-
-    <Card title="Negative space is architectural">
-      <p>There is no Connection Profile property for Local Constitution, Local Lease, Local Capsule, Commit authorization, Execution authorization, Effect or Closure.</p>
-      <p>Their absence is the boundary mechanism. A successful bind, successful transport, valid digest, signed receipt or ACCEPT decision cannot be interpreted as local authority to produce consequence.</p>
-    </Card>
-
-    <Card title="Receipt binding">
-      <p><b>ACCEPT_NARROWED</b> — a real NarrowingProof crosses and the signed receipt binds its digest.</p>
-      <p><b>ACCEPT</b> — no NarrowingProof crosses. The candidate serialization binds an integrity-protected no-narrowing assertion so the frozen AVP receipt field is not left ambiguous and no fictitious narrowing event is manufactured.</p>
-      <p style={{color:"#fde68a"}}><b>Candidate seam:</b> the no-narrowing serialization is presented for boundary/well-formedness review. It does not amend or reinterpret frozen AVP v1.0.2.</p>
-    </Card>
-
-    <Card title="Lifecycle and revocation">
-      <p><b>Passport revocation:</b> a TA-14 authority-context event carried through its separate governed channel. A revoked Passport cannot remain operative merely because the connection still exists.</p>
-      <p><b>Connection revocation:</b> a CNS/CP connection-policy event that ends the governed exchange. It does not itself rewrite the Passport's authority history.</p>
-      <p><b>Renewal / supersession:</b> a renewed or superseding Passport is a new value of the Passport property on the same connection when that connection remains valid; it is not inherently a new connection.</p>
-    </Card>
-
-    <Card title="TA-14 consequence boundary">
-      <blockquote style={{fontSize:24,lineHeight:1.45,margin:"8px 0",borderLeft:"4px solid #94a3b8",paddingLeft:18}}>
-        Does this proposed consequence have sufficient <b>Admissible Evidence</b>, <b>Applicable Authority</b>, and <b>Established Standing</b> to become reality <b>NOW</b>?
-      </blockquote>
-      <p><b>No admissible evidence. No admissible execution.</b></p>
-      <p>CNS/CP governs the connection. AVP carries authority context. TA-14 governs admissible execution at the consequence boundary.</p>
-      <p><b>Authority context may cross. Execution authority must be established locally.</b></p>
-    </Card>
-
-    <Card title="Local examination evidence">
-      <p>The repository preserves the original local failure, the receipt-integrity correction, and the corrected 15-fixture validation. All expected outcomes in the corrected suite were met.</p>
-      <p><b>Invariant:</b> <code>execution_authority = NOT_ESTABLISHED_BY_CP</code> · <code>local_execution_observed = false</code>.</p>
-      <p>This evidence is deliberately bounded: LOCAL EXERCISE ONLY. It establishes neither CNS/CP registry publication nor external conformance or interoperability.</p>
-    </Card>
-
-    <Card title="External boundary review questions">
-      <p>1. Is this Connection Profile structurally well-formed?</p>
-      <p>2. Are Passport + digest and decision + receipt + conditional narrowing proof correctly located at the connection layer?</p>
-      <p>3. Does any property or statement improperly reach below the connection boundary?</p>
-      <p>4. Are Passport revocation and connection revocation correctly separated?</p>
-      <p>That review does not delegate TA-14/AVP semantics, Admissible Evidence, Applicable Authority, Established Standing or the consequence determination.</p>
-    </Card>
-
-    <Card title="Candidate status">
-      <p><b>NOT REGISTERED.</b> This surface records the proposed Connection Profile and its bounded local evidence for review before registry publication or any claim of CNS/CP conformance.</p>
-    </Card>
-  </main>;
-}
+const Card=({title,children}:{title:string;children:React.ReactNode})=><section style={{border:"1px solid #334155",borderRadius:16,padding:24,background:"#0f172a",marginBottom:18}}><h2 style={{fontSize:22,margin:"0 0 12px"}}>{title}</h2>{children}</section>;
+export default function Page(){return <main style={{maxWidth:1040,margin:"0 auto",padding:"48px 22px 90px",fontFamily:"Arial,sans-serif",color:"#e2e8f0",background:"#020617",minHeight:"100vh"}}>
+<div style={{border:"2px solid #f59e0b",borderRadius:14,padding:16,marginBottom:28,color:"#fde68a",fontWeight:800}}>CANDIDATE CONNECTION PROFILE — NOT REGISTERED</div>
+<p style={{letterSpacing:2,textTransform:"uppercase",color:"#94a3b8"}}>TA-14 Authority · Authority Passport × CNS/CP</p><h1 style={{fontSize:46,lineHeight:1.05,margin:"8px 0 14px"}}>cp:ta14.avp.passport</h1>
+<p style={{fontSize:22,lineHeight:1.5,color:"#cbd5e1"}}>A bounded connection contract for presenting a TA-14 Authority Passport across an organizational boundary. The connection may carry authority context. It does not create execution authority.</p>
+<Card title="Governing separation"><div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:12}}>{["Presenter domain","CNS/CP connection","Receiving domain","TA-14 consequence boundary"].map((x,i)=><div key={x} style={{padding:16,border:"1px solid #475569",borderRadius:12}}><b>{i+1}. {x}</b><p>{["Presents the Authority Passport as the governed authority-context object.","Governs whether the parties are connected and the named properties permitted to cross.","Returns the connection-layer decision and integrity-bound receipt.","Applies the TA-14 consequence determination before any proposed consequence may become reality NOW."][i]}</p></div>)}</div><p style={{fontSize:20,fontWeight:800}}>Connection ≠ authority to execute.</p></Card>
+<Card title="The crossing — at a glance"><div style={{padding:20,border:"1px solid #475569",borderRadius:14,textAlign:"center",fontSize:18,lineHeight:1.8}}><b>PRESENTER DOMAIN</b><div>↓</div><div><code>passport</code> + <code>passport_digest</code></div><div style={{fontWeight:800}}>↓ CNS/CP CONNECTION ↓</div><b>RECEIVING DOMAIN</b><div>↓</div><div><code>decision</code> + signed <code>receipt</code> + conditional <code>narrowing_proof</code></div><div>↓</div><b>PRESENTER DOMAIN</b></div><div style={{marginTop:18,padding:18,border:"2px solid #f59e0b",borderRadius:12,textAlign:"center",fontSize:20,fontWeight:900,color:"#fde68a"}}>THE CONNECTION ENDS HERE. EXECUTION AUTHORITY DOES NOT CROSS.</div></Card>
+<Card title="Connection Profile projection"><p><b>Provider → Consumer:</b> opaque <code>passport</code> + <code>passport_digest</code>.</p><p><b>Consumer → Provider:</b> <code>decision</code> + signed <code>receipt</code> + conditional <code>narrowing_proof</code>.</p><p><b>Connection-layer decisions:</b> ACCEPT · ACCEPT_NARROWED · HOLD · REJECT.</p><p>The Passport remains opaque to CNS/CP. Purpose, scope, delegation, consequence budget, expiry, lineage and other AVP semantics remain inside the governed Passport rather than being promoted into independent Connection Profile properties.</p></Card>
+<Card title="Negative space is architectural"><p>There is no Connection Profile property for Local Constitution, Local Lease, Local Capsule, Commit authorization, Execution authorization, Effect or Closure.</p><p>Their absence is the boundary mechanism. A successful bind, successful transport, valid digest, signed receipt or ACCEPT decision cannot be interpreted as local authority to produce consequence.</p></Card>
+<Card title="Receipt binding"><p><b>ACCEPT_NARROWED</b> — a real NarrowingProof crosses and the signed receipt binds its digest.</p><p><b>ACCEPT</b> — no NarrowingProof crosses. The candidate serialization binds an integrity-protected no-narrowing assertion so the frozen AVP receipt field is not left ambiguous and no fictitious narrowing event is manufactured.</p><div style={{padding:16,border:"1px solid #f59e0b",borderRadius:12,color:"#fde68a"}}><b>UNRESOLVED CANDIDATE SEAM:</b> The ACCEPT no-narrowing serialization remains proposed, not settled. It is presented for CNS/CP boundary and well-formedness review and does not amend or reinterpret frozen AVP v1.0.2.</div></Card>
+<Card title="Lifecycle and revocation"><p><b>Passport revocation:</b> a TA-14 authority-context event carried through its separate governed channel. A revoked Passport cannot remain operative merely because the connection still exists.</p><p><b>Connection revocation:</b> a CNS/CP connection-policy event that ends the governed exchange. It does not itself rewrite the Passport's authority history.</p><p><b>Renewal / supersession:</b> a renewed or superseding Passport is a new value of the Passport property on the same connection when that connection remains valid; it is not inherently a new connection.</p></Card>
+<Card title="TA-14 consequence boundary"><blockquote style={{fontSize:24,lineHeight:1.45,margin:"8px 0",borderLeft:"4px solid #94a3b8",paddingLeft:18}}>Does this proposed consequence have sufficient <b>Admissible Evidence</b>, <b>Applicable Authority</b>, and <b>Established Standing</b> to become reality <b>NOW</b>?</blockquote><p><b>No admissible evidence. No admissible execution.</b></p><p>CNS/CP governs the connection. AVP carries authority context. TA-14 governs admissible execution at the consequence boundary.</p><p><b>Authority context may cross. Execution authority must be established locally.</b></p></Card>
+<Card title="Local examination evidence"><p>The repository preserves the original local failure, the receipt-integrity correction, and the corrected 15-fixture validation. All expected outcomes in the corrected suite were met.</p><p><b>Invariant:</b> <code>execution_authority = NOT_ESTABLISHED_BY_CP</code> · <code>local_execution_observed = false</code>.</p><p>This evidence is deliberately bounded: LOCAL EXERCISE ONLY. It establishes neither CNS/CP registry publication nor external conformance or interoperability.</p></Card>
+<Card title="External boundary review questions"><p>1. Is this Connection Profile structurally well-formed?</p><p>2. Are Passport + digest and decision + receipt + conditional narrowing proof correctly located at the connection layer?</p><p>3. Does any property or statement improperly reach below the connection boundary?</p><p>4. Are Passport revocation and connection revocation correctly separated?</p><p>5. Is the proposed ACCEPT no-narrowing binding well-formed without creating a fictitious NarrowingProof?</p><p>That review does not delegate TA-14/AVP semantics, Admissible Evidence, Applicable Authority, Established Standing or the consequence determination.</p></Card>
+<Card title="Candidate status"><p><b>NOT REGISTERED.</b> This surface records the proposed Connection Profile and its bounded local evidence for review before registry publication or any claim of CNS/CP conformance.</p></Card></main>}
