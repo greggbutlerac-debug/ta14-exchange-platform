@@ -12,9 +12,9 @@ export async function POST(request:NextRequest){
   const form=await request.formData(),intakeId=String(form.get("intakeId")??"").trim(),file=form.get("file");
   if(!/^TA14-CEX-\d{8}-[A-Z0-9]{10}$/.test(intakeId)||!(file instanceof File))return NextResponse.json({error:"A valid examination intake and evidence file are required."},{status:400});
   if(file.size<1||file.size>MAX)return NextResponse.json({error:"Evidence files must be between 1 byte and 50 MB."},{status:413});
-  const client=db();const {data:intake,error:intakeError}=await client.from("ta14_consequence_examination_intakes").select("intake_id,status").eq("intake_id",intakeId).single();
+  const client=db();const {data:intake,error:intakeError}=await client.from("ta14_consequence_examination_intakes").select("intake_id,status,evidence_frozen_at").eq("intake_id",intakeId).single();
   if(intakeError||!intake)return NextResponse.json({error:"Examination intake was not found."},{status:404});
-  if(!["READY_FOR_PAYMENT","PAID"].includes(intake.status))return NextResponse.json({error:"Evidence cannot be added in the current intake state."},{status:409});
+  if(intake.status!=="READY_FOR_PAYMENT"||intake.evidence_frozen_at)return NextResponse.json({error:"This intake evidence set is frozen. Additional evidence requires a governed supplement or revalidation path."},{status:409});
   const bytes=Buffer.from(await file.arrayBuffer()),sha256=createHash("sha256").update(bytes).digest("hex"),name=safeName(file.name),objectId=randomUUID(),path=`consequence-intakes/${intakeId}/${objectId}-${name}`;
   const {error:uploadError}=await client.storage.from(BUCKET).upload(path,bytes,{contentType:file.type||"application/octet-stream",upsert:false,cacheControl:"0"});
   if(uploadError){console.error("Evidence storage upload failed",uploadError);return NextResponse.json({error:"Unable to preserve the evidence bytes."},{status:500})}
