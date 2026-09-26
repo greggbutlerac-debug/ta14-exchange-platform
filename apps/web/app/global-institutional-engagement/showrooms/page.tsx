@@ -5,11 +5,13 @@ const WorldReturn=()=> <div style={{padding:'12px 18px',borderBottom:'1px solid 
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
 
 const countries=[
+{code:'GY',flag:'🇬🇾',country:'CO-OPERATIVE REPUBLIC OF GUYANA',institution:'Environmental Protection Agency · Air, Noise & Radiation Department',status:'FORMAL EXECUTIVE-DIRECTOR ROUTE RECEIVED · SUBMISSION PREPARATION',language:'ENGLISH',href:'/global-institutional-engagement/guyana'},
 {code:'GA',flag:'🇬🇦',country:'GABONESE REPUBLIC',institution:'Conseil National Climat · Secrétariat Permanent',status:'SUBSTANTIVE CNC REPLY RECEIVED · TECHNICAL DIALOGUE PREPARATION',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/gabon'},
 {code:'EE',flag:'🇪🇪',country:'REPUBLIC OF ESTONIA',institution:'Estonian Environment Agency · EKUK · Ministry of Climate',status:'INSTITUTIONAL REFERRAL RECEIVED · TECHNICAL SEAM IDENTIFIED',language:'ESTONIAN + ENGLISH',href:'/global-institutional-engagement/estonia'},
 {code:'UAE',flag:'🇦🇪',country:'UNITED ARAB EMIRATES',institution:'Ministry of Climate Change and Environment',status:'MOCCAE SUGGESTION 5200001108 · CLARIFICATION RETURNED',language:'ARABIC + ENGLISH',href:'/environmental-integrity-governance/uae'},
 {code:'TH',flag:'🇹🇭',country:'KINGDOM OF THAILAND',institution:'Pollution Control Department',status:'OFFICIAL DIRECTOR-GENERAL BRIEF SUBMITTED',language:'THAI + ENGLISH',href:'/global-institutional-engagement/thailand'},
 {code:'GT',flag:'🇬🇹',country:'REPUBLIC OF GUATEMALA',institution:'Ministerio de Ambiente y Recursos Naturales · MARN',status:'MARN TECHNICAL MEETING CONFIRMED · 24 SEP',language:'SPANISH + ENGLISH',href:'/global-institutional-engagement/guatemala'},
+{code:'UZ',flag:'🇺🇿',country:'REPUBLIC OF UZBEKISTAN',institution:'National Committee on Ecology and Climate Change',status:'OFFICIAL REPLY · TECHNICAL-EXPERT DIALOGUE READY AFTER MATERIAL REVIEW',language:'UZBEK + ENGLISH',href:'/global-institutional-engagement/uzbekistan'},
 {code:'KZ',flag:'🇰🇿',country:'REPUBLIC OF KAZAKHSTAN',institution:'Ministry of Ecology and Natural Resources · Kazhydromet',status:'FORMAL MINISTRY LETTER SUBMITTED',language:'KAZAKH + RUSSIAN + ENGLISH',href:'/global-institutional-engagement/kazakhstan'},
 {code:'PG',flag:'🇵🇬',country:'PAPUA NEW GUINEA',institution:'Crusaders Air Solution × TA-14 Authority',status:'PARTNER SHOWROOM REVIEW ACTIVE',language:'TOK PISIN + HIRI MOTU + ENGLISH',href:'/environmental-integrity-governance/png-atmospheric-integrity-pilot'},
 {code:'CZ',flag:'🇨🇿',country:'CZECH REPUBLIC',institution:'Czech Hydrometeorological Institute · ČHMÚ',status:'INSTITUTIONAL RESPONSE RECEIVED',language:'CZECH + ENGLISH',href:'/global-institutional-engagement/czech-republic'},
@@ -23,6 +25,7 @@ const countries=[
 {code:'NO',flag:'🇳🇴',country:'KINGDOM OF NORWAY',institution:'Norwegian Environment Agency · Miljødirektoratet',status:'OFFICIAL WEB-FORM ROUTE REQUIRED',language:'NORWEGIAN + ENGLISH',href:'/global-institutional-engagement/norway'},
 {code:'SG',flag:'🇸🇬',country:'REPUBLIC OF SINGAPORE',institution:'National Environment Agency · Environment Health Institute',status:'SUBSTANTIVE NEA ENGAGEMENT',language:'ENGLISH',href:'/global-institutional-engagement/singapore'},
 {code:'FR',flag:'🇫🇷',country:'FRANCE',institution:'Bruno Tudal · TA-14 Ambassador · Environmental Health & IAQ',status:'NATIONAL AMBASSADOR SHOWROOM',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/france'}
+
 ];
 
 const related=[

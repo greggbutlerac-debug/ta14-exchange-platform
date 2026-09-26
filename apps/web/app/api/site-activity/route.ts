@@ -57,19 +57,11 @@ export async function POST(_req: NextRequest) {
     // Public institutional metrics are deliberately bounded to counts that can be
     // established from the Exchange's own ledgers. They are activity/state metrics,
     // not certification, efficacy, or universal execution claims.
-    const [registry, profiles, geography, academy, showrooms, receipts, reports] = await Promise.all([
-      supabase.from("ai_governance_registry_submissions").select("id", { count: "exact", head: true }).eq("status", "registered"),
-      supabase.from("ta14_governance_profiles").select("id", { count: "exact", head: true }).eq("profile_status", "published"),
-      supabase.from("ta14_seo_intelligence_events").select("country").not("country", "is", null),
-      supabase.from("ta14_seo_intelligence_events").select("visit_id").ilike("page_path", "%academy%"),
-      supabase.from("ta14_seo_intelligence_events").select("visit_id").ilike("page_path", "%governance-showcase%"),
-      supabase.from("ta14_afa_eaba_challenge_receipts").select("receipt_id", { count: "exact", head: true }),
-      supabase.from("ta14_afa_eaba_challenge_reports").select("report_id", { count: "exact", head: true }),
-    ]);
-
-    const countries = new Set((geography.data ?? []).map((row) => row.country).filter(Boolean)).size;
-    const academyVisits = new Set((academy.data ?? []).map((row) => row.visit_id).filter(Boolean)).size;
-    const showroomVisits = new Set((showrooms.data ?? []).map((row) => row.visit_id).filter(Boolean)).size;
+    const { data: institutionalRows, error: institutionalError } = await supabase.rpc("get_ta14_institutional_metrics");
+    const institutional = Array.isArray(institutionalRows) ? institutionalRows[0] : institutionalRows;
+    if (institutionalError) {
+      console.error("Institutional metrics RPC error:", institutionalError);
+    }
 
     const response = NextResponse.json({
       counted: true,
@@ -79,13 +71,13 @@ export async function POST(_req: NextRequest) {
       firstRecordedAt: result.first_recorded_at ?? null,
       updatedAt: result.updated_at ?? null,
       institutional: {
-        registeredGovernances: registry.count ?? null,
-        publishedShowrooms: profiles.count ?? null,
-        countriesObserved: geography.error ? null : countries,
-        academyVisits: academy.error ? null : academyVisits,
-        showroomVisits: showrooms.error ? null : showroomVisits,
-        afaEabaReceipts: receipts.count ?? null,
-        afaEabaReports: reports.count ?? null,
+        registeredGovernances: institutionalError ? null : toSafeNumber(institutional?.registered_governances),
+        publishedShowrooms: institutionalError ? null : toSafeNumber(institutional?.published_showrooms),
+        countriesObserved: institutionalError ? null : toSafeNumber(institutional?.countries_observed),
+        academyVisits: institutionalError ? null : toSafeNumber(institutional?.academy_visits),
+        showroomVisits: institutionalError ? null : toSafeNumber(institutional?.showroom_visits),
+        afaEabaReceipts: institutionalError ? null : toSafeNumber(institutional?.afa_eaba_receipts),
+        afaEabaReports: institutionalError ? null : toSafeNumber(institutional?.afa_eaba_reports),
       },
     });
 
