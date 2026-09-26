@@ -1,4 +1,4 @@
-import { createHash } from 'crypto';
+import { createHash, randomUUID } from 'crypto';
 import { NextRequest,NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 function t(v:unknown,max=500){return typeof v==='string'?v.trim().slice(0,max):''}
@@ -22,6 +22,11 @@ export async function POST(request:NextRequest){
   const evidenceManifestSha256=createHash('sha256').update(canonicalize(evidenceManifest)).digest('hex');
   const {data,error}=await supabase.from('ta14_consequence_examination_intakes').update({status:'PAID',paypal_order_id:orderId,paypal_capture_id:captureId,paid_amount:149.00,paid_currency:'USD',paid_at:paidAt,evidence_manifest:evidenceManifest,evidence_manifest_sha256:evidenceManifestSha256,evidence_frozen_at:paidAt,evidence_item_count:evidence?.length??0,updated_at:new Date().toISOString()}).eq('intake_id',intakeId).eq('status','READY_FOR_PAYMENT').select('intake_id,status,paid_at,payload_sha256,evidence_manifest_sha256,evidence_item_count,evidence_frozen_at').single();
   if(error||!data)return NextResponse.json({error:'Payment was captured but the intake could not be marked paid. Retain the PayPal capture ID for reconciliation.'},{status:500});
-  return NextResponse.json({ok:true,intakeId:data.intake_id,status:data.status,paidAt:data.paid_at,payloadSha256:data.payload_sha256,evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count,evidenceFrozenAt:data.evidence_frozen_at,boundary:'Payment purchases the governed examination only. It does not establish admissibility, authority, standing, certification, endorsement, compliance, execution permission, or a favorable determination.'});
+  const queueId='TA14-CEX-Q-'+randomUUID().replaceAll('-','').slice(0,12).toUpperCase();
+  const {data:queue,error:queueError}=await supabase.from('ta14_consequence_examination_queue').insert({queue_id:queueId,intake_id:intakeId,state:'QUEUED',paid_at:data.paid_at,evidence_manifest_sha256:data.evidence_manifest_sha256,evidence_item_count:data.evidence_item_count??0}).select('queue_id,state,queued_at').single();
+  if(queueError||!queue)return NextResponse.json({error:'Payment and evidence freeze were recorded, but the examination queue entry could not be created. Retain the intake and PayPal capture IDs for reconciliation.',intakeId,status:'PAID'},{status:500});
+  const {error:eventError}=await supabase.from('ta14_consequence_examination_queue_events').insert({queue_id:queue.queue_id,intake_id:intakeId,event_type:'PAID_INTAKE_QUEUED',from_state:null,to_state:'QUEUED',event_payload:{evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count??0}});
+  if(eventError)console.error('Consequence queue chronology insert failed',eventError);
+  return NextResponse.json({ok:true,intakeId:data.intake_id,status:data.status,queueId:queue.queue_id,queueState:queue.state,queuedAt:queue.queued_at,paidAt:data.paid_at,payloadSha256:data.payload_sha256,evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count,evidenceFrozenAt:data.evidence_frozen_at,boundary:'Payment purchases and queues the governed examination only. It does not establish admissibility, authority, standing, certification, endorsement, compliance, execution permission, or a favorable determination.'});
  }catch(e){console.error('Consequence payment record failed',e);return NextResponse.json({error:'Unable to record the consequence examination payment.'},{status:500})}
 }
