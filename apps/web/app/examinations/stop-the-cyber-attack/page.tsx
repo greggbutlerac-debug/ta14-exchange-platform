@@ -36,15 +36,15 @@ export default function Page(){
  const runId='NIST-STCA-'+(scenario==='emergency'?'ER':scenario==='attack'?'CA':'NO')+'-001';
  const connectionLabel=scenario==='normal'?'NOT APPLICABLE · LOCAL CONTROL':ungoverned?'NO GOVERNED CONNECTION ATTEMPTED':connection;
  const receiptDecision=taReached?decision:'NOT REACHED';
- const examPath: Array<[string,string,boolean]>=[
-  ['ACTOR','OBSERVED',true],
-  ['CROSSING',scenario==='normal'?'LOCAL':connection,true],
-  ['OBJECTS',connection==='BOUND'?'PASSPORT + DIGEST':scenario==='normal'?'LOCAL ONLY':'NONE',connection==='BOUND'||scenario==='normal'],
-  ['TA-14',receiptDecision,taReached],
-  ['BINDING',taReached&&decision==='ALLOW'?'NEXT':'BLOCKED',false],
-  ['COMMIT','NOT EXAMINED',false],
-  ['EXECUTION','NOT OCCURRED',false],
-  ['OUTCOME','NONE',false]
+ const examPath=[
+  {label:'ACTOR',value:'OBSERVED',reached:true},
+  {label:'CROSSING',value:scenario==='normal'?'LOCAL':connection,reached:true},
+  {label:'OBJECTS',value:connection==='BOUND'?'PASSPORT + DIGEST':scenario==='normal'?'LOCAL ONLY':'NONE',reached:connection==='BOUND'||scenario==='normal'},
+  {label:'TA-14',value:receiptDecision,reached:taReached},
+  {label:'BINDING',value:taReached&&decision==='ALLOW'?'NEXT':'BLOCKED',reached:false},
+  {label:'COMMIT',value:'NOT EXAMINED',reached:false},
+  {label:'EXECUTION',value:'NOT OCCURRED',reached:false},
+  {label:'OUTCOME',value:'NONE',reached:false}
  ];
  return <main>
  <nav><Link href="/">TA-14 EXCHANGE</Link><span>NIST WORKSHOP EXAMINATION SURFACE · WORKING DRAFT</span></nav>
@@ -52,7 +52,7 @@ export default function Page(){
  <section className="mission"><small>EXPERIMENT OBJECTIVE</small><h2>One building. Three attempts. Two independent boundaries.</h2><p>NIST does not need to accept an architecture to challenge the experiment. Select a scenario, change a condition, revoke access, and observe the record. Connection success is recorded separately from consequence authority.</p><div className="boundaryStrip"><div><b>BOUNDARY A · CROSSING</b><span>Who is connecting? What governs the crossing? What actually crossed?</span></div><div><b>BOUNDARY B · CONSEQUENCE</b><span>Given what arrived, is this specific consequence supported NOW?</span></div></div></section>
  <section><small>WHAT ARE WE TESTING?</small><h2>Same building. Different interaction, connection, context and authority.</h2><div className="cards">{(Object.keys(scenarios) as Scenario[]).map(k=><button key={k} onClick={()=>reset(k)} className={scenario===k?'active':''}><b>{scenarios[k].name}</b><span>{scenarios[k].attempt}</span></button>)}</div></section>
  <section className="runbar"><div><small>EXAMINATION RUN</small><b>{runId}</b></div><div><small>STATE</small><b>{taReached?'LOCAL EXAMINATION ACTIVE':'STOPPED BEFORE LOCAL EXAMINATION'}</b></div><div><small>CURRENT RESULT</small><b>{receiptDecision}</b></div></section>
- <section className="path"><small>OBSERVABLE PATH</small><h2>Watch exactly where the attempt stops.</h2><div className="pathNodes">{examPath.map(([label,value,reached],i)=><div key={String(label)} className={reached?'reached':'pending'}><span>{String(i+1).padStart(2,'0')}</span><b>{label}</b><em>{String(value)}</em></div>)}</div><p className="allowRule"><b>ALLOW ≠ EXECUTION.</b> ALLOW permits progression to the next governed local boundary; it does not itself authorize an effect.</p></section>
+ <section className="path"><small>OBSERVABLE PATH</small><h2>Watch exactly where the attempt stops.</h2><div className="pathNodes">{examPath.map((item,i)=><div key={item.label} className={item.reached?'reached':'pending'}><span>{String(i+1).padStart(2,'0')}</span><b>{item.label}</b><em>{item.value}</em></div>)}</div><p className="allowRule"><b>ALLOW ≠ EXECUTION.</b> ALLOW permits progression to the next governed local boundary; it does not itself authorize an effect.</p></section>
  <section className="experiment"><div className="panel"><small>01 · ATTEMPTED INTERACTION</small><h3>{s.name}</h3><p>{s.attempt}</p><dl><dt>Ownership / organizational boundary?</dt><dd>{s.crosses?'YES':'NO · CONTROL CASE'}</dd><dt>Proposed consequence</dt><dd>{s.consequence}</dd></dl></div>
  <div className="arrow">→</div><div className="panel"><small>02 · CONNECTION OBSERVATION</small><h3>{connection}</h3><p>This panel records the connection-layer observation separately from any TA-14 determination.</p><dl><dt>Governed crossing</dt><dd>{s.crosses?'OBSERVE PROFILE / EXISTING MECHANISM':'NO CROSS-ORGANIZATION PROFILE REQUIRED'}</dd><dt>Connection result</dt><dd>{connection}</dd><dt>What crossed?</dt><dd>{connection==='BOUND'?'Passport + passportDigest; response properties observed separately':scenario==='normal'?'No cross-organization crossing · local operation remains locally examinable':'Nothing through a bound Profile'}</dd></dl>{s.connection==='BOUND'&&<button onClick={()=>setConnectionRevoked(v=>!v)}>{connectionRevoked?'RESTORE CONNECTION':'REVOKE CONNECTION'}</button>}{scenario==='attack'&&<button onClick={()=>setUngoverned(v=>!v)}>{ungoverned?'RESTORE GOVERNED ATTEMPT':'SIMULATE UNGOVERNED CROSSING'}</button>}</div>
  <div className="stop">STOP<br/><span>CONNECTION LAYER ENDS</span></div>
