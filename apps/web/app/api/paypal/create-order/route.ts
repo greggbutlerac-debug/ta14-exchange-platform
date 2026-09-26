@@ -8,6 +8,7 @@ export const runtime = 'nodejs';
 type PayPalEnvironment = 'sandbox' | 'live';
 
 type ProductId =
+  | 'governed-consequence-examination'
   | 'preserved-governed-run'
   | 'independent-partner-review'
   | 'dual-partner-review'
@@ -71,6 +72,16 @@ const NO_STORE_HEADERS = {
 };
 
 const PRODUCT_CATALOG: Record<ProductId, CatalogProduct> = {
+  'governed-consequence-examination': {
+    id: 'governed-consequence-examination',
+    name: 'TA-14 Governed Consequence Examination',
+    description:
+      'One bounded consequence examination with an ALLOW, HOLD, DENY, or ESCALATE determination, preserved examination record, integrity receipt, verification, and replay package.',
+    price: '149.00',
+    currency: 'USD',
+    category: 'review',
+    billing: 'one-time',
+  },
   'eu-ai-act-readiness-review': {
     id: 'eu-ai-act-readiness-review',
     name: 'EU AI Act Governed Readiness Review',
