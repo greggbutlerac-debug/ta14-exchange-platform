@@ -1,0 +1,100 @@
+export const metadata={title:'Angela Bolton · Fixed Asset Consultant — One Asset. One Identity. Many Systems.',description:'A public showroom for Angela Bolton and Fixed Asset Consultant: capital lifecycle, CIP, asset evidence, reconciliation, physical verification and design-to-disposal control.'};
+
+const lifecycle=[
+['01','PLAN + DESIGN','The future asset begins before it reaches the ledger. Scope, budget, ownership, location and intended use begin shaping what must be preserved.'],
+['02','CIP','Construction in Progress accumulates cost while the physical thing is still becoming real. Cost and reality can drift apart if nobody reconciles them.'],
+['03','PLACE IN SERVICE','A capital project becomes a depreciable asset only when the accounting event and physical operating reality actually align.'],
+['04','OPERATE + VERIFY','Location, condition, warranty, responsible cost center and supporting documentation must remain current enough to rely on.'],
+['05','CHANGE','Transfers, improvements, impairments, component changes and ownership changes create new versions of the asset story.'],
+['06','DISPOSE + RETIRE','Retirement is not deletion. The final record must preserve what left service, why, when, under whose approval and with what financial effect.']
+];
+
+const evidence=[
+['PHYSICAL REALITY','Does the thing actually exist, where the records say it exists, in the condition the records imply?'],
+['ACCOUNTING UNIT','What exactly was capitalized — the component, system, project, improvement or grouped asset?'],
+['COST + BASIS','What cost was assigned, from which source, and has that cost been reconciled to the books?'],
+['IN-SERVICE STATE','When did the asset actually become operational, and does the accounting date match that reality?'],
+['WARRANTY + OWNERSHIP','Who owns or leases it, what coverage exists, and what conditions may affect that coverage?'],
+['APPROVAL HISTORY','Which capital decisions were approved, by whom, and what did those approvals actually authorize?'],
+['FINDINGS HISTORY','What was observed, when was it verified, what changed later, and were superseded findings preserved?'],
+['DISPOSAL STATE','Was the asset sold, scrapped, transferred, impaired or retired — and did the physical and financial records close together?']
+];
+
+const systems=[
+['FINANCE','General ledger, fixed asset register, depreciation books, tax records and close processes.'],
+['CAPITAL','Budgets, project approvals, CIP, capitalization, forecast and placement-in-service decisions.'],
+['FACILITIES','Condition, maintenance, location, operational status, warranty and field reality.'],
+['RISK','Insurance schedules, ownership, lease status, impairment and supporting documentation.'],
+['DESIGN + PROJECT','Design intent, project scope, components, replacements and what was actually delivered.'],
+['AUDIT + CONTROL','Reconciliation, traceability, version history, evidence and the ability to reconstruct a decision later.']
+];
+
+const questions=[
+'What does this organization actually own?',
+'Where is it physically?',
+'What accounting unit contains it?',
+'What did it cost?',
+'When did it really enter service?',
+'What condition is it in now?',
+'What changed since the last verification?',
+'Who approved the capital event?',
+'What documentation supports the record?',
+'What will it cost next year?',
+'What should be retired, impaired, transferred or replaced?',
+'Can the whole story be reconstructed later?'
+];
+
+export default function FixedAssetConsultantShowroom(){return <main className="page">
+<div className="ledgerBg" aria-hidden="true"><div className="vlines"/><div className="stamp">PHYSICAL REALITY<br/>↕<br/>FINANCIAL RECORD</div></div>
+
+<nav className="shell nav"><div className="brand">FIXED ASSET <span>CONSULTANT</span></div><div><a href="#lifecycle">LIFECYCLE</a><a href="#evidence">EVIDENCE</a><a href="#identity">IDENTITY</a></div></nav>
+
+<header className="shell hero">
+<div>
+<p className="eyebrow">ANGELA BOLTON · FIXED ASSET CONSULTANT</p>
+<h1>One asset.<br/><em>One identity.</em><br/>Many systems.</h1>
+<p className="lead">A building does not become financially understandable just because the ledger balances. Angela Bolton’s work sits where capital, accounting, physical verification and asset lifecycle meet — making sure the record still describes the thing that actually exists.</p>
+<div className="ctas"><a className="primary" href="https://fixedassetconsultant.com/" target="_blank" rel="noreferrer">VISIT FIXED ASSET CONSULTANT ↗</a><a href="https://fixedassetconsultant.com/design-to-disposal/" target="_blank" rel="noreferrer">DESIGN TO DISPOSAL ↗</a><a href="https://fixedassetconsultant.com/digital-twin-case-study" target="_blank" rel="noreferrer">CASE STUDY ↗</a></div>
+</div>
+<aside className="identityCard">
+<small>THE OPERATING QUESTION</small>
+<h2>Does the record still describe the real asset?</h2>
+<div className="assetGlyph"><span>ASSET</span><b>AHU-01</b><i>IDENTITY</i></div>
+<div className="cardRows"><p><span>PHYSICAL</span><b>VERIFY</b></p><p><span>FINANCIAL</span><b>RECONCILE</b></p><p><span>LIFECYCLE</span><b>TRACE</b></p><p><span>FINDINGS</span><b>PRESERVE</b></p></div>
+</aside>
+</header>
+
+<section className="thesis"><div className="shell"><small>THE FIXED ASSET PROBLEM</small><h2>A clean spreadsheet can still describe the wrong reality.</h2><p>Fixed asset work is not only depreciation. It is the discipline of keeping capital decisions, accounting records, documentation and the physical world aligned from acquisition through retirement.</p></div></section>
+
+<section id="lifecycle" className="shell section"><p className="eyebrow">DESIGN TO DISPOSAL</p><h2>The asset lifecycle is a chain, not a column in a spreadsheet.</h2><div className="lifeGrid">{lifecycle.map(([n,t,d])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p></article>)}</div></section>
+
+<section className="dark"><div className="shell section"><p className="eyebrow">THE FINANCE / FIELD SEAM</p><h2>The book value is not the building.</h2><div className="seam">
+<div className="side"><small>FINANCIAL RECORD</small><strong>COST<br/>DATE<br/>LIFE<br/>BOOK VALUE<br/>APPROVAL</strong></div>
+<div className="bridge"><b>↔</b><span>RECONCILE</span><i>↕</i><span>VERIFY</span><b>↔</b></div>
+<div className="side"><small>PHYSICAL REALITY</small><strong>IDENTITY<br/>LOCATION<br/>CONDITION<br/>WARRANTY<br/>STATUS</strong></div>
+</div><p className="note">The difficult work lives in the mapping between those two realities — especially when a physical component does not line up cleanly with the accounting unit that contains it.</p></div></section>
+
+<section id="evidence" className="shell section"><p className="eyebrow">ASSET INFORMATION READINESS</p><h2>Before the record can support a decision, it has to be believable.</h2><div className="evidenceGrid">{evidence.map(([t,d],i)=><article key={t}><span>{String(i+1).padStart(2,'0')}</span><h3>{t}</h3><p>{d}</p></article>)}</div></section>
+
+<section className="systems"><div className="shell section"><p className="eyebrow">THE SYSTEMS DO NOT HAVE TO MERGE</p><h2>The goal was never one giant platform.</h2><p className="intro">Different departments need different systems. The practical challenge is making sure they are talking about the same physical asset when it matters.</p><div className="systemGrid">{systems.map(([t,d])=><article key={t}><h3>{t}</h3><p>{d}</p></article>)}</div></div></section>
+
+<section id="identity" className="identity"><div className="shell identityGrid"><div><p className="eyebrow">ONE IDENTITY · EVERY SYSTEM</p><h2>The asset stops being five different half-known things.</h2><p>Angela’s current public writing argues for a simpler target than forcing every department onto one enterprise platform: give the asset a durable identity that can be recognized across design, maintenance, finance, insurance and facilities systems while each system remains independent.</p><a href="https://www.linkedin.com/pulse/one-identity-every-system-angela-bolton-haeqc" target="_blank" rel="noreferrer">READ “ONE IDENTITY, EVERY SYSTEM” ↗</a></div>
+<div className="orbit"><div className="core">ONE<br/><b>ASSET</b><br/>IDENTITY</div><span className="o1">DESIGN</span><span className="o2">FINANCE</span><span className="o3">FACILITIES</span><span className="o4">INSURANCE</span><span className="o5">CAPITAL</span><span className="o6">AUDIT</span></div></div></section>
+
+<section className="questions"><div className="shell section"><p className="eyebrow">THE EXECUTIVE QUESTIONS</p><h2>What should the owner be able to ask — without assembling the answer after the fact?</h2><div className="qGrid">{questions.map((q,i)=><div key={q}><span>{String(i+1).padStart(2,'0')}</span><p>{q}</p></div>)}</div></div></section>
+
+<section className="work"><div className="shell section"><p className="eyebrow">THE WORK SURFACE</p><h2>From spreadsheet chaos to lifecycle control.</h2><div className="workGrid">
+<a href="https://fixedassetconsultant.com/design-to-disposal/" target="_blank" rel="noreferrer"><small>LIFECYCLE</small><h3>Design to Disposal</h3><p>A documented lifecycle view connecting design, capital, accounting, field reality and disposal.</p><b>EXPLORE ↗</b></a>
+<a href="https://fixedassetconsultant.com/digital-twin-case-study" target="_blank" rel="noreferrer"><small>CASE STUDY</small><h3>Digital Twin Case Study</h3><p>A client-oriented view of connected asset information and the practical fixed-asset problem.</p><b>EXPLORE ↗</b></a>
+<a href="https://fixedassetconsultant.com/insights/the-fixed-asset-problem-isnt-always-in-fixed-assets" target="_blank" rel="noreferrer"><small>INSIGHT</small><h3>The Fixed Asset Problem Isn’t Always in Fixed Assets</h3><p>Why a financial record can be internally consistent while the surrounding asset information remains incomplete.</p><b>READ ↗</b></a>
+<a href="https://www.linkedin.com/pulse/one-identity-every-system-angela-bolton-haeqc" target="_blank" rel="noreferrer"><small>CURRENT THINKING</small><h3>One Identity, Every System</h3><p>Why independent systems can remain independent while the physical asset becomes consistently recognizable across them.</p><b>READ ↗</b></a>
+</div></div></section>
+
+<section className="final"><div className="shell"><p className="eyebrow">FIXED ASSET CONSULTANT</p><h2>The owner should not have to choose between the books and the building.</h2><p>The strongest asset record is one that can survive contact with physical reality — and still explain the asset from design through disposal.</p><div className="ctas"><a className="primary" href="https://fixedassetconsultant.com/" target="_blank" rel="noreferrer">VISIT FIXED ASSET CONSULTANT ↗</a><a href="https://fixedassetconsultant.com/design-to-disposal/" target="_blank" rel="noreferrer">EXPLORE DESIGN TO DISPOSAL ↗</a></div></div></section>
+
+<section className="shell sources"><p className="eyebrow">PUBLIC SOURCE RECORD</p><div><a href="https://fixedassetconsultant.com/" target="_blank" rel="noreferrer">Fixed Asset Consultant</a><a href="https://fixedassetconsultant.com/design-to-disposal/" target="_blank" rel="noreferrer">Design to Disposal</a><a href="https://fixedassetconsultant.com/digital-twin-case-study" target="_blank" rel="noreferrer">Digital Twin Case Study</a><a href="https://fixedassetconsultant.com/insights/the-fixed-asset-problem-isnt-always-in-fixed-assets" target="_blank" rel="noreferrer">Fixed Asset Problem Insight</a><a href="https://www.linkedin.com/pulse/one-identity-every-system-angela-bolton-haeqc" target="_blank" rel="noreferrer">One Identity, Every System</a></div><p className="fine">Public profile showroom assembled from Fixed Asset Consultant’s published materials and Angela Bolton’s public writing. It presents the fixed-asset discipline on its own terms.</p></section>
+
+<footer className="shell footer">ANGELA BOLTON · FIXED ASSET CONSULTANT · CAPITAL · LIFECYCLE · EVIDENCE · PHYSICAL REALITY · DESIGN TO DISPOSAL</footer>
+
+<style>{`.page{min-height:100vh;background:#f4f1e8;color:#17231c;font-family:Arial,Helvetica,sans-serif;overflow:hidden}.ledgerBg{position:absolute;inset:0 0 auto;height:950px;background:radial-gradient(circle at 75% 23%,rgba(82,115,85,.13),transparent 27%),linear-gradient(#faf8f1,#eee9dc);pointer-events:none}.vlines{position:absolute;inset:0;background-image:linear-gradient(90deg,rgba(23,35,28,.035) 1px,transparent 1px),linear-gradient(rgba(23,35,28,.025) 1px,transparent 1px);background-size:48px 48px}.stamp{position:absolute;right:7%;top:170px;transform:rotate(-8deg);border:3px double rgba(73,99,77,.18);padding:25px;color:rgba(73,99,77,.24);font-weight:950;font-size:14px;letter-spacing:.1em;text-align:center}.shell{position:relative;width:min(1220px,calc(100% - 40px));margin:auto}.nav{height:78px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(23,35,28,.13);z-index:2}.brand{font-weight:950;letter-spacing:.08em}.brand span{color:#58755d}.nav>div:last-child{display:flex;gap:26px}.nav a{color:#506158;text-decoration:none;font-size:9px;font-weight:900;letter-spacing:.12em}.hero{display:grid;grid-template-columns:1.18fr .82fr;gap:60px;align-items:center;padding:100px 0 110px;z-index:2}.eyebrow{color:#58755d;font-size:9px;font-weight:950;letter-spacing:.18em}.hero h1{font:clamp(65px,8vw,105px)/.88 Georgia,serif;letter-spacing:-.06em;margin:20px 0 30px}.hero h1 em{font-style:normal;color:#58755d}.lead{max-width:770px;font-size:18px;line-height:1.72;color:#4e5e55}.ctas{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}.ctas a{padding:13px 16px;border:1px solid rgba(23,35,28,.2);border-radius:999px;color:#26362d;text-decoration:none;font-size:9px;font-weight:950}.ctas .primary{background:#294132;color:#fff;border-color:#294132}.identityCard{background:#17231c;color:#f4f1e8;border-radius:24px;padding:28px;box-shadow:0 30px 80px rgba(32,42,36,.17)}.identityCard>small{color:#8caf94;font-weight:950;font-size:8px;letter-spacing:.14em}.identityCard h2{font:31px/1.08 Georgia,serif;margin:12px 0 25px}.assetGlyph{padding:34px;background:#22342a;border:1px solid rgba(255,255,255,.1);text-align:center;border-radius:17px}.assetGlyph span,.assetGlyph i{display:block;font-size:8px;letter-spacing:.2em;color:#91ad99}.assetGlyph b{display:block;font:51px Georgia,serif;margin:8px}.cardRows p{display:flex;justify-content:space-between;margin:0;padding:13px 2px;border-bottom:1px solid rgba(255,255,255,.09);font-size:9px}.cardRows span{color:#9cad9f}.cardRows b{color:#dbe5dd}.thesis{background:#294132;color:#fff}.thesis .shell{padding:78px 0}.thesis small{font-size:8px;font-weight:950;letter-spacing:.18em;color:#9abb9f}.thesis h2,.section h2,.identity h2,.final h2{font:clamp(43px,5.5vw,72px)/1 Georgia,serif;letter-spacing:-.045em;margin:12px 0 24px;max-width:1000px}.thesis p{max-width:900px;color:#d2ded5;font-size:16px;line-height:1.75}.section{padding:90px 0}.lifeGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:13px;margin-top:42px}.lifeGrid article{padding:25px;background:#fbfaf5;border:1px solid rgba(23,35,28,.12)}.lifeGrid span,.evidenceGrid span{color:#67836c;font:22px Georgia,serif}.lifeGrid h3,.evidenceGrid h3{font-size:15px;margin:19px 0 8px}.lifeGrid p,.evidenceGrid p,.systemGrid p{color:#627168;font-size:11px;line-height:1.65}.dark{background:#111914;color:#f4f1e8}.seam{display:grid;grid-template-columns:1fr 150px 1fr;gap:25px;align-items:center;margin-top:48px}.side{padding:36px;border:1px solid rgba(255,255,255,.12);background:#18231c}.side small{color:#90ab96;font-size:8px;font-weight:950}.side strong{display:block;font:24px/1.55 Georgia,serif;margin-top:20px}.bridge{text-align:center;display:flex;flex-direction:column;gap:8px;color:#9cba9f}.bridge b{font-size:30px}.bridge span{font-size:8px;font-weight:950;letter-spacing:.12em}.note{max-width:920px;margin-top:35px;color:#9eaea3;font-size:14px;line-height:1.7}.evidenceGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;margin-top:42px}.evidenceGrid article{padding:22px;border-top:3px solid #6a846f;background:#ebe7dc}.systems{background:#ded8c8}.intro{max-width:900px;color:#59685f;font-size:15px;line-height:1.7}.systemGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:38px}.systemGrid article{padding:24px;background:#f4f1e8;border:1px solid rgba(23,35,28,.11)}.systemGrid h3{font:22px Georgia,serif;margin:0 0 10px}.identity{padding:100px 0;background:#18251e;color:#f5f3eb}.identityGrid{display:grid;grid-template-columns:1fr .85fr;gap:75px;align-items:center}.identity p{color:#b8c6bc;font-size:15px;line-height:1.75}.identity a{display:inline-block;margin-top:18px;color:#a8c6ae;text-decoration:none;font-size:10px;font-weight:950}.orbit{position:relative;aspect-ratio:1;max-width:490px;margin:auto;border:1px solid rgba(156,190,162,.24);border-radius:50%}.orbit:before,.orbit:after{content:"";position:absolute;border:1px solid rgba(156,190,162,.14);border-radius:50%;inset:15%}.orbit:after{inset:30%}.core{position:absolute;inset:36%;border-radius:50%;background:#9fbea5;color:#17231c;display:flex;flex-direction:column;justify-content:center;text-align:center;font-size:8px}.core b{font:20px Georgia,serif}.orbit span{position:absolute;padding:8px 10px;background:#223329;border:1px solid rgba(255,255,255,.12);font-size:8px;font-weight:950}.o1{top:5%;left:42%}.o2{top:25%;right:-3%}.o3{bottom:25%;right:-5%}.o4{bottom:4%;left:40%}.o5{bottom:24%;left:-5%}.o6{top:25%;left:-3%}.questions{background:#f8f6ef}.qGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:#d6d2c6;margin-top:40px}.qGrid>div{background:#f8f6ef;padding:22px}.qGrid span{color:#6c856f;font:20px Georgia,serif}.qGrid p{font:17px/1.35 Georgia,serif;margin:14px 0}.work{background:#ece7db}.workGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:42px}.workGrid a{min-height:230px;padding:28px;background:#f8f6ef;color:#213127;text-decoration:none;border:1px solid rgba(23,35,28,.12);display:flex;flex-direction:column}.workGrid small{color:#667f6a;font-size:8px;font-weight:950}.workGrid h3{font:27px/1.12 Georgia,serif;margin:18px 0 10px}.workGrid p{color:#657269;font-size:12px;line-height:1.65}.workGrid b{margin-top:auto;color:#58755d;font-size:9px}.final{padding:105px 0;background:#9db4a0;color:#142018}.final p{max-width:900px;font-size:16px;line-height:1.7}.final .ctas a{border-color:rgba(20,32,24,.24)}.final .ctas .primary{background:#17231c;color:#fff}.sources{padding:70px 0}.sources>div{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:25px}.sources a{padding:16px;border:1px solid rgba(23,35,28,.12);color:#506158;text-decoration:none;font-size:10px}.fine{color:#748178;font-size:10px;line-height:1.65;max-width:900px;margin-top:24px}.footer{padding:32px 0 58px;border-top:1px solid rgba(23,35,28,.12);color:#718077;font-size:9px;letter-spacing:.08em}@media(max-width:900px){.nav>div:last-child{display:none}.hero,.identityGrid{grid-template-columns:1fr}.lifeGrid,.evidenceGrid,.systemGrid,.qGrid{grid-template-columns:1fr 1fr}.seam{grid-template-columns:1fr}.bridge{flex-direction:row;justify-content:center}.workGrid{grid-template-columns:1fr}}@media(max-width:620px){.lifeGrid,.evidenceGrid,.systemGrid,.qGrid,.sources>div{grid-template-columns:1fr}.hero{padding-top:60px}.hero h1{font-size:58px}.stamp{display:none}}`}</style>
+</main>}
