@@ -17,7 +17,7 @@ export function RouteAwareGlobalChrome() {
   const isP3479TechnicalProposition = pathname === '/ieee-p3479-technical-proposition';
   const isNistBuildingControlsConversation = pathname === '/nist-ai-optimized-building-controls';
   const isGuyanaInstitutionalShowroom = pathname === '/global-institutional-engagement/guyana';
-  const isDedicatedOrganizationShowroom = pathname === '/showrooms/onuma';
+  const isDedicatedOrganizationShowroom = pathname === '/showrooms/onuma' || pathname === '/showrooms/automatedbuildings';
   const isBlueIotDiscussionShowroom = pathname === '/environmental-integrity-governance/showcase/blue-iot-evidence-to-action';
   const isPublicShowroom =
     pathname.includes('/showcase/') ||
