@@ -1,26 +1,5 @@
 import Link from 'next/link';
 export default function AirGradientOpenAirFoundationShowroom(){
-  const [indoor,setIndoor]=useState<State>('supported');
-  const [outdoor,setOutdoor]=useState<State>('supported');
-  const [authority,setAuthority]=useState<State>('missing');
-  const [standing,setStanding]=useState<State>('supported');
-  const [action,setAction]=useState<Action>('OPEN_WINDOWS');
-
-  const result:Result = action==='HOLD' ? 'HOLD'
-    : indoor==='missing'||outdoor==='missing'||authority==='missing' ? 'HOLD'
-    : standing==='missing' ? 'ESCALATE'
-    : 'ALLOW';
-
-  const accent={ALLOW:'#7ff0bd',HOLD:'#f2c46d',DENY:'#ff7d8c',ESCALATE:'#c7adff'}[result];
-  const explanation={
-    ALLOW:'The demonstration has current indoor and outdoor evidence, an identified authority path, established standing, and a bounded proposed consequence. ALLOW remains a governance determination; TA-14 does not execute the physical action.',
-    HOLD:'The record is not sufficient for execution yet. The evidence or authority path is incomplete, or the selected consequence is intentionally being held.',
-    DENY:'The proposed consequence is outside the examined authority or scope.',
-    ESCALATE:'Competing environmental conditions or unresolved standing make silent automated execution inappropriate. Route the decision to an authorized actor.'
-  }[result];
-
-  const chip=(on:boolean)=>({cursor:'pointer',padding:'10px 13px',borderRadius:999,border:on?'1px solid rgba(127,240,189,.58)':'1px solid rgba(117,215,255,.18)',background:on?'rgba(127,240,189,.10)':'rgba(3,13,21,.72)',color:on?'#e8fff4':'#8ea5b0',fontWeight:950,fontSize:10,letterSpacing:'.06em'} as const);
-
   return <main style={{minHeight:'100vh',padding:'46px 20px 110px',background:'radial-gradient(circle at 82% 2%,rgba(65,206,255,.17),transparent 27%),radial-gradient(circle at 7% 35%,rgba(94,238,183,.11),transparent 29%),linear-gradient(180deg,#02070c,#06121b 50%,#02070c)',color:'#eef8fb',fontFamily:'Inter,system-ui,sans-serif'}}>
     <div style={{maxWidth:1240,margin:'0 auto'}}>
       <nav style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',paddingBottom:20,borderBottom:'1px solid rgba(111,220,255,.12)'}}>
