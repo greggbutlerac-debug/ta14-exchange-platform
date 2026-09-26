@@ -36,7 +36,7 @@ export default function Page(){
  const runId='NIST-STCA-'+(scenario==='emergency'?'ER':scenario==='attack'?'CA':'NO')+'-001';
  const connectionLabel=scenario==='normal'?'NOT APPLICABLE · LOCAL CONTROL':ungoverned?'NO GOVERNED CONNECTION ATTEMPTED':connection;
  const receiptDecision=taReached?decision:'NOT REACHED';
- const examPath=[
+ const examPath: Array<[string,string,boolean]>=[
   ['ACTOR','OBSERVED',true],
   ['CROSSING',scenario==='normal'?'LOCAL':connection,true],
   ['OBJECTS',connection==='BOUND'?'PASSPORT + DIGEST':scenario==='normal'?'LOCAL ONLY':'NONE',connection==='BOUND'||scenario==='normal'],
