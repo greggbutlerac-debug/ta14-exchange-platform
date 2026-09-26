@@ -34,7 +34,7 @@ export default function HomePage() {
           <div className="consequence-first__states" aria-label="TA-14 determination states">
             <span>ALLOW</span><span>HOLD</span><span>DENY</span><span>ESCALATE</span>
           </div>
-          <a className="consequence-first__cta" href="/consequence-boundary">RUN THE BOUNDARY →</a>
+          <div style={{display:"flex",gap:10,flexWrap:"wrap"}}><a className="consequence-first__cta" href="/consequence-machine">BRING YOUR CONSEQUENCE →</a><a className="consequence-first__cta consequence-first__cta--secondary" href="/consequence-boundary">RUN THE DEMONSTRATION →</a></div>
           <p className="consequence-first__rule">Everything else in the Exchange exists to establish, examine, preserve, teach, or reconstruct why that determination was legitimate.</p>
           <div className="consequence-first__journey">
             {consequenceJourney.map(([n,title,copy]) => (
@@ -61,7 +61,7 @@ export default function HomePage() {
         .consequence-first__tests p{margin:7px 0 0;color:#8fa2ad;font-size:10px;line-height:1.5}
         .consequence-first__states{display:flex;gap:8px;flex-wrap:wrap;margin:24px 0}
         .consequence-first__states span{padding:9px 13px;border:1px solid rgba(121,220,255,.28);border-radius:999px;color:#9ce6ff;font-size:10px;font-weight:950;letter-spacing:.12em;background:rgba(3,18,29,.8)}
-        .consequence-first__cta{display:inline-flex;align-items:center;min-height:50px;padding:0 18px;border-radius:11px;background:linear-gradient(135deg,#81e5ff,#73e2b5);color:#04131b;text-decoration:none;font-size:11px;font-weight:950;letter-spacing:.08em}
+        .consequence-first__cta{display:inline-flex;align-items:center;min-height:50px;padding:0 18px;border-radius:11px;background:linear-gradient(135deg,#81e5ff,#73e2b5);color:#04131b;text-decoration:none;font-size:11px;font-weight:950;letter-spacing:.08em}.consequence-first__cta--secondary{background:transparent;color:#9ce6ff;border:1px solid rgba(121,220,255,.28)}
         .consequence-first__rule{max-width:980px;margin:28px 0;color:#d6e1e7;font:20px/1.55 Georgia,serif}
         .consequence-first__journey{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;margin-top:24px}
         .consequence-first__journey article{min-height:150px;padding:15px 12px;border:1px solid rgba(118,231,193,.17);border-radius:12px;background:rgba(3,16,24,.82)}
