@@ -119,10 +119,10 @@ export default function IndiaSchoolAir(){
   <section id="sources" className="sources"><div className="shell section">
    <p className="eyebrow">06 · PUBLIC SOURCE RECORD</p><h2>Inspect the basis.</h2>
    <div className="sourceList">
-    <a href="https://dsel.education.gov.in/sites/default/files/Schooling_5th_CS_Conference.pdf" target="_blank" rel="noreferrer"><b>Ministry of Education · UDISE+ 2024–25</b><span>School, student and management totals.</span></a>
+    <a href="https://www.education.gov.in/sites/upload_files/mhrd/files/statistics-new/UDISE%2BReport%202024-25%20-%20NEP%20Structure.pdf" target="_blank" rel="noreferrer"><b>Ministry of Education · UDISE+ 2024–25</b><span>School, student and management totals.</span></a>
     <a href="https://beeindia.gov.in/sites/default/files/ECSBC_2024.pdf" target="_blank" rel="noreferrer"><b>Bureau of Energy Efficiency · ECSBC 2024</b><span>Scope, ventilation and indoor-air-quality provisions.</span></a>
-    <a href="https://ncdc.mohfw.gov.in/uploads/pdf/air2.pdf" target="_blank" rel="noreferrer"><b>Ministry of Health / NCDC · Health Advisory on Air Pollution</b><span>School-child precautions and classroom ventilation guidance.</span></a>
-    <a href="https://cpcb.nic.in/" target="_blank" rel="noreferrer"><b>Central Pollution Control Board</b><span>National air-quality management, monitoring and standards context.</span></a>
+    <a href="https://ncdc.mohfw.gov.in/wp-content/uploads/2025/04/Updated-Draft-Health-Advisory-on-Air-Pollution-under-NPCCHH_latest-version_15-04-2025.pdf" target="_blank" rel="noreferrer"><b>Ministry of Health / NCDC · Health Advisory on Air Pollution</b><span>School-child precautions and classroom ventilation guidance.</span></a>
+    <a href="https://cpcb.nic.in/displaypdf.php?id=bWFudWFsLW1vbml0b3JpbmcvQVFJX05BTVBfUmVwX1NlcHRlbWJlcjIwMTYucGRm" target="_blank" rel="noreferrer"><b>Central Pollution Control Board · NAAQS table</b><span>National ambient PM₂.₅ standard: 40 µg/m³ annual and 60 µg/m³ 24-hour.</span></a>
     <a href="https://www.ishrae.in/standards-position-published" target="_blank" rel="noreferrer"><b>ISHRAE Standards Committee</b><span>Indoor Environmental Quality Standard and related technical standards.</span></a>
     <a href="https://www.who.int/news/item/07-09-2022-who-releases-new-repository-of-resources-for-air-quality-management" target="_blank" rel="noreferrer"><b>World Health Organization · 2021 Air Quality Guidelines</b><span>Health-based PM₂.₅ guideline values; not legally binding standards.</span></a>
    </div>
