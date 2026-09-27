@@ -56,7 +56,7 @@ export default function FixedAssetConsultantShowroom(){return <main className="p
 <p className="lead">A building does not become financially understandable just because the ledger balances. Angela Bolton’s work sits where capital, accounting, physical verification and asset lifecycle meet — making sure the record still describes the thing that actually exists.</p>
 <div className="ctas"><a className="primary" href="https://fixedassetconsultant.com/" target="_blank" rel="noreferrer">VISIT FIXED ASSET CONSULTANT ↗</a><a href="https://fixedassetconsultant.com/design-to-disposal/" target="_blank" rel="noreferrer">DESIGN TO DISPOSAL ↗</a><a href="https://fixedassetconsultant.com/digital-twin-case-study" target="_blank" rel="noreferrer">CASE STUDY ↗</a></div>
 </div>
-<aside className="identityCard"><div className="profileHeader"><div className="founderPhoto"><img src="/angela-bolton-portrait.svg" alt="Angela Bolton, Fixed Asset Consultant"/></div><div className="profileIdentity"><small>ANGELA BOLTON</small><strong>FIXED ASSET CONSULTANT</strong></div></div>
+<aside className="identityCard"><div className="profileHeader"><div className="founderPhoto"><img src="/angela-bolton-portrait.jpg" alt="Angela Bolton, Fixed Asset Consultant"/></div><div className="profileIdentity"><small>ANGELA BOLTON</small><strong>FIXED ASSET CONSULTANT</strong></div></div>
 <small>THE OPERATING QUESTION</small>
 <h2>Does the record still describe the real asset?</h2>
 <div className="assetGlyph"><span>ASSET</span><b>AHU-01</b><i>IDENTITY</i></div>
