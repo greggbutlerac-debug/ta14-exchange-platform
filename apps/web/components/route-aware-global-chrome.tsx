@@ -17,8 +17,27 @@ export function RouteAwareGlobalChrome() {
   const isP3479TechnicalProposition = pathname === '/ieee-p3479-technical-proposition';
   const isNistBuildingControlsConversation = pathname === '/nist-ai-optimized-building-controls';
   const isGuyanaInstitutionalShowroom = pathname === '/global-institutional-engagement/guyana';
-  const isDedicatedOrganizationShowroom = pathname === '/showrooms/onuma' || pathname === '/showrooms/automatedbuildings';
-  const isAreaHome = ['/', '/showrooms', '/governance-showcase', '/global-institutional-engagement', '/environmental-integrity-governance', '/academy', '/ai-governance', '/artifacts/registry'].includes(pathname);
+  const showroomIndexPaths = ['/showrooms','/showrooms/environmental-atmospheric','/showrooms/interoperability-systems','/showrooms/registered-governance','/showrooms/artifacts-examination-records'];
+  const countryShowroomPaths = [
+    '/global-institutional-engagement/guyana','/global-institutional-engagement/gabon','/global-institutional-engagement/estonia',
+    '/environmental-integrity-governance/uae','/global-institutional-engagement/thailand','/global-institutional-engagement/guatemala',
+    '/global-institutional-engagement/uzbekistan','/global-institutional-engagement/kazakhstan','/environmental-integrity-governance/png-atmospheric-integrity-pilot',
+    '/global-institutional-engagement/czech-republic','/global-institutional-engagement/united-states-epa-indoor-air','/global-institutional-engagement/ireland',
+    '/environmental-integrity-governance/bosnia-herzegovina','/environmental-integrity-governance/georgia','/environmental-integrity-governance/ukraine',
+    '/environmental-integrity-governance/kyrgyzstan','/global-institutional-engagement/montenegro','/global-institutional-engagement/norway',
+    '/global-institutional-engagement/singapore','/global-institutional-engagement/france'
+  ];
+  const environmentalShowroomPaths = [
+    '/global-framework-for-action','/global-institutional-engagement/healthy-indoor-air-consequence-boundary',
+    '/global-institutional-engagement/continuous-commissioning','/global-institutional-engagement/school-iaq-consequence-boundary',
+    '/global-institutional-engagement/ashrae-education-iaq-execution-boundary','/global-institutional-engagement/go-aqs',
+    '/environmental-integrity-governance/fungal-spore-evidence','/environmental-integrity-governance/federated-atmospheric-integrity-network',
+    '/environmental-integrity-governance/pair'
+  ];
+  const isCountryShowroom = countryShowroomPaths.includes(pathname);
+  const isEnvironmentalShowroom = environmentalShowroomPaths.includes(pathname);
+  const isDirectShowroom = pathname.startsWith('/showrooms/') && !showroomIndexPaths.includes(pathname);
+  const isAreaHome = ['/', ...showroomIndexPaths, '/governance-showcase', '/global-institutional-engagement', '/environmental-integrity-governance', '/academy', '/ai-governance', '/artifacts/registry'].includes(pathname);
   const isBlueIotDiscussionShowroom = pathname === '/environmental-integrity-governance/showcase/blue-iot-evidence-to-action';
   const isPublicShowroom =
     pathname.includes('/showcase/') ||
@@ -28,7 +47,24 @@ export function RouteAwareGlobalChrome() {
     pathname === '/execution-authority-boundary-architecture' ||
     pathname === '/ai-governance/ta14-architecture-showroom' ||
     pathname === '/ai-governance/admissible-architecture' ||
-    pathname === '/the-curb-test';
+    pathname === '/the-curb-test' ||
+    pathname === '/habits-ta14-interoperability' ||
+    isCountryShowroom ||
+    isEnvironmentalShowroom ||
+    isDirectShowroom;
+  const showroomAction =
+    isCountryShowroom
+      ? { href:'/global-institutional-engagement/showrooms', label:'COUNTRY ROOMS' }
+      : pathname === '/showrooms/india-school-air' || pathname === '/showrooms/uk-school-air' || isEnvironmentalShowroom || pathname.startsWith('/environmental-integrity-governance/showcase/')
+      ? { href:'/showrooms/environmental-atmospheric', label:'ENVIRONMENTAL ROOMS' }
+      : pathname === '/showrooms/elias-ta14-examination' || pathname.startsWith('/artifacts/')
+      ? { href:'/showrooms/artifacts-examination-records', label:'EXAMINATION RECORDS' }
+      : pathname.startsWith('/governance-showcase/') || pathname.includes('/registry/records/')
+      ? { href:'/showrooms/registered-governance', label:'REGISTERED GOVERNANCE' }
+      : pathname === '/habits-ta14-interoperability' || pathname.startsWith('/showrooms/') || pathname.includes('/showcase/') || pathname === '/admissible-federation-architecture' || pathname === '/execution-authority-boundary-architecture'
+      ? { href:'/showrooms/interoperability-systems', label:'INTEROPERABILITY ROOMS' }
+      : { href:'/showrooms', label:'CLASSIFIED SHOWROOMS' };
+
   const isEnvironmentalIntegrityContext =
     pathname === '/environmental-integrity-governance' ||
     pathname.startsWith('/environmental-integrity-governance/') ||
@@ -150,9 +186,9 @@ export function RouteAwareGlobalChrome() {
           <nav className="ta14-showroom-wayfinding" aria-label="TA-14 showroom navigation">
             <a href="/" aria-label="Return to TA-14 Exchange">TA-14 EXCHANGE</a>
             <span aria-hidden="true">·</span>
-            <a href="/governance-showcase">GOVERNANCE SHOWCASES</a>
+            <a className="primary" href={showroomAction.href}>{showroomAction.label}</a>
             <span aria-hidden="true">·</span>
-            <a href="/showrooms">CLASSIFIED SHOWROOMS</a>
+            <a href="/showrooms">ALL SHOWROOMS</a>
           </nav>
           <style>{`
             .ta14-showroom-wayfinding {
@@ -180,6 +216,18 @@ export function RouteAwareGlobalChrome() {
               font-weight: 900;
               letter-spacing: .08em;
               white-space: nowrap;
+            }
+            .ta14-showroom-wayfinding a.primary {
+              padding: 7px 10px;
+              border-radius: 8px;
+              background: #efc66e;
+              color: #071018;
+            }
+            .ta14-showroom-wayfinding a.primary:hover,
+            .ta14-showroom-wayfinding a.primary:focus-visible {
+              color: #071018;
+              text-decoration: none;
+              background: #fff0b8;
             }
             .ta14-showroom-wayfinding a:hover,
             .ta14-showroom-wayfinding a:focus-visible {
