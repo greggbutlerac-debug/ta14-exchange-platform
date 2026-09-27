@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "A public profile showroom examining Anto Budiardjo's long arc from building integration to CNS/CP, Connection Profiles, interoperability, and governed connectivity.",
 };
 
-const sources: [string, string][] = [
+const sources = [
   ["Padi.io — About", "https://www.home.padi.io/about"],
   ["Padi.io — Rethinking Interoperability", "https://www.home.padi.io/"],
   ["AutomatedBuildings — Anto Budiardjo", "https://www.automatedbuildings.com/author/anto/"],
@@ -13,7 +13,7 @@ const sources: [string, string][] = [
   ["Monday Live! — Members", "https://www.mondaylive.org/members"],
 ];
 
-const arc: [string, string, string][] = [
+const arc = [
   ["1989 →", "Connected buildings", "Development of building connectivity and integration technologies begins decades before today's digital-twin vocabulary."],
   ["INTEGRATION", "Systems meet", "The problem starts as getting independently designed building systems to exchange useful information without bespoke integration everywhere."],
   ["INTEROPERABILITY", "Context matters", "The work moves beyond raw data transport toward shared meaning, relationships, roles, and the context surrounding a connection."],
@@ -49,7 +49,7 @@ export default function AntoBudiardjoShowroom() {
 
     <section className="section"><div className="shell"><p className="eyebrow">THE WORK BEHIND THE CONNECTION</p><h2>Interoperability is not just getting the data through.</h2><p className="intro">When systems multiply, one-off integrations become expensive, brittle and hard to reason about. Anto's work has repeatedly pushed toward a different model: make the relationship between systems explicit enough that people and software can understand what is connecting, why, and under what declared conditions.</p><div className="flow">{[["01","NAME"],["02","DECLARE"],["03","MATCH"],["04","CONNECT"],["05","OBSERVE"]].map(([n,x])=><div key={x}><small>{n}</small><b>{x}</b></div>)}</div></div></section>
 
-    <section id="arc" className="section dark"><div className="shell"><p className="eyebrow">A LONG CONNECTIVITY ARC</p><h2>This did not start with digital twins or AI agents.</h2><p className="intro">Padi.io's public biography traces Anto's connected-building work to 1989. The vocabulary has changed over time, but the recurring problem has remained recognizable: how independently governed systems form useful relationships without dissolving their boundaries.</p><div className="arc">{arc.map(([k,t,d])=><article key={k}><b>{k}</b><h3>{t}</h3><p>{d}</p></article>)}</div></div></section>
+    <section id="arc" className="section dark"><div className="shell"><p className="eyebrow">A LONG CONNECTIVITY ARC</p><h2>This did not start with digital twins or AI agents.</h2><p className="intro">Padi.io's public biography traces Anto's connected-building work to 1989. The vocabulary has changed over time, but the recurring problem has remained recognizable: how independently governed systems form useful relationships without dissolving their boundaries.</p><div className="arc">{arc.map((item)=><article key={item[0]}><b>{item[0]}</b><h3>{item[1]}</h3><p>{item[2]}</p></article>)}</div></div></section>
 
     <section className="quote"><div className="shell"><blockquote>“Every connection between systems is governed by a named, immutable contract.”</blockquote><p>SUMMARY OF THE CONNECTION PROFILE MODEL DESCRIBED IN ANTO'S 2026 PUBLIC WRITING · SEE SOURCE RECORD BELOW</p></div></section>
 
@@ -57,7 +57,7 @@ export default function AntoBudiardjoShowroom() {
 
     <section className="section dark"><div className="shell"><p className="eyebrow">WHY IT MATTERS</p><h2>A named relationship can be inspected, challenged and reused.</h2><div className="cards"><article className="card"><small>01 · EXPLICITNESS</small><h3>The relationship stops being hidden glue.</h3><p>The connection becomes something that can be named, described and reasoned about instead of disappearing inside custom integration code.</p></article><article className="card"><small>02 · REUSE</small><h3>A pattern can travel.</h3><p>A Connection Profile can describe a reusable relationship rather than forcing every project to rediscover the same integration contract.</p></article><article className="card"><small>03 · BOUNDARIES</small><h3>Connectivity can remain distinct from consequence.</h3><p>Knowing what crossed a connection does not by itself settle whether a later proposed action is authorized to become reality.</p></article></div><div className="boundary"><p><strong>Important boundary:</strong> this is an independent TA-14 public profile and interoperability examination. It does not claim that Anto Budiardjo, Padi.io, CNS/CP, Monday Live!, the IBB Project or AutomatedBuildings.com adopts TA-14. CNS/CP remains independently stewarded; TA-14 remains independently governed. The seam is published so each side can be inspected and corrected without being merged by implication.</p></div></div></section>
 
-    <section id="record" className="section"><div className="shell"><p className="eyebrow">PUBLIC WORK SURFACE</p><h2>Follow the architecture through the record.</h2><p className="intro">Anto's public work spans building integration, cloud-native systems, context-driven interoperability, Connection Profiles, the IBB Project and the governance problem created when autonomous systems begin forming relationships at scale.</p><p className="sourceNote">External links open the underlying public sources directly.</p><div className="sources">{sources.map(([label,url])=><a key={url} href={url} target="_blank" rel="noreferrer">{label} ↗</a>)}</div></div></section>
+    <section id="record" className="section"><div className="shell"><p className="eyebrow">PUBLIC WORK SURFACE</p><h2>Follow the architecture through the record.</h2><p className="intro">Anto's public work spans building integration, cloud-native systems, context-driven interoperability, Connection Profiles, the IBB Project and the governance problem created when autonomous systems begin forming relationships at scale.</p><p className="sourceNote">External links open the underlying public sources directly.</p><div className="sources">{sources.map((item)=><a key={item[1]} href={item[1]} target="_blank" rel="noreferrer">{item[0]} ↗</a>)}</div></div></section>
 
     <section className="section"><div className="shell"><p className="eyebrow">ANTO BUDIARDJO</p><h2>The system does not become interoperable merely because two endpoints can exchange bytes.</h2><p className="intro">The relationship itself needs structure. That is the through-line this showroom makes visible: from building integration to named, contextual, inspectable connectivity — and then to the next boundary, where connection meets consequence.</p></div></section>
 
