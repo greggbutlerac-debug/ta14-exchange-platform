@@ -21,7 +21,8 @@ export default function InvivusExperience(){
  const[signal,setSignal]=useState(0),[provenance,setProvenance]=useState(false),[continuity,setContinuity]=useState(false),[validated,setValidated]=useState(false);
  const[action,setAction]=useState(1),[authority,setAuthority]=useState(false),[standing,setStanding]=useState(false),[binding,setBinding]=useState(false);
  const[executed,setExecuted]=useState(false),[verified,setVerified]=useState(false);
- const risk=moisture+duration+material;\n const conditionState=risk<=2?'LOW':risk<=5?'ELEVATED':'PERSISTENT';
+ const risk=moisture+duration+material;
+ const conditionState=risk<=2?'LOW':risk<=5?'ELEVATED':'PERSISTENT';
  const evidence=signals[signal].quality+[provenance,continuity,validated].filter(Boolean).length;
  const burden=consequences[action].burden;
  const missing=useMemo(()=>{const m:string[]=[];if(evidence<burden)m.push('evidence appropriate to this consequence');if(!authority)m.push('Applicable Authority');if(!standing)m.push('Established Standing');if(burden>=4&&!binding)m.push('exact execution binding');return m},[evidence,burden,authority,standing,binding]);
