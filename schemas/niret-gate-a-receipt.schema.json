@@ -1,0 +1,222 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/niret-gate-a-receipt.schema.json",
+  "title": "TA-14-NIRET-GA-C1 Gate A receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "gate_version",
+    "receipt_id",
+    "record_id",
+    "evaluated_at",
+    "determination",
+    "reason_codes",
+    "indication_path",
+    "scope",
+    "gate_b_authorized",
+    "statement",
+    "question_type",
+    "stated_proposition",
+    "stated_basis",
+    "equipment_identity",
+    "pairing",
+    "equipment_class",
+    "metering_device",
+    "metering_device_evidence",
+    "refrigerant_declared",
+    "a2l_check",
+    "technician_identity",
+    "certification_or_supervisor_ref",
+    "work_scope_ref",
+    "site_and_jurisdiction_status",
+    "instruments",
+    "oem_document_refs",
+    "measurement_set",
+    "steady_state_window",
+    "run_start",
+    "run_interrupted",
+    "ice_policy_status",
+    "ice_restoration_record",
+    "pre_gate_corrections",
+    "validity_terminating_conditions",
+    "evidence_hashes",
+    "policy_refs",
+    "authority_refs",
+    "not_generalized",
+    "limitations",
+    "prior_receipt_ids",
+    "content_hash",
+    "required_propositions",
+    "established_propositions",
+    "unresolved_propositions",
+    "next_justified_actions",
+    "ambiguity_findings",
+    "evidence_provenance",
+    "raw_static_pressures",
+    "derived_tesp",
+    "frozen_spec_sha256",
+    "workflow_terminated"
+  ],
+  "properties": {
+    "gate_version": {
+      "const": "TA-14-NIRET-GA-C1"
+    },
+    "receipt_id": {
+      "type": "string",
+      "pattern": "^NIRET-GA-C1-[0-9A-F]{24}$"
+    },
+    "record_id": {},
+    "evaluated_at": {},
+    "determination": {
+      "enum": [
+        "ALLOW",
+        "HOLD",
+        "DENY",
+        "ESCALATE"
+      ]
+    },
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "indication_path": {
+      "enum": [
+        "I1",
+        null
+      ]
+    },
+    "scope": {
+      "const": "PRESSURE_EVIDENCE_ONLY"
+    },
+    "gate_b_authorized": {
+      "const": false
+    },
+    "statement": {
+      "const": "Permission to connect gauges != permission to move refrigerant."
+    },
+    "question_type": {},
+    "stated_proposition": {},
+    "stated_basis": {},
+    "equipment_identity": {},
+    "pairing": {},
+    "equipment_class": {},
+    "metering_device": {},
+    "metering_device_evidence": {},
+    "refrigerant_declared": {},
+    "a2l_check": {},
+    "technician_identity": {},
+    "certification_or_supervisor_ref": {},
+    "work_scope_ref": {},
+    "site_and_jurisdiction_status": {},
+    "instruments": {},
+    "oem_document_refs": {},
+    "measurement_set": {},
+    "steady_state_window": {},
+    "run_start": {},
+    "run_interrupted": {
+      "type": "boolean"
+    },
+    "ice_policy_status": {
+      "type": "object",
+      "required": [
+        "policy",
+        "established",
+        "reason_codes",
+        "asserts_diagnosis"
+      ],
+      "properties": {
+        "asserts_diagnosis": {
+          "const": false
+        }
+      }
+    },
+    "ice_restoration_record": {},
+    "pre_gate_corrections": {},
+    "validity_terminating_conditions": {},
+    "evidence_hashes": {},
+    "policy_refs": {},
+    "authority_refs": {},
+    "not_generalized": {},
+    "limitations": {},
+    "prior_receipt_ids": {},
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "required_propositions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "established_propositions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unresolved_propositions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "proposition",
+          "results",
+          "reason_codes",
+          "evidence_keys",
+          "next_justified_action"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "proposition": {
+            "type": "string"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "enum": [
+                "HOLD",
+                "DENY",
+                "ESCALATE"
+              ]
+            }
+          },
+          "reason_codes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "evidence_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "next_justified_action": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "next_justified_actions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ambiguity_findings": {},
+    "evidence_provenance": {},
+    "raw_static_pressures": {},
+    "derived_tesp": {},
+    "frozen_spec_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$"
+    },
+    "workflow_terminated": {
+      "const": false
+    }
+  }
+}

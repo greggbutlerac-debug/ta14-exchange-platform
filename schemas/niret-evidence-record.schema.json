@@ -1,0 +1,347 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/niret-evidence-record.schema.json",
+  "title": "TA-14-NIRET-GA-C1 Gate A input (request, evidence record, OEM reference)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["request", "evidence", "oem"],
+  "properties": {
+    "request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requestId", "question", "statedProposition", "statedBasis", "evaluatedAt"],
+      "properties": {
+        "requestId": { "type": "string", "minLength": 1 },
+        "question": { "enum": ["REFRIGERANT_CHARGE", "RESTRICTION", "NON_CONDENSABLES", "COMPRESSOR", "VALVE", "LEAK", "OTHER"] },
+        "statedProposition": { "type": "string" },
+        "statedBasis": {
+          "type": "array",
+          "items": { "enum": ["NONINVASIVE_EVIDENCE", "GAUGE_AVAILABLE", "CUSTOMER_CLAIM", "PRIOR_TECHNICIAN_CLAIM", "SYSTEMS_ARE_ALWAYS_LOW", "TIME_OR_DISPATCH_PRESSURE", "REFRIGERATION_CYCLE_KNOWLEDGE", "SERVICE_HISTORY", "RH_ALONE"] }
+        },
+        "evaluatedAt": { "$ref": "#/$defs/timestamp" },
+        "priorReceiptIds": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["recordId", "pressureSideEntry", "equipment", "mode", "metering", "refrigerant", "technician", "authorization", "safety", "instruments", "plannedPressureInstruments", "operation", "events", "corrections", "evaporator", "condenser", "measurements"],
+      "properties": {
+        "recordId": { "type": "string", "minLength": 1 },
+        "pressureSideEntry": { "enum": ["NOT_PERFORMED", "PROPOSED_OUTSIDE_GATE_A", "ATTEMPTED", "INSTRUMENTS_CONNECTED"] },
+        "equipment": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["configuration", "compressorStaging"],
+          "properties": {
+            "indoorModel": { "type": "string" },
+            "outdoorModel": { "type": "string" },
+            "pairingVerifiedAgainstOem": { "type": "boolean" },
+            "identityEstablishableFromOem": { "type": "boolean" },
+            "configuration": { "enum": ["DUCTED_SPLIT", "DUCTLESS", "MINI_SPLIT", "MULTI_SPLIT", "PACKAGED", "UNKNOWN"] },
+            "compressorStaging": { "enum": ["SINGLE_STAGE", "TWO_STAGE", "INVERTER", "UNKNOWN"] },
+            "verifiedAt": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "mode": { "enum": ["COOLING", "HEATING", "UNKNOWN"] },
+        "metering": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["type", "evidenceBasis"],
+          "properties": {
+            "type": { "enum": ["FIXED_ORIFICE", "CAPILLARY_TUBE", "TXV", "EEV", "UNKNOWN"] },
+            "evidenceBasis": { "enum": ["DIRECT_OBSERVATION", "CONFIGURATION_DOCUMENT", "INFERRED_FROM_PRESSURE", "NONE"] },
+            "establishableFromOem": { "type": "boolean" },
+            "verifiedAt": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "refrigerant": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["a2lMarkingsObserved", "flammableRefrigerantLabelsObserved", "integritySuspect"],
+          "properties": {
+            "declared": { "type": "string" },
+            "safetyClass": { "enum": ["A1", "A2L", "A2", "A3", "B1", "B2L", "B2", "B3", "UNKNOWN"] },
+            "a2lMarkingsObserved": { "type": "boolean" },
+            "flammableRefrigerantLabelsObserved": { "type": "boolean" },
+            "integritySuspect": { "type": "boolean" }
+          }
+        },
+        "technician": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["identity"],
+          "properties": {
+            "identity": { "type": "string", "minLength": 1 },
+            "certification": {
+              "oneOf": [
+                {
+                  "type": "object", "additionalProperties": false,
+                  "required": ["status", "type", "certificateRef"],
+                  "properties": {
+                    "status": { "const": "CERTIFIED" },
+                    "type": { "$ref": "#/$defs/certType" },
+                    "certificateRef": { "type": "string", "minLength": 1 }
+                  }
+                },
+                {
+                  "type": "object", "additionalProperties": false,
+                  "required": ["status", "supervisorCertificateRef", "supervisorType"],
+                  "properties": {
+                    "status": { "const": "SUPERVISED_APPRENTICE" },
+                    "supervisorCertificateRef": { "type": "string", "minLength": 1 },
+                    "supervisorType": { "$ref": "#/$defs/certType" }
+                  }
+                },
+                {
+                  "type": "object", "additionalProperties": false,
+                  "required": ["status"],
+                  "properties": { "status": { "const": "NOT_CERTIFIED" } }
+                }
+              ]
+            }
+          }
+        },
+        "authorization": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "workScopeRef": { "type": "string" },
+            "workScopeIncludesDiagnosis": { "type": "boolean" },
+            "sitePermission": { "enum": ["GRANTED", "WITHHELD", "UNCONFIRMED"] },
+            "jurisdiction": { "enum": ["NOT_REQUIRED", "CONFIRMED", "UNCONFIRMED"] }
+          }
+        },
+        "safety": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": { "hazard": { "enum": ["NONE_IDENTIFIED", "CORRECTABLE_HAZARD", "BEYOND_COMPETENCE"] } }
+        },
+        "instruments": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["instrumentId", "calibrationValid", "setupVerified"],
+            "properties": {
+              "instrumentId": { "type": "string", "minLength": 1 },
+              "calibrationValid": { "type": "boolean" },
+              "setupVerified": { "type": "boolean" }
+            }
+          }
+        },
+        "plannedPressureInstruments": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["instrumentId", "ratedForRefrigerants", "calibrationValid"],
+            "properties": {
+              "instrumentId": { "type": "string", "minLength": 1 },
+              "ratedForRefrigerants": { "type": "array", "items": { "type": "string" } },
+              "calibrationValid": { "type": "boolean" }
+            }
+          }
+        },
+        "operation": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "runStartedAt": { "$ref": "#/$defs/timestamp" },
+            "compressorRunningSteadily": { "type": "boolean" }
+          }
+        },
+        "events": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["type", "at"],
+            "properties": {
+              "type": { "enum": ["FILTER_REPLACED_OR_REMOVED", "BLOWER_SETTING_CHANGED", "DUCT_DAMPER_ZONING_CHANGE", "EVAPORATOR_COIL_CLEANED", "CONDENSER_COIL_CLEANED", "PANELS_REMOVED", "THERMOSTAT_CONTROL_MODE_CHANGE", "COMPRESSOR_POWER_INTERRUPTED_OR_CYCLED", "REFRIGERANT_CHARGE_CHANGED", "FREEZE_SWITCH_TRIP_OR_ICING", "DEFROST_CYCLE", "REPAIR_OR_COMPONENT_REPLACEMENT", "MATERIAL_WEATHER_OR_LOAD_CHANGE"] },
+              "at": { "$ref": "#/$defs/timestamp" },
+              "affectsIdentity": { "type": "boolean" }
+            }
+          }
+        },
+        "corrections": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["at", "declaredFinding", "authorityRef", "beforeRecordRef", "correctionDescription", "afterRecordRef"],
+            "properties": {
+              "at": { "$ref": "#/$defs/timestamp" },
+              "declaredFinding": { "type": "string" },
+              "authorityRef": { "type": "string" },
+              "beforeRecordRef": { "type": "string" },
+              "correctionDescription": { "type": "string" },
+              "afterRecordRef": { "type": "string" },
+              "rebaselinedAt": { "$ref": "#/$defs/timestamp" }
+            }
+          }
+        },
+        "evaporator": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "iceStatus": { "enum": ["NO_ICE", "ICE_PRESENT", "UNDETERMINED"] },
+            "iceObservedAt": { "$ref": "#/$defs/timestamp" },
+            "icingOccurred": { "type": "boolean" },
+            "iceRestoration": {
+              "type": "object", "additionalProperties": false,
+              "required": ["iceCompletelyRemoved", "causeInvestigated", "causeDisposition", "airflowAndHeatTransferReestablished", "returnedToOperatingEnvelope", "steadyStateReestablished", "freshMeasurementSetObtained", "completedAt"],
+              "properties": {
+                "iceCompletelyRemoved": { "type": "boolean" },
+                "causeInvestigated": { "type": "boolean" },
+                "causeDisposition": { "enum": ["CORRECTED", "BOUNDED", "UNRESOLVED"] },
+                "airflowAndHeatTransferReestablished": { "type": "boolean" },
+                "returnedToOperatingEnvelope": { "type": "boolean" },
+                "steadyStateReestablished": { "type": "boolean" },
+                "freshMeasurementSetObtained": { "type": "boolean" },
+                "completedAt": { "$ref": "#/$defs/timestamp" }
+              }
+            }
+          }
+        },
+        "condenser": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "panelsInPlace": { "type": "boolean" },
+            "coilCondition": { "enum": ["CLEAR", "PARTIAL_OBSTRUCTION", "MATERIALLY_RESTRICTED", "UNDETERMINED"] },
+            "fanOperating": { "type": "boolean" },
+            "observedAt": { "$ref": "#/$defs/timestamp" }
+          }
+        },
+        "airflowMethod": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["method", "motorType"],
+          "properties": {
+            "method": { "enum": ["OEM_SPECIFIED_METHOD", "OEM_CFM_ESP_TABLE", "DUCT_TRAVERSE", "FLOW_GRID", "PRESSURE_MATCHING", "TEMPERATURE_RISE"] },
+            "motorType": { "enum": ["PSC", "ECM", "OTHER", "UNKNOWN"] },
+            "componentsClean": { "type": "boolean" }
+          }
+        },
+        "observations": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "filterCondition": { "type": "string" },
+            "blowerOperatingEvidence": { "type": "string" },
+            "compressorOperatingEvidence": { "type": "string" },
+            "leakIndications": { "type": "string" }
+          }
+        },
+        "measurements": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "returnDryBulb": { "$ref": "#/$defs/measurement" },
+            "returnWetBulb": { "$ref": "#/$defs/measurement" },
+            "returnRh": { "$ref": "#/$defs/measurement" },
+            "supplyDryBulb": { "$ref": "#/$defs/measurement" },
+            "supplyWetBulb": { "$ref": "#/$defs/measurement" },
+            "supplyRh": { "$ref": "#/$defs/measurement" },
+            "outdoorDryBulb": { "$ref": "#/$defs/measurement" },
+            "outdoorWetBulb": { "$ref": "#/$defs/measurement" },
+            "outdoorRh": { "$ref": "#/$defs/measurement" },
+            "airflow": { "$ref": "#/$defs/measurement" },
+            "returnStatic": { "$ref": "#/$defs/measurement" },
+            "supplyStatic": { "$ref": "#/$defs/measurement" },
+            "suctionLineTemp": { "$ref": "#/$defs/measurement" },
+            "liquidLineTemp": { "$ref": "#/$defs/measurement" },
+            "supplyVoltage": { "$ref": "#/$defs/measurement" },
+            "compressorCurrent": { "$ref": "#/$defs/measurement" },
+            "blowerCurrent": { "$ref": "#/$defs/measurement" }
+          }
+        },
+        "stabilityReadings": { "type": "array", "items": { "$ref": "#/$defs/measurement" } }
+      }
+    },
+    "oem": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["documentRefs", "chargingMethod", "requiresUnavailableToolOrMode", "measurementLocations", "noninvasiveCriterion"],
+      "properties": {
+        "documentRefs": { "type": "array", "items": { "type": "string" } },
+        "chargingMethod": {
+          "oneOf": [
+            { "type": "object", "additionalProperties": false, "required": ["status", "ref"], "properties": { "status": { "const": "IDENTIFIED" }, "ref": { "type": "string", "minLength": 1 } } },
+            { "type": "object", "additionalProperties": false, "required": ["status", "obtainable"], "properties": { "status": { "const": "NOT_OBTAINED" }, "obtainable": { "type": "boolean" } } }
+          ]
+        },
+        "requiresUnavailableToolOrMode": { "type": "boolean" },
+        "airflowRange": { "$ref": "#/$defs/oemRange" },
+        "espRange": { "$ref": "#/$defs/oemRange" },
+        "ambientEnvelope": { "$ref": "#/$defs/oemRange" },
+        "voltageRange": { "$ref": "#/$defs/oemRange" },
+        "minRunMinutes": {
+          "type": "object", "additionalProperties": false, "required": ["value", "ref"],
+          "properties": { "value": { "type": "number", "exclusiveMinimum": 0 }, "ref": { "type": "string", "minLength": 1 } }
+        },
+        "stabilityCriterion": {
+          "type": "object", "additionalProperties": false, "required": ["measurement", "maxChange", "unit", "ref"],
+          "properties": {
+            "measurement": { "$ref": "#/$defs/measurementKey" },
+            "maxChange": { "type": "number", "minimum": 0 },
+            "unit": { "$ref": "#/$defs/unit" },
+            "ref": { "type": "string", "minLength": 1 }
+          }
+        },
+        "permitsEcmWithTableMethod": { "type": "boolean" },
+        "measurementLocations": {
+          "type": "object",
+          "propertyNames": { "$ref": "#/$defs/measurementKey" },
+          "additionalProperties": { "type": "string", "minLength": 1 }
+        },
+        "noninvasiveCriterion": {
+          "oneOf": [
+            {
+              "type": "object", "additionalProperties": false, "required": ["status", "derivation", "range"],
+              "properties": {
+                "status": { "const": "PUBLISHED" },
+                "derivation": {
+                  "oneOf": [
+                    { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "enum": ["RETURN_MINUS_SUPPLY_DRY_BULB", "RETURN_MINUS_SUPPLY_WET_BULB"] } } },
+                    { "type": "object", "additionalProperties": false, "required": ["kind", "measurement"], "properties": { "kind": { "const": "SINGLE_MEASUREMENT" }, "measurement": { "$ref": "#/$defs/measurementKey" } } }
+                  ]
+                },
+                "range": { "$ref": "#/$defs/oemRange" }
+              }
+            },
+            { "type": "object", "additionalProperties": false, "required": ["status", "obtainable"], "properties": { "status": { "const": "NOT_OBTAINED" }, "obtainable": { "type": "boolean" } } }
+          ]
+        }
+      }
+    }
+  },
+  "$defs": {
+    "timestamp": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$" },
+    "unit": { "enum": ["F", "PCT_RH", "CFM", "IN_WC", "V", "A"] },
+    "certType": { "enum": ["TYPE_I", "TYPE_II", "TYPE_III", "UNIVERSAL"] },
+    "measurementKey": { "enum": ["returnDryBulb", "returnWetBulb", "returnRh", "supplyDryBulb", "supplyWetBulb", "supplyRh", "outdoorDryBulb", "outdoorWetBulb", "outdoorRh", "airflow", "returnStatic", "supplyStatic", "suctionLineTemp", "liquidLineTemp", "supplyVoltage", "compressorCurrent", "blowerCurrent"] },
+    "measurement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["value", "unit", "measuredAt", "location", "instrumentId", "provenance"],
+      "properties": {
+        "value": { "type": "number" },
+        "unit": { "$ref": "#/$defs/unit" },
+        "accuracy": { "type": "number", "minimum": 0 },
+        "measuredAt": { "$ref": "#/$defs/timestamp" },
+        "location": { "type": "string", "minLength": 1 },
+        "instrumentId": { "type": "string", "minLength": 1 },
+        "provenance": { "type": "string", "pattern": "^(MANUAL|INSTRUMENT:.+)$" }
+      }
+    },
+    "oemRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["min", "max", "unit", "ref"],
+      "properties": {
+        "min": { "type": "number" },
+        "max": { "type": "number" },
+        "unit": { "$ref": "#/$defs/unit" },
+        "ref": { "type": "string", "minLength": 1 }
+      }
+    }
+  }
+}

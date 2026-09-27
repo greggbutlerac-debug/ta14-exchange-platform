@@ -1,0 +1,449 @@
+{
+  "baseline": "TA-14-NIRET-GA-C1",
+  "title": "Pressure-Instrument Diagnostic Entry - Bounded Charge-Diagnostic Scope",
+  "status": "OWNER_FROZEN_AMENDED_A1_A2_A3",
+  "governing_proposition": "Has sufficient Admissible Evidence, Applicable Authority, and Established Standing been established, NOW, to justify connecting pressure instruments to obtain refrigerant-side pressure evidence for the stated refrigerant-charge question?",
+  "output_boundary": {
+    "allow_scope": "PRESSURE_EVIDENCE_ONLY",
+    "gate_b_authorized": false,
+    "never_authorizes": [
+      "refrigerant addition",
+      "refrigerant removal",
+      "recovery",
+      "evacuation",
+      "charging",
+      "repair",
+      "circuit opening",
+      "any other Gate-B refrigerant-mass intervention"
+    ],
+    "statement": "Permission to connect gauges != permission to move refrigerant."
+  },
+  "scope": {
+    "question": "REFRIGERANT_CHARGE_ONLY",
+    "equipment": "Ducted split-system air conditioner or heat pump; single- or two-stage; non-inverter",
+    "mode": "COOLING",
+    "metering_device": [
+      "FIXED_ORIFICE",
+      "CAPILLARY_TUBE",
+      "TXV"
+    ],
+    "refrigerant": "Non-A2L refrigerant declared on the equipment nameplate; no A2L red markings or flammable-refrigerant labels",
+    "oem_data": [
+      "Published applicable OEM charging method/data for the identified model",
+      "Published applicable OEM airflow/static-pressure data for the identified model"
+    ],
+    "technician": "EPA Section 608 certified technician, or apprentice under direct supervision of a certified technician, under a diagnostic work scope",
+    "outside_scope_result": "Fail closed to HOLD or ESCALATE per logic"
+  },
+  "prerequisites": {
+    "P01": "Indoor and outdoor equipment identity and pairing recorded and matched to OEM documentation",
+    "P02": "Declared refrigerant recorded; non-A2L (no red-marked ports/pipes/hoses, no flammable-refrigerant labels); instruments rated for that refrigerant",
+    "P03": "Metering-device type established from direct/configuration evidence; never inferred from pressure",
+    "P04": "OEM-prescribed minimum continuous run completed with no compressor interruption and no charge change during the run",
+    "P05": "Instruments valid: calibrated per instrument-manufacturer interval, correct setup and placement",
+    "P06": "Evaporator free of ice; if icing occurred, TA-14 ice restoration sequence complete",
+    "P07": "Any pre-Gate-A correction recorded (declared finding, applicable authority, before-condition record, bounded correction, after-condition record) and new operating baseline established",
+    "P08": "Measured indoor airflow within OEM range by an OEM method or an ANSI/ACCA 5 QI-2015 section 4.1.2 method",
+    "P09": "Measured external static pressure within OEM range",
+    "P10": "Heat rejection valid: panels in place, condenser coil not materially restricted, condenser fan operating",
+    "P11": "Outdoor ambient within the OEM envelope for the OEM method used",
+    "P12": "Entering-evaporator dry-bulb and wet-bulb (or RH) measured at steady state",
+    "P13": "Fresh internally coherent measurement set within one steady-state window, with no invalidating event since",
+    "P14": "OEM charging method identified for this model",
+    "P15": "Request not based solely on a prohibited basis; evaluated at the indication step per Amendment A2",
+    "P16": "No unresolved hazard",
+    "P17": "Authority to test: 608 certification or supervised apprentice; work scope includes diagnosis; site permission; jurisdictional authorization where applicable",
+    "P18": "Indication established via I1 or I2"
+  },
+  "conditional": {
+    "C01": "If OEM criterion requires leaving-air (supply) readings: measure at OEM location; OEM location absent -> HOLD",
+    "C02": "If OEM criterion requires suction/liquid line temperatures: measure at OEM location; OEM location absent -> HOLD",
+    "C03": "If voltage relevant to OEM operating envelope: within nameplate/OEM range else HOLD",
+    "C04": "Compressor not running steadily or abnormal cycling: fails P04 -> HOLD",
+    "C05": "Suspected mixed/contaminated refrigerant -> ESCALATE",
+    "C06": "OEM-specified measured-stability criterion applies in addition to P04",
+    "C07": "OEM-specified airflow method governs; otherwise ACCA 5 QI section 4.1.2; temperature-rise never for cooling airflow",
+    "C08": "Leak indications recorded only; not a charge indication; leak question outside scope"
+  },
+  "indication": {
+    "I1": "Indicator interval lies entirely OUTSIDE the OEM-published criterion for this model (F1), with airflow established WITHIN OEM range",
+    "I2": "TA-14 policy: I1 evidence valid but ambiguous against OEM criterion AND >=2 plausible charge-related hypotheses remain AND valid non-invasive evidence cannot discriminate AND the OEM pressure-based method would discriminate; contradiction alone never qualifies",
+    "not_indication_authority": [
+      "ANSI/ACCA 4 QM (corroboration only)",
+      "RESNET 310 non-invasive method (not adopted)",
+      "CA Title 24 RA3.2 (not adopted)"
+    ]
+  },
+  "logic": {
+    "precedence": "DENY > ESCALATE > HOLD > ALLOW; empty requirement set -> HOLD; D1/D2 evaluated only after all HOLD/ESCALATE checks pass; D3 and D4 apply regardless",
+    "ALLOW": "All P01-P17 satisfied AND P18 via I1 or I2",
+    "HOLD": [
+      "Any P01-P17 missing, invalid, or stale",
+      "Minimum run incomplete or interrupted",
+      "OEM run time not specified",
+      "Frozen/materially iced evaporator or TA-14 restoration incomplete",
+      "Airflow or ESP outside OEM range",
+      "Heat rejection invalid",
+      "Ambient outside OEM envelope",
+      "Voltage out of range where applicable",
+      "OEM data/criterion not yet obtained but obtainable",
+      "OEM measurement location not specified",
+      "Authority documents missing or jurisdictional authorization unconfirmed",
+      "Correctable hazard",
+      "Conflict not meeting I2",
+      "Prohibited basis with incomplete evidence",
+      "Metering device unestablished",
+      "Pre-Gate-A correction not re-baselined",
+      "Instruments not rated or invalid",
+      "Any ambiguous comparison per F1, or missing instrument accuracy",
+      "I2 predicates not establishable by the engine in C1"
+    ],
+    "DENY": {
+      "D1": "All P01-P17 satisfied and the indicator interval lies entirely WITHIN the OEM-published criterion (F1) with no I2 condition: pressure-side diagnostic entry not currently indicated/justified",
+      "D2": "Request rests solely on a prohibited basis, all other prerequisites satisfied, and the indicator interval lies entirely WITHIN the OEM criterion (Amendment A2)",
+      "D3": "Authority to test expressly withheld",
+      "never": [
+        "missing evidence",
+        "missing OEM method or criterion",
+        "out-of-range reading",
+        "ambiguous evidence"
+      ],
+      "D4": "Pressure-instrument entry proposed or attempted before Gate-A ALLOW: PRESSURE_INSTRUMENT_ENTRY_NOT_AUTHORIZED (Amendment A1)"
+    },
+    "ESCALATE": [
+      "A2L refrigerant or A2L markings",
+      "Inverter/EEV equipment",
+      "Ductless, mini-split or multi-split",
+      "Heating-mode question",
+      "Any non-charge question",
+      "OEM data/criterion unobtainable and no TA-14-adopted method applies",
+      "OEM procedure requires unavailable tools or modes",
+      "Metering device or identity unestablishable even from OEM documents",
+      "Technician not certified and not supervised apprentice, or out of scope",
+      "Hazard beyond competence",
+      "Suspected mixed/contaminated refrigerant"
+    ]
+  },
+  "invalidation": {
+    "principle": "Evidence expires by state change, not elapsed clock. After any event: re-establish affected prerequisites, complete a new OEM minimum run (P04), obtain a new measurement set (P13).",
+    "events": {
+      "filter_replaced_or_removed": [
+        "P08",
+        "P09",
+        "P12",
+        "P13"
+      ],
+      "blower_setting_changed": [
+        "P08",
+        "P09",
+        "P12",
+        "P13"
+      ],
+      "duct_damper_zoning_change": [
+        "P08",
+        "P09",
+        "P12",
+        "P13"
+      ],
+      "evaporator_coil_cleaned": [
+        "P08",
+        "P09",
+        "P04",
+        "P13"
+      ],
+      "condenser_coil_cleaned": [
+        "P10",
+        "P04",
+        "P13"
+      ],
+      "panels_removed": [
+        "P10",
+        "P04",
+        "P13"
+      ],
+      "thermostat_control_mode_change": [
+        "P04",
+        "P13"
+      ],
+      "compressor_power_interrupted_or_cycled": [
+        "P04",
+        "P13"
+      ],
+      "refrigerant_charge_changed": [
+        "P04",
+        "P13",
+        "GATE_B_EVENT_RECORDED_SEPARATELY"
+      ],
+      "freeze_switch_trip_or_icing": [
+        "P06",
+        "TA14_ICE_RESTORATION_SEQUENCE"
+      ],
+      "defrost_cycle": [
+        "P04",
+        "P13"
+      ],
+      "repair_or_component_replacement": [
+        "P01_IF_AFFECTED",
+        "P03_IF_AFFECTED",
+        "P04",
+        "P13"
+      ],
+      "material_weather_or_load_change": [
+        "P11",
+        "P12",
+        "P13"
+      ]
+    }
+  },
+  "measurement": {
+    "airflow": "OEM method or ACCA 5 QI-2015 section 4.1.2 (OEM CFM/ESP table, traverse, flow grid, pressure matching); never temperature rise for cooling; OEM-table method not for ECM unless OEM permits",
+    "external_static_pressure": "OEM-specified locations; clean components for OEM-table method (QI footnote 8)",
+    "entering_air_db_wb_rh": "At steady state; OEM location",
+    "line_temperatures": "OEM-specified location; liquid-line probe insulated from ambient",
+    "outdoor_entering_air": "OEM-specified; where air enters the unit",
+    "voltage_current": "Voltmeter and ammeter vs nameplate/OEM ranges (QI section 4.4.2)",
+    "instruments": "Rated for refrigerant; calibrated per instrument-manufacturer interval",
+    "oem_silent_location": "HOLD pending applicable authority; RESNET 310-2020 practice is reference only, not TA-14 authority"
+  },
+  "oem_dependent": [
+    "Airflow CFM range",
+    "ESP range",
+    "Non-invasive performance criterion",
+    "Charging method, targets, tolerances (QI tolerances not additive)",
+    "Ambient envelope",
+    "Minimum run time and any stability criterion",
+    "Measurement locations",
+    "Voltage/current ranges",
+    "Freeze-protection behavior",
+    "Instrument refrigerant compatibility"
+  ],
+  "ta14_policy": {
+    "T1_gate_a_boundary": "Gate A is a TA-14 evidentiary boundary stricter than federal requirements (certification only) and stricter than ACCA 4 QM field-practice footnotes and OEM owner-facing text",
+    "T2_complete_ice_removal": {
+      "trigger": "Frozen or materially iced evaporator -> Gate A HOLD",
+      "restoration": [
+        "Ice completely removed",
+        "Condition responsible for icing investigated and corrected or explicitly bounded",
+        "Airflow and heat-transfer prerequisites re-established",
+        "Equipment returned to the applicable valid operating envelope",
+        "Steady state re-established using the applicable OEM/authoritative method",
+        "Fresh internally coherent measurement set obtained"
+      ],
+      "carry_forward": "Pre-restoration refrigerant-diagnostic measurements shall not be carried forward as proof of the restored operating state",
+      "non_diagnostic": "Icing establishes an invalid/confounded test state, not a cause; it does not prove low charge, an airflow fault, a metering-device fault, or any other diagnosis",
+      "attribution": "TA-14 policy only; not attributed to ACCA, ASHRAE, EPA, any OEM, or any other external authority"
+    },
+    "T3_prohibited_bases": [
+      "Gauge availability",
+      "Customer or prior-technician claim",
+      "Systems are always low",
+      "Time/dispatch pressure",
+      "Refrigeration-cycle knowledge",
+      "Service history",
+      "RH alone"
+    ],
+    "T4_discrimination_rule": "I2 as defined; contradiction alone never ALLOW",
+    "T5_coherence_and_invalidation": "Co-temporal measurement set and state-change invalidation",
+    "T6_determinations": "Only ALLOW/HOLD/DENY/ESCALATE; not-indicated is DENY with reason code"
+  },
+  "external_authorities": [
+    "40 CFR 82.152 (Technician definition)",
+    "40 CFR 82.161(a) (certification requirement)",
+    "EPA Section 608 Technician Certification Requirements page (attaching/detaching hoses and gauges to measure pressure is a technician activity)",
+    "EPA Definitions of Section 608 Terms page (connecting gauges to measure pressure not considered opening; EPA guidance)",
+    "40 CFR Part 82 Subpart G Appendix W (A2L use conditions, red markings, trained technicians, UL 60335-2-40 3rd ed.)",
+    "ANSI/ACCA 5 QI-2015 sections 4.1.1, 4.1.2, 4.3.1 Notes 1-3, 4.3.2, 4.4, Table 1, footnotes 6 and 8",
+    "ANSI/RESNET/ACCA 310-2020 section 8.2.1, footnote 69, section 8.4.3.6 (principle only)",
+    "CA Title 24 2022 Reference Appendix RA3.2 (corroboration of time-based stabilization only)",
+    "Carrier 48FC 08-16 Service and Maintenance Instructions (OEM example)",
+    "Trane Installer's Guide 18-AC98D1-5-EN (OEM example)",
+    "Lennox XP16 Installation Instructions (OEM example)",
+    "ANSI/ACCA 4 QM (2013 text; current 2019 R2024 unverified; corroboration only)"
+  ],
+  "not_generalized": [
+    "RESNET 310 Table B1",
+    "RESNET 310 non-invasive method (DTD / target liquid line)",
+    "CA Title 24 RA3.2 targets, envelopes, 15-minute run, Table RA3.2-2",
+    "ACCA 5 QI informative 10/15-minute figures",
+    "ACCA 5 QI informative 55F/60F ambient and 350-450 CFM/ton",
+    "Individual OEM values (Trane 20 min, Lennox 5-10 min, Carrier 30F freeze switch)",
+    "RESNET 310 instrument accuracies and probe locations"
+  ],
+  "limitations": {
+    "no_oem_noninvasive_criterion": "HOLD if obtainable / ESCALATE if not; restricts ALLOW frequency",
+    "oem_silent_run_time": "HOLD pending applicable authority",
+    "numeric_measured_stability": "OEM-specific (C06); otherwise not relied upon",
+    "oem_silent_measurement_location": "HOLD pending applicable authority",
+    "condenser_leaving_air": "Not relied upon unless OEM criterion",
+    "refrigerant_purity": "Conditional (C05 ESCALATE); otherwise not relied upon",
+    "leak_indications": "Outside bounded scope",
+    "non_charge_questions": "Outside bounded scope -> ESCALATE",
+    "a2l": "Outside bounded scope -> ESCALATE (Annex HH, OEM A2L tools, later SNAP appendices unverified)",
+    "jurisdictional_licensing": "Conditional (P17); unconfirmed -> HOLD",
+    "hose_connection_releases": "Not relied upon; Gate A makes no regulatory-compliance claim",
+    "edition_texts": "ACCA 4 QM-2019 text, RESNET 310-2025 text, ACCA 5 QI ANSI re-designation outcome: not relied upon",
+    "ice_removal_external_authority": "None; adopted as TA-14 policy"
+  },
+  "receipt_schema": [
+    "gate_version",
+    "receipt_id",
+    "record_id",
+    "evaluated_at",
+    "determination",
+    "reason_codes",
+    "indication_path",
+    "scope",
+    "gate_b_authorized",
+    "statement",
+    "question_type",
+    "stated_proposition",
+    "stated_basis",
+    "equipment_identity",
+    "pairing",
+    "equipment_class",
+    "metering_device",
+    "metering_device_evidence",
+    "refrigerant_declared",
+    "a2l_check",
+    "technician_identity",
+    "certification_or_supervisor_ref",
+    "work_scope_ref",
+    "site_and_jurisdiction_status",
+    "instruments",
+    "oem_document_refs",
+    "measurement_set",
+    "steady_state_window",
+    "run_start",
+    "run_interrupted",
+    "ice_policy_status",
+    "ice_restoration_record",
+    "pre_gate_corrections",
+    "validity_terminating_conditions",
+    "evidence_hashes",
+    "policy_refs",
+    "authority_refs",
+    "not_generalized",
+    "limitations",
+    "prior_receipt_ids",
+    "content_hash",
+    "required_propositions",
+    "established_propositions",
+    "unresolved_propositions",
+    "next_justified_actions",
+    "ambiguity_findings",
+    "evidence_provenance",
+    "raw_static_pressures",
+    "derived_tesp",
+    "frozen_spec_sha256"
+  ],
+  "required_tests": {
+    "T01": "Empty/all-missing record -> HOLD",
+    "T02": "Any unknown field defaults to HOLD, never ALLOW",
+    "T03": "Every ALLOW has gate_b_authorized=false and scope=PRESSURE_EVIDENCE_ONLY",
+    "T04": "No path yields refrigerant-movement authority",
+    "T05": "ice_present=true -> HOLD(TA14_ICE_POLICY) even with all else passing",
+    "T06": "Post-thaw pre-restoration measurement set rejected -> HOLD",
+    "T07": "Restoration missing any of 6 steps -> HOLD",
+    "T08": "Ice policy cited in policy_refs as TA-14, never external",
+    "T09": "Ice-related receipt asserts no diagnosis",
+    "T10": "Each invalidation event turns an ALLOW-qualifying record to HOLD until new run and new set",
+    "T11": "Compressor interruption restarts minimum run",
+    "T12": "A2L refrigerant or markings -> ESCALATE",
+    "T13": "Inverter, ductless, multi-split, heating mode, non-charge question -> ESCALATE",
+    "T14": "No OEM method, obtainable -> HOLD",
+    "T15": "No OEM method, unobtainable -> ESCALATE",
+    "T16": "Missing OEM method never DENY",
+    "T17": "No OEM non-invasive criterion -> HOLD if obtainable, else ESCALATE",
+    "T18": "No OEM run time -> HOLD",
+    "T19": "Missing evidence never DENY",
+    "T20": "DENY(NOT_INDICATED) only when all prerequisites pass and evidence within OEM criterion",
+    "T21": "Prohibited basis: incomplete evidence -> HOLD; complete no-indication -> DENY",
+    "T22": "Authority expressly withheld -> DENY regardless",
+    "T23": "Ambiguous without all I2 conditions -> HOLD",
+    "T24": "I2 ALLOW requires all four I2 conditions",
+    "T25": "Uncertified, unsupervised technician -> ESCALATE",
+    "T26": "Precedence DENY>ESCALATE>HOLD>ALLOW consistent with deriveDecision",
+    "T27": "No hard-coded CFM/ton, ESP, split, superheat, subcooling, pressure, or run-time constants",
+    "T28": "Every range check resolves to an OEM reference; missing -> HOLD",
+    "T29": "Without owner-adoption flag, RESNET 310 Table B1/non-invasive method and Title 24 RA3.2 never contribute to ALLOW",
+    "T30": "Unknown metering device -> HOLD",
+    "T31": "Metering device inferred from pressure rejected",
+    "T32": "Identical inputs -> identical receipt content_hash",
+    "T33": "Every receipt contains all receipt_schema fields",
+    "T34": "Pre-Gate-A correction without re-baseline -> HOLD",
+    "T35": "Instruments not rated for refrigerant -> HOLD",
+    "T36": "Range reading whose accuracy interval straddles an OEM boundary -> HOLD, never DENY or ALLOW",
+    "T37": "Interval entirely within OEM range establishes the proposition; entirely outside fails it",
+    "T38": "Missing instrument accuracy -> HOLD",
+    "T39": "Derived value uncertainty uses worst-case linear sum of input accuracies",
+    "T40": "Ambiguous indicator in C1 -> HOLD(I2_PREDICATES_NOT_ESTABLISHABLE); no ALLOW via I2",
+    "T41": "All evidence fields populated with values that do not support the propositions -> not ALLOW",
+    "T42": "Receipt lists every unresolved required proposition with reason code and next justified action; established+unresolved = required",
+    "T43": "Engine output identical whether evidence provenance is MANUAL or INSTRUMENT for identical values, accuracies, locations and times",
+    "T44": "Ice observed at any time after the start of the qualifying window invalidates that window -> HOLD",
+    "T45": "pressure_side_entry ATTEMPTED/INSTRUMENTS_CONNECTED/PROPOSED_OUTSIDE_GATE_A -> DENY(PRESSURE_INSTRUMENT_ENTRY_NOT_AUTHORIZED)",
+    "T46": "Refrigerant-side pressure evidence keys present in the evidence -> DENY(PRESSURE_INSTRUMENT_ENTRY_NOT_AUTHORIZED), not merely HOLD",
+    "T47": "Premature-entry DENY receipt states the workflow is not terminated and the next action is returning to non-invasive evidence",
+    "T48": "Prohibited-only basis, all else satisfied, indicator WITHIN -> DENY(NOT_INDICATED_PROHIBITED_BASIS)",
+    "T49": "Prohibited-only basis, all else satisfied, indicator OUTSIDE -> HOLD(PROHIBITED_BASIS_RESTATE_REQUIRED), never ALLOW",
+    "T50": "TESP derived from raw supply and return static with summed uncertainty; raw values preserved in receipt",
+    "T51": "Unit mismatch -> HOLD; no conversion",
+    "T52": "Missing certification documentation -> HOLD; explicit NOT_CERTIFIED -> ESCALATE",
+    "T53": "Condenser condition PARTIAL_OBSTRUCTION or UNDETERMINED never satisfies P10"
+  },
+  "owner_rulings": {
+    "F1_ambiguity": {
+      "definition": "Ambiguous: the available evidence does not establish the proposition with sufficient certainty for the requested consequence.",
+      "interval_rule": "For every range comparison, form the interval [value - u, value + u] where u is the recorded instrument accuracy for that reading. WITHIN: entire interval inside the OEM acceptance range (including any OEM-defined tolerance). OUTSIDE: entire interval outside that range. Otherwise AMBIGUOUS.",
+      "derived_values": "Uncertainty of a derived value is the worst-case linear sum of the recorded accuracies of its inputs (TA-14 policy; conservative; fails closed).",
+      "missing_accuracy": "If instrument accuracy is not recorded, the comparison cannot be established -> HOLD.",
+      "applies_to": [
+        "P08",
+        "P09",
+        "P11",
+        "C03",
+        "P18/I1",
+        "D1"
+      ],
+      "effect": "Where ambiguity materially affects Gate A -> HOLD (additional or corrected evidence required). Ambiguity never yields DENY and never yields ALLOW by assumption, rule of thumb, or favorable interpretation.",
+      "i2_reconciliation": "I2 remains in the frozen specification but each I2 predicate (>=2 plausible charge hypotheses; non-invasive evidence cannot discriminate; OEM pressure method would discriminate) must itself be established by the engine from evidence. C1 defines no engine method to establish these predicates; therefore in C1 an AMBIGUOUS indicator yields HOLD(I2_PREDICATES_NOT_ESTABLISHABLE). I2 is reserved for a future version that defines that method.",
+      "attribution": "Owner ruling F1 (TA-14 policy)"
+    },
+    "F2_ice": {
+      "rule": "P06 stands as 'free of ice'. For this frozen scope an iced evaporator is not a valid charge-diagnostic operating condition. The evaporator must be free of ice before the qualifying measurement set is established.",
+      "state_change": "After defrost, correction, repair, cycling, material load/environment change, or any other state-changing event, affected prerequisites must be re-established and a new synchronized evidence set obtained.",
+      "attribution": "Owner ruling F2 (TA-14 policy); not attributed to any external authority"
+    },
+    "engine_determines": "Technician- or instrument-supplied entries are evidence, not conclusions. The engine alone determines whether each required proposition is established. Complete fields do not imply ALLOW; the values and observations must support the propositions. Categorical observations (e.g., filter, evaporator, condenser condition) are evidence evaluated by engine rules; an absent or unsupported entry leaves the proposition unestablished -> HOLD."
+  },
+  "amendments": {
+    "prior_fingerprint": "f28332524c72b8fec95bb0e8190fa56287d43d199b7864188d989b55eb42fde9",
+    "A1_premature_pressure_instrument_entry": {
+      "rule": "Before Gate A returns ALLOW, connecting pressure instruments or otherwise attempting pressure-side diagnostic entry is NOT AUTHORIZED. If pressure-instrument entry is proposed or attempted before Gate-A ALLOW: DETERMINATION DENY, REASON PRESSURE_INSTRUMENT_ENTRY_NOT_AUTHORIZED.",
+      "detection": "Evidence record field pressure_side_entry is PROPOSED_OUTSIDE_GATE_A, ATTEMPTED, or INSTRUMENTS_CONNECTED, OR the evidence contains any refrigerant-side pressure evidence key: refrigerantPressureReadings, suctionPressure, liquidPressure, dischargePressure, saturationTemperature, superheat, subcooling.",
+      "proposed_interpretation": "'Proposed' means an entry action declared for execution outside a Gate-A evaluation (PROPOSED_OUTSIDE_GATE_A). Submitting a Gate-A request is not itself premature entry.",
+      "scope_of_deny": "The DENY applies to the proposed pressure-instrument entry consequence. It does not terminate the diagnostic workflow; the technician may return to non-invasive evidence and submit a new Gate-A determination.",
+      "determination_definitions": {
+        "HOLD": "The proposed Gate-A determination cannot yet be resolved because required evidence, valid test conditions, continuity, or prerequisite state is insufficient or unresolved.",
+        "DENY": "The proposed pressure-instrument entry is not authorized by the evidence and authority currently established.",
+        "ESCALATE": "Safety, certification, equipment class, contradictory evidence, or another condition requires authority/review outside the normal Gate-A path.",
+        "ALLOW": "Pressure-instrument diagnostic entry is justified for the bounded purpose of obtaining pressure evidence only."
+      },
+      "gate_b": "Gate-A ALLOW never authorizes refrigerant addition, removal, recovery, charging, evacuation, valve movement for refrigerant transfer, or any other Gate-B refrigerant-mass intervention.",
+      "attribution": "Owner ruling (TA-14 policy)"
+    },
+    "A2_D2_P15_resolution": {
+      "ruling": "Option A",
+      "rule": "P15 is evaluated at the indication step, not as a prerequisite-stage HOLD. When all other prerequisites are satisfied and the request rests solely on a prohibited basis: indicator WITHIN OEM criterion -> DENY (D2, NOT_INDICATED_PROHIBITED_BASIS); indicator OUTSIDE -> HOLD (basis must be restated on the established evidence); indicator AMBIGUOUS -> HOLD. P15 remains mandatory for ALLOW. A missing stated basis leaves P15 unestablished -> HOLD.",
+      "corrects": "D2 previously required P15 to be both unsatisfied and satisfied (via D1); T21 was unreachable.",
+      "attribution": "Owner ruling (TA-14 policy)"
+    },
+    "A3_implementation_rulings": {
+      "oem_tables": "The engine does not invent or interpret OEM tables; the OEM reference input supplies the applicable resolved range with its document reference.",
+      "units": "No silent unit conversion; a unit mismatch leaves the proposition unestablished -> HOLD.",
+      "static_pressure": "Raw return static and supply static measurements are preserved; TESP is derived as supply static minus return static (signed, relative to the equipment surroundings) with worst-case uncertainty per F1.",
+      "certification": "Missing certification documentation -> HOLD; explicit NOT_CERTIFIED -> ESCALATE.",
+      "observations": "Ambiguous or undetermined observations never satisfy a proposition that requires CLEAR evidence."
+    }
+  }
+}
