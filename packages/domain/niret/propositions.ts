@@ -10,7 +10,7 @@ export const GATE_A_VERSION = "TA-14-NIRET-GA-C1" as const;
 
 /** SHA-256 of the canonical frozen specification (gate-a-c1.spec.json). */
 export const FROZEN_SPEC_SHA256 =
-  "484cd55baaf36f23c3150b68c79fa2fa54c66269d2862eb2bf822ca1efd6f358" as const;
+  "4f0a6c874157833f4e4aa5254605bd687f6fccd43a435132e9fd4aac4855f04a" as const;
 
 export const GATE_A_SCOPE = "PRESSURE_EVIDENCE_ONLY" as const;
 
@@ -55,6 +55,12 @@ export const NEXT_ACTION_BY_PROPOSITION: Readonly<Record<PropositionId, string>>
   P18: "ESTABLISH_INDICATION_AGAINST_OEM_CRITERION",
 };
 
+/** A7: format of the record and document SHA-256 digests in governed OEM provenance. */
+export const SHA256_HEX = /^[0-9a-f]{64}$/;
+
+/** A6: technical ALLOW with execution authority not established. */
+export const DO_NOT_CONNECT_ACTION = "DO_NOT_CONNECT_UNTIL_EXECUTION_AUTHORITY_ESTABLISHED" as const;
+
 /** Refrigerant designations listed with A2L use conditions in 40 CFR Part 82 Subpart G Appendix W. */
 export const APPENDIX_W_A2L_REFRIGERANTS = [
   "R-32", "R-452B", "R-454A", "R-454B", "R-454C", "R-457A",
@@ -86,4 +92,8 @@ export const TA14_POLICY_REFS = [
   "TA14-AMENDMENT-A1: Premature pressure-instrument entry -> DENY",
   "TA14-AMENDMENT-A2: P15 evaluated at the indication step",
   "TA14-AMENDMENT-A3: No OEM-table invention, no unit conversion, derived TESP, certification handling, CLEAR-only observations",
+  "TA14-AMENDMENT-A4: Certification must be independently VERIFIED; technician declaration never verifies itself",
+  "TA14-AMENDMENT-A5: Declarations may restrict, never grant; authority/standing and ALLOW-contributing OEM criteria require independent establishment with provenance",
+  "TA14-AMENDMENT-A6: Technical NIRET determination is separate from execution authority; technical ALLOW is never authority to execute",
+  "TA14-AMENDMENT-A7: OEM criteria come only from a VERIFIED, CURRENT, independently reviewed governed OEM reference record for the exact system; bounded criteria, no interpolation, fail closed",
 ] as const;

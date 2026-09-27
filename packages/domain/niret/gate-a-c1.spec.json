@@ -1,7 +1,7 @@
 {
   "baseline": "TA-14-NIRET-GA-C1",
   "title": "Pressure-Instrument Diagnostic Entry - Bounded Charge-Diagnostic Scope",
-  "status": "OWNER_FROZEN_AMENDED_A1_A2_A3",
+  "status": "OWNER_FROZEN_AMENDED_A1_A6",
   "governing_proposition": "Has sufficient Admissible Evidence, Applicable Authority, and Established Standing been established, NOW, to justify connecting pressure instruments to obtain refrigerant-side pressure evidence for the stated refrigerant-charge question?",
   "output_boundary": {
     "allow_scope": "PRESSURE_EVIDENCE_ONLY",
@@ -36,7 +36,7 @@
     "outside_scope_result": "Fail closed to HOLD or ESCALATE per logic"
   },
   "prerequisites": {
-    "P01": "Indoor and outdoor equipment identity and pairing recorded and matched to OEM documentation",
+    "P01": "Indoor and outdoor equipment identity (manufacturer, indoor model, outdoor model) recorded, and the pairing established by a VERIFIED governed OEM reference record naming that exact manufacturer and indoor/outdoor combination (Amendment A7); a declared pairing may restrict, never grant",
     "P02": "Declared refrigerant recorded; non-A2L (no red-marked ports/pipes/hoses, no flammable-refrigerant labels); instruments rated for that refrigerant",
     "P03": "Metering-device type established from direct/configuration evidence; never inferred from pressure",
     "P04": "OEM-prescribed minimum continuous run completed with no compressor interruption and no charge change during the run",
@@ -49,11 +49,11 @@
     "P11": "Outdoor ambient within the OEM envelope for the OEM method used",
     "P12": "Entering-evaporator dry-bulb and wet-bulb (or RH) measured at steady state",
     "P13": "Fresh internally coherent measurement set within one steady-state window, with no invalidating event since",
-    "P14": "OEM charging method identified for this model",
+    "P14": "OEM charging method identified for this model from a VERIFIED, CURRENT governed OEM reference record with complete record, document and custody provenance, independently reviewed (Amendments A5, A7); manual transcription never satisfies P14",
     "P15": "Request not based solely on a prohibited basis; evaluated at the indication step per Amendment A2",
     "P16": "No unresolved hazard",
-    "P17": "Authority to test: 608 certification or supervised apprentice; work scope includes diagnosis; site permission; jurisdictional authorization where applicable",
-    "P18": "Indication established via I1 or I2"
+    "P17": "Execution authority (A6): submitter authenticated; 608 certification (Type II or Universal, or supervised apprentice with such a supervisor) independently VERIFIED per A4; and no declared or established restriction (work scope excludes diagnosis, site permission withheld or unconfirmed, jurisdiction unconfirmed or required-not-confirmed, identity mismatch). Grants of work scope, site permission and jurisdiction are not required by Gate A; they belong to the field-authority layer.",
+    "P18": "Indication established via I1 or I2, against the single OEM-published criterion candidate whose published applicability conditions contain the measured conditions (Amendment A7); no interpolation, calculation or unrepresented lookup"
   },
   "conditional": {
     "C01": "If OEM criterion requires leaving-air (supply) readings: measure at OEM location; OEM location absent -> HOLD",
@@ -75,7 +75,7 @@
     ]
   },
   "logic": {
-    "precedence": "DENY > ESCALATE > HOLD > ALLOW; empty requirement set -> HOLD; D1/D2 evaluated only after all HOLD/ESCALATE checks pass; D3 and D4 apply regardless",
+    "precedence": "DENY > ESCALATE > HOLD > ALLOW; empty requirement set -> HOLD; D1/D2 evaluated only after all HOLD/ESCALATE checks pass; D3 and D4 apply regardless; A6: technical_determination is derived from INPUT, SCOPE, P01-P16 and P18; execution_authority from P17 and ENTRY; determination (pressure-instrument entry authorized) combines both with the same precedence; D1/D2 are evaluated after all technical HOLD/ESCALATE checks pass",
     "ALLOW": "All P01-P17 satisfied AND P18 via I1 or I2",
     "HOLD": [
       "Any P01-P17 missing, invalid, or stale",
@@ -96,7 +96,9 @@
       "Pre-Gate-A correction not re-baselined",
       "Instruments not rated or invalid",
       "Any ambiguous comparison per F1, or missing instrument accuracy",
-      "I2 predicates not establishable by the engine in C1"
+      "I2 predicates not establishable by the engine in C1",
+      "Certification declared/documented but not verified, or verification evidence incomplete or self-supplied (A4)",
+      "Submitter unauthenticated; authority element not established, incomplete, or self-established; OEM reference not verified, incomplete, or self-verified (A5)"
     ],
     "DENY": {
       "D1": "All P01-P17 satisfied and the indicator interval lies entirely WITHIN the OEM-published criterion (F1) with no I2 condition: pressure-side diagnostic entry not currently indicated/justified",
@@ -121,7 +123,9 @@
       "Metering device or identity unestablishable even from OEM documents",
       "Technician not certified and not supervised apprentice, or out of scope",
       "Hazard beyond competence",
-      "Suspected mixed/contaminated refrigerant"
+      "Suspected mixed/contaminated refrigerant",
+      "Certification verification unavailable (A4)",
+      "Authority establishment source or OEM reference verification unavailable; established identity mismatch (A5)"
     ]
   },
   "invalidation": {
@@ -282,7 +286,9 @@
     "jurisdictional_licensing": "Conditional (P17); unconfirmed -> HOLD",
     "hose_connection_releases": "Not relied upon; Gate A makes no regulatory-compliance claim",
     "edition_texts": "ACCA 4 QM-2019 text, RESNET 310-2025 text, ACCA 5 QI ANSI re-designation outcome: not relied upon",
-    "ice_removal_external_authority": "None; adopted as TA-14 policy"
+    "ice_removal_external_authority": "None; adopted as TA-14 policy",
+    "oem_interpolation": "Not performed in C1: a criterion requiring interpolation, calculation or an unrepresented lookup condition -> ESCALATE",
+    "oem_registry_empty": "The governed OEM registry contains no record until a genuine manufacturer source is supplied, reviewed and registered; until then P14 and P01 cannot be satisfied"
   },
   "receipt_schema": [
     "gate_version",
@@ -334,7 +340,14 @@
     "evidence_provenance",
     "raw_static_pressures",
     "derived_tesp",
-    "frozen_spec_sha256"
+    "frozen_spec_sha256",
+    "certification_status",
+    "submitted_by",
+    "authority_status",
+    "oem_reference_provenance",
+    "technical_determination",
+    "execution_authority",
+    "oem_criterion_selection"
   ],
   "required_tests": {
     "T01": "Empty/all-missing record -> HOLD",
@@ -389,7 +402,57 @@
     "T50": "TESP derived from raw supply and return static with summed uncertainty; raw values preserved in receipt",
     "T51": "Unit mismatch -> HOLD; no conversion",
     "T52": "Missing certification documentation -> HOLD; explicit NOT_CERTIFIED -> ESCALATE",
-    "T53": "Condenser condition PARTIAL_OBSTRUCTION or UNDETERMINED never satisfies P10"
+    "T53": "Condenser condition PARTIAL_OBSTRUCTION or UNDETERMINED never satisfies P10",
+    "T54": "Declared certification with no verification -> HOLD(CERTIFICATION_NOT_VERIFIED); never ALLOW",
+    "T55": "Documented certification with NOT_VERIFIED -> HOLD(CERTIFICATION_NOT_VERIFIED)",
+    "T56": "VERIFICATION_UNAVAILABLE -> ESCALATE(CERTIFICATION_VERIFICATION_UNAVAILABLE)",
+    "T57": "VERIFIED by a verifier equal to the technician identity -> HOLD(CERTIFICATION_SELF_VERIFICATION_REJECTED)",
+    "T58": "VERIFIED missing verifier, reference or verifiedAt -> HOLD(CERTIFICATION_VERIFICATION_EVIDENCE_INCOMPLETE)",
+    "T59": "Complete independent verification satisfies the certification element; ALLOW still requires every other proposition",
+    "T60": "Supervised apprentice requires the supervisor's certification to be verified",
+    "T61": "Receipt certification_status distinguishes DECLARED/DOCUMENTED from VERIFIED and records verifier evidence",
+    "T62": "Missing certification -> HOLD and explicit NOT_CERTIFIED -> ESCALATE are unchanged",
+    "T63": "Evaluator endpoint discards client-asserted verification and records VERIFICATION_UNAVAILABLE when no verification source is integrated",
+    "T64": "Missing server-stamped submitter -> HOLD(SUBMITTER_UNAUTHENTICATED)",
+    "T65": "Each authority element declared only -> HOLD(<ELEMENT>_NOT_ESTABLISHED); never ALLOW",
+    "T66": "Authority source unavailable -> ESCALATE(<ELEMENT>_ESTABLISHMENT_UNAVAILABLE)",
+    "T67": "Establishment by the technician or the submitting account -> HOLD(<ELEMENT>_SELF_ESTABLISHMENT_REJECTED)",
+    "T68": "Incomplete establishment -> HOLD(<ELEMENT>_ESTABLISHMENT_EVIDENCE_INCOMPLETE)",
+    "T69": "Established restrictive findings restrict (identity mismatch ESCALATE, excludes diagnosis ESCALATE, WITHHELD DENY, jurisdiction unconfirmed HOLD); declared restrictions still restrict",
+    "T70": "Manual OEM transcription (NOT_VERIFIED) -> HOLD(OEM_REFERENCE_NOT_VERIFIED); never ALLOW",
+    "T71": "OEM verification unavailable -> ESCALATE(OEM_REFERENCE_VERIFICATION_UNAVAILABLE)",
+    "T72": "OEM provenance incomplete or self-verified -> HOLD; revision optional",
+    "T73": "The same measurements reach ALLOW only when the OEM reference is independently VERIFIED with provenance",
+    "T74": "With a manual OEM reference, measurement propositions (P08-P13) are still evaluated and established as evidence",
+    "T75": "Receipt records submitted_by, per-element authority_status (declared vs established, source) and oem_reference_provenance",
+    "T76": "Evaluator endpoint stamps the authenticated submitter and discards client-asserted establishment and OEM verification",
+    "T77": "Complete technical evidence with certification not verified -> technical ALLOW, execution authority not ALLOW, determination not ALLOW",
+    "T78": "determination is ALLOW only when technical and execution authority are both ALLOW",
+    "T79": "Technical HOLD, DENY and ESCALATE remain governed by the evidence rules regardless of execution authority",
+    "T80": "Missing work scope, site permission, jurisdiction or identity grants no longer block Gate A",
+    "T81": "Declared and established restrictions still restrict execution authority",
+    "T82": "Premature pressure-instrument entry -> execution authority DENY and determination DENY; technical determination unaffected",
+    "T83": "Technical ALLOW with execution authority not established carries the do-not-connect next action",
+    "T84": "Receipt records technical_determination and execution_authority separately",
+    "T85": "A VERIFIED, CURRENT governed record with complete A7 provenance matching the exact system satisfies P01 and P14 and can reach ALLOW",
+    "T86": "VERIFIED provenance not acquired from the governed registry -> HOLD OEM_REFERENCE_NOT_FROM_GOVERNED_REGISTRY",
+    "T87": "Missing A7 record, document or custody provenance, or a malformed hash -> HOLD OEM_REFERENCE_PROVENANCE_INCOMPLETE",
+    "T88": "Reviewer equal to transcriber, technician or submitter, or review before transcription -> HOLD",
+    "T89": "SUPERSEDED or WITHDRAWN record -> HOLD",
+    "T90": "Manufacturer or indoor/outdoor combination not in the record -> P01 HOLD OEM_REFERENCE_MODEL_MISMATCH",
+    "T91": "A declared pairing never establishes P01 without a governed record; a declared false pairing restricts",
+    "T92": "Exactly one applicable candidate supplies the criterion; the indication uses that candidate's range",
+    "T93": "No applicable candidate: coverage COMPLETE -> ESCALATE, PARTIAL -> HOLD",
+    "T94": "Applicability ambiguous under F1 -> HOLD; more than one applicable candidate -> HOLD",
+    "T95": "Interpolation, calculation or unrepresented lookup condition -> ESCALATE; no value manufactured and no indication evaluated",
+    "T96": "Applicability condition measurement unusable or in a non-contract unit -> HOLD, no candidate selected",
+    "T97": "Receipt identifies the governed record, document hash, custody and selected candidate",
+    "T98": "The shipped registry is empty and pins no record; every lookup resolves to no record",
+    "T99": "Registry integrity failure (hash or manifest mismatch, invalid record) makes the registry unavailable -> P14 ESCALATE",
+    "T100": "Registration rejects non-independent review, overlapping or non-uniform candidates, unit mismatches, inverted bounds, duplicate CURRENT records, and SUPERSEDED without successor",
+    "T101": "Resolution is exact; PENDING_REVIEW, REJECTED and SUPERSEDED records never resolve as VERIFIED",
+    "T102": "A resolved record replaces all submitted OEM values and client-asserted provenance",
+    "T103": "Technician transcription yields only a non-authoritative curation request and cannot satisfy P14"
   },
   "owner_rulings": {
     "F1_ambiguity": {
@@ -444,6 +507,327 @@
       "static_pressure": "Raw return static and supply static measurements are preserved; TESP is derived as supply static minus return static (signed, relative to the equipment surroundings) with worst-case uncertainty per F1.",
       "certification": "Missing certification documentation -> HOLD; explicit NOT_CERTIFIED -> ESCALATE.",
       "observations": "Ambiguous or undetermined observations never satisfy a proposition that requires CLEAR evidence."
+    },
+    "A4_certification_verification": {
+      "prior_fingerprint": "484cd55baaf36f23c3150b68c79fa2fa54c66269d2862eb2bf822ca1efd6f358",
+      "scope": "Narrow correction to the certification element of P17 and to the receipt only. No other frozen criterion is changed.",
+      "defect_corrected": "P17 previously accepted a technician-supplied certificate number as established authority (old P17 text: 'Authority to test: 608 certification or supervised apprentice; work scope includes diagnosis; site permission; jurisdictional authorization where applicable'). Self-declaration could satisfy authority to test.",
+      "rule": "A technician-entered certification (including a certificate number) is DECLARED or DOCUMENTED evidence only and never VERIFIED. Self-declaration can never create its own verification. Gate A must not return ALLOW solely from technician declaration.",
+      "states": {
+        "assurance": [
+          "DECLARED",
+          "DOCUMENTED"
+        ],
+        "verification": [
+          "VERIFIED",
+          "NOT_VERIFIED",
+          "VERIFICATION_UNAVAILABLE"
+        ],
+        "credential": [
+          "CERTIFIED",
+          "SUPERVISED_APPRENTICE",
+          "NOT_CERTIFIED",
+          "MISSING"
+        ]
+      },
+      "evaluation": {
+        "missing_certification": "HOLD CERTIFICATION_DOCUMENTATION_MISSING (unchanged, A3)",
+        "explicit_not_certified": "ESCALATE TECHNICIAN_NOT_CERTIFIED (unchanged, A3)",
+        "type_not_applicable": "ESCALATE (unchanged)",
+        "verification_absent_or_NOT_VERIFIED": "HOLD CERTIFICATION_NOT_VERIFIED",
+        "VERIFICATION_UNAVAILABLE": "ESCALATE CERTIFICATION_VERIFICATION_UNAVAILABLE",
+        "VERIFIED_incomplete": "HOLD CERTIFICATION_VERIFICATION_EVIDENCE_INCOMPLETE (verifier, reference and verifiedAt are all required)",
+        "VERIFIED_by_technician_self": "HOLD CERTIFICATION_SELF_VERIFICATION_REJECTED (verifier equals the technician identity)",
+        "VERIFIED_complete_independent": "Certification element of P17 satisfied",
+        "apprentice": "For SUPERVISED_APPRENTICE the verification applies to the supervisor's certification"
+      },
+      "determination_mapping_rationale": "Follows the existing C1 pattern for missing OEM data: evidence that may still be obtained -> HOLD; evidence unavailable through the Gate-A path -> ESCALATE.",
+      "trust_boundary": "VERIFIED evidence must be supplied by a server-side verification source, never by the technician form. Where no verification source is integrated, the evaluator endpoint records VERIFICATION_UNAVAILABLE and discards any client-asserted verification.",
+      "receipt": "New canonical receipt field certification_status records credential status, type, reference, assurance, verification status, verifier evidence, and whether the engine established the certification element.",
+      "attribution": "Owner ruling (TA-14 policy); not attributed to EPA or any external authority"
+    },
+    "A5_authority_standing_and_oem_provenance": {
+      "prior_fingerprint": "6eee7ae91c1da70aaba5b88165c1a59cbb9887973603f2dc62b47c4eaf84e261",
+      "governing_rule": "Declaration does not verify itself. Evidence entered by the actor cannot, by itself, manufacture the Applicable Authority or Established Standing required for that actor's proposed consequence.",
+      "principle": "Declarations may restrict, never grant: a declared restriction (e.g. site permission WITHHELD, work scope excludes diagnosis) is honored; a declared grant is evidence only.",
+      "scope": "Narrow correction to P17 authority/standing elements, the P14 OEM basis, and the receipt. No measurement, observation, or other frozen criterion is changed.",
+      "old_rules": {
+        "P14": "OEM charging method identified for this model",
+        "P17": "Authority to test: 608 certification (Type II or Universal) or supervised apprentice whose supervisor holds such certification, with the certification independently VERIFIED per Amendment A4; work scope includes diagnosis; site permission; jurisdictional authorization where applicable"
+      },
+      "submitter": {
+        "rule": "The server stamps the authenticated account as submittedBy. Authentication establishes who submitted the record only; it establishes no work authorization, permission, jurisdiction, certification, or standing.",
+        "missing": "HOLD SUBMITTER_UNAUTHENTICATED"
+      },
+      "authority_elements": {
+        "elements": {
+          "identity": [
+            "MATCHES_DECLARED_TECHNICIAN",
+            "DOES_NOT_MATCH"
+          ],
+          "workScope": [
+            "INCLUDES_DIAGNOSIS",
+            "EXCLUDES_DIAGNOSIS"
+          ],
+          "sitePermission": [
+            "GRANTED",
+            "WITHHELD"
+          ],
+          "jurisdiction": [
+            "NOT_REQUIRED",
+            "CONFIRMED",
+            "REQUIRED_NOT_CONFIRMED"
+          ]
+        },
+        "states": [
+          "DECLARED/DOCUMENTED (technician entry)",
+          "ESTABLISHED",
+          "NOT_ESTABLISHED",
+          "SOURCE_UNAVAILABLE"
+        ],
+        "evaluation": {
+          "absent_or_NOT_ESTABLISHED": "HOLD <ELEMENT>_NOT_ESTABLISHED",
+          "SOURCE_UNAVAILABLE": "ESCALATE <ELEMENT>_ESTABLISHMENT_UNAVAILABLE",
+          "ESTABLISHED_incomplete": "HOLD <ELEMENT>_ESTABLISHMENT_EVIDENCE_INCOMPLETE (source, reference, establishedAt, finding required)",
+          "ESTABLISHED_by_self": "HOLD <ELEMENT>_SELF_ESTABLISHMENT_REJECTED (source equals technician identity or submitting account)",
+          "ESTABLISHED_restrictive_finding": "identity DOES_NOT_MATCH -> ESCALATE TECHNICIAN_IDENTITY_MISMATCH; workScope EXCLUDES_DIAGNOSIS -> ESCALATE WORK_SCOPE_EXCLUDES_DIAGNOSIS; sitePermission WITHHELD -> DENY AUTHORITY_TO_TEST_WITHHELD; jurisdiction REQUIRED_NOT_CONFIRMED -> HOLD JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED",
+          "ESTABLISHED_granting_finding": "element satisfied",
+          "declarations": "Existing declared checks remain and continue to restrict; they never grant on their own."
+        },
+        "codes": {
+          "identity": "TECHNICIAN_IDENTITY",
+          "workScope": "WORK_SCOPE",
+          "sitePermission": "SITE_PERMISSION",
+          "jurisdiction": "JURISDICTION"
+        }
+      },
+      "certification": "Unchanged from A4 (independently VERIFIED required).",
+      "oem_reference": {
+        "rule": "An OEM criterion that can materially contribute to ALLOW must come from a governed/verified source with provenance. Manual transcription is DECLARED / MANUAL_TRANSCRIPTION and cannot independently satisfy P14.",
+        "provenance_fields": [
+          "manufacturer",
+          "model",
+          "documentId",
+          "revision (where available)",
+          "pageRef (page/table/chart)",
+          "sourceRef (URL/file/reference)",
+          "acquisitionMethod",
+          "verification",
+          "verifiedBy",
+          "verifiedAt"
+        ],
+        "evaluation": {
+          "absent_or_NOT_VERIFIED": "HOLD OEM_REFERENCE_NOT_VERIFIED",
+          "VERIFICATION_UNAVAILABLE": "ESCALATE OEM_REFERENCE_VERIFICATION_UNAVAILABLE",
+          "VERIFIED_incomplete": "HOLD OEM_REFERENCE_PROVENANCE_INCOMPLETE",
+          "VERIFIED_by_self": "HOLD OEM_REFERENCE_SELF_VERIFICATION_REJECTED",
+          "VERIFIED_complete_independent": "OEM basis element of P14 satisfied"
+        },
+        "no_substitution": "No universal HVAC rule or invented threshold is substituted when OEM criteria cannot be established."
+      },
+      "measurements": "Technician observations and qualified measurements remain evidence and are still evaluated against the supplied reference; they need no external verification because the technician measured them.",
+      "trust_boundary": "submittedBy, authority establishment, and OEM verification are supplied server-side. Client-asserted establishment or verification is discarded. Where no source is integrated, the endpoint records SOURCE_UNAVAILABLE / VERIFICATION_UNAVAILABLE.",
+      "determination_mapping_rationale": "Same as A4 and existing C1 OEM handling: obtainable -> HOLD; unavailable through the Gate-A path -> ESCALATE.",
+      "receipt": "New canonical receipt fields submitted_by, authority_status, oem_reference_provenance.",
+      "attribution": "Owner ruling (TA-14 policy); not attributed to any external authority"
+    },
+    "A6_technical_vs_execution_authority": {
+      "prior_fingerprint": "ff8d7d3262071ae94fbe81a5ce2b77078deae4c227adb4ed452ea3e9920cea7a",
+      "defect_corrected": "Execution-authority gaps (certification verification, work scope, site permission, jurisdiction, identity) blocked evaluation of the technical indication (P15/P18) and turned every result into a generic HOLD/ESCALATE, conflating the technical NIRET question with authority to perform the test.",
+      "technical_question": "Has sufficient admissible non-invasive evidence been established to justify obtaining refrigerant pressure evidence?",
+      "partition": {
+        "technical": [
+          "INPUT",
+          "SCOPE",
+          "P01",
+          "P02",
+          "P03",
+          "P04",
+          "P05",
+          "P06",
+          "P07",
+          "P08",
+          "P09",
+          "P10",
+          "P11",
+          "P12",
+          "P13",
+          "P14",
+          "P15",
+          "P16",
+          "P18"
+        ],
+        "execution_authority": [
+          "P17",
+          "ENTRY"
+        ]
+      },
+      "determinations": {
+        "technical_determination": "Precedence over technical checks only.",
+        "execution_authority": "Precedence over P17 and ENTRY checks only.",
+        "determination": "Pressure-instrument entry authorized: the fail-closed combination of both (ALLOW only when both are ALLOW). Technical ALLOW never authorizes execution."
+      },
+      "indication": "The indication step (P15/P18, including D1/D2) is evaluated when all technical prerequisites are satisfied, regardless of execution authority. indication_path reports the technical indication path.",
+      "execution_authority_rule": {
+        "required": [
+          "Authenticated submitter (identity of record)",
+          "Certification independently VERIFIED (A4, unchanged)"
+        ],
+        "restrictions_honored": [
+          "Declared or established work scope EXCLUDES_DIAGNOSIS -> ESCALATE",
+          "Declared or established site permission WITHHELD -> DENY; declared UNCONFIRMED -> HOLD",
+          "Declared jurisdiction UNCONFIRMED or established REQUIRED_NOT_CONFIRMED -> HOLD",
+          "Established identity DOES_NOT_MATCH -> ESCALATE"
+        ],
+        "no_longer_required": [
+          "Established grants of work scope, site permission, jurisdiction and technician identity (moved to the field-authority layer)",
+          "Declared work-scope documentation, site permission, and jurisdiction when not declared at all"
+        ],
+        "principle": "Declarations may restrict, never grant (A5, unchanged). Authentication establishes only who submitted."
+      },
+      "supersedes": "A5 authority_elements requirement that identity, workScope, sitePermission and jurisdiction be ESTABLISHED; A5 restrictive findings, OEM provenance rules, and receipt fields remain in force.",
+      "unchanged": [
+        "Premature pressure-instrument entry -> DENY (A1), now reported under execution authority",
+        "All technical evidence rules, OEM provenance (A5), ice policy, ambiguity (F1), state-change rules",
+        "Gate A never authorizes refrigerant-mass intervention (Gate B)"
+      ],
+      "receipt": "New canonical receipt fields technical_determination and execution_authority; determination keeps its meaning (pressure-instrument entry authorized).",
+      "attribution": "Owner approval (TA-14 policy)"
+    },
+    "A7_governed_oem_reference_record": {
+      "prior_fingerprint": "e94ecb338b7b53d6342fd1f0c77cfe0fa0de8180214808cd701260f36d1367b5",
+      "defect_corrected": "(a) The OEM non-invasive criterion carried a single range with no applicability conditions, so a verified range published for other conditions could be relied upon; (b) P01 pairing was satisfied by a technician declaration (pairingVerifiedAgainstOem=true), a declared grant.",
+      "owner_rulings": [
+        "Bounded criteria records for C1",
+        "No interpolation in C1: a criterion requiring interpolation, calculation, a lookup condition not represented by the governed record, or information outside the bounded record fails closed; no value is manufactured",
+        "Pre-registry custody and process-based independence: records reach the registry only through owner-reviewed merge; the registry manifest pins each record's SHA-256",
+        "No invented, example, approximate, generic, assumed, remembered or technician-supplied OEM criteria are registered as authoritative values",
+        "The authoritative registry remains empty until a genuine manufacturer source is supplied"
+      ],
+      "old_rules": {
+        "P01": "Indoor and outdoor equipment identity and pairing recorded and matched to OEM documentation",
+        "P14": "OEM charging method identified for this model, and the OEM reference supplying ALLOW-contributing criteria is VERIFIED with complete provenance by an independent verifier (Amendment A5)",
+        "P18": "Indication established via I1 or I2"
+      },
+      "governed_record": {
+        "contract": "schemas/niret-oem-reference-record.schema.json",
+        "preserves": [
+          "manufacturer",
+          "model family",
+          "matched systems (exact indoor/outdoor model combinations)",
+          "equipment identity scope (configuration, compressor staging, metering, refrigerant)",
+          "document identifier, title, revision and date where available",
+          "page/table/chart reference for every criterion value",
+          "source/acquisition reference, method, actor and time",
+          "SHA-256 of the original document",
+          "exact criteria extracted",
+          "applicability conditions for each criterion candidate",
+          "transcriber identity and time",
+          "reviewer identity, review time, review method",
+          "verification state",
+          "supersession status"
+        ],
+        "verification_states": [
+          "PENDING_REVIEW",
+          "VERIFIED",
+          "REJECTED"
+        ],
+        "supersession_states": [
+          "CURRENT",
+          "SUPERSEDED",
+          "WITHDRAWN"
+        ],
+        "independence": "A VERIFIED record names a reviewer distinct from the transcriber; the review time is not before the transcription time; the reviewer is not the evaluated technician or submitting account; the record reaches the registry only through owner-reviewed merge with its SHA-256 pinned in the manifest (process-based independence, not a cryptographic signature).",
+        "registration_rejects": [
+          "schema-invalid record",
+          "record hash not matching the manifest",
+          "manifest entry without record or record without manifest entry",
+          "VERIFIED without independent review",
+          "review before transcription",
+          "min exceeding max",
+          "applicability unit not the measurement's contract unit",
+          "candidates constraining different condition sets",
+          "candidates whose applicability bands overlap",
+          "more than one CURRENT record for the same matched system",
+          "SUPERSEDED without supersededBy"
+        ],
+        "registry_integrity_failure": "Any rejected record makes the registry unavailable: OEM verification VERIFICATION_UNAVAILABLE -> P14 ESCALATE"
+      },
+      "resolution": {
+        "match": "Exact manufacturer and indoor/outdoor model combination, ignoring only case and whitespace; no pattern, prefix, family or wildcard matching",
+        "resolved": "A VERIFIED, CURRENT record replaces every OEM value supplied with the submission; client-asserted provenance is discarded",
+        "not_verified": "A PENDING_REVIEW record, no record, or manual transcription -> provenance MANUAL_TRANSCRIPTION/NOT_VERIFIED -> P14 HOLD OEM_REFERENCE_NOT_VERIFIED",
+        "curation_request": "Technician transcription may produce a curation request (non-authoritative, never VERIFIED, never an OEM record, never an engine input as verified provenance)"
+      },
+      "evaluation": {
+        "P14": {
+          "acquisition_not_governed": "HOLD OEM_REFERENCE_NOT_FROM_GOVERNED_REGISTRY",
+          "provenance_incomplete": "HOLD OEM_REFERENCE_PROVENANCE_INCOMPLETE (manufacturer, documentId, pageRef, sourceRef, recordId, recordHash and documentHash as SHA-256, matchedSystems, transcribedBy/At, verifiedBy/At, supersession)",
+          "superseded": "HOLD OEM_REFERENCE_SUPERSEDED",
+          "withdrawn": "HOLD OEM_REFERENCE_WITHDRAWN",
+          "reviewer_is_technician_or_submitter": "HOLD OEM_REFERENCE_SELF_VERIFICATION_REJECTED",
+          "reviewer_is_transcriber": "HOLD OEM_REFERENCE_REVIEW_NOT_INDEPENDENT",
+          "review_before_transcription": "HOLD OEM_REFERENCE_REVIEW_PRECEDES_TRANSCRIPTION"
+        },
+        "P01": {
+          "identity_missing_or_declared_pairing_false": "HOLD IDENTITY_OR_PAIRING_UNESTABLISHED (ESCALATE IDENTITY_UNESTABLISHABLE where not establishable)",
+          "no_verified_governed_record": "HOLD PAIRING_NOT_ESTABLISHED_BY_GOVERNED_OEM_RECORD",
+          "manufacturer_or_combination_not_in_record": "HOLD OEM_REFERENCE_MODEL_MISMATCH"
+        },
+        "P18_criterion_selection": {
+          "rule": "Each candidate's applicability conditions are compared with the qualifying measurements under F1; a candidate applies only when every condition is WITHIN. Exactly one applicable candidate supplies the criterion range.",
+          "interpolation_required": "ESCALATE OEM_CRITERION_REQUIRES_INTERPOLATION",
+          "calculation_required": "ESCALATE OEM_CRITERION_REQUIRES_CALCULATION",
+          "unrepresented_condition": "ESCALATE OEM_CRITERION_CONDITION_NOT_REPRESENTED",
+          "condition_unit_mismatch": "HOLD UNIT_MISMATCH (no conversion)",
+          "condition_measurement_unusable": "HOLD per measurement rules; not selected",
+          "more_than_one_applies": "HOLD OEM_CRITERION_CANDIDATES_CONFLICT",
+          "none_applies_some_ambiguous": "HOLD OEM_CRITERION_APPLICABILITY_AMBIGUOUS",
+          "none_applies_coverage_complete": "ESCALATE OEM_CRITERION_NOT_PUBLISHED_FOR_CONDITIONS",
+          "none_applies_coverage_partial": "HOLD OEM_CRITERION_NOT_IN_RECORD_FOR_CONDITIONS"
+        }
+      },
+      "receipt": "oem_reference_provenance adds record_id, record_hash, document_hash, document_date, matched_systems, transcribed_by, transcribed_at, supersession; new oem_criterion_selection (status, candidateId, range, interpolation_performed=false); equipment_identity adds manufacturer; pairing records the governed record that established it.",
+      "unchanged": [
+        "A6 partition: technical determination != execution authority; P01, P14 and P18 remain technical",
+        "Gate A never authorizes refrigerant-mass intervention (Gate B)",
+        "F1 ambiguity, ice policy, state-change rules, A1-A6",
+        "NIRET -> TA-14 Gate adapter remains a contract specification only"
+      ],
+      "attribution": "Owner approval (TA-14 policy)"
     }
-  }
+  },
+  "revision": "C1-R4",
+  "fingerprint_history": [
+    {
+      "revision": "C1-initial",
+      "sha256": "0f261ea12efef7a9c068187370aafdeec145cc64ac0ba80b2166a7d9c540b185",
+      "note": "Owner-approved candidate before F1/F2 rulings"
+    },
+    {
+      "revision": "C1-F1F2",
+      "sha256": "f28332524c72b8fec95bb0e8190fa56287d43d199b7864188d989b55eb42fde9",
+      "note": "F1 ambiguity and F2 ice rulings applied"
+    },
+    {
+      "revision": "C1-A1A3",
+      "sha256": "484cd55baaf36f23c3150b68c79fa2fa54c66269d2862eb2bf822ca1efd6f358",
+      "note": "A1 premature entry, A2 D2/P15, A3 implementation rulings; committed in 40320c75"
+    },
+    {
+      "revision": "C1-R1",
+      "sha256": "6eee7ae91c1da70aaba5b88165c1a59cbb9887973603f2dc62b47c4eaf84e261",
+      "note": "A4 certification verification"
+    },
+    {
+      "revision": "C1-R2",
+      "sha256": "ff8d7d3262071ae94fbe81a5ce2b77078deae4c227adb4ed452ea3e9920cea7a",
+      "note": "A5 authority/standing and OEM provenance"
+    },
+    {
+      "revision": "C1-R3",
+      "sha256": "e94ecb338b7b53d6342fd1f0c77cfe0fa0de8180214808cd701260f36d1367b5",
+      "note": "A6 technical determination vs execution authority"
+    }
+  ]
 }

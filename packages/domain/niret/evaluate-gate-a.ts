@@ -17,10 +17,14 @@ import {
   GATE_A_VERSION,
   PROHIBITED_BASES,
   REQUIRED_PROPOSITIONS,
+  SHA256_HEX,
   type PropositionId,
 } from "./propositions";
 import type {
+  AuthorityElement,
   CheckResult,
+  CriterionCandidate,
+  CriterionSelection,
   GateAEvaluation,
   GateAInput,
   IntervalFinding,
@@ -32,7 +36,7 @@ import type {
 } from "./types";
 import type { ValidationOutcome } from "./validate";
 
-const EXPECTED_UNIT: Readonly<Record<MeasurementKey, Unit>> = {
+export const EXPECTED_UNIT: Readonly<Record<MeasurementKey, Unit>> = {
   returnDryBulb: "F", returnWetBulb: "F", returnRh: "PCT_RH",
   supplyDryBulb: "F", supplyWetBulb: "F", supplyRh: "PCT_RH",
   outdoorDryBulb: "F", outdoorWetBulb: "F", outdoorRh: "PCT_RH",
@@ -49,12 +53,27 @@ const OEM_LOCATION_REQUIRED = new Set<MeasurementKey>([
 ]);
 
 const ACCEPTED_CERTIFICATIONS = new Set(["TYPE_II", "UNIVERSAL"]);
+
+/** Amendment A6: propositions that govern authority to execute the entry, not the technical question. */
+export const EXECUTION_AUTHORITY: ReadonlySet<PropositionId> = new Set<PropositionId>(["P17", "ENTRY"]);
+
+// Amendment A5/A6 authority elements: findings that restrict execution authority.
+const AUTHORITY_ELEMENTS: readonly AuthorityElement[] = ["identity", "workScope", "sitePermission", "jurisdiction"];
+const AUTHORITY_RESTRICTIONS: Readonly<Record<AuthorityElement, Readonly<Record<string, [CheckResult, string]>>>> = {
+  identity: { DOES_NOT_MATCH: ["ESCALATE", "TECHNICIAN_IDENTITY_MISMATCH"] },
+  workScope: { EXCLUDES_DIAGNOSIS: ["ESCALATE", "WORK_SCOPE_EXCLUDES_DIAGNOSIS"] },
+  sitePermission: { WITHHELD: ["DENY", "AUTHORITY_TO_TEST_WITHHELD"] },
+  jurisdiction: { REQUIRED_NOT_CONFIRMED: ["HOLD", "JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED"] },
+};
 const PROHIBITED = new Set<string>(PROHIBITED_BASES);
 
 function normalizeRefrigerant(designation: string): string {
   return designation.toUpperCase().replace(/[^A-Z0-9]/g, "");
 }
 const A2L_DESIGNATIONS = new Set(APPENDIX_W_A2L_REFRIGERANTS.map(normalizeRefrigerant));
+
+/** A7: model and manufacturer identity compare exactly, ignoring only case and whitespace. */
+const identityKey = (value: string): string => value.toUpperCase().replace(/\s+/g, "");
 
 const ms = (stamp: string): number => Date.parse(stamp);
 const iso = (value: number): string => new Date(value).toISOString();
@@ -103,7 +122,8 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   if (!validation.valid) {
     for (const field of validation.unknownFields) checks.add("INPUT", "HOLD", "INPUT_UNKNOWN_FIELD", [field]);
     for (const field of validation.invalidFields) checks.add("INPUT", "HOLD", "INPUT_INVALID", [field]);
-    return finalize(checks, findings, null, null, { effectiveRunStart: null, windowStart: null, windowEnd }, false);
+    return finalize(checks, findings, null, null, { status: "NOT_EVALUATED", candidateId: null },
+      { effectiveRunStart: null, windowStart: null, windowEnd }, false);
   }
   checks.add("INPUT", "SATISFIED", "INPUT_VALID");
   checks.settle("ENTRY", "NO_PRESSURE_SIDE_ENTRY");
@@ -135,11 +155,24 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   const identityRepairs = repairsAffecting("P01_IF_AFFECTED");
   const meteringRepairs = repairsAffecting("P03_IF_AFFECTED");
 
-  // P01 — equipment identity and pairing.
+  // P01 — equipment identity and pairing. Amendment A7: the pairing is established only by an
+  // independently verified governed OEM record that names this exact manufacturer and indoor/outdoor
+  // combination; a declared pairing may restrict (false), never grant.
   const equipment = evidence.equipment;
-  if (!equipment.indoorModel || !equipment.outdoorModel || equipment.pairingVerifiedAgainstOem !== true) {
+  const provenance = oem.provenance;
+  const governedRecord = provenance?.verification === "VERIFIED" && provenance.acquisitionMethod === "GOVERNED_LIBRARY";
+  if (!equipment.manufacturer?.trim() || !equipment.indoorModel?.trim() || !equipment.outdoorModel?.trim() || equipment.pairingVerifiedAgainstOem === false) {
     checks.add("P01", equipment.identityEstablishableFromOem === false ? "ESCALATE" : "HOLD",
       equipment.identityEstablishableFromOem === false ? "IDENTITY_UNESTABLISHABLE" : "IDENTITY_OR_PAIRING_UNESTABLISHED");
+  } else if (!governedRecord) {
+    checks.add("P01", "HOLD", "PAIRING_NOT_ESTABLISHED_BY_GOVERNED_OEM_RECORD");
+  } else if (
+    identityKey(provenance.manufacturer ?? "") !== identityKey(equipment.manufacturer) ||
+    !(provenance.matchedSystems ?? []).some((system) =>
+      identityKey(system.indoorModel) === identityKey(equipment.indoorModel as string) &&
+      identityKey(system.outdoorModel) === identityKey(equipment.outdoorModel as string))
+  ) {
+    checks.add("P01", "HOLD", "OEM_REFERENCE_MODEL_MISMATCH");
   } else if (identityRepairs.some((event) => !equipment.verifiedAt || ms(equipment.verifiedAt) < ms(event.at))) {
     checks.add("P01", "HOLD", "IDENTITY_REVERIFICATION_REQUIRED_AFTER_REPAIR");
   }
@@ -183,12 +216,38 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   else if (certification.status === "NOT_CERTIFIED") checks.add("P17", "ESCALATE", "TECHNICIAN_NOT_CERTIFIED");
   else if (certification.status === "CERTIFIED" && !ACCEPTED_CERTIFICATIONS.has(certification.type)) checks.add("P17", "ESCALATE", "CERTIFICATION_TYPE_NOT_APPLICABLE");
   else if (certification.status === "SUPERVISED_APPRENTICE" && !ACCEPTED_CERTIFICATIONS.has(certification.supervisorType)) checks.add("P17", "ESCALATE", "SUPERVISOR_CERTIFICATION_TYPE_NOT_APPLICABLE");
+  else {
+    // Amendment A4: declaration or documentation never verifies itself.
+    const verification = certification.verification;
+    if (!verification || verification.status === "NOT_VERIFIED") checks.add("P17", "HOLD", "CERTIFICATION_NOT_VERIFIED");
+    else if (verification.status === "VERIFICATION_UNAVAILABLE") checks.add("P17", "ESCALATE", "CERTIFICATION_VERIFICATION_UNAVAILABLE");
+    else if (!verification.verifier?.trim() || !verification.reference?.trim() || !verification.verifiedAt) {
+      checks.add("P17", "HOLD", "CERTIFICATION_VERIFICATION_EVIDENCE_INCOMPLETE");
+    } else if (verification.verifier.trim().toLowerCase() === evidence.technician.identity.trim().toLowerCase()) {
+      checks.add("P17", "HOLD", "CERTIFICATION_SELF_VERIFICATION_REJECTED");
+    }
+  }
+  // Amendment A6: execution authority requires an authenticated submitter and verified
+  // certification. Work scope, site permission, jurisdiction and identity grants are not
+  // required here (field-authority layer), but any declared or established restriction
+  // still restricts (A5: declarations may restrict, never grant).
   const authorization = evidence.authorization;
   if (authorization.workScopeIncludesDiagnosis === false) checks.add("P17", "ESCALATE", "WORK_SCOPE_EXCLUDES_DIAGNOSIS");
-  else if (authorization.workScopeIncludesDiagnosis !== true || !authorization.workScopeRef) checks.add("P17", "HOLD", "WORK_SCOPE_DOCUMENTATION_MISSING");
   if (authorization.sitePermission === "WITHHELD") checks.add("P17", "DENY", "AUTHORITY_TO_TEST_WITHHELD");
-  else if (authorization.sitePermission !== "GRANTED") checks.add("P17", "HOLD", "SITE_PERMISSION_UNCONFIRMED");
-  if (authorization.jurisdiction !== "NOT_REQUIRED" && authorization.jurisdiction !== "CONFIRMED") checks.add("P17", "HOLD", "JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED");
+  else if (authorization.sitePermission === "UNCONFIRMED") checks.add("P17", "HOLD", "SITE_PERMISSION_UNCONFIRMED");
+  if (authorization.jurisdiction === "UNCONFIRMED") checks.add("P17", "HOLD", "JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED");
+  const technicianId = evidence.technician.identity.trim().toLowerCase();
+  const submitterId = evidence.submittedBy?.accountId.trim().toLowerCase();
+  const isSelf = (party: string) => {
+    const normalized = party.trim().toLowerCase();
+    return normalized === technicianId || (submitterId !== undefined && normalized === submitterId);
+  };
+  if (!evidence.submittedBy) checks.add("P17", "HOLD", "SUBMITTER_UNAUTHENTICATED");
+  for (const element of AUTHORITY_ELEMENTS) {
+    const finding = evidence.authorityEstablishment?.[element]?.finding;
+    const restriction = finding ? AUTHORITY_RESTRICTIONS[element][finding] : undefined;
+    if (restriction) { const [result, reason] = restriction; checks.add("P17", result, reason); }
+  }
   checks.settle("P17", "AUTHORITY_TO_TEST_ESTABLISHED");
 
   // P14 — OEM charging method.
@@ -197,6 +256,25 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
       oem.chargingMethod.obtainable ? "OEM_CHARGING_METHOD_PENDING" : "OEM_CHARGING_METHOD_UNAVAILABLE");
   }
   if (oem.requiresUnavailableToolOrMode) checks.add("P14", "ESCALATE", "OEM_PROCEDURE_REQUIRES_UNAVAILABLE_TOOL_OR_MODE");
+  // Amendment A5: ALLOW-contributing OEM criteria need an independently VERIFIED reference with provenance.
+  // Amendment A7: only a governed OEM reference record satisfies it — transcription never does — and the
+  // record must identify itself, its document and its custody, be current, and be independently reviewed.
+  if (!provenance || provenance.verification === "NOT_VERIFIED") checks.add("P14", "HOLD", "OEM_REFERENCE_NOT_VERIFIED");
+  else if (provenance.verification === "VERIFICATION_UNAVAILABLE") checks.add("P14", "ESCALATE", "OEM_REFERENCE_VERIFICATION_UNAVAILABLE");
+  else if (provenance.acquisitionMethod !== "GOVERNED_LIBRARY") checks.add("P14", "HOLD", "OEM_REFERENCE_NOT_FROM_GOVERNED_REGISTRY");
+  else if ([provenance.manufacturer, provenance.documentId, provenance.pageRef, provenance.sourceRef, provenance.verifiedBy,
+    provenance.verifiedAt, provenance.recordId, provenance.transcribedBy, provenance.transcribedAt].some((field) => !field?.trim()) ||
+    !SHA256_HEX.test(provenance.recordHash ?? "") || !SHA256_HEX.test(provenance.documentHash ?? "") ||
+    !provenance.matchedSystems?.length || !provenance.supersession) {
+    checks.add("P14", "HOLD", "OEM_REFERENCE_PROVENANCE_INCOMPLETE");
+  } else if (provenance.supersession === "SUPERSEDED") checks.add("P14", "HOLD", "OEM_REFERENCE_SUPERSEDED");
+  else if (provenance.supersession === "WITHDRAWN") checks.add("P14", "HOLD", "OEM_REFERENCE_WITHDRAWN");
+  else if (isSelf(provenance.verifiedBy as string)) checks.add("P14", "HOLD", "OEM_REFERENCE_SELF_VERIFICATION_REJECTED");
+  else if (identityKey(provenance.verifiedBy as string) === identityKey(provenance.transcribedBy as string)) {
+    checks.add("P14", "HOLD", "OEM_REFERENCE_REVIEW_NOT_INDEPENDENT");
+  } else if (ms(provenance.verifiedAt as string) < ms(provenance.transcribedAt as string)) {
+    checks.add("P14", "HOLD", "OEM_REFERENCE_REVIEW_PRECEDES_TRANSCRIPTION");
+  }
   checks.settle("P14", "OEM_CHARGING_METHOD_IDENTIFIED");
 
   // P04 — steady state: OEM minimum run after the latest state change.
@@ -373,6 +451,8 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   // Indication inputs are part of the qualifying measurement set.
   const criterion = oem.noninvasiveCriterion;
   let indicator: { value: number; uncertainty: number; unit: Unit } | null = null;
+  let selected: CriterionCandidate | null = null;
+  let criterionSelection: CriterionSelection = { status: criterion.status === "PUBLISHED" ? "NOT_EVALUATED" : "NOT_PUBLISHED", candidateId: null };
   if (criterion.status === "PUBLISHED") {
     const derivation = criterion.derivation;
     if (derivation.kind === "SINGLE_MEASUREMENT") {
@@ -391,6 +471,65 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
         };
       }
     }
+
+    // Amendment A7: the criterion value is taken from exactly one OEM-published candidate whose
+    // applicability conditions contain the measured conditions (F1). Nothing is interpolated,
+    // calculated, or looked up outside the bounded record; anything else fails closed.
+    const lookup = criterion.lookup;
+    if (lookup.interpolationRequired) checks.add("P18", "ESCALATE", "OEM_CRITERION_REQUIRES_INTERPOLATION");
+    if (lookup.calculationRequired) checks.add("P18", "ESCALATE", "OEM_CRITERION_REQUIRES_CALCULATION");
+    if (lookup.unrepresentedConditions.length > 0) {
+      checks.add("P18", "ESCALATE", "OEM_CRITERION_CONDITION_NOT_REPRESENTED", [...lookup.unrepresentedConditions]);
+    }
+    if (lookup.interpolationRequired || lookup.calculationRequired || lookup.unrepresentedConditions.length > 0) {
+      criterionSelection = { status: "NOT_REPRESENTABLE", candidateId: null };
+    } else {
+      const conditionKeys = [...new Set(criterion.candidates.flatMap((candidate) => candidate.appliesWhen.map((condition) => condition.measurement)))];
+      const conditions = new Map(conditionKeys.map((key) => [key, use(key, "P18")] as const));
+      const unitsValid = criterion.candidates.every((candidate) => candidate.appliesWhen.every((condition) => {
+        if (condition.unit === EXPECTED_UNIT[condition.measurement]) return true;
+        checks.add("P18", "HOLD", "UNIT_MISMATCH", [`applicability:${candidate.candidateId}:${condition.measurement}`]);
+        return false;
+      }));
+      if (unitsValid && [...conditions.values()].every((measurement) => measurement !== null)) {
+        const matches: CriterionCandidate[] = [];
+        const ambiguous: CriterionCandidate[] = [];
+        for (const candidate of criterion.candidates) {
+          const classes = candidate.appliesWhen.map((condition) => {
+            const measurement = conditions.get(condition.measurement) as Measurement;
+            return { condition, measurement, classification: classifyInterval(measurement.value, measurement.accuracy as number, condition) };
+          });
+          if (classes.every((item) => item.classification === "WITHIN")) matches.push(candidate);
+          else if (!classes.some((item) => item.classification === "OUTSIDE")) ambiguous.push(candidate);
+          for (const item of classes) {
+            if (item.classification === "AMBIGUOUS" || classes.every((other) => other.classification === "WITHIN")) {
+              findings.push({
+                subject: `applicability:${candidate.candidateId}:${item.condition.measurement}`,
+                value: item.measurement.value,
+                uncertainty: item.measurement.accuracy as number,
+                range: { min: item.condition.min, max: item.condition.max, unit: item.condition.unit, ref: item.condition.ref },
+                classification: item.classification,
+              });
+            }
+          }
+        }
+        const [only, ...others] = matches;
+        if (only && others.length === 0) {
+          selected = only;
+          criterionSelection = { status: "SELECTED", candidateId: only.candidateId };
+        } else if (only) {
+          checks.add("P18", "HOLD", "OEM_CRITERION_CANDIDATES_CONFLICT", matches.map((candidate) => candidate.candidateId));
+          criterionSelection = { status: "CONFLICT", candidateId: null };
+        } else if (ambiguous.length > 0) {
+          checks.add("P18", "HOLD", "OEM_CRITERION_APPLICABILITY_AMBIGUOUS", ambiguous.map((candidate) => candidate.candidateId));
+          criterionSelection = { status: "AMBIGUOUS", candidateId: null };
+        } else {
+          checks.add("P18", criterion.coverage === "COMPLETE" ? "ESCALATE" : "HOLD",
+            criterion.coverage === "COMPLETE" ? "OEM_CRITERION_NOT_PUBLISHED_FOR_CONDITIONS" : "OEM_CRITERION_NOT_IN_RECORD_FOR_CONDITIONS");
+          criterionSelection = { status: "NONE_APPLICABLE", candidateId: null };
+        }
+      }
+    }
   }
 
   // P05 and P13 settle after every measurement has been examined.
@@ -399,7 +538,8 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   checks.settle("P13", "SYNCHRONIZED_MEASUREMENT_SET_IN_QUALIFYING_WINDOW");
 
   // P15 + P18 — indication step (Amendment A2), reached only when all else is satisfied.
-  const prerequisitesSatisfied = !checks.failing();
+  // A6: the technical indication waits on technical prerequisites only.
+  const prerequisitesSatisfied = !checks.items.some((check) => check.result !== "SATISFIED" && !EXECUTION_AUTHORITY.has(check.proposition));
   const basis = request.statedBasis;
   const prohibitedOnly = basis.length > 0 && basis.every((code) => PROHIBITED.has(code));
   if (!prerequisitesSatisfied) {
@@ -409,8 +549,8 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     checks.add("P15", "HOLD", "NOT_EVALUATED_INDICATION_UNAVAILABLE");
     checks.add("P18", criterion.obtainable ? "HOLD" : "ESCALATE",
       criterion.obtainable ? "OEM_NONINVASIVE_CRITERION_PENDING" : "INDICATION_AUTHORITY_UNAVAILABLE");
-  } else if (indicator) {
-    const classification = compare("indicator", "P18", indicator.value, indicator.uncertainty, criterion.range, indicator.unit,
+  } else if (indicator && selected) {
+    const classification = compare("indicator", "P18", indicator.value, indicator.uncertainty, selected.range, indicator.unit,
       { outside: "", ambiguous: "" });
     if (basis.length === 0) {
       checks.add("P15", "HOLD", "STATED_BASIS_MISSING");
@@ -444,7 +584,7 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     windowStart: windowStart === null ? null : iso(windowStart),
     windowEnd,
   };
-  return finalize(checks, findings, derivedTesp, indicationPath, window, runRestarted);
+  return finalize(checks, findings, derivedTesp, indicationPath, criterionSelection, window, runRestarted);
 }
 
 function finalize(
@@ -452,6 +592,7 @@ function finalize(
   findings: IntervalFinding[],
   derivedTesp: GateAEvaluation["derivedTesp"],
   indicationPath: GateAEvaluation["indicationPath"],
+  criterionSelection: CriterionSelection,
   window: GateAEvaluation["window"],
   runRestarted: boolean,
 ): GateAEvaluation {
@@ -462,12 +603,17 @@ function finalize(
     }
   }
   const determination = deriveDecision(toRequirementResults(checks.items));
+  const technicalDetermination = deriveDecision(toRequirementResults(checks.items.filter((check) => !EXECUTION_AUTHORITY.has(check.proposition))));
+  const executionAuthorityDetermination = deriveDecision(toRequirementResults(checks.items.filter((check) => EXECUTION_AUTHORITY.has(check.proposition))));
   return {
     determination,
+    technicalDetermination,
+    executionAuthorityDetermination,
     checks: checks.items,
-    indicationPath: determination === "ALLOW" ? indicationPath : null,
+    indicationPath: technicalDetermination === "ALLOW" ? indicationPath : null,
     ambiguityFindings: findings,
     derivedTesp,
+    criterionSelection,
     window,
     runRestarted,
   };

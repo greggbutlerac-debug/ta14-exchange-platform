@@ -77,10 +77,14 @@ export function validateGateAInput(raw: unknown): ValidationOutcome {
       const range = input.oem[key] as { min: number; max: number } | undefined;
       if (range && range.min > range.max) invalidFields.push(`/oem/${key}: min exceeds max`);
     }
-    const criterion = input.oem.noninvasiveCriterion as { status: string; range?: { min: number; max: number } };
-    if (criterion.status === "PUBLISHED" && criterion.range && criterion.range.min > criterion.range.max) {
-      invalidFields.push("/oem/noninvasiveCriterion/range: min exceeds max");
-    }
+    type Bounds = { min: number; max: number };
+    const criterion = input.oem.noninvasiveCriterion as { status: string; candidates?: Array<{ range: Bounds; appliesWhen: Bounds[] }> };
+    (criterion.candidates ?? []).forEach((candidate, index) => {
+      if (candidate.range.min > candidate.range.max) invalidFields.push(`/oem/noninvasiveCriterion/candidates/${index}/range: min exceeds max`);
+      candidate.appliesWhen.forEach((condition, at) => {
+        if (condition.min > condition.max) invalidFields.push(`/oem/noninvasiveCriterion/candidates/${index}/appliesWhen/${at}: min exceeds max`);
+      });
+    });
   }
 
   return {

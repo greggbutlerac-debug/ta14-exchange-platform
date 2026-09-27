@@ -55,7 +55,14 @@
     "raw_static_pressures",
     "derived_tesp",
     "frozen_spec_sha256",
-    "workflow_terminated"
+    "workflow_terminated",
+    "certification_status",
+    "submitted_by",
+    "authority_status",
+    "oem_reference_provenance",
+    "technical_determination",
+    "execution_authority",
+    "oem_criterion_selection"
   ],
   "properties": {
     "gate_version": {
@@ -217,6 +224,98 @@
     },
     "workflow_terminated": {
       "const": false
+    },
+    "certification_status": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "submitted_by": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "authority_status": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "oem_reference_provenance": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "technical_determination": {
+      "type": "object",
+      "required": [
+        "question",
+        "determination",
+        "established_propositions",
+        "unresolved_propositions",
+        "reason_codes"
+      ],
+      "properties": {
+        "determination": {
+          "enum": [
+            "ALLOW",
+            "HOLD",
+            "DENY",
+            "ESCALATE"
+          ]
+        }
+      }
+    },
+    "execution_authority": {
+      "type": "object",
+      "required": [
+        "question",
+        "determination",
+        "established_propositions",
+        "unresolved_propositions",
+        "reason_codes"
+      ],
+      "properties": {
+        "determination": {
+          "enum": [
+            "ALLOW",
+            "HOLD",
+            "DENY",
+            "ESCALATE"
+          ]
+        }
+      }
+    },
+    "determination_meaning": {
+      "type": "string"
+    },
+    "oem_criterion_selection": {
+      "type": "object",
+      "required": [
+        "status",
+        "candidateId",
+        "range",
+        "interpolation_performed"
+      ],
+      "properties": {
+        "status": {
+          "enum": [
+            "SELECTED",
+            "NONE_APPLICABLE",
+            "AMBIGUOUS",
+            "CONFLICT",
+            "NOT_REPRESENTABLE",
+            "NOT_EVALUATED",
+            "NOT_PUBLISHED"
+          ]
+        },
+        "interpolation_performed": {
+          "const": false
+        }
+      }
     }
   }
 }

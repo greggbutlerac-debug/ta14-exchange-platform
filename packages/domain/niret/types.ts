@@ -90,10 +90,62 @@ export interface IceRestorationRecord {
   completedAt: string;
 }
 
+/**
+ * Amendment A4: how the credential was supplied (assurance) is separate from
+ * whether it was independently verified. Technician entry is never VERIFIED.
+ */
+export interface CertificationVerification {
+  assurance: "DECLARED" | "DOCUMENTED";
+  status: "VERIFIED" | "NOT_VERIFIED" | "VERIFICATION_UNAVAILABLE";
+  verifier?: string;
+  reference?: string;
+  verifiedAt?: string;
+}
+
 export type CertificationEvidence =
-  | { status: "CERTIFIED"; type: "TYPE_I" | "TYPE_II" | "TYPE_III" | "UNIVERSAL"; certificateRef: string }
-  | { status: "SUPERVISED_APPRENTICE"; supervisorCertificateRef: string; supervisorType: "TYPE_I" | "TYPE_II" | "TYPE_III" | "UNIVERSAL" }
+  | { status: "CERTIFIED"; type: "TYPE_I" | "TYPE_II" | "TYPE_III" | "UNIVERSAL"; certificateRef: string; verification?: CertificationVerification }
+  | { status: "SUPERVISED_APPRENTICE"; supervisorCertificateRef: string; supervisorType: "TYPE_I" | "TYPE_II" | "TYPE_III" | "UNIVERSAL"; verification?: CertificationVerification }
   | { status: "NOT_CERTIFIED" };
+
+/** Amendment A5: an authority/standing element established by an independent, server-side source. */
+export interface AuthorityEstablishment {
+  status: "ESTABLISHED" | "NOT_ESTABLISHED" | "SOURCE_UNAVAILABLE";
+  finding?: string;
+  source?: string;
+  reference?: string;
+  establishedAt?: string;
+}
+
+export type AuthorityElement = "identity" | "workScope" | "sitePermission" | "jurisdiction";
+
+/** Amendment A5: provenance of the OEM reference supplying ALLOW-contributing criteria. */
+export interface OemProvenance {
+  acquisitionMethod: "GOVERNED_LIBRARY" | "MANUAL_TRANSCRIPTION";
+  verification: "VERIFIED" | "NOT_VERIFIED" | "VERIFICATION_UNAVAILABLE";
+  manufacturer?: string;
+  model?: string;
+  documentId?: string;
+  revision?: string;
+  pageRef?: string;
+  sourceRef?: string;
+  verifiedBy?: string;
+  verifiedAt?: string;
+  /** Amendment A7: governed OEM reference record identity and custody. */
+  recordId?: string;
+  recordHash?: string;
+  documentHash?: string;
+  documentDate?: string;
+  matchedSystems?: MatchedSystem[];
+  transcribedBy?: string;
+  transcribedAt?: string;
+  supersession?: "CURRENT" | "SUPERSEDED" | "WITHDRAWN";
+}
+
+/** Amendment A7: an indoor/outdoor combination the OEM document explicitly covers. */
+export interface MatchedSystem {
+  indoorModel: string;
+  outdoorModel: string;
+}
 
 export type AirflowMethod =
   | "OEM_SPECIFIED_METHOD" | "OEM_CFM_ESP_TABLE" | "DUCT_TRAVERSE" | "FLOW_GRID"
@@ -104,7 +156,13 @@ export type PressureSideEntry = "NOT_PERFORMED" | "PROPOSED_OUTSIDE_GATE_A" | "A
 export interface EvidenceRecord {
   recordId: string;
   pressureSideEntry: PressureSideEntry;
+  /** Stamped server-side from the authenticated session (A5). */
+  submittedBy?: { accountId: string; method: "AUTHENTICATED_SESSION" };
+  /** Supplied server-side by independent sources only (A5). */
+  authorityEstablishment?: Partial<Record<AuthorityElement, AuthorityEstablishment>>;
   equipment: {
+    /** Nameplate manufacturer (A7: matched exactly against the governed OEM record). */
+    manufacturer?: string;
     indoorModel?: string;
     outdoorModel?: string;
     pairingVerifiedAgainstOem?: boolean;
@@ -189,6 +247,7 @@ export type NoninvasiveDerivation =
 
 export interface OemReference {
   documentRefs: string[];
+  provenance?: OemProvenance;
   chargingMethod: { status: "IDENTIFIED"; ref: string } | { status: "NOT_OBTAINED"; obtainable: boolean };
   requiresUnavailableToolOrMode: boolean;
   airflowRange?: OemRange;
@@ -200,8 +259,36 @@ export interface OemReference {
   permitsEcmWithTableMethod?: boolean;
   measurementLocations: Partial<Record<MeasurementKey, string>>;
   noninvasiveCriterion:
-    | { status: "PUBLISHED"; derivation: NoninvasiveDerivation; range: OemRange }
+    | {
+        status: "PUBLISHED";
+        derivation: NoninvasiveDerivation;
+        /** A7: COMPLETE when the candidates cover every condition the OEM publishes a criterion for. */
+        coverage: "COMPLETE" | "PARTIAL";
+        /** A7: anything the bounded record cannot represent fails closed (no interpolation in C1). */
+        lookup: { interpolationRequired: boolean; calculationRequired: boolean; unrepresentedConditions: string[] };
+        candidates: CriterionCandidate[];
+      }
     | { status: "NOT_OBTAINED"; obtainable: boolean };
+}
+
+/** Amendment A7: one published criterion value and the OEM-published conditions under which it applies. */
+export interface CriterionCandidate {
+  candidateId: string;
+  range: OemRange;
+  appliesWhen: ApplicabilityCondition[];
+}
+
+export interface ApplicabilityCondition {
+  measurement: MeasurementKey;
+  min: number;
+  max: number;
+  unit: Unit;
+  ref: string;
+}
+
+export interface CriterionSelection {
+  status: "SELECTED" | "NONE_APPLICABLE" | "AMBIGUOUS" | "CONFLICT" | "NOT_REPRESENTABLE" | "NOT_EVALUATED" | "NOT_PUBLISHED";
+  candidateId: string | null;
 }
 
 export interface GateAInput {
@@ -229,11 +316,18 @@ export interface IntervalFinding {
 }
 
 export interface GateAEvaluation {
+  /** Pressure-instrument entry authorized: both parts must be ALLOW (A6). */
   determination: Determination;
+  /** A6: the technical NIRET question only. */
+  technicalDetermination: Determination;
+  /** A6: authority to execute the pressure-instrument entry (P17, ENTRY). */
+  executionAuthorityDetermination: Determination;
   checks: PropositionCheck[];
   indicationPath: "I1" | null;
   ambiguityFindings: IntervalFinding[];
   derivedTesp: { value: number; uncertainty: number; unit: Unit } | null;
+  /** A7: which OEM criterion candidate (if any) the indication was evaluated against. */
+  criterionSelection: CriterionSelection;
   window: { effectiveRunStart: string | null; windowStart: string | null; windowEnd: string };
   runRestarted: boolean;
 }

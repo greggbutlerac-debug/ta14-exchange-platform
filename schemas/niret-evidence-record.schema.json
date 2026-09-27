@@ -29,11 +29,31 @@
       "properties": {
         "recordId": { "type": "string", "minLength": 1 },
         "pressureSideEntry": { "enum": ["NOT_PERFORMED", "PROPOSED_OUTSIDE_GATE_A", "ATTEMPTED", "INSTRUMENTS_CONNECTED"] },
+        "submittedBy": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["accountId", "method"],
+          "properties": {
+            "accountId": { "type": "string", "minLength": 1 },
+            "method": { "const": "AUTHENTICATED_SESSION" }
+          }
+        },
+        "authorityEstablishment": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "identity": { "$ref": "#/$defs/authorityEstablishment" },
+            "workScope": { "$ref": "#/$defs/authorityEstablishment" },
+            "sitePermission": { "$ref": "#/$defs/authorityEstablishment" },
+            "jurisdiction": { "$ref": "#/$defs/authorityEstablishment" }
+          }
+        },
         "equipment": {
           "type": "object",
           "additionalProperties": false,
           "required": ["configuration", "compressorStaging"],
           "properties": {
+            "manufacturer": { "type": "string" },
             "indoorModel": { "type": "string" },
             "outdoorModel": { "type": "string" },
             "pairingVerifiedAgainstOem": { "type": "boolean" },
@@ -81,7 +101,8 @@
                   "properties": {
                     "status": { "const": "CERTIFIED" },
                     "type": { "$ref": "#/$defs/certType" },
-                    "certificateRef": { "type": "string", "minLength": 1 }
+                    "certificateRef": { "type": "string", "minLength": 1 },
+                    "verification": { "$ref": "#/$defs/certificationVerification" }
                   }
                 },
                 {
@@ -90,7 +111,8 @@
                   "properties": {
                     "status": { "const": "SUPERVISED_APPRENTICE" },
                     "supervisorCertificateRef": { "type": "string", "minLength": 1 },
-                    "supervisorType": { "$ref": "#/$defs/certType" }
+                    "supervisorType": { "$ref": "#/$defs/certType" },
+                    "verification": { "$ref": "#/$defs/certificationVerification" }
                   }
                 },
                 {
@@ -262,6 +284,37 @@
       "required": ["documentRefs", "chargingMethod", "requiresUnavailableToolOrMode", "measurementLocations", "noninvasiveCriterion"],
       "properties": {
         "documentRefs": { "type": "array", "items": { "type": "string" } },
+        "provenance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["acquisitionMethod", "verification"],
+          "properties": {
+            "acquisitionMethod": { "enum": ["GOVERNED_LIBRARY", "MANUAL_TRANSCRIPTION"] },
+            "verification": { "enum": ["VERIFIED", "NOT_VERIFIED", "VERIFICATION_UNAVAILABLE"] },
+            "manufacturer": { "type": "string" },
+            "model": { "type": "string" },
+            "documentId": { "type": "string" },
+            "revision": { "type": "string" },
+            "pageRef": { "type": "string" },
+            "sourceRef": { "type": "string" },
+            "verifiedBy": { "type": "string" },
+            "verifiedAt": { "$ref": "#/$defs/timestamp" },
+            "recordId": { "type": "string" },
+            "recordHash": { "type": "string" },
+            "documentHash": { "type": "string" },
+            "documentDate": { "type": "string" },
+            "matchedSystems": {
+              "type": "array",
+              "items": {
+                "type": "object", "additionalProperties": false, "required": ["indoorModel", "outdoorModel"],
+                "properties": { "indoorModel": { "type": "string", "minLength": 1 }, "outdoorModel": { "type": "string", "minLength": 1 } }
+              }
+            },
+            "transcribedBy": { "type": "string" },
+            "transcribedAt": { "$ref": "#/$defs/timestamp" },
+            "supersession": { "enum": ["CURRENT", "SUPERSEDED", "WITHDRAWN"] }
+          }
+        },
         "chargingMethod": {
           "oneOf": [
             { "type": "object", "additionalProperties": false, "required": ["status", "ref"], "properties": { "status": { "const": "IDENTIFIED" }, "ref": { "type": "string", "minLength": 1 } } },
@@ -295,7 +348,7 @@
         "noninvasiveCriterion": {
           "oneOf": [
             {
-              "type": "object", "additionalProperties": false, "required": ["status", "derivation", "range"],
+              "type": "object", "additionalProperties": false, "required": ["status", "derivation", "coverage", "lookup", "candidates"],
               "properties": {
                 "status": { "const": "PUBLISHED" },
                 "derivation": {
@@ -304,7 +357,39 @@
                     { "type": "object", "additionalProperties": false, "required": ["kind", "measurement"], "properties": { "kind": { "const": "SINGLE_MEASUREMENT" }, "measurement": { "$ref": "#/$defs/measurementKey" } } }
                   ]
                 },
-                "range": { "$ref": "#/$defs/oemRange" }
+                "coverage": { "enum": ["COMPLETE", "PARTIAL"] },
+                "lookup": {
+                  "type": "object", "additionalProperties": false,
+                  "required": ["interpolationRequired", "calculationRequired", "unrepresentedConditions"],
+                  "properties": {
+                    "interpolationRequired": { "type": "boolean" },
+                    "calculationRequired": { "type": "boolean" },
+                    "unrepresentedConditions": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+                  }
+                },
+                "candidates": {
+                  "type": "array", "minItems": 1,
+                  "items": {
+                    "type": "object", "additionalProperties": false, "required": ["candidateId", "range", "appliesWhen"],
+                    "properties": {
+                      "candidateId": { "type": "string", "minLength": 1 },
+                      "range": { "$ref": "#/$defs/oemRange" },
+                      "appliesWhen": {
+                        "type": "array",
+                        "items": {
+                          "type": "object", "additionalProperties": false, "required": ["measurement", "min", "max", "unit", "ref"],
+                          "properties": {
+                            "measurement": { "$ref": "#/$defs/measurementKey" },
+                            "min": { "type": "number" },
+                            "max": { "type": "number" },
+                            "unit": { "$ref": "#/$defs/unit" },
+                            "ref": { "type": "string", "minLength": 1 }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
               }
             },
             { "type": "object", "additionalProperties": false, "required": ["status", "obtainable"], "properties": { "status": { "const": "NOT_OBTAINED" }, "obtainable": { "type": "boolean" } } }
@@ -317,6 +402,30 @@
     "timestamp": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2})$" },
     "unit": { "enum": ["F", "PCT_RH", "CFM", "IN_WC", "V", "A"] },
     "certType": { "enum": ["TYPE_I", "TYPE_II", "TYPE_III", "UNIVERSAL"] },
+    "authorityEstablishment": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status"],
+      "properties": {
+        "status": { "enum": ["ESTABLISHED", "NOT_ESTABLISHED", "SOURCE_UNAVAILABLE"] },
+        "finding": { "enum": ["MATCHES_DECLARED_TECHNICIAN", "DOES_NOT_MATCH", "INCLUDES_DIAGNOSIS", "EXCLUDES_DIAGNOSIS", "GRANTED", "WITHHELD", "NOT_REQUIRED", "CONFIRMED", "REQUIRED_NOT_CONFIRMED"] },
+        "source": { "type": "string" },
+        "reference": { "type": "string" },
+        "establishedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
+    "certificationVerification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["assurance", "status"],
+      "properties": {
+        "assurance": { "enum": ["DECLARED", "DOCUMENTED"] },
+        "status": { "enum": ["VERIFIED", "NOT_VERIFIED", "VERIFICATION_UNAVAILABLE"] },
+        "verifier": { "type": "string" },
+        "reference": { "type": "string" },
+        "verifiedAt": { "$ref": "#/$defs/timestamp" }
+      }
+    },
     "measurementKey": { "enum": ["returnDryBulb", "returnWetBulb", "returnRh", "supplyDryBulb", "supplyWetBulb", "supplyRh", "outdoorDryBulb", "outdoorWetBulb", "outdoorRh", "airflow", "returnStatic", "supplyStatic", "suctionLineTemp", "liquidLineTemp", "supplyVoltage", "compressorCurrent", "blowerCurrent"] },
     "measurement": {
       "type": "object",

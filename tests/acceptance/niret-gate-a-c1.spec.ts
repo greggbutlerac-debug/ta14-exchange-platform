@@ -18,6 +18,39 @@ import receiptSchema from "../../schemas/niret-gate-a-receipt.schema.json";
 const validateReceipt = new Ajv2020({ allErrors: true, strict: false }).compile(receiptSchema);
 const T = (hhmm: string) => `2026-09-27T${hhmm}:00Z`;
 
+/** Independent verification evidence (test double for a server-side verification source). */
+const VERIFIED = () => ({ assurance: "DECLARED" as const, status: "VERIFIED" as const, verifier: "CERT-VERIFIER-SVC", reference: "VR-0001", verifiedAt: T("10:10") });
+
+/** Independent, server-side authority establishment (test double for A5 sources). */
+const ESTABLISHED = (finding: string) => ({ status: "ESTABLISHED" as const, finding, source: "DISPATCH-AUTHORITY-SVC", reference: `AUTH-${finding}`, establishedAt: T("09:45") });
+const ALL_ESTABLISHED = () => ({
+  identity: ESTABLISHED("MATCHES_DECLARED_TECHNICIAN"),
+  workScope: ESTABLISHED("INCLUDES_DIAGNOSIS"),
+  sitePermission: ESTABLISHED("GRANTED"),
+  jurisdiction: ESTABLISHED("NOT_REQUIRED"),
+});
+/**
+ * Provenance of a HYPOTHETICAL governed OEM reference record (A7 test double).
+ * "ExampleCo", its models, document and hashes are synthetic: this is not a
+ * real-world OEM record and is never registered in the governed registry.
+ */
+const VERIFIED_OEM = () => ({
+  acquisitionMethod: "GOVERNED_LIBRARY" as const, verification: "VERIFIED" as const,
+  manufacturer: "ExampleCo", model: "CU-200", documentId: "IOM-CU200", revision: "Rev A", pageRef: "Table 7",
+  sourceRef: "oem-library://ExampleCo/IOM-CU200/RevA", verifiedBy: "OEM-LIBRARY-SVC", verifiedAt: T("09:40"),
+  recordId: "NIRET-OEM-SYNTHETIC-TEST-1", recordHash: sha256Canonical("SYNTHETIC-TEST-RECORD"),
+  documentHash: sha256Canonical("SYNTHETIC-TEST-DOCUMENT"), documentDate: "2026-01",
+  matchedSystems: [{ indoorModel: "AH-100", outdoorModel: "CU-200" }],
+  transcribedBy: "CURATOR-TEST-1", transcribedAt: T("09:20"), supersession: "CURRENT" as const,
+});
+/** A7 criterion shape: one condition-independent synthetic candidate. */
+const CRITERION = () => ({
+  status: "PUBLISHED" as const, derivation: { kind: "RETURN_MINUS_SUPPLY_DRY_BULB" as const },
+  coverage: "PARTIAL" as const,
+  lookup: { interpolationRequired: false, calculationRequired: false, unrepresentedConditions: [] as string[] },
+  candidates: [{ candidateId: "TD-1", range: { min: 16, max: 21, unit: "F" as const, ref: "OEM-IOM-CU200:td" }, appliesWhen: [] as Array<{ measurement: "outdoorDryBulb" | "returnWetBulb"; min: number; max: number; unit: "F"; ref: string }> }],
+});
+
 function m(value: number, unit: Measurement["unit"], accuracy: number | undefined, location: string, instrumentId: string, at = "10:25"): Measurement {
   const measurement: Measurement = { value, unit, measuredAt: T(at), location, instrumentId, provenance: "MANUAL" };
   if (accuracy !== undefined) measurement.accuracy = accuracy;
@@ -33,11 +66,13 @@ function baseline(): GateAInput {
     },
     evidence: {
       recordId: "REC-1", pressureSideEntry: "NOT_PERFORMED",
-      equipment: { indoorModel: "AH-100", outdoorModel: "CU-200", pairingVerifiedAgainstOem: true, configuration: "DUCTED_SPLIT", compressorStaging: "SINGLE_STAGE", verifiedAt: T("09:50") },
+      submittedBy: { accountId: "account-uuid-1", method: "AUTHENTICATED_SESSION" },
+      authorityEstablishment: ALL_ESTABLISHED(),
+      equipment: { manufacturer: "ExampleCo", indoorModel: "AH-100", outdoorModel: "CU-200", pairingVerifiedAgainstOem: true, configuration: "DUCTED_SPLIT", compressorStaging: "SINGLE_STAGE", verifiedAt: T("09:50") },
       mode: "COOLING",
       metering: { type: "TXV", evidenceBasis: "DIRECT_OBSERVATION", verifiedAt: T("09:55") },
       refrigerant: { declared: "R-410A", safetyClass: "A1", a2lMarkingsObserved: false, flammableRefrigerantLabelsObserved: false, integritySuspect: false },
-      technician: { identity: "TECH-1", certification: { status: "CERTIFIED", type: "UNIVERSAL", certificateRef: "EPA608-0001" } },
+      technician: { identity: "TECH-1", certification: { status: "CERTIFIED", type: "UNIVERSAL", certificateRef: "EPA608-0001", verification: VERIFIED() } },
       authorization: { workScopeRef: "WO-1", workScopeIncludesDiagnosis: true, sitePermission: "GRANTED", jurisdiction: "NOT_REQUIRED" },
       safety: { hazard: "NONE_IDENTIFIED" },
       instruments: ["THERMO-1", "MANO-1", "FLOW-1", "VOLT-1"].map((instrumentId) => ({ instrumentId, calibrationValid: true, setupVerified: true })),
@@ -60,6 +95,7 @@ function baseline(): GateAInput {
     },
     oem: {
       documentRefs: ["OEM-IOM-CU200"],
+      provenance: VERIFIED_OEM(),
       chargingMethod: { status: "IDENTIFIED", ref: "OEM-IOM-CU200:charging" },
       requiresUnavailableToolOrMode: false,
       airflowRange: { min: 1050, max: 1300, unit: "CFM", ref: "OEM-IOM-CU200:airflow" },
@@ -70,10 +106,7 @@ function baseline(): GateAInput {
         returnDryBulb: "RETURN_PLENUM", returnWetBulb: "RETURN_PLENUM", supplyDryBulb: "SUPPLY_PLENUM",
         supplyWetBulb: "SUPPLY_PLENUM", outdoorDryBulb: "CONDENSER_INLET", returnStatic: "RETURN_PORT", supplyStatic: "SUPPLY_PORT",
       },
-      noninvasiveCriterion: {
-        status: "PUBLISHED", derivation: { kind: "RETURN_MINUS_SUPPLY_DRY_BULB" },
-        range: { min: 16, max: 21, unit: "F", ref: "OEM-IOM-CU200:td" },
-      },
+      noninvasiveCriterion: CRITERION(),
     },
   };
 }
@@ -95,7 +128,7 @@ function run(mutate: (input: Mutable) => void = () => {}) {
 
 describe("TA-14-NIRET-GA-C1 freeze guard", () => {
   it("frozen specification matches the approved fingerprint", () => {
-    expect(FROZEN_SPEC_SHA256).toBe("484cd55baaf36f23c3150b68c79fa2fa54c66269d2862eb2bf822ca1efd6f358");
+    expect(FROZEN_SPEC_SHA256).toBe("4f0a6c874157833f4e4aa5254605bd687f6fccd43a435132e9fd4aac4855f04a");
     expect(frozenSpecSha256()).toBe(FROZEN_SPEC_SHA256);
     expect(sha256Canonical(spec)).toBe(FROZEN_SPEC_SHA256);
   });
@@ -109,6 +142,21 @@ describe("TA-14-NIRET-GA-C1 freeze guard", () => {
   it("the frozen spec records the A1/A2/A3 amendments and the prior fingerprint", () => {
     expect(spec.amendments.prior_fingerprint).toBe("f28332524c72b8fec95bb0e8190fa56287d43d199b7864188d989b55eb42fde9");
     expect(spec.amendments.A2_D2_P15_resolution.ruling).toBe("Option A");
+  });
+  it("revision history preserves every prior fingerprint (A4 is auditable, not a silent replacement)", () => {
+    expect(spec.revision).toBe("C1-R4");
+    expect(spec.fingerprint_history.map((entry) => entry.sha256)).toEqual([
+      "0f261ea12efef7a9c068187370aafdeec145cc64ac0ba80b2166a7d9c540b185",
+      "f28332524c72b8fec95bb0e8190fa56287d43d199b7864188d989b55eb42fde9",
+      "484cd55baaf36f23c3150b68c79fa2fa54c66269d2862eb2bf822ca1efd6f358",
+      "6eee7ae91c1da70aaba5b88165c1a59cbb9887973603f2dc62b47c4eaf84e261",
+      "ff8d7d3262071ae94fbe81a5ce2b77078deae4c227adb4ed452ea3e9920cea7a",
+      "e94ecb338b7b53d6342fd1f0c77cfe0fa0de8180214808cd701260f36d1367b5",
+    ]);
+    expect(spec.amendments.A7_governed_oem_reference_record.prior_fingerprint).toBe("e94ecb338b7b53d6342fd1f0c77cfe0fa0de8180214808cd701260f36d1367b5");
+    expect(spec.amendments.A6_technical_vs_execution_authority.prior_fingerprint).toBe("ff8d7d3262071ae94fbe81a5ce2b77078deae4c227adb4ed452ea3e9920cea7a");
+    expect(spec.amendments.A5_authority_standing_and_oem_provenance.prior_fingerprint).toBe("6eee7ae91c1da70aaba5b88165c1a59cbb9887973603f2dc62b47c4eaf84e261");
+    expect(spec.amendments.A4_certification_verification.prior_fingerprint).toBe("484cd55baaf36f23c3150b68c79fa2fa54c66269d2862eb2bf822ca1efd6f358");
   });
 });
 
@@ -127,7 +175,7 @@ describe("ALLOW path", () => {
     expect(JSON.stringify(receipt)).not.toMatch(/"gate_b_authorized":true/);
   });
   it("supervised apprentice with a Type II/Universal supervisor can reach ALLOW", () => {
-    const { evaluation } = run((i) => { i.evidence.technician.certification = { status: "SUPERVISED_APPRENTICE", supervisorCertificateRef: "EPA608-0002", supervisorType: "TYPE_II" }; });
+    const { evaluation } = run((i) => { i.evidence.technician.certification = { status: "SUPERVISED_APPRENTICE", supervisorCertificateRef: "EPA608-0002", supervisorType: "TYPE_II", verification: VERIFIED() }; });
     expect(evaluation.determination).toBe("ALLOW");
   });
 });
@@ -487,5 +535,390 @@ describe("Determinism, precedence, decoupling (T26, T27, T29, T32, T43)", () => 
     const source = readFileSync(new URL("../../packages/domain/niret/evaluate-gate-a.ts", import.meta.url), "utf8");
     expect(source).not.toMatch(/Table B1|RA3\.2|RESNET|Title 24/i);
     expect(spec.not_generalized).toEqual(expect.arrayContaining(["RESNET 310 Table B1"]));
+  });
+});
+
+describe("Amendment A4 — certification must be independently verified (T54-T63)", () => {
+  type Cert = NonNullable<GateAInput["evidence"]["technician"]["certification"]>;
+  const withCert = (certification: Cert) => run((i) => { i.evidence.technician.certification = certification; });
+  const certified = (verification?: Record<string, unknown>) =>
+    ({ status: "CERTIFIED", type: "UNIVERSAL", certificateRef: "EPA608-0001", ...(verification ? { verification } : {}) }) as Cert;
+
+  it("T54 declared certificate number with no verification -> HOLD(CERTIFICATION_NOT_VERIFIED), never ALLOW", () => {
+    const { evaluation, reasons, receipt } = withCert(certified());
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toContain("CERTIFICATION_NOT_VERIFIED");
+    // A6: only execution authority (P17) is unresolved; the technical question is answered.
+    expect((receipt.unresolved_propositions as Array<{ proposition: string }>).map((u) => u.proposition)).toEqual(["P17"]);
+    expect(evaluation.technicalDetermination).toBe("ALLOW");
+  });
+  it("T55 documented but NOT_VERIFIED -> HOLD(CERTIFICATION_NOT_VERIFIED)", () => {
+    const { evaluation, reasons } = withCert(certified({ assurance: "DOCUMENTED", status: "NOT_VERIFIED" }));
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toContain("CERTIFICATION_NOT_VERIFIED");
+  });
+  it("T56 VERIFICATION_UNAVAILABLE -> ESCALATE(CERTIFICATION_VERIFICATION_UNAVAILABLE)", () => {
+    const { evaluation, reasons } = withCert(certified({ assurance: "DECLARED", status: "VERIFICATION_UNAVAILABLE" }));
+    expect(evaluation.determination).toBe("ESCALATE");
+    expect(reasons).toContain("CERTIFICATION_VERIFICATION_UNAVAILABLE");
+  });
+  it("T57 self-verification by the technician -> HOLD(CERTIFICATION_SELF_VERIFICATION_REJECTED)", () => {
+    const { evaluation, reasons } = withCert(certified({ ...VERIFIED(), verifier: " tech-1 " }));
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toContain("CERTIFICATION_SELF_VERIFICATION_REJECTED");
+  });
+  it.each(["verifier", "reference", "verifiedAt"])("T58 VERIFIED without %s -> HOLD(CERTIFICATION_VERIFICATION_EVIDENCE_INCOMPLETE)", (field) => {
+    const verification: Record<string, unknown> = VERIFIED();
+    delete verification[field];
+    const { evaluation, reasons } = withCert(certified(verification));
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toContain("CERTIFICATION_VERIFICATION_EVIDENCE_INCOMPLETE");
+  });
+  it("T59 complete independent verification satisfies the certification element; ALLOW still needs everything else", () => {
+    expect(withCert(certified(VERIFIED())).evaluation.determination).toBe("ALLOW");
+    const incomplete = run((i) => { delete i.evidence.measurements.airflow; });
+    expect(incomplete.evaluation.determination).toBe("HOLD");
+    expect((incomplete.receipt.certification_status as { established: boolean }).established).toBe(true);
+  });
+  it("T60 supervised apprentice requires the supervisor's certification to be verified", () => {
+    const unverified = withCert({ status: "SUPERVISED_APPRENTICE", supervisorCertificateRef: "EPA608-0002", supervisorType: "TYPE_II" });
+    expect(unverified.evaluation.determination).toBe("HOLD");
+    expect(unverified.reasons).toContain("CERTIFICATION_NOT_VERIFIED");
+    expect((unverified.receipt.certification_status as { applies_to: string }).applies_to).toBe("SUPERVISOR");
+  });
+  it("T61 receipt certification_status distinguishes declared from verified and records verifier evidence", () => {
+    const declared = withCert(certified()).receipt.certification_status as Record<string, unknown>;
+    expect(declared).toMatchObject({ credential: "CERTIFIED", assurance: "DECLARED", verification_status: "NOT_VERIFIED", verifier: null, established: false });
+    const verified = run().receipt.certification_status as Record<string, unknown>;
+    expect(verified).toMatchObject({ assurance: "DECLARED", verification_status: "VERIFIED", verifier: "CERT-VERIFIER-SVC", verification_reference: "VR-0001", established: true, reason_codes: [] });
+  });
+  it("T62 missing certification -> HOLD and explicit NOT_CERTIFIED -> ESCALATE are unchanged", () => {
+    const missing = run((i) => { delete i.evidence.technician.certification; });
+    expect(missing.evaluation.determination).toBe("HOLD");
+    expect((missing.receipt.certification_status as { credential: string }).credential).toBe("MISSING");
+    const notCertified = withCert({ status: "NOT_CERTIFIED" });
+    expect(notCertified.evaluation.determination).toBe("ESCALATE");
+    expect(notCertified.reasons).toContain("TECHNICIAN_NOT_CERTIFIED");
+  });
+});
+
+describe("Amendment A5 — declarations may restrict, never grant (T64, T69-T75; T65-T68 superseded by A6)", () => {
+  const ELEMENTS = [
+    ["identity", "TECHNICIAN_IDENTITY"], ["workScope", "WORK_SCOPE"], ["sitePermission", "SITE_PERMISSION"], ["jurisdiction", "JURISDICTION"],
+  ] as const;
+  type Est = NonNullable<GateAInput["evidence"]["authorityEstablishment"]>;
+  const withElement = (element: keyof Est, record: Est[keyof Est] | undefined) => run((i) => {
+    const establishment = { ...ALL_ESTABLISHED() } as Est;
+    if (record === undefined) delete establishment[element]; else establishment[element] = record;
+    i.evidence.authorityEstablishment = establishment;
+  });
+
+  it("T64 missing server-stamped submitter -> HOLD(SUBMITTER_UNAUTHENTICATED)", () => {
+    const { evaluation, reasons } = run((i) => { delete i.evidence.submittedBy; });
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toContain("SUBMITTER_UNAUTHENTICATED");
+  });
+  it("T69 established restrictive findings restrict; declared restrictions still restrict", () => {
+    expect(withElement("identity", ESTABLISHED("DOES_NOT_MATCH")).evaluation.determination).toBe("ESCALATE");
+    expect(withElement("workScope", ESTABLISHED("EXCLUDES_DIAGNOSIS")).evaluation.determination).toBe("ESCALATE");
+    expect(withElement("sitePermission", ESTABLISHED("WITHHELD")).evaluation.determination).toBe("DENY");
+    expect(withElement("jurisdiction", ESTABLISHED("REQUIRED_NOT_CONFIRMED")).reasons).toContain("JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED");
+    expect(run((i) => { i.evidence.authorization.sitePermission = "WITHHELD"; }).evaluation.determination).toBe("DENY");
+    expect(run((i) => { i.evidence.authorization.workScopeIncludesDiagnosis = false; }).evaluation.determination).toBe("ESCALATE");
+  });
+  it("T70 manual OEM transcription -> HOLD(OEM_REFERENCE_NOT_VERIFIED), never ALLOW", () => {
+    for (const provenance of [undefined, { ...VERIFIED_OEM(), acquisitionMethod: "MANUAL_TRANSCRIPTION" as const, verification: "NOT_VERIFIED" as const }]) {
+      const { evaluation, reasons } = run((i) => { if (provenance) i.oem.provenance = provenance; else delete i.oem.provenance; });
+      expect(evaluation.determination).toBe("HOLD");
+      expect(reasons).toContain("OEM_REFERENCE_NOT_VERIFIED");
+    }
+  });
+  it("T71 OEM verification unavailable -> ESCALATE", () => {
+    const { evaluation, reasons } = run((i) => { i.oem.provenance = { acquisitionMethod: "MANUAL_TRANSCRIPTION", verification: "VERIFICATION_UNAVAILABLE" }; });
+    expect(evaluation.determination).toBe("ESCALATE");
+    expect(reasons).toContain("OEM_REFERENCE_VERIFICATION_UNAVAILABLE");
+  });
+  // A7 supersedes "model" with matchedSystems (T87 covers the A7 record fields).
+  it.each(["manufacturer", "documentId", "pageRef", "sourceRef", "verifiedBy", "verifiedAt"] as const)("T72 OEM provenance without %s -> HOLD", (field) => {
+    const provenance: Record<string, unknown> = VERIFIED_OEM();
+    delete provenance[field];
+    const { evaluation, reasons } = run((i) => { i.oem.provenance = provenance as never; });
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toContain("OEM_REFERENCE_PROVENANCE_INCOMPLETE");
+  });
+  it("T72 revision is optional; self-verified OEM reference -> HOLD", () => {
+    const { revision: _omit, ...noRevision } = VERIFIED_OEM();
+    expect(run((i) => { i.oem.provenance = noRevision; }).evaluation.determination).toBe("ALLOW");
+    const self = run((i) => { i.oem.provenance = { ...VERIFIED_OEM(), verifiedBy: "tech-1" }; });
+    expect(self.evaluation.determination).toBe("HOLD");
+    expect(self.reasons).toContain("OEM_REFERENCE_SELF_VERIFICATION_REJECTED");
+  });
+  it("T73 the same measurements reach ALLOW only with an independently VERIFIED OEM reference", () => {
+    const manual = run((i) => { i.oem.provenance = { ...VERIFIED_OEM(), acquisitionMethod: "MANUAL_TRANSCRIPTION", verification: "NOT_VERIFIED" }; });
+    const verified = run();
+    expect(manual.receipt.measurement_set).toEqual(verified.receipt.measurement_set);
+    expect(manual.evaluation.determination).not.toBe("ALLOW");
+    expect(verified.evaluation.determination).toBe("ALLOW");
+  });
+  it("T74 with a manual OEM reference, measurements are still evaluated and established as evidence", () => {
+    const { receipt, evaluation } = run((i) => { i.oem.provenance = { ...VERIFIED_OEM(), acquisitionMethod: "MANUAL_TRANSCRIPTION", verification: "NOT_VERIFIED" }; });
+    for (const proposition of ["P05", "P08", "P09", "P10", "P11", "P12", "P13"]) expect(receipt.established_propositions).toContain(proposition);
+    expect(evaluation.ambiguityFindings.map((finding) => finding.subject)).toEqual(expect.arrayContaining(["airflow", "derivedTesp", "outdoorDryBulb"]));
+    expect(receipt.derived_tesp).toEqual({ value: 0.5, uncertainty: 0.02, unit: "IN_WC" });
+  });
+  it("T75 receipt records submitter, per-element authority status and OEM provenance", () => {
+    const established = run().receipt;
+    expect(established.submitted_by).toEqual({ accountId: "account-uuid-1", method: "AUTHENTICATED_SESSION" });
+    expect(established.authority_status).toMatchObject({
+      submitter_authenticated: true,
+      work_scope: { declared_assurance: "DECLARED", establishment_status: "ESTABLISHED", source: "DISPATCH-AUTHORITY-SVC", established: true },
+    });
+    expect(established.oem_reference_provenance).toMatchObject({ acquisition_method: "GOVERNED_LIBRARY", verification: "VERIFIED", established: true });
+    const declaredOnly = run((i) => { delete i.evidence.authorityEstablishment; delete i.oem.provenance; }).receipt;
+    expect(declaredOnly.authority_status).toMatchObject({ site_permission: { declared: "GRANTED", establishment_status: "NOT_ESTABLISHED", established: false } });
+    expect(declaredOnly.oem_reference_provenance).toMatchObject({ verification: "NOT_VERIFIED", established: false });
+  });
+});
+
+describe("Amendment A6 — technical NIRET determination vs execution authority (T77-T84)", () => {
+  const unverified = (i: Mutable) => { i.evidence.technician.certification = { status: "CERTIFIED", type: "UNIVERSAL", certificateRef: "EPA608-0001" }; };
+
+  it("T77 complete technical evidence, certification not verified -> technical ALLOW, execution HOLD, entry not authorized", () => {
+    const { evaluation, receipt } = run(unverified);
+    expect(evaluation.technicalDetermination).toBe("ALLOW");
+    expect(evaluation.executionAuthorityDetermination).toBe("HOLD");
+    expect(evaluation.determination).toBe("HOLD");
+    expect(receipt.technical_determination).toMatchObject({ determination: "ALLOW", unresolved_propositions: [], reason_codes: [] });
+    expect(receipt.execution_authority).toMatchObject({ determination: "HOLD", unresolved_propositions: ["P17"], reason_codes: ["CERTIFICATION_NOT_VERIFIED"] });
+    expect(receipt.indication_path).toBe("I1");
+  });
+  it("T78 determination is ALLOW only when both parts are ALLOW", () => {
+    const both = run();
+    expect([both.evaluation.technicalDetermination, both.evaluation.executionAuthorityDetermination, both.evaluation.determination]).toEqual(["ALLOW", "ALLOW", "ALLOW"]);
+    for (const mutate of [unverified, (i: Mutable) => { delete i.evidence.measurements.airflow; }]) {
+      const { evaluation } = run(mutate);
+      expect(evaluation.determination).not.toBe("ALLOW");
+    }
+  });
+  it("T79 technical HOLD, DENY and ESCALATE follow the evidence rules even when execution authority is also missing", () => {
+    const hold = run((i) => { unverified(i); delete i.evidence.measurements.airflow; });
+    expect(hold.evaluation.technicalDetermination).toBe("HOLD");
+    const deny = run((i) => { unverified(i); i.evidence.measurements.supplyDryBulb = m(57, "F", 0.5, "SUPPLY_PLENUM", "THERMO-1"); });
+    expect(deny.evaluation.technicalDetermination).toBe("DENY");
+    expect(deny.reasons).toContain("NOT_INDICATED");
+    expect(deny.evaluation.determination).toBe("DENY");
+    const escalate = run((i) => { unverified(i); i.oem.provenance = { acquisitionMethod: "MANUAL_TRANSCRIPTION", verification: "VERIFICATION_UNAVAILABLE" }; });
+    expect(escalate.evaluation.technicalDetermination).toBe("ESCALATE");
+    expect(escalate.reasons).toContain("OEM_REFERENCE_VERIFICATION_UNAVAILABLE");
+  });
+  it("T80 missing work-scope, site-permission, jurisdiction or identity grants no longer block Gate A", () => {
+    const { evaluation } = run((i) => {
+      delete i.evidence.authorityEstablishment;
+      i.evidence.authorization = {};
+    });
+    expect(evaluation.technicalDetermination).toBe("ALLOW");
+    expect(evaluation.executionAuthorityDetermination).toBe("ALLOW");
+    expect(evaluation.determination).toBe("ALLOW");
+    const unavailable = run((i) => {
+      i.evidence.authorityEstablishment = { workScope: { status: "SOURCE_UNAVAILABLE" }, sitePermission: { status: "NOT_ESTABLISHED" }, jurisdiction: { status: "SOURCE_UNAVAILABLE" }, identity: { status: "SOURCE_UNAVAILABLE" } };
+    });
+    expect(unavailable.evaluation.determination).toBe("ALLOW");
+  });
+  it("T81 declared and established restrictions still restrict execution authority, never the technical answer", () => {
+    const cases: Array<[(i: Mutable) => void, string, string]> = [
+      [(i) => { i.evidence.authorization.sitePermission = "WITHHELD"; }, "DENY", "AUTHORITY_TO_TEST_WITHHELD"],
+      [(i) => { i.evidence.authorization.sitePermission = "UNCONFIRMED"; }, "HOLD", "SITE_PERMISSION_UNCONFIRMED"],
+      [(i) => { i.evidence.authorization.jurisdiction = "UNCONFIRMED"; }, "HOLD", "JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED"],
+      [(i) => { i.evidence.authorization.workScopeIncludesDiagnosis = false; }, "ESCALATE", "WORK_SCOPE_EXCLUDES_DIAGNOSIS"],
+      [(i) => { i.evidence.authorityEstablishment!.identity = { status: "ESTABLISHED", finding: "DOES_NOT_MATCH", source: "HR", reference: "R", establishedAt: T("09:00") }; }, "ESCALATE", "TECHNICIAN_IDENTITY_MISMATCH"],
+      [(i) => { i.evidence.authorityEstablishment!.sitePermission = { status: "ESTABLISHED", finding: "WITHHELD" }; }, "DENY", "AUTHORITY_TO_TEST_WITHHELD"],
+    ];
+    for (const [mutate, expected, reason] of cases) {
+      const { evaluation, reasons } = run(mutate);
+      expect(evaluation.executionAuthorityDetermination).toBe(expected);
+      expect(evaluation.technicalDetermination).toBe("ALLOW");
+      expect(evaluation.determination).toBe(expected);
+      expect(reasons).toContain(reason);
+    }
+  });
+  it("T82 premature pressure-instrument entry -> execution DENY and determination DENY; technical unaffected", () => {
+    const { evaluation, receipt } = run((i) => { i.evidence.pressureSideEntry = "INSTRUMENTS_CONNECTED"; });
+    expect(evaluation.executionAuthorityDetermination).toBe("DENY");
+    expect(evaluation.determination).toBe("DENY");
+    expect(evaluation.technicalDetermination).toBe("ALLOW");
+    expect((receipt.execution_authority as { reason_codes: string[] }).reason_codes).toContain("PRESSURE_INSTRUMENT_ENTRY_NOT_AUTHORIZED");
+  });
+  it("T83 technical ALLOW without execution authority carries the do-not-connect action first", () => {
+    const { receipt } = run(unverified);
+    expect((receipt.next_justified_actions as string[])[0]).toBe("DO_NOT_CONNECT_UNTIL_EXECUTION_AUTHORITY_ESTABLISHED");
+    expect(receipt.next_justified_actions).not.toContain("ACQUIRE_PRESSURE_EVIDENCE_ONLY");
+    expect(run().receipt.next_justified_actions).toEqual(["ACQUIRE_PRESSURE_EVIDENCE_ONLY"]);
+  });
+  it("T84 receipt records the two parts separately, and Gate B is never authorized", () => {
+    const { receipt } = run(unverified);
+    expect(Object.keys(receipt)).toEqual(expect.arrayContaining(["technical_determination", "execution_authority", "determination"]));
+    expect((receipt.technical_determination as { unresolved_propositions: string[] }).unresolved_propositions).not.toContain("P17");
+    expect((receipt.execution_authority as { established_propositions: string[] }).established_propositions).toEqual(["ENTRY"]);
+    expect(receipt.gate_b_authorized).toBe(false);
+  });
+});
+
+describe("Amendment A7 — governed OEM reference record and bounded criteria (T85-T97)", () => {
+  type Candidate = ReturnType<typeof CRITERION>["candidates"][number];
+  const cell = (candidateId: string, min: number, max: number, outdoor: [number, number]): Candidate => ({
+    candidateId, range: { min, max, unit: "F", ref: `OEM-IOM-CU200:${candidateId}` },
+    appliesWhen: [{ measurement: "outdoorDryBulb", min: outdoor[0], max: outdoor[1], unit: "F", ref: `OEM-IOM-CU200:${candidateId}:odb` }],
+  });
+  const withCandidates = (candidates: Candidate[], coverage: "COMPLETE" | "PARTIAL" = "PARTIAL") => (i: Mutable) => {
+    i.oem.noninvasiveCriterion = { ...CRITERION(), coverage, candidates };
+  };
+  const provenance = (patch: Record<string, unknown>) => (i: Mutable) => { i.oem.provenance = { ...VERIFIED_OEM(), ...patch } as never; };
+  const checksFor = (evaluation: { checks: Array<{ proposition: string; result: string; reason: string }> }, proposition: string) =>
+    evaluation.checks.filter((check) => check.proposition === proposition);
+
+  it("T85 a VERIFIED, CURRENT governed record for the exact system satisfies P01 and P14 and can reach ALLOW", () => {
+    const { evaluation, receipt } = run();
+    expect(evaluation.determination).toBe("ALLOW");
+    expect(checksFor(evaluation, "P01")).toEqual([expect.objectContaining({ result: "SATISFIED" })]);
+    expect(checksFor(evaluation, "P14")).toEqual([expect.objectContaining({ result: "SATISFIED" })]);
+    expect(receipt.pairing).toMatchObject({ establishedByGovernedOemRecord: "NIRET-OEM-SYNTHETIC-TEST-1" });
+  });
+  it("T86 VERIFIED provenance not acquired from the governed registry -> HOLD; execution authority unaffected (A6)", () => {
+    const { evaluation, reasons } = run(provenance({ acquisitionMethod: "MANUAL_TRANSCRIPTION" }));
+    expect(evaluation.determination).toBe("HOLD");
+    expect(reasons).toEqual(expect.arrayContaining(["OEM_REFERENCE_NOT_FROM_GOVERNED_REGISTRY", "PAIRING_NOT_ESTABLISHED_BY_GOVERNED_OEM_RECORD"]));
+    expect(evaluation.technicalDetermination).toBe("HOLD");
+    expect(evaluation.executionAuthorityDetermination).toBe("ALLOW");
+  });
+  it.each(["recordId", "recordHash", "documentHash", "matchedSystems", "transcribedBy", "transcribedAt", "supersession"])(
+    "T87 governed provenance without %s -> HOLD(OEM_REFERENCE_PROVENANCE_INCOMPLETE)", (field) => {
+      const incomplete: Record<string, unknown> = VERIFIED_OEM();
+      delete incomplete[field];
+      const { evaluation, reasons } = run((i) => { i.oem.provenance = incomplete as never; });
+      expect(evaluation.determination).toBe("HOLD");
+      expect(reasons).toContain("OEM_REFERENCE_PROVENANCE_INCOMPLETE");
+    });
+  it("T87 malformed record or document hash, or no matched system -> HOLD", () => {
+    for (const patch of [{ recordHash: "abc123" }, { documentHash: "Z".repeat(64) }, { matchedSystems: [] }]) {
+      const { evaluation, reasons } = run(provenance(patch));
+      expect(evaluation.determination).toBe("HOLD");
+      expect(reasons).toContain("OEM_REFERENCE_PROVENANCE_INCOMPLETE");
+    }
+  });
+  it("T88 review must be independent of the transcriber, technician and submitter, and follow transcription", () => {
+    const cases: Array<[Record<string, unknown>, string]> = [
+      [{ verifiedBy: "curator-test-1" }, "OEM_REFERENCE_REVIEW_NOT_INDEPENDENT"],
+      [{ verifiedBy: "TECH-1" }, "OEM_REFERENCE_SELF_VERIFICATION_REJECTED"],
+      [{ verifiedBy: "account-uuid-1" }, "OEM_REFERENCE_SELF_VERIFICATION_REJECTED"],
+      [{ verifiedAt: T("09:10") }, "OEM_REFERENCE_REVIEW_PRECEDES_TRANSCRIPTION"],
+    ];
+    for (const [patch, reason] of cases) {
+      const { evaluation, reasons } = run(provenance(patch));
+      expect(evaluation.determination).toBe("HOLD");
+      expect(reasons).toContain(reason);
+    }
+  });
+  it("T89 SUPERSEDED or WITHDRAWN record -> HOLD", () => {
+    expect(run(provenance({ supersession: "SUPERSEDED" })).reasons).toContain("OEM_REFERENCE_SUPERSEDED");
+    expect(run(provenance({ supersession: "WITHDRAWN" })).reasons).toContain("OEM_REFERENCE_WITHDRAWN");
+    expect(run(provenance({ supersession: "SUPERSEDED" })).evaluation.determination).toBe("HOLD");
+  });
+  it("T90 manufacturer or indoor/outdoor combination not in the record -> P01 HOLD(OEM_REFERENCE_MODEL_MISMATCH); exact match ignores only case and whitespace", () => {
+    for (const mutate of [
+      (i: Mutable) => { i.evidence.equipment.outdoorModel = "CU-300"; },
+      (i: Mutable) => { i.evidence.equipment.indoorModel = "AH-1000"; },
+      (i: Mutable) => { i.evidence.equipment.manufacturer = "OtherCo"; },
+      (i: Mutable) => { i.evidence.equipment.outdoorModel = "CU200"; },
+    ]) {
+      const { evaluation, reasons } = run(mutate);
+      expect(evaluation.determination).toBe("HOLD");
+      expect(reasons).toContain("OEM_REFERENCE_MODEL_MISMATCH");
+    }
+    expect(run((i) => { i.evidence.equipment.outdoorModel = " cu-200 "; i.evidence.equipment.manufacturer = "EXAMPLECO"; }).evaluation.determination).toBe("ALLOW");
+  });
+  it("T91 a declared pairing never establishes P01 without a governed record; a declared false pairing restricts", () => {
+    expect(run((i) => { delete i.evidence.equipment.pairingVerifiedAgainstOem; }).evaluation.determination).toBe("ALLOW");
+    const declaredFalse = run((i) => { i.evidence.equipment.pairingVerifiedAgainstOem = false; });
+    expect(declaredFalse.reasons).toContain("IDENTITY_OR_PAIRING_UNESTABLISHED");
+    const declaredOnly = run((i) => { i.evidence.equipment.pairingVerifiedAgainstOem = true; i.oem.provenance = { ...VERIFIED_OEM(), acquisitionMethod: "MANUAL_TRANSCRIPTION", verification: "NOT_VERIFIED" }; });
+    expect(declaredOnly.reasons).toContain("PAIRING_NOT_ESTABLISHED_BY_GOVERNED_OEM_RECORD");
+    expect(run((i) => { delete i.evidence.equipment.manufacturer; }).reasons).toContain("IDENTITY_OR_PAIRING_UNESTABLISHED");
+  });
+  it("T92 exactly one applicable candidate supplies the criterion; the indication uses that candidate's range", () => {
+    // Indicator: return 76 - supply 52 = 24 +/- 1 F. Outdoor 88 +/- 0.5 F selects cell A.
+    const outside = run(withCandidates([cell("A", 16, 21, [80, 95]), cell("B", 20, 30, [95, 110])]));
+    expect(outside.evaluation.criterionSelection).toEqual({ status: "SELECTED", candidateId: "A" });
+    expect(outside.evaluation.determination).toBe("ALLOW");
+    const within = run(withCandidates([cell("A", 20, 26, [80, 95]), cell("B", 16, 21, [95, 110])]));
+    expect(within.evaluation.criterionSelection).toEqual({ status: "SELECTED", candidateId: "A" });
+    expect(within.evaluation.determination).toBe("DENY");
+    expect(within.reasons).toContain("NOT_INDICATED");
+  });
+  it("T93 no applicable candidate: coverage COMPLETE -> ESCALATE, PARTIAL -> HOLD; no value is substituted", () => {
+    const cells = [cell("A", 16, 21, [95, 105]), cell("B", 16, 21, [105, 115])];
+    const complete = run(withCandidates(cells, "COMPLETE"));
+    expect(complete.evaluation.determination).toBe("ESCALATE");
+    expect(complete.reasons).toContain("OEM_CRITERION_NOT_PUBLISHED_FOR_CONDITIONS");
+    const partial = run(withCandidates(cells, "PARTIAL"));
+    expect(partial.evaluation.determination).toBe("HOLD");
+    expect(partial.reasons).toContain("OEM_CRITERION_NOT_IN_RECORD_FOR_CONDITIONS");
+    for (const result of [complete, partial]) {
+      expect(result.evaluation.criterionSelection.status).toBe("NONE_APPLICABLE");
+      expect(result.evaluation.ambiguityFindings.map((finding) => finding.subject)).not.toContain("indicator");
+    }
+  });
+  it("T94 applicability ambiguous under F1 -> HOLD; more than one applicable candidate -> HOLD", () => {
+    const ambiguous = run(withCandidates([cell("A", 16, 21, [80, 88.2]), cell("B", 16, 21, [88.2, 95])]));
+    expect(ambiguous.evaluation.determination).toBe("HOLD");
+    expect(ambiguous.reasons).toContain("OEM_CRITERION_APPLICABILITY_AMBIGUOUS");
+    expect(ambiguous.evaluation.criterionSelection.status).toBe("AMBIGUOUS");
+    const conflict = run(withCandidates([cell("A", 16, 21, [80, 95]), cell("B", 10, 30, [85, 100])]));
+    expect(conflict.evaluation.determination).toBe("HOLD");
+    expect(conflict.reasons).toContain("OEM_CRITERION_CANDIDATES_CONFLICT");
+    expect(conflict.evaluation.criterionSelection.status).toBe("CONFLICT");
+  });
+  it("T95 interpolation, calculation or an unrepresented lookup condition -> ESCALATE; no value manufactured, no indication evaluated", () => {
+    const lookups = [
+      [{ interpolationRequired: true, calculationRequired: false, unrepresentedConditions: [] }, "OEM_CRITERION_REQUIRES_INTERPOLATION"],
+      [{ interpolationRequired: false, calculationRequired: true, unrepresentedConditions: [] }, "OEM_CRITERION_REQUIRES_CALCULATION"],
+      [{ interpolationRequired: false, calculationRequired: false, unrepresentedConditions: ["indoor load"] }, "OEM_CRITERION_CONDITION_NOT_REPRESENTED"],
+    ] as const;
+    for (const [lookup, reason] of lookups) {
+      const { evaluation, reasons, receipt } = run((i) => { i.oem.noninvasiveCriterion = { ...CRITERION(), lookup: { ...lookup, unrepresentedConditions: [...lookup.unrepresentedConditions] } }; });
+      expect(evaluation.determination).toBe("ESCALATE");
+      expect(evaluation.technicalDetermination).toBe("ESCALATE");
+      expect(reasons).toContain(reason);
+      expect(evaluation.criterionSelection).toEqual({ status: "NOT_REPRESENTABLE", candidateId: null });
+      expect(evaluation.ambiguityFindings.map((finding) => finding.subject)).not.toContain("indicator");
+      expect(receipt.indication_path).toBeNull();
+      expect(receipt.oem_criterion_selection).toMatchObject({ range: null, interpolation_performed: false });
+    }
+  });
+  it("T96 an applicability condition measurement unusable or in a non-contract unit -> HOLD, no candidate selected", () => {
+    const unmeasured = run(withCandidates([{ ...cell("A", 16, 21, [80, 95]), appliesWhen: [{ measurement: "outdoorWetBulb", min: 60, max: 80, unit: "F", ref: "x" }] } as unknown as Candidate]));
+    expect(unmeasured.evaluation.determination).toBe("HOLD");
+    expect(unmeasured.reasons).toContain("OUTDOORWETBULB_UNAVAILABLE");
+    expect(unmeasured.evaluation.criterionSelection.status).toBe("NOT_EVALUATED");
+    const wrongUnit = run(withCandidates([{ ...cell("A", 16, 21, [80, 95]), appliesWhen: [{ measurement: "outdoorDryBulb", min: 27, max: 35, unit: "PCT_RH", ref: "x" }] } as unknown as Candidate]));
+    expect(wrongUnit.evaluation.determination).toBe("HOLD");
+    expect(wrongUnit.reasons).toContain("UNIT_MISMATCH");
+    expect(wrongUnit.evaluation.criterionSelection.status).toBe("NOT_EVALUATED");
+  });
+  it("T97 the receipt identifies the governed record, document hash, custody and selected candidate; P01/P14/P18 stay technical (A6)", () => {
+    const { receipt } = run(withCandidates([cell("A", 16, 21, [80, 95])]));
+    expect(receipt.oem_reference_provenance).toMatchObject({
+      acquisition_method: "GOVERNED_LIBRARY", verification: "VERIFIED", established: true,
+      record_id: "NIRET-OEM-SYNTHETIC-TEST-1", record_hash: sha256Canonical("SYNTHETIC-TEST-RECORD"),
+      document_hash: sha256Canonical("SYNTHETIC-TEST-DOCUMENT"), document_date: "2026-01",
+      matched_systems: [{ indoorModel: "AH-100", outdoorModel: "CU-200" }],
+      transcribed_by: "CURATOR-TEST-1", verified_by: "OEM-LIBRARY-SVC", supersession: "CURRENT",
+    });
+    expect(receipt.oem_criterion_selection).toEqual({
+      status: "SELECTED", candidateId: "A", range: { min: 16, max: 21, unit: "F", ref: "OEM-IOM-CU200:A" }, interpolation_performed: false,
+    });
+    expect(receipt.oem_document_refs).toEqual(expect.arrayContaining(["OEM-IOM-CU200:A", "OEM-IOM-CU200:A:odb"]));
+    expect(receipt.equipment_identity).toEqual({ manufacturer: "ExampleCo", indoorModel: "AH-100", outdoorModel: "CU-200" });
+    for (const id of ["P01", "P14", "P18"]) expect(spec.amendments.A6_technical_vs_execution_authority.partition.technical).toContain(id);
+    expect(receipt.gate_b_authorized).toBe(false);
   });
 });
