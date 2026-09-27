@@ -1,12 +1,7 @@
 "use client";
 
-import type { Metadata } from "next";
 import { useState } from "react";
 
-const metadata: Metadata = {
-  title: "Anto Budiardjo | Making Connectivity Explicit | TA-14 Exchange",
-  description: "A public profile showroom examining Anto Budiardjo's long arc from building integration to CNS/CP, Connection Profiles, interoperability, and governed connectivity.",
-};
 
 const sources = [
   ["Padi.io — About", "https://www.home.padi.io/about"],
