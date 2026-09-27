@@ -5,7 +5,7 @@ export const metadata: Metadata = {
   description: "A public profile showroom examining Anto Budiardjo's long arc from building integration to CNS/CP, Connection Profiles, interoperability, and governed connectivity.",
 };
 
-const sources = [
+const sources: [string, string][] = [
   ["Padi.io — About", "https://www.home.padi.io/about"],
   ["Padi.io — Rethinking Interoperability", "https://www.home.padi.io/"],
   ["AutomatedBuildings — Anto Budiardjo", "https://www.automatedbuildings.com/author/anto/"],
@@ -13,7 +13,7 @@ const sources = [
   ["Monday Live! — Members", "https://www.mondaylive.org/members"],
 ];
 
-const arc = [
+const arc: [string, string, string][] = [
   ["1989 →", "Connected buildings", "Development of building connectivity and integration technologies begins decades before today's digital-twin vocabulary."],
   ["INTEGRATION", "Systems meet", "The problem starts as getting independently designed building systems to exchange useful information without bespoke integration everywhere."],
   ["INTEROPERABILITY", "Context matters", "The work moves beyond raw data transport toward shared meaning, relationships, roles, and the context surrounding a connection."],
