@@ -18,6 +18,24 @@ export function RouteAwareGlobalChrome() {
   const isNistBuildingControlsConversation = pathname === '/nist-ai-optimized-building-controls';
   const isGuyanaInstitutionalShowroom = pathname === '/global-institutional-engagement/guyana';
   const showroomIndexPaths = ['/showrooms','/showrooms/environmental-atmospheric','/showrooms/interoperability-systems','/showrooms/registered-governance','/showrooms/artifacts-examination-records'];
+  const countryShowroomPaths = [
+    '/global-institutional-engagement/guyana','/global-institutional-engagement/gabon','/global-institutional-engagement/estonia',
+    '/environmental-integrity-governance/uae','/global-institutional-engagement/thailand','/global-institutional-engagement/guatemala',
+    '/global-institutional-engagement/uzbekistan','/global-institutional-engagement/kazakhstan','/environmental-integrity-governance/png-atmospheric-integrity-pilot',
+    '/global-institutional-engagement/czech-republic','/global-institutional-engagement/united-states-epa-indoor-air','/global-institutional-engagement/ireland',
+    '/environmental-integrity-governance/bosnia-herzegovina','/environmental-integrity-governance/georgia','/environmental-integrity-governance/ukraine',
+    '/environmental-integrity-governance/kyrgyzstan','/global-institutional-engagement/montenegro','/global-institutional-engagement/norway',
+    '/global-institutional-engagement/singapore','/global-institutional-engagement/france'
+  ];
+  const environmentalShowroomPaths = [
+    '/global-framework-for-action','/global-institutional-engagement/healthy-indoor-air-consequence-boundary',
+    '/global-institutional-engagement/continuous-commissioning','/global-institutional-engagement/school-iaq-consequence-boundary',
+    '/global-institutional-engagement/ashrae-education-iaq-execution-boundary','/global-institutional-engagement/go-aqs',
+    '/environmental-integrity-governance/fungal-spore-evidence','/environmental-integrity-governance/federated-atmospheric-integrity-network',
+    '/environmental-integrity-governance/pair'
+  ];
+  const isCountryShowroom = countryShowroomPaths.includes(pathname);
+  const isEnvironmentalShowroom = environmentalShowroomPaths.includes(pathname);
   const isDirectShowroom = pathname.startsWith('/showrooms/') && !showroomIndexPaths.includes(pathname);
   const isAreaHome = ['/', ...showroomIndexPaths, '/governance-showcase', '/global-institutional-engagement', '/environmental-integrity-governance', '/academy', '/ai-governance', '/artifacts/registry'].includes(pathname);
   const isBlueIotDiscussionShowroom = pathname === '/environmental-integrity-governance/showcase/blue-iot-evidence-to-action';
@@ -31,9 +49,13 @@ export function RouteAwareGlobalChrome() {
     pathname === '/ai-governance/admissible-architecture' ||
     pathname === '/the-curb-test' ||
     pathname === '/habits-ta14-interoperability' ||
+    isCountryShowroom ||
+    isEnvironmentalShowroom ||
     isDirectShowroom;
   const showroomAction =
-    pathname === '/showrooms/india-school-air' || pathname === '/showrooms/uk-school-air' || pathname.startsWith('/environmental-integrity-governance/')
+    isCountryShowroom
+      ? { href:'/global-institutional-engagement/showrooms', label:'COUNTRY ROOMS' }
+      : pathname === '/showrooms/india-school-air' || pathname === '/showrooms/uk-school-air' || isEnvironmentalShowroom || pathname.startsWith('/environmental-integrity-governance/showcase/')
       ? { href:'/showrooms/environmental-atmospheric', label:'ENVIRONMENTAL ROOMS' }
       : pathname === '/showrooms/elias-ta14-examination' || pathname.startsWith('/artifacts/')
       ? { href:'/showrooms/artifacts-examination-records', label:'EXAMINATION RECORDS' }
