@@ -113,7 +113,7 @@ export default function SeoIntelligencePage() {
           </div>
         </div>
         <div className="commandActions">
-          <Link href="/workspace/mission-control" className="headerLink">Mission Control</Link>
+          <Link href="/workspace/mission-control" className="headerLink">Mission Control</Link>\n          <Link href="/workspace/mission-control/commercial-intelligence" className="headerLink">Commercial Intelligence</Link>
           <Link href="/workspace/ai-governance" className="headerLink">AI Governance</Link>
           <Link href="/workspace/ai-governance/registry" className="headerLink">Registry</Link>
           <Link href="/" className="headerPrimary">Return to Institution →</Link>
