@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/eie-calculation-result.schema.json",
+  "title": "TA-14-EIE-ARCH-1.0 s05 Analyzer calculation result (Phase 2A)",
+  "description": "An attributable evidence transformation with complete lineage. It carries no comparison, threshold, interpretation, determination, authority, gate, command or quantity field (additionalProperties: false throughout).",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "uncertainty": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["status", "methodRef", "value", "unit"], "properties": { "status": { "const": "PROPAGATED" }, "methodRef": { "type": "string", "minLength": 1 }, "value": { "type": "number" }, "unit": { "type": "string", "minLength": 1 } } },
+        { "type": "object", "additionalProperties": false, "required": ["status", "reason"], "properties": { "status": { "const": "NOT_PROPAGATED" }, "reason": { "type": "string", "minLength": 1 } } }
+      ]
+    },
+    "binding": {
+      "oneOf": [
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "name", "windowId", "channel", "source"],
+          "properties": {
+            "kind": { "const": "WINDOW_CHANNEL" }, "name": { "type": "string", "minLength": 1 }, "windowId": { "type": "string" }, "channel": { "type": "string" },
+            "source": { "type": "object", "additionalProperties": false, "required": ["provider", "deviceId"], "properties": { "provider": { "type": "string" }, "deviceId": { "type": "string" } } }
+          }
+        },
+        {
+          "type": "object", "additionalProperties": false, "required": ["kind", "name", "resultHash", "output"],
+          "properties": { "kind": { "const": "PRIOR_RESULT" }, "name": { "type": "string", "minLength": 1 }, "resultHash": { "type": "string" }, "output": { "type": "string" } }
+        }
+      ]
+    }
+  },
+  "required": ["contract", "architectureFingerprint", "analyzer", "request", "function", "reference", "evidenceMode", "inputs", "assumptions", "status", "outputs", "reasonCodes", "resultHash"],
+  "properties": {
+    "contract": { "const": "TA-14-EIE-ARCH-1.0/s05" },
+    "architectureFingerprint": { "const": "f4575172495fec67c29b964465d5f90f23845dbe98d30bd31f4e9281ba075170" },
+    "analyzer": {
+      "type": "object", "additionalProperties": false, "required": ["analyzerId", "analyzerVersion", "mode"],
+      "properties": { "analyzerId": { "type": "string", "minLength": 1 }, "analyzerVersion": { "type": "string", "minLength": 1 }, "mode": { "enum": ["SIMULATION", "PRODUCTION"] } }
+    },
+    "request": {
+      "type": "object", "additionalProperties": false, "required": ["functionId", "functionVersion", "referenceId", "inputs", "requestedBy"],
+      "properties": {
+        "functionId": { "type": "string" }, "functionVersion": { "type": "string" }, "referenceId": { "type": "string" },
+        "inputs": { "type": "array", "items": { "$ref": "#/$defs/binding" } },
+        "requestedBy": { "type": "object", "additionalProperties": false, "required": ["role", "id"], "properties": { "role": { "type": "string" }, "id": { "type": "string" } } }
+      }
+    },
+    "function": {
+      "type": "object", "additionalProperties": false, "required": ["functionId", "functionVersion", "catalogueItem", "implementation"],
+      "properties": {
+        "functionId": { "type": "string" }, "functionVersion": { "type": "string" }, "catalogueItem": { "type": ["string", "null"] },
+        "implementation": {
+          "oneOf": [
+            { "type": "null" },
+            { "type": "object", "additionalProperties": false, "required": ["package", "version", "fileHash"], "properties": { "package": { "type": "string" }, "version": { "type": "string" }, "fileHash": { "$ref": "#/$defs/sha256" } } }
+          ]
+        }
+      }
+    },
+    "reference": {
+      "type": "object", "additionalProperties": false,
+      "required": ["referenceId", "kind", "role", "entryHash", "activationState", "calculationVersion", "locators"],
+      "properties": {
+        "referenceId": { "type": "string" },
+        "kind": { "enum": ["EXTERNAL", "TA14_METHOD", "SYNTHETIC", null] },
+        "role": { "enum": ["PSYCHROMETRIC_PROPERTIES", "REFRIGERANT_PROPERTIES", "WINDOW_STATISTICS", "SYNTHETIC", null] },
+        "entryHash": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/sha256" }] },
+        "activationState": { "enum": ["CANDIDATE", "ACTIVE", "SUSPENDED", "RETIRED", null] },
+        "calculationVersion": { "type": ["string", "null"] },
+        "locators": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "evidenceMode": { "enum": ["SIMULATION", "PRODUCTION"] },
+    "inputs": {
+      "type": "object", "additionalProperties": false, "required": ["windows", "observations", "priorResults"],
+      "properties": {
+        "windows": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["windowId", "headerHash", "sealHash", "recorderMode", "purpose", "assetId", "continuityStatus"],
+            "properties": {
+              "windowId": { "type": "string" }, "headerHash": { "$ref": "#/$defs/sha256" }, "sealHash": { "$ref": "#/$defs/sha256" },
+              "recorderMode": { "enum": ["SIMULATION", "PRODUCTION"] }, "purpose": { "type": "string" }, "assetId": { "type": "string" },
+              "continuityStatus": { "enum": ["INTACT", "DEGRADED", "BROKEN"] }
+            }
+          }
+        },
+        "observations": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false,
+            "required": ["binding", "windowId", "windowSeq", "entryHash", "observationId", "observationHash", "value", "unit", "observedAt", "acquisitionMethod", "accuracyOrUncertainty"],
+            "properties": {
+              "binding": { "type": "string" }, "windowId": { "type": "string" }, "windowSeq": { "type": "integer", "minimum": 1 },
+              "entryHash": { "$ref": "#/$defs/sha256" }, "observationId": { "type": "string" }, "observationHash": { "$ref": "#/$defs/sha256" },
+              "value": { "type": "number" }, "unit": { "type": "string" }, "observedAt": { "type": "string" },
+              "acquisitionMethod": { "enum": ["LIVE_ADAPTER", "MANUAL_INSTRUMENT", "SIMULATED"] }, "accuracyOrUncertainty": {}
+            }
+          }
+        },
+        "priorResults": {
+          "type": "array",
+          "items": {
+            "type": "object", "additionalProperties": false, "required": ["binding", "resultHash", "output", "value", "unit", "uncertainty"],
+            "properties": {
+              "binding": { "type": "string" }, "resultHash": { "$ref": "#/$defs/sha256" }, "output": { "type": "string" },
+              "value": { "type": "number" }, "unit": { "type": "string" }, "uncertainty": { "$ref": "#/$defs/uncertainty" }
+            }
+          }
+        }
+      }
+    },
+    "assumptions": { "type": "array", "items": { "type": "string" } },
+    "status": { "enum": ["ESTABLISHED", "NOT_ESTABLISHED"] },
+    "outputs": {
+      "type": "array",
+      "items": {
+        "type": "object", "additionalProperties": false, "required": ["name", "value", "unit", "uncertainty"],
+        "properties": { "name": { "type": "string", "minLength": 1 }, "value": { "type": "number" }, "unit": { "type": "string", "minLength": 1 }, "uncertainty": { "$ref": "#/$defs/uncertainty" } }
+      }
+    },
+    "reasonCodes": { "type": "array", "items": { "type": "string", "pattern": "^EIE-" } },
+    "resultHash": { "$ref": "#/$defs/sha256" }
+  },
+  "if": { "properties": { "status": { "const": "NOT_ESTABLISHED" } } },
+  "then": { "properties": { "outputs": { "maxItems": 0 }, "reasonCodes": { "contains": { "const": "EIE-CALC-CALCULATION_NOT_ESTABLISHED" } } } },
+  "else": { "properties": { "reasonCodes": { "maxItems": 0 } } }
+}

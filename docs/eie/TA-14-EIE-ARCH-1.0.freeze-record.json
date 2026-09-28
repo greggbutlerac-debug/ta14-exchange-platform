@@ -1,0 +1,60 @@
+{
+  "recordType": "TA-14 architecture freeze record",
+  "architectureId": "TA-14-EIE-ARCH-1.0",
+  "title": "TA-14 Environmental Integrity Ecosystem Architecture Specification",
+  "predecessor": "TA-14-EIE-ARCH-1.0-RC1",
+  "status": "FROZEN",
+  "ownerFreezeConfirmed": "2026-09-28",
+  "ownerFreezeStatement": "Owner designated TA-14 Environmental Integrity Ecosystem Architecture 1.0 (TA-14-EIE-ARCH-1.0) FROZEN. The materialized and verified specification is the governing architectural baseline for implementation.",
+  "specificationStatusField": "FROZEN_CANDIDATE (as recorded inside the fingerprinted specification; intentionally not modified; the governing freeze status is this record's status)",
+  "specification": {
+    "path": "docs/eie/TA-14-EIE-ARCH-1.0.spec.json",
+    "sizeBytes": 28920,
+    "canonicalSha256": "f4575172495fec67c29b964465d5f90f23845dbe98d30bd31f4e9281ba075170",
+    "canonicalSha256Rule": "SHA-256 over canonical JSON of the specification (object keys sorted recursively, no insignificant whitespace), as stated in the specification's fingerprintRule; same canonicalization that reproduces the pinned C1-R7 fingerprint",
+    "rawFileSha256": "b4caac0cd0ac9229dab26e1498d460ff95f31046a3fcf49f32e050716cabb8d6",
+    "rawFileSha256Rule": "SHA-256 over the exact file bytes",
+    "fingerprintOfRecord": "canonicalSha256"
+  },
+  "materialization": {
+    "materializedAt": "2026-09-28T12:01:37Z",
+    "source": "Recovered scratch artifact written by the preceding Claude Code session (transcript 73792a46-d873-44ae-a458-932d94bd5b9c, row 5414, 2026-09-28T11:31:51Z)",
+    "method": "Byte-for-byte file copy; no reserialization, normalization, formatting or content change",
+    "verification": [
+      "cmp: repository copy byte-identical to recovered artifact",
+      "raw-file SHA-256 computed independently with shasum and openssl: identical",
+      "canonical SHA-256 computed independently with the Node canonicalizer (fp.cjs) and a separate Python canonicalizer: identical"
+    ],
+    "fingerprintProvenance": "No fingerprint was computed in the originating session (both hashing attempts failed). The canonical fingerprint was first computed on 2026-09-28 over the unmodified recovered artifact and accepted by owner decision subject to this verification."
+  },
+  "ownerRulings": {
+    "G1": "CLOSED: recovered G1 ruling adopted by owner as part of TA-14-EIE-ARCH-1.0 without substantive change (specification s05_calculation, s06_determinationBoundary.oemPrecedence). CRR-1 contract frozen; candidate entries remain CANDIDATE with possession and use NOT_ESTABLISHED.",
+    "G2": "CLOSED: execution bounds are OEM_CRITERION or TECHNICIAN_DECLARED, admitted only by Gate B, executed only as committed; missing bounds HOLD; no TA-14 execution profile created (specification s10_gateB, s13_governor).",
+    "G3": "CLOSED: DECLARED -> DOCUMENTED -> VERIFIED/ESTABLISHED; authentication establishes identity only; no consent-giver standing source invented; consent standing and execution authority HOLD / NOT ESTABLISHED until one exists (specification s01, s11)."
+  },
+  "boundaries": {
+    "gateA": "TA-14-NIRET-GA-C1 revision C1-R7 unchanged; canonical fingerprint f934afe35313adac9f8794e0d345119a9bb64d621cc028aec286f9c3f5e09fa6 re-verified",
+    "gateB": "Not implemented; reserved for a separately frozen B1 specification",
+    "gateAImpliesGateB": false,
+    "universalThresholdsIntroduced": false,
+    "universalThresholdsStatement": "No universal HVACD/R or refrigerant quantities, timings, convergence thresholds, electrical limits, performance-degradation definitions or charge rules are introduced.",
+    "ta14GateRepository": "Not modified"
+  },
+  "invariants": [
+    "Monitoring is not evidence.",
+    "Evidence is not authority.",
+    "Authority is not execution.",
+    "GAUGE AVAILABLE ≠ ENTRY JUSTIFIED",
+    "ENTRY JUSTIFIED ≠ DIAGNOSIS",
+    "DIAGNOSIS ≠ INTERVENTION AUTHORITY",
+    "Gate A ALLOW never implies Gate B ALLOW."
+  ],
+  "operationalActivationDependenciesWaived": false,
+  "operationalActivationDependencies": [
+    "CRR-1 entries (CRR-PSY-ASHRAE-F2025-CH1, CRR-REF-NIST-REFPROP-10.0) remain CANDIDATE until lawful possession and permitted use are established by evidence, independently reviewed, conformance-tested, hash-pinned and owner-activated; until then all dependent calculations are NOT ESTABLISHED.",
+    "No consent-giver standing source exists; consent standing and execution authority are HOLD until one is established.",
+    "No reachable governed OEM package; equipment-specific determinations resolve to NOT_APPLICABLE_NO_OEM_CRITERION or NO_RECORD.",
+    "Gate B (B1) specification must be separately frozen before any Governor execution."
+  ],
+  "nonVerificationStatement": "Freezing this architecture does not mark any external reference, OEM record, calculation implementation, credential, consent standing or execution authority VERIFIED, ESTABLISHED, pinned or activated. Each remains subject to its own governed verification and activation."
+}

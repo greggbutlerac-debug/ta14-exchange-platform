@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/eie-crr-entry.schema.json",
+  "title": "TA-14-EIE-ARCH-1.0 s05 CRR-1 Calculation Reference Registry entry",
+  "description": "An immutable registration. Possession, review, conformance, pin, activation and supersession are derived from the append-only CRR-1 event log, never stored on the entry. Candidate is not established; implementation is not authority; authorship is not verification.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "established": {
+      "oneOf": [
+        { "type": "object", "additionalProperties": false, "required": ["status", "value", "basisRef"], "properties": { "status": { "const": "ESTABLISHED" }, "value": {}, "basisRef": { "type": "string", "minLength": 1 } } },
+        { "type": "object", "additionalProperties": false, "required": ["status", "requiredFrom"], "properties": { "status": { "const": "NOT_ESTABLISHED" }, "requiredFrom": { "type": "string", "minLength": 1 } } }
+      ]
+    },
+    "optionalEstablished": { "oneOf": [{ "type": "null" }, { "$ref": "#/$defs/established" }] }
+  },
+  "required": [
+    "referenceId", "kind", "role", "publisher", "title", "editionOrVersion", "chapterOrSection", "methodOrEquations", "units", "assumptions",
+    "validDomain", "pressureOrElevationBasis", "refrigerantIdentityAndComposition", "fluidModel", "saturationConvention", "uncertaintyMethod",
+    "implementation", "implementationNote", "conformanceTestRef", "calculationVersion", "acquisition", "contentIdentity", "applicability",
+    "locators", "supersedes"
+  ],
+  "properties": {
+    "referenceId": { "type": "string", "pattern": "^CRR-[A-Z0-9.-]+$" },
+    "kind": { "enum": ["EXTERNAL", "TA14_METHOD", "SYNTHETIC"] },
+    "role": { "enum": ["PSYCHROMETRIC_PROPERTIES", "REFRIGERANT_PROPERTIES", "WINDOW_STATISTICS", "SYNTHETIC"] },
+    "publisher": { "type": "string", "minLength": 1 },
+    "title": { "type": "string", "minLength": 1 },
+    "editionOrVersion": { "type": "string", "minLength": 1 },
+    "chapterOrSection": { "type": ["string", "null"] },
+    "methodOrEquations": { "$ref": "#/$defs/established" },
+    "units": { "$ref": "#/$defs/established" },
+    "assumptions": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "validDomain": { "$ref": "#/$defs/established" },
+    "pressureOrElevationBasis": { "$ref": "#/$defs/optionalEstablished" },
+    "refrigerantIdentityAndComposition": { "$ref": "#/$defs/optionalEstablished" },
+    "fluidModel": { "$ref": "#/$defs/optionalEstablished" },
+    "saturationConvention": { "$ref": "#/$defs/optionalEstablished" },
+    "uncertaintyMethod": { "$ref": "#/$defs/established" },
+    "implementation": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object", "additionalProperties": false, "required": ["package", "version", "fileHash"],
+          "properties": { "package": { "type": "string", "minLength": 1 }, "version": { "type": "string", "minLength": 1 }, "fileHash": { "type": "string", "pattern": "^[0-9a-f]{64}$" } }
+        }
+      ]
+    },
+    "implementationNote": { "type": ["string", "null"] },
+    "conformanceTestRef": { "type": ["string", "null"] },
+    "calculationVersion": { "type": ["string", "null"] },
+    "acquisition": {
+      "type": "object", "additionalProperties": false, "required": ["method", "sourceRef", "acquiredAt"],
+      "properties": {
+        "method": { "enum": ["NOT_ACQUIRED", "LICENSED_COPY", "PUBLIC_DOCUMENT", "TA14_AUTHORED", "SYNTHETIC_FIXTURE"] },
+        "sourceRef": { "type": ["string", "null"] },
+        "acquiredAt": { "type": ["string", "null"] }
+      }
+    },
+    "contentIdentity": {
+      "type": "object", "additionalProperties": false, "required": ["sha256", "basis"],
+      "properties": { "sha256": { "oneOf": [{ "type": "null" }, { "type": "string", "pattern": "^[0-9a-f]{64}$" }] }, "basis": { "type": "string", "minLength": 1 } }
+    },
+    "applicability": { "type": "string", "minLength": 1 },
+    "locators": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "supersedes": { "type": ["string", "null"] }
+  }
+}

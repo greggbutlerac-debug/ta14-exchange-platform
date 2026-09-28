@@ -1,0 +1,525 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/eie-evidence-window.schema.json",
+  "title": "TA-14-EIE-ARCH-1.0 s03 Environmental Integrity Recorder evidence window",
+  "description": "Evidence preservation only. A window carries no calculation, interpretation, determination, authority, commitment or execution output.",
+  "type": "object",
+  "additionalProperties": false,
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "submitter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "role",
+        "id"
+      ],
+      "properties": {
+        "role": {
+          "enum": [
+            "NODE",
+            "TECHNICIAN",
+            "ANALYZER",
+            "GOVERNOR"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "provider",
+        "deviceId"
+      ],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "minLength": 1
+        },
+        "deviceId": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "chainRecord": {
+      "type": "object",
+      "required": [
+        "windowId",
+        "windowSeq",
+        "kind",
+        "recordedAt",
+        "submittedBy",
+        "prevEntryHash",
+        "entryHash"
+      ],
+      "properties": {
+        "windowId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "windowSeq": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "kind": {
+          "enum": [
+            "OBSERVATION",
+            "CORRECTION",
+            "EVENT",
+            "REJECTED_SUBMISSION",
+            "PREMATURE_PRESSURE_ENTRY",
+            "GATE_A_RECEIPT",
+            "MATERIAL_CHANGE",
+            "GAP"
+          ]
+        },
+        "recordedAt": {
+          "type": "string",
+          "minLength": 1
+        },
+        "submittedBy": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/submitter"
+            }
+          ]
+        },
+        "prevEntryHash": {
+          "$ref": "#/$defs/sha256"
+        },
+        "entryHash": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "profileBound": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "value",
+            "basisRef"
+          ],
+          "properties": {
+            "status": {
+              "const": "ESTABLISHED"
+            },
+            "value": {},
+            "basisRef": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "status",
+            "requiredFrom"
+          ],
+          "properties": {
+            "status": {
+              "const": "NOT_ESTABLISHED"
+            },
+            "requiredFrom": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    }
+  },
+  "required": [
+    "windowId",
+    "headerHash",
+    "contract",
+    "architectureFingerprint",
+    "recorderId",
+    "recorderMode",
+    "purpose",
+    "assetId",
+    "openTrigger",
+    "openedAt",
+    "openedBy",
+    "admittedChannels",
+    "admittedSources",
+    "continuityProfile",
+    "continuityProfileHash",
+    "predecessorWindowIds",
+    "predecessorSealHashes",
+    "entries",
+    "events",
+    "gaps",
+    "closeTrigger",
+    "closedAt",
+    "continuityStatus",
+    "lastEntryHash",
+    "sealHash",
+    "recorderSignature"
+  ],
+  "properties": {
+    "windowId": {
+      "type": "string",
+      "pattern": "^EIE-WIN-[0-9a-f]{64}$"
+    },
+    "headerHash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "contract": {
+      "const": "TA-14-EIE-ARCH-1.0/s03"
+    },
+    "architectureFingerprint": {
+      "const": "f4575172495fec67c29b964465d5f90f23845dbe98d30bd31f4e9281ba075170"
+    },
+    "recorderId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "recorderMode": {
+      "enum": [
+        "SIMULATION",
+        "PRODUCTION"
+      ]
+    },
+    "purpose": {
+      "enum": [
+        "CONTINUOUS",
+        "BASELINE_NONINVASIVE",
+        "PRESSURE_EVIDENCE",
+        "EXECUTION",
+        "POST_STABILIZATION",
+        "POST_VERIFICATION"
+      ]
+    },
+    "assetId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "openTrigger": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "ref",
+        "gateAReceiptId",
+        "gateAReceiptContentHash",
+        "gateAReceiptWindowId",
+        "gateAReceiptEntryHash"
+      ],
+      "properties": {
+        "type": {
+          "enum": [
+            "SESSION_START",
+            "GATE_A_ALLOW_RECEIPT",
+            "GATE_B_COMMIT",
+            "GOVERNOR_TERMINATION",
+            "SCHEDULE"
+          ]
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "gateAReceiptId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gateAReceiptContentHash": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        },
+        "gateAReceiptWindowId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "gateAReceiptEntryHash": {
+          "oneOf": [
+            {
+              "type": "null"
+            },
+            {
+              "$ref": "#/$defs/sha256"
+            }
+          ]
+        }
+      }
+    },
+    "openedAt": {
+      "type": "string",
+      "minLength": 1
+    },
+    "openedBy": {
+      "$ref": "#/$defs/submitter"
+    },
+    "admittedChannels": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "eie-node-observation.schema.json#/properties/channel"
+      }
+    },
+    "admittedSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source"
+      }
+    },
+    "predecessorWindowIds": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "predecessorSealHashes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/sha256"
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/chainRecord"
+          },
+          {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "OBSERVATION",
+                  "CORRECTION"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/chainRecord"
+          },
+          {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "EVENT",
+                  "REJECTED_SUBMISSION",
+                  "PREMATURE_PRESSURE_ENTRY",
+                  "GATE_A_RECEIPT",
+                  "MATERIAL_CHANGE"
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "allOf": [
+          {
+            "$ref": "#/$defs/chainRecord"
+          },
+          {
+            "properties": {
+              "kind": {
+                "const": "GAP"
+              }
+            }
+          }
+        ]
+      }
+    },
+    "closeTrigger": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "type",
+            "ref",
+            "by"
+          ],
+          "properties": {
+            "type": {
+              "enum": [
+                "DECLARED_END_OF_PURPOSE",
+                "NEXT_LIFECYCLE_RECEIPT",
+                "CONTINUITY_BREAK",
+                "PROFILE_TIMEOUT"
+              ]
+            },
+            "ref": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "by": {
+              "oneOf": [
+                {
+                  "type": "null"
+                },
+                {
+                  "$ref": "#/$defs/submitter"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "closedAt": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "continuityStatus": {
+      "enum": [
+        "INTACT",
+        "DEGRADED",
+        "BROKEN"
+      ]
+    },
+    "lastEntryHash": {
+      "$ref": "#/$defs/sha256"
+    },
+    "sealHash": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "$ref": "#/$defs/sha256"
+        }
+      ]
+    },
+    "recorderSignature": {
+      "oneOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "keyId",
+            "signature"
+          ],
+          "properties": {
+            "keyId": {
+              "type": "string",
+              "minLength": 1
+            },
+            "signature": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
+    },
+    "continuityProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "profileId",
+        "profileVersion",
+        "basis",
+        "sequenceSemantics",
+        "maxGapSeconds",
+        "maxObservationAgeSeconds",
+        "maxSourceClockLeadSeconds",
+        "windowTimeoutSeconds"
+      ],
+      "properties": {
+        "profileId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "profileVersion": {
+          "type": "string",
+          "minLength": 1
+        },
+        "basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "kind",
+            "ref"
+          ],
+          "properties": {
+            "kind": {
+              "enum": [
+                "SYNTHETIC_FIXTURE",
+                "OEM_CRITERION",
+                "GOVERNED_METHOD",
+                "SOURCE_DOCUMENTATION"
+              ]
+            },
+            "ref": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "sequenceSemantics": {
+          "$ref": "#/$defs/profileBound"
+        },
+        "maxGapSeconds": {
+          "$ref": "#/$defs/profileBound"
+        },
+        "maxObservationAgeSeconds": {
+          "$ref": "#/$defs/profileBound"
+        },
+        "maxSourceClockLeadSeconds": {
+          "$ref": "#/$defs/profileBound"
+        },
+        "windowTimeoutSeconds": {
+          "$ref": "#/$defs/profileBound"
+        }
+      }
+    },
+    "continuityProfileHash": {
+      "$ref": "#/$defs/sha256"
+    }
+  }
+}

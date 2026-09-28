@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.org/schemas/eie-node-observation.schema.json",
+  "title": "TA-14-EIE-ARCH-1.0 s04 Environmental Integrity Node raw observation",
+  "description": "Raw observation only. No derived values, stability, drift or diagnostic judgement. Unknown fields are rejected, never repaired.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "observationId", "channel", "source", "instrument", "location", "value", "unit", "observedAt", "receivedAt",
+    "sequence", "acquisitionMethod", "accuracyOrUncertainty", "sourceQuality", "adapterVersion"
+  ],
+  "properties": {
+    "observationId": { "type": "string", "minLength": 1 },
+    "channel": {
+      "enum": [
+        "RETURN_DRY_BULB", "RETURN_RH", "RETURN_WET_BULB", "SUPPLY_DRY_BULB", "SUPPLY_RH", "OUTDOOR_DRY_BULB",
+        "BAROMETRIC_PRESSURE", "ELEVATION", "LIQUID_LINE_TEMPERATURE", "SUCTION_LINE_TEMPERATURE",
+        "RETURN_STATIC_PRESSURE", "SUPPLY_STATIC_PRESSURE", "AIRFLOW", "VOLTAGE", "CURRENT", "SCALE_MASS",
+        "SUCTION_PRESSURE", "LIQUID_PRESSURE"
+      ]
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "deviceId"],
+      "properties": {
+        "provider": { "type": "string", "minLength": 1 },
+        "deviceId": { "type": "string", "minLength": 1 }
+      }
+    },
+    "instrument": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "calibrationOrFitnessRef", "fitUntil"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "calibrationOrFitnessRef": { "type": "string", "minLength": 1 },
+        "fitUntil": { "type": "string", "minLength": 1 }
+      }
+    },
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["physical", "class", "basis"],
+      "properties": {
+        "physical": { "type": "string", "minLength": 1 },
+        "class": { "enum": ["A", "B", "C"] },
+        "basis": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "ref"],
+          "properties": {
+            "kind": { "enum": ["OEM_CITATION", "GOVERNED_METHOD"] },
+            "ref": { "type": "string", "minLength": 1 }
+          }
+        }
+      }
+    },
+    "value": { "type": "number" },
+    "unit": { "type": "string", "minLength": 1 },
+    "observedAt": { "type": "string", "minLength": 1 },
+    "receivedAt": { "type": "string", "minLength": 1 },
+    "sequence": { "type": "integer", "minimum": 0 },
+    "acquisitionMethod": { "enum": ["LIVE_ADAPTER", "MANUAL_INSTRUMENT", "SIMULATED"] },
+    "accuracyOrUncertainty": {
+      "oneOf": [
+        { "type": "null" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["kind", "value", "unit", "basisRef"],
+          "properties": {
+            "kind": { "enum": ["ACCURACY", "UNCERTAINTY"] },
+            "value": { "type": "number", "minimum": 0 },
+            "unit": { "type": "string", "minLength": 1 },
+            "basisRef": { "type": "string", "minLength": 1 }
+          }
+        }
+      ]
+    },
+    "sourceQuality": { "type": "string", "minLength": 1 },
+    "adapterVersion": { "type": "string", "minLength": 1 }
+  }
+}

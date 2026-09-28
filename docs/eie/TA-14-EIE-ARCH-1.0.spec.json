@@ -1,0 +1,286 @@
+{
+  "specId": "TA-14-EIE-ARCH-1.0",
+  "title": "TA-14 Environmental Integrity Ecosystem Architecture Specification",
+  "status": "FROZEN_CANDIDATE",
+  "parent": "TA-14 Gate (parent contract; unmodified)",
+  "relatedProfiles": {
+    "gateA": "TA-14-NIRET-GA-C1 revision C1-R7, fingerprint f934afe35313adac9f8794e0d345119a9bb64d621cc028aec286f9c3f5e09fa6, unchanged",
+    "gateB": "Reserved: separate frozen specification (B1); not implemented",
+    "calculationReferenceRegistry": "CRR-1: contract frozen here; entries activate separately"
+  },
+  "fingerprintRule": "SHA-256 over canonical JSON (keys sorted, no insignificant whitespace) of this document.",
+  "invariants": [
+    "Monitoring is not evidence.",
+    "Evidence is not authority.",
+    "Authority is not execution.",
+    "GAUGE AVAILABLE != ENTRY JUSTIFIED",
+    "ENTRY JUSTIFIED != DIAGNOSIS",
+    "DIAGNOSIS != INTERVENTION AUTHORITY",
+    "Gate A ALLOW never implies Gate B ALLOW; gate_b_authorized is never set by Gate A.",
+    "No universal HVACD/R or refrigerant quantities, timings, convergence thresholds, electrical limits, performance-degradation definitions or charge rules (generic delta-T, CFM/ton, superheat, subcooling, approach, pressures, line temperatures, psychrometric performance) are defined by this architecture.",
+    "A declaration never verifies itself: DECLARED -> DOCUMENTED -> VERIFIED/ESTABLISHED.",
+    "Unknown, missing, stale, simulated-in-production, unsealed, unactivated or out-of-scope conditions fail closed."
+  ],
+  "canonicalChain": [
+    "Physical Reality", "Environmental Integrity Node", "Environmental Integrity Recorder", "HVAC Diagnostic Analyzer",
+    "NIRET / Gate A (only when pressure-side entry is proposed)", "pressure-side evidence", "Analyzer",
+    "Declared Diagnostic Determination", "Gate B", "Refrigerant Governor", "physical consequence", "Node", "Recorder",
+    "Analyzer / HPR-V outcome comparison", "new governed Reality"
+  ],
+  "stages": {
+    "OBSERVATION": "raw reading; Node; no consequence",
+    "RECORD": "sealed, sequenced window entry; Recorder; no consequence",
+    "CALCULATION": "derived value with lineage under an activated CRR-1 reference; Analyzer; no consequence",
+    "INTERPRETATION": "thermodynamic behavior finding; Analyzer; no consequence",
+    "TECHNICAL_DETERMINATION": "criterion-bound result and Declared Diagnostic Determination; Analyzer computes, qualified technician accepts; no consequence",
+    "AUTHORITY": "Gate A or Gate B receipt; gate engines only; enables, never performs",
+    "COMMIT": "bounded Gate B commitment; enables execution only",
+    "EXECUTION": "physical refrigerant transfer; Governor; only within the commitment",
+    "OUTCOME": "HPR-V and comparison; Node -> Recorder -> Analyzer; no consequence"
+  },
+  "s01_componentBoundaries": {
+    "node": { "may": ["produce raw observations under the observation contract"], "mayNot": ["derive", "classify", "judge stability or drift", "diagnose", "command", "open or close windows", "rewrite history"] },
+    "recorder": { "may": ["create, sequence, seal and close evidence windows on defined triggers", "accept attributable events", "verify continuity"], "mayNot": ["interpret", "decide", "command", "allow any submitter to alter preserved entries"] },
+    "analyzer": { "may": ["calculate only through activated CRR-1 references", "interpret", "evaluate evidence sufficiency", "compute technical determinations against governed criteria"], "mayNot": ["authorize anything", "issue commands or refrigerant quantities", "alter preserved history", "turn a calculation reference or thermodynamic behavior into equipment-specific OEM authority"] },
+    "gateA": { "may": ["sole authority for pressure-instrument entry (C1-R7)"], "mayNot": ["be modified by this specification"] },
+    "gateB": { "may": ["sole authority for a bounded refrigerant-mass intervention (future B1)"], "mayNot": ["be satisfied by Gate A ALLOW alone"] },
+    "governor": { "may": ["execute only within a valid Gate B commitment", "refuse", "HOLD", "stop", "terminate"], "mayNot": ["grant, extend or infer authority", "invent, enlarge or infer bounds", "manufacture custody or evidence"], "profiles": "Execution strategies (e.g. psychrometric-observed, OEM-method) are bounded profiles of one Governor and carry no authority; any TA-14 governed execution profile must be separately versioned and frozen." },
+    "technician": { "may": ["supervise", "accept or disagree with a computed determination (separately recorded)", "request gates", "propose technician-declared bounds", "stop"], "mayNot": ["self-verify identity, qualification or authority", "edit preserved records or Analyzer results"] },
+    "consentGiver": { "may": ["grant or withdraw a consent object"], "mayNot": ["create technical admissibility or execution authority"] }
+  },
+  "s02_lifecycle": {
+    "states": [
+      "S0 UNOBSERVED", "S1 OBSERVING", "S2 HPR0_WINDOW_OPEN", "S3 HPR0_SEALED", "S4 NONINVASIVE_ANALYZED", "S5 GATE_A_EVALUATED",
+      "S6 PRESSURE_WINDOW_OPEN", "S7 HPR_BL_SEALED", "S8 DETERMINATION_COMPUTED", "S9 DETERMINATION_DECLARED", "S10 GATE_B_EVALUATED",
+      "S11 COMMITTED", "S12 PRE_EXECUTION_REVALIDATED", "S13 EXECUTING", "S14 EXECUTION_TERMINATED", "S15 POST_STABILIZATION_WINDOW",
+      "S16 HPR_V_SEALED", "S17 OUTCOME_COMPARED_CLOSED"
+    ],
+    "holds": ["S8 requires ESTABLISHED calculations", "S9 requires established acceptor standing", "S12H no step on failed revalidation", "S13H execution hold"],
+    "terminalExecutionStates": ["COMPLETED_WITHIN_COMMITMENT", "STOPPED", "CONSENT_WITHDRAWN", "COMMITMENT_EXPIRED", "ABORTED"],
+    "rules": [
+      "Transitions are forward-only and each requires the predecessor receipt or seal.",
+      "S6 opens only on a C1-R7 receipt with determination=ALLOW (technical and execution) and scope=PRESSURE_EVIDENCE_ONLY.",
+      "Gate A DENY/HOLD/ESCALATE or a determination indicating no intervention proceeds to closure without intervention, or back to a curable state.",
+      "A material change (identity, configuration, hazard, continuity gap, unrecorded intervention, consent withdrawal, credential or standing loss, reference deactivation) returns the lifecycle to the earliest state whose evidence it undermines; prior receipts are preserved with standing CHALLENGED."
+    ]
+  },
+  "s03_evidenceWindow": {
+    "owner": "Recorder",
+    "fields": ["windowId", "purpose", "assetId", "openTrigger{type,ref}", "openedAt(Recorder clock)", "admittedChannels", "admittedSources", "continuityPolicy(profile-supplied)", "entries[]", "events[]", "gaps[]", "closeTrigger", "closedAt", "continuityStatus INTACT|DEGRADED|BROKEN", "sealHash", "recorderSignature", "predecessorWindowIds"],
+    "purposes": ["CONTINUOUS", "BASELINE_NONINVASIVE", "PRESSURE_EVIDENCE", "EXECUTION", "POST_STABILIZATION", "POST_VERIFICATION"],
+    "openTriggers": { "SESSION_START": "baseline windows", "GATE_A_ALLOW_RECEIPT": "only opener of PRESSURE_EVIDENCE", "GATE_B_COMMIT": "only opener of EXECUTION", "GOVERNOR_TERMINATION": "post windows", "SCHEDULE": "CONTINUOUS only" },
+    "closeTriggers": ["declared end of purpose", "next lifecycle receipt", "continuity break", "profile-declared timeout"],
+    "rules": [
+      "entryHash = SHA-256(prevEntryHash || canonical(entry)).",
+      "Node, Analyzer, Governor and technician append attributable events only; no update or delete; corrections are new entries referencing the corrected entry.",
+      "The actor is not the sole historian: Governor events require corroborating Node observations in the same EXECUTION window; uncorroborated execution is DEGRADED and cannot close as verified."
+    ]
+  },
+  "s04_nodeObservation": {
+    "fields": ["observationId", "channel", "source{provider,deviceId}", "instrument{id,calibrationOrFitnessRef,fitUntil}", "location{physical,class A|B|C,basis(OEM citation or governed method id)}", "value", "unit", "observedAt", "receivedAt", "sequence", "acquisitionMethod LIVE_ADAPTER|MANUAL_INSTRUMENT|SIMULATED", "accuracyOrUncertainty", "sourceQuality", "adapterVersion"],
+    "channels": ["return dry bulb", "return RH or wet bulb", "supply dry bulb", "supply RH", "outdoor dry bulb", "barometric pressure", "elevation (with source)", "liquid-line temperature", "suction-line temperature", "return static", "supply static", "airflow (governed method)", "voltage", "current", "scale mass (custody)", "IAQ channels", "suction pressure", "liquid pressure"],
+    "rules": [
+      "Raw values only; no derived values, stability, drift or diagnostic judgement.",
+      "Pressure channels are admissible only inside a PRESSURE_EVIDENCE window; pressure observed elsewhere is recorded as premature entry (C1-R7 A1).",
+      "Missing required field, undeclared unit or unparseable time is rejected, never repaired.",
+      "No sensor manufacturer or device is architectural authority; adapters map sources onto this contract."
+    ]
+  },
+  "s05_calculation": {
+    "registry": "CRR-1 (Calculation Reference Registry)",
+    "entryFields": ["referenceId", "publisher", "title", "editionOrVersion", "chapterOrSection", "methodOrEquations", "units", "assumptions", "validDomain", "pressureOrElevationBasis (psychrometric)", "refrigerantIdentityAndComposition (property)", "fluidModel (property)", "saturationConvention (property)", "implementation{package,version,fileHash}", "conformanceTestRef", "calculationVersion", "possessionAndUseBasis{status NOT_ESTABLISHED|ESTABLISHED,evidenceRef}", "review{state,reviewedBy,reviewedAt}", "activation{state CANDIDATE|ACTIVE|SUSPENDED|RETIRED,activatedBy,activatedAt}"],
+    "activationPrerequisites": [
+      "lawful possession and permitted use of the reference and any implementation ESTABLISHED by evidence",
+      "independent review of the entry",
+      "implementation conformance-tested against the pinned reference",
+      "hash-pinned in the registry manifest",
+      "owner activation"
+    ],
+    "candidateEntries": [
+      { "referenceId": "CRR-PSY-ASHRAE-F2025-CH1", "role": "governing psychrometric reference", "identity": "ASHRAE Handbook - Fundamentals (2025), Chapter 1 Psychrometrics, SI and I-P", "state": "CANDIDATE", "possessionAndUse": "NOT_ESTABLISHED" },
+      { "referenceId": "CRR-REF-NIST-REFPROP-10.0", "role": "governing refrigerant-property reference", "identity": "NIST Standard Reference Database 23, REFPROP Version 10.0, full mixture model at the composition of the ASHRAE Standard 34 designation", "state": "CANDIDATE", "possessionAndUse": "NOT_ESTABLISHED" }
+    ],
+    "implementationRule": "An implementation (e.g. PsychroLib, which states it implements the 2017 ASHRAE Fundamentals Chapter 1) is admissible only for the reference it is conformance-verified against; it never substitutes for a different edition and is never itself a governing reference.",
+    "catalogue": ["humidity ratio", "enthalpy", "dew point", "air mass flow from governed airflow evidence", "sensible, latent and total heat rate", "moisture removal rate", "refrigerant saturation temperature from pressure", "superheat", "subcooling", "declared window statistics"],
+    "rules": [
+      "Pure, deterministic functions declaring referenceId, calculationVersion, input observation ids and hashes, output units and uncertainty propagation.",
+      "No threshold comparisons inside calculations.",
+      "Missing, ambiguous, incompatible, unactivated or out-of-domain reference, or missing input: CALCULATION NOT ESTABLISHED; dependent determinations fail closed.",
+      "A calculation reference never becomes equipment-specific or OEM authority."
+    ]
+  },
+  "s06_determinationBoundary": {
+    "interpretation": "Behavior findings describe thermodynamic behavior; never charge rules; never authority.",
+    "determination": "Declared propositions evaluated only against governed criteria: OEM-bound where authoritative OEM criteria exist (A7/A8 registry); otherwise equipment-specific propositions are INDETERMINATE or NOT_APPLICABLE_NO_OEM_CRITERION.",
+    "oemPrecedence": "Where an applicable governed OEM charging procedure supplies or explicitly requires its own pressure-temperature relationship, table, chart, correction or calculation method, that OEM method governs the equipment-specific determination within its stated applicability. A CRR-1 reference may be used for independent calculation or comparison but never silently replaces the OEM method; differences are recorded as findings. If the OEM procedure requires a saturation value but its convention is not stated in the governed record and no activated CRR-1 convention applies, the input is NOT ESTABLISHED. If the OEM procedure is internally conflicting, the determination is HOLD.",
+    "forbiddenOutputs": ["commands", "refrigerant quantities", "authority fields", "gate fields"]
+  },
+  "s07_hpr": {
+    "HPR0": "As-found record sealed before any disturbance; never superseded.",
+    "HPR_BL": "Stabilized baseline immediately before the governed intervention: Part A non-invasive; Part B pressure evidence only under Gate A ALLOW. Any non-refrigerant correction after HPR0 is recorded as an intervention with its own post-state and a new HPR-BL is sealed.",
+    "HPR_V": "Post-intervention record with the same channels, locations, location basis and governed methods as HPR-BL, instruments of equivalent fitness, linked to HPR-BL; only matched channels are compared; unmatched is NOT_COMPARABLE."
+  },
+  "s08_declaredDiagnosticDetermination": {
+    "computedPart": ["determinationId", "assetId", "identityBinding (governed binding id or NO_RECORD)", "inputWindowIds and sealHashes", "gateAReceiptHash", "analyzer{id,version,specFingerprint}", "calculationReferenceIds and calculationVersions", "criterionSources (record ids)", "propositions and results", "uncertainty", "class", "limitations", "computedAt"],
+    "classes": ["WITHIN_OEM_CRITERION", "OUTSIDE_OEM_CRITERION (direction only as the OEM states it)", "INDETERMINATE", "NOT_APPLICABLE_NO_OEM_CRITERION", "NON_CHARGE_CONDITION_UNRESOLVED"],
+    "declarationPart": ["technicianIdentity", "declarantStanding{level,source,reference}", "acceptance ACCEPTED|DISAGREED", "declaredAt", "computedPartHash"],
+    "rules": [
+      "The computed part is immutable; acceptance cannot alter it.",
+      "DISAGREED creates a separately attributable disagreement/correction record.",
+      "Acceptance requires independently established identity and qualification (G3); otherwise HOLD.",
+      "DISAGREED or INDETERMINATE cannot support Gate B (HOLD).",
+      "Standing CURRENT; CHALLENGED on material change or profile-declared validity expiry."
+    ]
+  },
+  "s09_gateAInterface": [
+    "An adapter builds the C1-R7 input from sealed windows, packaging Node readings as Measurements with instrument, location class and governed method; the engine recomputes all derivations.",
+    "The C1-R7 receipt is preserved into the Recorder.",
+    "Continuous series are not consumed by C1-R7; continuous-evidence Gate A semantics require a separately frozen amendment (e.g. C1-R8)."
+  ],
+  "s10_gateB": {
+    "form": "Separate frozen specification (B1) under the TA-14 Gate; not implemented.",
+    "purposes": { "DIAGNOSTIC_CHARGE_ADJUSTMENT": "first defined purpose", "reserved": ["INSTALLATION_WEIGH_IN", "RECOVERY_FOR_REPAIR", "EVACUATION_RECHARGE", "COMPONENT_REPLACEMENT"], "undefined": "DENY or ESCALATE; no generic Gate A bypass" },
+    "propositions": {
+      "B-P01": "Asset identity current and bound",
+      "B-P02": "Gate A ALLOW receipt and sealed HPR-BL exist",
+      "B-P03": "Declared Diagnostic Determination ACCEPTED, CURRENT, OEM-bound, directional",
+      "B-P04": "Execution authority: independently verified certification (NIRET verifier architecture), authenticated submitter, not self-issued",
+      "B-P05": "Consent current, covering scope, with consent-giver standing ESTABLISHED",
+      "B-P06": "Custody source or destination identified and measurable",
+      "B-P07": "Bound completeness and provenance (each bound OEM_CRITERION or TECHNICIAN_DECLARED)",
+      "B-P08": "Bound admissibility: technician-declared bounds require a declarant with ESTABLISHED qualification",
+      "B-P09": "EXECUTION window openable and baseline sealed",
+      "B-P10": "No material change since the determination (GCEA standing)",
+      "B-P11": "No safety exclusion (e.g. A2L, unresolved hazard)",
+      "B-P12": "Bound consistency: no contradiction of a governed OEM record or of the determination direction; step bound resolvable within the custody instrument's declared accuracy",
+      "B-P13": "Stop-condition observability: every declared stop condition references an observable channel or Analyzer output"
+    },
+    "bounds": ["direction", "refrigerant identity", "maximum total mass", "maximum step mass", "pause and stabilization rule", "continuation and termination criteria", "stop conditions including any 'performance worsens' definition and electrical limits"],
+    "boundRules": [
+      "OEM requirements control where applicable authoritative OEM criteria exist.",
+      "Technician-declared bounds are attributable inputs, not OEM criteria and not technical truth; Gate B evaluates their admissibility before commitment.",
+      "Missing or unknown required bounds: HOLD."
+    ],
+    "receipt": ["determination", "commitId", "scope and committed bounds with provenance", "expiresAt", "standing", "reliedOn references"],
+    "invariant": "Gate A ALLOW is evidence for B-P02 only and never satisfies any B-P alone; a missing proposition is HOLD, never ALLOW."
+  },
+  "s11_consent": {
+    "fields": ["consentId", "consentingActorIdentity", "standing{level DECLARED|DOCUMENTED|ESTABLISHED,source,reference}", "consequenceAndScope{asset,purpose,bounds}", "grantedAt", "validUntil", "withdrawalState", "withdrawnAt", "withdrawalChannel", "hash"],
+    "rules": [
+      "Consent is a separate, attributable, revocable authority object; necessary where applicable, never independently sufficient.",
+      "Consent-giver standing must be independently established; no owner/occupant/agent verification source is invented; until one exists consent standing and execution authority are HOLD / NOT ESTABLISHED.",
+      "Checked before every Governor step; withdrawal during execution causes controlled stop/HOLD and termination CONSENT_WITHDRAWN."
+    ]
+  },
+  "s12_custody": {
+    "fields": ["custodyId", "refrigerantIdentity", "containerIdentity", "sourceOrRecoveryDestination", "startingMass (scale observation under s04)", "endingMass", "transferredMass with uncertainty", "actor", "assetId", "timestamps", "commitId", "executionReceiptRef"],
+    "rules": ["Transferred mass must reconcile with Governor step totals within declared uncertainty; mismatch is a custody discrepancy: stop/HOLD.", "The Governor cannot create, estimate or backfill custody evidence."]
+  },
+  "s13_governor": {
+    "command": ["commitId", "stepIndex", "direction", "maxStepMass", "pauseAndStabilizationRule", "continuationCriterionRefs", "boundProvenance per parameter"],
+    "stepRecord": ["preStepRevalidationRef", "containerMassBefore", "containerMassAfter", "actuationEvent", "start", "end", "responseWindowRef"],
+    "pauseRecord": ["declared rule", "observations relied on"],
+    "stopReasons": ["STOP-PERFORMANCE", "STOP-STABILITY", "STOP-ELECTRICAL", "STOP-SENSOR", "STOP-CONSENT", "STOP-CUSTODY", "STOP-COMMIT-EXPIRED", "STOP-TECHNICIAN", "STOP-HAZARD", "STOP-STANDING"],
+    "terminationReceipt": ["terminalState", "totalTransferred", "custodyReconciliation", "windowSeals", "gateBCommitRef"],
+    "rules": ["Any command parameter not in the commitment is rejected (GOV-CMD-BOUND_NOT_COMMITTED).", "No receipt contains an authority field."]
+  },
+  "s14_preExecutionRevalidation": {
+    "when": "Immediately before the first step and before every step (GCEA evaluateExecutionAttempt pattern).",
+    "checks": ["commitment CURRENT and unexpired", "consent valid and consent-giver standing ESTABLISHED", "executor certification and standing current", "acceptor standing current", "determination not CHALLENGED", "asset identity unchanged", "no hazard", "EXECUTION window INTACT", "required channels live and fresh", "custody container identified and scale fit", "CRR-1 references still ACTIVE and pinned"],
+    "onFailure": "HOLD; no step; nothing carried forward from a prior check."
+  },
+  "s15_outcomeClosure": {
+    "steps": ["termination opens POST_STABILIZATION window (duration from the OEM criterion or the committed bound; neither: HOLD)", "HPR-V sealed", "Analyzer compares matched channels", "closure receipt; sealed record becomes the next governed baseline"],
+    "outcomes": ["VERIFIED_CHANGE_WITHIN_CRITERION", "NO_MEASURABLE_CHANGE", "ADVERSE_CHANGE", "NOT_COMPARABLE"],
+    "rule": "An outcome claim never exceeds what was re-measured."
+  },
+  "s16_failClosed": [
+    "Unknown, missing, stale, simulated in production, unsealed or out-of-scope: HOLD (ESCALATE when outside scope).",
+    "Pressure observation outside a PRESSURE_EVIDENCE window: premature entry, DENY (C1-R7 A1).",
+    "No Gate B evaluation without a Gate A receipt and sealed HPR-BL, except under a separately defined purpose.",
+    "No Governor step without a commitment and per-step revalidation.",
+    "No self-authority, self-verification or self-historization.",
+    "Disagreement or indeterminacy blocks Gate B.",
+    "Custody mismatch stops execution.",
+    "Undefined Gate B purpose: DENY or ESCALATE.",
+    "Unactivated, unpossessed, unconfirmed or out-of-domain calculation reference: NOT ESTABLISHED.",
+    "Bound without provenance, or missing required bound: HOLD.",
+    "Unestablished human standing: HOLD.",
+    "HOLD is never read as ALLOW; absence of DENY is never permission."
+  ],
+  "s17_reasonCodeFamilies": {
+    "gateA": "existing C1-R7 codes, unchanged",
+    "EIE-OBS-*": ["UNIT_UNDECLARED", "SOURCE_UNIDENTIFIED", "INSTRUMENT_UNFIT", "LOCATION_BASIS_MISSING", "PRESSURE_OUTSIDE_WINDOW"],
+    "EIE-WIN-*": ["TRIGGER_INVALID", "CONTINUITY_BROKEN", "SEAL_MISMATCH", "UNCORROBORATED_ACTOR_EVENT"],
+    "EIE-CALC-*": ["INPUT_MISSING", "CALCULATION_NOT_ESTABLISHED"],
+    "EIE-REF-*": ["MISSING", "UNCONFIRMED", "NOT_ACTIVATED", "POSSESSION_NOT_ESTABLISHED", "OUT_OF_DOMAIN", "IMPLEMENTATION_UNVERIFIED", "CONVENTION_NOT_ESTABLISHED"],
+    "EIE-INT-*/EIE-DDD-*": ["NO_OEM_CRITERION", "OEM_METHOD_CONFLICT", "INDETERMINATE", "DISAGREED", "CHALLENGED"],
+    "EIE-STANDING-*": ["DECLARED_ONLY", "SOURCE_UNAVAILABLE", "NOT_ESTABLISHED"],
+    "GATEB-*": ["PURPOSE_UNDEFINED", "GATE_A_RECEIPT_MISSING", "DDD_NOT_ACCEPTED"],
+    "GATEB-BOUND-*": ["MISSING", "PROVENANCE_MISSING", "UNRESOLVABLE_BY_INSTRUMENT", "CONTRADICTS_OEM", "CONTRADICTS_DETERMINATION"],
+    "EIE-CONSENT-*": ["MISSING", "EXPIRED", "WITHDRAWN", "RELATIONSHIP_UNESTABLISHED"],
+    "EIE-CUSTODY-*": ["CONTAINER_UNIDENTIFIED", "SCALE_UNFIT", "RECONCILIATION_MISMATCH"],
+    "GOV-CMD-*/GOV-STEP-*/GOV-STOP-*": ["BOUND_NOT_COMMITTED", "stop reasons per s13"],
+    "EIE-REVAL-*": ["one code per s14 check"],
+    "EIE-OUT-*": ["NOT_COMPARABLE", "UNMATCHED_METHOD"],
+    "EIE-PROV-*": ["LINEAGE_BROKEN", "HASH_MISMATCH"]
+  },
+  "s18_provenance": [
+    "SHA-256 over canonical JSON for every object; hash-chained window entries; Recorder seals signed with a server-side key.",
+    "Every derived value records input observation hashes, function id, referenceId, implementation hash and calculationVersion.",
+    "Every determination, receipt and outcome references predecessor seal hashes.",
+    "Recorder clock is authoritative; source time is preserved.",
+    "Replay from sealed windows must reproduce the determination hash."
+  ],
+  "s19_persistence": {
+    "appendOnlyStores": ["windows", "window entries", "analyzer computations", "determinations", "declarations", "disagreements", "Gate B receipts", "consents", "consent events", "custody records", "governor events", "outcomes", "CRR-1 registry entries and activation events"],
+    "rules": ["Gate A receipts are referenced, not duplicated.", "Recorder seals under the service role; submitters append only their own attributable events; row-level security; no update or delete grants."],
+    "ownerPolicy": "Retention and volume for continuous raw time series (not an architecture blocker)."
+  },
+  "s20_simulation": [
+    "Simulated Node sources, scale and actuator are deterministic fixtures with acquisitionMethod=SIMULATED.",
+    "Simulated observations never support a production determination or gate input.",
+    "The simulated actuator performs no physical action.",
+    "Architecture precedes hardware; begin with simulated or read-only adapters."
+  ],
+  "s21_conformance": [
+    "Per-contract conformance suites for s03 to s15.",
+    "Invariant tests: no history rewrite; hash chain; Gate A never implies Gate B; no step without revalidation; consent withdrawal mid-step; custody mismatch; SIMULATED rejected in production; no generic charge rules (static checks extended to Analyzer and Governor code); bound absent from commitment rejected.",
+    "Reference tests: implementation conformance against the pinned reference before activation; out-of-domain input yields NOT ESTABLISHED; unactivated reference yields NOT ESTABLISHED.",
+    "Adversarial tests: forged events, self-issued authority, reordered windows, backdated seals, uncorroborated Governor events.",
+    "Golden replay tests of sealed chains.",
+    "Synthetic fixtures only."
+  ],
+  "s22_reuse": {
+    "hashingAndSigning": ["packages/crypto/receipts.ts", "packages/domain/canonical-json.ts"],
+    "decisionFold": ["packages/domain/state-machine.ts"],
+    "gateA": ["packages/domain/niret/*", "apps/web/lib/niret/server-evaluate.ts", "packages/domain/niret/oem-registry/*"],
+    "executionAuthorityAndStanding": ["apps/web/lib/niret/certification-verifier.ts", "supabase/migrations/20260928120000_niret_certification_verifications.sql", "CertificationVerifier and AuthorityEstablisher interfaces in apps/web/lib/niret/server-evaluate.ts"],
+    "gateBStandingAndRevalidation": ["apps/web/lib/governance-continuity-execution-authority.ts", "apps/web/lib/governance-continuity-execution-lifecycle.ts", "apps/web/lib/governance-continuity-outcome-record.ts", "docs/gcea/TA14_GCEA_v1.0_ARCHITECTURE_FREEZE.md"],
+    "observationAndContinuity": ["apps/web/lib/environmental-evidence-gateway.ts", "docs/environmental-evidence-gateway/HIBOUAIR_R1_ADAPTER_CONTRACT_v1.0.md"],
+    "boundedInterpretation": ["apps/web/lib/environmental-governance/proposition-entitlement.ts", "apps/web/lib/environmental-governance/bounded-determination.ts"],
+    "registryPattern": ["A7 hash-pinned, independently reviewed registry (packages/domain/niret/oem-registry/registry.ts)"],
+    "appendOnlyPersistence": ["GCEA lifecycle verifications, AFA/EABA append-only evidence and certification-verification migrations"],
+    "uiShells": ["apps/web/app/workspace/environmental-records/*"],
+    "tests": ["tests/acceptance/fixtures/*", "T27-style static rule checks"]
+  },
+  "s23_legacyCorrectionInventory": [
+    "Academy Step 13.5 sequencing (no Gate A, Declared Diagnostic Determination or Gate B; Node recording derived psychrometrics; technician-role statement contrary to ruling 2).",
+    "Academy Step 13 vs 13.5: 'The system declares it'.",
+    "HPR-BL: instruction to connect gauges, measure pressure and access refrigerant as the transition into NIRET; 'NIRET (Authorization Gate) -> Intervention'; generic '~70-80F' and '>=20 minutes'.",
+    "NIRET Classification Record: generic split, approach and suction-depression tables; 'unknown -> treat as fixed orifice'; generic run-time and return-air ranges; benchmark as basis.",
+    "'NIRET Standard' page describing 'NERIC'.",
+    "EIR describing NIRET as verified justification for intervention.",
+    "Ecosystem page: Analyzer 'does not diagnose' (superseded by ruling 1); 'five tools, three roles'; two separate Governors.",
+    "Repository Step 13: 'Evaluate and, when justified, adjust refrigerant' in one step.",
+    "Academy blueprint sequence without Gate B.",
+    "Public positioning of 'Analyzer-driven' and 'autonomous' charging (patent filings out of scope).",
+    "TA-14 Gate examples/hvac_execution_demo.json: ALLOW for refrigerant adjustment after threshold_check_completed (Gate repository; not modified)."
+  ],
+  "s24_operationalActivationDependencies": [
+    "CRR-1 entries remain CANDIDATE until lawful possession and permitted use are established, independently reviewed, conformance-tested, hash-pinned and activated; until then all dependent calculations are NOT ESTABLISHED.",
+    "No consent-giver standing source exists; consent standing and execution authority are HOLD until one is established.",
+    "No reachable governed OEM package; equipment-specific determinations resolve to NOT_APPLICABLE_NO_OEM_CRITERION or NO_RECORD.",
+    "Gate B (B1) specification to be separately frozen before any Governor execution."
+  ]
+}
