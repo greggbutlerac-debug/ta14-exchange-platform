@@ -1,10 +1,5 @@
 "use client";\n\nimport Link from "next/link";\nimport { useState } from "react";
 
-export const metadata = {
-  title: "HABITS × TA-14 R1 Final Result | TA-14 Exchange",
-  description: "Bilaterally preserved R1 result establishing bounded interface-state interoperability at the tested HABITS × TA-14 determination-state seam."
-};
-
 const established = [
   "Bidirectional transport",
   "Object identity / provenance preservation",
@@ -23,6 +18,13 @@ const notEstablished = [
 ];
 
 export default function Page() {
+  const [direction,setDirection]=useState<"habits"|"ta14">("habits");
+  const [crossed,setCrossed]=useState(false);
+  const [field,setField]=useState("Object identity & provenance");
+  const preserved=["Object identity & provenance","Originating architecture / state owner","Determination identity & state","Evidentiary standing & limitations","Applicability","Material UNKNOWNs","Freshness / currentness","Governance-authorisation context","Continuity state","Consequence binding","Effective examination point"];
+  const blocked=["Local constitutional authority","Receiving architecture determination","Execution authority"];
+  const source=direction==="habits"?"HABITS / P-01: UAB: HOLD":"TA-14 / P-01: HOLD";
+  const receiver=direction==="habits"?"TA-14":"HABITS";
   return <main className="page"><div className="wrap">
     <nav>
       <Link href="/">TA-14 EXCHANGE</Link>
@@ -36,6 +38,15 @@ export default function Page() {
       <p className="lede">R1 tested whether HABITS and TA-14 could transport and recognize independently attributable determination state across a frozen interface without either architecture inheriting the other's authority or determination.</p>
       <div className="result"><small>R1 RESULT</small><strong>BOUNDED INTERFACE-STATE INTEROPERABILITY ESTABLISHED FOR THE TESTED R1 OBJECTS, FIELDS, DIRECTIONS AND FROZEN INTERFACE CONDITIONS.</strong></div>
     </header>
+
+    <section className="interactive">
+      <p className="eyebrow">INTERACTIVE R1 REPLAY · PRESERVED RESULT</p>
+      <h2>Run the crossing yourself.</h2>
+      <p className="note">This replay does not create a new examination. It lets you inspect the already-preserved R1 crossing logic.</p>
+      <div className="controls"><button className={direction==="habits"?"active":""} onClick={()=>{setDirection("habits");setCrossed(false)}}>HABITS → TA-14</button><button className={direction==="ta14"?"active":""} onClick={()=>{setDirection("ta14");setCrossed(false)}}>TA-14 → HABITS</button><button className="run" onClick={()=>setCrossed(true)}>{crossed?"REPLAY COMPLETE ✓":"RUN PRESERVED CROSSING →"}</button></div>
+      <div className={"replay "+(crossed?"crossed":"")}><div className="node"><small>ORIGINATING STATE</small><strong>{source}</strong><p>Independently owned determination.</p></div><div className="rail"><span>{crossed?"ATTRIBUTABLE CONTEXT CROSSED":"READY"}</span><i>→</i></div><div className="node receiver"><small>RECEIVING ARCHITECTURE</small><strong>{receiver}</strong><p>{crossed?"Recognized as inspectable context. Local determination remains independent.":"No received context yet."}</p></div></div>
+      {crossed&&<div className="inspect"><div><h3>11 frozen fields survive the crossing</h3><div className="fieldlist">{preserved.map(x=><button key={x} className={field===x?"selected":""} onClick={()=>setField(x)}>✓ {x}</button>)}</div><p className="fieldread"><b>INSPECTING:</b> {field}<br/><span>Preserved as attributable R1 context; receipt does not establish new local authority.</span></p></div><div><h3>These do not transfer</h3>{blocked.map(x=><div className="blocked" key={x}>✕ {x}</div>)}<div className="verdict"><small>R1 RECEIPT TEST</small><strong>LOCAL INDEPENDENCE PRESERVED</strong><p>RECEIPT ≠ ACCEPTANCE · RECOGNITION ≠ ADOPTION</p></div></div></div>}
+    </section>
 
     <section>
       <p className="eyebrow">THE TESTED SEAM</p>
