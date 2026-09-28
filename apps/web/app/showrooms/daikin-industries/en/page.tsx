@@ -32,7 +32,7 @@ const scenarios = [
 
 export default function DaikinIndustriesShowroom() {
   const [scenario,setScenario] = useState(0);
-  const [decision,setDecision] = useState<"ALLOW"|"HOLD"|"ESCALATE"|null>(null);
+  const [decision,setDecision] = useState<"ALLOW"|"HOLD"|"DENY"|"ESCALATE"|null>(null);
   const current = useMemo(()=>scenarios[scenario], [scenario]);
 
   return <main className="page">
@@ -77,7 +77,7 @@ export default function DaikinIndustriesShowroom() {
 <article><h3>What happens when the answer is not ALLOW?</h3><p>HOLD preserves the proposal without execution. DENY rejects the proposed consequence under the established conditions. ESCALATE routes the unresolved question to an authorized decision-maker.</p></article>
 <article><h3>Does TA-14 require Daikin to adopt a proprietary platform?</h3><p>No adoption is assumed by this showroom. The architecture can first be examined as a boundary model against existing Daikin workflows, interfaces, evidence and authority structures.</p></article>
 <article><h3>What would a first Daikin × TA-14 examination look like?</h3><p>Choose one bounded consequence, freeze the actors, evidence, connection route and authority conditions, then run controlled changes to determine exactly where ALLOW becomes HOLD, DENY or ESCALATE.</p></article>
-</div></div></section><section id="record" className="section dark"><div className="shell"><p className="eyebrow">PUBLIC SOURCE RECORD</p><h2>Follow Daikin's own published strategy.</h2><p className="intro">The examination is intentionally anchored to primary Daikin sources, including material released September 28, 2026.</p><div className="sources">{sources.map(s=><a key={s[1]} href={s[1]} target="_blank" rel="noreferrer">{s[0]} ↗</a>)}</div></div></section>
+</div></div></section><section className="dark"><div className="shell"><p className="eyebrow">NEXT STEP</p><h2>Propose a bounded Daikin × TA-14 technical examination.</h2><p>No product adoption or partnership is assumed. Select one real consequence, freeze the evidence, authority, connection and execution boundaries, and test the seam under Daikin's actual technical conditions.</p><a className="langCta" href="mailto:gregbutlerac@gmail.com?subject=Daikin%20%C3%97%20TA-14%20Bounded%20Technical%20Examination">Propose a bounded examination →</a></div></section><section id="record" className="section dark"><div className="shell"><p className="eyebrow">PUBLIC SOURCE RECORD</p><h2>Follow Daikin's own published strategy.</h2><p className="intro">The examination is intentionally anchored to primary Daikin sources, including material released September 28, 2026.</p><div className="sources">{sources.map(s=><a key={s[1]} href={s[1]} target="_blank" rel="noreferrer">{s[0]} ↗</a>)}</div></div></section>
 
     <footer className="footer"><div className="shell"><a className="langCta" href="/showrooms/daikin-industries">日本語版を読む →</a><br/><br/>DAIKIN INDUSTRIES · PUBLIC STRATEGY SHOWROOM · PRIMARY-SOURCE EXAMINATION · OPEN FOR CORRECTION · NO ENDORSEMENT IMPLIED · TA-14 EXCHANGE</div></footer>
   </main>;
