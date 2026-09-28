@@ -14,6 +14,7 @@ import { DeterminationPanel, ReceiptPanel, type EvaluationResponse } from "./Nir
 
 const BASIS_OPTIONS: Array<[string, string]> = [
   ["NONINVASIVE_EVIDENCE", "Measured non-invasive evidence"],
+  ["POST_CHARGE_CHANGE_OR_REPAIR_VERIFICATION", "Verification after a logged charge change or refrigerant-circuit repair"],
   ["CUSTOMER_CLAIM", "Customer says it needs refrigerant"],
   ["PRIOR_TECHNICIAN_CLAIM", "Previous technician's statement"],
   ["SERVICE_HISTORY", "Service history"],
@@ -234,7 +235,10 @@ export default function NiretWorkbench() {
                 <li key={`${event.type}-${event.at}`}>
                   {STATE_EVENT_LABELS[event.type]} · {event.at}
                   {event.type === "REPAIR_OR_COMPONENT_REPLACEMENT" && (
-                    <CheckField label="Affected identity or metering device" checked={event.affectsIdentity} onChange={(v) => patch((d) => { d.events[index].affectsIdentity = v; })} />
+                    <>
+                      <CheckField label="Affected identity or metering device" checked={event.affectsIdentity} onChange={(v) => patch((d) => { d.events[index].affectsIdentity = v; })} />
+                      <CheckField label="Repair affected the refrigerant circuit" checked={event.affectsRefrigerantCircuit === true} onChange={(v) => patch((d) => { d.events[index].affectsRefrigerantCircuit = v; })} />
+                    </>
                   )}
                   <button type="button" onClick={() => patch((d) => { d.events.splice(index, 1); })}>Remove</button>
                 </li>
@@ -300,7 +304,8 @@ export default function NiretWorkbench() {
             options={[["", "Not established"], ["OEM_SPECIFIED_METHOD", "OEM-specified method"], ["OEM_CFM_ESP_TABLE", "OEM CFM/ESP table"], ["DUCT_TRAVERSE", "Duct traverse"], ["FLOW_GRID", "Flow grid"], ["PRESSURE_MATCHING", "Pressure matching"], ["TEMPERATURE_RISE", "Temperature rise"]]} />
           <SelectField label="Blower motor" value={form.airflowMethod.motorType} onChange={(v) => patch((d) => { d.airflowMethod.motorType = v; })}
             options={[["", "Not established"], ["PSC", "PSC"], ["ECM", "ECM"], ["OTHER", "Other"], ["UNKNOWN", "Unknown"]]} />
-          <TriField label="Filter, coil, and fan clean (table method)" value={form.airflowMethod.componentsClean} onChange={(v) => patch((d) => { d.airflowMethod.componentsClean = v; })} />
+          <TriField label="Filter, coil, and fan clean (table method / OEM operating point)" value={form.airflowMethod.componentsClean} onChange={(v) => patch((d) => { d.airflowMethod.componentsClean = v; })} />
+          <TextField label="Installed blower setting (exactly as the OEM labels it, e.g. Tap 3 or NORMAL)" value={form.airflowMethod.blowerSetting ?? ""} onChange={(v) => patch((d) => { d.airflowMethod.blowerSetting = v; })} />
           {measure("airflow", "Established airflow")}
           {measure("returnStatic", "Return static")}
           {measure("supplyStatic", "Supply static")}

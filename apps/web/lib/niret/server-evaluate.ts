@@ -59,9 +59,12 @@ export interface SubmissionContext {
 export interface OemReferenceContext {
   source: "GOVERNED_RECORD" | "MANUAL_TRANSCRIPTION";
   status: OemResolution["status"] | "NO_REGISTRY";
+  /** A8: the governed system binding. */
   recordId: string | null;
-  document: string | null;
+  /** A8: each separately preserved source bound to the system. */
+  documents: string[];
   measurementLocations: Partial<Record<MeasurementKey, { location: string; oemText: string }>>;
+  conflicts: string[];
 }
 
 const AUTHORITY_ELEMENTS: readonly AuthorityElement[] = ["identity", "workScope", "sitePermission", "jurisdiction"];
@@ -128,6 +131,9 @@ export function applyServerEvidence(input: unknown, sources: EvaluationSources):
     const resolution = resolveSubmissionOem(root, sources);
     if (resolution?.status === "RESOLVED") {
       root.oem = clone(resolution.reference) as unknown as Record<string, unknown>;
+    } else if (resolution?.status === "CONFLICT") {
+      // A8 (R5-02): conflicting bound sources make the binding inadmissible; nothing from it is relied upon.
+      oem.provenance = { acquisitionMethod: "GOVERNED_LIBRARY", verification: "NOT_VERIFIED", recordId: resolution.bindingId, conflicts: [...resolution.conflicts] };
     } else {
       const supplied = (oem.provenance ?? {}) as Record<string, unknown>;
       const declared: Record<string, string> = {};
@@ -157,22 +163,30 @@ export function oemReferenceContext(input: unknown, sources: EvaluationSources):
   if (input === null || typeof input !== "object" || !(input as { oem?: unknown }).oem) return null;
   const resolution = resolveSubmissionOem(input, sources);
   if (resolution?.status === "RESOLVED") {
-    const { record } = resolution;
+    const byId = new Map(resolution.sources.map((record) => [record.recordId, record] as const));
     return {
       source: "GOVERNED_RECORD",
       status: "RESOLVED",
-      recordId: record.recordId,
-      document: [record.equipment.manufacturer, record.document.documentId, record.document.revision, record.document.title].filter(Boolean).join(" · "),
-      measurementLocations: Object.fromEntries(Object.entries(record.criteria.measurementLocations)
-        .map(([key, value]) => [key, { location: value?.location ?? "", oemText: value?.oemText ?? "" }])),
+      recordId: resolution.bindingId,
+      documents: resolution.sources.map((record) =>
+        [record.sourceClass, record.manufacturer, record.document.documentId, record.document.revision, record.document.title,
+          // A10: a historical AHRI listing is never shown as currently certified.
+          record.ahriListing ? `AHRI present status ${record.ahriListing.presentStatus}${record.ahriListing.certifiedAtObservation ? " (currently certified)" : " (historical listing; not currently AHRI certified)"}` : null,
+        ].filter(Boolean).join(" · ")),
+      measurementLocations: Object.fromEntries(Object.entries(resolution.binding.criterionSources.measurementLocations ?? {}).flatMap(([key, id]) => {
+        const value = byId.get(id as string)?.criteria.measurementLocations?.[key as MeasurementKey];
+        return value ? [[key, { location: value.location, oemText: value.oemText }]] : [];
+      })),
+      conflicts: [],
     };
   }
   return {
     source: "MANUAL_TRANSCRIPTION",
     status: resolution?.status ?? "NO_REGISTRY",
-    recordId: resolution?.status === "NOT_VERIFIED" ? resolution.recordId : null,
-    document: null,
+    recordId: resolution?.status === "NOT_VERIFIED" || resolution?.status === "CONFLICT" ? resolution.bindingId : null,
+    documents: [],
     measurementLocations: {},
+    conflicts: resolution?.status === "CONFLICT" ? [...resolution.conflicts] : [],
   };
 }
 

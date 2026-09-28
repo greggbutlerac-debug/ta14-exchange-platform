@@ -1,0 +1,114 @@
+{
+  "recordId": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9",
+  "recordVersion": 2,
+  "contract": "TA-14-NIRET-GA-C1/A8",
+  "sourceClass": "OEM_OUTDOOR_UNIT_INSTRUCTIONS",
+  "manufacturer": "Trane",
+  "coverage": {
+    "modelFamily": "4TTR4",
+    "models": [
+      "4TTR4018–060"
+    ]
+  },
+  "matchedSystems": [],
+  "ahriReference": null,
+  "document": {
+    "documentId": "18-AC51D1-9-EN",
+    "title": "Installer's Guide — Condensing Units 4TTR4018–060",
+    "revision": "9",
+    "date": "2015-07-01",
+    "sha256": "568b190d5ffa6f010bd890b8f16404ff6e8d8a4bc4ecd79a4887320f1e8bc157",
+    "mediaType": "application/pdf"
+  },
+  "acquisition": {
+    "method": "OEM_WEBSITE_DOWNLOAD",
+    "sourceRef": "https://www.trane.com/content/dam/Trane/Commercial/global/products-systems/equipment/unitary/split-systems/Small%20Splits/Air%20Conditioners/18-AC51D1-9-EN.pdf",
+    "acquiredBy": "Claude Opus 5.5 (AI assistant) acting on instruction of greggbutlerac-debug",
+    "acquiredAt": "2026-09-27T20:20:18Z"
+  },
+  "curation": {
+    "transcribedBy": "Claude Opus 5.5 (AI assistant) acting on instruction of greggbutlerac-debug",
+    "transcribedAt": "2026-09-28T02:10:00Z",
+    "curationRequestRef": null
+  },
+  "review": {
+    "state": "VERIFIED",
+    "reviewedBy": "Atlas / OpenAI",
+    "reviewedAt": "2026-09-28T02:36:50Z",
+    "method": "INDEPENDENT_SECOND_READ_AGAINST_HASHED_DOCUMENT",
+    "notes": "Independent review determination: PASS WITH EXPLICIT LIMITATIONS (reviewer Atlas / OpenAI; result conveyed by owner greggbutlerac-debug; reviewedAt is the time the result was recorded). Supported: Trane 4TTR4 charging-method/source transcription; indoor 70–80 °F recorded as OEM advisory, not a Gate-A method condition. Package limitations (NOT ESTABLISHED): (1) an authoritative mapping from complete installed-equipment nameplate identifiers to the AHRI designations 4TTR4036L1 and TEM6A0C36H31; (2) the physical Trane component/configuration that realizes the AHRI +TDR enhancement on the installed TEM6. An unmatched or unresolved field identity fails closed. The review result does not report an independent re-download/hash comparison of source documents or an AHRI 'Verify Certificate' check."
+  },
+  "status": {
+    "supersession": "CURRENT",
+    "supersededBy": null,
+    "supersedes": []
+  },
+  "criteria": {
+    "chargingMethod": {
+      "status": "IDENTIFIED",
+      "description": "Subcooling (in cooling mode) is the only recommended method of charging above 55º F ambient outdoor temperature (§14.1 STEP 1; method §14.2 'Subcooling Charging in Cooling (Above 55º F Outdoor Temp.)'). [OEM ADVISORY, not a method condition (owner direction 2026-09-27): prose 'For best results the indoor temperature should be kept between 70º F to 80º F'; 'Indoor Temp' graphic ✓ 70–80º F, ✗ above/below. The source does not state that operation outside 70–80º F invalidates the procedure; NIRET does not use it to deny technical entry.]",
+      "cite": {
+        "pageRef": "15",
+        "tableOrChart": "Section 14.1 Temperature Measurements STEP 1; Section 14.2 heading"
+      },
+      "pressureBased": true,
+      "meteringTypes": [
+        "TXV",
+        "EEV"
+      ],
+      "conditions": [
+        {
+          "measurement": "outdoorDryBulb",
+          "min": 55,
+          "max": 120,
+          "unit": "F",
+          "cite": {
+            "pageRef": "15",
+            "tableOrChart": "Section 14.1 Temperature Measurements, STEP 1: 'Subcooling (in cooling mode) is the only recommended method of charging above 55º F ambient outdoor temperature.' and 'Outdoor Temp' thermometer graphic: ✓ between 55º F and 120º F, ✗ above 120º F, ✗ below 55º F"
+          }
+        }
+      ],
+      "postEventVerification": {
+        "text": "At startup, or whenever charge is removed or added, the system must be operated for a minimum of 20 minutes to stabilize before accurate measurements can be made.",
+        "cite": {
+          "pageRef": "16",
+          "tableOrChart": "Section 14.2 STEP 3"
+        }
+      }
+    },
+    "specialToolOrModeRequired": {
+      "value": false,
+      "description": null,
+      "cite": null
+    },
+    "ambientEnvelope": {
+      "min": 55,
+      "max": 120,
+      "unit": "F",
+      "cite": {
+        "pageRef": "15",
+        "tableOrChart": "Section 14.1 Temperature Measurements, STEP 1: 'Subcooling (in cooling mode) is the only recommended method of charging above 55º F ambient outdoor temperature.' and 'Outdoor Temp' thermometer graphic: ✓ between 55º F and 120º F, ✗ above 120º F, ✗ below 55º F"
+      }
+    },
+    "minRunMinutes": {
+      "value": 20,
+      "cite": {
+        "pageRef": "16",
+        "tableOrChart": "Section 14.2 STEP 3: 'Stabilize the system by operating for a minimum of 20 minutes.'"
+      }
+    },
+    "measurementLocations": {
+      "liquidLineTemp": {
+        "location": "at the outdoor unit's service valve",
+        "oemText": "Measure the liquid line temperature and pressure at the outdoor unit's service valve.",
+        "cite": {
+          "pageRef": "17",
+          "tableOrChart": "Section 14.2 STEP 4"
+        }
+      }
+    },
+    "noninvasiveCriterion": {
+      "status": "NOT_IN_DOCUMENT"
+    }
+  }
+}

@@ -1,0 +1,286 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ta14.exchange/schemas/niret-oem-system-binding.schema.json",
+  "title": "TA-14 NIRET Governed OEM System Binding (TA-14-NIRET-GA-C1 Amendment A8)",
+  "description": "Binds separately preserved source records to one exactly matched system without merging their provenance. Maps every criterion to exactly one constituent. Pairing may be established by first-party OEM match data or a verified AHRI certification listing; an AHRI listing never supplies a technical criterion.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "bindingId",
+    "bindingVersion",
+    "contract",
+    "system",
+    "constituents",
+    "pairingSources",
+    "criterionSources",
+    "noninvasiveCriterionAbsence",
+    "curation",
+    "review",
+    "status"
+  ],
+  "properties": {
+    "bindingId": {
+      "type": "string",
+      "pattern": "^NIRET-OEM-BIND-[A-Z0-9][A-Z0-9-]{2,80}$"
+    },
+    "bindingVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contract": {
+      "const": "TA-14-NIRET-GA-C1/A8"
+    },
+    "system": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "manufacturer",
+        "indoorModel",
+        "outdoorModel"
+      ],
+      "properties": {
+        "manufacturer": {
+          "type": "string",
+          "minLength": 1
+        },
+        "indoorModel": {
+          "type": "string",
+          "minLength": 1
+        },
+        "outdoorModel": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "constituents": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "recordId",
+          "recordHash"
+        ],
+        "properties": {
+          "recordId": {
+            "type": "string",
+            "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+          },
+          "recordHash": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        }
+      }
+    },
+    "pairingSources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+      }
+    },
+    "criterionSources": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "specialToolOrModeRequired"
+      ],
+      "properties": {
+        "chargingMethod": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "specialToolOrModeRequired": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "airflowCriteria": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "espTableDomain": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "staticLimits": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "ambientEnvelope": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "voltageRange": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "minRunMinutes": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "stabilityCriterion": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "permitsEcmWithTableMethod": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "noninvasiveCriterion": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        },
+        "measurementLocations": {
+          "type": "object",
+          "propertyNames": {
+            "enum": [
+              "returnDryBulb",
+              "returnWetBulb",
+              "returnRh",
+              "supplyDryBulb",
+              "supplyWetBulb",
+              "supplyRh",
+              "outdoorDryBulb",
+              "outdoorWetBulb",
+              "outdoorRh",
+              "airflow",
+              "returnStatic",
+              "supplyStatic",
+              "suctionLineTemp",
+              "liquidLineTemp",
+              "supplyVoltage",
+              "compressorCurrent",
+              "blowerCurrent"
+            ]
+          },
+          "additionalProperties": {
+            "type": "string",
+            "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+          }
+        },
+        "fanPerformance": {
+          "type": "string",
+          "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+        }
+      }
+    },
+    "noninvasiveCriterionAbsence": {
+      "enum": [
+        "NOT_IN_BOUND_SOURCES",
+        "OEM_CONFIRMED_NOT_PUBLISHED",
+        null
+      ],
+      "description": "Required (non-null) exactly when criterionSources.noninvasiveCriterion is absent."
+    },
+    "curation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "transcribedBy",
+        "transcribedAt"
+      ],
+      "properties": {
+        "transcribedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transcribedAt": {
+          "$ref": "#/$defs/timestamp"
+        }
+      }
+    },
+    "review": {
+      "$ref": "#/$defs/review"
+    },
+    "status": {
+      "$ref": "#/$defs/status"
+    }
+  },
+  "$defs": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "reviewedBy",
+        "reviewedAt",
+        "method",
+        "notes"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "PENDING_REVIEW",
+            "VERIFIED",
+            "REJECTED"
+          ]
+        },
+        "reviewedBy": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "reviewedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "const": "INDEPENDENT_SECOND_READ_AGAINST_HASHED_DOCUMENT"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supersession",
+        "supersededBy",
+        "supersedes"
+      ],
+      "properties": {
+        "supersession": {
+          "enum": [
+            "CURRENT",
+            "SUPERSEDED",
+            "WITHDRAWN"
+          ]
+        },
+        "supersededBy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

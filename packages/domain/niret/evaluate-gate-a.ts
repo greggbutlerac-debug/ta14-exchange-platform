@@ -10,17 +10,21 @@
  */
 
 import { deriveDecision, type RequirementResult } from "../state-machine";
+import spec from "./gate-a-c1.spec.json";
 import { classifyInterval, worstCaseUncertainty } from "./interval";
+import { isTwoSided, magnitudeInterval, rangeRecord, resolveRange } from "./range";
 import { invalidatedBy } from "./invalidation";
 import {
   APPENDIX_W_A2L_REFRIGERANTS,
   GATE_A_VERSION,
+  I3_PERMITTED_BASES,
   PROHIBITED_BASES,
   REQUIRED_PROPOSITIONS,
   SHA256_HEX,
   type PropositionId,
 } from "./propositions";
 import type {
+  AirflowEvidence,
   AuthorityElement,
   CheckResult,
   CriterionCandidate,
@@ -29,8 +33,12 @@ import type {
   GateAInput,
   IntervalFinding,
   Measurement,
+  MeasurementAuthority,
   MeasurementKey,
+  MeteringType,
+  OemProvenance,
   OemRange,
+  OemSourceClass,
   PropositionCheck,
   Unit,
 } from "./types";
@@ -45,12 +53,17 @@ export const EXPECTED_UNIT: Readonly<Record<MeasurementKey, Unit>> = {
   supplyVoltage: "V", compressorCurrent: "A", blowerCurrent: "A",
 };
 
-/** Measurements whose location must be the OEM-specified location (spec "measurement"). */
-const OEM_LOCATION_REQUIRED = new Set<MeasurementKey>([
-  "returnDryBulb", "returnWetBulb", "returnRh", "supplyDryBulb", "supplyWetBulb", "supplyRh",
-  "outdoorDryBulb", "outdoorWetBulb", "outdoorRh", "returnStatic", "supplyStatic",
-  "suctionLineTemp", "liquidLineTemp",
-]);
+/**
+ * Amendment A9 (C1-R6) location authority. Class A: an OEM-prescribed location governs.
+ * Class B/C: where the OEM prescribes none, a TA-14 governed measurement method (spec
+ * governed_measurement_methods) applicable to the key establishes the location and procedure.
+ */
+const CLASS_C = new Set<MeasurementKey>(["airflow", "supplyVoltage", "compressorCurrent", "blowerCurrent"]);
+/** Criterion inputs whose measurement point must be the OEM's (no governed substitute). */
+const OEM_POINT_REQUIRED_AS_CRITERION_INPUT = new Set<MeasurementKey>(["suctionLineTemp"]);
+const GOVERNED_METHODS: ReadonlyMap<string, readonly string[]> = new Map(
+  (spec.governed_measurement_methods as Array<{ id: string; applies_to: string[] }>).map((method) => [method.id, method.applies_to]),
+);
 
 const ACCEPTED_CERTIFICATIONS = new Set(["TYPE_II", "UNIVERSAL"]);
 
@@ -66,6 +79,7 @@ const AUTHORITY_RESTRICTIONS: Readonly<Record<AuthorityElement, Readonly<Record<
   jurisdiction: { REQUIRED_NOT_CONFIRMED: ["HOLD", "JURISDICTIONAL_AUTHORIZATION_UNCONFIRMED"] },
 };
 const PROHIBITED = new Set<string>(PROHIBITED_BASES);
+const I3_PERMITTED = new Set<string>(I3_PERMITTED_BASES);
 
 function normalizeRefrigerant(designation: string): string {
   return designation.toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -107,6 +121,10 @@ function toRequirementResults(checks: PropositionCheck[]): RequirementResult[] {
 export function evaluateGateA(raw: unknown, validation: ValidationOutcome): GateAEvaluation {
   const checks = new Checks();
   const findings: IntervalFinding[] = [];
+  const measurementAuthority: GateAEvaluation["measurementAuthority"] = {};
+  let airflowEvidence: AirflowEvidence = {
+    path: null, blowerSetting: null, designatedSetting: null, operatingPoint: null, bracket: null, convention: null, ref: null,
+  };
   let derivedTesp: GateAEvaluation["derivedTesp"] = null;
   let indicationPath: GateAEvaluation["indicationPath"] = null;
 
@@ -123,7 +141,7 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     for (const field of validation.unknownFields) checks.add("INPUT", "HOLD", "INPUT_UNKNOWN_FIELD", [field]);
     for (const field of validation.invalidFields) checks.add("INPUT", "HOLD", "INPUT_INVALID", [field]);
     return finalize(checks, findings, null, null, { status: "NOT_EVALUATED", candidateId: null },
-      { effectiveRunStart: null, windowStart: null, windowEnd }, false);
+      { effectiveRunStart: null, windowStart: null, windowEnd }, false, {}, airflowEvidence);
   }
   checks.add("INPUT", "SATISFIED", "INPUT_VALID");
   checks.settle("ENTRY", "NO_PRESSURE_SIDE_ENTRY");
@@ -160,12 +178,16 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   // combination; a declared pairing may restrict (false), never grant.
   const equipment = evidence.equipment;
   const provenance = oem.provenance;
-  const governedRecord = provenance?.verification === "VERIFIED" && provenance.acquisitionMethod === "GOVERNED_LIBRARY";
+  // Amendment A8: the pairing comes from a VERIFIED, CURRENT system binding naming its pairing source(s).
+  const governedRecord = provenance?.verification === "VERIFIED" && provenance.acquisitionMethod === "GOVERNED_LIBRARY" &&
+    !(provenance.conflicts?.length);
   if (!equipment.manufacturer?.trim() || !equipment.indoorModel?.trim() || !equipment.outdoorModel?.trim() || equipment.pairingVerifiedAgainstOem === false) {
     checks.add("P01", equipment.identityEstablishableFromOem === false ? "ESCALATE" : "HOLD",
       equipment.identityEstablishableFromOem === false ? "IDENTITY_UNESTABLISHABLE" : "IDENTITY_OR_PAIRING_UNESTABLISHED");
   } else if (!governedRecord) {
     checks.add("P01", "HOLD", "PAIRING_NOT_ESTABLISHED_BY_GOVERNED_OEM_RECORD");
+  } else if (!provenance.pairingSources?.length) {
+    checks.add("P01", "HOLD", "PAIRING_SOURCE_ABSENT");
   } else if (
     identityKey(provenance.manufacturer ?? "") !== identityKey(equipment.manufacturer) ||
     !(provenance.matchedSystems ?? []).some((system) =>
@@ -202,6 +224,10 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     checks.add("P03", "HOLD", "METERING_REVERIFICATION_REQUIRED_AFTER_REPAIR");
   }
   if (metering.type !== "EEV") checks.settle("P03", "METERING_DEVICE_ESTABLISHED");
+  // A8 (R5-12): metering-restricted OEM criteria apply only to an established metering device.
+  const establishedMetering = checks.failing("P03") ? null : metering.type;
+  const meteringApplies = (types: readonly MeteringType[] | undefined) =>
+    !types || (establishedMetering !== null && (types as readonly string[]).includes(establishedMetering));
 
   // P16 — safety.
   const hazard = evidence.safety.hazard;
@@ -257,23 +283,14 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   }
   if (oem.requiresUnavailableToolOrMode) checks.add("P14", "ESCALATE", "OEM_PROCEDURE_REQUIRES_UNAVAILABLE_TOOL_OR_MODE");
   // Amendment A5: ALLOW-contributing OEM criteria need an independently VERIFIED reference with provenance.
-  // Amendment A7: only a governed OEM reference record satisfies it — transcription never does — and the
-  // record must identify itself, its document and its custody, be current, and be independently reviewed.
-  if (!provenance || provenance.verification === "NOT_VERIFIED") checks.add("P14", "HOLD", "OEM_REFERENCE_NOT_VERIFIED");
-  else if (provenance.verification === "VERIFICATION_UNAVAILABLE") checks.add("P14", "ESCALATE", "OEM_REFERENCE_VERIFICATION_UNAVAILABLE");
-  else if (provenance.acquisitionMethod !== "GOVERNED_LIBRARY") checks.add("P14", "HOLD", "OEM_REFERENCE_NOT_FROM_GOVERNED_REGISTRY");
-  else if ([provenance.manufacturer, provenance.documentId, provenance.pageRef, provenance.sourceRef, provenance.verifiedBy,
-    provenance.verifiedAt, provenance.recordId, provenance.transcribedBy, provenance.transcribedAt].some((field) => !field?.trim()) ||
-    !SHA256_HEX.test(provenance.recordHash ?? "") || !SHA256_HEX.test(provenance.documentHash ?? "") ||
-    !provenance.matchedSystems?.length || !provenance.supersession) {
-    checks.add("P14", "HOLD", "OEM_REFERENCE_PROVENANCE_INCOMPLETE");
-  } else if (provenance.supersession === "SUPERSEDED") checks.add("P14", "HOLD", "OEM_REFERENCE_SUPERSEDED");
-  else if (provenance.supersession === "WITHDRAWN") checks.add("P14", "HOLD", "OEM_REFERENCE_WITHDRAWN");
-  else if (isSelf(provenance.verifiedBy as string)) checks.add("P14", "HOLD", "OEM_REFERENCE_SELF_VERIFICATION_REJECTED");
-  else if (identityKey(provenance.verifiedBy as string) === identityKey(provenance.transcribedBy as string)) {
-    checks.add("P14", "HOLD", "OEM_REFERENCE_REVIEW_NOT_INDEPENDENT");
-  } else if (ms(provenance.verifiedAt as string) < ms(provenance.transcribedAt as string)) {
-    checks.add("P14", "HOLD", "OEM_REFERENCE_REVIEW_PRECEDES_TRANSCRIPTION");
+  // Amendment A7: only a governed OEM reference satisfies it — transcription never does.
+  // Amendment A8 (C1-R5): the governed reference is a system binding over separately preserved source
+  // records; the binding and every constituent must be complete, current, verified and independently
+  // reviewed, and no criterion may come from a certification listing (AHRI establishes pairing only).
+  const provenanceFinding = governedProvenanceFinding(provenance, isSelf);
+  if (provenanceFinding) { const [result, reason] = provenanceFinding; checks.add("P14", result, reason); }
+  if (oem.chargingMethod.status === "IDENTIFIED" && !meteringApplies(oem.chargingMethod.meteringTypes)) {
+    checks.add("P14", "HOLD", "OEM_CHARGING_METHOD_NOT_APPLICABLE_TO_METERING");
   }
   checks.settle("P14", "OEM_CHARGING_METHOD_IDENTIFIED");
 
@@ -299,7 +316,38 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   if (evidence.operation.compressorRunningSteadily !== true) checks.add("P04", "HOLD", "COMPRESSOR_NOT_ESTABLISHED_RUNNING_STEADILY");
 
   /** Establish one measurement for use; failures are attributed to the responsible proposition. */
-  const use = (key: MeasurementKey, owner: PropositionId): Measurement | null => {
+  /** A9: apply Class A/B/C location authority; returns false (with a HOLD) when not established. */
+  const locationEstablished = (key: MeasurementKey, measurement: Measurement, owner: PropositionId, criterionInput: boolean): boolean => {
+    const oemLocation = oem.measurementLocations[key] ?? null;
+    const record = (authorityClass: MeasurementAuthority["authorityClass"], locationBasis: MeasurementAuthority["locationBasis"]) => {
+      measurementAuthority[key] = { authorityClass, locationBasis, location: measurement.location, oemLocation, methodId: measurement.methodId ?? null };
+    };
+    if (oemLocation) {
+      record("A", oemLocation === measurement.location ? "OEM" : "UNESTABLISHED");
+      if (oemLocation !== measurement.location) { checks.add(owner, "HOLD", "MEASUREMENT_LOCATION_NOT_OEM_LOCATION", [key]); return false; }
+      return true;
+    }
+    const authorityClass = CLASS_C.has(key) ? "C" : "B";
+    if (criterionInput && OEM_POINT_REQUIRED_AS_CRITERION_INPUT.has(key)) {
+      record("A", "UNESTABLISHED");
+      checks.add(owner, "HOLD", "OEM_LOCATION_AUTHORITY_UNAVAILABLE", [key]);
+      return false;
+    }
+    if (!measurement.methodId) {
+      record(authorityClass, "UNESTABLISHED");
+      checks.add(owner, "HOLD", "OEM_LOCATION_AUTHORITY_UNAVAILABLE", [key]);
+      return false;
+    }
+    if (!(GOVERNED_METHODS.get(measurement.methodId) ?? []).includes(key)) {
+      record(authorityClass, "UNESTABLISHED");
+      checks.add(owner, "HOLD", "GOVERNED_METHOD_NOT_APPLICABLE", [key]);
+      return false;
+    }
+    record(authorityClass, "GOVERNED_METHOD");
+    return true;
+  };
+
+  const use = (key: MeasurementKey, owner: PropositionId, criterionInput = false): Measurement | null => {
     const measurement = evidence.measurements[key];
     if (!measurement) {
       checks.add(owner, "HOLD", `${key.toUpperCase()}_UNAVAILABLE`, [key]);
@@ -311,26 +359,82 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     const instrument = evidence.instruments.find((item) => item.instrumentId === measurement.instrumentId);
     if (!instrument) { checks.add("P05", "HOLD", "INSTRUMENT_UNREGISTERED", [key]); usable = false; }
     else if (!instrument.calibrationValid || !instrument.setupVerified) { checks.add("P05", "HOLD", "INSTRUMENT_INVALID", [key]); usable = false; }
-    if (OEM_LOCATION_REQUIRED.has(key)) {
-      const oemLocation = oem.measurementLocations[key];
-      if (!oemLocation) { checks.add(owner, "HOLD", "OEM_LOCATION_AUTHORITY_UNAVAILABLE", [key]); usable = false; }
-      else if (oemLocation !== measurement.location) { checks.add(owner, "HOLD", "MEASUREMENT_LOCATION_NOT_OEM_LOCATION", [key]); usable = false; }
-    }
+    if (!locationEstablished(key, measurement, owner, criterionInput)) usable = false;
     if (windowStart === null) { checks.add("P13", "HOLD", "STEADY_STATE_WINDOW_UNESTABLISHED", [key]); usable = false; }
     else if (ms(measurement.measuredAt) < windowStart) { checks.add("P13", "HOLD", "MEASUREMENT_OUTSIDE_QUALIFYING_WINDOW", [key]); usable = false; }
     return usable ? measurement : null;
   };
 
+  /** F1 comparison against an OEM range whose bounds are resolved per Amendment A8 (stated, unbounded or derived). */
   const compare = (
     subject: string, owner: PropositionId, value: number, uncertainty: number, range: OemRange, unit: Unit,
     reasons: { outside: string; ambiguous: string },
   ): "WITHIN" | "OUTSIDE" | "AMBIGUOUS" | null => {
     if (range.unit !== unit) { checks.add(owner, "HOLD", "UNIT_MISMATCH", [subject]); return null; }
-    const classification = classifyInterval(value, uncertainty, range);
-    findings.push({ subject, value, uncertainty, range: { min: range.min, max: range.max, unit: range.unit, ref: range.ref }, classification });
+    const bounds = resolveRange(range);
+    if (!bounds) { checks.add(owner, "HOLD", "OEM_RANGE_INVALID", [subject]); return null; }
+    const classification = classifyInterval(value, uncertainty, bounds);
+    findings.push({ subject, value, uncertainty, range: rangeRecord(range, bounds), classification });
     if (classification === "OUTSIDE" && reasons.outside) checks.add(owner, "HOLD", reasons.outside, [subject]);
     if (classification === "AMBIGUOUS" && reasons.ambiguous) checks.add(owner, "HOLD", reasons.ambiguous, [subject]);
     return classification;
+  };
+
+  /**
+   * Amendment A7/A8: select exactly one OEM-published candidate whose applicability conditions contain the
+   * measured conditions (F1) and whose metering restriction matches the established metering device.
+   * Nothing is interpolated; anything else fails closed with `${prefix}_...` reasons on `owner`.
+   */
+  const selectCandidate = (
+    candidates: readonly CriterionCandidate[], owner: PropositionId, prefix: string, coverage: "COMPLETE" | "PARTIAL",
+  ): { selected: CriterionCandidate | null; selection: CriterionSelection } => {
+    const conditionKeys = [...new Set(candidates.flatMap((candidate) => candidate.appliesWhen.map((condition) => condition.measurement)))];
+    const conditions = new Map(conditionKeys.map((key) => [key, use(key, owner)] as const));
+    const conditionsValid = candidates.every((candidate) => candidate.appliesWhen.every((condition) => {
+      const subject = `applicability:${candidate.candidateId}:${condition.measurement}`;
+      if (condition.unit !== EXPECTED_UNIT[condition.measurement]) { checks.add(owner, "HOLD", "UNIT_MISMATCH", [subject]); return false; }
+      if (!resolveRange(condition)) { checks.add(owner, "HOLD", "OEM_RANGE_INVALID", [subject]); return false; }
+      return true;
+    }));
+    if (!conditionsValid || [...conditions.values()].some((measurement) => measurement === null)) {
+      return { selected: null, selection: { status: "NOT_EVALUATED", candidateId: null } };
+    }
+    const matches: CriterionCandidate[] = [];
+    const ambiguous: CriterionCandidate[] = [];
+    for (const candidate of candidates) {
+      if (!meteringApplies(candidate.meteringTypes)) continue;
+      const classes = candidate.appliesWhen.map((condition) => {
+        const measurement = conditions.get(condition.measurement) as Measurement;
+        const bounds = resolveRange(condition) as { min: number; max: number };
+        return { condition, measurement, bounds, classification: classifyInterval(measurement.value, measurement.accuracy as number, bounds) };
+      });
+      if (classes.every((item) => item.classification === "WITHIN")) matches.push(candidate);
+      else if (!classes.some((item) => item.classification === "OUTSIDE")) ambiguous.push(candidate);
+      for (const item of classes) {
+        if (item.classification === "AMBIGUOUS" || classes.every((other) => other.classification === "WITHIN")) {
+          findings.push({
+            subject: `applicability:${candidate.candidateId}:${item.condition.measurement}`,
+            value: item.measurement.value,
+            uncertainty: item.measurement.accuracy as number,
+            range: rangeRecord(item.condition, item.bounds),
+            classification: item.classification,
+          });
+        }
+      }
+    }
+    const [only, ...others] = matches;
+    if (only && others.length === 0) return { selected: only, selection: { status: "SELECTED", candidateId: only.candidateId } };
+    if (only) {
+      checks.add(owner, "HOLD", `${prefix}_CANDIDATES_CONFLICT`, matches.map((candidate) => candidate.candidateId));
+      return { selected: null, selection: { status: "CONFLICT", candidateId: null } };
+    }
+    if (ambiguous.length > 0) {
+      checks.add(owner, "HOLD", `${prefix}_APPLICABILITY_AMBIGUOUS`, ambiguous.map((candidate) => candidate.candidateId));
+      return { selected: null, selection: { status: "AMBIGUOUS", candidateId: null } };
+    }
+    checks.add(owner, coverage === "COMPLETE" ? "ESCALATE" : "HOLD",
+      coverage === "COMPLETE" ? `${prefix}_NOT_PUBLISHED_FOR_CONDITIONS` : `${prefix}_NOT_IN_RECORD_FOR_CONDITIONS`);
+    return { selected: null, selection: { status: "NONE_APPLICABLE", candidateId: null } };
   };
 
   // C06 — OEM measured-stability criterion (only where the OEM specifies one).
@@ -339,7 +443,8 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     const readings = (evidence.stabilityReadings ?? []).filter((reading) => ms(reading.measuredAt) >= (windowStart ?? Infinity));
     const series = readings.filter((reading) =>
       reading.unit === criterion.unit && reading.accuracy !== undefined &&
-      evidence.instruments.some((item) => item.instrumentId === reading.instrumentId && item.calibrationValid && item.setupVerified));
+      evidence.instruments.some((item) => item.instrumentId === reading.instrumentId && item.calibrationValid && item.setupVerified) &&
+      locationEstablished(criterion.measurement, reading, "P04", true));
     if (series.length < 2 || series.length !== readings.length) {
       checks.add("P04", "HOLD", "OEM_STABILITY_CRITERION_UNESTABLISHED", [criterion.measurement]);
     } else {
@@ -392,22 +497,7 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   }
   checks.settle("P07", evidence.corrections.length ? "CORRECTIONS_RECORDED_AND_REBASELINED" : "NO_PRE_GATE_CORRECTIONS");
 
-  // P08 — airflow within OEM range by an acceptable method.
-  const method = evidence.airflowMethod;
-  if (!method) checks.add("P08", "HOLD", "AIRFLOW_METHOD_UNRECORDED");
-  else if (method.method === "TEMPERATURE_RISE") checks.add("P08", "HOLD", "AIRFLOW_METHOD_NOT_ACCEPTABLE_FOR_COOLING");
-  else if (method.method === "OEM_CFM_ESP_TABLE") {
-    if (method.motorType === "UNKNOWN") checks.add("P08", "HOLD", "BLOWER_MOTOR_TYPE_UNESTABLISHED");
-    if (method.motorType === "ECM" && oem.permitsEcmWithTableMethod !== true) checks.add("P08", "HOLD", "OEM_TABLE_METHOD_NOT_PERMITTED_FOR_ECM");
-    if (method.componentsClean !== true) checks.add("P08", "HOLD", "COMPONENTS_NOT_ESTABLISHED_CLEAN_FOR_TABLE_METHOD");
-  }
-  const airflow = use("airflow", "P08");
-  if (!oem.airflowRange) checks.add("P08", "HOLD", "OEM_AIRFLOW_RANGE_UNAVAILABLE");
-  else if (airflow) compare("airflow", "P08", airflow.value, airflow.accuracy as number, oem.airflowRange, airflow.unit,
-    { outside: "AIRFLOW_OUTSIDE_OEM_RANGE", ambiguous: "AIRFLOW_AMBIGUOUS" });
-  checks.settle("P08", "AIRFLOW_WITHIN_OEM_RANGE");
-
-  // P09 — TESP derived from raw supply and return static (Amendment A3).
+  // Static pressures and derived TESP (A3) are established first: P08 path (b) and P09 both rely on them.
   const returnStatic = use("returnStatic", "P09");
   const supplyStatic = use("supplyStatic", "P09");
   if (returnStatic && supplyStatic) {
@@ -416,13 +506,127 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
       uncertainty: worstCaseUncertainty([supplyStatic.accuracy as number, returnStatic.accuracy as number]),
       unit: "IN_WC",
     };
-    if (!oem.espRange) checks.add("P09", "HOLD", "OEM_ESP_RANGE_UNAVAILABLE");
-    else compare("derivedTesp", "P09", derivedTesp.value, derivedTesp.uncertainty, oem.espRange, "IN_WC",
-      { outside: "ESP_OUTSIDE_OEM_RANGE", ambiguous: "ESP_AMBIGUOUS" });
-  } else if (!oem.espRange) {
-    checks.add("P09", "HOLD", "OEM_ESP_RANGE_UNAVAILABLE");
   }
-  checks.settle("P09", "EXTERNAL_STATIC_PRESSURE_WITHIN_OEM_RANGE");
+
+  // P08 — airflow established as not confounding the OEM charging method (A8/A9):
+  // (a) an applicable OEM airflow acceptance criterion (typed forms; one-sided limits enforced only), or
+  // (b) the OEM published operating point: identified OEM cooling setting (designated where the OEM
+  //     designates one), TESP within the OEM fan-performance range, airflow bracketed between adjacent
+  //     published values without interpolation, OEM limits met, clean components.
+  // Generic CFM/ton values are never used.
+  const method = evidence.airflowMethod;
+  if (!method) checks.add("P08", "HOLD", "AIRFLOW_METHOD_UNRECORDED");
+  else if (method.method === "TEMPERATURE_RISE") checks.add("P08", "HOLD", "AIRFLOW_METHOD_NOT_ACCEPTABLE_FOR_COOLING");
+  else if (method.method === "OEM_CFM_ESP_TABLE") {
+    if (method.motorType === "UNKNOWN") checks.add("P08", "HOLD", "BLOWER_MOTOR_TYPE_UNESTABLISHED");
+    if (method.motorType === "ECM" && oem.permitsEcmWithTableMethod !== true) checks.add("P08", "HOLD", "OEM_TABLE_METHOD_NOT_PERMITTED_FOR_ECM");
+    if (method.componentsClean !== true) checks.add("P08", "HOLD", "COMPONENTS_NOT_ESTABLISHED_CLEAN_FOR_TABLE_METHOD");
+  }
+  const airflowCriteria = (oem.airflowCriteria ?? []).filter((criterion) => meteringApplies(criterion.meteringTypes));
+  const fanPerformance = oem.fanPerformance;
+  const tableMethod = method?.method === "OEM_CFM_ESP_TABLE";
+  // A measured airflow is required unless the OEM table method establishes it through path (b).
+  const airflow = !(tableMethod && fanPerformance) && (airflowCriteria.length === 0 || airflowCriteria.some((criterion) => criterion.kind === "CFM_RANGE"))
+    ? use("airflow", "P08") : null;
+  if (airflowCriteria.length === 0 && !fanPerformance) checks.add("P08", "HOLD", "OEM_AIRFLOW_RANGE_UNAVAILABLE");
+
+  // Path (a): OEM acceptance criteria — every applicable criterion is enforced as a limit.
+  let acceptedTwoSided = false;
+  const oneSidedRanges: OemRange[] = [];
+  for (const criterion of airflowCriteria) {
+    if (criterion.kind === "CFM_RANGE") {
+      if (!isTwoSided(criterion.range)) oneSidedRanges.push(criterion.range);
+      if (airflow) {
+        const classification = compare("airflow", "P08", airflow.value, airflow.accuracy as number, criterion.range, airflow.unit,
+          { outside: "AIRFLOW_OUTSIDE_OEM_RANGE", ambiguous: "AIRFLOW_AMBIGUOUS" });
+        if (classification === "WITHIN" && isTwoSided(criterion.range)) acceptedTwoSided = true;
+      }
+    } else {
+      const { selected: cell } = selectCandidate(criterion.candidates, "P08", "OEM_AIRFLOW_CHECK", criterion.coverage);
+      if (!cell) continue;
+      const entering = use("returnDryBulb", "P08", true);
+      const leaving = use("supplyDryBulb", "P08", true);
+      if (entering && leaving) {
+        const classification = compare("coilTemperatureDrop", "P08", entering.value - leaving.value,
+          worstCaseUncertainty([entering.accuracy as number, leaving.accuracy as number]), cell.range, "F",
+          { outside: "AIRFLOW_TEMPERATURE_DROP_OUTSIDE_OEM_CHECK", ambiguous: "AIRFLOW_TEMPERATURE_DROP_AMBIGUOUS" });
+        if (classification === "WITHIN" && isTwoSided(cell.range)) acceptedTwoSided = true;
+      }
+    }
+  }
+  if (acceptedTwoSided) {
+    airflowEvidence = { ...airflowEvidence, path: "OEM_ACCEPTANCE_CRITERION" };
+  } else if (fanPerformance) {
+    // Path (b): OEM published operating point.
+    const failing = (reason: string, keys: string[] = []) => checks.add("P08", "HOLD", reason, keys);
+    const setting = method?.blowerSetting?.trim() || null;
+    const published = setting ? fanPerformance.settings.find((entry) => identityKey(entry.setting) === identityKey(setting)) : undefined;
+    airflowEvidence = {
+      ...airflowEvidence, blowerSetting: setting, designatedSetting: fanPerformance.designatedSetting,
+      convention: fanPerformance.convention, ref: fanPerformance.ref,
+    };
+    if (!method || method.componentsClean !== true) failing("COMPONENTS_NOT_ESTABLISHED_CLEAN_FOR_TABLE_METHOD");
+    if (method?.motorType === "ECM" && tableMethod && oem.permitsEcmWithTableMethod !== true && !checks.items.some((c) => c.reason === "OEM_TABLE_METHOD_NOT_PERMITTED_FOR_ECM")) {
+      failing("OEM_TABLE_METHOD_NOT_PERMITTED_FOR_ECM");
+    }
+    if (!setting) failing("BLOWER_SETTING_UNIDENTIFIED");
+    else if (!published || !published.coolingPermitted) failing("BLOWER_SETTING_NOT_OEM_COOLING_SETTING");
+    else if (fanPerformance.designatedSetting !== null && identityKey(fanPerformance.designatedSetting) !== identityKey(setting)) {
+      failing("BLOWER_SETTING_NOT_OEM_DESIGNATED");
+    } else if (derivedTesp) {
+      const points = [...published.points].sort((a, b) => a.esp - b.esp);
+      const domain = { min: (points[0] as { esp: number }).esp, max: (points.at(-1) as { esp: number }).esp };
+      const classification = compare("operatingPointTesp", "P08", derivedTesp.value, derivedTesp.uncertainty,
+        { min: domain.min, max: domain.max, unit: "IN_WC", ref: fanPerformance.ref }, "IN_WC",
+        { outside: "AIRFLOW_OPERATING_POINT_OUTSIDE_OEM_DATA", ambiguous: "AIRFLOW_OPERATING_POINT_AMBIGUOUS" });
+      if (classification === "WITHIN") {
+        const low = derivedTesp.value - derivedTesp.uncertainty;
+        const high = derivedTesp.value + derivedTesp.uncertainty;
+        const from = [...points].reverse().find((point) => point.esp <= low) as { esp: number; cfm: number };
+        const to = points.find((point) => point.esp >= high) as { esp: number; cfm: number };
+        const span = points.filter((point) => point.esp >= from.esp && point.esp <= to.esp).map((point) => point.cfm);
+        const steps: number[] = [];
+        span.reduce((previous, cfm) => { steps.push(Math.sign(cfm - previous)); return cfm; });
+        const monotonic = steps.every((step) => step <= 0) || steps.every((step) => step >= 0);
+        if (!monotonic) {
+          failing("AIRFLOW_BRACKET_NOT_MONOTONIC", ["airflow"]);
+        } else {
+          const bracket = { espLow: from.esp, espHigh: to.esp, cfmMin: Math.min(...span), cfmMax: Math.max(...span) };
+          airflowEvidence = { ...airflowEvidence, operatingPoint: { tesp: derivedTesp.value, uncertainty: derivedTesp.uncertainty }, bracket };
+          // OEM one-sided limits apply to the bracketed airflow (table method) or the measured airflow.
+          const half = (bracket.cfmMax - bracket.cfmMin) / 2;
+          for (const range of oneSidedRanges) {
+            if (tableMethod) compare("airflow", "P08", bracket.cfmMin + half, half, range, "CFM",
+              { outside: "AIRFLOW_OUTSIDE_OEM_RANGE", ambiguous: "AIRFLOW_AMBIGUOUS" });
+          }
+          if (!checks.failing("P08")) airflowEvidence = { ...airflowEvidence, path: "OEM_PUBLISHED_OPERATING_POINT" };
+        }
+      }
+    }
+    if (airflowEvidence.path === null && !checks.failing("P08")) failing("AIRFLOW_OPERATING_POINT_UNESTABLISHED");
+  } else if (airflowCriteria.length > 0) {
+    checks.add("P08", "HOLD", "AIRFLOW_ACCEPTANCE_ONE_SIDED");
+  }
+  checks.settle("P08", "AIRFLOW_ACCEPTED_BY_OEM_CRITERION");
+
+  // P09 — Amendment A8 (R5-05): TESP lies within the ESP range of the OEM blower-performance data
+  // (no extrapolation) and every OEM static limit is met.
+  const staticLimits = oem.staticLimits ?? [];
+  if (!oem.espTableDomain && staticLimits.length === 0) checks.add("P09", "HOLD", "OEM_ESP_RANGE_UNAVAILABLE");
+  if (derivedTesp && oem.espTableDomain) {
+    compare("derivedTesp", "P09", derivedTesp.value, derivedTesp.uncertainty, oem.espTableDomain, "IN_WC",
+      { outside: "ESP_OUTSIDE_OEM_RANGE", ambiguous: "ESP_AMBIGUOUS" });
+  }
+  for (const limit of staticLimits) {
+    const measured = limit.component === "TOTAL" ? derivedTesp
+      : limit.component === "RETURN" ? returnStatic && { value: returnStatic.value, uncertainty: returnStatic.accuracy as number }
+      : supplyStatic && { value: supplyStatic.value, uncertainty: supplyStatic.accuracy as number };
+    if (!measured) continue;
+    const interval = limit.basis === "MAGNITUDE" ? magnitudeInterval(measured.value, measured.uncertainty) : measured;
+    compare(`staticLimit:${limit.component}:${limit.basis}`, "P09", interval.value, interval.uncertainty, limit.range, "IN_WC",
+      { outside: "STATIC_PRESSURE_LIMIT_NOT_MET", ambiguous: "STATIC_PRESSURE_LIMIT_AMBIGUOUS" });
+  }
+  checks.settle("P09", "EXTERNAL_STATIC_PRESSURE_WITHIN_OEM_DATA");
 
   // P10 — heat rejection: only CLEAR, panels in place, fan operating, observed after the latest state change.
   const condenser = evidence.condenser;
@@ -456,17 +660,20 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
   if (criterion.status === "PUBLISHED") {
     const derivation = criterion.derivation;
     if (derivation.kind === "SINGLE_MEASUREMENT") {
-      const single = use(derivation.measurement, "P18");
+      const single = use(derivation.measurement, "P18", true);
       if (single) indicator = { value: single.value, uncertainty: single.accuracy as number, unit: single.unit };
     } else {
-      const [returnKey, supplyKey]: [MeasurementKey, MeasurementKey] = derivation.kind === "RETURN_MINUS_SUPPLY_DRY_BULB"
-        ? ["returnDryBulb", "supplyDryBulb"] : ["returnWetBulb", "supplyWetBulb"];
-      const entering = use(returnKey, "P18");
-      const leaving = use(supplyKey, "P18");
-      if (entering && leaving) {
+      const [minuendKey, subtrahendKey]: [MeasurementKey, MeasurementKey] =
+        derivation.kind === "RETURN_MINUS_SUPPLY_DRY_BULB" ? ["returnDryBulb", "supplyDryBulb"]
+        : derivation.kind === "RETURN_MINUS_SUPPLY_WET_BULB" ? ["returnWetBulb", "supplyWetBulb"]
+        // A8 (R5-09): OEM-defined approach = liquid-line temperature minus outdoor ambient.
+        : ["liquidLineTemp", "outdoorDryBulb"];
+      const minuend = use(minuendKey, "P18", true);
+      const subtrahend = use(subtrahendKey, "P18", true);
+      if (minuend && subtrahend) {
         indicator = {
-          value: entering.value - leaving.value,
-          uncertainty: worstCaseUncertainty([entering.accuracy as number, leaving.accuracy as number]),
+          value: minuend.value - subtrahend.value,
+          uncertainty: worstCaseUncertainty([minuend.accuracy as number, subtrahend.accuracy as number]),
           unit: "F",
         };
       }
@@ -474,7 +681,7 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
 
     // Amendment A7: the criterion value is taken from exactly one OEM-published candidate whose
     // applicability conditions contain the measured conditions (F1). Nothing is interpolated,
-    // calculated, or looked up outside the bounded record; anything else fails closed.
+    // calculated beyond A8 OEM-stated arithmetic, or looked up outside the bounded record.
     const lookup = criterion.lookup;
     if (lookup.interpolationRequired) checks.add("P18", "ESCALATE", "OEM_CRITERION_REQUIRES_INTERPOLATION");
     if (lookup.calculationRequired) checks.add("P18", "ESCALATE", "OEM_CRITERION_REQUIRES_CALCULATION");
@@ -484,51 +691,9 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     if (lookup.interpolationRequired || lookup.calculationRequired || lookup.unrepresentedConditions.length > 0) {
       criterionSelection = { status: "NOT_REPRESENTABLE", candidateId: null };
     } else {
-      const conditionKeys = [...new Set(criterion.candidates.flatMap((candidate) => candidate.appliesWhen.map((condition) => condition.measurement)))];
-      const conditions = new Map(conditionKeys.map((key) => [key, use(key, "P18")] as const));
-      const unitsValid = criterion.candidates.every((candidate) => candidate.appliesWhen.every((condition) => {
-        if (condition.unit === EXPECTED_UNIT[condition.measurement]) return true;
-        checks.add("P18", "HOLD", "UNIT_MISMATCH", [`applicability:${candidate.candidateId}:${condition.measurement}`]);
-        return false;
-      }));
-      if (unitsValid && [...conditions.values()].every((measurement) => measurement !== null)) {
-        const matches: CriterionCandidate[] = [];
-        const ambiguous: CriterionCandidate[] = [];
-        for (const candidate of criterion.candidates) {
-          const classes = candidate.appliesWhen.map((condition) => {
-            const measurement = conditions.get(condition.measurement) as Measurement;
-            return { condition, measurement, classification: classifyInterval(measurement.value, measurement.accuracy as number, condition) };
-          });
-          if (classes.every((item) => item.classification === "WITHIN")) matches.push(candidate);
-          else if (!classes.some((item) => item.classification === "OUTSIDE")) ambiguous.push(candidate);
-          for (const item of classes) {
-            if (item.classification === "AMBIGUOUS" || classes.every((other) => other.classification === "WITHIN")) {
-              findings.push({
-                subject: `applicability:${candidate.candidateId}:${item.condition.measurement}`,
-                value: item.measurement.value,
-                uncertainty: item.measurement.accuracy as number,
-                range: { min: item.condition.min, max: item.condition.max, unit: item.condition.unit, ref: item.condition.ref },
-                classification: item.classification,
-              });
-            }
-          }
-        }
-        const [only, ...others] = matches;
-        if (only && others.length === 0) {
-          selected = only;
-          criterionSelection = { status: "SELECTED", candidateId: only.candidateId };
-        } else if (only) {
-          checks.add("P18", "HOLD", "OEM_CRITERION_CANDIDATES_CONFLICT", matches.map((candidate) => candidate.candidateId));
-          criterionSelection = { status: "CONFLICT", candidateId: null };
-        } else if (ambiguous.length > 0) {
-          checks.add("P18", "HOLD", "OEM_CRITERION_APPLICABILITY_AMBIGUOUS", ambiguous.map((candidate) => candidate.candidateId));
-          criterionSelection = { status: "AMBIGUOUS", candidateId: null };
-        } else {
-          checks.add("P18", criterion.coverage === "COMPLETE" ? "ESCALATE" : "HOLD",
-            criterion.coverage === "COMPLETE" ? "OEM_CRITERION_NOT_PUBLISHED_FOR_CONDITIONS" : "OEM_CRITERION_NOT_IN_RECORD_FOR_CONDITIONS");
-          criterionSelection = { status: "NONE_APPLICABLE", candidateId: null };
-        }
-      }
+      const result = selectCandidate(criterion.candidates, "P18", "OEM_CRITERION", criterion.coverage);
+      selected = result.selected;
+      criterionSelection = result.selection;
     }
   }
 
@@ -546,9 +711,52 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     checks.add("P15", "HOLD", "NOT_EVALUATED_PREREQUISITES_UNRESOLVED");
     if (!checks.failing("P18")) checks.add("P18", "HOLD", "NOT_EVALUATED_PREREQUISITES_UNRESOLVED");
   } else if (criterion.status === "NOT_OBTAINED") {
-    checks.add("P15", "HOLD", "NOT_EVALUATED_INDICATION_UNAVAILABLE");
-    checks.add("P18", criterion.obtainable ? "HOLD" : "ESCALATE",
-      criterion.obtainable ? "OEM_NONINVASIVE_CRITERION_PENDING" : "INDICATION_AUTHORITY_UNAVAILABLE");
+    // Amendment A8 (C1-R5) I3 — OEM post-event verification path (owner ruling Option C). Available only when
+    // no governed source publishes a non-invasive charge criterion, the OEM method is pressure-based and its
+    // documentation requires or supports verification after a charge change or repair, and the evidence
+    // record carries that event (the anchor). The anchor establishes a bounded purpose, not a diagnosis.
+    const chargingMethod = oem.chargingMethod;
+    const postEvent = chargingMethod.status === "IDENTIFIED" && chargingMethod.pressureBased === true
+      ? chargingMethod.postEventVerification : undefined;
+    const anchors = evidence.events.filter((event) =>
+      (event.type === "REFRIGERANT_CHARGE_CHANGED" ||
+        (event.type === "REPAIR_OR_COMPONENT_REPLACEMENT" && event.affectsRefrigerantCircuit === true)) &&
+      effectiveRunStart !== null && ms(event.at) <= effectiveRunStart);
+    if (!postEvent || anchors.length === 0) {
+      checks.add("P15", "HOLD", "NOT_EVALUATED_INDICATION_UNAVAILABLE");
+      checks.add("P18", criterion.obtainable ? "HOLD" : "ESCALATE",
+        criterion.obtainable ? "OEM_NONINVASIVE_CRITERION_PENDING" : "INDICATION_AUTHORITY_UNAVAILABLE");
+      if (postEvent) checks.add("P18", "HOLD", "I3_EVENT_ANCHOR_ABSENT");
+      else if (anchors.length > 0) checks.add("P18", "HOLD", "I3_OEM_POST_EVENT_VERIFICATION_NOT_DOCUMENTED");
+    } else {
+      let methodConditionsEstablished = true;
+      for (const condition of (chargingMethod.status === "IDENTIFIED" ? chargingMethod.conditions : undefined) ?? []) {
+        const measurement = use(condition.measurement, "P18", true);
+        const classification = measurement
+          ? compare(`methodCondition:${condition.measurement}`, "P18", measurement.value, measurement.accuracy as number, condition, measurement.unit,
+            { outside: "I3_METHOD_CONDITIONS_NOT_ESTABLISHED", ambiguous: "I3_METHOD_CONDITIONS_AMBIGUOUS" })
+          : null;
+        if (classification !== "WITHIN") methodConditionsEstablished = false;
+      }
+      if (basis.length === 0) {
+        checks.add("P15", "HOLD", "STATED_BASIS_MISSING");
+        checks.add("P18", "HOLD", "NOT_EVALUATED_BASIS_UNRESOLVED");
+      } else if (prohibitedOnly) {
+        checks.add("P15", "HOLD", "PROHIBITED_BASIS_RESTATE_REQUIRED");
+        checks.add("P18", "HOLD", "NOT_EVALUATED_BASIS_UNRESOLVED");
+      } else if (!basis.some((code) => I3_PERMITTED.has(code))) {
+        checks.add("P15", "HOLD", "I3_BASIS_NOT_PERMITTED");
+        checks.add("P18", "HOLD", "NOT_EVALUATED_BASIS_UNRESOLVED");
+      } else {
+        checks.add("P15", "SATISFIED", "BASIS_NOT_SOLELY_PROHIBITED");
+        if (methodConditionsEstablished) {
+          checks.add("P18", "SATISFIED", "I3_OEM_POST_EVENT_VERIFICATION", anchors.map((event) => `${event.type}@${event.at}`));
+          indicationPath = "I3";
+        } else if (!checks.failing("P18")) {
+          checks.add("P18", "HOLD", "I3_METHOD_CONDITIONS_NOT_ESTABLISHED");
+        }
+      }
+    }
   } else if (indicator && selected) {
     const classification = compare("indicator", "P18", indicator.value, indicator.uncertainty, selected.range, indicator.unit,
       { outside: "", ambiguous: "" });
@@ -584,7 +792,49 @@ export function evaluateGateA(raw: unknown, validation: ValidationOutcome): Gate
     windowStart: windowStart === null ? null : iso(windowStart),
     windowEnd,
   };
-  return finalize(checks, findings, derivedTesp, indicationPath, criterionSelection, window, runRestarted);
+  return finalize(checks, findings, derivedTesp, indicationPath, criterionSelection, window, runRestarted, measurementAuthority, airflowEvidence);
+}
+
+const CERTIFICATION_LISTING: OemSourceClass = "AHRI_CERTIFICATION_LISTING";
+
+/** Amendments A5/A7/A8: provenance rules for the governed OEM reference (binding + constituents). */
+function governedProvenanceFinding(
+  provenance: OemProvenance | undefined,
+  isSelf: (party: string) => boolean,
+): [CheckResult, string] | null {
+  if (provenance?.conflicts?.length) return ["HOLD", "OEM_BINDING_CONFLICT"];
+  if (!provenance || provenance.verification === "NOT_VERIFIED") return ["HOLD", "OEM_REFERENCE_NOT_VERIFIED"];
+  if (provenance.verification === "VERIFICATION_UNAVAILABLE") return ["ESCALATE", "OEM_REFERENCE_VERIFICATION_UNAVAILABLE"];
+  if (provenance.acquisitionMethod !== "GOVERNED_LIBRARY") return ["HOLD", "OEM_REFERENCE_NOT_FROM_GOVERNED_REGISTRY"];
+  const blank = (value: string | undefined) => !value?.trim();
+  const sources = provenance.sources ?? [];
+  const sourceIds = new Set(sources.map((source) => source.recordId));
+  const complete =
+    ![provenance.manufacturer, provenance.verifiedBy, provenance.verifiedAt, provenance.recordId, provenance.transcribedBy, provenance.transcribedAt].some(blank) &&
+    SHA256_HEX.test(provenance.recordHash ?? "") && !!provenance.matchedSystems?.length && !!provenance.supersession &&
+    sources.length > 0 && !!provenance.pairingSources?.length && provenance.criterionSources !== undefined &&
+    provenance.pairingSources.every((id) => sourceIds.has(id)) &&
+    Object.values(provenance.criterionSources).every((id) => sourceIds.has(id)) &&
+    sources.every((source) =>
+      ![source.recordId, source.documentId, source.sourceRef, source.transcribedBy, source.transcribedAt].some(blank) &&
+      SHA256_HEX.test(source.recordHash) && SHA256_HEX.test(source.documentHash) && !!source.supersession);
+  if (!complete) return ["HOLD", "OEM_REFERENCE_PROVENANCE_INCOMPLETE"];
+  const supersessions = [provenance.supersession, ...sources.map((source) => source.supersession)];
+  if (supersessions.includes("SUPERSEDED")) return ["HOLD", "OEM_REFERENCE_SUPERSEDED"];
+  if (supersessions.includes("WITHDRAWN")) return ["HOLD", "OEM_REFERENCE_WITHDRAWN"];
+  if (sources.some((source) => source.verification !== "VERIFIED" || blank(source.verifiedBy) || blank(source.verifiedAt))) {
+    return ["HOLD", "OEM_SOURCE_NOT_VERIFIED"];
+  }
+  const reviews = [
+    { by: provenance.verifiedBy as string, at: provenance.verifiedAt as string, transcriber: provenance.transcribedBy as string, transcribedAt: provenance.transcribedAt as string },
+    ...sources.map((source) => ({ by: source.verifiedBy as string, at: source.verifiedAt as string, transcriber: source.transcribedBy, transcribedAt: source.transcribedAt })),
+  ];
+  if (reviews.some((review) => isSelf(review.by))) return ["HOLD", "OEM_REFERENCE_SELF_VERIFICATION_REJECTED"];
+  if (reviews.some((review) => identityKey(review.by) === identityKey(review.transcriber))) return ["HOLD", "OEM_REFERENCE_REVIEW_NOT_INDEPENDENT"];
+  if (reviews.some((review) => ms(review.at) < ms(review.transcribedAt))) return ["HOLD", "OEM_REFERENCE_REVIEW_PRECEDES_TRANSCRIPTION"];
+  const listings = new Set(sources.filter((source) => source.sourceClass === CERTIFICATION_LISTING).map((source) => source.recordId));
+  if (Object.values(provenance.criterionSources ?? {}).some((id) => listings.has(id))) return ["HOLD", "OEM_CRITERION_FROM_NON_OEM_SOURCE"];
+  return null;
 }
 
 function finalize(
@@ -595,6 +845,8 @@ function finalize(
   criterionSelection: CriterionSelection,
   window: GateAEvaluation["window"],
   runRestarted: boolean,
+  measurementAuthority: GateAEvaluation["measurementAuthority"],
+  airflowEvidence: AirflowEvidence,
 ): GateAEvaluation {
   // Fail closed: any required proposition without a check is unresolved.
   for (const proposition of REQUIRED_PROPOSITIONS) {
@@ -614,6 +866,8 @@ function finalize(
     ambiguityFindings: findings,
     derivedTesp,
     criterionSelection,
+    measurementAuthority,
+    airflowEvidence,
     window,
     runRestarted,
   };

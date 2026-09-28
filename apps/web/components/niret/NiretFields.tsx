@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 
 import type { MeasurementKey } from "../../../../packages/domain/niret/types";
 import type { InstrumentKind, MeasurementEntry, NiretFormState, StaticDirection, TriState } from "../../lib/niret/form-state";
+import { governedMethodFor } from "../../lib/niret/governed-methods";
 import { unitFor } from "../../lib/niret/oem-reference";
 
 export const nowIso = (): string => new Date().toISOString();
@@ -93,6 +94,7 @@ export function MeasurementField({
   const kind = kindForKey(measurementKey);
   const instruments = form.instruments.filter((row) => row.kind === kind);
   const oemLocation = form.oem.locations[measurementKey] ?? "";
+  const method = governedMethodFor(measurementKey);
   const update = (patch: Partial<MeasurementEntry>) => onChange({ ...entry, ...patch });
   return (
     <div id={`field-${measurementKey}`} className={`nrMeasure${attention.length ? " attention" : ""}`}>
@@ -119,6 +121,12 @@ export function MeasurementField({
       </div>
       <div className="nrMeasureRow">
         <input aria-label={`${label} location`} value={entry.location} placeholder={oemLocation ? `OEM location: ${oemLocation}` : "Measurement location"} onChange={(event) => update({ location: event.target.value })} />
+        {method && (
+          <label className="nrCheck" title={`${method.procedure} Sources: ${method.sources.join("; ")}`}>
+            <input type="checkbox" checked={entry.governedMethod === true} onChange={(event) => update({ governedMethod: event.target.checked })} />
+            Measured per TA-14 governed method {method.id} ({method.title}) — applies only where the OEM prescribes no location
+          </label>
+        )}
         {oemLocation && entry.location !== oemLocation && <button type="button" onClick={() => update({ location: oemLocation })}>Use OEM location</button>}
       </div>
       <div className="nrMeasureRow">

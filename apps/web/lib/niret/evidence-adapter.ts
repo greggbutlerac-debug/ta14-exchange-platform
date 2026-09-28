@@ -10,6 +10,7 @@
 
 import type { GateAInput, MeasurementKey } from "../../../../packages/domain/niret/types";
 import type { InstrumentKind, MeasurementEntry, NiretFormState } from "./form-state";
+import { governedMethodFor } from "./governed-methods";
 import { manualOemReference, parseEntry, triState, unitFor, type OemReferenceSource } from "./oem-reference";
 
 const KIND_FOR_UNIT: Readonly<Record<string, InstrumentKind>> = {
@@ -35,6 +36,9 @@ function measurement(form: NiretFormState, key: MeasurementKey, entry: Measureme
     provenance: "MANUAL",
   };
   if (accuracy !== undefined) result.accuracy = accuracy;
+  // A9: only an explicit technician affirmation records a governed measurement method.
+  const methodId = entry.governedMethod ? governedMethodFor(key)?.id : undefined;
+  if (methodId) result.methodId = methodId;
   return result;
 }
 
@@ -120,7 +124,11 @@ export function buildGateAInput(form: NiretFormState, options: AdapterOptions): 
       runStartedAt: text(form.operation.runStartedAt),
       compressorRunningSteadily: triState(form.operation.compressorRunningSteadily),
     },
-    events: form.events.map((event) => ({ type: event.type, at: event.at, ...(event.affectsIdentity ? { affectsIdentity: true } : {}) })),
+    events: form.events.map((event) => ({
+      type: event.type, at: event.at,
+      ...(event.affectsIdentity ? { affectsIdentity: true } : {}),
+      ...(event.affectsRefrigerantCircuit ? { affectsRefrigerantCircuit: true } : {}),
+    })),
     corrections: form.corrections.map((correction) => ({
       at: correction.at,
       declaredFinding: correction.declaredFinding,
@@ -145,7 +153,10 @@ export function buildGateAInput(form: NiretFormState, options: AdapterOptions): 
       observedAt: text(form.condenser.observedAt),
     },
     airflowMethod: form.airflowMethod.method
-      ? { method: form.airflowMethod.method, motorType: form.airflowMethod.motorType || "UNKNOWN", componentsClean: triState(form.airflowMethod.componentsClean) }
+      ? {
+          method: form.airflowMethod.method, motorType: form.airflowMethod.motorType || "UNKNOWN", componentsClean: triState(form.airflowMethod.componentsClean),
+          ...(form.airflowMethod.blowerSetting?.trim() ? { blowerSetting: form.airflowMethod.blowerSetting.trim() } : {}),
+        }
       : undefined,
     observations: Object.keys(observations).length ? observations : undefined,
     measurements,

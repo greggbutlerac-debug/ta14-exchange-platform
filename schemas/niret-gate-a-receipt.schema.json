@@ -62,7 +62,10 @@
     "oem_reference_provenance",
     "technical_determination",
     "execution_authority",
-    "oem_criterion_selection"
+    "oem_criterion_selection",
+    "indication_meaning",
+    "measurement_authority",
+    "airflow_evidence"
   ],
   "properties": {
     "gate_version": {
@@ -91,7 +94,64 @@
     "indication_path": {
       "enum": [
         "I1",
+        "I3",
         null
+      ]
+    },
+    "measurement_authority": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "authorityClass",
+          "locationBasis",
+          "location",
+          "oemLocation",
+          "methodId"
+        ],
+        "properties": {
+          "authorityClass": {
+            "enum": [
+              "A",
+              "B",
+              "C"
+            ]
+          },
+          "locationBasis": {
+            "enum": [
+              "OEM",
+              "GOVERNED_METHOD",
+              "UNESTABLISHED"
+            ]
+          }
+        }
+      }
+    },
+    "airflow_evidence": {
+      "type": "object",
+      "required": [
+        "path",
+        "blowerSetting",
+        "designatedSetting",
+        "operatingPoint",
+        "bracket",
+        "convention",
+        "ref"
+      ],
+      "properties": {
+        "path": {
+          "enum": [
+            "OEM_ACCEPTANCE_CRITERION",
+            "OEM_PUBLISHED_OPERATING_POINT",
+            null
+          ]
+        }
+      }
+    },
+    "indication_meaning": {
+      "type": [
+        "string",
+        "null"
       ]
     },
     "scope": {

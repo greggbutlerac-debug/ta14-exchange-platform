@@ -1,0 +1,55 @@
+{
+  "bindingId": "NIRET-OEM-BIND-TRANE-4TTR4036L1-TEM6A0C36H31",
+  "bindingVersion": 1,
+  "contract": "TA-14-NIRET-GA-C1/A8",
+  "system": {
+    "manufacturer": "Trane",
+    "indoorModel": "TEM6A0C36H31+TDR",
+    "outdoorModel": "4TTR4036L1"
+  },
+  "constituents": [
+    {
+      "recordId": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9",
+      "recordHash": "90e11bd5ca3bef41f03760a21f662eb92f910e8e3dae3cead291178e6d1adda3"
+    },
+    {
+      "recordId": "NIRET-OEM-TRANE-TEM6-IG-18-GF74D1-1F",
+      "recordHash": "20c87dd67e886ce2ee1336a1517b3d1765993db35ff227d91b025fa23cac1dc3"
+    },
+    {
+      "recordId": "NIRET-OEM-AHRI-7791584",
+      "recordHash": "eb1f6057a57695f61627acf348404e303cf4236e6d9e0801d99b1e93ef274c3f"
+    }
+  ],
+  "pairingSources": [
+    "NIRET-OEM-AHRI-7791584"
+  ],
+  "criterionSources": {
+    "chargingMethod": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9",
+    "specialToolOrModeRequired": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9",
+    "ambientEnvelope": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9",
+    "minRunMinutes": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9",
+    "fanPerformance": "NIRET-OEM-TRANE-TEM6-IG-18-GF74D1-1F",
+    "espTableDomain": "NIRET-OEM-TRANE-TEM6-IG-18-GF74D1-1F",
+    "measurementLocations": {
+      "liquidLineTemp": "NIRET-OEM-TRANE-4TTR4-IG-18-AC51D1-9"
+    }
+  },
+  "noninvasiveCriterionAbsence": "NOT_IN_BOUND_SOURCES",
+  "curation": {
+    "transcribedBy": "Claude Opus 5.5 (AI assistant) acting on instruction of greggbutlerac-debug",
+    "transcribedAt": "2026-09-28T01:45:00Z"
+  },
+  "review": {
+    "state": "PENDING_REVIEW",
+    "reviewedBy": null,
+    "reviewedAt": null,
+    "method": "INDEPENDENT_SECOND_READ_AGAINST_HASHED_DOCUMENT",
+    "notes": "Held at PENDING_REVIEW deliberately. Independent review (Atlas / OpenAI, 2026-09-28T02:36:50Z, conveyed by owner) determined PASS WITH EXPLICIT LIMITATIONS for the package; the binding is the object that would bind an installed field system, and the reviewer directed that it must not do so until its governed identity requirements are independently established. Package limitations (NOT ESTABLISHED): (1) an authoritative mapping from complete installed-equipment nameplate identifiers to the AHRI designations 4TTR4036L1 and TEM6A0C36H31; (2) the physical Trane component/configuration that realizes the AHRI +TDR enhancement on the installed TEM6. An unmatched or unresolved field identity fails closed."
+  },
+  "status": {
+    "supersession": "CURRENT",
+    "supersededBy": null,
+    "supersedes": []
+  }
+}

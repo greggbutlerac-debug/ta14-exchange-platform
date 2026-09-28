@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { GOVERNED_OEM_REGISTRY } from "../../../../../../../packages/domain/niret/oem-registry";
+import { loadCertificationVerifier } from "../../../../../lib/niret/certification-verifier";
 import { evaluateNiretSubmission, NO_SOURCES, submissionContext } from "../../../../../lib/niret/server-evaluate";
 import { createClient } from "../../../../../lib/supabase/server";
 
@@ -34,11 +35,14 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Submission is not valid JSON." }, { status: 400 });
   }
 
-  // The authenticated account establishes who submitted the record only. No certification or
-  // authority source is integrated yet: those are recorded as unavailable. The governed OEM
-  // registry (A7) is integrated; it is empty until a genuine manufacturer source is registered.
-  const sources = { ...NO_SOURCES, submitter: { accountId: user.id }, oemRegistry: GOVERNED_OEM_REGISTRY };
-  const { receipt, findings, oemReference } = evaluateNiretSubmission(body.input, new Date(), sources);
+  // The authenticated account establishes who submitted the record only. Certification is verified
+  // only from appointed-verifier records for that account (A4); no authority-establishment source is
+  // integrated yet, so those elements are recorded as unavailable. The governed OEM registry (A7) is
+  // integrated; it is empty until a genuine manufacturer source is registered.
+  const now = new Date();
+  const certificationVerifier = await loadCertificationVerifier(supabase, user.id, now);
+  const sources = { ...NO_SOURCES, submitter: { accountId: user.id }, certificationVerifier, oemRegistry: GOVERNED_OEM_REGISTRY };
+  const { receipt, findings, oemReference } = evaluateNiretSubmission(body.input, now, sources);
   return NextResponse.json(
     { receipt, findings, context: submissionContext(sources, oemReference) },
     { headers: { "Cache-Control": "no-store" } },

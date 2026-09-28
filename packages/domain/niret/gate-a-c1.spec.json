@@ -36,24 +36,24 @@
     "outside_scope_result": "Fail closed to HOLD or ESCALATE per logic"
   },
   "prerequisites": {
-    "P01": "Indoor and outdoor equipment identity (manufacturer, indoor model, outdoor model) recorded, and the pairing established by a VERIFIED governed OEM reference record naming that exact manufacturer and indoor/outdoor combination (Amendment A7); a declared pairing may restrict, never grant",
+    "P01": "Indoor and outdoor equipment identity (manufacturer, indoor model, outdoor model) recorded, and the pairing established by a system binding that is TA-14-VERIFIED and TA-14-CURRENT (TA-14 review and supersession status, not AHRI status) whose pairing source is first-party OEM match data or an AHRI listing (present or historical) establishing that the exact manufacturer and indoor/outdoor combination was listed by AHRI; the listing's present AHRI status is preserved and a Discontinued or otherwise historical listing is never represented as currently certified (Amendments A7, A8, A10); conflicting pairing sources -> HOLD; a declared pairing may restrict, never grant",
     "P02": "Declared refrigerant recorded; non-A2L (no red-marked ports/pipes/hoses, no flammable-refrigerant labels); instruments rated for that refrigerant",
     "P03": "Metering-device type established from direct/configuration evidence; never inferred from pressure",
     "P04": "OEM-prescribed minimum continuous run completed with no compressor interruption and no charge change during the run",
     "P05": "Instruments valid: calibrated per instrument-manufacturer interval, correct setup and placement",
     "P06": "Evaporator free of ice; if icing occurred, TA-14 ice restoration sequence complete",
     "P07": "Any pre-Gate-A correction recorded (declared finding, applicable authority, before-condition record, bounded correction, after-condition record) and new operating baseline established",
-    "P08": "Measured indoor airflow within OEM range by an OEM method or an ANSI/ACCA 5 QI-2015 section 4.1.2 method",
-    "P09": "Measured external static pressure within OEM range",
+    "P08": "Indoor airflow established as not confounding the OEM charging method, by either (a) an applicable OEM-published airflow acceptance criterion in an admissible form (A8), one-sided limits enforced but not alone sufficient; or (b) the OEM published operating point (Amendment A9): the installed blower setting is identified and is an OEM-published cooling setting for the indoor unit and size, and is the OEM-designated setting where the OEM designates one; derived TESP lies within the OEM fan-performance ESP range for that setting without extrapolation, measured per the table's convention; airflow is determined by an ANSI/ACCA 5 QI-2015 section 4.1.2 method, the OEM table method bracketing between adjacent published values (no interpolation; monotonic bracket required); every OEM-published airflow and static limit and method-validity condition is satisfied; components are clean. Generic CFM/ton values and non-OEM tolerances are never acceptance criteria.",
+    "P09": "Derived TESP (A3) lies within the ESP range of the OEM blower-performance data for the installed blower setting, without extrapolation, and every OEM-published static-pressure limit applicable to the matched system, configuration and measured component is satisfied; if the OEM publishes neither, P09 is not established (Amendment A8)",
     "P10": "Heat rejection valid: panels in place, condenser coil not materially restricted, condenser fan operating",
     "P11": "Outdoor ambient within the OEM envelope for the OEM method used",
     "P12": "Entering-evaporator dry-bulb and wet-bulb (or RH) measured at steady state",
     "P13": "Fresh internally coherent measurement set within one steady-state window, with no invalidating event since",
-    "P14": "OEM charging method identified for this model from a VERIFIED, CURRENT governed OEM reference record with complete record, document and custody provenance, independently reviewed (Amendments A5, A7); manual transcription never satisfies P14",
+    "P14": "OEM charging method identified for this model from a VERIFIED, CURRENT governed OEM reference record bound to the exact system by a VERIFIED, CURRENT system binding, with complete binding and per-source record, document and custody provenance, each independently reviewed (Amendments A5, A7, A8); the method must apply to the established metering device; manual transcription never satisfies P14",
     "P15": "Request not based solely on a prohibited basis; evaluated at the indication step per Amendment A2",
     "P16": "No unresolved hazard",
     "P17": "Execution authority (A6): submitter authenticated; 608 certification (Type II or Universal, or supervised apprentice with such a supervisor) independently VERIFIED per A4; and no declared or established restriction (work scope excludes diagnosis, site permission withheld or unconfirmed, jurisdiction unconfirmed or required-not-confirmed, identity mismatch). Grants of work scope, site permission and jurisdiction are not required by Gate A; they belong to the field-authority layer.",
-    "P18": "Indication established via I1 or I2, against the single OEM-published criterion candidate whose published applicability conditions contain the measured conditions (Amendment A7); no interpolation, calculation or unrepresented lookup"
+    "P18": "Indication established via I1 or I2 against the single applicable OEM-published non-invasive criterion candidate, including OEM-defined temperature differences and OEM-stated tolerance bands (Amendments A7, A8); no interpolation, extrapolation, generic rule or unrepresented lookup; or via I3 only when no bound source publishes a non-invasive charge criterion"
   },
   "conditional": {
     "C01": "If OEM criterion requires leaving-air (supply) readings: measure at OEM location; OEM location absent -> HOLD",
@@ -66,17 +66,18 @@
     "C08": "Leak indications recorded only; not a charge indication; leak question outside scope"
   },
   "indication": {
-    "I1": "Indicator interval lies entirely OUTSIDE the OEM-published criterion for this model (F1), with airflow established WITHIN OEM range",
+    "I1": "Indicator interval lies entirely OUTSIDE the OEM-published criterion for this model (F1), with P08 established",
     "I2": "TA-14 policy: I1 evidence valid but ambiguous against OEM criterion AND >=2 plausible charge-related hypotheses remain AND valid non-invasive evidence cannot discriminate AND the OEM pressure-based method would discriminate; contradiction alone never qualifies",
     "not_indication_authority": [
       "ANSI/ACCA 4 QM (corroboration only)",
       "RESNET 310 non-invasive method (not adopted)",
       "CA Title 24 RA3.2 (not adopted)"
-    ]
+    ],
+    "I3": "OEM post-event verification path (Amendment A8, owner ruling Option C): no bound source publishes a non-invasive charge criterion; the OEM charging method for the system is pressure-based and its governed documentation requires or supports verification after a charge change or repair; the evidence record contains a REFRIGERANT_CHARGE_CHANGED event, or a REPAIR_OR_COMPONENT_REPLACEMENT event flagged as affecting the refrigerant circuit, at or before the effective run start, with the OEM minimum run completed after it; every published applicability condition of the OEM method (ambient window, indoor window, run time, airflow validity, metering device) is established non-invasively in the qualifying window; and the stated basis includes POST_CHARGE_CHANGE_OR_REPAIR_VERIFICATION or NONINVASIVE_EVIDENCE and is not solely prohibited. The receipt states 'OEM-prescribed pressure-based verification admissible after recorded event', never an indication of charge fault. D1 is not available via I3. The event anchor establishes a bounded diagnostic purpose; it does not establish a diagnosis and does not manufacture OEM authority."
   },
   "logic": {
     "precedence": "DENY > ESCALATE > HOLD > ALLOW; empty requirement set -> HOLD; D1/D2 evaluated only after all HOLD/ESCALATE checks pass; D3 and D4 apply regardless; A6: technical_determination is derived from INPUT, SCOPE, P01-P16 and P18; execution_authority from P17 and ENTRY; determination (pressure-instrument entry authorized) combines both with the same precedence; D1/D2 are evaluated after all technical HOLD/ESCALATE checks pass",
-    "ALLOW": "All P01-P17 satisfied AND P18 via I1 or I2",
+    "ALLOW": "All P01-P17 satisfied AND P18 via I1, I2 or I3",
     "HOLD": [
       "Any P01-P17 missing, invalid, or stale",
       "Minimum run incomplete or interrupted",
@@ -200,14 +201,21 @@
     }
   },
   "measurement": {
-    "airflow": "OEM method or ACCA 5 QI-2015 section 4.1.2 (OEM CFM/ESP table, traverse, flow grid, pressure matching); never temperature rise for cooling; OEM-table method not for ECM unless OEM permits",
-    "external_static_pressure": "OEM-specified locations; clean components for OEM-table method (QI footnote 8)",
-    "entering_air_db_wb_rh": "At steady state; OEM location",
-    "line_temperatures": "OEM-specified location; liquid-line probe insulated from ambient",
-    "outdoor_entering_air": "OEM-specified; where air enters the unit",
+    "airflow": "OEM method or ACCA 5 QI-2015 section 4.1.2 (OEM CFM/ESP table, traverse, flow grid, pressure matching); never temperature rise for cooling; OEM-table method not for ECM unless OEM permits; an OEM coil temperature-drop (Delta-T) acceptance check is an OEM method and is not the temperature-rise method (Amendment A8)",
+    "external_static_pressure": "Location authority per location_authority (Class B); measured per the OEM fan-performance table convention; clean components for the OEM-table method and the OEM published operating point (QI footnote 8)",
+    "entering_air_db_wb_rh": "At steady state; location authority per location_authority (Class B)",
+    "line_temperatures": "Location authority per location_authority (Class B; Class A where an OEM criterion input names the point; suction line as an OEM criterion input requires the OEM point); liquid-line probe insulated from ambient",
+    "outdoor_entering_air": "Location authority per location_authority (Class B)",
     "voltage_current": "Voltmeter and ammeter vs nameplate/OEM ranges (QI section 4.4.2)",
     "instruments": "Rated for refrigerant; calibrated per instrument-manufacturer interval",
-    "oem_silent_location": "HOLD pending applicable authority; RESNET 310-2020 practice is reference only, not TA-14 authority"
+    "oem_silent_location": "Superseded by location_authority (Amendment A9): where the OEM is silent, a TA-14 governed measurement method establishes the location and procedure with complete provenance; otherwise HOLD. RESNET 310-2020 locations are adopted only as TA-14 governed measurement methods, never as criteria.",
+    "location_authority": {
+      "class_A": "OEM-specific location required: where the applicable OEM prescribes a measurement location (governed record measurementLocations), the measurement must be taken there; failure -> HOLD MEASUREMENT_LOCATION_NOT_OEM_LOCATION. Inputs to an OEM criterion follow the point named by the OEM procedure; suctionLineTemp used as an OEM criterion input with no OEM point -> HOLD.",
+      "class_B": "OEM location if specified; otherwise a TA-14 governed measurement method: returnDryBulb, returnWetBulb, returnRh, supplyDryBulb, supplyWetBulb, supplyRh, outdoorDryBulb, outdoorWetBulb, outdoorRh, liquidLineTemp, suctionLineTemp, returnStatic, supplyStatic",
+      "class_C": "Governed measurement method sufficient (OEM location governs only if the OEM specifies one): airflow, supplyVoltage, compressorCurrent, blowerCurrent",
+      "governed_method_provenance": "Measurement records the governed method identifier applicable to the key, physical location, instrument identity (registered, calibration valid, setup verified), timestamp, raw value and unit; operating state from the qualifying window; technician identity and authenticated submitter from the evidence record; derived values carry lineage. Missing or inapplicable method identifier -> HOLD.",
+      "rule": "Governed methods establish measurement validity only; they never manufacture, replace, broaden or infer an OEM acceptance criterion."
+    }
   },
   "oem_dependent": [
     "Airflow CFM range",
@@ -248,7 +256,11 @@
     ],
     "T4_discrimination_rule": "I2 as defined; contradiction alone never ALLOW",
     "T5_coherence_and_invalidation": "Co-temporal measurement set and state-change invalidation",
-    "T6_determinations": "Only ALLOW/HOLD/DENY/ESCALATE; not-indicated is DENY with reason code"
+    "T6_determinations": "Only ALLOW/HOLD/DENY/ESCALATE; not-indicated is DENY with reason code",
+    "T7_governed_measurement_methods": {
+      "rule": "The enumerated governed_measurement_methods are adopted as TA-14 measurement policy (methodology from ANSI/RESNET/ACCA 310-2020 and ANSI/ACCA 5 QI-2015). They define where and how to measure when the OEM does not prescribe it; they never supply an acceptance value.",
+      "attribution": "TA-14 policy (owner ratification C1-R6); measurement methodology only"
+    }
   },
   "external_authorities": [
     "40 CFR 82.152 (Technician definition)",
@@ -271,10 +283,10 @@
     "ACCA 5 QI informative 10/15-minute figures",
     "ACCA 5 QI informative 55F/60F ambient and 350-450 CFM/ton",
     "Individual OEM values (Trane 20 min, Lennox 5-10 min, Carrier 30F freeze switch)",
-    "RESNET 310 instrument accuracies and probe locations"
+    "RESNET 310 instrument accuracies (probe locations adopted only as TA-14 governed measurement methods, never as criteria)"
   ],
   "limitations": {
-    "no_oem_noninvasive_criterion": "HOLD if obtainable / ESCALATE if not; restricts ALLOW frequency",
+    "no_oem_noninvasive_criterion": "HOLD if obtainable / ESCALATE if not; I3 (event-anchored OEM post-event verification) is the only alternative, bounded as specified",
     "oem_silent_run_time": "HOLD pending applicable authority",
     "numeric_measured_stability": "OEM-specific (C06); otherwise not relied upon",
     "oem_silent_measurement_location": "HOLD pending applicable authority",
@@ -288,7 +300,9 @@
     "edition_texts": "ACCA 4 QM-2019 text, RESNET 310-2025 text, ACCA 5 QI ANSI re-designation outcome: not relied upon",
     "ice_removal_external_authority": "None; adopted as TA-14 policy",
     "oem_interpolation": "Not performed in C1: a criterion requiring interpolation, calculation or an unrepresented lookup condition -> ESCALATE",
-    "oem_registry_empty": "The governed OEM registry contains no record until a genuine manufacturer source is supplied, reviewed and registered; until then P14 and P01 cannot be satisfied"
+    "oem_registry_empty": "The governed OEM registry contains no record until a genuine manufacturer source is supplied, reviewed and registered; until then P14 and P01 cannot be satisfied",
+    "oem_permitted_interpolation": "Not performed in C1 even where the OEM permits interpolation (C2 candidate); such criteria fail closed",
+    "oem_operands_single_source": "OEM-stated arithmetic operands must be cited in the same source record as the criterion; cross-document operands are not represented in C1 and fail closed"
   },
   "receipt_schema": [
     "gate_version",
@@ -347,7 +361,10 @@
     "oem_reference_provenance",
     "technical_determination",
     "execution_authority",
-    "oem_criterion_selection"
+    "oem_criterion_selection",
+    "indication_meaning",
+    "measurement_authority",
+    "airflow_evidence"
   ],
   "required_tests": {
     "T01": "Empty/all-missing record -> HOLD",
@@ -452,7 +469,39 @@
     "T100": "Registration rejects non-independent review, overlapping or non-uniform candidates, unit mismatches, inverted bounds, duplicate CURRENT records, and SUPERSEDED without successor",
     "T101": "Resolution is exact; PENDING_REVIEW, REJECTED and SUPERSEDED records never resolve as VERIFIED",
     "T102": "A resolved record replaces all submitted OEM values and client-asserted provenance",
-    "T103": "Technician transcription yields only a non-authoritative curation request and cannot satisfy P14"
+    "T103": "Technician transcription yields only a non-authoritative curation request and cannot satisfy P14",
+    "T104": "A VERIFIED, CURRENT multi-source binding (outdoor instructions + indoor fan performance + pairing source) establishes P01/P14 and can reach ALLOW; receipt lists every constituent separately",
+    "T105": "Binding conflicts (pairing source not listing the system, or conflicting criterion values) -> HOLD OEM_BINDING_CONFLICT",
+    "T106": "A constituent that is unverified, superseded, withdrawn or self/non-independently reviewed makes the binding inadmissible -> HOLD",
+    "T107": "A criterion sourced from an AHRI certification listing -> HOLD; AHRI may establish pairing only",
+    "T108": "P08 admissible forms: stated CFM bounds, percent-of-rated, per-ton with published tonnage, tolerance band; one-sided only -> HOLD AIRFLOW_ACCEPTANCE_ONE_SIDED",
+    "T109": "P08 OEM Delta-T airflow check selects a cell without interpolation; outside -> HOLD; ambiguous or grid-point-only -> HOLD",
+    "T110": "P08 metering-restricted criteria apply only to the established metering device",
+    "T111": "P09 TESP within the OEM blower-data ESP range and all OEM static limits (signed and magnitude); outside or ambiguous -> HOLD; no OEM static data -> HOLD",
+    "T112": "P18 OEM-defined approach (liquid line minus outdoor) with OEM tolerance band: outside -> I1 ALLOW; within -> D1 DENY",
+    "T113": "Unbounded sides only where OEM-stated; invalid or inconsistent ranges -> HOLD, never a manufactured value",
+    "T114": "I3: event anchor + OEM post-event verification + method conditions + permitted basis -> technical ALLOW via I3 with non-fault receipt meaning",
+    "T115": "I3 without event anchor -> HOLD/ESCALATE as before; concern basis alone never establishes I3",
+    "T116": "I3 without OEM-documented post-event verification, or with method conditions unmet/ambiguous, or with a prohibited-only or non-permitted basis -> HOLD",
+    "T117": "I3 unavailable where a non-invasive criterion is published; D1 never reached via I3",
+    "T118": "Charging method not applicable to the established metering device -> HOLD",
+    "T119": "Registry: bindings hash-pinned; structural binding faults make the registry unavailable (ESCALATE); duplicate CURRENT binding for one system rejected",
+    "T120": "Registration rejects AHRI listings carrying criteria, approach derivation without OEM definition, unstated derivation operands and invalid unbounded sides",
+    "T121": "Shipped registry remains empty; no fabricated authoritative record or binding",
+    "T122": "Receipt records binding, constituents, criterion sources, derivations and indication meaning; gate_b_authorized false",
+    "T123": "P08 path (b): identified OEM cooling setting, TESP within the OEM fan-performance range, monotonic bracket, OEM limits met, clean components -> P08 established",
+    "T124": "P08 path (b): setting unidentified, not an OEM cooling setting, or not the OEM-designated setting -> HOLD",
+    "T125": "P08 path (b): TESP outside or ambiguous against the OEM fan-performance range -> HOLD; no extrapolation",
+    "T126": "P08 path (b): non-monotonic bracket -> HOLD; no interpolated airflow value is produced",
+    "T127": "P08 path (b): OEM one-sided limits and method-validity conditions still enforced; components not clean -> HOLD",
+    "T128": "Class A: OEM-specified location not followed -> HOLD, regardless of any governed method claimed",
+    "T129": "Class B/C: OEM silent and a governed method with complete provenance -> accepted; missing or inapplicable method -> HOLD",
+    "T130": "Suction line as an OEM criterion input without an OEM point -> HOLD",
+    "T131": "A governed method never supplies an acceptance criterion: without an OEM criterion or operating point, P08/P09/P18 remain unestablished",
+    "T132": "Receipt records measurement authority per measurement, airflow evidence path and derived-value lineage; generic CFM/ton never used",
+    "T133": "AHRI listing record requires a structured ahriListing; certifiedAtObservation must equal present status in {ACTIVE, PRODUCTION_STOPPED}; non-listing sources carry none",
+    "T134": "A Discontinued (historical) AHRI listing may establish pairing identity; the receipt preserves its present status and never represents it as currently certified",
+    "T135": "AHRI listing evidence never supplies criteria (unchanged A8 invariant)"
   },
   "owner_rulings": {
     "F1_ambiguity": {
@@ -795,9 +844,165 @@
         "NIRET -> TA-14 Gate adapter remains a contract specification only"
       ],
       "attribution": "Owner approval (TA-14 policy)"
+    },
+    "A8_c1_r5_oem_evidence_forms_and_i3": {
+      "prior_fingerprint": "4f0a6c874157833f4e4aa5254605bd687f6fccd43a435132e9fd4aac4855f04a",
+      "ratification": "OWNER RATIFICATION — TA-14-NIRET-GA-C1 REVISION C1-R5: R5-01 through R5-18 ratified; I3 owner ruling Option C (R5-19 through R5-21 adopted as the event-anchored formulation); P08 final rule, multi-document rule and AHRI limitation adopted; interpolation remains prohibited; Gate B out of scope.",
+      "basis": "OEM reality check of first-party Trane (18-AC51D1-9-EN), Carrier (24ACB3/24ACC6/24APB6 Installation Instructions; 24ACC6 and FB4C Product Data) and Lennox (13ACX Service Literature Corp. 0612-L2; Bulletin 210739; CBX25UH Product Specifications) material.",
+      "old_rules": {
+        "P01": "Indoor and outdoor equipment identity (manufacturer, indoor model, outdoor model) recorded, and the pairing established by a VERIFIED governed OEM reference record naming that exact manufacturer and indoor/outdoor combination (Amendment A7); a declared pairing may restrict, never grant",
+        "P08": "Measured indoor airflow within OEM range by an OEM method or an ANSI/ACCA 5 QI-2015 section 4.1.2 method",
+        "P09": "Measured external static pressure within OEM range",
+        "P14": "OEM charging method identified for this model from a VERIFIED, CURRENT governed OEM reference record with complete record, document and custody provenance, independently reviewed (Amendments A5, A7); manual transcription never satisfies P14",
+        "P18": "Indication established via I1 or I2, against the single OEM-published criterion candidate whose published applicability conditions contain the measured conditions (Amendment A7); no interpolation, calculation or unrepresented lookup",
+        "I1": "Indicator interval lies entirely OUTSIDE the OEM-published criterion for this model (F1), with airflow established WITHIN OEM range",
+        "ALLOW": "All P01-P17 satisfied AND P18 via I1 or I2",
+        "limitation_no_oem_noninvasive_criterion": "HOLD if obtainable / ESCALATE if not; restricts ALLOW frequency",
+        "measurement_airflow": "OEM method or ACCA 5 QI-2015 section 4.1.2 (OEM CFM/ESP table, traverse, flow grid, pressure matching); never temperature rise for cooling; OEM-table method not for ECM unless OEM permits"
+      },
+      "changes": {
+        "R5-01": "P01 pairing via VERIFIED, CURRENT system binding with first-party OEM match data or VERIFIED AHRI listing as pairing source — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-02": "Conflicting pairing sources or conflicting values for one criterion across bound sources -> HOLD (OEM_BINDING_CONFLICT); never reconciled — TIGHTENS",
+        "R5-03": "P08 typed OEM airflow acceptance criteria — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-04": "P08 two-sided requirement; one-sided limits enforced only (AIRFLOW_ACCEPTANCE_ONE_SIDED) — TIGHTENS",
+        "R5-05": "P09 table ESP range plus OEM static limits, no extrapolation — CLARIFICATION",
+        "R5-06": "P14 requires a VERIFIED, CURRENT system binding even for one document — TIGHTENS",
+        "R5-07": "P18 admits OEM-defined temperature differences and OEM-stated tolerance bands — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-08": "I1 'with P08 established' — CLARIFICATION",
+        "R5-09": "Derivation LIQUID_LINE_MINUS_OUTDOOR_DRY_BULB, only where a bound OEM document defines it (definitionCite) — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-10": "OEM-stated arithmetic: TOLERANCE_BAND, PERCENT_OF_RATED, PER_TON with every operand cited in the source; computed deterministically by the engine; F1 applies; derivation recorded in the receipt — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-11": "Unbounded side only where the OEM states 'and above'/'and below' (cited) — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-12": "Metering-device applicability for candidates, airflow criteria and the charging method, matched against established P03 — TIGHTENS",
+        "R5-13": "Multi-document system binding — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-14": "AHRI listing establishes pairing identity only — BROADENS ADMISSIBLE OEM EVIDENCE FORM WITHOUT LOWERING AUTHORITY",
+        "R5-15": "Delta-T acceptance check is an OEM method, not temperature rise — CLARIFICATION",
+        "R5-16": "No interpolation retained; OEM-permitted interpolation noted as C2 candidate — NO THRESHOLD CHANGE",
+        "R5-17": "Receipt records binding, every constituent source, per-criterion source and derivations — NO THRESHOLD CHANGE",
+        "R5-18": "no_oem_noninvasive_criterion limitation text — CLARIFICATION",
+        "R5-19": "ALLOW via I1, I2 or I3 — POLICY CHANGE (owner ruling Option C)",
+        "R5-20": "I3 event-anchored OEM post-event verification path — POLICY CHANGE (owner ruling Option C)",
+        "R5-21": "P15 permitted bases: NONINVASIVE_EVIDENCE, POST_CHARGE_CHANGE_OR_REPAIR_VERIFICATION; I3 accepts either only with the event anchor — POLICY CHANGE (owner ruling Option C)"
+      },
+      "i3_owner_ruling_interpretation": "Option C adopted. POST_CHARGE_CHANGE_OR_REPAIR_VERIFICATION is preserved as the OEM-supported basis where the governed OEM documentation requires or supports post-event verification (chargingMethod.postEventVerification, cited). The non-invasive-concern path (NONINVASIVE_EVIDENCE) reaches I3 only with the same event anchor and the established qualifying measurement set. A concern, intuition, habit, convenience or wish to see pressures never establishes I3 without the anchor.",
+      "p08_final_rule": {
+        "admissible": [
+          "Direct numeric OEM criterion",
+          "Bounded table/chart values at published points within the published range, no extrapolation",
+          "OEM-stated arithmetic/formula with every operand OEM-published in the same bound source for the exact model (tolerance band, percent of rated value, per-ton factor x published nominal tonnage)",
+          "OEM-stated temperature-difference airflow check (Delta-T), only where the target is selectable without interpolation",
+          "OEM-published tolerance band"
+        ],
+        "prohibited": [
+          "Interpolation (including OEM-permitted) and extrapolation",
+          "Formulas requiring capacity or psychrometric tables",
+          "Generic rules (e.g. 400 CFM/ton, ACCA/RESNET/Title 24 values) substituted for OEM criteria",
+          "Technician-derived calculations",
+          "Operands not stated in the bound source"
+        ],
+        "two_sided": "At least one applicable criterion must bound airflow on both sides"
+      },
+      "multi_document_rule": "A governed system reference for an exactly matched system may bind two or more independently preserved authoritative source records. Each source record retains its own identity, source class, document hash, identifier, revision/date, acquisition, transcription, independent review, applicability and supersession status. Source records are never merged, and no binding creates or alters a source. The system binding names the exact system; lists each constituent by record ID and record hash; maps every criterion to exactly one constituent and citation; names the pairing source; and is itself independently reviewed. The binding is current only while every constituent is VERIFIED, CURRENT and hash-valid. Conflicting pairing evidence, or conflicting values for one criterion, makes the binding inadmissible (HOLD).",
+      "ahri_rule": "A hashed AHRI certification listing, where applicable and VERIFIED, may establish matched-system identity (that the exact indoor/outdoor combination is a certified match). It never supplies, implies or overrides any charging, airflow, static-pressure, run-time, location or indication criterion; those come only from first-party OEM sources. Where first-party OEM match data exists it is preferred.",
+      "contracts": [
+        "schemas/niret-oem-reference-record.schema.json (source record, A8)",
+        "schemas/niret-oem-system-binding.schema.json (system binding, A8)"
+      ],
+      "registry": "Structural rejection of any record or binding makes the registry unavailable (ESCALATE); binding content conflicts make that binding inadmissible (HOLD); records and bindings are hash-pinned in the manifest; empty until a genuine manufacturer source is supplied.",
+      "fail_closed_invariants": [
+        "Generic CFM/ton, generic Delta-T or temperature-split rules, generic superheat/subcooling, ACCA/RESNET/Title 24 values never substitute for OEM criteria",
+        "No technician-created OEM authority (transcription, self-verification, declared pairing that grants)",
+        "AHRI or any certification listing never supplies technical criteria",
+        "Unmatched or approximately matched equipment data (family, prefix, wildcard, different model series) inadmissible",
+        "No interpolation, extrapolation, unstated operands or unrepresented lookup",
+        "Stale, superseded, withdrawn, unverified or hash-invalid references or bindings inadmissible",
+        "Unresolved airflow (one-sided only, F1-ambiguous, method not permitted) fails closed",
+        "Invalid operating state (run incomplete, outside OEM windows, ice, heat rejection not CLEAR, invalidating events, incoherent set) fails closed",
+        "I3 unavailable where any bound source publishes a non-invasive charge criterion; D1 never via I3",
+        "Technical ALLOW is not execution authority (A6); no pressure entry before Gate A ALLOW (A1)",
+        "Gate A ALLOW is never refrigerant-mass intervention authority; gate_b_authorized is always false"
+      ],
+      "unchanged": [
+        "Scope, A1-A6, F1, ice policy, state-change rules, execution-authority partition",
+        "Gate B out of scope",
+        "NIRET -> TA-14 Gate adapter remains a contract specification only"
+      ],
+      "attribution": "Owner ratification (TA-14 policy)"
+    },
+    "A9_c1_r6_airflow_and_measurement_authority": {
+      "prior_fingerprint": "14f120712d0bdb68f96a25e81d95f88fe84c3c7f75a3ae883dc2a2fcf36c0ec5",
+      "ratification": "OWNER RATIFICATION — C1-R6 AIRFLOW AND MEASUREMENT AUTHORITY CORRECTION: P08 corrected airflow evidence path adopted; three-class measurement-location authority adopted; TA-14 governed measurement methods adopted; all C1-R5 invariants preserved.",
+      "governing_principle": "NIRET must establish that airflow and measurement evidence are technically valid for the applicable equipment and OEM diagnostic method. It does not require a manufacturer to publish a universal two-sided airflow acceptance band that the manufacturer itself does not use.",
+      "basis": "Bounded technical-authority examination: first-party Lennox, Carrier and Trane material; ANSI/ACCA 5 QI-2015 sections 4.1.1, 4.1.2, 4.3.1 notes 1-2, footnotes 7-8; ANSI/RESNET/ACCA 310-2020 sections 6.5.2.1, 6.8, 8.2.1, 8.4.3.2-8.4.3.6.",
+      "old_rules": {
+        "P08": "Indoor airflow established as acceptable by an OEM-published airflow acceptance criterion for the matched system and charging method, in an admissible form (A8 P08 final rule), measured by an OEM method or an ANSI/ACCA 5 QI-2015 section 4.1.2 method; the acceptance criterion must bound airflow on both sides; one-sided OEM limits are enforced but do not alone establish P08",
+        "measurement": {
+          "airflow": "OEM method or ACCA 5 QI-2015 section 4.1.2 (OEM CFM/ESP table, traverse, flow grid, pressure matching); never temperature rise for cooling; OEM-table method not for ECM unless OEM permits; an OEM coil temperature-drop (Delta-T) acceptance check is an OEM method and is not the temperature-rise method (Amendment A8)",
+          "external_static_pressure": "OEM-specified locations; clean components for OEM-table method (QI footnote 8)",
+          "entering_air_db_wb_rh": "At steady state; OEM location",
+          "line_temperatures": "OEM-specified location; liquid-line probe insulated from ambient",
+          "outdoor_entering_air": "OEM-specified; where air enters the unit",
+          "voltage_current": "Voltmeter and ammeter vs nameplate/OEM ranges (QI section 4.4.2)",
+          "instruments": "Rated for refrigerant; calibrated per instrument-manufacturer interval",
+          "oem_silent_location": "HOLD pending applicable authority; RESNET 310-2020 practice is reference only, not TA-14 authority"
+        },
+        "not_generalized_resnet_locations": "RESNET 310 instrument accuracies and probe locations"
+      },
+      "p08_path_b": {
+        "evidence": [
+          "OEM fan-performance data for the exactly matched indoor unit (governed record: fanPerformance)",
+          "installed blower setting (evidence: airflowMethod.blowerSetting)",
+          "derived TESP from governed or OEM-located static measurements",
+          "OEM designation of the setting where the OEM designates one",
+          "OEM limits and method-validity conditions (airflowCriteria enforced)",
+          "clean components"
+        ],
+        "fail_closed": {
+          "no_fan_performance_data": "HOLD OEM_FAN_PERFORMANCE_UNAVAILABLE",
+          "setting_unidentified": "HOLD BLOWER_SETTING_UNIDENTIFIED",
+          "setting_not_oem_cooling_setting": "HOLD BLOWER_SETTING_NOT_OEM_COOLING_SETTING",
+          "setting_not_designated": "HOLD BLOWER_SETTING_NOT_OEM_DESIGNATED",
+          "operating_point_outside_data": "HOLD AIRFLOW_OPERATING_POINT_OUTSIDE_OEM_DATA",
+          "operating_point_ambiguous": "HOLD AIRFLOW_OPERATING_POINT_AMBIGUOUS",
+          "bracket_not_monotonic": "HOLD AIRFLOW_BRACKET_NOT_MONOTONIC",
+          "components_not_clean": "HOLD COMPONENTS_NOT_ESTABLISHED_CLEAN_FOR_TABLE_METHOD",
+          "ecm_table_not_permitted": "HOLD OEM_TABLE_METHOD_NOT_PERMITTED_FOR_ECM",
+          "oem_limit_violated": "HOLD AIRFLOW_OUTSIDE_OEM_RANGE / AIRFLOW_AMBIGUOUS"
+        },
+        "bracketing": "The operating point's TESP interval is enclosed by the nearest published ESP points at or below its low end and at or above its high end; airflow is bounded by the published CFM values over that span, which must be monotonic; no interpolated value is produced."
+      },
+      "location_authority": "measurement.location_authority",
+      "governed_measurement_methods": "governed_measurement_methods (TA-14 policy T7)",
+      "receipt": "New measurement_authority (per measurement: authority class, location basis, OEM reference or governed method id, location) and airflow_evidence (path, setting, operating point, bracket); derived_tesp carries lineage.",
+      "invariants_preserved": [
+        "All C1-R5 fail-closed invariants",
+        "Generic 350-450/400 CFM-per-ton rules non-generalized and non-authoritative",
+        "No interpolation",
+        "Technical ALLOW != execution authority",
+        "Gate A ALLOW != refrigerant-mass intervention authority; gate_b_authorized false"
+      ],
+      "attribution": "Owner ratification (TA-14 policy)"
+    },
+    "A10_c1_r7_historical_ahri_listing": {
+      "prior_fingerprint": "c133db7fff88f3e30397c78b1703355e685c9bb2f075b3c4c66268cb74618628",
+      "ratification": "OWNER RATIFICATION — HISTORICAL AHRI TEMPORAL CORRECTION B1–B3",
+      "governing_rule": "A historically valid AHRI listing may establish historical matched-system identity for already-installed equipment. Its present status must be preserved and it must not be represented as currently certified when the listing is Discontinued.",
+      "basis": "AHRI General Operations Manual (May 2025) section 11.4: Active and Production Stopped models are AHRI certified; Discontinued and Obsolete models are not AHRI certified; Discontinued models remain searchable for five years. AHRI USE OM (June 2026) section 5 preamble: all certified products shall be listed in the Directory.",
+      "old_rules": {
+        "P01": "Indoor and outdoor equipment identity (manufacturer, indoor model, outdoor model) recorded, and the pairing established by a VERIFIED, CURRENT system binding whose pairing source is first-party OEM match data or a VERIFIED AHRI certification listing naming that exact manufacturer and indoor/outdoor combination (Amendments A7, A8); conflicting pairing sources -> HOLD; a declared pairing may restrict, never grant",
+        "A8_ahri_rule": "A hashed AHRI certification listing, where applicable and VERIFIED, may establish matched-system identity (that the exact indoor/outdoor combination is a certified match). It never supplies, implies or overrides any charging, airflow, static-pressure, run-time, location or indication criterion; those come only from first-party OEM sources. Where first-party OEM match data exists it is preferred.",
+        "record_schema_ahri": "sourceClass AHRI_CERTIFICATION_LISTING with ahriReference only; acquisition method AHRI_DIRECTORY_CERTIFICATE; no structured present/historical status, dates or listed configuration"
+      },
+      "changes": {
+        "B1": "A8 ahri_rule superseded by ahri_rule below (A8 text preserved in old_rules and in A8).",
+        "B2": "P01 wording: AHRI listing present or historical; TA-14 VERIFIED/CURRENT distinguished from AHRI status; historical listings never represented as currently certified.",
+        "B3": "Source-record contract: AHRI listings carry a structured ahriListing object (reference, exact listed components as listed, enhancements, historical listing evidence, present status and observation time, certifiedAtObservation derived from present status, listing dates where established, ratings basis, limitations); acquisition method AHRI_DIRECTORY_RECORD added; receipt source provenance carries the AHRI present status and certifiedAtObservation."
+      },
+      "ahri_rule": "A hashed AHRI listing — present or historical — where applicable and TA-14-VERIFIED, may establish matched-system identity: that the exact indoor/outdoor combination was listed by AHRI for the recorded configuration. Its present AHRI status (Active, Production Stopped, Discontinued, Obsolete) is preserved; only Active and Production Stopped are represented as currently AHRI certified; a Discontinued listing establishes historical listed identity only. It never supplies, implies or overrides any charging, airflow, static-pressure, run-time, location or indication criterion, current field condition, execution authority or refrigerant-mass intervention authority; those come only from their own authorities. Where first-party OEM match data exists it is preferred.",
+      "no_expansion": "The temporal correction does not expand what AHRI establishes.",
+      "attribution": "Owner ratification (TA-14 policy)"
     }
   },
-  "revision": "C1-R4",
+  "revision": "C1-R7",
   "fingerprint_history": [
     {
       "revision": "C1-initial",
@@ -828,6 +1033,120 @@
       "revision": "C1-R3",
       "sha256": "e94ecb338b7b53d6342fd1f0c77cfe0fa0de8180214808cd701260f36d1367b5",
       "note": "A6 technical determination vs execution authority"
+    },
+    {
+      "revision": "C1-R4",
+      "sha256": "4f0a6c874157833f4e4aa5254605bd687f6fccd43a435132e9fd4aac4855f04a",
+      "note": "A7 governed OEM reference record"
+    },
+    {
+      "revision": "C1-R5",
+      "sha256": "14f120712d0bdb68f96a25e81d95f88fe84c3c7f75a3ae883dc2a2fcf36c0ec5",
+      "note": "A8 OEM evidence forms, multi-source binding, event-anchored I3"
+    },
+    {
+      "revision": "C1-R6",
+      "sha256": "c133db7fff88f3e30397c78b1703355e685c9bb2f075b3c4c66268cb74618628",
+      "note": "A9 P08 OEM operating point; measurement-location authority; governed measurement methods"
+    }
+  ],
+  "governed_measurement_methods": [
+    {
+      "id": "GM-RA-01",
+      "title": "Return / entering air",
+      "applies_to": [
+        "returnDryBulb",
+        "returnWetBulb",
+        "returnRh"
+      ],
+      "procedure": "Test hole in the return side upstream of the indoor coil and out of line of sight of the coil; if none can be located or created, the return grille closest to the equipment. Average over at least 10 seconds.",
+      "sources": [
+        "ANSI/RESNET/ACCA 310-2020 sections 8.4.3.2, 8.4.3.3"
+      ]
+    },
+    {
+      "id": "GM-SA-01",
+      "title": "Supply / leaving air",
+      "applies_to": [
+        "supplyDryBulb",
+        "supplyWetBulb",
+        "supplyRh"
+      ],
+      "procedure": "Test hole in the supply side downstream of the indoor coil and heating equipment, before the first supply branch, out of line of sight of the coil, not in flexible duct.",
+      "sources": [
+        "ANSI/RESNET/ACCA 310-2020 section 6.5.2.1 (supply test-hole placement)"
+      ]
+    },
+    {
+      "id": "GM-OA-01",
+      "title": "Outdoor ambient",
+      "applies_to": [
+        "outdoorDryBulb",
+        "outdoorWetBulb",
+        "outdoorRh"
+      ],
+      "procedure": "Where the outdoor air stream enters the condensing unit, with the sensor shaded from direct sun.",
+      "sources": [
+        "ANSI/RESNET/ACCA 310-2020 section 8.4.3.6.1"
+      ]
+    },
+    {
+      "id": "GM-RL-01",
+      "title": "Refrigerant-line surface temperature",
+      "applies_to": [
+        "liquidLineTemp",
+        "suctionLineTemp"
+      ],
+      "procedure": "Pipe-temperature probe in contact with the refrigerant line at the condensing unit within 6 inches of the respective service valve, insulated from ambient.",
+      "sources": [
+        "ANSI/RESNET/ACCA 310-2020 sections 8.4.3.6.2, 8.4.3.6.3"
+      ]
+    },
+    {
+      "id": "GM-SP-01",
+      "title": "Static pressure",
+      "applies_to": [
+        "returnStatic",
+        "supplyStatic"
+      ],
+      "procedure": "Static pressure probe in test holes on the return and supply sides immediately external to the indoor unit, following the measurement convention of the OEM fan-performance data used (filter, coil and accessory conditions as the OEM states); clean components.",
+      "sources": [
+        "ANSI/ACCA 5 QI-2015 section 4.1.2(a) and footnote 8",
+        "ANSI/RESNET/ACCA 310-2020 section 6.8"
+      ]
+    },
+    {
+      "id": "GM-AF-01",
+      "title": "Airflow",
+      "applies_to": [
+        "airflow"
+      ],
+      "procedure": "An ANSI/ACCA 5 QI-2015 section 4.1.2 method: duct traverse, flow grid, or pressure matching; the OEM CFM/ESP table method is evaluated as the OEM published operating point (P08 path b). Never temperature rise for cooling.",
+      "sources": [
+        "ANSI/ACCA 5 QI-2015 section 4.1.2"
+      ]
+    },
+    {
+      "id": "GM-EL-01",
+      "title": "Electrical",
+      "applies_to": [
+        "supplyVoltage",
+        "compressorCurrent",
+        "blowerCurrent"
+      ],
+      "procedure": "Voltmeter / clamp ammeter at the unit terminals or conductors under operation.",
+      "sources": [
+        "ANSI/ACCA 5 QI-2015 section 4.4"
+      ]
+    },
+    {
+      "id": "GM-DV-01",
+      "title": "Derived values",
+      "applies_to": [],
+      "procedure": "Computed only by the engine from recorded raw measurements (e.g. TESP, indicator differences); inputs and worst-case uncertainty recorded as lineage; never technician-derived.",
+      "sources": [
+        "TA-14 policy"
+      ]
     }
   ]
 }

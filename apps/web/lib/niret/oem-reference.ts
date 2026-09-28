@@ -93,9 +93,12 @@ export function manualOemReference(form: NiretFormState): OemReferenceSource {
             }
           : { status: "NOT_OBTAINED", obtainable: triState(oem.criterionObtainable) ?? true },
       };
+      // A8: a transcribed airflow range is a declared CFM_RANGE criterion; a transcribed ESP range is the
+      // declared blower-data ESP range. Both remain unverified transcription.
+      const airflow = range(oem.airflow, "CFM", source);
+      if (airflow) reference.airflowCriteria = [{ kind: "CFM_RANGE", range: airflow }];
       const optional: Array<[string, OemRange | undefined]> = [
-        ["airflowRange", range(oem.airflow, "CFM", source)],
-        ["espRange", range(oem.esp, "IN_WC", source)],
+        ["espTableDomain", range(oem.esp, "IN_WC", source)],
         ["ambientEnvelope", range(oem.ambient, "F", source)],
         ["voltageRange", range(oem.voltage, "V", source)],
       ];

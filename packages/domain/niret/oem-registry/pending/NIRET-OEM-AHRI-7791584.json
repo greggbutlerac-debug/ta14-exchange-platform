@@ -1,0 +1,79 @@
+{
+  "recordId": "NIRET-OEM-AHRI-7791584",
+  "recordVersion": 3,
+  "contract": "TA-14-NIRET-GA-C1/A8",
+  "sourceClass": "AHRI_CERTIFICATION_LISTING",
+  "manufacturer": "Trane",
+  "coverage": {
+    "modelFamily": null,
+    "models": [
+      "4TTR4036L1",
+      "TEM6A0C36H31+TDR"
+    ]
+  },
+  "matchedSystems": [
+    {
+      "indoorModel": "TEM6A0C36H31+TDR",
+      "outdoorModel": "4TTR4036L1",
+      "meteringDevice": null,
+      "cite": {
+        "pageRef": "AHRI Certificate No. 134350330301305940, p.1",
+        "tableOrChart": "Outdoor / Indoor Unit Model Number fields"
+      }
+    }
+  ],
+  "ahriReference": "7791584",
+  "document": {
+    "documentId": "AHRI-CERT-134350330301305940",
+    "title": "AHRI Certificate of Product Ratings — AHRI Certified Reference Number 7791584 (Certificate No. 134350330301305940, dated 09-27-2026)",
+    "revision": null,
+    "date": "2026-09-27",
+    "sha256": "ff81495b38d7b559c2d0b7254225a7122c17c05681649c738be74c7141f82b15",
+    "mediaType": "application/pdf"
+  },
+  "acquisition": {
+    "method": "AHRI_DIRECTORY_CERTIFICATE",
+    "sourceRef": "https://beta-ahrisearch.ahridirectory.org/Home/DownloadCertificate?ReferenceId=sUzbLVC3/aFB9wkj0dGAHxHLJs9ufjfbhnhK5cYQFj72E8K6YnLB/twbr3qJM0H7&ProductTypeId=3500 (reached from https://www.ahridirectory.org/; macOS download provenance kMDItemWhereFroms); file AHRICertificate.pdf, 137,376 bytes",
+    "acquiredBy": "greggbutlerac-debug (owner), via www.ahridirectory.org",
+    "acquiredAt": "2026-09-28T01:37:10Z"
+  },
+  "curation": {
+    "transcribedBy": "Claude Opus 5.5 (AI assistant) acting on instruction of greggbutlerac-debug",
+    "transcribedAt": "2026-09-28T01:45:00Z",
+    "curationRequestRef": null
+  },
+  "review": {
+    "state": "VERIFIED",
+    "reviewedBy": "Atlas / OpenAI",
+    "reviewedAt": "2026-09-28T02:36:50Z",
+    "method": "INDEPENDENT_SECOND_READ_AGAINST_HASHED_DOCUMENT",
+    "notes": "Independent review determination: PASS WITH EXPLICIT LIMITATIONS (reviewer Atlas / OpenAI; result conveyed by owner greggbutlerac-debug; reviewedAt is the time the result was recorded). Supported: AHRI Reference 7791584 artifact identity and certificate contents; historical listed combination 4TTR4036L1 + TEM6A0C36H31+TDR; Model Status Discontinued; Model Discontinued Date 12-30-2024; ratings/provenance as recorded. Historical pairing evidence is never represented as current certification. The certificate does not establish R-410A or 1065 CFM. Package limitations (NOT ESTABLISHED): (1) an authoritative mapping from complete installed-equipment nameplate identifiers to the AHRI designations 4TTR4036L1 and TEM6A0C36H31; (2) the physical Trane component/configuration that realizes the AHRI +TDR enhancement on the installed TEM6. An unmatched or unresolved field identity fails closed. The review result does not report an independent re-download/hash comparison of source documents or an AHRI 'Verify Certificate' check."
+  },
+  "status": {
+    "supersession": "CURRENT",
+    "supersededBy": null,
+    "supersedes": []
+  },
+  "criteria": {},
+  "ahriListing": {
+    "referenceNumber": "7791584",
+    "listedOutdoorModel": "4TTR4036L1",
+    "listedIndoorModel": "TEM6A0C36H31+TDR",
+    "enhancements": [
+      {
+        "notation": "+TDR",
+        "meaning": "Time Delay Relay enhancement, indicated by the plus (+) sign following the Indoor Unit designation; part of the rated indoor-unit configuration",
+        "authority": "AHRI USE OM (June 2026) §5.8 and Appendix F item 2e, SHA-256 6750f43ae19f11d2ed2046a6ea0f2986bdacea1f29f337a0bcc94e537b44c57d (the certificate itself does not define '+TDR')"
+      }
+    ],
+    "historicalListingEvidence": "AHRI Certificate of Product Ratings No. 134350330301305940, dated 2026-09-27, for AHRI Certified Reference Number 7791584 (artifact SHA-256 ff81495b38d7b559c2d0b7254225a7122c17c05681649c738be74c7141f82b15; held by owner, not reproduced). Corroborated by the AHRI directory record for 7791584 (SHA-256 9fba29fef14a0f4cbd179acf7fd33c721820cd87087621cc13b7436fd9ee80cc).",
+    "presentStatus": "DISCONTINUED",
+    "presentStatusObservedAt": "2026-09-28T01:37:10Z",
+    "certifiedAtObservation": false,
+    "listedFrom": null,
+    "discontinuedOn": "2024-12-30",
+    "ratingsBasis": null,
+    "ratings": {},
+    "limitations": "Reference record only: identifies the AHRI artifact and states the propositions TA-14 relies on (listed designations; present status Discontinued, dated 2024-12-30, per the certificate's status fields and its definition of Discontinued). Ratings and other certificate content are not reproduced; the certificate's terms restrict entry of its contents into a database, and the ratings are not NIRET criteria. Discontinued models are not AHRI certified (AHRI General OM May 2025 §11.4.3): historical listed identity only. The designations are not complete nameplate model numbers; no nameplate mapping is established. What realizes '+TDR' is not established. Establishes no charging, airflow, static-pressure, run-time, measurement-location or indication criterion, no field condition, and no execution or refrigerant-handling authority."
+  }
+}

@@ -10,6 +10,32 @@
 import Ajv2020 from "ajv/dist/2020";
 import schema from "../../../schemas/niret-evidence-record.schema.json";
 import { PRESSURE_EVIDENCE_KEYS } from "./propositions";
+import { resolveRange } from "./range";
+import type { OemRange } from "./types";
+
+type RangeAt = [string, Pick<OemRange, "min" | "max" | "unbounded" | "derivation">];
+
+/** Every OEM range in the input, with its path (A8). */
+function oemRanges(oem: Record<string, unknown>): RangeAt[] {
+  const found: RangeAt[] = [];
+  const add = (path: string, value: unknown) => { if (value && typeof value === "object") found.push([path, value as RangeAt[1]]); };
+  for (const key of ["ambientEnvelope", "voltageRange", "espTableDomain"]) add(`/oem/${key}`, oem[key]);
+  (oem.staticLimits as Array<{ range: unknown }> | undefined ?? []).forEach((limit, i) => add(`/oem/staticLimits/${i}/range`, limit.range));
+  const candidates = (path: string, list: Array<{ range: unknown; appliesWhen: unknown[] }> | undefined) => (list ?? []).forEach((candidate, i) => {
+    add(`${path}/${i}/range`, candidate.range);
+    candidate.appliesWhen.forEach((condition, j) => add(`${path}/${i}/appliesWhen/${j}`, condition));
+  });
+  (oem.airflowCriteria as Array<{ kind: string; range?: unknown; candidates?: Array<{ range: unknown; appliesWhen: unknown[] }> }> | undefined ?? [])
+    .forEach((criterion, i) => {
+      if (criterion.kind === "CFM_RANGE") add(`/oem/airflowCriteria/${i}/range`, criterion.range);
+      else candidates(`/oem/airflowCriteria/${i}/candidates`, criterion.candidates);
+    });
+  const criterion = oem.noninvasiveCriterion as { candidates?: Array<{ range: unknown; appliesWhen: unknown[] }> } | undefined;
+  candidates("/oem/noninvasiveCriterion/candidates", criterion?.candidates);
+  const method = oem.chargingMethod as { conditions?: unknown[] } | undefined;
+  (method?.conditions ?? []).forEach((condition, i) => add(`/oem/chargingMethod/conditions/${i}`, condition));
+  return found;
+}
 
 const ajv = new Ajv2020({ allErrors: true, strict: false });
 const validateSchema = ajv.compile(schema);
@@ -73,17 +99,16 @@ export function validateGateAInput(raw: unknown): ValidationOutcome {
       if (Number.isNaN(at)) invalidFields.push(`timestamp not parseable: ${stamp}`);
       else if (at > evaluatedAt) invalidFields.push(`timestamp after evaluatedAt: ${stamp}`);
     }
-    for (const key of ["airflowRange", "espRange", "ambientEnvelope", "voltageRange"]) {
-      const range = input.oem[key] as { min: number; max: number } | undefined;
-      if (range && range.min > range.max) invalidFields.push(`/oem/${key}: min exceeds max`);
+    // Amendment A8: every OEM range must resolve (stated, OEM-stated unbounded side, or OEM-stated derivation).
+    for (const [path, range] of oemRanges(input.oem)) {
+      if (!resolveRange(range)) invalidFields.push(`${path}: range bounds invalid (min exceeds max, unstated unbounded side, or invalid derivation)`);
     }
-    type Bounds = { min: number; max: number };
-    const criterion = input.oem.noninvasiveCriterion as { status: string; candidates?: Array<{ range: Bounds; appliesWhen: Bounds[] }> };
-    (criterion.candidates ?? []).forEach((candidate, index) => {
-      if (candidate.range.min > candidate.range.max) invalidFields.push(`/oem/noninvasiveCriterion/candidates/${index}/range: min exceeds max`);
-      candidate.appliesWhen.forEach((condition, at) => {
-        if (condition.min > condition.max) invalidFields.push(`/oem/noninvasiveCriterion/candidates/${index}/appliesWhen/${at}: min exceeds max`);
-      });
+    // Amendment A9: fan-performance points must be distinct published ESP values per setting.
+    const fan = input.oem.fanPerformance as { settings: Array<{ points: Array<{ esp: number }> }> } | undefined;
+    (fan?.settings ?? []).forEach((setting, i) => {
+      if (new Set(setting.points.map((point) => point.esp)).size !== setting.points.length) {
+        invalidFields.push(`/oem/fanPerformance/settings/${i}/points: duplicate ESP`);
+      }
     });
   }
 

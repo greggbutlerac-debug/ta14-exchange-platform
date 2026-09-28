@@ -1,240 +1,1346 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://ta14.exchange/schemas/niret-oem-reference-record.schema.json",
-  "title": "TA-14 NIRET Governed OEM Reference Record (TA-14-NIRET-GA-C1 Amendment A7)",
-  "description": "One bounded record per OEM document revision and exactly matched manufacturer/indoor/outdoor combinations. Every criterion value carries its own citation. Nothing is interpolated, calculated, or inferred; anything the record cannot represent is declared so the engine fails closed.",
+  "title": "TA-14 NIRET Governed OEM Source Record (TA-14-NIRET-GA-C1 Amendments A7/A8)",
+  "description": "One separately preserved authoritative source (one document revision). Each source keeps its own identity, hash, acquisition, transcription, independent review, applicability and supersession. Sources are never merged; a system binding (niret-oem-system-binding.schema.json) binds them to an exactly matched system. Every criterion value carries its own citation. No interpolation; OEM-stated arithmetic only with operands cited in this document.",
   "type": "object",
   "additionalProperties": false,
-  "required": ["recordId", "recordVersion", "contract", "equipment", "document", "acquisition", "curation", "review", "status", "criteria"],
+  "required": [
+    "recordId",
+    "recordVersion",
+    "contract",
+    "sourceClass",
+    "manufacturer",
+    "coverage",
+    "matchedSystems",
+    "ahriReference",
+    "document",
+    "acquisition",
+    "curation",
+    "review",
+    "status",
+    "criteria"
+  ],
   "properties": {
-    "recordId": { "type": "string", "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$" },
-    "recordVersion": { "type": "integer", "minimum": 1 },
-    "contract": { "const": "TA-14-NIRET-GA-C1/A7" },
-    "equipment": {
+    "recordId": {
+      "type": "string",
+      "pattern": "^NIRET-OEM-[A-Z0-9][A-Z0-9-]{2,80}$"
+    },
+    "recordVersion": {
+      "type": "integer",
+      "minimum": 1
+    },
+    "contract": {
+      "const": "TA-14-NIRET-GA-C1/A8"
+    },
+    "sourceClass": {
+      "enum": [
+        "OEM_OUTDOOR_UNIT_INSTRUCTIONS",
+        "OEM_INDOOR_UNIT_FAN_PERFORMANCE",
+        "OEM_PRODUCT_DATA",
+        "AHRI_CERTIFICATION_LISTING"
+      ]
+    },
+    "manufacturer": {
+      "type": "string",
+      "minLength": 1
+    },
+    "coverage": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["manufacturer", "modelFamily", "matchedSystems"],
+      "required": [
+        "modelFamily",
+        "models"
+      ],
       "properties": {
-        "manufacturer": { "type": "string", "minLength": 1 },
-        "modelFamily": { "type": ["string", "null"], "minLength": 1 },
-        "matchedSystems": {
+        "modelFamily": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "models": {
           "type": "array",
           "minItems": 1,
           "items": {
-            "type": "object",
-            "additionalProperties": false,
-            "required": ["indoorModel", "outdoorModel", "cite"],
-            "properties": {
-              "indoorModel": { "type": "string", "minLength": 1 },
-              "outdoorModel": { "type": "string", "minLength": 1 },
-              "cite": { "$ref": "#/$defs/cite" }
-            }
+            "type": "string",
+            "minLength": 1
           }
         }
-      }
+      },
+      "description": "Model numbers exactly as printed in the source that the source applies to."
+    },
+    "matchedSystems": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "indoorModel",
+          "outdoorModel",
+          "cite"
+        ],
+        "properties": {
+          "indoorModel": {
+            "type": "string",
+            "minLength": 1
+          },
+          "outdoorModel": {
+            "type": "string",
+            "minLength": 1
+          },
+          "meteringDevice": {
+            "enum": [
+              "FIXED_ORIFICE",
+              "CAPILLARY_TUBE",
+              "TXV",
+              "EEV",
+              null
+            ]
+          },
+          "cite": {
+            "$ref": "#/$defs/cite"
+          }
+        }
+      },
+      "description": "Indoor/outdoor pairings this source itself states (match tables, AHRI listings). Empty when the source states none."
+    },
+    "ahriReference": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "minLength": 1,
+      "description": "AHRI certified reference number; required for AHRI_CERTIFICATION_LISTING, otherwise null."
     },
     "document": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["documentId", "title", "revision", "date", "sha256", "mediaType"],
+      "required": [
+        "documentId",
+        "title",
+        "revision",
+        "date",
+        "sha256",
+        "mediaType"
+      ],
       "properties": {
-        "documentId": { "type": "string", "minLength": 1 },
-        "title": { "type": "string", "minLength": 1 },
-        "revision": { "type": ["string", "null"], "minLength": 1 },
-        "date": { "type": ["string", "null"], "minLength": 1 },
-        "sha256": { "$ref": "#/$defs/sha256" },
-        "mediaType": { "type": "string", "minLength": 1 }
+        "documentId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "revision": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "date": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "mediaType": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
     "acquisition": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["method", "sourceRef", "acquiredBy", "acquiredAt"],
+      "required": [
+        "method",
+        "sourceRef",
+        "acquiredBy",
+        "acquiredAt"
+      ],
       "properties": {
-        "method": { "enum": ["OEM_WEBSITE_DOWNLOAD", "OEM_DIRECT_SUPPLY", "DISTRIBUTOR_SUPPLY", "LITERATURE_SHIPPED_WITH_EQUIPMENT"] },
-        "sourceRef": { "type": "string", "minLength": 1 },
-        "acquiredBy": { "type": "string", "minLength": 1 },
-        "acquiredAt": { "$ref": "#/$defs/timestamp" }
+        "method": {
+          "enum": [
+            "OEM_WEBSITE_DOWNLOAD",
+            "OEM_DIRECT_SUPPLY",
+            "DISTRIBUTOR_SUPPLY",
+            "LITERATURE_SHIPPED_WITH_EQUIPMENT",
+            "AHRI_DIRECTORY_CERTIFICATE",
+            "AHRI_DIRECTORY_RECORD"
+          ]
+        },
+        "sourceRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acquiredBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "acquiredAt": {
+          "$ref": "#/$defs/timestamp"
+        }
       }
     },
     "curation": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["transcribedBy", "transcribedAt", "curationRequestRef"],
+      "required": [
+        "transcribedBy",
+        "transcribedAt",
+        "curationRequestRef"
+      ],
       "properties": {
-        "transcribedBy": { "type": "string", "minLength": 1 },
-        "transcribedAt": { "$ref": "#/$defs/timestamp" },
-        "curationRequestRef": { "type": ["string", "null"], "minLength": 1 }
+        "transcribedBy": {
+          "type": "string",
+          "minLength": 1
+        },
+        "transcribedAt": {
+          "$ref": "#/$defs/timestamp"
+        },
+        "curationRequestRef": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
       }
     },
     "review": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["state", "reviewedBy", "reviewedAt", "method", "notes"],
-      "properties": {
-        "state": { "enum": ["PENDING_REVIEW", "VERIFIED", "REJECTED"] },
-        "reviewedBy": { "type": ["string", "null"], "minLength": 1 },
-        "reviewedAt": { "anyOf": [{ "$ref": "#/$defs/timestamp" }, { "type": "null" }] },
-        "method": { "const": "INDEPENDENT_SECOND_READ_AGAINST_HASHED_DOCUMENT" },
-        "notes": { "type": ["string", "null"] }
-      }
+      "$ref": "#/$defs/review"
     },
     "status": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["supersession", "supersededBy", "supersedes"],
-      "properties": {
-        "supersession": { "enum": ["CURRENT", "SUPERSEDED", "WITHDRAWN"] },
-        "supersededBy": { "type": ["string", "null"] },
-        "supersedes": { "type": "array", "items": { "type": "string" } }
-      }
+      "$ref": "#/$defs/status"
     },
     "criteria": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["chargingMethod", "specialToolOrModeRequired", "measurementLocations", "noninvasiveCriterion"],
       "properties": {
         "chargingMethod": {
           "oneOf": [
             {
-              "type": "object", "additionalProperties": false, "required": ["status", "description", "cite"],
-              "properties": { "status": { "const": "IDENTIFIED" }, "description": { "type": "string", "minLength": 1 }, "cite": { "$ref": "#/$defs/cite" } }
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "description",
+                "cite",
+                "pressureBased"
+              ],
+              "properties": {
+                "status": {
+                  "const": "IDENTIFIED"
+                },
+                "description": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                },
+                "pressureBased": {
+                  "type": "boolean"
+                },
+                "meteringTypes": {
+                  "type": "array",
+                  "minItems": 1,
+                  "items": {
+                    "enum": [
+                      "FIXED_ORIFICE",
+                      "CAPILLARY_TUBE",
+                      "TXV",
+                      "EEV"
+                    ]
+                  }
+                },
+                "conditions": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/$defs/condition"
+                  }
+                },
+                "postEventVerification": {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "text",
+                    "cite"
+                  ],
+                  "properties": {
+                    "text": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "cite": {
+                      "$ref": "#/$defs/cite"
+                    }
+                  },
+                  "description": "OEM text requiring or supporting verification after a charge change or repair (I3)."
+                }
+              }
             },
-            { "type": "object", "additionalProperties": false, "required": ["status"], "properties": { "status": { "const": "NOT_IN_DOCUMENT" } } },
             {
-              "type": "object", "additionalProperties": false, "required": ["status", "cite"],
-              "properties": { "status": { "const": "OEM_CONFIRMED_NOT_PUBLISHED" }, "cite": { "$ref": "#/$defs/cite" } }
+              "$ref": "#/$defs/absent"
+            },
+            {
+              "$ref": "#/$defs/confirmedAbsent"
             }
           ]
         },
         "specialToolOrModeRequired": {
-          "type": "object", "additionalProperties": false, "required": ["value", "description", "cite"],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "description",
+            "cite"
+          ],
           "properties": {
-            "value": { "type": "boolean" },
-            "description": { "type": ["string", "null"] },
-            "cite": { "anyOf": [{ "$ref": "#/$defs/cite" }, { "type": "null" }] }
+            "value": {
+              "type": "boolean"
+            },
+            "description": {
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "cite": {
+              "anyOf": [
+                {
+                  "$ref": "#/$defs/cite"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
           }
         },
-        "airflowRange": { "$ref": "#/$defs/citedRange" },
-        "espRange": { "$ref": "#/$defs/citedRange" },
-        "ambientEnvelope": { "$ref": "#/$defs/citedRange" },
-        "voltageRange": { "$ref": "#/$defs/citedRange" },
+        "airflowCriteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "oneOf": [
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "range"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "CFM_RANGE"
+                  },
+                  "range": {
+                    "$ref": "#/$defs/citedRange"
+                  },
+                  "meteringTypes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "enum": [
+                        "FIXED_ORIFICE",
+                        "CAPILLARY_TUBE",
+                        "TXV",
+                        "EEV"
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "kind",
+                  "coverage",
+                  "candidates"
+                ],
+                "properties": {
+                  "kind": {
+                    "const": "TEMPERATURE_DROP"
+                  },
+                  "coverage": {
+                    "enum": [
+                      "COMPLETE",
+                      "PARTIAL"
+                    ]
+                  },
+                  "candidates": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "$ref": "#/$defs/candidate"
+                    }
+                  },
+                  "meteringTypes": {
+                    "type": "array",
+                    "minItems": 1,
+                    "items": {
+                      "enum": [
+                        "FIXED_ORIFICE",
+                        "CAPILLARY_TUBE",
+                        "TXV",
+                        "EEV"
+                      ]
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        },
+        "espTableDomain": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "blowerSetting",
+            "range"
+          ],
+          "properties": {
+            "blowerSetting": {
+              "type": "string",
+              "minLength": 1
+            },
+            "range": {
+              "$ref": "#/$defs/citedRange"
+            }
+          }
+        },
+        "staticLimits": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "component",
+              "basis",
+              "range"
+            ],
+            "properties": {
+              "component": {
+                "enum": [
+                  "TOTAL",
+                  "RETURN",
+                  "SUPPLY"
+                ]
+              },
+              "basis": {
+                "enum": [
+                  "SIGNED",
+                  "MAGNITUDE"
+                ]
+              },
+              "range": {
+                "$ref": "#/$defs/citedRange"
+              }
+            }
+          }
+        },
+        "ambientEnvelope": {
+          "$ref": "#/$defs/citedRange"
+        },
+        "voltageRange": {
+          "$ref": "#/$defs/citedRange"
+        },
         "minRunMinutes": {
-          "type": "object", "additionalProperties": false, "required": ["value", "cite"],
-          "properties": { "value": { "type": "number", "exclusiveMinimum": 0 }, "cite": { "$ref": "#/$defs/cite" } }
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "cite"
+          ],
+          "properties": {
+            "value": {
+              "type": "number",
+              "exclusiveMinimum": 0
+            },
+            "cite": {
+              "$ref": "#/$defs/cite"
+            }
+          }
         },
         "stabilityCriterion": {
-          "type": "object", "additionalProperties": false, "required": ["measurement", "maxChange", "unit", "cite"],
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "measurement",
+            "maxChange",
+            "unit",
+            "cite"
+          ],
           "properties": {
-            "measurement": { "$ref": "#/$defs/measurementKey" },
-            "maxChange": { "type": "number", "minimum": 0 },
-            "unit": { "$ref": "#/$defs/unit" },
-            "cite": { "$ref": "#/$defs/cite" }
+            "measurement": {
+              "$ref": "#/$defs/measurementKey"
+            },
+            "maxChange": {
+              "type": "number",
+              "minimum": 0
+            },
+            "unit": {
+              "$ref": "#/$defs/unit"
+            },
+            "cite": {
+              "$ref": "#/$defs/cite"
+            }
           }
         },
         "permitsEcmWithTableMethod": {
-          "type": "object", "additionalProperties": false, "required": ["value", "cite"],
-          "properties": { "value": { "type": "boolean" }, "cite": { "$ref": "#/$defs/cite" } }
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "value",
+            "cite"
+          ],
+          "properties": {
+            "value": {
+              "type": "boolean"
+            },
+            "cite": {
+              "$ref": "#/$defs/cite"
+            }
+          }
         },
         "measurementLocations": {
           "type": "object",
-          "propertyNames": { "$ref": "#/$defs/measurementKey" },
+          "propertyNames": {
+            "$ref": "#/$defs/measurementKey"
+          },
           "additionalProperties": {
-            "type": "object", "additionalProperties": false, "required": ["location", "oemText", "cite"],
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "location",
+              "oemText",
+              "cite"
+            ],
             "properties": {
-              "location": { "type": "string", "minLength": 1 },
-              "oemText": { "type": "string", "minLength": 1 },
-              "cite": { "$ref": "#/$defs/cite" }
+              "location": {
+                "type": "string",
+                "minLength": 1
+              },
+              "oemText": {
+                "type": "string",
+                "minLength": 1
+              },
+              "cite": {
+                "$ref": "#/$defs/cite"
+              }
             }
           }
         },
         "noninvasiveCriterion": {
           "oneOf": [
             {
-              "type": "object", "additionalProperties": false,
-              "required": ["status", "derivation", "coverage", "lookup", "candidates"],
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "status",
+                "derivation",
+                "coverage",
+                "lookup",
+                "candidates"
+              ],
               "properties": {
-                "status": { "const": "PUBLISHED" },
+                "status": {
+                  "const": "PUBLISHED"
+                },
                 "derivation": {
                   "oneOf": [
-                    { "type": "object", "additionalProperties": false, "required": ["kind"], "properties": { "kind": { "enum": ["RETURN_MINUS_SUPPLY_DRY_BULB", "RETURN_MINUS_SUPPLY_WET_BULB"] } } },
-                    { "type": "object", "additionalProperties": false, "required": ["kind", "measurement"], "properties": { "kind": { "const": "SINGLE_MEASUREMENT" }, "measurement": { "$ref": "#/$defs/measurementKey" } } }
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "enum": [
+                            "RETURN_MINUS_SUPPLY_DRY_BULB",
+                            "RETURN_MINUS_SUPPLY_WET_BULB",
+                            "LIQUID_LINE_MINUS_OUTDOOR_DRY_BULB"
+                          ]
+                        }
+                      }
+                    },
+                    {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "kind",
+                        "measurement"
+                      ],
+                      "properties": {
+                        "kind": {
+                          "const": "SINGLE_MEASUREMENT"
+                        },
+                        "measurement": {
+                          "$ref": "#/$defs/measurementKey"
+                        }
+                      }
+                    }
                   ]
                 },
-                "coverage": { "enum": ["COMPLETE", "PARTIAL"] },
+                "definitionCite": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/$defs/cite"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "description": "Where the OEM defines the derivation (required for LIQUID_LINE_MINUS_OUTDOOR_DRY_BULB)."
+                },
+                "coverage": {
+                  "enum": [
+                    "COMPLETE",
+                    "PARTIAL"
+                  ]
+                },
                 "lookup": {
-                  "type": "object", "additionalProperties": false,
-                  "required": ["interpolationRequired", "calculationRequired", "unrepresentedConditions"],
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "interpolationRequired",
+                    "calculationRequired",
+                    "unrepresentedConditions"
+                  ],
                   "properties": {
-                    "interpolationRequired": { "type": "boolean" },
-                    "calculationRequired": { "type": "boolean" },
-                    "unrepresentedConditions": { "type": "array", "items": { "type": "string", "minLength": 1 } }
+                    "interpolationRequired": {
+                      "type": "boolean"
+                    },
+                    "calculationRequired": {
+                      "type": "boolean"
+                    },
+                    "unrepresentedConditions": {
+                      "type": "array",
+                      "items": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    }
                   }
                 },
                 "candidates": {
-                  "type": "array", "minItems": 1,
+                  "type": "array",
+                  "minItems": 1,
                   "items": {
-                    "type": "object", "additionalProperties": false, "required": ["candidateId", "range", "cite", "appliesWhen"],
-                    "properties": {
-                      "candidateId": { "type": "string", "minLength": 1 },
-                      "range": {
-                        "type": "object", "additionalProperties": false, "required": ["min", "max", "unit"],
-                        "properties": { "min": { "type": "number" }, "max": { "type": "number" }, "unit": { "$ref": "#/$defs/unit" } }
-                      },
-                      "cite": { "$ref": "#/$defs/cite" },
-                      "appliesWhen": {
-                        "type": "array",
-                        "items": {
-                          "type": "object", "additionalProperties": false, "required": ["measurement", "min", "max", "unit", "cite"],
-                          "properties": {
-                            "measurement": { "$ref": "#/$defs/measurementKey" },
-                            "min": { "type": "number" },
-                            "max": { "type": "number" },
-                            "unit": { "$ref": "#/$defs/unit" },
-                            "cite": { "$ref": "#/$defs/cite" }
-                          }
+                    "$ref": "#/$defs/candidate"
+                  }
+                }
+              }
+            },
+            {
+              "$ref": "#/$defs/absent"
+            },
+            {
+              "$ref": "#/$defs/confirmedAbsent"
+            }
+          ]
+        },
+        "fanPerformance": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "convention",
+            "designatedSetting",
+            "settings"
+          ],
+          "description": "A9: OEM fan-performance data (airflow by setting against external static pressure) for the indoor unit; values exactly as published.",
+          "properties": {
+            "convention": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "text",
+                "cite"
+              ],
+              "properties": {
+                "text": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                }
+              }
+            },
+            "designatedSetting": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "setting",
+                    "cite"
+                  ],
+                  "properties": {
+                    "setting": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "cite": {
+                      "$ref": "#/$defs/cite"
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "settings": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "setting",
+                  "coolingPermitted",
+                  "cite",
+                  "points"
+                ],
+                "properties": {
+                  "setting": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "coolingPermitted": {
+                    "type": "boolean"
+                  },
+                  "cite": {
+                    "$ref": "#/$defs/cite"
+                  },
+                  "points": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                      "type": "object",
+                      "additionalProperties": false,
+                      "required": [
+                        "esp",
+                        "cfm"
+                      ],
+                      "properties": {
+                        "esp": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "cfm": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
                         }
                       }
                     }
                   }
                 }
               }
-            },
-            { "type": "object", "additionalProperties": false, "required": ["status"], "properties": { "status": { "const": "NOT_IN_DOCUMENT" } } },
-            {
-              "type": "object", "additionalProperties": false, "required": ["status", "cite"],
-              "properties": { "status": { "const": "OEM_CONFIRMED_NOT_PUBLISHED" }, "cite": { "$ref": "#/$defs/cite" } }
             }
-          ]
+          }
         }
       }
+    },
+    "ahriListing": {
+      "description": "A10: structured AHRI listing evidence; required for AHRI_CERTIFICATION_LISTING, absent otherwise. Present status is preserved; only ACTIVE and PRODUCTION_STOPPED are currently AHRI certified.",
+      "anyOf": [
+        {
+          "type": "null"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "referenceNumber",
+            "listedOutdoorModel",
+            "listedIndoorModel",
+            "enhancements",
+            "historicalListingEvidence",
+            "presentStatus",
+            "presentStatusObservedAt",
+            "certifiedAtObservation",
+            "listedFrom",
+            "discontinuedOn",
+            "ratingsBasis",
+            "ratings",
+            "limitations"
+          ],
+          "properties": {
+            "referenceNumber": {
+              "type": "string",
+              "minLength": 1
+            },
+            "listedOutdoorModel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "listedIndoorModel": {
+              "type": "string",
+              "minLength": 1
+            },
+            "enhancements": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "required": [
+                  "notation",
+                  "meaning",
+                  "authority"
+                ],
+                "properties": {
+                  "notation": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "meaning": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "authority": {
+                    "type": "string",
+                    "minLength": 1
+                  }
+                }
+              }
+            },
+            "historicalListingEvidence": {
+              "type": "string",
+              "minLength": 1
+            },
+            "presentStatus": {
+              "enum": [
+                "ACTIVE",
+                "PRODUCTION_STOPPED",
+                "DISCONTINUED",
+                "OBSOLETE"
+              ]
+            },
+            "presentStatusObservedAt": {
+              "$ref": "#/$defs/timestamp"
+            },
+            "certifiedAtObservation": {
+              "type": "boolean"
+            },
+            "listedFrom": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            },
+            "discontinuedOn": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            },
+            "ratingsBasis": {
+              "type": [
+                "string",
+                "null"
+              ],
+              "minLength": 1
+            },
+            "ratings": {
+              "type": "object",
+              "additionalProperties": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              }
+            },
+            "limitations": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      ]
     }
   },
   "$defs": {
-    "timestamp": { "type": "string", "format": "date-time", "pattern": "^\\d{4}-\\d{2}-\\d{2}T" },
-    "sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
-    "unit": { "enum": ["F", "PCT_RH", "CFM", "IN_WC", "V", "A"] },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^\\d{4}-\\d{2}-\\d{2}T"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "unit": {
+      "enum": [
+        "F",
+        "PCT_RH",
+        "CFM",
+        "IN_WC",
+        "V",
+        "A"
+      ]
+    },
     "measurementKey": {
       "enum": [
-        "returnDryBulb", "returnWetBulb", "returnRh", "supplyDryBulb", "supplyWetBulb", "supplyRh",
-        "outdoorDryBulb", "outdoorWetBulb", "outdoorRh", "airflow", "returnStatic", "supplyStatic",
-        "suctionLineTemp", "liquidLineTemp", "supplyVoltage", "compressorCurrent", "blowerCurrent"
+        "returnDryBulb",
+        "returnWetBulb",
+        "returnRh",
+        "supplyDryBulb",
+        "supplyWetBulb",
+        "supplyRh",
+        "outdoorDryBulb",
+        "outdoorWetBulb",
+        "outdoorRh",
+        "airflow",
+        "returnStatic",
+        "supplyStatic",
+        "suctionLineTemp",
+        "liquidLineTemp",
+        "supplyVoltage",
+        "compressorCurrent",
+        "blowerCurrent"
       ]
     },
     "cite": {
-      "type": "object", "additionalProperties": false, "required": ["pageRef", "tableOrChart"],
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pageRef",
+        "tableOrChart"
+      ],
       "properties": {
-        "pageRef": { "type": "string", "minLength": 1 },
-        "tableOrChart": { "type": ["string", "null"], "minLength": 1 }
+        "pageRef": {
+          "type": "string",
+          "minLength": 1
+        },
+        "tableOrChart": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        }
       }
     },
-    "citedRange": {
-      "type": "object", "additionalProperties": false, "required": ["min", "max", "unit", "cite"],
+    "unbounded": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "side",
+        "cite"
+      ],
       "properties": {
-        "min": { "type": "number" },
-        "max": { "type": "number" },
-        "unit": { "$ref": "#/$defs/unit" },
-        "cite": { "$ref": "#/$defs/cite" }
+        "side": {
+          "enum": [
+            "MIN",
+            "MAX"
+          ]
+        },
+        "cite": {
+          "$ref": "#/$defs/cite"
+        }
+      },
+      "description": "Only where the OEM states 'and above' (MAX unbounded) or 'and below' (MIN unbounded)."
+    },
+    "derivation": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "form",
+            "nominal",
+            "tolerance"
+          ],
+          "properties": {
+            "form": {
+              "const": "TOLERANCE_BAND"
+            },
+            "nominal": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "cite"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                }
+              }
+            },
+            "tolerance": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "cite"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "form",
+            "rated",
+            "percent"
+          ],
+          "properties": {
+            "form": {
+              "const": "PERCENT_OF_RATED"
+            },
+            "rated": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "cite"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                }
+              }
+            },
+            "percent": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "cite"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                }
+              }
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "form",
+            "nominalTons",
+            "minPerTon",
+            "maxPerTon"
+          ],
+          "properties": {
+            "form": {
+              "const": "PER_TON"
+            },
+            "nominalTons": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "value",
+                "cite"
+              ],
+              "properties": {
+                "value": {
+                  "type": "number"
+                },
+                "cite": {
+                  "$ref": "#/$defs/cite"
+                }
+              }
+            },
+            "minPerTon": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "cite"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "number"
+                    },
+                    "cite": {
+                      "$ref": "#/$defs/cite"
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "maxPerTon": {
+              "anyOf": [
+                {
+                  "type": "object",
+                  "additionalProperties": false,
+                  "required": [
+                    "value",
+                    "cite"
+                  ],
+                  "properties": {
+                    "value": {
+                      "type": "number"
+                    },
+                    "cite": {
+                      "$ref": "#/$defs/cite"
+                    }
+                  }
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "description": "OEM-stated arithmetic; every operand cited in this same source document."
+    },
+    "citedRange": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "min",
+        "max",
+        "unit",
+        "cite"
+      ],
+      "properties": {
+        "min": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        },
+        "cite": {
+          "$ref": "#/$defs/cite"
+        },
+        "unbounded": {
+          "$ref": "#/$defs/unbounded"
+        },
+        "derivation": {
+          "$ref": "#/$defs/derivation"
+        }
+      }
+    },
+    "condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "measurement",
+        "min",
+        "max",
+        "unit",
+        "cite"
+      ],
+      "properties": {
+        "measurement": {
+          "$ref": "#/$defs/measurementKey"
+        },
+        "min": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "max": {
+          "type": [
+            "number",
+            "null"
+          ]
+        },
+        "unit": {
+          "$ref": "#/$defs/unit"
+        },
+        "cite": {
+          "$ref": "#/$defs/cite"
+        },
+        "unbounded": {
+          "$ref": "#/$defs/unbounded"
+        }
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidateId",
+        "range",
+        "appliesWhen"
+      ],
+      "properties": {
+        "candidateId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "range": {
+          "$ref": "#/$defs/citedRange"
+        },
+        "meteringTypes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "enum": [
+              "FIXED_ORIFICE",
+              "CAPILLARY_TUBE",
+              "TXV",
+              "EEV"
+            ]
+          }
+        },
+        "appliesWhen": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/condition"
+          }
+        }
+      }
+    },
+    "absent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status"
+      ],
+      "properties": {
+        "status": {
+          "const": "NOT_IN_DOCUMENT"
+        }
+      }
+    },
+    "confirmedAbsent": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "status",
+        "cite"
+      ],
+      "properties": {
+        "status": {
+          "const": "OEM_CONFIRMED_NOT_PUBLISHED"
+        },
+        "cite": {
+          "$ref": "#/$defs/cite"
+        }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "reviewedBy",
+        "reviewedAt",
+        "method",
+        "notes"
+      ],
+      "properties": {
+        "state": {
+          "enum": [
+            "PENDING_REVIEW",
+            "VERIFIED",
+            "REJECTED"
+          ]
+        },
+        "reviewedBy": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1
+        },
+        "reviewedAt": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/timestamp"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "method": {
+          "const": "INDEPENDENT_SECOND_READ_AGAINST_HASHED_DOCUMENT"
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "supersession",
+        "supersededBy",
+        "supersedes"
+      ],
+      "properties": {
+        "supersession": {
+          "enum": [
+            "CURRENT",
+            "SUPERSEDED",
+            "WITHDRAWN"
+          ]
+        },
+        "supersededBy": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "supersedes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       }
     }
   }

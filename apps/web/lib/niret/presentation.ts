@@ -40,6 +40,10 @@ export const TECHNICAL_TEXT: Readonly<Record<Determination, { headline: string; 
   ESCALATE: { headline: "TECHNICAL NIRET: ESCALATE", meaning: "The technical question is outside this Gate-A version or needs authority it cannot supply here (for example, governed OEM criteria)." },
 };
 
+/** A8 (I3): plain meaning of a technical ALLOW reached through the OEM post-event verification path. */
+export const I3_MEANING =
+  "OEM-prescribed pressure-based verification is admissible after the recorded charge change or refrigerant-circuit repair. This is not a finding that the charge is wrong.";
+
 /** A6: whether the actor may actually perform the pressure-instrument entry. */
 export const EXECUTION_TEXT: Readonly<Record<Determination, { headline: string; meaning: string }>> = {
   ALLOW: { headline: "EXECUTION AUTHORITY: ESTABLISHED", meaning: "The actor is authorized to perform the pressure-instrument entry." },
@@ -127,6 +131,7 @@ export interface ReceiptLike {
   submitted_by: { accountId: string; method: string } | null;
   authority_status: (Record<string, AuthorityElementLike | unknown> & { submitter_authenticated: boolean }) | null;
   oem_reference_provenance: OemProvenanceLike | null;
+  indication_path?: "I1" | "I3" | null;
 }
 
 export interface PresentedReceipt {
@@ -174,7 +179,12 @@ export function presentReceipt(receipt: ReceiptLike, findings: readonly FindingL
     meaning: authorized
       ? "Technical NIRET and execution authority are both established. Acquire pressure evidence only."
       : DETERMINATION_TEXT[receipt.determination].meaning,
-    technical: { determination: technical, ...TECHNICAL_TEXT[technical] },
+    technical: {
+      determination: technical,
+      ...TECHNICAL_TEXT[technical],
+      // A8 I3: the OEM post-event verification path is admissibility of an OEM check, not an indication of fault.
+      ...(technical === "ALLOW" && receipt.indication_path === "I3" ? { meaning: I3_MEANING } : {}),
+    },
     execution: { determination: execution, ...EXECUTION_TEXT[execution] },
     prematureEntry: receipt.reason_codes.includes(PREMATURE_ENTRY_REASON),
     reasons: receipt.reason_codes.map((code) => ({ code, label: humanize(code) })),

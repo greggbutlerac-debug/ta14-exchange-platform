@@ -10,7 +10,7 @@ export const GATE_A_VERSION = "TA-14-NIRET-GA-C1" as const;
 
 /** SHA-256 of the canonical frozen specification (gate-a-c1.spec.json). */
 export const FROZEN_SPEC_SHA256 =
-  "4f0a6c874157833f4e4aa5254605bd687f6fccd43a435132e9fd4aac4855f04a" as const;
+  "f934afe35313adac9f8794e0d345119a9bb64d621cc028aec286f9c3f5e09fa6" as const;
 
 export const GATE_A_SCOPE = "PRESSURE_EVIDENCE_ONLY" as const;
 
@@ -78,7 +78,13 @@ export const PROHIBITED_BASES = [
   "TIME_OR_DISPATCH_PRESSURE", "REFRIGERATION_CYCLE_KNOWLEDGE", "SERVICE_HISTORY", "RH_ALONE",
 ] as const;
 
-export const PERMITTED_BASES = ["NONINVASIVE_EVIDENCE"] as const;
+export const PERMITTED_BASES = ["NONINVASIVE_EVIDENCE", "POST_CHARGE_CHANGE_OR_REPAIR_VERIFICATION"] as const;
+
+/**
+ * Amendment A8 (C1-R5) I3, owner ruling Option C: bases that may accompany the event-anchored
+ * OEM post-event verification path. Neither establishes I3 without the recorded event anchor.
+ */
+export const I3_PERMITTED_BASES = ["POST_CHARGE_CHANGE_OR_REPAIR_VERIFICATION", "NONINVASIVE_EVIDENCE"] as const;
 
 export const TA14_POLICY_REFS = [
   "TA14-POLICY-T1: Gate A evidentiary boundary (stricter than federal certification-only requirement)",
@@ -96,4 +102,7 @@ export const TA14_POLICY_REFS = [
   "TA14-AMENDMENT-A5: Declarations may restrict, never grant; authority/standing and ALLOW-contributing OEM criteria require independent establishment with provenance",
   "TA14-AMENDMENT-A6: Technical NIRET determination is separate from execution authority; technical ALLOW is never authority to execute",
   "TA14-AMENDMENT-A7: OEM criteria come only from a VERIFIED, CURRENT, independently reviewed governed OEM reference record for the exact system; bounded criteria, no interpolation, fail closed",
+  "TA14-AMENDMENT-A8 (C1-R5): multi-source system binding; typed OEM airflow/static criteria; OEM-defined approach and tolerance bands; event-anchored I3 OEM post-event verification path; interpolation remains prohibited",
+  "TA14-AMENDMENT-A9 (C1-R6): P08 OEM published operating point path; three-class measurement-location authority; TA-14 governed measurement methods (policy T7) establish measurement validity only, never criteria",
+  "TA14-AMENDMENT-A10 (C1-R7): historical AHRI listings may establish historical matched-system identity; present AHRI status preserved; never represented as currently certified",
 ] as const;

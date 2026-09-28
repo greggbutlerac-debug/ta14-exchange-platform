@@ -21,7 +21,7 @@ import {
   TA14_POLICY_REFS,
   type PropositionId,
 } from "./propositions";
-import type { GateAEvaluation, GateAInput, PropositionCheck } from "./types";
+import type { CriterionCandidate, GateAEvaluation, GateAInput, PropositionCheck } from "./types";
 
 const NEXT_ACTION_BY_DENY_REASON: Readonly<Record<string, string>> = {
   PRESSURE_INSTRUMENT_ENTRY_NOT_AUTHORIZED: "RETURN_TO_NONINVASIVE_EVIDENCE_AND_RESUBMIT",
@@ -119,19 +119,46 @@ function oemProvenanceStatus(oem: GateAInput["oem"], p14: PropositionCheck[]) {
     source_ref: provenance?.sourceRef ?? null,
     verified_by: provenance?.verifiedBy ?? null,
     verified_at: provenance?.verifiedAt ?? null,
-    // Amendment A7: exactly which governed record, document and custody supported the determination.
+    // Amendments A7/A8: exactly which governed system binding and which separately preserved
+    // source records (each with its own document hash and custody) supported the determination.
     record_id: provenance?.recordId ?? null,
     record_hash: provenance?.recordHash ?? null,
-    document_hash: provenance?.documentHash ?? null,
-    document_date: provenance?.documentDate ?? null,
     matched_systems: provenance?.matchedSystems ?? [],
     transcribed_by: provenance?.transcribedBy ?? null,
     transcribed_at: provenance?.transcribedAt ?? null,
     supersession: provenance?.supersession ?? null,
+    sources: provenance?.sources ?? [],
+    pairing_sources: provenance?.pairingSources ?? [],
+    criterion_sources: provenance?.criterionSources ?? {},
+    conflicts: provenance?.conflicts ?? [],
     established: provenance?.verification === "VERIFIED" && reasons.length === 0,
     reason_codes: reasons,
   };
 }
+
+/** Every OEM citation relied upon or available to the evaluation (A7/A8). */
+function oemReferenceRefs(oem: GateAInput["oem"]): string[] {
+  const ranges = (list: Array<{ ref: string } | undefined>) => list.flatMap((range) => (range ? [range.ref] : []));
+  const candidates = (list: CriterionCandidate[]) => list.flatMap((candidate) => [candidate.range.ref, ...candidate.appliesWhen.map((condition) => condition.ref)]);
+  const method = oem.chargingMethod;
+  return [
+    ...oem.documentRefs,
+    ...(method.status === "IDENTIFIED"
+      ? [method.ref, ...ranges(method.conditions ?? []), ...(method.postEventVerification ? [method.postEventVerification.ref] : [])]
+      : []),
+    ...(oem.airflowCriteria ?? []).flatMap((criterion) => (criterion.kind === "CFM_RANGE" ? [criterion.range.ref] : candidates(criterion.candidates))),
+    ...ranges([oem.espTableDomain, oem.ambientEnvelope, oem.voltageRange]),
+    ...(oem.staticLimits ?? []).map((limit) => limit.range.ref),
+    ...(oem.minRunMinutes ? [oem.minRunMinutes.ref] : []),
+    ...(oem.stabilityCriterion ? [oem.stabilityCriterion.ref] : []),
+    ...(oem.noninvasiveCriterion.status === "PUBLISHED" ? candidates(oem.noninvasiveCriterion.candidates) : []),
+  ];
+}
+
+const INDICATION_MEANING: Readonly<Record<string, string>> = {
+  I1: "OEM_NONINVASIVE_CRITERION_INDICATES_PRESSURE_EVIDENCE",
+  I3: "OEM_PRESCRIBED_PRESSURE_BASED_VERIFICATION_ADMISSIBLE_AFTER_RECORDED_EVENT — not an indication of charge fault",
+};
 
 export type GateAReceipt = Record<string, unknown> & {
   receipt_id: string;
@@ -190,16 +217,7 @@ export function buildReceipt(raw: unknown, evaluation: GateAEvaluation): GateARe
   if (evidence) evidenceHashes.evidence_record = sha256Canonical(evidence);
   if (oem) evidenceHashes.oem_reference = sha256Canonical(oem);
 
-  const oemRefs = oem ? [...new Set([
-    ...oem.documentRefs,
-    ...(oem.chargingMethod.status === "IDENTIFIED" ? [oem.chargingMethod.ref] : []),
-    ...[oem.airflowRange, oem.espRange, oem.ambientEnvelope, oem.voltageRange].flatMap((range) => (range ? [range.ref] : [])),
-    ...(oem.minRunMinutes ? [oem.minRunMinutes.ref] : []),
-    ...(oem.stabilityCriterion ? [oem.stabilityCriterion.ref] : []),
-    ...(oem.noninvasiveCriterion.status === "PUBLISHED"
-      ? oem.noninvasiveCriterion.candidates.flatMap((candidate) => [candidate.range.ref, ...candidate.appliesWhen.map((condition) => condition.ref)])
-      : []),
-  ])].sort() : [];
+  const oemRefs = oem ? [...new Set(oemReferenceRefs(oem))].sort() : [];
 
   const certification = evidence?.technician.certification;
   const p06 = byProposition.get("P06") ?? [];
@@ -223,6 +241,7 @@ export function buildReceipt(raw: unknown, evaluation: GateAEvaluation): GateARe
     },
     reason_codes: [...new Set(evaluation.checks.filter((check) => check.result !== "SATISFIED").map((check) => check.reason))].sort(),
     indication_path: evaluation.indicationPath,
+    indication_meaning: evaluation.indicationPath ? INDICATION_MEANING[evaluation.indicationPath] : null,
     scope: GATE_A_SCOPE,
     gate_b_authorized: false as const,
     statement: GATE_A_STATEMENT,
@@ -272,7 +291,10 @@ export function buildReceipt(raw: unknown, evaluation: GateAEvaluation): GateARe
     oem_document_refs: oemRefs,
     measurement_set: measurements,
     raw_static_pressures: { returnStatic: measurements.returnStatic ?? null, supplyStatic: measurements.supplyStatic ?? null },
-    derived_tesp: evaluation.derivedTesp,
+    // A9: derived-value lineage — TESP is computed only by the engine from the raw static readings.
+    derived_tesp: evaluation.derivedTesp ? { ...evaluation.derivedTesp, lineage: { method: "GM-DV-01", inputs: ["supplyStatic", "returnStatic"], formula: "supplyStatic - returnStatic" } } : null,
+    measurement_authority: evaluation.measurementAuthority,
+    airflow_evidence: evaluation.airflowEvidence,
     steady_state_window: evaluation.window,
     run_start: evidence?.operation.runStartedAt ?? null,
     run_interrupted: evaluation.runRestarted,

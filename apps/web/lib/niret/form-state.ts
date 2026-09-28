@@ -33,6 +33,8 @@ export interface MeasurementEntry {
   instrumentId: string;
   location: string;
   measuredAt: string;
+  /** A9: technician affirms the TA-14 governed measurement method was followed (used only where the OEM prescribes no location). */
+  governedMethod?: boolean;
 }
 
 /** Air-side static is entered as magnitude plus direction; the adapter signs it. */
@@ -59,6 +61,8 @@ export interface EventEntry {
   type: StateEventType;
   at: string;
   affectsIdentity: boolean;
+  /** A8 (I3 event anchor): the repair affected the refrigerant circuit. */
+  affectsRefrigerantCircuit?: boolean;
 }
 
 /**
@@ -170,6 +174,8 @@ export interface NiretFormState {
     method: "" | "OEM_SPECIFIED_METHOD" | "OEM_CFM_ESP_TABLE" | "DUCT_TRAVERSE" | "FLOW_GRID" | "PRESSURE_MATCHING" | "TEMPERATURE_RISE";
     motorType: "" | "PSC" | "ECM" | "OTHER" | "UNKNOWN";
     componentsClean: TriState;
+    /** A9: installed indoor blower setting exactly as the OEM labels it. */
+    blowerSetting?: string;
   };
   measurements: Partial<Record<MeasurementKey, MeasurementEntry>>;
   staticDirection: { returnStatic: StaticDirection; supplyStatic: StaticDirection };

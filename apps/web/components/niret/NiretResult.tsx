@@ -16,8 +16,9 @@ export interface EvaluationResponse {
       source: string;
       status: string;
       recordId: string | null;
-      document: string | null;
+      documents: string[];
       measurementLocations: Record<string, { location: string; oemText: string }>;
+      conflicts: string[];
     } | null;
     note: string;
   };
@@ -94,7 +95,8 @@ export function DeterminationPanel({ response, nominalCapacityBtuh }: { response
 }
 
 const OEM_STATUS_TEXT: Readonly<Record<string, string>> = {
-  RESOLVED: "A governed OEM record was used. Your manual OEM entries were not used.",
+  RESOLVED: "A governed OEM system binding was used. Your manual OEM entries were not used.",
+  CONFLICT: "The OEM sources bound to this system disagree. Nothing from them was relied on.",
   NOT_VERIFIED: "A governed OEM record for this system is awaiting independent review. It cannot be relied on yet.",
   NO_RECORD: "No governed OEM record covers this exact manufacturer and indoor/outdoor combination. Your OEM entries were evaluated as a transcription only; copy a curation request to have a record created.",
   REGISTRY_UNAVAILABLE: "The governed OEM registry failed its integrity check and is unavailable. Nothing from it was relied on.",
@@ -107,8 +109,12 @@ function OemRecordContext({ oemReference }: { oemReference: NonNullable<Evaluati
     <>
       <p className={oemReference.status === "RESOLVED" ? "nrCertOk" : "nrCertOpen"}>
         {OEM_STATUS_TEXT[oemReference.status] ?? oemReference.status}
-        {oemReference.recordId && <> Record <code>{oemReference.recordId}</code>{oemReference.document ? ` — ${oemReference.document}` : ""}.</>}
+        {oemReference.recordId && <> Binding <code>{oemReference.recordId}</code>.</>}
       </p>
+      {oemReference.documents.length > 0 && (
+        <ul className="nrPropList">{oemReference.documents.map((document) => <li key={document} className="ok">{document}</li>)}</ul>
+      )}
+      {oemReference.conflicts.length > 0 && <p className="nrCertOpen">Conflicts: {oemReference.conflicts.join(" · ")}</p>}
       {locations.length > 0 && (
         <p>OEM measurement locations (enter the location exactly as listed):{" "}
           {locations.map(([key, value]) => <span key={key}><code>{key}</code>: {value.location} ({value.oemText}); </span>)}

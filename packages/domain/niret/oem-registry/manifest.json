@@ -1,5 +1,6 @@
 {
-  "contract": "TA-14-NIRET-GA-C1/A7",
-  "note": "SHA-256 (canonical JSON) of every registered governed OEM reference record. A record enters only through owner-reviewed merge, with its hash pinned here. Empty until a genuine manufacturer source is supplied, transcribed and independently reviewed.",
-  "records": {}
+  "contract": "TA-14-NIRET-GA-C1/A8",
+  "note": "SHA-256 (canonical JSON) of every registered governed OEM source record and system binding. Each enters only through owner-reviewed merge, with its hash pinned here. Empty until a genuine manufacturer source is supplied, transcribed and independently reviewed.",
+  "records": {},
+  "bindings": {}
 }
