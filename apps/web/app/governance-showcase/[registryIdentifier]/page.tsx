@@ -1,32 +1,7 @@
-import GenericGovernanceShowcase, {
-  generateMetadata as generateGenericMetadata,
-} from '../../workspace/ai-governance/registry/showcase/[registryIdentifier]/page';
+import GenericGovernanceShowcase, { generateMetadata as generateGenericMetadata } from '../../workspace/ai-governance/registry/showcase/[registryIdentifier]/page';
 import VelosShowcase from '../TA-14-AIGR-000029/VelosShowcase';
-
-type Props = { params: Promise<{ registryIdentifier: string }> };
-
-export const dynamic = 'force-dynamic';
-
-export async function generateMetadata({ params }: Props) {
-  const { registryIdentifier } = await params;
-
-  if (decodeURIComponent(registryIdentifier).toUpperCase() === 'TA-14-AIGR-000029') {
-    return {
-      title: 'Velos Systems v1.0.0 | TA-14 Governance Showcase',
-      description:
-        'Interactive TA-14 governance showcase for Velos Systems v1.0.0, TA-14-AIGR-000029, preserving separate prior and successor R1 examination chains.',
-    };
-  }
-
-  return generateGenericMetadata({ params });
-}
-
-export default async function GovernanceShowcaseRoute(props: Props) {
-  const { registryIdentifier } = await props.params;
-
-  if (decodeURIComponent(registryIdentifier).toUpperCase() === 'TA-14-AIGR-000029') {
-    return <VelosShowcase />;
-  }
-
-  return GenericGovernanceShowcase(props);
-}
+import Link from 'next/link';
+type Props={params:Promise<{registryIdentifier:string}>};
+export const dynamic='force-dynamic';
+export async function generateMetadata({params}:Props){const {registryIdentifier}=await params;if(decodeURIComponent(registryIdentifier).toUpperCase()==='TA-14-AIGR-000029')return{title:'Velos Systems v1.0.0 | TA-14 Governance Showcase',description:'Interactive TA-14 governance showcase for Velos Systems v1.0.0, TA-14-AIGR-000029, preserving separate prior and successor R1 examination chains.'};return generateGenericMetadata({params});}
+export default async function GovernanceShowcaseRoute(props:Props){const {registryIdentifier}=await props.params;const id=decodeURIComponent(registryIdentifier).toUpperCase();if(id==='TA-14-AIGR-000029')return <VelosShowcase/>;if(id==='TA-14-AIGR-000044')return <div><GenericGovernanceShowcase {...props}/><aside style={{position:'fixed',right:18,bottom:18,zIndex:50,maxWidth:360,padding:16,border:'1px solid #7ff0bd55',borderRadius:14,background:'#04111ff2',boxShadow:'0 14px 45px #0009',fontFamily:'Arial,sans-serif'}}><small style={{color:'#7ff0bd',fontWeight:900,letterSpacing:1}}>BILATERALLY PRESERVED · R1 CLOSED</small><p style={{color:'#d9e8ef',fontSize:13,lineHeight:1.45,margin:'9px 0'}}>HABITS × TA-14 bounded interface-state interoperability is established for the tested R1 seam.</p><Link href="/showrooms/habits-ta14-r1-final-result" style={{color:'#8ddcff',fontSize:10,fontWeight:900,textDecoration:'none'}}>OPEN R1 FINAL RESULT →</Link></aside></div>;return <GenericGovernanceShowcase {...props}/>;}
