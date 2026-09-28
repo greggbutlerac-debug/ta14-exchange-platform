@@ -1512,7 +1512,7 @@ export default function RegisterGovernancePage() {
     if (!form.authorityConfirmed) nextErrors.push('Submission authority must be confirmed.');
     if (!form.accuracyConfirmed) nextErrors.push('Accuracy declaration must be confirmed.');
     if (!form.boundaryConfirmed) nextErrors.push('Registry boundary must be acknowledged.');
-    if (!termsAccepted) nextErrors.push('TA14-RET-001 v1.1 Registry Terms must be accepted before submission.');
+    if (!termsAccepted) nextErrors.push('TA14-RET-001 v1.1 Registry Terms and Standing Policy v0.4 must be accepted before submission.');
 
     if (!form.reviewPathway) nextErrors.push('A requested review pathway is required.');
 
@@ -2470,8 +2470,8 @@ export default function RegisterGovernancePage() {
                     }}
                   />
                   <span>
-                    <strong>TA14-RET-001 v1.1 Registry Terms</strong>
-                    I have reviewed and explicitly accept the Registry Terms governing this submission.
+                    <strong>TA14-RET-001 v1.1 Registry Terms + Standing Policy v0.4</strong>
+                    I have reviewed and explicitly accept TA14-RET-001 v1.1 together with Standing Policy v0.4, which is incorporated into and governs this registration, including its intellectual-property and permitted-use protections.
                     Acceptance will be preserved as an attributable account-backed record before the intake is submitted.
                     {' '}
                     <Link href="/governance/registration-evidence-terms" target="_blank">
