@@ -7,7 +7,7 @@ import { generateDevelopmentSigningKey, sha256Canonical } from "../../../package
 import { FROZEN_SPEC_SHA256, GATE_A_SCOPE, GATE_A_VERSION } from "../../../packages/domain/niret/propositions";
 import { validityTerminatingConditions } from "../../../packages/domain/niret/invalidation";
 import {
-  developmentSealSigner, EvidenceRecorder, GATE_A_RECEIPT_ID_PREFIX, InMemoryEvidenceStore, SimulatedNodeAdapter,
+  ACQUISITION_METHODS, CHANNELS, developmentSealSigner, EvidenceRecorder, GATE_A_RECEIPT_ID_PREFIX, WINDOW_PURPOSES, InMemoryEvidenceStore, SimulatedNodeAdapter,
   type ContinuityProfile, type ContinuityProfileRegistry, type EvidenceStore, type GateAEvaluator, type NodeObservation,
   type OpenWindowRequest, type RecorderMode, type RecorderSealSigner, type Submitter,
 } from "../../../packages/domain/eie";
@@ -26,6 +26,8 @@ export const TEST_PROFILE: ContinuityProfile = {
   maxObservationAgeSeconds: fixtureBound(300),
   maxSourceClockLeadSeconds: fixtureBound(5),
   windowTimeoutSeconds: { status: "NOT_ESTABLISHED", requiredFrom: "SYNTHETIC: no timeout in this fixture" },
+  // SYNTHETIC fixture: applies to every purpose, channel and acquisition method so tests can exercise them.
+  applicability: { purposes: [...WINDOW_PURPOSES], channels: [...CHANNELS], acquisitionMethods: [...ACQUISITION_METHODS] },
 };
 
 export const profileWith = (overrides: Partial<ContinuityProfile>): ContinuityProfile => ({ ...structuredClone(TEST_PROFILE), ...overrides });

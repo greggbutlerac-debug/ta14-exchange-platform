@@ -27,4 +27,18 @@ export {
   buildGateAInput, CHANNEL_TO_MEASUREMENT_KEY, GATE_A_INPUT_ADAPTER_VERSION, receiptCitesManifest,
   type AdapterContext, type AdapterResult, type GateAInputManifest, type GateAInputRequest, type MeasurementLineage,
 } from "./gate-a-input";
+export {
+  deriveKeyRecord, keyMaySeal, keyRecordResolver, publicKeySha256, resolveSealKey, KEY_APPROVER_ROLE, KEY_CUSTODIAN_ROLE,
+  KEY_ENVIRONMENTS, PROTECTION_LEVELS, SEAL_ALGORITHMS,
+  type KeyActor, type KeyEnvironment, type KeyRecordEvent, type KeyRegistration, type KeyState, type SealKeyResolution,
+} from "./key-record";
+export {
+  checkpointFor, CHECKPOINT_CONTRACT, InMemoryWitnessStore, verifyWitnessChain, WitnessAppendViolation, witnessPort, witnessSealedWindows,
+  type ChainVerification, type TsaTransport, type WitnessCheckpoint, type WitnessRecord, type WitnessStore, type WitnessTrust,
+} from "./witness/checkpoint";
+export {
+  buildTimestampRequest, EKU_TIME_STAMPING_OID, pemToDer, SHA256_OID, verifyTimestampResponse, verifyTimestampToken,
+  type TimestampFields, type TimestampVerification,
+} from "./witness/rfc3161";
+export type { SealSignature } from "./signer";
 export * from "./types";

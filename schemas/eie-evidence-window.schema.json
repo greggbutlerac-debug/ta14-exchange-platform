@@ -442,6 +442,7 @@
           "additionalProperties": false,
           "required": [
             "keyId",
+            "algorithm",
             "signature"
           ],
           "properties": {
@@ -452,6 +453,9 @@
             "signature": {
               "type": "string",
               "minLength": 1
+            },
+            "algorithm": {
+              "const": "ED25519"
             }
           }
         }
@@ -468,7 +472,8 @@
         "maxGapSeconds",
         "maxObservationAgeSeconds",
         "maxSourceClockLeadSeconds",
-        "windowTimeoutSeconds"
+        "windowTimeoutSeconds",
+        "applicability"
       ],
       "properties": {
         "profileId": {
@@ -515,6 +520,45 @@
         },
         "windowTimeoutSeconds": {
           "$ref": "#/$defs/profileBound"
+        },
+        "applicability": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "purposes",
+            "channels",
+            "acquisitionMethods"
+          ],
+          "properties": {
+            "purposes": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "#/properties/purpose"
+              }
+            },
+            "channels": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "$ref": "eie-node-observation.schema.json#/properties/channel"
+              }
+            },
+            "acquisitionMethods": {
+              "type": "array",
+              "minItems": 1,
+              "uniqueItems": true,
+              "items": {
+                "enum": [
+                  "LIVE_ADAPTER",
+                  "MANUAL_INSTRUMENT",
+                  "SIMULATED"
+                ]
+              }
+            }
+          }
         }
       }
     },

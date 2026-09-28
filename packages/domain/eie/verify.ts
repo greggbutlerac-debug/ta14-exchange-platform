@@ -71,7 +71,7 @@ export function verifyWindow(window: EvidenceWindow, resolveKey: RecorderKeyReso
     if (objectHash(body) !== window.sealHash) codes.add(EIE_REASON.SEAL_MISMATCH);
     const closedMs = parseInstant(window.closedAt);
     if (closedMs === null || closedMs < prevRecordedMs) codes.add(EIE_REASON.CHRONOLOGY_VIOLATION);
-    if (!verifySealSignature({ windowId: window.windowId, sealHash: window.sealHash }, window.recorderSignature, resolveKey)) {
+    if (!verifySealSignature({ windowId: window.windowId, sealHash: window.sealHash }, window.recorderSignature, resolveKey, window.closedAt)) {
       codes.add(EIE_REASON.SIGNATURE_INVALID);
     }
   } else if (window.closedAt !== null || window.closeTrigger !== null || window.recorderSignature !== null) {

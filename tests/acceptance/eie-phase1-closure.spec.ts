@@ -536,7 +536,8 @@ describe("IAQ disposition", () => {
     const schema = JSON.parse(readFileSync(new URL("../../schemas/eie-node-observation.schema.json", import.meta.url), "utf8"));
     expect((schema.properties.channel.enum as string[]).filter((c) => /IAQ|CO2|PM|VOC/i.test(c))).toEqual([]);
     const { recorder } = makeRecorder();
-    expect(await recorder.openWindow(baselineRequest({ admittedChannels: ["IAQ_CO2" as never] }), TECH))
-      .toMatchObject({ opened: false, reasonCodes: [EIE_REASON.CHANNEL_NOT_ADMITTED] });
+    const result = await recorder.openWindow(baselineRequest({ admittedChannels: ["IAQ_CO2" as never] }), TECH);
+    expect(result).toMatchObject({ opened: false });
+    expect(!result.opened && result.reasonCodes).toContain(EIE_REASON.CHANNEL_NOT_ADMITTED);
   });
 });

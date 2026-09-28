@@ -495,7 +495,7 @@ describe("Phase 1 source derives nothing and authorizes nothing", () => {
     const dir = new URL("../../packages/domain/eie/", import.meta.url);
     const files = readdirSync(dir).filter((f) => f.endsWith(".ts"));
     expect(files.sort()).toEqual([
-      "chain.ts", "continuity-profile.ts", "gate-a-binding.ts", "index.ts", "observation.ts", "reason-codes.ts", "recorder.ts",
+      "chain.ts", "continuity-profile.ts", "gate-a-binding.ts", "index.ts", "key-record.ts", "observation.ts", "reason-codes.ts", "recorder.ts",
       "signer.ts", "simulated-node.ts", "spec-guard.ts", "store.ts", "time.ts", "types.ts", "verify.ts",
     ]);
     const code = (file: string) => readFileSync(new URL(file, dir), "utf8").replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*$/gm, "");

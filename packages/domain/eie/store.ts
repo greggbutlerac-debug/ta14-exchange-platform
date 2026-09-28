@@ -8,6 +8,7 @@
  * database boundary.
  */
 import { deepFreeze, frozenCopy } from "./chain";
+import type { SealSignature } from "./signer";
 import type { ChainRecord, CloseTrigger, ContinuityStatus, WindowHeader } from "./types";
 
 export interface WindowSeal {
@@ -17,7 +18,7 @@ export interface WindowSeal {
   continuityStatus: ContinuityStatus;
   lastEntryHash: string;
   sealHash: string;
-  recorderSignature: { keyId: string; signature: string };
+  recorderSignature: SealSignature;
 }
 
 export interface StoredWindow {

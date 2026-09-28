@@ -24,13 +24,18 @@
  * - Degraded versus broken: BROKEN means evidence is known to be missing from the record. DEGRADED means
  *   no evidence is known to be missing, but the source delivered preserved chronology anomalies (and,
  *   per s03, uncorroborated actor events). BROKEN takes precedence.
+ * - Applicability: a profile names the window purposes, channels and acquisition methods its basis
+ *   covers. A window outside that cannot open, and an observation acquired another way is not admitted.
  * - Closure eligibility: an enabled submitter may close on declared end of purpose or the next lifecycle
  *   receipt at any time. The Recorder alone closes on continuity break or an established timeout.
  *   Evidence sufficiency (for example a minimum duration) is not a Recorder question.
  */
 import { objectHash } from "./chain";
 import { EIE_REASON } from "./reason-codes";
-import { PROFILE_BASIS_KINDS, SEQUENCE_SEMANTICS, type ContinuityProfile, type ProfileBound, type RecorderMode } from "./types";
+import {
+  ACQUISITION_METHODS, CHANNELS, PROFILE_BASIS_KINDS, SEQUENCE_SEMANTICS, WINDOW_PURPOSES,
+  type ContinuityProfile, type ProfileBound, type RecorderMode,
+} from "./types";
 
 /** Governed, owner-pinned continuity profiles: `${profileId}@${profileVersion}` -> canonical hash. None exists yet. */
 export type ContinuityProfileRegistry = ReadonlyMap<string, string>;
@@ -47,6 +52,14 @@ function boundShape(bound: unknown, valid: (value: unknown) => boolean): boolean
   return false;
 }
 const nonNegative = (value: unknown) => typeof value === "number" && Number.isFinite(value) && value >= 0;
+const subsetOf = (value: unknown, allowed: readonly string[]) =>
+  Array.isArray(value) && value.length > 0 && new Set(value).size === value.length && value.every((v) => allowed.includes(v));
+
+/** Applicability is required: the purposes, channels and acquisition methods the profile's basis actually covers. */
+function applicabilityShape(value: unknown): boolean {
+  return isRecord(value) && Object.keys(value).sort().join(",") === "acquisitionMethods,channels,purposes"
+    && subsetOf(value.purposes, WINDOW_PURPOSES) && subsetOf(value.channels, CHANNELS) && subsetOf(value.acquisitionMethods, ACQUISITION_METHODS);
+}
 
 export type ProfileResolution =
   | { ok: true; profile: ContinuityProfile; profileHash: string }
@@ -65,7 +78,8 @@ export function resolveContinuityProfile(
     && boundShape(input.maxGapSeconds, nonNegative)
     && boundShape(input.maxObservationAgeSeconds, nonNegative)
     && boundShape(input.maxSourceClockLeadSeconds, nonNegative)
-    && boundShape(input.windowTimeoutSeconds, nonNegative);
+    && boundShape(input.windowTimeoutSeconds, nonNegative)
+    && applicabilityShape(input.applicability);
   if (!shapeOk) return { ok: false, reasonCodes: [EIE_REASON.PROFILE_INVALID] };
 
   const profile = structuredClone(input) as unknown as ContinuityProfile;

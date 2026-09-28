@@ -49,6 +49,13 @@ export interface RecorderOptions {
   profileRegistry?: ContinuityProfileRegistry;
   /** Trusted Recorder public keys, used to re-verify sealed evidence windows before they supply Gate A input. */
   resolveRecorderKey?: RecorderKeyResolver;
+  /** When set, a sealed evidence window supplies Gate A input only if an independent witness binds its exact seal. */
+  evidenceWitness?: (window: EvidenceWindow) => Promise<boolean>;
+  /**
+   * When set, a Gate A evaluation proceeds only if the declared equipment identity exactly equals the
+   * asset's independently verified nameplate transcriptions. Returns reason codes (empty = consistent).
+   */
+  assetIdentity?: (assetId: string, declared: unknown) => Promise<string[]>;
 }
 
 /** Phase 1 enables Node and technician submissions only; Analyzer and Governor do not exist yet. */
@@ -168,6 +175,10 @@ export class EvidenceRecorder {
 
     const profile = resolveContinuityProfile(request.continuityProfile, this.#options.mode, this.#options.profileRegistry ?? GOVERNED_CONTINUITY_PROFILES);
     if (!profile.ok) profile.reasonCodes.forEach((c) => codes.add(c));
+    else if (!profile.profile.applicability.purposes.includes(purpose)
+      || !Array.isArray(request.admittedChannels) || request.admittedChannels.some((c) => !profile.profile.applicability.channels.includes(c))) {
+      codes.add(EIE_REASON.PROFILE_NOT_APPLICABLE);
+    }
 
     const channels = request.admittedChannels;
     if (!Array.isArray(channels) || channels.length === 0 || !channels.every((c) => CHANNELS.includes(c))
@@ -294,6 +305,7 @@ export class EvidenceRecorder {
     }
 
     if (!header.admittedChannels.includes(observation.channel)) codes.add(EIE_REASON.CHANNEL_NOT_ADMITTED);
+    if (!profile.applicability.acquisitionMethods.includes(observation.acquisitionMethod)) codes.add(EIE_REASON.OBSERVATION_PROFILE_NOT_APPLICABLE);
     if (!header.admittedSources.some((s) => sourceKey(s) === sourceKey(observation.source))) codes.add(EIE_REASON.SOURCE_NOT_ADMITTED);
     if (codes.size > 0) return this.#reject(window, now.iso, submitter, "OBSERVATION", raw, codes);
 
@@ -420,12 +432,20 @@ export class EvidenceRecorder {
     let adapted: ReturnType<typeof buildGateAInput> | null = null;
     if (codes.size === 0 && resolveKey) {
       const evidenceWindows = await Promise.all(ids.map((id) => this.getWindow(id)));
+      const witness = this.#options.evidenceWitness;
+      if (witness) {
+        for (const w of evidenceWindows) if (w && !(await witness(w))) codes.add(EIE_REASON.EVIDENCE_WINDOW_UNWITNESSED);
+      }
+      if (this.#options.assetIdentity) {
+        const declared = isRecord(request) ? request.declared : undefined;
+        (await this.#options.assetIdentity(window.header.assetId, declared)).forEach((c) => codes.add(c));
+      }
       const assetWindows = (await Promise.all((await this.#store.listWindowIds(window.header.assetId)).map((id) => this.getWindow(id))))
         .filter((w): w is EvidenceWindow => w !== undefined);
-      adapted = buildGateAInput(request, {
+      if (codes.size === 0) adapted = buildGateAInput(request, {
         mode: this.#options.mode, assetId: window.header.assetId, evidenceWindows, assetWindows, resolveRecorderKey: resolveKey,
       });
-      if (!adapted.ok) adapted.reasonCodes.forEach((c) => codes.add(c));
+      if (adapted && !adapted.ok) adapted.reasonCodes.forEach((c) => codes.add(c));
     }
     const now = this.#now(window);
     if (codes.size > 0 || !evaluator || !adapted?.ok) return this.#reject(window, now.iso, submitter, "GATE_A_EVALUATION", request, codes);
@@ -549,7 +569,7 @@ export class EvidenceRecorder {
     await this.#store.appendSeal({
       windowId: window.windowId, closeTrigger, closedAt: body.closedAt, continuityStatus: body.continuityStatus,
       lastEntryHash: body.lastEntryHash, sealHash,
-      recorderSignature: { keyId: signer.keyId, signature: signer.sign({ windowId: window.windowId, sealHash }) },
+      recorderSignature: { keyId: signer.keyId, algorithm: signer.algorithm, signature: await signer.sign({ windowId: window.windowId, sealHash }) },
     });
   }
 

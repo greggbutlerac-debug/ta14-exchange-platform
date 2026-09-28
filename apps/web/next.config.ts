@@ -11,6 +11,9 @@ const nextConfig: NextConfig = {
     externalDir: true,
   },
 
+  // Loaded natively by Node on the server (EIE pilot KMS seal signer); bundling google-gax breaks its runtime file resolution.
+  serverExternalPackages: ["@google-cloud/kms", "google-gax"],
+
   env: {
     NEXT_PUBLIC_SUPABASE_ANON_KEY: supabasePublicKey,
   },

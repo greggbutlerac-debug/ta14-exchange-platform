@@ -110,6 +110,8 @@ export interface ContinuityProfile {
   maxObservationAgeSeconds: ProfileBound<number>;
   maxSourceClockLeadSeconds: ProfileBound<number>;
   windowTimeoutSeconds: ProfileBound<number>;
+  /** Where the profile applies. A window outside it cannot open; an acquisition method outside it is not admitted. */
+  applicability: { purposes: WindowPurpose[]; channels: Channel[]; acquisitionMethods: AcquisitionMethod[] };
 }
 
 export type SubmitterRole = "NODE" | "TECHNICIAN" | "ANALYZER" | "GOVERNOR";
@@ -277,7 +279,7 @@ export interface EvidenceWindow extends WindowHeader {
   continuityStatus: ContinuityStatus;
   lastEntryHash: string;
   sealHash: string | null;
-  recorderSignature: { keyId: string; signature: string } | null;
+  recorderSignature: { keyId: string; algorithm: "ED25519"; signature: string } | null;
 }
 
 export type Outcome<T> =

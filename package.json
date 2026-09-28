@@ -17,16 +17,20 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "verify": "npm run typecheck && npm run test && npm run build",
-    "clean": "node -e \"const fs=require('fs'); for (const path of ['apps/web/.next','coverage']) fs.rmSync(path,{recursive:true,force:true});\""
+    "clean": "node -e \"const fs=require('fs'); for (const path of ['apps/web/.next','coverage']) fs.rmSync(path,{recursive:true,force:true});\"",
+    "eie:verify-export": "vitest run scripts/eie-pilot/verify-export.spec.ts"
   },
   "dependencies": {
+    "@google-cloud/kms": "^6.2.0",
     "@supabase/ssr": "^0.7.0",
     "@supabase/supabase-js": "^2.57.4",
     "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.6.1",
     "ajv": "^8.17.1",
+    "asn1js": "^3.0.10",
     "next": "^15.5.7",
     "phaser": "^3.90.0",
+    "pkijs": "^3.4.1",
     "react": "^19.2.0",
     "react-dom": "^19.2.0"
   },

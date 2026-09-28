@@ -1,0 +1,33 @@
+{
+  "document": "TA-14 EIE Tier 1 pilot continuity profile — DRAFT",
+  "stage": "AUTHORSHIP IN PROGRESS (not documented complete, not independently reviewed, not established, not activated)",
+  "authorRole": "TA-14 GOVERNANCE OWNER",
+  "draftAssistance": "AI-assisted draft. AI is not an author of record and cannot attest review.",
+  "independentReviewer": null,
+  "establishment": null,
+  "activation": null,
+  "authorActionsRequired": [
+    "Author maxGapSeconds for the manual-instrument snapshot procedure and record its basis. No value is proposed here; TA-14 authorship of this value establishes nothing until independently reviewed.",
+    "Decide whether maxObservationAgeSeconds, maxSourceClockLeadSeconds and windowTimeoutSeconds are established or remain NOT_ESTABLISHED (NOT_ESTABLISHED lead means zero tolerance).",
+    "Confirm applicability (purpose, channels, acquisition method)."
+  ],
+  "reviewRequirements": [
+    "An eligible independent reviewer who is not the author attests each value against its cited basis, including the manual-node adapter's sequencing behaviour.",
+    "Only then may the TA-14 Governance Owner establish the version and pin its canonical hash in packages/domain/eie/pilot/pinned-profiles.ts."
+  ],
+  "profile": {
+    "profileId": "TA14-EIE-PILOT-MANUAL-SNAPSHOT",
+    "profileVersion": "0.1.0-draft",
+    "basis": { "kind": "GOVERNED_METHOD", "ref": "TA-14 manual-instrument Node adapter (packages/domain/eie/pilot/manual-node.ts, ta14-eie-manual-node/1.0.0)" },
+    "sequenceSemantics": { "status": "ESTABLISHED", "value": "CONTIGUOUS_PER_STREAM", "basisRef": "manual-node.ts nextSequence: the server assigns 1, 2, 3 ... per (instrument, channel) stream in a window" },
+    "maxGapSeconds": { "status": "NOT_ESTABLISHED", "requiredFrom": "TA-14 Governance Owner authorship, then independent review" },
+    "maxObservationAgeSeconds": { "status": "NOT_ESTABLISHED", "requiredFrom": "TA-14 Governance Owner authorship decision" },
+    "maxSourceClockLeadSeconds": { "status": "NOT_ESTABLISHED", "requiredFrom": "TA-14 Governance Owner authorship decision (zero tolerance while not established)" },
+    "windowTimeoutSeconds": { "status": "NOT_ESTABLISHED", "requiredFrom": "TA-14 Governance Owner authorship decision" },
+    "applicability": {
+      "purposes": ["BASELINE_NONINVASIVE"],
+      "channels": ["RETURN_DRY_BULB", "RETURN_WET_BULB", "RETURN_RH", "SUPPLY_DRY_BULB", "SUPPLY_RH", "OUTDOOR_DRY_BULB", "AIRFLOW", "RETURN_STATIC_PRESSURE", "SUPPLY_STATIC_PRESSURE", "LIQUID_LINE_TEMPERATURE", "SUCTION_LINE_TEMPERATURE"],
+      "acquisitionMethods": ["MANUAL_INSTRUMENT"]
+    }
+  }
+}
