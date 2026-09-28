@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 const established = [
   "Bidirectional transport",
@@ -24,6 +24,21 @@ export default function Page() {
   const [direction,setDirection]=useState<"habits"|"ta14">("habits");
   const [crossed,setCrossed]=useState(false);
   const [field,setField]=useState("Object identity & provenance");
+  const replayRef=useRef<HTMLElement | null>(null);
+  const autoPlayed=useRef(false);
+  useEffect(()=>{
+    const el=replayRef.current;
+    if(!el) return;
+    const observer=new IntersectionObserver(([entry])=>{
+      if(entry.isIntersecting && !autoPlayed.current){
+        autoPlayed.current=true;
+        window.setTimeout(()=>setCrossed(true),450);
+        observer.disconnect();
+      }
+    },{threshold:.45});
+    observer.observe(el);
+    return ()=>observer.disconnect();
+  },[]);
   const preserved=["Object identity & provenance","Originating architecture / state owner","Determination identity & state","Evidentiary standing & limitations","Applicability","Material UNKNOWNs","Freshness / currentness","Governance-authorisation context","Continuity state","Consequence binding","Effective examination point"];
   const blocked=["Local constitutional authority","Receiving architecture determination","Execution authority"];
   const source=direction==="habits"?"HABITS / P-01: UAB: HOLD":"TA-14 / P-01: HOLD";
@@ -42,10 +57,10 @@ export default function Page() {
       <div className="result"><small>R1 RESULT</small><strong>BOUNDED INTERFACE-STATE INTEROPERABILITY ESTABLISHED FOR THE TESTED R1 OBJECTS, FIELDS, DIRECTIONS AND FROZEN INTERFACE CONDITIONS.</strong></div>
     </header>
 
-    <section className="interactive">
+    <section className="interactive" ref={replayRef}>
       <p className="eyebrow">INTERACTIVE R1 REPLAY · PRESERVED RESULT</p>
       <h2>Run the crossing yourself.</h2>
-      <p className="note">This replay does not create a new examination. It lets you inspect the already-preserved R1 crossing logic.</p>
+      <p className="note">This replay does not create a new examination. It demonstrates the already-preserved R1 crossing once on arrival, then remains available for manual replay and direction switching.</p>
       <div className="controls"><button className={direction==="habits"?"active":""} onClick={()=>{setDirection("habits");setCrossed(false)}}>HABITS → TA-14</button><button className={direction==="ta14"?"active":""} onClick={()=>{setDirection("ta14");setCrossed(false)}}>TA-14 → HABITS</button><button className="run" onClick={()=>setCrossed(true)}>{crossed?"REPLAY COMPLETE ✓":"RUN PRESERVED CROSSING →"}</button></div>
       <div className={"replay "+(crossed?"crossed":"")}><div className="node"><small>ORIGINATING STATE</small><strong>{source}</strong><p>Independently owned determination.</p></div><div className="rail"><span>{crossed?"ATTRIBUTABLE CONTEXT CROSSED":"READY"}</span><div className="track"><i>→</i>{crossed&&<b className="packet">AUTHORITY<br/>CONTEXT</b>}</div></div><div className="node receiver"><small>RECEIVING ARCHITECTURE</small><strong>{receiver}</strong><p>{crossed?"Recognized as inspectable context. Local determination remains independent.":"No received context yet."}</p></div></div>
       {crossed&&<div className="inspect"><div><h3>11 frozen fields survive the crossing</h3><div className="fieldlist">{preserved.map(x=><button key={x} className={field===x?"selected":""} onClick={()=>setField(x)}>✓ {x}</button>)}</div><p className="fieldread"><b>INSPECTING:</b> {field}<br/><span>Preserved as attributable R1 context; receipt does not establish new local authority.</span></p></div><div><h3>Hard-stop gates</h3><p className="gateintro">The attributable context arrives. These three states do not cross with it.</p>{blocked.map((x,i)=><div className={"blocked gate g"+i} key={x}><span>✕</span><div><small>HARD STOP {i+1}</small><b>{x}</b></div></div>)}<div className="verdict"><small>R1 RECEIPT TEST</small><strong>LOCAL INDEPENDENCE PRESERVED</strong><p>RECEIPT ≠ ACCEPTANCE · RECOGNITION ≠ ADOPTION</p></div></div></div>}
