@@ -5,7 +5,6 @@ const WorldReturn=()=> <div style={{padding:'12px 18px',borderBottom:'1px solid 
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
 
 const countries=[
-{code:'BE',flag:'🇧🇪',country:'KINGDOM OF BELGIUM',institution:'FPS Public Health · Indoor Air Quality',status:'TICKET 105350 · SUBSTANTIVE HELPDESK RESPONSE PRESERVED',language:'DUTCH + FRENCH + ENGLISH',href:'/global-institutional-engagement/belgium'},
 {code:'PS',flag:'🇵🇸',country:'STATE OF PALESTINE',institution:'Environment Quality Authority · Air Quality and Ozone Department',status:'SUBSTANTIVE EQA REPLY RECEIVED · CLARIFICATION REQUEST ACTIVE',language:'ARABIC + ENGLISH',href:'/global-institutional-engagement/palestine'},
 {code:'GY',flag:'🇬🇾',country:'CO-OPERATIVE REPUBLIC OF GUYANA',institution:'Environmental Protection Agency · Air, Noise & Radiation Department',status:'FORMAL EXECUTIVE-DIRECTOR ROUTE RECEIVED · SUBMISSION PREPARATION',language:'ENGLISH',href:'/global-institutional-engagement/guyana'},
 {code:'GA',flag:'🇬🇦',country:'GABONESE REPUBLIC',institution:'Conseil National Climat · Secrétariat Permanent',status:'SUBSTANTIVE CNC REPLY RECEIVED · TECHNICAL DIALOGUE PREPARATION',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/gabon'},
