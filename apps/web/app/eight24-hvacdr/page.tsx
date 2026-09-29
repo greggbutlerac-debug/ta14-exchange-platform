@@ -2,8 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'TA-14 × Eight24 | HVACD/R Founding Partnership',
-  description: 'Private working overview of the TA-14 × Eight24 HVACD/R technician-readiness program.',
-  robots: { index: false, follow: false }
+  description: 'Public program showroom for the TA-14 × Eight24 HVACD/R technician-readiness system: curriculum, immersive implementation, evidence, execution and verified performance.'
 };
 
 const phases = [
@@ -36,13 +35,13 @@ export default function Page(){
     <div style={{maxWidth:1180,margin:'auto',padding:'0 22px'}}>
       <nav style={{padding:'26px 0',display:'flex',justifyContent:'space-between',gap:16,borderBottom:'1px solid #18303b',fontSize:11,fontWeight:900,letterSpacing:1.3}}>
         <Link href="/" style={{color:'#70dcff',textDecoration:'none'}}>TA-14 EXCHANGE</Link>
-        <span style={{color:'#efc86c'}}>PRIVATE WORKING ROOM · FOUNDING PARTNERSHIP</span>
+        <span style={{color:'#efc86c'}}>PUBLIC PROGRAM SHOWROOM · FOUNDING PARTNERSHIP</span>
       </nav>
 
       <header style={{padding:'92px 0 64px'}}>
         <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>TA-14 × EIGHT24 SOLUTIONS · HVACD/R TECHNICIAN READINESS PROGRAM</p>
-        <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(48px,8vw,96px)',lineHeight:.92,margin:'18px 0 28px'}}>THE WHOLE<br/><i>PARTNERSHIP.</i></h1>
-        <p style={{maxWidth:860,color:'#a9bdc6',fontSize:20,lineHeight:1.7}}>One working room for the program, the curriculum, the immersive build, the ownership boundary and the path from what already exists to commercial deployment.</p>
+        <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(48px,8vw,96px)',lineHeight:.92,margin:'18px 0 28px'}}>FROM FIELD KNOWLEDGE<br/><i>TO PROVEN READINESS.</i></h1>
+        <p style={{maxWidth:860,color:'#a9bdc6',fontSize:20,lineHeight:1.7}}>TA-14 brings the field curriculum, evidence discipline and consequence-boundary architecture. Eight24 brings the immersive environment, implementation and deployment infrastructure. Together, the program is designed to move a learner from knowing what to do to demonstrating what the evidence supports, acting within the applicable boundary and proving the outcome.</p>
         <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:34}}>
           {['120 HOURS','18 MODULES','7 PHASES','HVACD/R','14-HOUR CAPSTONE','WALKTHROUGH → GUIDED → PERFORM'].map(x=><span key={x} style={{border:'1px solid #214352',borderRadius:999,padding:'10px 14px',fontSize:10,fontWeight:900,color:'#d6e7ed'}}>{x}</span>)}
         </div>
@@ -60,7 +59,16 @@ export default function Page(){
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>02 · WHAT EACH SIDE BRINGS</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>02 · WHAT THE PARTNERSHIP PRODUCES</p>
+        <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(34px,5vw,58px)',margin:'12px 0'}}>Training that has to survive the field.</h2>
+        <p style={{maxWidth:900,color:'#9fb4be',lineHeight:1.8,fontSize:17}}>A technician does not become ready by completing content. Readiness has to appear in observable performance: establish the condition, collect the right evidence, distinguish diagnosis from assumption, determine what action is supported, execute within authority, and verify what changed.</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12,marginTop:26}}>
+          {[['01','SEE','Observe the system and the actual field condition.'],['02','PROVE','Create an attributable record from measurements and evidence.'],['03','DECIDE','Determine what the evidence supports — including HOLD when it does not support intervention.'],['04','ACT','Perform the bounded technical consequence correctly.'],['05','VERIFY','Re-measure, preserve the outcome and establish the new baseline.']].map(x=><div key={x[0]} style={{padding:22,border:'1px solid #173746',borderRadius:16,background:'#06121a'}}><b style={{color:'#70dcff',fontSize:11}}>{x[0]} · {x[1]}</b><p style={{color:'#9fb4be',lineHeight:1.6,fontSize:14}}>{x[2]}</p></div>)}
+        </div>
+      </section>
+
+      <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>03 · WHAT EACH SIDE BRINGS</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:16,marginTop:24}}>
           {[['TA-14',ta14,'#70dcff'],['EIGHT24 SOLUTIONS',eight24,'#efc86c']].map(([name,items,color]:any)=><div key={name} style={{padding:28,border:'1px solid #173746',borderRadius:20,background:'#06121a'}}>
             <h3 style={{fontFamily:'Georgia,serif',fontSize:31,color}}>{name}</h3>
@@ -71,7 +79,7 @@ export default function Page(){
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>03 · THE 120-HOUR JOURNEY</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>04 · THE 120-HOUR JOURNEY</p>
         <div style={{display:'grid',gap:12,marginTop:24}}>
           {phases.map(p=><div key={p[0]} style={{display:'grid',gridTemplateColumns:'70px minmax(180px,1fr) 80px minmax(220px,2fr)',gap:18,alignItems:'center',padding:22,border:'1px solid #173746',borderRadius:16,background:'#06121a'}}>
             <b style={{fontFamily:'Georgia,serif',fontSize:30,color:'#70dcff'}}>{p[0]}</b><div><b>{p[1]}</b><small style={{display:'block',color:'#6f8994',marginTop:5}}>{p[3]}</small></div><b style={{color:'#efc86c'}}>{p[2]}</b><span style={{color:'#9fb4be',fontSize:13,lineHeight:1.55}}>{p[4]}</span>
@@ -80,7 +88,7 @@ export default function Page(){
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>04 · CURRICULUM SHOWROOMS</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>05 · CURRICULUM SHOWROOMS</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:44,margin:'12px 0'}}>Every module becomes a room.</h2>
         <p style={{maxWidth:820,color:'#9fb4be',lineHeight:1.7}}>Instead of hiding the curriculum in a static PDF, each module gets an inspectable interactive showroom: purpose, competencies, lesson inventory, delivery mode, evidence objects, VR behavior, assessment, dependencies and completion criteria.</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:12,marginTop:26}}>
@@ -93,13 +101,13 @@ export default function Page(){
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>05 · DEHUMIDIFICATION IS NOT A FOOTNOTE</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>06 · DEHUMIDIFICATION IS NOT A FOOTNOTE</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:42}}>HVAC<b style={{color:'#70dcff'}}>D</b>/R</h2>
         <p style={{maxWidth:880,color:'#9fb4be',lineHeight:1.8,fontSize:17}}>D = Dehumidification. Moisture control is treated as a first-class technical discipline with its own evidence, measurements, operating conditions, diagnostic reasoning, interventions and outcome verification. Acceptable temperature does not automatically establish acceptable moisture performance.</p>
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>06 · OWNERSHIP BOUNDARY</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>07 · OWNERSHIP BOUNDARY</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:16,marginTop:22}}>
           <div style={{padding:28,border:'1px solid #1b4353',borderRadius:20}}><h3 style={{fontFamily:'Georgia,serif',fontSize:30}}>TA-14 owns TA-14.</h3><p style={{color:'#9fb4be',lineHeight:1.7}}>Underlying curriculum architecture, TA-14 methods, Academy, HPR / PI-HPR, NIRET, DDD, Seven In / Seven Out, execution architecture, independent publishing and TA-14 improvements remain TA-14.</p></div>
           <div style={{padding:28,border:'1px solid #514426',borderRadius:20}}><h3 style={{fontFamily:'Georgia,serif',fontSize:30}}>Eight24 owns Eight24.</h3><p style={{color:'#9fb4be',lineHeight:1.7}}>Platform, source code, VR implementation, independently developed 3D and interaction assets, LMS, deployment infrastructure, customer relationships and pre-existing Eight24 IP remain Eight24.</p></div>
@@ -108,14 +116,14 @@ export default function Page(){
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>07 · WHAT HAPPENS NEXT</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>08 · FROM CURRICULUM TO DEPLOYMENT</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:14,marginTop:22}}>
-          {[['NOW','Align on the ownership/license boundary, master curriculum and implementation sequence.'],['NEXT','Build the first reusable VR/state/evidence architecture and integrated service-call prototype.'],['THEN','Scale the simulation catalog, deploy cohorts, measure readiness and expand institutional delivery.']].map(x=><div key={x[0]} style={{padding:26,borderTop:'3px solid #70dcff',background:'#06121a'}}><b style={{color:'#efc86c'}}>{x[0]}</b><p style={{color:'#a9bdc6',lineHeight:1.7}}>{x[1]}</p></div>)}
+          {[['CURRICULUM','Keep the 120-hour master curriculum inspectable through the 18 module rooms.'],['IMMERSIVE BUILD','Translate field states, evidence objects, decisions and service-call consequences into reusable immersive interactions.'],['READINESS','Use walkthrough → guided → perform progression to move toward increasingly independent technician performance.']].map(x=><div key={x[0]} style={{padding:26,borderTop:'3px solid #70dcff',background:'#06121a'}}><b style={{color:'#efc86c'}}>{x[0]}</b><p style={{color:'#a9bdc6',lineHeight:1.7}}>{x[1]}</p></div>)}
         </div>
       </section>
 
       <footer style={{padding:'44px 0 70px',borderTop:'1px solid #18303b',color:'#667f89',fontSize:10,display:'flex',justifyContent:'space-between',gap:16,flexWrap:'wrap'}}>
-        <span>TA-14 × EIGHT24 SOLUTIONS · FOUNDING PARTNERSHIP WORKING ROOM</span><span>HVACD/R · D = DEHUMIDIFICATION</span>
+        <span>TA-14 × EIGHT24 SOLUTIONS · HVACD/R TECHNICIAN READINESS PROGRAM</span><span>HVACD/R · D = DEHUMIDIFICATION</span>
       </footer>
     </div>
   </main>
