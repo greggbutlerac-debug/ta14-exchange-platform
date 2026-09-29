@@ -1,1 +1,9 @@
-export default function Page(){return <main><h1>David Greenberg × Eight24 Solutions</h1><img src="/david-greenberg.jpg" alt="David Greenberg"/><p>When training becomes qualification.</p><p>This living showroom preserves David Greenberg's place in the Eight24 Solutions collaboration record and will extend as attributable evidence and milestones are added.</p><a href="/showrooms/eight24-solutions">Return to Eight24 Solutions</a></main>}
+export default function Page() {
+  return (
+    <main>
+      <h1>David Greenberg × Eight24 Solutions</h1>
+      <p>When training becomes qualification.</p>
+      <a href="/showrooms/eight24-solutions">Return to Eight24 Solutions</a>
+    </main>
+  );
+}
