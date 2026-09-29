@@ -42,7 +42,7 @@ export default function Page(){
       <header style={{padding:'92px 0 64px'}}>
         <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>TA-14 × EIGHT24 SOLUTIONS · HVACD/R TECHNICIAN READINESS PROGRAM</p>
         <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(48px,8vw,96px)',lineHeight:.92,margin:'18px 0 28px'}}>THE WHOLE<br/><i>PARTNERSHIP.</i></h1>
-        <p style={{maxWidth:860,color:'#a9bdc6',fontSize:20,lineHeight:1.7}}>One working room for the program, the curriculum, the immersive build, the ownership boundary, the economics and the path from what already exists to commercial deployment.</p>
+        <p style={{maxWidth:860,color:'#a9bdc6',fontSize:20,lineHeight:1.7}}>One working room for the program, the curriculum, the immersive build, the ownership boundary and the path from what already exists to commercial deployment.</p>
         <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:34}}>
           {['120 HOURS','18 MODULES','7 PHASES','HVACD/R','14-HOUR CAPSTONE','WALKTHROUGH → GUIDED → PERFORM'].map(x=><span key={x} style={{border:'1px solid #214352',borderRadius:999,padding:'10px 14px',fontSize:10,fontWeight:900,color:'#d6e7ed'}}>{x}</span>)}
         </div>
@@ -108,18 +108,9 @@ export default function Page(){
       </section>
 
       <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>07 · PROPOSED FOUNDING ECONOMICS · PRIVATE</p>
-        <h2 style={{fontFamily:'Georgia,serif',fontSize:42}}>Fund the continuation. Preserve the upside.</h2>
-        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:14,marginTop:24}}>
-          {[['$10,000','FOUNDING DEVELOPMENT + INTEGRATION','Due at agreement; recognizes work already underway and establishes funded continuation.'],['MILESTONES','FUTURE DEVELOPMENT','Curriculum and implementation work defined and funded as production proceeds.'],['7.5%','OPENING COMMERCIAL LICENSE','Proposed share of attributable gross commercial revenue from licensed TA-14 HVACD/R products.'],['SEPARATE','VR EXCLUSIVITY','Not included by default. Any exclusivity requires separate economics and meaningful minimum guarantees.']].map(x=><div key={x[1]} style={{padding:24,border:'1px solid #173746',borderRadius:18,background:'#06121a'}}><b style={{fontFamily:'Georgia,serif',fontSize:30,color:'#70dcff'}}>{x[0]}</b><h3 style={{fontSize:12,letterSpacing:1.2,color:'#efc86c'}}>{x[1]}</h3><p style={{color:'#8fa6b0',fontSize:13,lineHeight:1.6}}>{x[2]}</p></div>)}
-        </div>
-        <p style={{color:'#8098a2',fontSize:12,marginTop:18}}>Working proposal for discussion. This room is not a signed agreement and does not transfer ownership, grant exclusivity or activate a commercial license.</p>
-      </section>
-
-      <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>08 · WHAT HAPPENS NEXT</p>
+        <p style={{color:'#efc86c',fontWeight:900,fontSize:11,letterSpacing:2}}>07 · WHAT HAPPENS NEXT</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:14,marginTop:22}}>
-          {[['NOW','Align on commercial framework, founding payment, ownership/license boundary and master curriculum.'],['NEXT','Build the first reusable VR/state/evidence architecture and integrated service-call prototype.'],['THEN','Scale the simulation catalog, deploy cohorts, measure readiness and expand institutional delivery.']].map(x=><div key={x[0]} style={{padding:26,borderTop:'3px solid #70dcff',background:'#06121a'}}><b style={{color:'#efc86c'}}>{x[0]}</b><p style={{color:'#a9bdc6',lineHeight:1.7}}>{x[1]}</p></div>)}
+          {[['NOW','Align on the ownership/license boundary, master curriculum and implementation sequence.'],['NEXT','Build the first reusable VR/state/evidence architecture and integrated service-call prototype.'],['THEN','Scale the simulation catalog, deploy cohorts, measure readiness and expand institutional delivery.']].map(x=><div key={x[0]} style={{padding:26,borderTop:'3px solid #70dcff',background:'#06121a'}}><b style={{color:'#efc86c'}}>{x[0]}</b><p style={{color:'#a9bdc6',lineHeight:1.7}}>{x[1]}</p></div>)}
         </div>
       </section>
 
