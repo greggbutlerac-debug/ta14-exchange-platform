@@ -95,6 +95,22 @@ return <main style={{fontFamily:"Arial,sans-serif",background:"#f3f7f8",color:"#
 <p style={{fontFamily:"Georgia,serif",fontSize:24,lineHeight:1.55}}><strong>The most important measurement is not simply what the building knows.</strong><br/>It is whether what the building does next is justified.</p>
 <div style={{marginTop:45,padding:24,background:"#fff",border:"1px solid #d2e0e5",fontSize:13,lineHeight:1.75,color:"#455c65"}}><strong>Disclosure boundary.</strong> This is an independent TA-14 public conference surface prepared in connection with Greggory Don Butler's selected remote oral presentation at the EDIAQI Indoor Air Quality Conference in Zagreb on 29 September 2026. It does not state or imply that EDIAQI, its organisers, speakers, participants, funders or partner institutions have adopted, validated or endorsed TA-14. Conference-related factual corrections are welcomed. This surface is intended to remain as the pre-presentation record and may be extended downward after the conference with questions, corrections, responses and subsequent examination material.</div>
 </section>
+<section style={{padding:"76px 6vw",background:"#eef7fa",borderTop:"1px solid #c9dce4"}}>
+<div style={{maxWidth:1160,margin:"auto"}}>
+<p style={{fontWeight:950,letterSpacing:2,fontSize:10,color:"#08799f"}}>10 · PRESENTATION RECORD · 29 SEP 2026</p>
+<h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(40px,5vw,66px)",lineHeight:1.02,letterSpacing:"-.04em",maxWidth:980}}>Presentation delivered. Public surface preserved. The record remains open.</h2>
+<p style={{fontFamily:"Georgia,serif",fontSize:19,lineHeight:1.75,maxWidth:920}}>Greggory Don Butler delivered the remote oral presentation to the EDIAQI Indoor Air Quality Conference in Zagreb using this public showroom as the live presentation surface. The screen was shared in Microsoft Teams and the showroom was scrolled in sequence with the spoken presentation so the visual record and oral argument remained aligned.</p>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:30}}>
+<article style={{background:"#fff",border:"1px solid #d2e0e5",padding:25}}><small style={{fontWeight:950,color:"#08799f",letterSpacing:1.4}}>DELIVERY</small><h3 style={{fontFamily:"Georgia,serif",fontSize:27}}>Completed live</h3><p style={{lineHeight:1.7,color:"#52666e"}}>The full seven-minute presentation was delivered remotely on 29 September 2026.</p></article>
+<article style={{background:"#fff",border:"1px solid #d2e0e5",padding:25}}><small style={{fontWeight:950,color:"#08799f",letterSpacing:1.4}}>PRESENTATION SURFACE</small><h3 style={{fontFamily:"Georgia,serif",fontSize:27}}>This showroom was used live</h3><p style={{lineHeight:1.7,color:"#52666e"}}>The public page itself served as the visual presentation surface while the argument was delivered and scrolled in sequence.</p></article>
+<article style={{background:"#fff",border:"1px solid #d2e0e5",padding:25}}><small style={{fontWeight:950,color:"#08799f",letterSpacing:1.4}}>Q&A</small><h3 style={{fontFamily:"Georgia,serif",fontSize:27}}>Questions raised: 0</h3><p style={{lineHeight:1.7,color:"#52666e"}}>No audience questions were raised during the allotted question period. This records the event as it occurred; it does not infer why no questions were asked.</p></article>
+</div>
+<div style={{marginTop:34,padding:32,background:"#062b3a",color:"#fff"}}>
+<p style={{fontWeight:950,letterSpacing:1.6,fontSize:10,color:"#6bddff"}}>THE RECORD REMAINS OPEN</p>
+<p style={{fontFamily:"Georgia,serif",fontSize:27,lineHeight:1.5,marginBottom:0}}>Questions, corrections, technical challenges, equivalent mechanisms and examination requests may be added below this preserved presentation record as they arise.</p>
+</div>
+<div style={{marginTop:28,padding:24,background:"#fff",border:"1px solid #d2e0e5",fontSize:13,lineHeight:1.75,color:"#455c65"}}><strong>Preservation rule.</strong> The material above remains the public presentation surface used for the conference. Post-presentation developments are appended beneath it rather than rewriting the record of what was presented.</div>
+</div></section>
 <footer style={{padding:"34px 6vw",background:"#02141c",color:"#8ca6b0",fontSize:10,letterSpacing:1,lineHeight:1.7}}><div style={{maxWidth:1160,margin:"auto"}}>🇭🇷 CROATIA · EDIAQI × TA-14 · PUBLIC CONFERENCE SURFACE · MONITORING → GOVERNANCE → CONSEQUENCE · NO ENDORSEMENT IMPLIED · TA-14 EXCHANGE</div></footer>
 </main>;
 }
