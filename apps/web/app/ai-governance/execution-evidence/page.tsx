@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'AI Execution Evidence: Authority, Changed Conditions, Refusal & Proof | TA-14',
   description: 'A practical hub for proving AI execution claims: changed authorization, changed evidence, unauthorized execution, refusal, blocking, and replayable evidence.',
-  alternates: { canonical: 'https://ta14exchange.com/ai-governance/execution-evidence' },
+  alternates: { canonical: 'https://www.ta14exchange.com/ai-governance/execution-evidence' },
 };
 
 const problems = [

@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'AI Agent Audit Trail: What Should It Actually Prove? | TA-14',
   description: 'A practical guide to AI agent audit trails: authority, evidence, commitment, execution, outcome, replay, and the difference between logs and proof.',
-  alternates: { canonical: 'https://ta14exchange.com/ai-governance/ai-agent-audit-trail' },
+  alternates: { canonical: 'https://www.ta14exchange.com/ai-governance/ai-agent-audit-trail' },
 };
 
 const faq = [

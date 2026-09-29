@@ -11,6 +11,7 @@ import { SixthWorldNativeDominance } from '../components/sixth-world-native-domi
 import { SixthWorldUAEStandard } from '../components/sixth-world-uae-standard';
 import { EIGGlobalInstitutionalBridge } from '../components/eig-global-institutional-bridge';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
+import { CANONICAL_EXCHANGE_ORIGIN } from '../lib/site/canonical-origin';
 
 import './globals.css';
 import './activity-dock.css';
@@ -19,7 +20,7 @@ import './guatemala-flag-fix.css';
 const GA_MEASUREMENT_ID = 'G-QENCGQJ41B';
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://ta14exchange.com'),
+  metadataBase: new URL(CANONICAL_EXCHANGE_ORIGIN),
   title: { default: 'TA-14 Authority Governance Institution', template: '%s | TA-14 Authority Governance Institution' },
   description: 'Govern AI systems, evidence, obligations, decisions, change, and consequence through TA-14 admissible execution records and governed operating worlds.',
   applicationName: 'TA-14 Authority Governance Institution',

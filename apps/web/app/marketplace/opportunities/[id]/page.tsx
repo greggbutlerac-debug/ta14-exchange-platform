@@ -1,592 +1,768 @@
-// apps/web/app/marketplace/opportunities/[id]/page.tsx
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
-import { useParams } from 'next/navigation';
 
-type OpportunityStatus = 'OPEN' | 'REVIEWING' | 'MATCHED' | 'CLOSED';
+import IdRecordDetail from './id-record-detail';
 
-type Opportunity = {
-  id: string;
+import {
+  marketplaceActions,
+  marketplaceRoutes,
+} from '../../../../lib/marketplace-routes';
+
+type OpportunityRecord = {
+  slug: string;
   title: string;
-  organization: string;
   domain: string;
-  status: OpportunityStatus;
-  visibility: 'PUBLIC DEMONSTRATION' | 'PRIVATE DEMONSTRATION';
+  state: 'OPEN' | 'INVITATION ONLY' | 'PREVIEW';
+  visibility: string;
   summary: string;
+  problem: string;
   consequentialAction: string;
-  requestedDeliverables: string[];
-  evidenceAvailable: string[];
-  evidenceMissing: string[];
-  qualifications: string[];
-  timeline: string;
+  deliverable: string;
   budget: string;
-  posted: string;
-  responseDeadline: string;
-  reviewBoundary: string;
-  routeOutcome: 'READY FOR REVIEW' | 'PARTIAL' | 'HOLD';
+  timing: string;
+  postedBy: string;
+  postedDate: string;
+  proposalDeadline: string;
+  evidence: string[];
+  gaps: string[];
+  qualifications: string[];
+  responsibilities: string[];
+  proofBoundaries: string[];
+  milestones: {
+    title: string;
+    description: string;
+  }[];
 };
 
-const MARKETPLACE_ROUTES = {
-  home: '/marketplace',
-  opportunities: '/marketplace/opportunities',
-  professionals: '/marketplace/professionals',
-  postNeed: '/marketplace/post-a-need',
-} as const;
-
-const OPPORTUNITIES: Opportunity[] = [
+const opportunityRecords: OpportunityRecord[] = [
   {
-    id: 'TA-14-MKT-OPP-001',
-    title: 'Independent review of an AI hiring governance route',
-    organization: 'Northstar Workforce Systems',
-    domain: 'AI Governance / Employment',
-    status: 'OPEN',
-    visibility: 'PUBLIC DEMONSTRATION',
+    slug: 'high-risk-vendor-payment-approval-route',
+    title: 'High-Risk Vendor Payment Approval Route',
+    domain: 'Financial Execution Governance',
+    state: 'OPEN',
+    visibility: 'Public demonstration opportunity',
     summary:
-      'A workforce technology provider is seeking an independent, bounded review of a proposed AI-assisted candidate screening route before expanding deployment into the European Union.',
+      'Design a bounded consequential execution route that prevents vendor payment when procurement authority, financial authority, beneficiary identity, or evidence continuity is unresolved.',
+    problem:
+      'The current approval process can collect multiple approvals without proving that the approving parties hold current authority, that the beneficiary is the intended recipient, or that the evidence presented belongs to the same transaction state.',
     consequentialAction:
-      'The system may influence whether applicants advance, are delayed, or are excluded from further review. The requester wants the route evaluated for role clarity, evidence sufficiency, human oversight, logging, and likely EU AI Act high-risk obligations.',
-    requestedDeliverables: [
-      'Provider and deployer role analysis',
-      'Annex III and Article 6 classification pathway',
-      'Requirement-to-evidence map',
-      'Human-oversight and escalation review',
-      'Bounded gap report',
-      'Independent review record',
+      'Release or withhold a vendor payment valued at $27,500 or more.',
+    deliverable:
+      'A complete route architecture, declared decision logic, evidence requirements, authority checks, challenge states, replay cases, and bounded verification record.',
+    budget: '$3,200 fixed scope',
+    timing: 'Requested within 12 days',
+    postedBy: 'Demonstration Organization',
+    postedDate: 'July 21, 2026',
+    proposalDeadline: 'Preview only - proposals are not yet connected',
+    evidence: [
+      'Demonstration purchase order',
+      'Demonstration invoice',
+      'Procurement approval record',
+      'Finance approval record',
+      'Beneficiary identity record',
     ],
-    evidenceAvailable: [
-      'System architecture overview',
-      'Model card and intended-purpose statement',
-      'Candidate-screening workflow diagram',
-      'Current human-review procedure',
-      'Sample decision logs',
-    ],
-    evidenceMissing: [
-      'Validated bias and performance testing record',
-      'Formal Article 9 risk-management record',
-      'Complete data-governance provenance package',
-      'Fundamental-rights impact assessment',
+    gaps: [
+      'Current procurement authority has not been proven.',
+      'Current finance authority has not been proven.',
+      'Beneficiary identity is not yet bound to the approved vendor record.',
+      'No replay record exists for conflicting approval states.',
     ],
     qualifications: [
-      'AI governance or EU AI Act experience',
-      'Employment or workforce-system knowledge',
-      'Independent review capability',
-      'Evidence-mapping and documentation experience',
+      'AI governance architecture',
+      'Financial controls',
+      'Consequential execution design',
+      'Evidence continuity',
+      'Route verification and replay',
     ],
-    timeline: '30 days from engagement',
-    budget: '$4,000-$7,500 demonstration range',
-    posted: 'July 21, 2026',
-    responseDeadline: 'August 15, 2026',
-    reviewBoundary:
-      'The engagement requests a bounded governance review. It does not request legal representation, certification, conformity assessment, or a regulator determination.',
-    routeOutcome: 'PARTIAL',
+    responsibilities: [
+      'Translate the declared problem into a bounded execution route.',
+      'Separate evidence, authority, approval, verification, and execution roles.',
+      'Define ALLOW, HOLD, DENY, and ESCALATE conditions.',
+      'Create test cases for missing, stale, contradictory, and valid evidence.',
+      'Declare what the route proves and what remains outside scope.',
+    ],
+    proofBoundaries: [
+      'The route does not prove that an invoice is commercially reasonable.',
+      'The route does not replace legal, accounting, tax, or sanctions review.',
+      'The route does not execute payment by itself.',
+      'Verification is limited to the declared cases and supplied evidence model.',
+    ],
+    milestones: [
+      {
+        title: 'Problem and Authority Review',
+        description:
+          'Confirm the consequential action, authority holders, evidence classes, exclusions, and route boundaries.',
+      },
+      {
+        title: 'Route Architecture',
+        description:
+          'Draft the decision sequence, evidence gates, authority checks, and exception handling.',
+      },
+      {
+        title: 'Replay and Challenge Cases',
+        description:
+          'Test valid, missing, stale, conflicting, and manipulated evidence scenarios.',
+      },
+      {
+        title: 'Verification Package',
+        description:
+          'Preserve the route version, test results, limitations, reviewer identity, and declared proof boundaries.',
+      },
+    ],
   },
   {
-    id: 'TA-14-MKT-OPP-002',
-    title: 'Governed environmental record interpretation for a school',
-    organization: 'Demonstration Public Facilities Group',
-    domain: 'Environmental Integrity / Buildings',
-    status: 'OPEN',
-    visibility: 'PUBLIC DEMONSTRATION',
+    slug: 'hospital-environmental-record-framework',
+    title: 'Hospital Environmental Record Framework',
+    domain: 'Healthcare Environmental Governance',
+    state: 'INVITATION ONLY',
+    visibility: 'Invitation-only demonstration opportunity',
     summary:
-      'A facilities group wants a governed interpretation pathway for building atmospheric records covering classrooms, mechanical spaces, and occupied common areas.',
+      'Create a governed environmental record framework for a hospital environment with attributable contributors, continuity review, interpretation boundaries, and daily preservation.',
+    problem:
+      'Environmental data may exist across building systems, laboratories, facilities teams, clinicians, and external vendors without a governed record that preserves identity, continuity, interpretation scope, and proof boundaries.',
     consequentialAction:
-      'The resulting interpretation may inform maintenance prioritization, occupant communication, and requests for additional investigation.',
-    requestedDeliverables: [
-      'Record intake and identity review',
-      'Continuity and admissibility assessment',
-      'Governed interpretation record',
-      'Evidence-gap report',
-      'Post-intervention comparison route',
+      'Issue and preserve a hospital environmental record and governed interpretation that may inform operational review.',
+    deliverable:
+      'Record architecture, contributor roles, evidence schema, continuity controls, interpretation boundaries, review workflow, and preservation requirements.',
+    budget: '$12,000 proposed budget',
+    timing: 'Four-week target',
+    postedBy: 'Demonstration Healthcare Organization',
+    postedDate: 'July 21, 2026',
+    proposalDeadline: 'Invitation workflow not yet connected',
+    evidence: [
+      'Building sensor exports',
+      'HVAC service records',
+      'Laboratory reports',
+      'Room pressure records',
+      'Facilities incident history',
     ],
-    evidenceAvailable: [
-      'Seven days of sensor exports',
-      'Building floor plan',
-      'HVAC equipment schedule',
-      'Maintenance chronology',
-    ],
-    evidenceMissing: [
-      'Calibrated instrument certificates',
-      'Outdoor reference conditions',
-      'Contributor identity record for two data periods',
+    gaps: [
+      'No unified record steward has been declared.',
+      'Evidence continuity differs across source systems.',
+      'Interpretations are not consistently separated from diagnosis.',
+      'No shared proof-boundary language exists.',
     ],
     qualifications: [
-      'Building science or HVAC expertise',
-      'Environmental record interpretation',
-      'Evidence continuity review',
-      'Ability to preserve diagnostic boundaries',
+      'Healthcare operations',
+      'Environmental records',
+      'Indoor environmental quality',
+      'Evidence continuity',
+      'Governed interpretation',
     ],
-    timeline: '21 days',
-    budget: '$2,500-$5,000 demonstration range',
-    posted: 'July 20, 2026',
-    responseDeadline: 'August 10, 2026',
-    reviewBoundary:
-      'The requested work concerns record interpretation and continuity. Diagnosis and optimization remain separate scopes.',
-    routeOutcome: 'HOLD',
+    responsibilities: [
+      'Define the hospital environmental record structure.',
+      'Separate source record, interpretation, diagnosis, and optimization.',
+      'Declare bounded contributor roles and permissions.',
+      'Define review, correction, supersession, and preservation states.',
+      'Create a daily governed record workflow.',
+    ],
+    proofBoundaries: [
+      'The framework does not diagnose a patient or occupant.',
+      'The record does not prove causation without additional evidence.',
+      'The framework does not replace clinical judgment.',
+      'Interpretation remains limited to the evidence actually preserved.',
+    ],
+    milestones: [
+      {
+        title: 'Source and Contributor Mapping',
+        description:
+          'Identify source systems, responsible parties, evidence classes, and custody transitions.',
+      },
+      {
+        title: 'Record Schema',
+        description:
+          'Define required fields, continuity controls, version states, and contributor permissions.',
+      },
+      {
+        title: 'Interpretation Boundaries',
+        description:
+          'Separate what the record shows from diagnosis, attribution, and optimization.',
+      },
+      {
+        title: 'Daily Preservation Workflow',
+        description:
+          'Create the repeatable process for issuance, review, correction, and archival.',
+      },
+    ],
+  },
+  {
+    slug: 'hvac-baseline-post-intervention-record',
+    title: 'HVAC Baseline and Post-Intervention Record',
+    domain: 'HVAC Performance Governance',
+    state: 'PREVIEW',
+    visibility: 'Public demonstration opportunity',
+    summary:
+      'Create an evidence-governed workflow that preserves original operating state, declared diagnostic determinations, intervention evidence, and post-intervention performance comparison.',
+    problem:
+      'HVAC work is often performed without a complete baseline, without declared evidence-bound determinations, and without a post-intervention record proving what changed.',
+    consequentialAction:
+      'Authorize intervention, declare completion, and represent that system performance improved.',
+    deliverable:
+      'Baseline record, evidence requirements, diagnostic-determination structure, intervention record, post-state comparison, and bounded performance report.',
+    budget: '$2,100 fixed scope',
+    timing: 'Two-week target',
+    postedBy: 'Demonstration Mechanical Contractor',
+    postedDate: 'July 21, 2026',
+    proposalDeadline: 'Preview only - proposals are not yet connected',
+    evidence: [
+      'Equipment identification',
+      'Electrical measurements',
+      'Airflow and static-pressure measurements',
+      'Refrigerant-system measurements',
+      'Pre-intervention and post-intervention video',
+    ],
+    gaps: [
+      'Original state is not consistently preserved.',
+      'Diagnostic determinations are often mixed with interventions.',
+      'Performance claims are not tied to baseline comparison.',
+      'Evidence timing and technician identity may be incomplete.',
+    ],
+    qualifications: [
+      'HVAC diagnostics',
+      'Performance measurement',
+      'Evidence-governed records',
+      'Refrigerant-system analysis',
+      'Post-intervention verification',
+    ],
+    responsibilities: [
+      'Define the non-invasive baseline sequence.',
+      'Separate measurements from diagnostic determinations.',
+      'Declare intervention authorization and execution evidence.',
+      'Create post-intervention comparison requirements.',
+      'State what improvement can and cannot be claimed.',
+    ],
+    proofBoundaries: [
+      'The record does not guarantee future equipment life.',
+      'The record does not prove causation beyond measured evidence.',
+      'The record does not replace manufacturer requirements.',
+      'Post-state comparison is limited to the declared test conditions.',
+    ],
+    milestones: [
+      {
+        title: 'Baseline Definition',
+        description:
+          'Declare required original-state evidence before intervention is authorized.',
+      },
+      {
+        title: 'Determination Structure',
+        description:
+          'Separate observations, measurements, evidence-bound determinations, and exclusions.',
+      },
+      {
+        title: 'Intervention Record',
+        description:
+          'Preserve authorization, technician identity, action, materials, and timestamps.',
+      },
+      {
+        title: 'Post-State Comparison',
+        description:
+          'Compare performance against the original state under declared conditions.',
+      },
+    ],
   },
 ];
 
-function getOpportunity(id: string | undefined): Opportunity {
-  return OPPORTUNITIES.find((opportunity) => opportunity.id === id) ?? OPPORTUNITIES[0];
+function findOpportunity(slug: string) {
+  return opportunityRecords.find((record) => record.slug === slug);
 }
 
-function StatusBadge({
-  status,
-  outcome,
+export function generateStaticParams() {
+  return opportunityRecords.map((record) => ({
+    id: record.slug,
+  }));
+}
+
+export async function generateMetadata({
+  params,
 }: {
-  status: OpportunityStatus;
-  outcome: Opportunity['routeOutcome'];
-}) {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id: slug } = await params;
+  const opportunity = findOpportunity(slug);
+
+  if (!opportunity) {
+    // Not a slug record: the ID-addressed page renders with the inherited default metadata.
+    return {};
+  }
+
+  return {
+    title: opportunity.title,
+    description: opportunity.summary,
+  };
+}
+
+function ArrowIcon() {
   return (
-    <div className="status-row">
-      <span className={`status-badge status-${status.toLowerCase()}`}>{status}</span>
-      <span className={`outcome-badge outcome-${outcome.toLowerCase().replaceAll(' ', '-')}`}>
-        {outcome}
-      </span>
-    </div>
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+    >
+      <path
+        d="M5 12h14M13 6l6 6-6 6"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
   );
 }
 
-export default function MarketplaceOpportunityDetailPage() {
-  const params = useParams<{ id: string }>();
-  const opportunity = useMemo(() => getOpportunity(params?.id), [params?.id]);
+function CheckIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+    >
+      <path
+        d="m5 12.5 4 4L19 7"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
-  const [applicationOpen, setApplicationOpen] = useState(false);
-  const [questionOpen, setQuestionOpen] = useState(false);
-  const [submitted, setSubmitted] = useState<'application' | 'question' | null>(null);
+function AlertIcon() {
+  return (
+    <svg
+      aria-hidden="true"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+    >
+      <path
+        d="M12 8v5M12 17.2v.1M10.3 3.7 2.7 17a2 2 0 0 0 1.7 3h15.2a2 2 0 0 0 1.7-3L13.7 3.7a2 2 0 0 0-3.4 0Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
-  const submitDemo = (kind: 'application' | 'question') => {
-    setSubmitted(kind);
-    setApplicationOpen(false);
-    setQuestionOpen(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
+export default async function OpportunityDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id: slug } = await params;
+  const opportunity = findOpportunity(slug);
+
+  if (!opportunity) {
+    // Not a slug record: render the ID-addressed record page (canonical in-app links use IDs).
+    return <IdRecordDetail />;
+  }
 
   return (
-    <main className="page-shell">
-      <div className="cosmos" aria-hidden="true">
-        <span className="star star-one" />
-        <span className="star star-two" />
-        <span className="star star-three" />
-        <span className="star star-four" />
-        <span className="orbit orbit-one">
-          <span />
-        </span>
-        <span className="orbit orbit-two">
-          <span />
-        </span>
-        <span className="route route-one" />
-        <span className="route route-two" />
+    <main className="opportunityPage">
+      <div className="backgroundLayer" aria-hidden="true">
+        <div className="glow glowOne" />
+        <div className="glow glowTwo" />
+        <div className="star starOne" />
+        <div className="star starTwo" />
+        <div className="star starThree" />
+        <div className="line lineOne" />
+        <div className="line lineTwo" />
       </div>
 
-      <div className="content-shell">
-        <nav className="breadcrumbs" aria-label="Breadcrumb">
-          <Link href={MARKETPLACE_ROUTES.home}>Marketplace</Link>
-          <span>/</span>
-          <Link href={MARKETPLACE_ROUTES.opportunities}>Opportunities</Link>
-          <span>/</span>
-          <span>{opportunity.id}</span>
-        </nav>
+      <section className="heroSection">
+        <div className="pageShell">
+          <Link className="backLink" href={marketplaceRoutes.opportunities}>
+            <span aria-hidden="true">←</span>
+            Back to Marketplace Opportunities
+          </Link>
 
-        {submitted ? (
-          <section className="submission-confirmation" aria-live="polite">
-            <span className="eyebrow">DEMONSTRATION ONLY</span>
-            <h1>
-              {submitted === 'application'
-                ? 'Your application preview has been created.'
-                : 'Your question preview has been created.'}
-            </h1>
-            <p>
-              No information was transmitted or persisted. This page demonstrates the future
-              Marketplace interaction while preserving the boundary that no live matching,
-              messaging, identity verification, payment, or engagement has occurred.
-            </p>
-            <div className="action-row">
-              <button className="primary-button" type="button" onClick={() => setSubmitted(null)}>
-                Return to opportunity
-              </button>
-              <Link className="secondary-button" href={MARKETPLACE_ROUTES.opportunities}>
-                Browse opportunities
-              </Link>
-            </div>
-          </section>
-        ) : (
-          <>
-            <header className="hero">
-              <div className="hero-meta">
-                <span className="eyebrow">{opportunity.visibility}</span>
-                <span className="record-id">{opportunity.id}</span>
+          <div className="heroGrid">
+            <div className="heroCopy">
+              <div className="heroTopline">
+                <span className="stateBadge">{opportunity.state}</span>
+                <span className="demoBadge">DEMONSTRATION RECORD</span>
               </div>
 
-              <StatusBadge status={opportunity.status} outcome={opportunity.routeOutcome} />
-
+              <span className="kicker">{opportunity.domain}</span>
               <h1>{opportunity.title}</h1>
-              <p className="organization">{opportunity.organization}</p>
-              <p className="hero-copy">{opportunity.summary}</p>
+              <p className="heroLead">{opportunity.summary}</p>
 
-              <div className="hero-facts">
-                <article>
-                  <span>Domain</span>
-                  <strong>{opportunity.domain}</strong>
-                </article>
-                <article>
-                  <span>Timeline</span>
-                  <strong>{opportunity.timeline}</strong>
-                </article>
-                <article>
-                  <span>Budget</span>
-                  <strong>{opportunity.budget}</strong>
-                </article>
-                <article>
-                  <span>Response deadline</span>
-                  <strong>{opportunity.responseDeadline}</strong>
-                </article>
+              <div className="heroActions">
+                <a className="primaryButton" href="#apply">
+                  Review application boundary
+                  <ArrowIcon />
+                </a>
+                <a className="secondaryButton" href="#scope">
+                  Read full scope
+                </a>
               </div>
 
-              <div className="action-row">
-                <button
-                  className="primary-button"
-                  type="button"
-                  onClick={() => {
-                    setApplicationOpen(true);
-                    setQuestionOpen(false);
-                  }}
-                >
-                  Apply to this opportunity
-                </button>
-                <button
-                  className="secondary-button"
-                  type="button"
-                  onClick={() => {
-                    setQuestionOpen(true);
-                    setApplicationOpen(false);
-                  }}
-                >
-                  Ask a scoped question
-                </button>
-                <Link className="text-link" href={MARKETPLACE_ROUTES.postNeed}>
-                  Post a governance need
-                </Link>
+              <div className="boundaryNotice">
+                <AlertIcon />
+                <span>
+                  This is a demonstration opportunity record. Applications,
+                  messaging, proposal submission, contracting, file exchange,
+                  and payments are not yet connected.
+                </span>
               </div>
-            </header>
+            </div>
 
-            <section className="governed-sequence" aria-label="Opportunity workflow">
+            <aside className="summaryCard" aria-label="Opportunity summary">
+              <div className="summaryHeader">
+                <span>OPPORTUNITY SUMMARY</span>
+                <strong>{opportunity.visibility}</strong>
+              </div>
+
+              <dl>
+                <div>
+                  <dt>Budget</dt>
+                  <dd>{opportunity.budget}</dd>
+                </div>
+                <div>
+                  <dt>Timing</dt>
+                  <dd>{opportunity.timing}</dd>
+                </div>
+                <div>
+                  <dt>Posted by</dt>
+                  <dd>{opportunity.postedBy}</dd>
+                </div>
+                <div>
+                  <dt>Posted</dt>
+                  <dd>{opportunity.postedDate}</dd>
+                </div>
+                <div>
+                  <dt>Proposal status</dt>
+                  <dd>{opportunity.proposalDeadline}</dd>
+                </div>
+              </dl>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section className="sectionBlock" id="scope">
+        <div className="pageShell contentGrid">
+          <div className="mainColumn">
+            <article className="contentCard">
+              <span className="sectionKicker">THE PROBLEM</span>
+              <h2>What must be governed</h2>
+              <p>{opportunity.problem}</p>
+            </article>
+
+            <article className="contentCard">
+              <span className="sectionKicker">CONSEQUENTIAL ACTION</span>
+              <h2>What may occur</h2>
+              <p>{opportunity.consequentialAction}</p>
+            </article>
+
+            <article className="contentCard">
+              <span className="sectionKicker">REQUESTED DELIVERABLE</span>
+              <h2>What must be produced</h2>
+              <p>{opportunity.deliverable}</p>
+            </article>
+
+            <article className="contentCard">
+              <span className="sectionKicker">RESPONSIBILITIES</span>
+              <h2>What the selected contributor must do</h2>
+
+              <div className="checkList">
+                {opportunity.responsibilities.map((item) => (
+                  <div className="checkItem" key={item}>
+                    <CheckIcon />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="contentCard">
+              <span className="sectionKicker">MILESTONES</span>
+              <h2>Proposed work sequence</h2>
+
+              <div className="milestoneList">
+                {opportunity.milestones.map((milestone, index) => (
+                  <div className="milestone" key={milestone.title}>
+                    <div className="milestoneNumber">
+                      {String(index + 1).padStart(2, '0')}
+                    </div>
+                    <div>
+                      <h3>{milestone.title}</h3>
+                      <p>{milestone.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </article>
+
+            <article className="contentCard proofCard">
+              <span className="sectionKicker">PROOF BOUNDARIES</span>
+              <h2>What the work must not overclaim</h2>
+
+              <div className="boundaryList">
+                {opportunity.proofBoundaries.map((item) => (
+                  <div className="boundaryItem" key={item}>
+                    <AlertIcon />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </article>
+          </div>
+
+          <aside className="sideColumn">
+            <div className="sideCard">
+              <span className="sectionKicker">AVAILABLE EVIDENCE</span>
+              <h3>Evidence already declared</h3>
+
+              <div className="chipList">
+                {opportunity.evidence.map((item) => (
+                  <span className="chip" key={item}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="sideCard warningCard">
+              <span className="sectionKicker">KNOWN GAPS</span>
+              <h3>What remains unresolved</h3>
+
+              <div className="smallList">
+                {opportunity.gaps.map((item) => (
+                  <div key={item}>
+                    <AlertIcon />
+                    <span>{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="sideCard">
+              <span className="sectionKicker">QUALIFICATIONS</span>
+              <h3>Requested competence</h3>
+
+              <div className="chipList">
+                {opportunity.qualifications.map((item) => (
+                  <span className="chip" key={item}>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="sideCard governanceCard">
+              <span className="sectionKicker">TA-14 DECISION STATES</span>
+              <h3>Route outcomes</h3>
+
+              <div className="decisionList">
+                <span>ALLOW</span>
+                <span>HOLD</span>
+                <span>DENY</span>
+                <span>ESCALATE</span>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section className="sectionBlock sectionTint" id="apply">
+        <div className="pageShell applicationPanel">
+          <div>
+            <span className="sectionKicker">APPLICATION BOUNDARY</span>
+            <h2>Apply with a bounded proposal, not a generic claim.</h2>
+            <p>
+              The connected workflow will require the applicant to declare
+              relevant qualifications, proposed method, exclusions, conflicts,
+              timing, price, deliverables, and the evidence needed to perform
+              the work.
+            </p>
+
+            <div className="applicationRequirements">
               {[
-                'Need preserved',
-                'Scope reviewed',
-                'Evidence declared',
-                'Professional selected',
-                'Work bounded',
-                'Review preserved',
-              ].map((step, index) => (
-                <div className="sequence-step" key={step}>
-                  <span>{String(index + 1).padStart(2, '0')}</span>
-                  <strong>{step}</strong>
+                'Identity and organization',
+                'Relevant qualifications',
+                'Proposed method',
+                'Declared exclusions',
+                'Conflict disclosure',
+                'Timeline and price',
+                'Required evidence',
+                'Proof-boundary agreement',
+              ].map((item) => (
+                <div key={item}>
+                  <CheckIcon />
+                  <span>{item}</span>
                 </div>
               ))}
-            </section>
-
-            {(applicationOpen || questionOpen) && (
-              <section className="interaction-panel">
-                <div className="interaction-heading">
-                  <div>
-                    <span className="eyebrow">DEMONSTRATION INTERACTION</span>
-                    <h2>{applicationOpen ? 'Application preview' : 'Scoped question preview'}</h2>
-                  </div>
-                  <button
-                    className="close-button"
-                    type="button"
-                    onClick={() => {
-                      setApplicationOpen(false);
-                      setQuestionOpen(false);
-                    }}
-                    aria-label="Close interaction panel"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                {applicationOpen ? (
-                  <div className="form-grid">
-                    <label>
-                      Professional or organization
-                      <input placeholder="Name" />
-                    </label>
-                    <label>
-                      Relevant expertise
-                      <textarea
-                        rows={4}
-                        placeholder="Explain your relevant governance, technical, legal, review, or domain experience."
-                      />
-                    </label>
-                    <label>
-                      Proposed scope
-                      <textarea
-                        rows={5}
-                        placeholder="Describe what you can review, produce, verify, or preserve—and what remains outside your scope."
-                      />
-                    </label>
-                    <label>
-                      Independence and conflicts
-                      <textarea
-                        rows={4}
-                        placeholder="Disclose any conflicts, prior involvement, commercial relationships, or limitations."
-                      />
-                    </label>
-                    <button
-                      className="primary-button"
-                      type="button"
-                      onClick={() => submitDemo('application')}
-                    >
-                      Create application preview
-                    </button>
-                  </div>
-                ) : (
-                  <div className="form-grid">
-                    <label>
-                      Your question
-                      <textarea
-                        rows={5}
-                        placeholder="Ask a question about scope, evidence, timeline, deliverables, qualifications, or review boundaries."
-                      />
-                    </label>
-                    <label>
-                      Why the answer matters
-                      <textarea
-                        rows={4}
-                        placeholder="Explain how the answer changes your ability to respond or define a bounded scope."
-                      />
-                    </label>
-                    <button
-                      className="primary-button"
-                      type="button"
-                      onClick={() => submitDemo('question')}
-                    >
-                      Create question preview
-                    </button>
-                  </div>
-                )}
-              </section>
-            )}
-
-            <div className="detail-layout">
-              <div className="main-column">
-                <section className="detail-card">
-                  <div className="section-heading">
-                    <span>01</span>
-                    <div>
-                      <h2>Consequential action</h2>
-                      <p>What may bind, change, deny, approve, release, or affect someone?</p>
-                    </div>
-                  </div>
-                  <p className="body-copy">{opportunity.consequentialAction}</p>
-                </section>
-
-                <section className="detail-card">
-                  <div className="section-heading">
-                    <span>02</span>
-                    <div>
-                      <h2>Requested deliverables</h2>
-                      <p>The declared outputs expected from the engagement.</p>
-                    </div>
-                  </div>
-                  <div className="item-grid">
-                    {opportunity.requestedDeliverables.map((item) => (
-                      <article className="item-card" key={item}>
-                        <span className="check-mark">✓</span>
-                        <strong>{item}</strong>
-                      </article>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="detail-card">
-                  <div className="section-heading">
-                    <span>03</span>
-                    <div>
-                      <h2>Evidence state</h2>
-                      <p>Available evidence and declared gaps remain visibly separate.</p>
-                    </div>
-                  </div>
-
-                  <div className="evidence-columns">
-                    <div className="evidence-panel available">
-                      <h3>Evidence available</h3>
-                      <ul>
-                        {opportunity.evidenceAvailable.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div className="evidence-panel missing">
-                      <h3>Evidence missing or unresolved</h3>
-                      <ul>
-                        {opportunity.evidenceMissing.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </section>
-
-                <section className="detail-card">
-                  <div className="section-heading">
-                    <span>04</span>
-                    <div>
-                      <h2>Required qualifications</h2>
-                      <p>
-                        Evidence-based qualifications should replace popularity-based reputation.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="qualification-list">
-                    {opportunity.qualifications.map((item) => (
-                      <span key={item}>{item}</span>
-                    ))}
-                  </div>
-                </section>
-
-                <section className="detail-card">
-                  <div className="section-heading">
-                    <span>05</span>
-                    <div>
-                      <h2>Review boundary</h2>
-                      <p>The opportunity must not silently expand beyond the declared engagement.</p>
-                    </div>
-                  </div>
-                  <div className="boundary-box">
-                    <strong>Declared boundary</strong>
-                    <p>{opportunity.reviewBoundary}</p>
-                  </div>
-                </section>
-              </div>
-
-              <aside className="sidebar">
-                <section className="sidebar-card sticky-card">
-                  <span className="eyebrow">Opportunity record</span>
-                  <h2>Current declared state</h2>
-
-                  <dl>
-                    <div>
-                      <dt>Status</dt>
-                      <dd>{opportunity.status}</dd>
-                    </div>
-                    <div>
-                      <dt>Route readiness</dt>
-                      <dd>{opportunity.routeOutcome}</dd>
-                    </div>
-                    <div>
-                      <dt>Posted</dt>
-                      <dd>{opportunity.posted}</dd>
-                    </div>
-                    <div>
-                      <dt>Response deadline</dt>
-                      <dd>{opportunity.responseDeadline}</dd>
-                    </div>
-                    <div>
-                      <dt>Visibility</dt>
-                      <dd>{opportunity.visibility}</dd>
-                    </div>
-                  </dl>
-
-                  <div className="boundary-note">
-                    <strong>Marketplace boundary</strong>
-                    <p>
-                      A listing is not an endorsement, certification, identity verification,
-                      compliance finding, or promise of work.
-                    </p>
-                  </div>
-                </section>
-
-                <section className="sidebar-card">
-                  <span className="eyebrow">Related pathways</span>
-                  <div className="link-stack">
-                    <Link href={MARKETPLACE_ROUTES.professionals}>Browse professionals</Link>
-                    <Link href={MARKETPLACE_ROUTES.opportunities}>View all opportunities</Link>
-                    <Link href={MARKETPLACE_ROUTES.postNeed}>Post another need</Link>
-                  </div>
-                </section>
-              </aside>
             </div>
+          </div>
 
-            <section className="final-cta">
-              <span className="eyebrow">READY TO RESPOND?</span>
-              <h2>Bring a bounded scope, declared expertise, and visible limitations.</h2>
-              <p>
-                The Marketplace should preserve who proposed what, which evidence was available,
-                which boundaries were declared, and what work was ultimately accepted.
-              </p>
-              <div className="action-row centered-actions">
-                <button
-                  className="primary-button"
-                  type="button"
-                  onClick={() => {
-                    setApplicationOpen(true);
-                    setQuestionOpen(false);
-                    window.scrollTo({ top: 520, behavior: 'smooth' });
-                  }}
-                >
-                  Apply to opportunity
-                </button>
-                <Link className="secondary-button" href={MARKETPLACE_ROUTES.opportunities}>
-                  Browse more opportunities
-                </Link>
-              </div>
-            </section>
-          </>
-        )}
-      </div>
+          <div className="applicationAction">
+            <span>APPLICATIONS NOT CONNECTED</span>
+            <button type="button" disabled>
+              Submit bounded proposal
+            </button>
+            <small>
+              This control remains disabled until authenticated Marketplace
+              proposals are implemented.
+            </small>
+          </div>
+        </div>
+      </section>
 
-      <style jsx>{`
-        :global(*) {
+      <section className="finalSection">
+        <div className="pageShell finalPanel">
+          <div>
+            <span className="sectionKicker">MARKETPLACE PRINCIPLE</span>
+            <h2>
+              The opportunity record preserves the problem before contributors
+              propose the answer.
+            </h2>
+            <p>
+              Scope, evidence, authority, consequence, qualifications,
+              deliverables, and proof boundaries remain visible before work
+              begins.
+            </p>
+          </div>
+
+          <div className="finalActions">
+            <Link
+              aria-label={marketplaceActions.postNeed.description}
+              className="primaryButton"
+              href={marketplaceActions.postNeed.href}
+            >
+              Post a Governance Need
+              <ArrowIcon />
+            </Link>
+            <Link
+              className="secondaryButton"
+              href={marketplaceRoutes.home}
+            >
+              Return to Marketplace
+            </Link>
+          </div>
+
+          <div className="maxim">
+            No admissible evidence. No admissible execution.
+          </div>
+        </div>
+      </section>
+
+      <style>{`
+        :root {
+          --bg: #041019;
+          --panel: rgba(8, 29, 40, 0.84);
+          --border: rgba(118, 213, 220, 0.2);
+          --border-strong: rgba(118, 213, 220, 0.42);
+          --text: #f3fbfc;
+          --muted: #a9c1c8;
+          --teal: #67e0df;
+          --blue: #62a9ff;
+          --gold: #ffd878;
+          --violet: #bca4ff;
+          --red: #ff9d9d;
+        }
+
+        * {
           box-sizing: border-box;
         }
 
-        :global(html) {
+        html {
           scroll-behavior: smooth;
         }
 
-        :global(body) {
+        body {
           margin: 0;
-          color: #eef8ff;
-          background: #06111d;
+          background: var(--bg);
         }
 
-        :global(a) {
-          color: inherit;
-        }
-
-        button,
-        input,
-        textarea {
-          font: inherit;
-        }
-
-        .page-shell {
+        .opportunityPage {
+          position: relative;
           min-height: 100vh;
-          position: relative;
           overflow: hidden;
+          color: var(--text);
           background:
-            linear-gradient(rgba(4, 15, 26, 0.78), rgba(4, 15, 26, 0.97)),
-            radial-gradient(circle at 18% 5%, rgba(22, 139, 180, 0.17), transparent 34%),
-            radial-gradient(circle at 82% 8%, rgba(111, 70, 193, 0.13), transparent 31%);
+            radial-gradient(circle at 12% 8%, rgba(37, 185, 189, 0.15), transparent 30%),
+            radial-gradient(circle at 86% 18%, rgba(98, 169, 255, 0.12), transparent 28%),
+            linear-gradient(180deg, #031019 0%, #071821 54%, #031019 100%);
         }
 
-        .content-shell {
-          width: min(1180px, calc(100% - 36px));
-          margin: 0 auto;
-          padding: 34px 0 96px;
-          position: relative;
-          z-index: 2;
-        }
-
-        .cosmos {
+        .opportunityPage::before {
+          content: '';
           position: fixed;
           inset: 0;
           pointer-events: none;
-          opacity: 0.72;
+          opacity: 0.22;
+          background-image:
+            linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+          background-size: 42px 42px;
+          mask-image: linear-gradient(to bottom, black, transparent 88%);
+        }
+
+        .backgroundLayer {
+          position: absolute;
+          inset: 0;
+          z-index: 0;
+          overflow: hidden;
+          pointer-events: none;
+        }
+
+        .glow {
+          position: absolute;
+          width: 380px;
+          height: 380px;
+          border-radius: 50%;
+          filter: blur(90px);
+          opacity: 0.13;
+          animation: glowPulse 9s ease-in-out infinite;
+        }
+
+        .glowOne {
+          top: 4%;
+          left: -130px;
+          background: var(--teal);
+        }
+
+        .glowTwo {
+          top: 40%;
+          right: -150px;
+          background: var(--blue);
+          animation-delay: 3s;
+        }
+
+        .line {
+          position: absolute;
+          height: 1px;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(103, 224, 223, 0.58),
+            transparent
+          );
+          filter: drop-shadow(0 0 7px rgba(103, 224, 223, 0.35));
+          animation: lineMove 13s linear infinite;
+        }
+
+        .lineOne {
+          top: 13%;
+          left: -10%;
+          width: 46vw;
+          transform: rotate(17deg);
+        }
+
+        .lineTwo {
+          top: 58%;
+          right: -8%;
+          width: 38vw;
+          transform: rotate(-19deg);
+          animation-delay: -6s;
         }
 
         .star {
@@ -594,170 +770,103 @@ export default function MarketplaceOpportunityDetailPage() {
           width: 4px;
           height: 4px;
           border-radius: 50%;
-          background: #e8fbff;
-          box-shadow: 0 0 16px rgba(139, 229, 255, 0.95);
-          animation: drift 13s ease-in-out infinite;
+          background: white;
+          box-shadow: 0 0 12px white;
+          animation: twinkle 4.2s ease-in-out infinite;
         }
 
-        .star-one {
-          top: 15%;
-          left: 9%;
+        .starOne {
+          top: 7%;
+          left: 24%;
         }
 
-        .star-two {
-          top: 29%;
-          right: 12%;
-          animation-delay: -5s;
+        .starTwo {
+          top: 16%;
+          right: 14%;
+          animation-delay: 1.2s;
         }
 
-        .star-three {
-          bottom: 24%;
-          left: 14%;
-          animation-delay: -9s;
+        .starThree {
+          top: 44%;
+          left: 7%;
+          animation-delay: 2.4s;
         }
 
-        .star-four {
-          bottom: 12%;
-          right: 16%;
-          animation-delay: -3s;
+        .pageShell {
+          position: relative;
+          z-index: 2;
+          width: min(1160px, calc(100% - 40px));
+          margin: 0 auto;
         }
 
-        .orbit {
-          position: absolute;
-          width: 320px;
-          height: 320px;
-          border: 1px solid rgba(103, 205, 233, 0.12);
-          border-radius: 50%;
-          animation: rotate 32s linear infinite;
+        .heroSection {
+          padding: 86px 0 90px;
         }
 
-        .orbit span {
-          position: absolute;
-          width: 9px;
-          height: 9px;
-          border-radius: 50%;
-          background: #84e7fa;
-          box-shadow: 0 0 20px rgba(99, 218, 242, 0.9);
-          left: 50%;
-          top: -5px;
+        .backLink {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 52px;
+          color: var(--muted);
+          text-decoration: none;
+          font-size: 0.9rem;
+          font-weight: 700;
+          transition: color 180ms ease, transform 180ms ease;
         }
 
-        .orbit-one {
-          right: -165px;
-          top: 5%;
+        .backLink:hover {
+          color: var(--teal);
+          transform: translateX(-3px);
         }
 
-        .orbit-two {
-          left: -185px;
-          bottom: 12%;
-          width: 390px;
-          height: 390px;
-          animation-direction: reverse;
+        .heroGrid {
+          display: grid;
+          grid-template-columns: minmax(0, 1.08fr) minmax(360px, 0.72fr);
+          gap: 58px;
+          align-items: start;
         }
 
-        .route {
-          position: absolute;
-          width: 42vw;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(78, 204, 233, 0.34), transparent);
-          animation: pulse 7s ease-in-out infinite;
-        }
-
-        .route-one {
-          top: 25%;
-          left: -7%;
-          transform: rotate(-18deg);
-        }
-
-        .route-two {
-          right: -5%;
-          bottom: 21%;
-          transform: rotate(22deg);
-          animation-delay: -3s;
-        }
-
-        .breadcrumbs {
+        .heroTopline {
           display: flex;
           flex-wrap: wrap;
           gap: 10px;
-          color: #8eb4c5;
-          font-size: 0.88rem;
-          margin-bottom: 58px;
-        }
-
-        .breadcrumbs a {
-          text-decoration: none;
-        }
-
-        .breadcrumbs a:hover,
-        .text-link:hover,
-        .link-stack a:hover {
-          color: #ffffff;
-        }
-
-        .hero {
-          max-width: 980px;
-          padding-bottom: 58px;
-        }
-
-        .hero-meta,
-        .status-row,
-        .action-row,
-        .interaction-heading {
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 12px;
-        }
-
-        .hero-meta {
-          justify-content: space-between;
-          margin-bottom: 18px;
-        }
-
-        .eyebrow {
-          display: inline-block;
-          color: #72d8ef;
-          font-size: 0.75rem;
-          font-weight: 900;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-        }
-
-        .record-id {
-          color: #839eac;
-          font-size: 0.82rem;
-        }
-
-        .status-row {
           margin-bottom: 22px;
         }
 
-        .status-badge,
-        .outcome-badge {
+        .stateBadge,
+        .demoBadge {
+          display: inline-flex;
+          align-items: center;
+          min-height: 30px;
+          padding: 0 11px;
           border-radius: 999px;
-          padding: 8px 11px;
-          font-size: 0.72rem;
-          font-weight: 900;
-          letter-spacing: 0.09em;
+          font-size: 0.64rem;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
         }
 
-        .status-open {
-          color: #87efc4;
-          border: 1px solid rgba(90, 224, 169, 0.34);
-          background: rgba(51, 170, 123, 0.09);
+        .stateBadge {
+          color: #042125;
+          background: var(--gold);
         }
 
-        .outcome-partial {
-          color: #ffe49b;
-          border: 1px solid rgba(239, 191, 67, 0.34);
-          background: rgba(191, 137, 28, 0.09);
+        .demoBadge {
+          color: var(--muted);
+          border: 1px solid rgba(169, 193, 200, 0.18);
+          background: rgba(169, 193, 200, 0.05);
         }
 
-        .outcome-hold {
-          color: #ffb4aa;
-          border: 1px solid rgba(245, 105, 89, 0.34);
-          background: rgba(183, 63, 50, 0.1);
+        .kicker,
+        .sectionKicker {
+          display: inline-flex;
+          align-items: center;
+          color: var(--teal);
+          font-size: 0.75rem;
+          font-weight: 850;
+          letter-spacing: 0.16em;
+          text-transform: uppercase;
         }
 
         h1,
@@ -768,527 +877,605 @@ export default function MarketplaceOpportunityDetailPage() {
         }
 
         h1 {
-          max-width: 950px;
-          margin: 0 0 18px;
-          font-size: clamp(3rem, 7vw, 6.5rem);
-          line-height: 0.96;
-          letter-spacing: -0.055em;
+          margin: 14px 0 24px;
+          font-size: clamp(3.2rem, 6.5vw, 6.8rem);
+          line-height: 0.95;
+          letter-spacing: -0.058em;
+          text-wrap: balance;
         }
 
-        .organization {
-          margin-bottom: 24px;
-          color: #e9ca77;
-          font-size: 1.1rem;
-          font-weight: 800;
+        .heroLead {
+          max-width: 760px;
+          color: var(--muted);
+          font-size: clamp(1.05rem, 1.6vw, 1.28rem);
+          line-height: 1.75;
         }
 
-        .hero-copy,
-        .body-copy {
-          color: #b8ced9;
-          font-size: 1.09rem;
-          line-height: 1.78;
+        .heroActions,
+        .finalActions {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 14px;
+          margin-top: 32px;
         }
 
-        .hero-copy {
-          max-width: 820px;
-        }
-
-        .hero-facts {
-          display: grid;
-          grid-template-columns: repeat(4, minmax(0, 1fr));
-          gap: 12px;
-          margin-top: 34px;
-        }
-
-        .hero-facts article {
-          min-height: 100px;
-          padding: 17px;
-          border: 1px solid rgba(106, 197, 221, 0.16);
-          border-radius: 17px;
-          background: rgba(11, 31, 47, 0.7);
-        }
-
-        .hero-facts span {
-          display: block;
-          margin-bottom: 9px;
-          color: #7596a6;
-          font-size: 0.72rem;
-          text-transform: uppercase;
-          letter-spacing: 0.09em;
-        }
-
-        .hero-facts strong {
-          line-height: 1.45;
-        }
-
-        .action-row {
-          margin-top: 30px;
-        }
-
-        .primary-button,
-        .secondary-button {
+        .primaryButton,
+        .secondaryButton {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          min-height: 48px;
+          padding: 0 20px;
           border-radius: 999px;
-          padding: 14px 21px;
-          font-weight: 900;
           text-decoration: none;
+          font-size: 0.94rem;
+          font-weight: 800;
           transition:
             transform 180ms ease,
-            border-color 180ms ease;
-          cursor: pointer;
+            border-color 180ms ease,
+            background 180ms ease,
+            box-shadow 180ms ease;
         }
 
-        .primary-button {
-          border: 1px solid #87e4f8;
-          color: #031019;
-          background: linear-gradient(135deg, #a5efff, #56cae7);
-          box-shadow: 0 12px 34px rgba(60, 191, 222, 0.18);
+        .primaryButton {
+          color: #031114;
+          background: linear-gradient(135deg, var(--teal), #b2f7f1);
+          box-shadow: 0 12px 34px rgba(37, 185, 189, 0.24);
         }
 
-        .secondary-button {
-          border: 1px solid rgba(147, 208, 227, 0.3);
-          color: #eaf9ff;
-          background: rgba(10, 29, 44, 0.82);
+        .secondaryButton {
+          color: var(--text);
+          border: 1px solid var(--border-strong);
+          background: rgba(10, 30, 42, 0.64);
+          backdrop-filter: blur(12px);
         }
 
-        .primary-button:hover,
-        .secondary-button:hover {
+        .primaryButton:hover,
+        .secondaryButton:hover {
           transform: translateY(-2px);
         }
 
-        .text-link {
-          color: #95cddd;
-          font-weight: 800;
-          text-decoration: none;
+        .primaryButton:hover {
+          box-shadow: 0 16px 42px rgba(37, 185, 189, 0.34);
         }
 
-        .governed-sequence {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
+        .secondaryButton:hover {
+          border-color: var(--teal);
+          background: rgba(14, 42, 54, 0.9);
+        }
+
+        .boundaryNotice {
+          display: flex;
+          align-items: flex-start;
           gap: 10px;
-          padding: 20px 0 68px;
-        }
-
-        .sequence-step {
-          min-height: 115px;
-          border: 1px solid rgba(103, 194, 218, 0.15);
-          border-radius: 17px;
-          padding: 15px;
-          background: rgba(9, 29, 44, 0.69);
-        }
-
-        .sequence-step span {
-          display: block;
-          margin-bottom: 34px;
-          color: #57cee9;
-          font-size: 0.75rem;
-        }
-
-        .sequence-step strong {
-          font-size: 0.9rem;
-          line-height: 1.4;
-        }
-
-        .interaction-panel,
-        .submission-confirmation {
-          margin-bottom: 28px;
-          padding: clamp(24px, 4vw, 42px);
-          border: 1px solid rgba(100, 201, 228, 0.22);
-          border-radius: 28px;
-          background:
-            linear-gradient(145deg, rgba(14, 41, 59, 0.97), rgba(7, 23, 36, 0.95));
-          box-shadow: 0 24px 65px rgba(0, 0, 0, 0.22);
-        }
-
-        .interaction-heading {
-          justify-content: space-between;
-          margin-bottom: 25px;
-        }
-
-        .interaction-heading h2 {
-          margin: 8px 0 0;
-          font-size: 2rem;
-        }
-
-        .close-button {
-          width: 44px;
-          height: 44px;
-          border: 1px solid rgba(139, 210, 230, 0.22);
-          border-radius: 50%;
-          color: #dff7ff;
-          background: rgba(255, 255, 255, 0.035);
-          font-size: 1.45rem;
-          cursor: pointer;
-        }
-
-        .form-grid {
-          display: grid;
-          gap: 18px;
-        }
-
-        label {
-          color: #edfaff;
-          font-weight: 800;
-        }
-
-        input,
-        textarea {
-          width: 100%;
-          display: block;
-          margin-top: 9px;
-          padding: 14px 15px;
-          border: 1px solid rgba(130, 207, 227, 0.22);
+          max-width: 760px;
+          margin-top: 28px;
+          padding: 14px 16px;
+          border: 1px solid rgba(255, 216, 120, 0.22);
           border-radius: 14px;
-          color: #f5fbff;
-          background: rgba(4, 16, 27, 0.78);
-          outline: none;
-          resize: vertical;
+          color: #eadfbf;
+          background: rgba(255, 216, 120, 0.06);
+          font-size: 0.85rem;
+          line-height: 1.6;
         }
 
-        input:focus,
-        textarea:focus {
-          border-color: #70d8ef;
-          box-shadow: 0 0 0 3px rgba(76, 198, 227, 0.13);
+        .boundaryNotice svg {
+          flex: 0 0 auto;
+          margin-top: 2px;
+          color: var(--gold);
         }
 
-        input::placeholder,
-        textarea::placeholder {
-          color: #648091;
+        .summaryCard {
+          padding: 24px;
+          border: 1px solid var(--border-strong);
+          border-radius: 26px;
+          background:
+            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.13), transparent 30%),
+            linear-gradient(145deg, rgba(9, 32, 44, 0.92), rgba(4, 17, 25, 0.97));
+          box-shadow: 0 28px 70px rgba(0, 0, 0, 0.28);
         }
 
-        .detail-layout {
+        .summaryHeader {
           display: grid;
-          grid-template-columns: minmax(0, 1fr) 300px;
+          gap: 6px;
+          margin-bottom: 20px;
+          padding-bottom: 18px;
+          border-bottom: 1px solid rgba(118, 213, 220, 0.15);
+        }
+
+        .summaryHeader span {
+          color: var(--teal);
+          font-size: 0.68rem;
+          font-weight: 850;
+          letter-spacing: 0.15em;
+        }
+
+        .summaryHeader strong {
+          line-height: 1.45;
+        }
+
+        dl {
+          display: grid;
+          gap: 0;
+          margin: 0;
+        }
+
+        dl > div {
+          display: grid;
+          gap: 5px;
+          padding: 14px 0;
+          border-bottom: 1px solid rgba(118, 213, 220, 0.09);
+        }
+
+        dl > div:last-child {
+          border-bottom: 0;
+        }
+
+        dt {
+          color: #78959d;
+          font-size: 0.68rem;
+          font-weight: 850;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        dd {
+          margin: 0;
+          color: #e4f0f2;
+          font-size: 0.9rem;
+          line-height: 1.5;
+        }
+
+        .sectionBlock {
+          position: relative;
+          padding: 105px 0;
+          scroll-margin-top: 70px;
+        }
+
+        .sectionTint {
+          border-top: 1px solid rgba(118, 213, 220, 0.08);
+          border-bottom: 1px solid rgba(118, 213, 220, 0.08);
+          background: linear-gradient(
+            180deg,
+            rgba(9, 28, 39, 0.66),
+            rgba(5, 18, 26, 0.45)
+          );
+        }
+
+        .contentGrid {
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) minmax(300px, 0.38fr);
           gap: 26px;
           align-items: start;
         }
 
-        .main-column {
+        .mainColumn,
+        .sideColumn {
           display: grid;
           gap: 20px;
         }
 
-        .detail-card,
-        .sidebar-card {
-          border: 1px solid rgba(103, 194, 220, 0.17);
-          border-radius: 26px;
+        .sideColumn {
+          position: sticky;
+          top: 24px;
+        }
+
+        .contentCard,
+        .sideCard {
+          border: 1px solid var(--border);
           background:
-            linear-gradient(145deg, rgba(14, 38, 55, 0.93), rgba(7, 23, 36, 0.9));
-          box-shadow: 0 22px 56px rgba(0, 0, 0, 0.16);
+            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.08), transparent 28%),
+            linear-gradient(145deg, rgba(10, 31, 43, 0.86), rgba(4, 18, 27, 0.95));
+          box-shadow: 0 20px 50px rgba(0, 0, 0, 0.16);
         }
 
-        .detail-card {
-          padding: clamp(24px, 4vw, 40px);
+        .contentCard {
+          padding: 30px;
+          border-radius: 24px;
         }
 
-        .section-heading {
-          display: flex;
-          gap: 17px;
-          align-items: flex-start;
-          padding-bottom: 24px;
-          margin-bottom: 25px;
-          border-bottom: 1px solid rgba(111, 197, 220, 0.14);
+        .contentCard h2 {
+          margin: 10px 0 14px;
+          font-size: clamp(2rem, 3.7vw, 3.7rem);
+          line-height: 1.08;
+          letter-spacing: -0.045em;
+          text-wrap: balance;
         }
 
-        .section-heading > span {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          flex: 0 0 42px;
-          height: 42px;
-          border-radius: 50%;
-          color: #78dcf3;
-          background: rgba(80, 199, 227, 0.11);
-          font-weight: 900;
-        }
-
-        .section-heading h2 {
-          margin: 2px 0 6px;
-          font-size: 1.55rem;
-        }
-
-        .section-heading p {
+        .contentCard > p {
           margin: 0;
-          color: #91aab7;
-          line-height: 1.55;
+          color: var(--muted);
+          font-size: 1.02rem;
+          line-height: 1.78;
         }
 
-        .item-grid {
+        .checkList,
+        .boundaryList {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
           gap: 12px;
+          margin-top: 24px;
         }
 
-        .item-card {
-          min-height: 96px;
-          padding: 17px;
-          border: 1px solid rgba(113, 196, 219, 0.14);
-          border-radius: 17px;
-          background: rgba(255, 255, 255, 0.027);
+        .checkItem,
+        .boundaryItem {
+          display: flex;
+          gap: 11px;
+          align-items: flex-start;
+          padding: 14px;
+          border: 1px solid rgba(118, 213, 220, 0.12);
+          border-radius: 13px;
+          background: rgba(255, 255, 255, 0.018);
+          color: #dcebed;
+          line-height: 1.6;
         }
 
-        .check-mark {
-          display: block;
-          margin-bottom: 18px;
-          color: #78e4bb;
-          font-weight: 900;
+        .checkItem svg {
+          flex: 0 0 auto;
+          margin-top: 3px;
+          color: var(--teal);
         }
 
-        .item-card strong {
-          line-height: 1.45;
+        .boundaryItem svg {
+          flex: 0 0 auto;
+          margin-top: 3px;
+          color: var(--gold);
         }
 
-        .evidence-columns {
+        .proofCard {
+          border-color: rgba(255, 216, 120, 0.22);
+          background:
+            radial-gradient(circle at 0 0, rgba(255, 216, 120, 0.08), transparent 28%),
+            linear-gradient(145deg, rgba(35, 30, 18, 0.72), rgba(15, 18, 22, 0.95));
+        }
+
+        .milestoneList {
           display: grid;
-          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 12px;
+          margin-top: 24px;
+        }
+
+        .milestone {
+          display: grid;
+          grid-template-columns: 48px 1fr;
           gap: 14px;
+          align-items: start;
+          padding: 16px;
+          border: 1px solid rgba(118, 213, 220, 0.12);
+          border-radius: 14px;
+          background: rgba(255, 255, 255, 0.018);
         }
 
-        .evidence-panel {
-          padding: 21px;
-          border-radius: 20px;
+        .milestoneNumber {
+          width: 42px;
+          height: 42px;
+          display: grid;
+          place-items: center;
+          border-radius: 50%;
+          color: #031114;
+          background: var(--teal);
+          font-size: 0.7rem;
+          font-weight: 900;
+          box-shadow: 0 0 18px rgba(103, 224, 223, 0.24);
         }
 
-        .evidence-panel.available {
-          border: 1px solid rgba(79, 205, 151, 0.2);
-          background: rgba(46, 145, 105, 0.065);
-        }
-
-        .evidence-panel.missing {
-          border: 1px solid rgba(229, 170, 64, 0.22);
-          background: rgba(177, 115, 23, 0.07);
-        }
-
-        .evidence-panel h3 {
+        .milestone h3 {
+          margin: 2px 0 7px;
           font-size: 1rem;
         }
 
-        .evidence-panel ul {
+        .milestone p {
           margin: 0;
-          padding-left: 19px;
-          color: #adc2cc;
-          line-height: 1.72;
+          color: var(--muted);
+          line-height: 1.6;
         }
 
-        .qualification-list {
+        .sideCard {
+          padding: 22px;
+          border-radius: 20px;
+        }
+
+        .sideCard h3 {
+          margin: 10px 0 18px;
+          font-size: 1.2rem;
+        }
+
+        .chipList {
           display: flex;
           flex-wrap: wrap;
+          gap: 8px;
+        }
+
+        .chip {
+          display: inline-flex;
+          align-items: center;
+          min-height: 32px;
+          padding: 0 11px;
+          border: 1px solid rgba(103, 224, 223, 0.16);
+          border-radius: 999px;
+          color: #dcebed;
+          background: rgba(103, 224, 223, 0.06);
+          font-size: 0.74rem;
+          line-height: 1.4;
+        }
+
+        .warningCard {
+          border-color: rgba(255, 216, 120, 0.2);
+        }
+
+        .smallList {
+          display: grid;
           gap: 10px;
         }
 
-        .qualification-list span {
-          padding: 10px 13px;
-          border: 1px solid rgba(111, 201, 225, 0.2);
-          border-radius: 999px;
-          color: #cce9f2;
-          background: rgba(74, 185, 214, 0.06);
-          font-size: 0.84rem;
-          font-weight: 800;
+        .smallList > div {
+          display: flex;
+          gap: 9px;
+          align-items: flex-start;
+          color: #dfd5bc;
+          font-size: 0.78rem;
+          line-height: 1.55;
         }
 
-        .boundary-box,
-        .boundary-note {
-          border-left: 3px solid #dfba58;
-          border-radius: 0 15px 15px 0;
-          padding: 17px 19px;
-          background: rgba(205, 152, 31, 0.075);
+        .smallList svg {
+          flex: 0 0 auto;
+          margin-top: 2px;
+          color: var(--gold);
         }
 
-        .boundary-box p,
-        .boundary-note p {
-          margin: 7px 0 0;
-          color: #c4b88e;
-          line-height: 1.65;
+        .governanceCard {
+          background:
+            radial-gradient(circle at 0 0, rgba(188, 164, 255, 0.1), transparent 28%),
+            linear-gradient(145deg, rgba(22, 23, 45, 0.84), rgba(4, 18, 27, 0.95));
         }
 
-        .sidebar {
+        .decisionList {
           display: grid;
-          gap: 18px;
+          grid-template-columns: repeat(2, 1fr);
+          gap: 8px;
         }
 
-        .sidebar-card {
-          padding: 23px;
-        }
-
-        .sticky-card {
-          position: sticky;
-          top: 22px;
-        }
-
-        .sidebar-card h2 {
-          margin: 10px 0 22px;
-          font-size: 1.45rem;
-        }
-
-        dl {
-          margin: 0;
-        }
-
-        dl div {
-          padding: 13px 0;
-          border-bottom: 1px solid rgba(111, 197, 220, 0.12);
-        }
-
-        dt {
-          color: #7595a4;
-          font-size: 0.72rem;
-          text-transform: uppercase;
+        .decisionList span {
+          display: grid;
+          place-items: center;
+          min-height: 38px;
+          border: 1px solid rgba(188, 164, 255, 0.18);
+          border-radius: 10px;
+          color: #e8e1ff;
+          background: rgba(188, 164, 255, 0.06);
+          font-size: 0.7rem;
+          font-weight: 850;
           letter-spacing: 0.08em;
         }
 
-        dd {
-          margin: 6px 0 0;
-          color: #f0fbff;
-          font-weight: 800;
-          line-height: 1.45;
-        }
-
-        .boundary-note {
-          margin-top: 21px;
-        }
-
-        .link-stack {
+        .applicationPanel {
           display: grid;
-        }
-
-        .link-stack a {
-          padding: 13px 0;
-          border-bottom: 1px solid rgba(111, 197, 220, 0.12);
-          color: #a9d5e2;
-          text-decoration: none;
-          font-weight: 800;
-        }
-
-        .final-cta {
-          max-width: 910px;
-          margin: 80px auto 0;
-          padding: clamp(32px, 5vw, 58px);
-          border: 1px solid rgba(117, 205, 228, 0.19);
-          border-radius: 30px;
-          text-align: center;
+          grid-template-columns: minmax(0, 1fr) minmax(300px, 0.42fr);
+          gap: 44px;
+          align-items: center;
+          padding: 34px;
+          border: 1px solid var(--border-strong);
+          border-radius: 28px;
           background:
-            radial-gradient(circle at top, rgba(56, 173, 205, 0.11), transparent 48%),
-            rgba(10, 30, 46, 0.84);
+            radial-gradient(circle at 0 0, rgba(103, 224, 223, 0.12), transparent 26%),
+            linear-gradient(145deg, rgba(9, 32, 44, 0.9), rgba(4, 17, 25, 0.96));
         }
 
-        .final-cta h2 {
-          margin: 12px 0 16px;
-          font-size: clamp(2rem, 4vw, 3.5rem);
-          letter-spacing: -0.035em;
+        .applicationPanel h2,
+        .finalPanel h2 {
+          margin: 10px 0 16px;
+          font-size: clamp(2.2rem, 4.4vw, 4.6rem);
+          line-height: 1.05;
+          letter-spacing: -0.05em;
+          text-wrap: balance;
         }
 
-        .final-cta p {
-          color: #aabec9;
+        .applicationPanel p,
+        .finalPanel p {
+          color: var(--muted);
+          font-size: 1.02rem;
           line-height: 1.75;
         }
 
-        .centered-actions {
-          justify-content: center;
+        .applicationRequirements {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 10px;
+          margin-top: 26px;
         }
 
-        .submission-confirmation {
-          max-width: 880px;
-          margin: 20px auto;
-          padding: clamp(35px, 6vw, 70px);
+        .applicationRequirements > div {
+          display: flex;
+          gap: 9px;
+          align-items: center;
+          padding: 11px 12px;
+          border: 1px solid rgba(118, 213, 220, 0.12);
+          border-radius: 11px;
+          background: rgba(255, 255, 255, 0.018);
+          color: #dcebed;
+          font-size: 0.78rem;
         }
 
-        .submission-confirmation h1 {
-          margin-top: 20px;
-          font-size: clamp(2.6rem, 6vw, 5rem);
+        .applicationRequirements svg {
+          flex: 0 0 auto;
+          color: var(--teal);
         }
 
-        .submission-confirmation p {
-          color: #aec2cc;
-          line-height: 1.75;
-          font-size: 1.08rem;
+        .applicationAction {
+          display: grid;
+          gap: 12px;
+          padding: 22px;
+          border: 1px solid rgba(255, 216, 120, 0.2);
+          border-radius: 20px;
+          background: rgba(255, 216, 120, 0.05);
         }
 
-        @keyframes drift {
+        .applicationAction > span {
+          color: var(--gold);
+          font-size: 0.68rem;
+          font-weight: 850;
+          letter-spacing: 0.13em;
+        }
+
+        .applicationAction button {
+          min-height: 48px;
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          border-radius: 999px;
+          color: #789098;
+          background: rgba(255, 255, 255, 0.035);
+          font-weight: 800;
+          cursor: not-allowed;
+        }
+
+        .applicationAction small {
+          color: #a99f87;
+          line-height: 1.5;
+        }
+
+        .finalSection {
+          padding: 60px 0 80px;
+        }
+
+        .finalPanel {
+          display: grid;
+          gap: 30px;
+          padding: 42px;
+          border: 1px solid var(--border-strong);
+          border-radius: 30px;
+          background:
+            radial-gradient(circle at 86% 12%, rgba(98, 169, 255, 0.13), transparent 32%),
+            radial-gradient(circle at 10% 88%, rgba(103, 224, 223, 0.12), transparent 32%),
+            linear-gradient(145deg, rgba(8, 30, 42, 0.95), rgba(3, 15, 23, 0.98));
+        }
+
+        .finalPanel p {
+          max-width: 820px;
+          margin: 0;
+        }
+
+        .maxim {
+          padding-top: 24px;
+          border-top: 1px solid rgba(118, 213, 220, 0.14);
+          color: var(--teal);
+          font-size: 0.84rem;
+          font-weight: 850;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+        }
+
+        @keyframes glowPulse {
           0%,
           100% {
-            transform: translate3d(0, 0, 0) scale(0.9);
-            opacity: 0.46;
+            opacity: 0.09;
+            transform: scale(0.92);
           }
           50% {
-            transform: translate3d(18px, -22px, 0) scale(1.35);
+            opacity: 0.17;
+            transform: scale(1.08);
+          }
+        }
+
+        @keyframes lineMove {
+          0% {
+            opacity: 0;
+            translate: -12% 0;
+          }
+          20%,
+          80% {
+            opacity: 0.72;
+          }
+          100% {
+            opacity: 0;
+            translate: 38% 0;
+          }
+        }
+
+        @keyframes twinkle {
+          0%,
+          100% {
+            opacity: 0.25;
+            transform: scale(0.8);
+          }
+          50% {
             opacity: 1;
-          }
-        }
-
-        @keyframes rotate {
-          to {
-            transform: rotate(360deg);
-          }
-        }
-
-        @keyframes pulse {
-          0%,
-          100% {
-            opacity: 0.2;
-          }
-          50% {
-            opacity: 0.78;
+            transform: scale(1.35);
           }
         }
 
         @media (max-width: 980px) {
-          .hero-facts {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-          }
-
-          .governed-sequence {
-            grid-template-columns: repeat(3, 1fr);
-          }
-
-          .detail-layout {
+          .heroGrid,
+          .contentGrid,
+          .applicationPanel {
             grid-template-columns: 1fr;
           }
 
-          .sticky-card {
-            position: relative;
-            top: 0;
+          .sideColumn {
+            position: static;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
           }
         }
 
-        @media (max-width: 680px) {
-          .content-shell {
-            width: min(100% - 24px, 1180px);
-            padding-top: 22px;
+        @media (max-width: 700px) {
+          .pageShell {
+            width: min(100% - 24px, 1160px);
           }
 
-          .breadcrumbs {
-            margin-bottom: 42px;
+          .heroSection {
+            padding-top: 56px;
           }
 
-          .hero-facts,
-          .item-grid,
-          .evidence-columns {
+          .backLink {
+            margin-bottom: 38px;
+          }
+
+          .sectionBlock {
+            padding: 78px 0;
+          }
+
+          .sideColumn,
+          .applicationRequirements {
             grid-template-columns: 1fr;
           }
 
-          .governed-sequence {
-            grid-template-columns: repeat(2, 1fr);
+          .contentCard {
+            padding: 23px 19px;
           }
 
-          .hero-meta {
-            align-items: flex-start;
+          .applicationPanel,
+          .finalPanel {
+            padding: 28px 22px;
+          }
+        }
+
+        @media (max-width: 480px) {
+          h1 {
+            font-size: clamp(2.8rem, 16vw, 4.2rem);
+          }
+
+          .heroActions,
+          .finalActions {
+            align-items: stretch;
             flex-direction: column;
+          }
+
+          .primaryButton,
+          .secondaryButton {
+            width: 100%;
+          }
+
+          .milestone {
+            grid-template-columns: 1fr;
           }
         }
 
         @media (prefers-reduced-motion: reduce) {
-          :global(html) {
-            scroll-behavior: auto;
-          }
-
-          .star,
-          .orbit,
-          .route {
-            animation: none;
-          }
-
-          .primary-button,
-          .secondary-button {
-            transition: none;
+          *,
+          *::before,
+          *::after {
+            scroll-behavior: auto !important;
+            animation-duration: 0.001ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.001ms !important;
           }
         }
       `}</style>

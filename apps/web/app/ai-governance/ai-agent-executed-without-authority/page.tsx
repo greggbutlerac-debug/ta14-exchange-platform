@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'AI Agent Executed Without Authority: What Must You Prove? | TA-14',
   description: 'A practical examination of unauthorized AI agent execution, authority boundaries, commitment formation, bypass, evidence, and replay.',
-  alternates: { canonical: 'https://ta14exchange.com/ai-governance/ai-agent-executed-without-authority' },
+  alternates: { canonical: 'https://www.ta14exchange.com/ai-governance/ai-agent-executed-without-authority' },
 };
 
 const faq = [

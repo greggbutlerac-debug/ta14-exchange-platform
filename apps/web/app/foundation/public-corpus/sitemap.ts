@@ -1,23 +1,12 @@
 import type { MetadataRoute } from "next";
 
+import { CANONICAL_EXCHANGE_ORIGIN } from "../../../lib/site/canonical-origin";
 import { TA14_PUBLIC_CORPUS } from "./corpus";
 
-const FALLBACK_SITE_URL = "https://ta14-exchange-platform-theta.vercel.app";
-
+// Sitemap URLs always use the canonical Exchange origin (matching app/sitemap.ts and robots.ts).
+// Deployment-derived hosts (VERCEL_URL / VERCEL_PROJECT_PRODUCTION_URL) are Vercel infrastructure.
 function getSiteUrl() {
-  const configuredUrl =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.SITE_URL ??
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
-    process.env.VERCEL_URL;
-
-  if (!configuredUrl) return FALLBACK_SITE_URL;
-
-  const normalizedUrl = configuredUrl.startsWith("http")
-    ? configuredUrl
-    : `https://${configuredUrl}`;
-
-  return normalizedUrl.replace(/\/$/, "");
+  return CANONICAL_EXCHANGE_ORIGIN;
 }
 
 function getLastModified(date: string | undefined, year: number) {

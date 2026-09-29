@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'How Do You Prove an AI Action Was Actually Blocked? | TA-14',
   description: 'Learn what evidence distinguishes a logged rejection from proof that an AI or agentic action could not form executable commitment or reach execution.',
-  alternates: { canonical: 'https://ta14exchange.com/ai-governance/prove-ai-action-was-blocked' },
+  alternates: { canonical: 'https://www.ta14exchange.com/ai-governance/prove-ai-action-was-blocked' },
 };
 
 const faq = [
