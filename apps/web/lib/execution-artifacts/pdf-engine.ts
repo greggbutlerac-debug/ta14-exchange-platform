@@ -10,6 +10,7 @@
  * Governing principle:
  * No admissible evidence. No admissible execution.
  */
+import { CANONICAL_EXCHANGE_ORIGIN } from "../site/canonical-origin";
 
 import {
   CHAIN_LINKS,
@@ -266,7 +267,7 @@ export const DEFAULT_ARTIFACT_PDF_OPTIONS: ArtifactPdfOptions = {
   generatedAt: undefined,
   verificationBaseUrl: undefined,
   institutionName: "TA-14 Authority",
-  institutionUrl: "https://ta14-exchange-platform-theta.vercel.app",
+  institutionUrl: CANONICAL_EXCHANGE_ORIGIN,
   footerNotice: "No admissible evidence. No admissible execution.",
   locale: "en-US",
 };

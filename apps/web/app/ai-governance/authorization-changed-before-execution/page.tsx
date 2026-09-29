@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'What Happens When AI Authorization Changes Before Execution? | TA-14',
   description: 'A practical governance guide to changed authorization, stale approvals, revalidation, and execution control for AI and agentic systems.',
-  alternates: { canonical: 'https://ta14exchange.com/ai-governance/authorization-changed-before-execution' },
+  alternates: { canonical: 'https://www.ta14exchange.com/ai-governance/authorization-changed-before-execution' },
 };
 
 const faq = [

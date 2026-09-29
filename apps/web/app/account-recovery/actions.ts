@@ -2,10 +2,10 @@
 
 import { redirect } from "next/navigation";
 
+import { CANONICAL_EXCHANGE_ORIGIN } from "../../lib/site/canonical-origin";
 import { createClient } from "../../lib/supabase/server";
 
 const DEFAULT_NEXT = "/workspace/ai-governance/registry/register";
-const CANONICAL_EXCHANGE_ORIGIN = "https://www.ta14exchange.com";
 
 function safeNext(value: FormDataEntryValue | string | null | undefined): string {
   if (typeof value !== "string") return DEFAULT_NEXT;

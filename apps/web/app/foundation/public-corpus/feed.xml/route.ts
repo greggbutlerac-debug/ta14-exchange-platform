@@ -1,3 +1,4 @@
+import { CANONICAL_EXCHANGE_ORIGIN } from "../../../../lib/site/canonical-origin";
 import { TA14_PUBLIC_CORPUS } from "../corpus";
 
 export const dynamic = "force-static";
@@ -12,18 +13,10 @@ function escapeXml(value: string) {
     .replaceAll("'", "&apos;");
 }
 
+// Public feed links always use the canonical Exchange origin. Deployment-derived hosts
+// (VERCEL_URL / VERCEL_PROJECT_PRODUCTION_URL) are Vercel infrastructure, not public TA-14 surfaces.
 function getSiteUrl() {
-  const configured =
-    process.env.NEXT_PUBLIC_SITE_URL ??
-    process.env.SITE_URL ??
-    process.env.VERCEL_PROJECT_PRODUCTION_URL ??
-    process.env.VERCEL_URL;
-
-  if (!configured) {
-    return "https://ta14-exchange-platform-theta.vercel.app";
-  }
-
-  return configured.startsWith("http") ? configured : `https://${configured}`;
+  return CANONICAL_EXCHANGE_ORIGIN;
 }
 
 function getRecordDate(record: (typeof TA14_PUBLIC_CORPUS)[number]) {

@@ -3,7 +3,7 @@ import Link from 'next/link';
 export const metadata = {
   title: 'What If the Evidence Changes Before AI Execution? | TA-14',
   description: 'How changed evidence, stale records, material updates, and revalidation affect AI execution standing before consequence occurs.',
-  alternates: { canonical: 'https://ta14exchange.com/ai-governance/evidence-changed-before-execution' },
+  alternates: { canonical: 'https://www.ta14exchange.com/ai-governance/evidence-changed-before-execution' },
 };
 
 const faq = [

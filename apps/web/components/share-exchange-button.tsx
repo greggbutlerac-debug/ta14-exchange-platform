@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from 'react';
 
+import { canonicalExchangeUrl, publicOriginFor } from '../lib/site/canonical-origin';
+
 const SHARE_TITLE = 'TA-14 Exchange Platform';
 
 const SHARE_TEXT =
@@ -32,10 +34,11 @@ function ShareIcon() {
 
 function resolveExchangeUrl(): string {
   if (typeof window === 'undefined') {
-    return 'https://ta14-exchange-platform-theta.vercel.app/';
+    return canonicalExchangeUrl('/');
   }
 
-  return `${window.location.origin}/`;
+  // Share the current TA-14 domain (Exchange or Authority), but never a Vercel deployment host.
+  return `${publicOriginFor(window.location.origin)}/`;
 }
 
 async function copyToClipboard(value: string): Promise<void> {
