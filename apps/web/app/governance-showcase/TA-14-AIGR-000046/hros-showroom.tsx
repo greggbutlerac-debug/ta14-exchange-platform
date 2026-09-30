@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   HROS_CONDITIONS,
@@ -23,6 +23,17 @@ import {
 
 const CLAIM_NUMBERS = REGISTERED_FORMAL_CLAIMS.map((_, i) => i + 1);
 const listNumbers = (prefix: string, numbers: number[]) => numbers.map((n) => `${prefix} ${n}`).join(" · ");
+
+
+function ImageTeacher({ text }: { text: string }) {
+  const [speaking,setSpeaking]=useState(false),[paused,setPaused]=useState(false),[voices,setVoices]=useState<SpeechSynthesisVoice[]>([]),[voiceName,setVoiceName]=useState("Samantha"),[rate,setRate]=useState(.8),[pitch,setPitch]=useState(.95);
+  useEffect(()=>{if(!("speechSynthesis" in window))return;const load=()=>{const v=window.speechSynthesis.getVoices().filter(x=>x.lang.toLowerCase().startsWith("en"));setVoices(v);setVoiceName(v.some(x=>x.name==="Samantha")?"Samantha":v.find(x=>x.lang==="en-US")?.name||v[0]?.name||"")};load();speechSynthesis.addEventListener("voiceschanged",load);return()=>{speechSynthesis.cancel();speechSynthesis.removeEventListener("voiceschanged",load)}},[]);
+  const stop=()=>{speechSynthesis.cancel();setSpeaking(false);setPaused(false)};
+  const start=()=>{stop();const u=new SpeechSynthesisUtterance(text);const v=voices.find(x=>x.name===voiceName);if(v)u.voice=v;u.rate=rate;u.pitch=pitch;u.onend=()=>stop();setSpeaking(true);speechSynthesis.speak(u)};
+  const toggle=()=>{if(!speaking)return start();if(paused){speechSynthesis.resume();setPaused(false)}else{speechSynthesis.pause();setPaused(true)}};
+  return <div className="imageTeacher"><div className="teacherTop"><b>GUIDED IMAGE WALKTHROUGH · LISTEN + READ</b><div><button type="button" onClick={toggle}>{!speaking?"▶ PLAY":paused?"▶ RESUME":"Ⅱ PAUSE"}</button><button type="button" onClick={start}>↻ RESTART</button>{speaking&&<button type="button" onClick={stop}>■ STOP</button>}</div></div><div className="teacherControls"><label>VOICE<select value={voiceName} onChange={e=>{stop();setVoiceName(e.target.value)}}>{voices.map(v=><option key={v.name}>{v.name}</option>)}</select></label><label>SPEED · {rate.toFixed(2)}×<input type="range" min=".65" max="1.2" step=".05" value={rate} onChange={e=>{stop();setRate(+e.target.value)}}/></label><label>PITCH · {pitch.toFixed(2)}<input type="range" min=".7" max="1.3" step=".05" value={pitch} onChange={e=>{stop();setPitch(+e.target.value)}}/></label></div><p>{text}</p></div>;
+}
+const IMAGE_TEACHING={authority:"Look at the image from left to right. The AI side represents capability: a system can analyze, reason, recommend, or prepare a technically possible action. Now notice the boundary before execution. HROS declares that capability does not carry its own permission into reality. At this point, attributable human authority must be present before the proposed action may continue toward execution. That separation is the lesson: capability is not authority, and understanding is not permission. This image teaches the architecture HROS has registered. It is not a TA-14 finding that HROS has demonstrated this behavior in operation.",bypass:"Now look at the boundary as an adversary would. A governed gate matters only if another route cannot quietly go around it. Imagine an API call, database write, financial transaction, transport path, or physical actuator approaching the same real-world consequence from another direction. The examination question is not simply whether the main route contains a human gate. It is whether every consequential route is still forced to establish the required authority before execution. HROS declares a fail-closed boundary and transport interlocks. TA-14 has preserved that declaration, but has not yet demonstrated that bypass resistance under examination.",provenance:"This image begins after authorization and asks what survives the consequence. A defensible record should be able to distinguish what the system proposed, who authorized it, what authority applied, when authorization occurred, what action actually executed, and what outcome became real. HROS declares cryptographic provenance and execution receipts intended to preserve that chain. The important distinction is that authorization and historical attribution are different problems. This visual represents the provenance problem HROS says it addresses. It is not evidence that TA-14 has examined or verified the implementation."} as const;
 
 function RegisteredQuote({ prefix, number, line }: { prefix: string; number: number; line: string }) {
   const { heading, body } = splitRegisteredLine(line);
@@ -75,6 +86,7 @@ export default function HrosShowroom({ initialCondition = "baseline", initialCla
         <img src="/hros-human-authority-execution-boundary.png" alt="HROS teaching visual showing capability reaching a human authority boundary before execution." />
         <figcaption><b>THE HUMAN-AUTHORITY BOUNDARY</b><span>The proposal may be technically possible. HROS declares that capability still stops here until attributable human authority is present. The image teaches the separation; the interactive chain below lets you test the declaration.</span></figcaption>
       </figure>
+      <ImageTeacher text={IMAGE_TEACHING.authority} />
 
       <div className="controls" role="group" aria-label="Choose a condition">
         {HROS_CONDITIONS.map((c) => (
@@ -122,6 +134,7 @@ export default function HrosShowroom({ initialCondition = "baseline", initialCla
         <img src="/hros-fail-closed-bypass-boundary.png" alt="HROS teaching visual showing attempted execution routes encountering a fail-closed authority boundary." />
         <figcaption><b>THE BYPASS QUESTION</b><span>A governed boundary matters most when another route tries to go around it. This visual frames the adversarial question: if transport, API, finance, database or physical actuation approaches execution another way, where does authority still have to be established?</span></figcaption>
       </figure>
+      <ImageTeacher text={IMAGE_TEACHING.bypass} />
 
       <div className="rule"><b>IMPORTANT BOUNDARY</b> This interactive model explains HROS&apos;s declared architecture from the permanent Registry record. Operating it does not run HROS, and it does not convert declaration into runtime proof. Claim numbers follow the order in which the claims appear in the registered text.</div>
     </section>
@@ -222,6 +235,7 @@ export default function HrosShowroom({ initialCondition = "baseline", initialCla
         <img src="/hros-provenance-execution-record.png" alt="HROS teaching visual representing authorization, execution receipt and preserved provenance after a consequential action." />
         <figcaption><b>THE RECORD AFTER THE CONSEQUENCE</b><span>The question changes after execution: can the system still show what was proposed, who authorized it, what actually executed and which record preserves that sequence? The image represents the declared provenance problem; it is not evidence that HROS has demonstrated it.</span></figcaption>
       </figure>
+      <ImageTeacher text={IMAGE_TEACHING.provenance} />
     </section>
 
     <section aria-labelledby="history-h">
@@ -262,6 +276,7 @@ export default function HrosShowroom({ initialCondition = "baseline", initialCla
     .hros .facts{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin:34px 0 0;border:1px solid #ffffff16;border-radius:16px;overflow:hidden;background:#ffffff12}.hros .facts div{padding:16px 18px;background:#05121a}.hros .facts dt{color:#7f98a6;font-size:9px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}.hros .facts dd{margin:6px 0 0;font-size:14px;color:#e6f1f6}
     .hros section{padding:62px 0;border-top:1px solid #ffffff14}
     .hros .visual{margin:30px 0 28px;border:1px solid #f2c66d44;border-radius:18px;overflow:hidden;background:#06131e;box-shadow:0 22px 70px #0008}.hros .visual img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover}.hros .visual figcaption{display:grid;grid-template-columns:minmax(190px,.34fr) 1fr;gap:20px;padding:20px 22px;border-top:1px solid #ffffff14}.hros .visual figcaption b{color:#f2c66d;font-size:10px;letter-spacing:.12em}.hros .visual figcaption span{color:#a9beca;font-size:13px;line-height:1.6}
+    .hros .imageTeacher{margin:-16px 0 30px;padding:18px 20px;border:1px solid #78e8d833;border-radius:14px;background:#041019}.hros .teacherTop{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.hros .teacherTop>b{color:#78e8d8;font-size:9px;letter-spacing:.12em}.hros .teacherTop>div{display:flex;gap:7px;flex-wrap:wrap}.hros .imageTeacher button{cursor:pointer;padding:8px 10px;border:1px solid #f2c66d55;border-radius:8px;background:#0b1a27;color:#f2c66d;font-size:9px;font-weight:900}.hros .teacherControls{display:flex;gap:16px;flex-wrap:wrap;margin:14px 0}.hros .teacherControls label{display:grid;gap:5px;color:#8299a8;font-size:8px;font-weight:900;letter-spacing:.1em}.hros .teacherControls select{min-width:170px;background:#07131f;color:#dcebf3;border:1px solid #ffffff22;border-radius:7px;padding:6px}.hros .teacherControls input{width:150px}.hros .imageTeacher>p{margin:0;color:#b8cbd5;font-size:14px;line-height:1.7}
     .hros .controls{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}.hros .controls button{cursor:pointer;min-height:44px;background:#0b1a27;color:#cce2ef;border:1px solid #ffffff22;border-radius:10px;padding:11px 14px;font-weight:900;font-size:10px;letter-spacing:.05em;transition:.15s}.hros .controls button:hover{border-color:#78e8d888}.hros .controls button[aria-pressed="true"]{background:#f2c66d;color:#07121a;border-color:#f2c66d}
     .hros .chain{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.hros .node{position:relative;padding:16px 14px;border:1px solid #78e8d833;border-radius:14px;background:#06131e;min-height:190px;display:flex;flex-direction:column;transition:.2s}
     .hros .node .num{color:#f2c66d;font-size:8px;font-weight:900;letter-spacing:.06em}.hros .node b{margin-top:10px;font-size:12px;letter-spacing:.06em}.hros .node p{color:#8ea6b4;font-size:12px;line-height:1.45;margin:8px 0 12px;flex:1}.hros .node em{font-style:normal;font-size:9px;font-weight:950;letter-spacing:.08em;padding:6px 7px;border-radius:7px;align-self:flex-start}
