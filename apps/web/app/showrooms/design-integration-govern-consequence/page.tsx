@@ -69,6 +69,7 @@ export default function Page(){
     <article><small>OBSERVED REALITY</small><h3>{current.signal}</h3><p>{current.evidence}</p></article>
     <article><small>PROPOSED CONSEQUENCE</small><h3>{current.proposal}</h3><p>A technically routable command is now approaching the consequence boundary.</p></article>
    </div>
+   <div className="preflight"><small>CONVENTIONAL INTEGRATION CHECKS</small><div>{['CONNECTED ✓','INTEROPERABLE ✓','AUTHENTICATED ✓','COMMAND VALID ✓','CYBER CHECK PASSED ✓'].map(x=><b key={x}>{x}</b>)}</div><strong>AUTHORIZED NOW?</strong><p>Five green lights establish important conditions. None, by itself, answers the consequence question below.</p></div>
    <div className="gate">
     <small>TA-14 · CONSEQUENCE BOUNDARY</small>
     <h3>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</h3>
