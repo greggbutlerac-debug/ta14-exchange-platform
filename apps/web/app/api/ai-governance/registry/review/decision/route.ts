@@ -1,6 +1,8 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
+
+import { deliverRegistrationNotificationsNow } from '@/lib/registry-notifications/delivery';
 
 type DecisionAction =
   | 'return_for_correction'
@@ -289,6 +291,9 @@ export async function POST(request: NextRequest) {
         `The decision was not preserved because the immutable Registry event could not be written: ${eventError.message}`,
       );
     }
+
+    // Any Registry notification produced by this decision is delivered immediately; the cron retries.
+    after(() => deliverRegistrationNotificationsNow(submissionId));
 
     return NextResponse.json({
       ok: true,

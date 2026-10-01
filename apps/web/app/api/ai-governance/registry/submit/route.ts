@@ -1,8 +1,9 @@
 import { createServerClient } from '@supabase/ssr';
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
 import { getSupabasePublicEnvironment } from '@/lib/supabase/env';
+import { deliverRegistrationNotificationsNow } from '@/lib/registry-notifications/delivery';
 const REQUIRED_TEXT_FIELDS = [
   'governance_name',
   'governance_category',
@@ -868,6 +869,9 @@ export async function POST(
           'registered' &&
         refreshedSubmission?.registry_identifier
       ) {
+        // Owner alert as close to the committed registration as possible; the cron is the retry path.
+        after(() => deliverRegistrationNotificationsNow(submissionId));
+
         return NextResponse.json({
           ok: true,
 
@@ -902,6 +906,9 @@ export async function POST(
     /*
      * Successful automatic registration.
      */
+    // Owner alert as close to the committed registration as possible; the cron is the retry path.
+    after(() => deliverRegistrationNotificationsNow(submissionId));
+
     return NextResponse.json({
       ok: true,
 
