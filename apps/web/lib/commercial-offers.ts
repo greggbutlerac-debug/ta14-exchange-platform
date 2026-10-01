@@ -12,7 +12,7 @@ export const executionAuthorityReview:CommercialEngine={
   deliverables:['Frozen proposition and execution boundary','Evidence / authority / continuity map','ALLOW · HOLD · DENY · ESCALATE determination','Missing-control findings and remediation priorities','Publishable or private evidence package, as scoped'],
   proof:['Identity is not execution authority.','Evidence is not automatically sufficient for consequence.','A control discovered after the act did not govern the act.'],
   seoTerms:['AI execution authority review','AI governance assessment','runtime AI controls','prove AI action authorized','AI agent authorization audit'],
-  ctaLabel:'REQUEST PAID REVIEW',ctaHref:request('TA-14 Execution Authority Review'),secondaryLabel:'OPEN EXISTING CLAIM REVIEW',secondaryHref:'/execution-claim-review'
+  ctaLabel:'REQUEST PAID REVIEW',ctaHref:request('TA-14 Execution Authority Review'),secondaryLabel:'START WITH ONE $149 EXAMINATION',secondaryHref:'/consequence-machine'
 };
 
 export const hvacAdmissibleDiagnosticRecord:CommercialEngine={
@@ -51,7 +51,7 @@ export const recordProvenanceReview:CommercialEngine={
   deliverables:['Record-creation and modification timeline','Human / AI contribution map','Acceptance and signing-authority review','Continuity and version findings','Gaps that prevent reliable attribution','Bounded provenance determination'],
   proof:['The final document is not the complete provenance chain.','Signature does not prove authorship.','Auditability requires preserving who generated, changed, accepted and relied on what.'],
   seoTerms:['AI record provenance audit','AI medical note audit trail','AI documentation provenance','record authenticity review','AI generated document audit'],
-  ctaLabel:'REQUEST PROVENANCE REVIEW',ctaHref:request('TA-14 Record Provenance Review'),secondaryLabel:'VIEW EXECUTION EVIDENCE',secondaryHref:'/execution-evidence-snapshot'
+  ctaLabel:'REQUEST PROVENANCE REVIEW',ctaHref:request('TA-14 Record Provenance Review'),secondaryLabel:'START WITH ONE $149 EXAMINATION',secondaryHref:'/consequence-machine'
 };
 
 export const agentAuthorityBenchmark:CommercialEngine={
