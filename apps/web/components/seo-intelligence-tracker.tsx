@@ -52,6 +52,19 @@ function euFunnelSignal(text: string) {
   return null;
 }
 
+/**
+ * Records a commercial funnel step for the current visit. Analytics only: the authoritative business
+ * state (intake persisted, payment verified, queued) lives server-side and never depends on this call.
+ */
+export function trackFunnelEvent(
+  eventType: "intake_started" | "intake_completed" | "payment_started" | "payment_completed",
+  metadata: Record<string, unknown> = {},
+) {
+  if (typeof window === "undefined") return;
+  const params = new URLSearchParams(window.location.search);
+  send({ ...payload(window.location.pathname, params), eventType, targetText: `TA14_${eventType.toUpperCase()}`, metadata: { funnel: "ta14-commercial-v1", stage: eventType, offer: "governed-consequence-examination", ...metadata } });
+}
+
 export function SeoIntelligenceTracker() {
   const pathname = usePathname();
   const last = useRef("");
@@ -94,8 +107,9 @@ export function SeoIntelligenceTracker() {
         });
         const isBoundedExamStart =
           window.location.pathname === "/pricing" &&
-          anchor.protocol === "mailto:" &&
-          anchor.href.includes("subject=TA-14%20Bounded%20Examination%20Request");
+          ((anchor.protocol === "mailto:" &&
+            anchor.href.includes("subject=TA-14%20Bounded%20Examination%20Request")) ||
+            (anchor.origin === window.location.origin && anchor.pathname === "/consequence-machine"));
         if(isBoundedExamStart){
           send({...payload(window.location.pathname,params),eventType:"bounded_exam_clicked",targetHref:anchor.href,targetText,metadata:{funnel:"ta14-commercial-v1",stage:"bounded_exam_clicked",offer:"bounded-examination"}});
         }
