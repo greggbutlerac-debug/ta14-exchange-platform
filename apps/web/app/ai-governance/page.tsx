@@ -309,8 +309,8 @@ export default function AiGovernancePage() {
             ))}
           </div>
           <div className="mt-9 flex flex-wrap gap-4">
-            <Link href="/pricing?utm_source=internal&utm_medium=ai_governance_hub&utm_campaign=execution_evidence" className="rounded-full border border-cyan-300 bg-cyan-300 px-7 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-black">Bounded examination — from $149</Link>
-            <Link href="/pricing/ai-governance?utm_source=internal&utm_medium=ai_governance_hub&utm_campaign=architecture_engagement" className="rounded-full border border-white/20 px-7 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-white">Architecture & interoperability work</Link>
+            <Link href="/pricing" className="rounded-full border border-cyan-300 bg-cyan-300 px-7 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-black">Bounded examination — from $149</Link>
+            <Link href="/pricing/ai-governance" className="rounded-full border border-white/20 px-7 py-3.5 text-sm font-black uppercase tracking-[0.18em] text-white">Architecture & interoperability work</Link>
           </div>
         </div>
       </section>
