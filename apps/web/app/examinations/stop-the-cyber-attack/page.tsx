@@ -105,8 +105,8 @@ export default function Page(){
  const examPath=[
   {label:'ACTOR',value:'OBSERVED',reached:true},
   {label:'CROSSING',value:scenario==='normal'?'LOCAL':connection,reached:true},
-  {label:'OBJECTS',value:connection==='MADE'?'PASSPORT + DIGEST':scenario==='normal'?'LOCAL ONLY':'NONE',reached:connection==='MADE'||scenario==='normal'},
-  {label:'TA-14',value:receiptDecision,reached:taReached},
+  {label:'EXCHANGE',value:connection==='MADE'?'PROFILE-DEFINED':scenario==='normal'?'LOCAL ONLY':'NONE',reached:connection==='MADE'||scenario==='normal'},
+  {label:'LOCAL CHECK',value:receiptDecision,reached:taReached},
   {label:'BINDING',value:taReached&&decision==='ALLOW'?'NEXT':'BLOCKED',reached:false},
   {label:'COMMIT',value:'NOT EXAMINED',reached:false},
   {label:'EXECUTION',value:'NOT OCCURRED',reached:false},
