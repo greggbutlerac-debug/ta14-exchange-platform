@@ -2,15 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 
 import { createClient } from '@supabase/supabase-js';
 
+import { isOperatorIdentity } from '@/lib/owner-alerts/server';
+
 type NotificationDeliveryRow = {
   id: string;
   notification_key: string;
   notification_type: string;
   priority: string;
   state: string;
+  submission_id: string | null;
   registry_identifier: string | null;
   governance_name: string;
   claimant_name: string | null;
+  contact_email?: string | null;
   organization_name: string | null;
   requested_review_pathway: string | null;
   title: string;
@@ -145,7 +149,7 @@ function notificationSubject(row: NotificationDeliveryRow): string {
     return `TA-14 Registry — Review requested — ${row.governance_name}`;
   }
 
-  return `TA-14 Registry — ${row.governance_name} registered`;
+  return `[TA-14] GOVERNANCE REGISTERED — ACTION REQUIRED — ${row.governance_name}`;
 }
 
 function notificationHeadline(row: NotificationDeliveryRow): string {
@@ -185,7 +189,7 @@ function notificationIntro(row: NotificationDeliveryRow): string {
     return 'A governance submission has entered a review pathway and is waiting for Registry attention.';
   }
 
-  return 'A governance registration completed automatically in the TA-14 AI Governance Exchange. No manual registration action is required unless the Registry Inbox separately marks the event as requiring attention.';
+  return 'A governance registration was committed in the TA-14 AI Governance Exchange. ACTION: review the record in the Registry Inbox and contact the registrant to arrange the $0 Founding Demonstration that every registered governance receives. Registration itself requires no approval step.';
 }
 
 function buildEmailHtml(row: NotificationDeliveryRow): string {
@@ -232,6 +236,14 @@ function buildEmailHtml(row: NotificationDeliveryRow): string {
           <div style="margin-bottom:12px;">
             <strong style="color:#ffffff;">Organization:</strong>
             ${escapeHtml(organization)}
+          </div>
+          <div style="margin-bottom:12px;">
+            <strong style="color:#ffffff;">Contact email:</strong>
+            ${escapeHtml(row.contact_email ?? 'Not available')}
+          </div>
+          <div style="margin-bottom:12px;">
+            <strong style="color:#ffffff;">Event time:</strong>
+            ${escapeHtml(row.occurred_at)}
           </div>
           <div>
             <strong style="color:#ffffff;">Pathway:</strong>
@@ -443,6 +455,7 @@ async function getUndeliveredNotifications(
         'notification_type',
         'priority',
         'state',
+        'submission_id',
         'registry_identifier',
         'governance_name',
         'claimant_name',
@@ -521,6 +534,50 @@ function authorizeRequest(request: NextRequest): boolean {
   );
 }
 
+/**
+ * Adds the registrant's contact email to each notification and removes registrations made by the
+ * owner/operators (test or admin registrations), which must not produce an owner alert.
+ */
+async function withSubmitterContext(
+  rows: NotificationDeliveryRow[],
+  results: DeliveryResult[],
+): Promise<NotificationDeliveryRow[]> {
+  const ids = [...new Set(rows.map((row) => row.submission_id).filter(Boolean))] as string[];
+  if (!ids.length) return rows;
+
+  const { data, error } = await getServiceClient()
+    .from('ai_governance_registry_submissions')
+    .select('id,contact_email,owner_user_id')
+    .in('id', ids);
+
+  if (error) {
+    // Context is best-effort; the alert itself must still go out.
+    console.error('TA14_REGISTRY_NOTIFICATION_CONTEXT_FAILED', error.message);
+    return rows;
+  }
+
+  const byId = new Map(
+    (data ?? []).map((s: { id: string; contact_email: string | null; owner_user_id: string | null }) => [s.id, s]),
+  );
+
+  return rows.filter((row) => {
+    const submission = row.submission_id ? byId.get(row.submission_id) : undefined;
+    row.contact_email = submission?.contact_email ?? null;
+    if (submission && isOperatorIdentity({ userId: submission.owner_user_id, email: submission.contact_email })) {
+      results.push({
+        notificationId: row.id,
+        registryIdentifier: row.registry_identifier,
+        governanceName: row.governance_name,
+        delivered: false,
+        skipped: true,
+        reason: 'Operator/test registration: no owner alert is sent.',
+      });
+      return false;
+    }
+    return true;
+  });
+}
+
 async function deliver(request: NextRequest) {
   if (!authorizeRequest(request)) {
     return NextResponse.json(
@@ -556,13 +613,14 @@ async function deliver(request: NextRequest) {
     const retryCooldownMinutes =
       getRetryCooldownMinutes();
 
-    const notifications =
+    const candidates =
       await getUndeliveredNotifications(
         limit,
         cutoffAt,
       );
 
     const results: DeliveryResult[] = [];
+    const notifications = await withSubmitterContext(candidates, results);
 
     for (const notification of notifications) {
       for (const recipient of recipients) {
@@ -655,7 +713,7 @@ async function deliver(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      inspectedNotifications: notifications.length,
+      inspectedNotifications: candidates.length,
       recipients: recipients.length,
       emailDeliveryCutoffAt: cutoffAt,
       retryCooldownMinutes,

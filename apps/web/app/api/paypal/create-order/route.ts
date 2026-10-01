@@ -1,5 +1,7 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { alertProduct } from '@/lib/owner-alerts/products';
+import { raiseOwnerAlert } from '@/lib/owner-alerts/server';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -471,6 +473,28 @@ export async function POST(request: NextRequest) {
 
     const approvalUrl =
       order.links?.find((link) => link.rel === 'approve')?.href ?? null;
+
+    await raiseOwnerAlert({
+      alertKey: `payment_initiated:paypal-order:${order.id}`,
+      alertType: 'PAYMENT_INITIATED',
+      isTest: environment.environment === 'sandbox',
+      facts: {
+        product: alertProduct(product.id).name,
+        route: alertProduct(product.id).route,
+        status: 'PAYMENT INITIATED — NOT YET VERIFIED. No PAID state exists.',
+        references: [
+          { label: 'PayPal order ID', value: order.id },
+          ...(customerReference ? [{ label: 'Customer / intake reference', value: customerReference }] : []),
+        ],
+        amount: product.price,
+        currency: product.currency,
+        amountBasis: 'LISTED_PRICE',
+        provider: environment.environment === 'sandbox' ? 'PayPal (sandbox)' : 'PayPal',
+        providerReference: order.id,
+        occurredAt: new Date().toISOString(),
+        action: 'No action. This is NOT a payment. Do not start work. A PAYMENT VERIFIED alert follows only if PayPal confirms the capture.',
+      },
+    });
 
     return jsonResponse(
       {

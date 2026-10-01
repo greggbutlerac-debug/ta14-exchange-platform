@@ -2,6 +2,7 @@ import { createHash, randomUUID } from 'crypto';
 import { NextRequest,NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { getPayPalConfig, getPayPalOrder, isValidPayPalOrderId, verifyCompletedOrder } from '@/lib/billing/paypal-server';
+import { isOperatorIdentity, raiseOwnerAlert } from '@/lib/owner-alerts/server';
 function t(v:unknown,max=500){return typeof v==='string'?v.trim().slice(0,max):''}
 function sameOrigin(r:NextRequest){const o=r.headers.get('origin');if(!o)return true;try{return new URL(o).host===r.nextUrl.host}catch{return false}}
 function canonicalize(value:unknown):string{if(Array.isArray(value))return '['+value.map(canonicalize).join(',')+']';if(value&&typeof value==='object'){const o=value as Record<string,unknown>;return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canonicalize(o[k])).join(',')+'}'}return JSON.stringify(value)}
@@ -34,6 +35,13 @@ export async function POST(request:NextRequest){
   if(queueError||!queue)return NextResponse.json({error:'Payment and evidence freeze were recorded, but the examination queue entry could not be created. Retain the intake and PayPal capture IDs for reconciliation.',intakeId,status:'PAID'},{status:500});
   const {error:eventError}=await supabase.from('ta14_consequence_examination_queue_events').insert({queue_id:queue.queue_id,intake_id:intakeId,event_type:'PAID_INTAKE_QUEUED',from_state:null,to_state:'QUEUED',event_payload:{evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count??0}});
   if(eventError)console.error('Consequence queue chronology insert failed',eventError);
+  // Owner alerts follow the persisted PAID + QUEUED state. They never affect this response.
+  const isTest=paypal.environment==='sandbox'||isOperatorIdentity({email:verified.payerEmail});
+  const who={name:verified.payerName,email:verified.payerEmail};
+  const references=[{label:'Intake ID',value:intakeId},{label:'Queue ID',value:queue.queue_id},{label:'PayPal order ID',value:orderId}];
+  const provider=paypal.environment==='sandbox'?'PayPal (sandbox)':'PayPal';
+  await raiseOwnerAlert({alertKey:`payment_verified:paypal-capture:${captureId}`,alertType:'PAYMENT_VERIFIED',isTest,facts:{who,product:'Governed Consequence Examination ($149)',route:'/consequence-machine',status:'PAID — verified with PayPal by the server',references,amount:verified.amount,currency:verified.currency,amountBasis:'PAID',provider,providerReference:captureId,occurredAt:paidAt,verifiedAt:new Date().toISOString(),action:'Payment is verified and the intake is queued. Perform the examination (see the READY FOR FULFILLMENT alert).'}});
+  await raiseOwnerAlert({alertKey:`ready_for_fulfillment:consequence-intake:${intakeId}`,alertType:'READY_FOR_FULFILLMENT',isTest,facts:{who,product:'Governed Consequence Examination ($149)',route:'/consequence-machine',status:`QUEUED — ${data.evidence_item_count??0} evidence item(s) frozen`,references:[...references,{label:'Evidence manifest SHA-256',value:String(data.evidence_manifest_sha256??'')}],amount:verified.amount,currency:verified.currency,amountBasis:'PAID',provider,providerReference:captureId,occurredAt:String(queue.queued_at??paidAt),action:`1) Assign an examiner to queue entry ${queue.queue_id} (POST /api/admin/consequence-examinations/transition). 2) Examine intake ${intakeId} against its frozen evidence manifest. 3) Issue and deliver the ALLOW / HOLD / DENY / ESCALATE examination record. No admin page exists for this queue yet; the queue is in ta14_consequence_examination_queue.`}});
   return NextResponse.json({ok:true,intakeId:data.intake_id,status:data.status,queueId:queue.queue_id,queueState:queue.state,queuedAt:queue.queued_at,paidAt:data.paid_at,payloadSha256:data.payload_sha256,evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count,evidenceFrozenAt:data.evidence_frozen_at,boundary:'Payment purchases and queues the governed examination only. It does not establish admissibility, authority, standing, certification, endorsement, compliance, execution permission, or a favorable determination.'});
  }catch(e){console.error('Consequence payment record failed',e);return NextResponse.json({error:'Unable to record the consequence examination payment.'},{status:500})}
 }

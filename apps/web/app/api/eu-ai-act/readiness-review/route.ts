@@ -1,6 +1,7 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { isOperatorIdentity, raiseOwnerAlert } from '@/lib/owner-alerts/server';
 
 type IntakePayload = {
   organizationName?: unknown;
@@ -210,6 +211,28 @@ export async function POST(request: NextRequest) {
         { status: 500 },
       );
     }
+
+    await raiseOwnerAlert({
+      alertKey: `engagement:eu-readiness-intake:${data.intake_id}`,
+      alertType: 'COMMERCIAL_ENGAGEMENT_ACCEPTED',
+      isTest: isOperatorIdentity({ email: contactEmail }),
+      facts: {
+        who: { name: contactName, email: contactEmail, organization: organizationName },
+        product: 'EU AI Act Readiness Review ($750)',
+        route: '/eu-ai-act/readiness-review',
+        status: `Intake submitted (${data.status}); payment not yet verified`,
+        references: [
+          { label: 'Intake ID', value: data.intake_id },
+          { label: 'AI system', value: systemName },
+        ],
+        amount: '750.00',
+        currency: 'USD',
+        amountBasis: 'LISTED_PRICE',
+        occurredAt: data.submitted_at ?? new Date().toISOString(),
+        action:
+          'Review the intake. Do not start the review until a PAYMENT VERIFIED alert for the $750 readiness review arrives. If no payment follows, contact the customer at the email above.',
+      },
+    });
 
     return NextResponse.json(
       {

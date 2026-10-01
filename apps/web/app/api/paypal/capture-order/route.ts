@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
+import { alertProduct } from "@/lib/owner-alerts/products";
+import { isOperatorIdentity, raiseOwnerAlert } from "@/lib/owner-alerts/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -544,6 +546,32 @@ export async function POST(request: NextRequest) {
 
     const payer =
       payerDetails(order);
+    // PayPal has just confirmed this capture to the server (not the browser): the payment is verified.
+    const product = alertProduct(firstPurchaseUnit?.reference_id);
+    const customReference = firstPurchaseUnit?.custom_id ?? null;
+    await raiseOwnerAlert({
+      alertKey: `payment_verified:paypal-capture:${completedCapture.id}`,
+      alertType: "PAYMENT_VERIFIED",
+      isTest: environment.environment === "sandbox" || isOperatorIdentity({ email: payer.email }),
+      facts: {
+        who: { name: [payer.givenName, payer.surname].filter(Boolean).join(" ") || null, email: payer.email },
+        product: product.name,
+        route: product.route,
+        status: "PAYMENT CAPTURED — COMPLETED",
+        references: [
+          { label: "PayPal order ID", value: order.id },
+          ...(customReference ? [{ label: "Customer / intake reference", value: customReference }] : []),
+        ],
+        amount: amount?.value ?? null,
+        currency: amount?.currency_code ?? null,
+        amountBasis: "PAID",
+        provider: environment.environment === "sandbox" ? "PayPal (sandbox)" : "PayPal",
+        providerReference: completedCapture.id,
+        occurredAt: completedCapture.create_time ?? new Date().toISOString(),
+        verifiedAt: new Date().toISOString(),
+        action: product.fulfilment,
+      },
+    });
 
     return jsonResponse(
       {

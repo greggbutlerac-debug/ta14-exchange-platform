@@ -7,6 +7,10 @@
     {
       "path": "/api/acceptance/institutional-finding/trigger",
       "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/owner-alerts/deliver",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
