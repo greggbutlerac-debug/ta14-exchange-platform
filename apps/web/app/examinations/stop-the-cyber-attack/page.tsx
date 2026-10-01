@@ -6,6 +6,17 @@ type Scenario='emergency'|'attack'|'normal';
 type Connection='MADE'|'REFUSED'|'NEVER ATTEMPTED';
 type Decision='ALLOW'|'HOLD'|'DENY'|'ESCALATE';
 
+const teachingVisuals=[
+{n:'01',title:'THE EXPERIMENT',img:'/nist-exam-01-the-experiment.png'},
+{n:'02',title:'THE OBSERVABLE PATH',img:'/nist-exam-02-the-observable-path.png'},
+{n:'03',title:'THE CROSSING',img:'/nist-exam-03-the-crossing.png'},
+{n:'04',title:'THE LOCAL EXAMINATION',img:'/nist-exam-04-the-local-examination.png'},
+{n:'05',title:'THE RECEIPT',img:'/nist-exam-05-the-receipt.png'},
+{n:'06',title:'BREAK IT',img:'/nist-exam-06-break-it.png'},
+{n:'07',title:'THE ROUND TRIP',img:'/nist-exam-07-the-round-trip.png'},
+{n:'08',title:'CHALLENGE THE CLAIM',img:'/nist-exam-08-challenge-the-claim.png'}
+];
+
 const scenarios={
  emergency:{name:'EMERGENCY RESPONSE',attempt:'Legitimate responder requests a bounded building interaction.',crosses:true,connection:'MADE' as Connection,consequence:'Candidate emergency electrical-disconnect consequence. Exact RE1 object identifier remains to be frozen by the working team.'},
  attack:{name:'CYBERATTACK',attempt:'Unauthorized or compromised person, machine, system, or AI agent attempts to interact.',crosses:true,connection:'REFUSED' as Connection,consequence:'Issue a consequential building command.'},
@@ -49,6 +60,7 @@ export default function Page(){
  return <main>
  <nav><Link href="/">TA-14 EXCHANGE</Link><span>NIST WORKSHOP EXAMINATION SURFACE · WORKING DRAFT</span></nav>
  <header><small>STOP THE CYBER ATTACK · OCTOBER 2, 2026 · 10–11 AM EDT</small><h1>MAKE THE BUILDING <em>PROVE IT</em></h1><p className="lede">A live NIST workshop examination using established connection and TA-14 consequence-governance boundaries: change the actor, crossing, evidence or authority and observe exactly where the proposed building consequence stops.</p><div className="heroRule"><span>01 · CAN IT CONNECT?</span><b>≠</b><span>02 · MAY THIS CONSEQUENCE EXECUTE?</span></div><div className="status">WORKING DRAFT · OPEN FOR CORRECTION · NOT A NIST ENDORSEMENT · NOT A PRODUCTION CNS/CP IMPLEMENTATION</div></header>
+ <section className="teachingVisuals"><small>VISUAL TEACHING LAYER</small><h2>Eight images. One working examination.</h2><p>Learn the experiment visually, then use the live controls below to test it.</p><div className="teachingStack">{teachingVisuals.map(v=><article key={v.n}><div><span>{v.n}</span><b>{v.title}</b></div><img src={v.img} alt={v.title}/></article>)}</div></section>
  <section className="mission"><small>WORKSHOP EXAMINATION OBJECTIVE</small><h2>One building. Three attempts. Two independent boundaries.</h2><p><b>The workshop scenario is experimental; the underlying TA-14 consequence-governance architecture is not being invented during the webinar.</b></p><p>NIST does not need to accept an architecture to challenge the experiment. Select a scenario, change a condition, revoke access, and observe the record. Connection success is recorded separately from consequence authority.</p><p className="independence"><b>INDEPENDENCE RULE:</b> Neither boundary may infer the state of the other. A MADE connection does not imply ALLOW, and an ALLOW determination does not imply that the connection remains MADE.</p><div className="boundaryStrip"><div><b>BOUNDARY A · CROSSING</b><span>Who is connecting? What governs the crossing? What actually crossed?</span></div><div><b>BOUNDARY B · CONSEQUENCE</b><span>Given what arrived, is this specific consequence supported NOW?</span></div></div></section>
  <section><small>WHAT ARE WE TESTING?</small><h2>Same building. Different interaction, connection, context and authority.</h2><div className="cards">{(Object.keys(scenarios) as Scenario[]).map(k=><button key={k} onClick={()=>reset(k)} className={scenario===k?'active':''}><b>{scenarios[k].name}</b><span>{scenarios[k].attempt}</span></button>)}</div></section>
  <section className="runbar"><div><small>EXAMINATION RUN</small><b>{runId}</b></div><div><small>STATE</small><b>{taReached?'LOCAL EXAMINATION ACTIVE':'STOPPED BEFORE LOCAL EXAMINATION'}</b></div><div><small>CURRENT RESULT</small><b>{receiptDecision}</b></div></section>
