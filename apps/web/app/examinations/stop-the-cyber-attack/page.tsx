@@ -99,7 +99,7 @@ export default function Page(){
  const reset=(x:Scenario)=>{setScenario(x);setEvidence(true);setAuthority(true);setStanding(true);setCurrent(true);setConnectionRevoked(false);setPassportRevoked(false);setUngoverned(false)};
  const reason=!taReached?'The attempted crossing stopped before a receiving-domain consequence examination.':decision==='ALLOW'?'Present test inputs support this candidate consequence proceeding to the next local boundary.':decision==='HOLD'?'A required present condition is missing, stale, or revoked. Stop and re-establish before proceeding.':decision==='DENY'?'Applicable Authority for this proposed consequence is not established.': 'Established Standing for this proposed consequence is not established; route for bounded escalation.';
  const next=!taReached?'NO LOCAL COMMIT PATH':decision==='ALLOW'?'NEXT: BINDING → COMMIT EXAMINATION':decision==='HOLD'?'COMMIT BLOCKED · RE-ESTABLISH':decision==='DENY'?'COMMIT BLOCKED': 'COMMIT BLOCKED · ESCALATE';
- const runId='NIST-STCA-'+(scenario==='emergency'?'ER':scenario==='attack'?'CA':'NO')+'-001-T0';
+ const runId='RE1-COALITION-'+(scenario==='emergency'?'ER':scenario==='attack'?'CA':'NO')+'-001-T0';
  const connectionLabel=scenario==='normal'?'NOT APPLICABLE · LOCAL CONTROL':ungoverned?'NO GOVERNED CONNECTION ATTEMPTED':connection;
  const receiptDecision=taReached?decision:'NOT REACHED';
  const examPath=[
