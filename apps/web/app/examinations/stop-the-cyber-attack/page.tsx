@@ -1,4 +1,5 @@
 'use client';
+import Link from 'next/link';
 import {useMemo,useRef,useState} from 'react';
 
 type Scenario='emergency'|'attack'|'normal';
