@@ -1,6 +1,7 @@
 import { createHash, randomUUID } from 'crypto';
 import { NextRequest,NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { getPayPalConfig, getPayPalOrder, isValidPayPalOrderId, verifyCompletedOrder } from '@/lib/billing/paypal-server';
 function t(v:unknown,max=500){return typeof v==='string'?v.trim().slice(0,max):''}
 function sameOrigin(r:NextRequest){const o=r.headers.get('origin');if(!o)return true;try{return new URL(o).host===r.nextUrl.host}catch{return false}}
 function canonicalize(value:unknown):string{if(Array.isArray(value))return '['+value.map(canonicalize).join(',')+']';if(value&&typeof value==='object'){const o=value as Record<string,unknown>;return '{'+Object.keys(o).sort().map(k=>JSON.stringify(k)+':'+canonicalize(o[k])).join(',')+'}'}return JSON.stringify(value)}
@@ -8,13 +9,19 @@ function client(){const url=process.env.NEXT_PUBLIC_SUPABASE_URL?.trim()??'';con
 export async function POST(request:NextRequest){
  try{
   if(!sameOrigin(request))return NextResponse.json({error:'Cross-origin submission is not allowed.'},{status:403});
-  const p=await request.json() as Record<string,unknown>;const intakeId=t(p.intakeId,100),orderId=t(p.orderId,100),captureId=t(p.captureId,100),amount=t(p.amount,30),currency=t(p.currency,10).toUpperCase(),customId=t(p.customId,300),capturedAt=t(p.capturedAt,100);
-  if(!intakeId||!orderId||!captureId||amount!=='149.00'||currency!=='USD'||customId!==`governed-consequence-examination:${intakeId}`)return NextResponse.json({error:'Payment confirmation does not match this $149 examination intake.'},{status:400});
+  const p=await request.json() as Record<string,unknown>;const intakeId=t(p.intakeId,100),orderId=t(p.orderId,100),claimedCaptureId=t(p.captureId,100)||null;
+  // The browser supplies only lookup keys. Amount, currency, capture and binding are read from PayPal itself.
+  if(!intakeId||!orderId||!isValidPayPalOrderId(orderId))return NextResponse.json({error:'Payment confirmation does not identify this $149 examination intake.'},{status:400});
   const {data:existing,error:readError}=await client().from('ta14_consequence_examination_intakes').select('intake_id,status,paypal_order_id,paypal_capture_id').eq('intake_id',intakeId).single();
   if(readError||!existing)return NextResponse.json({error:'Examination intake was not found.'},{status:404});
-  if(existing.status==='PAID'&&existing.paypal_capture_id===captureId)return NextResponse.json({ok:true,intakeId,status:'PAID',idempotent:true});
+  if(existing.status==='PAID'&&existing.paypal_order_id===orderId)return NextResponse.json({ok:true,intakeId,status:'PAID',idempotent:true});
   if(existing.status!=='READY_FOR_PAYMENT')return NextResponse.json({error:'This intake is not awaiting payment.'},{status:409});
-  const paidAt=capturedAt&&Number.isFinite(Date.parse(capturedAt))?capturedAt:new Date().toISOString();
+  const paypal=getPayPalConfig();if(!paypal)return NextResponse.json({error:'Payment verification is not configured.'},{status:503});
+  let order;try{order=await getPayPalOrder(paypal,orderId)}catch(e){console.error('Consequence payment verification lookup failed',e);return NextResponse.json({error:'Payment could not be verified with PayPal yet. Retain the PayPal order ID; verification can be retried.'},{status:502})}
+  const verified=verifyCompletedOrder(order,{orderId,referenceId:'governed-consequence-examination',customId:`governed-consequence-examination:${intakeId}`,amount:'149.00',currency:'USD',claimedCaptureId});
+  if(!verified.ok){console.error('Consequence payment verification rejected',{intakeId,orderId,reason:verified.reason});return NextResponse.json({error:'PayPal does not confirm a completed $149 payment for this intake.',reason:verified.reason},{status:402})}
+  const captureId=verified.captureId;
+  const paidAt=verified.capturedAt&&Number.isFinite(Date.parse(verified.capturedAt))?verified.capturedAt:new Date().toISOString();
   const supabase=client();
   const {data:evidence,error:evidenceError}=await supabase.from('ta14_consequence_intake_evidence').select('id,original_filename,media_type,size_bytes,sha256,evidence_state,created_at').eq('intake_id',intakeId).order('created_at',{ascending:true}).order('id',{ascending:true});
   if(evidenceError)return NextResponse.json({error:'Payment was captured but the evidence manifest could not be frozen. Retain the PayPal capture ID for reconciliation.'},{status:500});
