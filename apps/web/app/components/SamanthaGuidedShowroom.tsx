@@ -32,6 +32,7 @@ export default function SamanthaGuidedShowroom({
   const [paused,setPaused]=useState(false);
   const [voicesReady,setVoicesReady]=useState(false);
   const [speechSupported,setSpeechSupported]=useState(true);
+  const [voiceName,setVoiceName]=useState('');
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
   const speechRun=useRef(0);
@@ -51,6 +52,7 @@ export default function SamanthaGuidedShowroom({
     u.lang=language==='en'?'en-US':'en-US';
     const voices=window.speechSynthesis.getVoices();
     u.voice=voices.find(v=>/samantha/i.test(v.name))??voices.find(v=>v.lang.toLowerCase().startsWith('en-us'))??null;
+    setVoiceName(u.voice?.name??'Browser default');
     u.rate=.92; u.pitch=1;
     u.onend=()=>{
       if(speechRun.current!==run)return;
@@ -89,7 +91,7 @@ export default function SamanthaGuidedShowroom({
   useEffect(()=>{
     if(typeof window==='undefined')return;
     if(!('speechSynthesis' in window)){setSpeechSupported(false);return;}
-    const load=()=>{window.speechSynthesis.getVoices();setVoicesReady(true)};
+    const load=()=>{const voices=window.speechSynthesis.getVoices();setVoicesReady(true);const preferred=voices.find(v=>/samantha/i.test(v.name))??voices.find(v=>v.lang.toLowerCase().startsWith('en-us'));setVoiceName(preferred?.name??'Browser default')};
     load(); window.speechSynthesis.addEventListener('voiceschanged',load);
     return()=>{window.speechSynthesis.removeEventListener('voiceschanged',load);window.speechSynthesis.cancel()};
   },[]);
@@ -134,7 +136,7 @@ export default function SamanthaGuidedShowroom({
       }else setActive(0);
     }}>{l.label}<small>{l.status}</small></button>)}</div>
     {!started?<button className="samanthaPlay" onClick={()=>go(0)}>▶ LET SAMANTHA WALK ME THROUGH THIS SHOWROOM</button>:null}
-    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?(!speechSupported?'DEVICE NARRATION · NOT AVAILABLE IN THIS BROWSER':voicesReady?'SAMANTHA VOICE · BROWSER NARRATION READY':'SAMANTHA VOICE · LOADING DEVICE VOICES'):'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
+    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?(!speechSupported?'DEVICE NARRATION · NOT AVAILABLE IN THIS BROWSER':voicesReady?`VOICE READY · ${voiceName||'BROWSER NARRATION'}`:'SAMANTHA VOICE · LOADING DEVICE VOICES'):'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
     <nav>{current.sections.map((s,i)=><button key={s.id} className={i===active?'active':''} onClick={()=>go(i)}><span>{s.number}</span><b>{s.title}</b></button>)}</nav>
     {started?<div className="samanthaControls"><button onClick={togglePause} disabled={!speechSupported&&!current.audioSrc}>{paused?'▶ RESUME':'Ⅱ PAUSE'}</button><button onClick={restart}>↺ RESTART</button></div>:null}
     {started?<div className="samanthaNow"><small>NOW EXPLAINING</small><b>{current.sections[active]?.title}</b><p>{current.sections[active]?.narration}</p>{!follow?<button onClick={()=>{setFollow(true);center(current.sections[active].id)}}>↳ RETURN TO SAMANTHA</button>:null}</div>:null}
