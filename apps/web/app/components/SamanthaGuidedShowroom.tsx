@@ -31,6 +31,7 @@ export default function SamanthaGuidedShowroom({
   const [follow,setFollow]=useState(true);
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
+  const speechRun=useRef(0);
   const current=languages.find(x=>x.code===language)??languages[0];
 
   const center=(id:string)=>{
@@ -39,12 +40,34 @@ export default function SamanthaGuidedShowroom({
     window.setTimeout(()=>{programmaticScroll.current=false},900);
   };
 
+  const speak=(index:number,run:number)=>{
+    if(typeof window==='undefined'||!('speechSynthesis' in window)||current.audioSrc)return;
+    const section=current.sections[index]; if(!section)return;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(section.narration);
+    u.lang=language==='en'?'en-US':'en-US';
+    const voices=window.speechSynthesis.getVoices();
+    u.voice=voices.find(v=>/samantha/i.test(v.name))??voices.find(v=>v.lang.toLowerCase().startsWith('en-us'))??null;
+    u.rate=.92; u.pitch=1;
+    u.onend=()=>{
+      if(speechRun.current!==run)return;
+      const next=index+1;
+      if(next<current.sections.length){setActive(next);if(follow)center(current.sections[next].id);window.setTimeout(()=>speak(next,run),450)}
+      else setStarted(false);
+    };
+    window.speechSynthesis.speak(u);
+  };
+
   const go=(index:number)=>{
     const next=Math.max(0,Math.min(index,current.sections.length-1));
     setActive(next); setStarted(true); setFollow(true);
+    const run=speechRun.current+1; speechRun.current=run;
     if(audioRef.current){audioRef.current.currentTime=current.sections[next].startSeconds; void audioRef.current.play();}
+    else window.setTimeout(()=>speak(next,run),100);
     center(current.sections[next].id);
   };
+
+  useEffect(()=>()=>{if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel()},[]);
 
   useEffect(()=>{
     document.documentElement.dataset.showroomLanguage=language;
@@ -74,6 +97,8 @@ export default function SamanthaGuidedShowroom({
     <div className="samanthaLanguages">{languages.map(l=><button key={l.code} className={l.code===language?'on':''} onClick={()=>{
       const wasStarted=started;
       const sectionId=current.sections[active]?.id;
+      speechRun.current+=1;
+      if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();
       setLanguage(l.code);
       setFollow(true);
       if(wasStarted){
@@ -84,7 +109,7 @@ export default function SamanthaGuidedShowroom({
       }else setActive(0);
     }}>{l.label}<small>{l.status}</small></button>)}</div>
     {!started?<button className="samanthaPlay" onClick={()=>go(0)}>▶ LET SAMANTHA WALK ME THROUGH THIS SHOWROOM</button>:null}
-    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">NARRATION AUDIO · READY TO ATTACH</div>}
+    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">SAMANTHA VOICE · BROWSER NARRATION READY</div>}
     <nav>{current.sections.map((s,i)=><button key={s.id} className={i===active?'active':''} onClick={()=>go(i)}><span>{s.number}</span><b>{s.title}</b></button>)}</nav>
     {started?<div className="samanthaNow"><small>NOW EXPLAINING</small><b>{current.sections[active]?.title}</b><p>{current.sections[active]?.narration}</p>{!follow?<button onClick={()=>{setFollow(true);center(current.sections[active].id)}}>↳ RETURN TO SAMANTHA</button>:null}</div>:null}
     <style jsx>{`
