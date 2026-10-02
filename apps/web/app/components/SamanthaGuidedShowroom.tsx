@@ -104,9 +104,12 @@ export default function SamanthaGuidedShowroom({
   useEffect(()=>{
     if(!started)return;
     const manual=()=>{if(!programmaticScroll.current)setFollow(false)};
+    const keyboard=(e:KeyboardEvent)=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))manual()};
     window.addEventListener('wheel',manual,{passive:true});
     window.addEventListener('touchmove',manual,{passive:true});
-    return()=>{window.removeEventListener('wheel',manual);window.removeEventListener('touchmove',manual)};
+    window.addEventListener('scroll',manual,{passive:true});
+    window.addEventListener('keydown',keyboard);
+    return()=>{window.removeEventListener('wheel',manual);window.removeEventListener('touchmove',manual);window.removeEventListener('scroll',manual);window.removeEventListener('keydown',keyboard)};
   },[started]);
 
   useEffect(()=>{
