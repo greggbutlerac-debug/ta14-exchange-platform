@@ -46,8 +46,8 @@
 <text x="824" y="712.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="824" dy="0.0">The request exceeds the grant</tspan></text>
 <rect x="40" y="770" width="720" height="150" rx="12" fill="#e5f5ec" stroke="#1f8a4c" stroke-width="2"/>
 <rect x="40" y="770" width="720" height="6" rx="3" fill="#1f8a4c"/>
-<text x="56" y="804" font-size="19" fill="#1f8a4c" font-weight="700" text-anchor="start"><tspan x="56" dy="0.0">TA-14 DOES NOT ORIGINATE ALL AUTHORITY</tspan></text>
-<text x="56" y="839.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="56" dy="0.0">A sufficient delegated grant may satisfy Applicable Authority. TA-14 asks whether</tspan><tspan x="56" dy="19.2">this exact consequence has sufficient Admissible Evidence, Applicable Authority</tspan><tspan x="56" dy="19.2">and Established Standing to become reality NOW.</tspan></text>
+<text x="56" y="804" font-size="19" fill="#1f8a4c" font-weight="700" text-anchor="start"><tspan x="56" dy="0.0">TA-14 DOES NOT ORIGINATE AUTHORITY</tspan></text>
+<text x="56" y="839.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="56" dy="0.0">TA-14 verifies whether the Applicable Authority presented for the proposed</tspan><tspan x="56" dy="19.2">consequence is sufficient. Authority originates from the legitimate authority</tspan><tspan x="56" dy="19.2">source; a Connection Profile may carry evidence of a valid delegation.</tspan></text>
 <rect x="790" y="770" width="706" height="150" rx="12" fill="#fdeceb" stroke="#c0392b" stroke-width="2"/>
 <rect x="790" y="770" width="706" height="6" rx="3" fill="#c0392b"/>
 <text x="806" y="804" font-size="19" fill="#c0392b" font-weight="700" text-anchor="start"><tspan x="806" dy="0.0">TA-14 GOVERNS ONLY AT ITS COMMIT BOUNDARY</tspan></text>
