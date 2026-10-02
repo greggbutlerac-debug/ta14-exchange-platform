@@ -41,7 +41,7 @@ export default function SamanthaGuidedShowroom({
   };
 
   const speak=(index:number,run:number)=>{
-    if(typeof window==='undefined'||!('speechSynthesis' in window)||current.audioSrc)return;
+    if(typeof window==='undefined'||!('speechSynthesis' in window)||current.audioSrc||language!=='en')return;
     const section=current.sections[index]; if(!section)return;
     window.speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(section.narration);
@@ -109,7 +109,7 @@ export default function SamanthaGuidedShowroom({
       }else setActive(0);
     }}>{l.label}<small>{l.status}</small></button>)}</div>
     {!started?<button className="samanthaPlay" onClick={()=>go(0)}>▶ LET SAMANTHA WALK ME THROUGH THIS SHOWROOM</button>:null}
-    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">SAMANTHA VOICE · BROWSER NARRATION READY</div>}
+    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?'SAMANTHA VOICE · BROWSER NARRATION READY':'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
     <nav>{current.sections.map((s,i)=><button key={s.id} className={i===active?'active':''} onClick={()=>go(i)}><span>{s.number}</span><b>{s.title}</b></button>)}</nav>
     {started?<div className="samanthaNow"><small>NOW EXPLAINING</small><b>{current.sections[active]?.title}</b><p>{current.sections[active]?.narration}</p>{!follow?<button onClick={()=>{setFollow(true);center(current.sections[active].id)}}>↳ RETURN TO SAMANTHA</button>:null}</div>:null}
     <style jsx>{`
@@ -121,6 +121,7 @@ export default function SamanthaGuidedShowroom({
       .samanthaNow{margin-top:9px;border-top:1px solid #ffffff1f;padding-top:9px}.samanthaNow small{font-size:6px;color:#f1cb73}.samanthaNow b{display:block;font-size:10px;margin:4px 0}.samanthaNow p{font-size:8px;line-height:1.5;color:#aebfc5}
       :global(html[data-showroom-language="en"] .tp),:global(html[data-showroom-language="en"] .hm){display:none!important}
       :global(html[data-showroom-language="en"] .en){display:initial!important}
+      :global(html[data-showroom-language="local"] .en){display:none!important}
       @media(max-width:900px){.samanthaGuide{position:relative;left:auto;top:auto;width:auto;max-height:none;margin:12px}.samanthaGuide nav{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}}
     `}</style>
   </aside>;
