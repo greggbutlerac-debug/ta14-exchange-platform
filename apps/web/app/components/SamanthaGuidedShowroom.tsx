@@ -33,12 +33,12 @@ export default function SamanthaGuidedShowroom({
   const [voicesReady,setVoicesReady]=useState(false);
   const [speechSupported,setSpeechSupported]=useState(true);
   const [voiceName,setVoiceName]=useState('');
-  const canNarrate=Boolean(current.audioSrc)||(language==='en'&&speechSupported);
-  const guidedMode=canNarrate?'GUIDED':'EXPLORE';
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
   const speechRun=useRef(0);
   const current=languages.find(x=>x.code===language)??languages[0];
+  const canNarrate=Boolean(current.audioSrc)||(language==='en'&&speechSupported);
+  const guidedMode=canNarrate?'GUIDED':'EXPLORE';
 
   const center=(id:string)=>{
     programmaticScroll.current=true;
