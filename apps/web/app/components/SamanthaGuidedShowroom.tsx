@@ -34,6 +34,7 @@ export default function SamanthaGuidedShowroom({
   const [speechSupported,setSpeechSupported]=useState(true);
   const [voiceName,setVoiceName]=useState('');
   const canNarrate=Boolean(current.audioSrc)||(language==='en'&&speechSupported);
+  const guidedMode=canNarrate?'GUIDED':'EXPLORE';
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
   const speechRun=useRef(0);
@@ -124,20 +125,25 @@ export default function SamanthaGuidedShowroom({
   },[active,current,follow]);
 
   return <aside className="samanthaGuide" aria-label="Samantha guided showroom">
-    <div className="samanthaHead"><b>SAMANTHA</b><span>GUIDED SHOWROOM</span></div>
+    <div className="samanthaHead"><b>SAMANTHA</b><span>{guidedMode} SHOWROOM</span></div>
     <div className="samanthaLanguages">{languages.map(l=><button key={l.code} className={l.code===language?'on':''} onClick={()=>{
       const wasStarted=started;
       const sectionId=current.sections[active]?.id;
       speechRun.current+=1;
       if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();
       setLanguage(l.code);
+      setPaused(false);
       setFollow(true);
-      if(wasStarted){
+      const nextCanNarrate=Boolean(l.audioSrc)||(l.code==='en'&&speechSupported);
+      if(wasStarted&&nextCanNarrate){
         const nextSections=l.sections;
         const nextIndex=Math.max(0,nextSections.findIndex(s=>s.id===sectionId));
         setActive(nextIndex);
         window.setTimeout(()=>center(nextSections[nextIndex].id),0);
-      }else setActive(0);
+      }else{
+        setStarted(false);
+        if(sectionId){const nextIndex=Math.max(0,l.sections.findIndex(s=>s.id===sectionId));setActive(nextIndex);window.setTimeout(()=>center(l.sections[nextIndex].id),0)}else setActive(0);
+      }
     }}>{l.label}<small>{l.status}</small></button>)}</div>
     {!started?(canNarrate?<button className="samanthaPlay" onClick={()=>go(0)}>▶ LET SAMANTHA WALK ME THROUGH THIS SHOWROOM</button>:<div className="samanthaExplore"><b>EXPLORE THIS SHOWROOM</b><span>LOCAL GUIDED NARRATION WILL ACTIVATE AFTER LANGUAGE REVIEW.</span></div>):null}
     {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?(!speechSupported?'DEVICE NARRATION · NOT AVAILABLE IN THIS BROWSER':voicesReady?`VOICE READY · ${voiceName||'BROWSER NARRATION'}`:'SAMANTHA VOICE · LOADING DEVICE VOICES'):'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
