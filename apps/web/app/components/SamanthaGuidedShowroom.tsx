@@ -29,6 +29,7 @@ export default function SamanthaGuidedShowroom({
   const [active,setActive]=useState(0);
   const [started,setStarted]=useState(false);
   const [follow,setFollow]=useState(true);
+  const [paused,setPaused]=useState(false);
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
   const speechRun=useRef(0);
@@ -60,11 +61,27 @@ export default function SamanthaGuidedShowroom({
 
   const go=(index:number)=>{
     const next=Math.max(0,Math.min(index,current.sections.length-1));
-    setActive(next); setStarted(true); setFollow(true);
+    setActive(next); setStarted(true); setFollow(true); setPaused(false);
     const run=speechRun.current+1; speechRun.current=run;
     if(audioRef.current){audioRef.current.currentTime=current.sections[next].startSeconds; void audioRef.current.play();}
     else window.setTimeout(()=>speak(next,run),100);
     center(current.sections[next].id);
+  };
+
+  const togglePause=()=>{
+    if(typeof window==='undefined')return;
+    if(audioRef.current){
+      if(audioRef.current.paused){void audioRef.current.play();setPaused(false)}else{audioRef.current.pause();setPaused(true)}
+      return;
+    }
+    if(!('speechSynthesis' in window)||language!=='en')return;
+    if(window.speechSynthesis.paused){window.speechSynthesis.resume();setPaused(false)}else{window.speechSynthesis.pause();setPaused(true)}
+  };
+
+  const restart=()=>{
+    speechRun.current+=1;
+    if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();
+    setPaused(false);go(0);
   };
 
   useEffect(()=>()=>{if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel()},[]);
@@ -111,6 +128,7 @@ export default function SamanthaGuidedShowroom({
     {!started?<button className="samanthaPlay" onClick={()=>go(0)}>▶ LET SAMANTHA WALK ME THROUGH THIS SHOWROOM</button>:null}
     {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?'SAMANTHA VOICE · BROWSER NARRATION READY':'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
     <nav>{current.sections.map((s,i)=><button key={s.id} className={i===active?'active':''} onClick={()=>go(i)}><span>{s.number}</span><b>{s.title}</b></button>)}</nav>
+    {started?<div className="samanthaControls"><button onClick={togglePause}>{paused?'▶ RESUME':'Ⅱ PAUSE'}</button><button onClick={restart}>↺ RESTART</button></div>:null}
     {started?<div className="samanthaNow"><small>NOW EXPLAINING</small><b>{current.sections[active]?.title}</b><p>{current.sections[active]?.narration}</p>{!follow?<button onClick={()=>{setFollow(true);center(current.sections[active].id)}}>↳ RETURN TO SAMANTHA</button>:null}</div>:null}
     <style jsx>{`
       .samanthaGuide{position:fixed;left:14px;top:88px;z-index:900;width:250px;max-height:calc(100vh - 110px);overflow:auto;background:#061318f2;border:1px solid #d9b85a66;border-radius:14px;padding:13px;box-shadow:0 18px 60px #0009;color:#fff;font-family:Arial,sans-serif}
@@ -118,7 +136,7 @@ export default function SamanthaGuidedShowroom({
       .samanthaLanguages{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:10px 0}.samanthaLanguages button,.samanthaPlay,nav button,.samanthaNow button{cursor:pointer;border:1px solid #31505a;background:#0a2027;color:#dce8eb;border-radius:7px;padding:8px;font-weight:800}.samanthaLanguages button.on{border-color:#f1cb73;color:#f1cb73}.samanthaLanguages small{display:block;font-size:6px;margin-top:3px;color:#8fa5ad}.samanthaPlay{width:100%;border-color:#f1cb73;color:#071719;background:#f1cb73;font-size:8px;letter-spacing:.05em}
       audio{width:100%;height:32px;margin:9px 0}.samanthaPending{font-size:7px;color:#8fa5ad;text-align:center;padding:9px;border:1px dashed #31505a;border-radius:6px;margin:9px 0}
       nav{display:grid;gap:5px}nav button{display:grid;grid-template-columns:28px 1fr;text-align:left;align-items:center;font-size:8px}nav button span{color:#6f8992;font-size:10px}nav button.active{border-color:#f1cb73;background:#f1cb7315}nav button.active span{color:#f1cb73}
-      .samanthaNow{margin-top:9px;border-top:1px solid #ffffff1f;padding-top:9px}.samanthaNow small{font-size:6px;color:#f1cb73}.samanthaNow b{display:block;font-size:10px;margin:4px 0}.samanthaNow p{font-size:8px;line-height:1.5;color:#aebfc5}
+      .samanthaControls{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}.samanthaControls button{cursor:pointer;border:1px solid #31505a;background:#0a2027;color:#dce8eb;border-radius:7px;padding:8px;font-size:7px;font-weight:900}.samanthaNow{margin-top:9px;border-top:1px solid #ffffff1f;padding-top:9px}.samanthaNow small{font-size:6px;color:#f1cb73}.samanthaNow b{display:block;font-size:10px;margin:4px 0}.samanthaNow p{font-size:8px;line-height:1.5;color:#aebfc5}
       :global(html[data-showroom-language="en"] .tp),:global(html[data-showroom-language="en"] .hm){display:none!important}
       :global(html[data-showroom-language="en"] .en){display:initial!important}
       :global(html[data-showroom-language="local"] .en){display:none!important}
