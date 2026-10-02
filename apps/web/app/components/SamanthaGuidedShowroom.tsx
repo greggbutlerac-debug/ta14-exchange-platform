@@ -30,6 +30,7 @@ export default function SamanthaGuidedShowroom({
   const [started,setStarted]=useState(false);
   const [follow,setFollow]=useState(true);
   const [paused,setPaused]=useState(false);
+  const [voicesReady,setVoicesReady]=useState(false);
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
   const speechRun=useRef(0);
@@ -84,7 +85,12 @@ export default function SamanthaGuidedShowroom({
     setPaused(false);go(0);
   };
 
-  useEffect(()=>()=>{if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel()},[]);
+  useEffect(()=>{
+    if(typeof window==='undefined'||!('speechSynthesis' in window))return;
+    const load=()=>{window.speechSynthesis.getVoices();setVoicesReady(true)};
+    load(); window.speechSynthesis.addEventListener('voiceschanged',load);
+    return()=>{window.speechSynthesis.removeEventListener('voiceschanged',load);window.speechSynthesis.cancel()};
+  },[]);
 
   useEffect(()=>{
     document.documentElement.dataset.showroomLanguage=language;
@@ -126,7 +132,7 @@ export default function SamanthaGuidedShowroom({
       }else setActive(0);
     }}>{l.label}<small>{l.status}</small></button>)}</div>
     {!started?<button className="samanthaPlay" onClick={()=>go(0)}>▶ LET SAMANTHA WALK ME THROUGH THIS SHOWROOM</button>:null}
-    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?'SAMANTHA VOICE · BROWSER NARRATION READY':'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
+    {current.audioSrc?<audio ref={audioRef} src={current.audioSrc} controls preload="metadata"/>:<div className="samanthaPending">{language==='en'?(voicesReady?'SAMANTHA VOICE · BROWSER NARRATION READY':'SAMANTHA VOICE · LOADING DEVICE VOICES'):'LOCAL NARRATION · PENDING LANGUAGE REVIEW'}</div>}
     <nav>{current.sections.map((s,i)=><button key={s.id} className={i===active?'active':''} onClick={()=>go(i)}><span>{s.number}</span><b>{s.title}</b></button>)}</nav>
     {started?<div className="samanthaControls"><button onClick={togglePause}>{paused?'▶ RESUME':'Ⅱ PAUSE'}</button><button onClick={restart}>↺ RESTART</button></div>:null}
     {started?<div className="samanthaNow"><small>NOW EXPLAINING</small><b>{current.sections[active]?.title}</b><p>{current.sections[active]?.narration}</p>{!follow?<button onClick={()=>{setFollow(true);center(current.sections[active].id)}}>↳ RETURN TO SAMANTHA</button>:null}</div>:null}
