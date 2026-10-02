@@ -1,0 +1,82 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1536 1024" width="1536" height="1024" font-family="Arial, Helvetica, sans-serif" role="img" aria-label="A CONNECTION PROFILE CAN CARRY A CONTROL RIGHT"><defs><marker id="ah-bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#f4f7fa"/></marker><marker id="ah-navy" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0b2340"/></marker><marker id="ah-ink" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0d1b2a"/></marker><marker id="ah-muted" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#4a5d70"/></marker><marker id="ah-line" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#c7d3df"/></marker><marker id="ah-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1f6fd1"/></marker><marker id="ah-blue_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e6f0fc"/></marker><marker id="ah-green" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#1f8a4c"/></marker><marker id="ah-green_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e5f5ec"/></marker><marker id="ah-amber" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#b5730a"/></marker><marker id="ah-amber_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#fdf3e1"/></marker><marker id="ah-red" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#c0392b"/></marker><marker id="ah-red_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#fdeceb"/></marker><marker id="ah-violet" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#6b3fb5"/></marker><marker id="ah-violet_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#efe8fb"/></marker><marker id="ah-teal" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#0f7c86"/></marker><marker id="ah-teal_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e2f4f5"/></marker><marker id="ah-gray_bg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#eef2f6"/></marker><marker id="ah-white" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#ffffff"/></marker><marker id="ah-gold" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#e7c76e"/></marker></defs><rect width="1536" height="1024" fill="#f4f7fa"/><rect x="0" y="0" width="1536" height="118" fill="#0b2340"/><text x="40" y="38" font-size="18" fill="#e7c76e" font-weight="700" letter-spacing="2">LESSON 02 OF 08</text><text x="40" y="78" font-size="34" fill="#ffffff" font-weight="700">A CONNECTION PROFILE CAN CARRY A CONTROL RIGHT</text><text x="40" y="106" font-size="18" fill="#9fd8ff">The Profile defines the right. A named enforcement component checks it at commit.</text>
+<rect x="40" y="150" width="250" height="230" rx="12" fill="#e6f0fc" stroke="#1f6fd1" stroke-width="2"/>
+<rect x="40" y="150" width="250" height="6" rx="3" fill="#1f6fd1"/>
+<text x="56" y="184" font-size="19" fill="#1f6fd1" font-weight="700" text-anchor="start"><tspan x="56" dy="0.0">ORG B · REQUESTING</tspan><tspan x="56" dy="24.3">PARTY</tspan></text>
+<text x="56" y="243.32" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="56" dy="0.0">Asks to write the AHU-1</tspan><tspan x="56" dy="19.2">supply-air temperature</tspan><tspan x="56" dy="19.2">(SAT) setpoint: 58 °F →</tspan><tspan x="56" dy="19.2">62 °F.</tspan></text>
+<rect x="330" y="150" width="330" height="280" rx="12" fill="#efe8fb" stroke="#6b3fb5" stroke-width="2"/>
+<rect x="330" y="150" width="330" height="6" rx="3" fill="#6b3fb5"/>
+<text x="346" y="184" font-size="19" fill="#6b3fb5" font-weight="700" text-anchor="start"><tspan x="346" dy="0.0">CONNECTION PROFILE (CNS/CP)</tspan></text>
+<circle cx="352" cy="214.0" r="3.5" fill="#6b3fb5"/>
+<text x="364" y="219.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="364" dy="0.0">Named parties: Owner ↔ Org B</tspan></text>
+<circle cx="352" cy="243.0" r="3.5" fill="#6b3fb5"/>
+<text x="364" y="248.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="364" dy="0.0">Purpose: SAT optimisation</tspan></text>
+<circle cx="352" cy="272.0" r="3.5" fill="#6b3fb5"/>
+<text x="364" y="277.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="364" dy="0.0">Control right: write AHU-1 SAT,</tspan><tspan x="364" dy="19.2">55–65 °F, business hours</tspan></text>
+<circle cx="352" cy="320.2" r="3.5" fill="#6b3fb5"/>
+<text x="364" y="325.2" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="364" dy="0.0">Validity and revocation terms</tspan></text>
+<text x="346" y="392" font-size="14" fill="#6b3fb5" font-weight="700" text-anchor="start"><tspan x="346" dy="0.0">Defines the right. Does not validate,</tspan><tspan x="346" dy="17.9">filter or enforce it.</tspan></text>
+<rect x="330" y="450" width="330" height="145" rx="12" fill="#efe8fb" stroke="#6b3fb5" stroke-width="2"/>
+<rect x="330" y="450" width="330" height="6" rx="3" fill="#6b3fb5"/>
+<text x="346" y="484" font-size="19" fill="#6b3fb5" font-weight="700" text-anchor="start"><tspan x="346" dy="0.0">CONNECTION INSTANCE</tspan></text>
+<text x="346" y="519.0" font-size="14" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="346" dy="0.0">Owner ↔ Org B · valid 7 days · state</tspan><tspan x="346" dy="17.9">ACTIVE or REVOKED, held by the</tspan><tspan x="346" dy="17.9">connection host.</tspan></text>
+<rect x="330" y="612" width="330" height="168" rx="12" fill="#e2f4f5" stroke="#0f7c86" stroke-width="2"/>
+<rect x="330" y="612" width="330" height="6" rx="3" fill="#0f7c86"/>
+<text x="346" y="646" font-size="19" fill="#0f7c86" font-weight="700" text-anchor="start"><tspan x="346" dy="0.0">AUTHENTICATION /</tspan><tspan x="346" dy="24.3">AUTHORIZATION</tspan></text>
+<text x="346" y="705.32" font-size="14" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="346" dy="0.0">Identity, credentials, transport</tspan><tspan x="346" dy="17.9">security. Background IAM and network</tspan><tspan x="346" dy="17.9">layer — not the Profile.</tspan></text>
+<line x1="290" y1="265" x2="328" y2="265" stroke="#1f6fd1" stroke-width="3" marker-end="url(#ah-blue)"/>
+<line x1="660" y1="300" x2="698" y2="300" stroke="#6b3fb5" stroke-width="3" marker-end="url(#ah-violet)"/>
+<rect x="700" y="150" width="430" height="630" rx="12" fill="#fdf3e1" stroke="#b5730a" stroke-width="3"/>
+<rect x="700" y="150" width="430" height="8" rx="3" fill="#b5730a"/>
+<text x="718" y="186" font-size="20" fill="#b5730a" font-weight="700" text-anchor="start"><tspan x="718" dy="0.0">ENFORCEMENT / COMMIT POINT</tspan></text>
+<text x="718" y="212" font-size="16" fill="#0d1b2a" font-weight="700" text-anchor="start"><tspan x="718" dy="0.0">Named component: BAS integration gateway</tspan></text>
+<circle cx="732" cy="253" r="13" fill="#b5730a"/>
+<text x="732" y="258" font-size="14" fill="#fff" font-weight="700" text-anchor="middle"><tspan x="732" dy="0.0">1</tspan></text>
+<text x="756" y="258" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="756" dy="0.0">Request authenticated (from IAM)</tspan></text>
+<circle cx="732" cy="292.0" r="13" fill="#b5730a"/>
+<text x="732" y="297.0" font-size="14" fill="#fff" font-weight="700" text-anchor="middle"><tspan x="732" dy="0.0">2</tspan></text>
+<text x="756" y="297.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="756" dy="0.0">Connection instance active, not revoked</tspan></text>
+<circle cx="732" cy="331.0" r="13" fill="#b5730a"/>
+<text x="732" y="336.0" font-size="14" fill="#fff" font-weight="700" text-anchor="middle"><tspan x="732" dy="0.0">3</tspan></text>
+<text x="756" y="336.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="756" dy="0.0">Command inside the control right: point,</tspan><tspan x="756" dy="19.2">55–65 °F, hours</tspan></text>
+<circle cx="732" cy="389.2" r="13" fill="#b5730a"/>
+<text x="732" y="394.2" font-size="14" fill="#fff" font-weight="700" text-anchor="middle"><tspan x="732" dy="0.0">4</tspan></text>
+<text x="756" y="394.2" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="756" dy="0.0">Delegated consequence authority on record</tspan><tspan x="756" dy="19.2">from a grantor who holds it</tspan></text>
+<circle cx="732" cy="447.4" r="13" fill="#b5730a"/>
+<text x="732" y="452.4" font-size="14" fill="#fff" font-weight="700" text-anchor="middle"><tspan x="732" dy="0.0">5</tspan></text>
+<text x="756" y="452.4" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="756" dy="0.0">TA-14 consequence examination: Admissible</tspan><tspan x="756" dy="19.2">Evidence · Applicable Authority ·</tspan><tspan x="756" dy="19.2">Established Standing · NOW</tspan></text>
+<circle cx="732" cy="524.8" r="13" fill="#b5730a"/>
+<text x="732" y="529.8" font-size="14" fill="#fff" font-weight="700" text-anchor="middle"><tspan x="732" dy="0.0">6</tspan></text>
+<text x="756" y="529.8" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="756" dy="0.0">Local safety interlocks permit</tspan><tspan x="756" dy="19.2">(freeze-stat, fan proven)</tspan></text>
+<rect x="716" y="690" width="190" height="74" rx="10" fill="#e5f5ec" stroke="#1f8a4c" stroke-width="2"/>
+<text x="811" y="720" font-size="18" fill="#1f8a4c" font-weight="700" text-anchor="middle"><tspan x="811" dy="0.0">ALLOW</tspan></text>
+<text x="811" y="746" font-size="14" fill="#0d1b2a" font-weight="400" text-anchor="middle"><tspan x="811" dy="0.0">gateway writes</tspan></text>
+<rect x="918" y="690" width="196" height="74" rx="10" fill="#fdeceb" stroke="#c0392b" stroke-width="2"/>
+<text x="1016" y="714" font-size="15" fill="#c0392b" font-weight="700" text-anchor="middle"><tspan x="1016" dy="0.0">HOLD · DENY · ESCALATE</tspan></text>
+<text x="1016" y="740" font-size="14" fill="#0d1b2a" font-weight="400" text-anchor="middle"><tspan x="1016" dy="0.0">no write · logged</tspan></text>
+<line x1="1130" y1="410" x2="1168" y2="410" stroke="#1f8a4c" stroke-width="3" marker-end="url(#ah-green)"/>
+<text x="1149.0" y="402.0" font-size="13" fill="#1f8a4c" font-weight="700" text-anchor="middle"><tspan x="1149.0" dy="0.0">write</tspan></text>
+<rect x="1170" y="150" width="326" height="250" rx="12" fill="#e5f5ec" stroke="#1f8a4c" stroke-width="2"/>
+<rect x="1170" y="150" width="326" height="6" rx="3" fill="#1f8a4c"/>
+<text x="1186" y="184" font-size="19" fill="#1f8a4c" font-weight="700" text-anchor="start"><tspan x="1186" dy="0.0">AHU-1 CONTROLLER</tspan></text>
+<text x="1186" y="219.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="1186" dy="0.0">Receives the setpoint only from the</tspan><tspan x="1186" dy="19.2">gateway. The fan and coil respond:</tspan><tspan x="1186" dy="19.2">physical execution changes reality.</tspan></text>
+<rect x="1170" y="420" width="326" height="360" rx="12" fill="#e2f4f5" stroke="#0f7c86" stroke-width="2"/>
+<rect x="1170" y="420" width="326" height="6" rx="3" fill="#0f7c86"/>
+<text x="1186" y="454" font-size="19" fill="#0f7c86" font-weight="700" text-anchor="start"><tspan x="1186" dy="0.0">RECORD</tspan></text>
+<text x="1186" y="489.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="1186" dy="0.0">Request, each check result,</tspan><tspan x="1186" dy="19.2">disposition, command and outcome —</tspan><tspan x="1186" dy="19.2">kept by the gateway and the BAS,</tspan><tspan x="1186" dy="19.2">not by the Profile.</tspan></text>
+<rect x="40" y="800" width="360" height="165" rx="12" fill="#e6f0fc" stroke="#1f6fd1" stroke-width="2"/>
+<rect x="40" y="800" width="360" height="6" rx="3" fill="#1f6fd1"/>
+<text x="56" y="834" font-size="19" fill="#1f6fd1" font-weight="700" text-anchor="start"><tspan x="56" dy="0.0">CONTROL RIGHT</tspan></text>
+<text x="56" y="869.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="56" dy="0.0">Permission to issue a defined command</tspan><tspan x="56" dy="19.2">to a defined point within defined</tspan><tspan x="56" dy="19.2">limits.</tspan></text>
+<rect x="420" y="800" width="360" height="165" rx="12" fill="#efe8fb" stroke="#6b3fb5" stroke-width="2"/>
+<rect x="420" y="800" width="360" height="6" rx="3" fill="#6b3fb5"/>
+<text x="436" y="834" font-size="19" fill="#6b3fb5" font-weight="700" text-anchor="start"><tspan x="436" dy="0.0">CONSEQUENCE AUTHORITY</tspan></text>
+<text x="436" y="869.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="436" dy="0.0">Authority over the physical</tspan><tspan x="436" dy="19.2">consequence. May be delegated through a</tspan><tspan x="436" dy="19.2">governed connection when the grantor</tspan><tspan x="436" dy="19.2">actually holds it.</tspan></text>
+<rect x="800" y="800" width="330" height="165" rx="12" fill="#e5f5ec" stroke="#1f8a4c" stroke-width="2"/>
+<rect x="800" y="800" width="330" height="6" rx="3" fill="#1f8a4c"/>
+<text x="816" y="834" font-size="19" fill="#1f8a4c" font-weight="700" text-anchor="start"><tspan x="816" dy="0.0">COMMIT PERMISSION</tspan></text>
+<text x="816" y="869.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="816" dy="0.0">Decided at actuation, at the</tspan><tspan x="816" dy="19.2">enforcement point: current</tspan><tspan x="816" dy="19.2">evidence, authority, standing,</tspan><tspan x="816" dy="19.2">scope, revocation, safety.</tspan></text>
+<rect x="1150" y="800" width="346" height="165" rx="12" fill="#fdeceb" stroke="#c0392b" stroke-width="2"/>
+<rect x="1150" y="800" width="346" height="6" rx="3" fill="#c0392b"/>
+<text x="1166" y="834" font-size="19" fill="#c0392b" font-weight="700" text-anchor="start"><tspan x="1166" dy="0.0">ONLY THIS PATH IS GOVERNED</tspan></text>
+<text x="1166" y="869.0" font-size="15" fill="#0d1b2a" font-weight="400" text-anchor="start"><tspan x="1166" dy="0.0">If the BAS front end, a vendor tool</tspan><tspan x="1166" dy="19.2">or a direct protocol write can also</tspan><tspan x="1166" dy="19.2">change AHU-1, TA-14 is advisory on</tspan><tspan x="1166" dy="19.2">that path.</tspan></text>
+<rect x="0" y="980" width="1536" height="44" fill="#0b2340"/><text x="40" y="1008" font-size="14" fill="#c9d7e4">TA-14 working technical response to questions raised by David Holmberg. Not authored, endorsed or accepted by David Holmberg or NIST.</text></svg>
