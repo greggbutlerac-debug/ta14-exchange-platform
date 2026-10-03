@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type Gate = 'supported' | 'missing' | 'expired' | 'outside';
 type Result = 'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE';
@@ -63,6 +64,49 @@ const voices = [
   ['ALN', 'Keep the owner, asset lifecycle, decision, responsibility, and business consequence in view.'],
   ['TA-14', 'Ask the final pre-consequence question: does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?']
 ];
+
+
+const chicagoVisuals = [
+  {n:'01',k:'PROOF OVER PROMISE',title:'Proof matters. Permission is a different question.',img:'/01-proof-over-promise-proof-is-not-permission.png',script:'Start with the central Chicago proposition. Proof matters. A sensor can be calibrated. Analytics can be correct. A result can be verified. But proof by itself does not establish permission to change physical reality. The next question is consequence-specific: proven sufficient for what consequence? TA-14 separates proof from admissible evidence, applicable authority, established standing, commitment, execution, and outcome. The purpose is not to weaken proof. It is to prevent a valid result from silently becoming authority it never established.'},
+  {n:'02',k:'THE CLASSROOM',title:'A verified condition creates a proposal — not automatic permission.',img:'/02-classroom-elevated-co2-proposed-consequence.png',script:'Here is the classroom example. Sensors verify elevated carbon dioxide in an occupied classroom. Analytics recommend increasing outdoor-air ventilation. The controller is technically capable of sending the command. Those facts establish an important part of the case, but not the whole case. Before the command becomes physical reality, the proposed consequence still has to establish admissible evidence, applicable authority, established standing, and execution scope under current conditions. Capability tells us what the system can do. Governance determines what it may do now.'},
+  {n:'03',k:'THE AUTHORITY BOUNDARY',title:'A correct result can still stop before execution.',img:'/03-proof-does-not-cross-the-authority-boundary.png',script:'This visual isolates the authority boundary. On the left, the measurement is verified and the recommendation may be technically valid. The information can reach another system. But execution authority does not silently travel with the data or recommendation. Policy, codes, operating requirements, owner requirements, contracts, and other applicable authority conditions must be established for this exact consequence. If a required condition is missing, the command stops. The equipment remains unchanged. Proof can travel. Execution authority must be established where the consequence will occur.'},
+  {n:'04',k:'THE CANONICAL CHAIN',title:'Eight anchors separate observation from consequence.',img:'/04-reality-to-outcome-admissible-execution-chain.png',script:'This is the canonical TA-14 chain. Reality is the actual condition. Record preserves what was observed. Continuity asks whether that record remains current enough for the proposition. Admissibility asks whether the evidence is attributable and fit. Binding connects the evidence to applicable authority. Commit defines the exact bounded action under present conditions. Execution is what the authorized system actually does. Outcome returns us to reality and requires a new baseline to be observed. No anchor is allowed to borrow standing from the one before it.'},
+  {n:'05',k:'HOLD',title:'HOLD stops this consequence. It does not erase the evidence.',img:'/05-hold-the-consequence-before-execution.png',script:'Now watch what happens when proof survives but a required authority condition does not. The evidence can remain correct. The recommendation can remain technically valid. TA-14 does not rewrite either one. Instead, the proposed consequence receives HOLD because a required present condition is missing or no longer current. Standing, commit, execution, and outcome are not allowed to be assumed. HOLD is not a declaration that nothing may happen. It means this proposed consequence has not yet earned permission to cross into reality.'},
+  {n:'06',k:'CHANGING CONDITIONS',title:'The same proof can face a different decision at a different NOW.',img:'/06-same-proof-different-authority-different-outcome.png',script:'These two sides can begin with the same technical proof. In Scenario A, the required authority and standing conditions are current, so the bounded consequence may reach ALLOW. In Scenario B, a required authority condition has changed, expired, or is unresolved, so the same technical recommendation reaches HOLD. This is why commissioned once does not mean authorized forever. A valid recommendation does not carry permanent permission. Every consequential crossing is examined against the conditions that exist now.'},
+  {n:'07',k:'THE GOVERNED CROSSING',title:'Context can cross systems without transferring execution authority.',img:'/07-governed-crossing-authority-does-not-travel.png',script:'Independent systems need to cooperate without surrendering their governance. A provider may send verified data, recommendations, asset information, semantic relationships, and authority context through a governed Connection Profile. The receiving system can use that context to understand the proposition. But the connection does not transfer execution authority. The consumer establishes authority, standing, and the local commit before execution. Authority context can travel. Execution authority does not travel. Connection enables cooperation. Governance establishes permission.'},
+  {n:'08',k:'THE CHICAGO TECHNICAL CHALLENGE',title:'Bring the proof. Freeze the boundary. Try to break it.',img:'/08-chicago-technical-challenge-bring-your-proof.png',script:'This is the challenge for Chicago. Bring one verified result from a real system. Name the exact consequence that result proposes. Freeze the evidence, authority, standing, and operating conditions at the boundary. Then challenge the architecture. Challenge the data. Challenge the authority. Challenge the execution path. Change the conditions and see whether the disposition still holds. The goal is not to ask anyone to accept TA-14. The goal is to make the boundary falsifiable. If the mechanism survives technical challenge, we have something repeatable to examine further. If it fails, the failure should be visible and correctable.'}
+] as const;
+
+function SamanthaReadAlong({text}:{text:string}) {
+  const [speaking,setSpeaking]=useState(false), [paused,setPaused]=useState(false), [active,setActive]=useState(-1);
+  const [voices,setVoices]=useState<SpeechSynthesisVoice[]>([]), [voiceName,setVoiceName]=useState('Samantha');
+  const [rate,setRate]=useState(.8);
+  const words=[...text.matchAll(/\S+/g)].map(m=>({word:m[0],start:m.index||0}));
+  const spans=useRef<(HTMLSpanElement|null)[]>([]);
+  useEffect(()=>{if(!('speechSynthesis' in window))return;const load=()=>{const v=window.speechSynthesis.getVoices().filter(x=>x.lang.toLowerCase().startsWith('en'));setVoices(v);setVoiceName(v.some(x=>x.name==='Samantha')?'Samantha':v.find(x=>x.lang==='en-US')?.name||v[0]?.name||'')};load();window.speechSynthesis.addEventListener('voiceschanged',load);return()=>window.speechSynthesis.removeEventListener('voiceschanged',load)},[]);
+  useEffect(()=>{if(active>=0)spans.current[active]?.scrollIntoView({behavior:'smooth',block:'center'})},[active]);
+  const stop=()=>{window.speechSynthesis?.cancel();setSpeaking(false);setPaused(false);setActive(-1)};
+  const start=()=>{stop();const u=new SpeechSynthesisUtterance(text);const v=voices.find(x=>x.name===voiceName);if(v)u.voice=v;u.rate=rate;u.pitch=.95;u.onboundary=e=>{if(e.name!=='word')return;let x=0;for(let i=0;i<words.length;i++){if(words[i].start<=e.charIndex)x=i;else break}setActive(x)};u.onend=()=>{setSpeaking(false);setPaused(false);setActive(-1)};setSpeaking(true);window.speechSynthesis.speak(u)};
+  const toggle=()=>{if(!speaking)return start();if(paused){window.speechSynthesis.resume();setPaused(false)}else{window.speechSynthesis.pause();setPaused(true)}};
+  return <div style={{marginTop:14,padding:20,borderRadius:16,border:'1px solid rgba(111,220,255,.22)',background:'rgba(2,10,17,.82)'}}>
+    <div style={{display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap'}}><b style={{fontSize:10,letterSpacing:'.14em',color:'#70dcff'}}>SAMANTHA · SYNCHRONIZED READ-ALONG</b><div style={{display:'flex',gap:7,flexWrap:'wrap'}}><button onClick={toggle} style={samanthaButton}>{!speaking?'▶ PLAY':paused?'▶ RESUME':'Ⅱ PAUSE'}</button><button onClick={start} style={samanthaButton}>↻ RESTART</button>{speaking&&<button onClick={stop} style={samanthaButton}>■ STOP</button>}</div></div>
+    <div style={{display:'flex',gap:14,alignItems:'center',flexWrap:'wrap',marginTop:14}}><label style={{fontSize:9,fontWeight:900,color:'#8fb2c0'}}>VOICE <select value={voiceName} onChange={e=>{stop();setVoiceName(e.target.value)}} style={{marginLeft:7,background:'#020a11',color:'#eef8fb',border:'1px solid rgba(111,220,255,.22)',padding:7}}>{voices.map(v=><option key={v.name}>{v.name}</option>)}</select></label><label style={{fontSize:9,fontWeight:900,color:'#8fb2c0'}}>SPEED · {rate.toFixed(2)}× <input type="range" min=".65" max="1.15" step=".05" value={rate} onChange={e=>{stop();setRate(+e.target.value)}} /></label></div>
+    <p style={{fontSize:'clamp(17px,1.8vw,22px)',lineHeight:1.9,color:'#bfd0d7',marginBottom:0}}>{words.map((w,i)=><span key={i} ref={el=>{spans.current[i]=el}} style={active===i?{background:'#71f2b6',color:'#03100b',padding:'2px 3px',borderRadius:3,fontWeight:900}:undefined}>{w.word} </span>)}</p>
+  </div>;
+}
+
+const samanthaButton={cursor:'pointer',padding:'10px 13px',borderRadius:9,border:'1px solid rgba(111,220,255,.3)',background:'rgba(8,37,47,.9)',color:'#eef8fb',fontWeight:950,fontSize:10} as const;
+
+function ChicagoVisual({index}:{index:number}) {
+  const [open,setOpen]=useState(false); const v=chicagoVisuals[index];
+  return <section id={'visual-'+v.n} style={{marginTop:24,padding:'clamp(20px,3vw,30px)',border:'1px solid rgba(111,220,255,.18)',borderRadius:24,background:'linear-gradient(145deg,rgba(5,24,37,.88),rgba(2,9,15,.98))',scrollMarginTop:24}}>
+    <div style={{fontSize:10,fontWeight:950,letterSpacing:'.17em',color:'#70dcff'}}>{v.n} · {v.k}</div>
+    <h2 style={{fontSize:'clamp(28px,4vw,50px)',lineHeight:1.02,letterSpacing:'-.04em',margin:'10px 0 20px'}}>{v.title}</h2>
+    <Image src={v.img} alt={v.title} width={1536} height={1024} sizes="(max-width: 1280px) 100vw, 1280px" style={{display:'block',width:'100%',height:'auto',borderRadius:16,border:'1px solid rgba(111,220,255,.24)',boxShadow:'0 24px 80px rgba(0,0,0,.45)'}} />
+    <div style={{display:'flex',gap:12,alignItems:'center',flexWrap:'wrap',marginTop:16}}><button onClick={()=>{window.speechSynthesis?.cancel();setOpen(!open)}} style={{...samanthaButton,border:'1px solid rgba(113,242,182,.4)',background:'rgba(113,242,182,.11)',color:'#e6fff2'}}>{open?'CLOSE EXPLANATION':'▶ SAMANTHA — EXPLAIN THIS VISUAL'}</button><span style={{fontSize:9,fontWeight:900,letterSpacing:'.12em',color:'#7896a3'}}>LISTEN · READ · PAUSE · RESTART</span></div>
+    {open&&<SamanthaReadAlong text={v.script}/>}
+  </section>;
+}
 
 export default function ProofOverPromiseChicagoShowroom() {
   const [proof, setProof] = useState<Gate>('supported');
@@ -170,6 +214,8 @@ export default function ProofOverPromiseChicagoShowroom() {
           </div>
         </section>
 
+        <ChicagoVisual index={0}/>
+
         <section style={{marginTop:24,padding:'clamp(26px,5vw,48px)',...card}}>
           <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#70dcff'}}>WHY CHICAGO MATTERS</div>
           <h2 style={{fontSize:'clamp(34px,5.3vw,64px)',letterSpacing:'-.05em',lineHeight:1,margin:'12px 0 16px'}}>Two independent events. One unusually important week.</h2>
@@ -220,6 +266,9 @@ export default function ProofOverPromiseChicagoShowroom() {
           </div>
         </section>
 
+        <ChicagoVisual index={1}/>
+        <ChicagoVisual index={2}/>
+
         <section style={{marginTop:24,padding:'clamp(28px,5vw,50px)',...card}}>
           <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#70dcff'}}>TWO LAYERS · ONE BOUNDARY</div>
           <h2 style={{fontSize:'clamp(33px,5vw,60px)',letterSpacing:'-.045em',lineHeight:1.02,margin:'12px 0 20px'}}>Chicago asks the question. TA-14 runs the examination.</h2>
@@ -241,6 +290,8 @@ export default function ProofOverPromiseChicagoShowroom() {
             </div>)}
           </div>
         </section>
+
+        <ChicagoVisual index={3}/>
 
         <section id="chicago-exam" style={{marginTop:24,padding:'clamp(28px,5vw,50px)',...card,scrollMarginTop:24}}>
           <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#71f2b6'}}>RUN THE PROOF → CONSEQUENCE EXAM</div>
@@ -297,6 +348,10 @@ export default function ProofOverPromiseChicagoShowroom() {
           </div>
         </section>
 
+        <ChicagoVisual index={4}/>
+        <ChicagoVisual index={5}/>
+        <ChicagoVisual index={6}/>
+
         <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
           <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#70dcff'}}>NO MERGER REQUIRED</div>
           <h2 style={{fontSize:'clamp(34px,5.3vw,64px)',lineHeight:1,letterSpacing:'-.05em',margin:'12px 0 24px'}}>The power is in the seam between independently governed work.</h2>
@@ -338,6 +393,8 @@ export default function ProofOverPromiseChicagoShowroom() {
             <Link href="/admissible-federation-architecture" style={{padding:'13px 17px',borderRadius:11,border:'1px solid rgba(111,220,255,.27)',color:'#b9f2ff',textDecoration:'none',fontWeight:950,fontSize:12}}>ADMISSIBLE FEDERATION ARCHITECTURE →</Link>
           </div>
         </section>
+
+        <ChicagoVisual index={7}/>
 
         <footer style={{marginTop:28,paddingTop:20,borderTop:'1px solid rgba(111,220,255,.1)',display:'flex',justifyContent:'space-between',gap:15,flexWrap:'wrap',color:'#66818e',fontSize:11,lineHeight:1.6}}>
           <div>TA-14 AUTHORITY · PUBLIC TECHNICAL SHOWROOM · CHICAGO 2027</div>
