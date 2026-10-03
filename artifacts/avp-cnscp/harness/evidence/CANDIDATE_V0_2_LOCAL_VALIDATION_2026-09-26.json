@@ -1,0 +1,35 @@
+{
+  "status": "LOCAL_EXERCISE_ONLY",
+  "profile": "cp:ta14.avp.passport:candidate-v0.2",
+  "executed_at": "2026-09-26T16:16:16.367Z",
+  "candidate_seam": "ACCEPT no-narrowing serialization remains proposed pending CNS/CP review",
+  "all_expectations_met": true,
+  "invariants_preserved": true,
+  "fixture_count": 16,
+  "summary": {
+    "expected_pass_and_passed": 6,
+    "expected_fail_closed_and_failed_closed": 10,
+    "expectation_failures": 0,
+    "execution_authority": "NOT_ESTABLISHED_BY_CP",
+    "local_execution_observed": false
+  },
+  "fixtures": [
+    {"fixture_id":"CP2-FX-001","expected":"PASS","actual":"PASS","errors":[]},
+    {"fixture_id":"CP2-FX-002","expected":"PASS","actual":"PASS","errors":[],"note":"valid ACCEPT with deterministic no-narrowing receipt binding"},
+    {"fixture_id":"CP2-FX-003","expected":"PASS","actual":"PASS","errors":[]},
+    {"fixture_id":"CP2-FX-004","expected":"PASS","actual":"PASS","errors":[]},
+    {"fixture_id":"CP2-FX-005","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["PASSPORT_DIGEST_MISMATCH","RECEIPT_PASSPORT_BINDING_MISMATCH"]},
+    {"fixture_id":"CP2-FX-006","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["RECEIPT_INTEGRITY_MISMATCH","RECEIPT_DECISION_BINDING_MISMATCH"]},
+    {"fixture_id":"CP2-FX-007","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["MISSING_NARROWING_PROOF"]},
+    {"fixture_id":"CP2-FX-008","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["NARROWING_PROOF_BINDING_MISMATCH"]},
+    {"fixture_id":"CP2-FX-009","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["RECEIPT_INTEGRITY_MISMATCH","NO_NARROWING_BINDING_MISMATCH"]},
+    {"fixture_id":"CP2-FX-010","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["EXTRANEOUS_NARROWING_PROOF"]},
+    {"fixture_id":"CP2-FX-011","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["MISSING_PROVIDER_PROPERTY"]},
+    {"fixture_id":"CP2-FX-012","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["BAD_DECISION","RECEIPT_DECISION_BINDING_MISMATCH","EXTRANEOUS_NARROWING_PROOF"]},
+    {"fixture_id":"CP2-FX-013","expected":"PASS","actual":"PASS","errors":[],"note":"revocation semantic simulated locally; revoked is inside opaque Passport, not a CP property"},
+    {"fixture_id":"CP2-FX-014","expected":"PASS","actual":"PASS","errors":[],"note":"freshness semantic simulated locally; expiry remains inside opaque Passport"},
+    {"fixture_id":"CP2-FX-015","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["RECEIPT_INTEGRITY_MISMATCH","RECEIPT_PASSPORT_BINDING_MISMATCH"]},
+    {"fixture_id":"CP2-FX-016","expected":"FAIL_CLOSED","actual":"FAIL_CLOSED","errors":["RECEIPT_INTEGRITY_MISMATCH"]}
+  ],
+  "claims_boundary": "Bounded local fixture evidence only. Not CNS/CP registry publication, external conformance, interoperability, or execution authority."
+}
