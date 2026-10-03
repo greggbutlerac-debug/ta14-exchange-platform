@@ -33,6 +33,7 @@ export default function SamanthaGuidedShowroom({
   const [voicesReady,setVoicesReady]=useState(false);
   const [speechSupported,setSpeechSupported]=useState(true);
   const [voiceName,setVoiceName]=useState('');
+  const lastScrollY=useRef(0);
   const audioRef=useRef<HTMLAudioElement|null>(null);
   const programmaticScroll=useRef(false);
   const speechRun=useRef(0);
@@ -42,6 +43,7 @@ export default function SamanthaGuidedShowroom({
 
   const center=(id:string)=>{
     programmaticScroll.current=true;
+    lastScrollY.current=window.scrollY;
     document.getElementById(id)?.scrollIntoView({behavior:'smooth',block:'center'});
     window.setTimeout(()=>{programmaticScroll.current=false},900);
   };
@@ -105,13 +107,15 @@ export default function SamanthaGuidedShowroom({
 
   useEffect(()=>{
     if(!started)return;
+    lastScrollY.current=window.scrollY;
     const manual=()=>{if(!programmaticScroll.current)setFollow(false)};
+    const scrolled=()=>{const moved=Math.abs(window.scrollY-lastScrollY.current)>6;lastScrollY.current=window.scrollY;if(moved&&!programmaticScroll.current)setFollow(false)};
     const keyboard=(e:KeyboardEvent)=>{if(['ArrowUp','ArrowDown','PageUp','PageDown','Home','End',' '].includes(e.key))manual()};
     window.addEventListener('wheel',manual,{passive:true});
     window.addEventListener('touchmove',manual,{passive:true});
-    window.addEventListener('scroll',manual,{passive:true});
+    window.addEventListener('scroll',scrolled,{passive:true});
     window.addEventListener('keydown',keyboard);
-    return()=>{window.removeEventListener('wheel',manual);window.removeEventListener('touchmove',manual);window.removeEventListener('scroll',manual);window.removeEventListener('keydown',keyboard)};
+    return()=>{window.removeEventListener('wheel',manual);window.removeEventListener('touchmove',manual);window.removeEventListener('scroll',scrolled);window.removeEventListener('keydown',keyboard)};
   },[started]);
 
   useEffect(()=>{
