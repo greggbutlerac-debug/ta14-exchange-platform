@@ -84,7 +84,6 @@ function SamanthaReadAlong({text}:{text:string}) {
   const words=[...text.matchAll(/\S+/g)].map(m=>({word:m[0],start:m.index||0}));
   const spans=useRef<(HTMLSpanElement|null)[]>([]);
   useEffect(()=>{if(!('speechSynthesis' in window))return;const load=()=>{const v=window.speechSynthesis.getVoices().filter(x=>x.lang.toLowerCase().startsWith('en'));setVoices(v);setVoiceName(v.some(x=>x.name==='Samantha')?'Samantha':v.find(x=>x.lang==='en-US')?.name||v[0]?.name||'')};load();window.speechSynthesis.addEventListener('voiceschanged',load);return()=>window.speechSynthesis.removeEventListener('voiceschanged',load)},[]);
-  useEffect(()=>{if(active>=0)spans.current[active]?.scrollIntoView({behavior:'smooth',block:'center'})},[active]);
   const stop=()=>{window.speechSynthesis?.cancel();setSpeaking(false);setPaused(false);setActive(-1)};
   const start=()=>{stop();const u=new SpeechSynthesisUtterance(text);const v=voices.find(x=>x.name===voiceName);if(v)u.voice=v;u.rate=rate;u.pitch=.95;u.onboundary=e=>{if(e.name!=='word')return;let x=0;for(let i=0;i<words.length;i++){if(words[i].start<=e.charIndex)x=i;else break}setActive(x)};u.onend=()=>{setSpeaking(false);setPaused(false);setActive(-1)};setSpeaking(true);window.speechSynthesis.speak(u)};
   const toggle=()=>{if(!speaking)return start();if(paused){window.speechSynthesis.resume();setPaused(false)}else{window.speechSynthesis.pause();setPaused(true)}};
