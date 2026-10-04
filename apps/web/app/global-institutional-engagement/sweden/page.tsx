@@ -48,7 +48,7 @@ export default function SwedenPage() {
             <b>SUBSTANTIVE EPA RESPONSE RECEIVED</b>
             <b>NATIVE SWEDISH PATH IDENTIFIED</b>
             <b>NO GAP PRESUMED</b>
-            <b>ONE EXECUTION-BOUNDARY QUESTION REMAINS</b>
+            <b>TECHNICAL QUESTION UNRESOLVED THROUGH CORRESPONDENCE</b>
           </div>
         </header>
 
@@ -133,12 +133,13 @@ export default function SwedenPage() {
         </section>
 
         <section>
-          <p className="eyebrow">NEXT TECHNICAL CLARIFICATION</p>
-          <h2>We only need to identify the native Swedish control.</h2>
+          <p className="eyebrow">OPEN TECHNICAL QUESTION · PUBLIC-SOURCE EXAMINATION ONLY</p>
+          <h2>The remaining question stays open without presuming a Swedish governance gap.</h2>
           <div className="next">
             <p><strong>1.</strong> Is the instrument-malfunction verification governed by a defined Swedish procedure, reference method, quality-assurance protocol or responsible authority?</p>
             <p><strong>2.</strong> If material evidence changes after activation but before execution, what native rule causes revalidation, suspension, withdrawal or escalation?</p>
             <p><strong>3.</strong> If Sweden already governs both points, TA-14 should document that control accurately rather than claim a gap.</p>
+            <p><strong>STATUS.</strong> Swedish EPA advised on 30 September 2026 that it did not have resources to provide further information and referred TA-14 to the publicly available Swedish EPA, SMHI and EEA webpages. Direct dialogue is therefore closed unless Sweden reopens it; the technical question remains unresolved through correspondence.</p>
           </div>
         </section>
 
@@ -147,7 +148,9 @@ export default function SwedenPage() {
           <div className="rows">
             <article><span>18 SEP 2026</span><b>TA-14 → SWEDISH EPA / SMHI</b><p>Asked what gives near-real-time evidence sufficient status to support consequential action, and what requires revalidation if conditions change before execution.</p></article>
             <article><span>24 SEP 2026</span><b>SWEDISH EPA AIR QUALITY UNIT → TA-14</b><p>Identified the statutory alert-threshold pathway, the three-hour and 100 km² conditions, and the practical need to verify that an apparent exceedance is not caused by instrument malfunction.</p></article>
-            <article><span>NEXT</span><b>BOUNDED CLARIFICATION</b><p>Identify the Swedish verification and revalidation control at the execution boundary.</p></article>
+            <article><span>24 SEP 2026</span><b>TA-14 → SWEDISH EPA AIR QUALITY UNIT</b><p>Narrowed the public record, separated the statutory pathway from the practical instrument-malfunction observation, and asked the remaining changed-evidence / pre-execution question.</p></article>
+            <article><span>30 SEP 2026</span><b>SWEDISH EPA AIR QUALITY UNIT → TA-14</b><p>Advised that it did not have resources to provide further information and referred TA-14 to the publicly available Swedish EPA, SMHI and EEA webpages.</p></article>
+            <article><span>STATUS</span><b>DIRECT DIALOGUE CLOSED · TECHNICAL QUESTION OPEN</b><p>No governance gap is inferred. Further examination is limited to public sources unless Sweden reopens the dialogue.</p></article>
           </div>
         </section>
 
