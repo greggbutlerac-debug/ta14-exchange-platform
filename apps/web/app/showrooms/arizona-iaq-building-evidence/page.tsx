@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
+import Samantha from './Samantha';
 
 export const metadata={
   title:'Arizona IAQ · Preserving the Building as Evidence | TA14',
@@ -36,6 +37,7 @@ export default function Page(){
         <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(52px,8vw,94px)',lineHeight:.92,margin:'20px 0 30px',letterSpacing:'-.03em'}}>PRESERVING THE<br/><span style={{color:'#efc86c'}}>BUILDING AS EVIDENCE</span></h1>
         <p style={{fontFamily:'Georgia,serif',fontSize:'clamp(24px,3vw,38px)',lineHeight:1.25,maxWidth:980,margin:'0 0 28px'}}>A building can change in minutes. The consequences of what happened inside it can be argued months or years later.</p>
         <p style={{maxWidth:880,color:'#a9bbc3',fontSize:19,lineHeight:1.8}}>The technical problem is not simply whether someone collected a reading. It is whether enough trustworthy context survives for another qualified person—who was not there—to determine what actually existed, what changed, who was authorized to act, and what happened afterward.</p>
+        <Samantha text="Welcome to the Arizona indoor air quality evidence continuity examination. A building can change in minutes, while questions about what happened inside it may remain for months or years. This showroom asks what evidence must survive so a qualified person who was not present can later reconstruct the original condition, distinguish observation from interpretation, determine what authority actually applied, and examine the consequence that followed. Follow the Monday-through-six-months-later scenario, then examine the seventeen contextual elements and the eight-stage TA14 consequence boundary. The purpose is not to declare that every investigation requires every possible record. The purpose is to make the evidentiary question explicit before the original physical reality disappears."/>
       </header>
 
       <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(280px,1fr))',gap:16,marginBottom:42}}>
@@ -90,6 +92,16 @@ export default function Page(){
       <div style={{margin:'34px 0 8px',border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#041019'}}><Image src="/TA14_Arizona_IAQ_04_Reality_To_Outcome_Consequence_Boundary.png" alt="TA14 consequence boundary from Reality through Record, Continuity, Admissibility, Binding, Commit, Execution and Outcome" width={1536} height={1024} sizes="(max-width: 1180px) 100vw, 1136px" style={{width:'100%',height:'auto',display:'block'}} /></div>
 
       <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
+        <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>WHY ARIZONA IS THE EXAMINATION SURFACE</p>
+        <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(34px,5vw,56px)',margin:'10px 0 20px'}}>Arizona is the location of the open technical question—not a shortcut to a legal conclusion.</h2>
+        <p style={{maxWidth:930,color:'#9fb4be',fontSize:17,lineHeight:1.8}}>This examination arose from Arizona-focused professional outreach concerning preservation of indoor-environmental conditions as evidence. TA14 is therefore keeping the question anchored to Arizona while deliberately avoiding an unsupported claim that Arizona law, regulation, or professional practice already requires the TA14 architecture described here.</p>
+        <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:14,marginTop:26}}>
+          {[['THE JURISDICTION MATTERS','Applicable duties, standards, contracts, professional practices and legal consequences can depend on the jurisdiction and the specific use of the evidence.'],['THE TECHNICAL QUESTION REMAINS OPEN','What must be preserved depends on what a later decision is asking the surviving record to prove.'],['THE INVITATION IS SPECIFIC','Arizona practitioners are invited to identify the established mechanism, correct the framing, or submit a better evidentiary path.']].map(([t,b])=><article key={t} style={{padding:25,border:'1px solid #244654',borderRadius:16,background:'#06121a'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:24,color:'#efc86c'}}>{t}</h3><p style={{color:'#9fb4be',lineHeight:1.7}}>{b}</p></article>)}
+        </div>
+        <Samantha text="Why Arizona? Because this open examination grew from Arizona-focused professional outreach about preserving a building's indoor environmental condition as evidence. That does not mean TA14 is claiming Arizona law requires this architecture. The jurisdiction matters because applicable duties, contracts, standards, professional practices, and later legal uses may differ. The technical question remains narrower and testable: for the consequence being proposed, what evidence and context must survive, and what established Arizona mechanism already governs that preservation if one exists? Arizona practitioners are invited to identify it, correct this framing, or bring forward a better mechanism."/>
+      </section>
+
+      <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
         <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>WHERE THE RECORD CAN FAIL</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(34px,5vw,56px)',margin:'10px 0 24px'}}>The risk is not only a bad sensor.</h2>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:14}}>
@@ -101,6 +113,8 @@ export default function Page(){
         <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>THE PROFESSION IS INVITED TO CHALLENGE THIS</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,60px)',lineHeight:1.1}}>We are not asking for agreement.<br/>We are asking for an answer that survives examination.</h2>
         <p style={{maxWidth:920,color:'#9fb4be',fontSize:17,lineHeight:1.8}}>If an established standard, protocol, evidentiary method, chain-of-custody practice, commissioning record, forensic procedure, or legal mechanism already solves this problem, identify it. If TA14 has framed the problem incorrectly, show where. If the architecture is incomplete, improve it. If something better already exists, bring it forward.</p>
+        <div style={{display:'flex',gap:12,flexWrap:'wrap',margin:'26px 0 6px'}}><Link href="/workspace/ai-governance/reviews/submit" style={{display:'inline-block',padding:'14px 18px',borderRadius:12,background:'#70dcff',color:'#021018',fontWeight:900,textDecoration:'none'}}>SUBMIT A TECHNICAL RESPONSE →</Link><Link href="/workspace/ai-governance/reviews" style={{display:'inline-block',padding:'14px 18px',borderRadius:12,border:'1px solid #365366',color:'#d7e8ee',fontWeight:900,textDecoration:'none'}}>REVIEW THE RESPONSE PATH</Link></div>
+        <p style={{maxWidth:900,color:'#78919b',fontSize:13,lineHeight:1.7}}>Use the governed submission surface for an independent review, evidence challenge, factual correction, technical comment, replication request, or other attributable response. A submission remains attributable to its submitter and does not become a TA14 finding merely because it is received.</p>
         <div style={{display:'flex',flexWrap:'wrap',gap:9,marginTop:28}}>{audiences.map(x=><span key={x} style={{padding:'10px 13px',border:'1px solid #244654',borderRadius:999,color:'#c5d4da',fontSize:12,fontWeight:800}}>{x}</span>)}</div>
       </section>
 
