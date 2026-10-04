@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 type Disposition='ALLOW'|'HOLD'|'DENY'|'ESCALATE';
@@ -43,7 +44,7 @@ export default function AaronHastingsBuildingMLShowroom(){
       ['AUTHORIZED','May this actor or system cause this specific consequence?','Credentials, access, capability, or human approval do not automatically establish authority.']
      ].map(([t,q,d],i)=><article key={t} style={{padding:24,borderRadius:18,border:'1px solid rgba(112,220,255,.15)',background:'rgba(2,10,17,.58)'}}><div style={{fontSize:11,color:[C.cyan,C.green,C.purple][i],fontWeight:1000}}>0{i+1}</div><h3 style={{fontSize:25,margin:'8px 0'}}>{t}</h3><div style={{fontWeight:900,lineHeight:1.45}}>{q}</div><p style={{color:C.muted,lineHeight:1.6,fontSize:14}}>{d}</p></article>)}
     </div>
-    <Samantha text="Valid, admissible, and authorized answer different questions. A valid sensor reading may still be insufficient for the action being proposed. Even admissible evidence does not manufacture authority. Keep these three gates separate."/>
+    <Image src="/TA14_Aaron_Hastings_Building_ML_01_Valid_Admissible_Authorized.png" alt="Valid admissible and authorized building ML teaching visual" width={1536} height={1024} style={{display:"block",width:"100%",height:"auto",marginTop:22,borderRadius:20}}/><Samantha text="This visual separates technical validity, decision-specific admissibility, authority, and execution. A valid inference does not automatically become admissible evidence, and admissible evidence does not automatically create authority to act."/>
    </section>
 
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
@@ -59,7 +60,7 @@ export default function AaronHastingsBuildingMLShowroom(){
      ].map(([n,t,d])=><article key={n} style={{padding:22,borderRadius:17,border:'1px solid rgba(112,220,255,.14)',background:'rgba(2,10,17,.55)'}}><div style={{fontSize:10,color:C.cyan,fontWeight:950}}>{n}</div><div style={{marginTop:7,fontSize:17,fontWeight:1000}}>{t}</div><p style={{fontSize:13,lineHeight:1.6,color:C.muted}}>{d}</p></article>)}
     </div>
     <div style={{marginTop:20,padding:22,borderRadius:17,border:'1px solid rgba(255,211,111,.28)',background:'rgba(255,211,111,.05)',fontWeight:1000,fontSize:'clamp(20px,2.7vw,32px)',lineHeight:1.3}}>Same prediction. Different consequence. <span style={{color:C.gold}}>Different proof burden.</span></div>
-    <Samantha text="One prediction can lead to very different proposed consequences. Displaying an advisory, creating a work order, changing a setpoint, and shutting down equipment are not interchangeable actions. The architecture examines the exact consequence being proposed now."/>
+    <Image src="/TA14_Aaron_Hastings_Building_ML_02_Same_Inference_Four_Consequences.png" alt="Same ML inference four different consequences teaching visual" width={1536} height={1024} style={{display:"block",width:"100%",height:"auto",marginTop:22,borderRadius:20}}/><Samantha text="This visual holds the machine learning inference constant while the proposed consequence changes from advisory, to work order, to physical control. As consequence increases, evidence, authority, safeguards, and verification must fit the exact action being proposed."/>
    </section>
 
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
@@ -73,7 +74,7 @@ export default function AaronHastingsBuildingMLShowroom(){
      <div style={{fontSize:'clamp(27px,4vw,48px)',fontWeight:1000,marginTop:10}}>KNOW / INFER / RECOMMEND <span style={{color:C.green}}>│</span> ACT</div>
      <p style={{color:'#b9ccd5',lineHeight:1.65}}>The boundary is not where intelligence ends. It is where a proposition is about to become consequence. At that point, TA-14 resolves the route as ALLOW, HOLD, DENY, or ESCALATE.</p>
     </div>
-    <Samantha text="The commit boundary separates knowing from causing. An ML system may observe, infer, and recommend without possessing execution authority. Before the proposed action crosses into reality, the evidence, authority, standing, and current conditions must be examined."/>
+    <Image src="/TA14_Aaron_Hastings_Building_ML_03_Commit_Boundary.png" alt="Building ML commit boundary teaching visual" width={1536} height={1024} style={{display:"block",width:"100%",height:"auto",marginTop:22,borderRadius:20}}/><Samantha text="This visual moves from knowing, to inference, to recommendation. At the commit boundary the route becomes allow, hold, deny, or escalate. Only an allowed bounded action crosses into execution, followed by verification and the recorded outcome."/>
    </section>
 
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',border:'1px solid rgba(255,211,111,.28)',borderRadius:24,background:'linear-gradient(145deg,rgba(56,43,10,.24),rgba(2,10,17,.97))'}}>
@@ -118,6 +119,7 @@ export default function AaronHastingsBuildingMLShowroom(){
     </div>
    </section>
 
+   <div style={{marginTop:22}}><Image src="/TA14_Aaron_Hastings_Building_ML_04_Governed_Building_ML_Loop.png" alt="Governed Building ML Loop teaching visual" width={1536} height={1024} style={{display:"block",width:"100%",height:"auto",borderRadius:20}}/><Samantha text="This visual follows the governed building machine learning loop from reality, through AIR and ACA, into intelligence and a proposed consequence, then through AEA before execution. The measured outcome returns to reality and begins the record again."/></div>
    <section style={{marginTop:24,padding:'clamp(34px,6vw,68px)',border:'1px solid rgba(113,242,182,.3)',borderRadius:28,background:'radial-gradient(circle at 76% 0%,rgba(113,242,182,.11),transparent 28%),linear-gradient(145deg,rgba(8,36,48,.96),rgba(3,11,19,.98))'}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:C.green}}>PRESENTATION-READY DISTINCTION</div>
     <h2 style={{fontSize:'clamp(38px,6vw,76px)',lineHeight:.95,letterSpacing:'-.058em',margin:'14px 0 22px'}}>AN ADMISSIBLE INPUT DOES NOT CREATE AN ADMISSIBLE OUTPUT.</h2>
