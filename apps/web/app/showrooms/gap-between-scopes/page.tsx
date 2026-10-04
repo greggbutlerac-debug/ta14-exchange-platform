@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useEffect, useMemo, useState } from 'react';
 
 type Disposition='ALLOW'|'HOLD'|'DENY'|'ESCALATE';
@@ -46,6 +47,7 @@ export default function GapBetweenScopesShowroom(){
      ].map(([n,t,d])=><article key={n} style={{padding:22,borderRadius:17,border:'1px solid rgba(112,220,255,.14)',background:'rgba(2,10,17,.55)'}}><div style={{fontSize:10,color:C.cyan,fontWeight:950}}>{n}</div><div style={{marginTop:7,fontSize:20,fontWeight:1000}}>{t}</div><p style={{fontSize:14,lineHeight:1.6,color:C.muted}}>{d}</p></article>)}
     </div>
     <div style={{marginTop:22,padding:24,borderRadius:18,border:'1px solid rgba(255,211,111,.28)',background:'rgba(255,211,111,.05)',fontSize:'clamp(22px,3vw,36px)',fontWeight:1000,lineHeight:1.3}}>INSTALLED ≠ COMPLETE · COMPLETE ≠ VERIFIED · VERIFIED ≠ ACCEPTED</div>
+    <Image src="/01_TA14_Showroom_The_Gap_Between_Scopes.png" alt="The Gap Between Scopes — eight-stage commissioning handoff teaching visual" width={1536} height={1024} sizes="(max-width: 1260px) 100vw, 1260px" style={{width:'100%',height:'auto',marginTop:22,borderRadius:18,border:'1px solid rgba(112,220,255,.18)'}} />
     <Samantha text="Section one separates common project states. Installed is not complete. Complete is not verified. Verified is not accepted. Each transition needs its own evidence and applicable decision path. Calling something done cannot make the next state true."/>
    </section>
 
@@ -65,6 +67,7 @@ export default function GapBetweenScopesShowroom(){
       <div style={{fontSize:'clamp(27px,4vw,48px)',fontWeight:1000,marginTop:10}}>RESPONSIBILITY <span style={{color:C.green}}>│</span> EXECUTION AUTHORITY</div>
       <p style={{color:'#b9ccd5',lineHeight:1.65}}>A person or organization can be responsible for a task without having unlimited authority to create every downstream consequence. Scope, evidence, prerequisites, acceptance criteria, current standing, and applicable authority still govern the boundary.</p>
     </div>
+    <Image src="/02_TA14_Showroom_RACI_vs_Execution_Authority.png" alt="RACI versus Execution Authority — roles compared with evidence, authority, standing and consequence context" width={1536} height={1024} sizes="(max-width: 1260px) 100vw, 1260px" style={{width:'100%',height:'auto',marginTop:22,borderRadius:18,border:'1px solid rgba(112,220,255,.18)'}} />
     <Samantha text="RACI answers who is responsible, accountable, consulted, and informed. TA14 does not replace those roles. It examines the separate execution boundary. Being responsible for work does not automatically authorize every downstream consequence that the work could cause."/>
    </section>
 
@@ -75,6 +78,7 @@ export default function GapBetweenScopesShowroom(){
      {['TASK','DELIVERABLE','READINESS','VERIFICATION','ACCEPTANCE','EXECUTION','OUTCOME'].map((x,i)=><div key={x} style={{padding:18,borderRadius:15,border:'1px solid rgba(112,220,255,.14)',background:i===4?'rgba(113,242,182,.07)':'rgba(2,10,17,.55)',textAlign:'center'}}><div style={{fontSize:10,color:C.cyan,fontWeight:950}}>0{i+1}</div><div style={{marginTop:7,fontSize:13,fontWeight:1000}}>{x}</div></div>)}
     </div>
     <div style={{marginTop:22,padding:24,borderRadius:18,border:'1px solid rgba(255,211,111,.28)',background:'rgba(255,211,111,.05)',fontSize:'clamp(20px,2.8vw,34px)',fontWeight:1000,lineHeight:1.35}}>A handoff is not a sentence in a meeting. <span style={{color:C.gold}}>It is a proposed transition in reality.</span></div>
+    <Image src="/03_TA14_Showroom_The_Handoff_Proof_Path.png" alt="The Handoff Proof Path — task through outcome and ongoing re-examination" width={1536} height={1024} sizes="(max-width: 1260px) 100vw, 1260px" style={{width:'100%',height:'auto',marginTop:22,borderRadius:18,border:'1px solid rgba(112,220,255,.18)'}} />
     <Samantha text="This is the handoff proof path. A task produces a deliverable. Readiness must be established. Verification examines the evidence. Acceptance must occur through the applicable path. Only then can an authorized execution cross the boundary, after which the actual outcome returns to the record."/>
    </section>
 
@@ -92,6 +96,7 @@ export default function GapBetweenScopesShowroom(){
       ['06 · ACCEPTANCE / OUTCOME','The applicable acceptance criteria are evaluated, exceptions are preserved, and the observed outcome becomes the next record.']
      ].map(([t,d])=><div key={t} style={{display:'grid',gridTemplateColumns:'minmax(150px,210px) 1fr',gap:14,padding:18,borderRadius:15,border:'1px solid rgba(112,220,255,.12)',background:'rgba(2,10,17,.52)'}}><div style={{fontWeight:1000,color:C.cyan}}>{t}</div><div style={{color:'#b9ccd5',lineHeight:1.6}}>{d}</div></div>)}
     </div>
+    <Image src="/04_TA14_Showroom_AHU_Commit_Boundary.png" alt="AHU Commit Boundary — commissioning example examining whether the system can cross the handoff" width={1536} height={1024} sizes="(max-width: 1260px) 100vw, 1260px" style={{width:'100%',height:'auto',marginTop:22,borderRadius:18,border:'1px solid rgba(112,220,255,.18)'}} />
     <Samantha text="The AHU example makes the boundary concrete. Installation and programming may both be complete while test readiness is not. Missing balancing, unverified safeties, stale records, or absent acceptance can block the transition. The question is not whether people worked. The question is whether this exact next consequence is supported now."/>
    </section>
 
