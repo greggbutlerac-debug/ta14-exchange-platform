@@ -68,6 +68,7 @@ export default function HumanConsequenceBoundaryShowroom(){
     <Visual src="/01-human-consequence-boundary.png" alt="The Human Consequence Boundary teaching visual" script="This visual introduces the consequence boundary. Observation, reasoning, recommendation, and human judgment may approach the boundary, but none of them becomes permission by itself. Before a consequence becomes real, admissible evidence, applicable authority, and established standing must be sufficient now."/>
    </section>
 
+   <section style={{marginTop:24,padding:'22px',border:'1px solid rgba(113,242,182,.34)',borderRadius:20,background:'rgba(2,10,17,.55)'}}><a href="/TA14_HPS_AHIA_AEA_Practitioner_Technical_Reference_v2_REPAIRED.pdf" download style={{color:'#e7fff3',fontWeight:950,textDecoration:'none'}}>DOWNLOAD THE PRACTITIONER TECHNICAL REFERENCE — PDF</a><div style={{marginTop:8,fontSize:13,color:'#819aa7'}}>21-page HPS × AHIA × AEA practitioner reference and pressure-test package</div></section>
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:C.green}}>START WITH THE DISTINCTION</div>
     <h2 style={{fontSize:'clamp(34px,5.5vw,68px)',lineHeight:.98,letterSpacing:'-.05em',margin:'12px 0 22px'}}>Observed is not inferred.<br/>Inferred is not authorized.</h2>
