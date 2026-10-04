@@ -50,7 +50,7 @@ export default function GovernedAir(){
  {i===1&&<ClassifyLab/>}{i===2&&<GateLab kind="ACA"/>}
  {i===3&&<div className="checkpoint"><b>ACA DOES NOT MAKE AI INFALLIBLE</b><p>Governed input does not guarantee correct reasoning. That is why the AI output faces a new consequence examination.</p></div>}{i===4&&<div className="checkpoint"><b>CORE RULE</b><p>AN ADMISSIBLE INPUT DOES NOT CREATE AN ADMISSIBLE OUTPUT.</p></div>}
  {i===5&&<GateLab kind="AEA"/>}
- {i===6&&<div className="loop">{['REALITY','AIR','ACA','INTELLIGENCE','AEA','COMMIT','EXECUTION','OUTCOME','↻ NEW REALITY'].map(x=><b key={x}>{x}</b>)}</div>}
+ {i===6&&<div className="loop">{['REALITY','AIR','GOVERNED EVIDENCE RELEASE','ACA','INTELLIGENCE','PROPOSED CONSEQUENCE','AEA','COMMIT','EXECUTION','OUTCOME','↻ NEW REALITY','AIR'].map((x,j)=><b key={`${x}-${j}`}>{x}</b>)}</div>}
  {i===7&&<div className="checkpoint"><b>THE LOOP CONTINUES</b><p>Continuous monitoring → AIR → governed evidence release → ACA → intelligence → proposed consequence → AEA → commit → execution → observed outcome → new reality → AIR.</p></div>}
  
  </section>)}
