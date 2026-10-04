@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 
 export const metadata={
   title:'Arizona IAQ · Preserving the Building as Evidence | TA14',
@@ -50,6 +51,8 @@ export default function Page(){
         </div>
       </section>
 
+      <div style={{margin:'34px 0 8px',border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#041019'}}><Image src="/TA14_Arizona_IAQ_01_When_The_Building_Changes_What_Survives.png" alt="TA14 Arizona IAQ timeline showing how the same building can change before later examination" width={1536} height={1024} sizes="(max-width: 1180px) 100vw, 1136px" style={{width:'100%',height:'auto',display:'block'}} /></div>
+
       <section style={{padding:'56px 0',borderTop:'1px solid #18303b'}}>
         <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>A SIMPLE SCENARIO</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(34px,5vw,56px)',margin:'10px 0 28px'}}>Monday existed. Friday looks different.</h2>
@@ -66,11 +69,15 @@ export default function Page(){
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:10,marginTop:28}}>{evidence.map((x,i)=><div key={x} style={{padding:'16px 18px',border:'1px solid #193847',borderRadius:12,background:'#06121a',color:'#c7d5da'}}><span style={{color:'#70dcff',fontWeight:900,marginRight:10}}>{String(i+1).padStart(2,'0')}</span>{x}</div>)}</div>
       </section>
 
+      <div style={{margin:'34px 0 8px',border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#041019'}}><Image src="/TA14_Arizona_IAQ_02_What_Must_Survive.png" alt="TA14 Arizona IAQ evidence continuity visual showing contextual elements that may need to survive" width={1536} height={1024} sizes="(max-width: 1180px) 100vw, 1136px" style={{width:'100%',height:'auto',display:'block'}} /></div>
+
       <section style={{padding:'62px 0',borderTop:'1px solid #18303b'}}>
         <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>THE CRITICAL DISTINCTION</p>
         <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,60px)',lineHeight:1.08,maxWidth:1000}}>Observation is not interpretation.<br/>Interpretation is not authority.<br/><span style={{color:'#efc86c'}}>Capability is not permission.</span></h2>
         <p style={{maxWidth:900,color:'#9fb4be',fontSize:17,lineHeight:1.8}}>A sensor can observe. A consultant can interpret. A control system can execute. An owner can instruct. A regulator can impose obligations. Those are not interchangeable roles. Before evidence becomes consequence, the route between them must remain inspectable.</p>
       </section>
+
+      <div style={{margin:'34px 0 8px',border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#041019'}}><Image src="/TA14_Arizona_IAQ_03_Observation_Interpretation_Authority_Permission.png" alt="TA14 distinction between observation, interpretation, authority and permission" width={1536} height={1024} sizes="(max-width: 1180px) 100vw, 1136px" style={{width:'100%',height:'auto',display:'block'}} /></div>
 
       <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
         <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>THE TA14 CONSEQUENCE BOUNDARY</p>
@@ -79,6 +86,8 @@ export default function Page(){
           {chain.map(x=><article key={x.n} style={{padding:24,border:'1px solid #244654',borderRadius:16,background:'#06121a'}}><small style={{color:'#70dcff',fontWeight:900}}>{x.n}</small><h3 style={{fontFamily:'Georgia,serif',fontSize:25,margin:'8px 0'}}>{x.t}</h3><p style={{color:'#98adb6',lineHeight:1.65,marginBottom:0}}>{x.b}</p></article>)}
         </div>
       </section>
+
+      <div style={{margin:'34px 0 8px',border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#041019'}}><Image src="/TA14_Arizona_IAQ_04_Reality_To_Outcome_Consequence_Boundary.png" alt="TA14 consequence boundary from Reality through Record, Continuity, Admissibility, Binding, Commit, Execution and Outcome" width={1536} height={1024} sizes="(max-width: 1180px) 100vw, 1136px" style={{width:'100%',height:'auto',display:'block'}} /></div>
 
       <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
         <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>WHERE THE RECORD CAN FAIL</p>
