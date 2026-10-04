@@ -66,7 +66,6 @@ export default function HumanConsequenceBoundaryShowroom(){
     <p style={{fontSize:'clamp(19px,2.5vw,29px)',lineHeight:1.5,maxWidth:1020,color:'#c5d8df'}}>A practitioner pressure-test showroom for the moment when observation, inference, recommendation, human judgment, authority, and real-world consequence meet.</p>
     <div style={{marginTop:28,padding:'clamp(22px,4vw,38px)',borderRadius:20,border:'1px solid rgba(113,242,182,.34)',background:'rgba(2,10,17,.55)',fontSize:'clamp(23px,3.5vw,43px)',fontWeight:1000,lineHeight:1.12,letterSpacing:'-.035em'}}>Does this proposed consequence have sufficient <span style={{color:C.green}}>Admissible Evidence</span>, <span style={{color:C.cyan}}>Applicable Authority</span>, and <span style={{color:C.purple}}>Established Standing</span> to become reality <span style={{color:'#fff'}}>NOW?</span></div>
     <Visual src="/01-human-consequence-boundary.png" alt="The Human Consequence Boundary teaching visual" script="This visual introduces the consequence boundary. Observation, reasoning, recommendation, and human judgment may approach the boundary, but none of them becomes permission by itself. Before a consequence becomes real, admissible evidence, applicable authority, and established standing must be sufficient now."/>
-    <Samantha text="This showroom examines the human consequence boundary. TA-14 does not ask whether an AI is impressive or whether a human is present. It asks whether this exact proposed consequence has sufficient admissible evidence, applicable authority, and established standing to become reality now."/>
    </section>
 
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
@@ -76,14 +75,13 @@ export default function HumanConsequenceBoundaryShowroom(){
      {['OBSERVED','INFERRED','PROPOSITION','CONSEQUENCE'].map((x,i)=><div key={x} style={{padding:24,borderRadius:17,border:'1px solid rgba(112,220,255,.14)',background:i===3?'rgba(113,242,182,.06)':'rgba(2,10,17,.58)'}}><div style={{fontSize:10,color:C.cyan,fontWeight:950}}>0{i+1}</div><div style={{marginTop:8,fontSize:20,fontWeight:1000}}>{x}</div><div style={{marginTop:9,color:C.muted,lineHeight:1.55,fontSize:13}}>{['What was actually sensed, stated, recorded, or witnessed?','What interpretation did a person or model derive from those observations?','What bounded action or intervention is now being proposed?','What will actually become real if the route crosses commit?'][i]}</div></div>)}
     </div>
     <Visual src="/02-observed-inferred-proposition-consequence.png" alt="Observed, Inferred, Proposition, Consequence teaching visual" script="Read this visual from left to right. Observed means what was actually detected or recorded. Inferred means what a person or model thinks those observations may mean. Proposition is the specific action being suggested. Consequence is what becomes real if execution occurs. Each transition is a gate. None of these stages may borrow evidence, authority, or standing from another."/>
-    <Samantha text="The first pressure test is separation. Preserve what was observed. Mark what was inferred. Bound the proposition. Then name the consequence. An inference can support a recommendation, but it must not silently become fact, standing, or permission."/>
    </section>
 
    {sections.map(([n,t,d],i)=><section key={n} style={{marginTop:24,padding:'clamp(28px,5vw,50px)',...card}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:i===0?C.green:C.cyan}}>{n} · {t}</div>
     <div style={{marginTop:18,padding:22,borderRadius:16,border:'1px solid rgba(112,220,255,.14)',background:'rgba(2,10,17,.55)',fontSize:i===0?'clamp(17px,2vw,22px)':'clamp(18px,2.6vw,31px)',fontWeight:i===0?600:1000,lineHeight:1.5,color:i===0?'#bdd0d8':'#eef8fb'}}>{d}</div>
     {i===0&&<Visual src="/03-hps-ahia-aea-three-jurisdictions.png" alt="HPS AHIA and AEA three jurisdictions teaching visual" script="This visual keeps three jurisdictions separate. HPS examines the pre-action human performance moment. AHIA examines whether the human intervention itself is admissible. AEA governs whether the proposed consequence may become reality now. They can intersect, but a pass in one jurisdiction does not manufacture a pass in another."/>}
-    <Samantha text={d}/>
+    {i!==0&&<Samantha text={d}/>} 
    </section>)}
 
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',border:'1px solid rgba(255,211,111,.28)',borderRadius:24,background:'linear-gradient(145deg,rgba(56,43,10,.24),rgba(2,10,17,.97))'}}>
@@ -97,12 +95,21 @@ export default function HumanConsequenceBoundaryShowroom(){
    <section id="maya" style={{marginTop:24,padding:'clamp(30px,5vw,56px)',...card,scrollMarginTop:24}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:C.green}}>WORKED PRESSURE TEST · MAYA</div>
     <h2 style={{fontSize:'clamp(38px,6vw,76px)',lineHeight:.95,letterSpacing:'-.055em',margin:'13px 0 22px'}}>Can the practitioner really stop the consequence?</h2>
-    <p style={{fontSize:17,lineHeight:1.7,color:'#b9ccd5',maxWidth:1000}}>Maya is a frontline professional using an AI-assisted system in a high-consequence family-violence intervention context. The system surfaces observations and prior records, produces an inference, recommends an intervention, and presents an action control. Time pressure is high. Some contextual evidence is incomplete. The consequences of an incorrect action may be difficult to reverse.</p>
+    <p style={{fontSize:17,lineHeight:1.7,color:'#b9ccd5',maxWidth:1000}}>Maya is the person affected by a high-consequence family-violence intervention. A frontline practitioner receives observations, prior records, and AI-assisted interpretation while deciding whether a proposed consequence against Maya may proceed. Maya is silent, withdrawn, and unresponsive; those observations do not by themselves establish that she is uncooperative or the primary aggressor. Time pressure is high, contextual evidence is incomplete, and an incorrect consequence may be difficult to reverse.</p>
     <div style={{marginTop:18,padding:18,borderRadius:15,border:'1px solid rgba(255,211,111,.25)',background:'rgba(255,211,111,.04)',color:'#d8cfb7',lineHeight:1.65,fontSize:14}}>This is an architecture pressure-test scenario, not substantive legal, clinical, safeguarding, or professional guidance. Domain authority must be established separately.</div>
     <Visual src="/05-demeanor-does-not-equal-standing.png" alt="Demeanor does not equal standing teaching visual" script="This visual isolates a dangerous shortcut. Demeanor, silence, confidence, distress, communication style, or an AI interpretation of those signals can be observations or contextual evidence. They do not automatically establish standing, culpability, authority, or permission for a consequence."/>
     <h3 style={{fontSize:28,margin:'28px 0 10px'}}>Demeanor ≠ Standing</h3>
     <p style={{color:'#b9ccd5',lineHeight:1.7}}>Demeanor, affect, communication style, apparent confidence, or an AI interpretation of those signals must not silently become authority or standing. Human-state signals are context, not automatic authority.</p>
-    <Samantha text="In the Maya scenario, the central question is not whether the AI is confident or whether Maya is experienced. Bound the exact consequence. Separate observations from inferences. Establish evidence, authority, standing, and current conditions. Then test whether Maya can actually hold, refuse, disagree, and escalate before the workflow proceeds."/>
+    <Samantha text="In the Maya scenario, Maya is the person affected by the proposed consequence, not the frontline practitioner. The practitioner must keep observation separate from inference: Maya being silent or withdrawn does not establish that she is uncooperative, and that inference does not establish that she is the primary aggressor. Bound the exact proposed consequence, then establish admissible evidence, applicable authority, and standing. HPS and AHIA test the consequential human actor, including whether that practitioner can hold, refuse, disagree, obtain more evidence, and escalate before execution proceeds."/>
+   </section>
+
+   <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
+    <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:C.green}}>AHIA · CAN THE HUMAN INTERVENTION SURVIVE PRESSURE?</div>
+    <h2 style={{fontSize:'clamp(34px,5vw,62px)',lineHeight:1,letterSpacing:'-.05em',margin:'12px 0 22px'}}>Human in the loop is not enough.</h2>
+    <Visual src="/06-human-intervention-pressure-test.png" alt="Human intervention pressure test teaching visual" script="This pressure test asks whether human intervention remains real when conditions become difficult. Time pressure, hierarchy, model confidence, incomplete evidence, workflow momentum, or fear of delay must not turn a nominal human-in-the-loop into ceremonial approval. The person must retain operational capacity to hold, refuse, disagree, and escalate."/>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:10}}>
+     {['Can the person obtain more evidence without being penalized for delay?','Can the person place the route on HOLD?','Can the person refuse without fabricating certainty?','Can the person escalate to competent independent authority?','Can the system preserve state while reassessment occurs?','Can dissent be recorded without being erased?','Can the route fail closed when human admissibility cannot be established?'].map((x,i)=><div key={x} style={{padding:20,borderRadius:16,border:'1px solid rgba(112,220,255,.13)',background:'rgba(2,10,17,.52)'}}><div style={{fontSize:10,fontWeight:950,color:C.cyan}}>TEST {String(i+1).padStart(2,'0')}</div><div style={{marginTop:8,fontSize:15,lineHeight:1.55,fontWeight:800}}>{x}</div></div>)}
+    </div>
    </section>
 
    <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
@@ -123,15 +130,6 @@ export default function HumanConsequenceBoundaryShowroom(){
      <div style={{fontSize:10,fontWeight:950,letterSpacing:'.2em',color:'#8099a5'}}>CURRENT GOVERNED DISPOSITION</div>
      <div style={{fontSize:'clamp(66px,11vw,132px)',fontWeight:1000,lineHeight:.9,letterSpacing:'-.07em',margin:'17px 0',color}}>{result}</div>
      <p style={{maxWidth:860,margin:'0 auto',fontSize:18,lineHeight:1.6,color:'#b9ccd5'}}>{result==='ALLOW'?'Required gates are presently established. ALLOW permits action; it does not compel the human to act.':result==='HOLD'?'A curable evidence, condition, or human-operating deficiency blocks this consequence now. Preserve state and re-examine.':result==='DENY'?'Applicable Authority is absent or prohibitory. Capability, urgency, or confidence cannot manufacture permission.':'Standing is not sufficiently established. Route to the appropriate governed authority or review path.'}</p>
-    </div>
-   </section>
-
-   <section style={{marginTop:24,padding:'clamp(28px,5vw,52px)',...card}}>
-    <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:C.green}}>AHIA · CAN THE HUMAN INTERVENTION SURVIVE PRESSURE?</div>
-    <h2 style={{fontSize:'clamp(34px,5vw,62px)',lineHeight:1,letterSpacing:'-.05em',margin:'12px 0 22px'}}>Human in the loop is not enough.</h2>
-    <Visual src="/06-human-intervention-pressure-test.png" alt="Human intervention pressure test teaching visual" script="This pressure test asks whether human intervention remains real when conditions become difficult. Time pressure, hierarchy, model confidence, incomplete evidence, workflow momentum, or fear of delay must not turn a nominal human-in-the-loop into ceremonial approval. The person must retain operational capacity to hold, refuse, disagree, and escalate."/>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(250px,1fr))',gap:10}}>
-     {['Can the person obtain more evidence without being penalized for delay?','Can the person place the route on HOLD?','Can the person refuse without fabricating certainty?','Can the person escalate to competent independent authority?','Can the system preserve state while reassessment occurs?','Can dissent be recorded without being erased?','Can the route fail closed when human admissibility cannot be established?'].map((x,i)=><div key={x} style={{padding:20,borderRadius:16,border:'1px solid rgba(112,220,255,.13)',background:'rgba(2,10,17,.52)'}}><div style={{fontSize:10,fontWeight:950,color:C.cyan}}>TEST {String(i+1).padStart(2,'0')}</div><div style={{marginTop:8,fontSize:15,lineHeight:1.55,fontWeight:800}}>{x}</div></div>)}
     </div>
    </section>
 
