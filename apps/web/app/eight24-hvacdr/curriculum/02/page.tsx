@@ -1,6 +1,6 @@
 'use client';
 
-import {CurriculumRoom} from '../[id]/page';
+import {CurriculumRoom} from '../CurriculumRoom';
 
 export default function Page(){
   return <CurriculumRoom idOverride="02"/>;
