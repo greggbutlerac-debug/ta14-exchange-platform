@@ -119,6 +119,9 @@ const rooms=[
 ['ONUMA/BIMgenie LT-2 Evidence Case','/ai-governance/admissible-architecture/onuma-lt2','EXAMINATIONS & DEMONSTRATIONS','ONUMA BIMgenie LT2 ACA AEA evidence'],
 ['ONUMA/BIM · ACA Rerun','/ai-governance/admissible-computation/onuma-bim-rerun','EXAMINATIONS & DEMONSTRATIONS','ONUMA BIM ACA prospective frozen examination'],
 ['U.S. School Air Quality Governance','/global-institutional-engagement/united-states-epa-indoor-air/school-air-quality-governance','BUILDINGS & HVAC','USA school air quality governance EPA scenario'],
+['Belgium · Indoor Air Evidence to Consequence','/global-institutional-engagement/belgium','COUNTRIES & PUBLIC INSTITUTIONS','Belgium FPS Public Health ticket 105350 indoor air'],
+['Sweden · From Air-Quality Evidence to Action','/global-institutional-engagement/sweden','COUNTRIES & PUBLIC INSTITUTIONS','Sweden EPA air quality short term action plan'],
+['Education Facilities IAQ · Execution Boundary','/global-institutional-engagement/ashrae-education-iaq-execution-boundary','BUILDINGS & HVAC','ASHRAE education facilities IAQ BMS execution demonstration'],
 ['Proof Over Promise · Chicago','/showrooms/proof-over-promise-chicago','EVENTS & PRESENTATIONS','Chicago ASHRAE AHR proof'],
 ] as const;
 
