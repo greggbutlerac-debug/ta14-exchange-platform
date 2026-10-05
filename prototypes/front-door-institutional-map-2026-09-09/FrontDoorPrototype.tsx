@@ -42,7 +42,7 @@ const doors = [
   ['FA','FEDERATION & AUTHORITY','Move bounded authority context across independent domains without transferring execution authority. Explore AVP, Connection Profiles, evidence, and recognition.','/federation-authority','cyan'],
   ['GI','GLOBAL INSTITUTIONAL ENGAGEMENT','Enter country-specific public showrooms built from real institutional conversations, local evidence pathways, sovereign authority contexts, and preserved engagement records.','/global-institutional-engagement','sovereign'],
   ['EA','EXECUTION ARTIFACTS','Inspect portable records of determinations, execution effects, evidence boundaries, receipts, replay, verification and preserved outcomes.','/artifacts','artifactDoor'],
-  ['SR','SHOWROOMS','Search ${showroomCount} canonical public technical showrooms across people, countries, organizations, environment, buildings, AI, interoperability, governance, examinations and events.','/showrooms','showroomDoor'],
+  ['SR','SHOWROOMS',`Search ${showroomCount} canonical public technical showrooms across people, countries, organizations, environment, buildings, AI, interoperability, governance, examinations and events.`,'/showrooms','showroomDoor'],
 ];
 
 const architecturePaths = [
