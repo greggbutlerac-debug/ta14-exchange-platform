@@ -16,7 +16,7 @@ const collections=[
 ] as const;
 
 const rooms=[
-['Aaron Hastings · Building ML','/showrooms/aaron-hastings-building-ml','PEOPLE & PRACTITIONERS','machine learning building automation HVAC analytics AEA ACA authority evidence consequence'],
+['Building ML Consequence Boundary','/showrooms/building-ml-consequence-boundary','AI & MACHINE INTELLIGENCE','machine learning building automation HVAC analytics AEA ACA authority evidence consequence'],
 ['Anto Budiardjo','/showrooms/anto-budiardjo','PEOPLE & PRACTITIONERS','CNS CP federation AFA buildings interoperability'],
 ['Kimon Onuma','/showrooms/onuma','PEOPLE & PRACTITIONERS','ONUMA BIM buildings interoperability'],
 ['Yong Ku Kim','/showrooms/yong-ku-kim','PEOPLE & PRACTITIONERS','buildings practitioner'],
