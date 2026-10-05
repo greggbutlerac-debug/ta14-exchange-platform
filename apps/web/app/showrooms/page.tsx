@@ -1,15 +1,141 @@
+'use client';
 import Link from 'next/link';
+import {useMemo,useState} from 'react';
 
-const classes=[
-{n:'01',name:'COUNTRY & INSTITUTIONAL',tag:'JURISDICTION · INSTITUTION · PUBLIC RECORD',copy:'Country-facing rooms for ministries, laboratories, agencies, national programs and institutional engagement. Native language, authority, correspondence state and local evidence pathways remain attributable.',href:'/global-institutional-engagement/showrooms',examples:'Guatemala · Norway · Singapore · France · Bosnia and Herzegovina'},
-{n:'02',name:'ENVIRONMENTAL & ATMOSPHERIC',tag:'AIR · PAIR · EIG · IAQ · DRIFT',copy:'Rooms examining atmospheric reality, mechanical performance, exposure continuity, environmental drift and the path from measured condition to governed consequence.',href:'/showrooms/environmental-atmospheric',examples:'AIR · PAIR · Healthy Indoor Air · Continuous Commissioning · Education IAQ'},
-{n:'03',name:'INTEROPERABILITY & SYSTEMS',tag:'INDEPENDENT SYSTEMS · SHARED BOUNDARY',copy:'Rooms where independent systems or architectures meet TA-14 without being collapsed into TA-14. Evidence exchange, authority boundaries, changed-context revalidation and consequence are made inspectable.',href:'/showrooms/interoperability-systems',examples:'ONUMA / RE1 · SCGA × TA-14 · ANDEKS · Keystone ↔ FEIG · CONTROLTOWER OS'},
-{n:'04',name:'REGISTERED GOVERNANCE',tag:'IDENTITY · VERSION · FREEZE · STANDING',copy:'Rooms centered on a registered governance object: its identity, frozen version, bounded propositions, examination status and current standing.',href:'/showrooms/registered-governance',examples:'VSA · Keystone · Harmonic · CONTROLTOWER OS · ANDEKS · Elias architectures'},
-{n:'05',name:'ARTIFACTS & EXAMINATION RECORDS',tag:'FINDING · RECEIPT · REPLAY · EVIDENCE',copy:'Preserved records produced by governed work. Findings, receipts, frozen examination objects, replay records and bounded results remain records rather than becoming architecture introductions.',href:'/showrooms/artifacts-examination-records',examples:'Governed findings · Technical Freeze · R1 results · receipts · evidence packages'},
-{n:'06',name:'HUMAN PERFORMANCE & EXECUTION',tag:'HUMAN AGENCY · GUIDANCE · ACTION · RECEIPT',copy:'Rooms governing the moment before human action becomes consequence. Assistance, wearable AI, sequence guidance, authority, standing, changed conditions and human choice remain explicitly separated.',href:'/human-performance-stack',examples:'Human Performance Stack · wearable guidance · HVACD/R · high-consequence human action'},
-{n:'07',name:'HUMAN TRUST × MACHINE TRUST',tag:'AI · BMS · HUMAN-IN-THE-LOOP · CONSEQUENCE',copy:'An interactive examination of the boundary between trust, authentication, intelligence and execution authority. Test human approval, machine trust, competing air-quality evidence, time, audit, cybersecurity and software liability.',href:'/showrooms/human-trust-machine-trust',examples:'AHU consequence test · CO₂ × PM2.5 · T0 → Tn · AI audit · software liability'}
-];
+const collections=[
+['PEOPLE & PRACTITIONERS','People whose work is examined, taught or connected to TA14.'],
+['COUNTRIES & PUBLIC INSTITUTIONS','Country-facing and institutional technical rooms.'],
+['ORGANIZATIONS & PARTNERS','Organizations, collaborators and public company rooms.'],
+['ENVIRONMENT & ATMOSPHERIC INTEGRITY','Air, environmental evidence, AIR, PAIR and EIG.'],
+['BUILDINGS & HVAC','Building systems, commissioning, HVAC and operational consequence.'],
+['AI & MACHINE INTELLIGENCE','AI, ML, agents, computation and machine-generated proposals.'],
+['INTEROPERABILITY & SYSTEMS','Connections, protocols, federation and system boundaries.'],
+['GOVERNANCE & ARCHITECTURES','TA14 architectures and registered governance teaching surfaces.'],
+['EXAMINATIONS & DEMONSTRATIONS','Bounded examinations, proving-ground demonstrations and tests.'],
+['EVENTS & PRESENTATIONS','Conference, meeting and presentation experiences.'],
+] as const;
 
-export const metadata={title:'TA-14 Showroom Directory',description:'The classified directory for TA-14 country, environmental, interoperability, governance and artifact showroom families.'};
+const rooms=[
+['Aaron Hastings · Building ML','/showrooms/aaron-hastings-building-ml','PEOPLE & PRACTITIONERS','machine learning building automation HVAC analytics AEA ACA authority evidence consequence'],
+['Anto Budiardjo','/showrooms/anto-budiardjo','PEOPLE & PRACTITIONERS','CNS CP federation AFA buildings interoperability'],
+['Kimon Onuma','/showrooms/onuma','PEOPLE & PRACTITIONERS','ONUMA BIM buildings interoperability'],
+['Yong Ku Kim','/showrooms/yong-ku-kim','PEOPLE & PRACTITIONERS','buildings practitioner'],
+['Michael Bordenaro','/showrooms/michael-bordenaro','PEOPLE & PRACTITIONERS','practitioner buildings'],
+['Bruno Tudal','/showrooms/bruno-tudal','PEOPLE & PRACTITIONERS','France indoor air practitioner'],
+['Steven Stobo · WeRAI','/showrooms/steven-stobo-werai','PEOPLE & PRACTITIONERS','WeRAI AHIA human router AI'],
+['Geoff Crawford','/showrooms/eight24-solutions/geoff-crawford','PEOPLE & PRACTITIONERS','Eight24 HVAC training'],
+['David Greenberg','/showrooms/eight24-solutions/david-greenberg','PEOPLE & PRACTITIONERS','Eight24 HVAC training'],
+['Jayesh Chavan','/showrooms/eight24-solutions/jayesh-chavan','PEOPLE & PRACTITIONERS','Eight24 HVAC training'],
+['United States · EPA Indoor Air','/global-institutional-engagement/united-states-epa-indoor-air','COUNTRIES & PUBLIC INSTITUTIONS','USA EPA indoor air institutional'],
+['Palestine','/global-institutional-engagement/palestine','COUNTRIES & PUBLIC INSTITUTIONS','EQA environmental air'],
+['Guatemala','/global-institutional-engagement/guatemala','COUNTRIES & PUBLIC INSTITUTIONS','MARN environmental air'],
+['Bosnia and Herzegovina','/environmental-integrity-governance/bosnia-herzegovina','COUNTRIES & PUBLIC INSTITUTIONS','FHMZBiH air quality authority'],
+['UAE','/environmental-integrity-governance/uae','COUNTRIES & PUBLIC INSTITUTIONS','United Arab Emirates air quality'],
+['Papua New Guinea · Atmospheric Integrity Pilot','/environmental-integrity-governance/png-atmospheric-integrity-pilot','COUNTRIES & PUBLIC INSTITUTIONS','PNG Crusaders AIR EIG pilot'],
+['Guyana','/global-institutional-engagement/guyana','COUNTRIES & PUBLIC INSTITUTIONS','EPA air noise radiation institutional'],
+['Gabon','/global-institutional-engagement/gabon','COUNTRIES & PUBLIC INSTITUTIONS','Conseil National Climat French institutional'],
+['Estonia','/global-institutional-engagement/estonia','COUNTRIES & PUBLIC INSTITUTIONS','Environment Agency EKUK Ministry Climate'],
+['Thailand','/global-institutional-engagement/thailand','COUNTRIES & PUBLIC INSTITUTIONS','Pollution Control Department institutional'],
+['Uzbekistan','/global-institutional-engagement/uzbekistan','COUNTRIES & PUBLIC INSTITUTIONS','ecology climate institutional'],
+['Kazakhstan','/global-institutional-engagement/kazakhstan','COUNTRIES & PUBLIC INSTITUTIONS','ecology Kazhydromet institutional'],
+['Czech Republic','/global-institutional-engagement/czech-republic','COUNTRIES & PUBLIC INSTITUTIONS','CHMI hydrometeorological institutional'],
+['Ireland','/global-institutional-engagement/ireland','COUNTRIES & PUBLIC INSTITUTIONS','EPA Ireland Dublin institutional'],
+['Georgia','/environmental-integrity-governance/georgia','COUNTRIES & PUBLIC INSTITUTIONS','National Environmental Agency institutional'],
+['Ukraine','/environmental-integrity-governance/ukraine','COUNTRIES & PUBLIC INSTITUTIONS','Ministry Economy institutional'],
+['Kyrgyz Republic','/environmental-integrity-governance/kyrgyzstan','COUNTRIES & PUBLIC INSTITUTIONS','natural resources ecology institutional'],
+['Montenegro','/global-institutional-engagement/montenegro','COUNTRIES & PUBLIC INSTITUTIONS','Environmental Protection Agency institutional'],
+['Norway','/global-institutional-engagement/norway','COUNTRIES & PUBLIC INSTITUTIONS','Miljodirektoratet environment institutional'],
+['Singapore','/global-institutional-engagement/singapore','COUNTRIES & PUBLIC INSTITUTIONS','NEA Environment Health Institute institutional'],
+['France','/global-institutional-engagement/france','COUNTRIES & PUBLIC INSTITUTIONS','France national ambassador IAQ institutional'],
+['Eight24 Solutions','/showrooms/eight24-solutions','ORGANIZATIONS & PARTNERS','HVAC training organization'],
+['AutomatedBuildings.com · Ken Sinclair','/showrooms/automatedbuildings','ORGANIZATIONS & PARTNERS','Ken Sinclair building automation'],
+['Daikin Industries','/showrooms/daikin-industries','ORGANIZATIONS & PARTNERS','HVAC FUSION30 Japan'],
+['Airthings Space Radon','/environmental-integrity-governance/showcase/airthings-space-radon','ENVIRONMENT & ATMOSPHERIC INTEGRITY','radon sensors AIR evidence'],
+['Fungal Spore Evidence','/environmental-integrity-governance/fungal-spore-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','mold spores evidence'],
+['Building Governed Air','/environmental-integrity-governance/building-governed-air','BUILDINGS & HVAC','classroom CO2 HVAC AIR AEA EIG'],
+['Governed Air','/global-institutional-engagement/governed-air','ENVIRONMENT & ATMOSPHERIC INTEGRITY','AIR ACA AI AEA governed intelligence'],
+['The Gap Between Scopes','/showrooms/gap-between-scopes','BUILDINGS & HVAC','RACI commissioning handoff acceptance consequence'],
+['Admissible Search Proof','/ai-governance/admissible-computation/showcase/admissible-search-proof','AI & MACHINE INTELLIGENCE','ACA search AI evidence'],
+['The Six Results You Never Saw','/ai-governance/admissible-computation/showcase/six-results-you-never-saw','AI & MACHINE INTELLIGENCE','ACA search admitted evidence'],
+['Tulshekar Gangireddy · Autonomous Agent','/autonomous-agent-examination/tulshekar-gangireddy','AI & MACHINE INTELLIGENCE','agent credentials validation AFA AEA EABA ACA'],
+['Admissible Federation Architecture','/admissible-federation-architecture','GOVERNANCE & ARCHITECTURES','AFA federation authority'],
+['Execution Authority Boundary Architecture','/execution-authority-boundary-architecture','GOVERNANCE & ARCHITECTURES','EABA execution commit boundary'],
+['Human Performance Stack','/human-performance-stack','GOVERNANCE & ARCHITECTURES','HPS human performance consequence'],
+['TA14 Canonical Architecture Showroom','/ai-governance/ta14-architecture-showroom','GOVERNANCE & ARCHITECTURES','HPS AHIA ACA AEA architecture'],
+['Harmonic · Moral Clarity AI','/governance-showcase/TA-14-AIGR-000008','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000008 registered governance Harmonic'],
+['ANDEKS','/governance-showcase/TA-14-AIGR-000012','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000012 registered governance'],
+['VSA TEAM 22','/governance-showcase/TA-14-AIGR-000025','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000025 registered governance'],
+['Velos Systems v1.0.0','/governance-showcase/TA-14-AIGR-000029','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000029 registered governance Velos'],
+['CONTROLTOWER OS','/governance-showcase/TA-14-AIGR-000030','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000030 registered governance'],
+['S3DVS Version 1.0','/governance-showcase/TA-14-AIGR-000033','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000033 registered governance'],
+['HSG · Elias Systems','/governance-showcase/TA-14-AIGR-000034','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000034 registered governance Elias'],
+['EGBP v1.0.0','/governance-showcase/TA-14-AIGR-000036','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000036 registered governance Elias'],
+['Admissible Computation Architecture v1.1','/governance-showcase/TA-14-AIGR-000039','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000039 ACA registered governance'],
+['ESGL v1.0','/governance-showcase/TA-14-AIGR-000040','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000040 registered governance Elias'],
+['HROS v3.3 · WeRAI','/governance-showcase/TA-14-AIGR-000046','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000046 registered governance WeRAI'],
+['Federation Authority Foundations','/federation-authority/foundations','GOVERNANCE & ARCHITECTURES','federation authority foundations'],
+['AFA × EABA Operational Challenge','/afa-eaba-operational-challenge','EXAMINATIONS & DEMONSTRATIONS','AFA EABA challenge examination'],
+['Environmental Evidence Conformance','/environmental-integrity-governance/demonstrations/environmental-evidence-conformance','EXAMINATIONS & DEMONSTRATIONS','EIG evidence conformance monitoring admissibility'],
+['EIG Demonstration Architecture','/environmental-integrity-governance/demonstrations/architecture','EXAMINATIONS & DEMONSTRATIONS','EIG demonstration architecture evidence admissibility'],
+['The Conflicting Environmental Record','/environmental-integrity-governance/demonstrations/conflicting-environmental-record','EXAMINATIONS & DEMONSTRATIONS','EIG environmental conflicting measurements'],
+['The Moisture Condition Changed Before Commit','/environmental-integrity-governance/demonstrations/changed-condition-moisture','EXAMINATIONS & DEMONSTRATIONS','EIG moisture changed condition commit'],
+['From Environmental Reporting to Environmental Authority','/environmental-integrity-governance/demonstrations/reporting-to-authority','EXAMINATIONS & DEMONSTRATIONS','EIG reporting authority monitoring'],
+['When the Average Erases the Event','/environmental-integrity-governance/demonstrations/transient-pm25-aggregation','EXAMINATIONS & DEMONSTRATIONS','EIG PM2.5 aggregation time resolution'],
+['The Wrong Inspection Object','/environmental-integrity-governance/demonstrations/wrong-inspection-object','EXAMINATIONS & DEMONSTRATIONS','EIG inspection object symptom cause'],
+['Stop the Cyber Attack','/examinations/stop-the-cyber-attack','EXAMINATIONS & DEMONSTRATIONS','cyber building authority evidence'],
+['David Holmberg Technical Challenge','/examinations/david-holmberg-technical-challenge','EXAMINATIONS & DEMONSTRATIONS','technical challenge'],
+['SCGA Examination Architecture v0.4','/governance-showcase/scga-v0-4','EXAMINATIONS & DEMONSTRATIONS','SCGA Elias adversarial examination'],
+['Global Framework for Action','/global-framework-for-action','EXAMINATIONS & DEMONSTRATIONS','healthy indoor air global framework'],
+['Stop the Cyber Attack · Presentation','/examinations/stop-the-cyber-attack/presentation','EVENTS & PRESENTATIONS','cyber presentation building'],
+['NIST AI-Optimized Building Controls','/nist-ai-optimized-building-controls','EVENTS & PRESENTATIONS','NIST meeting AI building controls non endorsement'],
+['Greenbuild · ONUMA × TA14 RE1','/greenbuild/onuma-re1','EVENTS & PRESENTATIONS','Greenbuild ONUMA RE1'],
+['Arizona · The Building as Evidence','/showrooms/arizona-building-as-evidence','BUILDINGS & HVAC','Arizona building evidence HVAC chronology legal forensic'],
+['Arizona IAQ · Preserving the Building as Evidence','/showrooms/arizona-iaq-building-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Arizona IAQ evidence continuity building'],
+['Design Integration · Govern Consequence','/showrooms/design-integration-govern-consequence','INTEROPERABILITY & SYSTEMS','BAS lighting metering fire access AI integration consequence'],
+['EDIAQI Croatia · Governed Air','/showrooms/ediaqi-croatia','EVENTS & PRESENTATIONS','Croatia Zagreb EDIAQI indoor air conference'],
+['Elias Systems × TA14 Examination','/showrooms/elias-ta14-examination','EXAMINATIONS & DEMONSTRATIONS','Elias frozen examination identity continuity'],
+['Angela Bolton · Fixed Asset Consultant','/showrooms/fixed-asset-consultant','PEOPLE & PRACTITIONERS','fixed asset CIP lifecycle evidence reconciliation'],
+['Founding Institutional Sponsorship','/showrooms/founding-institutional-sponsorship','ORGANIZATIONS & PARTNERS','sponsorship public technical education institutional'],
+['HABITS × TA14 R1 Final Result','/showrooms/habits-ta14-r1-final-result','EXAMINATIONS & DEMONSTRATIONS','HABITS interoperability preserved R1'],
+['Human Consequence Boundary','/showrooms/human-consequence-boundary','GOVERNANCE & ARCHITECTURES','AEA HPS AHIA human intervention consequence'],
+['Human Trust × Machine Trust','/showrooms/human-trust-machine-trust','AI & MACHINE INTELLIGENCE','human machine trust authority consequence'],
+['India · School Air','/showrooms/india-school-air','BUILDINGS & HVAC','India school classroom CO2 PM2.5 ventilation filtration'],
+['United Kingdom · School Air','/showrooms/uk-school-air','BUILDINGS & HVAC','UK school indoor air ventilation authority'],
+['Healthy Indoor Air · Consequence Boundary','/global-institutional-engagement/healthy-indoor-air-consequence-boundary','ENVIRONMENT & ATMOSPHERIC INTEGRITY','healthy indoor air CO2 PM2.5 consequence'],
+['Continuous Commissioning','/global-institutional-engagement/continuous-commissioning','BUILDINGS & HVAC','commissioning operations changed conditions revalidation'],
+['HVAC Execution Boundary · TC 1.4','/global-institutional-engagement/ashrae-tc14-hvac-execution-boundary','BUILDINGS & HVAC','ASHRAE HVAC controls execution authority'],
+['Fire Chief Electrical Shutoff','/global-institutional-engagement/fire-chief-electrical-shutoff','EXAMINATIONS & DEMONSTRATIONS','fire chief electrical shutoff authority ALN'],
+['GO AQS · Evidence to Consequence','/global-institutional-engagement/go-aqs','ENVIRONMENT & ATMOSPHERIC INTEGRITY','GO AQS indoor environment standard evidence'],
+['School IAQ Consequence Boundary','/global-institutional-engagement/school-iaq-consequence-boundary','BUILDINGS & HVAC','school IAQ AIR EIG AEA'],
+['The Governed Crossing · CNS/CP × ONUMA × TA14','/global-institutional-engagement/responder-connection-boundary','INTEROPERABILITY & SYSTEMS','CNS CP ONUMA AFA AVP EABA connection'],
+['HABITS × TA14 Interoperability Lab','/habits-ta14-interoperability','INTEROPERABILITY & SYSTEMS','HABITS interoperability enforcement contract'],
+['Execution Authority Integration Boundary','/execution-authority-infrastructure/integration-boundary','INTEROPERABILITY & SYSTEMS','execution authority integration boundary native systems'],
+['Federated Atmospheric Integrity Network','/environmental-integrity-governance/federated-atmospheric-integrity-network','ENVIRONMENT & ATMOSPHERIC INTEGRITY','federated atmospheric AIR EIG network'],
+['AirGradient · OpenAIR Foundation','/environmental-integrity-governance/showcase/airgradient-openair-foundation','ENVIRONMENT & ATMOSPHERIC INTEGRITY','AirGradient OpenAIR sensors environmental evidence'],
+['Safer Air Project','/environmental-integrity-governance/showcase/safer-air-project','ENVIRONMENT & ATMOSPHERIC INTEGRITY','safer air environmental evidence'],
+['Invivus · MoldMap · AerLume','/environmental-integrity-governance/showcase/invivus-moldmap-aerlume','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Invivus MoldMap AerLume mold environmental'],
+['Blue IoT · Evidence to Action','/environmental-integrity-governance/showcase/blue-iot-evidence-to-action','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Blue IoT sensors evidence action'],
+['Atmospheric Mechanical Chronology','/environmental-integrity-governance/showcase/atmospheric-mechanical-chronology','ENVIRONMENT & ATMOSPHERIC INTEGRITY','atmospheric mechanical chronology HVAC evidence'],
+['ONUMA/BIMgenie LT-2 Evidence Case','/ai-governance/admissible-architecture/onuma-lt2','EXAMINATIONS & DEMONSTRATIONS','ONUMA BIMgenie LT2 ACA AEA evidence'],
+['ONUMA/BIM · ACA Rerun','/ai-governance/admissible-computation/onuma-bim-rerun','EXAMINATIONS & DEMONSTRATIONS','ONUMA BIM ACA prospective frozen examination'],
+['U.S. School Air Quality Governance','/global-institutional-engagement/united-states-epa-indoor-air/school-air-quality-governance','BUILDINGS & HVAC','USA school air quality governance EPA scenario'],
+['Belgium · Indoor Air Evidence to Consequence','/global-institutional-engagement/belgium','COUNTRIES & PUBLIC INSTITUTIONS','Belgium FPS Public Health ticket 105350 indoor air'],
+['Sweden · From Air-Quality Evidence to Action','/global-institutional-engagement/sweden','COUNTRIES & PUBLIC INSTITUTIONS','Sweden EPA air quality short term action plan'],
+['Education Facilities IAQ · Execution Boundary','/global-institutional-engagement/ashrae-education-iaq-execution-boundary','BUILDINGS & HVAC','ASHRAE education facilities IAQ BMS execution demonstration'],
+['Proof Over Promise · Chicago','/showrooms/proof-over-promise-chicago','EVENTS & PRESENTATIONS','Chicago ASHRAE AHR proof'],
+] as const;
 
-export default function ShowroomDirectory(){return <main className="page"><div className="matrix" aria-hidden="true">REALITY　RECORD　CONTINUITY　ADMISSIBILITY　BINDING　COMMIT　EXECUTION　OUTCOME　REALIDAD　REGISTRO　CONTINUIDAD　AUTORIDAD　RÉALITÉ　PREUVE　EXÉCUTION　現実　記録　実行　현실　기록　실행</div><div className="shell"><nav><Link href="/" className="brand"><b>TA-14</b> EXCHANGE</Link><Link href="/global-institutional-engagement">GLOBAL ENGAGEMENT</Link><Link href="/artifacts/registry">ARTIFACT REGISTRY</Link></nav><header><p className="eyebrow">TA-14 EXCHANGE · CLASSIFIED PUBLIC SHOWROOM DIRECTORY</p><h1>Every room has<br/><em>an identity.</em></h1><p>A showroom is a presentation format, not a classification. TA-14 separates jurisdictional engagement, environmental examination, interoperability, registered governance and preserved examination records so that cross-linking never erases what a record actually is.</p><div className="rule">COUNTRY ≠ ENVIRONMENTAL ≠ INTEROPERABILITY ≠ GOVERNANCE ≠ ARTIFACT ≠ HUMAN EXECUTION ≠ EXECUTION TRUST</div></header><section className="grid">{classes.map(c=><Link href={c.href} key={c.n} className="card"><span className="num">{c.n}</span><small>{c.tag}</small><h2>{c.name}</h2><p>{c.copy}</p><div className="examples"><b>EXAMPLES / ENTRY POINTS</b>{c.examples}</div><strong>ENTER CLASS →</strong></Link>)}</section><section className="logic"><p className="eyebrow">CLASSIFICATION RULE</p><h2>Classify by what the room governs. Link by what the room touches.</h2><div><article><b>GUATEMALA</b><p>Country & Institutional. It may invoke AIR or EIG and later produce an examination artifact. Its identity remains the Guatemala institutional record.</p></article><article><b>ONUMA / RE1</b><p>Interoperability & Systems. It may use AEA, AIR or environmental evidence and produce governed findings. Its identity remains a cross-system examination surface.</p></article><article><b>VSA + R1</b><p>The VSA architecture belongs to Registered Governance. The R1 finding belongs to Artifacts & Examination Records. They link to one another without becoming the same object.</p></article></div></section><footer>TA-14 AUTHORITY · PUBLIC TECHNICAL SHOWROOM DIRECTORY<br/>REALITY → RECORD → CONTINUITY → ADMISSIBILITY → BINDING → COMMIT → EXECUTION → OUTCOME</footer></div><style>{`.page{min-height:100vh;background:#02070c;color:#edf5f8;font-family:Arial,sans-serif;position:relative;overflow:hidden}.matrix{position:fixed;inset:0;color:rgba(86,206,244,.035);font:700 15px/3 monospace;word-spacing:30px;transform:rotate(-8deg) scale(1.3);pointer-events:none}.shell{position:relative;width:min(1220px,calc(100% - 36px));margin:auto}nav{height:80px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,.09)}nav a{color:#bcd0d9;text-decoration:none;font-size:10px;font-weight:900;letter-spacing:.12em}.brand{font-size:17px!important}.brand b,.eyebrow{color:#70dcff}header{padding:100px 0 68px}header h1{font:clamp(58px,9vw,110px)/.9 Georgia,serif;letter-spacing:-.055em;margin:18px 0 30px}header h1 em{font-style:normal;color:#efc86c}header>p{max-width:930px;color:#a7bbc5;font-size:18px;line-height:1.75}.eyebrow{font-size:10px;font-weight:950;letter-spacing:.2em}.rule{margin-top:38px;padding:20px 24px;border:1px solid rgba(239,200,108,.28);background:rgba(239,200,108,.05);color:#efc86c;font-size:11px;font-weight:950;letter-spacing:.1em}.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding:30px 0 80px}.card{min-height:390px;padding:30px;border:1px solid rgba(112,220,255,.2);border-radius:22px;background:linear-gradient(145deg,rgba(10,43,59,.72),rgba(2,8,13,.96));color:#edf5f8;text-decoration:none;position:relative;transition:.2s}.card:hover{transform:translateY(-5px);border-color:#70dcff}.card:last-child{grid-column:1/-1}.num{display:block;color:#efc86c;font:28px Georgia,serif}.card small{display:block;color:#70dcff;font-size:8px;font-weight:950;letter-spacing:.15em;margin-top:20px}.card h2{font:34px/1.05 Georgia,serif;margin:10px 0 18px}.card p{color:#9eb1ba;line-height:1.7;font-size:13px;max-width:760px}.examples{margin:24px 0 48px;color:#7f949f;font-size:11px;line-height:1.7}.examples b{display:block;color:#b7c8cf;font-size:8px;letter-spacing:.12em}.card>strong{position:absolute;bottom:28px;color:#70dcff;font-size:9px}.logic{padding:76px 0;border-top:1px solid rgba(255,255,255,.08)}.logic h2{max-width:900px;font:clamp(38px,5vw,64px)/1.02 Georgia,serif;margin:12px 0 34px}.logic>div{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}.logic article{padding:24px;border:1px solid rgba(255,255,255,.09);border-radius:16px;background:rgba(5,17,25,.72)}.logic article b{color:#efc86c;font-size:10px}.logic article p{color:#92a6b0;font-size:12px;line-height:1.65}footer{padding:45px 0 70px;border-top:1px solid rgba(255,255,255,.07);color:#6f8792;font-size:9px;line-height:1.8}@media(max-width:800px){nav{height:auto;padding:20px 0;gap:14px;flex-wrap:wrap}.grid,.logic>div{grid-template-columns:1fr}.card:last-child{grid-column:auto}}`}</style></main>}
+export default function Showrooms(){
+ const [q,setQ]=useState(''); const [cat,setCat]=useState('ALL');
+ const visible=useMemo(()=>rooms.filter(r=>(cat==='ALL'||r[2]===cat)&&(!q||r.join(' ').toLowerCase().includes(q.toLowerCase()))),[q,cat]);
+ return <main className="page"><div className="shell">
+  <nav><Link href="/">← TA14 EXCHANGE</Link><b>SHOWROOM LIBRARY · INVENTORY V1</b></nav>
+  <header><p>PUBLIC TECHNICAL LIBRARY</p><h1>FIND YOUR<br/><em>SHOWROOM.</em></h1><p className="lead">One searchable door into TA14 public teaching, examination and presentation surfaces. A showroom teaches or examines. Artifacts prove or preserve. Indexes organize. Registry records establish identity or status.</p></header>
+  <section className="search"><label>SEARCH ALL SHOWROOMS<input value={q} onChange={e=>setQ(e.target.value)} placeholder="Try: Aaron Hastings, Palestine, radon, ONUMA, HVAC, BACnet, AI, authority, mold…"/></label><div className="filters"><button onClick={()=>setCat('ALL')} className={cat==='ALL'?'on':''}>ALL</button>{collections.map(c=><button key={c[0]} onClick={()=>setCat(c[0])} className={cat===c[0]?'on':''}>{c[0]}</button>)}</div><b>{visible.length} MATCH{visible.length===1?'':'ES'}</b></section>
+  <section className="grid">{visible.map(r=><Link href={r[1]} key={r[1]} className="card"><small>{r[2]}</small><h2>{r[0]}</h2><p>{r[3].split(' ').slice(0,8).join(' · ')}</p><b>ENTER SHOWROOM →</b></Link>)}</section>
+  <section className="collections"><p>PRIMARY COLLECTIONS</p>{collections.map(c=><button key={c[0]} onClick={()=>{setCat(c[0]);setQ('');scrollTo({top:0,behavior:'smooth'})}}><b>{c[0]}</b><span>{c[1]}</span></button>)}</section>
+  <footer>TA14 AUTHORITY GOVERNANCE INSTITUTION · SHOWROOM LIBRARY · INVENTORY V1<br/><span>One substantive public room = one showroom. Language variants and continuation surfaces do not multiply the count.</span></footer>
+ </div><style jsx>{`
+ .page{min-height:100vh;background:#03090e;color:#eaf5f7;font-family:Arial,sans-serif}.shell{max-width:1320px;margin:auto;padding:28px}nav{display:flex;justify-content:space-between;border-bottom:1px solid #17313b;padding-bottom:18px;font-size:12px;letter-spacing:.12em}nav a{color:#91e8f5;text-decoration:none}header{padding:70px 0 38px}header>p:first-child,.collections>p{color:#64dceb;font-weight:900;letter-spacing:.2em;font-size:11px}h1{font-size:clamp(58px,10vw,128px);line-height:.82;letter-spacing:-.07em;margin:18px 0}h1 em{color:#75efba;font-style:normal}.lead{max-width:850px;color:#9db3bc;font-size:19px;line-height:1.65}.search{position:sticky;top:0;background:#03090ef2;backdrop-filter:blur(14px);z-index:5;padding:18px 0;border-block:1px solid #17313b}.search label{font-size:10px;letter-spacing:.16em;font-weight:900}.search input{display:block;width:100%;box-sizing:border-box;margin:9px 0 13px;padding:17px;border-radius:12px;border:1px solid #244a57;background:#07141b;color:white;font-size:16px}.filters{display:flex;gap:7px;overflow:auto;padding-bottom:8px}.filters button{white-space:nowrap;background:#07141b;color:#86a2ad;border:1px solid #17313b;border-radius:999px;padding:8px 11px;font-size:9px;font-weight:900}.filters button.on{color:#03100c;background:#75efba;border-color:#75efba}.search>b{font-size:10px;color:#75efba}.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;padding:28px 0 70px}.card{min-height:190px;padding:22px;border:1px solid #17313b;border-radius:16px;background:#061117;text-decoration:none;color:inherit;display:flex;flex-direction:column}.card:hover{border-color:#64dceb;transform:translateY(-2px)}.card small{color:#64dceb;font-weight:900;letter-spacing:.12em;font-size:9px}.card h2{font-size:24px;line-height:1.05;margin:18px 0 10px}.card p{color:#718c97;font-size:11px;line-height:1.6;text-transform:uppercase}.card>b{margin-top:auto;color:#75efba;font-size:11px}.collections{border-top:1px solid #17313b;padding:55px 0}.collections button{width:100%;display:grid;grid-template-columns:minmax(240px,1fr) 2fr;text-align:left;padding:18px 0;border:0;border-bottom:1px solid #122832;background:none;color:inherit}.collections b{font-size:13px;color:#eaf5f7}.collections span{color:#78919b}footer{border-top:1px solid #17313b;padding:30px 0 50px;color:#6f8993;font-size:10px;letter-spacing:.1em;line-height:1.8}footer span{letter-spacing:0}@media(max-width:700px){.collections button{grid-template-columns:1fr;gap:7px}nav{gap:20px}h1{font-size:60px}}
+ `}</style></main>
+}
