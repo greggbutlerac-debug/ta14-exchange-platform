@@ -170,6 +170,8 @@ export default async function GovernanceShowcaseDetailPage({ params }: Props) {
   const publicEvidenceCount = Math.max(record.evidence_count ?? 0, evidenceObjects.length);
   const relationIds = (profile?.related_registry_identifiers ?? []).filter((id) => id.toUpperCase() !== registryIdentifier);
   const relatedRecords = directory.filter((candidate) => relationIds.includes(candidate.registry_identifier));
+  const isHabits = registryIdentifier === 'TA-14-AIGR-000044';
+  const registryHref = `/workspace/ai-governance/registry/records/${encodeURIComponent(registryIdentifier)}`;
 
   const milestones = [
     { label: 'Permanent Registry Identity', detail: registryIdentifier, active: true },
@@ -182,7 +184,7 @@ export default async function GovernanceShowcaseDetailPage({ params }: Props) {
 
   const recordNodes = [
     { label: 'Identity', value: shortName || name, active: true },
-    { label: 'Authority', value: steward, active: Boolean(steward) },
+    { label: isHabits ? 'Stewardship' : 'Authority', value: steward, active: Boolean(steward) },
     { label: 'Evidence', value: publicEvidenceCount ? `${publicEvidenceCount} preserved` : 'Awaiting public evidence', active: publicEvidenceCount > 0 },
     { label: 'Demonstrations', value: demonstrations.length ? `${demonstrations.length} entered` : 'Open future node', active: demonstrations.length > 0 },
     { label: 'Artifacts', value: governedArtifacts.length ? `${governedArtifacts.length} governed` : 'Open future node', active: governedArtifacts.length > 0 },
@@ -232,6 +234,7 @@ export default async function GovernanceShowcaseDetailPage({ params }: Props) {
               <h1>{name}</h1>
               <div className="hero-subtitle">{profile?.profile_subtitle || category}</div>
               <p className="hero-summary">{summary}</p>
+              {isHabits ? <p className="hero-summary"><strong>Execution Boundary:</strong> HABITS preserves a distinct execution-boundary responsibility: the UAB determines admissibility, and the HABITS Execution Boundary enforces that determination without silently transferring execution authority to TA-14.</p> : null}
               <div className="actions">
                 <Link className="button primary" href={`/workspace/ai-governance/registry/records/${encodeURIComponent(registryIdentifier)}`}>Open Authoritative Registry Record →</Link>
                 {primaryWebsite ? <a className="button secondary" href={primaryWebsite} target="_blank" rel="noreferrer">Visit Governance Website ↗</a> : null}
@@ -264,7 +267,7 @@ export default async function GovernanceShowcaseDetailPage({ params }: Props) {
       </div></div></div>
 
       <section className="section"><div className="wrap">
-        <div className="section-head"><div><div className="kicker">Governance Constellation</div><h2>A living record, not a directory listing.</h2></div><p className="lead">The center is the permanent governance identity. Every preserved evidence object, demonstration, artifact, and chronology event deepens the institutional record around it without changing who owns or stewards the architecture.</p></div>
+        <div className="section-head"><div><div className="kicker">Governance Constellation</div><h2>A living record, not a directory listing.</h2></div><p className="lead">The center is the permanent governance identity. Every preserved evidence object, demonstration, artifact, and chronology event deepens the institutional record around it without changing who owns or stewards the architecture. {isHabits ? 'For HABITS, stewardship identifies the attributable steward of the registered governance; it does not imply that stewardship alone supplies execution authority for a proposed consequence.' : ''}</p></div>
         <div className="constellation">
           <div className="stars" />
           <div className="core-node"><div><strong>{shortName || name}</strong><small>{registryIdentifier}</small></div></div>
@@ -278,7 +281,7 @@ export default async function GovernanceShowcaseDetailPage({ params }: Props) {
       </div></section>
 
       <section className="section"><div className="wrap">
-        <div className="section-head"><div><div className="kicker">Founding Demonstration</div><h2>The first major proof point gets the stage.</h2></div><p className="lead">A Founding Demonstration should never disappear inside a generic artifact list. When one enters the governed record, it becomes a major institutional moment on this page.</p></div>
+        <div className="section-head"><div><div className="kicker">Founding Demonstration</div><h2>A bounded examination gets a visible record.</h2></div><p className="lead">A Founding Demonstration should never disappear inside a generic artifact list. Its recorded result may be supported, held, limited, unresolved, denied, or escalated; the institutional value is the attributable bounded record, not a predetermined positive outcome.</p></div>
         {founding ? <article className="spotlight"><div className="kicker">✦ Founding Demonstration Entered Into the Record</div><h3>{founding.title}</h3><div className="artifact-id">{founding.artifact_identifier}</div><p>{founding.public_summary}</p><div className="chips"><span className="chip">{founding.artifact_type}</span><span className="chip">Entered {formatDate(founding.registered_at)}</span><span className="chip">{founding.evidence_object_identifiers?.length ?? 0} Linked Evidence Objects</span>{founding.finding_class ? <span className="chip">{founding.finding_class}</span> : null}</div><div className="actions"><Link className="button primary" href={artifactHref(founding.artifact_identifier, founding.public_record_href)}>Enter the Demonstration Record →</Link></div></article> : <article className="spotlight"><div className="kicker">Founding Demonstration · Open Future Milestone</div><h3>The Registry foundation is established. The demonstration stage remains open.</h3><p>No published governed artifact linked to this governance is currently classified as a founding or demonstration record. When one is formally entered, this entire section upgrades automatically and gives that event flagship treatment.</p></article>}
       </div></section>
 
@@ -298,8 +301,8 @@ export default async function GovernanceShowcaseDetailPage({ params }: Props) {
           <div className="content-card emphasis"><h3>Who They Are</h3><SectionText value={profile?.who_they_are_markdown || record.summary} /></div>
           <div className="content-card"><h3>What They Are Building</h3><SectionText value={profile?.what_they_are_building_markdown} /></div>
           <div className="content-card"><h3>What They Declared</h3><SectionText value={profile?.what_they_declared_markdown || record.formal_claims} /></div>
-          <div className="content-card"><h3>Explicit Boundaries & Non-Claims</h3><SectionText value={profile?.non_claims || record.explicit_non_claims} /></div>
-          <div className="content-card"><h3>Known Limitations</h3><SectionText value={record.known_limitations} /></div>
+          <div className="content-card"><h3>Explicit Boundaries & Non-Claims</h3><SectionText value={profile?.non_claims || record.explicit_non_claims} />{isHabits ? <p><Link href={registryHref}>Inspect the registered non-claims in the authoritative Registry record →</Link></p> : null}</div>
+          <div className="content-card"><h3>Known Limitations</h3><SectionText value={record.known_limitations} />{isHabits ? <p><Link href={registryHref}>Inspect the registered limitations in the authoritative Registry record →</Link></p> : null}</div>
           <div className="content-card emphasis"><h3>TA-14 Institutional Commentary</h3><SectionText value={profile?.ta14_commentary_markdown || profile?.why_ta14_is_paying_attention_markdown} /></div>
         </div>
       </div></section>
