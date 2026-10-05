@@ -61,28 +61,72 @@ export default function Page(){
    </section>
 
    <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
-    <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>VISUAL EXAMINATION · SAMANTHA NARRATION</p>
-    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>See the evidence chain. Then hear why each crossing matters.</h2>
-    <div style={{display:'grid',gap:38,marginTop:30}}>
-     {visuals.map((v,i)=><article key={v.src} style={{border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
-      <img src={v.src} alt={v.title} style={{display:'block',width:'100%',height:'auto'}}/>
-      <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{v.title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{v.audio}</p></details></div>
-     </article>)}
-    </div>
-   </section>
-
-   <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
-    <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>FROM ATMOSPHERE TO OUTCOME</p>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:14,marginTop:24}}>
-     {chain.map(([n,t,b])=><article key={n} style={{padding:24,border:'1px solid #244654',borderRadius:16,background:'#06121a'}}><b style={{color:'#70dcff'}}>{n}</b><h3 style={{fontFamily:'Georgia,serif',fontSize:24,margin:'8px 0'}}>{t}</h3><p style={{color:'#98adb6',lineHeight:1.65,margin:0}}>{b}</p></article>)}
+    <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>01 · OPEN DATA</p>
+    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>Open data is the start — not the consequence.</h2>
+    <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
+     <img src={visuals[0].src} alt={visuals[0].title} style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[0].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[0].audio}</p></details></div>
+    </article>
+    <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
+     <h3 style={{fontFamily:'Georgia,serif',fontSize:34,color:'#eef6f8'}}>The observation has crossed its first boundary.</h3>
+     <p>The atmosphere existed before anyone measured it. The monitor did not create that reality; it produced an observation of it. Publishing the observation makes the record available to others, but availability is not the same thing as authority.</p>
+     <p>A government, researcher, funder, attorney, community or regulator may eventually ask that observation to support a consequence. Before that happens, another question has to be answered.</p>
+     <p style={{fontFamily:'Georgia,serif',fontSize:28,color:'#efc86c'}}><b>What survived with the number?</b></p>
     </div>
    </section>
 
    <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
-    <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>THE PRACTITIONER PRESSURE TEST</p>
-    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(34px,5vw,54px)'}}>Observed is not inferred. Inferred is not authorized.</h2>
-    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:12,marginTop:26}}>
+    <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>02 · EVIDENCE CONTINUITY</p>
+    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>What must survive with the PM2.5 observation?</h2>
+    <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
+     <img src={visuals[1].src} alt={visuals[1].title} style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[1].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[1].audio}</p></details></div>
+    </article>
+    <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
+     <h3 style={{fontFamily:'Georgia,serif',fontSize:34,color:'#eef6f8'}}>The number survived. Now what?</h3>
+     <p>If we can recover the raw observation, time, location, instrument identity, calibration or verification context and every transformation, we have something much stronger than a dashboard number. We have a traceable record.</p>
+     <p>But a traceable record still does not automatically authorize a consequence. Measurement is not continuity. Continuity is not admissibility. Admissibility is not authority. Authority is not execution. Execution is not proof of outcome.</p>
+     <p style={{fontFamily:'Georgia,serif',fontSize:28,color:'#efc86c'}}><b>How does physical reality become an authorized real-world outcome?</b></p>
+    </div>
+   </section>
+
+   <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
+    <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>03 · GOVERNED CROSSINGS</p>
+    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>From atmosphere to outcome.</h2>
+    <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
+     <img src={visuals[2].src} alt={visuals[2].title} style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[2].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[2].audio}</p></details></div>
+    </article>
+    <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:14,marginTop:34}}>
+     {chain.map(([n,t,b])=><article key={n} style={{padding:24,border:'1px solid #244654',borderRadius:16,background:'#06121a'}}><b style={{color:'#70dcff'}}>{n}</b><h3 style={{fontFamily:'Georgia,serif',fontSize:24,margin:'8px 0'}}>{t}</h3><p style={{color:'#98adb6',lineHeight:1.65,margin:0}}>{b}</p></article>)}
+    </div>
+    <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
+     <h3 style={{fontFamily:'Georgia,serif',fontSize:34,color:'#eef6f8'}}>The chain is visible. Now find the dangerous crossing.</h3>
+     <p>One of the easiest mistakes happens when someone moves from what the evidence actually observed to what they believe the evidence means. Those are not the same thing.</p>
+     <p>A monitor can observe a PM2.5 concentration. Analysis can produce an inference. But the inference does not acquire execution authority merely because the underlying measurements are good.</p>
+     <p style={{fontFamily:'Georgia,serif',fontSize:28,color:'#efc86c'}}><b>Observed is not inferred. Inferred is not authorized.</b></p>
+    </div>
+   </section>
+
+   <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
+    <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>04 · CONSEQUENCE BOUNDARY</p>
+    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>The policy consequence boundary.</h2>
+    <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
+     <img src={visuals[3].src} alt={visuals[3].title} style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[3].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[3].audio}</p></details></div>
+    </article>
+    <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
+     <p><b style={{color:'#eef6f8'}}>OBSERVED:</b> What did the evidence actually establish?</p>
+     <p><b style={{color:'#eef6f8'}}>INFERRED:</b> What conclusion is being drawn from that evidence?</p>
+     <p><b style={{color:'#eef6f8'}}>AUTHORITY BOUNDARY:</b> Who has standing, what authority applies, and what evidence is sufficient for this particular consequence?</p>
+     <p><b style={{color:'#eef6f8'}}>AUTHORIZED CONSEQUENCE:</b> What may actually become real?</p>
+    </div>
+    <div style={{marginTop:34,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))',gap:12}}>
      {questions.map((q,i)=><div key={q} style={{padding:22,border:'1px solid #1e3d4b',borderRadius:14,background:'#041019',color:'#b7c8ce',lineHeight:1.65}}><span style={{color:'#70dcff',fontWeight:900,marginRight:10}}>{String(i+1).padStart(2,'0')}</span>{q}</div>)}
+    </div>
+    <div style={{marginTop:34,padding:28,border:'1px solid #4c4a2b',borderRadius:18,background:'#111006'}}>
+     <p style={{color:'#efc86c',fontWeight:900,letterSpacing:1.3}}>CANONICAL QUESTION</p>
+     <p style={{fontFamily:'Georgia,serif',fontSize:'clamp(26px,3.5vw,40px)',lineHeight:1.3,marginBottom:0}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
     </div>
    </section>
 
@@ -90,10 +134,6 @@ export default function Page(){
     <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>A POSSIBLE EPIC × TA14 DEMONSTRATION</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(34px,5vw,54px)'}}>Add a governed evidence layer without closing the data.</h2>
     <p style={{maxWidth:920,color:'#a3b6be',fontSize:18,lineHeight:1.8}}>A collaborative demonstration could begin with an existing open PM2.5 stream and preserve the evidence chain around one policy-relevant question: raw observation, instrument and location identity, transformations, continuity, applicable authority, standing, decision, execution and measured outcome. The purpose would not be to replace EPIC's open-data model. It would test whether the path from open data to consequential use can become more replayable, auditable and defensible.</p>
-    <div style={{marginTop:26,padding:28,border:'1px solid #4c4a2b',borderRadius:18,background:'#111006'}}>
-      <p style={{color:'#efc86c',fontWeight:900,letterSpacing:1.3}}>CANONICAL QUESTION</p>
-      <p style={{fontFamily:'Georgia,serif',fontSize:'clamp(26px,3.5vw,40px)',lineHeight:1.3,marginBottom:0}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
-    </div>
    </section>
 
    <section style={{padding:'58px 0 86px',borderTop:'1px solid #18303b'}}>
