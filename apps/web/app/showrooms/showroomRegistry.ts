@@ -69,6 +69,7 @@ export const showroomRooms=[
 ['Admissible Computation Architecture v1.1','/governance-showcase/TA-14-AIGR-000039','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000039 ACA registered governance'],
 ['ESGL v1.0','/governance-showcase/TA-14-AIGR-000040','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000040 registered governance Elias'],
 ['HROS v3.3 · WeRAI','/governance-showcase/TA-14-AIGR-000046','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000046 registered governance WeRAI'],
+['HABITS','/governance-showcase/TA-14-AIGR-000044','GOVERNANCE & ARCHITECTURES','TA-14-AIGR-000044 registered governance HABITS interoperability R1'],
 ['Federation Authority Foundations','/federation-authority/foundations','GOVERNANCE & ARCHITECTURES','federation authority foundations'],
 ['AFA × EABA Operational Challenge','/afa-eaba-operational-challenge','EXAMINATIONS & DEMONSTRATIONS','AFA EABA challenge examination'],
 ['Environmental Evidence Conformance','/environmental-integrity-governance/demonstrations/environmental-evidence-conformance','EXAMINATIONS & DEMONSTRATIONS','EIG evidence conformance monitoring admissibility'],
