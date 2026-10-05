@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import Image from 'next/image';
+import Samantha from './Samantha';
 
 export const metadata={
   title:'EPIC Air Quality Fund · Open Data to Governed Consequence | TA14',
@@ -64,8 +66,8 @@ export default function Page(){
     <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>01 · OPEN DATA</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>Open data is the start — not the consequence.</h2>
     <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
-     <img src={visuals[0].src} alt={visuals[0].title} style={{display:'block',width:'100%',height:'auto'}}/>
-     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[0].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[0].audio}</p></details></div>
+     <Image src={visuals[0].src} alt={visuals[0].title} width={1536} height={1024} sizes="(max-width: 1160px) 100vw, 1160px" style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'8px 26px 28px'}}><Samantha text={visuals[0].audio}/></div>
     </article>
     <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
      <h3 style={{fontFamily:'Georgia,serif',fontSize:34,color:'#eef6f8'}}>The observation has crossed its first boundary.</h3>
@@ -79,8 +81,8 @@ export default function Page(){
     <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>02 · EVIDENCE CONTINUITY</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>What must survive with the PM2.5 observation?</h2>
     <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
-     <img src={visuals[1].src} alt={visuals[1].title} style={{display:'block',width:'100%',height:'auto'}}/>
-     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[1].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[1].audio}</p></details></div>
+     <Image src={visuals[1].src} alt={visuals[1].title} width={1536} height={1024} sizes="(max-width: 1160px) 100vw, 1160px" style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'8px 26px 28px'}}><Samantha text={visuals[1].audio}/></div>
     </article>
     <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
      <h3 style={{fontFamily:'Georgia,serif',fontSize:34,color:'#eef6f8'}}>The number survived. Now what?</h3>
@@ -94,8 +96,8 @@ export default function Page(){
     <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>03 · GOVERNED CROSSINGS</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>From atmosphere to outcome.</h2>
     <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
-     <img src={visuals[2].src} alt={visuals[2].title} style={{display:'block',width:'100%',height:'auto'}}/>
-     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[2].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[2].audio}</p></details></div>
+     <Image src={visuals[2].src} alt={visuals[2].title} width={1536} height={1024} sizes="(max-width: 1160px) 100vw, 1160px" style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'8px 26px 28px'}}><Samantha text={visuals[2].audio}/></div>
     </article>
     <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:14,marginTop:34}}>
      {chain.map(([n,t,b])=><article key={n} style={{padding:24,border:'1px solid #244654',borderRadius:16,background:'#06121a'}}><b style={{color:'#70dcff'}}>{n}</b><h3 style={{fontFamily:'Georgia,serif',fontSize:24,margin:'8px 0'}}>{t}</h3><p style={{color:'#98adb6',lineHeight:1.65,margin:0}}>{b}</p></article>)}
@@ -112,8 +114,8 @@ export default function Page(){
     <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>04 · CONSEQUENCE BOUNDARY</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>The policy consequence boundary.</h2>
     <article style={{marginTop:28,border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
-     <img src={visuals[3].src} alt={visuals[3].title} style={{display:'block',width:'100%',height:'auto'}}/>
-     <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{visuals[3].title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{visuals[3].audio}</p></details></div>
+     <Image src={visuals[3].src} alt={visuals[3].title} width={1536} height={1024} sizes="(max-width: 1160px) 100vw, 1160px" style={{display:'block',width:'100%',height:'auto'}}/>
+     <div style={{padding:'8px 26px 28px'}}><Samantha text={visuals[3].audio}/></div>
     </article>
     <div style={{maxWidth:900,margin:'38px auto 0',fontSize:18,lineHeight:1.85,color:'#a3b6be'}}>
      <p><b style={{color:'#eef6f8'}}>OBSERVED:</b> What did the evidence actually establish?</p>
@@ -140,9 +142,15 @@ export default function Page(){
     <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>CURRENT STATUS · OCTOBER 5, 2026</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(32px,4vw,48px)'}}>The 2026 EPIC funding call is closed. The technical conversation is not.</h2>
     <p style={{maxWidth:900,color:'#a3b6be',fontSize:17,lineHeight:1.8}}>EPIC's public registry remains open to air-quality actors, and EPIC publicly invites partnership inquiries. TA14 is presenting this room as a bounded demonstration and invitation to examine whether evidence-governance infrastructure can strengthen the durability of open PM2.5 programs and the policy consequences they support.</p>
-    <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:30}}>
-     <a href="https://aqfund.epic.uchicago.edu/air-quality-registry/" target="_blank" rel="noreferrer" style={{padding:'14px 18px',borderRadius:12,background:'#70dcff',color:'#001018',fontWeight:900,textDecoration:'none'}}>EPIC AIR QUALITY REGISTRY ↗</a>
-     <a href="https://aqfund.epic.uchicago.edu/call-for-proposals/" target="_blank" rel="noreferrer" style={{padding:'14px 18px',borderRadius:12,border:'1px solid #365366',color:'#edf5f8',fontWeight:900,textDecoration:'none'}}>2026 CALL RECORD ↗</a>
+    <div style={{marginTop:34,padding:28,border:'1px solid #4c4a2b',borderRadius:18,background:'#111006'}}>
+     <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:1.5}}>05 · DEMONSTRATION</p>
+     <h3 style={{fontFamily:'Georgia,serif',fontSize:'clamp(28px,4vw,42px)',margin:'10px 0 14px'}}>The data can remain open. The consequence should remain provable.</h3>
+     <p style={{color:'#b7c8ce',fontSize:17,lineHeight:1.75,maxWidth:900}}>TA14 can examine one bounded PM2.5 evidence-to-consequence route as an independent technical demonstration: preserve the raw observation, continuity, transformations, authority, decision, execution and measured outcome without closing or replacing the underlying open-data system.</p>
+     <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:24}}>
+      <a href="mailto:ta14admissibleexecution@gmail.com?subject=EPIC%20PM2.5%20Evidence-to-Consequence%20Demonstration" style={{padding:'14px 18px',borderRadius:12,background:'#efc86c',color:'#111006',fontWeight:900,textDecoration:'none'}}>EXAMINE THE EVIDENCE-TO-CONSEQUENCE BOUNDARY →</a>
+      <a href="https://aqfund.epic.uchicago.edu/air-quality-registry/" target="_blank" rel="noreferrer" style={{padding:'14px 18px',borderRadius:12,border:'1px solid #365366',color:'#edf5f8',fontWeight:900,textDecoration:'none'}}>EPIC AIR QUALITY REGISTRY ↗</a>
+      <a href="https://aqfund.epic.uchicago.edu/call-for-proposals/" target="_blank" rel="noreferrer" style={{padding:'14px 18px',borderRadius:12,border:'1px solid #365366',color:'#edf5f8',fontWeight:900,textDecoration:'none'}}>2026 CALL RECORD ↗</a>
+     </div>
     </div>
    </section>
   </div>
