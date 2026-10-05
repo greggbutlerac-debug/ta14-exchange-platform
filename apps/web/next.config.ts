@@ -67,6 +67,78 @@ const nextConfig: NextConfig = {
         destination: "/governance-showcase/:registryIdentifier",
         permanent: true,
       },
+      // Public-route recovery: preserve older/shared URLs and repair malformed links
+      // observed in production traffic without manufacturing new content.
+      {
+        source: "/showrooms/Zm91bmRpbm",
+        destination: "/showrooms/founding-institutional-sponsorship",
+        permanent: true,
+      },
+      {
+        source: "/admissible-execution-architecture",
+        destination: "/registry/ta-14-admissible-execution-architecture",
+        permanent: true,
+      },
+      {
+        source: "/admissible-computation-architecture",
+        destination: "/ai-governance/admissible-computation",
+        permanent: true,
+      },
+      {
+        source: "/ai-governance/playground",
+        destination: "/workspace/ai-governance/playground",
+        permanent: true,
+      },
+      {
+        source: "/governance-library/all",
+        destination: "/governance-library",
+        permanent: true,
+      },
+      {
+        source: "/entity-review",
+        destination: "/workspace/entity-review",
+        permanent: true,
+      },
+      {
+        source: "/request-review",
+        destination: "/workspace/entity-review",
+        permanent: true,
+      },
+      {
+        source: "/ai-governance/my-routes",
+        destination: "/workspace/my-routes",
+        permanent: true,
+      },
+      {
+        source: "/workspace/governed-records/admissibility-review",
+        destination: "/workspace/governed-records",
+        permanent: true,
+      },
+      {
+        source: "/global-institutional-engagement/null",
+        destination: "/global-institutional-engagement/showrooms",
+        permanent: true,
+      },
+      {
+        source: "/workspace/ai-governance/registry/records/TA-14-AIGR-000017/null",
+        destination: "/registry/TA-14-AIGR-000017",
+        permanent: true,
+      },
+      {
+        source: "/eu-ai-act/null",
+        destination: "/eu-ai-act",
+        permanent: true,
+      },
+      {
+        source: "/null",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/index",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
 
