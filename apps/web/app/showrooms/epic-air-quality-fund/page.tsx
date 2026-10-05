@@ -25,6 +25,13 @@ const questions=[
  'What changed after the decision, and was the claimed outcome actually measured?'
 ];
 
+const visuals=[
+ {src:'/TA14_EPIC_01_Open_Data_Is_The_Start.png',title:'01 · OPEN DATA IS THE START — NOT THE CONSEQUENCE',audio:'Section one begins with physical reality. Air exists before a monitor describes it. Section two is measurement: the instrument creates an observation tied to time, place, identity and operating state. Section three makes that observation open and inspectable. But open data is still evidence, not permission. Before a policy proposal becomes a real-world consequence, the evidence must cross a governance boundary where continuity, admissibility, applicable authority and standing are established. The lesson is simple: measurement can inform a consequence, but measurement alone does not authorize one.'},
+ {src:'/TA14_EPIC_02_What_Must_Survive_With_PM25.png',title:'02 · WHAT MUST SURVIVE WITH THE PM2.5 OBSERVATION?',audio:'This image asks what must travel with a PM2.5 number if someone may later rely on it. Section one preserves time. Section two preserves location. Section three preserves instrument identity. Section four preserves calibration and verification context. Section five protects the raw value. Section six records every transformation rather than silently replacing the original observation. Section seven preserves context and uncertainty. Section eight preserves provenance: where the record came from, who handled it, and how its history can be reconstructed. A number without this continuity may remain useful information, but it becomes much harder to defend when the proposed consequence carries legal, institutional, financial or public-policy weight.'},
+ {src:'/TA14_EPIC_03_Atmosphere_To_Outcome.png',title:'03 · FROM ATMOSPHERE TO OUTCOME',audio:'Now follow the complete route. One: physical reality is the atmospheric condition itself. Two: measurement captures an observation. Three: the open record makes that observation inspectable and reusable. Four: continuity preserves provenance, timestamps, instrument identity, calibration context and transformations. Five: admissibility tests whether the evidence is sufficient for the exact proposition being advanced. Six: binding connects applicable law, policy, institutional authority and standing. Seven: commit and execution require an authorized actor to accept responsibility and cause a bounded action. Eight: outcome measures what actually changed and preserves that result as the next reality. Each crossing matters. Skipping a crossing does not make the missing authority appear.'},
+ {src:'/TA14_EPIC_04_Policy_Consequence_Boundary.png',title:'04 · THE POLICY CONSEQUENCE BOUNDARY',audio:'The final image separates three things that are often collapsed. Section one is observed: what was actually measured in the air, at a particular place and time, by a particular instrument. Section two is inferred: models, assumptions, aggregation and interpretation may tell us what that observation could mean. But inference is not authorization. The governance boundary asks whether the evidence is sufficient, which authority applies, who has standing, whether the decision record is preserved and whether permission exists for the proposed action. Only then do we reach section three: an authorized consequence carried out by a qualified actor within defined scope. Observed is not inferred. Inferred is not authorized.'}
+];
+
 export default function Page(){
  return <main style={{minHeight:'100vh',background:'linear-gradient(180deg,#02070c,#06131b 50%,#02070c)',color:'#eef6f8',fontFamily:'Arial,sans-serif'}}>
   <div style={{maxWidth:1160,margin:'auto',padding:'0 22px'}}>
@@ -51,6 +58,17 @@ export default function Page(){
     <p style={{color:'#efc86c',fontSize:11,fontWeight:900,letterSpacing:2}}>THE GOVERNANCE GAP</p>
     <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08,maxWidth:980}}>An admissible input does not automatically create an admissible output.</h2>
     <p style={{maxWidth:900,color:'#a3b6be',fontSize:18,lineHeight:1.8}}>A PM2.5 observation may be technically sound and openly available. A later policy decision can still require additional evidence, applicable authority, established standing, scope, interpretation discipline and a preserved decision record. TA14 keeps those layers separate so the route from measurement to consequence can be inspected rather than assumed.</p>
+   </section>
+
+   <section style={{padding:'58px 0',borderTop:'1px solid #18303b'}}>
+    <p style={{color:'#70dcff',fontSize:11,fontWeight:900,letterSpacing:2}}>VISUAL EXAMINATION · SAMANTHA NARRATION</p>
+    <h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(36px,5vw,58px)',lineHeight:1.08}}>See the evidence chain. Then hear why each crossing matters.</h2>
+    <div style={{display:'grid',gap:38,marginTop:30}}>
+     {visuals.map((v,i)=><article key={v.src} style={{border:'1px solid #244654',borderRadius:18,overflow:'hidden',background:'#06121a'}}>
+      <img src={v.src} alt={v.title} style={{display:'block',width:'100%',height:'auto'}}/>
+      <div style={{padding:'24px 26px 28px'}}><h3 style={{fontFamily:'Georgia,serif',fontSize:26,margin:'0 0 14px'}}>{v.title}</h3><details style={{border:'1px solid #355262',borderRadius:12,padding:'15px 17px',background:'#041019'}}><summary style={{cursor:'pointer',color:'#70dcff',fontWeight:900}}>▶ SAMANTHA · LISTEN / READ THE TEACHING</summary><p style={{color:'#b7c8ce',fontSize:16,lineHeight:1.8,margin:'16px 0 0'}}>{v.audio}</p></details></div>
+     </article>)}
+    </div>
    </section>
 
    <section style={{padding:'54px 0',borderTop:'1px solid #18303b'}}>
