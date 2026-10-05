@@ -3,5 +3,5 @@
 import {CurriculumRoom} from '../CurriculumRoom';
 
 export default function Page(){
-  return <CurriculumRoom/>;
+  return <CurriculumRoom idOverride="01"/>;
 }
