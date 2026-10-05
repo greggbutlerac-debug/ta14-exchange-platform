@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import ProofLayer from './ProofLayer';
+import {showroomCount} from '../../apps/web/app/showrooms/showroomRegistry';
 
 const steps = [
   ['01','REGISTER','Give the governance a permanent, attributable identity.'],
@@ -41,7 +42,7 @@ const doors = [
   ['FA','FEDERATION & AUTHORITY','Move bounded authority context across independent domains without transferring execution authority. Explore AVP, Connection Profiles, evidence, and recognition.','/federation-authority','cyan'],
   ['GI','GLOBAL INSTITUTIONAL ENGAGEMENT','Enter country-specific public showrooms built from real institutional conversations, local evidence pathways, sovereign authority contexts, and preserved engagement records.','/global-institutional-engagement','sovereign'],
   ['EA','EXECUTION ARTIFACTS','Inspect portable records of determinations, execution effects, evidence boundaries, receipts, replay, verification and preserved outcomes.','/artifacts','artifactDoor'],
-  ['SR','SHOWROOMS','Search 107 canonical public technical showrooms across people, countries, organizations, environment, buildings, AI, interoperability, governance, examinations and events.','/showrooms','showroomDoor'],
+  ['SR','SHOWROOMS',`Search ${showroomCount} canonical public technical showrooms across people, countries, organizations, environment, buildings, AI, interoperability, governance, examinations and events.`,'/showrooms','showroomDoor'],
 ];
 
 const architecturePaths = [
@@ -53,7 +54,7 @@ const architecturePaths = [
 
 const proof = [
   ['30+','REGISTERED GOVERNANCES','Independent and TA-14 architectures with preserved identity and chronology.'],
-  ['107','CANONICAL SHOWROOMS','Searchable public technical teaching, examination and presentation surfaces across ten primary collections.'],
+  [String(showroomCount),'CANONICAL SHOWROOMS','Searchable public technical teaching, examination and presentation surfaces across ten primary collections.'],
   ['R1+','EXAMINATIONS','Interoperability is treated as a separate evidentiary object, not a marketing claim.'],
   ['ART','GOVERNED ARTIFACTS','Portable records that preserve claims, evidence, determinations, limits and outcomes.'],
 ];
