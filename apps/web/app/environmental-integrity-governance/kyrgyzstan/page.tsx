@@ -81,8 +81,8 @@ export default function KyrgyzstanPage() {
           <div style={{fontSize:13,fontWeight:900,letterSpacing:".12em",color:"#0961a8"}}>TECHNICAL GOVERNANCE REFERENCE · v1.1 EXAMINATION EDITION</div>
           <h2 style={{fontSize:30,margin:"8px 0 10px"}}>Download the complete examination record</h2>
           <p style={{fontSize:17,lineHeight:1.6}}>The downloadable reference preserves source precedence, claim boundaries, the canonical eight-anchor architecture, and the changed-condition revalidation analysis used to build this showroom.</p>
-          <a href="/TA14_Kyrgyz_Republic_Evidence_to_Enforcement_Technical_Governance_Reference_v1.1_Examination_Edition.pdf" style={{display:"inline-block",marginTop:8,background:"#075aa8",color:"white",padding:"14px 20px",borderRadius:10,fontWeight:900,textDecoration:"none"}}>DOWNLOAD TECHNICAL GOVERNANCE REFERENCE PDF ↓</a>
-          <p style={{fontSize:13,color:"#6a7890",marginTop:12}}>If the PDF asset has not yet been published to the site repository, this control remains reserved for the frozen v1.1 file.</p>
+          <a href="/TA14_Kyrgyz_Republic_Evidence_to_Enforcement_Technical_Governance_Reference_v1.1_Examination_Edition%20(1).pdf" style={{display:"inline-block",marginTop:8,background:"#075aa8",color:"white",padding:"14px 20px",borderRadius:10,fontWeight:900,textDecoration:"none"}}>DOWNLOAD TECHNICAL GOVERNANCE REFERENCE PDF ↓</a>
+          <p style={{fontSize:13,color:"#6a7890",marginTop:12}}>Frozen v1.1 Examination Edition · Ministry record № 01-10/31492 · 02.10.2026</p>
         </section>
 
         <section style={{marginTop:38,padding:"26px",borderRadius:16,background:"#071c45",color:"white"}}>
