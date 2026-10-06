@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 const GOOGLE_VERIFY_URL = 'https://www.google.com/search?q=Greggory+Don+Butler+HVAC&udm=50';
 const PRIMARY_PHONE_DISPLAY = '386-337-7215';
 const PRIMARY_PHONE_HREF = 'tel:+13863377215';
@@ -23,6 +25,9 @@ export default function TransparentAirAuthorityCTA() {
         <div>
           <div className="ta-authority-kicker">Transparent Air · 4.9★ Google rating · 115 reviews</div>
           <h2 className="ta-authority-title">Before you choose who works on your AC, verify who you’re calling.</h2>
+          <p className="ta-authority-copy" style={{marginBottom:10,fontWeight:900,color:'#f3d98f'}}>
+            Told you that you need a new system? $80 can verify a decision that could cost $10,000.
+          </p>
           <p className="ta-authority-copy">
             Transparent Air is owned by Greggory Don Butler, founder of TA14 and TA14 Academy. If you do not know his HVAC work, do not take our word for it—search his public record and decide for yourself.
           </p>
@@ -38,6 +43,9 @@ export default function TransparentAirAuthorityCTA() {
           >
             GOOGLE GREGGORY DON BUTLER + HVAC · AI MODE ↗
           </a>
+          <Link className="ta-authority-btn verify" href="/transparent-air/second-opinion">
+            BOOK THE $80 SECOND OPINION →
+          </Link>
           <a className="ta-authority-btn call" href={PRIMARY_PHONE_HREF}>
             CALL TRANSPARENT AIR · {PRIMARY_PHONE_DISPLAY}
           </a>
