@@ -98,7 +98,7 @@ export default function TransparentAirPage() {
           <div className="eyebrow">The offer</div>
           <h2>Repair call, heat pump problem, or expensive recommendation—we start with evidence.</h2>
           <div className="cards">
-            <article className="card"><h3>AC / Heat Pump Not Working</h3><p>We evaluate the present condition and operating evidence before deciding what should be repaired.</p></article>
+            <article className="card"><h3>AC / Heat Pump Not Working</h3><p>We evaluate the present condition and operating evidence before deciding what should be repaired.</p><p><Link href="/transparent-air/ac-not-working">AC NOT WORKING →</Link><br/><Link href="/transparent-air/heat-pump-not-working">HEAT PUMP NOT WORKING →</Link></p></article>
             <article className="card"><h3>Expensive Repair</h3><p>If the recommendation is costly and you are unsure about the diagnosis, get another set of eyes on it before authorizing the work.</p></article>
             <article className="card"><h3>Told You Need a New System?</h3><p>A replacement decision can cost thousands. <Link href="/transparent-air/second-opinion">Get a Transparent Air second opinion →</Link></p></article>
           </div>
