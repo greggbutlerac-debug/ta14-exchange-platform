@@ -17,7 +17,7 @@ const visuals:Visual[]=[
     n:'01',
     k:'YOU ALREADY HAVE THE BEGINNING',
     title:'Continuous monitoring gives you visibility. Governed Air takes it the rest of the way.',
-    img:'/governed-air-01-you-already-have-the-beginning-wide-final.png',
+    img:'/governed-air-01-you-already-have-the-beginning.png',
     script:'Start with what the building already has. Sensors, BAS points, dashboards, trends and alarms can continuously observe temperature, humidity, carbon dioxide, particles, airflow, pressure, energy and equipment state. That visibility is valuable. It can support diagnosis, optimization and operations. But monitoring alone does not preserve an admissible record, establish legitimate computational reliance, create permission for a proposed consequence, or prove the physical outcome. Governed Air begins with this existing infrastructure and adds the boundaries that determine what the evidence may legitimately support.',
     takeaway:'Monitoring establishes observation. It does not by itself establish what the observation is authorized to cause.'
   },
