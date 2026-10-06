@@ -1,6 +1,7 @@
 import Link from 'next/link';
 
 const GOOGLE_VERIFY_URL = 'https://www.google.com/search?q=Greggory+Don+Butler+HVAC&udm=50';
+const GOOGLE_BUSINESS_URL = 'https://www.google.com/maps/search/?api=1&query=Transparent%20Air%20386-337-7215';
 const PRIMARY_PHONE_DISPLAY = '386-337-7215';
 const PRIMARY_PHONE_HREF = 'tel:+13863377215';
 
@@ -34,6 +35,15 @@ export default function TransparentAirAuthorityCTA() {
           <span className="ta-authority-note">Independent Google search opens in a new tab.</span>
         </div>
         <div className="ta-authority-actions">
+          <a
+            className="ta-authority-btn verify"
+            href={GOOGLE_BUSINESS_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            data-transparent-air-proof="google-transparent-air-business-profile"
+          >
+            SEE TRANSPARENT AIR ON GOOGLE · 4.9★ · 115 REVIEWS ↗
+          </a>
           <a
             className="ta-authority-btn verify"
             href={GOOGLE_VERIFY_URL}
