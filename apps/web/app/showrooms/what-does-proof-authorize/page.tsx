@@ -94,6 +94,13 @@ export default function ProofAuthorityShowroom(){
     <div style={{marginTop:25,padding:'clamp(30px,5vw,55px)',borderRadius:22,border:'1px solid '+accent+'66',background:'rgba(2,9,15,.7)',textAlign:'center'}}><div style={{fontSize:10,fontWeight:950,letterSpacing:'.18em',color:'#829ba7'}}>DETERMINATION</div><div style={{fontSize:'clamp(70px,12vw,140px)',fontWeight:1000,lineHeight:.9,letterSpacing:'-.07em',color:accent,margin:'18px 0'}}>{result}</div></div>
    </section>
 
+   <section style={{marginTop:24,padding:'clamp(30px,5vw,52px)',border:'1px solid rgba(112,220,255,.28)',borderRadius:24,background:'linear-gradient(145deg,rgba(5,28,42,.96),rgba(3,11,19,.98))'}}>
+    <div style={{fontSize:11,fontWeight:950,letterSpacing:'.17em',color:'#70dcff'}}>PUBLIC TECHNICAL REFERENCE · v1.0</div>
+    <h2 style={{fontSize:'clamp(32px,5vw,58px)',letterSpacing:'-.045em',lineHeight:1,margin:'12px 0 16px'}}>Take the examination with you.</h2>
+    <p style={{fontSize:17,lineHeight:1.7,color:'#b8cad2',maxWidth:900}}>The 12-page independent technical reference preserves the full consequence examination: claim, evidence, scope, reality, crossing, authority, determination, consequence, and the governing question.</p>
+    <a href="/TA14_What_Does_Proof_Actually_Authorize_Technical_Reference_v1_under25MB.pdf" download style={{display:'inline-block',marginTop:20,padding:'15px 19px',borderRadius:11,border:'1px solid rgba(113,242,182,.42)',background:'rgba(113,242,182,.08)',color:'#dffff0',textDecoration:'none',fontWeight:950}}>DOWNLOAD TECHNICAL REFERENCE — PDF →</a>
+   </section>
+
    <section style={{marginTop:24,padding:'clamp(34px,6vw,68px)',border:'1px solid rgba(113,242,182,.34)',borderRadius:28,background:'linear-gradient(145deg,rgba(8,36,48,.96),rgba(3,11,19,.98))'}}>
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#71f2b6'}}>THE GOVERNING QUESTION</div>
     <h2 style={{fontSize:'clamp(31px,5vw,62px)',lineHeight:1.05,letterSpacing:'-.045em',margin:'15px 0'}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</h2>
