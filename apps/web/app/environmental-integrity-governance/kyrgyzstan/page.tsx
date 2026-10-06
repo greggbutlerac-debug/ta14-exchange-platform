@@ -1,29 +1,96 @@
-import Link from 'next/link';
-import InstitutionalSeamLab from '../../components/InstitutionalSeamLab';
+import Link from "next/link";
 
-export const metadata={title:'Кыргызстан · абанын сапаты жана учурдагы ыйгарым укук | TA-14',description:'Кыргызстан үчүн TA-14 техникалык showroom: абанын сапаты боюнча далилден учурдагы ыйгарым укуктуу аракетке чейинки чек.'};
+export const metadata = {
+  title: "Kyrgyz Republic — Evidence to Enforcement | TA14",
+  description: "Independent TA14 examination of Kyrgyz Republic Ministry response No. 01-10/31492 dated 02.10.2026.",
+};
 
-const timeline=[
-['20 сен 2026','TA-14 → Министрлик','Абанын сапаты боюнча ишенимдүү далилден учурдагы ыйгарым укуктуу аракетке чейинки чек жөнүндө чектелген техникалык суроо жөнөтүлдү.'],
-['21 сен 2026','Министрлик → TA-14','Документтик камсыздоо бөлүмү кайрылууну жетекчилик кароосу үчүн Министрликтин атына жөнөтүүнү суранды жана электрондук жарандык кайрылуунун талаптарын түшүндүрдү. Үлгү DOCX тиркелди.'],
-['АЗЫР','TA-14 · формалдуу маршрут','Кыргыз тили негизги болгон коомдук техникалык showroom түзүлдү. Кийинки кат Министрликтин атына формалдуу түрдө багытталышы керек.'],
-['КИЙИНКИ','Формалдуу кайрылуу','Министрликтин берген үлгүсүн жана процедуралык талаптарын сактап, институционалдык техникалык суроону жетекчиликке жөнөтүү.']];
+const boards = [
+  ["01","Official Ministry Response","The controlling record. Establish what the Ministry actually stated before any architectural interpretation begins.","/kyrgyz-official-ministry-response-01-corrected.png"],
+  ["02","Roles Are Separated","Monitoring, evidence production, and consequential enforcement are not treated as the same institutional function.","/kyrgyz-roles-separated-02.png"],
+  ["03","Evidence Must Be Verified and Current","Accurate measurement, proper calibration, verification, and currency matter before evidence is used for consequential decision-making.","/kyrgyz-verified-current-evidence-03.png"],
+  ["04","Changed Conditions Trigger Revalidation","When material conditions change, yesterday's record cannot simply be carried forward. Re-measurement and additional verification may be required.","/kyrgyz-changed-conditions-revalidation-04.png"],
+  ["05","Evidence-to-Enforcement Decision Architecture","A consequence must survive the path from observed conditions through evidence sufficiency and lawful authority before execution.","/kyrgyz-evidence-to-enforcement-decision-architecture-05.png"],
+  ["06","TA14 Eight-Anchor Mapping","TA14 independently maps the response against the canonical chain: Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome.","/kyrgyz-ta14-eight-anchor-architecture-mapping-06.png"],
+  ["07","Put the Consequence on Trial","A pressure test asks whether yesterday's valid evidence can authorize today's proposed consequence after reality has changed.","/kyrgyz-consequence-pressure-test-07.png"],
+  ["08","Execution Must Produce a Verified Outcome","Governance does not end when an action occurs. The outcome must be observed and preserved as the new reality.","/kyrgyz-execution-to-verified-outcome-08.png"],
+];
 
-export default function Kyrgyzstan(){return <main className="p"><div className="s">
-<nav><Link href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/global-institutional-engagement">ГЛОБАЛДЫК ИНСТИТУЦИОНАЛДЫК ӨЗ АРА АРАКЕТТЕНҮҮ</Link></nav>
-<header><div className="flags"><span>🇰🇬 <b>КЫРГЫЗ РЕСПУБЛИКАСЫ</b></span><small>КООМДУК ТЕХНИКАЛЫК SHOWROOM</small><span>🇺🇸 <b>TA-14 AUTHORITY</b></span></div><em>КЫРГЫЗ ТИЛИ НЕГИЗГИ · РУССКИЙ + ENGLISH REFERENCE</em><h1>Далил T0дө жетиштүү болсо,<br/><strong>T1де ыйгарым укукту эмне сактайт?</strong></h1><i>If evidence is sufficient at T0, what keeps authority current at T1?</i><p>TA-14 Кыргыз Республикасынын Жаратылыш ресурстары, экология жана техникалык көзөмөл министрлигине абанын сапаты боюнча далил менен конкреттүү аракетке учурдагы ыйгарым укуктун ортосундагы чек жөнүндө тар техникалык суроо жөнөттү. Министрлик жооп берип, кайрылууну жетекчилик кароосу үчүн Министрликтин атына формалдуу багыттоону суранды.</p><small>RU · Министерство попросило направить обращение на имя Министерства для рассмотрения руководством. EN · The Ministry requested a formally addressed submission for leadership review.</small><aside><b>Жол ачылды. Техникалык жооп али берилген жок.</b><span>Процедурный маршрут установлен; технический вопрос остаётся открытым. · The procedural route is established; the technical question remains open.</span></aside></header>
+export default function KyrgyzstanPage() {
+  return (
+    <main style={{minHeight:"100vh",background:"#f4f7fb",color:"#10254b"}}>
+      <section style={{background:"linear-gradient(135deg,#071c45,#075aa8)",color:"white",padding:"28px 20px 52px"}}>
+        <div style={{maxWidth:1180,margin:"0 auto"}}>
+          <div style={{display:"flex",justifyContent:"space-between",gap:16,flexWrap:"wrap",fontSize:13,fontWeight:800,letterSpacing:".08em"}}>
+            <Link href="/showrooms" style={{color:"white",textDecoration:"none"}}>← SHOWROOMS</Link>
+            <span>TA14 · PUBLIC TECHNICAL EXAMINATION · KYRGYZ REPUBLIC</span>
+          </div>
+          <div style={{marginTop:40,maxWidth:920}}>
+            <div style={{fontSize:14,fontWeight:900,letterSpacing:".14em",color:"#ffd54a"}}>OFFICIAL MINISTRY RESPONSE RECEIVED · 02 OCT 2026</div>
+            <h1 style={{fontSize:"clamp(42px,7vw,82px)",lineHeight:.95,margin:"14px 0 20px",letterSpacing:"-.04em"}}>Evidence to Enforcement</h1>
+            <p style={{fontSize:"clamp(19px,2.4vw,28px)",lineHeight:1.35,margin:0,maxWidth:900}}>What happens when environmental evidence is valid, conditions change, and a real consequence is proposed?</p>
+          </div>
+        </div>
+      </section>
 
-<section><em>ЭМНЕ АНЫКТАЛДЫ</em><h2>Институционалдык жооп бар. Эми суроону туура формалдуу маршрут менен өткөрүү керек.</h2><div className="cards"><article><b>Кайрылуу алынды</b><p>Министрликтин документтик камсыздоо бөлүмү TA-14кө түз жооп берди.</p></article><article><b>Формалдуу багыт берилди</b><p>Жетекчилик кароосу үчүн кат Министрликтин атына жөнөтүлүшү керек.</p></article><article><b>Чек сакталат</b><p>Бул жооп TA-14тү колдоо, кабыл алуу, өнөктөштүк же техникалык ырастоо болуп эсептелбейт.</p></article></div></section>
+      <section style={{maxWidth:1180,margin:"-24px auto 0",padding:"0 20px 70px"}}>
+        <div style={{background:"white",borderRadius:18,padding:"28px",boxShadow:"0 16px 50px rgba(5,34,77,.12)",border:"1px solid #d9e3f0"}}>
+          <div style={{fontSize:13,fontWeight:900,letterSpacing:".12em",color:"#b1261b"}}>CONTROLLING SOURCE</div>
+          <h2 style={{fontSize:30,margin:"8px 0 12px"}}>Ministry response № 01-10/31492 · 02.10.2026</h2>
+          <p style={{fontSize:18,lineHeight:1.65,margin:0}}>The Ministry of Natural Resources, Ecology and Technical Supervision of the Kyrgyz Republic provided a formal response to TA14. The signed Ministry record controls. The teaching boards and architectural mappings below are independent TA14 analysis and must not be read as Ministry adoption of TA14.</p>
+        </div>
 
-<section><em>КЫРГЫЗСТАН ҮЧҮН АЧЫК СУРОО</em><h2>Мониторинг далил түзө алат. Бирок далил өзү эле кийинки кесепетке мөөнөтсүз ыйгарым укук бербейт.</h2><div className="flow">РЕАЛДУУ АБАЛ → КАТТОО → <b>АКТУАЛДУУЛУК</b> → ДАЛИЛ → <strong>ЫЙГАРЫМ УКУК</strong> → АТКАРУУ → НАТЫЙЖА</div><blockquote><b>Эгер T0 учурунда PM2.5, PM10 же башка көрсөткүч чарага негиз берсе, бирок T1деги аткарууга чейин метеорология, концентрация, булак, мейкиндиктик өкүлчүлүк же маалыматтын ишенимдүүлүгү олуттуу өзгөрсө, мурунку негизди автоматтык улантуунун ордуна кайсы механизм HOLD, кайра текшерүү же кайра ыйгарым укук берүүнү талап кылат?</b><small>EN · If a material condition changes before execution, what mechanism requires HOLD, revalidation or re-authorization instead of silently carrying the earlier basis forward?</small></blockquote></section>
+        <div style={{margin:"34px 0",padding:"26px",borderRadius:16,background:"#071c45",color:"white"}}>
+          <div style={{fontSize:13,fontWeight:900,letterSpacing:".13em",color:"#ffd54a"}}>THE GOVERNING QUESTION</div>
+          <div style={{fontSize:"clamp(25px,3vw,39px)",fontWeight:900,lineHeight:1.18,marginTop:10}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</div>
+        </div>
 
-<InstitutionalSeamLab eyebrow="КЫРГЫЗСТАН · ДАЛИЛ ≠ МӨӨНӨТСҮЗ ЫЙГАРЫМ УКУК" title="Далил менен аткаруунун ортосунда бир материалдык шартты өзгөртүңүз." intro="Бул модель Кыргызстанда мындай механизм жок деп айтпайт. Ал TA-14 Министрликтен түшүндүрүп берүүнү сураган так чекке көңүл бурат." nativeLabel="Кыргызстандын системасы" nativeValue="Абанын сапаты боюнча учурдагы далил" actionLabel="Сунушталган кесепет" actionValue="Компетенттүү орган тарабынан конкреттүү аракет" ui={{nativeSystem:'КЫРГЫЗСТАНДЫН МЕКЕМЕСИ / СИСТЕМАСЫ',governanceSeam:'БАШКАРУУ ЧЕГИ',currentEvidenceAuthority:'УЧУРДАГЫ ДАЛИЛ + ЫЙГАРЫМ УКУК',proposedConsequence:'СУНУШТАЛГАН КЕСЕПЕТ',currentDetermination:'УЧУРДАГЫ АНЫКТАМА',reset:'БАШТАПКЫ АБАЛ',runAgain:'КАЙРА ИШТЕТҮҮ',readSeam:'ЧЕКТИ ОКУУ',seamRule:'Мурунку далил туура бойдон калышы мүмкүн, бирок материалдык өзгөрүү T1деги кесепетке чейин жаңы аныктаманы талап кылышы мүмкүн. · EN: A material change can preserve the earlier record while requiring a new determination before consequence.'}} stages={[{label:'Далил + ыйгарым укук',state:'Учурдагы негиз',determination:'ALLOW',explanation:'T0дө далил жана компетенттүү ыйгарым укук белгилүү аракетти колдойт.'},{label:'Материалдык шарт өзгөрөт',state:'Кайра текшерүү керек',determination:'HOLD',changed:'убакыт / метеорология / концентрация / булак / контекст / маалымат статусу',explanation:'Тарыхый жазуу туура бойдон калышы мүмкүн, бирок T1 үчүн жетиштүүлүк кайра аныкталышы керек.'},{label:'Кыргызстандын кайра текшерүү механизми',state:'Негиз кайра аныкталды',determination:'ALLOW',changed:'учурдагы далил + учурдагы ыйгарым укук',explanation:'Аткаруу далилдин жана ыйгарым укуктун учурдагы абалы кайра аныкталгандан кийин гана уланат.'}]} />
+        <section style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14,marginBottom:42}}>
+          {[
+            ["MINISTRY RESPONSE","The signed governmental record."],
+            ["TA14 MAPPING","Independent architectural examination."],
+            ["TA14 FINDING","SUPPORTED — BOUNDED ALIGNMENT."],
+            ["BOUNDARY","No adoption · endorsement · partnership · certification."],
+          ].map(([a,b])=><div key={a} style={{background:"white",border:"1px solid #d9e3f0",borderRadius:14,padding:20}}><div style={{fontSize:12,fontWeight:900,letterSpacing:".1em",color:"#0961a8"}}>{a}</div><div style={{fontSize:17,fontWeight:800,lineHeight:1.4,marginTop:8}}>{b}</div></div>)}
+        </section>
 
-<section><em>МИНИСТРЛИК БЕРГЕН ПРОЦЕДУРАЛЫК МАРШРУТ</em><h2>Кийинки кадам — техникалык суроону жетекчилик кароосуна туура формада киргизүү.</h2><div className="routes"><article><b>ИНСТИТУЦИОНАЛДЫК КАЙРЫЛУУ</b><p>Министрлик TA-14төн кайрылууну Кыргыз Республикасынын Жаратылыш ресурстары, экология жана техникалык көзөмөл министрлигинин атына жөнөтүүнү суранды.</p><strong>info@mnr.gov.kg</strong></article><article><b>АЛЬТЕРНАТИВДҮҮ ЖАРАНДЫК МАРШРУТ</b><p>Министрлик электрондук жарандык кайрылуу үчүн мамлекеттик органды, аты-жөнүн, байланыш телефонун, жашаган дарегин жана кайрылуунун маңызын көрсөтүү талаптарын да берди.</p><strong>Министрлик берген процедуралык талаптар</strong></article></div><aside><b>TA-14 КИЙИНКИ КАДАМ:</b> Институционалдык мүнөздү сактап, катты Министрликтин атына формалдуу түрдө жөнөтүү жана техникалык адиске багыттоону суроо.<span>EN · Preserve the institutional route, formally address the Ministry, and request technical routing.</span></aside></section>
+        <section>
+          <div style={{fontSize:13,fontWeight:900,letterSpacing:".12em",color:"#0961a8"}}>EIGHT-BOARD TEACHING SEQUENCE</div>
+          <h2 style={{fontSize:"clamp(32px,4vw,50px)",margin:"8px 0 10px"}}>The record advances one question at a time.</h2>
+          <p style={{fontSize:18,lineHeight:1.6,maxWidth:850,margin:"0 0 30px"}}>Each board has a different job. The sequence moves from source integrity to institutional roles, evidence currency, revalidation, authority, pressure testing, execution, and proven outcome.</p>
+          {boards.map(([n,title,desc,img])=>(
+            <article key={n} style={{background:"white",border:"1px solid #d9e3f0",borderRadius:18,overflow:"hidden",margin:"0 0 30px",boxShadow:"0 10px 30px rgba(5,34,77,.07)"}}>
+              <div style={{padding:"22px 24px"}}>
+                <div style={{fontSize:12,fontWeight:900,letterSpacing:".12em",color:"#0961a8"}}>BOARD {n} OF 08</div>
+                <h3 style={{fontSize:28,margin:"5px 0 7px"}}>{title}</h3>
+                <p style={{fontSize:17,lineHeight:1.55,margin:0,color:"#38506f"}}>{desc}</p>
+              </div>
+              <img src={img} alt={title} style={{display:"block",width:"100%",height:"auto",borderTop:"1px solid #d9e3f0"}} />
+            </article>
+          ))}
+        </section>
 
-<section><em>ИНСТИТУЦИОНАЛДЫК ЖАЗУУ</em><h2>Эмне болду жана эмне ачык бойдон калды.</h2><div className="timeline">{timeline.map(x=><article key={x[0]}><b>{x[0]}</b><strong>{x[1]}</strong><p>{x[2]}</p></article>)}</div></section>
+        <section style={{background:"#fff7dc",border:"2px solid #e8b51e",borderRadius:18,padding:"28px",marginTop:40}}>
+          <div style={{fontSize:13,fontWeight:900,letterSpacing:".12em",color:"#8c5d00"}}>TA14 INDEPENDENT FINDING</div>
+          <h2 style={{fontSize:34,margin:"8px 0",color:"#0b6335"}}>SUPPORTED — BOUNDED ALIGNMENT</h2>
+          <p style={{fontSize:18,lineHeight:1.65,margin:"0 0 14px"}}>The examined Ministry response independently demonstrates governance behaviors materially consistent with TA14 principles concerning evidence currency, measurement verification, authority separation, changed-condition revalidation, renewed decision basis, and interruption before consequential action.</p>
+          <p style={{fontSize:17,lineHeight:1.6,margin:0,fontWeight:800}}>This finding does not establish adoption of TA14, equivalence to TA14, endorsement, partnership, certification, regulatory approval, or implementation of the complete TA14 architecture.</p>
+        </section>
 
-<section className="cta"><em>БИЗ СҮРӨТТӨП БЕРҮҮНҮ СУРАГАН ЧЕК</em><h2>Кыргызстандын системасында далил мурда жетиштүү болгонун гана эмес, конкреттүү аракет аткаруу учурунда дагы ыйгарым укуктуу болгонун эмне көрсөтөт?</h2><small>RU · Что подтверждает не только достаточность доказательства ранее, но и действующее полномочие на конкретное действие в момент исполнения? · EN · What proves not only prior evidentiary sufficiency, but current authority for the particular action at execution?</small><p>Бул коомдук жазуу Министрликтин же Кыргыз Республикасынын TA-14тү колдоосун, кабыл алуусун, сертификаттоосун, сатып алуусун, өнөктөштүгүн же жөнгө салуучу таануусун билдирбейт.</p><a href="https://mnr.gov.kg/" target="_blank" rel="noreferrer">КЫРГЫЗ РЕСПУБЛИКАСЫНЫН ЖАРАТЫЛЫШ РЕСУРСТАРЫ МИНИСТРЛИГИ ↗</a></section>
-<footer>🇰🇬 КЫРГЫЗ РЕСПУБЛИКАСЫ <b>×</b> 🇺🇸 TA-14 AUTHORITY <small>КЫРГЫЗ ТИЛИ НЕГИЗГИ · РУССКИЙ + ENGLISH REFERENCE</small></footer>
-</div><style>{`
-*{box-sizing:border-box}.p{min-height:100vh;background:radial-gradient(circle at 10% 0%,#e8112d35,transparent 30%),radial-gradient(circle at 90% 0%,#ffef0020,transparent 28%),#07111a;color:#f4f7f9;font-family:Arial}.s{width:min(1160px,calc(100% - 36px));margin:auto}nav{height:72px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff18}a{color:#ffef00;text-decoration:none;font-weight:900;font-size:11px}header,section{padding:58px 0;border-bottom:1px solid #ffffff12}.flags{display:flex;justify-content:space-between;align-items:center;font-size:20px}.flags small,small{color:#86a0af}.flags>small{font-size:9px}em{color:#ffef00;font-style:normal;font-size:9px;font-weight:900;letter-spacing:.14em}h1{font:clamp(45px,7vw,80px) Georgia,serif;line-height:1;margin:20px 0}h1 strong{color:#ffef00}header>i{color:#ff9c9c}header>p,section>p{max-width:980px;color:#bfd0da;font-size:17px;line-height:1.7}aside{margin-top:26px;padding:22px;border-left:4px solid #ffef00;background:#ffef000b}aside span{display:block;color:#8da4b2;margin-top:8px}h2{max-width:1000px;font:clamp(34px,5vw,56px) Georgia,serif;line-height:1.05;margin:10px 0 18px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:28px}.cards article,.routes article{padding:22px;border:1px solid #ffffff16;border-radius:14px;background:#0d1b26}.cards b,.routes b{color:#ffef00}.cards p,.routes p,.timeline p{color:#9fb4c0;line-height:1.6}.flow{margin:30px 0;padding:20px;border:1px solid #ffffff18;border-radius:12px;text-align:center;word-spacing:8px}.flow b{color:#ff9c9c}.flow strong{color:#ffef00}blockquote{margin:0;padding:25px;border-left:4px solid #e8112d;background:#e8112d0c;font:20px Georgia,serif;line-height:1.5}blockquote small{display:block;margin-top:14px;font:11px Arial}.routes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:26px}.routes strong{display:block;color:#ff9c9c;margin-top:15px}.timeline article{display:grid;grid-template-columns:130px 240px 1fr;gap:18px;padding:17px 0;border-bottom:1px solid #ffffff12}.cta{text-align:center}.cta h2,.cta p{margin-left:auto;margin-right:auto}.cta a{display:inline-block;margin-top:20px;padding:14px 20px;border:1px solid #ffef0066;border-radius:999px}footer{display:flex;gap:18px;align-items:center;padding:30px 0 45px}footer small{margin-left:auto}@media(max-width:760px){nav a:last-child{display:none}.flags{display:grid;gap:12px}.cards,.routes{grid-template-columns:1fr}.timeline article{grid-template-columns:1fr;gap:5px}footer{flex-wrap:wrap}footer small{margin-left:0;width:100%}}`}</style></main>}
+        <section style={{marginTop:38,background:"white",border:"1px solid #d9e3f0",borderRadius:18,padding:"28px"}}>
+          <div style={{fontSize:13,fontWeight:900,letterSpacing:".12em",color:"#0961a8"}}>TECHNICAL GOVERNANCE REFERENCE · v1.1 EXAMINATION EDITION</div>
+          <h2 style={{fontSize:30,margin:"8px 0 10px"}}>Download the complete examination record</h2>
+          <p style={{fontSize:17,lineHeight:1.6}}>The downloadable reference preserves source precedence, claim boundaries, the canonical eight-anchor architecture, and the changed-condition revalidation analysis used to build this showroom.</p>
+          <a href="/TA14_Kyrgyz_Republic_Evidence_to_Enforcement_Technical_Governance_Reference_v1.1_Examination_Edition.pdf" style={{display:"inline-block",marginTop:8,background:"#075aa8",color:"white",padding:"14px 20px",borderRadius:10,fontWeight:900,textDecoration:"none"}}>DOWNLOAD TECHNICAL GOVERNANCE REFERENCE PDF ↓</a>
+          <p style={{fontSize:13,color:"#6a7890",marginTop:12}}>If the PDF asset has not yet been published to the site repository, this control remains reserved for the frozen v1.1 file.</p>
+        </section>
+
+        <section style={{marginTop:38,padding:"26px",borderRadius:16,background:"#071c45",color:"white"}}>
+          <div style={{fontSize:13,fontWeight:900,letterSpacing:".12em",color:"#ffd54a"}}>THE CONTROL RULE</div>
+          <div style={{fontSize:26,fontWeight:900,marginTop:8}}>Yesterday's valid evidence does not automatically authorize today's consequence.</div>
+          <div style={{fontSize:20,marginTop:10}}>Observed is not inferred. Inferred is not authorized.</div>
+        </section>
+      </section>
+    </main>
+  );
+}
