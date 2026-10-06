@@ -44,9 +44,24 @@ export default function HomePage() {
           <p className="consequence-first__close"><strong>AUTHORITY IS NOT AUTOMATICALLY APPLICABLE. STANDING IS NOT AUTOMATICALLY INHERITED.</strong><br/>NEW PROPOSITION = NEW CHAIN. A historical determination stays fixed. If material conditions cross its evidence boundary, the answer is <strong>NEW ASSESSMENT REQUIRED.</strong></p>
         </div>
       </section>
+      <section className="transparent-air-home-bridge" aria-label="Transparent Air local HVAC service">
+        <div className="transparent-air-home-bridge__inner">
+          <div>
+            <p className="transparent-air-home-bridge__eyebrow">LOCAL HVAC SERVICE · PINELLAS COUNTY</p>
+            <h2>AC not working? Transparent Air is taking service calls.</h2>
+            <p>Evidence-based AC diagnostics, heat pump service, repair evaluations, and second opinions from the same HVAC practice behind TA14 Academy.</p>
+            <p className="transparent-air-home-bridge__proof">4.9★ on Google · 115 reviews · Greggory Don Butler personally performs Transparent Air second-opinion evaluations.</p>
+          </div>
+          <div className="transparent-air-home-bridge__actions">
+            <a href="/transparent-air">TRANSPARENT AIR · AC REPAIR →</a>
+            <a href="tel:+13863377215">CALL 386-337-7215</a>
+          </div>
+        </div>
+      </section>
       <FrontDoorPrototype />
       <CanonicalChain24 />
       <style>{`
+        .transparent-air-home-bridge{background:linear-gradient(135deg,#071d28,#0b4351);color:#fff;border-bottom:1px solid rgba(255,255,255,.08);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.transparent-air-home-bridge__inner{width:min(1220px,calc(100% - 36px));margin:auto;padding:28px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:28px;align-items:center}.transparent-air-home-bridge__eyebrow{margin:0 0 8px;color:#79dcff;font-size:10px;font-weight:950;letter-spacing:.16em}.transparent-air-home-bridge h2{margin:0 0 8px;font-size:clamp(26px,3.6vw,46px);line-height:1;letter-spacing:-.035em}.transparent-air-home-bridge p{margin:0;color:#b7cbd3;line-height:1.55;max-width:820px}.transparent-air-home-bridge__proof{margin-top:9px!important;color:#f3d98f!important;font-weight:900}.transparent-air-home-bridge__actions{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}.transparent-air-home-bridge__actions a{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:0 16px;border-radius:10px;text-decoration:none;font-size:10px;font-weight:950;letter-spacing:.07em;background:#e7ad45;color:#082934}.transparent-air-home-bridge__actions a:first-child{background:#fff;color:#0a3444}@media(max-width:800px){.transparent-air-home-bridge__inner{grid-template-columns:1fr}.transparent-air-home-bridge__actions{justify-content:flex-start}.transparent-air-home-bridge__actions a{width:100%}}
         .consequence-first{background:radial-gradient(circle at 50% 0,rgba(77,201,255,.18),transparent 36%),linear-gradient(180deg,#01060c,#04131d);color:#f3f8fb;border-bottom:1px solid rgba(255,255,255,.08);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
         .consequence-first__inner{width:min(1220px,calc(100% - 36px));margin:auto;padding:54px 0 48px}
         .consequence-first__eyebrow{margin:0;color:#79dcff;font-size:10px;font-weight:950;letter-spacing:.2em}
