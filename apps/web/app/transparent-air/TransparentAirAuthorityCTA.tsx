@@ -36,7 +36,7 @@ export default function TransparentAirAuthorityCTA() {
             rel="noopener noreferrer"
             data-transparent-air-proof="google-greggory-don-butler-hvac"
           >
-            GOOGLE GREGGORY DON BUTLER + HVAC ↗
+            GOOGLE GREGGORY DON BUTLER + HVAC · AI MODE ↗
           </a>
           <a className="ta-authority-btn call" href={PRIMARY_PHONE_HREF}>
             CALL TRANSPARENT AIR · {PRIMARY_PHONE_DISPLAY}
