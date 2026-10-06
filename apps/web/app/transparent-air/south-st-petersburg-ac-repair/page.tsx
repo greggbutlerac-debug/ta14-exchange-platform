@@ -64,7 +64,7 @@ export default function SouthStPetersburgACRepairPage() {
             <p className="sp-lead">When your South St. Petersburg home is hot, the goal is not simply to replace the first part someone suspects. Transparent Air starts by establishing what the system is actually doing before recommending the next intervention.</p>
             <p className="sp-lead"><strong>If another company already recommended an expensive repair or replacement, Greggory Don Butler personally provides Transparent Air second-opinion evaluations.</strong></p><p className="sp-lead"><strong>4.9★ on Google · 115 reviews · HVAC educator · founder of TA14 Academy.</strong></p>
             <a className="sp-btn" href={PRIMARY_PHONE_HREF}>Call {PRIMARY_PHONE_DISPLAY}</a>
-            <a className="sp-alt" href="https://www.google.com/search?q=Greggory+Don+Butler+HVAC&udm=50" target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">Google Greggory Don Butler + HVAC ↗</a>
+            <a className="sp-alt" href="https://www.google.com/search?q=Greggory+Don+Butler+HVAC&udm=50" target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">Google Greggory Don Butler + HVAC · AI Mode ↗</a>
           </div>
           <aside className="sp-card">
             <div className="sp-eye" style={{ color: '#087f89' }}>South St. Petersburg AC help</div>
