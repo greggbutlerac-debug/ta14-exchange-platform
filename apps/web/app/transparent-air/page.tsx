@@ -4,7 +4,7 @@ import Link from 'next/link';
 const PAGE_URL = 'https://www.ta14exchange.com/transparent-air';
 const PHONE_DISPLAY = '386-337-7215';
 const PHONE_HREF = 'tel:+13863377215';
-const GOOGLE_VERIFY_URL = 'https://www.google.com/search?q=Greggory+Don+Butler+HVAC';
+const GOOGLE_VERIFY_URL = 'https://www.google.com/search?q=Greggory+Don+Butler+HVAC&udm=50';
 
 export const metadata: Metadata = {
   title: 'Transparent Air | AC Repair, Heat Pump Service & Second Opinions in Pinellas County',
