@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import TransparentAirCallAnalytics from './TransparentAirCallAnalytics';
 import TransparentAirLocalNav from './TransparentAirLocalNav';
+import TransparentAirAuthorityCTA from './TransparentAirAuthorityCTA';
 
 export const metadata: Metadata = {
   title: {
@@ -67,6 +68,7 @@ export default function TransparentAirLayout({
     <>
       <TransparentAirCallAnalytics />
       {children}
+      <TransparentAirAuthorityCTA />
       <TransparentAirLocalNav />
     </>
   );
