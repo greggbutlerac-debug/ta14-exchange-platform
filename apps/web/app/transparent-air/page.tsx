@@ -100,7 +100,7 @@ export default function TransparentAirPage() {
           <div className="cards">
             <article className="card"><h3>AC / Heat Pump Not Working</h3><p>We evaluate the present condition and operating evidence before deciding what should be repaired.</p><p><Link href="/transparent-air/ac-not-working">AC NOT WORKING →</Link><br/><Link href="/transparent-air/ac-not-cooling">AC NOT COOLING →</Link><br/><Link href="/transparent-air/heat-pump-not-working">HEAT PUMP NOT WORKING →</Link></p></article>
             <article className="card"><h3>Expensive Repair</h3><p>If the recommendation is costly and you are unsure about the diagnosis, get another set of eyes on it before authorizing the work.</p></article>
-            <article className="card"><h3>Told You Need a New System?</h3><p>A replacement decision can cost thousands. <Link href="/transparent-air/told-you-need-new-ac">See what to verify before replacement →</Link></p></article>
+            <article className="card"><h3>A New Kind of AC Insurance</h3><p><strong>$80 to verify a decision that could cost $10,000.</strong> Not an insurance policy—a low-cost second opinion before a high-cost replacement decision.</p><p><Link href="/transparent-air/told-you-need-new-ac">VERIFY BEFORE YOU REPLACE →</Link></p></article>
           </div>
         </div>
       </section>
@@ -121,7 +121,7 @@ export default function TransparentAirPage() {
           <p>Call Transparent Air and tell us what the system is doing.</p>
           <div className="actions">
             <a className="btn call" href={PHONE_HREF}>CALL {PHONE_DISPLAY}</a>
-            <Link className="btn verify" href="/transparent-air/second-opinion">GET A SECOND OPINION →</Link>
+            <Link className="btn verify" href="/transparent-air/second-opinion">BOOK THE $80 SECOND OPINION →</Link>
           </div>
         </div>
       </section>
