@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useMemo, useState } from 'react';
 
 type State='SUPPORTED'|'UNESTABLISHED';
@@ -16,6 +17,41 @@ const stages=[
  ['07','DETERMINATION','Governance must terminate operationally.','ALLOW. HOLD. DENY. ESCALATE. The examination must produce a bounded disposition rather than vague confidence.'],
  ['08','CONSEQUENCE','Execution creates new reality.','Preserve what was executed, what outcome became real, and the new baseline. Proof supports propositions. It does not authorize itself.']
 ] as const;
+
+const stageImages=[
+ '/wide_infographic_style_educational_slide_diagram_w.png',
+ '/a_wide_clean_infographic_educational_slide_style.png',
+ '/wide_infographic_educational_presentation_image_wi.png',
+ '/wide_infographic_poster_style_image_with_graphic_p.png',
+ '/wide_infographic_poster_with_clean_corporate_tech.png',
+ '/wide_infographic_poster_with_clean_corporate_educa.png',
+ '/wide_infographic_poster_clean_educational_infogra.png',
+ '/wide_infographic_poster_with_clean_glossy_educat.png'
+] as const;
+
+const samantha=[
+ 'Freeze the proposition before evaluating the proof. Installed, connected, accurate, effective, safe, scalable and authorized are different claims. A claim begins the examination; it is not yet proof, permission, or consequence.',
+ 'Ask what the evidence actually establishes. Measurements, records, tests and verified observations may support a proposition, but evidence has scope. Preserve what was measured, how it was established, and what the record does not prove.',
+ 'Define where the proof stops. Identify the asset, location, operating state, time window, conditions and consequence actually supported. A bounded result must not silently become a universal claim.',
+ 'Return to physical reality. Verified once does not mean established now. Conditions change, sensors drift, overrides occur and equipment states move. Current consequence requires sufficient continuity between the record and reality now.',
+ 'The crossing is not the permission. Identity, context, semantics, evidence and validly derived authority may cross independently governed systems. The receiving execution boundary still has to establish whether this specific consequence is permitted.',
+ 'Authority may originate elsewhere and derived authority may traverse multiple entities. The receiver does not manufacture new authority. It establishes whether the authority reaching execution is valid, current, applicable, sufficient and within scope. Locally established does not mean locally originated.',
+ 'Governance must terminate in an operational disposition. ALLOW, HOLD, DENY or ESCALATE. The purpose is not vague confidence. It is an inspectable determination before a consequence becomes reality.',
+ 'Execution creates outcome, and outcome creates new reality. Preserve what was executed, verify what actually happened, compare it with the baseline, record the result and establish the new reality for the next consequence.'
+] as const;
+
+function Samantha({text}:{text:string}){
+ const speak=()=>{ if(typeof window==='undefined'||!window.speechSynthesis)return; window.speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); const voices=window.speechSynthesis.getVoices(); u.voice=voices.find(v=>v.name==='Samantha')||voices.find(v=>v.lang==='en-US')||null; u.rate=.84; window.speechSynthesis.speak(u); };
+ const pause=()=>{ if(typeof window!=='undefined') window.speechSynthesis?.pause(); };
+ const resume=()=>{ if(typeof window!=='undefined') window.speechSynthesis?.resume(); };
+ const stop=()=>{ if(typeof window!=='undefined') window.speechSynthesis?.cancel(); };
+ const b={padding:'9px 12px',borderRadius:9,border:'1px solid rgba(111,220,255,.28)',background:'rgba(8,37,47,.88)',color:'#eef8fb',fontWeight:900,cursor:'pointer'} as const;
+ return <div style={{marginTop:15,padding:17,border:'1px solid rgba(113,242,182,.22)',borderRadius:14,background:'rgba(2,10,17,.65)'}}>
+  <div style={{fontSize:10,fontWeight:950,letterSpacing:'.16em',color:'#71f2b6'}}>SAMANTHA · IMAGE NARRATION</div>
+  <div style={{display:'flex',gap:7,flexWrap:'wrap',marginTop:11}}><button onClick={speak} style={b}>PLAY</button><button onClick={pause} style={b}>PAUSE</button><button onClick={resume} style={b}>RESUME</button><button onClick={stop} style={b}>STOP</button></div>
+  <p style={{margin:'13px 0 0',fontSize:15,lineHeight:1.7,color:'#b9ccd5'}}>{text}</p>
+ </div>;
+}
 
 export default function ProofAuthorityShowroom(){
  const [evidence,setEvidence]=useState<State>('SUPPORTED');
@@ -46,6 +82,8 @@ export default function ProofAuthorityShowroom(){
     <div style={{fontSize:11,fontWeight:950,letterSpacing:'.17em',color:n==='06'?'#71f2b6':'#70dcff'}}>{n} · {k}</div>
     <h2 style={{fontSize:'clamp(30px,4.4vw,54px)',lineHeight:1,letterSpacing:'-.045em',margin:'11px 0 15px'}}>{title}</h2>
     <p style={{fontSize:17,lineHeight:1.7,color:'#b8cad2',maxWidth:1000,margin:0}}>{copy}</p>
+    <Image src={stageImages[Number(n)-1]} alt={title} width={1536} height={1024} sizes="(max-width: 1240px) 100vw, 1240px" style={{display:'block',width:'100%',height:'auto',marginTop:18,borderRadius:16,border:'1px solid rgba(111,220,255,.23)',boxShadow:'0 24px 70px rgba(0,0,0,.42)'}}/>
+    <Samantha text={samantha[Number(n)-1]}/>
     {n==='06'&&<div style={{marginTop:22,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(170px,1fr))',gap:9}}>{['ORIGINATING AUTHORITY','DELEGATION','DERIVED AUTHORITY','RECEIVING ENTITY','EXECUTION BOUNDARY'].map((x,i)=><div key={x} style={{padding:16,borderRadius:14,border:'1px solid rgba(113,242,182,.2)',background:'rgba(113,242,182,.035)',fontWeight:950,fontSize:12}}>{String(i+1).padStart(2,'0')} · {x}</div>)}</div>}
    </section>)}
 
