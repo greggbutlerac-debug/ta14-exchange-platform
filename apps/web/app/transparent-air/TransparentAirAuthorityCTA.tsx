@@ -1,7 +1,7 @@
 import Link from 'next/link';
 
 const GOOGLE_VERIFY_URL = 'https://www.google.com/search?q=Greggory+Don+Butler+HVAC&udm=50';
-const GOOGLE_BUSINESS_URL = 'https://www.google.com/maps/search/?api=1&query=Transparent%20Air%20386-337-7215';
+const GOOGLE_BUSINESS_URL = 'https://share.google/adpzDyiFdd3q2Z0Yu';
 const PRIMARY_PHONE_DISPLAY = '386-337-7215';
 const PRIMARY_PHONE_HREF = 'tel:+13863377215';
 
