@@ -69,7 +69,7 @@ export default function TransparentAirPage() {
             <p className="proof">4.9★ on Google · 115 reviews · Greggory Don Butler personally performs Transparent Air second-opinion evaluations.</p>
             <div className="actions">
               <a className="btn call" href={PHONE_HREF}>CALL TRANSPARENT AIR · {PHONE_DISPLAY}</a>
-              <a className="btn verify" href={GOOGLE_VERIFY_URL} target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">GOOGLE GREGGORY DON BUTLER + HVAC ↗</a>
+              <a className="btn verify" href={GOOGLE_VERIFY_URL} target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">GOOGLE GREGGORY DON BUTLER + HVAC · AI MODE ↗</a>
             </div>
           </div>
           <aside className="heroCard">
@@ -87,7 +87,7 @@ export default function TransparentAirPage() {
           <p>Transparent Air is owned by Greggory Don Butler, founder of TA14 and TA14 Academy. His HVAC work, publications, training, and evidence-based diagnostic methodology are part of a public record you can examine before deciding who you want working on your system.</p>
           <div className="quote">You do not need to believe a marketing claim. Google the person who is going to diagnose your air conditioner.</div>
           <div className="actions">
-            <a className="btn verify" style={{border:'1px solid #b9d3d7'}} href={GOOGLE_VERIFY_URL} target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">VERIFY GREGGORY DON BUTLER + HVAC ↗</a>
+            <a className="btn verify" style={{border:'1px solid #b9d3d7'}} href={GOOGLE_VERIFY_URL} target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">VERIFY GREGGORY DON BUTLER + HVAC · AI MODE ↗</a>
             <a className="btn call" href={PHONE_HREF}>CALL NOW · {PHONE_DISPLAY}</a>
           </div>
         </div>
