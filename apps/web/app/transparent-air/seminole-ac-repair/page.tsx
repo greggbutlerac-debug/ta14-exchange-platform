@@ -62,9 +62,9 @@ export default function SeminoleACRepairPage() {
             <div className="s-eye">Transparent Air · Seminole, Florida</div>
             <h1 className="s-h1">AC Repair in Seminole Starts With Getting the Diagnosis Right.</h1>
             <p className="s-lead">When your Seminole home is hot, the fastest path is not always replacing the first part someone suspects. Transparent Air starts by establishing what the system is actually doing before recommending the next intervention.</p>
-            <p className="s-lead"><strong>If another company already recommended an expensive repair or replacement, Greggory Don Butler personally provides Transparent Air second-opinion evaluations.</strong></p>
+            <p className="s-lead"><strong>If another company already recommended an expensive repair or replacement, Greggory Don Butler personally provides Transparent Air second-opinion evaluations.</strong></p><p className="s-lead"><strong>4.9★ on Google · 115 reviews · HVAC educator · founder of TA14 Academy.</strong></p>
             <a className="s-btn" href={PRIMARY_PHONE_HREF}>Call {PRIMARY_PHONE_DISPLAY}</a>
-            <a className="s-alt" href={SECONDARY_PHONE_HREF}>Or {SECONDARY_PHONE_DISPLAY}</a>
+            <a className="s-alt" href="https://www.google.com/search?q=Greggory+Don+Butler+HVAC" target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-greggory-don-butler-hvac">Google Greggory Don Butler + HVAC ↗</a>
           </div>
           <aside className="s-card">
             <div className="s-eye" style={{ color: '#087f89' }}>Seminole AC help</div>
