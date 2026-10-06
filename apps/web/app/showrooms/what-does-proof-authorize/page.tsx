@@ -56,7 +56,7 @@ function Samantha({text}:{text:string}){
 export default function ProofAuthorityShowroom(){
  const [evidence,setEvidence]=useState<State>('SUPPORTED');
  const [continuity,setContinuity]=useState<State>('SUPPORTED');
- const [authority,setAuthority]=useState<State>('UNESTABLISHED');
+ const [authority,setAuthority]=useState<State>('SUPPORTED');
  const [standing,setStanding]=useState<State>('SUPPORTED');
  const [scope,setScope]=useState<State>('SUPPORTED');
  const result:Result=useMemo(()=>scope==='UNESTABLISHED'?'DENY':evidence==='UNESTABLISHED'||continuity==='UNESTABLISHED'||authority==='UNESTABLISHED'?'HOLD':standing==='UNESTABLISHED'?'ESCALATE':'ALLOW',[evidence,continuity,authority,standing,scope]);
