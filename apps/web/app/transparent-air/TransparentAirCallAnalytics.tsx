@@ -37,6 +37,17 @@ export default function TransparentAirCallAnalytics() {
       if (!link) return;
 
       const href = link.getAttribute('href') || '';
+      const proof = link.getAttribute('data-transparent-air-proof');
+      if (proof) {
+        send('transparent_air_authority_verify_click', {
+          landing_path: landingPath,
+          proof_target: proof.slice(0, 120),
+          traffic_source: source.slice(0, 120),
+          traffic_medium: medium.slice(0, 80),
+          campaign: campaign.slice(0, 120),
+        });
+      }
+
       if (!href.startsWith('tel:')) return;
 
       const label = (link.textContent || '')
