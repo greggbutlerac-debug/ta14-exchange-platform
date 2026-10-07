@@ -15,7 +15,6 @@ export const showroomRooms=[
 ['Colombia · Ambient Air Quality Technical Conversation','/global-institutional-engagement/colombia','COUNTRIES & PUBLIC INSTITUTIONS','Colombia Ministry Environment ambient air quality technical conversation evidence authority standing'],
 ['Evidence-Governed HVAC Service','/showrooms/evidence-governed-hvac','BUILDINGS & HVAC','HVAC evidence diagnostic authorization bounded execution verification outcome industry examination'],
 ['EPIC Air Quality Fund · Open Data → Governed Consequence','/showrooms/epic-air-quality-fund','ENVIRONMENT & ATMOSPHERIC INTEGRITY','EPIC PM2.5 open data policy evidence governance'],
-['Building ML Consequence Boundary','/showrooms/building-ml-consequence-boundary','AI & MACHINE INTELLIGENCE','machine learning building automation HVAC analytics AEA ACA authority evidence consequence'],
 ['Anto Budiardjo','/showrooms/anto-budiardjo','PEOPLE & PRACTITIONERS','CNS CP federation AFA buildings interoperability'],
 ['Kimon Onuma','/showrooms/onuma','PEOPLE & PRACTITIONERS','ONUMA BIM buildings interoperability'],
 ['Yong Ku Kim','/showrooms/yong-ku-kim','PEOPLE & PRACTITIONERS','buildings practitioner'],
