@@ -32,6 +32,7 @@ const governanceLibraryHref = '/workspace/ai-governance/library';
 const institutionalAuthorityHref = '/workspace/ai-governance/institutional-authority/registration-package';
 const institutionalAuthorityPrefix = '/workspace/ai-governance/institutional-authority';
 const registryHref = '/workspace/ai-governance/registry';
+const institutionalContinuationHref = '/workspace/ai-governance/registry/institutional-continuation';
 const registryInboxHref = '/workspace/ai-governance/registry/inbox';
 const partnerReviewNetworkHref = '/workspace/ai-governance/partner-review-network';
 const pricingHref = '/workspace/ai-governance/pricing';
@@ -51,6 +52,7 @@ const workspaceNavigation: NavigationItem[] = [
   { href: governanceLibraryHref, label: 'Governance Library', glyph: 'L', matchPrefixes: [governanceLibraryHref] },
   { href: institutionalAuthorityHref, label: 'Institutional Authority', glyph: 'IA', matchPrefixes: [institutionalAuthorityPrefix], institutional: true },
   { href: registryHref, label: 'Registry', glyph: 'RG', matchPrefixes: [registryHref] },
+  { href: institutionalContinuationHref, label: 'Institutional Continuation', glyph: 'IC', matchPrefixes: [institutionalContinuationHref], institutional: true },
   { href: registryInboxHref, label: 'Registry Inbox', glyph: 'IN', matchPrefixes: [registryInboxHref], institutional: true },
   { href: '/workspace/routes/new', label: 'Build a Route', glyph: '◇', matchPrefixes: ['/workspace/routes/new'] },
   { href: '/workspace/routes', label: 'My AI Routes', glyph: 'R', matchPrefixes: ['/workspace/routes'] },
@@ -81,7 +83,7 @@ function isItemActive(pathname: string, item: NavigationItem) {
   }
   if (item.href === aiGovernanceHomeHref) return pathname === aiGovernanceHomeHref;
   if (item.href === registryHref) {
-    return pathname === registryHref || (pathname.startsWith(`${registryHref}/`) && !pathname.startsWith(registryInboxHref));
+    return pathname === registryHref || (pathname.startsWith(`${registryHref}/`) && !pathname.startsWith(registryInboxHref) && !pathname.startsWith(institutionalContinuationHref));
   }
   const prefixes = item.matchPrefixes ?? [item.href];
   return prefixes.some((prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`));
