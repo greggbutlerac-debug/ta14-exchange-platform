@@ -19,6 +19,7 @@ export function RouteAwareGlobalChrome() {
   const isGuyanaInstitutionalShowroom = pathname === '/global-institutional-engagement/guyana';
   const showroomIndexPaths = ['/showrooms','/showrooms/environmental-atmospheric','/showrooms/interoperability-systems','/showrooms/registered-governance','/showrooms/artifacts-examination-records'];
   const countryShowroomPaths = [
+    '/global-institutional-engagement/romania',
     '/global-institutional-engagement/guyana','/global-institutional-engagement/gabon','/global-institutional-engagement/estonia',
     '/environmental-integrity-governance/uae','/global-institutional-engagement/thailand','/global-institutional-engagement/guatemala',
     '/global-institutional-engagement/uzbekistan','/global-institutional-engagement/kazakhstan','/environmental-integrity-governance/png-atmospheric-integrity-pilot',
