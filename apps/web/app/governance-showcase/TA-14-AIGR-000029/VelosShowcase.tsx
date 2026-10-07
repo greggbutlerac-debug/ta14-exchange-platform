@@ -34,7 +34,7 @@ export default function VelosShowcase(){
    <section className="visual">
     <p className="eyebrow">01 · THE REGISTERED ARCHITECTURE</p>
     <h2>Velos is the enforcement substrate. TA-14 does not redefine it.</h2>
-    <img src="/Velos Systems Governance Architecture.png" alt="Velos Systems registered governance architecture" />
+    <img src="/Velos Systems Global Operations Hub.png" alt="Velos Systems registered governance architecture" />
     <details open><summary>SAMANTHA · ARCHITECTURE GUIDE</summary><p>Start with the registered identity: Velos Systems v1.0.0, TA-14-AIGR-000029. The participant declares a Linux Kernel eBPF tc-ingress substrate, PEP-L4 WireGate™, with deterministic Layer-4 enforcement. Registration preserves that identity. It does not validate performance, establish interoperability, or create execution authority. The examination must keep Velos native logic separate from TA-14's governance of the examination boundary.</p></details>
    </section>
 
@@ -51,7 +51,7 @@ export default function VelosShowcase(){
 
    <section className="visual light">
     <p className="eyebrow">04 · THE COMPLETE OPERATING PICTURE</p><h2>The larger system matters. The examination claim remains bounded.</h2>
-    <img src="/Velos Systems Governance Workflow.png" alt="Velos Systems governance workflow and operating picture" />
+    <img src="/Velos Systems_ Governance in Motion.png" alt="Velos Systems governance workflow and operating picture" />
     <details open><summary>SAMANTHA · BOUNDARY GUIDE</summary><p>This visual helps explain the wider operational ambition around connected infrastructure. Do not confuse that wider context with what R1 can establish. The frozen proposition is about one declared interface, one declared Layer-4 execution boundary, active pre-execution interdiction, and preserved refusal evidence. Aviation, maritime, rail, utilities, cities, resilience, sustainability, security, safety, certification, superiority, and production readiness are not established merely because they appear in the wider operating context.</p></details>
    </section>
 
