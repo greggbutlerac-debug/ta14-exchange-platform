@@ -23,7 +23,7 @@ const boards=[
  {n:'07',title:'REVALIDARE — ACUM',img:'https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/main/TA14_Romania_07_Revalidation_NOW.png',
  en:'A determination that was justified earlier may not remain justified now. Revalidation asks whether the evidence, authority, standing, risk and real-world context remain sufficient immediately before the proposed consequence becomes reality.',
  ro:'O determinare justificată anterior poate să nu mai fie justificată acum. Revalidarea întreabă dacă probele, autoritatea, calitatea, riscul și contextul real rămân suficiente imediat înainte ca o consecință propusă să devină realitate.'},
- {n:'08',title:'OUTCOME & NEW REALITY',img:'https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/main/A14_Romania_08_Outcome_New_Reality.png',
+ {n:'08',title:'REZULTAT & NOUA REALITATE',img:'https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/main/A14_Romania_08_Outcome_New_Reality.png',
  en:'Execution is not the end of the evidence chain. The outcome must return to observation. What actually happened should be measured, preserved and compared with the intended consequence so the next decision begins from a new proved reality, not an assumption.',
  ro:'Execuția nu reprezintă sfârșitul lanțului probator. Rezultatul trebuie să revină la observație. Ceea ce s-a întâmplat efectiv trebuie măsurat, păstrat și comparat cu consecința intenționată, astfel încât următoarea decizie să pornească de la o nouă realitate demonstrată, nu de la o presupunere.'}
 ];
