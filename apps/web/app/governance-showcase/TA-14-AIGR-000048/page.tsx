@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 type Lang = "en" | "tn";
-type Scenario = "baseline" | "missingAuthority" | "tamperedEvidence" | "externalExecution";
+type Scenario = "baseline" | "missingAuthority" | "tamperedEvidence" | "externalExecution" | "failedTests";
 
 const COPY = {
   en: {
@@ -22,10 +22,12 @@ const COPY = {
     missingAuthority: ["Candidate request enters the workflow.","Workflow is structured, but authority is unresolved.","Analysis cannot manufacture authority.","Evidence records the unresolved authority condition.","Admission condition is not satisfied: deny or halt.","No execution authority is created by the SWI decision."],
     tamperedEvidence: ["Candidate request enters the workflow.","Workflow is structured.","Analysis reaches an evidence-dependent gate.","Tampered or bad-integrity evidence is rejected in the submitted reproduction.","The decision cannot rely on rejected evidence.","Execution should not inherit an unsupported decision."],
     externalExecution: ["Candidate request enters the workflow.","Workflow conditions are structured.","Analysis and evidence may support a decision.","SWI can preserve the governance decision.","A recorded decision is not proof that an external system enforced it.","External execution remains a separate dependency."],
+    failedTests: ["Candidate request enters the workflow.","The workflow must preserve the state actually observed.","A failed test is evidence, not something to hide.","The current-main reproduction preserves 55 passes and 2 failures, including a node-registry failure.","A bounded decision must carry those limitations forward.","A failed test cannot be converted into execution assurance."],
     resultBaseline: "BOUNDED PATH · DECISION EVIDENCE PRESERVED · EXTERNAL ENFORCEMENT STILL SEPARATE",
     resultMissing: "DENY / HALT · AUTHORITY IS A GOVERNANCE CONDITION, NOT AN INFERENCE",
     resultTampered: "REJECT EVIDENCE · BAD INTEGRITY CANNOT BECOME DECISION PROOF",
     resultExternal: "BOUNDARY PRESERVED · GOVERNANCE DECISION ≠ EXTERNAL EXECUTION PROOF",
+    resultFailed: "PRESERVE FAILURE · 55 PASSED + 2 FAILED IS STRONGER GOVERNANCE THAN A PERFECT-LOOKING RECORD",
     regTitle: "What registration established — and what it did not.",
     registered: "TA-14-AIGR-000048 is a public registered governance record. The Registry accepted the record as sufficiently attributable, bounded and preserved.",
     notCert: "Registration is not certification. TA-14 did not certify SWI's performance, legality, safety, production readiness, or fitness for execution.",
@@ -50,10 +52,12 @@ const COPY = {
     missingAuthority: ["Kopo e tsena mo tirong.","Tiro e rulaganngwa, mme taolo ga e ise e tlhomamisiwe.","Tshekatsheko ga e kgone go itirela taolo.","Bosupi bo kwala gore taolo ga e ise e rarabololwe.","Maemo a ga a a kgotsofadiwa: gana kgotsa emisa.","Tshwetso ya SWI ga e itirele tetla ya tiragatso."],
     tamperedEvidence: ["Kopo e tsena mo tirong.","Tiro e a rulaganngwa.","Tshekatsheko e fitlha mo kgorong e e ikaegileng ka bosupi.","Bosupi jo bo fetotsweng kgotsa jo bo sa ikanyegeng bo a ganwa.","Tshwetso ga e a tshwanela go ikaega ka bosupi jo bo gannweng.","Tiragatso ga e a tshwanela go ikaega ka tshwetso e e sa tshegediwang."],
     externalExecution: ["Kopo e tsena mo tirong.","Maemo a tiro a a rulaganngwa.","Tshekatsheko le bosupi di ka tshegetsa tshwetso.","SWI e ka boloka tshwetso ya puso.","Tshwetso e e kwadilweng ga se bosupi jwa gore tsamaiso ya kwa ntle e e diragaditse.","Tiragatso ya kwa ntle e sala e le boikarabelo jo bo aroganeng."],
+    failedTests: ["Kopo e tsena mo tirong.","Tiro e tshwanetse go boloka maemo a a bonweng.","Teko e e paletsweng ke bosupi, ga e a tshwanela go fitlhwa.","Reproduction ya current-main e boloka diteko tse 55 tse di atlegileng le tse 2 tse di paletsweng.","Tshwetso e tshwanetse go tsweletsa melelwane eo.","Teko e e paletsweng ga e kgone go fetolwa go nna netefatso ya tiragatso."],
     resultBaseline: "TSELA E E LEKANYEDITSWENG · BOSUPI JWA TSHWETSO BO BOLOKILWE · TIRAGATSO YA KWA NTLE E AROGANE",
     resultMissing: "GANA / EMISA · TAOLO KE MAEMO A PUSO, GA SE KAKANYO",
     resultTampered: "GANA BOSUPI · BOSUPI JO BO SA IKANYEGENG GA BO KGONE GO NNA BOPAKI JWA TSHWETSO",
     resultExternal: "MOLELWANE O BOLOKILWE · TSHWETSO YA PUSO ≠ BOSUPI JWA TIRAGATSO YA KWA NTLE",
+    resultFailed: "BOLOKA GO PALELWA · REKOTO E E BONALANG E LE NNETE E BOTLHOKWA GO FETA E E BONALANG E ITEKANETSE",
     regTitle: "Se kwadiso e se tlhomamisitseng — le se e sa se tlhomamisang.",
     registered: "TA-14-AIGR-000048 ke rekoto ya puso ya setšhaba e e kwadisitsweng. Registry e amogetse rekoto jaaka e e nang le mong yo o bonalang, melelwane e e tlhalositsweng le bosupi jo bo bolokilweng.",
     notCert: "Kwadiso ga se setifikeiti. TA-14 ga e a netefatsa tiragatso, semolao, pabalesego, go siamela tlhagiso kgotsa go siamela tiragatso ga SWI.",
@@ -70,6 +74,7 @@ const SCENARIOS: {id:Scenario; en:string; tn:string}[] = [
   {id:"missingAuthority",en:"MISSING AUTHORITY",tn:"TAOLO E TLHAELA"},
   {id:"tamperedEvidence",en:"TAMPERED EVIDENCE",tn:"BOSUPI JO BO FETOTSWENG"},
   {id:"externalExecution",en:"EXTERNAL EXECUTION",tn:"TIRAGATSO YA KWA NTLE"},
+  {id:"failedTests",en:"FAILED TESTS",tn:"DITEKO TSE DI PALETSWENG"},
 ];
 
 export default function SwiShowroom(){
@@ -78,7 +83,7 @@ export default function SwiShowroom(){
   const [speaking,setSpeaking]=useState(false);
   const c=COPY[lang];
   const details=useMemo(()=>c[scenario],[c,scenario]);
-  const result=scenario==="baseline"?c.resultBaseline:scenario==="missingAuthority"?c.resultMissing:scenario==="tamperedEvidence"?c.resultTampered:c.resultExternal;
+  const result=scenario==="baseline"?c.resultBaseline:scenario==="missingAuthority"?c.resultMissing:scenario==="tamperedEvidence"?c.resultTampered:scenario==="externalExecution"?c.resultExternal:c.resultFailed;
 
   useEffect(()=>()=>{if(typeof window!=="undefined"&&"speechSynthesis" in window) window.speechSynthesis.cancel()},[]);
   const speak=()=>{ if(!("speechSynthesis" in window))return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(c.walkthrough); u.lang=lang==="tn"?"tn-BW":"en-US"; const voices=speechSynthesis.getVoices(); const preferred=voices.find(v=>v.lang.toLowerCase().startsWith(lang==="tn"?"tn":"en")); if(preferred)u.voice=preferred; u.rate=.86; u.onend=()=>setSpeaking(false); u.onerror=()=>setSpeaking(false); setSpeaking(true); speechSynthesis.speak(u); };
@@ -131,6 +136,40 @@ export default function SwiShowroom(){
           </article>)}
         </div>
         <div style={{marginTop:12,padding:18,border:"1px solid #f2c45f77",borderRadius:12,background:"#f2c45f0d",color:"#f2c45f",fontWeight:950,fontSize:12,letterSpacing:".05em"}}>{result}</div>
+      </section>
+
+      <section style={{padding:"72px 0 8px"}}>
+        <div style={{fontSize:11,fontWeight:950,letterSpacing:".16em",color:"#8ed8ff"}}>WHY SWI MATTERS</div>
+        <h2 style={{fontSize:"clamp(34px,5vw,58px)",letterSpacing:"-.04em",margin:"10px 0 18px"}}>A workflow can look intelligent and still lose the reason it was allowed to continue.</h2>
+        <p style={{maxWidth:920,color:"#b8cbd9",lineHeight:1.8,fontSize:16}}>SWI's useful governance contribution is not another AI answer. It is the attempt to make the path inspectable: what entered, how the workflow was structured, what analysis occurred, what evidence survived, what decision was recorded, and where responsibility passes to an external execution system. That makes the workflow pressure-testable instead of merely impressive.</p>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:12,marginTop:26}}>
+          {[
+            ["01 · STRUCTURE BEFORE CONSEQUENCE","A candidate request is not yet a governed consequence. Conditions, boundaries and admission logic must become explicit before a decision can carry weight."],
+            ["02 · EVIDENCE MUST SURVIVE","A result is stronger when the record preserves supporting evidence, rejected evidence and failures instead of presenting only the successful path."],
+            ["03 · DENIAL IS A REAL OUTCOME","A governed workflow must be able to stop. Missing authority, bad-integrity evidence or unmet admission conditions cannot be repaired by confidence or capability."],
+            ["04 · EXECUTION IS ANOTHER BOUNDARY","SWI can preserve a governance decision. That does not prove an external API, agent, machine or institution obeyed it. The handoff remains a separate proof burden."]
+          ].map(([h,b])=><article key={h} style={{padding:22,border:"1px solid #315b79",borderRadius:14,background:"#061522"}}><b style={{color:"#f2c45f",fontSize:12}}>{h}</b><p style={{color:"#b8cbd9",lineHeight:1.7,fontSize:14,marginBottom:0}}>{b}</p></article>)}
+        </div>
+      </section>
+
+      <section style={{padding:"66px 0 8px"}}>
+        <div style={{fontSize:11,fontWeight:950,letterSpacing:".16em",color:"#f2c45f"}}>THE PRESERVED TEST RECORD</div>
+        <h2 style={{fontSize:"clamp(34px,5vw,58px)",letterSpacing:"-.04em",margin:"10px 0 22px"}}>Do not erase the two failures.</h2>
+        <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(210px,1fr))",gap:10}}>
+          <article style={{padding:24,border:"1px solid #315b79",borderRadius:14,background:"#071827"}}><small style={{color:"#7893a8"}}>REPRODUCED V1</small><strong style={{display:"block",fontSize:34,marginTop:8}}>379 / 379</strong><span style={{color:"#8ed8ff"}}>tests passed</span></article>
+          <article style={{padding:24,border:"1px solid #315b79",borderRadius:14,background:"#071827"}}><small style={{color:"#7893a8"}}>REPRODUCED V2</small><strong style={{display:"block",fontSize:34,marginTop:8}}>645 / 645</strong><span style={{color:"#8ed8ff"}}>tests passed</span></article>
+          <article style={{padding:24,border:"1px solid #f2c45f77",borderRadius:14,background:"#201b0d"}}><small style={{color:"#c9a94f"}}>CURRENT MAIN REPRODUCTION</small><strong style={{display:"block",fontSize:34,marginTop:8}}>55 + 2</strong><span style={{color:"#f2c45f"}}>passed + failed</span></article>
+        </div>
+        <p style={{maxWidth:920,color:"#a9bdcc",lineHeight:1.75,marginTop:20}}>The current-main reproduction includes two failed tests, including a node-registry failure. That is not a reason to cosmetically weaken the showroom. It is exactly why preserved evidence matters: a governance record should retain adverse observations alongside successes. The submitted reproduction was participant-commissioned and AI-assisted, not an independent TA-14 examination.</p>
+      </section>
+
+      <section style={{padding:"66px 0 8px"}}>
+        <div style={{fontSize:11,fontWeight:950,letterSpacing:".16em",color:"#8ed8ff"}}>TA-14 CONSEQUENCE BOUNDARY</div>
+        <h2 style={{fontSize:"clamp(34px,5vw,58px)",letterSpacing:"-.04em",margin:"10px 0 18px"}}>Where SWI stops is as important as where it starts.</h2>
+        <div style={{display:"flex",alignItems:"stretch",gap:8,flexWrap:"wrap"}}>
+          {["SWI WORKFLOW","RECORDED DECISION","EXTERNAL ENFORCEMENT","REAL-WORLD CONSEQUENCE"].map((x,i)=><div key={x} style={{flex:"1 1 190px",padding:20,border:"1px solid "+(i===2?"#f2c45f88":"#315b79"),borderRadius:12,background:i===2?"#f2c45f0b":"#061522"}}><small style={{color:"#6d879a"}}>0{i+1}</small><b style={{display:"block",marginTop:7,color:i===2?"#f2c45f":"#eef7ff"}}>{x}</b>{i===2&&<p style={{fontSize:12,lineHeight:1.55,color:"#c8b77f"}}>SEPARATE PROOF BURDEN</p>}</div>)}
+        </div>
+        <div style={{marginTop:16,padding:18,borderLeft:"4px solid #f2c45f",background:"#f2c45f0c",color:"#d7c994",lineHeight:1.7}}><b>TA-14 RULE:</b> A preserved decision is evidence of a governance decision. It is not, by itself, evidence that execution was authorized, enforced, occurred as intended, or produced the claimed outcome.</div>
       </section>
 
       <section style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14,padding:"64px 0"}}>
