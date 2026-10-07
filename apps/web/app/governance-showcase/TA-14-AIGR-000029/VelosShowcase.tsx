@@ -2,38 +2,85 @@
 import {useState} from 'react';
 
 const states=[
- {t:'Registered identity',s:'REGISTERED · PUBLIC',d:'Velos Systems v1.0.0 is a registered independent governance identity. Registration does not establish Technical Freeze, execution authority, interoperability, safety, certification, or a TA-14 finding.'},
- {t:'Prior R1',s:'CLOSED · NO FINAL TA-14 FINDING',d:'The prior R1 evidence-reconciliation chain closed incomplete for final evidence reconciliation. A participant-reported local result remains distinct from an institutional TA-14 finding.'},
- {t:'Successor R1',s:'OPEN · PRESENT-STATE REVALIDATION',d:'The successor R1 is a new present-state chain. It does not repair, replace, or silently inherit authority from the prior closure.'},
- {t:'Reconciled facts',s:'FREEZE PREPARATION · NOT FREEZE',d:'Participant identity and authority, registered baseline, interface terminology, execution-crossing point, revocation behavior, receipt semantics, clock/correlation model, performance exclusion, proposition, and non-claim boundary are reconciled.'},
- {t:'Freeze blockers',s:'HOLD · TECHNICAL FREEZE NOT YET ESTABLISHED',d:'Executable artifact hashes, environment identities, target fixture, evidence collectors, reproducible F0-F9 fixtures, frozen F0-F9 acceptance criteria, publication boundary, replay terms if used, and final participant freeze acceptance remain blockers.'},
- {t:'Attempt execution',s:'HOLD · EXECUTION NOT AUTHORIZED',d:'Until Technical Freeze is formally issued, execution is exploratory and may not be treated as R1 examination evidence.'},
- {t:'Attempt silent inheritance',s:'DENY · NO SILENT INHERITANCE',d:'Neither registration nor a prior chain supplies present standing to the successor R1. Current-state evidence must independently satisfy the new chain.'}
+ {t:'Registered identity',s:'REGISTERED · PUBLIC',d:'Velos Systems v1.0.0 is the registered independent governance identity. Registration preserves identity and provenance; it does not establish Technical Freeze, interoperability, execution authority, safety, certification, or a TA-14 finding.'},
+ {t:'Prior R1',s:'CLOSED · NO FINAL TA-14 FINDING',d:'The earlier R1 chain closed without a final TA-14 finding. A participant-reported local result remains distinct from an institutional finding and cannot be promoted into one retrospectively.'},
+ {t:'Successor R1',s:'OPEN · PRESENT-STATE REVALIDATION',d:'The successor R1 is a new present-state chain. It does not repair, replace, or silently inherit standing from the prior closure.'},
+ {t:'Reconciled facts',s:'FREEZE PREPARATION · NOT FREEZE',d:'Identity, authority, registered baseline, interface terminology, execution-crossing point, revocation behavior, receipt semantics, chronology model, performance exclusion, proposition, and non-claim boundary are sufficiently reconciled for freeze preparation.'},
+ {t:'Freeze blockers',s:'HOLD · TECHNICAL FREEZE NOT YET ESTABLISHED',d:'Immutable artifact digests, final environment identities, target fixture, evidence collectors, reproducible failure fixtures, acceptance criteria, publication boundary, replay terms if used, and final participant freeze acceptance still have to be sealed.'},
+ {t:'Attempt execution',s:'HOLD · EXECUTION NOT AUTHORIZED',d:'Until Technical Freeze is formally issued, execution remains exploratory and cannot be admitted as R1 examination evidence.'},
+ {t:'Attempt silent inheritance',s:'DENY · NO SILENT INHERITANCE',d:'Neither registration nor the prior chain supplies present standing to the successor R1. Current-state evidence must independently satisfy the new examination chain.'}
 ] as const;
+
+const route=[
+ ['1','UPSTREAM STATE','A frozen TA-14 state is presented across the declared interface.'],
+ ['2','NATIVE VELOS EVALUATION','Velos evaluates the received state using its own declared native invariants.'],
+ ['3','LAYER-4 BOUNDARY','The declared execution cut is the tc_ingress decision point before the destination application socket.'],
+ ['4','PASS OR INTERDICT','Declared progression is TC_ACT_OK; declared refusal uses TC_ACT_SHOT / channel teardown behavior within the frozen route.'],
+ ['5','REFUSAL EVIDENCE','Kernel event and Governance Refusal Receipt must bind the challenged action to the refusal chronology.']
+];
 
 export default function VelosShowcase(){
  const [i,setI]=useState(0); const x=states[i];
- return <main style={{minHeight:'100vh',background:'radial-gradient(circle at 12% 0%,rgba(28,100,139,.25),transparent 31%),linear-gradient(180deg,#020813,#06111e 48%,#020710)',color:'#f3f6f9',padding:'64px 20px',fontFamily:'Inter,system-ui,sans-serif'}}>
- <div style={{width:'min(1100px,100%)',margin:'0 auto'}}>
- <a href="/registry/records/TA-14-AIGR-000029" style={{color:'#a9bfd2',textDecoration:'none'}}>← PERMANENT REGISTRY RECORD</a>
- <header style={{marginTop:36,padding:'clamp(30px,6vw,58px)',border:'1px solid rgba(213,167,75,.28)',borderRadius:28,background:'rgba(8,26,45,.86)'}}>
- <div style={{color:'#d7aa51',fontSize:11,fontWeight:900,letterSpacing:'.15em'}}>TA-14 GOVERNANCE SHOWCASE · TA-14-AIGR-000029</div>
- <h1 style={{fontSize:'clamp(48px,8vw,86px)',lineHeight:.95,margin:'16px 0'}}>VELOS SYSTEMS</h1>
- <p style={{fontSize:22,color:'#7edcf3'}}>v1.0.0 · Layer-4 Deterministic Enforcement Substrate</p>
- <p style={{color:'#b4c5d5',fontSize:17,lineHeight:1.8,maxWidth:850}}>Two examination chains share one registered identity, but they do not share standing. Explore the boundary between registration, historical closure, present-state revalidation, Technical Freeze, and execution.</p>
- </header>
- <section style={{marginTop:28,padding:'clamp(24px,4vw,38px)',border:'1px solid rgba(126,220,243,.22)',borderRadius:22,background:'rgba(5,17,30,.9)'}}>
- <div style={{color:'#7edcf3',fontSize:11,fontWeight:900,letterSpacing:'.14em'}}>RECORDED EXAMINATION PLAYER</div>
- <h2 style={{fontSize:'clamp(30px,4vw,46px)',margin:'10px 0'}}>Two chains. One identity. No silent inheritance.</h2>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:9,marginTop:22}}>
- {states.map((v,n)=><button key={v.t} type="button" onClick={()=>setI(n)} style={{textAlign:'left',padding:'14px 15px',borderRadius:11,cursor:'pointer',fontFamily:'inherit',fontWeight:850,border:i===n?'1px solid rgba(215,170,81,.75)':'1px solid rgba(126,220,243,.16)',background:i===n?'rgba(80,57,14,.42)':'rgba(3,12,22,.72)',color:i===n?'#e1b85f':'#d9e8f1'}}>{String(n+1).padStart(2,'0')} · {v.t}</button>)}
- </div>
- <div style={{marginTop:18,padding:25,borderRadius:16,border:'1px solid rgba(215,170,81,.25)',background:'rgba(2,9,17,.8)'}}>
- <small style={{color:'#7893a7',fontWeight:900,letterSpacing:1.2}}>CURRENT STATE</small><div style={{color:'#e1b85f',fontSize:'clamp(21px,3vw,31px)',fontWeight:950,margin:'8px 0 12px'}}>{x.s}</div><p style={{color:'#bdccd7',lineHeight:1.75}}>{x.d}</p>
- <div style={{display:'grid',gridTemplateColumns:'1fr auto 1fr',gap:12,alignItems:'center',marginTop:22}}>
- <div style={{padding:16,border:'1px solid rgba(255,143,143,.2)',borderRadius:12}}><b>PRIOR R1</b><p style={{color:'#9fb5c4',lineHeight:1.6}}>Closed without final TA-14 finding.</p></div><div style={{color:'#d7aa51',fontWeight:950}}>≠</div><div style={{padding:16,border:'1px solid rgba(126,220,243,.22)',borderRadius:12}}><b>SUCCESSOR R1</b><p style={{color:'#9fb5c4',lineHeight:1.6}}>Open present-state revalidation.</p></div></div>
- <button type="button" onClick={()=>setI(0)} style={{marginTop:18,padding:'10px 14px',borderRadius:10,border:'1px solid rgba(215,170,81,.3)',background:'transparent',color:'#e1b85f',fontWeight:850,cursor:'pointer'}}>RESTORE REGISTRATION BASELINE</button>
- </div>
- <p style={{fontSize:12,color:'#71899a',lineHeight:1.65,marginTop:16}}>Interactive presentation only. It does not establish Technical Freeze, authorize execution, create a TA-14 finding, or transfer standing from the prior R1 into the successor chain.</p>
- </section></div></main>
+ return <main className="shell">
+  <div className="wrap">
+   <nav><a href="/registry/records/TA-14-AIGR-000029">← PERMANENT REGISTRY RECORD</a><span>TA-14 · REGISTERED GOVERNANCE SHOWROOM</span></nav>
+   <header className="hero">
+    <p className="eyebrow">TA-14-AIGR-000029 · VELOS SYSTEMS · v1.0.0</p>
+    <h1>Can an inadmissible consequence be stopped <em>before execution?</em></h1>
+    <p className="lede">Velos declares a Layer-4 deterministic enforcement substrate. The TA-14 examination question is narrower than the marketing claim: can a frozen inadmissible state cross the declared interface, be evaluated by native Velos logic, and be actively interdicted before the consequence crosses the declared execution boundary—with evidence proving prevention rather than observation?</p>
+    <div className="rule">REGISTRATION ≠ TECHNICAL FREEZE · TECHNICAL FREEZE ≠ EXECUTION · PRIOR EVIDENCE ≠ PRESENT STANDING</div>
+   </header>
+
+   <section className="visual">
+    <p className="eyebrow">01 · THE REGISTERED ARCHITECTURE</p>
+    <h2>Velos is the enforcement substrate. TA-14 does not redefine it.</h2>
+    <img src="/Velos Systems Governance Architecture.png" alt="Velos Systems registered governance architecture" />
+    <details open><summary>SAMANTHA · ARCHITECTURE GUIDE</summary><p>Start with the registered identity: Velos Systems v1.0.0, TA-14-AIGR-000029. The participant declares a Linux Kernel eBPF tc-ingress substrate, PEP-L4 WireGate™, with deterministic Layer-4 enforcement. Registration preserves that identity. It does not validate performance, establish interoperability, or create execution authority. The examination must keep Velos native logic separate from TA-14's governance of the examination boundary.</p></details>
+   </section>
+
+   <section className="route">
+    <p className="eyebrow">02 · THE CONSEQUENCE PATH</p><h2>Do not ask whether the system saw the violation. Ask whether the consequence crossed.</h2>
+    <div className="routegrid">{route.map(r=><article key={r[0]}><b>{r[0]}</b><h3>{r[1]}</h3><p>{r[2]}</p></article>)}</div>
+    <div className="maxim">ACTIVE INTERDICTION ≠ PASSIVE OBSERVATION</div>
+   </section>
+
+   <section className="lab">
+    <div className="controls"><p className="eyebrow">03 · OPERATE THE GOVERNANCE</p><h2>Two chains. One identity. No silent inheritance.</h2>{states.map((v,n)=><button key={v.t} onClick={()=>setI(n)} className={i===n?'active':''}>{String(n+1).padStart(2,'0')} · {v.t}</button>)}</div>
+    <div className="state"><small>CURRENT CONTROLLED STATE</small><h3>{x.s}</h3><p>{x.d}</p><div className="split"><span><b>PRIOR R1</b><br/>CLOSED<br/><small>NO FINAL TA-14 FINDING</small></span><strong>≠</strong><span><b>SUCCESSOR R1</b><br/>PRESENT-STATE CHAIN<br/><small>TECHNICAL FREEZE NOT YET ISSUED</small></span></div><button className="reset" onClick={()=>setI(0)}>RESTORE REGISTRATION BASELINE</button></div>
+   </section>
+
+   <section className="visual light">
+    <p className="eyebrow">04 · THE COMPLETE OPERATING PICTURE</p><h2>The larger system matters. The examination claim remains bounded.</h2>
+    <img src="/Velos Systems Governance Workflow.png" alt="Velos Systems governance workflow and operating picture" />
+    <details open><summary>SAMANTHA · BOUNDARY GUIDE</summary><p>This visual helps explain the wider operational ambition around connected infrastructure. Do not confuse that wider context with what R1 can establish. The frozen proposition is about one declared interface, one declared Layer-4 execution boundary, active pre-execution interdiction, and preserved refusal evidence. Aviation, maritime, rail, utilities, cities, resilience, sustainability, security, safety, certification, superiority, and production readiness are not established merely because they appear in the wider operating context.</p></details>
+   </section>
+
+   <section className="evidence">
+    <p className="eyebrow">05 · WHAT THE SUCCESSOR R1 IS ACTUALLY TRYING TO ESTABLISH</p><h2>One proposition. Five burdens.</h2>
+    <div className="cards">
+     <article><b>P1-A</b><h3>Interface correspondence</h3><p>The frozen state must cross the exact declared carrier without semantic substitution or undeclared authority creation.</p></article>
+     <article><b>P1-B</b><h3>Native evaluation</h3><p>Velos must evaluate the state using declared native invariants—not a TA-14-authored replacement engine.</p></article>
+     <article><b>P1-C</b><h3>Pre-execution refusal</h3><p>When refusal is required, the challenged consequence must not cross the declared execution boundary.</p></article>
+     <article><b>P1-D</b><h3>Evidence correspondence</h3><p>The event and receipt must correlate to the challenged action, native determination, execution cut, and chronology.</p></article>
+     <article><b>P1-E</b><h3>Active enforcement</h3><p>The admitted evidence must distinguish prevention from detection, alerting, logging, or retrospective explanation.</p></article>
+    </div>
+   </section>
+
+   <section className="freeze">
+    <div><p className="eyebrow">06 · PRESENT STATE</p><h2>Ready for final freeze-completion package.</h2><p>The proposition, native semantics, route, consequence boundary, evidence channels, and failure logic have advanced beyond broad architectural scoping. Exact identity sealing and final participant acceptance remain.</p></div>
+    <div className="hold"><small>R1 STATUS</small><strong>TECHNICAL FREEZE<br/>NOT YET ISSUED</strong><p>No R1 examination execution is authorized until final immutable identities and freeze acceptance are preserved.</p></div>
+   </section>
+
+   <section className="ceiling">
+    <p className="eyebrow">07 · CLAIM CEILING</p><h2>A successful future R1 would still be a bounded finding.</h2>
+    <div className="claims"><span>NO UNIVERSAL INTEROPERABILITY</span><span>NO SECURITY CERTIFICATION</span><span>NO SAFETY CERTIFICATION</span><span>NO PRODUCTION RELIANCE</span><span>NO PERFORMANCE FINDING</span><span>NO ARCHITECTURE MERGER</span></div>
+    <p className="note">The declared &lt;4.0 µs latency profile is excluded from R1. Any captured latency remains participant telemetry unless separately frozen and admitted under an appropriate measurement proposition.</p>
+   </section>
+
+   <footer><b>VELOS SYSTEMS · TA-14-AIGR-000029</b><span>REGISTERED IDENTITY → FREEZE → EXECUTION → EVIDENCE → FINDING</span><small>Registration is not certification. Interactive presentation does not create a finding.</small></footer>
+  </div>
+  <style jsx>{`
+   :global(*){box-sizing:border-box}:global(body){margin:0;background:#02070d;color:#eef7fb;font-family:Inter,system-ui,sans-serif}:global(a){color:inherit;text-decoration:none}.shell{min-height:100vh;background:radial-gradient(circle at 12% 0%,#073c58 0,transparent 25%),radial-gradient(circle at 88% 18%,#49340d55 0,transparent 24%),linear-gradient(180deg,#02070d,#061522 52%,#02070d)}.wrap{width:min(1440px,100%);margin:auto}nav{padding:22px 4vw;display:flex;justify-content:space-between;border-bottom:1px solid #17384b;color:#91cfe3;font-size:.75rem;letter-spacing:.12em}.hero,.visual,.route,.lab,.evidence,.freeze,.ceiling,footer{margin:0 4vw}.hero{padding:85px 0 55px}.eyebrow{color:#70ddff;font-size:.7rem;font-weight:900;letter-spacing:.16em}.hero h1{font-size:clamp(3.4rem,7.4vw,7.3rem);line-height:.91;max-width:1200px;margin:14px 0 26px}.hero h1 em{font-style:normal;color:#e5b957}.lede{max-width:1040px;color:#b7cbd6;font-size:1.08rem;line-height:1.75}.rule{margin-top:28px;border:1px solid #8a6b2e;padding:16px;border-radius:12px;color:#f0c96f;background:#191506;font-weight:900;letter-spacing:.06em}.visual,.route,.evidence,.freeze,.ceiling{padding:55px 0;border-top:1px solid #15384a}.visual h2,.route h2,.evidence h2,.freeze h2,.ceiling h2,.controls h2{font-size:clamp(2rem,4vw,4.1rem);line-height:1.02;max-width:1050px;margin:9px 0 28px}.visual img{width:100%;display:block;border:1px solid #26556d;border-radius:20px;box-shadow:0 25px 70px #0009}.visual details{margin-top:18px;border:1px solid #254d61;border-radius:14px;background:#071724;padding:18px}.visual summary{cursor:pointer;color:#e7bc62;font-weight:900;letter-spacing:.08em}.visual details p{color:#b7cad5;line-height:1.75}.routegrid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}.routegrid article,.cards article{border:1px solid #1d4c63;background:#06141f;border-radius:16px;padding:20px}.routegrid b,.cards b{color:#e6b957;font-size:1.4rem}.routegrid h3,.cards h3{font-size:1.05rem}.routegrid p,.cards p{color:#a9c0cd;line-height:1.6;font-size:.9rem}.maxim{margin-top:16px;text-align:center;padding:18px;border-radius:12px;background:#0a2636;border:1px solid #3c87a7;color:#8be4ff;font-weight:950;letter-spacing:.13em}.lab{display:grid;grid-template-columns:.8fr 1.2fr;gap:18px;padding:55px 0;border-top:1px solid #15384a}.controls,.state{border:1px solid #1b465c;border-radius:20px;background:#06131e;padding:25px}.controls button{display:block;width:100%;text-align:left;padding:12px 13px;margin:6px 0;border-radius:10px;border:1px solid #234b5f;background:#071a26;color:#bed1da;font-weight:800;cursor:pointer}.controls button.active{border-color:#e1b65d;background:#35290d;color:white}.state small{color:#7895a5;font-weight:900;letter-spacing:.12em}.state h3{color:#e5b957;font-size:clamp(2rem,4vw,3.7rem);margin:12px 0}.state>p{color:#b7cbd6;line-height:1.75}.split{display:grid;grid-template-columns:1fr auto 1fr;gap:12px;align-items:center;margin-top:28px}.split span{border:1px solid #28536a;border-radius:13px;padding:20px;text-align:center;line-height:1.7}.split strong{color:#e5b957;font-size:2rem}.reset{margin-top:18px;padding:10px 14px;border:1px solid #7b6330;border-radius:9px;background:transparent;color:#e5b957;font-weight:900;cursor:pointer}.light{background:linear-gradient(180deg,transparent,#0a1b2855,transparent)}.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:11px}.freeze{display:grid;grid-template-columns:1.3fr .7fr;gap:25px}.freeze>div>p{color:#adc3cf;line-height:1.7}.hold{border:1px solid #8a6b2e;border-radius:18px;background:#191406;padding:26px}.hold strong{display:block;color:#f0c96f;font-size:1.5rem;margin:12px 0}.claims{display:flex;flex-wrap:wrap;gap:9px}.claims span{border:1px solid #694b4b;background:#1a0d0d;padding:11px 13px;border-radius:999px;color:#ffc0c0;font-size:.75rem;font-weight:900}.note{color:#9fb7c4;line-height:1.7;max-width:1000px;margin-top:25px}footer{padding:45px 0 70px;border-top:1px solid #17384b;display:flex;gap:20px;justify-content:space-between;align-items:center;color:#8fa8b5;font-size:.75rem}footer b{color:#e6b957} @media(max-width:950px){.routegrid,.cards{grid-template-columns:1fr 1fr}.lab,.freeze{grid-template-columns:1fr}.split{grid-template-columns:1fr}.split strong{text-align:center}footer{align-items:flex-start;flex-direction:column}}@media(max-width:600px){.routegrid,.cards{grid-template-columns:1fr}.hero{padding-top:55px}nav{gap:15px;flex-wrap:wrap}}
+  `}</style>
+ </main>
 }
