@@ -5,6 +5,9 @@ const WorldReturn=()=> <div style={{padding:'12px 18px',borderBottom:'1px solid 
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
 
 const countries=[
+{code:'BE',flag:'🇧🇪',country:'KINGDOM OF BELGIUM',institution:'FPS Public Health · Indoor Air Quality',status:'SUBSTANTIVE NATIONAL HELPDESK RESPONSE RECEIVED · TICKET 105350 PRESERVED',language:'DUTCH + FRENCH + GERMAN + ENGLISH',href:'/global-institutional-engagement/belgium'},
+{code:'SE',flag:'🇸🇪',country:'KINGDOM OF SWEDEN',institution:'Swedish Environmental Protection Agency · Air Quality Unit',status:'SUBSTANTIVE EPA RESPONSE RECEIVED · NATIVE ACTION PATH IDENTIFIED',language:'SWEDISH + ENGLISH',href:'/global-institutional-engagement/sweden'},
+{code:'CO',flag:'🇨🇴',country:'REPUBLIC OF COLOMBIA',institution:'Ministry of Environment and Sustainable Development',status:'TECHNICAL CONVERSATION ACCEPTED · INITIAL MEETING PROPOSED',language:'SPANISH + ENGLISH',href:'/global-institutional-engagement/colombia'},
 {code:'PS',flag:'🇵🇸',country:'STATE OF PALESTINE',institution:'Environment Quality Authority · Air Quality and Ozone Department',status:'SUBSTANTIVE EQA REPLY RECEIVED · CLARIFICATION REQUEST ACTIVE',language:'ARABIC + ENGLISH',href:'/global-institutional-engagement/palestine'},
 {code:'GY',flag:'🇬🇾',country:'CO-OPERATIVE REPUBLIC OF GUYANA',institution:'Environmental Protection Agency · Air, Noise & Radiation Department',status:'FORMAL EXECUTIVE-DIRECTOR ROUTE RECEIVED · SUBMISSION PREPARATION',language:'ENGLISH',href:'/global-institutional-engagement/guyana'},
 {code:'GA',flag:'🇬🇦',country:'GABONESE REPUBLIC',institution:'Conseil National Climat · Secrétariat Permanent',status:'SUBSTANTIVE CNC REPLY RECEIVED · TECHNICAL DIALOGUE PREPARATION',language:'FRENCH + ENGLISH',href:'/global-institutional-engagement/gabon'},
