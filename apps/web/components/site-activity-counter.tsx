@@ -49,7 +49,7 @@ export function SiteActivityCounter(){
     {label:"Published governance showrooms",value:activity.institutional?.publishedShowrooms??null},
     {label:"Countries observed",value:activity.institutional?.countriesObserved??null},
     {label:"Distinct Academy visits",value:activity.institutional?.academyVisits??null},
-    {label:"Distinct showroom visits",value:activity.institutional?.showroomVisits??null},
+    {label:"Distinct governance showroom visits",value:activity.institutional?.showroomVisits??null},
     {label:"AFA × EABA durable receipts",value:activity.institutional?.afaEabaReceipts??null},
     {label:"AFA × EABA bounded reports",value:activity.institutional?.afaEabaReports??null},
   ];
