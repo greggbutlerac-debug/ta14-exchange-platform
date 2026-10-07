@@ -80,14 +80,14 @@ const SCENARIOS: {id:Scenario; en:string; tn:string}[] = [
 export default function SwiShowroom(){
   const [lang,setLang]=useState<Lang>("en");
   const [scenario,setScenario]=useState<Scenario>("baseline");
-  const [speaking,setSpeaking]=useState(false);
+  const [speaking,setSpeaking]=useState(false);\n  const [activeStep,setActiveStep]=useState(0);
   const c=COPY[lang];
   const details=useMemo(()=>c[scenario],[c,scenario]);
   const result=scenario==="baseline"?c.resultBaseline:scenario==="missingAuthority"?c.resultMissing:scenario==="tamperedEvidence"?c.resultTampered:scenario==="externalExecution"?c.resultExternal:c.resultFailed;
 
-  useEffect(()=>()=>{if(typeof window!=="undefined"&&"speechSynthesis" in window) window.speechSynthesis.cancel()},[]);
+  useEffect(()=>()=>{if(typeof window!=="undefined"&&"speechSynthesis" in window) window.speechSynthesis.cancel()},[]);\n  useEffect(()=>{setActiveStep(0); const t=window.setInterval(()=>setActiveStep(v=>v<5?v+1:v),420); return()=>window.clearInterval(t)},[scenario]);
   const speak=()=>{ if(!("speechSynthesis" in window))return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(c.walkthrough); u.lang=lang==="tn"?"tn-BW":"en-US"; const voices=speechSynthesis.getVoices(); const preferred=voices.find(v=>v.lang.toLowerCase().startsWith(lang==="tn"?"tn":"en")); if(preferred)u.voice=preferred; u.rate=.86; u.onend=()=>setSpeaking(false); u.onerror=()=>setSpeaking(false); setSpeaking(true); speechSynthesis.speak(u); };
-  const stop=()=>{speechSynthesis.cancel();setSpeaking(false)};
+  const stop=()=>{speechSynthesis.cancel();setSpeaking(false)};\n  const sectionVoice=(text:string)=>{ if(!("speechSynthesis" in window))return; speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang=lang==="tn"?"tn-BW":"en-US"; u.rate=.86; u.onend=()=>setSpeaking(false); setSpeaking(true); speechSynthesis.speak(u); };\n  const failAt=scenario==="missingAuthority"?4:scenario==="tamperedEvidence"?3:scenario==="externalExecution"?5:scenario==="failedTests"?3:-1;
 
   return <main style={{minHeight:"100vh",background:"radial-gradient(circle at 70% 0,#0d3760 0,#061523 35%,#02070d 75%)",color:"#eef7ff",fontFamily:"Arial,Helvetica,sans-serif"}}>
     <div style={{maxWidth:1240,margin:"0 auto",padding:"28px 22px 80px"}}>
