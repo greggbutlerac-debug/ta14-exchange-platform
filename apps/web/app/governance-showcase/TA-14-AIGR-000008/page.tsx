@@ -29,11 +29,11 @@ export default function HarmonicGovernanceShowroom(){
     <nav><Link href="/">TA-14 EXCHANGE</Link><Link href="/artifacts/registry">ARTIFACT REGISTRY →</Link></nav>
 
     <header>
-      <div className="badges"><b>REGISTERED GOVERNANCE</b><b>INTERACTIVE SHOWROOM</b><b>TA-14-AIGR-000008 / VERSION SERIES</b></div>
+      <div className="badges"><b>REGISTERED GOVERNANCE</b><b>INTERACTIVE SHOWROOM</b><b>TA-14-AIGR-000008 · v1.0 ORIGINAL BASELINE</b></div>
       <p className="eyebrow">HARMONIC CONSTITUTIONAL RUNTIME · MORAL CLARITY AI</p>
-      <h1>See how Harmonic represents continuation, change, uncertainty, and authority.</h1>
-      <p className="lede">This page separates two things on purpose: Harmonic's declared governance model, and the bounded evidence TA-14 has actually examined. Use the model below to understand the architecture, then open the preserved demonstrations to replay what the record earned.</p>
-    </header>
+      <h1>Harmonic Constitutional Runtime v1.0</h1>
+      <p className="lede">A sovereign constitutional runtime for consequence-bearing autonomous systems. This showroom preserves the original registered v1.0 baseline separately from later Harmonic versions.</p>
+    </header>\n\n    <figure className="teachingImage"><img src="/Harmonic%20Constitutional%20Governance%20Registry.png" alt="Harmonic Constitutional Runtime v1.0 registered governance infographic" /><figcaption>HARMONIC CONSTITUTIONAL RUNTIME · ORIGINAL REGISTERED BASELINE · TA-14-AIGR-000008</figcaption></figure>
 
     <section>
       <p className="eyebrow">HOW THE GOVERNANCE WORKS</p>
