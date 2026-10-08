@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Preserving School Air as Admissible Evidence','/showrooms/thailand-school-air-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Chiang Mai Thailand AirGradient school classroom smoke PM2.5 purifier positive pressure evidence authority Samantha'],
 ['American Lung Association · Invisible Risks: Clinical Evidence to Environmental Consequence','/showrooms/american-lung-association-invisible-risks','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent eight-visual clinical indoor air quality evidence education authority standing execution outcome'],
 
 ['Clean Air, Developing Minds · Columbia Research','/showrooms/clean-air-developing-minds','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent Columbia childhood cognitive development air pollution evidence scientific authority consequence'],
