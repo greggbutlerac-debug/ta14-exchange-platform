@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Clean Air, Developing Minds · Columbia Research','/showrooms/clean-air-developing-minds','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent Columbia childhood cognitive development air pollution evidence scientific authority consequence'],
 ['Romania · Air-Quality Data to Consequential Action','/global-institutional-engagement/romania','COUNTRIES & PUBLIC INSTITUTIONS','Romania ANMAP air quality technical inquiry evidence authority standing'],
 ['Colombia · Ambient Air Quality Technical Conversation','/global-institutional-engagement/colombia','COUNTRIES & PUBLIC INSTITUTIONS','Colombia Ministry Environment ambient air quality technical conversation evidence authority standing'],
 ['Evidence-Governed HVAC Service','/showrooms/evidence-governed-hvac','BUILDINGS & HVAC','HVAC evidence diagnostic authorization bounded execution verification outcome industry examination'],
