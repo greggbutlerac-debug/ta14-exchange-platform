@@ -24,7 +24,7 @@ export default function HomePage() {
         <div className="consequence-first__inner">
           <p className="consequence-first__eyebrow">THE CONSEQUENCE BOUNDARY</p>
           <h1 id="consequence-first-title">A consequence is proposed. Can it become reality <em>NOW?</em></h1>
-          <p className="consequence-first__lead">Before capability becomes consequence, TA-14 asks whether this exact proposed consequence has <strong>ADMISSIBLE EVIDENCE</strong>, <strong>APPLICABLE AUTHORITY</strong>, and <strong>ESTABLISHED STANDING</strong> to become reality now.</p>
+          <p className="consequence-first__lead">Before capability becomes consequence, TA14 asks: Does this proposed consequence have <strong>sufficient Admissible Evidence</strong>, <strong>Applicable Authority</strong>, and <strong>Established Standing</strong> to become reality <strong>NOW?</strong></p>
           <div className="consequence-first__tests" aria-label="TA-14 consequence-boundary tests">
             <div><small>EVIDENCE</small><b>ADMISSIBLE</b><p>Attributable, continuous, current, and sufficient for this determination.</p></div>
             <div><small>AUTHORITY</small><b>APPLICABLE</b><p>Valid for this actor, object, scope, condition, jurisdiction, and execution path.</p></div>
