@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
+const teachingLessons: [string,string,string][] = [["00","Detection is not permission","A sensor can report an environmental condition. It cannot authorize a person to change a building. First name the proposed action, affected people, responsible authority and the outcome we need to verify."],["01","Six signals, one chronology","Radon, carbon dioxide, humidity, temperature, pressure and light describe different conditions. They are not interchangeable. Each reading needs its own context, units and limitations."],["02","From measurement to evidence","An evidence record needs a known device, place, time, units, collection method and an intact history. Preserve original readings separately from estimates or transformations."],["03","Keep responsibilities separate","Airthings provides environmental sensing and data access. AIR is a proposed record-preservation architecture. TA14 examines the consequence boundary. Authorized people and external systems remain responsible for action."],["04","From observation to proposal","An alert is not a command. Investigation, changing ventilation, restricting occupancy and remediation are different proposed consequences. Each must be examined independently."],["05","The authority boundary","Ask the governing question: Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW? Permission for yesterday's inspection is not permission for today's control change."],["06","Four different consequences","Investigating, ventilating, restricting occupancy and remediating may each require different evidence, permissions and professional responsibilities. The same sensor reading does not grant the same permission."],["07","Execution is not proof","A completed action does not prove improvement. Preserve who acted and why, then compare appropriate observations over time, accounting for uncertainty and changing conditions."],["08","Where the systems meet","Sensing, attributable records, governance decisions, external execution and observed outcomes form a chain. Crossing a data interface does not transfer authority. Every new consequence must earn its own permission."]];
 const sensors=[
  ['RADON','Continuous radon measurement'],
  ['CO₂','Ventilation context'],
@@ -20,6 +21,11 @@ const consequences=[
 ];
 
 export default function AirthingsSpaceRadonShowroom(){
+ const [lessonIndex,setLessonIndex]=useState(0);
+ const [isNarrating,setIsNarrating]=useState(false);
+ useEffect(()=>()=>{if(typeof window!=='undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();},[]);
+ const stopNarration=()=>{if(typeof window!=='undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel();setIsNarrating(false);};
+ const playNarration=()=>{if(typeof window==='undefined'||!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(teachingLessons[lessonIndex][2]);u.rate=.91;u.pitch=1;u.onend=()=>{setIsNarrating(false);setLessonIndex(i=>Math.min(i+1,teachingLessons.length-1));};u.onerror=()=>setIsNarrating(false);setIsNarrating(true);window.speechSynthesis.speak(u);};
  const [phase,setPhase]=useState<'DETECTED'|'VALIDATED'|'ALLOW'|'HOLD'|'DENY'|'ESCALATE'|'VERIFIED'>('DETECTED');
  const [choice,setChoice]=useState('INVESTIGATE');
  const determination=phase==='ALLOW'||phase==='VERIFIED'?'ALLOW':['HOLD','DENY','ESCALATE'].includes(phase)?phase:'PENDING';
@@ -143,6 +149,31 @@ export default function AirthingsSpaceRadonShowroom(){
  <p style={{color:'#a9bbc4',lineHeight:1.65,maxWidth:960,margin:0}}>A bounded examination could use the states and evidence Airthings actually exposes, preserve the resulting environmental chronology, identify the exact proposed consequence, and test where authority and standing are established without asking TA-14 to replace sensing, analytics, cloud services, operators, controls, or remediation expertise.</p>
  </section>
 
+
+ <section id="technical-reference" style={{marginTop:22,padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(127,240,189,.38)',borderRadius:26,background:'linear-gradient(135deg,rgba(13,54,47,.48),rgba(4,14,23,.96))'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>OFFICIAL TA14 INDEPENDENT TECHNICAL REFERENCE · VERSION 2.0</div>
+ <h2 style={{fontSize:'clamp(28px,4.4vw,48px)',letterSpacing:'-.04em',margin:'10px 0 12px'}}>The Sensor Detected the Condition. Who Authorized the Consequence?</h2>
+ <p style={{color:'#b7c9d5',lineHeight:1.65,maxWidth:920}}>Read the complete 27-page illustrated educational reference: nine teaching figures, practitioner explanations, an illustrative radon investigation, the decision ledger, claims boundaries and an implementation checklist.</p>
+ <a href="/TA14_Airthings_Space_Radon_Technical_Reference_v2_Under25MB.pdf" download style={{display:'inline-block',marginTop:10,padding:'15px 22px',borderRadius:12,background:'#7ff0bd',color:'#03131a',fontWeight:950,textDecoration:'none'}}>↓ DOWNLOAD TECHNICAL GOVERNANCE REFERENCE v2.0 (PDF)</a>
+ <p style={{color:'#8ea8b2',fontSize:12,lineHeight:1.6,marginTop:15}}>Independent TA14 educational publication. No Airthings sponsorship, endorsement, integration, regulatory approval or site-specific radon finding is asserted.</p>
+ </section>
+ <section id="guided-lessons" style={{marginTop:22,padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:26,background:'rgba(4,13,22,.94)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>GUIDED TEACHING · NINE DISTINCT SECTIONS</div>
+ <h2 style={{fontSize:'clamp(27px,4vw,46px)',letterSpacing:'-.04em',margin:'10px 0 12px'}}>Learn the boundary, one lesson at a time.</h2>
+ <p style={{color:'#a9bbc4',lineHeight:1.6}}>Choose a lesson and press Play to hear its educational narration. When narration ends, the next lesson is selected automatically without starting its audio. The PDF contains each original teaching figure and its corresponding practitioner lesson.</p>
+ <div style={{display:'flex',flexWrap:'wrap',gap:8,margin:'22px 0'}}>{teachingLessons.map(([number,title],i)=><button key={number} onClick={()=>{stopNarration();setLessonIndex(i);}} aria-label={`Select lesson ${number}: ${title}`} aria-pressed={lessonIndex===i} style={{cursor:'pointer',padding:'10px 14px',borderRadius:12,border:lessonIndex===i?'1px solid #7ff0bd':'1px solid #3a5764',background:lessonIndex===i?'rgba(127,240,189,.14)':'rgba(2,9,15,.7)',color:lessonIndex===i?'#7ff0bd':'#b4c9d3',fontWeight:900}}>{number}</button>)}</div>
+ <div style={{padding:'clamp(20px,3vw,32px)',borderRadius:18,border:'1px solid rgba(113,231,255,.18)',background:'rgba(2,9,15,.72)'}} aria-live="polite">
+ <div style={{color:'#7ff0bd',fontSize:12,fontWeight:950,letterSpacing:'.12em'}}>LESSON {teachingLessons[lessonIndex][0]} OF 08</div>
+ <h3 style={{fontSize:'clamp(23px,3.3vw,36px)',margin:'10px 0 16px'}}>{teachingLessons[lessonIndex][1]}</h3>
+ <p style={{color:'#d1e1e8',fontSize:18,lineHeight:1.75,maxWidth:950}}>{teachingLessons[lessonIndex][2]}</p>
+ <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:24}}>
+ <button onClick={isNarrating?stopNarration:playNarration} style={{cursor:'pointer',padding:'12px 18px',borderRadius:12,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.12)',color:'#7ff0bd',fontWeight:900}}>{isNarrating?'■ Stop narration':'▶ Play narration'}</button>
+ <button onClick={()=>{stopNarration();setLessonIndex(i=>Math.max(0,i-1));}} disabled={lessonIndex===0} style={{cursor:lessonIndex===0?'not-allowed':'pointer',opacity:lessonIndex===0?.4:1,padding:'12px 18px',borderRadius:12,border:'1px solid #536c79',background:'transparent',color:'#c1d3dc',fontWeight:900}}>← Previous</button>
+ <button onClick={()=>{stopNarration();setLessonIndex(i=>Math.min(8,i+1));}} disabled={lessonIndex===8} style={{cursor:lessonIndex===8?'not-allowed':'pointer',opacity:lessonIndex===8?.4:1,padding:'12px 18px',borderRadius:12,border:'1px solid #536c79',background:'transparent',color:'#c1d3dc',fontWeight:900}}>Next →</button>
+ </div>
+ <p style={{color:'#8ea8b2',fontSize:12,marginTop:16}}>Narration uses a voice available on your device; a named Samantha voice is not guaranteed. Audio never advances without your initial Play action.</p>
+ </div>
+ </section>
  <section style={{marginTop:22,padding:'28px',borderRadius:24,border:'1px solid rgba(242,191,106,.18)',background:'rgba(45,33,10,.22)'}}>
  <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#f2bf6a'}}>INDEPENDENCE + PROVENANCE NOTICE</div>
  <p style={{color:'#b8b2a2',lineHeight:1.6,marginBottom:8}}>This is an independent TA-14 technical discussion surface based on Airthings' September 21, 2026 public announcement of Space Radon and a September 22, 2026 technical response from Airthings for Business. The response clarified the platform boundary; it did not sponsor, approve, certify, or endorse this TA-14 examination. No partnership, integration, certification, affiliation, or transfer of authority is asserted.</p>
