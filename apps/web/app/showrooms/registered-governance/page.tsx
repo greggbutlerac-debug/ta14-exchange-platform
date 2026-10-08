@@ -1,6 +1,7 @@
 import Link from 'next/link';
 export const metadata={title:'REGISTERED GOVERNANCE | TA-14 Exchange'};
 const rooms=[
+{"kind":"TA-14-AIGR-000009","name":"DAR-Z AI Ω∞ · Darz\u0027 Morris","href":"/governance-showcase/TA-14-AIGR-000009","copy":"Constitutional Intelligence Habitat v1.0: evidence-first stewardship, attributable governance records, constitutional boundaries and accountable evolution."},
 {"kind":"TA-14-AIGR-000048","name":"Structured Workflow Intelligence","href":"/governance-showcase/TA-14-AIGR-000048","copy":"Registered SWI governance identity preserving workflow evidence, decision boundaries, limitations and the separation between governance decision and external execution."},
 {"kind":"TA-14-AIGR-000047","name":"Admissible Standing Architecture","href":"/governance-showcase/TA-14-AIGR-000047","copy":"Registered ASA governance identity separating applicable authority from the actor-to-authority relationship required to establish standing."},
 {"kind":"TA-14-AIGR-000046","name":"HROS · WeRAI AI Integration Inc.","href":"/governance-showcase/TA-14-AIGR-000046","copy":"Interactive showroom for the declared HROS v3.3 authority chain, with claims, non-claims, limitations and preserved evidence."},
