@@ -12,6 +12,8 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['American Lung Association · Invisible Risks: Clinical Evidence to Environmental Consequence','/showrooms/american-lung-association-invisible-risks','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent eight-visual clinical indoor air quality evidence education authority standing execution outcome'],
+
 ['Clean Air, Developing Minds · Columbia Research','/showrooms/clean-air-developing-minds','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent Columbia childhood cognitive development air pollution evidence scientific authority consequence'],
 ['Romania · Air-Quality Data to Consequential Action','/global-institutional-engagement/romania','COUNTRIES & PUBLIC INSTITUTIONS','Romania ANMAP air quality technical inquiry evidence authority standing'],
 ['Colombia · Ambient Air Quality Technical Conversation','/global-institutional-engagement/colombia','COUNTRIES & PUBLIC INSTITUTIONS','Colombia Ministry Environment ambient air quality technical conversation evidence authority standing'],
