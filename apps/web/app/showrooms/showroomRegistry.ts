@@ -127,6 +127,9 @@ export const showroomRooms=[
 ['Sweden · From Air-Quality Evidence to Action','/global-institutional-engagement/sweden','COUNTRIES & PUBLIC INSTITUTIONS','Sweden EPA air quality short term action plan'],
 ['Education Facilities IAQ · Execution Boundary','/global-institutional-engagement/ashrae-education-iaq-execution-boundary','BUILDINGS & HVAC','ASHRAE education facilities IAQ BMS execution demonstration'],
 ['Proof Over Promise · Chicago','/showrooms/proof-over-promise-chicago','EVENTS & PRESENTATIONS','Chicago ASHRAE AHR proof'],
+['Pooja Choradia · PAIR/ERI Clinical','/showrooms/pooja-choradia-pair-eri-clinical','PEOPLE & PRACTITIONERS','PAIR ERI clinical practitioner environmental evidence human consequence'],
+['School Atmospheric Integrity Demonstration','/showrooms/school-atmospheric-integrity','ENVIRONMENT & ATMOSPHERIC INTEGRITY','schools indoor air atmospheric integrity evidence authority authorized intervention outcome'],
+['What Does Proof Authorize?','/showrooms/what-does-proof-authorize','EXAMINATIONS & DEMONSTRATIONS','proof evidence authority standing consequence authorization examination'],
 ] as const;
 
 export const showroomCount = showroomRooms.length;
