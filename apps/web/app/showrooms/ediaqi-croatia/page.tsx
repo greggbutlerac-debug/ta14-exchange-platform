@@ -111,6 +111,24 @@ return <main style={{fontFamily:"Arial,sans-serif",background:"#f3f7f8",color:"#
 </div>
 <div style={{marginTop:28,padding:24,background:"#fff",border:"1px solid #d2e0e5",fontSize:13,lineHeight:1.75,color:"#455c65"}}><strong>Preservation rule.</strong> The material above remains the public presentation surface used for the conference. Post-presentation developments are appended beneath it rather than rewriting the record of what was presented.</div>
 </div></section>
+
+<section style={{padding:"76px 6vw",background:"#fff",borderTop:"1px solid #c9dce4"}}>
+<div style={{maxWidth:1160,margin:"auto"}}>
+<p style={{fontWeight:950,letterSpacing:2,fontSize:10,color:"#08799f"}}>11 · INDEPENDENT CONFERENCE DOCUMENT · 8 OCT 2026</p>
+<h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(38px,5vw,62px)",lineHeight:1.05,letterSpacing:"-.04em"}}>Certificate of Presentation received.</h2>
+<p style={{fontFamily:"Georgia,serif",fontSize:20,lineHeight:1.7,maxWidth:920}}>On 8 October 2026, the EDIAQI conference organizers sent Greggory Don Butler an official Certificate of Presentation recognizing delivery of an oral presentation at the EDIAQI Indoor Air Quality Conference, Zagreb, Croatia, on 29 September 2026.</p>
+<div style={{border:"2px solid #b8d6e2",padding:"clamp(24px,5vw,54px)",background:"#f4fafc",maxWidth:820,margin:"34px auto",textAlign:"center"}}>
+<p style={{fontSize:12,letterSpacing:2,fontWeight:900,color:"#08799f"}}>EDIAQI · DOCUMENTED PRESENTATION RECOGNITION</p>
+<h3 style={{fontFamily:"Georgia,serif",fontSize:"clamp(34px,5vw,54px)",margin:"20px 0"}}>Certificate of Presentation</h3>
+<p style={{fontSize:23,fontWeight:800}}>Greggory Don Butler</p>
+<p>TA-14 Authority / Transparent Air, United States</p>
+<p style={{fontFamily:"Georgia,serif",fontSize:19,lineHeight:1.7}}>For delivering an oral presentation at the<br/><strong>EDIAQI Indoor Air Quality Conference</strong><br/>Zagreb, Croatia · 29 September 2026</p>
+<p style={{fontSize:13,color:"#52666e"}}>Mario Lovrić · EDIAQI Scientific Coordinator</p>
+<p style={{fontSize:11,color:"#52666e",marginTop:22}}>Transcribed details from the issued certificate; this panel is not a reproduction of the signed original PDF.</p>
+</div>
+<p style={{fontSize:16,lineHeight:1.8,maxWidth:920}}>The original PDF, titled “Greggory Don Butler.pdf”, is retained as the source document. This public panel records its verified wording; the original PDF is not yet hosted here for download.</p>
+<div style={{padding:24,background:"#062b3a",color:"#fff",lineHeight:1.8,maxWidth:920}}><strong>Scope of recognition:</strong> The certificate confirms an oral presentation. It does not certify, validate, approve, or endorse TA14 governance architecture, its claims, or any implementation. The earlier presentation surface and its chronology remain unchanged.</div>
+</div></section>
 <footer style={{padding:"34px 6vw",background:"#02141c",color:"#8ca6b0",fontSize:10,letterSpacing:1,lineHeight:1.7}}><div style={{maxWidth:1160,margin:"auto"}}>🇭🇷 CROATIA · EDIAQI × TA-14 · PUBLIC CONFERENCE SURFACE · MONITORING → GOVERNANCE → CONSEQUENCE · NO ENDORSEMENT IMPLIED · TA-14 EXCHANGE</div></footer>
 </main>;
 }
