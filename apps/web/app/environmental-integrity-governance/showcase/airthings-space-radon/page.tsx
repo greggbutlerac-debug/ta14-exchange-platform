@@ -165,6 +165,10 @@ export default function AirthingsSpaceRadonShowroom(){
  <div style={{padding:'clamp(20px,3vw,32px)',borderRadius:18,border:'1px solid rgba(113,231,255,.18)',background:'rgba(2,9,15,.72)'}} aria-live="polite">
  <div style={{color:'#7ff0bd',fontSize:12,fontWeight:950,letterSpacing:'.12em'}}>LESSON {teachingLessons[lessonIndex][0]} OF 08</div>
  <h3 style={{fontSize:'clamp(23px,3.3vw,36px)',margin:'10px 0 16px'}}>{teachingLessons[lessonIndex][1]}</h3>
+ <div style={{margin:'14px 0 22px',borderRadius:16,overflow:'hidden',border:'1px solid rgba(113,231,255,.22)',background:'#fff'}}>
+ <iframe key={lessonIndex} title={`Teaching figure ${teachingLessons[lessonIndex][0]}: ${teachingLessons[lessonIndex][1]}`} src={`/TA14_Airthings_Space_Radon_Technical_Reference_v2_Under25MB.pdf#page=${lessonIndex*2+3}&view=FitH&toolbar=0&navpanes=0`} style={{display:'block',width:'100%',height:'min(72vw,720px)',minHeight:360,border:0}} />
+ </div>
+ <p style={{fontSize:12,color:'#91a8b7',margin:'0 0 16px'}}>Figure ${teachingLessons[lessonIndex][0]} is displayed from the published technical reference. If your browser does not display embedded PDF pages, <a style={{color:'#9eeaff'}} href={`/TA14_Airthings_Space_Radon_Technical_Reference_v2_Under25MB.pdf#page=${lessonIndex*2+3}`} target="_blank" rel="noreferrer">open this figure in the PDF</a>.</p>
  <p style={{color:'#d1e1e8',fontSize:18,lineHeight:1.75,maxWidth:950}}>{teachingLessons[lessonIndex][2]}</p>
  <div style={{display:'flex',flexWrap:'wrap',gap:10,marginTop:24}}>
  <button onClick={isNarrating?stopNarration:playNarration} style={{cursor:'pointer',padding:'12px 18px',borderRadius:12,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.12)',color:'#7ff0bd',fontWeight:900}}>{isNarrating?'■ Stop narration':'▶ Play narration'}</button>
