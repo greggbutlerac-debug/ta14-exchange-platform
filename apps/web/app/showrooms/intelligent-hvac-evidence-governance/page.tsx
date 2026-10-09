@@ -9,7 +9,7 @@ const lessons=[
     "intro": "Identify the actual building, plant, zones, schedules, occupancy, weather and current operating state before interpreting a simulated or measured savings claim.",
     "question": "What did the building actually do before the proposed controller change?",
     "narration": "Number one. Reality. Begin with the physical building, not a promised percentage and not an attractive simulation. The building has real equipment, occupants, weather, schedules, maintenance history and operating constraints. Before an AI controller can be evaluated, we must know which system was operating, what it was doing, and what problem the proposed change is supposed to solve. A simulation can inform a proposal, but it is not itself a measurement of what occurred in the building. Establish the real conditions and identify the precise consequence under consideration. The question is not whether artificial intelligence is impressive. The question is what actually happened here, in this building, at this time.",
-    "image": "/TA14_Intelligent_HVAC_01_REALITY.png"
+    "image": "/HVAC%20Reality_%20Building%20Evidence%20Infographic.png"
   },
   {
     "n": "02",
@@ -18,7 +18,7 @@ const lessons=[
     "intro": "Keep raw time series, timestamp conventions, sensor accuracy, calibration, measured baseline, tariff and contextual records. Separate raw observations from adjustments.",
     "question": "Can a third party reconstruct the observations without relying on a dashboard summary?",
     "narration": "Number two. Record. A building's reality is useful as evidence only when its observations are preserved. We need the original measurements, timestamps, meter and sensor identities, calibration information, controller states, baseline settings, weather, occupancy, tariffs and any missing-data periods. A dashboard screenshot or a claimed percentage cannot replace the underlying time series. Preserve raw and adjusted results separately, including the method and uncertainty behind adjustments. If a later reviewer cannot reconstruct the comparison, the claim has an evidentiary limitation. Record is the foundation for continuity, not a declaration that the claim is already admissible.",
-    "image": "/TA14_Intelligent_HVAC_02_RECORD.png"
+    "image": "/TA14%20Step%2002_%20Preserved%20HVAC%20Evidence.png"
   },
   {
     "n": "03",
@@ -27,7 +27,7 @@ const lessons=[
     "intro": "Trace baseline, installation, configuration changes, controller versions, exceptions, missing data, maintenance and final verification without silently bridging gaps.",
     "question": "Can every consequential change be traced to its time, author and operating context?",
     "narration": "Number three. Continuity. A field demonstration changes over time. Equipment is commissioned. Controllers are updated. Setpoints change. Sensors fail. People override schedules. Weather and occupancy shift. Each event can affect the comparison. Preserve a dated sequence from baseline through deployment, operation and outcome, with exceptions rather than hidden gaps. An apparently continuous chart is not necessarily a continuous evidentiary record. The important question is whether the measurements, configuration and context can be traced without unsupported assumptions. Observed is not inferred. Inferred is not authorized.",
-    "image": "/TA14_Intelligent_HVAC_03_CONTINUITY.png"
+    "image": "/Evidence%20Continuity%20in%20HVAC%20Governance.png"
   },
   {
     "n": "04",
@@ -36,7 +36,7 @@ const lessons=[
     "intro": "The review recommends a measured baseline, a whole-building or thermally accounted boundary, and at least seven days of testing, ideally a month or longer. TA14 also examines uncertainty and context.",
     "question": "Is this evidence sufficient for this exact claim, rather than a generic performance promise?",
     "narration": "Number four. Admissibility. The research review identifies three especially important experimental design choices. First, compare against a measured baseline in the same building or a comparable nearby building, rather than assuming a simulated counterfactual reproduces reality. Second, define the thermal boundary. Savings in one zone may shift heating or cooling demand to another. Third, allow sufficient time. The authors recommend at least seven days and ideally a month or more. These are the researchers' recommendations, not newly invented TA14 thresholds. TA14 additionally asks whether uncertainty, weather, occupancy and context support this particular claim. A research finding may be credible without being sufficient to authorize a particular building action.",
-    "image": "/TA14_Intelligent_HVAC_04_ADMISSIBILITY.png"
+    "image": "/HVAC%20Claim%20Admissibility%20Infographic.png"
   },
   {
     "n": "05",
@@ -45,7 +45,7 @@ const lessons=[
     "intro": "Identify the specific building, equipment, zones, version, claimed savings, requested command and operating envelope. Binding a claim does not itself authorize it.",
     "question": "What precise action does this evidence support, and what falls outside that support?",
     "narration": "Number five. Binding. Evidence must be attached to something definite. Which building? Which air-handling unit? Which zones? Which software version? Which claimed energy or cost change? Which exact proposed setpoint, schedule or command? An average savings figure across studies cannot be automatically transferred to an individual facility. The reviewed paper offers useful evidence about experimental methods, but does not establish the operating envelope of this hypothetical building. Binding defines the claim and action precisely. It is not a substitute for standing or permission.",
-    "image": "/TA14_Intelligent_HVAC_05_BINDING.png"
+    "image": "/TA14%20Binding%20Authority%20Governance%20Infographic.png"
   },
   {
     "n": "06",
@@ -54,7 +54,7 @@ const lessons=[
     "intro": "Confirm the decision-maker's standing, applicable authority, approval scope, validity window, safeguards, escalation route and revalidation conditions.",
     "question": "Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?",
     "narration": "Number six. Commit. The authority boundary is distinct from technical capability. An AI controller may propose a change. A facilities operator may understand its implications. An engineer may validate constraints. But the party empowered to approve the intervention must have established standing and applicable authority for the specific asset and action. Record the approval, its scope, expiry, safeguards, emergency stops and conditions requiring revalidation. The TA14 governing question is: Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW? If these elements are missing, do not silently treat the proposed action as approved. The illustrated approvals in this teaching series are not real authorizations.",
-    "image": "/TA14_Intelligent_HVAC_06_COMMIT.png"
+    "image": "/HVAC%20AI%20Governance_%20Commit%20and%20Monitor.png"
   },
   {
     "n": "07",
@@ -63,7 +63,7 @@ const lessons=[
     "intro": "Record the approved command, BAS response, equipment behavior, constraints, override events and changed-context triggers. Hold or escalate when the authorized envelope no longer applies.",
     "question": "Did the actual command remain inside the approved scope and safety limits?",
     "narration": "Number seven. Execution. Once a bounded action is authorized, the real control system must execute only that action and only within the approved envelope. Preserve the command issued, the building automation system's acknowledgement, equipment response, timestamps, alarm conditions, overrides and exceptions. Watch for changed context: a fault, unexpected occupancy, unusual weather, changed schedule or a condition outside approved limits. A controller that can issue a command does not thereby acquire authority to issue any command. When the context changes, revalidate, hold or escalate as required. The graphics are illustrative, not live building logs.",
-    "image": "/TA14_Intelligent_HVAC_07_EXECUTION.png"
+    "image": "/HVAC%20AI%20Execution%20Governance%20Infographic.png"
   },
   {
     "n": "08",
@@ -72,7 +72,7 @@ const lessons=[
     "intro": "Compare measured outcomes against the defensible baseline; check energy, cost, comfort, IAQ, equipment impacts and unexpected consequences. Preserve uncertainty and the resulting operating record.",
     "question": "What actually changed, and can that result be verified independently?",
     "narration": "Number eight. Outcome. The work is not complete because a command was accepted or because a graph turned green. Verify what actually happened against a defensible baseline. Examine energy and cost effects, indoor comfort, air quality, equipment behavior, unintended consequences and uncertainty. Preserve the raw evidence and the analysis methods so a future examiner can reconstruct the result. The review reports duration-weighted averages for filtered studies, not a guaranteed saving in this building. If the outcome is verified, it becomes part of the new recorded reality for the next decision. Execution creates outcome; outcome creates new reality. No admissible evidence. No admissible execution.",
-    "image": "/TA14_Intelligent_HVAC_08_OUTCOME.png"
+    "image": "/HVAC%20Outcome%20Governance%20Dashboard.png"
   }
 ];
 const pdf='/TA14_Intelligent_HVAC_Control_Evidence_Governance_Reference_v2.0%20(1).pdf';
