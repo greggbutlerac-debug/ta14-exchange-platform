@@ -75,7 +75,7 @@ const lessons=[
     "image": "/TA14_Intelligent_HVAC_08_OUTCOME.png"
   }
 ];
-const pdf='/TA14_Intelligent_HVAC_Control_Evidence_Governance_Reference_v2.0.pdf';
+const pdf='/TA14_Intelligent_HVAC_Control_Evidence_Governance_Reference_v2.0%20(1).pdf';
 function AudioGuide({script,number}:{script:string;number:string}){
  const [status,setStatus]=useState('idle');const utter=useRef<SpeechSynthesisUtterance|null>(null);
  function stop(){if(typeof window!=='undefined')window.speechSynthesis?.cancel();utter.current=null;setStatus('idle')}
