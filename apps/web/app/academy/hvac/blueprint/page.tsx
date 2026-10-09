@@ -6,12 +6,12 @@ export const metadata = {
 };
 
 const domains = [
-  ["Sequence", "15%", "Follow the governed service order and preserve prerequisite evidence before moving forward."],
-  ["HVAC Performance Record", "20%", "Create and preserve the original-state baseline before consequence-bearing intervention."],
-  ["NIRET", "20%", "Satisfy the Non-Invasive Refrigerant Entry Threshold before invasive refrigerant entry."],
-  ["Declared Diagnostic Determination", "15%", "State the evidence-supported determination before intervention, including limits and unresolved conditions."],
-  ["Evidence-Based Intervention", "15%", "Perform only the action supported by the preserved evidence and declared determination."],
-  ["HVAC Post-Performance Record", "15%", "Create the post-state record and compare it directly against the original HVAC Performance Record."],
+  ["Sequence + Non-Invasive Evidence", "20%", "Preserve the governed order and establish operating reality before invasive disturbance."],
+  ["NIRET + Original-State Record", "20%", "Apply NIRET inside baseline establishment and preserve refrigerant-side evidence only when entry is justified."],
+  ["Declared Diagnostic Determination", "15%", "State what the evidence establishes, what it does not establish, and remaining uncertainty before intervention."],
+  ["Evidence-Based Intervention", "15%", "Execute only an intervention supported by evidence and within separately established applicable authority."],
+  ["HVAC Post-Performance Record", "15%", "Capture the post-intervention state using comparable methods, points, units, and operating conditions."],
+  ["Proof of Performance", "15%", "Compare original-state and post-performance records and issue the supported verified outcome."],
 ];
 
 const criticalFailures = [
@@ -20,7 +20,7 @@ const criticalFailures = [
   "Fabricating, backfilling, reconstructing, or silently changing baseline evidence.",
   "Failing to declare the diagnostic determination before intervention.",
   "Performing an intervention materially unsupported by the evidence or declared determination.",
-  "Claiming improvement without a comparable HVAC Post-Performance Record.",
+  "Claiming improvement from a post-performance record alone, without Proof of Performance against the preserved original state.",
   "Creating an unsafe condition or violating applicable safety or legal requirements.",
 ];
 
@@ -42,7 +42,7 @@ const teachingImages = [
   ["02", "Original-State Baseline", "/Original-State HVAC Baseline Infographic.png"],
   ["03", "NIRET", "/HVAC NIRET Decision Flow Infographic.png"],
   ["04", "Refrigerant-Side Evidence — if justified", "/Refrigerant-Side HVAC Evidence Baseline.png"],
-  ["05", "Original-State HVAC Performance Record", "/HVAC Measurements to Evidence Journey.png"],
+  ["05", "Original-State Established", "/HVAC Evidence-to-Outcome Sequence Summary.png"],
   ["06", "Declared Diagnostic Determination", "/HVAC Evidence-Based Diagnostic Workflow (1).png"],
   ["07", "Evidence-Based Intervention", "/HVAC Evidence-Based Diagnostic Workflow.png"],
   ["08", "HVAC Post-Performance Record", "/HVAC Post-Performance Record Infographic.png"],
@@ -72,7 +72,7 @@ export default function HvacBlueprintPage() {
 
         <section className="principle">
           <b>Evidence first. Truth preserved. Intervention earned.</b>
-          <span>The technician must prove the progression from original system state, through justified refrigerant entry and a declared diagnostic determination, to an intervention whose outcome is verified against the preserved baseline.</span>
+          <span>The technician must establish and preserve the original system state before disturbance, use NIRET to determine whether refrigerant-side entry is evidentially necessary, declare what the evidence supports, intervene only within established authority, and prove the result by comparing the post-performance record to the preserved original state.</span>
         </section>
 
         <section className="practiceBridge">
