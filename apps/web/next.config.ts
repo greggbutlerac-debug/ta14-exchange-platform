@@ -70,6 +70,16 @@ const nextConfig: NextConfig = {
       // Public-route recovery: preserve older/shared URLs and repair malformed links
       // observed in production traffic without manufacturing new content.
       {
+        source: "/examinations/c3RvcC10aG",
+        destination: "/examinations/stop-the-cyber-attack",
+        permanent: true,
+      },
+      {
+        source: "/registry/ta-14-admissible-execution-architecture/showcase/b3duZXItdG",
+        destination: "/registry/ta-14-admissible-execution-architecture/showcase/owner-to-consequence-collaboration",
+        permanent: true,
+      },
+      {
         source: "/showrooms/YXJpem9uYS",
         destination: "/showrooms/arizona-building-as-evidence",
         permanent: true,
