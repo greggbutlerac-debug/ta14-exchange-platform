@@ -44,7 +44,7 @@ const teachingImages = [
   ["04", "Refrigerant-Side Evidence — if justified", "/Refrigerant-Side HVAC Evidence Baseline.png"],
   ["05", "Original-State Established", "/HVAC Evidence-to-Outcome Sequence Summary.png"],
   ["06", "Declared Diagnostic Determination", "/HVAC Evidence-Based Diagnostic Workflow (1).png"],
-  ["07", "Evidence-Based Intervention", ""],
+  ["07", "Evidence-Based Intervention", "/Evidence-Based HVAC Intervention Workflow.png"],
   ["08", "HVAC Post-Performance Record", "/HVAC Post-Performance Record Infographic.png"],
   ["09", "Proof of Performance", "/HVAC Proof of Performance Workflow.png"],
   ["10", "Complete Governed Sequence", "/Complete HVAC Evidence-to-Outcome Sequence.png"],
