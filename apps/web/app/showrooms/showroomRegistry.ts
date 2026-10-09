@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Intelligent HVAC Control · Evidence Governance','/showrooms/intelligent-hvac-evidence-governance','BUILDINGS & HVAC','MPC reinforcement learning field demonstrations evidence baseline authority standing execution outcome eight Samantha images technical reference'],
 ['The Future of Integration · Prove the Consequence','/showrooms/future-of-integration-prove-the-consequence','INTEROPERABILITY & SYSTEMS','Eight-image TA14 future integration Ken Sinclair AutomatedBuildings admissible evidence authority standing Samantha execution governance'],
 ['Preserving School Air as Admissible Evidence','/showrooms/thailand-school-air-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Chiang Mai Thailand AirGradient school classroom smoke PM2.5 purifier positive pressure evidence authority Samantha'],
 ['American Lung Association · Invisible Risks: Clinical Evidence to Environmental Consequence','/showrooms/american-lung-association-invisible-risks','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent eight-visual clinical indoor air quality evidence education authority standing execution outcome'],
