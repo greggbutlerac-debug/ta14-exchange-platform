@@ -226,8 +226,10 @@ function requiredEnvironment() {
   const clientSecret = process.env.PAYPAL_CLIENT_SECRET?.trim();
   const environmentValue = process.env.PAYPAL_ENVIRONMENT?.trim().toLowerCase();
 
-  const environment: PayPalEnvironment =
-    environmentValue === 'sandbox' ? 'sandbox' : 'live';
+  if (environmentValue !== 'sandbox' && environmentValue !== 'live') {
+    return null;
+  }
+  const environment: PayPalEnvironment = environmentValue;
 
   if (!clientId || !clientSecret) {
     return null;
