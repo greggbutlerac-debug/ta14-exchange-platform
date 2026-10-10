@@ -5,7 +5,7 @@ const lessons=[{"n":1,"title":"Construction completion is not production authori
 const pdf="/"+encodeURIComponent("TA14_Semiconductor_Fab_Consequence_Boundary_Technical_Reference_v2.0 (1).pdf");
 export default function Page(){
  const [speaking,setSpeaking]=useState(-1);
- function narrate(i){if(typeof window==='undefined'||!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(speaking===i){setSpeaking(-1);return;}const u=new SpeechSynthesisUtterance(lessons[i].script);u.rate=.94;const voices=window.speechSynthesis.getVoices();u.voice=voices.find(v=>/samantha/i.test(v.name))||voices.find(v=>/en-US/i.test(v.lang))||null;u.onend=()=>setSpeaking(-1);u.onerror=()=>setSpeaking(-1);setSpeaking(i);window.speechSynthesis.speak(u);}
+ function narrate(i:number){if(typeof window==='undefined'||!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(speaking===i){setSpeaking(-1);return;}const u=new SpeechSynthesisUtterance(lessons[i].script);u.rate=.94;const voices=window.speechSynthesis.getVoices();u.voice=voices.find(v=>/samantha/i.test(v.name))||voices.find(v=>/en-US/i.test(v.lang))||null;u.onend=()=>setSpeaking(-1);u.onerror=()=>setSpeaking(-1);setSpeaking(i);window.speechSynthesis.speak(u);}
  return <main style={{background:'#07111b',color:'#eff6fb',minHeight:'100vh',fontFamily:'Arial,sans-serif',padding:'30px 18px 100px'}}>
  <div style={{maxWidth:1050,margin:'auto'}}>
  <nav style={{display:'flex',gap:24,flexWrap:'wrap',marginBottom:60}}><Link href="/showrooms" style={{color:'#7bdcff'}}>← ALL SHOWROOMS</Link><Link href="/showrooms/buildings-hvac" style={{color:'#7bdcff'}}>BUILDINGS & HVAC</Link></nav>
