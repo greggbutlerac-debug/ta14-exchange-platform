@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Malawi 2026 · Clean Air, Defensible Evidence, Accountable Action','/showrooms/malawi-clean-air-governance','COUNTRIES & PUBLIC INSTITUTIONS','Malawi Karonga clean air PM2.5 AIR EIG evidence authority standing environmental governance eight narrated chapters independent pre-examination'],
 ['The Filter Is Not the Proof · Filtration Evidence and Authority','/showrooms/the-filter-is-not-the-proof','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Filtration performance installation operating reality evidence continuity authority execution verified outcome eight-image English French audio technical reference'],
 ['School Air Quality Governance · From Monitoring to Authorized Intervention','/showrooms/school-air-quality-governance','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images school IAQ evidence authority Samantha narration'],
 ['Semiconductor Fab · Construction to Authorized Production','/showrooms/semiconductor-fab-consequence-boundary','BUILDINGS & HVAC','semiconductor fab cleanroom commissioning production authorization construction handoff eight images Samantha technical reference evidence authority standing'],
