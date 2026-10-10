@@ -1,5 +1,6 @@
 import { randomUUID } from 'crypto';
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -366,6 +367,29 @@ export async function POST(request: NextRequest) {
 
   const product = PRODUCT_CATALOG[requestedProductId];
   const customerReference = normalizeCustomerReference(body.customerReference);
+
+  // A paid examination must be tied to an existing, unpaid, persisted intake.
+  // Other catalog products retain their existing order-creation behavior.
+  if (product.id === 'governed-consequence-examination') {
+    if (!customerReference || !/^TA14-CEX-\d{8}-[A-Z0-9]{10}$/.test(customerReference)) {
+      return jsonResponse({error: 'EXAMINATION_INTAKE_REQUIRED', message: 'Create a valid examination intake before paying.'}, 400);
+    }
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+    const serviceKey = process.env.SUPABASE_SECRET_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+    if (!supabaseUrl || !serviceKey) {
+      return jsonResponse({error: 'EXAMINATION_INTAKE_CONFIGURATION_MISSING', message: 'Examination intake validation is unavailable.'}, 503);
+    }
+    const db = createClient(supabaseUrl, serviceKey, {auth: {persistSession: false, autoRefreshToken: false}});
+    const {data: intake, error: intakeError} = await db.from('ta14_consequence_examination_intakes')
+      .select('intake_id,status').eq('intake_id', customerReference).maybeSingle();
+    if (intakeError) {
+      console.error('TA14_EXAMINATION_INTAKE_LOOKUP_FAILED', intakeError);
+      return jsonResponse({error: 'EXAMINATION_INTAKE_LOOKUP_FAILED', message: 'Unable to verify examination intake.'}, 503);
+    }
+    if (!intake || intake.status !== 'READY_FOR_PAYMENT') {
+      return jsonResponse({error: 'EXAMINATION_INTAKE_NOT_PAYABLE', message: 'Examination intake does not exist or is not awaiting payment.'}, 409);
+    }
+  }
   const orderReference = `TA14-${randomUUID()}`;
   const invoiceId = `TA14-${Date.now()}-${randomUUID().slice(0, 8)}`;
 
