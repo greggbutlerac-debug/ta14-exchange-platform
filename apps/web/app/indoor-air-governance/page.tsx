@@ -22,6 +22,7 @@ const links = [
   {href:'/environmental-integrity-governance',title:'Environmental Integrity Governance',desc:'Examine the governance layer connecting environmental observations to accountable decisions.'},
   {href:'/environmental-records',title:'Atmospheric and Environmental Records',desc:'Explore provenance, preservation, continuity and evidence limitations.'},
   {href:'/global-institutional-engagement/united-states-epa-indoor-air/school-air-quality-governance',title:'School Air: The Execution Boundary',desc:'Follow a hypothetical ventilation decision when outdoor wildfire smoke changes before execution.'},
+  {href:'/showrooms/school-air-quality-governance',title:'School Air Quality Governance · Eight-Image Showroom',desc:'Explore the existing visual examination of monitoring, admissible evidence, authorized intervention and verified outcome.'},
   {href:'/showrooms/uk-school-air',title:'Interactive School-Air Consequence Test',desc:'Compare proposed actions and their evidence, authority and standing requirements.'},
   {href:'/foundation/public-corpus',title:'Public Technical Corpus',desc:'Review the published architecture and its documented development history.'},
   {href:'/workspace/ai-governance/registry/register',title:'Registered Governance',desc:'Establish the registration pathway before requesting a formal examination.'},
