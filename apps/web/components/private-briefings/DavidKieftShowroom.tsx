@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * UNLISTED, SHAREABLE SHOWROOM. Anyone possessing the URL may access it.
@@ -10,6 +10,27 @@ const lessons: [string,string,string,string,string][] = [["01","The Shared Chall
 
 export default function DavidKieftShowroom() {
   const [answer,setAnswer]=useState<string | null>(null);
+  const [speaking,setSpeaking]=useState<string | null>(null);
+  const [paused,setPaused]=useState(false);
+  const [speechAvailable,setSpeechAvailable]=useState(false);
+  const speechRun=useRef(0);
+  useEffect(()=>{setSpeechAvailable(typeof window!=="undefined" && "speechSynthesis" in window);return ()=>{speechRun.current++;if("speechSynthesis" in window)window.speechSynthesis.cancel();};},[]);
+  const stopNarration=()=>{speechRun.current++;window.speechSynthesis.cancel();setSpeaking(null);setPaused(false);};
+  const speakLesson=(start:number,all=false)=>{
+    if(!("speechSynthesis" in window))return;
+    const run=++speechRun.current;
+    window.speechSynthesis.cancel();setPaused(false);
+    const play=(i:number)=>{
+      if(run!==speechRun.current || i>=lessons.length){setSpeaking(null);return;}
+      const lesson=lessons[i];setSpeaking(lesson[0]);
+      const narration=`Chapter ${lesson[0]}. ${lesson[1]}. ${lesson[2]}. ${lesson[4]}. The question is not simply what the system can measure or recommend, but whether the proposed consequence has admissible evidence, applicable authority and established standing now.`;
+      const utterance=new SpeechSynthesisUtterance(narration);utterance.lang="en-US";utterance.rate=0.9;
+      utterance.onend=()=>{if(run===speechRun.current){if(all)play(i+1);else setSpeaking(null);}};
+      utterance.onerror=()=>{if(run===speechRun.current)setSpeaking(null);};
+      window.speechSynthesis.speak(utterance);
+    };play(start);
+  };
+
   const scenarios=[
     {name:"Evidence and authorization are current",correct:"ALLOW",why:"A bounded action may proceed only when all required checks are established."},
     {name:"Sensor provenance cannot be established",correct:"HOLD",why:"Insufficient admissible evidence means execution cannot proceed."},
@@ -26,6 +47,16 @@ export default function DavidKieftShowroom() {
       </header>
       <h1 style={{fontSize:"clamp(2rem,5vw,4rem)",lineHeight:1.1,marginBottom:12}}>From Measurable Standards to Governed Consequences</h1>
       <p style={{color:"#b9d3df",maxWidth:800,lineHeight:1.7}}>A collaborative exploration of environmental observation, admissible evidence, local execution authority and verified engineering outcomes. Independent illustrative scenarios; no Raven Delta or third-party endorsement implied.</p>
+      <div style={{padding:"18px 20px",border:"1px solid #38617b",borderRadius:14,background:"#112a3a",marginTop:24}}>
+        <strong style={{color:"#6ee5e3"}}>GUIDED AUDIO EXAMINATION</strong>
+        <p style={{color:"#b9d3df",lineHeight:1.6}}>Listen to the eight chapters in sequence or play a single section below. This is browser-generated narration, not a recording of Samantha. The page stays freely scrollable.</p>
+        {speechAvailable?<div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
+          <button type="button" onClick={()=>speakLesson(0,true)} style={{padding:"11px 15px",borderRadius:9,cursor:"pointer"}}>▶ Listen to all eight</button>
+          <button type="button" disabled={!speaking} onClick={()=>{if(paused){window.speechSynthesis.resume();setPaused(false);}else{window.speechSynthesis.pause();setPaused(true);}}} style={{padding:"11px 15px",borderRadius:9,cursor:"pointer"}}>{paused?"▶ Resume":"Ⅱ Pause"}</button>
+          <button type="button" disabled={!speaking} onClick={stopNarration} style={{padding:"11px 15px",borderRadius:9,cursor:"pointer"}}>■ Stop</button>
+          <span role="status" style={{alignSelf:"center",color:"#6ee5e3"}}>{speaking?"Narrating section "+speaking:"Ready to listen"}</span>
+        </div>:<p>Audio narration is unavailable in this browser. All written content remains accessible.</p>}
+      </div>
       <nav aria-label="Jump to a section" style={{display:"flex",flexWrap:"wrap",gap:10,margin:"28px 0 42px"}}>
         {lessons.map((item)=><a key={item[0]} href={"#section-"+item[0]} style={{display:"inline-flex",alignItems:"center",gap:7,padding:"11px 14px",borderRadius:10,border:"1px solid #49738b",background:"#112a3a",color:"white",textDecoration:"none",fontWeight:700}}><span style={{color:"#6ee5e3"}}>{item[0]}</span><span style={{fontWeight:400,fontSize:13}}>{item[1]}</span></a>)}
         <a href="#authority-exercise" style={{padding:"11px 14px",borderRadius:10,border:"1px solid #49738b",color:"white",textDecoration:"none"}}>Authority exercise ↓</a>
@@ -40,6 +71,7 @@ export default function DavidKieftShowroom() {
         <div style={{aspectRatio:"16 / 9",background:"#123044",border:"1px solid #37657c",borderRadius:16,overflow:"hidden",display:"grid",placeItems:"center"}}>
           <img loading={lesson[0]==="01"?"eager":"lazy"} src={"/"+encodeURIComponent(lesson[3])} alt={lesson[1]+": "+lesson[2]} style={{width:"100%",height:"100%",objectFit:"contain"}} />
         </div>
+        {speechAvailable&&<div><button type="button" onClick={()=>speakLesson(Number(lesson[0])-1)} style={{padding:"11px 16px",borderRadius:9,cursor:"pointer"}}>▶ Listen to section {lesson[0]}</button></div>}
         <div style={{display:"flex",justifyContent:"flex-end"}}>
           <a href="#top" style={{color:"#6ee5e3"}}>↑ Back to sections</a>
         </div>
