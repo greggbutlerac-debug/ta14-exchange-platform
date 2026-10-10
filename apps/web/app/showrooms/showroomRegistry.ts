@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Environmental Accountability · From Promise to Verified Consequence','/showrooms/environmental-accountability','ENVIRONMENT & ATMOSPHERIC INTEGRITY','TA14 Environmental Accountability Initiative ten lesson institutional examination clean air commitments AIR EIG evidence regulatory duty authority standing intervention independent pilot'],
 ['School Air Quality Governance · From Monitoring to Authorized Intervention','/showrooms/school-air-quality-governance','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images school IAQ evidence authority Samantha narration'],
 ['Semiconductor Fab · Construction to Authorized Production','/showrooms/semiconductor-fab-consequence-boundary','BUILDINGS & HVAC','semiconductor fab cleanroom commissioning production authorization construction handoff eight images Samantha technical reference evidence authority standing'],
 ['Intelligent HVAC Control · Evidence Governance','/showrooms/intelligent-hvac-evidence-governance','BUILDINGS & HVAC','MPC reinforcement learning field demonstrations evidence baseline authority standing execution outcome eight Samantha images technical reference'],
