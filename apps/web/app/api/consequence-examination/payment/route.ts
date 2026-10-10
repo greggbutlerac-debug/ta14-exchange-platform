@@ -48,7 +48,12 @@ export async function POST(request:NextRequest){
   if(existingQueue)return NextResponse.json({ok:true,intakeId,status:'PAID',queueId:existingQueue.queue_id,queueState:existingQueue.state,idempotent:true});
   const queueId='TA14-CEX-Q-'+randomUUID().replaceAll('-','').slice(0,12).toUpperCase();
   const {data:queue,error:queueError}=await supabase.from('ta14_consequence_examination_queue').insert({queue_id:queueId,intake_id:intakeId,state:'QUEUED',paid_at:data.paid_at,evidence_manifest_sha256:data.evidence_manifest_sha256,evidence_item_count:data.evidence_item_count??0}).select('queue_id,state,queued_at').single();
-  if(queueError||!queue)return NextResponse.json({error:'Payment and evidence freeze were recorded, but the examination queue entry could not be created. Retain the intake and PayPal capture IDs for reconciliation.',intakeId,status:'PAID'},{status:500});
+  if(queueError||!queue){
+   const {data:recoveredQueue,error:recoveryError}=await supabase.from('ta14_consequence_examination_queue').select('queue_id,state,queued_at').eq('intake_id',intakeId).maybeSingle();
+   if(!recoveryError&&recoveredQueue)return NextResponse.json({ok:true,intakeId,status:'PAID',queueId:recoveredQueue.queue_id,queueState:recoveredQueue.state,queuedAt:recoveredQueue.queued_at,idempotent:true});
+   console.error('Paid examination queue insert or recovery failed',queueError,recoveryError);
+   return NextResponse.json({error:'Payment was recorded but examination queue creation requires reconciliation. Contact support with your intake ID; do not pay again.',intakeId,status:'PAID'},{status:500});
+  }
   const {error:eventError}=await supabase.from('ta14_consequence_examination_queue_events').insert({queue_id:queue.queue_id,intake_id:intakeId,event_type:'PAID_INTAKE_QUEUED',from_state:null,to_state:'QUEUED',event_payload:{evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count??0}});
   if(eventError)console.error('Consequence queue chronology insert failed',eventError);
   return NextResponse.json({ok:true,intakeId:data.intake_id,status:data.status,queueId:queue.queue_id,queueState:queue.state,queuedAt:queue.queued_at,paidAt:data.paid_at,payloadSha256:data.payload_sha256,evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count,evidenceFrozenAt:data.evidence_frozen_at,boundary:'Payment purchases and queues the governed examination only. It does not establish admissibility, authority, standing, certification, endorsement, compliance, execution permission, or a favorable determination.'});
