@@ -28,6 +28,11 @@ const imageFiles=[
 'TA14_Environmental_Accountability_09_Independent_Examination.png',
 'TA14_Environmental_Accountability_10_Institutional_Invitation.png'
 ];
+// Original GitHub upload filenames verified in apps/web/public. These are illustrative title matches, not independently examined records.
+const originalFilenameCandidates:Record<number,string[]>={
+ 3:['From Measurement to Environmental Evidence.png'],
+ 5:['The Authority Boundary_ Environmental Governance Gate.png']
+};
 const referencePdf='TA14_Environmental_Accountability_Institutional_Examination_and_Pilot_Reference_v3.0.pdf';
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
 export default function EnvironmentalAccountabilityShowroom(){
@@ -47,7 +52,15 @@ export default function EnvironmentalAccountabilityShowroom(){
    }
    return '';
   };
-  Promise.all(imageFiles.map(findAsset)).then(urls=>{if(active)setImageUrls(urls);});
+  Promise.all(imageFiles.map(async(file,i)=>{
+   const primary=await findAsset(file);
+   if(primary)return primary;
+   for(const candidate of originalFilenameCandidates[i]||[]){
+    const url=await findAsset(candidate);
+    if(url)return url;
+   }
+   return '';
+  })).then(urls=>{if(active)setImageUrls(urls);});
   findAsset(referencePdf).then(url=>{if(active)setPdfUrl(url);});
   return ()=>{active=false;};
  },[]);
@@ -64,7 +77,7 @@ export default function EnvironmentalAccountabilityShowroom(){
  </header>
  <section style={{margin:'40px 0',padding:24,border:'1px solid #245269',borderRadius:16}}><h2>One governing question</h2><p style={{fontSize:20,lineHeight:1.5}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{chain.map(s=><span key={s} style={{border:'1px solid #386477',borderRadius:7,padding:9,fontSize:10,fontWeight:800}}>{s}</span>)}</div></section>
  {Boolean(pdfUrl)&&<section style={{padding:20,marginBottom:20,border:"1px solid #2e6475",borderRadius:12}}><a href={pdfUrl} download style={{color:"#83eac7",fontWeight:900}}>DOWNLOAD INSTITUTIONAL REFERENCE v3.0 (PDF) ↓</a></section>}
- <section id="lessons"><h2 style={{fontSize:32}}>Ten numbered examinations</h2><p style={{color:'#a8c4ce'}}>Free scrolling. Each lesson has a separately accessible narration script. Samantha audio is not yet published. Illustrations and reference materials appear only when their configured public files are available. Existing public images are not automatically treated as evidence for this examination.</p>
+ <section id="lessons"><h2 style={{fontSize:32}}>Ten numbered examinations</h2><p style={{color:'#a8c4ce'}}>Free scrolling. Each lesson has a separately accessible narration script. Samantha audio is not yet published. Illustrations and reference materials appear only when their configured public files are available. Images are educational illustrations, not independent evidence. Existing public images are not automatically treated as evidence for this examination.</p>
  {lessons.map(([title,question,script],i)=><article key={title} id={`lesson-${i+1}`} style={{margin:'22px 0',border:'1px solid #24475a',borderRadius:16,overflow:'hidden',background:'#071c28'}}>
  {i===7&&Boolean(imageUrls[i])&&<p role="note" style={{margin:20,padding:15,border:'1px solid #e3b96c',borderRadius:8,color:'#ffe0a1',lineHeight:1.5}}><strong>Evidence warning:</strong> The following image is a hypothetical illustration. Any depicted PASS, ALLOW, verified outcome, or admissibility conclusion is NOT established where sensor calibration, provenance, baseline, and independent verification are missing. The appropriate evidentiary disposition remains HOLD pending examination.</p>}
  {Boolean(imageUrls[i])&&<img src={imageUrls[i]} alt={`${String(i+1).padStart(2,"0")}: ${title} — ${question}`} loading="lazy" style={{width:"100%",height:"auto",display:"block"}}/>}
