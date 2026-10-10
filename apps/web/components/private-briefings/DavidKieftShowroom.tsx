@@ -3,9 +3,8 @@
 import { useState } from "react";
 
 /**
- * DRAFT COMPONENT ONLY. Do not expose via an app route until server-side
- * invitation authorization protects HTML, image assets, and the PDF.
- * Static /public files are not private, even when the page is hidden.
+ * UNLISTED, SHAREABLE SHOWROOM. Anyone possessing the URL may access it.
+ * The public image/PDF assets are not confidential.
  */
 const lessons: [string,string,string,string,string][] = [["01","The Shared Challenge","From measurable standards to governed consequences","Governed Consequences Technical Showroom.png","What would make a monitored environmental condition sufficiently evidenced and locally authorized to support an engineering action?"],["02","Environmental Observation","Preserve what the instruments actually observed","Environmental Observation Dashboard.png","Capture the original reading, instrument, time, location, calibration context and uncertainty. Observation is not inference."],["03","Evidence Integrity and Continuity","Can the record withstand examination?","Evidence Integrity Dashboard.png","Examine provenance, gaps, calibration, continuity, relevance and integrity without replacing the raw record."],["04","Measurable Standards and Computation","Standards and models inform, but do not authorize","Measurable Standards and Computation.png","Determine which requirements actually apply. Examine computational inputs, assumptions, and limitations before treating an output as a proposed action."],["05","The Authority Boundary","Evidence, authority and standing must be established NOW","Authority Boundary Control Room.png","A technically plausible recommendation cannot cross into execution without current applicable authority, established standing and bounded scope."],["06","Engineering Intervention","Execution remains local and bounded","TA14 Engineering Intervention Blueprint.png","Qualified personnel act only within established permissions and safety constraints. Preserve who acted, when, why and within which scope."],["07","Verified Outcomes and Revalidation","New reality requires new examination","Verified Outcomes and Revalidation Dashboard.png","Record the actual outcome, distinguish observed changes from inferred benefits, and revalidate when conditions or authority change."],["08","The Opportunity to Collaborate","An invitation to compare complementary approaches","TA14 Collaboration Roadmap_ Measurable Impact.png","A bounded, mutually defined technical examination could explore interoperability without presuming a partnership, endorsement, or deficiency."]];
 
@@ -25,7 +24,7 @@ export default function DavidKieftShowroom() {
     <div style={{maxWidth:1180,margin:"auto"}}>
       <header style={{borderBottom:"1px solid #365268",paddingBottom:22,display:"flex",justifyContent:"space-between",gap:20,flexWrap:"wrap"}}>
         <div><strong style={{letterSpacing:".15em"}}>TA14 AUTHORITY GOVERNANCE INSTITUTION</strong><p style={{color:"#a9c4d4"}}>Private technical exploration prepared for David Kieft · Raven Delta Group</p></div>
-        <span style={{color:"#a9c4d4"}}>DRAFT · NOT FOR DISTRIBUTION</span>
+        <span style={{color:"#a9c4d4"}}>UNLISTED · SHAREABLE BY LINK</span>
       </header>
       <h1 style={{fontSize:"clamp(2rem,5vw,4rem)",lineHeight:1.1,marginBottom:12}}>From Measurable Standards to Governed Consequences</h1>
       <p style={{color:"#b9d3df",maxWidth:800,lineHeight:1.7}}>A collaborative exploration of environmental observation, admissible evidence, local execution authority and verified engineering outcomes. Independent illustrative scenarios; no Raven Delta or third-party endorsement implied.</p>
@@ -35,7 +34,7 @@ export default function DavidKieftShowroom() {
       <section aria-live="polite" style={{display:"grid",gridTemplateColumns:"minmax(0,1fr)",gap:18}}>
         <div><p style={{color:"#6ee5e3",fontWeight:700}}>{lesson[0]} / 08</p><h2 style={{fontSize:"clamp(1.6rem,3vw,2.5rem)",margin:"8px 0"}}>{lesson[1]}</h2><h3 style={{fontWeight:500,color:"#9ed5e1"}}>{lesson[2]}</h3><p style={{lineHeight:1.8,maxWidth:900}}>{lesson[4]}</p></div>
         <div style={{aspectRatio:"16 / 9",background:"#123044",border:"1px solid #37657c",borderRadius:16,overflow:"hidden",display:"grid",placeItems:"center"}}>
-          {/* Files are in public/ on main. Never ship this as a private experience until assets are relocated behind authorization. */}
+          {/* Unlisted public asset. Do not place confidential information in this showroom. */}
           <img src={"/"+encodeURIComponent(lesson[3])} alt={lesson[1]+": "+lesson[2]} style={{width:"100%",height:"100%",objectFit:"contain"}} />
         </div>
         <div style={{display:"flex",gap:10,justifyContent:"space-between",flexWrap:"wrap"}}>
@@ -52,7 +51,7 @@ export default function DavidKieftShowroom() {
         <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>{["ALLOW","HOLD","DENY","ESCALATE"].map(x=><button key={x} onClick={()=>setAnswer(x)} style={{padding:"12px 20px",borderRadius:8}}>{x}</button>)}</div>
         {answer&&<p role="status"><strong>{answer===current.correct?"Supported illustrative disposition":"Consider the missing boundary"}: {current.correct}.</strong> {current.why}</p>}
       </section>
-      <footer style={{padding:"40px 0",color:"#a9c4d4"}}>PDF companion uploaded: TA14_David_Kieft_Private_Technical_Exploration_v2.pdf. Access link intentionally withheld pending protected delivery. No live Raven Delta data or operational integration is represented.</footer>
+      <footer style={{padding:"40px 0",color:"#a9c4d4"}}><a href={"/"+encodeURIComponent("TA14_David_Kieft_Private_Technical_Exploration_v2.pdf")} target="_blank" rel="noopener noreferrer" style={{color:"#6ee5e3"}}>↓ Download technical reference v2.0 (PDF)</a> · Unlisted shareable link; no third-party endorsement. No live Raven Delta data or operational integration is represented.</footer>
     </div>
   </main>;
 }
