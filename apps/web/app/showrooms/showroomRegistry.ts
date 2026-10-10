@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['The Filter Is Not the Proof · Filtration Evidence and Authority','/showrooms/the-filter-is-not-the-proof','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Filtration performance installation operating reality evidence continuity authority execution verified outcome eight-image English French audio technical reference'],
 ['School Air Quality Governance · From Monitoring to Authorized Intervention','/showrooms/school-air-quality-governance','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images school IAQ evidence authority Samantha narration'],
 ['Semiconductor Fab · Construction to Authorized Production','/showrooms/semiconductor-fab-consequence-boundary','BUILDINGS & HVAC','semiconductor fab cleanroom commissioning production authorization construction handoff eight images Samantha technical reference evidence authority standing'],
 ['Intelligent HVAC Control · Evidence Governance','/showrooms/intelligent-hvac-evidence-governance','BUILDINGS & HVAC','MPC reinforcement learning field demonstrations evidence baseline authority standing execution outcome eight Samantha images technical reference'],
