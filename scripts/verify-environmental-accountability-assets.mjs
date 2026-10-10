@@ -1,5 +1,5 @@
 // Run from the repository root: node scripts/verify-environmental-accountability-assets.mjs
-import {existsSync, statSync} from 'node:fs';
+import {existsSync, statSync, openSync, readSync, closeSync} from 'node:fs';
 import {join} from 'node:path';
 const dir='apps/web/public/environmental-accountability';
 const names=[
@@ -16,6 +16,11 @@ const names=[
 'TA14_Environmental_Accountability_Institutional_Examination_and_Pilot_Reference_v3.0.pdf'
 ];
 let failures=0;
-for(const name of names){const path=join(dir,name);if(!existsSync(path)||statSync(path).size===0){console.error('MISSING:',path);failures++;}else console.log('OK:',path);}
+for(const name of names){const path=join(dir,name);if(!existsSync(path)||statSync(path).size===0){console.error('MISSING:',path);failures++;continue;}
+ const fd=openSync(path,'r');const header=Buffer.alloc(24);const count=readSync(fd,header,0,24,0);closeSync(fd);
+ const png=name.endsWith('.png');const valid=png ? count===24 && header.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10])) && header.toString('ascii',12,16)==='IHDR' : header.toString('ascii',0,5)==='%PDF-';
+ if(!valid){console.error('INVALID FILE SIGNATURE:',path);failures++;continue;}
+ if(png){const width=header.readUInt32BE(16),height=header.readUInt32BE(20);if(width<1000||height<600){console.error('UNEXPECTED IMAGE SIZE:',path,width,height);failures++;continue;}}
+ console.log('OK:',path);}
 if(failures){console.error(failures+' assets missing. Keep assetsPublished=false.');process.exitCode=1;}
 else console.log('All 11 assets present. Verify visual accuracy and PDF before enabling assetsPublished.');
