@@ -15,6 +15,7 @@ const chapters=[
 const pdf='/TA14_Tamale_Community_Air_Evidence_Technical_Reference_v2.3%20(1).pdf';
 export default function TamaleShowroom(){
  const [playing,setPlaying]=useState(-1);
+ const [language,setLanguage]=useState('en');
  const [answers,setAnswers]=useState({evidence:false,authority:false,standing:false});
  useEffect(()=>()=>{if(typeof window!=='undefined')window.speechSynthesis?.cancel()},[]);
  function speak(i:number){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(playing===i){setPlaying(-1);return;}const u=new SpeechSynthesisUtterance(chapters[i].script);u.lang='en-US';u.rate=0.9;const voices=window.speechSynthesis.getVoices();u.voice=voices.find(v=>/samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en')&&/female/i.test(v.name))||null;u.onend=()=>setPlaying(-1);u.onerror=()=>setPlaying(-1);setPlaying(i);window.speechSynthesis.speak(u);}
@@ -31,12 +32,13 @@ export default function TamaleShowroom(){
  <p style={{padding:16,background:'#e7eef3',borderLeft:'4px solid #126f86',lineHeight:1.6}}>Independent educational demonstration. All pictured people, scenarios, measurements, charts and decisions are illustrative. No field data verification, frozen baseline, formal TA14 disposition, partnership, Ghana Health Service, Quali-Breeze, Kombian James Libaarbor or Air Aware Labs endorsement is claimed.</p>
  <a href={pdf} download style={{display:'inline-block',padding:'15px 22px',background:'#073451',color:'white',borderRadius:8,textDecoration:'none',fontWeight:700}}>↓ Download Technical Governance Reference v2.3 (PDF)</a>
  </header>
+ <section aria-label="Language access" style={{background:'#e7eef3',padding:20,borderRadius:12,margin:'18px 0'}}><label htmlFor="tamale-language" style={{fontWeight:700,marginRight:12}}>Narration language</label><select id="tamale-language" value={language} onChange={e=>{window.speechSynthesis?.cancel();setPlaying(-1);setLanguage(e.target.value)}} style={{padding:10,borderRadius:6}}><option value="en">English — narration available</option><option value="dag">Dagbani — translation and native-speaker recording pending</option><option value="gjn">Gonja — translation and native-speaker recording pending</option></select><p style={{lineHeight:1.6,marginBottom:0}}>{language==='en'?'English chapter narration is available using your device’s speech voices. Samantha is used only if installed.':'Local-language audio and text are not yet available. English chapter text remains visible. We will not substitute English audio or unverified translations for local-language narration. Native-speaker review is required before release.'}</p></section>
  <p style={{color:'#526779'}}>Eight illustrated chapters. Select Play Narration for browser speech; a Samantha voice is used when available. Images remain independently scrollable.</p>
  {chapters.map((c,i)=><section id={'chapter-'+(i+1)} key={c.file} style={{background:'white',margin:'30px 0',padding:'clamp(16px,3vw,34px)',borderRadius:16,boxShadow:'0 3px 20px #0b25320d'}}>
  <p style={{fontWeight:800,color:'#127b91',letterSpacing:2}}>CHAPTER {String(i+1).padStart(2,'0')} / 08</p>
  <h2 style={{fontSize:'clamp(24px,3vw,36px)',margin:'10px 0 20px'}}>{c.title}</h2>
  <img src={'/'+encodeURIComponent(c.file)} alt={'Chapter '+(i+1)+': '+c.title+' — illustrative educational infographic'} style={{width:'100%',height:'auto',borderRadius:8}} loading="lazy"/>
- <div style={{display:'flex',gap:12,alignItems:'center',marginTop:20,flexWrap:'wrap'}}><button onClick={()=>speak(i)} style={{border:0,borderRadius:8,background:'#073451',color:'white',padding:'12px 20px',cursor:'pointer'}}>{playing===i?'■ Stop narration':'▶ Play narration'}</button><span style={{fontSize:14,color:'#536779'}}>Narration {i+1} · browser voice</span></div>
+ <div style={{display:'flex',gap:12,alignItems:'center',marginTop:20,flexWrap:'wrap'}}><button onClick={()=>speak(i)} disabled={language!=='en'} style={{border:0,borderRadius:8,background:'#073451',color:'white',padding:'12px 20px',cursor:language==='en'?'pointer':'not-allowed',opacity:language==='en'?1:0.55}}>{language!=='en'?'Local narration pending':playing===i?'■ Stop narration':'▶ Play narration'}</button><span style={{fontSize:14,color:'#536779'}}>Narration {i+1} · browser voice</span></div>
  <p style={{fontSize:17,lineHeight:1.7}}>{c.script}</p>
  </section>)}
  <section style={{background:'white',borderRadius:16,padding:'32px',marginTop:36}}>
