@@ -1,4 +1,4 @@
-import { createHash, randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 import { NextRequest,NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 function t(v:unknown,max=500){return typeof v==='string'?v.trim().slice(0,max):''}
@@ -58,21 +58,30 @@ export async function POST(request:NextRequest){
   if(evidenceError)return NextResponse.json({error:'Payment was captured but the evidence manifest could not be frozen. Retain the PayPal capture ID for reconciliation.'},{status:500});
   const evidenceManifest={schema:'TA14_CONSEQUENCE_INTAKE_EVIDENCE_MANIFEST_V1',intakeId,items:(evidence??[]).map(x=>({evidenceId:x.id,filename:x.original_filename,mediaType:x.media_type,sizeBytes:x.size_bytes,sha256:x.sha256,state:x.evidence_state}))};
   const evidenceManifestSha256=createHash('sha256').update(canonicalize(evidenceManifest)).digest('hex');
-  const {data,error}=existing.status==='PAID'?await supabase.from('ta14_consequence_examination_intakes').select('intake_id,status,paid_at,payload_sha256,evidence_manifest_sha256,evidence_item_count,evidence_frozen_at').eq('intake_id',intakeId).single():await supabase.from('ta14_consequence_examination_intakes').update({status:'PAID',paypal_order_id:orderId,paypal_capture_id:captureId,paid_amount:149.00,paid_currency:'USD',paid_at:paidAt,evidence_manifest:evidenceManifest,evidence_manifest_sha256:evidenceManifestSha256,evidence_frozen_at:paidAt,evidence_item_count:evidence?.length??0,updated_at:new Date().toISOString()}).eq('intake_id',intakeId).eq('status','READY_FOR_PAYMENT').select('intake_id,status,paid_at,payload_sha256,evidence_manifest_sha256,evidence_item_count,evidence_frozen_at').single();
-  if(error||!data)return NextResponse.json({error:'Payment was captured but the intake could not be marked paid. Retain the PayPal capture ID for reconciliation.'},{status:500});
-  const {data:existingQueue,error:queueReadError}=await supabase.from('ta14_consequence_examination_queue').select('queue_id,state,queued_at').eq('intake_id',intakeId).maybeSingle();
-  if(queueReadError)return NextResponse.json({error:'Unable to verify examination queue state. Please contact support with your intake ID.'},{status:500});
-  if(existingQueue)return NextResponse.json({ok:true,intakeId,status:'PAID',queueId:existingQueue.queue_id,queueState:existingQueue.state,idempotent:true});
-  const queueId='TA14-CEX-Q-'+randomUUID().replaceAll('-','').slice(0,12).toUpperCase();
-  const {data:queue,error:queueError}=await supabase.from('ta14_consequence_examination_queue').insert({queue_id:queueId,intake_id:intakeId,state:'QUEUED',paid_at:data.paid_at,evidence_manifest_sha256:data.evidence_manifest_sha256,evidence_item_count:data.evidence_item_count??0}).select('queue_id,state,queued_at').single();
-  if(queueError||!queue){
-   const {data:recoveredQueue,error:recoveryError}=await supabase.from('ta14_consequence_examination_queue').select('queue_id,state,queued_at').eq('intake_id',intakeId).maybeSingle();
-   if(!recoveryError&&recoveredQueue)return NextResponse.json({ok:true,intakeId,status:'PAID',queueId:recoveredQueue.queue_id,queueState:recoveredQueue.state,queuedAt:recoveredQueue.queued_at,idempotent:true});
-   console.error('Paid examination queue insert or recovery failed',queueError,recoveryError);
-   return NextResponse.json({error:'Payment was recorded but examination queue creation requires reconciliation. Contact support with your intake ID; do not pay again.',intakeId,status:'PAID'},{status:500});
+  // One privileged database transaction binds payment, freezes evidence,
+  // establishes the queue and writes its initial chronology event.
+  const {data:finalized,error:finalizeError}=await supabase.rpc('ta14_finalize_verified_examination_payment',{
+    p_intake_id:intakeId,
+    p_order_id:orderId,
+    p_capture_id:captureId,
+    p_paid_at:paidAt,
+    p_manifest:evidenceManifest,
+    p_manifest_sha256:evidenceManifestSha256,
+    p_evidence_item_count:evidence?.length??0
+  });
+  const result=Array.isArray(finalized)?finalized[0]:null;
+  if(finalizeError||!result){
+    console.error('Atomic examination payment finalization failed',finalizeError);
+    return NextResponse.json({error:'Payment was captured but examination intake finalization requires reconciliation. Do not pay again; contact support with your intake ID.',intakeId},{status:500});
   }
-  const {error:eventError}=await supabase.from('ta14_consequence_examination_queue_events').insert({queue_id:queue.queue_id,intake_id:intakeId,event_type:'PAID_INTAKE_QUEUED',from_state:null,to_state:'QUEUED',event_payload:{evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count??0}});
-  if(eventError)console.error('Consequence queue chronology insert failed',eventError);
-  return NextResponse.json({ok:true,intakeId:data.intake_id,status:data.status,queueId:queue.queue_id,queueState:queue.state,queuedAt:queue.queued_at,paidAt:data.paid_at,payloadSha256:data.payload_sha256,evidenceManifestSha256:data.evidence_manifest_sha256,evidenceItemCount:data.evidence_item_count,evidenceFrozenAt:data.evidence_frozen_at,boundary:'Payment purchases and queues the governed examination only. It does not establish admissibility, authority, standing, certification, endorsement, compliance, execution permission, or a favorable determination.'});
+  return NextResponse.json({
+    ok:true,intakeId:result.result_intake_id,status:'PAID',
+    queueId:result.result_queue_id,queueState:result.result_queue_state,
+    paidAt:result.result_paid_at,
+    evidenceManifestSha256:result.result_manifest_sha256,
+    evidenceItemCount:result.result_evidence_item_count,
+    idempotent:result.result_idempotent,
+    boundary:'Payment purchases and queues the governed examination only. It does not establish admissibility, authority, standing, certification, endorsement, compliance, execution permission, or a favorable determination.'
+  });
  }catch(e){console.error('Consequence payment record failed',e);return NextResponse.json({error:'Unable to record the consequence examination payment.'},{status:500})}
 }
