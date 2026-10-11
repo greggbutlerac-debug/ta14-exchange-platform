@@ -431,7 +431,7 @@ export async function POST(request: NextRequest) {
     const unit = preflight.purchase_units[0];
     if (unit.reference_id === "governed-consequence-examination") {
       const intakeId = unit.custom_id?.replace(/^governed-consequence-examination:/, "") ?? "";
-      if (!/^TA14-CEX-\\d{8}-[A-Z0-9]{10}$/.test(intakeId) ||
+      if (!/^TA14-CEX-\d{8}-[A-Z0-9]{10}$/.test(intakeId) ||
           unit.custom_id !== `governed-consequence-examination:${intakeId}` ||
           unit.amount?.value !== "149.00" || unit.amount?.currency_code !== "USD") {
         return jsonResponse({ error: "EXAMINATION_ORDER_MISMATCH", message: "Examination order details do not match the required purchase." }, 409);
