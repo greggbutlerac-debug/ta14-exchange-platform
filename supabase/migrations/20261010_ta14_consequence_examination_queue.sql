@@ -58,7 +58,7 @@ RETURNS trigger
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
-AS $
+AS $$
 DECLARE v_status text; v_frozen_at timestamptz;
 BEGIN
   SELECT status, evidence_frozen_at INTO v_status, v_frozen_at
@@ -69,7 +69,7 @@ BEGIN
   END IF;
   RETURN NEW;
 END;
-$;
+$$;
 DROP TRIGGER IF EXISTS ta14_guard_examination_evidence_insert
   ON public.ta14_consequence_intake_evidence;
 CREATE TRIGGER ta14_guard_examination_evidence_insert
@@ -101,7 +101,7 @@ RETURNS TABLE (
 LANGUAGE plpgsql
 SECURITY DEFINER
 SET search_path = ''
-AS $
+AS $$
 DECLARE
   v_intake public.ta14_consequence_examination_intakes%ROWTYPE;
   v_queue public.ta14_consequence_examination_queue%ROWTYPE;
@@ -187,7 +187,7 @@ BEGIN
     v_intake.paid_at, v_intake.evidence_manifest_sha256,
     coalesce(v_intake.evidence_item_count, 0), v_was_paid;
 END;
-$;
+$$;
 REVOKE ALL ON FUNCTION public.ta14_finalize_verified_examination_payment(
   text,text,text,timestamptz,jsonb,text,integer) FROM PUBLIC, anon, authenticated;
 GRANT EXECUTE ON FUNCTION public.ta14_finalize_verified_examination_payment(
