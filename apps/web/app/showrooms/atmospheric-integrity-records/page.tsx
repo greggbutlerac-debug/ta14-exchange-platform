@@ -1,54 +1,70 @@
+'use client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-export const metadata = {
-  title: 'Atmospheric Integrity Records (AIR) | TA14 Authority Governance Institution',
-  description: 'Independent educational demonstration of outdoor and indoor atmospheric observations, provenance, continuity, admissibility, authority and verified environmental outcomes.'
-};
-
-const chapters = [
-  {name:'01 · Atmospheric reality', body:'Outdoor and indoor environments are connected, but not interchangeable. Weather, outdoor sources, building envelope, ventilation, filtration, occupancy and indoor sources affect conditions. Record the boundary and the context before interpreting observations.'},
-  {name:'02 · Observation', body:'Identify pollutant, unit, sampling location, averaging period, device, calibration status and environmental conditions. A reading is a candidate observation—not proof of personal dose, disease, source attribution or compliance.'},
-  {name:'03 · Record', body:'Preserve original readings with time, provenance, instrument identity, custody, corrections and access history. Keep raw and adjusted values separate, with methods and uncertainty disclosed.'},
-  {name:'04 · Continuity', body:'Track missing intervals, instrument replacement, location changes, ventilation changes and other breaks. A record cannot silently bridge an unobserved period or a changed physical condition.'},
-  {name:'05 · Admissibility', body:'Examine whether the evidence is sufficient for the specific proposed claim. Indoor/outdoor comparisons require aligned time windows, appropriate instruments and contextual limitations. Observed is not inferred. Inferred is not authorized.'},
-  {name:'06 · Authority and standing', body:'Identify who proposes an action, who is affected, the applicable legal and operational authority, consent and the scope of permission. TA14 does not itself grant regulatory, medical or building-control authority.'},
-  {name:'07 · Bounded intervention', body:'Describe the proposed HVAC, filtration, source-control or public-health action, the authorized actor, permitted limits, safety constraints and evidence required before execution. A dashboard recommendation is not a command.'},
-  {name:'08 · Verified outcome', body:'Preserve post-intervention observations, changed conditions, comparison methods and uncertainty. A measured environmental change does not by itself establish reduced individual exposure, clinical benefit or causation.'}
+const stages = [
+ {title:'ONE ATMOSPHERE',sub:'Outdoor and indoor reality',lesson:'Air crosses a building boundary, but indoor and outdoor conditions are not identical. Outdoor smoke, envelope leakage, outdoor-air intake, filtration, occupancy and indoor sources all matter.',voice:'Stage one. One atmosphere, two observation environments. Outdoor smoke may influence indoor air through an intake, an open window, or leakage. But an indoor reading cannot be attributed to outdoors without additional evidence. Record the conditions on both sides of the building boundary.',tag:'REALITY',color:'#63b3ed'},
+ {title:'OBSERVATION',sub:'Two sensors are not one conclusion',lesson:'Illustrative observations: outdoor PM2.5 = 48 micrograms per cubic meter; classroom PM2.5 = 23 micrograms per cubic meter. These are hypothetical numbers, not field data. Instrument accuracy, units, timestamps, sampling periods and location must be examined.',voice:'Stage two. An outdoor instrument reads forty eight, and an indoor instrument reads twenty three micrograms per cubic meter. These are fictional classroom values. Without aligned sampling periods, calibration evidence and site context, we cannot infer infiltration, exposure or a health outcome.',tag:'OBSERVE',color:'#f6ad55'},
+ {title:'ATMOSPHERIC INTEGRITY RECORD',sub:'Preserve what actually happened',lesson:'AIR preserves raw values, device IDs, units, clock basis, sampling interval, location, instrument status, source records, access history and any adjustment method. Original observations are not overwritten.',voice:'Stage three. A number on a dashboard is not yet a defensible record. Preserve its original value, source, timestamp, location, instrument and custody. Corrections are additional entries, never silent replacements. Atmospheric Integrity Records maintain the evidentiary history.',tag:'RECORD',color:'#68d391'},
+ {title:'CONTINUITY',sub:'Show gaps and changing conditions',lesson:'The outdoor instrument has a hypothetical 14-minute data gap. The classroom air handler changes operating mode. Neither event can be hidden or treated as a continuous, unchanged condition.',voice:'Stage four. A missing observation is not an observed zero. A change in air handler operation is not the same physical condition. Continuity must reveal gaps, replacements, operating changes and uncertainty before comparisons are relied upon.',tag:'CONTINUITY',color:'#b794f4'},
+ {title:'ADMISSIBILITY',sub:'What does this evidence support?',lesson:'The readings may support a limited statement that two instruments reported different values during their respective intervals. They do not establish infiltration rate, individual dose, source attribution, legal compliance or medical causation.',voice:'Stage five. Examine the claim, not just the dataset. These observations may support a narrow description of measured conditions. They do not establish a source, a person's exposure, or a diagnosis. Observed is not inferred. Inferred is not authorized.',tag:'ADMISSIBILITY',color:'#f6e05e'},
+ {title:'AUTHORITY & STANDING',sub:'Who may decide what happens next?',lesson:'A facilities operator proposes a filtration adjustment. The room asks who has authority over the equipment, what operating limits apply, whether affected parties have standing, and whether the proposed action is permitted now.',voice:'Stage six. A plausible intervention is not permission. Identify the accountable operator, applicable authority, established standing, safety requirements and scope of the proposed consequence. Capability is not authority.',tag:'AUTHORITY',color:'#fc8181'},
+ {title:'BOUNDED EXECUTION',sub:'Proposed action is not executed action',lesson:'Example: inspect the filtration system and, only if locally authorized, adjust operation within documented equipment and safety constraints. The teaching scenario issues no live command. Missing authority produces HOLD, not automatic execution.',voice:'Stage seven. The system may recommend checking filtration, but no actuator command is issued here. The action remains bounded by local authority, equipment limits and evidence. When those conditions are unproven, the illustrative examination holds the proposal.',tag:'EXECUTION',color:'#4fd1c5'},
+ {title:'VERIFIED OUTCOME',sub:'Measure again; do not overclaim',lesson:'After a hypothetical authorized intervention, preserve new indoor and outdoor readings and operating context. A change in PM2.5 may be reported with limitations. It does not automatically prove clinical benefit or causal attribution.',voice:'Stage eight. Execution is not outcome. Capture post intervention measurements, preserve changed conditions and compare only what the evidence allows. Environmental improvement does not automatically prove a medical result. The new observation becomes the next reality.',tag:'OUTCOME',color:'#90cdf4'}
 ];
-const links=[
-  ['/environmental-integrity-governance','Environmental Integrity Governance (EIG)'],
-  ['/environmental-integrity-governance/pair','Personal Atmospheric Integrity Records (PAIR)'],
-  ['/showrooms/tamale-community-air-evidence','Community air evidence · Tamale'],
-  ['/showrooms/school-air-quality-governance','School air quality governance'],
-  ['/showrooms/environmental-accountability','Environmental accountability']
+const nav = [
+ ['/showrooms/environmental-atmospheric','Environmental & Atmospheric collection'],
+ ['/environmental-integrity-governance','Environmental Integrity Governance'],
+ ['/environmental-integrity-governance/pair','Personal Atmospheric Integrity Records'],
+ ['/showrooms/tamale-community-air-evidence','Tamale community air evidence'],
+ ['/showrooms','All showrooms']
 ];
-export default function AtmosphericIntegrityRecords() {
- return <main style={{maxWidth:1000,margin:'0 auto',padding:'48px 24px 100px',lineHeight:1.7}}>
-  <nav><Link href="/showrooms/environmental-atmospheric">← Environmental & Atmospheric</Link> · <Link href="/showrooms">All Showrooms</Link></nav>
-  <p style={{letterSpacing:'.1em',fontSize:13,marginTop:38}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · INDEPENDENT EDUCATIONAL ARCHITECTURE</p>
-  <h1 style={{fontSize:'clamp(2rem,5vw,4rem)',lineHeight:1.1}}>Atmospheric Integrity Records <span style={{whiteSpace:'nowrap'}}>(AIR)</span></h1>
-  <p style={{fontSize:'1.35rem'}}>One atmosphere. Indoor and outdoor reality. Defensible evidence.</p>
-  <p><strong>EDUCATIONAL DEMONSTRATION · NO LIVE MONITORING · NO FROZEN BASELINE · NO FORMAL DISPOSITION.</strong> All scenarios are illustrative. This page does not assert clinical efficacy, regulatory approval, independent validation, or endorsement by third parties.</p>
-  <section style={{padding:'24px',border:'1px solid currentColor',borderRadius:12,margin:'32px 0'}}>
-   <h2>The governing question</h2>
-   <p><strong>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</strong></p>
-   <p>Atmospheric Integrity Records preserve what was observed, where, when, how, and under which limitations. AIR does not convert observation into diagnosis, prediction into permission, or intervention into verified benefit.</p>
-  </section>
-  <h2>Eight evidence-to-consequence chapters</h2>
-  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))',gap:16}}>
-   {chapters.map(c=><article key={c.name} style={{padding:22,border:'1px solid #7776',borderRadius:12}}><h3>{c.name}</h3><p>{c.body}</p></article>)}
-  </div>
-  <section style={{marginTop:36}}>
-   <h2>Illustrative classroom crossing</h2>
-   <p>Outdoor PM2.5 increases during a regional smoke episode. An indoor sensor also reports elevated PM2.5. The observations must be preserved with timestamps, sensor metadata, ventilation state, window position, occupancy and uncertainty. The two readings alone do not prove infiltration rate, personal exposure or health harm.</p>
-   <p>A proposed filtration or ventilation adjustment remains a <strong>proposed consequence</strong> until claim-specific evidence, applicable authority, standing and safe execution limits are established. After any authorized intervention, record actual execution and compare relevant post-condition measurements without overstating the result.</p>
-  </section>
-  <section style={{marginTop:36}}>
-   <h2>How AIR connects to TA14</h2>
-   <p><strong>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</strong></p>
-   <p>Possible dispositions at an examined consequence boundary: <strong>ALLOW / HOLD / DENY / ESCALATE</strong>. No disposition is issued by this teaching room.</p>
-   <ul>{links.map(([href,label])=><li key={href}><Link href={href}>{label} →</Link></li>)}</ul>
-  </section>
-  <p style={{marginTop:36}}><Link href="/showrooms/environmental-atmospheric">← Return to Environmental & Atmospheric showrooms</Link></p>
+function Diagram({step}:{step:number}) {
+ const s=stages[step];
+ return <svg viewBox="0 0 900 500" role="img" aria-label={s.title+' illustrated teaching diagram'} style={{width:'100%',height:'auto',display:'block',borderRadius:16,background:'#091827'}}>
+ <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop stopColor="#163b56"/><stop offset="1" stopColor="#0b1e2e"/></linearGradient><pattern id="grid" width="32" height="32" patternUnits="userSpaceOnUse"><path d="M32 0H0V32" fill="none" stroke="#ffffff" strokeOpacity=".05"/></pattern></defs>
+ <rect width="900" height="500" fill="url(#sky)"/><rect width="900" height="500" fill="url(#grid)"/>
+ <text x="34" y="42" fill="#d6e7f4" fontSize="15" fontWeight="700">TA14 · ATMOSPHERIC INTEGRITY RECORDS</text><text x="865" y="42" fill={s.color} textAnchor="end" fontSize="18" fontWeight="800">{String(step+1).padStart(2,'0')} / 08</text>
+ <rect x="35" y="77" width="386" height="315" rx="14" fill="#14324a" stroke="#5a94b0"/><rect x="479" y="77" width="386" height="315" rx="14" fill="#123c40" stroke="#5aa39d"/>
+ <text x="60" y="115" fill="#b4dafa" fontSize="24" fontWeight="700">OUTDOOR ATMOSPHERE</text><text x="505" y="115" fill="#b9f2dd" fontSize="24" fontWeight="700">INDOOR CLASSROOM</text>
+ <circle cx="112" cy="184" r="36" fill="#f7b955" opacity=".85"/><path d="M70 272 Q110 238 148 272 T240 272 T330 272" stroke="#b4dafa" strokeWidth="7" fill="none" opacity=".65"/>
+ <rect x="538" y="165" width="250" height="153" rx="6" fill="#1f5260" stroke="#9bd6ca" strokeWidth="3"/><rect x="554" y="181" width="94" height="63" fill="#366d82" stroke="#c4e6eb"/><path d="M554 181L648 244M648 181L554 244" stroke="#9bc5cf"/><rect x="678" y="264" width="82" height="13" fill="#8ab3b1"/><rect x="694" y="277" width="9" height="40" fill="#8ab3b1"/><rect x="741" y="277" width="9" height="40" fill="#8ab3b1"/>
+ <path d="M399 230H501" stroke={s.color} strokeWidth="6" strokeDasharray={step===5||step===6?'9 12':'0'} /><path d="M491 217L509 230L491 243" fill="none" stroke={s.color} strokeWidth="6"/>
+ <rect x="153" y="307" width="225" height="62" rx="10" fill="#071b2c" stroke="#75a7be"/><rect x="522" y="307" width="300" height="62" rx="10" fill="#09272c" stroke="#75b5a6"/>
+ <text x="266" y="333" textAnchor="middle" fill="#e5f3ff" fontSize="18">{step===1||step===2?'PM2.5 · 48 µg/m³':step===3?'14 MIN GAP FLAGGED':step===4?'CLAIM MUST BE BOUNDED':step===5?'AUTHORITY REQUIRED':step===6?'NO LIVE COMMAND':'SOURCE + CONTEXT'}</text>
+ <text x="672" y="333" textAnchor="middle" fill="#e5fff2" fontSize="18">{step===1||step===2?'PM2.5 · 23 µg/m³':step===3?'AHU MODE CHANGED':step===4?'NOT A DIAGNOSIS':step===5?'STANDING REQUIRED':step===6?'HOLD PENDING PROOF':'OBSERVATION ≠ PERMISSION'}</text>
+ <text x="266" y="354" textAnchor="middle" fill="#9ab9c9" fontSize="12">ILLUSTRATIVE · NOT FIELD DATA</text><text x="672" y="354" textAnchor="middle" fill="#9ab9c9" fontSize="12">ILLUSTRATIVE · NOT FIELD DATA</text>
+ <rect x="35" y="412" width="830" height="59" rx="11" fill="#07121e" stroke={s.color}/><text x="57" y="449" fill={s.color} fontSize="21" fontWeight="700">{s.tag}</text><text x="845" y="449" textAnchor="end" fill="#e9f3f8" fontSize="18">{step===0?'CONNECTED ≠ IDENTICAL':step===1?'MEASUREMENT ≠ CAUSATION':step===2?'RAW RECORDS PRESERVED':step===3?'GAPS REMAIN VISIBLE':step===4?'OBSERVED ≠ AUTHORIZED':step===5?'CAPABILITY ≠ AUTHORITY':step===6?'HOLD UNTIL ESTABLISHED':'OUTCOME MUST BE EXAMINED'}</text>
+ </svg>;
+}
+export default function AtmosphericIntegrityRecords(){
+ const [index,setIndex]=useState(0); const [speaking,setSpeaking]=useState(false); const [evidence,setEvidence]=useState([false,false,false,false]);
+ useEffect(()=>{return ()=>{if(typeof window!=='undefined'&&'speechSynthesis'in window)window.speechSynthesis.cancel();};},[]);
+ function change(i:number){if(typeof window!=='undefined'&&'speechSynthesis'in window)window.speechSynthesis.cancel();setSpeaking(false);setIndex(i);}
+ function narrate(){if(!('speechSynthesis'in window))return;window.speechSynthesis.cancel();if(speaking){setSpeaking(false);return;}const u=new SpeechSynthesisUtterance(stages[index].voice);u.rate=.93;u.onend=()=>setSpeaking(false);u.onerror=()=>setSpeaking(false);const voices=window.speechSynthesis.getVoices();const v=voices.find(v=>/samantha/i.test(v.name))||voices.find(v=>/en-US/.test(v.lang));if(v)u.voice=v;window.speechSynthesis.speak(u);setSpeaking(true);}
+ const s=stages[index]; const checks=['Source instruments and timestamps verified','Gaps and uncertainty accounted for','Applicable execution authority established','Standing and safe operating limits established'];
+ return <main style={{maxWidth:1140,margin:'0 auto',padding:'28px 20px 100px',lineHeight:1.65}}>
+ <nav><Link href="/showrooms/environmental-atmospheric">← Environmental & Atmospheric</Link> · <Link href="/showrooms">All Showrooms</Link></nav>
+ <p style={{fontSize:12,letterSpacing:'.13em',marginTop:34}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · INDEPENDENT EDUCATIONAL SHOWROOM</p>
+ <h1 style={{fontSize:'clamp(2.2rem,5vw,4.4rem)',lineHeight:1.08,margin:'12px 0'}}>Atmospheric Integrity Records <span style={{color:'#7dbbd2'}}>(AIR)</span></h1>
+ <p style={{fontSize:'1.3rem'}}>One atmosphere. Indoor and outdoor reality. Defensible evidence.</p>
+ <p style={{fontSize:13,opacity:.8}}>ILLUSTRATIVE CLASSROOM SCENARIO · NO LIVE DATA OR CONTROL · BASELINE NOT FROZEN · NO FORMAL DISPOSITION · NO THIRD-PARTY ENDORSEMENT OR CLINICAL CLAIM</p>
+ <section style={{padding:22,border:'1px solid #7c9aab',borderRadius:14,margin:'28px 0'}}><strong>The governing question</strong><p style={{fontSize:'1.2rem',marginBottom:0}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p></section>
+ <section aria-label="Eight stage guided classroom">
+ <div style={{display:'flex',flexWrap:'wrap',gap:7,marginBottom:18}}>{stages.map((x,i)=><button key={i} type="button" onClick={()=>change(i)} aria-label={'Open stage '+(i+1)+' '+x.title} aria-current={i===index?'step':undefined} style={{cursor:'pointer',padding:'9px 14px',borderRadius:9,border:i===index?'2px solid #7bd5ff':'1px solid #789',background:i===index?'#173e56':'transparent',color:'inherit'}}>{String(i+1).padStart(2,'0')}</button>)}</div>
+ <Diagram step={index}/>
+ <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:12,flexWrap:'wrap',marginTop:14}}>
+ <div><p style={{fontSize:12,letterSpacing:'.1em',margin:'0 0 3px'}}>STAGE {String(index+1).padStart(2,'0')} / 08</p><h2 style={{margin:0}}>{s.title}</h2><p style={{margin:'4px 0'}}>{s.sub}</p></div>
+ <div style={{display:'flex',gap:8,flexWrap:'wrap'}}><button onClick={narrate} type="button" style={{padding:'11px 16px',borderRadius:9,cursor:'pointer'}}>{speaking?'■ Stop narration':'▶ Samantha narration (if available)'}</button><button onClick={()=>change(Math.max(0,index-1))} disabled={index===0} type="button" style={{padding:'11px 16px',borderRadius:9,cursor:'pointer'}}>← Previous</button><button onClick={()=>change(Math.min(7,index+1))} disabled={index===7} type="button" style={{padding:'11px 16px',borderRadius:9,cursor:'pointer'}}>Next →</button></div>
+ </div>
+ <article style={{padding:'20px 0 28px',fontSize:'1.08rem'}}><h3>What this image teaches</h3><p>{s.lesson}</p></article>
+ </section>
+ <section style={{borderTop:'1px solid #789',paddingTop:30}}>
+ <h2>Practitioner pressure test · Should the intervention proceed?</h2>
+ <p>Illustrative proposal: change classroom air-handler operation during a smoke episode. Check only what the scenario has actually established. These boxes are a teaching exercise, not evidence validation.</p>
+ <div style={{display:'grid',gap:10}}>{checks.map((c,i)=><label key={c} style={{display:'flex',gap:12,alignItems:'center',padding:12,border:'1px solid #789',borderRadius:9}}><input type="checkbox" checked={evidence[i]} onChange={e=>setEvidence(a=>a.map((v,j)=>j===i?e.target.checked:v))}/>{c}</label>)}</div>
+ <div style={{padding:20,marginTop:16,border:'1px solid #b89c59',borderRadius:12}}><strong>Illustrative disposition: {evidence.every(Boolean)?'READY FOR FORMAL EXAMINATION — NOT AN ALLOW':'HOLD — REQUIREMENTS NOT ESTABLISHED'}</strong><p style={{marginBottom:0}}>Checking boxes does not prove that evidence or authority exists. No action is authorized or executed here. A real ALLOW / HOLD / DENY / ESCALATE decision requires an independent, case-specific examination.</p></div>
+ </section>
+ <section style={{paddingTop:30}}><h2>From atmosphere to accountable consequence</h2><p><strong>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</strong></p><p>AIR preserves the environmental record; EIG examines its use in governance. PAIR concerns person-centered environmental chronology. None automatically establishes individual exposure, medical causation, permission to act, or a verified health outcome.</p><h3>Explore connected architecture</h3><ul>{nav.map(([href,label])=><li key={href}><Link href={href}>{label} →</Link></li>)}</ul></section>
  </main>;
 }
