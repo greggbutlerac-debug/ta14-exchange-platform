@@ -107,16 +107,12 @@ DECLARE
   v_queue public.ta14_consequence_examination_queue%ROWTYPE;
   v_was_paid boolean;
 BEGIN
-  IF p_intake_id !~ '^TA14-CEX-[0-9]{8}-[A-Z0-9]{10}
-
-     OR p_order_id !~ '^[A-Z0-9]{1,36}
-
-     OR p_capture_id !~ '^[A-Z0-9]{1,36}
-
+  IF p_intake_id !~ '^TA14-CEX-[0-9]{8}-[A-Z0-9]{10}$'
+     OR p_order_id !~ '^[A-Z0-9]{1,36}$'
+     OR p_capture_id !~ '^[A-Z0-9]{1,36}$'
      OR p_paid_at IS NULL
      OR p_manifest IS NULL
-     OR p_manifest_sha256 !~ '^[0-9a-f]{64}
-
+     OR p_manifest_sha256 !~ '^[0-9a-f]{64}$'
      OR p_evidence_item_count IS NULL OR p_evidence_item_count < 0
   THEN
     RAISE EXCEPTION 'Invalid verified payment finalization parameters';
