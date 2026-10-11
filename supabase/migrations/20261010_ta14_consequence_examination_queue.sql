@@ -51,6 +51,33 @@ REVOKE ALL ON public.ta14_consequence_examination_queue FROM anon,authenticated;
 REVOKE ALL ON public.ta14_consequence_examination_queue_events FROM anon,authenticated;
 
 
+-- Evidence writes must serialize against the same parent intake row lock
+-- used by the payment finalization transaction.
+CREATE OR REPLACE FUNCTION public.ta14_guard_examination_evidence_insert()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = ''
+AS $
+DECLARE v_status text; v_frozen_at timestamptz;
+BEGIN
+  SELECT status, evidence_frozen_at INTO v_status, v_frozen_at
+    FROM public.ta14_consequence_examination_intakes
+    WHERE intake_id = NEW.intake_id FOR UPDATE;
+  IF NOT FOUND OR v_status <> 'READY_FOR_PAYMENT' OR v_frozen_at IS NOT NULL THEN
+    RAISE EXCEPTION 'Examination evidence is frozen or intake is not payable';
+  END IF;
+  RETURN NEW;
+END;
+$;
+DROP TRIGGER IF EXISTS ta14_guard_examination_evidence_insert
+  ON public.ta14_consequence_intake_evidence;
+CREATE TRIGGER ta14_guard_examination_evidence_insert
+  BEFORE INSERT ON public.ta14_consequence_intake_evidence
+  FOR EACH ROW EXECUTE FUNCTION public.ta14_guard_examination_evidence_insert();
+REVOKE ALL ON FUNCTION public.ta14_guard_examination_evidence_insert()
+  FROM PUBLIC, anon, authenticated;
+
 -- One database transaction for the verified payment, evidence freeze, queue,
 -- and initial chronology event. Only the trusted service role may execute.
 CREATE OR REPLACE FUNCTION public.ta14_finalize_verified_examination_payment(
@@ -100,6 +127,14 @@ BEGIN
     WHERE intake_id = p_intake_id FOR UPDATE;
   IF NOT FOUND THEN
     RAISE EXCEPTION 'Examination intake does not exist';
+  END IF;
+
+  -- Locking the parent intake serializes evidence inserts against payment
+  -- finalization. Reject stale manifests rather than silently omitting files.
+  IF NOT v_intake.status = 'PAID' AND
+     (SELECT count(*) FROM public.ta14_consequence_intake_evidence
+       WHERE intake_id = p_intake_id) <> p_evidence_item_count THEN
+    RAISE EXCEPTION 'Evidence changed during payment finalization; reconciliation required';
   END IF;
 
   v_was_paid := v_intake.status = 'PAID';
