@@ -70,6 +70,7 @@ export function evaluateExecutionAuthority(input: ExecutionAuthorityInput): Auth
   let determination: AuthorityDetermination = 'ALLOW';
 
   if (!validTimestamp(now) || (authority !== null && (!validTimestamp(authority.effectiveAt) || !validTimestamp(authority.expiresAt)))) { determination = 'DENY'; reasons.push('INVALID_AUTHORITY_TIMESTAMP'); }
+  if (authority && validTimestamp(authority.effectiveAt) && validTimestamp(authority.expiresAt) && new Date(authority.effectiveAt).getTime() >= new Date(authority.expiresAt).getTime()) { determination = 'DENY'; reasons.push('INVALID_AUTHORITY_INTERVAL'); }
   if (!evidence.continuitySupported) { if (determination !== 'DENY') determination = 'HOLD'; reasons.push('CONTINUITY_UNSUPPORTED'); }
   if (!evidence.admissibilitySupported) { if (determination !== 'DENY') determination = 'HOLD'; reasons.push('ADMISSIBILITY_UNSUPPORTED'); }
   if (change?.material) { standing = 'CHALLENGED'; if (determination !== 'DENY') determination = 'HOLD'; reasons.push('MATERIAL_CHANGE_REQUIRES_REAUTHORIZATION'); }
@@ -134,7 +135,7 @@ export function evaluateExecutionAttempt(input: { authorityInput: ExecutionAutho
   if (input.interventionAuthority) {
     const override = input.interventionAuthority;
     const t = new Date(input.attempt.attemptedAt).getTime();
-    const valid = !override.revoked && override.routeId === input.authorityInput.asset.routeId && override.consequence === input.attempt.consequence && new Date(override.effectiveAt).getTime() <= t && new Date(override.expiresAt).getTime() > t;
+    const valid = validTimestamp(input.attempt.attemptedAt) && validTimestamp(override.effectiveAt) && validTimestamp(override.expiresAt) && new Date(override.effectiveAt).getTime() < new Date(override.expiresAt).getTime() && !override.revoked && override.routeId === input.authorityInput.asset.routeId && override.consequence === input.attempt.consequence && new Date(override.effectiveAt).getTime() <= t && new Date(override.expiresAt).getTime() > t;
     if (!valid) { if (determination !== 'DENY') determination = 'ESCALATE'; executionPermitted = false; reasons.push('INTERVENTION_AUTHORITY_INVALID_OR_UNSCOPED'); }
   }
 
