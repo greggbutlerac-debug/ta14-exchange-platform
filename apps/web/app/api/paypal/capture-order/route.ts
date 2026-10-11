@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -413,6 +414,43 @@ export async function POST(request: NextRequest) {
   try {
     const accessToken =
       await getPayPalAccessToken(environment);
+
+    // Inspect the approved order before taking money. An examination order
+    // must match a persisted, still-payable intake and the exact $149 price.
+    const preflightResponse = await fetch(
+      `${environment.apiBase}/v2/checkout/orders/${encodeURIComponent(orderId)}`,
+      { headers: { Authorization: `Bearer ${accessToken}`, Accept: "application/json" }, cache: "no-store" },
+    );
+    if (!preflightResponse.ok) {
+      return jsonResponse({ error: "PAYPAL_ORDER_PREFLIGHT_FAILED", message: "Unable to verify this order before capture." }, 502);
+    }
+    const preflight = (await preflightResponse.json()) as PayPalOrderResponse;
+    if (preflight.id !== orderId || preflight.purchase_units?.length !== 1) {
+      return jsonResponse({ error: "PAYPAL_ORDER_PREFLIGHT_INVALID", message: "Order structure cannot be verified." }, 409);
+    }
+    const unit = preflight.purchase_units[0];
+    if (unit.reference_id === "governed-consequence-examination") {
+      const intakeId = unit.custom_id?.replace(/^governed-consequence-examination:/, "") ?? "";
+      if (!/^TA14-CEX-\\d{8}-[A-Z0-9]{10}$/.test(intakeId) ||
+          unit.custom_id !== `governed-consequence-examination:${intakeId}` ||
+          unit.amount?.value !== "149.00" || unit.amount?.currency_code !== "USD") {
+        return jsonResponse({ error: "EXAMINATION_ORDER_MISMATCH", message: "Examination order details do not match the required purchase." }, 409);
+      }
+      const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim();
+      const key = process.env.SUPABASE_SECRET_KEY?.trim() || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
+      if (!url || !key) {
+        return jsonResponse({ error: "EXAMINATION_DATABASE_UNAVAILABLE", message: "Cannot validate the examination before capture." }, 503);
+      }
+      const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+      const { data: intake, error: intakeError } = await db.from("ta14_consequence_examination_intakes")
+        .select("status").eq("intake_id", intakeId).maybeSingle();
+      if (intakeError) {
+        return jsonResponse({ error: "EXAMINATION_INTAKE_LOOKUP_FAILED", message: "Cannot validate the examination before capture." }, 503);
+      }
+      if (intake?.status !== "READY_FOR_PAYMENT") {
+        return jsonResponse({ error: "EXAMINATION_INTAKE_NOT_PAYABLE", message: "This examination is not awaiting payment. Do not pay again." }, 409);
+      }
+    }
 
     const captureUrl =
       `${environment.apiBase}/v2/checkout/orders/` +
