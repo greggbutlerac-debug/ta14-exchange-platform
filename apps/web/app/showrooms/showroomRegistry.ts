@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Atmospheric Integrity Records (AIR) · Indoor and Outdoor Evidence','/showrooms/atmospheric-integrity-records','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Foundational AIR atmospheric integrity records outdoor indoor air evidence provenance continuity admissibility authority intervention verified outcomes'],
 ['Predictive Intelligence and the Consequence Boundary','/showrooms/predictive-intelligence-consequence-boundary','INTEROPERABILITY & SYSTEMS','Predictive AI BAS VAV evidence authority standing eight numbered scenes Samantha interactive simulated examination technical reference'],
 ['When Community Air Becomes Evidence · Tamale, Northern Ghana','/showrooms/tamale-community-air-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Tamale Ghana community air evidence atmospheric integrity records independent technical educational demonstration'],
 ['Environmental Accountability · From Promise to Verified Consequence','/showrooms/environmental-accountability','ENVIRONMENT & ATMOSPHERIC INTEGRITY','TA14 Environmental Accountability Initiative ten lesson institutional examination clean air commitments AIR EIG evidence regulatory duty authority standing intervention independent pilot'],
