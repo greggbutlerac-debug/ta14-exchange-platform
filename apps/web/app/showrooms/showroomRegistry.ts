@@ -9,6 +9,7 @@ export const showroomCollections=[
 ['GOVERNANCE & ARCHITECTURES','TA14 architectures and registered governance teaching surfaces.'],
 ['EXAMINATIONS & DEMONSTRATIONS','Bounded examinations, proving-ground demonstrations and tests.'],
 ['EVENTS & PRESENTATIONS','Conference, meeting and presentation experiences.'],
+['Malawi 2026 · Clean Air Governance','/showrooms/malawi-clean-air-governance','COUNTRIES & PUBLIC INSTITUTIONS','Malawi atmospheric integrity evidence local authority Karonga hypothetical clean air'],
 ] as const;
 
 export const showroomRooms=[
