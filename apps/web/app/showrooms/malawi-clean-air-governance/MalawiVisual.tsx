@@ -3,8 +3,8 @@ import {useState} from 'react';
 import TeachingDiagram from './TeachingDiagram';
 const illustrations=[
 'TA14 Governed Environmental Evidence.png',
-'From Sensor Data to Real-World Impact.png',
-'From Measurement to Real-World Impact.png',
+'TA14 Governed Environmental Evidence.png',
+'TA14 Governed Environmental Evidence.png',
 'From Sensor Reading to Governed Outcome.png',
 'Pyramid of Value_ Sensor to Impact.png',
 'The Sensor’s Highest Purpose.png',
