@@ -61,19 +61,22 @@ function receipt<T extends GceaCanonicalVersion>(payload: unknown, canonicalVers
   return { algorithm: 'SHA-256', canonicalVersion, hash, replayId: `TA14-GCEA-${hash.slice(0, 20).toUpperCase()}`, payload };
 }
 
+function validTimestamp(value: string): boolean { return typeof value === 'string' && value.trim().length > 0 && Number.isFinite(new Date(value).getTime()); }
+
 export function evaluateExecutionAuthority(input: ExecutionAuthorityInput): AuthorityEvaluation {
   const { asset, authority, change, evidence, now } = input;
   const reasons: string[] = [];
   let standing: StandingState = 'CURRENT';
   let determination: AuthorityDetermination = 'ALLOW';
 
-  if (!evidence.continuitySupported) { determination = 'HOLD'; reasons.push('CONTINUITY_UNSUPPORTED'); }
-  if (!evidence.admissibilitySupported) { determination = 'HOLD'; reasons.push('ADMISSIBILITY_UNSUPPORTED'); }
-  if (change?.material) { standing = 'CHALLENGED'; determination = 'HOLD'; reasons.push('MATERIAL_CHANGE_REQUIRES_REAUTHORIZATION'); }
+  if (!validTimestamp(now) || (authority !== null && (!validTimestamp(authority.effectiveAt) || !validTimestamp(authority.expiresAt)))) { determination = 'DENY'; reasons.push('INVALID_AUTHORITY_TIMESTAMP'); }
+  if (!evidence.continuitySupported) { if (determination !== 'DENY') determination = 'HOLD'; reasons.push('CONTINUITY_UNSUPPORTED'); }
+  if (!evidence.admissibilitySupported) { if (determination !== 'DENY') determination = 'HOLD'; reasons.push('ADMISSIBILITY_UNSUPPORTED'); }
+  if (change?.material) { standing = 'CHALLENGED'; if (determination !== 'DENY') determination = 'HOLD'; reasons.push('MATERIAL_CHANGE_REQUIRES_REAUTHORIZATION'); }
 
-  if (!authority) { determination = 'HOLD'; reasons.push('AUTHORITY_ABSENT'); }
+  if (!authority) { if (determination !== 'DENY') determination = 'HOLD'; reasons.push('AUTHORITY_ABSENT'); }
   else if (authority.revoked) { standing = 'REVOKED'; determination = 'DENY'; reasons.push('AUTHORITY_REVOKED'); }
-  else if (new Date(authority.effectiveAt).getTime() > new Date(now).getTime()) { determination = 'HOLD'; reasons.push('AUTHORITY_NOT_EFFECTIVE'); }
+  else if (new Date(authority.effectiveAt).getTime() > new Date(now).getTime()) { if (determination !== 'DENY') determination = 'HOLD'; reasons.push('AUTHORITY_NOT_EFFECTIVE'); }
   else if (new Date(authority.expiresAt).getTime() <= new Date(now).getTime()) { standing = 'EXPIRED'; determination = 'DENY'; reasons.push('AUTHORITY_EXPIRED'); }
   else if (authority.assetId !== asset.assetId || authority.assetVersion !== asset.version || authority.routeId !== asset.routeId || authority.consequence !== asset.consequence) { determination = 'DENY'; reasons.push('AUTHORITY_SCOPE_MISMATCH'); }
 
@@ -122,15 +125,17 @@ export function evaluateExecutionAttempt(input: { authorityInput: ExecutionAutho
   let determination: AuthorityDetermination = standing.determination;
   let executionPermitted = false;
 
+  if (!validTimestamp(input.attempt.attemptedAt)) { determination = 'DENY'; reasons.push('INVALID_ATTEMPT_TIMESTAMP'); }
   if (input.attempt.consequence !== input.authorityInput.asset.consequence) { determination = 'DENY'; reasons.push('ATTEMPT_CONSEQUENCE_MISMATCH'); }
   else if (standing.determination !== 'ALLOW' || standing.bindingScope !== input.attempt.consequence) { determination = 'DENY'; reasons.push('EXECUTION_BOUNDARY_REFUSED'); }
+  else if (determination === 'DENY') { reasons.push('EXECUTION_BOUNDARY_REFUSED'); }
   else { executionPermitted = true; determination = 'ALLOW'; reasons.push('EXECUTION_BOUNDARY_PERMITTED'); }
 
   if (input.interventionAuthority) {
     const override = input.interventionAuthority;
     const t = new Date(input.attempt.attemptedAt).getTime();
     const valid = !override.revoked && override.routeId === input.authorityInput.asset.routeId && override.consequence === input.attempt.consequence && new Date(override.effectiveAt).getTime() <= t && new Date(override.expiresAt).getTime() > t;
-    if (!valid) { determination = 'ESCALATE'; executionPermitted = false; reasons.push('INTERVENTION_AUTHORITY_INVALID_OR_UNSCOPED'); }
+    if (!valid) { if (determination !== 'DENY') determination = 'ESCALATE'; executionPermitted = false; reasons.push('INTERVENTION_AUTHORITY_INVALID_OR_UNSCOPED'); }
   }
 
   const payload = { canonicalVersion: 'TA14.GCEA.EXECUTION.v1', authorityInput: input.authorityInput, standingReceiptHash: standing.receipt.hash, attempt: input.attempt, interventionAuthority: input.interventionAuthority ?? null, determination, executionPermitted, reasonCodes: reasons, evaluatedAt: input.attempt.attemptedAt };
