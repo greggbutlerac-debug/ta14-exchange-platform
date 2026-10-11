@@ -18,4 +18,4 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Execute isolated adversarial tests
-        run: npm test -- tests/ta14-internal-adversarial-001.test.ts
+        run: npm test -- tests/ta14-internal-adversarial-001.test.ts tests/ta14-internal-adversarial-001-outcome.test.ts tests/ta14-internal-adversarial-001-temporal.test.ts tests/ta14-internal-adversarial-001-binding.test.ts
