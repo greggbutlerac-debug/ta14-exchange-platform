@@ -36,7 +36,9 @@ const originalFilenameCandidates:Record<number,string[]>={
  4:['Atmospheric Integrity Record Infographic.png'],
  5:['The Authority Boundary_ Environmental Governance Gate.png'],
  6:['From Evidence to Authorized Action.png'],
- 7:['The Verified Outcome Infographic.png']
+ 7:['The Verified Outcome Infographic.png'],
+ 8:['The Independent Governance Overlay.png'],
+ 9:['01-pilot-ownership.png']
 };
 const referencePdf='TA14_Environmental_Accountability_Institutional_Examination_and_Pilot_Reference_v3.0.pdf';
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
