@@ -15,7 +15,9 @@ const lessons=[
 ['The Institutional Invitation','From technical examination to a funded pilot','Invite a regulator or institutional partner to define a bounded, time-limited examination with roles, privacy, success criteria, falsifiers, and independent review. A pilot is not regulatory endorsement.']
 ];
 // GitHub uploads were placed directly in apps/web/public; retain the packaged subfolder as a fallback.
-const assetRoots=['/','/environmental-accountability/'];
+// The uploaded asset package is currently nested beneath public/apps/web/public/ on main.
+// Prefer those original numbered illustrations over subject-matched fallback images.
+const assetRoots=['/apps/web/public/environmental-accountability/','/environmental-accountability/','/'];
 const imageFiles=[
 'TA14_Environmental_Accountability_01_The_Promise.png',
 'TA14_Environmental_Accountability_02_Human_Infrastructure.png',
