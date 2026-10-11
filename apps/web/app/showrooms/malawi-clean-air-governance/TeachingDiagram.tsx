@@ -66,7 +66,7 @@ export default function TeachingDiagram({number,title,copy}:DiagramProps){
  <text x={x+49} y={y+57} textAnchor="middle" fill="#071927" fontSize="23" fontWeight="bold">{i+1}</text>
  <text x={x+92} y={y+56} fill="#f8fbfe" fontSize="22" fontWeight="bold">{item.heading}</text>
  <text x={x+25} y={y+115} fill="#c6e2ee" fontSize="19">{item.detail}</text>
- <text x={x+25} y={y+151} fill="#8dc4d7" fontSize="15">EVIDENCE BEFORE CONSEQUENCE</text>
+ <text x={x+25} y={y+151} fill="#8dc4d7" fontSize="15">{stages[Math.max(0,Math.min(7,Number(number)-1))]} · SECTION {i+1}</text>
  </g>})}
  <rect x="55" y="612" width="990" height="64" rx="12" fill="#16475c" stroke="#efc56b" strokeWidth="2"/>
  <text x="80" y="651" fill="#ffe3a0" fontSize="21" fontWeight="bold">TA14 GATE: {gate}</text>
