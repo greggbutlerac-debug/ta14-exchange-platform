@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['When Community Air Becomes Evidence · Tamale, Northern Ghana','/showrooms/tamale-community-air-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Kombian James Libaarbor Tamale community air Quali Breeze independent eight illustrated chapters browser Samantha narration evidence authority outcome technical reference v2.3'],
 ['Intelligent Infrastructure · From Edge Attestation to Authorized Physical Consequence','/showrooms/jeffrey-decoux-intelligent-infrastructure','INTEROPERABILITY & SYSTEMS','Jeffrey DeCoux independent technical pre-examination physical AI autonomous mobility AFA EABA eight images Samantha narration execution authority technical reference'],
 ['The Filter Is Not the Proof · Filtration Evidence and Authority','/showrooms/the-filter-is-not-the-proof','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Filtration performance installation operating reality evidence continuity authority execution verified outcome eight-image English French audio technical reference'],
 ['School Air Quality Governance · From Monitoring to Authorized Intervention','/showrooms/school-air-quality-governance','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images school IAQ evidence authority Samantha narration'],
