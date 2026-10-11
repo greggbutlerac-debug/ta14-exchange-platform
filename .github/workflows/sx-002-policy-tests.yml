@@ -1,0 +1,25 @@
+name: SX-002 isolated policy tests
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - audit/afa-eaba-sx-002-candidate
+    paths:
+      - apps/web/lib/governance/sx-002-policy-prototype.ts
+      - apps/web/lib/governance/sx-002-policy-prototype.test.ts
+      - .github/workflows/sx-002-policy-tests.yml
+permissions:
+  contents: read
+jobs:
+  isolated-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Execute committed TypeScript policy tests
+        run: npm exec --yes --package=tsx -- tsx --test apps/web/lib/governance/sx-002-policy-prototype.test.ts
+      - name: State test scope
+        run: echo 'Policy-level checks only. No database effects, credentials, or deployments.'
