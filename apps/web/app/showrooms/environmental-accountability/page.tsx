@@ -31,7 +31,10 @@ const imageFiles=[
 // Original GitHub upload filenames verified in apps/web/public. These are illustrative title matches, not independently examined records.
 const originalFilenameCandidates:Record<number,string[]>={
  3:['From Measurement to Environmental Evidence.png'],
- 5:['The Authority Boundary_ Environmental Governance Gate.png']
+ 4:['Atmospheric Integrity Record Infographic.png'],
+ 5:['The Authority Boundary_ Environmental Governance Gate.png'],
+ 6:['From Evidence to Authorized Action.png'],
+ 7:['The Verified Outcome Infographic.png']
 };
 const referencePdf='TA14_Environmental_Accountability_Institutional_Examination_and_Pilot_Reference_v3.0.pdf';
 const chain=['REALITY','RECORD','CONTINUITY','ADMISSIBILITY','BINDING','COMMIT','EXECUTION','OUTCOME'];
