@@ -30,6 +30,8 @@ const imageFiles=[
 ];
 // Original GitHub upload filenames verified in apps/web/public. These are illustrative title matches, not independently examined records.
 const originalFilenameCandidates:Record<number,string[]>={
+ 0:['01-proof-over-promise-proof-is-not-permission.png'],
+ 1:['01-human-consequence-boundary.png'],
  3:['From Measurement to Environmental Evidence.png'],
  4:['Atmospheric Integrity Record Infographic.png'],
  5:['The Authority Boundary_ Environmental Governance Gate.png'],
