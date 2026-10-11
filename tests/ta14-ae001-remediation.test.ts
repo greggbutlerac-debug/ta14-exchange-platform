@@ -49,6 +49,23 @@ describe('AE001 remediation regression expectations', () => {
     expect(result.executionPermitted).toBe(false);
     expect(result.record.reasonCodes).toContain('COMMIT_INPUT_RECEIPT_MISMATCH');
   });
+  it('rejects inverted authority validity interval', () => {
+    const input = baseline(); input.authority!.effectiveAt = '2027-01-01T00:00:00Z'; input.authority!.expiresAt = '2026-01-01T00:00:00Z';
+    const result = evaluateExecutionAuthority(input);
+    expect(result.determination).toBe('DENY');
+    expect(result.reasonCodes).toContain('INVALID_AUTHORITY_INTERVAL');
+    expect(evaluateCommit(input).commitPermitted).toBe(false);
+  });
+  it('rejects zero-duration authority validity interval', () => {
+    const input = baseline(); input.authority!.expiresAt = input.authority!.effectiveAt;
+    expect(evaluateExecutionAuthority(input).reasonCodes).toContain('INVALID_AUTHORITY_INTERVAL');
+  });
+  it('rejects invalid intervention interval without granting execution', () => {
+    const input = baseline();
+    const result = evaluateExecutionAttempt({ authorityInput: input, attempt: attempt(input.now), interventionAuthority: { authorityId: 'I', routeId: 'R', consequence: 'mock_action', effectiveAt: '2027-01-01T00:00:00Z', expiresAt: '2026-01-01T00:00:00Z', revoked: false } });
+    expect(result.executionPermitted).toBe(false);
+    expect(result.determination).toBe('ESCALATE');
+  });
   it('allows valid bounded internal demonstration, without claiming external effect', () => {
     const input = baseline(); const prior = evaluateCommit(input);
     const result = createExecutionRecord({ authorityInput: input, commitEvaluation: prior, attempt: attempt(input.now) });
