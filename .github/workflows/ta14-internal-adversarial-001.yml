@@ -1,0 +1,21 @@
+name: TA14 Internal Adversarial 001
+on:
+  push:
+    branches:
+      - examination/ta14-internal-adversarial-001
+  workflow_dispatch:
+jobs:
+  adversarial-evaluator:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Execute isolated adversarial tests
+        run: npm test -- tests/ta14-internal-adversarial-001.test.ts
