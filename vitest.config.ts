@@ -1,7 +1,8 @@
-import { defineConfig } from "vitest/config";
+import { fileURLToPath, URL } from 'node:url';
+import { defineConfig } from 'vitest/config';
 
-// tsconfig uses "jsx": "preserve" for Next.js; tests that render React
-// components need Vite to transform JSX itself.
+// Preserve Next.js JSX transform and resolve application imports for tests.
 export default defineConfig({
-  oxc: { jsx: { runtime: "automatic" } },
+  oxc: { jsx: { runtime: 'automatic' } },
+  resolve: { alias: { '@': fileURLToPath(new URL('./apps/web', import.meta.url)) } },
 });
