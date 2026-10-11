@@ -80,6 +80,26 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/ai-governance/register",
+        destination: "/workspace/ai-governance/registry/register",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/dGhhaWxhbm",
+        destination: "/showrooms/thailand-school-air-evidence",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/Y2xlYW4tYW",
+        destination: "/showrooms/clean-air-developing-minds",
+        permanent: true,
+      },
+      {
+        source: "/examinations/ZGF2aWQtaG",
+        destination: "/examinations/david-holmberg-technical-challenge",
+        permanent: true,
+      },
+      {
         source: "/showrooms/YXJpem9uYS",
         destination: "/showrooms/arizona-building-as-evidence",
         permanent: true,
