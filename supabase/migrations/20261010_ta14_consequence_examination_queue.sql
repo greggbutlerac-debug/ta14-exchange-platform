@@ -63,17 +63,29 @@ DECLARE v_status text; v_frozen_at timestamptz;
 BEGIN
   SELECT status, evidence_frozen_at INTO v_status, v_frozen_at
     FROM public.ta14_consequence_examination_intakes
-    WHERE intake_id = NEW.intake_id FOR UPDATE;
+    WHERE intake_id = CASE WHEN TG_OP = 'DELETE' THEN OLD.intake_id ELSE NEW.intake_id END
+    FOR UPDATE;
   IF NOT FOUND OR v_status <> 'READY_FOR_PAYMENT' OR v_frozen_at IS NOT NULL THEN
     RAISE EXCEPTION 'Examination evidence is frozen or intake is not payable';
   END IF;
+  IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
   RETURN NEW;
 END;
-$$;
+$;
 DROP TRIGGER IF EXISTS ta14_guard_examination_evidence_insert
   ON public.ta14_consequence_intake_evidence;
 CREATE TRIGGER ta14_guard_examination_evidence_insert
   BEFORE INSERT ON public.ta14_consequence_intake_evidence
+  FOR EACH ROW EXECUTE FUNCTION public.ta14_guard_examination_evidence_insert();
+DROP TRIGGER IF EXISTS ta14_guard_examination_evidence_update
+  ON public.ta14_consequence_intake_evidence;
+CREATE TRIGGER ta14_guard_examination_evidence_update
+  BEFORE UPDATE ON public.ta14_consequence_intake_evidence
+  FOR EACH ROW EXECUTE FUNCTION public.ta14_guard_examination_evidence_insert();
+DROP TRIGGER IF EXISTS ta14_guard_examination_evidence_delete
+  ON public.ta14_consequence_intake_evidence;
+CREATE TRIGGER ta14_guard_examination_evidence_delete
+  BEFORE DELETE ON public.ta14_consequence_intake_evidence
   FOR EACH ROW EXECUTE FUNCTION public.ta14_guard_examination_evidence_insert();
 REVOKE ALL ON FUNCTION public.ta14_guard_examination_evidence_insert()
   FROM PUBLIC, anon, authenticated;
