@@ -61,7 +61,7 @@ export default function Page(){
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:12,marginTop:30}}>
           {['WHAT WAS OBSERVED?','WHAT WAS DETERMINED?','WHAT WAS AUTHORIZED?','WHAT WAS CHANGED?','WHAT EVIDENCE ESTABLISHES THE OUTCOME?'].map((q,i)=><div key={q} style={{padding:22,border:'1px solid rgba(112,220,255,.18)',borderRadius:15,background:'rgba(4,18,27,.72)'}}><span style={{display:'block',color:'#70dcff',fontWeight:900,fontSize:10,marginBottom:10}}>0{i+1}</span><b style={{fontSize:14,lineHeight:1.45}}>{q}</b></div>)}
         </div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/Original-State HVAC Baseline Infographic.png"} alt={"Original HVAC operating baseline before intervention"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 01 · Original HVAC operating baseline before intervention</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/Complete HVAC Evidence-to-Outcome Sequence.png"} alt={"Overview of the complete evidence-to-outcome service process"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 01 · Overview of the complete evidence-to-outcome service process</figcaption></figure>
         <Samantha text={narration[0]}/>
       </section>
 
@@ -76,7 +76,7 @@ export default function Page(){
         <div style={{marginTop:24,padding:26,border:'1px solid rgba(239,200,108,.28)',borderRadius:18,background:'rgba(52,39,7,.1)',fontSize:'clamp(18px,2.3vw,28px)',fontWeight:900,lineHeight:1.5}}>
           ENTRY ≠ DIAGNOSIS<br/>DIAGNOSIS ≠ INTERVENTION AUTHORIZATION<br/>CAPABILITY ≠ AUTHORITY
         </div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Evidence-Based Diagnostic Workflow.png"} alt={"Evidence-based diagnostic workflow"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 02 · Evidence-based diagnostic workflow</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Evidence-First Service Sequence Poster (1).png"} alt={"Seven-boundary evidence-first service sequence"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 02 · Seven-boundary evidence-first service sequence</figcaption></figure>
         <Samantha text={narration[1]}/>
       </section>
 
@@ -92,7 +92,7 @@ export default function Page(){
           ].map(([t,d])=><article key={t} style={{padding:24,border:'1px solid rgba(112,220,255,.16)',borderRadius:16,background:'#06131b'}}><h3 style={{fontSize:18,margin:'0 0 10px'}}>{t}</h3><p style={{color:'#94aab3',lineHeight:1.7,fontSize:13,margin:0}}>{d}</p></article>)}
         </div>
         <div style={{marginTop:24,padding:24,border:'1px solid rgba(113,242,182,.25)',borderRadius:16,background:'rgba(8,42,34,.12)',fontWeight:900,fontSize:22}}>MINIMUM ≠ OPTIONAL</div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Sequence_ Evidence Before Intervention.png"} alt={"Preserving evidence before intervention"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 03 · Preserving evidence before intervention</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/Original-State HVAC Baseline Infographic.png"} alt={"Preserving the original HVAC operating baseline"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 03 · Preserving the original HVAC operating baseline</figcaption></figure>
         <Samantha text={narration[2]}/>
       </section>
 
@@ -111,7 +111,7 @@ export default function Page(){
           ].map(([t,d])=><div key={t} style={{padding:20,borderRadius:14,border:'1px solid rgba(239,200,108,.16)',background:'rgba(4,18,27,.68)'}}><b style={{color:'#efc86c',fontSize:11}}>{t}</b><p style={{color:'#96aab2',fontSize:13,lineHeight:1.55}}>{d}</p></div>)}
         </div>
         <div style={{marginTop:24,padding:22,borderRadius:15,border:'1px solid rgba(112,220,255,.18)',background:'#06131b',color:'#a7bcc4',lineHeight:1.7}}>Routine service may operate under valid prior delegation when the delegation clearly establishes a bounded class of interventions. Prior delegation is not unlimited authority. Work outside the envelope requires new authorization.</div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC NIRET Decision Flow Infographic.png"} alt={"Intervention decision and authority boundaries"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 04 · Intervention decision and authority boundaries</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC NIRET Decision Flow Infographic.png"} alt={"Intervention authorization and decision boundaries"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 04 · Intervention authorization and decision boundaries</figcaption></figure>
         <Samantha text={narration[3]}/>
       </section>
 
@@ -129,7 +129,7 @@ export default function Page(){
             ['VERIFY','Do not infer satisfaction where intervention destroyed the evidence needed to test a proposition.']
           ].map(([t,d],i)=><article key={t} style={{padding:22,border:'1px solid rgba(239,200,108,.16)',borderRadius:15,background:'rgba(51,39,7,.09)'}}><span style={{color:'#efc86c',fontSize:10,fontWeight:900}}>0{i+1}</span><h3 style={{fontSize:18,margin:'8px 0'}}>{t}</h3><p style={{color:'#a9a082',fontSize:13,lineHeight:1.6}}>{d}</p></article>)}
         </div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Evidence-First Service Sequence Poster (1).png"} alt={"Evidence-first HVAC service sequence"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 05 · Evidence-first HVAC service sequence</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/Evidence-Based HVAC Intervention Workflow.png"} alt={"Bounded HVAC intervention workflow"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 05 · Bounded HVAC intervention workflow</figcaption></figure>
         <Samantha text={narration[4]}/>
       </section>
 
@@ -140,7 +140,7 @@ export default function Page(){
           <p style={{fontFamily:'Georgia,serif',fontSize:'clamp(25px,3vw,38px)',lineHeight:1.35,margin:'0 0 20px'}}>The technician finished the work. What does the evidence actually establish?</p>
           <p style={{color:'#9eb3bc',lineHeight:1.8,fontSize:16}}>Verification examines the post-intervention state against propositions that remain validly evaluable. If intervention makes a proposition no longer evaluable, the record identifies that limitation rather than inferring satisfaction. Verification evidence remains distinguishable from the technician's conclusion.</p>
         </div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Post-Performance Record Infographic.png"} alt={"Post-intervention performance record"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 06 · Post-intervention performance record</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Post-Performance Record Infographic.png"} alt={"Post-intervention verification record"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 06 · Post-intervention verification record</figcaption></figure>
         <Samantha text={narration[5]}/>
       </section>
 
@@ -151,7 +151,7 @@ export default function Page(){
           {outcomes.map(([t,d])=><article key={t} style={{padding:22,border:t==='INDETERMINATE'?'1px solid rgba(239,200,108,.4)':'1px solid rgba(113,242,182,.14)',borderRadius:15,background:t==='INDETERMINATE'?'rgba(52,39,7,.12)':'rgba(4,18,27,.7)'}}><b style={{color:t==='INDETERMINATE'?'#efc86c':'#71f2b6',fontSize:13}}>{t}</b><p style={{color:'#96aab2',fontSize:13,lineHeight:1.6}}>{d}</p></article>)}
         </div>
         <div style={{marginTop:24,padding:25,border:'1px solid rgba(239,200,108,.26)',borderRadius:16,background:'rgba(52,39,7,.1)',fontFamily:'Georgia,serif',fontSize:'clamp(22px,2.8vw,34px)',lineHeight:1.35}}>INDETERMINATE is a defensible outcome when the available evidence cannot establish another state.</div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Evidence-to-Outcome Sequence Summary.png"} alt={"HVAC evidence-to-outcome sequence"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 07 · HVAC evidence-to-outcome sequence</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Outcome Governance Dashboard.png"} alt={"Evidence-based outcome classification"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 07 · Evidence-based outcome classification</figcaption></figure>
         <Samantha text={narration[6]}/>
       </section>
 
@@ -170,7 +170,7 @@ export default function Page(){
             'What empirical study would determine whether this process improves service quality, accountability, repeatability, or evidentiary integrity?'
           ].map((q,i)=><div key={q} style={{padding:22,border:'1px solid rgba(185,168,255,.15)',borderRadius:14,background:'rgba(42,32,72,.10)',color:'#bdb8c8',lineHeight:1.65}}><span style={{color:'#b9a8ff',fontWeight:900,marginRight:10}}>{String(i+1).padStart(2,'0')}</span>{q}</div>)}
         </div>
-        <figure style={{margin:'30px 0 18px'}}><img src={"/Complete HVAC Evidence-to-Outcome Sequence.png"} alt={"Complete HVAC evidence-to-outcome examination"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 08 · Complete HVAC evidence-to-outcome examination</figcaption></figure>
+        <figure style={{margin:'30px 0 18px'}}><img src={"/HVAC Evidence-to-Outcome Sequence Summary.png"} alt={"Complete evidence-to-outcome examination summary"} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:18,border:'1px solid rgba(112,220,255,.22)'}}/><figcaption style={{fontSize:12,color:'#91a8b1',marginTop:10}}>ILLUSTRATION 08 · Complete evidence-to-outcome examination summary</figcaption></figure>
         <Samantha text={narration[7]}/>
       </section>
 
