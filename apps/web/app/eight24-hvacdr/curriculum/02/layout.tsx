@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import {usePathname} from 'next/navigation';
+import {useEffect} from 'react';
 import {LessonVisualSamantha} from '../01/LessonVisualSamantha';
 import {lessonVisuals} from './lessonVisuals';
 
@@ -11,6 +12,10 @@ export default function Module02Layout({children}:{children:React.ReactNode}){
   const pathname=usePathname();
   const match=pathname.match(/\/curriculum\/02\/lesson\/(\d{2})(?:\/|$)/);
   const current=match?.[1];
+
+  useEffect(()=>{
+    if(current) window.scrollTo({top:0,left:0,behavior:'auto'});
+  },[pathname,current]);
 
   if(!current)return <>{children}</>;
 
@@ -32,8 +37,8 @@ export default function Module02Layout({children}:{children:React.ReactNode}){
 
     <div style={{background:'#001326',padding:'20px'}}>
       <nav aria-label="Lesson progression" style={{maxWidth:1120,margin:'auto',display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}>
-        {Number(current)>1?<Link href={`/eight24-hvacdr/curriculum/02/lesson/${String(Number(current)-1).padStart(2,'0')}`} style={{color:'#fff',fontWeight:800}}>← PREVIOUS LESSON</Link>:<Link href="/eight24-hvacdr/curriculum/02" style={{color:'#fff',fontWeight:800}}>← MODULE 02 HOME</Link>}
-        {Number(current)<18?<Link href={`/eight24-hvacdr/curriculum/02/lesson/${String(Number(current)+1).padStart(2,'0')}`} style={{color:'#fff',fontWeight:800}}>NEXT LESSON →</Link>:<Link href="/eight24-hvacdr" style={{color:'#fff',fontWeight:800}}>PROGRAM HOME →</Link>}
+        {Number(current)>1?<Link scroll={true} href={`/eight24-hvacdr/curriculum/02/lesson/${String(Number(current)-1).padStart(2,'0')}`} style={{color:'#fff',fontWeight:800}}>← PREVIOUS LESSON</Link>:<Link href="/eight24-hvacdr/curriculum/02" style={{color:'#fff',fontWeight:800}}>← MODULE 02 HOME</Link>}
+        {Number(current)<18?<Link scroll={true} href={`/eight24-hvacdr/curriculum/02/lesson/${String(Number(current)+1).padStart(2,'0')}`} style={{color:'#fff',fontWeight:800}}>NEXT LESSON →</Link>:<Link href="/eight24-hvacdr" style={{color:'#fff',fontWeight:800}}>PROGRAM HOME →</Link>}
       </nav>
     </div>
   </>;
