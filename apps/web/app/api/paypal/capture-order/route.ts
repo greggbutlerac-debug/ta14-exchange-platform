@@ -120,6 +120,11 @@ function requiredEnvironment() {
   if (environmentValue !== "sandbox" && environmentValue !== "live") {
     return null;
   }
+  // Never allow a preview deployment to send payment requests to PayPal Live.
+  // The preview must have its own sandbox-scoped credentials and environment.
+  if (process.env.VERCEL_ENV === 'preview' && environmentValue !== 'sandbox') {
+    return null;
+  }
   const environment: PayPalEnvironment = environmentValue;
 
   if (!clientId || !clientSecret) {
