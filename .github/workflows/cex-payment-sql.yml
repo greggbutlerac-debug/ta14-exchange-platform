@@ -95,6 +95,35 @@ jobs:
             EXCEPTION WHEN OTHERS THEN
               IF SQLERRM = 'Evidence delete unexpectedly allowed' THEN RAISE; END IF;
             END;
+            BEGIN
+              UPDATE public.ta14_consequence_intake_evidence SET intake_id=v_id WHERE intake_id=v_id;
+              RAISE EXCEPTION 'Evidence update unexpectedly allowed';
+            EXCEPTION WHEN OTHERS THEN
+              IF SQLERRM = 'Evidence update unexpectedly allowed' THEN RAISE; END IF;
+            END;
+            BEGIN
+              PERFORM * FROM public.ta14_finalize_verified_examination_payment(
+                v_id,'OTHERORDER','OTHERCAPTURE',now(),'{}'::jsonb,v_hash,1);
+              RAISE EXCEPTION 'Conflicting payment unexpectedly allowed';
+            EXCEPTION WHEN OTHERS THEN
+              IF SQLERRM = 'Conflicting payment unexpectedly allowed' THEN RAISE; END IF;
+            END;
+            IF (SELECT paypal_order_id FROM public.ta14_consequence_examination_intakes WHERE intake_id=v_id) <> 'ORDER123' THEN
+              RAISE EXCEPTION 'Payment binding changed after conflicting request';
+            END IF;
+            INSERT INTO public.ta14_consequence_examination_intakes(intake_id,status)
+            VALUES ('TA14-CEX-20261013-KLMNOPQRST','READY_FOR_PAYMENT');
+            BEGIN
+              PERFORM * FROM public.ta14_finalize_verified_examination_payment(
+                'TA14-CEX-20261013-KLMNOPQRST','ORDER456','CAPTURE456',now(),'{}'::jsonb,v_hash,1);
+              RAISE EXCEPTION 'Stale evidence count unexpectedly allowed';
+            EXCEPTION WHEN OTHERS THEN
+              IF SQLERRM = 'Stale evidence count unexpectedly allowed' THEN RAISE; END IF;
+            END;
+            IF EXISTS (SELECT 1 FROM public.ta14_consequence_examination_queue
+              WHERE intake_id='TA14-CEX-20261013-KLMNOPQRST') THEN
+              RAISE EXCEPTION 'Stale evidence request created a queue';
+            END IF;
           END
           $test$;
           SQL
