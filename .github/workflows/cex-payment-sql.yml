@@ -1,0 +1,100 @@
+name: Examination payment SQL smoke test
+on:
+  pull_request:
+    paths:
+      - 'supabase/migrations/20261010_ta14_consequence_examination_queue.sql'
+      - '.github/workflows/cex-payment-sql.yml'
+  workflow_dispatch:
+jobs:
+  isolated-postgres:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: ta14_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: postgres
+      PGDATABASE: ta14_test
+    steps:
+      - uses: actions/checkout@v4
+      - name: Create isolated fixture tables and roles
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE anon NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE ROLE service_role NOLOGIN;
+          CREATE TABLE public.ta14_consequence_examination_intakes (
+            intake_id text PRIMARY KEY,
+            status text NOT NULL,
+            paypal_order_id text,
+            paypal_capture_id text,
+            paid_amount numeric,
+            paid_currency text,
+            paid_at timestamptz,
+            evidence_manifest jsonb,
+            evidence_manifest_sha256 text,
+            evidence_frozen_at timestamptz,
+            evidence_item_count integer,
+            updated_at timestamptz NOT NULL DEFAULT now()
+          );
+          CREATE TABLE public.ta14_consequence_intake_evidence (
+            id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            intake_id text NOT NULL REFERENCES public.ta14_consequence_examination_intakes(intake_id)
+          );
+          SQL
+      - name: Execute staged migration in disposable PostgreSQL
+        run: psql -v ON_ERROR_STOP=1 -f supabase/migrations/20261010_ta14_consequence_examination_queue.sql
+      - name: Verify payment, idempotency, queue and frozen evidence
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          INSERT INTO public.ta14_consequence_examination_intakes(intake_id,status)
+          VALUES ('TA14-CEX-20261013-ABCDEFGHIJ','READY_FOR_PAYMENT');
+          INSERT INTO public.ta14_consequence_intake_evidence(intake_id)
+          VALUES ('TA14-CEX-20261013-ABCDEFGHIJ');
+          DO $test$
+          DECLARE
+            r record;
+            v_hash text := repeat('a',64);
+            v_id text := 'TA14-CEX-20261013-ABCDEFGHIJ';
+          BEGIN
+            SELECT * INTO r FROM public.ta14_finalize_verified_examination_payment(
+              v_id,'ORDER123','CAPTURE123',now(),'{}'::jsonb,v_hash,1);
+            IF r.result_queue_state <> 'QUEUED' OR r.result_idempotent THEN
+              RAISE EXCEPTION 'First payment finalization failed';
+            END IF;
+            SELECT * INTO r FROM public.ta14_finalize_verified_examination_payment(
+              v_id,'ORDER123','CAPTURE123',now(),'{}'::jsonb,v_hash,1);
+            IF NOT r.result_idempotent THEN
+              RAISE EXCEPTION 'Repeat payment not idempotent';
+            END IF;
+            IF (SELECT count(*) FROM public.ta14_consequence_examination_queue WHERE intake_id=v_id) <> 1
+               OR (SELECT count(*) FROM public.ta14_consequence_examination_queue_events WHERE intake_id=v_id) <> 1 THEN
+              RAISE EXCEPTION 'Duplicate or missing queue/events';
+            END IF;
+            BEGIN
+              INSERT INTO public.ta14_consequence_intake_evidence(intake_id) VALUES (v_id);
+              RAISE EXCEPTION 'Evidence insert unexpectedly allowed';
+            EXCEPTION WHEN OTHERS THEN
+              IF SQLERRM = 'Evidence insert unexpectedly allowed' THEN RAISE; END IF;
+            END;
+            BEGIN
+              DELETE FROM public.ta14_consequence_intake_evidence WHERE intake_id=v_id;
+              RAISE EXCEPTION 'Evidence delete unexpectedly allowed';
+            EXCEPTION WHEN OTHERS THEN
+              IF SQLERRM = 'Evidence delete unexpectedly allowed' THEN RAISE; END IF;
+            END;
+          END
+          $test$;
+          SQL
