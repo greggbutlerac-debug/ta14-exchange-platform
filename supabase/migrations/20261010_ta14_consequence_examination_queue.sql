@@ -71,7 +71,7 @@ BEGIN
   IF TG_OP = 'DELETE' THEN RETURN OLD; END IF;
   RETURN NEW;
 END;
-$;
+$$;
 DROP TRIGGER IF EXISTS ta14_guard_examination_evidence_insert
   ON public.ta14_consequence_intake_evidence;
 CREATE TRIGGER ta14_guard_examination_evidence_insert
