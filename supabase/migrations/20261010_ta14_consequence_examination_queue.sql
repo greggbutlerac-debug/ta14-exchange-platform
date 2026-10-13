@@ -121,8 +121,7 @@ DECLARE
 BEGIN
   IF p_intake_id IS NULL OR p_order_id IS NULL OR p_capture_id IS NULL
      OR p_manifest_sha256 IS NULL
-     OR p_intake_id !~ '^TA14-CEX-[0-9]{8}-[A-Z0-9]{10}
-     OR p_order_id !~ '^[A-Z0-9]{1,36}$'
+     OR p_intake_id !~ '^TA14-CEX-[0-9]{8}-[A-Z0-9]{10}     OR p_order_id !~ '^[A-Z0-9]{1,36}$'
      OR p_capture_id !~ '^[A-Z0-9]{1,36}$'
      OR p_paid_at IS NULL
      OR p_manifest IS NULL
