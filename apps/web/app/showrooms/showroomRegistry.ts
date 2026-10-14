@@ -9,10 +9,10 @@ export const showroomCollections=[
 ['GOVERNANCE & ARCHITECTURES','TA14 architectures and registered governance teaching surfaces.'],
 ['EXAMINATIONS & DEMONSTRATIONS','Bounded examinations, proving-ground demonstrations and tests.'],
 ['EVENTS & PRESENTATIONS','Conference, meeting and presentation experiences.'],
-['Malawi 2026 · Clean Air Governance','/showrooms/malawi-clean-air-governance','COUNTRIES & PUBLIC INSTITUTIONS','Malawi atmospheric integrity evidence local authority Karonga hypothetical clean air'],
 ] as const;
 
 export const showroomRooms=[
+['Malawi 2026 · Clean Air Governance','/showrooms/malawi-clean-air-governance','COUNTRIES & PUBLIC INSTITUTIONS','Malawi atmospheric integrity evidence local authority Karonga hypothetical clean air'],
 ['Predictive Intelligence and the Consequence Boundary','/showrooms/predictive-intelligence-consequence-boundary','INTEROPERABILITY & SYSTEMS','Predictive AI BAS VAV evidence authority standing eight numbered scenes Samantha interactive simulated examination technical reference'],
 ['When Community Air Becomes Evidence · Tamale, Northern Ghana','/showrooms/tamale-community-air-evidence','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Tamale Ghana community air evidence atmospheric integrity records independent technical educational demonstration'],
 ['Environmental Accountability · From Promise to Verified Consequence','/showrooms/environmental-accountability','ENVIRONMENT & ATMOSPHERIC INTEGRITY','TA14 Environmental Accountability Initiative ten lesson institutional examination clean air commitments AIR EIG evidence regulatory duty authority standing intervention independent pilot'],
