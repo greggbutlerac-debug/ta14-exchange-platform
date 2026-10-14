@@ -13,7 +13,8 @@ const slides=[
  {title:'Authorized Execution',file:'Authorized Execution_ Smart City Operations.png',voice:'Execution must be constrained to the authorized scope, method, actor, and time. Preserve command logs, site records, safety checks, and deviations. The depicted operations are not proof of a real TA14 municipal deployment.'},
  {title:'Outcome and Accountability',file:'Outcome and Accountability in a Smarter City.png',voice:'Finally, compare observed outcomes with a defined baseline and keep the record available for review and correction. The before-and-after figures on this image are entirely hypothetical, not measured municipal performance or demonstrated causal benefit.'}
 ] as const;
-const gate=['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome'];
+const topics=['Overview','Reality','Record','Continuity + Admissibility','Authority + Standing','Binding + Commit','Execution','Outcome'];
+const anchorNotes=['Overview of all eight architectural anchors','Architectural anchor 01 — REALITY','Architectural anchor 02 — RECORD','Architectural anchors 03 and 04 — CONTINUITY + ADMISSIBILITY','Architectural anchor 05 — BINDING, with separate applicable authority and established standing','Architectural anchors 05 and 06 — BINDING + COMMIT','Architectural anchor 07 — EXECUTION','Architectural anchor 08 — OUTCOME'];
 export default function SmartCityShowroom(){
  const [speaking,setSpeaking]=useState(-1);
  useEffect(()=>()=>{if(typeof window!=='undefined')window.speechSynthesis?.cancel()},[]);
@@ -21,7 +22,7 @@ export default function SmartCityShowroom(){
   if(!('speechSynthesis' in window))return;
   window.speechSynthesis.cancel();
   if(speaking===i){setSpeaking(-1);return}
-  const u=new SpeechSynthesisUtterance('Teaching image '+(i+1)+' of eight. '+slides[i].title+'. '+slides[i].voice);
+  const u=new SpeechSynthesisUtterance('Teaching image '+(i+1)+' of eight. '+anchorNotes[i]+'. '+slides[i].title+'. '+slides[i].voice);
   const voices=window.speechSynthesis.getVoices();
   u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en'))||null;
   u.rate=.9;u.onend=()=>setSpeaking(-1);u.onerror=()=>setSpeaking(-1);window.speechSynthesis.speak(u);setSpeaking(i);
@@ -45,11 +46,14 @@ export default function SmartCityShowroom(){
   <p style={{color:'#8ecedc'}}>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</p>
   <div style={{display:'flex',gap:9,flexWrap:'wrap',marginTop:22}}>{['ALLOW','HOLD','DENY','ESCALATE'].map((x,i)=><span key={x} style={{padding:'9px 16px',borderRadius:8,fontWeight:800,background:['#176b4c','#805f1c','#82333d','#50408c'][i]}}>{x}</span>)}</div>
  </section>
- <nav aria-label="Teaching image navigation" style={{display:'flex',flexWrap:'wrap',gap:8,padding:'26px 0'}}>{slides.map((s,i)=><a href={'#image-'+(i+1)} key={s.file} style={{border:'1px solid #476986',borderRadius:7,padding:'9px 12px',textDecoration:'none',color:'#e6f5ff',fontSize:13}}>{String(i+1).padStart(2,'0')} · {gate[i]}</a>)}</nav>
+ <p style={{fontSize:15,lineHeight:1.7,color:'#ffdfa0',background:'#1e2837',padding:'15px 18px',borderRadius:10}}>NUMBERING KEY: The 01–08 labels below are <strong>showroom teaching-image numbers</strong>, not the eight TA14 architectural anchor numbers. The overview is Teaching Image 01; Reality is architectural Anchor 01 but Teaching Image 02; Record is architectural Anchor 02 but Teaching Image 03. Some original infographic trackers visually emphasize a different number. Use the architectural labels given above each image as the authoritative sequence. Original artworks are retained without alteration.</p>
+ <nav aria-label="Teaching image navigation" style={{display:'flex',flexWrap:'wrap',gap:8,padding:'26px 0'}}>{slides.map((s,i)=><a href={'#image-'+(i+1)} key={s.file} style={{border:'1px solid #476986',borderRadius:7,padding:'9px 12px',textDecoration:'none',color:'#e6f5ff',fontSize:13}}>{String(i+1).padStart(2,'0')} · {topics[i]}</a>)}</nav>
  <div id="images">{slides.map((s,i)=><section key={s.file} id={'image-'+(i+1)} style={{scrollMarginTop:25,borderTop:'1px solid #365370',padding:'42px 0 36px'}}>
   <p style={{color:'#f5cb70',fontSize:12,fontWeight:800,letterSpacing:2}}>ORIGINAL TEACHING IMAGE {String(i+1).padStart(2,'0')} OF 08</p>
+  <p style={{fontSize:15,fontWeight:800,color:'#9de2eb',margin:'8px 0'}}>{anchorNotes[i]}</p>
   <h2 style={{fontSize:'clamp(25px,4vw,38px)',margin:'8px 0 22px'}}>{s.title}</h2>
   <img src={'/'+encodeURIComponent(s.file)} alt={'TA14 Smart City teaching image '+String(i+1).padStart(2,'0')+': '+s.title+'; all readings, approvals and outcomes hypothetical'} loading={i===0?'eager':'lazy'} style={{width:'100%',height:'auto',display:'block',borderRadius:12,border:'1px solid #375675'}}/>
+  {(i===1||i===2)&&<p style={{fontSize:14,lineHeight:1.5,color:'#ffe2a8',margin:'12px 0 0'}}>Illustration numbering caution: this original image's internal progress tracker does not identify the architectural anchor taught by this section. {anchorNotes[i]} is the authoritative label. The source image has not been edited.</p>}
   <div style={{display:'flex',flexWrap:'wrap',gap:13,alignItems:'center',marginTop:20}}>
    <button type="button" onClick={()=>narrate(i)} style={{background:'#9de2eb',color:'#062232',padding:'12px 17px',fontWeight:800,border:0,borderRadius:9,cursor:'pointer'}}>{speaking===i?'■ Stop narration':'▶ Samantha narration '+String(i+1).padStart(2,'0')}</button>
    <span style={{fontSize:13,color:'#aec8d9'}}>Samantha when available on your device; otherwise an English voice.</span>
