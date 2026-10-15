@@ -17,10 +17,11 @@ export async function GET(request: NextRequest) {
   const tokenHash = url.searchParams.get("token_hash");
   const type = url.searchParams.get("type");
 
-  // Never trust forwarded host headers or a preview-domain callback for
-  // session-bearing redirects. All Exchange auth links use the canonical host.
+  // Keep preview callbacks on their preview host for cookie-based testing.
+  // Production callbacks use the canonical Exchange origin.
   const origin = isVercelDeploymentHost(url.host)
-    ? url.origin // Preview cookies must remain on the same host for isolated testing.\n    : CANONICAL_EXCHANGE_ORIGIN;
+    ? url.origin // Preview cookies must remain on the same host for isolated testing.
+    : CANONICAL_EXCHANGE_ORIGIN;
   const supabase = await createClient();
 
   let error: { message: string } | null = null;
