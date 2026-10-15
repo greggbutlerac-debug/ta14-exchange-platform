@@ -27,6 +27,28 @@ export default function BlueIotEvidenceToActionShowroom(){
  <p style={{fontSize:'clamp(18px,2.2vw,26px)',lineHeight:1.48,maxWidth:980,color:'#b7c9d5',margin:0}}>A bounded CO₂ example for examining the point between environmental intelligence and consequential building action: when does evidence become sufficient not merely to inform a response, but to support an authorized consequence now?</p>
  </section>
 
+ <section aria-label="Eight-image guided technical examination" style={{margin:'22px 0',padding:'clamp(22px,4vw,42px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:26,background:'rgba(4,16,26,.95)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>GUIDED TECHNICAL EXAMINATION · EIGHT TEACHING IMAGES</div>
+ <h2 style={{fontSize:'clamp(28px,4.6vw,50px)',letterSpacing:'-.04em',margin:'10px 0 12px'}}>Evidence to action: the complete teaching sequence</h2>
+ <p style={{color:'#aec1cd',lineHeight:1.65,maxWidth:960}}>Eight numbered illustrations explain the distinction between observation, admissible evidence, a bounded proposed consequence, applicable authority, established standing, external execution and verified outcome. The Classroom 214 examples and operational values are illustrative, not verified Blue IoT data or operating recommendations.</p>
+ <a href="/TA14_Blue_IoT_Evidence_to_Action_Technical_Examination_v2%20(1).pdf" download style={{display:'inline-block',padding:'14px 22px',borderRadius:999,background:'#7ff0bd',color:'#04151a',fontWeight:950,textDecoration:'none',marginBottom:20}}>DOWNLOAD THE TECHNICAL EXAMINATION V2.0 (PDF) ↓</a>
+ {[
+ ['01','THE SIGNAL','CO₂ Detection in Classroom 214.png','A sustained environmental observation starts an examination. Detection alone neither proves the cause nor authorizes an intervention.'],
+ ['02','PRESERVE THE RECORD','Validating Classroom Sensor Records.png','Preserve raw readings, sensor identity, timestamps, provenance, quality information and continuity; keep derived values distinguishable.'],
+ ['03','PROPOSE THE CONSEQUENCE','Proposed Classroom Ventilation Consequence.png','State a bounded proposed action with equipment and zone, operating constraints, intended effect, safety checks and rollback condition.'],
+ ['04','FIND THE AUTHORITY','Authority Verification Technical Showroom Slide.png','Examine ACTOR, CAPACITY, STANDING BASIS and AUTHORITY RELATIONSHIP. Applicable Authority is not itself Established Standing.'],
+ ['05','THE CONSEQUENCE BOUNDARY','TA-14_ The Consequence Boundary.png','TA14 examines Admissible Evidence, Applicable Authority and Established Standing and records ALLOW, HOLD, DENY or ESCALATE with reasons.'],
+ ['06','THE AUTHORITY GAP','Authority Gap_ Classroom 214 Ventilation Hold.png','Adequate CO₂ evidence does not supply missing permission. An unresolved authority or standing gap produces a bounded HOLD.'],
+ ['07','EXTERNAL EXECUTION','TA-14 Execute_ Authorized BMS Control Flow.png','Only the authorized operator or BMS may execute and record a permitted action. A command acknowledgment is not the environmental outcome.'],
+ ['08','OUTCOME BECOMES EVIDENCE','Verifying Classroom CO₂ Outcomes.png','Preserve actual equipment response, subsequent environmental observations, uncertainties and any new revalidation requirements.'],
+ ].map(([number,title,file,narration])=><article key={number} style={{marginTop:24,padding:'clamp(14px,2.5vw,26px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:18,background:'rgba(1,10,18,.65)'}}>
+ <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:14,alignItems:'center'}}><h3 style={{fontSize:'clamp(19px,2.6vw,28px)',margin:0,color:'#eef7fb'}}>{number} / 08 · {title}</h3><span style={{fontSize:11,color:'#7ff0bd',fontWeight:900}}>ILLUSTRATIVE EXAMINATION</span></div>
+ <img src={`/${encodeURIComponent(file)}`} alt={`TA14 Blue IoT teaching image ${number} of 08: ${title}. ${narration}`} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:12,border:'1px solid rgba(113,231,255,.16)'}}/>
+ <p style={{margin:'16px 0 0',lineHeight:1.65,color:'#b8cbd6'}}><strong style={{color:'#7ff0bd'}}>SAMANTHA · NARRATION SCRIPT:</strong> {narration}</p>
+ </article>)}
+ <p style={{margin:'20px 0 0',fontSize:13,color:'#8fa8b7'}}>Narration scripts are displayed for accessibility and review. Recorded Samantha audio is not yet available; no audio playback is represented as implemented. Scroll freely through all eight images.</p>
+ </section>
+
  <section style={{margin:'22px 0',padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(127,240,189,.22)',borderRadius:26,background:'rgba(5,18,27,.88)'}}>
  <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>THE PRACTICAL PATHWAY</div>
  <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 8px'}}>Sense it. Validate it. Govern the consequence. Verify the outcome.</h2>
