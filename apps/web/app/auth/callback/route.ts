@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 
 import { createClient } from "../../../lib/supabase/server";
-import { CANONICAL_EXCHANGE_ORIGIN } from "../../../lib/site/canonical-origin";
+import { CANONICAL_EXCHANGE_ORIGIN, isVercelDeploymentHost } from "../../../lib/site/canonical-origin";
 
 function safePath(value: string | null): string {
   if (!value || !value.startsWith("/") || value.startsWith("//") || /[\r\n\\]/.test(value)) {
@@ -19,7 +19,8 @@ export async function GET(request: NextRequest) {
 
   // Never trust forwarded host headers or a preview-domain callback for
   // session-bearing redirects. All Exchange auth links use the canonical host.
-  const origin = CANONICAL_EXCHANGE_ORIGIN;
+  const origin = isVercelDeploymentHost(url.host)
+    ? url.origin // Preview cookies must remain on the same host for isolated testing.\n    : CANONICAL_EXCHANGE_ORIGIN;
   const supabase = await createClient();
 
   let error: { message: string } | null = null;
@@ -35,8 +36,8 @@ export async function GET(request: NextRequest) {
   }
 
   if (error) {
-    const failure = new URL("/account-recovery", origin);
-    failure.searchParams.set("error", "The recovery link is invalid or expired. Request a new link.");
+    const failure = new URL(type === "recovery" || next.startsWith("/account-recovery/") ? "/account-recovery" : "/login", origin);
+    failure.searchParams.set("error", "The authentication link is invalid or expired. Request a new link.");
     failure.searchParams.set("next", next);
     return NextResponse.redirect(failure);
   }
