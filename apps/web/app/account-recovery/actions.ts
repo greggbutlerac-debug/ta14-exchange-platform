@@ -31,8 +31,10 @@ export async function requestAccountRecovery(formData: FormData): Promise<never>
   }
 
   const origin = recoveryOrigin();
-  const recoveryDestination = new URL("/account-recovery/reset", origin);
-  recoveryDestination.searchParams.set("next", next);
+  const recoveryDestination = new URL("/auth/callback", origin);
+  const resetDestination = new URL("/account-recovery/reset", origin);
+  resetDestination.searchParams.set("next", next);
+  recoveryDestination.searchParams.set("next", resetDestination.pathname + resetDestination.search);
 
   const supabase = await createClient();
   const { error } = await supabase.auth.resetPasswordForEmail(rawEmail.trim().toLowerCase(), {
