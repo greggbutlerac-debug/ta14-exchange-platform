@@ -26,6 +26,7 @@ type PayPalOrder = {
 async function verifyPayment(orderId:string,intakeId:string){
  const id=process.env.PAYPAL_CLIENT_ID?.trim(),secret=process.env.PAYPAL_CLIENT_SECRET?.trim(),mode=process.env.PAYPAL_ENVIRONMENT?.trim().toLowerCase();
  if(!id||!secret||(mode!=='live'&&mode!=='sandbox'))throw new Error('PayPal verification configuration unavailable');
+ if(process.env.VERCEL_ENV==='preview'&&mode!=='sandbox')throw new Error('Preview PayPal verification requires Sandbox configuration');
  const base=mode==='sandbox'?'https://api-m.sandbox.paypal.com':'https://api-m.paypal.com';
  const tokenResponse=await fetch(base+'/v1/oauth2/token',{method:'POST',headers:{Authorization:'Basic '+Buffer.from(id+':'+secret).toString('base64'),'Content-Type':'application/x-www-form-urlencoded'},body:'grant_type=client_credentials',cache:'no-store'});
  if(!tokenResponse.ok)throw new Error('PayPal authentication failed');
