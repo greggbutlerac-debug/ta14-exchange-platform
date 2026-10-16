@@ -56,7 +56,6 @@ export default function BlueIotEvidenceToActionShowroom(){
  <a href="/TA14_Blue_IoT_Evidence_to_Action_Technical_Examination_v2%20(1).pdf" download style={{display:'inline-block',padding:'14px 22px',borderRadius:999,background:'#7ff0bd',color:'#04151a',fontWeight:950,textDecoration:'none',marginBottom:20}}>DOWNLOAD THE TECHNICAL EXAMINATION V2.0 (PDF) ↓</a>
  <nav aria-label="Teaching image navigation" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'0 0 24px'}}>
  {Array.from({length:8},(_,i)=>String(i+1).padStart(2,'0')).map(n=><a key={n} href={`#teaching-${n}`} style={{padding:'10px 14px',borderRadius:999,border:'1px solid rgba(113,231,255,.35)',color:'#a5efff',textDecoration:'none',fontWeight:900}}>{n}</a>)}
- <a href="#classroom-simulation" style={{padding:'10px 14px',color:'#7ff0bd',fontWeight:900}}>TRY THE SIMULATION ↓</a>
  </nav>
  {[
  ['01','THE SIGNAL','CO₂ Detection in Classroom 214.png','Start with what is actually observed. In this illustrative Classroom 214 case, a sensor reports sustained elevated carbon dioxide during an occupied interval. The observation may justify examining ventilation conditions, but it does not reveal the cause by itself. Occupancy, sensor placement, device condition, outdoor conditions and time history matter. At this stage we can say a condition was reported. We cannot yet say that a particular intervention is required, safe or authorized. Detection begins the examination; it does not make the decision.'],
@@ -80,7 +79,6 @@ export default function BlueIotEvidenceToActionShowroom(){
  <p style={{color:'#e4f3ed',lineHeight:1.65,margin:'0 0 18px'}}>{learningBridges[index][0]}</p>
  <div style={{fontSize:11,letterSpacing:'.14em',fontWeight:950,color:'#78e8ff',marginBottom:8}}>{index===7?'YOUR NEXT STEP':'WHAT YOU WILL LEARN NEXT'}</div>
  <p style={{color:'#c2dbe5',lineHeight:1.65,margin:'0 0 12px'}}>{learningBridges[index][1]}</p>
- <a href={index===7?'#classroom-simulation':`#teaching-${String(index+2).padStart(2,'0')}`} style={{color:'#7ff0bd',fontWeight:850,textDecoration:'underline'}}>{index===7?'Explore the Classroom 214 simulation →':`Continue to image ${String(index+2).padStart(2,'0')} →`}</a>
  </section>
  </article>)}
  <p style={{margin:'20px 0 0',fontSize:13,color:'#8fa8b7'}}>Read-aloud controls use the visitor's browser/device voice. The Samantha voice is preferred automatically when installed, but is not guaranteed; this is not a studio-recorded Samantha audio track. Scripts remain visible for accessibility. Scroll freely through all eight images.</p>
