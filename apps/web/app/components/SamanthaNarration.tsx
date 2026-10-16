@@ -4,7 +4,7 @@ import {useEffect,useRef,useState} from 'react';
 
 type Lesson={title:string;learned:string;next:string};
 
-export default function SamanthaNarration({lessons,lessonIndex}:{lessons:readonly Lesson[];lessonIndex:number}){
+export default function SamanthaNarration({lessons,lessonIndex,script}:{lessons:readonly Lesson[];lessonIndex:number;script:string}){
  const active=lessonIndex;
  const [speaking,setSpeaking]=useState(false);
  const [supported,setSupported]=useState(true);
@@ -25,7 +25,7 @@ export default function SamanthaNarration({lessons,lessonIndex}:{lessons:readonl
   window.speechSynthesis.cancel();
 
   const l=lessons[index];
-  const u=new SpeechSynthesisUtterance('Lesson '+(index+1)+' of eight. '+l.title+'. What you just learned: '+l.learned+'. What comes next: '+l.next);
+  const u=new SpeechSynthesisUtterance(script);
   if(voiceRef.current)u.voice=voiceRef.current;
   u.lang='en-US';u.rate=.91;u.pitch=1;
   u.onend=()=>setSpeaking(false);u.onerror=()=>setSpeaking(false);
