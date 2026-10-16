@@ -1,0 +1,128 @@
+name: SX-002 isolated policy and PostgreSQL tests
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/sx-002-policy-tests.yml'
+      - 'apps/web/lib/governance/sx-002-policy-prototype*'
+      - 'docs/examinations/afa-eaba/staging-only/**'
+  workflow_dispatch:
+  push:
+    branches:
+      - audit/afa-eaba-sx-002-candidate
+    paths:
+      - apps/web/lib/governance/sx-002-policy-prototype.ts
+      - apps/web/lib/governance/sx-002-policy-prototype.test.ts
+      - docs/examinations/afa-eaba/staging-only/SX-002_NULL_FAIL_CLOSED_CANDIDATE.sql
+      - .github/workflows/sx-002-policy-tests.yml
+permissions:
+  contents: read
+jobs:
+  isolated-policy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_PASSWORD: test_only_password
+          POSTGRES_DB: sx002_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      PGHOST: localhost
+      PGPORT: 5432
+      PGUSER: postgres
+      PGPASSWORD: test_only_password
+      PGDATABASE: sx002_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+      - name: Run Vitest policy checks
+        run: npx vitest run apps/web/lib/governance/sx-002-policy-prototype.test.ts
+      - name: Build synthetic isolated effect sink
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          CREATE ROLE service_role NOLOGIN;
+          CREATE ROLE anon NOLOGIN;
+          CREATE ROLE authenticated NOLOGIN;
+          CREATE TABLE public.ta14_afa_eaba_challenge_effects (
+            effect_id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+            run_id uuid NOT NULL UNIQUE,
+            mechanism_id text NOT NULL,
+            mechanism_version text NOT NULL,
+            action text NOT NULL,
+            input_json jsonb NOT NULL,
+            effect_payload jsonb NOT NULL,
+            created_at timestamptz NOT NULL DEFAULT now()
+          );
+          SQL
+      - name: Apply candidate fail-closed SQL to disposable database
+        run: psql -v ON_ERROR_STOP=1 -f docs/examinations/afa-eaba/staging-only/SX-002_NULL_FAIL_CLOSED_CANDIDATE.sql
+      - name: Test SQL authorization, NULL rejection, and replay
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          DO $tests$
+          DECLARE
+            i integer;
+            result jsonb;
+            gates boolean[];
+            baseline_count bigint;
+            run uuid := gen_random_uuid();
+          BEGIN
+            FOR i IN 1..6 LOOP
+              gates := ARRAY[true,true,true,true,true,false];
+              gates[i] := NULL;
+              SELECT count(*) INTO baseline_count FROM public.ta14_afa_eaba_challenge_effects;
+              result := public.ta14_afa_eaba_apply_effect(gen_random_uuid(),'test','v1','null-case',
+                gates[1],gates[2],gates[3],gates[4],gates[5],gates[6]);
+              IF result->>'authorized' <> 'false' OR result->>'fired' <> 'false'
+                 OR (SELECT count(*) FROM public.ta14_afa_eaba_challenge_effects) <> baseline_count
+              THEN RAISE EXCEPTION 'NULL case % failed',i; END IF;
+            END LOOP;
+            result := public.ta14_afa_eaba_apply_effect(gen_random_uuid(),'test','v1','denied',
+              false,true,true,true,true,false);
+            IF result->>'fired' <> 'false' THEN RAISE EXCEPTION 'False predicate fired'; END IF;
+            result := public.ta14_afa_eaba_apply_effect(gen_random_uuid(),'test','v1','bypass',
+              true,true,true,true,true,true);
+            IF result->>'fired' <> 'false' THEN RAISE EXCEPTION 'Explicit bypass fired'; END IF;
+            result := public.ta14_afa_eaba_apply_effect(run,'test','v1','valid',
+              true,true,true,true,true,false);
+            IF result->>'fired' <> 'true' OR
+              (SELECT count(*) FROM public.ta14_afa_eaba_challenge_effects WHERE run_id=run) <> 1
+            THEN RAISE EXCEPTION 'Valid commit not persisted once'; END IF;
+            BEGIN
+              PERFORM public.ta14_afa_eaba_apply_effect(run,'test','v1','replay',
+                true,true,true,true,true,false);
+              RAISE EXCEPTION 'Replay was not rejected';
+            EXCEPTION WHEN unique_violation THEN NULL;
+            END;
+            IF (SELECT count(*) FROM public.ta14_afa_eaba_challenge_effects WHERE run_id=run) <> 1
+            THEN RAISE EXCEPTION 'Replay changed effect count'; END IF;
+            RAISE NOTICE 'PASS: 6 NULL, false, bypass, valid, replay (10 cases)';
+          END;
+          $tests$;
+          SQL
+      - name: Assert API roles cannot execute candidate gate
+        run: |
+          psql -v ON_ERROR_STOP=1 <<'SQL'
+          DO $tests$
+          BEGIN
+            IF has_function_privilege('anon','public.ta14_afa_eaba_apply_effect(uuid,text,text,text,boolean,boolean,boolean,boolean,boolean,boolean)','EXECUTE')
+               OR has_function_privilege('authenticated','public.ta14_afa_eaba_apply_effect(uuid,text,text,text,boolean,boolean,boolean,boolean,boolean,boolean)','EXECUTE')
+            THEN RAISE EXCEPTION 'Unauthorized API role can execute candidate gate'; END IF;
+          END;
+          $tests$;
+          SQL
+      - name: Scope declaration
+        run: echo 'Disposable PostgreSQL test only. Not production, not full authority-provenance or privileged-write hardening.'
