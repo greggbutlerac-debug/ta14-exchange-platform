@@ -58,8 +58,17 @@ const lessons = [
   ]
 ] as const;
 
-const assetRoot = '/evidence-before-intervention';
-const pdfUrl = `${assetRoot}/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf`;
+const pdfUrl = '/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf';
+const imageFiles = [
+  'HVAC Evidence Before Intervention.png',
+  'Evidence Before Intervention_ HVAC Record.png',
+  'Evidence Before HVAC Intervention.png',
+  'Evidence Before HVAC Intervention (1).png',
+  'Evidence Before HVAC Intervention (2).png',
+  'Evidence Before Intervention_ HVAC Governance Guide.png',
+  'Post-Intervention HVAC Performance Record.png',
+  'Evidence Before Intervention_ Verified HVAC Outcomes.png',
+] as const;
 
 const academyChain = [
   'Sequence', 'Non-Invasive Evidence', 'NIRET',
@@ -101,7 +110,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
             <p style={{fontWeight:800}}>LESSON {String(i+1).padStart(2,'0')} / 08</p>
             <h3 style={{fontSize:'1.6rem'}}>{title}</h3>
             <figure style={{margin:'20px 0'}}>
-              <Image src={`${assetRoot}/lesson-${String(i+1).padStart(2,'0')}.png`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} sizes="(max-width: 1080px) 100vw, 1080px" style={{width:'100%',height:'auto',borderRadius:12}} />
+              <Image src={`/${encodeURIComponent(imageFiles[i])}`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} sizes="(max-width: 1080px) 100vw, 1080px" style={{width:'100%',height:'auto',borderRadius:12}} />
               <figcaption style={{fontSize:13,marginTop:8}}>Illustrative teaching image — no real authorization, signature, measured outcome, or technical attestation is represented.</figcaption>
             </figure>
             <h4>Samantha · guided narration</h4>
