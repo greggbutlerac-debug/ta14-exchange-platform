@@ -15,6 +15,7 @@ const slides=[
 ] as const;
 const topics=['Overview','Reality','Record','Continuity + Admissibility','Authority + Standing','Binding + Commit','Execution','Outcome'];
 const anchorNotes=['Overview of all eight architectural anchors','Architectural anchor 01 — REALITY','Architectural anchor 02 — RECORD','Architectural anchors 03 and 04 — CONTINUITY + ADMISSIBILITY','Architectural anchor 05 — BINDING, with separate applicable authority and established standing','Architectural anchors 05 and 06 — BINDING + COMMIT','Architectural anchor 07 — EXECUTION','Architectural anchor 08 — OUTCOME'];
+const learningTransitions = [["Connected systems can describe conditions and propose interventions, but they do not independently grant permission to act.","We begin with Reality: what a city sensor, operator or asset actually observed before any interpretation."],["Reality is the observed condition, not an inferred cause or an approved response. Illustrative readings require a source, time, unit and context.","Next we examine Record: which original observations were preserved so another reviewer can inspect them."],["A defensible record retains original measurements, provenance and transformations without silently replacing raw data with conclusions.","Next we test Continuity and Admissibility: whether those records remain trustworthy and fit for a proposed decision."],["Continuity protects an inspectable history; admissibility evaluates fitness for a particular question. Neither by itself grants permission to act.","Next we ask who has Applicable Authority and Established Standing to authorize the proposed consequence."],["The applicable rules and an actor's standing must both be established. Neither system access nor technical capability amounts to authority.","Next we bind the proposed action to a named local actor, identified asset, bounded scope and explicit commitment."],["Federated context may inform a decision, but execution authority must be established locally. A change in circumstances may require revalidation.","Next we examine Authorized Execution: how an approved action remains within limits and produces an inspectable trail."],["An authorized execution follows an approved actor, method, asset, time window and safeguards; deviations and stop conditions must be recorded.","Next we examine Outcome and Accountability: what actually changed and how to establish whether the consequence delivered its intended result."],["Completion is not proof of improvement. Comparable post-action evidence, uncertainty and review are necessary for an accountable outcome.","The eight-image journey is complete. The Technical Reference v3.2 explains the conceptual architecture and the evidence required for a bounded pilot."]] as const;
 export default function SmartCityShowroom(){
  const [speaking,setSpeaking]=useState(-1);
  useEffect(()=>()=>{if(typeof window!=='undefined')window.speechSynthesis?.cancel()},[]);
@@ -22,7 +23,7 @@ export default function SmartCityShowroom(){
   if(!('speechSynthesis' in window))return;
   window.speechSynthesis.cancel();
   if(speaking===i){setSpeaking(-1);return}
-  const u=new SpeechSynthesisUtterance('Teaching image '+(i+1)+' of eight. '+anchorNotes[i]+'. '+slides[i].title+'. '+slides[i].voice);
+  const u=new SpeechSynthesisUtterance('Teaching image '+(i+1)+' of eight. '+anchorNotes[i]+'. '+slides[i].title+'. '+slides[i].voice+' What you learned: '+learningTransitions[i][0]+' What you will learn next: '+learningTransitions[i][1]);
   const voices=window.speechSynthesis.getVoices();
   u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en'))||null;
   u.rate=.9;u.onend=()=>setSpeaking(-1);u.onerror=()=>setSpeaking(-1);window.speechSynthesis.speak(u);setSpeaking(i);
@@ -60,6 +61,16 @@ export default function SmartCityShowroom(){
   </div>
   <p style={{fontSize:17,lineHeight:1.78,color:'#d5e5ef',maxWidth:1100}}>{s.voice}</p>
   {i===0&&<p style={{fontSize:14,color:'#f2cf81'}}>This overview is the approved first image in the eight-image showroom sequence; the separate Smart City companion poster remains in the downloadable technical reference.</p>}
+  <aside aria-label={'Learning transition after image '+(i+1)} style={{marginTop:26,padding:'22px 24px',border:'1px solid #41627d',borderRadius:14,background:'#0c263b'}}>
+    <div style={{paddingBottom:17,borderBottom:'1px solid #37516a'}}>
+      <h3 style={{color:'#9de2eb',fontSize:17,margin:'0 0 10px'}}>What You Learned</h3>
+      <p style={{fontSize:16,lineHeight:1.7,color:'#e1eef5',margin:0}}>{learningTransitions[i][0]}</p>
+    </div>
+    <div style={{paddingTop:18}}>
+      <h3 style={{color:'#f4ca62',fontSize:17,margin:'0 0 10px'}}>What You’ll Learn Next</h3>
+      <p style={{fontSize:16,lineHeight:1.7,color:'#e1eef5',margin:0}}>{learningTransitions[i][1]}</p>
+    </div>
+  </aside>
  </section>)}</div>
  <section style={{marginTop:38,border:'1px solid #41627d',borderRadius:15,padding:25,background:'#0c243a'}}>
   <h2>What the examination does not establish</h2><p style={{lineHeight:1.7,color:'#d6e5ef'}}>This public room teaches TA14's evidence-and-authority boundary. It makes no claim that a municipality has approved, certified, deployed, or tested TA14; that pictured interventions occurred; or that the visualized outcomes are independently verified. The technical reference describes how a named municipal owner could define a bounded pilot and its acceptance criteria.</p>
