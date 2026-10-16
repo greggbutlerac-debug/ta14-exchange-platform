@@ -1,0 +1,58 @@
+'use client';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
+const stages=[
+  {
+    "file": "Energy-to-Environment Coupling_ School Performance Infographic.png",
+    "name": "The building consumed the energy. What did people receive?",
+    "script": "Energy alone is incomplete. A building can consume less while failing to deliver ventilation, cooling or clean air. We examine energy, equipment, atmospheric outcome, occupancy and time. What we learned: electricity consumption does not establish environmental service. Next: the five streams."
+  },
+  {
+    "file": "Five Evidence Streams Connected.png",
+    "name": "Five evidence streams",
+    "script": "Electrical energy is recorded in kilowatts and kilowatt-hours. Mechanical condition includes vibration, heat, sound, amperage and airflow. The atmosphere is measured through temperature, humidity, carbon dioxide and particulate observations. Occupancy provides human context; continuity connects the timeline. Attendance does not prove individual exposure. What we learned: five independent streams need meaningful links. Next: how AIR preserves them."
+  },
+  {
+    "file": "Inside the Atmospheric Integrity Record.png",
+    "name": "Inside the atmospheric integrity record",
+    "script": "An Atmospheric Integrity Record preserves original observations, their units, timestamps, source identities, context and quality. Derived cooling efficiency, cost calculations and adjusted values remain separate from originals. Interpretation cannot rewrite the record. What we learned: observed is not inferred; inferred is not authorized. Next: mechanical drift."
+  },
+  {
+    "file": "Mechanical Drift_ HVAC Performance Infographic.png",
+    "name": "Mechanical drift",
+    "script": "Machinery can keep running while its condition changes. This hypothetical illustration shows vibration, bearing heat and amperage rising while airflow falls from 12 thousand to 9 thousand 800 cubic feet per minute. Those observations support investigation, not an automatic diagnosis or replacement. What we learned: a running fan may be degrading. Next: environmental drift."
+  },
+  {
+    "file": "Environmental Drift_ Indoor Air Quality Dashboard.png",
+    "name": "Environmental drift",
+    "script": "A hypothetical occupied classroom changes from 72 to 76 degrees Fahrenheit, humidity from 48 to 62 percent, carbon dioxide from 620 to 1200 parts per million, and fine particles from 3.4 to 24.2 micrograms per cubic meter. These readings need occupancy, outdoor conditions and sensor context before explaining cause. What we learned: atmosphere must be independently measured. Next: energy-to-outcome drift."
+  },
+  {
+    "file": "Energy-to-Outcome Drift Infographic.png",
+    "name": "Energy-to-outcome drift",
+    "script": "An illustrative cooling system consumes 8 kilowatts at two operating points. Cooling delivery declines from 96 thousand to 80 thousand British thermal units per hour. Efficiency falls from 12 to 10 British thermal units per watt-hour. Equal electrical power does not mean equal environmental service, and kilowatt-hours are needed to calculate actual energy cost. What we learned: distinguish power, energy, thermal output and environmental conditions. Next: schools."
+  },
+  {
+    "file": "Schools and Environmental Performance.png",
+    "name": "Schools and occupancy",
+    "script": "Two hypothetical schools may serve similar purposes yet incur different energy costs, environmental conditions and attendance. Electricity cost per attended student-day can be calculated from attributable cost and attendance counts. It does not prove individual protection, causation or fair building comparison without occupancy, weather, service and measurement context. What we learned: human service and economics can be examined without overclaiming. Next: authorized consequence."
+  },
+  {
+    "file": "From Evidence to Authorized Consequence.png",
+    "name": "From evidence to authorized consequence",
+    "script": "The AIR preserves. ACA examines computations. AI or human analysis proposes a response. AEA examines admissible evidence, applicable authority and established standing. EABA checks local execution boundaries. A bounded diagnostic may be allowed; uncertain control changes held; unsupported replacement denied; broader decisions escalated. Illustrative dispositions are not real authorizations. The building consumed the energy, the equipment performed the work, the atmosphere received the result and people experienced the conditions. No admissible evidence. No admissible execution."
+  }
+];
+const pdf='/TA14_Energy_to_Environment_Coupling_Technical_Reference_v2 (1).pdf';
+export default function EnergyToEnvironmentCoupling(){
+ const [playing,setPlaying]=useState(-1);
+ useEffect(()=>()=>{if(typeof window!=='undefined')window.speechSynthesis?.cancel()},[]);
+ function speak(i:number){if(!('speechSynthesis' in window))return;window.speechSynthesis.cancel();if(playing===i){setPlaying(-1);return;}const u=new SpeechSynthesisUtterance(stages[i].script);const voices=window.speechSynthesis.getVoices();u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en-US'))||null;u.rate=.9;u.onend=()=>setPlaying(-1);u.onerror=()=>setPlaying(-1);window.speechSynthesis.speak(u);setPlaying(i);}
+ return <main style={{background:'#071722',color:'#ecf6fa',minHeight:'100vh',fontFamily:'Arial,sans-serif'}}><div style={{maxWidth:1180,margin:'auto',padding:'30px 20px 90px'}}>
+ <nav style={{display:'flex',gap:22,flexWrap:'wrap',fontSize:14}}><Link href='/showrooms/environmental-atmospheric' style={{color:'#8edff0'}}>← Environmental & Atmospheric</Link><Link href='/showrooms' style={{color:'#8edff0'}}>All showrooms</Link></nav>
+ <header style={{padding:'60px 0 35px'}}><p style={{color:'#7ce2c0',letterSpacing:2,fontWeight:800,fontSize:12}}>TA-14 AUTHORITY GOVERNANCE INSTITUTION · INDEPENDENT PUBLIC TECHNICAL SHOWROOM</p><h1 style={{fontSize:'clamp(38px,6vw,76px)',lineHeight:1.07,margin:'18px 0',fontFamily:'Georgia,serif'}}>Energy-to-Environment<br/><span style={{color:'#80d7ed'}}>Coupling</span></h1><p style={{fontSize:'clamp(19px,2.6vw,27px)',lineHeight:1.45}}>The building consumed the energy. What did the people receive?</p><p style={{maxWidth:870,lineHeight:1.8,color:'#b9cbd3'}}>An eight-image guided examination connecting electrical input, mechanical performance, atmospheric outcome, human occupancy and evidence continuity. Based on the February 2026 architecture; expanded October 2026. Independent and vendor-neutral.</p><p style={{border:'1px solid #916f48',background:'#211d1a',borderRadius:10,padding:17,lineHeight:1.6,color:'#f1d5b0'}}>EDUCATIONAL EXAMINATION — All illustrated measurements, costs, drift indicators, equipment states, and ALLOW / HOLD / DENY / ESCALATE decisions are hypothetical. No actual school finding, individual health outcome, regulatory certification or execution authorization is claimed.</p><a href={pdf} target='_blank' rel='noopener noreferrer' style={{display:'inline-block',padding:'15px 20px',background:'#9fe5eb',color:'#09232d',borderRadius:9,fontWeight:800,textDecoration:'none',marginTop:14}}>↓ Download Technical Reference v2 (PDF)</a></header>
+ <section style={{borderTop:'1px solid #35576a',borderBottom:'1px solid #35576a',padding:'23px 0 34px'}}><h2 style={{fontFamily:'Georgia,serif',fontSize:30}}>The governing question</h2><p style={{fontSize:22,lineHeight:1.6}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p><p style={{color:'#9fb7c4'}}>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</p></section>
+ <nav aria-label='Image chapters' style={{display:'flex',flexWrap:'wrap',gap:9,margin:'28px 0'}}>{stages.map((s,i)=><a key={s.file} href={'#image-'+(i+1)} style={{border:'1px solid #44697d',color:'#beeef5',borderRadius:7,padding:'9px 12px',textDecoration:'none'}}>{String(i+1).padStart(2,'0')}</a>)}</nav>
+ {stages.map((s,i)=><section id={'image-'+(i+1)} key={s.file} style={{padding:'36px 0 50px',borderBottom:'1px solid #284858',scrollMarginTop:25}}><p style={{letterSpacing:2,color:'#7edbc2',fontWeight:800,fontSize:12}}>IMAGE {String(i+1).padStart(2,'0')} / 08</p><h2 style={{fontFamily:'Georgia,serif',fontSize:'clamp(25px,3.4vw,40px)',margin:'9px 0 20px'}}>{s.name}</h2><img src={'/'+encodeURIComponent(s.file)} alt={'TA-14 energy-to-environment coupling teaching illustration '+(i+1)+': '+s.name+' — hypothetical example'} loading={i<2?'eager':'lazy'} style={{display:'block',width:'100%',height:'auto',borderRadius:12,border:'1px solid #305269'}}/><div style={{marginTop:18,padding:'23px 25px',background:'#102b39',borderRadius:12,border:'1px solid #2b5467'}}><div style={{display:'flex',alignItems:'center',justifyContent:'space-between',gap:12,flexWrap:'wrap'}}><h3 style={{margin:0,fontSize:19}}>Samantha · Narration {String(i+1).padStart(2,'0')}</h3><button type='button' onClick={()=>speak(i)} style={{cursor:'pointer',border:'1px solid #70b9c7',borderRadius:8,padding:'10px 15px',background:'#173e4b',color:'#e8f8fb'}}>{playing===i?'■ Stop narration':'▶ Listen'}</button></div><p style={{lineHeight:1.85,color:'#d0e0e6',whiteSpace:'pre-line'}}>{s.script}</p><p style={{color:'#9fc4d0',fontSize:13}}>Audio uses an available browser voice (Samantha where installed). Scroll naturally; no forced chapter advancement.</p></div>{i<7&&<p style={{color:'#83d5e7',marginTop:22}}>Coming next: {stages[i+1].name} ↓</p>}</section>)}
+ <section style={{padding:'40px 0'}}><h2 style={{fontFamily:'Georgia,serif',fontSize:31}}>Technical reference & independent examination</h2><p style={{lineHeight:1.8,color:'#c5d7df'}}>The 12-page expanded reference addresses measurement boundaries, kilowatt versus kilowatt-hour distinctions, delivered Btuh, three forms of drift, AIR continuity, occupancy economics, comparison limits and authority boundaries. Original February 2026 foundation remains separately preserved.</p><a href={pdf} target='_blank' rel='noopener noreferrer' style={{color:'#8fe2ee',fontWeight:800}}>Download TA-14 Energy-to-Environment Coupling Technical Reference v2 (PDF) ↗</a><p style={{lineHeight:1.8,color:'#bbced7',marginTop:24}}>Technical observations and documented challenges are welcome. No proposed physical consequence is automatically authorized by any illustration, model or calculation.</p><a href='mailto:ta14@misfitexecution.com?subject=Energy-to-Environment%20Coupling%20technical%20observation' style={{color:'#96e0ee'}}>Send a technical observation ↗</a></section><footer style={{borderTop:'1px solid #31556a',paddingTop:22,color:'#a8bdca'}}>TA-14 AUTHORITY GOVERNANCE INSTITUTION · Measured. Preserved. Examined. Defensible.</footer></div></main>;
+}
