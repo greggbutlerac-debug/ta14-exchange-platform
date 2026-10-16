@@ -70,6 +70,17 @@ const imageFiles = [
   'Evidence Before Intervention_ Verified HVAC Outcomes.png',
 ] as const;
 
+const teachingCautions = [
+  'A service concern, visual inspection, or equipment label is not independently sufficient to establish a repair.',
+  'Any refrigerant-gauge imagery is conditional teaching material. Pressure readings must not be taken before applicable NIRET and separate execution authority; do not treat illustrative readings as a real baseline.',
+  'The fourteen steps are a teaching route. Cleaning, panel operations, adjustments, and other consequential actions require their own safety and authority controls.',
+  'Use only the controlling Academy NIRET criteria. A threshold finding does not automatically authorize connection, entry, recovery, charging, or repair.',
+  'Any names, numbers, measurements, or apparent signatures in the illustration are fictional placeholders, not real evidence, determinations, or attestations.',
+  'Any apparent customer approval, license number, signature, proposed equipment change, or manufacturer instruction is illustrative only. Actual scope and authority must be independently established.',
+  'Changing equipment or operating conditions can defeat direct comparability. Preserve both records separately and identify any adjustments or limits on claims of improvement.',
+  'Sample signatures and before/after values do not establish verified outcomes. If provenance or comparability is insufficient, retain an indeterminate or otherwise supported classification.',
+] as const;
+
 const academyChain = [
   'Sequence', 'Non-Invasive Evidence', 'NIRET',
   'Refrigerant-Side Evidence (if justified and separately authorized)',
@@ -95,7 +106,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
       <p>Eight lessons for evidence-governed HVAC service. Teaching sequence only; not a replacement for the controlling Academy field standard.</p>
       <aside style={{border:'2px solid #a63b3b',borderRadius:12,padding:20,margin:'24px 0'}}>
         <strong>PUBLICATION HOLD · DRAFT</strong>
-        <p>Diagnostic-termination wording, applicable NIRET details, technical validation, and final asset verification remain outstanding. The illustrated examples are not field records, approvals, or credentials.</p>
+        <p>Diagnostic-termination wording, applicable NIRET details, independent technical validation, and lesson-image technical review remain outstanding. The illustrated examples are not field records, approvals, or credentials.</p>
       </aside>
       <nav aria-label="Room navigation" style={{display:'flex',gap:16,flexWrap:'wrap',margin:'24px 0'}}><a href="#lessons">Begin eight lessons ↓</a><a href={pdfUrl} target="_blank" rel="noopener noreferrer" download>Download technical reference (PDF) ↗</a><a href="/academy/hvac/blueprint">Academy Blueprint v0.2 ↗</a></nav>
       <section aria-labelledby="academy-chain">
@@ -113,6 +124,10 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
               <Image src={`/${encodeURIComponent(imageFiles[i])}`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} sizes="(max-width: 1080px) 100vw, 1080px" style={{width:'100%',height:'auto',borderRadius:12}} />
               <figcaption style={{fontSize:13,marginTop:8}}>Illustrative teaching image — no real authorization, signature, measured outcome, or technical attestation is represented.</figcaption>
             </figure>
+            <aside style={{borderLeft:'4px solid #bd7130',padding:'12px 16px',background:'#fff4e7',color:'#382713',margin:'16px 0'}}>
+              <strong>Technical interpretation boundary</strong>
+              <p style={{marginBottom:0}}>{teachingCautions[i]}</p>
+            </aside>
             <h4>Samantha · guided narration</h4>
             <p>{narration}</p>
             <h4>What you learned</h4><p>{learned}</p>
@@ -127,7 +142,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
       </section>
       <section>
         <h2>Companion technical reference</h2>
-        <p>Use the technical reference to inspect the field sequence, admissibility limits, and outcome classifications. The link below expects the committed file at the agreed public asset path.</p><p><a href={pdfUrl} download>Download the eight-page HVAC Technical Reference v1.0 (PDF)</a></p>
+        <p>Use the technical reference to inspect the field sequence, admissibility limits, and outcome classifications. The document is committed in the repository public directory.</p><p><a href={pdfUrl} download>Download the eight-page HVAC Technical Reference v1.0 (PDF)</a></p>
       </section>
       <footer style={{borderTop:'1px solid #899aa9',marginTop:40,paddingTop:24}}>
         <p>Independent technical observations are welcome. Please identify the lesson number, evidence concern, and proposed correction. Do not include private customer records.</p>
