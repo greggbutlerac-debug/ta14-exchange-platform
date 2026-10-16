@@ -1,67 +1,65 @@
 {
-  "status": "HOLD — asset placement and technical verification pending",
+  "status": "DRAFT REVIEW — eight image/PDF URLs verified in repository; editorial image ordering needs visual confirmation",
   "route": "/showrooms/evidence-before-intervention-examination",
   "lessons": [
     {
       "number": 1,
       "title": "Preserve Reality Before Intervention",
-      "local_source": "wide_infographic_poster_slide_with_a_clean_profes.png",
-      "target": "/evidence-before-intervention/lesson-01.png"
+      "repository_path": "apps/web/public/HVAC Evidence Before Intervention.png",
+      "public_url": "/HVAC%20Evidence%20Before%20Intervention.png"
     },
     {
       "number": 2,
       "title": "Original-State HVAC Performance Record",
-      "local_source": "wide_infographic_style_slide_image_with_a_clean_p.png",
-      "target": "/evidence-before-intervention/lesson-02.png"
+      "repository_path": "apps/web/public/Evidence Before Intervention_ HVAC Record.png",
+      "public_url": "/Evidence%20Before%20Intervention_%20HVAC%20Record.png"
     },
     {
       "number": 3,
       "title": "Seven In / Seven Out Examination",
-      "local_source": "a_wide_infographic_slide_layout_like_a_training_p.png",
-      "target": "/evidence-before-intervention/lesson-03.png"
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention.png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention.png"
     },
     {
       "number": 4,
       "title": "NIRET",
-      "local_source": "a_wide_infographic_style_educational_slide_board.png",
-      "target": "/evidence-before-intervention/lesson-04.png"
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention (1).png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention%20(1).png"
     },
     {
       "number": 5,
       "title": "Declared Diagnostic Determination",
-      "local_source": "wide_infographic_poster_with_a_professional_techni.png",
-      "target": "/evidence-before-intervention/lesson-05.png"
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention (2).png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention%20(2).png"
     },
     {
       "number": 6,
       "title": "Establish Authority Before Intervention",
-      "local_source": "a_detailed_infographic_poster_slide_with_a_profe.png",
-      "target": "/evidence-before-intervention/lesson-06.png"
+      "repository_path": "apps/web/public/Evidence Before Intervention_ HVAC Governance Guide.png",
+      "public_url": "/Evidence%20Before%20Intervention_%20HVAC%20Governance%20Guide.png"
     },
     {
       "number": 7,
       "title": "Post-Intervention HVAC Performance Record",
-      "local_source": "a_wide_infographic_style_instructional_slide_in_a.png",
-      "target": "/evidence-before-intervention/lesson-07.png"
+      "repository_path": "apps/web/public/Post-Intervention HVAC Performance Record.png",
+      "public_url": "/Post-Intervention%20HVAC%20Performance%20Record.png"
     },
     {
       "number": 8,
       "title": "Proof of Performance and Verified Outcome",
-      "local_source": "a_large_infographic_poster_style_image_clean_corp.png",
-      "target": "/evidence-before-intervention/lesson-08.png"
+      "repository_path": "apps/web/public/Evidence Before Intervention_ Verified HVAC Outcomes.png",
+      "public_url": "/Evidence%20Before%20Intervention_%20Verified%20HVAC%20Outcomes.png"
     }
   ],
   "companion_pdf": {
-    "local_source": "TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
-    "target": "/evidence-before-intervention/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
-    "status": "local verified; public repo path unverified"
+    "repository_path": "apps/web/public/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
+    "public_url": "/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
+    "status": "verified on main"
   },
   "publication_gates": [
-    "Confirm image text and factual accuracy; examples illustrative",
-    "Confirm controlling Academy NIRET and diagnostic-termination wording",
-    "Upload exact image and PDF assets",
-    "Verify image/PDF paths and accessibility",
-    "Confirm feedback email recipient",
-    "Technical review and explicit release authorization"
+    "Visually confirm correspondence and legibility for all eight images",
+    "Verify controlling Academy NIRET and diagnostic-termination language",
+    "Verify build/preview",
+    "Technical review and explicit authorization before merging"
   ]
 }
