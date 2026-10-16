@@ -2,7 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { CANONICAL_EXCHANGE_ORIGIN } from "../../lib/site/canonical-origin";
+import { CANONICAL_EXCHANGE_ORIGIN, isVercelDeploymentHost } from "../../lib/site/canonical-origin";
 import { createClient } from "../../lib/supabase/server";
 
 const DEFAULT_NEXT = "/workspace/ai-governance/registry/register";
@@ -16,8 +16,10 @@ function safeNext(value: FormDataEntryValue | string | null | undefined): string
 
 function recoveryOrigin(): string {
   // Recovery is an identity-continuity boundary. Do not derive its return
-  // origin from deployment aliases or forwarded host headers: the recovered
-  // session must return on the canonical Exchange host.
+  // origin from untrusted forwarded host headers. Previews use their own
+  // Vercel-provided hostname so the callback can set cookies on that host.
+  const previewHost = process.env.VERCEL_ENV === "preview" ? process.env.VERCEL_URL?.trim() : undefined;
+  if (previewHost && isVercelDeploymentHost(previewHost)) return `https://${previewHost}`;
   const configured = process.env.NEXT_PUBLIC_SITE_URL?.trim().replace(/\/$/, "");
   if (configured === CANONICAL_EXCHANGE_ORIGIN) return configured;
   return CANONICAL_EXCHANGE_ORIGIN;
