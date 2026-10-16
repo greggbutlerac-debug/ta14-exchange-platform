@@ -15,6 +15,14 @@ export async function GET(request: NextRequest) {
   const next = safePath(url.searchParams.get("next"));
   const code = url.searchParams.get("code");
   const tokenHash = url.searchParams.get("token_hash");
+  const isRecovery = next.startsWith("/account-recovery/reset");
+  // Supabase default recovery emails return fragment session tokens, invisible to server routes.
+  // Serve a same-origin client bridge to establish the browser session before opening the reset form.
+  if (isRecovery && !code && !tokenHash && !url.searchParams.has("error")) {
+    const bridge = new URL("/auth/recovery/complete", url.origin);
+    bridge.searchParams.set("next", next);
+    return NextResponse.redirect(bridge);
+  }
   const type = url.searchParams.get("type");
 
   // Keep preview callbacks on their preview host for cookie-based testing.
