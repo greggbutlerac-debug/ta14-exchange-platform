@@ -16,13 +16,18 @@ export default async function ReferralAdminPage() {
  const shell = (heading:string,detail:string) => <main style={{maxWidth:800,margin:'64px auto',padding:24,fontFamily:'system-ui'}}><h1>TA14 referral administration</h1><h2>{heading}</h2><p>{detail}</p></main>;
  if (authError || !user) return shell('Sign-in required','Sign in with a verified TA14 administrator account. Referral records are not public.');
 
+ const primaryAdminEmail = 'ta14admissibleexecution@gmail.com';
+ if (user.email?.toLowerCase() !== primaryAdminEmail || !user.email_confirmed_at) {
+  return shell('Account not eligible','The primary TA14 administrator must sign in with the verified TA14 email address.');
+ }
+
  // Server-only credentials; do not use NEXT_PUBLIC_ for the service-role key.
  const url=process.env.NEXT_PUBLIC_SUPABASE_URL;
  const key=process.env.SUPABASE_SERVICE_ROLE_KEY;
  if (!url || !key) return shell('Administrative access unavailable','Secure server configuration is not yet complete.');
  const admin=createServiceClient(url,key,{auth:{autoRefreshToken:false,persistSession:false}});
  const {data:allowed,error:allowError}=await admin.from('ta14_open_door_admins').select('user_id').eq('user_id',user.id).maybeSingle();
- if (allowError || !allowed) return shell('Access restricted','This signed-in account has not been explicitly approved to administer TA14 referral entitlements.');
+ if (allowError || !allowed) return <main style={{maxWidth:800,margin:'64px auto',padding:24,fontFamily:'system-ui'}}><h1>TA14 referral administration</h1><h2>Administrator enrollment pending</h2><p>Your TA14 email has been verified by the authentication provider, but this account has not yet been granted administrator privileges.</p><p>For secure enrollment, a trusted database administrator must match the authenticated user ID below to the verified Supabase account before adding it to the private administrator allowlist.</p><p><strong>Authenticated user ID:</strong> <code>{user.id}</code></p><p>Do not send passwords, login codes, or service-role credentials. This page does not grant itself access.</p></main>;
 
  const {data:rows,error:readError}=await admin.from('ta14_open_door_referral_entitlements')
   .select('id,referring_entity_id,referred_entity_id,qualifying_engagement_id,paid_amount_cents,entitlement_cents,redeemed_cents,eligibility_status')
