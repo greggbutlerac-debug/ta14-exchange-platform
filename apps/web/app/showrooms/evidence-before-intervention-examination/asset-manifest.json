@@ -1,0 +1,67 @@
+{
+  "status": "HOLD — asset placement and technical verification pending",
+  "route": "/showrooms/evidence-before-intervention-examination",
+  "lessons": [
+    {
+      "number": 1,
+      "title": "Preserve Reality Before Intervention",
+      "local_source": "wide_infographic_poster_slide_with_a_clean_profes.png",
+      "target": "/evidence-before-intervention/lesson-01.png"
+    },
+    {
+      "number": 2,
+      "title": "Original-State HVAC Performance Record",
+      "local_source": "wide_infographic_style_slide_image_with_a_clean_p.png",
+      "target": "/evidence-before-intervention/lesson-02.png"
+    },
+    {
+      "number": 3,
+      "title": "Seven In / Seven Out Examination",
+      "local_source": "a_wide_infographic_slide_layout_like_a_training_p.png",
+      "target": "/evidence-before-intervention/lesson-03.png"
+    },
+    {
+      "number": 4,
+      "title": "NIRET",
+      "local_source": "a_wide_infographic_style_educational_slide_board.png",
+      "target": "/evidence-before-intervention/lesson-04.png"
+    },
+    {
+      "number": 5,
+      "title": "Declared Diagnostic Determination",
+      "local_source": "wide_infographic_poster_with_a_professional_techni.png",
+      "target": "/evidence-before-intervention/lesson-05.png"
+    },
+    {
+      "number": 6,
+      "title": "Establish Authority Before Intervention",
+      "local_source": "a_detailed_infographic_poster_slide_with_a_profe.png",
+      "target": "/evidence-before-intervention/lesson-06.png"
+    },
+    {
+      "number": 7,
+      "title": "Post-Intervention HVAC Performance Record",
+      "local_source": "a_wide_infographic_style_instructional_slide_in_a.png",
+      "target": "/evidence-before-intervention/lesson-07.png"
+    },
+    {
+      "number": 8,
+      "title": "Proof of Performance and Verified Outcome",
+      "local_source": "a_large_infographic_poster_style_image_clean_corp.png",
+      "target": "/evidence-before-intervention/lesson-08.png"
+    }
+  ],
+  "companion_pdf": {
+    "local_source": "TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
+    "target": "/evidence-before-intervention/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
+    "status": "local verified; public repo path unverified"
+  },
+  "publication_gates": [
+    "Confirm image text and factual accuracy; examples illustrative",
+    "Confirm controlling Academy NIRET and diagnostic-termination wording",
+    "Upload exact image and PDF assets",
+    "Verify image/PDF paths and accessibility",
+    "Confirm feedback email recipient",
+    "Technical review and explicit release authorization"
+  ]
+}
