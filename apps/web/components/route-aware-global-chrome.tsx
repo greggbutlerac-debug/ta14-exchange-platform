@@ -182,7 +182,7 @@ export function RouteAwareGlobalChrome() {
         </>
       ) : null}
 
-      {isPublicShowroom ? (
+      {isPublicShowroom && !isBlueIotDiscussionShowroom ? (
         <>
           <nav className="ta14-showroom-wayfinding" aria-label="TA-14 showroom navigation">
             <a href="/" aria-label="Return to TA-14 Exchange">TA-14 EXCHANGE</a>
