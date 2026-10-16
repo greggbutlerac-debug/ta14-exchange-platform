@@ -61,6 +61,9 @@ export function createExecutionRecord(input: {
 
   if (!prior.commitPermitted || !committed) { commitValid = false; reasons.push('COMMIT_REQUIRED', 'COMMIT_NOT_PERMITTED'); }
   if (prior.receipt.hash !== expectedCommitReceiptHash) { commitValid = false; reasons.push('COMMIT_RECEIPT_INVALID'); }
+  const signedPayload = prior.receipt.payload as { commit?: unknown; commitPermitted?: unknown; authorityInput?: unknown } | null;
+  if (!signedPayload || digest(stable(signedPayload.commit ?? null)) !== digest(stable(committed ?? null)) || signedPayload.commitPermitted !== prior.commitPermitted) { commitValid = false; reasons.push('COMMIT_OBJECT_RECEIPT_MISMATCH'); }
+  if (!signedPayload || digest(stable(signedPayload.authorityInput ?? null)) !== digest(stable(input.authorityInput))) { commitValid = false; reasons.push('COMMIT_INPUT_RECEIPT_MISMATCH'); }
   if (committed && (committed.assetId !== input.authorityInput.asset.assetId || committed.assetVersion !== input.authorityInput.asset.version || committed.routeId !== input.authorityInput.asset.routeId || committed.consequence !== input.attempt.consequence)) { commitValid = false; reasons.push('COMMIT_SCOPE_MISMATCH'); }
   if (committed && input.authorityInput.authority && committed.authorityId !== input.authorityInput.authority.authorityId) { commitValid = false; reasons.push('COMMIT_AUTHORITY_MISMATCH'); }
   if (committed && committed.evidenceId !== input.authorityInput.evidence.evidenceId) { commitValid = false; reasons.push('COMMIT_EVIDENCE_MISMATCH'); }
