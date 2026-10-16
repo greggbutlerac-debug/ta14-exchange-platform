@@ -61,6 +61,8 @@ jobs:
           psql -v ON_ERROR_STOP=1 <<'SQL'
           INSERT INTO public.ta14_consequence_examination_intakes(intake_id,status)
           VALUES ('TA14-CEX-20261013-ABCDEFGHIJ','READY_FOR_PAYMENT');
+          INSERT INTO public.ta14_consequence_examination_intakes(intake_id,status)
+          VALUES ('TA14-CEX-20261013-KLMNOPQRST','READY_FOR_PAYMENT');
           INSERT INTO public.ta14_consequence_intake_evidence(intake_id)
           VALUES ('TA14-CEX-20261013-ABCDEFGHIJ');
           DO $test$
@@ -101,6 +103,15 @@ jobs:
             EXCEPTION WHEN OTHERS THEN
               IF SQLERRM = 'Evidence update unexpectedly allowed' THEN RAISE; END IF;
             END;
+            -- A paid row must not be moved into another, still-payable intake.
+            BEGIN
+              UPDATE public.ta14_consequence_intake_evidence
+                SET intake_id='TA14-CEX-20261013-KLMNOPQRST'
+                WHERE intake_id=v_id;
+              RAISE EXCEPTION 'Frozen evidence reassignment unexpectedly allowed';
+            EXCEPTION WHEN OTHERS THEN
+              IF SQLERRM = 'Frozen evidence reassignment unexpectedly allowed' THEN RAISE; END IF;
+            END;
             BEGIN
               PERFORM * FROM public.ta14_finalize_verified_examination_payment(
                 v_id,'OTHERORDER','OTHERCAPTURE',now(),'{}'::jsonb,v_hash,1);
@@ -111,8 +122,6 @@ jobs:
             IF (SELECT paypal_order_id FROM public.ta14_consequence_examination_intakes WHERE intake_id=v_id) <> 'ORDER123' THEN
               RAISE EXCEPTION 'Payment binding changed after conflicting request';
             END IF;
-            INSERT INTO public.ta14_consequence_examination_intakes(intake_id,status)
-            VALUES ('TA14-CEX-20261013-KLMNOPQRST','READY_FOR_PAYMENT');
             BEGIN
               PERFORM * FROM public.ta14_finalize_verified_examination_payment(
                 'TA14-CEX-20261013-KLMNOPQRST','ORDER456','CAPTURE456',now(),'{}'::jsonb,v_hash,1);
