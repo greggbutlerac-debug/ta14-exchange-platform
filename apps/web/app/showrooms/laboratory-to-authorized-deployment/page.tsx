@@ -46,7 +46,7 @@ const frames=[
   },
   {
     "title": "Verified Outcomes and Accountable Deployment",
-    "file": "Verified Outcomes Accountability Infographic.png",
+    "file": "Verified Outcomes and Accountable Deployment.png",
     "script": "Execute only a specifically authorized action, monitor against a declared baseline, preserve deviations and adverse effects, and reassess changed conditions. The numbers and outcomes in the illustration are hypothetical; they are not EPA, Blueprint or real classroom findings.",
     "description": "Record execution, verify outcomes and renew or withdraw permission as conditions change."
   }
