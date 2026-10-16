@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const steps=[
 ['01','DETECT','Sustained CO₂ event','Environmental sensing identifies a condition that may warrant attention. Detection is evidence of a condition, not authority to intervene.'],
@@ -15,6 +15,26 @@ const steps=[
 
 export default function BlueIotEvidenceToActionShowroom(){
  const [phase,setPhase]=useState<'DETECTED'|'VALIDATED'|'ALLOW'|'HOLD'|'VERIFIED'>('DETECTED');
+ const [speakingImage,setSpeakingImage]=useState<string|null>(null);
+ const [speechAvailable,setSpeechAvailable]=useState(false);
+ useEffect(()=>{
+  setSpeechAvailable(typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window);
+  return ()=>{ if(typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel(); };
+ },[]);
+ const stopNarration=()=>{if(typeof window !== 'undefined' && 'speechSynthesis' in window)window.speechSynthesis.cancel();setSpeakingImage(null);};
+ const playNarration=(number:string,title:string,script:string)=>{
+  if(typeof window==='undefined'||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
+  window.speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance('Image '+number+' of eight. '+title+'. '+script);
+  const voices=window.speechSynthesis.getVoices();
+  const selected=voices.find(v=>/samantha/i.test(v.name))||voices.find(v=>/^en[-_]/i.test(v.lang)&&/female|zira|ava|allison/i.test(v.name))||voices.find(v=>/^en[-_]/i.test(v.lang));
+  if(selected)utterance.voice=selected;
+  utterance.rate=0.9;
+  utterance.onend=()=>setSpeakingImage(null);
+  utterance.onerror=()=>setSpeakingImage(null);
+  setSpeakingImage(number);
+  window.speechSynthesis.speak(utterance);
+ };
  const determination=phase==='ALLOW'||phase==='VERIFIED'?'ALLOW':phase==='HOLD'?'HOLD':'PENDING';
  const accent=phase==='ALLOW'||phase==='VERIFIED'?'#7ff0bd':phase==='HOLD'?'#f2bf6a':'#6fdfff';
  return <main style={{minHeight:'100vh',padding:'48px 22px 100px',background:'radial-gradient(circle at 84% 4%,rgba(68,207,255,.16),transparent 28%),radial-gradient(circle at 10% 44%,rgba(74,229,179,.10),transparent 30%),linear-gradient(180deg,#02070d,#06111c 52%,#02070d)',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
@@ -44,9 +64,13 @@ export default function BlueIotEvidenceToActionShowroom(){
  ].map(([number,title,file,narration])=><article key={number} style={{marginTop:24,padding:'clamp(14px,2.5vw,26px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:18,background:'rgba(1,10,18,.65)'}}>
  <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:14,alignItems:'center'}}><h3 style={{fontSize:'clamp(19px,2.6vw,28px)',margin:0,color:'#eef7fb'}}>{number} / 08 · {title}</h3><span style={{fontSize:11,color:'#7ff0bd',fontWeight:900}}>ILLUSTRATIVE EXAMINATION</span></div>
  <img src={`/${encodeURIComponent(file)}`} alt={`TA14 Blue IoT teaching image ${number} of 08: ${title}. ${narration}`} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:12,border:'1px solid rgba(113,231,255,.16)'}}/>
- <p style={{margin:'16px 0 0',lineHeight:1.65,color:'#b8cbd6'}}><strong style={{color:'#7ff0bd'}}>SAMANTHA · NARRATION SCRIPT:</strong> {narration}</p>
+ <p style={{margin:'16px 0 10px',lineHeight:1.65,color:'#b8cbd6'}}><strong style={{color:'#7ff0bd'}}>NARRATION SCRIPT:</strong> {narration}</p>
+ <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+ <button type="button" disabled={!speechAvailable} onClick={()=>playNarration(number,title,narration)} aria-label={`Read image ${number} narration aloud`} style={{padding:'10px 16px',borderRadius:999,cursor:speechAvailable?'pointer':'not-allowed',background:'rgba(111,223,255,.12)',border:'1px solid rgba(111,223,255,.5)',color:'#adf0ff',fontWeight:800}}>{speakingImage===number?'RESTART NARRATION':'▶ LISTEN TO NARRATION'}</button>
+ <button type="button" disabled={!speakingImage} onClick={stopNarration} style={{padding:'10px 16px',borderRadius:999,cursor:speakingImage?'pointer':'not-allowed',background:'transparent',border:'1px solid rgba(255,255,255,.24)',color:'#e7f2f7',fontWeight:800}}>■ STOP</button>
+ </div>
  </article>)}
- <p style={{margin:'20px 0 0',fontSize:13,color:'#8fa8b7'}}>Narration scripts are displayed for accessibility and review. Recorded Samantha audio is not yet available; no audio playback is represented as implemented. Scroll freely through all eight images.</p>
+ <p style={{margin:'20px 0 0',fontSize:13,color:'#8fa8b7'}}>Read-aloud controls use the visitor's browser/device voice. The Samantha voice is preferred automatically when installed, but is not guaranteed; this is not a studio-recorded Samantha audio track. Scripts remain visible for accessibility. Scroll freely through all eight images.</p>
  </section>
 
  <section style={{margin:'22px 0',padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(127,240,189,.22)',borderRadius:26,background:'rgba(5,18,27,.88)'}}>
