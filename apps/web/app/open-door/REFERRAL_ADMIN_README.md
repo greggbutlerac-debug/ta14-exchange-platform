@@ -25,3 +25,23 @@
 - Privacy notice and retention policy for inquiry data.
 
 **Do not expose a Supabase service-role key to the browser.** The public inquiry form does not call this ledger. No customer-facing rewards are live.
+
+## Primary administrator enrollment — gated procedure
+
+Designated mailbox: `ta14admissibleexecution@gmail.com`. The institutional subject ID displayed by Mission Control is a candidate identifier, not sufficient evidence by itself to grant a privileged role.
+
+1. A trusted operator independently checks the live Supabase Auth user directory for the candidate UUID, matching email, and confirmed email status. Do not rely solely on a pasted screen, chat message, or client-supplied email.
+2. Independently establish TA14 authorization to administer referral entitlements and record the approval basis.
+3. Only after both checks, enroll the verified UUID in `public.ta14_open_door_admins` using a privileged administrative channel. Never expose the service-role key or implement self-enrollment.
+4. Verify `/open-door/admin` displays the read-only ledger for that account, while unrelated and anonymous sessions remain denied.
+5. Revoke access when authority ends and verify deployment protections before publication.
+
+Enrollment remains pending until those checks are complete. The dashboard does not issue payments or award services.
+
+## Test evidence and limits
+
+- A rolled-back referral insertion created an audit INSERT event.
+- A rolled-back entitlement update created an audit UPDATE event.
+- A database constraint rejected redemption beyond the earned balance.
+- The rollback and follow-up checks left zero fictional test records.
+- These checks do not establish authenticated administrator access, service-role-only function behavior, concurrency safety, reversal handling, or a production-ready payment flow.
