@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Energy-to-Environment Coupling · What Did the People Receive?','/showrooms/energy-to-environment-coupling','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images AIR electrical kW kWh HVAC mechanical drift environmental outcome occupancy school cost per student attendance energy accountability ACA AEA EABA Samantha narration technical reference'],
 ['Smart City Admissible Governance · A Smart City Is Not Necessarily a Governed City','/showrooms/smart-city-admissible-governance','INTEROPERABILITY & SYSTEMS','Eight original teaching images municipal sensors air traffic water public safety AFA EIG AIR authority standing bounded execution Smart City technical reference v3.2'],
 ['Malawi 2026 · Clean Air Governance','/showrooms/malawi-clean-air-governance','COUNTRIES & PUBLIC INSTITUTIONS','Malawi atmospheric integrity evidence local authority Karonga hypothetical clean air'],
 ['Predictive Intelligence and the Consequence Boundary','/showrooms/predictive-intelligence-consequence-boundary','INTEROPERABILITY & SYSTEMS','Predictive AI BAS VAV evidence authority standing eight numbered scenes Samantha interactive simulated examination technical reference'],
