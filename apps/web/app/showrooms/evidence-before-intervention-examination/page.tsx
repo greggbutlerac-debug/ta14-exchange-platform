@@ -60,12 +60,12 @@ const lessons = [
 
 const pdfUrl = '/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf';
 const imageFiles = [
-  'HVAC Evidence Before Intervention.png',
-  'Evidence Before Intervention_ HVAC Record.png',
   'Evidence Before HVAC Intervention.png',
+  'Evidence Before Intervention_ HVAC Record.png',
+  'HVAC Evidence Before Intervention.png',
   'Evidence Before HVAC Intervention (1).png',
   'Evidence Before HVAC Intervention (2).png',
-  'Evidence Before Intervention_ HVAC Governance Guide.png',
+  'Evidence Before HVAC Intervention (3).png',
   'Post-Intervention HVAC Performance Record.png',
   'Evidence Before Intervention_ Verified HVAC Outcomes.png',
 ] as const;
