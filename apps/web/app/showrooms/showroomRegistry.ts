@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Laboratory Efficacy to Authorized Deployment · Air-Treatment Evidence Examination','/showrooms/laboratory-to-authorized-deployment','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight distinct teaching images laboratory efficacy field deployment transferability uncertainty safety actor capacity standing authority decision outcomes EPA Blueprint independent technical reference'],
 ['Smart City Admissible Governance · A Smart City Is Not Necessarily a Governed City','/showrooms/smart-city-admissible-governance','INTEROPERABILITY & SYSTEMS','Eight original teaching images municipal sensors air traffic water public safety AFA EIG AIR authority standing bounded execution Smart City technical reference v3.2'],
 ['Malawi 2026 · Clean Air Governance','/showrooms/malawi-clean-air-governance','COUNTRIES & PUBLIC INSTITUTIONS','Malawi atmospheric integrity evidence local authority Karonga hypothetical clean air'],
 ['Predictive Intelligence and the Consequence Boundary','/showrooms/predictive-intelligence-consequence-boundary','INTEROPERABILITY & SYSTEMS','Predictive AI BAS VAV evidence authority standing eight numbered scenes Samantha interactive simulated examination technical reference'],
