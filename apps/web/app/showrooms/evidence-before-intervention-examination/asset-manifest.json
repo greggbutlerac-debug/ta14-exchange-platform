@@ -1,12 +1,12 @@
 {
-  "status": "DRAFT REVIEW — eight image/PDF URLs verified in repository; editorial image ordering needs visual confirmation",
+  "status": "DRAFT REVIEW — original eight source-image files independently matched to GitHub via SHA; technical/source-language review pending",
   "route": "/showrooms/evidence-before-intervention-examination",
   "lessons": [
     {
       "number": 1,
       "title": "Preserve Reality Before Intervention",
-      "repository_path": "apps/web/public/HVAC Evidence Before Intervention.png",
-      "public_url": "/HVAC%20Evidence%20Before%20Intervention.png"
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention.png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention.png"
     },
     {
       "number": 2,
@@ -17,8 +17,8 @@
     {
       "number": 3,
       "title": "Seven In / Seven Out Examination",
-      "repository_path": "apps/web/public/Evidence Before HVAC Intervention.png",
-      "public_url": "/Evidence%20Before%20HVAC%20Intervention.png"
+      "repository_path": "apps/web/public/HVAC Evidence Before Intervention.png",
+      "public_url": "/HVAC%20Evidence%20Before%20Intervention.png"
     },
     {
       "number": 4,
@@ -35,8 +35,8 @@
     {
       "number": 6,
       "title": "Establish Authority Before Intervention",
-      "repository_path": "apps/web/public/Evidence Before Intervention_ HVAC Governance Guide.png",
-      "public_url": "/Evidence%20Before%20Intervention_%20HVAC%20Governance%20Guide.png"
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention (3).png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention%20(3).png"
     },
     {
       "number": 7,
@@ -57,9 +57,9 @@
     "status": "verified on main"
   },
   "publication_gates": [
-    "Visually confirm correspondence and legibility for all eight images",
-    "Verify controlling Academy NIRET and diagnostic-termination language",
-    "Verify build/preview",
+    "Confirm image legibility and technical consistency, especially illustrative signatures and gauge timing",
+    "Verify controlling Academy NIRET and diagnostic-termination wording",
+    "Verify latest build and preview",
     "Technical review and explicit authorization before merging"
   ]
 }
