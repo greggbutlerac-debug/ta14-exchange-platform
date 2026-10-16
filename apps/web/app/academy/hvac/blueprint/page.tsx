@@ -99,6 +99,15 @@ export default function HvacBlueprintPage() {
           </div>
         </header>
 
+        <section className="aaaTeaching" aria-label="Assess Address Assure teaching framework" style={{ margin: "1.5rem 0", padding: "1.25rem", border: "1px solid currentColor", borderRadius: "12px" }}>
+          <small>PROPOSED TECHNICIAN-FACING TEACHING FRAMEWORK</small>
+          <h2>Assess → Address → Assure</h2>
+          <p><strong>ASSESS:</strong> Observe, measure, and preserve original conditions before intervention.</p>
+          <p><strong>ADDRESS:</strong> Justify the action, confirm authorization, and perform the work within scope.</p>
+          <p><strong>ASSURE:</strong> Measure again, compare against the original record, and report the actual outcome.</p>
+          <p><small>Inspired by Lisa Greenfield’s Assess → Address → Assure methodology. Attribution and proposed TA14 adaptation are pending Lisa’s confirmation. This teaching aid does not replace the nine proof elements, NIRET, the 14-step field route, or the v0.2 assessment requirements.</small></p>
+        </section>
+
         <section className="principle">
           <b>Evidence first. Truth preserved. Intervention earned.</b>
           <span>The technician must establish and preserve the original system state before disturbance, use NIRET to determine whether refrigerant-side entry is evidentially necessary, declare what the evidence supports, intervene only within established authority, and prove the result by comparing the post-performance record to the preserved original state.</span>
