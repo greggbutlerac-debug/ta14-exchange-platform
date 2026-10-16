@@ -61,6 +61,11 @@ SET search_path = ''
 AS $$
 DECLARE v_status text; v_frozen_at timestamptz;
 BEGIN
+  -- Never permit reassignment of a frozen evidence row to a payable intake.
+  -- Evidence remains bound to the original intake for its entire lifetime.
+  IF TG_OP = 'UPDATE' AND OLD.intake_id IS DISTINCT FROM NEW.intake_id THEN
+    RAISE EXCEPTION 'Examination evidence cannot be reassigned to another intake';
+  END IF;
   SELECT status, evidence_frozen_at INTO v_status, v_frozen_at
     FROM public.ta14_consequence_examination_intakes
     WHERE intake_id = CASE WHEN TG_OP = 'DELETE' THEN OLD.intake_id ELSE NEW.intake_id END
