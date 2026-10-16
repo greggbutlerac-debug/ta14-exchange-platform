@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Evidence Before Intervention | HVAC Technical Examination Draft | TA14',
@@ -57,6 +58,9 @@ const lessons = [
   ]
 ] as const;
 
+const assetRoot = '/evidence-before-intervention';
+const pdfUrl = `${assetRoot}/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf`;
+
 const academyChain = [
   'Sequence', 'Non-Invasive Evidence', 'NIRET',
   'Refrigerant-Side Evidence (if justified and separately authorized)',
@@ -84,7 +88,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
         <strong>PUBLICATION HOLD · DRAFT</strong>
         <p>Diagnostic-termination wording, applicable NIRET details, technical validation, and final asset verification remain outstanding. The illustrated examples are not field records, approvals, or credentials.</p>
       </aside>
-      <p><a href="/academy/hvac/blueprint">Read the Academy Evidence Before Intervention Blueprint v0.2</a></p>
+      <nav aria-label="Room navigation" style={{display:'flex',gap:16,flexWrap:'wrap',margin:'24px 0'}}><a href="#lessons">Begin eight lessons ↓</a><a href={pdfUrl} target="_blank" rel="noopener noreferrer" download>Download technical reference (PDF) ↗</a><a href="/academy/hvac/blueprint">Academy Blueprint v0.2 ↗</a></nav>
       <section aria-labelledby="academy-chain">
         <h2 id="academy-chain">Controlling Academy evidence-to-proof chain</h2>
         <ol>{academyChain.map((stage)=><li key={stage}>{stage}</li>)}</ol>
@@ -96,11 +100,11 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
           <article key={title} id={`lesson-${i+1}`} style={{border:'1px solid #899aa9',borderRadius:16,padding:24,margin:'24px 0'}}>
             <p style={{fontWeight:800}}>LESSON {String(i+1).padStart(2,'0')} / 08</p>
             <h3 style={{fontSize:'1.6rem'}}>{title}</h3>
-            <div style={{padding:20,background:'#eaf1f6',color:'#12263a',borderRadius:10}}>
-              <strong>Image asset awaiting verified repository placement</strong>
-              <p>The approved lesson illustration will appear here after the asset path is confirmed. No image is silently substituted.</p>
-            </div>
-            <h4>Samantha · narration draft</h4>
+            <figure style={{margin:'20px 0'}}>
+              <Image src={`${assetRoot}/lesson-${String(i+1).padStart(2,'0')}.png`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} sizes="(max-width: 1080px) 100vw, 1080px" style={{width:'100%',height:'auto',borderRadius:12}} />
+              <figcaption style={{fontSize:13,marginTop:8}}>Illustrative teaching image — no real authorization, signature, measured outcome, or technical attestation is represented.</figcaption>
+            </figure>
+            <h4>Samantha · guided narration</h4>
             <p>{narration}</p>
             <h4>What you learned</h4><p>{learned}</p>
             <h4>What comes next</h4><p>{next}</p>
@@ -114,10 +118,10 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
       </section>
       <section>
         <h2>Companion technical reference</h2>
-        <p>The eight-page Technical Reference v1.0 was reported committed by the owner, but its final repository/public URL has not yet been verified. The download control remains withheld until confirmed.</p>
+        <p>Use the technical reference to inspect the field sequence, admissibility limits, and outcome classifications. The link below expects the committed file at the agreed public asset path.</p><p><a href={pdfUrl} download>Download the eight-page HVAC Technical Reference v1.0 (PDF)</a></p>
       </section>
       <footer style={{borderTop:'1px solid #899aa9',marginTop:40,paddingTop:24}}>
-        <p><strong>Submit Technical Feedback</strong> — Email destination pending verification; no unverified recipient address is embedded.</p>
+        <p><strong>Submit Technical Feedback</strong> — Recipient address awaiting verification. Do not send sensitive or personal field records through an unverified channel.</p>
         <p>Examination draft only. No governing publication, credentialing, or institutional endorsement is implied.</p>
       </footer>
     </main>
