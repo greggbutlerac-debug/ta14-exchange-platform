@@ -121,7 +121,8 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
         <p>Use the technical reference to inspect the field sequence, admissibility limits, and outcome classifications. The link below expects the committed file at the agreed public asset path.</p><p><a href={pdfUrl} download>Download the eight-page HVAC Technical Reference v1.0 (PDF)</a></p>
       </section>
       <footer style={{borderTop:'1px solid #899aa9',marginTop:40,paddingTop:24}}>
-        <p><strong>Submit Technical Feedback</strong> — Recipient address awaiting verification. Do not send sensitive or personal field records through an unverified channel.</p>
+        <p>Independent technical observations are welcome. Please identify the lesson number, evidence concern, and proposed correction. Do not include private customer records.</p>
+        <a href="mailto:ta14admissibleexecution@gmail.com?subject=HVAC%20Evidence%20Before%20Intervention%20Technical%20Feedback" style={{position:'fixed',right:20,bottom:20,background:'#163c62',color:'white',padding:'10px 14px',borderRadius:999,fontSize:13,fontWeight:700,boxShadow:'0 4px 16px #0003',zIndex:20}}>Submit Technical Feedback ↗</a>
         <p>Examination draft only. No governing publication, credentialing, or institutional endorsement is implied.</p>
       </footer>
     </main>
