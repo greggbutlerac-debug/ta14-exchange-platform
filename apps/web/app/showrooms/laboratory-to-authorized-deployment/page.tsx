@@ -1,0 +1,58 @@
+'use client';
+import Link from 'next/link';
+import {useEffect,useState} from 'react';
+const frames=[
+  {
+    "title": "Laboratory Efficacy Is Not Field Authorization",
+    "file": "Laboratory Efficacy vs Real-World Authorization.png",
+    "script": "A laboratory finding is evidence about a bounded test. It does not by itself establish field performance, occupant safety, regulatory permission or authority to install. We must examine the actual proposed consequence and its site.",
+    "description": "Define the gap between a controlled experiment and a real occupied environment."
+  },
+  {
+    "title": "Precisely Bounded Claims and Quantitative Evidence",
+    "file": "Bounded Claims and Evidence Framework.png",
+    "script": "State the target, endpoint, population, site, comparison, duration and uncertainty. Record the original observations and prohibit extrapolations the test cannot support. An unsupported health claim stays on hold even when a narrower laboratory finding is defensible.",
+    "description": "Bind scientific claims to a precise endpoint and supporting evidence."
+  },
+  {
+    "title": "Evidence Provenance, Raw Observations, and Baseline Continuity",
+    "file": "Evidence Provenance and IAQ Continuity.png",
+    "script": "Preserve instrument identity, calibration, methodology, timestamps and raw observations. Keep raw and adjusted data separately and document every transformation. Baselines must remain comparable as occupancy, ventilation, equipment and operating conditions change.",
+    "description": "Protect provenance, unaltered readings, corrections and time continuity."
+  },
+  {
+    "title": "Scientific Transferability Matrix and Six Examination Gates",
+    "file": "Scientific Transferability Matrix and Examination Gates.png",
+    "script": "Compare seven transfer dimensions: target, airflow, population, dose and time, performance, safety and continuity. Then examine the claim, transfer, safety, continuity, authority and verification gates. A difference or unknown may require hold or escalation, not a presumed pass.",
+    "description": "Compare laboratory conditions with field conditions and examine six gates."
+  },
+  {
+    "title": "Human Consequence Boundary",
+    "file": "Human Consequence Boundary Infographic (1).png",
+    "script": "Examine who may be affected, how exposure may occur, potential byproducts, vulnerable occupants, operating faults and stop conditions. Safety is a competent-specialist determination, not an inference from a performance graph. All scenario values shown are illustrations, not verified study results.",
+    "description": "Protect people through bounded exposure, safety review and stop conditions."
+  },
+  {
+    "title": "Applicable Authority and Established Standing",
+    "file": "Authority and Standing Governance Infographic (3).png",
+    "script": "Applicable authority asks which requirements permit or constrain a proposed consequence. Established standing asks who may act. Record actor, capacity, standing basis and authority relationship. Neither capability nor institutional access establishes authority.",
+    "description": "Establish both governing rules and actor-specific standing."
+  },
+  {
+    "title": "Separate Efficacy and Deployment Dispositions",
+    "file": "Efficacy and Deployment Decision Framework.png",
+    "script": "Maintain separate records for the scientific claim and for site deployment. A claim may remain on hold while a narrower, independently approved evaluation is considered. Conversely, a valid efficacy finding never grants permission to install or operate.",
+    "description": "Keep efficacy findings separate from permission to execute."
+  },
+  {
+    "title": "Verified Outcomes and Accountable Deployment",
+    "file": "Verified Outcomes Accountability Infographic.png",
+    "script": "Execute only a specifically authorized action, monitor against a declared baseline, preserve deviations and adverse effects, and reassess changed conditions. The numbers and outcomes in the illustration are hypothetical; they are not EPA, Blueprint or real classroom findings.",
+    "description": "Record execution, verify outcomes and renew or withdraw permission as conditions change."
+  }
+];
+const pdf='/'+encodeURIComponent('TA14_Laboratory_to_Authorized_Deployment_v2_Institutional_Examination (2).pdf');
+function speak(script:string,onDone:()=>void){if(!('speechSynthesis' in window))return false;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(script);const v=window.speechSynthesis.getVoices();u.voice=v.find(x=>/Samantha/i.test(x.name))||v.find(x=>x.lang==='en-US')||null;u.rate=.91;u.onend=onDone;u.onerror=onDone;window.speechSynthesis.speak(u);return true}
+export default function LaboratoryDeploymentShowroom(){const [active,setActive]=useState(-1);useEffect(()=>()=>{window.speechSynthesis?.cancel()},[]);function narrate(i:number){if(active===i){window.speechSynthesis?.cancel();setActive(-1);return}const message='Image '+(i+1)+'. '+frames[i].title+'. '+frames[i].script;setActive(i);if(!speak(message,()=>setActive(-1)))setActive(-1)}
+return <main className="room"><div className="wrap"><nav><Link href="/showrooms">← All showrooms</Link><Link href="/showrooms/environmental-atmospheric">Environmental & atmospheric →</Link><Link href="/">TA14 Exchange →</Link></nav><header><p className="eyebrow">TA14 AUTHORITY GOVERNANCE INSTITUTION · INDEPENDENT TECHNICAL SHOWROOM</p><h1>FROM LABORATORY EFFICACY<br/><em>TO AUTHORIZED DEPLOYMENT</em></h1><p className="lead">Eight-image guided examination of the evidence-to-execution boundary for air-treatment technologies.</p><p className="note">Independent teaching surface informed by research-to-deployment challenges discussed in correspondence concerning EPA–Blueprint Biosecurity CRADA work. Not an EPA or Blueprint publication, endorsement, collaboration, authorization, or review. No confidential CRADA information was used. All device configurations, numerical results, health outcomes and dispositions displayed in illustrations are hypothetical.</p><div className="actions"><a href={pdf} download>↓ Download Technical Reference v2.0 (PDF)</a><a className="outline" href="#sequence">Explore eight images ↓</a></div></header><section className="question"><small>THE GOVERNING QUESTION</small><h2>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</h2><p>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</p></section><section id="sequence"><h2>Eight-image technical examination</h2><p>Scroll freely or select any image. Each teaching panel includes optional spoken narration, using Samantha when available in your browser.</p><div className="jump">{frames.map((s,i)=><a href={'#image-'+(i+1)} key={s.title}>{String(i+1).padStart(2,'0')} · {s.title}</a>)}</div>{frames.map((f,i)=><article id={'image-'+(i+1)} key={f.file}><div className="framehead"><span>{String(i+1).padStart(2,'0')}</span><div><h3>{f.title}</h3><p>{f.description}</p></div></div><img loading={i<2?'eager':'lazy'} src={'/'+encodeURIComponent(f.file)} alt={f.title+' — TA14 educational infographic; all numerical examples are illustrative'} /><div className="under"><button type="button" onClick={()=>narrate(i)} aria-label={(active===i?'Stop':'Play')+' narration for image '+(i+1)}>{active===i?'■ Stop narration':'▶ Hear narration'}</button><details><summary>Read narration</summary><p>{f.script}</p></details></div></article>)}</section><section className="close"><h2>What may legitimately be concluded?</h2><p>Scientific claim support, evidence transferability, safety, site authority and actor standing must be documented for the exact proposed action. A HOLD on a broad efficacy claim is not the same as a DENY for every narrower field study. An ALLOW is bounded by site, scope, actor, time and conditions and must be re-examined when they materially change.</p><p><strong>ALLOW / HOLD / DENY / ESCALATE</strong> apply to defined proposals, not technologies in the abstract. This room is an independent educational examination, not an engineering design, health claim, risk assessment, or regulatory determination.</p><div className="actions"><a href={pdf} download>↓ Technical Reference PDF</a><Link href="/showrooms">Explore all showrooms →</Link></div></section><footer>TA14 AUTHORITY GOVERNANCE INSTITUTION · EVIDENCE BEFORE CONSEQUENCE · NO ADMISSIBLE EVIDENCE. NO ADMISSIBLE EXECUTION.</footer></div><style jsx>{`
+.room{min-height:100vh;background:#061722;color:#e7f4fa;font-family:Arial,sans-serif}.wrap{max-width:1180px;margin:auto;padding:25px 22px}nav{display:flex;gap:24px;flex-wrap:wrap;font-size:13px}nav :global(a){color:#8de4ef}header{padding:65px 0 45px}.eyebrow,.question small{color:#7decc5;font-size:12px;font-weight:800;letter-spacing:.14em}h1{font-size:clamp(38px,6vw,68px);line-height:1.07;letter-spacing:-.04em;margin:20px 0}h1 em{font-style:normal;color:#82e9f4}.lead{font-size:22px;line-height:1.55;max-width:900px}.note{font-size:14px;line-height:1.75;border:1px solid #765d3b;padding:17px;border-radius:12px;background:#211c19;color:#e5d7c3}.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:24px}.actions a{display:inline-block;background:#89e4ed;color:#06202c;padding:14px 18px;border-radius:9px;text-decoration:none;font-weight:800}.actions .outline{background:transparent;color:#91e6ed;border:1px solid #5696a4}.question{border-block:1px solid #315568;padding:36px 0 42px}.question h2{font-size:clamp(24px,3vw,37px);line-height:1.35;max-width:1000px}.question p{color:#94c4d2}#sequence{padding:40px 0}#sequence>h2,.close h2{font-size:32px}#sequence>p,.close p{color:#bad2dd;line-height:1.7}.jump{display:flex;flex-wrap:wrap;gap:9px;margin:26px 0 38px}.jump a{border:1px solid #426679;color:#c8eef5;padding:9px 12px;text-decoration:none;border-radius:8px;font-size:12px}article{scroll-margin-top:20px;border-top:1px solid #345060;padding:35px 0 48px}.framehead{display:flex;align-items:start;gap:18px;margin-bottom:19px}.framehead>span{font-size:33px;color:#77dbed;font-weight:900}.framehead h3{font-size:clamp(23px,3vw,34px);margin:0 0 8px}.framehead p{color:#a8c9d5;line-height:1.5;margin:0}article img{display:block;width:100%;height:auto;border-radius:12px;border:1px solid #274858} .under{display:flex;gap:20px;align-items:start;flex-wrap:wrap;margin-top:15px}.under button{background:#0d4c65;color:#fff;border:1px solid #6ed6e5;border-radius:8px;padding:12px 16px;cursor:pointer;font-weight:700}.under details{flex:1;min-width:240px;border:1px solid #305367;border-radius:8px;padding:12px 16px}.under summary{cursor:pointer;color:#93e5ed;font-weight:700}.under details p{color:#bdd2dc;line-height:1.7}.close{padding:35px 0 60px;border-top:1px solid #315568}footer{font-size:11px;text-align:center;color:#8eb1c1;border-top:1px solid #294b5b;padding:25px 0}@media(max-width:650px){.wrap{padding:16px}header{padding:36px 0}.framehead{gap:11px}.framehead>span{font-size:26px}}`}</style></main>}
