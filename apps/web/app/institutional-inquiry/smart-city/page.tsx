@@ -17,8 +17,8 @@ export default function SmartCityInquiry(){
  return <main style={{background:'#071a2b',color:'#e6f4ff',minHeight:'100vh',padding:'50px 20px',fontFamily:'system-ui,sans-serif'}}><div style={{maxWidth:760,margin:'auto'}}>
  <Link href="/showrooms/smart-city-admissible-governance" style={{color:'#9de2eb'}}>← Return to Smart City showroom</Link>
  <p style={{color:'#f4ca70',fontSize:12,letterSpacing:2,marginTop:36}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · WRITTEN INQUIRY</p>
- <h1 style={{fontSize:'clamp(30px,5vw,48px)'}}>Request a Technical Examination</h1>
- <p style={{lineHeight:1.7,color:'#c4d7e5'}}>Tell us which real-world consequence you want to examine. This opens a written inquiry only; formal examination, governance registration, and commercial scope require separate agreement.</p>
+ <h1 style={{fontSize:'clamp(30px,5vw,48px)'}}>Begin an Institutional Inquiry</h1>
+ <p style={{lineHeight:1.7,color:'#c4d7e5'}}>Tell us about your infrastructure challenge, proposed collaboration, or real-world consequence you want to examine. Initial written discussions, including commercial partnership exploration, do not require payment or governance registration. Formal examinations are scoped separately by agreement.</p>
  <form onSubmit={e=>{e.preventDefault();if(ready)window.location.href=mailto;}} style={{display:'grid',gap:18,marginTop:30}}>
  <label>Institutional pathway<select value={pathway} onChange={e=>setPathway(e.target.value)} style={field}>{['Municipal & Government','Technology & Infrastructure','Research & Standards'].map(x=><option key={x}>{x}</option>)}</select></label>
  <label>Organization<input required value={organization} onChange={e=>setOrganization(e.target.value)} style={field}/></label>
