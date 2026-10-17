@@ -145,6 +145,16 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
         <ul>{criticalFailures.map(f=><li key={f}>{f}</li>)}</ul>
         <p>Urgent protective action remains bounded by applicable safety and legal requirements. Preserve surviving evidence and document lost testability.</p>
       </section>
+      <section aria-labelledby="academy-practice" style={{border:'1px solid #9fb9cc',borderRadius:14,padding:'24px',margin:'32px 0'}}>
+        <p style={{fontWeight:800,letterSpacing:'.09em',fontSize:12}}>CONTINUE THE ACADEMY ROUTE</p>
+        <h2 id="academy-practice">Study the governing blueprint. Then practice.</h2>
+        <p>This eight-image showroom is an introduction, not the complete controlling field standard or a competency credential. The Academy blueprint preserves the nine proof elements, explains the NIRET evidence boundary, and provides access to the fourteen-step field operations lab.</p>
+        <nav style={{display:'flex',flexWrap:'wrap',gap:18}}>
+          <a href="/academy/hvac/blueprint">Review the Academy blueprint and Samantha audio guide ↗</a>
+          <a href="/exchange/hvac/14-step/1">Begin the fourteen-step field route ↗</a>
+        </nav>
+        <p style={{fontSize:13,marginTop:16}}>The Academy's existing narration playback belongs to its own blueprint page. This showroom presently provides Samantha's written teaching narration; audio playback has not been implemented here.</p>
+      </section>
       <section>
         <h2>Companion technical reference</h2>
         <p>Use the technical reference to inspect the field sequence, admissibility limits, and outcome classifications. The document is committed in the repository public directory.</p><p><a href={pdfUrl} download>Download the eight-page HVAC Technical Reference v1.0 (PDF)</a></p>
