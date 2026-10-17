@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['VR4BIM × TA14 · The Model Is Coordinated. Who Authorizes Reality?','/showrooms/vr4bim-ta14-collaboration','INTEROPERABILITY & SYSTEMS','VR4BIM BIM construction coordination authority standing execution boundary independent collaboration concept eight illustrations technical reference no endorsement'],
 ['ONUMA Semantic Bridge · Back from Tokyo, October 16, 2026','/showrooms/onuma-semantic-bridge-october-2026','EVENTS & PRESENTATIONS','Kimon Onuma Semantic Bridge graph of graphs Asset Leadership Network Greggory Don Butler TA14 October 16 source-linked session record RE1 execution governance'],
 ['Energy-to-Environment Coupling · What Did the People Receive?','/showrooms/energy-to-environment-coupling','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images AIR electrical kW kWh HVAC mechanical drift environmental outcome occupancy school cost per student attendance energy accountability ACA AEA EABA Samantha narration technical reference'],
 ['Smart City Admissible Governance · A Smart City Is Not Necessarily a Governed City','/showrooms/smart-city-admissible-governance','INTEROPERABILITY & SYSTEMS','Eight original teaching images municipal sensors air traffic water public safety AFA EIG AIR authority standing bounded execution Smart City technical reference v3.2'],
