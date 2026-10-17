@@ -1,6 +1,6 @@
 'use client';
 import {useState} from 'react';
-import {evaluate} from '../../../../../governed-air/decision-engine.mjs';
+import {examineUnverifiedClaims} from '../../../../../governed-air/workspace-boundary.mjs';
 
 const evidenceKeys=['source','timestamp','calibration','continuity'] as const;
 const authorityKeys=['actor','capacity','standing_basis','authority_relationship','applicable_policy'] as const;
@@ -26,7 +26,7 @@ export default function ExaminationWorkspace(){
  const examine=()=>{
   const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
   const authority=Object.fromEntries(authorityKeys.map(k=>[k,fields[k]||'']));
-  const result=evaluate({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
+  const result=examineUnverifiedClaims({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
   setRecord({case_id:caseId,simulation:true,created_at:new Date().toISOString(),observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,result});
  };
  const download=()=>{if(!record)return;const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-examination-simulation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
