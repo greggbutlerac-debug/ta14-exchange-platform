@@ -18,4 +18,4 @@ jobs:
         with:
           node-version: '22'
       - name: Test simulated governance decisions
-        run: node --test governed-air/decision-engine.test.mjs
+        run: node --test governed-air/*.test.mjs
