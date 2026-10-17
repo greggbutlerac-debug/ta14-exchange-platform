@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import LessonAudio from './LessonAudio';
 
 export const metadata: Metadata = {
   title: 'Evidence Before Intervention | HVAC Technical Examination Draft | TA14',
@@ -123,6 +124,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
               <img src={`/${encodeURIComponent(imageFiles[i])}`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} loading={i < 2 ? "eager" : "lazy"} style={{width:'100%',height:'auto',borderRadius:12}} />
               <figcaption style={{fontSize:13,marginTop:8}}>Illustrative teaching image — no real authorization, signature, measured outcome, or technical attestation is represented.</figcaption>
             </figure>
+            <LessonAudio number={i+1} title={title} script={narration} />
             <section aria-label={`Samantha's narration for lesson ${i+1}`} style={{background:'#edf4fa',border:'1px solid #c6d9e7',borderRadius:14,padding:'clamp(20px,3vw,34px)',margin:'16px 0 24px',color:'#13283a'}}>
               <p style={{fontSize:12,fontWeight:800,letterSpacing:'.13em',textTransform:'uppercase',margin:'0 0 4px',color:'#326386'}}>TA14 · Guided teaching</p>
               <h4 style={{fontSize:'1.35rem',lineHeight:1.3,margin:'0 0 18px'}}>Samantha explains the image</h4>
@@ -153,7 +155,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
           <a href="/academy/hvac/blueprint">Review the Academy blueprint and Samantha audio guide ↗</a>
           <a href="/exchange/hvac/14-step/1">Begin the fourteen-step field route ↗</a>
         </nav>
-        <p style={{fontSize:13,marginTop:16}}>The Academy's existing narration playback belongs to its own blueprint page. This showroom presently provides Samantha's written teaching narration; audio playback has not been implemented here.</p>
+        <p style={{fontSize:13,marginTop:16}}>Each image has its own Samantha audio playback control immediately beneath it. Voice availability and voice identity depend on the visitor's device; complete written narration remains available.</p>
       </section>
       <section>
         <h2>Companion technical reference</h2>
