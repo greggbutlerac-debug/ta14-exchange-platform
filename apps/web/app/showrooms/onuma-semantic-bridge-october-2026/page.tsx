@@ -102,7 +102,7 @@ export default function OnumaSemanticBridgeRecord(){
  <p style={{fontSize:19,fontWeight:800,marginTop:26,color:'#8de9e2'}}>Represented is not observed. Inferred is not authorized. Capability is not authority.</p>
  </section>
  <section style={{...panel,marginBottom:26}}>
- <p style={eyebrow}>04 · EXAMINE THE BOUNDARY</p>
+ <p style={eyebrow}>05 · EXAMINE THE BOUNDARY</p>
  <h2 style={{fontSize:32,margin:'12px 0'}}>The RE1 work-order example</h2>
  <p style={muted}>The existing ONUMA × TA14 RE1 examination illustrates the difference between finding a represented operational relationship and establishing sufficient evidence and authority for physical electrical intervention. Bounded investigation is supported; unsupported physical work remains on HOLD.</p>
  <p style={{fontSize:20,lineHeight:1.6,fontWeight:800}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
