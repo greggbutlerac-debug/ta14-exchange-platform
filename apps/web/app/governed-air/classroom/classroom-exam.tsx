@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import Link from 'next/link';
-type Disposition='ALLOW'|'HOLD'|'DENY'|'ESCALATE';
+import { evaluate } from '../../../../../governed-air/decision-engine.mjs';
 const evidence=['source','timestamp','calibration','continuity'] as const;
 const authority=['actor','capacity','standing_basis','authority_relationship','applicable_policy'] as const;
 const labels:Record<string,string>={source:'Sensor source documented',timestamp:'Timestamp documented',calibration:'Calibration verified',continuity:'Measurement continuity verified',actor:'Responsible actor identified',capacity:'Actor capacity established',standing_basis:'Standing basis documented',authority_relationship:'Authority relationship documented',applicable_policy:'Applicable policy established'};
@@ -12,15 +12,11 @@ export default function ClassroomExam(){
  const [safety,setSafety]=useState(false);
  const [record,setRecord]=useState<Record<string,unknown>|null>(null);
  const examine=()=>{
-  const missingEvidence=evidence.filter(k=>!checked[k]);
-  const missingAuthority=authority.filter(k=>!checked[k]);
-  let disposition:Disposition='HOLD';let reason='Evidence and/or authority not established';
-  if(safety){disposition='ESCALATE';reason='Follow independently applicable safety procedures; no autonomous actuation'}
-  else if(action==='dismiss'){reason='Dismissal is not authorized by this teaching fixture'}
-  else if(missingEvidence.length||missingAuthority.length){reason='Evidence and/or authority not established'}
-  else if(action==='change_ventilation'){reason='Physical intervention requires separate site-specific execution authorization'}
-  else {disposition='ALLOW';reason='Simulated bounded investigation only; no real-world authority'}
-  setRecord({case_id:'GA-CLASSROOM-001',simulation:true,observation:{CO2_ppm:1680,hypothetical:true},proposed_action:action,safety_escalation:safety,missingEvidence,missingAuthority,disposition,reason,examined_at:new Date().toISOString()});
+  const evidenceRecord=Object.fromEntries(evidence.filter(k=>checked[k]).map(k=>[k,'documented in simulation']));
+  const authorityRecord=Object.fromEntries(authority.filter(k=>checked[k]).map(k=>[k,'documented in simulation']));
+  const input={observation:{value:1680,unit:'ppm',hypothetical:true},evidence:evidenceRecord,authority:authorityRecord,proposed_action:action,safety_escalation:safety};
+  const result=evaluate(input);
+  setRecord({case_id:'GA-CLASSROOM-001',version:'0.2',simulation:true,input,result,examined_at:new Date().toISOString()});
  };
  const download=()=>{if(!record)return;const url=URL.createObjectURL(new Blob([JSON.stringify(record,null,2)],{type:'application/json'}));const a=document.createElement('a');a.href=url;a.download='governed-air-simulation.json';a.click();URL.revokeObjectURL(url)};
  return <main style={{minHeight:'100vh',background:'#071923',color:'#e7f5f9',padding:'40px 20px',fontFamily:'system-ui,sans-serif'}}>
@@ -40,8 +36,8 @@ export default function ClassroomExam(){
  {([['investigate','Request bounded investigation'],['change_ventilation','Change ventilation controls'],['dismiss','Dismiss observation']] as const).map(([v,label])=><label key={v} style={{display:'block',padding:'10px 0'}}><input type="radio" name="action" checked={action===v} onChange={()=>setAction(v)}/> {label}</label>)}
  <label style={{display:'block',marginTop:15}}><input type="checkbox" checked={safety} onChange={e=>setSafety(e.target.checked)}/> Applicable safety procedure requires escalation</label>
  <button onClick={examine} style={{marginTop:20,padding:'13px 20px',background:'#79e0e0',color:'#07202b',border:0,borderRadius:9,fontWeight:700,cursor:'pointer'}}>Examine proposed action</button>
- <h3>Disposition</h3><div aria-live="polite" style={{fontSize:28,fontWeight:800,color:'#ffcf81'}}>{record?String(record.disposition):'AWAITING EXAMINATION'}</div>
- <p aria-live="polite">{record?String(record.reason):'Run the simulated examination to generate a decision record.'}</p>
+ <h3>Disposition</h3><div aria-live="polite" style={{fontSize:28,fontWeight:800,color:'#ffcf81'}}>{record?String((record.result as {disposition:string}).disposition):'AWAITING EXAMINATION'}</div>
+ <p aria-live="polite">{record?String((record.result as {reason:string}).reason):'Run the simulated examination to generate a decision record.'}</p>
  {record&&<><pre style={{whiteSpace:'pre-wrap',overflowWrap:'anywhere',fontSize:12,background:'#061b25',padding:14,borderRadius:10}}>{JSON.stringify(record,null,2)}</pre><button onClick={download} style={{padding:12,cursor:'pointer'}}>Download JSON record</button></>}
  </section></div>
  <p style={{marginTop:35}}>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome.</p>
