@@ -48,7 +48,12 @@ export default function OnumaSemanticBridgeRecord(){
  <section style={{...panel,marginBottom:26}}>
  <p style={eyebrow}>02 · RECOGNITION RECORD</p>
  <h2 style={{fontSize:32,margin:'12px 0'}}>A contribution surfaced inside the graph</h2>
- <p style={muted}>According to Greggory Don Butler's account of the Asset Leadership Network discussion, Kimon navigated the Semantic Bridge graph-of-graphs, searched for Butler and TA14, and described their work and progress. Butler reports that Michael Bordenaro then expressed strong appreciation for TA14's work.</p>
+ <p style={muted}>According to Greggory Don Butler's account of the Asset Leadership Network discussion, Kimon navigated the Semantic Bridge graph-of-graphs, searched for Butler and TA14, and described their work and progress. Butler reports that Michael Bordenaro then praised his work; his reading of the 49:48–50:35 segment appears below.</p>
+ <div style={{background:'#0b2131',border:'1px solid #3b7184',borderRadius:14,padding:22,marginTop:16}}>
+ <p style={{...eyebrow,color:'#8ce7e0'}}>PARTICIPANT-TRANSCRIBED RECORD · 49:48–50:35</p>
+ <p style={muted}>In Butler's reading of the session, Michael Bordenaro says: <em>“Gregory is doing amazing things.”</em> Kimon Onuma identifies TA14 in the Semantic Bridge graph and describes Butler's same-morning contribution on authority, governance, and the owner's perspective. Onuma connects that entry to the overheating-floor building example and asks whether the proposed action can be trusted. He also mentions Butler's involvement in a presentation Butler heard as “Bopping Your BIM.”</p>
+ <p style={{fontSize:13,color:'#a9c0ce',lineHeight:1.7}}>Butler supplied this reading from the recording. It has not been independently transcribed; exact phrasing, speaker attribution, and the presentation title remain subject to audio verification. This does not establish ONUMA or ALN endorsement or adoption.</p>
+ </div>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:15,marginTop:22}}>
  <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>DOCUMENTED ACKNOWLEDGMENT</p><p style={muted}>Kimon's public LinkedIn response confirms that he highlighted Butler's contribution during the session.</p></div>
  <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>PARTICIPANT ACCOUNT</p><p style={muted}>The graph demonstration and Michael Bordenaro's positive remarks are reported by Butler; exact wording and recording timestamps remain unverified here.</p></div>
