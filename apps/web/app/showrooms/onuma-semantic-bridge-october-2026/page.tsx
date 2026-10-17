@@ -56,7 +56,42 @@ export default function OnumaSemanticBridgeRecord(){
  <p style={{fontSize:13,color:'#9fbacb',lineHeight:1.7,marginTop:20}}>No formal endorsement, institutional partnership, independent technical validation, or adoption is asserted. This record can be updated with a verified recording timestamp and exact quotation.</p>
  </section>
  <section style={{...panel,marginBottom:26}}>
- <p style={eyebrow}>03 · CONCEPTUAL ARCHITECTURE · NOT A DEPLOYMENT DIAGRAM</p>
+ <p style={eyebrow}>03 · VISUAL FIELD GUIDE · ORIGINAL TA14 ILLUSTRATIONS</p>
+ <h2 style={{fontSize:32,margin:'12px 0'}}>See the connection, then examine the boundary</h2>
+ <p style={muted}>These diagrams are original explanatory graphics, not ONUMA screenshots, verified session frames, or representations of an implemented ONUMA–TA14 integration. The source links below let readers inspect ONUMA's work directly.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(285px,1fr))',gap:16,marginTop:22}}>
+ <div style={{background:'#061828',border:'1px solid #315c71',borderRadius:16,padding:20}}>
+ <p style={{...eyebrow,color:'#85e4e6'}}>A · SEMANTIC RELATIONSHIPS</p>
+ <svg viewBox="0 0 440 250" role="img" aria-label="Conceptual semantic graph linking building, space, HVAC, asset and work order" style={{width:'100%',height:'auto',display:'block'}}>
+ <defs><linearGradient id="semanticBg" x1="0" x2="1"><stop stopColor="#092638"/><stop offset="1" stopColor="#061421"/></linearGradient></defs>
+ <rect width="440" height="250" rx="12" fill="url(#semanticBg)"/>
+ {[[220,124,95,55],[220,124,345,52],[220,124,360,175],[220,124,95,190],[220,124,220,225],[95,55,95,190],[345,52,360,175]].map((l,i)=><line key={i} x1={l[0]} y1={l[1]} x2={l[2]} y2={l[3]} stroke="#2bbfd2" strokeWidth="2" opacity=".68"/>)}
+ {[[220,124,'BUILDING'],[95,55,'SPACE'],[345,52,'HVAC'],[360,175,'ASSET'],[95,190,'WORK ORDER'],[220,225,'RECORD']].map((n,i)=><g key={i}><circle cx={n[0]} cy={n[1]} r={i===0?43:37} fill={i===0?'#254e54':'#0b3148'} stroke={i===0?'#e9c16d':'#58d6e8'} strokeWidth="2"/><text x={n[0]} y={Number(n[1])+4} textAnchor="middle" fontSize={i===0?13:10} fontWeight="700" fill="#eefaff">{n[2]}</text></g>)}
+ </svg>
+ <p style={{...muted,fontSize:14}}>Relationships help locate and contextualize information. A connected node is not proof of the present physical condition.</p>
+ <a href={recording} target="_blank" rel="noopener noreferrer" style={{color:'#85e9e9',fontWeight:800,fontSize:13}}>VIEW ONUMA'S ORIGINAL SESSION ↗</a>
+ </div>
+ <div style={{background:'#061828',border:'1px solid #315c71',borderRadius:16,padding:20}}>
+ <p style={{...eyebrow,color:'#85e4e6'}}>B · REPRESENTATION TO CONSEQUENCE</p>
+ <svg viewBox="0 0 440 250" role="img" aria-label="Conceptual building asset and work-order model stopped at an evidence and authority gate" style={{width:'100%',height:'auto',display:'block'}}>
+ <rect width="440" height="250" rx="12" fill="#081e2d"/>
+ <g stroke="#54c5d7" fill="none" strokeWidth="2"><path d="M35 92L122 46L207 92V191H35Z"/><path d="M122 46V191M35 92H207M35 143H207M75 72V191M165 72V191"/><path d="M55 111h45v24H55zM138 111h48v24h-48zM55 157h45v23H55zM138 157h48v23h-48z"/></g>
+ <path d="M215 125h40" stroke="#5ce5de" strokeWidth="3"/><path d="M246 118l10 7-10 7" stroke="#5ce5de" fill="none" strokeWidth="3"/>
+ <rect x="264" y="65" width="155" height="123" rx="12" fill="#29251b" stroke="#f0c574" strokeWidth="2"/>
+ <text x="341" y="92" textAnchor="middle" fontSize="14" fill="#f0c574" fontWeight="700">AUTHORITY GATE</text>
+ <text x="341" y="116" textAnchor="middle" fontSize="12" fill="#f3f5f6">Evidence?</text>
+ <text x="341" y="139" textAnchor="middle" fontSize="12" fill="#f3f5f6">Authority?</text>
+ <text x="341" y="162" textAnchor="middle" fontSize="12" fill="#f3f5f6">Standing?</text>
+ <text x="121" y="218" textAnchor="middle" fontSize="13" fill="#c4e9ef">REPRESENTED BUILDING</text>
+ <text x="341" y="218" textAnchor="middle" fontSize="13" fill="#f0c574">ALLOW / HOLD</text>
+ </svg>
+ <p style={{...muted,fontSize:14}}>An asset relationship or work order can justify investigation without authorizing electrical, mechanical, or other physical intervention.</p>
+ <Link href={re1} style={{color:'#85e9e9',fontWeight:800,fontSize:13}}>OPEN THE RE1 FIELD CASE →</Link>
+ </div>
+ </div>
+ </section>
+ <section style={{...panel,marginBottom:26}}>
+ <p style={eyebrow}>04 · CONCEPTUAL ARCHITECTURE · NOT A DEPLOYMENT DIAGRAM</p>
  <h2 style={{fontSize:32,margin:'12px 0 8px'}}>From connected knowledge to governed consequence</h2>
  <p style={muted}>The following is a TA14 teaching interpretation of complementary functions. It does not claim that ONUMA implemented, approved, or adopted this architecture.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(270px,1fr))',gap:14,marginTop:24}}>
