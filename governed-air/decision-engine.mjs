@@ -1,15 +1,17 @@
-// Governed Air v0.1 — simulation-only deterministic evaluation.
-// This module never actuates physical equipment.
+// Governed Air teaching fixture v0.2. NOT production governance or equipment control.
 export function evaluate(input) {
-  const requiredEvidence = ['source','timestamp','calibration','continuity'];
-  const requiredAuthority = ['actor','capacity','standing_basis','authority_relationship','applicable_policy'];
-  const missingEvidence = requiredEvidence.filter(k => !input.evidence?.[k]);
-  const missingAuthority = requiredAuthority.filter(k => !input.authority?.[k]);
-  const action = input.proposed_action;
-  if (!['investigate','change_ventilation','dismiss'].includes(action)) return {disposition:'DENY',reason:'Unknown proposed action',missingEvidence,missingAuthority,simulation:true};
-  if (input.safety_escalation === true) return {disposition:'ESCALATE',reason:'Refer to applicable safety procedure; no autonomous action',missingEvidence,missingAuthority,simulation:true};
-  if (action === 'dismiss' && input.observation?.value >= 1500) return {disposition:'HOLD',reason:'Observation requires accountable review before dismissal; threshold is scenario-specific, not a health limit',missingEvidence,missingAuthority,simulation:true};
-  if (missingEvidence.length || missingAuthority.length) return {disposition:'HOLD',reason:'Evidence and/or authority not established',missingEvidence,missingAuthority,simulation:true};
-  if (action === 'change_ventilation') return {disposition:'HOLD',reason:'Physical intervention requires separate site-specific execution authorization and controls',missingEvidence,missingAuthority,simulation:true};
-  return {disposition:'ALLOW',reason:'Bounded investigation only; not physical intervention',missingEvidence,missingAuthority,simulation:true};
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return {disposition:'DENY',reason:'Invalid examination request',missingEvidence:[],missingAuthority:[],simulation:true};
+  const evidenceFields=['source','timestamp','calibration','continuity'];
+  const authorityFields=['actor','capacity','standing_basis','authority_relationship','applicable_policy'];
+  const present=(obj,key)=>typeof obj?.[key]==='string' && obj[key].trim().length>0;
+  const missingEvidence=evidenceFields.filter(k=>!present(input.evidence,k));
+  const missingAuthority=authorityFields.filter(k=>!present(input.authority,k));
+  const base={missingEvidence,missingAuthority,simulation:true};
+  const action=input.proposed_action;
+  if (!['investigate','change_ventilation','dismiss'].includes(action)) return {...base,disposition:'DENY',reason:'Unknown proposed action'};
+  if (input.safety_escalation===true) return {...base,disposition:'ESCALATE',reason:'Refer to independently applicable safety procedure; no autonomous action'};
+  if (action==='dismiss') return {...base,disposition:'HOLD',reason:'Dismissal is not authorized by this teaching fixture; review the observation'};
+  if (missingEvidence.length || missingAuthority.length) return {...base,disposition:'HOLD',reason:'Evidence and/or authority not established'};
+  if (action==='change_ventilation') return {...base,disposition:'HOLD',reason:'Physical intervention requires separate site-specific execution authorization'};
+  return {...base,disposition:'ALLOW',reason:'Simulated bounded investigation only; no real-world authority or physical intervention'};
 }
