@@ -33,6 +33,10 @@ begin
      and payment_evidence_verified_by is not null
      and payment_evidence_reviewed_at is not null
      and payment_evidence_reviewed_at <= now()
+     and payment_evidence_reviewed_at >= paid_verified_at
+     and payment_reversal_status = 'clear'
+     and payment_reversal_checked_at is not null
+     and payment_reversal_checked_at >= payment_evidence_reviewed_at
    returning * into v;
 
   if not found then
@@ -45,6 +49,12 @@ $$;
 revoke all on function public.ta14_open_door_approve_referral(uuid) from public, anon, authenticated;
 grant execute on function public.ta14_open_door_approve_referral(uuid) to service_role;
 
+-- Required companion columns in the schema proposal: payment_reversal_status
+-- and payment_reversal_checked_at. The default must be HOLD / unknown,
+-- not clear. The operator must reconcile these against the payment provider.
+-- A stored clear value can become stale; a current provider check is still
+-- required at approval time. Do not enable this RPC until that check exists.
+--
 -- Remaining gaps before deployment:
 -- 1. An independently verified payment-provider reference and reversal state.
 -- 2. A trusted, auditable workflow for setting evidence reviewer fields.
