@@ -1,5 +1,63 @@
 import Link from 'next/link';
 
+const illustratedLessons = [
+  {
+    "id": "01",
+    "title": "The command is valid. Is the consequence?",
+    "image": "/HVAC%20Control%20Governance_%20From%20Command%20to%20Consequence.png",
+    "narration": "A technically correct STOP_AHU_7 command is not automatically eligible for execution. Engineering capability describes what equipment can do; TA14 asks whether evidence, authority, and standing support this particular physical consequence now. Existing BMS and smoke-control safety functions retain their established responsibilities.",
+    "learned": "Distinguish technical command validity from present execution eligibility."
+  },
+  {
+    "id": "02",
+    "title": "Reality: What is AHU-7 doing right now?",
+    "image": "/AHU-7%20Reality%20Check_%20HVAC%20Control%20Systems.png",
+    "narration": "An optimizer may propose a stop while the supply fan is running, but that observation alone does not establish the building's operating mode, smoke-control assignment, or whether the AHU has an active safety duty. Identify authoritative sources and verify the actual asset and physical context. All readings in the illustration are hypothetical.",
+    "learned": "Identify the specific real-world facts required before assessing a command."
+  },
+  {
+    "id": "03",
+    "title": "Record: Can the evidence be trusted?",
+    "image": "/HVAC%20Evidence%20and%20Unified%20Timeline%20Records.png",
+    "narration": "A controller point, BMS trend, asset record, and fire/smoke status may describe different aspects of the same AHU. Preserve source identity, observation time, asset binding, integrity, and contradictions. A recent trend is not sufficient simply because a dashboard displays it. Determine which records are admissible for the proposed action.",
+    "learned": "Separate available data from records fit to support an exact consequential proposition."
+  },
+  {
+    "id": "04",
+    "title": "Continuity: When earlier permission expires",
+    "image": "/HVAC%20Continuity%20and%20Revalidation%20Dashboard.png",
+    "narration": "Authorization at T0 is not permanent permission. If AHU-7 enters an active smoke-control role before final admissible observation, the earlier optimization basis no longer survives unchanged. Revalidate or HOLD. A change after the final observable check remains a residual race governed by native physical and life-safety interlocks.",
+    "learned": "Explain why material changes break continuity, and where native safety must govern."
+  },
+  {
+    "id": "05",
+    "title": "Admissibility: Does evidence support this exact action?",
+    "image": "/HVAC%20Admissibility%20Evidence%20Matrix.png",
+    "narration": "Even accurate, timely evidence may establish fan speed or energy-saving opportunity without proving that STOP_AHU_7 is appropriate. Require the evidence to support that exact proposed consequence, including the affected asset, current operating condition, and any exclusions. Authorization and standing are separate tests, not substitutes for evidence sufficiency.",
+    "learned": "Test evidence against the precise action rather than general system relevance."
+  },
+  {
+    "id": "06",
+    "title": "Authority and standing: Who may execute?",
+    "image": "/HVAC%20Authority%20%26%20Standing%20Infographic.png",
+    "narration": "Authentication proves identity, not unlimited permission. Applicable Authority asks whether the actor may issue this class of action; Established Standing asks whether that authority belongs to this actor in this capacity, for this asset and current context. A service allowed to optimize normal ventilation may have no standing to stop an active life-safety path.",
+    "learned": "Distinguish Applicable Authority from Established Standing."
+  },
+  {
+    "id": "07",
+    "title": "Commit: The final governed boundary",
+    "image": "/HVAC%20Commit%20Decision%20Control%20Room%20Infographic.png",
+    "narration": "Immediately before dispatch, freeze the exact consequence binding and recheck required current evidence, authority, standing, timing windows, and material-change predicates. If the basis is stale or contradictory, the earlier ALLOW candidate cannot silently advance. HOLD and ESCALATE must follow a safety-aware site-specific policy; TA14 must never obstruct mandatory native life-safety action.",
+    "learned": "Describe a governed commit without claiming zero-latency sensing or replacing equipment interlocks."
+  },
+  {
+    "id": "08",
+    "title": "Outcome: Prove what happened and begin again",
+    "image": "/HVAC%20Outcome%20Verification%20Infographic.png",
+    "narration": "A successful command acknowledgement is not proof that an AHU actually stopped. Preserve dispatch evidence, authoritative feedback, observation times, any discrepancy, and the resulting state. Outcome closes this bounded chain; the next proposed action requires fresh evidence and authority evaluation. The illustrated success is hypothetical, not a field test.",
+    "learned": "Differentiate command acceptance from independently verified physical outcome."
+  }
+];
 const tests=[
 ['01','CAPABILITY','Can the control system issue the requested command?'],
 ['02','REALITY','What is physically true at the affected HVAC asset now?'],
@@ -110,7 +168,7 @@ const chain=[['REALITY','Present physical state'],['RECORD','Evidence + provenan
 export const metadata={title:'ASHRAE TC 1.4 HVAC Execution Boundary Showroom | TA-14',description:'A bounded TA-14 technical showroom for examining the distinction between control capability and present execution authority in HVAC control systems.'};
 
 export default function Page(){return <main className="p"><div className="s">
-<nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/showrooms">CLASSIFIED SHOWROOMS</Link></nav>
+<nav><Link className="brand" href="/"><b>TA-14</b> AUTHORITY</Link><Link href="/showrooms">CLASSIFIED SHOWROOMS</Link></nav><section id="illustrated-lessons" style={{padding:'45px 0 65px',borderBottom:'1px solid #234252'}}><p style={{fontSize:11,color:'#6fe8ff',letterSpacing:2,fontWeight:800}}>EIGHT ILLUSTRATED TEACHING EXAMINATIONS · INDEPENDENT TA14 WORK</p><h2 style={{fontSize:'clamp(30px,4vw,55px)',lineHeight:1.1}}>From a valid HVAC command to a governed physical outcome.</h2><p style={{maxWidth:850,lineHeight:1.75,color:'#b8cbd5'}}>Follow AHU-7 through capability, present physical reality, evidence, continuity, admissibility, authority and standing, commit, and outcome. Samantha's written teaching narration accompanies every visual. All illustrated measurements, timestamps, authority assignments and results are hypothetical, not field evidence or ASHRAE findings.</p><a href="/TA14_ASHRAE_HVAC_Execution_Boundary_Technical_Guide_v2.pdf" download style={{display:'inline-block',padding:'14px 20px',border:'1px solid #6fe8ff',color:'#6fe8ff',fontWeight:800,margin:'16px 0 30px'}}>DOWNLOAD COMPANION TECHNICAL PDF ↓</a><div style={{display:'grid',gap:34}}>{illustratedLessons.map((lesson)=><article key={lesson.id} style={{background:'#091b27',border:'1px solid #234252',borderRadius:18,overflow:'hidden'}}><div style={{padding:'24px 24px 8px'}}><small style={{color:'#e8b85f',letterSpacing:2,fontWeight:900}}>LESSON {lesson.id} / 08</small><h3 style={{fontSize:'clamp(23px,3vw,37px)',margin:'10px 0 18px'}}>{lesson.title}</h3></div><img src={lesson.image} alt={'Illustrated, hypothetical HVAC governance teaching diagram: '+lesson.title} loading="lazy" style={{display:'block',width:'100%',height:'auto'}}/><div style={{padding:'25px 28px 30px',display:'grid',gap:15}}><div><strong style={{color:'#6fe8ff'}}>SAMANTHA · TEACHING NARRATION</strong><p style={{lineHeight:1.85,color:'#d5e2e8',fontSize:16}}>{lesson.narration}</p></div><div><strong style={{color:'#e8b85f'}}>WHAT YOU LEARNED</strong><p style={{lineHeight:1.65}}>{lesson.learned}</p></div><div><strong style={{color:'#e8b85f'}}>WHAT COMES NEXT</strong><p style={{lineHeight:1.65}}>{Number(lesson.id)<8?'Continue to lesson '+String(Number(lesson.id)+1).padStart(2,'0')+' and test the next governance boundary.':'Continue into the R1-R9 technical challenge and empirical-test requirements below.'}</p></div></div></article>)}</div><p style={{marginTop:22,color:'#a5b9c5',lineHeight:1.65}}>Illustrative education only. This is not operational control guidance, an ASHRAE endorsement or certification, or evidence of demonstrated hardware performance. Existing fire/smoke-control logic, required interlocks and competent site authority remain controlling.</p></section>
 <header><p className="eye">ASHRAE TC 1.4 · HVAC CONTROL SYSTEMS · TECHNICAL EXAMINATION SURFACE</p><h1>The command can be correct.<br/><em>Is the consequence admissible now?</em></h1><p className="lead">This showroom isolates a narrow control-system question immediately before physical consequence: a controller, optimizer, AI layer or operator may be capable of issuing a technically valid HVAC command. What establishes that this exact proposed consequence has ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY and ESTABLISHED STANDING to become reality NOW?</p><div className="question"><small>THE EXAMINATION QUESTION</small><strong>Is there a technically meaningful distinction between a control system being capable and correctly configured to issue a command and that command having sufficiently established present evidence and execution authority to proceed?</strong></div></header>
 <section><p className="eye">THE BOUNDARY</p><h2>Keep the controls. Add a governed consequence boundary.</h2><div className="grid four"><article><b>BMS / CONTROLLER</b><p>Executes sequences, logic and physical commands.</p></article><article><b>SUPERVISORY OPTIMIZATION / AI</b><p>Proposes changes based on objectives, models and available state.</p></article><article><b>DIGITAL TWIN / ASSET RECORD</b><p>Supplies identity, topology, context and supporting evidence.</p></article><article className="hot"><b>TA-14</b><p>Determines whether the proposed consequence has ADMISSIBLE EVIDENCE, APPLICABLE AUTHORITY and ESTABLISHED STANDING to become reality NOW.</p></article></div></section>
 <section className="band"><div className="in"><p className="eye">ONE HVAC CASE</p><h2>AHU-7 · Proposed command: STOP_AHU_7</h2><p className="lead">A supervisory optimization layer identifies a demand-reduction opportunity and proposes stopping AHU-7. The command path works. The controller is correctly configured. The question is whether the consequence remains eligible to execute at commit.</p><div className="scenario">{scenarios.map(([a,b,c,d])=><article key={a}><span>{a}</span><p>{b}</p><strong>{c}</strong><small>{d}</small></article>)}</div></div></section>
