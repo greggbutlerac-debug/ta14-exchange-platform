@@ -16,7 +16,7 @@ NEXT_PUBLIC_SUPABASE_URL=<existing-supabase-project-url>
 ## Recommended
 
 ```text
-TA14_REGISTRY_NOTIFICATION_FROM=TA-14 Registry <registry@ta14authority.org>
+TA14_REGISTRY_NOTIFICATION_FROM=TA-14 Registry <ta14admissibleexecution@gmail.com>
 TA14_PUBLIC_APP_URL=https://ta14authority.org
 TA14_REGISTRY_NOTIFICATION_EMAIL_CUTOFF_AT=<activation-timestamp>
 ```
@@ -85,7 +85,7 @@ historical backfill from becoming a batch of retroactive email alerts.
 Before using:
 
 ```text
-TA14_REGISTRY_NOTIFICATION_FROM=TA-14 Registry <registry@ta14authority.org>
+TA14_REGISTRY_NOTIFICATION_FROM=TA-14 Registry <ta14admissibleexecution@gmail.com>
 ```
 
 verify `ta14authority.org` as a sending domain with Resend.

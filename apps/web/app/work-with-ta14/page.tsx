@@ -15,7 +15,7 @@ export const metadata = {
   description: 'Commercial entry point for TA-14 governance advisory, interoperability examinations, execution-readiness reviews, pilots, training and integration.',
 };
 
-const mail = `mailto:registry@ta14authority.org?subject=${encodeURIComponent('TA-14 Commercial Engagement')}&body=${encodeURIComponent('Organization:\nName / role:\nWhat are you trying to govern, examine, or build?\nWhat consequence or execution boundary matters?\nDesired timing:\n')}`;
+const mail = `mailto:ta14admissibleexecution@gmail.com?subject=${encodeURIComponent('TA-14 Commercial Engagement')}&body=${encodeURIComponent('Organization:\nName / role:\nWhat are you trying to govern, examine, or build?\nWhat consequence or execution boundary matters?\nDesired timing:\n')}`;
 
 export default function WorkWithTA14(){
   return <main className="page">
