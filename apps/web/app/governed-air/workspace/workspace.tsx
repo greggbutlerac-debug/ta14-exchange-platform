@@ -1,6 +1,6 @@
 'use client';
 import {useState} from 'react';
-import {evaluate} from '../../../../governed-air/decision-engine.mjs';
+import {evaluate} from '../../../../../governed-air/decision-engine.mjs';
 
 const evidenceKeys=['source','timestamp','calibration','continuity'] as const;
 const authorityKeys=['actor','capacity','standing_basis','authority_relationship','applicable_policy'] as const;
