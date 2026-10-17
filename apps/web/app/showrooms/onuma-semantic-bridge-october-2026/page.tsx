@@ -7,6 +7,7 @@ export const metadata: Metadata = {
 };
 
 const recording='https://sites.google.com/onuma.com/btblibrary/Past-Events/32_10-16-26-Back-from-Tokyo';
+const clip='https://www.youtube.com/watch?v=WVrJ9Urpw2Q&t=2988s';
 const re1='/greenbuild/onuma-re1';
 const smartCity='/showrooms/smart-city-admissible-governance';
 const panel:React.CSSProperties={background:'linear-gradient(145deg,#0e263b,#091b2d)',border:'1px solid #28516a',borderRadius:20,padding:'clamp(22px,4vw,38px)'};
@@ -54,11 +55,12 @@ export default function OnumaSemanticBridgeRecord(){
  <p style={muted}>In Butler's reading of the session, Michael Bordenaro says: <em>“Gregory is doing amazing things.”</em> Kimon Onuma identifies TA14 in the Semantic Bridge graph and describes Butler's same-morning contribution on authority, governance, and the owner's perspective. Onuma connects that entry to the overheating-floor building example and asks whether the proposed action can be trusted. He also mentions Butler's involvement in a presentation Butler heard as “Bopping Your BIM.”</p>
  <p style={{fontSize:13,color:'#a9c0ce',lineHeight:1.7}}>Butler supplied this reading from the recording. It has not been independently transcribed; exact phrasing, speaker attribution, and the presentation title remain subject to audio verification. This does not establish ONUMA or ALN endorsement or adoption.</p>
  </div>
+ <a href={clip} target="_blank" rel="noopener noreferrer" style={{display:'inline-block',marginTop:16,padding:'14px 20px',background:'#78e8d7',color:'#05202c',borderRadius:11,fontWeight:800,textDecoration:'none'}}>WATCH THE RECOGNITION SEGMENT · 49:48 ↗</a>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:15,marginTop:22}}>
  <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>DOCUMENTED ACKNOWLEDGMENT</p><p style={muted}>Kimon's public LinkedIn response confirms that he highlighted Butler's contribution during the session.</p></div>
- <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>PARTICIPANT ACCOUNT</p><p style={muted}>The graph demonstration and Michael Bordenaro's positive remarks are reported by Butler; exact wording and recording timestamps remain unverified here.</p></div>
+ <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>PARTICIPANT ACCOUNT</p><p style={muted}>Butler identifies 49:48–50:35 as the relevant recording segment and has supplied his reading of it. The timestamp is now documented; the precise dialogue still awaits independent audio verification.</p></div>
  </div>
- <p style={{fontSize:13,color:'#9fbacb',lineHeight:1.7,marginTop:20}}>No formal endorsement, institutional partnership, independent technical validation, or adoption is asserted. This record can be updated with a verified recording timestamp and exact quotation.</p>
+ <p style={{fontSize:13,color:'#9fbacb',lineHeight:1.7,marginTop:20}}>No formal endorsement, institutional partnership, independent technical validation, or adoption is asserted. The time-linked source is provided above. This record can be further updated with an independently checked transcript and precise quotation.</p>
  </section>
  <section style={{...panel,marginBottom:26}}>
  <p style={eyebrow}>03 · VISUAL FIELD GUIDE · ORIGINAL TA14 ILLUSTRATIONS</p>
