@@ -41,7 +41,7 @@ export default function MunicipalAirGovernance(){
  </section>
  <h2>Eight examinations</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:14}}>
- {lessons.map(([n,t,d])=><article key={n} style={{padding:22,border:'1px solid #355466',borderRadius:14,background:'#102b3b'}}><b style={{color:'#7ee1db'}}>{n}</b><h3>{t}</h3><p style={{lineHeight:1.6,color:'#c8d9e0'}}>{d}</p></article>)}
+ {lessons.map(([n,t,d])=><article key={n} style={{padding:22,border:'1px solid #355466',borderRadius:14,background:'#102b3b'}}><img src={'/municipal-air/lesson-'+Number(n)+'.svg'} alt={'Illustration '+n+': '+t} style={{width:'100%',aspectRatio:'5 / 3',objectFit:'cover',borderRadius:9,marginBottom:16}}/><b style={{color:'#7ee1db'}}>{n}</b><h3>{t}</h3><p style={{lineHeight:1.6,color:'#c8d9e0'}}>{d}</p></article>)}
  </div>
  <section style={{marginTop:64,padding:'32px 24px',border:'1px solid #3d6e7b',borderRadius:18,background:'#0e2835'}}>
  <p style={{color:'#82e1d9',letterSpacing:2}}>INTERACTIVE · HYPOTHETICAL</p><h2>Examine the proposed consequence</h2>
