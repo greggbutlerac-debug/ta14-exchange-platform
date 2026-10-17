@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import InteractiveMission from './InteractiveMission';
+import VisualLessons from './VisualLessons';
 
 export const metadata: Metadata = {
   title: 'Semantic Bridge × Execution Governance | ONUMA Session Record | TA14 Exchange',
@@ -63,6 +64,7 @@ export default function OnumaSemanticBridgeRecord(){
  </div>
  <p style={{fontSize:13,color:'#9fbacb',lineHeight:1.7,marginTop:20}}>No formal endorsement, institutional partnership, independent technical validation, or adoption is asserted. The time-linked source is provided above. This record can be further updated with an independently checked transcript and precise quotation.</p>
  </section>
+ <VisualLessons/>
  <InteractiveMission/>
  <section style={{...panel,marginBottom:26}}>
  <p style={eyebrow}>03 · VISUAL FIELD GUIDE · ORIGINAL TA14 ILLUSTRATIONS</p>
