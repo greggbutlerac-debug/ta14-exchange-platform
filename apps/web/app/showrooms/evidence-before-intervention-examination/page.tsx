@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 
 export const metadata: Metadata = {
   title: 'Evidence Before Intervention | HVAC Technical Examination Draft | TA14',
@@ -121,7 +120,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
             <p style={{fontWeight:800}}>LESSON {String(i+1).padStart(2,'0')} / 08</p>
             <h3 style={{fontSize:'1.6rem'}}>{title}</h3>
             <figure style={{margin:'20px 0'}}>
-              <Image src={`/${encodeURIComponent(imageFiles[i])}`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} sizes="(max-width: 1080px) 100vw, 1080px" style={{width:'100%',height:'auto',borderRadius:12}} />
+              <img src={`/${encodeURIComponent(imageFiles[i])}`} alt={`Teaching illustration ${i+1}: ${title}. Illustrative examples, not authenticated field evidence.`} width={1536} height={1024} loading={i < 2 ? "eager" : "lazy"} style={{width:'100%',height:'auto',borderRadius:12}} />
               <figcaption style={{fontSize:13,marginTop:8}}>Illustrative teaching image — no real authorization, signature, measured outcome, or technical attestation is represented.</figcaption>
             </figure>
             <aside style={{borderLeft:'4px solid #bd7130',padding:'12px 16px',background:'#fff4e7',color:'#382713',margin:'16px 0'}}>
