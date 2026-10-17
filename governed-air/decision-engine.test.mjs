@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {evaluate} from './decision-engine.mjs';
+const full={observation:{value:1680},proposed_action:'investigate',evidence:{source:'sensor A',timestamp:'2026-10-17T12:00:00Z',calibration:'verified',continuity:'verified'},authority:{actor:'operator',capacity:'facilities',standing_basis:'delegation',authority_relationship:'documented',applicable_policy:'example policy'}};
+test('missing records HOLD',()=>assert.equal(evaluate({proposed_action:'investigate'}).disposition,'HOLD'));
+test('complete bounded investigation ALLOW',()=>assert.equal(evaluate(full).disposition,'ALLOW'));
+test('physical intervention remains HOLD',()=>assert.equal(evaluate({...full,proposed_action:'change_ventilation'}).disposition,'HOLD'));
+test('safety escalation overrides',()=>assert.equal(evaluate({...full,safety_escalation:true}).disposition,'ESCALATE'));
+test('unknown action DENY',()=>assert.equal(evaluate({...full,proposed_action:'override'}).disposition,'DENY'));
+test('high reading cannot simply be dismissed',()=>assert.equal(evaluate({...full,proposed_action:'dismiss'}).disposition,'HOLD'));
