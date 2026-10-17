@@ -1,0 +1,62 @@
+'use client';
+import {useState} from 'react';
+import {evaluate} from '../../../../governed-air/decision-engine.mjs';
+
+const evidenceKeys=['source','timestamp','calibration','continuity'] as const;
+const authorityKeys=['actor','capacity','standing_basis','authority_relationship','applicable_policy'] as const;
+const labels:Record<string,string>={
+ source:'Observation source',timestamp:'Observation timestamp',calibration:'Calibration / verification basis',continuity:'Continuity and provenance',
+ actor:'Responsible actor',capacity:'Actor capacity',standing_basis:'Established standing basis',
+ authority_relationship:'Authority relationship',applicable_policy:'Applicable policy or rule'
+};
+const anchors=['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome'];
+type Action='investigate'|'change_ventilation'|'dismiss';
+type Result={disposition:string;reason:string;missingEvidence:string[];missingAuthority:string[];simulation:boolean};
+type Examination={case_id:string;simulation:true;created_at:string;observation:{description:string;value:string;unit:string};evidence:Record<string,string>;authority:Record<string,string>;proposed_action:Action;safety_escalation:boolean;result:Result};
+export default function ExaminationWorkspace(){
+ const [caseId,setCaseId]=useState('GA-WORKSPACE-DEMO-001');
+ const [description,setDescription]=useState('Hypothetical classroom CO₂ observation; no verified field record.');
+ const [value,setValue]=useState('1680');
+ const [unit,setUnit]=useState('ppm');
+ const [fields,setFields]=useState<Record<string,string>>({});
+ const [action,setAction]=useState<Action>('investigate');
+ const [escalation,setEscalation]=useState(false);
+ const [record,setRecord]=useState<Examination|null>(null);
+ const change=(key:string,value:string)=>{setFields(v=>({...v,[key]:value}));setRecord(null)};
+ const examine=()=>{
+  const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
+  const authority=Object.fromEntries(authorityKeys.map(k=>[k,fields[k]||'']));
+  const result=evaluate({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
+  setRecord({case_id:caseId,simulation:true,created_at:new Date().toISOString(),observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,result});
+ };
+ const download=()=>{if(!record)return;const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-examination-simulation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+ const input=(label:string,v:string,set:(v:string)=>void,placeholder='')=><label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{label}<input aria-label={label} value={v} placeholder={placeholder} onChange={e=>{set(e.target.value);setRecord(null)}} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11,fontSize:15}}/></label>;
+ const section={padding:22,border:'1px solid #346575',borderRadius:14,background:'#102d3b'};
+ return <main style={{minHeight:'100vh',background:'#071923',color:'#e7f5f9',padding:'35px 18px',fontFamily:'system-ui,sans-serif'}}>
+ <div style={{maxWidth:1150,margin:'auto'}}>
+ <p style={{color:'#7ce2df',letterSpacing:2,fontSize:12}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · PRIVATE DEVELOPMENT</p>
+ <h1 style={{fontSize:'clamp(32px,5vw,60px)',margin:'8px 0'}}>Governed Air <span style={{color:'#7ce2df'}}>Examination Workspace</span></h1>
+ <p style={{maxWidth:880,lineHeight:1.65}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
+ <p style={{borderLeft:'3px solid #f1bb71',paddingLeft:14,lineHeight:1.6}}><strong>SIMULATION ONLY.</strong> All information is hypothetical and entered for teaching. Text entries are claims, not independently verified evidence or authority. This tool cannot approve field work, control equipment, or confer legal standing. Records remain in this browser session until downloaded.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(310px,1fr))',gap:18,marginTop:24}}>
+ <section style={section}><h2>01 · Proposed reality</h2>
+ <div style={{display:'grid',gap:14}}>
+ {input('Case identifier',caseId,setCaseId)}
+ <label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>Observation description<textarea aria-label="Observation description" value={description} onChange={e=>{setDescription(e.target.value);setRecord(null)}} rows={4} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11}}/></label>
+ {input('Observed value (hypothetical)',value,setValue)}
+ {input('Unit',unit,setUnit)}
+ </div></section>
+ <section style={section}><h2>02 · Admissible evidence claims</h2><p style={{fontSize:13,color:'#a9d4df'}}>Provide the claimed source, timestamp, verification and continuity. Blank entries hold the simulated investigation.</p><div style={{display:'grid',gap:14}}>{evidenceKeys.map(k=><label key={k} style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{labels[k]}<input aria-label={labels[k]} value={fields[k]||''} onChange={e=>change(k,e.target.value)} placeholder="Enter hypothetical record or reference" style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11}}/></label>)}</div></section>
+ <section style={section}><h2>03 · Authority and standing claims</h2><p style={{fontSize:13,color:'#a9d4df'}}>An identified actor is not automatically authorized. Each relationship must be established independently in a real examination.</p><div style={{display:'grid',gap:14}}>{authorityKeys.map(k=><label key={k} style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{labels[k]}<input aria-label={labels[k]} value={fields[k]||''} onChange={e=>change(k,e.target.value)} placeholder="Enter hypothetical basis or reference" style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11}}/></label>)}</div></section>
+ <section style={section}><h2>04 · Proposed consequence</h2>
+ <div style={{display:'grid',gap:12}}>{([['investigate','Request bounded investigation'],['change_ventilation','Change ventilation controls'],['dismiss','Dismiss observation']] as const).map(([v,label])=><label key={v}><input type="radio" name="workspace-action" checked={action===v} onChange={()=>{setAction(v);setRecord(null)}}/> {label}</label>)}
+ <label><input type="checkbox" checked={escalation} onChange={e=>{setEscalation(e.target.checked);setRecord(null)}}/> Safety procedure requires escalation</label>
+ <button onClick={examine} style={{padding:14,background:'#79e0e0',color:'#071923',fontWeight:800,border:0,borderRadius:8,cursor:'pointer'}}>Examine proposed consequence</button>
+ <h3>Disposition: <span aria-live="polite" style={{color:'#ffce83'}}>{record?.result.disposition||'AWAITING EXAMINATION'}</span></h3>
+ <p aria-live="polite">{record?.result.reason||'No examination has been performed for the current inputs.'}</p>
+ {record&&<><p><strong>Missing evidence:</strong> {record.result.missingEvidence.join(', ')||'None listed'}</p><p><strong>Missing authority:</strong> {record.result.missingAuthority.join(', ')||'None listed'}</p><button onClick={download} style={{padding:12,cursor:'pointer'}}>Download simulated examination JSON</button></>}
+ </div></section>
+ </div>
+ <section style={{...section,marginTop:18}}><h2>Eight-anchor consequence chain</h2><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{anchors.map((a,i)=><span key={a} style={{border:'1px solid #457483',borderRadius:8,padding:'9px 12px',fontSize:13}}>{String(i+1).padStart(2,'0')} · {a}</span>)}</div><p style={{fontSize:13,color:'#a9d4df'}}>Illustrative chain only. Anchor-specific adjudication, binding, execution, and outcome verification are not implemented in this prototype.</p></section>
+ </div></main>;
+}
