@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import Samantha from '../epic-air-quality-fund/Samantha';
 const lessons=[
 ['01','The Coordinated Model','A multidisciplinary model can establish spatial coordination and technical context. It cannot alone establish permission to execute.','Identify the modeled assets, revisions, coordination status and unresolved clashes.','Coordination is a technical claim, not an execution authorization.','Examine the underlying record.'],
 ['02','The Evidence Boundary','A clash report, issue ticket, drawing and field verification are distinct records. Preserve their provenance and scope.','Compare the source model revision with the clash report and field observations.','Observed is not inferred. Inferred is not authorized.','Test continuity and admissibility.'],
@@ -34,7 +35,8 @@ export default function VR4BIMRoom(){
  <div role="img" aria-label={'Conceptual governance chain for '+title} style={{display:'flex',flexWrap:'wrap',gap:10,padding:'24px 0'}}>
  {['MODEL','RECORD','EVIDENCE','AUTHORITY','STANDING','DECISION'].map((v,i)=><span key={v} style={{border:'1px solid #64879a',padding:'14px 10px',borderRadius:8,background:i===Number(num)%6?'#385269':'#182f40',fontWeight:700,fontSize:13}}>{v}</span>)}
  </div>
- <p style={{lineHeight:1.75}}><strong>Teaching narration:</strong> Look at the chain from modeled information to the decision. {inspect} The question is not simply whether a model can represent the proposed change, but whether the record can support this exact consequence and whether the responsible actor is authorized to make it happen.</p>
+ <Samantha text={'Lesson '+num+'. '+title+'. Look at the six numbered concepts represented across the conceptual governance chain: model, record, evidence, authority, standing, and decision. First, '+teach+' Next, '+inspect+' Ask what the image establishes, what it does not establish, and which authority must be verified before the proposed action. This is a hypothetical teaching illustration, not an actual VR4BIM project or approval.'}/>
+ <p style={{lineHeight:1.75}}><strong>Image examination:</strong> {inspect}</p>
  </div>
  <p><strong>What we learned:</strong> {learn}</p><p><strong>What comes next:</strong> {next}</p>
  </section>)}
