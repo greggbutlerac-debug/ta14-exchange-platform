@@ -1,6 +1,6 @@
 import type { CommercialEngine } from '@/components/commercial-engine';
 
-const request=(subject:string)=>`mailto:registry@ta14authority.org?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('I want to discuss this TA-14 paid commercial offer.\n\nOrganization:\nUse case:\nCurrent system/workflow:\nDesired outcome:\n')}`;
+const request=(subject:string)=>`mailto:ta14admissibleexecution@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent('I want to discuss this TA-14 paid commercial offer.\n\nOrganization:\nUse case:\nCurrent system/workflow:\nDesired outcome:\n')}`;
 
 export const executionAuthorityReview:CommercialEngine={
   eyebrow:'TA-14 EXECUTION AUTHORITY REVIEW',
