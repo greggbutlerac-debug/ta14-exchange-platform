@@ -64,6 +64,19 @@ export default function SmartCityShowroom(){
   <a href={pdf} download style={{padding:'15px 20px',borderRadius:9,background:'#9de2eb',color:'#082232',textDecoration:'none',fontWeight:800}}>↓ Technical Reference v3.2 (PDF)</a>
   <a href="#images" style={{padding:'15px 20px',borderRadius:9,border:'1px solid #5983a4',color:'#dbefff',textDecoration:'none'}}>Explore eight images ↓</a>
  </div>
+ <section id="greenbuild-2026" style={{scrollMarginTop:30,background:'linear-gradient(145deg,#0b3044,#071d30)',border:'1px solid #49879e',borderRadius:18,padding:'clamp(18px,3vw,32px)',marginBottom:38}}>
+  <p style={{fontSize:12,letterSpacing:2,fontWeight:900,color:'#f4ca62'}}>GREENBUILD AI SUMMIT · OCTOBER 20, 2026 · PRESENTATION COMPANION</p>
+  <h2 style={{fontSize:'clamp(26px,4vw,40px)',margin:'12px 0'}}>Become the Building: From Intelligence to Authorized Action</h2>
+  <p style={{fontSize:17,lineHeight:1.7,color:'#d5eaf1'}}>An independent TA14 conceptual teaching companion to the ONUMA Become the Building exercise using the PAE Living Building as a shared reference. It illustrates why participant claims, graph relationships, and AI-generated insights must remain distinguishable from evidence, applicable authority, established standing, and permission to execute.</p>
+  <a href="/Building%20Intelligence%20to%20Authorized%20Action.png" target="_blank" rel="noopener noreferrer" title="Open full-size Greenbuild presentation companion image">
+   <img src="/Building%20Intelligence%20to%20Authorized%20Action.png" alt="Conceptual Greenbuild Become the Building slide illustrating participants, knowledge graph, AI insights, trust and authority checks, eight TA14 anchors, and bounded dispositions" style={{width:'100%',height:'auto',display:'block',borderRadius:12,border:'1px solid #447e91'}}/>
+  </a>
+  <p style={{fontSize:13,color:'#f6dba4',lineHeight:1.75}}>INDEPENDENT CONCEPT · NOT AN ONUMA ENDORSEMENT, PARTNERSHIP ANNOUNCEMENT, OR DEPLOYED INTEGRATION. All depicted building inputs, temperatures, decisions, and outcomes are hypothetical teaching examples. This graphic is not a verified transcript or operational record. The slide is provided for illustration and should receive editorial review before external presentation.</p>
+  <div style={{display:'flex',flexWrap:'wrap',gap:12,marginTop:18}}>
+    <a href="/Building%20Intelligence%20to%20Authorized%20Action.png" target="_blank" rel="noopener noreferrer" style={{padding:'12px 18px',background:'#9de2eb',color:'#082232',borderRadius:8,fontWeight:800,textDecoration:'none'}}>Open full-size Greenbuild visual ↗</a>
+    <a href="#images" style={{padding:'12px 18px',border:'1px solid #638ba0',color:'#dbefff',borderRadius:8,textDecoration:'none'}}>Explore eight governance lessons ↓</a>
+  </div>
+ </section>
  <section style={{padding:'10px 0 34px',borderBottom:'1px solid #35506a'}}>
   <h2 style={{fontSize:26}}>The governing question</h2>
   <p style={{fontSize:22,lineHeight:1.55,maxWidth:1000}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
