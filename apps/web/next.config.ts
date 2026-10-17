@@ -67,6 +67,12 @@ const nextConfig: NextConfig = {
         destination: "/governance-showcase/:registryIdentifier",
         permanent: true,
       },
+      // GA4 historical 404 recovery: redirect a verified truncated showroom alias.
+      {
+        source: "/showrooms/c2VtaWNvbm",
+        destination: "/showrooms/semiconductor-fab-consequence-boundary",
+        permanent: true,
+      },
       // Public-route recovery: preserve older/shared URLs and repair malformed links
       // observed in production traffic without manufacturing new content.
       {
