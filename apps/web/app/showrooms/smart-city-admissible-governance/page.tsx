@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 
 const pdf='/TA14_Smart_City_Admissible_Governance_Technical_Reference_v3.2 (1).pdf';
 const slides=[
@@ -18,15 +18,38 @@ const anchorNotes=['Overview of all eight architectural anchors','Architectural 
 const learningTransitions = [["Connected systems can describe conditions and propose interventions, but they do not independently grant permission to act.","We begin with Reality: what a city sensor, operator or asset actually observed before any interpretation."],["Reality is the observed condition, not an inferred cause or an approved response. Illustrative readings require a source, time, unit and context.","Next we examine Record: which original observations were preserved so another reviewer can inspect them."],["A defensible record retains original measurements, provenance and transformations without silently replacing raw data with conclusions.","Next we test Continuity and Admissibility: whether those records remain trustworthy and fit for a proposed decision."],["Continuity protects an inspectable history; admissibility evaluates fitness for a particular question. Neither by itself grants permission to act.","Next we ask who has Applicable Authority and Established Standing to authorize the proposed consequence."],["The applicable rules and an actor's standing must both be established. Neither system access nor technical capability amounts to authority.","Next we bind the proposed action to a named local actor, identified asset, bounded scope and explicit commitment."],["Federated context may inform a decision, but execution authority must be established locally. A change in circumstances may require revalidation.","Next we examine Authorized Execution: how an approved action remains within limits and produces an inspectable trail."],["An authorized execution follows an approved actor, method, asset, time window and safeguards; deviations and stop conditions must be recorded.","Next we examine Outcome and Accountability: what actually changed and how to establish whether the consequence delivered its intended result."],["Completion is not proof of improvement. Comparable post-action evidence, uncertainty and review are necessary for an accountable outcome.","The eight-image journey is complete. The Technical Reference v3.2 explains the conceptual architecture and the evidence required for a bounded pilot."]] as const;
 export default function SmartCityShowroom(){
  const [speaking,setSpeaking]=useState(-1);
- useEffect(()=>()=>{if(typeof window!=='undefined')window.speechSynthesis?.cancel()},[]);
+ const narrationToken=useRef(0);
+ useEffect(()=>()=>{narrationToken.current++;window.speechSynthesis?.cancel()},[]);
  function narrate(i:number){
   if(!('speechSynthesis' in window))return;
+  const wasSpeaking=speaking===i;
+  const token=++narrationToken.current;
   window.speechSynthesis.cancel();
-  if(speaking===i){setSpeaking(-1);return}
-  const u=new SpeechSynthesisUtterance('Teaching image '+(i+1)+' of eight. '+anchorNotes[i]+'. '+slides[i].title+'. '+slides[i].voice);
+  if(wasSpeaking){setSpeaking(-1);return}
+  const script='Teaching image '+(i+1)+' of eight. '+anchorNotes[i]+'. '+slides[i].title+'. '+slides[i].voice;
+  // Smaller utterances avoid browsers silently truncating longer lessons.
+  const sentences=script.match(/[^.!?]+[.!?]+|[^.!?]+$/g)||[script];
+  const chunks:string[]=[];
+  let current='';
+  for(const sentence of sentences){
+   if(current.length+sentence.length>180&&current){chunks.push(current.trim());current=''}
+   current+=sentence;
+  }
+  if(current.trim())chunks.push(current.trim());
   const voices=window.speechSynthesis.getVoices();
-  u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en'))||null;
-  u.rate=.9;u.onend=()=>setSpeaking(-1);u.onerror=()=>setSpeaking(-1);window.speechSynthesis.speak(u);setSpeaking(i);
+  const voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en'))||null;
+  let index=0;
+  const speakNext=()=>{
+   if(narrationToken.current!==token)return;
+   if(index>=chunks.length){setSpeaking(-1);return}
+   const u=new SpeechSynthesisUtterance(chunks[index++]);
+   u.voice=voice;u.rate=.9;
+   u.onend=speakNext;
+   u.onerror=()=>{if(narrationToken.current===token)setSpeaking(-1)};
+   window.speechSynthesis.speak(u);
+  };
+  setSpeaking(i);
+  speakNext();
  }
  return <main style={{background:'#061424',minHeight:'100vh',color:'#edf5ff',fontFamily:'Arial,sans-serif'}}>
  <div style={{maxWidth:1210,margin:'auto',padding:'28px 20px 90px'}}>
