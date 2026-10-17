@@ -29,12 +29,12 @@ export default function ClassroomExam(){
  <section style={{padding:24,border:'1px solid #346575',borderRadius:16,background:'#102d3b'}}>
  <p>CLASSROOM 001 · HYPOTHETICAL</p><h2 style={{fontSize:48,margin:'10px 0'}}>1,680 <small style={{fontSize:16}}>ppm CO₂</small></h2>
  <p>This number is not a universal health or legal threshold.</p><h3>Examine the evidence and authority</h3>
- {[...evidence,...authority].map(k=><label key={k} style={{display:'block',padding:'9px 0'}}><input type="checkbox" checked={!!checked[k]} onChange={e=>setChecked(v=>({...v,[k]:e.target.checked}))}/> {labels[k]}</label>)}
+ {[...evidence,...authority].map(k=><label key={k} style={{display:'block',padding:'9px 0'}}><input type="checkbox" checked={!!checked[k]} onChange={e=>{setChecked(v=>({...v,[k]:e.target.checked}));setRecord(null)}}/> {labels[k]}</label>)}
  </section>
  <section style={{padding:24,border:'1px solid #346575',borderRadius:16,background:'#102d3b'}}>
  <h2>Proposed consequence</h2>
- {([['investigate','Request bounded investigation'],['change_ventilation','Change ventilation controls'],['dismiss','Dismiss observation']] as const).map(([v,label])=><label key={v} style={{display:'block',padding:'10px 0'}}><input type="radio" name="action" checked={action===v} onChange={()=>setAction(v)}/> {label}</label>)}
- <label style={{display:'block',marginTop:15}}><input type="checkbox" checked={safety} onChange={e=>setSafety(e.target.checked)}/> Applicable safety procedure requires escalation</label>
+ {([['investigate','Request bounded investigation'],['change_ventilation','Change ventilation controls'],['dismiss','Dismiss observation']] as const).map(([v,label])=><label key={v} style={{display:'block',padding:'10px 0'}}><input type="radio" name="action" checked={action===v} onChange={()=>{setAction(v);setRecord(null)}}/> {label}</label>)}
+ <label style={{display:'block',marginTop:15}}><input type="checkbox" checked={safety} onChange={e=>{setSafety(e.target.checked);setRecord(null)}}/> Applicable safety procedure requires escalation</label>
  <button onClick={examine} style={{marginTop:20,padding:'13px 20px',background:'#79e0e0',color:'#07202b',border:0,borderRadius:9,fontWeight:700,cursor:'pointer'}}>Examine proposed action</button>
  <h3>Disposition</h3><div aria-live="polite" style={{fontSize:28,fontWeight:800,color:'#ffcf81'}}>{record?String((record.result as {disposition:string}).disposition):'AWAITING EXAMINATION'}</div>
  <p aria-live="polite">{record?String((record.result as {reason:string}).reason):'Run the simulated examination to generate a decision record.'}</p>
