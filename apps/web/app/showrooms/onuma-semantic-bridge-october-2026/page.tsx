@@ -48,10 +48,10 @@ export default function OnumaSemanticBridgeRecord(){
  <section style={{...panel,marginBottom:26}}>
  <p style={eyebrow}>02 · RECOGNITION RECORD</p>
  <h2 style={{fontSize:32,margin:'12px 0'}}>A contribution surfaced inside the graph</h2>
- <p style={muted}>According to Greggory Don Butler's account of the Asset Leadership Network discussion, Kimon navigated the Semantic Bridge graph-of-graphs, searched for Butler and TA14, and described their work and progress. Butler reports that Michael Bordinaro then expressed strong appreciation for TA14's work.</p>
+ <p style={muted}>According to Greggory Don Butler's account of the Asset Leadership Network discussion, Kimon navigated the Semantic Bridge graph-of-graphs, searched for Butler and TA14, and described their work and progress. Butler reports that Michael Bordenaro then expressed strong appreciation for TA14's work.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:15,marginTop:22}}>
  <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>DOCUMENTED ACKNOWLEDGMENT</p><p style={muted}>Kimon's public LinkedIn response confirms that he highlighted Butler's contribution during the session.</p></div>
- <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>PARTICIPANT ACCOUNT</p><p style={muted}>The graph demonstration and Michael Bordinaro's positive remarks are reported by Butler; exact wording and recording timestamps remain unverified here.</p></div>
+ <div style={{background:'#0a1b2b',border:'1px solid #31566c',borderRadius:13,padding:20}}><p style={{...eyebrow,color:'#8ce7e0'}}>PARTICIPANT ACCOUNT</p><p style={muted}>The graph demonstration and Michael Bordenaro's positive remarks are reported by Butler; exact wording and recording timestamps remain unverified here.</p></div>
  </div>
  <p style={{fontSize:13,color:'#9fbacb',lineHeight:1.7,marginTop:20}}>No formal endorsement, institutional partnership, independent technical validation, or adoption is asserted. This record can be updated with a verified recording timestamp and exact quotation.</p>
  </section>
