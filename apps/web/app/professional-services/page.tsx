@@ -60,14 +60,14 @@ export default function ProfessionalServicesPage() {
           <h3 className="mt-7 font-semibold">Included in the proposed scope</h3>
           <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-6 text-slate-300">{offer.scope.map(item => <li key={item}>{item}</li>)}</ul>
           <p className="mt-6 text-sm leading-6 text-slate-400"><strong className="text-slate-200">Boundary:</strong> {offer.exclusions}</p>
-          <div className="mt-auto pt-8"><a href={`mailto:ta14admissibleexecution@gmail.com?subject=${encodeURIComponent(offer.subject)}&body=${encodeURIComponent('Please send the written scope request process for this service.\\nOrganization / name:\\nProposed consequence or topic:\\nRelevant jurisdiction:\\nDesired delivery date:')}`} className="block rounded-lg bg-cyan-300 px-5 py-4 text-center font-bold text-slate-950 hover:bg-cyan-200">Request a written paid scope →</a></div>
+          <div className="mt-auto pt-8"><a href={`mailto:ta14admissibleexecution@gmail.com?subject=${encodeURIComponent(offer.subject)}&body=${encodeURIComponent('Please send the written scope request process for this service.\nOrganization / name:\nProposed consequence or topic:\nRelevant jurisdiction:\nDesired delivery date:')}`} className="block rounded-lg bg-cyan-300 px-5 py-4 text-center font-bold text-slate-950 hover:bg-cyan-200">Request a written paid scope →</a></div>
         </article>)}
       </section>
       <section className="mt-14 rounded-2xl border border-slate-700 p-8">
         <h2 className="text-2xl font-bold">What happens next?</h2>
         <p className="mt-4 leading-7 text-slate-300">Send a short written description of the proposed action, relevant actors, jurisdiction, available evidence, and the decision you need examined. TA14 will confirm fit, boundaries, deliverables, fees, and payment terms in writing before accepting an engagement. Sensitive or confidential material should not be sent until an appropriate handling arrangement is agreed.</p>
         <p className="mt-5 text-sm text-slate-400">An examination can conclude ALLOW, HOLD, DENY, or ESCALATE within its defined governance scope. It cannot grant external legal or operational authority.</p>
-        <div className="mt-6 flex flex-wrap gap-5 text-sm"><Link href="/examination-checkout" className="text-cyan-300 underline">Looking for the $149 entry examination?</Link><Link href="/pricing" className="text-cyan-300 underline">See broader institutional pricing</Link></div>
+        <div className="mt-6 flex flex-wrap gap-5 text-sm"><Link href="/pricing" className="text-cyan-300 underline">Explore the $149 entry examination</Link><Link href="/pricing" className="text-cyan-300 underline">See broader institutional pricing</Link></div>
       </section>
     </div>
   </main>;
