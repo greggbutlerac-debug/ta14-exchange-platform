@@ -12,7 +12,8 @@ const offers = [
 
 export const metadata = {
   title: 'Work With TA-14 | Commercial Entry',
-  description: 'Commercial entry point for TA-14 governance advisory, interoperability examinations, execution-readiness reviews, pilots, training and integration.',
+  description: 'TA14 governance advisory, interoperability examinations, execution-readiness reviews, pilots, training and integrations. Compare professional service prices and request a written scope.',
+  alternates: { canonical: '/work-with-ta14' },
 };
 
 const mail = `mailto:ta14admissibleexecution@gmail.com?subject=${encodeURIComponent('TA-14 Commercial Engagement')}&body=${encodeURIComponent('Organization:\nName / role:\nWhat are you trying to govern, examine, or build?\nWhat consequence or execution boundary matters?\nDesired timing:\n')}`;
@@ -35,7 +36,7 @@ export default function WorkWithTA14(){
       <div className="offers">{offers.map(([n,t,d,o])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{d}</p><small>WHAT YOU RECEIVE</small><b>{o}</b><a href={mail}>DISCUSS THIS ENGAGEMENT →</a></article>)}</div>
     </section>
 
-    <section className="path"><div style={{marginBottom:32,padding:22,border:'1px solid #ffd16644',borderRadius:16,background:'#2d240d55'}}><p className="eyebrow">REGISTRATION ≠ FREE PROFESSIONAL WORK</p><p style={{color:'#c7d3d9',lineHeight:1.7}}>Governance registration is free and establishes governed identity and standing to request examination. Registration does not create certification, approval, execution authority, or entitlement to unpaid examination work. A founding demonstration exists only when TA14 expressly grants one.</p><p className="eyebrow" style={{marginTop:18}}>RECORD BOUNDARY · PRIVATE / CONTROLLED / PUBLIC</p><p style={{color:'#9fb2bc',lineHeight:1.7}}>Publication boundaries are agreed before substantive commercial work begins.</p></div>
+    <section className="path"><p className="eyebrow">DEFINED PROFESSIONAL REVIEWS</p><h2>Need a clear starting price and deliverable?</h2><p>Compare the AI Execution Authority Review, Building Automation Governance Review and Private Institutional Teaching Room.</p><p><Link href="/professional-services" style={{color:"#ffd166",fontWeight:900}}>VIEW PROFESSIONAL SERVICES AND PRICING →</Link></p></section><section className="path"><div style={{marginBottom:32,padding:22,border:'1px solid #ffd16644',borderRadius:16,background:'#2d240d55'}}><p className="eyebrow">REGISTRATION ≠ FREE PROFESSIONAL WORK</p><p style={{color:'#c7d3d9',lineHeight:1.7}}>Governance registration is free and establishes governed identity and standing to request examination. Registration does not create certification, approval, execution authority, or entitlement to unpaid examination work. A founding demonstration exists only when TA14 expressly grants one.</p><p className="eyebrow" style={{marginTop:18}}>RECORD BOUNDARY · PRIVATE / CONTROLLED / PUBLIC</p><p style={{color:'#9fb2bc',lineHeight:1.7}}>Publication boundaries are agreed before substantive commercial work begins.</p></div>
       <p className="eyebrow">HOW COMMERCIAL WORK BEGINS</p>
       <h2>Interest should turn into a bounded engagement, not an endless conversation.</h2>
       <div className="steps">

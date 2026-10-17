@@ -1,8 +1,11 @@
 import Link from 'next/link';
+import type { Metadata } from 'next';
 
-export const metadata = {
-  title: 'Professional Governance Services | TA14 Authority Governance Institution',
-  description: 'Bounded independent examinations of AI execution, building automation, and private institutional teaching requirements.',
+export const metadata: Metadata = {
+  title: 'AI Execution Authority Review & Building Automation Governance Services',
+  description: 'AI agent execution authority reviews from $1,500, building automation governance reviews from $1,500, and private institutional teaching rooms from $750. Request a written TA14 scope.',
+  alternates: { canonical: '/professional-services' },
+  openGraph: { title: 'AI Execution Authority Review | TA14 Professional Services', description: 'Independent examinations of AI agent authority, building automation actions and evidence-to-execution boundaries.', url: '/professional-services', type: 'website' },
 };
 
 const offers = [
@@ -64,10 +67,23 @@ export default function ProfessionalServicesPage() {
         </article>)}
       </section>
       <section className="mt-14 rounded-2xl border border-slate-700 p-8">
+        <h2 className="text-2xl font-bold">Explore TA14 commercial and technical pathways</h2>
+        <p className="mt-4 text-slate-300">Start with the governance question that brought you here. These resources explain the boundaries before you request a paid review.</p>
+        <ul className="mt-5 text-sm text-slate-300">
+          <li><Link href="/ai-governance/ai-agent-executed-without-authority">AI agent executed without authority</Link></li>
+          <li><Link href="/ai-governance/prove-ai-agent-action-was-authorized">Proving an AI agent action was authorized</Link></li>
+          <li><Link href="/ai-governance/ai-agent-audit-trail">AI agent audit trails and evidence</Link></li>
+          <li><Link href="/eu-ai-act/commercial">EU AI Act commercial readiness</Link></li>
+          <li><Link href="/commercial">Other commercial governance examinations</Link></li>
+          <li><Link href="/work-with-ta14">Advisory, institutional pilots and integrations</Link></li>
+          <li><Link href="/transparent-air">Transparent Air HVAC field services</Link></li>
+        </ul>
+      </section>
+      <section className="mt-14 rounded-2xl border border-slate-700 p-8">
         <h2 className="text-2xl font-bold">What happens next?</h2>
         <p className="mt-4 leading-7 text-slate-300">Send a short written description of the proposed action, relevant actors, jurisdiction, available evidence, and the decision you need examined. TA14 will confirm fit, boundaries, deliverables, fees, and payment terms in writing before accepting an engagement. Sensitive or confidential material should not be sent until an appropriate handling arrangement is agreed.</p>
         <p className="mt-5 text-sm text-slate-400">An examination can conclude ALLOW, HOLD, DENY, or ESCALATE within its defined governance scope. It cannot grant external legal or operational authority.</p>
-        <div className="mt-6 flex flex-wrap gap-5 text-sm"><Link href="/pricing" className="text-cyan-300 underline">Explore the $149 entry examination</Link><Link href="/pricing" className="text-cyan-300 underline">See broader institutional pricing</Link></div>
+        <div className="mt-6 flex flex-wrap gap-5 text-sm"><Link href="/pricing" className="text-cyan-300 underline">Explore the $149 entry examination and institutional pricing</Link></div>
       </section>
     </div>
   </main>;
