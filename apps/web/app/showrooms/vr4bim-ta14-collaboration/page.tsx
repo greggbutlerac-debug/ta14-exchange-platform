@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import Samantha from '../epic-air-quality-fund/Samantha';
+const lessonImages=["Coordinated BIM Model Infographic.png","The Evidence Boundary_ BIM Change Governance.png","MEP Change Authorization Workflow.png","Construction Authority Workflow Infographic.png","Established Standing_ Authority Evaluation Poster.png","Construction Payment Governance Infographic.png","Digital Twin Intervention Governance Poster.png","Execution Decision Governance Infographic.png"];
 const lessons=[
 ['01','The Coordinated Model','A multidisciplinary model can establish spatial coordination and technical context. It cannot alone establish permission to execute.','Identify the modeled assets, revisions, coordination status and unresolved clashes.','Coordination is a technical claim, not an execution authorization.','Examine the underlying record.'],
 ['02','The Evidence Boundary','A clash report, issue ticket, drawing and field verification are distinct records. Preserve their provenance and scope.','Compare the source model revision with the clash report and field observations.','Observed is not inferred. Inferred is not authorized.','Test continuity and admissibility.'],
@@ -22,6 +23,7 @@ export default function VR4BIMRoom(){
  <h1 style={{fontFamily:'Georgia,serif',fontSize:'clamp(38px,6vw,76px)',lineHeight:1.08}}>The Model Is Coordinated.<br/><span style={{color:'#e9c47d'}}>Who Authorizes Reality?</span></h1>
  <p style={{fontSize:21,lineHeight:1.6,maxWidth:850}}>A proposed VR4BIM × TA14 interoperability demonstration: from multidisciplinary BIM coordination to accountable construction and operational consequences.</p>
  <p style={{border:'1px solid #526a78',padding:18,borderRadius:12,lineHeight:1.65}}>UNLISTED CONCEPT · NOT A PARTNERSHIP ANNOUNCEMENT · NO VR4BIM ENDORSEMENT · NO FORMAL EXAMINATION OR DISPOSITION. All cases, approvals, roles and outcomes are hypothetical. This page does not represent a real VR4BIM project or integrated product. No registration or payment is required to explore a potential commercial collaboration.</p>
+ <p><a href="/TA14_VR4BIM_Technical_Reference_v2_Under25MB.pdf" download style={{display:'inline-block',padding:'14px 20px',background:'#e9c47d',color:'#07131f',borderRadius:10,fontWeight:800,textDecoration:'none'}}>Download technical reference v2.0 (PDF, 2.5 MB) ↓</a></p>
  <p style={{fontWeight:700}}>Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome</p>
  <h2>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</h2>
  </header>
@@ -32,10 +34,8 @@ export default function VR4BIMRoom(){
  <p style={{color:'#e9c47d',fontWeight:700}}>LESSON {num} / 08</p><h2 style={{fontFamily:'Georgia,serif',fontSize:34}}>{title}</h2>
  <div style={{background:'#102637',padding:25,borderRadius:14}}>
  <p style={{fontSize:18,lineHeight:1.75}}><strong>What the illustration should teach:</strong> {teach}</p>
- <div role="img" aria-label={'Conceptual governance chain for '+title} style={{display:'flex',flexWrap:'wrap',gap:10,padding:'24px 0'}}>
- {['MODEL','RECORD','EVIDENCE','AUTHORITY','STANDING','DECISION'].map((v,i)=><span key={v} style={{border:'1px solid #64879a',padding:'14px 10px',borderRadius:8,background:i===Number(num)%6?'#385269':'#182f40',fontWeight:700,fontSize:13}}>{v}</span>)}
- </div>
- <Samantha text={'Lesson '+num+'. '+title+'. Look at the six numbered concepts represented across the conceptual governance chain: model, record, evidence, authority, standing, and decision. First, '+teach+' Next, '+inspect+' Ask what the image establishes, what it does not establish, and which authority must be verified before the proposed action. This is a hypothetical teaching illustration, not an actual VR4BIM project or approval.'}/>
+ <img src={'/'+encodeURIComponent(lessonImages[Number(num)-1])} alt={'Illustrated VR4BIM and TA14 lesson '+num+': '+title+'. All depicted identities and approvals are hypothetical.'} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:12}}/>
+ <Samantha text={'Lesson '+num+'. '+title+'. Examine the engineering and governance details in this illustration. First, '+teach+' Next, '+inspect+' Ask what the image establishes, what it does not establish, and which authority must be verified before the proposed action. This is a hypothetical teaching illustration, not an actual VR4BIM project or approval.'}/>
  <p style={{lineHeight:1.75}}><strong>Image examination:</strong> {inspect}</p>
  </div>
  <p><strong>What we learned:</strong> {learn}</p><p><strong>What comes next:</strong> {next}</p>
