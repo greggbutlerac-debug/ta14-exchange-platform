@@ -95,6 +95,8 @@ export default function SmartCityShowroom(){
     </div>
   </aside>
  </section>)}</div>
+ <div style={{position:'fixed',right:16,bottom:16,zIndex:50}}><Link href="/institutional-inquiry/smart-city" style={{display:'inline-block',background:'#9de2eb',color:'#062232',padding:'11px 14px',borderRadius:9,fontSize:13,fontWeight:800,textDecoration:'none',boxShadow:'0 5px 22px #0009'}}>Begin Institutional Inquiry ↗</Link></div>
+ <section style={{marginTop:38,border:'1px solid #41627d',borderRadius:15,padding:25,b
  <section style={{marginTop:38,border:'1px solid #41627d',borderRadius:15,padding:25,background:'#0c243a'}}>
   <h2>What the examination does not establish</h2><p style={{lineHeight:1.7,color:'#d6e5ef'}}>This public room teaches TA14's evidence-and-authority boundary. It makes no claim that a municipality has approved, certified, deployed, or tested TA14; that pictured interventions occurred; or that the visualized outcomes are independently verified. The technical reference describes how a named municipal owner could define a bounded pilot and its acceptance criteria.</p>
   <p style={{fontWeight:800,color:'#f5ca68'}}>Observed is not inferred. Inferred is not authorized. Capability ≠ Authority.</p>
