@@ -31,3 +31,10 @@ Scope: PR #607, eight-lesson showroom; not a replacement for the TA14 Academy HV
 ## Review boundary
 
 This examination note is not a field credential, regulatory opinion, equipment diagnostic instruction, governing amendment, or release authorization. It preserves the independent technical-review questions so they cannot be silently treated as solved by CI.
+
+## Follow-up verification — October 17, 2026
+
+- GitHub checks on commit `cfe167f78eb440c33d224130abf215cda08222a8`: **Verify application = success** and **Vercel Preview Comments = success**. These establish a passing application check, not technical approval.
+- GitHub search for `diagnostic termination`, `NIRET threshold`, and TA14 Google Sites references did **not** establish the controlling diagnostic-termination wording or complete detailed NIRET decision criteria. No substitute language was introduced.
+- Direct preview page, image, and PDF requests from the available external viewer were inaccessible to that viewer. This is **not** proof of a browser error or a passing rendering test; visual acceptance remains unverified.
+- Release decision remains **HOLD**; do not merge until the governing Academy source is provided and the image/desktop/mobile review is recorded.
