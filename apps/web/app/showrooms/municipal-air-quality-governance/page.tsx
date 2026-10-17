@@ -27,6 +27,18 @@ export default function MunicipalAirGovernance(){
  <h1 style={{fontSize:'clamp(36px,6vw,70px)',lineHeight:1.08,maxWidth:960,margin:'20px 0'}}>The City Can Measure.<br/><span style={{color:'#80e0df'}}>Who Authorizes the Response?</span></h1>
  <p style={{fontSize:20,lineHeight:1.6,maxWidth:780,color:'#c3d4dd'}}>Municipal Air Quality: From Legal Obligation to Authorized Action. A modular governance pathway for cities and asset owners—starting with data they may already possess.</p>
  <div style={{border:'1px solid #436476',padding:20,borderRadius:12,margin:'30px 0',color:'#d0e2e9'}}>CONCEPT ONLY · NO MUNICIPAL ENDORSEMENT · NO FORMAL EXAMINATION OR LEGAL DETERMINATION. All scenarios and dispositions are hypothetical. TA14 does not replace regulatory interpretation, certified monitoring, emergency response or qualified operators.</div>
+ <section style={{margin:'48px 0',padding:'28px 24px',border:'1px solid #3d6e7b',borderRadius:18,background:'#0b2330'}}>
+ <p style={{letterSpacing:2,fontSize:12,color:'#80e0df'}}>THE OWNER'S BUSINESS CASE</p>
+ <h2 style={{fontSize:30}}>Three components. One accountable consequence.</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:14}}>
+ {[
+ ['01 · CITY INPUTS','Existing monitors, building systems, inspection records, permits, responsible agencies and documented policies.','What already exists'],
+ ['02 · TA14 GOVERNANCE','Evidence provenance and fitness, applicable authority, established standing, bounded approval, execution and outcome records.','What TA14 adds'],
+ ['03 · OWNER VALUE','Traceable decisions, visible evidence gaps, clearer responsibilities, more defensible interventions and repeatable accountability.','What can be evaluated']
+ ].map(([eyebrow,body,heading])=><div key={eyebrow} style={{background:'#133645',borderRadius:12,padding:20}}><span style={{fontSize:12,color:'#80e0df'}}>{eyebrow}</span><h3>{heading}</h3><p style={{lineHeight:1.65,color:'#d0e0e7'}}>{body}</p></div>)}
+ </div>
+ <p style={{fontSize:14,color:'#b8d2dc',marginTop:22}}>Commercial hypothesis, not a demonstrated cost saving or legal defense. Any compliance or liability benefit requires jurisdiction-specific legal and operational validation.</p>
+ </section>
  <h2>Eight examinations</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(245px,1fr))',gap:14}}>
  {lessons.map(([n,t,d])=><article key={n} style={{padding:22,border:'1px solid #355466',borderRadius:14,background:'#102b3b'}}><b style={{color:'#7ee1db'}}>{n}</b><h3>{t}</h3><p style={{lineHeight:1.6,color:'#c8d9e0'}}>{d}</p></article>)}
