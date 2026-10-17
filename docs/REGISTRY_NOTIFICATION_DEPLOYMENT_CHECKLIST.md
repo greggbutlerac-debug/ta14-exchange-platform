@@ -76,7 +76,7 @@ who receives registration notification email.
 Verify the sender domain before using an institutional sender such as:
 
 ```text
-TA-14 Registry <registry@ta14authority.org>
+TA-14 Registry <ta14admissibleexecution@gmail.com>
 ```
 
 Confirm the sender is accepted by Resend before enabling production delivery.
