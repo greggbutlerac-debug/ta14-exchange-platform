@@ -371,7 +371,7 @@ async function sendWithResend(
   const apiKey = getEnv('RESEND_API_KEY');
   const fromAddress =
     getEnv('TA14_REGISTRY_NOTIFICATION_FROM') ||
-    'TA-14 Registry <registry@ta14authority.org>';
+    'TA-14 Registry <ta14admissibleexecution@gmail.com>';
 
   if (!apiKey) {
     throw new Error('RESEND_API_KEY is not configured.');
