@@ -64,6 +64,12 @@ export default function OnumaSemanticBridgeRecord(){
  </div>
  <p style={{fontSize:13,color:'#9fbacb',lineHeight:1.7,marginTop:20}}>No formal endorsement, institutional partnership, independent technical validation, or adoption is asserted. The time-linked source is provided above. This record can be further updated with an independently checked transcript and precise quotation.</p>
  </section>
+ <section style={{...panel,borderColor:'#6694a1',marginBottom:26}}>
+ <p style={eyebrow}>GREENBUILD AI SUMMIT · OCTOBER 20, 2026 · PRESENTATION COMPANION</p>
+ <h2 style={{fontSize:'clamp(27px,3.5vw,39px)',margin:'12px 0'}}>From the graph demonstration to Become the Building</h2>
+ <p style={muted}>The October 16 ONUMA session provides context for the subsequent Become the Building exercise at Greenbuild. Its PAE Living Building reference invites contributions from people, assets, sensors, and AI agents, revealing the difference between a participant's claim, an AI interpretation, human judgment, and authority to execute. TA14's illustrated Greenbuild companion is an independent conceptual interpretation, not a deployed integration or ONUMA endorsement.</p>
+ <a href="/showrooms/smart-city-admissible-governance#greenbuild-2026" style={{display:'inline-block',marginTop:12,padding:'14px 20px',background:'#78e8d7',color:'#05202c',borderRadius:11,fontWeight:800,textDecoration:'none'}}>EXPLORE THE GREENBUILD AUTHORITY COMPANION →</a>
+ </section>
  <VisualLessons/>
  <InteractiveMission/>
  <section style={{...panel,marginBottom:26}}>
