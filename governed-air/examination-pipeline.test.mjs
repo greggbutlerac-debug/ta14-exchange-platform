@@ -1,0 +1,18 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {generateKeyPairSync,sign} from 'node:crypto';
+import {examineGovernedAirCase} from './examination-pipeline.mjs';
+const {publicKey,privateKey}=generateKeyPairSync('ed25519');
+const now=Date.UTC(2026,9,18);
+const binding={tenant_id:'municipality-A',case_id:'air-case-001',subject_id:'sensor-1',action:'investigate',site_id:'building-1',policy_version:'policy-1'};
+const payload={...binding,key_id:'institution-key',schema:'ta14-attestation-v1',verification_status:'VERIFIED',issued_at:now-1000,expires_at:now+60000};
+const data=JSON.stringify(payload);
+const attestation={key_id:'institution-key',payload:data,signature:sign(null,Buffer.concat([Buffer.from('TA14-GOVERNED-AIR-ATTESTATION-v1\n'),Buffer.from(data)]),privateKey).toString('base64url')};
+const trust={keys:{'institution-key':{publicKeyPem:publicKey.export({type:'spki',format:'pem'})}},now};
+const input={observation:{description:'Hypothetical elevated CO2 observation'},binding,attestation};
+test('authentic signature records authentication but does not authorize',()=>{const r=examineGovernedAirCase(input,trust);assert.equal(r.attestation.trusted,true);assert.equal(r.disposition,'HOLD');assert.equal(r.executionAuthorized,false);assert.equal(r.trace[1].status,'ATTESTATION_AUTHENTICATED')});
+test('unsigned claim cannot establish authenticity',()=>assert.equal(examineGovernedAirCase({...input,attestation:null},trust).attestation.trusted,false));
+test('wrong tenant binding fails',()=>assert.equal(examineGovernedAirCase({...input,binding:{...binding,tenant_id:'other'}},trust).attestation.trusted,false));
+test('no independently configured key fails',()=>assert.equal(examineGovernedAirCase(input,{keys:{},now}).attestation.trusted,false));
+test('physical action mutation fails binding',()=>assert.equal(examineGovernedAirCase({...input,binding:{...binding,action:'change_ventilation'}},trust).attestation.trusted,false));
+test('all eight anchors have explicit statuses',()=>assert.deepEqual(examineGovernedAirCase(input,trust).trace.map(x=>x.anchor),['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome']));
