@@ -137,6 +137,7 @@ export default function EvidenceBeforeInterventionExaminationDraft() {
               <p style={{marginBottom:0}}>{teachingCautions[i]}</p>
             </aside>
 
+            {i === 4 && <p style={{borderLeft:"4px solid #3a6185",padding:"12px 16px",background:"#edf4fa"}}><strong>Diagnostic termination is a separate Academy requirement.</strong> A Declared Diagnostic Determination does not by itself establish that the controlling examination-stop conditions have been met. The specific Academy criteria must be verified before making that claim.</p>}
             <h4>What you learned</h4><p>{learned}</p>
             <h4>What comes next</h4><p>{next}</p>
           </article>
