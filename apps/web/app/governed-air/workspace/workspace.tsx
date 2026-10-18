@@ -1,6 +1,7 @@
 'use client';
 import {useState} from 'react';
 import {examineUnverifiedClaims} from '../../../../../governed-air/workspace-boundary.mjs';
+import {examineGovernedAirCase, type PipelineResult} from '../../../../../governed-air/examination-pipeline.mjs';
 
 const evidenceKeys=['source','timestamp','calibration','continuity'] as const;
 const authorityKeys=['actor','capacity','standing_basis','authority_relationship','applicable_policy'] as const;
@@ -12,7 +13,7 @@ const labels:Record<string,string>={
 const anchors=['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome'];
 type Action='investigate'|'change_ventilation'|'dismiss';
 type Result={disposition:string;reason:string;missingEvidence:string[];missingAuthority:string[];simulation:boolean};
-type Examination={case_id:string;simulation:true;created_at:string;observation:{description:string;value:string;unit:string};evidence:Record<string,string>;authority:Record<string,string>;proposed_action:Action;safety_escalation:boolean;result:Result};
+type Examination={pipeline:PipelineResult;case_id:string;simulation:true;created_at:string;observation:{description:string;value:string;unit:string};evidence:Record<string,string>;authority:Record<string,string>;proposed_action:Action;safety_escalation:boolean;result:Result};
 export default function ExaminationWorkspace(){
  const [caseId,setCaseId]=useState('GA-WORKSPACE-DEMO-001');
  const [description,setDescription]=useState('Hypothetical classroom CO₂ observation; no verified field record.');
@@ -27,7 +28,8 @@ export default function ExaminationWorkspace(){
   const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
   const authority=Object.fromEntries(authorityKeys.map(k=>[k,fields[k]||'']));
   const result=examineUnverifiedClaims({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
-  setRecord({case_id:caseId,simulation:true,created_at:new Date().toISOString(),observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,result});
+  const pipeline=examineGovernedAirCase({observation:{description,value,unit},evidence,authority,binding:{tenant_id:'unverified-demo',case_id:caseId,subject_id:'unverified-observation',action,site_id:'unverified-site',policy_version:'unverified-policy'}}, {keys:{}});
+  setRecord({pipeline,case_id:caseId,simulation:true,created_at:new Date().toISOString(),observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,result});
  };
  const download=()=>{if(!record)return;const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-examination-simulation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
  const input=(label:string,v:string,set:(v:string)=>void,placeholder='')=><label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{label}<input aria-label={label} value={v} placeholder={placeholder} onChange={e=>{set(e.target.value);setRecord(null)}} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11,fontSize:15}}/></label>;
@@ -57,6 +59,6 @@ export default function ExaminationWorkspace(){
  {record&&<><div style={{border:'1px solid #457483',borderRadius:10,padding:14,background:'#071e2b'}}><h4 style={{margin:'0 0 10px'}}>Examination requirement review</h4><p style={{fontSize:12,color:'#a9d4df'}}>Claim present means text was supplied, not that the claim is verified or admissible. No real-world authority is established.</p>{[...evidenceKeys,...authorityKeys].map(k=>{const missing=[...record.result.missingEvidence,...record.result.missingAuthority].includes(k);return <div key={k} style={{display:'flex',justifyContent:'space-between',gap:12,borderTop:'1px solid #274958',padding:'9px 0',fontSize:13}}><span>{labels[k]}</span><strong style={{color:missing?'#ffce83':'#86dfce',textAlign:'right'}}>{missing?'MISSING':'CLAIM PRESENT · UNVERIFIED'}</strong></div>})}</div><p><strong>Missing evidence:</strong> {record.result.missingEvidence.map(k=>labels[k]).join(', ')||'No blank fields; claims unverified'}</p><p><strong>Missing authority or standing:</strong> {record.result.missingAuthority.map(k=>labels[k]).join(', ')||'No blank fields; claims unverified'}</p><p style={{fontSize:13,color:'#a9d4df'}}><strong>Disposition boundary:</strong> {record.result.disposition==='ALLOW'?'Simulation-only bounded investigation; not execution authorization.':record.result.disposition==='ESCALATE'?'Refer to the independently applicable safety process.':record.result.disposition==='DENY'?'The request cannot proceed in this fixture.':'Do not advance this proposed consequence without resolving the stated limitation.'}</p><button onClick={download} style={{padding:12,cursor:'pointer'}}>Download simulated examination JSON</button></>}
  </div></section>
  </div>
- <section style={{...section,marginTop:18}}><h2>Eight-anchor consequence chain</h2><div style={{display:'flex',gap:8,flexWrap:'wrap'}}>{anchors.map((a,i)=><span key={a} style={{border:'1px solid #457483',borderRadius:8,padding:'9px 12px',fontSize:13}}>{String(i+1).padStart(2,'0')} · {a}</span>)}</div><p style={{fontSize:13,color:'#a9d4df'}}>Illustrative chain only. Anchor-specific adjudication, binding, execution, and outcome verification are not implemented in this prototype.</p></section>
+ <section style={{...section,marginTop:18}}><h2>Eight-anchor consequence chain</h2><p style={{fontSize:13,color:'#a9d4df'}}>Live examination trace of the current simulated record. No institutional trust keys or attestation are configured in this browser workspace. Anchor statuses do not authorize execution.</p><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10}}>{(record?.pipeline.trace||anchors.map(anchor=>({anchor,status:'AWAITING_EXAMINATION',note:'Run an examination to inspect this gate'}))).map((item,i)=><div key={item.anchor} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:9,padding:13}}><strong>{String(i+1).padStart(2,'0')} · {item.anchor}</strong><p style={{color:'#ffce83',fontSize:12,fontWeight:700,overflowWrap:'anywhere'}}>{item.status.replaceAll('_',' ')}</p><p style={{fontSize:12,color:'#a9d4df'}}>{item.note}</p></div>)}</div>{record&&<p style={{fontSize:13}}><strong>Independent verification:</strong> {record.pipeline.attestation.reason}. <strong>Execution authorized:</strong> No.</p>}</section>
  </div></main>;
 }
