@@ -1,0 +1,14 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {verifyEvidenceClaim,verifyAuthorityClaim,assessVerificationBoundary} from './trusted-verifier.mjs';
+const asserted={reference:'claim-1',status:'VERIFIED',trusted:true,executionAuthorized:true,verifier_signature:'forged'};
+test('self-asserted verified evidence is not trusted',()=>{const r=verifyEvidenceClaim(asserted,{tenantId:'tenant-A'});assert.equal(r.status,'INDETERMINATE');assert.equal(r.trusted,false);assert.equal(r.executionAuthorized,false)});
+test('self-asserted authority and standing are not trusted',()=>{const r=verifyAuthorityClaim(asserted,{tenantId:'tenant-A'});assert.equal(r.status,'INDETERMINATE');assert.equal(r.trusted,false)});
+test('forged signature never produces ALLOW',()=>assert.equal(assessVerificationBoundary({evidence:asserted,authority:asserted}).disposition,'HOLD'));
+test('missing claims fail closed',()=>assert.equal(assessVerificationBoundary(null).executionAuthorized,false));
+test('expired claimed receipt fails closed',()=>assert.equal(assessVerificationBoundary({evidence:{...asserted,expires_at:'2020-01-01'},authority:asserted}).disposition,'HOLD'));
+test('revoked claimed receipt fails closed',()=>assert.equal(assessVerificationBoundary({evidence:{...asserted,revoked_at:'2026-10-01'},authority:asserted}).disposition,'HOLD'));
+test('cross-tenant asserted verification fails closed',()=>assert.equal(assessVerificationBoundary({context:{tenantId:'tenant-B'},evidence:{...asserted,tenantId:'tenant-A'},authority:asserted}).disposition,'HOLD'));
+test('replayed claimed receipt fails closed',()=>assert.equal(assessVerificationBoundary({evidence:{...asserted,replayed:true},authority:asserted}).disposition,'HOLD'));
+test('mutated action binding fails closed',()=>assert.equal(assessVerificationBoundary({action:'change_ventilation',evidence:asserted,authority:asserted}).disposition,'HOLD'));
+test('verifier responses cannot be modified in place',()=>{const r=verifyEvidenceClaim(asserted,{});assert.equal(Object.isFrozen(r),true)});
