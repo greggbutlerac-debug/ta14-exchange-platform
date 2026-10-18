@@ -38,3 +38,10 @@ This examination note is not a field credential, regulatory opinion, equipment d
 - GitHub search for `diagnostic termination`, `NIRET threshold`, and TA14 Google Sites references did **not** establish the controlling diagnostic-termination wording or complete detailed NIRET decision criteria. No substitute language was introduced.
 - Direct preview page, image, and PDF requests from the available external viewer were inaccessible to that viewer. This is **not** proof of a browser error or a passing rendering test; visual acceptance remains unverified.
 - Release decision remains **HOLD**; do not merge until the governing Academy source is provided and the image/desktop/mobile review is recorded.
+
+## User audio acceptance — October 18, 2026
+
+- The owner reported that Samantha **finishes the narration** in the live preview on their device. This is user-reported successful end-to-end playback, not independent verification of all devices, voices, or accessibility modes.
+- Eight per-image Play / Stop controls are implemented, and the application check on commit `2ad64510d04d0545bac59de44934d840614b2521` completed successfully.
+- Audio implementation is **accepted for the user's tested browser/device**. Broader compatibility and interruption/resume behavior remain unverified.
+- Audio acceptance does **not** clear the NIRET, diagnostic-termination, technical image, or release authorization gates. **HOLD remains.**
