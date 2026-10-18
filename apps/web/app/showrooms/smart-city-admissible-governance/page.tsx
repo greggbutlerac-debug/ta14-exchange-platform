@@ -111,6 +111,6 @@ export default function SmartCityShowroom(){
  <section style={{marginTop:38,border:'1px solid #41627d',borderRadius:15,padding:25,background:'#0c243a'}}>
   <h2>What the examination does not establish</h2><p style={{lineHeight:1.7,color:'#d6e5ef'}}>This public room teaches TA14's evidence-and-authority boundary. It makes no claim that a municipality has approved, certified, deployed, or tested TA14; that pictured interventions occurred; or that the visualized outcomes are independently verified. The technical reference describes how a named municipal owner could define a bounded pilot and its acceptance criteria.</p>
   <p style={{fontWeight:800,color:'#f5ca68'}}>Observed is not inferred. Inferred is not authorized. Capability ≠ Authority.</p>
-  <Link href="/showrooms" style={{color:'#9de2eb'}}>← Explore all TA14 showrooms</Link>
+  <p><Link href="/work-with-ta14" style={{display:'inline-block',padding:'12px 16px',borderRadius:9,background:'#9de2eb',color:'#082639',fontWeight:800,textDecoration:'none'}}>Request a written scope for institutional examination →</Link></p><Link href="/showrooms" style={{color:'#9de2eb'}}>← Explore all TA14 showrooms</Link>
  </section></div></main>;
 }
