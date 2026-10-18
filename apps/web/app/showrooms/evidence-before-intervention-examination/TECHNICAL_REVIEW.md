@@ -45,3 +45,11 @@ This examination note is not a field credential, regulatory opinion, equipment d
 - Eight per-image Play / Stop controls are implemented, and the application check on commit `2ad64510d04d0545bac59de44934d840614b2521` completed successfully.
 - Audio implementation is **accepted for the user's tested browser/device**. Broader compatibility and interruption/resume behavior remain unverified.
 - Audio acceptance does **not** clear the NIRET, diagnostic-termination, technical image, or release authorization gates. **HOLD remains.**
+
+## Public-source cross-check — October 18, 2026
+
+- Published [TA14 Academy HVAC blueprint](https://www.ta14exchange.com/academy/hvac/blueprint) states that the **current TA14 Academy NIRET** must govern invasive refrigerant entry, and expressly notes that the blueprint does **not** silently redefine the threshold. This confirms that the summary is not a substitute for the controlling criteria.
+- Published [HVAC Academy schools description](https://www.ta14authority.org/academy/hvac/schools) corroborates baseline preservation, non-invasive threshold, declared diagnostic determination, bounded intervention, and post-intervention outcome comparison. It does not supply the complete operative threshold criteria.
+- The user's published [NIRET discussion](https://www.linkedin.com/pulse/i-never-wanted-homeowner-have-trust-me-greggory-don-butler-5asre) further distinguishes the gate for pressure-side evidence gathering from refrigerant movement. This is relevant background, **not** a verified replacement for the Academy's current controlling source.
+- Targeted searches of publicly indexed Google Sites pages did not recover an authoritative diagnostic-termination text or full NIRET rules. **Source release gate remains open**. Do not interpolate numerical conditions, declare an adopted termination rule, or infer approval.
+- The preview URL is not accessible to the external text viewer. This does not negate the owner's successful audio playback; browser-level image and mobile validation remain separate unverified requirements.
