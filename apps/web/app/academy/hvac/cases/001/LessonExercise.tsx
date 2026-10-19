@@ -1,5 +1,7 @@
 "use client";
-import {useState} from "react";
+import {useEffect,useState} from "react";
+const PROGRESS_EVENT="ta14-case001-progress";
+const STORAGE_KEY="ta14-case001-practice-v1";
 
 const exercises:{question:string;choices:string[];correct:number;why:string}[]=[
 {question:"What is established by the customer's statement that the house won't cool?",choices:["A confirmed refrigerant defect","A reported symptom requiring investigation","A verified equipment failure"],correct:1,why:"The complaint is a report, not a measured diagnosis."},
@@ -23,9 +25,10 @@ export default function LessonExercise({lesson}:{lesson:number}){
  const [submitted,setSubmitted]=useState(false);
  const [attempts,setAttempts]=useState(0);
  const [passed,setPassed]=useState(false);
+ useEffect(()=>{try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;if(saved[String(lesson)]>0){setPassed(true);setAttempts(saved[String(lesson)]);}}catch{}},[lesson]);
  if(!exercise)return null;
  const correct=selected===exercise.correct;
- function submit(){if(selected===null||passed)return;setSubmitted(true);setAttempts(a=>a+1);if(correct)setPassed(true);}
+ function submit(){if(selected===null||passed)return;setSubmitted(true);setAttempts(a=>a+1);if(correct){setPassed(true);try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;saved[String(lesson)]=attempts+1;window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(saved));window.dispatchEvent(new Event(PROGRESS_EVENT));}catch{}}}
  return <div className="exercise" aria-label={`Lesson ${lesson} understanding check`}>
  <div className="exercise-title">YOUR TURN · EVIDENCE DECISION</div>
  <h3>{exercise.question}</h3>
