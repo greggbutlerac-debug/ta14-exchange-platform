@@ -23,13 +23,25 @@ export default function ExaminationWorkspace(){
  const [action,setAction]=useState<Action>('investigate');
  const [escalation,setEscalation]=useState(false);
  const [record,setRecord]=useState<Examination|null>(null);
- const change=(key:string,value:string)=>{setFields(v=>({...v,[key]:value}));setRecord(null)};
- const examine=()=>{
+ const [serverResult,setServerResult]=useState<{disposition:string;reason:string;trace:{anchor:string;status:string;note:string}[];executionAuthorized:boolean}|null>(null);
+ const [serverError,setServerError]=useState('');
+ const [examining,setExamining]=useState(false);
+ const change=(key:string,value:string)=>{setFields(v=>({...v,[key]:value}));setRecord(null);setServerResult(null)};
+ const examine=async()=>{
   const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
   const authority=Object.fromEntries(authorityKeys.map(k=>[k,fields[k]||'']));
   const result=examineUnverifiedClaims({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
   const pipeline=explainUnverifiedExamination({observation:{description,value,unit},evidence,authority,proposed_action:action});
   setRecord({pipeline,case_id:caseId,simulation:true,created_at:new Date().toISOString(),observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,result});
+  setServerResult(null);setServerError('');setExamining(true);
+  try {
+   const response=await fetch('/api/governed-air/examine',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify({observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,binding:{tenant_id:'unverified-demo',case_id:caseId,subject_id:'unverified-observation',action,site_id:'unverified-site',policy_version:'unverified-policy'}})});
+   if(!response.ok) throw new Error('Server examination unavailable ('+response.status+')');
+   const data=await response.json();
+   if(!Array.isArray(data.trace)||data.executionAuthorized!==false||data.disposition!=='HOLD')throw new Error('Unexpected examination response; authorization not accepted');
+   setServerResult(data);
+  }catch(error){setServerError(error instanceof Error?error.message:'Server examination unavailable');}
+  finally{setExamining(false)}
  };
  const download=()=>{if(!record)return;const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-examination-simulation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
  const input=(label:string,v:string,set:(v:string)=>void,placeholder='')=><label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{label}<input aria-label={label} value={v} placeholder={placeholder} onChange={e=>{set(e.target.value);setRecord(null)}} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11,fontSize:15}}/></label>;
@@ -53,12 +65,14 @@ export default function ExaminationWorkspace(){
  <section style={section}><h2>04 · Proposed consequence</h2>
  <div style={{display:'grid',gap:12}}>{([['investigate','Request bounded investigation'],['change_ventilation','Change ventilation controls'],['dismiss','Dismiss observation']] as const).map(([v,label])=><label key={v}><input type="radio" name="workspace-action" checked={action===v} onChange={()=>{setAction(v);setRecord(null)}}/> {label}</label>)}
  <label><input type="checkbox" checked={escalation} onChange={e=>{setEscalation(e.target.checked);setRecord(null)}}/> Safety procedure requires escalation</label>
- <button onClick={examine} style={{padding:14,background:'#79e0e0',color:'#071923',fontWeight:800,border:0,borderRadius:8,cursor:'pointer'}}>Examine proposed consequence</button>
+ <button disabled={examining} onClick={examine} style={{padding:14,background:'#79e0e0',color:'#071923',fontWeight:800,border:0,borderRadius:8,cursor:'pointer'}}>{examining?'Examining…':'Examine proposed consequence'}</button>
+ {serverError&&<p role="alert" style={{color:'#ffce83'}}>Server examination unavailable: {serverError}. Local claim review remains simulation-only.</p>}
+ {serverResult&&<p style={{fontSize:13,color:'#86dfce'}}>Server-side examination received: {serverResult.disposition}. Execution authorized: No.</p>}
  <h3>Disposition: <span aria-live="polite" style={{color:'#ffce83'}}>{record?.result.disposition||'AWAITING EXAMINATION'}</span></h3>
  <p aria-live="polite">{record?.result.reason||'No examination has been performed for the current inputs.'}</p>
  {record&&<><div style={{border:'1px solid #457483',borderRadius:10,padding:14,background:'#071e2b'}}><h4 style={{margin:'0 0 10px'}}>Examination requirement review</h4><p style={{fontSize:12,color:'#a9d4df'}}>Claim present means text was supplied, not that the claim is verified or admissible. No real-world authority is established.</p>{[...evidenceKeys,...authorityKeys].map(k=>{const missing=[...record.result.missingEvidence,...record.result.missingAuthority].includes(k);return <div key={k} style={{display:'flex',justifyContent:'space-between',gap:12,borderTop:'1px solid #274958',padding:'9px 0',fontSize:13}}><span>{labels[k]}</span><strong style={{color:missing?'#ffce83':'#86dfce',textAlign:'right'}}>{missing?'MISSING':'CLAIM PRESENT · UNVERIFIED'}</strong></div>})}</div><p><strong>Missing evidence:</strong> {record.result.missingEvidence.map(k=>labels[k]).join(', ')||'No blank fields; claims unverified'}</p><p><strong>Missing authority or standing:</strong> {record.result.missingAuthority.map(k=>labels[k]).join(', ')||'No blank fields; claims unverified'}</p><p style={{fontSize:13,color:'#a9d4df'}}><strong>Disposition boundary:</strong> {record.result.disposition==='ALLOW'?'Simulation-only bounded investigation; not execution authorization.':record.result.disposition==='ESCALATE'?'Refer to the independently applicable safety process.':record.result.disposition==='DENY'?'The request cannot proceed in this fixture.':'Do not advance this proposed consequence without resolving the stated limitation.'}</p><button onClick={download} style={{padding:12,cursor:'pointer'}}>Download simulated examination JSON</button></>}
  </div></section>
  </div>
- <section style={{...section,marginTop:18}}><h2>Eight-anchor consequence chain</h2><p style={{fontSize:13,color:'#a9d4df'}}>Live examination trace of the current simulated record. No institutional trust keys or attestation are configured in this browser workspace. Anchor statuses do not authorize execution.</p><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10}}>{(record?.pipeline.trace||anchors.map(anchor=>({anchor,status:'AWAITING_EXAMINATION',note:'Run an examination to inspect this gate'}))).map((item,i)=><div key={item.anchor} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:9,padding:13}}><strong>{String(i+1).padStart(2,'0')} · {item.anchor}</strong><p style={{color:'#ffce83',fontSize:12,fontWeight:700,overflowWrap:'anywhere'}}>{item.status.replaceAll('_',' ')}</p><p style={{fontSize:12,color:'#a9d4df'}}>{item.note}</p></div>)}</div>{record&&<p style={{fontSize:13}}><strong>Independent verification:</strong> {record.pipeline.attestation.reason}. <strong>Execution authorized:</strong> No.</p>}</section>
+ <section style={{...section,marginTop:18}}><h2>Eight-anchor consequence chain</h2><p style={{fontSize:13,color:'#a9d4df'}}>Live examination trace of the current simulated record. No institutional trust keys or attestation are configured in this browser workspace. Anchor statuses do not authorize execution.</p><div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10}}>{(serverResult?.trace||record?.pipeline.trace||anchors.map(anchor=>({anchor,status:'AWAITING_EXAMINATION',note:'Run an examination to inspect this gate'}))).map((item,i)=><div key={item.anchor} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:9,padding:13}}><strong>{String(i+1).padStart(2,'0')} · {item.anchor}</strong><p style={{color:'#ffce83',fontSize:12,fontWeight:700,overflowWrap:'anywhere'}}>{item.status.replaceAll('_',' ')}</p><p style={{fontSize:12,color:'#a9d4df'}}>{item.note}</p></div>)}</div>{record&&<p style={{fontSize:13}}><strong>Examination source:</strong> {serverResult?'Server-side fail-closed pipeline':'Local explanatory fallback'}. <strong>Execution authorized:</strong> No.</p>}</section>
  </div></main>;
 }
