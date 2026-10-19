@@ -86,11 +86,23 @@ export function SeoIntelligenceTracker() {
       const anchor = target.closest("a") as HTMLAnchorElement | null;
       if (anchor?.href) {
         const targetText=(anchor.innerText || anchor.getAttribute("aria-label") || "").trim().slice(0, 500);
+        const onShowroom = window.location.pathname.startsWith("/showrooms/");
+        const commercialDestination = anchor.origin === window.location.origin &&
+          (anchor.pathname === "/work-with-ta14" || anchor.pathname === "/professional-services" || anchor.pathname === "/commercial");
+        const writtenInquiryClick = window.location.pathname === "/work-with-ta14" &&
+          anchor.protocol === "mailto:" &&
+          anchor.href.toLowerCase().startsWith("mailto:ta14admissibleexecution@gmail.com");
+        const funnelMetadata = writtenInquiryClick
+          ? { funnel: "ta14-written-engagement", stage: "email_link_clicked", confirmed_submission: false }
+          : onShowroom && commercialDestination
+            ? { funnel: "ta14-written-engagement", stage: "showroom_to_commercial_clicked", source_showroom: window.location.pathname }
+            : undefined;
         send({
           ...payload(window.location.pathname, params),
           eventType: "click",
           targetHref: anchor.href,
           targetText,
+          ...(funnelMetadata ? { metadata: funnelMetadata } : {}),
         });
         const isBoundedExamStart =
           window.location.pathname === "/pricing" &&
