@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Public Expenditure Admissibility · Who Authorizes the Payment?','/showrooms/public-expenditure-admissibility','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image government spending construction draw payment admissible evidence applicable authority established standing Samantha narration interactive simulated HOLD ALLOW DENY ESCALATE technical reference'],
 ['Municipal Air Quality Governance · Evidence to Authorized Action','/showrooms/municipal-air-quality-governance','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image municipal building and air-quality governance showroom local authority admissible evidence standing bounded execution verified outcome Samantha narration'],
 ['ONUMA Semantic Bridge · Back from Tokyo, October 16, 2026','/showrooms/onuma-semantic-bridge-october-2026','EVENTS & PRESENTATIONS','Kimon Onuma Semantic Bridge graph of graphs Asset Leadership Network Greggory Don Butler TA14 October 16 source-linked session record RE1 execution governance'],
 ['Energy-to-Environment Coupling · What Did the People Receive?','/showrooms/energy-to-environment-coupling','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight teaching images AIR electrical kW kWh HVAC mechanical drift environmental outcome occupancy school cost per student attendance energy accountability ACA AEA EABA Samantha narration technical reference'],
