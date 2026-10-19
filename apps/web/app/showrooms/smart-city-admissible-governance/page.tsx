@@ -116,6 +116,6 @@ export default function SmartCityShowroom(){
    <p style={{lineHeight:1.7,color:'#d6e5ef',margin:'0 0 14px'}}>TA14 offers separately scoped, paid reviews of evidence, applicable authority, established standing, and the execution boundary. For building automation or municipal infrastructure proposals, begin with a written scope request; the appropriate service and fee are confirmed before any work begins. This teaching room itself is not a formal examination or authorization.</p>
    <Link href="/professional-services" style={{display:'inline-block',padding:'13px 18px',borderRadius:9,background:'#9de2eb',color:'#082639',fontWeight:800,textDecoration:'none'}}>Explore paid governance review services →</Link>
   </div>
-  <p><Link href="/work-with-ta14" style={{display:'inline-block',padding:'12px 16px',borderRadius:9,background:'#9de2eb',color:'#082639',fontWeight:800,textDecoration:'none'}}>Request a written scope for institutional examination →</Link></p><Link href="/showrooms" style={{color:'#9de2eb'}}>← Explore all TA14 showrooms</Link>
+  <p><Link href="/work-with-ta14?source_showroom=smart-city-admissible-governance" style={{display:'inline-block',padding:'12px 16px',borderRadius:9,background:'#9de2eb',color:'#082639',fontWeight:800,textDecoration:'none'}}>Request a written scope for institutional examination →</Link></p><Link href="/showrooms" style={{color:'#9de2eb'}}>← Explore all TA14 showrooms</Link>
  </section></div></main>;
 }
