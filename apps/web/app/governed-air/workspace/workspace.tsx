@@ -1,5 +1,6 @@
 'use client';
 import {useState} from 'react';
+import classroomCase from '../../../../../governed-air/cases/classroom-ventilation-hold.v0.1.json';
 import {examineUnverifiedClaims} from '../../../../../governed-air/workspace-boundary.mjs';
 import {explainUnverifiedExamination, type BrowserExamination} from '../../../../../governed-air/browser-explanation.mjs';
 import {explainGovernanceGaps, type GovernanceGap} from '../../../../../governed-air/gap-explanation.mjs';
@@ -27,6 +28,8 @@ export default function ExaminationWorkspace(){
  const [serverResult,setServerResult]=useState<{disposition:string;reason:string;trace:{anchor:string;status:string;note:string}[];executionAuthorized:boolean}|null>(null);
  const [serverError,setServerError]=useState('');
  const [examining,setExamining]=useState(false);
+ const [loadedFixture,setLoadedFixture]=useState(false);
+ const loadClassroomCase=()=>{const c=classroomCase;setCaseId(c.case_id);setDescription(c.observation.description);setValue(c.observation.value);setUnit(c.observation.unit);setFields({...c.evidence,...c.authority});setAction('change_ventilation');setEscalation(false);setRecord(null);setServerResult(null);setServerError('');setLoadedFixture(true)};
  const change=(key:string,value:string)=>{setFields(v=>({...v,[key]:value}));setRecord(null);setServerResult(null)};
  const examine=async()=>{
   const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
@@ -54,6 +57,7 @@ export default function ExaminationWorkspace(){
  <h1 style={{fontSize:'clamp(32px,5vw,60px)',margin:'8px 0'}}>Governed Air <span style={{color:'#7ce2df'}}>Examination Workspace</span></h1>
  <p style={{maxWidth:880,lineHeight:1.65}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
  <p style={{borderLeft:'3px solid #f1bb71',paddingLeft:14,lineHeight:1.6}}><strong>SIMULATION ONLY.</strong> All information is hypothetical and entered for teaching. Text entries are claims, not independently verified evidence or authority. This tool cannot approve field work, control equipment, or confer legal standing. Records remain in this browser session until downloaded.</p>
+ <section style={{...section,marginTop:20,borderColor:'#638e9a'}}><h2>Guided hypothetical case</h2><p>Load a fictional classroom observation and examine a proposed ventilation control change. No reading here is a health threshold, site instruction, or verified instrument record.</p><button type="button" onClick={loadClassroomCase} style={{padding:'12px 18px',borderRadius:8,background:'#79e0e0',color:'#071923',fontWeight:800,cursor:'pointer'}}>Load classroom ventilation case</button>{loadedFixture&&<p style={{fontSize:13,color:'#a9d4df'}}>Case GA-CASE-SCHOOL-001 loaded. Select “Examine proposed consequence” below. You may edit claims and examine again; text alone never establishes authority.</p>}</section>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(310px,1fr))',gap:18,marginTop:24}}>
  <section style={section}><h2>01 · Proposed reality</h2>
  <div style={{display:'grid',gap:14}}>
