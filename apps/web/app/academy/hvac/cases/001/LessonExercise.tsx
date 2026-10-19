@@ -25,18 +25,22 @@ export default function LessonExercise({lesson}:{lesson:number}){
  const [submitted,setSubmitted]=useState(false);
  const [attempts,setAttempts]=useState(0);
  const [passed,setPassed]=useState(false);
+ const [reason,setReason]=useState("");
+ const [reasonChecked,setReasonChecked]=useState(false);
  useEffect(()=>{try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;if(saved[String(lesson)]>0){setPassed(true);setAttempts(saved[String(lesson)]);}}catch{}},[lesson]);
  if(!exercise)return null;
  const correct=selected===exercise.correct;
- function submit(){if(selected===null||passed)return;setSubmitted(true);setAttempts(a=>a+1);if(correct){setPassed(true);try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;saved[String(lesson)]=attempts+1;window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(saved));window.dispatchEvent(new Event(PROGRESS_EVENT));}catch{}}}
+ function submit(){if(selected===null||passed)return;setSubmitted(true);setAttempts(a=>a+1);if(correct){setReasonChecked(true);return;}}
+ function confirmReason(){if(!reason.trim()||passed)return;setPassed(true);try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;saved[String(lesson)]=attempts;window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(saved));window.dispatchEvent(new Event(PROGRESS_EVENT));}catch{}}
  return <div className="exercise" aria-label={`Lesson ${lesson} understanding check`}>
  <div className="exercise-title">YOUR TURN · EVIDENCE DECISION</div>
  <h3>{exercise.question}</h3>
  <fieldset disabled={passed}><legend className="sr-only">Choose one answer</legend>
- {exercise.choices.map((choice,i)=><label key={i} className="exercise-choice"><input type="radio" name={`case001-exercise-${lesson}`} checked={selected===i} onChange={()=>{setSelected(i);setSubmitted(false);}}/>{choice}</label>)}
+ {exercise.choices.map((choice,i)=><label key={i} className="exercise-choice"><input type="radio" name={`case001-exercise-${lesson}`} checked={selected===i} onChange={()=>{setSelected(i);setSubmitted(false);setReasonChecked(false);}}/>{choice}</label>)}
  </fieldset>
- <button type="button" onClick={submit} disabled={selected===null||passed}>{passed?"Understanding demonstrated":"Submit decision"}</button>
+ <button type="button" onClick={submit} disabled={selected===null||passed}>{passed?"Practice completed":"Submit decision"}</button>
+ {reasonChecked&&!passed&&<div className="exercise-feedback"><label htmlFor={`reason-${lesson}`}><strong>Explain your reasoning</strong></label><p>In your own words, what evidence or authority boundary supports this decision?</p><textarea id={`reason-${lesson}`} rows={3} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Explain the observation, missing evidence, or authority limit..." style={{width:"100%",padding:12,borderRadius:8,background:"#071c2b",color:"white",border:"1px solid #5e94ad"}}/><button type="button" disabled={reason.trim().length<25} onClick={confirmReason}>Record my explanation</button><p><small>This records an explanation but does not automatically assess its technical correctness.</small></p></div>}
  {submitted&&<div className="exercise-feedback" role="status"><strong>{correct?"SUPPORTED — correct decision":"RE-EXAMINE — try again"}</strong><p>{exercise.why}</p>{!correct&&<p>Review Samantha's explanation, then choose again.</p>}</div>}
- <small>{passed?`Completed in ${attempts} attempt${attempts===1?"":"s"} (this session only).`:"Practice check only — not a professional credential or authenticated assessment."}</small>
+ <small>{passed?`Completed in ${attempts} attempt${attempts===1?"":"s"} (this session only).`:"Practice check only. Written reasoning is collected but not graded or authenticated."}</small>
  </div>;
 }
