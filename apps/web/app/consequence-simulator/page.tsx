@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import SamanthaScenes from "./SamanthaScenes";
 
 type Choice = "execute" | "approve" | "hold" | "escalate";
 type Mode = "ungoverned" | "governed";
@@ -45,7 +46,8 @@ export default function ConsequenceSimulator() {
         <p style={{letterSpacing:3,color:"#8dc9f5"}}>TA14 AUTHORITY GOVERNANCE INSTITUTION</p>
         <h1 style={{fontSize:"clamp(2rem,5vw,4rem)",lineHeight:1.1}}>YOU AUTHORIZED WHAT HAPPENS NEXT</h1>
         <p style={{fontSize:18,color:"#b7ccdd"}}>Interactive consequence and execution authority experience · Hypothetical demonstration</p>
-        <section style={{background:"#11283b",padding:28,borderRadius:18,marginTop:28}}>
+        <SamanthaScenes />
+        <section id="decision-gate" style={{background:"#11283b",padding:28,borderRadius:18,marginTop:28}}>
           <h2>Scenario 01 — The Hospital Power Decision</h2>
           <p>A grid AI proposes reducing hospital electricity demand by 15%. Protected cooling may be affected. The grid and hospital have competing operational obligations.</p>
           <h3>What do you authorize?</h3>
