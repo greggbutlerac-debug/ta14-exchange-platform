@@ -22,7 +22,7 @@ export default async function WorkWithTA14({ searchParams }: Props){
   const source = (await searchParams).source_showroom;
   const sourceSlug = typeof source === 'string' && /^[a-z0-9-]{1,100}$/.test(source) ? source : null;
   const sourcePath = sourceSlug ? `/showrooms/${sourceSlug}` : null;
-  const body = ['Organization:', 'Name / role:', 'What are you trying to govern, examine, or build?', 'What consequence or execution boundary matters?', 'Desired timing:', ...(sourcePath ? ['', `Website entry page (visitor-provided context): https://www.ta14exchange.com${sourcePath}`] : [])].join('\\n');
+  const body = ['Organization:', 'Name / role:', 'What are you trying to govern, examine, or build?', 'What consequence or execution boundary matters?', 'Desired timing:', ...(sourcePath ? ['', `Website entry page (visitor-provided context): https://www.ta14exchange.com${sourcePath}`] : [])].join('\n');
   const mail = `mailto:ta14admissibleexecution@gmail.com?subject=${encodeURIComponent('TA-14 Commercial Engagement')}&body=${encodeURIComponent(body)}`;
   return <main className="page">
     <div className="grid"/>
