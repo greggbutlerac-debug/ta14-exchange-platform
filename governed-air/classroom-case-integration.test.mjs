@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {readFileSync} from 'node:fs';
+import {examineUnverifiedClaims} from './workspace-boundary.mjs';
+import {examineGovernedAirCase} from './examination-pipeline.mjs';
+import {explainGovernanceGaps} from './gap-explanation.mjs';
+const c=JSON.parse(readFileSync(new URL('./cases/classroom-ventilation-hold.v0.1.json',import.meta.url),'utf8'));
+test('classroom ventilation fixture remains explicitly fictional',()=>{assert.equal(c.fictional,true);assert.equal(c.proposed_action,'change_ventilation')});
+test('unverified classroom claims hold even when every field contains text',()=>{const r=examineUnverifiedClaims(c);assert.equal(r.disposition,'HOLD');assert.equal(r.executionAuthorized,false)});
+test('server examination cannot authorize classroom ventilation',()=>{const r=examineGovernedAirCase({...c,binding:{tenant_id:'fictional-school',case_id:c.case_id,subject_id:'fictional-sensor',action:c.proposed_action,site_id:'fictional-school',policy_version:'unverified'}},{keys:{}});assert.equal(r.disposition,'HOLD');assert.equal(r.executionAuthorized,false)});
+test('case explains independent verification gaps',()=>{const gaps=explainGovernanceGaps(c);assert.equal(gaps.length,11);assert.ok(gaps.every(x=>x.established===false))});
