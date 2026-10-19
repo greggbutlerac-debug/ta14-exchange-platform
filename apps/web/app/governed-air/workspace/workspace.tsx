@@ -1,7 +1,7 @@
 'use client';
 import {useState} from 'react';
 import {examineUnverifiedClaims} from '../../../../../governed-air/workspace-boundary.mjs';
-import {examineGovernedAirCase, type PipelineResult} from '../../../../../governed-air/examination-pipeline.mjs';
+import {explainUnverifiedExamination, type BrowserExamination} from '../../../../../governed-air/browser-explanation.mjs';
 
 const evidenceKeys=['source','timestamp','calibration','continuity'] as const;
 const authorityKeys=['actor','capacity','standing_basis','authority_relationship','applicable_policy'] as const;
@@ -13,7 +13,7 @@ const labels:Record<string,string>={
 const anchors=['Reality','Record','Continuity','Admissibility','Binding','Commit','Execution','Outcome'];
 type Action='investigate'|'change_ventilation'|'dismiss';
 type Result={disposition:string;reason:string;missingEvidence:string[];missingAuthority:string[];simulation:boolean};
-type Examination={pipeline:PipelineResult;case_id:string;simulation:true;created_at:string;observation:{description:string;value:string;unit:string};evidence:Record<string,string>;authority:Record<string,string>;proposed_action:Action;safety_escalation:boolean;result:Result};
+type Examination={pipeline:BrowserExamination;case_id:string;simulation:true;created_at:string;observation:{description:string;value:string;unit:string};evidence:Record<string,string>;authority:Record<string,string>;proposed_action:Action;safety_escalation:boolean;result:Result};
 export default function ExaminationWorkspace(){
  const [caseId,setCaseId]=useState('GA-WORKSPACE-DEMO-001');
  const [description,setDescription]=useState('Hypothetical classroom CO₂ observation; no verified field record.');
@@ -28,7 +28,7 @@ export default function ExaminationWorkspace(){
   const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
   const authority=Object.fromEntries(authorityKeys.map(k=>[k,fields[k]||'']));
   const result=examineUnverifiedClaims({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
-  const pipeline=examineGovernedAirCase({observation:{description,value,unit},evidence,authority,binding:{tenant_id:'unverified-demo',case_id:caseId,subject_id:'unverified-observation',action,site_id:'unverified-site',policy_version:'unverified-policy'}}, {keys:{}});
+  const pipeline=explainUnverifiedExamination({observation:{description,value,unit},evidence,authority,proposed_action:action});
   setRecord({pipeline,case_id:caseId,simulation:true,created_at:new Date().toISOString(),observation:{description,value,unit},evidence,authority,proposed_action:action,safety_escalation:escalation,result});
  };
  const download=()=>{if(!record)return;const blob=new Blob([JSON.stringify(record,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-examination-simulation.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
