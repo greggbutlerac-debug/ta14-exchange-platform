@@ -1,0 +1,36 @@
+{
+  "schema": "governed-air-case-v0.1",
+  "case_id": "GA-CASE-SCHOOL-001",
+  "title": "Classroom ventilation change proposed after a hypothetical CO2 observation",
+  "fictional": true,
+  "description": "An operator receives an unverified classroom carbon dioxide reading and proposes changing ventilation settings. The reading is illustrative, not a health threshold or control instruction.",
+  "observation": {
+    "description": "Hypothetical classroom CO2 reading; no independent instrument verification",
+    "value": "1680",
+    "unit": "ppm"
+  },
+  "evidence": {
+    "source": "Classroom monitor A (claimed)",
+    "timestamp": "2026-10-19T13:00:00-04:00 (claimed)",
+    "calibration": "No independent calibration record supplied",
+    "continuity": "No signed provenance or custody record supplied"
+  },
+  "authority": {
+    "actor": "Facilities operator (claimed)",
+    "capacity": "Building operations staff (claimed)",
+    "standing_basis": "No independently established standing",
+    "authority_relationship": "No verified delegation for control change",
+    "applicable_policy": "Site-specific control policy not independently verified"
+  },
+  "proposed_action": "change_ventilation",
+  "safety_escalation": false,
+  "expected_disposition": "HOLD",
+  "expected_execution_authorized": false,
+  "lesson": "A numerical reading and an asserted operator role do not establish admissible evidence, standing or authorization to change equipment.",
+  "boundary_notes": [
+    "Do not treat CO2 example value as a regulatory or clinical threshold.",
+    "No connection to equipment or autonomous control.",
+    "All entries are fictional claims; nonempty fields remain unverified.",
+    "A trusted signature alone would not establish admissibility or execution authority."
+  ]
+}
