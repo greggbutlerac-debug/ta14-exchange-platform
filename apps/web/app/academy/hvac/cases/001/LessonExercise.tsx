@@ -27,20 +27,21 @@ export default function LessonExercise({lesson}:{lesson:number}){
  const [passed,setPassed]=useState(false);
  const [reason,setReason]=useState("");
  const [reasonChecked,setReasonChecked]=useState(false);
+ const [rubric,setRubric]=useState([false,false,false]);
  useEffect(()=>{try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;if(saved[String(lesson)]>0){setPassed(true);setAttempts(saved[String(lesson)]);}}catch{}},[lesson]);
  if(!exercise)return null;
  const correct=selected===exercise.correct;
  function submit(){if(selected===null||passed)return;setSubmitted(true);setAttempts(a=>a+1);if(correct){setReasonChecked(true);return;}}
- function confirmReason(){if(!reason.trim()||passed)return;setPassed(true);try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;saved[String(lesson)]=attempts;window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(saved));window.dispatchEvent(new Event(PROGRESS_EVENT));}catch{}}
+ function confirmReason(){if(reason.trim().length<40||!rubric.every(Boolean)||passed)return;setPassed(true);try{const saved=JSON.parse(window.sessionStorage.getItem(STORAGE_KEY)||"{}") as Record<string,number>;saved[String(lesson)]=attempts;window.sessionStorage.setItem(STORAGE_KEY,JSON.stringify(saved));window.dispatchEvent(new Event(PROGRESS_EVENT));}catch{}}
  return <div className="exercise" aria-label={`Lesson ${lesson} understanding check`}>
  <div className="exercise-title">YOUR TURN · EVIDENCE DECISION</div>
  <h3>{exercise.question}</h3>
  <fieldset disabled={passed}><legend className="sr-only">Choose one answer</legend>
  {exercise.choices.map((choice,i)=><label key={i} className="exercise-choice"><input type="radio" name={`case001-exercise-${lesson}`} checked={selected===i} onChange={()=>{setSelected(i);setSubmitted(false);setReasonChecked(false);}}/>{choice}</label>)}
  </fieldset>
- <button type="button" onClick={submit} disabled={selected===null||passed}>{passed?"Practice completed":"Submit decision"}</button>
- {reasonChecked&&!passed&&<div className="exercise-feedback"><label htmlFor={`reason-${lesson}`}><strong>Explain your reasoning</strong></label><p>In your own words, what evidence or authority boundary supports this decision?</p><textarea id={`reason-${lesson}`} rows={3} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Explain the observation, missing evidence, or authority limit..." style={{width:"100%",padding:12,borderRadius:8,background:"#071c2b",color:"white",border:"1px solid #5e94ad"}}/><button type="button" disabled={reason.trim().length<25} onClick={confirmReason}>Record my explanation</button><p><small>This records an explanation but does not automatically assess its technical correctness.</small></p></div>}
- {submitted&&<div className="exercise-feedback" role="status"><strong>{correct?"SUPPORTED — correct decision":"RE-EXAMINE — try again"}</strong><p>{exercise.why}</p>{!correct&&<p>Review Samantha's explanation, then choose again.</p>}</div>}
- <small>{passed?`Completed in ${attempts} attempt${attempts===1?"":"s"} (this session only).`:"Practice check only. Written reasoning is collected but not graded or authenticated."}</small>
+ <button type="button" onClick={submit} disabled={selected===null||passed}>{passed?"Self-review completed":"Submit decision"}</button>
+ {reasonChecked&&!passed&&<div className="exercise-feedback"><label htmlFor={`reason-${lesson}`}><strong>Explain your reasoning</strong></label><p>In your own words, what evidence or authority boundary supports this decision?</p><textarea id={`reason-${lesson}`} rows={3} value={reason} onChange={e=>setReason(e.target.value)} placeholder="Explain the observation, missing evidence, or authority limit..." style={{width:"100%",padding:12,borderRadius:8,background:"#071c2b",color:"white",border:"1px solid #5e94ad"}}/><div className="reason-rubric"><strong>Self-review against the case evidence</strong><p>{exercise.why}</p>{["I identified the observation or source of evidence, without treating a report as a verified measurement.","I identified what remains unknown, or what authority or standing limits the next action.","My conclusion stays within the evidence and does not claim unverified restoration or permission."].map((item,i)=><label key={i} style={{display:"flex",gap:10,margin:"10px 0",alignItems:"flex-start"}}><input type="checkbox" checked={rubric[i]} onChange={e=>setRubric(previous=>previous.map((v,j)=>j===i?e.target.checked:v))}/>{item}</label>)}</div><button type="button" disabled={reason.trim().length<40||!rubric.every(Boolean)} onClick={confirmReason}>Complete self-review</button><p><small>You are checking your own reasoning against the rubric. This is not independent validation or instructor grading.</small></p></div>}
+ {submitted&&<div className="exercise-feedback" role="status"><strong>{correct?"CORRECT OPTION — explain why":"RE-EXAMINE — try again"}</strong><p>{exercise.why}</p>{!correct&&<p>Review Samantha's explanation, then choose again.</p>}</div>}
+ <small>{passed?`Completed in ${attempts} attempt${attempts===1?"":"s"} (this session only).`:"Practice only. Written reasoning and rubric selections are self-reviewed, not independently graded or authenticated."}</small>
  </div>;
 }
