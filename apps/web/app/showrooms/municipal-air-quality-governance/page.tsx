@@ -69,6 +69,6 @@ export default function MunicipalGovernanceShowroom(){
  <p style={{lineHeight:1.8}}>U.S. Clean Air Act and National Ambient Air Quality Standards concern ambient air regulation; building and workplace requirements must be separately identified under applicable codes, permits, laws and contracts. TA14 does not measure pollution or create government powers.</p>
  <a href={pdfZip} download style={{display:'inline-block',marginTop:12,padding:'15px 20px',borderRadius:9,background:'#b6eced',color:'#082639',fontWeight:800,textDecoration:'none'}}>↓ Download technical reference · ZIP containing PDF</a>
  </section>
- <p style={{marginTop:20}}><Link href="/work-with-ta14" style={{display:'inline-block',padding:'14px 18px',borderRadius:9,background:'#b6eced',color:'#082639',fontWeight:800,textDecoration:'none'}}>Explore a scoped institutional engagement →</Link></p><footer style={{padding:'45px 0 10px',color:'#a6c2d0'}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · Capability ≠ Authority. No admissible evidence. No admissible execution.</footer>
+ <p style={{marginTop:20}}><Link href="/work-with-ta14?source_showroom=municipal-air-quality-governance" style={{display:'inline-block',padding:'14px 18px',borderRadius:9,background:'#b6eced',color:'#082639',fontWeight:800,textDecoration:'none'}}>Explore a scoped institutional engagement →</Link></p><footer style={{padding:'45px 0 10px',color:'#a6c2d0'}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · Capability ≠ Authority. No admissible evidence. No admissible execution.</footer>
  </div></main>;
 }
