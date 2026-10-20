@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 
+const sceneImages = ["/The%20City%20That%20Runs%20Itself.png","/AI%20Grid%20Decision_%20Demand%20Spike.png","/Hospital%20Cooling%20Failure%20Alert.png","/Hospital%20HVAC%20Crisis%20Dashboard.png","/TA14%20Blocks%20Hospital%20Cooling%20Command.png","/Cascading%20Hospital%20Crisis_%20Operations%20Impacted.png","/Beyond%20One%20Building.png","/TA14_%20From%20Crisis%20to%20Accountability.png"];
 const scenes = [
   { title:"The Connected City", narration:"Welcome. This is a hypothetical city, where intelligent systems coordinate electrical power, healthcare, transportation, and buildings. They can exchange commands and respond quickly. But technical connectivity does not establish authority to impose every consequence." },
   { title:"The Grid Detects a Threat", narration:"Regional demand is rising. A grid optimization system proposes reducing hospital electricity use by fifteen percent. The recommendation may help the grid. It may also affect cooling required for clinical operations. A useful objective is not yet an authorized instruction." },
@@ -30,10 +31,8 @@ export default function SamanthaScenes({onDecisionScene}:{onDecisionScene?:()=>v
   function navigate(next:number){stop();setIndex(next);if(next===3)onDecisionScene?.();}
   return <section aria-label="Samantha narrated eight-scene experience" style={{marginTop:32,padding:24,background:"#11283b",borderRadius:18}}>
     <p style={{color:"#9dd4ff",letterSpacing:2}}>SAMANTHA · NARRATED CONSEQUENCE EXPERIENCE</p>
-    <p>Scene {index+1} of {scenes.length}</p>
-    <div role="img" aria-label={scenes[index].title+" conceptual scene placeholder"} style={{minHeight:180,display:"grid",placeItems:"center",textAlign:"center",padding:24,background:"linear-gradient(135deg,#071624,#183d58)",border:"1px solid #54728a",borderRadius:12}}>
-      <div><span style={{fontSize:42}}>◈</span><h2>{scenes[index].title}</h2><p style={{color:"#a7c6dd"}}>Cinematic scene artwork pending</p></div>
-    </div>
+    <p>Scene {index+1} of {scenes.length} · Illustrated hypothetical scenario</p>
+    <div style={{border:"1px solid #54728a",borderRadius:12,overflow:"hidden"}}><img src={sceneImages[index]} alt={`Illustrative TA14 consequence simulation: ${scenes[index].title}`} style={{width:"100%",height:"auto",display:"block"}} /></div>
     <p style={{lineHeight:1.7,fontSize:17}}>{scenes[index].narration}</p>
     <div style={{display:"flex",gap:10,flexWrap:"wrap"}}>
       <button type="button" disabled={!supported} onClick={speaking?stop:speak} style={buttonStyle}>{speaking?"Stop Samantha":"Hear Samantha"}</button>
