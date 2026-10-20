@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createExaminationReport} from './examination-report.mjs';
+import {validateExaminationReport} from './report-validation.mjs';
+import {explainUnverifiedExamination} from './browser-explanation.mjs';
+import {explainGovernanceGaps} from './gap-explanation.mjs';
+const c={case_id:'TEST-001',created_at:'2026-10-20T00:00:00Z',observation:{description:'fictional'},proposed_action:'change_ventilation',evidence:{},authority:{},result:{reason:'Not established'}};
+const record={...c,pipeline:explainUnverifiedExamination(c),gaps:explainGovernanceGaps(c)};
+test('preliminary report validates without implying execution authority',()=>{const report=createExaminationReport(record,null);assert.equal(validateExaminationReport(report).valid,true);assert.equal(report.execution_authorized,false)});
+test('altered execution permission is rejected',()=>{const report=createExaminationReport(record,null);report.execution_authorized=true;assert.equal(validateExaminationReport(report).valid,false)});
+test('missing governance anchor is rejected',()=>{const report=createExaminationReport(record,null);report.eight_anchor_trace.pop();assert.equal(validateExaminationReport(report).valid,false)});
+test('fake established requirement is rejected',()=>{const report=createExaminationReport(record,null);report.outstanding_requirements[0].established=true;assert.equal(validateExaminationReport(report).valid,false)});
