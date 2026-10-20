@@ -2,6 +2,7 @@
 import {useState} from 'react';
 import classroomCase from '../../../../../governed-air/cases/classroom-ventilation-hold.v0.1.json';
 import {createExaminationReport} from '../../../../../governed-air/examination-report.mjs';
+import {validateExaminationReport} from '../../../../../governed-air/report-validation.mjs';
 import {examineUnverifiedClaims} from '../../../../../governed-air/workspace-boundary.mjs';
 import {explainUnverifiedExamination, type BrowserExamination} from '../../../../../governed-air/browser-explanation.mjs';
 import {explainGovernanceGaps, type GovernanceGap} from '../../../../../governed-air/gap-explanation.mjs';
@@ -49,7 +50,7 @@ export default function ExaminationWorkspace(){
   }catch(error){setServerError(error instanceof Error?error.message:'Server examination unavailable');}
   finally{setExamining(false)}
  };
- const download=()=>{if(!record)return;const report=createExaminationReport(record,serverResult);const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-preliminary-examination-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+ const download=()=>{if(!record)return;const report=createExaminationReport(record,serverResult);const validation=validateExaminationReport(report);if(!validation.valid){setServerError('Report validation failed: '+validation.issues.join('; '));return;}const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='governed-air-preliminary-examination-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
  const input=(label:string,v:string,set:(v:string)=>void,placeholder='')=><label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{label}<input aria-label={label} value={v} placeholder={placeholder} onChange={e=>{set(e.target.value);setRecord(null)}} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11,fontSize:15}}/></label>;
  const section={padding:22,border:'1px solid #346575',borderRadius:14,background:'#102d3b'};
  return <main style={{minHeight:'100vh',background:'#071923',color:'#e7f5f9',padding:'35px 18px',fontFamily:'system-ui,sans-serif'}}>
