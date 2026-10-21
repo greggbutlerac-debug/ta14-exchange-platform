@@ -24,6 +24,11 @@ jobs:
           set -o pipefail
           node --test governed-air/*.test.mjs 2>&1 | tee governed-air-unit-tests.log
         shell: bash
+      - name: Publish unit test summary
+        if: always()
+        run: |
+          echo '## Governed Air unit tests' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f governed-air-unit-tests.log ]; then tail -n 25 governed-air-unit-tests.log >> "$GITHUB_STEP_SUMMARY"; else echo 'No test log was produced.' >> "$GITHUB_STEP_SUMMARY"; fi
       - name: Preserve unit test results
         if: always()
         uses: actions/upload-artifact@v4
@@ -60,6 +65,11 @@ jobs:
           set -o pipefail
           node --test apps/web/tests/governed-air.e2e.mjs 2>&1 | tee governed-air-browser-tests.log
         shell: bash
+      - name: Publish browser test summary
+        if: always()
+        run: |
+          echo '## Governed Air browser integration' >> "$GITHUB_STEP_SUMMARY"
+          if [ -f governed-air-browser-tests.log ]; then tail -n 30 governed-air-browser-tests.log >> "$GITHUB_STEP_SUMMARY"; else echo 'No browser test log was produced.' >> "$GITHUB_STEP_SUMMARY"; fi
       - name: Preserve browser and server logs
         if: always()
         uses: actions/upload-artifact@v4
