@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {fingerprintReport,verifyReportFingerprint} from './report-fingerprint.mjs';
+import {createExaminationReport} from './examination-report.mjs';
+import {explainUnverifiedExamination} from './browser-explanation.mjs';
+import {explainGovernanceGaps} from './gap-explanation.mjs';
+const c={case_id:'FINGERPRINT-001',created_at:'2026-10-21T00:00:00Z',observation:{description:'fictional'},proposed_action:'investigate',evidence:{},authority:{},result:{reason:'Not established'}};
+const record={...c,pipeline:explainUnverifiedExamination(c),gaps:explainGovernanceGaps(c)};
+test('fingerprint is deterministic and does not confer authority',()=>{const r=createExaminationReport(record);const a=fingerprintReport(r),b=fingerprintReport(r);assert.deepEqual(a,b);assert.equal(verifyReportFingerprint(r,a).matches,true);assert.equal(verifyReportFingerprint(r,a).authorityEstablished,false)});
+test('changed report content fails digest comparison',()=>{const r=createExaminationReport(record);const fp=fingerprintReport(r);r.case_id='TAMPERED';assert.equal(verifyReportFingerprint(r,fp).matches,false)});
+test('unauthorized report cannot be fingerprinted as valid',()=>{const r=createExaminationReport(record);r.execution_authorized=true;assert.throws(()=>fingerprintReport(r))});
