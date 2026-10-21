@@ -16,7 +16,7 @@ test('fictional classroom examination returns HOLD and exports matching report a
   await page.getByRole('button',{name:'Load classroom ventilation case'}).click();
   await assert.equal(await page.getByLabel('Case identifier').inputValue(),'GA-CASE-SCHOOL-001');
   await page.getByRole('button',{name:'Examine proposed consequence'}).click();
-  await page.getByText('Server-side fail-closed examination: HOLD').waitFor({timeout:20000});
+  await page.getByText('Server-side fail-closed examination: HOLD',{exact:false}).waitFor({timeout:20000});
   const downloads=[];
   page.on('download',d=>downloads.push(d));
   await page.getByRole('button',{name:'Download report + SHA-256 fingerprint'}).click();
@@ -51,7 +51,7 @@ test('changing a field invalidates an in-flight examination and prevents stale e
   await page.getByRole('button',{name:'Examine proposed consequence'}).click();
   await page.getByLabel('Observation description').fill('Changed while examination was pending');
   await page.waitForTimeout(1800);
-  assert.equal(await page.getByText('AWAITING EXAMINATION',{exact:true}).count(),1);
+  assert.equal(await page.getByRole('heading',{name:'Disposition: AWAITING EXAMINATION'}).count(),1);
   assert.equal(await page.getByRole('button',{name:'Download report + SHA-256 fingerprint'}).count(),0);
   await context.close();
  }finally{await browser.close()}
@@ -67,6 +67,6 @@ test('editing a completed examination clears the prior server trace and report e
   await page.getByLabel('Observation description').fill('A revised hypothetical observation');
   assert.equal(await page.getByText('Server-side fail-closed examination: HOLD').count(),0);
   assert.equal(await page.getByRole('button',{name:'Download report + SHA-256 fingerprint'}).count(),0);
-  assert.equal(await page.getByText('AWAITING EXAMINATION',{exact:true}).count(),1);
+  assert.equal(await page.getByRole('heading',{name:'Disposition: AWAITING EXAMINATION'}).count(),1);
  }finally{await browser.close()}
 });
