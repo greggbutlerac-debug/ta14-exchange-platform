@@ -1,0 +1,12 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {reviewExaminationPackage} from './independent-review.mjs';
+import {fingerprintReport} from './report-fingerprint.mjs';
+import {createExaminationReport} from './examination-report.mjs';
+import {explainUnverifiedExamination} from './browser-explanation.mjs';
+import {explainGovernanceGaps} from './gap-explanation.mjs';
+const c={case_id:'REVIEW-001',created_at:'2026-10-21T00:00:00Z',observation:{description:'fictional'},proposed_action:'investigate',evidence:{},authority:{},result:{reason:'Not established'}};
+const report=createExaminationReport({...c,pipeline:explainUnverifiedExamination(c),gaps:explainGovernanceGaps(c)});
+test('matching report hash does not establish authority or provenance',()=>{const result=reviewExaminationPackage(report,fingerprintReport(report),{referenceIndependentlyHeld:true});assert.equal(result.integrityMatch,true);assert.equal(result.provenanceVerified,false);assert.equal(result.authorityEstablished,false);assert.equal(result.executionAuthorized,false);assert.equal(result.disposition,'HOLD')});
+test('changed report is detected as integrity mismatch',()=>{const fp=fingerprintReport(report);const result=reviewExaminationPackage({...report,case_id:'CHANGED'},fp);assert.equal(result.integrityMatch,false)});
+test('claiming independent custody does not authenticate issuer',()=>{const result=reviewExaminationPackage(report,fingerprintReport(report),{referenceIndependentlyHeld:true});assert.equal(result.findings.find(x=>x.control==='Independent reference custody').status,'ASSERTED_NOT_VERIFIED');assert.equal(result.findings.find(x=>x.control==='Report issuer identity').status,'NOT_ESTABLISHED')});
