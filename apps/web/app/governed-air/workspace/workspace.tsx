@@ -1,5 +1,5 @@
 'use client';
-import {useState} from 'react';
+import {useRef,useState} from 'react';
 import classroomCase from '../../../../../governed-air/cases/classroom-ventilation-hold.v0.1.json';
 import {createExaminationReport} from '../../../../../governed-air/examination-report.mjs';
 import {validateExaminationReport} from '../../../../../governed-air/report-validation.mjs';
@@ -32,9 +32,12 @@ export default function ExaminationWorkspace(){
  const [serverError,setServerError]=useState('');
  const [examining,setExamining]=useState(false);
  const [loadedFixture,setLoadedFixture]=useState(false);
- const loadClassroomCase=()=>{const c=classroomCase;setCaseId(c.case_id);setDescription(c.observation.description);setValue(c.observation.value);setUnit(c.observation.unit);setFields({...c.evidence,...c.authority});setAction('change_ventilation');setEscalation(false);setRecord(null);setServerResult(null);setServerError('');setLoadedFixture(true)};
- const change=(key:string,value:string)=>{setFields(v=>({...v,[key]:value}));setRecord(null);setServerResult(null)};
+ const requestVersion=useRef(0);
+ const invalidate=()=>{requestVersion.current+=1;setRecord(null);setServerResult(null);setServerError('');setExamining(false)};
+ const loadClassroomCase=()=>{invalidate();const c=classroomCase;setCaseId(c.case_id);setDescription(c.observation.description);setValue(c.observation.value);setUnit(c.observation.unit);setFields({...c.evidence,...c.authority});setAction('change_ventilation');setEscalation(false);setRecord(null);setServerResult(null);setServerError('');setLoadedFixture(true)};
+ const change=(key:string,value:string)=>{setFields(v=>({...v,[key]:value}));invalidate()};
  const examine=async()=>{
+  const version=++requestVersion.current;
   const evidence=Object.fromEntries(evidenceKeys.map(k=>[k,fields[k]||'']));
   const authority=Object.fromEntries(authorityKeys.map(k=>[k,fields[k]||'']));
   const result=examineUnverifiedClaims({evidence,authority,proposed_action:action,safety_escalation:escalation}) as Result;
@@ -47,12 +50,12 @@ export default function ExaminationWorkspace(){
    if(!response.ok) throw new Error('Server examination unavailable ('+response.status+')');
    const data=await response.json();
    if(!Array.isArray(data.trace)||data.executionAuthorized!==false||data.disposition!=='HOLD')throw new Error('Unexpected examination response; authorization not accepted');
-   setServerResult(data);
-  }catch(error){setServerError(error instanceof Error?error.message:'Server examination unavailable');}
-  finally{setExamining(false)}
+   if(version===requestVersion.current)setServerResult(data);
+  }catch(error){if(version===requestVersion.current)setServerError(error instanceof Error?error.message:'Server examination unavailable');}
+  finally{if(version===requestVersion.current)setExamining(false)}
  };
  const download=async()=>{if(!record)return;const report=createExaminationReport(record,serverResult);const validation=validateExaminationReport(report);if(!validation.valid){setServerError('Report validation failed: '+validation.issues.join('; '));return;}try{const fingerprint=await createBrowserReportFingerprint(report);const files=[{name:'governed-air-preliminary-examination-report.json',data:report},{name:'governed-air-report-fingerprint.json',data:fingerprint}];for(const file of files){const blob=new Blob([JSON.stringify(file.data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}}catch(error){setServerError(error instanceof Error?error.message:'Fingerprint generation failed')}};
- const input=(label:string,v:string,set:(v:string)=>void,placeholder='')=><label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{label}<input aria-label={label} value={v} placeholder={placeholder} onChange={e=>{set(e.target.value);setRecord(null)}} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11,fontSize:15}}/></label>;
+ const input=(label:string,v:string,set:(v:string)=>void,placeholder='')=><label style={{display:'grid',gap:6,fontSize:13,color:'#a9d4df'}}>{label}<input aria-label={label} value={v} placeholder={placeholder} onChange={e=>{set(e.target.value);invalidate()}} style={{background:'#071e2b',border:'1px solid #457483',borderRadius:8,color:'white',padding:11,fontSize:15}}/></label>;
  const section={padding:22,border:'1px solid #346575',borderRadius:14,background:'#102d3b'};
  return <main style={{minHeight:'100vh',background:'#071923',color:'#e7f5f9',padding:'35px 18px',fontFamily:'system-ui,sans-serif'}}>
  <div style={{maxWidth:1150,margin:'auto'}}>
