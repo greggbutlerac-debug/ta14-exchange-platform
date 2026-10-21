@@ -20,7 +20,6 @@ test('fictional classroom examination returns HOLD and exports matching report a
   const downloads=[];
   page.on('download',d=>downloads.push(d));
   await page.getByRole('button',{name:'Download report + SHA-256 fingerprint'}).click();
-  await page.waitForFunction(()=>document.querySelector('button')!==null);
   for(let i=0;i<40&&downloads.length<2;i++)await page.waitForTimeout(250);
   assert.equal(downloads.length,2,'Expected two real browser downloads');
   const byName={};
@@ -55,5 +54,19 @@ test('changing a field invalidates an in-flight examination and prevents stale e
   assert.equal(await page.getByText('AWAITING EXAMINATION',{exact:true}).count(),1);
   assert.equal(await page.getByRole('button',{name:'Download report + SHA-256 fingerprint'}).count(),0);
   await context.close();
+ }finally{await browser.close()}
+});
+
+test('editing a completed examination clears the prior server trace and report export',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage();
+  await page.goto(origin+'/governed-air/workspace',{waitUntil:'networkidle'});
+  await page.getByRole('button',{name:'Examine proposed consequence'}).click();
+  await page.getByText('Server-side fail-closed examination: HOLD').waitFor({timeout:20000});
+  await page.getByLabel('Observation description').fill('A revised hypothetical observation');
+  assert.equal(await page.getByText('Server-side fail-closed examination: HOLD').count(),0);
+  assert.equal(await page.getByRole('button',{name:'Download report + SHA-256 fingerprint'}).count(),0);
+  assert.equal(await page.getByText('AWAITING EXAMINATION',{exact:true}).count(),1);
  }finally{await browser.close()}
 });
