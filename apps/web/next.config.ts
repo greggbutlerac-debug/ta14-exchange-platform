@@ -67,6 +67,17 @@ const nextConfig: NextConfig = {
         destination: "/governance-showcase/:registryIdentifier",
         permanent: true,
       },
+      // GA4 October 2026: recover unambiguous legacy links without changing active showroom routes.
+      {
+        source: "/TA14",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/bXVuaWNpcG",
+        destination: "/showrooms/municipal-air-quality-governance",
+        permanent: true,
+      },
       // GA4 historical 404 recovery: redirect a verified truncated showroom alias.
       {
         source: "/showrooms/c2VtaWNvbm",
