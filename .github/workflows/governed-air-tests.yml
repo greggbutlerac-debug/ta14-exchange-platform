@@ -19,3 +19,29 @@ jobs:
           node-version: '22'
       - name: Test simulated governance decisions
         run: node --test governed-air/*.test.mjs
+  browser-integration:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install web dependencies and browser test runner
+        run: |
+          cd apps/web
+          npm ci
+          npm install --no-save --package-lock=false playwright
+          npx playwright install --with-deps chromium
+      - name: Start local Next.js development server
+        run: |
+          cd apps/web
+          npm run dev -- --hostname 127.0.0.1 > /tmp/governed-air-next.log 2>&1 &
+          for i in $(seq 1 90); do
+            if curl --silent --fail http://127.0.0.1:3000/governed-air/workspace > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          cat /tmp/governed-air-next.log
+          exit 1
+      - name: Exercise classroom examination and real report downloads
+        run: node --test apps/web/tests/governed-air.e2e.mjs
