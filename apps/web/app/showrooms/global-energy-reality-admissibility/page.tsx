@@ -8,8 +8,8 @@ const cases=[
 {title:'Conflicting custody transfers',evidence:'Two signed transfer records disagree on the same shipment and reporting interval.',outcome:'ESCALATE',why:'Independent reconciliation and standing review are required before a finding.'}
 ];
 export default function GeraaShowroom(){
-const [active,setActive]=useState(0);const [scenario,setScenario]=useState(0);const [showNotes,setShowNotes]=useState(false);
-const l=lessons[active];const c=cases[scenario];
+const [scenario,setScenario]=useState(0);
+const c=cases[scenario];
 return <main style={{background:'#071c31',color:'#f5f8ff',minHeight:'100vh',padding:'clamp(16px,4vw,48px)',fontFamily:'Arial,sans-serif'}}>
 <div style={{maxWidth:1200,margin:'auto'}}>
 <a href="/showrooms" style={{color:'#a9d9ff'}}>← All showrooms</a>
@@ -17,15 +17,14 @@ return <main style={{background:'#071c31',color:'#f5f8ff',minHeight:'100vh',padd
 <h1 style={{fontSize:'clamp(30px,5vw,54px)',lineHeight:1.1}}>Global Energy Reality &amp; Admissibility Architecture</h1>
 <p style={{fontSize:20,color:'#c7d9e9'}}>GERAA v1.0 · What is physically happening, what is predicted, and what can be established NOW?</p>
 <p style={{border:'1px solid #66819a',padding:16,borderRadius:8}}>Educational prototype. Not a live global oil-monitoring network, price-control mechanism, regulatory determination, or institutional partnership. All numerical illustrations and examination cases are synthetic. Some artwork uses simplified accounting and must not be used as an actual reconciled oil balance.</p>
-<nav aria-label="Lesson navigation" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'24px 0'}}>{lessons.map((x,i)=><button key={i} onClick={()=>{setActive(i);setShowNotes(false)}} aria-current={active===i?'step':undefined} style={{padding:'10px 13px',borderRadius:7,border:'1px solid #6a8298',background:active===i?'#f0b62e':'#123451',color:active===i?'#102235':'white',cursor:'pointer'}}>{String(i+1).padStart(2,'0')} · {x.title}</button>)}</nav>
-<section aria-label={'Lesson '+(active+1)}>
-<h2>Lesson {String(active+1).padStart(2,'0')} · {l.title}</h2>
-<img src={'/'+encodeURIComponent(l.file)} alt={'GERAA lesson '+(active+1)+': '+l.title+'. Illustrative infographic; numerical examples are synthetic.'} style={{width:'100%',height:'auto',borderRadius:12}}/>
+<nav aria-label="Jump to a lesson" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'24px 0'}}>{lessons.map((x,i)=><a key={i} href={'#geraa-lesson-'+(i+1)} style={{padding:'10px 13px',borderRadius:7,border:'1px solid #6a8298',background:'#123451',color:'white',textDecoration:'none'}}>{String(i+1).padStart(2,'0')} · {x.title}</a>)}</nav>
+<p style={{color:'#c7d9e9'}}>All eight lessons are displayed below in one continuous, open-scroll experience. No next-button or collapsed lesson is required.</p>
+{lessons.map((l,i)=><section key={i} id={'geraa-lesson-'+(i+1)} aria-label={'Lesson '+(i+1)} style={{padding:'28px 0',borderBottom:'1px solid #66819a',scrollMarginTop:24}}>
+<h2>Lesson {String(i+1).padStart(2,'0')} · {l.title}</h2>
+<img loading={i<2?'eager':'lazy'} src={'/'+encodeURIComponent(l.file)} alt={'GERAA lesson '+(i+1)+': '+l.title+'. Illustrative infographic; numerical examples are synthetic.'} style={{width:'100%',height:'auto',borderRadius:12}}/>
 <h3>Samantha · Expanded narration</h3><p style={{fontSize:18,lineHeight:1.8,maxWidth:1000}}>{l.script}</p>
-<button onClick={()=>setShowNotes(!showNotes)} aria-expanded={showNotes} style={{padding:12,cursor:'pointer'}}>{showNotes?'Hide':'Show'} technical boundary</button>
-{showNotes&&<p style={{padding:16,background:'#123451',lineHeight:1.7}}>The illustration is educational, not an authenticated source record. The underlying claims require source, commodity definition, unit, geography, reporting interval, uncertainty, revisions, applicable authority, and established standing. Crude and refined-product movements must not be merged into a single conservation equation without conversion and transfer accounting.</p>}
-<div style={{display:'flex',justifyContent:'space-between',margin:'24px 0',gap:12}}><button disabled={active===0} onClick={()=>setActive(active-1)}>← Previous</button><button disabled={active===7} onClick={()=>setActive(active+1)}>Next lesson →</button></div>
-</section>
+<p style={{padding:16,background:'#123451',lineHeight:1.7}}><strong>Technical boundary:</strong> This illustration is educational, not an authenticated source record. Claims require source, commodity definition, unit, geography, reporting interval, uncertainty, revisions, applicable authority, and established standing. Crude and refined-product movements must not be merged into a single conservation equation without conversion and transfer accounting.</p>
+</section>)}
 <section style={{marginTop:60,borderTop:'1px solid #66819a',paddingTop:24}}>
 <h2>Interactive admissibility examination</h2><p>Choose one hypothetical claim. Dispositions are instructional examples, not official determinations.</p>
 <label htmlFor="case">Examination scenario </label><select id="case" value={scenario} onChange={e=>setScenario(Number(e.target.value))} style={{padding:12,maxWidth:'100%'}}>{cases.map((x,i)=><option key={i} value={i}>{x.title}</option>)}</select>
