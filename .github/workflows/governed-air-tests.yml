@@ -5,6 +5,8 @@ on:
     paths:
       - 'governed-air/**'
       - 'apps/web/app/governed-air/**'
+      - 'apps/web/app/api/governed-air/**'
+      - 'apps/web/tests/governed-air.e2e.mjs'
       - '.github/workflows/governed-air-tests.yml'
   workflow_dispatch:
 permissions:
