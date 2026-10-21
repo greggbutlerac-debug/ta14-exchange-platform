@@ -20,7 +20,9 @@ jobs:
         with:
           node-version: '22'
       - name: Test simulated governance decisions
-        run: node --test governed-air/*.test.mjs 2>&1 | tee governed-air-unit-tests.log
+        run: |
+          set -o pipefail
+          node --test governed-air/*.test.mjs 2>&1 | tee governed-air-unit-tests.log
         shell: bash
       - name: Preserve unit test results
         if: always()
@@ -54,7 +56,9 @@ jobs:
           cat /tmp/governed-air-next.log
           exit 1
       - name: Exercise classroom examination and real report downloads
-        run: node --test apps/web/tests/governed-air.e2e.mjs 2>&1 | tee governed-air-browser-tests.log
+        run: |
+          set -o pipefail
+          node --test apps/web/tests/governed-air.e2e.mjs 2>&1 | tee governed-air-browser-tests.log
         shell: bash
       - name: Preserve browser and server logs
         if: always()
