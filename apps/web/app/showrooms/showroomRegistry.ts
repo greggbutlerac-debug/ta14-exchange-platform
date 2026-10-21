@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Hotel Canaletto · From Verification to Governed Continuity','/showrooms/hotel-canaletto-governed-continuity','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent Italian English eight-scene concept Hotel Canaletto Venice Pureairion EHG Armony IAQ-ASE Bureau Veritas operational evidence Atmospheric Integrity Record continuity interruptions restoration revalidation TA14 educational decision gate'],
 ['Public Expenditure Admissibility · Who Authorizes the Payment?','/showrooms/public-expenditure-admissibility','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image government spending construction draw payment admissible evidence applicable authority established standing Samantha narration interactive simulated HOLD ALLOW DENY ESCALATE technical reference'],
 ['Municipal Air Quality Governance · Evidence to Authorized Action','/showrooms/municipal-air-quality-governance','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image municipal building and air-quality governance showroom local authority admissible evidence standing bounded execution verified outcome Samantha narration'],
 ['ONUMA Semantic Bridge · Back from Tokyo, October 16, 2026','/showrooms/onuma-semantic-bridge-october-2026','EVENTS & PRESENTATIONS','Kimon Onuma Semantic Bridge graph of graphs Asset Leadership Network Greggory Don Butler TA14 October 16 source-linked session record RE1 execution governance'],
