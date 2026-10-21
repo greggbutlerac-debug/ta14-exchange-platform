@@ -13,12 +13,6 @@ const replacementDiagrams: Record<number,{heading:string,steps:{label:string,det
 13:{heading:"Proof of Performance — evidence gates",steps:[{label:"ORIGINAL RECORD",detail:"Preserve raw original-state data separately from calculations"},{label:"POST RECORD",detail:"Preserve raw post-state data under comparable conditions"},{label:"ADMISSIBILITY",detail:"Check provenance, measurement method, uncertainty and confounders"},{label:"DISPOSITION",detail:"IMPROVED may be supported; RESTORED remains unestablished"}]},
 14:{heading:"Final case disposition",steps:[{label:"DETERMINATION",detail:"Filter restriction is an evidence-supported contributor in this simulation"},{label:"ACTION",detail:"Bounded filter replacement under established standing and authority"},{label:"OUTCOME",detail:"IMPROVED — simulated comparative air-side indicators"},{label:"OPEN",detail:"RESTORED NOT ESTABLISHED; comfort, design airflow and remaining causes need evidence"}]}
 };
-const niretSteps = [
-{label:"OBSERVED",value:"Customer reports inadequate cooling; simulated air-side evidence identifies a loaded return filter",tone:"observed"},
-{label:"NOT ESTABLISHED",value:"No admissible refrigerant pressures, superheat, subcooling or refrigerant-circuit defect",tone:"unknown"},
-{label:"NIRET DISPOSITION",value:"HOLD — do not connect gauges or enter the sealed refrigerant system",tone:"hold"},
-{label:"NEXT AUTHORIZED SCOPE",value:"Confirm technician standing and approval for bounded filter correction; preserve before/after records",tone:"scope"}
-];
 const learningChecks = [
 ["Record the complaint without converting it into a diagnosis.","What information is still only customer-reported?"],
 ["Identify hazards and the authority needed before testing.","What condition requires an immediate stop?"],
