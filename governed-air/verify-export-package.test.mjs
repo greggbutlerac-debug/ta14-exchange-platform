@@ -25,3 +25,14 @@ test('independent reviewer rejects changed report',()=>{
 test('independent reviewer rejects invalid schema',()=>{
  assert.equal(reviewExportPackage({...bundle,schema:'other'}).packageValid,false);
 });
+
+test('tampering with a supplied authority claim breaks the fingerprint',()=>{
+ const withClaims=createExaminationReport({...c,evidence:{source:'fictional sensor A'},authority:{actor:'fictional actor A',standing_basis:'unverified role'},safety_escalation:true,pipeline:explainUnverifiedExamination(c),gaps:explainGovernanceGaps(c)});
+ const signedByNobody={schema:'ta14-governed-air-export-package-v0.1',report:withClaims,fingerprint:fingerprintReport(withClaims)};
+ assert.equal(reviewExportPackage(signedByNobody).packageValid,true);
+ const changed={...withClaims,authority_claims:{...withClaims.authority_claims,standing_basis:'forged approval'}};
+ const review=reviewExportPackage({...signedByNobody,report:changed});
+ assert.equal(review.packageValid,false);
+ assert.equal(review.integrityMatch,false);
+ assert.equal(review.executionAuthorized,false);
+});
