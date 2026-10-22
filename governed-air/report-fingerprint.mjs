@@ -13,7 +13,7 @@ export function fingerprintReport(report) {
 export function verifyReportFingerprint(report,fingerprint) {
  try {
   const expected=fingerprintReport(report);
-  return {matches:fingerprint?.algorithm==='SHA-256'&&fingerprint?.digest===expected.digest&&fingerprint?.byte_length===expected.byte_length,reportValid:true,authorityEstablished:false};
+  return {matches:fingerprint?.algorithm==='SHA-256'&&fingerprint?.digest===expected.digest&&fingerprint?.byte_length===expected.byte_length&&fingerprint?.classification===expected.classification,reportValid:true,authorityEstablished:false};
  } catch {return {matches:false,reportValid:false,authorityEstablished:false}}
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
