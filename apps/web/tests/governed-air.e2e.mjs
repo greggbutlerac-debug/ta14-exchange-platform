@@ -94,3 +94,21 @@ test('editing inputs during delayed fingerprint calculation prevents stale downl
   await context.close();
  }finally{await browser.close()}
 });
+
+test('synthetic runtime reference page displays legacy PROCEED but production HOLD without actuation',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage();
+  const response=await page.goto(origin+'/governed-air/runtime-reference',{waitUntil:'networkidle'});
+  assert.equal(response?.status(),200,'Synthetic runtime reference route must load');
+  await page.getByRole('heading',{name:'Runtime Reference Boundary Demonstration'}).waitFor();
+  assert.equal(await page.getByText('SYNTHETIC FIXTURE ONLY.',{exact:false}).count(),1);
+  assert.equal(await page.getByText('Reference decision:').count(),1);
+  assert.equal(await page.getByText('Legacy receipt status:').count(),1);
+  const boundary=page.locator('section').filter({has:page.getByRole('heading',{name:'Effective production boundary'})});
+  assert.equal(await boundary.getByText('HOLD',{exact:true}).count(),1);
+  assert.equal(await boundary.getByText('Production execution authorized:').count(),1);
+  assert.equal(await boundary.getByText('Production commit authorized:').count(),1);
+  assert.equal(await page.locator('button').count(),0,'No execution buttons may be rendered');
+ }finally{await browser.close()}
+});
