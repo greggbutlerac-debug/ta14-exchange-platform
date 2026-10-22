@@ -36,3 +36,11 @@ test('tampering with a supplied authority claim breaks the fingerprint',()=>{
  assert.equal(review.integrityMatch,false);
  assert.equal(review.executionAuthorized,false);
 });
+
+test('rejects misleading fingerprint classification',()=>{
+ const changed={...bundle,fingerprint:{...bundle.fingerprint,classification:'SIGNED AUTHORITY ATTESTATION'}};
+ const review=reviewExportPackage(changed);
+ assert.equal(review.packageValid,false);
+ assert.equal(review.integrityMatch,false);
+ assert.equal(review.executionAuthorized,false);
+});
