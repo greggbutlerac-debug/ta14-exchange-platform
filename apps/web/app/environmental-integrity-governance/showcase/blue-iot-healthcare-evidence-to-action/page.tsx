@@ -13,6 +13,8 @@ const assets = [
   "TA14 HVAC Intervention Execution Dashboard.png",
   "Healthcare HVAC Outcome Verification Dashboard.png",
 ];
+const navigationButtonStyle = {padding:"12px 18px",background:"#176a9d",color:"#ffffff",border:"1px solid #75b9e2",borderRadius:8,cursor:"pointer",fontSize:15,fontWeight:600} as const;
+const disabledButtonStyle = { ...navigationButtonStyle, opacity:0.45, cursor:"not-allowed" };
 const lessons = [
   ["The signal", "A sustained CO₂ reading in Room 412 is an observation, not a diagnosis or an instruction. Establish the room, sensor, occupancy and clinical context before proposing any consequence."],
   ["Preserve the record", "Retain raw readings, timestamps, calibration status, provenance and continuity. Preserve adjusted dashboard data separately so another examiner can reconstruct the observation."],
@@ -51,8 +53,8 @@ export default function BlueIotHealthcarePage() {
         <img src={"/"+encodeURIComponent(assets[selected])} alt={`Healthcare governance illustration ${selected+1}: ${lessons[selected][0]}`} style={{width:"100%",height:"auto",borderRadius:12}}/>
         <h2>{String(selected+1).padStart(2,"0")} · {lessons[selected][0]}</h2>
         <p style={{fontSize:18,lineHeight:1.7,maxWidth:950}}>{lessons[selected][1]}</p>
-        <details style={{margin:"18px 0",lineHeight:1.75}}><summary style={{cursor:"pointer",fontWeight:700}}>Read Samantha\u0027s full narration</summary><p>{narration[selected]}</p></details>
-        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}><button onClick={speaking ? stopNarration : playNarration}>{speaking ? "Stop Samantha narration" : "Play Samantha narration"}</button><button disabled={selected===0} onClick={()=>chooseLesson(selected-1)}>Previous</button><button disabled={selected===7} onClick={()=>chooseLesson(selected+1)}>Next lesson</button></div>
+        <details style={{margin:"18px 0",lineHeight:1.75}}><summary style={{cursor:"pointer",fontWeight:700}}>Read Samantha's full narration</summary><p>{narration[selected]}</p></details>
+        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}><button type="button" style={navigationButtonStyle} onClick={speaking ? stopNarration : playNarration}>{speaking ? "Stop Samantha narration" : "Play Samantha narration"}</button><button type="button" style={selected===0?disabledButtonStyle:navigationButtonStyle} disabled={selected===0} onClick={()=>chooseLesson(selected-1)}>Previous</button><button type="button" style={selected===7?disabledButtonStyle:navigationButtonStyle} disabled={selected===7} onClick={()=>chooseLesson(selected+1)}>Next lesson</button></div>
       </section>
       <section style={{marginTop:54,padding:24,background:"#102e45",borderRadius:14}}>
         <h2>Interactive examination · Room 412</h2>
