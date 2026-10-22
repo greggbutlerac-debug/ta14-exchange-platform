@@ -12,6 +12,9 @@ export function validateExaminationReport(report) {
  }
  if(!Array.isArray(report.outstanding_requirements)||report.outstanding_requirements.length!==11)issues.push('Requirement review incomplete');
  else if(report.outstanding_requirements.some(x=>x.established!==false))issues.push('Unexpected established requirement');
+ if(!report.evidence_claims||typeof report.evidence_claims!=='object'||Array.isArray(report.evidence_claims))issues.push('Missing or invalid evidence claims');
+ if(!report.authority_claims||typeof report.authority_claims!=='object'||Array.isArray(report.authority_claims))issues.push('Missing or invalid authority claims');
+ if(typeof report.safety_escalation_claim!=='boolean')issues.push('Missing safety escalation claim');
  if(report.classification!=='HYPOTHETICAL SIMULATION — NOT AN EXECUTION AUTHORIZATION')issues.push('Missing simulation classification');
  return {valid:issues.length===0,issues};
 }
