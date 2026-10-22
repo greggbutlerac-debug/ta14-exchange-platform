@@ -103,12 +103,12 @@ test('synthetic runtime reference page displays legacy PROCEED but production HO
   assert.equal(response?.status(),200,'Synthetic runtime reference route must load');
   await page.getByRole('heading',{name:'Runtime Reference Boundary Demonstration'}).waitFor();
   assert.equal(await page.getByText('SYNTHETIC FIXTURE ONLY.',{exact:false}).count(),1);
-  assert.equal(await page.getByText('Reference decision:').count(),1);
-  assert.equal(await page.getByText('Legacy receipt status:').count(),1);
+  assert.match(await page.locator('section').first().innerText(),/Reference decision:\s*PROCEED/);
+  assert.match(await page.locator('section').first().innerText(),/Legacy receipt status:\s*EXECUTED/);
   const boundary=page.locator('section').filter({has:page.getByRole('heading',{name:'Effective production boundary'})});
   assert.equal(await boundary.getByText('HOLD',{exact:true}).count(),1);
-  assert.equal(await boundary.getByText('Production execution authorized:').count(),1);
-  assert.equal(await boundary.getByText('Production commit authorized:').count(),1);
+  assert.match(await boundary.innerText(),/Production execution authorized:\s*false/);
+  assert.match(await boundary.innerText(),/Production commit authorized:\s*false/);
   assert.equal(await page.locator('button').count(),0,'No execution buttons may be rendered');
  }finally{await browser.close()}
 });
