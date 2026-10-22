@@ -66,3 +66,31 @@ test('editing a completed examination clears the prior server trace and report e
   assert.equal(await page.getByRole('heading',{name:'Disposition: AWAITING EXAMINATION'}).count(),1);
  }finally{await browser.close()}
 });
+
+test('editing inputs during delayed fingerprint calculation prevents stale download',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const context=await browser.newContext({acceptDownloads:true});
+  const page=await context.newPage();
+  await page.addInitScript(()=>{
+   const original=SubtleCrypto.prototype.digest;
+   SubtleCrypto.prototype.digest=async function(...args){
+    window.__fingerprintStarted=true;
+    await new Promise(resolve=>setTimeout(resolve,1200));
+    return original.apply(this,args);
+   };
+  });
+  await page.goto(origin+'/governed-air/workspace',{waitUntil:'networkidle'});
+  await page.getByRole('button',{name:'Examine proposed consequence'}).click();
+  await page.getByText('Server-side fail-closed examination: HOLD').waitFor({timeout:20000});
+  let downloaded=false;
+  page.on('download',()=>{downloaded=true});
+  await page.getByRole('button',{name:'Download report and fingerprint package'}).click();
+  await page.waitForFunction(()=>window.__fingerprintStarted===true);
+  await page.getByLabel('Observation description').fill('Updated before fingerprint completes');
+  await page.waitForTimeout(1500);
+  assert.equal(downloaded,false,'Stale report must not download');
+  assert.equal(await page.getByRole('button',{name:'Download report and fingerprint package'}).count(),0);
+  await context.close();
+ }finally{await browser.close()}
+});
