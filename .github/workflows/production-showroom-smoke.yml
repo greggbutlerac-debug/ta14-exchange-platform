@@ -1,0 +1,38 @@
+name: Production Showroom HTTP Smoke Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify live public showroom responses
+        shell: bash
+        run: |
+          set -uo pipefail
+          failed=0
+          for path in \
+            /showrooms/hotel-canaletto-governed-continuity \
+            /showrooms/kmc-proof-before-action \
+            /showrooms/public-expenditure-admissibility; do
+            url="https://www.ta14exchange.com${path}"
+            echo "::group::${url}"
+            if result=$(curl --location --silent --show-error --max-time 20 --output /dev/null --write-out '%{http_code} %{url_effective}' "$url"); then
+              echo "HTTP ${result}"
+              code="${result%% *}"
+              if [ "$code" != "200" ]; then
+                echo "::error::Expected HTTP 200 for ${url}, got ${result}"
+                failed=1
+              fi
+            else
+              echo "::error::Could not connect to ${url}"
+              failed=1
+            fi
+            echo "::endgroup::"
+          done
+          exit "$failed"
