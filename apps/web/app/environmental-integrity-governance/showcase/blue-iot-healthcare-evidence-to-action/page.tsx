@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { narration } from "./narration";
 
 const assets = [
   "CO₂ Signal in Room 412.png",
@@ -25,6 +26,11 @@ const lessons = [
 
 export default function BlueIotHealthcarePage() {
   const [selected, setSelected] = useState(0);
+  const [speaking, setSpeaking] = useState(false);
+  useEffect(() => { return () => { if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel(); }; }, []);
+  const stopNarration = () => { if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel(); setSpeaking(false); };
+  const playNarration = () => { if (typeof window === "undefined" || !("speechSynthesis" in window)) return; window.speechSynthesis.cancel(); const utterance = new SpeechSynthesisUtterance(narration[selected]); utterance.rate = 0.92; utterance.onend = () => setSpeaking(false); utterance.onerror = () => setSpeaking(false); setSpeaking(true); window.speechSynthesis.speak(utterance); };
+  const chooseLesson = (index: number) => { stopNarration(); setSelected(index); };
   const [evidence, setEvidence] = useState(false);
   const [clinical, setClinical] = useState(false);
   const [capacity, setCapacity] = useState(false);
@@ -41,11 +47,12 @@ export default function BlueIotHealthcarePage() {
       <p style={{fontSize:18,maxWidth:850,lineHeight:1.6}}>Blue IoT / Encompass Blue discussion surface. A hypothetical hospital examination demonstrating the boundary between environmental intelligence and authorized consequence.</p>
       <p style={{borderLeft:"4px solid #f4bd55",padding:"12px 18px",background:"#153047",lineHeight:1.5}}>Illustrative only. All sensor values, equipment states, approvals, clinical risks and outcomes shown in the artwork are synthetic. This is not a live integration, medical guidance, a verified hospital record, or an endorsement by Blue IoT.</p>
       <section aria-label="Eight healthcare lessons" style={{marginTop:32}}>
-        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:18}}>{lessons.map((lesson,i)=><button key={i} onClick={()=>setSelected(i)} aria-pressed={selected===i} style={{padding:"12px 16px",background:selected===i?"#0b84d6":"#1a3449",color:"white",border:"1px solid #49708b",borderRadius:8,cursor:"pointer"}}>{String(i+1).padStart(2,"0")}</button>)}</div>
+        <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:18}}>{lessons.map((lesson,i)=><button key={i} onClick={()=>chooseLesson(i)} aria-pressed={selected===i} style={{padding:"12px 16px",background:selected===i?"#0b84d6":"#1a3449",color:"white",border:"1px solid #49708b",borderRadius:8,cursor:"pointer"}}>{String(i+1).padStart(2,"0")}</button>)}</div>
         <img src={"/"+encodeURIComponent(assets[selected])} alt={`Healthcare governance illustration ${selected+1}: ${lessons[selected][0]}`} style={{width:"100%",height:"auto",borderRadius:12}}/>
         <h2>{String(selected+1).padStart(2,"0")} · {lessons[selected][0]}</h2>
         <p style={{fontSize:18,lineHeight:1.7,maxWidth:950}}>{lessons[selected][1]}</p>
-        <div style={{display:"flex",gap:12}}><button disabled={selected===0} onClick={()=>setSelected(selected-1)}>Previous</button><button disabled={selected===7} onClick={()=>setSelected(selected+1)}>Next lesson</button></div>
+        <details style={{margin:"18px 0",lineHeight:1.75}}><summary style={{cursor:"pointer",fontWeight:700}}>Read Samantha\u0027s full narration</summary><p>{narration[selected]}</p></details>
+        <div style={{display:"flex",gap:12,flexWrap:"wrap"}}><button onClick={speaking ? stopNarration : playNarration}>{speaking ? "Stop Samantha narration" : "Play Samantha narration"}</button><button disabled={selected===0} onClick={()=>chooseLesson(selected-1)}>Previous</button><button disabled={selected===7} onClick={()=>chooseLesson(selected+1)}>Next lesson</button></div>
       </section>
       <section style={{marginTop:54,padding:24,background:"#102e45",borderRadius:14}}>
         <h2>Interactive examination · Room 412</h2>
