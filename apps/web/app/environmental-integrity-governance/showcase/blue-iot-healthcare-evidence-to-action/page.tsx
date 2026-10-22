@@ -63,7 +63,7 @@ export default function BlueIotHealthcarePage() {
           ["Equipment, pressure and filtration constraints checked",capacity,(v:boolean)=>toggle(setCapacity,v)],
           ["Actor, capacity, standing basis and authority relationship established",standing,(v:boolean)=>toggle(setStanding,v)],
           ["Monitoring and rollback plan approved",rollback,(v:boolean)=>toggle(setRollback,v)],
-        ] as const).map(([label,checked,onChange])=><label key={label} style={{display:"block",padding:"11px 0",lineHeight:1.5}}><input type="checkbox" checked={checked} onChange={()=>onChange()} style={{marginRight:12}}/>{label}</label>)}
+        ] as const).map(([label,checked,onChange])=><label key={label} style={{display:"block",padding:"11px 0",lineHeight:1.5}}><input type="checkbox" checked={checked} onChange={()=>onChange(checked)} style={{marginRight:12}}/>{label}</label>)}
         <button onClick={()=>setExamined(true)} style={{marginTop:14,padding:"12px 20px",background:"#1486d4",color:"white",border:0,borderRadius:8,cursor:"pointer"}}>Examine proposed consequence</button>
         <p role="status" style={{fontSize:25,fontWeight:700}}>Determination: {result}</p>
         <p>{!examined?"No determination issued.":ready?"Illustrative conditions are marked established. A real-world ALLOW would still require validated evidence, applicable local authority, current conditions and site-specific clinical approval.":"At least one required condition is unresolved. Preserve the record; do not execute. Resolve gaps and re-examine."}</p>
