@@ -20,3 +20,25 @@ test('report preserves claims examined without treating them as established',()=
  assert.equal(report.execution_authorized,false);
  assert.equal(validateExaminationReport(report).valid,true);
 });
+
+test('rejects missing evidence claims',()=>{
+ const report=createExaminationReport(record,null);
+ delete report.evidence_claims;
+ const result=validateExaminationReport(report);
+ assert.equal(result.valid,false);
+ assert.ok(result.issues.includes('Missing or invalid evidence claims'));
+});
+test('rejects malformed authority claims',()=>{
+ const report=createExaminationReport(record,null);
+ report.authority_claims='fictional operator';
+ const result=validateExaminationReport(report);
+ assert.equal(result.valid,false);
+ assert.ok(result.issues.includes('Missing or invalid authority claims'));
+});
+test('rejects absent safety escalation classification',()=>{
+ const report=createExaminationReport(record,null);
+ delete report.safety_escalation_claim;
+ const result=validateExaminationReport(report);
+ assert.equal(result.valid,false);
+ assert.ok(result.issues.includes('Missing safety escalation claim'));
+});
