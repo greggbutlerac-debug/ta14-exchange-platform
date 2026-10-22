@@ -10,3 +10,13 @@ test('preliminary report validates without implying execution authority',()=>{co
 test('altered execution permission is rejected',()=>{const report=createExaminationReport(record,null);report.execution_authorized=true;assert.equal(validateExaminationReport(report).valid,false)});
 test('missing governance anchor is rejected',()=>{const report=createExaminationReport(record,null);report.eight_anchor_trace.pop();assert.equal(validateExaminationReport(report).valid,false)});
 test('fake established requirement is rejected',()=>{const report=createExaminationReport(record,null);report.outstanding_requirements[0].established=true;assert.equal(validateExaminationReport(report).valid,false)});
+
+test('report preserves claims examined without treating them as established',()=>{
+ const supplied={...record,evidence:{source:'fictional sensor'},authority:{actor:'fictional operator'},safety_escalation:true};
+ const report=createExaminationReport(supplied,null);
+ assert.equal(report.evidence_claims.source,'fictional sensor');
+ assert.equal(report.authority_claims.actor,'fictional operator');
+ assert.equal(report.safety_escalation_claim,true);
+ assert.equal(report.execution_authorized,false);
+ assert.equal(validateExaminationReport(report).valid,true);
+});
