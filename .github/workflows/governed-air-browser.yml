@@ -1,0 +1,46 @@
+name: Governed Air Browser Regression
+on:
+  push:
+    branches:
+      - governed-air-foundation
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  browser-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - name: Checkout development branch
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          persist-credentials: false
+      - name: Set up Node 22
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020
+        with:
+          node-version: '22'
+      - name: Install application and browser dependencies
+        run: |
+          npm install --no-audit --no-fund
+          npm install --no-save --no-audit --no-fund playwright
+          npx playwright install --with-deps chromium
+      - name: Start isolated development server
+        run: |
+          npm run dev > /tmp/governed-air-next.log 2>&1 &
+          echo $! > /tmp/governed-air-next.pid
+          for i in $(seq 1 90); do
+            if curl --fail --silent http://127.0.0.1:3000/governed-air/runtime-reference > /dev/null; then exit 0; fi
+            sleep 2
+          done
+          tail -n 120 /tmp/governed-air-next.log
+          exit 1
+      - name: Run Governed Air browser tests
+        env:
+          GOVERNED_AIR_TEST_ORIGIN: http://127.0.0.1:3000
+        run: node --test tests/governed-air.e2e.mjs
+      - name: Print server logs on failure
+        if: failure()
+        run: tail -n 150 /tmp/governed-air-next.log || true
