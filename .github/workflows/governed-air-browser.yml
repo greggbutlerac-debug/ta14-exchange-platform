@@ -44,3 +44,11 @@ jobs:
       - name: Print server logs on failure
         if: failure()
         run: tail -n 150 /tmp/governed-air-next.log || true
+      - name: Preserve server logs for diagnosis
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: governed-air-next-server-log
+          path: /tmp/governed-air-next.log
+          if-no-files-found: ignore
+          retention-days: 7
