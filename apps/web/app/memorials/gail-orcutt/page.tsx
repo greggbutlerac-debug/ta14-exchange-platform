@@ -1,4 +1,5 @@
 import Link from "next/link";
+import MemorialExperience from "./MemorialExperience";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -44,12 +45,13 @@ export default function GailOrcuttMemorial() {
           <figcaption style={{fontSize:12,color:"#a7b8c4",marginTop:12,lineHeight:1.5}}>Illustrative AI-created portrait. Not an original or verified photograph of Gail Orcutt.</figcaption>
         </figure>
       </header>
+      <MemorialExperience />
       <div style={{padding:"54px 0 30px",textAlign:"center"}}>
         <p style={{fontFamily:"Georgia,serif",fontSize:"clamp(24px,4vw,43px)",lineHeight:1.35,maxWidth:800,margin:"auto",color:"#f1dfbd"}}>“The classroom may be silent.<br/>The evidence must never be.”</p>
       </div>
       <section style={{padding:"48px 0"}}>
         <p style={{color:"#e8c98d",letterSpacing:2,fontSize:12}}>THE LIFE AND LEGACY</p>
-        <h2 style={{fontFamily:"Georgia,serif",fontSize:40,marginTop:12}}>One person's work can outlive a lifetime.</h2>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:40,marginTop:12}}>A lifetime of teaching. A legacy of protection.</h2>
         <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:14}}>
           {timeline.map(t=><article key={t.year} style={{padding:22,border:"1px solid #385365",borderRadius:12,background:"#0b2331"}}><p style={{color:"#f0d29a",fontWeight:800,letterSpacing:2}}>{t.year}</p><h3 style={{fontFamily:"Georgia,serif",fontSize:23}}>{t.heading}</h3><p style={{lineHeight:1.7,color:"#c3d4dd"}}>{t.copy}</p></article>)}
         </div>
