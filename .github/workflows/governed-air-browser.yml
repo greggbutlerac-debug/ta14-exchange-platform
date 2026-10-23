@@ -27,6 +27,9 @@ jobs:
           npm install --no-audit --no-fund
           npm install --no-save --no-audit --no-fund playwright
           npx playwright install --with-deps chromium
+      - name: Verify reference boundary unit tests
+        run: |
+          node --test ../../governed-air/runtime-reference-adapter.test.mjs ../../governed-air/runtime-reference-fixture.test.mjs
       - name: Start isolated development server
         run: |
           npm run dev > /tmp/governed-air-next.log 2>&1 &
