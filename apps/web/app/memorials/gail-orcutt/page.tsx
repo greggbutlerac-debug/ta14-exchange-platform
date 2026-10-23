@@ -56,8 +56,8 @@ export default function GailOrcuttMemorial() {
           {timeline.map(t=><article key={t.year} style={{padding:22,border:"1px solid #385365",borderRadius:12,background:"#0b2331"}}><p style={{color:"#f0d29a",fontWeight:800,letterSpacing:2}}>{t.year}</p><h3 style={{fontFamily:"Georgia,serif",fontSize:23}}>{t.heading}</h3><p style={{lineHeight:1.7,color:"#c3d4dd"}}>{t.copy}</p></article>)}
         </div>
       </section>
-      {sections.map((s,i)=><section key={s.n} id={"chapter-"+s.n} style={{padding:"65px 0",borderTop:"1px solid #2c485a",display:"grid",gridTemplateColumns:"minmax(70px,130px) minmax(0,1fr)",gap:22}}>
-        <div style={{fontFamily:"Georgia,serif",fontSize:52,color:"#d6bb87"}}>{s.n}</div>
+      {sections.map((s,i)=><section key={s.n} id={"chapter-"+s.n} style={{padding:"clamp(45px,7vw,92px) clamp(18px,4vw,48px)",borderTop:"1px solid #2c485a",margin:"18px 0",borderRadius:18,background:i%3===0?"linear-gradient(125deg,#142e3d,#081925)":i%3===1?"linear-gradient(125deg,#0b2230,#172f36)":"linear-gradient(125deg,#182936,#0b1b29)",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(240px,1fr))",gap:24,alignItems:"start"}}>
+        <div style={{display:"flex",flexDirection:"column",gap:16}}><span style={{fontFamily:"Georgia,serif",fontSize:"clamp(70px,10vw,150px)",lineHeight:1,color:"#d6bb87",opacity:.85}}>{s.n}</span><span aria-hidden="true" style={{height:3,width:90,background:"#d6bb87",display:"block"}}/><span style={{fontFamily:"Georgia,serif",fontSize:20,color:"#e9d7b4",maxWidth:260}}>{["A lifetime of teaching","What we cannot see","A law in her name","The duty to follow through","Every child matters","A story shared","An enduring commitment","The lesson continues"][i]}</span></div>
         <div style={{maxWidth:820}}>
           <p style={{fontSize:12,color:"#85d9e2",fontWeight:700,letterSpacing:2}}>{s.kicker}</p>
           <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(29px,4vw,47px)",lineHeight:1.2}}>{s.title}</h2>
@@ -66,10 +66,10 @@ export default function GailOrcuttMemorial() {
           {i===3&&<Link href="/showrooms/radon-mitigation-evidence-continuity" style={{color:"#86e1eb"}}>Explore the radon evidence-continuity demonstration →</Link>}
         </div>
       </section>)}
-      <section style={{padding:"42px",border:"1px solid #4c6d77",borderRadius:16,background:"#0c2937"}}>
+      <section style={{padding:"clamp(30px,6vw,70px)",border:"1px solid #9d8051",borderRadius:18,background:"radial-gradient(circle at 80% 10%,#3c3a30 0%,#112c37 48%,#081923 100%)",textAlign:"center"}}>
         <p style={{fontSize:12,letterSpacing:2,color:"#e9c98e"}}>CONTINUE HER WORK</p>
-        <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(30px,4vw,48px)"}}>Protecting children requires evidence that lasts.</h2>
-        <p style={{lineHeight:1.8,fontSize:18,color:"#c7d8df"}}>Explore the existing TA14 radon mitigation examination, including why installation is not the same as verified improvement.</p>
+        <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(30px,4vw,48px)"}}>A teacher’s lesson should never end.</h2>
+        <p style={{lineHeight:1.8,fontSize:18,color:"#c7d8df"}}>In Gail’s memory, keep asking what was measured, what action followed, and whether the outcome was verified. Explore an educational examination of why completed work and verified improvement are not the same.</p>
         <Link href="/showrooms/radon-mitigation-evidence-continuity" style={{display:"inline-block",background:"#bce9ed",color:"#06202b",fontWeight:800,padding:"16px 22px",borderRadius:9,textDecoration:"none"}}>Enter the radon showroom →</Link>
       </section>
       <section style={{padding:"55px 0 20px"}}>
