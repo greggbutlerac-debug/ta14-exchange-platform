@@ -45,3 +45,23 @@ test('failed envelope and forged nested authorization fail closed',()=>{
  assert.ok(result.diagnostics.includes('INVALID_NESTED_AUTHORIZATION'));
  assert.equal(result.production_authorization.production_execution_authorized,false);
 });
+
+test('reference receipt and snapshot authorization claims cannot authorize production',()=>{
+ for(const claim of [true,false,null,'true',1]){
+  const x=make();
+  x.orchestration_result.reference_artifact_presentation.reference_receipt_execution_authorized_claim=claim;
+  x.orchestration_result.reference_artifact_presentation.reference_snapshot_execution_authorized_claim=claim;
+  x.orchestration_result.execution_receipt.execution_authorized=claim;
+  const result=project(x);
+  assert.equal(result.production_authorization.effective_disposition,'HOLD');
+  assert.equal(result.production_authorization.production_execution_authorized,false);
+  assert.equal(result.production_authorization.production_commit_authorized,false);
+ }
+});
+test('forged nested production commit authorization invalidates reference response',()=>{
+ const x=make();x.orchestration_result.production_authorization.production_commit_authorized=true;
+ const result=project(x);
+ assert.equal(result.valid_reference_response,false);
+ assert.ok(result.diagnostics.includes('INVALID_NESTED_AUTHORIZATION'));
+ assert.equal(result.production_authorization.production_commit_authorized,false);
+});
