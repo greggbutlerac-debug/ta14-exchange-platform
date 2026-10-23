@@ -4,6 +4,9 @@ on:
     branches:
       - governed-air-foundation
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 permissions:
   contents: read
 jobs:
@@ -44,6 +47,13 @@ jobs:
         env:
           GOVERNED_AIR_TEST_ORIGIN: http://127.0.0.1:3000
         run: node --test tests/governed-air.e2e.mjs
+      - name: Record verification status
+        if: success()
+        run: |
+          echo '### Governed Air verification' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Runtime reference unit tests: PASS' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Six browser integration tests: PASS' >> "$GITHUB_STEP_SUMMARY"
+          echo '- Execution authorization: NOT GRANTED; production HOLD' >> "$GITHUB_STEP_SUMMARY"
       - name: Print server logs on failure
         if: failure()
         run: tail -n 150 /tmp/governed-air-next.log || true
