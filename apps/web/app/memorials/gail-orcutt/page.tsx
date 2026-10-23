@@ -18,7 +18,7 @@ const chapters = [
     ],
     "image": "Eager Hands in a Sunlit Classroom.png",
     "alt": "Illustration of young students engaged in class",
-    "caption": "A lifetime spent helping others learn. Illustrative scene, not Gail's classroom."
+    "caption": "A lifetime spent helping others learn."
   },
   {
     "eyebrow": "MAY 2010",
@@ -42,7 +42,7 @@ const chapters = [
     ],
     "image": "ChatGPT Image Oct 23, 2026, 10_54_07 AM.png",
     "alt": "Schoolchildren working together on an environmental model",
-    "caption": "Education gives knowledge a path into action. AI-generated illustrative scene."
+    "caption": "Education gives knowledge a path into action."
   },
   {
     "eyebrow": "SCHOOLS AND THE INVISIBLE RISK",
@@ -78,7 +78,7 @@ const chapters = [
     ],
     "image": "Classroom Radon Test Inspection.png",
     "alt": "Illustration of a technician documenting a school radon test",
-    "caption": "A classroom radon measurement is the beginning of an evidence record. AI-generated illustrative example."
+    "caption": "A classroom radon measurement is the beginning of an evidence record."
   },
   {
     "eyebrow": "A LEGACY BEYOND ONE LAW",
@@ -90,7 +90,7 @@ const chapters = [
     ],
     "image": "ChatGPT Image Oct 23, 2026, 10_54_17 AM.png",
     "alt": "Illustration of children and a teacher planting a tree",
-    "caption": "What we plant in service to others can continue to grow. Illustrative scene."
+    "caption": "What we plant in service to others can continue to grow."
   },
   {
     "eyebrow": "HOW THIS TRIBUTE CAME TO BE",
@@ -102,7 +102,7 @@ const chapters = [
     ],
     "image": "Hands-On Learning in a Sunny Classroom.png",
     "alt": "Illustration of a teacher guiding children through a lesson",
-    "caption": "The lesson continues when others choose to learn and act. AI-generated illustration."
+    "caption": "The lesson continues when others choose to learn and act."
   }
 ];
 const imageSrc = (filename: string) => "/" + encodeURIComponent(filename);
@@ -112,6 +112,7 @@ export default function GailOrcuttMemorial() {
   <div style={{maxWidth:1420,margin:"auto",padding:"24px clamp(18px,4vw,72px) 100px"}}>
    <nav style={{display:"flex",justifyContent:"space-between",flexWrap:"wrap",gap:16,fontSize:14,marginBottom:32}}>
     <Link href="/" style={{color:"#a4e0e5",textDecoration:"none"}}>← TA14 Exchange</Link>
+    <p style={{fontFamily:"Georgia,serif",fontSize:"clamp(22px,2.6vw,35px)",lineHeight:1.5,color:"#f0d5a7",maxWidth:960,margin:"0 auto 38px"}}>May every classroom that is tested, every family that receives an answer, and every school that follows through be part of the lesson Gail left behind.</p>
     <Link href="/showrooms/radon-mitigation-evidence-continuity" style={{color:"#a4e0e5",textDecoration:"none"}}>Radon evidence showroom →</Link>
    </nav>
    <header style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,370px),1fr))",gap:"clamp(26px,5vw,80px)",alignItems:"center",padding:"54px 0 82px",borderBottom:"1px solid #3a5360"}}>
@@ -130,6 +131,7 @@ export default function GailOrcuttMemorial() {
    <div style={{textAlign:"center",padding:"clamp(66px,9vw,120px) 12px"}}>
      <p style={{fontFamily:"Georgia,serif",color:"#f0d6a7",fontSize:"clamp(29px,4.3vw,59px)",lineHeight:1.3,maxWidth:1010,margin:"auto"}}>“She did not live to see the law.<br/>But the lesson she taught was not forgotten.”</p>
    </div>
+   <p style={{fontSize:13,color:"#9eb6c0",textAlign:"center",margin:"0 0 28px"}}>The images below are symbolic AI-generated illustrations, not photographs of Gail, her students, or historical events.</p>
    <section aria-label="Gail Orcutt's life story">
     {chapters.map((c,i)=><article key={c.title} style={{borderTop:"1px solid #34505d",padding:"clamp(48px,7vw,100px) 0",display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(100%,400px),1fr))",alignItems:"center",gap:"clamp(28px,5vw,75px)"}}>
       <div style={{order:i%2===0?0:1}}>
@@ -140,15 +142,15 @@ export default function GailOrcuttMemorial() {
       </div>
       <figure style={{margin:0,order:i%2===0?1:0}}>
         <img src={imageSrc(c.image)} alt={c.alt} loading="lazy" style={{width:"100%",display:"block",borderRadius:16,border:"1px solid #365460",boxShadow:"0 18px 48px #0005"}}/>
-        <figcaption style={{fontSize:13,color:"#aebfc9",lineHeight:1.6,marginTop:13}}>{c.caption} AI-generated illustration; not a historical photograph.</figcaption>
+        <figcaption style={{fontSize:13,color:"#aebfc9",lineHeight:1.6,marginTop:13}}>{c.caption}</figcaption>
       </figure>
     </article>)}
    </section>
    <MemorialExperience />
    <section style={{margin:"76px 0 0",background:"linear-gradient(130deg,#143344,#0d2731)",padding:"clamp(30px,6vw,80px)",borderRadius:20,border:"1px solid #6f6b55",textAlign:"center"}}>
     <p style={{color:"#e9c98e",letterSpacing:2,fontSize:12}}>THE LESSON CONTINUES</p>
-    <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(34px,4.5vw,60px)",fontWeight:400,margin:"18px 0"}}>A teacher's influence has no final bell.</h2>
-    <p style={{fontSize:19,lineHeight:1.85,maxWidth:900,margin:"20px auto 34px",color:"#d2e0e5"}}>Gail's story reminds us that care becomes protection when people take the time to learn, test, respond, and follow through. No single measurement can tell the whole story. No law fulfills its purpose merely by being signed.</p>
+    <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(34px,4.5vw,60px)",fontWeight:400,margin:"18px 0"}}>A teacher’s influence has no final bell.</h2>
+    <p style={{fontSize:19,lineHeight:1.85,maxWidth:900,margin:"20px auto 34px",color:"#d2e0e5"}}>For thirty-three years, Gail gave children the gift of learning. When illness changed her own life, she used what she learned to help protect lives she would never know. She did not live to see the Iowa law carrying her name, but her voice helped bring a responsibility into the world that endures beyond her lifetime.</p>
     <Link href="/showrooms/radon-mitigation-evidence-continuity" style={{display:"inline-block",padding:"16px 26px",background:"#bce9ed",color:"#07212a",borderRadius:8,textDecoration:"none",fontWeight:800}}>Explore radon evidence and verification →</Link>
    </section>
    <section style={{padding:"75px 0 35px"}}>
