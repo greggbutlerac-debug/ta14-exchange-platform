@@ -12,6 +12,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Global Energy Reality & Admissibility Architecture · GERAA v1.0','/showrooms/global-energy-reality-admissibility','GOVERNANCE & ARCHITECTURES','Eight lessons global energy reality observed versus forecast production supply oil evidence continuity admissible authority standing Samantha narration interactive examination'],
 ['Hotel Canaletto · From Verification to Governed Continuity','/showrooms/hotel-canaletto-governed-continuity','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent Italian English eight-scene concept Hotel Canaletto Venice Pureairion EHG Armony IAQ-ASE Bureau Veritas operational evidence Atmospheric Integrity Record continuity interruptions restoration revalidation TA14 educational decision gate'],
 ['Public Expenditure Admissibility · Who Authorizes the Payment?','/showrooms/public-expenditure-admissibility','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image government spending construction draw payment admissible evidence applicable authority established standing Samantha narration interactive simulated HOLD ALLOW DENY ESCALATE technical reference'],
 ['Municipal Air Quality Governance · Evidence to Authorized Action','/showrooms/municipal-air-quality-governance','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image municipal building and air-quality governance showroom local authority admissible evidence standing bounded execution verified outcome Samantha narration'],
