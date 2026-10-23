@@ -65,3 +65,14 @@ test('forged nested production commit authorization invalidates reference respon
  assert.ok(result.diagnostics.includes('INVALID_NESTED_AUTHORIZATION'));
  assert.equal(result.production_authorization.production_commit_authorized,false);
 });
+
+test('invalid envelope suppresses misleading reference claims in the UI projection',()=>{
+ const x=make();x.success=false;
+ const result=project(x);
+ assert.equal(result.valid_reference_response,false);
+ assert.equal(result.reference_result.decision,null);
+ assert.equal(result.reference_result.receipt_status,null);
+ assert.equal(result.reference_result.receipt_execution_authorized_claim,false);
+ assert.equal(result.reference_result.snapshot_execution_authorized_claim,false);
+ assert.equal(result.production_authorization.effective_disposition,'HOLD');
+});
