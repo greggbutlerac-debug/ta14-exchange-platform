@@ -9,6 +9,8 @@ const steps = [
   { name: "04 · Verify", title: "The outcome must be measured", question: "Did the intervention achieve its purpose?", detail: "Appropriate post-mitigation testing helps establish whether radon concentrations were reduced under the measured conditions. Continued obligations may still apply.", evidence: "Preserve follow-up results, conditions, dates, and any remaining uncertainties." },
 ];
 
+const stageImages = ["Radon Evidence Records Infographic.png","Radon Mitigation Decision Authority.png","Radon Mitigation Evidence Continuity.png","Radon Evidence Continuity Workflow.png"];
+
 export default function MemorialExperience() {
   const [active, setActive] = useState(0);
   const item = steps[active];
@@ -33,6 +35,10 @@ export default function MemorialExperience() {
           <p style={{fontSize:13,lineHeight:1.6,color:"#aebfca"}}>Illustrative educational sequence only. Not a real school case, legal determination, or deployed TA14 authorization.</p>
         </aside>
       </div>
+      <figure style={{margin:"22px 0 10px"}}>
+        <img key={active} src={"/"+encodeURIComponent(stageImages[active])} alt={"Illustrative radon evidence and governance diagram for "+item.name} loading="lazy" style={{width:"100%",height:"auto",display:"block",borderRadius:14,border:"1px solid #537080"}}/>
+        <figcaption style={{fontSize:13,color:"#aebfca",marginTop:10}}>Educational reference illustration for {item.name}; this does not represent a real Gail Orcutt classroom, certified test, or deployed authorization.</figcaption>
+      </figure>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",gap:14,marginTop:18,flexWrap:"wrap"}}>
         <p style={{fontSize:13,color:"#b7cbd3"}}>Select any stage to revisit the evidence journey.</p>
         <button type="button" onClick={()=>setActive((active+1)%steps.length)} style={{padding:"13px 22px",background:"#bce9ed",border:0,borderRadius:8,color:"#06202b",fontWeight:800,cursor:"pointer"}}>{active===3?"Start again ↺":"Next stage →"}</button>
