@@ -112,3 +112,20 @@ test('synthetic runtime reference page displays legacy PROCEED but production HO
   assert.equal(await page.locator('button').count(),0,'No execution buttons may be rendered');
  }finally{await browser.close()}
 });
+
+test('workspace links to isolated synthetic runtime page and returns without execution controls',async()=>{
+ const browser=await chromium.launch({headless:true});
+ try{
+  const page=await browser.newPage();
+  await page.goto(origin+'/governed-air/workspace',{waitUntil:'networkidle'});
+  await page.getByRole('link',{name:'View synthetic runtime HOLD boundary'}).click();
+  await page.waitForURL('**/governed-air/runtime-reference');
+  await page.getByRole('heading',{name:'Runtime Reference Boundary Demonstration'}).waitFor();
+  const boundary=page.locator('section').filter({has:page.getByRole('heading',{name:'Effective production boundary'})});
+  assert.equal(await boundary.getByText('HOLD',{exact:true}).count(),1);
+  assert.equal(await page.locator('button').count(),0);
+  await page.getByRole('link',{name:'Return to Examination Workspace'}).click();
+  await page.waitForURL('**/governed-air/workspace');
+  await page.getByRole('heading',{name:/Governed Air.*Examination Workspace/}).waitFor();
+ }finally{await browser.close()}
+});
