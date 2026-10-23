@@ -1,0 +1,62 @@
+import Link from 'next/link';
+
+export const metadata = {
+  title: 'Latvija · Gaisa kvalitāte, pierādījumi un atbildīga rīcība | TA-14',
+  description: 'Izglītojošs TA-14 demonstrējums latviešu valodā, balstīts uz Latvijas Klimata un enerģētikas ministrijas 2026. gada 22. oktobra skaidrojumu par gaisa kvalitātes monitoringu un lēmumu pieņemšanu.'
+};
+
+const prefix = '/global-institutional-engagement';
+const lessons = [
+  {title:'VIDES SIGNĀLS', subtitle:'Novērojums sāk izmeklēšanu', image:'Rīgas gaisa kvalitātes monitorings_.png', body:'Ilustratīvs PM2.5 mērījums pievērš uzmanību iespējamiem riskiem. Mērījums ir novērojums, nevis automātiska atļauja rīkoties.', learned:'Novērojums var ierosināt izvērtēšanu, bet viens rādījums pats par sevi nenosaka tiesisku rīcību.', next:'Jāpārbauda datu izcelsme, metode un kvalitāte.'},
+  {title:'VAI DATI IR UZTICAMI?', subtitle:'No signāla līdz pārbaudāmam pierādījumam', image:'Trusted Data in the Quality Lab.png', body:'Ministrija norāda LVĢMC atbildību par monitoringu, mērījumiem, datu apkopošanu un novērtēšanu. TA-14 jautā, kā laika gaitā saglabāt datu izcelsmi un labojumu vēsturi.', learned:'Pierādījumu nepārtrauktībai svarīgi saglabāt avotu, laiku, metodi un kvalitātes statusu.', next:'Jānosaka kompetentās institūcijas.'},
+  {title:'KURŠ DRĪKST LEMT?', subtitle:'Kompetence nosaka atbildību', image:'Civic Decisions_ Riga Competence Meeting.png', body:'Saskaņā ar ministrijas atbildi pašvaldība sadarbībā ar Klimata un enerģētikas ministriju izstrādā un īsteno piesārņojuma samazināšanas pasākumus. Konkrētas pilnvaras katrā gadījumā jānosaka atbilstoši tiesību normām.', learned:'Datu pieejamība pati par sevi nepiešķir tiesības pieņemt vai izpildīt lēmumu.', next:'Jāapraksta konkrētais piedāvātais pasākums.'},
+  {title:'PAREDZĒTĀ RĪCĪBA', subtitle:'Priekšlikums nav izpilde', image:'Plānotā rīcība pilsētas gaisa kvalitātei.png', body:'Ilustratīvas iespējas var būt satiksmes organizācijas maiņa, emisiju mazināšana vai citi kompetentu institūciju izvērtēti pasākumi. Šeit nav apgalvots, ka kāds konkrēts pasākums Latvijā ir pieņemts.', learned:'Jāsasaista pasākuma mērķis, pamatojums, kompetence un sagaidāmais rezultāts.', next:'Pirms īstenošanas jāizvērtē pierādījumu un pilnvaru pietiekamība.'},
+  {title:'PIEĻAUJAMĪBAS ROBEŽA', subtitle:'Spēja nav pilnvara', image:'Admissibility Threshold Decision Panel.png', body:'TA-14 koncepcija piedāvā pārbaudīt Admissible Evidence, Applicable Authority un Established Standing, pirms iestājas paredzētās sekas. ALLOW, HOLD, DENY un ESCALATE ir TA-14 konceptuāli iznākumi, nevis Latvijas valsts lēmumu kodi.', learned:'Tehniski iespējama darbība ne vienmēr ir juridiski un institucionāli pieļaujama.', next:'Jāņem vērā jaunākie mērījumi un apstākļu izmaiņas.'},
+  {title:'REALITĀTE MAINĀS', subtitle:'Jauni dati — jauns izvērtējums', image:'Riga Air Quality_ Before and After.png', body:'Ministrija skaidro, ka atbildīgās institūcijas izmanto aktualizētos datus iepriekšējo pasākumu pārskatīšanai. Attēlā parādītie pirms un pēc rādījumi ir tikai izglītojošs piemērs un neapliecina īstu intervenci vai tās efektivitāti.', learned:'Sākotnējā lēmuma pamatojums jāpārskata, ja būtiski mainās fakti.', next:'Jānodala mērījumu izmaiņas no pierādītas cēloņsakarības.'},
+  {title:'VAI PASĀKUMS DARBOJĀS?', subtitle:'Rezultāts jāpārbauda, nevis jāpieņem', image:'Accountability and Continuous Improvement.png', body:'Pēc ilustratīvas intervences var salīdzināt novērojumus ar mērķi, vienlaikus pārbaudot datu kvalitāti un citus iespējamos ietekmes faktorus. Zemāks rādījums automātiski nepierāda intervences cēloņsakarību.', learned:'Darbības izpilde un pierādīts pozitīvs iznākums ir divi atšķirīgi apgalvojumi.', next:'Jāsaglabā izsekojama lēmuma un rezultāta ķēde.'},
+  {title:'INSTITUCIONĀLĀ IESPĒJA', subtitle:'Saistīt ierakstus, neaizstājot institūcijas', image:'Latvijas vides pārvaldības pierādījumu ķēde.png', body:'TA-14 piedāvā izglītojošu modeli, kurā novērojums, datu pārbaude, kompetence, lēmums, īstenošana un rezultāts veido rekonstruējamu pierādījumu ķēdi. Nav apgalvots, ka šāda integrācija jau pastāv vai ir ieviesta Latvijā.', learned:'Atbildīga pārvaldība prasa pārskatāmu saikni starp pierādījumiem, lēmumiem un faktiskajām sekām.', next:'Kompetentās iestādes var izvērtēt ierobežota tehniska demonstrējuma lietderību.'}
+];
+const asset = (name:string) => '/' + encodeURIComponent(name);
+
+export default function LatviaShowroom(){
+  return <main className="latvia">
+    <div className="wrap">
+      <nav className="nav"><Link href="/">TA-14 EXCHANGE</Link><Link href={prefix}>STARPTAUTISKĀ SADARBĪBA</Link><Link href={prefix + '/showrooms'}>VALSTU DEMONSTRĒJUMI</Link></nav>
+      <header className="hero">
+        <div className="kicker">🇱🇻 LATVIJA · PUBLISKS IZGLĪTOJOŠS DEMONSTRĒJUMS · 23.10.2026.</div>
+        <h1>Pierādījumi pastāv.<br/><em>Vai lēmumu var pamatot?</em></h1>
+        <p>No gaisa kvalitātes mērījuma līdz izsekojamai un pārbaudāmai publiskai rīcībai. Astoņi piemēri par datiem, kompetenci, pieļaujamību un rezultāta pārbaudi.</p>
+        <div className="factgrid"><div><small>INSTITUCIONĀLAIS PAMATS</small><strong>Ministrijas rakstiska atbilde</strong><span>22.10.2026. · Nr. 1-17/3494</span></div><div><small>LATVIJAS SISTĒMA</small><strong>LVĢMC · pašvaldības · ministrija</strong><span>Monitorings, novērtējums, pasākumi</span></div><div><small>TA-14 STATUSS</small><strong>Neatkarīgs priekšlikums</strong><span>Nav oficiāla apstiprinājuma vai ieviešanas</span></div></div>
+        <div className="notice"><b>SVARĪGA ROBEŽA</b> Šī lapa ir neatkarīgs TA-14 izglītojošs materiāls. Visi attēlotie dati, notikumi, vizualizācijas, amatpersonu attēlojumi un rezultāti ir ilustratīvi. Tas nav Latvijas valsts iestāžu apstiprināts projekts, faktiska piesārņojuma ziņojums vai pierādījums par TA-14 tehnoloģijas ieviešanu.</div>
+      </header>
+      <section className="intro"><span className="label">KO MINISTRIJA PASKAIDROJA</span><h2>Latvijai jau ir kompetentas institūcijas un tiesiska kārtība.</h2><p>Latvijas Klimata un enerģētikas ministrija savā 2026. gada 22. oktobra vēstulē norādīja uz Ministru kabineta 2009. gada 3. novembra noteikumiem Nr. 1290 “Noteikumi par gaisa kvalitāti”. Tā skaidroja, ka LVĢMC uzrauga un novērtē gaisa kvalitātes datus; pašvaldības sadarbībā ar ministriju izstrādā un īsteno attiecīgus pasākumus; jauni dati var būt pamats pasākumu pārskatīšanai.</p><blockquote>TA-14 papildjautājums: vai konkrētas rīcības mērījumus, to pārbaudi, kompetento lēmumu, izpildi un faktisko rezultātu iespējams sasaistīt vienā izsekojamā pierādījumu ķēdē?</blockquote><p>Ministrijas atbilde neapstiprina un nenoliedz vienotas ierakstu ķēdes esamību. Šo jautājumu nedrīkst pasniegt kā konstatētu trūkumu.</p></section>
+      <section id="nodarbibas"><span className="label">ASTOŅAS VIZUĀLAS NODARBĪBAS</span><h2>No novērojuma līdz iznākumam</h2><div className="lessons">{lessons.map((l,i)=><article className="lesson" key={l.title}><div className="lessonhead"><span>{String(i+1).padStart(2,'0')}</span><div><h3>{l.title}</h3><p>{l.subtitle}</p></div></div><img src={asset(l.image)} alt={l.title + ' — ilustratīvs TA-14 izglītojošs attēls'} loading="lazy"/><div className="lessonbody"><p>{l.body}</p><div className="twocol"><div><b>KO JŪS UZZINĀJĀT</b><p>{l.learned}</p></div><div><b>KAS TĀLĀK</b><p>{l.next}</p></div></div></div></article>)}</div></section>
+      <section className="finish"><span className="label">IESPĒJAMĀ SADARBĪBA</span><h2>Neaizstāt esošo sistēmu. Padarīt saikni starp tās ierakstiem pārbaudāmu.</h2><p>TA-14 var piedāvāt ierobežotu konceptuālu demonstrējumu, kas parāda kā saglabāt novērojuma, ieraksta, nepārtrauktības, pieļaujamības, saistoša lēmuma, izpildes un iznākuma sasaisti. Jebkāda konkrēta institucionāla izmantošana prasītu atsevišķu tehnisku un juridisku izvērtējumu.</p><a className="download" href={asset('TA14_Latvija_Institucionalais_Demonstrejums_v2 (1).pdf')} target="_blank" rel="noopener noreferrer">LEJUPIELĀDĒT LATVIJAS DEMONSTRĒJUMA PDF ↗</a><p className="contact">TA-14 Authority Governance Institution LLC · <a href="mailto:ta14admissibleexecution@gmail.com">ta14admissibleexecution@gmail.com</a></p></section>
+      <footer><b>AVOTU NOŠĶĪRUMS</b><p>Faktiskais pamats: Latvijas Klimata un enerģētikas ministrijas 22.10.2026. atbilde, Nr. 1-17/3494 (TA-14 korespondence). Ministrijas norādītais publiskais resurss: <a href="https://videscentrs.lvgmc.lv/gaiss" target="_blank" rel="noopener noreferrer">LVĢMC gaisa kvalitātes informācija</a>. TA-14 izvērtējums un attēli ir atsevišķs, ilustratīvs saturs.</p></footer>
+    </div>
+    <style>{`
+      .latvia{background:#081421;color:#edf5fb;min-height:100vh;font-family:Arial,Helvetica,sans-serif;line-height:1.65}
+      .latvia *{box-sizing:border-box}.latvia .wrap{max-width:1130px;margin:auto;padding:0 22px}.latvia a{color:inherit}
+      .latvia .nav{display:flex;gap:24px;flex-wrap:wrap;align-items:center;padding:24px 0;border-bottom:1px solid #294254;font-size:12px;letter-spacing:.12em;font-weight:700}
+      .latvia .nav a{text-decoration:none}.latvia .nav a:hover,.latvia footer a:hover{text-decoration:underline}
+      .latvia .hero{padding:78px 0 58px}.latvia .kicker,.latvia .label{color:#79e3d1;letter-spacing:.18em;font-size:12px;font-weight:800}
+      .latvia h1{font-size:clamp(42px,6vw,78px);line-height:1.1;letter-spacing:-.035em;margin:22px 0}.latvia h1 em{font-style:normal;color:#80dcd2}
+      .latvia .hero>p{max-width:780px;font-size:21px;color:#c5d6e2}
+      .latvia .factgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:38px 0}
+      .latvia .factgrid div{background:#132739;border:1px solid #29495b;padding:21px;display:flex;flex-direction:column;gap:7px}
+      .latvia .factgrid small{font-size:10px;letter-spacing:.12em;color:#7fcbbf}.latvia .factgrid strong{font-size:17px}.latvia .factgrid span{font-size:13px;color:#b4c5d0}
+      .latvia .notice{border-left:4px solid #e5b26e;background:#1c2935;color:#e2e8ef;padding:19px 22px;font-size:14px}.latvia .notice b{color:#ffc778;margin-right:8px}
+      .latvia section{padding:68px 0;border-top:1px solid #294254}.latvia h2{font-size:clamp(29px,4vw,44px);line-height:1.2;letter-spacing:-.025em;margin:15px 0 23px}
+      .latvia .intro>p,.latvia .finish>p{font-size:17px;color:#c3d5df;max-width:900px}
+      .latvia blockquote{margin:32px 0;padding:24px 28px;border-left:4px solid #7cded1;background:#13293a;font-size:21px;font-weight:700}
+      .latvia .lessons{display:grid;gap:38px;margin-top:28px}.latvia .lesson{background:#102333;border:1px solid #315066;overflow:hidden;border-radius:13px}
+      .latvia .lessonhead{display:flex;gap:22px;align-items:center;padding:25px 30px}.latvia .lessonhead>span{font-size:46px;font-weight:800;color:#7cded1;line-height:1}.latvia h3{font-size:26px;margin:0;letter-spacing:.03em}.latvia .lessonhead p{margin:2px 0 0;color:#bdd2df}
+      .latvia .lesson img{width:100%;height:auto;display:block;aspect-ratio:16/9;object-fit:cover;background:#07111d}
+      .latvia .lessonbody{padding:26px 30px}.latvia .lessonbody>p{font-size:17px;color:#e1eaf0}.latvia .twocol{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+      .latvia .twocol>div{background:#1b3444;border-radius:8px;padding:17px 20px}.latvia .twocol b{font-size:12px;letter-spacing:.1em;color:#7de1d3}.latvia .twocol p{margin:7px 0 0;font-size:14px}
+      .latvia .download{display:inline-block;margin:24px 0;padding:15px 22px;background:#80ded0;color:#071b24!important;border-radius:5px;text-decoration:none;font-weight:800;font-size:13px;letter-spacing:.07em}.latvia .download:hover{background:#c1fff3}
+      .latvia .contact{font-size:14px!important}.latvia footer{padding:30px 0 70px;color:#aabfcd;font-size:13px}.latvia footer b{color:#dbebf0;letter-spacing:.1em}
+      @media(max-width:700px){.latvia .hero{padding:45px 0}.latvia .factgrid,.latvia .twocol{grid-template-columns:1fr}.latvia .lessonhead{padding:18px;gap:14px}.latvia .lessonhead>span{font-size:35px}.latvia h3{font-size:20px}.latvia .lessonbody{padding:20px}.latvia section{padding:44px 0}}
+    `}</style>
+  </main>;
+}
