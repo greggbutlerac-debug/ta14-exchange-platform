@@ -23,10 +23,10 @@ export function projectRuntimeReferenceForWorkspace(raw){
   valid_reference_response:problems.length===0,
   diagnostics:problems,
   reference_result:{
-   decision:safeText(source.enforcement_decision?.decision),
-   receipt_status:safeText(p?.reference_receipt_status),
-   receipt_execution_authorized_claim:p?.reference_receipt_execution_authorized_claim===true,
-   snapshot_execution_authorized_claim:p?.reference_snapshot_execution_authorized_claim===true
+   decision:problems.length===0?safeText(source.enforcement_decision?.decision):null,
+   receipt_status:problems.length===0?safeText(p?.reference_receipt_status):null,
+   receipt_execution_authorized_claim:problems.length===0&&p?.reference_receipt_execution_authorized_claim===true,
+   snapshot_execution_authorized_claim:problems.length===0&&p?.reference_snapshot_execution_authorized_claim===true
   },
   production_authorization:{...HOLD}
  });
