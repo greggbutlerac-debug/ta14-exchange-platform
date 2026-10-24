@@ -32,8 +32,7 @@ const indoorAirRooms = [
   "/showrooms/uk-school-air",
   "/environmental-integrity-governance/building-governed-air",
   "/environmental-integrity-governance/showcase/airthings-space-radon",
-  "/environmental-integrity-governance/showcase/safer-air-project",
-  "/indoor-air-governance"
+  "/environmental-integrity-governance/showcase/safer-air-project"
 ] as const;
 const countryBridge = '/global-institutional-engagement/colombia';
 
