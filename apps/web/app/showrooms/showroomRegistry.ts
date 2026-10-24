@@ -1,6 +1,7 @@
 export const showroomCollections=[
 ['PEOPLE & PRACTITIONERS','People whose work is examined, taught or connected to TA14.'],
 ['COUNTRIES & PUBLIC INSTITUTIONS','Country-facing and institutional technical rooms.'],
+['MEMORIALS & ENVIRONMENTAL LEGACIES','Independent educational memorials honoring people whose advocacy advanced environmental health and protection.'],
 ['ORGANIZATIONS & PARTNERS','Organizations, collaborators and public company rooms.'],
 ['ENVIRONMENT & ATMOSPHERIC INTEGRITY','Air, environmental evidence, AIR, PAIR and EIG.'],
 ['BUILDINGS & HVAC','Building systems, commissioning, HVAC and operational consequence.'],
@@ -12,6 +13,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Gail Orcutt · A Teacher. A Legacy. A Promise.','/memorials/gail-orcutt','MEMORIALS & ENVIRONMENTAL LEGACIES','Independent educational memorial honoring Iowa teacher and radon advocate Gail Orcutt, school radon testing, child protection and environmental health legacy. AI-generated tribute portrait is illustrative and not an authenticated likeness.'],
 ['Global Energy Reality & Admissibility Architecture · GERAA v1.0','/showrooms/global-energy-reality-admissibility','GOVERNANCE & ARCHITECTURES','Eight lessons global energy reality observed versus forecast production supply oil evidence continuity admissible authority standing Samantha narration interactive examination'],
 ['Hotel Canaletto · From Verification to Governed Continuity','/showrooms/hotel-canaletto-governed-continuity','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Independent Italian English eight-scene concept Hotel Canaletto Venice Pureairion EHG Armony IAQ-ASE Bureau Veritas operational evidence Atmospheric Integrity Record continuity interruptions restoration revalidation TA14 educational decision gate'],
 ['Public Expenditure Admissibility · Who Authorizes the Payment?','/showrooms/public-expenditure-admissibility','COUNTRIES & PUBLIC INSTITUTIONS','Eight-image government spending construction draw payment admissible evidence applicable authority established standing Samantha narration interactive simulated HOLD ALLOW DENY ESCALATE technical reference'],
