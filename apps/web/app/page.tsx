@@ -20,6 +20,25 @@ export default function HomePage() {
     <>
       <RainEnhancer />
       <ArchitectureFamilyEnhancer />
+      <section className="goiaqg-feature" aria-labelledby="goiaqg-feature-title">
+        <div className="goiaqg-feature__inner">
+          <div className="goiaqg-feature__intro">
+            <p className="goiaqg-feature__eyebrow">FEATURED GLOBAL INITIATIVE · TA14 AUTHORITY GOVERNANCE INSTITUTION</p>
+            <h2 id="goiaqg-feature-title">Global Open <em>Indoor Air Quality Governance</em> <span>(GO-IAQG)</span></h2>
+            <p>Buildings can measure indoor air. Dashboards can score it. Intelligence can predict what may happen. <strong>But none of those alone proves that a particular intervention is supported by admissible evidence and authorized to occur now.</strong></p>
+            <div className="goiaqg-feature__actions">
+              <a href="/indoor-air-governance">EXPLORE INDOOR AIR GOVERNANCE →</a>
+              <a href="/showrooms/school-air-quality-governance">VIEW THE EIGHT-LESSON SCHOOL SHOWROOM →</a>
+            </div>
+          </div>
+          <div className="goiaqg-feature__pillars" aria-label="GO-IAQG teaching boundaries">
+            <div><small>01 · OBSERVE & PRESERVE</small><b>Environmental reality before interpretation</b><p>Preserve original observations, context, provenance and continuity before deriving a score or recommendation.</p></div>
+            <div><small>02 · EXAMINE & AUTHORIZE</small><b>Authority before consequential execution</b><p>Use admissible evidence, applicable authority and established standing to examine a proposed bounded action.</p></div>
+            <div><small>03 · VERIFY & ACCOUNT</small><b>Outcomes become the next record</b><p>Compare what actually changed with the intended result, including uncertainty, side effects and new conditions.</p></div>
+          </div>
+          <p className="goiaqg-feature__notice">OPEN EDUCATIONAL GOVERNANCE INITIATIVE · NO GOVERNMENT ADOPTION, CERTIFICATION, REGULATORY ENDORSEMENT OR LIVE BUILDING CONTROL IMPLIED</p>
+        </div>
+      </section>
       <section className="consequence-first" aria-labelledby="consequence-first-title">
         <div className="consequence-first__inner">
           <p className="consequence-first__eyebrow">THE CONSEQUENCE BOUNDARY</p>
@@ -51,6 +70,23 @@ export default function HomePage() {
       <FrontDoorPrototype />
       <CanonicalChain24 />
       <style>{`
+        .goiaqg-feature{background:linear-gradient(116deg,#071b29 0%,#082631 55%,#0c1c2a 100%);color:#f0f8fa;border-bottom:1px solid #5f93a16b;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+        .goiaqg-feature__inner{width:min(1220px,calc(100% - 36px));margin:auto;padding:38px 0 34px}
+        .goiaqg-feature__eyebrow{margin:0;color:#f4d46c;font-size:10px;font-weight:900;letter-spacing:.15em}
+        .goiaqg-feature h2{max-width:1120px;margin:12px 0 15px;font-size:clamp(30px,4.2vw,53px);line-height:1.06;letter-spacing:-.035em}
+        .goiaqg-feature h2 em{font-style:normal;color:#91e2db}.goiaqg-feature h2 span{font-size:.5em;vertical-align:middle;color:#f4d46c;white-space:nowrap}
+        .goiaqg-feature__intro>p:not(.goiaqg-feature__eyebrow){max-width:990px;color:#c2d6db;font-size:clamp(14px,1.5vw,17px);line-height:1.65}
+        .goiaqg-feature__intro strong{color:#fff0bd}
+        .goiaqg-feature__actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}
+        .goiaqg-feature__actions a{display:inline-flex;align-items:center;min-height:44px;padding:10px 15px;border-radius:9px;background:#f4d46c;color:#10242d;font-size:11px;font-weight:900;text-decoration:none;letter-spacing:.02em}
+        .goiaqg-feature__actions a+ a{background:transparent;color:#e2f1ed;border:1px solid #65919a}
+        .goiaqg-feature__pillars{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:23px}
+        .goiaqg-feature__pillars div{border:1px solid #56808c69;border-radius:12px;padding:18px;background:#051924b8}
+        .goiaqg-feature__pillars small{font-size:10px;font-weight:900;letter-spacing:.09em;color:#e7c965}
+        .goiaqg-feature__pillars b{display:block;margin-top:9px;font-size:14px;line-height:1.4}
+        .goiaqg-feature__pillars p{margin:7px 0 0;color:#9fb8c0;font-size:12px;line-height:1.55}
+        .goiaqg-feature__notice{color:#9fbbc3;font-size:10px;line-height:1.5;letter-spacing:.05em;margin:22px 0 0}
+        @media(max-width:720px){.goiaqg-feature__pillars{grid-template-columns:1fr}.goiaqg-feature__inner{padding:27px 0 29px}}
         .consequence-first{background:radial-gradient(circle at 50% 0,rgba(77,201,255,.18),transparent 36%),linear-gradient(180deg,#01060c,#04131d);color:#f3f8fb;border-bottom:1px solid rgba(255,255,255,.08);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
         .consequence-first__inner{width:min(1220px,calc(100% - 36px));margin:auto;padding:54px 0 48px}
         .consequence-first__eyebrow{margin:0;color:#79dcff;font-size:10px;font-weight:950;letter-spacing:.2em}
