@@ -22,6 +22,18 @@ return <main style={{fontFamily:"Arial,sans-serif",background:"#f3f7f8",color:"#
 <p style={{fontSize:10,fontWeight:950,letterSpacing:1.4,marginTop:28}}>INDEPENDENT TA-14 CONFERENCE SURFACE · NOT AN EDIAQI ENDORSEMENT · OPEN FOR CORRECTION</p>
 </div></header>
 
+<section aria-label="EDIAQI 2026 historical milestone" style={{padding:"38px 6vw",background:"#fff",borderBottom:"1px solid #c9dce4"}}>
+<div style={{maxWidth:1160,margin:"auto"}}>
+<p style={{fontSize:11,fontWeight:950,letterSpacing:1.8,color:"#08799f"}}>DOCUMENTED INTERNATIONAL PRESENTATION · ZAGREB, CROATIA</p>
+<h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(30px,4vw,47px)",lineHeight:1.15,margin:"12px 0 20px"}}>September 29, 2026: TA-14 presented at EDIAQI.</h2>
+<p style={{fontSize:18,lineHeight:1.75,maxWidth:960}}>The EDIAQI organizing committee selected Greggory Don Butler's abstract for oral presentation on September 18. TA-14 presented on September 29, received written thanks from the organizer on September 30, and received a conference certificate on October 8. The original presentation and subsequent eight-image teaching gallery are preserved below.</p>
+<div style={{display:"flex",flexWrap:"wrap",gap:12,marginTop:22}}>
+<a href="#ediaqi-historical-record-2026" style={{display:"inline-block",padding:"13px 18px",background:"#062b3a",color:"#fff",fontWeight:800,textDecoration:"none"}}>View dated historical record ↓</a>
+<a href="#ediaqi-certificate-record" style={{display:"inline-block",padding:"13px 18px",border:"1px solid #08799f",color:"#075d7b",fontWeight:800,textDecoration:"none"}}>View certificate record ↓</a>
+</div>
+<p style={{fontSize:13,color:"#52666e",marginTop:18,lineHeight:1.6}}>This documents conference participation and recognition, not EDIAQI endorsement or validation of TA-14 or GO-IAQG.</p>
+</div></section>
+
 <section style={{padding:"70px 6vw",maxWidth:1160,margin:"auto"}}>
 <p style={{fontWeight:950,letterSpacing:2,fontSize:10,color:"#08799f"}}>01 · START WHERE IAQ STARTS</p>
 <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(38px,5vw,62px)",lineHeight:1.02,letterSpacing:"-.04em",maxWidth:950}}>Sensors. Dashboards. Thresholds. Analytics. Artificial intelligence.</h2>
@@ -113,7 +125,7 @@ return <main style={{fontFamily:"Arial,sans-serif",background:"#f3f7f8",color:"#
 <div style={{marginTop:28,padding:24,background:"#fff",border:"1px solid #d2e0e5",fontSize:13,lineHeight:1.75,color:"#455c65"}}><strong>Preservation rule.</strong> The material above remains the public presentation surface used for the conference. Post-presentation developments are appended beneath it rather than rewriting the record of what was presented.</div>
 </div></section>
 
-<section style={{padding:"76px 6vw",background:"#fff",borderTop:"1px solid #c9dce4"}}>
+<section id="ediaqi-certificate-record" style={{padding:"76px 6vw",background:"#fff",borderTop:"1px solid #c9dce4"}}>
 <div style={{maxWidth:1160,margin:"auto"}}>
 <p style={{fontWeight:950,letterSpacing:2,fontSize:10,color:"#08799f"}}>11 · INDEPENDENT CONFERENCE DOCUMENT · 8 OCT 2026</p>
 <h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(38px,5vw,62px)",lineHeight:1.05,letterSpacing:"-.04em"}}>Certificate of Presentation received.</h2>
