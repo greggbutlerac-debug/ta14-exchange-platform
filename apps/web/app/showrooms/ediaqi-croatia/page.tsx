@@ -186,6 +186,30 @@ return <main style={{fontFamily:"Arial,sans-serif",background:"#f3f7f8",color:"#
 </article>
 <p style={{fontSize:13,lineHeight:1.8,color:"#455c65"}}><strong>Gallery provenance:</strong> TA14 educational illustrations added after the conference. Their illustrative measurements and scenes are not presented as measured conditions from the EDIAQI venue or as conference-issued material. Audio narration is not yet included in this version.</p>
 </div></section>
+
+<section id="ediaqi-historical-record-2026" style={{padding:"80px 6vw",background:"#e7f2f5",borderTop:"2px solid #a5cbd8"}}>
+<div style={{maxWidth:1160,margin:"auto"}}>
+<p style={{fontWeight:950,letterSpacing:2,color:"#08799f",fontSize:11}}>ARCHIVED INSTITUTIONAL HISTORY · CROATIA · ZAGREB · 2026</p>
+<h2 style={{fontFamily:"Georgia,serif",fontSize:"clamp(38px,5vw,64px)",lineHeight:1.07,maxWidth:1020}}>From a selected conference presentation to a preserved international research record.</h2>
+<p style={{fontSize:19,lineHeight:1.8,maxWidth:950}}>On 29 September 2026, Greggory Don Butler presented TA-14 Authority Governance Institution's work at the EDIAQI Indoor Air Quality Conference in Zagreb, Croatia. The existing presentation and eight-image educational gallery above are preserved as separate historical and teaching material. This dated addition records the correspondence and subsequent governance development without rewriting the original talk.</p>
+<div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:14,margin:"35px 0"}}>
+{[
+["18 SEPTEMBER 2026","Abstract selected","The EDIAQI organizing committee confirmed selection of TA-14's abstract for an oral presentation, citing its quality and relevance."],
+["29 SEPTEMBER 2026","Presentation delivered","TA-14 presented the difference between monitoring indoor air and establishing the evidence, authority and standing needed before physical action. The existing showroom served as the presentation visual."],
+["30 SEPTEMBER 2026","Organizer's written response","Alex Borg thanked Greggory for the presentation and confirmed an intention to circulate the showroom and presentation record to the EDIAQI consortium. This is an expressed intention, not proof of subsequent distribution or adoption."],
+["8 OCTOBER 2026","Certificate received","EDIAQI sent a certificate of participation and/or presentation. The certificate record appears above; recognition of presenting is not technical certification."],
+["OCTOBER 2026","Public acknowledgement","An EDIAQI EU conference recap publicly named Greggory Don Butler among the event's speakers and panellists. This establishes public acknowledgement, not institutional endorsement."]
+].map(([date,heading,detail])=><article key={date} style={{padding:25,background:"#fff",border:"1px solid #c4dce5"}}><p style={{fontSize:11,fontWeight:950,letterSpacing:1,color:"#08799f"}}>{date}</p><h3 style={{fontFamily:"Georgia,serif",fontSize:26,margin:"12px 0"}}>{heading}</h3><p style={{lineHeight:1.75,color:"#425965"}}>{detail}</p></article>)}
+</div>
+<div style={{padding:"36px",background:"#062b3a",color:"#fff"}}>
+<p style={{fontWeight:950,fontSize:11,letterSpacing:1.5,color:"#8de7ff"}}>CONTINUING WORK · GO-IAQG</p>
+<h3 style={{fontFamily:"Georgia,serif",fontSize:"clamp(29px,4vw,45px)",margin:"12px 0"}}>Global Open Indoor Air Quality Governance</h3>
+<p style={{fontSize:18,lineHeight:1.75,maxWidth:920,color:"#d7e9ef"}}>GO-IAQG is a developing TA-14 governance initiative connecting indoor environmental observations, evidence continuity, admissibility, applicable authority, established standing, bounded execution and verifiable outcomes. It is a subsequent extension of TA-14's work, not a claim that EDIAQI presented, endorsed or adopted GO-IAQG.</p>
+<p style={{fontFamily:"Georgia,serif",fontSize:24,lineHeight:1.5,color:"#a6edff"}}>Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW?</p>
+<a href="/showrooms/go-iaqg" style={{color:"#8de7ff",textDecoration:"underline",fontWeight:800}}>Explore the Global Open Indoor Air Quality Governance work →</a>
+</div>
+<p style={{fontSize:13,lineHeight:1.8,color:"#425965",marginTop:24}}><strong>Record integrity:</strong> The chronology above is grounded in September–October 2026 organizer correspondence and the EDIAQI public conference recap. The presentation was delivered by video conference; this page does not represent physical attendance. EDIAQI, its consortium, organizers and research institutions have not been represented as endorsing or adopting TA-14. All additional gallery images are illustrative and were created after the event.</p>
+</div></section>
 <footer style={{padding:"34px 6vw",background:"#02141c",color:"#8ca6b0",fontSize:10,letterSpacing:1,lineHeight:1.7}}><div style={{maxWidth:1160,margin:"auto"}}>🇭🇷 CROATIA · EDIAQI × TA-14 · PUBLIC CONFERENCE SURFACE · MONITORING → GOVERNANCE → CONSEQUENCE · NO ENDORSEMENT IMPLIED · TA-14 EXCHANGE</div></footer>
 </main>;
 }
