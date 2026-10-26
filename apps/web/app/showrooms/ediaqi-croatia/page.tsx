@@ -139,7 +139,9 @@ return <main style={{fontFamily:"Arial,sans-serif",background:"#f3f7f8",color:"#
 <p style={{fontSize:13,color:"#52666e"}}>Mario Lovrić · EDIAQI Scientific Coordinator</p>
 <p style={{fontSize:11,color:"#52666e",marginTop:22}}>Transcribed details from the issued certificate; this panel is not a reproduction of the signed original PDF.</p>
 </div>
-<p style={{fontSize:16,lineHeight:1.8,maxWidth:920}}>The original PDF, titled “Greggory Don Butler.pdf”, is retained as the source document. This public panel records its verified wording; the original PDF is not yet hosted here for download.</p>
+<p style={{fontSize:16,lineHeight:1.8,maxWidth:920}}>The original certificate PDF is now publicly available below. The panel above is a transcription for accessibility; the PDF is the original source document.</p>
+<a href="/Greggory%20Don%20Butler.pdf" target="_blank" rel="noopener noreferrer" style={{display:"inline-block",background:"#086d91",color:"#fff",padding:"15px 22px",fontWeight:900,textDecoration:"none",margin:"0 0 24px"}}>View original EDIAQI Certificate of Presentation (PDF) ↗</a>
+<p style={{fontSize:13,color:"#52666e",lineHeight:1.7,maxWidth:920}}>Source: EDIAQI certificate issued to Greggory Don Butler for the September 29, 2026 oral presentation in Zagreb. This is documentation of participation, not technical certification or institutional endorsement.</p>
 <div style={{padding:24,background:"#062b3a",color:"#fff",lineHeight:1.8,maxWidth:920}}><strong>Scope of recognition:</strong> The certificate confirms an oral presentation. It does not certify, validate, approve, or endorse TA14 governance architecture, its claims, or any implementation. The earlier presentation surface and its chronology remain unchanged.</div>
 </div></section>
 
