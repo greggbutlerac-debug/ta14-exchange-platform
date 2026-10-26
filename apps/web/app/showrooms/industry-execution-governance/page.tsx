@@ -2,6 +2,16 @@
 import Link from 'next/link';
 import { useState } from 'react';
 
+function ChapterVisual({ index, name }: { index: number; name: string }) {
+  const [missing, setMissing] = useState(false);
+  const filename = `chapter-${String(index + 1).padStart(2, '0')}-${name.toLowerCase()}.png`;
+  return <figure style={{ margin: '22px 0' }}>
+    {missing ? <div role="status" style={{ padding: '36px 20px', border: '1px dashed #54727c', borderRadius: 12, color: '#b6d2d8', textAlign: 'center' }}>Chapter illustration awaiting asset publication</div> : <img src={`/showrooms/industry-execution-governance/${filename}`} alt={`Illustrative TA14 governance diagram: ${name}`} loading="lazy" onError={() => setMissing(true)} style={{ display: 'block', width: '100%', maxWidth: 1100, height: 'auto', borderRadius: 12, border: '1px solid #315461' }} />}
+    <figcaption style={{ marginTop: 10, fontSize: 13, color: '#d8c68d' }}>Illustrative only. Synthetic engineering scenario; not evidence of deployment or validated outcomes.{index === 7 ? ' Health, attendance and engagement claims appearing within the draft illustration are not substantiated and must not be treated as findings.' : ''}</figcaption>
+  </figure>;
+}
+
+
 const chapters = [
   {name:'Reality',question:'What is physically happening?',lesson:'A measured condition is an observation, not permission to intervene.',next:'Preserve the observations with their sources.',detail:'In our synthetic occupied-school example, CO₂, particulate matter, temperature, humidity, occupancy, and outdoor conditions are observed. No measurement alone establishes that a proposed ventilation change is safe or authorized.'},
   {name:'Record',question:'What can be demonstrated from original evidence?',lesson:'Preserve raw observations, provenance, calibration status, timestamps, and operating context.',next:'Examine continuity across the decision interval.',detail:'AIR/PAIR distinguishes observed readings from adjusted values, inferred values, and model outputs. Retain source identity and original files so another engineer can inspect the basis of the proposed action.'},
@@ -39,6 +49,7 @@ export default function IndustryExecutionGovernance() {
       {chapters.map((c,i)=><article key={c.name} id={'chapter-'+(i+1)} style={{margin:'22px 0',padding:'clamp(20px,3vw,34px)',border:'1px solid #315461',borderRadius:14,background:i%2?'#102b36':'#0b222d'}}>
         <p style={{color:'#7ee0c5',letterSpacing:1,fontSize:13}}>CHAPTER {String(i+1).padStart(2,'0')} / 08</p>
         <h3 style={{fontSize:'clamp(25px,3vw,36px)',margin:'8px 0'}}>{c.name} — {c.question}</h3>
+        <ChapterVisual index={i} name={c.name} />
         <p style={{fontSize:18,lineHeight:1.7}}>{c.detail}</p>
         <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:14}}>
           <div style={{background:'#173946',padding:18,borderRadius:10}}><strong>What you learned</strong><p style={{lineHeight:1.6}}>{c.lesson}</p></div>
@@ -65,6 +76,6 @@ export default function IndustryExecutionGovernance() {
       <p><strong>Examination sequence:</strong> Select → Preserve → Examine → Compare → Report.</p>
       <p>For the seven-page companion brief, request the current PDF from <a href="mailto:ta14admissibleexecution@gmail.com?subject=TA14%20Professional%20Engineering%20Brief" style={{color:'#8be9d5'}}>ta14admissibleexecution@gmail.com</a>. A verified public PDF download will be added when the asset is published.</p>
     </section>
-    <footer style={{borderTop:'1px solid #315461',paddingTop:20,color:'#abc7cf'}}>TA14 Authority Governance Institution LLC · Educational demonstration · <Link href="/" style={{color:'#8be9d5'}}>TA14 Exchange</Link></footer>
+    <footer style={{borderTop:'1px solid #315461',paddingTop:20,color:'#abc7cf'}}>TA14 Authority Governance Institution · Educational demonstration · <Link href="/" style={{color:'#8be9d5'}}>TA14 Exchange</Link></footer>
   </main>;
 }
