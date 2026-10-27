@@ -3,6 +3,8 @@ import Link from 'next/link';
 import { useState } from 'react';
 
 function ChapterVisual({ index, name }: { index: number; name: string }) {
+  // Do not display the uncorrected Outcome draft: it contains unsupported health/attendance claims.
+  if (index === 7) return <figure style={{ margin: '22px 0' }}><div role="note" style={{ padding: '36px 20px', border: '1px dashed #54727c', borderRadius: 12, color: '#d8c68d', textAlign: 'center' }}>Outcome illustration withheld pending evidence-accurate revision. Environmental observations do not establish student health or attendance outcomes.</div><figcaption style={{ marginTop: 10, fontSize: 13, color: '#d8c68d' }}>Illustrative synthetic scenario. No health, attendance, or causal-effect claims are established.</figcaption></figure>;
   const [missing, setMissing] = useState(false);
   const filename = `chapter-${String(index + 1).padStart(2, '0')}-${name.toLowerCase()}.png`;
   return <figure style={{ margin: '22px 0' }}>
