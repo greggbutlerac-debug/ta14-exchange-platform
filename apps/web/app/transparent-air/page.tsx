@@ -8,9 +8,9 @@ const GOOGLE_VERIFY_URL = 'https://www.google.com/search?q=Greggory+Don+Butler+H
 const GOOGLE_BUSINESS_URL = 'https://maps.app.goo.gl/mzJaBCXreAta8X1R9';
 
 export const metadata: Metadata = {
-  title: 'Transparent Air | AC Repair, Heat Pump Service & $80 Second Opinions in Pinellas County',
+  title: 'Transparent Air | AC Maintenance, Repair & Heat Pump Service in St. Petersburg',
   description:
-    'AC not working? Transparent Air provides evidence-based AC diagnostics, heat pump service, repair evaluations, and $80 second opinions across South Pinellas County, Florida.',
+    'Schedule year-round AC maintenance and seasonal heat pump heating-readiness checks with Transparent Air in Gulfport and South St. Petersburg. Diagnostics and second opinions available.',
   alternates: { canonical: PAGE_URL },
   robots: { index: true, follow: true },
   openGraph: {
@@ -145,6 +145,34 @@ export default function TransparentAirPage() {
           </aside>
         </div>
       </header>
+
+      <section className="section alt" aria-label="AC maintenance and heating readiness">
+        <div className="wrap decisionGrid">
+          <div>
+            <div className="eyebrow" style={{color:'#087f89'}}>Seasonal maintenance · South Pinellas</div>
+            <h2>Florida cooling is year-round. Check the heat before you need it.</h2>
+            <p>Book an AC maintenance visit to review system operation, airflow, filters, drainage, and accessible equipment conditions. If your system provides heat, ask for a heating-readiness check before the occasional cold Florida night.</p>
+            <p>Our approach starts with observable conditions. We explain findings and discuss any proposed repair before additional work.</p>
+            <div className="actions">
+              <a className="btn primary" href={PHONE_HREF}>CALL TO SCHEDULE · {PHONE_DISPLAY}</a>
+              <a className="btn outline" href={GOOGLE_BUSINESS_URL} target="_blank" rel="noopener noreferrer">FIND TRANSPARENT AIR ON GOOGLE ↗</a>
+            </div>
+          </div>
+          <div className="offer">
+            <div className="eyebrow" style={{color:'#087f89'}}>Ask about a maintenance appointment</div>
+            <h3 style={{fontSize:28,margin:'12px 0'}}>Cooling maintenance + heating-readiness review</h3>
+            <ul className="list">
+              <li>Cooling operation and thermostat response</li>
+              <li>Airflow, filters, and accessible equipment conditions</li>
+              <li>Condensate drainage observations</li>
+              <li>Heating operation check where applicable</li>
+              <li>Documented findings and next-step discussion</li>
+            </ul>
+            <p style={{fontSize:13,color:'#6a7d82'}}>Scope and appointment pricing are confirmed when scheduling. Repairs or invasive diagnostics require separate authorization.</p>
+            <a className="btn primary" href={PHONE_HREF}>REQUEST MAINTENANCE · {PHONE_DISPLAY}</a>
+          </div>
+        </div>
+      </section>
 
       <section className="proofBar" aria-label="Transparent Air proof points">
         <div className="wrap proofGrid">
