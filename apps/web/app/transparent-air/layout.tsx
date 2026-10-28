@@ -27,6 +27,10 @@ export const metadata: Metadata = {
     'air conditioning repair South St Petersburg',
     'AC second opinion Pinellas County',
     'air conditioner second opinion',
+    'AC maintenance Gulfport FL',
+    'AC maintenance St Petersburg FL',
+    'AC not working near me South St Petersburg',
+    'heat pump heating check St Petersburg',
     'AC diagnostics',
     'HVAC diagnostics',
     'AC not cooling',
@@ -67,6 +71,8 @@ export default function TransparentAirLayout({
   return (
     <>
       <TransparentAirCallAnalytics />
+      <a href="tel:+13863377215" className="ta-mobile-call" aria-label="Call Transparent Air at 386-337-7215">Call Transparent Air · 386-337-7215</a>
+      <style>{` .ta-mobile-call{display:none} @media(max-width:700px){.ta-mobile-call{display:flex;align-items:center;justify-content:center;position:fixed;bottom:12px;left:12px;right:12px;z-index:9999;min-height:54px;padding:12px 18px;background:#e7ad45;color:#082934;font-weight:900;text-decoration:none;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);font-size:15px} body{padding-bottom:70px}} `}</style>
       {children}
       <TransparentAirAuthorityCTA />
       <TransparentAirLocalNav />
