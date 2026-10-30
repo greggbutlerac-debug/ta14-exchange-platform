@@ -2,80 +2,87 @@ import type { Metadata } from "next";
 import Image from "next/image";
 
 export const metadata: Metadata = {
-  title: "Schillings Air × TA-14 | Proposed Retrofit Governance Integration",
-  description: "A technical exploration of evidence-to-execution governance for measurement-led HVAC retrofits. Concept only; no partnership or production integration is claimed.",
+  title: "Schillings Air × TA-14 | Integration Exploration",
+  description: "Proposed evidence-bound HVAC retrofit governance, illustrated through fictional technical examples.",
   robots: { index: false, follow: false },
 };
 
-const chain = [
-  ["01", "Reality", "Observed building conditions"],
-  ["02", "Record", "Attributable measurements"],
-  ["03", "Continuity", "Source, time, custody and change"],
-  ["04", "Admissibility", "Evidence fit to rely upon"],
-  ["05", "Binding", "Current authority and permitted scope"],
-  ["06", "Commit", "Authorized, bounded decision"],
-  ["07", "Execution", "Recorded intervention and actor"],
-  ["08", "Outcome", "Post-action examination and exceptions"],
+const sections = [
+  {
+    id: "architecture", label: "01 / INTEGRATION", title: "Keep the infrastructure. Govern the decision.",
+    image: "/HVAC Integration Architecture and Governance.png",
+    detail: "Existing HVAC sensors, BMS and service records remain the physical and operational sources. The proposed TA-14 layer examines continuity, admissibility, authority and scope before a consequential action. Actual interfaces require joint engineering validation.",
+  },
+  {
+    id: "evidence", label: "02 / EVIDENCE", title: "Establish the right to rely.",
+    image: "/HVAC Governance Evidence Dashboard.png",
+    detail: "The specimen illustrates Reality → Record → Continuity → Admissibility → Binding → Commit → Execution → Outcome. Displayed record identifiers, readings, signatures, hashes and verification states are fictional.",
+  },
+  {
+    id: "determinations", label: "03 / RUNTIME", title: "Four determinations, four distinct consequences.",
+    image: "/Four Determinations_ TA-14 HVAC Governance Matrix.png",
+    detail: "ALLOW authorizes only the bounded permitted action. HOLD awaits admissible evidence. DENY blocks an impermissible request. ESCALATE refers an unresolved matter to accountable authority. Existing safety interlocks remain controlling.",
+  },
+  {
+    id: "workflow", label: "04 / HVAC METHOD", title: "Evidence before intervention.",
+    image: "/TA-14 HVAC Performance Workflow.png",
+    detail: "HPR-BL baseline → NIRET gate → DDD after evidence is collected and frozen → authorized intervention where warranted → HPR-V post-intervention record. No invasive work is assumed to be necessary.",
+  },
+  {
+    id: "outcomes", label: "05 / HYPOTHETICAL CASE", title: "Separate action from examined outcome.",
+    image: "/HVAC Retrofit Governance_ Before and After.png",
+    detail: "The illustrated changes in CO₂, particulate matter, airflow and comfort are fictional teaching values, not measured Schillings Air results. They demonstrate the form of a proposed evidence comparison, not a performance guarantee.",
+  },
+  {
+    id: "pilot", label: "06 / DEPLOYMENT", title: "Observe first. Consider control only after validation.",
+    image: "/TA-14 Deployment Pathway Infographic.png",
+    detail: "Proposed paid Phase A: read-only shadow evaluation at one selected asset. Optional Phase B: bounded controlled execution only after agreed security, safety, timing, authority and failure-mode acceptance. Illustrated schedules and portfolio figures are not commitments.",
+  },
+  {
+    id: "owner", label: "07 / CUSTOMER DELIVERABLE", title: "A record the building owner can examine.",
+    image: "/Building Owner HVAC Verification Report.png",
+    detail: "This is a fictional report specimen. The depicted facility, signatories, QR code, hash, measurements, green approvals and outcomes do not constitute authentic verification or customer authorization.",
+  },
 ];
-const decisions = [
-  ["ALLOW", "Required evidence and authority are established for this bounded action."],
-  ["HOLD", "Evidence is missing, stale, discontinuous or not yet admissible."],
-  ["DENY", "The proposed action is prohibited or required authority is absent."],
-  ["ESCALATE", "A designated accountable authority must resolve the condition."],
-];
-export default function SchillingsAirShowroom() {
+
+export default function Page() {
   return (
-    <main className="min-h-screen bg-[#061a2a] text-white">
-      <div className="mx-auto max-w-6xl px-5 py-10 sm:px-8">
-        <div className="mb-10 flex flex-wrap items-center justify-between gap-4 border-b border-white/15 pb-5 text-sm">
-          <a href="/" className="font-semibold tracking-wide text-teal-300">TA-14 AUTHORITY</a>
-          <span className="rounded-full border border-amber-300/40 bg-amber-300/10 px-4 py-2 text-amber-100">PRIVATE REVIEW DRAFT · PROPOSED INTEGRATION</span>
+    <main className="min-h-screen bg-[#071522] text-white">
+      <div className="mx-auto max-w-7xl px-5 py-8 sm:px-8">
+        <div className="flex flex-wrap items-center justify-between gap-4 border-b border-white/20 pb-6">
+          <a href="/" className="font-bold tracking-[.18em] text-cyan-300">TA-14 AUTHORITY</a>
+          <span className="rounded-full border border-amber-300/40 px-4 py-2 text-xs font-semibold text-amber-200">DRAFT · TECHNICAL EXPLORATION ONLY</span>
         </div>
-        <section className="py-10 sm:py-16">
-          <p className="mb-5 text-sm font-semibold uppercase tracking-[.25em] text-teal-300">Executive technical exploration · October 2026</p>
-          <h1 className="max-w-4xl text-4xl font-bold leading-tight sm:text-6xl">Govern the decision.<br/><span className="text-teal-300">Examine the outcome.</span></h1>
-          <p className="mt-6 max-w-3xl text-lg leading-relaxed text-slate-300">A proposed evidence-to-execution governance layer alongside Schillings Air&apos;s measurement-led HVAC retrofit offering. Existing sensors, controls, maintenance records and engineering authority remain in place.</p>
-          <p className="mt-5 max-w-3xl text-sm text-amber-100">This page is a TA-14 concept for discussion. It does not announce a partnership, endorsement, commissioned integration, verified building result or approved Schillings Air deployment.</p>
+        <header className="py-16 sm:py-24">
+          <p className="text-sm font-semibold uppercase tracking-[.2em] text-cyan-300">Schillings Air × TA-14 · Proposed integration</p>
+          <h1 className="mt-6 max-w-5xl text-5xl font-black leading-tight sm:text-7xl">Govern the decision.<br/><span className="text-cyan-300">Examine the outcome.</span></h1>
+          <p className="mt-6 max-w-3xl text-xl leading-relaxed text-slate-300">An illustrated engineering exploration of how HVAC measurements and retrofit operations could be connected to evidence-bound admissible execution governance.</p>
+          <p className="mt-5 max-w-3xl border-l-2 border-amber-300 pl-4 text-sm leading-relaxed text-amber-100">No partnership, endorsement, integration or deployment is claimed. All displayed site details, performance figures, approvals and results are illustrative.</p>
+          <nav aria-label="Chapters" className="mt-9 flex flex-wrap gap-2">
+            {sections.map(s => <a key={s.id} href={"#"+s.id} className="rounded-full border border-white/20 px-4 py-2 text-xs font-semibold hover:border-cyan-300">{s.label}</a>)}
+          </nav>
+        </header>
+        <div className="space-y-24">
+          {sections.map(s => <section key={s.id} id={s.id} className="scroll-mt-8">
+            <p className="text-sm font-bold tracking-[.18em] text-cyan-300">{s.label}</p>
+            <h2 className="mt-3 max-w-4xl text-3xl font-bold sm:text-5xl">{s.title}</h2>
+            <p className="my-6 max-w-4xl text-lg leading-relaxed text-slate-300">{s.detail}</p>
+            <div className="overflow-hidden rounded-xl border border-white/20 bg-white shadow-xl">
+              <Image src={s.image} alt={s.title + " — illustrative technical diagram, not verified Schillings Air field evidence"} width={1536} height={1024} unoptimized className="h-auto w-full"/>
+            </div>
+            <p className="mt-3 text-xs text-slate-400">Concept artwork only. Fictional figures, site details and approval markings are not field evidence.</p>
+          </section>)}
+        </div>
+        <section className="mt-24 rounded-2xl border border-cyan-300/30 bg-[#0d293e] p-8 sm:p-12">
+          <p className="text-sm font-bold tracking-widest text-cyan-300">PROPOSED COMMERCIAL NEXT STEP</p>
+          <h2 className="mt-4 text-4xl font-bold">One bounded, paid shadow-mode pilot.</h2>
+          <p className="mt-5 max-w-4xl text-lg leading-relaxed text-slate-300">Exchange technical materials, identify a specific asset and intervention, define evidence and authority interfaces, and agree on a paid Phase A statement of work and acceptance tests. Any live-control gate is a separate decision.</p>
+          <a href="/TA14_Schillings_Integration_Technical_Proposal_v1%20(1).pdf" target="_blank" rel="noopener noreferrer" className="mt-8 inline-block rounded-lg bg-cyan-300 px-6 py-3 font-bold text-[#071522]">Open technical proposal v1 PDF</a>
+          <p className="mt-3 text-sm text-amber-200">This linked PDF is an earlier draft, not a final approved commercial proposal.</p>
         </section>
-        <section aria-label="Illustrative integration architecture" className="overflow-hidden rounded-2xl border border-white/15 bg-white p-2">
-          <Image src="/Schillings Air × TA-14 Retrofit Governance Infographic.png" alt="Illustrative Schillings Air and TA-14 HVAC governance concept, from building measurements through admissibility and authorization to post-intervention examination; all displayed readings and equipment depictions are fictional examples." width={1536} height={1024} unoptimized className="h-auto w-full" priority />
-        </section>
-        <p className="mt-3 text-xs leading-relaxed text-slate-400">Illustrative concept artwork. Equipment depictions, CO₂ and PM values, control changes, performance improvements and authorization statuses are examples only; none are Schillings Air field data or validated results.</p>
-        <section className="py-16">
-          <h2 className="text-3xl font-semibold">Where TA-14 would fit</h2>
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {[
-              ["01 / OBSERVE", "Existing building systems", "Read-only telemetry and records: CO₂, particulate matter, airflow, occupancy, filters, equipment status, maintenance and source metadata where available."],
-              ["02 / GOVERN", "TA-14 decision boundary", "Examine provenance, continuity, admissibility, applicable policy, authority, standing, permitted scope and freshness at the point of action."],
-              ["03 / EXAMINE", "Bounded outcome record", "Record the proposed and actual intervention, responsible actor, decision basis, post-action evidence, uncertainty and unresolved exceptions."],
-            ].map(([tag,title,body])=><article key={tag} className="rounded-xl border border-white/15 bg-white/5 p-6"><p className="text-sm font-semibold text-teal-300">{tag}</p><h3 className="mt-3 text-xl font-semibold">{title}</h3><p className="mt-3 leading-relaxed text-slate-300">{body}</p></article>)}
-          </div>
-        </section>
-        <section className="rounded-2xl border border-white/15 bg-[#0b2940] p-6 sm:p-9">
-          <h2 className="text-3xl font-semibold">Eight links. One bounded right to rely.</h2>
-          <div className="mt-7 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            {chain.map(([n,title,desc])=><div key={n} className="rounded-lg border border-white/10 bg-[#061a2a] p-4"><span className="text-sm font-bold text-teal-300">{n}</span><h3 className="mt-2 text-lg font-semibold">{title}</h3><p className="mt-2 text-sm text-slate-300">{desc}</p></div>)}
-          </div>
-          <p className="mt-6 font-semibold text-teal-300">No admissible evidence. No admissible execution.</p>
-        </section>
-        <section className="py-16">
-          <h2 className="text-3xl font-semibold">A decision is more than a score</h2>
-          <div className="mt-7 grid gap-4 sm:grid-cols-2">
-            {decisions.map(([label,body])=><div key={label} className="rounded-xl border border-white/15 bg-white/5 p-5"><h3 className="text-xl font-bold text-teal-300">{label}</h3><p className="mt-2 text-slate-300">{body}</p></div>)}
-          </div>
-          <p className="mt-5 text-sm text-slate-400">Safety-critical controls, emergency procedures and site engineering authority must not be displaced by an unvalidated governance gate.</p>
-        </section>
-        <section className="rounded-2xl border border-white/15 bg-white/5 p-7 sm:p-10">
-          <h2 className="text-3xl font-semibold">A practical, paid evaluation pathway</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2">
-            <div><h3 className="text-xl font-semibold text-teal-300">Phase A · Read-only shadow mode</h3><p className="mt-3 leading-relaxed text-slate-300">Select one asset class and intervention. Map available data, decision ownership and evidence quality. Exercise ALLOW, HOLD, DENY and ESCALATE against bounded scenarios without changing live controls.</p></div>
-            <div><h3 className="text-xl font-semibold text-teal-300">Phase B · Optional controlled gate</h3><p className="mt-3 leading-relaxed text-slate-300">Consider only after jointly validating interface security, safety, authority, latency, revalidation, bypass detection and failure behavior. Production integration is not assumed.</p></div>
-          </div>
-          <p className="mt-7 border-t border-white/15 pt-6 text-slate-300">Proposed deliverables: integration map, event and evidence contract, scenario results, reviewable decision record, limitations and a deployment recommendation. Commercial terms require a mutually agreed statement of work.</p>
-        </section>
-        <footer className="py-12 text-sm text-slate-400">
+        <footer className="mt-16 border-t border-white/20 py-8 text-sm text-slate-400">
           <p className="font-semibold text-white">Greggory Don Butler · Founder, TA-14 Authority Governance Institution</p>
-          <p className="mt-2">Technical concept only · No Schillings Air endorsement or deployment asserted.</p>
+          <p className="mt-2">No admissible evidence. No admissible execution.</p>
         </footer>
       </div>
     </main>
