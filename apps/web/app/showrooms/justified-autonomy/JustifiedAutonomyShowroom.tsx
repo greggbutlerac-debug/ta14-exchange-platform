@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import {useEffect, useMemo, useState} from 'react';
+import {useEffect, useMemo, useRef, useState} from 'react';
 import './showroom.css';
 
 type Determination = 'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE';
@@ -107,6 +107,9 @@ export default function JustifiedAutonomyShowroom(){
   const [voice,setVoice]=useState<SpeechSynthesisVoice|null>(null);
   const [voiceState,setVoiceState]=useState<VoiceState>('checking');
   const [speechMode,setSpeechMode]=useState<SpeechMode>('idle');
+  const [guided,setGuided]=useState(false);
+  const [guidedFinished,setGuidedFinished]=useState(false);
+  const narrationRun=useRef(0);
   const [changed,setChanged]=useState(false);
   const [challengeIndex,setChallengeIndex]=useState(0);
   const [answers,setAnswers]=useState<Record<number,Determination>>({});
@@ -133,27 +136,63 @@ export default function JustifiedAutonomyShowroom(){
   },[]);
 
   const stop=()=>{
+    narrationRun.current+=1;
     if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();
     setSpeechMode('idle');
+    setGuided(false);
   };
   const navigate=(index:number)=>{
-    stop();setLessonIndex(Math.max(0,Math.min(lessons.length-1,index)));
+    stop();
+    setGuidedFinished(false);
+    setLessonIndex(Math.max(0,Math.min(lessons.length-1,index)));
   };
-  const play=(preview=false)=>{
+  const speak=(index:number,preview=false,autoAdvance=false)=>{
     if(!voice||!('speechSynthesis' in window))return;
+    const run=++narrationRun.current;
     window.speechSynthesis.cancel();
     const u=new SpeechSynthesisUtterance(preview?
       'Hello. I am Samantha, your TA-14 Justified Autonomy teaching guide. The voice you are hearing is the Samantha voice selected by this device.':
-      lesson.narration);
+      lessons[index].narration);
     u.voice=voice;
     u.lang=voice.lang;
     u.rate=.9;
     u.pitch=1;
-    u.onstart=()=>setSpeechMode('speaking');
-    u.onend=()=>setSpeechMode('idle');
-    u.onerror=()=>setSpeechMode('idle');
+    u.onstart=()=>{if(run===narrationRun.current)setSpeechMode('speaking');};
+    u.onend=()=>{
+      if(run!==narrationRun.current)return;
+      if(autoAdvance){
+        if(index<lessons.length-1){
+          const next=index+1;
+          setLessonIndex(next);
+          // The visitor starts the tour; subsequent lessons continue without further clicks.
+          speak(next,false,true);
+        }else{
+          setGuided(false);
+          setGuidedFinished(true);
+          setSpeechMode('idle');
+        }
+      }else setSpeechMode('idle');
+    };
+    u.onerror=()=>{
+      if(run!==narrationRun.current)return;
+      setSpeechMode('idle');
+      setGuided(false);
+    };
     setSpeechMode('speaking');
     window.speechSynthesis.speak(u);
+  };
+  const play=(preview=false)=>{
+    stop();
+    setGuidedFinished(false);
+    speak(lessonIndex,preview,false);
+  };
+  const startGuide=()=>{
+    if(!voice)return;
+    stop();
+    setGuided(true);
+    setGuidedFinished(false);
+    setLessonIndex(0);
+    speak(0,false,true);
   };
   const pause=()=>{
     if(!('speechSynthesis' in window))return;
@@ -196,7 +235,21 @@ export default function JustifiedAutonomyShowroom(){
       </section>
 
       <section id="lessons" aria-label="Eight teaching lessons">
-        <div className="ja-section-heading"><div className="ja-eyebrow">STEP INTO THE ARCHITECTURE</div><h2>Eight images. Eight lessons. One consequential question.</h2><p>Choose any lesson, review its teaching image, then listen to Samantha explain the reasoning. Narration is manual; the page does not auto-play or auto-scroll.</p></div>
+        <div className="ja-section-heading"><div className="ja-eyebrow">STEP INTO THE ARCHITECTURE</div><h2>Eight images. Eight lessons. One consequential question.</h2><p>Choose any lesson, review its teaching image, then listen to Samantha explain the reasoning. Start Samantha's guided tour for continuous narration across all eight lessons, or choose any lesson and control playback yourself. Audio never starts without a click.</p></div>
+        <div className="ja-tour" aria-label="Samantha guided tour">
+          <div>
+            <div className="ja-eyebrow">SAMANTHA · COMPLETE EIGHT-LESSON TOUR</div>
+            <h3>Let Samantha guide you.</h3>
+            <p>One click starts at lesson one. Samantha explains each teaching image and advances to the next lesson when narration finishes. Pause, resume, or stop whenever you want.</p>
+            <div className="ja-voice-status" aria-live="polite">{guided?'Guided tour in progress · Lesson '+(lessonIndex+1)+' of 8':guidedFinished?'Guided tour complete · All eight lessons finished':voice?'Samantha available · Ready to begin':'Samantha must be available on this device to begin the guided tour.'}</div>
+          </div>
+          <div className="ja-voice-controls">
+            <button className="ja-primary" type="button" onClick={startGuide} disabled={!voice||guided}>▶ START SAMANTHA'S TOUR</button>
+            <button className="ja-control" type="button" onClick={pause} disabled={!guided||speechMode!=='speaking'}>Ⅱ PAUSE</button>
+            <button className="ja-control" type="button" onClick={resume} disabled={!guided||speechMode!=='paused'}>▶ RESUME</button>
+            <button className="ja-control" type="button" onClick={stop} disabled={!guided}>■ STOP TOUR</button>
+          </div>
+        </div>
         <div className="ja-stage-tabs" role="group" aria-label="Select a lesson">
           {lessons.map((l,i)=><button key={l.title} type="button" className="ja-tab" aria-current={lessonIndex===i?'step':undefined} onClick={()=>navigate(i)}><span>{String(i+1).padStart(2,'0')} / 08</span><strong>{l.title}</strong></button>)}
         </div>
@@ -228,7 +281,7 @@ export default function JustifiedAutonomyShowroom(){
                 <button className="ja-control" type="button" onClick={stop} disabled={speechMode==='idle'}>■ STOP</button>
               </div>
             </div>
-            <p className="ja-voice-note">Voice safeguard: the player selects a named English Samantha voice only. Browser operating systems supply the voice; if Samantha is missing, the site will not silently fall back to a male or unspecified voice. Install or enable Samantha in your device speech settings to use narration.</p>
+            <p className="ja-voice-note">Voice safeguard: the guided tour and lesson player select a named English Samantha voice only. Browser operating systems supply the voice; if Samantha is missing, the site will not silently fall back to a male or unspecified voice. Install or enable Samantha in your device speech settings to use narration.</p>
             <details className="ja-script"><summary>Read the complete narration transcript</summary><p>{lesson.narration}</p></details>
           </div>
           <div className="ja-lesson-nav">
