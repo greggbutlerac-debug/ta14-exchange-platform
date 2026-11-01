@@ -26,21 +26,24 @@ const chain = [
 ];
 type Result = "ALLOW" | "HOLD" | "DENY" | "ESCALATE";
 export default function Page() {
-  const [fresh, setFresh] = useState(true);
-  const [source, setSource] = useState(true);
-  const [authority, setAuthority] = useState(true);
+  const [fresh, setFresh] = useState(false);
+  const [source, setSource] = useState(false);
+  const [authority, setAuthority] = useState(false);
   const [safe, setSafe] = useState(true);
   const [conflict, setConflict] = useState(false);
   const [selected, setSelected] = useState(0);
   const [run, setRun] = useState(0);
+  const [history, setHistory] = useState<string[]>(["00 · Proposed outdoor-air increase received · HOLD · No admissible baseline or authorization yet"]);
+  const [committed, setCommitted] = useState(false);
+  const [changedContext, setChangedContext] = useState(false);
   const result: Result = useMemo(() => {
     if (!safe) return "DENY";
     if (conflict) return "ESCALATE";
-    if (!fresh || !source || !authority) return "HOLD";
+    if (!fresh || !source || !authority || changedContext) return "HOLD";
     return "ALLOW";
-  }, [safe, conflict, fresh, source, authority]);
+  }, [safe, conflict, fresh, source, authority, changedContext]);
   const reasons = {
-    ALLOW: "Illustrative checks pass. A real gate would still revalidate at binding and commit.",
+    ALLOW: "Illustrative checks pass for consideration at commit. This is not an actuation command.",
     HOLD: "Missing or stale evidence or missing authority prevents admissible execution.",
     DENY: "The proposed action violates a hard safety or policy boundary.",
     ESCALATE: "Conflicting instructions require a designated accountable authority.",
@@ -52,6 +55,7 @@ export default function Page() {
     { label: "Authorized actor and scope present", value: authority, set: setAuthority },
     { label: "Safety and policy boundary satisfied", value: safe, set: setSafe },
     { label: "Conflicting authority requires review", value: conflict, set: setConflict },
+    { label: "Changed context invalidates prior evidence", value: changedContext, set: setChangedContext },
   ];
   return <main className="min-h-screen bg-[#06121d] text-white">
     <div className="mx-auto max-w-7xl px-5 sm:px-8">
@@ -76,12 +80,12 @@ export default function Page() {
       <section id="simulator" className="scroll-mt-8 py-20">
         <p className="text-xs font-bold tracking-[.2em] text-cyan-300">INTERACTIVE GOVERNANCE LAB · SIMULATED</p>
         <h2 className="mt-3 text-4xl font-black sm:text-5xl">Change the evidence. Change the decision.</h2>
-        <p className="mt-5 max-w-3xl text-lg text-slate-300">Hypothetical request: increase outdoor-air intake for an AHU after elevated CO₂ observations. Toggle each condition to see how a simplified TA-14 determination changes. This is an educational simulation, not a connected HVAC controller or the production governance engine.</p>
+        <p className="mt-5 max-w-3xl text-lg text-slate-300">Hypothetical request: increase outdoor-air intake for an AHU after elevated CO₂ observations. Begin in HOLD. Establish the evidence and authority, then inject a failure or changed context to see how a simplified TA-14 determination changes. This is an educational simulation, not a connected HVAC controller or the production governance engine.</p>
         <div className="mt-9 grid gap-6 lg:grid-cols-[1.1fr_.9fr]">
           <div className="rounded-2xl border border-white/15 bg-[#102739] p-6 sm:p-8">
             <p className="mb-5 text-xs font-bold tracking-widest text-slate-400">INPUT CONDITIONS</p>
             <div className="space-y-3">{checks.map((c,i)=><label key={c.label} className="flex cursor-pointer items-center justify-between gap-4 rounded-xl border border-white/10 bg-[#071927] p-4"><span className="text-sm font-medium sm:text-base">{c.label}</span><input type="checkbox" checked={c.value} onChange={e=>c.set(e.target.checked)} className="h-5 w-5 shrink-0 accent-cyan-300" aria-label={c.label}/></label>)}</div>
-            <button type="button" onClick={()=>{setFresh(true);setSource(true);setAuthority(true);setSafe(true);setConflict(false);setRun(n=>n+1);}} className="mt-6 rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold hover:border-cyan-300">Reset scenario</button>
+            <button type="button" onClick={()=>{setFresh(false);setSource(false);setAuthority(false);setSafe(true);setConflict(false);setChangedContext(false);setCommitted(false);setHistory(["00 · Scenario reset · HOLD · No admissible baseline or authorization yet"]);setRun(n=>n+1);}} className="mt-6 rounded-lg border border-white/30 px-5 py-3 text-sm font-semibold hover:border-cyan-300">Reset scenario</button>
           </div>
           <div className="flex flex-col rounded-2xl border border-white/15 bg-[#102739] p-6 sm:p-8">
             <p className="text-xs font-bold tracking-widest text-slate-400">SIMULATED DETERMINATION</p>
@@ -95,7 +99,7 @@ export default function Page() {
               <p><strong className="text-white">Revalidation:</strong> A real implementation would check live context at commit.</p>
               <p><strong className="text-white">Replay:</strong> Change any input to inspect a new determination.</p>
             </div>
-            <p className="mt-auto pt-8 text-xs text-slate-400">Simplified rule ordering for demonstration only; not an implementation specification.</p>
+            <div className="mt-7 grid gap-3 sm:grid-cols-2"><button type="button" onClick={()=>setHistory(h=>[...h, String(h.length).padStart(2,"0")+" · Examination · "+result+" · "+reasons[result]])} className="rounded-lg border border-cyan-300/60 px-4 py-3 text-sm font-bold text-cyan-200">Record examination</button><button type="button" onClick={()=>{const permitted=result==="ALLOW";setCommitted(permitted);setHistory(h=>[...h,String(h.length).padStart(2,"0")+" · Commit attempt · "+(permitted?"SIMULATED ALLOW (no physical command)":"BLOCKED: "+result)]);}} className="rounded-lg bg-cyan-300 px-4 py-3 text-sm font-bold text-[#06121d]">Attempt simulated commit</button></div><p className="mt-4 text-sm text-slate-300">{committed?"Simulated commit permitted. No equipment was controlled.":"No simulated commit recorded as permitted."}</p><div className="mt-6 rounded-xl border border-white/15 bg-[#071927] p-4"><p className="text-xs font-bold tracking-widest text-cyan-300">EVENT REPLAY · LOCAL SESSION ONLY</p><ol aria-live="polite" className="mt-3 max-h-48 space-y-2 overflow-auto text-xs leading-relaxed text-slate-300">{history.map((item,i)=><li key={i} className="border-l border-cyan-300/40 pl-3">{item}</li>)}</ol></div><p className="mt-auto pt-8 text-xs text-slate-400">Simplified teaching model only. This replay is held in browser memory; it is not an admissible audit record or implementation specification.</p>
           </div>
         </div>
       </section>
