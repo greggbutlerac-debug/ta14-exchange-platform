@@ -14,31 +14,37 @@ const hero='TA-14 Continuous Commissioning Dashboard.png';
 const pdf='TA-14_Continuous_Commissioning_Governed_Execution_Concept_v2 (1).pdf';
 const asset=(x:string)=>'/'+encodeURIComponent(x);
 export default function CommissioningVisualLessons(){
- const [active,setActive]=useState(0),[speaking,setSpeaking]=useState(false);
- const [title,image,script]=images[active];
- function stop(){if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setSpeaking(false)}
- function select(i:number){stop();setActive(i)}
- function listen(){if(typeof window==='undefined'||!('speechSynthesis' in window))return;stop();const u=new SpeechSynthesisUtterance(title+'. '+script);u.lang='en-US';u.rate=.93;u.onend=()=>setSpeaking(false);u.onerror=()=>setSpeaking(false);window.speechSynthesis.speak(u);setSpeaking(true)}
- const buttonStyle={cursor:'pointer',border:'1px solid #57ddd5',borderRadius:9,padding:'10px 15px',color:'#eef',background:'#103543',fontWeight:750} as const;
+ const [speaking,setSpeaking]=useState<number|null>(null);
+ function stop(){if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setSpeaking(null)}
+ function listen(i:number,title:string,script:string){
+  if(typeof window==='undefined'||!('speechSynthesis' in window))return;
+  stop();const u=new SpeechSynthesisUtterance(title+'. '+script);u.lang='en-US';u.rate=.93;
+  u.onend=()=>setSpeaking(null);u.onerror=()=>setSpeaking(null);window.speechSynthesis.speak(u);setSpeaking(i);
+ }
+ const buttonStyle={cursor:'pointer',border:'1px solid #57ddd5',borderRadius:9,padding:'12px 17px',color:'#eef',background:'#103543',fontWeight:750} as const;
+ const fullImage={display:'block',width:'100%',height:'auto',border:'1px solid #315b6a',borderRadius:15} as const;
  return <section id="visual-lessons" style={{padding:'45px 0 60px',borderTop:'1px solid #315869'}}>
-   <div className="eyebrow">TA-14 AUTHORITY · NINE VISUALS · EIGHT LESSONS</div>
-   <h2 style={{font:'700 clamp(32px,5vw,55px)/1.08 Georgia,serif',margin:'10px 0'}}>The complete architecture. Then the details.</h2>
-   <p style={{color:'#adc5cf',lineHeight:1.7}}>Samantha explains each lesson in detail. All imagery and data are illustrative and the architecture remains an independent technical concept, not a deployed system.</p>
-   <img src={asset(hero)} alt="Complete TA-14 continuous commissioning and governed execution architecture, with Samantha" style={{width:'100%',height:'auto',border:'1px solid #315b6a',borderRadius:15}}/>
-   <div role="tablist" aria-label="Eight commissioning lessons" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'24px 0'}}>
-    {images.map((x,i)=><button key={x[0]} role="tab" aria-selected={i===active} aria-controls="visual-lesson-panel" onClick={()=>select(i)} style={{...buttonStyle,background:i===active?'#086b70':'#102936'}}>{String(i+1).padStart(2,'0')}</button>)}
+   <div className="eyebrow">TA-14 AUTHORITY · NINE FULL-WIDTH VISUALS · EIGHT LESSONS</div>
+   <h2 style={{font:'700 clamp(32px,5vw,55px)/1.08 Georgia,serif',margin:'10px 0'}}>The complete architecture. Then every lesson.</h2>
+   <p style={{color:'#adc5cf',lineHeight:1.7,fontSize:17}}>Scroll through all nine images in order. Each illustration fills the available page width, with Samantha's explanation below it. No tabs, hidden images or side-by-side panels.</p>
+   <div style={{margin:'32px 0 60px'}}>
+    <div className="eyebrow">OVERVIEW · THE COMPLETE ARCHITECTURE</div>
+    <h3 style={{fontSize:29,margin:'12px 0'}}>Continuous Commissioning &amp; Governed Execution</h3>
+    <img src={asset(hero)} alt="Complete TA-14 continuous commissioning and governed execution architecture, with Samantha" style={fullImage}/>
+    <p style={{color:'#c5d9df',lineHeight:1.8,fontSize:17,maxWidth:1000,margin:'24px 0 0'}}>Commissioning establishes verified performance against owner requirements. Master Systems Integration connects operational systems. TA-14 examines whether a particular proposed consequence has admissible evidence, applicable authority and established standing NOW. The eight lessons below follow that distinction through record continuity, commitment, bounded execution and verified outcomes.</p>
    </div>
-   <div id="visual-lesson-panel" role="tabpanel" style={{display:'flex',gap:22,flexWrap:'wrap',alignItems:'flex-start'}}>
-     <div style={{flex:'1 1 500px',minWidth:0}}><img src={asset(image)} alt={'TA-14 visual lesson '+(active+1)+': '+title} style={{width:'100%',height:'auto',borderRadius:15,border:'1px solid #315b6a'}}/></div>
-     <article style={{flex:'1 1 290px',minWidth:0,padding:22,borderRadius:15,border:'1px solid #315b6a',background:'#081a24'}}>
-       <div className="eyebrow">SAMANTHA · TECHNICAL INTERPRETATION · {String(active+1).padStart(2,'0')}</div>
-       <h3 style={{fontSize:25}}>{title}</h3><p style={{color:'#c5d9df',lineHeight:1.8}}>{script}</p>
-       <button style={buttonStyle} onClick={listen}>▶ Listen to Samantha interpretation</button>{' '}
-       <button style={buttonStyle} disabled={!speaking} onClick={stop}>■ Stop</button>
-       <p style={{color:'#91aeba',fontSize:12,lineHeight:1.5}}>Voice playback uses the visitor's browser speech engine. The exact interpretation is preserved in text. Samantha does not grant execution authority.</p>
-       <div style={{display:'flex',gap:10,flexWrap:'wrap'}}><button style={buttonStyle} disabled={active===0} onClick={()=>select(active-1)}>Previous</button><button style={buttonStyle} disabled={active===7} onClick={()=>select(active+1)}>Next lesson</button></div>
-     </article>
-   </div>
+   {images.map(([title,image,script],i)=><article key={image} id={'commissioning-lesson-'+(i+1)} style={{margin:'0 0 75px',paddingTop:25,borderTop:'1px solid #315869'}}>
+     <div className="eyebrow">LESSON {String(i+1).padStart(2,'0')} OF 08 · SAMANTHA'S TECHNICAL WALKTHROUGH</div>
+     <h3 style={{font:'700 clamp(30px,4.5vw,48px)/1.12 Georgia,serif',margin:'14px 0 22px'}}>{title}</h3>
+     <img src={asset(image)} alt={'Full-width TA-14 technical visual '+(i+1)+': '+title} style={fullImage} loading={i<2?'eager':'lazy'}/>
+     <div style={{margin:'25px 0 0',padding:'22px 0',borderBottom:'1px solid #294c5a'}}>
+       <h4 style={{fontSize:23,margin:'0 0 12px'}}>Samantha explains</h4>
+       <p style={{color:'#c5d9df',lineHeight:1.85,fontSize:17,maxWidth:1050,margin:'0 0 22px'}}>{script}</p>
+       <button type="button" style={buttonStyle} onClick={()=>listen(i,title,script)}>▶ Listen to Samantha's interpretation</button>{' '}
+       <button type="button" style={buttonStyle} disabled={speaking!==i} onClick={stop}>■ Stop</button>
+       <p style={{color:'#91aeba',fontSize:13,lineHeight:1.6}}>Narration uses the visitor's browser voice. The full explanation remains visible as text. No building equipment is controlled by this educational showroom.</p>
+     </div>
+   </article>)}
    <div style={{marginTop:60}}>
      <div className="eyebrow">TECHNICAL REFERENCE · VERSION 2.0 · 7 PAGES</div>
      <h2 style={{font:'700 clamp(30px,5vw,49px)/1.1 Georgia,serif'}}>Read the full technical concept.</h2>
