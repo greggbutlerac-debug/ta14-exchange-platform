@@ -48,9 +48,13 @@ export default function Page(){
  <header style={{padding:'30px 0 55px'}}>
  <p style={{color:'#85dfef',letterSpacing:2,fontSize:12,fontWeight:800}}>TA14 AUTHORITY GOVERNANCE INSTITUTION · INDEPENDENT ARCHITECTURAL SHOWROOM</p>
  <h1 style={{fontSize:'clamp(40px,7vw,83px)',letterSpacing:-2,lineHeight:1.04,maxWidth:1100}}>The HVAC System That <span style={{color:'#edc76a'}}>Remembers Its Entire Life.</span></h1>
- <p style={{fontSize:21,color:'#b9d2df',maxWidth:920,lineHeight:1.65}}>From equipment commissioning to annual operating evidence, system-generated Declared Diagnostic Determinations, AEA-governed interventions and lifetime accountability.</p>
+ <p style={{fontSize:21,color:'#b9d2df',maxWidth:920,lineHeight:1.65}}>Imagine an HVAC system whose installation, operating condition, service history and proposed interventions can be reconstructed years later—from original measurements, not memories or assurances. TA-14 proposes the governed evidence architecture to make that possible.</p>
  <p style={{color:'#eed28b',fontSize:12}}>PROPOSED INTEGRATED ARCHITECTURE · INDEPENDENT TECHNICAL EVALUATION INVITED · NO MANUFACTURER ENDORSEMENT</p>
- <a href={pdf} target="_blank" rel="noopener noreferrer" style={{display:'inline-block',background:'#77deeb',color:'#052130',padding:'15px 22px',marginTop:18,borderRadius:9,fontWeight:800,textDecoration:'none'}}>Read the 14-page manufacturer PDF ↗</a>
+ <div style={{display:'flex',flexWrap:'wrap',gap:12,marginTop:24}}>
+ <a href="#lessons" style={{display:'inline-block',background:'#77deeb',color:'#052130',padding:'15px 22px',borderRadius:9,fontWeight:800,textDecoration:'none'}}>Explore all eight lessons ↓</a>
+ <a href={pdf} target="_blank" rel="noopener noreferrer" style={{display:'inline-block',border:'1px solid #78bed4',color:'#b7eef7',padding:'15px 22px',borderRadius:9,fontWeight:800,textDecoration:'none'}}>Read the 14-page manufacturer PDF ↗</a>
+ <a href="#manufacturer-pilot" style={{display:'inline-block',border:'1px solid #668a9a',color:'#d9e7ec',padding:'15px 22px',borderRadius:9,textDecoration:'none'}}>Explore a manufacturer pilot ↓</a>
+ </div>
  <p style={{fontSize:12,color:'#9db7c7',lineHeight:1.65,maxWidth:940}}>Educational concepts and illustrations. Physical refrigerant governance, lifetime cloud custody, and warranty integrations are proposed capabilities requiring independent validation. This page does not issue a real DDD, authorization or warranty determination.</p>
  </header>
  <section style={{...panel,marginBottom:45}}>
@@ -64,7 +68,59 @@ export default function Page(){
  ].map(([n,title,copy])=><div key={n} style={{background:'#172e43',padding:18,borderRadius:10}}><b style={{color:'#77deeb'}}>{n} · {title}</b><p style={{lineHeight:1.6,color:'#c4d9e4',fontSize:13}}>{copy}</p></div>)}
  </div><p style={{color:'#f0d080'}}>Execution boundary: Admissible Evidence + Applicable Authority + Established Standing → NOW</p>
  </section>
- <section id="lessons" style={{scrollMarginTop:25}}>
+
+ <section style={{...panel,marginBottom:45}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12,fontWeight:800}}>THE INTEGRATED EXPRESSION OF AEA</p>
+ <h2 style={{fontSize:30,margin:'8px 0 18px'}}>Physical reality → trustworthy intelligence → authorized consequence</h2>
+ <p style={{color:'#bdd7e3',lineHeight:1.7,maxWidth:1000}}>AEA is the foundational execution architecture. The Nodes, Recorder, AIR, ACA, Analyzer, NIRET and Refrigerant Governor fulfill different responsibilities; none may convert technical capability into permission on its own.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(165px,1fr))',gap:10,margin:'25px 0'}}>
+ {[
+ ['01','NODES + RECORDER','Capture physical observations and maintain source lineage.'],
+ ['02','AIR','Preserve provenance, timestamps, continuity, uncertainty and admissibility context.'],
+ ['03','ACA','Trace calculations, assumptions, model boundaries and proposed consequences.'],
+ ['04','HVAC ANALYZER','Compare operating evidence with verified manufacturer specifications.'],
+ ['05','AEA','Check admissible evidence, applicable authority and established standing NOW.'],
+ ['06','GOVERNOR + OUTCOME','Enforce only a current authorized command; record the resulting reality.']
+ ].map(([num,name,copy])=><div key={num} style={{padding:'19px 16px',background:'#162f42',border:'1px solid #375a70',borderRadius:11}}>
+ <small style={{color:'#72dbe9',fontWeight:900}}>{num}</small><h3 style={{fontSize:14,margin:'12px 0 8px',color:'#fff'}}>{name}</h3><p style={{fontSize:12,lineHeight:1.6,color:'#c5d8e3'}}>{copy}</p>
+ </div>)}
+ </div>
+ <p style={{color:'#f3ce76',lineHeight:1.65}}>No admissible evidence. No admissible execution. Commissioned once does not mean authorized forever.</p>
+ </section>
+ <section style={{...panel,marginBottom:45}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12,fontWeight:800}}>THE FIELD SERVICE SEQUENCE</p>
+ <h2 style={{fontSize:30,margin:'8px 0 18px'}}>What happens on an actual service visit?</h2>
+ <p style={{color:'#bdd7e3',lineHeight:1.7}}>The showroom's teaching-image numbering is educational, not a replacement for the operational sequence. The proposed workflow keeps these steps in order:</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:11,margin:'20px 0'}}>
+ {[
+ ['01','HPR-BL','Complete all required baseline steps and freeze the authentic evidence.'],
+ ['02','NIRET','Decide whether refrigerant-system entry is justified using non-invasive evidence.'],
+ ['03','DDD','The governed Analyzer issues the evidence-bound operating determination.'],
+ ['04','INTERVENTION','Execute only an appropriately justified, currently authorized correction.'],
+ ['05','HPR-V','Document and verify the post-intervention performance and outcome.']
+ ].map(([n,title,copy])=><div key={n} style={{border:'1px solid #416477',padding:20,borderRadius:10,background:'#102c40'}}>
+ <b style={{color:'#87e5f1'}}>{n} · {title}</b><p style={{color:'#c5dbe3',lineHeight:1.65,fontSize:13}}>{copy}</p></div>)}
+ </div>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(290px,1fr))',gap:14,marginTop:22}}>
+ <div style={{background:'#182e3f',borderRadius:12,padding:22,border:'1px solid #335769'}}><h3 style={{marginTop:0}}>The technician documents the reality</h3><p style={{color:'#c8dde7',lineHeight:1.7}}>Identifies model and serial information, positions probes, observes equipment, photographs coils and components, records installed-part differences, completes guided steps, performs authorized physical work and explains findings to the homeowner.</p></div>
+ <div style={{background:'#182e3f',borderRadius:12,padding:22,border:'1px solid #335769'}}><h3 style={{marginTop:0}}>The governed system issues the determination</h3><p style={{color:'#c8dde7',lineHeight:1.7}}>Verifies the evidence, checks applicable manufacturer specifications, preserves computational lineage, issues the DDD after the frozen baseline, evaluates proposed corrections and tests admissibility, authority and standing before execution.</p></div>
+ </div>
+ <p style={{color:'#e9ce83',lineHeight:1.6,marginTop:22}}>The technician is essential to authentic evidence collection—but does not author or alter the formal DDD, or override the independent fail-closed Governor.</p>
+ </section>
+ <section style={{...panel,marginBottom:45}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12,fontWeight:800}}>ILLUSTRATIVE ENGINEERING EXAMINATION · NOT FIELD DATA</p>
+ <h2 style={{fontSize:30,margin:'8px 0 18px'}}>What can two air-side nodes actually establish?</h2>
+ <p style={{color:'#bdd7e3',lineHeight:1.75}}>Consider a hypothetical cooling system operating at <strong style={{color:'#fff'}}>1,600 CFM</strong>. If properly measured return-air enthalpy is <strong style={{color:'#fff'}}>31 Btu/lb of dry air</strong> and supply-air enthalpy is <strong style={{color:'#fff'}}>23 Btu/lb</strong>, the difference is 8 Btu/lb. Using the conventional approximate standard-air factor:</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12,margin:'22px 0'}}>
+ {[
+ ['AIRFLOW','1,600 CFM','Hypothetical, measured at appropriate conditions'],
+ ['ENTHALPY DIFFERENCE','8 Btu/lb','Return 31 − supply 23'],
+ ['ESTIMATED AIR-SIDE TOTAL CAPACITY','57,600 Btu/h','4.5 × CFM × Δh ≈ 4.8 tons']
+ ].map(([title,value,note])=><div key={title} style={{background:'#17374b',border:'1px solid #3c6a7c',borderRadius:12,padding:20}}><p style={{fontSize:11,letterSpacing:1,color:'#93e2ee',fontWeight:900}}>{title}</p><strong style={{fontSize:25,color:'#fff'}}>{value}</strong><p style={{fontSize:12,color:'#b5d3df',lineHeight:1.55}}>{note}</p></div>)}
+ </div>
+ <p style={{color:'#c7dce5',lineHeight:1.7}}>This estimate depends on air density, reliable flow and psychrometric measurements, sensor placement, mixing and uncertainty. It can help evaluate heat transfer; <strong>it cannot alone determine refrigerant charge, distinguish every fault, establish warranty coverage or authorize an intervention.</strong> The Analyzer must also examine electrical consumption, static pressure, coil and component inspections, operating context and the applicable manufacturer requirements.</p>
+ </section>
+  <section id="lessons" style={{scrollMarginTop:25}}>
  <p style={{color:'#77deeb',letterSpacing:2,fontSize:12}}>COMPLETE · SCROLLABLE · EIGHT-LESSON EXAMINATION</p>
  <h2 style={{fontSize:34}}>Every lesson and every visual, in sequence</h2>
  <p style={{lineHeight:1.65,color:'#b6d0de'}}>All eight main teaching images and both additional architecture references are displayed below. Scroll normally to read the whole experience. No image must be unlocked, selected, or advanced to appear.</p>
@@ -92,9 +148,32 @@ export default function Page(){
  </div>
  </div></article>)}
  </section>
+
  <section style={{...panel,marginTop:45}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12,fontWeight:800}}>THE LIFETIME EQUIPMENT RECORD</p>
+ <h2 style={{fontSize:30,margin:'8px 0 17px'}}>One machine. Many evidence events. No overwritten history.</h2>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:12}}>
+ {[
+ ['INSTALLATION','Commissioning baseline','Installed configuration, manufacturer match, original operating measurements and attributable inspection evidence.'],
+ ['YEAR 01','Annual operating record','Frozen measurements, observed changes, required maintenance and a current evidence-based determination.'],
+ ['YEAR 03','Component change','Original part identity, replacement justification, authorized repair, and independently verifiable post-record.'],
+ ['YEAR 07','Warranty investigation','Reconstruct historical conditions, compare actual policy terms, and examine the evidence without automatically assigning fault.']
+ ].map(([period,title,copy])=><div key={period} style={{background:'#172f43',border:'1px solid #375a70',padding:20,borderRadius:10}}><p style={{color:'#83e3f0',fontSize:12,fontWeight:900}}>{period}</p><h3 style={{margin:'8px 0',fontSize:18}}>{title}</h3><p style={{color:'#c5dbe6',lineHeight:1.7,fontSize:13}}>{copy}</p></div>)}
+ </div>
+ <p style={{color:'#a9c9d8',lineHeight:1.65}}>Illustrative chronology. The design proposes permissioned, auditable records for homeowners, contractors, manufacturers and warranty administrators; it does not imply a deployed cloud service or automatic warranty entitlement.</p>
+ </section>
+  <section id="manufacturer-pilot" style={{...panel,marginTop:45,scrollMarginTop:24}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12,fontWeight:800}}>INSTITUTIONAL EVALUATION INVITATION</p>
  <h2 style={{fontSize:30}}>Manufacturer and warranty evaluation</h2>
- <p style={{color:'#c4d8e2',lineHeight:1.75,maxWidth:950}}>Proposed pilot: verify commissioning against manufacturer-specific requirements, preserve source records and annual examinations, compare diagnostic reproducibility, test authorization boundaries and evaluate the usefulness of privacy-controlled lifetime records for engineering and warranty review. A record may support investigation, but warranty coverage depends on applicable terms and law.</p>
+ <p style={{color:'#c4d8e2',lineHeight:1.75,maxWidth:950}}>A proposed paid evaluation would test how equipment-specific evidence can improve engineering decisions, field service, product reliability and fair warranty review—not ask an institution to accept an unvalidated claim.</p>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(240px,1fr))',gap:12,margin:'22px 0'}}>
+ {[
+ ['PHASE 01','Define and verify','Agree on equipment models, authentic specs, sensor calibration, privacy and ownership, commissioning criteria, scope and independent review.'],
+ ['PHASE 02','Collect and challenge','Run bounded commissioning and maintenance cases; test gaps, changes in context, incorrect parts, intervention refusal and record integrity.'],
+ ['PHASE 03','Report measured value','Evaluate reproducibility, diagnostic agreement, record completeness, technician time, fault attribution limitations and warranty-review usability.']
+ ].map(([phase,title,copy])=><div key={phase} style={{background:'#17364a',border:'1px solid #3c6478',borderRadius:12,padding:22}}><small style={{color:'#88e2ef',fontWeight:900}}>{phase}</small><h3 style={{fontSize:19}}>{title}</h3><p style={{color:'#c5dbe4',fontSize:13,lineHeight:1.7}}>{copy}</p></div>)}
+ </div>
+ <p style={{color:'#b8d0dd',fontSize:13,lineHeight:1.65}}>Success is not assumed: acceptance criteria, contract terms, independent measurements and responsibility for any physical actions must be agreed before a pilot begins. Warranty eligibility remains subject to the actual contract and applicable consumer law.</p>
  <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:20}}><Link href="/showrooms/founding-institutional-sponsorship" style={{padding:'14px 20px',background:'#77deeb',color:'#062230',borderRadius:9,textDecoration:'none',fontWeight:800}}>Institutional engagement →</Link><a href={pdf} target="_blank" rel="noopener noreferrer" style={{padding:'14px 20px',border:'1px solid #537c91',color:'#a5e6f3',borderRadius:9,textDecoration:'none'}}>Technical brief PDF ↗</a></div>
  </section>
  <footer style={{marginTop:65,padding:'35px 0',borderTop:'1px solid #294756',fontSize:12,color:'#91aebb'}}>TA-14 · No admissible evidence. No admissible execution. · Architectural demonstration; not field authorization.</footer>
