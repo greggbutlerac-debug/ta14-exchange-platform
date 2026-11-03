@@ -1,6 +1,6 @@
 'use client';
 import Link from 'next/link';
-import {useEffect,useState} from 'react';
+import {Fragment,useEffect,useState} from 'react';
 
 const lessons=[
 {title:'The HVAC System That Remembers Its Entire Life',image:'HVAC Lifetime Accountability Architecture.png',focus:'Commissioning becomes the first attributable operating reference.',script:'An HVAC system should not lose its operating history whenever a technician leaves. TA-14 proposes a lifecycle evidence record that starts with commissioning and follows the equipment through inspections, maintenance, interventions and verified outcomes. A cryptographic seal can help reveal changes after recording, but does not alone prove that a reading was accurate. Establish source, context, calibration, installation quality and verified manufacturer specifications before treating a claim as proven.'},
@@ -14,6 +14,17 @@ const lessons=[
 ] as const;
 const pdf='/TA-14_The_HVAC_System_That_Remembers_Its_Entire_Life_V2_Manufacturer_Brief%20%281%29.pdf';
 const img=(name:string)=>'/'+encodeURIComponent(name);
+
+
+const learningCheckpoints=[
+ {learned:'A lifelong HVAC record starts with verified commissioning, attributable measurements and an original baseline that later visits cannot silently overwrite.',next:'How Environmental Integrity Nodes collect the physical measurements and source context needed to establish that baseline.'},
+ {learned:'Return-air and supply-air observations, airflow, static pressure, electrical data and inspections are evidence inputs—not automatic fault diagnoses or permissions to act.',next:'How the eight-link Admissible Execution Architecture keeps those measurements connected to continuity, admissibility and authorized consequences.'},
+ {learned:'The AEA chain separates reality, records, computation, authority, execution and verified outcomes. The ability to propose a control action is not permission to execute it.',next:'How the HVAC Analyzer produces a Declared Diagnostic Determination only after the 14-step evidence baseline is complete and frozen.'},
+ {learned:'A DDD is issued by the governed system from an evidence-bound baseline. The technician gathers and explains observations, but cannot create or alter that formal determination.',next:'Why refrigerant-system entry must first satisfy NIRET—and why a separate physical Governor enforces only specifically authorized adjustments.'},
+ {learned:'NIRET establishes whether invasive refrigerant work is justified. The Analyzer proposes; AEA evaluates authority and standing NOW; the independent Governor enforces a bounded, fail-closed action.',next:'How commissioning, diagnostics, authorized interventions and post-work measurements could become a permissioned lifetime equipment history.'},
+ {learned:'The proposed TA-14 Authority Cloud preserves the chronology of source records and later events. Integrity checks help reveal record changes, but do not by themselves establish measurement accuracy.',next:'How consented lifetime records could help manufacturers investigate equipment reliability and support fairer warranty examination.'},
+ {learned:'Lifetime evidence may improve product engineering and warranty investigations, but recorded correlation cannot automatically establish causation, customer fault or warranty eligibility.',next:'What a founding manufacturer or warranty partner would actually evaluate in a bounded pilot—and which claims still need independent testing.'}
+] as const;
 
 const supplemental: Record<number, {name:string;title:string;caption:string}[]> = {
   0: [{name:'TA-14 HVAC Lifecycle Evidence Ecosystem.png',title:'Ecosystem architecture reference',caption:'The wider lifetime equipment evidence architecture, from measurement through governed service and outcome.'}],
@@ -156,7 +167,7 @@ export default function Page(){
  <nav aria-label="Jump to a lesson" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'24px 0 40px'}}>
  {lessons.map((l,i)=><a key={l.title} href={'#lesson-'+String(i+1).padStart(2,'0')} style={{border:'1px solid #315267',background:'#10283b',color:'#b8e9f5',padding:'10px 12px',borderRadius:9,textDecoration:'none',fontSize:12}}>{String(i+1).padStart(2,'0')} · {l.title}</a>)}
  </nav>
- {lessons.map((lesson,i)=><article key={lesson.title} id={'lesson-'+String(i+1).padStart(2,'0')} style={{...panel,padding:0,overflow:'hidden',marginBottom:32,scrollMarginTop:24}}>
+ {lessons.map((lesson,i)=><Fragment key={lesson.title}><article id={'lesson-'+String(i+1).padStart(2,'0')} style={{...panel,padding:0,overflow:'hidden',marginBottom:0,scrollMarginTop:24}}>
  <div style={{padding:'24px 27px'}}>
  <p style={{color:'#77deeb',fontSize:12,fontWeight:800}}>LESSON {String(i+1).padStart(2,'0')} / 08</p>
  <h3 style={{fontSize:'clamp(25px,4vw,39px)',margin:'8px 0'}}>{lesson.title}</h3>
@@ -175,7 +186,19 @@ export default function Page(){
  <p style={{fontSize:12,fontWeight:800,color:'#8cdeee',letterSpacing:1}}>FULL NARRATION TRANSCRIPT</p>
  <p style={{lineHeight:1.8,color:'#d2e3ed',fontSize:15,marginBottom:0}}>{lesson.script}</p>
  </div>
- </div></article>)}
+ </div></article>
+ {i<learningCheckpoints.length&&<aside aria-label={'Learning checkpoint '+(i+1)+' to '+(i+2)} style={{margin:'20px 0 58px',padding:'clamp(21px,3vw,38px)',border:'1px solid #38647a',borderRadius:15,background:'linear-gradient(135deg,#0e3042,#081c2b 65%,#173449)'}}>
+ <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',borderBottom:'1px solid #35596d',paddingBottom:15,marginBottom:19}}>
+ <b style={{color:'#88deee',fontSize:12,letterSpacing:1.5}}>LEARNING CHECKPOINT</b>
+ <span style={{color:'#a3c7d6',fontSize:12}}>{String(i+1).padStart(2,'0')} → {String(i+2).padStart(2,'0')}</span>
+ </div>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:30}}>
+ <div><p style={{color:'#f1cf78',fontWeight:900,fontSize:12,letterSpacing:1.3}}>✓ WHAT YOU'VE LEARNED</p><h3 style={{fontSize:'clamp(22px,3vw,30px)',margin:'9px 0'}}>What we established</h3><p style={{color:'#d0e2eb',fontSize:16,lineHeight:1.8}}>{learningCheckpoints[i].learned}</p></div>
+ <div><p style={{color:'#f1cf78',fontWeight:900,fontSize:12,letterSpacing:1.3}}>→ WHAT YOU'LL LEARN NEXT</p><h3 style={{fontSize:'clamp(22px,3vw,30px)',margin:'9px 0'}}>{lessons[i+1].title}</h3><p style={{color:'#d0e2eb',fontSize:16,lineHeight:1.8}}>{learningCheckpoints[i].next}</p>
+ <a href={'#lesson-'+String(i+2).padStart(2,'0')} style={{display:'inline-block',padding:'8px 0',marginTop:4,color:'#82e3f5',fontWeight:800,textDecoration:'underline',textUnderlineOffset:6}}>Continue to lesson {String(i+2).padStart(2,'0')} ↓</a>
+ </div>
+ </div></aside>}
+ </Fragment>)}
  </section>
 
  <section style={{...panel,marginTop:45}}>
