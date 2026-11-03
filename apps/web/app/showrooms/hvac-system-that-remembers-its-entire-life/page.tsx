@@ -120,6 +120,35 @@ export default function Page(){
  </div>
  <p style={{color:'#c7dce5',lineHeight:1.7}}>This estimate depends on air density, reliable flow and psychrometric measurements, sensor placement, mixing and uncertainty. It can help evaluate heat transfer; <strong>it cannot alone determine refrigerant charge, distinguish every fault, establish warranty coverage or authorize an intervention.</strong> The Analyzer must also examine electrical consumption, static pressure, coil and component inspections, operating context and the applicable manufacturer requirements.</p>
  </section>
+
+ <section style={{...panel,marginBottom:45}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12,fontWeight:800}}>HYPOTHETICAL DDD · ILLUSTRATIVE VALUES ONLY</p>
+ <h2 style={{fontSize:30,margin:'8px 0 17px'}}>A real operating determination is not a repair suggestion.</h2>
+ <p style={{color:'#c7dce6',lineHeight:1.75,maxWidth:1000}}>Suppose a fictional four-ton unit has been identified by model and serial number. In this teaching example, the manufacturer dataset is stipulated as verified and applicable; the measurements below are invented to illustrate the <strong>separation of evidence, determination, proposal and authorization</strong>. They are not real manufacturer specifications, certified measurements, or a validated TA-14 output.</p>
+ <div style={{overflowX:'auto',margin:'20px 0'}}>
+ <table style={{width:'100%',borderCollapse:'collapse',minWidth:620,textAlign:'left',fontSize:14}}>
+ <thead><tr style={{background:'#244456'}}><th style={{padding:13}}>Evidence field</th><th style={{padding:13}}>Fictional applicable requirement</th><th style={{padding:13}}>Fictional observed condition</th><th style={{padding:13}}>Interpretation</th></tr></thead>
+ <tbody>
+ {[
+ ['Equipment identity','Matched model, serial and configuration','Identity and installed configuration documented','Applicable specification basis established'],
+ ['Airflow','1,500–1,700 CFM for stated mode','1,280 CFM','Below illustrative target'],
+ ['External static pressure','Maximum 0.50 in. w.c. at specified test point','0.83 in. w.c.','Elevated; inspect actual restrictions and measurement context'],
+ ['Blower capacitor','7.5 µF ± 5% for matched component','6.4 µF','Outside illustrative component tolerance'],
+ ['Coil inspection','Authentic image and condition report required','Image received; fouling not yet confirmed','Do not infer fouling from airflow alone'],
+ ['Refrigerant evidence','NIRET prerequisites and applicable methods','Airflow and electrical deviations unresolved','Refrigerant entry not justified on this record']
+ ].map(([field,required,observed,meaning],i)=><tr key={field} style={{background:i%2?'#0e2536':'#183349',borderBottom:'1px solid #34566a'}}><td style={{padding:12,fontWeight:800}}>{field}</td><td style={{padding:12,color:'#c5dce7'}}>{required}</td><td style={{padding:12,color:'#c5dce7'}}>{observed}</td><td style={{padding:12,color:'#f1d48f'}}>{meaning}</td></tr>)}
+ </tbody></table></div>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(235px,1fr))',gap:13,margin:'22px 0'}}>
+ {[
+ ['01 · RECORD','Preserve original airflow, static-pressure and capacitance measurements; equipment identity, photos, timestamps and uncertainty.'],
+ ['02 · DDD','After the complete 14-step baseline is frozen, the governed Analyzer may determine documented airflow and component deviations.'],
+ ['03 · PROPOSED CORRECTION','Inspect the actual airflow restriction and evaluate the out-of-tolerance capacitor for replacement. No refrigerant charging is proposed.'],
+ ['04 · AEA DISPOSITION','Illustrative HOLD on execution until the specific correction, qualified actor, authorization, standing and current conditions are established.'],
+ ['05 · OUTCOME','No corrected performance is claimed until an authorized repair occurs and HPR-V documents a new measurement event.']
+ ].map(([title,copy])=><div key={title} style={{background:'#17364a',border:'1px solid #41677b',borderRadius:12,padding:19}}><b style={{color:'#93e5f3'}}>{title}</b><p style={{color:'#c9dce6',fontSize:13,lineHeight:1.7}}>{copy}</p></div>)}
+ </div>
+ <p style={{color:'#eacb80',lineHeight:1.7}}>Teaching conclusion: the DDD identifies supported equipment conditions; NIRET evaluates refrigerant entry; optimization proposes a correction; AEA governs whether that specific correction may be executed NOW. These are separate events with distinct evidence and authority.</p>
+ </section>
   <section id="lessons" style={{scrollMarginTop:25}}>
  <p style={{color:'#77deeb',letterSpacing:2,fontSize:12}}>COMPLETE · SCROLLABLE · EIGHT-LESSON EXAMINATION</p>
  <h2 style={{fontSize:34}}>Every lesson and every visual, in sequence</h2>
@@ -173,8 +202,17 @@ export default function Page(){
  ['PHASE 03','Report measured value','Evaluate reproducibility, diagnostic agreement, record completeness, technician time, fault attribution limitations and warranty-review usability.']
  ].map(([phase,title,copy])=><div key={phase} style={{background:'#17364a',border:'1px solid #3c6478',borderRadius:12,padding:22}}><small style={{color:'#88e2ef',fontWeight:900}}>{phase}</small><h3 style={{fontSize:19}}>{title}</h3><p style={{color:'#c5dbe4',fontSize:13,lineHeight:1.7}}>{copy}</p></div>)}
  </div>
- <p style={{color:'#b8d0dd',fontSize:13,lineHeight:1.65}}>Success is not assumed: acceptance criteria, contract terms, independent measurements and responsibility for any physical actions must be agreed before a pilot begins. Warranty eligibility remains subject to the actual contract and applicable consumer law.</p>
- <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:20}}><Link href="/showrooms/founding-institutional-sponsorship" style={{padding:'14px 20px',background:'#77deeb',color:'#062230',borderRadius:9,textDecoration:'none',fontWeight:800}}>Institutional engagement →</Link><a href={pdf} target="_blank" rel="noopener noreferrer" style={{padding:'14px 20px',border:'1px solid #537c91',color:'#a5e6f3',borderRadius:9,textDecoration:'none'}}>Technical brief PDF ↗</a></div>
+ <div style={{background:'#0c2e40',border:'1px solid #45738a',borderRadius:12,padding:22,margin:'20px 0'}}>
+ <h3 style={{fontSize:21,margin:'0 0 12px'}}>What an evaluation partner receives</h3>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))',gap:13}}>
+ {[
+ ['Architecture mapping','An equipment-specific map of evidence acquisition, ACA computation, DDD issuance, AEA authorization and outcome custody.'],
+ ['Documented demonstration','A bounded set of commissioning and service scenarios, with source-to-conclusion traceability and explicit unsupported conditions.'],
+ ['Pilot evaluation report','Defined results, limitations, open risks, repeatability checks and potential next steps—not an automatically favorable determination.']
+ ].map(([title,copy])=><div key={title}><b style={{color:'#99e4f0'}}>{title}</b><p style={{fontSize:13,color:'#c7dce5',lineHeight:1.65}}>{copy}</p></div>)}
+ </div></div>
+ <p style={{color:'#b8d0dd',fontSize:13,lineHeight:1.65}}>Evaluation scope, data access, cost, deliverables and technical acceptance criteria are agreed in writing. Success is not assumed. Warranty eligibility remains subject to the actual contract and applicable consumer law.</p>
+ <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:20}}><Link href="/pricing" style={{padding:'14px 20px',background:'#77deeb',color:'#062230',borderRadius:9,textDecoration:'none',fontWeight:800}}>Request a scoped evaluation →</Link><Link href="/showrooms/founding-institutional-sponsorship" style={{padding:'14px 20px',border:'1px solid #537c91',color:'#a5e6f3',borderRadius:9,textDecoration:'none'}}>Founding institutional support →</Link><a href={pdf} target="_blank" rel="noopener noreferrer" style={{padding:'14px 20px',border:'1px solid #537c91',color:'#a5e6f3',borderRadius:9,textDecoration:'none'}}>Technical brief PDF ↗</a></div>
  </section>
  <footer style={{marginTop:65,padding:'35px 0',borderTop:'1px solid #294756',fontSize:12,color:'#91aebb'}}>TA-14 · No admissible evidence. No admissible execution. · Architectural demonstration; not field authorization.</footer>
  </div></main>
