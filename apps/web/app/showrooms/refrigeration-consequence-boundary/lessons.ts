@@ -3,8 +3,8 @@
  * the simulation's actual results, so every number spoken matches the evidence exports.
  * Every lesson separates ARCHITECTURAL INTENT from what the SIMULATION DEMONSTRATED.
  */
-import { BASELINE, sealBaseline } from '@/lib/refrigeration-boundary/baseline';
-import type { ScenarioResult } from '@/lib/refrigeration-boundary/scenarios';
+import { BASELINE, sealBaseline } from '../../../lib/refrigeration-boundary/baseline';
+import type { ScenarioResult } from '../../../lib/refrigeration-boundary/scenarios';
 
 export type ImageSpec = { filename: string; size: string; purpose: string; layout: string[]; labels: string[]; constraints: string[] };
 export type Lesson = { number: string; slug: string; title: string; narration: string; explain: string[]; intent: string; demonstrated: string; scenarioIds: string[]; image: ImageSpec };

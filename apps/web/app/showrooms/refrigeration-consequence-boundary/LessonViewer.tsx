@@ -113,7 +113,7 @@ export function LessonViewer({ lessons, figures }: { lessons: Lesson[]; figures:
 function ImageSlot({ spec, number }: { spec: Lesson['image']; number: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div role="note" aria-label={`Teaching image ${number} not yet produced`} style={{ aspectRatio: '16 / 9', width: '100%', border: '2px dashed #7BAFD4', borderRadius: 14, background: 'repeating-linear-gradient(135deg,#031a2e,#031a2e 14px,#04223a 14px,#04223a 28px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 16, overflow: 'auto' }}>
+    <div role="note" aria-label={`Teaching image ${number} not yet produced`} style={{ aspectRatio: '16 / 9', minHeight: 240, width: '100%', border: '2px dashed #7BAFD4', borderRadius: 14, background: 'repeating-linear-gradient(135deg,#031a2e,#031a2e 14px,#04223a 14px,#04223a 28px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 16, overflow: 'auto' }}>
       <b style={{ color: '#B9D9EB', fontSize: 'clamp(14px, 2.4vw, 20px)', letterSpacing: 1 }}>TEACHING IMAGE {number} · NOT YET PRODUCED</b>
       <code style={{ color: '#7BAFD4', marginTop: 8, fontSize: 12 }}>{spec.filename} · {spec.size}</code>
       <span style={{ color: '#89A9BF', fontSize: 13, marginTop: 8, maxWidth: 640 }}>{spec.purpose}</span>
