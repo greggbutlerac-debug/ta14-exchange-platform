@@ -13,6 +13,8 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['The HVAC System That Remembers Its Entire Life','/showrooms/hvac-system-that-remembers-its-entire-life','BUILDINGS & HVAC','Eight illustrated lessons Samantha narration manufacturer warranty equipment lifecycle commissioning 14-step baseline DDD NIRET refrigerant governor Atmospheric Integrity Records ACA AEA lifetime evidence cloud manufacturer pilot technical PDF'],
+
 ['AIRsana × TA-14 · From Environmental Intelligence to Governed Consequences','/showrooms/airsana-italy-collaboration','ORGANIZATIONS & PARTNERS','Independent exploratory Italy bilingual English Italian eight lesson environmental integrity governance Atmospheric Integrity Records Admissible Execution Architecture AEA educational images PDF Samantha narration simulated execution boundary proposed collaboration'],
 ['Justified Autonomy · The Execution Boundary','/showrooms/justified-autonomy','GOVERNANCE & ARCHITECTURES','Eight teaching images Samantha-only narrated guide three requirements admissible evidence applicable authority established standing eight-link execution chain binding commit revalidation ALLOW HOLD DENY ESCALATE interactive changing reality decision challenge PDF institutional technical publication'],
 ['Before Intelligence Becomes Reality · Government Building AI Governance','/showrooms/before-intelligence-becomes-reality','COUNTRIES & PUBLIC INSTITUTIONS','Global government flagship educational showroom AIR Atmospheric Integrity Records ACA Admissible Computation Architecture AI interpretation AEA execution authority building management systems BIM digital twins environmental accountability eight images Samantha technical PDF paid evaluation'],
