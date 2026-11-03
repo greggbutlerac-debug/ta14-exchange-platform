@@ -8,12 +8,12 @@ import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { it } from "vitest";
 import { scenarioExport, summaryExport } from "../../apps/web/lib/refrigeration-boundary/export";
-import { runAllScenarios } from "../../apps/web/lib/refrigeration-boundary/scenarios";
+import { runAllScenarios, runExtensionScenarios } from "../../apps/web/lib/refrigeration-boundary/scenarios";
 
 const OUT = join(__dirname, "..", "..", "apps/web/public/showrooms/refrigeration-consequence-boundary/evidence");
 
 it.skipIf(process.env.TA14_RCB_WRITE_EXPORTS !== "1")("write evidence exports", async () => {
-  const results = await runAllScenarios();
+  const results = [...await runAllScenarios(), ...await runExtensionScenarios()];
   mkdirSync(OUT, { recursive: true });
   for (const r of results) writeFileSync(join(OUT, `${r.id}.json`), JSON.stringify(scenarioExport(r)) + "\n");
   writeFileSync(join(OUT, "summary.json"), JSON.stringify(summaryExport(results), null, 1) + "\n");

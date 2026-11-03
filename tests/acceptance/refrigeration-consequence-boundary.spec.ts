@@ -7,7 +7,7 @@ import { canonical } from "../../apps/web/lib/refrigeration-boundary/canonical";
 import { EnvironmentalIntegrityNode } from "../../apps/web/lib/refrigeration-boundary/ein";
 import { scenarioExport } from "../../apps/web/lib/refrigeration-boundary/export";
 import { submitCommand } from "../../apps/web/lib/refrigeration-boundary/gate";
-import { SCENARIOS, runAllScenarios, runScenario, type ScenarioResult } from "../../apps/web/lib/refrigeration-boundary/scenarios";
+import { SCENARIOS, runAllScenarios, runExtensionScenarios, runScenario, type ScenarioResult } from "../../apps/web/lib/refrigeration-boundary/scenarios";
 import { verifyIncidentRecord, type IncidentRecord } from "../../apps/web/lib/refrigeration-boundary/verify";
 
 /*
@@ -18,11 +18,12 @@ import { verifyIncidentRecord, type IncidentRecord } from "../../apps/web/lib/re
 const ROOT = join(__dirname, "..", "..");
 const EXPORT_DIR = join(ROOT, "apps/web/public/showrooms/refrigeration-consequence-boundary/evidence");
 let results: ScenarioResult[];
+let extension: ScenarioResult[];
 const byId = (id: string) => results.find((r) => r.id === id)!;
 const claim = (id: string, capability: string) => byId(id).claims.find((c) => c.capability === capability)!;
 const webSha256 = async (text: string) => Buffer.from(await globalThis.crypto.subtle.digest("SHA-256", new TextEncoder().encode(text))).toString("hex");
 
-beforeAll(async () => { results = await runAllScenarios(); });
+beforeAll(async () => { results = await runAllScenarios(); extension = await runExtensionScenarios(); });
 
 describe("claimed capabilities: computed verdicts, including honest failures", () => {
   const expected: Record<string, Record<string, string>> = {
@@ -159,9 +160,10 @@ describe("reproducibility and exports", () => {
     }
   });
   it("the committed evidence exports match a fresh run", () => {
-    const files = readdirSync(EXPORT_DIR).filter((f) => /^S\d\.json$/.test(f)).sort();
-    expect(files).toEqual(results.map((r) => `${r.id}.json`));
-    for (const r of results) expect(canonical(JSON.parse(readFileSync(join(EXPORT_DIR, `${r.id}.json`), "utf8")))).toBe(canonical(JSON.parse(JSON.stringify(scenarioExport(r)))));
+    const all = [...results, ...extension];
+    const files = readdirSync(EXPORT_DIR).filter((f) => /^[SE]\d\.json$/.test(f)).sort();
+    expect(files).toEqual(all.map((r) => `${r.id}.json`).sort());
+    for (const r of all) expect(canonical(JSON.parse(readFileSync(join(EXPORT_DIR, `${r.id}.json`), "utf8")))).toBe(canonical(JSON.parse(JSON.stringify(scenarioExport(r)))));
   });
   it("the simulation contains no network calls or real control endpoints", () => {
     const dir = join(ROOT, "apps/web/lib/refrigeration-boundary");

@@ -300,6 +300,38 @@
      "status": "PASS"
     }
    ]
+  },
+  {
+   "id": "E1",
+   "title": "Loss of independent evidence with the emergency protective pathway",
+   "chainHead": "ab23c9a74cd55c924387539fe48d300e29228c19e6ddee8662ece54c6b4fff7d",
+   "entries": 595,
+   "claims": [
+    {
+     "capability": "EMERGENCY_PROTECTIVE_MEASURE_EXECUTED",
+     "status": "PASS"
+    },
+    {
+     "capability": "EMERGENCY_EFFECT_LIMITED_TO_SEALED_BASELINE",
+     "status": "PASS"
+    },
+    {
+     "capability": "ORDINARY_GOVERNANCE_STILL_HOLDS",
+     "status": "PASS"
+    },
+    {
+     "capability": "DETECTION",
+     "status": "NOT_DEMONSTRATED"
+    },
+    {
+     "capability": "OUTCOME_VERIFIED_BY_INDEPENDENT_EVIDENCE",
+     "status": "NOT_DEMONSTRATED"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
   }
  ],
  "verification": "Each incident record verifies with verifyIncidentRecord (apps/web/lib/refrigeration-boundary/verify.ts) or the showroom's in-browser verifier."

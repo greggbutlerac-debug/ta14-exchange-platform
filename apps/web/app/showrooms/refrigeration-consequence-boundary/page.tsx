@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { BASELINE, SIMULATION_LABEL, sealBaseline } from '@/lib/refrigeration-boundary/baseline';
-import { runAllScenarios } from '@/lib/refrigeration-boundary/scenarios';
+import { runAllScenarios, runExtensionScenarios } from '@/lib/refrigeration-boundary/scenarios';
+import { PROTECTIVE_MEASURES, emergencyProtocol } from '@/lib/refrigeration-boundary/emergency';
 import { AdversarialDemo, type DemoScenario } from './AdversarialDemo';
 import { DriftChart } from './DriftChart';
 import { LessonViewer } from './LessonViewer';
@@ -20,11 +21,13 @@ const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}
 
 export default async function RefrigerationConsequenceBoundaryPage() {
   const results = await runAllScenarios();
+  const extension = await runExtensionScenarios();
+  const protocol = emergencyProtocol();
   const lessons = buildLessons(results);
   const seal = sealBaseline().sealSha256;
   const r = (id: string) => results.find((x) => x.id === id)!;
-  const demo: DemoScenario[] = results.map((x) => ({
-    id: x.id, title: x.title, attempted: x.attempted, outcome: x.outcome, unproven: x.unproven,
+  const demo: DemoScenario[] = [...results, ...extension].map((x) => ({
+    id: x.id, title: x.id.startsWith('E') ? `${x.title} (extension)` : x.title, attempted: x.attempted, outcome: x.outcome, unproven: x.unproven,
     bypass: x.groundTruth.bypassActions,
     submissions: x.aea.submissions.map((s) => ({ commandId: s.commandId, label: s.label, actorId: s.actorId, atMinute: s.atMinute, determination: s.determination, reasonCodes: s.reasonCodes, executed: s.executed, execution: s.execution && { determination: s.execution.determination, reasonCodes: s.execution.reasonCodes }, replayId: s.gcea.replayId })),
     transitions: x.ein.transitions.map((t) => ({ minute: t.minute, to: t.to, findings: t.findings })),
@@ -51,7 +54,7 @@ export default async function RefrigerationConsequenceBoundaryPage() {
   );
 
   return (
-    <main style={{ background: '#001426', color: '#fff', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif' }}>
+    <main style={{ background: '#001426', color: '#fff', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif', overflowWrap: 'anywhere' }}>
       <div role="note" style={{ background: '#E8B04B', color: '#001426', padding: '10px 16px', fontWeight: 900, fontSize: 13, textAlign: 'center' }}>{SIMULATION_LABEL} · UNLISTED PREVIEW · NOT FOR PUBLICATION UNTIL APPROVED</div>
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: '32px 16px 64px' }}>
         <header style={{ marginBottom: 28 }}>
@@ -68,6 +71,20 @@ export default async function RefrigerationConsequenceBoundaryPage() {
 
         <LessonViewer lessons={lessons} figures={{ '04': chart('S4', 'S4 · falsified controller reporting'), '05': latency, '08': matrix }} />
         <AdversarialDemo scenarios={demo} baseline={{ band: BASELINE.approvedAirBandC, productLimit: BASELINE.productLimitC, setpoint: BASELINE.setpointC, defrost: `${BASELINE.defrost.startsAt.join(', ')} × ${BASELINE.defrost.durationMin} min`, sealSha256: seal }} />
+
+        <section id="emergency-pathway" aria-label="Emergency-response pathway" style={{ margin: '0 0 32px', padding: 'clamp(14px, 3vw, 24px)', border: '1px solid #E8B04B', borderRadius: 18 }}>
+          <small style={{ color: '#E8B04B', fontWeight: 900, letterSpacing: 1 }}>DESIGN · EXAMINED IN SIMULATION (SCENARIO E1)</small>
+          <h2 style={{ fontFamily: 'Georgia, serif', fontSize: 'clamp(22px, 3.6vw, 30px)', margin: '6px 0 10px' }}>When independent evidence is lost: a separately authorized emergency pathway</h2>
+          <p style={{ color: '#C9E0EF', lineHeight: 1.8 }}>S6 is preserved as a failure case: with the independent evidence gone, ordinary governance held the corrective action, and the product warmed. The emergency pathway does not change that rule or the GCEA engine. It adds a narrow, pre-authorized route whose evidence is the recorded loss of evidence itself.</p>
+          <div style={{ overflowX: 'auto' }}><table style={{ borderCollapse: 'collapse', color: '#C9E0EF', fontSize: 14, minWidth: 640, width: '100%' }}>
+            <thead><tr>{['Tier', 'What it may do', 'What it requires'].map((h) => <th key={h} style={{ textAlign: 'left', padding: 8, borderBottom: '1px solid #285b78' }}>{h}</th>)}</tr></thead>
+            <tbody>
+              <tr><td style={{ padding: 8, verticalAlign: 'top' }}><b>E0 · Emergency notification</b></td><td style={{ padding: 8 }}>Tell the responder and the facility manager. No equipment effect.</td><td style={{ padding: 8 }}>An evidence-loss trigger. Always recorded.</td></tr>
+              <tr><td style={{ padding: 8, verticalAlign: 'top' }}><b>E1 · Protective measure</b></td><td style={{ padding: 8 }}>{Object.entries(PROTECTIVE_MEASURES).map(([k, v]) => <div key={k}><code>{k}</code>: {v}</div>)}Each only re-asserts a sealed-baseline value and takes no parameters.</td><td style={{ padding: 8 }}>A pre-issued authority scoped to the emergency route and the specific measure; emergency-responder standing; independent evidence lost for at least {protocol.activation.sustainedMin} minutes, computed from the EIN record; one use per incident; revalidation at execution; ordinary re-authorization afterwards.</td></tr>
+              <tr><td style={{ padding: 8, verticalAlign: 'top' }}><b>E2 · Consequential command</b></td><td style={{ padding: 8 }}>Defrost, any other setpoint, disabling alarms or reporting.</td><td style={{ padding: 8 }}><b>Not available on the emergency path.</b> Ordinary governance only: no admissible evidence, no admissible execution.</td></tr>
+            </tbody></table></div>
+          <p style={{ color: '#C9E0EF', lineHeight: 1.8 }}>The emergency route is refused whenever independent evidence is available, so it cannot be used to avoid ordinary governance. 22 adversarial tests cover stolen and expired grants, disguised commands, smuggled parameters, scope laundering, reuse, revocation and evidence returning before execution. In E1 the protective measure ran, but TA-14 still cannot show it helped: detection and outcome verification are NOT DEMONSTRATED.</p>
+        </section>
 
         <section aria-label="Governing requirements and limitations" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 12 }}>
           <div style={{ padding: 18, border: '1px solid #316987', borderRadius: 14 }}>
@@ -92,8 +109,8 @@ export default async function RefrigerationConsequenceBoundaryPage() {
         </section>
 
         <footer style={{ marginTop: 28, color: '#89A9BF', fontSize: 13, lineHeight: 1.8 }}>
-          <p>This examination was prompted by a refrigeration cybersecurity challenge raised by Kimon Onuma. No person or organization named or referenced here has reviewed, participated in, or endorsed this demonstration or its conclusions.</p>
-          <p>Evidence exports: {results.map((x) => <a key={x.id} href={`/showrooms/refrigeration-consequence-boundary/evidence/${x.id}.json`} style={{ color: '#B9D9EB', marginRight: 10 }}>{x.id}.json</a>)} · <a href="/showrooms/refrigeration-consequence-boundary/evidence/summary.json" style={{ color: '#B9D9EB' }}>summary.json</a></p>
+          <p>This is an independent TA-14 technical examination. No external party has reviewed, participated in, or endorsed this demonstration or its conclusions.</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px 12px', margin: '1em 0' }}>Evidence exports: {[...results, ...extension].map((x) => <a key={x.id} href={`/showrooms/refrigeration-consequence-boundary/evidence/${x.id}.json`} style={{ color: '#B9D9EB' }}>{x.id}.json</a>)}<a href="/showrooms/refrigeration-consequence-boundary/evidence/summary.json" style={{ color: '#B9D9EB' }}>summary.json</a></div>
           <p>The AEA decisions come from TA-14&apos;s production GCEA module, used unchanged. The EIN, EIR, actor checks, thermal model and attacker are simulation components. TA14 Authority Governance Institution · TA-14 Exchange.</p>
         </footer>
       </div>

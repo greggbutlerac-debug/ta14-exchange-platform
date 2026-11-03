@@ -13,6 +13,7 @@ import { EnvironmentalIntegrityRecorder } from './eir';
 import { executeCommitted, submitCommand, type Command, type HeldGrant, type SubmissionResult, type ExecutionResult } from './gate';
 import { verifyIncidentRecord, type IncidentRecord, type VerificationResult } from './verify';
 import type { MaterialChange } from '../governance-continuity-execution-authority';
+import { applyProtectiveMeasure, emergencyGrant, emergencyProtocol, evaluateEmergency, executeEmergency, protocolSeal, type HeldEmergencyGrant, type ProtectiveMeasure } from './emergency';
 
 export const DURATION_MIN = 1440;
 export const ATTACK_MINUTE = 180; // 03:00, outside every authorized defrost window
@@ -35,6 +36,8 @@ export type ScenarioDefinition = {
   response: 'AUTO' | 'NONE';
   revalidationDrill?: boolean;
   routineCommandDuringIncident?: boolean;
+  /** Extension only (never set on S1–S8): the separately authorized emergency protective pathway. */
+  emergency?: { measures: ProtectiveMeasure[]; activateAfterTriggerMin: number };
   capabilities: string[];
   unproven: string[];
 };
@@ -136,6 +139,33 @@ export const SCENARIOS: ScenarioDefinition[] = [
   },
 ];
 
+/** Extension scenarios. They do not alter S1–S8. */
+export const EXTENSION_SCENARIOS: ScenarioDefinition[] = [
+  {
+    id: 'E1', number: 9, title: 'Loss of independent evidence with the emergency protective pathway',
+    attempted: 'The S6 conditions (setpoint raised to +2 °C while the independent temperature evidence fails), with a pre-issued emergency protocol: after sustained evidence loss, the on-call responder requests the protective measure RESTORE_SEALED_SETPOINT.',
+    events: [{ at: ATTACK_MINUTE, kind: 'BYPASS', label: 'Direct controller write: setpoint +2 °C', apply: (c) => { c.setpointC = 2; } }],
+    probeFaults: [{ sourceId: 'P1', fromMinute: ATTACK_MINUTE - 10, mode: 'STUCK' }, { sourceId: 'P2', fromMinute: ATTACK_MINUTE - 10, mode: 'MISSING' }, { sourceId: 'AIR', fromMinute: ATTACK_MINUTE - 10, mode: 'MISSING' }],
+    response: 'AUTO',
+    emergency: { measures: ['RESTORE_SEALED_SETPOINT'], activateAfterTriggerMin: 20 },
+    capabilities: ['EMERGENCY_PROTECTIVE_MEASURE_EXECUTED', 'EMERGENCY_EFFECT_LIMITED_TO_SEALED_BASELINE', 'ORDINARY_GOVERNANCE_STILL_HOLDS', 'DETECTION', 'OUTCOME_VERIFIED_BY_INDEPENDENT_EVIDENCE', 'EVIDENCE_PRESERVATION'],
+    unproven: [
+      'That the protective measure helped: TA-14 has no independent evidence to show it. Only the simulation ground truth shows the effect.',
+      'That a compromised controller would honour the protective write. Here it does, by assumption.',
+      'That the attacker could not simply re-apply the change after the protective measure. Repeated attacks were not modelled, and each measure may be used once per incident.',
+      'In this run the measure happened to undo the attack before the product warmed. The responder could not have known that, because the action was taken without evidence of the deviation.',
+      'That re-asserting the sealed baseline is safe for every equipment state. The protocol is designed so measures only restore sealed values, but real equipment was not examined.',
+      ...COMMON_UNPROVEN,
+    ],
+  },
+];
+
+export async function runExtensionScenarios(): Promise<ScenarioResult[]> {
+  const out: ScenarioResult[] = [];
+  for (const d of EXTENSION_SCENARIOS) out.push(await runScenario(d));
+  return out;
+}
+
 type SeriesPoint = { minute: number; t: string; truthAirC: number; truthProductC: number; einAirC: number | null; einProductC: number | null; controllerReportedAirC: number; status: EinStatus; heaterOn: boolean; compressorOn: boolean };
 
 export type ScenarioResult = {
@@ -153,6 +183,7 @@ export type ScenarioResult = {
   groundTruth: { bypassActions: Array<{ minute: number; label: string }>; note: string };
   series: SeriesPoint[];
   record: IncidentRecord;
+  emergency: Array<{ minute: number; measure: string; stage: string; determination: string; reasonCodes: string[]; changed?: Record<string, unknown> }>;
 };
 
 export async function runScenario(def: ScenarioDefinition): Promise<ScenarioResult> {
@@ -187,6 +218,14 @@ export async function runScenario(def: ScenarioDefinition): Promise<ScenarioResu
   const pending: Array<{ at: number; run: () => void }> = [];
 
   eir.append(0, 'BASELINE_REFERENCE', { kind: 'RECORDER', id: 'EIR-SIM-01' }, true, { baselineId: BASELINE.baselineId, sealSha256: eir.sealed.sealSha256, note: 'The last authorized baseline is sealed and stored separately from observed reality.' }, null);
+  const protocol = emergencyProtocol();
+  const emergencyGrants: Record<string, HeldEmergencyGrant> = {};
+  const emergencyExecuted = new Set<string>();
+  const emergencyLog: Array<{ minute: number; measure: string; stage: 'SUBMITTED' | 'EXECUTED' | 'REFUSED'; determination: string; reasonCodes: string[]; changed?: Record<string, unknown> }> = [];
+  if (def.emergency) {
+    for (const m of def.emergency.measures) emergencyGrants[m] = { holderActorId: 'TECH-01', grant: emergencyGrant(m, -60, 1440) };
+    eir.append(0, 'EMERGENCY_PROTOCOL_ON_FILE', { kind: 'RECORDER', id: 'EIR-SIM-01' }, true, { protocolId: protocol.protocolId, protocolSeal: protocolSeal(protocol), activation: protocol.activation, measures: protocol.measures, grants: Object.values(emergencyGrants).map((g) => ({ authorityId: g.grant.authorityId, holder: g.holderActorId, consequence: g.grant.consequence, issuedBy: 'FM-01' })), note: 'Pre-issued, scoped emergency authority. Protective measures only; no consequential commands.' }, null);
+  }
 
   const evidence = () => ein.evidenceStanding(eir.entries.filter((e) => e.type === 'EIN_OBSERVATION').at(-1)?.entryHash ?? 'NO-EVIDENCE');
   const changeNow = (consequence: Command['consequence']): MaterialChange | null => incidentOpen && consequence !== 'RESTORE_AUTHORIZED_BASELINE'
@@ -234,6 +273,30 @@ export async function runScenario(def: ScenarioDefinition): Promise<ScenarioResu
     incidentOpen = true;
     eir.append(t, 'NOTIFICATION_SENT', { kind: 'RECORDER', id: 'EIR-SIM-01' }, true, { recipients: ['TECH-01 (on call)', 'FM-01'], channel: 'simulated notification', einStatus: ein.latest?.status });
     responseSteps.push({ minute: t, step: 'NOTIFICATION', detail: `Independent EIN status ${ein.latest?.status}; on-call technician and facility manager notified (simulated).` });
+    if (def.emergency) {
+      const e0 = evaluateEmergency({ actorId: 'TECH-01', request: { kind: 'EMERGENCY_NOTIFICATION', message: 'Independent evidence unavailable' }, held: null, ein, minute: t });
+      eir.append(t, 'EMERGENCY_NOTIFICATION', { kind: 'RECORDER', id: 'EIR-SIM-01' }, true, { tier: e0.tier, reasonCodes: e0.reasonCodes, einStatus: ein.latest?.status });
+      const at = t + def.emergency.activateAfterTriggerMin;
+      for (const measure of def.emergency.measures) {
+        pending.push({ at, run: () => {
+          const request = { kind: 'PROTECTIVE_MEASURE' as const, requestId: `EM-${def.id}-${measure}`, measure };
+          const d = evaluateEmergency({ actorId: 'TECH-01', request, held: emergencyGrants[measure] ?? null, ein, minute: at, protocol, executed: emergencyExecuted });
+          emergencyLog.push({ minute: at, measure, stage: 'SUBMITTED', determination: d.determination, reasonCodes: d.reasonCodes });
+          eir.append(at, 'EMERGENCY_MEASURE_SUBMITTED', { kind: 'AEA_GATE', id: 'GCEA-EMERGENCY-ROUTE' }, true, { requestId: request.requestId, measure, tier: d.tier, determination: d.determination, reasonCodes: d.reasonCodes, conditionEvidenceId: d.conditionEvidenceId, gceaReplayId: d.gcea?.replayId ?? null });
+          responseSteps.push({ minute: at, step: 'EMERGENCY_MEASURE_SUBMITTED', detail: `${measure}: ${d.determination} (${d.reasonCodes.join(', ')})` });
+          if (!d.permitted) return;
+          pending.push({ at: at + 5, run: () => {
+            const x = executeEmergency({ actorId: 'TECH-01', request, held: emergencyGrants[measure] ?? null, ein, minute: at + 5, protocol, executed: emergencyExecuted });
+            const changed = x.permitted ? applyProtectiveMeasure(measure, controller) : undefined;
+            if (x.permitted) emergencyExecuted.add(measure);
+            emergencyLog.push({ minute: at + 5, measure, stage: x.permitted ? 'EXECUTED' : 'REFUSED', determination: x.determination, reasonCodes: x.reasonCodes, changed });
+            eir.append(at + 5, x.permitted ? 'EMERGENCY_MEASURE_EXECUTED' : 'EMERGENCY_MEASURE_REFUSED', { kind: 'AEA_GATE', id: 'GCEA-EMERGENCY-ROUTE' }, true, { requestId: request.requestId, measure, determination: x.determination, reasonCodes: x.reasonCodes, changed: changed ?? null, gceaReplayId: x.gcea?.replayId ?? null });
+            responseSteps.push({ minute: at + 5, step: x.permitted ? 'EMERGENCY_MEASURE_EXECUTED' : 'EMERGENCY_MEASURE_REFUSED', detail: `${measure}: ${x.determination}${changed ? ` · set ${JSON.stringify(changed)}` : ''}` });
+            if (x.permitted) eir.append(at + 5, 'EMERGENCY_FOLLOW_UP_REQUIRED', { kind: 'RECORDER', id: 'EIR-SIM-01' }, true, { measure, followUp: protocol.followUp, note: 'An emergency protective measure is not an ordinary authorization. The incident stays open until ordinary governance re-authorizes with admissible evidence.' });
+          } });
+        } });
+      }
+    }
     pending.push({ at: t + 15, run: () => human(t + 15, 'HUMAN_ACKNOWLEDGED', 'TECH-01', { alertAtMinute: t }, 'ACKNOWLEDGED', 'TECH-01 acknowledges the alert.') });
     pending.push({ at: t + 20, run: () => {
       const executedAea = eir.entries.filter((e) => e.type === 'AEA_COMMAND_EXECUTED');
@@ -366,6 +429,7 @@ export async function runScenario(def: ScenarioDefinition): Promise<ScenarioResu
     groundTruth: { bypassActions, note: 'Available only because this is a simulation. Never supplied to the EIN, the EIR or the AEA gate.' },
     series,
     record,
+    emergency: emergencyLog,
   };
   result.claims = evaluateClaims(def, result);
   result.outcome = describeOutcome(result);
@@ -443,6 +507,26 @@ function evaluateClaims(def: ScenarioDefinition, r: ScenarioResult): Claim[] {
       const outcome = entries.find((e) => e.type === 'OUTCOME_RECORDED')?.payload as { firstNormalAfterRestoreMinute: number | null; independentStatusAtEnd: string } | undefined;
       const ok = !!outcome && outcome.firstNormalAfterRestoreMinute !== null && outcome.independentStatusAtEnd === 'NORMAL';
       return { capability: 'POST_INTERVENTION_VERIFICATION', status: ok ? 'PASS' : 'FAIL', basis: outcome ? `Independent EIN first NORMAL after restore at minute ${outcome.firstNormalAfterRestoreMinute}; status at end ${outcome.independentStatusAtEnd}.` : 'No outcome record.' };
+    },
+    EMERGENCY_PROTECTIVE_MEASURE_EXECUTED: () => {
+      const ex = r.emergency.filter((e) => e.stage === 'EXECUTED');
+      return { capability: 'EMERGENCY_PROTECTIVE_MEASURE_EXECUTED', status: ex.length ? 'PASS' : 'FAIL', basis: r.emergency.map((e) => `${e.minute} ${e.measure} ${e.stage} ${e.determination} (${e.reasonCodes.join(', ')})`).join(' · ') || 'No emergency activity.' };
+    },
+    EMERGENCY_EFFECT_LIMITED_TO_SEALED_BASELINE: () => {
+      const sealed: Record<string, unknown> = { setpointC: BASELINE.setpointC, defrostUntilMinute: null, alarmSuppressed: false };
+      const changes = r.emergency.filter((e) => e.stage === 'EXECUTED').map((e) => e.changed ?? {});
+      const ok = changes.length > 0 && changes.every((c) => Object.entries(c).every(([k, v]) => k in sealed && sealed[k] === v));
+      return { capability: 'EMERGENCY_EFFECT_LIMITED_TO_SEALED_BASELINE', status: ok ? 'PASS' : 'FAIL', basis: `Emergency changes: ${JSON.stringify(changes)}; sealed values: ${JSON.stringify(sealed)}.` };
+    },
+    ORDINARY_GOVERNANCE_STILL_HOLDS: () => {
+      const ordinary = corrective.filter((s) => !s.executed);
+      const ok = ordinary.length > 0 && ordinary.every((s) => s.determination === 'HOLD') && !corrective.some((s) => s.executed);
+      return { capability: 'ORDINARY_GOVERNANCE_STILL_HOLDS', status: ok ? 'PASS' : 'FAIL', basis: corrective.map((s) => `${s.commandId}: ${s.determination} (${s.reasonCodes.join(', ')})`).join(' · ') || 'No ordinary corrective submission.' };
+    },
+    OUTCOME_VERIFIED_BY_INDEPENDENT_EVIDENCE: () => {
+      const outcome = entries.find((e) => e.type === 'OUTCOME_RECORDED')?.payload as { independentStatusAtEnd: string } | undefined;
+      const verified = outcome?.independentStatusAtEnd === 'NORMAL';
+      return { capability: 'OUTCOME_VERIFIED_BY_INDEPENDENT_EVIDENCE', status: verified ? 'PASS' : 'NOT_DEMONSTRATED', basis: verified ? 'Independent evidence confirmed NORMAL at the end.' : `Independent status at end: ${outcome?.independentStatusAtEnd}. Whether the protective measure protected the product cannot be established from TA-14's evidence (simulation ground truth: product max ${r.physical.maxTruthProductC} °C, ${r.physical.truthMinutesProductAboveLimit} min above ${BASELINE.productLimitC} °C).` };
     },
     EVIDENCE_PRESERVATION: () => {
       const required = r.physical.changed || bypass ? ['EIN_OBSERVATION', 'EIN_STATUS_CHANGED', 'EIN_ALERT', 'OUTCOME_RECORDED'] : ['AEA_COMMAND_SUBMITTED', 'EIN_OBSERVATION', 'OUTCOME_RECORDED'];

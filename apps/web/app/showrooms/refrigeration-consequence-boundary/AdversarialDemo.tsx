@@ -106,7 +106,7 @@ export function AdversarialDemo({ scenarios, baseline }: { scenarios: DemoScenar
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: 12, marginTop: 12 }}>
         <div style={card}><b style={{ color: '#7BAFD4', fontSize: 12 }}>7 · AUTHORIZED CORRECTIVE ACTION</b>
-          {s.response.length === 0 ? <p style={{ color: '#C9E0EF' }}>None required.</p> : <ul style={{ color: '#C9E0EF', paddingLeft: 18, fontSize: 14, lineHeight: 1.6 }}>{s.response.filter((r) => /AUTHORITY|CORRECTIVE|ROUTINE/.test(r.step)).map((r, i) => <li key={i}>{hhmm(r.minute)} {r.step}: {r.detail}</li>)}</ul>}
+          {s.response.length === 0 ? <p style={{ color: '#C9E0EF' }}>None required.</p> : <ul style={{ color: '#C9E0EF', paddingLeft: 18, fontSize: 14, lineHeight: 1.6 }}>{s.response.filter((r) => /AUTHORITY|CORRECTIVE|ROUTINE|EMERGENCY/.test(r.step)).map((r, i) => <li key={i}>{hhmm(r.minute)} {r.step}: {r.detail}</li>)}</ul>}
         </div>
         <div style={card}><b style={{ color: '#7BAFD4', fontSize: 12 }}>8 · FINAL OUTCOME</b><p style={{ color: '#C9E0EF', lineHeight: 1.7, fontSize: 14 }}>{s.outcome}</p></div>
       </div>

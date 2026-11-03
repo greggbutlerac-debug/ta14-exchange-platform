@@ -14,7 +14,7 @@
 | Canonical hashing | EXISTS | `packages/domain/canonical-json.ts`, `packages/crypto/receipts.ts` | Same canonicalisation convention as GCEA |
 | Samantha narration | EXISTS (browser `speechSynthesis`, prefers the "Samantha" voice) | `apps/web/app/eight24-hvacdr/curriculum/01/LessonVisualSamantha.tsx` | **REQUIRES ADAPTATION:** that component requires a finished image and Spanish text, and has no EXPLAIN, previous/next or autoplay. A new English component follows its pattern |
 | Showroom infrastructure | EXISTS (23 showrooms; hand-maintained index and sitemap) | `apps/web/app/showrooms/*`, `apps/web/app/sitemap.ts` | New route, **unlisted**: not in the index or sitemap, with `robots: noindex` |
-| Related precedent | EXISTS | `apps/web/app/examinations/stop-the-cyber-attack` (Kimon's three-condition interoperability experiment); `apps/web/app/showrooms/onuma` | Not modified. **No refrigeration-specific challenge text is preserved in the repository** |
+| Related precedent | EXISTS | `apps/web/app/examinations/stop-the-cyber-attack` (an existing interoperability examination page) | Not modified and not referenced by this work |
 | Refrigeration thermal model | **MISSING** | — | Built here as an **illustrative, unvalidated** lumped model |
 | PDF tooling | **MISSING** (no PDF library); Google Chrome installed | — | HTML generated from actual results, printed with headless Chrome |
 | Image generation | **UNAVAILABLE** to the implementer | — | Image slots with exact production specifications. No placeholders presented as finished assets |

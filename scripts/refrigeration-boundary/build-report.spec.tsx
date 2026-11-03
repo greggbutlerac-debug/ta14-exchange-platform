@@ -13,7 +13,8 @@ import { it } from "vitest";
 import { DriftChart } from "../../apps/web/app/showrooms/refrigeration-consequence-boundary/DriftChart";
 import { BASELINE, SIMULATION_LABEL, sealBaseline } from "../../apps/web/lib/refrigeration-boundary/baseline";
 import { MODEL } from "../../apps/web/lib/refrigeration-boundary/plant";
-import { runAllScenarios, type ScenarioResult } from "../../apps/web/lib/refrigeration-boundary/scenarios";
+import { runAllScenarios, runExtensionScenarios, type ScenarioResult } from "../../apps/web/lib/refrigeration-boundary/scenarios";
+import { PROTECTIVE_MEASURES, emergencyProtocol } from "../../apps/web/lib/refrigeration-boundary/emergency";
 import { buildLessons } from "../../apps/web/app/showrooms/refrigeration-consequence-boundary/lessons";
 
 const OUT = join(__dirname, "..", "..", "docs/refrigeration-consequence-boundary/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.html");
@@ -21,7 +22,8 @@ const TEST_RESULTS = {
   date: "2026-11-03",
   base: "origin/main 04b58e0c",
   rcbSuite: "33 passed, 0 failed (tests/acceptance/refrigeration-consequence-boundary.spec.ts)",
-  fullSuite: "223 passed, 3 skipped (the gated export and report generator scripts, which run only when explicitly enabled), 0 failed; 23 test files",
+  emergencySuite: "28 passed, 0 failed (tests/acceptance/refrigeration-emergency-pathway.spec.ts), of which 22 are adversarial",
+  fullSuite: "251 passed, 3 skipped (the gated export and report generator scripts, which run only when explicitly enabled), 0 failed; 24 test files",
   typecheck: "tsc --noEmit: 0 errors",
   build: "next build: succeeded; /showrooms/refrigeration-consequence-boundary prerendered as static",
 };
@@ -55,7 +57,20 @@ function scenarioSection(r: ScenarioResult) {
   </table><div class="chart">${chart}</div></section>`;
 }
 
-function html(results: ScenarioResult[]) {
+function emergencySection(extension: ScenarioResult[]) {
+  const p = emergencyProtocol();
+  return `<h2>9A. Emergency-response pathway (extension)</h2>
+  <p>S6 is preserved unchanged as a documented failure: with independent evidence lost, ordinary governance held the corrective action and the product warmed. The GCEA engine is not modified to force an ALLOW. Instead, a separately authorized pathway is defined with three tiers that are never interchangeable.</p>
+  <table><tr><th>Tier</th><th>Permitted</th><th>Required</th></tr>
+  <tr><td>E0 Emergency notification</td><td>Notify the responder and facility manager. No equipment effect.</td><td>An evidence-loss trigger; always recorded.</td></tr>
+  <tr><td>E1 Protective measure</td><td>${Object.entries(PROTECTIVE_MEASURES).map(([k, v]) => `<b>${k}</b>: ${esc(v)}`).join("<br>")}<br>Each takes no parameters and only re-asserts a sealed-baseline value.</td><td>Protocol ${p.protocolId} bound to the sealed baseline; a pre-issued GCEA authority scoped to route <span class="m">${p.routeId}</span> and the specific measure; emergency-responder standing; independent evidence lost for ≥ ${p.activation.sustainedMin} min, computed from the EIN record (never caller-supplied); one use per measure per incident; revalidation at execution, including the condition; ${p.followUp.toLowerCase().replace(/_/g, " ")}.</td></tr>
+  <tr><td>E2 Consequential command</td><td>Defrost, any other setpoint, disabling alarms or reporting.</td><td><b>Not available on the emergency path</b>; ordinary governance only.</td></tr></table>
+  <p><b>Evidence appropriate to the action.</b> E1's evidence is the recorded, continuous EIN determination that state cannot be established, combined with the structural guarantee that the measure can only restore sealed values. GCEA receives that evidence standing honestly. When independent evidence is available, the emergency route is refused (DENY), so it cannot substitute for ordinary governance. If evidence returns before execution, execution is refused.</p>
+  <p><b>Adversarial tests (22, all passing):</b> evidence available → DENY; loss not yet sustained → HOLD; actor without responder standing (even with a stolen grant) → DENY; revoked standing → DENY; consequential commands (defrost, setpoint +2 °C, disabling the alarm) → DENY; consequential actions disguised as protective measures (four variants) → DENY; smuggled parameters → DENY; no authority → refused; an ordinary grant on the emergency route → DENY (scope mismatch); one measure's grant for another → DENY; an emergency grant on the ordinary route → DENY; expired grant → DENY; revocation between commit and execution → DENY; evidence returning before execution → DENY; reuse in the same incident → DENY; protocol bound to another baseline → DENY; a caller-supplied condition is ignored.</p>
+  ${extension.map(scenarioSection).join("")}`;
+}
+
+function html(results: ScenarioResult[], extension: ScenarioResult[]) {
   const r = (id: string) => results.find((x) => x.id === id)!;
   const claims = results.flatMap((x) => x.claims.map((c) => ({ id: x.id, ...c })));
   const n = (s: string) => claims.filter((c) => c.status === s).length;
@@ -78,6 +93,7 @@ function html(results: ScenarioResult[]) {
   </style></head><body>
   <div class="cover"><div class="k">TA14 AUTHORITY GOVERNANCE INSTITUTION · TA-14 EXCHANGE · TECHNICAL EXAMINATION v1 · PROPOSED, NOT VALIDATED</div>
   <h1 style="margin-top:14px">WHEN THE ATTACKER BYPASSES GOVERNANCE</h1><div class="sub">Refrigeration Cybersecurity, Physical Drift, and Admissible Evidence</div></div>
+  <p class="m">Revision 1.1: adds the emergency-response pathway and extension scenario E1 (section 9A); the origin statement is revised; scenarios S1–S8 and their results are unchanged.</p>
   <div class="warn">${SIMULATION_LABEL}. Every result in this document comes from a deterministic software simulation. No physical refrigeration system, controller, network or sensor was tested.</div>
 
   <h2>1. Executive summary</h2>
@@ -87,11 +103,12 @@ function html(results: ScenarioResult[]) {
   <li><b>Prevention</b> held for commands submitted through AEA (S1, S7) and <b>failed</b> for commands that bypassed it (S2, S3). AEA cannot refuse a command it never sees.</li>
   <li><b>Detection</b> by independent sensors succeeded in S2–S5 (${["S2", "S3", "S4", "S5"].map((id) => `${id} after ${r(id).ein.firstDeviationMinute! - 180} min`).join(", ")}), including against a controller that falsified its reports (S4) and a suppressed alarm (S5). It <b>failed</b> in S6, when the independent temperature evidence was lost; the gap was disclosed, and the corrective action was held for lack of admissible evidence.</li>
   <li><b>Evidence preservation</b>: all eight hash-chained records verify; five tamper types are detected; no authorization was fabricated for bypassed commands; no cause was attributed.</li>
+  <li><b>Emergency pathway</b> (extension E1, section 9A): with independent evidence lost, a pre-authorized protective measure that only re-asserts a sealed-baseline value was allowed; consequential commands are never available on that path; ordinary governance still held. Detection and outcome verification remained NOT DEMONSTRATED. 22 adversarial tests show the pathway cannot be used to bypass ordinary governance. S6 is preserved as a failure case.</li>
   <li><b>Recovery</b> (S8): a routine command was held during the open incident, a corrective authority revoked between commit and execution was refused at the execution boundary, and a fresh authority restored the baseline, verified afterwards by independent observation.</li></ul>
   ${matrix}
 
   <h2>2. Origin of the challenge</h2>
-  <p>This examination responds to a refrigeration cybersecurity challenge raised by Kimon Onuma, as described to the TA-14 team. No source document for that challenge is preserved in the TA-14 Exchange repository, so this report does not quote or characterize his position. No person or organization named or referenced in this report, including Kimon Onuma, ONUMA, Keith Gipson and Asset Leadership Network, has reviewed, participated in, or endorsed this examination or its conclusions.</p>
+  <p>This is an independent TA-14 technical examination. It examines a question that arises wherever refrigeration equipment is networked: what happens when an unauthorized actor changes equipment behaviour outside its intended governance boundary? No external party has reviewed, participated in, or endorsed this examination or its conclusions.</p>
 
   <h2>3. System architecture</h2>
   <table><tr><th>Component</th><th>Status in this examination</th><th>Role</th></tr>
@@ -137,9 +154,12 @@ function html(results: ScenarioResult[]) {
   <h2>9. The eight adversarial scenarios</h2>
   ${results.map(scenarioSection).join("")}
 
+  ${emergencySection(extension)}
+
   <h2>10. Actual test results and verification procedures</h2>
   <table><tr><th>Check (${TEST_RESULTS.date}, branch feat/refrigeration-consequence-boundary from ${TEST_RESULTS.base})</th><th>Result</th></tr>
   <tr><td>Refrigeration Consequence Boundary suite</td><td>${TEST_RESULTS.rcbSuite}</td></tr>
+  <tr><td>Emergency-pathway suite</td><td>${TEST_RESULTS.emergencySuite}</td></tr>
   <tr><td>Full repository test suite</td><td>${TEST_RESULTS.fullSuite}</td></tr>
   <tr><td>Type check</td><td>${TEST_RESULTS.typecheck}</td></tr>
   <tr><td>Production build</td><td>${TEST_RESULTS.build}</td></tr></table>
@@ -163,7 +183,7 @@ function html(results: ScenarioResult[]) {
 }
 
 it.skipIf(process.env.TA14_RCB_WRITE_REPORT !== "1")("write report HTML", async () => {
-  writeFileSync(OUT, html(await runAllScenarios()));
+  writeFileSync(OUT, html(await runAllScenarios(), await runExtensionScenarios()));
 }, 120000);
 
 it.skipIf(process.env.TA14_RCB_WRITE_REPORT !== "1")("write image specifications", async () => {
