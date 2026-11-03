@@ -14,14 +14,34 @@ const lessons=[
 ] as const;
 const pdf='/TA-14_The_HVAC_System_That_Remembers_Its_Entire_Life_V2_Manufacturer_Brief%20%281%29.pdf';
 const img=(name:string)=>'/'+encodeURIComponent(name);
+
+const supplemental: Record<number, {name:string;title:string;caption:string}[]> = {
+  0: [{name:'TA-14 HVAC Lifecycle Evidence Ecosystem.png',title:'Ecosystem architecture reference',caption:'The wider lifetime equipment evidence architecture, from measurement through governed service and outcome.'}],
+  2: [{name:'The 8-Link Chain of Integration.png',title:'The eight-link chain reference',caption:'The AEA sequence, shown in a second teaching visual for independent examination.'}]
+};
 export default function Page(){
- const [step,setStep]=useState(0),[speaking,setSpeaking]=useState(false),[auto,setAuto]=useState(false),[failed,setFailed]=useState(false);
- const item=lessons[step];
+ const [speaking,setSpeaking]=useState<number|null>(null);
+ const [failed,setFailed]=useState<Record<string,boolean>>({});
  useEffect(()=>()=>{if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel()},[]);
- function stop(){if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setSpeaking(false)}
- function go(i:number){stop();setStep(Math.max(0,Math.min(7,i)));setFailed(false)}
- function play(){if(typeof window==='undefined'||!('speechSynthesis' in window))return;stop();const u=new SpeechSynthesisUtterance('Lesson '+(step+1)+' of eight. '+item.title+'. '+item.script);u.lang='en-US';u.rate=.9;const voices=window.speechSynthesis.getVoices();u.voice=voices.find(v=>/samantha/i.test(v.name)&&/^en/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;u.onend=()=>{setSpeaking(false);if(auto&&step<7)go(step+1)};u.onerror=()=>setSpeaking(false);window.speechSynthesis.speak(u);setSpeaking(true)}
+ function stop(){if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setSpeaking(null)}
+ function play(i:number){
+   if(typeof window==='undefined'||!('speechSynthesis' in window))return;
+   stop();
+   const lesson=lessons[i];
+   const utterance=new SpeechSynthesisUtterance('Lesson '+(i+1)+' of eight. '+lesson.title+'. '+lesson.script);
+   utterance.lang='en-US';utterance.rate=.9;
+   const voices=window.speechSynthesis.getVoices();
+   utterance.voice=voices.find(v=>/samantha/i.test(v.name)&&/^en/i.test(v.lang))||voices.find(v=>/^en/i.test(v.lang))||null;
+   utterance.onend=()=>setSpeaking(null);
+   utterance.onerror=()=>setSpeaking(null);
+   window.speechSynthesis.speak(utterance);
+   setSpeaking(i);
+ }
  const panel={background:'#102439',border:'1px solid #284e65',borderRadius:16,padding:24};
+ const image=(filename:string,alt:string)=>{
+   return failed[filename]?<p style={{background:'#1d3544',padding:20}}>This image could not load: {filename}. The lesson text remains available.</p>:
+   <img src={img(filename)} loading="lazy" alt={alt} onError={()=>setFailed(prev=>({...prev,[filename]:true}))} style={{width:'100%',height:'auto',display:'block',background:'#18364b'}}/>;
+ };
  return <main style={{minHeight:'100vh',background:'#061321',color:'#f2f8fc',fontFamily:'Arial,sans-serif',padding:'25px 18px'}}>
  <div style={{maxWidth:1190,margin:'auto'}}>
  <nav style={{display:'flex',gap:25,flexWrap:'wrap',marginBottom:48}}><Link href="/showrooms" style={{color:'#80dcee'}}>← All showrooms</Link><Link href="/showrooms/environmental-atmospheric" style={{color:'#80dcee'}}>Environmental & Atmospheric</Link></nav>
@@ -44,18 +64,34 @@ export default function Page(){
  ].map(([n,title,copy])=><div key={n} style={{background:'#172e43',padding:18,borderRadius:10}}><b style={{color:'#77deeb'}}>{n} · {title}</b><p style={{lineHeight:1.6,color:'#c4d9e4',fontSize:13}}>{copy}</p></div>)}
  </div><p style={{color:'#f0d080'}}>Execution boundary: Admissible Evidence + Applicable Authority + Established Standing → NOW</p>
  </section>
- <section id="lessons"><p style={{color:'#77deeb',letterSpacing:2,fontSize:12}}>GUIDED EIGHT-IMAGE EXAMINATION</p><h2 style={{fontSize:34}}>Explore the equipment lifecycle</h2>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:9,marginBottom:22}}>{lessons.map((l,i)=><button key={l.title} onClick={()=>go(i)} style={{border:'1px solid '+(step===i?'#8ae9f0':'#315267'),background:step===i?'#205068':'#10283b',color:'#fff',padding:14,borderRadius:9,textAlign:'left',cursor:'pointer'}}><b style={{color:'#8ae9f0'}}>{String(i+1).padStart(2,'0')}</b> · {l.title}</button>)}</div>
- <article style={{...panel,padding:0,overflow:'hidden'}}>
- <div style={{padding:'24px 27px'}}><p style={{color:'#77deeb',fontSize:12}}>LESSON {String(step+1).padStart(2,'0')} / 08</p><h3 style={{fontSize:'clamp(25px,4vw,39px)',margin:'8px 0'}}>{item.title}</h3><p style={{color:'#eed38e'}}>{item.focus}</p></div>
- {failed?<div style={{padding:45}}>Teaching image unavailable. The lesson transcript remains below.</div>:<img src={img(item.image)} alt={'TA-14 HVAC lifetime lesson '+(step+1)+': '+item.title} style={{width:'100%',height:'auto',display:'block'}} onError={()=>setFailed(true)}/>}
+ <section id="lessons" style={{scrollMarginTop:25}}>
+ <p style={{color:'#77deeb',letterSpacing:2,fontSize:12}}>COMPLETE · SCROLLABLE · EIGHT-LESSON EXAMINATION</p>
+ <h2 style={{fontSize:34}}>Every lesson and every visual, in sequence</h2>
+ <p style={{lineHeight:1.65,color:'#b6d0de'}}>All eight main teaching images and both additional architecture references are displayed below. Scroll normally to read the whole experience. No image must be unlocked, selected, or advanced to appear.</p>
+ <nav aria-label="Jump to a lesson" style={{display:'flex',gap:8,flexWrap:'wrap',margin:'24px 0 40px'}}>
+ {lessons.map((l,i)=><a key={l.title} href={'#lesson-'+String(i+1).padStart(2,'0')} style={{border:'1px solid #315267',background:'#10283b',color:'#b8e9f5',padding:'10px 12px',borderRadius:9,textDecoration:'none',fontSize:12}}>{String(i+1).padStart(2,'0')} · {l.title}</a>)}
+ </nav>
+ {lessons.map((lesson,i)=><article key={lesson.title} id={'lesson-'+String(i+1).padStart(2,'0')} style={{...panel,padding:0,overflow:'hidden',marginBottom:32,scrollMarginTop:24}}>
+ <div style={{padding:'24px 27px'}}>
+ <p style={{color:'#77deeb',fontSize:12,fontWeight:800}}>LESSON {String(i+1).padStart(2,'0')} / 08</p>
+ <h3 style={{fontSize:'clamp(25px,4vw,39px)',margin:'8px 0'}}>{lesson.title}</h3>
+ <p style={{color:'#eed38e',lineHeight:1.6}}>{lesson.focus}</p></div>
+ {image(lesson.image,'TA-14 lesson '+(i+1)+': '+lesson.title)}
+ {(supplemental[i]||[]).map(extra=><div key={extra.name} style={{padding:'24px 20px 4px',background:'#0b1f30'}}>
+ <h4 style={{fontSize:21,margin:'4px 7px 12px'}}>{extra.title}</h4>
+ {image(extra.name,extra.title)}
+ <p style={{color:'#abc8d9',lineHeight:1.65,fontSize:13,padding:'4px 7px 8px'}}>{extra.caption}</p>
+ </div>)}
  <div style={{padding:27}}>
- <h4 style={{fontSize:20,margin:'0 0 12px'}}>▶ SAMANTHA — EXPLAIN</h4>
- <div style={{display:'flex',alignItems:'center',gap:15,flexWrap:'wrap'}}><button onClick={speaking?stop:play} style={{padding:'12px 18px',background:'#77deeb',border:0,borderRadius:8,color:'#042130',fontWeight:800,cursor:'pointer'}}>{speaking?'■ Stop':'▶ Play English narration'}</button><label style={{fontSize:13}}><input type="checkbox" checked={auto} onChange={e=>setAuto(e.target.checked)}/> Advance after narration</label></div>
- <p style={{fontSize:12,color:'#8daab9'}}>Uses Samantha voice where installed on the device; English fallback otherwise. Other language audio requires verified translation and is not represented as available.</p>
- <details style={{border:'1px solid #35566b',borderRadius:10,padding:18,marginTop:16}}><summary style={{cursor:'pointer'}}>Read Samantha's complete explanation</summary><p style={{lineHeight:1.75,color:'#c5d9e2'}}>{item.script}</p></details>
- <div style={{display:'flex',justifyContent:'space-between',gap:12,marginTop:24,alignItems:'center'}}><button onClick={()=>go(step-1)} disabled={step===0} style={{padding:'12px 18px',borderRadius:8,background:'#245066',color:'#fff',border:0,opacity:step===0?.35:1}}>← Previous</button><span>{step+1} / 8</span><button onClick={()=>go(step+1)} disabled={step===7} style={{padding:'12px 18px',borderRadius:8,background:'#245066',color:'#fff',border:0,opacity:step===7?.35:1}}>Next →</button></div>
- </div></article></section>
+ <h4 style={{fontSize:20,margin:'0 0 12px'}}>▶ SAMANTHA — EXPLAIN · LESSON {String(i+1).padStart(2,'0')}</h4>
+ <button type="button" onClick={()=>speaking===i?stop():play(i)} style={{padding:'12px 18px',background:'#77deeb',border:0,borderRadius:8,color:'#042130',fontWeight:800,cursor:'pointer'}}>{speaking===i?'■ Stop narration':'▶ Play English narration'}</button>
+ <p style={{fontSize:12,color:'#8daab9',lineHeight:1.65}}>Samantha is selected when available on the device; another English voice is used otherwise. Audio is optional. The complete explanation is always open below.</p>
+ <div style={{border:'1px solid #35566b',borderRadius:10,padding:'15px 19px',marginTop:16,background:'#152d3f'}}>
+ <p style={{fontSize:12,fontWeight:800,color:'#8cdeee',letterSpacing:1}}>FULL NARRATION TRANSCRIPT</p>
+ <p style={{lineHeight:1.8,color:'#d2e3ed',fontSize:15,marginBottom:0}}>{lesson.script}</p>
+ </div>
+ </div></article>)}
+ </section>
  <section style={{...panel,marginTop:45}}>
  <h2 style={{fontSize:30}}>Manufacturer and warranty evaluation</h2>
  <p style={{color:'#c4d8e2',lineHeight:1.75,maxWidth:950}}>Proposed pilot: verify commissioning against manufacturer-specific requirements, preserve source records and annual examinations, compare diagnostic reproducibility, test authorization boundaries and evaluate the usefulness of privacy-controlled lifetime records for engineering and warranty review. A record may support investigation, but warranty coverage depends on applicable terms and law.</p>
