@@ -67,7 +67,7 @@ export default function FoundingInstitutionalSponsorship(){
         <p className="bridgeLabel">→ WHAT YOU'LL LEARN NEXT</p>
         <h3>{visuals[i+1].title}</h3>
         <p>{lessonBridges[i].next}</p>
-        <a href={'#sponsor-lesson-'+visuals[i+1].n}>Continue to lesson {visuals[i+1].n} ↓</a>
+        <a href={i+1===4?'#sponsor-showroom':'#sponsor-lesson-'+visuals[i+1].n}>Continue to lesson {visuals[i+1].n} ↓</a>
       </div>
     </div>
   </aside>}
