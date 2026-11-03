@@ -50,7 +50,7 @@ export default function Page(){
  }
  const panel={background:'#102439',border:'1px solid #284e65',borderRadius:16,padding:24};
  const image=(filename:string,alt:string)=>{
-   return failed[filename]?<p style={{background:'#1d3544',padding:20}}>This image could not load: {filename}. The lesson text remains available.</p>:
+   return failed[filename]?(filename==='HVAC Lifecycle Memory Infographic.png'?<div style={{padding:24,background:'#173348'}}><p style={{color:'#d0e1e9',lineHeight:1.6}}>The new article companion image is pending upload to this site. The existing lifetime-architecture visual is shown below in the meantime.</p><img src={img('HVAC Lifetime Accountability Architecture.png')} alt="Existing HVAC lifetime evidence architecture illustration" style={{width:'100%',height:'auto',display:'block'}}/></div>:<p style={{background:'#1d3544',padding:20}}>This image could not load: {filename}. The lesson text remains available.</p>):
    <img src={img(filename)} loading="lazy" alt={alt} onError={()=>setFailed(prev=>({...prev,[filename]:true}))} style={{width:'100%',height:'auto',display:'block',background:'#18364b'}}/>;
  };
  return <main style={{minHeight:'100vh',background:'#061321',color:'#f2f8fc',fontFamily:'Arial,sans-serif',padding:'25px 18px'}}>
@@ -68,6 +68,15 @@ export default function Page(){
  </div>
  <p style={{fontSize:12,color:'#9db7c7',lineHeight:1.65,maxWidth:940}}>Educational concepts and illustrations. Physical refrigerant governance, lifetime cloud custody, and warranty integrations are proposed capabilities requiring independent validation. This page does not issue a real DDD, authorization or warranty determination.</p>
  </header>
+ <section aria-label="HVAC lifetime companion illustration" style={{margin:'0 0 46px',borderRadius:18,overflow:'hidden',border:'1px solid #36677a',background:'#0b2434'}}>
+ <div style={{padding:'22px 28px 16px'}}>
+ <p style={{color:'#83e5f0',fontWeight:900,fontSize:12,letterSpacing:1.5}}>LIFETIME SYSTEM ARCHITECTURE · ARTICLE COMPANION VISUAL</p>
+ <h2 style={{fontSize:'clamp(28px,4vw,43px)',margin:'10px 0 12px'}}>The machine remembers. The evidence remains examinable.</h2>
+ <p style={{color:'#c2d9e5',lineHeight:1.7,maxWidth:900}}>From commissioning and measurement to governed interpretation, bounded intervention and the preserved lifetime record.</p>
+ </div>
+ {image('HVAC Lifecycle Memory Infographic.png','TA-14 HVAC lifetime accountability architecture: commissioning, measurement, admissible computation, diagnostic determination, execution governance and preserved outcomes')}
+ <p style={{padding:'0 25px 20px',fontSize:12,lineHeight:1.7,color:'#9db8c7'}}>Conceptual illustration, not a validated device diagram or certification. AEA evaluates execution authorization; the proposed Refrigerant Governor only enforces a currently authorized boundary. Cryptographic sealing protects stored-record integrity, not original measurement accuracy.</p>
+ </section>
  <section style={{...panel,marginBottom:45}}>
  <h2 style={{fontSize:29}}>Four distinct lanes. One preserved equipment history.</h2>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
