@@ -48,6 +48,7 @@ export const showroomRooms=[
 ['Kimon Onuma','/showrooms/onuma','PEOPLE & PRACTITIONERS','ONUMA BIM buildings interoperability'],
 ['Yong Ku Kim','/showrooms/yong-ku-kim','PEOPLE & PRACTITIONERS','buildings practitioner'],
 ['Michael Bordenaro','/showrooms/michael-bordenaro','PEOPLE & PRACTITIONERS','practitioner buildings'],
+['John Kay · Career Tribute','/showrooms/john-kay','PEOPLE & PRACTITIONERS','John Kay career tribute healthy homes indoor air quality building science education leadership Contractor Nation CN Air Group'],
 ['Lisa Greenfield','/showrooms/lisa-greenfield','PEOPLE & PRACTITIONERS','indoor air quality schools education AAA assess address assure Center for Green Schools USGBC'],
 ['Bruno Tudal','/showrooms/bruno-tudal','PEOPLE & PRACTITIONERS','France indoor air practitioner'],
 ['Steven Stobo · WeRAI','/showrooms/steven-stobo-werai','PEOPLE & PRACTITIONERS','WeRAI AHIA human router AI'],
