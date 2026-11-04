@@ -5,6 +5,7 @@
  */
 import { BASELINE, sealBaseline } from '../../../lib/refrigeration-boundary/baseline';
 import type { ScenarioResult } from '../../../lib/refrigeration-boundary/scenarios';
+import { VISUAL_LESSONS } from './visual-lessons';
 
 export type ImageSpec = { filename: string; size: string; purpose: string; layout: string[]; labels: string[]; constraints: string[] };
 export type Lesson = { number: string; slug: string; title: string; narration: string; explain: string[]; intent: string; demonstrated: string; scenarioIds: string[]; image: ImageSpec };
@@ -136,7 +137,20 @@ export function buildLessons(results: ScenarioResult[]): Lesson[] {
       scenarioIds: ['S8'],
       image: { filename: 'rcb-08-the-outcome-becomes-evidence.png', size: '1920×1080', purpose: 'Compare the final outcome with the original baseline and show what was proven.', layout: ['Left: the sealed baseline envelope overlaid with the post-intervention independent temperatures returning inside it.', 'Centre: the outcome record (restored time, warmest independent product reading, minutes above limit, "product disposition: not decided by TA-14").', 'Right: a claims matrix (eight scenarios × capabilities) with PASS, FAIL and NOT DEMONSTRATED cells, and a footer "Simulation — not physical-system validation".'], labels: ['Outcome becomes the next evidence', 'What was proven · what was not'], constraints: COMMON_CONSTRAINTS },
     },
-  ].map((l) => l.number === '08' ? finishOutcomeLesson(l as Lesson, results) : l as Lesson);
+  ].map((l) => l.number === '08' ? finishOutcomeLesson(l as Lesson, results) : l as Lesson)
+   .map((l, index) => {
+      const visual = VISUAL_LESSONS[index];
+      return {
+        ...l,
+        title: visual.title,
+        narration: visual.narration,
+        explain: [visual.note, 'The original evidence export and live scenario charts below are authoritative. All illustrated charts are conceptual, not measurements.', ...l.explain],
+        intent: visual.intent,
+        demonstrated: visual.demonstrated,
+        scenarioIds: [...visual.scenarioIds],
+        image: { ...l.image, filename: visual.file, purpose: visual.note, labels: [visual.note] },
+      };
+   });
 }
 
 function finishOutcomeLesson(lesson: Lesson, results: ScenarioResult[]): Lesson {
