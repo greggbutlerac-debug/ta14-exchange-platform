@@ -2,12 +2,12 @@ import Link from 'next/link';
 import Samantha from '../epic-air-quality-fund/Samantha';
 
 export const metadata = {title:'HibouAir × TA-14 | From Environmental Intelligence to Governed Intervention',description:'Independent eight-image manufacturer technical pre-examination of environmental records, admissibility, standing, bounded decisions and verified outcomes.'};
-const pdf='/TA14_HibouAir_Manufacturer_Technical_Examination_v2%20(1).pdf';
+const pdf='https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/TA14_HibouAir_Manufacturer_Technical_Examination_v2%20(1).pdf';
 const slides=[
   {
     "number": "01",
     "title": "Environmental Reality: What the Sensor Actually Knows",
-    "image": "/Environmental%20Intelligence%20to%20Governed%20Action.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Environmental%20Intelligence%20to%20Governed%20Action.png",
     "script": "A sensor measures an environmental condition. Its observation does not by itself establish cause, compliance, exposure or permission to intervene. This independent teaching scenario uses hypothetical HibouAir-format readings, not a live manufacturer feed.",
     "learned": "A measurement is an observation, not authorization.",
     "upcoming": "Next, examine where the reading came from."
@@ -15,7 +15,7 @@ const slides=[
   {
     "number": "02",
     "title": "Source Record & Provenance",
-    "image": "/Source%20Record%20%26%20Provenance%20Infographic.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Source%20Record%20%26%20Provenance%20Infographic.png",
     "script": "An examinable source record retains identity, location, original timestamps, units, quality declarations and revisions. Preserve raw observations separately from interpretation. A hash can detect a later change but cannot prove the original measurement was accurate.",
     "learned": "Original provenance must survive interpretation.",
     "upcoming": "Next, test whether its chronology remained intact."
@@ -23,7 +23,7 @@ const slides=[
   {
     "number": "03",
     "title": "Continuity & Atmospheric Integrity Records",
-    "image": "/Continuity%20%26%20Atmospheric%20Integrity%20Records.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Continuity%20%26%20Atmospheric%20Integrity%20Records.png",
     "script": "Atmospheric Integrity Records preserve the sequence, missing intervals, transformations, uncertainty and linked receipts. A missing observation must remain visible. Continuity can be examined, challenged and replayed, but a preserved record does not automatically establish admissibility.",
     "learned": "Gaps and revisions must remain examinable.",
     "upcoming": "Next, examine fitness for a particular consequence."
@@ -31,7 +31,7 @@ const slides=[
   {
     "number": "04",
     "title": "Admissibility: Is the Evidence Sufficient?",
-    "image": "/HibouAir%20TA-14%20Evidence%20Admissibility%20Infographic.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/HibouAir%20TA-14%20Evidence%20Admissibility%20Infographic.png",
     "script": "An elevated classroom carbon dioxide reading may warrant investigation. In this hypothetical case, calibration evidence, quantified uncertainty, equipment mapping and the applicable decision threshold are incomplete. The proposed ventilation change receives HOLD; investigation may continue under separate authority.",
     "learned": "Relevant observations can still be insufficient for intervention.",
     "upcoming": "Next, identify who may lawfully invoke a decision."
@@ -39,7 +39,7 @@ const slides=[
   {
     "number": "05",
     "title": "Applicable Authority & Established Standing",
-    "image": "/Authority%20%26%20Standing%20Examination.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Authority%20%26%20Standing%20Examination.png",
     "script": "Applicable Authority asks which governing rule permits this particular action. Established Standing asks whether this specific actor, in a declared capacity, may invoke that authority for this asset, place and time. Neither is inferred from possession of a sensor or access to a dashboard. The evidence HOLD still applies.",
     "learned": "Authority and standing are separate, actor-specific gates.",
     "upcoming": "Next, see how a bounded disposition is issued."
@@ -47,7 +47,7 @@ const slides=[
   {
     "number": "06",
     "title": "Bounded Determination: ALLOW / HOLD / DENY / ESCALATE",
-    "image": "/Bounded%20Determination%20Governance%20Framework.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Bounded%20Determination%20Governance%20Framework.png",
     "script": "TA-14 examines a precise proposed consequence and issues ALLOW, HOLD, DENY or ESCALATE with reason codes, scope and expiry. In our running scenario, incomplete evidence produces HOLD even if authority and standing are otherwise established. Illustrative receipts are not actual operational determinations.",
     "learned": "A bounded determination is not a controller command.",
     "upcoming": "Next, separate permission from physical actuation."
@@ -55,7 +55,7 @@ const slides=[
   {
     "number": "07",
     "title": "The Intervention Boundary: Permission Is Not Execution",
-    "image": "/Permission%20Is%20Not%20Execution.png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Permission%20Is%20Not%20Execution.png",
     "script": "Permission is not execution. This image illustrates a separate hypothetical future in which deficiencies have been remedied and authorization re-examined. Even then, the local facility system or authorized operator must execute and log any change. Phase one of the proposed HibouAir evaluation remains read-only.",
     "learned": "Only separately authorized local systems or operators execute.",
     "upcoming": "Next, verify whether an authorized action achieved its intended result."
@@ -63,7 +63,7 @@ const slides=[
   {
     "number": "08",
     "title": "Verified Outcome & Continuing Record",
-    "image": "/Verified%20Environmental%20Outcome%20Dashboard%20(1).png",
+    "image": "https://raw.githubusercontent.com/greggbutlerac-debug/ta14-exchange-platform/8c9f0764d42feda8d3e2c07f05d25aec14e2adea/apps/web/Verified%20Environmental%20Outcome%20Dashboard%20(1).png",
     "script": "Execution is not proof of success. This final panel illustrates a hypothetical post-intervention improvement, not measured HibouAir results. A reviewer would need linked pre- and post-action records, context, independent verification and sustained observations. The earlier HOLD is not automatically converted to ALLOW.",
     "learned": "Outcome claims require independent examination and continuing evidence.",
     "upcoming": "You have completed the eight lessons. Review the pilot charter and challenge the proposed architecture."
