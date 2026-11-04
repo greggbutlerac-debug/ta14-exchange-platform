@@ -109,16 +109,17 @@ export function LessonViewer({ lessons, figures }: { lessons: Lesson[]; figures:
   );
 }
 
-/** An honest slot for a teaching image that has not been produced yet. Never a placeholder posing as a finished asset. */
+/** Static teaching illustration. The underlying examination data and charts remain authoritative. */
 function ImageSlot({ spec, number }: { spec: Lesson['image']; number: string }) {
-  const [open, setOpen] = useState(false);
+  const src = '/'+encodeURIComponent(spec.filename);
   return (
-    <div role="note" aria-label={`Teaching image ${number} not yet produced`} style={{ aspectRatio: '16 / 9', minHeight: 240, width: '100%', border: '2px dashed #7BAFD4', borderRadius: 14, background: 'repeating-linear-gradient(135deg,#031a2e,#031a2e 14px,#04223a 14px,#04223a 28px)', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', textAlign: 'center', padding: 16, overflow: 'auto' }}>
-      <b style={{ color: '#B9D9EB', fontSize: 'clamp(14px, 2.4vw, 20px)', letterSpacing: 1 }}>TEACHING IMAGE {number} · NOT YET PRODUCED</b>
-      <code style={{ color: '#7BAFD4', marginTop: 8, fontSize: 12 }}>{spec.filename} · {spec.size}</code>
-      <span style={{ color: '#89A9BF', fontSize: 13, marginTop: 8, maxWidth: 640 }}>{spec.purpose}</span>
-      <button onClick={() => setOpen((v) => !v)} aria-expanded={open} style={{ ...btn, marginTop: 12, fontSize: 12 }}>{open ? 'Hide production specification' : 'Show production specification'}</button>
-      {open && <ol style={{ color: '#C9E0EF', textAlign: 'left', fontSize: 13, lineHeight: 1.6, maxWidth: 760 }}>{spec.layout.map((l) => <li key={l}>{l}</li>)}<li>Labels: {spec.labels.join(' · ')}</li></ol>}
-    </div>
+    <figure style={{ margin: 0 }}>
+      <div style={{ aspectRatio: '16 / 9', border: '1px solid #316987', borderRadius: 14, overflow: 'hidden', background: '#031a2e' }}>
+        <img src={src} alt={`Lesson ${number}: ${spec.purpose}`} loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
+      </div>
+      <figcaption style={{ color: '#E8B04B', fontSize: 13, lineHeight: 1.65, marginTop: 10, borderLeft: '3px solid #E8B04B', paddingLeft: 10 }}>
+        SIMULATION - EDITORIAL TEACHING IMAGE. {spec.purpose}
+      </figcaption>
+    </figure>
   );
 }
