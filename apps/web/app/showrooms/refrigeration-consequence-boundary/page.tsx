@@ -1,4 +1,6 @@
 import type { Metadata } from 'next';
+import { notFound } from 'next/navigation';
+import { examinationAccess } from './access';
 import { BASELINE, SIMULATION_LABEL, sealBaseline } from '@/lib/refrigeration-boundary/baseline';
 import { runAllScenarios, runExtensionScenarios } from '@/lib/refrigeration-boundary/scenarios';
 import { PROTECTIVE_MEASURES, emergencyProtocol } from '@/lib/refrigeration-boundary/emergency';
@@ -9,17 +11,27 @@ import { buildLessons } from './lessons';
 
 // OWNER-GATED PREVIEW (layout.tsx / access.ts): 404 for everyone but the signed-in owner. Also absent
 // from the showroom index and sitemap, and not indexed. Publication requires Greggory's approval.
-export const metadata: Metadata = {
-  title: 'When the Attacker Bypasses Governance · TA-14 (Simulation preview)',
-  description: 'Refrigeration consequence boundary: a simulated adversarial demonstration of AEA prevention, independent detection and evidence preservation.',
-  robots: { index: false, follow: false, nocache: true },
-};
+// Next.js renders layouts and pages in parallel, so a gate in layout.tsx alone does not stop this
+// page's content (or static metadata) from being serialized into the 404 response. The page and
+// its metadata therefore check access themselves, before anything is computed.
+export const dynamic = 'force-dynamic';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const robots = { index: false, follow: false, nocache: true };
+  if (!(await examinationAccess()).allowed) return { robots };
+  return {
+    title: 'When the Attacker Bypasses Governance · TA-14 (Simulation preview)',
+    description: 'Refrigeration consequence boundary: a simulated adversarial demonstration of AEA prevention, independent detection and evidence preservation.',
+    robots,
+  };
+}
 
 const PDF = '/showrooms/refrigeration-consequence-boundary/files/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf';
 const STATUS_BG: Record<string, string> = { PASS: '#2f6f5e', FAIL: '#c0392b', NOT_DEMONSTRATED: '#5d6b75' };
 const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
 export default async function RefrigerationConsequenceBoundaryPage() {
+  if (!(await examinationAccess()).allowed) notFound();
   const results = await runAllScenarios();
   const extension = await runExtensionScenarios();
   const protocol = emergencyProtocol();

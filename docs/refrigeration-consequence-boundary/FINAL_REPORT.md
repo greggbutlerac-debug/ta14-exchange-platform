@@ -1,14 +1,28 @@
 # Refrigeration Consequence Boundary: final report (revision 1.2)
 
-**Date:** 2026-11-04 · **Repository:** `greggbutlerac-debug/ta14-exchange-platform` · **Branch:** `feat/refrigeration-consequence-boundary` · **Integrated with:** `origin/main` `f636d639` (merge commit, no history rewritten) · **Deployment:** none.
+**Date:** 2026-11-04 · **Repository:** `greggbutlerac-debug/ta14-exchange-platform` · **Branch:** `feat/refrigeration-consequence-boundary` · **Integrated with:** `origin/main` `3c688ebe` (merge commits, no history rewritten) · **Deployment:** none.
 
 > Everything here is software verification of a **simulation**. Nothing validates a physical refrigeration system, a real controller, or real sensors.
+
+## 0. Current blocker (upstream)
+
+`main` (`3c688ebe`) fails its own CI type check: `apps/web/app/showrooms/ShowroomReviewChallenge.tsx` (added upstream in `ebd87866`) assigns strings to a `Record<string,{name;example}>`. This produces 18 `TS2322` errors, so `npm run typecheck` and `next build` fail on `main` and on this branch after merging it. This branch does not modify that file. With a local-only, uncommitted patch to that file, this branch type-checks, builds and passes every check below. **PR CI will stay red until `main` is fixed.**
 
 ## 1. Integration with current main
 
 - The branch was 727 commits behind `main`. Upstream touched **no** examination file, the GCEA engine, dependencies or the test configuration. It did change `middleware.ts` (all `/showrooms/*` now bypass the session middleware), `sitemap.ts`, the showroom index and the global navigation. The merge was clean, with no conflicts.
 - **GCEA (`apps/web/lib/governance-continuity-execution-authority.ts`) is identical to current `main`.** A test pins it by SHA-256 (`0754f3ad…`). The first version of that test used `git diff origin/main`, which **failed in CI** on PR #675 because CI checkouts have no `origin/main` ref (git exit 128). It now pins the hash and passes in a shallow clone.
 - Upstream regression observed: six images committed upstream with decomposed-Unicode file names show as untracked twins on macOS (`core.precomposeunicode=true`). This is an upstream naming issue; they were not touched or staged.
+
+## 2a. Gate defect found and fixed (2026-11-04)
+
+The first version of the gate (commits `200141c2`/`682d2190`, pushed to the PR branch) returned HTTP 404 correctly, **but the 404 body still contained the whole examination**. Next.js renders a layout and its page in parallel, so the page's server-rendered output and its static `metadata` (title) were serialized into the 404 response even though `layout.tsx` called `notFound()`. Status-code checks did not catch it; inspecting the response body did.
+
+**Fix:** the page checks access as its first statement, and `generateMetadata` returns only generic `noindex` metadata unless access is allowed. The layout gate remains as a second layer. `scripts/refrigeration-boundary/gate-check.mjs` now checks status **and** body for examination content. After the fix, the page, evidence and PDF all return 404 with no leaked content (verified on a production build).
+
+**Exposure window:** the flawed gate was deployed only to the PR's automatic Vercel **preview**, from the push of `200141c2` until the fix was pushed. Whether that preview was publicly reachable depends on the project's Vercel deployment-protection settings, which were not visible from here.
+
+**The same flaw exists on `main` in unrelated code:** `/admin/environmental-evidence-gateway` (layout-only owner gate) returned 404 with its page content in the body (gateway demonstration, receipts, HibouAir demo data). `/admin/revenue` matched only the word "Revenue" (inconclusive); `/admin/governance-continuity-execution-authority` showed nothing. These were not changed by this branch and need their own fix.
 
 ## 2. Owner gate (new in 1.2)
 

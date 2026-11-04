@@ -40,8 +40,16 @@ describe("owner gate (fail closed)", () => {
   it("no examination file is served from public/", () => {
     expect(existsSync(join(ROOT, "apps/web/public/showrooms/refrigeration-consequence-boundary"))).toBe(false);
   });
+  it("the page gates itself before computing anything, because layouts and pages render in parallel", () => {
+    const page = read("page.tsx");
+    const body = page.slice(page.indexOf("export default async function"));
+    expect(body.split("\n")[1].trim()).toBe("if (!(await examinationAccess()).allowed) notFound();");
+    expect(page).not.toMatch(/export const metadata/);
+    const meta = page.slice(page.indexOf("export async function generateMetadata"), page.indexOf("export default async function"));
+    expect(meta.indexOf("examinationAccess()")).toBeLessThan(meta.indexOf("title:"));
+  });
   it("the page stays out of search indexes, the sitemap and the showroom index", () => {
-    expect(read("page.tsx")).toMatch(/robots: \{ index: false, follow: false, nocache: true \}/);
+    expect(read("page.tsx")).toMatch(/const robots = \{ index: false, follow: false, nocache: true \}/);
     expect(readFileSync(join(ROOT, "apps/web/app/sitemap.ts"), "utf8")).not.toContain("refrigeration-consequence-boundary");
     expect(readFileSync(join(ROOT, "apps/web/app/showrooms/page.tsx"), "utf8")).not.toContain("refrigeration-consequence-boundary");
   });
