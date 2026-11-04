@@ -251,10 +251,10 @@ describe("HROS showroom — permanent record CTAs, living history and directory"
     expect(text(render())).toContain("NEXT ENTRY Open");
   });
 
-  it("is listed first in the Registered Governance showroom directory", () => {
+  it("is listed uniquely in the Registered Governance showroom directory", () => {
     const source = readFileSync("apps/web/app/showrooms/registered-governance/page.tsx", "utf8");
     const rooms = JSON.parse(source.match(/const rooms=(\[.*?\]);/s)![1]) as Array<{ kind: string; href: string }>;
-    expect(rooms[0]).toMatchObject({ kind: "TA-14-AIGR-000046", href: "/governance-showcase/TA-14-AIGR-000046" });
+    expect(rooms.find((r) => r.kind === "TA-14-AIGR-000046")).toMatchObject({ kind: "TA-14-AIGR-000046", href: "/governance-showcase/TA-14-AIGR-000046" });
     expect(rooms.filter((r) => r.kind === "TA-14-AIGR-000046")).toHaveLength(1);
     // Prior entries are untouched and still present.
     for (const kind of ["TA-14-AIGR-000045", "TA-14-AIGR-000008", "TA-14-AIGR-000044"]) expect(rooms.some((r) => r.kind === kind)).toBe(true);

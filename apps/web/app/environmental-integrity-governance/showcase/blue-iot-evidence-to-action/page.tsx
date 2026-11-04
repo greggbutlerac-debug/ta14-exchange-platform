@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const steps=[
 ['01','DETECT','Sustained CO₂ event','Environmental sensing identifies a condition that may warrant attention. Detection is evidence of a condition, not authority to intervene.'],
@@ -13,8 +13,30 @@ const steps=[
 ['07','VERIFY','Outcome becomes new evidence','The resulting environmental state is observed and preserved as the next record rather than inferred from the command.'],
 ];
 
+const learningBridges: ReadonlyArray<readonly [string,string]> = [["You learned that a CO₂ observation can identify a condition worth examining, but it does not prove its cause or authorize a building change.","Next, learn how to preserve the sensor, timestamp, raw readings and provenance so the observation can be independently examined."],["You learned that raw evidence, provenance and continuity must survive the journey from sensor to dashboard; derived values cannot quietly replace originals.","Next, learn how to turn preserved evidence into a specific proposed consequence without confusing a recommendation with a command."],["You learned to define the proposed ventilation action, its equipment and zone, constraints, purpose and rollback conditions before judging it.","Next, learn who can invoke the applicable authority for this particular action, equipment and time."],["You learned why Applicable Authority is not the same as Established Standing, and how Actor, Capacity, Standing Basis and Authority Relationship must be examined.","Next, see how TA14 brings evidence, authority and standing together at the consequence boundary to issue a bounded determination."],["You learned that TA14 examines the complete proposed consequence and records ALLOW, HOLD, DENY or ESCALATE with reasons, scope and validity, without operating the building.","Next, test what happens when the evidence is sufficient but the actor’s authority relationship is missing."],["You learned that admissible environmental evidence does not create missing permission. A HOLD preserves the case until the authority or standing gap is resolved.","Next, learn why even an ALLOW does not execute a command: authorized site systems still control any physical intervention."],["You learned that an authorized operator or BMS decides whether to execute, and that commands, acknowledgments and equipment responses must be separately recorded.","Next, learn how post-action measurements establish what actually changed, and why a command acknowledgment is not proof of an environmental outcome."],["You learned to distinguish observed outcomes from intended results, preserve uncertainty and changed conditions, and treat the outcome as a new evidence record.","The eight lessons establish a complete distinction between environmental observation, admissible evidence, a bounded proposal, applicable authority, established standing, authorized execution and verified outcome. The Classroom 214 simulation below illustrates these boundaries; it does not represent real building evidence."]];
+
 export default function BlueIotEvidenceToActionShowroom(){
  const [phase,setPhase]=useState<'DETECTED'|'VALIDATED'|'ALLOW'|'HOLD'|'VERIFIED'>('DETECTED');
+ const [speakingImage,setSpeakingImage]=useState<string|null>(null);
+ const [speechAvailable,setSpeechAvailable]=useState(false);
+ useEffect(()=>{
+  setSpeechAvailable(typeof window !== 'undefined' && 'speechSynthesis' in window && 'SpeechSynthesisUtterance' in window);
+  return ()=>{ if(typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel(); };
+ },[]);
+ const stopNarration=()=>{if(typeof window !== 'undefined' && 'speechSynthesis' in window)window.speechSynthesis.cancel();setSpeakingImage(null);};
+ const playNarration=(number:string,title:string,script:string)=>{
+  if(typeof window==='undefined'||!('speechSynthesis' in window)||!('SpeechSynthesisUtterance' in window))return;
+  window.speechSynthesis.cancel();
+  const utterance=new SpeechSynthesisUtterance('Image '+number+' of eight. '+title+'. '+script);
+  const voices=window.speechSynthesis.getVoices();
+  const selected=voices.find(v=>/samantha/i.test(v.name))||voices.find(v=>/^en[-_]/i.test(v.lang)&&/female|zira|ava|allison/i.test(v.name))||voices.find(v=>/^en[-_]/i.test(v.lang));
+  if(selected)utterance.voice=selected;
+  utterance.rate=0.9;
+  utterance.onend=()=>setSpeakingImage(null);
+  utterance.onerror=()=>setSpeakingImage(null);
+  setSpeakingImage(number);
+  window.speechSynthesis.speak(utterance);
+ };
  const determination=phase==='ALLOW'||phase==='VERIFIED'?'ALLOW':phase==='HOLD'?'HOLD':'PENDING';
  const accent=phase==='ALLOW'||phase==='VERIFIED'?'#7ff0bd':phase==='HOLD'?'#f2bf6a':'#6fdfff';
  return <main style={{minHeight:'100vh',padding:'48px 22px 100px',background:'radial-gradient(circle at 84% 4%,rgba(68,207,255,.16),transparent 28%),radial-gradient(circle at 10% 44%,rgba(74,229,179,.10),transparent 30%),linear-gradient(180deg,#02070d,#06111c 52%,#02070d)',color:'#eef7fb',fontFamily:'Inter,system-ui,sans-serif'}}>
@@ -27,15 +49,50 @@ export default function BlueIotEvidenceToActionShowroom(){
  <p style={{fontSize:'clamp(18px,2.2vw,26px)',lineHeight:1.48,maxWidth:980,color:'#b7c9d5',margin:0}}>A bounded CO₂ example for examining the point between environmental intelligence and consequential building action: when does evidence become sufficient not merely to inform a response, but to support an authorized consequence now?</p>
  </section>
 
+ <section id="guided-examination" aria-label="Eight-image guided technical examination" style={{margin:'22px 0',padding:'clamp(22px,4vw,42px)',border:'1px solid rgba(113,231,255,.22)',borderRadius:26,background:'rgba(4,16,26,.95)'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#78e8ff'}}>GUIDED TECHNICAL EXAMINATION · EIGHT TEACHING IMAGES</div>
+ <h2 style={{fontSize:'clamp(28px,4.6vw,50px)',letterSpacing:'-.04em',margin:'10px 0 12px'}}>Evidence to action: the complete teaching sequence</h2>
+ <p style={{color:'#aec1cd',lineHeight:1.65,maxWidth:960}}>Eight numbered illustrations explain the distinction between observation, admissible evidence, a bounded proposed consequence, applicable authority, established standing, external execution and verified outcome. The Classroom 214 examples and operational values are illustrative, not verified Blue IoT data or operating recommendations.</p>
+ <a href="/TA14_Blue_IoT_Evidence_to_Action_Technical_Examination_v2%20(1).pdf" download style={{display:'inline-block',padding:'14px 22px',borderRadius:999,background:'#7ff0bd',color:'#04151a',fontWeight:950,textDecoration:'none',marginBottom:20}}>DOWNLOAD THE TECHNICAL EXAMINATION V2.0 (PDF) ↓</a>
+ <nav aria-label="Teaching image navigation" style={{display:'flex',flexWrap:'wrap',gap:8,margin:'0 0 24px'}}>
+ {Array.from({length:8},(_,i)=>String(i+1).padStart(2,'0')).map(n=><a key={n} href={`#teaching-${n}`} style={{padding:'10px 14px',borderRadius:999,border:'1px solid rgba(113,231,255,.35)',color:'#a5efff',textDecoration:'none',fontWeight:900}}>{n}</a>)}
+ </nav>
+ {[
+ ['01','THE SIGNAL','CO₂ Detection in Classroom 214.png','Start with what is actually observed. In this illustrative Classroom 214 case, a sensor reports sustained elevated carbon dioxide during an occupied interval. The observation may justify examining ventilation conditions, but it does not reveal the cause by itself. Occupancy, sensor placement, device condition, outdoor conditions and time history matter. At this stage we can say a condition was reported. We cannot yet say that a particular intervention is required, safe or authorized. Detection begins the examination; it does not make the decision.'],
+ ['02','PRESERVE THE RECORD','Validating Classroom Sensor Records.png','Before a signal can support a consequential decision, preserve its record. Identify the sensor, room, measurement units, timestamps, source history and available quality and calibration information. Retain raw observations as the primary record. If a dashboard smooths, adjusts or summarizes them, preserve the derived version separately with its method and source references. Look for gaps, clock drift and changes in sensor-to-room attribution. The result is not simply a pretty graph. It is a record that an independent examiner can reconstruct, challenge and trace.'],
+ ['03','PROPOSE THE CONSEQUENCE','Proposed Classroom Ventilation Consequence.png','Now state exactly what action is under consideration. For this hypothetical case, the proposition is to adjust outdoor-air ventilation serving Classroom 214. Name the equipment, zone, initiating actor, proposed operating duration, conditions, limits and rollback criteria. Do not presume that more outdoor air is always beneficial: humidity, equipment capability, filtration, weather, safety and site rules may change what is appropriate. A dashboard recommendation is not a control command. This proposition is a specific question that must still pass evidence, authority and standing examination.'],
+ ['04','FIND THE AUTHORITY','Authority Verification Technical Showroom Slide.png','Applicable Authority and Established Standing are different tests. A building may have a policy permitting ventilation changes, but that does not prove that this particular person or system may invoke the policy now. Examine the four standing anchors: ACTOR, CAPACITY, STANDING BASIS and AUTHORITY RELATIONSHIP. Identify who is acting, in what role, by what established basis, and for which equipment, site, action and time. Authority context may travel between systems, but execution authority must be established locally. An API credential or technical capability does not, by itself, prove standing.'],
+ ['05','THE CONSEQUENCE BOUNDARY','TA-14_ The Consequence Boundary.png','This is the TA14 consequence boundary. Ask the exact governing question: Does this proposed consequence have sufficient Admissible Evidence, Applicable Authority, and Established Standing to become reality NOW? The answer is scoped to this specific proposition and current conditions. A determination may be ALLOW, HOLD, DENY or ESCALATE. Record the reason, source references, time, limitations, and conditions requiring revalidation. Even an ALLOW is not a building-control instruction. It is a bounded governance determination, separate from physical execution.'],
+ ['06','THE AUTHORITY GAP','Authority Gap_ Classroom 214 Ventilation Hold.png','Consider the authority-gap branch. The Classroom 214 environmental evidence may be adequate, and the proposed action may be clearly described, yet the actor’s permission to change the relevant equipment remains unestablished. The correct illustrative determination is HOLD, with the missing authority relationship recorded. HOLD is not a failure to collect sensor data; it is successful recognition that good measurements cannot confer permission. Preserve the evidence, identify the remediable gap and require a fresh determination when the necessary standing is established.'],
+ ['07','EXTERNAL EXECUTION','TA-14 Execute_ Authorized BMS Control Flow.png','If the relevant conditions are established and a bounded ALLOW is issued, execution still belongs to the authorized site operator or building-management system. That system must independently apply its current safety and operating constraints. Record whether the action was accepted, declined, modified or attempted. If a command is issued, preserve its time, target, acknowledgment and observable equipment response. A successful acknowledgment only shows that a command was received. It does not establish that equipment changed as intended or that the air in Classroom 214 improved.'],
+ ['08','OUTCOME BECOMES EVIDENCE','Verifying Classroom CO₂ Outcomes.png','Finally examine what actually happened. Compare the proposed effect with post-action equipment states and time-stamped environmental observations, preserving changed occupancy, conditions, missing data and uncertainty. Distinguish NOT EXECUTED, EXECUTION UNCONFIRMED, EXECUTED WITH OUTCOME UNVERIFIED and VERIFIED OUTCOME. Do not infer causation from a single lower carbon-dioxide reading, and do not treat an apparent benefit as retroactive permission. Preserve the observed outcome as a new evidence record. That record informs the next examination; it does not automatically authorize the next consequence.']
+ ].map(([number,title,file,narration],index)=><article id={`teaching-${number}`} key={number} style={{scrollMarginTop:24,marginTop:24,padding:'clamp(14px,2.5vw,26px)',border:'1px solid rgba(113,231,255,.16)',borderRadius:18,background:'rgba(1,10,18,.65)'}}>
+ <div style={{display:'flex',justifyContent:'space-between',gap:12,flexWrap:'wrap',marginBottom:14,alignItems:'center'}}><h3 style={{fontSize:'clamp(19px,2.6vw,28px)',margin:0,color:'#eef7fb'}}>{number} / 08 · {title}</h3><span style={{fontSize:11,color:'#7ff0bd',fontWeight:900}}>ILLUSTRATIVE EXAMINATION</span></div>
+ <img src={`/${encodeURIComponent(file)}`} alt={`TA14 Blue IoT teaching image ${number} of 08: ${title}. ${narration}`} loading="lazy" style={{display:'block',width:'100%',height:'auto',borderRadius:12,border:'1px solid rgba(113,231,255,.16)'}}/>
+ <p style={{margin:'16px 0 10px',lineHeight:1.65,color:'#b8cbd6'}}><strong style={{color:'#7ff0bd'}}>NARRATION SCRIPT:</strong> {narration}</p>
+ <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+ <button type="button" disabled={!speechAvailable} onClick={()=>playNarration(number,title,narration+' What you just learned: '+learningBridges[index][0]+' What you will learn next: '+learningBridges[index][1])} aria-label={`Read image ${number} narration aloud`} style={{padding:'10px 16px',borderRadius:999,cursor:speechAvailable?'pointer':'not-allowed',background:'rgba(111,223,255,.12)',border:'1px solid rgba(111,223,255,.5)',color:'#adf0ff',fontWeight:800}}>{speakingImage===number?'RESTART NARRATION':'▶ LISTEN TO NARRATION'}</button>
+ <button type="button" disabled={!speakingImage} onClick={stopNarration} style={{padding:'10px 16px',borderRadius:999,cursor:speakingImage?'pointer':'not-allowed',background:'transparent',border:'1px solid rgba(255,255,255,.24)',color:'#e7f2f7',fontWeight:800}}>■ STOP</button>
+ </div>
+ <section aria-label={`Learning bridge after image ${number}`} style={{marginTop:20,padding:'18px 20px',borderRadius:14,border:'1px solid rgba(127,240,189,.27)',background:'rgba(9,39,39,.65)'}}>
+ <div style={{fontSize:11,letterSpacing:'.14em',fontWeight:950,color:'#7ff0bd',marginBottom:8}}>WHAT YOU JUST LEARNED</div>
+ <p style={{color:'#e4f3ed',lineHeight:1.65,margin:'0 0 18px'}}>{learningBridges[index][0]}</p>
+ <div style={{fontSize:11,letterSpacing:'.14em',fontWeight:950,color:'#78e8ff',marginBottom:8}}>{index===7?'FINAL LESSON SUMMARY':'WHAT YOU WILL LEARN NEXT'}</div>
+ <p style={{color:'#c2dbe5',lineHeight:1.65,margin:'0 0 12px'}}>{learningBridges[index][1]}</p>
+ </section>
+ </article>)}
+ <p style={{margin:'20px 0 0',fontSize:13,color:'#8fa8b7'}}>Read-aloud controls use the visitor's browser/device voice. The Samantha voice is preferred automatically when installed, but is not guaranteed; this is not a studio-recorded Samantha audio track. Scripts remain visible for accessibility. Scroll freely through all eight images.</p>
+ </section>
+
  <section style={{margin:'22px 0',padding:'clamp(26px,4vw,44px)',border:'1px solid rgba(127,240,189,.22)',borderRadius:26,background:'rgba(5,18,27,.88)'}}>
  <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>THE PRACTICAL PATHWAY</div>
  <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 8px'}}>Sense it. Validate it. Govern the consequence. Verify the outcome.</h2>
  <div style={{display:'grid',gap:9,marginTop:24}}>{steps.map(([n,a,b,c],i)=><div key={n} style={{display:'grid',gridTemplateColumns:'48px minmax(150px,210px) minmax(180px,280px) 1fr',gap:14,alignItems:'center',padding:'15px 16px',borderRadius:14,border:'1px solid rgba(113,231,255,.13)',background:i===4?'rgba(127,240,189,.055)':'rgba(2,9,15,.52)'}}><span style={{fontWeight:950,color:i===4?'#7ff0bd':'#526e7e'}}>{n}</span><b style={{color:i===4?'#7ff0bd':'#eef7fb'}}>{a}</b><span style={{fontWeight:800,color:'#c5d7df'}}>{b}</span><span style={{fontSize:13,lineHeight:1.48,color:'#91a8b7'}}>{c}</span></div>)}</div>
  </section>
 
- <section style={{padding:'clamp(26px,4vw,44px)',border:`1px solid ${accent}55`,borderRadius:26,background:'linear-gradient(135deg,rgba(15,56,49,.24),rgba(4,14,23,.95))'}}>
- <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>RUN ONE · SUSTAINED CO₂ EVENT</div>
- <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 20px'}}>Classroom 214 · proposed ventilation increase</h2>
+ <section id="classroom-simulation" style={{scrollMarginTop:24,padding:'clamp(26px,4vw,44px)',border:`1px solid ${accent}55`,borderRadius:26,background:'linear-gradient(135deg,rgba(15,56,49,.24),rgba(4,14,23,.95))'}}>
+ <div style={{fontSize:11,fontWeight:950,letterSpacing:'.18em',color:'#7ff0bd'}}>RUN ONE · SUSTAINED CO₂ EVENT · ILLUSTRATIVE SIMULATION ONLY</div>
+ <h2 style={{fontSize:'clamp(29px,4.6vw,52px)',letterSpacing:'-.04em',margin:'10px 0 20px'}}>Classroom 214 · proposed ventilation increase</h2><p style={{color:'#f2bf6a',lineHeight:1.55}}>Training simulation: buttons change this demonstration's displayed state only. No live evidence is validated, no real authority is established, and no command is sent to building equipment.</p>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:10}}>
  {[
  ['DETECTION','CO₂ remains elevated beyond the bounded observation period.'],
@@ -63,9 +120,9 @@ export default function BlueIotEvidenceToActionShowroom(){
  <div style={{marginTop:16,fontSize:12,color:'#879eac'}}>ENVIRONMENTAL CONDITION</div><div style={{fontWeight:900}}>SUSTAINED CO₂ EVENT</div>
  <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>PROPOSED CONSEQUENCE</div><div style={{fontWeight:900}}>INCREASE OUTDOOR-AIR VENTILATION</div>
  <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>TA-14 DETERMINATION</div><div style={{fontSize:'clamp(24px,3vw,38px)',fontWeight:1000,color:accent}}>{determination}</div>
- <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>EXECUTION STATE</div><div style={{fontWeight:900}}>{phase==='VERIFIED'?'EXECUTED BY AUTHORIZED SYSTEM':'NOT EXECUTED'}</div>
- <p style={{fontSize:13,lineHeight:1.55,color:'#a9bbc4'}}>{phase==='DETECTED'?'Detection establishes a condition to examine. It does not itself establish intervention authority.':phase==='VALIDATED'?'Evidence has been validated, but admissible evidence is still not the same thing as authority to intervene.':phase==='ALLOW'?'ALLOW is a bounded governance determination. The authorized BMS / HVAC system still retains execution control.':phase==='HOLD'?'HOLD preserves the environmental evidence while preventing the proposed consequence from being treated as authorized under an unresolved authority or standing condition.':'The post-action environmental state becomes the next evidence record.'}</p>
- {phase==='ALLOW'&&<button onClick={()=>setPhase('VERIFIED')} style={{cursor:'pointer',padding:'10px 16px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.11)',color:'#7ff0bd',fontWeight:950}}>EXECUTE EXTERNALLY + VERIFY OUTCOME</button>}
+ <div style={{marginTop:14,fontSize:12,color:'#879eac'}}>EXECUTION STATE</div><div style={{fontWeight:900}}>{phase==='VERIFIED'?'SIMULATED EXECUTION / OUTCOME':'NOT EXECUTED'}</div>
+ <p style={{fontSize:13,lineHeight:1.55,color:'#a9bbc4'}}>{phase==='DETECTED'?'Detection establishes a condition to examine. It does not itself establish intervention authority.':phase==='VALIDATED'?'Evidence has been validated, but admissible evidence is still not the same thing as authority to intervene.':phase==='ALLOW'?'ALLOW is a bounded governance determination. The authorized BMS / HVAC system still retains execution control.':phase==='HOLD'?'HOLD preserves the environmental evidence while preventing the proposed consequence from being treated as authorized under an unresolved authority or standing condition.':'In this training branch, a hypothetical post-action environmental state is represented as new evidence; no real outcome has been independently verified.'}</p>
+ {phase==='ALLOW'&&<button onClick={()=>setPhase('VERIFIED')} style={{cursor:'pointer',padding:'10px 16px',borderRadius:999,border:'1px solid #7ff0bd',background:'rgba(127,240,189,.11)',color:'#7ff0bd',fontWeight:950}}>SIMULATE EXTERNAL EXECUTION + OBSERVATION</button>}
  </div>
  </div>
  </section>

@@ -1,0 +1,27 @@
+TA-14 INDOOR AIR QUALITY GOVERNANCE — NUMBERED NARRATION
+Voice: Samantha (where available). Manual playback; do not auto-scroll.
+All observations and decisions in these illustrations are hypothetical.
+
+01 — REALITY
+We begin with the actual classroom, not a dashboard conclusion. Occupancy, indoor carbon dioxide, outdoor particulate matter, and the operating state of the air-handling system establish the physical context. Observation alone is not permission to intervene.
+
+02 — RECORD
+Preserve the raw readings, instrument identity, timestamp, location, and HVAC state. The Atmospheric Integrity Record must retain what was actually observed and where it came from. A summary cannot replace its underlying record.
+
+03 — CONTINUITY
+Follow the record through storage, synchronization, custody changes, and new observations. Preserve the original evidence while linking later conditions. An untracked gap or changed source must be examined rather than silently ignored.
+
+04 — ADMISSIBILITY
+Ask whether the evidence is valid, relevant, current, and sufficient for this exact proposed action. An elevated classroom carbon dioxide reading may justify examining ventilation, but outdoor wildfire smoke can change the decision context before execution.
+
+05 — BINDING
+Connect the evidence to the specific equipment, applicable policies, responsible parties, and bounded ventilation proposal. Neither evidence nor equipment capability establishes permission on its own.
+
+06 — COMMIT
+At the decision point, examine admissible evidence, applicable authority, and established standing. In this hypothetical case, changed outdoor conditions support HOLD rather than releasing the earlier prepared command. HOLD is a bounded disposition, not an automatic conclusion for every building.
+
+07 — EXECUTION
+The prepared command does not reach the air-handling equipment while HOLD remains in effect. The system's existing state is preserved and the non-release is documented. Capability is not authority.
+
+08 — OUTCOME
+Verify what actually happened. A blocked command is a meaningful, recordable outcome. Preserve the equipment state, environmental observations, decision rationale, and subsequent conditions so the next proposed action begins from a new, attributable reality.

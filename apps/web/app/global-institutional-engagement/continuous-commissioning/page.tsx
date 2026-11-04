@@ -2,6 +2,7 @@ import type {Metadata} from 'next';
 import Link from 'next/link';
 import CommissioningContinuityLab from './CommissioningContinuityLab';
 import CommissioningTimeline from './CommissioningTimeline';
+import CommissioningVisualLessons from './CommissioningVisualLessons';
 
 export const metadata:Metadata={
   title:'Continuous Commissioning Showroom | TA-14 Exchange',
@@ -22,6 +23,7 @@ export default function ContinuousCommissioningShowroom(){
         <h1>THE COMMISSIONING ENDED.<br/><em>THE BUILDING DID NOT.</em></h1>
         <p>This showroom examines the evidence boundary between a correctly commissioned condition and a later operational consequence. It does not replace commissioning. It asks what must still be true after handoff before yesterday's verified condition can support today's action.</p>
       </section>
+      <CommissioningVisualLessons/>
       <div className="sixty">
         <article><small>UNDERSTAND THIS ROOM IN 60 SECONDS</small><h2>Commissioning proves a condition. Operations changes it.</h2><p>A building can be correctly commissioned on Monday and face a different reality later. Sensors drift. Sequences change. Equipment is replaced. Operators intervene. Utilities degrade. A correction may clear an alarm without proving the condition stayed corrected.</p></article>
         <article className="why"><small>WHY THIS ROOM EXISTS</small><h2>The gap appears when yesterday's proof is used for today's consequence.</h2><p>Continuous commissioning helps detect and investigate change. TA-14 asks the adjoining governance question immediately before consequence: does the evidence still describe reality, does authority still stand, is the exact action bound, and may execution proceed now?</p></article>

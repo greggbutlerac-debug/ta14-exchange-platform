@@ -34,6 +34,15 @@ type Data = {
   intentTypes: Item[];
   intentPages: Item[];
   subscriptionPlans: Item[];
+  writtenEngagement?: {
+    showroomToCommercialClicks: number;
+    showroomToCommercialVisitors: number;
+    writtenInquiryLinkClicks: number;
+    writtenInquiryLinkVisitors: number;
+    confirmedWrittenInquiries: number | null;
+    topSourceShowrooms: Item[];
+    boundary: string;
+  };
 };
 
 function DataPanel({ title, eyebrow, items, empty = "No data recorded yet." }: { title: string; eyebrow: string; items: Item[]; empty?: string }) {
@@ -199,6 +208,18 @@ export default function SeoIntelligencePage() {
             </div>
             <div className="evidenceBoundary"><strong>EVIDENCE BOUNDARY</strong><p>Private owner view · rolling {data.windowDays}-day traffic window · no raw IP address stored. Intent is inferred behavior. Authenticated attribution requires a signed-in TA-14 identity. Paid conversion requires the authoritative billing ledger.</p></div>
           </section>
+
+          {data.writtenEngagement ? <section className="metricsSection panel" aria-label="Written commercial engagement">
+            <div className="panelHeading wide"><div><p className="eyebrow">SHOWROOM TO WRITTEN INQUIRY</p><h3>Bounded commercial engagement signals</h3></div><span className="panelState blue">BEHAVIORAL EVENTS · NOT SALES</span></div>
+            <div className="metricGrid">
+              <article className="metricCard"><span>{data.writtenEngagement.showroomToCommercialClicks.toLocaleString()}</span><small>Showroom → commercial clicks</small></article>
+              <article className="metricCard"><span>{data.writtenEngagement.showroomToCommercialVisitors.toLocaleString()}</span><small>Visits clicking commercial pathways</small></article>
+              <article className="metricCard"><span>{data.writtenEngagement.writtenInquiryLinkClicks.toLocaleString()}</span><small>Written-inquiry email link clicks</small></article>
+              <article className="metricCard"><span>—</span><small>Confirmed delivered inquiries: unavailable</small></article>
+            </div>
+            <div className="evidenceBoundary"><strong>EVIDENCE BOUNDARY</strong><p>{data.writtenEngagement.boundary} This view includes only qualified-human acquisition events; instrumentation begins at the rollout, so earlier visits are not retroactively classified.</p></div>
+            <DataPanel eyebrow="SOURCE SHOWROOMS" title="Showrooms generating commercial clickthrough" items={data.writtenEngagement.topSourceShowrooms} empty="No measured showroom-to-commercial clicks have been classified yet." />
+          </section> : null}
 
           <section id="signal-detail" className="detailIntro"><p className="eyebrow">SIGNAL DETAIL</p><h3>What the Exchange is telling us</h3></section>
           <section className="detailGrid">

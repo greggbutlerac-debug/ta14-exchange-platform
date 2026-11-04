@@ -67,6 +67,140 @@ const nextConfig: NextConfig = {
         destination: "/governance-showcase/:registryIdentifier",
         permanent: true,
       },
+      // GA4 October 2026: recover unambiguous legacy links without changing active showroom routes.
+      {
+        source: "/TA14",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/bXVuaWNpcG",
+        destination: "/showrooms/municipal-air-quality-governance",
+        permanent: true,
+      },
+      // GA4 historical 404 recovery: redirect a verified truncated showroom alias.
+      {
+        source: "/showrooms/c2VtaWNvbm",
+        destination: "/showrooms/semiconductor-fab-consequence-boundary",
+        permanent: true,
+      },
+      // Public-route recovery: preserve older/shared URLs and repair malformed links
+      // observed in production traffic without manufacturing new content.
+      {
+        source: "/examinations/c3RvcC10aG",
+        destination: "/examinations/stop-the-cyber-attack",
+        permanent: true,
+      },
+      {
+        source: "/registry/ta-14-admissible-execution-architecture/showcase/b3duZXItdG",
+        destination: "/registry/ta-14-admissible-execution-architecture/showcase/owner-to-consequence-collaboration",
+        permanent: true,
+      },
+      {
+        source: "/ai-governance/register",
+        destination: "/workspace/ai-governance/registry/register",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/dGhhaWxhbm",
+        destination: "/showrooms/thailand-school-air-evidence",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/Y2xlYW4tYW",
+        destination: "/showrooms/clean-air-developing-minds",
+        permanent: true,
+      },
+      {
+        source: "/examinations/ZGF2aWQtaG",
+        destination: "/examinations/david-holmberg-technical-challenge",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/YXJpem9uYS",
+        destination: "/showrooms/arizona-building-as-evidence",
+        permanent: true,
+      },
+      {
+        source: "/examinations/stop-the-cyber-attack/presentatio",
+        destination: "/examinations/stop-the-cyber-attack/presentation",
+        permanent: true,
+      },
+      {
+        source: "/global-institutional-engage/thailand",
+        destination: "/global-institutional-engagement/thailand",
+        permanent: true,
+      },
+      {
+        source: "/showrooms/Zm91bmRpbm",
+        destination: "/showrooms/founding-institutional-sponsorship",
+        permanent: true,
+      },
+      {
+        source: "/admissible-execution-architecture",
+        destination: "/registry/ta-14-admissible-execution-architecture",
+        permanent: true,
+      },
+      {
+        source: "/admissible-computation-architecture",
+        destination: "/ai-governance/admissible-computation",
+        permanent: true,
+      },
+      {
+        source: "/ai-governance/playground",
+        destination: "/workspace/ai-governance/playground",
+        permanent: true,
+      },
+      {
+        source: "/governance-library/all",
+        destination: "/governance-library",
+        permanent: true,
+      },
+      {
+        source: "/entity-review",
+        destination: "/workspace/entity-review",
+        permanent: true,
+      },
+      {
+        source: "/request-review",
+        destination: "/workspace/entity-review",
+        permanent: true,
+      },
+      {
+        source: "/ai-governance/my-routes",
+        destination: "/workspace/my-routes",
+        permanent: true,
+      },
+      {
+        source: "/workspace/governed-records/admissibility-review",
+        destination: "/workspace/governed-records",
+        permanent: true,
+      },
+      {
+        source: "/global-institutional-engagement/null",
+        destination: "/global-institutional-engagement/showrooms",
+        permanent: true,
+      },
+      {
+        source: "/workspace/ai-governance/registry/records/TA-14-AIGR-000017/null",
+        destination: "/registry/TA-14-AIGR-000017",
+        permanent: true,
+      },
+      {
+        source: "/eu-ai-act/null",
+        destination: "/eu-ai-act",
+        permanent: true,
+      },
+      {
+        source: "/null",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/index",
+        destination: "/",
+        permanent: true,
+      },
     ];
   },
 

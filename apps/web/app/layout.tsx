@@ -10,6 +10,7 @@ import { SixthWorldBilateralEnhancer } from '../components/sixth-world-bilateral
 import { SixthWorldNativeDominance } from '../components/sixth-world-native-dominance';
 import { SixthWorldUAEStandard } from '../components/sixth-world-uae-standard';
 import { EIGGlobalInstitutionalBridge } from '../components/eig-global-institutional-bridge';
+import { GOIAQGShowroomBridge } from '../components/go-iaqg-showroom-bridge';
 import ArtifactCorpusStatusShell from './artifacts/artifact-corpus-status-shell';
 import { CANONICAL_EXCHANGE_ORIGIN } from '../lib/site/canonical-origin';
 
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <SixthWorldNativeDominance />
     <SixthWorldUAEStandard />
     <EIGGlobalInstitutionalBridge />
+    <Suspense fallback={null}><GOIAQGShowroomBridge /></Suspense>
     {children}
     <Suspense fallback={null}><CommercialTrialConversion /></Suspense>
     <RouteAwareGlobalChrome />

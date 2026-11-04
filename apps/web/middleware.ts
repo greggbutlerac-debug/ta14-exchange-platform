@@ -19,6 +19,7 @@ const PUBLIC_ROUTE_PREFIXES = [
   "/eu-ai-act",
   "/global-institutional-engagement",
   "/greenbuild",
+  "/showrooms",
   "/registry/records",
   "/governance-showcase",
 ];

@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export const metadata = {
   title: 'Start with TA-14 | 14 days free',
-  description: 'Start TA-14 governance software free for 60 days with no credit card, or choose independent review, governance registration, or institutional deployment.',
+  description: 'Explore TA14 governance software with a 14-day free trial, independent AI execution authority reviews from $1,500, $149 bounded examinations, registration and institutional services.',
 };
 
 const paths = [
@@ -65,7 +65,7 @@ export default function StartPage() {
 
     <section className="conversion">
       <div><small>NEED A BOUNDED INDEPENDENT REVIEW?</small><h2>Not sure whether the evidence can support the claim?</h2><p>Start with the $149 bounded-examination baseline. When the question specifically requires a specialist evidence snapshot, deeper failure challenges, changed-condition analysis, authority review, or replay, the $249 Snapshot and $750+ Execution Claim Review remain available as expanded professional scopes. Payment never purchases a favorable result.</p></div>
-      <div className="conversionlinks"><Link href="/pricing">START WITH THE $149 BASELINE →</Link><Link href="/execution-evidence-snapshot">SPECIALIST $249 SNAPSHOT →</Link><Link href="/execution-claim-review">FULL $750+ CLAIM REVIEW →</Link><Link href="/execution-claim-review/intake">REQUEST A BOUNDED SCOPE →</Link></div>
+      <div className="conversionlinks"><Link href="/pricing">START WITH THE $149 BASELINE →</Link><Link href="/professional-services">AI EXECUTION AUTHORITY REVIEW FROM $1,500 →</Link><Link href="/execution-evidence-snapshot">SPECIALIST $249 SNAPSHOT →</Link><Link href="/execution-claim-review">FULL $750+ CLAIM REVIEW →</Link><Link href="/execution-claim-review/intake">REQUEST A BOUNDED SCOPE →</Link></div>
     </section>
 
     <section className="proof">

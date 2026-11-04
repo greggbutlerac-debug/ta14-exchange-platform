@@ -114,7 +114,7 @@ export default function ShangoFoundingDemonstrationPage() {
           </div>
 
           <div className="hero-actions">
-            <Link className="button primary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000011">Open Shango Registry Record</Link>
+            <Link className="button primary" href="/governance-showcase/TA-14-AIGR-000011">Open Shango Interactive Showroom</Link>\n            <Link className="button primary" href="/workspace/ai-governance/registry/records/TA-14-AIGR-000011">Open Shango Registry Record</Link>
             <Link className="button secondary" href="/artifacts/registry">Return to Registered Artifacts</Link>
             <Link className="button ghost" href="/workspace/ai-governance/reviews">Reviews & Responses</Link>
           </div>

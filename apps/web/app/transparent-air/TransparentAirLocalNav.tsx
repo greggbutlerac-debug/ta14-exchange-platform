@@ -4,6 +4,11 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const localPages = [
+  { href: '/transparent-air', label: 'Transparent Air Home' },
+  { href: '/transparent-air/ac-not-working', label: 'AC Not Working' },
+  { href: '/transparent-air/ac-not-cooling', label: 'AC Not Cooling' },
+  { href: '/transparent-air/heat-pump-not-working', label: 'Heat Pump Not Working' },
+  { href: '/transparent-air/told-you-need-new-ac', label: 'Told You Need a New AC? · $80 Second Opinion' },
   { href: '/transparent-air/gulfport-ac-repair', label: 'Gulfport AC Repair' },
   { href: '/transparent-air/south-st-petersburg-ac-repair', label: 'South St. Petersburg AC Repair' },
   { href: '/transparent-air/maximo-pinellas-point-ac-repair', label: 'Maximo / Pinellas Point · 33711 AC Repair' },
@@ -17,7 +22,7 @@ export default function TransparentAirLocalNav() {
   if (pathname === '/transparent-air/command-center') return null;
 
   return (
-    <nav aria-label="Transparent Air local service areas" style={{ background: '#062531', color: '#dcebed', padding: '30px 4vw 38px', borderTop: '1px solid #174653' }}>
+    <nav aria-label="Transparent Air service routes" style={{ background: '#062531', color: '#dcebed', padding: '30px 4vw 38px', borderTop: '1px solid #174653' }}>
       <div style={{ width: 'min(1160px, 92vw)', margin: '0 auto' }}>
         <div style={{ fontSize: '.76rem', fontWeight: 900, letterSpacing: '.14em', textTransform: 'uppercase', color: '#7ee0df', marginBottom: 12 }}>
           Transparent Air local service areas

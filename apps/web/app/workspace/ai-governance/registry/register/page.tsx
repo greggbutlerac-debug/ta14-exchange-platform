@@ -1360,6 +1360,11 @@ export default function RegisterGovernancePage() {
       window.localStorage.removeItem(DRAFT_KEY);
 
       if (payload.registration?.registryIdentifier) {
+        if (!payload.alreadyRegistered && typeof (window as Window & { gtag?: (...args: unknown[]) => void }).gtag === 'function') {
+          (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.('event', 'ta14_governance_registration_completed', {
+            transport_type: 'beacon',
+          });
+        }
         const finalized = {
           id: payload.registration.submissionId ?? submissionId,
           status: 'registered',
@@ -1381,6 +1386,11 @@ export default function RegisterGovernancePage() {
       }
 
       if (payload.submission?.id) {
+        if (typeof (window as Window & { gtag?: (...args: unknown[]) => void }).gtag === 'function') {
+          (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.('event', 'ta14_governance_submission_completed', {
+            transport_type: 'beacon',
+          });
+        }
         const pending = {
           id: payload.submission.id,
           status: payload.submission.status ?? 'submitted',
