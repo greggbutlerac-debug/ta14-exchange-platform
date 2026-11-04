@@ -12,7 +12,7 @@ const base:Case[]=[
 const topics:Record<string,string>={
  'smart-city':'municipal infrastructure','school':'school air and building operations','hvac':'HVAC intervention','filter':'filtration and indoor air','radon':'radon mitigation','energy':'energy and environmental outcomes','municipal':'municipal environmental action','predictive':'predictive recommendations','ai-':'AI-initiated consequences','building':'building operations','semiconductor':'semiconductor facility operations','air':'air-quality intervention','environmental':'environmental accountability','laboratory':'laboratory-to-field deployment','water':'water system intervention','traffic':'transportation operations','payment':'financial execution','refrigerant':'refrigerant-system intervention'
 };
-const excluded=['bruno-tudal','john-kay','anto-budiardjo','eight24-solutions','founding-institutional-sponsorship','environmental-atmospheric'];
+const excluded=['bruno-tudal','john-kay','anto-budiardjo','eight24-solutions','founding-institutional-sponsorship','environmental-atmospheric','prediction-is-not-permission'];
 function topicFor(path:string){const slug=path.split('/').filter(Boolean).slice(1).join('/');const key=Object.keys(topics).find(k=>slug.includes(k));return key?topics[key]:'the proposed operational consequence';}
 export default function ShowroomReviewChallenge(){
  const path=usePathname()||'';
