@@ -26,7 +26,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const PDF = '/showrooms/refrigeration-consequence-boundary/files/TA14_When_the_Attacker_Bypasses_Governance_Revision_1_4.pdf';
 const STATUS_BG: Record<string, string> = { PASS: '#2f6f5e', FAIL: '#c0392b', NOT_DEMONSTRATED: '#5d6b75' };
 const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
@@ -77,7 +76,6 @@ export default async function RefrigerationConsequenceBoundaryPage() {
           <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 16 }}>
             <a href="#lessons" style={{ padding: '12px 16px', borderRadius: 10, background: '#7BAFD4', color: '#001426', fontWeight: 900, textDecoration: 'none' }}>Start the eight lessons</a>
             <a href="#demonstration" style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #7BAFD4', color: '#C9E0EF', fontWeight: 800, textDecoration: 'none' }}>Open the interactive demonstration</a>
-            <a href={PDF} style={{ padding: '12px 16px', borderRadius: 10, border: '1px solid #7BAFD4', color: '#C9E0EF', fontWeight: 800, textDecoration: 'none' }}>⬇ Technical examination (PDF)</a>
           </div>
         </header>
 
