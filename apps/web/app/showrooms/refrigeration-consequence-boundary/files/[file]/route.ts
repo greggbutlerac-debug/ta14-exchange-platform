@@ -8,7 +8,7 @@ import { NextResponse } from 'next/server';
 import { examinationAccess } from '../../access';
 
 export const dynamic = 'force-dynamic';
-const PDF_NAME = 'TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf';
+const PDF_NAME = 'TA14_When_the_Attacker_Bypasses_Governance_Revision_1_4.pdf';
 
 export async function GET(_request: Request, { params }: { params: Promise<{ file: string }> }) {
   if (!(await examinationAccess()).allowed) return new NextResponse('Not found.', { status: 404 });
