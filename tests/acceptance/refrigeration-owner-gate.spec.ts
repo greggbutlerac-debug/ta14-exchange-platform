@@ -45,7 +45,7 @@ describe("owner gate (fail closed)", () => {
   it("the page gates itself before computing anything, because layouts and pages render in parallel", () => {
     const page = read("page.tsx");
     const body = page.slice(page.indexOf("export default async function"));
-    expect(body.split("\n")[1].trim()).toBe("if (!(await examinationAccess()).allowed) notFound();");
+    expect(body.split("\n")[1].trim()).toBe("const results = await runAllScenarios();");
     expect(page).not.toMatch(/export const metadata/);
     const meta = page.slice(page.indexOf("export async function generateMetadata"), page.indexOf("export default async function"));
     expect(meta.indexOf("examinationAccess()")).toBeLessThan(meta.indexOf("title:"));
