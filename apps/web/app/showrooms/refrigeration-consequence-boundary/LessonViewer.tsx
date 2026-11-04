@@ -112,6 +112,21 @@ export function LessonViewer({ lessons, figures }: { lessons: Lesson[]; figures:
 /** Static teaching illustration. The underlying examination data and charts remain authoritative. */
 function ImageSlot({ spec, number }: { spec: Lesson['image']; number: string }) {
   const src = '/'+encodeURIComponent(spec.filename);
+  // Editorial fail-closed: the uploaded E1 and review images contain materially
+  // inaccurate labels. Do not display them as authoritative teaching material.
+  if (number === '07' || number === '08') {
+    return (
+      <figure style={{ margin: 0, padding: 20, border: '1px solid #E8B04B', borderRadius: 14, background: '#031a2e' }}>
+        <strong style={{ color: '#E8B04B' }}>LESSON {number} · ILLUSTRATION WITHHELD PENDING CORRECTION</strong>
+        <p style={{ color: '#C9E0EF', lineHeight: 1.7 }}>
+          {number === '07'
+            ? 'The supplied E1 illustration implies a defrost permission outside the authorized protective-measure scope. Only sealed-baseline restoration, termination of an active defrost, and re-enabling an alarm are defined, subject to the separate emergency authority and execution revalidation.'
+            : 'The supplied review illustration mislabels S3 and S4 and omits S5 and S8. Use the live source-derived claims matrix below, not the withdrawn static table.'}
+        </p>
+        <figcaption style={{ color: '#B9D9EB', fontSize: 13 }}>SIMULATION · Accurate narration, evidence exports and the live review matrix remain available below.</figcaption>
+      </figure>
+    );
+  }
   return (
     <figure style={{ margin: 0 }}>
       <div style={{ aspectRatio: '16 / 9', border: '1px solid #316987', borderRadius: 14, overflow: 'hidden', background: '#031a2e' }}>
