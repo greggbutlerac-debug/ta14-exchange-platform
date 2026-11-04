@@ -27,14 +27,16 @@ describe("owner gate (fail closed)", () => {
   ];
   for (const [name, input, allowed] of cases) it(`${name} → ${allowed ? "allowed" : "404"}`, () => { expect(decideAccess(input).allowed).toBe(allowed); });
 
-  it("the layout, the evidence route and the PDF route all enforce the gate before anything else", () => {
+  it("the layout and evidence route enforce the gate; withdrawn PDF route stays absent", () => {
     expect(read("layout.tsx")).toMatch(/if \(!\(await examinationAccess\(\)\)\.allowed\) notFound\(\);/);
-    for (const route of ["evidence/[file]/route.ts", "files/[file]/route.ts"]) {
+    for (const route of ["evidence/[file]/route.ts"]) {
       const src = read(route);
       const gate = src.indexOf("examinationAccess()).allowed) return new NextResponse('Not found.', { status: 404 })");
       expect(gate).toBeGreaterThan(0);
       expect(gate).toBeLessThan(src.indexOf("await params"));
     }
+    expect(existsSync(join(DIR, "files/[file]/route.ts"))).toBe(false);
+    expect(read("page.tsx")).not.toContain("Technical examination (PDF)");
     expect(read("access.ts")).toMatch(/catch \{\s*userId = null; \/\/ fail closed/);
   });
   it("no examination file is served from public/", () => {
