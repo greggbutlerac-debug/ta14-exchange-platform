@@ -4,9 +4,12 @@
 
 > Everything here is software verification of a **simulation**. Nothing validates a physical refrigeration system, a real controller, or real sensors.
 
-## 0. Current blocker (upstream)
+## 0. Status (2026-11-04, `cd7b251e`)
 
-`main` (`3c688ebe`) fails its own CI type check: `apps/web/app/showrooms/ShowroomReviewChallenge.tsx` (added upstream in `ebd87866`) assigns strings to a `Record<string,{name;example}>`. This produces 18 `TS2322` errors, so `npm run typecheck` and `next build` fail on `main` and on this branch after merging it. This branch does not modify that file. With a local-only, uncommitted patch to that file, this branch type-checks, builds and passes every check below. **PR CI will stay red until `main` is fixed.**
+- The upstream type errors in `ShowroomReviewChallenge.tsx` were fixed on `main` (`3172f9a1`). This branch is merged with `main` `c333c8ac`. A separately prepared PR with the same fix (#676) was closed as redundant.
+- Clean local run of `cd7b251e`: `tsc` 0 errors; `vitest` 267 passed, 3 skipped, 0 failed; `next build` succeeded (965 pages). Leak check: page, evidence and PDF all 404 with no examination content in any body. Browser check: no failures and no console errors.
+- PR CI "Verify application": **pass**. Vercel preview deployment `ta14-exchange-platform-c2jqj5qt8-ta-14-exchange.vercel.app` (commit `cd7b251e`, which contains the gate fix `85eb3680`): **success**.
+- Unauthenticated requests to that preview (page, evidence, PDF, RSC payload) get 302 to Vercel SSO with no examination content. Vercel deployment protection sits in front of the app, so the app's own 404 can be observed there only with a protection-bypass token.
 
 ## 1. Integration with current main
 
