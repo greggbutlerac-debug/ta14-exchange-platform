@@ -1,0 +1,338 @@
+{
+ "schema": "ta14.rcb.summary.v1",
+ "label": "SIMULATION — NOT PHYSICAL-SYSTEM VALIDATION",
+ "baseline": {
+  "baselineId": "RCB-BL-1.0",
+  "version": "1.0",
+  "label": "SIMULATION — NOT PHYSICAL-SYSTEM VALIDATION",
+  "equipment": {
+   "assetId": "RCB-FREEZER-01",
+   "description": "Simulated reach-in display freezer",
+   "product": "Simulated packaged ice cream",
+   "controllerId": "CTRL-SIM-01",
+   "commandRoute": "controller-command-route"
+  },
+  "setpointC": -22,
+  "differentialK": 2,
+  "approvedAirBandC": [
+   -25,
+   -19
+  ],
+  "productLimitC": -18,
+  "productExceptionC": -15,
+  "defrost": {
+   "startsAt": [
+    "02:00",
+    "08:00",
+    "14:00",
+    "20:00"
+   ],
+   "durationMin": 20,
+   "maxDurationMin": 30,
+   "recoveryMin": 40
+  },
+  "operatingLimits": {
+   "setpointRangeC": [
+    -25,
+    -18
+   ],
+   "maxDefrostMin": 30
+  },
+  "einThresholds": {
+   "watchAirOutsideBandMin": 10,
+   "heaterOnAmps": 1,
+   "compressorOnAmps": 1,
+   "reportDisagreementK": 3,
+   "reportDisagreementSamples": 3,
+   "probeDisagreementK": 2,
+   "stuckSamples": 6,
+   "maxSampleAgeMin": 10
+  },
+  "controllerAlarm": {
+   "airAboveC": -12,
+   "forMin": 30
+  },
+  "actors": [
+   {
+    "actorId": "FM-01",
+    "role": "FACILITY_MANAGER",
+    "standing": "CURRENT"
+   },
+   {
+    "actorId": "TECH-01",
+    "role": "REFRIGERATION_TECHNICIAN",
+    "standing": "CURRENT"
+   }
+  ],
+  "evidenceSources": [
+   {
+    "sourceId": "P1",
+    "kind": "product-simulant probe (glycol bottle)",
+    "unit": "degC",
+    "independentOfController": true,
+    "logger": "EIN-LOGGER-A"
+   },
+   {
+    "sourceId": "P2",
+    "kind": "product-simulant probe (glycol bottle)",
+    "unit": "degC",
+    "independentOfController": true,
+    "logger": "EIN-LOGGER-B"
+   },
+   {
+    "sourceId": "AIR",
+    "kind": "cabinet air probe",
+    "unit": "degC",
+    "independentOfController": true,
+    "logger": "EIN-LOGGER-A"
+   },
+   {
+    "sourceId": "HEATER_CT",
+    "kind": "defrost heater current clamp",
+    "unit": "A",
+    "independentOfController": true,
+    "logger": "EIN-LOGGER-B"
+   },
+   {
+    "sourceId": "COMPRESSOR_CT",
+    "kind": "compressor current clamp",
+    "unit": "A",
+    "independentOfController": true,
+    "logger": "EIN-LOGGER-B"
+   }
+  ],
+  "thresholdBasis": "Configured for this simulation. -18 °C is a commonly cited frozen-storage temperature; site limits must come from the operator's food-safety plan and equipment documentation."
+ },
+ "model": {
+  "roomC": 24,
+  "evapC": -32,
+  "defrostTargetC": 15,
+  "tauCoolMin": 25,
+  "tauLeakMin": 240,
+  "tauDefrostMin": 40,
+  "tauProductMin": 300,
+  "heaterAmps": 8,
+  "compressorAmps": 6,
+  "idleAmps": 0.08,
+  "basis": "Illustrative lumped two-node model; parameters chosen for teaching, not measured."
+ },
+ "scenarios": [
+  {
+   "id": "S1",
+   "title": "Unauthorized defrost command submitted through AEA",
+   "chainHead": "1d088c9b71e22779411564fd78828456b1511880ad98ef6c04240ec2e526d113",
+   "entries": 581,
+   "claims": [
+    {
+     "capability": "PREVENTION",
+     "status": "PASS"
+    },
+    {
+     "capability": "NO_FALSE_ALERT",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S2",
+   "title": "Unauthorized defrost command bypassing AEA",
+   "chainHead": "569a63efd8825e5fbcb82dcf47bf3aaff719f4d0edde8087b29874039da551df",
+   "entries": 591,
+   "claims": [
+    {
+     "capability": "PREVENTION",
+     "status": "FAIL"
+    },
+    {
+     "capability": "DETECTION",
+     "status": "PASS"
+    },
+    {
+     "capability": "NO_FABRICATED_AUTHORIZATION",
+     "status": "PASS"
+    },
+    {
+     "capability": "ATTRIBUTION_NOT_ASSERTED",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S3",
+   "title": "Unauthorized temperature setpoint change",
+   "chainHead": "a6ece877e4a69442e7b6a509700877059b269a3f82fc183340855b45321e7a99",
+   "entries": 593,
+   "claims": [
+    {
+     "capability": "PREVENTION",
+     "status": "FAIL"
+    },
+    {
+     "capability": "DETECTION",
+     "status": "PASS"
+    },
+    {
+     "capability": "NO_FABRICATED_AUTHORIZATION",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S4",
+   "title": "Compromised controller reporting false temperatures",
+   "chainHead": "3ad8e79d2c1d8cd151618a6f2029a6ec9e9d0001866994310fe1f22d3f30cd1f",
+   "entries": 590,
+   "claims": [
+    {
+     "capability": "DETECTION",
+     "status": "PASS"
+    },
+    {
+     "capability": "DETECTION_INDEPENDENT_OF_CONTROLLER_REPORTS",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S5",
+   "title": "Suppressed controller alarm",
+   "chainHead": "7e89ea2dd9ef95b5929b171f63cc0204b0db2a1d221554bfcb6aadf8667323e0",
+   "entries": 593,
+   "claims": [
+    {
+     "capability": "DETECTION",
+     "status": "PASS"
+    },
+    {
+     "capability": "ALERT_INDEPENDENT_OF_CONTROLLER_ALARM",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S6",
+   "title": "Independent sensor failure or unavailable evidence",
+   "chainHead": "b72b60c36d55dbae9a6eb14cb29158849986a71585d2f556fb1c2856a715ce36",
+   "entries": 591,
+   "claims": [
+    {
+     "capability": "DETECTION",
+     "status": "FAIL"
+    },
+    {
+     "capability": "EVIDENCE_GAP_DISCLOSED",
+     "status": "PASS"
+    },
+    {
+     "capability": "NO_EXECUTION_WITHOUT_ADMISSIBLE_EVIDENCE",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S7",
+   "title": "Expired authorization replay",
+   "chainHead": "d2ffe71237fa71926e564f562fa7ef2187321ce6ea00aa4aef185609ff3938bb",
+   "entries": 582,
+   "claims": [
+    {
+     "capability": "PREVENTION",
+     "status": "PASS"
+    },
+    {
+     "capability": "NO_FALSE_ALERT",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "S8",
+   "title": "Authorized recovery with post-intervention verification",
+   "chainHead": "a92a0ff56e07a410f80ea7efa14a10facca20ddeb0f43d8f23e2e17e6d099975",
+   "entries": 597,
+   "claims": [
+    {
+     "capability": "ROUTINE_COMMAND_HELD_DURING_INCIDENT",
+     "status": "PASS"
+    },
+    {
+     "capability": "RUNTIME_REVALIDATION",
+     "status": "PASS"
+    },
+    {
+     "capability": "RECOVERY_AUTHORIZED",
+     "status": "PASS"
+    },
+    {
+     "capability": "POST_INTERVENTION_VERIFICATION",
+     "status": "PASS"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  },
+  {
+   "id": "E1",
+   "title": "Loss of independent evidence with the emergency protective pathway",
+   "chainHead": "ab23c9a74cd55c924387539fe48d300e29228c19e6ddee8662ece54c6b4fff7d",
+   "entries": 595,
+   "claims": [
+    {
+     "capability": "EMERGENCY_PROTECTIVE_MEASURE_EXECUTED",
+     "status": "PASS"
+    },
+    {
+     "capability": "EMERGENCY_EFFECT_LIMITED_TO_SEALED_BASELINE",
+     "status": "PASS"
+    },
+    {
+     "capability": "ORDINARY_GOVERNANCE_STILL_HOLDS",
+     "status": "PASS"
+    },
+    {
+     "capability": "DETECTION",
+     "status": "NOT_DEMONSTRATED"
+    },
+    {
+     "capability": "OUTCOME_VERIFIED_BY_INDEPENDENT_EVIDENCE",
+     "status": "NOT_DEMONSTRATED"
+    },
+    {
+     "capability": "EVIDENCE_PRESERVATION",
+     "status": "PASS"
+    }
+   ]
+  }
+ ],
+ "verification": "Each incident record verifies with verifyIncidentRecord (apps/web/lib/refrigeration-boundary/verify.ts) or the showroom's in-browser verifier."
+}
