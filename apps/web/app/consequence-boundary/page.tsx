@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import IndependentExamination from './IndependentExamination';
 import { useEffect, useMemo, useState } from 'react';
 
 type GateState = { evidence: boolean; authority: boolean; standing: boolean; escalation: boolean };
@@ -80,7 +81,7 @@ const chapters = [
     summary: 'The governing question is not whether a recommendation once appeared valid. It is whether the specific consequence is admissibly supported and legitimately permitted now.',
     samantha: "We have reached the final takeaway. The controller may have made an intelligent recommendation. The evidence may have supported that recommendation when it was created. A building policy may even permit this class of action. But none of that grants permanent permission. At the moment of commitment, the institution must still have sufficient admissible evidence, applicable authority, and established standing for this particular action. If not, the proper response is to stop, preserve the record, and examine again. No admissible evidence. No admissible execution.",
     learned: 'A prior recommendation is never permanent authorization. The consequence must remain justified at the commitment boundary.',
-    next: 'Use the interactive examination below to test how the result changes when one governance condition changes.'
+    next: 'Use the interactive examination and advanced evidence lab below to test how governance findings change, preserve a teaching receipt, and challenge three cases.'
   }
 ] as const;
 
@@ -187,7 +188,7 @@ export default function ConsequenceBoundaryPage() {
         <div className="cb-actions">
           <a className="cb-action" href="#image-01">BEGIN THE EIGHT-IMAGE EXAMINATION ↓</a>
           <a className="cb-action secondary" href={mediaBase + encodeURIComponent(pdfFile)} target="_blank" rel="noopener noreferrer">↓ DOWNLOAD THE TECHNICAL PDF</a>
-          <a className="cb-action secondary" href="#interactive">TRY THE INTERACTIVE BOUNDARY</a>
+          <a className="cb-action secondary" href="#interactive">TRY THE INTERACTIVE BOUNDARY</a><a className="cb-action secondary" href="#independent-examination">ADVANCED EVIDENCE LAB</a>
         </div>
         <small className="cb-note">Independent TA-14 educational material · Classroom 214 and its numerical readings are hypothetical illustrative examples · Not a school inspection, regulatory finding, or certification.</small>
       </header>
@@ -239,6 +240,7 @@ export default function ConsequenceBoundaryPage() {
           </article>
         </div>
       </section>
+      <IndependentExamination />
       <footer className="cb-footer"><h2>Intelligence is not authority.<br/>Authorization is not permanent.</h2><p>Admissible Execution Architecture examines the route:<br/><strong>REALITY → RECORD → CONTINUITY → ADMISSIBILITY → BINDING → COMMIT → EXECUTION → OUTCOME</strong></p><p><strong>NO ADMISSIBLE EVIDENCE. NO ADMISSIBLE EXECUTION.</strong></p><div className="cb-actions" style={{justifyContent:'center'}}><a className="cb-action" href={mediaBase + encodeURIComponent(pdfFile)} target="_blank" rel="noopener noreferrer">DOWNLOAD THE FULL EXAMINATION PDF</a><a className="cb-action secondary" href="#image-01">↑ RETURN TO IMAGE 01</a></div><p style={{marginTop:28}}><Link href="/">← RETURN TO THE TA-14 EXCHANGE</Link></p></footer>
     </div>
     {openImage && <div className="cb-modal" role="dialog" aria-modal="true" aria-label="Enlarged educational image" onClick={() => setOpenImage(null)}><button type="button" onClick={() => setOpenImage(null)}>✕ CLOSE</button><img src={mediaBase + encodeURIComponent(openImage)} alt="Enlarged TA-14 educational illustration" onClick={e => e.stopPropagation()}/></div>}
