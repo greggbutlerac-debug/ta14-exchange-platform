@@ -26,7 +26,7 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const PDF = '/showrooms/refrigeration-consequence-boundary/files/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf';
+const PDF = '/showrooms/refrigeration-consequence-boundary/files/TA14_When_the_Attacker_Bypasses_Governance_Revision_1_4.pdf';
 const STATUS_BG: Record<string, string> = { PASS: '#2f6f5e', FAIL: '#c0392b', NOT_DEMONSTRATED: '#5d6b75' };
 const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
@@ -81,7 +81,7 @@ export default async function RefrigerationConsequenceBoundaryPage() {
           </div>
         </header>
 
-        <LessonViewer lessons={lessons} figures={{ '04': chart('S4', 'S4 · falsified controller reporting'), '05': latency, '08': matrix }} />
+        <LessonViewer lessons={lessons} figures={{ '04': chart('S2', 'S2 · unauthorized six-hour defrost'), '05': chart('S4', 'S4 · falsified controller reporting'), '08': matrix }} />
         <AdversarialDemo scenarios={demo} baseline={{ band: BASELINE.approvedAirBandC, productLimit: BASELINE.productLimitC, setpoint: BASELINE.setpointC, defrost: `${BASELINE.defrost.startsAt.join(', ')} × ${BASELINE.defrost.durationMin} min`, sealSha256: seal }} />
 
         <section id="emergency-pathway" aria-label="Emergency-response pathway" style={{ margin: '0 0 32px', padding: 'clamp(14px, 3vw, 24px)', border: '1px solid #E8B04B', borderRadius: 18 }}>
