@@ -22,7 +22,7 @@ The first version of the gate (commits `200141c2`/`682d2190`, pushed to the PR b
 
 **Exposure window:** the flawed gate was deployed only to the PR's automatic Vercel **preview**, from the push of `200141c2` until the fix was pushed. Whether that preview was publicly reachable depends on the project's Vercel deployment-protection settings, which were not visible from here.
 
-**The same flaw exists on `main` in unrelated code:** `/admin/environmental-evidence-gateway` (layout-only owner gate) returned 404 with its page content in the body (gateway demonstration, receipts, HibouAir demo data). `/admin/revenue` matched only the word "Revenue" (inconclusive); `/admin/governance-continuity-execution-authority` showed nothing. These were not changed by this branch and need their own fix.
+**Related finding outside this branch:** a related access-control issue elsewhere in the repository was reported privately to the maintainers through a GitHub security advisory. Details are intentionally not recorded in this public file.
 
 ## 2. Owner gate (new in 1.2)
 
