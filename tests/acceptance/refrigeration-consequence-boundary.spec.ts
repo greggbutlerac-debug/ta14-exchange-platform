@@ -16,7 +16,7 @@ import { verifyIncidentRecord, type IncidentRecord } from "../../apps/web/lib/re
  */
 
 const ROOT = join(__dirname, "..", "..");
-const EXPORT_DIR = join(ROOT, "apps/web/public/showrooms/refrigeration-consequence-boundary/evidence");
+const EXPORT_DIR = join(ROOT, "docs/refrigeration-consequence-boundary/evidence");
 let results: ScenarioResult[];
 let extension: ScenarioResult[];
 const byId = (id: string) => results.find((r) => r.id === id)!;

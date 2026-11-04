@@ -19,13 +19,14 @@ import { buildLessons } from "../../apps/web/app/showrooms/refrigeration-consequ
 
 const OUT = join(__dirname, "..", "..", "docs/refrigeration-consequence-boundary/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.html");
 const TEST_RESULTS = {
-  date: "2026-11-03",
-  base: "origin/main 04b58e0c",
+  date: "2026-11-04",
+  base: "origin/main f636d639 (merged)",
   rcbSuite: "33 passed, 0 failed (tests/acceptance/refrigeration-consequence-boundary.spec.ts)",
   emergencySuite: "28 passed, 0 failed (tests/acceptance/refrigeration-emergency-pathway.spec.ts), of which 22 are adversarial",
-  fullSuite: "251 passed, 3 skipped (the gated export and report generator scripts, which run only when explicitly enabled), 0 failed; 24 test files",
+  gateSuite: "15 passed, 0 failed (tests/acceptance/refrigeration-owner-gate.spec.ts): owner gate, no third-party attribution, no emergency authorization from untrusted signals",
+  fullSuite: "266 passed, 3 skipped (the gated export and report generator scripts, which run only when explicitly enabled), 0 failed; 25 test files",
   typecheck: "tsc --noEmit: 0 errors",
-  build: "next build: succeeded; /showrooms/refrigeration-consequence-boundary prerendered as static",
+  build: "next build: succeeded (963 pages); the showroom and its evidence and PDF routes are dynamic and owner-gated; no lint script exists in the repository",
 };
 
 const esc = (s: unknown) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -93,7 +94,7 @@ function html(results: ScenarioResult[], extension: ScenarioResult[]) {
   </style></head><body>
   <div class="cover"><div class="k">TA14 AUTHORITY GOVERNANCE INSTITUTION · TA-14 EXCHANGE · TECHNICAL EXAMINATION v1 · PROPOSED, NOT VALIDATED</div>
   <h1 style="margin-top:14px">WHEN THE ATTACKER BYPASSES GOVERNANCE</h1><div class="sub">Refrigeration Cybersecurity, Physical Drift, and Admissible Evidence</div></div>
-  <p class="m">Revision 1.1: adds the emergency-response pathway and extension scenario E1 (section 9A); the origin statement is revised; scenarios S1–S8 and their results are unchanged.</p>
+  <p class="m">Revision 1.2: integrated with current main; the examination, its evidence exports and this PDF are owner-gated pending publication approval. Revision 1.1 added the emergency-response pathway and extension scenario E1 (section 9A) and revised the origin statement. Scenarios S1–S8 and their results are unchanged.</p>
   <div class="warn">${SIMULATION_LABEL}. Every result in this document comes from a deterministic software simulation. No physical refrigeration system, controller, network or sensor was tested.</div>
 
   <h2>1. Executive summary</h2>
@@ -160,11 +161,12 @@ function html(results: ScenarioResult[], extension: ScenarioResult[]) {
   <table><tr><th>Check (${TEST_RESULTS.date}, branch feat/refrigeration-consequence-boundary from ${TEST_RESULTS.base})</th><th>Result</th></tr>
   <tr><td>Refrigeration Consequence Boundary suite</td><td>${TEST_RESULTS.rcbSuite}</td></tr>
   <tr><td>Emergency-pathway suite</td><td>${TEST_RESULTS.emergencySuite}</td></tr>
+  <tr><td>Owner-gate and attribution suite</td><td>${TEST_RESULTS.gateSuite}</td></tr>
   <tr><td>Full repository test suite</td><td>${TEST_RESULTS.fullSuite}</td></tr>
   <tr><td>Type check</td><td>${TEST_RESULTS.typecheck}</td></tr>
   <tr><td>Production build</td><td>${TEST_RESULTS.build}</td></tr></table>
   <p><b>Reproduce:</b> <span class="m">npx vitest run tests/acceptance/refrigeration-consequence-boundary.spec.ts</span>. The tests assert the verdict of every claim (including the failures), that the GCEA file equals origin/main, chain verification (server and WebCrypto), detection of five tamper types, determinism, absence of network or control endpoints, and that the committed evidence exports equal a fresh run.</p>
-  <p><b>Verify an export:</b> download a record from the showroom (or <span class="m">apps/web/public/showrooms/refrigeration-consequence-boundary/evidence/S1–S8.json</span>) and use the showroom's in-browser verifier, or call <span class="m">verifyIncidentRecord</span> from <span class="m">apps/web/lib/refrigeration-boundary/verify.ts</span> with any SHA-256 function. Chain heads: ${results.map((x) => `${x.id} <span class="m">${x.eir.chainHead.slice(0, 16)}…</span>`).join("; ")}.</p>
+  <p><b>Verify an export:</b> download a record from the showroom (or <span class="m">docs/refrigeration-consequence-boundary/evidence/S1–S8.json</span>) and use the showroom's in-browser verifier, or call <span class="m">verifyIncidentRecord</span> from <span class="m">apps/web/lib/refrigeration-boundary/verify.ts</span> with any SHA-256 function. Chain heads: ${results.map((x) => `${x.id} <span class="m">${x.eir.chainHead.slice(0, 16)}…</span>`).join("; ")}.</p>
 
   <h2>11. Known limitations and untested conditions</h2>
   <ul>
@@ -174,6 +176,8 @@ function html(results: ScenarioResult[], extension: ScenarioResult[]) {
   <li>The actor-standing and parameter-bounds checks are simulation additions around GCEA, not production components. EIN and EIR here are simulations, not the EIE implementation.</li>
   <li>Records are hash-chained but unsigned, with no trusted time-stamp. Notifications and human actions are simulated.</li>
   <li>Thresholds are configured for the simulation; food-safety limits and product disposition are outside TA-14's determination.</li>
+  <li>Narration is browser speech synthesis. Its controls were exercised in a real (headless) browser, but audible playback was not verified.</li>
+  <li>The examination is owner-gated (404 for everyone else; fails closed). Access by the real signed-in owner was not exercised locally, because no live Supabase session was available; the gate was verified closed in every other configuration.</li>
   <li>Not examined: subtle drift (for example −22 → −19 °C), slow sensor drift, multiple simultaneous faults, theft of a current authority, real network paths and protocols.</li></ul>
 
   <h2>12. Independent examination invitation</h2>

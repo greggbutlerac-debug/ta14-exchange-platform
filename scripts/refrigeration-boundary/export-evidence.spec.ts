@@ -10,7 +10,7 @@ import { it } from "vitest";
 import { scenarioExport, summaryExport } from "../../apps/web/lib/refrigeration-boundary/export";
 import { runAllScenarios, runExtensionScenarios } from "../../apps/web/lib/refrigeration-boundary/scenarios";
 
-const OUT = join(__dirname, "..", "..", "apps/web/public/showrooms/refrigeration-consequence-boundary/evidence");
+const OUT = join(__dirname, "..", "..", "docs/refrigeration-consequence-boundary/evidence");
 
 it.skipIf(process.env.TA14_RCB_WRITE_EXPORTS !== "1")("write evidence exports", async () => {
   const results = [...await runAllScenarios(), ...await runExtensionScenarios()];

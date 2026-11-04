@@ -7,15 +7,15 @@ import { DriftChart } from './DriftChart';
 import { LessonViewer } from './LessonViewer';
 import { buildLessons } from './lessons';
 
-// UNLISTED PREVIEW: not linked from the showroom index or the sitemap, and not indexed.
-// Publication requires Greggory's approval.
+// OWNER-GATED PREVIEW (layout.tsx / access.ts): 404 for everyone but the signed-in owner. Also absent
+// from the showroom index and sitemap, and not indexed. Publication requires Greggory's approval.
 export const metadata: Metadata = {
   title: 'When the Attacker Bypasses Governance · TA-14 (Simulation preview)',
   description: 'Refrigeration consequence boundary: a simulated adversarial demonstration of AEA prevention, independent detection and evidence preservation.',
   robots: { index: false, follow: false, nocache: true },
 };
 
-const PDF = '/showrooms/refrigeration-consequence-boundary/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf';
+const PDF = '/showrooms/refrigeration-consequence-boundary/files/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf';
 const STATUS_BG: Record<string, string> = { PASS: '#2f6f5e', FAIL: '#c0392b', NOT_DEMONSTRATED: '#5d6b75' };
 const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
@@ -55,7 +55,7 @@ export default async function RefrigerationConsequenceBoundaryPage() {
 
   return (
     <main style={{ background: '#001426', color: '#fff', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif', overflowWrap: 'anywhere' }}>
-      <div role="note" style={{ background: '#E8B04B', color: '#001426', padding: '10px 16px', fontWeight: 900, fontSize: 13, textAlign: 'center' }}>{SIMULATION_LABEL} · UNLISTED PREVIEW · NOT FOR PUBLICATION UNTIL APPROVED</div>
+      <div role="note" style={{ background: '#E8B04B', color: '#001426', padding: '10px 16px', fontWeight: 900, fontSize: 13, textAlign: 'center' }}>{SIMULATION_LABEL} · OWNER-GATED PREVIEW · NOT FOR PUBLICATION UNTIL APPROVED</div>
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: '32px 16px 64px' }}>
         <header style={{ marginBottom: 28 }}>
           <small style={{ color: '#7BAFD4', fontWeight: 900, letterSpacing: 2 }}>TA-14 EXCHANGE · REFRIGERATION CONSEQUENCE BOUNDARY · TECHNICAL EXAMINATION (PROPOSED, NOT VALIDATED)</small>

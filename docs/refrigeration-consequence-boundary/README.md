@@ -1,6 +1,6 @@
 # Refrigeration Consequence Boundary: When the Attacker Bypasses Governance
 
-**Status:** proposed technical examination; **simulation only**. Unlisted preview, not published.
+**Status:** proposed technical examination; **simulation only**. **Owner-gated** pending publication approval: the page, evidence exports and PDF return 404 to everyone except the signed-in owner (`TA14_REVENUE_OWNER_USER_ID`).
 
 | Item | Location |
 |---|---|
@@ -8,10 +8,10 @@
 | Simulation (baseline, plant, EIN, EIR, gate, emergency pathway, scenarios, verifier, exports) | `apps/web/lib/refrigeration-boundary/` |
 | Tests | `tests/acceptance/refrigeration-consequence-boundary.spec.ts` (S1–S8, 33 tests); `tests/acceptance/refrigeration-emergency-pathway.spec.ts` (emergency pathway, E1, S6 preservation, 28 tests) |
 | Real-browser check | `node scripts/refrigeration-boundary/browser-check.mjs <base-url> <work-dir>` (Chrome DevTools Protocol) |
-| Evidence exports (machine-readable) | `apps/web/public/showrooms/refrigeration-consequence-boundary/evidence/S1–S8.json`, `E1.json` (extension), `summary.json` |
-| Technical examination PDF (and HTML source) | `TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf` (copy served from the showroom's `public` folder) |
+| Evidence exports (machine-readable) | `docs/refrigeration-consequence-boundary/evidence/S1–S8.json`, `E1.json` (extension), `summary.json` |
+| Technical examination PDF (and HTML source) | `TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.pdf`, served only through the owner-gated route `/showrooms/refrigeration-consequence-boundary/files/<name>` |
 | Teaching image specifications (images not yet produced) | `IMAGE_SPECIFICATIONS.md` |
-| Showroom (unlisted, `noindex`) | `apps/web/app/showrooms/refrigeration-consequence-boundary/` → `/showrooms/refrigeration-consequence-boundary` |
+| Showroom (owner-gated, `noindex`, not in the sitemap or index) | `apps/web/app/showrooms/refrigeration-consequence-boundary/` (gate: `access.ts`, `layout.tsx`; gated routes `evidence/[file]`, `files/[file]`) |
 
 ## Reproduce
 
@@ -24,8 +24,7 @@ TA14_RCB_WRITE_REPORT=1  npx vitest run scripts/refrigeration-boundary/build-rep
   file://$PWD/docs/refrigeration-consequence-boundary/TA-14_Refrigeration_Consequence_Boundary_Technical_Examination_v1.html
 ```
 
-A local `next start` needs the Supabase environment variables the site's middleware requires. For a
-preview without an account system, fake localhost values work (`NEXT_PUBLIC_SUPABASE_URL=http://localhost:9`).
+Local preview: `TA14_RCB_LOCAL_PREVIEW=1 npx next start apps/web`. The flag opens the gate only when `VERCEL` is unset, so it cannot take effect on a Vercel deployment. Without it, the examination returns 404 locally (fail closed).
 
 ## Boundaries
 
