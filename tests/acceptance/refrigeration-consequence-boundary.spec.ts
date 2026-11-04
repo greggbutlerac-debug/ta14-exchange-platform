@@ -1,4 +1,4 @@
-import { execFileSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -51,9 +51,11 @@ describe("claimed capabilities: computed verdicts, including honest failures", (
 });
 
 describe("the AEA execution boundary (production GCEA, unchanged)", () => {
-  it("the GCEA engine file is identical to origin/main", () => {
-    const diff = execFileSync("git", ["diff", "--stat", "origin/main", "--", "apps/web/lib/governance-continuity-execution-authority.ts"], { cwd: ROOT }).toString();
-    expect(diff).toBe("");
+  it("the GCEA engine file is byte-identical to the reviewed version (main f636d639)", () => {
+    // Pinned by content hash so the check works in any checkout (CI clones have no origin/main ref).
+    // A change to the engine must fail here and be reviewed; this examination never modifies it.
+    const gcea = readFileSync(join(ROOT, "apps/web/lib/governance-continuity-execution-authority.ts"));
+    expect(createHash("sha256").update(gcea).digest("hex")).toBe("0754f3add88880d23ffdda6ad102194284c48065102a39cb2690ec7c933c6562");
   });
   it("every gate determination carries the GCEA receipt, and simulation checks only ever tighten it", () => {
     for (const r of results) for (const s of r.aea.submissions) {

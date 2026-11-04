@@ -7,7 +7,7 @@
 ## 1. Integration with current main
 
 - The branch was 727 commits behind `main`. Upstream touched **no** examination file, the GCEA engine, dependencies or the test configuration. It did change `middleware.ts` (all `/showrooms/*` now bypass the session middleware), `sitemap.ts`, the showroom index and the global navigation. The merge was clean, with no conflicts.
-- **GCEA (`apps/web/lib/governance-continuity-execution-authority.ts`) is identical to current `main`.** A test asserts this.
+- **GCEA (`apps/web/lib/governance-continuity-execution-authority.ts`) is identical to current `main`.** A test pins it by SHA-256 (`0754f3ad…`). The first version of that test used `git diff origin/main`, which **failed in CI** on PR #675 because CI checkouts have no `origin/main` ref (git exit 128). It now pins the hash and passes in a shallow clone.
 - Upstream regression observed: six images committed upstream with decomposed-Unicode file names show as untracked twins on macOS (`core.precomposeunicode=true`). This is an upstream naming issue; they were not touched or staged.
 
 ## 2. Owner gate (new in 1.2)
@@ -41,6 +41,7 @@ Existing routes (`/`, `/showrooms`, `/showrooms/onuma`) returned 200 throughout.
 | # | Requirement | Status |
 |---|---|---|
 | 1–2 | Status confirmed; latest main fetched | Done (`f636d639`) |
+| PR | Draft PR #675; CI "Verify application" | First run failed (the test's git-ref dependency, see section 1); fixed |
 | 3–5 | Examination files compared; conflicts and upstream changes identified; main integrated safely | Done: clean merge; nothing unrelated overwritten |
 | 6 | Build, type check, lint, tests | Build, type check and tests pass. **Lint unavailable** in the repository |
 | 7 | AEA boundaries and fail-closed behaviour preserved | GCEA unchanged; S1–S8 results and exports byte-identical; the gate fails closed |
