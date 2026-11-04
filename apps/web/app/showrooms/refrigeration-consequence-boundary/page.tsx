@@ -1,6 +1,4 @@
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
-import { examinationAccess } from './access';
 import { BASELINE, SIMULATION_LABEL, sealBaseline } from '@/lib/refrigeration-boundary/baseline';
 import { runAllScenarios, runExtensionScenarios } from '@/lib/refrigeration-boundary/scenarios';
 import { PROTECTIVE_MEASURES, emergencyProtocol } from '@/lib/refrigeration-boundary/emergency';
@@ -18,7 +16,6 @@ export const dynamic = 'force-dynamic';
 
 export async function generateMetadata(): Promise<Metadata> {
   const robots = { index: false, follow: false, nocache: true };
-  if (!(await examinationAccess()).allowed) return { robots };
   return {
     title: 'When the Attacker Bypasses Governance · TA-14 (Simulation preview)',
     description: 'Refrigeration consequence boundary: a simulated adversarial demonstration of AEA prevention, independent detection and evidence preservation.',
@@ -30,7 +27,6 @@ const STATUS_BG: Record<string, string> = { PASS: '#2f6f5e', FAIL: '#c0392b', NO
 const hhmm = (m: number) => `${String(Math.floor(m / 60) % 24).padStart(2, '0')}:${String(m % 60).padStart(2, '0')}`;
 
 export default async function RefrigerationConsequenceBoundaryPage() {
-  if (!(await examinationAccess()).allowed) notFound();
   const results = await runAllScenarios();
   const extension = await runExtensionScenarios();
   const protocol = emergencyProtocol();
@@ -66,7 +62,7 @@ export default async function RefrigerationConsequenceBoundaryPage() {
 
   return (
     <main style={{ background: '#001426', color: '#fff', minHeight: '100vh', fontFamily: 'Inter, system-ui, sans-serif', overflowWrap: 'anywhere' }}>
-      <div role="note" style={{ background: '#E8B04B', color: '#001426', padding: '10px 16px', fontWeight: 900, fontSize: 13, textAlign: 'center' }}>{SIMULATION_LABEL} · OWNER-GATED PREVIEW · NOT FOR PUBLICATION UNTIL APPROVED</div>
+      <div role="note" style={{ background: '#E8B04B', color: '#001426', padding: '10px 16px', fontWeight: 900, fontSize: 13, textAlign: 'center' }}>{SIMULATION_LABEL} · UNLISTED PUBLIC SHOWROOM · SIMULATION ONLY</div>
       <div style={{ maxWidth: 1120, margin: '0 auto', padding: '32px 16px 64px' }}>
         <header style={{ marginBottom: 28 }}>
           <small style={{ color: '#7BAFD4', fontWeight: 900, letterSpacing: 2 }}>TA-14 EXCHANGE · REFRIGERATION CONSEQUENCE BOUNDARY · TECHNICAL EXAMINATION (PROPOSED, NOT VALIDATED)</small>
