@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Transparent Air | Get the Diagnosis Right',
     description:
-      '4.9★ on Google with 115 reviews. Evidence-based AC diagnostics, repair evaluations, heat pump service, and $80 second opinions.',
+      'Transparent Air offers a $29.95 initial AC diagnostic visit credited toward an approved repair in eligible South Pinellas service areas, plus $80 second opinions for major repair decisions.',
     url: PAGE_URL,
     type: 'website',
   },
@@ -132,7 +132,7 @@ export default function TransparentAirPage() {
               <span className="trustPill">Greggory Don Butler personally performs second opinions</span>
             </div>
             <div className="actions">
-              <a className="btn primary" href={PHONE_HREF}>CALL TRANSPARENT AIR · {PHONE_DISPLAY}</a>
+              <a className="btn primary" href={PHONE_HREF}>BOOK $29.95 DIAGNOSTIC · {PHONE_DISPLAY}</a>
               <a className="btn light" href={GOOGLE_BUSINESS_URL} target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-transparent-air-business-profile">
                 SEE TRANSPARENT AIR ON GOOGLE ↗
               </a>
@@ -178,7 +178,7 @@ export default function TransparentAirPage() {
         <div className="wrap proofGrid">
           <div className="proofItem"><span className="proofBig">4.9★</span><span className="proofSmall">Google rating</span></div>
           <div className="proofItem"><span className="proofBig">115</span><span className="proofSmall">Google reviews</span></div>
-          <div className="proofItem"><span className="proofBig">$80</span><span className="proofSmall">Second opinion</span></div>
+          <div className="proofItem"><span className="proofBig">$29.95</span><span className="proofSmall">Initial diagnostic · credited toward approved repair</span></div>
           <div className="proofItem"><span className="proofBig">386-337-7215</span><span className="proofSmall">Call Transparent Air</span></div>
         </div>
       </section>
