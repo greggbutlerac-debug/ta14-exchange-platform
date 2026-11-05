@@ -60,19 +60,19 @@ export const VISUAL_LESSONS = [
     scenarioIds: ['S6']
   },
   {
-    title: 'EMERGENCY PROTECTION IS NOT UNLIMITED AUTHORITY',
-    file: 'Emergency Protection Pathway E1 Infographic.png',
-    narration: 'When independent evidence is lost, ordinary corrective action remains on HOLD. A separate emergency extension tests constrained, pre-authorized protective measures. The demonstrated E1 action is RESTORE SEALED SETPOINT. The pathway also defines terminating an active defrost and re-enabling a controller alarm, each only to re-assert a sealed baseline value. It does not permit a new defrost, arbitrary settings, or an unrestricted override. Authority and emergency responder standing are checked again at execution. No physical equipment safety or independently verified protection was demonstrated.',
-    note: 'IMPORTANT artwork correction pending: "safe defrost" is NOT an allowed E1 command. Permitted defined actions restore sealed setpoint, terminate an active defrost, or re-enable an alarm. S6 remains FAIL.',
-    intent: 'Permit only separately authorized, pre-bounded protective measures.',
-    demonstrated: 'E1 protective setpoint restoration passed simulation checks; detection and independent outcome verification NOT DEMONSTRATED.',
-    scenarioIds: ['S6']
+    title: 'AUTHORIZED HUMAN INTERVENTION — REVALIDATE NOW',
+    file: 'Authorized Intervention Revalidation Flow (1).png',
+    narration: 'Detection does not authorize correction. Scenario S8 shows an alert, technician acknowledgement and investigation, followed by a fresh scoped corrective authority. A grant is then revoked between commit and execution; the execution gate checks authority again and returns DENY. Only a second fresh authority permits the simulated restore to the sealed baseline. This illustrates why commissioned once is not authorized forever. Separately, scenario S6 remains a detection failure when independent evidence disappears. Extension E1 tests only tightly bounded protective measures, including restoring a sealed setpoint, terminating an active defrost, or re-enabling an alarm. E1 does not authorize arbitrary defrost or override, and does not demonstrate a verified physical outcome.',
+    note: 'S8: a revoked grant is refused at execution. The illustration focuses on the DENY branch; the simulation also demonstrates a subsequent fresh authority and authorized restore. E1 is a separate emergency extension, not part of this sequence.',
+    intent: 'Distinguish ordinary corrective authorization and execution-time revalidation (S8) from the limited emergency pathway (E1).',
+    demonstrated: 'S8: revoked corrective authority DENY at execution, fresh authority ALLOW in simulation. E1: limited setpoint restoration simulated; independent outcome verification NOT DEMONSTRATED.',
+    scenarioIds: ['S8','S6']
   },
   {
     title: 'INDEPENDENT REVIEW: CAN THE EVIDENCE SURVIVE EXAMINATION?',
-    file: 'Independent Review_ Evidence Under Examination.png',
+    file: 'Independent Review_ Evidence Under Examination (1).png',
     narration: 'The final task is to reproduce the examination, challenge the declared assumptions, and preserve failures. Across eight original scenarios, twenty-seven examined claims passed and three failed. Prevention failed for direct bypassed controller commands in S2 and S3. Detection failed when independent temperature evidence was lost in S6. E1 is a separate limited emergency-pathway simulation, not part of those thirty claims. Reviewers should verify incident record continuity and the authorization boundary, while keeping records distinct from evidence that has actually been found admissible. The governing question is whether Admissible Evidence, Applicable Authority, and Established Standing justify this consequence now.',
-    note: 'IMPORTANT artwork correction pending: its summary table mislabels S3 and S4 and omits S5/S8. Refer to the live scenario matrix below, not the artwork, for determinations.',
+    note: 'Artwork is an educational overview, not a claims matrix: its one-result-per-scenario labels do NOT represent the 30 individual claims. Some pictured scenario examples are simplified or mismatched (especially S4/S5). Use the live claims matrix and evidence records below for all determinations.',
     intent: 'Expose the results, limitations and evidence record to independent challenge.',
     demonstrated: 'S1-S8: 27 PASS, 3 FAIL. E1 is separate. No physical-system validation or external endorsement.',
     scenarioIds: ['S1','S2','S3','S4','S5','S6','S7','S8']

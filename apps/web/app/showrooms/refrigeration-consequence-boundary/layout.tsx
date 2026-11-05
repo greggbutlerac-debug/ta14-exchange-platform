@@ -1,11 +1,8 @@
-import { notFound } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { examinationAccess } from './access';
 
-// Owner-gated pending publication approval (see access.ts).
-export const dynamic = 'force-dynamic';
-
-export default async function RefrigerationConsequenceBoundaryOwnerLayout({ children }: { children: ReactNode }) {
-  if (!(await examinationAccess()).allowed) notFound();
+// Issue #684: owner-authorized unlisted public teaching showroom.
+// Keep this route out of the public showroom registry and sitemap.
+// Page metadata independently sets robots noindex/nofollow.
+export default function RefrigerationConsequenceBoundaryLayout({ children }: { children: ReactNode }) {
   return children;
 }
