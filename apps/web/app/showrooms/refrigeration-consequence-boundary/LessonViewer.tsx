@@ -93,7 +93,7 @@ function ImageSlot({ spec, number }: { spec: Lesson['image']; number: string }) 
         <img src={src} alt={`Lesson ${number}: ${spec.purpose}`} loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
       </div>
       <figcaption style={{ color: '#E8B04B', fontSize: 13, lineHeight: 1.65, marginTop: 10, borderLeft: '3px solid #E8B04B', paddingLeft: 10 }}>
-        SIMULATION - EDITORIAL TEACHING IMAGE. {spec.purpose}{number === '07' ? ' CAUTION: Artwork reference to safe defrost is incorrect; E1 permits only restore sealed setpoint, terminate active defrost, or re-enable controller alarm.' : number === '08' ? ' CAUTION: Artwork summary table has scenario-label omissions/errors; use the live claims matrix below for correct results.' : ''}
+        SIMULATION - EDITORIAL TEACHING IMAGE. {spec.purpose}{number === '08' ? ' CAUTION: The artwork summarizes whole scenarios, not individual capability claims. It simplifies some scenario examples; the live claims matrix and records below control.' : ''}
       </figcaption>
     </figure>
   );
