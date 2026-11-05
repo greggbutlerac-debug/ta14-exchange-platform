@@ -84,57 +84,16 @@ export function LessonViewer({ lessons, figures }: { lessons: Lesson[]; figures:
 /** Static teaching illustration. The underlying examination data and charts remain authoritative. */
 function ImageSlot({ spec, number }: { spec: Lesson['image']; number: string }) {
   const src = '/'+encodeURIComponent(spec.filename);
-  // Source-aligned diagrams replace two inaccurate static illustrations.
-  // These are editorial summaries, not evidence exports or validation results.
-  if (number === '07') {
-    const stages = [
-      ['E0 · NOTIFY', 'Record independent evidence loss and notify the responder. No equipment effect.'],
-      ['E1 · BOUNDED PROTECTION', 'Pre-issued, scoped authority and responder standing; revalidate at execution.'],
-      ['ONLY THREE DEFINED MEASURES', 'Restore sealed setpoint · terminate active defrost · re-enable alarm. No arbitrary parameters.'],
-      ['E2 · NOT PERMITTED', 'New defrost, arbitrary setpoints, alarm suppression, and unrestricted commands are excluded.'],
-    ];
-    return (
-      <figure style={{ margin: 0, padding: 'clamp(16px, 3vw, 26px)', border: '1px solid #316987', borderRadius: 14, background: '#031a2e' }}>
-        <div style={{ color: '#7BAFD4', fontSize: 12, fontWeight: 900, letterSpacing: 2 }}>07 · EMERGENCY PROTECTION · SIMULATION E1</div>
-        <h3 style={{ color: '#fff', fontSize: 'clamp(20px, 3vw, 28px)' }}>Emergency protection is not unlimited authority.</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 12 }}>
-          {stages.map(([title, description], i) => <div key={title} style={{ border: '1px solid #316987', borderRadius: 10, padding: 16, borderTop: `4px solid ${i === 3 ? '#E86A5B' : '#7BAFD4'}` }}>
-            <strong style={{ color: i === 3 ? '#E8B04B' : '#B9D9EB' }}>{title}</strong>
-            <p style={{ color: '#C9E0EF', fontSize: 14, lineHeight: 1.65 }}>{description}</p>
-          </div>)}
-        </div>
-        <figcaption style={{ color: '#E8B04B', marginTop: 14, fontSize: 13 }}>S6 detection remains FAIL. E1 is a separate software simulation. Physical safety and protective outcome verification were NOT DEMONSTRATED.</figcaption>
-      </figure>
-    );
-  }
-  if (number === '08') {
-    const failures = [
-      ['S2', 'Direct defrost bypass · prevention FAIL'],
-      ['S3', 'Direct setpoint bypass · prevention FAIL'],
-      ['S6', 'Independent evidence loss · detection FAIL'],
-    ];
-    return (
-      <figure style={{ margin: 0, padding: 'clamp(16px, 3vw, 26px)', border: '1px solid #316987', borderRadius: 14, background: '#031a2e' }}>
-        <div style={{ color: '#7BAFD4', fontSize: 12, fontWeight: 900, letterSpacing: 2 }}>08 · INDEPENDENT REVIEW · SIMULATION S1-S8</div>
-        <h3 style={{ color: '#fff', fontSize: 'clamp(20px, 3vw, 28px)' }}>Can the evidence survive examination?</h3>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12 }}>
-          {[['27','PASS','#B9D9EB'],['3','FAIL','#E86A5B']].map(([n,label,color]) => <div key={label} style={{ flex: '1 1 150px', border: '1px solid #316987', borderRadius: 12, padding: 18 }}>
-            <div style={{ color, fontSize: 42, fontWeight: 900 }}>{n}</div><strong style={{ color }}>{label}</strong>
-          </div>)}
-        </div>
-        <h4 style={{ color: '#E8B04B', marginBottom: 8 }}>Three preserved failures</h4>
-        <ul style={{ color: '#C9E0EF', lineHeight: 1.8 }}>{failures.map(([id,detail]) => <li key={id}><strong>{id}:</strong> {detail}</li>)}</ul>
-        <figcaption style={{ color: '#B9D9EB', fontSize: 13, lineHeight: 1.7 }}>The full S1-S8 source-derived claims matrix appears below. E1 is a separate extension, not part of these 30 examined claims. No physical equipment tested; no independent third-party endorsement.</figcaption>
-      </figure>
-    );
-  }
+  // Show the supplied lesson artwork for every lesson, including 07 and 08.
+  // The original artwork contains known technical inaccuracies; keep explicit
+  // disclosures and the source-derived simulation/claims matrix as authoritative.
   return (
     <figure style={{ margin: 0 }}>
       <div style={{ aspectRatio: '16 / 9', border: '1px solid #316987', borderRadius: 14, overflow: 'hidden', background: '#031a2e' }}>
         <img src={src} alt={`Lesson ${number}: ${spec.purpose}`} loading="lazy" style={{ display: 'block', width: '100%', height: '100%', objectFit: 'contain' }} />
       </div>
       <figcaption style={{ color: '#E8B04B', fontSize: 13, lineHeight: 1.65, marginTop: 10, borderLeft: '3px solid #E8B04B', paddingLeft: 10 }}>
-        SIMULATION - EDITORIAL TEACHING IMAGE. {spec.purpose}
+        SIMULATION - EDITORIAL TEACHING IMAGE. {spec.purpose}{number === '07' ? ' CAUTION: Artwork reference to safe defrost is incorrect; E1 permits only restore sealed setpoint, terminate active defrost, or re-enable controller alarm.' : number === '08' ? ' CAUTION: Artwork summary table has scenario-label omissions/errors; use the live claims matrix below for correct results.' : ''}
       </figcaption>
     </figure>
   );
