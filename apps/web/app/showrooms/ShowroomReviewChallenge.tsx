@@ -56,7 +56,7 @@ export default function ShowroomReviewChallenge(){
  const slug=path.split('/').filter(Boolean).slice(1).join('/');
  const [answers,setAnswers]=useState<Record<number,string>>({});
  const [reveal,setReveal]=useState(false);
- if(!slug||excluded.some(x=>slug.startsWith(x)))return null;
+ if(!slug||slug==='maria-neira-air-health-humanity'||excluded.some(x=>slug.startsWith(x)))return null;
  const subject=topicFor(path);
  const cases=casesFor(slug,subject);
  const complete=cases.every((_,i)=>!!answers[i]);
