@@ -1,6 +1,7 @@
+
 import Link from 'next/link';
 
-export { dynamic } from '../../../../workspace/ai-governance/registry/showcase/page';
+export const dynamic = 'force-dynamic';
 
 export const metadata = {
   title: 'TA-14 Governance Showcase | AI Governance Exchange',
@@ -9,12 +10,37 @@ export const metadata = {
 };
 
 export default async function PublicGovernanceShowcasePage() {
-  const { default: WorkspaceShowcase } = await import('../../../../workspace/ai-governance/registry/showcase/page');
+  const { default: WorkspaceShowcase } = await import(
+    '../../../../workspace/ai-governance/registry/showcase/page'
+  );
+
   return (
     <>
-      <div style={{position:'relative',zIndex:20,background:'#020812',borderBottom:'1px solid rgba(226,177,79,.18)',padding:'10px 20px',color:'#a9bfd2',fontSize:12,textAlign:'center'}}>
-        Public Governance Showcase · <Link href="/registry" style={{color:'#efc66f',fontWeight:800,textDecoration:'none'}}>Authoritative Public Registry</Link>
+      <div
+        style={{
+          position: 'relative',
+          zIndex: 20,
+          background: '#020812',
+          borderBottom: '1px solid rgba(226,177,79,.18)',
+          padding: '10px 20px',
+          color: '#a9bfd2',
+          fontSize: 12,
+          textAlign: 'center',
+        }}
+      >
+        Public Governance Showcase ·{' '}
+        <Link
+          href="/registry"
+          style={{
+            color: '#efc66f',
+            fontWeight: 800,
+            textDecoration: 'none',
+          }}
+        >
+          Authoritative Public Registry
+        </Link>
       </div>
+
       <WorkspaceShowcase />
     </>
   );
