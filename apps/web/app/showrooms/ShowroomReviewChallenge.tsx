@@ -13,6 +13,27 @@ const topics:Record<string,string>={
  'smart-city':'municipal infrastructure','school':'school air and building operations','hvac':'HVAC intervention','filter':'filtration and indoor air','radon':'radon mitigation','energy':'energy and environmental outcomes','municipal':'municipal environmental action','predictive':'predictive recommendations','ai-':'AI-initiated consequences','building':'building operations','semiconductor':'semiconductor facility operations','air':'air-quality intervention','environmental':'environmental accountability','laboratory':'laboratory-to-field deployment','water':'water system intervention','traffic':'transportation operations','payment':'financial execution','refrigerant':'refrigerant-system intervention'
 };
 const subjectCases:Record<string,Case[]> = {
+ 'predictive-intelligence':[
+  {title:'Forecast is not authorization',prompt:'A predictive controller proposes a damper override, but sensor calibration and model-version continuity are missing. What is supported?',answer:'HOLD',reason:'A prediction cannot establish an admissible execution basis without verified provenance, current operating conditions, and bounded scope.'},
+  {title:'Remote override without delegation',prompt:'A remote analytics provider issues a local facility command without applicable delegated authority. What is supported?',answer:'DENY',reason:'Technical capability and model confidence do not establish local execution authority.'},
+  {title:'All gates established',prompt:'The current evidence is admissible, the action is bounded, and the actor has applicable authority and established standing. No further review is required. What is supported?',answer:'ALLOW',reason:'A bounded ALLOW may be justified NOW; execution and outcome must still be recorded separately.'}
+ ],
+ 'semiconductor':[
+  {title:'Commissioning versus production',prompt:'Fab utilities passed commissioning, but integrated operation and production acceptance remain unresolved. A production start is proposed. What is supported?',answer:'HOLD',reason:'Construction and commissioning do not establish a complete production authorization.'},
+  {title:'Cleanroom pressure continuity',prompt:'A pressure excursion occurred, but calibration and time-aligned adjacent-zone readings are missing for the affected process interval. May product release proceed?',answer:'HOLD',reason:'The process interval and admissibility of environmental evidence must be resolved before release.'},
+  {title:'Contractor signs production release',prompt:'A contractor attempts production release without documented authority for that decision. What is supported?',answer:'DENY',reason:'Construction responsibility does not establish production-release authority or standing.'}
+ ],
+ 'municipal-air-quality':[
+  {title:'Roadside sensor triggers restriction',prompt:'One low-cost roadside sensor reports elevated particles, and a traffic restriction is proposed without corroboration or fit-for-purpose validation. What is supported?',answer:'HOLD',reason:'An observation may prompt examination without being sufficient for a consequential restriction.'},
+  {title:'Cross-agency command',prompt:'A municipal monitoring unit commands a school HVAC system without a documented delegation over that asset. What is supported?',answer:'DENY',reason:'Shared observations do not grant centralized execution authority.'},
+  {title:'Traffic approval required',prompt:'A verified pollution event triggers consideration of a temporary traffic measure requiring a designated traffic authority. What is supported?',answer:'ESCALATE',reason:'Refer the proposed measure to the legally competent authority; escalation is not execution.'}
+ ],
+ 'environmental-accountability':[
+  {title:'Pledge versus verified outcome',prompt:'An institution made a clean-air commitment, but continuity and outcome records are missing. Can fulfillment be certified?',answer:'HOLD',reason:'A pledge is not evidence of continuously verified fulfillment.'},
+  {title:'Unverified compliance measurement',prompt:'A compliance claim relies on a sensor without preserved calibration or placement evidence. What is supported?',answer:'HOLD',reason:'The observation cannot support a verified compliance claim without an admissible record.'},
+  {title:'Wrong jurisdiction',prompt:'An analyst asserts compliance using a rule that does not apply to the facility jurisdiction or dutyholder. What is supported?',answer:'DENY',reason:'Applicable legal obligations and the authorized decision scope must be established.'}
+ ],
+
  'smart-city':[
   {title:'Critical building in a curtailment zone',prompt:'A city optimizer proposes reducing cooling across municipal buildings, but the target building is an emergency shelter and its protected operating constraints have not been examined. What is supported?',answer:'HOLD',reason:'A blanket optimization cannot bypass facility-specific evidence, occupancy risk, or binding operational constraints.'},
   {title:'Utility request outside municipal authority',prompt:'A utility requests a remote change to a city asset, but no applicable delegation authorizes the utility to commit that change. What is supported?',answer:'DENY',reason:'A request or technical capability does not establish applicable authority to act on the municipal asset.'},
