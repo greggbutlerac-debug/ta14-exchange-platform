@@ -61,16 +61,16 @@ export const VISUAL_LESSONS = [
   },
   {
     title: 'AUTHORIZED HUMAN INTERVENTION — REVALIDATE NOW',
-    file: 'Emergency Protection Pathway E1 Infographic.png',
+    file: 'Authorized Intervention Revalidation Flow (1).png',
     narration: 'Detection does not authorize correction. Scenario S8 shows an alert, technician acknowledgement and investigation, followed by a fresh scoped corrective authority. A grant is then revoked between commit and execution; the execution gate checks authority again and returns DENY. Only a second fresh authority permits the simulated restore to the sealed baseline. This illustrates why commissioned once is not authorized forever. Separately, scenario S6 remains a detection failure when independent evidence disappears. Extension E1 tests only tightly bounded protective measures, including restoring a sealed setpoint, terminating an active defrost, or re-enabling an alarm. E1 does not authorize arbitrary defrost or override, and does not demonstrate a verified physical outcome.',
-    note: 'This image depicts the separate E1 emergency extension, not the S8 human intervention sequence. Artwork correction pending: safe defrost is NOT an E1 action. S6 remains a failed detection case.',
+    note: 'S8: a revoked grant is refused at execution. The illustration focuses on the DENY branch; the simulation also demonstrates a subsequent fresh authority and authorized restore. E1 is a separate emergency extension, not part of this sequence.',
     intent: 'Distinguish ordinary corrective authorization and execution-time revalidation (S8) from the limited emergency pathway (E1).',
     demonstrated: 'S8: revoked corrective authority DENY at execution, fresh authority ALLOW in simulation. E1: limited setpoint restoration simulated; independent outcome verification NOT DEMONSTRATED.',
     scenarioIds: ['S8','S6']
   },
   {
     title: 'INDEPENDENT REVIEW: CAN THE EVIDENCE SURVIVE EXAMINATION?',
-    file: 'Independent Review_ Evidence Under Examination.png',
+    file: 'Independent Review_ Evidence Under Examination (1).png',
     narration: 'The final task is to reproduce the examination, challenge the declared assumptions, and preserve failures. Across eight original scenarios, twenty-seven examined claims passed and three failed. Prevention failed for direct bypassed controller commands in S2 and S3. Detection failed when independent temperature evidence was lost in S6. E1 is a separate limited emergency-pathway simulation, not part of those thirty claims. Reviewers should verify incident record continuity and the authorization boundary, while keeping records distinct from evidence that has actually been found admissible. The governing question is whether Admissible Evidence, Applicable Authority, and Established Standing justify this consequence now.',
     note: 'IMPORTANT artwork correction pending: its summary table mislabels S3 and S4 and omits S5/S8. Refer to the live scenario matrix below, not the artwork, for determinations.',
     intent: 'Expose the results, limitations and evidence record to independent challenge.',
