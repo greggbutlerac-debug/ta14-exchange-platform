@@ -72,7 +72,7 @@ export const VISUAL_LESSONS = [
     title: 'INDEPENDENT REVIEW: CAN THE EVIDENCE SURVIVE EXAMINATION?',
     file: 'Independent Review_ Evidence Under Examination (1).png',
     narration: 'The final task is to reproduce the examination, challenge the declared assumptions, and preserve failures. Across eight original scenarios, twenty-seven examined claims passed and three failed. Prevention failed for direct bypassed controller commands in S2 and S3. Detection failed when independent temperature evidence was lost in S6. E1 is a separate limited emergency-pathway simulation, not part of those thirty claims. Reviewers should verify incident record continuity and the authorization boundary, while keeping records distinct from evidence that has actually been found admissible. The governing question is whether Admissible Evidence, Applicable Authority, and Established Standing justify this consequence now.',
-    note: 'IMPORTANT artwork correction pending: its summary table mislabels S3 and S4 and omits S5/S8. Refer to the live scenario matrix below, not the artwork, for determinations.',
+    note: 'Artwork is an educational overview, not a claims matrix: its one-result-per-scenario labels do NOT represent the 30 individual claims. Some pictured scenario examples are simplified or mismatched (especially S4/S5). Use the live claims matrix and evidence records below for all determinations.',
     intent: 'Expose the results, limitations and evidence record to independent challenge.',
     demonstrated: 'S1-S8: 27 PASS, 3 FAIL. E1 is separate. No physical-system validation or external endorsement.',
     scenarioIds: ['S1','S2','S3','S4','S5','S6','S7','S8']
