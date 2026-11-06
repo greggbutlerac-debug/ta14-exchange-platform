@@ -6,14 +6,14 @@ import { EnvironmentalIntegrityNode } from "../../apps/web/lib/refrigeration-bou
 import { emergencyGrant, evaluateEmergency } from "../../apps/web/lib/refrigeration-boundary/emergency";
 
 /*
- * The examination is owner-gated pending publication approval, and emergency authorization never
- * rests on untrusted (inadmissible) controller signals.
+ * The unlisted teaching showroom is public under Issue #684; evidence exports remain owner-gated.
+ * Emergency authorization never rests on untrusted (inadmissible) controller signals.
  */
 const ROOT = join(__dirname, "..", "..");
 const DIR = join(ROOT, "apps/web/app/showrooms/refrigeration-consequence-boundary");
 const read = (p: string) => readFileSync(join(DIR, p), "utf8");
 
-describe("owner gate (fail closed)", () => {
+describe("public teaching showroom and protected evidence (fail closed)", () => {
   const owner = "00000000-0000-4000-8000-000000000001";
   const cases: Array<[string, Parameters<typeof decideAccess>[0], boolean]> = [
     ["the signed-in owner", { ownerId: owner, userId: owner }, true],
@@ -27,8 +27,9 @@ describe("owner gate (fail closed)", () => {
   ];
   for (const [name, input, allowed] of cases) it(`${name} → ${allowed ? "allowed" : "404"}`, () => { expect(decideAccess(input).allowed).toBe(allowed); });
 
-  it("the layout and evidence route enforce the gate; withdrawn PDF route stays absent", () => {
-    expect(read("layout.tsx")).toMatch(/if \(!\(await examinationAccess\(\)\)\.allowed\) notFound\(\);/);
+  it("the public layout remains accessible; evidence route stays gated and withdrawn PDF absent", () => {
+    expect(read("layout.tsx")).toContain("return children;");
+    expect(read("layout.tsx")).not.toMatch(/examinationAccess\(\)|notFound\(\)/);
     for (const route of ["evidence/[file]/route.ts"]) {
       const src = read(route);
       const gate = src.indexOf("examinationAccess()).allowed) return new NextResponse('Not found.', { status: 404 })");
@@ -42,13 +43,13 @@ describe("owner gate (fail closed)", () => {
   it("no examination file is served from public/", () => {
     expect(existsSync(join(ROOT, "apps/web/public/showrooms/refrigeration-consequence-boundary"))).toBe(false);
   });
-  it("the page gates itself before computing anything, because layouts and pages render in parallel", () => {
+  it("the public page computes scenarios without requiring examination access", () => {
     const page = read("page.tsx");
     const body = page.slice(page.indexOf("export default async function"));
     expect(body.split("\n")[1].trim()).toBe("const results = await runAllScenarios();");
     expect(page).not.toMatch(/export const metadata/);
     const meta = page.slice(page.indexOf("export async function generateMetadata"), page.indexOf("export default async function"));
-    expect(meta.indexOf("examinationAccess()")).toBeLessThan(meta.indexOf("title:"));
+    expect(meta).not.toMatch(/examinationAccess\(\)|notFound\(\)/);
   });
   it("the page stays out of search indexes, the sitemap and the showroom index", () => {
     expect(read("page.tsx")).toMatch(/const robots = \{ index: false, follow: false, nocache: true \}/);
