@@ -198,16 +198,16 @@ export default function TransparentAirPage() {
             </div>
           </div>
           <div className="offer">
-            <div className="eyebrow" style={{color:'#087f89'}}>The decision-protection offer</div>
-            <div className="price">$80</div>
-            <div className="priceSub">to verify a decision that could cost $10,000.</div>
+            <div className="eyebrow" style={{color:'#087f89'}}>The AC repair diagnostic offer</div>
+            <div className="price">$29</div>
+            <div className="priceSub">diagnostic service call — credited toward an approved repair.</div>
             <p>
-              Told you that you need a new system? Get a low-cost independent second opinion before you authorize a high-cost replacement decision.
+              We inspect your AC, explain the evidence, and show you why a repair is necessary before you decide. If you approve the recommended repair performed by Transparent Air, we credit the $29 diagnostic trip charge toward that repair — making the diagnostic service call effectively free.
             </p>
-            <p style={{fontSize:13,color:'#6a7d82'}}>This is a diagnostic second-opinion service, not an insurance policy. The evaluation may confirm the original recommendation or establish that another path is supportable.</p>
+            <p style={{fontSize:13,color:'#6a7d82'}}>If you decline the repair, the $29 diagnostic service-call charge applies. Repairs are quoted separately and require your approval. The independent $80 second-opinion service remains a separate option.</p>
             <div className="actions">
-              <Link className="btn primary" href="/transparent-air/second-opinion">BOOK THE $80 SECOND OPINION →</Link>
-              <Link className="btn outline" href="/transparent-air/told-you-need-new-ac">VERIFY BEFORE YOU REPLACE →</Link>
+              <a className="btn primary" href={PHONE_HREF}>BOOK THE $29 DIAGNOSTIC · {PHONE_DISPLAY}</a>
+              <Link className="btn outline" href="/transparent-air/second-opinion">EXPLORE SECOND OPINIONS →</Link>
             </div>
           </div>
         </div>
