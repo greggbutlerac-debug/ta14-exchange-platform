@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Transparent Air | Get the Diagnosis Right',
     description:
-      'Transparent Air offers a $29.95 initial AC diagnostic visit credited toward an approved repair in eligible South Pinellas service areas, plus $80 second opinions for major repair decisions.',
+      'Transparent Air offers a FREE AC service call with acceptance of repair in eligible South Pinellas service areas. If repair is declined, the diagnostic service-call fee is $29.95. Separate $80 second opinions are available.',
     url: PAGE_URL,
     type: 'website',
   },
@@ -122,9 +122,9 @@ export default function TransparentAirPage() {
         <div className="wrap heroGrid">
           <div>
             <div className="eyebrow">Transparent Air · South Pinellas County, Florida</div>
-            <h1>AC not working? <em>Get the diagnosis right.</em></h1>
+            <h1>AC not cooling? <em>FREE service call with repair.</em></h1>
             <p className="lead">
-              When the house is hot, you need the problem found—not a guess and not a parts cannon. Transparent Air provides evidence-based AC diagnostics, heat pump service, repair evaluations, and second opinions.
+              No diagnostic fee with acceptance of repair. If you decline the repair, the $29.95 diagnostic service-call fee applies. We show you what is wrong before you authorize any work.
             </p>
             <div className="trustRow">
               <span className="trustPill">4.9★ Google rating</span>
@@ -132,7 +132,7 @@ export default function TransparentAirPage() {
               <span className="trustPill">Greggory Don Butler personally performs second opinions</span>
             </div>
             <div className="actions">
-              <a className="btn primary" href={PHONE_HREF}>BOOK $29.95 DIAGNOSTIC · {PHONE_DISPLAY}</a>
+              <a className="btn primary" href={PHONE_HREF}>CALL FOR FREE SERVICE CALL OFFER · {PHONE_DISPLAY}</a>
               <a className="btn light" href={GOOGLE_BUSINESS_URL} target="_blank" rel="noopener noreferrer" data-transparent-air-proof="google-transparent-air-business-profile">
                 SEE TRANSPARENT AIR ON GOOGLE ↗
               </a>
@@ -178,7 +178,7 @@ export default function TransparentAirPage() {
         <div className="wrap proofGrid">
           <div className="proofItem"><span className="proofBig">4.9★</span><span className="proofSmall">Google rating</span></div>
           <div className="proofItem"><span className="proofBig">115</span><span className="proofSmall">Google reviews</span></div>
-          <div className="proofItem"><span className="proofBig">$29.95</span><span className="proofSmall">Initial diagnostic · credited toward approved repair</span></div>
+          <div className="proofItem"><span className="proofBig">FREE*</span><span className="proofSmall">Service call with accepted repair · $29.95 if repair declined</span></div>
           <div className="proofItem"><span className="proofBig">386-337-7215</span><span className="proofSmall">Call Transparent Air</span></div>
         </div>
       </section>
