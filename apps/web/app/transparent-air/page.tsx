@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Transparent Air | Get the Diagnosis Right',
     description:
-      'Transparent Air offers a FREE AC service call with acceptance of repair in eligible South Pinellas service areas. If repair is declined, the diagnostic service-call fee is $29.95. Separate $80 second opinions are available.',
+      'Transparent Air offers a $29 AC diagnostic service call credited toward an approved repair in eligible South Pinellas service areas, making the diagnostic trip effectively free with repair. Separate $80 second opinions are available.',
     url: PAGE_URL,
     type: 'website',
   },
@@ -124,7 +124,7 @@ export default function TransparentAirPage() {
             <div className="eyebrow">Transparent Air · South Pinellas County, Florida</div>
             <h1>AC not cooling? <em>FREE service call with repair.</em></h1>
             <p className="lead">
-              No diagnostic fee with acceptance of repair. If you decline the repair, the $29.95 diagnostic service-call fee applies. We show you what is wrong before you authorize any work.
+              The $29 diagnostic service-call charge is credited toward a repair you approve and have Transparent Air perform. If you decline the repair, the $29 fee applies. We show you the evidence before you authorize work.
             </p>
             <div className="trustRow">
               <span className="trustPill">4.9★ Google rating</span>
@@ -178,7 +178,7 @@ export default function TransparentAirPage() {
         <div className="wrap proofGrid">
           <div className="proofItem"><span className="proofBig">4.9★</span><span className="proofSmall">Google rating</span></div>
           <div className="proofItem"><span className="proofBig">115</span><span className="proofSmall">Google reviews</span></div>
-          <div className="proofItem"><span className="proofBig">FREE*</span><span className="proofSmall">Service call with accepted repair · $29.95 if repair declined</span></div>
+          <div className="proofItem"><span className="proofBig">FREE*</span><span className="proofSmall">$29 diagnostic credited toward approved repair · $29 if declined</span></div>
           <div className="proofItem"><span className="proofBig">386-337-7215</span><span className="proofSmall">Call Transparent Air</span></div>
         </div>
       </section>
