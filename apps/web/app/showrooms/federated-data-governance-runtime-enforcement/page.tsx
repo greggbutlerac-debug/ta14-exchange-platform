@@ -1,0 +1,20 @@
+import type { Metadata } from "next";
+export const metadata: Metadata = { title: "Federated Data Governance | Decision Rights Meet Runtime Enforcement", description: "An educational examination of federated stewardship, agent authority and consequential execution.", robots: { index: false, follow: false } };
+const panels = [
+["01 · THE QUESTION","Who performs governance work, who holds decision rights, and who remains accountable when the performer is an AI agent?"],
+["02 · GOVERNED CONTEXT","Record the dataset, steward, policy version, provenance, uncertainty and relevant operating conditions."],
+["03 · DECISION RIGHTS","Distinguish delegated tasks from authority to approve changes. A capable agent does not inherit a human steward's standing."],
+["04 · RUNTIME ENFORCEMENT","At the moment of commitment, independently examine admissible evidence, applicable authority and established standing."],
+["05 · FOUR DETERMINATIONS","ALLOW when conditions are satisfied; HOLD for missing or stale evidence; DENY prohibited actions; ESCALATE when human authority is required."],
+["06 · EXECUTION","Bind the determination to the exact actor, scope, action, target, time and conditions. Do not treat a previous approval as permanent permission."],
+["07 · ACCOUNTABILITY","Preserve attributable records of the proposal, decision, execution, exception and observed outcome without conflating logs with proof."],
+["08 · ASSURANCE & FEEDBACK","Test revocation, changed conditions, cross-domain delegation and disconnected operation. Re-evaluate rather than silently inheriting authority."]
+];
+export default function Page() { return <main style={{background:"#081421",color:"#f0f6ff",minHeight:"100vh",fontFamily:"system-ui, sans-serif",padding:"clamp(24px,5vw,76px)"}}>
+<div style={{maxWidth:1040,margin:"auto"}}><p style={{color:"#74d8ca",letterSpacing:3}}>TA-14 EXCHANGE · EDUCATIONAL SHOWROOM</p>
+<h1 style={{fontSize:"clamp(36px,6vw,70px)",lineHeight:1.08}}>Federated Data Governance:<br/><span style={{color:"#74d8ca"}}>When Decision Rights Meet Runtime Enforcement</span></h1>
+<p style={{fontSize:21,lineHeight:1.6,maxWidth:850}}>An AI agent may perform stewardship activity without acquiring the right to authorize its own consequential actions.</p>
+<section style={{padding:26,border:"1px solid #34657a",borderRadius:18,margin:"35px 0",background:"#102638"}}><h2>The governing chain</h2><p style={{fontSize:19,lineHeight:1.8}}>Governed Context → Decision Rights → Runtime Enforcement → Execution → Accountability → Assurance & Feedback</p><p>This sequence is a discussion model, not a claim of implementation or certification.</p></section>
+{panels.map(([heading,body])=><section key={heading} style={{borderBottom:"1px solid #294355",padding:"25px 0"}}><h2 style={{color:"#74d8ca"}}>{heading}</h2><p style={{fontSize:19,lineHeight:1.65}}>{body}</p><details><summary style={{cursor:"pointer"}}>Play Samantha / narration text</summary><p>{body}</p><p>Voice playback is not yet implemented for this page.</p></details></section>)}
+<section style={{padding:"32px 0"}}><h2>Independent examination challenge</h2><p>Can an agent be blocked after its permission is revoked? Can a federated node refuse stale evidence? Can an examiner reconstruct who authorized the exact committed consequence? These are test questions, not verified results.</p><h2>What you learned</h2><p>Federation distributes governance activity and decision rights. Runtime enforcement independently checks whether a particular consequence is authorized now.</p><h2>What comes next</h2><p>Develop testable cross-node scenarios, evidence schemas and fail-closed execution demonstrations. Image sequence, audio playback and technical PDF remain to be produced.</p></section>
+<footer style={{borderTop:"1px solid #294355",paddingTop:20,color:"#b4c9d7"}}>Conversation acknowledgment: Milan Gosalia's discussion of federated stewardship, decision rights, accountability and assurance informed this educational examination. This is an independent TA-14 interpretation, not a partnership, endorsement or quotation attributed to Milan.</footer></div></main>}
