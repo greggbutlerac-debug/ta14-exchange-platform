@@ -1,0 +1,425 @@
+[
+  {
+    "id": "ASA",
+    "title": "TA14 Admissible Standing Architecture (ASA) v1.0-RC1",
+    "publishedAt": "2026-10-07",
+    "access": "open",
+    "doi": "10.5281/zenodo.23199253",
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "HPS",
+    "title": "TA-14 Human Performance Stack (HPS) — Human Performance Execution Integrity Architecture",
+    "publishedAt": "2026-09-26",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "EABA",
+    "title": "TA-14 Execution Authority Boundary Architecture (EABA) v1.0-RC1",
+    "publishedAt": "2026-09-20",
+    "access": "open",
+    "doi": "10.5281/zenodo.22851885",
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "AFA",
+    "title": "TA-14 Admissible Federation Architecture (AFA) v1.0-RC1",
+    "publishedAt": "2026-09-19",
+    "access": "open",
+    "doi": "10.5281/zenodo.22846133",
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "AUTH-GOV",
+    "title": "TA-14 Authority Governance Architecture",
+    "publishedAt": "2026-09-18",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "ACA",
+    "title": "TA-14 Admissible Computation Architecture",
+    "publishedAt": "2026-09-08",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "BAG",
+    "title": "TA-14 Building Admissibility Gate",
+    "publishedAt": "2026-09-03",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "GRA",
+    "title": "TA-14 Governed Reality Architecture (GRA)",
+    "publishedAt": "2026-08-30",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "FEIG",
+    "title": "TA-14 Financial Execution Integrity Governance",
+    "publishedAt": "2026-08-23",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "CONT",
+    "title": "TA-14 Admissible Continuity Architecture",
+    "publishedAt": "2026-08-16",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "AHIA",
+    "title": "TA-14 Admissible Human Intervention Architecture",
+    "publishedAt": "2026-08-10",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "EGRESS",
+    "title": "TA-14 Admissible Egress Architecture",
+    "publishedAt": "2026-08-02",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "SF",
+    "title": "TA-14 Standards Family Framework",
+    "publishedAt": "2026-07-17",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "CONF",
+    "title": "TA-14 Conformance, Assurance, and Certification Standard",
+    "publishedAt": "2026-07-16",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "REG",
+    "title": "TA-14 Registry and Namespace Governance Standard",
+    "publishedAt": "2026-07-15",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "AVP",
+    "title": "TA-14 Authority Passport Protocol",
+    "publishedAt": "2026-07-15",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "IRRS",
+    "title": "TA-14 Independent Route Replay Reference Specification",
+    "publishedAt": "2026-07-15",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "RVS",
+    "title": "TA-14 Replay Verification Standard",
+    "publishedAt": "2026-07-15",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "POR",
+    "title": "TA-14 Proof of Restraint Standard",
+    "publishedAt": "2026-07-15",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "CCS",
+    "title": "TA-14 Consequence Constitution Specification",
+    "publishedAt": "2026-07-15",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "REPLAY-IMPL",
+    "title": "TA-14 Independent Route Replay Verification: Reference Implementation",
+    "publishedAt": "2026-07-14",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "RAP",
+    "title": "TA-14 Runtime Admissibility Protocol",
+    "publishedAt": "2026-07-14",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "CAG",
+    "title": "TA-14 Continuous Admissibility Governance",
+    "publishedAt": "2026-07-14",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "LAS",
+    "title": "TA-14 Living Authority Standard",
+    "publishedAt": "2026-07-14",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "RECORDS",
+    "title": "TA-14 Admissible Records Architecture",
+    "publishedAt": "2026-07-02",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "NONOCC",
+    "title": "TA-14 Admissible Non-Occurrence Architecture",
+    "publishedAt": "2026-07-02",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "ADMISSIBILITY",
+    "title": "TA-14 Admissible Admissibility Architecture",
+    "publishedAt": "2026-07-02",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "MEMORY",
+    "title": "TA-14 Admissible Memory Architecture",
+    "publishedAt": "2026-07-02",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "PCA",
+    "title": "TA-14 Prevented Consequence Architecture",
+    "publishedAt": "2026-07-02",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "ARCH-SITE",
+    "title": "TA-14 Architecture Site v1.1.0 (software record)",
+    "publishedAt": "2026-06-23",
+    "access": "open",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "REALITY",
+    "title": "TA-14 Admissible Reality Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "NEW-REALITY",
+    "title": "TA-14 New Reality Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "OUTCOME-GOV",
+    "title": "TA-14 Outcome Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "OUTCOME-REALITY",
+    "title": "TA-14 Outcome Reality Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "EXEC-GOV",
+    "title": "TA-14 Execution Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "EXEC-REALITY",
+    "title": "TA-14 Execution Reality Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "COMMIT-GOV",
+    "title": "TA-14 Commit Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "COMMIT-REALITY",
+    "title": "TA-14 Commit Reality Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "BINDING-GOV",
+    "title": "TA-14 Binding Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "BINDING-REALITY",
+    "title": "TA-14 Binding Reality Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "CONSEQ-FORM",
+    "title": "TA-14 Consequence Formation Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "LEGITIMACY",
+    "title": "TA-14 Legitimacy Governance Architecture",
+    "publishedAt": "2026-06-01",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "CORPUS-SELF",
+    "title": "TA-14 Corpus Self-Governance Architecture",
+    "publishedAt": "2026-05-31",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "RELIANCE",
+    "title": "TA-14 Reliance Governance Architecture",
+    "publishedAt": "2026-05-30",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "ADMISS-EVID",
+    "title": "TA-14 Admissible Evidence Architecture",
+    "publishedAt": "2026-05-30",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "EVID-GOV",
+    "title": "TA-14 Evidence Governance Architecture",
+    "publishedAt": "2026-05-30",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  },
+  {
+    "id": "AEA",
+    "title": "TA-14 Admissible Execution Architecture: Volume 1 Foundational Monograph",
+    "publishedAt": "2026-05-30",
+    "access": "restricted",
+    "doi": null,
+    "localArchiveStatus": "metadata-only",
+    "source": "founder-supplied-zenodo-dashboard"
+  }
+]
