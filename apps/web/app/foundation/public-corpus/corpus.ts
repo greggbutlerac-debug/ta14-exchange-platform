@@ -16,7 +16,8 @@ export type CorpusStatus =
   | 'ACTIVE'
   | 'REFERENCE_IMPLEMENTATION'
   | 'LINK_PENDING'
-  | 'INVENTORY_PENDING';
+  | 'INVENTORY_PENDING'
+  | 'ACCESS_UNVERIFIED';
 
 export type CorpusRecord = {
   id: string;
