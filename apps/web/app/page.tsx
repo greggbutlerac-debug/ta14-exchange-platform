@@ -39,6 +39,25 @@ export default function HomePage() {
           <p className="goiaqg-feature__notice">OPEN EDUCATIONAL GOVERNANCE INITIATIVE · NO GOVERNMENT ADOPTION, CERTIFICATION, REGULATORY ENDORSEMENT OR LIVE BUILDING CONTROL IMPLIED</p>
         </div>
       </section>
+      <section className="goiaqg-feature" aria-labelledby="gowig-feature-title" style={{background:'linear-gradient(116deg,#052c37 0%,#073f47 55%,#0b2739 100%)',borderTop:'1px solid #56c5c188'}}>
+        <div className="goiaqg-feature__inner">
+          <div className="goiaqg-feature__intro">
+            <p className="goiaqg-feature__eyebrow">FEATURED GLOBAL INITIATIVE · TA14 AUTHORITY GOVERNANCE INSTITUTION</p>
+            <h2 id="gowig-feature-title">Global Open <em>Water Integrity Governance</em> <span>(GO-WIG)</span></h2>
+            <p>Water quality is measured. <strong>Water integrity is governed.</strong> Samples, sensors and treatment intelligence inform decisions, but do not alone establish that a consequential intervention is justified, authorized and verified.</p>
+            <div className="goiaqg-feature__actions">
+              <a href="/water-integrity-governance">EXPLORE WATER INTEGRITY GOVERNANCE →</a>
+              <a href="/showrooms/environmental-atmospheric">EXPLORE ENVIRONMENTAL GOVERNANCE →</a>
+            </div>
+          </div>
+          <div className="goiaqg-feature__pillars" aria-label="GO-WIG governance boundaries">
+            <div><small>01 · MEASURE & PRESERVE</small><b>Attributable water-quality evidence</b><p>Preserve sampling context, laboratory results, calibration, uncertainty and continuity.</p></div>
+            <div><small>02 · EXAMINE & AUTHORIZE</small><b>Authority before consequential action</b><p>Establish admissible evidence, applicable authority and standing for each proposed intervention.</p></div>
+            <div><small>03 · VERIFY & ACCOUNT</small><b>Environmental consequences matter</b><p>Examine what actually changed and preserve the resulting water and environmental record.</p></div>
+          </div>
+          <p className="goiaqg-feature__notice">OPEN EDUCATIONAL GOVERNANCE PROPOSAL · NO REGULATORY APPROVAL, GOVERNMENT ADOPTION, INDEPENDENT VALIDATION OR LIVE WATER-SYSTEM CONTROL IMPLIED</p>
+        </div>
+      </section>
       <section className="consequence-first" aria-labelledby="consequence-first-title">
         <div className="consequence-first__inner">
           <p className="consequence-first__eyebrow">THE CONSEQUENCE BOUNDARY</p>
