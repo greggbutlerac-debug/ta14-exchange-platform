@@ -1,45 +1,61 @@
 import {describe, expect, it} from 'vitest';
-import {evaluateProductionBaselineAdmission, type VerifiedEvidenceReceipt} from '../../apps/web/lib/hvac-performance-record/production-admission';
+import {
+  PRODUCTION_ADMISSION_OPERATIONAL,
+  evaluateProductionBaselineAdmission as admit,
+} from '../../apps/web/lib/hvac-performance-record/production-admission';
+import {claimCodes, codes, consistent} from './production-admission.fixture';
 
-const baseline = () => ({
-  intakeId: 'INTAKE-1', frozenAt: null, unresolvedSafetyStops: [] as string[],
-  steps: Array.from({length: 14}, (_, i) => ({
-    number: i + 1, technicianAttested: true, evidenceRefs: ['EV-' + (i + 1)],
-  })),
-});
-const receipts = (): VerifiedEvidenceReceipt[] => Array.from({length: 14}, (_, i) => ({
-  recordId: 'EV-' + (i + 1), intakeId: 'INTAKE-1', stepNumber: i + 1,
-  verification: 'VERIFIED', stored: true, digestVerified: true,
-  identityVerified: true, calibrationVerified: true, verifiedBy: 'independent-verifier',
-}));
-
+// The original scenarios from this PR, retained. Each negative case now
+// asserts its specific rejection code: because the gate is non-operational,
+// `admissible === false` alone would hold vacuously.
 describe('HPR production baseline admission (not freeze or DDD)', () => {
-  it('admits only complete independently verified evidence', () => {
-    expect(evaluateProductionBaselineAdmission(baseline(), receipts()).admissible).toBe(true);
+  it('is non-operational: even fully consistent claims are not admissible', () => {
+    const r = admit(consistent());
+    expect(PRODUCTION_ADMISSION_OPERATIONAL).toBe(false);
+    expect(r.admissible).toBe(false);
+    expect(r.operational).toBe(false);
+    expect(r.claimsConsistent).toBe(true);
+    expect(codes(r)).toEqual(['TRUSTED_VERIFICATION_AUTHORITY_UNAVAILABLE']);
   });
   it('rejects unverified technician evidence and missing storage', () => {
-    const r = receipts(); r[0].verification = 'UNVERIFIED'; r[1].stored = false;
-    expect(evaluateProductionBaselineAdmission(baseline(), r).admissible).toBe(false);
+    const input = consistent();
+    input.receipts[0].verification = 'UNVERIFIED';
+    input.receipts[1].stored = false;
+    const r = admit(input);
+    expect(r.claimsConsistent).toBe(false);
+    expect(claimCodes(r)).toEqual(['RECEIPT_NOT_VERIFIED', 'RECEIPT_CHECK_FAILED']);
   });
   it('rejects missing identity, digest, calibration, and verifier attribution', () => {
-    const r = receipts();
-    r[0].identityVerified = false; r[1].digestVerified = false;
-    r[2].calibrationVerified = false; r[3].verifiedBy = null;
-    expect(evaluateProductionBaselineAdmission(baseline(), r).admissible).toBe(false);
+    const input = consistent();
+    input.receipts[0].identityVerified = false;
+    input.receipts[1].digestVerified = false;
+    input.receipts[2].calibrationVerified = false;
+    (input.receipts[3] as Record<string, unknown>).verifierPrincipalId = null;
+    expect(claimCodes(admit(input))).toEqual(['MALFORMED_INPUT']);
+    input.receipts[3].verifierPrincipalId = 'VERIFIER-1';
+    const r = admit(input);
+    expect(r.rejections.filter(x => x.code === 'RECEIPT_CHECK_FAILED').map(x => x.detail)).toEqual([
+      'identityVerified is not true', 'digestVerified is not true', 'calibrationVerified is not true',
+    ]);
   });
   it('rejects safety stops and misattributed evidence', () => {
-    const b = baseline(); b.unresolvedSafetyStops.push('electrical hazard');
-    const r = receipts(); r[0].intakeId = 'OTHER';
-    expect(evaluateProductionBaselineAdmission(b, r).admissible).toBe(false);
+    const input = consistent();
+    input.baseline.unresolvedSafetyStops.push('electrical hazard');
+    input.receipts[0].intakeId = 'OTHER';
+    expect(claimCodes(admit(input))).toEqual(['UNRESOLVED_SAFETY_STOP', 'RECEIPT_BINDING_MISMATCH']);
   });
   it('rejects duplicate, absent, and mismatched step receipts', () => {
-    const r = receipts(); r[1].recordId = r[0].recordId;
-    expect(evaluateProductionBaselineAdmission(baseline(), r).admissible).toBe(false);
-    const wrong = receipts(); wrong[0].stepNumber = 2;
-    expect(evaluateProductionBaselineAdmission(baseline(), wrong).admissible).toBe(false);
+    const dup = consistent();
+    dup.receipts[1].receiptId = dup.receipts[0].receiptId;
+    expect(claimCodes(admit(dup))).toEqual(['RECEIPT_DUPLICATE_ID', 'RECEIPT_MISSING']);
+    const wrong = consistent();
+    wrong.receipts[0].stepNumber = 2;
+    expect(claimCodes(admit(wrong))).toEqual(['RECEIPT_BINDING_MISMATCH']);
   });
   it('rejects already frozen and incomplete baselines', () => {
-    const b = baseline(); b.frozenAt = '2026-11-12T15:00:00Z'; b.steps.pop();
-    expect(evaluateProductionBaselineAdmission(b, receipts()).admissible).toBe(false);
+    const input = consistent();
+    input.baseline.frozenAt = '2026-11-12T15:00:00Z';
+    input.baseline.steps.pop();
+    expect(claimCodes(admit(input))).toEqual(expect.arrayContaining(['BASELINE_ALREADY_FROZEN', 'STEP_COUNT_INVALID']));
   });
 });
