@@ -44,6 +44,15 @@ export default function AirEvidenceDiagram({kind}:{kind:DiagramKind}){
     <p style={{color:'#b9cbd3',lineHeight:1.7,margin:'0 0 16px'}}>{item.description}</p>
     <svg viewBox="0 0 800 250" role="img" aria-label={item.title} style={{display:'block',width:'100%',height:'auto',background:'#081c27',borderRadius:12}}>
       <defs><marker id={'arrow-'+kind} viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#70dcff"/></marker></defs>
+      {isPractice ? <>
+        {[65,310,555].map((x,i)=><g key={i}>
+          <rect x={x} y="75" width="180" height="110" rx="12" fill="#163947" stroke="#7bafd4" strokeWidth="3"/>
+          <text x={x+90} y="125" fill="#edf5f8" fontSize="13" fontWeight="bold" textAnchor="middle">{item.labels[i]}</text>
+          <text x={x+90} y="150" fill="#b8d3dd" fontSize="13" textAnchor="middle">{'STEP '+(i+1)}</text>
+        </g>)}
+        <path d="M248 130 H300 M493 130 H545" stroke="#70dcff" strokeWidth="5" markerEnd={'url(#arrow-'+kind+')'}/>
+        <text x="400" y="222" fill="#a9bdc6" fontSize="14" textAnchor="middle">Conceptual evidence sequence · not to scale</text>
+      </> : <>
       <rect x="50" y="75" width="700" height="110" rx="10" fill="#0c2b3b" stroke="#7bafd4" strokeWidth="3"/>
       <rect x="320" y="75" width="160" height="110" fill="#284b55" stroke="#efc86c" strokeWidth="3"/>
       <path d="M95 130 H280 M510 130 H700" stroke="#70dcff" strokeWidth="5" markerEnd={'url(#arrow-'+kind+')'}/>
@@ -52,7 +61,8 @@ export default function AirEvidenceDiagram({kind}:{kind:DiagramKind}){
       <text x="190" y="22" fill="#edf5f8" fontSize="16" textAnchor="middle">{item.labels[0]}</text>
       <text x="400" y="131" fill="#edf5f8" fontSize="15" textAnchor="middle">{item.labels[1]}</text>
       <text x="615" y="22" fill="#edf5f8" fontSize="16" textAnchor="middle">{item.labels[2]}</text>
-      <text x="400" y="221" fill="#a9bdc6" fontSize="14" textAnchor="middle">{isPractice?'Conceptual evidence sequence · not to scale':'Conceptual airflow path · not to scale'}</text>
+      <text x="400" y="221" fill="#a9bdc6" fontSize="14" textAnchor="middle">Conceptual airflow path · not to scale</text>
+      </>}
     </svg>
     <p style={{margin:'16px 0 0'}}>{caption(item.note)}</p>
   </figure>;
