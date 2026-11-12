@@ -15,7 +15,7 @@ export type Module03Lesson = {
   delivery: string;
   evidenceObject: string;
   visual: {src: string; status: 'asset-found-review-pending'} | null;
-  narrationStatus: 'draft-not-integrated';
+  narrationStatus: 'read-along-script-integrated-audio-pending';
   assessmentStatus: 'local-practice-not-persisted';
 };
 
@@ -30,7 +30,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/Air%20Is%20Part%20of%20the%20System%20Infographic.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -43,7 +43,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/Airflow%20Path%20and%20System%20Boundaries.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -56,7 +56,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/HVAC%20Airflow%20and%20Static%20Pressure%20Investigation.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -66,7 +66,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "delivery": "GUIDED EXERCISE",
     "evidenceObject": "TESP evidence record",
     "visual": null,
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -76,7 +76,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "delivery": "VIDEO + CASE",
     "evidenceObject": "Component pressure-drop record",
     "visual": null,
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -86,7 +86,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "delivery": "VIDEO + EXERCISE",
     "evidenceObject": "Airflow measurement record",
     "visual": null,
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -99,7 +99,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/HVAC%20Temperature%20%26%20Humidity%20Training%20Infographic.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -112,7 +112,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/TA-14%20Academy_%20Heat%20Transfer%20%26%20Moisture%20Control.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -125,7 +125,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/HVAC%20Temperature%20%26%20Humidity%20Training%20Infographic.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -138,7 +138,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/HVAC%20Temperature%20%26%20Humidity%20Training%20Infographic.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -151,7 +151,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/TA-14%20Academy_%20Heat%20Transfer%20%26%20Moisture%20Control.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -164,7 +164,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/TA-14%20Academy_%20Heat%20Transfer%20%26%20Moisture%20Control.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -177,7 +177,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/TA-14%20Academy_%20Heat%20Transfer%20%26%20Moisture%20Control.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -187,7 +187,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "delivery": "GUIDED VR",
     "evidenceObject": "Guided airflow/moisture VR record",
     "visual": null,
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -197,7 +197,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "delivery": "PERFORM VR",
     "evidenceObject": "Independent environmental performance record",
     "visual": null,
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   },
   {
@@ -210,7 +210,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "src": "/Independent%20Review%20Challenge%20Infographic.png",
       "status": "asset-found-review-pending"
     },
-    "narrationStatus": "draft-not-integrated",
+    "narrationStatus": "read-along-script-integrated-audio-pending",
     "assessmentStatus": "local-practice-not-persisted"
   }
 ];
