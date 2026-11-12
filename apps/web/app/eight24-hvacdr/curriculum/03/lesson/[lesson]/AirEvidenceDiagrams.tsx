@@ -1,6 +1,6 @@
 import type {ReactNode} from 'react';
 
-type DiagramKind = 'tesp' | 'component-drop' | 'airflow';
+type DiagramKind = 'tesp' | 'component-drop' | 'airflow' | 'guided-practice' | 'independent-practice';
 
 const diagrams: Record<DiagramKind, {title:string;description:string;labels:string[];note:string}> = {
   tesp: {
@@ -15,6 +15,18 @@ const diagrams: Record<DiagramKind, {title:string;description:string;labels:stri
     labels:['UPSTREAM TAP','FILTER / COIL / COMPONENT','DOWNSTREAM TAP'],
     note:'The pressure difference describes the measured component under current conditions. Compare with the applicable manufacturer specification; pressure drop alone does not identify a failed component.'
   },
+  'guided-practice': {
+    title:'Guided practice — collect, compare, and qualify evidence',
+    description:'This browser-based exercise is a teaching simulation, not immersive VR or a verified field record.',
+    labels:['OPERATING STATE','PRESSURE / TEMP / RH','SUPPORTED FINDING'],
+    note:'Use the guided prompts to establish the system state, collect distinct airflow and moisture observations, then identify what remains unverified. No DDD or intervention authority is issued.'
+  },
+  'independent-practice': {
+    title:'Independent performance exercise — evidence before conclusions',
+    description:'Make your own evidence decisions before submitting. Feedback is local and no credential or field record is created.',
+    labels:['FIELD CONTEXT','MEASURED EVIDENCE','BOUNDARY DECISION'],
+    note:'Distinguish observations from defensible conclusions. Missing evidence calls for further examination, not an unsupported charge or component-replacement decision.'
+  },
   airflow: {
     title:'Airflow estimation — area and representative velocity',
     description:'A conceptual duct cross-section and measurement plane, not a substitute for an approved traverse method.',
@@ -25,6 +37,7 @@ const diagrams: Record<DiagramKind, {title:string;description:string;labels:stri
 
 export default function AirEvidenceDiagram({kind}:{kind:DiagramKind}){
   const item=diagrams[kind];
+  const isPractice=kind==='guided-practice'||kind==='independent-practice';
   const caption=(children:ReactNode)=><span style={{color:'#cce0e9',fontSize:13,lineHeight:1.6}}>{children}</span>;
   return <figure style={{margin:'0 0 28px',padding:'clamp(14px,3vw,24px)',background:'#06121a',border:'1px solid #173746',borderRadius:16}}>
     <figcaption style={{fontWeight:800,color:'#efc86c',marginBottom:8}}>{item.title}</figcaption>
@@ -39,7 +52,7 @@ export default function AirEvidenceDiagram({kind}:{kind:DiagramKind}){
       <text x="190" y="22" fill="#edf5f8" fontSize="16" textAnchor="middle">{item.labels[0]}</text>
       <text x="400" y="131" fill="#edf5f8" fontSize="15" textAnchor="middle">{item.labels[1]}</text>
       <text x="615" y="22" fill="#edf5f8" fontSize="16" textAnchor="middle">{item.labels[2]}</text>
-      <text x="400" y="221" fill="#a9bdc6" fontSize="14" textAnchor="middle">Conceptual airflow path · not to scale</text>
+      <text x="400" y="221" fill="#a9bdc6" fontSize="14" textAnchor="middle">{isPractice?'Conceptual evidence sequence · not to scale':'Conceptual airflow path · not to scale'}</text>
     </svg>
     <p style={{margin:'16px 0 0'}}>{caption(item.note)}</p>
   </figure>;
