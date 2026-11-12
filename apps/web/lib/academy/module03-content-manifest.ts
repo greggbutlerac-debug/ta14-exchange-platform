@@ -218,6 +218,8 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
 export const module03ManifestSummary = {
   moduleId: '03',
   plannedMinutes: 420,
+  scheduledLessonMinutes: 415,
+  unscheduledMinutes: 5, // Curriculum target minus the 16 allocated lesson durations; not yet assigned to a lesson.
   lessonCount: 16,
   readiness: 'preview-integrated-production-pending',
   authorityBoundary: 'Training records are not DDDs or intervention authorizations',
