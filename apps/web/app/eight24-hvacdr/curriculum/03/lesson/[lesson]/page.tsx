@@ -83,6 +83,8 @@ export default function Module03LessonPreview(){
     {lesson.id==='3.04'&&<AirEvidenceDiagram kind="tesp"/>}
     {lesson.id==='3.05'&&<AirEvidenceDiagram kind="component-drop"/>}
     {lesson.id==='3.06'&&<AirEvidenceDiagram kind="airflow"/>}
+    {lesson.id==='3.14'&&<AirEvidenceDiagram kind="guided-practice"/>}
+    {lesson.id==='3.15'&&<AirEvidenceDiagram kind="independent-practice"/>}
     {lesson.id==='3.01'&&<Lesson301/>}
     {lesson.id==='3.02'&&<Lesson302/>}
     {lesson.id==='3.03'&&<Lesson303/>}
