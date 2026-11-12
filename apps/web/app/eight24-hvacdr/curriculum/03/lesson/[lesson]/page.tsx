@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import {useParams} from 'next/navigation';
 import {useState} from 'react';
+import AirEvidenceDiagram from './AirEvidenceDiagrams';
 import Lesson302 from './Lesson302';
 import Lesson303 from './Lesson303';
 import Lesson304 from './Lesson304';
@@ -79,6 +80,9 @@ export default function Module03LessonPreview(){
     <p style={{color:'#a9bdc6'}}>{lesson.minutes} minutes · {lesson.delivery}</p>
     <div style={{padding:22,border:'1px solid #514426',borderRadius:16,background:'#0b1013',margin:'30px 0'}}><b style={{color:'#efc86c'}}>INTEGRATION PREVIEW — NOT A DELIVERED LESSON</b><p style={{color:'#a9bdc6',lineHeight:1.7}}>The canonical lesson inventory is available. All 16 Module 03 lessons now include written teaching, local practice checks or browser-based exercises. These are previews, not delivered or credentialing lessons. Recorded narration, immersive VR and saved learner progression are still pending. This page does not issue a credential, DDD or authorization to intervene.</p></div>
     {lesson.visual&&<section style={{marginBottom:28}}><h2 style={{fontFamily:'Georgia,serif'}}>Proposed visual reference · instructional review pending</h2><p style={{color:'#a9bdc6'}}>This image exists in the repository. Its association with this lesson is provisional and requires instructional approval.</p><div style={{position:'relative',width:'100%',aspectRatio:'3 / 2',background:'#06121a',border:'1px solid #173746',borderRadius:16,overflow:'hidden'}}><Image src={lesson.visual.src} alt={'Proposed teaching reference for '+lesson.title} fill sizes="(max-width: 940px) 100vw, 940px" style={{objectFit:'contain'}}/></div></section>}
+    {lesson.id==='3.04'&&<AirEvidenceDiagram kind="tesp"/>}
+    {lesson.id==='3.05'&&<AirEvidenceDiagram kind="component-drop"/>}
+    {lesson.id==='3.06'&&<AirEvidenceDiagram kind="airflow"/>}
     {lesson.id==='3.01'&&<Lesson301/>}
     {lesson.id==='3.02'&&<Lesson302/>}
     {lesson.id==='3.03'&&<Lesson303/>}
