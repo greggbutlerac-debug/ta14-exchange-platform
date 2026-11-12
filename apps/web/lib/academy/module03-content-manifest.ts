@@ -1,7 +1,7 @@
 /**
  * Module 03 content integration manifest (production preparation only).
  *
- * Inventory is aligned to CurriculumRoom.tsx. Image paths refer only to assets
+ * Inventory is aligned to CurriculumRoom.tsx. All 16 lessons have browser-based\n * teaching or assessment previews; no persisted learner completion exists. Image paths refer only to assets
  * verified in apps/web/public on 2026-11-05. Association with an individual
  * lesson is PROVISIONAL and requires instructional/visual review.
  *
@@ -16,7 +16,7 @@ export type Module03Lesson = {
   evidenceObject: string;
   visual: {src: string; status: 'asset-found-review-pending'} | null;
   narrationStatus: 'draft-not-integrated';
-  assessmentStatus: 'not-integrated';
+  assessmentStatus: 'local-practice-not-persisted';
 };
 
 export const module03ContentManifest: readonly Module03Lesson[] = [
@@ -31,7 +31,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.02",
@@ -44,7 +44,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.03",
@@ -57,7 +57,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.04",
@@ -67,7 +67,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "evidenceObject": "TESP evidence record",
     "visual": null,
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.05",
@@ -77,7 +77,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "evidenceObject": "Component pressure-drop record",
     "visual": null,
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.06",
@@ -87,7 +87,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "evidenceObject": "Airflow measurement record",
     "visual": null,
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.07",
@@ -100,7 +100,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.08",
@@ -113,7 +113,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.09",
@@ -126,7 +126,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.10",
@@ -139,7 +139,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.11",
@@ -152,7 +152,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.12",
@@ -165,7 +165,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.13",
@@ -178,7 +178,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.14",
@@ -188,7 +188,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "evidenceObject": "Guided airflow/moisture VR record",
     "visual": null,
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.15",
@@ -198,7 +198,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
     "evidenceObject": "Independent environmental performance record",
     "visual": null,
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   },
   {
     "id": "3.16",
@@ -211,7 +211,7 @@ export const module03ContentManifest: readonly Module03Lesson[] = [
       "status": "asset-found-review-pending"
     },
     "narrationStatus": "draft-not-integrated",
-    "assessmentStatus": "not-integrated"
+    "assessmentStatus": "local-practice-not-persisted"
   }
 ];
 
@@ -219,6 +219,6 @@ export const module03ManifestSummary = {
   moduleId: '03',
   plannedMinutes: 420,
   lessonCount: 16,
-  readiness: 'integration-pending',
+  readiness: 'preview-integrated-production-pending',
   authorityBoundary: 'Training records are not DDDs or intervention authorizations',
 } as const;
