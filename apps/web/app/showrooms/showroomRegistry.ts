@@ -13,6 +13,7 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Air-Safe Healing Sanctuary · From Owner Promise to Governed Stewardship','/showrooms/air-safe-healing-sanctuary','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Lloyd Helferty UnityNet Energime Michael Bordenaro Stephanie Kimon Onuma Canada community clean-air refuge public access owner obligations municipal refuge eight lessons Samantha narration PDF AEA AIR EIG lifetime environmental stewardship international UN-relevant independent examination'],
 ['Prediction Is Not Permission · From Forecast to Authorized Consequence','/showrooms/prediction-is-not-permission','INTEROPERABILITY & SYSTEMS','Eight original teaching images Samantha narration prediction is not authority sports car school CO2 outdoor PM2.5 AIR EIG AEA ASA HOLD ALLOW DENY ESCALATE independent review challenge technical reference PDF'],
 ['The HVAC System That Remembers Its Entire Life','/showrooms/hvac-system-that-remembers-its-entire-life','BUILDINGS & HVAC','Eight illustrated lessons Samantha narration manufacturer warranty equipment lifecycle commissioning 14-step baseline DDD NIRET refrigerant governor Atmospheric Integrity Records ACA AEA lifetime evidence cloud manufacturer pilot technical PDF'],
 
