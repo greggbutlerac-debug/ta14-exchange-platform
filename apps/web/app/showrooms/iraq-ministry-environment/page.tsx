@@ -6,12 +6,12 @@ export default function IraqMinistryShowroom(){
  const [active,setActive]=useState(-1);
  const [voices,setVoices]=useState(false);
  useEffect(()=>()=>{if(typeof window!=='undefined'&&'speechSynthesis'in window)window.speechSynthesis.cancel()},[]);
- function narrate(i:number){if(!('speechSynthesis'in window)){setVoices(true);return;}window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(lessons[i].title+'. '+lessons[i].text);u.lang='ar-IQ';u.rate=.88;const v=window.speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('ar'));if(!v){setVoices(true);return;}u.voice=v;u.onend=()=>setActive(-1);window.speechSynthesis.speak(u);setActive(i);}
+ function narrate(i:number){if(!('speechSynthesis'in window)){setVoices(true);setActive(-1);return;}window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(lessons[i].title+'. '+lessons[i].text);u.lang='ar-IQ';u.rate=.88;const v=window.speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('ar'));if(!v){setVoices(true);setActive(-1);return;}u.voice=v;setVoices(false);u.onend=()=>setActive(-1);u.onerror=()=>setActive(-1);window.speechSynthesis.speak(u);setActive(i);}
  return <main dir="rtl" style={{background:'#071829',color:'#f4f7fb',minHeight:'100vh',fontFamily:'Tahoma,Arial,sans-serif'}}>
  <div style={{maxWidth:1100,margin:'auto',padding:'28px 20px'}}>
  <nav style={{display:'flex',justifyContent:'space-between',gap:20,flexWrap:'wrap'}}><a href="/showrooms" style={{color:'#8cd9d8'}}>العودة إلى صالات العرض</a><span>TA-14 · فحص فني مستقل · 2026</span></nav>
  <header style={{padding:'65px 0 45px',borderBottom:'1px solid #315066'}}>
- <p style={{color:'#e6c27d',fontWeight:700}}>جمهورية العراق · وزارة البيئة · مادة مقترحة للفحص الفني المستقل</p>
+ <p style={{color:'#e6c27d',fontWeight:700}}>العراق · مادة تعليمية مستقلة مقترحة للنقاش الفني مع الجهات المختصة</p>
  <h1 style={{fontSize:'clamp(32px,5vw,58px)',lineHeight:1.35,maxWidth:900}}>من الرصد البيئي إلى الإجراء المبرر</h1>
  <p style={{fontSize:21,lineHeight:1.9,maxWidth:850,color:'#cbd9e6'}}>ثمانية دروس بصرية لفحص سلامة الأدلة الجوية، وحدود السلطة، والصفة القائمة، وقرارات التنفيذ وفق بنية AEA المقترحة.</p>
  <p style={{background:'#183348',padding:18,borderRight:'4px solid #e6c27d',lineHeight:1.8}}>هذه صالة تعليمية أعدّتها TA-14 بصورة مستقلة. لا تعني موافقة وزارة البيئة العراقية أو مشاركتها أو اعتمادها أو تشغيلها للنظام. الأمثلة والبيانات افتراضية للتعليم فقط.</p>
