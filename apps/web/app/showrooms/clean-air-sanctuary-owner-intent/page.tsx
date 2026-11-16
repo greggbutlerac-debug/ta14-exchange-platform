@@ -32,7 +32,7 @@ export default function CleanAirSanctuaryShowroom(){
  <p style={{fontSize:21,lineHeight:1.65,maxWidth:970,color:'#c7d8df'}}>A proposed Clean Air Sanctuary demonstration connecting owner requirements, building intelligence, frontier AI, TA-14 execution governance and independently examinable public benefit.</p>
  <div style={{padding:22,border:'1px solid #4d6b78',borderRadius:14,background:'#0a1b25',lineHeight:1.7,maxWidth:1020}}><strong style={{color:'#f2cb7c'}}>PROPOSAL STATUS · NOT AN APPROVED OR OPERATING PILOT.</strong> The library, scenarios, data and outcomes depicted are conceptual or illustrative. ALN, ONUMA, UNIC and TA-14 contributions are proposed; no municipal approval, partner endorsement, funding award or verified outcome is implied.</div>
  <div style={{display:'flex',flexWrap:'wrap',gap:12,marginTop:24}}>
- <a href={pdf} download style={{padding:'14px 20px',background:'#7be6e6',color:'#03151d',borderRadius:9,fontWeight:900,textDecoration:'none'}}>↓ DOWNLOAD 13-PAGE TECHNICAL & FUNDING PROSPECTUS</a>
+ <a href={pdf} download style={{padding:'14px 20px',background:'#7be6e6',color:'#03151d',borderRadius:9,fontWeight:900,textDecoration:'none'}}>↓ DOWNLOAD TECHNICAL & FUNDING PROSPECTUS</a>
  <a href="#lessons" style={{padding:'14px 20px',border:'1px solid #78e8ed',color:'#d6fafa',borderRadius:9,textDecoration:'none',fontWeight:800}}>EXPLORE EIGHT LESSONS</a>
  </div>
  </header>
