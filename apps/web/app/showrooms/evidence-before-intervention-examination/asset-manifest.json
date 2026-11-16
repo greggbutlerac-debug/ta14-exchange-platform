@@ -1,0 +1,65 @@
+{
+  "status": "DRAFT REVIEW — original eight source-image files independently matched to GitHub via SHA; technical/source-language review pending",
+  "route": "/showrooms/evidence-before-intervention-examination",
+  "lessons": [
+    {
+      "number": 1,
+      "title": "Preserve Reality Before Intervention",
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention.png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention.png"
+    },
+    {
+      "number": 2,
+      "title": "Original-State HVAC Performance Record",
+      "repository_path": "apps/web/public/Evidence Before Intervention_ HVAC Record.png",
+      "public_url": "/Evidence%20Before%20Intervention_%20HVAC%20Record.png"
+    },
+    {
+      "number": 3,
+      "title": "Seven In / Seven Out Examination",
+      "repository_path": "apps/web/public/HVAC Evidence Before Intervention.png",
+      "public_url": "/HVAC%20Evidence%20Before%20Intervention.png"
+    },
+    {
+      "number": 4,
+      "title": "NIRET",
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention (1).png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention%20(1).png"
+    },
+    {
+      "number": 5,
+      "title": "Declared Diagnostic Determination",
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention (2).png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention%20(2).png"
+    },
+    {
+      "number": 6,
+      "title": "Establish Authority Before Intervention",
+      "repository_path": "apps/web/public/Evidence Before HVAC Intervention (3).png",
+      "public_url": "/Evidence%20Before%20HVAC%20Intervention%20(3).png"
+    },
+    {
+      "number": 7,
+      "title": "Post-Intervention HVAC Performance Record",
+      "repository_path": "apps/web/public/Post-Intervention HVAC Performance Record.png",
+      "public_url": "/Post-Intervention%20HVAC%20Performance%20Record.png"
+    },
+    {
+      "number": 8,
+      "title": "Proof of Performance and Verified Outcome",
+      "repository_path": "apps/web/public/Evidence Before Intervention_ Verified HVAC Outcomes.png",
+      "public_url": "/Evidence%20Before%20Intervention_%20Verified%20HVAC%20Outcomes.png"
+    }
+  ],
+  "companion_pdf": {
+    "repository_path": "apps/web/public/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
+    "public_url": "/TA14_Evidence_Before_Intervention_HVAC_Technical_Reference_v1.pdf",
+    "status": "verified on main"
+  },
+  "publication_gates": [
+    "Confirm image legibility and technical consistency, especially illustrative signatures and gauge timing",
+    "Verify controlling Academy NIRET and diagnostic-termination wording",
+    "Verify latest build and preview",
+    "Technical review and explicit authorization before merging"
+  ]
+}
