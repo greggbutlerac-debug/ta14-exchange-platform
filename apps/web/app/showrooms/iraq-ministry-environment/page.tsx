@@ -6,7 +6,7 @@ export default function IraqMinistryShowroom(){
  const [active,setActive]=useState(-1);
  const [voices,setVoices]=useState(false);
  useEffect(()=>()=>{if(typeof window!=='undefined'&&'speechSynthesis'in window)window.speechSynthesis.cancel()},[]);
- function narrate(i:number){if(!('speechSynthesis'in window)){setVoices(true);return;}window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(lessons[i].title+'. '+lessons[i].text);u.lang='ar-IQ';u.rate=.88;const v=window.speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('ar'));if(v)u.voice=v;u.onend=()=>setActive(-1);window.speechSynthesis.speak(u);setActive(i);}
+ function narrate(i:number){if(!('speechSynthesis'in window)){setVoices(true);return;}window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(lessons[i].title+'. '+lessons[i].text);u.lang='ar-IQ';u.rate=.88;const v=window.speechSynthesis.getVoices().find(v=>v.lang.toLowerCase().startsWith('ar'));if(!v){setVoices(true);return;}u.voice=v;u.onend=()=>setActive(-1);window.speechSynthesis.speak(u);setActive(i);}
  return <main dir="rtl" style={{background:'#071829',color:'#f4f7fb',minHeight:'100vh',fontFamily:'Tahoma,Arial,sans-serif'}}>
  <div style={{maxWidth:1100,margin:'auto',padding:'28px 20px'}}>
  <nav style={{display:'flex',justifyContent:'space-between',gap:20,flexWrap:'wrap'}}><a href="/showrooms" style={{color:'#8cd9d8'}}>العودة إلى صالات العرض</a><span>TA-14 · فحص فني مستقل · 2026</span></nav>
@@ -17,12 +17,12 @@ export default function IraqMinistryShowroom(){
  <p style={{background:'#183348',padding:18,borderRight:'4px solid #e6c27d',lineHeight:1.8}}>هذه صالة تعليمية أعدّتها TA-14 بصورة مستقلة. لا تعني موافقة وزارة البيئة العراقية أو مشاركتها أو اعتمادها أو تشغيلها للنظام. الأمثلة والبيانات افتراضية للتعليم فقط.</p>
  <a href={pdf} target="_blank" rel="noopener noreferrer" style={{display:'inline-block',marginTop:16,background:'#e6c27d',color:'#102033',padding:'15px 23px',borderRadius:8,fontWeight:700}}>قراءة الدليل الفني ثنائي اللغة — العربية ثم الإنجليزية (PDF)</a>
  </header>
- <section style={{padding:'45px 0'}}><h2 style={{fontSize:30}}>الدروس الثمانية</h2><p style={{color:'#bed0dd'}}>تتبع كل صورة شرحاً مستقلاً. زر الاستماع يستخدم صوتاً عربياً متاحاً في متصفحك؛ قد تختلف جودة الصوت حسب الجهاز.</p>
+ <section style={{padding:'45px 0'}}><h2 style={{fontSize:30}}>الدروس الثمانية</h2><p style={{color:'#bed0dd'}}>تتبع كل صورة شرحاً مستقلاً. زر الاستماع يستخدم صوتاً عربياً متاحاً في متصفحك؛ يتطلب التشغيل صوتاً عربياً مثبتاً على الجهاز، وقد تختلف الجودة.</p>
  {lessons.map((l,i)=><article key={i} style={{margin:'35px 0 55px',background:'#10283b',border:'1px solid #2c5065',borderRadius:14,overflow:'hidden'}}>
  <div style={{padding:'22px 26px'}}><small style={{color:'#e6c27d'}}>الدرس {String(i+1).padStart(2,'0')} / 08</small><h3 style={{fontSize:27,margin:'12px 0'}}>{l.title}</h3><p style={{fontSize:18,lineHeight:2,color:'#dce7ee'}}>{l.text}</p></div>
  <img src={l.src} alt={l.title+' — رسم تعليمي توضيحي'} loading="lazy" style={{width:'100%',height:'auto',display:'block'}}/>
  <div style={{padding:22,display:'flex',gap:12,flexWrap:'wrap',alignItems:'center'}}>
- <button type="button" onClick={()=>narrate(i)} style={{background:'#e6c27d',border:0,color:'#102033',padding:'12px 20px',borderRadius:8,fontWeight:700,cursor:'pointer'}}>{active===i?'إعادة تشغيل الشرح':'▶ استمع إلى شرح سامانثا'}</button>
+ <button type="button" onClick={()=>narrate(i)} style={{background:'#e6c27d',border:0,color:'#102033',padding:'12px 20px',borderRadius:8,fontWeight:700,cursor:'pointer'}}>{active===i?'إعادة تشغيل الشرح':'▶ استمع إلى الشرح بالعربية'}</button>
  <button type="button" onClick={()=>{window.speechSynthesis?.cancel();setActive(-1)}} style={{background:'transparent',border:'1px solid #7596a7',color:'#fff',padding:'12px 18px',borderRadius:8,cursor:'pointer'}}>إيقاف الصوت</button>
  </div></article>)}
  </section>
@@ -32,6 +32,6 @@ export default function IraqMinistryShowroom(){
  <a href={pdf} target="_blank" rel="noopener noreferrer" style={{color:'#f0d18e',fontWeight:700}}>تحميل الدليل الفني الكامل (العربية والإنجليزية)</a>
  </section>
  <footer style={{padding:'35px 0',color:'#a8c0d0',fontSize:14}}>TA-14 Authority Governance Institution LLC · Independent technical examination · No government endorsement implied</footer>
- {voices&&<p role="alert">التشغيل الصوتي غير مدعوم في هذا المتصفح.</p>}
+ {voices&&<p role="alert">لا يتوفر صوت عربي مناسب في هذا المتصفح. يمكنك قراءة النص المصاحب لكل صورة.</p>}
  </div></main>
 }
