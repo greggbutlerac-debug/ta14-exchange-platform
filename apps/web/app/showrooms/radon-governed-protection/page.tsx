@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import Samantha from './Samantha';
+import ShowroomReviewChallenge from '../ShowroomReviewChallenge';
 
 export const metadata={
  title:'Radon: From Measurement to Governed Protection | TA-14 Exchange',
@@ -106,6 +107,7 @@ export default function Page(){
   <a href={asset(pdf)} download style={{display:'inline-block',padding:'15px 22px',borderRadius:10,background:'#e8c57a',color:'#182431',textDecoration:'none',fontWeight:900}}>↓ EXAMINE THE TECHNICAL PROSPECTUS</a>
   <p style={{marginTop:24}}><Link href="/work-with-ta14?source_showroom=radon-governed-protection" style={{color:'#91e3f0'}}>Request a bounded professional examination →</Link></p>
  </section>
+ <ShowroomReviewChallenge embedded />
  <footer style={{padding:'32px 0 65px',borderTop:'1px solid #294454',color:'#829ba9',lineHeight:1.7,fontSize:12}}>TA-14 Authority Governance Institution · Independent educational concept · No certification · No legal or regulatory jurisdiction created · No affiliated endorsement · No field-validated operational claim.</footer>
  </div></main>
 }
