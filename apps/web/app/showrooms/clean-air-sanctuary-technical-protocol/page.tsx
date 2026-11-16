@@ -89,10 +89,9 @@ const fixtures:{id:string;condition:string;expected:Disposition;note:string}[]=[
 const disclosure="PROPOSED TECHNICAL EXAMINATION · NO DEPLOYED PILOT OR CONFIRMED PARTNERSHIP. The facility, digital screens, green checks and test outcomes in the illustrations are conceptual. No building control, certification, measured air improvement, municipal approval, partner endorsement or funding award is asserted.";
 const actionStyle={borderRadius:9,padding:'12px 16px',fontWeight:800,cursor:'pointer'} as const;
 export default function CleanAirSanctuaryProtocol(){
- const [active,setActive]=useState(0);
  const [selected,setSelected]=useState<Disposition|null>(null);
  const [fixture,setFixture]=useState(1);
- const lesson=lessons[active]; const test=fixtures[fixture];
+ const test=fixtures[fixture];
  return <main style={{background:'#06131d',color:'#f1f8fa',minHeight:'100vh',fontFamily:'Arial,Helvetica,sans-serif'}}>
  <div style={{maxWidth:1190,margin:'0 auto',padding:'0 20px 90px'}}>
  <nav style={{display:'flex',gap:20,flexWrap:'wrap',padding:'23px 0',borderBottom:'1px solid #31505c'}}>
@@ -118,26 +117,22 @@ export default function CleanAirSanctuaryProtocol(){
  </section>
  <section id="lessons" style={{paddingTop:45}}>
  <p style={{color:'#8ee9e7',fontWeight:900,letterSpacing:2}}>EIGHT IMAGE-GUIDED LESSONS</p>
- <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(210px,1fr))',gap:10,margin:'19px 0 30px'}}>
- {lessons.map((l,i)=><button type="button" key={l.img} aria-pressed={active===i} onClick={()=>setActive(i)} style={{...actionStyle,textAlign:'left',background:active===i?'#1a5864':'#102732',color:'#fff',border:active===i?'2px solid #90f4ea':'1px solid #38616f'}}>{String(i+1).padStart(2,'0')} · {l.title}</button>)}
- </div>
- <h2 style={{fontSize:'clamp(26px,4vw,42px)',margin:'12px 0'}}>{String(active+1).padStart(2,'0')} / 08 · {lesson.title}</h2>
+ <p style={{fontSize:18,lineHeight:1.7,color:'#c0d5de'}}>Scroll straight down through all eight lessons. Every image, Samantha narration, explanation and takeaway appears in sequence without clicking Next.</p>
+ {lessons.map((lesson,i)=><article key={lesson.img} id={'lesson-'+(i+1)} style={{padding:'35px 0 42px',borderBottom:'1px solid #365b69'}}>
+ <h2 style={{fontSize:'clamp(26px,4vw,42px)',margin:'12px 0'}}>{String(i+1).padStart(2,'0')} / 08 · {lesson.title}</h2>
  <p style={{fontSize:18,color:'#c0d5de',lineHeight:1.65}}>{lesson.intro}</p>
  <div style={{position:'relative',width:'100%',aspectRatio:'16 / 9',borderRadius:15,overflow:'hidden',border:'1px solid #457283',background:'#11212d'}}>
- <Image src={'/'+encodeURIComponent(lesson.img)} alt={'Lesson '+(active+1)+' educational image: '+lesson.title+'; imagery and dashboards are conceptual'} fill sizes="(max-width: 900px) 100vw, 1190px" style={{objectFit:'contain'}} priority={active===0}/>
+ <Image src={'/'+encodeURIComponent(lesson.img)} alt={'Lesson '+(i+1)+' educational image: '+lesson.title+'; imagery and dashboards are conceptual'} fill sizes="(max-width: 900px) 100vw, 1190px" style={{objectFit:'contain'}} priority={i===0}/>
  </div>
  <div style={{marginTop:17,padding:23,border:'1px solid #365b69',borderRadius:13,background:'#0b2430'}}>
- <SamanthaNarration lessons={narrationLessons} lessonIndex={active} script={lesson.script}/>
+ <SamanthaNarration lessons={narrationLessons} lessonIndex={i} script={lesson.script}/>
  <p style={{lineHeight:1.85,color:'#d2e4e8',fontSize:16}}>{lesson.script}</p>
  </div>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(275px,1fr))',gap:13,margin:'17px 0'}}>
  <div style={{padding:20,borderRadius:12,background:'#123039'}}><strong style={{color:'#8ee9e7'}}>WHAT YOU LEARNED</strong><p style={{lineHeight:1.7}}>{lesson.learned}</p></div>
  <div style={{padding:20,borderRadius:12,background:'#123039'}}><strong style={{color:'#8ee9e7'}}>WHAT COMES NEXT</strong><p style={{lineHeight:1.7}}>{lesson.next}</p></div>
  </div>
- <div style={{display:'flex',gap:12,justifyContent:'space-between',marginTop:17}}>
- <button type="button" disabled={active===0} onClick={()=>setActive(i=>Math.max(0,i-1))} style={{...actionStyle,background:'#1c3a44',color:'#fff',border:0,opacity:active===0?.4:1}}>PREVIOUS LESSON</button>
- <button type="button" disabled={active===7} onClick={()=>setActive(i=>Math.min(7,i+1))} style={{...actionStyle,background:'#8ee9e7',color:'#06131d',border:0,opacity:active===7?.4:1}}>NEXT LESSON</button>
- </div>
+ </article>)}
  </section>
  <section id="review" style={{marginTop:72,padding:28,borderRadius:16,border:'1px solid #49707d',background:'#0b2835'}}>
  <p style={{color:'#8ee9e7',letterSpacing:2,fontWeight:900,fontSize:12}}>INTERACTIVE TECHNICAL EXAMINATION · SIMULATED POLICY ONLY</p>
