@@ -72,12 +72,12 @@ function casesFor(slug:string,subject:string):Case[]{
 }
 const excluded=['bruno-tudal','john-kay','anto-budiardjo','eight24-solutions','founding-institutional-sponsorship','environmental-atmospheric','prediction-is-not-permission'];
 function topicFor(path:string){const slug=path.split('/').filter(Boolean).slice(1).join('/');const key=Object.keys(topics).find(k=>slug.includes(k));return key?topics[key]:'the proposed operational consequence';}
-export default function ShowroomReviewChallenge(){
+export default function ShowroomReviewChallenge({embedded=false}:{embedded?:boolean}={}){
  const path=usePathname()||'';
  const slug=path.split('/').filter(Boolean).slice(1).join('/');
  const [answers,setAnswers]=useState<Record<number,string>>({});
  const [reveal,setReveal]=useState(false);
- if(!slug||slug==='maria-neira-air-health-humanity'||excluded.some(x=>slug.startsWith(x)))return null;
+ if(!slug||slug==='maria-neira-air-health-humanity'||excluded.some(x=>slug.startsWith(x))||(!embedded&&slug==='radon-governed-protection'))return null;
  const subject=topicFor(path);
  const cases=casesFor(slug,subject);
  const complete=cases.every((_,i)=>!!answers[i]);
