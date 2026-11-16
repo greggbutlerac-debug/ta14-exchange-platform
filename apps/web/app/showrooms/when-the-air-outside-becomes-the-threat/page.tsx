@@ -8,30 +8,30 @@ export const metadata = {
   openGraph: { title: 'When the Air Outside Becomes the Threat | TA-14', description: 'From environmental measurement to authorized building action.', url: 'https://www.ta14exchange.com/showrooms/when-the-air-outside-becomes-the-threat', type: 'website' }
 };
 
-const pdf = '/'+encodeURIComponent('TA14_Window_Decision_Governance_Workshop_Enhanced.pdf');
+const pdf = '/'+encodeURIComponent('TA14_Window_Decision_Governance_Workshop_Enhanced (1).pdf');
 const lessons = [
-  {n:'01', title:'The Library in Lagos', img:'a_wide_cinematic_infographic_slide_for_01_the.png',
+  {n:'01', title:'The Library in Lagos', img:'The Library in Lagos_ A Governance Scenario.png',
    script:'A virtual library is placed in Lagos, Nigeria, to examine one simple problem: when outdoor pollution is elevated, may its operable windows remain open? The building and pollution event are hypothetical. The owner purpose, occupied zones, vulnerable users, window boundaries and actual control responsibilities must be specified before any decision is justified.',
    learned:'Establish the owner purpose, exact building boundary, occupants, and proposed consequence before considering automation.', next:'Define the window action and its competing environmental consequences.'},
-  {n:'02', title:'The Window Decision', img:'a_detailed_infographic_style_scene_a_wide_realis.png',
+  {n:'02', title:'The Window Decision', img:'The Window Decision_ Library Airflow Tradeoffs.png',
    script:'The hypothetical proposed action is to close specified operable windows for a defined duration. Opening or closing changes more than one variable. Outdoor and indoor particulate exposure, carbon dioxide, ventilation, temperature, relative humidity, energy, accessibility and occupant safety may move in different directions. The displayed readings, duration and thresholds are fictional workshop inputs, not site measurements or validated operating limits.',
    learned:'An exact action must be defined and evaluated against multiple environmental consequences.', next:'Test whether the observations are trustworthy enough to support that action.'},
-  {n:'03', title:'Can We Trust the Evidence?', img:'a_detailed_infographic_slide_style_image_overal.png',
+  {n:'03', title:'Can We Trust the Evidence?', img:'Trustworthy Evidence Monitoring Workshop.png',
    script:'One outdoor PM2.5 value cannot by itself establish admissible evidence. An Atmospheric Integrity Record should preserve instrument identity, location and placement, custodian, calibration, time source, timestamps, missing data, uncertainty, corroboration and revision history. The green checks and calibration example in this image are illustrative only. A reviewer must be able to inspect contradictory and missing information rather than accept a confidence badge.',
    learned:'Decision-grade evidence is attributable, time-relevant, quality-assessed and independently challengeable.', next:'Separate what an AI model predicts from what anybody has permission to do.'},
-  {n:'04', title:'Prediction Is Not Permission', img:'a_detailed_infographic_style_slide_a_modern_tech.png',
+  {n:'04', title:'Prediction Is Not Permission', img:'Prediction Is Not Permission (3).png',
    script:'An analytics model might forecast rising outdoor particles and recommend closing windows. A forecast is a claim about possible future conditions. It is not an instruction with independent authority to operate building equipment. Before execution, Admissible Execution Architecture evaluates Admissible Evidence, Applicable Authority and Established Standing for the precise proposed action now. The chart and green checkmarks are conceptual, not evidence of a configured or validated authorization gate.',
    learned:'Prediction may inform an authorized decision; prediction is never the source of permission.', next:'Examine the four outcomes of the execution boundary.'},
-  {n:'05', title:'The Execution Boundary', img:'a_detailed_infographic_scene_a_high_contrast_cin.png',
+  {n:'05', title:'The Execution Boundary', img:'Execution Boundary_ TA-14 Governance Atlas.png',
    script:'A proposed consequential action reaches the AEA boundary. ALLOW means the action-specific requirements are satisfied within an approved scope. HOLD means a potentially resolvable gap prevents this discretionary action now. DENY rejects a prohibited request. ESCALATE routes the unresolved issue to the designated professional or authority. An outcome for one window command is not a general building-wide permission. Independently authorized fire, smoke-control and emergency actions must not be obstructed by a discretionary HOLD.',
    learned:'An execution decision is narrow, time-specific, reasoned and reviewable; an emergency safety path retains its separate authority.', next:'Ask who may actually invoke the governing instruction.'},
-  {n:'06', title:'Who Has Authority?', img:'a_detailed_infographic_style_workshop_slide_a_wid.png',
+  {n:'06', title:'Who Has Authority?', img:'Who Has Authority_ Governance Workshop Atlas.png',
    script:'The asset owner may state the public-service objective, an operator may work within delegated control scope, a qualified engineer may establish technical safety constraints, a public authority may impose applicable obligations, and community representatives may have defined stewardship roles. These are illustrative roles, not legal assignments. Applicable Authority identifies the verified governing instrument; Established Standing establishes whether this particular actor may rely on it for these windows and conditions right now.',
    learned:'Having a relevant role is not the same as holding a valid, current delegation for the proposed action.', next:'Reconsider the exact same virtual library in a different jurisdiction.'},
-  {n:'07', title:'Same Building, Canada', img:'a_highly_detailed_infographic_poster_landscape_i.png',
+  {n:'07', title:'Same Building, Canada', img:'Same Building, Canada_ Governance Reassessed.png',
    script:'Move the virtual library from Lagos to Canada. The digital building geometry may be unchanged, but local conditions, climate, building and safety rules, owner obligations, occupancy, equipment and delegated authority must be re-established. This image shows illustrative readings and a conditional ALLOW label; neither verifies Canadian law, a real indoor environment, or a legitimate window-control delegation. No Lagos authorization transfers automatically across borders.',
    learned:'The same model cannot carry environmental assumptions or permissions into a different jurisdiction without revalidation.', next:'Show how the decision is recorded and re-examined over the asset lifetime.'},
-  {n:'08', title:'Prove It Over Time', img:'a_detailed_infographic_style_dashboard_ta_14_g.png',
+  {n:'08', title:'Prove It Over Time', img:'Prove It Over Time_ Governance Atlas.png',
    script:'A responsible window decision is not complete merely because a command was issued. An environmental integrity record should connect the request, admitted observations, governing rule, actor standing, outcome, actual equipment state, post-action environmental verification, exceptions, repairs, reauthorization and future assessment. The illustrated completed record is hypothetical and does not imply any facility has been commissioned. Independent reviewers should be able to challenge every material claim.',
    learned:'A lifetime record preserves what was proposed, why it was authorized or held, what happened, and what must be reviewed next.', next:'Take the independent examination and inspect the companion PDF.'}
 ];
