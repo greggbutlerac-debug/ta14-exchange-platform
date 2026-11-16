@@ -18,12 +18,25 @@
 --     the JWT verified by Supabase). Clients cannot write technician_user_id:
 --     the column is excluded from the INSERT grant, and guard triggers reject
 --     any row whose technician differs from auth.uid().
---   * Original evidence is append-only. UPDATE, DELETE and TRUNCATE are
---     revoked from every API role (including service_role) and rejected by
---     triggers. Corrections are new rows that reference the row they
---     supersede, carry a reason, and are attributed to the correcting
---     technician.
+--   * Original evidence is append-only for the controlled application roles
+--     (anon, authenticated, service_role): UPDATE, DELETE and TRUNCATE are not
+--     granted to them, and row/statement triggers reject those operations.
+--     Corrections are new rows that reference the row they supersede, carry a
+--     reason, and are attributed to the correcting technician.
+--     LIMIT: this is not absolute immutability. A privileged PostgreSQL
+--     owner / superuser can disable or drop triggers, alter grants, or run
+--     DDL. Protection against that class of actor is procedural (migration
+--     review, restricted owner credentials, audit) and is out of scope here.
 --   * The 14 canonical inspection steps are seeded and then locked.
+--   * Equipment identity in this increment is PROVISIONAL and technician-
+--     scoped (identity_scope = 'TECHNICIAN_PROVISIONAL'). It is not a
+--     canonical, cross-technician equipment identity.
+--   * A storage reference records a digest DECLARED by the server caller. It
+--     is UNRECONCILED: the database cannot prove the object exists or that the
+--     digest was computed over its bytes. It is not verified integrity.
+--   * A PHOTO submission with no storage reference is STORAGE_PENDING and is
+--     incomplete. Nothing in this migration lets any submission satisfy
+--     production admission.
 
 -- ---------------------------------------------------------------------------
 -- Shared guards
@@ -131,7 +144,7 @@ as $$
   );
 $$;
 
-revoke all on function public.hpr_is_active_technician() from public, anon;
+revoke all on function public.hpr_is_active_technician() from public, anon, service_role;
 grant execute on function public.hpr_is_active_technician() to authenticated;
 
 -- Returns the verified caller id or raises. Never trusts row contents.
@@ -163,7 +176,15 @@ $$;
 revoke all on function public.hpr_require_active_technician() from public, anon, authenticated, service_role;
 
 -- ---------------------------------------------------------------------------
--- Equipment identity (as registered by a technician)
+-- Equipment identity: PROVISIONAL, technician-scoped
+--
+-- Intentionally provisional. Two technicians who inspect the same physical
+-- unit create two rows. A canonical equipment identity, and the append-only
+-- link / transfer events that bind provisional rows to it, belong to a
+-- separate identity authority and MUST exist before any multi-technician
+-- lifetime history is built (docs/hvac-performance-record/
+-- FIELD-EVIDENCE-OPEN-DEPENDENCIES.md, D5). Technicians will never be able
+-- to assert canonical identity.
 -- ---------------------------------------------------------------------------
 
 create table public.hpr_equipment (
@@ -174,8 +195,12 @@ create table public.hpr_equipment (
   serial_number text not null check (length(btrim(serial_number)) between 1 and 200),
   equipment_type text not null check (length(btrim(equipment_type)) between 1 and 200),
   registered_at timestamptz not null default now(),
+  identity_scope text not null default 'TECHNICIAN_PROVISIONAL' check (identity_scope = 'TECHNICIAN_PROVISIONAL'),
   verification_status text not null default 'UNVERIFIED' check (verification_status = 'UNVERIFIED')
 );
+
+comment on table public.hpr_equipment is
+  'PROVISIONAL technician-scoped equipment identity. Not canonical; not a lifetime equipment record. See FIELD-EVIDENCE-OPEN-DEPENDENCIES.md D5.';
 
 create unique index hpr_equipment_registrant_identity_key
   on public.hpr_equipment (registered_by, lower(btrim(manufacturer)), upper(btrim(serial_number)));
@@ -219,8 +244,8 @@ create table public.hpr_evidence_submissions (
   instrument_id text check (instrument_id is null or length(btrim(instrument_id)) between 1 and 200),
   calibration_ref text check (calibration_ref is null or length(btrim(calibration_ref)) between 1 and 200),
   -- A digest the client says it computed. Informational only: it is never an
-  -- integrity proof. The authoritative digest is server_sha256 on
-  -- hpr_evidence_storage_objects, written only by the server.
+  -- integrity proof. See server_declared_sha256 on
+  -- hpr_evidence_storage_objects (also UNRECONCILED in this increment).
   client_declared_sha256 text check (client_declared_sha256 is null or client_declared_sha256 ~ '^[0-9a-f]{64}$'),
   supersedes_submission_id uuid references public.hpr_evidence_submissions (id) on delete restrict,
   correction_reason text check (correction_reason is null or length(btrim(correction_reason)) between 1 and 4000),
@@ -262,28 +287,37 @@ create index hpr_evidence_inspection_step_idx
 -- ---------------------------------------------------------------------------
 -- Private storage references (schema only; bucket + upload are increment 2)
 --
--- Object path convention (enforced):
+-- Object path convention (derived, never caller-supplied):
 --   {technician_user_id}/{inspection_id}/{submission_id}/original
--- Rows are written only through hpr_record_evidence_storage_object(), which
--- is executable only by service_role, i.e. the server after it has streamed
--- the bytes and computed SHA-256 itself.
+--
+-- CONTRACT — a storage reference is a DECLARATION, not verified integrity.
+-- Rows are written only through hpr_declare_evidence_storage_object(),
+-- executable only by service_role. The database does NOT check that the
+-- object exists, that the bytes are what was declared, or that the digest
+-- was computed over them. service_role permission establishes only that a
+-- server-side caller made the declaration. Every row is therefore
+-- reconciliation_status = 'UNRECONCILED' (CHECK-constrained). Reconciliation
+-- (re-reading the stored bytes, re-hashing, comparing) must be a separate,
+-- append-only, attributable record in a later increment; it never updates
+-- this row. See FIELD-EVIDENCE-OPEN-DEPENDENCIES.md D1 and D4.
 -- ---------------------------------------------------------------------------
 
 create table public.hpr_evidence_storage_objects (
   submission_id uuid primary key references public.hpr_evidence_submissions (id) on delete restrict,
   bucket_id text not null default 'hpr-field-evidence-private' check (bucket_id = 'hpr-field-evidence-private'),
   object_path text not null unique,
-  server_sha256 text not null check (server_sha256 ~ '^[0-9a-f]{64}$'),
-  byte_size bigint not null check (byte_size > 0 and byte_size <= 26214400),
-  content_type text not null check (content_type in ('image/jpeg', 'image/png', 'image/heic', 'image/webp')),
-  recorded_at timestamptz not null default now()
+  server_declared_sha256 text not null check (server_declared_sha256 ~ '^[0-9a-f]{64}$'),
+  declared_byte_size bigint not null check (declared_byte_size > 0 and declared_byte_size <= 26214400),
+  declared_content_type text not null check (declared_content_type in ('image/jpeg', 'image/png', 'image/heic', 'image/webp')),
+  reconciliation_status text not null default 'UNRECONCILED' check (reconciliation_status = 'UNRECONCILED'),
+  declared_at timestamptz not null default now()
 );
 
-create or replace function public.hpr_record_evidence_storage_object(
+create or replace function public.hpr_declare_evidence_storage_object(
   p_submission_id uuid,
-  p_server_sha256 text,
-  p_byte_size bigint,
-  p_content_type text
+  p_declared_sha256 text,
+  p_declared_byte_size bigint,
+  p_declared_content_type text
 )
 returns public.hpr_evidence_storage_objects
 language plpgsql
@@ -304,22 +338,22 @@ begin
   end if;
 
   insert into public.hpr_evidence_storage_objects (
-    submission_id, object_path, server_sha256, byte_size, content_type
+    submission_id, object_path, server_declared_sha256, declared_byte_size, declared_content_type
   ) values (
     v_sub.id,
     v_sub.technician_user_id::text || '/' || v_sub.inspection_id::text || '/' || v_sub.id::text || '/original',
-    lower(p_server_sha256),
-    p_byte_size,
-    p_content_type
+    lower(p_declared_sha256),
+    p_declared_byte_size,
+    p_declared_content_type
   )
   returning * into v_row;
   return v_row;
 end;
 $$;
 
-revoke all on function public.hpr_record_evidence_storage_object(uuid, text, bigint, text)
+revoke all on function public.hpr_declare_evidence_storage_object(uuid, text, bigint, text)
   from public, anon, authenticated;
-grant execute on function public.hpr_record_evidence_storage_object(uuid, text, bigint, text)
+grant execute on function public.hpr_declare_evidence_storage_object(uuid, text, bigint, text)
   to service_role;
 
 -- ---------------------------------------------------------------------------
@@ -340,6 +374,7 @@ begin
       message = 'HPR_TECHNICIAN_IDENTITY_MISMATCH: registered_by must be the authenticated caller';
   end if;
   new.registered_at := now();
+  new.identity_scope := 'TECHNICIAN_PROVISIONAL';
   new.verification_status := 'UNVERIFIED';
   return new;
 end;
@@ -554,10 +589,21 @@ grant select on table public.hpr_evidence_storage_objects to authenticated, serv
 -- so the caller's RLS applies.
 -- ---------------------------------------------------------------------------
 
+-- storage_state: NOT_APPLICABLE (non-photo) | STORAGE_PENDING (photo, no
+-- reference: incomplete) | DECLARED_UNRECONCILED (photo with a declared,
+-- unreconciled reference). No state here means complete, verified, or
+-- admissible; production admission must require a future reconciled state.
 create view public.hpr_evidence_current
 with (security_invoker = true) as
-select s.*
+select
+  s.*,
+  case
+    when s.kind <> 'PHOTO' then 'NOT_APPLICABLE'
+    when o.submission_id is null then 'STORAGE_PENDING'
+    else 'DECLARED_UNRECONCILED'
+  end as storage_state
 from public.hpr_evidence_submissions s
+left join public.hpr_evidence_storage_objects o on o.submission_id = s.id
 where not exists (
   select 1 from public.hpr_evidence_submissions n
   where n.supersedes_submission_id = s.id
@@ -569,4 +615,10 @@ grant select on table public.hpr_evidence_current to authenticated, service_role
 comment on table public.hpr_evidence_submissions is
   'HPR technician field evidence. Append-only; always UNVERIFIED. Corrections are superseding rows. Not verification, not a DDD, not intervention authority.';
 comment on column public.hpr_evidence_submissions.client_declared_sha256 is
-  'Client claim only; never an integrity proof. See hpr_evidence_storage_objects.server_sha256.';
+  'Client claim only; never an integrity proof.';
+
+comment on table public.hpr_evidence_storage_objects is
+  'Server-DECLARED storage reference. UNRECONCILED: object existence and digest-over-bytes are not proven by the database. Not verified integrity.';
+
+comment on function public.hpr_declare_evidence_storage_object(uuid, text, bigint, text) is
+  'service_role only. Records a server-declared digest/size/MIME and derives the object path. Does not prove the object exists or that the digest matches stored bytes. Result is UNRECONCILED.';

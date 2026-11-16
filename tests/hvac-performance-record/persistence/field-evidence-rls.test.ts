@@ -2,9 +2,14 @@
  * Executes the HPR field-evidence migration in real Postgres (PGlite) and
  * attacks its access boundary as anon, authenticated and service_role.
  */
+import {readFileSync} from 'node:fs';
+import {fileURLToPath} from 'node:url';
 import {afterAll, beforeAll, describe, expect, it} from 'vitest';
 import {HVAC_BASELINE_STEP_TITLES} from '../../../apps/web/lib/hvac-performance-record/step-definitions';
-import {HVAC_BASELINE_STEP_ZONES} from '../../../apps/web/lib/hvac-performance-record/production-admission';
+import {
+  HVAC_BASELINE_STEP_ZONES,
+  PRODUCTION_ADMISSION_OPERATIONAL,
+} from '../../../apps/web/lib/hvac-performance-record/production-admission';
 import {SupabaseSim, type Actor} from './supabase-pglite-harness';
 
 const TECH_A = '00000000-0000-4000-8000-00000000000a';
@@ -146,14 +151,14 @@ describe('unauthorized access', () => {
   it('only service_role can record a server-side storage reference', async () => {
     const inspection = await openInspection(A);
     const photo = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null});
-    const call = 'select * from public.hpr_record_evidence_storage_object($1, $2, 1024, \'image/jpeg\')';
+    const call = 'select * from public.hpr_declare_evidence_storage_object($1, $2, 1024, \'image/jpeg\')';
     await expect(sim.as(anon, call, [photo.id, SHA])).rejects.toThrow(PERMISSION_DENIED);
     await expect(sim.as(A, call, [photo.id, SHA])).rejects.toThrow(PERMISSION_DENIED);
     await expect(sim.as(A,
-      `insert into public.hpr_evidence_storage_objects (submission_id, object_path, server_sha256, byte_size, content_type)
+      `insert into public.hpr_evidence_storage_objects (submission_id, object_path, server_declared_sha256, declared_byte_size, declared_content_type)
        values ($1, 'x', $2, 1, 'image/jpeg')`, [photo.id, SHA])).rejects.toThrow(PERMISSION_DENIED);
     await expect(sim.as(service,
-      `insert into public.hpr_evidence_storage_objects (submission_id, object_path, server_sha256, byte_size, content_type)
+      `insert into public.hpr_evidence_storage_objects (submission_id, object_path, server_declared_sha256, declared_byte_size, declared_content_type)
        values ($1, 'x', $2, 1, 'image/jpeg')`, [photo.id, SHA])).rejects.toThrow(PERMISSION_DENIED);
   });
 
@@ -278,7 +283,7 @@ describe('cross-inspection access', () => {
   it('storage references are visible only to the owning technician', async () => {
     const inspection = await openInspection(A);
     const photo = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null});
-    await sim.as(service, `select * from public.hpr_record_evidence_storage_object($1, $2, 2048, 'image/jpeg')`, [photo.id, SHA]);
+    await sim.as(service, `select * from public.hpr_declare_evidence_storage_object($1, $2, 2048, 'image/jpeg')`, [photo.id, SHA]);
     expect(await sim.as(A, 'select submission_id from public.hpr_evidence_storage_objects where submission_id = $1', [photo.id]))
       .toHaveLength(1);
     expect(await sim.as(B, 'select submission_id from public.hpr_evidence_storage_objects where submission_id = $1', [photo.id]))
@@ -310,7 +315,7 @@ describe('attempted replacement of original evidence', () => {
     await expect(sim.as(service, 'truncate public.hpr_evidence_submissions cascade')).rejects.toThrow(PERMISSION_DENIED);
   });
 
-  it('the database owner is still stopped by append-only triggers', async () => {
+  it('owner-level DML is rejected while the append-only triggers are in place', async () => {
     for (const table of ['hpr_equipment', 'hpr_inspections', 'hpr_evidence_submissions', 'hpr_evidence_storage_objects']) {
       await expect(sim.admin(`delete from public.${table}`)).rejects.toThrow(APPEND_ONLY);
       await expect(sim.admin(`truncate public.${table} cascade`)).rejects.toThrow(APPEND_ONLY);
@@ -321,23 +326,44 @@ describe('attempted replacement of original evidence', () => {
       .rejects.toThrow(APPEND_ONLY);
   });
 
+  it('DOCUMENTED LIMIT: a privileged owner can disable the triggers (not absolute immutability)', async () => {
+    // Demonstrates the boundary rather than hiding it. Rolled back so the shared DB is unchanged.
+    let rewritten: string | undefined;
+    await sim.db.transaction(async tx => {
+      await tx.exec('alter table public.hpr_evidence_submissions disable trigger hpr_evidence_append_only');
+      await tx.query(`update public.hpr_evidence_submissions set observation = 'owner rewrite' where id = $1`, [original.id]);
+      rewritten = (await tx.query<{observation: string}>(
+        'select observation from public.hpr_evidence_submissions where id = $1', [original.id])).rows[0].observation;
+      await tx.rollback();
+    }).catch(() => undefined);
+    expect(rewritten).toBe('owner rewrite');
+    const [row] = await sim.admin<{observation: string}>(
+      'select observation from public.hpr_evidence_submissions where id = $1', [original.id]);
+    expect(row.observation).toBe('Original as-found observation');
+    // Application roles cannot perform the same DDL.
+    for (const actor of [A, service]) {
+      await expect(sim.as(actor, 'alter table public.hpr_evidence_submissions disable trigger hpr_evidence_append_only'))
+        .rejects.toThrow(/must be owner/);
+    }
+  });
+
   it('a stored photograph reference cannot be replaced or re-recorded', async () => {
     const photo = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null, step: 4});
-    const call = `select * from public.hpr_record_evidence_storage_object($1, $2, 4096, 'image/jpeg')`;
-    const [stored] = await sim.as<{object_path: string; server_sha256: string}>(service, call, [photo.id, SHA.toUpperCase()]);
+    const call = `select * from public.hpr_declare_evidence_storage_object($1, $2, 4096, 'image/jpeg')`;
+    const [stored] = await sim.as<{object_path: string; server_declared_sha256: string}>(service, call, [photo.id, SHA.toUpperCase()]);
     expect(stored.object_path).toBe(`${TECH_A}/${inspection}/${photo.id}/original`);
-    expect(stored.server_sha256).toBe(SHA);
+    expect(stored.server_declared_sha256).toBe(SHA);
     await expect(sim.as(service, call, [photo.id, 'cd'.repeat(32)])).rejects.toThrow(/duplicate key/);
-    await expect(sim.as(service, `update public.hpr_evidence_storage_objects set server_sha256 = $2 where submission_id = $1`,
+    await expect(sim.as(service, `update public.hpr_evidence_storage_objects set server_declared_sha256 = $2 where submission_id = $1`,
       [photo.id, 'cd'.repeat(32)])).rejects.toThrow(PERMISSION_DENIED);
   });
 
   it('storage references are rejected for non-photo evidence and malformed digests', async () => {
-    const call = `select * from public.hpr_record_evidence_storage_object($1, $2, 4096, 'image/jpeg')`;
+    const call = `select * from public.hpr_declare_evidence_storage_object($1, $2, 4096, 'image/jpeg')`;
     await expect(sim.as(service, call, [original.id, SHA])).rejects.toThrow(/HPR_STORAGE_KIND_MISMATCH/);
     const photo = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null, step: 8});
     await expect(sim.as(service, call, [photo.id, 'not-a-digest'])).rejects.toThrow(/check constraint/);
-    await expect(sim.as(service, `select * from public.hpr_record_evidence_storage_object($1, $2, 4096, 'application/pdf')`, [photo.id, SHA]))
+    await expect(sim.as(service, `select * from public.hpr_declare_evidence_storage_object($1, $2, 4096, 'application/pdf')`, [photo.id, SHA]))
       .rejects.toThrow(/check constraint/);
   });
 });
@@ -429,5 +455,164 @@ describe('evidence shape', () => {
     await expect(insert('OBSERVATION', '', '')).rejects.toThrow(/hpr_evidence_observation_required/);
     await expect(insert('PHOTO', ', client_declared_sha256', `, 'ABC'`)).rejects.toThrow(/check constraint/);
     await expect(submitEvidence(A, inspection, {capturedAt: '2099-01-01T00:00:00Z'})).rejects.toThrow(/HPR_CAPTURE_TIME_IN_FUTURE/);
+  });
+});
+
+describe('review D2: privilege audit of every HPR object', () => {
+  const ROLES = ['anon', 'authenticated', 'service_role'] as const;
+
+  it('every hpr_* function has exactly the intended EXECUTE grants and none for PUBLIC', async () => {
+    const expected: Record<string, ReadonlyArray<string>> = {
+      hpr_reject_mutation: [],
+      hpr_is_active_technician: ['authenticated'],
+      hpr_require_active_technician: [],
+      hpr_guard_equipment_insert: [],
+      hpr_guard_inspection_insert: [],
+      hpr_guard_evidence_insert: [],
+      hpr_declare_evidence_storage_object: ['service_role'],
+    };
+    const rows = await sim.admin<{name: string; oid: number; public_exec: boolean}>(`
+      select p.proname as name, p.oid::int as oid,
+        exists (select 1 from aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) a
+                where a.grantee = 0 and a.privilege_type = 'EXECUTE') as public_exec
+      from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public' and p.proname like 'hpr\\_%'`);
+    expect(rows.map(r => r.name).sort()).toEqual(Object.keys(expected).sort());
+    for (const row of rows) {
+      expect(row.public_exec, row.name + ' PUBLIC').toBe(false);
+      for (const role of ROLES) {
+        const [{ok}] = await sim.admin<{ok: boolean}>(
+          `select has_function_privilege($1, $2::oid, 'EXECUTE') as ok`, [role, row.oid]);
+        expect(ok, row.name + ' / ' + role).toBe(expected[row.name].includes(role));
+      }
+    }
+  });
+
+  it('every SECURITY DEFINER hpr_* function pins an empty search_path', async () => {
+    const rows = await sim.admin<{name: string; config: string[] | null}>(`
+      select p.proname as name, p.proconfig as config
+      from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+      where n.nspname = 'public' and p.proname like 'hpr\\_%' and p.prosecdef`);
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) expect(r.config, r.name).toContain('search_path=""');
+  });
+
+  it('table-level privileges match the intended matrix exactly', async () => {
+    const objects = [
+      'hpr_baseline_steps', 'hpr_technicians', 'hpr_equipment', 'hpr_inspections',
+      'hpr_evidence_submissions', 'hpr_evidence_storage_objects', 'hpr_evidence_current',
+    ];
+    const privileges = ['SELECT', 'INSERT', 'UPDATE', 'DELETE', 'TRUNCATE', 'REFERENCES', 'TRIGGER'];
+    const allowed = new Set([
+      ...objects.map(o => `authenticated:${o}:SELECT`),
+      ...objects.map(o => `service_role:${o}:SELECT`),
+      'service_role:hpr_technicians:INSERT',
+    ]);
+    for (const role of ROLES) for (const object of objects) for (const privilege of privileges) {
+      const [{ok}] = await sim.admin<{ok: boolean}>(
+        'select has_table_privilege($1, $2, $3) as ok', [role, 'public.' + object, privilege]);
+      expect(ok, `${role}:${object}:${privilege}`).toBe(allowed.has(`${role}:${object}:${privilege}`));
+    }
+  });
+
+  it('column-level INSERT/UPDATE grants exclude identity, status, time and integrity columns', async () => {
+    const columnsWith = async (role: string, table: string, privilege: string) => (await sim.admin<{c: string}>(`
+      select column_name as c from information_schema.columns
+      where table_schema = 'public' and table_name = $2
+        and has_column_privilege($1, 'public.' || $2, column_name, $3)
+      order by column_name`, [role, table, privilege])).map(r => r.c);
+    expect(await columnsWith('authenticated', 'hpr_equipment', 'INSERT'))
+      .toEqual(['equipment_type', 'manufacturer', 'model', 'serial_number']);
+    expect(await columnsWith('authenticated', 'hpr_inspections', 'INSERT'))
+      .toEqual(['concern', 'equipment_id', 'operating_mode_as_found']);
+    expect(await columnsWith('authenticated', 'hpr_evidence_submissions', 'INSERT')).toEqual([
+      'calibration_ref', 'client_captured_at', 'client_declared_sha256', 'client_record_id', 'correction_reason',
+      'inspection_id', 'instrument_id', 'kind', 'measurement_unit', 'measurement_value', 'observation',
+      'step_number', 'supersedes_submission_id',
+    ]);
+    for (const table of ['hpr_equipment', 'hpr_inspections', 'hpr_evidence_submissions', 'hpr_evidence_storage_objects']) {
+      for (const role of ROLES) expect(await columnsWith(role, table, 'UPDATE'), role + ' UPDATE ' + table).toEqual([]);
+      expect(await columnsWith('service_role', table, 'INSERT'), 'service_role INSERT ' + table).toEqual([]);
+    }
+    expect(await columnsWith('authenticated', 'hpr_evidence_storage_objects', 'INSERT')).toEqual([]);
+    expect(await columnsWith('service_role', 'hpr_technicians', 'UPDATE'))
+      .toEqual(['enrollment_note', 'status', 'status_changed_at']);
+  });
+  it('the preview verification script reports no findings against this migration', async () => {
+    const script = readFileSync(fileURLToPath(new URL(
+      '../../../supabase/verification/verify_hpr_field_evidence_privileges.sql', import.meta.url)), 'utf8');
+    const results = await sim.db.exec(script);
+    expect(results).toHaveLength(7);
+    results.slice(0, 6).forEach((result, i) => expect(result.rows, 'verification query ' + (i + 1)).toEqual([]));
+    expect(results[6].rows).toHaveLength(1);
+  });
+});
+
+describe('review D1: storage reference is a declaration, not verified integrity', () => {
+  it('records a declaration even though no object exists, and marks it UNRECONCILED', async () => {
+    const inspection = await openInspection(A);
+    const photo = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null});
+    // No storage backend exists in this increment: the DB cannot know whether bytes were uploaded.
+    const [row] = await sim.as<{reconciliation_status: string}>(service,
+      `select * from public.hpr_declare_evidence_storage_object($1, $2, 1, 'image/png')`, [photo.id, SHA]);
+    expect(row.reconciliation_status).toBe('UNRECONCILED');
+  });
+
+  it('no role can mark a reference reconciled, and the schema forbids any other state', async () => {
+    const [{def}] = await sim.admin<{def: string}>(`
+      select pg_get_constraintdef(c.oid) as def from pg_constraint c
+      where c.conrelid = 'public.hpr_evidence_storage_objects'::regclass
+        and pg_get_constraintdef(c.oid) like '%reconciliation_status%'`);
+    expect(def).toMatch(/reconciliation_status = 'UNRECONCILED'/);
+    await expect(sim.as(service, `update public.hpr_evidence_storage_objects set reconciliation_status = 'RECONCILED'`))
+      .rejects.toThrow(PERMISSION_DENIED);
+  });
+});
+
+describe('review D4: photo without a storage object stays incomplete', () => {
+  it('reports STORAGE_PENDING until declared, then DECLARED_UNRECONCILED — never complete', async () => {
+    const inspection = await openInspection(A);
+    const photo = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null, step: 1});
+    const note = await submitEvidence(A, inspection, {step: 2});
+    const state = async () => Object.fromEntries((await sim.as<{id: string; storage_state: string}>(A,
+      'select id, storage_state from public.hpr_evidence_current where inspection_id = $1', [inspection]))
+      .map(r => [r.id, r.storage_state]));
+    expect(await state()).toEqual({[photo.id]: 'STORAGE_PENDING', [note.id]: 'NOT_APPLICABLE'});
+    await sim.as(service, `select * from public.hpr_declare_evidence_storage_object($1, $2, 10, 'image/jpeg')`, [photo.id, SHA]);
+    expect((await state())[photo.id]).toBe('DECLARED_UNRECONCILED');
+    const [{states}] = await sim.admin<{states: string}>(
+      `select pg_get_viewdef('public.hpr_evidence_current'::regclass) as states`);
+    expect(states).not.toMatch(/'(COMPLETE|VERIFIED|RECONCILED|ADMISSIBLE)'/);
+  });
+
+  it('a failed upload is recovered by a superseding submission, never by overwriting', async () => {
+    const inspection = await openInspection(A);
+    const failed = await submitEvidence(A, inspection, {kind: 'PHOTO', observation: null, step: 9});
+    const retry = await submitEvidence(A, inspection, {
+      kind: 'PHOTO', observation: null, step: 9, supersedes: failed.id, reason: 'UPLOAD_FAILED: object never stored',
+    });
+    const rows = await sim.as<{id: string; storage_state: string}>(A,
+      'select id, storage_state from public.hpr_evidence_current where inspection_id = $1', [inspection]);
+    expect(rows).toEqual([{id: retry.id, storage_state: 'STORAGE_PENDING'}]);
+    const history = await sim.as(A, 'select id from public.hpr_evidence_submissions where inspection_id = $1', [inspection]);
+    expect(history).toHaveLength(2);
+  });
+
+  it('production admission remains non-operational', () => {
+    expect(PRODUCTION_ADMISSION_OPERATIONAL).toBe(false);
+  });
+});
+
+describe('review D5: equipment identity is provisional and technician-scoped', () => {
+  it('marks every equipment row TECHNICIAN_PROVISIONAL and lets two technicians register the same unit separately', async () => {
+    const serial = 'SHARED-UNIT-' + ++counter;
+    const a = await registerEquipment(A, serial);
+    const b = await registerEquipment(B, serial);
+    expect(a).not.toBe(b);
+    const [row] = await sim.as<{identity_scope: string}>(A, 'select identity_scope from public.hpr_equipment where id = $1', [a]);
+    expect(row.identity_scope).toBe('TECHNICIAN_PROVISIONAL');
+    await expect(sim.as(A,
+      `insert into public.hpr_equipment (manufacturer, model, serial_number, equipment_type, identity_scope)
+       values ('a','b','c','d','CANONICAL')`)).rejects.toThrow(PERMISSION_DENIED);
   });
 });
