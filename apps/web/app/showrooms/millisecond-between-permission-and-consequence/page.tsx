@@ -113,7 +113,6 @@ const imagePath=(name:string)=>'/'+encodeURIComponent(name);
 export default function MillisecondShowroom(){
  const [activeCase,setActiveCase]=useState(0);
  const [answers,setAnswers]=useState<Record<number,Decision>>({});
- const [showAll,setShowAll]=useState(false);
  const current=cases[activeCase];
  const answer=answers[activeCase];
  const score=cases.filter((c,i)=>answers[i]===c.correct).length;
