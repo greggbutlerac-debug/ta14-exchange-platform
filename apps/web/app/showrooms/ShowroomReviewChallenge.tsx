@@ -70,6 +70,12 @@ function casesFor(slug:string,subject:string):Case[]{
  if(key)return subjectCases[key];
  return base.map((c,i)=>({...c,prompt:i===0?c.prompt+' Consider this in the context of '+subject+'.':c.prompt}));
 }
+const iraqCases:Case[]=[
+ {title:'الدليل غير مكتمل',prompt:'تقترح جهة إجراءً بيئياً بناءً على قراءة واحدة، لكن مصدر القياس أو استمرارية السجل غير موثقين. ما القرار المناسب قبل التنفيذ؟',answer:'HOLD',reason:'يُعلّق التنفيذ حتى تُستكمل نسبة القياس واستمرارية السجل والتحقق من كفاية الدليل. القراءة وحدها لا تمنح إذناً.'},
+ {title:'تجاوز حدود السلطة',prompt:'السجل حديث وموثوق، لكن الجهة التي تقترح التدخل لا تملك السلطة الواجبة التطبيق لتنفيذه. ما القرار؟',answer:'DENY',reason:'لا تُنشئ جودة الدليل سلطة قانونية. يُرفض هذا الإجراء غير المخوّل، ويمكن اقتراح مسار جديد عبر جهة مختصة.'},
+ {title:'الحاجة إلى جهة مختصة أخرى',prompt:'يستلزم الإجراء البيئي المقترح مراجعة جهة محددة وفق متطلب موثق. ما المسار الصحيح؟',answer:'ESCALATE',reason:'تُحال المسألة إلى الجهة المخولة مع حفظ السجل والقرار المعلّق؛ الإحالة ليست إذناً بالتنفيذ.'}
+];
+const arabicDecisions:Record<string,string>={ALLOW:'السماح',HOLD:'التعليق',DENY:'الرفض',ESCALATE:'الإحالة'};
 const excluded=['bruno-tudal','john-kay','anto-budiardjo','eight24-solutions','founding-institutional-sponsorship','environmental-atmospheric','prediction-is-not-permission'];
 function topicFor(path:string){const slug=path.split('/').filter(Boolean).slice(1).join('/');const key=Object.keys(topics).find(k=>slug.includes(k));return key?topics[key]:'the proposed operational consequence';}
 export default function ShowroomReviewChallenge({embedded=false}:{embedded?:boolean}={}){
@@ -79,31 +85,32 @@ export default function ShowroomReviewChallenge({embedded=false}:{embedded?:bool
  const [reveal,setReveal]=useState(false);
  if(!slug||slug==='maria-neira-air-health-humanity'||excluded.some(x=>slug.startsWith(x))||(!embedded&&slug==='radon-governed-protection'))return null;
  const subject=topicFor(path);
- const cases=casesFor(slug,subject);
+ const iraq=slug==='iraq-ministry-environment';
+ const cases=iraq?iraqCases:casesFor(slug,subject);
  const complete=cases.every((_,i)=>!!answers[i]);
  const score=cases.filter((c,i)=>answers[i]===c.answer).length;
- return <section id="independent-review-challenge" aria-labelledby="review-challenge-title" style={{background:'#061d2a',color:'#eef7fa',padding:'64px max(20px,calc((100vw - 1080px)/2))',borderTop:'2px solid #cda95a'}}>
+ return <section dir={iraq?"rtl":"ltr"} lang={iraq?"ar":"en"} id="independent-review-challenge" aria-labelledby="review-challenge-title" style={{background:'#061d2a',color:'#eef7fa',padding:'64px max(20px,calc((100vw - 1080px)/2))',borderTop:'2px solid #cda95a'}}>
   <div style={{maxWidth:1080,margin:'0 auto'}}>
-   <p style={{fontSize:12,fontWeight:900,letterSpacing:'.14em',color:'#f0c875'}}>TA-14 ACADEMY · INDEPENDENT REVIEW CHALLENGE</p>
-   <h2 id="review-challenge-title" style={{fontSize:'clamp(27px,4vw,43px)',margin:'10px 0'}}>Can you defend the determination?</h2>
-   <p style={{color:'#c1d4dc',lineHeight:1.7,maxWidth:800}}>Apply the governance principles to three hypothetical cases relevant to {subject}. Choose a determination, then examine the reasoning. These cases teach the distinction between Admissible Evidence, Applicable Authority, and Established Standing; they do not issue real-world authorization.</p>
+   <p style={{fontSize:12,fontWeight:900,letterSpacing:'.14em',color:'#f0c875'}}>{iraq?"أكاديمية TA-14 · تحدي المراجعة المستقلة":"TA-14 ACADEMY · INDEPENDENT REVIEW CHALLENGE"}</p>
+   <h2 id="review-challenge-title" style={{fontSize:'clamp(27px,4vw,43px)',margin:'10px 0'}}>{iraq?"هل تستطيع تبرير القرار؟":"Can you defend the determination?"}</h2>
+   <p style={{color:'#c1d4dc',lineHeight:1.7,maxWidth:800}}>{iraq?"طبّق مبادئ الحوكمة على ثلاث حالات بيئية افتراضية. اختر القرار ثم راجع التسبيب. هذه أمثلة تعليمية لا تمنح أي إذن حقيقي بالتنفيذ.":"Apply the governance principles to three hypothetical cases relevant to "+subject+". Choose a determination, then examine the reasoning. These cases teach the distinction between Admissible Evidence, Applicable Authority, and Established Standing; they do not issue real-world authorization."}</p>
    <div style={{display:'grid',gap:15,marginTop:24}}>
     {cases.map((c,i)=><article key={c.title} style={{border:'1px solid #385e70',background:'#0b2938',borderRadius:14,padding:22}}>
-      <p style={{color:'#f0c875',fontSize:12,fontWeight:900,margin:'0 0 6px'}}>CASE {String(i+1).padStart(2,'0')}</p>
+      <p style={{color:'#f0c875',fontSize:12,fontWeight:900,margin:'0 0 6px'}}>{iraq?"الحالة":"CASE"} {String(i+1).padStart(2,'0')}</p>
       <h3 style={{fontSize:21,margin:'0 0 10px'}}>{c.title}</h3>
       <p style={{color:'#d3e2e9',lineHeight:1.65}}>{c.prompt}</p>
-      <div role="group" aria-label={'Choose a determination for case '+(i+1)} style={{display:'flex',gap:9,flexWrap:'wrap'}}>
-       {(['ALLOW','HOLD','DENY','ESCALATE'] as const).map(a=><button key={a} type="button" aria-pressed={answers[i]===a} onClick={()=>{setAnswers(x=>({...x,[i]:a}));setReveal(false)}} style={{border:'1px solid #7293a2',borderRadius:8,padding:'10px 15px',fontWeight:800,cursor:'pointer',background:answers[i]===a?'#f0c875':'#123749',color:answers[i]===a?'#061d2a':'#eef7fa'}}>{a}</button>)}
+      <div role="group" aria-label={(iraq?'اختر القرار للحالة ':'Choose a determination for case ')+(i+1)} style={{display:'flex',gap:9,flexWrap:'wrap'}}>
+       {(['ALLOW','HOLD','DENY','ESCALATE'] as const).map(a=><button key={a} type="button" aria-pressed={answers[i]===a} onClick={()=>{setAnswers(x=>({...x,[i]:a}));setReveal(false)}} style={{border:'1px solid #7293a2',borderRadius:8,padding:'10px 15px',fontWeight:800,cursor:'pointer',background:answers[i]===a?'#f0c875':'#123749',color:answers[i]===a?'#061d2a':'#eef7fa'}}>{iraq?arabicDecisions[a]+" · "+a:a}</button>)}
       </div>
-      {reveal&&<div style={{borderLeft:'3px solid #f0c875',background:'#123748',padding:15,marginTop:16,lineHeight:1.65}}><strong>{answers[i]===c.answer?'SUPPORTED':'RE-EXAMINE'} · {c.answer}</strong><p style={{marginBottom:0}}>{c.reason}</p></div>}
+      {reveal&&<div style={{borderLeft:'3px solid #f0c875',background:'#123748',padding:15,marginTop:16,lineHeight:1.65}}><strong>{iraq?(answers[i]===c.answer?'قرار مدعوم':'أعد الفحص'):(answers[i]===c.answer?'SUPPORTED':'RE-EXAMINE')} · {iraq?arabicDecisions[c.answer]+' · ':''}{c.answer}</strong><p style={{marginBottom:0}}>{c.reason}</p></div>}
      </article>)}
    </div>
    <div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:22}}>
-    <button type="button" disabled={!complete} onClick={()=>setReveal(true)} style={{border:0,borderRadius:9,padding:'13px 19px',background:complete?'#f0c875':'#7b8b92',color:'#061d2a',fontWeight:900,cursor:complete?'pointer':'not-allowed'}}>REVEAL THE EXAMINATION</button>
-    <button type="button" onClick={()=>{setAnswers({});setReveal(false)}} style={{border:'1px solid #7a9aa9',borderRadius:9,padding:'13px 19px',background:'transparent',color:'#eef7fa',fontWeight:900,cursor:'pointer'}}>RESET CHALLENGE</button>
+    <button type="button" disabled={!complete} onClick={()=>setReveal(true)} style={{border:0,borderRadius:9,padding:'13px 19px',background:complete?'#f0c875':'#7b8b92',color:'#061d2a',fontWeight:900,cursor:complete?'pointer':'not-allowed'}}>{iraq?"إظهار المراجعة":"REVEAL THE EXAMINATION"}</button>
+    <button type="button" onClick={()=>{setAnswers({});setReveal(false)}} style={{border:'1px solid #7a9aa9',borderRadius:9,padding:'13px 19px',background:'transparent',color:'#eef7fa',fontWeight:900,cursor:'pointer'}}>{iraq?"إعادة التحدي":"RESET CHALLENGE"}</button>
    </div>
-   {reveal&&<p aria-live="polite" style={{fontWeight:800,marginTop:16}}>Supported determinations: {score} of {cases.length}. The reasoning matters more than the score.</p>}
-   <p style={{fontSize:12,color:'#9eb8c4',lineHeight:1.7,marginTop:22}}>Independent educational examples only. The questions are hypothetical and do not assess a real institution, building, person, or operating system. Actual governance determinations require case-specific evidence, applicable authority, established standing, and bounded review.</p>
+   {reveal&&<p aria-live="polite" style={{fontWeight:800,marginTop:16}}>{iraq?<>القرارات المدعومة: {score} من {cases.length}. التسبيب أهم من الدرجة.</>:<>Supported determinations: {score} of {cases.length}. The reasoning matters more than the score.</>}</p>}
+   <p style={{fontSize:12,color:'#9eb8c4',lineHeight:1.7,marginTop:22}}>{iraq?"أمثلة تعليمية مستقلة وافتراضية فقط، لا تقيّم مؤسسة أو مبنى أو شخصاً أو نظاماً حقيقياً. تتطلب القرارات الفعلية أدلة خاصة بالحالة وسلطة واجبة التطبيق وصفة قائمة ومراجعة محددة النطاق.":"Independent educational examples only. The questions are hypothetical and do not assess a real institution, building, person, or operating system. Actual governance determinations require case-specific evidence, applicable authority, established standing, and bounded review."}</p>
   </div>
  </section>;
 }
