@@ -235,7 +235,7 @@ export default function JustifiedAutonomyShowroom(){
       </section>
 
       <section id="lessons" aria-label="Eight teaching lessons">
-        <div className="ja-section-heading"><div className="ja-eyebrow">STEP INTO THE ARCHITECTURE</div><h2>Eight images. Eight lessons. One consequential question.</h2><p>Choose any lesson, review its teaching image, then listen to Samantha explain the reasoning. Start Samantha's guided tour for continuous narration across all eight lessons, or choose any lesson and control playback yourself. Audio never starts without a click.</p></div>
+        <div className="ja-section-heading"><div className="ja-eyebrow">STEP INTO THE ARCHITECTURE</div><h2>Eight images. Eight lessons. One consequential question.</h2><p>Scroll through all eight teaching images and explanations in order. Every image is visible without selecting a lesson. Play Samantha beneath any image, or start her complete guided tour. Audio never starts without a click.</p></div>
         <div className="ja-tour" aria-label="Samantha guided tour">
           <div>
             <div className="ja-eyebrow">SAMANTHA · COMPLETE EIGHT-LESSON TOUR</div>
@@ -250,46 +250,40 @@ export default function JustifiedAutonomyShowroom(){
             <button className="ja-control" type="button" onClick={stop} disabled={!guided}>■ STOP TOUR</button>
           </div>
         </div>
-        <div className="ja-stage-tabs" role="group" aria-label="Select a lesson">
-          {lessons.map((l,i)=><button key={l.title} type="button" className="ja-tab" aria-current={lessonIndex===i?'step':undefined} onClick={()=>navigate(i)}><span>{String(i+1).padStart(2,'0')} / 08</span><strong>{l.title}</strong></button>)}
-        </div>
-        <article className="ja-lesson">
-          <div className="ja-lesson-head">
-            <div><div className="ja-lesson-tag">LESSON {String(lessonIndex+1).padStart(2,'0')} / 08 · {lesson.label.toUpperCase()}</div><h2>{lesson.title}</h2></div>
-            <span className="ja-lesson-tag">TEACHING IMAGE · {lessonIndex+1} OF 8</span>
-          </div>
-          <figure className="ja-lesson-image">
-            <img src={imagePath(lesson.image)} alt={lesson.alt} loading={lessonIndex===0?'eager':'lazy'}/>
-            <figcaption>Illustrative educational graphic. Read the explanation below for the governing technical distinctions.</figcaption>
-          </figure>
-          <div className="ja-takeaway"><strong>THE LESSON TO REMEMBER</strong><p>{lesson.takeaway}</p></div>
-          <div className="ja-lesson-details">
-            <div className="ja-panel"><small>WHY IT MATTERS</small><p>{lesson.explanation}</p></div>
-            <div className="ja-panel"><small>ASK YOURSELF</small><p>{lesson.question}</p></div>
-          </div>
-          <div className="ja-voice" aria-label="Samantha narration player">
-            <div className="ja-voice-top">
-              <div>
-                <small>SAMANTHA · GUIDED LESSON NARRATION</small>
-                <div className="ja-voice-status" aria-live="polite">{voiceState==='ready'&&voice ? 'Verified voice selected: '+voice.name+' ('+voice.lang+')' : voiceState==='checking' ? 'Checking voices installed on this device…' : voiceState==='unsupported' ? 'Speech playback is not supported in this browser.' : 'Samantha voice is unavailable on this device. Narration remains disabled; no other voice is substituted.'}</div>
-              </div>
-              <div className="ja-voice-controls">
-                <button className="ja-control" type="button" onClick={()=>play(true)} disabled={!voice}>TEST SAMANTHA</button>
-                <button className="ja-control" type="button" onClick={()=>play()} disabled={!voice}>▶ PLAY LESSON</button>
-                <button className="ja-control" type="button" onClick={pause} disabled={speechMode!=='speaking'}>Ⅱ PAUSE</button>
-                <button className="ja-control" type="button" onClick={resume} disabled={speechMode!=='paused'}>▶ RESUME</button>
-                <button className="ja-control" type="button" onClick={stop} disabled={speechMode==='idle'}>■ STOP</button>
-              </div>
+        <div className="ja-all-lessons">
+          {lessons.map((item,i)=><article className="ja-lesson" key={item.title} id={`lesson-${i+1}`}>
+            <div className="ja-lesson-head">
+              <div><div className="ja-lesson-tag">LESSON {String(i+1).padStart(2,'0')} / 08 · {item.label.toUpperCase()}</div><h2>{item.title}</h2></div>
+              <span className="ja-lesson-tag">TEACHING IMAGE · {i+1} OF 8</span>
             </div>
-            <p className="ja-voice-note">Voice safeguard: the guided tour and lesson player select a named English Samantha voice only. Browser operating systems supply the voice; if Samantha is missing, the site will not silently fall back to a male or unspecified voice. Install or enable Samantha in your device speech settings to use narration.</p>
-            <details className="ja-script"><summary>Read the complete narration transcript</summary><p>{lesson.narration}</p></details>
-          </div>
-          <div className="ja-lesson-nav">
-            <button className="ja-secondary" type="button" onClick={()=>navigate(lessonIndex-1)} disabled={lessonIndex===0}>← PREVIOUS LESSON</button>
-            <span style={{alignSelf:'center',color:'#b5d5de',fontSize:13}}>{lessonIndex+1} of {lessons.length}</span>
-            <button className="ja-primary" type="button" onClick={()=>navigate(lessonIndex+1)} disabled={lessonIndex===lessons.length-1}>NEXT LESSON →</button>
-          </div>
-        </article>
+            <figure className="ja-lesson-image">
+              <img src={imagePath(item.image)} alt={item.alt} loading={i===0?'eager':'lazy'}/>
+              <figcaption>Illustrative educational graphic. Read the explanation below for the governing technical distinctions.</figcaption>
+            </figure>
+            <div className="ja-takeaway"><strong>THE LESSON TO REMEMBER</strong><p>{item.takeaway}</p></div>
+            <div className="ja-lesson-details">
+              <div className="ja-panel"><small>WHY IT MATTERS</small><p>{item.explanation}</p></div>
+              <div className="ja-panel"><small>ASK YOURSELF</small><p>{item.question}</p></div>
+            </div>
+            <div className="ja-voice" aria-label={`Samantha narration for lesson ${i+1}`}>
+              <div className="ja-voice-top">
+                <div>
+                  <small>SAMANTHA · GUIDED LESSON NARRATION</small>
+                  <div className="ja-voice-status" aria-live="polite">{voiceState==='ready'&&voice ? 'Verified voice selected: '+voice.name+' ('+voice.lang+')' : voiceState==='checking' ? 'Checking voices installed on this device…' : voiceState==='unsupported' ? 'Speech playback is not supported in this browser.' : 'Samantha voice is unavailable on this device. Narration remains disabled; no other voice is substituted.'}</div>
+                </div>
+                <div className="ja-voice-controls">
+                  <button className="ja-control" type="button" onClick={()=>{stop();speak(i,true,false)}} disabled={!voice}>TEST SAMANTHA</button>
+                  <button className="ja-control" type="button" onClick={()=>{stop();setLessonIndex(i);speak(i,false,false)}} disabled={!voice}>▶ PLAY LESSON</button>
+                  <button className="ja-control" type="button" onClick={pause} disabled={lessonIndex!==i||speechMode!=='speaking'}>Ⅱ PAUSE</button>
+                  <button className="ja-control" type="button" onClick={resume} disabled={lessonIndex!==i||speechMode!=='paused'}>▶ RESUME</button>
+                  <button className="ja-control" type="button" onClick={stop} disabled={lessonIndex!==i||speechMode==='idle'}>■ STOP</button>
+                </div>
+              </div>
+              <p className="ja-voice-note">Voice safeguard: narration selects a named English Samantha voice only. If Samantha is unavailable, no substitute voice is used.</p>
+              <details className="ja-script"><summary>Read the complete narration transcript</summary><p>{item.narration}</p></details>
+            </div>
+          </article>)}
+        </div>
       </section>
 
       <section className="ja-demo" id="demonstration">
