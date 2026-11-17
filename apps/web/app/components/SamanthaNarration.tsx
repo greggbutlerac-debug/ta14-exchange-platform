@@ -33,7 +33,7 @@ export default function SamanthaNarration({lessons,lessonIndex,script}:{lessons:
  };
  return <div className="samanthaInline" aria-label={'Samantha narration for lesson '+(lessonIndex+1)}>
   <button type="button" className="samanthaPlay" onClick={()=>speaking?stop():play(active)} disabled={!supported}>{speaking?'■ STOP SAMANTHA':'▶ PLAY SAMANTHA'}</button>
-  <span>LESSON {String(lessonIndex+1).padStart(2,'0')} / 08 · {lessons[lessonIndex].title}</span>
+  <span>LESSON {String(lessonIndex+1).padStart(2,'0')} / {String(lessons.length).padStart(2,'0')} · {lessons[lessonIndex].title}</span>
   {!supported?<span>Voice playback unavailable in this browser.</span>:null}
  </div>;
 }
