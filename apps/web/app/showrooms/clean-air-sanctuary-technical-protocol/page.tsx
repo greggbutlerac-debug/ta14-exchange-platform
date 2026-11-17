@@ -71,8 +71,27 @@ learned:"Record integrity makes the decision inspectable; it does not itself pro
 next:"Read the technical protocol and challenge the proposed test before any field deployment."
 }
 ] as const;
+const extensionRaw=[
+{
+title:"Community Consent, Stewardship & Authority",
+img:"Community Consent Governance Framework.png",
+intro:"Community-defined needs shape the purpose of a refuge; applicable consent and stewardship obligations must be examined without converting participation into operational permission.",
+script:"This educational extension responds to the question of how community consent and stewardship enter the proposed Clean Air Sanctuary governance record. Identify the affected people, consultation or consent requirements that actually apply, the record of engagement, any withdrawal or change of conditions, and those accountable for ongoing stewardship. Keep the community's voice distinct from municipal, owner, professional and emergency authorities. At the execution boundary, test admissible evidence, applicable authority, established standing and all applicable consent conditions for the exact proposed action. If an obligatory consent condition is absent or unresolved, do not infer permission: HOLD, DENY or ESCALATE according to the frozen rule. Community consultation neither grants building-control rights nor overrides life-safety duties. This diagram is a hypothetical governance model, not an approved community agreement or a verified deployment.",
+learned:"Community input establishes priorities and relevant obligations; it does not independently confer legal or operational authority.",
+next:"Examine the independent checks required before any simulated decision could progress toward physical action."
+},
+{
+title:"Independent Review Before Physical Deployment",
+img:"From Simulation to Verified Outcomes.png",
+intro:"A simulated ALLOW is a bounded teaching result, not authorization to operate a building or proof of cleaner air.",
+script:"The proposed progression has five distinct stages: offline simulation with preserved successes, failures and HOLDs; independent examination of frozen rules, evidence sources, authority assignments, stop conditions and reproducibility; site-specific approvals by the actual owner, qualified professionals and applicable public authorities; a separately authorized, safety-monitored bounded field pilot; and independent measurement of physical outcomes including uncertainty, side effects and trade-offs. The pictured library, equipment, check marks, trends and percentage changes are fictional illustration only. In particular, the PM2.5, carbon dioxide and index percentages displayed are not field readings, measured improvements or claims of efficacy. No facility has been selected or approved and no independent validation or field pilot is asserted. An ALLOW within an offline test cannot cross into operational control without a fresh, separately authorized site-specific decision.",
+learned:"A defensible simulated disposition, permission for a field intervention and verified environmental improvement are three different claims.",
+next:"Use the original ten adversarial fixtures and independent-review challenge to test the proposed governance boundary."
+}
+] as const;
 const lessons=raw.map(l=>({...l}));
-const narrationLessons=lessons.map(l=>({title:l.title,learned:l.learned,next:l.next}));
+const extensionLessons=extensionRaw.map(l=>({...l}));
+const narrationLessons=[...lessons,...extensionLessons].map(l=>({title:l.title,learned:l.learned,next:l.next}));
 type Disposition='ALLOW'|'HOLD'|'DENY'|'ESCALATE';
 const fixtures:{id:string;condition:string;expected:Disposition;note:string}[]=[
 {id:'F01',condition:'Evidence, authority, standing and constraints all valid',expected:'ALLOW',note:'Only within the frozen simulated scope'},
@@ -102,12 +121,12 @@ export default function CleanAirSanctuaryProtocol(){
  <header style={{padding:'54px 0 34px'}}>
  <p style={{color:'#8ee9e7',fontSize:12,fontWeight:900,letterSpacing:2}}>TA-14 AUTHORITY GOVERNANCE INSTITUTION · BOUNDED TECHNICAL EXAMINATION</p>
  <h1 style={{fontSize:'clamp(37px,6vw,69px)',lineHeight:1.07,margin:'15px 0',maxWidth:1050}}>Clean Air Sanctuary<br/><span style={{color:'#82e2df'}}>From Intention to a Reproducible Decision</span></h1>
- <p style={{fontSize:20,lineHeight:1.65,maxWidth:950,color:'#c2d8df'}}>Eight lessons, one bounded library scenario, ten adversarial test fixtures and a technical protocol for independent scrutiny of the proposed execution boundary.</p>
+ <p style={{fontSize:20,lineHeight:1.65,maxWidth:950,color:'#c2d8df'}}>Eight original lessons, two technical-extension lessons, one bounded library scenario, ten original adversarial test fixtures and a technical protocol for independent scrutiny of the proposed execution boundary.</p>
  <div style={{background:'#1d251d',border:'1px solid #9c8353',borderRadius:12,padding:20,lineHeight:1.8,color:'#f6e7c9'}}>{disclosure}</div>
  <div style={{display:'flex',gap:12,flexWrap:'wrap',marginTop:23}}>
  <a href={pdf} target="_blank" rel="noopener noreferrer" style={{...actionStyle,background:'#8ee9e7',color:'#071721',textDecoration:'none'}}>READ 13-PAGE TECHNICAL PDF</a>
  <a href={pdf} download style={{...actionStyle,background:'#14323e',border:'1px solid #85b6c4',color:'#f1f8fa',textDecoration:'none'}}>DOWNLOAD PDF</a>
- <a href="#lessons" style={{...actionStyle,border:'1px solid #85b6c4',color:'#f1f8fa',textDecoration:'none'}}>EXPLORE EIGHT LESSONS</a>
+ <a href="#lessons" style={{...actionStyle,border:'1px solid #85b6c4',color:'#f1f8fa',textDecoration:'none'}}>EXPLORE ALL TEN LESSONS</a>
  </div>
  </header>
  <section style={{padding:'25px 28px',borderRadius:15,background:'#0d2a38',border:'1px solid #335e6b'}}>
@@ -126,6 +145,27 @@ export default function CleanAirSanctuaryProtocol(){
  </div>
  <div style={{marginTop:17,padding:23,border:'1px solid #365b69',borderRadius:13,background:'#0b2430'}}>
  <SamanthaNarration lessons={narrationLessons} lessonIndex={i} script={lesson.script}/>
+ <p style={{lineHeight:1.85,color:'#d2e4e8',fontSize:16}}>{lesson.script}</p>
+ </div>
+ <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(275px,1fr))',gap:13,margin:'17px 0'}}>
+ <div style={{padding:20,borderRadius:12,background:'#123039'}}><strong style={{color:'#8ee9e7'}}>WHAT YOU LEARNED</strong><p style={{lineHeight:1.7}}>{lesson.learned}</p></div>
+ <div style={{padding:20,borderRadius:12,background:'#123039'}}><strong style={{color:'#8ee9e7'}}>WHAT COMES NEXT</strong><p style={{lineHeight:1.7}}>{lesson.next}</p></div>
+ </div>
+ </article>)}
+ </section>
+ <section id="technical-extension" style={{paddingTop:54}}>
+ <p style={{color:'#8ee9e7',fontWeight:900,letterSpacing:2}}>TECHNICAL EXAMINATION EXTENSION · LESSONS 09–10</p>
+ <h2 style={{fontSize:'clamp(27px,4vw,43px)'}}>Community authority and independent deployment review</h2>
+ <p style={{fontSize:18,lineHeight:1.7,color:'#c0d5de'}}>Two additional educational examinations address community consent and stewardship, and the controls separating offline simulation from authorized field deployment. The original eight lessons and all ten adversarial fixtures remain unchanged. These are proposed controls, not independently validated operational findings.</p>
+ {extensionLessons.map((lesson,i)=><article key={lesson.img} id={'lesson-'+(i+9)} style={{padding:'35px 0 42px',borderBottom:'1px solid #365b69'}}>
+ <h3 style={{fontSize:'clamp(26px,4vw,42px)',margin:'12px 0'}}>{String(i+9).padStart(2,'0')} / 10 · {lesson.title}</h3>
+ <p style={{fontSize:18,color:'#c0d5de',lineHeight:1.65}}>{lesson.intro}</p>
+ <div style={{position:'relative',width:'100%',aspectRatio:'16 / 9',borderRadius:15,overflow:'hidden',border:'1px solid #457283',background:'#11212d'}}>
+ <Image src={'/'+encodeURIComponent(lesson.img)} alt={'Illustrative lesson '+(i+9)+': '+lesson.title+'. All buildings, tests, graphics and metrics are hypothetical.'} fill sizes="(max-width: 900px) 100vw, 1190px" style={{objectFit:'contain'}}/>
+ </div>
+ {i===1&&<p style={{marginTop:12,padding:15,border:'1px solid #c7a46a',borderRadius:9,color:'#f6e7c9',lineHeight:1.65,background:'#282519'}}><strong>ILLUSTRATIVE DATA ONLY:</strong> The percentages and charts printed within this image are fictional teaching graphics, not actual PM2.5, CO₂, air-quality index or pilot results. No real-world environmental improvement has been demonstrated by this image.</p>}
+ <div style={{marginTop:17,padding:23,border:'1px solid #365b69',borderRadius:13,background:'#0b2430'}}>
+ <SamanthaNarration lessons={narrationLessons} lessonIndex={i+8} script={lesson.script}/>
  <p style={{lineHeight:1.85,color:'#d2e4e8',fontSize:16}}>{lesson.script}</p>
  </div>
  <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(275px,1fr))',gap:13,margin:'17px 0'}}>
