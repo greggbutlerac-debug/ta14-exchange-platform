@@ -65,6 +65,11 @@ Artwork and document release is still HOLD; the verified GitHub file references 
 - The uploaded review master `TA14_Brugge_Research_Examination_v4_Editorial_Corrected (2).pdf` has duplicate `scripts` on page 27 in the Evidence Status paragraph. Fix in a revised PDF, then point showroom at the revised asset.
 - Source controls still pending: DOI landing pages; all complete coauthor lists (particularly 2025 JACC); 2021 MAPC stable link; clinical methods/tables/intervals/prespecification and multiplicity; community contributor attribution preferences.
 
+## Academy challenge — gap confirmed in page source
+- [ ] Current `page.tsx` ends with scientific release control and footer; **no Academy challenge is implemented**. Do not describe it as present or tested.
+- [ ] Design a clearly educational four-scenario evidence/authority/standing exercise. Label scenarios hypothetical and separate from the Brugge research findings.
+- [ ] Verify keyboard interaction, accessible feedback, answer explanations, and no implied third-party endorsement.
+
 ## Web / release verification
 - [ ] Confirm each image file path and the PDF path return 200 on preview, including spaces, underscores, parentheses.
 - [ ] Ensure Samantha playback beneath every one of twelve images works on target browsers; accurately describe fallback behavior if no Samantha voice is installed.
