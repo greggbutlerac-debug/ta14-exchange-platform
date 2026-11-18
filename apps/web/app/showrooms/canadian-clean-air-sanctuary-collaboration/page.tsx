@@ -74,6 +74,17 @@ const exhibits = [
   },
 ] as const;
 
+const learningBridges = [
+  { learned:'You learned that a Clean Air Sanctuary begins with an owner-defined public-service promise. The purpose, eligible users and acceptance criteria must be established before any technology can claim success.', next:'You are about to learn how ONUMA can give that public purpose a grounded digital representation of the building, its spaces and its equipment.' },
+  { learned:'You learned that ONUMA can connect proposed decisions to building spaces, systems and assets. Digital context improves understanding but never substitutes for the owner\'s authorization.', next:'You are about to learn why Asset Leadership Network examines reliability, resources and lifecycle stewardship rather than treating one intervention as the whole solution.' },
+  { learned:'You learned that asset stewardship asks whether the sanctuary can be operated, maintained and supported responsibly over time—not just demonstrated once.', next:'You are about to learn how UnityNet International Canada brings community needs, accessibility and public trust into the proposed collaboration.' },
+  { learned:'You learned that community participation must be meaningful, while operational authority remains with the legitimate building owner. Prospective partners are not automatically confirmed participants.', next:'You are about to learn how environmental measurements, equipment state and AI analysis can inform bounded recommendations without becoming permission to act.' },
+  { learned:'You learned that attributable environmental evidence and analysis can support a proposed response. Synthetic dashboard values are teaching examples, and an AI recommendation is not an execution authorization.', next:'You are about to learn how TA-14 examines admissible evidence, applicable authority and established standing at the execution boundary.' },
+  { learned:'You learned that TA-14\'s proposed execution gate distinguishes ALLOW, HOLD, DENY and ESCALATE for a specific consequence. Safety systems and lawful owner authority remain independently protected.', next:'You are about to learn how independent verification separates an authorized decision, equipment response, environmental change and demonstrated public-service performance.' },
+  { learned:'You learned that a command, an equipment response, a changed reading and a verified refuge outcome are four different claims. Each needs its own evidence and limitations.', next:'You are about to learn how ONUMA, ALN, UnityNet International Canada, TA-14 and the building owner could work together without collapsing their separate responsibilities.' },
+  { learned:'You learned how independent organizations can contribute complementary capabilities while the owner retains operating authority and prospective participation remains unconfirmed.', next:'You are about to examine the bounded discovery, simulation, evidence and approvals that would be needed before anyone could responsibly propose a live pilot.' },
+] as const;
+
 const participantRoles = [
   ['ONUMA','Kimon Onuma · Yong Ku Kim','Digital building intelligence and asset context'],
   ['Asset Leadership Network','Mike Bordenaro','Lifecycle stewardship and owner objectives'],
@@ -175,7 +186,16 @@ export default function CanadianCleanAirSanctuaryShowroom(){
               <summary style={{cursor:'pointer',color:cyan,fontWeight:700}}>Read full exhibit narration</summary>
               <p style={{maxWidth:1040,lineHeight:1.8,color:muted}}>{e.narration}</p>
             </details>
-            <p style={{margin:'20px 0 0',color:ink,lineHeight:1.65}}><strong style={{color:amber}}>Core lesson: </strong>{e.takeaway}</p>
+            <div aria-label={'Learning bridge after exhibit '+(i+1)} style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))',gap:15,marginTop:23}}>
+              <div style={{padding:'22px 23px',background:'#11363d',border:'1px solid #46848a',borderRadius:12}}>
+                <h3 style={{fontSize:18,color:'#a8f1e7',margin:'0 0 12px'}}>What You Just Learned</h3>
+                <p style={{lineHeight:1.75,color:ink,margin:0}}>{learningBridges[i].learned}</p>
+              </div>
+              <div style={{padding:'22px 23px',background:'#182b3e',border:'1px solid #47718b',borderRadius:12}}>
+                <h3 style={{fontSize:18,color:'#b7dcff',margin:'0 0 12px'}}>What You're About to Learn</h3>
+                <p style={{lineHeight:1.75,color:ink,margin:0}}>{learningBridges[i].next}</p>
+              </div>
+            </div>
           </div>
         </article>)}
       </section>
