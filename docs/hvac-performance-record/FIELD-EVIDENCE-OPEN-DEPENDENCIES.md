@@ -19,6 +19,8 @@ admission, intervention or physical-control capability.
 | D3 | `ON DELETE RESTRICT` vs retention/privacy; immutability claims | **Claims corrected**; limit demonstrated in a test. **Unresolved**: retention/erasure decision. | Production |
 | D4 | Photo without a stored object | **Addressed in schema**: `storage_state = STORAGE_PENDING`; recovery by supersession only. Orphan design below. | Increment 2 |
 | D5 | Per-technician equipment identity | **Declared provisional** (`identity_scope = TECHNICIAN_PROVISIONAL`). Canonical identity model below. | Multi-technician lifetime history |
+| D6 | Repo migrations cannot be applied from scratch (duplicate versions, pre-existing) | **Detected and documented**; the local script fails fast in `full` mode. Not fixed in #704. | Full-history local/branch verification |
+| L | Local Supabase verification (Atlas checkpoint 2026-11-17) | **Script and real-auth suite committed. Not yet executed: Docker and Supabase CLI are not installed on the developer Mac.** | D2 sign-off |
 
 ---
 
@@ -187,3 +189,87 @@ equipment record.
   resolves them.
 
 This is a dependency, not part of #704.
+
+## D6 — Existing migrations cannot be applied from scratch (pre-existing defect)
+
+The Supabase CLI records each migration under its numeric version prefix
+(`supabase_migrations.schema_migrations.version` is the primary key). 27 of the
+77 repository migrations use 8-digit date-only versions, and **22 of them
+collide across 5 versions**:
+
+| Version | Files |
+|---|---|
+| `20260721` | 2 (partner review network) |
+| `20260722` | 6 (AI governance registry foundation, evidence storage, finalization, public directory, reviewer decisions, sources) |
+| `20260808` | 3 (registry projections, version series) |
+| `20260809` | 8 (24-link academy, canonical registry, provenance, patents, admin notifications) |
+| `20260810` | 3 (governance life history, harmonic identity correction) |
+
+As a result, a from-scratch `supabase db reset` / `supabase start` with the
+full history is expected to fail on a duplicate version. In addition,
+`2026MMDD_` filenames sort *after* `2026MMDDhhmmss_` filenames on the same day
+(`_` > `0`–`9`), so the apply order may differ from the authoring order.
+`scripts/hpr/local-supabase-verify.sh full` detects the collision up front and
+stops with this list.
+
+**Not fixed in #704, deliberately.** Some of these migrations are already
+reflected in the production schema. Renaming them changes their recorded
+versions and can desynchronise production migration history. It needs a
+separate reviewed PR that:
+1. reads the production `schema_migrations` history (read-only, by the owner);
+2. assigns unique 14-digit versions in the true historical order;
+3. plans `supabase migration repair` for production as an owner-run step
+   with no schema change; and
+4. proves a clean from-scratch apply locally.
+
+The HPR migration itself has a unique 14-digit version and depends only on
+`auth.users` and core Postgres, so `hpr-only` mode isolates it from this
+defect.
+
+## Local Supabase verification route (Atlas checkpoint 2026-11-17)
+
+Supabase preview branching is not available on the current plan (Atlas:
+`Branching is supported only on the Pro plan or above`). No branch was
+created. The route is now an isolated local stack.
+
+**Committed:**
+- `scripts/hpr/local-supabase-verify.sh [hpr-only|full]`:
+  - strips every `SUPABASE_*`, `NEXT_PUBLIC_SUPABASE_*`, `DATABASE_URL`,
+    `POSTGRES_*` and `PG*` variable (including `SUPABASE_ACCESS_TOKEN`);
+  - works in a fresh, unlinked scratch project and refuses non-loopback
+    API and DB URLs;
+  - runs `supabase start` on fresh volumes and prints the migration history;
+  - runs the verification SQL (requires 0 findings) and `db lint` / advisors
+    where the CLI provides them;
+  - runs the real-auth suite, then `supabase stop --no-backup`.
+- `tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts`
+  runs real GoTrue users and real PostgREST against the local stack. It
+  covers:
+  - anon denial on every HPR table and RPC, and rejection of a JWT forged
+    with a foreign key;
+  - attribution to the GoTrue-verified user, and rejection of forged
+    identity, verification, time and id fields;
+  - enrollment gating and self-enrollment denial;
+  - isolation between two independently authenticated technicians;
+  - UPDATE, DELETE and UPSERT denial for both the technician and
+    `service_role`;
+  - superseding corrections and duplicate record ids;
+  - storage declaration that is `service_role`-only, single-write and
+    `UNRECONCILED`, with `STORAGE_PENDING` before it.
+
+  It skips unless the script provides local credentials, and it throws if
+  pointed at a non-loopback URL (verified).
+
+**Execution status: NOT RUN.** On the developer Mac (macOS 26.6.2, arm64,
+Homebrew present), these are missing:
+- a Docker-compatible runtime. Install **one** of: Docker Desktop for Mac
+  (Apple silicon) <https://docs.docker.com/desktop/setup/install/mac-install/>,
+  OrbStack (`brew install orbstack`), or Colima (`brew install colima docker`,
+  then `colima start`). Docker Desktop requires admin approval and licence
+  acceptance.
+- the Supabase CLI: `brew install supabase/tap/supabase`.
+
+Then run `scripts/hpr/local-supabase-verify.sh` and attach the printed
+`verify.log` to PR #704. Section 1 of the log records the exact CLI and Docker
+versions. Hosted security and performance advisors may not have a local
+equivalent; the script reports which are available.

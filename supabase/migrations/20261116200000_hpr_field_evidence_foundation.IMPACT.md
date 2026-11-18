@@ -68,7 +68,9 @@ execution authority or Refrigerant Governor capability.
 
 ## Migration review requirements (before any non-local execution)
 - [ ] Independent review (Atlas) of RLS policies, grants and SECURITY DEFINER functions (`search_path = ''` is set on all of them).
-- [ ] Apply to a Supabase **branch / preview project** only. Run `supabase/verification/verify_hpr_field_evidence_privileges.sql` (sections 1–6 must return 0 rows) and the security and performance advisors.
+- [ ] Preview branching is unavailable on the current plan, so verify on an **isolated local stack**: `scripts/hpr/local-supabase-verify.sh` (requires Docker + Supabase CLI; not yet installed on the developer Mac). The script applies the migration, runs the verification SQL and the real GoTrue/PostgREST suite, and never uses production credentials.
+- [ ] Full-history from-scratch apply is blocked by pre-existing duplicate migration versions (D6, separate PR).
+- [ ] Alternatively apply to a Supabase **branch / preview project** only. Run `supabase/verification/verify_hpr_field_evidence_privileges.sql` (sections 1–6 must return 0 rows) and the security and performance advisors.
 - [ ] Exercise PostgREST + GoTrue with real tokens per the D2 checklist in `docs/hvac-performance-record/FIELD-EVIDENCE-OPEN-DEPENDENCIES.md`.
 - [ ] Retention / erasure decision (D3, owner + legal). Current fail-closed default is `on delete restrict`. Recommended: a pseudonymous principal plus an erasable mapping, before any production data exists.
 - [ ] Accept technician-scoped equipment identity as **provisional** only. A canonical identity / link / custody model (D5) is required before multi-technician lifetime history.
