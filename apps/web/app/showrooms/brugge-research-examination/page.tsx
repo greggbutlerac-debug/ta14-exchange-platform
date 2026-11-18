@@ -20,12 +20,12 @@ const studies = [
   {
     title: 'Visualizing Air Pollution: Communication of Environmental Health Information in a Chinese Immigrant Community',
     year: '2019', journal: 'Journal of Health Communication', doi: '10.1080/10810730.2019.1597949',
-    image: 'Visualizing Air Quality in Chinatown.png', method: 'Community communication evaluation',
+    image: 'TA-14 Air Pollution Communication Exhibit.png', method: 'Community communication evaluation',
     finding: 'Examines visual and bilingual approaches to making near-roadway pollution information accessible to a Chinese immigrant community.',
     boundary: 'Understanding and engagement do not demonstrate measured exposure reduction or improvement in health.',
     question: 'Can a community-facing visualization show when, where, how and with what uncertainty the underlying data were produced?',
     narration: 'Lesson two changes the problem from technical control to understanding. A map or graphic may be scientifically grounded and still fail to reach the people most affected by the issue. This paper examines communication in a Chinese immigrant community through visual and bilingual approaches. The relevant outcome is communication, not an independently demonstrated improvement in air quality. A TA-14 research extension would ask whether each displayed measurement can be traced to its time, place, method and uncertainty. Better presentation is valuable; it is not the same as proven intervention performance.',
-    caution: 'The uploaded artwork gives the wrong journal. Use the citation displayed in this lesson.'
+    caution: 'The display’s Moderate air-quality reading is illustrative, not a documented observation in the paper. The PLAY SAMANTHA graphic printed in the image is not interactive; use the actual narration button beneath the image. Full source and artwork review remains open.'
   },
   {
     title: 'Two communities, one highway and the fight for clean air: the role of political history in shaping community engagement and environmental health research translation',
