@@ -90,12 +90,12 @@ const studies = [
   {
     title: 'Effect of HEPA Filtration Air Purifiers on Blood Pressure: A Pragmatic Randomized Crossover Trial',
     year: '2025', journal: 'Journal of the American College of Cardiology (JACC)', doi: '10.1016/j.jacc.2025.06.037',
-    image: 'HEPA Purifiers and Blood Pressure Findings.png', method: 'Pragmatic randomized crossover trial; 154 analyzed participants',
+    image: 'HEPA Filtration and Blood Pressure Trial.png', method: 'Pragmatic randomized crossover trial; 154 analyzed participants',
     finding: 'In participants with baseline systolic blood pressure of at least 120 mm Hg, the reported HEPA-versus-sham systolic contrast favored HEPA by 3.0 mm Hg (p = .04).',
     boundary: 'This subgroup result is not a significant benefit for every participant; no significant diastolic benefit was reported. Confidence intervals and model details remain under review.',
     question: 'Can filter operation, measured particle change and measured blood pressure each be audited as distinct endpoints?',
     narration: 'Lesson nine is a clinical trial, and its interpretation needs special care. In a randomized crossover study of portable HEPA versus sham filtration, one hundred fifty-four participants were analyzed. The reported subgroup with elevated baseline systolic pressure showed a three millimeter of mercury between-condition difference favoring HEPA. That does not mean the entire study population experienced a statistically significant blood-pressure benefit. The distinction between exposure, treatment adherence and clinical response must remain visible. A proposed TA-14 record could track those domains separately, but this trial did not test TA-14.',
-    caution: 'Do not use the 3.3 mm Hg graphic as the verified trial estimate. The source review gives a 3.0 mm Hg subgroup contrast. The illustration also should not imply a no-purifier control when the comparison was sham filtration.'
+    caution: 'The revised artwork reflects the sham control and a 3.0 mm Hg subgroup contrast, but its absolute chart values (about 133.2 and 130.2 mm Hg) are illustrative and must not be presented as observed group means without verification against the publication. Recheck embedded citation and subgroup wording.'
   },
   {
     title: 'Effect of HEPA filtration air purifiers on cognitive function from a secondary outcome analysis of a pragmatic randomized crossover trial',
@@ -124,7 +124,7 @@ const studies = [
     finding: 'Proposes traceable baseline evidence, applicable authority, established standing, bounded ALLOW / HOLD / DENY / ESCALATE decisions, and independent post-action verification.',
     boundary: 'No Brugge publication in this examination studied, tested, approved or validated TA-14. The proposal must be tested separately.',
     question: 'Would a prospectively registered comparison show more complete, reproducible and contestable intervention records than ordinary documentation?',
-    narration: 'The final lesson is intentionally separate from the scientific literature. The preceding eleven publications explore different questions about exposure, communication, community action, regulation and selected effects of filtration. None evaluated TA-14. This exhibit introduces a proposed boundary for consequential environmental action. It would examine admissible evidence, applicable authority and established standing at the relevant moment, then preserve the disposition and the outcome. Its first validation should test record completeness, intervention fidelity, reviewer agreement and reproducibility, not claim improved health by association with another research team's findings.',
+    narration: 'The final lesson is intentionally separate from the scientific literature. The preceding eleven publications explore different questions about exposure, communication, community action, regulation and selected effects of filtration. None evaluated TA-14. This exhibit introduces a proposed boundary for consequential environmental action. It would examine admissible evidence, applicable authority and established standing at the relevant moment, then preserve the disposition and the outcome. Its first validation should test record completeness, intervention fidelity, reviewer agreement and reproducibility, not claim improved health by association with another research team\'s findings.',
     caution: 'Proposed framework only. The research bibliography does not establish a collaboration, endorsement or validation by Dr. Brugge.'
   }
 ] as const;
