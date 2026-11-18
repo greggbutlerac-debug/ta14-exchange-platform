@@ -9,6 +9,33 @@ Status: **HOLD — internal review only**. Prepared 18 November 2026.
 4. Exhibit 12 is a distinct TA-14 proposal, not a conclusion from the 11 publications.
 5. Do not invent figures, participant counts, effects, confidence intervals, journal titles or DOI identifiers; verify all nontrivial claims against originals.
 
+## Consolidated asset inventory (18 November 2026)
+
+The following twelve source-to-artwork links are currently wired into `page.tsx`. They are distinct exhibit slots, not twelve approved scientific figures. The PDF and two separate overview concepts are also retained in the repository.
+
+| Exhibit | Current asset |
+|---|---|
+| 01 | Reducing Traffic Pollution Exposure.png |
+| 02 | TA-14 Air Pollution Communication Exhibit.png |
+| 03 | Two Communities, One Highway.png |
+| 04 | CBPR Partnerships for Cleaner Roadways.png |
+| 05 | Traffic Air Pollution Health Infographic.png |
+| 06 | Particulate Policy_ Ultrafine Particle Exposure.png |
+| 07 | Boston Chinatown Community Charrette Infographic.png |
+| 08 | Communities Taking Action on Air Quality.png |
+| 09 | HEPA Filtration and Blood Pressure Trial.png |
+| 10 | HEPA Filtration and Cognitive Function.png |
+| 11 | HEPA Filtration Study_ Inflammatory Marker Findings.png |
+| 12 | From Research Evidence to Justified Action.png |
+
+Companion PDF: `TA14_Brugge_Research_Examination_v4_Editorial_Corrected (2).pdf`.
+
+Separate editorial overview concepts (not counted as exhibits): `TA-14 Air Pollution Accountability Exhibition-2.png`; `TA-14 Air Quality Evidence to Action-1.png`. Do not replace an exhibit with these or add them as additional numbered lessons by accident.
+
+Image candidates superseded for this room should remain in the asset repository for now, but should **not** be reintroduced into the room: `Visualizing Air Quality in Chinatown.png`, `HEPA Purifiers and Blood Pressure Findings.png`, `HEPA Filtration and Inflammation Study.png`, `HEPA Filtration and Inflammatory Markers.png`.
+
+Artwork and document release is still HOLD; the verified GitHub file references do not establish that captions, DOI strings or visualized statistics are accurate.
+
 ## Exhibit-by-exhibit image review
 | # | Correct study/source | Artwork release check |
 |---|---|---|
