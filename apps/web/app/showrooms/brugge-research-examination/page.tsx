@@ -110,12 +110,12 @@ const studies = [
   {
     title: 'Pro-inflammatory cytokines moderated by visceral adiposity from a pragmatic randomized crossover trial of portable HEPA air purifiers',
     year: '2026 online / 2027 volume', journal: 'American Journal of Preventive Cardiology', doi: '10.1016/j.ajpc.2026.101775',
-    image: 'HEPA Filtration and Inflammatory Markers.png', method: 'Secondary biomarker analysis; 116 participants',
+    image: 'HEPA Filtration Study_ Inflammatory Marker Findings.png', method: 'Secondary biomarker analysis; 116 participants',
     finding: 'No overall IL-1β effect was reported; a high-visceral-adiposity subgroup of 12 participants showed a reported IL-1β reduction.',
     boundary: 'This is not evidence that visceral fat was reduced. A small subgroup cannot justify generalized anti-inflammatory claims; precision and multiplicity require checking.',
     question: 'How can an exploratory biomarker signal be presented without converting it into a clinical treatment claim?',
     narration: 'Lesson eleven turns to inflammatory biomarkers. The secondary analysis included one hundred sixteen participants and found no overall difference in interleukin one beta. The researchers also reported a reduction in that marker among a small subgroup of twelve people with higher visceral adiposity. The biomarker changed in that analysis; the study did not establish that the purifier reduced visceral fat. With such a small subgroup, confidence intervals, prespecification and multiple comparisons matter. This distinction must survive every illustration, caption and narration.',
-    caution: 'Revised artwork now distinguishes the reported IL-1β subgroup signal from visceral adiposity, and shows the correct DOI. However, its study-design panel says HEPA versus typical indoor air; confirm and correct the sham-control comparison before public release.'
+    caution: 'The updated illustration identifies HEPA versus sham filtration and separates the overall null IL-1β result from the exploratory high-visceral-adiposity subgroup finding. Original-source checks of methods, uncertainty, multiplicity and all embedded text remain required before publication.'
   },
   {
     title: 'Proposed TA-14 evidence-to-action boundary',
