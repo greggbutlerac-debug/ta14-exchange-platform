@@ -105,6 +105,28 @@ describe('AEA Proof Gate 1: governed simulation route', () => {
     expect(controller.observe().defrostUntilMinute).toBe(0);
     expect(controller.attempts).toHaveLength(25);
   });
+  it('TOCTOU: material operational change after submission blocks execution', () => {
+    const controller = new ControlledFreezer();
+    const change: MaterialChange = {
+      changeId: 'PG1-INCIDENT', detectedAt: minuteToIso(61),
+      category: 'OPERATIONAL', material: true, description: 'Open simulated incident',
+    };
+    const result = controller.request(attempt('PG1-MATERIAL-CHANGE'), 61, { change });
+    expect(result.submit.determination).toBe('ALLOW');
+    expect(result.execution?.executionPermitted).toBe(false);
+    expect(result.mutated).toBe(false);
+    expect(controller.observe().defrostUntilMinute).toBe(0);
+  });
+  it('KNOWN GAP: repeated valid command ID is not deduplicated by this harness', () => {
+    const controller = new ControlledFreezer();
+    const first = controller.request(attempt('PG1-DUPLICATE'), 60);
+    const second = controller.request(attempt('PG1-DUPLICATE'), 61);
+    // Two accepted mutations are evidence of missing one-time execution semantics.
+    // This test intentionally documents the gap; it does NOT certify replay resistance.
+    expect(first.mutated).toBe(true);
+    expect(second.mutated).toBe(true);
+    expect(controller.attempts.filter((a) => a.mutated)).toHaveLength(2);
+  });
   it('explicit scope: the harness exposes no public direct-write method', () => {
     const controller = new ControlledFreezer();
     expect('writeDirect' in controller).toBe(false);
