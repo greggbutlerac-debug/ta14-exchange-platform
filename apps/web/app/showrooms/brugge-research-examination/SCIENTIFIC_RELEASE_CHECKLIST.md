@@ -5,7 +5,7 @@ Status: **HOLD — internal review only**. Prepared 18 November 2026.
 ## Verified preview audit — 18 November 2026
 
 - GitHub Actions **Verify** completed successfully for branch commit `8007865995c7169c2b02fabb191e05f8743e00cd` (workflow run 44330389719).
-- Vercel preview for that commit reported **READY**: `https://ta14-exchange-platform-knkcowfpa-ta-14-exchange.vercel.app/showrooms/brugge-research-examination`.
+- Vercel preview for that commit reported **READY** (deployment URL retained in GitHub/Vercel checks, not source).
 - Authenticated fetch of the preview returned HTTP **200**.
 - Server-rendered HTML contains **12 distinct image elements**, the 12 expected filename-based asset paths, playback button markup, the companion PDF link, and a `noindex` directive.
 - **Not yet verified:** HTTP response for every individual image and the PDF; interactive voice playback on actual devices; visible text embedded in every uploaded PNG; clinical scientific source accuracy. Passing the build is not scientific approval.
