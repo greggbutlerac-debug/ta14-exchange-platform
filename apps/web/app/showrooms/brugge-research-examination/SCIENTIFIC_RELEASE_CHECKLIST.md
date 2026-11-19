@@ -66,8 +66,8 @@ Artwork and document release is still HOLD; the verified GitHub file references 
 - Source controls still pending: DOI landing pages; all complete coauthor lists (particularly 2025 JACC); 2021 MAPC stable link; clinical methods/tables/intervals/prespecification and multiplicity; community contributor attribution preferences.
 
 ## Academy challenge — gap confirmed in page source
-- [ ] Current `page.tsx` ends with scientific release control and footer; **no Academy challenge is implemented**. Do not describe it as present or tested.
-- [ ] Design a clearly educational four-scenario evidence/authority/standing exercise. Label scenarios hypothetical and separate from the Brugge research findings.
+- [x] Four-scenario Academy challenge component is now implemented and mounted after exhibit 12 (`BruggeAcademyChallenge.tsx`). This is code implementation only, not browser or accessibility test completion.
+- [x] Four fictional scenarios cover evidence, authority, standing, and ALLOW/HOLD/DENY/ESCALATE, with explanatory feedback and explicit separation from Brugge research findings.
 - [ ] Verify keyboard interaction, accessible feedback, answer explanations, and no implied third-party endorsement.
 
 ## Web / release verification
