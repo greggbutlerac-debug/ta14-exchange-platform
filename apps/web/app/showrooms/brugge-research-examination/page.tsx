@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import SamanthaNarration from '../../components/SamanthaNarration';
+import BruggeAcademyChallenge from './BruggeAcademyChallenge';
 import './showroom.css';
 
 const documentPdf = '/' + encodeURIComponent('TA14_Brugge_Research_Examination_v4_Editorial_Corrected (2).pdf');
@@ -158,6 +159,7 @@ export default function BruggeIndependentExamination(){
         <div className="be-next">{i<studies.length-1?<a href={'#exhibit-'+String(i+2).padStart(2,'0')}>NEXT EXHIBIT · {String(i+2).padStart(2,'0')} ↓</a>:<a href="#verification">CONTINUE TO RELEASE CONTROL ↓</a>}</div>
       </article>)}
     </div>
+    <BruggeAcademyChallenge />
     <section id="verification" className="be-review"><h2>Scientific release control</h2><p>Before publication, reconcile each figure against the cited source, correct embedded image errors, verify the three HEPA analyses' full results tables and confidence intervals, complete JACC author credit, confirm the MAPC report URL, and rewrite any narration challenged by source review. This room and its illustrations remain working material until those checks are complete.</p><a href={documentPdf} target="_blank" rel="noopener noreferrer">READ THE 28-PAGE REVIEW MASTER (PDF) ↗</a></section>
     <footer className="be-foot">TA-14 AUTHORITY GOVERNANCE INSTITUTION · SCIENTIFIC REVIEW DRAFT · NO THIRD-PARTY ENDORSEMENT · NOVEMBER 2026</footer>
   </div></main>;
