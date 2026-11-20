@@ -168,6 +168,7 @@ export const showroomRooms=[
 ['Pooja Choradia · PAIR/ERI Clinical','/showrooms/pooja-choradia-pair-eri-clinical','PEOPLE & PRACTITIONERS','PAIR ERI clinical practitioner environmental evidence human consequence'],
 ['School Atmospheric Integrity Demonstration','/showrooms/school-atmospheric-integrity','ENVIRONMENT & ATMOSPHERIC INTEGRITY','schools indoor air atmospheric integrity evidence authority authorized intervention outcome'],
 ['What Does Proof Authorize?','/showrooms/what-does-proof-authorize','EXAMINATIONS & DEMONSTRATIONS','proof evidence authority standing consequence authorization examination'],
+['The Consequence Wars · Episode 1','/showrooms/the-consequence-wars','AI & MACHINE INTELLIGENCE','cinematic interactive fictional governance AEA execution boundary evidence authority standing'],
 ] as const;
 
 export const showroomCount = showroomRooms.length;
