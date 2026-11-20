@@ -13,6 +13,8 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Dr. Moya Hill · Founding Maryland Ambassador','/showrooms/dr-moya-hill','PEOPLE & PRACTITIONERS','Dr Moya Hill founding Maryland honorary ambassador information governance Unified Information Governance Model UIGM seven disciplines privacy FOIA transparency records cybersecurity legal compliance risk training culture AI inputs eight educational exhibits Samantha narration draft review PDF'],
+
 ['Iraq Ministry of Environment · From Monitoring to Justified Action','/showrooms/iraq-ministry-environment','COUNTRIES & PUBLIC INSTITUTIONS','Independent Arabic-first eight-image technical examination AIR AEA EIG bilingual Arabic English PDF illustrative decision trace independent critique no Ministry endorsement'],
 ['TA-14 × Budo Magaru-Ilaitia · Crusaders Air Solution · Papua New Guinea','/showrooms/ta14-budo','ORGANIZATIONS & PARTNERS','Budo Magaru-Ilaitia Crusaders Air Solution Papua New Guinea voluntary Authority Governance Ambassador acceptance 13 November 2026 local clean air leadership eight illustrated chapters Samantha narration atmospheric integrity pilot proposed AIR EIG AEA companion PDF collaborative review'],
 ['Radon: From Measurement to Governed Protection','/showrooms/radon-governed-protection','ENVIRONMENT & ATMOSPHERIC INTEGRITY','Eight original radon teaching images Samantha narration V2 technical PDF Daisy Rezende inquiry licensing certification competence measurement QA AEA ALLOW HOLD DENY ESCALATE mitigation independent verification homeowner stewardship'],
