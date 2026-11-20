@@ -46,6 +46,12 @@ class ControlledFreezer {
       return { submit, execution: null, mutated: false };
     }
     const executionInput = { ...input, ...executionOverrides, minute: executeAtMinute };
+    // Bind the exact submitted command payload to the execution request.
+    // GCEA's commit ID alone does not include command parameters.
+    if (JSON.stringify(executionInput.command) !== JSON.stringify(input.command)) {
+      this.attempts.push({ id: input.command.commandId, determination: 'DENY', mutated: false, receipt: 'LOCAL_COMMAND_PAYLOAD_MISMATCH' });
+      return { submit, execution: null, mutated: false, reason: 'COMMAND_PAYLOAD_MISMATCH' };
+    }
     const execution = executeCommitted({ ...executionInput, change: executionInput.change ?? null });
     const mutated = execution.executionPermitted && execution.determination === 'ALLOW';
     if (mutated) {
@@ -160,6 +166,25 @@ describe('AEA Proof Gate 1: governed simulation route', () => {
     expect(submit.commitPermitted).toBe(false);
     expect(execution.executionPermitted).toBe(false);
     expect(execution.reasonCodes).toContain('SIM_COMMAND_OUTSIDE_AUTHORIZED_LIMITS');
+  });
+  it('TOCTOU: changing approved command parameters before execution cannot mutate state', () => {
+    const controller = new ControlledFreezer();
+    const result = controller.request(attempt('PG1-PAYLOAD-SWAP'), 61, {
+      command: command('PG1-PAYLOAD-SWAP', 25),
+    });
+    expect(result.submit?.commitPermitted).toBe(true);
+    expect(result.reason).toBe('COMMAND_PAYLOAD_MISMATCH');
+    expect(result.mutated).toBe(false);
+    expect(controller.observe().defrostUntilMinute).toBe(0);
+  });
+  it('TOCTOU: changing command ID before execution cannot mutate state', () => {
+    const controller = new ControlledFreezer();
+    const result = controller.request(attempt('PG1-ID-SWAP'), 61, {
+      command: command('PG1-OTHER-ID'),
+    });
+    expect(result.reason).toBe('COMMAND_PAYLOAD_MISMATCH');
+    expect(result.mutated).toBe(false);
+    expect(controller.observe().defrostUntilMinute).toBe(0);
   });
   it('KNOWN BOUNDARY: commit ID is not bound to command parameters or command ID', () => {
     // GCEA commit binds asset/route/consequence/authority/evidence/time,
