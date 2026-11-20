@@ -98,7 +98,7 @@ const scenes: Scene[] = [
   },
   {
     number: '10',
-    title: 'The Verified Consequence',
+    title: 'The Outcome Still Requires Verification',
     image: 'Governance Prevails_ The Execution Boundary.png',
     alt: 'A cinematic Guardian victory scene contains an illustrative ALLOW display, separate from the denied attack.',
     narration: 'The cooling response must be observed, not merely assumed. The permitted intervention and its measured effects are separate events. Record the outcome and remaining uncertainty. One incident ends; the boundary remains.',
