@@ -12,7 +12,7 @@ type Request = {
   evidence: EvidenceStanding; change: MaterialChange | null; minute: number;
 };
 const digest = (value: unknown) => createHash('sha256').update(JSON.stringify(value)).digest('hex');
-export type Ticket = { token: string; commandDigest: string; commandId: string; issuedAt: number; commitId: string };
+export type Ticket = { token: string; commandDigest: string; commandId: string; issuedAt: number; commitId: string; actorId: string; authorityId: string; evidenceId: string };
 export type Result = { allowed: boolean; reason: string; state: number };
 
 export class CommandBoundEmulator {
@@ -25,7 +25,7 @@ export class CommandBoundEmulator {
     if (!submission.commitPermitted || !submission.gcea.commitId) return null;
     const commandDigest = digest(request.command);
     const token = digest({ commandDigest, commitId: submission.gcea.commitId, actorId: request.actorId, minute: request.minute });
-    const ticket = { token, commandDigest, commandId: request.command.commandId, issuedAt: request.minute, commitId: submission.gcea.commitId };
+    const ticket = { token, commandDigest, commandId: request.command.commandId, issuedAt: request.minute, commitId: submission.gcea.commitId, actorId: request.actorId, authorityId: request.held!.grant.authorityId, evidenceId: request.evidence.evidenceId };
     // A repeat authorization for the same token is not a fresh capability.
     if (!this.consumed.has(token)) this.tickets.set(token, ticket);
     return ticket;
@@ -37,6 +37,7 @@ export class CommandBoundEmulator {
     if (digest(issued) !== digest(ticket)) return fail('ALTERED_TICKET');
     if (digest(request.command) !== issued.commandDigest || request.command.commandId !== issued.commandId) return fail('COMMAND_PAYLOAD_MISMATCH');
     if (request.minute < issued.issuedAt) return fail('EXECUTION_BEFORE_AUTHORIZATION');
+    if (request.actorId !== issued.actorId || request.held?.grant.authorityId !== issued.authorityId || request.evidence.evidenceId !== issued.evidenceId) return fail('AUTHORIZATION_BINDING_MISMATCH');
     // Re-evaluate standing at the final write boundary.
     const execution = executeCommitted(request);
     if (!execution.executionPermitted) return fail('EXECUTION_BOUNDARY_REFUSED');
