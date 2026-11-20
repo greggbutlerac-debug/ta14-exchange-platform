@@ -32,9 +32,14 @@ type Attempt = {
 };
 class ControlledFreezer {
   private defrostUntilMinute = 0;
+  private readonly executedCommandIds = new Set<string>();
   readonly attempts: Array<{ id: string; determination: string; mutated: boolean; receipt: string }> = [];
   observe() { return { defrostUntilMinute: this.defrostUntilMinute }; }
   request(input: Attempt, executeAtMinute = input.minute, executionOverrides: Partial<Attempt> = {}) {
+    if (this.executedCommandIds.has(input.command.commandId)) {
+      this.attempts.push({ id: input.command.commandId, determination: 'DENY', mutated: false, receipt: 'LOCAL_DUPLICATE_COMMAND_ID' });
+      return { submit: null, execution: null, mutated: false, reason: 'DUPLICATE_COMMAND_ID' };
+    }
     const submit = submitCommand({ ...input, change: input.change ?? null });
     if (!submit.commitPermitted) {
       this.attempts.push({ id: input.command.commandId, determination: submit.determination, mutated: false, receipt: submit.gcea.receiptHash });
@@ -43,7 +48,10 @@ class ControlledFreezer {
     const executionInput = { ...input, ...executionOverrides, minute: executeAtMinute };
     const execution = executeCommitted({ ...executionInput, change: executionInput.change ?? null });
     const mutated = execution.executionPermitted && execution.determination === 'ALLOW';
-    if (mutated) this.defrostUntilMinute = executeAtMinute + input.command.params.durationMin!;
+    if (mutated) {
+      this.executedCommandIds.add(input.command.commandId);
+      this.defrostUntilMinute = executeAtMinute + input.command.params.durationMin!;
+    }
     this.attempts.push({ id: input.command.commandId, determination: execution.determination, mutated, receipt: execution.gcea.receiptHash });
     return { submit, execution, mutated };
   }
@@ -117,15 +125,23 @@ describe('AEA Proof Gate 1: governed simulation route', () => {
     expect(result.mutated).toBe(false);
     expect(controller.observe().defrostUntilMinute).toBe(0);
   });
-  it('KNOWN GAP: repeated valid command ID is not deduplicated by this harness', () => {
+  it('replay: repeated valid command ID is denied by the simulated controller adapter', () => {
     const controller = new ControlledFreezer();
     const first = controller.request(attempt('PG1-DUPLICATE'), 60);
     const second = controller.request(attempt('PG1-DUPLICATE'), 61);
-    // Two accepted mutations are evidence of missing one-time execution semantics.
-    // This test intentionally documents the gap; it does NOT certify replay resistance.
     expect(first.mutated).toBe(true);
-    expect(second.mutated).toBe(true);
-    expect(controller.attempts.filter((a) => a.mutated)).toHaveLength(2);
+    expect(second.mutated).toBe(false);
+    expect(second.reason).toBe('DUPLICATE_COMMAND_ID');
+    expect(controller.observe().defrostUntilMinute).toBe(80);
+    expect(controller.attempts.filter((a) => a.mutated)).toHaveLength(1);
+  });
+  it('a denied attempt does not consume the command ID', () => {
+    const controller = new ControlledFreezer();
+    const denied = controller.request({ ...attempt('PG1-RETRY'), held: null });
+    const allowed = controller.request(attempt('PG1-RETRY'));
+    expect(denied.mutated).toBe(false);
+    expect(allowed.mutated).toBe(true);
+    expect(controller.attempts.filter((a) => a.mutated)).toHaveLength(1);
   });
   it('explicit scope: the harness exposes no public direct-write method', () => {
     const controller = new ControlledFreezer();
