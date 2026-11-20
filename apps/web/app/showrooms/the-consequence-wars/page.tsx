@@ -119,10 +119,10 @@ const scenes: Scene[] = [
   {
     number: '10',
     title: 'Governance Prevails — Execution Denied',
-    image: 'Governance Prevails_ The Execution Boundary.png',
-    alt: 'Aegis defeats Override in a fictional data-center confrontation. The current artwork incorrectly displays ALLOW and must be replaced with the approved execution-denied finale.',
+    image: 'TA14_Consequence_Wars_Scene10_Execution_Denied (1).png',
+    alt: 'Aegis restrains Override in a fictional data-center confrontation as the execution boundary displays EXECUTION DENIED for the unauthorized control command.',
     narration: 'The command was capable of execution. It was not justified to execute. The boundary held. Override\'s unauthorized command was denied before permitted actuation. The legitimate cooling concern still requires its own evidence, authority, standing and safety response. One incident ends; the boundary remains.',
-    lesson: 'The correct final decision for Override\'s command is DENY, not ALLOW. The illustration currently displays an incorrect green authorization panel and is awaiting replacement. Blocking an attempted command does not, by itself, prove the plant remained safe; actual control and safety outcomes require attributable event evidence.',
+    lesson: 'The correct disposition for Override\'s unauthorized command is DENY. The fictional execution-boundary panel shows that this particular attempted actuation was blocked; the physical condition of the facility and any legitimate cooling response still require separate evidence.',
     interaction: 'Explain what the DENY decision establishes and what still requires independent verification.',
     learned: "The victory is a justified DENY of the unauthorized command. A blocked execution is not proof that the building was cooled or remained safe; outcomes must still be observed and recorded.",
     nextLesson: "Episode 1 ends here. Override's bypass was DENIED; the separate cooling request remained on HOLD. In the next case, ask which specific command is under review and whether it has sufficient AE, AA and ES now."
@@ -216,7 +216,7 @@ export default function ConsequenceWarsShowroom() {
         <p style={{ color: '#e9c16d', fontWeight: 800, letterSpacing: 1 }}>EPISODE 1 · THE MILLISECOND BETWEEN PERMISSION AND CONSEQUENCE</p>
         <p style={{ maxWidth: 920, lineHeight: 1.75, fontSize: 19, color: '#c9d9e8' }}>A fictional data-center AI recommends action. A fabricated claim and an unauthorized override threaten to turn a recommendation into a real-world consequence. The Guardians examine what is justified to happen now.</p>
         <p style={{ maxWidth: 970, lineHeight: 1.7, padding: 20, background: '#0f2233', border: '1px solid #476b7e', borderRadius: 12, color: '#e5d9c8' }}>
-          <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scenes 09 and 10 still display older artwork with incorrect execution labels. Their narrative has been corrected to DENY the malicious command, but the artwork must be replaced before publication.
+          <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scene 09 still contains earlier illustrative EXECUTE markings that require editorial correction. Scene 10 now shows the revised DENIED verdict. This is fictional teaching content, not a deployed system or validated data-center incident.
         </p>
         <a href={'/' + encodeURIComponent('TA14_Consequence_Wars_Episode_1_Production_Bible_v5_Under25MB.pdf')} download style={{ display: 'inline-block', background: '#9be6f8', color: '#082132', padding: '13px 18px', fontWeight: 800, borderRadius: 9, textDecoration: 'none' }}>Download Episode 1 production bible (PDF)</a>
       </header>
