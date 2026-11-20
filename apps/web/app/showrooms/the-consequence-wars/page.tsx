@@ -81,14 +81,14 @@ const scenes: Scene[] = [
     lesson: 'An Atmospheric Integrity Record supports attribution and examination; a sealed or traceable record is not itself proof of physical measurement accuracy or admissibility.',
     interaction: 'Check provenance, calibration, uncertainty, and continuity.',
     learned: "An Atmospheric Integrity Record supports attribution, not automatic truth. A green status in the illustration cannot independently establish sensor accuracy, uninterrupted continuity or admissibility.",
-    nextLesson: "Next, Terra Prime considers whether cooling could affect energy demand, air and other environmental consequences."
+    nextLesson: "Next, Tara Prime considers whether cooling could affect energy demand, air and other environmental consequences."
   },
   {
     number: '07',
-    title: 'Terra Prime Sees the Trade-off',
-    image: 'Terra Prime_ Environmental Consequences.png',
-    alt: 'Terra Prime studies a green environmental digital twin comparing cooling, energy demand, and wider effects.',
-    narration: 'Terra Prime sees beyond the hot server racks. More cooling can alter energy demand and environmental effects. The intervention must address the danger without hiding new consequences elsewhere.',
+    title: 'Tara Prime Sees the Trade-off',
+    image: 'Tara Prime_ Environmental Consequences.png',
+    alt: 'Tara Prime studies a green environmental digital twin comparing cooling, energy demand, and wider effects.',
+    narration: 'Tara Prime sees beyond the hot server racks. More cooling can alter energy demand and environmental effects. The intervention must address the danger without hiding new consequences elsewhere.',
     lesson: 'Environmental Integrity Governance examines combined consequences. Any percentages shown in the fictional artwork are invented illustrative values, not measured impact estimates.',
     interaction: 'Compare the benefit of cooling with environmental trade-offs.',
     learned: "Environmental trade-offs deserve examination, but the illustrated numbers are fictional and do not establish actual impacts or automatically prohibit action.",
