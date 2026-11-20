@@ -152,13 +152,14 @@ describe('AEA Proof Gate 1: governed simulation route', () => {
     expect(result.executionPermitted).toBe(true);
     expect(result.determination).toBe('ALLOW');
   });
-  it('KNOWN BOUNDARY: raw execution helper does not recheck command parameter bounds', () => {
+  it('raw execution helper now rechecks command parameter bounds', () => {
     // Demonstrates why all claimed writes must pass the guarded adapter.
     const input = { ...attempt('PG1-RAW-BOUND'), command: command('PG1-RAW-BOUND', 360) };
     const submit = submitCommand({ ...input, change: null });
     const execution = executeCommitted({ ...input, change: null });
     expect(submit.commitPermitted).toBe(false);
-    expect(execution.executionPermitted).toBe(true);
+    expect(execution.executionPermitted).toBe(false);
+    expect(execution.reasonCodes).toContain('SIM_COMMAND_OUTSIDE_AUTHORIZED_LIMITS');
   });
   it('explicit scope: the harness exposes no public direct-write method', () => {
     const controller = new ControlledFreezer();
