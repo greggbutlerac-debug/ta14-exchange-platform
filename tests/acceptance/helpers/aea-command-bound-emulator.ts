@@ -3,9 +3,9 @@
  * Not a production adapter or distributed durable ledger.
  */
 import { createHash } from 'node:crypto';
-import { BASELINE, minuteToIso } from '../../apps/web/lib/refrigeration-boundary/baseline';
-import { submitCommand, executeCommitted, type Command, type HeldGrant } from '../../apps/web/lib/refrigeration-boundary/gate';
-import type { EvidenceStanding, MaterialChange } from '../../apps/web/lib/governance-continuity-execution-authority';
+import { BASELINE, minuteToIso } from '../../../apps/web/lib/refrigeration-boundary/baseline';
+import { submitCommand, executeCommitted, type Command, type HeldGrant } from '../../../apps/web/lib/refrigeration-boundary/gate';
+import type { EvidenceStanding, MaterialChange } from '../../../apps/web/lib/governance-continuity-execution-authority';
 
 type Request = {
   actorId: string; command: Command; held: HeldGrant | null;
