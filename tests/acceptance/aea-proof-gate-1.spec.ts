@@ -143,6 +143,23 @@ describe('AEA Proof Gate 1: governed simulation route', () => {
     expect(allowed.mutated).toBe(true);
     expect(controller.attempts.filter((a) => a.mutated)).toHaveLength(1);
   });
+  it('KNOWN BOUNDARY: raw executeCommitted is not coupled to an earlier submit receipt', () => {
+    // This is a characterization test, NOT a prevention test. The adapter
+    // requires submit first; the exported GCEA execution helper itself does not
+    // receive a prior commit ID. A caller with direct access may skip submit.
+    const input = attempt('PG1-RAW-EXEC');
+    const result = executeCommitted({ ...input, change: null });
+    expect(result.executionPermitted).toBe(true);
+    expect(result.determination).toBe('ALLOW');
+  });
+  it('KNOWN BOUNDARY: raw execution helper does not recheck command parameter bounds', () => {
+    // Demonstrates why all claimed writes must pass the guarded adapter.
+    const input = { ...attempt('PG1-RAW-BOUND'), command: command('PG1-RAW-BOUND', 360) };
+    const submit = submitCommand({ ...input, change: null });
+    const execution = executeCommitted({ ...input, change: null });
+    expect(submit.commitPermitted).toBe(false);
+    expect(execution.executionPermitted).toBe(true);
+  });
   it('explicit scope: the harness exposes no public direct-write method', () => {
     const controller = new ControlledFreezer();
     expect('writeDirect' in controller).toBe(false);
