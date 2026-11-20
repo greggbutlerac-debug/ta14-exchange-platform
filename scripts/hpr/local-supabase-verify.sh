@@ -34,7 +34,18 @@ RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/ta14-hpr-local.XXXXXX")"
 WORKDIR="$RUN_DIR/project"
 LOG="$RUN_DIR/verify.log"
 mkdir -p "$WORKDIR"
-exec > >(tee -a "$LOG") 2>&1
+# Redact credentials from everything written to the terminal and verify.log
+# (`supabase start` / `status` print local JWTs, sb_* keys and DB passwords).
+if sed -l -n '' </dev/null 2>/dev/null; then SED_LB=-l; else SED_LB=-u; fi
+redact() {
+  sed -E $SED_LB \
+    -e 's/eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+/[REDACTED_JWT]/g' \
+    -e 's/sb_(publishable|secret)_[A-Za-z0-9_-]+/sb_\1_[REDACTED]/g' \
+    -e 's#(postgres(ql)?://[^:/@[:space:]]+):[^@[:space:]]+@#\1:[REDACTED]@#g' \
+    -e 's#(https?://[^?[:space:]"]+)\?[^[:space:]"]*(Signature|X-Amz|Encoded|token)[^[:space:]"]*#\1?[REDACTED_QUERY]#g' \
+    -e 's/("?[A-Z0-9_]*(KEY|SECRET|TOKEN|PASSWORD)[A-Z0-9_]*"?[[:space:]]*[=:][[:space:]]*"?)[^",[:space:]}]+/\1[REDACTED]/g'
+}
+exec > >(redact | tee -a "$LOG") 2>&1
 
 step() { printf '\n=== %s ===\n' "$*"; }
 fail() { printf '\nFAIL: %s\nLog: %s\n' "$*" "$LOG" >&2; exit 1; }
@@ -120,15 +131,21 @@ echo "PASS: sections 1-6 returned 0 rows; section 7 storage_pending_photos=$out"
 
 # --- 4b. lint / advisors where supported --------------------------------------
 step "4b. Lint / advisors"
-db_subcommands="$(supabase db --help 2>/dev/null | awk '/^Available Commands:/{f=1;next} f&&NF{print $1} f&&!NF{exit}')"
+# CLI v1/v2 print "Available Commands:", CLI v3 prints "SUBCOMMANDS".
+db_subcommands="$(supabase db --help 2>/dev/null | awk '/^(Available Commands:|SUBCOMMANDS)/{f=1;next} f&&NF{print $1} f&&!NF{exit}')"
 echo "supabase db subcommands: $(echo $db_subcommands)"
+# CLI v1/v2 need --local; CLI v3 targets local by default and has no --local.
+# --remote is never passed, and the scratch project is unlinked (checked above).
+local_flag() { supabase db "$1" --help 2>/dev/null | grep -qE '^[[:space:]]*--local\b' && echo --local || true; }
 if printf '%s\n' $db_subcommands | grep -qx lint; then
-  supabase db lint --local --level warning --schema public || echo "WARN: db lint reported issues (see above)"
+  echo "\$ supabase db lint $(local_flag lint) --level warning --schema public"
+  supabase db lint $(local_flag lint) --level warning --schema public || echo "WARN: db lint reported issues (see above)"
 else
   echo "supabase db lint: not supported by this CLI"
 fi
 if printf '%s\n' $db_subcommands | grep -qx advisors; then
-  supabase db advisors --local || echo "WARN: advisors reported issues (see above)"
+  echo "\$ supabase db advisors $(local_flag advisors) --type all --level info"
+  supabase db advisors $(local_flag advisors) --type all --level info || echo "WARN: advisors reported issues (see above)"
 else
   echo "Security/performance advisors: not available in this CLI version (hosted-only)."
 fi
@@ -141,5 +158,12 @@ HPR_LOCAL_SUPABASE_ANON_KEY="$LOCAL_ANON" \
 HPR_LOCAL_SUPABASE_SERVICE_ROLE_KEY="$LOCAL_SERVICE" \
   npx vitest run tests/hvac-performance-record/local-supabase --reporter=verbose \
   || fail "local Supabase integration tests failed"
+
+step "6. Log credential scan"
+sleep 1  # let the redaction pipe flush
+if grep -nE 'eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}|sb_(secret|publishable)_[A-Za-z0-9]|postgres(ql)?://[^:/@[:space:]]+:[^[@[:space:]]+@|"?[A-Z0-9_]*(KEY|SECRET|TOKEN|PASSWORD)[A-Z0-9_]*"?[[:space:]]*[=:][[:space:]]*"?[^[",[:space:]}]' "$LOG" >/dev/null; then
+  fail "verify.log contains an unredacted credential-like value"
+fi
+echo "PASS: no unredacted JWTs, sb_* keys, DB passwords or *KEY/*SECRET/*TOKEN values in $LOG"
 
 step "RESULT: PASS ($MODE)"

@@ -53,7 +53,20 @@ function forgedToken(sub: string): string {
   return `${header}.${payload}.${signature}`;
 }
 
-describe.skipIf(!configured)('HPR field evidence on local Supabase (GoTrue + PostgREST)', () => {
+/**
+ * A skipped run is NOT authorization evidence. When the local stack is not
+ * configured, the suite is reported as skipped, with this explicit
+ * "NOT EXECUTED" label, so CI output cannot be read as "integration tests passed".
+ */
+const SUITE_TITLE = configured
+  ? 'HPR field evidence on local Supabase (GoTrue + PostgREST)'
+  : 'NOT EXECUTED — local Supabase stack unavailable (run scripts/hpr/local-supabase-verify.sh); skipped integration coverage is not verification';
+
+if (!configured && process.env.CI) {
+  console.warn('[hpr] local Supabase integration suite NOT EXECUTED in this run: skipped, not passed.');
+}
+
+describe.skipIf(!configured)(SUITE_TITLE, () => {
   let service: SupabaseClient;
   let anon: SupabaseClient;
   let A: Principal;

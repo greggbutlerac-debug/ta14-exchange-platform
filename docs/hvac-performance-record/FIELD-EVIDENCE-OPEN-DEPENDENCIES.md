@@ -222,6 +222,15 @@ separate reviewed PR that:
    with no schema change; and
 4. proves a clean from-scratch apply locally.
 
+**Update 2026-11-20:** the audit and remediation plan are in separate draft
+PR #723 (`docs/audits/2026-11-20-legacy-migration-version-collision-audit.md`),
+which is docs only. It records that alphabetical order inside 4 of the 5
+colliding versions differs from commit order, and that there are real forward
+dependencies (for example, `…_append_bridge` sorts before the `…_foundation`
+table it references), so a mechanical rename is unsafe. No migration file is
+renamed, and no production `schema_migrations` change or `migration repair`
+is proposed as a routine fix.
+
 The HPR migration itself has a unique 14-digit version and depends only on
 `auth.users` and core Postgres, so `hpr-only` mode isolates it from this
 defect.
@@ -260,16 +269,45 @@ created. The route is now an isolated local stack.
   It skips unless the script provides local credentials, and it throws if
   pointed at a non-loopback URL (verified).
 
-**Execution status: NOT RUN.** On the developer Mac (macOS 26.6.2, arm64,
-Homebrew present), these are missing:
-- a Docker-compatible runtime. Install **one** of: Docker Desktop for Mac
-  (Apple silicon) <https://docs.docker.com/desktop/setup/install/mac-install/>,
-  OrbStack (`brew install orbstack`), or Colima (`brew install colima docker`,
-  then `colima start`). Docker Desktop requires admin approval and licence
-  acceptance.
-- the Supabase CLI: `brew install supabase/tap/supabase`.
+**Execution status: RUN LOCALLY, PASS (hpr-only), 2026-11-20.** This is
+local evidence only. It is not a production proof, a production migration or
+a verification of any HPR record.
 
-Then run `scripts/hpr/local-supabase-verify.sh` and attach the printed
-`verify.log` to PR #704. Section 1 of the log records the exact CLI and Docker
-versions. Hosted security and performance advisors may not have a local
-equivalent; the script reports which are available.
+Environment (developer Mac, macOS 26.6.2, arm64), installed with Homebrew:
+- Colima 0.10.3 (vz VM, 4 CPU / 6 GiB): Docker server 29.5.2, Ubuntu 24.04.4
+  aarch64. Docker CLI 29.10.0.
+- Supabase CLI 3.2.0, using these local images: postgres 17.12.0.000,
+  gotrue v2.198.0, postgrest v16.5, kong 2.8.1, storage-api v1.96.0 and
+  realtime v2.167.0.
+
+Isolation evidence:
+- the scratch project is unlinked, with no `supabase/.temp/project-ref`;
+- there are no `SUPABASE_*`, `DATABASE_URL` or `PG*` variables, and no
+  `~/.supabase/access-token`;
+- API and DB URLs are loopback (`127.0.0.1:54321` and `127.0.0.1:54322`), and
+  lint and advisors report `target.kind = local`.
+
+No hosted-project command was run.
+
+| Step | Observed |
+|---|---|
+| Migration history | exactly `20261116200000 hpr_field_evidence_foundation`, applied by `supabase start` with no errors |
+| Verification SQL | sections 1–6: **0 rows**; section 7 `storage_pending_photos = 0` |
+| `supabase db lint --level warning --schema public` | `No schema errors found` (`results: []`) |
+| `supabase db advisors --type all --level info` | **0 security findings.** 4 INFO performance findings, all expected on a fresh, empty database: 3 × `unused_index`, and 1 × `unindexed_foreign_keys` on `hpr_evidence_submissions.step_number` → the locked 14-row `hpr_baseline_steps` (never deleted; lookups use `hpr_evidence_inspection_step_idx`). No migration change was made. |
+| Real GoTrue/PostgREST suite | **11/11 passed** (10 integration cases + loopback guard) |
+| Log credential scan | pass; the script now fails if any JWT, `sb_*` key, DB password or `*KEY` / `*SECRET` / `*TOKEN` value appears unredacted |
+| `full` mode | stops before starting the stack and lists the 22 duplicate-version files (D6) |
+
+Local-environment defects found and fixed in the script (no HPR schema
+change):
+1. CLI 3.x prints `SUBCOMMANDS`, not `Available Commands:`, so lint and
+   advisors were silently skipped on the first run. The script now detects both
+   formats and passes `--local` only where the CLI has it. CLI 3 targets local by
+   default, and `--remote` is never passed.
+2. The first run's log exposed `JWT_SECRET` and the S3 protocol keys of the
+   throwaway local stack. The CLI prints these as JSON (`"NAME":"value"`), which
+   the redaction did not match. They were local-only, the stack was destroyed,
+   and `JWT_SECRET` is the CLI's public default. Redaction now covers JSON and
+   env forms and signed URLs, and the log scan enforces it. The first log was
+   redacted in place.

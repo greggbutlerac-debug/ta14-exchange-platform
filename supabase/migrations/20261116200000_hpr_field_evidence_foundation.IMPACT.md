@@ -1,6 +1,6 @@
 # Object Impact — 20261116200000_hpr_field_evidence_foundation.sql
 
-Status: COMMITTED FOR REVIEW / NOT EXECUTED IN ANY SUPABASE PROJECT
+Status: COMMITTED FOR REVIEW / EXECUTED ONLY ON AN ISOLATED LOCAL STACK (2026-11-20); NOT APPLIED TO ANY HOSTED SUPABASE PROJECT
 
 ## Domain boundary
 HVAC Performance Record (HPR) technician field evidence, increment 1: schema,
@@ -68,10 +68,10 @@ execution authority or Refrigerant Governor capability.
 
 ## Migration review requirements (before any non-local execution)
 - [ ] Independent review (Atlas) of RLS policies, grants and SECURITY DEFINER functions (`search_path = ''` is set on all of them).
-- [ ] Preview branching is unavailable on the current plan, so verify on an **isolated local stack**: `scripts/hpr/local-supabase-verify.sh` (requires Docker + Supabase CLI; not yet installed on the developer Mac). The script applies the migration, runs the verification SQL and the real GoTrue/PostgREST suite, and never uses production credentials.
-- [ ] Full-history from-scratch apply is blocked by pre-existing duplicate migration versions (D6, separate PR).
+- [x] Preview branching is unavailable on the current plan, so verify on an **isolated local stack**: `scripts/hpr/local-supabase-verify.sh`. **Ran 2026-11-20 with Supabase CLI 3.2.0 and Colima / Docker 29.5.2. PASS:** verification SQL 0 findings, lint clean, advisors 0 security findings (4 INFO performance), real GoTrue/PostgREST suite 11/11. This is local evidence only, not production proof. Details: `FIELD-EVIDENCE-OPEN-DEPENDENCIES.md`, local verification section.
+- [ ] Full-history from-scratch apply is blocked by pre-existing duplicate migration versions (D6). Audit and plan are in separate draft PR #723; no migration is renamed.
 - [ ] Alternatively apply to a Supabase **branch / preview project** only. Run `supabase/verification/verify_hpr_field_evidence_privileges.sql` (sections 1–6 must return 0 rows) and the security and performance advisors.
-- [ ] Exercise PostgREST + GoTrue with real tokens per the D2 checklist in `docs/hvac-performance-record/FIELD-EVIDENCE-OPEN-DEPENDENCIES.md`.
+- [x] Exercise PostgREST + GoTrue with real tokens per the D2 checklist (local stack, 2026-11-20). Repeat on any future preview or staging project in `docs/hvac-performance-record/FIELD-EVIDENCE-OPEN-DEPENDENCIES.md`.
 - [ ] Retention / erasure decision (D3, owner + legal). Current fail-closed default is `on delete restrict`. Recommended: a pseudonymous principal plus an erasable mapping, before any production data exists.
 - [ ] Accept technician-scoped equipment identity as **provisional** only. A canonical identity / link / custody model (D5) is required before multi-technician lifetime history.
 - [ ] Confirm the 25 MiB size limit and the image MIME allowlist on `hpr_evidence_storage_objects`.
