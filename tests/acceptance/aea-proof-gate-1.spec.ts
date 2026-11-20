@@ -161,6 +161,18 @@ describe('AEA Proof Gate 1: governed simulation route', () => {
     expect(execution.executionPermitted).toBe(false);
     expect(execution.reasonCodes).toContain('SIM_COMMAND_OUTSIDE_AUTHORIZED_LIMITS');
   });
+  it('KNOWN BOUNDARY: commit ID is not bound to command parameters or command ID', () => {
+    // GCEA commit binds asset/route/consequence/authority/evidence/time,
+    // not the exact simulation command payload. Do not treat it as a
+    // cryptographic authorization for a particular defrost duration.
+    const a = attempt('PG1-COMMIT-A');
+    const b = { ...attempt('PG1-COMMIT-B'), command: command('PG1-COMMIT-B', 25) };
+    const first = submitCommand({ ...a, change: null });
+    const second = submitCommand({ ...b, change: null });
+    expect(first.commitPermitted).toBe(true);
+    expect(second.commitPermitted).toBe(true);
+    expect(first.gcea.commitId).toBe(second.gcea.commitId);
+  });
   it('explicit scope: the harness exposes no public direct-write method', () => {
     const controller = new ControlledFreezer();
     expect('writeDirect' in controller).toBe(false);
