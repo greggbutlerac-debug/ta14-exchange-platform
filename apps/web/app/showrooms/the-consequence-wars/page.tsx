@@ -218,7 +218,7 @@ export default function ConsequenceWarsShowroom() {
         <p style={{ maxWidth: 970, lineHeight: 1.7, padding: 20, background: '#0f2233', border: '1px solid #476b7e', borderRadius: 12, color: '#e5d9c8' }}>
           <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scene 09's green EXECUTE shield is a fictional illustration of prerequisites for justified autonomy, not an authorization of Override or a report that equipment operated. Scene 10 gives the actual outcome of the depicted attack: DENY.
         </p>
-        <a href={'/' + encodeURIComponent('TA14_Consequence_Wars_Episode_1_Production_Bible_v5_Under25MB.pdf')} download style={{ display: 'inline-block', background: '#9be6f8', color: '#082132', padding: '13px 18px', fontWeight: 800, borderRadius: 9, textDecoration: 'none' }}>Download Episode 1 production bible v5 (archival draft PDF)</a>
+        <a href={'/' + encodeURIComponent('TA14_Consequence_Wars_Episode_1_Production_Bible_v6_DENY_Final (1).pdf')} download style={{ display: 'inline-block', background: '#9be6f8', color: '#082132', padding: '13px 18px', fontWeight: 800, borderRadius: 9, textDecoration: 'none' }}>Download Episode 1 production bible v6 (PDF)</a>
       </header>
       <section aria-label="The governing question" style={{ borderTop: '1px solid #21445d', borderBottom: '1px solid #21445d', padding: '24px 0' }}>
         <p style={{ color: '#81dcfb', fontWeight: 800, letterSpacing: 1.5, fontSize: 12 }}>THE CONSEQUENCE GATE</p>
