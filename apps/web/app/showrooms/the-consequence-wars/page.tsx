@@ -107,25 +107,25 @@ const scenes: Scene[] = [
   },
   {
     number: '09',
-    title: 'A New, Bounded Request',
+    title: 'The Boundary Refuses the Bypass',
     image: 'Justified Autonomy_ The Turning Point.png',
-    alt: 'Aegis and Override clash around an illuminated justified-autonomy shield as a new, separately authorized action is considered.',
-    narration: 'A qualified operator must establish the correct actor, role, scope, and approval. The legitimate request is examined again at the instant of execution. Only a new, bounded ALLOW can support the permitted action, subject to local safeguards.',
-    lesson: 'The previous HOLD cannot silently turn into ALLOW, and a denied bypass cannot be revived by changing its label. This scene requires final artwork review because the current battle art visually compresses authorization and execution.',
-    interaction: 'Inspect the requirements of a newly assessed action.',
-    learned: "The earlier HOLD cannot silently become ALLOW, and the denied bypass cannot be rebranded. Any legitimate action requires a fresh execution-time AE/AA/ES assessment.",
-    nextLesson: "Next, distinguish a newly authorized action from its physical outcome. Permission does not demonstrate successful cooling."
+    alt: 'Aegis resists Override at the fictional execution boundary. The existing illustration contains a green execute label that is inconsistent with the denied bypass and awaits replacement.',
+    narration: 'Override demands execution without the required authorization. Aegis refuses the bypass. No favorable prediction can substitute for admissible evidence, applicable authority or established standing at the moment of execution. The malicious command remains denied.',
+    lesson: 'The attempted bypass is DENIED. The separate legitimate cooling need remains unresolved and must not be conflated with Override\'s command. The current illustration incorrectly shows EXECUTE and must be replaced before publication.',
+    interaction: 'Identify why the attempted bypass cannot proceed.',
+    learned: "The execution boundary does not turn a malicious bypass into a permitted action. Override lacks established requirements for this command; the specific attempted execution remains denied.",
+    nextLesson: "Next, witness the result of the confrontation: Aegis stops Override's unauthorized command. The legitimate cooling request remains a separate matter for later review."
   },
   {
     number: '10',
-    title: 'The Outcome Still Requires Verification',
+    title: 'Governance Prevails — Execution Denied',
     image: 'Governance Prevails_ The Execution Boundary.png',
-    alt: 'A cinematic Guardian victory scene contains an illustrative ALLOW display, separate from the denied attack.',
-    narration: 'The cooling response must be observed, not merely assumed. The permitted intervention and its measured effects are separate events. Record the outcome and remaining uncertainty. One incident ends; the boundary remains.',
-    lesson: 'The ALLOW shown in the finale refers only to the independently re-evaluated, legitimate action, never to Override. Success requires separate observation, safety checks, and an attributable outcome record. This finale artwork remains under editorial review.',
-    interaction: 'Review the record and explain what was actually verified.',
-    learned: "The finale's ALLOW applies only to an independently reassessed legitimate action. It does not prove an observed cooling result; that requires measurements, safeguards and an attributable record.",
-    nextLesson: "Episode 1 ends here. Review DENY versus HOLD versus ALLOW, and ask in the next case what was authorized and what outcome was actually verified."
+    alt: 'Aegis defeats Override in a fictional data-center confrontation. The current artwork incorrectly displays ALLOW and must be replaced with the approved execution-denied finale.',
+    narration: 'The command was capable of execution. It was not justified to execute. The boundary held. Override\'s unauthorized command was denied before permitted actuation. The legitimate cooling concern still requires its own evidence, authority, standing and safety response. One incident ends; the boundary remains.',
+    lesson: 'The correct final decision for Override\'s command is DENY, not ALLOW. The illustration currently displays an incorrect green authorization panel and is awaiting replacement. Blocking an attempted command does not, by itself, prove the plant remained safe; actual control and safety outcomes require attributable event evidence.',
+    interaction: 'Explain what the DENY decision establishes and what still requires independent verification.',
+    learned: "The victory is a justified DENY of the unauthorized command. A blocked execution is not proof that the building was cooled or remained safe; outcomes must still be observed and recorded.",
+    nextLesson: "Episode 1 ends here. Override's bypass was DENIED; the separate cooling request remained on HOLD. In the next case, ask which specific command is under review and whether it has sufficient AE, AA and ES now."
   }
 ];
 
@@ -216,7 +216,7 @@ export default function ConsequenceWarsShowroom() {
         <p style={{ color: '#e9c16d', fontWeight: 800, letterSpacing: 1 }}>EPISODE 1 · THE MILLISECOND BETWEEN PERMISSION AND CONSEQUENCE</p>
         <p style={{ maxWidth: 920, lineHeight: 1.75, fontSize: 19, color: '#c9d9e8' }}>A fictional data-center AI recommends action. A fabricated claim and an unauthorized override threaten to turn a recommendation into a real-world consequence. The Guardians examine what is justified to happen now.</p>
         <p style={{ maxWidth: 970, lineHeight: 1.7, padding: 20, background: '#0f2233', border: '1px solid #476b7e', borderRadius: 12, color: '#e5d9c8' }}>
-          <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scenes 09 and 10 contain illustrative artwork requiring editorial correction before publication; the technical explanations below the images state the intended distinction.
+          <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scenes 09 and 10 still display older artwork with incorrect execution labels. Their narrative has been corrected to DENY the malicious command, but the artwork must be replaced before publication.
         </p>
         <a href={'/' + encodeURIComponent('TA14_Consequence_Wars_Episode_1_Production_Bible_v5_Under25MB.pdf')} download style={{ display: 'inline-block', background: '#9be6f8', color: '#082132', padding: '13px 18px', fontWeight: 800, borderRadius: 9, textDecoration: 'none' }}>Download Episode 1 production bible (PDF)</a>
       </header>
@@ -277,7 +277,7 @@ export default function ConsequenceWarsShowroom() {
       </div>
       <footer style={{ paddingTop: 44, lineHeight: 1.8, color: '#c6d8e7' }}>
         <h2 style={{ color: '#f7fbff', fontSize: 34 }}>The boundary remains.</h2>
-        <p>Prediction is not permission. Capability is not authority. Authorized execution is not by itself proof of the physical outcome. The next consequence requires its own evidence, applicable authority, and established standing.</p>
+        <p>Prediction is not permission. Capability is not authority. Override's unauthorized execution was DENIED; the separate legitimate cooling request remained on HOLD. A decision does not by itself prove the building's physical condition.</p>
         <p>Fictional learning experience · Not an operational decision, certification, or proof of a deployed architecture. ACA’s formal technical specification remains open for verification before technical claims are finalized.</p>
         <Link href="/showrooms" style={linkStyle}>Return to all showrooms</Link>
       </footer>
