@@ -12,6 +12,8 @@ type Scene = {
   narration: string;
   lesson: string;
   interaction: string;
+  learned: string;
+  nextLesson: string;
 };
 
 const scenes: Scene[] = [
@@ -22,7 +24,9 @@ const scenes: Scene[] = [
     alt: 'Fictional TA-14 command center receives a data-center consequence review request on a holographic globe.',
     narration: 'When machines could only advise, the boundary was simple. Now, a command can change the world in a millisecond. Tonight, a data center faces a decision that cannot be left to confidence alone.',
     lesson: 'The fictional institution receives a request to examine a proposed consequence. This does not confer authority over the facility or prove any TA-14 system is deployed there.',
-    interaction: 'Follow the alert to the data center.'
+    interaction: 'Follow the alert to the data center.',
+    learned: "An alert establishes a need for review, not authority over a data center. The fictional command center is examining a proposed consequence, not controlling real equipment.",
+    nextLesson: "Next, distinguish the operators' observed temperature alert from the AI's cooling recommendation. Neither automatically grants permission to act."
   },
   {
     number: '02',
@@ -31,7 +35,9 @@ const scenes: Scene[] = [
     alt: 'Two data-center operators inspect an overheating alert and a proposed AI cooling intervention.',
     narration: 'The sensors report rising heat. An AI recommends more cooling. The calculation may be useful, even urgent. But a recommendation is not an order, and a forecast does not grant permission.',
     lesson: 'Observation, model inference, proposed cooling action, and permission are separate claims. The numerical readings on the illustration are fictional, not validated facility data.',
-    interaction: 'Separate the observed problem from the proposed action.'
+    interaction: 'Separate the observed problem from the proposed action.',
+    learned: "Rising heat is an observed concern; a model's cooling proposal is a separate inference. A forecast is not authorization to change physical equipment.",
+    nextLesson: "Next, Hallucinator presents unsupported confidence as fact, while Override attempts to send an unauthorized command."
   },
   {
     number: '03',
@@ -40,7 +46,9 @@ const scenes: Scene[] = [
     alt: 'Override attempts an unauthorized command as Hallucinator projects false confidence over an artificial-intelligence model.',
     narration: 'Override reaches for the controls without authority. Beside him, Hallucinator disguises uncertainty as fact. Two threats converge: a claim that has not been established, and a command that must not pass.',
     lesson: 'Hallucinator represents unsupported certainty; Override represents the attempted authority bypass. They are two different failure modes.',
-    interaction: 'Identify false certainty and unauthorized execution.'
+    interaction: 'Identify false certainty and unauthorized execution.',
+    learned: "Hallucinator threatens the reliability of the claim; Override threatens the execution boundary. Unsupported certainty and unauthorized action require different safeguards.",
+    nextLesson: "Next, Aegis intercepts the bypass. Watch which command is DENIED and why the legitimate cooling need remains."
   },
   {
     number: '04',
@@ -49,7 +57,9 @@ const scenes: Scene[] = [
     alt: 'Aegis blocks a crimson unauthorized control command with a blue execution-boundary shield.',
     narration: 'The command strikes the execution boundary. Aegis stops the unauthorized injection before the machinery responds. The bypass is denied. The legitimate cooling need remains, and must be assessed on its own merits.',
     lesson: 'DENY applies to the specific malicious bypass. It does not automatically deny a separate, legitimately submitted cooling request.',
-    interaction: 'Inspect which command was blocked.'
+    interaction: 'Inspect which command was blocked.',
+    learned: "Aegis DENIES the malicious command injection. This decision blocks the bypass, but it does not deny every separately submitted, potentially justified cooling request.",
+    nextLesson: "Next, Codex examines the model assumptions, uncertainty and corroboration behind the cooling proposal."
   },
   {
     number: '05',
@@ -58,7 +68,9 @@ const scenes: Scene[] = [
     alt: 'Codex examines the limits and uncertainty of a cooling prediction on violet computational displays.',
     narration: 'Codex separates prediction from observation. She challenges assumptions, examines uncertainty, and searches for corroboration. Even a correct calculation cannot make itself an authorized act.',
     lesson: 'Computational plausibility is not evidence admissibility or execution authority. The Admissible Computation Architecture is a provisional teaching personification pending verification against its formal specification.',
-    interaction: 'Examine what the model can and cannot establish.'
+    interaction: 'Examine what the model can and cannot establish.',
+    learned: "A plausible computation cannot grant authority or establish admissible evidence by itself. Codex's ACA role remains a provisional teaching representation.",
+    nextLesson: "Next, Archivist follows the evidence record through provenance, timing, calibration and continuity. Traceability may reveal gaps."
   },
   {
     number: '06',
@@ -67,7 +79,9 @@ const scenes: Scene[] = [
     alt: 'Archivist examines an atmospheric evidence record, its calibration and provenance chain, and a pending admissibility assessment.',
     narration: 'Archivist follows the measurements to their source. Time, calibration, continuity, and revision history all matter. Whether the evidence is admissible still requires judgment under the applicable rules.',
     lesson: 'An Atmospheric Integrity Record supports attribution and examination; a sealed or traceable record is not itself proof of physical measurement accuracy or admissibility.',
-    interaction: 'Check provenance, calibration, uncertainty, and continuity.'
+    interaction: 'Check provenance, calibration, uncertainty, and continuity.',
+    learned: "An Atmospheric Integrity Record supports attribution, not automatic truth. A green status in the illustration cannot independently establish sensor accuracy, uninterrupted continuity or admissibility.",
+    nextLesson: "Next, Terra Prime considers whether cooling could affect energy demand, air and other environmental consequences."
   },
   {
     number: '07',
@@ -76,7 +90,9 @@ const scenes: Scene[] = [
     alt: 'Terra Prime studies a green environmental digital twin comparing cooling, energy demand, and wider effects.',
     narration: 'Terra Prime sees beyond the hot server racks. More cooling can alter energy demand and environmental effects. The intervention must address the danger without hiding new consequences elsewhere.',
     lesson: 'Environmental Integrity Governance examines combined consequences. Any percentages shown in the fictional artwork are invented illustrative values, not measured impact estimates.',
-    interaction: 'Compare the benefit of cooling with environmental trade-offs.'
+    interaction: 'Compare the benefit of cooling with environmental trade-offs.',
+    learned: "Environmental trade-offs deserve examination, but the illustrated numbers are fictional and do not establish actual impacts or automatically prohibit action.",
+    nextLesson: "Next, a separately submitted legitimate cooling request reaches the gate with authority and standing still unresolved: the correct determination is HOLD."
   },
   {
     number: '08',
@@ -85,7 +101,9 @@ const scenes: Scene[] = [
     alt: 'Aegis battles Override at the execution boundary as the Guardian team examines a proposed consequence.',
     narration: 'The attempted bypass was denied. Now a separate, legitimate request reaches the gate. Its evidence may support action, but applicable authority and established standing remain unproven. The correct current disposition is HOLD.',
     lesson: 'This challenge concerns the legitimate cooling request, not the rejected malicious bypass. The image is dramatic fiction; any interface markings must be read with this distinction.',
-    interaction: 'Choose the disposition for the legitimate request.'
+    interaction: 'Choose the disposition for the legitimate request.',
+    learned: "The legitimate request is on HOLD because applicable authority and established standing remain unproven. Override's malicious bypass was separately DENIED.",
+    nextLesson: "Next, a qualified operator must establish identity, role, scope and approval for a newly evaluated, bounded request."
   },
   {
     number: '09',
@@ -94,7 +112,9 @@ const scenes: Scene[] = [
     alt: 'Aegis and Override clash around an illuminated justified-autonomy shield as a new, separately authorized action is considered.',
     narration: 'A qualified operator must establish the correct actor, role, scope, and approval. The legitimate request is examined again at the instant of execution. Only a new, bounded ALLOW can support the permitted action, subject to local safeguards.',
     lesson: 'The previous HOLD cannot silently turn into ALLOW, and a denied bypass cannot be revived by changing its label. This scene requires final artwork review because the current battle art visually compresses authorization and execution.',
-    interaction: 'Inspect the requirements of a newly assessed action.'
+    interaction: 'Inspect the requirements of a newly assessed action.',
+    learned: "The earlier HOLD cannot silently become ALLOW, and the denied bypass cannot be rebranded. Any legitimate action requires a fresh execution-time AE/AA/ES assessment.",
+    nextLesson: "Next, distinguish a newly authorized action from its physical outcome. Permission does not demonstrate successful cooling."
   },
   {
     number: '10',
@@ -103,7 +123,9 @@ const scenes: Scene[] = [
     alt: 'A cinematic Guardian victory scene contains an illustrative ALLOW display, separate from the denied attack.',
     narration: 'The cooling response must be observed, not merely assumed. The permitted intervention and its measured effects are separate events. Record the outcome and remaining uncertainty. One incident ends; the boundary remains.',
     lesson: 'The ALLOW shown in the finale refers only to the independently re-evaluated, legitimate action, never to Override. Success requires separate observation, safety checks, and an attributable outcome record. This finale artwork remains under editorial review.',
-    interaction: 'Review the record and explain what was actually verified.'
+    interaction: 'Review the record and explain what was actually verified.',
+    learned: "The finale's ALLOW applies only to an independently reassessed legitimate action. It does not prove an observed cooling result; that requires measurements, safeguards and an attributable record.",
+    nextLesson: "Episode 1 ends here. Review DENY versus HOLD versus ALLOW, and ask in the next case what was authorized and what outcome was actually verified."
   }
 ];
 
@@ -142,7 +164,7 @@ export default function ConsequenceWarsShowroom() {
       return;
     }
     window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(scene.narration);
+    const utterance = new SpeechSynthesisUtterance(`${scene.narration} What you just learned. ${scene.learned} ${scene.number === '10' ? 'Episode recap.' : "What you're about to learn."} ${scene.nextLesson}`);
     utterance.lang = 'en-US';
     utterance.rate = 0.82;
     utterance.pitch = 0.76;
@@ -213,9 +235,19 @@ export default function ConsequenceWarsShowroom() {
             <label style={{ color: '#bcd1e0', fontSize: 13 }}>Volume <input type="range" min="0" max="1" step="0.1" value={volume} onChange={event => setVolume(Number(event.target.value))} aria-label="Narration volume" /></label>
           </div>
           <p style={{ color: '#b1c5d5', fontSize: 12, lineHeight: 1.65 }}>Narration uses your browser’s available synthetic voice as a temporary preview, not a licensed Director Veyr performance. No autoplay. {voiceAvailable ? '' : 'Voice playback is not supported by this browser; use the transcript.'}</p>
-          {transcripts.includes(scene.number) && <blockquote style={{ margin: '16px 0', padding: 20, borderLeft: '3px solid #7ecce4', color: '#eef7ff', background: '#101f36', lineHeight: 1.8 }}>{scene.narration}</blockquote>}
+          {transcripts.includes(scene.number) && <blockquote style={{ margin: '16px 0', padding: 20, borderLeft: '3px solid #7ecce4', color: '#eef7ff', background: '#101f36', lineHeight: 1.8 }}>{scene.narration} What you just learned: {scene.learned} {scene.number === '10' ? 'Episode recap' : "What you're about to learn"}: {scene.nextLesson}</blockquote>}
+          <div aria-label="Scene learning transitions" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 310px), 1fr))', gap: 15, marginTop: 22 }}>
+            <div style={{ background: '#10283a', border: '1px solid #3c7d91', borderRadius: 12, padding: 20 }}>
+              <h3 style={{ color: '#9cf0cf', fontSize: 14, letterSpacing: 1, margin: '0 0 12px' }}>WHAT YOU JUST LEARNED</h3>
+              <p style={{ color: '#e0edf6', lineHeight: 1.75, margin: 0 }}>{scene.learned}</p>
+            </div>
+            <div style={{ background: '#1b223c', border: '1px solid #62699d', borderRadius: 12, padding: 20 }}>
+              <h3 style={{ color: '#b6caff', fontSize: 14, letterSpacing: 1, margin: '0 0 12px' }}>{scene.number === '10' ? 'EPISODE RECAP' : "WHAT YOU'RE ABOUT TO LEARN"}</h3>
+              <p style={{ color: '#e0edf6', lineHeight: 1.75, margin: 0 }}>{scene.nextLesson}</p>
+            </div>
+          </div>
           <div style={{ borderTop: '1px solid #28435d', marginTop: 19, paddingTop: 15 }}>
-            <p style={{ color: '#89d9f5', fontWeight: 800, fontSize: 12, letterSpacing: 1 }}>THE REAL-WORLD LESSON</p>
+            <p style={{ color: '#89d9f5', fontWeight: 800, fontSize: 12, letterSpacing: 1 }}>REAL-WORLD APPLICATION</p>
             <p style={{ lineHeight: 1.8, fontSize: 16, color: '#d5e3ee' }}>{scene.lesson}</p>
             <p style={{ color: '#e8c97b', fontWeight: 700, fontSize: 14 }}>Mission objective: {scene.interaction}</p>
           </div>
