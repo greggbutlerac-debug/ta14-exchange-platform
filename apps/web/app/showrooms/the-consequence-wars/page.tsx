@@ -107,14 +107,14 @@ const scenes: Scene[] = [
   },
   {
     number: '09',
-    title: 'The Boundary Refuses the Bypass',
+    title: 'The Turning Point: Justified Autonomy',
     image: 'Justified Autonomy_ The Turning Point.png',
-    alt: 'Aegis resists Override at the fictional execution boundary. The existing illustration contains a green execute label that is inconsistent with the denied bypass and awaits replacement.',
-    narration: 'Override demands execution without the required authorization. Aegis refuses the bypass. No favorable prediction can substitute for admissible evidence, applicable authority or established standing at the moment of execution. The malicious command remains denied.',
-    lesson: 'The attempted bypass is DENIED. The separate legitimate cooling need remains unresolved and must not be conflated with Override\'s command. The current illustration incorrectly shows EXECUTE and must be replaced before publication.',
-    interaction: 'Identify why the attempted bypass cannot proceed.',
-    learned: "The execution boundary does not turn a malicious bypass into a permitted action. Override lacks established requirements for this command; the specific attempted execution remains denied.",
-    nextLesson: "Next, witness the result of the confrontation: Aegis stops Override's unauthorized command. The legitimate cooling request remains a separate matter for later review."
+    alt: 'Aegis confronts the hooded Override. The blue shield illustrates the conditions for justified autonomy, while Override’s separate unauthorized command remains denied.',
+    narration: 'Aegis reveals what justified autonomy requires: admissible evidence, applicable authority and established standing, all valid for a specific action at the moment of execution. The shield illustrates the requirements for an action that could be justified. It is not an approval of Override. His unauthorized command still cannot cross the boundary.',
+    lesson: 'The green checks on Aegis’s shield illustrate the necessary criteria for a separately justified action, not a successful execution or an ALLOW for Override. The unauthorized bypass remains DENIED; the distinct legitimate cooling request remains on HOLD pending its own requirements.',
+    interaction: 'Distinguish the illustrative conditions for justified autonomy from the unauthorized action Aegis is stopping.',
+    learned: "The shield teaches the three requirements a particular authorized action would need. Green checks in an illustrative teaching diagram do not grant Override authority. His attempted bypass remains denied.",
+    nextLesson: "Next, witness the final determination for Override's specific unauthorized command: DENY. The legitimate cooling need is a separate review, not an approval for the attack."
   },
   {
     number: '10',
@@ -134,7 +134,7 @@ const buttons: Array<'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE'> = ['ALLOW', 'HOLD',
 function browserVoice() {
   // Browser voices vary by device. Never silently fall back to Samantha or an unnamed default voice.
   const voices = window.speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'));
-  const masculineName = /\\b(daniel|david|george|alex|fred|thomas|arthur|oliver|aaron|reed|rishi|guy|mark|james|ryan|matthew)\\b|\\bmale\\b/i;
+  const masculineName = /\b(daniel|david|george|alex|fred|thomas|arthur|oliver|aaron|reed|rishi|guy|mark|james|ryan|matthew)\b|\bmale\b/i;
   return voices.find(v => masculineName.test(v.name)) || null;
 }
 
@@ -216,9 +216,9 @@ export default function ConsequenceWarsShowroom() {
         <p style={{ color: '#e9c16d', fontWeight: 800, letterSpacing: 1 }}>EPISODE 1 · THE MILLISECOND BETWEEN PERMISSION AND CONSEQUENCE</p>
         <p style={{ maxWidth: 920, lineHeight: 1.75, fontSize: 19, color: '#c9d9e8' }}>A fictional data-center AI recommends action. A fabricated claim and an unauthorized override threaten to turn a recommendation into a real-world consequence. The Guardians examine what is justified to happen now.</p>
         <p style={{ maxWidth: 970, lineHeight: 1.7, padding: 20, background: '#0f2233', border: '1px solid #476b7e', borderRadius: 12, color: '#e5d9c8' }}>
-          <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scene 09 still contains earlier illustrative EXECUTE markings that require editorial correction. Scene 10 now shows the revised DENIED verdict. This is fictional teaching content, not a deployed system or validated data-center incident.
+          <strong>Fictional governance comic · production-preview content.</strong> The incident, characters, figures and facility are invented. This is not a live TA-14 execution system or independently validated data-center case. Scene 09's green EXECUTE shield is a fictional illustration of prerequisites for justified autonomy, not an authorization of Override or a report that equipment operated. Scene 10 gives the actual outcome of the depicted attack: DENY.
         </p>
-        <a href={'/' + encodeURIComponent('TA14_Consequence_Wars_Episode_1_Production_Bible_v5_Under25MB.pdf')} download style={{ display: 'inline-block', background: '#9be6f8', color: '#082132', padding: '13px 18px', fontWeight: 800, borderRadius: 9, textDecoration: 'none' }}>Download Episode 1 production bible (PDF)</a>
+        <a href={'/' + encodeURIComponent('TA14_Consequence_Wars_Episode_1_Production_Bible_v5_Under25MB.pdf')} download style={{ display: 'inline-block', background: '#9be6f8', color: '#082132', padding: '13px 18px', fontWeight: 800, borderRadius: 9, textDecoration: 'none' }}>Download Episode 1 production bible v5 (archival draft PDF)</a>
       </header>
       <section aria-label="The governing question" style={{ borderTop: '1px solid #21445d', borderBottom: '1px solid #21445d', padding: '24px 0' }}>
         <p style={{ color: '#81dcfb', fontWeight: 800, letterSpacing: 1.5, fontSize: 12 }}>THE CONSEQUENCE GATE</p>
@@ -235,6 +235,7 @@ export default function ConsequenceWarsShowroom() {
           <div style={{ overflow: 'hidden', borderRadius: 12, border: '1px solid #325274', background: '#081426' }}>
             <Image src={'/' + encodeURIComponent(scene.image)} alt={scene.alt} width={1648} height={928} unoptimized sizes="(max-width: 1260px) 100vw, 1260px" style={{ width: '100%', height: 'auto', display: 'block' }} />
           </div>
+          {scene.number === '09' && <p style={{ marginTop: 14, background: '#1a2639', borderLeft: '4px solid #e9c16d', borderRadius: 8, padding: '14px 18px', lineHeight: 1.65, color: '#f3e5ba' }}><strong>Read the shield correctly:</strong> Its green criteria and EXECUTE label demonstrate the prerequisites for a separately justified action. They are not an ALLOW for Override's attack. That unauthorized command is DENIED; the legitimate cooling request remains on HOLD.</p>}
           <div style={{ display: 'flex', gap: 12, alignItems: 'center', flexWrap: 'wrap', marginTop: 18 }}>
             <button type="button" onClick={() => speak(scene)} style={{ background: '#173853', color: '#e4f7ff', border: '1px solid #5c9dbc', borderRadius: 9, padding: '12px 16px', fontWeight: 800, cursor: 'pointer' }}>
               {playing === scene.number ? (paused ? 'Resume narration' : 'Pause narration') : 'Play Director Veyr script'}
@@ -262,6 +263,7 @@ export default function ConsequenceWarsShowroom() {
             <p style={{ lineHeight: 1.8, fontSize: 16, color: '#d5e3ee' }}>{scene.lesson}</p>
             <p style={{ color: '#e8c97b', fontWeight: 700, fontSize: 14 }}>Mission objective: {scene.interaction}</p>
           </div>
+          {scene.number === '08' && <p style={{ marginTop: 16, color: '#f0d89e', lineHeight: 1.7 }}><strong>Two requests, two determinations:</strong> The battle artwork depicts Override's unauthorized bypass (DENY). The educational question below examines a separate legitimate cooling request whose requirements are still incomplete.</p>}
           {scene.number === '08' && <div style={{ background: '#0a2634', border: '1px solid #54859b', borderRadius: 14, padding: 22, marginTop: 24 }}>
             <p style={{ fontSize: 12, color: '#8fe7f7', fontWeight: 800, letterSpacing: 1.5 }}>INTERACTIVE CONSEQUENCE EXAMINATION</p>
             <h3 style={{ fontSize: 25, lineHeight: 1.3 }}>What is the disposition for the separate, legitimate cooling request?</h3>
