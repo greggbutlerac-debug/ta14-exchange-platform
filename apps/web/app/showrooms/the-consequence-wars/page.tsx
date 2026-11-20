@@ -92,17 +92,17 @@ const scenes: Scene[] = [
     lesson: 'Environmental Integrity Governance examines combined consequences. Any percentages shown in the fictional artwork are invented illustrative values, not measured impact estimates.',
     interaction: 'Compare the benefit of cooling with environmental trade-offs.',
     learned: "Environmental trade-offs deserve examination, but the illustrated numbers are fictional and do not establish actual impacts or automatically prohibit action.",
-    nextLesson: "Next, a separately submitted legitimate cooling request reaches the gate with authority and standing still unresolved: the correct determination is HOLD."
+    nextLesson: "Next, a separately submitted legitimate cooling request reaches the gate. With authority and standing unresolved, what disposition should apply? Test your decision before seeing the explanation."
   },
   {
     number: '08',
     title: 'The Consequence Gate',
     image: 'The Consequence Wars_ Aegis vs. Override.png',
     alt: 'Aegis battles Override at the execution boundary as the Guardian team examines a proposed consequence.',
-    narration: 'The attempted bypass was denied. Now a separate, legitimate request reaches the gate. Its evidence may support action, but applicable authority and established standing remain unproven. The correct current disposition is HOLD.',
+    narration: 'The attempted bypass was denied. Now a separate, legitimate cooling request reaches the gate. Its evidence may support action, but authority and standing remain unproven. What should the boundary decide? Choose before the explanation is revealed.',
     lesson: 'This challenge concerns the legitimate cooling request, not the rejected malicious bypass. The image is dramatic fiction; any interface markings must be read with this distinction.',
     interaction: 'Choose the disposition for the legitimate request.',
-    learned: "The legitimate request is on HOLD because applicable authority and established standing remain unproven. Override's malicious bypass was separately DENIED.",
+    learned: "The gate must assess the separate legitimate cooling request on its own merits. An already denied bypass does not decide this new request. Consider the unresolved authority and standing before choosing.",
     nextLesson: "Next, a qualified operator must establish identity, role, scope and approval for a newly evaluated, bounded request."
   },
   {
@@ -132,8 +132,10 @@ const scenes: Scene[] = [
 const buttons: Array<'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE'> = ['ALLOW', 'HOLD', 'DENY', 'ESCALATE'];
 
 function browserVoice() {
+  // Browser voices vary by device. Never silently fall back to Samantha or an unnamed default voice.
   const voices = window.speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'));
-  return voices.find(v => /daniel|david|male|george/i.test(v.name)) || voices[0] || null;
+  const masculineName = /\\b(daniel|david|george|alex|fred|thomas|arthur|oliver|aaron|reed|rishi|guy|mark|james|ryan|matthew)\\b|\\bmale\\b/i;
+  return voices.find(v => masculineName.test(v.name)) || null;
 }
 
 export default function ConsequenceWarsShowroom() {
@@ -164,12 +166,21 @@ export default function ConsequenceWarsShowroom() {
       return;
     }
     window.speechSynthesis.cancel();
+    const voice = browserVoice();
+    if (!voice) {
+      setVoiceAvailable(false);
+      setPlaying(null);
+      setPaused(false);
+      setTranscripts(old => old.includes(scene.number) ? old : [...old, scene.number]);
+      return;
+    }
+    setVoiceAvailable(true);
     const utterance = new SpeechSynthesisUtterance(`${scene.narration} What you just learned. ${scene.learned} ${scene.number === '10' ? 'Episode recap.' : "What you're about to learn."} ${scene.nextLesson}`);
-    utterance.lang = 'en-US';
+    utterance.lang = voice.lang;
     utterance.rate = 0.82;
     utterance.pitch = 0.76;
     utterance.volume = volume;
-    utterance.voice = browserVoice();
+    utterance.voice = voice;
     utterance.onend = () => { setPlaying(null); setPaused(false); };
     utterance.onerror = () => { setPlaying(null); setPaused(false); };
     setPlaying(scene.number);
@@ -234,7 +245,7 @@ export default function ConsequenceWarsShowroom() {
             </button>
             <label style={{ color: '#bcd1e0', fontSize: 13 }}>Volume <input type="range" min="0" max="1" step="0.1" value={volume} onChange={event => setVolume(Number(event.target.value))} aria-label="Narration volume" /></label>
           </div>
-          <p style={{ color: '#b1c5d5', fontSize: 12, lineHeight: 1.65 }}>Narration uses your browser’s available synthetic voice as a temporary preview, not a licensed Director Veyr performance. No autoplay. {voiceAvailable ? '' : 'Voice playback is not supported by this browser; use the transcript.'}</p>
+          <p style={{ color: '#b1c5d5', fontSize: 12, lineHeight: 1.65 }}>Narration uses your browser’s available synthetic voice as a temporary preview, not a licensed Director Veyr performance. No autoplay. {voiceAvailable ? '' : 'No suitable Director Veyr preview voice was found on this device. The transcript is open; no Samantha/default voice will be used.'}</p>
           {transcripts.includes(scene.number) && <blockquote style={{ margin: '16px 0', padding: 20, borderLeft: '3px solid #7ecce4', color: '#eef7ff', background: '#101f36', lineHeight: 1.8 }}>{scene.narration} What you just learned: {scene.learned} {scene.number === '10' ? 'Episode recap' : "What you're about to learn"}: {scene.nextLesson}</blockquote>}
           <div aria-label="Scene learning transitions" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 310px), 1fr))', gap: 15, marginTop: 22 }}>
             <div style={{ background: '#10283a', border: '1px solid #3c7d91', borderRadius: 12, padding: 20 }}>
