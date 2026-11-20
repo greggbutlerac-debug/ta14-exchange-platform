@@ -90,7 +90,7 @@ const exhibits: Exhibit[] = [
 ];
 
 const asset = (name: string) => '/' + encodeURIComponent(name);
-const pdf = asset('TA14_Dr_Moya_Hill_Ambassador_Expanded_Review_v2 (1).pdf');
+const pdf = asset('TA14_Dr_Moya_Hill_Ambassador_Expanded_Review_v2 (1).pdf'); // Historical 20-page review; aligned V3 is pending upload.
 const portrait = '/moya-hill-recognition-photo.jpg';
 
 function Narration({ exhibit }: { exhibit: Exhibit }) {
@@ -144,15 +144,15 @@ export default function DrMoyaHillShowroom() {
         <h1>Dr. Moya Hill <em>Governing information before AI relies on it.</em></h1>
         <p className={styles.lead}>Celebrating a governance leader, international speaker, educator, author and creator of the independent Unified Information Governance Model™.</p>
         <p className={styles.independence}>Her professional work remains her own. The honorary TA-14 ambassador designation is not a government appointment, employer endorsement, technical certification or claim of jointly implemented technology.</p>
-        <div className={styles.actions}><a href="#exhibits">Explore eight exhibits</a><a href={pdf} target="_blank" rel="noopener noreferrer" className={styles.outline}>Read 20-page review PDF</a></div>
+        <div className={styles.actions}><a href="#exhibits">Explore eight exhibits</a><a href={pdf} target="_blank" rel="noopener noreferrer" className={styles.outline}>Read original 20-page review PDF</a></div>
       </div><figure className={styles.portrait}><img src={portrait} alt="Dr. Moya Hill, in a professional recognition photograph supplied for editorial review" /><figcaption>Supplied recognition image · Inspiring Women Leaders of 2026. Display pending confirmation of reproduction rights and Dr. Hill’s approval.</figcaption></figure></div>
     </div></header>
     <section className={styles.intro}><div className={styles.wrap}>
       <p className={styles.eyebrow}>ABOUT THE RECOGNITION</p>
       <h2>A career in information stewardship and responsible AI</h2>
       <p>Dr. Hill’s public materials describe a career spanning FOIA, privacy, records leadership, transparency, compliance, risk, and information governance. Her work asks organizations to treat information quality, context and obligations as prerequisites for responsible AI use—not as afterthoughts.</p>
-      <p>This showroom is an independent educational recognition prepared for her review. The images are illustrative, not records of actual projects. Her model and intellectual property are her own. The November 2026 honorary ambassador invitation received a warmly affirmative response, but that is not approval of these final publication materials.</p>
-      <div className={styles.quickLinks}><a href="https://www.linkedin.com/in/dr-moya-hill-912837179/" target="_blank" rel="noopener noreferrer">Dr. Hill’s LinkedIn profile</a><a href="https://drmoyahill.com/" target="_blank" rel="noopener noreferrer">Professional website</a><a href={pdf} target="_blank" rel="noopener noreferrer">Review PDF · 20 pages</a></div>
+      <p>This showroom is an independent educational recognition prepared for her review. The linked 20-page original PDF contains an earlier, broader exhibit sequence; an aligned 11-page V3 review has been prepared separately and must be uploaded before replacing the PDF link. The images are illustrative, not records of actual projects. Her model and intellectual property are her own. The November 2026 honorary ambassador invitation received a warmly affirmative response, but that is not approval of these final publication materials.</p>
+      <div className={styles.quickLinks}><a href="https://drmoyahill.com/" target="_blank" rel="noopener noreferrer">Professional website</a><a href={pdf} target="_blank" rel="noopener noreferrer">Original review PDF · 20 pages</a></div>
     </div></section>
     <section className={styles.chapters} id="exhibits"><div className={styles.wrap}>
       <p className={styles.eyebrow}>THE EDUCATIONAL SERIES</p><h2>Eight distinct exhibits</h2>
@@ -170,7 +170,7 @@ export default function DrMoyaHillShowroom() {
     <section className={styles.close}><div className={styles.wrap}><p className={styles.eyebrow}>EDITORIAL & PUBLICATION BOUNDARIES</p><h2>Distinct work. Independent leadership. Clear attribution.</h2>
       <p>Dr. Hill’s Unified Information Governance Model™ concerns the governance of information and its lifecycle. TA-14’s Admissible Execution Architecture concerns whether evidence, authority and standing justify a proposed consequence at execution time. Those are separately owned concepts. No operational integration, joint product, public-sector endorsement, grant, verified outcome or regulatory status is claimed.</p>
       <p>Her statements are her own and do not represent the Department of Veterans Affairs or any government agency. Portrait rights, biographical wording, model terminology and final public release remain subject to review.</p>
-      <div className={styles.actions}><a href={pdf} target="_blank" rel="noopener noreferrer">Open review PDF</a><Link href="/showrooms" className={styles.outline}>Return to showrooms</Link></div>
+      <div className={styles.actions}><a href={pdf} target="_blank" rel="noopener noreferrer">Open original review PDF</a><Link href="/showrooms" className={styles.outline}>Return to showrooms</Link></div>
     </div></section>
   </main>;
 }
