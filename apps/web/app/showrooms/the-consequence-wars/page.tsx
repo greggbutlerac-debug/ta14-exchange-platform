@@ -133,9 +133,13 @@ const buttons: Array<'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE'> = ['ALLOW', 'HOLD',
 
 function browserVoice() {
   // Browser voices vary by device. Never silently fall back to Samantha or an unnamed default voice.
-  const voices = window.speechSynthesis.getVoices().filter(v => v.lang.toLowerCase().startsWith('en'));
-  const masculineName = /\b(daniel|david|george|alex|fred|thomas|arthur|oliver|aaron|reed|rishi|guy|mark|james|ryan|matthew)\b|\bmale\b/i;
-  return voices.find(v => masculineName.test(v.name)) || null;
+  // The approved preview is an English (UK) male narrator, not Samantha.
+  // Do not select an American voice or silently use the browser default.
+  const voices = window.speechSynthesis.getVoices().filter(v =>
+    /^en[-_]GB$/i.test(v.lang) && !/samantha/i.test(v.name)
+  );
+  const approvedNames = /\b(daniel|oliver|arthur|george|ryan)\b/i;
+  return voices.find(v => approvedNames.test(v.name)) || null;
 }
 
 export default function ConsequenceWarsShowroom() {
@@ -246,7 +250,7 @@ export default function ConsequenceWarsShowroom() {
             </button>
             <label style={{ color: '#bcd1e0', fontSize: 13 }}>Volume <input type="range" min="0" max="1" step="0.1" value={volume} onChange={event => setVolume(Number(event.target.value))} aria-label="Narration volume" /></label>
           </div>
-          <p style={{ color: '#b1c5d5', fontSize: 12, lineHeight: 1.65 }}>Narration uses your browser’s available synthetic voice as a temporary preview, not a licensed Director Veyr performance. No autoplay. {voiceAvailable ? '' : 'No suitable Director Veyr preview voice was found on this device. The transcript is open; no Samantha/default voice will be used.'}</p>
+          <p style={{ color: '#b1c5d5', fontSize: 12, lineHeight: 1.65 }}>Narration uses your browser’s available synthetic voice as a temporary preview, not a licensed Director Veyr performance. No autoplay. {voiceAvailable ? '' : 'No approved British-English narrator voice was found on this device. The transcript is open; no Samantha/default voice will be used.'}</p>
           {transcripts.includes(scene.number) && <blockquote style={{ margin: '16px 0', padding: 20, borderLeft: '3px solid #7ecce4', color: '#eef7ff', background: '#101f36', lineHeight: 1.8 }}>{scene.narration} What you just learned: {scene.learned} {scene.number === '10' ? 'Episode recap' : "What you're about to learn"}: {scene.nextLesson}</blockquote>}
           <div aria-label="Scene learning transitions" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 310px), 1fr))', gap: 15, marginTop: 22 }}>
             <div style={{ background: '#10283a', border: '1px solid #3c7d91', borderRadius: 12, padding: 20 }}>
