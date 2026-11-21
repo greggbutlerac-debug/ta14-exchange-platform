@@ -86,7 +86,7 @@ const scenes: Scene[] = [
   {
     number: '07',
     title: 'Tara Prime Sees the Trade-off',
-    image: 'Tara Prime_ Environmental Consequences.png',
+    image: 'Terra Prime_ Environmental Consequences.png',
     alt: 'Tara Prime studies a green environmental digital twin comparing cooling, energy demand, and wider effects.',
     narration: 'Tara Prime sees beyond the hot server racks. More cooling can alter energy demand and environmental effects. The intervention must address the danger without hiding new consequences elsewhere.',
     lesson: 'Environmental Integrity Governance examines combined consequences. Any percentages shown in the fictional artwork are invented illustrative values, not measured impact estimates.',
