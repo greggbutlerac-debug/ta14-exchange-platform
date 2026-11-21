@@ -129,6 +129,12 @@ const scenes: Scene[] = [
   }
 ];
 
+const academyCases = [
+  { title: 'Evidence is not yet admissible', question: 'A proposed consequence is supported by an observation, but source attribution or record continuity is missing. What should happen before execution?', correct: 'HOLD', explanation: 'HOLD: the evidence gap must be resolved and examined before execution. Missing attribution or continuity is not cured by confidence.' },
+  { title: 'The actor exceeds authority', question: 'The record is current and reliable, but the proposed consequence falls outside the actor’s applicable authority. What is the supported determination?', correct: 'DENY', explanation: 'DENY: reliable evidence does not confer authority. A new, separately authorized request would require its own assessment.' },
+  { title: 'A higher authority is required', question: 'The proposed consequence triggers a documented requirement for review by another designated authority. What is the appropriate route?', correct: 'ESCALATE', explanation: 'ESCALATE: refer to the designated authority under the applicable rule. Escalation itself is not permission to actuate.' }
+] as const;
+
 const buttons: Array<'ALLOW' | 'HOLD' | 'DENY' | 'ESCALATE'> = ['ALLOW', 'HOLD', 'DENY', 'ESCALATE'];
 
 function browserVoice() {
@@ -147,6 +153,8 @@ export default function ConsequenceWarsShowroom() {
   const [paused, setPaused] = useState(false);
   const [volume, setVolume] = useState(0.9);
   const [choice, setChoice] = useState<string | null>(null);
+  const [academyChoices, setAcademyChoices] = useState<Record<number, string>>({});
+  const [academyRevealed, setAcademyRevealed] = useState(false);
   const [transcripts, setTranscripts] = useState<string[]>([]);
   const [voiceAvailable, setVoiceAvailable] = useState(true);
 
@@ -281,6 +289,23 @@ export default function ConsequenceWarsShowroom() {
           </div>
         </section>)}
       </div>
+      <section aria-labelledby="academy-heading" style={{ marginTop: 44, background: '#0b1629', border: '1px solid #3d6382', borderRadius: 18, padding: 24 }}>
+        <p style={{ color: '#8cddfa', fontWeight: 800, letterSpacing: 1.5 }}>TA-14 ACADEMY · INDEPENDENT REVIEW CHALLENGE</p>
+        <h2 id="academy-heading" style={{ fontSize: 32 }}>Can you defend the determination?</h2>
+        <p style={{ lineHeight: 1.75 }}>Apply the governance principles to three hypothetical cases. These examples do not issue real-world authorization.</p>
+        {academyCases.map((item, index) => <fieldset key={item.title} style={{ border: '1px solid #345471', borderRadius: 12, padding: 20, marginTop: 18 }}>
+          <legend style={{ color: '#e9c16d', fontWeight: 800 }}>CASE {String(index + 1).padStart(2, '0')}</legend>
+          <h3 style={{ fontSize: 22 }}>{item.title}</h3>
+          <p style={{ lineHeight: 1.75 }}>{item.question}</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 10 }}>{buttons.map(option => <button key={option} type="button" aria-pressed={academyChoices[index] === option} onClick={() => { setAcademyChoices(old => ({ ...old, [index]: option })); setAcademyRevealed(false); }} style={{ padding: '12px 16px', borderRadius: 8, cursor: 'pointer', border: '1px solid #779eb5', background: academyChoices[index] === option ? '#f2d18e' : '#153247', color: academyChoices[index] === option ? '#10202a' : '#f0f8ff', fontWeight: 800 }}>{option}</button>)}</div>
+          {academyRevealed && <p aria-live="polite" style={{ lineHeight: 1.7, color: academyChoices[index] === item.correct ? '#95f5c4' : '#f0d59f' }}>{academyChoices[index] === item.correct ? 'Correct. ' : academyChoices[index] ? 'Review this determination. ' : 'No answer selected. '}{item.explanation}</p>}
+        </fieldset>)}
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: 12, marginTop: 22 }}>
+          <button type="button" onClick={() => setAcademyRevealed(true)} style={{ padding: '13px 18px', borderRadius: 9, background: '#9be6f8', color: '#082132', fontWeight: 800, cursor: 'pointer' }}>REVEAL THE EXAMINATION</button>
+          <button type="button" onClick={() => { setAcademyChoices({}); setAcademyRevealed(false); }} style={{ padding: '13px 18px', borderRadius: 9, background: '#173853', color: '#fff', border: '1px solid #5c9dbc', cursor: 'pointer' }}>RESET CHALLENGE</button>
+        </div>
+        <p style={{ fontSize: 13, color: '#b1c5d5', lineHeight: 1.7 }}>Independent educational examples only. Actual governance determinations require case-specific evidence, applicable authority, established standing, and bounded review.</p>
+      </section>
       <footer style={{ paddingTop: 44, lineHeight: 1.8, color: '#c6d8e7' }}>
         <h2 style={{ color: '#f7fbff', fontSize: 34 }}>The boundary remains.</h2>
         <p>Prediction is not permission. Capability is not authority. Override's unauthorized execution was DENIED; the separate legitimate cooling request remained on HOLD. A decision does not by itself prove the building's physical condition.</p>
