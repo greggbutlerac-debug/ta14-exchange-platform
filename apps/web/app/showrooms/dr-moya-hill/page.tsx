@@ -145,14 +145,14 @@ export default function DrMoyaHillShowroom() {
         <p className={styles.lead}>Celebrating a governance leader, international speaker, educator, author and creator of the independent Unified Information Governance Model™.</p>
         <p className={styles.independence}>Her professional work remains her own. The honorary TA-14 ambassador designation is not a government appointment, employer endorsement, technical certification or claim of jointly implemented technology.</p>
         <div className={styles.actions}><a href="#exhibits">Explore eight exhibits</a><a href={pdf} target="_blank" rel="noopener noreferrer" className={styles.outline}>Read aligned 11-page V3 PDF</a></div>
-      </div><figure className={styles.portrait}><img src={portrait} alt="Dr. Moya Hill, in a professional recognition photograph supplied for editorial review" /><figcaption>Supplied recognition image · Inspiring Women Leaders of 2026. Display pending confirmation of reproduction rights and Dr. Hill’s approval.</figcaption></figure></div>
+      </div></div>
     </div></header>
-    <section className={styles.intro}><div className={styles.wrap}>
+    <section className={styles.intro}><div className={styles.wrap}><div className={styles.introGrid}><div className={styles.introCopy}>
       <p className={styles.eyebrow}>ABOUT THE RECOGNITION</p>
       <h2>A career in information stewardship and responsible AI</h2>
       <p>Dr. Hill’s public materials describe a career spanning FOIA, privacy, records leadership, transparency, compliance, risk, and information governance. Her work asks organizations to treat information quality, context and obligations as prerequisites for responsible AI use—not as afterthoughts.</p>
       <p>This showroom is an independent educational recognition prepared for her review. The linked 11-page V3 PDF follows the same eight-exhibit sequence used here. The images are illustrative, not records of actual projects. Her model and intellectual property are her own. The November 2026 honorary ambassador invitation received a warmly affirmative response, but that is not approval of these final publication materials.</p>
-      <div className={styles.quickLinks}><a href="https://drmoyahill.com/" target="_blank" rel="noopener noreferrer">Professional website</a><a href={pdf} target="_blank" rel="noopener noreferrer">Aligned review PDF · 11 pages</a></div>
+      <div className={styles.quickLinks}><a href="https://drmoyahill.com/" target="_blank" rel="noopener noreferrer">Professional website</a><a href={pdf} target="_blank" rel="noopener noreferrer">Aligned review PDF · 11 pages</a></div></div><figure className={styles.portrait}><img src={portrait} alt="Dr. Moya Hill, in a professional recognition photograph supplied for editorial review" /><figcaption>Supplied recognition image · Inspiring Women Leaders of 2026. Display pending confirmation of reproduction rights and Dr. Hill’s approval.</figcaption></figure></div>
     </div></section>
     <section className={styles.chapters} id="exhibits"><div className={styles.wrap}>
       <p className={styles.eyebrow}>THE EDUCATIONAL SERIES</p><h2>Eight distinct exhibits</h2>
