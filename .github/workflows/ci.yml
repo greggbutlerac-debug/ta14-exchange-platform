@@ -50,5 +50,14 @@ jobs:
       - name: Run automated tests
         run: npm test
 
+      # CI has no local Supabase stack, so the HPR GoTrue/PostgREST integration
+      # suite is skipped here. Say so explicitly: skipped is not passed.
+      - name: Report HPR local Supabase integration status
+        if: ${{ env.HPR_LOCAL_SUPABASE_URL == '' }}
+        run: |
+          echo "::warning title=HPR local Supabase integration NOT EXECUTED::10 GoTrue/PostgREST integration tests were skipped in CI (no local stack). Skipped is not passed and is not authorization evidence. Run scripts/hpr/local-supabase-verify.sh and attach verify.log."
+          echo "### HPR local Supabase integration: NOT EXECUTED in CI" >> "$GITHUB_STEP_SUMMARY"
+          echo "10 integration tests were skipped (no local stack). Skipped is not passed. Evidence comes only from \`scripts/hpr/local-supabase-verify.sh\` logs." >> "$GITHUB_STEP_SUMMARY"
+
       - name: Build production application
         run: npm run build
