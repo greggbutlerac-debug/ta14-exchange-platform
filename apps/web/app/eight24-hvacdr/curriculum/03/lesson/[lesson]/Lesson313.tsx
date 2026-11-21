@@ -1,0 +1,54 @@
+'use client';
+import {useState} from 'react';
+
+const narration=[
+ 'Welcome to Lesson 3.13, Airflow, Coil and Moisture Interaction. These conditions cannot be interpreted as independent variables. A proposed adjustment can improve one observed outcome while worsening another.',
+ 'Airflow carries sensible and latent loads to the cooling coil. Coil surface conditions influence the exchange of heat and water vapor. Runtime and control logic determine how long those interactions occur.',
+ 'A pressure measurement may help describe an airside condition, but it does not independently prove airflow. A temperature difference may help describe sensible cooling, but it does not independently establish moisture removal.',
+ 'A wet coil or visible condensate confirms moisture is present or has condensed in the observed context. It does not establish the latent rate or that the occupied space is being adequately dehumidified.',
+ 'Reducing airflow can change coil temperature, sensible heat transfer and moisture behavior. But it can also create operating risks or violate manufacturer limits. Never recommend or perform that change from a single humidity complaint.',
+ 'Increasing airflow may change air distribution and sensible performance while also changing coil contact conditions and moisture removal. The actual consequence depends on equipment, controls and measured conditions.',
+ 'Consider a homeowner who reports a cool but clammy home. The technician records the complaint and indoor readings, then verifies the airflow path, operating state, return and supply temperatures, moisture conditions, runtime and manufacturer constraints.',
+ 'If the coil is dirty, that observation belongs in the evidence record. It does not by itself prove the measured airflow, refrigerant condition or cause of the humidity complaint.',
+ 'If the blower is operating at a documented speed, that establishes the command or setting. It does not establish delivered CFM without a supported method.',
+ 'When readings come from different operating states or different test boundaries, preserve them separately. Do not combine incompatible measurements into a confident performance conclusion.',
+ 'The proper decision is sometimes HOLD: preserve the evidence, identify the missing measurement and continue the baseline. An unsupported intervention is not justified simply because it might help.',
+ 'The technician performs inspections and collects authentic evidence. The HVAC Analyzer issues the formal DDD only after all fourteen baseline steps are complete and frozen. NIRET and the independent Refrigerant Governor govern later refrigerant entry when applicable.',
+ 'The objective is to reason across interacting consequences while maintaining clear evidence, authority and uncertainty boundaries.'
+];
+const interactions=[
+ ['AIRFLOW → COIL','Changes in airflow alter the air delivered to the coil and may affect temperatures, coil surface conditions and operating limits.'],
+ ['COIL → MOISTURE','Condensation depends on air moisture conditions and coil surface state; visible water does not quantify removal.'],
+ ['RUNTIME → OUTCOME','Control strategy and cycle duration influence the time available for moisture removal and indoor results.'],
+ ['STATIC PRESSURE ≠ CFM','Pressure is evidence about a defined pressure boundary; it is not automatically a measured flow rate.'],
+ ['DELTA T ≠ TOTAL CAPACITY','Temperature difference alone does not establish total cooling or latent performance.'],
+ ['PROPOSED CHANGE → CONSEQUENCES','Before any intervention, establish manufacturer constraints, evidence, authority and potential unintended effects.']
+] as const;
+const cases=[
+ {id:'reduce',name:'LOWER BLOWER SPEED',observation:'Indoor RH is reported high, but delivered airflow and manufacturer blower limits have not been verified.',risk:'Changing blower speed may alter coil conditions and equipment operation; benefit and safety are unproven.',next:'HOLD the adjustment. Verify airflow, operating state, manufacturer constraints and paired temperature/moisture evidence.'},
+ {id:'coil',name:'DIRTY COIL OBSERVED',observation:'A photograph shows apparent debris on a coil. Static pressure and airflow measurements have not been validated.',risk:'Appearance alone does not quantify restriction, moisture removal or the root cause of the complaint.',next:'Record the observation, verify safe inspection and applicable measurements, and complete the baseline before a determination.'},
+ {id:'cycle',name:'SHORT CYCLES · CLAMMY ROOM',observation:'The thermostat reaches setpoint; occupants report clamminess and short cooling cycles. A verified humidity trend is unavailable.',risk:'The cause could involve controls, loads, airflow, moisture sources or other conditions; refrigerant fault is not established.',next:'Verify time-stamped indoor conditions, runtime, controls, airflow and moisture-load context before interpreting performance.'}
+] as const;
+const questions=[
+ {q:'Why must airflow, coil and moisture be evaluated together?',o:['They have no effect on one another','Changing one can influence the others and the overall system outcome','A single static pressure reading measures all three'],a:1,why:'The interactions can create tradeoffs and unintended consequences.'},
+ {q:'Does a blower speed setting establish actual CFM?',o:['Yes, always','Only if the thermostat reaches setpoint','No, delivered airflow needs a supported measurement or estimate'],a:2,why:'A setting is not a verified delivered flow rate.'},
+ {q:'A dirty-looking coil photograph proves:',o:['An observed surface condition, not a quantified airflow or moisture-performance failure','The refrigerant charge is low','The latent capacity is zero'],a:0,why:'Visual evidence must not be extended beyond its boundary.'},
+ {q:'High indoor RH alone authorizes lowering blower speed.',o:['True','False'],a:1,why:'Intervention requires verified conditions, applicable constraints and authority.'},
+ {q:'What is justified when critical measurements are missing?',o:['Complete the baseline and HOLD unsupported conclusions or changes','Declare a failed coil','Adjust refrigerant charge'],a:0,why:'Missing admissible evidence cannot support a formal determination or intervention.'}
+];
+const panel={padding:24,border:'1px solid #173746',borderRadius:16,background:'#06121a'} as const;
+export default function Lesson313(){
+ const [caseId,setCaseId]=useState<(typeof cases)[number]['id']>('reduce');
+ const [notes,setNotes]=useState(''),[reveal,setReveal]=useState(false);
+ const [answers,setAnswers]=useState<Record<number,number>>({}),[submitted,setSubmitted]=useState(false);
+ const current=cases.find(c=>c.id===caseId)??cases[0];
+ const score=questions.reduce((n,q,i)=>n+(answers[i]===q.a?1:0),0);
+ return <div style={{display:'grid',gap:24,marginBottom:30}}>
+ <section style={panel}><b style={{color:'#efc86c'}}>LEARNING OBJECTIVE</b><p style={{color:'#d6e7ed',lineHeight:1.8}}>Explain the coupled effects of airflow, coil conditions, moisture and runtime; identify the evidence and authority needed before changing an operating variable.</p></section>
+ <section style={panel}><b style={{color:'#efc86c'}}>SAMANTHA · FULL TEXT READ-ALONG</b><p style={{color:'#a9bdc6',fontSize:13}}>Written narration for review. Recorded audio and synchronized playback are not integrated.</p>{narration.map((p,i)=><p key={i} style={{color:'#d6e7ed',fontSize:17,lineHeight:1.9,margin:'20px 0'}}>{p}</p>)}</section>
+ <section style={panel}><b style={{color:'#efc86c'}}>SIX INTERACTION BOUNDARIES</b>{interactions.map((x,i)=><details key={i} style={{padding:'15px 0',borderBottom:'1px solid #173746'}}><summary style={{cursor:'pointer',fontWeight:800,color:'#70dcff'}}>{i+1}. {x[0]}</summary><p style={{color:'#d6e7ed',lineHeight:1.8}}>{x[1]}</p></details>)}</section>
+ <section style={panel}><b style={{color:'#efc86c'}}>GUIDED CONSEQUENCE EXAMINATION</b><p style={{color:'#a9bdc6'}}>Select a hypothetical situation. Document the observation, potential interactions, missing evidence and decision boundary before revealing the suggested review.</p><div style={{display:'flex',flexWrap:'wrap',gap:10}}>{cases.map(c=><button key={c.id} aria-pressed={caseId===c.id} onClick={()=>{setCaseId(c.id);setNotes('');setReveal(false)}} style={{padding:12,borderRadius:8,border:'1px solid #285b78',background:caseId===c.id?'#16435c':'#0b2030',color:'#edf5f8',cursor:'pointer'}}>{c.name}</button>)}</div><p style={{color:'#d6e7ed',lineHeight:1.8}}>{current.observation}</p><label style={{display:'grid',gap:8,color:'#d6e7ed'}}>Your evidence and consequence record<textarea rows={5} value={notes} onChange={e=>setNotes(e.target.value)} style={{padding:12,background:'#02070c',border:'1px solid #285b78',color:'#edf5f8',borderRadius:8,width:'100%'}} placeholder="Observed: ... Possible interacting consequences: ... Missing evidence: ... Decision: ..."/></label><button onClick={()=>setReveal(x=>!x)} style={{padding:12,borderRadius:8,cursor:'pointer'}}>{reveal?'HIDE':'REVEAL'} REVIEW</button>{reveal&&<div style={{color:'#70dcff',lineHeight:1.8}}><p><strong>Consequence boundary:</strong> {current.risk}</p><p><strong>Next admissible step:</strong> {current.next}</p></div>}<p style={{color:'#a9bdc6',fontSize:13}}>Training simulation only. Notes are not persisted; do not enter customer-identifying data.</p></section>
+ <section style={panel}><b style={{color:'#efc86c'}}>INDEPENDENT REVIEW · FIVE QUESTIONS</b>{questions.map((q,i)=><fieldset key={i} style={{border:0,borderTop:'1px solid #173746',padding:'20px 0'}}><legend style={{fontWeight:800,paddingTop:10}}>{i+1}. {q.q}</legend>{q.o.map((o,j)=><label key={j} style={{display:'flex',gap:12,padding:'9px 0',color:'#d6e7ed'}}><input type="radio" name={'m03-313-'+i} checked={answers[i]===j} disabled={submitted} onChange={()=>setAnswers(v=>({...v,[i]:j}))}/>{o}</label>)}{submitted&&<p style={{color:answers[i]===q.a?'#8fe0bf':'#efc86c'}}>{answers[i]===q.a?'SUPPORTED':'REVIEW REQUIRED'} — {q.why}</p>}</fieldset>)}{submitted?<><p style={{fontWeight:800}}>Practice score: {score} / {questions.length}</p><button onClick={()=>{setAnswers({});setSubmitted(false)}} style={{padding:12,cursor:'pointer'}}>RETRY</button></>:<button disabled={Object.keys(answers).length!==questions.length} onClick={()=>setSubmitted(true)} style={{padding:'12px 18px',borderRadius:10,background:'#7BAFD4',color:'#001426',fontWeight:900,cursor:'pointer',opacity:Object.keys(answers).length===questions.length?1:.5}}>CHECK ANSWERS</button>}<p style={{color:'#a9bdc6',fontSize:13}}>Local practice only. No persisted grade, DDD or intervention authorization.</p></section>
+ <section style={panel}><b style={{color:'#70dcff'}}>HANDOFF → LESSON 3.14</b><p style={{color:'#a9bdc6',lineHeight:1.8}}>Next, use a guided practice environment to connect airside and moisture observations into an evidence sequence before making a determination.</p></section>
+ </div>;
+}
