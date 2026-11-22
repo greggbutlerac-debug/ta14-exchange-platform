@@ -194,7 +194,7 @@ export default function DrMoyaHillShowroom() {
     <section className={styles.publication} id="publication"><div className={styles.wrap}>
       <p className={styles.eyebrow}>THE INDEPENDENT COMPANION PUBLICATION</p>
       <h2>Governing information <em>before AI relies on it.</em></h2>
-      <p>Explore the aligned eleven-page review PDF. It follows all eight approved exhibits and provides the teaching points, visual sequence, attribution notes, and publication review checklist.</p>
+      <p>Explore the aligned eleven-page review PDF. It follows all eight educational exhibits and provides the teaching points, visual sequence, attribution notes, and publication review checklist.</p>
       <a href={pdf} target="_blank" rel="noopener noreferrer">Read the companion PDF ↗</a>
     </div></section>
     <section className={styles.close}><div className={styles.wrap}><p className={styles.eyebrow}>EDITORIAL & PUBLICATION BOUNDARIES</p><h2>Distinct work. Independent leadership. Clear attribution.</h2>
