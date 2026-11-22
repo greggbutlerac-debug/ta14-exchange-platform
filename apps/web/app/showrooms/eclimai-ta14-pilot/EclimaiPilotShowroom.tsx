@@ -23,7 +23,8 @@ export default function EclimaiPilotShowroom(){
   if(typeof window==='undefined'||!('speechSynthesis' in window))return;
   window.speechSynthesis.cancel();
   if(playing===id){setPlaying(null);return;}
-  const u=new SpeechSynthesisUtterance('Exhibit '+id+'. '+title+'. '+description+' All data and diagrams are illustrative. No deployed integration or validated result is claimed.');
+  const lesson=transitions[Number(id)-1];
+  const u=new SpeechSynthesisUtterance('Exhibit '+id+'. '+title+'. '+description+' Here is what you just learned. '+lesson[0]+' Here is what you will learn next. '+lesson[1]+' All data and diagrams are illustrative. No deployed integration or validated result is claimed.');
   const voices=window.speechSynthesis.getVoices();
   u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en-US'))||null;
   u.rate=.87;u.onend=()=>setPlaying(null);u.onerror=()=>setPlaying(null);
