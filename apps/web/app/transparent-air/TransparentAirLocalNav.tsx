@@ -8,7 +8,7 @@ const localPages = [
   { href: '/transparent-air/ac-not-working', label: 'AC Not Working' },
   { href: '/transparent-air/ac-not-cooling', label: 'AC Not Cooling' },
   { href: '/transparent-air/heat-pump-not-working', label: 'Heat Pump Not Working' },
-  { href: '/transparent-air/told-you-need-new-ac', label: 'Told You Need a New AC? · $80 Second Opinion' },
+  { href: '/transparent-air/told-you-need-new-ac', label: 'Told You Need a New AC? · $49 Second Opinion' },
   { href: '/transparent-air/gulfport-ac-repair', label: 'Gulfport AC Repair' },
   { href: '/transparent-air/south-st-petersburg-ac-repair', label: 'South St. Petersburg AC Repair' },
   { href: '/transparent-air/maximo-pinellas-point-ac-repair', label: 'Maximo / Pinellas Point · 33711 AC Repair' },
