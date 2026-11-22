@@ -44,6 +44,17 @@ describe('Proof Gate 2: fail-closed reservation-before-execution adapter', () =>
     expect(adapter.execute(ticket, request)).toMatchObject({ allowed: false, reason: 'DUPLICATE_DURABLE_RESERVATION', state: 0 });
   });
 
+  it('invalid ticket preflight cannot reserve a command ID', () => {
+    const directory = newDirectory();
+    const request = proofFixture('RESERVED-FORGED');
+    const emulator = new CommandBoundEmulator();
+    const ticket = emulator.authorize(request)!;
+    const ledger = new LocalHostReservationLedger(directory);
+    const adapter = new ReservedExecutionAdapter(emulator, ledger);
+    expect(adapter.execute({ ...ticket, token: 'forged' }, request)).toMatchObject({ allowed: false, state: 0 });
+    expect(ledger.inspect(request.command.commandId)).toBeNull();
+    expect(adapter.execute(ticket, request)).toMatchObject({ allowed: true, state: 1 });
+  });
   it('does not permit a changed payload after an earlier reservation', () => {
     const directory = newDirectory();
     const request = proofFixture('RESERVED-SWAP');
