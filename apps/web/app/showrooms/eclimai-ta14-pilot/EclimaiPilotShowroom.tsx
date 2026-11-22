@@ -46,7 +46,13 @@ export default function EclimaiPilotShowroom(){
    {exhibits.map(([id,title,image,description])=><article className="eclExhibit" key={id} id={'exhibit-'+id}>
     <div className="eclHeading"><span>{id}</span><h3>{title}</h3></div>
     {(id==='05'||id==='07'||id==='08')&&<aside className="eclPreImageNotice" role="note"><strong>Important illustration correction:</strong> {id==='05'?'The calculations and performance figures pictured below are illustrative, not validated measurements.':id==='07'?'The picture below may contain the word “approved.” That wording is incorrect: no pilot or partner endorsement has been approved.': 'This is a separate hypothetical verification scenario, not a continuation of the HOLD in Exhibit 07. Its numbers are not validated.'}</aside>}
-    <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration'} loading="lazy"/><figcaption>ILLUSTRATIVE / SYNTHETIC · NOT LIVE ECLIMAI OR TA-14 MEASUREMENT</figcaption></figure>
+    {(id==='05'||id==='07'||id==='08')?
+    <figure className="eclSafeDiagram" aria-label={title+' — corrected conceptual schematic'}>
+      <div className="eclDiagramTitle">{id==='05'?'THERMAL PERFORMANCE: REQUIRED EVIDENCE':id==='07'?'EXECUTION GOVERNANCE: UNAPPROVED CONCEPT':'POST-ACTION VERIFICATION: SEPARATE SCENARIO'}</div>
+      <div className="eclDiagramFlow">{(id==='05'?['Measured electrical input','Independently measured thermal output','Documented calculation + uncertainty']:id==='07'?['Optimizer proposes','AEA checks evidence, authority, standing','Missing evidence → HOLD']:['Separately authorized command','Observed equipment response','Independent environmental outcome']).map((step,i)=><div className="eclDiagramNode" key={step}><span>{String(i+1).padStart(2,'0')}</span><strong>{step}</strong></div>)}</div>
+      <figcaption>CONCEPTUAL SCHEMATIC · NO PILOT APPROVAL · NO VALIDATED RESULTS</figcaption>
+    </figure>:
+    <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration'} loading="lazy"/><figcaption>ILLUSTRATIVE / SYNTHETIC · NOT LIVE ECLIMAI OR TA-14 MEASUREMENT</figcaption></figure>}
     <p>{description}</p>
     {id==='05'&&<p className="eclCorrection"><strong>Engineering limitation:</strong> The numerical thermal-performance illustration is not a validated calculation. Do not interpret depicted kW, BTU/h, efficiency or savings as measured results.</p>}
     {id==='07'&&<p className="eclCorrection"><strong>Approval correction:</strong> Any wording embedded in the image suggesting an “approved” pilot is incorrect. No joint pilot, field authorization or EclimAi endorsement has been granted. This is a synthetic HOLD teaching case.</p>}
