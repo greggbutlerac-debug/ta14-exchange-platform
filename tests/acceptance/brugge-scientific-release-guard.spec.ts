@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -41,6 +41,17 @@ describe('Brugge scientific review release guard', () => {
     }
     expect(challenge).toContain('Four fictional governance situations');
     expect(challenge).toContain('not experiments, findings, or endorsements');
+  });
+
+  it('references twelve existing image assets and an existing PDF in the public directory', () => {
+    const publicDir = resolve(process.cwd(), 'apps/web/public');
+    const images = [...page.matchAll(/image: '([^']+\\.png)'/g)].map(m => m[1]);
+    expect(images).toHaveLength(12);
+    for (const filename of images) {
+      expect(existsSync(resolve(publicDir, filename)), 'Missing exhibit asset: ' + filename).toBe(true);
+    }
+    const pdf = 'TA14_Brugge_Research_Examination_v4_Editorial_Corrected (2).pdf';
+    expect(existsSync(resolve(publicDir, pdf)), 'Missing review PDF').toBe(true);
   });
 
   it('does not insert deployment preview hosts into the tracked checklist', () => {
