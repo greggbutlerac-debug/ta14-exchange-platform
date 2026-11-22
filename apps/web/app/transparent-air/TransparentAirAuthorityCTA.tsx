@@ -27,7 +27,7 @@ export default function TransparentAirAuthorityCTA() {
           <div className="ta-authority-kicker">Transparent Air · 4.9★ Google rating · 115 reviews</div>
           <h2 className="ta-authority-title">St. Petersburg AC service, backed by experience.</h2>
           <p className="ta-authority-copy" style={{marginBottom:10,fontWeight:900,color:'#f3d98f'}}>
-            Need a second opinion before replacing your AC? Ask about our $80 diagnostic visit.
+            Need a second opinion before replacing your AC? Ask about our $49 diagnostic visit.
           </p>
           <p className="ta-authority-copy">
             Transparent Air serves South Pinellas County with practical air-conditioning diagnostics and service. Founded by Greggory Don Butler, also founder of TA14 Academy. Explore our reviews or call to discuss your system.
@@ -54,7 +54,7 @@ export default function TransparentAirAuthorityCTA() {
             SEARCH OUR HVAC BACKGROUND ↗
           </a>
           <Link className="ta-authority-btn verify" href="/transparent-air/second-opinion">
-            EXPLORE THE $80 SECOND OPINION →
+            EXPLORE THE $49 SECOND OPINION →
           </Link>
           <a className="ta-authority-btn call" href={PRIMARY_PHONE_HREF}>
             CALL TRANSPARENT AIR · {PRIMARY_PHONE_DISPLAY}
