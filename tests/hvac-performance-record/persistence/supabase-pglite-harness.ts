@@ -8,7 +8,8 @@
  * and Supabase's default privileges that grant ALL on new public tables and
  * functions to the API roles (so the migration must revoke them itself).
  *
- * Not modeled: PostgREST, GoTrue JWT signature verification, storage.*.
+ * Not modeled: PostgREST, GoTrue JWT signature verification, and the Storage
+ * API (increment 2 adds only a minimal storage.* table model, STORAGE_STUB).
  * A JWT `sub` here is set directly; in production it comes from a token
  * Supabase has verified. That trust boundary is outside this harness.
  */
@@ -45,6 +46,47 @@ alter default privileges in schema public grant all on functions to anon, authen
 alter default privileges in schema public grant all on sequences to anon, authenticated, service_role;
 `;
 
+export const PHOTO_MIGRATION_PATH = process.env.HPR_PHOTO_MIGRATION_PATH ?? path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)), '../../../supabase/migrations/20261122120000_hpr_private_photo_reconciliation.sql',
+);
+
+/**
+ * Minimal model of the Supabase `storage` schema used by increment 2: the
+ * buckets/objects tables, storage.foldername(), RLS enabled on objects, and
+ * Supabase's broad table grants on storage.objects to the API roles (so the
+ * migration's policies, not missing grants, are what deny access).
+ * Not modeled: the Storage API server, its backend bytes, or its own checks.
+ */
+export const STORAGE_STUB = `
+create schema storage;
+grant usage on schema storage to anon, authenticated, service_role;
+create table storage.buckets (
+  id text primary key, name text not null unique, owner uuid, public boolean default false,
+  file_size_limit bigint, allowed_mime_types text[], created_at timestamptz default now(), updated_at timestamptz default now()
+);
+create table storage.objects (
+  id uuid primary key default gen_random_uuid(),
+  bucket_id text references storage.buckets (id),
+  name text not null,
+  owner uuid, owner_id text,
+  created_at timestamptz default now(), updated_at timestamptz default now(), last_accessed_at timestamptz default now(),
+  metadata jsonb, version text, user_metadata jsonb,
+  unique (bucket_id, name)
+);
+create function storage.foldername(name text) returns text[] language plpgsql immutable as $$
+declare _parts text[];
+begin
+  select string_to_array(name, '/') into _parts;
+  return _parts[1:array_length(_parts, 1) - 1];
+end $$;
+alter table storage.objects enable row level security;
+alter table storage.buckets enable row level security;
+grant all on storage.objects, storage.buckets to anon, authenticated, service_role;
+grant execute on function storage.foldername(text) to anon, authenticated, service_role;
+`;
+
+export type SimOptions = {photoIncrement?: boolean};
+
 export type Actor =
   | {role: 'anon'}
   | {role: 'authenticated'; sub: string}
@@ -53,10 +95,12 @@ export type Actor =
 export class SupabaseSim {
   private constructor(readonly db: PGlite) {}
 
-  static async create(): Promise<SupabaseSim> {
+  static async create(options: SimOptions = {}): Promise<SupabaseSim> {
     const db = new PGlite();
     await db.exec(SUPABASE_STUB);
+    if (options.photoIncrement) await db.exec(STORAGE_STUB);
     await db.exec(readFileSync(MIGRATION_PATH, 'utf8'));
+    if (options.photoIncrement) await db.exec(readFileSync(PHOTO_MIGRATION_PATH, 'utf8'));
     return new SupabaseSim(db);
   }
 

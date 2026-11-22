@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
-# TA-14 HPR — isolated LOCAL Supabase verification for PR #704.
+# TA-14 HPR — isolated LOCAL Supabase verification for PR #704 and increment 2
+# (#730: private photo storage, server hashing, append-only reconciliation).
 #
 # Spins up a throwaway local Supabase stack (Docker) in a scratch workdir that
 # is NOT linked to any Supabase project, applies migrations, runs the
 # read-only privilege verification SQL, runs lint/advisors where the CLI
-# supports them, runs the real GoTrue/PostgREST integration suite, then stops
-# the stack and discards its volumes.
+# supports them, runs the real GoTrue/PostgREST/Storage integration suites and
+# the PGlite mutation check, then stops the stack and discards its volumes.
 #
 # It never uses production credentials:
 #   * every SUPABASE_* / DATABASE_URL / POSTGRES_* variable is removed from
@@ -15,7 +16,7 @@
 #   * API and DB URLs reported by `supabase status` must be loopback.
 #
 # Usage:
-#   scripts/hpr/local-supabase-verify.sh            # HPR migration only (default)
+#   scripts/hpr/local-supabase-verify.sh            # HPR migrations only (default: #704 + increment 2)
 #   scripts/hpr/local-supabase-verify.sh full       # every repo migration from scratch
 #   KEEP_STACK=1 scripts/hpr/local-supabase-verify.sh   # leave the stack running
 #
@@ -27,8 +28,12 @@ MODE="${1:-hpr-only}"
 case "$MODE" in hpr-only|full) ;; *) echo "usage: $0 [hpr-only|full]" >&2; exit 2;; esac
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-HPR_MIGRATION="20261116200000_hpr_field_evidence_foundation.sql"
+HPR_MIGRATIONS=(
+  "20261116200000_hpr_field_evidence_foundation.sql"
+  "20261122120000_hpr_private_photo_reconciliation.sql"
+)
 VERIFY_SQL="$REPO_ROOT/supabase/verification/verify_hpr_field_evidence_privileges.sql"
+VERIFY_SQL_2="$REPO_ROOT/supabase/verification/verify_hpr_photo_reconciliation_privileges.sql"
 PROJECT_ID="ta14-hpr-local-verify"
 RUN_DIR="$(mktemp -d "${TMPDIR:-/tmp}/ta14-hpr-local.XXXXXX")"
 WORKDIR="$RUN_DIR/project"
@@ -87,7 +92,7 @@ if [ "$MODE" = "full" ]; then
   fi
   cp "$REPO_ROOT"/supabase/migrations/*.sql supabase/migrations/
 else
-  cp "$REPO_ROOT/supabase/migrations/$HPR_MIGRATION" supabase/migrations/
+  for m in "${HPR_MIGRATIONS[@]}"; do cp "$REPO_ROOT/supabase/migrations/$m" supabase/migrations/; done
 fi
 echo "migrations staged: $(ls supabase/migrations | wc -l | tr -d ' ')"
 
@@ -121,13 +126,19 @@ step "3b. Migration history"
 psql_local -At -c "select version || ' ' || coalesce(name, '') from supabase_migrations.schema_migrations order by version"
 
 # --- 4. privilege verification SQL -------------------------------------------
-step "4. verify_hpr_field_evidence_privileges.sql"
-out="$(psql_local -At -F ' | ' < "$VERIFY_SQL")"
+# Each file must print exactly one line: its informational last section.
+# Any other row is a finding.
+one_info_row() { [ "$(printf '%s\n' "$1" | sed '/^$/d' | wc -l | tr -d ' ')" = "1" ] && [[ "$(printf '%s' "$1" | sed '/^$/d')" =~ ^[0-9]+( \| [0-9]+)*$ ]]; }
+step "4. verify_hpr_photo_reconciliation_privileges.sql (increment 2; includes the combined EXECUTE matrix)"
+out2="$(psql_local -At -F ' | ' < "$VERIFY_SQL_2")"
+echo "$out2"
+one_info_row "$out2" || fail "increment-2 verification SQL reported findings (sections 1-6 must return 0 rows)"
+echo "PASS: sections 1-6 returned 0 rows; section 7 (expired_attempts | unrecorded_orphans | failed | inconclusive) = $out2"
+step "4a. verify_hpr_field_evidence_privileges.sql sections 2-7 (#704; section 1 superseded by increment 2)"
+out="$(sed -n '/^-- 2\. /,$p' "$VERIFY_SQL" | psql_local -At -F ' | ')"
 echo "$out"
-lines="$(printf '%s\n' "$out" | sed '/^$/d' | wc -l | tr -d ' ')"
-[ "$lines" = "1" ] && [[ "$(printf '%s' "$out" | sed '/^$/d')" =~ ^[0-9]+$ ]] \
-  || fail "verification SQL reported findings (sections 1-6 must return 0 rows)"
-echo "PASS: sections 1-6 returned 0 rows; section 7 storage_pending_photos=$out"
+one_info_row "$out" || fail "#704 verification SQL reported findings (sections 2-6 must return 0 rows)"
+echo "PASS: #704 sections 2-6 returned 0 rows; section 7 storage_pending_photos=$out"
 
 # --- 4b. lint / advisors where supported --------------------------------------
 step "4b. Lint / advisors"
@@ -151,13 +162,25 @@ else
 fi
 
 # --- 5. real GoTrue / PostgREST integration ----------------------------------
-step "5. Real auth / RLS / isolation / append-only (vitest)"
+step "5. Real auth / RLS / Storage / upload route / reconciliation (vitest)"
 cd "$REPO_ROOT"
+STORAGE_CONTAINER="supabase_storage_${PROJECT_ID}"
+docker inspect "$STORAGE_CONTAINER" >/dev/null 2>&1 || fail "local storage container $STORAGE_CONTAINER not running"
 HPR_LOCAL_SUPABASE_URL="$LOCAL_API_URL" \
 HPR_LOCAL_SUPABASE_ANON_KEY="$LOCAL_ANON" \
 HPR_LOCAL_SUPABASE_SERVICE_ROLE_KEY="$LOCAL_SERVICE" \
+HPR_LOCAL_STORAGE_CONTAINER="$STORAGE_CONTAINER" \
   npx vitest run tests/hvac-performance-record/local-supabase --reporter=verbose \
   || fail "local Supabase integration tests failed"
+
+step "5a. Post-test verification SQL (state after adversarial tests)"
+out2="$(psql_local -At -F ' | ' < "$VERIFY_SQL_2")"
+echo "$out2"
+one_info_row "$out2" || fail "increment-2 verification SQL reported findings after tests"
+echo "PASS: no privilege drift; section 7 (expired_attempts | unrecorded_orphans | failed | inconclusive) = $out2"
+
+step "5b. PGlite mutation check (increment-2 migration weakened 16 ways)"
+node scripts/hpr/mutation-check-photo-reconciliation.mjs || fail "a migration mutation survived the PGlite suite"
 
 step "6. Log credential scan"
 sleep 1  # let the redaction pipe flush

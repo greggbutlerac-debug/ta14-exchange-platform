@@ -1,0 +1,138 @@
+
+=== 1. Tooling ===
+supabase CLI: 3.2.0
+docker:       client 29.10.0 / server 29.5.2
+mode:         hpr-only
+workdir:      $TMPDIR/ta14-hpr-local.XXXXXX/project (unlinked scratch project)
+credential env vars stripped: 0
+
+=== 2. Scratch project ===
+migrations staged: 2
+
+=== 3. supabase start (fresh volumes, migrations applied) ===
+Starting database...
+Initialising schema...
+Seeding globals from roles.sql...
+Applying migration 20261116200000_hpr_field_evidence_foundation.sql...
+Applying migration 20261122120000_hpr_private_photo_reconciliation.sql...
+no files matched pattern: supabase/seed.sql
+{"DB_URL":"postgresql://postgres:[REDACTED]@127.0.0.1:54322/postgres","API_URL":"http://127.0.0.1:54321","REST_URL":"http://127.0.0.1:54321/rest/v1","GRAPHQL_URL":"http://127.0.0.1:54321/graphql/v1","PUBLISHABLE_KEY":"[REDACTED]","SECRET_KEY":"[REDACTED]","JWT_SECRET":"[REDACTED]","ANON_KEY":"[REDACTED]","SERVICE_ROLE_KEY":"[REDACTED]","MAILPIT_URL":"http://127.0.0.1:54324","STORAGE_S3_URL":"http://127.0.0.1:54321/storage/v1/s3","S3_PROTOCOL_ACCESS_KEY_ID":"[REDACTED]","S3_PROTOCOL_ACCESS_KEY_SECRET":"[REDACTED]","S3_PROTOCOL_REGION":"local","message":""}
+Stopped services: [supabase_imgproxy_ta14-hpr-local-verify supabase_studio_ta14-hpr-local-verify supabase_edge_runtime_ta14-hpr-local-verify supabase_analytics_ta14-hpr-local-verify supabase_vector_ta14-hpr-local-verify supabase_pooler_ta14-hpr-local-verify]
+API: http://127.0.0.1:54321 (loopback verified)
+
+=== 3b. Migration history ===
+20261116200000 hpr_field_evidence_foundation
+20261122120000 hpr_private_photo_reconciliation
+
+=== 4. verify_hpr_photo_reconciliation_privileges.sql (increment 2; includes the combined EXECUTE matrix) ===
+0 | 0 | 0 | 0
+PASS: sections 1-6 returned 0 rows; section 7 (expired_attempts | unrecorded_orphans | failed | inconclusive) = 0 | 0 | 0 | 0
+
+=== 4a. verify_hpr_field_evidence_privileges.sql sections 2-7 (#704; section 1 superseded by increment 2) ===
+0
+PASS: #704 sections 2-6 returned 0 rows; section 7 storage_pending_photos=0
+
+=== 4b. Lint / advisors ===
+supabase db subcommands: diff dump push pull reset lint start query advisors schema
+$ supabase db lint  --level warning --schema public
+Target: local stack (127.0.0.1:54322)
+Linting schema: public
+
+No schema errors found
+{"results":[],"message":"db lint","target":{"kind":"local","host":"127.0.0.1","port":54322}}
+$ supabase db advisors  --type all --level info
+Target: local stack (127.0.0.1:54322)
+{"results":[{"name":"unindexed_foreign_keys","title":"Unindexed foreign keys","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Identifies foreign key constraints without a covering index, which can impact database performance.","detail":"Table `public.hpr_evidence_submissions` has a foreign key `hpr_evidence_submissions_step_number_fkey` without a covering index. This can lead to suboptimal query performance.","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys","metadata":{"name":"hpr_evidence_submissions","type":"table","schema":"public","fkey_name":"hpr_evidence_submissions_step_number_fkey","fkey_columns":[3]},"cacheKey":"unindexed_foreign_keys_public_hpr_evidence_submissions_hpr_evidence_submissions_step_number_fkey"},{"name":"unindexed_foreign_keys","title":"Unindexed foreign keys","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Identifies foreign key constraints without a covering index, which can impact database performance.","detail":"Table `public.hpr_storage_orphan_records` has a foreign key `hpr_storage_orphan_records_last_attempt_id_fkey` without a covering index. This can lead to suboptimal query performance.","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0001_unindexed_foreign_keys","metadata":{"name":"hpr_storage_orphan_records","type":"table","schema":"public","fkey_name":"hpr_storage_orphan_records_last_attempt_id_fkey","fkey_columns":[7]},"cacheKey":"unindexed_foreign_keys_public_hpr_storage_orphan_records_hpr_storage_orphan_records_last_attempt_id_fkey"},{"name":"unused_index","title":"Unused Index","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Detects if an index has never been used and may be a candidate for removal.","detail":"Index `hpr_inspections_technician_idx` on table `public.hpr_inspections` has not been used","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index","metadata":{"name":"hpr_inspections","type":"table","schema":"public"},"cacheKey":"unused_index_public_hpr_inspections_hpr_inspections_technician_idx"},{"name":"unused_index","title":"Unused Index","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Detects if an index has never been used and may be a candidate for removal.","detail":"Index `hpr_inspections_equipment_idx` on table `public.hpr_inspections` has not been used","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index","metadata":{"name":"hpr_inspections","type":"table","schema":"public"},"cacheKey":"unused_index_public_hpr_inspections_hpr_inspections_equipment_idx"},{"name":"unused_index","title":"Unused Index","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Detects if an index has never been used and may be a candidate for removal.","detail":"Index `hpr_evidence_inspection_step_idx` on table `public.hpr_evidence_submissions` has not been used","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index","metadata":{"name":"hpr_evidence_submissions","type":"table","schema":"public"},"cacheKey":"unused_index_public_hpr_evidence_submissions_hpr_evidence_inspection_step_idx"},{"name":"unused_index","title":"Unused Index","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Detects if an index has never been used and may be a candidate for removal.","detail":"Index `hpr_photo_upload_attempt_submission_idx` on table `public.hpr_photo_upload_attempts` has not been used","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index","metadata":{"name":"hpr_photo_upload_attempts","type":"table","schema":"public"},"cacheKey":"unused_index_public_hpr_photo_upload_attempts_hpr_photo_upload_attempt_submission_idx"},{"name":"unused_index","title":"Unused Index","level":"INFO","facing":"EXTERNAL","categories":["PERFORMANCE"],"description":"Detects if an index has never been used and may be a candidate for removal.","detail":"Index `hpr_reconciliation_submission_idx` on table `public.hpr_evidence_storage_reconciliations` has not been used","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0005_unused_index","metadata":{"name":"hpr_evidence_storage_reconciliations","type":"table","schema":"public"},"cacheKey":"unused_index_public_hpr_evidence_storage_reconciliations_hpr_reconciliation_submission_idx"},{"name":"rls_enabled_no_policy","title":"RLS Enabled No Policy","level":"INFO","facing":"EXTERNAL","categories":["SECURITY"],"description":"Detects cases where row level security (RLS) has been enabled on a table but no RLS policies have been created.","detail":"Table `public.hpr_storage_orphan_records` has RLS enabled, but no policies exist","remediation":"https://supabase.com/docs/guides/database/database-linter?lint=0008_rls_enabled_no_policy","metadata":{"name":"hpr_storage_orphan_records","type":"table","schema":"public"},"cacheKey":"rls_enabled_no_policy_public_hpr_storage_orphan_records"}],"message":"db advisors","target":{"kind":"local","host":"127.0.0.1","port":54322}}
+
+=== 5. Real auth / RLS / Storage / upload route / reconciliation (vitest) ===
+
+ RUN  v4.1.10 ~/ta14-hpr-photo-reconciliation
+
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > exposes the 14 canonical steps to authenticated users only 28ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > anon is denied on every HPR table and RPC 16ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > rejects a JWT not signed by this stack, even when it names an enrolled technician 1ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > attributes records to the GoTrue-verified user and keeps them UNVERIFIED 16ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > rejects client-supplied identity, verification and time fields through PostgREST 28ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > enrollment gates writes and cannot be self-granted 18ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > isolates two independently authenticated technicians 36ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > denies UPDATE, DELETE and UPSERT of evidence to the technician and to service_role 40ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > records corrections as superseding rows and rejects duplicate record ids 41ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > HPR field evidence on local Supabase (GoTrue + PostgREST) > storage declaration is service_role-only, single-write and UNRECONCILED; photos start STORAGE_PENDING 35ms
+ ✓ tests/hvac-performance-record/local-supabase/field-evidence-local-supabase.test.ts > local Supabase guard > accepts only loopback http URLs 0ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > uploads through the real route: server digest, derived path, UNRECONCILED, boundary intact 166ms
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > denies unenrolled and suspended users and other technicians (403), storing nothing
+[hpr] hpr.photo.open_rejected { reason: 'HPR_TECHNICIAN_NOT_AUTHORIZED', code: '42501' }
+
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > reconciles by re-reading and re-hashing the stored bytes (MATCH is still UNVERIFIED) 48ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects missing, forged and tampered sessions with 401 17ms
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > denies unenrolled and suspended users and other technicians (403), storing nothing
+[hpr] hpr.photo.open_rejected { reason: 'HPR_SUBMISSION_NOT_ACCESSIBLE', code: '42501' }
+
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > denies unenrolled and suspended users and other technicians (403), storing nothing
+[hpr] hpr.photo.open_rejected { reason: 'HPR_TECHNICIAN_NOT_AUTHORIZED', code: '42501' }
+
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > denies unenrolled and suspended users and other technicians (403), storing nothing 87ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > enforces 25 MiB: exact limit accepted, limit + 1 rejected while streaming (no Content-Length) 493ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects MIME / signature mismatch, truncated and partial uploads, recording each 270ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects a digest mismatch against client_declared_sha256 before storing 139ms
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects request replay and duplicate finalization
+[hpr] hpr.photo.open_rejected { reason: 'HPR_UPLOAD_REPLAY', code: '23505' }
+
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects request replay and duplicate finalization
+[hpr] hpr.photo.open_rejected { reason: 'HPR_ALREADY_DECLARED', code: '23505' }
+
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects request replay and duplicate finalization
+[hpr] hpr.photo.open_rejected { reason: 'HPR_UPLOAD_IN_PROGRESS', code: '55P03' }
+
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects request replay and duplicate finalization
+[hpr] hpr.photo.open_rejected { reason: 'HPR_ALREADY_DECLARED', code: '23505' }
+
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > rejects request replay and duplicate finalization 252ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > cannot overwrite, upsert, move or delete an original, even with the service key; clients cannot write 256ms
+stderr | tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > handles object written / declaration failed: orphan recorded, never adopted, recovery by supersession
+[hpr] hpr.photo.open_rejected { reason: 'HPR_OBJECT_ORPHANED', code: '23505' }
+
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > handles object written / declaration failed: orphan recorded, never adopted, recovery by supersession 299ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > records an ambiguous storage failure as FAILED with object_may_exist, leaving the submission pending 127ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > is disabled unless HPR_PHOTO_UPLOAD_ENABLED=true 12ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > backend tampering (privileged access outside the controlled roles) > detects bytes rewritten in the storage backend (DIGEST_MISMATCH, sticky) 247ms
+ ✓ tests/hvac-performance-record/local-supabase/photo-upload-local-supabase.test.ts > HPR private photo upload + reconciliation on local Supabase (GoTrue + PostgREST + Storage) > backend tampering (privileged access outside the controlled roles) > records bytes removed from the backend as READ_FAILED (inconclusive, never MATCH) 127ms
+
+ Test Files  2 passed (2)
+      Tests  25 passed (25)
+   Start at  12:30:39
+   Duration  3.25s (transform 70ms, setup 0ms, import 142ms, tests 3.77s, environment 0ms)
+
+
+=== 5a. Post-test verification SQL (state after adversarial tests) ===
+0 | 0 | 1 | 1
+PASS: no privilege drift; section 7 (expired_attempts | unrecorded_orphans | failed | inconclusive) = 0 | 0 | 1 | 1
+
+=== 5b. PGlite mutation check (increment-2 migration weakened 16 ways) ===
+KILLED   bucket made public
+KILLED   client INSERT policy on the bucket
+KILLED   bucket guard ignores UPDATE/DELETE
+KILLED   path discipline removed
+KILLED   authenticated may complete attempts
+KILLED   ownership check removed from open
+KILLED   nonce replay index removed
+KILLED   concurrent attempt check removed
+KILLED   object existence not required
+KILLED   storage size not compared
+KILLED   client digest not compared
+KILLED   digest mismatch counted as MATCH
+KILLED   failure not sticky
+KILLED   #704 direct declaration left to service_role
+KILLED   reconciliations not append-only
+KILLED   search_path pin removed
+
+16/16 mutations killed
+
+=== 6. Log credential scan ===
+PASS: no unredacted JWTs, sb_* keys, DB passwords or *KEY/*SECRET/*TOKEN values in $TMPDIR/ta14-hpr-local.XXXXXX/verify.log
+
+=== RESULT: PASS (hpr-only) ===
+
+=== Teardown ===
+{"project_id_filter":"ta14-hpr-local-verify","backup":false,"message":"Stopped supabase local development setup."}
+Log: $TMPDIR/ta14-hpr-local.XXXXXX/verify.log
