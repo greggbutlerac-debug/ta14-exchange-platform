@@ -30,6 +30,15 @@ export class CommandBoundEmulator {
     if (!this.consumed.has(token)) this.tickets.set(token, ticket);
     return ticket;
   }
+  preflight(ticket: Ticket, request: Request): string | null {
+    const issued = this.tickets.get(ticket.token);
+    if (!issued || this.consumed.has(ticket.token)) return 'MISSING_OR_CONSUMED_TICKET';
+    if (digest(issued) !== digest(ticket)) return 'ALTERED_TICKET';
+    if (digest(request.command) !== issued.commandDigest || request.command.commandId !== issued.commandId) return 'COMMAND_PAYLOAD_MISMATCH';
+    if (request.minute < issued.issuedAt) return 'EXECUTION_BEFORE_AUTHORIZATION';
+    if (request.actorId !== issued.actorId || request.held?.grant.authorityId !== issued.authorityId || request.evidence.evidenceId !== issued.evidenceId) return 'AUTHORIZATION_BINDING_MISMATCH';
+    return null;
+  }
   execute(ticket: Ticket, request: Request): Result {
     const fail = (reason: string): Result => ({ allowed: false, reason, state: this.state });
     const issued = this.tickets.get(ticket.token);
