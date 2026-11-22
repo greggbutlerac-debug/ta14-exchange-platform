@@ -234,6 +234,17 @@ describe.skipIf(!configured)(SUITE_TITLE, () => {
     const args = {p_submission_id: photo.id, p_declared_sha256: SHA, p_declared_byte_size: 4096, p_declared_content_type: 'image/jpeg'};
     const asUser = await A.db.rpc('hpr_declare_evidence_storage_object', args);
     expect(asUser.error?.code).toBe(DENIED);
+    // Increment 2 (20261122120000_hpr_private_photo_reconciliation) revokes the
+    // direct declaration from service_role: a declaration then requires a
+    // completed upload attempt with a stored object (photo-upload-local-supabase.test.ts).
+    const increment2 = (await service.from('hpr_photo_upload_attempts').select('id').limit(1)).error === null;
+    if (increment2) {
+      const direct = await service.rpc('hpr_declare_evidence_storage_object', args);
+      expect(direct.error?.code).toBe(DENIED);
+      const still = await A.db.from('hpr_evidence_current').select('storage_state').eq('id', photo.id).single();
+      expect(still.data?.storage_state).toBe('STORAGE_PENDING');
+      return;
+    }
     const declared = await service.rpc('hpr_declare_evidence_storage_object', args).single();
     expect(declared.error).toBeNull();
     expect(declared.data).toMatchObject({

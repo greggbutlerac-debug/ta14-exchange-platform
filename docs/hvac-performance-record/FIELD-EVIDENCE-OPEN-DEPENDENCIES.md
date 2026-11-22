@@ -22,6 +22,15 @@ admission, intervention or physical-control capability.
 | D6 | Repo migrations cannot be applied from scratch (duplicate versions, pre-existing) | **Detected and documented**; the local script fails fast in `full` mode. Not fixed in #704. | Full-history local/branch verification |
 | L | Local Supabase verification (Atlas checkpoint 2026-11-17) | **Script and real-auth suite committed. Not yet executed: Docker and Supabase CLI are not installed on the developer Mac.** | D2 sign-off |
 
+**Update 2026-11-22 (increment 2, issue #730):** the upload route, private
+bucket, server hashing, append-only upload attempts, reconciliation and orphan
+records described under D1 and D4 below are now implemented. They are verified
+locally only, and the route is disabled by default. See
+`PHOTO-UPLOAD-RECONCILIATION.md`. Increment 2 also revokes `service_role`
+EXECUTE on `hpr_declare_evidence_storage_object` (a declaration now requires a
+completed upload attempt and a stored object), and it supersedes section 1 of
+`verify_hpr_field_evidence_privileges.sql`. D3, D5 and D6 remain open.
+
 ---
 
 ## D1 — Storage reference contract
