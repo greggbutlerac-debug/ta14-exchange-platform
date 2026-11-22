@@ -24,6 +24,13 @@ describe('Proof Gate 2: local-host reservation ledger prototype', () => {
     expect(ledger.reserve('COMMAND-2', 'digest-b').accepted).toBe(false);
     expect(ledger.inspect('COMMAND-2')?.commandDigest).toBe('digest-a');
   });
+  it('two ledger objects competing for one ID accept only one reservation', () => {
+    const d = dir();
+    const a = new LocalHostReservationLedger(d);
+    const b = new LocalHostReservationLedger(d);
+    const results = [a.reserve('COMMAND-COMPETE', 'digest'), b.reserve('COMMAND-COMPETE', 'digest')];
+    expect(results.filter((result) => result.accepted)).toHaveLength(1);
+  });
   it('permits distinct command IDs', () => {
     const ledger = new LocalHostReservationLedger(dir());
     expect(ledger.reserve('COMMAND-A', 'a').accepted).toBe(true);
