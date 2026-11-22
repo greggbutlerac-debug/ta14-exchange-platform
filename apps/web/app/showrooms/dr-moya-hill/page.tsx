@@ -89,6 +89,8 @@ const exhibits: Exhibit[] = [
   }
 ];
 
+const reflections = [["THE HUMAN PURPOSE","Public trust depends on the people who create, protect, disclose, review, and rely on information. Governance is both an organizational obligation and a human practice.","When a public decision is challenged, can its information and decision trail be examined?"],["A CONNECTED APPROACH","Dr. Hill’s independently developed model invites organizations to connect interdependent information duties rather than leaving decisions scattered across disconnected programs.","Where can responsibilities become disconnected between a record’s creation, use, disclosure, and eventual disposition?"],["BEFORE AN AI ANSWER","Reliable AI use begins with the origin, currency, permissions and limitations of the information supplied to the system. These are governance decisions, not merely technical retrieval steps.","Could a confident answer still be based on a superseded policy or a record the user was not permitted to access?"],["THE OUTPUT RETURNS","An AI output can enter an official workflow and later appear to other systems as an authoritative source. Provenance, verification and version history become essential.","If an AI-generated claim is copied into a record, who establishes whether it was ever independently verified?"],["TWO DUTIES, ONE PUBLIC TRUST","Privacy and transparency can both be legally required. Trustworthy practice examines disclosure duties and restrictions together, preserving the reasons for decisions.","How would you demonstrate that a disclosure was both appropriately transparent and protective of restricted information?"],["SEVEN DISCIPLINES, SHARED RESPONSIBILITY","Privacy, FOIA and transparency, records, cybersecurity, legal and compliance, risk, and training and culture intersect throughout the information lifecycle.","Which failure could arise if a cybersecurity restriction is implemented without consulting records and transparency duties?"],["FROM PRINCIPLE TO PRACTICE","In this hypothetical example, good governance changes the work before an AI summary is trusted: authoritative sources, lawful access, retention rules and review all matter.","What would an independent reviewer need to see before accepting an AI-assisted program summary?"],["HONORING INDEPENDENT LEADERSHIP","The honorary Maryland ambassador recognition celebrates Dr. Hill’s independent professional voice. It does not imply any state appointment or joint technical deployment.","How can professional recognition preserve a leader’s independent voice and avoid implying endorsement that was never granted?"]] as const;
+
 const asset = (name: string) => '/' + encodeURIComponent(name);
 const pdf = asset('TA14_Dr_Moya_Hill_Ambassador_Showroom_Aligned_Review_v3.pdf');
 const portrait = '/dr-moya-hill-face-portrait.jpg';
@@ -154,6 +156,7 @@ export default function DrMoyaHillShowroom() {
       <p>This showroom is an independent educational recognition prepared for her review. The linked 11-page V3 PDF follows the same eight-exhibit sequence used here. The images are illustrative, not records of actual projects. Her model and intellectual property are her own. The November 2026 honorary ambassador invitation received a warmly affirmative response, but that is not approval of these final publication materials.</p>
       <div className={styles.quickLinks}><a href="https://drmoyahill.com/" target="_blank" rel="noopener noreferrer">Professional website</a><a href={pdf} target="_blank" rel="noopener noreferrer">Aligned review PDF · 11 pages</a></div>
     </div></section>
+    <section className={styles.reflectionBand}><div className={styles.wrap}><p className={styles.eyebrow}>AN EDITORIAL REFLECTION · NOT A QUOTATION FROM DR. HILL</p><p>Information becomes valuable when people can trust where it came from, understand how it may be used, and account for the decisions made with it.</p></div></section>
     <section className={styles.chapters} id="exhibits"><div className={styles.wrap}>
       <p className={styles.eyebrow}>THE EDUCATIONAL SERIES</p><h2>Eight distinct exhibits</h2>
       <p className={styles.explain}>Each image is numbered and has its own narration immediately below it. The text distinguishes public biographical descriptions from educational examples and makes no claim of a deployed system.</p>
@@ -163,9 +166,25 @@ export default function DrMoyaHillShowroom() {
         <h3>{e.title}</h3>
         <p className={styles.summary}>{e.summary}</p>
         <figure className={styles.exhibitArt}><img src={asset(e.image)} loading="lazy" alt={'Educational exhibit ' + e.number + ': ' + e.title} /><figcaption>Conceptual educational artwork · not evidence of a particular real-world implementation.</figcaption></figure>
-        <Narration exhibit={e}/>
-        <div className={styles.takeaway}><strong>THE TEACHING POINT</strong><p>{e.takeaway}</p></div>
+        <div className={styles.chapterBody}>
+          <div className={styles.storyPanel}>
+            <p className={styles.eyebrow}>{reflections[e.number - 1][0]}</p>
+            <p className={styles.storyText}>{reflections[e.number - 1][1]}</p>
+            <div className={styles.takeaway}><strong>THE TEACHING POINT</strong><p>{e.takeaway}</p></div>
+          </div>
+          <div className={styles.chapterSidebar}>
+            <Narration exhibit={e}/>
+            <div className={styles.question}><strong>A QUESTION TO CONSIDER</strong><p>{reflections[e.number - 1][2]}</p></div>
+            {e.number < 8 && <a className={styles.nextChapter} href={'#exhibit-' + (e.number + 1)}>Continue to chapter {String(e.number+1).padStart(2,'0')} ↓</a>}
+          </div>
+        </div>
       </article>)}
+    </div></section>
+    <section className={styles.publication} id="publication"><div className={styles.wrap}>
+      <p className={styles.eyebrow}>THE INDEPENDENT COMPANION PUBLICATION</p>
+      <h2>Governing information <em>before AI relies on it.</em></h2>
+      <p>Explore the aligned eleven-page review PDF. It follows all eight approved exhibits and provides the teaching points, visual sequence, attribution notes, and publication review checklist.</p>
+      <a href={pdf} target="_blank" rel="noopener noreferrer">Read the companion PDF ↗</a>
     </div></section>
     <section className={styles.close}><div className={styles.wrap}><p className={styles.eyebrow}>EDITORIAL & PUBLICATION BOUNDARIES</p><h2>Distinct work. Independent leadership. Clear attribution.</h2>
       <p>Dr. Hill’s Unified Information Governance Model™ concerns the governance of information and its lifecycle. TA-14’s Admissible Execution Architecture concerns whether evidence, authority and standing justify a proposed consequence at execution time. Those are separately owned concepts. No operational integration, joint product, public-sector endorsement, grant, verified outcome or regulatory status is claimed.</p>
