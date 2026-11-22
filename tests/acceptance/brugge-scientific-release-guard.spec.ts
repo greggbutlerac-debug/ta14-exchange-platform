@@ -45,7 +45,7 @@ describe('Brugge scientific review release guard', () => {
 
   it('references twelve existing image assets and an existing PDF in the public directory', () => {
     const publicDir = resolve(process.cwd(), 'apps/web/public');
-    const images = [...page.matchAll(/image: '([^']+\\.png)'/g)].map(m => m[1]);
+    const images = [...page.matchAll(/image: '([^']+\.png)'/g)].map(m => m[1]);
     expect(images).toHaveLength(12);
     for (const filename of images) {
       expect(existsSync(resolve(publicDir, filename)), 'Missing exhibit asset: ' + filename).toBe(true);
