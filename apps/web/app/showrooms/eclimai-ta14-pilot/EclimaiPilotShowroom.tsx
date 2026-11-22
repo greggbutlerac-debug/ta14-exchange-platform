@@ -44,6 +44,7 @@ export default function EclimaiPilotShowroom(){
   <section id="exhibits" className="eclExhibits"><p className="eclEyebrow">EIGHT EXHIBITS · FREE SCROLL</p><h2>Follow the evidence.</h2>
    {exhibits.map(([id,title,image,description])=><article className="eclExhibit" key={id} id={'exhibit-'+id}>
     <div className="eclHeading"><span>{id}</span><h3>{title}</h3></div>
+    {(id==='05'||id==='07'||id==='08')&&<aside className="eclPreImageNotice" role="note"><strong>Important illustration correction:</strong> {id==='05'?'The calculations and performance figures pictured below are illustrative, not validated measurements.':id==='07'?'The picture below may contain the word “approved.” That wording is incorrect: no pilot or partner endorsement has been approved.': 'This is a separate hypothetical verification scenario, not a continuation of the HOLD in Exhibit 07. Its numbers are not validated.'}</aside>}
     <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration'} loading="lazy"/><figcaption>ILLUSTRATIVE / SYNTHETIC · NOT LIVE ECLIMAI OR TA-14 MEASUREMENT</figcaption></figure>
     <p>{description}</p>
     {id==='05'&&<p className="eclCorrection"><strong>Engineering limitation:</strong> The numerical thermal-performance illustration is not a validated calculation. Do not interpret depicted kW, BTU/h, efficiency or savings as measured results.</p>}
