@@ -96,7 +96,7 @@ const studies = [
     boundary: 'This subgroup result is not a significant benefit for every participant; no significant diastolic benefit was reported. Confidence intervals and model details remain under review.',
     question: 'Can filter operation, measured particle change and measured blood pressure each be audited as distinct endpoints?',
     narration: 'Lesson nine is a clinical trial, and its interpretation needs special care. In a randomized crossover study of portable HEPA versus sham filtration, one hundred fifty-four participants were analyzed. The reported subgroup with elevated baseline systolic pressure showed a three millimeter of mercury between-condition difference favoring HEPA. That does not mean the entire study population experienced a statistically significant blood-pressure benefit. The distinction between exposure, treatment adherence and clinical response must remain visible. A proposed TA-14 record could track those domains separately, but this trial did not test TA-14.',
-    caution: 'The revised artwork reflects the sham control and a 3.0 mm Hg subgroup contrast, but its absolute chart values (about 133.2 and 130.2 mm Hg) are illustrative and must not be presented as observed group means without verification against the publication. Recheck embedded citation and subgroup wording.'
+    caution: 'The image includes unverified absolute blood-pressure chart values (approximately 133.2 and 130.2 mm Hg). These must not be presented as observed group means. Verify every embedded label against the source, including HEPA-versus-sham control, subgroup definition, 3.0 mm Hg contrast, citation and uncertainty.'
   },
   {
     title: 'Effect of HEPA filtration air purifiers on cognitive function from a secondary outcome analysis of a pragmatic randomized crossover trial',
@@ -116,7 +116,7 @@ const studies = [
     boundary: 'This is not evidence that visceral fat was reduced. A small subgroup cannot justify generalized anti-inflammatory claims; precision and multiplicity require checking.',
     question: 'How can an exploratory biomarker signal be presented without converting it into a clinical treatment claim?',
     narration: 'Lesson eleven turns to inflammatory biomarkers. The secondary analysis included one hundred sixteen participants and found no overall difference in interleukin one beta. The researchers also reported a reduction in that marker among a small subgroup of twelve people with higher visceral adiposity. The biomarker changed in that analysis; the study did not establish that the purifier reduced visceral fat. With such a small subgroup, confidence intervals, prespecification and multiple comparisons matter. This distinction must survive every illustration, caption and narration.',
-    caution: 'The updated illustration identifies HEPA versus sham filtration and separates the overall null IL-1β result from the exploratory high-visceral-adiposity subgroup finding. Original-source checks of methods, uncertainty, multiplicity and all embedded text remain required before publication.'
+    caution: 'Do not rely on the image to distinguish the overall null IL-1β finding from the reported high-visceral-adiposity subgroup signal. Verify the control, DOI, endpoint labels, uncertainty and multiplicity against the publication. The intervention was not shown to reduce visceral fat.'
   },
   {
     title: 'Proposed TA-14 evidence-to-action boundary',
@@ -143,7 +143,7 @@ export default function BruggeIndependentExamination(){
     </header>
     <section className="be-alert" aria-label="Scientific release notice">
       <strong>SCIENTIFIC REVIEW HOLD — NOT APPROVED FOR PUBLIC RELEASE</strong>
-      <p>The uploaded artwork contains known citation and scientific-description errors. Corrected text below each illustration controls this working draft; embedded labels must not be relied upon. The accompanying PDF is also a review draft. Independent verification of source metadata, methods, estimates and authorship remains open.</p>
+      <p>The uploaded artwork contains known citation and scientific-description errors. The accompanying source descriptions identify review-stage corrections, but do not make the illustrations scientifically accurate. Do not use or redistribute the images as verified scientific evidence; embedded labels must not be relied upon. The accompanying PDF is also a review draft. Independent verification of source metadata, methods, estimates and authorship remains open.</p>
       <p>No study cited here tested TA-14. No authorship, partnership, endorsement, approval or peer review by Dr. Brugge or collaborators is implied. This is not a systematic review or an independent statistical replication.</p>
     </section>
     <section className="be-guide"><h2>Read each exhibit in four steps</h2><div className="be-guide-grid"><div><b>01 · SOURCE</b><p>Identify the actual study and its method.</p></div><div><b>02 · CONTRIBUTION</b><p>State what the evidence supports.</p></div><div><b>03 · BOUNDARY</b><p>Do not promote association, opinions or subgroups into unsupported proof.</p></div><div><b>04 · SEPARATE QUESTION</b><p>Ask what a future governed intervention would need to establish.</p></div></div></section>
