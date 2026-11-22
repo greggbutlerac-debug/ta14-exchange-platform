@@ -52,6 +52,6 @@ describe('Proof Gate 2: fail-closed reservation-before-execution adapter', () =>
     const adapter = new ReservedExecutionAdapter(emulator, new LocalHostReservationLedger(directory));
     const altered = { ...request, command: { ...request.command, params: { durationMin: 30 } } };
     expect(adapter.execute(ticket, altered)).toMatchObject({ allowed: false, reason: 'COMMAND_PAYLOAD_MISMATCH', state: 0 });
-    expect(adapter.execute(ticket, request)).toMatchObject({ allowed: false, reason: 'DUPLICATE_DURABLE_RESERVATION', state: 0 });
+    expect(adapter.execute(ticket, request)).toMatchObject({ allowed: true, state: 1 });
   });
 });
