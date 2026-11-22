@@ -24,7 +24,7 @@ export default function EclimaiPilotShowroom(){
   window.speechSynthesis.cancel();
   if(playing===id){setPlaying(null);return;}
   const lesson=transitions[Number(id)-1];
-  const specificCorrection=id==='05'?'The depicted performance calculations have not been validated.':id==='07'?'Any approval wording shown inside this illustration is incorrect. EclimAi has not approved this pilot or presentation.':id==='08'?'This is a separate hypothetical scenario, not a continuation of the HOLD decision in exhibit seven. No depicted savings or occupant-hour figures are validated.':'';
+  const specificCorrection=id==='05'?'The schematic specifies measurements needed; no performance figures have been validated.':id==='07'?'This is an unapproved concept. EclimAi has not approved a joint pilot or this presentation.':id==='08'?'This is a separate hypothetical scenario, not a continuation of the HOLD decision in exhibit seven. No energy savings or occupant-hour outcomes are claimed.':'';
   const u=new SpeechSynthesisUtterance('Exhibit '+id+'. '+title+'. '+description+' '+specificCorrection+' Here is what you just learned. '+lesson[0]+' Here is what you will learn next. '+lesson[1]+' All data and diagrams are illustrative. No deployed integration or validated result is claimed.');
   const voices=window.speechSynthesis.getVoices();
   u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en-US'))||null;
@@ -45,7 +45,7 @@ export default function EclimaiPilotShowroom(){
   <section id="exhibits" className="eclExhibits"><p className="eclEyebrow">EIGHT EXHIBITS · FREE SCROLL</p><h2>Follow the evidence.</h2>
    {exhibits.map(([id,title,image,description])=><article className="eclExhibit" key={id} id={'exhibit-'+id}>
     <div className="eclHeading"><span>{id}</span><h3>{title}</h3></div>
-    {(id==='05'||id==='07'||id==='08')&&<aside className="eclPreImageNotice" role="note"><strong>Important illustration correction:</strong> {id==='05'?'The calculations and performance figures pictured below are illustrative, not validated measurements.':id==='07'?'The picture below may contain the word “approved.” That wording is incorrect: no pilot or partner endorsement has been approved.': 'This is a separate hypothetical verification scenario, not a continuation of the HOLD in Exhibit 07. Its numbers are not validated.'}</aside>}
+
     {(id==='05'||id==='07'||id==='08')?
     <figure className="eclSafeDiagram" aria-label={title+' — corrected conceptual schematic'}>
       <div className="eclDiagramTitle">{id==='05'?'THERMAL PERFORMANCE: REQUIRED EVIDENCE':id==='07'?'EXECUTION GOVERNANCE: UNAPPROVED CONCEPT':'POST-ACTION VERIFICATION: SEPARATE SCENARIO'}</div>
@@ -54,9 +54,6 @@ export default function EclimaiPilotShowroom(){
     </figure>:
     <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration'} loading="lazy"/><figcaption>ILLUSTRATIVE / SYNTHETIC · NOT LIVE ECLIMAI OR TA-14 MEASUREMENT</figcaption></figure>}
     <p>{description}</p>
-    {id==='05'&&<p className="eclCorrection"><strong>Engineering limitation:</strong> The numerical thermal-performance illustration is not a validated calculation. Do not interpret depicted kW, BTU/h, efficiency or savings as measured results.</p>}
-    {id==='07'&&<p className="eclCorrection"><strong>Approval correction:</strong> Any wording embedded in the image suggesting an “approved” pilot is incorrect. No joint pilot, field authorization or EclimAi endorsement has been granted. This is a synthetic HOLD teaching case.</p>}
-    {id==='08'&&<p className="eclCorrection"><strong>Scenario separation:</strong> This image illustrates a different hypothetical post-authorization verification pathway. It does not follow from the HOLD in Exhibit 07. Pictured numerical outcomes, occupant-hour and savings values are unvalidated and must not be cited as results.</p>}
     <div className="eclNarration"><div><strong>SAMANTHA · EXHIBIT {id}</strong><small>Spoken guide · scrolling remains available</small></div><button type="button" onClick={()=>narrate(id,title,description)}>{playing===id?'■ Stop Samantha':'▶ Play Samantha'}</button></div>
     <div className="eclTransition" aria-label={'Learning transition after exhibit '+id}>
       <div><span className="eclEyebrow">HERE'S WHAT YOU JUST LEARNED</span><p>{transitions[Number(id)-1][0]}</p></div>
