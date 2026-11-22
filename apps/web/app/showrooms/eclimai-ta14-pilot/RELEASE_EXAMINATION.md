@@ -1,18 +1,25 @@
 # EclimAi x TA-14 | Release examination
 Date: 2026-11-22
-Status: HOLD - technical draft; no partner approval or validated pilot
+Status: HOLD for external distribution; technical preview available, partner approval absent
 
-## Verified from GitHub
-- PR #727 branch builds successfully: Verify application and Vercel Preview Comments both successful at commit 0f6af850f006a7b4b6f112a1d2c378bc42ead52a.
-- Eight teaching exhibits, scripted narration and read-only synthetic decision fixtures are implemented.
-- v2 review is available as a print-friendly HTML page. The original PDF binary has NOT been committed.
+## Verified
+- PR #727 is a draft technical examination, not a joint pilot approval.
+- At commit 2c6d8bf6c32412e34dacb2668f81914e156b0b0f, GitHub Verify application and Vercel Preview Comments completed successfully; Vercel preview reported READY at the matching SHA.
+- The React exhibit array references eight original image assets (01-08), and the user reported the restored showroom looked good.
+- Eight exhibit narration controls and a two-fixture synthetic HOLD/ALLOW teaching demonstration are present in source code.
+- v2 technical review is accessible as print-friendly HTML at /showrooms/eclimai-ta14-pilot/review; no committed v2 PDF binary is claimed.
 
-## Outstanding release blockers
-1. Inspect the raster artwork of exhibits 05, 07, 08 and remove misleading embedded numerical, approval and scenario-continuity claims from the source images themselves. Textual and spoken warnings are not a substitute for correcting the pixels.
-2. Upload the final reviewed PDF binary into the branch and link it, or explicitly choose the print-friendly v2 HTML review as the authoritative companion and stop describing the PDF as attached.
-3. Perform a browser-based visual QA pass at desktop and mobile widths: images, wrapping, links, narration controls, simulated HOLD and ALLOW, and print layout. CI build success does not prove browser functionality.
-4. Confirm EclimAi consent for co-branding and external distribution. The unlisted noindex URL is publicly accessible and not confidential.
-5. No pilot or physical actuation without separate site-owner/operator authorization, validated evidence and independent verification protocol.
+## Not independently verified
+- Browser-level narration playback and voice selection; speechSynthesis availability and voice vary by device/browser.
+- Browser-level Academy question interaction, HOLD/ALLOW button operation, mobile layout, print output and all image loads.
+- Scientific validity of pictured numbers, calculations, approval language or outcomes in the original raster images.
+
+## Required before external release
+1. Correct embedded misleading text and numbers in original artwork 05, 07 and 08. The visible disclaimers mitigate but do not replace pixel-level correction.
+2. Run desktop/mobile browser checks for all eight image loads, Samantha play/stop, HOLD/ALLOW and Academy questions; record observed results, not assumptions.
+3. Use the print-ready v2 review as the authoritative companion unless a reviewed PDF binary is separately committed and linked.
+4. Obtain EclimAi's explicit consent before externally distributing a co-branded presentation. The noindex preview URL is publicly reachable, not confidential.
+5. Require separately approved site/operator protocol and independent outcome verification before any physical pilot or performance claims.
 
 ## Decision
-Keep PR #727 in draft and do not publish or externally circulate as an approved collaboration. No verified energy savings, health improvements, live deployment or joint authorization may be claimed.
+Keep PR #727 draft. Technical build/deployment success does not establish functional browser verification, partner consent, pilot execution or validated savings.
