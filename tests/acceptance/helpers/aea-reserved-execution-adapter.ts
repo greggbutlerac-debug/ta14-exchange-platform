@@ -19,6 +19,8 @@ export class ReservedExecutionAdapter {
     // The emulator's own checks are still the final gate, but the reservation
     // is irreversible: any subsequent validation failure needs explicit
     // operator reconciliation, not automatic replay.
+    const preflightFailure = this.emulator.preflight(ticket, request);
+    if (preflightFailure) return { allowed: false, reason: preflightFailure, state: this.emulator.observe() };
     const reservation = this.ledger.reserve(request.command.commandId, ticket.commandDigest);
     if (!reservation.accepted) {
       return { allowed: false, reason: 'DUPLICATE_DURABLE_RESERVATION', state: this.emulator.observe() };
