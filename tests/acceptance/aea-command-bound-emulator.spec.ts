@@ -39,6 +39,19 @@ describe('Proof Gate 2 prototype: exact-command one-shot capability', () => {
     const revoked = { ...request, held: { ...request.held!, grant: { ...request.held!.grant, revoked: true } } };
     expect(emu.execute(ticket, revoked)).toMatchObject({ allowed: false, reason: 'EXECUTION_BOUNDARY_REFUSED', state: 0 });
   });
+  it('KNOWN GAP: a fresh emulator can reauthorize an already executed command', () => {
+    // Two process instances have no shared ledger. This intentionally
+    // characterizes the restart/distributed replay gap, not a security pass.
+    const request = proofFixture('PG2-RESTART');
+    const first = new CommandBoundEmulator();
+    const ticket = first.authorize(request)!;
+    expect(first.execute(ticket, request).allowed).toBe(true);
+    const restarted = new CommandBoundEmulator();
+    const replayedTicket = restarted.authorize(request)!;
+    expect(restarted.execute(replayedTicket, request).allowed).toBe(true);
+    // Each instance observed one mutation: no globally enforced at-most-once rule.
+    expect(first.observe() + restarted.observe()).toBe(2);
+  });
   it('sequential attempts from the same ticket execute at most once', () => {
     const emu = new CommandBoundEmulator();
     const request = proofFixture('PG2-RACE');
