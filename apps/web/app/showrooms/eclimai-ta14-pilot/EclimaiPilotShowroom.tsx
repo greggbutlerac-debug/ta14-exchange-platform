@@ -46,6 +46,9 @@ export default function EclimaiPilotShowroom(){
     <div className="eclHeading"><span>{id}</span><h3>{title}</h3></div>
     <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration'} loading="lazy"/><figcaption>ILLUSTRATIVE / SYNTHETIC · NOT LIVE ECLIMAI OR TA-14 MEASUREMENT</figcaption></figure>
     <p>{description}</p>
+    {id==='05'&&<p className="eclCorrection"><strong>Engineering limitation:</strong> The numerical thermal-performance illustration is not a validated calculation. Do not interpret depicted kW, BTU/h, efficiency or savings as measured results.</p>}
+    {id==='07'&&<p className="eclCorrection"><strong>Approval correction:</strong> Any wording embedded in the image suggesting an “approved” pilot is incorrect. No joint pilot, field authorization or EclimAi endorsement has been granted. This is a synthetic HOLD teaching case.</p>}
+    {id==='08'&&<p className="eclCorrection"><strong>Scenario separation:</strong> This image illustrates a different hypothetical post-authorization verification pathway. It does not follow from the HOLD in Exhibit 07. Pictured numerical outcomes, occupant-hour and savings values are unvalidated and must not be cited as results.</p>}
     <div className="eclNarration"><div><strong>SAMANTHA · EXHIBIT {id}</strong><small>Spoken guide · scrolling remains available</small></div><button type="button" onClick={()=>narrate(id,title,description)}>{playing===id?'■ Stop Samantha':'▶ Play Samantha'}</button></div>
     <div className="eclTransition" aria-label={'Learning transition after exhibit '+id}>
       <div><span className="eclEyebrow">HERE'S WHAT YOU JUST LEARNED</span><p>{transitions[Number(id)-1][0]}</p></div>
