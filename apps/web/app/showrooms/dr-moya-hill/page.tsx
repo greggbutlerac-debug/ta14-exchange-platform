@@ -144,7 +144,8 @@ export default function DrMoyaHillShowroom() {
     <header className={styles.hero} id="top"><div className={styles.wrap}>
       <p className={styles.flag}>COLLABORATIVE REVIEW EDITION · NOT YET APPROVED FOR PUBLIC RELEASE</p>
       <div className={styles.heroGrid}><div>
-        <p className={styles.eyebrow}>FOUNDING MARYLAND AMBASSADOR · PROFESSIONAL RECOGNITION</p>
+        <p className={styles.ambassadorDesignation}>TA-14 AUTHORITY GOVERNANCE AMBASSADOR <span>MARYLAND</span></p>
+        <p className={styles.eyebrow}>FOUNDING HONORARY AMBASSADOR · PROFESSIONAL RECOGNITION</p>
         <h1>Dr. Moya Hill <em>Governing information before AI relies on it.</em></h1>
         <p className={styles.lead}>Celebrating a governance leader, international speaker, educator, author and creator of the independent Unified Information Governance Model™.</p>
         <p className={styles.independence}>Her professional work remains her own. The honorary TA-14 ambassador designation is not a government appointment, employer endorsement, technical certification or claim of jointly implemented technology.</p>
