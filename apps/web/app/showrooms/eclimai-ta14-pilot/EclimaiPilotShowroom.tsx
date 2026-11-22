@@ -24,7 +24,8 @@ export default function EclimaiPilotShowroom(){
   window.speechSynthesis.cancel();
   if(playing===id){setPlaying(null);return;}
   const lesson=transitions[Number(id)-1];
-  const u=new SpeechSynthesisUtterance('Exhibit '+id+'. '+title+'. '+description+' Here is what you just learned. '+lesson[0]+' Here is what you will learn next. '+lesson[1]+' All data and diagrams are illustrative. No deployed integration or validated result is claimed.');
+  const specificCorrection=id==='05'?'The depicted performance calculations have not been validated.':id==='07'?'Any approval wording shown inside this illustration is incorrect. EclimAi has not approved this pilot or presentation.':id==='08'?'This is a separate hypothetical scenario, not a continuation of the HOLD decision in exhibit seven. No depicted savings or occupant-hour figures are validated.':'';
+  const u=new SpeechSynthesisUtterance('Exhibit '+id+'. '+title+'. '+description+' '+specificCorrection+' Here is what you just learned. '+lesson[0]+' Here is what you will learn next. '+lesson[1]+' All data and diagrams are illustrative. No deployed integration or validated result is claimed.');
   const voices=window.speechSynthesis.getVoices();
   u.voice=voices.find(v=>/Samantha/i.test(v.name))||voices.find(v=>v.lang.startsWith('en-US'))||null;
   u.rate=.87;u.onend=()=>setPlaying(null);u.onerror=()=>setPlaying(null);
