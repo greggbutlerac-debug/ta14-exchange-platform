@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Transparent Air | Get the Diagnosis Right',
     description:
-      'Transparent Air offers a $29 AC diagnostic service call credited toward an approved repair in eligible South Pinellas service areas, making the diagnostic trip effectively free with repair. Separate $80 second opinions are available.',
+      'Transparent Air offers a $29 AC diagnostic service call credited toward an approved repair in eligible South Pinellas service areas, making the diagnostic trip effectively free with repair. Separate $49 second opinions are available.',
     url: PAGE_URL,
     type: 'website',
   },
@@ -204,7 +204,7 @@ export default function TransparentAirPage() {
             <p>
               We inspect your AC, explain the evidence, and show you why a repair is necessary before you decide. If you approve the recommended repair performed by Transparent Air, we credit the $29 diagnostic trip charge toward that repair — making the diagnostic service call effectively free.
             </p>
-            <p style={{fontSize:13,color:'#6a7d82'}}>If you decline the repair, the $29 diagnostic service-call charge applies. Repairs are quoted separately and require your approval. The independent $80 second-opinion service remains a separate option.</p>
+            <p style={{fontSize:13,color:'#6a7d82'}}>If you decline the repair, the $29 diagnostic service-call charge applies. Repairs are quoted separately and require your approval. The independent $49 second-opinion service remains a separate option.</p>
             <div className="actions">
               <a className="btn primary" href={PHONE_HREF}>BOOK THE $29 DIAGNOSTIC · {PHONE_DISPLAY}</a>
               <Link className="btn outline" href="/transparent-air/second-opinion">EXPLORE SECOND OPINIONS →</Link>
@@ -236,7 +236,7 @@ export default function TransparentAirPage() {
             </article>
             <article className="card">
               <h3>Told You Need a New AC?</h3>
-              <p><strong>$80 to verify a decision that could cost $10,000.</strong> Protect the decision before you replace the equipment.</p>
+              <p><strong>$49 to verify a decision that could cost $10,000.</strong> Protect the decision before you replace the equipment.</p>
               <p><Link href="/transparent-air/told-you-need-new-ac">VERIFY BEFORE YOU REPLACE →</Link></p>
             </article>
           </div>
@@ -259,7 +259,7 @@ export default function TransparentAirPage() {
           <p>Call Transparent Air and tell us what the system is doing.</p>
           <div className="actions">
             <a className="btn primary" href={PHONE_HREF}>CALL {PHONE_DISPLAY}</a>
-            <Link className="btn light" href="/transparent-air/second-opinion">BOOK THE $80 SECOND OPINION →</Link>
+            <Link className="btn light" href="/transparent-air/second-opinion">BOOK THE $49 SECOND OPINION →</Link>
             <a className="btn light" href={GOOGLE_BUSINESS_URL} target="_blank" rel="noopener noreferrer">SEE 4.9★ GOOGLE REVIEWS ↗</a>
           </div>
         </div>
