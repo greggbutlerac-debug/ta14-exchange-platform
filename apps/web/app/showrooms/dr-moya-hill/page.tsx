@@ -91,7 +91,7 @@ const exhibits: Exhibit[] = [
 
 const asset = (name: string) => '/' + encodeURIComponent(name);
 const pdf = asset('TA14_Dr_Moya_Hill_Ambassador_Showroom_Aligned_Review_v3.pdf');
-const portrait = '/moya-hill-hero-final.jpg';
+const portrait = '/dr-moya-hill-face-portrait.jpg';
 
 function Narration({ exhibit }: { exhibit: Exhibit }) {
   const [mode, setMode] = useState<'idle'|'playing'|'paused'|'unsupported'>('idle');
