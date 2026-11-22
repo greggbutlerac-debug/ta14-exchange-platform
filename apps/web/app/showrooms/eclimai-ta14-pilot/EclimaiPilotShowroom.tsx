@@ -7,7 +7,7 @@ const exhibits = [
  ['02','Mechanical effort meets human context','HVAC Effort Meets Human Context-2.png','Relate measured HVAC electrical and thermal performance to EclimAi occupancy estimates. Occupancy is not a substitute for measured environmental conditions.'],
  ['03','Proposed integration blueprint','EclimAi × TA-14_ Proposed Integration Blueprint-3.png','Separate occupancy intelligence, attributable AIR records, optimization proposals, execution authorization and post-action verification. No live interface has been validated.'],
  ['04','Synchronized environmental record','Synchronized Building Environmental Dashboard-4.png','Align exterior, interior, occupancy and equipment evidence while preserving original timestamps, quality flags and missing-data limitations.'],
- ['05','HVAC thermal performance','EclimAi HVAC Thermal Performance Dashboard-5.png','Distinguish measured electrical input from independently established thermal delivery. The illustration does not validate its pictured engineering calculations.'],
+ ['05','HVAC thermal performance','EclimAi HVAC Thermal Performance Dashboard-5.png','Distinguish measured electrical input from independently established thermal delivery. Any pictured engineering calculations are hypothetical and unvalidated.'],
  ['06','Atmospheric Integrity Record','Air Record_ HVAC Evidence Dashboard-6.png','Preserve attributable observations, derived values, revisions and continuity gaps. Illustrated record IDs and verification indicators are fictional.'],
  ['07','Independent execution governance','EclimAi × TA-14 Governance Dashboard.png','AEA examines Admissible Evidence, Applicable Authority and Established Standing at the execution boundary. Stale mandatory evidence means HOLD in the teaching scenario.'],
  ['08','Verify the consequence','eclimai-ta14-08-verify.png','Separate the proposed action, authorized decision, actual equipment response and observed environmental outcomes. Energy and occupant-hour calculations require a defensible method.']
@@ -46,13 +46,8 @@ export default function EclimaiPilotShowroom(){
    {exhibits.map(([id,title,image,description])=><article className="eclExhibit" key={id} id={'exhibit-'+id}>
     <div className="eclHeading"><span>{id}</span><h3>{title}</h3></div>
 
-    {(id==='05'||id==='07'||id==='08')?
-    <figure className="eclSafeDiagram" aria-label={title+' — corrected conceptual schematic'}>
-      <div className="eclDiagramTitle">{id==='05'?'THERMAL PERFORMANCE: REQUIRED EVIDENCE':id==='07'?'EXECUTION GOVERNANCE: UNAPPROVED CONCEPT':'POST-ACTION VERIFICATION: SEPARATE SCENARIO'}</div>
-      <div className="eclDiagramFlow">{(id==='05'?['Measured electrical input','Independently measured thermal output','Documented calculation + uncertainty']:id==='07'?['Optimizer proposes','AEA checks evidence, authority, standing','Missing evidence → HOLD']:['Separately authorized command','Observed equipment response','Independent environmental outcome']).map((step,i)=><div className="eclDiagramNode" key={step}><span>{String(i+1).padStart(2,'0')}</span><strong>{step}</strong></div>)}</div>
-      <figcaption>CONCEPTUAL SCHEMATIC · NO PILOT APPROVAL · NO VALIDATED RESULTS</figcaption>
-    </figure>:
-    <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration'} loading="lazy"/><figcaption>ILLUSTRATIVE / SYNTHETIC · NOT LIVE ECLIMAI OR TA-14 MEASUREMENT</figcaption></figure>}
+    {(id==='05'||id==='07'||id==='08')&&<div className="eclImageDisclosure" role="note"><strong>Illustration only — not verified:</strong> {id==='05'?'Any pictured thermal calculations, efficiency or savings figures are hypothetical and not validated.':id==='07'?'Any wording inside the original artwork implying an approved pilot is incorrect. No EclimAi pilot or co-branding approval is claimed.':'This depicts a separate hypothetical verification example, not the outcome of Exhibit 07 HOLD. Any pictured outcomes or savings are unvalidated.'}</div>}
+    <figure><img src={'/'+encodeURIComponent(image)} alt={title+' — hypothetical teaching illustration, not independently validated'} loading="lazy"/><figcaption>ORIGINAL EXHIBIT ARTWORK · HYPOTHETICAL / SYNTHETIC · SEE CORRECTION ABOVE WHERE APPLICABLE</figcaption></figure>
     <p>{description}</p>
     <div className="eclNarration"><div><strong>SAMANTHA · EXHIBIT {id}</strong><small>Spoken guide · scrolling remains available</small></div><button type="button" onClick={()=>narrate(id,title,description)}>{playing===id?'■ Stop Samantha':'▶ Play Samantha'}</button></div>
     <div className="eclTransition" aria-label={'Learning transition after exhibit '+id}>
