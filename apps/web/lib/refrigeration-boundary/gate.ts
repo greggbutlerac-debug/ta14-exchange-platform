@@ -78,16 +78,17 @@ export type ExecutionResult = { commandId: string; determination: AuthorityDeter
 export function executeCommitted(input: { actorId: string; command: Command; held: HeldGrant | null; evidence: EvidenceStanding; change: MaterialChange | null; minute: number; b?: AuthorizedBaseline }): ExecutionResult {
   const b = input.b ?? BASELINE;
   const actor = actorCheck(input.actorId, input.held, b);
+  const bounds = boundsCheck(input.command, b);
   const attempt = evaluateExecutionAttempt({
     authorityInput: { asset: assetFor(input.command, b), authority: input.held?.grant ?? null, change: input.change, evidence: input.evidence, now: minuteToIso(input.minute) },
     attempt: { attemptId: `${input.command.commandId}-EXEC`, attemptedAt: minuteToIso(input.minute), consequence: input.command.consequence },
   });
-  const determination = stricter(attempt.determination, actor.determination);
+  const determination = [actor.determination, bounds.determination].reduce(stricter, attempt.determination);
   return {
     commandId: input.command.commandId,
     determination,
     executionPermitted: determination === 'ALLOW' && attempt.executionPermitted,
-    reasonCodes: [...actor.reasons, ...attempt.reasonCodes],
+    reasonCodes: [...actor.reasons, ...bounds.reasons, ...attempt.reasonCodes],
     gcea: { receiptHash: attempt.receipt.hash, replayId: attempt.receipt.replayId },
   };
 }
