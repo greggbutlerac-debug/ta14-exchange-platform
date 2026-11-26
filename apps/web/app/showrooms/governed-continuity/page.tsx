@@ -79,6 +79,7 @@ const cases: {label:string; description:string; expected:Decision; explanation:s
   {label:'Unresolved exceptional scope', description:'A novel safety exception needs a policy-designated supervisor to determine scope.', expected:'ESCALATE', explanation:'The request cannot proceed until the designated authority completes its review.'},
   {label:'All prerequisites established', description:'Current evidence, scoped authorization, established standing and required safeguards are all stipulated valid.', expected:'ALLOW', explanation:'Only the narrowly described synthetic action is permitted; outcome verification remains separate.'}
 ];
+const learningTransitions = ["Next, examine what happens when the founder retires and undocumented knowledge or authority must pass to someone else.","Next, take the buyer’s perspective: what records would make the enterprise independently examinable?","Next, explore how HPR and AIR can preserve attributable technical and environmental evidence.","Next, distinguish reliable evidence from the authority and standing required to act on it.","Next, examine how AuthorityGate represents the execution boundary through ALLOW, HOLD, DENY and ESCALATE.","Next, test the policy intent of revoking obsolete founder permissions and establishing successor standing.","Next, consider what an enterprise could look like when accountability no longer depends on one individual.","Move from conceptual illustration to independent testing of evidence, delegation, revocation, standing, record continuity, bypass resistance and outcome verification."];
 const choices:Decision[]=['ALLOW','HOLD','DENY','ESCALATE'];
 const referencePdf = '/' + encodeURIComponent('TA14_Governed_Continuity_v0.1 (2).pdf');
 const imageUrl=(name:string)=>'/' + encodeURIComponent(name);
@@ -165,7 +166,7 @@ export default function GovernedContinuityShowroom() {
           <div className="gc-image"><Image src={imageUrl(exhibit.image)} alt={'Exhibit '+(index+1)+': '+exhibit.title+' — conceptual TA-14 educational illustration'} width={1648} height={928} sizes="(max-width: 900px) 100vw, 1160px" style={{width:'100%',height:'auto'}} priority={index===0}/></div>
           <div className="gc-controls"><button type="button" onClick={()=>play(index)} disabled={!voiceAvailable}>{speaking===index?'■ Stop narration':'▶ Play narration'}</button><button type="button" onClick={()=>setShowTranscripts(x=>!x)}>{showTranscripts?'Hide transcripts':'Show transcripts'}</button><span>{voiceAvailable?'Samantha voice when available; otherwise the browser’s English voice.':'Narration unavailable in this browser.'}</span></div>
           {showTranscripts&&<p className="gc-transcript"><strong>Narration transcript: </strong>{exhibit.narration}</p>}
-          <div className="gc-lesson"><strong>What the exhibit establishes:</strong> {exhibit.lesson}</div>
+          
           {index===5&&<section className="gc-interactive" aria-label="Synthetic AuthorityGate decision challenge">
             <p className="gc-eyebrow">INTERACTIVE · SYNTHETIC GOVERNANCE CHALLENGE</p>
             <h3>What should the gate decide?</h3>
@@ -184,6 +185,8 @@ export default function GovernedContinuityShowroom() {
             <div className="gc-feedback" role="status"><strong>Expected synthetic determination: {result}</strong><p>{resultExplanation}</p></div>
             <p className="gc-small">All other prerequisites are deliberately stipulated valid. This illustrates policy intent; actual revocation, identity, records and bypass resistance remain untested in this specific reference case.</p>
           </section>}
+          <section className="gc-lesson" aria-label="Learning recap"><h3>What We Just Learned</h3><p>{exhibit.lesson}</p></section>
+          <section className="gc-transcript" aria-label="Learning transition" style={{marginTop:16,borderLeft:'4px solid #d5b66e'}}><h3>{index===7?'Where We Go From Here':"What We're About to Learn"}</h3><p>{learningTransitions[index]}</p>{index<7&&<a href={'#exhibit-'+(index+2)}>Continue to Exhibit {String(index+2).padStart(2,'0')} →</a>}</section>
         </article>)}
       </section>
 
