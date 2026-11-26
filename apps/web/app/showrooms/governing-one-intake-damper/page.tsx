@@ -118,6 +118,21 @@ export default function GoverningOneIntakeDamper(){
      </div>
      {showTranscripts&&<p style={{color:muted,lineHeight:1.75}}><strong>Narration: </strong>{exhibit.narration}</p>}
      <p style={{background:'#153946',padding:'14px 18px',borderLeft:'4px solid '+teal,borderRadius:6,lineHeight:1.7}}><strong>Examination lesson:</strong> {exhibit.lesson}</p>
+     <aside aria-label="Learning transition" style={{marginTop:24,padding:'20px 22px',border:'1px solid #315c69',borderRadius:10,background:'#102f3c'}}>
+      <p style={{color:teal,fontSize:12,fontWeight:800,letterSpacing:2}}>WHAT WE JUST LEARNED</p>
+      <p style={{lineHeight:1.7,margin:'8px 0 20px'}}>{exhibit.lesson}</p>
+      <p style={{color:teal,fontSize:12,fontWeight:800,letterSpacing:2}}>WHAT WE WILL LEARN NEXT</p>
+      <p style={{lineHeight:1.7,margin:'8px 0 0'}}>{[
+       'Next, we will see how rising occupancy changes the library environment and why attributable measurements must precede interpretation.',
+       'Next, we will examine how building intelligence turns admissible observations into a proposed damper action without granting itself permission.',
+       'Next, we will discover why a recommendation can lose its justification when outdoor conditions change before execution.',
+       'Next, we will examine how AuthorityGate evaluates current evidence, applicable authority and established standing at the execution boundary.',
+       'Next, we will see how escalation prevents an unjustified discretionary increase while preserving required ventilation and independent safety controls.',
+       'Next, we will examine how changed conditions can support a new, independently justified authorization rather than reuse an earlier permission.',
+       'Next, we will distinguish reported damper movement from independently verified airflow and environmental outcomes.',
+       'Next, you will apply these principles yourself by changing the simulated conditions and examining the resulting AuthorityGate determination.'
+      ][i]}</p>
+     </aside>
      <div style={{marginTop:16,display:'flex',justifyContent:'flex-end'}}>
       <a href={i===7?'#simulation':'#exhibit-'+(i+2)} style={{color:teal,fontWeight:800,textUnderlineOffset:4}}>{i===7?'Continue to the simulation →':'Continue to Exhibit '+String(i+2).padStart(2,'0')+' →'}</a>
      </div>
