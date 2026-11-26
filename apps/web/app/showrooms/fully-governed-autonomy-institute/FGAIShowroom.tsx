@@ -116,6 +116,62 @@ const lessons: Lesson[] = [
   }
 ];
 
+
+const learningTransitions = [
+  [
+    "An installed autonomous controller may be capable of action, but capability alone never supplies permission to bind a consequence to reality.",
+    "We will trace the proposed progression from connectivity and interoperability to Level 4 Autonomy-Ready and TA-14's proposed Level 5, Fully Governed Autonomy."
+  ],
+  [
+    "Level 4 describes autonomous capability. Proposed Level 5 adds independent evaluation of whether a particular consequence is justified at execution.",
+    "We will test why even a convincing prediction cannot substitute for current, attributable evidence when a real damper action is proposed."
+  ],
+  [
+    "A forecast can inform an operator, but stale sensor evidence cannot authorize an opening command. In this teaching case, the correct disposition is HOLD.",
+    "We will examine the three prerequisites that must be established together: Admissible Evidence, Applicable Authority and Established Standing."
+  ],
+  [
+    "Accurate data cannot authorize action by itself. An execution boundary must establish the evidence, applicable authority and the actor's standing together.",
+    "We will see how TA-14 AuthorityGate evaluates a proposed command and returns ALLOW, HOLD, DENY or ESCALATE before the consequence occurs."
+  ],
+  [
+    "An earlier authorization is not permanent. AuthorityGate must reassess current conditions, including revocation, at the moment of execution.",
+    "We will move from one governed command to the larger question: how institutions preserve accountable decisions and authority when people and leadership change."
+  ],
+  [
+    "Accountability requires enduring authority records, attributable decisions and verifiable outcomes—not reliance on a founder's personal approval.",
+    "We will apply consequence governance beyond buildings to healthcare, finance, transport, water, energy and other fields where interpreted data can change reality."
+  ],
+  [
+    "Energy or financial optimization is not sufficient if it violates applicable safety and environmental constraints. Consequence governance concerns the governed action across domains.",
+    "We will close by exploring independent examination, the limits of membership claims and the founding commitment of the Fully Governed Autonomy Institute."
+  ]
+] as const;
+
+function LearningBridge({ index }: { index: number }) {
+  const [learned, next] = learningTransitions[index];
+  const nextNumber = String(index + 2).padStart(2, '0');
+  return (
+    <aside aria-label={'Learning transition to exhibit ' + nextNumber} style={{
+      margin: '22px 0 30px', padding: 'clamp(23px,4vw,39px)', borderRadius: 22,
+      border: '1px solid rgba(237,199,119,.34)',
+      background: 'linear-gradient(110deg,rgba(25,43,67,.95),rgba(9,20,40,.98))'
+    }}>
+      <div style={{display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(260px,1fr))', gap: 24}}>
+        <div>
+          <div style={{fontSize: 11, fontWeight: 900, letterSpacing: '.16em', color: '#edc777'}}>WHAT WE JUST LEARNED</div>
+          <p style={{fontSize: 18, color: '#ecf3fc', lineHeight: 1.7, margin: '12px 0 0'}}>{learned}</p>
+        </div>
+        <div style={{borderLeft: '3px solid rgba(237,199,119,.5)', paddingLeft: 23}}>
+          <div style={{fontSize: 11, fontWeight: 900, letterSpacing: '.16em', color: '#edc777'}}>WHAT WE'RE ABOUT TO LEARN · EXHIBIT {nextNumber}</div>
+          <p style={{fontSize: 18, color: '#ecf3fc', lineHeight: 1.7, margin: '12px 0 0'}}>{next}</p>
+          <a href={'#exhibit-' + nextNumber} style={{display:'inline-block',marginTop: 14, color: '#f0d28c',fontWeight: 800,textDecoration:'underline'}}>Continue to exhibit {nextNumber} ↓</a>
+        </div>
+      </div>
+    </aside>
+  );
+}
+
 const gold = '#edc777';
 const panel = { background: 'linear-gradient(145deg,rgba(12,27,49,.98),rgba(3,11,25,.98))', border: '1px solid rgba(237,199,119,.27)', borderRadius: 22 } as const;
 const buttonStyle = { border: '1px solid rgba(237,199,119,.4)', background: 'rgba(237,199,119,.08)', color: '#f7e8c8', borderRadius: 10, padding: '11px 15px', fontSize: 13, fontWeight: 800, cursor: 'pointer' } as const;
@@ -224,7 +280,8 @@ export default function FGAIShowroom() {
           <h2 style={{ fontSize: 'clamp(34px,5.5vw,62px)', letterSpacing: '-.045em', margin: '10px 0' }}>Walk the boundary from capability to consequence.</h2>
         </div>
 
-        {lessons.map((lesson) => (
+        {lessons.map((lesson, index) => (
+          <div key={lesson.number}>
           <section key={lesson.number} id={'exhibit-' + lesson.number} style={{ ...panel, marginTop: 20, padding: 'clamp(18px,3.7vw,42px)', scrollMarginTop: 22 }}>
             <div style={{ color: gold, letterSpacing: '.17em', fontSize: 11, fontWeight: 900 }}>EXHIBIT {lesson.number} OF 08</div>
             <h2 style={{ fontSize: 'clamp(30px,4.8vw,53px)', lineHeight: 1.12, letterSpacing: '-.04em', margin: '11px 0' }}>{lesson.title}</h2>
@@ -235,6 +292,8 @@ export default function FGAIShowroom() {
             <Samantha text={lesson.narration} number={lesson.number} />
             <Challenge lesson={lesson} />
           </section>
+          {index < lessons.length - 1 && <LearningBridge index={index} />}
+          </div>
         ))}
 
         <footer style={{ ...panel, marginTop: 28, padding: 'clamp(24px,4vw,43px)' }}>
