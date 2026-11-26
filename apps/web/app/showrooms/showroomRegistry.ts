@@ -10,6 +10,7 @@ export const showroomCollections=[
 ['GOVERNANCE & ARCHITECTURES','TA14 architectures and registered governance teaching surfaces.'],
 ['EXAMINATIONS & DEMONSTRATIONS','Bounded examinations, proving-ground demonstrations and tests.'],
 ['EVENTS & PRESENTATIONS','Conference, meeting and presentation experiences.'],
+['Governed Continuity · From Founder Dependency to Institutional Accountability','/showrooms/governed-continuity','BUILDINGS & HVAC','Eight cinematic exhibits Samantha narration when available technical PDF synthetic AuthorityGate ALLOW HOLD DENY ESCALATE decision challenge ownership transition simulation founder successor standing FGAI Governed Enterprise Continuity GEC Sandrea West founding-day contributor recognition educational demonstration not live deployment'],
 ] as const;
 
 export const showroomRooms=[
