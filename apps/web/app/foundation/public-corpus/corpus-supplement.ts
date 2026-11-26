@@ -220,6 +220,7 @@ export const PATENT_CORPUS_RECORDS: CorpusRecord[] = [
 ];
 
 export const ZENODO_ARCHITECTURE_RECORDS: CorpusRecord[] = [
+  { id: 'zenodo-acga-v1', category: 'ZENODO', title: 'TA-14 Admissible Consequence Governance Architecture (ACGA) v1.0', date: '2026-11-26', year: 2026, author: 'Greggory Don Butler', platform: 'Zenodo', status: 'PUBLIC_RECORD', identifier: '10.5281/zenodo.24563827', href: 'https://doi.org/10.5281/zenodo.24563827', relationship: 'Coordinates consequence formation, authorization, execution and outcome verification across domains. AEA retains foundational execution jurisdiction; AuthorityGate provides runtime enforcement within declared protected boundaries.', description: 'Public Examination Edition, 39 pages, CC BY 4.0. Proposed architectural specification; institutional adoption and independent implementation certification are not asserted.', sourceClass: 'Zenodo DOI deposit', tags: ['Zenodo', 'DOI', 'TA-14', 'ACGA', 'AEA', 'AuthorityGate', 'Consequence Governance', 'v1.0'] },
   // Dashboard reconciliation (47 total uploads): these ten were absent from the
   // 27 architecture + 10 standards records. Search links are intentionally
   // provisional until exact Zenodo record IDs and access status are verified.
