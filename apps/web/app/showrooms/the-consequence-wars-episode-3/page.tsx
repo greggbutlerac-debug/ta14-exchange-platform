@@ -82,7 +82,7 @@ export default function RadonConsequenceWars(){
  </section>
  <footer style={{padding:'38px 0 0',color:'#c7d6e4',lineHeight:1.8}}>
  <h2 style={{color:'#fff'}}>The greatest battle is against an invisible risk that people cannot sense.</h2>
- <p>**MONITOR · MITIGATE · VERIFY** means test the building, use qualified mitigation when indicated, and retest the real outcome. AEA examines Admissible Evidence (AE), Applicable Authority (AA), and Established Standing (ES). AuthorityGate can return ALLOW, HOLD, DENY, or ESCALATE. In this story, the Guardians work together—against exposure, not one another.</p>
+ <p><strong style={{color:'#ffca81'}}>MONITOR · MITIGATE · VERIFY</strong> means test the building, use qualified mitigation when indicated, and retest the real outcome. AEA examines Admissible Evidence (AE), Applicable Authority (AA), and Established Standing (ES). AuthorityGate can return ALLOW, HOLD, DENY, or ESCALATE. In this story, the Guardians work together—against exposure, not one another.</p>
  <p style={{fontSize:13}}>Fictional comic intended for approximately age 14 and up. Values 8.7 pCi/L and 1.2 pCi/L are illustrative, not real field records. Nothing here is installation guidance, a medical diagnosis, or proof that any particular building is safe.</p>
  <Link href="/comics" style={{color:'#ffce86',fontWeight:900}}>← RETURN TO THE COMICS LIBRARY</Link>
  </footer></div></main>
