@@ -5,7 +5,7 @@ const series = [
     title: 'The Consequence Wars',
     subtitle: 'Cinematic interactive governance comics',
     description: 'Fictional Guardians confront unauthorized automation. Follow the evidence, examine authority, and decide when a proposed consequence must be held, denied, or escalated.',
-    episodes: [{number: 1, title: 'The Millisecond Between Permission and Consequence', href: '/showrooms/the-consequence-wars', status: 'READ EPISODE 1'}, {number: 2, title: 'The Air That Betrayed Them', href: '/showrooms/the-consequence-wars-episode-2', status: 'EXPLORE EPISODE 2'}],
+    episodes: [{number: 1, title: 'The Millisecond Between Permission and Consequence', href: '/showrooms/the-consequence-wars', status: 'READ EPISODE 1'}, {number: 2, title: 'The Air That Betrayed Them', href: '/showrooms/the-consequence-wars-episode-2', status: 'EXPLORE EPISODE 2'}, {number: 3, title: 'Radon: The Invisible Intruder', href: '/showrooms/the-consequence-wars-episode-3', status: 'EXPLORE EPISODE 3'}],
   },
 ];
 
