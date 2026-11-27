@@ -82,7 +82,7 @@ const cases: {label:string; description:string; expected:Decision; explanation:s
 const learningTransitions = ["Next, examine what happens when the founder retires and undocumented knowledge or authority must pass to someone else.","Next, take the buyer’s perspective: what records would make the enterprise independently examinable?","Next, explore how HPR and AIR can preserve attributable technical and environmental evidence.","Next, distinguish reliable evidence from the authority and standing required to act on it.","Next, examine how AuthorityGate represents the execution boundary through ALLOW, HOLD, DENY and ESCALATE.","Next, test the policy intent of revoking obsolete founder permissions and establishing successor standing.","Next, consider what an enterprise could look like when accountability no longer depends on one individual.","Move from conceptual illustration to independent testing of evidence, delegation, revocation, standing, record continuity, bypass resistance and outcome verification."];
 const shadowCase = {description:'A senior technician encounters a proposed $2,800 compressor replacement on Friday. Their delegated approval limit is $1,000. The retired founder texts: Just take care of them and we will sort the paperwork Monday. What should the technician and dispatcher do?', expected:'ESCALATE' as Decision, explanation:'Hold the replacement pending review by the currently designated approver. The retired founder has no current approval standing in this fixture. Preserve the text, diagnostic baseline, proposed scope and escalation record. Independently authorized emergency protective measures may proceed only within their own scope. Re-evaluate evidence, authority and standing before release, then verify actual work and outcomes.'};
 const choices:Decision[]=['ALLOW','HOLD','DENY','ESCALATE'];
-const referencePdf = '/' + encodeURIComponent('TA14_Governed_Continuity_v0.1 (2).pdf');
+const referencePdf = '/' + encodeURIComponent('TA14_Governed_Continuity_v0.2 (1).pdf');
 const imageUrl=(name:string)=>'/' + encodeURIComponent(name);
 
 export default function GovernedContinuityShowroom() {
@@ -140,7 +140,7 @@ export default function GovernedContinuityShowroom() {
         <h1>Governed <em>Continuity</em></h1>
         <p className="gc-subtitle">From Founder Dependency to Institutional Accountability</p>
         <p className="gc-lead">An eight-exhibit educational reference case exploring how technical evidence, authority and accountability could remain examinable across leadership and ownership transitions.</p>
-        <div className="gc-actions"><a href="#exhibits" className="gc-primary">Explore eight exhibits</a><a href={referencePdf} download className="gc-secondary">Download original technical PDF · v0.1</a></div>
+        <div className="gc-actions"><a href="#exhibits" className="gc-primary">Explore eight exhibits</a><a href={referencePdf} download className="gc-secondary">Download revised technical PDF · v0.2</a></div>
         <div className="gc-notice"><strong>Discussion draft · synthetic reference scenario.</strong> Images and interactive outcomes are conceptual. No actual client, production integration, physical equipment action, independent certification, audited valuation effect or verified successor transition is established by this showroom. Any scene implying completion or commercial benefit depicts a proposed goal, not achieved results.</div>
       </header>
 
@@ -205,7 +205,7 @@ export default function GovernedContinuityShowroom() {
       <section className="gc-footer-panel">
         <h2>From illustration to independent proof</h2>
         <p>A credible deployment must separately test evidence completeness, valid delegations, revoked permissions, established standing, record reconstruction, bypass resistance and post-work outcome verification. Manual interventions require separate human and procedural controls. Neither the images nor the synthetic quiz prove those conditions have been achieved.</p>
-        <div className="gc-actions"><a href={referencePdf} download className="gc-primary">Read the original eight-page technical concept PDF · v0.1</a><Link href="/showrooms" className="gc-secondary">Return to showroom library</Link></div>
+        <div className="gc-actions"><a href={referencePdf} download className="gc-primary">Read the revised eight-page technical concept PDF · v0.2</a><Link href="/showrooms" className="gc-secondary">Return to showroom library</Link></div>
         <p className="gc-small">TA-14 Governed Continuity is an educational application proposal within the Governed Enterprise Continuity area of examination. Sandrea West's contribution is acknowledged above; no partner endorsement or contractual arrangement is represented.</p>
       </section>
     </div>
