@@ -14,6 +14,8 @@ export const showroomCollections=[
 ] as const;
 
 export const showroomRooms=[
+['Admissible Consequence Governance Architecture · ACGA v1.0','/showrooms/admissible-consequence-governance','GOVERNANCE & ARCHITECTURES','Public examination edition nine images eight lessons narration PDF Zenodo five determinations ALLOW HOLD NARROW ESCALATE DENY; proposed specification not certification'],
+
 ['Fully Governed Autonomy Institute (FGAI) · Justified Autonomy and Accountable Execution','/showrooms/fully-governed-autonomy-institute','GOVERNANCE & ARCHITECTURES','FGAI educational flagship eight illustrated exhibits seven what we just learned and what we are about to learn transitions Samantha narration interactive governance challenges educational guide draft founding charter proposed Level 5 fully governed autonomy Admissible Evidence Applicable Authority Established Standing TA-14 AuthorityGate ALLOW HOLD DENY ESCALATE consequence governance institutional accountability; educational only, not certification'],
 
 ['Governing One Intake Damper · From CO₂ Evidence to Authorized Action','/showrooms/governing-one-intake-damper','EXAMINATIONS & DEMONSTRATIONS','Eight images, Samantha narration, Examination Edition 1.0 PDF, one primary outdoor-air intake damper, CO2 ventilation request, changing outdoor PM2.5, Atmospheric Integrity Records, ACA, AEA, AuthorityGate ALLOW HOLD DENY ESCALATE interactive virtual simulation and independent outcome examination; educational simulation only'],
