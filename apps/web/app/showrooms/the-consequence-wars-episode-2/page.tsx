@@ -3,61 +3,95 @@
 import Link from 'next/link';
 import {useState} from 'react';
 
-type Chapter={title:string;eyebrow:string;voice:string;lesson:string;accent:string;icon:string};
-const chapters:Chapter[]=[
-{title:'THE SCHOOL BELL',eyebrow:'01 / A NORMAL SCHOOL DAY',voice:'At Riverside Elementary, the children are learning. A classroom sensor reports carbon dioxide rising to a fictional 1,850 parts per million. The reading deserves attention, but it does not determine the solution.',lesson:'Observation is not permission. CO₂ is a ventilation indicator, not by itself a complete assessment of indoor-air safety.',accent:'#7dd3fc',icon:'🏫'},
-{title:'THE HELPFUL ANSWER',eyebrow:'02 / PROMPTOR ARRIVES',voice:'PROMPTOR identifies the rising CO₂ and recommends increasing outdoor ventilation. He genuinely wants to help the children, using the information available to him.',lesson:'A recommendation is not authorization. PROMPTOR is a fictional character, not a depiction of a real monitoring provider.',accent:'#ffcf71',icon:'✦'},
-{title:'THE MISSING HORIZON',eyebrow:'03 / SMOKE BEYOND THE WINDOWS',voice:'Outside the school, a wildfire darkens the horizon. Outdoor fine particles reach a fictional 285 micrograms per cubic meter. The monitoring recommendation did not include this critical condition.',lesson:'The outdoor value is an illustrative story value, not a verified sensor record available to the proposed control decision.',accent:'#fb923c',icon:'🔥'},
-{title:'THE COMMAND QUEUE',eyebrow:'04 / FROM ADVICE TO ACTUATION',voice:'The system translates the recommendation into a proposed increase in outdoor-air damper opening. The request enters the command queue. It has not executed. The TA-14 Authority Governance Institution receives an alert before execution. PROMPTOR welcomes the review.',lesson:'Detect → recommend → queue are not the same as execute. A queued request cannot bypass the execution gate.',accent:'#fbbf24',icon:'⚙'},
-{title:'THE EVIDENCE GAP',eyebrow:'05 / ARCHIVIST INVESTIGATES',voice:'Archivist examines the Atmospheric Integrity Records. The classroom CO₂ has a traceable record. The outdoor smoke evidence is missing from the decision packet. The action cannot be justified from the available record.',lesson:'AIR tests provenance, timing, calibration, uncertainty and continuity. Missing evidence is marked as missing, never as passed.',accent:'#67e8f9',icon:'▤'},
-{title:'THE CALCULATION TRAP',eyebrow:'06 / CODEX EXAMINES THE MODEL',voice:'Codex examines the computation. It optimized for a single variable: carbon dioxide. It did not adequately account for outdoor smoke, filtration, exposure duration or uncertainty. The number may be right. The proposed action may still be wrong.',lesson:'Admissible computation requires declared scope, traceable inputs and uncertainty. A correct input does not validate an incomplete consequence model.',accent:'#c4b5fd',icon:'◈'},
-{title:'THE INVISIBLE TRADE-OFF',eyebrow:'07 / TERRA PRIME SEES BOTH SIDES',voice:'Terra Prime projects two pathways across the school. More outdoor air might reduce carbon dioxide, but without suitable protection it might increase fine-particle exposure. The children cannot be protected by moving danger from one variable to another.',lesson:'Environmental Integrity Governance examines combined consequences; neither CO₂ nor PM₂.₅ can be optimized in isolation.',accent:'#86efac',icon:'🌿'},
-{title:'INTELLIGENCE AND GOVERNANCE',eyebrow:'08 / PROMPTOR AND AEGIS',voice:'AEGIS explains the missing outdoor evidence. PROMPTOR listens and agrees to pause the proposed change. Together with Archivist, Codex and Terra Prime, they examine alternatives. The children’s safety is their shared priority.',lesson:'Urgency does not create authority. The proposed consequence must satisfy the execution requirements at decision time.',accent:'#93c5fd',icon:'🤝'},
-{title:'THE GUARDIAN’S DECISION',eyebrow:'09 / THE GATE HOLDS',voice:'The gate examines the specific proposed damper increase. Its evidence packet is incomplete, the environmental trade-off unresolved and authority for this change not established. The command receives HOLD. It is not executed.',lesson:'HOLD is not a permanent ventilation strategy or a claim of safety. It prevents this unsupported change while authorized staff assess alternatives.',accent:'#fca5a5',icon:'⛨'},
-{title:'THE CHILDREN COME FIRST',eyebrow:'10 / A JUSTIFIED RESPONSE',voice:'Inside the classroom, the teacher continues caring for the students. Qualified school personnel assess the wildfire conditions, filtration, ventilation needs and protective procedures. PROMPTOR and AEGIS work together to support qualified personnel. The next action will be selected and verified through the appropriate authority. Intelligence and governance, together for the children.',lesson:'Monitoring identifies problems. Governance examines consequences. Qualified personnel must determine and verify the appropriate response.',accent:'#f9e7a3',icon:'♥'}
+type Scene={title:string;eyebrow:string;voice:string;lesson:string;accent:string};
+const scenes:Scene[]=[
+  {title:'The classroom alert',eyebrow:'01 / THE CLASSROOM ALERT',voice:'At fictional Riverdale Elementary, classroom carbon dioxide reaches 1,850 parts per million. Meanwhile, wildfire smoke moves into the region. Two environmental concerns now require investigation. Neither a sensor reading nor an alarm can decide which physical intervention is justified.',lesson:'A measurement identifies a condition; it does not authorize an intervention.',accent:'#7dd3fc'},
+  {title:'The wider environment',eyebrow:'02 / AEGIS ASSESSES CONTEXT',voice:'AEGIS examines regional wildfire information, indoor carbon dioxide, fine particles, and the vulnerability of the children. The illustrated regional air-quality index is context, not verified local outdoor-air evidence for a damper command.',lesson:'Indoor and outdoor consequences must be assessed together. Regional AQI cannot substitute for the local evidence needed for a specific action.',accent:'#93c5fd'},
+  {title:'Intelligence proposes',eyebrow:'03 / PROMPTOR ANALYZES',voice:'PROMPTOR is trying to help. He recommends increasing ventilation and using filtration, based on the information he has. But his display shows atmospheric carbon dioxide at 431 parts per million. That is not the classroom reading of 1,850 parts per million, and it cannot independently authorize a classroom damper change.',lesson:'A helpful recommendation is not execution authority. Scene 3 is the intentionally retained illustration; its atmospheric reading must not be confused with indoor classroom CO₂.',accent:'#ffcf71'},
+  {title:'Joint reassessment',eyebrow:'04 / INTELLIGENCE AND GOVERNANCE COOPERATE',voice:'When the larger environmental context becomes clear, PROMPTOR and AEGIS agree to reassess the proposed ventilation change through TA-14 AuthorityGate before any command can reach the equipment. Neither character is an adversary. They share responsibility for protecting the children.',lesson:'A recommendation is not authorization. Cooperation improves the decision without bypassing its execution boundary.',accent:'#c4b5fd'},
+  {title:'The execution boundary',eyebrow:'05 / HOLD THE ORIGINAL COMMAND',voice:'The proposed increase in outdoor-air intake reaches the execution boundary. Outdoor smoke evidence for the action is incomplete, combined consequences remain unresolved, and applicable authority and standing must be established. The gate returns HOLD. That particular command is not executed.',lesson:'Admissible Evidence, Applicable Authority, and Established Standing must be satisfied for the exact action at execution time. The illustration’s green checks are not proof that those conditions passed. HOLD is not a declaration of occupant safety.',accent:'#fca5a5'},
+  {title:'A cooperative response',eyebrow:'06 / ASSESS PROTECTIVE OPTIONS',voice:'PROMPTOR and AEGIS cooperate on next steps. Qualified school personnel must assess ventilation, filtration, monitoring, and protective procedures. Any new physical change is a distinct action requiring its own evidence and authorization. The team does not treat the first HOLD as an instruction to reduce outdoor air automatically.',lesson:'The action-plan checkmarks in the artwork are illustrative, not verified execution records. Reduced outdoor-air intake is not universally safe.',accent:'#86efac'},
+  {title:'Examining the outcome',eyebrow:'07 / VERIFY THE WHOLE ENVIRONMENT',voice:'The illustration depicts a later reduction in classroom carbon dioxide from 1,850 to 1,120 parts per million. That imagined trend is not proof of its cause. Ordinary particle filtration does not remove carbon dioxide. Occupancy, outdoor-air exchange, particle exposure, instrument validity, and timing all matter.',lesson:'An improved number is not proof of comprehensive safety. Atmospheric Integrity Records require attributable measurements and verification of the full environmental consequence.',accent:'#67e8f9'},
+  {title:'Renewed authorization',eyebrow:'08 / A DIFFERENT ACTION MAY BE ALLOWED',voice:'A separately assessed protective plan may receive ALLOW if admissible evidence, applicable authority, and established standing are demonstrated at execution time. This is not a reversal of the original HOLD without evidence. The scenario depicts what renewed justification could make possible.',lesson:'Each proposed consequence needs its own authorization. The displayed ALLOW is conditional and illustrative, not documented proof that a real school met every requirement.',accent:'#a7f3d0'},
+  {title:'Physical verification',eyebrow:'09 / TEST THE EQUIPMENT AND THE OUTCOME',voice:'In the mechanical room, the team reviews the air-handling unit and the purported execution record. Authorized school personnel would need to establish actual equipment response, airflow, indoor carbon dioxide, smoke exposure, and other relevant outcomes before accepting the result.',lesson:'Authorization, execution, and outcome verification are different events. Stable airflow and lower CO₂ alone do not certify indoor-air safety.',accent:'#f9c997'},
+  {title:'Together for the children',eyebrow:'10 / A SHARED COMMITMENT',voice:'PROMPTOR and AEGIS stand alongside the children with a shared commitment to better decisions. Intelligence can identify possibilities. Governance establishes which actions are justified. Their cooperation illustrates the goal, not a measured safety certification. Intelligence and governance, together for the children.',lesson:'The final illustration is an aspirational fictional ending. A claim that the air is clean would require measured, attributable evidence.',accent:'#fde68a'}
 ];
 const decisions=['ALLOW','HOLD','DENY','ESCALATE'] as const;
+const pdf='/TA14_Consequence_Wars_Episode_2_Illustrated_Edition.pdf';
+
 export default function ConsequenceWarsEpisode2(){
-const [index,setIndex]=useState(0),[answer,setAnswer]=useState<string|null>(null),[playing,setPlaying]=useState(false);
-const current=chapters[index];
-const sceneImage='/scene-'+String(index+1).padStart(2,'0')+'.jpg';
-function speak(){if(typeof window==='undefined'||!('speechSynthesis' in window))return;window.speechSynthesis.cancel();const utterance=new SpeechSynthesisUtterance(current.voice+' '+current.lesson);utterance.lang='en-GB';utterance.rate=.89;utterance.onend=()=>setPlaying(false);utterance.onerror=()=>setPlaying(false);setPlaying(true);window.speechSynthesis.speak(utterance)}
-function stop(){if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();setPlaying(false)}
-function move(next:number){stop();setIndex(Math.max(0,Math.min(chapters.length-1,next)));setAnswer(null)}
-return <main style={{background:'radial-gradient(ellipse at 80% 0%,#30201a,#0b1428 44%,#040913 100%)',minHeight:'100vh',color:'#f4f7ff',fontFamily:'Arial,sans-serif'}}>
-<div style={{maxWidth:1180,margin:'auto',padding:'25px 18px 100px'}}>
-<nav style={{display:'flex',gap:18,flexWrap:'wrap',fontSize:12,letterSpacing:1.3,fontWeight:800}}><Link style={{color:'#90dafa'}} href="/comics">← COMICS LIBRARY</Link><Link style={{color:'#90dafa'}} href="/showrooms/the-consequence-wars">EPISODE 1</Link><Link style={{color:'#90dafa'}} href="/showrooms">ALL SHOWROOMS</Link></nav>
-<header style={{padding:'65px 0 32px'}}>
-<p style={{fontSize:12,letterSpacing:3,color:'#ffce77',fontWeight:900}}>TA-14 ORIGINAL GRAPHIC STORIES · SEASON ONE · EPISODE 02</p>
-<h1 style={{fontSize:'clamp(46px,8vw,105px)',lineHeight:.98,letterSpacing:-3,margin:'20px 0',fontWeight:900}}>THE AIR THAT<br/><span style={{color:'#ffb36b'}}>BETRAYED THEM</span></h1>
-<p style={{fontSize:'clamp(18px,2.2vw,25px)',color:'#c9d6e8',maxWidth:790,lineHeight:1.5}}>When the solution becomes the threat. An elementary school. A wildfire. A helpful intelligence with incomplete information. One decision that must not be rushed.</p>
-<p style={{fontSize:13,color:'#a7b6cc',maxWidth:850,lineHeight:1.7}}>Fictional educational experience. All readings, characters, commands and outcomes are illustrative. No real school, deployment, control intervention or independently validated protection is claimed.</p>
-</header>
-<section aria-label="Interactive comic chapters" style={{border:'1px solid #51617c',borderRadius:24,overflow:'hidden',boxShadow:'0 35px 90px #0009'}}>
-<div style={{background:'linear-gradient(100deg,#07152b,#1a2239)',padding:'17px 24px',display:'flex',justifyContent:'space-between',gap:10,flexWrap:'wrap',alignItems:'center'}}><strong style={{color:'#ffcc79',letterSpacing:1.6,fontSize:12}}>THE CONSEQUENCE WARS · 02</strong><span style={{fontSize:13,color:'#b8c8db'}}>SCENE {String(index+1).padStart(2,'0')} OF 10</span></div>
-<div style={{background:'#050b17',padding:'12px',display:'flex',justifyContent:'center',borderBottom:'1px solid #3e526b'}}><img key={sceneImage} src={sceneImage} alt={'Illustrated comic artwork for scene '+(index+1)+': '+current.title} loading="eager" style={{display:'block',width:'100%',maxWidth:1050,height:'auto',objectFit:'contain',borderRadius:8}} /></div>
-<div style={{minHeight:420,background:'radial-gradient(ellipse at 65% 30%, '+current.accent+'25,transparent 55%),linear-gradient(135deg,#111f38,#090d19)',padding:'clamp(26px,5vw,64px)',display:'flex',flexDirection:'column',justifyContent:'center',position:'relative'}}>
-<div style={{fontSize:12,fontWeight:900,letterSpacing:2,color:current.accent}}>{current.eyebrow}</div>
-<div style={{fontSize:'clamp(45px,8vw,92px)',fontWeight:900,lineHeight:1.02,letterSpacing:-2,maxWidth:900,margin:'20px 0',textShadow:'0 6px 22px #000'}}>{current.title}</div>
-<div style={{fontSize:85,color:current.accent,opacity:.8,position:'absolute',right:30,bottom:12}} aria-hidden="true">{current.icon}</div>
-<p style={{fontSize:'clamp(17px,2vw,23px)',lineHeight:1.6,maxWidth:780,zIndex:1,marginBottom:0}}>{current.voice}</p>
-</div>
-<div style={{background:'#0b1a30',padding:'22px 26px',borderTop:'1px solid #3e526b'}}>
-<p style={{color:'#ffcc79',fontSize:12,fontWeight:900,letterSpacing:1.5}}>WHAT THIS SCENE TEACHES</p><p style={{lineHeight:1.65,color:'#d4e0ed'}}>{current.lesson}</p>
-<div style={{display:'flex',gap:10,flexWrap:'wrap',marginTop:22}}>
-<button onClick={()=>move(index-1)} disabled={index===0} style={{padding:'12px 20px',background:'#1e344d',border:'1px solid #4b6989',color:'#fff',borderRadius:9,cursor:'pointer',opacity:index===0?.5:1}}>← PREVIOUS</button>
-<button onClick={()=>move(index+1)} disabled={index===9} style={{padding:'12px 20px',background:'#9fe4f7',border:0,color:'#0b1727',fontWeight:900,borderRadius:9,cursor:'pointer',opacity:index===9?.5:1}}>NEXT SCENE →</button>
-<button onClick={playing?stop:speak} style={{padding:'12px 20px',background:'#1e344d',border:'1px solid #4b6989',color:'#fff',borderRadius:9,cursor:'pointer'}}>{playing?'■ STOP NARRATION':'▶ PLAY NARRATION'}</button>
-</div>
-</div>
-</section>
-<div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(65px,1fr))',gap:8,margin:'20px 0 55px'}}>{chapters.map((ch,i)=><button key={i} aria-label={'Go to scene '+(i+1)+': '+ch.title} onClick={()=>move(i)} style={{border:'1px solid '+(index===i?'#ffe0a0':'#465a75'),borderRadius:8,background:index===i?'#4a3641':'#14223a',color:'#fff',padding:'12px 4px',fontWeight:900,cursor:'pointer'}}>{String(i+1).padStart(2,'0')}</button>)}</div>
-<section style={{border:'1px solid #526a87',background:'#101e33',borderRadius:20,padding:'clamp(22px,4vw,42px)'}}>
-<p style={{color:'#ffcc79',fontWeight:900,fontSize:12,letterSpacing:2}}>YOUR TURN · THE EXECUTION CHALLENGE</p><h2 style={{fontSize:'clamp(25px,4vw,43px)',margin:'12px 0'}}>The school’s CO₂ is high. Outdoor smoke evidence is missing from the action packet. PROMPTOR recommends increasing the outdoor-air damper.</h2>
-<p style={{color:'#c8d5e5',fontSize:18}}>What should the execution gate do with this specific proposed command?</p>
-<div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'22px 0'}}>{decisions.map(d=><button key={d} onClick={()=>setAnswer(d)} style={{padding:'15px 26px',borderRadius:10,border:'1px solid '+(answer===d?'#ffdc8b':'#4a607a'),background:answer===d?'#49392c':'#1d2b43',color:'#fff',fontWeight:900,cursor:'pointer'}}>{d}</button>)}</div>
-{answer&&<div role="status" style={{padding:20,borderRadius:12,background:answer==='HOLD'?'#173e35':'#432c30',border:'1px solid '+(answer==='HOLD'?'#53caa5':'#d68c8c')}}><strong>{answer==='HOLD'?'CORRECT — HOLD THE PROPOSED CHANGE':'NOT FOR THIS REQUEST — RECONSIDER'}</strong><p style={{lineHeight:1.7,marginBottom:0}}>The proposed damper increase lacks a sufficient verified environmental evidence packet. HOLD prevents this specific change from executing while qualified personnel assess the wildfire conditions, filtration, ventilation requirements and authorized alternatives. A HOLD is not permission to ignore elevated CO₂ or to shut ventilation down indefinitely.</p></div>}
-</section>
-<section style={{marginTop:40,color:'#b8c7d9',lineHeight:1.75}}><h2 style={{color:'#fff'}}>The boundary is the lesson.</h2><p>Atmospheric Integrity Records examine the evidence. Admissible Computation examines the model. Environmental Integrity Governance examines combined consequences. Admissible Execution Architecture determines whether the proposed consequence has admissible evidence, applicable authority and established standing now.</p><p><strong style={{color:'#ffe2a4'}}>Monitoring can identify a problem. It cannot, by itself, authorize the solution.</strong></p><p style={{fontSize:13}}>This illustrated interactive edition presents ten selected comic images with narration and a decision challenge. The illustrations and all depicted values are fictional and educational; artwork labels do not constitute verified environmental evidence.</p></section>
-</div></main>
+  const [answer,setAnswer]=useState<string|null>(null);
+  const [speaking,setSpeaking]=useState<number|null>(null);
+  function stop(){
+    if(typeof window!=='undefined'&&'speechSynthesis' in window)window.speechSynthesis.cancel();
+    setSpeaking(null);
+  }
+  function narrate(index:number){
+    if(typeof window==='undefined'||!('speechSynthesis' in window))return;
+    if(speaking===index){stop();return;}
+    window.speechSynthesis.cancel();
+    const utterance=new SpeechSynthesisUtterance(scenes[index].voice+' '+scenes[index].lesson);
+    utterance.lang='en-US';
+    utterance.rate=.9;
+    utterance.onend=()=>setSpeaking(null);
+    utterance.onerror=()=>setSpeaking(null);
+    setSpeaking(index);
+    window.speechSynthesis.speak(utterance);
+  }
+  return <main style={{background:'radial-gradient(ellipse at 80% 0%,#30201a,#0b1428 42%,#040913 100%)',minHeight:'100vh',color:'#f4f7ff',fontFamily:'Arial,sans-serif'}}>
+    <div style={{maxWidth:1160,margin:'auto',padding:'26px 18px 100px'}}>
+      <nav style={{display:'flex',flexWrap:'wrap',gap:20,fontSize:12,letterSpacing:1.2,fontWeight:800}}>
+        <Link href="/comics" style={{color:'#90dafa'}}>← COMICS LIBRARY</Link>
+        <Link href="/showrooms/the-consequence-wars" style={{color:'#90dafa'}}>EPISODE 1</Link>
+        <Link href="/showrooms" style={{color:'#90dafa'}}>ALL SHOWROOMS</Link>
+      </nav>
+      <header style={{padding:'65px 0 40px'}}>
+        <p style={{color:'#ffd38b',fontSize:12,letterSpacing:2.4,fontWeight:900}}>TA-14 ORIGINAL GRAPHIC STORIES · SEASON ONE · EPISODE 02</p>
+        <h1 style={{fontSize:'clamp(40px,7.5vw,94px)',lineHeight:1.02,letterSpacing:-2,margin:'20px 0',fontWeight:900}}>THE AIR THAT<br/><span style={{color:'#ffb36b'}}>BETRAYED THEM</span></h1>
+        <p style={{fontSize:'clamp(18px,2.4vw,25px)',maxWidth:870,lineHeight:1.5,color:'#d3deec'}}>A school. A wildfire. Two environmental concerns. One shared responsibility.</p>
+        <p style={{maxWidth:880,color:'#b8c9de',lineHeight:1.7}}>PROMPTOR and AEGIS work together. The original unsupported damper command receives HOLD. A different intervention can proceed only through renewed evidence, authority, standing and verification.</p>
+        <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'28px 0'}}>
+          <a href="#scene-01" style={{background:'#ffcc79',color:'#091529',fontWeight:900,padding:'14px 22px',borderRadius:9,textDecoration:'none'}}>READ ALL TEN SCENES ↓</a>
+          <a href={pdf} target="_blank" rel="noopener noreferrer" style={{border:'1px solid #66839d',color:'#e9f5ff',fontWeight:800,padding:'14px 22px',borderRadius:9,textDecoration:'none'}}>OPEN ILLUSTRATED PDF ↗</a>
+        </div>
+        <p style={{fontSize:13,color:'#a3b4cb',lineHeight:1.65}}>Fictional educational simulation. All readings, characters, commands and outcomes are illustrative. Artwork labels are not field-validated evidence or occupant-safety certification. Editorial explanations below clarify where the pictures simplify or contradict execution logic.</p>
+      </header>
+      <div style={{display:'flex',flexDirection:'column',gap:42}}>
+        {scenes.map((scene,index)=>{
+          const file='/scene-'+String(index+1).padStart(2,'0')+'.jpg';
+          return <section id={'scene-'+String(index+1).padStart(2,'0')} key={index} aria-label={'Scene '+(index+1)+': '+scene.title} style={{background:'#0b172a',border:'1px solid #344e6b',borderRadius:18,overflow:'hidden',boxShadow:'0 16px 55px #0007'}}>
+            <div style={{background:'linear-gradient(100deg,#0e213b,#1a2035)',padding:'18px 24px',display:'flex',gap:10,justifyContent:'space-between',flexWrap:'wrap',alignItems:'center'}}>
+              <strong style={{fontSize:12,letterSpacing:1.8,color:scene.accent}}>{scene.eyebrow}</strong><span style={{color:'#b9c9dc',fontSize:13}}>SCENE {String(index+1).padStart(2,'0')} / 10</span>
+            </div>
+            <img src={file} alt={'Episode 2 illustrated scene '+(index+1)+': '+scene.title} loading={index===0?'eager':'lazy'} style={{display:'block',width:'100%',height:'auto'}}/>
+            <div style={{padding:'clamp(22px,4vw,42px)'}}>
+              <h2 style={{fontSize:'clamp(27px,4vw,42px)',margin:'0 0 18px',color:'#fff'}}>{scene.title}</h2>
+              <p style={{fontSize:'clamp(16px,1.8vw,19px)',lineHeight:1.75,color:'#e2eaf5'}}>{scene.voice}</p>
+              <div style={{borderLeft:'4px solid '+scene.accent,padding:'6px 0 6px 18px',margin:'22px 0',color:'#c9d8e8',lineHeight:1.65}}>
+                <strong style={{color:scene.accent}}>WHAT WE JUST LEARNED</strong><p style={{margin:'8px 0 0'}}>{scene.lesson}</p>
+              </div>
+              <button onClick={()=>narrate(index)} style={{background:'#213a56',border:'1px solid #6c8bab',borderRadius:9,padding:'11px 18px',color:'#fff',fontWeight:800,cursor:'pointer'}}>{speaking===index?'■ STOP NARRATION':'▶ LISTEN TO THIS SCENE'}</button>
+            </div>
+          </section>;
+        })}
+      </div>
+      <section style={{marginTop:55,background:'#101f36',border:'1px solid #49617f',borderRadius:18,padding:'clamp(22px,4vw,42px)'}}>
+        <p style={{fontSize:12,letterSpacing:2,color:'#ffcc79',fontWeight:900}}>THE EXECUTION CHALLENGE</p>
+        <h2 style={{fontSize:'clamp(24px,3.6vw,38px)'}}>Classroom CO₂ is elevated, but the proposed damper increase lacks sufficient outdoor-smoke evidence. What happens to that original command?</h2>
+        <div style={{display:'flex',flexWrap:'wrap',gap:12,margin:'20px 0'}}>
+          {decisions.map(d=><button key={d} onClick={()=>setAnswer(d)} style={{padding:'14px 24px',border:'1px solid '+(answer===d?'#ffe0a3':'#526b8b'),borderRadius:9,color:'#fff',background:answer===d?'#4b3b29':'#23364d',fontWeight:900,cursor:'pointer'}}>{d}</button>)}
+        </div>
+        {answer&&<div role="status" style={{padding:20,borderRadius:12,background:answer==='HOLD'?'#173d35':'#432c30',lineHeight:1.7}}>
+          <strong>{answer==='HOLD'?'CORRECT — HOLD THE ORIGINAL DAMPPER CHANGE'.replace('DAMPPER','DAMPER'):'NOT FOR THIS SPECIFIC COMMAND'}</strong>
+          <p>The original increase must not execute without sufficient evidence, applicable authority and established standing. Qualified personnel should assess protective options. A later, separately justified action may receive its own decision; the initial HOLD does not automatically become ALLOW.</p>
+        </div>}
+      </section>
+      <footer style={{marginTop:40,lineHeight:1.7,color:'#b6c8d9'}}>
+        <h2 style={{color:'#fff'}}>Intelligence and governance — together for the children.</h2>
+        <p>Atmospheric Integrity Records (AIR) examine measurement provenance and continuity. Environmental Integrity Governance (EIG) examines combined consequences. Admissible Execution Architecture (AEA), implemented through TA-14 AuthorityGate, evaluates Admissible Evidence (AE), Applicable Authority (AA), and Established Standing (ES) at execution time.</p>
+        <p><a href={pdf} target="_blank" rel="noopener noreferrer" style={{color:'#ffcc79',fontWeight:800}}>Read or download the 11-page illustrated PDF ↗</a></p>
+        <p style={{fontSize:13}}>This comic is fiction for education, not operational guidance. No depicted value, result or safety declaration is independently verified.</p>
+      </footer>
+    </div>
+  </main>;
 }
