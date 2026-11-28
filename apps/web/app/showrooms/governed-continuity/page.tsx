@@ -79,7 +79,7 @@ const cases: {label:string; description:string; expected:Decision; explanation:s
   {label:'Unresolved exceptional scope', description:'A novel safety exception needs a policy-designated supervisor to determine scope.', expected:'ESCALATE', explanation:'The request cannot proceed until the designated authority completes its review.'},
   {label:'All prerequisites established', description:'Current evidence, scoped authorization, established standing and required safeguards are all stipulated valid.', expected:'ALLOW', explanation:'Only the narrowly described synthetic action is permitted; outcome verification remains separate.'}
 ];
-const learningTransitions = ["Next, examine what happens when the founder retires and undocumented knowledge or authority must pass to someone else.","Next, take the buyer’s perspective: what records would make the enterprise independently examinable?","Next, explore how HPR and AIR can preserve attributable technical and environmental evidence.","Next, distinguish reliable evidence from the authority and standing required to act on it.","Next, examine how AuthorityGate represents the execution boundary through ALLOW, HOLD, DENY and ESCALATE.","Next, test the policy intent of revoking obsolete founder permissions and establishing successor standing.","Next, consider what an enterprise could look like when accountability no longer depends on one individual.","Move from conceptual illustration to independent testing of evidence, delegation, revocation, standing, record continuity, bypass resistance and outcome verification."];
+const learningTransitions = ["Next, examine what happens when the founder retires and undocumented knowledge or authority must pass to someone else.","Next, take the buyer’s perspective: what records would make the enterprise independently examinable?","Next, explore how HPR and AIR can preserve attributable technical and environmental evidence.","Next, distinguish reliable evidence from the authority and standing required to act on it.","Next, examine how AuthorityGate represents the execution boundary through ALLOW, HOLD, DENY and ESCALATE.","Next, test the policy intent of revoking obsolete founder permissions and establishing successor standing.","Next, consider what an enterprise could look like when accountability no longer depends on one individual.","Next, examine the proposed six-part 30-day founder-absence methodology, including independent reconstruction and execution-time authority continuity."];
 const shadowCase = {description:'A senior technician encounters a proposed $2,800 compressor replacement on Friday. Their delegated approval limit is $1,000. The retired founder texts: Just take care of them and we will sort the paperwork Monday. What should the technician and dispatcher do?', expected:'ESCALATE' as Decision, explanation:'Hold the replacement pending review by the currently designated approver. The retired founder has no current approval standing in this fixture. Preserve the text, diagnostic baseline, proposed scope and escalation record. Independently authorized emergency protective measures may proceed only within their own scope. Re-evaluate evidence, authority and standing before release, then verify actual work and outcomes.'};
 const choices:Decision[]=['ALLOW','HOLD','DENY','ESCALATE'];
 const referencePdf = '/' + encodeURIComponent('TA14_Governed_Continuity_v0.2 (1).pdf');
@@ -134,7 +134,7 @@ export default function GovernedContinuityShowroom() {
       : 'The successor has a new scoped delegation in this fictional fixture. All other prerequisites are stipulated valid.';
   return <main className="gc">
     <div className="gc-shell">
-      <nav className="gc-nav"><Link href="/showrooms">← TA-14 showroom library</Link><span>INDEPENDENT EDUCATIONAL EXAMINATION · WEB REVISION 0.2</span></nav>
+      <nav className="gc-nav"><Link href="/showrooms">← TA-14 showroom library</Link><span>INDEPENDENT EDUCATIONAL EXAMINATION · WEB REVISION 0.3</span></nav>
       <header className="gc-hero">
         <p className="gc-eyebrow">TA-14 AUTHORITY GOVERNANCE INSTITUTION · FGAI AREA OF EXAMINATION</p>
         <h1>Governed <em>Continuity</em></h1>
@@ -200,6 +200,27 @@ export default function GovernedContinuityShowroom() {
           <section className="gc-lesson" aria-label="Learning recap"><h3>What We Just Learned</h3><p>{exhibit.lesson}</p></section>
           <section className="gc-transcript" aria-label="Learning transition" style={{marginTop:16,borderLeft:'4px solid #d5b66e'}}><h3>{index===7?'Where We Go From Here':"What We're About to Learn"}</h3><p>{learningTransitions[index]}</p>{index<7&&<a href={'#exhibit-'+(index+2)}>Continue to Exhibit {String(index+2).padStart(2,'0')} →</a>}</section>
         </article>)}
+      </section>
+
+      <section className="gc-footer-panel" id="founder-absence-examination" aria-label="Proposed 30-day founder-absence examination">
+        <p className="gc-eyebrow">PROPOSED EXAMINATION · 30 DAYS · SIX CRITERIA</p>
+        <h2>Can the institution stand alone?</h2>
+        <p>Revenue demonstrates commercial activity. Governed continuity examines institutional maturity. The founder’s absence must not create an authority vacuum or transfer all dependency to the successor.</p>
+        <ol>
+          <li><strong>Decision dependency — Escalation and override log.</strong> Record exceptions by trigger and role. No unauthorized founder approvals; all observed exceptions must be attributable.</li>
+          <li><strong>Technical continuity — Baseline-to-verification job audits.</strong> Sample completed work orders for required diagnostic evidence, reasoning, authorized intervention and verified outcomes.</li>
+          <li><strong>Distributed authority — Role-bound authority matrix.</strong> Examine whether sampled consequential actions fall within documented, current delegation and scope.</li>
+          <li><strong>Exception governance — Controlled pressure drills.</strong> Examine informal approvals, warranty commitments, emergency scope and financial pressure. All staged unauthorized requests must receive the appropriate HOLD, DENY or ESCALATE response.</li>
+          <li><strong>Independent reconstruction — Third-party review.</strong> An independent reviewer reconstructs five sampled job histories without founder or successor assistance, identifying evidence, actor, authority, intervention and outcome.</li>
+          <li><strong>Authority continuity — Execution boundary examination.</strong> Test expired, revoked, superseded and inapplicable authorizations, changed evidence and standing. None may justify execution within the examined boundary. Renew justification before release.</li>
+        </ol>
+        <h3>Proposed examination timeline</h3>
+        <p>Days 01–05: establish baseline, scope and acceptance criteria. Days 06–20: observe operations and preserve evidence. Days 21–25: conduct controlled exception drills. Days 26–30: independently reconstruct records and issue bounded findings.</p>
+        <p>Maintain qualified escalation coverage and separately authorized emergency protective measures throughout. Define sampling, evidence sufficiency and test conditions before examination; never stage unsafe physical interventions.</p>
+        <h3>Reporting outcomes</h3>
+        <p><strong>DEMONSTRATED</strong> — scoped criteria satisfied; <strong>PARTIALLY DEMONSTRATED</strong> — some criteria satisfied with material gaps; <strong>NOT DEMONSTRATED</strong> — examined requirements not established; <strong>NOT EXAMINED</strong> — insufficient examination to determine an outcome.</p>
+        <p>The first five operational artifacts were proposed by Sandrea West, founder of The Infinite Knowledge Group. The sixth execution-time authority criterion extends the examination through TA-14’s governance architecture.</p>
+        <p className="gc-small">Proposed educational methodology only. No live founder-absence examination, certification, valuation effect, commercial alliance or production enforcement is established. Findings would be limited to the sampled scope and observed conditions.</p>
       </section>
 
       <section className="gc-footer-panel">
