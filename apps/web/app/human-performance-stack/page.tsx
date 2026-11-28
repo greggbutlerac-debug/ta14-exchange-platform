@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import IllustratedExhibits from './IllustratedExhibits';
 import { useMemo, useState } from 'react';
 
 type State = 'established' | 'missing' | 'changed';
@@ -92,7 +93,7 @@ export default function HumanPerformanceStackShowroom(){
       <h1>THE MOMENT<br/><em>BEFORE HUMAN ACTION</em><br/>BECOMES CONSEQUENCE.</h1>
       <p className="lead">A human-facing execution architecture for high-consequence moments. The system creates a pause. The system shows what matters. <b>The human chooses and acts.</b> The record saves the truth of the moment.</p>
       <div className="doctrine"><strong>THE HUMAN REMAINS THE ACTOR.</strong><span>THE SYSTEM GUIDES.</span><span>THE RECORD PRESERVES THE TRUTH.</span><span>THE OUTCOME BECOMES REVIEWABLE.</span></div>
-      <div className="actions"><a href="#exam">RUN THE HUMAN-ACTION EXAM ↓</a><a className="secondary" href="https://www.amazon.com/dp/B0H732NR2F" target="_blank" rel="noreferrer">READ THE MASTER EDITION ↗</a></div>
+      <div className="actions"><a href="#illustrated-examination">EXPLORE EIGHT ILLUSTRATED EXHIBITS ↓</a><a className="secondary" href="#exam">RUN THE HUMAN-ACTION EXAM ↓</a><a className="secondary" href="https://www.amazon.com/dp/B0H732NR2F" target="_blank" rel="noreferrer">READ THE MASTER EDITION ↗</a></div>
     </header>
 
     <section className="question">
@@ -100,6 +101,8 @@ export default function HumanPerformanceStackShowroom(){
       <h2>Does this proposed consequence have sufficient <em>Admissible Evidence</em>, <em>Applicable Authority</em>, and <em>Established Standing</em> to become reality <u>NOW</u>?</h2>
       <p>HPS applies that question at the human edge. It does not remove judgment. It makes the pre-action moment inspectable enough that assistance does not silently become authority.</p>
     </section>
+
+    <IllustratedExhibits/>
 
     <section className="chain"><p className="eyebrow">THE HUMAN PERFORMANCE EXECUTION CHAIN</p><div className="chainGrid">{moments.map(([n,t,c])=><article key={n}><span>{n}</span><h3>{t}</h3><p>{c}</p></article>)}</div></section>
 
