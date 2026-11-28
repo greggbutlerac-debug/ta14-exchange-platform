@@ -76,7 +76,7 @@ const iraqCases:Case[]=[
  {title:'الحاجة إلى جهة مختصة أخرى',prompt:'يستلزم الإجراء البيئي المقترح مراجعة جهة محددة وفق متطلب موثق. ما المسار الصحيح؟',answer:'ESCALATE',reason:'تُحال المسألة إلى الجهة المخولة مع حفظ السجل والقرار المعلّق؛ الإحالة ليست إذناً بالتنفيذ.'}
 ];
 const arabicDecisions:Record<string,string>={ALLOW:'السماح',HOLD:'التعليق',DENY:'الرفض',ESCALATE:'الإحالة'};
-const excluded=['the-consequence-wars','bruno-tudal','john-kay','anto-budiardjo','eight24-solutions','founding-institutional-sponsorship','environmental-atmospheric','prediction-is-not-permission'];
+const excluded=['the-consequence-wars','bruno-tudal','john-kay','anto-budiardjo','eight24-solutions','founding-institutional-sponsorship','environmental-atmospheric','prediction-is-not-permission','admissible-consequence-governance'];
 function topicFor(path:string){const slug=path.split('/').filter(Boolean).slice(1).join('/');const key=Object.keys(topics).find(k=>slug.includes(k));return key?topics[key]:'the proposed operational consequence';}
 export default function ShowroomReviewChallenge({embedded=false}:{embedded?:boolean}={}){
  const path=usePathname()||'';
